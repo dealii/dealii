@@ -752,6 +752,32 @@ namespace VectorTools
       return true;
     }
 
+    template <typename number>
+    void invert_mass_matrix(const SparseMatrix<number> &mass_matrix,
+                            const Vector<number> &rhs,
+                            Vector<number> &solution)
+    {
+      // Allow for a maximum of 5*n steps to reduce the residual by 10^-12. n
+      // steps may not be sufficient, since roundoff errors may accumulate for
+      // badly conditioned matrices
+      ReductionControl      control(5*rhs.size(), 0., 1e-12, false, false);
+      GrowingVectorMemory<Vector<number> > memory;
+      SolverCG<Vector<number> >            cg(control,memory);
+
+      PreconditionSSOR<SparseMatrix<number> > prec;
+      prec.initialize(mass_matrix, 1.2);
+
+      cg.solve (mass_matrix, solution, rhs, prec);
+    }
+
+    template <typename number>
+    void invert_mass_matrix(const SparseMatrix<std::complex<number> > &/*mass_matrix*/,
+                            const Vector<std::complex<number> > &/*rhs*/,
+                            Vector<std::complex<number> > &/*solution*/)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+
 
     /**
      * Generic implementation of the project() function
@@ -825,18 +851,7 @@ namespace VectorTools
           constraints.condense(mass_matrix, tmp);
         }
 
-      // Allow for a maximum of 5*n steps to reduce the residual by 10^-12. n
-      // steps may not be sufficient, since roundoff errors may accumulate for
-      // badly conditioned matrices
-      ReductionControl      control(5*tmp.size(), 0., 1e-12, false, false);
-      GrowingVectorMemory<Vector<number> > memory;
-      SolverCG<Vector<number> >            cg(control,memory);
-
-      PreconditionSSOR<SparseMatrix<number> > prec;
-      prec.initialize(mass_matrix, 1.2);
-
-      cg.solve (mass_matrix, vec, tmp, prec);
-
+      invert_mass_matrix(mass_matrix,tmp,vec);
       constraints.distribute (vec);
 
       // copy vec into vec_result. we can't use vec_result itself above, since
@@ -2165,6 +2180,75 @@ namespace VectorTools
 
   namespace
   {
+    // keep the first argument non-reference since we use it
+    // with 1e-8 * number
+    template <typename number1, typename number2>
+    bool real_part_bigger_than(const number1 a,
+                               const number2 &b)
+    {
+      return a > b;
+    }
+
+    template <typename number1, typename number2>
+    bool real_part_bigger_than(const std::complex<number1> a,
+                               const std::complex<number2> &b)
+    {
+      Assert(std::abs(a.imag()) <= 1e-15*std::abs(a) , ExcInternalError());
+      Assert(std::abs(b.imag()) <= 1e-15*std::abs(b) , ExcInternalError());
+      return a.real() > b.real();
+    }
+
+    // this function is needed to get an idea where
+    // rhs.norm_sqr()  is too small for a given type.
+    template <typename number>
+    number min_number(const number &/*dummy*/)
+    {
+      return std::numeric_limits<number>::min();
+    }
+
+    // Sine rhs.norm_sqr() is non-negative real, in complex case we
+    // take the numeric limits of the underlying type used in std::complex<>.
+    template <typename number>
+    number min_number(const std::complex<number> &/*dummy*/)
+    {
+      return std::numeric_limits<number>::min();
+    }
+
+
+    template <typename number>
+    void invert_mass_matrix(const SparseMatrix<number> &mass_matrix,
+                            const FilteredMatrix<Vector<number> > &filtered_mass_matrix,
+                            FilteredMatrix<Vector<number> > &filtered_preconditioner,
+                            const Vector<number> &rhs,
+                            Vector<number> &boundary_projection)
+    {
+      // Allow for a maximum of 5*n steps to reduce the residual by 10^-12. n
+      // steps may not be sufficient, since roundoff errors may accumulate for
+      // badly conditioned matrices
+      ReductionControl        control(5*rhs.size(), 0., 1.e-12, false, false);
+      GrowingVectorMemory<Vector<number> > memory;
+      SolverCG<Vector<number> >            cg(control,memory);
+
+      PreconditionSSOR<SparseMatrix<number> > prec;
+      prec.initialize(mass_matrix, 1.2);
+      filtered_preconditioner.initialize(prec, true);
+      // solve
+      cg.solve (filtered_mass_matrix, boundary_projection, rhs, filtered_preconditioner);
+      filtered_preconditioner.apply_constraints(boundary_projection, true);
+      filtered_preconditioner.clear();
+    }
+
+    template <typename number>
+    void invert_mass_matrix(const SparseMatrix<std::complex<number> > &/*mass_matrix*/,
+                            const FilteredMatrix<Vector<std::complex<number> > > &/*filtered_mass_matrix*/,
+                            FilteredMatrix<Vector<std::complex<number> > > &/*filtered_preconditioner*/,
+                            const Vector<std::complex<number> > &/*rhs*/,
+                            Vector<std::complex<number> > &/*boundary_projection*/)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+
+
     template <int dim, int spacedim, template <int, int> class DoFHandlerType,
               template <int,int> class M_or_MC, template <int> class Q_or_QC, typename number>
     void
@@ -2292,13 +2376,18 @@ namespace VectorTools
       FilteredMatrix<Vector<number> > filtered_precondition;
       std::vector<bool> excluded_dofs(mass_matrix.m(), false);
 
+      // we assemble mass matrix with unit weight,
+      // thus it will be real-valued irrespectively of the underlying algebra
+      // with positive elements on diagonal.
+      // Thus in order to extend this filtering to complex-algebra simply take
+      // the real-part of element.
       number max_element = 0.;
       for (unsigned int i=0; i<mass_matrix.m(); ++i)
-        if (mass_matrix.diag_element(i) > max_element)
+        if (real_part_bigger_than(mass_matrix.diag_element(i),max_element))
           max_element = mass_matrix.diag_element(i);
 
       for (unsigned int i=0; i<mass_matrix.m(); ++i)
-        if (mass_matrix.diag_element(i) < 1.e-8 * max_element)
+        if (real_part_bigger_than(1.e-8 * max_element,mass_matrix.diag_element(i)))
           {
             filtered_mass_matrix.add_constraint(i, 0.);
             filtered_precondition.add_constraint(i, 0.);
@@ -2310,24 +2399,15 @@ namespace VectorTools
 
       // cannot reduce residual in a useful way if we are close to the square
       // root of the minimal double value
-      if (rhs.norm_sqr() < 1e28 * std::numeric_limits<number>::min())
+      if (rhs.norm_sqr() < 1e28 * min_number(number()))
         boundary_projection = 0;
       else
         {
-          // Allow for a maximum of 5*n steps to reduce the residual by 10^-12. n
-          // steps may not be sufficient, since roundoff errors may accumulate for
-          // badly conditioned matrices
-          ReductionControl        control(5*rhs.size(), 0., 1.e-12, false, false);
-          GrowingVectorMemory<Vector<number> > memory;
-          SolverCG<Vector<number> >              cg(control,memory);
-
-          PreconditionSSOR<SparseMatrix<number> > prec;
-          prec.initialize(mass_matrix, 1.2);
-          filtered_precondition.initialize(prec, true);
-          // solve
-          cg.solve (filtered_mass_matrix, boundary_projection, rhs, filtered_precondition);
-          filtered_precondition.apply_constraints(boundary_projection, true);
-          filtered_precondition.clear();
+          invert_mass_matrix(mass_matrix,
+                             filtered_mass_matrix,
+                             filtered_precondition,
+                             rhs,
+                             boundary_projection);
         }
       // fill in boundary values
       for (unsigned int i=0; i<dof_to_boundary_mapping.size(); ++i)

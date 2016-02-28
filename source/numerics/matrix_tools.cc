@@ -306,12 +306,12 @@ namespace MatrixCreator
                     {
                       if (data.coefficient->n_components==1)
                         for (unsigned int point=0; point<n_q_points; ++point)
-                          add_data += (phi_i[point] * phi_j[point] * JxW[point] *
-                                       data.coefficient_values[point]);
+                          add_data += (data.coefficient_values[point] *
+                                       phi_i[point] * phi_j[point] * JxW[point]);
                       else
                         for (unsigned int point=0; point<n_q_points; ++point)
-                          add_data += (phi_i[point] * phi_j[point] * JxW[point] *
-                                       data.coefficient_vector_values[point](component_i));
+                          add_data += (data.coefficient_vector_values[point](component_i) *
+                                       phi_i[point] * phi_j[point] * JxW[point]);
                     }
                   else
                     for (unsigned int point=0; point<n_q_points; ++point)
@@ -328,12 +328,12 @@ namespace MatrixCreator
                 add_data = 0;
                 if (data.rhs_function->n_components==1)
                   for (unsigned int point=0; point<n_q_points; ++point)
-                    add_data += phi_i[point] * JxW[point] *
-                                data.rhs_values[point];
+                    add_data += data.rhs_values[point] *
+                                phi_i[point] * JxW[point];
                 else
                   for (unsigned int point=0; point<n_q_points; ++point)
-                    add_data += phi_i[point] * JxW[point] *
-                                data.rhs_vector_values[point](component_i);
+                    add_data += data.rhs_vector_values[point](component_i) *
+                                phi_i[point] * JxW[point];
                 copy_data.cell_rhs(i) = add_data;
               }
           }
@@ -352,16 +352,16 @@ namespace MatrixCreator
                         {
                           if (data.coefficient->n_components==1)
                             for (unsigned int point=0; point<n_q_points; ++point)
-                              add_data += (fe_values.shape_value_component(i,point,comp_i) *
+                              add_data += (data.coefficient_values[point] *
+                                           fe_values.shape_value_component(i,point,comp_i) *
                                            fe_values.shape_value_component(j,point,comp_i) *
-                                           JxW[point] *
-                                           data.coefficient_values[point]);
+                                           JxW[point]);
                           else
                             for (unsigned int point=0; point<n_q_points; ++point)
-                              add_data += (fe_values.shape_value_component(i,point,comp_i) *
+                              add_data += (data.coefficient_vector_values[point](comp_i) *
+                                           fe_values.shape_value_component(i,point,comp_i) *
                                            fe_values.shape_value_component(j,point,comp_i) *
-                                           JxW[point] *
-                                           data.coefficient_vector_values[point](comp_i));
+                                           JxW[point]);
                         }
                       else
                         for (unsigned int point=0; point<n_q_points; ++point)
@@ -381,12 +381,14 @@ namespace MatrixCreator
                     {
                       if (data.rhs_function->n_components==1)
                         for (unsigned int point=0; point<n_q_points; ++point)
-                          add_data += fe_values.shape_value_component(i,point,comp_i) *
-                                      JxW[point] * data.rhs_values[point];
+                          add_data += data.rhs_values[point] *
+                                      fe_values.shape_value_component(i,point,comp_i) *
+                                      JxW[point];
                       else
                         for (unsigned int point=0; point<n_q_points; ++point)
-                          add_data += fe_values.shape_value_component(i,point,comp_i) *
-                                      JxW[point] * data.rhs_vector_values[point](comp_i);
+                          add_data += data.rhs_vector_values[point](comp_i) *
+                                      fe_values.shape_value_component(i,point,comp_i) *
+                                      JxW[point];
                     }
                 copy_data.cell_rhs(i) = add_data;
               }
@@ -1964,7 +1966,7 @@ namespace MatrixTools
     // there is no such thing
     number first_nonzero_diagonal_entry = 1;
     for (unsigned int i=0; i<n_dofs; ++i)
-      if (matrix.diag_element(i) != 0)
+      if (matrix.diag_element(i) != number())
         {
           first_nonzero_diagonal_entry = matrix.diag_element(i);
           break;
@@ -2002,7 +2004,7 @@ namespace MatrixTools
         // store the new rhs entry to make
         // the gauss step more efficient
         number new_rhs;
-        if (matrix.diag_element(dof_number) != 0.0)
+        if (matrix.diag_element(dof_number) != number())
           {
             new_rhs = dof->second * matrix.diag_element(dof_number);
             right_hand_side(dof_number) = new_rhs;
@@ -2076,7 +2078,7 @@ namespace MatrixTools
                                    "function, see the documentation."));
 
                 // correct right hand side
-                right_hand_side(row) -= p->value() /
+                right_hand_side(row) -= static_cast<number>(p->value()) /
                                         diagonal_entry * new_rhs;
 
                 // set matrix entry to zero
@@ -2399,7 +2401,7 @@ namespace MatrixTools
             // figure out which rows of the matrix we
             // have to eliminate on this processor
             std::vector<types::global_dof_index> constrained_rows;
-            for (std::map<types::global_dof_index,double>::const_iterator
+            for (std::map<types::global_dof_index,PetscScalar>::const_iterator
                  dof  = boundary_values.begin();
                  dof != boundary_values.end();
                  ++dof)
@@ -2422,7 +2424,7 @@ namespace MatrixTools
 
             std::vector<types::global_dof_index> indices;
             std::vector<PetscScalar>  solution_values;
-            for (std::map<types::global_dof_index,double>::const_iterator
+            for (std::map<types::global_dof_index,PetscScalar>::const_iterator
                  dof  = boundary_values.begin();
                  dof != boundary_values.end();
                  ++dof)
@@ -2522,7 +2524,7 @@ namespace MatrixTools
               block++;
             }
           const types::global_dof_index index = dof->first - offset;
-          block_boundary_values[block].insert(std::pair<types::global_dof_index, double> (index,dof->second));
+          block_boundary_values[block].insert(std::pair<types::global_dof_index, PetscScalar> (index,dof->second));
         }
     }
 
@@ -2928,54 +2930,5 @@ namespace MatrixTools
 // explicit instantiations
 #include "matrix_tools.inst"
 
-namespace MatrixTools
-{
-  template
-  void
-  apply_boundary_values<double> (const std::map<types::global_dof_index,double> &boundary_values,
-                                 SparseMatrix<double>  &matrix,
-                                 Vector<double>   &solution,
-                                 Vector<double>   &right_hand_side,
-                                 const bool        eliminate_columns);
-
-  template
-  void
-  apply_boundary_values<long double> (const std::map<types::global_dof_index,long double> &boundary_values,
-                                      SparseMatrix<long double>  &matrix,
-                                      Vector<long double>   &solution,
-                                      Vector<long double>   &right_hand_side,
-                                      const bool        eliminate_columns);
-
-  template
-  void
-  apply_boundary_values<float> (const std::map<types::global_dof_index,float> &boundary_values,
-                                SparseMatrix<float>  &matrix,
-                                Vector<float>   &solution,
-                                Vector<float>   &right_hand_side,
-                                const bool        eliminate_columns);
-
-  template
-  void
-  apply_boundary_values<long double> (const std::map<types::global_dof_index,long double> &boundary_values,
-                                      BlockSparseMatrix<long double>  &matrix,
-                                      BlockVector<long double>   &solution,
-                                      BlockVector<long double>   &right_hand_side,
-                                      const bool        eliminate_columns);
-
-  template
-  void
-  apply_boundary_values<double> (const std::map<types::global_dof_index,double> &boundary_values,
-                                 BlockSparseMatrix<double>  &matrix,
-                                 BlockVector<double>   &solution,
-                                 BlockVector<double>   &right_hand_side,
-                                 const bool        eliminate_columns);
-  template
-  void
-  apply_boundary_values<float> (const std::map<types::global_dof_index,float> &boundary_values,
-                                BlockSparseMatrix<float>  &matrix,
-                                BlockVector<float>   &solution,
-                                BlockVector<float>   &right_hand_side,
-                                const bool        eliminate_columns);
-}
 
 DEAL_II_NAMESPACE_CLOSE
