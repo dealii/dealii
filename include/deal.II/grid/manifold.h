@@ -338,12 +338,12 @@ public:
   /// @}
 
   /**
-   * @name Computing direction vectors
+   * @name Computing tangent vectors
    */
   /// @{
 
   /**
-   * Return a "direction" vector that, at $\mathbf x_1$, is tangential to
+   * Return a vector that, at $\mathbf x_1$, is tangential to
    * the geodesic that connects two points $\mathbf x_1,\mathbf x_2$. The geodesic
    * is the shortest line between these two points, where "shortest" is defined
    * via a metric specific to a particular implementation of this class in a
@@ -354,6 +354,16 @@ public:
    * a higher dimensional space (e.g., the surface of a sphere), then the
    * direction vector is tangential to the surface, and consequently may point in
    * a different direction than the straight line that connects the two points.
+   *
+   * While tangent vectors are often normalized to unit length, the vectors
+   * returned by this function are normalized as described in the introduction
+   * of this class. Specifically, if $\mathbf s(t)$ traces out the geodesic
+   * between the two points where $\mathbf x_1 = \mathbf s(0)$ and
+   * $\mathbf x_2 = \mathbf s(1)$, then the returned vector must equal
+   * $\mathbf s'(0)$. In other words, the norm of the returned vector also
+   * encodes, in some sense, the <i>length</i> of the geodesic because a curve
+   * $\mathbf s(t)$ must move "faster" if the two points it connects between
+   * arguments $t=0$ and $t=1$ are farther apart.
    *
    * This function is used, among other cases, in computing normal vectors to
    * faces or, more generally, surfaces such as the boundary. Since not all
@@ -460,11 +470,13 @@ public:
                        const Point<spacedim> &candidate) const;
 
   /**
-   * Return a "direction" vector that, at $\mathbf x_1$, is tangential to
+   * Return a vector that, at $\mathbf x_1$, is tangential to
    * the geodesic that connects two points $\mathbf x_1,\mathbf x_2$.
    * For the current class, we assume that the manifold is flat, so
    * the geodesic is the straight line between the two points, and we
-   * return $\mathbf x_2-\mathbf x_1$.
+   * return $\mathbf x_2-\mathbf x_1$. The normalization of the vector
+   * is chosen so that it fits the convention described in
+   * Manifold::get_tangent_vector().
    *
    * @note If you use this class as a stepping stone to build a manifold
    *   that only "slightly" deviates from a flat manifold, by overloading
