@@ -1289,6 +1289,9 @@ MATRIX_FUNCTIONS(SparseMatrix<float>);
 MATRIX_FUNCTIONS(FullMatrix<double>);
 MATRIX_FUNCTIONS(FullMatrix<float>);
 MATRIX_FUNCTIONS(FullMatrix<std::complex<double> >);
+MATRIX_FUNCTIONS(SparseMatrix<std::complex<double> >);
+MATRIX_FUNCTIONS(SparseMatrix<std::complex<long double> >);
+MATRIX_FUNCTIONS(SparseMatrix<std::complex<float> >);
 
 BLOCK_MATRIX_FUNCTIONS(BlockSparseMatrix<double>);
 BLOCK_MATRIX_FUNCTIONS(BlockSparseMatrix<float>);
