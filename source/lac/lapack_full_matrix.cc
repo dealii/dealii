@@ -906,7 +906,7 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
   lwork = static_cast<int>(work[0] + 1);
 
   // resize workspace array
-  work.resize((size_type) lwork);
+  work.resize(static_cast<size_type>(lwork));
 
   // Finally compute the generalized eigenvalues.
   sygv (&itype, jobz, uplo, &nn, values_A, &nn,
