@@ -1,0 +1,13 @@
+
+DEAL::Testing dim=1, spacedim=1
+DEAL::0.800000
+DEAL::Testing dim=1, spacedim=2
+DEAL::0.800000 0.800000
+DEAL::Testing dim=1, spacedim=3
+DEAL::0.800000 0.800000 0.800000
+DEAL::Testing dim=2, spacedim=2
+DEAL::0.800000 0.800000
+DEAL::Testing dim=2, spacedim=3
+DEAL::0.800000 0.800000 0.800000
+DEAL::Testing dim=3, spacedim=3
+DEAL::0.800000 0.800000 0.800000
