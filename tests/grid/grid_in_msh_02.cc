@@ -53,7 +53,7 @@ void check_file ()
         {
           if (cell->at_boundary(face))
             deallog << "vertex " << cell->face_index(face)
-                    << " has boundary indicator " << (int)cell->face(face)->boundary_indicator()
+                    << " has boundary indicator " << (int)cell->face(face)->boundary_id()
                     << std::endl;
         }
     }
