@@ -75,7 +75,8 @@ namespace
       for (unsigned int i=0; i<criteria.size(); ++i)
         m = std::max (m, criteria(i));
 #else
-      Assert(false, ExcNotImplemented())
+      Assert(false, ExcMessage("The GridRefinement functions should only get real-valued vectors of refinement indicators."
+                               " Using these functions with complex-valued PETSc vectors does not make sense."))
 #endif
       return m;
     }
@@ -93,7 +94,8 @@ namespace
       for (unsigned int i=1; i<criteria.size(); ++i)
         m = std::min (m, criteria(i));
 #else
-      Assert(false, ExcNotImplemented());
+      Assert(false, ExcMessage("The GridRefinement functions should only get real-valued vectors of refinement indicators."
+                               " Using these functions with complex-valued PETSc vectors does not make sense."))
 #endif
       return m;
     }
