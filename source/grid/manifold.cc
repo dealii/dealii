@@ -51,21 +51,14 @@ Point<spacedim>
 Manifold<dim, spacedim>::
 get_new_point (const Quadrature<spacedim> &quad) const
 {
-  const std::vector<Point<spacedim> > &surrounding_points = quad.get_points();
-  const std::vector<double> &weights = quad.get_weights();
+  Assert(std::abs(std::accumulate(quad.get_weights().begin(), quad.get_weights().end(), 0.0)-1.0) < 1e-10,
+         ExcMessage("The weights for the individual points should sum to 1!"));
+
   Point<spacedim> p;
+  for (unsigned int i=0; i<quad.size(); ++i)
+    p += quad.weight(i) * quad.point(i);
 
-#ifdef DEBUG
-  double sum=0;
-  for (unsigned int i=0; i<weights.size(); ++i)
-    sum+= weights[i];
-  Assert(std::abs(sum-1.0) < 1e-10, ExcMessage("Weights should sum to 1!"));
-#endif
-
-  for (unsigned int i=0; i<surrounding_points.size(); ++i)
-    p += surrounding_points[i]*weights[i];
-
-  return project_to_manifold(surrounding_points, p);
+  return project_to_manifold(quad.get_points(), p);
 }
 
 
@@ -219,18 +212,11 @@ Point<spacedim>
 FlatManifold<dim, spacedim>::
 get_new_point (const Quadrature<spacedim> &quad) const
 {
+  Assert(std::abs(std::accumulate(quad.get_weights().begin(), quad.get_weights().end(), 0.0)-1.0) < 1e-10,
+         ExcMessage("The weights for the individual points should sum to 1!"));
+
   const std::vector<Point<spacedim> > &surrounding_points = quad.get_points();
   const std::vector<double> &weights = quad.get_weights();
-
-#ifdef DEBUG
-  double sum=0;
-  for (unsigned int i=0; i<weights.size(); ++i)
-    sum+= weights[i];
-  // Here it is correct to use tolerance as an absolute one, since
-  // this should be relative to unity.
-  Assert(std::abs(sum-1.0) < tolerance, ExcMessage("Weights should sum to 1!"));
-#endif
-
 
   Point<spacedim> p;
   Point<spacedim> dp;
