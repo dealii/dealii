@@ -167,6 +167,8 @@ get_new_point_on_quad (const Triangulation<1,1>::quad_iterator &) const
   return Point<1>();
 }
 
+
+
 template <>
 Point<2>
 Manifold<1,2>::
@@ -175,6 +177,7 @@ get_new_point_on_quad (const Triangulation<1,2>::quad_iterator &) const
   Assert (false, ExcImpossibleInDim(1));
   return Point<2>();
 }
+
 
 
 template <>
@@ -186,6 +189,8 @@ get_new_point_on_quad (const Triangulation<1,3>::quad_iterator &) const
   return Point<3>();
 }
 
+
+
 template <int dim, int spacedim>
 Point<spacedim>
 Manifold<dim, spacedim>::
@@ -195,6 +200,8 @@ get_new_point_on_hex (const typename Triangulation<dim, spacedim>::hex_iterator 
   return Point<spacedim>();
 }
 
+
+
 template <>
 Point<3>
 Manifold<3,3>::
@@ -203,6 +210,16 @@ get_new_point_on_hex (const Triangulation<3, 3>::hex_iterator &hex) const
   return get_new_point(get_default_quadrature(hex, true));
 }
 
+
+
+template <int dim, int spacedim>
+Tensor<1,spacedim>
+Manifold<dim,spacedim>::get_tangent_vector(const Point<spacedim> &,
+                                           const Point<spacedim> &) const
+{
+  Assert (false, ExcPureFunctionCalled());
+  return Tensor<1,spacedim>();
+}
 
 /* -------------------------- FlatManifold --------------------- */
 

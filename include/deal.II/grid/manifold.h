@@ -336,6 +336,43 @@ public:
   get_new_point_on_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
   /// @}
+
+  /**
+   * @name Computing direction vectors
+   */
+  /// @{
+
+  /**
+   * Return a "direction" vector that, at $\mathbf x_1$, is tangential to
+   * the geodesic that connects two points $\mathbf x_1,\mathbf x_2$. The geodesic
+   * is the shortest line between these two points, where "shortest" is defined
+   * via a metric specific to a particular implementation of this class in a
+   * derived class. For example, in the case of a FlatManifold, the shortest
+   * line between two points is just the straight line, and in this case the
+   * direction vector is just the difference $\mathbf d=\mathbf x_2-\mathbf x_1$.
+   * On the other hand, for a manifold that describes a surface embedded in
+   * a higher dimensional space (e.g., the surface of a sphere), then the
+   * direction vector is tangential to the surface, and consequently may point in
+   * a different direction than the straight line that connects the two points.
+   *
+   * This function is used, among other cases, in computing normal vectors to
+   * faces or, more generally, surfaces such as the boundary. Since not all
+   * programs need this functionality, this function has a default
+   * implementation that just throws an exception. Consequently, derived
+   * classes only have to implement this function if the program that uses
+   * them does in fact call it directly or indirectly.
+   *
+   * @param x1 The first point that describes the geodesic, and the one
+   *   at which the "direction" is to be evaluated.
+   * @param x2 The second point that describes the geodesic.
+   * @return A "direction" vector tangential to the geodesic.
+   */
+  virtual
+  Tensor<1,spacedim>
+  get_tangent_vector (const Point<spacedim> &x1,
+                      const Point<spacedim> &x2) const;
+
+  /// @}
 };
 
 
