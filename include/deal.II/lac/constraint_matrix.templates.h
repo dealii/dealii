@@ -136,7 +136,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
 
   double average_diagonal = 0;
   for (size_type i=0; i<uncondensed.m(); ++i)
-    average_diagonal += std::fabs (uncondensed.diag_element(i));
+    average_diagonal += std::abs (uncondensed.diag_element(i));
   average_diagonal /= uncondensed.m();
 
   // store for each index whether it must be
@@ -181,10 +181,15 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
                 {
                   for (size_type q=0;
                        q!=lines[distribute[column]].entries.size(); ++q)
-                    uncondensed.add (row,
-                                     lines[distribute[column]].entries[q].first,
-                                     entry->value() *
-                                     lines[distribute[column]].entries[q].second);
+                    {
+                      // need a temporary variable to avoid errors like
+                      // no known conversion from 'complex<typename ProductType<float, double>::type>' to 'const complex<float>' for 3rd argument
+                      number v = static_cast<number>(entry->value());
+                      v *=lines[distribute[column]].entries[q].second;
+                      uncondensed.add (row,
+                                       lines[distribute[column]].entries[q].first,
+                                       v);
+                    }
 
                   // need to subtract this element from the
                   // vector. this corresponds to an
@@ -193,7 +198,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
                   // the matrix with Gauss elimination
                   if (use_vectors == true)
                     vec(row) -=
-                      entry->value() * lines[distribute[column]].inhomogeneity;
+                      static_cast<number>(entry->value()) * lines[distribute[column]].inhomogeneity;
 
                   // set old value to zero
                   entry->value() = 0.;
@@ -227,10 +232,15 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
                 {
                   for (size_type q=0;
                        q!=lines[distribute[row]].entries.size(); ++q)
-                    uncondensed.add (lines[distribute[row]].entries[q].first,
-                                     column,
-                                     entry->value() *
-                                     lines[distribute[row]].entries[q].second);
+                    {
+                      // need a temporary variable to avoid errors like
+                      // no known conversion from 'complex<typename ProductType<float, double>::type>' to 'const complex<float>' for 3rd argument
+                      number v = static_cast<number>(entry->value());
+                      v *= lines[distribute[row]].entries[q].second;
+                      uncondensed.add (lines[distribute[row]].entries[q].first,
+                                       column,
+                                       v);
+                    }
 
                   // set old entry to zero
                   entry->value() = 0.;
@@ -247,15 +257,20 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
                     {
                       for (size_type q=0;
                            q!=lines[distribute[column]].entries.size(); ++q)
-                        uncondensed.add (lines[distribute[row]].entries[p].first,
-                                         lines[distribute[column]].entries[q].first,
-                                         entry->value() *
-                                         lines[distribute[row]].entries[p].second *
-                                         lines[distribute[column]].entries[q].second);
+                        {
+                          // need a temporary variable to avoid errors like
+                          // no known conversion from 'complex<typename ProductType<float, double>::type>' to 'const complex<float>' for 3rd argument
+                          number v = static_cast<number>(entry->value());
+                          v *= lines[distribute[row]].entries[p].second *
+                               lines[distribute[column]].entries[q].second;
+                          uncondensed.add (lines[distribute[row]].entries[p].first,
+                                           lines[distribute[column]].entries[q].first,
+                                           v);
+                        }
 
                       if (use_vectors == true)
                         vec(lines[distribute[row]].entries[p].first) -=
-                          entry->value() * lines[distribute[row]].entries[p].second *
+                          static_cast<number>(entry->value()) * lines[distribute[row]].entries[p].second *
                           lines[distribute[column]].inhomogeneity;
                     }
 
@@ -1945,7 +1960,7 @@ add_this_index:
             // of fill in a zero in the ith components with an inhomogeneity,
             // we set those to: inhomogeneity(i)*global_matrix (i,i).
             if (use_inhomogeneities_for_rhs == true)
-              global_vector(global_row) += constraints.get_inhomogeneity(global_row) * new_diagonal;
+              global_vector(global_row) += new_diagonal * constraints.get_inhomogeneity(global_row);
           }
       }
   }
@@ -2142,10 +2157,10 @@ resolve_vector_entry (const size_type                       i,
     {
       val = local_vector(loc_row);
       for (size_type i=0; i<n_inhomogeneous_rows; ++i)
-        val -= (lines[lines_cache[calculate_line_index(local_dof_indices
+        val -= (local_matrix(loc_row, global_rows.constraint_origin(i)) *
+                lines[lines_cache[calculate_line_index(local_dof_indices
                                                        [global_rows.constraint_origin(i)])]].
-                inhomogeneity *
-                local_matrix(loc_row, global_rows.constraint_origin(i)));
+                inhomogeneity);
     }
 
   // go through the indirect contributions
@@ -2154,11 +2169,11 @@ resolve_vector_entry (const size_type                       i,
       const size_type loc_row_q = global_rows.local_row(i,q);
       LocalType add_this = local_vector (loc_row_q);
       for (size_type k=0; k<n_inhomogeneous_rows; ++k)
-        add_this -= (lines[lines_cache[calculate_line_index
+        add_this -= (local_matrix(loc_row_q,global_rows.constraint_origin(k)) *
+                     lines[lines_cache[calculate_line_index
                                        (local_dof_indices
                                         [global_rows.constraint_origin(k)])]].
-                     inhomogeneity *
-                     local_matrix(loc_row_q,global_rows.constraint_origin(k)));
+                     inhomogeneity);
       val += add_this * global_rows.constraint_value(i,q);
     }
   return val;

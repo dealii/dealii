@@ -61,6 +61,11 @@ for (S1 : REAL_SCALARS; S2 : REAL_SCALARS)
     template void ConstraintMatrix::condense<S1,Vector<S2> >(SparseMatrix<S1>&, Vector<S2>&) const;
     template void ConstraintMatrix::condense<S1,BlockVector<S2> >(BlockSparseMatrix<S1>&, BlockVector<S2>&) const;
   }
+  
+for (S1 : COMPLEX_SCALARS)
+  {
+    template void ConstraintMatrix::condense<S1,Vector<S1> >(SparseMatrix<S1>&, Vector<S1>&) const;
+  }
 
 
 for (Vec : SERIAL_VECTORS)
