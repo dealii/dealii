@@ -38,6 +38,15 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Removed: Functions with names containing <code>boundary_indicator</code>
+  have been removed. They had previously already been deprecated, and replaced
+  by functions containing the string <code>boundary_id</code> instead, to keep
+  with the style used for <code>material_id</code>, <code>subdomain_id</code>,
+  etc.
+  <br>
+  (Wolfgang Bangerth, 2016/02/28)
+  </li>
+
   <li> Changed: Many functions in VectorTools and MatrixTools now require
   matching data types between vectors, matrices, and Function arguments.
   <br>

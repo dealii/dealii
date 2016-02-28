@@ -3781,7 +3781,7 @@ namespace GridGenerator
         for (unsigned int f=0; f<4; ++f)
           if (cell->at_boundary(f)
               &&
-              (cell->face(f)->boundary_indicator() != 0))
+              (cell->face(f)->boundary_id() != 0))
             {
               quad.boundary_id = cell->face(f)->boundary_id();
               max_boundary_id = std::max(max_boundary_id, quad.boundary_id);

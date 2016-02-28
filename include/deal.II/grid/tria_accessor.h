@@ -885,14 +885,6 @@ public:
   types::boundary_id boundary_id () const;
 
   /**
-   * Return the boundary indicator of this object.
-   *
-   * @deprecated This spelling of the function name is deprecated. Use
-   * boundary_id() instead.
-   */
-  types::boundary_id boundary_indicator () const DEAL_II_DEPRECATED;
-
-  /**
    * Set the boundary indicator of the current object. The same applies as for
    * the boundary_id() function.
    *
@@ -922,14 +914,6 @@ public:
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   void set_boundary_id (const types::boundary_id) const;
-
-  /**
-   * Set the boundary indicator of this object.
-   *
-   * @deprecated This spelling of the function name is deprecated. Use
-   * set_boundary_id() instead.
-   */
-  void set_boundary_indicator (const types::boundary_id) const DEAL_II_DEPRECATED;
 
   /**
    * Do as set_boundary_id() but also set the boundary indicators of the
@@ -962,14 +946,6 @@ public:
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   void set_all_boundary_ids (const types::boundary_id) const;
-
-  /**
-   * Set the boundary indicator of this object and all that bound it.
-   *
-   * @deprecated This spelling of the function name is deprecated. Use
-   * set_all_boundary_ids() instead.
-   */
-  void set_all_boundary_indicators (const types::boundary_id) const DEAL_II_DEPRECATED;
 
   /**
    * Return whether this object is at the boundary. Obviously, the use of this
@@ -2065,14 +2041,6 @@ public:
   types::boundary_id boundary_id () const;
 
   /**
-   * Return the boundary indicator of this object.
-   *
-   * @deprecated This spelling of the function name is deprecated. Use
-   * boundary_id() instead.
-   */
-  types::boundary_id boundary_indicator () const DEAL_II_DEPRECATED;
-
-  /**
    * Return the manifold indicator of this object.
    *
    * @see
@@ -2208,14 +2176,6 @@ public:
   set_boundary_id (const types::boundary_id);
 
   /**
-   * Set the boundary indicator of this object.
-   *
-   * @deprecated This spelling of the function name is deprecated. Use
-   * set_boundary_id() instead.
-   */
-  void set_boundary_indicator (const types::boundary_id) DEAL_II_DEPRECATED;
-
-  /**
    * Set the manifold indicator of this vertex. This does nothing so far since
    * manifolds are only used to refine and map objects, but vertices are not
    * refined and the mapping is trivial. This function is here only to allow
@@ -2237,14 +2197,6 @@ public:
    */
   void
   set_all_boundary_ids (const types::boundary_id);
-
-  /**
-   * Set the boundary indicator of this object and all that bound it.
-   *
-   * @deprecated This spelling of the function name is deprecated. Use
-   * set_all_boundary_ids() instead.
-   */
-  void set_all_boundary_indicators (const types::boundary_id) DEAL_II_DEPRECATED;
 
   /**
    * Set the manifold indicator of this object and all of its lower-

@@ -1697,13 +1697,6 @@ public:
   std::vector<types::boundary_id> get_boundary_ids() const;
 
   /**
-   * Deprecated spelling of get_boundary_ids().
-   *
-   * @deprecated Use get_boundary_ids() instead.
-   */
-  std::vector<types::boundary_id> get_boundary_indicators() const DEAL_II_DEPRECATED;
-
-  /**
    * Returns a vector containing all manifold indicators assigned to the
    * objects of this Triangulation. Note, that each manifold indicator is
    * reported only once. The size of the return vector will represent the

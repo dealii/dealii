@@ -9008,15 +9008,6 @@ Triangulation<dim, spacedim>::get_boundary_ids () const
 
 
 template <int dim, int spacedim>
-std::vector<types::boundary_id>
-Triangulation<dim, spacedim>::get_boundary_indicators () const
-{
-  return get_boundary_ids();
-}
-
-
-
-template <int dim, int spacedim>
 std::vector<types::manifold_id>
 Triangulation<dim, spacedim>::get_manifold_ids () const
 {
