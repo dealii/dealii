@@ -284,6 +284,8 @@ get_new_point (const Quadrature<spacedim> &quad) const
   return project_to_manifold(surrounding_points, p);
 }
 
+
+
 template <int dim, int spacedim>
 Point<spacedim>
 FlatManifold<dim, spacedim>::project_to_manifold (const std::vector<Point<spacedim> > &/*vertices*/,
@@ -293,11 +295,37 @@ FlatManifold<dim, spacedim>::project_to_manifold (const std::vector<Point<spaced
 }
 
 
+
+template <int dim, int spacedim>
+Tensor<1,spacedim>
+FlatManifold<dim, spacedim>::get_tangent_vector (const Point<spacedim> &x1,
+                                                 const Point<spacedim> &x2) const
+{
+  Tensor<1,spacedim> direction = x2-x1;
+
+  // see if we have to take into account periodicity. if so, we need
+  // to make sure that if a distance in one coordinate direction
+  // is larger than half of the box length, then go the other way
+  // around (i.e., via the periodic box)
+  for (unsigned int d=0; d<spacedim; ++d)
+    if (periodicity[d] > tolerance)
+      if (direction[d] < -periodicity[d]/2)
+        direction[d] += periodicity[d];
+      else if (direction[d] > periodicity[d]/2)
+        direction[d] -= periodicity[d];
+
+  return direction;
+}
+
+
+
 /* -------------------------- ChartManifold --------------------- */
 
 template <int dim, int spacedim, int chartdim>
 ChartManifold<dim,spacedim,chartdim>::~ChartManifold ()
 {}
+
+
 
 template <int dim, int spacedim, int chartdim>
 ChartManifold<dim,spacedim,chartdim>::ChartManifold (const Point<chartdim> periodicity):

@@ -411,7 +411,7 @@ public:
    * Periodicity will be intended in the following way: the domain is
    * considered to be the box contained in [Point<spacedim>(), periodicity)
    * where the right extreme is excluded. If any of the components of this box
-   * has zero length, then no periodicity is computed in that direction.
+   * has zero length, then no periodicity is assumed in that direction.
    * Whenever a function that tries to compute averages is called, an
    * exception will be thrown if one of the points which you are using for the
    * average lies outside the periodicity box. The return points are
@@ -426,8 +426,8 @@ public:
    *
    * This particular implementation constructs the weighted average of the
    * surrounding points, and then calls internally the function
-   * project_to_manifold. The reason why we do it this way, is to allow lazy
-   * programmers to implement only the project_to_manifold function for their
+   * project_to_manifold(). The reason why we do it this way, is to allow lazy
+   * programmers to implement only the project_to_manifold() function for their
    * own Manifold classes which are small (or trivial) perturbations of a flat
    * manifold. This is the case whenever the coarse mesh is a decent
    * approximation of the manifold geometry. In this case, the middle point of
@@ -442,7 +442,8 @@ public:
    * the manifold mid point, i.e., as long as the coarse mesh size is small
    * enough.
    */
-  virtual Point<spacedim>
+  virtual
+  Point<spacedim>
   get_new_point(const Quadrature<spacedim> &quad) const;
 
 
@@ -450,12 +451,38 @@ public:
    * Project to FlatManifold. This is the identity function for flat,
    * Euclidean spaces. Note however that this function can be overloaded by
    * derived classes, which will then benefit from the logic behind the
-   * get_new_point class which are often very similar (if not identical) to
+   * get_new_point() function which are often very similar (if not identical) to
    * the one implemented in this class.
    */
   virtual
-  Point<spacedim> project_to_manifold (const std::vector<Point<spacedim> > &points,
-                                       const Point<spacedim> &candidate) const;
+  Point<spacedim>
+  project_to_manifold (const std::vector<Point<spacedim> > &points,
+                       const Point<spacedim> &candidate) const;
+
+  /**
+   * Return a "direction" vector that, at $\mathbf x_1$, is tangential to
+   * the geodesic that connects two points $\mathbf x_1,\mathbf x_2$.
+   * For the current class, we assume that the manifold is flat, so
+   * the geodesic is the straight line between the two points, and we
+   * return $\mathbf x_2-\mathbf x_1$.
+   *
+   * @note If you use this class as a stepping stone to build a manifold
+   *   that only "slightly" deviates from a flat manifold, by overloading
+   *   the project_to_manifold() function.
+   *
+   * @param x1 The first point that describes the geodesic, and the one
+   *   at which the "direction" is to be evaluated.
+   * @param x2 The second point that describes the geodesic.
+   * @return A "direction" vector tangential to the geodesic. Here, this is
+   *   $\mathbf x_2-\mathbf x_1$, possibly modified by the periodicity of
+   *   the domain as set in the constructor, to use the "shortest" connection
+   *   between the points through the periodic boundary as necessary.
+   */
+  virtual
+  Tensor<1,spacedim>
+  get_tangent_vector (const Point<spacedim> &x1,
+                      const Point<spacedim> &x2) const;
+
 private:
   /**
    * The periodicity of this Manifold. Periodicity affects the way a middle
@@ -474,7 +501,7 @@ private:
 
   DeclException4(ExcPeriodicBox, int, Point<spacedim>, Point<spacedim>, double,
                  << "The component number " << arg1 << " of the point [ " << arg2
-                 << " ]  is not in the interval [ " << -arg4
+                 << " ] is not in the interval [ " << -arg4
                  << ", " << arg3[arg4] << "), bailing out.");
 
   /**
