@@ -754,26 +754,26 @@ namespace VectorTools
 
     template <typename number>
     void invert_mass_matrix(const SparseMatrix<number> &mass_matrix,
-                            const Vector<number> &tmp,
-                            Vector<number> &vec)
+                            const Vector<number> &rhs,
+                            Vector<number> &solution)
     {
       // Allow for a maximum of 5*n steps to reduce the residual by 10^-12. n
       // steps may not be sufficient, since roundoff errors may accumulate for
       // badly conditioned matrices
-      ReductionControl      control(5*tmp.size(), 0., 1e-12, false, false);
+      ReductionControl      control(5*rhs.size(), 0., 1e-12, false, false);
       GrowingVectorMemory<Vector<number> > memory;
       SolverCG<Vector<number> >            cg(control,memory);
 
       PreconditionSSOR<SparseMatrix<number> > prec;
       prec.initialize(mass_matrix, 1.2);
 
-      cg.solve (mass_matrix, vec, tmp, prec);
+      cg.solve (mass_matrix, solution, rhs, prec);
     }
 
     template <typename number>
-    void invert_mass_matrix(const SparseMatrix<std::complex<number> > &mass_matrix,
-                            const Vector<std::complex<number> > &tmp,
-                            Vector<std::complex<number> > &vec)
+    void invert_mass_matrix(const SparseMatrix<std::complex<number> > &/*mass_matrix*/,
+                            const Vector<std::complex<number> > &/*rhs*/,
+                            Vector<std::complex<number> > &/*solution*/)
     {
       Assert(false, ExcNotImplemented());
     }
@@ -2180,7 +2180,7 @@ namespace VectorTools
 
   namespace
   {
-    // keep first argument is non-reference since we use it
+    // keep the first argument non-reference since we use it
     // with 1e-8 * number
     template <typename number1, typename number2>
     bool real_part_bigger_than(const number1 a,
@@ -2193,25 +2193,23 @@ namespace VectorTools
     bool real_part_bigger_than(const std::complex<number1> a,
                                const std::complex<number2> &b)
     {
-      Assert(std::abs(a.imag()) < 1e-15 , ExcInternalError());
-      Assert(std::abs(b.imag()) < 1e-15 , ExcInternalError());
+      Assert(std::abs(a.imag()) <= 1e-15*std::abs(a) , ExcInternalError());
+      Assert(std::abs(b.imag()) <= 1e-15*std::abs(b) , ExcInternalError());
       return a.real() > b.real();
     }
 
+    // this function is needed to get an idea where
+    // rhs.norm_sqr()  is too small for a given type.
     template <typename number>
-    double min_number()
+    number min_number(const number &/*dummy*/)
     {
       return std::numeric_limits<number>::min();
     }
 
+    // Sine rhs.norm_sqr() is non-negative real, in complex case we
+    // take the numeric limits of the underlying type used in std::complex<>.
     template <typename number>
-    double min_number(const number &dummy)
-    {
-      return std::numeric_limits<number>::min();
-    }
-
-    template <typename number>
-    double min_number(const std::complex<number> &dummy)
+    number min_number(const std::complex<number> &/*dummy*/)
     {
       return std::numeric_limits<number>::min();
     }
@@ -2220,7 +2218,7 @@ namespace VectorTools
     template <typename number>
     void invert_mass_matrix(const SparseMatrix<number> &mass_matrix,
                             const FilteredMatrix<Vector<number> > &filtered_mass_matrix,
-                            FilteredMatrix<Vector<number> > &filtered_precondition,
+                            FilteredMatrix<Vector<number> > &filtered_preconditioner,
                             const Vector<number> &rhs,
                             Vector<number> &boundary_projection)
     {
@@ -2233,19 +2231,19 @@ namespace VectorTools
 
       PreconditionSSOR<SparseMatrix<number> > prec;
       prec.initialize(mass_matrix, 1.2);
-      filtered_precondition.initialize(prec, true);
+      filtered_preconditioner.initialize(prec, true);
       // solve
-      cg.solve (filtered_mass_matrix, boundary_projection, rhs, filtered_precondition);
-      filtered_precondition.apply_constraints(boundary_projection, true);
-      filtered_precondition.clear();
+      cg.solve (filtered_mass_matrix, boundary_projection, rhs, filtered_preconditioner);
+      filtered_preconditioner.apply_constraints(boundary_projection, true);
+      filtered_preconditioner.clear();
     }
 
     template <typename number>
-    void invert_mass_matrix(const SparseMatrix<std::complex<number> > &mass_matrix,
-                            const FilteredMatrix<Vector<std::complex<number> > > &filtered_mass_matrix,
-                            FilteredMatrix<Vector<std::complex<number> > > &filtered_precondition,
-                            const Vector<std::complex<number> > &rhs,
-                            Vector<std::complex<number> > &boundary_projection)
+    void invert_mass_matrix(const SparseMatrix<std::complex<number> > &/*mass_matrix*/,
+                            const FilteredMatrix<Vector<std::complex<number> > > &/*filtered_mass_matrix*/,
+                            FilteredMatrix<Vector<std::complex<number> > > &/*filtered_preconditioner*/,
+                            const Vector<std::complex<number> > &/*rhs*/,
+                            Vector<std::complex<number> > &/*boundary_projection*/)
     {
       Assert(false, ExcNotImplemented());
     }
