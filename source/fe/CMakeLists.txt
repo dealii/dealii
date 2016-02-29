@@ -57,6 +57,7 @@ SET(_src
   mapping_q1_eulerian.cc
   mapping_q.cc
   mapping_q_eulerian.cc
+  mapping_manifold.cc
   )
 
 SET(_inst
