@@ -71,7 +71,7 @@ program the details of your geometry:
 - Integration: When using higher order finite element methods, it is often
   necessary to compute integrals using curved approximations of the boundary,
   i.e., describe each edge or face of cells as curves, instead of straight
-  line segments or bilinear patches). The same is, of course, true when
+  line segments or bilinear patches. The same is, of course, true when
   integrating boundary terms (e.g., inhomogenous Neumann boundary
   conditions). For the purpose of integration, the various Mapping classes
   then provide the transformation from the reference cell to the actual cell.
