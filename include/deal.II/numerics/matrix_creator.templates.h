@@ -1196,9 +1196,9 @@ namespace MatrixCreator
 
   }
 
-  
-  
-  
+
+
+
 
 
 
@@ -1260,7 +1260,7 @@ namespace MatrixCreator
                                      std_cxx11::cref(component_mapping))),
                     static_cast<std_cxx11::function<void (MatrixCreator::internal::AssemblerBoundary
                                                           ::CopyData<DoFHandler<dim,spacedim>,number> const &)> > (std_cxx11::bind(
-														     &internal::copy_boundary_mass_matrix_1<dim,spacedim,number>,
+                                                                &internal::copy_boundary_mass_matrix_1<dim,spacedim,number>,
                                                                 std_cxx11::_1,
                                                                 std_cxx11::cref(boundary_functions),
                                                                 std_cxx11::cref(dof_to_boundary_mapping),
