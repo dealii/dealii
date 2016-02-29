@@ -131,11 +131,11 @@ namespace Manifolds
  * specific way, rather than to have unit norm. See the documentation of
  * Manifold::get_tangent_vector(), as well as below, for more information.
  *
- * In the simplest case (namely, the FlatManifold class), these direction
+ * In the simplest case (namely, the FlatManifold class), these tangent
  * vectors are just the difference vector between the two given points.
  * However, in more complicated (and more interesting) cases, the direction may
  * be different. For example, for the SphericalManifold case, if the two given
- * points lie on a common grand circle around the origin, then the direction
+ * points lie on a common grand circle around the origin, then the tangent
  * vector will be tangential to the grand circle, rather than pointing straight
  * from one point to the other.
  *
@@ -351,10 +351,10 @@ public:
    * via a metric specific to a particular implementation of this class in a
    * derived class. For example, in the case of a FlatManifold, the shortest
    * line between two points is just the straight line, and in this case the
-   * direction vector is just the difference $\mathbf d=\mathbf x_2-\mathbf x_1$.
+   * tangent vector is just the difference $\mathbf d=\mathbf x_2-\mathbf x_1$.
    * On the other hand, for a manifold that describes a surface embedded in
    * a higher dimensional space (e.g., the surface of a sphere), then the
-   * direction vector is tangential to the surface, and consequently may point in
+   * tangent vector is tangential to the surface, and consequently may point in
    * a different direction than the straight line that connects the two points.
    *
    * While tangent vectors are often normalized to unit length, the vectors
