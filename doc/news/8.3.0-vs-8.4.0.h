@@ -273,6 +273,12 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2015/11/29)
   </li>
 
+  <li> New: We now experimentally support Microsoft Visual C++ compiler under
+  Windows.
+  <br>
+  (Timo Heister, 2015/11/26)
+  </li>
+
   <li> New: There is now a function template numbers::signaling_nan() that
   is used to create invalid floating point objects. These objects can either
   be scalars, or of type Tensor, SymmetricTensor, or DerivativeForm. The
