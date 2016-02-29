@@ -39,61 +39,28 @@ template <int,int> class MappingQ;
 
 
 /**
- * This class implements the functionality for polynomial mappings $Q_p$ of
- * polynomial degree $p$ that will be used on all cells of the mesh. The
- * MappingQ1 and MappingQ classes specialize this behavior slightly.
+ * This class implements the functionality for Manifold conforming
+ * mappings. This Mapping computes the transformation between the
+ * reference and real cell by exploiting the geometrical information
+ * coming from the underlying Manifold object.
  *
- * The class is poorly named. It should really have been called MappingQ
- * because it consistently uses $Q_p$ mappings on all cells of a
- * triangulation. However, the name MappingQ was already taken when we rewrote
- * the entire class hierarchy for mappings. One might argue that one should
- * always use MappingQGeneric over the existing class MappingQ (which, unless
- * explicitly specified during the construction of the object, only uses
- * mappings of degree $p$ <i>on cells at the boundary of the domain</i>). On
- * the other hand, there are good reasons to use MappingQ in many situations:
- * in many situations, curved domains are only provided with information about
- * how exactly edges at the boundary are shaped, but we do not know anything
- * about internal edges. Thus, in the absence of other information, we can
- * only assume that internal edges are straight lines, and in that case
- * internal cells may as well be treated is bilinear quadrilaterals or
- * trilinear hexahedra. (An example of how such meshes look is shown in step-1
- * already, but it is also discussed in the "Results" section of step-6.)
- * Because bi-/trilinear mappings are significantly cheaper to compute than
- * higher order mappings, it is advantageous in such situations to use the
- * higher order mapping only on cells at the boundary of the domain -- i.e.,
- * the behavior of MappingQ. Of course, MappingQGeneric also uses bilinear
- * mappings for interior cells as long as it has no knowledge about curvature
- * of interior edges, but it implements this the expensive way: as a general
- * $Q_p$ mapping where the mapping support points just <i>happen</i> to be
- * arranged along linear or bilinear edges or faces.
+ * Quadrature points computed using this mapping lye on the exact
+ * geometrical objects, and tangent and normal vectors computed using
+ * this class are normal and tangent to the underlying geometry. This
+ * is in constrast with the MappingQ class, which approximates the
+ * geometry using a polynomial of some order, and then computes the
+ * normals and tangents using the approximated surface.
  *
- * There are a number of special cases worth considering:
- * - If you really want to use a higher order mapping for all cells,
- * you can do this using the current class, but this only makes sense if you
- * can actually provide information about how interior edges and faces of the
- * mesh should be curved. This is typically done by associating a Manifold
- * with interior cells and edges. A simple example of this is discussed in the
- * "Results" section of step-6; a full discussion of manifolds is provided in
- * step-53.
- * - If you are working on meshes that describe a (curved) manifold
- * embedded in higher space dimensions, i.e., if dim!=spacedim, then every
- * cell is at the boundary of the domain you will likely already have attached
- * a manifold object to all cells that can then also be used by the mapping
- * classes for higher order mappings.
- *
- *
- * @author Wolfgang Bangerth, 2015
+ * @author Luca Heltai, Wolfgang Bangerth, Alberto Sartori 2016
  */
 template <int dim, int spacedim=dim>
 class MappingManifold : public Mapping<dim,spacedim>
 {
 public:
   /**
-   * Constructor.  @p polynomial_degree denotes the polynomial degree of the
-   * polynomials that are used to map cells from the reference to the real
-   * cell.
+   * Constructor.
    */
-  MappingManifold (const unsigned int polynomial_degree);
+  MappingManifold ();
 
   /**
    * Copy constructor.
@@ -103,12 +70,6 @@ public:
   // for documentation, see the Mapping base class
   virtual
   Mapping<dim,spacedim> *clone () const;
-
-  /**
-   * Return the degree of the mapping, i.e. the value which was passed to the
-   * constructor.
-   */
-  unsigned int get_degree () const;
 
   /**
    * Always returns @p true because the default implementation of functions in
@@ -208,10 +169,9 @@ public:
   {
   public:
     /**
-     * Constructor. The argument denotes the polynomial degree of the mapping
-     * to which this object will correspond.
+     * Constructor.
      */
-    InternalData(const unsigned int polynomial_degree);
+    InternalData();
 
     /**
      * Initialize the object's member variables related to cell data based on

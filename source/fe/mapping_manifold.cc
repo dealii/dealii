@@ -662,9 +662,9 @@ namespace internal
 
 
 template<int dim, int spacedim>
-MappingManifold<dim,spacedim>::InternalData::InternalData (const unsigned int polynomial_degree)
+MappingManifold<dim,spacedim>::InternalData::InternalData ()
   :
-  polynomial_degree (polynomial_degree),
+  polynomial_degree (1),
   n_shape_functions (Utilities::fixed_power<dim>(polynomial_degree+1))
 {}
 
@@ -821,8 +821,9 @@ namespace
 {
   template <int dim>
   std::vector<unsigned int>
-  get_dpo_vector (const unsigned int degree)
+  get_dpo_vector ()
   {
+    unsigned int degree = 1;
     std::vector<unsigned int> dpo(dim+1, 1U);
     for (unsigned int i=1; i<dpo.size(); ++i)
       dpo[i]=dpo[i-1]*(degree-1);
@@ -861,7 +862,7 @@ compute_shape_function_values (const std::vector<Point<dim> > &unit_points)
       const std::vector<unsigned int>
       renumber (FETools::
                 lexicographic_to_hierarchic_numbering (
-                  FiniteElementData<dim> (get_dpo_vector<dim>(polynomial_degree), 1,
+                  FiniteElementData<dim> (get_dpo_vector<dim>(), 1,
                                           polynomial_degree)));
 
       std::vector<double> values;
@@ -1155,16 +1156,14 @@ namespace
 
 
 template<int dim, int spacedim>
-MappingManifold<dim,spacedim>::MappingManifold (const unsigned int p)
+MappingManifold<dim,spacedim>::MappingManifold ()
   :
-  polynomial_degree(p),
+  polynomial_degree(1),
   line_support_points(this->polynomial_degree+1),
   fe_q(dim == 3 ? new FE_Q<dim>(this->polynomial_degree) : 0),
   support_point_weights_on_quad (compute_support_point_weights_on_quad<dim>(this->polynomial_degree)),
   support_point_weights_on_hex (compute_support_point_weights_on_hex<dim>(this->polynomial_degree))
 {
-  Assert (p >= 1, ExcMessage ("It only makes sense to create polynomial mappings "
-                              "with a polynomial degree greater or equal to one."));
 }
 
 
@@ -1187,16 +1186,6 @@ Mapping<dim,spacedim> *
 MappingManifold<dim,spacedim>::clone () const
 {
   return new MappingManifold<dim,spacedim>(*this);
-}
-
-
-
-
-template<int dim, int spacedim>
-unsigned int
-MappingManifold<dim,spacedim>::get_degree() const
-{
-  return polynomial_degree;
 }
 
 
@@ -1932,7 +1921,7 @@ typename MappingManifold<dim,spacedim>::InternalData *
 MappingManifold<dim,spacedim>::get_data (const UpdateFlags update_flags,
                                          const Quadrature<dim> &q) const
 {
-  InternalData *data = new InternalData(polynomial_degree);
+  InternalData *data = new InternalData();
   data->initialize (this->requires_update_flags(update_flags), q, q.size());
 
   return data;
