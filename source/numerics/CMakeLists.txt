@@ -29,6 +29,10 @@ SET(_src
   error_estimator_inst2.cc
   fe_field_function.cc
   histogram.cc
+  matrix_creator.cc
+  matrix_creator_inst2.cc
+  matrix_creator_inst3.cc
+  matrix_tools_once.cc
   matrix_tools.cc
   point_value_history.cc
   solution_transfer.cc
@@ -59,6 +63,7 @@ SET(_inst
   error_estimator_1d.inst.in
   error_estimator.inst.in
   fe_field_function.inst.in
+  matrix_creator.inst.in
   matrix_tools.inst.in
   point_value_history.inst.in
   solution_transfer.inst.in
