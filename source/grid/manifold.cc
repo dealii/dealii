@@ -305,10 +305,12 @@ FlatManifold<dim, spacedim>::get_tangent_vector (const Point<spacedim> &x1,
   // around (i.e., via the periodic box)
   for (unsigned int d=0; d<spacedim; ++d)
     if (periodicity[d] > tolerance)
-      if (direction[d] < -periodicity[d]/2)
-        direction[d] += periodicity[d];
-      else if (direction[d] > periodicity[d]/2)
-        direction[d] -= periodicity[d];
+      {
+        if (direction[d] < -periodicity[d]/2)
+          direction[d] += periodicity[d];
+        else if (direction[d] > periodicity[d]/2)
+          direction[d] -= periodicity[d];
+      }
 
   return direction;
 }
