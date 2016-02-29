@@ -21,4 +21,13 @@ DEAL_II_NAMESPACE_OPEN
 // ---------------------------- explicit instantiations --------------------
 #include "vector_tools_boundary.inst"
 
+// extra instantiations to make unit tests pass:
+template
+void VectorTools::interpolate_boundary_values (
+  const dealii::DoFHandler<2, 2> &,
+  const types::boundary_id,
+  const Function<2,float> &,
+  std::map<types::global_dof_index,float> &,
+  const ComponentMask &);
+
 DEAL_II_NAMESPACE_CLOSE
