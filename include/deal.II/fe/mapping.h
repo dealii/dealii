@@ -891,7 +891,7 @@ public:
    * The mapping types currently implemented by derived classes are:
    * <ul>
    * <li> @p mapping_contravariant: maps a vector field on the reference cell
-   * is to the physical cell through the Jacobian:
+   * to the physical cell through the Jacobian:
    * @f[
    * \mathbf u(\mathbf x) = J(\hat{\mathbf  x})\hat{\mathbf  u}(\hat{\mathbf  x}).
    * @f]

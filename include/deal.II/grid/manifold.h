@@ -66,7 +66,7 @@ namespace Manifolds
  *
  * In the most essential use of manifolds, manifold descriptions are used
  * to create a "point between other points". For example, when a triangulation
- * creates a new vertex on a cell, face, or edge , it determines the new
+ * creates a new vertex on a cell, face, or edge, it determines the new
  * vertex' coordinates through the following function call:
  *   @code
  *     ...
