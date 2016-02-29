@@ -65,7 +65,7 @@ namespace Manifolds
  * <h3>Common use case: Creating a new vertex</h3>
  *
  * In the most essential use of manifolds, manifold descriptions are used
- * to create a "point between other points. For example, when a triangulation
+ * to create a "point between other points". For example, when a triangulation
  * creates a new vertex on a cell, face, or edge , it determines the new
  * vertex' coordinates through the following function call:
  *   @code
@@ -82,9 +82,9 @@ namespace Manifolds
  * new point. In the simplest case, for example in the FlatManifold class, the
  * function simply computes the arithmetic average (with given weights) of
  * the given points. However, other classes do something differently; for example,
- * the SphericalManifold class used to describe domains that form (part of) the
- * sphere, will ensure that if it is given the two vertices of an edge at
- * the boundary, the new point returned will lie on the grand circle that connects
+ * the SphericalManifold class, which is used to describe domains that form (part of) the
+ * sphere, will ensure that, given the two vertices of an edge at
+ * the boundary, the new returned point will lie on the grand circle that connects
  * the two points, rather than choosing a point that is half-way between the
  * two points in ${\mathbb R}^d$.
  *
@@ -131,11 +131,11 @@ namespace Manifolds
  * specific way, rather than to have unit norm. See the documentation of
  * Manifold::get_tangent_vector(), as well as below, for more information.
  *
- * In the simplest case (namely, the FlatManifold class), these direction
+ * In the simplest case (namely, the FlatManifold class), these tangent
  * vectors are just the difference vector between the two given points.
  * However, in more complicated (and more interesting) cases, the direction may
  * be different. For example, for the SphericalManifold case, if the two given
- * points lie on a common grand circle around the origin, then the direction
+ * points lie on a common grand circle around the origin, then the tangent
  * vector will be tangential to the grand circle, rather than pointing straight
  * from one point to the other.
  *
@@ -173,7 +173,7 @@ namespace Manifolds
  * uses time, not arc length to denote progress along the geodesic.
  *
  * In this picture, computing a mid-point between points $\mathbf x_1$
- * and $\mathbf x_2$ with weights $w_1$ and $w_2=1-w_1$ then simply
+ * and $\mathbf x_2$, with weights $w_1$ and $w_2=1-w_1$, simply
  * requires computing the point $\mathbf s(w_1)$. Computing a new
  * point as a weighted average of more than two points can be done
  * by considering pairwise geodetics, finding suitable points on
@@ -267,7 +267,7 @@ public:
    * Manifolds::get_default_quadrature() function, and then calls the
    * Manifold<dim,spacedim>::get_new_point() function. User derived classes
    * can overload Manifold<dim,spacedim>::get_new_point() or
-   * Manifold<dim,spacedim>::project_to_surface(), which is called by the
+   * Manifold<dim,spacedim>::project_to_manifold(), which is called by the
    * default implementation of Manifold<dim,spacedim>::get_new_point().
    */
   virtual
@@ -288,7 +288,7 @@ public:
    * Manifolds::get_default_quadrature() function, and then calls the
    * Manifold<dim,spacedim>::get_new_point() function. User derived classes
    * can overload Manifold<dim,spacedim>::get_new_point() or
-   * Manifold<dim,spacedim>::project_to_surface(), which is called by the
+   * Manifold<dim,spacedim>::project_to_manifold(), which is called by the
    * default implementation of Manifold<dim,spacedim>::get_new_point().
    */
   virtual
@@ -310,7 +310,7 @@ public:
    * Manifolds::get_default_quadrature() function, and then calls the
    * Manifold<dim,spacedim>::get_new_point() function. User derived classes
    * can overload Manifold<dim,spacedim>::get_new_point() or
-   * Manifold<dim,spacedim>::project_to_surface(), which is called by the
+   * Manifold<dim,spacedim>::project_to_manifold(), which is called by the
    * default implementation of Manifold<dim,spacedim>::get_new_point().
    */
   virtual
@@ -351,10 +351,10 @@ public:
    * via a metric specific to a particular implementation of this class in a
    * derived class. For example, in the case of a FlatManifold, the shortest
    * line between two points is just the straight line, and in this case the
-   * direction vector is just the difference $\mathbf d=\mathbf x_2-\mathbf x_1$.
+   * tangent vector is just the difference $\mathbf d=\mathbf x_2-\mathbf x_1$.
    * On the other hand, for a manifold that describes a surface embedded in
    * a higher dimensional space (e.g., the surface of a sphere), then the
-   * direction vector is tangential to the surface, and consequently may point in
+   * tangent vector is tangential to the surface, and consequently may point in
    * a different direction than the straight line that connects the two points.
    *
    * While tangent vectors are often normalized to unit length, the vectors
@@ -371,7 +371,7 @@ public:
    * $\mathbf s'(0) \approx \frac{$\mathbf s(\epsilon)-\mathbf x_1}{\epsilon}$
    * for a small value of $\epsilon$, and the evaluation of $\mathbf s(\epsilon)$
    * is done by calling get_new_point(). If possible, derived classes should
-   * override this function by an implement of the exact derivative.
+   * override this function by an implemention of the exact derivative.
    *
    * @param x1 The first point that describes the geodesic, and the one
    *   at which the "direction" is to be evaluated.
