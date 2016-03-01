@@ -834,16 +834,6 @@ namespace MatrixTools
                          const bool             eliminate_columns = true);
 
   /**
-   * Same function, but for parallel PETSc matrices and a non-parallel vector.
-   */
-  void
-  apply_boundary_values (const std::map<types::global_dof_index,PetscScalar> &boundary_values,
-                         PETScWrappers::MPI::SparseMatrix  &matrix,
-                         PETScWrappers::Vector       &solution,
-                         PETScWrappers::MPI::Vector  &right_hand_side,
-                         const bool             eliminate_columns = true);
-
-  /**
    * Same as above but for BlockSparseMatrix.
    */
   void
