@@ -698,7 +698,8 @@ namespace Manifolds
 
   template <typename OBJECT>
   Quadrature<OBJECT::AccessorType::space_dimension>
-  get_default_quadrature(const OBJECT &obj, bool with_laplace)
+  get_default_quadrature(const OBJECT &obj,
+                         const bool with_laplace)
   {
     const int spacedim = OBJECT::AccessorType::space_dimension;
     const int dim = OBJECT::AccessorType::structure_dimension;
