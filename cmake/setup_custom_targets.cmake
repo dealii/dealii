@@ -91,6 +91,15 @@ IF(NOT DEAL_II_COMPONENT_PACKAGE)
 ENDIF()
 
 #
+# Provide "indent" target for indenting all headers and source files
+#
+ADD_CUSTOM_TARGET(indent
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  COMMAND ./contrib/utilities/indent
+  )
+
+
+#
 # Provide an "info" target to print a help message:
 #
 IF(CMAKE_GENERATOR MATCHES "Ninja")
@@ -127,6 +136,8 @@ FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 #
 #    setup_tests    - set up testsuite subprojects
 #    prune_tests    - remove all testsuite subprojects
+#
+#    indent         - indent all headers and source file
 #
 ###\")"
   )
