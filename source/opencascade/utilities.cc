@@ -600,6 +600,13 @@ namespace OpenCASCADE
     Assert(props.IsCurvatureDefined(), ExcMessage("Curvature is not well defined!"));
     Standard_Real Mean_Curvature = props.MeanCurvature();
     Point<3> normal = Point<3>(Normal.X(),Normal.Y(),Normal.Z());
+
+    if (face.Orientation()==TopAbs_REVERSED)
+      {
+        normal *= -1;
+        Mean_Curvature *= -1;
+      }
+
     return std_cxx11::tuple<Point<3>, Point<3>, double>(point(Value), normal, Mean_Curvature);
   }
 
