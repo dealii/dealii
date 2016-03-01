@@ -40,632 +40,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace internal
-{
-  namespace MappingQ1
-  {
-    namespace
-    {
-
-      // These are left as templates on the spatial dimension (even though dim
-      // == spacedim must be true for them to make sense) because templates are
-      // expanded before the compiler eliminates code due to the 'if (dim ==
-      // spacedim)' statement (see the body of the general
-      // transform_real_to_unit_cell).
-      template<int spacedim>
-      Point<1>
-      transform_real_to_unit_cell
-      (const std_cxx11::array<Point<spacedim>, GeometryInfo<1>::vertices_per_cell> &vertices,
-       const Point<spacedim> &p)
-      {
-        Assert(spacedim == 1, ExcInternalError());
-        return Point<1>((p[0] - vertices[0](0))/(vertices[1](0) - vertices[0](0)));
-      }
-
-
-
-      template<int spacedim>
-      Point<2>
-      transform_real_to_unit_cell
-      (const std_cxx11::array<Point<spacedim>, GeometryInfo<2>::vertices_per_cell> &vertices,
-       const Point<spacedim> &p)
-      {
-        Assert(spacedim == 2, ExcInternalError());
-        const double x = p(0);
-        const double y = p(1);
-
-        const double x0 = vertices[0](0);
-        const double x1 = vertices[1](0);
-        const double x2 = vertices[2](0);
-        const double x3 = vertices[3](0);
-
-        const double y0 = vertices[0](1);
-        const double y1 = vertices[1](1);
-        const double y2 = vertices[2](1);
-        const double y3 = vertices[3](1);
-
-        const double a = (x1 - x3)*(y0 - y2) - (x0 - x2)*(y1 - y3);
-        const double b = -(x0 - x1 - x2 + x3)*y + (x - 2*x1 + x3)*y0 - (x - 2*x0 + x2)*y1
-                         - (x - x1)*y2 + (x - x0)*y3;
-        const double c = (x0 - x1)*y - (x - x1)*y0 + (x - x0)*y1;
-
-        const double discriminant = b*b - 4*a*c;
-        // exit if the point is not in the cell (this is the only case where the
-        // discriminant is negative)
-        if (discriminant < 0.0)
-          {
-            AssertThrow (false,
-                         (typename Mapping<spacedim,spacedim>::ExcTransformationFailed()));
-          }
-
-        double eta1;
-        double eta2;
-        // special case #1: if a is zero, then use the linear formula
-        if (a == 0.0 && b != 0.0)
-          {
-            eta1 = -c/b;
-            eta2 = -c/b;
-          }
-        // special case #2: if c is very small or the square root of the
-        // discriminant is nearly b.
-        else if (std::abs(c) < 1e-12*std::abs(b)
-                 || std::abs(std::sqrt(discriminant) - b) <= 1e-14*std::abs(b))
-          {
-            eta1 = (-b - std::sqrt(discriminant)) / (2*a);
-            eta2 = (-b + std::sqrt(discriminant)) / (2*a);
-          }
-        // finally, use the numerically stable version of the quadratic formula:
-        else
-          {
-            eta1 = 2*c / (-b - std::sqrt(discriminant));
-            eta2 = 2*c / (-b + std::sqrt(discriminant));
-          }
-        // pick the one closer to the center of the cell.
-        const double eta = (std::abs(eta1 - 0.5) < std::abs(eta2 - 0.5)) ? eta1 : eta2;
-
-        /*
-         * There are two ways to compute xi from eta, but either one may have a
-         * zero denominator.
-         */
-        const double subexpr0 = -eta*x2 + x0*(eta - 1);
-        const double xi_denominator0 = eta*x3 - x1*(eta - 1) + subexpr0;
-        const double max_x = std::max(std::max(std::abs(x0), std::abs(x1)),
-                                      std::max(std::abs(x2), std::abs(x3)));
-
-        if (std::abs(xi_denominator0) > 1e-10*max_x)
-          {
-            const double xi = (x + subexpr0)/xi_denominator0;
-            return Point<2>(xi, eta);
-          }
-        else
-          {
-            const double max_y = std::max(std::max(std::abs(y0), std::abs(y1)),
-                                          std::max(std::abs(y2), std::abs(y3)));
-            const double subexpr1 = -eta*y2 + y0*(eta - 1);
-            const double xi_denominator1 = eta*y3 - y1*(eta - 1) + subexpr1;
-            if (std::abs(xi_denominator1) > 1e-10*max_y)
-              {
-                const double xi = (subexpr1 + y)/xi_denominator1;
-                return Point<2>(xi, eta);
-              }
-            else // give up and try Newton iteration
-              {
-                AssertThrow (false,
-                             (typename Mapping<spacedim,spacedim>::ExcTransformationFailed()));
-              }
-          }
-        // bogus return to placate compiler. It should not be possible to get
-        // here.
-        Assert(false, ExcInternalError());
-        return Point<2>(std::numeric_limits<double>::quiet_NaN(),
-                        std::numeric_limits<double>::quiet_NaN());
-      }
-
-
-
-      template<int spacedim>
-      Point<3>
-      transform_real_to_unit_cell
-      (const std_cxx11::array<Point<spacedim>, GeometryInfo<3>::vertices_per_cell> &/*vertices*/,
-       const Point<spacedim> &/*p*/)
-      {
-        // It should not be possible to get here
-        Assert(false, ExcInternalError());
-        return Point<3>();
-      }
-
-
-
-      /**
-       * Compute an initial guess to pass to the Newton method in
-       * transform_real_to_unit_cell.  For the initial guess we proceed in the
-       * following way:
-       * <ul>
-       * <li> find the least square dim-dimensional plane approximating the cell
-       * vertices, i.e. we find an affine map A x_hat + b from the reference cell
-       * to the real space.
-       * <li> Solve the equation A x_hat + b = p for x_hat
-       * <li> This x_hat is the initial solution used for the Newton Method.
-       * </ul>
-       *
-       * @note if dim<spacedim we first project p onto the plane.
-       *
-       * @note if dim==1 (for any spacedim) the initial guess is the exact
-       * solution and no Newton iteration is needed.
-       *
-       * Some details about how we compute the least square plane. We look
-       * for a spacedim x (dim + 1) matrix X such that X * M = Y where M is
-       * a (dim+1) x n_vertices matrix and Y a spacedim x n_vertices.  And:
-       * The i-th column of M is unit_vertex[i] and the last row all
-       * 1's. The i-th column of Y is real_vertex[i].  If we split X=[A|b],
-       * the least square approx is A x_hat+b Classically X = Y * (M^t (M
-       * M^t)^{-1}) Let K = M^t * (M M^t)^{-1} = [KA Kb] this can be
-       * precomputed, and that is exactly what we do.  Finally A = Y*KA and
-       * b = Y*Kb.
-       */
-      template <int dim>
-      struct TransformR2UInitialGuess
-      {
-        static const double KA[GeometryInfo<dim>::vertices_per_cell][dim];
-        static const double Kb[GeometryInfo<dim>::vertices_per_cell];
-      };
-
-
-      /*
-        Octave code:
-        M=[0 1; 1 1];
-        K1 = transpose(M) * inverse (M*transpose(M));
-        printf ("{%f, %f},\n", K1' );
-      */
-      template <>
-      const double
-      TransformR2UInitialGuess<1>::
-      KA[GeometryInfo<1>::vertices_per_cell][1] =
-      {
-        {-1.000000},
-        {1.000000}
-      };
-
-      template <>
-      const double
-      TransformR2UInitialGuess<1>::
-      Kb[GeometryInfo<1>::vertices_per_cell] = {1.000000, 0.000000};
-
-
-      /*
-        Octave code:
-        M=[0 1 0 1;0 0 1 1;1 1 1 1];
-        K2 = transpose(M) * inverse (M*transpose(M));
-        printf ("{%f, %f, %f},\n", K2' );
-      */
-      template <>
-      const double
-      TransformR2UInitialGuess<2>::
-      KA[GeometryInfo<2>::vertices_per_cell][2] =
-      {
-        {-0.500000, -0.500000},
-        { 0.500000, -0.500000},
-        {-0.500000,  0.500000},
-        { 0.500000,  0.500000}
-      };
-
-      /*
-        Octave code:
-        M=[0 1 0 1 0 1 0 1;0 0 1 1 0 0 1 1; 0 0 0 0 1 1 1 1; 1 1 1 1 1 1 1 1];
-        K3 = transpose(M) * inverse (M*transpose(M))
-        printf ("{%f, %f, %f, %f},\n", K3' );
-      */
-      template <>
-      const double
-      TransformR2UInitialGuess<2>::
-      Kb[GeometryInfo<2>::vertices_per_cell] =
-      {0.750000,0.250000,0.250000,-0.250000 };
-
-
-      template <>
-      const double
-      TransformR2UInitialGuess<3>::
-      KA[GeometryInfo<3>::vertices_per_cell][3] =
-      {
-        {-0.250000, -0.250000, -0.250000},
-        { 0.250000, -0.250000, -0.250000},
-        {-0.250000,  0.250000, -0.250000},
-        { 0.250000,  0.250000, -0.250000},
-        {-0.250000, -0.250000,  0.250000},
-        { 0.250000, -0.250000,  0.250000},
-        {-0.250000,  0.250000,  0.250000},
-        { 0.250000,  0.250000,  0.250000}
-
-      };
-
-
-      template <>
-      const double
-      TransformR2UInitialGuess<3>::
-      Kb[GeometryInfo<3>::vertices_per_cell] =
-      {0.500000,0.250000,0.250000,0.000000,0.250000,0.000000,0.000000,-0.250000};
-
-      template<int dim, int spacedim>
-      Point<dim>
-      transform_real_to_unit_cell_initial_guess (const std::vector<Point<spacedim> > &vertex,
-                                                 const Point<spacedim>               &p)
-      {
-        Point<dim> p_unit;
-
-        dealii::FullMatrix<double>  KA(GeometryInfo<dim>::vertices_per_cell, dim);
-        dealii::Vector <double>  Kb(GeometryInfo<dim>::vertices_per_cell);
-
-        KA.fill( (double *)(TransformR2UInitialGuess<dim>::KA) );
-        for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-          Kb(i) = TransformR2UInitialGuess<dim>::Kb[i];
-
-        FullMatrix<double> Y(spacedim, GeometryInfo<dim>::vertices_per_cell);
-        for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; v++)
-          for (unsigned int i=0; i<spacedim; ++i)
-            Y(i,v) = vertex[v][i];
-
-        FullMatrix<double> A(spacedim,dim);
-        Y.mmult(A,KA); // A = Y*KA
-        dealii::Vector<double> b(spacedim);
-        Y.vmult(b,Kb); // b = Y*Kb
-
-        for (unsigned int i=0; i<spacedim; ++i)
-          b(i) -= p[i];
-        b*=-1;
-
-        dealii::Vector<double> dest(dim);
-
-        FullMatrix<double> A_1(dim,spacedim);
-        if (dim<spacedim)
-          A_1.left_invert(A);
-        else
-          A_1.invert(A);
-
-        A_1.vmult(dest,b); //A^{-1}*b
-
-        for (unsigned int i=0; i<dim; ++i)
-          p_unit[i]=dest(i);
-
-        return p_unit;
-      }
-      template <int spacedim>
-      void
-      compute_shape_function_values (const unsigned int            n_shape_functions,
-                                     const std::vector<Point<1> > &unit_points,
-                                     typename dealii::MappingManifold<1,spacedim>::InternalData &data)
-      {
-        (void)n_shape_functions;
-        const unsigned int n_points=unit_points.size();
-        for (unsigned int k = 0 ; k < n_points ; ++k)
-          {
-            double x = unit_points[k](0);
-
-            if (data.shape_values.size()!=0)
-              {
-                Assert(data.shape_values.size()==n_shape_functions*n_points,
-                       ExcInternalError());
-                data.shape(k,0) = 1.-x;
-                data.shape(k,1) = x;
-              }
-            if (data.shape_derivatives.size()!=0)
-              {
-                Assert(data.shape_derivatives.size()==n_shape_functions*n_points,
-                       ExcInternalError());
-                data.derivative(k,0)[0] = -1.;
-                data.derivative(k,1)[0] = 1.;
-              }
-            if (data.shape_second_derivatives.size()!=0)
-              {
-                // the following may or may not
-                // work if dim != spacedim
-                Assert (spacedim == 1, ExcNotImplemented());
-
-                Assert(data.shape_second_derivatives.size()==n_shape_functions*n_points,
-                       ExcInternalError());
-                data.second_derivative(k,0)[0][0] = 0;
-                data.second_derivative(k,1)[0][0] = 0;
-              }
-            if (data.shape_third_derivatives.size()!=0)
-              {
-                // if lower order derivative don't work, neither should this
-                Assert (spacedim == 1, ExcNotImplemented());
-
-                Assert(data.shape_third_derivatives.size()==n_shape_functions*n_points,
-                       ExcInternalError());
-
-                Tensor<3,1> zero;
-                data.third_derivative(k,0) = zero;
-                data.third_derivative(k,1) = zero;
-              }
-            if (data.shape_fourth_derivatives.size()!=0)
-              {
-                // if lower order derivative don't work, neither should this
-                Assert (spacedim == 1, ExcNotImplemented());
-
-                Assert(data.shape_fourth_derivatives.size()==n_shape_functions*n_points,
-                       ExcInternalError());
-
-                Tensor<4,1> zero;
-                data.fourth_derivative(k,0) = zero;
-                data.fourth_derivative(k,1) = zero;
-              }
-          }
-      }
-
-
-      template <int spacedim>
-      void
-      compute_shape_function_values (const unsigned int            n_shape_functions,
-                                     const std::vector<Point<2> > &unit_points,
-                                     typename dealii::MappingManifold<2,spacedim>::InternalData &data)
-      {
-        (void)n_shape_functions;
-        const unsigned int n_points=unit_points.size();
-        for (unsigned int k = 0 ; k < n_points ; ++k)
-          {
-            double x = unit_points[k](0);
-            double y = unit_points[k](1);
-
-            if (data.shape_values.size()!=0)
-              {
-                Assert(data.shape_values.size()==n_shape_functions*n_points,
-                       ExcInternalError());
-                data.shape(k,0) = (1.-x)*(1.-y);
-                data.shape(k,1) = x*(1.-y);
-                data.shape(k,2) = (1.-x)*y;
-                data.shape(k,3) = x*y;
-              }
-            if (data.shape_derivatives.size()!=0)
-              {
-                Assert(data.shape_derivatives.size()==n_shape_functions*n_points,
-                       ExcInternalError());
-                data.derivative(k,0)[0] = (y-1.);
-                data.derivative(k,1)[0] = (1.-y);
-                data.derivative(k,2)[0] = -y;
-                data.derivative(k,3)[0] = y;
-                data.derivative(k,0)[1] = (x-1.);
-                data.derivative(k,1)[1] = -x;
-                data.derivative(k,2)[1] = (1.-x);
-                data.derivative(k,3)[1] = x;
-              }
-            if (data.shape_second_derivatives.size()!=0)
-              {
-                Assert(data.shape_second_derivatives.size()==n_shape_functions*n_points,
-                       ExcInternalError());
-                data.second_derivative(k,0)[0][0] = 0;
-                data.second_derivative(k,1)[0][0] = 0;
-                data.second_derivative(k,2)[0][0] = 0;
-                data.second_derivative(k,3)[0][0] = 0;
-                data.second_derivative(k,0)[0][1] = 1.;
-                data.second_derivative(k,1)[0][1] = -1.;
-                data.second_derivative(k,2)[0][1] = -1.;
-                data.second_derivative(k,3)[0][1] = 1.;
-                data.second_derivative(k,0)[1][0] = 1.;
-                data.second_derivative(k,1)[1][0] = -1.;
-                data.second_derivative(k,2)[1][0] = -1.;
-                data.second_derivative(k,3)[1][0] = 1.;
-                data.second_derivative(k,0)[1][1] = 0;
-                data.second_derivative(k,1)[1][1] = 0;
-                data.second_derivative(k,2)[1][1] = 0;
-                data.second_derivative(k,3)[1][1] = 0;
-              }
-            if (data.shape_third_derivatives.size()!=0)
-              {
-                Assert(data.shape_third_derivatives.size()==n_shape_functions*n_points,
-                       ExcInternalError());
-
-                Tensor<3,2> zero;
-                for (unsigned int i=0; i<4; ++i)
-                  data.third_derivative(k,i) = zero;
-              }
-            if (data.shape_fourth_derivatives.size()!=0)
-              {
-                Assert(data.shape_fourth_derivatives.size()==n_shape_functions*n_points,
-                       ExcInternalError());
-                Tensor<4,2> zero;
-                for (unsigned int i=0; i<4; ++i)
-                  data.fourth_derivative(k,i) = zero;
-              }
-          }
-      }
-
-
-
-      template <int spacedim>
-      void
-      compute_shape_function_values (const unsigned int            n_shape_functions,
-                                     const std::vector<Point<3> > &unit_points,
-                                     typename dealii::MappingManifold<3,spacedim>::InternalData &data)
-      {
-        (void)n_shape_functions;
-        const unsigned int n_points=unit_points.size();
-        for (unsigned int k = 0 ; k < n_points ; ++k)
-          {
-            double x = unit_points[k](0);
-            double y = unit_points[k](1);
-            double z = unit_points[k](2);
-
-            if (data.shape_values.size()!=0)
-              {
-                Assert(data.shape_values.size()==n_shape_functions*n_points,
-                       ExcInternalError());
-                data.shape(k,0) = (1.-x)*(1.-y)*(1.-z);
-                data.shape(k,1) = x*(1.-y)*(1.-z);
-                data.shape(k,2) = (1.-x)*y*(1.-z);
-                data.shape(k,3) = x*y*(1.-z);
-                data.shape(k,4) = (1.-x)*(1.-y)*z;
-                data.shape(k,5) = x*(1.-y)*z;
-                data.shape(k,6) = (1.-x)*y*z;
-                data.shape(k,7) = x*y*z;
-              }
-            if (data.shape_derivatives.size()!=0)
-              {
-                Assert(data.shape_derivatives.size()==n_shape_functions*n_points,
-                       ExcInternalError());
-                data.derivative(k,0)[0] = (y-1.)*(1.-z);
-                data.derivative(k,1)[0] = (1.-y)*(1.-z);
-                data.derivative(k,2)[0] = -y*(1.-z);
-                data.derivative(k,3)[0] = y*(1.-z);
-                data.derivative(k,4)[0] = (y-1.)*z;
-                data.derivative(k,5)[0] = (1.-y)*z;
-                data.derivative(k,6)[0] = -y*z;
-                data.derivative(k,7)[0] = y*z;
-                data.derivative(k,0)[1] = (x-1.)*(1.-z);
-                data.derivative(k,1)[1] = -x*(1.-z);
-                data.derivative(k,2)[1] = (1.-x)*(1.-z);
-                data.derivative(k,3)[1] = x*(1.-z);
-                data.derivative(k,4)[1] = (x-1.)*z;
-                data.derivative(k,5)[1] = -x*z;
-                data.derivative(k,6)[1] = (1.-x)*z;
-                data.derivative(k,7)[1] = x*z;
-                data.derivative(k,0)[2] = (x-1)*(1.-y);
-                data.derivative(k,1)[2] = x*(y-1.);
-                data.derivative(k,2)[2] = (x-1.)*y;
-                data.derivative(k,3)[2] = -x*y;
-                data.derivative(k,4)[2] = (1.-x)*(1.-y);
-                data.derivative(k,5)[2] = x*(1.-y);
-                data.derivative(k,6)[2] = (1.-x)*y;
-                data.derivative(k,7)[2] = x*y;
-              }
-            if (data.shape_second_derivatives.size()!=0)
-              {
-                // the following may or may not
-                // work if dim != spacedim
-                Assert (spacedim == 3, ExcNotImplemented());
-
-                Assert(data.shape_second_derivatives.size()==n_shape_functions*n_points,
-                       ExcInternalError());
-                data.second_derivative(k,0)[0][0] = 0;
-                data.second_derivative(k,1)[0][0] = 0;
-                data.second_derivative(k,2)[0][0] = 0;
-                data.second_derivative(k,3)[0][0] = 0;
-                data.second_derivative(k,4)[0][0] = 0;
-                data.second_derivative(k,5)[0][0] = 0;
-                data.second_derivative(k,6)[0][0] = 0;
-                data.second_derivative(k,7)[0][0] = 0;
-                data.second_derivative(k,0)[1][1] = 0;
-                data.second_derivative(k,1)[1][1] = 0;
-                data.second_derivative(k,2)[1][1] = 0;
-                data.second_derivative(k,3)[1][1] = 0;
-                data.second_derivative(k,4)[1][1] = 0;
-                data.second_derivative(k,5)[1][1] = 0;
-                data.second_derivative(k,6)[1][1] = 0;
-                data.second_derivative(k,7)[1][1] = 0;
-                data.second_derivative(k,0)[2][2] = 0;
-                data.second_derivative(k,1)[2][2] = 0;
-                data.second_derivative(k,2)[2][2] = 0;
-                data.second_derivative(k,3)[2][2] = 0;
-                data.second_derivative(k,4)[2][2] = 0;
-                data.second_derivative(k,5)[2][2] = 0;
-                data.second_derivative(k,6)[2][2] = 0;
-                data.second_derivative(k,7)[2][2] = 0;
-
-                data.second_derivative(k,0)[0][1] = (1.-z);
-                data.second_derivative(k,1)[0][1] = -(1.-z);
-                data.second_derivative(k,2)[0][1] = -(1.-z);
-                data.second_derivative(k,3)[0][1] = (1.-z);
-                data.second_derivative(k,4)[0][1] = z;
-                data.second_derivative(k,5)[0][1] = -z;
-                data.second_derivative(k,6)[0][1] = -z;
-                data.second_derivative(k,7)[0][1] = z;
-                data.second_derivative(k,0)[1][0] = (1.-z);
-                data.second_derivative(k,1)[1][0] = -(1.-z);
-                data.second_derivative(k,2)[1][0] = -(1.-z);
-                data.second_derivative(k,3)[1][0] = (1.-z);
-                data.second_derivative(k,4)[1][0] = z;
-                data.second_derivative(k,5)[1][0] = -z;
-                data.second_derivative(k,6)[1][0] = -z;
-                data.second_derivative(k,7)[1][0] = z;
-
-                data.second_derivative(k,0)[0][2] = (1.-y);
-                data.second_derivative(k,1)[0][2] = -(1.-y);
-                data.second_derivative(k,2)[0][2] = y;
-                data.second_derivative(k,3)[0][2] = -y;
-                data.second_derivative(k,4)[0][2] = -(1.-y);
-                data.second_derivative(k,5)[0][2] = (1.-y);
-                data.second_derivative(k,6)[0][2] = -y;
-                data.second_derivative(k,7)[0][2] = y;
-                data.second_derivative(k,0)[2][0] = (1.-y);
-                data.second_derivative(k,1)[2][0] = -(1.-y);
-                data.second_derivative(k,2)[2][0] = y;
-                data.second_derivative(k,3)[2][0] = -y;
-                data.second_derivative(k,4)[2][0] = -(1.-y);
-                data.second_derivative(k,5)[2][0] = (1.-y);
-                data.second_derivative(k,6)[2][0] = -y;
-                data.second_derivative(k,7)[2][0] = y;
-
-                data.second_derivative(k,0)[1][2] = (1.-x);
-                data.second_derivative(k,1)[1][2] = x;
-                data.second_derivative(k,2)[1][2] = -(1.-x);
-                data.second_derivative(k,3)[1][2] = -x;
-                data.second_derivative(k,4)[1][2] = -(1.-x);
-                data.second_derivative(k,5)[1][2] = -x;
-                data.second_derivative(k,6)[1][2] = (1.-x);
-                data.second_derivative(k,7)[1][2] = x;
-                data.second_derivative(k,0)[2][1] = (1.-x);
-                data.second_derivative(k,1)[2][1] = x;
-                data.second_derivative(k,2)[2][1] = -(1.-x);
-                data.second_derivative(k,3)[2][1] = -x;
-                data.second_derivative(k,4)[2][1] = -(1.-x);
-                data.second_derivative(k,5)[2][1] = -x;
-                data.second_derivative(k,6)[2][1] = (1.-x);
-                data.second_derivative(k,7)[2][1] = x;
-              }
-            if (data.shape_third_derivatives.size()!=0)
-              {
-                // if lower order derivative don't work, neither should this
-                Assert (spacedim == 3, ExcNotImplemented());
-
-                Assert(data.shape_third_derivatives.size()==n_shape_functions*n_points,
-                       ExcInternalError());
-
-                for (unsigned int i=0; i<3; ++i)
-                  for (unsigned int j=0; j<3; ++j)
-                    for (unsigned int l=0; l<3; ++l)
-                      if ((i==j)||(j==l)||(l==i))
-                        {
-                          for (unsigned int m=0; m<8; ++m)
-                            data.third_derivative(k,m)[i][j][l] = 0;
-                        }
-                      else
-                        {
-                          data.third_derivative(k,0)[i][j][l] = -1.;
-                          data.third_derivative(k,1)[i][j][l] = 1.;
-                          data.third_derivative(k,2)[i][j][l] = 1.;
-                          data.third_derivative(k,3)[i][j][l] = -1.;
-                          data.third_derivative(k,4)[i][j][l] = 1.;
-                          data.third_derivative(k,5)[i][j][l] = -1.;
-                          data.third_derivative(k,6)[i][j][l] = -1.;
-                          data.third_derivative(k,7)[i][j][l] = 1.;
-                        }
-
-              }
-            if (data.shape_fourth_derivatives.size()!=0)
-              {
-                // if lower order derivative don't work, neither should this
-                Assert (spacedim == 3, ExcNotImplemented());
-
-                Assert(data.shape_fourth_derivatives.size()==n_shape_functions*n_points,
-                       ExcInternalError());
-                Tensor<4,3> zero;
-                for (unsigned int i=0; i<8; ++i)
-                  data.fourth_derivative(k,i) = zero;
-              }
-          }
-      }
-    }
-  }
-}
-
-
-
-
-
 template<int dim, int spacedim>
 MappingManifold<dim,spacedim>::InternalData::InternalData ()
-  :
-  polynomial_degree (1),
-  n_shape_functions (Utilities::fixed_power<dim>(polynomial_degree+1))
 {}
 
 
@@ -674,18 +50,18 @@ template<int dim, int spacedim>
 std::size_t
 MappingManifold<dim,spacedim>::InternalData::memory_consumption () const
 {
-  return (Mapping<dim,spacedim>::InternalDataBase::memory_consumption() +
-          MemoryConsumption::memory_consumption (shape_values) +
-          MemoryConsumption::memory_consumption (shape_derivatives) +
-          MemoryConsumption::memory_consumption (covariant) +
-          MemoryConsumption::memory_consumption (contravariant) +
-          MemoryConsumption::memory_consumption (unit_tangentials) +
-          MemoryConsumption::memory_consumption (aux) +
-          MemoryConsumption::memory_consumption (mapping_support_points) +
-          MemoryConsumption::memory_consumption (cell_of_current_support_points) +
-          MemoryConsumption::memory_consumption (volume_elements) +
-          MemoryConsumption::memory_consumption (polynomial_degree) +
-          MemoryConsumption::memory_consumption (n_shape_functions));
+  return (Mapping<dim,spacedim>::InternalDataBase::memory_consumption() );
+  // MemoryConsumption::memory_consumption (shape_values) +
+  // MemoryConsumption::memory_consumption (shape_derivatives) +
+  // MemoryConsumption::memory_consumption (covariant) +
+  // MemoryConsumption::memory_consumption (contravariant) +
+  // MemoryConsumption::memory_consumption (unit_tangentials) +
+  // MemoryConsumption::memory_consumption (aux) +
+  // MemoryConsumption::memory_consumption (mapping_support_points) +
+  // MemoryConsumption::memory_consumption (cell_of_current_support_points) +
+  // MemoryConsumption::memory_consumption (volume_elements) +
+  // MemoryConsumption::memory_consumption (polynomial_degree) +
+  // MemoryConsumption::memory_consumption (n_shape_functions));
 }
 
 
@@ -702,49 +78,52 @@ initialize (const UpdateFlags      update_flags,
 
   const unsigned int n_q_points = q.size();
 
+  // Update the weights used in the Manifold Quadrature formulas
+  compute_manifold_quadrature_weights(q);
+
   // see if we need the (transformation) shape function values
   // and/or gradients and resize the necessary arrays
   if (this->update_each & update_quadrature_points)
-    shape_values.resize(n_shape_functions * n_q_points);
+    cell_manifold_quadratures.resize(q.size());
 
-  if (this->update_each & (update_covariant_transformation
-                           | update_contravariant_transformation
-                           | update_JxW_values
-                           | update_boundary_forms
-                           | update_normal_vectors
-                           | update_jacobians
-                           | update_jacobian_grads
-                           | update_inverse_jacobians
-                           | update_jacobian_pushed_forward_grads
-                           | update_jacobian_2nd_derivatives
-                           | update_jacobian_pushed_forward_2nd_derivatives
-                           | update_jacobian_3rd_derivatives
-                           | update_jacobian_pushed_forward_3rd_derivatives))
-    shape_derivatives.resize(n_shape_functions * n_q_points);
+  // if (this->update_each & (update_covariant_transformation
+  //                          | update_contravariant_transformation
+  //                          | update_JxW_values
+  //                          | update_boundary_forms
+  //                          | update_normal_vectors
+  //                          | update_jacobians
+  //                          | update_jacobian_grads
+  //                          | update_inverse_jacobians
+  //                          | update_jacobian_pushed_forward_grads
+  //                          | update_jacobian_2nd_derivatives
+  //                          | update_jacobian_pushed_forward_2nd_derivatives
+  //                          | update_jacobian_3rd_derivatives
+  //                          | update_jacobian_pushed_forward_3rd_derivatives))
+  //   shape_derivatives.resize(n_shape_functions * n_q_points);
 
-  if (this->update_each & update_covariant_transformation)
-    covariant.resize(n_original_q_points);
+  // if (this->update_each & update_covariant_transformation)
+  //   covariant.resize(n_original_q_points);
 
-  if (this->update_each & update_contravariant_transformation)
-    contravariant.resize(n_original_q_points);
+  // if (this->update_each & update_contravariant_transformation)
+  //   contravariant.resize(n_original_q_points);
 
-  if (this->update_each & update_volume_elements)
-    volume_elements.resize(n_original_q_points);
+  // if (this->update_each & update_volume_elements)
+  //   volume_elements.resize(n_original_q_points);
 
-  if (this->update_each &
-      (update_jacobian_grads | update_jacobian_pushed_forward_grads) )
-    shape_second_derivatives.resize(n_shape_functions * n_q_points);
+  // if (this->update_each &
+  //     (update_jacobian_grads | update_jacobian_pushed_forward_grads) )
+  //   shape_second_derivatives.resize(n_shape_functions * n_q_points);
 
-  if (this->update_each &
-      (update_jacobian_2nd_derivatives | update_jacobian_pushed_forward_2nd_derivatives) )
-    shape_third_derivatives.resize(n_shape_functions * n_q_points);
+  // if (this->update_each &
+  //     (update_jacobian_2nd_derivatives | update_jacobian_pushed_forward_2nd_derivatives) )
+  //   shape_third_derivatives.resize(n_shape_functions * n_q_points);
 
-  if (this->update_each &
-      (update_jacobian_3rd_derivatives | update_jacobian_pushed_forward_3rd_derivatives) )
-    shape_fourth_derivatives.resize(n_shape_functions * n_q_points);
+  // if (this->update_each &
+  //     (update_jacobian_3rd_derivatives | update_jacobian_pushed_forward_3rd_derivatives) )
+  //   shape_fourth_derivatives.resize(n_shape_functions * n_q_points);
 
-  // now also fill the various fields with their correct values
-  compute_shape_function_values (q.get_points());
+  // // now also fill the various fields with their correct values
+  // compute_shape_function_values (q.get_points());
 }
 
 
@@ -756,413 +135,72 @@ initialize_face (const UpdateFlags      update_flags,
                  const Quadrature<dim> &q,
                  const unsigned int     n_original_q_points)
 {
-  initialize (update_flags, q, n_original_q_points);
+  // initialize (update_flags, q, n_original_q_points);
 
-  if (dim > 1)
-    {
-      if (this->update_each & update_boundary_forms)
-        {
-          aux.resize (dim-1, std::vector<Tensor<1,spacedim> > (n_original_q_points));
+  // if (dim > 1)
+  //   {
+  //     if (this->update_each & update_boundary_forms)
+  //       {
+  //         aux.resize (dim-1, std::vector<Tensor<1,spacedim> > (n_original_q_points));
 
-          // Compute tangentials to the
-          // unit cell.
-          const unsigned int nfaces = GeometryInfo<dim>::faces_per_cell;
-          unit_tangentials.resize (nfaces*(dim-1),
-                                   std::vector<Tensor<1,dim> > (n_original_q_points));
-          if (dim==2)
-            {
-              // ensure a counterclockwise
-              // orientation of tangentials
-              static const int tangential_orientation[4]= {-1,1,1,-1};
-              for (unsigned int i=0; i<nfaces; ++i)
-                {
-                  Tensor<1,dim> tang;
-                  tang[1-i/2]=tangential_orientation[i];
-                  std::fill (unit_tangentials[i].begin(),
-                             unit_tangentials[i].end(), tang);
-                }
-            }
-          else if (dim==3)
-            {
-              for (unsigned int i=0; i<nfaces; ++i)
-                {
-                  Tensor<1,dim> tang1, tang2;
+  //         // Compute tangentials to the
+  //         // unit cell.
+  //         const unsigned int nfaces = GeometryInfo<dim>::faces_per_cell;
+  //         unit_tangentials.resize (nfaces*(dim-1),
+  //                                  std::vector<Tensor<1,dim> > (n_original_q_points));
+  //         if (dim==2)
+  //           {
+  //             // ensure a counterclockwise
+  //             // orientation of tangentials
+  //             static const int tangential_orientation[4]= {-1,1,1,-1};
+  //             for (unsigned int i=0; i<nfaces; ++i)
+  //               {
+  //                 Tensor<1,dim> tang;
+  //                 tang[1-i/2]=tangential_orientation[i];
+  //                 std::fill (unit_tangentials[i].begin(),
+  //                            unit_tangentials[i].end(), tang);
+  //               }
+  //           }
+  //         else if (dim==3)
+  //           {
+  //             for (unsigned int i=0; i<nfaces; ++i)
+  //               {
+  //                 Tensor<1,dim> tang1, tang2;
 
-                  const unsigned int nd=
-                    GeometryInfo<dim>::unit_normal_direction[i];
+  //                 const unsigned int nd=
+  //                   GeometryInfo<dim>::unit_normal_direction[i];
 
-                  // first tangential
-                  // vector in direction
-                  // of the (nd+1)%3 axis
-                  // and inverted in case
-                  // of unit inward normal
-                  tang1[(nd+1)%dim]=GeometryInfo<dim>::unit_normal_orientation[i];
-                  // second tangential
-                  // vector in direction
-                  // of the (nd+2)%3 axis
-                  tang2[(nd+2)%dim]=1.;
+  //                 // first tangential
+  //                 // vector in direction
+  //                 // of the (nd+1)%3 axis
+  //                 // and inverted in case
+  //                 // of unit inward normal
+  //                 tang1[(nd+1)%dim]=GeometryInfo<dim>::unit_normal_orientation[i];
+  //                 // second tangential
+  //                 // vector in direction
+  //                 // of the (nd+2)%3 axis
+  //                 tang2[(nd+2)%dim]=1.;
 
-                  // same unit tangents
-                  // for all quadrature
-                  // points on this face
-                  std::fill (unit_tangentials[i].begin(),
-                             unit_tangentials[i].end(), tang1);
-                  std::fill (unit_tangentials[nfaces+i].begin(),
-                             unit_tangentials[nfaces+i].end(), tang2);
-                }
-            }
-        }
-    }
+  //                 // same unit tangents
+  //                 // for all quadrature
+  //                 // points on this face
+  //                 std::fill (unit_tangentials[i].begin(),
+  //                            unit_tangentials[i].end(), tang1);
+  //                 std::fill (unit_tangentials[nfaces+i].begin(),
+  //                            unit_tangentials[nfaces+i].end(), tang2);
+  //               }
+  //           }
+  //       }
+  //   }
 }
-
-
-
-namespace
-{
-  template <int dim>
-  std::vector<unsigned int>
-  get_dpo_vector ()
-  {
-    unsigned int degree = 1;
-    std::vector<unsigned int> dpo(dim+1, 1U);
-    for (unsigned int i=1; i<dpo.size(); ++i)
-      dpo[i]=dpo[i-1]*(degree-1);
-    return dpo;
-  }
-}
-
-
-
-template<int dim, int spacedim>
-void
-MappingManifold<dim,spacedim>::InternalData::
-compute_shape_function_values (const std::vector<Point<dim> > &unit_points)
-{
-  // if the polynomial degree is one, then we can simplify code a bit
-  // by using hard-coded shape functions.
-  if ((polynomial_degree == 1)
-      &&
-      (dim == spacedim))
-    internal::MappingQ1::compute_shape_function_values<spacedim> (n_shape_functions,
-        unit_points, *this);
-  else
-    // otherwise ask an object that describes the polynomial space
-    {
-      const unsigned int n_points=unit_points.size();
-
-      // Construct the tensor product polynomials used as shape functions for the
-      // Qp mapping of cells at the boundary.
-      const QGaussLobatto<1> line_support_points (polynomial_degree + 1);
-      const TensorProductPolynomials<dim>
-      tensor_pols (Polynomials::generate_complete_Lagrange_basis(line_support_points.get_points()));
-      Assert (n_shape_functions==tensor_pols.n(),
-              ExcInternalError());
-
-      // then also construct the mapping from lexicographic to the Qp shape function numbering
-      const std::vector<unsigned int>
-      renumber (FETools::
-                lexicographic_to_hierarchic_numbering (
-                  FiniteElementData<dim> (get_dpo_vector<dim>(), 1,
-                                          polynomial_degree)));
-
-      std::vector<double> values;
-      std::vector<Tensor<1,dim> > grads;
-      if (shape_values.size()!=0)
-        {
-          Assert(shape_values.size()==n_shape_functions*n_points,
-                 ExcInternalError());
-          values.resize(n_shape_functions);
-        }
-      if (shape_derivatives.size()!=0)
-        {
-          Assert(shape_derivatives.size()==n_shape_functions*n_points,
-                 ExcInternalError());
-          grads.resize(n_shape_functions);
-        }
-
-      std::vector<Tensor<2,dim> > grad2;
-      if (shape_second_derivatives.size()!=0)
-        {
-          Assert(shape_second_derivatives.size()==n_shape_functions*n_points,
-                 ExcInternalError());
-          grad2.resize(n_shape_functions);
-        }
-
-      std::vector<Tensor<3,dim> > grad3;
-      if (shape_third_derivatives.size()!=0)
-        {
-          Assert(shape_third_derivatives.size()==n_shape_functions*n_points,
-                 ExcInternalError());
-          grad3.resize(n_shape_functions);
-        }
-
-      std::vector<Tensor<4,dim> > grad4;
-      if (shape_fourth_derivatives.size()!=0)
-        {
-          Assert(shape_fourth_derivatives.size()==n_shape_functions*n_points,
-                 ExcInternalError());
-          grad4.resize(n_shape_functions);
-        }
-
-
-      if (shape_values.size()!=0 ||
-          shape_derivatives.size()!=0 ||
-          shape_second_derivatives.size()!=0 ||
-          shape_third_derivatives.size()!=0 ||
-          shape_fourth_derivatives.size()!=0 )
-        for (unsigned int point=0; point<n_points; ++point)
-          {
-            tensor_pols.compute(unit_points[point], values, grads, grad2, grad3, grad4);
-
-            if (shape_values.size()!=0)
-              for (unsigned int i=0; i<n_shape_functions; ++i)
-                shape(point,renumber[i]) = values[i];
-
-            if (shape_derivatives.size()!=0)
-              for (unsigned int i=0; i<n_shape_functions; ++i)
-                derivative(point,renumber[i]) = grads[i];
-
-            if (shape_second_derivatives.size()!=0)
-              for (unsigned int i=0; i<n_shape_functions; ++i)
-                second_derivative(point,renumber[i]) = grad2[i];
-
-            if (shape_third_derivatives.size()!=0)
-              for (unsigned int i=0; i<n_shape_functions; ++i)
-                third_derivative(point,renumber[i]) = grad3[i];
-
-            if (shape_fourth_derivatives.size()!=0)
-              for (unsigned int i=0; i<n_shape_functions; ++i)
-                fourth_derivative(point,renumber[i]) = grad4[i];
-          }
-    }
-}
-
-
-namespace
-{
-  /**
-   * Compute the <tt>support_point_weights_on_quad(hex)</tt> arrays.
-   *
-   * Called by the <tt>compute_support_point_weights_on_quad(hex)</tt> functions if the
-   * data is not yet hardcoded.
-   *
-   * For the definition of the <tt>support_point_weights_on_quad(hex)</tt> please
-   * refer to equation (8) of the `mapping' report.
-   */
-  template<int dim>
-  Table<2,double>
-  compute_laplace_vector(const unsigned int polynomial_degree)
-  {
-    Table<2,double> lvs;
-
-    Assert(lvs.n_rows()==0, ExcInternalError());
-    Assert(dim==2 || dim==3, ExcNotImplemented());
-
-    // for degree==1, we shouldn't have to compute any support points, since all
-    // of them are on the vertices
-    Assert(polynomial_degree>1, ExcInternalError());
-
-    const unsigned int n_inner = Utilities::fixed_power<dim>(polynomial_degree-1);
-    const unsigned int n_outer = (dim==1) ? 2 :
-                                 ((dim==2) ?
-                                  4+4*(polynomial_degree-1) :
-                                  8+12*(polynomial_degree-1)+6*(polynomial_degree-1)*(polynomial_degree-1));
-
-
-    // compute the shape gradients at the quadrature points on the unit cell
-    const QGauss<dim> quadrature(polynomial_degree+1);
-    const unsigned int n_q_points=quadrature.size();
-
-    typename MappingManifold<dim>::InternalData quadrature_data(polynomial_degree);
-    quadrature_data.shape_derivatives.resize(quadrature_data.n_shape_functions *
-                                             n_q_points);
-    quadrature_data.compute_shape_function_values(quadrature.get_points());
-
-    // Compute the stiffness matrix of the inner dofs
-    FullMatrix<long double> S(n_inner);
-    for (unsigned int point=0; point<n_q_points; ++point)
-      for (unsigned int i=0; i<n_inner; ++i)
-        for (unsigned int j=0; j<n_inner; ++j)
-          {
-            long double res = 0.;
-            for (unsigned int l=0; l<dim; ++l)
-              res += (long double)quadrature_data.derivative(point, n_outer+i)[l] *
-                     (long double)quadrature_data.derivative(point, n_outer+j)[l];
-
-            S(i,j) += res * (long double)quadrature.weight(point);
-          }
-
-    // Compute the components of T to be the product of gradients of inner and
-    // outer shape functions.
-    FullMatrix<long double> T(n_inner, n_outer);
-    for (unsigned int point=0; point<n_q_points; ++point)
-      for (unsigned int i=0; i<n_inner; ++i)
-        for (unsigned int k=0; k<n_outer; ++k)
-          {
-            long double res = 0.;
-            for (unsigned int l=0; l<dim; ++l)
-              res += (long double)quadrature_data.derivative(point, n_outer+i)[l] *
-                     (long double)quadrature_data.derivative(point, k)[l];
-
-            T(i,k) += res *(long double)quadrature.weight(point);
-          }
-
-    FullMatrix<long double> S_1(n_inner);
-    S_1.invert(S);
-
-    FullMatrix<long double> S_1_T(n_inner, n_outer);
-
-    // S:=S_1*T
-    S_1.mmult(S_1_T,T);
-
-    // Resize and initialize the lvs
-    lvs.reinit (n_inner, n_outer);
-    for (unsigned int i=0; i<n_inner; ++i)
-      for (unsigned int k=0; k<n_outer; ++k)
-        lvs(i,k) = -S_1_T(i,k);
-
-    return lvs;
-  }
-
-
-  /**
-   * This function is needed by the constructor of
-   * <tt>MappingQ<dim,spacedim></tt> for <tt>dim=</tt> 2 and 3.
-   *
-   * For <tt>degree<4</tt> this function sets the @p support_point_weights_on_quad to
-   * the hardcoded data. For <tt>degree>=4</tt> and MappingQ<2> this vector is
-   * computed.
-   *
-   * For the definition of the @p support_point_weights_on_quad please refer to
-   * equation (8) of the `mapping' report.
-   */
-  template<int dim>
-  Table<2,double>
-  compute_support_point_weights_on_quad(const unsigned int polynomial_degree)
-  {
-    Table<2,double> loqvs;
-
-    // in 1d, there are no quads, so return an empty object
-    if (dim == 1)
-      return loqvs;
-
-    // we are asked to compute weights for interior support points, but
-    // there are no interior points if degree==1
-    if (polynomial_degree == 1)
-      return loqvs;
-
-    const unsigned int n_inner_2d=(polynomial_degree-1)*(polynomial_degree-1);
-    const unsigned int n_outer_2d=4+4*(polynomial_degree-1);
-
-    // first check whether we have precomputed the values for some polynomial
-    // degree; the sizes of arrays is n_inner_2d*n_outer_2d
-    if (polynomial_degree == 2)
-      {
-        // (checked these values against the output of compute_laplace_vector
-        // again, and found they're indeed right -- just in case someone wonders
-        // where they come from -- WB)
-        static const double loqv2[1*8]
-          = {1/16., 1/16., 1/16., 1/16., 3/16., 3/16., 3/16., 3/16.};
-        Assert (sizeof(loqv2)/sizeof(loqv2[0]) ==
-                n_inner_2d * n_outer_2d,
-                ExcInternalError());
-
-        // copy and return
-        loqvs.reinit(n_inner_2d, n_outer_2d);
-        for (unsigned int unit_point=0; unit_point<n_inner_2d; ++unit_point)
-          for (unsigned int k=0; k<n_outer_2d; ++k)
-            loqvs[unit_point][k] = loqv2[unit_point*n_outer_2d+k];
-      }
-    else
-      {
-        // not precomputed, then do so now
-        loqvs = compute_laplace_vector<2>(polynomial_degree);
-      }
-
-    // the sum of weights of the points at the outer rim should be one. check
-    // this
-    for (unsigned int unit_point=0; unit_point<loqvs.n_rows(); ++unit_point)
-      Assert(std::fabs(std::accumulate(loqvs[unit_point].begin(),
-                                       loqvs[unit_point].end(),0.)-1)<1e-13*polynomial_degree,
-             ExcInternalError());
-
-    return loqvs;
-  }
-
-
-
-  /**
-   * This function is needed by the constructor of <tt>MappingQ<3></tt>.
-   *
-   * For <tt>degree==2</tt> this function sets the @p support_point_weights_on_hex to
-   * the hardcoded data. For <tt>degree>2</tt> this vector is computed.
-   *
-   * For the definition of the @p support_point_weights_on_hex please refer to
-   * equation (8) of the `mapping' report.
-   */
-  template <int dim>
-  Table<2,double>
-  compute_support_point_weights_on_hex(const unsigned int polynomial_degree)
-  {
-    Table<2,double> lohvs;
-
-    // in 1d and 2d, there are no hexes, so return an empty object
-    if (dim < 3)
-      return lohvs;
-
-    // we are asked to compute weights for interior support points, but
-    // there are no interior points if degree==1
-    if (polynomial_degree == 1)
-      return lohvs;
-
-    const unsigned int n_inner = Utilities::fixed_power<dim>(polynomial_degree-1);
-    const unsigned int n_outer = 8+12*(polynomial_degree-1)+6*(polynomial_degree-1)*(polynomial_degree-1);
-
-    // first check whether we have precomputed the values for some polynomial
-    // degree; the sizes of arrays is n_inner_2d*n_outer_2d
-    if (polynomial_degree == 2)
-      {
-        static const double lohv2[26]
-          = {1/128., 1/128., 1/128., 1/128., 1/128., 1/128., 1/128., 1/128.,
-             7/192., 7/192., 7/192., 7/192., 7/192., 7/192., 7/192., 7/192.,
-             7/192., 7/192., 7/192., 7/192.,
-             1/12., 1/12., 1/12., 1/12., 1/12., 1/12.
-            };
-
-        // copy and return
-        lohvs.reinit(n_inner, n_outer);
-        for (unsigned int unit_point=0; unit_point<n_inner; ++unit_point)
-          for (unsigned int k=0; k<n_outer; ++k)
-            lohvs[unit_point][k] = lohv2[unit_point*n_outer+k];
-      }
-    else
-      {
-        // not precomputed, then do so now
-        lohvs = compute_laplace_vector<dim>(polynomial_degree);
-      }
-
-    // the sum of weights of the points at the outer rim should be one. check
-    // this
-    for (unsigned int unit_point=0; unit_point<n_inner; ++unit_point)
-      Assert(std::fabs(std::accumulate(lohvs[unit_point].begin(),
-                                       lohvs[unit_point].end(),0.) - 1)<1e-13*polynomial_degree,
-             ExcInternalError());
-
-    return lohvs;
-  }
-}
-
-
 
 
 template<int dim, int spacedim>
 MappingManifold<dim,spacedim>::MappingManifold ()
   :
-  polynomial_degree(1),
-  line_support_points(this->polynomial_degree+1),
-  fe_q(dim == 3 ? new FE_Q<dim>(this->polynomial_degree) : 0),
-  support_point_weights_on_quad (compute_support_point_weights_on_quad<dim>(this->polynomial_degree)),
-  support_point_weights_on_hex (compute_support_point_weights_on_hex<dim>(this->polynomial_degree))
+  fe_q(1)
+  // support_point_weights_on_quad (compute_support_point_weights_on_quad<dim>(this->polynomial_degree)),
+  // support_point_weights_on_hex (compute_support_point_weights_on_hex<dim>(this->polynomial_degree)),
 {
 }
 
@@ -1171,11 +209,7 @@ MappingManifold<dim,spacedim>::MappingManifold ()
 template<int dim, int spacedim>
 MappingManifold<dim,spacedim>::MappingManifold (const MappingManifold<dim,spacedim> &mapping)
   :
-  polynomial_degree(mapping.polynomial_degree),
-  line_support_points(mapping.line_support_points),
-  fe_q(dim == 3 ? new FE_Q<dim>(*mapping.fe_q) : 0),
-  support_point_weights_on_quad (mapping.support_point_weights_on_quad),
-  support_point_weights_on_hex (mapping.support_point_weights_on_hex)
+  fe_q(1)
 {}
 
 
@@ -1196,28 +230,14 @@ MappingManifold<dim,spacedim>::
 transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                              const Point<dim> &p) const
 {
-  // set up the polynomial space
-  const QGaussLobatto<1> line_support_points (polynomial_degree + 1);
-  const TensorProductPolynomials<dim>
-  tensor_pols (Polynomials::generate_complete_Lagrange_basis(line_support_points.get_points()));
-  Assert (tensor_pols.n() == Utilities::fixed_power<dim>(polynomial_degree+1),
-          ExcInternalError());
-
-  // then also construct the mapping from lexicographic to the Qp shape function numbering
-  const std::vector<unsigned int>
-  renumber (FETools::
-            lexicographic_to_hierarchic_numbering (
-              FiniteElementData<dim> (get_dpo_vector<dim>(polynomial_degree), 1,
-                                      polynomial_degree)));
-
-  const std::vector<Point<spacedim> > support_points
-    = this->compute_mapping_support_points(cell);
-
-  Point<spacedim> mapped_point;
-  for (unsigned int i=0; i<tensor_pols.n(); ++i)
-    mapped_point += support_points[renumber[i]] * tensor_pols.compute_value (i, p);
-
-  return mapped_point;
+  std::vector<Point<spacedim> > vertices;
+  std::vector<Point<spacedim> > weights;
+  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+    {
+      vertices.push_back(cell->vertex(v));
+      weights.push_back(fe_q.shape_value(v,p));
+    }
+  return cell->get_manifold().get_new_point(Quadrature<spacedim>(vertices, weights));
 }
 
 
@@ -1231,629 +251,6 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
 template <>
 class MappingManifold<3,4>
 {};
-
-namespace
-{
-  /**
-   * Using the relative weights of the shape functions evaluated at
-   * one point on the reference cell (and stored in data.shape_values
-   * and accessed via data.shape(0,i)) and the locations of mapping
-   * support points (stored in data.mapping_support_points), compute
-   * the mapped location of that point in real space.
-   */
-  template<int dim, int spacedim>
-  Point<spacedim>
-  compute_mapped_location_of_point (const typename MappingManifold<dim,spacedim>::InternalData &data)
-  {
-    AssertDimension (data.shape_values.size(),
-                     data.mapping_support_points.size());
-
-    // use now the InternalData to compute the point in real space.
-    Point<spacedim> p_real;
-    for (unsigned int i=0; i<data.mapping_support_points.size(); ++i)
-      p_real += data.mapping_support_points[i] * data.shape(0,i);
-
-    return p_real;
-  }
-
-
-  /**
-   * Implementation of transform_real_to_unit_cell for dim==spacedim
-   */
-  template <int dim>
-  Point<dim>
-  do_transform_real_to_unit_cell_internal
-  (const typename Triangulation<dim,dim>::cell_iterator &cell,
-   const Point<dim>                                     &p,
-   const Point<dim>                                     &initial_p_unit,
-   typename MappingManifold<dim,dim>::InternalData      &mdata)
-  {
-    const unsigned int spacedim = dim;
-
-    const unsigned int n_shapes=mdata.shape_values.size();
-    (void)n_shapes;
-    Assert(n_shapes!=0, ExcInternalError());
-    AssertDimension (mdata.shape_derivatives.size(), n_shapes);
-
-    std::vector<Point<spacedim> > &points=mdata.mapping_support_points;
-    AssertDimension (points.size(), n_shapes);
-
-
-    // Newton iteration to solve
-    //    f(x)=p(x)-p=0
-    // where we are looking for 'x' and p(x) is the forward transformation
-    // from unit to real cell. We solve this using a Newton iteration
-    //    x_{n+1}=x_n-[f'(x)]^{-1}f(x)
-    // The start value is set to be the linear approximation to the cell
-
-    // The shape values and derivatives of the mapping at this point are
-    // previously computed.
-
-    Point<dim> p_unit = initial_p_unit;
-
-    mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit));
-
-    Point<spacedim> p_real = compute_mapped_location_of_point<dim,spacedim>(mdata);
-    Tensor<1,spacedim> f = p_real-p;
-
-    // early out if we already have our point
-    if (f.norm_square() < 1e-24 * cell->diameter() * cell->diameter())
-      return p_unit;
-
-    // we need to compare the position of the computed p(x) against the given
-    // point 'p'. We will terminate the iteration and return 'x' if they are
-    // less than eps apart. The question is how to choose eps -- or, put maybe
-    // more generally: in which norm we want these 'p' and 'p(x)' to be eps
-    // apart.
-    //
-    // the question is difficult since we may have to deal with very elongated
-    // cells where we may achieve 1e-12*h for the distance of these two points
-    // in the 'long' direction, but achieving this tolerance in the 'short'
-    // direction of the cell may not be possible
-    //
-    // what we do instead is then to terminate iterations if
-    //    \| p(x) - p \|_A < eps
-    // where the A-norm is somehow induced by the transformation of the cell.
-    // in particular, we want to measure distances relative to the sizes of
-    // the cell in its principal directions.
-    //
-    // to define what exactly A should be, note that to first order we have
-    // the following (assuming that x* is the solution of the problem, i.e.,
-    // p(x*)=p):
-    //    p(x) - p = p(x) - p(x*)
-    //             = -grad p(x) * (x*-x) + higher order terms
-    // This suggest to measure with a norm that corresponds to
-    //    A = {[grad p(x]^T [grad p(x)]}^{-1}
-    // because then
-    //    \| p(x) - p \|_A  \approx  \| x - x* \|
-    // Consequently, we will try to enforce that
-    //    \| p(x) - p \|_A  =  \| f \|  <=  eps
-    //
-    // Note that using this norm is a bit dangerous since the norm changes
-    // in every iteration (A isn't fixed by depends on xk). However, if the
-    // cell is not too deformed (it may be stretched, but not twisted) then
-    // the mapping is almost linear and A is indeed constant or nearly so.
-    const double eps = 1.e-11;
-    const unsigned int newton_iteration_limit = 20;
-
-    unsigned int newton_iteration = 0;
-    double last_f_weighted_norm;
-    do
-      {
-#ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
-        std::cout << "Newton iteration " << newton_iteration << std::endl;
-#endif
-
-        // f'(x)
-        Tensor<2,spacedim> df;
-        for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
-          {
-            const Tensor<1,dim> &grad_transform=mdata.derivative(0,k);
-            const Point<spacedim> &point=points[k];
-
-            for (unsigned int i=0; i<spacedim; ++i)
-              for (unsigned int j=0; j<dim; ++j)
-                df[i][j]+=point[i]*grad_transform[j];
-          }
-
-        // Solve  [f'(x)]d=f(x)
-        Tensor<2,spacedim> df_inverse = invert(df);
-        const Tensor<1,spacedim> delta = df_inverse * static_cast<const Tensor<1,spacedim>&>(f);
-
-#ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
-        std::cout << "   delta=" << delta  << std::endl;
-#endif
-
-        // do a line search
-        double step_length = 1;
-        do
-          {
-            // update of p_unit. The spacedim-th component of transformed point
-            // is simply ignored in codimension one case. When this component is
-            // not zero, then we are projecting the point to the surface or
-            // curve identified by the cell.
-            Point<dim> p_unit_trial = p_unit;
-            for (unsigned int i=0; i<dim; ++i)
-              p_unit_trial[i] -= step_length * delta[i];
-
-            // shape values and derivatives
-            // at new p_unit point
-            mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit_trial));
-
-            // f(x)
-            Point<spacedim> p_real_trial = compute_mapped_location_of_point<dim,spacedim>(mdata);
-            const Tensor<1,spacedim> f_trial = p_real_trial-p;
-
-#ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
-            std::cout << "     step_length=" << step_length << std::endl
-                      << "       ||f ||   =" << f.norm() << std::endl
-                      << "       ||f*||   =" << f_trial.norm() << std::endl
-                      << "       ||f*||_A =" << (df_inverse * f_trial).norm() << std::endl;
-#endif
-
-            // see if we are making progress with the current step length
-            // and if not, reduce it by a factor of two and try again
-            //
-            // strictly speaking, we should probably use the same norm as we use
-            // for the outer algorithm. in practice, line search is just a
-            // crutch to find a "reasonable" step length, and so using the l2
-            // norm is probably just fine
-            if (f_trial.norm() < f.norm())
-              {
-                p_real = p_real_trial;
-                p_unit = p_unit_trial;
-                f = f_trial;
-                break;
-              }
-            else if (step_length > 0.05)
-              step_length /= 2;
-            else
-              AssertThrow (false,
-                           (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
-          }
-        while (true);
-
-        ++newton_iteration;
-        if (newton_iteration > newton_iteration_limit)
-          AssertThrow (false,
-                       (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
-        last_f_weighted_norm = (df_inverse * f).norm();
-      }
-    while (last_f_weighted_norm > eps);
-
-    return p_unit;
-  }
-
-
-
-  /**
-   * Implementation of transform_real_to_unit_cell for dim==spacedim-1
-   */
-  template <int dim>
-  Point<dim>
-  do_transform_real_to_unit_cell_internal_codim1
-  (const typename Triangulation<dim,dim+1>::cell_iterator &cell,
-   const Point<dim+1>                                       &p,
-   const Point<dim>                                         &initial_p_unit,
-   typename MappingManifold<dim,dim+1>::InternalData       &mdata)
-  {
-    const unsigned int spacedim = dim+1;
-
-    const unsigned int n_shapes=mdata.shape_values.size();
-    (void)n_shapes;
-    Assert(n_shapes!=0, ExcInternalError());
-    Assert(mdata.shape_derivatives.size()==n_shapes, ExcInternalError());
-    Assert(mdata.shape_second_derivatives.size()==n_shapes, ExcInternalError());
-
-    std::vector<Point<spacedim> > &points=mdata.mapping_support_points;
-    Assert(points.size()==n_shapes, ExcInternalError());
-
-    Point<spacedim> p_minus_F;
-
-    Tensor<1,spacedim>  DF[dim];
-    Tensor<1,spacedim>  D2F[dim][dim];
-
-    Point<dim> p_unit = initial_p_unit;
-    Point<dim> f;
-    Tensor<2,dim>  df;
-
-    // Evaluate first and second derivatives
-    mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit));
-
-    for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
-      {
-        const Tensor<1,dim>   &grad_phi_k = mdata.derivative(0,k);
-        const Tensor<2,dim>   &hessian_k  = mdata.second_derivative(0,k);
-        const Point<spacedim> &point_k = points[k];
-
-        for (unsigned int j=0; j<dim; ++j)
-          {
-            DF[j] += grad_phi_k[j] * point_k;
-            for (unsigned int l=0; l<dim; ++l)
-              D2F[j][l] += hessian_k[j][l] * point_k;
-          }
-      }
-
-    p_minus_F = p;
-    p_minus_F -= compute_mapped_location_of_point<dim,spacedim>(mdata);
-
-
-    for (unsigned int j=0; j<dim; ++j)
-      f[j] = DF[j] * p_minus_F;
-
-    for (unsigned int j=0; j<dim; ++j)
-      {
-        f[j] = DF[j] * p_minus_F;
-        for (unsigned int l=0; l<dim; ++l)
-          df[j][l] = -DF[j]*DF[l] + D2F[j][l] * p_minus_F;
-      }
-
-
-    const double eps = 1.e-12*cell->diameter();
-    const unsigned int loop_limit = 10;
-
-    unsigned int loop=0;
-
-    while (f.norm()>eps && loop++<loop_limit)
-      {
-        // Solve  [df(x)]d=f(x)
-        const Tensor<1,dim> d = invert(df) * static_cast<const Tensor<1,dim>&>(f);
-        p_unit -= d;
-
-        for (unsigned int j=0; j<dim; ++j)
-          {
-            DF[j].clear();
-            for (unsigned int l=0; l<dim; ++l)
-              D2F[j][l].clear();
-          }
-
-        mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit));
-
-        for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
-          {
-            const Tensor<1,dim>   &grad_phi_k = mdata.derivative(0,k);
-            const Tensor<2,dim>   &hessian_k  = mdata.second_derivative(0,k);
-            const Point<spacedim> &point_k = points[k];
-
-            for (unsigned int j=0; j<dim; ++j)
-              {
-                DF[j] += grad_phi_k[j] * point_k;
-                for (unsigned int l=0; l<dim; ++l)
-                  D2F[j][l] += hessian_k[j][l] * point_k;
-              }
-          }
-
-        //TODO: implement a line search here in much the same way as for
-        // the corresponding function above that does so for dim==spacedim
-        p_minus_F = p;
-        p_minus_F -= compute_mapped_location_of_point<dim,spacedim>(mdata);
-
-        for (unsigned int j=0; j<dim; ++j)
-          {
-            f[j] = DF[j] * p_minus_F;
-            for (unsigned int l=0; l<dim; ++l)
-              df[j][l] = -DF[j]*DF[l] + D2F[j][l] * p_minus_F;
-          }
-
-      }
-
-
-    // Here we check that in the last execution of while the first
-    // condition was already wrong, meaning the residual was below
-    // eps. Only if the first condition failed, loop will have been
-    // increased and tested, and thus have reached the limit.
-    AssertThrow (loop<loop_limit, (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
-
-    return p_unit;
-  }
-
-
-}
-
-
-
-// visual studio freaks out when trying to determine if
-// do_transform_real_to_unit_cell_internal with dim=3 and spacedim=4 is a good
-// candidate. So instead of letting the compiler pick the correct overload, we
-// use template specialization to make sure we pick up the right function to
-// call:
-
-template<int dim, int spacedim>
-Point<dim>
-MappingManifold<dim,spacedim>::
-transform_real_to_unit_cell_internal
-(const typename Triangulation<dim,spacedim>::cell_iterator &,
- const Point<spacedim> &,
- const Point<dim> &) const
-{
-  // default implementation (should never be called)
-  Assert(false, ExcInternalError());
-  return Point<dim>();
-}
-
-template<>
-Point<1>
-MappingManifold<1,1>::
-transform_real_to_unit_cell_internal
-(const Triangulation<1,1>::cell_iterator &cell,
- const Point<1>                            &p,
- const Point<1>                                 &initial_p_unit) const
-{
-  const int dim = 1;
-  const int spacedim = 1;
-
-  const Quadrature<dim> point_quadrature(initial_p_unit);
-
-  UpdateFlags update_flags = update_quadrature_points | update_jacobians;
-  if (spacedim>dim)
-    update_flags |= update_jacobian_grads;
-  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
-                                                      point_quadrature));
-
-  mdata->mapping_support_points = this->compute_mapping_support_points (cell);
-
-  // dispatch to the various specializations for spacedim=dim,
-  // spacedim=dim+1, etc
-  return do_transform_real_to_unit_cell_internal<1>(cell, p, initial_p_unit, *mdata);
-}
-
-template<>
-Point<2>
-MappingManifold<2, 2>::
-transform_real_to_unit_cell_internal
-(const Triangulation<2, 2>::cell_iterator &cell,
- const Point<2>                            &p,
- const Point<2>                                 &initial_p_unit) const
-{
-  const int dim = 2;
-  const int spacedim = 2;
-
-  const Quadrature<dim> point_quadrature(initial_p_unit);
-
-  UpdateFlags update_flags = update_quadrature_points | update_jacobians;
-  if (spacedim>dim)
-    update_flags |= update_jacobian_grads;
-  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
-                                                      point_quadrature));
-
-  mdata->mapping_support_points = this->compute_mapping_support_points (cell);
-
-  // dispatch to the various specializations for spacedim=dim,
-  // spacedim=dim+1, etc
-  return do_transform_real_to_unit_cell_internal<2>(cell, p, initial_p_unit, *mdata);
-}
-
-template<>
-Point<3>
-MappingManifold<3, 3>::
-transform_real_to_unit_cell_internal
-(const Triangulation<3, 3>::cell_iterator &cell,
- const Point<3>                            &p,
- const Point<3>                                 &initial_p_unit) const
-{
-  const int dim = 3;
-  const int spacedim = 3;
-
-  const Quadrature<dim> point_quadrature(initial_p_unit);
-
-  UpdateFlags update_flags = update_quadrature_points | update_jacobians;
-  if (spacedim>dim)
-    update_flags |= update_jacobian_grads;
-  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
-                                                      point_quadrature));
-
-  mdata->mapping_support_points = this->compute_mapping_support_points (cell);
-
-  // dispatch to the various specializations for spacedim=dim,
-  // spacedim=dim+1, etc
-  return do_transform_real_to_unit_cell_internal<3>(cell, p, initial_p_unit, *mdata);
-}
-
-template<>
-Point<1>
-MappingManifold<1, 2>::
-transform_real_to_unit_cell_internal
-(const Triangulation<1, 2>::cell_iterator &cell,
- const Point<2>                            &p,
- const Point<1>                                 &initial_p_unit) const
-{
-  const int dim = 1;
-  const int spacedim = 2;
-
-  const Quadrature<dim> point_quadrature(initial_p_unit);
-
-  UpdateFlags update_flags = update_quadrature_points | update_jacobians;
-  if (spacedim>dim)
-    update_flags |= update_jacobian_grads;
-  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
-                                                      point_quadrature));
-
-  mdata->mapping_support_points = this->compute_mapping_support_points (cell);
-
-  // dispatch to the various specializations for spacedim=dim,
-  // spacedim=dim+1, etc
-  return do_transform_real_to_unit_cell_internal_codim1<1>(cell, p, initial_p_unit, *mdata);
-}
-
-template<>
-Point<2>
-MappingManifold<2, 3>::
-transform_real_to_unit_cell_internal
-(const Triangulation<2, 3>::cell_iterator &cell,
- const Point<3>                            &p,
- const Point<2>                                 &initial_p_unit) const
-{
-  const int dim = 2;
-  const int spacedim = 3;
-
-  const Quadrature<dim> point_quadrature(initial_p_unit);
-
-  UpdateFlags update_flags = update_quadrature_points | update_jacobians;
-  if (spacedim>dim)
-    update_flags |= update_jacobian_grads;
-  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
-                                                      point_quadrature));
-
-  mdata->mapping_support_points = this->compute_mapping_support_points (cell);
-
-  // dispatch to the various specializations for spacedim=dim,
-  // spacedim=dim+1, etc
-  return do_transform_real_to_unit_cell_internal_codim1<2>(cell, p, initial_p_unit, *mdata);
-}
-
-template<>
-Point<1>
-MappingManifold<1, 3>::
-transform_real_to_unit_cell_internal
-(const Triangulation<1, 3>::cell_iterator &,
- const Point<3> &,
- const Point<1> &) const
-{
-  Assert (false, ExcNotImplemented());
-  return Point<1>();
-}
-
-
-
-template<int dim, int spacedim>
-Point<dim>
-MappingManifold<dim,spacedim>::
-transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                             const Point<spacedim>                            &p) const
-{
-  // Use an exact formula if one is available. this is only the case
-  // for Q1 mappings in 1d, and in 2d if dim==spacedim
-  if ((polynomial_degree == 1) &&
-      ((dim == 1)
-       ||
-       ((dim == 2) && (dim == spacedim))))
-    {
-      // The dimension-dependent algorithms are much faster (about 25-45x in
-      // 2D) but fail most of the time when the given point (p) is not in the
-      // cell. The dimension-independent Newton algorithm given below is
-      // slower, but more robust (though it still sometimes fails). Therefore
-      // this function implements the following strategy based on the
-      // p's dimension:
-      //
-      // * In 1D this mapping is linear, so the mapping is always invertible
-      //   (and the exact formula is known) as long as the cell has non-zero
-      //   length.
-      // * In 2D the exact (quadratic) formula is called first. If either the
-      //   exact formula does not succeed (negative discriminant in the
-      //   quadratic formula) or succeeds but finds a solution outside of the
-      //   unit cell, then the Newton solver is called. The rationale for the
-      //   second choice is that the exact formula may provide two different
-      //   answers when mapping a point outside of the real cell, but the
-      //   Newton solver (if it converges) will only return one answer.
-      //   Otherwise the exact formula successfully found a point in the unit
-      //   cell and that value is returned.
-      // * In 3D there is no (known to the authors) exact formula, so the Newton
-      //   algorithm is used.
-      const std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
-      vertices = this->get_vertices(cell);
-      try
-        {
-          switch (dim)
-            {
-            case 1:
-            {
-              // formula not subject to any issues in 1d
-              if (spacedim == 1)
-                return internal::MappingQ1::transform_real_to_unit_cell(vertices, p);
-              else
-                {
-                  const std::vector<Point<spacedim> > a (vertices.begin(),
-                                                         vertices.end());
-                  return internal::MappingQ1::transform_real_to_unit_cell_initial_guess<dim,spacedim>(a,p);
-                }
-            }
-
-            case 2:
-            {
-              const Point<dim> point
-                = internal::MappingQ1::transform_real_to_unit_cell(vertices, p);
-
-              // formula not guaranteed to work for points outside of
-              // the cell. only take the computed point if it lies
-              // inside the reference cell
-              const double eps = 1e-15;
-              if (-eps <= point(1) && point(1) <= 1 + eps &&
-                  -eps <= point(0) && point(0) <= 1 + eps)
-                {
-                  return point;
-                }
-              else
-                break;
-            }
-
-            default:
-            {
-              // we should get here, based on the if-condition at the top
-              Assert(false, ExcInternalError());
-            }
-            }
-        }
-      catch (const typename Mapping<spacedim,spacedim>::ExcTransformationFailed &)
-        {
-          // simply fall through and continue on to the standard Newton code
-        }
-    }
-  else
-    {
-      // we can't use an explicit formula,
-    }
-
-
-  Point<dim> initial_p_unit;
-  if (polynomial_degree == 1)
-    {
-      // Find the initial value for the Newton iteration by a normal
-      // projection to the least square plane determined by the vertices
-      // of the cell
-      const std::vector<Point<spacedim> > a
-        = this->compute_mapping_support_points (cell);
-      Assert(a.size() == GeometryInfo<dim>::vertices_per_cell,
-             ExcInternalError());
-      initial_p_unit = internal::MappingQ1::transform_real_to_unit_cell_initial_guess<dim,spacedim>(a,p);
-    }
-  else
-    {
-      try
-        {
-          // Find the initial value for the Newton iteration by a normal
-          // projection to the least square plane determined by the vertices
-          // of the cell
-          //
-          // we do this by first getting all support points, then
-          // throwing away all but the vertices, and finally calling
-          // the same function as above
-          std::vector<Point<spacedim> > a
-            = this->compute_mapping_support_points (cell);
-          a.resize(GeometryInfo<dim>::vertices_per_cell);
-          initial_p_unit = internal::MappingQ1::transform_real_to_unit_cell_initial_guess<dim,spacedim>(a,p);
-        }
-      catch (const typename Mapping<dim,spacedim>::ExcTransformationFailed &)
-        {
-          for (unsigned int d=0; d<dim; ++d)
-            initial_p_unit[d] = 0.5;
-        }
-
-      // in case the function above should have given us something
-      // back that lies outside the unit cell (that might happen
-      // because we may have given a point 'p' that lies inside the
-      // cell with the higher order mapping, but outside the Q1-mapped
-      // reference cell), then project it back into the reference cell
-      // in hopes that this gives a better starting point to the
-      // following iteration
-      initial_p_unit = GeometryInfo<dim>::project_to_unit_cell(initial_p_unit);
-    }
-
-  // perform the Newton iteration and return the result. note that
-  // this statement may throw an exception, which we simply pass up to
-  // the caller
-  return this->transform_real_to_unit_cell_internal(cell, p, initial_p_unit);
-}
-
 
 
 template<int dim, int spacedim>
@@ -1934,7 +331,7 @@ typename MappingManifold<dim,spacedim>::InternalData *
 MappingManifold<dim,spacedim>::get_face_data (const UpdateFlags        update_flags,
                                               const Quadrature<dim-1> &quadrature) const
 {
-  InternalData *data = new InternalData(polynomial_degree);
+  InternalData *data = new InternalData();
   data->initialize_face (this->requires_update_flags(update_flags),
                          QProjector<dim>::project_to_all_faces(quadrature),
                          quadrature.size());
@@ -1949,7 +346,7 @@ typename MappingManifold<dim,spacedim>::InternalData *
 MappingManifold<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
                                                  const Quadrature<dim-1>& quadrature) const
 {
-  InternalData *data = new InternalData(polynomial_degree);
+  InternalData *data = new InternalData();
   data->initialize_face (this->requires_update_flags(update_flags),
                          QProjector<dim>::project_to_all_subfaces(quadrature),
                          quadrature.size());
@@ -3641,7 +2038,7 @@ add_line_support_points (const typename Triangulation<dim,spacedim>::cell_iterat
               cell->get_manifold() :
               line->get_manifold() );
 
-          get_intermediate_points_on_object (manifold, line_support_points, line, line_points);
+          //          get_intermediate_points_on_object (manifold, line_support_points, line, line_points);
 
           if (dim==3)
             {
@@ -3668,134 +2065,134 @@ MappingManifold<3,3>::
 add_quad_support_points(const Triangulation<3,3>::cell_iterator &cell,
                         std::vector<Point<3> >                &a) const
 {
-  const unsigned int faces_per_cell    = GeometryInfo<3>::faces_per_cell,
-                     vertices_per_face = GeometryInfo<3>::vertices_per_face,
-                     lines_per_face    = GeometryInfo<3>::lines_per_face,
-                     vertices_per_cell = GeometryInfo<3>::vertices_per_cell;
+//   const unsigned int faces_per_cell    = GeometryInfo<3>::faces_per_cell,
+//                      vertices_per_face = GeometryInfo<3>::vertices_per_face,
+//                      lines_per_face    = GeometryInfo<3>::lines_per_face,
+//                      vertices_per_cell = GeometryInfo<3>::vertices_per_cell;
 
-  static const StraightBoundary<3> straight_boundary;
-  // used if face quad at boundary or entirely in the interior of the domain
-  std::vector<Point<3> > quad_points ((polynomial_degree-1)*(polynomial_degree-1));
-  // used if only one line of face quad is at boundary
-  std::vector<Point<3> > b(4*polynomial_degree);
+//   static const StraightBoundary<3> straight_boundary;
+//   // used if face quad at boundary or entirely in the interior of the domain
+//   std::vector<Point<3> > quad_points ((polynomial_degree-1)*(polynomial_degree-1));
+//   // used if only one line of face quad is at boundary
+//   std::vector<Point<3> > b(4*polynomial_degree);
 
-  // Used by the new Manifold interface. This vector collects the
-  // vertices used to compute the intermediate points.
-  std::vector<Point<3> > vertices(4);
+//   // Used by the new Manifold interface. This vector collects the
+//   // vertices used to compute the intermediate points.
+//   std::vector<Point<3> > vertices(4);
 
-  // loop over all faces and collect points on them
-  for (unsigned int face_no=0; face_no<faces_per_cell; ++face_no)
-    {
-      const Triangulation<3>::face_iterator face = cell->face(face_no);
+//   // loop over all faces and collect points on them
+//   for (unsigned int face_no=0; face_no<faces_per_cell; ++face_no)
+//     {
+//       const Triangulation<3>::face_iterator face = cell->face(face_no);
 
-      // select the correct mappings for the present face
-      const bool face_orientation = cell->face_orientation(face_no),
-                 face_flip        = cell->face_flip       (face_no),
-                 face_rotation    = cell->face_rotation   (face_no);
+//       // select the correct mappings for the present face
+//       const bool face_orientation = cell->face_orientation(face_no),
+//                  face_flip        = cell->face_flip       (face_no),
+//                  face_rotation    = cell->face_rotation   (face_no);
 
-#ifdef DEBUG
-      // some sanity checks up front
-      for (unsigned int i=0; i<vertices_per_face; ++i)
-        Assert(face->vertex_index(i)==cell->vertex_index(
-                 GeometryInfo<3>::face_to_cell_vertices(face_no, i,
-                                                        face_orientation,
-                                                        face_flip,
-                                                        face_rotation)),
-               ExcInternalError());
+// #ifdef DEBUG
+//       // some sanity checks up front
+//       for (unsigned int i=0; i<vertices_per_face; ++i)
+//         Assert(face->vertex_index(i)==cell->vertex_index(
+//                  GeometryInfo<3>::face_to_cell_vertices(face_no, i,
+//                                                         face_orientation,
+//                                                         face_flip,
+//                                                         face_rotation)),
+//                ExcInternalError());
 
-      // indices of the lines that bound a face are given by GeometryInfo<3>::
-      // face_to_cell_lines
-      for (unsigned int i=0; i<lines_per_face; ++i)
-        Assert(face->line(i)==cell->line(GeometryInfo<3>::face_to_cell_lines(
-                                           face_no, i, face_orientation, face_flip, face_rotation)),
-               ExcInternalError());
-#endif
+//       // indices of the lines that bound a face are given by GeometryInfo<3>::
+//       // face_to_cell_lines
+//       for (unsigned int i=0; i<lines_per_face; ++i)
+//         Assert(face->line(i)==cell->line(GeometryInfo<3>::face_to_cell_lines(
+//                                            face_no, i, face_orientation, face_flip, face_rotation)),
+//                ExcInternalError());
+// #endif
 
-      // if face at boundary, then ask boundary object to return intermediate
-      // points on it
-      if (face->at_boundary())
-        {
-          get_intermediate_points_on_object(face->get_manifold(), line_support_points, face, quad_points);
+//       // if face at boundary, then ask boundary object to return intermediate
+//       // points on it
+//       if (face->at_boundary())
+//         {
+//           get_intermediate_points_on_object(face->get_manifold(), line_support_points, face, quad_points);
 
-          // in 3D, the orientation, flip and rotation of the face might not
-          // match what we expect here, namely the standard orientation. thus
-          // reorder points accordingly. since a Mapping uses the same shape
-          // function as an FE_Q, we can ask a FE_Q to do the reordering for us.
-          for (unsigned int i=0; i<quad_points.size(); ++i)
-            a.push_back(quad_points[fe_q->adjust_quad_dof_index_for_face_orientation(i,
-                                    face_orientation,
-                                    face_flip,
-                                    face_rotation)]);
-        }
-      else
-        {
-          // face is not at boundary, but maybe some of its lines are. count
-          // them
-          unsigned int lines_at_boundary=0;
-          for (unsigned int i=0; i<lines_per_face; ++i)
-            if (face->line(i)->at_boundary())
-              ++lines_at_boundary;
+//           // in 3D, the orientation, flip and rotation of the face might not
+//           // match what we expect here, namely the standard orientation. thus
+//           // reorder points accordingly. since a Mapping uses the same shape
+//           // function as an FE_Q, we can ask a FE_Q to do the reordering for us.
+//           for (unsigned int i=0; i<quad_points.size(); ++i)
+//             a.push_back(quad_points[fe_q->adjust_quad_dof_index_for_face_orientation(i,
+//                                     face_orientation,
+//                                     face_flip,
+//                                     face_rotation)]);
+//         }
+//       else
+//         {
+//           // face is not at boundary, but maybe some of its lines are. count
+//           // them
+//           unsigned int lines_at_boundary=0;
+//           for (unsigned int i=0; i<lines_per_face; ++i)
+//             if (face->line(i)->at_boundary())
+//               ++lines_at_boundary;
 
-          Assert(lines_at_boundary<=lines_per_face, ExcInternalError());
+//           Assert(lines_at_boundary<=lines_per_face, ExcInternalError());
 
-          // if at least one of the lines bounding this quad is at the
-          // boundary, then collect points separately
-          if (lines_at_boundary>0)
-            {
-              // call of function add_weighted_interior_points increases size of b
-              // about 1. There resize b for the case the mentioned function
-              // was already called.
-              b.resize(4*polynomial_degree);
+//           // if at least one of the lines bounding this quad is at the
+//           // boundary, then collect points separately
+//           if (lines_at_boundary>0)
+//             {
+//               // call of function add_weighted_interior_points increases size of b
+//               // about 1. There resize b for the case the mentioned function
+//               // was already called.
+//               b.resize(4*polynomial_degree);
 
-              // b is of size 4*degree, make sure that this is the right size
-              Assert(b.size()==vertices_per_face+lines_per_face*(polynomial_degree-1),
-                     ExcDimensionMismatch(b.size(),
-                                          vertices_per_face+lines_per_face*(polynomial_degree-1)));
+//               // b is of size 4*degree, make sure that this is the right size
+//               Assert(b.size()==vertices_per_face+lines_per_face*(polynomial_degree-1),
+//                      ExcDimensionMismatch(b.size(),
+//                                           vertices_per_face+lines_per_face*(polynomial_degree-1)));
 
-              // sort the points into b. We used access from the cell (not
-              // from the face) to fill b, so we can assume a standard face
-              // orientation. Doing so, the calculated points will be in
-              // standard orientation as well.
-              for (unsigned int i=0; i<vertices_per_face; ++i)
-                b[i]=a[GeometryInfo<3>::face_to_cell_vertices(face_no, i)];
+//               // sort the points into b. We used access from the cell (not
+//               // from the face) to fill b, so we can assume a standard face
+//               // orientation. Doing so, the calculated points will be in
+//               // standard orientation as well.
+//               for (unsigned int i=0; i<vertices_per_face; ++i)
+//                 b[i]=a[GeometryInfo<3>::face_to_cell_vertices(face_no, i)];
 
-              for (unsigned int i=0; i<lines_per_face; ++i)
-                for (unsigned int j=0; j<polynomial_degree-1; ++j)
-                  b[vertices_per_face+i*(polynomial_degree-1)+j]=
-                    a[vertices_per_cell + GeometryInfo<3>::face_to_cell_lines(
-                        face_no, i)*(polynomial_degree-1)+j];
+//               for (unsigned int i=0; i<lines_per_face; ++i)
+//                 for (unsigned int j=0; j<polynomial_degree-1; ++j)
+//                   b[vertices_per_face+i*(polynomial_degree-1)+j]=
+//                     a[vertices_per_cell + GeometryInfo<3>::face_to_cell_lines(
+//                         face_no, i)*(polynomial_degree-1)+j];
 
-              // Now b includes the support points on the quad and we can
-              // apply the laplace vector
-              add_weighted_interior_points (support_point_weights_on_quad, b);
-              AssertDimension (b.size(),
-                               4*this->polynomial_degree +
-                               (this->polynomial_degree-1)*(this->polynomial_degree-1));
+//               // Now b includes the support points on the quad and we can
+//               // apply the laplace vector
+//               add_weighted_interior_points (support_point_weights_on_quad, b);
+//               AssertDimension (b.size(),
+//                                4*this->polynomial_degree +
+//                                (this->polynomial_degree-1)*(this->polynomial_degree-1));
 
-              for (unsigned int i=0; i<(polynomial_degree-1)*(polynomial_degree-1); ++i)
-                a.push_back(b[4*polynomial_degree+i]);
-            }
-          else
-            {
-              // face is entirely in the interior. get intermediate
-              // points from the relevant manifold object.
-              vertices.resize(4);
-              for (unsigned int i=0; i<4; ++i)
-                vertices[i] = face->vertex(i);
-              get_intermediate_points (face->get_manifold(), line_support_points, vertices, quad_points);
-              // in 3D, the orientation, flip and rotation of the face might
-              // not match what we expect here, namely the standard
-              // orientation. thus reorder points accordingly. since a Mapping
-              // uses the same shape function as an FE_Q, we can ask a FE_Q to
-              // do the reordering for us.
-              for (unsigned int i=0; i<quad_points.size(); ++i)
-                a.push_back(quad_points[fe_q->adjust_quad_dof_index_for_face_orientation(i,
-                                        face_orientation,
-                                        face_flip,
-                                        face_rotation)]);
-            }
-        }
-    }
+//               for (unsigned int i=0; i<(polynomial_degree-1)*(polynomial_degree-1); ++i)
+//                 a.push_back(b[4*polynomial_degree+i]);
+//             }
+//           else
+//             {
+//               // face is entirely in the interior. get intermediate
+//               // points from the relevant manifold object.
+//               vertices.resize(4);
+//               for (unsigned int i=0; i<4; ++i)
+//                 vertices[i] = face->vertex(i);
+//               get_intermediate_points (face->get_manifold(), line_support_points, vertices, quad_points);
+//               // in 3D, the orientation, flip and rotation of the face might
+//               // not match what we expect here, namely the standard
+//               // orientation. thus reorder points accordingly. since a Mapping
+//               // uses the same shape function as an FE_Q, we can ask a FE_Q to
+//               // do the reordering for us.
+//               for (unsigned int i=0; i<quad_points.size(); ++i)
+//                 a.push_back(quad_points[fe_q->adjust_quad_dof_index_for_face_orientation(i,
+//                                         face_orientation,
+//                                         face_flip,
+//                                         face_rotation)]);
+//             }
+//         }
+//     }
 }
 
 
@@ -3806,11 +2203,11 @@ MappingManifold<2,3>::
 add_quad_support_points(const Triangulation<2,3>::cell_iterator &cell,
                         std::vector<Point<3> >                &a) const
 {
-  std::vector<Point<3> > quad_points ((polynomial_degree-1)*(polynomial_degree-1));
-  get_intermediate_points_on_object (cell->get_manifold(), line_support_points,
-                                     cell, quad_points);
-  for (unsigned int i=0; i<quad_points.size(); ++i)
-    a.push_back(quad_points[i]);
+  // std::vector<Point<3> > quad_points ((polynomial_degree-1)*(polynomial_degree-1));
+  // get_intermediate_points_on_object (cell->get_manifold(), line_support_points,
+  //                                    cell, quad_points);
+  // for (unsigned int i=0; i<quad_points.size(); ++i)
+  //   a.push_back(quad_points[i]);
 }
 
 
