@@ -941,8 +941,8 @@ namespace DoFTools
       }
 
 
-      // implementation of the same function in namespace DoFTools for
-      // non-hp DoFHandlers
+      // implementation of the same function in namespace DoFTools for hp
+      // DoFHandlers
       template <int dim, int spacedim, typename SparsityPatternType>
       void
       make_flux_sparsity_pattern (const dealii::hp::DoFHandler<dim,spacedim> &dof,
