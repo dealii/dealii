@@ -231,7 +231,7 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
                              const Point<dim> &p) const
 {
   std::vector<Point<spacedim> > vertices;
-  std::vector<Point<spacedim> > weights;
+  std::vector<double> weights;
   for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
     {
       vertices.push_back(cell->vertex(v));
@@ -901,183 +901,183 @@ namespace internal
 
 
 
-template<int dim, int spacedim>
-CellSimilarity::Similarity
-MappingManifold<dim,spacedim>::
-fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                const CellSimilarity::Similarity                           cell_similarity,
-                const Quadrature<dim>                                     &quadrature,
-                const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
-{
-  // ensure that the following static_cast is really correct:
-  Assert (dynamic_cast<const InternalData *>(&internal_data) != 0,
-          ExcInternalError());
-  const InternalData &data = static_cast<const InternalData &>(internal_data);
+// template<int dim, int spacedim>
+// CellSimilarity::Similarity
+// MappingManifold<dim,spacedim>::
+// fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+//                 const CellSimilarity::Similarity                           cell_similarity,
+//                 const Quadrature<dim>                                     &quadrature,
+//                 const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+//                 internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
+// {
+//   // ensure that the following static_cast is really correct:
+//   Assert (dynamic_cast<const InternalData *>(&internal_data) != 0,
+//           ExcInternalError());
+//   const InternalData &data = static_cast<const InternalData &>(internal_data);
 
-  const unsigned int n_q_points=quadrature.size();
+//   const unsigned int n_q_points=quadrature.size();
 
-  // if necessary, recompute the support points of the transformation of this cell
-  // (note that we need to first check the triangulation pointer, since otherwise
-  // the second test might trigger an exception if the triangulations are not the
-  // same)
-  if ((data.mapping_support_points.size() == 0)
-      ||
-      (&cell->get_triangulation() !=
-       &data.cell_of_current_support_points->get_triangulation())
-      ||
-      (cell != data.cell_of_current_support_points))
-    {
-      data.mapping_support_points = this->compute_mapping_support_points(cell);
-      data.cell_of_current_support_points = cell;
-    }
+//   // if necessary, recompute the support points of the transformation of this cell
+//   // (note that we need to first check the triangulation pointer, since otherwise
+//   // the second test might trigger an exception if the triangulations are not the
+//   // same)
+//   if ((data.mapping_support_points.size() == 0)
+//       ||
+//       (&cell->get_triangulation() !=
+//        &data.cell_of_current_support_points->get_triangulation())
+//       ||
+//       (cell != data.cell_of_current_support_points))
+//     {
+//       data.mapping_support_points = this->compute_mapping_support_points(cell);
+//       data.cell_of_current_support_points = cell;
+//     }
 
-  internal::maybe_compute_q_points<dim,spacedim> (QProjector<dim>::DataSetDescriptor::cell (),
-                                                  data,
-                                                  output_data.quadrature_points);
-  internal::maybe_update_Jacobians<dim,spacedim> (cell_similarity,
-                                                  QProjector<dim>::DataSetDescriptor::cell (),
-                                                  data);
+//   internal::maybe_compute_q_points<dim,spacedim> (QProjector<dim>::DataSetDescriptor::cell (),
+//                                                   data,
+//                                                   output_data.quadrature_points);
+//   internal::maybe_update_Jacobians<dim,spacedim> (cell_similarity,
+//                                                   QProjector<dim>::DataSetDescriptor::cell (),
+//                                                   data);
 
-  const UpdateFlags update_flags = data.update_each;
-  const std::vector<double> &weights=quadrature.get_weights();
+//   const UpdateFlags update_flags = data.update_each;
+//   const std::vector<double> &weights=quadrature.get_weights();
 
-  // Multiply quadrature weights by absolute value of Jacobian determinants or
-  // the area element g=sqrt(DX^t DX) in case of codim > 0
+//   // Multiply quadrature weights by absolute value of Jacobian determinants or
+//   // the area element g=sqrt(DX^t DX) in case of codim > 0
 
-  if (update_flags & (update_normal_vectors
-                      | update_JxW_values))
-    {
-      AssertDimension (output_data.JxW_values.size(), n_q_points);
+//   if (update_flags & (update_normal_vectors
+//                       | update_JxW_values))
+//     {
+//       AssertDimension (output_data.JxW_values.size(), n_q_points);
 
-      Assert( !(update_flags & update_normal_vectors ) ||
-              (output_data.normal_vectors.size() == n_q_points),
-              ExcDimensionMismatch(output_data.normal_vectors.size(), n_q_points));
-
-
-      if (cell_similarity != CellSimilarity::translation)
-        for (unsigned int point=0; point<n_q_points; ++point)
-          {
-
-            if (dim == spacedim)
-              {
-                const double det = data.contravariant[point].determinant();
-
-                // check for distorted cells.
-
-                // TODO: this allows for anisotropies of up to 1e6 in 3D and
-                // 1e12 in 2D. might want to find a finer
-                // (dimension-independent) criterion
-                Assert (det > 1e-12*Utilities::fixed_power<dim>(cell->diameter()/
-                                                                std::sqrt(double(dim))),
-                        (typename Mapping<dim,spacedim>::ExcDistortedMappedCell(cell->center(), det, point)));
-
-                output_data.JxW_values[point] = weights[point] * det;
-              }
-            // if dim==spacedim, then there is no cell normal to
-            // compute. since this is for FEValues (and not FEFaceValues),
-            // there are also no face normals to compute
-            else //codim>0 case
-              {
-                Tensor<1, spacedim> DX_t [dim];
-                for (unsigned int i=0; i<spacedim; ++i)
-                  for (unsigned int j=0; j<dim; ++j)
-                    DX_t[j][i] = data.contravariant[point][i][j];
-
-                Tensor<2, dim> G; //First fundamental form
-                for (unsigned int i=0; i<dim; ++i)
-                  for (unsigned int j=0; j<dim; ++j)
-                    G[i][j] = DX_t[i] * DX_t[j];
-
-                output_data.JxW_values[point]
-                  = sqrt(determinant(G)) * weights[point];
-
-                if (cell_similarity == CellSimilarity::inverted_translation)
-                  {
-                    // we only need to flip the normal
-                    if (update_flags & update_normal_vectors)
-                      output_data.normal_vectors[point] *= -1.;
-                  }
-                else
-                  {
-                    const unsigned int codim = spacedim-dim;
-                    (void)codim;
-
-                    if (update_flags & update_normal_vectors)
-                      {
-                        Assert( codim==1 , ExcMessage("There is no cell normal in codim 2."));
-
-                        if (dim==1)
-                          output_data.normal_vectors[point] =
-                            cross_product_2d(-DX_t[0]);
-                        else //dim == 2
-                          output_data.normal_vectors[point] =
-                            cross_product_3d(DX_t[0], DX_t[1]);
-
-                        output_data.normal_vectors[point] /= output_data.normal_vectors[point].norm();
-
-                        if (cell->direction_flag() == false)
-                          output_data.normal_vectors[point] *= -1.;
-                      }
-
-                  }
-              } //codim>0 case
-
-          }
-    }
+//       Assert( !(update_flags & update_normal_vectors ) ||
+//               (output_data.normal_vectors.size() == n_q_points),
+//               ExcDimensionMismatch(output_data.normal_vectors.size(), n_q_points));
 
 
+//       if (cell_similarity != CellSimilarity::translation)
+//         for (unsigned int point=0; point<n_q_points; ++point)
+//           {
 
-  // copy values from InternalData to vector given by reference
-  if (update_flags & update_jacobians)
-    {
-      AssertDimension (output_data.jacobians.size(), n_q_points);
-      if (cell_similarity != CellSimilarity::translation)
-        for (unsigned int point=0; point<n_q_points; ++point)
-          output_data.jacobians[point] = data.contravariant[point];
-    }
+//             if (dim == spacedim)
+//               {
+//                 const double det = data.contravariant[point].determinant();
 
-  // copy values from InternalData to vector given by reference
-  if (update_flags & update_inverse_jacobians)
-    {
-      AssertDimension (output_data.inverse_jacobians.size(), n_q_points);
-      if (cell_similarity != CellSimilarity::translation)
-        for (unsigned int point=0; point<n_q_points; ++point)
-          output_data.inverse_jacobians[point] = data.covariant[point].transpose();
-    }
+//                 // check for distorted cells.
 
-  internal::maybe_update_jacobian_grads<dim,spacedim> (cell_similarity,
-                                                       QProjector<dim>::DataSetDescriptor::cell (),
-                                                       data,
-                                                       output_data.jacobian_grads);
+//                 // TODO: this allows for anisotropies of up to 1e6 in 3D and
+//                 // 1e12 in 2D. might want to find a finer
+//                 // (dimension-independent) criterion
+//                 Assert (det > 1e-12*Utilities::fixed_power<dim>(cell->diameter()/
+//                                                                 std::sqrt(double(dim))),
+//                         (typename Mapping<dim,spacedim>::ExcDistortedMappedCell(cell->center(), det, point)));
 
-  internal::maybe_update_jacobian_pushed_forward_grads<dim,spacedim> (cell_similarity,
-      QProjector<dim>::DataSetDescriptor::cell (),
-      data,
-      output_data.jacobian_pushed_forward_grads);
+//                 output_data.JxW_values[point] = weights[point] * det;
+//               }
+//             // if dim==spacedim, then there is no cell normal to
+//             // compute. since this is for FEValues (and not FEFaceValues),
+//             // there are also no face normals to compute
+//             else //codim>0 case
+//               {
+//                 Tensor<1, spacedim> DX_t [dim];
+//                 for (unsigned int i=0; i<spacedim; ++i)
+//                   for (unsigned int j=0; j<dim; ++j)
+//                     DX_t[j][i] = data.contravariant[point][i][j];
 
-  internal::maybe_update_jacobian_2nd_derivatives<dim,spacedim> (cell_similarity,
-      QProjector<dim>::DataSetDescriptor::cell (),
-      data,
-      output_data.jacobian_2nd_derivatives);
+//                 Tensor<2, dim> G; //First fundamental form
+//                 for (unsigned int i=0; i<dim; ++i)
+//                   for (unsigned int j=0; j<dim; ++j)
+//                     G[i][j] = DX_t[i] * DX_t[j];
 
-  internal::maybe_update_jacobian_pushed_forward_2nd_derivatives<dim,spacedim> (cell_similarity,
-      QProjector<dim>::DataSetDescriptor::cell (),
-      data,
-      output_data.jacobian_pushed_forward_2nd_derivatives);
+//                 output_data.JxW_values[point]
+//                   = sqrt(determinant(G)) * weights[point];
 
-  internal::maybe_update_jacobian_3rd_derivatives<dim,spacedim> (cell_similarity,
-      QProjector<dim>::DataSetDescriptor::cell (),
-      data,
-      output_data.jacobian_3rd_derivatives);
+//                 if (cell_similarity == CellSimilarity::inverted_translation)
+//                   {
+//                     // we only need to flip the normal
+//                     if (update_flags & update_normal_vectors)
+//                       output_data.normal_vectors[point] *= -1.;
+//                   }
+//                 else
+//                   {
+//                     const unsigned int codim = spacedim-dim;
+//                     (void)codim;
 
-  internal::maybe_update_jacobian_pushed_forward_3rd_derivatives<dim,spacedim> (cell_similarity,
-      QProjector<dim>::DataSetDescriptor::cell (),
-      data,
-      output_data.jacobian_pushed_forward_3rd_derivatives);
+//                     if (update_flags & update_normal_vectors)
+//                       {
+//                         Assert( codim==1 , ExcMessage("There is no cell normal in codim 2."));
 
-  return cell_similarity;
-}
+//                         if (dim==1)
+//                           output_data.normal_vectors[point] =
+//                             cross_product_2d(-DX_t[0]);
+//                         else //dim == 2
+//                           output_data.normal_vectors[point] =
+//                             cross_product_3d(DX_t[0], DX_t[1]);
+
+//                         output_data.normal_vectors[point] /= output_data.normal_vectors[point].norm();
+
+//                         if (cell->direction_flag() == false)
+//                           output_data.normal_vectors[point] *= -1.;
+//                       }
+
+//                   }
+//               } //codim>0 case
+
+//           }
+//     }
+
+
+
+//   // copy values from InternalData to vector given by reference
+//   if (update_flags & update_jacobians)
+//     {
+//       AssertDimension (output_data.jacobians.size(), n_q_points);
+//       if (cell_similarity != CellSimilarity::translation)
+//         for (unsigned int point=0; point<n_q_points; ++point)
+//           output_data.jacobians[point] = data.contravariant[point];
+//     }
+
+//   // copy values from InternalData to vector given by reference
+//   if (update_flags & update_inverse_jacobians)
+//     {
+//       AssertDimension (output_data.inverse_jacobians.size(), n_q_points);
+//       if (cell_similarity != CellSimilarity::translation)
+//         for (unsigned int point=0; point<n_q_points; ++point)
+//           output_data.inverse_jacobians[point] = data.covariant[point].transpose();
+//     }
+
+//   internal::maybe_update_jacobian_grads<dim,spacedim> (cell_similarity,
+//                                                        QProjector<dim>::DataSetDescriptor::cell (),
+//                                                        data,
+//                                                        output_data.jacobian_grads);
+
+//   internal::maybe_update_jacobian_pushed_forward_grads<dim,spacedim> (cell_similarity,
+//       QProjector<dim>::DataSetDescriptor::cell (),
+//       data,
+//       output_data.jacobian_pushed_forward_grads);
+
+//   internal::maybe_update_jacobian_2nd_derivatives<dim,spacedim> (cell_similarity,
+//       QProjector<dim>::DataSetDescriptor::cell (),
+//       data,
+//       output_data.jacobian_2nd_derivatives);
+
+//   internal::maybe_update_jacobian_pushed_forward_2nd_derivatives<dim,spacedim> (cell_similarity,
+//       QProjector<dim>::DataSetDescriptor::cell (),
+//       data,
+//       output_data.jacobian_pushed_forward_2nd_derivatives);
+
+//   internal::maybe_update_jacobian_3rd_derivatives<dim,spacedim> (cell_similarity,
+//       QProjector<dim>::DataSetDescriptor::cell (),
+//       data,
+//       output_data.jacobian_3rd_derivatives);
+
+//   internal::maybe_update_jacobian_pushed_forward_3rd_derivatives<dim,spacedim> (cell_similarity,
+//       QProjector<dim>::DataSetDescriptor::cell (),
+//       data,
+//       output_data.jacobian_pushed_forward_3rd_derivatives);
+
+//   return cell_similarity;
+// }
 
 
 
@@ -1290,159 +1290,159 @@ namespace internal
 
 
 
-template<int dim, int spacedim>
-void
-MappingManifold<dim,spacedim>::
-fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                     const unsigned int                                         face_no,
-                     const Quadrature<dim-1>                                   &quadrature,
-                     const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                     internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
-{
-  // ensure that the following cast is really correct:
-  Assert ((dynamic_cast<const InternalData *>(&internal_data) != 0),
-          ExcInternalError());
-  const InternalData &data
-    = static_cast<const InternalData &>(internal_data);
+// template<int dim, int spacedim>
+// void
+// MappingManifold<dim,spacedim>::
+// fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+//                      const unsigned int                                         face_no,
+//                      const Quadrature<dim-1>                                   &quadrature,
+//                      const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+//                      internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
+// {
+//   // ensure that the following cast is really correct:
+//   Assert ((dynamic_cast<const InternalData *>(&internal_data) != 0),
+//           ExcInternalError());
+//   const InternalData &data
+//     = static_cast<const InternalData &>(internal_data);
 
-  // if necessary, recompute the support points of the transformation of this cell
-  // (note that we need to first check the triangulation pointer, since otherwise
-  // the second test might trigger an exception if the triangulations are not the
-  // same)
-  if ((data.mapping_support_points.size() == 0)
-      ||
-      (&cell->get_triangulation() !=
-       &data.cell_of_current_support_points->get_triangulation())
-      ||
-      (cell != data.cell_of_current_support_points))
-    {
-      data.mapping_support_points = this->compute_mapping_support_points(cell);
-      data.cell_of_current_support_points = cell;
-    }
+//   // if necessary, recompute the support points of the transformation of this cell
+//   // (note that we need to first check the triangulation pointer, since otherwise
+//   // the second test might trigger an exception if the triangulations are not the
+//   // same)
+//   if ((data.mapping_support_points.size() == 0)
+//       ||
+//       (&cell->get_triangulation() !=
+//        &data.cell_of_current_support_points->get_triangulation())
+//       ||
+//       (cell != data.cell_of_current_support_points))
+//     {
+//       data.mapping_support_points = this->compute_mapping_support_points(cell);
+//       data.cell_of_current_support_points = cell;
+//     }
 
-  internal::do_fill_fe_face_values (*this,
-                                    cell, face_no, numbers::invalid_unsigned_int,
-                                    QProjector<dim>::DataSetDescriptor::face (face_no,
-                                        cell->face_orientation(face_no),
-                                        cell->face_flip(face_no),
-                                        cell->face_rotation(face_no),
-                                        quadrature.size()),
-                                    quadrature,
-                                    data,
-                                    output_data);
-}
+//   internal::do_fill_fe_face_values (*this,
+//                                     cell, face_no, numbers::invalid_unsigned_int,
+//                                     QProjector<dim>::DataSetDescriptor::face (face_no,
+//                                         cell->face_orientation(face_no),
+//                                         cell->face_flip(face_no),
+//                                         cell->face_rotation(face_no),
+//                                         quadrature.size()),
+//                                     quadrature,
+//                                     data,
+//                                     output_data);
+// }
 
 
 
-template<int dim, int spacedim>
-void
-MappingManifold<dim,spacedim>::
-fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                        const unsigned int                                         face_no,
-                        const unsigned int                                         subface_no,
-                        const Quadrature<dim-1>                                   &quadrature,
-                        const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                        internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
-{
-  // ensure that the following cast is really correct:
-  Assert ((dynamic_cast<const InternalData *>(&internal_data) != 0),
-          ExcInternalError());
-  const InternalData &data
-    = static_cast<const InternalData &>(internal_data);
+// template<int dim, int spacedim>
+// void
+// MappingManifold<dim,spacedim>::
+// fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+//                         const unsigned int                                         face_no,
+//                         const unsigned int                                         subface_no,
+//                         const Quadrature<dim-1>                                   &quadrature,
+//                         const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+//                         internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
+// {
+//   // ensure that the following cast is really correct:
+//   Assert ((dynamic_cast<const InternalData *>(&internal_data) != 0),
+//           ExcInternalError());
+//   const InternalData &data
+//     = static_cast<const InternalData &>(internal_data);
 
-  // if necessary, recompute the support points of the transformation of this cell
-  // (note that we need to first check the triangulation pointer, since otherwise
-  // the second test might trigger an exception if the triangulations are not the
-  // same)
-  if ((data.mapping_support_points.size() == 0)
-      ||
-      (&cell->get_triangulation() !=
-       &data.cell_of_current_support_points->get_triangulation())
-      ||
-      (cell != data.cell_of_current_support_points))
-    {
-      data.mapping_support_points = this->compute_mapping_support_points(cell);
-      data.cell_of_current_support_points = cell;
-    }
+//   // if necessary, recompute the support points of the transformation of this cell
+//   // (note that we need to first check the triangulation pointer, since otherwise
+//   // the second test might trigger an exception if the triangulations are not the
+//   // same)
+//   if ((data.mapping_support_points.size() == 0)
+//       ||
+//       (&cell->get_triangulation() !=
+//        &data.cell_of_current_support_points->get_triangulation())
+//       ||
+//       (cell != data.cell_of_current_support_points))
+//     {
+//       data.mapping_support_points = this->compute_mapping_support_points(cell);
+//       data.cell_of_current_support_points = cell;
+//     }
 
-  internal::do_fill_fe_face_values (*this,
-                                    cell, face_no, subface_no,
-                                    QProjector<dim>::DataSetDescriptor::subface (face_no, subface_no,
-                                        cell->face_orientation(face_no),
-                                        cell->face_flip(face_no),
-                                        cell->face_rotation(face_no),
-                                        quadrature.size(),
-                                        cell->subface_case(face_no)),
-                                    quadrature,
-                                    data,
-                                    output_data);
-}
+//   internal::do_fill_fe_face_values (*this,
+//                                     cell, face_no, subface_no,
+//                                     QProjector<dim>::DataSetDescriptor::subface (face_no, subface_no,
+//                                         cell->face_orientation(face_no),
+//                                         cell->face_flip(face_no),
+//                                         cell->face_rotation(face_no),
+//                                         quadrature.size(),
+//                                         cell->subface_case(face_no)),
+//                                     quadrature,
+//                                     data,
+//                                     output_data);
+// }
 
 
 
 namespace
 {
-  template <int dim, int spacedim, int rank>
-  void
-  transform_fields(const ArrayView<const Tensor<rank,dim> >               &input,
-                   const MappingType                                       mapping_type,
-                   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                   const ArrayView<Tensor<rank,spacedim> >                &output)
-  {
-    AssertDimension (input.size(), output.size());
-    Assert ((dynamic_cast<const typename MappingManifold<dim,spacedim>::InternalData *>(&mapping_data) != 0),
-            ExcInternalError());
-    const typename MappingManifold<dim,spacedim>::InternalData
-    &data = static_cast<const typename MappingManifold<dim,spacedim>::InternalData &>(mapping_data);
+  // template <int dim, int spacedim, int rank>
+  // void
+  // transform_fields(const ArrayView<const Tensor<rank,dim> >               &input,
+  //                  const MappingType                                       mapping_type,
+  //                  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  //                  const ArrayView<Tensor<rank,spacedim> >                &output)
+  // {
+  //   AssertDimension (input.size(), output.size());
+  //   Assert ((dynamic_cast<const typename MappingManifold<dim,spacedim>::InternalData *>(&mapping_data) != 0),
+  //           ExcInternalError());
+  //   const typename MappingManifold<dim,spacedim>::InternalData
+  //   &data = static_cast<const typename MappingManifold<dim,spacedim>::InternalData &>(mapping_data);
 
-    switch (mapping_type)
-      {
-      case mapping_contravariant:
-      {
-        Assert (data.update_each & update_contravariant_transformation,
-                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+  //   switch (mapping_type)
+  //     {
+  //     case mapping_contravariant:
+  //     {
+  //       Assert (data.update_each & update_contravariant_transformation,
+  //               typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
 
-        for (unsigned int i=0; i<output.size(); ++i)
-          output[i] = apply_transformation(data.contravariant[i], input[i]);
+  //       for (unsigned int i=0; i<output.size(); ++i)
+  //         output[i] = apply_transformation(data.contravariant[i], input[i]);
 
-        return;
-      }
+  //       return;
+  //     }
 
-      case mapping_piola:
-      {
-        Assert (data.update_each & update_contravariant_transformation,
-                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
-        Assert (data.update_each & update_volume_elements,
-                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_volume_elements"));
-        Assert (rank==1, ExcMessage("Only for rank 1"));
-        if (rank!=1)
-          return;
+  //     case mapping_piola:
+  //     {
+  //       Assert (data.update_each & update_contravariant_transformation,
+  //               typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+  //       Assert (data.update_each & update_volume_elements,
+  //               typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_volume_elements"));
+  //       Assert (rank==1, ExcMessage("Only for rank 1"));
+  //       if (rank!=1)
+  //         return;
 
-        for (unsigned int i=0; i<output.size(); ++i)
-          {
-            output[i] = apply_transformation(data.contravariant[i], input[i]);
-            output[i] /= data.volume_elements[i];
-          }
-        return;
-      }
-      //We still allow this operation as in the
-      //reference cell Derivatives are Tensor
-      //rather than DerivativeForm
-      case mapping_covariant:
-      {
-        Assert (data.update_each & update_contravariant_transformation,
-                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+  //       for (unsigned int i=0; i<output.size(); ++i)
+  //         {
+  //           output[i] = apply_transformation(data.contravariant[i], input[i]);
+  //           output[i] /= data.volume_elements[i];
+  //         }
+  //       return;
+  //     }
+  //     //We still allow this operation as in the
+  //     //reference cell Derivatives are Tensor
+  //     //rather than DerivativeForm
+  //     case mapping_covariant:
+  //     {
+  //       Assert (data.update_each & update_contravariant_transformation,
+  //               typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
 
-        for (unsigned int i=0; i<output.size(); ++i)
-          output[i] = apply_transformation(data.covariant[i], input[i]);
+  //       for (unsigned int i=0; i<output.size(); ++i)
+  //         output[i] = apply_transformation(data.covariant[i], input[i]);
 
-        return;
-      }
+  //       return;
+  //     }
 
-      default:
-        Assert(false, ExcNotImplemented());
-      }
-  }
+  //     default:
+  //       Assert(false, ExcNotImplemented());
+  //     }
+  // }
 
 
   template <int dim, int spacedim, int rank>
@@ -1753,74 +1753,74 @@ transform (const ArrayView<const Tensor<2, dim> >                  &input,
 
 
 
-template<int dim, int spacedim>
-void
-MappingManifold<dim,spacedim>::
-transform (const ArrayView<const  DerivativeForm<2, dim, spacedim> > &input,
-           const MappingType                                          mapping_type,
-           const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_data,
-           const ArrayView<Tensor<3,spacedim> >                      &output) const
-{
+// template<int dim, int spacedim>
+// void
+// MappingManifold<dim,spacedim>::
+// transform (const ArrayView<const  DerivativeForm<2, dim, spacedim> > &input,
+//            const MappingType                                          mapping_type,
+//            const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_data,
+//            const ArrayView<Tensor<3,spacedim> >                      &output) const
+// {
 
-  AssertDimension (input.size(), output.size());
-  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
-          ExcInternalError());
-  const InternalData &data = static_cast<const InternalData &>(mapping_data);
+//   AssertDimension (input.size(), output.size());
+//   Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
+//           ExcInternalError());
+//   const InternalData &data = static_cast<const InternalData &>(mapping_data);
 
-  switch (mapping_type)
-    {
-    case mapping_covariant_gradient:
-    {
-      Assert (data.update_each & update_contravariant_transformation,
-              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+//   switch (mapping_type)
+//     {
+//     case mapping_covariant_gradient:
+//     {
+//       Assert (data.update_each & update_contravariant_transformation,
+//               typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
 
-      for (unsigned int q=0; q<output.size(); ++q)
-        for (unsigned int i=0; i<spacedim; ++i)
-          for (unsigned int j=0; j<spacedim; ++j)
-            {
-              double tmp[dim];
-              for (unsigned int K=0; K<dim; ++K)
-                {
-                  tmp[K] = data.covariant[q][j][0] * input[q][i][0][K];
-                  for (unsigned int J=1; J<dim; ++J)
-                    tmp[K] += data.covariant[q][j][J] * input[q][i][J][K];
-                }
-              for (unsigned int k=0; k<spacedim; ++k)
-                {
-                  output[q][i][j][k] = data.covariant[q][k][0] * tmp[0];
-                  for (unsigned int K=1; K<dim; ++K)
-                    output[q][i][j][k] += data.covariant[q][k][K] * tmp[K];
-                }
-            }
-      return;
-    }
+//       for (unsigned int q=0; q<output.size(); ++q)
+//         for (unsigned int i=0; i<spacedim; ++i)
+//           for (unsigned int j=0; j<spacedim; ++j)
+//             {
+//               double tmp[dim];
+//               for (unsigned int K=0; K<dim; ++K)
+//                 {
+//                   tmp[K] = data.covariant[q][j][0] * input[q][i][0][K];
+//                   for (unsigned int J=1; J<dim; ++J)
+//                     tmp[K] += data.covariant[q][j][J] * input[q][i][J][K];
+//                 }
+//               for (unsigned int k=0; k<spacedim; ++k)
+//                 {
+//                   output[q][i][j][k] = data.covariant[q][k][0] * tmp[0];
+//                   for (unsigned int K=1; K<dim; ++K)
+//                     output[q][i][j][k] += data.covariant[q][k][K] * tmp[K];
+//                 }
+//             }
+//       return;
+//     }
 
-    default:
-      Assert(false, ExcNotImplemented());
-    }
-}
+//     default:
+//       Assert(false, ExcNotImplemented());
+//     }
+// }
 
 
 
-template<int dim, int spacedim>
-void
-MappingManifold<dim,spacedim>::
-transform (const ArrayView<const  Tensor<3,dim> >                  &input,
-           const MappingType                                        mapping_type,
-           const typename Mapping<dim,spacedim>::InternalDataBase  &mapping_data,
-           const ArrayView<Tensor<3,spacedim> >                    &output) const
-{
-  switch (mapping_type)
-    {
-    case mapping_piola_hessian:
-    case mapping_contravariant_hessian:
-    case mapping_covariant_hessian:
-      transform_hessians(input, mapping_type, mapping_data, output);
-      return;
-    default:
-      Assert(false, ExcNotImplemented());
-    }
-}
+// template<int dim, int spacedim>
+// void
+// MappingManifold<dim,spacedim>::
+// transform (const ArrayView<const  Tensor<3,dim> >                  &input,
+//            const MappingType                                        mapping_type,
+//            const typename Mapping<dim,spacedim>::InternalDataBase  &mapping_data,
+//            const ArrayView<Tensor<3,spacedim> >                    &output) const
+// {
+//   switch (mapping_type)
+//     {
+//     case mapping_piola_hessian:
+//     case mapping_contravariant_hessian:
+//     case mapping_covariant_hessian:
+//       transform_hessians(input, mapping_type, mapping_data, output);
+//       return;
+//     default:
+//       Assert(false, ExcNotImplemented());
+//     }
+// }
 
 
 
@@ -1989,73 +1989,73 @@ namespace
 }
 
 
-template <int dim, int spacedim>
-void
-MappingManifold<dim,spacedim>::
-add_line_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                         std::vector<Point<spacedim> > &a) const
-{
-  // if we only need the midpoint, then ask for it.
-  if (this->polynomial_degree==2)
-    {
-      for (unsigned int line_no=0; line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
-        {
-          const typename Triangulation<dim,spacedim>::line_iterator line =
-            (dim == 1  ?
-             static_cast<typename Triangulation<dim,spacedim>::line_iterator>(cell) :
-             cell->line(line_no));
+// template <int dim, int spacedim>
+// void
+// MappingManifold<dim,spacedim>::
+// add_line_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+//                          std::vector<Point<spacedim> > &a) const
+// {
+//   // if we only need the midpoint, then ask for it.
+//   if (this->polynomial_degree==2)
+//     {
+//       for (unsigned int line_no=0; line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
+//         {
+//           const typename Triangulation<dim,spacedim>::line_iterator line =
+//             (dim == 1  ?
+//              static_cast<typename Triangulation<dim,spacedim>::line_iterator>(cell) :
+//              cell->line(line_no));
 
-          const Manifold<dim,spacedim> &manifold =
-            ( ( line->manifold_id() == numbers::invalid_manifold_id ) &&
-              ( dim < spacedim )
-              ?
-              cell->get_manifold()
-              :
-              line->get_manifold() );
-          a.push_back(manifold.get_new_point_on_line(line));
-        }
-    }
-  else
-    // otherwise call the more complicated functions and ask for inner points
-    // from the boundary description
-    {
-      std::vector<Point<spacedim> > line_points (this->polynomial_degree-1);
-      // loop over each of the lines, and if it is at the boundary, then first
-      // get the boundary description and second compute the points on it
-      for (unsigned int line_no=0; line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
-        {
-          const typename Triangulation<dim,spacedim>::line_iterator
-          line = (dim == 1
-                  ?
-                  static_cast<typename Triangulation<dim,spacedim>::line_iterator>(cell)
-                  :
-                  cell->line(line_no));
+//           const Manifold<dim,spacedim> &manifold =
+//             ( ( line->manifold_id() == numbers::invalid_manifold_id ) &&
+//               ( dim < spacedim )
+//               ?
+//               cell->get_manifold()
+//               :
+//               line->get_manifold() );
+//           a.push_back(manifold.get_new_point_on_line(line));
+//         }
+//     }
+//   else
+//     // otherwise call the more complicated functions and ask for inner points
+//     // from the boundary description
+//     {
+//       std::vector<Point<spacedim> > line_points (this->polynomial_degree-1);
+//       // loop over each of the lines, and if it is at the boundary, then first
+//       // get the boundary description and second compute the points on it
+//       for (unsigned int line_no=0; line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
+//         {
+//           const typename Triangulation<dim,spacedim>::line_iterator
+//           line = (dim == 1
+//                   ?
+//                   static_cast<typename Triangulation<dim,spacedim>::line_iterator>(cell)
+//                   :
+//                   cell->line(line_no));
 
-          const Manifold<dim,spacedim> &manifold =
-            ( ( line->manifold_id() == numbers::invalid_manifold_id ) &&
-              ( dim < spacedim )
-              ?
-              cell->get_manifold() :
-              line->get_manifold() );
+//           const Manifold<dim,spacedim> &manifold =
+//             ( ( line->manifold_id() == numbers::invalid_manifold_id ) &&
+//               ( dim < spacedim )
+//               ?
+//               cell->get_manifold() :
+//               line->get_manifold() );
 
-          //          get_intermediate_points_on_object (manifold, line_support_points, line, line_points);
+//           //          get_intermediate_points_on_object (manifold, line_support_points, line, line_points);
 
-          if (dim==3)
-            {
-              // in 3D, lines might be in wrong orientation. if so, reverse
-              // the vector
-              if (cell->line_orientation(line_no))
-                a.insert (a.end(), line_points.begin(), line_points.end());
-              else
-                a.insert (a.end(), line_points.rbegin(), line_points.rend());
-            }
-          else
-            // in 2D, lines always have the correct orientation. simply append
-            // all points
-            a.insert (a.end(), line_points.begin(), line_points.end());
-        }
-    }
-}
+//           if (dim==3)
+//             {
+//               // in 3D, lines might be in wrong orientation. if so, reverse
+//               // the vector
+//               if (cell->line_orientation(line_no))
+//                 a.insert (a.end(), line_points.begin(), line_points.end());
+//               else
+//                 a.insert (a.end(), line_points.rbegin(), line_points.rend());
+//             }
+//           else
+//             // in 2D, lines always have the correct orientation. simply append
+//             // all points
+//             a.insert (a.end(), line_points.begin(), line_points.end());
+//         }
+//     }
+// }
 
 
 
@@ -2223,53 +2223,53 @@ add_quad_support_points(const typename Triangulation<dim,spacedim>::cell_iterato
 
 
 
-template<int dim, int spacedim>
-std::vector<Point<spacedim> >
-MappingManifold<dim,spacedim>::
-compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
-{
-  // get the vertices first
-  std::vector<Point<spacedim> > a(GeometryInfo<dim>::vertices_per_cell);
-  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-    a[i] = cell->vertex(i);
+// template<int dim, int spacedim>
+// std::vector<Point<spacedim> >
+// MappingManifold<dim,spacedim>::
+// compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
+// {
+//   // get the vertices first
+//   std::vector<Point<spacedim> > a(GeometryInfo<dim>::vertices_per_cell);
+//   for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+//     a[i] = cell->vertex(i);
 
-  if (this->polynomial_degree>1)
-    switch (dim)
-      {
-      case 1:
-        add_line_support_points(cell, a);
-        break;
-      case 2:
-        // in 2d, add the points on the four bounding lines to the exterior
-        // (outer) points
-        add_line_support_points(cell, a);
+//   if (this->polynomial_degree>1)
+//     switch (dim)
+//       {
+//       case 1:
+//         add_line_support_points(cell, a);
+//         break;
+//       case 2:
+//         // in 2d, add the points on the four bounding lines to the exterior
+//         // (outer) points
+//         add_line_support_points(cell, a);
 
-        // then get the support points on the quad if we are on a
-        // manifold, otherwise compute them from the points around it
-        if (dim != spacedim)
-          add_quad_support_points(cell, a);
-        else
-          add_weighted_interior_points (support_point_weights_on_quad, a);
-        break;
+//         // then get the support points on the quad if we are on a
+//         // manifold, otherwise compute them from the points around it
+//         if (dim != spacedim)
+//           add_quad_support_points(cell, a);
+//         else
+//           add_weighted_interior_points (support_point_weights_on_quad, a);
+//         break;
 
-      case 3:
-      {
-        // in 3d also add the points located on the boundary faces
-        add_line_support_points (cell, a);
-        add_quad_support_points (cell, a);
+//       case 3:
+//       {
+//         // in 3d also add the points located on the boundary faces
+//         add_line_support_points (cell, a);
+//         add_quad_support_points (cell, a);
 
-        // then compute the interior points
-        add_weighted_interior_points (support_point_weights_on_hex, a);
-        break;
-      }
+//         // then compute the interior points
+//         add_weighted_interior_points (support_point_weights_on_hex, a);
+//         break;
+//       }
 
-      default:
-        Assert(false, ExcNotImplemented());
-        break;
-      }
+//       default:
+//         Assert(false, ExcNotImplemented());
+//         break;
+//       }
 
-  return a;
-}
+//   return a;
+// }
 
 
 
@@ -2280,3 +2280,4 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
 DEAL_II_NAMESPACE_CLOSE
 
 template class dealii::MappingManifold<2,2>;
+
