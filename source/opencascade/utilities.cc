@@ -601,6 +601,10 @@ namespace OpenCASCADE
     Standard_Real Mean_Curvature = props.MeanCurvature();
     Point<3> normal = Point<3>(Normal.X(),Normal.Y(),Normal.Z());
 
+    // In the case your manifold changes from convex to concave or viceversa
+    // the normal could jump from "inner" to "outer" normal.
+    // However, you should be able to change the normal verse preserving
+    // the manifold orientation:
     if (face.Orientation()==TopAbs_REVERSED)
       {
         normal *= -1;
