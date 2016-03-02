@@ -18,9 +18,9 @@
 # the URLs to point to the local files. To be run in the doc/doxygen/deal.II
 # directory of an installed deal.II documentation.
 
-if [ ! -f index.html ]
+if [ ! -f Tutorial.html ]
 then
-  echo "Please run this script in the doc output directory (install/doc)"
+  echo "Please run this script in the doc output directory (<install>/doc/doxygen/deal.II)"
   exit 1
 fi
 
@@ -30,7 +30,7 @@ echo "Downloading images (press ctrl-c to cancel) ..."
 cd images
 {
 trap "echo \"(skipping)\"" SIGINT
-wget -q -nd -A png,gif -m -l 1 -np http://www.dealii.org/images/steps/developer/
+wget -q -nd -A svg,png,gif -m -l 1 -np http://www.dealii.org/images/steps/developer/
 }
 rm robots.txt*
 cd ..
