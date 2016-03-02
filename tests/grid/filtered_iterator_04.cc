@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// check filtered iterators using two predicate
+// check filtered iterators using multiple predicate
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -57,15 +57,11 @@ void test ()
     if ((cell->subdomain_id()==0) && (cell->at_boundary()))
       cell_set.insert(cell);
 
-  const IteratorFilters::AtBoundary predicate_1;
-  const IteratorFilters::SubdomainEqualTo predicate_2(0);
-  FilteredIterator<active_cell_iterator> fi_cell(predicate_1),
-                   end_fi_cell(predicate_1, tria.end());
-  fi_cell.set_to_next_positive(tria.begin_active());
-  FilteredIterator<FilteredIterator<active_cell_iterator> > filtered_cell(predicate_2, fi_cell),
-                   end_filtered_cell(predicate_2, end_fi_cell);
+
   unsigned int n_filtered_cells = 0;
-  for (; filtered_cell!=end_filtered_cell; ++filtered_cell)
+  for (auto filtered_cell : filter_iterators(tria.active_cell_iterators(),
+                                             IteratorFilters::AtBoundary(),
+                                             IteratorFilters::SubdomainEqualTo(0)))
     {
       AssertThrow(cell_set.count(filtered_cell)==1, ExcMessage("Wrong cell filtered."));
       ++n_filtered_cells;

@@ -19,6 +19,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/iterator_range.h>
 #include <deal.II/grid/tria_iterator_base.h>
 
 #include <set>
@@ -769,6 +770,99 @@ make_filtered_iterator (const BaseIterator &i,
   return fi;
 }
 
+
+
+#ifdef DEAL_II_WITH_CXX11
+/**
+ * Filter the  given range of iterators using a Predicate. This allows to replace:
+ * @code
+ *   DoFHandler<dim> dof_handler;
+ *   ...
+ *   for (auto cell : dof_handler.active_cell_iterators())
+ *     {
+ *       if (cell->is_locally_owned())
+ *         {
+ *           fe_values.reinit (cell);
+ *           ...do the local integration on 'cell'...;
+ *         }
+ *     }
+ * @endcode
+ * by:
+ * @code
+ *   DoFHandler<dim> dof_handler;
+ *   ...
+ *   for (auto cell : filter_iterators(dof_handler.active_cell_iterators(),
+ *                                    IteratorFilters::LocallyOwned())
+ *     {
+ *       fe_values.reinit (cell);
+ *       ...do the local integration on 'cell'...;
+ *     }
+ * @endcode
+ *
+ * @author Bruno Turcksin 
+ * @relates FilteredIterator 
+ * @ingroup CPP11
+ */
+template <typename BaseIterator, typename Predicate>
+IteratorRange<FilteredIterator<BaseIterator> >
+filter_iterators (IteratorRange<BaseIterator> i,
+                  const Predicate &p)
+{
+  FilteredIterator<BaseIterator> fi(p, *(i.begin()));
+  FilteredIterator<BaseIterator> fi_end(p, *(i.end()));
+
+  return IteratorRange<FilteredIterator<BaseIterator> > (fi, fi_end);
+}
+#endif
+
+
+
+#ifdef DEAL_II_WITH_CXX14
+/**
+ * Filter the given of iterators an arbitrary number of Predicates. This allows
+ * to replace:
+ * @code
+ *   DoFHandler<dim> dof_handler;
+ *   ...
+ *   for (auto cell : dof_handler.active_cell_iterators())
+ *     {
+ *       if (cell->is_locally_owned())
+ *         {
+ *           if (cell->at_boundary())
+ *             {
+ *               fe_values.reinit (cell);
+ *               ...do the local integration on 'cell'...;
+ *             }
+ *         }
+ *     }
+ * @endcode
+ * by:
+ * @code
+ *   DoFHandler<dim> dof_handler;
+ *   ...
+ *   for (auto cell : filter_iterators(dof_handler.active_cell_iterators(),
+ *                                    IteratorFilters::LocallyOwned(),
+ *                                    IteratorFilters::AtBoundary())
+ *     {
+ *       fe_values.reinit (cell);
+ *       ...do the local integration on 'cell'...;
+ *     }
+ * @endcode
+ *
+ * @note This function requires C++14
+ *
+ * @author Bruno Turcksin
+ * @relates FilteredIterator
+ */
+template <typename BaseIterator, typename Predicate, typename... Targs>
+auto
+filter_iterators (IteratorRange<BaseIterator> i,
+                  const Predicate &p, const Targs... args)
+{
+  auto fi = filter_iterators(i,p);
+  return filter_iterators(fi, args...);
+}
+#endif
 
 
 /* ------------------ Inline functions and templates ------------ */
