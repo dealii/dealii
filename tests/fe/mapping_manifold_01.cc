@@ -58,7 +58,7 @@ void test()
   std::vector<Point<spacedim> > q_points = quadrature.get_points();
 
 
-  MappingManifold<dim,spacedim> map_manifold();
+  MappingManifold<dim,spacedim> map_manifold;
   MappingQGeneric<dim,spacedim> map_q1(1);
 
 

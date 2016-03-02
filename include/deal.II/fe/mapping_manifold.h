@@ -445,56 +445,18 @@ protected:
    * solving a Laplace equation, or if dim<spacedim, it asks the underlying
    * manifold for the locations of interior points.
    */
-  virtual
-  std::vector<Point<spacedim> >
-  compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
+  // virtual
+  // std::vector<Point<spacedim> >
+  // compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
   /**
    * Transforms the point @p p on the real cell to the corresponding point on
    * the unit cell @p cell by a Newton iteration.
    */
-  Point<dim>
-  transform_real_to_unit_cell_internal (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                                        const Point<spacedim> &p,
-                                        const Point<dim> &initial_p_unit) const;
-
-  /**
-   * For <tt>dim=2,3</tt>. Append the support points of all shape functions
-   * located on bounding lines of the given cell to the vector @p a. Points
-   * located on the vertices of a line are not included.
-   *
-   * Needed by the @p compute_support_points() function. For <tt>dim=1</tt>
-   * this function is empty. The function uses the underlying manifold object
-   * of the line (or, if none is set, of the cell) for the location of the
-   * requested points.
-   *
-   * This function is made virtual in order to allow derived classes to choose
-   * shape function support points differently than the present class, which
-   * chooses the points as interpolation points on the boundary.
-   */
-  virtual
-  void
-  add_line_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                           std::vector<Point<spacedim> > &a) const;
-
-  /**
-   * For <tt>dim=3</tt>. Append the support points of all shape functions
-   * located on bounding faces (quads in 3d) of the given cell to the vector
-   * @p a. Points located on the vertices or lines of a quad are not included.
-   *
-   * Needed by the @p compute_support_points() function. For <tt>dim=1</tt>
-   * and <tt>dim=2</tt> this function is empty. The function uses the
-   * underlying manifold object of the quad (or, if none is set, of the cell)
-   * for the location of the requested points.
-   *
-   * This function is made virtual in order to allow derived classes to choose
-   * shape function support points differently than the present class, which
-   * chooses the points as interpolation points on the boundary.
-   */
-  virtual
-  void
-  add_quad_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                          std::vector<Point<spacedim> > &a) const;
+  // Point<dim>
+  // transform_real_to_unit_cell_internal (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+  //                                       const Point<spacedim> &p,
+  //                                       const Point<dim> &initial_p_unit) const;
 
   /**
    * Make MappingQ a friend since it needs to call the fill_fe_values()

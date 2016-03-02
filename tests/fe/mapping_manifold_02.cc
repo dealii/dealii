@@ -61,15 +61,15 @@ void test()
   const QGauss<spacedim> quadrature(1);
 
   std::vector<Point<spacedim> > q_points_from_quadrature = quadrature.get_points();
-  
+
   FE_Q<dim,spacedim> fe(1);
-  
+
   DoFHandler<dim,spacedim> dof(tr);
   dof.distribute_dofs(fe);
 
 
   FEValues<dim,spacedim> fe_values (fe, quadrature,
-				    update_quadrature_points);
+                                    update_quadrature_points);
 
 
   MappingManifold<dim,spacedim> map_manifold;
@@ -84,8 +84,8 @@ void test()
         {
           const Point<spacedim> pq = map_manifold.transform_unit_to_real_cell(cell,q_points[q]);
 
-	  AssertThrow(pq.distance(q_points_from_fe_values[q]) < 1e-10,
-		      ExcInternalError());
+          AssertThrow(pq.distance(q_points_from_fe_values[q]) < 1e-10,
+                      ExcInternalError());
         }
     }
   deallog << "OK" << std::endl;

@@ -223,6 +223,15 @@ MappingManifold<dim,spacedim>::clone () const
 }
 
 
+template<int dim, int spacedim>
+Point<dim>
+MappingManifold<dim,spacedim>::
+transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                             const Point<spacedim> &p) const
+{
+  Assert(false, ExcNotImplemented());
+  return Point<dim>();
+}
 
 template<int dim, int spacedim>
 Point<spacedim>
@@ -901,15 +910,15 @@ namespace internal
 
 
 
-// template<int dim, int spacedim>
-// CellSimilarity::Similarity
-// MappingManifold<dim,spacedim>::
-// fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-//                 const CellSimilarity::Similarity                           cell_similarity,
-//                 const Quadrature<dim>                                     &quadrature,
-//                 const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-//                 internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
-// {
+template<int dim, int spacedim>
+CellSimilarity::Similarity
+MappingManifold<dim,spacedim>::
+fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                const CellSimilarity::Similarity                           cell_similarity,
+                const Quadrature<dim>                                     &quadrature,
+                const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
+{
 //   // ensure that the following static_cast is really correct:
 //   Assert (dynamic_cast<const InternalData *>(&internal_data) != 0,
 //           ExcInternalError());
@@ -1075,9 +1084,9 @@ namespace internal
 //       QProjector<dim>::DataSetDescriptor::cell (),
 //       data,
 //       output_data.jacobian_pushed_forward_3rd_derivatives);
-
-//   return cell_similarity;
-// }
+  Assert(false, ExcNotImplemented());
+  return cell_similarity;
+}
 
 
 
@@ -1274,7 +1283,7 @@ namespace internal
       maybe_update_jacobian_3rd_derivatives<dim,spacedim> (CellSimilarity::none,
                                                            data_set,
                                                            data,
-                                                            output_data.jacobian_3rd_derivatives);
+                                                           output_data.jacobian_3rd_derivatives);
       maybe_update_jacobian_pushed_forward_3rd_derivatives<dim,spacedim> (CellSimilarity::none,
           data_set,
           data,
@@ -1290,15 +1299,15 @@ namespace internal
 
 
 
-// template<int dim, int spacedim>
-// void
-// MappingManifold<dim,spacedim>::
-// fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-//                      const unsigned int                                         face_no,
-//                      const Quadrature<dim-1>                                   &quadrature,
-//                      const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-//                      internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
-// {
+template<int dim, int spacedim>
+void
+MappingManifold<dim,spacedim>::
+fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                     const unsigned int                                         face_no,
+                     const Quadrature<dim-1>                                   &quadrature,
+                     const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                     internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
+{
 //   // ensure that the following cast is really correct:
 //   Assert ((dynamic_cast<const InternalData *>(&internal_data) != 0),
 //           ExcInternalError());
@@ -1330,20 +1339,21 @@ namespace internal
 //                                     quadrature,
 //                                     data,
 //                                     output_data);
-// }
+  Assert(false, ExcNotImplemented());
+}
 
 
 
-// template<int dim, int spacedim>
-// void
-// MappingManifold<dim,spacedim>::
-// fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-//                         const unsigned int                                         face_no,
-//                         const unsigned int                                         subface_no,
-//                         const Quadrature<dim-1>                                   &quadrature,
-//                         const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-//                         internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
-// {
+template<int dim, int spacedim>
+void
+MappingManifold<dim,spacedim>::
+fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                        const unsigned int                                         face_no,
+                        const unsigned int                                         subface_no,
+                        const Quadrature<dim-1>                                   &quadrature,
+                        const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                        internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
+{
 //   // ensure that the following cast is really correct:
 //   Assert ((dynamic_cast<const InternalData *>(&internal_data) != 0),
 //           ExcInternalError());
@@ -1376,7 +1386,7 @@ namespace internal
 //                                     quadrature,
 //                                     data,
 //                                     output_data);
-// }
+}
 
 
 
@@ -1694,8 +1704,8 @@ namespace
     //     return;
     //   }
     //   default:
-        Assert(false, ExcNotImplemented());
-  //     }
+    Assert(false, ExcNotImplemented());
+    //     }
   }
 }
 
@@ -1747,20 +1757,20 @@ transform (const ArrayView<const Tensor<2, dim> >                  &input,
   //     transform_gradients(input, mapping_type, mapping_data, output);
   //     return;
   //   default:
-      Assert(false, ExcNotImplemented());
-      //    }
+  Assert(false, ExcNotImplemented());
+  //    }
 }
 
 
 
-// template<int dim, int spacedim>
-// void
-// MappingManifold<dim,spacedim>::
-// transform (const ArrayView<const  DerivativeForm<2, dim, spacedim> > &input,
-//            const MappingType                                          mapping_type,
-//            const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_data,
-//            const ArrayView<Tensor<3,spacedim> >                      &output) const
-// {
+template<int dim, int spacedim>
+void
+MappingManifold<dim,spacedim>::
+transform (const ArrayView<const  DerivativeForm<2, dim, spacedim> > &input,
+           const MappingType                                          mapping_type,
+           const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_data,
+           const ArrayView<Tensor<3,spacedim> >                      &output) const
+{
 
 //   AssertDimension (input.size(), output.size());
 //   Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
@@ -1796,20 +1806,20 @@ transform (const ArrayView<const Tensor<2, dim> >                  &input,
 //     }
 
 //     default:
-//       Assert(false, ExcNotImplemented());
+  Assert(false, ExcNotImplemented());
 //     }
-// }
+}
 
 
 
-// template<int dim, int spacedim>
-// void
-// MappingManifold<dim,spacedim>::
-// transform (const ArrayView<const  Tensor<3,dim> >                  &input,
-//            const MappingType                                        mapping_type,
-//            const typename Mapping<dim,spacedim>::InternalDataBase  &mapping_data,
-//            const ArrayView<Tensor<3,spacedim> >                    &output) const
-// {
+template<int dim, int spacedim>
+void
+MappingManifold<dim,spacedim>::
+transform (const ArrayView<const  Tensor<3,dim> >                  &input,
+           const MappingType                                        mapping_type,
+           const typename Mapping<dim,spacedim>::InternalDataBase  &mapping_data,
+           const ArrayView<Tensor<3,spacedim> >                    &output) const
+{
 //   switch (mapping_type)
 //     {
 //     case mapping_piola_hessian:
@@ -1818,9 +1828,9 @@ transform (const ArrayView<const Tensor<2, dim> >                  &input,
 //       transform_hessians(input, mapping_type, mapping_data, output);
 //       return;
 //     default:
-//       Assert(false, ExcNotImplemented());
+  Assert(false, ExcNotImplemented());
 //     }
-// }
+}
 
 
 
@@ -2056,170 +2066,6 @@ namespace
 //         }
 //     }
 // }
-
-
-
-template <>
-void
-MappingManifold<3,3>::
-add_quad_support_points(const Triangulation<3,3>::cell_iterator &cell,
-                        std::vector<Point<3> >                &a) const
-{
-//   const unsigned int faces_per_cell    = GeometryInfo<3>::faces_per_cell,
-//                      vertices_per_face = GeometryInfo<3>::vertices_per_face,
-//                      lines_per_face    = GeometryInfo<3>::lines_per_face,
-//                      vertices_per_cell = GeometryInfo<3>::vertices_per_cell;
-
-//   static const StraightBoundary<3> straight_boundary;
-//   // used if face quad at boundary or entirely in the interior of the domain
-//   std::vector<Point<3> > quad_points ((polynomial_degree-1)*(polynomial_degree-1));
-//   // used if only one line of face quad is at boundary
-//   std::vector<Point<3> > b(4*polynomial_degree);
-
-//   // Used by the new Manifold interface. This vector collects the
-//   // vertices used to compute the intermediate points.
-//   std::vector<Point<3> > vertices(4);
-
-//   // loop over all faces and collect points on them
-//   for (unsigned int face_no=0; face_no<faces_per_cell; ++face_no)
-//     {
-//       const Triangulation<3>::face_iterator face = cell->face(face_no);
-
-//       // select the correct mappings for the present face
-//       const bool face_orientation = cell->face_orientation(face_no),
-//                  face_flip        = cell->face_flip       (face_no),
-//                  face_rotation    = cell->face_rotation   (face_no);
-
-// #ifdef DEBUG
-//       // some sanity checks up front
-//       for (unsigned int i=0; i<vertices_per_face; ++i)
-//         Assert(face->vertex_index(i)==cell->vertex_index(
-//                  GeometryInfo<3>::face_to_cell_vertices(face_no, i,
-//                                                         face_orientation,
-//                                                         face_flip,
-//                                                         face_rotation)),
-//                ExcInternalError());
-
-//       // indices of the lines that bound a face are given by GeometryInfo<3>::
-//       // face_to_cell_lines
-//       for (unsigned int i=0; i<lines_per_face; ++i)
-//         Assert(face->line(i)==cell->line(GeometryInfo<3>::face_to_cell_lines(
-//                                            face_no, i, face_orientation, face_flip, face_rotation)),
-//                ExcInternalError());
-// #endif
-
-//       // if face at boundary, then ask boundary object to return intermediate
-//       // points on it
-//       if (face->at_boundary())
-//         {
-//           get_intermediate_points_on_object(face->get_manifold(), line_support_points, face, quad_points);
-
-//           // in 3D, the orientation, flip and rotation of the face might not
-//           // match what we expect here, namely the standard orientation. thus
-//           // reorder points accordingly. since a Mapping uses the same shape
-//           // function as an FE_Q, we can ask a FE_Q to do the reordering for us.
-//           for (unsigned int i=0; i<quad_points.size(); ++i)
-//             a.push_back(quad_points[fe_q->adjust_quad_dof_index_for_face_orientation(i,
-//                                     face_orientation,
-//                                     face_flip,
-//                                     face_rotation)]);
-//         }
-//       else
-//         {
-//           // face is not at boundary, but maybe some of its lines are. count
-//           // them
-//           unsigned int lines_at_boundary=0;
-//           for (unsigned int i=0; i<lines_per_face; ++i)
-//             if (face->line(i)->at_boundary())
-//               ++lines_at_boundary;
-
-//           Assert(lines_at_boundary<=lines_per_face, ExcInternalError());
-
-//           // if at least one of the lines bounding this quad is at the
-//           // boundary, then collect points separately
-//           if (lines_at_boundary>0)
-//             {
-//               // call of function add_weighted_interior_points increases size of b
-//               // about 1. There resize b for the case the mentioned function
-//               // was already called.
-//               b.resize(4*polynomial_degree);
-
-//               // b is of size 4*degree, make sure that this is the right size
-//               Assert(b.size()==vertices_per_face+lines_per_face*(polynomial_degree-1),
-//                      ExcDimensionMismatch(b.size(),
-//                                           vertices_per_face+lines_per_face*(polynomial_degree-1)));
-
-//               // sort the points into b. We used access from the cell (not
-//               // from the face) to fill b, so we can assume a standard face
-//               // orientation. Doing so, the calculated points will be in
-//               // standard orientation as well.
-//               for (unsigned int i=0; i<vertices_per_face; ++i)
-//                 b[i]=a[GeometryInfo<3>::face_to_cell_vertices(face_no, i)];
-
-//               for (unsigned int i=0; i<lines_per_face; ++i)
-//                 for (unsigned int j=0; j<polynomial_degree-1; ++j)
-//                   b[vertices_per_face+i*(polynomial_degree-1)+j]=
-//                     a[vertices_per_cell + GeometryInfo<3>::face_to_cell_lines(
-//                         face_no, i)*(polynomial_degree-1)+j];
-
-//               // Now b includes the support points on the quad and we can
-//               // apply the laplace vector
-//               add_weighted_interior_points (support_point_weights_on_quad, b);
-//               AssertDimension (b.size(),
-//                                4*this->polynomial_degree +
-//                                (this->polynomial_degree-1)*(this->polynomial_degree-1));
-
-//               for (unsigned int i=0; i<(polynomial_degree-1)*(polynomial_degree-1); ++i)
-//                 a.push_back(b[4*polynomial_degree+i]);
-//             }
-//           else
-//             {
-//               // face is entirely in the interior. get intermediate
-//               // points from the relevant manifold object.
-//               vertices.resize(4);
-//               for (unsigned int i=0; i<4; ++i)
-//                 vertices[i] = face->vertex(i);
-//               get_intermediate_points (face->get_manifold(), line_support_points, vertices, quad_points);
-//               // in 3D, the orientation, flip and rotation of the face might
-//               // not match what we expect here, namely the standard
-//               // orientation. thus reorder points accordingly. since a Mapping
-//               // uses the same shape function as an FE_Q, we can ask a FE_Q to
-//               // do the reordering for us.
-//               for (unsigned int i=0; i<quad_points.size(); ++i)
-//                 a.push_back(quad_points[fe_q->adjust_quad_dof_index_for_face_orientation(i,
-//                                         face_orientation,
-//                                         face_flip,
-//                                         face_rotation)]);
-//             }
-//         }
-//     }
-}
-
-
-
-template <>
-void
-MappingManifold<2,3>::
-add_quad_support_points(const Triangulation<2,3>::cell_iterator &cell,
-                        std::vector<Point<3> >                &a) const
-{
-  // std::vector<Point<3> > quad_points ((polynomial_degree-1)*(polynomial_degree-1));
-  // get_intermediate_points_on_object (cell->get_manifold(), line_support_points,
-  //                                    cell, quad_points);
-  // for (unsigned int i=0; i<quad_points.size(); ++i)
-  //   a.push_back(quad_points[i]);
-}
-
-
-
-template <int dim, int spacedim>
-void
-MappingManifold<dim,spacedim>::
-add_quad_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &,
-                        std::vector<Point<spacedim> > &) const
-{
-  Assert (false, ExcInternalError());
-}
 
 
 
