@@ -102,6 +102,7 @@ SET(_inst
   mapping_q1.inst.in
   mapping_q_eulerian.inst.in
   mapping_q.inst.in
+  mapping_manifold.inst.in
   )
 
 FILE(GLOB _header
