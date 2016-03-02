@@ -68,6 +68,12 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li> New: added indent target to indent all headers and source
+ files. Now you can do make (or ninja) indent inside the build
+ directory.
+ <br>
+ (Alberto Sartori, 2016/03/02)
+ </li>
 </ol>
 
 
