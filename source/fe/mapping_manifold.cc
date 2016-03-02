@@ -1274,7 +1274,7 @@ namespace internal
       maybe_update_jacobian_3rd_derivatives<dim,spacedim> (CellSimilarity::none,
                                                            data_set,
                                                            data,
-                                                           output_data.jacobian_3rd_derivatives);
+                                                            output_data.jacobian_3rd_derivatives);
       maybe_update_jacobian_pushed_forward_3rd_derivatives<dim,spacedim> (CellSimilarity::none,
           data_set,
           data,
@@ -1675,27 +1675,27 @@ namespace
                                const typename Mapping<dim,spacedim>::InternalDataBase       &mapping_data,
                                const ArrayView<Tensor<rank+1, spacedim> >                   &output)
   {
-    AssertDimension (input.size(), output.size());
-    Assert ((dynamic_cast<const typename MappingManifold<dim,spacedim>::InternalData *>(&mapping_data) != 0),
-            ExcInternalError());
-    const typename MappingManifold<dim,spacedim>::InternalData
-    &data = static_cast<const typename MappingManifold<dim,spacedim>::InternalData &>(mapping_data);
+    // AssertDimension (input.size(), output.size());
+    // Assert ((dynamic_cast<const typename MappingManifold<dim,spacedim>::InternalData *>(&mapping_data) != 0),
+    //         ExcInternalError());
+    // const typename MappingManifold<dim,spacedim>::InternalData
+    // &data = static_cast<const typename MappingManifold<dim,spacedim>::InternalData &>(mapping_data);
 
-    switch (mapping_type)
-      {
-      case mapping_covariant:
-      {
-        Assert (data.update_each & update_contravariant_transformation,
-                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+    // switch (mapping_type)
+    //   {
+    //   case mapping_covariant:
+    //   {
+    //     Assert (data.update_each & update_contravariant_transformation,
+    //             typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
 
-        for (unsigned int i=0; i<output.size(); ++i)
-          output[i] = apply_transformation(data.covariant[i], input[i]);
+    //     for (unsigned int i=0; i<output.size(); ++i)
+    //       output[i] = apply_transformation(data.covariant[i], input[i]);
 
-        return;
-      }
-      default:
+    //     return;
+    //   }
+    //   default:
         Assert(false, ExcNotImplemented());
-      }
+  //     }
   }
 }
 
@@ -1709,7 +1709,7 @@ transform (const ArrayView<const Tensor<1, dim> >                  &input,
            const typename Mapping<dim,spacedim>::InternalDataBase  &mapping_data,
            const ArrayView<Tensor<1, spacedim> >                   &output) const
 {
-  transform_fields(input, mapping_type, mapping_data, output);
+  //  transform_fields(input, mapping_type, mapping_data, output);
 }
 
 
@@ -1735,20 +1735,20 @@ transform (const ArrayView<const Tensor<2, dim> >                  &input,
            const typename Mapping<dim,spacedim>::InternalDataBase  &mapping_data,
            const ArrayView<Tensor<2, spacedim> >                   &output) const
 {
-  switch (mapping_type)
-    {
-    case mapping_contravariant:
-      transform_fields(input, mapping_type, mapping_data, output);
-      return;
+  // switch (mapping_type)
+  //   {
+  //   case mapping_contravariant:
+  //     transform_fields(input, mapping_type, mapping_data, output);
+  //     return;
 
-    case mapping_piola_gradient:
-    case mapping_contravariant_gradient:
-    case mapping_covariant_gradient:
-      transform_gradients(input, mapping_type, mapping_data, output);
-      return;
-    default:
+  //   case mapping_piola_gradient:
+  //   case mapping_contravariant_gradient:
+  //   case mapping_covariant_gradient:
+  //     transform_gradients(input, mapping_type, mapping_data, output);
+  //     return;
+  //   default:
       Assert(false, ExcNotImplemented());
-    }
+      //    }
 }
 
 
