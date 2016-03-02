@@ -603,7 +603,7 @@ namespace OpenCASCADE
 
     // In the case your manifold changes from convex to concave or viceversa
     // the normal could jump from "inner" to "outer" normal.
-    // However, you should be able to change the normal verse preserving
+    // However, you should be able to change the normal sense preserving
     // the manifold orientation:
     if (face.Orientation()==TopAbs_REVERSED)
       {
