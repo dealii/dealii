@@ -53,7 +53,7 @@ void test()
     cell->set_all_manifold_ids (0);
   triangulation.refine_global (0);
 
-  const QGauss<spacedim> quadrature(7);
+  const QIterated<QTrapez<spacedim> > quadrature(7);
 
   std::vector<Point<spacedim> > q_points = quadrature.get_points();
 
