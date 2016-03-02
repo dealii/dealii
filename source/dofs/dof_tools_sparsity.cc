@@ -747,23 +747,23 @@ namespace DoFTools
                                   dofs_on_this_cell[j]);
 
               // Loop over all interior neighbors
-              for (unsigned int face = 0;
-                   face < GeometryInfo<DoFHandlerType::dimension>::faces_per_cell;
-                   ++face)
+              for (unsigned int face_n = 0;
+                   face_n < GeometryInfo<DoFHandlerType::dimension>::faces_per_cell;
+                   ++face_n)
                 {
                   const typename DoFHandlerType::face_iterator
-                  cell_face = cell->face(face);
+                  cell_face = cell->face(face_n);
                   if (cell_face->user_flag_set ())
                     continue;
 
-                  if (cell->at_boundary (face) )
+                  if (cell->at_boundary (face_n) )
                     {
                       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
                         {
-                          const bool i_non_zero_i = support_on_face (i, face);
+                          const bool i_non_zero_i = support_on_face (i, face_n);
                           for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
                             {
-                              const bool j_non_zero_i = support_on_face (j, face);
+                              const bool j_non_zero_i = support_on_face (j, face_n);
 
                               if ((flux_dof_mask(i,j) == always)
                                   ||
@@ -780,14 +780,14 @@ namespace DoFTools
                   else
                     {
                       typename DoFHandlerType::level_cell_iterator
-                      neighbor = cell->neighbor(face);
+                      neighbor = cell->neighbor(face_n);
                       // Refinement edges are taken care of by coarser
                       // cells
-                      if (cell->neighbor_is_coarser(face))
+                      if (cell->neighbor_is_coarser(face_n))
                         continue;
 
                       const unsigned int
-                      neighbor_face = cell->neighbor_of_neighbor(face);
+                      neighbor_face_n = cell->neighbor_of_neighbor(face_n);
 
                       if (cell_face->has_children())
                         {
@@ -797,17 +797,17 @@ namespace DoFTools
                             {
                               const typename DoFHandlerType::level_cell_iterator
                               sub_neighbor
-                                = cell->neighbor_child_on_subface (face, sub_nr);
+                                = cell->neighbor_child_on_subface (face_n, sub_nr);
 
                               sub_neighbor->get_dof_indices (dofs_on_other_cell);
                               for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
                                 {
-                                  const bool i_non_zero_i = support_on_face (i, face);
-                                  const bool i_non_zero_e = support_on_face (i, neighbor_face);
+                                  const bool i_non_zero_i = support_on_face (i, face_n);
+                                  const bool i_non_zero_e = support_on_face (i, neighbor_face_n);
                                   for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
                                     {
-                                      const bool j_non_zero_i = support_on_face (j, face);
-                                      const bool j_non_zero_e = support_on_face (j, neighbor_face);
+                                      const bool j_non_zero_i = support_on_face (j, face_n);
+                                      const bool j_non_zero_e = support_on_face (j, neighbor_face_n);
 
                                       if (flux_dof_mask(i,j) == always)
                                         {
@@ -864,7 +864,7 @@ namespace DoFTools
                                         }
                                     }
                                 }
-                              sub_neighbor->face(neighbor_face)->set_user_flag ();
+                              sub_neighbor->face(neighbor_face_n)->set_user_flag ();
                             }
                         }
                       else
@@ -872,12 +872,12 @@ namespace DoFTools
                           neighbor->get_dof_indices (dofs_on_other_cell);
                           for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
                             {
-                              const bool i_non_zero_i = support_on_face (i, face);
-                              const bool i_non_zero_e = support_on_face (i, neighbor_face);
+                              const bool i_non_zero_i = support_on_face (i, face_n);
+                              const bool i_non_zero_e = support_on_face (i, neighbor_face_n);
                               for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
                                 {
-                                  const bool j_non_zero_i = support_on_face (j, face);
-                                  const bool j_non_zero_e = support_on_face (j, neighbor_face);
+                                  const bool j_non_zero_i = support_on_face (j, face_n);
+                                  const bool j_non_zero_e = support_on_face (j, neighbor_face_n);
                                   if (flux_dof_mask(i,j) == always)
                                     {
                                       sparsity.add (dofs_on_this_cell[i],
@@ -933,7 +933,7 @@ namespace DoFTools
                                     }
                                 }
                             }
-                          neighbor->face(neighbor_face)->set_user_flag ();
+                          neighbor->face(neighbor_face_n)->set_user_flag ();
                         }
                     }
                 }
