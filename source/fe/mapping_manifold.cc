@@ -2278,3 +2278,5 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
 
 
 DEAL_II_NAMESPACE_CLOSE
+
+template class dealii::MappingManifold<2,2>;
