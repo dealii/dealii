@@ -81,7 +81,6 @@ public:
    */
   DerivativeForm   &operator = (const DerivativeForm <order, dim, spacedim, Number> &);
 
-
   /**
    * Assignment operator.
    */
@@ -110,7 +109,6 @@ public:
    */
   DerivativeForm<1, spacedim, dim, Number> transpose () const;
 
-
   /**
    * Computes the volume element associated with the jacobian of the
    * transformation F. That is to say if $DF$ is square, it computes
@@ -118,16 +116,12 @@ public:
    */
   double determinant () const;
 
-
   /**
    * Assuming (*this) stores the jacobian of the mapping F, it computes its
    * covariant matrix, namely $DF*G^{-1}$, where $G = DF^{t}*DF$. If $DF$ is
    * square, covariant from gives $DF^{-t}$.
    */
   DerivativeForm<1, dim, spacedim, Number> covariant_form() const;
-
-
-
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -142,7 +136,6 @@ public:
                   int,
                   << "Invalid DerivativeForm index " << arg1);
 
-
 private:
   /**
    * Auxiliary function that computes (*this) * T^{t}
@@ -150,13 +143,10 @@ private:
   DerivativeForm<1, dim, spacedim, Number> times_T_t (Tensor<2,dim,Number> T) const;
 
 
-private:
   /**
    * Array of tensors holding the subelements.
    */
   Tensor<order,dim,Number> tensor[spacedim];
-
-
 };
 
 
