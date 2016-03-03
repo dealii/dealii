@@ -84,6 +84,13 @@ inconvenience this causes.
 
 
 <ol> 
+ <li> Fixed: The OpenCASCADE::push_forward_and_differential_forms()
+ function is now able to change the direction of the normal vector
+ according to Orientation() method.  
+ <br> 
+ (Mauro Bardelloni, 2016/03/02) 
+ </li> 
+
  <li> Fixed: The function IndexSet::make_trilinos_map() now works if some 
  processors have a contiguous range of indices and others do not.
  <br>
@@ -108,7 +115,6 @@ inconvenience this causes.
  <br>
  (Spencer Patty, 2016/02/11)
  </li>
-
 </ol>
 
 */
