@@ -754,8 +754,6 @@ namespace DoFTools
                 {
                   const typename DoFHandlerType::face_iterator
                   cell_face = cell->face (face_n);
-                  if (cell_face->user_flag_set ())
-                    continue;
 
                   if (cell->at_boundary (face_n))
                     {
@@ -782,12 +780,27 @@ namespace DoFTools
                     {
                       typename DoFHandlerType::level_cell_iterator
                       neighbor = cell->neighbor (face_n);
-                      // Refinement edges are taken care of by coarser cells
-                      if (cell->neighbor_is_coarser (face_n))
+                      // If the cells are on the same level then only add to
+                      // the sparsity pattern if the current cell is 'greater'
+                      // in the total ordering.
+                      if (neighbor->level () == cell->level ()
+                          &&
+                          neighbor->index () > cell->index ())
                         continue;
+                      // If we are more refined then the neighbor, then we
+                      // will automatically find the active neighbor cell when
+                      // we call 'neighbor (face_n)' above. The opposite is
+                      // not true; if the neighbor is more refined then the
+                      // call 'neighbor (face_n)' will *not* return an active
+                      // cell. Hence, only add things to the sparsity pattern
+                      // if the neighbor is coarser than the current cell.
+                      if (neighbor->level () != cell->level ()
+                          &&
+                          !cell->neighbor_is_coarser (face_n))
+                        continue; // (the neighbor is finer)
 
                       const unsigned int
-                      neighbor_face_n = cell->neighbor_of_neighbor (face_n);
+                      neighbor_face_n = cell->neighbor_face_no (face_n);
 
                       if (cell_face->has_children ())
                         {
@@ -864,7 +877,6 @@ namespace DoFTools
                                         }
                                     }
                                 }
-                              sub_neighbor->face(neighbor_face_n)->set_user_flag ();
                             }
                         }
                       else
@@ -933,7 +945,6 @@ namespace DoFTools
                                     }
                                 }
                             }
-                          neighbor->face (neighbor_face_n)->set_user_flag ();
                         }
                     }
                 }
