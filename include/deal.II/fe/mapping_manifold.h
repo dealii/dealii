@@ -44,9 +44,9 @@ template <int,int> class MappingQ;
  * reference and real cell by exploiting the geometrical information
  * coming from the underlying Manifold object.
  *
- * Quadrature points computed using this mapping lye on the exact
+ * Quadrature points computed using this mapping lie on the exact
  * geometrical objects, and tangent and normal vectors computed using
- * this class are normal and tangent to the underlying geometry. This
+ * this class are tangent and normal to the underlying geometry. This
  * is in constrast with the MappingQ class, which approximates the
  * geometry using a polynomial of some order, and then computes the
  * normals and tangents using the approximated surface.
@@ -218,6 +218,14 @@ public:
     typename Triangulation<dim,spacedim>::cell_iterator current_cell;
 
     /**
+     * The actual quadrature on the reference cell.
+     *
+     * Computed once.
+     */
+    Quadrature<dim> quad;
+
+
+    /**
      * Values of quadrature weights for manifold quadrature formulas.
      *
      * Computed once.
@@ -287,25 +295,25 @@ public:
     //  */
     // const unsigned int n_shape_functions;
 
-    // /**
-    //  * Tensors of covariant transformation at each of the quadrature points.
-    //  * The matrix stored is the Jacobian * G^{-1}, where G = Jacobian^{t} *
-    //  * Jacobian, is the first fundamental form of the map; if dim=spacedim
-    //  * then it reduces to the transpose of the inverse of the Jacobian matrix,
-    //  * which itself is stored in the @p contravariant field of this structure.
-    //  *
-    //  * Computed on each cell.
-    //  */
-    // mutable std::vector<DerivativeForm<1,dim, spacedim > >  covariant;
+    /**
+     * Tensors of covariant transformation at each of the quadrature points.
+     * The matrix stored is the Jacobian * G^{-1}, where G = Jacobian^{t} *
+     * Jacobian, is the first fundamental form of the map; if dim=spacedim
+     * then it reduces to the transpose of the inverse of the Jacobian matrix,
+     * which itself is stored in the @p contravariant field of this structure.
+     *
+     * Computed on each cell.
+     */
+    mutable std::vector<DerivativeForm<1,dim, spacedim > >  covariant;
 
-    // /**
-    //  * Tensors of contravariant transformation at each of the quadrature
-    //  * points. The contravariant matrix is the Jacobian of the transformation,
-    //  * i.e. $J_{ij}=dx_i/d\hat x_j$.
-    //  *
-    //  * Computed on each cell.
-    //  */
-    // mutable std::vector< DerivativeForm<1,dim,spacedim> > contravariant;
+    /**
+     * Tensors of contravariant transformation at each of the quadrature
+     * points. The contravariant matrix is the Jacobian of the transformation,
+     * i.e. $J_{ij}=dx_i/d\hat x_j$.
+     *
+     * Computed on each cell.
+     */
+    mutable std::vector< DerivativeForm<1,dim,spacedim> > contravariant;
 
     // /**
     //  * Auxiliary vectors for internal use.

@@ -51,8 +51,6 @@ std::size_t
 MappingManifold<dim,spacedim>::InternalData::memory_consumption () const
 {
   return (Mapping<dim,spacedim>::InternalDataBase::memory_consumption() );
-  // MemoryConsumption::memory_consumption (shape_values) +
-  // MemoryConsumption::memory_consumption (shape_derivatives) +
   // MemoryConsumption::memory_consumption (covariant) +
   // MemoryConsumption::memory_consumption (contravariant) +
   // MemoryConsumption::memory_consumption (unit_tangentials) +
@@ -76,33 +74,21 @@ initialize (const UpdateFlags      update_flags,
   // in fill_fe_*_values()
   this->update_each = update_flags;
 
+  // Store the quadrature
+  this->quad = q;
   const unsigned int n_q_points = q.size();
+
 
   // see if we need the (transformation) shape function values
   // and/or gradients and resize the necessary arrays
   if (this->update_each & update_quadrature_points)
     compute_manifold_quadrature_weights(q);
 
-  // if (this->update_each & (update_covariant_transformation
-  //                          | update_contravariant_transformation
-  //                          | update_JxW_values
-  //                          | update_boundary_forms
-  //                          | update_normal_vectors
-  //                          | update_jacobians
-  //                          | update_jacobian_grads
-  //                          | update_inverse_jacobians
-  //                          | update_jacobian_pushed_forward_grads
-  //                          | update_jacobian_2nd_derivatives
-  //                          | update_jacobian_pushed_forward_2nd_derivatives
-  //                          | update_jacobian_3rd_derivatives
-  //                          | update_jacobian_pushed_forward_3rd_derivatives))
-  //   shape_derivatives.resize(n_shape_functions * n_q_points);
+  if (this->update_each & update_covariant_transformation)
+    covariant.resize(n_original_q_points);
 
-  // if (this->update_each & update_covariant_transformation)
-  //   covariant.resize(n_original_q_points);
-
-  // if (this->update_each & update_contravariant_transformation)
-  //   contravariant.resize(n_original_q_points);
+  if (this->update_each & update_contravariant_transformation)
+    contravariant.resize(n_original_q_points);
 
   // if (this->update_each & update_volume_elements)
   //   volume_elements.resize(n_original_q_points);
@@ -405,78 +391,64 @@ namespace internal
      * Update the co- and contravariant matrices as well as their determinant, for the cell
      * described stored in the data object, but only if the update_flags of the @p data
      * argument indicate so.
-     *
-     * Skip the computation if possible as indicated by the first argument.
      */
     template <int dim, int spacedim>
     void
-    maybe_update_Jacobians (const CellSimilarity::Similarity                                   cell_similarity,
+    maybe_update_Jacobians (const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
                             const typename dealii::QProjector<dim>::DataSetDescriptor          data_set,
                             const typename dealii::MappingManifold<dim,spacedim>::InternalData      &data)
     {
       const UpdateFlags update_flags = data.update_each;
 
       if (update_flags & update_contravariant_transformation)
-        // if the current cell is just a
-        // translation of the previous one, no
-        // need to recompute jacobians...
-        if (cell_similarity != CellSimilarity::translation)
-          {
-            const unsigned int n_q_points = data.contravariant.size();
+        {
+          const unsigned int n_q_points = data.contravariant.size();
 
-            std::fill(data.contravariant.begin(), data.contravariant.end(),
-                      DerivativeForm<1,dim,spacedim>());
+          std::fill(data.contravariant.begin(), data.contravariant.end(),
+                    DerivativeForm<1,dim,spacedim>());
 
-            Assert (data.n_shape_functions > 0, ExcInternalError());
-            const Tensor<1,spacedim> *supp_pts =
-              &data.mapping_support_points[0];
 
-            for (unsigned int point=0; point<n_q_points; ++point)
-              {
-                const Tensor<1,dim> *data_derv =
-                  &data.derivative(point+data_set, 0);
+          for (unsigned int point=0; point<n_q_points; ++point)
+            {
+              // Start by figuring out how to compute the direction in
+              // the reference space:
+              const Point<dim> &p = data.quad.point(point+data_set);
 
-                double result [spacedim][dim];
+              // Always get the maximum length from the point to the
+              // boundary of the reference element, to compute the
+              // tangent vectors from the Manifold object
+              for (unsigned int i=0; i<dim; ++i)
+                {
+                  Point<dim> ei = Point<dim>::unit_vector(i);
+                  double ai = ei*p;
+                  Assert(ai >=0, ExcInternalError("Was expecting a quadrature point "
+                                                  "inside the unit reference element."));
+                  Point<dim> np(ai > .5 ? p-ai *ei : p+(1-ai)*ei);
 
-                // peel away part of sum to avoid zeroing the
-                // entries and adding for the first time
-                for (unsigned int i=0; i<spacedim; ++i)
-                  for (unsigned int j=0; j<dim; ++j)
-                    result[i][j] = data_derv[0][j] * supp_pts[0][i];
-                for (unsigned int k=1; k<data.n_shape_functions; ++k)
-                  for (unsigned int i=0; i<spacedim; ++i)
-                    for (unsigned int j=0; j<dim; ++j)
-                      result[i][j] += data_derv[k][j] * supp_pts[k][i];
+                  // In the lenghts, we store also the direction sign,
+                  // which is positive, if the coordinate is < .5,
+                  double L = ai > .5 ? -ai: 1-ai;
 
-                // write result into contravariant data. for
-                // j=dim in the case dim<spacedim, there will
-                // never be any nonzero data that arrives in
-                // here, so it is ok anyway because it was
-                // initialized to zero at the initialization
-                for (unsigned int i=0; i<spacedim; ++i)
-                  for (unsigned int j=0; j<dim; ++j)
-                    data.contravariant[point][i][j] = result[i][j];
-              }
-          }
+                  data.contravariant[point][i] = cell->get_manifold().get_tangent_vector(p, np)/L;
+                }
+            }
 
-      if (update_flags & update_covariant_transformation)
-        if (cell_similarity != CellSimilarity::translation)
-          {
-            const unsigned int n_q_points = data.contravariant.size();
-            for (unsigned int point=0; point<n_q_points; ++point)
-              {
-                data.covariant[point] = (data.contravariant[point]).covariant_form();
-              }
-          }
+          if (update_flags & update_covariant_transformation)
+            {
+              const unsigned int n_q_points = data.contravariant.size();
+              for (unsigned int point=0; point<n_q_points; ++point)
+                {
+                  data.covariant[point] = (data.contravariant[point]).covariant_form();
+                }
+            }
 
-      if (update_flags & update_volume_elements)
-        if (cell_similarity != CellSimilarity::translation)
-          {
-            const unsigned int n_q_points = data.contravariant.size();
-            for (unsigned int point=0; point<n_q_points; ++point)
-              data.volume_elements[point] = data.contravariant[point].determinant();
-          }
-
+          if (update_flags & update_volume_elements)
+            {
+              const unsigned int n_q_points = data.contravariant.size();
+              for (unsigned int point=0; point<n_q_points; ++point)
+                data.volume_elements[point] = data.contravariant[point].determinant();
+            }
+        }
     }
 
     /**
@@ -1675,27 +1647,27 @@ namespace
                                const typename Mapping<dim,spacedim>::InternalDataBase       &mapping_data,
                                const ArrayView<Tensor<rank+1, spacedim> >                   &output)
   {
-    // AssertDimension (input.size(), output.size());
-    // Assert ((dynamic_cast<const typename MappingManifold<dim,spacedim>::InternalData *>(&mapping_data) != 0),
-    //         ExcInternalError());
-    // const typename MappingManifold<dim,spacedim>::InternalData
-    // &data = static_cast<const typename MappingManifold<dim,spacedim>::InternalData &>(mapping_data);
+    AssertDimension (input.size(), output.size());
+    Assert ((dynamic_cast<const typename MappingManifold<dim,spacedim>::InternalData *>(&mapping_data) != 0),
+            ExcInternalError());
+    const typename MappingManifold<dim,spacedim>::InternalData
+    &data = static_cast<const typename MappingManifold<dim,spacedim>::InternalData &>(mapping_data);
 
-    // switch (mapping_type)
-    //   {
-    //   case mapping_covariant:
-    //   {
-    //     Assert (data.update_each & update_contravariant_transformation,
-    //             typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+    switch (mapping_type)
+      {
+      case mapping_covariant:
+      {
+        Assert (data.update_each & update_contravariant_transformation,
+                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
 
-    //     for (unsigned int i=0; i<output.size(); ++i)
-    //       output[i] = apply_transformation(data.covariant[i], input[i]);
+        for (unsigned int i=0; i<output.size(); ++i)
+          output[i] = apply_transformation(data.covariant[i], input[i]);
 
-    //     return;
-    //   }
-    //   default:
-    Assert(false, ExcNotImplemented());
-    //     }
+        return;
+      }
+      default:
+        Assert(false, ExcNotImplemented());
+      }
   }
 }
 
@@ -1762,42 +1734,42 @@ transform (const ArrayView<const  DerivativeForm<2, dim, spacedim> > &input,
            const ArrayView<Tensor<3,spacedim> >                      &output) const
 {
 
-//   AssertDimension (input.size(), output.size());
-//   Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
-//           ExcInternalError());
-//   const InternalData &data = static_cast<const InternalData &>(mapping_data);
+  AssertDimension (input.size(), output.size());
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
+          ExcInternalError());
+  const InternalData &data = static_cast<const InternalData &>(mapping_data);
 
-//   switch (mapping_type)
-//     {
-//     case mapping_covariant_gradient:
-//     {
-//       Assert (data.update_each & update_contravariant_transformation,
-//               typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+  switch (mapping_type)
+    {
+    case mapping_covariant_gradient:
+    {
+      Assert (data.update_each & update_contravariant_transformation,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
 
-//       for (unsigned int q=0; q<output.size(); ++q)
-//         for (unsigned int i=0; i<spacedim; ++i)
-//           for (unsigned int j=0; j<spacedim; ++j)
-//             {
-//               double tmp[dim];
-//               for (unsigned int K=0; K<dim; ++K)
-//                 {
-//                   tmp[K] = data.covariant[q][j][0] * input[q][i][0][K];
-//                   for (unsigned int J=1; J<dim; ++J)
-//                     tmp[K] += data.covariant[q][j][J] * input[q][i][J][K];
-//                 }
-//               for (unsigned int k=0; k<spacedim; ++k)
-//                 {
-//                   output[q][i][j][k] = data.covariant[q][k][0] * tmp[0];
-//                   for (unsigned int K=1; K<dim; ++K)
-//                     output[q][i][j][k] += data.covariant[q][k][K] * tmp[K];
-//                 }
-//             }
-//       return;
-//     }
+      for (unsigned int q=0; q<output.size(); ++q)
+        for (unsigned int i=0; i<spacedim; ++i)
+          for (unsigned int j=0; j<spacedim; ++j)
+            {
+              double tmp[dim];
+              for (unsigned int K=0; K<dim; ++K)
+                {
+                  tmp[K] = data.covariant[q][j][0] * input[q][i][0][K];
+                  for (unsigned int J=1; J<dim; ++J)
+                    tmp[K] += data.covariant[q][j][J] * input[q][i][J][K];
+                }
+              for (unsigned int k=0; k<spacedim; ++k)
+                {
+                  output[q][i][j][k] = data.covariant[q][k][0] * tmp[0];
+                  for (unsigned int K=1; K<dim; ++K)
+                    output[q][i][j][k] += data.covariant[q][k][K] * tmp[K];
+                }
+            }
+      return;
+    }
 
-//     default:
-  Assert(false, ExcNotImplemented());
-//     }
+    default:
+      Assert(false, ExcNotImplemented());
+    }
 }
 
 
