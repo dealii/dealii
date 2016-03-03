@@ -76,6 +76,7 @@ void test()
 
   cell = triangulation.begin_active();
 
+  std::ofstream two_be_plotted("plot.txt");
   for (; cell!=endc; ++cell)
     {
       fe_values.reinit(cell);
@@ -89,6 +90,7 @@ void test()
               deallog << "Expected: " << pq << ", got: "
                       << q_points_from_fe_values[q] << std::endl;
             }
+          two_be_plotted << pq <<  " " << q_points_from_fe_values[q] << std::endl;
         }
     }
   deallog << "OK" << std::endl;

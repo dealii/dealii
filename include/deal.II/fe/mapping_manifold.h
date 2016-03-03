@@ -222,7 +222,7 @@ public:
      *
      * Computed once.
      */
-    std::vector<std::vector<double> > cell_manifold_quadratures_weights;
+    std::vector<std::vector<double> > cell_manifold_quadrature_weights;
 
     // /**
     //  * Values of shape function derivatives. Access by function @p derivative.
@@ -582,13 +582,13 @@ inline
 void
 MappingManifold<dim,spacedim>::InternalData::compute_manifold_quadrature_weights (const Quadrature<dim> &quad)
 {
-  static FE_Q<dim> fe_q(1);
-  cell_manifold_quadratures_weights.resize(quad.size(), std::vector<double>(GeometryInfo<dim>::vertices_per_cell));
+  FE_Q<dim> fe_q(1);
+  cell_manifold_quadrature_weights.resize(quad.size(), std::vector<double>(GeometryInfo<dim>::vertices_per_cell));
   for (unsigned int q=0; q<quad.size(); ++q)
     {
       for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
         {
-          cell_manifold_quadratures_weights[q][i] = fe_q.shape_value(i, quad.point(q));
+          cell_manifold_quadrature_weights[q][i] = fe_q.shape_value(i, quad.point(q));
         }
     }
 }

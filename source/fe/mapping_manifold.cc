@@ -380,19 +380,22 @@ namespace internal
     {
       const UpdateFlags update_flags = data.update_each;
 
-      AssertDimension(quadrature_points.size(),
-                      data.cell_manifold_quadratures_weights.size());
-
-      std::vector<Point<spacedim> > vertices;
-      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-        vertices[v] = cell->vertex(v);
 
       if (update_flags & update_quadrature_points)
         {
+
+          AssertDimension(quadrature_points.size(),
+                          data.cell_manifold_quadrature_weights.size());
+
+          std::vector<Point<spacedim> > vertices;
+          for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+            vertices.push_back(cell->vertex(v));
+
           for (unsigned int point=0; point<quadrature_points.size(); ++point)
             {
               quadrature_points[point] = cell->get_manifold().
-                                         get_new_point(Quadrature<spacedim>(vertices, data.cell_manifold_quadratures_weights[point]));
+                                         get_new_point(Quadrature<spacedim>(vertices,
+                                                       data.cell_manifold_quadrature_weights[point]));
             }
         }
     }
