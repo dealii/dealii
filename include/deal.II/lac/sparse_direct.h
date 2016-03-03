@@ -36,8 +36,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * This class provides an interface to the sparse direct solver UMFPACK (see
- * <a href="http://www.cise.ufl.edu/research/sparse/umfpack">this link</a>).
+ * This class provides an interface to the sparse direct solver UMFPACK, which
+ * is part of the SuiteSparse library (see <a
+ * href="http://faculty.cse.tamu.edu/davis/suitesparse.html">this link</a>).
  * UMFPACK is a set of routines for solving non-symmetric sparse linear
  * systems, Ax=b, using the Unsymmetric-pattern MultiFrontal method and direct
  * sparse LU factorization. Matrices may have symmetric or unsymmetric
@@ -63,7 +64,8 @@ DEAL_II_NAMESPACE_OPEN
  * @note UMFPACK has its own license, independent of that of deal.II. If you
  * want to use the UMFPACK you have to accept that license. It is linked to
  * from the deal.II ReadMe file. UMFPACK is included courtesy of its author,
- * <a href="http://www.cise.ufl.edu/~davis/">Timothy A. Davis</a>.
+ * <a href="http://faculty.cse.tamu.edu/davis/welcome.html">Timothy
+ * A. Davis</a>.
  *
  *
  * <h4>Instantiations</h4>
