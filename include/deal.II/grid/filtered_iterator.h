@@ -23,6 +23,9 @@
 #include <deal.II/grid/tria_iterator_base.h>
 
 #include <set>
+#ifdef DEAL_II_WITH_CXX11
+#include <tuple>
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -773,8 +776,37 @@ make_filtered_iterator (const BaseIterator &i,
 
 
 #ifdef DEAL_II_WITH_CXX11
+namespace internal
+{
+  namespace FilteredIterator
+  {
+    // The following classes create a nested sequencee of
+    // FilteredIterator<FilteredIterator<...<BaseIterator>...>> with as many
+    // levels of FilteredIterator classes as there are elements in the TypeList
+    // if the latter is given as a std::tuple<Args...>.
+    template <typename BaseIterator, typename TypeList>
+    struct NestFilteredIterators;
+
+    template <typename BaseIterator, typename Predicate>
+    struct NestFilteredIterators<BaseIterator, std::tuple<Predicate> >
+    {
+      typedef ::dealii::FilteredIterator<BaseIterator> type;
+    };
+
+    template <typename BaseIterator, typename Predicate, typename... Targs>
+    struct NestFilteredIterators<BaseIterator, std::tuple<Predicate, Targs...> >
+    {
+      typedef ::dealii::FilteredIterator<typename NestFilteredIterators<BaseIterator,
+              std::tuple<Targs...> >::type> type;
+    };
+  }
+}
+
+
+
 /**
- * Filter the  given range of iterators using a Predicate. This allows to replace:
+ * Filter the  given range of iterators using a Predicate. This allows to
+ * replace:
  * @code
  *   DoFHandler<dim> dof_handler;
  *   ...
@@ -799,8 +831,8 @@ make_filtered_iterator (const BaseIterator &i,
  *     }
  * @endcode
  *
- * @author Bruno Turcksin 
- * @relates FilteredIterator 
+ * @author Bruno Turcksin, 2016
+ * @relates FilteredIterator
  * @ingroup CPP11
  */
 template <typename BaseIterator, typename Predicate>
@@ -813,14 +845,12 @@ filter_iterators (IteratorRange<BaseIterator> i,
 
   return IteratorRange<FilteredIterator<BaseIterator> > (fi, fi_end);
 }
-#endif
 
 
 
-#ifdef DEAL_II_WITH_CXX14
 /**
- * Filter the given of iterators an arbitrary number of Predicates. This allows
- * to replace:
+ * Filter the given range of iterators through an arbitrary number of
+ * Predicates. This allows to replace:
  * @code
  *   DoFHandler<dim> dof_handler;
  *   ...
@@ -849,16 +879,18 @@ filter_iterators (IteratorRange<BaseIterator> i,
  *     }
  * @endcode
  *
- * @note This function requires C++14
- *
- * @author Bruno Turcksin
+ * @author Bruno Turcksin, 2016
  * @relates FilteredIterator
+ * @ingroup CPP11
  */
 template <typename BaseIterator, typename Predicate, typename... Targs>
-auto
+IteratorRange<typename internal::FilteredIterator::
+NestFilteredIterators<BaseIterator,std::tuple<Predicate, Targs...> >::type>
 filter_iterators (IteratorRange<BaseIterator> i,
-                  const Predicate &p, const Targs... args)
+                  const Predicate &p,
+                  const Targs... args)
 {
+  // Recursively create filtered iterators, one predicate at a time
   auto fi = filter_iterators(i,p);
   return filter_iterators(fi, args...);
 }
