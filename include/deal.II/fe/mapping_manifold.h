@@ -206,16 +206,29 @@ public:
     compute_manifold_quadrature_weights(const Quadrature<dim> &quadrature);
 
     /**
+     * Store vertices internally.
+     */
+    void
+    store_vertices(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
+
+    /**
      * Return an estimate (in bytes) or the memory consumption of this object.
      */
     virtual std::size_t memory_consumption () const;
 
     /**
-     * Store the current cell.
+     * The current cell vertices.
      *
      * Computed each.
      */
-    typename Triangulation<dim,spacedim>::cell_iterator current_cell;
+    mutable std::vector<Point<spacedim> > vertices;
+
+    /**
+     * The current cell.
+     *
+     * Computed each.
+     */
+    mutable typename Triangulation<dim,spacedim>::cell_iterator cell;
 
     /**
      * The actual quadrature on the reference cell.
@@ -331,11 +344,16 @@ public:
     //  */
     // mutable typename Triangulation<dim,spacedim>::cell_iterator cell_of_current_support_points;
 
-    // /**
-    //  * The determinant of the Jacobian in each quadrature point. Filled if
-    //  * #update_volume_elements.
-    //  */
-    // mutable std::vector<double> volume_elements;
+    /**
+     * The determinant of the Jacobian in each quadrature point. Filled if
+     * #update_volume_elements.
+     */
+    mutable std::vector<double> volume_elements;
+
+    /**
+     * A Q1 Finite element, to compute weights.
+     */
+    const FE_Q<dim> fe_q;
   };
 
 
@@ -400,63 +418,6 @@ protected:
   const FE_Q<dim,spacedim> fe_q;
 
   /**
-   * A table of weights by which we multiply the locations of the support
-   * points on the perimeter of a quad to get the location of interior support
-   * points.
-   *
-   * Sizes: support_point_weights_on_quad.size()= number of inner
-   * unit_support_points support_point_weights_on_quad[i].size()= number of
-   * outer unit_support_points, i.e.  unit_support_points on the boundary of
-   * the quad
-   *
-   * For the definition of this vector see equation (8) of the `mapping'
-   * report.
-   */
-  Table<2,double> support_point_weights_on_quad;
-
-  /**
-   * A table of weights by which we multiply the locations of the support
-   * points on the perimeter of a hex to get the location of interior support
-   * points.
-   *
-   * For the definition of this vector see equation (8) of the `mapping'
-   * report.
-   */
-  Table<2,double> support_point_weights_on_hex;
-
-  /**
-   * Return the locations of support points for the mapping. For example, for
-   * $Q_1$ mappings these are the vertices, and for higher order polynomial
-   * mappings they are the vertices plus interior points on edges, faces, and
-   * the cell interior that are placed in consultation with the Manifold
-   * description of the domain and its boundary. However, other classes may
-   * override this function differently. In particular, the MappingQ1Eulerian
-   * class does exactly this by not computing the support points from the
-   * geometry of the current cell but instead evaluating an externally given
-   * displacement field in addition to the geometry of the cell.
-   *
-   * The default implementation of this function is appropriate for most
-   * cases. It takes the locations of support points on the boundary of the
-   * cell from the underlying manifold. Interior support points (ie. support
-   * points in quads for 2d, in hexes for 3d) are then computed using the
-   * solution of a Laplace equation with the position of the outer support
-   * points as boundary values, in order to make the transformation as smooth
-   * as possible.
-   *
-   * The function works its way from the vertices (which it takes from the
-   * given cell) via the support points on the line (for which it calls the
-   * add_line_support_points() function) and the support points on the quad
-   * faces (in 3d, for which it calls the add_quad_support_points() function).
-   * It then adds interior support points that are either computed by
-   * interpolation from the surrounding points using weights computed by
-   * solving a Laplace equation, or if dim<spacedim, it asks the underlying
-   * manifold for the locations of interior points.
-   */
-  // virtual
-  // std::vector<Point<spacedim> >
-  // compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
-
-  /**
    * Transforms the point @p p on the real cell to the corresponding point on
    * the unit cell @p cell by a Newton iteration.
    */
@@ -464,13 +425,6 @@ protected:
   // transform_real_to_unit_cell_internal (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   //                                       const Point<spacedim> &p,
   //                                       const Point<dim> &initial_p_unit) const;
-
-  /**
-   * Make MappingQ a friend since it needs to call the fill_fe_values()
-   * functions on its MappingManifold(1) sub-object.
-   */
-  template <int, int> friend class MappingQ;
-
 };
 
 
@@ -481,17 +435,16 @@ protected:
 
 #ifndef DOXYGEN
 
-// template<int dim, int spacedim>
-// inline
-// const Tensor<1,dim> &
-// MappingManifold<dim,spacedim>::InternalData::derivative (const unsigned int qpoint,
-//                                                          const unsigned int shape_nr) const
-// {
-//   Assert(qpoint*n_shape_functions + shape_nr < shape_derivatives.size(),
-//          ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
-//                        shape_derivatives.size()));
-//   return shape_derivatives [qpoint*n_shape_functions + shape_nr];
-// }
+template<int dim, int spacedim>
+inline
+void
+MappingManifold<dim,spacedim>::InternalData::store_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
+{
+  vertices.resize(GeometryInfo<dim>::vertices_per_cell);
+  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+    vertices[i] = cell->vertex(i);
+  this->cell = cell;
+}
 
 
 
