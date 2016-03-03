@@ -91,8 +91,8 @@ initialize (const UpdateFlags      update_flags,
   if (this->update_each & update_contravariant_transformation)
     contravariant.resize(n_original_q_points);
 
-  // if (this->update_each & update_volume_elements)
-  //   volume_elements.resize(n_original_q_points);
+  if (this->update_each & update_volume_elements)
+    volume_elements.resize(n_original_q_points);
 
   // if (this->update_each &
   //     (update_jacobian_grads | update_jacobian_pushed_forward_grads) )
@@ -441,7 +441,7 @@ namespace internal
                   Tensor<1,spacedim> T = data.cell->get_manifold().get_tangent_vector(P, NP);
 
                   for (unsigned int d=0; d<spacedim; ++d)
-                    data.contravariant[point][i][d] = T[d]/L;
+                    data.contravariant[point][d][i] = T[d]*L;
                 }
             }
 
@@ -921,112 +921,111 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   internal::maybe_update_Jacobians<dim,spacedim> (QProjector<dim>::DataSetDescriptor::cell (),
                                                   data);
 
-//   const UpdateFlags update_flags = data.update_each;
-//   const std::vector<double> &weights=quadrature.get_weights();
+  const UpdateFlags update_flags = data.update_each;
+  const std::vector<double> &weights=quadrature.get_weights();
 
-//   // Multiply quadrature weights by absolute value of Jacobian determinants or
-//   // the area element g=sqrt(DX^t DX) in case of codim > 0
+  // Multiply quadrature weights by absolute value of Jacobian determinants or
+  // the area element g=sqrt(DX^t DX) in case of codim > 0
 
-//   if (update_flags & (update_normal_vectors
-//                       | update_JxW_values))
-//     {
-//       AssertDimension (output_data.JxW_values.size(), n_q_points);
+  if (update_flags & (update_normal_vectors
+                      | update_JxW_values))
+    {
+      AssertDimension (output_data.JxW_values.size(), n_q_points);
 
-//       Assert( !(update_flags & update_normal_vectors ) ||
-//               (output_data.normal_vectors.size() == n_q_points),
-//               ExcDimensionMismatch(output_data.normal_vectors.size(), n_q_points));
-
-
-//       if (cell_similarity != CellSimilarity::translation)
-//         for (unsigned int point=0; point<n_q_points; ++point)
-//           {
-
-//             if (dim == spacedim)
-//               {
-//                 const double det = data.contravariant[point].determinant();
-
-//                 // check for distorted cells.
-
-//                 // TODO: this allows for anisotropies of up to 1e6 in 3D and
-//                 // 1e12 in 2D. might want to find a finer
-//                 // (dimension-independent) criterion
-//                 Assert (det > 1e-12*Utilities::fixed_power<dim>(cell->diameter()/
-//                                                                 std::sqrt(double(dim))),
-//                         (typename Mapping<dim,spacedim>::ExcDistortedMappedCell(cell->center(), det, point)));
-
-//                 output_data.JxW_values[point] = weights[point] * det;
-//               }
-//             // if dim==spacedim, then there is no cell normal to
-//             // compute. since this is for FEValues (and not FEFaceValues),
-//             // there are also no face normals to compute
-//             else //codim>0 case
-//               {
-//                 Tensor<1, spacedim> DX_t [dim];
-//                 for (unsigned int i=0; i<spacedim; ++i)
-//                   for (unsigned int j=0; j<dim; ++j)
-//                     DX_t[j][i] = data.contravariant[point][i][j];
-
-//                 Tensor<2, dim> G; //First fundamental form
-//                 for (unsigned int i=0; i<dim; ++i)
-//                   for (unsigned int j=0; j<dim; ++j)
-//                     G[i][j] = DX_t[i] * DX_t[j];
-
-//                 output_data.JxW_values[point]
-//                   = sqrt(determinant(G)) * weights[point];
-
-//                 if (cell_similarity == CellSimilarity::inverted_translation)
-//                   {
-//                     // we only need to flip the normal
-//                     if (update_flags & update_normal_vectors)
-//                       output_data.normal_vectors[point] *= -1.;
-//                   }
-//                 else
-//                   {
-//                     const unsigned int codim = spacedim-dim;
-//                     (void)codim;
-
-//                     if (update_flags & update_normal_vectors)
-//                       {
-//                         Assert( codim==1 , ExcMessage("There is no cell normal in codim 2."));
-
-//                         if (dim==1)
-//                           output_data.normal_vectors[point] =
-//                             cross_product_2d(-DX_t[0]);
-//                         else //dim == 2
-//                           output_data.normal_vectors[point] =
-//                             cross_product_3d(DX_t[0], DX_t[1]);
-
-//                         output_data.normal_vectors[point] /= output_data.normal_vectors[point].norm();
-
-//                         if (cell->direction_flag() == false)
-//                           output_data.normal_vectors[point] *= -1.;
-//                       }
-
-//                   }
-//               } //codim>0 case
-
-//           }
-//     }
+      Assert( !(update_flags & update_normal_vectors ) ||
+              (output_data.normal_vectors.size() == n_q_points),
+              ExcDimensionMismatch(output_data.normal_vectors.size(), n_q_points));
 
 
+      for (unsigned int point=0; point<n_q_points; ++point)
+        {
 
-//   // copy values from InternalData to vector given by reference
-//   if (update_flags & update_jacobians)
-//     {
-//       AssertDimension (output_data.jacobians.size(), n_q_points);
-//       if (cell_similarity != CellSimilarity::translation)
-//         for (unsigned int point=0; point<n_q_points; ++point)
-//           output_data.jacobians[point] = data.contravariant[point];
-//     }
+          if (dim == spacedim)
+            {
+              const double det = data.contravariant[point].determinant();
 
-//   // copy values from InternalData to vector given by reference
-//   if (update_flags & update_inverse_jacobians)
-//     {
-//       AssertDimension (output_data.inverse_jacobians.size(), n_q_points);
-//       if (cell_similarity != CellSimilarity::translation)
-//         for (unsigned int point=0; point<n_q_points; ++point)
-//           output_data.inverse_jacobians[point] = data.covariant[point].transpose();
-//     }
+              // check for distorted cells.
+
+              // TODO: this allows for anisotropies of up to 1e6 in 3D and
+              // 1e12 in 2D. might want to find a finer
+              // (dimension-independent) criterion
+              Assert (det > 1e-12*Utilities::fixed_power<dim>(cell->diameter()/
+                                                              std::sqrt(double(dim))),
+                      (typename Mapping<dim,spacedim>::ExcDistortedMappedCell(cell->center(), det, point)));
+
+              output_data.JxW_values[point] = weights[point] * det;
+            }
+          // if dim==spacedim, then there is no cell normal to
+          // compute. since this is for FEValues (and not FEFaceValues),
+          // there are also no face normals to compute
+          else //codim>0 case
+            {
+              Tensor<1, spacedim> DX_t [dim];
+              for (unsigned int i=0; i<spacedim; ++i)
+                for (unsigned int j=0; j<dim; ++j)
+                  DX_t[j][i] = data.contravariant[point][i][j];
+
+              Tensor<2, dim> G; //First fundamental form
+              for (unsigned int i=0; i<dim; ++i)
+                for (unsigned int j=0; j<dim; ++j)
+                  G[i][j] = DX_t[i] * DX_t[j];
+
+              output_data.JxW_values[point]
+                = sqrt(determinant(G)) * weights[point];
+
+              if (cell_similarity == CellSimilarity::inverted_translation)
+                {
+                  // we only need to flip the normal
+                  if (update_flags & update_normal_vectors)
+                    output_data.normal_vectors[point] *= -1.;
+                }
+              else
+                {
+                  const unsigned int codim = spacedim-dim;
+                  (void)codim;
+
+                  if (update_flags & update_normal_vectors)
+                    {
+                      Assert( codim==1 , ExcMessage("There is no cell normal in codim 2."));
+
+                      if (dim==1)
+                        output_data.normal_vectors[point] =
+                          cross_product_2d(-DX_t[0]);
+                      else //dim == 2
+                        output_data.normal_vectors[point] =
+                          cross_product_3d(DX_t[0], DX_t[1]);
+
+                      output_data.normal_vectors[point] /= output_data.normal_vectors[point].norm();
+
+                      if (cell->direction_flag() == false)
+                        output_data.normal_vectors[point] *= -1.;
+                    }
+
+                }
+            } //codim>0 case
+
+        }
+    }
+
+
+
+  // copy values from InternalData to vector given by reference
+  if (update_flags & update_jacobians)
+    {
+      AssertDimension (output_data.jacobians.size(), n_q_points);
+      if (cell_similarity != CellSimilarity::translation)
+        for (unsigned int point=0; point<n_q_points; ++point)
+          output_data.jacobians[point] = data.contravariant[point];
+    }
+
+  // copy values from InternalData to vector given by reference
+  if (update_flags & update_inverse_jacobians)
+    {
+      AssertDimension (output_data.inverse_jacobians.size(), n_q_points);
+      if (cell_similarity != CellSimilarity::translation)
+        for (unsigned int point=0; point<n_q_points; ++point)
+          output_data.inverse_jacobians[point] = data.covariant[point].transpose();
+    }
 
 //   internal::maybe_update_jacobian_grads<dim,spacedim> (cell_similarity,
 //                                                        QProjector<dim>::DataSetDescriptor::cell (),
