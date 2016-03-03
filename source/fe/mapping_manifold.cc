@@ -1073,7 +1073,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 //       QProjector<dim>::DataSetDescriptor::cell (),
 //       data,
 //       output_data.jacobian_pushed_forward_3rd_derivatives);
-  Assert(false, ExcNotImplemented());
+
   return cell_similarity;
 }
 
@@ -2110,10 +2110,8 @@ namespace
 
 
 //--------------------------- Explicit instantiations -----------------------
-#include "mapping_q_generic.inst"
+#include "mapping_manifold.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE
-
-template class dealii::MappingManifold<2,2>;
 
