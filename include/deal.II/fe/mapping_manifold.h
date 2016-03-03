@@ -205,18 +205,17 @@ public:
     void
     compute_manifold_quadrature_weights(const Quadrature<dim> &quadrature);
 
-
     /**
      * Return an estimate (in bytes) or the memory consumption of this object.
      */
     virtual std::size_t memory_consumption () const;
 
     /**
-     * Values of manifold quadrature formulas.
+     * Store the current cell.
      *
      * Computed each.
      */
-    std::vector<Quadrature<spacedim> > cell_manifold_quadratures;
+    typename Triangulation<dim,spacedim>::cell_iterator current_cell;
 
     /**
      * Values of quadrature weights for manifold quadrature formulas.

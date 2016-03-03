@@ -84,10 +84,11 @@ void test()
         {
           const Point<spacedim> pq = map_manifold.transform_unit_to_real_cell(cell,q_points_from_quadrature[q]);
 
-          if(pq.distance(q_points_from_fe_values[q]) > 1e-10) {
-	    deallog << "Expected: " << pq << ", got: "
-		    << q_points_from_fe_values[q] << std::endl;
-	  }
+          if (pq.distance(q_points_from_fe_values[q]) > 1e-10)
+            {
+              deallog << "Expected: " << pq << ", got: "
+                      << q_points_from_fe_values[q] << std::endl;
+            }
         }
     }
   deallog << "OK" << std::endl;

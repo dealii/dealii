@@ -78,13 +78,10 @@ initialize (const UpdateFlags      update_flags,
 
   const unsigned int n_q_points = q.size();
 
-  // Update the weights used in the Manifold Quadrature formulas
-  compute_manifold_quadrature_weights(q);
-
   // see if we need the (transformation) shape function values
   // and/or gradients and resize the necessary arrays
   if (this->update_each & update_quadrature_points)
-    cell_manifold_quadratures.resize(q.size());
+    compute_manifold_quadrature_weights(q);
 
   // if (this->update_each & (update_covariant_transformation
   //                          | update_contravariant_transformation
@@ -125,7 +122,6 @@ initialize (const UpdateFlags      update_flags,
   // // now also fill the various fields with their correct values
   // compute_shape_function_values (q.get_points());
 }
-
 
 
 template <int dim, int spacedim>
@@ -377,23 +373,26 @@ namespace internal
      */
     template <int dim, int spacedim>
     void
-    maybe_compute_q_points (const typename QProjector<dim>::DataSetDescriptor                 data_set,
+    maybe_compute_q_points (const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
+                            const typename QProjector<dim>::DataSetDescriptor                 data_set,
                             const typename dealii::MappingManifold<dim,spacedim>::InternalData      &data,
                             std::vector<Point<spacedim> >                                     &quadrature_points)
     {
       const UpdateFlags update_flags = data.update_each;
 
+      AssertDimension(quadrature_points.size(),
+                      data.cell_manifold_quadratures_weights.size());
+
+      std::vector<Point<spacedim> > vertices;
+      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+        vertices[v] = cell->vertex(v);
+
       if (update_flags & update_quadrature_points)
         {
           for (unsigned int point=0; point<quadrature_points.size(); ++point)
             {
-              const double *shape = &data.shape(point+data_set,0);
-              Point<spacedim> result = (shape[0] *
-                                        data.mapping_support_points[0]);
-              for (unsigned int k=1; k<data.n_shape_functions; ++k)
-                for (unsigned int i=0; i<spacedim; ++i)
-                  result[i] += shape[k] * data.mapping_support_points[k][i];
-              quadrature_points[point] = result;
+              quadrature_points[point] = cell->get_manifold().
+                                         get_new_point(Quadrature<spacedim>(vertices, data.cell_manifold_quadratures_weights[point]));
             }
         }
     }
@@ -919,31 +918,18 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                 const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
                 internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
 {
-//   // ensure that the following static_cast is really correct:
-//   Assert (dynamic_cast<const InternalData *>(&internal_data) != 0,
-//           ExcInternalError());
-//   const InternalData &data = static_cast<const InternalData &>(internal_data);
+  // ensure that the following static_cast is really correct:
+  Assert (dynamic_cast<const InternalData *>(&internal_data) != 0,
+          ExcInternalError());
+  const InternalData &data = static_cast<const InternalData &>(internal_data);
 
-//   const unsigned int n_q_points=quadrature.size();
+  const unsigned int n_q_points=quadrature.size();
 
-//   // if necessary, recompute the support points of the transformation of this cell
-//   // (note that we need to first check the triangulation pointer, since otherwise
-//   // the second test might trigger an exception if the triangulations are not the
-//   // same)
-//   if ((data.mapping_support_points.size() == 0)
-//       ||
-//       (&cell->get_triangulation() !=
-//        &data.cell_of_current_support_points->get_triangulation())
-//       ||
-//       (cell != data.cell_of_current_support_points))
-//     {
-//       data.mapping_support_points = this->compute_mapping_support_points(cell);
-//       data.cell_of_current_support_points = cell;
-//     }
+  internal::maybe_compute_q_points<dim,spacedim> (cell,
+                                                  QProjector<dim>::DataSetDescriptor::cell (),
+                                                  data,
+                                                  output_data.quadrature_points);
 
-//   internal::maybe_compute_q_points<dim,spacedim> (QProjector<dim>::DataSetDescriptor::cell (),
-//                                                   data,
-//                                                   output_data.quadrature_points);
 //   internal::maybe_update_Jacobians<dim,spacedim> (cell_similarity,
 //                                                   QProjector<dim>::DataSetDescriptor::cell (),
 //                                                   data);
@@ -1258,7 +1244,8 @@ namespace internal
                             const typename dealii::MappingManifold<dim,spacedim>::InternalData      &data,
                             internal::FEValues::MappingRelatedData<dim,spacedim>              &output_data)
     {
-      maybe_compute_q_points<dim,spacedim> (data_set,
+      maybe_compute_q_points<dim,spacedim> (cell,
+                                            data_set,
                                             data,
                                             output_data.quadrature_points);
       maybe_update_Jacobians<dim,spacedim> (CellSimilarity::none,
