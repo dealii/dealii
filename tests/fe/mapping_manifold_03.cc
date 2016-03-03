@@ -37,22 +37,9 @@ void test()
 
   Triangulation<dim, spacedim>   triangulation;
 
-  Point<spacedim> center;
-  for (unsigned int i=0; i<spacedim; ++i)
-    center[i] = 5+i;
+  GridGenerator::hyper_cube (triangulation);
 
-  const double inner_radius = 0.5,
-               outer_radius = 1.0;
-  GridGenerator::hyper_shell (triangulation,
-                              center, inner_radius, outer_radius);
-
-
-  static  const SphericalManifold<dim> manifold(center);
-
-  triangulation.set_all_manifold_ids(0);
-  triangulation.set_manifold (0, manifold);
-
-  const QGauss<spacedim> quad(3);
+  const QGauss<dim> quad(5);
 
   FE_Q<dim,spacedim> fe(1);
 
@@ -82,15 +69,19 @@ void test()
 
   for (unsigned int q=0; q<jac_from_mapping_q.size(); ++q)
     {
+      double dist = 0;
+      for (unsigned int d=0; d<spacedim; ++d)
+        dist += (jac_from_mapping_manifold[q][d] - jac_from_mapping_q[q][d]).norm();
+      if (dist > 1e-10)
+        {
+          deallog << "Jacobian from mapping manifold at point "<< q << std::endl;
+          for (unsigned int d=0; d<spacedim; ++d)
+            deallog << jac_from_mapping_manifold[q][d] << std::endl;
 
-      deallog << "Jacobian from mapping manifold at point "<< q << std::endl;
-      for (unsigned int d=0; d<dim; ++d)
-        deallog << jac_from_mapping_manifold[q][d] << std::endl;
-
-      deallog << "Jacobian from mapping q at point "<< q << std::endl;
-      for (unsigned int d=0; d<dim; ++d)
-        deallog << jac_from_mapping_q[q][d] << std::endl;
-
+          deallog << "Jacobian from mapping q at point "<< q << std::endl;
+          for (unsigned int d=0; d<spacedim; ++d)
+            deallog << jac_from_mapping_q[q][d] << std::endl;
+        }
     }
 
   deallog << "OK" << std::endl;
@@ -104,7 +95,13 @@ main()
   deallog.attach(logfile);
   deallog.threshold_double(1.e-10);
 
+  test<1,1>();
+  test<1,2>();
+  test<1,3>();
+
   test<2,2>();
+  test<2,3>();
+
   test<3,3>();
 
   return 0;

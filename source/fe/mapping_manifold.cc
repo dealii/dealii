@@ -441,7 +441,7 @@ namespace internal
                   Tensor<1,spacedim> T = data.cell->get_manifold().get_tangent_vector(P, NP);
 
                   for (unsigned int d=0; d<spacedim; ++d)
-                    data.contravariant[point][d][i] = T[d]*L;
+                    data.contravariant[point][d][i] = T[d]/L;
                 }
             }
 
