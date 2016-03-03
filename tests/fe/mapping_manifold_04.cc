@@ -13,8 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
+
 // Check that the Jacobian obtained through MappingManifold and
-// MappingQ1 are the same on a FlatManifold, on trivial meshes
+// MappingQ1 are the same on a FlatManifold, with non-trivial cells
 
 
 #include "../tests.h"
@@ -36,9 +37,16 @@ void test()
 
   Triangulation<dim, spacedim>   triangulation;
 
-  GridGenerator::hyper_cube (triangulation);
+  Point<spacedim> center;
+  for (unsigned int i=0; i<spacedim; ++i)
+    center[i] = 5+i;
 
-  const QGauss<dim> quad(5);
+  const double inner_radius = 0.5,
+               outer_radius = 1.0;
+  GridGenerator::hyper_shell (triangulation,
+                              center, inner_radius, outer_radius);
+
+  const QGauss<spacedim> quad(3);
 
   FE_Q<dim,spacedim> fe(1);
 
@@ -94,13 +102,7 @@ main()
   deallog.attach(logfile);
   deallog.threshold_double(1.e-10);
 
-  test<1,1>();
-  test<1,2>();
-  test<1,3>();
-
   test<2,2>();
-  test<2,3>();
-
   test<3,3>();
 
   return 0;
