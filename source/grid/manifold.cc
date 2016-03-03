@@ -326,7 +326,8 @@ ChartManifold<dim,spacedim,chartdim>::~ChartManifold ()
 
 
 template <int dim, int spacedim, int chartdim>
-ChartManifold<dim,spacedim,chartdim>::ChartManifold (const Point<chartdim> periodicity):
+ChartManifold<dim,spacedim,chartdim>::ChartManifold (const Point<chartdim> periodicity)
+  :
   sub_manifold(periodicity)
 {}
 
@@ -351,7 +352,34 @@ get_new_point (const Quadrature<spacedim> &quad) const
 
 
 
+template <int dim, int spacedim, int chartdim>
+DerivativeForm<1,chartdim,spacedim>
+ChartManifold<dim,spacedim,chartdim>::
+push_forward_gradient(const Point<chartdim> &) const
+{
+  // function must be implemented in a derived class to be usable,
+  // as discussed in this function's documentation
+  Assert (false, ExcPureFunctionCalled());
+  return DerivativeForm<1,chartdim,spacedim>();
+}
 
+
+template <int dim, int spacedim, int chartdim>
+Tensor<1,spacedim>
+ChartManifold<dim,spacedim,chartdim>::
+get_tangent_vector (const Point<spacedim> &x1,
+                    const Point<spacedim> &x2) const
+{
+  const DerivativeForm<1,chartdim,spacedim> F_prime = push_forward_gradient(pull_back(x1));
+  const Tensor<1,chartdim>                  delta   = sub_manifold.get_tangent_vector(pull_back(x1),
+                                                      pull_back(x2));
+
+  Tensor<1,spacedim> result;
+  for (unsigned int i=0; i<spacedim; ++i)
+    result[i] += F_prime[i] * delta;
+
+  return result;
+}
 
 
 // explicit instantiations
