@@ -400,7 +400,7 @@ public:
  * @author Luca Heltai, 2014
  */
 template <int dim, int spacedim=dim>
-class FlatManifold: public Manifold<dim, spacedim>
+class FlatManifold : public Manifold<dim, spacedim>
 {
 public:
   /**
@@ -430,7 +430,7 @@ public:
    * guaranteed to lie in the periodicity box plus or minus
    * tolerance*periodicity.norm().
    */
-  FlatManifold (const Point<spacedim> periodicity=Point<spacedim>(),
+  FlatManifold (const Point<spacedim> &periodicity = Point<spacedim>(),
                 const double tolerance=1e-10);
 
   /**
@@ -615,7 +615,7 @@ private:
  * @author Luca Heltai, 2013, 2014
  */
 template <int dim, int spacedim=dim, int chartdim=dim>
-class ChartManifold: public Manifold<dim,spacedim>
+class ChartManifold : public Manifold<dim,spacedim>
 {
 public:
   /**
@@ -632,7 +632,7 @@ public:
    * of (2*pi-eps) and (eps) is not pi, but 2*pi (or zero), since, on the
    * manifold, these two points are at distance 2*eps and not (2*pi-eps)
    */
-  ChartManifold(const Point<chartdim> periodicity=Point<chartdim>());
+  ChartManifold(const Point<chartdim> &periodicity = Point<chartdim>());
 
   /**
    * Destructor. Does nothing here, but needs to be declared to make it
