@@ -1,0 +1,22 @@
+
+DEAL::Testing dim=2, spacedim=2
+DEAL::Cell: 1.0
+DEAL::Face 6 is OK!
+DEAL::Face 12 is OK!
+DEAL::Face 4 is OK!
+DEAL::Face 14 is OK!
+DEAL::Cell: 1.1
+DEAL::Face 12 is OK!
+DEAL::Face 8 is OK!
+DEAL::Face 5 is OK!
+DEAL::Face 15 is OK!
+DEAL::Cell: 1.2
+DEAL::Face 7 is OK!
+DEAL::Face 13 is OK!
+DEAL::Face 14 is OK!
+DEAL::Face 10 is OK!
+DEAL::Cell: 1.3
+DEAL::Face 13 is OK!
+DEAL::Face 9 is OK!
+DEAL::Face 15 is OK!
+DEAL::Face 11 is OK!
