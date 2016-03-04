@@ -84,6 +84,12 @@ inconvenience this causes.
 
 
 <ol> 
+ <li> New: When using C++11, the function filter_iterators allows to filter a 
+ range of iterators using predicates (like the ones defined in IteratorFilter).
+ <br>
+ (Bruno Turcksin, 2016/03/04)
+ </li>
+
  <li> Fixed: The OpenCASCADE::push_forward_and_differential_forms()
  function is now able to change the direction of the normal vector
  according to Orientation() method.  

@@ -19,9 +19,13 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/iterator_range.h>
 #include <deal.II/grid/tria_iterator_base.h>
 
 #include <set>
+#ifdef DEAL_II_WITH_CXX11
+#include <tuple>
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -298,6 +302,24 @@ namespace IteratorFilters
      * Flag stating whether only locally owned cells must return true.
      */
     const bool only_locally_owned;
+  };
+
+  /**
+   * Filter for iterators that evaluates to true if the iterator of the object
+   * pointed to is on the boundary.
+   *
+   * @author Bruno Turcksin, 2016
+   *
+   * @ingroup Iterators
+   */
+  class AtBoundary
+  {
+  public:
+    /**
+     * Evaluate the iterator and return true if the object at the boundary.
+     */
+    template <class Iterator>
+    bool operator () (const Iterator &i) const;
   };
 }
 
@@ -751,6 +773,128 @@ make_filtered_iterator (const BaseIterator &i,
   return fi;
 }
 
+
+
+#ifdef DEAL_II_WITH_CXX11
+namespace internal
+{
+  namespace FilteredIterator
+  {
+    // The following classes create a nested sequencee of
+    // FilteredIterator<FilteredIterator<...<BaseIterator>...>> with as many
+    // levels of FilteredIterator classes as there are elements in the TypeList
+    // if the latter is given as a std::tuple<Args...>.
+    template <typename BaseIterator, typename TypeList>
+    struct NestFilteredIterators;
+
+    template <typename BaseIterator, typename Predicate>
+    struct NestFilteredIterators<BaseIterator, std::tuple<Predicate> >
+    {
+      typedef ::dealii::FilteredIterator<BaseIterator> type;
+    };
+
+    template <typename BaseIterator, typename Predicate, typename... Targs>
+    struct NestFilteredIterators<BaseIterator, std::tuple<Predicate, Targs...> >
+    {
+      typedef ::dealii::FilteredIterator<typename NestFilteredIterators<BaseIterator,
+              std::tuple<Targs...> >::type> type;
+    };
+  }
+}
+
+
+
+/**
+ * Filter the  given range of iterators using a Predicate. This allows to
+ * replace:
+ * @code
+ *   DoFHandler<dim> dof_handler;
+ *   ...
+ *   for (auto cell : dof_handler.active_cell_iterators())
+ *     {
+ *       if (cell->is_locally_owned())
+ *         {
+ *           fe_values.reinit (cell);
+ *           ...do the local integration on 'cell'...;
+ *         }
+ *     }
+ * @endcode
+ * by:
+ * @code
+ *   DoFHandler<dim> dof_handler;
+ *   ...
+ *   for (auto cell : filter_iterators(dof_handler.active_cell_iterators(),
+ *                                    IteratorFilters::LocallyOwned())
+ *     {
+ *       fe_values.reinit (cell);
+ *       ...do the local integration on 'cell'...;
+ *     }
+ * @endcode
+ *
+ * @author Bruno Turcksin, 2016
+ * @relates FilteredIterator
+ * @ingroup CPP11
+ */
+template <typename BaseIterator, typename Predicate>
+IteratorRange<FilteredIterator<BaseIterator> >
+filter_iterators (IteratorRange<BaseIterator> i,
+                  const Predicate &p)
+{
+  FilteredIterator<BaseIterator> fi(p, *(i.begin()));
+  FilteredIterator<BaseIterator> fi_end(p, *(i.end()));
+
+  return IteratorRange<FilteredIterator<BaseIterator> > (fi, fi_end);
+}
+
+
+
+/**
+ * Filter the given range of iterators through an arbitrary number of
+ * Predicates. This allows to replace:
+ * @code
+ *   DoFHandler<dim> dof_handler;
+ *   ...
+ *   for (auto cell : dof_handler.active_cell_iterators())
+ *     {
+ *       if (cell->is_locally_owned())
+ *         {
+ *           if (cell->at_boundary())
+ *             {
+ *               fe_values.reinit (cell);
+ *               ...do the local integration on 'cell'...;
+ *             }
+ *         }
+ *     }
+ * @endcode
+ * by:
+ * @code
+ *   DoFHandler<dim> dof_handler;
+ *   ...
+ *   for (auto cell : filter_iterators(dof_handler.active_cell_iterators(),
+ *                                    IteratorFilters::LocallyOwned(),
+ *                                    IteratorFilters::AtBoundary())
+ *     {
+ *       fe_values.reinit (cell);
+ *       ...do the local integration on 'cell'...;
+ *     }
+ * @endcode
+ *
+ * @author Bruno Turcksin, 2016
+ * @relates FilteredIterator
+ * @ingroup CPP11
+ */
+template <typename BaseIterator, typename Predicate, typename... Targs>
+IteratorRange<typename internal::FilteredIterator::
+NestFilteredIterators<BaseIterator,std::tuple<Predicate, Targs...> >::type>
+filter_iterators (IteratorRange<BaseIterator> i,
+                  const Predicate &p,
+                  const Targs... args)
+{
+  // Recursively create filtered iterators, one predicate at a time
+  auto fi = filter_iterators(i,p);
+  return filter_iterators(fi, args...);
+}
+#endif
 
 
 /* ------------------ Inline functions and templates ------------ */
@@ -1215,6 +1359,17 @@ namespace IteratorFilters
            active_fe_indices.find(i->active_fe_index()) != active_fe_indices.end();
   }
 
+
+
+// ---------------- IteratorFilters::AtBoundary ---------
+
+  template <class Iterator>
+  inline
+  bool
+  AtBoundary::operator () (const Iterator &i) const
+  {
+    return (i->at_boundary());
+  }
 }
 
 
