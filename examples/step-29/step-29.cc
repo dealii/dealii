@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2007 - 2015 by the deal.II authors
+ * Copyright (C) 2007 - 2016 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -318,7 +318,7 @@ namespace Step29
   // be any subset of update_values, update_gradients and update_hessians
   // (and, in the case of face data, also update_normal_vectors), which are
   // documented in UpdateFlags.  Of course, computation of the derivatives
-  // requires additional resources, so only the flags for data that is really
+  // requires additional resources, so only the flags for data that are really
   // needed should be given here, just as we do when we use FEValues objects.
   // In our case, only the function values of $v$ and $w$ are needed to
   // compute $|u|$, so we're good with the update_values flag.
