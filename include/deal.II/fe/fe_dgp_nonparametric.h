@@ -20,6 +20,7 @@
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomial_space.h>
 #include <deal.II/fe/fe.h>
+#include <deal.II/fe/mapping.h>
 
 DEAL_II_NAMESPACE_OPEN
 
