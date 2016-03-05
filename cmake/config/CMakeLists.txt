@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II authors
+## Copyright (C) 2012 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -212,7 +212,13 @@ ENDFOREACH()
 
 GET_CMAKE_PROPERTY(res VARIABLES)
 FOREACH(var ${res})
-  IF(var MATCHES "DEAL_II_WITH")
+  #
+  # Workaround: We export all variables that match "DEAL_II_.*WITH" to also
+  # export package configuration variables of the form
+  #   DEAL_II_ARPACK_WITH_PARPACK
+  # etc.
+  #
+  IF(var MATCHES "DEAL_II_.*WITH")
     STRING(REPLACE "DEAL_II_WITH_" "" _name ${var})
 
     FOREACH(_file ${_files})
