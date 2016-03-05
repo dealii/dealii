@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II authors
+## Copyright (C) 2012 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -366,11 +366,13 @@ OPTION(DEAL_II_WITH_CXX11
   "Compile deal.II using C++11 language standard."
   ${DEAL_II_HAVE_CXX11}
   )
+LIST(APPEND DEAL_II_FEATURES CXX11)
 
 OPTION(DEAL_II_WITH_CXX14
   "Compile deal.II using C++14 language standard."
   ${DEAL_II_HAVE_CXX14}
   )
+LIST(APPEND DEAL_II_FEATURES CXX14)
 
 #
 # Bail out if user requested C++11 support (DEAL_II_WITH_CXX11) but support
