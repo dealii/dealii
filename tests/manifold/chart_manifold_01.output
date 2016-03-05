@@ -1,0 +1,46 @@
+
+DEAL::Testing dim=1, spacedim=1
+DEAL::Cell: 1.0
+DEAL::OK!
+DEAL::Cell: 1.1
+DEAL::OK!
+DEAL::Testing dim=1, spacedim=2
+DEAL::Cell: 1.0
+DEAL::OK!
+DEAL::Cell: 1.1
+DEAL::OK!
+DEAL::Testing dim=2, spacedim=2
+DEAL::Cell: 1.0
+DEAL::OK!
+DEAL::Cell: 1.1
+DEAL::OK!
+DEAL::Cell: 1.2
+DEAL::OK!
+DEAL::Cell: 1.3
+DEAL::OK!
+DEAL::Testing dim=2, spacedim=3
+DEAL::Cell: 1.0
+DEAL::OK!
+DEAL::Cell: 1.1
+DEAL::OK!
+DEAL::Cell: 1.2
+DEAL::OK!
+DEAL::Cell: 1.3
+DEAL::OK!
+DEAL::Testing dim=3, spacedim=3
+DEAL::Cell: 1.0
+DEAL::OK!
+DEAL::Cell: 1.1
+DEAL::OK!
+DEAL::Cell: 1.2
+DEAL::OK!
+DEAL::Cell: 1.3
+DEAL::OK!
+DEAL::Cell: 1.4
+DEAL::OK!
+DEAL::Cell: 1.5
+DEAL::OK!
+DEAL::Cell: 1.6
+DEAL::OK!
+DEAL::Cell: 1.7
+DEAL::OK!
