@@ -171,11 +171,7 @@ SET(_files
   ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
   )
-SET(_makefiles
-  ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/Make.global_options
-  ${CMAKE_CURRENT_BINARY_DIR}/Make.global_options
-  )
-FOREACH(_file ${_files} ${_makefiles})
+FOREACH(_file ${_files})
   FILE(APPEND ${_file} "\n\n#\n# Feature configuration:\n#\n\n")
 ENDFOREACH()
 
