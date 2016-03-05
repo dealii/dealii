@@ -20,8 +20,8 @@
 
 
 Point<3> periodicity (/*r=*/0,
-                      /*phi=*/2*numbers::PI,
-                      /*z=*/0);
+                            /*phi=*/2*numbers::PI,
+                            /*z=*/0);
 
 class MyCylinderManifold : public ChartManifold<2,3,3>
 {
@@ -29,7 +29,7 @@ public:
   static const int dim = 2;
   static const int spacedim = 3;
   static const int chartdim = 3;
-  
+
   MyCylinderManifold ()
     :
     ChartManifold<dim,spacedim,spacedim>(periodicity)
@@ -46,7 +46,7 @@ public:
 
     const double r   = std::sqrt(x*x + y*y);
     const double phi = std::atan2(y,x);
-    
+
     return Point<3>(r,
                     phi,
                     z);
@@ -60,7 +60,7 @@ public:
     const double r   = chart_point[0];
     const double phi = chart_point[1];
     const double z   = chart_point[2];
-    
+
     return Point<3>(r*std::cos(phi),
                     r*std::sin(phi),
                     z);
@@ -71,7 +71,7 @@ public:
   push_forward_gradient(const Point<spacedim> &chart_point) const
   {
     DerivativeForm<1,spacedim,spacedim> g;
-    
+
     const double r   = chart_point[0];
     const double phi = chart_point[1];
     const double z   = chart_point[2];
@@ -79,15 +79,15 @@ public:
     g[0][0] = std::cos(phi);
     g[0][1] = -r*std::sin(phi);
     g[0][2] = 0;
-    
+
     g[1][0] = std::sin(phi);
     g[1][1] = r*std::cos(phi);
     g[1][2] = 0;
-    
+
     g[2][0] = 0;
     g[2][1] = 0;
     g[2][2] = 1;
-    
+
     return g;
   }
 };
@@ -113,19 +113,19 @@ void test()
 
   // check two points that are horizontal
   test_direction (manifold.push_forward (Point<3>(/*r  =*/2,
-                                                  /*phi=*/3*numbers::PI/4,
-                                                  /*z  =*/-1)),
+                                                          /*phi=*/3*numbers::PI/4,
+                                                          /*z  =*/-1)),
                   manifold.push_forward (Point<3>(/*r  =*/2,
-                                                  /*phi=*/-3*numbers::PI/4,
-                                                  /*z  =*/-1)));
+                                                          /*phi=*/-3*numbers::PI/4,
+                                                          /*z  =*/-1)));
 
   // same but rotated
   test_direction (manifold.push_forward (Point<3>(/*r  =*/2,
-                                                  /*phi=*/-numbers::PI/4,
-                                                  /*z  =*/-1)),
+                                                          /*phi=*/-numbers::PI/4,
+                                                          /*z  =*/-1)),
                   manifold.push_forward (Point<3>(/*r  =*/2,
-                                                  /*phi=*/numbers::PI/4,
-                                                  /*z  =*/-1)));
+                                                          /*phi=*/numbers::PI/4,
+                                                          /*z  =*/-1)));
 }
 
 int main ()
