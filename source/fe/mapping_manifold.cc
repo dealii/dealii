@@ -396,14 +396,11 @@ namespace internal
 
       if (update_flags & update_quadrature_points)
         {
-          AssertDimension(quadrature_points.size(),
-                          data.cell_manifold_quadrature_weights.size());
-
           for (unsigned int point=0; point<quadrature_points.size(); ++point)
             {
               quadrature_points[point] = data.manifold->
                                          get_new_point(Quadrature<spacedim>(data.vertices,
-                                                       data.cell_manifold_quadrature_weights[point]));
+                                                       data.cell_manifold_quadrature_weights[point+data_set]));
             }
         }
     }
@@ -1329,7 +1326,6 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
                                     quadrature,
                                     data,
                                     output_data);
-  Assert(false, ExcNotImplemented());
 }
 
 
