@@ -24,6 +24,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/derivative_form.h>
 #include <deal.II/grid/tria.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -547,11 +548,39 @@ private:
  * calling the pull_back() method for all <tt>surrounding_points</tt>,
  * computing their weighted average in the chartdim Euclidean space, and
  * calling the push_forward() method with the resulting point, i.e., \f[
- * p^{\text{new}} = F(\sum_i w_i F^{-1}(p_i)).  \f]
+ * \mathbf x^{\text{new}} = F(\sum_i w_i F^{-1}(\mathbf x_i)).  \f]
  *
  * Derived classes are required to implement the push_forward() and the
- * pull_back() methods. All other functions required by mappings will then be
- * provided by this class.
+ * pull_back() methods. All other functions (with the exception of the
+ * push_forward_gradient() function, see below) that are required by mappings
+ * will then be provided by this class.
+ *
+ *
+ * <h3>Providing function gradients</h3>
+ *
+ * In order to compute vectors that are tangent to the manifold (for example,
+ * tangent to a surface embedded in higher dimensional space, or simply the
+ * three unit vectors of ${\mathbb R}^3$), one needs to also have access
+ * to the <i>gradient</i> of the push-forward function $F$. The gradient
+ * is the matrix ${\nabla F)_{ij}=\partial_j F_i$, where we take the derivative
+ * with regard to the chartdim reference coordinates on the flat Euclidean
+ * space in which $\mathcal B$ is located. In other words, at a point
+ * $\mathbf x$, $\nabla F(\mathbf x)$ is a matrix of size @p spacedim
+ * times @p chartdim.
+ *
+ * Only the ChartManifold::get_tangent_vector() function uses the gradient
+ * of the push-forward, but only a subset of all finite element codes
+ * actually require the computation of tangent vectors. Consequently,
+ * while derived classes need to implement the abstract virtual push_forward()
+ * and pull_back() functions of this class, they do not need to implement
+ * the virtual push_forward_gradient() function. Rather, that function has a
+ * default implementation (and consequently is not abstract, therefore not
+ * forcing derived classes to overload it), but the default implementation
+ * clearly can not compute anything useful and therefore simply triggers
+ * and exception.
+ *
+ *
+ * <h3>A note on the template arguments</h3>
  *
  * The dimension arguments @p chartdim, @p dim and @p spacedim must satisfy
  * the following relationships:
@@ -616,7 +645,8 @@ public:
    * Refer to the general documentation of this class and the documentation of
    * the base class for more information.
    */
-  virtual Point<spacedim>
+  virtual
+  Point<spacedim>
   get_new_point(const Quadrature<spacedim> &quad) const;
 
   /**
@@ -625,7 +655,8 @@ public:
    *
    * Refer to the general documentation of this class for more information.
    */
-  virtual Point<chartdim>
+  virtual
+  Point<chartdim>
   pull_back(const Point<spacedim> &space_point) const = 0;
 
   /**
@@ -634,8 +665,89 @@ public:
    *
    * Refer to the general documentation of this class for more information.
    */
-  virtual Point<spacedim>
+  virtual
+  Point<spacedim>
   push_forward(const Point<chartdim> &chart_point) const = 0;
+
+  /**
+   * Given a point in the chartdim dimensional Euclidean space, this method
+   * returns the derivatives of the function $F$ that maps from the
+   * chartdim-dimensional to the spacedim-dimensional space. In other
+   * words, it is a matrix of size $\text{spacedim}\times\text{chartdim}$.
+   *
+   * This function is used in the computations required by the
+   * get_tangent_vector() function. Since not all users of the Manifold
+   * class interface will require calling that function, the current
+   * function is implemented but will trigger an exception whenever
+   * called. This allows derived classes to avoid implementing the
+   * push_forward_gradient function if this functionality is not
+   * needed in the user program.
+   *
+   * Refer to the general documentation of this class for more information.
+   */
+  virtual
+  DerivativeForm<1,chartdim,spacedim>
+  push_forward_gradient(const Point<chartdim> &chart_point) const;
+
+  /**
+   * Return a vector that, at $\mathbf x_1$, is tangential to
+   * the geodesic that connects two points $\mathbf x_1,\mathbf x_2$.
+   * See the documentation of the Manifold class and of
+   * Manifold::get_tangent_vector() for a more detailed description.
+   *
+   * For the current class, we assume that this geodesic is the image
+   * under the push_forward() operation of a straight line of the
+   * pre-images of @p x1 and @p x2 (where pre-images are computed by pulling
+   * back the locations @p x1 and @p x2). In other words, if these
+   * preimages are $\xi_1=F^{-1}(\mathbf x_1), \xi_2=F^{-1}(\mathbf x_2)$,
+   * then the geodesic in preimage (the chartdim-dimensional Euclidean) space
+   * is
+   * @f{align*}{
+   *   \zeta(t) &= \xi_1 +  t (\xi_2-\xi_1)
+   *  \\          &= F^{-1}(\mathbf x_1) + t\left[F^{-1}(\mathbf x_2)
+   *                                             -F^{-1}(\mathbf x_1)\right]
+   * @f}
+   * In image space, i.e., in the space in which we operate, this
+   * leads to the curve
+   * @f{align*}{
+   *   \mathbf s(t) &= F(s(t)
+   *  \\          &= F(\xi_1 +  t (\xi_2-\xi_1))
+   *  \\          &= F\left(F^{-1}(\mathbf x_1) + t\left[F^{-1}(\mathbf x_2)
+   *                                     -F^{-1}(\mathbf x_1)\right]\right).
+   * @f}
+   * What the current function is supposed to return is $\mathbf s'(0)$. By
+   * the chain rule, this is equal to
+   * @f{align*}{
+   *   \mathbf s'(0) &=
+   *     \frac{d}{dt}\left. F\left(F^{-1}(\mathbf x_1)
+   *                        + t\left[F^{-1}(\mathbf x_2)
+   *                                 -F^{-1}(\mathbf x_1)\right]\right)
+   *                 \right|_{t=0}
+   * \\ &= \nabla_\xi F\left(F^{-1}(\mathbf x_1)\right)
+   *                    \left[F^{-1}(\mathbf x_2)
+   *                                 -F^{-1}(\mathbf x_1)\right].
+   * @f}
+   * This formula may then have to be slightly modified by
+   * considering any periodicity that was assumed in the call to
+   * the constructor.
+   *
+   * Thus, the computation of tangent vectors also requires the
+   * implementation of <i>derivatives</i> $\nabla_\xi F(\xi)$ of
+   * the push-forward mapping. Here, $F^{-1}(\mathbf x_2)-F^{-1}(\mathbf x_1)$
+   * is a chartdim-dimensional vector, and $\nabla_\xi F\left(F^{-1}(\mathbf x_1)\right)
+   * = \nabla_\xi F\left(\xi_1\right)$ is a spacedim-times-chartdim-dimensional
+   * matrix. Consequently, and as desired, the operation results in a
+   * spacedim-dimensional vector.
+   *
+   * @param x1 The first point that describes the geodesic, and the one
+   *   at which the "direction" is to be evaluated.
+   * @param x2 The second point that describes the geodesic.
+   * @return A "direction" vector tangential to the geodesic.
+   */
+  virtual
+  Tensor<1,spacedim>
+  get_tangent_vector (const Point<spacedim> &x1,
+                      const Point<spacedim> &x2) const;
 
 private:
   /**
