@@ -353,22 +353,26 @@ namespace internal
   {
     /**
      * Some specialization for face Manifolds. In one dimension, there
-     * are no Manifolds associated to faces.
+     * are no Manifolds associated to faces. The mapping argument is
+     * only used to help the compiler infer dim and spacedim.
      */
     template<int spacedim>
     const dealii::Manifold<1, spacedim> &
-    get_face_manifold(const typename dealii::Triangulation<1,spacedim>::cell_iterator &cell,
+    get_face_manifold(const MappingManifold<1,spacedim> &,
+                      const typename dealii::Triangulation<1,spacedim>::cell_iterator &cell,
                       const unsigned int &)
     {
       return cell->get_manifold();
     }
 
     /**
-     * Some specialization for face Manifolds.
+     * Some specialization for face Manifolds. The mapping argument is
+     * only used to help the compiler infer dim and spacedim.
      */
     template<int dim, int spacedim>
     const dealii::Manifold<dim,spacedim> &
-    get_face_manifold(const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
+    get_face_manifold(const MappingManifold<dim,spacedim> &,
+                      const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
                       const unsigned int face_no)
     {
       return cell->face(face_no)->get_manifold();
@@ -1257,10 +1261,7 @@ namespace internal
     {
       data.store_vertices(cell);
 
-      // This should really be get_face_manifold(cell, face_no), but
-      // that does not compile... At the moment this class works only
-      // on the cell manifold, and does not respect face manifolds.
-      data.manifold = &cell->get_manifold();
+      data.manifold = &get_face_manifold(mapping, cell, face_no);
 
       maybe_compute_q_points<dim,spacedim> (data_set,
                                             data,
