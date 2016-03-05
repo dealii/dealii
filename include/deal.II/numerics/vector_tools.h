@@ -22,7 +22,6 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/point.h>
 #include <deal.II/dofs/function_map.h>
-#include <deal.II/fe/mapping_q.h>
 #include <deal.II/hp/mapping_collection.h>
 
 #include <map>
