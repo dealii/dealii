@@ -32,6 +32,13 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+namespace parallel
+{
+  namespace distributed
+  {
+    template <int, int> class Triangulation;
+  }
+}
 
 namespace hp
 {

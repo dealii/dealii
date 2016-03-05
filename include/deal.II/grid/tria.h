@@ -48,7 +48,7 @@ template <int dim, int spacedim> class Manifold;
 
 template <int, int, int> class TriaAccessor;
 template <int spacedim> class TriaAccessor<0,1,spacedim>;
-
+template <int, int, int> class TriaAccessorBase;
 
 namespace internal
 {

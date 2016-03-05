@@ -36,6 +36,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+template <int dim, int spacedim> class Triangulation;
+
 namespace internal
 {
   namespace hp

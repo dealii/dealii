@@ -39,6 +39,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+template <int dim, int spacedim> class FiniteElement;
+template <int dim, int spacedim> class Triangulation;
+
 namespace internal
 {
   namespace DoFHandler
