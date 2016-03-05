@@ -276,20 +276,20 @@ public:
     //  */
     // std::vector<Tensor<4,dim> > shape_fourth_derivatives;
 
-    // /**
-    //  * Unit tangential vectors. Used for the computation of boundary forms and
-    //  * normal vectors.
-    //  *
-    //  * This vector has (dim-1)GeometryInfo::faces_per_cell entries. The first
-    //  * GeometryInfo::faces_per_cell contain the vectors in the first
-    //  * tangential direction for each face; the second set of
-    //  * GeometryInfo::faces_per_cell entries contain the vectors in the second
-    //  * tangential direction (only in 3d, since there we have 2 tangential
-    //  * directions per face), etc.
-    //  *
-    //  * Filled once.
-    //  */
-    // std::vector<std::vector<Tensor<1,dim> > > unit_tangentials;
+    /**
+     * Unit tangential vectors. Used for the computation of boundary forms and
+     * normal vectors.
+     *
+     * This vector has (dim-1)GeometryInfo::faces_per_cell entries. The first
+     * GeometryInfo::faces_per_cell contain the vectors in the first
+     * tangential direction for each face; the second set of
+     * GeometryInfo::faces_per_cell entries contain the vectors in the second
+     * tangential direction (only in 3d, since there we have 2 tangential
+     * directions per face), etc.
+     *
+     * Filled once.
+     */
+    std::vector<std::vector<Tensor<1,dim> > > unit_tangentials;
 
     // /**
     //  * The polynomial degree of the mapping. Since the objects here are also
@@ -328,10 +328,10 @@ public:
      */
     mutable std::vector< DerivativeForm<1,dim,spacedim> > contravariant;
 
-    // /**
-    //  * Auxiliary vectors for internal use.
-    //  */
-    // mutable std::vector<std::vector<Tensor<1,spacedim> > > aux;
+    /**
+     * Auxiliary vectors for internal use.
+     */
+    mutable std::vector<std::vector<Tensor<1,spacedim> > > aux;
 
     // /**
     //  * Stores the support points of the mapping shape functions on the @p
@@ -354,6 +354,13 @@ public:
      * A Q1 Finite element, to compute weights.
      */
     const FE_Q<dim> fe_q;
+
+    /**
+     * A pointer to the Manifold in use.
+     *
+     * Updated each.
+     */
+    mutable SmartPointer<const Manifold<dim,spacedim> > manifold;
   };
 
 
