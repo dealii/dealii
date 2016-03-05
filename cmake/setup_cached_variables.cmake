@@ -76,17 +76,27 @@ If(DEAL_II_HAVE_DOC_DIRECTORY)
     "Enable configuration, build and installation of the documentation. This adds a COMPONENT \"documentation\" to the build system."
     OFF
     )
+  LIST(APPEND DEAL_II_COMPONENTS DOCUMENTATION)
+
 ENDIF()
 
 OPTION(DEAL_II_COMPONENT_EXAMPLES
   "Enable configuration and installation of the example steps. This adds a COMPONENT \"examples\" to the build system."
   ON
   )
+LIST(APPEND DEAL_II_COMPONENTS EXAMPLES)
+
+OPTION(DEAL_II_COMPONENT_PACKAGE
+  "Generates additional targets for packaging deal.II"
+  OFF
+  )
+LIST(APPEND DEAL_II_COMPONENTS PACKAGE)
 
 OPTION(DEAL_II_COMPONENT_PARAMETER_GUI
   "Build and install the parameter_gui. This adds a COMPONENT \"parameter_gui\" to the build system."
   OFF
   )
+LIST(APPEND DEAL_II_COMPONENTS PARAMETER_GUI)
 
 OPTION(DEAL_II_ALLOW_AUTODETECTION
   "Allow to automatically set up features by setting all undefined DEAL_II_WITH_* variables to ON or OFF"
@@ -95,11 +105,6 @@ OPTION(DEAL_II_ALLOW_AUTODETECTION
 
 OPTION(DEAL_II_FORCE_AUTODETECTION
   "Force feature autodetection by undefining all DEAL_II_WITH_* variables prior to configure"
-  OFF
-  )
-
-OPTION(DEAL_II_COMPONENT_PACKAGE
-  "Generates additional targets for packaging deal.II"
   OFF
   )
 
