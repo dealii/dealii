@@ -1,0 +1,16 @@
+
+DEAL::dim=2, spacedim=2
+DEAL::P0      : 0.00000 1.00000
+DEAL::P1      : 1.00000 0.00000
+DEAL::T(P0-P1): 1.57080 -9.61835e-17
+DEAL::Error   : 0
+DEAL::dim=2, spacedim=3
+DEAL::P0      : 0.00000 1.00000 0.00000
+DEAL::P1      : 1.00000 0.00000 0.00000
+DEAL::T(P0-P1): 1.57080 -9.61835e-17 0.00000
+DEAL::Error   : 0
+DEAL::dim=3, spacedim=3
+DEAL::P0      : 0.00000 1.00000 0.00000
+DEAL::P1      : 1.00000 0.00000 0.00000
+DEAL::T(P0-P1): 1.57080 -9.61835e-17 0.00000
+DEAL::Error   : 0
