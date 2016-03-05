@@ -175,26 +175,31 @@ FOREACH(_file ${_files})
   FILE(APPEND ${_file} "\n\n#\n# Feature configuration:\n#\n\n")
 ENDFOREACH()
 
-GET_CMAKE_PROPERTY(res VARIABLES)
-FOREACH(var ${res})
-  #
-  # Workaround: We export all variables that match "DEAL_II_.*WITH" to also
-  # export package configuration variables of the form
-  #   DEAL_II_ARPACK_WITH_PARPACK
-  # etc.
-  #
-  IF(var MATCHES "DEAL_II_.*WITH")
-    STRING(REPLACE "DEAL_II_WITH_" "" _name ${var})
+GET_CMAKE_PROPERTY(_res VARIABLES)
+FOREACH(_var ${_res})
+  IF(_var MATCHES "DEAL_II_.*WITH")
+    LIST(APPEND _additional_config_variables ${_var})
+  ENDIF()
+ENDFOREACH()
 
-    FOREACH(_file ${_files})
-      FILE(APPEND ${_file} "SET(${var} ${${var}})\n")
-      IF(${var} AND NOT "${${_name}_VERSION}" STREQUAL "")
-        FILE(APPEND ${_file}
-          "SET(DEAL_II_${_name}_VERSION \"${${_name}_VERSION}\")\n"
-          )
+SET(_deal_ii_features_sorted ${DEAL_II_FEATURES})
+LIST(SORT _deal_ii_features_sorted)
+FOREACH(_name ${_deal_ii_features_sorted})
+  SET(_var DEAL_II_WITH_${_name})
+
+  FOREACH(_file ${_files})
+    FILE(APPEND ${_file} "SET(${_var} ${${_var}})\n")
+    IF(${_var} AND NOT "${${_name}_VERSION}" STREQUAL "")
+      FILE(APPEND ${_file}
+        "SET(DEAL_II_${_name}_VERSION \"${${_name}_VERSION}\")\n"
+        )
+    ENDIF()
+    FOREACH(_additional ${_additional_config_variables})
+      IF(_additional MATCHES "DEAL_II_${_name}_WITH")
+        FILE(APPEND ${_file} "SET(${_additional} ${${_additional}})\n")
       ENDIF()
     ENDFOREACH()
-  ENDIF()
+  ENDFOREACH()
 ENDFOREACH()
 
 MESSAGE(STATUS "Setting up project configuration - Done")
