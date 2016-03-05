@@ -28,7 +28,6 @@ DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
 template <int dim, int spacedim> class Triangulation;
-template <class T> class Vector;
 
 
 /**

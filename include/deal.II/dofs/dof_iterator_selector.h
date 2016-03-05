@@ -31,7 +31,6 @@ template <typename Accessor> class TriaRawIterator;
 template <typename Accessor> class TriaIterator;
 template <typename Accessor> class TriaActiveIterator;
 template <int dim, int spacedim> class Triangulation;
-template <int dim, int spacedim> class DoFHandler;
 
 
 namespace internal

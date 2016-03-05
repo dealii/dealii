@@ -33,9 +33,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template<int dim, int spacedim> class FESystem;
-
-
 /**
  * A namespace solely for the purpose of defining the Domination enum as well
  * as associated operators.

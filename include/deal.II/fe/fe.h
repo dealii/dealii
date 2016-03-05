@@ -32,11 +32,6 @@ template <int dim, int spacedim> class FEValues;
 template <int dim, int spacedim> class FEFaceValues;
 template <int dim, int spacedim> class FESubfaceValues;
 template <int dim, int spacedim> class FESystem;
-namespace hp
-{
-  template <int dim, int spacedim> class FECollection;
-}
-
 
 /**
  * This is the base class for finite elements in arbitrary dimensions. It

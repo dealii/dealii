@@ -75,7 +75,6 @@ namespace internal
   }
 }
 
-template <int dim, int spacedim> class DoFHandler;
 namespace hp
 {
   template <int dim, int spacedim> class DoFHandler;

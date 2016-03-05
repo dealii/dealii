@@ -31,9 +31,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim, int spacedim> class MappingQ;
-
-
 /*!@addtogroup fe */
 /*@{*/
 

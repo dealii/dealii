@@ -29,7 +29,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <typename number> class SparseMatrix;
 class DynamicSparsityPattern;
 
 

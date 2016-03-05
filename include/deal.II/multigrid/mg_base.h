@@ -29,8 +29,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <typename> class MGLevelObject;
-
 /*!@addtogroup mg */
 /*@{*/
 

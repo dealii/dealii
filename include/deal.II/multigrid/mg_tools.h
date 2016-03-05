@@ -27,14 +27,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <class Object> class MGLevelObject;
 template <int dim, int spacedim> class DoFHandler;
-template <typename number> class Vector;
-template <typename number> class SparseMatrix;
-template <typename number> class BlockVector;
-template <typename number> class BlockSparseMatrix;
-template <typename number> class FullMatrix;
-template <typename number> class BlockSparseMatrix;
 
 /* !@addtogroup mg */
 /* @{ */

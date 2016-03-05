@@ -29,9 +29,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim, int space_dim> class Triangulation;
-
-
 /**
  * We collect here some helper functions used in the Manifold<dim,spacedim>
  * classes.

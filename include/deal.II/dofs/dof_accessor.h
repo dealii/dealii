@@ -27,7 +27,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <typename number> class FullMatrix;
-template <typename number> class SparseMatrix;
 template <typename number> class Vector;
 class ConstraintMatrix;
 

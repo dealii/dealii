@@ -30,10 +30,6 @@ namespace parallel
 {
   namespace distributed
   {
-    // forward declarations
-    template <int dim, int spacedim> class Triangulation;
-
-
     /**
      * Collection of functions controlling refinement and coarsening of
      * parallel::distributed::Triangulation objects. This namespace provides

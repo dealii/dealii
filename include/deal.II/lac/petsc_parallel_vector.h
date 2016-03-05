@@ -30,12 +30,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-
-// forward declaration
-template <typename> class Vector;
-class IndexSet;
-
-
 /*! @addtogroup PETScWrappers
  *@{
  */

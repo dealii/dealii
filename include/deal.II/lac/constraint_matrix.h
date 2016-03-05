@@ -43,8 +43,6 @@ class BlockSparsityPattern;
 class BlockDynamicSparsityPattern;
 template <typename number> class SparseMatrix;
 template <typename number> class BlockSparseMatrix;
-class BlockIndices;
-
 
 namespace internals
 {

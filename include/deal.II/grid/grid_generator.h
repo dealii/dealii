@@ -28,11 +28,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim, int spacedim> class Triangulation;
-template <typename number> class Vector;
-template <typename number> class SparseMatrix;
-
-
 /**
  * This namespace provides a collection of functions for generating
  * triangulations for some basic geometries.

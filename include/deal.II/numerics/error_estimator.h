@@ -27,13 +27,11 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int, int> class DoFHandler;
 template <int, int> class Mapping;
 template <int> class Quadrature;
 
 namespace hp
 {
-  template <int, int> class DoFHandler;
   template <int> class QCollection;
 }
 

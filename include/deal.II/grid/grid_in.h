@@ -29,8 +29,6 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int space_dim> class Triangulation;
 template <int dim> struct CellData;
-struct SubCellData;
-
 
 /**
  * This class implements an input mechanism for grid data. It allows to read a

@@ -23,10 +23,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim> class PolynomialSpace;
-template <int dim, int spacedim> class MappingQ;
-
-
 /*!@addtogroup fe */
 /*@{*/
 

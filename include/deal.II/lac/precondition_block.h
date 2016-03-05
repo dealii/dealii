@@ -27,9 +27,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template<typename MatrixType, typename inverse_type>
-class PreconditionBlockJacobi;
-
 /*! @addtogroup Preconditioners
  *@{
  */
