@@ -17,7 +17,6 @@
 #define dealii__fe_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/geometry_info.h>
 #include <deal.II/fe/fe_base.h>
 #include <deal.II/fe/fe_values_extractors.h>
 #include <deal.II/fe/fe_update_flags.h>

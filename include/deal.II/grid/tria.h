@@ -25,8 +25,6 @@
 #include <deal.II/base/iterator_range.h>
 #include <deal.II/base/std_cxx11/function.h>
 #include <deal.II/grid/tria_iterator_selector.h>
-#include <deal.II/grid/tria_faces.h>
-#include <deal.II/grid/tria_levels.h>
 
 // Ignore deprecation warnings for auto_ptr.
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
