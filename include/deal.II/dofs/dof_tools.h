@@ -1697,8 +1697,8 @@ namespace DoFTools
    * @note The ordering of rows (cells) follows the ordering of the standard
    * cell iterators.
    */
-  template <typename DoFHandlerType, class Sparsity>
-  void make_cell_patches(Sparsity                &block_list,
+  template <typename DoFHandlerType, class SparsityPatternType>
+  void make_cell_patches(SparsityPatternType     &block_list,
                          const DoFHandlerType    &dof_handler,
                          const unsigned int       level,
                          const std::vector<bool> &selected_dofs = std::vector<bool>(),
