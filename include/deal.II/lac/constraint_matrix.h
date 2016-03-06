@@ -740,6 +740,14 @@ public:
                               VectorType                   &global_vector,
                               const FullMatrix<LocalType>  &local_matrix) const;
 
+  template <typename VectorType, typename LocalType>
+  void
+  distribute_local_to_global (const Vector<LocalType>      &local_vector,
+                              const std::vector<size_type> &local_dof_indices_row,
+                              const std::vector<size_type> &local_dof_indices_col,
+                              VectorType                   &global_vector,
+                              const FullMatrix<LocalType>  &local_matrix) const;
+
   /**
    * Enter a single value into a result vector, obeying constraints.
    */

@@ -624,14 +624,26 @@ distribute_local_to_global (const Vector<LocalType>      &local_vector,
                             VectorType                   &global_vector,
                             const FullMatrix<LocalType>  &local_matrix) const
 {
+  distribute_local_to_global(local_vector,local_dof_indices,local_dof_indices, global_vector, local_matrix);
+}
+
+template <typename VectorType, typename LocalType>
+void
+ConstraintMatrix::
+distribute_local_to_global (const Vector<LocalType>      &local_vector,
+                            const std::vector<size_type> &local_dof_indices_row,
+                            const std::vector<size_type> &local_dof_indices_col,
+                            VectorType                   &global_vector,
+                            const FullMatrix<LocalType>  &local_matrix) const
+{
   Assert (sorted == true, ExcMatrixNotClosed());
-  AssertDimension (local_vector.size(), local_dof_indices.size());
-  AssertDimension (local_matrix.m(), local_dof_indices.size());
-  AssertDimension (local_matrix.n(), local_dof_indices.size());
+  AssertDimension (local_vector.size(), local_dof_indices_col.size());
+  AssertDimension (local_matrix.m(), local_dof_indices_row.size());
+  AssertDimension (local_matrix.n(), local_dof_indices_col.size());
 
   const size_type n_local_dofs = local_vector.size();
   if (lines.empty())
-    global_vector.add(local_dof_indices, local_vector);
+    global_vector.add(local_dof_indices_col, local_vector);
   else
     for (size_type i=0; i<n_local_dofs; ++i)
       {
@@ -639,15 +651,15 @@ distribute_local_to_global (const Vector<LocalType>      &local_vector,
         // constrained. if not, just write the entry
         // into the vector. otherwise, need to resolve
         // the constraint
-        if (is_constrained(local_dof_indices[i]) == false)
+        if (is_constrained(local_dof_indices_col[i]) == false)
           {
-            global_vector(local_dof_indices[i]) += local_vector(i);
+            global_vector(local_dof_indices_col[i]) += local_vector(i);
             continue;
           }
 
         // find the constraint line to the given
         // global dof index
-        const size_type line_index = calculate_line_index (local_dof_indices[i]);
+        const size_type line_index = calculate_line_index (local_dof_indices_col[i]);
         const ConstraintLine *position =
           lines_cache.size() <= line_index ? 0 : &lines[lines_cache[line_index]];
 
@@ -658,9 +670,9 @@ distribute_local_to_global (const Vector<LocalType>      &local_vector,
         if (val != 0)
           for (size_type j=0; j<n_local_dofs; ++j)
             {
-              if (is_constrained(local_dof_indices[j]) == false)
+              if (is_constrained(local_dof_indices_row[j]) == false)
                 {
-                  global_vector(local_dof_indices[j]) -= val * local_matrix(j,i);
+                  global_vector(local_dof_indices_row[j]) -= val * local_matrix(j,i);
                   continue;
                 }
 
@@ -670,7 +682,7 @@ distribute_local_to_global (const Vector<LocalType>      &local_vector,
                 continue;
 
               const ConstraintLine &position_j =
-                lines[lines_cache[calculate_line_index(local_dof_indices[j])]];
+                lines[lines_cache[calculate_line_index(local_dof_indices_row[j])]];
 
               for (size_type q=0; q<position_j.entries.size(); ++q)
                 {
