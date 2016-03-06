@@ -27,6 +27,7 @@
 #include "../tests.h"
 
 #include <deal.II/base/utilities.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/fe/mapping_fe_field.h>

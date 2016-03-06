@@ -23,6 +23,7 @@
 
 #include "../tests.h"
 #include <deal.II/fe/fe_q_hierarchical.h>
+#include <deal.II/fe/mapping_q.h>
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/base/function.h>
 

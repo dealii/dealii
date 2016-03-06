@@ -43,6 +43,7 @@ std::ofstream logfile("output");
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q.h>
 #include <deal.II/numerics/vector_tools.h>
 
 #include <fstream>
