@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id: 19.cc $
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2004 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,7 +36,7 @@ void test (PETScWrappers::Vector &v)
       norm = std::max (norm,std::fabs (std::sqrt ((k*k + 2.*k*2.*k))));
     }
 
-  v.compress (VectorOperation::add);
+  v.compress (VectorOperation::insert);
 
   // then check the norm
   Assert (v.linfty_norm() == norm, ExcInternalError());

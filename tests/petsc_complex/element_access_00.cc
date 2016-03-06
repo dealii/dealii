@@ -1,8 +1,6 @@
-
 // ---------------------------------------------------------------------
-// $Id:
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2004 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,7 +37,7 @@ void test_vector (PETScWrappers::Vector &v)
   for (unsigned int k=0; k<v.size(); ++k)
     v(k) = std::complex<double> (k,v.size()-k);
 
-  v.compress (VectorOperation::add);
+  v.compress (VectorOperation::insert);
 
   // check that is what we get by casting PetscScalar to std::real()
   // and std::imag()
@@ -67,7 +65,7 @@ int main (int argc, char **argv)
 
   try
     {
-      PetscInitialize (&argc, &argv, (char *) 0, (char *) 0);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
         PETScWrappers::Vector v (5);
         test_vector (v);
@@ -75,7 +73,6 @@ int main (int argc, char **argv)
         deallog << "vector:" << std::endl;
         v.print (logfile);
       }
-      PetscFinalize ();
     }
 
 

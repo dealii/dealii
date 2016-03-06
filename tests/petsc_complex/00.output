@@ -11,4 +11,3 @@ DEAL::Check PetscScalar division
 DEAL::OK
 DEAL::Check PetscScalar multiply
 DEAL::OK
-

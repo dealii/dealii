@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id: 18.cc $
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2004 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,7 +37,7 @@ void test (PETScWrappers::Vector &v)
       norm += std::fabs (1.*k*1.*k /*+ 1.*k*2*ki - 1.*k*2*ki*/ + 2*k*2.*k/*i*/);
     }
 
-  v.compress (VectorOperation::add);
+  v.compress (VectorOperation::insert);
 
   // then check the l2-norm
   PetscReal l2_norm = v.l2_norm();

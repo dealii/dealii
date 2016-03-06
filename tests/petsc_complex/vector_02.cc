@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id vector_02.cc $
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2004 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,7 +32,7 @@ void test ()
   for (unsigned int k=0; k<v.size(); ++k)
     v(k) = k;
 
-  v.compress (VectorOperation::add);
+  v.compress (VectorOperation::insert);
 
   PETScWrappers::Vector v2(s);
   for (unsigned int k=0; k<v2.size(); ++k)
@@ -44,7 +43,7 @@ void test ()
       v2(k) = PetscScalar (k,-1.0*k);
     }
 
-  v2.compress(VectorOperation::add);
+  v2.compress(VectorOperation::insert);
 
   // we now print the vector v, it is all real. Then print after
   // adding v2 which is complex, and then subtract v2 again to get the

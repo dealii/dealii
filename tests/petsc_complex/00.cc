@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id: 00.cc$
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2004 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,21 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-// PETSc includes: We would like to do this cleanly
-//
-#include <petscksp.h>
-#include <petscsys.h>
-#include <petscmath.h>
-//
-// though a horrible warning message
-//
-// warning: imaginary constants are a GCC extension [enabled by default]
-//
-// appears. This seems to be related to the direct useage of
-// PetscScalar in accordance with gcc.gnu.org bug 7263.
-
-// deal.II includes
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
 
@@ -159,16 +143,16 @@ void init_petsc_complex ()
   deallog << "OK" << std::endl;
 }
 
+
 int main (int argc, char **argv)
 {
   std::ofstream logfile ("output");
   dealii::deallog.attach (logfile);
-  dealii::deallog.depth_console (0);
   deallog.threshold_double(1.e-10);
 
   try
     {
-      PetscInitialize (&argc, &argv, (char *) 0, (char *) 0);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       {
         // initialisation (zero and nonzero)
         init_petsc_complex ();
@@ -182,7 +166,6 @@ int main (int argc, char **argv)
         divide_petsc_complex_by_a_number ();
         multiply_petsc_complex_by_a_number ();
       }
-      PetscFinalize ();
     }
 
   catch (std::exception &exc)
@@ -209,8 +192,6 @@ int main (int argc, char **argv)
                 << std::endl;
       return 1;
     }
-
-  logfile << std::endl;
 
   return 0;
 }

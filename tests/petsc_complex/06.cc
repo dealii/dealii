@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id: 06.cc $
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2004 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,7 +30,7 @@ void test (PETScWrappers::SparseMatrix &m)
       if ((i+2*j+1) % 3 == 0)
         m.set (i,j, std::complex<double> (0.,i*j*.5+.5));
 
-  m.compress (VectorOperation::add);
+  m.compress (VectorOperation::insert);
 
   // compare against the exact value of the l1-norm (max col-sum)
   deallog << m.l1_norm() << std::endl;

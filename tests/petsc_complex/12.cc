@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id: 12.cc $
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2004 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,7 +38,7 @@ void test (PETScWrappers::Vector &v)
       pattern[k] = true;
     }
 
-  v.compress (VectorOperation::add);
+  v.compress (VectorOperation::insert);
 
   // check that they are ok, and this time all of them
   for (unsigned int k=0; k<v.size(); ++k)

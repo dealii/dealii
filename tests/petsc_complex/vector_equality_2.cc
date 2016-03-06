@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id: vector_equality_2.cc $
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2004 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //

@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id: 17.cc $
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2004 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,7 +33,7 @@ void test (PETScWrappers::Vector &v)
       v(k) = PetscScalar (k,2.*k);
       norm += std::fabs (1.*k+2.*k);
     }
-  v.compress (VectorOperation::add);
+  v.compress (VectorOperation::insert);
 
   // then check the norm
   Assert (v.l1_norm() == norm, ExcInternalError());

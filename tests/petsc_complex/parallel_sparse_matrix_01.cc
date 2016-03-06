@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id: testsuite.html 32446 2014-02-10 14:31:22Z bangerth $
 //
-// Copyright (C) 2013 by the deal.II Authors
+// Copyright (C) 2004 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -113,7 +112,7 @@ void test (const unsigned int poly_degree = 1)
       if (cell->is_locally_owned())
         {
           fe_values.reinit (cell);
-          cell_mass_matrix    = PetscScalar(0);
+          cell_mass_matrix    = PetscScalar();
 
           for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
             for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -160,8 +159,8 @@ void test (const unsigned int poly_degree = 1)
   vector.compress(VectorOperation::insert);
   constraints.distribute(vector);
 
-  deallog<<"symmetric: "<<mass_matrix.is_symmetric()<<std::endl;
-  deallog<<"hermitian: "<<mass_matrix.is_hermitian()<<std::endl;
+  deallog<<"symmetric: "<<(mass_matrix.is_symmetric()==PETSC_TRUE)<<std::endl;
+  deallog<<"hermitian: "<<(mass_matrix.is_hermitian()==PETSC_TRUE)<<std::endl;
 
   PETScWrappers::MPI::Vector tmp(vector);
   mass_matrix.vmult (tmp, vector);
@@ -192,8 +191,8 @@ int main (int argc, char *argv[])
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
-
-  test<2>();
-
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  {
+    test<2>();
+  }
 }

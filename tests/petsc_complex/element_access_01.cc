@@ -1,8 +1,6 @@
-
 // ---------------------------------------------------------------------
-// $Id:
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2004 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,7 +40,7 @@ void test_matrix (PETScWrappers::SparseMatrix &m)
         m.set (k,l, std::complex<double> (el_r,el_i));
       }
 
-  m.compress (VectorOperation::add);
+  m.compress (VectorOperation::insert);
 
   for (unsigned int k=0; k<m.m(); ++k)
     for (unsigned int l=0; l<m.n(); ++l)
@@ -66,7 +64,7 @@ int main (int argc, char **argv)
 
   try
     {
-      PetscInitialize (&argc, &argv, (char *) 0, (char *) 0);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
         PETScWrappers::SparseMatrix m (5,5,5);
         test_matrix (m);
@@ -74,7 +72,6 @@ int main (int argc, char **argv)
         deallog << "matrix:" << std::endl;
         m.print (logfile);
       }
-      PetscFinalize ();
     }
 
 

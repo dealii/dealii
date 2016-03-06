@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id: testsuite.html 32446 2014-05-21 14:31:22Z davydov $
 //
-// Copyright (C) 2013 by the deal.II Authors
+// Copyright (C) 2004 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -170,8 +169,8 @@ int main (int argc, char *argv[])
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
-
-  test ();
-
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  {
+    test ();
+  }
 }

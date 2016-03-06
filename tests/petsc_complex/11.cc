@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id: 11.cc $
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2004 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +29,7 @@ void test (PETScWrappers::Vector &v)
   for (unsigned int k=0; k<v.size(); k+=1+k)
     v(k) = std::complex<double> (k,.5*k);
 
-  v.compress (VectorOperation::add);
+  v.compress (VectorOperation::insert);
 
   Assert (v.size() == 100, ExcInternalError());
 

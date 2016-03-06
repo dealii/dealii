@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id: solver_real_02.cc $
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2004 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -83,9 +82,9 @@ int main(int argc, char **argv)
     PETScWrappers::Vector  f(dim);
     PETScWrappers::Vector  u(dim);
     f = 1.;
-    A.compress (VectorOperation::add);
-    f.compress (VectorOperation::add);
-    u.compress (VectorOperation::add);
+    A.compress (VectorOperation::insert);
+    f.compress (VectorOperation::insert);
+    u.compress (VectorOperation::insert);
 
     PETScWrappers::SolverChebychev solver(control);
     PETScWrappers::PreconditionJacobi preconditioner(A);

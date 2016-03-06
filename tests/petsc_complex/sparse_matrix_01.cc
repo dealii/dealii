@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id sparse_matrix_01.cc $
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2004 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,13 +32,13 @@ void test ()
     for (unsigned int l=0; l<=k; ++l)
       m.set (k,l, k+2*l);
 
-  m.compress (VectorOperation::add);
+  m.compress (VectorOperation::insert);
 
   PETScWrappers::SparseMatrix m2(s,s,s);
   m2.set(0,1,5.0);
   for (unsigned int k=0; k<m2.m(); ++k)
     m2.set(k,k,PetscScalar(1.0+k,-1.0-k));
-  m2.compress(VectorOperation::add);
+  m2.compress(VectorOperation::insert);
 
   // we now print the matrix m, it is all real. Then print after
   // adding m2 which is complex, and then subtract m2 again to get the

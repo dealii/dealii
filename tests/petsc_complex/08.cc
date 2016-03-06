@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id: 08.cc $
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2004 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,7 +36,7 @@ void test (PETScWrappers::SparseMatrix &m)
         }
   norm = std::sqrt(norm);
 
-  m.compress (VectorOperation::add);
+  m.compress (VectorOperation::insert);
 
   // compare against the exact value of the l2-norm (max row-sum)
   deallog << m.frobenius_norm() << std::endl;
