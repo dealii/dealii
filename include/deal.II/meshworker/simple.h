@@ -1289,24 +1289,20 @@ namespace MeshWorker
                   {
                     assemble(info1.matrix(k+m*n*n,false).matrix, info1.vector(m).block(column), m,
                              info1.indices_by_block[column]);
-                    assemble(info1.matrix(k+m*n*n,true).matrix, info1.vector(m).block(column), m,
-                             info1.indices_by_block[row], info2.indices_by_block[column]);
                     assemble(info2.matrix(k+m*n*n,false).matrix, info2.vector(m).block(column), m,
                              info2.indices_by_block[column]);
-                    assemble(info2.matrix(k+m*n*n,true).matrix, info2.vector(m).block(column), m,
-                             info2.indices_by_block[row], info1.indices_by_block[column]);
                   }
                 else
                   {
                     assemble(info1.matrix(k+m*n*n,false).matrix, info1.vector(m).block(column), m,
                              info1.indices_by_block[row], info1.indices_by_block[column]);
-                    assemble(info1.matrix(k+m*n*n,true).matrix, info1.vector(m).block(column), m,
-                             info1.indices_by_block[row], info2.indices_by_block[column]);
                     assemble(info2.matrix(k+m*n*n,false).matrix, info2.vector(m).block(column), m,
                              info2.indices_by_block[row], info2.indices_by_block[column]);
-                    assemble(info2.matrix(k+m*n*n,true).matrix, info2.vector(m).block(column), m,
-                             info2.indices_by_block[row], info1.indices_by_block[column]);
                   }
+                assemble(info1.matrix(k+m*n*n,true).matrix, info1.vector(m).block(column), m,
+                         info1.indices_by_block[row], info2.indices_by_block[column]);
+                assemble(info2.matrix(k+m*n*n,true).matrix, info2.vector(m).block(column), m,
+                         info2.indices_by_block[row], info1.indices_by_block[column]);
               }
         }
     }
