@@ -25,6 +25,7 @@
 #include <deal.II/base/iterator_range.h>
 #include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <deal.II/dofs/block_info.h>
+#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_iterator_selector.h>
 #include <deal.II/dofs/number_cache.h>
 #include <deal.II/dofs/dof_faces.h>
