@@ -28,7 +28,7 @@ for (S: REAL_SCALARS; T : DEAL_II_VEC_TEMPLATES)
     template void ConstraintMatrix::condense<parallel::distributed::T<S> >(const parallel::distributed::T<S> &, parallel::distributed::T<S> &) const;
     template void ConstraintMatrix::condense<parallel::distributed::T<S> >(parallel::distributed::T<S> &vec) const;
     template void ConstraintMatrix::distribute_local_to_global<parallel::distributed::T<S> > (
-      const Vector<double>&, const std::vector<types::global_dof_index> &, parallel::distributed::T<S> &, const FullMatrix<double>&) const;
+      const Vector<S>&, const std::vector<types::global_dof_index> &, parallel::distributed::T<S> &, const FullMatrix<S>&) const;
     template void ConstraintMatrix::set_zero<parallel::distributed::T<S> >(parallel::distributed::T<S> &) const;
   }
 
