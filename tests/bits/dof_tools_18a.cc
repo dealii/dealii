@@ -42,14 +42,9 @@ make_masks (const unsigned int n,
 }
 
 
-void
-my_check_this (const DoFHandler<1> &)
-{}
-
-
 template <int dim>
 void
-my_check_this (const DoFHandler<dim> &dof_handler)
+check_this (const DoFHandler<dim> &dof_handler)
 {
   Table<2,DoFTools::Coupling> mask_int;
   Table<2,DoFTools::Coupling> mask_ext;
@@ -86,20 +81,4 @@ my_check_this (const DoFHandler<dim> &dof_handler)
                (sp.begin(l)-sp.begin()) +
                (sp.row_length(l)>1 ? ++sp.begin(l) : sp.begin(l))->column());
   deallog << hash << std::endl;
-}
-
-
-template <int dim>
-void
-check_this (const DoFHandler<dim> &dof_handler)
-{
-  // since we can't forward declare
-  // check_this in this file (it is forward
-  // declared in dof_tools_common.h), we
-  // also can't make the driver file aware of
-  // the overload for 1d. to avoid linker
-  // errors, we can consequently not overload
-  // check_this, and need this forwarder
-  // function
-  my_check_this (dof_handler);
 }
