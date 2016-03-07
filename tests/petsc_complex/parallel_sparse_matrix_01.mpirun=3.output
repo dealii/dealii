@@ -1,6 +1,4 @@
 
-DEAL::symmetric: 1
-DEAL::hermitian: 1
 DEAL::(conj(vector),M vector): 
 DEAL::real part:      337.563
 DEAL::imaginary part: 0

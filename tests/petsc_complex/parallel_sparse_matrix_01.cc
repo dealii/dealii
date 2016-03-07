@@ -39,6 +39,8 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/sparsity_tools.h>
 
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
@@ -78,21 +80,27 @@ void test (const unsigned int poly_degree = 1)
 
 
   vector.reinit(locally_owned_dofs, mpi_communicator);
-  const types::global_dof_index n_local_dofs = locally_owned_dofs.n_elements();
-  mass_matrix.reinit  (mpi_communicator,
-                       dof_handler.n_dofs(),
-                       dof_handler.n_dofs(),
-                       n_local_dofs,
-                       n_local_dofs,
-                       dof_handler.max_couplings_between_dofs());
 
   ConstraintMatrix constraints;
   constraints.reinit(locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints  (dof_handler, constraints);
   constraints.close ();
 
+  DynamicSparsityPattern dsp (locally_relevant_dofs);
+  DoFTools::make_sparsity_pattern (dof_handler, dsp,
+                                   constraints, false);
+  SparsityTools::distribute_sparsity_pattern (dsp,
+                                              dof_handler.n_locally_owned_dofs_per_processor(),
+                                              mpi_communicator,
+                                              locally_relevant_dofs);
+
+  mass_matrix.reinit (locally_owned_dofs,
+                      locally_owned_dofs,
+                      dsp,
+                      mpi_communicator);
+
   //assemble mass matrix:
-  mass_matrix = 0.0;
+  mass_matrix = PetscScalar();
   {
     QGauss<dim> quadrature_formula(poly_degree+1);
     FEValues<dim> fe_values (fe, quadrature_formula,
@@ -125,12 +133,11 @@ void test (const unsigned int poly_degree = 1)
                 }
 
           cell->get_dof_indices (local_dof_indices);
-
-          constraints
-          .distribute_local_to_global (cell_mass_matrix,
-                                       local_dof_indices,
-                                       mass_matrix);
+          constraints.distribute_local_to_global (cell_mass_matrix,
+                                                  local_dof_indices,
+                                                  mass_matrix);
         }
+
     mass_matrix.compress (VectorOperation::add);
   }
 
@@ -159,11 +166,9 @@ void test (const unsigned int poly_degree = 1)
   vector.compress(VectorOperation::insert);
   constraints.distribute(vector);
 
-  deallog<<"symmetric: "<<(mass_matrix.is_symmetric()==PETSC_TRUE)<<std::endl;
-  deallog<<"hermitian: "<<(mass_matrix.is_hermitian()==PETSC_TRUE)<<std::endl;
-
   PETScWrappers::MPI::Vector tmp(vector);
   mass_matrix.vmult (tmp, vector);
+  //mass_matrix.Tvmult (tmp, vector);
 
   const std::complex<double> norm1 = vector*tmp;
   deallog<<"(conj(vector),M vector): "<<std::endl;
@@ -188,11 +193,35 @@ int main (int argc, char *argv[])
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  {
-    test<2>();
-  }
+  try
+    {
+      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+      test<2>();
+    }
+  catch (std::exception &exc)
+    {
+      std::cerr << std::endl << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      std::cerr << "Exception on processing: " << std::endl
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
+      return 1;
+    }
+  catch (...)
+    {
+      std::cerr << std::endl << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      std::cerr << "Unknown exception!" << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      return 1;
+    };
 }

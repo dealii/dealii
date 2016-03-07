@@ -105,7 +105,7 @@ void test ()
   DoFTools::make_hanging_node_constraints  (dof_handler, constraints);
   constraints.close ();
   //set vector:
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (mpi_communicator);
   for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); i++)
     {
       const PetscScalar val = 1.0+myid+ (myid+i%2)*2.0*PETSC_i;
