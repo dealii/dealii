@@ -1641,7 +1641,7 @@ unsigned int CellAccessor<dim,spacedim>::neighbor_of_neighbor_internal (const un
 
   // if we have a 1d mesh in 1d, we
   // can assume that the left
-  // neighbor of the right neigbor is
+  // neighbor of the right neighbor is
   // the current cell. but that is an
   // invariant that isn't true if the
   // mesh is embedded in a higher
