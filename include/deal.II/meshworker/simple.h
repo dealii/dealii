@@ -112,7 +112,7 @@ namespace MeshWorker
        * The global residal vectors filled by assemble().
        */
       AnyData residuals;
-    private:
+
       /**
        * A pointer to the object containing constraints.
        */
@@ -462,10 +462,6 @@ namespace MeshWorker
                     const DOFINFO &info2);
 
     private:
-      /**
-       * A pointer to the object containing constraints.
-       */
-      SmartPointer<const ConstraintMatrix,MatrixSimple<MatrixType> > constraints;
       /**
         * Assemble a single matrix <code>M</code> into the element at
         * <code>index</code> in the vector #matrix.
@@ -1143,7 +1139,7 @@ namespace MeshWorker
     inline void
     SystemSimple<MatrixType,VectorType>::initialize(const ConstraintMatrix &c)
     {
-      constraints = &c;
+      ResidualSimple<VectorType>::initialize(c);
     }
 
 
@@ -1170,7 +1166,7 @@ namespace MeshWorker
       AnyData residuals = ResidualSimple<VectorType>::residuals;
       VectorType *v = residuals.entry<VectorType *>(index);
 
-      if (constraints == 0)
+      if (ResidualSimple<VectorType>::constraints == 0)
         {
           for (unsigned int i=0; i<indices.size(); ++i)
             (*v)(indices[i]) += vector(i);
@@ -1182,7 +1178,7 @@ namespace MeshWorker
         }
       else
         {
-          constraints->distribute_local_to_global(M,vector,indices,*MatrixSimple<MatrixType>::matrix[index],*v, true);
+          ResidualSimple<VectorType>::constraints->distribute_local_to_global(M,vector,indices,*MatrixSimple<MatrixType>::matrix[index],*v, true);
         }
     }
 
@@ -1200,7 +1196,7 @@ namespace MeshWorker
       AnyData residuals = ResidualSimple<VectorType>::residuals;
       VectorType *v = residuals.entry<VectorType *>(index);
 
-      if (constraints == 0)
+      if (ResidualSimple<VectorType>::constraints == 0)
         {
           for (unsigned int i=0; i<i1.size(); ++i)
             (*v)(i1[i]) += vector(i);
@@ -1212,8 +1208,8 @@ namespace MeshWorker
         }
       else
         {
-          constraints->distribute_local_to_global(vector, i1, i2, *v, M);
-          constraints->distribute_local_to_global(M, i1, i2, *MatrixSimple<MatrixType>::matrix[index]);
+          ResidualSimple<VectorType>::constraints->distribute_local_to_global(vector, i1, i2, *v, M);
+          ResidualSimple<VectorType>::constraints->distribute_local_to_global(M, i1, i2, *MatrixSimple<MatrixType>::matrix[index]);
         }
     }
 
