@@ -52,16 +52,12 @@ template<int dim, int spacedim>
 std::size_t
 MappingManifold<dim,spacedim>::InternalData::memory_consumption () const
 {
-  return (Mapping<dim,spacedim>::InternalDataBase::memory_consumption() );
-  // MemoryConsumption::memory_consumption (covariant) +
-  // MemoryConsumption::memory_consumption (contravariant) +
-  // MemoryConsumption::memory_consumption (unit_tangentials) +
-  // MemoryConsumption::memory_consumption (aux) +
-  // MemoryConsumption::memory_consumption (mapping_support_points) +
-  // MemoryConsumption::memory_consumption (cell_of_current_support_points) +
-  // MemoryConsumption::memory_consumption (volume_elements) +
-  // MemoryConsumption::memory_consumption (polynomial_degree) +
-  // MemoryConsumption::memory_consumption (n_shape_functions));
+  return (Mapping<dim,spacedim>::InternalDataBase::memory_consumption() +
+          MemoryConsumption::memory_consumption (covariant) +
+          MemoryConsumption::memory_consumption (contravariant) +
+          MemoryConsumption::memory_consumption (unit_tangentials) +
+          MemoryConsumption::memory_consumption (aux) +
+          MemoryConsumption::memory_consumption (volume_elements));
 }
 
 
@@ -284,14 +280,12 @@ MappingManifold<dim,spacedim>::requires_update_flags (const UpdateFlags in) cons
                  | update_jacobian_pushed_forward_3rd_derivatives) )
         out |= update_covariant_transformation;
 
-      // The contravariant transformation
-      // used in the Piola transformation, which
-      // requires the determinant of the
-      // Jacobi matrix of the transformation.
-      // Because we have no way of knowing here whether the finite
-      // elements wants to use the contravariant of the Piola
-      // transforms, we add the JxW values to the list of flags to be
-      // updated for each cell.
+      // The contravariant transformation used in the Piola
+      // transformation, which requires the determinant of the Jacobi
+      // matrix of the transformation.  Because we have no way of
+      // knowing here whether the finite elements wants to use the
+      // contravariant of the Piola transforms, we add the JxW values
+      // to the list of flags to be updated for each cell.
       if (out & update_contravariant_transformation)
         out |= update_JxW_values;
 
