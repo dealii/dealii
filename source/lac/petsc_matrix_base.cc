@@ -578,7 +578,9 @@ namespace PETScWrappers
 #endif
     truth;
     assert_is_compressed ();
-    MatIsSymmetric (matrix, tolerance, &truth);
+    int ierr = MatIsSymmetric (matrix, tolerance, &truth);
+    (void)ierr;
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
     return truth;
   }
 
@@ -597,7 +599,9 @@ namespace PETScWrappers
     truth;
 
     assert_is_compressed ();
-    MatIsHermitian (matrix, tolerance, &truth);
+    int ierr = MatIsHermitian (matrix, tolerance, &truth);
+    (void)ierr;
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return truth;
   }
