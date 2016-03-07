@@ -615,7 +615,6 @@ ConstraintMatrix::set_zero (VectorType &vec) const
 
 
 
-
 template <typename VectorType, typename LocalType>
 void
 ConstraintMatrix::
@@ -626,6 +625,8 @@ distribute_local_to_global (const Vector<LocalType>      &local_vector,
 {
   distribute_local_to_global(local_vector,local_dof_indices,local_dof_indices, global_vector, local_matrix);
 }
+
+
 
 template <typename VectorType, typename LocalType>
 void
