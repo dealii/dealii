@@ -740,6 +740,16 @@ public:
                               VectorType                   &global_vector,
                               const FullMatrix<LocalType>  &local_matrix) const;
 
+  /**
+   * Same as the previous function, except that it uses two (possibly) different
+   * index sets to correctly handle inhomogeneties when the local matrix is
+   * computed from a combination of two neighboring elements, for example for an
+   * edge integral term in dG. Note that in the case that these two elements have
+   * different polynomial degree, the local matrix is rectangular.
+   *
+   * <tt>local_dof_indices_row<tt> is the set of row indices and
+   * <tt>local_dof_indices_col<tt> is the set of column indices of the local matrix.
+   */
   template <typename VectorType, typename LocalType>
   void
   distribute_local_to_global (const Vector<LocalType>      &local_vector,
