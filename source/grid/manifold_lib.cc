@@ -93,7 +93,7 @@ SphericalManifold<dim,spacedim>::push_forward(const Point<spacedim> &spherical_p
         break;
       }
       default:
-        Assert(false, ExcInternalError());
+        Assert(false, ExcNotImplemented());
       }
   return p+center;
 }
@@ -152,7 +152,7 @@ SphericalManifold<dim,spacedim>::push_forward_gradient(const Point<spacedim> &sp
         break;
       case 3:
       {
-        const double &phi= spherical_point[2];
+        const double phi= spherical_point[2];
         DX[0][0] =      sin(theta)*cos(phi);
         DX[0][1] =  rho*cos(theta)*cos(phi);
         DX[0][2] = -rho*sin(theta)*sin(phi);
@@ -164,8 +164,8 @@ SphericalManifold<dim,spacedim>::push_forward_gradient(const Point<spacedim> &sp
         DX[2][0] =      cos(theta);
         DX[2][1] = -rho*sin(theta);
         DX[2][2] = 0;
+        break;
       }
-      break;
       default:
         Assert(false, ExcInternalError());
       }
