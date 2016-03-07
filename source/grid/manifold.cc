@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2015 by the deal.II authors
+// Copyright (C) 1998 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -228,8 +228,9 @@ Manifold<dim,spacedim>::get_tangent_vector(const Point<spacedim> &x1,
 
 
 template <int dim, int spacedim>
-FlatManifold<dim,spacedim>::FlatManifold (const Point<spacedim> periodicity,
-                                          const double tolerance) :
+FlatManifold<dim,spacedim>::FlatManifold (const Point<spacedim> &periodicity,
+                                          const double tolerance)
+  :
   periodicity(periodicity),
   tolerance(tolerance)
 {}
@@ -326,7 +327,7 @@ ChartManifold<dim,spacedim,chartdim>::~ChartManifold ()
 
 
 template <int dim, int spacedim, int chartdim>
-ChartManifold<dim,spacedim,chartdim>::ChartManifold (const Point<chartdim> periodicity)
+ChartManifold<dim,spacedim,chartdim>::ChartManifold (const Point<chartdim> &periodicity)
   :
   sub_manifold(periodicity)
 {}
