@@ -86,12 +86,12 @@ SphericalManifold<dim,spacedim>::push_forward(const Point<spacedim> &spherical_p
         break;
       case 3:
       {
-        const double &phi= spherical_point[2];
+        const double phi= spherical_point[2];
         p[0] = rho*sin(theta)*cos(phi);
         p[1] = rho*sin(theta)*sin(phi);
         p[2] = rho*cos(theta);
+        break;
       }
-      break;
       default:
         Assert(false, ExcInternalError());
       }
