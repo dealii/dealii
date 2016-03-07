@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2015 by the deal.II authors
+// Copyright (C) 2006 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,7 @@
 #include <deal.II/base/work_stream.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/grid/tria.h>
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/meshworker/local_integrator.h>
 #include <deal.II/meshworker/dof_info.h>
 #include <deal.II/meshworker/integration_info.h>
@@ -32,7 +33,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <typename> class TriaActiveIterator;
-template <typename> class FilteredIterator;
 
 namespace internal
 {
@@ -52,7 +52,7 @@ namespace internal
   }
 
   template <class ACCESSOR>
-  inline bool is_active_iterator(const FilteredIterator<TriaActiveIterator<ACCESSOR> > &)
+  inline bool is_active_iterator(const dealii::FilteredIterator<TriaActiveIterator<ACCESSOR> > &)
   {
     return true;
   }
