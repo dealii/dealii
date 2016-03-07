@@ -93,7 +93,7 @@ SphericalManifold<dim,spacedim>::push_forward(const Point<spacedim> &spherical_p
         break;
       }
       default:
-        Assert(false, ExcInternalError());
+        Assert(false, ExcNotImplemented());
       }
   return p+center;
 }
@@ -130,6 +130,47 @@ SphericalManifold<dim,spacedim>::pull_back(const Point<spacedim> &space_point) c
   return p;
 }
 
+
+template <int dim, int spacedim>
+DerivativeForm<1,spacedim,spacedim>
+SphericalManifold<dim,spacedim>::push_forward_gradient(const Point<spacedim> &spherical_point) const
+{
+  Assert(spherical_point[0] >=0.0,
+         ExcMessage("Negative radius for given point."));
+  const double rho = spherical_point[0];
+  const double theta = spherical_point[1];
+
+  DerivativeForm<1,spacedim,spacedim> DX;
+  if (rho > 1e-10)
+    switch (spacedim)
+      {
+      case 2:
+        DX[0][0] = cos(theta);
+        DX[0][1] = -rho*sin(theta);
+        DX[1][0] = sin(theta);
+        DX[1][1] = rho*cos(theta);
+        break;
+      case 3:
+      {
+        const double phi= spherical_point[2];
+        DX[0][0] =      sin(theta)*cos(phi);
+        DX[0][1] =  rho*cos(theta)*cos(phi);
+        DX[0][2] = -rho*sin(theta)*sin(phi);
+
+        DX[1][0] =     sin(theta)*sin(phi);
+        DX[1][1] = rho*cos(theta)*sin(phi);
+        DX[1][2] = rho*sin(theta)*cos(phi);
+
+        DX[2][0] =      cos(theta);
+        DX[2][1] = -rho*sin(theta);
+        DX[2][2] = 0;
+        break;
+      }
+      default:
+        Assert(false, ExcInternalError());
+      }
+  return DX;
+}
 
 // ============================================================
 // CylindricalManifold

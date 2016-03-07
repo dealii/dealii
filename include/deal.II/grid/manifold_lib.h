@@ -84,6 +84,24 @@ public:
   virtual Point<spacedim>
   push_forward(const Point<spacedim> &chart_point) const;
 
+
+  /**
+   * Given a point in the spacedim dimensional Euclidean space, this
+   * method returns the derivatives of the function $F$ that maps from
+   * the polar coordinate system to the Euclidean coordinate
+   * system. In other words, it is a matrix of size
+   * $\text{spacedim}\times\text{spacedim}$.
+   *
+   * This function is used in the computations required by the
+   * get_tangent_vector() function.
+   *
+   * Refer to the general documentation of this class for more information.
+   */
+  virtual
+  DerivativeForm<1,spacedim,spacedim>
+  push_forward_gradient(const Point<spacedim> &chart_point) const;
+
+
   /**
    * Let the new point be the average sum of surrounding vertices.
    *
