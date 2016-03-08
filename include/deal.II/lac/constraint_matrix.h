@@ -744,11 +744,18 @@ public:
    * Same as the previous function, except that it uses two (possibly) different
    * index sets to correctly handle inhomogeneties when the local matrix is
    * computed from a combination of two neighboring elements, for example for an
-   * edge integral term in dG. Note that in the case that these two elements have
+   * edge integral term in DG. Note that in the case that these two elements have
    * different polynomial degree, the local matrix is rectangular.
    *
    * <tt>local_dof_indices_row<tt> is the set of row indices and
    * <tt>local_dof_indices_col<tt> is the set of column indices of the local matrix.
+   * <tt>diagonal=false<tt> says whether the two index sets are equal or not.
+   *
+   * If both index sets are equal, <tt>diagonal<tt> must be set to true or we
+   * simply use the previous function. If both index sets are different (diagonal=false)
+   * the <tt>global_vector<tt> is modified to handle inhomogeneties but no
+   * entries from <tt>local_vector<tt> are added. Note that the edge integrals for inner
+   * edged for DG do not contribute any values to the right hand side.
    */
   template <typename VectorType, typename LocalType>
   void
@@ -756,7 +763,8 @@ public:
                               const std::vector<size_type> &local_dof_indices_row,
                               const std::vector<size_type> &local_dof_indices_col,
                               VectorType                   &global_vector,
-                              const FullMatrix<LocalType>  &local_matrix) const;
+                              const FullMatrix<LocalType>  &local_matrix,
+                              bool diagonal = false) const;
 
   /**
    * Enter a single value into a result vector, obeying constraints.

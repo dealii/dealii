@@ -1198,9 +1198,6 @@ namespace MeshWorker
 
       if (ResidualSimple<VectorType>::constraints == 0)
         {
-          for (unsigned int i=0; i<i1.size(); ++i)
-            (*v)(i1[i]) += vector(i);
-
           for (unsigned int j=0; j<i1.size(); ++j)
             for (unsigned int k=0; k<i2.size(); ++k)
               if (std::fabs(M(j,k)) >= MatrixSimple<MatrixType>::threshold)
@@ -1208,7 +1205,7 @@ namespace MeshWorker
         }
       else
         {
-          ResidualSimple<VectorType>::constraints->distribute_local_to_global(vector, i1, i2, *v, M);
+          ResidualSimple<VectorType>::constraints->distribute_local_to_global(vector, i1, i2, *v, M, false);
           ResidualSimple<VectorType>::constraints->distribute_local_to_global(M, i1, i2, *MatrixSimple<MatrixType>::matrix[index]);
         }
     }
@@ -1238,11 +1235,11 @@ namespace MeshWorker
 
                 if (row == column)
                   assemble(info.matrix(k+m*n*n,false).matrix,
-                           info.vector(m).block(column), m,
-                           info.indices_by_block[column]);
+                           info.vector(m).block(row), m,
+                           info.indices_by_block[row]);
                 else
                   assemble(info.matrix(k+m*n*n,false).matrix,
-                           info.vector(m).block(column), m,
+                           info.vector(m).block(row), m,
                            info.indices_by_block[row],
                            info.indices_by_block[column]);
               }
@@ -1283,21 +1280,21 @@ namespace MeshWorker
 
                 if (row == column)
                   {
-                    assemble(info1.matrix(k+m*n*n,false).matrix, info1.vector(m).block(column), m,
-                             info1.indices_by_block[column]);
-                    assemble(info2.matrix(k+m*n*n,false).matrix, info2.vector(m).block(column), m,
-                             info2.indices_by_block[column]);
+                    assemble(info1.matrix(k+m*n*n,false).matrix, info1.vector(m).block(row), m,
+                             info1.indices_by_block[row]);
+                    assemble(info2.matrix(k+m*n*n,false).matrix, info2.vector(m).block(row), m,
+                             info2.indices_by_block[row]);
                   }
                 else
                   {
-                    assemble(info1.matrix(k+m*n*n,false).matrix, info1.vector(m).block(column), m,
+                    assemble(info1.matrix(k+m*n*n,false).matrix, info1.vector(m).block(row), m,
                              info1.indices_by_block[row], info1.indices_by_block[column]);
-                    assemble(info2.matrix(k+m*n*n,false).matrix, info2.vector(m).block(column), m,
+                    assemble(info2.matrix(k+m*n*n,false).matrix, info2.vector(m).block(row), m,
                              info2.indices_by_block[row], info2.indices_by_block[column]);
                   }
-                assemble(info1.matrix(k+m*n*n,true).matrix, info1.vector(m).block(column), m,
+                assemble(info1.matrix(k+m*n*n,true).matrix, info1.vector(m).block(row), m,
                          info1.indices_by_block[row], info2.indices_by_block[column]);
-                assemble(info2.matrix(k+m*n*n,true).matrix, info2.vector(m).block(column), m,
+                assemble(info2.matrix(k+m*n*n,true).matrix, info2.vector(m).block(row), m,
                          info2.indices_by_block[row], info1.indices_by_block[column]);
               }
         }
