@@ -27,6 +27,8 @@ namespace std_cxx11
 {
   using std::shared_ptr;
   using std::enable_shared_from_this;
+  using std::make_shared;
+  using std::dynamic_pointer_cast;
 }
 DEAL_II_NAMESPACE_CLOSE
 
@@ -34,11 +36,14 @@ DEAL_II_NAMESPACE_CLOSE
 
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/make_shared.hpp>
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx11
 {
   using boost::shared_ptr;
   using boost::enable_shared_from_this;
+  using boost::make_shared;
+  using boost::dynamic_pointer_cast;
 }
 DEAL_II_NAMESPACE_CLOSE
 

@@ -22,8 +22,7 @@
 #include <iostream>
 #include <vector>
 
-// Check LinearAlgebra::EpetraWrappers::Vector assignement and the operator
-// overloading.
+// Check LinearAlgebra::EpetraWrappers::Vector assignement and import
 
 
 void test()

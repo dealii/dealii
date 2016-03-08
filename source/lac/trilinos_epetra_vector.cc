@@ -34,7 +34,7 @@ namespace LinearAlgebra
     Vector::Vector()
       :
       vector(new Epetra_FEVector(Epetra_Map(0,0,0,Utilities::Trilinos::comm_self()))),
-      epetra_comm_pattern(nullptr)
+      epetra_comm_pattern(NULL)
     {}
 
 
@@ -42,7 +42,7 @@ namespace LinearAlgebra
     Vector::Vector(const Vector &V)
       :
       vector(new Epetra_FEVector(V.trilinos_vector())),
-      epetra_comm_pattern(nullptr)
+      epetra_comm_pattern(NULL)
     {}
 
 
@@ -51,7 +51,7 @@ namespace LinearAlgebra
                    const MPI_Comm &communicator)
       :
       vector(new Epetra_FEVector(parallel_partitioner.make_trilinos_map(communicator,false))),
-      epetra_comm_pattern(nullptr)
+      epetra_comm_pattern(NULL)
     {}
 
 
@@ -101,11 +101,11 @@ namespace LinearAlgebra
 
     void Vector::import(const ReadWriteVector<double>                  &V,
                         VectorOperation::values                         operation,
-                        std::shared_ptr<const CommunicationPatternBase> communication_pattern)
+                        std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern)
     {
       // If no communication pattern is given, create one. Otherwsie, use the
       // one given.
-      if (communication_pattern == nullptr)
+      if (communication_pattern == NULL)
         {
           // The first time import is called, a communication pattern is created.
           // Check if the communication pattern already exists and if it can be
@@ -121,8 +121,8 @@ namespace LinearAlgebra
       else
         {
           epetra_comm_pattern =
-            std::dynamic_pointer_cast<const CommunicationPattern> (communication_pattern);
-          AssertThrow(epetra_comm_pattern != nullptr,
+            std_cxx11::dynamic_pointer_cast<const CommunicationPattern> (communication_pattern);
+          AssertThrow(epetra_comm_pattern != NULL,
                       ExcMessage(std::string("The communication pattern is not of type ") +
                                  "LinearAlgebra::EpetraWrappers::CommunicationPattern."));
         }

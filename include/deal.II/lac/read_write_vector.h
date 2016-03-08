@@ -233,7 +233,7 @@ namespace LinearAlgebra
      */
     void import(const PETScWrappers::MPI::Vector &petsc_vec,
                 VectorOperation::values operation,
-                std::shared_ptr<const CommunicationPatternBase> communication_pattern = nullptr);
+                std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern = NULL);
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -247,7 +247,7 @@ namespace LinearAlgebra
      */
     void import(const TrilinosWrappers::MPI::Vector &trilinos_vec,
                 VectorOperation::values operation,
-                std::shared_ptr<const CommunicationPatternBase> communication_pattern = nullptr);
+                std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern = NULL);
 
     /**
      * Imports all the elements present in the vector's IndexSet from the input
@@ -259,7 +259,7 @@ namespace LinearAlgebra
      */
     void import(const EpetraWrappers::Vector &epetra_vec,
                 VectorOperation::values operation,
-                std::shared_ptr<const CommunicationPatternBase> communication_pattern = nullptr);
+                std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern = NULL);
 #endif
 
     /**
@@ -454,7 +454,7 @@ namespace LinearAlgebra
                 const IndexSet                                 &locally_owned_elements,
                 VectorOperation::values                         operation,
                 const MPI_Comm                                 &mpi_comm,
-                std::shared_ptr<const CommunicationPatternBase> communication_pattern);
+                std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern);
 #endif
 
     /**
@@ -497,7 +497,7 @@ namespace LinearAlgebra
      * CommunicationPattern for the communication between the
      * source_stored_elements IndexSet and the current vector.
      */
-    std::shared_ptr<CommunicationPatternBase> comm_pattern;
+    std_cxx11::shared_ptr<CommunicationPatternBase> comm_pattern;
 
     /**
      * Pointer to the array of local elements of this vector.
@@ -517,8 +517,8 @@ namespace LinearAlgebra
   inline
   ReadWriteVector<Number>::ReadWriteVector ()
     :
-    comm_pattern(nullptr),
-    val(nullptr)
+    comm_pattern(NULL),
+    val(NULL)
   {}
 
 
@@ -528,8 +528,8 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::ReadWriteVector (const ReadWriteVector<Number> &v)
     :
     Subscriptor(),
-    comm_pattern(nullptr),
-    val(nullptr)
+    comm_pattern(NULL),
+    val(NULL)
   {
     this->operator=(v);
   }
@@ -540,8 +540,8 @@ namespace LinearAlgebra
   inline
   ReadWriteVector<Number>::ReadWriteVector (const size_type size)
     :
-    comm_pattern(nullptr),
-    val(nullptr)
+    comm_pattern(NULL),
+    val(NULL)
   {
     reinit (size, false);
   }
@@ -552,8 +552,8 @@ namespace LinearAlgebra
   inline
   ReadWriteVector<Number>::ReadWriteVector (const IndexSet &locally_stored_indices)
     :
-    comm_pattern(nullptr),
-    val(nullptr)
+    comm_pattern(NULL),
+    val(NULL)
   {
     reinit (locally_stored_indices);
   }

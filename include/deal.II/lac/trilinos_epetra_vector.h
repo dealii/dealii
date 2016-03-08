@@ -101,8 +101,7 @@ namespace LinearAlgebra
        */
       virtual void import(const ReadWriteVector<double>  &V,
                           VectorOperation::values         operation,
-                          std::shared_ptr<const CommunicationPatternBase> communication_pattern = nullptr)
-      override;
+                          std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern = NULL);
 
       /**
        * Multiply the entire vector by a fixed factor.

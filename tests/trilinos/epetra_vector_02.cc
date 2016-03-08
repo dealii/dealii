@@ -22,6 +22,7 @@
 #include <iostream>
 #include <vector>
 
+// Check LinearAlgebra::EpetraWrappers::Vector add and sadd.
 
 void test()
 {

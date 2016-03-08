@@ -110,88 +110,89 @@ namespace LinearAlgebra
     /**
      * Multiply the entire vector by a fixed factor.
      */
-    virtual Vector<Number> &operator*= (const Number factor) override;
+    virtual Vector<Number> &operator*= (const Number factor);
 
     /**
      * Divide the entire vector by a fixed factor.
      */
-    virtual Vector<Number> &operator/= (const Number factor) override;
+    virtual Vector<Number> &operator/= (const Number factor);
 
     /**
      * Add the vector @p V to the present one.
      */
-    virtual Vector<Number> &operator+= (const VectorSpaceVector<Number> &V) override;
+    virtual Vector<Number> &operator+= (const VectorSpaceVector<Number> &V);
 
     /**
      * Substract the vector @p V from the present one.
      */
-    virtual Vector<Number> &operator-= (const VectorSpaceVector<Number> &V) override;
+    virtual Vector<Number> &operator-= (const VectorSpaceVector<Number> &V);
 
     /**
      * Return the scalar product of two vectors.
      */
-    virtual Number operator* (const VectorSpaceVector<Number> &V) const override;
+    virtual Number operator* (const VectorSpaceVector<Number> &V) const;
 
     /**
      * This function is not implemented and will throw an exception.
      */
     virtual void import(const ReadWriteVector<Number> &V,
                         VectorOperation::values operation,
-                        std::shared_ptr<const CommunicationPatternBase> communication_pattern = nullptr) override;
+                        std_cxx11::shared_ptr<const CommunicationPatternBase>
+                        communication_pattern = NULL);
 
     /**
      * Add @p a to all components. Note that @p a is a scalar not a vector.
      */
-    virtual void add(const Number a) override;
+    virtual void add(const Number a);
 
     /**
      * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.
      */
-    virtual void add(const Number a, const VectorSpaceVector<Number> &V) override;
+    virtual void add(const Number a, const VectorSpaceVector<Number> &V);
 
     /**
      * Multiple addition of a multiple of a vector, i.e. <tt>*this +=
      * a*V+b*W</tt>.
      */
     virtual void add(const Number a, const VectorSpaceVector<Number> &V,
-                     const Number b, const VectorSpaceVector<Number> &W) override;
+                     const Number b, const VectorSpaceVector<Number> &W);
 
     /**
      * Scaling and simple addition of a multiple of a vector, i.e. <tt>*this =
      * s*(*this)+a*V</tt>.
      */
     virtual void sadd(const Number s, const Number a,
-                      const VectorSpaceVector<Number> &V) override;
+                      const VectorSpaceVector<Number> &V);
 
     /**
      * Scale each element of this vector by the corresponding element in the
      * argument. This function is mostly meant to simulate multiplication (and
      * immediate re-assignement) by a diagonal scaling matrix.
      */
-    virtual void scale(const VectorSpaceVector<Number> &scaling_factors) override;
+    virtual void scale(const VectorSpaceVector<Number> &scaling_factors);
 
     /**
      * Assignement <tt>*this = a*V</tt>.
      */
-    virtual void equ(const Number a, const VectorSpaceVector<Number> &V) override;
+    virtual void equ(const Number a, const VectorSpaceVector<Number> &V);
 
     /**
      * Return the l<sub>1</sub> norm of the vector (i.e., the sum of the
      * absolute values of all entries).
      */
-    virtual typename VectorSpaceVector<Number>::real_type l1_norm() const override;
+    virtual typename VectorSpaceVector<Number>::real_type l1_norm() const;
 
     /**
      * Return the l<sub>2</sub> norm of the vector (i.e., the square root of
      * the sum of the square of all entries among all processors).
      */
-    virtual typename VectorSpaceVector<Number>::real_type l2_norm() const override;
+    virtual typename VectorSpaceVector<Number>::real_type l2_norm() const;
 
     /**
      * Return the maximum norm of the vector (i.e., the maximum absolute value
      * among all entries and among all processors).
      */
-    virtual typename VectorSpaceVector<Number>::real_type linfty_norm() const override;
+    virtual typename VectorSpaceVector<Number>::real_type linfty_norm() const;
 
     /**
      * Perform a combined operation of a vector addition and a subsequent
@@ -204,13 +205,13 @@ namespace LinearAlgebra
      */
     virtual Number add_and_dot(const Number a,
                                const VectorSpaceVector<Number> &V,
-                               const VectorSpaceVector<Number> &W) override;
+                               const VectorSpaceVector<Number> &W);
 
     /**
      * Return the global size of the vector, equal to the sum of the number of
      * locally owned indices among all processors.
      */
-    virtual size_type size() const override;
+    virtual size_type size() const;
 
     /**
      * Return an index set that describes which elements of this vector are
@@ -223,7 +224,7 @@ namespace LinearAlgebra
      *  vec.locally_owned_elements() == complete_index_set(vec.size())
      * @endcode
      */
-    virtual dealii::IndexSet locally_owned_elements() const override;
+    virtual dealii::IndexSet locally_owned_elements() const;
 
     /**
      * Prints the vector to the output stream @p out.
@@ -231,7 +232,7 @@ namespace LinearAlgebra
     virtual void print(std::ostream &out,
                        const unsigned int precision=3,
                        const bool scientific=true,
-                       const bool across=true) const override;
+                       const bool across=true) const;
     /**
      * Write the vector en bloc to a file. This is done in a binary mode, so
      * the output is neither readable by humans nor (probably) by other
@@ -255,7 +256,7 @@ namespace LinearAlgebra
     /**
      * Returns the memory consumption of this class in bytes.
      */
-    virtual std::size_t memory_consumption() const override;
+    virtual std::size_t memory_consumption() const;
 
     /**
      * Attempt to perform an operation between two incompatible vector types.
