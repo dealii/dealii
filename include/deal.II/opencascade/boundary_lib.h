@@ -24,6 +24,7 @@
 
 #include <deal.II/opencascade/utilities.h>
 #include <deal.II/grid/tria_boundary.h>
+#include <deal.II/grid/manifold.h>
 
 // opencascade needs "HAVE_CONFIG_H" to be exported...
 #define HAVE_CONFIG_H
@@ -319,6 +320,74 @@ namespace OpenCASCADE
      */
     const double length;
   };
+
+  /**
+   * TODO:
+   *
+   * @ingroup manifold
+   *
+   * @author Luca Heltai, 2014
+   */
+  template <int dim, int spacedim>
+  class NURBSPatchManifold : public ChartManifold<dim, spacedim, 2>
+  {
+  public:
+    /**
+     * TODO:
+     * Asser: count shape!
+     */
+    NURBSPatchManifold(const TopoDS_Face &face, const double tolerance = 1e-7);
+
+    /**
+     * TODO:  3 -> 2
+     */
+    virtual Point<2>
+    pull_back(const Point<spacedim> &space_point) const;
+
+    /**
+     * TODO:
+     */
+    virtual Point<spacedim>
+    push_forward(const Point<2> &chart_point) const;
+
+    /**
+     * Given a point in the spacedim dimensional Euclidean space, this
+     * method returns the derivatives of the function $F$ that maps from
+     * the polar coordinate system to the Euclidean coordinate
+     * system. In other words, it is a matrix of size
+     * $\text{spacedim}\times\text{spacedim}$.
+     *
+     * This function is used in the computations required by the
+     * get_tangent_vector() function.
+     *
+     * Refer to the general documentation of this class for more information.
+     */
+    virtual
+    DerivativeForm<1,dim,spacedim>
+    push_forward_gradient(const Point<2> &chart_point) const;
+
+    // /**
+    //  * Let the new point be the average sum of surrounding vertices.
+    //  *
+    //  * In the two dimensional implementation, we use the pull_back and
+    //  * push_forward mechanism. For three dimensions, this does not work well, so
+    //  * we overload the get_new_point function directly.
+    //  */
+    // virtual Point<spacedim>
+    // get_new_point(const Quadrature<spacedim> &quad) const;
+
+    /**
+     * TODO
+     */
+     std::tuple<double, double, double, double>
+     get_uv_bounds() const;
+     
+  private:
+    TopoDS_Face face;
+
+    double tolerance;
+  };
+
 }
 
 /*@}*/

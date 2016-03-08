@@ -10,6 +10,8 @@
 #include <GCPnts_AbscissaPoint.hxx>
 #include <ShapeAnalysis_Curve.hxx>
 #include <BRep_Tool.hxx>
+#include <BRepTools.hxx>
+#include <ShapeAnalysis_Surface.hxx>
 #include <TopoDS.hxx>
 #include <Adaptor3d_HCurve.hxx>
 #include <Handle_Adaptor3d_HCurve.hxx>
@@ -252,7 +254,72 @@ namespace OpenCASCADE
     return point(P);
   }
 
+  template <int dim, int spacedim>
+  NURBSPatchManifold<dim, spacedim>::
+  NURBSPatchManifold( const TopoDS_Face &face,
+                      const double tolerance)
+    :
+    face(face),
+    tolerance(tolerance)
+  {}
 
+  template<>
+  Point<2>
+  NURBSPatchManifold<2, 3>::
+  pull_back(const Point<3> &space_point) const
+  {
+    Handle(Geom_Surface) SurfToProj = BRep_Tool::Surface(face);
+
+    ShapeAnalysis_Surface projector(SurfToProj);
+    gp_Pnt2d proj_params = projector.ValueOfUV(point(space_point), tolerance);
+
+    double u = proj_params.X();
+    double v = proj_params.Y();
+
+    return Point<2>(u,v);
+  }
+
+  template<>
+  Point<3>
+  NURBSPatchManifold<2, 3>::
+  push_forward(const Point<2> &chart_point) const
+  {
+    return ::dealii::OpenCASCADE::push_forward(face, chart_point[0], chart_point[1]);
+  }
+
+  template<>
+  DerivativeForm<1,2,3>
+  NURBSPatchManifold<2, 3>::
+  push_forward_gradient(const Point<2> &chart_point) const
+  {
+    DerivativeForm<1,2,3> DX;
+    Handle(Geom_Surface) surf = BRep_Tool::Surface(face);
+
+    gp_Pnt q;
+    gp_Vec Du, Dv;
+    surf->D1(chart_point[0],chart_point[1], q, Du, Dv);
+
+    DX[0][0] = Du.X();
+    DX[0][1] = Du.Y();
+    DX[0][2] = Du.Z();
+    DX[1][0] = Dv.X();
+    DX[1][1] = Dv.Y();
+    DX[1][2] = Dv.Z();
+
+    return DX;
+  }
+
+  template<>
+  std::tuple<double, double, double, double>
+  NURBSPatchManifold<2, 3>::
+  get_uv_bounds() const
+  {
+    Standard_Real umin, umax, vmin, vmax;
+    BRepTools::UVBounds(face, umin, umax, vmin, vmax);    
+    return std::make_tuple(umin, umax, vmin, vmax);
+  }
+
+template class NURBSPatchManifold<2, 3 >; 
 // Explicit instantiations
 #include "boundary_lib.inst"
 
