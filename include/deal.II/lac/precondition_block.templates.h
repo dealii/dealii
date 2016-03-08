@@ -128,8 +128,6 @@ void PreconditionBlock<MatrixType,inverse_type>::invert_permuted_diagblocks
 
   if (this->same_diagonal())
     {
-      deallog << "PreconditionBlock uses only one diagonal block" << std::endl;
-
       for (size_type row_cell=0; row_cell<blocksize; ++row_cell)
         {
           typename MatrixType::const_iterator entry = M.begin(row_cell);
@@ -438,7 +436,6 @@ void PreconditionBlock<MatrixType,inverse_type>::invert_diagblocks()
 
   if (this->same_diagonal())
     {
-      deallog << "PreconditionBlock uses only one diagonal block" << std::endl;
       for (size_type row_cell=0; row_cell<blocksize; ++row_cell)
         {
           typename MatrixType::const_iterator entry = M.begin(row_cell);
