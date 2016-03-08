@@ -71,50 +71,52 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
         (const hp::DoFHandler<deal_II_dimension>&,
          const Function<deal_II_dimension, VEC::value_type>&,
          VEC&);
-         
+
      template
       void interpolate_based_on_material_id(const Mapping<deal_II_dimension, deal_II_space_dimension>&,
                                             const DoFHandler<deal_II_dimension, deal_II_space_dimension>&,
                                             const std::map< types::material_id, const Function<deal_II_space_dimension, VEC::value_type>* >&,
                                             VEC&,
                                             const ComponentMask&);
-         
+
      template
       void interpolate_based_on_material_id(const Mapping<deal_II_dimension>&,
                                             const hp::DoFHandler<deal_II_dimension>&,
                                             const std::map< types::material_id, const Function<deal_II_dimension, VEC::value_type>* >&,
                                             VEC&,
                                             const ComponentMask&);
-         
+
       \}
 #endif
   }
 
 
-for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
-{
-  namespace VectorTools \{
-
+  for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
+    {
+  #if deal_II_dimension <= deal_II_space_dimension
+      namespace VectorTools \{
   template
     void interpolate_to_different_mesh
-    (const DoFHandler<deal_II_dimension> &,
+    (const DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
      const VEC                           &,
-     const DoFHandler<deal_II_dimension> &,
+     const DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
      VEC                                 &);
 
   template
     void interpolate_to_different_mesh
-    (const DoFHandler<deal_II_dimension> &,
+    (const DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
      const VEC                           &,
-     const DoFHandler<deal_II_dimension> &,
+     const DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
      const ConstraintMatrix              &,
      VEC                                 &);
 
   template
     void interpolate_to_different_mesh
-    (const InterGridMap<DoFHandler<deal_II_dimension> > &,
+    (const InterGridMap<DoFHandler<deal_II_dimension,deal_II_space_dimension> > &,
      const VEC                                          &,
      const ConstraintMatrix                             &,
      VEC                                                &);
   \}
+  #endif
+
 }
