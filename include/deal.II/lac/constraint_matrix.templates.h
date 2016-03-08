@@ -642,7 +642,7 @@ distribute_local_to_global (const Vector<LocalType>      &local_vector,
   AssertDimension (local_vector.size(), local_dof_indices_row.size());
   AssertDimension (local_matrix.m(), local_dof_indices_row.size());
   AssertDimension (local_matrix.n(), local_dof_indices_col.size());
-  
+
   // diagonal checks if we have only one index set (if both are equal
   // diagonal should be set to true).
   // If true we do both, assemply of the right hand side (next lines)
@@ -718,9 +718,9 @@ distribute_local_to_global (const Vector<LocalType>      &local_vector,
             for (size_type j=0; j<position->entries.size(); ++j)
               {
                 Assert (!(!local_lines.size()
-                      || local_lines.is_element(position->entries[j].first))
-                      || is_constrained(position->entries[j].first) == false,
-                      ExcMessage ("Tried to distribute to a fixed dof."));
+                          || local_lines.is_element(position->entries[j].first))
+                        || is_constrained(position->entries[j].first) == false,
+                        ExcMessage ("Tried to distribute to a fixed dof."));
                 global_vector(position->entries[j].first)
                 += local_vector(i) * position->entries[j].second;
               }
