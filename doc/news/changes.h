@@ -88,7 +88,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 
-<ol> 
+<ol>
+ <li> New: Add NURBSPatchManifold. This class is a child of ChartManifold and
+ implements a manifold descriptor for the face of a CAD imported usign 
+ OpenCASCADE.
+ <br> 
+ (Mauro Bardelloni, 2016/03/09) 
+ </li> 
+  
  <li> New: When using C++11, there is now a function Threads::new_task()
  that can take as an argument either a lambda function, or the result
  of a std::bind expression, or anything else that can be called as in a

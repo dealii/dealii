@@ -300,27 +300,27 @@ namespace OpenCASCADE
     surf->D1(chart_point[0],chart_point[1], q, Du, Dv);
 
     DX[0][0] = Du.X();
-    DX[0][1] = Du.Y();
-    DX[0][2] = Du.Z();
-    DX[1][0] = Dv.X();
+    DX[1][0] = Du.Y();
+    DX[2][0] = Du.Z();
+    DX[0][1] = Dv.X();
     DX[1][1] = Dv.Y();
-    DX[1][2] = Dv.Z();
+    DX[2][1] = Dv.Z();
 
     return DX;
   }
 
   template<>
-  std::tuple<double, double, double, double>
+  std_cxx11::tuple<double, double, double, double>
   NURBSPatchManifold<2, 3>::
   get_uv_bounds() const
   {
     Standard_Real umin, umax, vmin, vmax;
-    BRepTools::UVBounds(face, umin, umax, vmin, vmax);    
-    return std::make_tuple(umin, umax, vmin, vmax);
+    BRepTools::UVBounds(face, umin, umax, vmin, vmax);
+    return std_cxx11::make_tuple(umin, umax, vmin, vmax);
   }
 
-template class NURBSPatchManifold<2, 3 >; 
 // Explicit instantiations
+  template class NURBSPatchManifold<2, 3 >;
 #include "boundary_lib.inst"
 
 } // end namespace OpenCASCADE

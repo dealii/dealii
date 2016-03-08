@@ -322,30 +322,33 @@ namespace OpenCASCADE
   };
 
   /**
-   * TODO:
+   * Manifold description for the face of a CAD imported usign OpenCASCADE.
    *
    * @ingroup manifold
    *
-   * @author Luca Heltai, 2014
+   * @author Andrea Mola, Mauro Bardelloni, 2016
    */
   template <int dim, int spacedim>
   class NURBSPatchManifold : public ChartManifold<dim, spacedim, 2>
   {
   public:
     /**
-     * TODO:
-     * Asser: count shape!
+     * The constructor takes an OpenCASCADE TopoDS_Face @p face and an optional
+     * @p tolerance. This class uses the interval OpenCASCADE variables @var u,
+     * @var v to descrive the manifold.
      */
     NURBSPatchManifold(const TopoDS_Face &face, const double tolerance = 1e-7);
 
     /**
-     * TODO:  3 -> 2
+     * Pull back the given point from the Euclidean space. Will return the uv
+     * coordinates associated with the point @p space_point.
      */
     virtual Point<2>
     pull_back(const Point<spacedim> &space_point) const;
 
     /**
-     * TODO:
+     * Given a @p chart_point in the uv coordinate system, this method returns the
+     * Euclidean coordinates associated.
      */
     virtual Point<spacedim>
     push_forward(const Point<2> &chart_point) const;
@@ -353,9 +356,9 @@ namespace OpenCASCADE
     /**
      * Given a point in the spacedim dimensional Euclidean space, this
      * method returns the derivatives of the function $F$ that maps from
-     * the polar coordinate system to the Euclidean coordinate
+     * the uv coordinate system to the Euclidean coordinate
      * system. In other words, it is a matrix of size
-     * $\text{spacedim}\times\text{spacedim}$.
+     * $\text{spacedim}\times\text{chartdim}$.
      *
      * This function is used in the computations required by the
      * get_tangent_vector() function.
@@ -363,28 +366,26 @@ namespace OpenCASCADE
      * Refer to the general documentation of this class for more information.
      */
     virtual
-    DerivativeForm<1,dim,spacedim>
+    DerivativeForm<1,2,spacedim>
     push_forward_gradient(const Point<2> &chart_point) const;
 
-    // /**
-    //  * Let the new point be the average sum of surrounding vertices.
-    //  *
-    //  * In the two dimensional implementation, we use the pull_back and
-    //  * push_forward mechanism. For three dimensions, this does not work well, so
-    //  * we overload the get_new_point function directly.
-    //  */
-    // virtual Point<spacedim>
-    // get_new_point(const Quadrature<spacedim> &quad) const;
+  private:
+    /**
+     * Return a tuple representing the minimum and maximum values of u
+     * and v.  Precisely, it returns (u_min, u_max, v_min, v_max)
+     */
+    std_cxx11::tuple<double, double, double, double>
+    get_uv_bounds() const;
 
     /**
-     * TODO
+     * An OpenCASCADE TopoDS_Face @p face given by the CAD.
      */
-     std::tuple<double, double, double, double>
-     get_uv_bounds() const;
-     
-  private:
     TopoDS_Face face;
 
+    /**
+     * Tolerance used by OpenCASCADE to identify points in each
+     * operation.
+     */
     double tolerance;
   };
 
