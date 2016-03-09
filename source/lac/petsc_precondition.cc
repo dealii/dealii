@@ -78,7 +78,7 @@ namespace PETScWrappers
     ierr = PCCreate(comm, &pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-#if DEAL_II_PETSC_VERSION_LT(3, 5, 0)
+#if DEAL_II_PETSC_VERSION_LT(3,5,0)
     ierr = PCSetOperators(pc , matrix, matrix, SAME_PRECONDITIONER);
 #else
     ierr = PCSetOperators(pc , matrix, matrix);
@@ -479,6 +479,8 @@ namespace PETScWrappers
   void
   PreconditionBoomerAMG::initialize ()
   {
+
+#ifdef PETSC_HAVE_HYPRE
 #ifndef PETSC_USE_COMPLEX
     int ierr;
     ierr = PCSetType (pc, const_cast<char *>(PCHYPRE));
@@ -488,38 +490,75 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     if (additional_data.output_details)
-      PetscOptionsSetValue("-pc_hypre_boomeramg_print_statistics","1");
+#if PETSC_VERSION_GT(3,7,0)
+      PetscOptionsSetValue(NULL, "-pc_hypre_boomeramg_print_statistics","1");
 
-    PetscOptionsSetValue("-pc_hypre_boomeramg_agg_nl",
+    PetscOptionsSetValue(NULL, "-pc_hypre_boomeramg_agg_nl",
                          Utilities::int_to_string(
                            additional_data.aggressive_coarsening_num_levels
                          ).c_str());
+#else
+      PetscOptionsSetValue("-pc_hypre_boomeramg_print_statistics","1");
+
+    PetscOptionsSetValue("-pc_hypre_boomeramg_agg_nl",
+			 Utilities::int_to_string(
+                         additional_data.aggressive_coarsening_num_levels
+                         ).c_str());
+
+#endif
 
     std::stringstream ssStream;
     ssStream << additional_data.max_row_sum;
+#if PETSC_VERSION_GT(3,7,0)
+    PetscOptionsSetValue(NULL, "-pc_hypre_boomeramg_max_row_sum", ssStream.str().c_str());
+#else
     PetscOptionsSetValue("-pc_hypre_boomeramg_max_row_sum", ssStream.str().c_str());
+#endif
 
     ssStream.str(""); // empty the stringstream
     ssStream << additional_data.strong_threshold;
+#if PETSC_VERSION_GT(3,7,0)
+    PetscOptionsSetValue(NULL, "-pc_hypre_boomeramg_strong_threshold", ssStream.str().c_str());
+#else
     PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", ssStream.str().c_str());
+#endif
 
     if (additional_data.symmetric_operator)
       {
+#if PETSC_VERSION_GT(3,7,0)
+        PetscOptionsSetValue(NULL, "-pc_hypre_boomeramg_relax_type_up", "symmetric-SOR/Jacobi");
+        PetscOptionsSetValue(NULL, "-pc_hypre_boomeramg_relax_type_down", "symmetric-SOR/Jacobi");
+        PetscOptionsSetValue(NULL, "-pc_hypre_boomeramg_relax_type_coarse", "Gaussian-elimination");
+#else
         PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_up", "symmetric-SOR/Jacobi");
         PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_down", "symmetric-SOR/Jacobi");
         PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_coarse", "Gaussian-elimination");
+#endif
       }
     else
       {
+#if PETSC_VERSION_GT(3,7,0)
+	PetscOptionsSetValue(NULL, "-pc_hypre_boomeramg_relax_type_up", "SOR/Jacobi");
+        PetscOptionsSetValue(NULL, "-pc_hypre_boomeramg_relax_type_down", "SOR/Jacobi");
+        PetscOptionsSetValue(NULL, "-pc_hypre_boomeramg_relax_type_coarse", "Gaussian-elimination");
+#else
         PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_up", "SOR/Jacobi");
         PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_down", "SOR/Jacobi");
         PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_coarse", "Gaussian-elimination");
+#endif
       }
 
     ierr = PCSetFromOptions (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 #else
     Assert(false, ExcMessage("Complex-valued PETSc does not support BoomerAMG preconditioner."));
+#endif
+
+#else // PETSC_HAVE_HYPRE
+    (void)pc;
+    Assert (false,
+            ExcMessage ("Your PETSc installation does not include a copy of "
+                        "the hypre package necessary for this preconditioner."));
 #endif
   }
 
