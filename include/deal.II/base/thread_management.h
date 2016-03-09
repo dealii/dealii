@@ -3142,7 +3142,15 @@ namespace Threads
    *   In particular, they will likely <i>capture</i> variables
    *   from the surrounding context and use them within the lambda.
    *   See https://en.wikipedia.org/wiki/Anonymous_function#C.2B.2B_.28since_C.2B.2B11.29
-   *   for more on this.
+   *   for more on how lambda functions work.
+   *
+   * @note If you pass a lambda function as an argument to the
+   *   current function that captures a variable <i>by reference</i>,
+   *   or if you use a std::bind that binds a function argument to
+   *   a reference variable using std::ref() or std::cref(), then
+   *   obviously you can only do this if the variables you reference
+   *   or capture have a lifetime that extends at least until the time
+   *   where the task finishes.
    *
    * @ingroup CPP11
    */
