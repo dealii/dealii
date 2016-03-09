@@ -24,6 +24,7 @@
 
 #include <deal.II/opencascade/utilities.h>
 #include <deal.II/grid/tria_boundary.h>
+#include <deal.II/grid/manifold.h>
 
 // opencascade needs "HAVE_CONFIG_H" to be exported...
 #define HAVE_CONFIG_H
@@ -319,6 +320,75 @@ namespace OpenCASCADE
      */
     const double length;
   };
+
+  /**
+   * Manifold description for the face of a CAD imported usign OpenCASCADE.
+   *
+   * @ingroup manifold
+   *
+   * @author Andrea Mola, Mauro Bardelloni, 2016
+   */
+  template <int dim, int spacedim>
+  class NURBSPatchManifold : public ChartManifold<dim, spacedim, 2>
+  {
+  public:
+    /**
+     * The constructor takes an OpenCASCADE TopoDS_Face @p face and an optional
+     * @p tolerance. This class uses the interval OpenCASCADE variables @var u,
+     * @var v to descrive the manifold.
+     */
+    NURBSPatchManifold(const TopoDS_Face &face, const double tolerance = 1e-7);
+
+    /**
+     * Pull back the given point from the Euclidean space. Will return the uv
+     * coordinates associated with the point @p space_point.
+     */
+    virtual Point<2>
+    pull_back(const Point<spacedim> &space_point) const;
+
+    /**
+     * Given a @p chart_point in the uv coordinate system, this method returns the
+     * Euclidean coordinates associated.
+     */
+    virtual Point<spacedim>
+    push_forward(const Point<2> &chart_point) const;
+
+    /**
+     * Given a point in the spacedim dimensional Euclidean space, this
+     * method returns the derivatives of the function $F$ that maps from
+     * the uv coordinate system to the Euclidean coordinate
+     * system. In other words, it is a matrix of size
+     * $\text{spacedim}\times\text{chartdim}$.
+     *
+     * This function is used in the computations required by the
+     * get_tangent_vector() function.
+     *
+     * Refer to the general documentation of this class for more information.
+     */
+    virtual
+    DerivativeForm<1,2,spacedim>
+    push_forward_gradient(const Point<2> &chart_point) const;
+
+  private:
+    /**
+     * Return a tuple representing the minimum and maximum values of u
+     * and v.  Precisely, it returns (u_min, u_max, v_min, v_max)
+     */
+    std_cxx11::tuple<double, double, double, double>
+    get_uv_bounds() const;
+
+    /**
+     * An OpenCASCADE TopoDS_Face @p face given by the CAD.
+     */
+    TopoDS_Face face;
+
+    /**
+     * Tolerance used by OpenCASCADE to identify points in each
+     * operation.
+     */
+    double tolerance;
+  };
+
 }
 
 /*@}*/
