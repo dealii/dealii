@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2015 by the deal.II authors
+// Copyright (C) 2000 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -3087,6 +3087,76 @@ namespace Threads
   {
     return Task<RT>(function);
   }
+
+
+#ifdef DEAL_II_WITH_CXX11
+
+  /**
+   * Overload of the new_task function for objects that can be called like a
+   * function object without arguments. In particular, this function allows
+   * calling Threads::new_thread() with either objects that result from using
+   * std::bind, or using lambda functions. For example, this function is called
+   * when writing code such as
+   * @code
+   * Threads::Task<int>
+   *   task = Threads::new_task ( [] () {
+   *                                      do_this();
+   *                                      then_do_that();
+   *                                      return 42;
+   *                                    });
+   * @endcode
+   * Here, we schedule the call to the sequence of functions
+   * <code>do_this()</code> and <code>then_do_that()</code> on
+   * a separate task, by making the lambda function declared here the
+   * function to execute on the task. The lambda function then returns
+   * 42 (which is a bit pointless here, but it could of course be some
+   * computed number), and this is going to be the returned value you
+   * can later retrieve via <code>task.return_value()</code> once the
+   * task (i.e., the body of the lambda function) has completed.
+   *
+   * @note Every lambda function (or whatever else it is you pass to
+   *   the new_task() function here, for example the result of a
+   *   std::bind() expression) has a return type and consequently
+   *   returns an object of this type. This type can be inferred
+   *   using the C++11 <code>decltype</code> statement used in the
+   *   declaration of this function, and it is then used as the template
+   *   argument of the Threads::Task object returned by the current function.
+   *   In the example above, because the lambda function returns 42
+   *   (which in C++ has data type <code>int</code>), the inferred
+   *   type is <code>int</code> and the task object will have type
+   *   <code>Task@<int@></code>. In other words, it is not <i>necessary</i>
+   *   to explicitly specify in user code what that return type
+   *   of the lambda or std::bind expression will be, though it is
+   *   possible to explicitly do so by (entirely equivalently) writing
+   *   @code
+   *   Threads::Task<int>
+   *     task = Threads::new_task ( [] () -> int {
+   *                                               do_this();
+   *                                               then_do_that();
+   *                                               return 42;
+   *                                             });
+   *   @endcode
+   *
+   * @note In practice, the lambda functions you will pass to
+   *   new_task() will of course typically be more complicated.
+   *   In particular, they will likely <i>capture</i> variables
+   *   from the surrounding context and use them within the lambda.
+   *   See https://en.wikipedia.org/wiki/Anonymous_function#C.2B.2B_.28since_C.2B.2B11.29
+   *   for more on this.
+   *
+   * @ingroup CPP11
+   */
+  template <typename FunctionObjectType>
+  inline
+  auto
+  new_task (FunctionObjectType function_object)
+  -> Task<decltype(function_object())>
+  {
+    typedef decltype(function_object()) return_type;
+    return Task<return_type>(std_cxx11::function<return_type ()>(function_object));
+  }
+
+#endif
 
   /**
    * Overload of the new_task function for non-member or static member

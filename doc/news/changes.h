@@ -68,12 +68,12 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
- <li> New: added another scaling factor to Kelly error estimator, namely h_K.
+ <li> New: Added another scaling factor to Kelly error estimator, namely h_K.
  <br>
  (Denis Davydov, 2016/03/05)
  </li>
 
- <li> New: added indent target to indent all headers and source
+ <li> New: Added indent target to indent all headers and source
  files. Now you can do make (or ninja) indent inside the build
  directory.
  <br>
@@ -89,7 +89,15 @@ inconvenience this causes.
 
 
 <ol> 
- <li> New: When using C++11, the function filter_iterators allows to filter a 
+ <li> New: When using C++11, there is now a function Threads::new_task()
+ that can take as an argument either a lambda function, or the result
+ of a std::bind expression, or anything else that can be called as in a
+ function call.
+ <br>
+ (Wolfgang Bangerth, 2016/03/07)
+ </li>
+
+ <li> New: When using C++11, the function filter_iterators() allows to filter a 
  range of iterators using predicates (like the ones defined in IteratorFilter).
  <br>
  (Bruno Turcksin, 2016/03/04)
