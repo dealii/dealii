@@ -24,6 +24,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+template <typename> class Vector;
+
+
 /*!@addtogroup mapping */
 /*@{*/
 

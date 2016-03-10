@@ -17,12 +17,7 @@
 #define dealii__mapping_q1_h
 
 
-#include <deal.II/base/derivative_form.h>
 #include <deal.II/base/config.h>
-#include <deal.II/base/table.h>
-#include <deal.II/base/qprojector.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/fe/mapping_q_generic.h>
 
 #include <cmath>
