@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2015 by the deal.II authors
+## Copyright (C) 2013 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -96,6 +96,7 @@ ENDIF()
 ADD_CUSTOM_TARGET(indent
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
   COMMAND ./contrib/utilities/indent
+  COMMENT "Indenting all files in the deal.II directories"
   )
 
 
