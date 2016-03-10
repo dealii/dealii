@@ -1,7 +1,7 @@
 #!/bin/bash
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2013, 2015 by the deal.II authors
+## Copyright (C) 2012 - 2013, 2015, 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -16,12 +16,12 @@
 
 if test ! -d source -o ! -d include -o ! -d examples ; then
   echo "*** This script must be run from the top-level directory of deal.II."
-  exit
+  exit 1
 fi
 
 if test ! -f contrib/utilities/astyle.rc ; then
   echo "*** No style file contrib/utilities/astyle.rc found."
-  exit
+  exit 1
 fi
 
 if test -z "`which astyle`" ; then
@@ -30,19 +30,17 @@ if test -z "`which astyle`" ; then
   echo "*** You can download astyle from http://astyle.sourceforge.net/"
   echo "*** Note that you will need exactly version 2.04 (no newer or"
   echo "*** older version will yield the correct indentation)."
-  exit
+  exit 1
 fi
 
 if test "`astyle --version 2>&1`" != "Artistic Style Version 2.04" ; then
   echo "*** Found a version of astyle different than the required version 2.04."
-  exit
+  exit 1
 fi
 
 
 
 # collect all header and source files and process them in batches of 50 files
 # with up to 10 in parallel
-echo "--- Indenting all deal.II header and source files"
-
 find tests include source examples \( -name '*.cc' -o -name '*.h' \) -print | xargs -n 50 -P 10 astyle --options=contrib/utilities/astyle.rc
 
