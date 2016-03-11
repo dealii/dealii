@@ -30,7 +30,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int, int> class FiniteElement;
 template <int, int> class DoFHandler;
 
 

@@ -25,8 +25,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int, int> class FEValuesBase;
-
 namespace internal
 {
   namespace DataOut

@@ -25,6 +25,7 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/mapping_q_generic.h>
 
 #include <fstream>
 

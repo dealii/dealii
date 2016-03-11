@@ -19,16 +19,12 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/table.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/point.h>
 #include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/lac/sparsity_pattern.h>
-#include <deal.II/dofs/function_map.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/fe/fe.h>
 #include <deal.II/fe/component_mask.h>
-#include <deal.II/hp/mapping_collection.h>
+#include <deal.II/hp/dof_handler.h>
 
 #include <vector>
 #include <set>
@@ -36,20 +32,19 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template<int dim, class T> class Table;
-class SparsityPattern;
-template <typename number> class Vector;
+class BlockMask;
 template <int dim, typename Number> class Function;
 template <int dim, int spacedim> class FiniteElement;
-template <int dim, int spacedim> class DoFHandler;
 namespace hp
 {
-  template <int dim, int spacedim> class DoFHandler;
   template <int dim, int spacedim> class MappingCollection;
+  template <int dim, int spacedim> class FECollection;
 }
-class ConstraintMatrix;
 template <class MeshType> class InterGridMap;
 template <int dim, int spacedim> class Mapping;
+class SparsityPattern;
+template <int dim, class T> class Table;
+template <typename Number> class Vector;
 
 namespace GridTools
 {

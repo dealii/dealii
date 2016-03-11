@@ -37,6 +37,8 @@ namespace internal
 {
   namespace MatrixFreeFunctions
   {
+    template <typename Number> class ConstraintValues;
+
     /**
      * The class that stores the indices of the degrees of freedom for all the
      * cells. Essentially, this is a smart number cache in the style of a

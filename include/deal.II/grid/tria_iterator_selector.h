@@ -22,7 +22,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim> class CellAccessor;
-template <int, int, int> class TriaAccessorBase;
 template <int, int, int> class InvalidAccessor;
 template <int, int, int> class TriaAccessor;
 template <int dim, int spacedim>  class TriaAccessor<0, dim, spacedim>;

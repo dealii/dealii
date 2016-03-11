@@ -18,11 +18,13 @@
 
 
 #include <deal.II/base/config.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/mapping.h>
+#include <deal.II/fe/mapping_q1.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/hp/dof_handler.h>
 
 #include <bitset>
 #include <list>
@@ -30,12 +32,16 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+namespace parallel
+{
+  namespace distributed
+  {
+    template <int, int> class Triangulation;
+  }
+}
 
-template <int, int> class DoFHandler;
-template <int, int> class Mapping;
 namespace hp
 {
-  template <int, int> class DoFHandler;
   template <int, int> class MappingCollection;
 }
 

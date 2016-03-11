@@ -35,9 +35,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int, int> class Triangulation;
-
-
 namespace parallel
 {
   /**

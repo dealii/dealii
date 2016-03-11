@@ -29,9 +29,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <typename number> class Vector;
 template <class VectorType> class FilteredMatrixBlock;
-
 
 /*! @addtogroup Matrix2
  *@{

@@ -29,10 +29,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim, int space_dim> class Triangulation;
-
-
-
 /**
  * This class is used to represent a boundary to a triangulation. When a
  * triangulation creates a new vertex on the boundary of the domain, it

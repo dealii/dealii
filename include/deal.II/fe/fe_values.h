@@ -48,12 +48,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim>   class Quadrature;
 template <int dim, int spacedim=dim> class FEValuesBase;
-
-template <typename Number> class Vector;
-template <typename Number> class BlockVector;
-
 
 namespace internal
 {

@@ -46,16 +46,6 @@ namespace internal
 {
   namespace PointValueHistory
   {
-    template <int dim> class PointGeometryData;
-  }
-}
-
-
-
-namespace internal
-{
-  namespace PointValueHistory
-  {
     /**
      * A class that stores the data needed to reference the support points
      * closest to one requested point.

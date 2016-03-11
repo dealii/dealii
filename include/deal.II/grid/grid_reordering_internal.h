@@ -20,7 +20,6 @@
 #include <deal.II/base/config.h>
 #include <deal.II/grid/tria.h>
 
-#include <map>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

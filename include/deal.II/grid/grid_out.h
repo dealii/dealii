@@ -22,8 +22,6 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/data_out_base.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/fe/mapping.h>
 
 #include <string>
 

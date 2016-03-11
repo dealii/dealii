@@ -35,7 +35,6 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, int spacedim> class Triangulation;
 template <int, int, int> class TriaAccessorBase;
 
-template <typename> class TriaRawIterator;
 template <typename> class TriaIterator;
 template <typename> class TriaActiveIterator;
 

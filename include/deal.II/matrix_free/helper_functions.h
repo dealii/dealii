@@ -33,9 +33,6 @@ namespace internal
 {
   namespace MatrixFreeFunctions
   {
-    // forward declaration of internal data structure
-    template <typename Number> struct ConstraintValues;
-
     /**
      * A struct that collects all information related to parallelization with
      * threads: The work is subdivided into tasks that can be done

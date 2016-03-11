@@ -19,16 +19,13 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/grid/tria.h>
 
-#include <vector>
 #include <limits>
 
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
 template <int dim, int spacedim> class Triangulation;
-template <class T> class Vector;
 
 
 /**

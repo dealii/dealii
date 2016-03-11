@@ -25,8 +25,6 @@
 #include <deal.II/base/iterator_range.h>
 #include <deal.II/base/std_cxx11/function.h>
 #include <deal.II/grid/tria_iterator_selector.h>
-#include <deal.II/grid/tria_faces.h>
-#include <deal.II/grid/tria_levels.h>
 
 // Ignore deprecation warnings for auto_ptr.
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
@@ -50,7 +48,7 @@ template <int dim, int spacedim> class Manifold;
 
 template <int, int, int> class TriaAccessor;
 template <int spacedim> class TriaAccessor<0,1,spacedim>;
-
+template <int, int, int> class TriaAccessorBase;
 
 namespace internal
 {
@@ -75,7 +73,6 @@ namespace internal
   }
 }
 
-template <int dim, int spacedim> class DoFHandler;
 namespace hp
 {
   template <int dim, int spacedim> class DoFHandler;

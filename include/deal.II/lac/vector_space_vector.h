@@ -27,10 +27,6 @@ class IndexSet;
 
 namespace LinearAlgebra
 {
-  template <typename Number>
-  class ReadWriteVector;
-
-
   /*! @addtogroup Vectors
    *@{
    */

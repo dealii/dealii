@@ -33,14 +33,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <typename number> class BlockSparseMatrix;
-class BlockSparsityPattern;
 class BlockDynamicSparsityPattern;
-#ifdef DEAL_II_WITH_TRILINOS
-namespace TrilinosWrappers
-{
-  class BlockSparsityPattern;
-}
-#endif
 
 /*! @addtogroup Sparsity
  *@{

@@ -31,14 +31,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim, int spacedim> class DoFHandler;
-namespace hp
-{
-  template <int dim, int spacedim> class DoFHandler;
-}
-
-
-
 /**
  * This namespace provides functions that compute a cell-wise approximation of
  * the norm of a derivative of a finite element field by taking difference

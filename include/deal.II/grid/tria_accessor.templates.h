@@ -35,16 +35,6 @@ DEAL_II_NAMESPACE_OPEN
 namespace parallel
 {
   template <int, int> class Triangulation;
-
-  namespace distributed
-  {
-    template <int, int> class Triangulation;
-  }
-
-  namespace shared
-  {
-    template <int, int> class Triangulation;
-  }
 }
 
 

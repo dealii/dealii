@@ -17,7 +17,6 @@
 #define dealii__fe_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/geometry_info.h>
 #include <deal.II/fe/fe_base.h>
 #include <deal.II/fe/fe_values_extractors.h>
 #include <deal.II/fe/fe_update_flags.h>
@@ -32,11 +31,6 @@ template <int dim, int spacedim> class FEValues;
 template <int dim, int spacedim> class FEFaceValues;
 template <int dim, int spacedim> class FESubfaceValues;
 template <int dim, int spacedim> class FESystem;
-namespace hp
-{
-  template <int dim, int spacedim> class FECollection;
-}
-
 
 /**
  * This is the base class for finite elements in arbitrary dimensions. It
