@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2016 by the deal.II authors
+// Copyright (C) 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,8 +17,8 @@
 #define dealii__mapping_manifold_h
 
 
-#include <deal.II/base/derivative_form.h>
 #include <deal.II/base/config.h>
+#include <deal.II/base/derivative_form.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/qprojector.h>
@@ -72,8 +72,8 @@ public:
   Mapping<dim,spacedim> *clone () const;
 
   /**
-   * Always returns @p true because the default implementation of functions in
-   * this class preserves vertex locations.
+   * Always returns @p true because this class assumes that the
+   * vertices always lies on the underlying Manifold.
    */
   virtual
   bool preserves_vertex_locations () const;
@@ -239,42 +239,24 @@ public:
 
 
     /**
-     * Values of quadrature weights for manifold quadrature formulas.
+     * Values of quadrature weights for manifold quadrature
+     * formulas.
+     *
+     * The Manifold class has a function (Manifold::get_new_point())
+     * that returns new points according to a weighted average of some
+     * surrounding points on the Manifold. For each quadrature point,
+     * we call this function with a Quadrature formula constructed
+     * using the vertices of the current cell, and the values of the
+     * basis functions of an FE_Q(1) finite element evaluated at the
+     * quadrature point itslef. While the vertices of the cell change
+     * for every cell, the weights can be computed once for each
+     * quadrature point. We store this information in the following
+     * variable, where the first index runs through the quadrature
+     * points, and the second index runs through the vertex indices.
      *
      * Computed once.
      */
     std::vector<std::vector<double> > cell_manifold_quadrature_weights;
-
-    // /**
-    //  * Values of shape function derivatives. Access by function @p derivative.
-    //  *
-    //  * Computed once.
-    //  */
-    // std::vector<Tensor<1,dim> > shape_derivatives;
-
-    // /**
-    //  * Values of shape function second derivatives. Access by function @p
-    //  * second_derivative.
-    //  *
-    //  * Computed once.
-    //  */
-    // std::vector<Tensor<2,dim> > shape_second_derivatives;
-
-    // /**
-    //  * Values of shape function third derivatives. Access by function @p
-    //  * second_derivative.
-    //  *
-    //  * Computed once.
-    //  */
-    // std::vector<Tensor<3,dim> > shape_third_derivatives;
-
-    // /**
-    //  * Values of shape function fourth derivatives. Access by function @p
-    //  * second_derivative.
-    //  *
-    //  * Computed once.
-    //  */
-    // std::vector<Tensor<4,dim> > shape_fourth_derivatives;
 
     /**
      * Unit tangential vectors. Used for the computation of boundary forms and
@@ -290,23 +272,6 @@ public:
      * Filled once.
      */
     std::vector<std::vector<Tensor<1,dim> > > unit_tangentials;
-
-    // /**
-    //  * The polynomial degree of the mapping. Since the objects here are also
-    //  * used (with minor adjustments) by MappingQ, we need to store this.
-    //  */
-    // unsigned int polynomial_degree;
-
-    // /**
-    //  * Number of shape functions. If this is a Q1 mapping, then it is simply
-    //  * the number of vertices per cell. However, since also derived classes
-    //  * use this class (e.g. the Mapping_Q() class), the number of shape
-    //  * functions may also be different.
-    //  *
-    //  * In general, it is $(p+1)^\text{dim}$, where $p$ is the polynomial
-    //  * degree of the mapping.
-    //  */
-    // const unsigned int n_shape_functions;
 
     /**
      * Tensors of covariant transformation at each of the quadrature points.
@@ -332,17 +297,6 @@ public:
      * Auxiliary vectors for internal use.
      */
     mutable std::vector<std::vector<Tensor<1,spacedim> > > aux;
-
-    // /**
-    //  * Stores the support points of the mapping shape functions on the @p
-    //  * cell_of_current_support_points.
-    //  */
-    // mutable std::vector<Point<spacedim> > mapping_support_points;
-
-    // /**
-    //  * Stores the cell of which the @p mapping_support_points are stored.
-    //  */
-    // mutable typename Triangulation<dim,spacedim>::cell_iterator cell_of_current_support_points;
 
     /**
      * The determinant of the Jacobian in each quadrature point. Filled if
@@ -454,103 +408,11 @@ MappingManifold<dim,spacedim>::InternalData::store_vertices (const typename Tria
 }
 
 
-
-// template<int dim, int spacedim>
-// inline
-// Tensor<1,dim> &
-// MappingManifold<dim,spacedim>::InternalData::derivative (const unsigned int qpoint,
-//                                                          const unsigned int shape_nr)
-// {
-//   Assert(qpoint*n_shape_functions + shape_nr < shape_derivatives.size(),
-//          ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
-//                        shape_derivatives.size()));
-//   return shape_derivatives [qpoint*n_shape_functions + shape_nr];
-// }
-
-
-// template <int dim, int spacedim>
-// inline
-// const Tensor<2,dim> &
-// MappingManifold<dim,spacedim>::InternalData::second_derivative (const unsigned int qpoint,
-//     const unsigned int shape_nr) const
-// {
-//   Assert(qpoint*n_shape_functions + shape_nr < shape_second_derivatives.size(),
-//          ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
-//                        shape_second_derivatives.size()));
-//   return shape_second_derivatives [qpoint*n_shape_functions + shape_nr];
-// }
-
-
-// template <int dim, int spacedim>
-// inline
-// Tensor<2,dim> &
-// MappingManifold<dim,spacedim>::InternalData::second_derivative (const unsigned int qpoint,
-//     const unsigned int shape_nr)
-// {
-//   Assert(qpoint*n_shape_functions + shape_nr < shape_second_derivatives.size(),
-//          ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
-//                        shape_second_derivatives.size()));
-//   return shape_second_derivatives [qpoint*n_shape_functions + shape_nr];
-// }
-
-// template <int dim, int spacedim>
-// inline
-// const Tensor<3,dim> &
-// MappingManifold<dim,spacedim>::InternalData::third_derivative (const unsigned int qpoint,
-//     const unsigned int shape_nr) const
-// {
-//   Assert(qpoint*n_shape_functions + shape_nr < shape_third_derivatives.size(),
-//          ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
-//                        shape_third_derivatives.size()));
-//   return shape_third_derivatives [qpoint*n_shape_functions + shape_nr];
-// }
-
-
-// template <int dim, int spacedim>
-// inline
-// Tensor<3,dim> &
-// MappingManifold<dim,spacedim>::InternalData::third_derivative (const unsigned int qpoint,
-//     const unsigned int shape_nr)
-// {
-//   Assert(qpoint*n_shape_functions + shape_nr < shape_third_derivatives.size(),
-//          ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
-//                        shape_third_derivatives.size()));
-//   return shape_third_derivatives [qpoint*n_shape_functions + shape_nr];
-// }
-
-
-// template <int dim, int spacedim>
-// inline
-// const Tensor<4,dim> &
-// MappingManifold<dim,spacedim>::InternalData::fourth_derivative (const unsigned int qpoint,
-//     const unsigned int shape_nr) const
-// {
-//   Assert(qpoint*n_shape_functions + shape_nr < shape_fourth_derivatives.size(),
-//          ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
-//                        shape_fourth_derivatives.size()));
-//   return shape_fourth_derivatives [qpoint*n_shape_functions + shape_nr];
-// }
-
-
-// template <int dim, int spacedim>
-// inline
-// Tensor<4,dim> &
-// MappingManifold<dim,spacedim>::InternalData::fourth_derivative (const unsigned int qpoint,
-//     const unsigned int shape_nr)
-// {
-//   Assert(qpoint*n_shape_functions + shape_nr < shape_fourth_derivatives.size(),
-//          ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
-//                        shape_fourth_derivatives.size()));
-//   return shape_fourth_derivatives [qpoint*n_shape_functions + shape_nr];
-// }
-
-
 template <int dim, int spacedim>
 inline
 void
 MappingManifold<dim,spacedim>::InternalData::compute_manifold_quadrature_weights (const Quadrature<dim> &quad)
 {
-  FE_Q<dim> fe_q(1);
   cell_manifold_quadrature_weights.resize(quad.size(), std::vector<double>(GeometryInfo<dim>::vertices_per_cell));
   for (unsigned int q=0; q<quad.size(); ++q)
     {
