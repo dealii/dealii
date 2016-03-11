@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Test high order MappingQ on Manifolds.
+// Test high order MappingQ on a ChartManifold.
 
 #include "../tests.h"
 

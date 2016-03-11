@@ -41,9 +41,15 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+
 template<int dim, int spacedim>
-MappingManifold<dim,spacedim>::InternalData::InternalData () :
-  fe_q(1)
+const FE_Q<dim,spacedim>
+MappingManifold<dim,spacedim>::fe_q = FE_Q<dim,spacedim>(1);
+
+
+
+template<int dim, int spacedim>
+MappingManifold<dim,spacedim>::InternalData::InternalData ()
 {}
 
 
@@ -176,18 +182,14 @@ initialize_face (const UpdateFlags      update_flags,
 
 
 template<int dim, int spacedim>
-MappingManifold<dim,spacedim>::MappingManifold () :
-  fe_q(1)
-  // support_point_weights_on_quad (compute_support_point_weights_on_quad<dim>(this->polynomial_degree)),
-  // support_point_weights_on_hex (compute_support_point_weights_on_hex<dim>(this->polynomial_degree)),
+MappingManifold<dim,spacedim>::MappingManifold ()
 {
 }
 
 
 
 template<int dim, int spacedim>
-MappingManifold<dim,spacedim>::MappingManifold (const MappingManifold<dim,spacedim> &mapping) :
-  fe_q(1)
+MappingManifold<dim,spacedim>::MappingManifold (const MappingManifold<dim,spacedim> &mapping)
 {}
 
 
@@ -452,7 +454,7 @@ namespace internal
 
                   // Get the weights to compute the np point in real space
                   for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_cell; ++j)
-                    weights[j] = data.fe_q.shape_value(j, np);
+                    weights[j] = MappingManifold<dim,spacedim>::fe_q.shape_value(j, np);
 
                   Point<spacedim> NP=data.manifold->
                                      get_new_point(Quadrature<spacedim>(data.vertices, weights));

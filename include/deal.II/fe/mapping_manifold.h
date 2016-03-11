@@ -305,11 +305,6 @@ public:
     mutable std::vector<double> volume_elements;
 
     /**
-     * A Q1 Finite element, to compute weights.
-     */
-    const FE_Q<dim> fe_q;
-
-    /**
      * A pointer to the Manifold in use.
      *
      * Updated each.
@@ -371,12 +366,12 @@ public:
    * @}
    */
 
-protected:
-
   /**
    * An FE_Q object, used to compute weights for Manifold quadratures.
    */
-  const FE_Q<dim,spacedim> fe_q;
+  static const FE_Q<dim,spacedim> fe_q;
+
+protected:
 
   /**
    * Transforms the point @p p on the real cell to the corresponding point on
