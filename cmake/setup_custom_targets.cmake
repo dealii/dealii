@@ -99,6 +99,19 @@ ADD_CUSTOM_TARGET(indent
   COMMENT "Indenting all files in the deal.II directories"
   )
 
+#
+# Provide "relocate" target to run install_name_tool on all external libraries
+# under ${DEAL_II_CPACK_EXTERNAL_LIBS_TREE}
+#
+IF(CMAKE_SYSTEM_NAME MATCHES "Darwin" AND 
+  NOT "${DEAL_II_CPACK_EXTERNAL_LIBS_TREE}" STREQUAL "")
+  ADD_CUSTOM_TARGET(relocate
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMAND ./contrib/utilities/relocate_libraries.py
+    COMMENT "Running install_name_tool under ${DEAL_II_CPACK_EXTERNAL_LIBS_TREE}"
+    )
+ENDIF()
+
 
 #
 # Provide an "info" target to print a help message:
@@ -139,6 +152,9 @@ FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 #    prune_tests    - remove all testsuite subprojects
 #
 #    indent         - indent all headers and source file
+#
+#    relocate       - (only available on Darwin machines) fix RPATH for external 
+#                     libraries, if packaging was requested
 #
 ###\")"
   )
