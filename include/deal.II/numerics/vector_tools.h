@@ -22,6 +22,8 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/point.h>
 #include <deal.II/dofs/function_map.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/mapping_collection.h>
 
 #include <map>
@@ -37,11 +39,9 @@ template <int dim> class QGauss;
 template <typename number> class Vector;
 template <typename number> class FullMatrix;
 template <int dim, int spacedim> class Mapping;
-template <int dim, int spacedim> class DoFHandler;
 template <typename gridtype> class InterGridMap;
 namespace hp
 {
-  template <int dim, int spacedim> class DoFHandler;
   template <int dim> class QCollection;
 }
 class ConstraintMatrix;
