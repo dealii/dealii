@@ -99,7 +99,8 @@ inconvenience this causes.
  <li> New: When using C++11, there is now a function Threads::new_task()
  that can take as an argument either a lambda function, or the result
  of a std::bind expression, or anything else that can be called as in a
- function call.
+ function call. There is also a similar function Threads::new_thread()
+ that takes the same kind of argument.
  <br>
  (Wolfgang Bangerth, 2016/03/07)
  </li>

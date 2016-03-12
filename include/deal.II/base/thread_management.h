@@ -1736,6 +1736,85 @@ namespace Threads
     return Thread<RT>(function);
   }
 
+
+#ifdef DEAL_II_WITH_CXX11
+
+  /**
+   * Overload of the new_thread() function for objects that can be called like a
+   * function object without arguments. In particular, this function allows
+   * calling Threads::new_thread() with either objects that result from using
+   * std::bind, or using lambda functions. For example, this function is called
+   * when writing code such as
+   * @code
+   * Threads::Thread<int>
+   *   thread = Threads::new_thread ( [] () {
+   *                                          do_this();
+   *                                          then_do_that();
+   *                                          return 42;
+   *                                        });
+   * @endcode
+   * Here, we run the sequence of functions
+   * <code>do_this()</code> and <code>then_do_that()</code> on
+   * a separate thread, by making the lambda function declared here the
+   * function to execute on the thread. The lambda function then returns
+   * 42 (which is a bit pointless here, but it could of course be some
+   * computed number), and this is going to be the returned value you
+   * can later retrieve via <code>thread.return_value()</code> once the
+   * thread (i.e., the body of the lambda function) has completed.
+   *
+   * @note Every lambda function (or whatever else it is you pass to
+   *   the new_thread() function here, for example the result of a
+   *   std::bind() expression) has a return type and consequently
+   *   returns an object of this type. This type can be inferred
+   *   using the C++11 <code>decltype</code> statement used in the
+   *   declaration of this function, and it is then used as the template
+   *   argument of the Threads::Thread object returned by the current function.
+   *   In the example above, because the lambda function returns 42
+   *   (which in C++ has data type <code>int</code>), the inferred
+   *   type is <code>int</code> and the task object will have type
+   *   <code>Task@<int@></code>. In other words, it is not <i>necessary</i>
+   *   to explicitly specify in user code what that return type
+   *   of the lambda or std::bind expression will be, though it is
+   *   possible to explicitly do so by (entirely equivalently) writing
+   *   @code
+   *   Threads::Thread<int>
+   *     thread = Threads::new_thread ( [] () -> int {
+   *                                                   do_this();
+   *                                                   then_do_that();
+   *                                                   return 42;
+   *                                                 });
+   *   @endcode
+   *
+   * @note In practice, the lambda functions you will pass to
+   *   new_thread() will of course typically be more complicated.
+   *   In particular, they will likely <i>capture</i> variables
+   *   from the surrounding context and use them within the lambda.
+   *   See https://en.wikipedia.org/wiki/Anonymous_function#C.2B.2B_.28since_C.2B.2B11.29
+   *   for more on how lambda functions work.
+   *
+   * @note If you pass a lambda function as an argument to the
+   *   current function that captures a variable <i>by reference</i>,
+   *   or if you use a std::bind that binds a function argument to
+   *   a reference variable using std::ref() or std::cref(), then
+   *   obviously you can only do this if the variables you reference
+   *   or capture have a lifetime that extends at least until the time
+   *   where the thread finishes.
+   *
+   * @ingroup CPP11
+   */
+  template <typename FunctionObjectType>
+  inline
+  auto
+  new_thread (FunctionObjectType function_object)
+  -> Thread<decltype(function_object())>
+  {
+    typedef decltype(function_object()) return_type;
+    return Thread<return_type>(std_cxx11::function<return_type ()>(function_object));
+  }
+
+#endif
+
+
   /**
    * Overload of the new_thread function for non-member or static member
    * functions with no arguments.
@@ -3094,7 +3173,7 @@ namespace Threads
   /**
    * Overload of the new_task function for objects that can be called like a
    * function object without arguments. In particular, this function allows
-   * calling Threads::new_thread() with either objects that result from using
+   * calling Threads::new_task() with either objects that result from using
    * std::bind, or using lambda functions. For example, this function is called
    * when writing code such as
    * @code
