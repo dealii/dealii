@@ -21,7 +21,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/fe/mapping_q_generic.h>
-#include <deal.II/fe/mapping_manifold.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/grid/manifold_lib.h>
 
