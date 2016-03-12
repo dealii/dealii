@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2015 by the deal.II authors
+// Copyright (C) 2005 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -513,7 +513,7 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
   // Check that all the processors have a contiguous range of values. Otherwise,
   // we risk to call different Epetra_Map on different processors and the code
   // hangs.
-  bool all_contiguous = (Utilities::MPI::min (is_contiguous() ? 1 : 0, communicator) == 1);
+  const bool all_contiguous = (Utilities::MPI::min (is_contiguous() ? 1 : 0, communicator) == 1);
   if ((all_contiguous) && (!overlapping))
     return Epetra_Map (TrilinosWrappers::types::int_type(size()),
                        TrilinosWrappers::types::int_type(n_elements()),
