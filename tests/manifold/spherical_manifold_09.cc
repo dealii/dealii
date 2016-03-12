@@ -59,64 +59,65 @@ void test()
 
   // Compute the points with the faces
   deallog << "Face quadratures ("
-	  << face_quad.size() * GeometryInfo<dim>::faces_per_cell
-	  << ")" << std::endl;
-  
-  for(unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f) {
-    std::vector<Point<spacedim> > vertices;
-    std::vector<double> weights(GeometryInfo<dim>::vertices_per_face);
-    
-    for(unsigned int i=0; i<GeometryInfo<dim>::vertices_per_face; ++i)
-      vertices.push_back(cell->face(f)->vertex(i));
-    
-    for (unsigned int i=0; i<face_quad.size(); ++i)
-    {
-      for(unsigned int v=0; v<weights.size(); ++v)
-	weights[v] = face_fe_q.shape_value(v, face_quad.point(i));
+          << face_quad.size() * GeometryInfo<dim>::faces_per_cell
+          << ")" << std::endl;
 
-      deallog << manifold.get_new_point(Quadrature<spacedim>(vertices, weights))
-	      << std::endl;
+  for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+    {
+      std::vector<Point<spacedim> > vertices;
+      std::vector<double> weights(GeometryInfo<dim>::vertices_per_face);
+
+      for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_face; ++i)
+        vertices.push_back(cell->face(f)->vertex(i));
+
+      for (unsigned int i=0; i<face_quad.size(); ++i)
+        {
+          for (unsigned int v=0; v<weights.size(); ++v)
+            weights[v] = face_fe_q.shape_value(v, face_quad.point(i));
+
+          deallog << manifold.get_new_point(Quadrature<spacedim>(vertices, weights))
+                  << std::endl;
+        }
     }
-  }
 
   // Project the face quads
   Quadrature<dim> quad = QProjector<dim>::project_to_all_faces(face_quad);
 
   deallog << "Face quadratures projected on cell "
-	  << "(" << quad.size() << ")" << std::endl;
+          << "(" << quad.size() << ")" << std::endl;
 
   std::vector<Point<spacedim> > vertices;
-  for(unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i) 
+  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
     vertices.push_back(cell->vertex(i));
 
   // Used to compute weights.
   FE_Q<dim> fe_q(1);
 
   std::vector<double> weights(GeometryInfo<dim>::vertices_per_cell);
-  
+
   for (unsigned int i=0; i<quad.size(); ++i)
     {
-      for(unsigned int v=0; v<weights.size(); ++v)
-	weights[v] = fe_q.shape_value(v, quad.point(i));
+      for (unsigned int v=0; v<weights.size(); ++v)
+        weights[v] = fe_q.shape_value(v, quad.point(i));
 
       deallog << manifold.get_new_point(Quadrature<spacedim>(vertices, weights))
-	      << std::endl;
+              << std::endl;
     }
 
   // for(unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f) {
   //   std::vector<Point<spacedim> > vertices;
   //   std::vector<double> weights(GeometryInfo<dim>::vertices_per_face);
-    
+
   //   for(unsigned int i=0; i<GeometryInfo<dim>::vertices_per_face; ++i)
   //     vertices.push_back(cell->face(f)->vertex(i));
-    
+
   //   for (unsigned int i=0; i<face_quad.size(); ++i)
   //   {
   //     for(unsigned int v=0; v<weights.size(); ++v)
-  // 	weights[v] = face_fe_q.shape_value(v, face_quad.point(i));
+  //  weights[v] = face_fe_q.shape_value(v, face_quad.point(i));
 
   //     deallog << manifold.get_new_point(Quadrature<spacedim>(vertices, weights))
-  // 	      << std::endl;
+  //        << std::endl;
   //   }
   // }
 }
