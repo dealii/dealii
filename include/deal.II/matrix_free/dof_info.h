@@ -37,7 +37,7 @@ namespace internal
 {
   namespace MatrixFreeFunctions
   {
-    template <typename Number> class ConstraintValues;
+    template <typename Number> struct ConstraintValues;
 
     /**
      * The class that stores the indices of the degrees of freedom for all the
