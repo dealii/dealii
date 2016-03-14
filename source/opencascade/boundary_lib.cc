@@ -18,6 +18,8 @@
 
 #ifdef DEAL_II_WITH_OPENCASCADE
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+
 #include <GCPnts_AbscissaPoint.hxx>
 #include <BRepAdaptor_Curve.hxx>
 #include <BRepAdaptor_CompCurve.hxx>
@@ -31,6 +33,8 @@
 #include <TopoDS.hxx>
 #include <Adaptor3d_HCurve.hxx>
 #include <Handle_Adaptor3d_HCurve.hxx>
+
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 
