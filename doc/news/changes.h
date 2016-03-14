@@ -89,6 +89,14 @@ inconvenience this causes.
 
 
 <ol>
+ <li> New: Added custom target "relocate" to Mac OS X builds, that runs 
+ a script to make all paths absolute in the shared libraries included
+ in the deal.II package (only enabled when building a package, and when
+ including external libraries to the package)
+ <br> 
+ (Luca Heltai, 2016/03/14) 
+ </li> 
+  
  <li> New: Add NURBSPatchManifold. This class is a child of ChartManifold and
  implements a manifold descriptor for the face of a CAD imported usign 
  OpenCASCADE.
