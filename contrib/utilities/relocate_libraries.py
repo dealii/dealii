@@ -1,9 +1,24 @@
 #!/usr/bin/env python
 
-# This script runs install_name_tool on each library under basedir (first argument
-# on command line) and makes sure that all libraries are installed with absolute
-# id name. This makes Mac OS X happy about not using DYLD_LIBRARY_PATH, which is generally
-# a bad thing. 
+## ---------------------------------------------------------------------
+##
+## Copyright (C) 2016 by the deal.II authors
+##
+## This file is part of the deal.II library.
+##
+## The deal.II library is free software; you can use it, redistribute
+## it, and/or modify it under the terms of the GNU Lesser General
+## Public License as published by the Free Software Foundation; either
+## version 2.1 of the License, or (at your option) any later version.
+## The full text of the license can be found in the file LICENSE at
+## the top level of the deal.II distribution.
+##
+## ---------------------------------------------------------------------
+
+## This script runs install_name_tool on each library under basedir (first argument
+## on command line) and makes sure that all libraries are installed with absolute
+## id name. This makes Mac OS X happy about not using DYLD_LIBRARY_PATH, which is generally
+## a bad thing. 
 
 import os
 import sys
