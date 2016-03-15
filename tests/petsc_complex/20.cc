@@ -48,7 +48,7 @@ void test (PETScWrappers::Vector &v,
   w.compress (VectorOperation::insert);
 
   // make sure the scalar product is zero
-  Assert (v*w == product, ExcInternalError());
+  AssertThrow (v*w == product, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

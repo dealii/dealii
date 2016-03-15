@@ -37,7 +37,7 @@ void test (PETScWrappers::Vector &v,
     w(k) += v(k);
 
   // check that they're equal
-  Assert (v==w, ExcInternalError());
+  AssertThrow (v==w, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

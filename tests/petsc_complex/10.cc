@@ -40,13 +40,13 @@ void test (PETScWrappers::SparseMatrix &m)
     for (unsigned int j=0; j<m.m(); ++j)
       if ((i+2*j+1) % 3 == 0)
         {
-          Assert (m(i,j)    == std::complex<double> (0.,(i*j*.5+.5)/4*3), ExcInternalError());
-          Assert (m.el(i,j) == std::complex<double> (0.,(i*j*.5+.5)/4*3), ExcInternalError());
+          AssertThrow (m(i,j)    == std::complex<double> (0.,(i*j*.5+.5)/4*3), ExcInternalError());
+          AssertThrow (m.el(i,j) == std::complex<double> (0.,(i*j*.5+.5)/4*3), ExcInternalError());
         }
       else
         {
-          Assert (m(i,j)    == std::complex<double> (0.,0.), ExcInternalError());
-          Assert (m.el(i,j) == std::complex<double> (0.,0.), ExcInternalError());
+          AssertThrow (m(i,j)    == std::complex<double> (0.,0.), ExcInternalError());
+          AssertThrow (m.el(i,j) == std::complex<double> (0.,0.), ExcInternalError());
         }
 
   deallog << "OK" << std::endl;

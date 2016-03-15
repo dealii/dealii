@@ -36,7 +36,7 @@ void test (PETScWrappers::Vector &v,
         w(k) = std::complex<double> (k+1.,k+1.);
     }
 
-  Assert (!(v==w), ExcInternalError());
+  AssertThrow (!(v==w), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

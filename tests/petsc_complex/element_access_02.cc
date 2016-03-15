@@ -38,8 +38,8 @@ void test (PETScWrappers::SparseMatrix &m)
   // check the matrix is correctly filled
   for (unsigned int k=0; k<m.m(); ++k)
     for (unsigned int l=0; l<m.n(); ++l)
-      Assert (m(k,l).real () == -1.*(m(k,l).imag ()),
-              ExcInternalError());
+      AssertThrow (m(k,l).real () == -1.*(m(k,l).imag ()),
+                   ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

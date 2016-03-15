@@ -38,8 +38,8 @@ void test (PETScWrappers::SparseMatrix &m)
   m.compress (VectorOperation::insert);
 
   deallog << m.n_nonzero_elements() << std::endl;
-  Assert (m.n_nonzero_elements() == counter,
-          ExcInternalError());
+  AssertThrow (m.n_nonzero_elements() == counter,
+               ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

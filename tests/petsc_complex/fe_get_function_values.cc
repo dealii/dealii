@@ -152,8 +152,8 @@ void test ()
 
           for (unsigned int q=0; q<n_q_points; ++q)
             {
-              Assert ( PetscRealPart(values[q])      == values_Re[q], ExcInternalError() );
-              Assert ( PetscImaginaryPart(values[q]) == values_Im[q], ExcInternalError() );
+              AssertThrow ( PetscRealPart(values[q])      == values_Re[q], ExcInternalError() );
+              AssertThrow ( PetscImaginaryPart(values[q]) == values_Im[q], ExcInternalError() );
             }
         }
   }

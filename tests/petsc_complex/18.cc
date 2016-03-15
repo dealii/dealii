@@ -41,7 +41,7 @@ void test (PETScWrappers::Vector &v)
 
   // then check the l2-norm
   PetscReal l2_norm = v.l2_norm();
-  Assert (l2_norm==std::sqrt(norm), ExcInternalError());
+  AssertThrow (l2_norm==std::sqrt(norm), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

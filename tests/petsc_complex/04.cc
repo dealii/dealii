@@ -24,8 +24,8 @@
 
 void test (PETScWrappers::SparseMatrix &m)
 {
-  Assert (m.m() == 5, ExcInternalError());
-  Assert (m.n() == 5, ExcInternalError());
+  AssertThrow (m.m() == 5, ExcInternalError());
+  AssertThrow (m.n() == 5, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

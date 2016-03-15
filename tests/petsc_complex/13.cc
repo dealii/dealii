@@ -39,10 +39,10 @@ void test (PETScWrappers::Vector &v)
 
   // check that they are ok, and this time all of them
   for (unsigned int i=0; i<v.size(); ++i)
-    Assert ( ( (pattern[i]==true) && (v(i).real()==i) && (v(i).imag()==i) ) ||
-             //&& (v(i)==std::complex<double> (1.,1.)) ) ||
-             ( (pattern[i]==false) && (v(i).real()==0.) && (v(i).imag()==0.) ),
-             ExcInternalError());
+    AssertThrow ( ( (pattern[i]==true) && (v(i).real()==i) && (v(i).imag()==i) ) ||
+                  //&& (v(i)==std::complex<double> (1.,1.)) ) ||
+                  ( (pattern[i]==false) && (v(i).real()==0.) && (v(i).imag()==0.) ),
+                  ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

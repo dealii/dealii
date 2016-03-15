@@ -48,8 +48,8 @@ void test_matrix (PETScWrappers::SparseMatrix &m)
         PetscReal el_r = static_cast<double> (k+l);
         PetscReal el_i = static_cast<double> (-1.*(k+l));
 
-        Assert ((m(k,l).real ()==el_r) && (m(k,l).imag ()==el_i),
-                ExcInternalError());
+        AssertThrow ((m(k,l).real ()==el_r) && (m(k,l).imag ()==el_i),
+                     ExcInternalError());
       }
 
   deallog << "OK" << std::endl;

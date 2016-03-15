@@ -42,11 +42,11 @@ void multiply_petsc_complex_by_a_number ()
   const PetscScalar gamma = alpha * beta;
 
   // Check real access
-  Assert (PetscRealPart (gamma)==0., ExcInternalError());
-  Assert (PetscImaginaryPart (gamma) ==5., ExcInternalError());
+  AssertThrow (PetscRealPart (gamma)==0., ExcInternalError());
+  AssertThrow (PetscImaginaryPart (gamma) ==5., ExcInternalError());
 
   // This is legal too!
-  Assert (gamma==std::complex<double> (0.,5), ExcInternalError());
+  AssertThrow (gamma==std::complex<double> (0.,5), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -63,18 +63,18 @@ void divide_petsc_complex_by_a_number ()
   const PetscScalar beta = alpha/2.;
 
   // Check real access
-  Assert (PetscRealPart (alpha)==1.,  ExcInternalError());
-  Assert (PetscRealPart (beta) ==0.5, ExcInternalError());
+  AssertThrow (PetscRealPart (alpha)==1.,  ExcInternalError());
+  AssertThrow (PetscRealPart (beta) ==0.5, ExcInternalError());
 
   // operate on alpha (now alpha==beta)
   alpha /= 2.;
 
   // Check complex access
-  Assert (PetscImaginaryPart (alpha)==1., ExcInternalError());
-  Assert (PetscImaginaryPart (beta) ==1., ExcInternalError());
+  AssertThrow (PetscImaginaryPart (alpha)==1., ExcInternalError());
+  AssertThrow (PetscImaginaryPart (beta) ==1., ExcInternalError());
 
   // This is legal too!
-  Assert (alpha==beta, ExcInternalError());
+  AssertThrow (alpha==beta, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -87,7 +87,7 @@ void make_std_complex_from_petsc_complex ()
   const std::complex<double> beta = alpha;
 
   // These should be the same of course
-  Assert (alpha==beta, ExcInternalError());
+  AssertThrow (alpha==beta, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -100,7 +100,7 @@ void make_petsc_complex_from_std_complex ()
   const PetscScalar alpha = beta;
 
   // These should be the same of course
-  Assert (alpha==beta, ExcInternalError());
+  AssertThrow (alpha==beta, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -114,7 +114,7 @@ void make_petsc_complex ()
   const PetscScalar alpha = 1.0 + 2.0*PETSC_i;
 
   // Test if PetscScalar is an std::complex.
-  Assert (alpha==std::complex<double> (1.,2.), ExcInternalError());
+  AssertThrow (alpha==std::complex<double> (1.,2.), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -127,18 +127,18 @@ void init_petsc_complex ()
 
   // Initialise (no argument) to zero.
   const PetscScalar alpha;
-  Assert (alpha==std::complex<double> (0.,0.), ExcInternalError());
+  AssertThrow (alpha==std::complex<double> (0.,0.), ExcInternalError());
 
   // Initialise (real argument) to zero.
   const PetscScalar beta = 0.;
-  Assert (beta==alpha, ExcInternalError());
+  AssertThrow (beta==alpha, ExcInternalError());
 
   // Initialise (real+complex argument) to zero.
   const PetscScalar gamma = 0. + 0.*PETSC_i;
-  Assert (gamma==beta, ExcInternalError());
+  AssertThrow (gamma==beta, ExcInternalError());
 
   // If alpha==beta==gamma, then:
-  Assert (alpha==gamma, ExcInternalError());
+  AssertThrow (alpha==gamma, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

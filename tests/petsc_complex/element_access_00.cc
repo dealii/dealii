@@ -42,16 +42,16 @@ void test_vector (PETScWrappers::Vector &v)
   // check that is what we get by casting PetscScalar to std::real()
   // and std::imag()
   for (unsigned int k=0; k<v.size(); ++k)
-    Assert ((static_cast<std::complex<double> > (v(k)).real ()==k) &&
-            (static_cast<std::complex<double> > (v(k)).imag ()==v.size()-k),
-            ExcInternalError());
+    AssertThrow ((static_cast<std::complex<double> > (v(k)).real ()==k) &&
+                 (static_cast<std::complex<double> > (v(k)).imag ()==v.size()-k),
+                 ExcInternalError());
 
   // check that is what we get by
   // dealii::internal::VectorReference::real() and
   // dealii::internal::VectorReference::imag()
   for (unsigned int k=0; k<v.size(); ++k)
-    Assert ((v(k).real ()==k) && (v(k).imag ()==v.size()-k),
-            ExcInternalError());
+    AssertThrow ((v(k).real ()==k) && (v(k).imag ()==v.size()-k),
+                 ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
