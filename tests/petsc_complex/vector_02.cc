@@ -35,13 +35,8 @@ void test ()
   v.compress (VectorOperation::insert);
 
   PETScWrappers::Vector v2(s);
-  for (unsigned int k=0; k<v2.size(); ++k)
-    {
-      // This fails
-      // v2(k) = PetscScalar (k,-k);
-      // This is ok
-      v2(k) = PetscScalar (k,-1.0*k);
-    }
+  for (int k=0; k<v2.size(); ++k)
+    v2(k) = PetscScalar (k,-k);
 
   v2.compress(VectorOperation::insert);
 
