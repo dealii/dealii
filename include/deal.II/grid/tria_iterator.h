@@ -364,24 +364,6 @@ public:
   TriaRawIterator &operator = (const TriaRawIterator &);
 
   /**
-   * Assignment operator.
-   */
-//    template <class OtherAccessor>
-//    TriaRawIterator & operator = (const TriaRawIterator<OtherAccessor>&);
-
-  /**
-   * Assignment operator.
-   */
-//    template <class OtherAccessor>
-//    TriaRawIterator & operator = (const TriaIterator<OtherAccessor>&);
-
-  /**
-   * Assignment operator.
-   */
-//    template <class OtherAccessor>
-//    TriaRawIterator & operator = (const TriaActiveIterator<OtherAccessor>&);
-
-  /**
    * Compare for equality.
    */
   bool operator == (const TriaRawIterator &) const;
