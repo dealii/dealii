@@ -68,6 +68,11 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li> New: Added unit tests for complex-valued PETSc and SLEPc.
+ <br>
+ (Toby D. Young, Denis Davydov, 2016/03/11)
+ </li>
+
  <li> New: Added another scaling factor to Kelly error estimator, namely h_K.
  <br>
  (Denis Davydov, 2016/03/05)

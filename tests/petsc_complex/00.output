@@ -1,0 +1,13 @@
+
+DEAL::Check PetscScalar initialisation
+DEAL::OK
+DEAL::Check a nonzero PetscScalar
+DEAL::OK
+DEAL::Check PetscScalar initialised from std
+DEAL::OK
+DEAL::Check std initialised from PetscScalar
+DEAL::OK
+DEAL::Check PetscScalar division
+DEAL::OK
+DEAL::Check PetscScalar multiply
+DEAL::OK
