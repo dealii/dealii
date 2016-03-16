@@ -398,7 +398,7 @@ namespace LinearAlgebra
 
     // in >> c;
     in.read(&c,1);
-    AssertThrow(c=']', ExcIO());
+    AssertThrow(c==']', ExcIO());
   }
 }
 
