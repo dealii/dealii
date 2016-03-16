@@ -41,25 +41,6 @@ template <int dim> const unsigned int GeometryInfo<dim>::hexes_per_cell;
 
 using namespace numbers;
 
-// make sure that also the icc compiler defines (and not only declares)
-// these variables
-namespace internal
-{
-  void foo (const unsigned int *) {}
-
-  template <int dim>
-  void define_variables ()
-  {
-    foo(&::dealii::GeometryInfo<dim>::vertices_per_cell);
-  }
-
-  template void define_variables<2> ();
-  template void define_variables<3> ();
-  template void define_variables<4> ();
-}
-
-
-
 template <>
 const unsigned int
 GeometryInfo<1>::unit_normal_direction[faces_per_cell]
