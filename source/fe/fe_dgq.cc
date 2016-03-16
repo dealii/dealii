@@ -17,6 +17,7 @@
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/template_constraints.h>
+#include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_tools.h>
 
@@ -200,6 +201,8 @@ FE_DGQ<dim, spacedim>::FE_DGQ (const Quadrature<1> &points)
   // are the tensor product of the
   // Lagrange interpolation points in
   // the constructor.
+  Assert (points.size() > 0,
+          (typename FiniteElement<dim, spacedim>::ExcFEHasNoSupportPoints ()));
   Quadrature<dim> support_quadrature(points);
   this->unit_support_points = support_quadrature.get_points();
 
