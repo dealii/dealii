@@ -38,6 +38,12 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Removed: Support for the legacy <code>Make.global_options</code>
+  file has been removed.
+  <br>
+  (Matthias Maier, 2016/03/17)
+  </li>
+
   <li> Removed: Functions with names containing <code>boundary_indicator</code>
   have been removed. They had previously already been deprecated, and replaced
   by functions containing the string <code>boundary_id</code> instead, to keep
