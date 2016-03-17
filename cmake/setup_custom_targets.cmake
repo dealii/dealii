@@ -139,9 +139,30 @@ FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 #    prune_tests    - remove all testsuite subprojects
 #
 #    indent         - indent all headers and source file
+")
+
 #
+# Provide "relocate" target to run install_name_tool on all external libraries
+# under ${DEAL_II_CPACK_EXTERNAL_LIBS_TREE}
+#
+IF(CMAKE_SYSTEM_NAME MATCHES "Darwin" AND 
+  NOT "${DEAL_II_CPACK_EXTERNAL_LIBS_TREE}" STREQUAL "")
+  ADD_CUSTOM_TARGET(relocate
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMAND ./contrib/utilities/relocate_libraries.py
+    COMMENT "Running install_name_tool under ${DEAL_II_CPACK_EXTERNAL_LIBS_TREE}"
+    )
+  FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
+  "#
+#    relocate       - fix RPATH for external libraries, if packaging was requested
+"
+   )
+ENDIF()
+
+FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
+"#
 ###\")"
-  )
+)
 
 ADD_CUSTOM_TARGET(info
   COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
