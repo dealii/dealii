@@ -321,8 +321,8 @@ void MGTransferMatrixFree<dim,Number>::build
       std::vector<types::global_dof_index> ghosted_level_dofs_l0;
 
       // step 2.1: loop over the cells on the coarse side
-      for (typename DoFHandler<dim>::cell_iterator cell = mg_dof.begin(level-1);
-           cell != mg_dof.end(level-1); ++cell)
+      typename DoFHandler<dim>::cell_iterator cell, endc = mg_dof.end(level-1);
+      for (cell = mg_dof.begin(level-1); cell != endc; ++cell)
         {
           // need to look into a cell if it has children and it is locally owned
           if (!cell->has_children())

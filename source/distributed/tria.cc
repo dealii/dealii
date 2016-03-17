@@ -4681,7 +4681,9 @@ namespace parallel
     {
       const std::vector<bool> locally_active_vertices =
         mark_locally_active_vertices_on_level(level);
-      for (cell_iterator cell = this->begin(level); cell != this->end(level); ++cell)
+      cell_iterator cell = this->begin(level),
+                    endc = this->end(level);
+      for ( ; cell != endc; ++cell)
         if (cell->level_subdomain_id() != dealii::numbers::artificial_subdomain_id
             && cell->level_subdomain_id() != this->locally_owned_subdomain())
           for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
@@ -4704,7 +4706,9 @@ namespace parallel
       Assert (dim>1, ExcNotImplemented());
 
       std::vector<bool> marked_vertices(this->n_vertices(), false);
-      for (cell_iterator cell = this->begin(level); cell != this->end(level); ++cell)
+      cell_iterator cell = this->begin(level),
+                    endc = this->end(level);
+      for ( ; cell != endc; ++cell)
         if (cell->level_subdomain_id() == this->locally_owned_subdomain())
           for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
             marked_vertices[cell->vertex_index(v)] = true;
