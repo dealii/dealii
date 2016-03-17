@@ -2437,7 +2437,7 @@ void GridIn<2>::read_tecplot (std::istream &in)
             cells[cell].vertices[3]=i  +(j+1)*I;
             ++cell;
           }
-      Assert(cell=n_cells, ExcInternalError());
+      Assert(cell==n_cells, ExcInternalError());
       std::vector<unsigned int> boundary_vertices(2*I+2*J-4);
       unsigned int k=0;
       for (unsigned int i=1; i<I+1; ++i)
