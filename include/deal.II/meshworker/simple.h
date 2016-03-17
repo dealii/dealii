@@ -72,11 +72,11 @@ namespace MeshWorker
        * structure in DoFInfo is being used.
        *
        * Store information on the local block structure. If the assembler is
-       * inititialized with this function, initialize_info() will generate one
+       * initialized with this function, initialize_info() will generate one
        * local matrix for each block row and column, which will be numbered
        * lexicographically, row by row.
        *
-       * In spite of using local block structure, all blocks will be enteres
+       * In spite of using local block structure, all blocks will be entered
        * into the same global matrix, disregarding any global block structure.
        */
 
@@ -109,7 +109,7 @@ namespace MeshWorker
                     const DOFINFO &info2);
     protected:
       /**
-       * The global residal vectors filled by assemble().
+       * The global residual vectors filled by assemble().
        */
       AnyData residuals;
 
@@ -957,7 +957,7 @@ namespace MeshWorker
         for (unsigned int k=0; k<i2.size(); ++k)
           if (std::fabs(M(j,k)) >= threshold)
             // Enter values into matrix only if j corresponds to a
-            // degree of freedom on the refinemenent edge, k does
+            // degree of freedom on the refinement edge, k does
             // not, and both are not on the boundary. This is part
             // the difference between the complete matrix with no
             // boundary condition at the refinement edge and and

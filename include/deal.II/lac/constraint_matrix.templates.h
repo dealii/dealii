@@ -645,11 +645,11 @@ distribute_local_to_global (const Vector<LocalType>      &local_vector,
 
   // diagonal checks if we have only one index set (if both are equal
   // diagonal should be set to true).
-  // If true we do both, assemply of the right hand side (next lines)
+  // If true we do both, assembly of the right hand side (next lines)
   // and (see further below) modifications of the right hand side
   // according to the inhomogeneous constraints.
   // Otherwise we only modify the right hand side according to
-  // local_matrix and the inhomogeneos constraints, and omit the vector add.
+  // local_matrix and the inhomogeneous constraints, and omit the vector add.
 
   const size_type m_local_dofs = local_dof_indices_row.size();
   const size_type n_local_dofs = local_dof_indices_col.size();
