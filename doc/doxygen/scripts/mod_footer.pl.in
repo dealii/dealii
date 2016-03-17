@@ -4,8 +4,8 @@ my $host = hostname;
 
 my $hosting = << 'EOT'
 &nbsp;&nbsp;Hosting provided by&nbsp;
-<a href="http://www.iwr.uni-heidelberg.de/"><img src="http://www.dealii.org/pictures/IWRlogo4.png" alt="IWR"></a>
-<a href="http://www.uni-heidelberg.de/"><img src="http://www.dealii.org/pictures/UniLogo4.png" alt="Universität Heidelberg"></a>
+<a href="http://www.iwr.uni-heidelberg.de/"><img src="https://www.dealii.org/pictures/IWRlogo4.png" alt="IWR"></a>
+<a href="http://www.uni-heidelberg.de/"><img src="https://www.dealii.org/pictures/UniLogo4.png" alt="Universität Heidelberg"></a>
 EOT
     ;
 
