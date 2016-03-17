@@ -106,9 +106,9 @@ namespace LocalIntegrators
 
 
     /**
-     * The weak boundary condition of Nitsche type for linear elasticity:
+     * The matrix for the weak boundary condition of Nitsche type for linear elasticity:
      * @f[
-     * \int_F \Bigl(\gamma (u-g) \cdot v - n^T \epsilon(u) v - (u-g) \epsilon(v) n^T\Bigr)\;ds.
+     * \int_F \Bigl(\gamma u \cdot v - n^T \epsilon(u) v - u \epsilon(v) n\Bigr)\;ds.
      * @f]
      */
     template <int dim>
@@ -147,6 +147,67 @@ namespace LocalIntegrators
                       M(i,j) -= .5*dx* fe.shape_grad_component(i,k,d2)[d1] *n[d2]* u;
                     }
                 }
+        }
+    }
+
+    /**
+     * The matrix for the weak boundary condition of Nitsche type for the tangential displacement in linear elasticity:
+     * @f[
+     * \int_F \Bigl(\gamma u_\tau \cdot v_\tau - n^T \epsilon(u_\tau) v_\tau - u_\tau^T \epsilon(v_\tau) n\Bigr)\;ds.
+     * @f]
+     */
+    template <int dim>
+    inline void nitsche_tangential_matrix (
+      FullMatrix<double> &M,
+      const FEValuesBase<dim> &fe,
+      double penalty,
+      double factor = 1.)
+    {
+      const unsigned int n_dofs = fe.dofs_per_cell;
+
+      AssertDimension(fe.get_fe().n_components(), dim);
+      AssertDimension(M.m(), n_dofs);
+      AssertDimension(M.n(), n_dofs);
+
+      for (unsigned int k=0; k<fe.n_quadrature_points; ++k)
+        {
+          const double dx = factor * fe.JxW(k);
+          const Tensor<1,dim> n = fe.normal_vector(k);
+          for (unsigned int i=0; i<n_dofs; ++i)
+            for (unsigned int j=0; j<n_dofs; ++j)
+              {
+                double udotn = 0.;
+                double vdotn = 0.;
+                double ngradun = 0.;
+                double ngradvn = 0.;
+
+                for (unsigned int d=0; d<dim; ++d)
+                  {
+                    udotn += n[d]*fe.shape_value_component(j,k,d);
+                    vdotn += n[d]*fe.shape_value_component(i,k,d);
+                    ngradun += n*fe.shape_grad_component(j,k,d)*n[d];
+                    ngradvn += n*fe.shape_grad_component(i,k,d)*n[d];
+                  }
+                for (unsigned int d1=0; d1<dim; ++d1)
+                  {
+                    const double u = fe.shape_value_component(j,k,d1) - udotn * n[d1];
+                    const double v = fe.shape_value_component(i,k,d1) - vdotn * n[d1];
+                    M(i,j) += dx * 2. * penalty * u * v;
+                    // Correct the gradients below and subtract normal component
+                    M(i,j) += dx * (ngradun * v + ngradvn * u);
+                    for (unsigned int d2=0; d2<dim; ++d2)
+                      {
+                        // v . nabla u n
+                        M(i,j) -= .5*dx* fe.shape_grad_component(j,k,d1)[d2] *n[d2]* v;
+                        // v (nabla u)^T n
+                        M(i,j) -= .5*dx* fe.shape_grad_component(j,k,d2)[d1] *n[d2]* v;
+                        // u  nabla v n
+                        M(i,j) -= .5*dx* fe.shape_grad_component(i,k,d1)[d2] *n[d2]* u;
+                        // u (nabla v)^T n
+                        M(i,j) -= .5*dx* fe.shape_grad_component(i,k,d2)[d1] *n[d2]* u;
+                      }
+                  }
+              }
         }
     }
 
@@ -205,6 +266,72 @@ namespace LocalIntegrators
                     result(i) -= .5*dx * (u-g) * fe.shape_grad_component(i,k,d2)[d1] * n[d2];
                   }
               }
+        }
+    }
+
+    /**
+     * The weak boundary condition of Nitsche type for the tangential displacement in linear elasticity:
+     * @f[
+     * \int_F \Bigl(\gamma (u_\tau-g_\tau) \cdot v_\tau - n^T \epsilon(u_\tau) v - (u_\tau-g_\tau) \epsilon(v_\tau) n\Bigr)\;ds.
+     * @f]
+     */
+    template <int dim, typename number>
+    inline void nitsche_tangential_residual (
+      Vector<number> &result,
+      const FEValuesBase<dim> &fe,
+      const VectorSlice<const std::vector<std::vector<double> > > &input,
+      const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > > &Dinput,
+      const VectorSlice<const std::vector<std::vector<double> > > &data,
+      double penalty,
+      double factor = 1.)
+    {
+      const unsigned int n_dofs = fe.dofs_per_cell;
+      AssertVectorVectorDimension(input, dim, fe.n_quadrature_points);
+      AssertVectorVectorDimension(Dinput, dim, fe.n_quadrature_points);
+      AssertVectorVectorDimension(data, dim, fe.n_quadrature_points);
+
+      for (unsigned int k=0; k<fe.n_quadrature_points; ++k)
+        {
+          const double dx = factor * fe.JxW(k);
+          const Tensor<1,dim> n = fe.normal_vector(k);
+          for (unsigned int i=0; i<n_dofs; ++i)
+            {
+              double udotn = 0.;
+              double gdotn = 0.;
+              double vdotn = 0.;
+              double ngradun = 0.;
+              double ngradvn = 0.;
+
+              for (unsigned int d=0; d<dim; ++d)
+                {
+                  udotn += n[d]*input[d][k];
+                  gdotn += n[d]*data[d][k];
+                  vdotn += n[d]*fe.shape_value_component(i,k,d);
+                  ngradun += n*Dinput[d][k]*n[d];
+                  ngradvn += n*fe.shape_grad_component(i,k,d)*n[d];
+                }
+              for (unsigned int d1=0; d1<dim; ++d1)
+                {
+                  const double u= input[d1][k] - udotn*n[d1];
+                  const double v= fe.shape_value_component(i,k,d1) - vdotn*n[d1];
+                  const double g= data[d1][k] - gdotn*n[d1];
+                  result(i) += dx * 2.*penalty * (u-g) * v;
+                  // Correct the gradients below and subtract normal component
+                  result(i) += dx * (ngradun * v + ngradvn * (u-g));
+                  for (unsigned int d2=0; d2<dim; ++d2)
+                    {
+
+                      // v . nabla u n
+                      result(i) -= .5*dx* Dinput[d1][k][d2] *n[d2]* v;
+                      // v (nabla u)^T n
+                      result(i) -= .5*dx* Dinput[d2][k][d1] *n[d2]* v;
+                      // u  nabla v n
+                      result(i) -= .5*dx* (u-g) * fe.shape_grad_component(i,k,d1)[d2] *n[d2];
+                      // u (nabla v)^T n
+                      result(i) -= .5*dx* (u-g) * fe.shape_grad_component(i,k,d2)[d1] *n[d2];
+                    }
+                }
+            }
         }
     }
 
