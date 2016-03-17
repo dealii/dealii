@@ -19,6 +19,8 @@ for (S: REAL_SCALARS; T : DEAL_II_VEC_TEMPLATES)
     template void ConstraintMatrix::condense<T<S> >(T<S> &vec) const;
     template void ConstraintMatrix::distribute_local_to_global<T<S> > (
       const Vector<S>&, const std::vector<types::global_dof_index> &, T<S> &, const FullMatrix<S>&) const;  
+    template void ConstraintMatrix::distribute_local_to_global<T<S> > (
+      const Vector<S>&, const std::vector<types::global_dof_index> &, const std::vector<types::global_dof_index> &, T<S> &, const FullMatrix<S>&, bool) const;
     template void ConstraintMatrix::set_zero<T<S> >(T<S> &) const;
   }
 
@@ -28,7 +30,9 @@ for (S: REAL_SCALARS; T : DEAL_II_VEC_TEMPLATES)
     template void ConstraintMatrix::condense<parallel::distributed::T<S> >(const parallel::distributed::T<S> &, parallel::distributed::T<S> &) const;
     template void ConstraintMatrix::condense<parallel::distributed::T<S> >(parallel::distributed::T<S> &vec) const;
     template void ConstraintMatrix::distribute_local_to_global<parallel::distributed::T<S> > (
-      const Vector<double>&, const std::vector<types::global_dof_index> &, parallel::distributed::T<S> &, const FullMatrix<double>&) const;
+      const Vector<S>&, const std::vector<types::global_dof_index> &, parallel::distributed::T<S> &, const FullMatrix<S>&) const;
+    template void ConstraintMatrix::distribute_local_to_global<parallel::distributed::T<S> > (
+      const Vector<S>&, const std::vector<types::global_dof_index> &, const std::vector<types::global_dof_index> &, parallel::distributed::T<S> &, const FullMatrix<S>&, bool) const;
     template void ConstraintMatrix::set_zero<parallel::distributed::T<S> >(parallel::distributed::T<S> &) const;
   }
 
@@ -39,6 +43,8 @@ for (V: EXTERNAL_SEQUENTIAL_VECTORS)
     template void ConstraintMatrix::condense<V >(V&vec) const;
     template void ConstraintMatrix::distribute_local_to_global<V > (
       const Vector<V::value_type>&, const std::vector<types::global_dof_index> &, V&, const FullMatrix<V::value_type>&) const;
+    template void ConstraintMatrix::distribute_local_to_global<V > (
+      const Vector<V::value_type>&, const std::vector<types::global_dof_index> &, const std::vector<types::global_dof_index> &, V&, const FullMatrix<V::value_type>&, bool) const;
     template void ConstraintMatrix::set_zero<V >(V&) const;
   }
 
