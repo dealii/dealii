@@ -172,8 +172,8 @@ void MGTransferPrebuilt<VectorType>::build_matrices
       DynamicSparsityPattern dsp (this->sizes[level+1],
                                   this->sizes[level],
                                   level_p1_relevant_dofs);
-      for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
-           cell != mg_dof.end(level); ++cell)
+      typename DoFHandler<dim>::cell_iterator cell, endc = mg_dof.end(level);
+      for (cell=mg_dof.begin(level); cell != endc; ++cell)
         if (cell->has_children() &&
             ( mg_dof.get_triangulation().locally_owned_subdomain()==numbers::invalid_subdomain_id
               || cell->level_subdomain_id()==mg_dof.get_triangulation().locally_owned_subdomain()
@@ -219,8 +219,7 @@ void MGTransferPrebuilt<VectorType>::build_matrices
       FullMatrix<double> prolongation;
 
       // now actually build the matrices
-      for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
-           cell != mg_dof.end(level); ++cell)
+      for (cell=mg_dof.begin(level); cell != endc; ++cell)
         if (cell->has_children() &&
             (mg_dof.get_triangulation().locally_owned_subdomain()==numbers::invalid_subdomain_id
              || cell->level_subdomain_id()==mg_dof.get_triangulation().locally_owned_subdomain())

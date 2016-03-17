@@ -731,8 +731,9 @@ namespace internal
               // level, as those lines logically belong to the same
               // level as the cell, at least for for isotropic
               // refinement
-              for (typename DoFHandler<2,spacedim>::level_cell_iterator cell = dof_handler.begin(level);
-                   cell != dof_handler.end(level); ++cell)
+              typename DoFHandler<2,spacedim>::level_cell_iterator cell,
+                       endc = dof_handler.end(level);
+              for (cell = dof_handler.begin(level); cell != endc; ++cell)
                 for (unsigned int line=0; line < GeometryInfo<2>::faces_per_cell; ++line)
                   cell->face(line)->set_user_flag();
 
@@ -883,8 +884,9 @@ namespace internal
               // flag all lines adjacent to cells of the current level, as
               // those lines logically belong to the same level as the cell,
               // at least for isotropic refinement
-              for (typename DoFHandler<3,spacedim>::level_cell_iterator cell = dof_handler.begin(level);
-                   cell != dof_handler.end(level); ++cell)
+              typename DoFHandler<3,spacedim>::level_cell_iterator cell,
+                       endc = dof_handler.end(level);
+              for (cell = dof_handler.begin(level); cell != endc; ++cell)
                 for (unsigned int line=0; line < GeometryInfo<3>::lines_per_cell; ++line)
                   cell->line(line)->set_user_flag();
 
@@ -909,8 +911,7 @@ namespace internal
               // flag all quads adjacent to cells of the current level, as
               // those quads logically belong to the same level as the cell,
               // at least for isotropic refinement
-              for (typename DoFHandler<3,spacedim>::level_cell_iterator cell = dof_handler.begin(level);
-                   cell != dof_handler.end(level); ++cell)
+              for (cell = dof_handler.begin(level); cell != endc; ++cell)
                 for (unsigned int quad=0; quad < GeometryInfo<3>::quads_per_cell; ++quad)
                   cell->quad(quad)->set_user_flag();
 
