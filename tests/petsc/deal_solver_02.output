@@ -1,4 +1,4 @@
 
 DEAL::Size 32 Unknowns 961
 DEAL::Solver type: N6dealii14SolverBicgstabINS_13PETScWrappers6VectorEEE
-DEAL::Solver stopped within 49 - 51 iterations
+DEAL::Solver stopped within 48 - 51 iterations
