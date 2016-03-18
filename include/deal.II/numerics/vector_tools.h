@@ -1192,7 +1192,7 @@ namespace VectorTools
    * module on
    * @ref constraints.
    *
-   * <h4>Arguments to this function></h4>
+   * <h4>Arguments to this function</h4>
    *
    * This function is explicitly for use with FE_Nedelec elements, or with
    * FESystem elements which contain FE_Nedelec elements. It will throw an
