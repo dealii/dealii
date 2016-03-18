@@ -321,6 +321,20 @@ FunctionManifold<dim,spacedim,chartdim>::push_forward(const Point<chartdim> &cha
 
 
 template <int dim, int spacedim, int chartdim>
+DerivativeForm<1,chartdim, spacedim>
+FunctionManifold<dim,spacedim,chartdim>::push_forward_gradient(const Point<chartdim> &chart_point) const
+{
+  DerivativeForm<1, chartdim, spacedim> DF;
+  std::vector<Tensor<1, chartdim> > gradients(spacedim);
+  push_forward_function->vector_gradient(chart_point, gradients);
+  for (unsigned int i=0; i<spacedim; ++i)
+    for (unsigned int j=0; j<chartdim; ++j)
+      DF[i][j] = gradients[i][j];
+  return DF;
+}
+
+
+template <int dim, int spacedim, int chartdim>
 Point<chartdim>
 FunctionManifold<dim,spacedim,chartdim>::pull_back(const Point<spacedim> &space_point) const
 {

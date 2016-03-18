@@ -266,6 +266,22 @@ public:
   push_forward(const Point<chartdim> &chart_point) const;
 
   /**
+   * Given a point in the chartdim dimensional Euclidean space, this
+   * method returns the derivatives of the function $F$ that maps from
+   * the sub_manifold coordinate system to the Euclidean coordinate
+   * system. In other words, it is a matrix of size
+   * $\text{spacedim}\times\text{chartdim}$.
+   *
+   * This function is used in the computations required by the
+   * get_tangent_vector() function.
+   *
+   * Refer to the general documentation of this class for more information.
+   */
+  virtual
+  DerivativeForm<1,chartdim,spacedim>
+  push_forward_gradient(const Point<chartdim> &chart_point) const;
+
+  /**
    * Given a point in the spacedim coordinate system, uses the
    * pull_back_function to compute the pull_back of points in @p spacedim
    * space dimensions to @p chartdim space dimensions.

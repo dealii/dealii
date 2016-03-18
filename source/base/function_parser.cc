@@ -48,7 +48,7 @@ template <int dim>
 FunctionParser<dim>::FunctionParser(const unsigned int n_components,
                                     const double       initial_time)
   :
-  Function<dim>(n_components, initial_time)
+  AutoDerivativeFunction<dim>(1e-8, n_components, initial_time)
 {}
 
 

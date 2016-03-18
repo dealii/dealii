@@ -19,7 +19,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/function.h>
+#include <deal.II/base/auto_derivative_function.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/thread_local_storage.h>
@@ -177,7 +177,7 @@ template <typename> class Vector;
  * @author Luca Heltai, Timo Heister 2005, 2014
  */
 template <int dim>
-class FunctionParser : public Function<dim>
+class FunctionParser : public AutoDerivativeFunction<dim>
 {
 public:
   /**
