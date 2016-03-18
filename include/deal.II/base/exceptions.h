@@ -1054,8 +1054,8 @@ namespace StandardExceptions
 
 
 /**
- * Special assertion, testing whether <tt>vec</tt> has size <tt>dim1</tt>, and
- * each entry of the vector has the size <tt>dim2</tt>
+ * An assertion that tests whether <tt>vec</tt> has size <tt>dim1</tt>, and
+ * each entry of the vector is itself an array that has the size <tt>dim2</tt>.
  *
  * @ingroup Exceptions
  * @author Guido Kanschat 2010
@@ -1065,14 +1065,9 @@ namespace StandardExceptions
 
 
 /**
- * Special assertion for index range of nonnegative indices.
- *
- * Since this is used very often and always repeats the arguments, we
- * introduce this special assertion for ExcIndexRange in order to keep the
- * user codes shorter.
- *
- * Called wit arguments <tt>index</tt> and <tt>range</tt> it asserts that
- * <tt>index&lt;range</tt> and throws ExcIndexRange(index,0,range) if it
+ * An assertion that tests that a given index is within the half-open
+ * range <code>[0,range)</code>. It throws an exception object
+ * <code>ExcIndexRange(index,0,range)</code> if the assertion
  * fails.
  *
  * @ingroup Exceptions
@@ -1081,6 +1076,18 @@ namespace StandardExceptions
 #define AssertIndexRange(index,range) Assert((index) < (range), \
                                              dealii::ExcIndexRange((index),0,(range)))
 
+/**
+ * An assertion that tests that a given index is within the half-open
+ * range <code>[0,range)</code>. It throws an exception object
+ * <code>ExcIndexRange(index,0,range)</code> if the assertion
+ * fails.
+ *
+ * This variation of the AssertIndexRange assertion is used for indices of type
+ * types::global_dof_index for which we need to make special accommodations because
+ * they may not fit into the regular 32-bit integer indices used in AssertIndexRange.
+ *
+ * @ingroup Exceptions
+ */
 #define AssertGlobalIndexRange(index,range) Assert((index) < (range), \
                                                    ExcIndexRange<types::global_dof_index>((index),0,(range)))
 
