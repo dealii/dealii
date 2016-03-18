@@ -100,21 +100,29 @@ inconvenience this causes.
 
 
 <ol>
- <li> New: Added custom target "relocate" to Mac OS X builds, that runs 
+ <li> Improved: The distribution of degrees of freedom on multigrid levels,
+ DoFHandler::distribute_mg_dofs(), contained a few steps that scaled
+ quadratically in the number of local cells for certain configurations. These
+ steps have been replaced by linear complexity calls.
+ <br>
+ (Martin Kronbichler, 2016/03/18)
+ </li>
+
+ <li> New: Added custom target "relocate" to Mac OS X builds, that runs
  a script to make all paths absolute in the shared libraries included
  in the deal.II package (only enabled when building a package, and when
  including external libraries to the package)
- <br> 
- (Luca Heltai, 2016/03/14) 
- </li> 
-  
+ <br>
+ (Luca Heltai, 2016/03/14)
+ </li>
+
  <li> New: Add NURBSPatchManifold. This class is a child of ChartManifold and
- implements a manifold descriptor for the face of a CAD imported usign 
+ implements a manifold descriptor for the face of a CAD imported usign
  OpenCASCADE.
- <br> 
- (Mauro Bardelloni, 2016/03/09) 
- </li> 
-  
+ <br>
+ (Mauro Bardelloni, 2016/03/09)
+ </li>
+
  <li> New: When using C++11, there is now a function Threads::new_task()
  that can take as an argument either a lambda function, or the result
  of a std::bind expression, or anything else that can be called as in a
@@ -124,7 +132,7 @@ inconvenience this causes.
  (Wolfgang Bangerth, 2016/03/07)
  </li>
 
- <li> New: When using C++11, the function filter_iterators() allows to filter a 
+ <li> New: When using C++11, the function filter_iterators() allows to filter a
  range of iterators using predicates (like the ones defined in IteratorFilter).
  <br>
  (Bruno Turcksin, 2016/03/04)
@@ -132,18 +140,18 @@ inconvenience this causes.
 
  <li> Fixed: The OpenCASCADE::push_forward_and_differential_forms()
  function is now able to change the direction of the normal vector
- according to Orientation() method.  
- <br> 
- (Mauro Bardelloni, 2016/03/02) 
- </li> 
+ according to Orientation() method.
+ <br>
+ (Mauro Bardelloni, 2016/03/02)
+ </li>
 
- <li> Fixed: The function IndexSet::make_trilinos_map() now works if some 
+ <li> Fixed: The function IndexSet::make_trilinos_map() now works if some
  processors have a contiguous range of indices and others do not.
  <br>
  (Bruno Turcksin, 2016/02/17)
  </li>
 
- <li> Updated: step-44 has been been expressed in a more dimension independent 
+ <li> Updated: step-44 has been been expressed in a more dimension independent
  manner, and can be now run in both 2-d and 3-d.
  <br>
  (Jean-Paul Pelteret, 2016/02/17)
@@ -155,8 +163,8 @@ inconvenience this causes.
  (Jean-Paul Pelteret, 2016/02/12)
  </li>
 
- <li> Fixed: The GridTools::build_triangulation_from_patches() function now 
- also copies the locations of vertices from the cells of the source 
+ <li> Fixed: The GridTools::build_triangulation_from_patches() function now
+ also copies the locations of vertices from the cells of the source
  triangulation to the triangulation that is built from the list of patch cells.
  <br>
  (Spencer Patty, 2016/02/11)

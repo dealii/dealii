@@ -3590,7 +3590,8 @@ namespace parallel
           for (unsigned int lvl=this->n_levels(); lvl>0; )
             {
               --lvl;
-              for (typename Triangulation<dim,spacedim>::cell_iterator cell = this->begin(lvl); cell!=this->end(lvl); ++cell)
+              typename Triangulation<dim,spacedim>::cell_iterator cell, endc = this->end(lvl);
+              for (cell = this->begin(lvl); cell!=endc; ++cell)
                 {
                   if ((!cell->has_children() && cell->subdomain_id()==this->locally_owned_subdomain())
                       || (cell->has_children() && cell->child(0)->level_subdomain_id()==this->locally_owned_subdomain()))
@@ -3630,7 +3631,8 @@ namespace parallel
           for (unsigned int lvl=this->n_levels(); lvl>0;)
             {
               --lvl;
-              for (typename Triangulation<dim,spacedim>::cell_iterator cell = this->begin(lvl); cell!=this->end(lvl); ++cell)
+              typename Triangulation<dim,spacedim>::cell_iterator cell, endc = this->end(lvl);
+              for (cell = this->begin(lvl); cell!=endc; ++cell)
                 {
                   if (cell->has_children())
                     for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
