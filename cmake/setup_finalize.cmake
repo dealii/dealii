@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II authors
+## Copyright (C) 2012 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -62,8 +62,10 @@ ENDFOREACH()
 # Register features:
 #
 FOREACH(_feature ${DEAL_II_FEATURES})
-  FILTER_SYSTEM_LIBRARIES(${_feature}) # TODO, remove here
-  REGISTER_FEATURE(${_feature})
+  IF(DEAL_II_WITH_${_feature})
+    FILTER_SYSTEM_LIBRARIES(${_feature})
+    REGISTER_FEATURE(${_feature})
+  ENDIF()
 ENDFOREACH()
 
 #
