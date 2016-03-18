@@ -2143,8 +2143,8 @@ namespace internal
   // parallel::distributed::Vector is really the same as stored in MatrixFree
   template <typename VectorType>
   inline
-  void check_vector_compatibility (const VectorType                             &vec,
-                                   const internal::MatrixFreeFunctions::DoFInfo &dof_info)
+  void check_vector_compatibility (const VectorType                             &NDEBUG_UNUSED_PARAMETER(vec),
+                                   const internal::MatrixFreeFunctions::DoFInfo &NDEBUG_UNUSED_PARAMETER(dof_info))
   {
     AssertDimension (vec.size(),
                      dof_info.vector_partitioner->size());
@@ -6523,7 +6523,7 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
 inline
 void
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::check_template_arguments(const unsigned int fe_no)
+::check_template_arguments(const unsigned int NDEBUG_UNUSED_PARAMETER(fe_no))
 {
 #ifdef DEBUG
   // print error message when the dimensions do not match. Propose a possible

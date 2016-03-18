@@ -280,6 +280,20 @@ namespace deal_II_exceptions
 
 
 /**
+ * Sometimes, some parameters of a function are only used for Asserts or other
+ * code which is DEBUG-mode specific. To prevent warnings about unused
+ * parameters when compiling in RELEASE mode, the NDEBUG_UNUSED_PARAMETER macro
+ * allows hiding such parameters.
+ *
+ */
+#ifdef DEBUG
+#define NDEBUG_UNUSED_PARAMETER(var) var
+#else
+#define NDEBUG_UNUSED_PARAMETER(var)
+#endif
+
+
+/**
  * This is the main routine in the exception mechanism for debug mode error
  * checking. It asserts that a certain condition is fulfilled, otherwise
  * issues an error and aborts the program.
