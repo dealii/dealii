@@ -29,21 +29,24 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * @brief Auxiliary class aiding in the handling of block structures like in
- * BlockVector or FESystem.
+ * BlockIndices represents a range of indices (such as the range $[0,N)$
+ * of valid indices for elements of a vector) and how this one range
+ * is broken down into smaller but contiguous "blocks" (such as the velocity
+ * and pressure parts of a solution vector). In particular, it provides the
+ * ability to translate between global indices and the indices <i>within</i>
+ * a block. This class is used, for example, in the BlockVector,
+ * BlockSparsityPattern, and BlockMatrixBase classes.
  *
- * The information obtained from this class falls into two groups. First, it
- * is possible to obtain the number of blocks, namely size(), the block_size()
- * for each block and the total_size() of the object described by the block
- * indices, namely the length of the whole index set. These functions do not
- * make any assumption on the ordering of the index set.
+ * The information that can be obtained from this class falls into two groups.
+ * First, it is possible to query the global size of the index space (through
+ * the total_size() member function), and the number of blocks and their sizes
+ * (via size() and the block_size() functions).
  *
- * If on the other hand the index set is ordered "by blocks", such that each
- * block forms a consecutive set of indices, this class that manages the
- * conversion of global indices into a block vector or matrix to the local
- * indices within this block. This is required, for example, when you address
- * a global element in a block vector and want to know which element within
- * which block this is. It is also useful if a matrix is composed of several
+ * Secondly, this class manages the conversion of global indices to the
+ * local indices within this block, and the other way around. This is required,
+ * for example, when you address a global element in a block vector and want to
+ * know within which block this is, and which index within this block it
+ * corresponds to. It is also useful if a matrix is composed of several
  * blocks, where you have to translate global row and column indices to local
  * ones.
  *
@@ -121,7 +124,7 @@ public:
   /**
    * String representation of the block sizes. The output is of the form
    * `[nb->b1,b2,b3|s]`, where `nb` is n_blocks(), `s` is total_size() and
-   * `b1` etc. are the values of block_size().
+   * `b1` etc. are the values returned by block_size() for each of the blocks.
    */
   std::string to_string () const;
 
