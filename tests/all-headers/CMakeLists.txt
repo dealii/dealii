@@ -45,6 +45,10 @@ FILE(GLOB_RECURSE _headers RELATIVE ${_include_dir}/deal.II
   ${_include_dir}/deal.II/*.h
   )
 
+# Do not test bundled headers to avoid issues when tests are run
+# for an already installed library
+STRING(REGEX REPLACE "bundled/[^;]+;?" "" _headers "${_headers}")
+
 FOREACH(_header ${_headers})
   FOREACH(_build ${DEAL_II_BUILD_TYPES})
     STRING(TOLOWER ${_build} _build_lowercase)
