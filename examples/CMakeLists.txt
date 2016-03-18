@@ -48,3 +48,15 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
 
   MESSAGE(STATUS "Setting up examples - Done")
 ENDIF()
+
+#
+# Add a dummy target to make files known to IDEs like qtcreator
+#
+
+FILE(GLOB _misc
+  ${CMAKE_CURRENT_SOURCE_DIR}/step-*/*.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/step-*/*.h
+)
+ADD_CUSTOM_TARGET(dummy_examples_files
+  SOURCES ${_misc}
+  )
