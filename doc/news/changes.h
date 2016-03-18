@@ -74,6 +74,11 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li> New: Added GridTools::rotate() in three space dimensions.
+ <br>
+ (Timo Heister, 2016/03/18)
+ </li>
+
  <li> New: Added unit tests for complex-valued PETSc and SLEPc.
  <br>
  (Toby D. Young, Denis Davydov, 2016/03/11)
