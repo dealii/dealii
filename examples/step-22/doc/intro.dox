@@ -787,7 +787,7 @@ A profile of how many CPU instructions are spent at the various
 different places in the program during refinement cycles
 zero through three in 3d is shown here:
 
-<img src="http://www.dealii.org/images/steps/developer/step-22.profile-3.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-22.profile-3.png" alt="">
 
 As can be seen, at this refinement level approximately three quarters of the
 instruction count is spent on the actual solver (the SparseILU::vmult calls
@@ -816,7 +816,7 @@ discussion of results below as well.
 As a final point, and as a point of reference, the following picture also
 shows how the profile looked at an early stage of optimizing this program:
 
-<img src="http://www.dealii.org/images/steps/developer/step-22.profile-3.original.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-22.profile-3.original.png" alt="">
 
 As mentioned above, the runtime of this version was about four times as long
 as for the first profile, with the SparseILU decomposition taking up about

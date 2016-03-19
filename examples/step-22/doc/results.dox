@@ -75,31 +75,31 @@ corners, so there is need for refinement there as well:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-22.2d.mesh-0.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-0.png" alt="">
     </td>
 
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-22.2d.mesh-1.png" alt="">
-    </td>
-  </tr>
-
-  <tr>
-    <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-22.2d.mesh-2.png" alt="">
-    </td>
-
-    <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-22.2d.mesh-3.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-1.png" alt="">
     </td>
   </tr>
 
   <tr>
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-22.2d.mesh-4.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-2.png" alt="">
     </td>
 
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-22.2d.mesh-5.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-3.png" alt="">
+    </td>
+  </tr>
+
+  <tr>
+    <td ALIGN="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-4.png" alt="">
+    </td>
+
+    <td ALIGN="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-5.png" alt="">
     </td>
   </tr>
 </table>
@@ -108,7 +108,7 @@ Finally, following is a plot of the flow field. It shows fluid
 transported along with the moving upper boundary and being replaced by
 material coming from below:
 
-<img src="http://www.dealii.org/images/steps/developer/step-22.2d.solution.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-22.2d.solution.png" alt="">
 
 This plot uses the capability of VTK-based visualization programs (in
 this case of VisIt) to show vector data; this is the result of us
@@ -186,31 +186,31 @@ look as follow:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-22.3d.mesh-0.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-0.png" alt="">
     </td>
 
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-22.3d.mesh-1.png" alt="">
-    </td>
-  </tr>
-
-  <tr>
-    <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-22.3d.mesh-2.png" alt="">
-    </td>
-
-    <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-22.3d.mesh-3.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-1.png" alt="">
     </td>
   </tr>
 
   <tr>
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-22.3d.mesh-4.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-2.png" alt="">
     </td>
 
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-22.3d.mesh-5.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-3.png" alt="">
+    </td>
+  </tr>
+
+  <tr>
+    <td ALIGN="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-4.png" alt="">
+    </td>
+
+    <td ALIGN="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-5.png" alt="">
     </td>
   </tr>
 </table>
@@ -219,7 +219,7 @@ Again, they show essentially the location of singularities introduced
 by boundary conditions. The vector field computed makes for an
 interesting graph:
 
-<img src="http://www.dealii.org/images/steps/developer/step-22.3d.solution.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-22.3d.solution.png" alt="">
 
 The isocontours shown here as well are those of the pressure
 variable, showing the singularity at the point of discontinuous
@@ -242,7 +242,7 @@ appropriately sorted into their corresponding blocks of the matrix and
 vector), then we get the following image after the first adaptive
 refinement in two dimensions:
 
-<img src="http://www.dealii.org/images/steps/developer/step-22.2d.sparsity-nor.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-22.2d.sparsity-nor.png" alt="">
 
 In order to generate such a graph, you have to insert a piece of
 code like the following to the end of the setup step.
@@ -263,7 +263,7 @@ In this program, we have thus chosen a more advanced renumbering of
 components.  The renumbering with DoFRenumbering::Cuthill_McKee and grouping
 the components into velocity and pressure yields the following output:
 
-<img src="http://www.dealii.org/images/steps/developer/step-22.2d.sparsity-ren.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-22.2d.sparsity-ren.png" alt="">
 
 It is apparent that the situation has improved a lot. Most of the elements are
 now concentrated around the diagonal in the (0,0) block in the matrix. Similar
@@ -283,7 +283,7 @@ considerable amount of tentative fill-in elements. This illustrates why UMFPACK
 is not a good choice in 3D - a full decomposition needs many new entries that
  eventually won't fit into the physical memory (RAM):
 
-<img src="http://www.dealii.org/images/steps/developer/step-22.3d.sparsity_uu-ren.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-22.3d.sparsity_uu-ren.png" alt="">
 
 
 
@@ -793,11 +793,11 @@ then we get images where the the fault line is curved:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-22.3d-extension.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-22.3d-extension.png" alt="">
     </td>
 
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-22.3d-grid-extension.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-22.3d-grid-extension.png" alt="">
     </td>
   </tr>
 </table>

@@ -14,14 +14,14 @@ along the top surface and something for the visualization programs to apply
 their shading algorithms to (because the top surfaces of the cells are now no
 longer just tangential to a sphere but tilted):
 
-<img src="http://www.dealii.org/images/steps/developer/step-53.mesh.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-53.mesh.png" alt="">
 
 Yet, at least as far as visualizations are concerned, this is still not too
 impressive. Rather, let us visualize things in a way so that we show the
 actual elevation along the top surface. In other words, we want a picture like
 this, with an incredible amount of detail:
 
-<img src="http://www.dealii.org/images/steps/developer/step-53.topo.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-53.topo.png" alt="">
 
 A zoom-in of this picture shows the vertical displacement quite clearly (here,
 looking from the West-Northwest over the rift valley, the triple peaks
@@ -36,7 +36,7 @@ George</a>
 and toward the great flatness of
 <a href="http://en.wikipedia.org/wiki/Lake_Victoria">Lake Victoria</a>):
 
-<img src="http://www.dealii.org/images/steps/developer/step-53.topozoom.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-53.topozoom.png" alt="">
 
 
 These image were produced with three small modifications: 
@@ -130,7 +130,7 @@ neighboring cell. This can be shown more clearly by using a different surface
 description in which we enlarge the vertical topography to enhance the effect
 (courtesy of Alexander Grayver):
 
-<img src="http://www.dealii.org/images/steps/developer/step-53.smooth-geometry.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-53.smooth-geometry.png" alt="">
 
 So what is happening here? Partly, this is only a result of visualization, but
 there is an underlying real cause as well:

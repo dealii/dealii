@@ -16,13 +16,13 @@ as it should.
 <table align="center" class="tutorial" cellspacing="3" cellpadding="3">
   <tr>
      <td align="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-44.Q1-P0_convergence.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-44.Q1-P0_convergence.png" alt="">
 	<p align="center">
         Convergence of the $Q_1-DGPM_0-DGPM_0$ formulation in 3-d.
 	</p>
     </td>
     <td align="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-44.Q2-P1_convergence.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-44.Q2-P1_convergence.png" alt="">
 	<p align="center">
         Convergence of the $Q_2-DGPM_1-DGPM_1$ formulation in 3-d.
 	</p>
@@ -138,19 +138,19 @@ and is opposite to the physically realistic interpretation of pressure.
 <table align="center" class="tutorial" cellspacing="3" cellpadding="3">
   <tr>
     <td align="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-44.Q1-P0_gr_1_p_ratio_80-displacement.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-44.Q1-P0_gr_1_p_ratio_80-displacement.png" alt="">
 	<p align="center">
         Z-displacement solution for the 3-d problem.
 	</p>
     </td>
     <td align="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-44.Q1-P0_gr_1_p_ratio_80-pressure.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-44.Q1-P0_gr_1_p_ratio_80-pressure.png" alt="">
 	<p align="center">
         Discontinuous piece-wise constant pressure field.
 	</p>
     </td>
      <td align="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-44.Q1-P0_gr_1_p_ratio_80-dilatation.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-44.Q1-P0_gr_1_p_ratio_80-dilatation.png" alt="">
 	<p align="center">
         Discontinuous piece-wise constant dilatation field.
 	</p>
@@ -180,19 +180,19 @@ and could be smoothed on a continuous grid for the post-processing purposes.
 
   <tr>
     <td align="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-44.Q2-P1_gr_3_p_ratio_80-displacement.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-44.Q2-P1_gr_3_p_ratio_80-displacement.png" alt="">
 	<p align="center">
         Z-displacement solution for the 3-d problem.
 	</p>
     </td>
     <td align="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-44.Q2-P1_gr_3_p_ratio_80-pressure.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-44.Q2-P1_gr_3_p_ratio_80-pressure.png" alt="">
 	<p align="center">
         Discontinuous linear pressure field.
 	</p>
     </td>
     <td align="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-44.Q2-P1_gr_3_p_ratio_80-dilatation.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-44.Q2-P1_gr_3_p_ratio_80-dilatation.png" alt="">
 	<p align="center">
         Discontinuous linear dilatation field.
 	</p>
@@ -225,7 +225,7 @@ some finite-strain problems involving alternative constitutive models.
 <table align="center" class="tutorial" cellspacing="3" cellpadding="3">
   <tr>
      <td align="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-44.Normalised_runtime.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-44.Normalised_runtime.png" alt="">
 	<p align="center">
         Runtime on a 4-core machine, normalised against the lowest grid resolution $Q_1-DGPM_0-DGPM_0$ solution that utilised a SSOR preconditioner.
 	</p>
@@ -244,13 +244,13 @@ displacement field, although qualitatively similar, is different to that of the 
 
   <tr>
     <td align="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-44.2d-gr_2.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-44.2d-gr_2.png" alt="">
 	<p align="center">
         Y-displacement solution in 2-d for 2 global grid refinement levels.
 	</p>
     </td>
     <td align="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-44.2d-gr_5.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-44.2d-gr_5.png" alt="">
 	<p align="center">
         Y-displacement solution in 2-d for 5 global grid refinement levels.
 	</p>

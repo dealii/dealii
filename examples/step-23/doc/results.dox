@@ -65,7 +65,7 @@ In addition to the screen output, the program writes the solution of each time
 step to an output file. If we process them adequately and paste them into a
 movie, we get the following:
 
-<img src="http://www.dealii.org/images/steps/developer/step-23.movie.gif" alt="Animation of the solution of step 23.">
+<img src="https://www.dealii.org/images/steps/developer/step-23.movie.gif" alt="Animation of the solution of step 23.">
 
 The movie shows the generated wave nice traveling through the domain and back,
 being reflected at the clamped boundary. Some numerical noise is trailing the

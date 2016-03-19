@@ -51,9 +51,9 @@ DEAL::Writing solution to <sol-5.gnuplot>
 We show the solutions on the initial mesh, the mesh after two
 and after five adaptive refinement steps.
 
-<img src="http://www.dealii.org/images/steps/developer/step-12.sol-0.png" alt="">
-<img src="http://www.dealii.org/images/steps/developer/step-12.sol-2.png" alt="">
-<img src="http://www.dealii.org/images/steps/developer/step-12.sol-5.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-12.sol-0.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-12.sol-2.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-12.sol-5.png" alt="">
 
 
 Then we show the final grid (after 5 refinement steps) and the solution again,
@@ -62,13 +62,13 @@ function and the VTK-based VisIt visualization program) that better shows the
 sharpness of the jump on the refined mesh and the over- and undershoots of the
 solution along the interface:
 
-<img src="http://www.dealii.org/images/steps/developer/step-12.grid-5.png" alt="">
-<img src="http://www.dealii.org/images/steps/developer/step-12.3d-solution.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-12.grid-5.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-12.3d-solution.png" alt="">
 
 
 And finally we show a plot of a 3d computation.
 
-<img src="http://www.dealii.org/images/steps/developer/step-12.sol-5-3d.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-12.sol-5-3d.png" alt="">
 
 
 <a name="dg-vs-cg"></a>
@@ -97,14 +97,14 @@ refinement, results look much different when using a continuous element:
       0 &nbsp;
     </td>
     <td valign="top">
-      <img src="http://www.dealii.org/images/steps/developer/step-12.cg.sol-0.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-12.cg.sol-0.png" alt="">
     </td>
 
     <td valign="top">
       1 &nbsp;
     </td>
     <td valign="top">
-      <img src="http://www.dealii.org/images/steps/developer/step-12.cg.sol-1.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-12.cg.sol-1.png" alt="">
     </td>
   </tr>
 
@@ -113,14 +113,14 @@ refinement, results look much different when using a continuous element:
       2 &nbsp;
     </td>
     <td valign="top">
-      <img src="http://www.dealii.org/images/steps/developer/step-12.cg.sol-2.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-12.cg.sol-2.png" alt="">
     </td>
 
     <td valign="top">
       3 &nbsp;
     </td>
     <td valign="top">
-      <img src="http://www.dealii.org/images/steps/developer/step-12.cg.sol-3.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-12.cg.sol-3.png" alt="">
     </td>
   </tr>
 
@@ -129,14 +129,14 @@ refinement, results look much different when using a continuous element:
       4 &nbsp;
     </td>
     <td valign="top">
-      <img src="http://www.dealii.org/images/steps/developer/step-12.cg.sol-4.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-12.cg.sol-4.png" alt="">
     </td>
 
     <td valign="top">
       5 &nbsp;
     </td>
     <td valign="top">
-      <img src="http://www.dealii.org/images/steps/developer/step-12.cg.sol-5.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-12.cg.sol-5.png" alt="">
     </td>
   </tr>
 </table>

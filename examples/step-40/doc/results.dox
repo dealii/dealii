@@ -66,10 +66,10 @@ partitioning onto the 16 processors, and the corresponding solution:
 <TABLE WIDTH="100%">
 <tr>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-40.mesh.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-40.mesh.png" alt="">
 </td>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-40.solution.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-40.solution.png" alt="">
 </td>
 </tr>
 </table>
@@ -89,10 +89,10 @@ more interpretation can be found in the final version of the paper):
 <TABLE WIDTH="100%">
 <tr>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-40.strong2.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-40.strong2.png" alt="">
 </td>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-40.strong.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-40.strong.png" alt="">
 </td>
 </tr>
 </table>
@@ -113,10 +113,10 @@ this in the following two graphs for 256 and 4096 processors:
 <TABLE WIDTH="100%">
 <tr>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-40.256.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-40.256.png" alt="">
 </td>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-40.4096.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-40.4096.png" alt="">
 </td>
 </tr>
 </table>

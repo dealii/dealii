@@ -3,8 +3,8 @@
 The created output is not very surprising. We simply see that the solution is
 periodic with respect to the left and lower boundary:
 
-<img src="http://www.dealii.org/images/steps/developer/step-45.periodic.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-45.periodic.png" alt="">
 
 Without the periodicity constraints we would have ended up with the following solution:
 
-<img src="http://www.dealii.org/images/steps/developer/step-45.non_periodic.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-45.non_periodic.png" alt="">

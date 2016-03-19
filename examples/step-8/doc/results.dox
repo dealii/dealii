@@ -9,10 +9,10 @@ the $x$- and $y$-displacements as a scalar components:
 <TABLE WIDTH="100%">
 <tr>
 <td>
-<img src="http://www.dealii.org/images/steps/developer/step-8.x.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-8.x.png" alt="">
 </td>
 <td>
-<img src="http://www.dealii.org/images/steps/developer/step-8.y.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-8.y.png" alt="">
 </td>
 </tr>
 </table>
@@ -22,7 +22,7 @@ You can clearly see the sources of $x$-displacement around $x=0.5$ and
 $x=-0.5$, and of $y$-displacement at the origin. The next image shows the
 final grid after eight steps of refinement:
 
-<img src="http://www.dealii.org/images/steps/developer/step-8.grid.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-8.grid.png" alt="">
 
 
 What one frequently would like to do is to show the displacement as a vector
@@ -46,7 +46,7 @@ step-22. The vector field then looks like this (Visit randomly selects a few
 hundred vertices from which to draw the vectors; drawing them from each
 individual vertex would make the picture unreadable):
 
-<img src="http://www.dealii.org/images/steps/developer/step-8.vectors.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-8.vectors.png" alt="">
 
 
 We note that one may have intuitively expected the

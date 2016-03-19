@@ -54,7 +54,7 @@ The results are easily visualized:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr valign="top">
     <td valign="top" align="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-46.velocity-magnitude.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-46.velocity-magnitude.png" alt="">
 
       <p align="center">
         Magnitude of the fluid velocity.
@@ -62,7 +62,7 @@ The results are easily visualized:
     </td>
 
     <td valign="top" align="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-46.pressure.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-46.pressure.png" alt="">
 
       <p align="center">
         Fluid pressure. The dynamic range has been truncated to cut off the
@@ -74,7 +74,7 @@ The results are easily visualized:
   </tr>
   <tr valign="top">
     <td valign="top" align="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-46.velocity.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-46.velocity.png" alt="">
 
       <p align="center">
         Fluid velocity.
@@ -82,7 +82,7 @@ The results are easily visualized:
     </td>
 
     <td valign="top" align="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-46.displacement.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-46.displacement.png" alt="">
 
       <p align="center">
         Solid displacement.
@@ -140,7 +140,7 @@ The results can also be visualized and yield some good pictures:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr valign="top">
     <td valign="top" align="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-46.3d.velocity.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-46.3d.velocity.png" alt="">
 
       <p align="center">
         Vectors of the fluid velocity and magnitude of the
@@ -149,7 +149,7 @@ The results can also be visualized and yield some good pictures:
     </td>
 
     <td valign="top" align="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-46.3d.streamlines.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-46.3d.streamlines.png" alt="">
 
       <p align="center">
         Streamlines of the velocity, with the mesh superimposed.
@@ -158,7 +158,7 @@ The results can also be visualized and yield some good pictures:
   </tr>
   <tr valign="top">
     <td valign="top" align="center" colspan="2">
-      <img src="http://www.dealii.org/images/steps/developer/step-46.3d.displacement.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-46.3d.displacement.png" alt="">
 
       <p align="center">
         Solid displacement.

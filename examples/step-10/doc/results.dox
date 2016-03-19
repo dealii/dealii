@@ -28,18 +28,18 @@ these pictures in acceptable quality, view them one by one.
 
 <table style="width:80%" align="center">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-10.ball_mapping_q1_ref0.png" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-10.ball_mapping_q1_ref1.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-10.ball_mapping_q1_ref0.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-10.ball_mapping_q1_ref1.png" alt=""></td>
   </tr>
 
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-10.ball_mapping_q2_ref0.png" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-10.ball_mapping_q2_ref1.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-10.ball_mapping_q2_ref0.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-10.ball_mapping_q2_ref1.png" alt=""></td>
   </tr>
 
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-10.ball_mapping_q3_ref0.png" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-10.ball_mapping_q3_ref1.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-10.ball_mapping_q3_ref0.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-10.ball_mapping_q3_ref1.png" alt=""></td>
   </tr>
 </table>
 
@@ -51,9 +51,9 @@ with dashed lines the exact circle:
 
 <table style="width:80%" align="center">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-10.quarter-q1.png" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-10.quarter-q2.png" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-10.quarter-q3.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-10.quarter-q1.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-10.quarter-q2.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-10.quarter-q3.png" alt=""></td>
   </tr>
 </table>
 

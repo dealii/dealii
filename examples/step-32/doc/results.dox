@@ -22,12 +22,12 @@ magnitude more than we had available in step-31:
 <table align="center" border="1" cellspacing="3" cellpadding="3">
   <tr>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-32.3d.cube.0.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-32.3d.cube.0.png" alt="">
     </td>
   </tr>
   <tr>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-32.3d.cube.1.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-32.3d.cube.1.png" alt="">
     </td>
   </tr>
 </table>
@@ -188,114 +188,114 @@ the current version):
 <table>
   <tr>
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.temperature.0000.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.temperature.0000.png" alt="">
     </td>
 
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.temperature.0100.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.temperature.0100.png" alt="">
     </td>
 
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.temperature.0200.png" alt="">
-    </td>
-  </tr>
-
-  <tr>
-    <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.temperature.0300.png" alt="">
-    </td>
-
-    <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.temperature.0400.png" alt="">
-    </td>
-
-    <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.temperature.0500.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.temperature.0200.png" alt="">
     </td>
   </tr>
 
   <tr>
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.temperature.0600.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.temperature.0300.png" alt="">
     </td>
 
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.temperature.0700.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.temperature.0400.png" alt="">
     </td>
 
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.temperature.0800.png" alt="">
-    </td>
-  </tr>
-
-  <tr>
-    <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.temperature.0900.png" alt="">
-    </td>
-
-    <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.temperature.1000.png" alt="">
-    </td>
-
-    <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.temperature.1100.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.temperature.0500.png" alt="">
     </td>
   </tr>
 
   <tr>
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.temperature.1200.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.temperature.0600.png" alt="">
     </td>
 
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.temperature.1300.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.temperature.0700.png" alt="">
     </td>
 
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.temperature.1400.png" alt="">
-    </td>
-  </tr>
-
-  <tr>
-    <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.temperature.1500.png" alt="">
-    </td>
-
-    <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.temperature.1600.png" alt="">
-    </td>
-
-    <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.temperature.1700.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.temperature.0800.png" alt="">
     </td>
   </tr>
 
   <tr>
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.temperature.1800.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.temperature.0900.png" alt="">
     </td>
 
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.temperature.1900.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.temperature.1000.png" alt="">
     </td>
 
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.temperature.2000.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.temperature.1100.png" alt="">
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.temperature.1200.png" alt="">
+    </td>
+
+    <td>
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.temperature.1300.png" alt="">
+    </td>
+
+    <td>
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.temperature.1400.png" alt="">
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.temperature.1500.png" alt="">
+    </td>
+
+    <td>
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.temperature.1600.png" alt="">
+    </td>
+
+    <td>
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.temperature.1700.png" alt="">
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.temperature.1800.png" alt="">
+    </td>
+
+    <td>
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.temperature.1900.png" alt="">
+    </td>
+
+    <td>
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.temperature.2000.png" alt="">
     </td>
   </tr>
 
 
   <tr>
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.temperature.2100.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.temperature.2100.png" alt="">
     </td>
 
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.grid.2100.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.grid.2100.png" alt="">
     </td>
 
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-32.2d.partition.2100.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-32.2d.partition.2100.png" alt="">
     </td>
   </tr>
 </table>
@@ -324,7 +324,7 @@ continues to dominate flow.
 These different phases can also be identified if we look at the
 maximal velocity as a function of time in the simulation:
 
-<img src="http://www.dealii.org/images/steps/developer/step-32.2d.t_vs_vmax.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-32.2d.t_vs_vmax.png" alt="">
 
 Here, the velocity (shown in centimeters per year) becomes very large,
 to the order of several meters per year) at the beginning when the
@@ -349,9 +349,9 @@ isocontours of the temperature and the partition of the domain (along
 with the mesh) onto 512 processors:
 
 <p align="center">
-<img src="http://www.dealii.org/images/steps/developer/step-32.3d-sphere.solution.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-32.3d-sphere.solution.png" alt="">
 
-<img src="http://www.dealii.org/images/steps/developer/step-32.3d-sphere.partition.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-32.3d-sphere.partition.png" alt="">
 </p>
 
 

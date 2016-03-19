@@ -515,7 +515,7 @@ program, and with a different viscosity that affects transport
 velocities and therefore time step sizes) in 2d will produce the
 following graph:
 
-<img src="http://www.dealii.org/images/steps/developer/step-32.beta.2d.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-32.beta.2d.png" alt="">
 
 As can be seen, values $\beta \le 0.05$ are too small whereas
 $\beta=0.052$ appears to work, at least to the time horizon shown
@@ -545,7 +545,7 @@ viscosity $\nu$ and play with the constant $c_R$, making it as large
 as possible in order to make $\nu$ as small as possible. This gives us
 a picture like this:
 
-<img src="http://www.dealii.org/images/steps/developer/step-32.beta_cr.2d.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-32.beta_cr.2d.png" alt="">
 
 Consequently, $c_R=0.1$ would appear to be the right value here. While this
 graph has been obtained for an exponent $\alpha=1$, in the program we use
@@ -924,7 +924,7 @@ the following quantities:
   href="http://www.wolframalpha.com/input/?i=plot+%28sqrt%28x^2%2By^2%29%2B0.2*%28sqrt%28x^2%2By^2%29*%281-sqrt%28x^2%2By^2%29%29*sin%286*atan2%28x%2Cy%29%29%29%2C+x%3D-1+to+1%2C+y%3D-1+to+1">this
   page</a>):
 
-  <img src="http://www.dealii.org/images/steps/developer/step-32.2d-initial.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-32.2d-initial.png" alt="">
 
   The point of this profile is that if we had used $s$ instead of $\tau$ in
   the definition of $T(\mathbf x)$ then it would simply be a linear

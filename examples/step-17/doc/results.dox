@@ -122,8 +122,8 @@ Here is some output generated in the 12th cycle of the program, i.e. with roughl
 
 <table align="center" style="width:80%">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-17.12-ux.png" alt="" width="100%"></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-17.12-uy.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-17.12-ux.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-17.12-uy.png" alt="" width="100%"></td>
   </tr>
 </table>
 
@@ -136,8 +136,8 @@ though, is to look at the mesh and partition at this step:
 
 <table align="center" width="80%">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-17.12-grid.png" alt="" width="100%"></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-17.12-partition.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-17.12-grid.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-17.12-partition.png" alt="" width="100%"></td>
   </tr>
 </table>
 
@@ -219,8 +219,8 @@ we contend ourselves with showing output from cycle 4:
 
 <table width="80%" align="center">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-17.4-3d-partition.png" width="100%" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-17.4-3d-ux.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-17.4-3d-partition.png" width="100%" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-17.4-3d-ux.png" alt="" width="100%"></td>
   </tr>
 </table>
 

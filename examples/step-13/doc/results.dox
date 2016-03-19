@@ -58,46 +58,46 @@ first 9 refinement steps of the Kelly refinement indicator:
 <table width="80%" align="center">
   <tr>
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-13.solution-kelly-0.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-13.solution-kelly-0.png" alt="">
     </td>
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-13.solution-kelly-1.png" alt="">
-    </td>
-  </tr>
-
-  <tr>
-    <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-13.solution-kelly-2.png" alt="">
-    </td>
-    <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-13.solution-kelly-3.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-13.solution-kelly-1.png" alt="">
     </td>
   </tr>
 
   <tr>
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-13.solution-kelly-4.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-13.solution-kelly-2.png" alt="">
     </td>
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-13.solution-kelly-5.png" alt="">
-    </td>
-  </tr>
-
-  <tr>
-    <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-13.solution-kelly-6.png" alt="">
-    </td>
-    <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-13.solution-kelly-7.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-13.solution-kelly-3.png" alt="">
     </td>
   </tr>
 
   <tr>
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-13.solution-kelly-8.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-13.solution-kelly-4.png" alt="">
     </td>
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-13.solution-kelly-9.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-13.solution-kelly-5.png" alt="">
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <img src="https://www.dealii.org/images/steps/developer/step-13.solution-kelly-6.png" alt="">
+    </td>
+    <td>
+      <img src="https://www.dealii.org/images/steps/developer/step-13.solution-kelly-7.png" alt="">
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <img src="https://www.dealii.org/images/steps/developer/step-13.solution-kelly-8.png" alt="">
+    </td>
+    <td>
+      <img src="https://www.dealii.org/images/steps/developer/step-13.solution-kelly-9.png" alt="">
     </td>
   </tr>
 </table>
@@ -107,7 +107,7 @@ While we're already at watching pictures, this is the eighth grid, as
 viewed from top:
 
 
-<img src="http://www.dealii.org/images/steps/developer/step-13.grid-kelly-8.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-13.grid-kelly-8.png" alt="">
 
 
 However, we are not yet finished with evaluation the point value
@@ -116,7 +116,7 @@ $e=|u(x_0)-u_h(x_0)|$ for the two
 refinement criteria yields the following picture:
 
 
-<img src="http://www.dealii.org/images/steps/developer/step-13.error.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-13.error.png" alt="">
 
 
 
