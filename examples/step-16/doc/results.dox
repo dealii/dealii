@@ -3,7 +3,7 @@
 On the finest mesh, the solution looks like this:
 
 <p align="center">
-  <img src="http://www.dealii.org/images/steps/developer/step-16.solution.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-16.solution.png" alt="">
 </p>
 
 More importantly, we would like to see if the multigrid method really

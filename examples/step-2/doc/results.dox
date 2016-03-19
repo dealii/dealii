@@ -11,8 +11,8 @@ and which can't couple when discretizing a local, i.e. differential,
 equation):
 <table style="width:60%" align="center">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-2.sparsity-1.svg" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-2.sparsity-2.svg" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-2.sparsity-1.svg" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-2.sparsity-2.svg" alt=""></td>
   </tr>
 </table>
 

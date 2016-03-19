@@ -135,34 +135,34 @@ images encode the norm of the stress in the material):
 <table width="100%">
   <tr width="100%">
     <td width="33%">
-      <img src="http://www.dealii.org/images/steps/developer/step-18.sequential-0002.0000.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0002.0000.png" alt="">
        Time = 2
     </td>
 
     <td width="33%">
-      <img src="http://www.dealii.org/images/steps/developer/step-18.sequential-0005.0000.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0005.0000.png" alt="">
        Time = 5
     </td>
 
     <td width="33%">
-      <img src="http://www.dealii.org/images/steps/developer/step-18.sequential-0007.0000.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0007.0000.png" alt="">
        Time = 7
     </td>
   </tr>
 
   <tr width="100%">
     <td width="33%">
-      <img src="http://www.dealii.org/images/steps/developer/step-18.sequential-0008.0000.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0008.0000.png" alt="">
       Time = 8
     </td>
 
     <td width="33%">
-      <img src="http://www.dealii.org/images/steps/developer/step-18.sequential-0009.0000.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0009.0000.png" alt="">
       Time = 9
     </td>
 
     <td width="33%">
-      <img src="http://www.dealii.org/images/steps/developer/step-18.sequential-0010.0000.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0010.0000.png" alt="">
       Time = 10
     </td>
   </tr>
@@ -265,11 +265,11 @@ for the 16 processors:
 <table width="100%">
   <tr width="100%">
     <td width="49%">
-      <img src="http://www.dealii.org/images/steps/developer/step-18.parallel-000mesh.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-000mesh.png" alt="">
     </td>
 
     <td width="49%">
-      <img src="http://www.dealii.org/images/steps/developer/step-18.parallel-0002.p.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0002.p.png" alt="">
     </td>
   </tr>
 </table>
@@ -282,34 +282,34 @@ sequential case:
 <table width="100%">
   <tr width="100%">
     <td width="33%">
-      <img src="http://www.dealii.org/images/steps/developer/step-18.parallel-0002.s.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0002.s.png" alt="">
        Time = 2
     </td>
 
     <td width="33%">
-      <img src="http://www.dealii.org/images/steps/developer/step-18.parallel-0005.s.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0005.s.png" alt="">
        Time = 5
     </td>
 
     <td width="33%">
-      <img src="http://www.dealii.org/images/steps/developer/step-18.parallel-0007.s.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0007.s.png" alt="">
        Time = 7
     </td>
   </tr>
 
   <tr width="100%">
     <td width="33%">
-      <img src="http://www.dealii.org/images/steps/developer/step-18.parallel-0008.s.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0008.s.png" alt="">
        Time = 8
     </td>
 
     <td width="33%">
-      <img src="http://www.dealii.org/images/steps/developer/step-18.parallel-0009.s.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0009.s.png" alt="">
        Time = 9
     </td>
 
     <td width="33%">
-      <img src="http://www.dealii.org/images/steps/developer/step-18.parallel-0010.s.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0010.s.png" alt="">
        Time = 10
     </td>
   </tr>

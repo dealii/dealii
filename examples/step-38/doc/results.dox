@@ -36,7 +36,7 @@ this, neatly following the theoretically predicted pattern:
 Finally, the program produces graphical output that we can visualize. Here is
 a plot of the results:
 
-<img src="http://www.dealii.org/images/steps/developer/step-38.solution-3d.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-38.solution-3d.png" alt="">
 
 The program also works for 1d curves in 2d, not just 2d surfaces in 3d. You
 can test this by changing the template argument in <code>main()</code> like
@@ -50,7 +50,7 @@ then looks like so (the white curve is the domain, the colored curve is the
 solution extruded into the third dimension, clearly showing the change in sign
 as the curve moves from one quadrant of the domain into the adjacent one):
 
-<img src="http://www.dealii.org/images/steps/developer/step-38.solution-2d.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-38.solution-2d.png" alt="">
 
 
 <a name="extensions"></a>
@@ -67,9 +67,9 @@ before, we stretch it by a factor of 10 in the z-direction, and then we jumble
 the x- and y-coordinates a bit. Let's show the computational domain and the
 solution first before we go into details of the implementation below:
 
-<img src="http://www.dealii.org/images/steps/developer/step-38.warp-1.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-38.warp-1.png" alt="">
 
-<img src="http://www.dealii.org/images/steps/developer/step-38.warp-2.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-38.warp-2.png" alt="">
 
 The way to produce such a mesh is by using the GridTools::transform
 function. It needs a way to transform each individual mesh point to a

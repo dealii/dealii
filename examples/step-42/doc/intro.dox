@@ -29,7 +29,7 @@ solution will look like (the deformable body is a cube - only half of
 which is actually shown -, the obstacle corresponds
 to a Chinese character that is discussed below):
 
-<img src="http://www.dealii.org/images/steps/developer/step-42.CellConstitutionLi2.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-42.CellConstitutionLi2.png" alt="">
 
 
 This problem description implies that we have to take care of an additional
@@ -405,7 +405,7 @@ Compared to step-41, the programs has a few new classes:
   looks as follows (see also the picture at
   the top of this section on how the end result looks like):
 
-  <img src="http://www.dealii.org/images/steps/developer/step-42.character.png" alt="" width="25%">
+  <img src="https://www.dealii.org/images/steps/developer/step-42.character.png" alt="" width="25%">
 </ul>
 
 Other than that, let us comment only on the following aspects:

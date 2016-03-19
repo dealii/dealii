@@ -96,7 +96,7 @@ refines a mesh edge finding the new vertex as the point splitting in two even
 parts the curvilinear length of the CAD curve portion that lies between the
 vertices of the original edge.
 
-<img src="http://www.dealii.org/images/steps/developer/step-54.CurveSplit.png" alt="" width="500">
+<img src="https://www.dealii.org/images/steps/developer/step-54.CurveSplit.png" alt="" width="500">
 
 
 A different projection strategy has been implemented in the
@@ -111,8 +111,8 @@ shape---typically lying on the shape boundary---is selected.  If the shape is
 composed of several sub-shapes, the projection is carried out onto every
 single sub-shape, and the closest projection point point is selected.
 
-<img src="http://www.dealii.org/images/steps/developer/step-54.NormalProjectionEdge.png" alt="" width="500">
-<img src="http://www.dealii.org/images/steps/developer/step-54.NormalProjection.png" alt="" width="500">
+<img src="https://www.dealii.org/images/steps/developer/step-54.NormalProjectionEdge.png" alt="" width="500">
+<img src="https://www.dealii.org/images/steps/developer/step-54.NormalProjection.png" alt="" width="500">
 
 As we are about to experience, for some shapes, setting the projection
 direction as that normal to the CAD surface will not lead to surface mesh
@@ -129,7 +129,7 @@ the direction used at construction time.  In this way, the user will have a
 higher control on the projection direction to be enforced to ensure good mesh
 quality.
 
-<img src="http://www.dealii.org/images/steps/developer/step-54.DirectionalProjection.png" alt="" width="500">
+<img src="https://www.dealii.org/images/steps/developer/step-54.DirectionalProjection.png" alt="" width="500">
 
 
 Of course the latter approach is effective only when the orientation of the
@@ -170,7 +170,7 @@ arbitrarily shaped surfaces are considered, and unless you have a geometry for
 which a more specific approach is known to be appropriate.
 
 
-<img src="http://www.dealii.org/images/steps/developer/step-54.ProjectionComparisons.png" alt="" width="700">
+<img src="https://www.dealii.org/images/steps/developer/step-54.ProjectionComparisons.png" alt="" width="700">
 
 
 <h3> The testcase </h3>
@@ -183,7 +183,7 @@ flow of water around the ship (in a way similar to step-34) but we will not
 try to do this here. To already give you an idea of the geometry we consider,
 here is a picture:
 
-<img src="http://www.dealii.org/images/steps/developer/step-54.bare.png" alt="" width="500">
+<img src="https://www.dealii.org/images/steps/developer/step-54.bare.png" alt="" width="500">
 
 In the program, we read both the geometry and a coarse mesh from files, and
 then employ several of the options discussed above to place new vertices for a

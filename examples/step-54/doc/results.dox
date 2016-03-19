@@ -16,19 +16,19 @@ same grids shown in the second row.
 
 <table style="width:90%">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.common_0.png" alt="" width="400"></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_1.png" alt="" width="400"></td>		
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_2.png" alt="" width="400"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.common_0.png" alt="" width="400"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.normal_1.png" alt="" width="400"></td>		
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.normal_2.png" alt="" width="400"></td>
   </tr>
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_3.png" alt="" width="400"></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_4.png" alt="" width="400"></td>		
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_5.png" alt="" width="400"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.normal_3.png" alt="" width="400"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.normal_4.png" alt="" width="400"></td>		
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.normal_5.png" alt="" width="400"></td>
   </tr>
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_front_3.png" alt="" width="400"></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_front_4.png" alt="" width="400"></td>		
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_front_5.png" alt="" width="400"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.normal_front_3.png" alt="" width="400"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.normal_front_4.png" alt="" width="400"></td>		
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.normal_front_5.png" alt="" width="400"></td>
   </tr>
 </table>
 
@@ -45,19 +45,19 @@ is indicated with a small yellow arrow at the bottom left of each image).
 
 <table style="width:90%">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.common_0.png" alt="" width="400"></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.directional_1.png" alt="" width="400"></td>		
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.directional_2.png" alt="" width="400"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.common_0.png" alt="" width="400"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.directional_1.png" alt="" width="400"></td>		
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.directional_2.png" alt="" width="400"></td>
   </tr>
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.directional_3.png" alt="" width="400"></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.directional_4.png" alt="" width="400"></td>		
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.directional_5.png" alt="" width="400"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.directional_3.png" alt="" width="400"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.directional_4.png" alt="" width="400"></td>		
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.directional_5.png" alt="" width="400"></td>
   </tr>
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.directional_front_3.png" alt="" width="400"></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.directional_front_4.png" alt="" width="400"></td>		
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.directional_front_5.png" alt="" width="400"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.directional_front_3.png" alt="" width="400"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.directional_front_4.png" alt="" width="400"></td>		
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.directional_front_5.png" alt="" width="400"></td>
   </tr>
 </table>
 
@@ -69,19 +69,19 @@ The final test shows results using instead the projection normal to the faces:
 
 <table style="width:90%">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.common_0.png" alt="" width="400"></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_1.png" alt="" width="400"></td>		
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_2.png" alt="" width="400"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.common_0.png" alt="" width="400"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_1.png" alt="" width="400"></td>		
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_2.png" alt="" width="400"></td>
   </tr>
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_3.png" alt="" width="400"></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_4.png" alt="" width="400"></td>		
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_5.png" alt="" width="400"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_3.png" alt="" width="400"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_4.png" alt="" width="400"></td>		
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_5.png" alt="" width="400"></td>
   </tr>
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_front_3.png" alt="" width="400"></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_front_4.png" alt="" width="400"></td>		
-    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_front_5.png" alt="" width="400"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_front_3.png" alt="" width="400"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_front_4.png" alt="" width="400"></td>		
+    <td><img src="https://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_front_5.png" alt="" width="400"></td>
   </tr>
 </table>
 

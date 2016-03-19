@@ -96,7 +96,7 @@ with two objects cut out in the interior. This is how
 <code>untitled.geo</code> looks like in gmsh (displaying the boundary
 indicators as well as the mesh discussed further down below):
 
-<img src="http://www.dealii.org/images/steps/developer/step-49.gmsh_picture.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-49.gmsh_picture.png" alt="">
 
 You might want to open the <code>untitled.geo</code> file in a text editor (it
 is located in the same directory as the <code>step-49.cc</code> source file) to
@@ -125,7 +125,7 @@ loading the file.  Now this is the mesh read from the <code>.msh</code> file
 and saved again by deal.II as an image (see the <code>grid_1</code> function
 of the current program):
 
-<img src="http://www.dealii.org/images/steps/developer/step-49.grid-1.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-49.grid-1.png" alt="">
 
 
 <h3>Modifying a Mesh</h3>
@@ -151,10 +151,10 @@ coordinate of a mesh with a sine curve:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-5a.png" alt=""> regular input mesh
+        <img src="https://www.dealii.org/images/steps/developer/step-49.grid-5a.png" alt=""> regular input mesh
     </td>
     <td ALIGN="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-5.png" alt=""> output mesh
+        <img src="https://www.dealii.org/images/steps/developer/step-49.grid-5.png" alt=""> output mesh
     </td>
   </tr>
 </TABLE>
@@ -166,10 +166,10 @@ of this tutorial:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-6a.png" alt=""> regular input mesh
+        <img src="https://www.dealii.org/images/steps/developer/step-49.grid-6a.png" alt=""> regular input mesh
     </td>
     <td ALIGN="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-6.png" alt=""> wall-adapted output mesh
+        <img src="https://www.dealii.org/images/steps/developer/step-49.grid-6.png" alt=""> wall-adapted output mesh
     </td>
   </tr>
 </TABLE>
@@ -181,10 +181,10 @@ demonstrated in <code>grid_7()</code> and the result is as follows:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-7a.png" alt=""> regular input mesh
+        <img src="https://www.dealii.org/images/steps/developer/step-49.grid-7a.png" alt=""> regular input mesh
     </td>
     <td ALIGN="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-7.png" alt=""> perturbed output mesh
+        <img src="https://www.dealii.org/images/steps/developer/step-49.grid-7.png" alt=""> perturbed output mesh
     </td>
   </tr>
 </TABLE>
@@ -216,9 +216,9 @@ These are the input meshes and the output mesh:
 
 <table width="80%" align="center">
   <tr>
-    <td ALIGN="center"><img src="http://www.dealii.org/images/steps/developer/step-49.grid-2a.png" alt="" height="200px">input mesh 1</td>
-    <td ALIGN="center"><img src="http://www.dealii.org/images/steps/developer/step-49.grid-2b.png" alt="" height="200px">input mesh 2</td>
-    <td ALIGN="center"><img src="http://www.dealii.org/images/steps/developer/step-49.grid-2.png" alt="" height="200px">merged mesh</td>
+    <td ALIGN="center"><img src="https://www.dealii.org/images/steps/developer/step-49.grid-2a.png" alt="" height="200px">input mesh 1</td>
+    <td ALIGN="center"><img src="https://www.dealii.org/images/steps/developer/step-49.grid-2b.png" alt="" height="200px">input mesh 2</td>
+    <td ALIGN="center"><img src="https://www.dealii.org/images/steps/developer/step-49.grid-2.png" alt="" height="200px">merged mesh</td>
   </tr>
 </table>
 
@@ -234,11 +234,11 @@ centered by moving the top vertices upwards:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-3a.png" alt="" height="200px"> input mesh
+        <img src="https://www.dealii.org/images/steps/developer/step-49.grid-3a.png" alt="" height="200px"> input mesh
     </td>
 
     <td ALIGN="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-3.png" alt="" height="200px"> top vertices moved upwards
+        <img src="https://www.dealii.org/images/steps/developer/step-49.grid-3.png" alt="" height="200px"> top vertices moved upwards
     </td>
   </tr>
 </table>
@@ -260,11 +260,11 @@ mesh, generated for example with gmsh, that is read in from a
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-49.grid-4base.png" alt=""> input mesh
+      <img src="https://www.dealii.org/images/steps/developer/step-49.grid-4base.png" alt=""> input mesh
     </td>
 
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-49.grid-4.png" alt=""> extruded output mesh
+      <img src="https://www.dealii.org/images/steps/developer/step-49.grid-4.png" alt=""> extruded output mesh
     </td>
   </tr>
 </table>

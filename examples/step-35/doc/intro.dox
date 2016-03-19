@@ -218,7 +218,7 @@ vector-valued functions (e.g. divergences) becomes a little awkward, and others.
 The testcase that we use for this program consists of the flow around a square obstacle. The geometry is
 as follows:
 
-<img src="http://www.dealii.org/images/steps/developer/step-35.geometry.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-35.geometry.png" alt="">
 
 with $H=4.1$, making the geometry slightly non-symmetric.
 

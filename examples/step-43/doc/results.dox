@@ -14,7 +14,7 @@ pictures, so here is some output of a run in 3d:
 <table align="center" class="tutorial" cellspacing="3" cellpadding="3">
   <tr>
     <td align="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-43.3d.velocity.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-43.3d.velocity.png" alt="">
 	<p align="center">
         Velocity vectors of flow through the porous medium with random
         permeability model. Streaming paths of high permeability and resulting
@@ -22,7 +22,7 @@ pictures, so here is some output of a run in 3d:
 	</p>
     </td>
     <td align="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-43.3d.streamlines.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-43.3d.streamlines.png" alt="">
 	<p align="center">
         Streamlines colored by the saturation along the streamline path. Blue
         streamlines indicate low saturations, i.e., the flow along these
@@ -36,14 +36,14 @@ pictures, so here is some output of a run in 3d:
 
   <tr>
     <td align="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-43.3d.saturation.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-43.3d.saturation.png" alt="">
 	<p align="center">
         Streamlines with a volume rendering of the saturation, showing how far
         the fluid front has advanced at this time.
 	</p>
     </td>
     <td align="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-43.3d.mesh.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-43.3d.mesh.png" alt="">
 	<p align="center">
 	Surface of the mesh showing the adaptive refinement along the front.
 	</p>

@@ -52,7 +52,7 @@ With all this, here are a few movies that show how the saturation progresses
 over time. First, this is for the single crack model, as implemented in the
 <code>SingleCurvingCrack::KInverse</code> class:
 
-<img src="http://www.dealii.org/images/steps/developer/step-21.centerline.gif" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-21.centerline.gif" alt="">
 
 As can be seen, the water rich fluid snakes its way mostly along the
 high-permeability zone in the middle of the domain, whereas the rest of the
@@ -66,14 +66,14 @@ The second movie shows the saturation for the random medium model of class
 centers of high permeability and fluid hops from one of these zones to
 the next:
 
-<img src="http://www.dealii.org/images/steps/developer/step-21.random2d.gif" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-21.random2d.gif" alt="">
 
 
 Finally, here is the same situation in three space dimensions, on a mesh with
 <code>n_refinement_steps=5</code>, which produces a mesh of some 32,000 cells
 and 167,000 degrees of freedom:
 
-<img src="http://www.dealii.org/images/steps/developer/step-21.random3d.gif" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-21.random3d.gif" alt="">
 
 To repeat these computations, all you have to do is to change the line
 @code

@@ -89,31 +89,31 @@ the color scale used for the temperature is not always the same):
 <table align="center" border="1" cellspacing="3" cellpadding="3">
   <tr>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.2d.solution.00.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.2d.solution.00.png" alt="">
     </td>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.2d.solution.01.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.2d.solution.01.png" alt="">
     </td>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.2d.solution.02.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.2d.solution.02.png" alt="">
     </td>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.2d.solution.03.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.2d.solution.03.png" alt="">
     </td>
   </tr>
 
   <tr>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.2d.solution.04.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.2d.solution.04.png" alt="">
     </td>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.2d.solution.05.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.2d.solution.05.png" alt="">
     </td>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.2d.solution.06.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.2d.solution.06.png" alt="">
     </td>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.2d.solution.07.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.2d.solution.07.png" alt="">
     </td>
   </tr>
 </table>
@@ -137,31 +137,31 @@ adaptive mesh and the flow field at the same time steps:
 <table align="center" border="1" cellspacing="3" cellpadding="3">
   <tr>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.2d.grid.00.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.2d.grid.00.png" alt="">
     </td>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.2d.grid.01.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.2d.grid.01.png" alt="">
     </td>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.2d.grid.02.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.2d.grid.02.png" alt="">
     </td>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.2d.grid.03.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.2d.grid.03.png" alt="">
     </td>
   </tr>
 
   <tr>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.2d.grid.04.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.2d.grid.04.png" alt="">
     </td>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.2d.grid.05.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.2d.grid.05.png" alt="">
     </td>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.2d.grid.06.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.2d.grid.06.png" alt="">
     </td>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.2d.grid.07.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.2d.grid.07.png" alt="">
     </td>
   </tr>
 </table>
@@ -242,43 +242,43 @@ following plots:
 <table align="center" border="1" cellspacing="3" cellpadding="3">
   <tr>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.3d.solution.00.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.3d.solution.00.png" alt="">
     </td>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.3d.solution.01.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.3d.solution.01.png" alt="">
     </td>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.3d.solution.02.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.3d.solution.02.png" alt="">
     </td>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.3d.solution.03.png" alt="">
-    </td>
-  </tr>
-
-  <tr>
-    <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.3d.solution.04.png" alt="">
-    </td>
-    <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.3d.solution.05.png" alt="">
-    </td>
-    <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.3d.solution.06.png" alt="">
-    </td>
-    <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.3d.solution.07.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.3d.solution.03.png" alt="">
     </td>
   </tr>
 
   <tr>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.3d.solution.08.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.3d.solution.04.png" alt="">
     </td>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.3d.solution.09.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.3d.solution.05.png" alt="">
     </td>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.3d.solution.10.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.3d.solution.06.png" alt="">
+    </td>
+    <td>
+        <img src="https://www.dealii.org/images/steps/developer/step-31.3d.solution.07.png" alt="">
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+        <img src="https://www.dealii.org/images/steps/developer/step-31.3d.solution.08.png" alt="">
+    </td>
+    <td>
+        <img src="https://www.dealii.org/images/steps/developer/step-31.3d.solution.09.png" alt="">
+    </td>
+    <td>
+        <img src="https://www.dealii.org/images/steps/developer/step-31.3d.solution.10.png" alt="">
     </td>
     <td>
     </td>
@@ -411,19 +411,19 @@ bilinear elements (<code>temperature_degree=1</code>) in 2d:
 <table align="center" border="1" cellspacing="3" cellpadding="3">
   <tr>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.timestep.q1.beta=0.01.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.timestep.q1.beta=0.01.png" alt="">
     </td>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.timestep.q1.beta=0.03.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.timestep.q1.beta=0.03.png" alt="">
     </td>
   </tr>
 
   <tr>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.timestep.q1.beta=0.1.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.timestep.q1.beta=0.1.png" alt="">
     </td>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.timestep.q1.beta=0.5.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.timestep.q1.beta=0.5.png" alt="">
     </td>
   </tr>
 </table>
@@ -488,16 +488,16 @@ retain the $Q_2/Q_1$ stable Taylor-Hood element for the Stokes system:
 <table align="center" border="1" cellspacing="3" cellpadding="3">
   <tr>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.timestep.q2.beta=0.01.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.timestep.q2.beta=0.01.png" alt="">
     </td>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.timestep.q2.beta=0.03.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.timestep.q2.beta=0.03.png" alt="">
     </td>
   </tr>
 
   <tr>
     <td>
-        <img src="http://www.dealii.org/images/steps/developer/step-31.timestep.q2.beta=0.1.png" alt="">
+        <img src="https://www.dealii.org/images/steps/developer/step-31.timestep.q2.beta=0.1.png" alt="">
     </td>
   </tr>
 </table>

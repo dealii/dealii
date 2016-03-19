@@ -16,14 +16,14 @@ the coarse mesh. Several of the meshes shown in the introduction section fall
 into this category. For example, for this mesh the central hole is supposed to
 be round:
 
-<img src="http://www.dealii.org/images/steps/developer/step-49.grid-2a.png" alt="" height="200px">
+<img src="https://www.dealii.org/images/steps/developer/step-49.grid-2a.png" alt="" height="200px">
 
 On the other hand, if you simply refine it, the Triangulation class can not
 know whether you wanted the hole to be round or to be an octagon. The default
 is to place new points along existing edges. After two mesh refinement steps,
 this would yield the following mesh, which is not what we wanted:
 
-<img src="http://www.dealii.org/images/steps/developer/step-49.grid-2d-refined.png" alt="" height="200px">
+<img src="https://www.dealii.org/images/steps/developer/step-49.grid-2d-refined.png" alt="" height="200px">
 
 What needs to happen is that you tell the triangulation that you in fact want
 to use a curved boundary. The way to do this requires three steps:
@@ -46,7 +46,7 @@ The goal was to generate (and use) a geometry that describes a
 microstructured electric device. In a CAD program, the geometry looks like
 this:
 
-<img src="http://www.dealii.org/images/steps/developer/step-49.yuhan.1.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-49.yuhan.1.png" alt="">
 
 In the following, we will walk you through the entire process of creating a
 mesh for this geometry, including a number of common pitfalls by showing the
@@ -227,7 +227,7 @@ void create_3d_grid (Triangulation<3> &triangulation)
 
 With this code, you get a mesh that looks like this:
 
-<img src="http://www.dealii.org/images/steps/developer/step-49.yuhan.2.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-49.yuhan.2.png" alt="">
 
 The next step is to teach each of the top surfaces that they should be
 curved. We can do this by creating CylinderBoundary objects that
@@ -283,7 +283,7 @@ describe this. A first attempt looks like this:
 
 With this code, we get a mesh that looks like this:
 
-<img src="http://www.dealii.org/images/steps/developer/step-49.yuhan.3.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-49.yuhan.3.png" alt="">
 
 This is clearly not correct: The new vertices that have been entered at
 mid-edge and mid-face points are not where they should have been. Upon some
@@ -305,7 +305,7 @@ axis:
 
 This yields an improvement, though it is still not quite correct:
 
-<img src="http://www.dealii.org/images/steps/developer/step-49.yuhan.4.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-49.yuhan.4.png" alt="">
 
 Looking closely at this mesh, we realize that the new points on mid-face
 vertices are where they should be, though the new vertices inserted at
@@ -317,7 +317,7 @@ easily fixed by using the function TriaAccessor::set_all_boundary_ids()
 instead of TriaAccessor::set_boundary_id() used above. With this change,
 the grid now looks like this:
 
-<img src="http://www.dealii.org/images/steps/developer/step-49.yuhan.5.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-49.yuhan.5.png" alt="">
 
 This is already better. However, something is still going wrong on the
 front left face. On second look, we can also see that the faces where
@@ -372,11 +372,11 @@ code does the trick:
 
 With this, we finally get a mesh that looks good:
 
-<img src="http://www.dealii.org/images/steps/developer/step-49.yuhan.6.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-49.yuhan.6.png" alt="">
 
 We can then refine the mesh two more times to see in more detail what
 happens to the curved part of the boundary:
 
- <img src="http://www.dealii.org/images/steps/developer/step-49.yuhan.7.png" alt="">
+ <img src="https://www.dealii.org/images/steps/developer/step-49.yuhan.7.png" alt="">
 
  So, yes!, this is finally what we were looking for!

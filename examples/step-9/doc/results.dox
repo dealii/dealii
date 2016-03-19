@@ -29,7 +29,7 @@ resolve the features of the solution. The final grid showing this is
 displayed in the following picture:
 
 
-<img src="http://www.dealii.org/images/steps/developer/step-9.grid.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-9.grid.png" alt="">
 
 
 
@@ -37,7 +37,7 @@ The structure of the grid will be understandable by looking at the
 solution itself:
 
 
-<img src="http://www.dealii.org/images/steps/developer/step-9.solution.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-9.solution.png" alt="">
 
 
 

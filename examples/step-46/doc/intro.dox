@@ -540,7 +540,7 @@ introduction.
 
 We will consider the following situation as a testcase:
 
-<img src="http://www.dealii.org/images/steps/developer/step-46.layout.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-46.layout.png" alt="">
 
 As discussed at the top of this document, we need to assume in a few places
 that a cell is either entirely in the fluid or solid part of the domain and,

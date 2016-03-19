@@ -35,37 +35,37 @@ solution. This yields the following set of images:
 <TABLE WIDTH="100%">
 <tr>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-15.solution-0.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-15.solution-0.png" alt="">
 </td>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-15.solution-1.png" alt="">
-</td>
-</tr>
-
-<tr>
-<td>
-  <img src="http://www.dealii.org/images/steps/developer/step-15.solution-2.png" alt="">
-</td>
-<td>
-  <img src="http://www.dealii.org/images/steps/developer/step-15.solution-3.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-15.solution-1.png" alt="">
 </td>
 </tr>
 
 <tr>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-15.solution-4.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-15.solution-2.png" alt="">
 </td>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-15.solution-5.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-15.solution-3.png" alt="">
 </td>
 </tr>
 
 <tr>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-15.solution-6.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-15.solution-4.png" alt="">
 </td>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-15.solution-7.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-15.solution-5.png" alt="">
+</td>
+</tr>
+
+<tr>
+<td>
+  <img src="https://www.dealii.org/images/steps/developer/step-15.solution-6.png" alt="">
+</td>
+<td>
+  <img src="https://www.dealii.org/images/steps/developer/step-15.solution-7.png" alt="">
 </td>
 </tr>
 </table>
@@ -85,7 +85,7 @@ the inside of the domain, where nothing interesting happens,
 because there isn't much change in the solution. The final solution
 and mesh are shown here:
 
-<img src="http://www.dealii.org/images/steps/developer/step-15.grid.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-15.grid.png" alt="">
 
 
 

@@ -63,24 +63,24 @@ vorticity and in the right the velocity field:
 
 <table>
   <tr>
-    <td> <img src="http://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.0.png" alt=""> </td>
-    <td> <img src="http://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.0.png" alt=""> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.0.png" alt=""> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.0.png" alt=""> </td>
   </tr>
   <tr>
-    <td> <img src="http://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.1.png" alt=""> </td>
-    <td> <img src="http://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.1.png" alt=""> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.1.png" alt=""> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.1.png" alt=""> </td>
   </tr>
   <tr>
-    <td> <img src="http://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.2.png" alt=""> </td>
-    <td> <img src="http://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.2.png" alt=""> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.2.png" alt=""> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.2.png" alt=""> </td>
   </tr>
   <tr>
-    <td> <img src="http://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.3.png" alt=""> </td>
-    <td> <img src="http://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.3.png" alt=""> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.3.png" alt=""> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.3.png" alt=""> </td>
   </tr>
   <tr>
-    <td> <img src="http://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.4.png" alt=""> </td>
-    <td> <img src="http://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.4.png" alt=""> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.vorticity.4.png" alt=""> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_100.velocity.4.png" alt=""> </td>
   </tr>
 </table>
 
@@ -98,12 +98,12 @@ yields the following images at times $t=20,40$:
 
 <table>
   <tr>
-    <td> <img src="http://www.dealii.org/images/steps/developer/step-35.Re_500.vorticity.0.png" alt=""> </td>
-    <td> <img src="http://www.dealii.org/images/steps/developer/step-35.Re_500.velocity.0.png" alt=""> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.vorticity.0.png" alt=""> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.velocity.0.png" alt=""> </td>
   </tr>
   <tr>
-    <td> <img src="http://www.dealii.org/images/steps/developer/step-35.Re_500.vorticity.1.png" alt=""> </td>
-    <td> <img src="http://www.dealii.org/images/steps/developer/step-35.Re_500.velocity.1.png" alt=""> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.vorticity.1.png" alt=""> </td>
+    <td> <img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.velocity.1.png" alt=""> </td>
   </tr>
 </table>
 
@@ -116,7 +116,7 @@ small scale dynamics. The riddle is easily solved,
 however, by looking at a zoom at the region behind the obstacle, and
 the mesh size we have there:
 
-<img src="http://www.dealii.org/images/steps/developer/step-35.Re_500.zoom.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.zoom.png" alt="">
 
 It is clear here that the flow is still reasonably well resolved in
 the immediate wake of the obstacle, where the mesh is relatively fine,
@@ -128,7 +128,7 @@ finer mesh.
 A rerun with one more mesh refinement set in the parameter file
 confirms that results look much more sensible now:
 
-<img src="http://www.dealii.org/images/steps/developer/step-35.Re_500.zoom_2.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.zoom_2.png" alt="">
 
 Here, the zone where the mesh becomes coarser is immediately
 downstream of the big red blob at the bottom of the wake behind the

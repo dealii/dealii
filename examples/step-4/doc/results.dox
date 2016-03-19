@@ -38,7 +38,7 @@ you should play around with your favorite visualization tool to get familiar
 with its functionality. Here's what I have come up with for the 2d solution:
 
 <p align="center">
-  <img src="http://www.dealii.org/images/steps/developer/step-4.solution-2d.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-4.solution-2d.png" alt="">
 </p>
 
 (@dealiiVideoLectureSeeAlso{11,32})
@@ -71,11 +71,11 @@ so that it is possible to see through them and see what's behind.
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-4.solution-3d.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-4.solution-3d.png" alt="">
     </td>
 
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-4.contours-3d.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-4.contours-3d.png" alt="">
     </td>
   </tr>
 </table>
