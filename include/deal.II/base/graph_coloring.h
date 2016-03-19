@@ -351,7 +351,7 @@ namespace GraphColoring
                   // iterators.
                   std::vector<unsigned int>::iterator it;
                   it = std::max_element(colors_counter[i].begin(),colors_counter[i].end());
-                  unsigned int min_iterators(-1);
+                  unsigned int min_iterators (static_cast<unsigned int>(-1));
                   unsigned int pos(0);
                   // Find the color of coloring with the least number of colors among
                   // the colors that have not been used yet.
@@ -402,7 +402,7 @@ namespace GraphColoring
                       // iterators.
                       std::vector<unsigned int>::iterator it;
                       it = std::max_element(colors_counter[i].begin(),colors_counter[i].end());
-                      unsigned int min_iterators(-1);
+                      unsigned int min_iterators(static_cast<unsigned int>(-1));
                       unsigned int pos(0);
                       // Find the color of coloring with the least number of colors among
                       // the colors that have not been used yet.

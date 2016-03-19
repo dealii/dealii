@@ -66,7 +66,7 @@ public:
    * construct an empty CellId.
    */
   CellId()
-    : coarse_cell_id(-1)
+    : coarse_cell_id(static_cast<unsigned int>(-1))
   {}
 
   /**

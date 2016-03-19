@@ -3205,7 +3205,6 @@ CellAccessor<3>::subface_case(const unsigned int face_no) const
     {
     case RefinementCase<3>::no_refinement:
       return dealii::internal::SubfaceCase<3>::case_none;
-      break;
     case RefinementCase<3>::cut_x:
       if (face(face_no)->child(0)->has_children())
         {
@@ -3231,7 +3230,6 @@ CellAccessor<3>::subface_case(const unsigned int face_no) const
           else
             return dealii::internal::SubfaceCase<3>::case_x;
         }
-      break;
     case RefinementCase<3>::cut_y:
       if (face(face_no)->child(0)->has_children())
         {
@@ -3257,10 +3255,8 @@ CellAccessor<3>::subface_case(const unsigned int face_no) const
           else
             return dealii::internal::SubfaceCase<3>::case_y;
         }
-      break;
     case RefinementCase<3>::cut_xy:
       return dealii::internal::SubfaceCase<3>::case_xy;
-      break;
     default:
       Assert(false, ExcInternalError());
     }
