@@ -3098,7 +3098,7 @@ CellAccessor<dim,spacedim>::id() const
   while (ptr.level()>0)
     {
       // determine which child we are
-      unsigned char v=-1;
+      unsigned char v = static_cast<unsigned char>(-1);
       for (unsigned int c=0; c<ptr.parent()->n_children(); ++c)
         {
           if (ptr.parent()->child_index(c)==ptr.index())
