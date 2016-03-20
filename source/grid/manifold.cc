@@ -105,9 +105,11 @@ normal_vector (const typename Triangulation<3, 3>::face_iterator &face,
   // Verify we have a valid vertex index
   AssertIndexRange(min_index, 4);
 
-  // now figure out which vertices are better to compute tangent vectors
-  // we split the cell in 4 quadrants, and use v1/v2 for the first quadrant
-  // (the one at the corner with vertex 0)
+  // Now figure out which vertices are better to compute tangent vectors
+  // we split the cell in 4 quadrants, and use the most orthogonal vertices
+  // to the closest vertex if we ar far from the center, othewise we use
+  // the two consecutive vertices, on the opposite side with respect to
+  // the face center.
   if ((p-face->center()).norm_square() < min_distance)
     {
       // we are close to the face center: pick two consecutive vertices,
