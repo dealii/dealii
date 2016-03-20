@@ -74,7 +74,8 @@ normal_vector (const typename Triangulation<2, 2>::face_iterator &face,
   Tensor<1,spacedim> tangent = ((p-face->vertex(0)).norm_square() > (p-face->vertex(1)).norm_square() ?
                                 get_tangent_vector(p, face->vertex(0)) :
                                 -get_tangent_vector(p, face->vertex(1)));
-  return cross_product_2d(tangent);
+  Tensor<1,spacedim> normal = cross_product_2d(tangent);
+  return normal/normal.norm();
 }
 
 template<>
@@ -87,16 +88,19 @@ normal_vector (const typename Triangulation<3, 3>::face_iterator &face,
   Tensor<1,spacedim> t1,t2;
 
   // Take the difference between p and all four vertices
-  Tensor<1,spacedim> dp[4];
-  double dpns[4];
-  int min_index=-1;
-  double min_distance = 0;
-  for (unsigned int i=0; i<4; ++i)
+  int min_index=0;
+  Tensor<1,spacedim> dp = p-face->vertex(0);
+  double min_distance = dp.norm_square();
+
+  for (unsigned int i=1; i<4; ++i)
     {
-      dp[i] = p-face->vertex(i);
-      dpns[i] = dp[i].norm_square();
-      min_index = (min_index == -1 ? (int)i : dpns[i] < min_distance ? i : min_index);
-      min_distance = dpns[min_index];
+      dp = p-face->vertex(i);
+      double distance = dp.norm_square();
+      if (distance < min_distance)
+        {
+          min_index = i;
+          min_distance = distance;
+        }
     }
   // Verify we have a valid vertex index
   AssertIndexRange(min_index, 4);
@@ -153,7 +157,8 @@ normal_vector (const typename Triangulation<3, 3>::face_iterator &face,
           break;
         }
     }
-  return cross_product_3d(t1,t2);
+  Tensor<1,spacedim> normal = cross_product_3d(t1,t2);
+  return normal/normal.norm();
 }
 
 
@@ -165,6 +170,48 @@ normal_vector (const typename Triangulation<dim, spacedim>::face_iterator &face,
 {
   Assert(false, ExcPureFunctionCalled());
   return Tensor<1,spacedim>();
+}
+
+
+
+template <>
+void
+Manifold<2, 2>::
+get_normals_at_vertices (const typename Triangulation<2, 2>::face_iterator &face,
+                         FaceVertexNormals &n) const
+{
+  n[0] = cross_product_2d(get_tangent_vector(face->vertex(0), face->vertex(1)));
+  n[1] = -cross_product_2d(get_tangent_vector(face->vertex(1), face->vertex(0)));
+
+  n[0] /= n[0].norm();
+  n[1] /= n[1].norm();
+}
+
+
+template <>
+void
+Manifold<3, 3>::
+get_normals_at_vertices (const typename Triangulation<3, 3>::face_iterator &face,
+                         FaceVertexNormals &n) const
+{
+  n[0] = cross_product_3d
+         (get_tangent_vector(face->vertex(0), face->vertex(1)),
+          get_tangent_vector(face->vertex(0), face->vertex(2)));
+
+  n[1] = cross_product_3d
+         (get_tangent_vector(face->vertex(1), face->vertex(3)),
+          get_tangent_vector(face->vertex(1), face->vertex(0)));
+
+  n[2] = cross_product_3d
+         (get_tangent_vector(face->vertex(2), face->vertex(0)),
+          get_tangent_vector(face->vertex(2), face->vertex(3)));
+
+  n[3] = cross_product_3d
+         (get_tangent_vector(face->vertex(3), face->vertex(2)),
+          get_tangent_vector(face->vertex(3), face->vertex(1)));
+
+  for (unsigned int i=0; i<4; ++i)
+    n[i] /=n[i].norm();
 }
 
 

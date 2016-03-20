@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// test GridTools::torus() and TorusManifold, output visually checked
+// test get_normals_at_vertices for a SphericalManifold.
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -46,7 +46,8 @@ void test ()
       << "set view equal xyz" << std::endl
       << "set size ratio -1" << std::endl
       << "set multiplot" << std::endl
-      << "splot '-' with vectors " << std::endl;
+      << (dim == 3 ? "s" : "")
+      << "plot '-' with vectors " << std::endl;
 
   for (typename Triangulation<dim,spacedim>::active_cell_iterator
        cell = triangulation.begin_active();
