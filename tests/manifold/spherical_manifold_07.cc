@@ -62,6 +62,12 @@ void test ()
 
             for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
               {
+                Tensor<1,spacedim> dn = n[v]-manifold.normal_vector
+                                        (cell->face(f), cell->face(f)->vertex(v));
+
+                if ( dn.norm() > 1e-10)
+                  deallog << "Error on vertex " << f << ", face "
+                          << cell->face(f) << ": " << dn << std::endl;
 
                 deallog.get_file_stream() << cell->face(f)->vertex(v)
                                           << " " << n[v]*.1 << std::endl;
