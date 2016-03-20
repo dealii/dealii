@@ -73,7 +73,7 @@ normal_vector (const typename Triangulation<2, 2>::face_iterator &face,
 
   Tensor<1,spacedim> tangent = ((p-face->vertex(0)).norm_square() > (p-face->vertex(1)).norm_square() ?
                                 get_tangent_vector(p, face->vertex(0)) :
-                                get_tangent_vector(p, face->vertex(1)));
+                                -get_tangent_vector(p, face->vertex(1)));
   return cross_product_2d(tangent);
 }
 
@@ -175,7 +175,10 @@ get_normals_at_vertices (const typename Triangulation<dim, spacedim>::face_itera
                          FaceVertexNormals &n) const
 {
   for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
-    n[v] = normal_vector(face, face->vertex(v));
+    {
+      n[v] = normal_vector(face, face->vertex(v));
+      n[v] /= n[v].norm();
+    }
 }
 
 
