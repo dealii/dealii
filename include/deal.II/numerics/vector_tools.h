@@ -1192,7 +1192,7 @@ namespace VectorTools
    * module on
    * @ref constraints.
    *
-   * <h4>Arguments to this function></h4>
+   * <h4>Arguments to this function</h4>
    *
    * This function is explicitly for use with FE_Nedelec elements, or with
    * FESystem elements which contain FE_Nedelec elements. It will throw an
@@ -1327,24 +1327,36 @@ namespace VectorTools
    * variable and $\vec u_\Gamma$ is a prescribed vector field whose normal
    * component we want to be equal to the normal component of the solution.
    * These conditions have exactly the form handled by the ConstraintMatrix
-   * class, so instead of creating a map between boundary degrees of freedom
-   * and corresponding value, we here create a list of constraints that are
+   * class, in that they relate a <i>linear combination</i> of boundary degrees
+   * of freedom to a corresponding value (the inhomogeneity of the constraint).
+   * Consequently, the current function creates a list of constraints that are
    * written into a ConstraintMatrix. This object may already have some
    * content, for example from hanging node constraints, that remains
    * untouched. These constraints have to be applied to the linear system like
-   * any other such constraints, i.e. you have to condense the linear system
+   * any other such constraints, i.e., you have to condense the linear system
    * with the constraints before solving, and you have to distribute the
    * solution vector afterwards.
    *
-   * The use of this function is explained in more detail in step-31. It
-   * doesn't make much sense in 1d, so the function throws an exception in
-   * that case.
+   * This function treats a more general case than
+   * VectorTools::compute_no_normal_flux_constraints() (which can only handle
+   * the case where $\vec u_\Gamma \cdot \vec n = 0$, and is used in
+   * step-31 and step-32). However, because everything that would apply
+   * to that function also applies as a special case to the current
+   * function, the following discussion is relevant to both.
+   *
+   * @note This function doesn't make much sense in 1d, so it throws an
+   *   exception if @p dim equals one.
+   *
+   *
+   * <h4>Arguments to this function</h4>
    *
    * The second argument of this function denotes the first vector component
    * in the finite element that corresponds to the vector function that you
    * want to constrain. For example, if we were solving a Stokes equation in
    * 2d and the finite element had components $(u,v,p)$, then @p
-   * first_vector_component would be zero. On the other hand, if we solved the
+   * first_vector_component needs to be zero if you intend to constraint
+   * the vector $(u,v)^T \cdot \vec n = \vec u_\Gamma \cdot \vec n$.
+   * On the other hand, if we solved the
    * Maxwell equations in 3d and the finite element has components
    * $(E_x,E_y,E_z,B_x,B_y,B_z)$ and we want the boundary condition $\vec
    * B\cdot \vec n=\vec B_\Gamma\cdot \vec n$, then @p first_vector_component
@@ -1368,10 +1380,10 @@ namespace VectorTools
    * function multiple times with only one boundary indicator, or whether we
    * call the function once with the whole set of boundary indicators at once.
    *
-   * The forth parameter describes the boundary function that is used for
+   * The fourth parameter describes the boundary function that is used for
    * computing these constraints.
    *
-   * The mapping argument is used to compute the boundary points where the
+   * The mapping argument is used to compute the boundary points at which the
    * function needs to request the normal vector $\vec n$ from the boundary
    * description.
    *
@@ -1511,7 +1523,10 @@ namespace VectorTools
    *
    * Because it makes for good pictures, here are two images of vector fields
    * on a circle and on a sphere to which the constraints computed by this
-   * function have been applied:
+   * function have been applied (for illustration purposes, we enforce zero
+   * normal flux, which can more easily be computed using
+   * VectorTools::compute_no_normal_flux_constraints(), as this must
+   * lead to a <i>tangential</i> vector field):
    *
    * <p ALIGN="center">
    * @image html no_normal_flux_5.png
@@ -1539,8 +1554,10 @@ namespace VectorTools
    const Mapping<dim, spacedim>         &mapping = StaticMappingQ1<dim>::mapping);
 
   /**
-   * Same as above for homogeneous normal-flux constraints, i.e., for
-   * imposing the condition $\vec u \cdot \vec n= 0$.
+   * This function does the same as the compute_nonzero_normal_flux_constraints()
+   * function (see there for more information), but for the simpler case of
+   * homogeneous normal-flux constraints, i.e., for imposing the condition
+   * $\vec u \cdot \vec n= 0$. This function is used in step-31 and step-32.
    *
    * @ingroup constraints
    *
