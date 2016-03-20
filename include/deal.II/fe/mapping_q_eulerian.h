@@ -17,6 +17,7 @@
 #ifndef dealii__mapping_q_eulerian_h
 #define dealii__mapping_q_eulerian_h
 
+#include <deal.II/base/config.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -27,6 +28,8 @@
 
 
 DEAL_II_NAMESPACE_OPEN
+
+template <typename> class Vector;
 
 
 /*!@addtogroup mapping */
