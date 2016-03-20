@@ -373,6 +373,31 @@ TorusManifold<dim>::TorusManifold (const double R, const double r)
   Assert (r>0.0, ExcMessage("inner radius must be positive."));
 }
 
+template <int dim>
+DerivativeForm<1,3,3>
+TorusManifold<dim>::push_forward_gradient(const Point<3> &chart_point) const
+{
+  DerivativeForm<1,spacedim,spacedim> DX;
+
+  double phi = chart_point(0);
+  double theta = chart_point(1);
+  double w = chart_point(2);
+
+  DX[0][0] = -sin(phi)*R - r*w*cos(theta)*sin(phi);
+  DX[0][1] = -r*w*sin(theta)*cos(phi);
+  DX[0][2] = r*cos(theta)*cos(phi);
+
+  DX[1][0] = 0;
+  DX[1][1] = r*w*cos(theta);
+  DX[1][2] = r*cos(theta);
+
+  DX[2][0] = cos(phi)*R + r*w*cos(theta)*cos(phi);
+  DX[2][1] = -r*w*sin(theta)*sin(phi);
+  DX[2][2] = r*cos(theta)*sin(phi);
+
+  return DX;
+}
+
 
 
 // explicit instantiations

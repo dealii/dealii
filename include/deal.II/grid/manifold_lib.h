@@ -349,6 +349,13 @@ public:
   virtual Point<spacedim>
   push_forward(const Point<chartdim> &chart_point) const;
 
+  /**
+   * Gradient.
+   */
+  virtual
+  DerivativeForm<1,chartdim,spacedim>
+  push_forward_gradient(const Point<chartdim> &chart_point) const;
+
 private:
   double r, R;
 };
