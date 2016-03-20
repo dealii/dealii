@@ -133,6 +133,14 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
       void scale<deal_II_dimension> (const double,
                                      Triangulation<deal_II_dimension, deal_II_space_dimension> &);
 
+#if deal_II_space_dimension==3
+    template
+      void
+      rotate<deal_II_dimension> (const double,
+                                 const unsigned int ,
+                                 Triangulation<deal_II_dimension, deal_II_space_dimension> &);
+#endif
+
     template
       void distort_random<deal_II_dimension> (const double,
                                      Triangulation<deal_II_dimension, deal_II_space_dimension> &,
