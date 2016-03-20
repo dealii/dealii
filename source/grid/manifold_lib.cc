@@ -332,6 +332,49 @@ FunctionManifold<dim,spacedim,chartdim>::pull_back(const Point<spacedim> &space_
   return result;
 }
 
+
+
+template <int dim>
+Point<3>
+TorusManifold<dim>::pull_back(const Point<3> &p) const
+{
+  double x = p(0);
+  double z = p(1);
+  double y = p(2);
+  double phi = atan2(y, x);
+  double theta = atan2(z, std::sqrt(x*x+y*y)-R);
+  double w = std::sqrt((pow(y-sin(phi)*R, 2.0)+pow(x-cos(phi)*R, 2.0)+z*z))/r;
+  return Point<3>(phi, theta, w);
+}
+
+template <int dim>
+Point<3>
+TorusManifold<dim>::push_forward(const Point<3> &chart_point) const
+{
+  double phi = chart_point(0);
+  double theta = chart_point(1);
+  double w = chart_point(2);
+
+  return Point<3>(cos(phi)*R + r*w*cos(theta)*cos(phi),
+                  r*w*sin(theta),
+                  sin(phi)*R + r*w*cos(theta)*sin(phi)
+                 );
+}
+
+
+template <int dim>
+TorusManifold<dim>::TorusManifold (const double R, const double r)
+  : ChartManifold<dim,3,3> (Point<3>(2*numbers::PI, 2*numbers::PI, 0.0)),
+    r(r),
+    R(R)
+{
+  Assert (R>r, ExcMessage("Outer radius R must be greater than the inner "
+                          "radius r."));
+  Assert (r>0.0, ExcMessage("inner radius must be positive."));
+}
+
+
+
 // explicit instantiations
 #include "manifold_lib.inst"
 
