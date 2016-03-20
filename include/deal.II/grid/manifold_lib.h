@@ -250,7 +250,8 @@ public:
                    const typename FunctionParser<spacedim>::ConstMap = typename FunctionParser<spacedim>::ConstMap(),
                    const std::string chart_vars=FunctionParser<chartdim>::default_variable_names(),
                    const std::string space_vars=FunctionParser<spacedim>::default_variable_names(),
-                   const double tolerance=1e-10);
+                   const double tolerance=1e-10,
+                   const double h=1e-8);
 
   /**
    * If needed, we delete the pointers we own.
@@ -264,6 +265,30 @@ public:
    */
   virtual Point<spacedim>
   push_forward(const Point<chartdim> &chart_point) const;
+
+  /**
+   * Given a point in the chartdim dimensional Euclidean space, this
+   * method returns the derivatives of the function $F$ that maps from
+   * the sub_manifold coordinate system to the Euclidean coordinate
+   * system. In other words, it is a matrix of size
+   * $\text{spacedim}\times\text{chartdim}$.
+   *
+   * This function is used in the computations required by the
+   * get_tangent_vector() function. The default implementation calls
+   * the get_gradient() method of the
+   * FunctionManifold::push_forward_function() member class. If you
+   * construct this object using the constructor that takes two string
+   * expression, then the default implementation of this method uses a
+   * finite difference scheme to compute the gradients(see the
+   * AutoDerivativeFunction() class for details), and you can specify
+   * the size of the spatial step size at construction time with the
+   * @p h parameter.
+   *
+   * Refer to the general documentation of this class for more information.
+   */
+  virtual
+  DerivativeForm<1,chartdim,spacedim>
+  push_forward_gradient(const Point<chartdim> &chart_point) const;
 
   /**
    * Given a point in the spacedim coordinate system, uses the

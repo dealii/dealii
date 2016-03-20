@@ -98,7 +98,6 @@ inconvenience this causes.
 <a name="specific"></a>
 <h3>Specific improvements</h3>
 
-
 <ol>
  <li> Improved: The distribution of degrees of freedom on multigrid levels,
  DoFHandler::distribute_mg_dofs(), contained a few steps that scaled

@@ -267,14 +267,15 @@ FunctionManifold<dim,spacedim,chartdim>::FunctionManifold
  const typename FunctionParser<spacedim>::ConstMap const_map,
  const std::string chart_vars,
  const std::string space_vars,
- const double tolerance) :
+ const double tolerance,
+ const double h) :
   ChartManifold<dim,spacedim,chartdim>(periodicity),
   const_map(const_map),
   tolerance(tolerance),
   owns_pointers(true)
 {
-  FunctionParser<chartdim> *pf = new FunctionParser<chartdim>(spacedim);
-  FunctionParser<spacedim> *pb = new FunctionParser<spacedim>(chartdim);
+  FunctionParser<chartdim> *pf = new FunctionParser<chartdim>(spacedim, 0.0, h);
+  FunctionParser<spacedim> *pb = new FunctionParser<spacedim>(chartdim, 0.0, h);
   pf->initialize(chart_vars, push_forward_expression, const_map);
   pb->initialize(space_vars, pull_back_expression, const_map);
   push_forward_function = pf;
@@ -317,6 +318,20 @@ FunctionManifold<dim,spacedim,chartdim>::push_forward(const Point<chartdim> &cha
 #endif
 
   return result;
+}
+
+
+template <int dim, int spacedim, int chartdim>
+DerivativeForm<1,chartdim, spacedim>
+FunctionManifold<dim,spacedim,chartdim>::push_forward_gradient(const Point<chartdim> &chart_point) const
+{
+  DerivativeForm<1, chartdim, spacedim> DF;
+  std::vector<Tensor<1, chartdim> > gradients(spacedim);
+  push_forward_function->vector_gradient(chart_point, gradients);
+  for (unsigned int i=0; i<spacedim; ++i)
+    for (unsigned int j=0; j<chartdim; ++j)
+      DF[i][j] = gradients[i][j];
+  return DF;
 }
 
 
