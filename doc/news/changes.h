@@ -104,6 +104,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: DoFHandler::locally_owned_dofs() could create a segmentation
+ fault in cases where some processors do not own any cells. This was caused
+ by an incorrect computation in DoFTools::locally_owned_dofs_per_subdomain().
+ <br>
+ (Wolfgang Bangerth, 2016/03/20)
+ </li>
+
  <li> Improved: The distribution of degrees of freedom on multigrid levels,
  DoFHandler::distribute_mg_dofs(), contained a few steps that scaled
  quadratically in the number of local cells for certain configurations. These
