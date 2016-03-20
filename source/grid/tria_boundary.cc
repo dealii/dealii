@@ -106,31 +106,6 @@ get_intermediate_points_on_face (const Triangulation<1,3>::face_iterator &,
 }
 
 
-
-
-template <int dim, int spacedim>
-Tensor<1,spacedim>
-Boundary<dim, spacedim>::
-normal_vector (const typename Triangulation<dim, spacedim>::face_iterator &,
-               const Point<spacedim> &) const
-{
-  Assert (false, ExcPureFunctionCalled());
-  return Tensor<1,spacedim>();
-}
-
-
-
-template <int dim, int spacedim>
-void
-Boundary<dim, spacedim>::
-get_normals_at_vertices (const typename Triangulation<dim, spacedim>::face_iterator &,
-                         FaceVertexNormals &) const
-{
-  Assert (false, ExcPureFunctionCalled());
-}
-
-
-
 template <int dim, int spacedim>
 Point<spacedim>
 Boundary<dim, spacedim>::

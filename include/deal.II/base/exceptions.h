@@ -836,6 +836,20 @@ namespace StandardExceptions
                   << "d or simply does not make any sense.");
 
   /**
+   * This exception is raised if a functionality is not possible in the given
+   * combination of dimension and space-dimension.
+   *
+   * The constructor takes two <tt>int</tt>, denoting the dimension and the
+   * space dimension.
+   */
+  DeclException2 (ExcImpossibleInDimSpacedim,
+                  int, int,
+                  << "You are trying to execute functionality that is "
+                  << "impossible in dimensions <" << arg1 << "," << arg2
+                  << "> or simply does not make any sense.");
+
+
+  /**
    * A number is zero, but it should not be here.
    */
   DeclExceptionMsg(ExcZero,
