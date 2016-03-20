@@ -181,14 +181,17 @@ class FunctionParser : public AutoDerivativeFunction<dim>
 {
 public:
   /**
-   * Constructor for Parsed functions. Its arguments are the same of the base
-   * class Function. The only difference is that this object needs to be
-   * initialized with initialize() method before you can use it. If an attempt
-   * to use this function is made before the initialize() method has been
-   * called, then an exception is thrown.
+   * Constructor for Parsed functions. Its arguments are the same of
+   * the base class Function, with the additional parameter @p h, used
+   * for the computation of gradients using finite differences. This
+   * object needs to be initialized with the initialize() method
+   * before you can use it. If an attempt to use this function is made
+   * before the initialize() method has been called, then an exception
+   * is thrown.
    */
   FunctionParser (const unsigned int n_components = 1,
-                  const double       initial_time = 0.0);
+                  const double       initial_time = 0.0,
+                  const double       h = 1e-8);
 
   /**
    * Destructor. Explicitly delete the FunctionParser objects (there is one

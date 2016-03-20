@@ -267,14 +267,15 @@ FunctionManifold<dim,spacedim,chartdim>::FunctionManifold
  const typename FunctionParser<spacedim>::ConstMap const_map,
  const std::string chart_vars,
  const std::string space_vars,
- const double tolerance) :
+ const double tolerance,
+ const double h) :
   ChartManifold<dim,spacedim,chartdim>(periodicity),
   const_map(const_map),
   tolerance(tolerance),
   owns_pointers(true)
 {
-  FunctionParser<chartdim> *pf = new FunctionParser<chartdim>(spacedim);
-  FunctionParser<spacedim> *pb = new FunctionParser<spacedim>(chartdim);
+  FunctionParser<chartdim> *pf = new FunctionParser<chartdim>(spacedim, 0.0, h);
+  FunctionParser<spacedim> *pb = new FunctionParser<spacedim>(chartdim, 0.0, h);
   pf->initialize(chart_vars, push_forward_expression, const_map);
   pb->initialize(space_vars, pull_back_expression, const_map);
   push_forward_function = pf;
