@@ -44,15 +44,8 @@ void test<3,3> ()
   triangulation.set_manifold (0, desc_torus);
   triangulation.set_manifold (1, desc_sphere);
 
-  triangulation.refine_global(0);
   triangulation.begin_active()->set_refine_flag();
   triangulation.execute_coarsening_and_refinement ();
-
-  /*
-  std::ofstream out ("grid-1.vtk");
-  GridOut grid_out;
-  grid_out.write_vtk (triangulation, out);
-  */
 
   unsigned int c = 0;
   for (Triangulation<dim, spacedim>::active_vertex_iterator v = triangulation.begin_active_vertex();

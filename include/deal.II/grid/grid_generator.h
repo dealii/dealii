@@ -762,8 +762,7 @@ namespace GridGenerator
 
   /**
    * Produce the volume or surface mesh of a torus. The axis of the torus is
-   * the $y$-axis while the plane of the torus is the $x$-$z$ plane. The
-   * function is implemented
+   * the $y$-axis while the plane of the torus is the $x$-$z$ plane.
    *
    * If @p dim is 3, the mesh will be the volume of the torus. By default,
    * the boundary faces will have manifold id 0 and you should attach a

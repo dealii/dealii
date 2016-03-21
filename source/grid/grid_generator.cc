@@ -716,6 +716,8 @@ namespace GridGenerator
     // GridReordering<> doc
     GridReordering<dim,spacedim>::reorder_cells (cells);
     tria.create_triangulation_compatibility (vertices, cells, SubCellData());
+
+    tria.set_all_manifold_ids(0);
   }
 
   template<>
