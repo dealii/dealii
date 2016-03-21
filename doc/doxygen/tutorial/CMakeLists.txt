@@ -46,18 +46,40 @@ STRING(REGEX REPLACE "/+doc/+author" "" _code_gallery_names "${_code_gallery_nam
 ADD_CUSTOM_TARGET(tutorial)
 
 #
-# Describe how to build tutorial.h:
+# Describe how to build tutorial.h.
+#
+# First collect the various files this all depends on. This
+# is simpler for the tutorials since the directory names
+# are structured. For the code gallery, we have already
+# determined the list of names of the relevant subdirectories
+# (which may be empty), so we can create the list of files
+# the following target depends on without a GLOB and instead
+# using just a FOREACH loop.
+#
+# For tutorial programs, the steps.pl script will read
+# tooltip, kind, and builds-on files. For the code gallery
+# programs, the 'kind' is obvious and we only need the other
+# two categories.
 #
 
-file(GLOB _deal_ii_steps_buildson
-  ${CMAKE_SOURCE_DIR}/examples/step-*/doc/builds-on
-  )
-file(GLOB _deal_ii_steps_kind
-  ${CMAKE_SOURCE_DIR}/examples/step-*/doc/kind
-  )
 file(GLOB _deal_ii_steps_tooltip
   ${CMAKE_SOURCE_DIR}/examples/step-*/doc/tooltip
   )
+FOREACH(_gallery ${_code_gallery_names})
+  LIST(APPEND _deal_ii_code_gallery_tooltip
+       ${_gallery}/doc/tooltip)
+ENDFOREACH()
+file(GLOB _deal_ii_steps_kind
+  ${CMAKE_SOURCE_DIR}/examples/step-*/doc/kind
+  )
+file(GLOB _deal_ii_steps_buildson
+  ${CMAKE_SOURCE_DIR}/examples/step-*/doc/builds-on
+  )
+FOREACH(_gallery ${_code_gallery_names})
+  LIST(APPEND _deal_ii_code_gallery_buildson
+       ${_gallery}/doc/builds-on)
+ENDFOREACH()
+
 
 ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/tutorial.h
@@ -71,11 +93,11 @@ ADD_CUSTOM_COMMAND(
   DEPENDS
     ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/steps.pl
     ${CMAKE_CURRENT_SOURCE_DIR}/tutorial.h.in
-    ${_deal_ii_steps}
-    ${_deal_ii_steps_kind}
     ${_deal_ii_steps_tooltip}
+    ${_deal_ii_steps_kind}
     ${_deal_ii_steps_buildson}
-    ${_code_gallery_names}
+    ${_deal_ii_code_gallery_tooltip}
+    ${_deal_ii_code_gallery_buildson}
   )
 ADD_CUSTOM_TARGET(build_tutorial_h
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tutorial.h
