@@ -350,6 +350,8 @@ namespace GridGenerator
         p1(i) = std::min(p_1(i), p_2(i));
         p2(i) = std::max(p_1(i), p_2(i));
       }
+      //for (typename Triangulation<1,spacedim>::cell_iterator cell = tria.begin();
+      //     cell != tria.end(); ++cell)
 
     std::vector<Point<spacedim> > vertices (GeometryInfo<dim>::vertices_per_cell);
     switch (dim)
@@ -1846,7 +1848,8 @@ namespace GridGenerator
   template <>
   void hyper_L (Triangulation<1> &,
                 const double,
-                const double)
+                const double,
+                const bool)
   {
     Assert (false, ExcNotImplemented());
   }
@@ -2080,7 +2083,8 @@ namespace GridGenerator
   void
   hyper_L (Triangulation<2> &tria,
            const double a,
-           const double b)
+           const double b,
+           const bool colorize)
   {
     const Point<2> vertices[8] = { Point<2> (a,a),
                                    Point<2> ((a+b)/2,a),
@@ -2109,6 +2113,26 @@ namespace GridGenerator
       std::vector<Point<2> >(&vertices[0], &vertices[8]),
       cells,
       SubCellData());       // no boundary information
+
+    if (colorize)
+      {
+        auto cell = tria.begin();
+        
+        cell->face(0)->set_boundary_id(0);
+        cell->face(2)->set_boundary_id(1);
+        cell++;
+
+        cell->face(1)->set_boundary_id(2);
+        cell->face(2)->set_boundary_id(1);
+        cell->face(3)->set_boundary_id(3);
+        cell++;
+
+        cell->face(0)->set_boundary_id(0);
+        cell->face(1)->set_boundary_id(4);
+        cell->face(3)->set_boundary_id(5);
+
+      }
+
   }
 
 
@@ -2707,7 +2731,8 @@ namespace GridGenerator
   void
   hyper_L (Triangulation<3> &tria,
            const double      a,
-           const double      b)
+           const double      b,
+           const bool)
   {
     // we slice out the top back right
     // part of the cube
