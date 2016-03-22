@@ -3107,7 +3107,6 @@ protected:
 
   /**
    * Recreate information about periodic neighbors from periodic_face_pairs_level_0.
-   * Only faces that belong to locally owned or ghosted cells are stored.
    */
   void update_periodic_face_map ();
 

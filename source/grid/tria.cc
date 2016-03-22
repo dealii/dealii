@@ -934,6 +934,16 @@ namespace
     Assert(face_1->at_boundary()  &&face_2->at_boundary(),
            ExcMessage ("Periodic faces must be on the boundary"));
 
+    // insert periodic face pair for both cells
+    typedef std::pair<typename Triangulation<dim,spacedim>::cell_iterator, unsigned int> CellFace;
+    const CellFace cell_face_1 (cell_1, n_face_1);
+    const CellFace cell_face_2 (cell_2, n_face_2);
+    const std::pair<CellFace, CellFace> periodic_faces (cell_face_1, cell_face_2);
+
+    // Only one periodic neighbor is allowed
+    Assert(periodic_face_map.count(cell_face_1) == 0, ExcInternalError());
+    periodic_face_map.insert(periodic_faces);
+
     // A lookup table on how to go through the child cells depending on the
     // orientation:
     // see Documentation of GeometryInfo for details
@@ -1025,40 +1035,8 @@ namespace
           }
 
       }
-    else
-      {
-        // Otherwise at least one of the two faces is active and
-        // we need to do some work and enter the periodic face pairs!
-
-        //periodic boundary can only be on the boundary of the domain
-        Assert(cell_1->at_boundary(n_face_1), ExcInternalError());
-        Assert(cell_2->at_boundary(n_face_2), ExcInternalError());
-
-        //Ignore artificial cells, cell_2 may not be active
-        if (!cell_1->is_artificial())
-          {
-            // if cell_2 is active it must not be artificial
-            if (!cell_2->has_children() && cell_2->is_artificial())
-              {
-                std::cout<<"The artificial neighbor of the cell with center " <<cell_1->center()
-                         <<" is the cell with center "<<cell_2->center()<<std::endl;
-                //Assert(!cell_2->is_artificial(), ExcInternalError());
-              }
-            if (cell_2->has_children() || !cell_2->is_artificial())
-              {
-                // insert periodic face pair for both cells
-                typedef std::pair<typename Triangulation<dim,spacedim>::cell_iterator, unsigned int> CellFace;
-                const CellFace cell_face_1 (cell_1, n_face_1);
-                const CellFace cell_face_2 (cell_2, n_face_2);
-                const std::pair<CellFace, CellFace> periodic_faces (cell_face_1, cell_face_2);
-
-                // Only one periodic neighbor is allowed
-                Assert(periodic_face_map.count(cell_face_1) == 0, ExcInternalError());
-                periodic_face_map.insert(periodic_faces);
-              }
-          }
-      }
   }
+
 
 }// end of anonymous namespace
 
@@ -11813,8 +11791,7 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement ()
                cells_with_distorted_children);
 
   // For parallel::distributed::Triangulations we update
-  // periodic_face_map later. At this point cells might be
-  // artificial which prevents us from storing the correct faces
+  // periodic_face_map later.
   const parallel::Triangulation< dim, spacedim > *distributed_triangulation
     = dynamic_cast<const parallel::Triangulation< dim, spacedim > *> (this);
   if (!distributed_triangulation)
