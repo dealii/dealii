@@ -74,6 +74,13 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li> New: Added GridGenerator::torus() to generate the volume mesh of a
+ torus in three dimensions and a manifold description TorusManifold to
+ go with it.
+ <br>
+ (Timo Heister, 2016/03/21)
+ </li>
+
  <li> New: Added GridTools::rotate() in three space dimensions.
  <br>
  (Timo Heister, 2016/03/18)
