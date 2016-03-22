@@ -589,6 +589,9 @@ namespace Step22
     for (unsigned int i = 0; i<cycle; i++)
       n_points*=2;
 
+    //don't test exactly at the support points, since point_value is not stable there
+    const double eps = 1./(16.*n_points);
+
     for (unsigned int i=1; i< n_points; i++)
       {
         Vector<double> value1(3);
@@ -596,9 +599,9 @@ namespace Step22
 
         Point<2> point1;
         point1(0)=0;
-        point1(1)=.5*(1.+1.*i/n_points);
+        point1(1)=.5*(1.+1.*i/n_points+eps);
         Point<2> point2;
-        point2(0)=.5*(1.+1.*i/n_points);
+        point2(0)=.5*(1.+1.*i/n_points+eps);
         point2(1)=0.;
 
         get_point_value (point1, 0, value1);

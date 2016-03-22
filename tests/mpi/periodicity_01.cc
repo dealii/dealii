@@ -328,16 +328,19 @@ namespace Step40
     for (unsigned int i = 0; i<cycle; i++)
       n_points*=2;
 
+    //don't test exactly at the support points, since point_value is not stable there
+    const double eps = 1./(16.*n_points);
+
     for (unsigned int i=1; i< n_points; i++)
       {
         Vector<double> value1(1);
         Vector<double> value2(1);
 
         Point <2> point1;
-        point1(0)=1.*i/n_points;
+        point1(0)=1.*i/n_points+eps;
         point1(1)=0.;
         Point <2> point2;
-        point2(0)=1.*i/n_points;
+        point2(0)=1.*i/n_points+eps;
         point2(1)=1.;
 
         get_point_value (point1, 0, value1);
@@ -363,6 +366,9 @@ namespace Step40
     for (unsigned int i = 0; i<cycle; i++)
       n_points*=2;
 
+    //don't test exactly at the support points, since point_value is not stable there
+    const double eps = 1./(16.*n_points);
+
     for (unsigned int i=1; i< n_points; i++)
       for (unsigned int j=1; j< n_points; j++)
         {
@@ -372,21 +378,21 @@ namespace Step40
           Vector<double> value4(1);
 
           Point <3> point1;
-          point1(0)=1.*i/n_points;
-          point1(1)=1.*j/n_points;
-          point1(2)=0.;
+          point1(0)=1.*i/n_points+eps;
+          point1(1)=1.*j/n_points+eps;
+          point1(2)=0;
           Point <3> point2;
-          point2(0)=1.*i/n_points;
-          point2(1)=1.*j/n_points;
+          point2(0)=1.*i/n_points+eps;
+          point2(1)=1.*j/n_points+eps;
           point2(2)=1.;
           Point <3> point3;
-          point3(0)=1.*i/n_points;
+          point3(0)=1.*i/n_points+eps;
           point3(1)=0.;
-          point3(2)=1.*j/n_points;;
+          point3(2)=1.*j/n_points+eps;
           Point <3> point4;
-          point4(0)=1.*i/n_points;
+          point4(0)=1.*i/n_points+eps;
           point4(1)=1.;
-          point4(2)=1.*j/n_points;;
+          point4(2)=1.*j/n_points+eps;
 
           get_point_value (point1, 0, value1);
           get_point_value (point2, 0, value2);
