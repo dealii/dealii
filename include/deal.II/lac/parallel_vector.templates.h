@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2015 by the deal.II authors
+// Copyright (C) 2011 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -229,9 +229,9 @@ namespace parallel
       }
 
       template <typename PETSC_Number, typename Number>
-      void copy_petsc_vector (const std::complex<PETSC_Number> *petsc_start_ptr,
-                              const std::complex<PETSC_Number> *petsc_end_ptr,
-                              Number *ptr)
+      void copy_petsc_vector (const std::complex<PETSC_Number> * /*petsc_start_ptr*/,
+                              const std::complex<PETSC_Number> * /*petsc_end_ptr*/,
+                              Number * /*ptr*/)
       {
         AssertThrow(false, ExcMessage("Tried to copy complex -> real"));
       }
