@@ -572,11 +572,11 @@ namespace GridGenerator
    * Initialize the given triangulation with a hyper-L (in 2d or 3d)
    * consisting of exactly <tt>2^dim-1</tt> cells. It produces the hypercube
    * with the interval [<i>left,right</i>] without the hypercube made out of
-   * the interval [<i>(left+right)/2,right</i>] for each coordinate. If the 
+   * the interval [<i>(left+right)/2,right</i>] for each coordinate. If the
    * @p colorize flag is set, the @p boundary_ids of the surfaces are
    * assigned, such that the left boundary is 0, and the others are set with
-   * growing number accordingly to the counterclockwise. This function will 
-   * create the classical L-shape in 2d and it will look like the following 
+   * growing number accordingly to the counterclockwise. This function will
+   * create the classical L-shape in 2d and it will look like the following
    * in 3d:
    *
    * @image html hyper_l.png
