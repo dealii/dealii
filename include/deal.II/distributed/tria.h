@@ -946,7 +946,7 @@ namespace parallel
        */
       void
       fill_level_vertices_with_ghost_neighbors
-      (const unsigned int level,
+      (const int level,
        std::map<unsigned int, std::set<dealii::types::subdomain_id> >
        &vertices_with_ghost_neighbors);
 
@@ -960,7 +960,7 @@ namespace parallel
        * Used by DoFHandler::Policy::ParallelDistributed.
        */
       std::vector<bool>
-      mark_locally_active_vertices_on_level(const unsigned int level) const;
+      mark_locally_active_vertices_on_level(const int level) const;
 
       template <int, int> friend class dealii::internal::DoFHandler::Policy::ParallelDistributed;
     };

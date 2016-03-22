@@ -2244,7 +2244,7 @@ namespace parallel
         }
 
       this->update_number_cache ();
-      Triangulation<dim, spacedim>::update_periodic_face_map();
+      this->update_periodic_face_map();
     }
 
 
@@ -2773,7 +2773,7 @@ namespace parallel
         }
 
       this->update_number_cache ();
-      Triangulation<dim, spacedim>::update_periodic_face_map();
+      this->update_periodic_face_map();
     }
 
 
@@ -3197,6 +3197,13 @@ namespace parallel
             topological_vertex_numbering[periodic.cell[0]->face(periodic.face_idx[0])->vertex_index(vface0)]
               = topological_vertex_numbering[periodic.cell[1]->face(periodic.face_idx[1])->vertex_index(v)]
                 = min_index;
+
+            /*  std::cout << "Old identified vertices " << periodic.cell[0]->face(periodic.face_idx[0])->vertex_index(vface0)
+                        << " at "                 << periodic.cell[0]->face(periodic.face_idx[0])->vertex(vface0)
+                        << " and "                << periodic.cell[1]->face(periodic.face_idx[1])->vertex_index(v)
+                        << " at "                 << periodic.cell[1]->face(periodic.face_idx[1])->vertex(v)
+                        << std::endl;*/
+
           }
       }
 
@@ -3206,10 +3213,9 @@ namespace parallel
       // artificial cell layer (the active cells are taken care of by p4est)
       template <int dim, int spacedim>
       bool enforce_mesh_balance_over_periodic_boundaries
-      (Triangulation<dim,spacedim> &tria,
-       const std::vector<GridTools::PeriodicFacePair<typename dealii::Triangulation<dim,spacedim>::cell_iterator> > &periodic_face_pairs_level_0)
+      (Triangulation<dim,spacedim> &tria)
       {
-        if (periodic_face_pairs_level_0.empty())
+        if (tria.get_periodic_face_map().size()==0)
           return false;
 
         std::vector<bool> flags_before[2];
@@ -3217,13 +3223,99 @@ namespace parallel
         tria.save_refine_flags (flags_before[1]);
 
         std::vector<unsigned int> topological_vertex_numbering(tria.n_vertices());
+        std::vector<unsigned int> topological_vertex_numbering_cmp(tria.n_vertices());
         for (unsigned int i=0; i<topological_vertex_numbering.size(); ++i)
-          topological_vertex_numbering[i] = i;
+          {
+            topological_vertex_numbering[i] = i;
+            topological_vertex_numbering_cmp[i] = i;
+          }
+        //std::cout << std::endl;
         for (unsigned int i=0; i<periodic_face_pairs_level_0.size(); ++i)
           {
             identify_periodic_vertices_recursively(periodic_face_pairs_level_0[i],
-                                                   topological_vertex_numbering);
+                                                   topological_vertex_numbering_cmp);
           }
+        // combine vertices that have different locations (and thus, different
+        // vertex_index) but represent the same topological entity over periodic
+        // boundaries. The vector topological_vertex_numbering contains a linear
+        // map from 0 to n_vertices at input and at output relates periodic
+        // vertices with only one vertex index. The output is used to always
+        // identify the same vertex according to the periodicity, e.g. when
+        // finding the maximum cell level around a vertex.
+        //
+        // Example: On a 3D cell with vertices numbered from 0 to 7 and periodic
+        // boundary conditions in x direction, the vector
+        // topological_vertex_numbering will contain the numbers
+        // {0,0,2,2,4,4,6,6} (because the vertex pairs {0,1}, {2,3}, {4,5},
+        // {6,7} belong together, respectively). If periodicity is set in x and
+        // z direction, the output is {0,0,2,2,0,0,2,2}, and if periodicity is
+        // in all directions, the output is simply {0,0,0,0,0,0,0,0}.
+        typedef typename Triangulation<dim, spacedim>::cell_iterator cell_iterator;
+        typename std::map<std::pair<cell_iterator, unsigned int>,
+                 std::pair<std::pair<cell_iterator,unsigned int>, std::bitset<3> > >::const_iterator it;
+        for (it = tria.get_periodic_face_map().begin(); it!= tria.get_periodic_face_map().end(); ++it)
+          {
+            const cell_iterator &cell_1 = it->first.first;
+            const unsigned int face_no_1 = it->first.second;
+            const cell_iterator &cell_2 = it->second.first.first;
+            const unsigned int face_no_2 = it->second.first.second;
+            const std::bitset<3> face_orientation = it->second.second;
+
+            if (cell_1->level() == cell_2->level())
+              {
+                for (unsigned int v=0; v<GeometryInfo<dim-1>::vertices_per_cell; ++v)
+                  {
+                    // take possible non-standard orientation of face on cell[0] into
+                    // account
+                    const unsigned int vface0 =
+                      GeometryInfo<dim>::standard_to_real_face_vertex(v,face_orientation[0],
+                                                                      face_orientation[1],
+                                                                      face_orientation[2]);
+                    const unsigned int vi0 = topological_vertex_numbering[cell_1->face(face_no_1)->vertex_index(vface0)];
+                    const unsigned int vi1 = topological_vertex_numbering[cell_2->face(face_no_2)->vertex_index(v)];
+                    const unsigned int min_index = std::min(vi0, vi1);
+                    topological_vertex_numbering[cell_1->face(face_no_1)->vertex_index(vface0)]
+                      = topological_vertex_numbering[cell_2->face(face_no_2)->vertex_index(v)]
+                        = min_index;
+                    /*  std::cout << "Newly identified vertices " << cell_1->face(face_no_1)->vertex_index(vface0)
+                              << " at "                 << cell_1->face(face_no_1)->vertex(vface0)
+                              << " and "                << cell_2->face(face_no_2)->vertex_index(v)
+                              << " at "                 << cell_2->face(face_no_2)->vertex(v)
+                              << std::endl;*/
+                  }
+              }
+          }
+
+        // There must not be any chains!
+        for (unsigned int i=0; i<topological_vertex_numbering.size(); ++i)
+          {
+            const unsigned int j = topological_vertex_numbering[i];
+            if (j != i)
+              Assert(topological_vertex_numbering[j] == j,
+                     ExcInternalError());
+          }
+
+        for (unsigned int i=0; i<topological_vertex_numbering_cmp.size(); ++i)
+          {
+            const unsigned int j = topological_vertex_numbering_cmp[i];
+            if (j != i)
+              Assert(topological_vertex_numbering_cmp[j] == j,
+                     ExcInternalError());
+          }
+
+        if (topological_vertex_numbering != topological_vertex_numbering_cmp)
+          {
+            for (unsigned int i=0; i<topological_vertex_numbering.size(); ++i)
+              {
+                if (topological_vertex_numbering[i] != topological_vertex_numbering_cmp[i])
+                  std::cout << i
+                            << " old: " << topological_vertex_numbering_cmp[i]
+                            << " new: " << topological_vertex_numbering[i]
+                            << std::endl;
+              }
+            Assert( false, ExcInternalError());
+          }
+
 
         // this code is replicated from grid/tria.cc but using an indirection
         // for periodic boundary conditions
@@ -3356,12 +3448,11 @@ namespace parallel
       do
         {
           this->dealii::Triangulation<dim,spacedim>::prepare_coarsening_and_refinement();
-
+          this->update_periodic_face_map();
           // enforce 2:1 mesh balance over periodic boundaries
           if (this->smooth_grid &
               dealii::Triangulation<dim,spacedim>::limit_level_difference_at_vertices)
-            mesh_changed = enforce_mesh_balance_over_periodic_boundaries(*this,
-                           this->periodic_face_pairs_level_0);
+            mesh_changed = enforce_mesh_balance_over_periodic_boundaries(*this);
         }
       while (mesh_changed);
 
@@ -3895,7 +3986,7 @@ namespace parallel
 
       refinement_in_progress = false;
       this->update_number_cache ();
-      Triangulation<dim, spacedim>::update_periodic_face_map();
+      this->update_periodic_face_map();
     }
 
     template <int dim, int spacedim>
@@ -3965,7 +4056,7 @@ namespace parallel
 
       // update how many cells, edges, etc, we store locally
       this->update_number_cache ();
-      Triangulation<dim, spacedim>::update_periodic_face_map();
+      this->update_periodic_face_map();
     }
 
 
@@ -4678,7 +4769,7 @@ namespace parallel
     void
     Triangulation<dim,spacedim>::
     fill_level_vertices_with_ghost_neighbors
-    (const unsigned int level,
+    (const int level,
      std::map<unsigned int, std::set<dealii::types::subdomain_id> >
      &vertices_with_ghost_neighbors)
     {
@@ -4694,9 +4785,72 @@ namespace parallel
               vertices_with_ghost_neighbors[cell->vertex_index(v)]
               .insert (cell->level_subdomain_id());
 
+      std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+      vertices_with_ghost_neighbors_cmp = vertices_with_ghost_neighbors;
+
+
       for (unsigned int i=0; i<this->periodic_face_pairs_level_0.size(); ++i)
         set_periodic_ghost_neighbors_recursively(this->periodic_face_pairs_level_0[i],
-                                                 level, vertices_with_ghost_neighbors);
+                                                 level, vertices_with_ghost_neighbors_cmp);
+
+      //now for the vertices on periodic faces
+      typename std::map<std::pair<cell_iterator, unsigned int>,
+               std::pair<std::pair<cell_iterator,unsigned int>, std::bitset<3> > >::const_iterator it;
+
+      for (it = this->get_periodic_face_map().begin(); it!= this->get_periodic_face_map().end(); ++it)
+        {
+          const cell_iterator &cell_1 = it->first.first;
+          const unsigned int face_no_1 = it->first.second;
+          const cell_iterator &cell_2 = it->second.first.first;
+          const unsigned int face_no_2 = it->second.first.second;
+          const std::bitset<3> face_orientation = it->second.second;
+
+          if (cell_1->level() == level &&
+              cell_2->level() == level)
+            {
+              for (unsigned int v=0; v<GeometryInfo<dim-1>::vertices_per_cell; ++v)
+                {
+                  // take possible non-standard orientation of faces into account
+                  const unsigned int vface0 =
+                    GeometryInfo<dim>::standard_to_real_face_vertex(v,face_orientation[0],
+                                                                    face_orientation[1],
+                                                                    face_orientation[2]);
+                  const unsigned int idx0 = cell_1->face(face_no_1)->vertex_index(vface0);
+                  const unsigned int idx1 = cell_2->face(face_no_2)->vertex_index(v);
+                  if (vertices_with_ghost_neighbors.find(idx0) != vertices_with_ghost_neighbors.end())
+                    vertices_with_ghost_neighbors[idx1].insert(vertices_with_ghost_neighbors[idx0].begin(),
+                                                               vertices_with_ghost_neighbors[idx0].end());
+                  if (vertices_with_ghost_neighbors.find(idx1) != vertices_with_ghost_neighbors.end())
+                    vertices_with_ghost_neighbors[idx0].insert(vertices_with_ghost_neighbors[idx1].begin(),
+                                                               vertices_with_ghost_neighbors[idx1].end());
+                }
+            }
+        }
+
+      if (vertices_with_ghost_neighbors != vertices_with_ghost_neighbors_cmp)
+        {
+          std::cout << "Print vertices_with_ghost_neighbors: " << std::endl;
+          std::map<unsigned int, std::set<dealii::types::subdomain_id> >::const_iterator it;
+          for (it = vertices_with_ghost_neighbors.begin(); it!=vertices_with_ghost_neighbors.end(); ++it)
+            {
+              std::cout << "Vertex " << it->first << " is on subdomains ";
+              std::set<dealii::types::subdomain_id>::const_iterator it2;
+              for (it2 = it->second.begin(); it2!=it->second.end(); ++it2)
+                std::cout << *it2 << " ";
+              std::cout << std::endl;
+            }
+
+          std::cout << "Print vertices_with_ghost_neighbors_cmp: " << std::endl;
+          for (it = vertices_with_ghost_neighbors_cmp.begin(); it!=vertices_with_ghost_neighbors_cmp.end(); ++it)
+            {
+              std::cout << "Vertex " << it->first << " is on subdomains ";
+              std::set<dealii::types::subdomain_id>::const_iterator it2;
+              for (it2 = it->second.begin(); it2!=it->second.end(); ++it2)
+                std::cout << *it2 << " ";
+              std::cout << std::endl;
+            }
+          Assert(false, ExcInternalError());
+        }
     }
 
 
@@ -4704,7 +4858,7 @@ namespace parallel
     template<int dim, int spacedim>
     std::vector<bool>
     Triangulation<dim,spacedim>
-    ::mark_locally_active_vertices_on_level (const unsigned int level) const
+    ::mark_locally_active_vertices_on_level (const int level) const
     {
       Assert (dim>1, ExcNotImplemented());
 
@@ -4716,10 +4870,48 @@ namespace parallel
           for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
             marked_vertices[cell->vertex_index(v)] = true;
 
+      std::vector<bool> marked_vertices_cmp = marked_vertices;
+
       for (unsigned int i=0; i<this->periodic_face_pairs_level_0.size(); ++i)
         mark_periodic_vertices_recursively(this->periodic_face_pairs_level_0[i],
-                                           level, marked_vertices);
+                                           level, marked_vertices_cmp);
 
+      /**
+       * ensure that if one of the two vertices on a periodic face is marked
+       * as active (i.e., belonging to an owned level cell), also the other
+       * one is active
+       */
+      typename std::map<std::pair<cell_iterator, unsigned int>,
+               std::pair<std::pair<cell_iterator,unsigned int>, std::bitset<3> > >::const_iterator it;
+
+      for (it = this->get_periodic_face_map().begin(); it!= this->get_periodic_face_map().end(); ++it)
+        {
+          const cell_iterator &cell_1 = it->first.first;
+          const unsigned int face_no_1 = it->first.second;
+          const cell_iterator &cell_2 = it->second.first.first;
+          const unsigned int face_no_2 = it->second.first.second;
+          const std::bitset<3> &face_orientation = it->second.second;
+
+          if (cell_1->level() == level &&
+              cell_2->level() == level)
+            {
+              for (unsigned int v=0; v<GeometryInfo<dim-1>::vertices_per_cell; ++v)
+                {
+                  // take possible non-standard orientation of faces into account
+                  const unsigned int vface0 =
+                    GeometryInfo<dim>::standard_to_real_face_vertex(v,face_orientation[0],
+                                                                    face_orientation[1],
+                                                                    face_orientation[2]);
+                  if (marked_vertices[cell_1->face(face_no_1)->vertex_index(vface0)] ||
+                      marked_vertices[cell_2->face(face_no_2)->vertex_index(v)])
+                    marked_vertices[cell_1->face(face_no_1)->vertex_index(vface0)]
+                      = marked_vertices[cell_2->face(face_no_2)->vertex_index(v)]
+                        = true;
+                }
+            }
+        }
+
+      Assert(marked_vertices == marked_vertices_cmp, ExcInternalError());
       return marked_vertices;
     }
 
@@ -4965,7 +5157,7 @@ namespace parallel
         }
 
       this->update_number_cache ();
-      Triangulation<dim, spacedim>::update_periodic_face_map();
+      this->update_periodic_face_map();
     }
 
 

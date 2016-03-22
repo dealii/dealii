@@ -241,7 +241,7 @@ void check
   triangulation.execute_coarsening_and_refinement();
 
   typedef std::pair<typename Triangulation<dim>::cell_iterator, unsigned int> CellFace;
-  const typename std::map<CellFace, std::pair<CellFace, std::bitset<3> > > &face_map = triangulation.periodic_face_map;
+  const typename std::map<CellFace, std::pair<CellFace, std::bitset<3> > > &face_map = triangulation.get_periodic_face_map();
   typename std::map<CellFace, std::pair<CellFace, std::bitset<3> > >::const_iterator it;
   int sum_of_pairs_local = face_map.size();
   int sum_of_pairs_global;
@@ -263,8 +263,9 @@ void check
             {
               std::cout << "face_center_1: " << face_center_1 << std::endl;
               std::cout << "face_center_2: " << face_center_2 << std::endl;
-              for (auto it = triangulation.periodic_face_map.begin();
-                   it !=  triangulation.periodic_face_map.end(); ++it)
+              typename std::map<CellFace, std::pair<CellFace, std::bitset<3> > >::const_iterator it;
+              for (it = triangulation.get_periodic_face_map().begin();
+                   it !=  triangulation.get_periodic_face_map().end(); ++it)
                 {
                   std::cout << "The cell with center " << it->first.first->center()
                             << " has on face " << it->first.second
