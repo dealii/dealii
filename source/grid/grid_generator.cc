@@ -2077,7 +2077,6 @@ namespace GridGenerator
 
 
 
-//TODO: Colorize edges as circumference, left and right radius
 // Implementation for 2D only
   template <>
   void
@@ -2112,7 +2111,7 @@ namespace GridGenerator
     tria.create_triangulation (
       std::vector<Point<2> >(&vertices[0], &vertices[8]),
       cells,
-      SubCellData());       // no boundary information
+      SubCellData());
 
     if (colorize)
       {
@@ -2732,7 +2731,7 @@ namespace GridGenerator
   hyper_L (Triangulation<3> &tria,
            const double      a,
            const double      b,
-           const bool)
+           const bool        colorize)
   {
     // we slice out the top back right
     // part of the cube
@@ -2792,6 +2791,11 @@ namespace GridGenerator
       std::vector<Point<3> >(&vertices[0], &vertices[26]),
       cells,
       SubCellData());       // no boundary information
+
+    if (colorize)
+      {
+        Assert (false, ExcNotImplemented());
+      } 
   }
 
 
