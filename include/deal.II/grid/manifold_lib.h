@@ -334,6 +334,57 @@ private:
 };
 
 
+/**
+ * Manifold description for the surface of a Torus in three dimensions. The
+ * Torus is assumed to be in the x-z plane. The reference coordinate system
+ * is given by the angle $phi$ around the y axis, the angle $theta$ around
+ * the centerline of the torus, and the distance to the centerline $w$
+ * (between 0 and 1).
+ *
+ * This class was developed to be used in conjunction with
+ * GridGenerator::torus.
+ *
+ * @ingroup manifold
+ *
+ * @author Timo Heister, 2016
+ */
+template <int dim>
+class TorusManifold : public ChartManifold<dim,3,3>
+{
+public:
+  static const int chartdim = 3;
+  static const int spacedim = 3;
+
+  /**
+   * Constructor. Specify the radius of the centerline @p R and the radius
+   * of the torus itself (@p r). The variables have the same meaning as
+   * the parameters in GridGenerator::torus().
+   */
+  TorusManifold (const double R, const double r);
+
+  /**
+   * Pull back operation.
+   */
+  virtual Point<chartdim>
+  pull_back(const Point<spacedim> &p) const;
+
+  /**
+   * Push forward operation.
+   */
+  virtual Point<spacedim>
+  push_forward(const Point<chartdim> &chart_point) const;
+
+  /**
+   * Gradient.
+   */
+  virtual
+  DerivativeForm<1,chartdim,spacedim>
+  push_forward_gradient(const Point<chartdim> &chart_point) const;
+
+private:
+  double r, R;
+};
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
