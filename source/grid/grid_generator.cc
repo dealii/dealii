@@ -16,10 +16,10 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_reordering.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/grid/intergrid_map.h>
 
 #include <deal.II/distributed/tria.h>
@@ -3484,11 +3484,11 @@ namespace GridGenerator
         // once and then re-arrange all
         // interior nodes so that the mesh is
         // the least distorted
-        HyperShellBoundary<3> boundary (p);
+        SphericalManifold<3> boundary (p);
         Triangulation<3> tmp;
         hyper_shell (tmp, p, inner_radius, outer_radius, 12);
-        tmp.set_boundary(0, boundary);
-        tmp.set_boundary(1, boundary);
+        tmp.set_manifold(0, boundary);
+        tmp.set_manifold(1, boundary);
         tmp.refine_global (1);
 
         // let's determine the distance at
