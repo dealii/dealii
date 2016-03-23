@@ -576,7 +576,7 @@ namespace GridGenerator
    * @p colorize flag is set, the @p boundary_ids of the surfaces are
    * assigned, such that the left boundary is 0, and the others are set with
    * growing number accordingly to the counterclockwise. Colorize option works
-   * only with 2-dimensional problem. This function will create the classical 
+   * only with 2-dimensional problem. This function will create the classical
    * L-shape in 2d and it will look like the following in 3d:
    *
    * @image html hyper_l.png
