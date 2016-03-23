@@ -246,37 +246,36 @@ get_new_point (const Quadrature<spacedim> &quad) const
   const std::vector<Point<spacedim> > &surrounding_points = quad.get_points();
   const std::vector<double> &weights = quad.get_weights();
 
-  Point<spacedim> p;
-  Point<spacedim> dp;
   Point<spacedim> minP = periodicity;
-  const bool check_period = (periodicity.norm() > tolerance);
-  if (check_period)
-    for (unsigned int i=0; i<surrounding_points.size(); ++i)
-      for (unsigned int d=0; d<spacedim; ++d)
+
+  for (unsigned int d=0; d<spacedim; ++d)
+    if (periodicity[d] > 0)
+      for (unsigned int i=0; i<surrounding_points.size(); ++i)
         {
           minP[d] = std::min(minP[d], surrounding_points[i][d]);
-          if (periodicity[d] > 0)
-            Assert( (surrounding_points[i][d] < periodicity[d]+tolerance*periodicity.norm()) ||
-                    (surrounding_points[i][d] >= -tolerance*periodicity.norm()),
-                    ExcPeriodicBox(d, surrounding_points[i], periodicity, tolerance*periodicity.norm()));
+          Assert( (surrounding_points[i][d] < periodicity[d]+tolerance*periodicity.norm()) ||
+                  (surrounding_points[i][d] >= -tolerance*periodicity.norm()),
+                  ExcPeriodicBox(d, surrounding_points[i], periodicity, tolerance*periodicity.norm()));
         }
 
+  // compute the weighted average point, possibly taking into account periodicity
+  Point<spacedim> p;
   for (unsigned int i=0; i<surrounding_points.size(); ++i)
     {
-      dp = Point<spacedim>();
-      if (check_period)
-        {
-          for (unsigned int d=0; d<spacedim; ++d)
-            if (periodicity[d] > 0)
-              dp[d] = ( (surrounding_points[i][d]-minP[d]) > periodicity[d]/2.0 ?
-                        -periodicity[d] : 0.0 );
-        }
+      Point<spacedim> dp;
+      for (unsigned int d=0; d<spacedim; ++d)
+        if (periodicity[d] > 0)
+          dp[d] = ( (surrounding_points[i][d]-minP[d]) > periodicity[d]/2.0 ?
+                    -periodicity[d] : 0.0 );
+
       p += (surrounding_points[i]+dp)*weights[i];
     }
-  if (check_period)
-    for (unsigned int d=0; d<spacedim; ++d)
-      if (periodicity[d] > 0)
-        p[d] = (p[d] < 0 ? p[d] + periodicity[d] : p[d]);
+
+  // if necessary, also adjust the weighted point by the periodicity
+  for (unsigned int d=0; d<spacedim; ++d)
+    if (periodicity[d] > 0)
+      if (p[d] < 0)
+        p[d] += periodicity[d];
 
   return project_to_manifold(surrounding_points, p);
 }
