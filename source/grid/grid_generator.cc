@@ -350,7 +350,6 @@ namespace GridGenerator
         p1(i) = std::min(p_1(i), p_2(i));
         p2(i) = std::max(p_1(i), p_2(i));
       }
-    //
 
     std::vector<Point<spacedim> > vertices (GeometryInfo<dim>::vertices_per_cell);
     switch (dim)
@@ -2114,7 +2113,7 @@ namespace GridGenerator
 
     if (colorize)
       {
-        auto cell = tria.begin();
+        typename Triangulation<2>::cell_iterator cell = tria.begin();
 
         cell->face(0)->set_boundary_id(0);
         cell->face(2)->set_boundary_id(1);
