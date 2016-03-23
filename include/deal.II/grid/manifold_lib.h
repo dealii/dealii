@@ -365,21 +365,21 @@ public:
   /**
    * Pull back operation.
    */
-  virtual Point<chartdim>
-  pull_back(const Point<spacedim> &p) const;
+  virtual Point<3>
+  pull_back(const Point<3> &p) const;
 
   /**
    * Push forward operation.
    */
-  virtual Point<spacedim>
-  push_forward(const Point<chartdim> &chart_point) const;
+  virtual Point<3>
+  push_forward(const Point<3> &chart_point) const;
 
   /**
    * Gradient.
    */
   virtual
-  DerivativeForm<1,chartdim,spacedim>
-  push_forward_gradient(const Point<chartdim> &chart_point) const;
+  DerivativeForm<1,3,3>
+  push_forward_gradient(const Point<3> &chart_point) const;
 
 private:
   double r, R;
