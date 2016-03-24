@@ -150,8 +150,8 @@ namespace LinearAlgebra
   template <typename Number>
   void
   ReadWriteVector<Number>::import(const PETScWrappers::MPI::Vector &petsc_vec,
-                                  VectorOperation::values operation,
-                                  std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern)
+                                  VectorOperation::values /*operation*/,
+                                  std_cxx11::shared_ptr<const CommunicationPatternBase> /*communication_pattern*/)
   {
     //TODO: this works only if no communication is needed.
     Assert(petsc_vec.locally_owned_elements() == stored_elements,
