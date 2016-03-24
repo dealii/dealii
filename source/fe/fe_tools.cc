@@ -97,11 +97,30 @@ namespace FETools
     return new FE_DGQArbitraryNodes<1>(quad);
   }
   template <>
+  FiniteElement<1, 2> *
+  FEFactory<FE_DGQ<1, 2> >::get (const Quadrature<1> &quad) const
+  {
+    return new FE_DGQArbitraryNodes<1, 2>(quad);
+  }
+  template <>
+  FiniteElement<1, 3> *
+  FEFactory<FE_DGQ<1, 3> >::get (const Quadrature<1> &quad) const
+  {
+    return new FE_DGQArbitraryNodes<1, 3>(quad);
+  }
+  template <>
   FiniteElement<2, 2> *
   FEFactory<FE_DGQ<2> >::get (const Quadrature<1> &quad) const
   {
     return new FE_DGQArbitraryNodes<2>(quad);
   }
+  template <>
+  FiniteElement<2, 3> *
+  FEFactory<FE_DGQ<2, 3> >::get (const Quadrature<1> &quad) const
+  {
+    return new FE_DGQArbitraryNodes<2, 3>(quad);
+  }
+
   template <>
   FiniteElement<3, 3> *
   FEFactory<FE_DGQ<3> >::get (const Quadrature<1> &quad) const
@@ -1510,6 +1529,16 @@ namespace FETools
                     const Subscriptor *ptr = fe_name_map.find(name_part)->second.get();
                     const FEFactoryBase<dim,spacedim> *fef=dynamic_cast<const FEFactoryBase<dim,spacedim>*>(ptr);
                     return fef->get(QGaussLobatto<1>(tmp.first));
+                  }
+                else  if (quadrature_name.compare("QGauss") == 0)
+                  {
+                    const std::pair<int,unsigned int> tmp
+                      = Utilities::get_integer_at_position (name, 0);
+                    // delete "))"
+                    name.erase(0, tmp.second+2);
+                    const Subscriptor *ptr = fe_name_map.find(name_part)->second.get();
+                    const FEFactoryBase<dim,spacedim> *fef=dynamic_cast<const FEFactoryBase<dim,spacedim>*>(ptr);
+                    return fef->get(QGauss<1>(tmp.first));
                   }
                 else
                   {
