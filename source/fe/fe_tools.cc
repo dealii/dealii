@@ -97,11 +97,24 @@ namespace FETools
     return new FE_DGQArbitraryNodes<1>(quad);
   }
   template <>
+  FiniteElement<1, 2> *
+  FEFactory<FE_DGQ<1, 2> >::get (const Quadrature<1> &quad) const
+  {
+    return new FE_DGQArbitraryNodes<1, 2>(quad);
+  }
+  template <>
   FiniteElement<2, 2> *
   FEFactory<FE_DGQ<2> >::get (const Quadrature<1> &quad) const
   {
     return new FE_DGQArbitraryNodes<2>(quad);
   }
+  template <>
+  FiniteElement<2, 3> *
+  FEFactory<FE_DGQ<2, 3> >::get (const Quadrature<1> &quad) const
+  {
+    return new FE_DGQArbitraryNodes<2, 3>(quad);
+  }
+
   template <>
   FiniteElement<3, 3> *
   FEFactory<FE_DGQ<3> >::get (const Quadrature<1> &quad) const
@@ -1511,617 +1524,612 @@ namespace FETools
                     const FEFactoryBase<dim,spacedim> *fef=dynamic_cast<const FEFactoryBase<dim,spacedim>*>(ptr);
                     return fef->get(QGaussLobatto<1>(tmp.first));
                   }
+                else  if (quadrature_name.compare("QGauss") == 0)
+                  {
+                    const std::pair<int,unsigned int> tmp
+                      = Utilities::get_integer_at_position (name, 0);
+                    // delete "))"
+                    name.erase(0, tmp.second+2);
+                    const Subscriptor *ptr = fe_name_map.find(name_part)->second.get();
+                    const FEFactoryBase<dim,spacedim> *fef=dynamic_cast<const FEFactoryBase<dim,spacedim>*>(ptr);
+                    return fef->get(QGauss<1>(tmp.first));
+                  }
                 else
                   {
-                    unsigned int position = name.find('(');
-                    const std::string quadrature_name(name, 0, position);
-                    name.erase(0,position+1);
-                    if (quadrature_name.compare("QGauss") == 0)
-                      {
-                        const std::pair<int,unsigned int> tmp
-                          = Utilities::get_integer_at_position (name, 0);
-                        // delete "))"
-                        name.erase(0, tmp.second+2);
-                        const Subscriptor *ptr = fe_name_map.find(name_part)->second.get();
-                        const FEFactoryBase<dim,spacedim> *fef=dynamic_cast<const FEFactoryBase<dim,spacedim>*>(ptr);
-                        return fef->get(QGauss<1>(tmp.first));
-                      }
-                    else
-                      {
-                        AssertThrow (false,ExcNotImplemented());
-                      }
+                    AssertThrow (false,ExcNotImplemented());
                   }
               }
-
-
-            // hm, if we have come thus far, we
-            // didn't know what to do with the
-            // string we got. so do as the docs
-            // say: raise an exception
-            AssertThrow (false, ExcInvalidFEName(name));
-
-            // make some compilers happy that
-            // do not realize that we can't get
-            // here after throwing
-            return 0;
           }
 
 
+        // hm, if we have come thus far, we
+        // didn't know what to do with the
+        // string we got. so do as the docs
+        // say: raise an exception
+        AssertThrow (false, ExcInvalidFEName(name));
 
-        template <int dim,int spacedim>
-        FiniteElement<dim,spacedim> *get_fe_from_name (std::string &name)
-        {
-          return get_fe_from_name_ext<dim,spacedim> (name, fe_name_map[dim][spacedim]);
-        }
+        // make some compilers happy that
+        // do not realize that we can't get
+        // here after throwing
+        return 0;
+      }
+
+
+
+      template <int dim,int spacedim>
+      FiniteElement<dim,spacedim> *get_fe_from_name (std::string &name)
+      {
+        return get_fe_from_name_ext<dim,spacedim> (name, fe_name_map[dim][spacedim]);
       }
     }
+  }
 
 
 
 
 
-    template <int dim, int spacedim>
-    FiniteElement<dim, spacedim> *
-    get_fe_by_name (const std::string &parameter_name)
+  template <int dim, int spacedim>
+  FiniteElement<dim, spacedim> *
+  get_fe_by_name (const std::string &parameter_name)
+  {
+    std::string name = Utilities::trim(parameter_name);
+    std::size_t index = 1;
+    // remove spaces that are not between two word (things that match the
+    // regular expression [A-Za-z0-9_]) characters.
+    while (2 < name.size() && index < name.size() - 1)
+      {
+        if (name[index] == ' ' &&
+            (!(std::isalnum(name[index - 1]) || name[index - 1] == '_') ||
+             !(std::isalnum(name[index + 1]) || name[index + 1] == '_')))
+          {
+            name.erase(index, 1);
+          }
+        else
+          {
+            ++index;
+          }
+      }
+
+    // Create a version of the name
+    // string where all template
+    // parameters are eliminated.
+    for (unsigned int pos1 = name.find('<');
+         pos1 < name.size();
+         pos1 = name.find('<'))
+      {
+
+        const unsigned int pos2 = name.find('>');
+        // If there is only a single
+        // character between those two,
+        // it should be 'd' or the number
+        // representing the dimension.
+        if (pos2-pos1 == 2)
+          {
+            const char dimchar = '0' + dim;
+            (void)dimchar;
+            if (name.at(pos1+1) != 'd')
+              Assert (name.at(pos1+1) == dimchar,
+                      ExcInvalidFEDimension(name.at(pos1+1), dim));
+          }
+        else
+          Assert(pos2-pos1 == 4, ExcInvalidFEName(name));
+
+        // If pos1==pos2, then we are
+        // probably at the end of the
+        // string
+        if (pos2 != pos1)
+          name.erase(pos1, pos2-pos1+1);
+      }
+    // Replace all occurrences of "^dim"
+    // by "^d" to be handled by the
+    // next loop
+    for (unsigned int pos = name.find("^dim");
+         pos < name.size();
+         pos = name.find("^dim"))
+      name.erase(pos+2, 2);
+
+    // Replace all occurrences of "^d"
+    // by using the actual dimension
+    for (unsigned int pos = name.find("^d");
+         pos < name.size();
+         pos = name.find("^d"))
+      name.at(pos+1) = '0' + dim;
+
+    try
+      {
+        FiniteElement<dim,spacedim> *fe = internal::get_fe_from_name<dim,spacedim> (name);
+
+        // Make sure the auxiliary function
+        // ate up all characters of the name.
+        AssertThrow (name.size() == 0,
+                     ExcInvalidFEName(parameter_name
+                                      + std::string(" extra characters after "
+                                                    "end of name")));
+        return fe;
+      }
+    catch (const std::string &errline)
+      {
+        AssertThrow(false, ExcInvalidFEName(parameter_name
+                                            + std::string(" at ")
+                                            + errline));
+        return 0;
+      }
+  }
+
+
+  template <int dim>
+  FiniteElement<dim> *
+  get_fe_from_name (const std::string &parameter_name)
+  {
+    return get_fe_by_name<dim,dim> (parameter_name);
+  }
+
+
+  template <int dim, int spacedim>
+  void
+
+  compute_projection_from_quadrature_points_matrix (const FiniteElement<dim,spacedim> &fe,
+                                                    const Quadrature<dim>    &lhs_quadrature,
+                                                    const Quadrature<dim>    &rhs_quadrature,
+                                                    FullMatrix<double>       &X)
+  {
+    Assert (fe.n_components() == 1, ExcNotImplemented());
+
+    // first build the matrices M and Q
+    // described in the documentation
+    FullMatrix<double> M (fe.dofs_per_cell, fe.dofs_per_cell);
+    FullMatrix<double> Q (fe.dofs_per_cell, rhs_quadrature.size());
+
+    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+      for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
+        for (unsigned int q=0; q<lhs_quadrature.size(); ++q)
+          M(i,j) += fe.shape_value (i, lhs_quadrature.point(q)) *
+                    fe.shape_value (j, lhs_quadrature.point(q)) *
+                    lhs_quadrature.weight(q);
+
+    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+      for (unsigned int q=0; q<rhs_quadrature.size(); ++q)
+        Q(i,q) += fe.shape_value (i, rhs_quadrature.point(q)) *
+                  rhs_quadrature.weight(q);
+
+    // then invert M
+    FullMatrix<double> M_inverse (fe.dofs_per_cell, fe.dofs_per_cell);
+    M_inverse.invert (M);
+
+    // finally compute the result
+    X.reinit (fe.dofs_per_cell, rhs_quadrature.size());
+    M_inverse.mmult (X, Q);
+
+    Assert (X.m() == fe.dofs_per_cell, ExcInternalError());
+    Assert (X.n() == rhs_quadrature.size(), ExcInternalError());
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  compute_interpolation_to_quadrature_points_matrix (const FiniteElement<dim,spacedim> &fe,
+                                                     const Quadrature<dim>    &quadrature,
+                                                     FullMatrix<double>       &I_q)
+  {
+    Assert (fe.n_components() == 1, ExcNotImplemented());
+    Assert (I_q.m() == quadrature.size(),
+            ExcMessage ("Wrong matrix size"));
+    Assert (I_q.n() == fe.dofs_per_cell, ExcMessage ("Wrong matrix size"));
+
+    for (unsigned int q=0; q<quadrature.size(); ++q)
+      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+        I_q(q,i) = fe.shape_value (i, quadrature.point(q));
+  }
+
+
+
+  template <int dim>
+  void
+  compute_projection_from_quadrature_points(
+    const FullMatrix<double>                &projection_matrix,
+    const std::vector< Tensor<1, dim > >    &vector_of_tensors_at_qp,
+    std::vector< Tensor<1, dim > >          &vector_of_tensors_at_nodes)
+  {
+
+    // check that the number columns of the projection_matrix
+    // matches the size of the vector_of_tensors_at_qp
+    Assert(projection_matrix.n_cols() == vector_of_tensors_at_qp.size(),
+           ExcDimensionMismatch(projection_matrix.n_cols(),
+                                vector_of_tensors_at_qp.size()));
+
+    // check that the number rows of the projection_matrix
+    // matches the size of the vector_of_tensors_at_nodes
+    Assert(projection_matrix.n_rows() == vector_of_tensors_at_nodes.size(),
+           ExcDimensionMismatch(projection_matrix.n_rows(),
+                                vector_of_tensors_at_nodes.size()));
+
+    // number of support points (nodes) to project to
+    const unsigned int n_support_points = projection_matrix.n_rows();
+    // number of quadrature points to project from
+    const unsigned int n_quad_points = projection_matrix.n_cols();
+
+    // component projected to the nodes
+    Vector<double> component_at_node(n_support_points);
+    // component at the quadrature point
+    Vector<double> component_at_qp(n_quad_points);
+
+    for (unsigned int ii = 0; ii < dim; ++ii)
+      {
+
+        component_at_qp = 0;
+
+        // populate the vector of components at the qps
+        // from vector_of_tensors_at_qp
+        // vector_of_tensors_at_qp data is in form:
+        //      columns:        0, 1, ...,  dim
+        //      rows:           0,1,....,  n_quad_points
+        // so extract the ii'th column of vector_of_tensors_at_qp
+        for (unsigned int q = 0; q < n_quad_points; ++q)
+          {
+            component_at_qp(q) = vector_of_tensors_at_qp[q][ii];
+          }
+
+        // project from the qps -> nodes
+        // component_at_node = projection_matrix_u * component_at_qp
+        projection_matrix.vmult(component_at_node, component_at_qp);
+
+        // rewrite the projection of the components
+        // back into the vector of tensors
+        for (unsigned int nn =0; nn <n_support_points; ++nn)
+          {
+            vector_of_tensors_at_nodes[nn][ii] = component_at_node(nn);
+          }
+      }
+  }
+
+
+
+  template <int dim>
+  void
+  compute_projection_from_quadrature_points(
+    const FullMatrix<double>                        &projection_matrix,
+    const std::vector< SymmetricTensor<2, dim > >   &vector_of_tensors_at_qp,
+    std::vector< SymmetricTensor<2, dim > >         &vector_of_tensors_at_nodes)
+  {
+
+    // check that the number columns of the projection_matrix
+    // matches the size of the vector_of_tensors_at_qp
+    Assert(projection_matrix.n_cols() == vector_of_tensors_at_qp.size(),
+           ExcDimensionMismatch(projection_matrix.n_cols(),
+                                vector_of_tensors_at_qp.size()));
+
+    // check that the number rows of the projection_matrix
+    // matches the size of the vector_of_tensors_at_nodes
+    Assert(projection_matrix.n_rows() == vector_of_tensors_at_nodes.size(),
+           ExcDimensionMismatch(projection_matrix.n_rows(),
+                                vector_of_tensors_at_nodes.size()));
+
+    // number of support points (nodes)
+    const unsigned int n_support_points = projection_matrix.n_rows();
+    // number of quadrature points to project from
+    const unsigned int n_quad_points = projection_matrix.n_cols();
+
+    // number of unique entries in a symmetric second-order tensor
+    const unsigned int n_independent_components =
+      SymmetricTensor<2, dim >::n_independent_components;
+
+    // component projected to the nodes
+    Vector<double> component_at_node(n_support_points);
+    // component at the quadrature point
+    Vector<double> component_at_qp(n_quad_points);
+
+    // loop over the number of unique dimensions of the tensor
+    for (unsigned int ii = 0; ii < n_independent_components; ++ii)
+      {
+
+        component_at_qp = 0;
+
+        // row-column entry of tensor corresponding the unrolled index
+        TableIndices<2>  row_column_index = SymmetricTensor< 2, dim >::unrolled_to_component_indices(ii);
+        const unsigned int row = row_column_index[0];
+        const unsigned int column = row_column_index[1];
+
+        //  populate the vector of components at the qps
+        //  from vector_of_tensors_at_qp
+        //  vector_of_tensors_at_qp is in form:
+        //      columns:       0, 1, ..., n_independent_components
+        //      rows:           0,1,....,  n_quad_points
+        //  so extract the ii'th column of vector_of_tensors_at_qp
+        for (unsigned int q = 0; q < n_quad_points; ++q)
+          {
+            component_at_qp(q) = (vector_of_tensors_at_qp[q])[row][column];
+          }
+
+        // project from the qps -> nodes
+        // component_at_node = projection_matrix_u * component_at_qp
+        projection_matrix.vmult(component_at_node, component_at_qp);
+
+        // rewrite the projection of the components back into the vector of tensors
+        for (unsigned int nn =0; nn <n_support_points; ++nn)
+          {
+            (vector_of_tensors_at_nodes[nn])[row][column] = component_at_node(nn);
+          }
+      }
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  compute_projection_from_face_quadrature_points_matrix (const FiniteElement<dim, spacedim> &fe,
+                                                         const Quadrature<dim-1>    &lhs_quadrature,
+                                                         const Quadrature<dim-1>    &rhs_quadrature,
+                                                         const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
+                                                         const unsigned int face,
+                                                         FullMatrix<double>       &X)
+  {
+    Assert (fe.n_components() == 1, ExcNotImplemented());
+    Assert (lhs_quadrature.size () > fe.degree, ExcNotGreaterThan (lhs_quadrature.size (), fe.degree));
+
+
+
+    // build the matrices M and Q
+    // described in the documentation
+    FullMatrix<double> M (fe.dofs_per_cell, fe.dofs_per_cell);
+    FullMatrix<double> Q (fe.dofs_per_cell, rhs_quadrature.size());
+
     {
-      std::string name = Utilities::trim(parameter_name);
-      std::size_t index = 1;
-      // remove spaces that are not between two word (things that match the
-      // regular expression [A-Za-z0-9_]) characters.
-      while (2 < name.size() && index < name.size() - 1)
-        {
-          if (name[index] == ' ' &&
-              (!(std::isalnum(name[index - 1]) || name[index - 1] == '_') ||
-               !(std::isalnum(name[index + 1]) || name[index + 1] == '_')))
-            {
-              name.erase(index, 1);
-            }
-          else
-            {
-              ++index;
-            }
-        }
-
-      // Create a version of the name
-      // string where all template
-      // parameters are eliminated.
-      for (unsigned int pos1 = name.find('<');
-           pos1 < name.size();
-           pos1 = name.find('<'))
-        {
-
-          const unsigned int pos2 = name.find('>');
-          // If there is only a single
-          // character between those two,
-          // it should be 'd' or the number
-          // representing the dimension.
-          if (pos2-pos1 == 2)
-            {
-              const char dimchar = '0' + dim;
-              (void)dimchar;
-              if (name.at(pos1+1) != 'd')
-                Assert (name.at(pos1+1) == dimchar,
-                        ExcInvalidFEDimension(name.at(pos1+1), dim));
-            }
-          else
-            Assert(pos2-pos1 == 4, ExcInvalidFEName(name));
-
-          // If pos1==pos2, then we are
-          // probably at the end of the
-          // string
-          if (pos2 != pos1)
-            name.erase(pos1, pos2-pos1+1);
-        }
-      // Replace all occurrences of "^dim"
-      // by "^d" to be handled by the
-      // next loop
-      for (unsigned int pos = name.find("^dim");
-           pos < name.size();
-           pos = name.find("^dim"))
-        name.erase(pos+2, 2);
-
-      // Replace all occurrences of "^d"
-      // by using the actual dimension
-      for (unsigned int pos = name.find("^d");
-           pos < name.size();
-           pos = name.find("^d"))
-        name.at(pos+1) = '0' + dim;
-
-      try
-        {
-          FiniteElement<dim,spacedim> *fe = internal::get_fe_from_name<dim,spacedim> (name);
-
-          // Make sure the auxiliary function
-          // ate up all characters of the name.
-          AssertThrow (name.size() == 0,
-                       ExcInvalidFEName(parameter_name
-                                        + std::string(" extra characters after "
-                                                      "end of name")));
-          return fe;
-        }
-      catch (const std::string &errline)
-        {
-          AssertThrow(false, ExcInvalidFEName(parameter_name
-                                              + std::string(" at ")
-                                              + errline));
-          return 0;
-        }
-    }
-
-
-    template <int dim>
-    FiniteElement<dim> *
-    get_fe_from_name (const std::string &parameter_name)
-    {
-      return get_fe_by_name<dim,dim> (parameter_name);
-    }
-
-
-    template <int dim, int spacedim>
-    void
-
-    compute_projection_from_quadrature_points_matrix (const FiniteElement<dim,spacedim> &fe,
-                                                      const Quadrature<dim>    &lhs_quadrature,
-                                                      const Quadrature<dim>    &rhs_quadrature,
-                                                      FullMatrix<double>       &X)
-    {
-      Assert (fe.n_components() == 1, ExcNotImplemented());
-
-      // first build the matrices M and Q
-      // described in the documentation
-      FullMatrix<double> M (fe.dofs_per_cell, fe.dofs_per_cell);
-      FullMatrix<double> Q (fe.dofs_per_cell, rhs_quadrature.size());
+      // need an FEFaceValues object to evaluate shape function
+      // values on the specified face.
+      FEFaceValues <dim> fe_face_values (fe, lhs_quadrature, update_values);
+      fe_face_values.reinit (cell, face); // setup shape_value on this face.
 
       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
         for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
           for (unsigned int q=0; q<lhs_quadrature.size(); ++q)
-            M(i,j) += fe.shape_value (i, lhs_quadrature.point(q)) *
-                      fe.shape_value (j, lhs_quadrature.point(q)) *
+            M(i,j) += fe_face_values.shape_value (i, q) *
+                      fe_face_values.shape_value (j, q) *
                       lhs_quadrature.weight(q);
+      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+        {
+          M(i,i) = (M(i,i) == 0 ? 1 : M(i,i));
+        }
+    }
+
+    {
+      FEFaceValues <dim> fe_face_values (fe, rhs_quadrature, update_values);
+      fe_face_values.reinit (cell, face); // setup shape_value on this face.
 
       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
         for (unsigned int q=0; q<rhs_quadrature.size(); ++q)
-          Q(i,q) += fe.shape_value (i, rhs_quadrature.point(q)) *
+          Q(i,q) += fe_face_values.shape_value (i, q) *
                     rhs_quadrature.weight(q);
-
-      // then invert M
-      FullMatrix<double> M_inverse (fe.dofs_per_cell, fe.dofs_per_cell);
-      M_inverse.invert (M);
-
-      // finally compute the result
-      X.reinit (fe.dofs_per_cell, rhs_quadrature.size());
-      M_inverse.mmult (X, Q);
-
-      Assert (X.m() == fe.dofs_per_cell, ExcInternalError());
-      Assert (X.n() == rhs_quadrature.size(), ExcInternalError());
     }
+    // then invert M
+    FullMatrix<double> M_inverse (fe.dofs_per_cell, fe.dofs_per_cell);
+    M_inverse.invert (M);
+
+    // finally compute the result
+    X.reinit (fe.dofs_per_cell, rhs_quadrature.size());
+    M_inverse.mmult (X, Q);
+
+    Assert (X.m() == fe.dofs_per_cell, ExcInternalError());
+    Assert (X.n() == rhs_quadrature.size(), ExcInternalError());
+  }
 
 
 
-    template <int dim, int spacedim>
-    void
-    compute_interpolation_to_quadrature_points_matrix (const FiniteElement<dim,spacedim> &fe,
-                                                       const Quadrature<dim>    &quadrature,
-                                                       FullMatrix<double>       &I_q)
-    {
-      Assert (fe.n_components() == 1, ExcNotImplemented());
-      Assert (I_q.m() == quadrature.size(),
-              ExcMessage ("Wrong matrix size"));
-      Assert (I_q.n() == fe.dofs_per_cell, ExcMessage ("Wrong matrix size"));
+  template <int dim>
+  void
+  hierarchic_to_lexicographic_numbering (unsigned int degree, std::vector<unsigned int> &h2l)
+  {
+    // number of support points in each
+    // direction
+    const unsigned int n = degree+1;
 
-      for (unsigned int q=0; q<quadrature.size(); ++q)
-        for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-          I_q(q,i) = fe.shape_value (i, quadrature.point(q));
-    }
+    unsigned int dofs_per_cell = n;
+    for (unsigned int i=1; i<dim; ++i)
+      dofs_per_cell *= n;
 
+    // Assert size maches degree
+    AssertDimension (h2l.size(), dofs_per_cell);
 
+    // polynomial degree
+    const unsigned int dofs_per_line = degree - 1;
 
-    template <int dim>
-    void
-    compute_projection_from_quadrature_points(
-      const FullMatrix<double>                &projection_matrix,
-      const std::vector< Tensor<1, dim > >    &vector_of_tensors_at_qp,
-      std::vector< Tensor<1, dim > >          &vector_of_tensors_at_nodes)
-    {
-
-      // check that the number columns of the projection_matrix
-      // matches the size of the vector_of_tensors_at_qp
-      Assert(projection_matrix.n_cols() == vector_of_tensors_at_qp.size(),
-             ExcDimensionMismatch(projection_matrix.n_cols(),
-                                  vector_of_tensors_at_qp.size()));
-
-      // check that the number rows of the projection_matrix
-      // matches the size of the vector_of_tensors_at_nodes
-      Assert(projection_matrix.n_rows() == vector_of_tensors_at_nodes.size(),
-             ExcDimensionMismatch(projection_matrix.n_rows(),
-                                  vector_of_tensors_at_nodes.size()));
-
-      // number of support points (nodes) to project to
-      const unsigned int n_support_points = projection_matrix.n_rows();
-      // number of quadrature points to project from
-      const unsigned int n_quad_points = projection_matrix.n_cols();
-
-      // component projected to the nodes
-      Vector<double> component_at_node(n_support_points);
-      // component at the quadrature point
-      Vector<double> component_at_qp(n_quad_points);
-
-      for (unsigned int ii = 0; ii < dim; ++ii)
-        {
-
-          component_at_qp = 0;
-
-          // populate the vector of components at the qps
-          // from vector_of_tensors_at_qp
-          // vector_of_tensors_at_qp data is in form:
-          //      columns:        0, 1, ...,  dim
-          //      rows:           0,1,....,  n_quad_points
-          // so extract the ii'th column of vector_of_tensors_at_qp
-          for (unsigned int q = 0; q < n_quad_points; ++q)
-            {
-              component_at_qp(q) = vector_of_tensors_at_qp[q][ii];
-            }
-
-          // project from the qps -> nodes
-          // component_at_node = projection_matrix_u * component_at_qp
-          projection_matrix.vmult(component_at_node, component_at_qp);
-
-          // rewrite the projection of the components
-          // back into the vector of tensors
-          for (unsigned int nn =0; nn <n_support_points; ++nn)
-            {
-              vector_of_tensors_at_nodes[nn][ii] = component_at_node(nn);
-            }
-        }
-    }
-
-
-
-    template <int dim>
-    void
-    compute_projection_from_quadrature_points(
-      const FullMatrix<double>                        &projection_matrix,
-      const std::vector< SymmetricTensor<2, dim > >   &vector_of_tensors_at_qp,
-      std::vector< SymmetricTensor<2, dim > >         &vector_of_tensors_at_nodes)
-    {
-
-      // check that the number columns of the projection_matrix
-      // matches the size of the vector_of_tensors_at_qp
-      Assert(projection_matrix.n_cols() == vector_of_tensors_at_qp.size(),
-             ExcDimensionMismatch(projection_matrix.n_cols(),
-                                  vector_of_tensors_at_qp.size()));
-
-      // check that the number rows of the projection_matrix
-      // matches the size of the vector_of_tensors_at_nodes
-      Assert(projection_matrix.n_rows() == vector_of_tensors_at_nodes.size(),
-             ExcDimensionMismatch(projection_matrix.n_rows(),
-                                  vector_of_tensors_at_nodes.size()));
-
-      // number of support points (nodes)
-      const unsigned int n_support_points = projection_matrix.n_rows();
-      // number of quadrature points to project from
-      const unsigned int n_quad_points = projection_matrix.n_cols();
-
-      // number of unique entries in a symmetric second-order tensor
-      const unsigned int n_independent_components =
-        SymmetricTensor<2, dim >::n_independent_components;
-
-      // component projected to the nodes
-      Vector<double> component_at_node(n_support_points);
-      // component at the quadrature point
-      Vector<double> component_at_qp(n_quad_points);
-
-      // loop over the number of unique dimensions of the tensor
-      for (unsigned int ii = 0; ii < n_independent_components; ++ii)
-        {
-
-          component_at_qp = 0;
-
-          // row-column entry of tensor corresponding the unrolled index
-          TableIndices<2>  row_column_index = SymmetricTensor< 2, dim >::unrolled_to_component_indices(ii);
-          const unsigned int row = row_column_index[0];
-          const unsigned int column = row_column_index[1];
-
-          //  populate the vector of components at the qps
-          //  from vector_of_tensors_at_qp
-          //  vector_of_tensors_at_qp is in form:
-          //      columns:       0, 1, ..., n_independent_components
-          //      rows:           0,1,....,  n_quad_points
-          //  so extract the ii'th column of vector_of_tensors_at_qp
-          for (unsigned int q = 0; q < n_quad_points; ++q)
-            {
-              component_at_qp(q) = (vector_of_tensors_at_qp[q])[row][column];
-            }
-
-          // project from the qps -> nodes
-          // component_at_node = projection_matrix_u * component_at_qp
-          projection_matrix.vmult(component_at_node, component_at_qp);
-
-          // rewrite the projection of the components back into the vector of tensors
-          for (unsigned int nn =0; nn <n_support_points; ++nn)
-            {
-              (vector_of_tensors_at_nodes[nn])[row][column] = component_at_node(nn);
-            }
-        }
-    }
-
-
-
-    template <int dim, int spacedim>
-    void
-    compute_projection_from_face_quadrature_points_matrix (const FiniteElement<dim, spacedim> &fe,
-                                                           const Quadrature<dim-1>    &lhs_quadrature,
-                                                           const Quadrature<dim-1>    &rhs_quadrature,
-                                                           const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
-                                                           const unsigned int face,
-                                                           FullMatrix<double>       &X)
-    {
-      Assert (fe.n_components() == 1, ExcNotImplemented());
-      Assert (lhs_quadrature.size () > fe.degree, ExcNotGreaterThan (lhs_quadrature.size (), fe.degree));
-
-
-
-      // build the matrices M and Q
-      // described in the documentation
-      FullMatrix<double> M (fe.dofs_per_cell, fe.dofs_per_cell);
-      FullMatrix<double> Q (fe.dofs_per_cell, rhs_quadrature.size());
-
+    // the following lines of code are somewhat odd, due to the way the
+    // hierarchic numbering is organized. if someone would really want to
+    // understand these lines, you better draw some pictures where you
+    // indicate the indices and orders of vertices, lines, etc, along with the
+    // numbers of the degrees of freedom in hierarchical and lexicographical
+    // order
+    switch (dim)
       {
-        // need an FEFaceValues object to evaluate shape function
-        // values on the specified face.
-        FEFaceValues <dim> fe_face_values (fe, lhs_quadrature, update_values);
-        fe_face_values.reinit (cell, face); // setup shape_value on this face.
+      case 1:
+      {
+        h2l[0] = 0;
+        h2l[1] = dofs_per_cell-1;
+        for (unsigned int i=2; i<dofs_per_cell; ++i)
+          h2l[i] = i-1;
 
-        for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-          for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
-            for (unsigned int q=0; q<lhs_quadrature.size(); ++q)
-              M(i,j) += fe_face_values.shape_value (i, q) *
-                        fe_face_values.shape_value (j, q) *
-                        lhs_quadrature.weight(q);
-        for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-          {
-            M(i,i) = (M(i,i) == 0 ? 1 : M(i,i));
-          }
+        break;
       }
 
+      case 2:
       {
-        FEFaceValues <dim> fe_face_values (fe, rhs_quadrature, update_values);
-        fe_face_values.reinit (cell, face); // setup shape_value on this face.
+        unsigned int next_index = 0;
+        // first the four vertices
+        h2l[next_index++] = 0;
+        h2l[next_index++] = n-1;
+        h2l[next_index++] = n*(n-1);
+        h2l[next_index++] = n*n-1;
 
-        for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-          for (unsigned int q=0; q<rhs_quadrature.size(); ++q)
-            Q(i,q) += fe_face_values.shape_value (i, q) *
-                      rhs_quadrature.weight(q);
+        // left   line
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          h2l[next_index++] = (1+i)*n;
+
+        // right  line
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          h2l[next_index++] = (2+i)*n-1;
+
+        // bottom line
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          h2l[next_index++] = 1+i;
+
+        // top    line
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          h2l[next_index++] = n*(n-1)+i+1;
+
+        // inside quad
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          for (unsigned int j=0; j<dofs_per_line; ++j)
+            h2l[next_index++] = n*(i+1)+j+1;
+
+        Assert (next_index == dofs_per_cell, ExcInternalError());
+
+        break;
       }
-      // then invert M
-      FullMatrix<double> M_inverse (fe.dofs_per_cell, fe.dofs_per_cell);
-      M_inverse.invert (M);
 
-      // finally compute the result
-      X.reinit (fe.dofs_per_cell, rhs_quadrature.size());
-      M_inverse.mmult (X, Q);
+      case 3:
+      {
+        unsigned int next_index = 0;
+        // first the eight vertices
+        h2l[next_index++] = 0;                 // 0
+        h2l[next_index++] = (      1)*degree;  // 1
+        h2l[next_index++] = (    n  )*degree;  // 2
+        h2l[next_index++] = (    n+1)*degree;  // 3
+        h2l[next_index++] = (n*n    )*degree;  // 4
+        h2l[next_index++] = (n*n  +1)*degree;  // 5
+        h2l[next_index++] = (n*n+n  )*degree;  // 6
+        h2l[next_index++] = (n*n+n+1)*degree;  // 7
 
-      Assert (X.m() == fe.dofs_per_cell, ExcInternalError());
-      Assert (X.n() == rhs_quadrature.size(), ExcInternalError());
-    }
+        // line 0
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          h2l[next_index++] = (i+1)*n;
+        // line 1
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          h2l[next_index++] = n-1+(i+1)*n;
+        // line 2
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          h2l[next_index++] = 1+i;
+        // line 3
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          h2l[next_index++] = 1+i+n*(n-1);
 
+        // line 4
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          h2l[next_index++] = (n-1)*n*n+(i+1)*n;
+        // line 5
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          h2l[next_index++] = (n-1)*(n*n+1)+(i+1)*n;
+        // line 6
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          h2l[next_index++] = n*n*(n-1)+i+1;
+        // line 7
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          h2l[next_index++] = n*n*(n-1)+i+1+n*(n-1);
 
-
-    template <int dim>
-    void
-    hierarchic_to_lexicographic_numbering (unsigned int degree, std::vector<unsigned int> &h2l)
-    {
-      // number of support points in each
-      // direction
-      const unsigned int n = degree+1;
-
-      unsigned int dofs_per_cell = n;
-      for (unsigned int i=1; i<dim; ++i)
-        dofs_per_cell *= n;
-
-      // Assert size maches degree
-      AssertDimension (h2l.size(), dofs_per_cell);
-
-      // polynomial degree
-      const unsigned int dofs_per_line = degree - 1;
-
-      // the following lines of code are somewhat odd, due to the way the
-      // hierarchic numbering is organized. if someone would really want to
-      // understand these lines, you better draw some pictures where you
-      // indicate the indices and orders of vertices, lines, etc, along with the
-      // numbers of the degrees of freedom in hierarchical and lexicographical
-      // order
-      switch (dim)
-        {
-        case 1:
-        {
-          h2l[0] = 0;
-          h2l[1] = dofs_per_cell-1;
-          for (unsigned int i=2; i<dofs_per_cell; ++i)
-            h2l[i] = i-1;
-
-          break;
-        }
-
-        case 2:
-        {
-          unsigned int next_index = 0;
-          // first the four vertices
-          h2l[next_index++] = 0;
-          h2l[next_index++] = n-1;
-          h2l[next_index++] = n*(n-1);
-          h2l[next_index++] = n*n-1;
-
-          // left   line
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            h2l[next_index++] = (1+i)*n;
-
-          // right  line
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            h2l[next_index++] = (2+i)*n-1;
-
-          // bottom line
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            h2l[next_index++] = 1+i;
-
-          // top    line
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            h2l[next_index++] = n*(n-1)+i+1;
-
-          // inside quad
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            for (unsigned int j=0; j<dofs_per_line; ++j)
-              h2l[next_index++] = n*(i+1)+j+1;
-
-          Assert (next_index == dofs_per_cell, ExcInternalError());
-
-          break;
-        }
-
-        case 3:
-        {
-          unsigned int next_index = 0;
-          // first the eight vertices
-          h2l[next_index++] = 0;                 // 0
-          h2l[next_index++] = (      1)*degree;  // 1
-          h2l[next_index++] = (    n  )*degree;  // 2
-          h2l[next_index++] = (    n+1)*degree;  // 3
-          h2l[next_index++] = (n*n    )*degree;  // 4
-          h2l[next_index++] = (n*n  +1)*degree;  // 5
-          h2l[next_index++] = (n*n+n  )*degree;  // 6
-          h2l[next_index++] = (n*n+n+1)*degree;  // 7
-
-          // line 0
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            h2l[next_index++] = (i+1)*n;
-          // line 1
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            h2l[next_index++] = n-1+(i+1)*n;
-          // line 2
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            h2l[next_index++] = 1+i;
-          // line 3
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            h2l[next_index++] = 1+i+n*(n-1);
-
-          // line 4
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            h2l[next_index++] = (n-1)*n*n+(i+1)*n;
-          // line 5
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            h2l[next_index++] = (n-1)*(n*n+1)+(i+1)*n;
-          // line 6
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            h2l[next_index++] = n*n*(n-1)+i+1;
-          // line 7
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            h2l[next_index++] = n*n*(n-1)+i+1+n*(n-1);
-
-          // line 8
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            h2l[next_index++] = (i+1)*n*n;
-          // line 9
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            h2l[next_index++] = n-1+(i+1)*n*n;
-          // line 10
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            h2l[next_index++] = (i+1)*n*n+n*(n-1);
-          // line 11
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            h2l[next_index++] = n-1+(i+1)*n*n+n*(n-1);
+        // line 8
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          h2l[next_index++] = (i+1)*n*n;
+        // line 9
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          h2l[next_index++] = n-1+(i+1)*n*n;
+        // line 10
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          h2l[next_index++] = (i+1)*n*n+n*(n-1);
+        // line 11
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          h2l[next_index++] = n-1+(i+1)*n*n+n*(n-1);
 
 
-          // inside quads
-          // face 0
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            for (unsigned int j=0; j<dofs_per_line; ++j)
-              h2l[next_index++] = (i+1)*n*n+n*(j+1);
-          // face 1
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            for (unsigned int j=0; j<dofs_per_line; ++j)
-              h2l[next_index++] = (i+1)*n*n+n-1+n*(j+1);
-          // face 2, note the orientation!
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            for (unsigned int j=0; j<dofs_per_line; ++j)
-              h2l[next_index++] = (j+1)*n*n+i+1;
-          // face 3, note the orientation!
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            for (unsigned int j=0; j<dofs_per_line; ++j)
-              h2l[next_index++] = (j+1)*n*n+n*(n-1)+i+1;
-          // face 4
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            for (unsigned int j=0; j<dofs_per_line; ++j)
-              h2l[next_index++] = n*(i+1)+j+1;
-          // face 5
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            for (unsigned int j=0; j<dofs_per_line; ++j)
-              h2l[next_index++] = (n-1)*n*n+n*(i+1)+j+1;
+        // inside quads
+        // face 0
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          for (unsigned int j=0; j<dofs_per_line; ++j)
+            h2l[next_index++] = (i+1)*n*n+n*(j+1);
+        // face 1
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          for (unsigned int j=0; j<dofs_per_line; ++j)
+            h2l[next_index++] = (i+1)*n*n+n-1+n*(j+1);
+        // face 2, note the orientation!
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          for (unsigned int j=0; j<dofs_per_line; ++j)
+            h2l[next_index++] = (j+1)*n*n+i+1;
+        // face 3, note the orientation!
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          for (unsigned int j=0; j<dofs_per_line; ++j)
+            h2l[next_index++] = (j+1)*n*n+n*(n-1)+i+1;
+        // face 4
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          for (unsigned int j=0; j<dofs_per_line; ++j)
+            h2l[next_index++] = n*(i+1)+j+1;
+        // face 5
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          for (unsigned int j=0; j<dofs_per_line; ++j)
+            h2l[next_index++] = (n-1)*n*n+n*(i+1)+j+1;
 
-          // inside hex
-          for (unsigned int i=0; i<dofs_per_line; ++i)
-            for (unsigned int j=0; j<dofs_per_line; ++j)
-              for (unsigned int k=0; k<dofs_per_line; ++k)
-                h2l[next_index++]       = n*n*(i+1)+n*(j+1)+k+1;
+        // inside hex
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          for (unsigned int j=0; j<dofs_per_line; ++j)
+            for (unsigned int k=0; k<dofs_per_line; ++k)
+              h2l[next_index++]       = n*n*(i+1)+n*(j+1)+k+1;
 
-          Assert (next_index == dofs_per_cell, ExcInternalError());
+        Assert (next_index == dofs_per_cell, ExcInternalError());
 
-          break;
-        }
+        break;
+      }
 
-        default:
-          Assert (false, ExcNotImplemented());
-        }
-    }
+      default:
+        Assert (false, ExcNotImplemented());
+      }
+  }
 
 
 
-    template <int dim>
-    void
-    hierarchic_to_lexicographic_numbering (const FiniteElementData<dim> &fe,
-                                           std::vector<unsigned int> &h2l)
-    {
-      Assert (h2l.size() == fe.dofs_per_cell,
-              ExcDimensionMismatch (h2l.size(), fe.dofs_per_cell));
-      hierarchic_to_lexicographic_numbering<dim> (fe.dofs_per_line+1, h2l);
-    }
+  template <int dim>
+  void
+  hierarchic_to_lexicographic_numbering (const FiniteElementData<dim> &fe,
+                                         std::vector<unsigned int> &h2l)
+  {
+    Assert (h2l.size() == fe.dofs_per_cell,
+            ExcDimensionMismatch (h2l.size(), fe.dofs_per_cell));
+    hierarchic_to_lexicographic_numbering<dim> (fe.dofs_per_line+1, h2l);
+  }
 
 
 
-    template <int dim>
-    std::vector<unsigned int>
-    hierarchic_to_lexicographic_numbering (const FiniteElementData<dim> &fe)
-    {
-      Assert (fe.n_components() == 1, ExcInvalidFE());
-      std::vector<unsigned int> h2l(fe.dofs_per_cell);
-      hierarchic_to_lexicographic_numbering<dim> (fe.dofs_per_line+1, h2l);
-      return (h2l);
-    }
+  template <int dim>
+  std::vector<unsigned int>
+  hierarchic_to_lexicographic_numbering (const FiniteElementData<dim> &fe)
+  {
+    Assert (fe.n_components() == 1, ExcInvalidFE());
+    std::vector<unsigned int> h2l(fe.dofs_per_cell);
+    hierarchic_to_lexicographic_numbering<dim> (fe.dofs_per_line+1, h2l);
+    return (h2l);
+  }
 
-    template <int dim>
-    void
-    lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe,
-                                           std::vector<unsigned int>    &l2h)
-    {
-      l2h = lexicographic_to_hierarchic_numbering (fe);
-    }
-
-
-
-    template <int dim>
-    std::vector<unsigned int>
-    lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe)
-    {
-      return Utilities::invert_permutation(hierarchic_to_lexicographic_numbering (fe));
-    }
-
-  } // end of namespace FETools
+  template <int dim>
+  void
+  lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe,
+                                         std::vector<unsigned int>    &l2h)
+  {
+    l2h = lexicographic_to_hierarchic_numbering (fe);
+  }
 
 
 
-  /*-------------- Explicit Instantiations -------------------------------*/
+  template <int dim>
+  std::vector<unsigned int>
+  lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe)
+  {
+    return Utilities::invert_permutation(hierarchic_to_lexicographic_numbering (fe));
+  }
+
+} // end of namespace FETools
+
+
+
+/*-------------- Explicit Instantiations -------------------------------*/
 #include "fe_tools.inst"
 
 
-  /*----------------------------   fe_tools.cc     ---------------------------*/
+/*----------------------------   fe_tools.cc     ---------------------------*/
 
-  DEAL_II_NAMESPACE_CLOSE
+DEAL_II_NAMESPACE_CLOSE
