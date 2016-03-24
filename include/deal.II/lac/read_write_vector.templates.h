@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015, 2016 by the deal.II authors
+// Copyright (C) 2015-2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,9 +21,11 @@
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_epetra_vector.h>
 
 #ifdef DEAL_II_WITH_TRILINOS
-#  include <Epetra_Import.h>
+#  include <deal.II/lac/trilinos_epetra_communication_pattern.h>
+#  include "Epetra_Import.h"
 #endif
 
 DEAL_II_NAMESPACE_OPEN
@@ -66,6 +68,10 @@ namespace LinearAlgebra
     // set entries to zero if so requested
     if (omit_zeroing_entries == false)
       this->operator = (Number());
+
+    // reset the communication patter
+    source_stored_elements.clear();
+    comm_pattern = NULL;
   }
 
 
@@ -82,6 +88,10 @@ namespace LinearAlgebra
 
     if (omit_zeroing_entries == false)
       this->operator= (Number());
+
+    // reset the communication patter
+    source_stored_elements.clear();
+    comm_pattern = NULL;
   }
 
 
@@ -99,6 +109,10 @@ namespace LinearAlgebra
     // initialize to zero
     if (omit_zeroing_entries == false)
       this->operator= (Number());
+
+    // reset the communication patter
+    source_stored_elements.clear();
+    comm_pattern = NULL;
   }
 
 
@@ -134,8 +148,10 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  ReadWriteVector<Number> &
-  ReadWriteVector<Number>::operator = (const PETScWrappers::MPI::Vector &petsc_vec)
+  void
+  ReadWriteVector<Number>::import(const PETScWrappers::MPI::Vector &petsc_vec,
+                                  VectorOperation::values operation,
+                                  const CommunicationPatternBase *communication_pattern)
   {
     //TODO: this works only if no communication is needed.
     Assert(petsc_vec.locally_owned_elements() == stored_elements,
@@ -152,10 +168,6 @@ namespace LinearAlgebra
     // restore the representation of the vector
     ierr = VecRestoreArray (static_cast<const Vec &>(petsc_vec), &start_ptr);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    // return a pointer to this object per normal c++ operator overloading
-    // semantics
-    return *this;
   }
 #endif
 
@@ -163,64 +175,85 @@ namespace LinearAlgebra
 
 #ifdef DEAL_II_WITH_TRILINOS
   template <typename Number>
-  ReadWriteVector<Number> &
-  ReadWriteVector<Number>::operator = (const TrilinosWrappers::MPI::Vector &trilinos_vec)
+  void
+  ReadWriteVector<Number>::import(const Epetra_MultiVector        &multivector,
+                                  const IndexSet                  &source_elements,
+                                  VectorOperation::values          operation,
+                                  const MPI_Comm                  &mpi_comm,
+                                  std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern)
   {
-    // Copy the local elements
-    std::vector<size_type> trilinos_indices, readwrite_indices;
-    trilinos_vec.locally_owned_elements().fill_index_vector(trilinos_indices);
-    stored_elements.fill_index_vector(readwrite_indices);
-    std::vector<size_type> intersection(trilinos_indices.size());
-    std::vector<size_type>::iterator end;
-    end = std::set_intersection(trilinos_indices.begin(), trilinos_indices.end(),
-                                readwrite_indices.begin(), readwrite_indices.end(),
-                                intersection.begin());
-    const size_t intersection_size = end-intersection.begin();
-    intersection.resize(intersection_size);
-    std::vector<size_t> trilinos_position(intersection_size);
-    unsigned int j=0;
-    for (size_t i=0; i<intersection_size; ++i)
+    std_cxx11::shared_ptr<const EpetraWrappers::CommunicationPattern> epetra_comm_pattern;
+
+    // If no communication pattern is given, create one. Otherwise, use the one
+    // given.
+    if (communication_pattern == NULL)
       {
-        while (intersection[i]!=trilinos_indices[j])
-          ++j;
-        trilinos_position[i] = j;
+        // The first time import is called, we create a communication pattern.
+        // Check if the communication pattern already exists and if it can be
+        // reused.
+        if ((source_elements.size() == source_stored_elements.size()) &&
+            (source_elements == source_stored_elements))
+          {
+            epetra_comm_pattern =
+              std_cxx11::dynamic_pointer_cast<const EpetraWrappers::CommunicationPattern> (comm_pattern);
+            if (epetra_comm_pattern == NULL)
+              epetra_comm_pattern = std_cxx11::make_shared<const EpetraWrappers::CommunicationPattern>(
+                                      create_epetra_comm_pattern(source_elements, mpi_comm));
+          }
+        else
+          epetra_comm_pattern = std_cxx11::make_shared<const EpetraWrappers::CommunicationPattern>(
+                                  create_epetra_comm_pattern(source_elements, mpi_comm));
       }
-    double *values = trilinos_vec.trilinos_vector().Values();
-    for (size_t i=0; i<trilinos_position.size(); ++i)
-      val[global_to_local(intersection[i])] = values[trilinos_position[i]];
-
-
-#ifdef DEAL_II_WITH_MPI
-    // Copy the off-processor elements if necessary
-    if (intersection_size != n_elements())
+    else
       {
-        Epetra_BlockMap source_map = trilinos_vec.trilinos_vector().Map();
-        std::vector<size_type> off_proc_indices(readwrite_indices.size());
-        // Subtract the elements of readwrite that are in intersection.
-        end = std::set_difference(readwrite_indices.begin(), readwrite_indices.end(),
-                                  intersection.begin(), intersection.end(), off_proc_indices.begin());
-        off_proc_indices.resize(end-off_proc_indices.begin());
-        // Cast size_type to TrilinosWrappers::type::int_type
-        TrilinosWrappers::types::int_type *off_proc_array =
-          new TrilinosWrappers::types::int_type [off_proc_indices.size()];
-        for (size_t i=0; i<off_proc_indices.size(); ++i)
-          off_proc_array[i] = static_cast<TrilinosWrappers::types::int_type> (
-                                off_proc_indices[i]);
-        Epetra_Map target_map(off_proc_indices.size(),off_proc_indices.size(),
-                              off_proc_array,0,source_map.Comm());
-        delete [] off_proc_array;
-        Epetra_Import import(target_map, source_map);
-        Epetra_FEVector target_vector(target_map);
-        target_vector.Import(trilinos_vec.trilinos_vector(), import, Insert);
-        values = target_vector.Values();
-        for (unsigned int i=0; i<off_proc_indices.size(); ++i)
-          val[global_to_local(off_proc_indices[i])] = values[i];
+        epetra_comm_pattern = std_cxx11::dynamic_pointer_cast<const EpetraWrappers::CommunicationPattern> (
+                                communication_pattern);
+        AssertThrow(epetra_comm_pattern != NULL,
+                    ExcMessage(std::string("The communication pattern is not of type ") +
+                               "LinearAlgebra::EpetraWrappers::CommunicationPattern."));
       }
-#endif
 
-    // return a pointer to this object per normal c++ operator overloading
-    // semantics
-    return *this;
+    Epetra_Import import(epetra_comm_pattern->get_epetra_import());
+
+    Epetra_FEVector target_vector(import.TargetMap());
+
+    if (operation==VectorOperation::insert)
+      {
+        target_vector.Import(multivector, import, Insert);
+        double *values = target_vector.Values();
+        for (int i=0; i<target_vector.MyLength(); ++i)
+          val[i] = values[i];
+      }
+    else
+      {
+        target_vector.Import(multivector, import, Add);
+        double *values = target_vector.Values();
+        for (int i=0; i<target_vector.MyLength(); ++i)
+          val[i] += values[i];
+      }
+  }
+
+
+  template <typename Number>
+  void
+  ReadWriteVector<Number>::import(const TrilinosWrappers::MPI::Vector            &trilinos_vec,
+                                  VectorOperation::values                         operation,
+                                  std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern)
+  {
+    import(trilinos_vec.trilinos_vector(), trilinos_vec.locally_owned_elements(),
+           operation, trilinos_vec.get_mpi_communicator(), communication_pattern);
+  }
+
+
+
+  template <typename Number>
+  void
+  ReadWriteVector<Number>::import(const LinearAlgebra::EpetraWrappers::Vector    &trilinos_vec,
+                                  VectorOperation::values                         operation,
+                                  std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern)
+  {
+    import(trilinos_vec.trilinos_vector(), trilinos_vec.locally_owned_elements(),
+           operation, trilinos_vec.get_mpi_communicator(), communication_pattern);
   }
 #endif
 
@@ -279,6 +312,24 @@ namespace LinearAlgebra
     out.flags (old_flags);
     out.precision(old_precision);
   }
+
+
+
+#ifdef DEAL_II_WITH_TRILINOS
+  template <typename Number>
+  EpetraWrappers::CommunicationPattern
+  ReadWriteVector<Number>::create_epetra_comm_pattern(const IndexSet &source_index_set,
+                                                      const MPI_Comm &mpi_comm)
+  {
+    source_stored_elements = source_index_set;
+    EpetraWrappers::CommunicationPattern epetra_comm_pattern(
+      source_stored_elements, stored_elements, mpi_comm);
+    comm_pattern.reset(new EpetraWrappers::CommunicationPattern(
+                         source_stored_elements, stored_elements, mpi_comm));
+
+    return epetra_comm_pattern;
+  }
+#endif
 } // end of namespace LinearAlgebra
 
 
