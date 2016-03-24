@@ -51,7 +51,6 @@ void check_norms ()
       for (unsigned int i=0; i<size; ++i)
         vec[i] = (number)value;
       const number l1_norma = vec.l1_norm();
-      std::cout<<l1_norma<<std::endl;
       AssertThrow (std::abs(l1_norma-value*size) < acc*size*value,
                    ExcInternalError());
       const number l2_norma = vec.l2_norm();

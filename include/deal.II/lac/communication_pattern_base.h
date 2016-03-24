@@ -42,6 +42,11 @@ namespace LinearAlgebra
   {
   public:
     /**
+     * Destructor.
+     */
+    virtual ~CommunicationPatternBase() {};
+
+    /**
      * Reinitialize the communication pattern. The first argument @p
      * vector_space_vector_index_set is the index set associated to a
      * VectorSpaceVector object. The second argument @p
