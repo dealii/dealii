@@ -1934,6 +1934,21 @@ periodic_neighbor (const unsigned int i_face) const
 
 
 template <int dim, int spacedim>
+TriaIterator<CellAccessor<dim,spacedim> >
+CellAccessor<dim, spacedim>::
+neighbor_or_periodic_neighbor (const unsigned int i_face) const
+{
+  if (!(this->face(i_face)->at_boundary()))
+    return this->neighbor(i_face);
+  else if (this->has_periodic_neighbor(i_face))
+    return this->periodic_neighbor(i_face);
+  else
+    Assert (false, TriaAccessorExceptions::ExcNoPeriodicNeighbor());
+}
+
+
+
+template <int dim, int spacedim>
 TriaIterator<CellAccessor<dim, spacedim> >
 CellAccessor<dim, spacedim>::
 periodic_neighbor_child_on_subface (const unsigned int i_face,

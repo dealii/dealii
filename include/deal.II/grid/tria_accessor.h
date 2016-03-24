@@ -2527,6 +2527,16 @@ public:
   periodic_neighbor (const unsigned int i) const;
 
   /**
+   * For a cell whose @c ith face is not at a boundary, this function returns
+   * the same result as neighbor(). If the @c ith face is at a periodic boundary
+   * this function returns the same result as periodic_neighbor(). If neither of
+   * the aforementioned conditions are met, i.e. the @c ith face is on a
+   * nonperiodic boundary, an exception will be thrown.
+   */
+  TriaIterator<CellAccessor<dim, spacedim> >
+  neighbor_or_periodic_neighbor (const unsigned int i) const;
+
+  /**
    * Returns an iterator to the periodic neighbor of the cell at a given
    * face and subface number. The general guidelines for using this function
    * is similar to the function neighbor_child_on_subface(). The
@@ -2588,8 +2598,9 @@ public:
   periodic_neighbor_of_periodic_neighbor (const unsigned int i) const;
 
   /**
-   * If a cell has periodic neighbor, this function returns the face number
-   * of the neighbor, which is connected to this cell.
+   * If a cell has a periodic neighbor at its @c ith face, this function
+   * returns the face number of the periodic neighbor, which is connected
+   * to the @c ith face of this cell.
    */
   unsigned int
   periodic_neighbor_face_no (const unsigned int i) const;
