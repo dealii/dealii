@@ -22,8 +22,8 @@
 
 //#include <fstream>
 
-void graph_laplacian(const SparsityPattern& sparsity,
-                     SparseMatrix<double>& matrix)
+void graph_laplacian(const SparsityPattern &sparsity,
+                     SparseMatrix<double> &matrix)
 {
   matrix = 0.0;
 
@@ -38,7 +38,7 @@ void graph_laplacian(const SparsityPattern& sparsity,
 }
 
 
-SparseMatrix<double> graph_laplacian(const SparsityPattern& sparsity)
+SparseMatrix<double> graph_laplacian(const SparsityPattern &sparsity)
 {
   SparseMatrix<double> A(sparsity);
   graph_laplacian(sparsity, A);
@@ -48,7 +48,7 @@ SparseMatrix<double> graph_laplacian(const SparsityPattern& sparsity)
 
 
 SparseMatrix<double>
-graph_laplacian_move_return(const SparsityPattern& sparsity)
+graph_laplacian_move_return(const SparsityPattern &sparsity)
 {
   SparseMatrix<double> A(sparsity);
   graph_laplacian(sparsity, A);
