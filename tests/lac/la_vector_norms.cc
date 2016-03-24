@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// checks that the l1, l2, lp norm is computed correctly for deal.II vectors
+// checks that the l1 and l2 norm are computed correctly for deal.II vectors
 // (check the summation algorithm), including an accuracy test (should not
 // lose more than 1 decimal also for 200000 vector entries)
 

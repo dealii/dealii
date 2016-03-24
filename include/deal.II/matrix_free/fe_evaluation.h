@@ -2146,6 +2146,9 @@ namespace internal
   void check_vector_compatibility (const VectorType                             &vec,
                                    const internal::MatrixFreeFunctions::DoFInfo &dof_info)
   {
+    (void) vec;
+    (void) dof_info;
+
     AssertDimension (vec.size(),
                      dof_info.vector_partitioner->size());
   }
@@ -6525,6 +6528,7 @@ void
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::check_template_arguments(const unsigned int fe_no)
 {
+  (void)fe_no;
 #ifdef DEBUG
   // print error message when the dimensions do not match. Propose a possible
   // fix

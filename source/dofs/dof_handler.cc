@@ -1437,7 +1437,8 @@ void DoFHandler<2>::renumber_dofs (const unsigned int  level,
       // level, as those lines logically belong to the same
       // level as the cell, at least for for isotropic
       // refinement
-      for (level_cell_iterator cell = begin(level); cell != end(level); ++cell)
+      level_cell_iterator cell, endc = end(level);
+      for (cell = begin(level); cell != endc; ++cell)
         for (unsigned int line=0; line < GeometryInfo<2>::faces_per_cell; ++line)
           cell->face(line)->set_user_flag();
 
@@ -1497,12 +1498,13 @@ void DoFHandler<3>::renumber_dofs (const unsigned int  level,
       // level, as those lines logically belong to the same
       // level as the cell, at least for for isotropic
       // refinement
-      for (level_cell_iterator cell = begin(level) ; cell != end(level) ; ++cell)
+      level_cell_iterator cell, endc = end(level);
+      for (cell = begin(level) ; cell != endc ; ++cell)
         for (unsigned int line=0; line < GeometryInfo<3>::lines_per_cell; ++line)
           cell->line(line)->set_user_flag();
 
 
-      for (cell_iterator cell = begin(level); cell != end(level); ++cell)
+      for (cell = begin(level); cell != endc; ++cell)
         for (unsigned int l=0; l<GeometryInfo<3>::lines_per_cell; ++l)
           if (cell->line(l)->user_flag_set())
             {
@@ -1527,11 +1529,12 @@ void DoFHandler<3>::renumber_dofs (const unsigned int  level,
       // level, as those lines logically belong to the same
       // level as the cell, at least for for isotropic
       // refinement
-      for (level_cell_iterator cell = begin(level) ; cell != end(level); ++cell)
+      level_cell_iterator cell, endc = end(level);
+      for (cell = begin(level) ; cell != endc; ++cell)
         for (unsigned int quad=0; quad < GeometryInfo<3>::faces_per_cell; ++quad)
           cell->face(quad)->set_user_flag();
 
-      for (cell_iterator cell = begin(level); cell != end(level); ++cell)
+      for (cell = begin(level); cell != endc; ++cell)
         for (unsigned int q=0; q<GeometryInfo<3>::quads_per_cell; ++q)
           if (cell->quad(q)->user_flag_set())
             {

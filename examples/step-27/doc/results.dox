@@ -54,20 +54,20 @@ boundary conditions.
 Of maybe more interest is to look at the graphical output. First, here is the
 solution of the problem:
 
-<img src="http://www.dealii.org/images/steps/developer/step-27.solution.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-27.solution.png" alt="">
 
 Secondly, let us look at the sequence of meshes generated:
 
 <table width="60%" align="center">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-27.mesh-0.png" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-27.mesh-1.png" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-27.mesh-2.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-27.mesh-0.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-27.mesh-1.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-27.mesh-2.png" alt=""></td>
   </tr>
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-27.mesh-3.png" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-27.mesh-4.png" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-27.mesh-5.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-27.mesh-3.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-27.mesh-4.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-27.mesh-5.png" alt=""></td>
   </tr>
 </table>
 
@@ -77,15 +77,15 @@ distribution of finite element polynomial degrees to these mesh cells:
 
 <table width="60%" align="center">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-27.fe_degree-0.png" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-27.fe_degree-1.png" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-27.fe_degree-2.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-0.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-1.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-2.png" alt=""></td>
   </tr>
 
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-27.fe_degree-3.png" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-27.fe_degree-4.png" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-27.fe_degree-5.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-3.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-4.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-5.png" alt=""></td>
   </tr>
 </table>
 
@@ -102,15 +102,15 @@ indicating least smoothness and red indicating the smoothest areas:
 
 <table width="60%" align="center">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-27.smoothness-0.png" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-27.smoothness-1.png" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-27.smoothness-2.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-0.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-1.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-2.png" alt=""></td>
   </tr>
 
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-27.smoothness-3.png" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-27.smoothness-4.png" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-27.smoothness-5.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-3.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-4.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-5.png" alt=""></td>
   </tr>
 </table>
 

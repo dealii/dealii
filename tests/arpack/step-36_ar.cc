@@ -212,7 +212,7 @@ namespace Step36
   template <int dim>
   std::pair<unsigned int, double> EigenvalueProblem<dim>::solve ()
   {
-    SolverControl solver_control (dof_handler.n_dofs(), 1e-9);
+    SolverControl solver_control (dof_handler.n_dofs(), 1e-10);
     SparseDirectUMFPACK inverse;
     inverse.initialize (stiffness_matrix);
     const unsigned int num_arnoldi_vectors = 2*eigenvalues.size() + 2;
@@ -241,14 +241,22 @@ namespace Step36
                                Utilities::int_to_string(i) +
                                " and " +
                                Utilities::int_to_string(j) +
-                               " are not orthonormal!"));
+                               " are not orthonormal!"
+                               " failing norm is " +
+                               Utilities::to_string(
+                                 std::abs( eigenfunctions[j] * Bx - (i==j) )
+                               )
+                              ));
 
           stiffness_matrix.vmult(Ax,eigenfunctions[i]);
           Ax.add(-1.0*std::real(eigenvalues[i]),Bx);
           Assert (Ax.l2_norm() < 1e-8,
                   ExcMessage("Returned vector " +
                              Utilities::int_to_string(i) +
-                             " is not an eigenvector!"));
+                             " is not an eigenvector!"
+                             " L2 norm of the residual is " +
+                             Utilities::to_string(Ax.l2_norm())
+                            ));
         }
     }
     for (unsigned int i=0; i<eigenfunctions.size(); ++i)

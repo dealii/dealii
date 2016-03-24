@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/numbers.h>
+#include <deal.II/base/std_cxx11/shared_ptr.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -70,9 +71,21 @@ namespace LinearAlgebra
     virtual VectorSpaceVector<Number> &operator-= (const VectorSpaceVector<Number> &V) = 0;
 
     /**
+     * Import all the elements present in the vector's IndexSet from the input
+     * vector @p V. VectorOperation::values @p operation is used to decide if
+     * the elements in @p V should be added to the current vector or replace the
+     * current elements. The last parameter can be used if the same
+     * communication pattern is used multiple times. This can be used to improve
+     * performance.
+     */
+    virtual void import(const ReadWriteVector<Number> &V,
+                        VectorOperation::values operation,
+                        std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern = NULL) = 0;
+
+    /**
      * Return the scalar product of two vectors.
      */
-    virtual Number operator* (const VectorSpaceVector<Number> &V) = 0;
+    virtual Number operator* (const VectorSpaceVector<Number> &V) const = 0;
 
     /**
      * Add @p a to all components. Note that @p a is a scalar not a vector.
@@ -113,19 +126,19 @@ namespace LinearAlgebra
      * Return the l<sub>1</sub> norm of the vector (i.e., the sum of the
      * absolute values of all entries among all processors).
      */
-    virtual real_type l1_norm() = 0;
+    virtual real_type l1_norm() const = 0;
 
     /**
      * Return the l<sub>2</sub> norm of the vector (i.e., the square root of
      * the sum of the square of all entries among all processors).
      */
-    virtual real_type l2_norm() = 0;
+    virtual real_type l2_norm() const = 0;
 
     /**
      * Return the maximum norm of the vector (i.e., the maximum absolute value
      * among all entries and among all processors).
      */
-    virtual real_type linfty_norm() = 0;
+    virtual real_type linfty_norm() const = 0;
 
     /**
      * Perform a combined operation of a vector addition and a subsequent
@@ -164,7 +177,7 @@ namespace LinearAlgebra
      *  vec.locally_owned_elements() == complete_index_set(vec.size())
      * @endcode
      */
-    virtual const dealii::IndexSet &locally_owned_elements() const = 0;
+    virtual dealii::IndexSet locally_owned_elements() const = 0;
 
     /**
      * Print the vector to the output stream @p out.

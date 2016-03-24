@@ -79,7 +79,7 @@ iteration steps is constant at approximately 17.
 
 <h2>Postprocessing of the logfile</h2>
 
-<img src="http://www.dealii.org/images/steps/developer/step-39-convergence.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-39-convergence.png" alt="">
 Using the perl script <tt>postprocess.pl</tt>, we extract relevant
 data into <tt>output.dat</tt>, which can be used to plot graphs with
 <tt>gnuplot</tt>. The graph above for instance was produced with

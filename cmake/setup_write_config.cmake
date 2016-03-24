@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2014 - 2015 by the deal.II authors
+## Copyright (C) 2014 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -164,22 +164,15 @@ ENDIF()
 _both("DEAL_II_ALLOW_AUTODETECTION = ${DEAL_II_ALLOW_AUTODETECTION}):\n")
 
 
-GET_CMAKE_PROPERTY(_variables VARIABLES)
-FOREACH(_var ${_variables})
-  IF(_var MATCHES "DEAL_II_WITH")
-    LIST(APPEND _features "${_var}")
-  ELSEIF(_var MATCHES "DEAL_II_COMPONENT")
-    LIST(APPEND _components "${_var}")
-  ENDIF()
-ENDFOREACH()
+SET(_deal_ii_features_sorted ${DEAL_II_FEATURES})
+LIST(SORT _deal_ii_features_sorted)
+FOREACH(_feature ${_deal_ii_features_sorted})
+  SET(_var DEAL_II_WITH_${_feature})
 
-FOREACH(_var ${_features})
   IF(${${_var}})
-
     #
     # The feature is enabled:
     #
-    STRING(REGEX REPLACE "^DEAL_II_WITH_" "" _feature ${_var})
     IF(FEATURE_${_feature}_EXTERNAL_CONFIGURED)
       _both("#        ${_var} set up with external dependencies\n")
     ELSEIF(FEATURE_${_feature}_BUNDLED_CONFIGURED)
@@ -236,15 +229,13 @@ ENDFOREACH()
 _both(
   "#\n#  Component configuration:\n"
   )
-FOREACH(_var ${_components})
-  IF(_var MATCHES "DEAL_II_COMPONENT")
-    IF(${${_var}})
-      _both("#        ${_var}\n")
-      STRING(REPLACE "DEAL_II_COMPONENT_" "" _component ${_var})
-      LIST(APPEND _components ${_component})
-    ELSE()
-      _both("#      ( ${_var} = ${${_var}} )\n")
-    ENDIF()
+
+FOREACH(_component ${DEAL_II_COMPONENTS})
+  SET(_var DEAL_II_COMPONENT_${_component})
+  IF(${${_var}})
+    _both("#        ${_var}\n")
+  ELSE()
+    _both("#      ( ${_var} = ${${_var}} )\n")
   ENDIF()
 ENDFOREACH()
 

@@ -48,7 +48,7 @@ The final solution, as written by the program at the end of the
 
 
 
-<img src="http://www.dealii.org/images/steps/developer/step-6.solution.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-6.solution.png" alt="">
 
 
 
@@ -60,37 +60,37 @@ format. These are shown in the following:
 <TABLE WIDTH="100%">
 <tr>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-6.grid-0.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-0.png" alt="">
 </td>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-6.grid-1.png" alt="">
-</td>
-</tr>
-
-<tr>
-<td>
-  <img src="http://www.dealii.org/images/steps/developer/step-6.grid-2.png" alt="">
-</td>
-<td>
-  <img src="http://www.dealii.org/images/steps/developer/step-6.grid-3.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-1.png" alt="">
 </td>
 </tr>
 
 <tr>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-6.grid-4.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-2.png" alt="">
 </td>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-6.grid-5.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-3.png" alt="">
 </td>
 </tr>
 
 <tr>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-6.grid-6.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-4.png" alt="">
 </td>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-6.grid-7.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-5.png" alt="">
+</td>
+</tr>
+
+<tr>
+<td>
+  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-6.png" alt="">
+</td>
+<td>
+  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-7.png" alt="">
 </td>
 </tr>
 </table>
@@ -214,11 +214,11 @@ following results (left: iterations; right: CPU time):
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-6.q2.dofs_vs_iterations.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-6.q2.dofs_vs_iterations.png" alt="">
     </td>
 
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-6.q2.dofs_vs_time.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-6.q2.dofs_vs_time.png" alt="">
     </td>
   </tr>
 </table>
@@ -238,11 +238,11 @@ bi-linear one. If one makes this change, the results are as follows:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-6.q1.dofs_vs_iterations.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-6.q1.dofs_vs_iterations.png" alt="">
     </td>
 
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-6.q1.dofs_vs_time.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-6.q1.dofs_vs_time.png" alt="">
     </td>
   </tr>
 </table>
@@ -343,7 +343,7 @@ center of the mesh only fails for the central square of the mesh):
 After a few global refinement steps, this would lead to a mesh of the following
 kind:
 
-<img src="http://www.dealii.org/images/steps/developer/step-6.manifold-grid-4-bad.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-4-bad.png" alt="">
 
 This is not a good mesh: the central cell has been refined in such a way that
 the children located in the four corners of the original central cell
@@ -446,37 +446,37 @@ This code then generates the following, much better sequence of meshes:
 <TABLE WIDTH="100%">
 <tr>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-6.manifold-grid-0.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-0.png" alt="">
 </td>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-6.manifold-grid-1.png" alt="">
-</td>
-</tr>
-
-<tr>
-<td>
-  <img src="http://www.dealii.org/images/steps/developer/step-6.manifold-grid-2.png" alt="">
-</td>
-<td>
-  <img src="http://www.dealii.org/images/steps/developer/step-6.manifold-grid-3.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-1.png" alt="">
 </td>
 </tr>
 
 <tr>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-6.manifold-grid-4.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-2.png" alt="">
 </td>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-6.manifold-grid-5.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-3.png" alt="">
 </td>
 </tr>
 
 <tr>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-6.manifold-grid-6.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-4.png" alt="">
 </td>
 <td>
-  <img src="http://www.dealii.org/images/steps/developer/step-6.manifold-grid-7.png" alt="">
+  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-5.png" alt="">
+</td>
+</tr>
+
+<tr>
+<td>
+  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-6.png" alt="">
+</td>
+<td>
+  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-7.png" alt="">
 </td>
 </tr>
 </table>

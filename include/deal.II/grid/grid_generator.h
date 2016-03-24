@@ -572,9 +572,12 @@ namespace GridGenerator
    * Initialize the given triangulation with a hyper-L (in 2d or 3d)
    * consisting of exactly <tt>2^dim-1</tt> cells. It produces the hypercube
    * with the interval [<i>left,right</i>] without the hypercube made out of
-   * the interval [<i>(left+right)/2,right</i>] for each coordinate.  All
-   * faces will have boundary indicator 0. This function will create the
-   * classical L-shape in 2d and it will look like the following in 3d:
+   * the interval [<i>(left+right)/2,right</i>] for each coordinate. If the
+   * @p colorize flag is set, the @p boundary_ids of the surfaces are
+   * assigned, such that the left boundary is 0, and the others are set with
+   * growing number accordingly to the counterclockwise. Colorize option works
+   * only with 2-dimensional problem. This function will create the classical
+   * L-shape in 2d and it will look like the following in 3d:
    *
    * @image html hyper_l.png
    *
@@ -586,7 +589,8 @@ namespace GridGenerator
   template <int dim>
   void hyper_L (Triangulation<dim> &tria,
                 const double        left = -1.,
-                const double        right= 1.);
+                const double        right= 1.,
+                const bool          colorize = false);
 
   /**
    * Initialize the given Triangulation with a hypercube with a slit. In each
@@ -761,9 +765,17 @@ namespace GridGenerator
 
 
   /**
-   * Produce the surface meshing of the torus. The axis of the torus is the
-   * $y$-axis while the plane of the torus is the $x$-$z$ plane. The boundary
-   * of this object can be described by the TorusBoundary class.
+   * Produce the volume or surface mesh of a torus. The axis of the torus is
+   * the $y$-axis while the plane of the torus is the $x$-$z$ plane.
+   *
+   * If @p dim is 3, the mesh will be the volume of the torus. By default,
+   * the boundary faces will have manifold id 0 and you should attach a
+   * TorusManifold to it. The cells will have manifold id 1 and you should
+   * attach a SphericalManifold to it.
+   *
+   * If @p dim is 2, the mesh will describe the surface of the torus. All
+   * cells and faces will have manifold id 0 and you should attach a
+   * TorusManifold to it.
    *
    * @param tria The triangulation to be filled.
    *
@@ -771,10 +783,14 @@ namespace GridGenerator
    * torus containing the loop of cells. Must be greater than @p r.
    *
    * @param r The inner radius of the torus.
+   *
+   * @note Implemented for Triangulation<2,3> and Triangulation<3,3>.
    */
-  void torus (Triangulation<2,3> &tria,
-              const double        R,
-              const double        r);
+  template <int dim, int spacedim>
+  void torus (Triangulation<dim,spacedim> &tria,
+              const double R,
+              const double r);
+
 
 
   /**

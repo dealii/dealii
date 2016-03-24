@@ -1,0 +1,5 @@
+
+DEAL:FE_Q<2>(1)::difference rhs 0
+DEAL:FE_Q<2>(1)::difference matrix 0
+DEAL:FE_DGQ<2>(1)::difference rhs 0
+DEAL:FE_DGQ<2>(1)::difference matrix 0

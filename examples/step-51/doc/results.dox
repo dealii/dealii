@@ -33,12 +33,12 @@ Dirichlet conditions on the right and top boundaries.
 
 <table align="center">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-51.sol_2.png" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-51.sol_3.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-51.sol_2.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-51.sol_3.png" alt=""></td>
   </tr>
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-51.sol_4.png" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-51.sol_8.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-51.sol_4.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-51.sol_8.png" alt=""></td>
   </tr>
 </table>
 
@@ -51,12 +51,12 @@ analytical solution.
 
 <table align="center">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-51.post_2.png" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-51.post_3.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-51.post_2.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-51.post_3.png" alt=""></td>
   </tr>
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-51.post_4.png" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-51.post_8.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-51.post_4.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-51.post_8.png" alt=""></td>
   </tr>
 </table>
 
@@ -68,8 +68,8 @@ solutions.
 
 <table align="center">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-51.sol_q3_2.png" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-51.post_q3_2.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-51.sol_q3_2.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-51.post_q3_2.png" alt=""></td>
   </tr>
 </table>
 
@@ -200,8 +200,8 @@ block structure in the matrix on the finest level.
 
 <table align="center">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-51.2d_plain.png" width="400" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-51.2dt_plain.png" width="400" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-51.2d_plain.png" width="400" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-51.2dt_plain.png" width="400" alt=""></td>
   </tr>
 </table>
 
@@ -217,8 +217,8 @@ for $p=1$.
 
 <table align="center">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-51.2d_post.png" width="400" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-51.2dt_post.png" width="400" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-51.2d_post.png" width="400" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-51.2dt_post.png" width="400" alt=""></td>
   </tr>
 </table>
 
@@ -231,8 +231,8 @@ linears. However, the advantage of HDG for higher orders remains.
 
 <table align="center">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-51.2d_postb.png" width="400" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-51.2dt_postb.png" width="400" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-51.2d_postb.png" width="400" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-51.2dt_postb.png" width="400" alt=""></td>
   </tr>
 </table>
 
@@ -264,16 +264,16 @@ of DoFs) is very similar to the results for FE_FaceQ.
 
 <table align="center">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-51.3d_plain.png" width="400" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-51.3dt_plain.png" width="400" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-51.3d_plain.png" width="400" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-51.3dt_plain.png" width="400" alt=""></td>
   </tr>
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-51.3d_post.png" width="400" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-51.3dt_post.png" width="400" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-51.3d_post.png" width="400" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-51.3dt_post.png" width="400" alt=""></td>
   </tr>
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-51.3d_postb.png" width="400" alt=""></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-51.3dt_postb.png" width="400" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-51.3d_postb.png" width="400" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-51.3dt_postb.png" width="400" alt=""></td>
   </tr>
 </table>
 

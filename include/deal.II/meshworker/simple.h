@@ -72,11 +72,11 @@ namespace MeshWorker
        * structure in DoFInfo is being used.
        *
        * Store information on the local block structure. If the assembler is
-       * inititialized with this function, initialize_info() will generate one
+       * initialized with this function, initialize_info() will generate one
        * local matrix for each block row and column, which will be numbered
        * lexicographically, row by row.
        *
-       * In spite of using local block structure, all blocks will be enteres
+       * In spite of using local block structure, all blocks will be entered
        * into the same global matrix, disregarding any global block structure.
        */
 
@@ -107,11 +107,12 @@ namespace MeshWorker
       template<class DOFINFO>
       void assemble(const DOFINFO &info1,
                     const DOFINFO &info2);
-    private:
+    protected:
       /**
-       * The global residal vectors filled by assemble().
+       * The global residual vectors filled by assemble().
        */
       AnyData residuals;
+
       /**
        * A pointer to the object containing constraints.
        */
@@ -203,6 +204,19 @@ namespace MeshWorker
       template<class DOFINFO>
       void assemble(const DOFINFO &info1,
                     const DOFINFO &info2);
+    protected:
+      /**
+       * The vector of global matrices being assembled.
+       */
+      std::vector<SmartPointer<MatrixType,MatrixSimple<MatrixType> > > matrix;
+
+      /**
+        * The smallest positive number that will be entered into the global
+        * matrix. All smaller absolute values will be treated as zero and will
+        * not be assembled.
+        */
+      const double threshold;
+
     private:
       /**
        * Assemble a single matrix <code>M</code> into the element at
@@ -214,20 +228,9 @@ namespace MeshWorker
                     const std::vector<types::global_dof_index> &i2);
 
       /**
-       * The vector of global matrices being assembled.
-       */
-      std::vector<SmartPointer<MatrixType,MatrixSimple<MatrixType> > > matrix;
-      /**
        * A pointer to the object containing constraints.
        */
       SmartPointer<const ConstraintMatrix,MatrixSimple<MatrixType> > constraints;
-
-      /**
-       * The smallest positive number that will be entered into the global
-       * matrix. All smaller absolute values will be treated as zero and will
-       * not be assembled.
-       */
-      const double threshold;
 
     };
 
@@ -457,6 +460,22 @@ namespace MeshWorker
       template<class DOFINFO>
       void assemble(const DOFINFO &info1,
                     const DOFINFO &info2);
+
+    private:
+      /**
+        * Assemble a single matrix <code>M</code> into the element at
+        * <code>index</code> in the vector #matrix.
+        */
+      void assemble(const FullMatrix<double> &M,
+                    const Vector<double> &vector,
+                    const unsigned int index,
+                    const std::vector<types::global_dof_index> &indices);
+
+      void assemble(const FullMatrix<double> &M,
+                    const Vector<double> &vector,
+                    const unsigned int index,
+                    const std::vector<types::global_dof_index> &i1,
+                    const std::vector<types::global_dof_index> &i2);
     };
 
 
@@ -938,7 +957,7 @@ namespace MeshWorker
         for (unsigned int k=0; k<i2.size(); ++k)
           if (std::fabs(M(j,k)) >= threshold)
             // Enter values into matrix only if j corresponds to a
-            // degree of freedom on the refinemenent edge, k does
+            // degree of freedom on the refinement edge, k does
             // not, and both are not on the boundary. This is part
             // the difference between the complete matrix with no
             // boundary condition at the refinement edge and and
@@ -1120,7 +1139,6 @@ namespace MeshWorker
     inline void
     SystemSimple<MatrixType,VectorType>::initialize(const ConstraintMatrix &c)
     {
-      MatrixSimple<MatrixType>::initialize(c);
       ResidualSimple<VectorType>::initialize(c);
     }
 
@@ -1135,14 +1153,98 @@ namespace MeshWorker
       ResidualSimple<VectorType>::initialize_info(info, face);
     }
 
+    template <typename MatrixType,typename VectorType>
+    inline void
+    SystemSimple<MatrixType,VectorType>::assemble(const FullMatrix<double> &M,
+                                                  const Vector<double> &vector,
+                                                  const unsigned int index,
+                                                  const std::vector<types::global_dof_index> &indices)
+    {
+      AssertDimension(M.m(), indices.size());
+      AssertDimension(M.n(), indices.size());
+
+      AnyData residuals = ResidualSimple<VectorType>::residuals;
+      VectorType *v = residuals.entry<VectorType *>(index);
+
+      if (ResidualSimple<VectorType>::constraints == 0)
+        {
+          for (unsigned int i=0; i<indices.size(); ++i)
+            (*v)(indices[i]) += vector(i);
+
+          for (unsigned int j=0; j<indices.size(); ++j)
+            for (unsigned int k=0; k<indices.size(); ++k)
+              if (std::fabs(M(j,k)) >= MatrixSimple<MatrixType>::threshold)
+                MatrixSimple<MatrixType>::matrix[index]->add(indices[j], indices[k], M(j,k));
+        }
+      else
+        {
+          ResidualSimple<VectorType>::constraints->distribute_local_to_global(M,vector,indices,*MatrixSimple<MatrixType>::matrix[index],*v, true);
+        }
+    }
+
+    template <typename MatrixType,typename VectorType>
+    inline void
+    SystemSimple<MatrixType,VectorType>::assemble(const FullMatrix<double> &M,
+                                                  const Vector<double> &vector,
+                                                  const unsigned int index,
+                                                  const std::vector<types::global_dof_index> &i1,
+                                                  const std::vector<types::global_dof_index> &i2)
+    {
+      AssertDimension(M.m(), i1.size());
+      AssertDimension(M.n(), i2.size());
+
+      AnyData residuals = ResidualSimple<VectorType>::residuals;
+      VectorType *v = residuals.entry<VectorType *>(index);
+
+      if (ResidualSimple<VectorType>::constraints == 0)
+        {
+          for (unsigned int j=0; j<i1.size(); ++j)
+            for (unsigned int k=0; k<i2.size(); ++k)
+              if (std::fabs(M(j,k)) >= MatrixSimple<MatrixType>::threshold)
+                MatrixSimple<MatrixType>::matrix[index]->add(i1[j], i2[k], M(j,k));
+        }
+      else
+        {
+          ResidualSimple<VectorType>::constraints->distribute_local_to_global(vector, i1, i2, *v, M, false);
+          ResidualSimple<VectorType>::constraints->distribute_local_to_global(M, i1, i2, *MatrixSimple<MatrixType>::matrix[index]);
+        }
+    }
+
 
     template <typename MatrixType, typename VectorType>
     template <class DOFINFO>
     inline void
     SystemSimple<MatrixType,VectorType>::assemble(const DOFINFO &info)
     {
-      MatrixSimple<MatrixType>::assemble(info);
-      ResidualSimple<VectorType>::assemble(info);
+      AssertDimension(MatrixSimple<MatrixType>::matrix.size(),ResidualSimple<VectorType>::residuals.size());
+      Assert(!info.level_cell, ExcMessage("Cell may not access level dofs"));
+      const unsigned int n = info.indices_by_block.size();
+
+      if (n == 0)
+        {
+          for (unsigned int m=0; m<MatrixSimple<MatrixType>::matrix.size(); ++m)
+            assemble(info.matrix(m,false).matrix,info.vector(m).block(0), m, info.indices);
+        }
+      else
+        {
+          for (unsigned int m=0; m<MatrixSimple<MatrixType>::matrix.size(); ++m)
+            for (unsigned int k=0; k<n*n; ++k)
+              {
+                const unsigned int row = info.matrix(k+m*n*n,false).row;
+                const unsigned int column = info.matrix(k+m*n*n,false).column;
+
+                if (row == column)
+                  assemble(info.matrix(k+m*n*n,false).matrix,
+                           info.vector(m).block(row), m,
+                           info.indices_by_block[row]);
+                else
+                  assemble(info.matrix(k+m*n*n,false).matrix,
+                           info.vector(m).block(row), m,
+                           info.indices_by_block[row],
+                           info.indices_by_block[column]);
+              }
+        }
+
     }
 
 
@@ -1152,8 +1254,50 @@ namespace MeshWorker
     SystemSimple<MatrixType,VectorType>::assemble(const DOFINFO &info1,
                                                   const DOFINFO &info2)
     {
-      MatrixSimple<MatrixType>::assemble(info1, info2);
-      ResidualSimple<VectorType>::assemble(info1, info2);
+      Assert(!info1.level_cell, ExcMessage("Cell may not access level dofs"));
+      Assert(!info2.level_cell, ExcMessage("Cell may not access level dofs"));
+      AssertDimension(info1.indices_by_block.size(),info2.indices_by_block.size());
+
+      const unsigned int n = info1.indices_by_block.size();
+
+      if (n == 0)
+        {
+          for (unsigned int m=0; m<MatrixSimple<MatrixType>::matrix.size(); ++m)
+            {
+              assemble(info1.matrix(m,false).matrix, info1.vector(m).block(0), m, info1.indices);
+              assemble(info1.matrix(m,true).matrix, info1.vector(m).block(0), m, info1.indices, info2.indices);
+              assemble(info2.matrix(m,false).matrix, info2.vector(m).block(0), m, info2.indices);
+              assemble(info2.matrix(m,true).matrix, info2.vector(m).block(0), m, info2.indices, info1.indices);
+            }
+        }
+      else
+        {
+          for (unsigned int m=0; m<MatrixSimple<MatrixType>::matrix.size(); ++m)
+            for (unsigned int k=0; k<n*n; ++k)
+              {
+                const unsigned int row = info1.matrix(k+m*n*n,false).row;
+                const unsigned int column = info1.matrix(k+m*n*n,false).column;
+
+                if (row == column)
+                  {
+                    assemble(info1.matrix(k+m*n*n,false).matrix, info1.vector(m).block(row), m,
+                             info1.indices_by_block[row]);
+                    assemble(info2.matrix(k+m*n*n,false).matrix, info2.vector(m).block(row), m,
+                             info2.indices_by_block[row]);
+                  }
+                else
+                  {
+                    assemble(info1.matrix(k+m*n*n,false).matrix, info1.vector(m).block(row), m,
+                             info1.indices_by_block[row], info1.indices_by_block[column]);
+                    assemble(info2.matrix(k+m*n*n,false).matrix, info2.vector(m).block(row), m,
+                             info2.indices_by_block[row], info2.indices_by_block[column]);
+                  }
+                assemble(info1.matrix(k+m*n*n,true).matrix, info1.vector(m).block(row), m,
+                         info1.indices_by_block[row], info2.indices_by_block[column]);
+                assemble(info2.matrix(k+m*n*n,true).matrix, info2.vector(m).block(row), m,
+                         info2.indices_by_block[row], info1.indices_by_block[column]);
+              }
+        }
     }
   }
 }

@@ -209,7 +209,7 @@ examples/\step-19> ls -l solution-0005.gnuplot
 
 We can then visualize this one file with gnuplot, obtaining something like
 this:
-<img src="http://www.dealii.org/images/steps/developer/step-19.solution-0005.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-19.solution-0005.png" alt="">
 
 That's not particularly exciting, but the file we're looking at has only one
 32nd of the entire domain anyway, so we can't expect much.

@@ -20,6 +20,7 @@
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature.h>
+#include <deal.II/base/qprojector.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/parallel_vector.h>

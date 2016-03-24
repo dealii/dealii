@@ -41,7 +41,7 @@ Number of degrees of freedom: 2109
 Maybe of more interest is a visualization of the solution and the mesh on which
 it was computed:
 
-<img src="http://www.dealii.org/images/steps/developer/step-26.movie.gif" alt="Animation of the solution of step 26.">
+<img src="https://www.dealii.org/images/steps/developer/step-26.movie.gif" alt="Animation of the solution of step 26.">
 
 The movie shows how the two sources switch on and off and how the mesh reacts
 to this. It is quite obvious that the mesh as is is probably not the best we

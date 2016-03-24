@@ -197,16 +197,16 @@ element surface, and the potential extended to the outer and inner
 domain. The combination of the two for the two dimensional case looks
 like
 
-<img src="http://www.dealii.org/images/steps/developer/step-34_2d.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-34_2d.png" alt="">
 
 while in three dimensions we show first the potential on the surface,
 together with a contour plot,
 
-<img src="http://www.dealii.org/images/steps/developer/step-34_3d.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-34_3d.png" alt="">
 
 and then the external contour plot of the potential, with opacity set to 25%:
 
-<img src="http://www.dealii.org/images/steps/developer/step-34_3d-2.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-34_3d-2.png" alt="">
 
 
 <a name="extensions"></a>

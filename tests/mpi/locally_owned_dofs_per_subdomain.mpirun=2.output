@@ -1,0 +1,19 @@
+
+DEAL:0::dim=2
+DEAL:0::rank=0
+DEAL:0::  n_dofs=4
+DEAL:0::  n_locally_owned_dofs=4
+DEAL:0::dim=3
+DEAL:0::rank=0
+DEAL:0::  n_dofs=8
+DEAL:0::  n_locally_owned_dofs=8
+
+DEAL:1::dim=2
+DEAL:1::rank=1
+DEAL:1::  n_dofs=4
+DEAL:1::  n_locally_owned_dofs=0
+DEAL:1::dim=3
+DEAL:1::rank=1
+DEAL:1::  n_dofs=8
+DEAL:1::  n_locally_owned_dofs=0
+

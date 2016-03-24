@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2015 by the deal.II authors
+// Copyright (C) 2003 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,6 +40,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/qprojector.h>
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/dofs/dof_tools.h>
 

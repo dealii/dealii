@@ -57,21 +57,21 @@ k-effective and the ratio between maximum of fast flux and maximum of thermal on
 The grids of fast and thermal energy groups at mesh iteration #9 are shown 
 in following figure.
 
-<img src="http://www.dealii.org/images/steps/developer/step-28.grid-0.9.order2.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-28.grid-0.9.order2.png" alt="">
 
-<img src="http://www.dealii.org/images/steps/developer/step-28.grid-1.9.order2.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-28.grid-1.9.order2.png" alt="">
 
 We see that the grid of thermal group is much finer than the one of fast group. 
 The solutions on these grids are, (Note: flux are normalized with total fission
 source equal to 1)
 
-<img src="http://www.dealii.org/images/steps/developer/step-28.solution-0.9.order2.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-28.solution-0.9.order2.png" alt="">
 
-<img src="http://www.dealii.org/images/steps/developer/step-28.solution-1.9.order2.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-28.solution-1.9.order2.png" alt="">
 
 Then we plot the convergence data with polynomial order being equal to 1,2 and 3.
 
-<img src="http://www.dealii.org/images/steps/developer/step-28.convergence.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-28.convergence.png" alt="">
 
 The estimated ``exact'' k-effective = 0.906834721253 which is simply from last
 mesh iteration of polynomial order 3 minus 2e-10. We see that h-adaptive calculations

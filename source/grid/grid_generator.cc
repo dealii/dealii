@@ -582,12 +582,15 @@ namespace GridGenerator
 
 
 
+  template<>
   void
-  torus (Triangulation<2,3>  &tria,
-         const double         R,
-         const double         r)
+  torus<2,3> (Triangulation<2,3>  &tria,
+              const double R,
+              const double r)
   {
-    Assert (R>r, ExcMessage("Outer radius must be greater than inner radius."));
+    Assert (R>r, ExcMessage("Outer radius R must be greater than the inner "
+                            "radius r."));
+    Assert (r>0.0, ExcMessage("The inner radius r must be positive."));
 
     const unsigned int dim=2;
     const unsigned int spacedim=3;
@@ -713,9 +716,36 @@ namespace GridGenerator
     // GridReordering<> doc
     GridReordering<dim,spacedim>::reorder_cells (cells);
     tria.create_triangulation_compatibility (vertices, cells, SubCellData());
+
+    tria.set_all_manifold_ids(0);
   }
 
+  template<>
+  void
+  torus<3,3> (Triangulation<3,3>  &tria,
+              const double R,
+              const double r)
+  {
+    Assert (R>r, ExcMessage("Outer radius R must be greater than the inner "
+                            "radius r."));
+    Assert (r>0.0, ExcMessage("The inner radius r must be positive."));
 
+    // abuse the moebius function to generate a torus for us
+    GridGenerator::moebius(tria,
+                           6 /*n_cells*/,
+                           0 /*n_rotations*/,
+                           R,
+                           r);
+
+    // rotate by 90 degrees around the x axis to make the torus sit in the
+    // x-z plane instead of the x-y plane to be consistent with the other
+    // torus() function.
+    GridTools::rotate(numbers::PI/2.0, 0, tria);
+
+    // set manifolds as documented
+    tria.set_all_manifold_ids(1);
+    tria.set_all_manifold_ids_on_boundary(0);
+  }
 
   template<>
   void
@@ -1846,7 +1876,8 @@ namespace GridGenerator
   template <>
   void hyper_L (Triangulation<1> &,
                 const double,
-                const double)
+                const double,
+                const bool)
   {
     Assert (false, ExcNotImplemented());
   }
@@ -2074,13 +2105,13 @@ namespace GridGenerator
 
 
 
-//TODO: Colorize edges as circumference, left and right radius
 // Implementation for 2D only
   template <>
   void
   hyper_L (Triangulation<2> &tria,
            const double a,
-           const double b)
+           const double b,
+           const bool colorize)
   {
     const Point<2> vertices[8] = { Point<2> (a,a),
                                    Point<2> ((a+b)/2,a),
@@ -2108,7 +2139,27 @@ namespace GridGenerator
     tria.create_triangulation (
       std::vector<Point<2> >(&vertices[0], &vertices[8]),
       cells,
-      SubCellData());       // no boundary information
+      SubCellData());
+
+    if (colorize)
+      {
+        typename Triangulation<2>::cell_iterator cell = tria.begin();
+
+        cell->face(0)->set_boundary_id(0);
+        cell->face(2)->set_boundary_id(1);
+        cell++;
+
+        cell->face(1)->set_boundary_id(2);
+        cell->face(2)->set_boundary_id(1);
+        cell->face(3)->set_boundary_id(3);
+        cell++;
+
+        cell->face(0)->set_boundary_id(0);
+        cell->face(1)->set_boundary_id(4);
+        cell->face(3)->set_boundary_id(5);
+
+      }
+
   }
 
 
@@ -2707,7 +2758,8 @@ namespace GridGenerator
   void
   hyper_L (Triangulation<3> &tria,
            const double      a,
-           const double      b)
+           const double      b,
+           const bool        colorize)
   {
     // we slice out the top back right
     // part of the cube
@@ -2767,6 +2819,11 @@ namespace GridGenerator
       std::vector<Point<3> >(&vertices[0], &vertices[26]),
       cells,
       SubCellData());       // no boundary information
+
+    if (colorize)
+      {
+        Assert (false, ExcNotImplemented());
+      }
   }
 
 

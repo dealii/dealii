@@ -3590,7 +3590,8 @@ namespace parallel
           for (unsigned int lvl=this->n_levels(); lvl>0; )
             {
               --lvl;
-              for (typename Triangulation<dim,spacedim>::cell_iterator cell = this->begin(lvl); cell!=this->end(lvl); ++cell)
+              typename Triangulation<dim,spacedim>::cell_iterator cell, endc = this->end(lvl);
+              for (cell = this->begin(lvl); cell!=endc; ++cell)
                 {
                   if ((!cell->has_children() && cell->subdomain_id()==this->locally_owned_subdomain())
                       || (cell->has_children() && cell->child(0)->level_subdomain_id()==this->locally_owned_subdomain()))
@@ -3630,7 +3631,8 @@ namespace parallel
           for (unsigned int lvl=this->n_levels(); lvl>0;)
             {
               --lvl;
-              for (typename Triangulation<dim,spacedim>::cell_iterator cell = this->begin(lvl); cell!=this->end(lvl); ++cell)
+              typename Triangulation<dim,spacedim>::cell_iterator cell, endc = this->end(lvl);
+              for (cell = this->begin(lvl); cell!=endc; ++cell)
                 {
                   if (cell->has_children())
                     for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
@@ -4681,7 +4683,9 @@ namespace parallel
     {
       const std::vector<bool> locally_active_vertices =
         mark_locally_active_vertices_on_level(level);
-      for (cell_iterator cell = this->begin(level); cell != this->end(level); ++cell)
+      cell_iterator cell = this->begin(level),
+                    endc = this->end(level);
+      for ( ; cell != endc; ++cell)
         if (cell->level_subdomain_id() != dealii::numbers::artificial_subdomain_id
             && cell->level_subdomain_id() != this->locally_owned_subdomain())
           for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
@@ -4704,7 +4708,9 @@ namespace parallel
       Assert (dim>1, ExcNotImplemented());
 
       std::vector<bool> marked_vertices(this->n_vertices(), false);
-      for (cell_iterator cell = this->begin(level); cell != this->end(level); ++cell)
+      cell_iterator cell = this->begin(level),
+                    endc = this->end(level);
+      for ( ; cell != endc; ++cell)
         if (cell->level_subdomain_id() == this->locally_owned_subdomain())
           for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
             marked_vertices[cell->vertex_index(v)] = true;

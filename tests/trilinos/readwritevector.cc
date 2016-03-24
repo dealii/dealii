@@ -54,7 +54,7 @@ void test()
     readwrite_is.add_range(2,6);
   readwrite_is.compress();
   LinearAlgebra::ReadWriteVector<double> readwrite(readwrite_is);
-  readwrite = tril_vector;
+  readwrite.import(tril_vector,VectorOperation::insert);
   if (rank==0)
     {
       std::vector<double> comp(4);
@@ -78,6 +78,33 @@ void test()
         AssertThrow(readwrite.local_element(i)==comp[i],
                     ExcMessage("Element not copied correctly"));
     }
+
+  readwrite.import(tril_vector,VectorOperation::add);
+
+  if (rank==0)
+    {
+      std::vector<double> comp(4);
+      comp[0] = 0.;
+      comp[1] = 2.;
+      comp[2] = 12.;
+      comp[3] = 14.;
+      for (unsigned int i=0; i<4; ++i)
+        AssertThrow(readwrite.local_element(i)==comp[i],
+                    ExcMessage("Element not copied correctly"));
+    }
+  MPI_Barrier(MPI_COMM_WORLD);
+  if (rank==1)
+    {
+      std::vector<double> comp(4);
+      comp[0] = 4.;
+      comp[1] = 6.;
+      comp[2] = 8.;
+      comp[3] = 10.;
+      for (unsigned int i=0; i<4; ++i)
+        AssertThrow(readwrite.local_element(i)==comp[i],
+                    ExcMessage("Element not copied correctly"));
+    }
+
   deallog << "OK" <<std::endl;
 }
 

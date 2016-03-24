@@ -1,0 +1,10 @@
+
+DEAL::(conj(vector),M vector): 
+DEAL::real part:      337.563
+DEAL::imaginary part: 0
+DEAL::matrix_scalar_product(vec,vec): 
+DEAL::real part:      337.563
+DEAL::imaginary part: 0
+DEAL::matrix_norm_square(vec): 
+DEAL::real part:      337.563
+DEAL::imaginary part: 0

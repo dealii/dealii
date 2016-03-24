@@ -36,14 +36,14 @@ look like this:
 
 <table width="80%">
 <tr>
-<td><img src="http://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.0.png" alt=""></td>
-<td><img src="http://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.1.png" alt=""></td>
-<td><img src="http://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.2.png" alt=""></td>
+<td><img src="https://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.0.png" alt=""></td>
+<td><img src="https://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.1.png" alt=""></td>
+<td><img src="https://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.2.png" alt=""></td>
 </tr>
 
 <tr>
-<td><img src="http://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.3.png" alt=""></td>
-<td><img src="http://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.4.png" alt=""></td>
+<td><img src="https://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.3.png" alt=""></td>
+<td><img src="https://www.dealii.org/images/steps/developer/step-36.default.eigenfunction.4.png" alt=""></td>
 <td></td>
 </tr>
 </table>
@@ -102,20 +102,20 @@ probability densities $|\Psi(\mathbf x)|^2$ that are significant only where the
 potential is the lowest, i.e. in the top right and bottom left sector of inner
 circle of the potential):
 
-<img src="http://www.dealii.org/images/steps/developer/step-36.mod.potential.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-36.mod.potential.png" alt="">
 
 The first five eigenfunctions are now like this:
 
 <table width="80%">
 <tr>
-<td><img src="http://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.0.png" alt=""></td>
-<td><img src="http://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.1.png" alt=""></td>
-<td><img src="http://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.2.png" alt=""></td>
+<td><img src="https://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.0.png" alt=""></td>
+<td><img src="https://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.1.png" alt=""></td>
+<td><img src="https://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.2.png" alt=""></td>
 </tr>
 
 <tr>
-<td><img src="http://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.3.png" alt=""></td>
-<td><img src="http://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.4.png" alt=""></td>
+<td><img src="https://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.3.png" alt=""></td>
+<td><img src="https://www.dealii.org/images/steps/developer/step-36.mod.eigenfunction.4.png" alt=""></td>
 <td></td>
 </tr>
 </table>

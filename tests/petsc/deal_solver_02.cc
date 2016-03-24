@@ -55,7 +55,7 @@ check_solve(SolverType          &solver,
     {
       check_solver_within_range(
         solver.solve(A,u,f,P),
-        solver_control.last_step(), 49, 51);
+        solver_control.last_step(), 48, 51);
     }
   catch (std::exception &e)
     {

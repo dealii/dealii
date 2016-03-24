@@ -119,7 +119,7 @@ href="http://en.wikipedia.org/wiki/East_African_rift">East African Rift</a>, a
 zone where two continental plates drift apart. Not to beat around the bush,
 the geometry we want to describe looks like this:
 
-<img src="http://www.dealii.org/images/steps/developer/step-53.topo.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-53.topo.png" alt="">
 
 In particular, though you cannot see this here, the top surface is not
 just colored by the elevation but is, in fact, deformed to follow the 

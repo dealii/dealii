@@ -1,0 +1,22 @@
+
+DEAL::Size 32 Unknowns 961
+DEAL::Solver type: N6dealii13PETScWrappers16SolverRichardsonE
+DEAL::Starting value 7.750
+DEAL::Failure step 100 value 4.004
+DEAL::
+--------------------------------------------------------
+An error occurred in file <petsc_solver.cc> in function
+    void dealii::PETScWrappers::SolverBase::solve(const dealii::PETScWrappers::MatrixBase &, dealii::PETScWrappers::VectorBase &, const dealii::PETScWrappers::VectorBase &, const dealii::PETScWrappers::PreconditionerBase &)
+The violated condition was: 
+    false
+The name and call sequence of the exception was:
+    SolverControl::NoConvergence (solver_control.last_step(), solver_control.last_value())
+Additional Information: 
+Iterative method reported convergence failure in step 100. The residual in the last step was 4.00437.
+
+This error message can indicate that you have simply not allowed a sufficiently large number of iterations for your iterative solver to converge. This often happens when you increase the size of your problem. In such cases, the last residual will likely still be very small, and you can make the error go away by increasing the allowed number of iterations when setting up the SolverControl object that determines the maximal number of iterations you allow.
+
+The other situation where this error may occur is when your matrix is not invertible (e.g., your matrix has a null-space), or if you try to apply the wrong solver to a matrix (e.g., using CG for a matrix that is not symmetric or not positive definite). In these cases, the residual in the last iteration is likely going to be large.
+--------------------------------------------------------
+
+DEAL::Solver stopped after 100 iterations

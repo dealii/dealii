@@ -669,7 +669,7 @@ This benchmark problem is taken from
   <strong> 75 </strong>,
   291-304.
 
- <img src="http://www.dealii.org/images/steps/developer/step-44.setup.png" alt="">
+ <img src="https://www.dealii.org/images/steps/developer/step-44.setup.png" alt="">
 
 The material is quasi-incompressible neo-Hookean with <a href="http://en.wikipedia.org/wiki/Shear_modulus">shear modulus</a> $\mu = 80.194e6$ and $\nu = 0.4999$.
 For such a choice of material properties a conventional single-field $Q_1$ approach would lock.

@@ -78,16 +78,16 @@ The graphical output of the program looks as follows:
 <table align="center" border="1" cellspacing="3" cellpadding="3">
   <tr>
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-29.v.png" alt="v = Re(u)">
+      <img src="https://www.dealii.org/images/steps/developer/step-29.v.png" alt="v = Re(u)">
     </td>
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-29.w.png" alt="w = Im(u)">
+      <img src="https://www.dealii.org/images/steps/developer/step-29.w.png" alt="w = Im(u)">
     </td>
   </tr>
 
   <tr>
     <td colspan="2">
-      <img src="http://www.dealii.org/images/steps/developer/step-29.intensity.png" alt="|u|">
+      <img src="https://www.dealii.org/images/steps/developer/step-29.intensity.png" alt="|u|">
     </td>
   </tr>
 </table>
@@ -107,10 +107,10 @@ the intensity is actually focused in $x$-direction:
 <table align="center" border="1" cellspacing="3" cellpadding="3">
   <tr>
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-29.surface.png" alt="|u|">
+      <img src="https://www.dealii.org/images/steps/developer/step-29.surface.png" alt="|u|">
     </td>
     <td>
-      <img src="http://www.dealii.org/images/steps/developer/step-29.contours.png" alt="|u|">
+      <img src="https://www.dealii.org/images/steps/developer/step-29.contours.png" alt="|u|">
     </td>
   </tr>
 </table>

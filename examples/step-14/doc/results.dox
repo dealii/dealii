@@ -52,11 +52,11 @@ grid, primal and dual numerical solutions look like this:
 <table align="center">
   <tr>
     <td width="50%">
-      <img src="http://www.dealii.org/images/steps/developer/step-14.point-value.solution-5.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-14.point-value.solution-5.png" alt="">
     </td>
 
     <td width="50%">
-      <img src="http://www.dealii.org/images/steps/developer/step-14.point-value.solution-5-dual.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-14.point-value.solution-5-dual.png" alt="">
     </td>
   </tr>
 </table>
@@ -75,14 +75,14 @@ refinement, here are some of them:
 
 <table width="80%" align="center">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-value.grid-0.png" alt="" width="100%"></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-value.grid-2.png" alt="" width="100%"></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-value.grid-4.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-value.grid-0.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-value.grid-2.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-value.grid-4.png" alt="" width="100%"></td>
   </tr>
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-value.grid-5.png" alt="" width="100%"></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-value.grid-7.png" alt="" width="100%"></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-value.grid-8.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-value.grid-5.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-value.grid-7.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-value.grid-8.png" alt="" width="100%"></td>
   </tr>
 </table>
 
@@ -126,8 +126,8 @@ value:
 
 <table width="80%" align="center">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-value.error.png" alt="" width="100%"></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-value.error-estimation.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-value.error.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-value.error-estimation.png" alt="" width="100%"></td>
   </tr>
 </table>
 
@@ -147,7 +147,7 @@ function $1/(r^2+0.1^2)$, where $r$
 is the distance to the evaluation point; it can be shown that this is
 the optimal weight if we neglect the effects of boundaries):
 
-<img src="http://www.dealii.org/images/steps/developer/step-14.point-value.error-comparison.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-14.point-value.error-comparison.png" alt="">
 
 
 
@@ -228,7 +228,7 @@ evaluation shows this:
 <table align="center">
   <tr>
     <td width="50%">
-      <img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.solution-5-dual.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.solution-5-dual.png" alt="">
     </td>
 </table>
 This time, the grids in refinement cycles 0, 5, 6, 7, 8, and 9 look
@@ -236,14 +236,14 @@ like this:
 
 <table align="center" width="80%">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-0.png" alt="" width="100%"></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-5.png" alt="" width="100%"></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-6.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-0.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-5.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-6.png" alt="" width="100%"></td>
   </tr>
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-7.png" alt="" width="100%"></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-8.png" alt="" width="100%"></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-9.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-7.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-8.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.grid-9.png" alt="" width="100%"></td>
   </tr>
 </table>
 
@@ -270,8 +270,8 @@ see a comparison of true and estimated error:
 
 <table width="80%" align="center">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.error.png" alt="" width="100%"></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-14.point-derivative.error-estimation.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.error.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.point-derivative.error-estimation.png" alt="" width="100%"></td>
   </tr>
 </table>
 
@@ -298,8 +298,8 @@ respectively, look like this:
 
 <table width="80%" align="center">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-14.step-13.grid-9.png" alt="" width="100%"></td>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-14.step-13.grid-10.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.step-13.grid-9.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.step-13.grid-10.png" alt="" width="100%"></td>
   </tr>
 </table>
 
@@ -311,7 +311,7 @@ like so:
 
 <table width="80%" align="center">
   <tr>
-    <td><img src="http://www.dealii.org/images/steps/developer/step-14.step-13.solution-7.png" alt="" width="100%"></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-14.step-13.solution-7.png" alt="" width="100%"></td>
   </tr>
 </table>
 
@@ -325,7 +325,7 @@ important for computing the point value.
 The next point is to compare the new (duality based) mesh refinement
 criterion with the old ones. These are the results:
 
-<img src="http://www.dealii.org/images/steps/developer/step-14.step-13.error-comparison.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-14.step-13.error-comparison.png" alt="">
 
 
 

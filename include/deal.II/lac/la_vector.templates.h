@@ -25,7 +25,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace LinearAlgebra
 {
   template <typename Number>
-  VectorSpaceVector<Number> &Vector<Number>::operator*= (const Number factor)
+  Vector<Number> &Vector<Number>::operator*= (const Number factor)
   {
     AssertIsFinite(factor);
     for (unsigned int i=0; i<this->size(); ++i)
@@ -37,7 +37,7 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  VectorSpaceVector<Number> &Vector<Number>::operator/= (const Number factor)
+  Vector<Number> &Vector<Number>::operator/= (const Number factor)
   {
     AssertIsFinite(factor);
     Assert(factor!=Number(0.), ExcZero());
@@ -49,7 +49,7 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  VectorSpaceVector<Number> &Vector<Number>::operator+= (const VectorSpaceVector<Number> &V)
+  Vector<Number> &Vector<Number>::operator+= (const VectorSpaceVector<Number> &V)
   {
     // Check that casting will work.
     Assert(dynamic_cast<const Vector<Number>*>(&V)!=NULL, ExcVectorTypeNotCompatible());
@@ -70,7 +70,7 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  VectorSpaceVector<Number> &Vector<Number>::operator-= (const VectorSpaceVector<Number> &V)
+  Vector<Number> &Vector<Number>::operator-= (const VectorSpaceVector<Number> &V)
   {
     // Check that casting will work.
     Assert(dynamic_cast<const Vector<Number>*>(&V)!=NULL, ExcVectorTypeNotCompatible());
@@ -91,7 +91,7 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  Number Vector<Number>::operator* (const VectorSpaceVector<Number> &V)
+  Number Vector<Number>::operator* (const VectorSpaceVector<Number> &V) const
   {
     // Check that casting will work.
     Assert(dynamic_cast<const Vector<Number>*>(&V)!=NULL,
@@ -110,6 +110,16 @@ namespace LinearAlgebra
       }
 
     return value;
+  }
+
+
+
+  template <typename Number>
+  void Vector<Number>::import(const ReadWriteVector<Number> &,
+                              VectorOperation::values        ,
+                              std_cxx11::shared_ptr<const CommunicationPatternBase>)
+  {
+    AssertThrow(false, ExcMessage("This function is not implemented."));
   }
 
 
@@ -221,7 +231,7 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  typename VectorSpaceVector<Number>::real_type Vector<Number>::l1_norm()
+  typename VectorSpaceVector<Number>::real_type Vector<Number>::l1_norm() const
   {
     Assert (this->size(), ExcEmptyObject());
 
@@ -235,7 +245,7 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  typename VectorSpaceVector<Number>::real_type Vector<Number>::l2_norm()
+  typename VectorSpaceVector<Number>::real_type Vector<Number>::l2_norm() const
   {
     Assert (this->size(), ExcEmptyObject());
 
@@ -277,7 +287,7 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  typename VectorSpaceVector<Number>::real_type Vector<Number>::linfty_norm()
+  typename VectorSpaceVector<Number>::real_type Vector<Number>::linfty_norm() const
   {
     typename ReadWriteVector<Number>::real_type norm = 0.;
     for (unsigned int i=0; i<this->size(); ++i)
@@ -303,7 +313,7 @@ namespace LinearAlgebra
   template <typename Number>
   typename VectorSpaceVector<Number>::real_type Vector<Number>::l1_norm_recursive(
     unsigned int i,
-    unsigned int j)
+    unsigned int j) const
   {
     Assert(j>=i, ExcInternalError());
     typename ReadWriteVector<Number>::real_type norm = 0.;
@@ -324,7 +334,7 @@ namespace LinearAlgebra
   template <typename Number>
   typename VectorSpaceVector<Number>::real_type Vector<Number>::l2_norm_squared_recursive(
     unsigned int i,
-    unsigned int j)
+    unsigned int j) const
   {
     Assert(j>=i, ExcInternalError());
 
@@ -398,7 +408,7 @@ namespace LinearAlgebra
 
     // in >> c;
     in.read(&c,1);
-    AssertThrow(c=']', ExcIO());
+    AssertThrow(c==']', ExcIO());
   }
 }
 

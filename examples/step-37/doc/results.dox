@@ -7,7 +7,7 @@ a different coefficient), there is little to say about the
 solution. We show a picture anyway, illustrating the size of the
 solution through both isocontours and volume rendering:
 
-<img src="http://www.dealii.org/images/steps/developer/step-37.solution.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-37.solution.png" alt="">
 
 Of more interest is to evaluate some aspects of the multigrid solver.
 When we run this program in 2D for quadratic ($Q_2$) elements, we get the

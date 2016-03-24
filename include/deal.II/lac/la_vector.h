@@ -110,27 +110,35 @@ namespace LinearAlgebra
     /**
      * Multiply the entire vector by a fixed factor.
      */
-    virtual VectorSpaceVector<Number> &operator*= (const Number factor);
+    virtual Vector<Number> &operator*= (const Number factor);
 
     /**
      * Divide the entire vector by a fixed factor.
      */
-    virtual VectorSpaceVector<Number> &operator/= (const Number factor);
+    virtual Vector<Number> &operator/= (const Number factor);
 
     /**
      * Add the vector @p V to the present one.
      */
-    virtual VectorSpaceVector<Number> &operator+= (const VectorSpaceVector<Number> &V);
+    virtual Vector<Number> &operator+= (const VectorSpaceVector<Number> &V);
 
     /**
      * Substract the vector @p V from the present one.
      */
-    virtual VectorSpaceVector<Number> &operator-= (const VectorSpaceVector<Number> &V);
+    virtual Vector<Number> &operator-= (const VectorSpaceVector<Number> &V);
 
     /**
      * Return the scalar product of two vectors.
      */
-    virtual Number operator* (const VectorSpaceVector<Number> &V);
+    virtual Number operator* (const VectorSpaceVector<Number> &V) const;
+
+    /**
+     * This function is not implemented and will throw an exception.
+     */
+    virtual void import(const ReadWriteVector<Number> &V,
+                        VectorOperation::values operation,
+                        std_cxx11::shared_ptr<const CommunicationPatternBase>
+                        communication_pattern = NULL);
 
     /**
      * Add @p a to all components. Note that @p a is a scalar not a vector.
@@ -172,19 +180,19 @@ namespace LinearAlgebra
      * Return the l<sub>1</sub> norm of the vector (i.e., the sum of the
      * absolute values of all entries).
      */
-    virtual typename VectorSpaceVector<Number>::real_type l1_norm();
+    virtual typename VectorSpaceVector<Number>::real_type l1_norm() const;
 
     /**
      * Return the l<sub>2</sub> norm of the vector (i.e., the square root of
      * the sum of the square of all entries among all processors).
      */
-    virtual typename VectorSpaceVector<Number>::real_type l2_norm();
+    virtual typename VectorSpaceVector<Number>::real_type l2_norm() const;
 
     /**
      * Return the maximum norm of the vector (i.e., the maximum absolute value
      * among all entries and among all processors).
      */
-    virtual typename VectorSpaceVector<Number>::real_type linfty_norm();
+    virtual typename VectorSpaceVector<Number>::real_type linfty_norm() const;
 
     /**
      * Perform a combined operation of a vector addition and a subsequent
@@ -203,7 +211,7 @@ namespace LinearAlgebra
      * Return the global size of the vector, equal to the sum of the number of
      * locally owned indices among all processors.
      */
-    size_type size() const;
+    virtual size_type size() const;
 
     /**
      * Return an index set that describes which elements of this vector are
@@ -216,7 +224,7 @@ namespace LinearAlgebra
      *  vec.locally_owned_elements() == complete_index_set(vec.size())
      * @endcode
      */
-    const dealii::IndexSet &locally_owned_elements() const;
+    virtual dealii::IndexSet locally_owned_elements() const;
 
     /**
      * Prints the vector to the output stream @p out.
@@ -248,7 +256,7 @@ namespace LinearAlgebra
     /**
      * Returns the memory consumption of this class in bytes.
      */
-    std::size_t memory_consumption() const;
+    virtual std::size_t memory_consumption() const;
 
     /**
      * Attempt to perform an operation between two incompatible vector types.
@@ -264,7 +272,7 @@ namespace LinearAlgebra
      * large vector.
      */
     typename VectorSpaceVector<Number>::real_type l1_norm_recursive(unsigned int i,
-        unsigned int j);
+        unsigned int j) const;
 
     /**
      * Compute the squared L2 norm in a recursive way by dividing the vector
@@ -273,7 +281,7 @@ namespace LinearAlgebra
      */
     typename VectorSpaceVector<Number>::real_type l2_norm_squared_recursive(
       unsigned int i,
-      unsigned int j);
+      unsigned int j) const;
 
     /**
      * Serialize the data of this object using boost. This function is
@@ -391,9 +399,9 @@ namespace LinearAlgebra
 
   template <typename Number>
   inline
-  const dealii::IndexSet &Vector<Number>::locally_owned_elements() const
+  dealii::IndexSet Vector<Number>::locally_owned_elements() const
   {
-    return ReadWriteVector<Number>::get_stored_elements();
+    return IndexSet(ReadWriteVector<Number>::get_stored_elements());
   }
 
 

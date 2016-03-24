@@ -46,9 +46,10 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 FunctionParser<dim>::FunctionParser(const unsigned int n_components,
-                                    const double       initial_time)
+                                    const double       initial_time,
+                                    const double       h)
   :
-  Function<dim>(n_components, initial_time)
+  AutoDerivativeFunction<dim>(h, n_components, initial_time)
 {}
 
 

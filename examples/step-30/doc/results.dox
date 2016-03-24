@@ -108,20 +108,20 @@ algorithms (right).
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-30.sol-1.iso.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-30.sol-1.iso.png" alt="">
     </td>
 
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-30.sol-1.aniso.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-30.sol-1.aniso.png" alt="">
     </td>
   </tr>
   <tr>
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-30.sol-5.iso.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-30.sol-5.iso.png" alt="">
     </td>
 
     <td ALIGN="center">
-      <img src="http://www.dealii.org/images/steps/developer/step-30.sol-5.aniso.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-30.sol-5.aniso.png" alt="">
     </td>
   </tr>
 </table>
@@ -132,7 +132,7 @@ indicator seems to effectively select the appropriate cells for anisotropic
 refinement. This observation is strengthened by the plot of the an adapted
 anisotropic grid, e.g. the grid after three refinement steps.
 
-<img src="http://www.dealii.org/images/steps/developer/step-30.grid-3.aniso.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-30.grid-3.aniso.png" alt="">
 
 In the whole left part of the domain refinement is only performed along the
 y-axis of cells. In the right part of the domain the refinement is dominated by

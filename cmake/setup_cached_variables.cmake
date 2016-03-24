@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II authors
+## Copyright (C) 2012 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -76,17 +76,27 @@ If(DEAL_II_HAVE_DOC_DIRECTORY)
     "Enable configuration, build and installation of the documentation. This adds a COMPONENT \"documentation\" to the build system."
     OFF
     )
+  LIST(APPEND DEAL_II_COMPONENTS DOCUMENTATION)
+
 ENDIF()
 
 OPTION(DEAL_II_COMPONENT_EXAMPLES
   "Enable configuration and installation of the example steps. This adds a COMPONENT \"examples\" to the build system."
   ON
   )
+LIST(APPEND DEAL_II_COMPONENTS EXAMPLES)
+
+OPTION(DEAL_II_COMPONENT_PACKAGE
+  "Generates additional targets for packaging deal.II"
+  OFF
+  )
+LIST(APPEND DEAL_II_COMPONENTS PACKAGE)
 
 OPTION(DEAL_II_COMPONENT_PARAMETER_GUI
   "Build and install the parameter_gui. This adds a COMPONENT \"parameter_gui\" to the build system."
   OFF
   )
+LIST(APPEND DEAL_II_COMPONENTS PARAMETER_GUI)
 
 OPTION(DEAL_II_ALLOW_AUTODETECTION
   "Allow to automatically set up features by setting all undefined DEAL_II_WITH_* variables to ON or OFF"
@@ -95,11 +105,6 @@ OPTION(DEAL_II_ALLOW_AUTODETECTION
 
 OPTION(DEAL_II_FORCE_AUTODETECTION
   "Force feature autodetection by undefining all DEAL_II_WITH_* variables prior to configure"
-  OFF
-  )
-
-OPTION(DEAL_II_COMPONENT_PACKAGE
-  "Generates additional targets for packaging deal.II"
   OFF
   )
 
@@ -315,6 +320,7 @@ OPTION(DEAL_II_WITH_64BIT_INDICES
   "If set to ON, then use 64-bit data types to represent global degree of freedom indices. The default is to OFF. You only want to set this to ON if you will solve problems with more than 2^31 (approximately 2 billion) unknowns. If set to ON, you also need to ensure that both Trilinos and/or PETSc support 64-bit indices."
   OFF
   )
+LIST(APPEND DEAL_II_FEATURES 64BIT_INDICES)
 
 OPTION(DEAL_II_DOXYGEN_USE_MATHJAX
   "If set to ON, doxygen documentation is generated using mathjax"

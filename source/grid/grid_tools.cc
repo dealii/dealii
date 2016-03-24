@@ -523,6 +523,36 @@ namespace GridTools
       const double angle;
     };
 
+    // Transformation to rotate around one of the cartesian axes.
+    class Rotate3d
+    {
+    public:
+      Rotate3d (const double angle,
+                const unsigned int axis)
+        :
+        angle(angle),
+        axis(axis)
+      {}
+
+      Point<3> operator() (const Point<3> &p) const
+      {
+        if (axis==0)
+          return Point<3> (p(0),
+                           std::cos(angle)*p(1) - std::sin(angle) * p(2),
+                           std::sin(angle)*p(1) + std::cos(angle) * p(2));
+        else if (axis==1)
+          return Point<3> (std::cos(angle)*p(0) + std::sin(angle) * p(2),
+                           p(1),
+                           -std::sin(angle)*p(0) + std::cos(angle) * p(2));
+        else
+          return Point<3> (std::cos(angle)*p(0) - std::sin(angle) * p(1),
+                           std::sin(angle)*p(0) + std::cos(angle) * p(1),
+                           p(2));
+      }
+    private:
+      const double angle;
+      const unsigned int axis;
+    };
 
     template <int spacedim>
     class Scale
@@ -559,7 +589,16 @@ namespace GridTools
     transform (Rotate2d(angle), triangulation);
   }
 
+  template<int dim>
+  void
+  rotate (const double      angle,
+          const unsigned int axis,
+          Triangulation<dim,3> &triangulation)
+  {
+    Assert(axis<3, ExcMessage("Invalid axis given!"));
 
+    transform (Rotate3d(angle, axis), triangulation);
+  }
 
   template <int dim, int spacedim>
   void

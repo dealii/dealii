@@ -250,7 +250,8 @@ public:
                    const typename FunctionParser<spacedim>::ConstMap = typename FunctionParser<spacedim>::ConstMap(),
                    const std::string chart_vars=FunctionParser<chartdim>::default_variable_names(),
                    const std::string space_vars=FunctionParser<spacedim>::default_variable_names(),
-                   const double tolerance=1e-10);
+                   const double tolerance=1e-10,
+                   const double h=1e-8);
 
   /**
    * If needed, we delete the pointers we own.
@@ -264,6 +265,30 @@ public:
    */
   virtual Point<spacedim>
   push_forward(const Point<chartdim> &chart_point) const;
+
+  /**
+   * Given a point in the chartdim dimensional Euclidean space, this
+   * method returns the derivatives of the function $F$ that maps from
+   * the sub_manifold coordinate system to the Euclidean coordinate
+   * system. In other words, it is a matrix of size
+   * $\text{spacedim}\times\text{chartdim}$.
+   *
+   * This function is used in the computations required by the
+   * get_tangent_vector() function. The default implementation calls
+   * the get_gradient() method of the
+   * FunctionManifold::push_forward_function() member class. If you
+   * construct this object using the constructor that takes two string
+   * expression, then the default implementation of this method uses a
+   * finite difference scheme to compute the gradients(see the
+   * AutoDerivativeFunction() class for details), and you can specify
+   * the size of the spatial step size at construction time with the
+   * @p h parameter.
+   *
+   * Refer to the general documentation of this class for more information.
+   */
+  virtual
+  DerivativeForm<1,chartdim,spacedim>
+  push_forward_gradient(const Point<chartdim> &chart_point) const;
 
   /**
    * Given a point in the spacedim coordinate system, uses the
@@ -308,6 +333,57 @@ private:
   const bool owns_pointers;
 };
 
+
+/**
+ * Manifold description for the surface of a Torus in three dimensions. The
+ * Torus is assumed to be in the x-z plane. The reference coordinate system
+ * is given by the angle $phi$ around the y axis, the angle $theta$ around
+ * the centerline of the torus, and the distance to the centerline $w$
+ * (between 0 and 1).
+ *
+ * This class was developed to be used in conjunction with
+ * GridGenerator::torus.
+ *
+ * @ingroup manifold
+ *
+ * @author Timo Heister, 2016
+ */
+template <int dim>
+class TorusManifold : public ChartManifold<dim,3,3>
+{
+public:
+  static const int chartdim = 3;
+  static const int spacedim = 3;
+
+  /**
+   * Constructor. Specify the radius of the centerline @p R and the radius
+   * of the torus itself (@p r). The variables have the same meaning as
+   * the parameters in GridGenerator::torus().
+   */
+  TorusManifold (const double R, const double r);
+
+  /**
+   * Pull back operation.
+   */
+  virtual Point<3>
+  pull_back(const Point<3> &p) const;
+
+  /**
+   * Push forward operation.
+   */
+  virtual Point<3>
+  push_forward(const Point<3> &chart_point) const;
+
+  /**
+   * Gradient.
+   */
+  virtual
+  DerivativeForm<1,3,3>
+  push_forward_gradient(const Point<3> &chart_point) const;
+
+private:
+  double r, R;
+};
 
 DEAL_II_NAMESPACE_CLOSE
 
