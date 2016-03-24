@@ -62,6 +62,177 @@ get_new_point (const Quadrature<spacedim> &quad) const
 }
 
 
+
+template <>
+Tensor<1,2>
+Manifold<2, 2>::
+normal_vector (const typename Triangulation<2, 2>::face_iterator &face,
+               const Point<2> &p) const
+{
+  const int spacedim=2, dim=2;
+
+  Tensor<1,spacedim> tangent = ((p-face->vertex(0)).norm_square() > (p-face->vertex(1)).norm_square() ?
+                                -get_tangent_vector(p, face->vertex(0)) :
+                                get_tangent_vector(p, face->vertex(1)));
+  Tensor<1,spacedim> normal = cross_product_2d(tangent);
+  return normal/normal.norm();
+}
+
+template<>
+Tensor<1,3>
+Manifold<3, 3>::
+normal_vector (const typename Triangulation<3, 3>::face_iterator &face,
+               const Point<3> &p) const
+{
+  const int spacedim=3, dim=3;
+  Tensor<1,spacedim> t1,t2;
+
+  // Take the difference between p and all four vertices
+  int min_index=0;
+  Tensor<1,spacedim> dp = p-face->vertex(0);
+  double min_distance = dp.norm_square();
+
+  for (unsigned int i=1; i<4; ++i)
+    {
+      dp = p-face->vertex(i);
+      double distance = dp.norm_square();
+      if (distance < min_distance)
+        {
+          min_index = i;
+          min_distance = distance;
+        }
+    }
+  // Verify we have a valid vertex index
+  AssertIndexRange(min_index, 4);
+
+  // Now figure out which vertices are better to compute tangent vectors
+  // we split the cell in 4 quadrants, and use the most orthogonal vertices
+  // to the closest vertex if we ar far from the center, othewise we use
+  // the two consecutive vertices, on the opposite side with respect to
+  // the face center.
+  if ((p-face->center()).norm_square() < min_distance)
+    {
+      // we are close to the face center: pick two consecutive vertices,
+      // but not the closest one. We make sure the direction is always
+      // the same.
+      if (min_index < 2)
+        {
+          t1 = get_tangent_vector(p, face->vertex(3));
+          t2 = get_tangent_vector(p, face->vertex(2));
+        }
+      else
+        {
+          t1 = get_tangent_vector(p, face->vertex(0));
+          t2 = get_tangent_vector(p, face->vertex(1));
+        }
+    }
+  else
+    {
+      switch (min_index)
+        {
+        case 0:
+        {
+          t1 = get_tangent_vector(p, face->vertex(1));
+          t2 = get_tangent_vector(p, face->vertex(2));
+          break;
+        }
+        case 1:
+        {
+          t1 = get_tangent_vector(p, face->vertex(3));
+          t2 = get_tangent_vector(p, face->vertex(0));
+          break;
+        }
+        case 2:
+        {
+          t1 = get_tangent_vector(p, face->vertex(0));
+          t2 = get_tangent_vector(p, face->vertex(3));
+          break;
+        }
+        case 3:
+        {
+          t1 = get_tangent_vector(p, face->vertex(2));
+          t2 = get_tangent_vector(p, face->vertex(1));
+          break;
+        }
+        default:
+          Assert(false, ExcInternalError());
+          break;
+        }
+    }
+  Tensor<1,spacedim> normal = cross_product_3d(t1,t2);
+  return normal/normal.norm();
+}
+
+
+template <int dim, int spacedim>
+Tensor<1,spacedim>
+Manifold<dim, spacedim>::
+normal_vector (const typename Triangulation<dim, spacedim>::face_iterator &face,
+               const Point<spacedim> &p) const
+{
+  Assert(false, ExcPureFunctionCalled());
+  return Tensor<1,spacedim>();
+}
+
+
+
+template <>
+void
+Manifold<2, 2>::
+get_normals_at_vertices (const typename Triangulation<2, 2>::face_iterator &face,
+                         FaceVertexNormals &n) const
+{
+  n[0] = cross_product_2d(get_tangent_vector(face->vertex(0), face->vertex(1)));
+  n[1] = -cross_product_2d(get_tangent_vector(face->vertex(1), face->vertex(0)));
+
+  n[0] /= n[0].norm();
+  n[1] /= n[1].norm();
+}
+
+
+template <>
+void
+Manifold<3, 3>::
+get_normals_at_vertices (const typename Triangulation<3, 3>::face_iterator &face,
+                         FaceVertexNormals &n) const
+{
+  n[0] = cross_product_3d
+         (get_tangent_vector(face->vertex(0), face->vertex(1)),
+          get_tangent_vector(face->vertex(0), face->vertex(2)));
+
+  n[1] = cross_product_3d
+         (get_tangent_vector(face->vertex(1), face->vertex(3)),
+          get_tangent_vector(face->vertex(1), face->vertex(0)));
+
+  n[2] = cross_product_3d
+         (get_tangent_vector(face->vertex(2), face->vertex(0)),
+          get_tangent_vector(face->vertex(2), face->vertex(3)));
+
+  n[3] = cross_product_3d
+         (get_tangent_vector(face->vertex(3), face->vertex(2)),
+          get_tangent_vector(face->vertex(3), face->vertex(1)));
+
+  for (unsigned int i=0; i<4; ++i)
+    n[i] /=n[i].norm();
+}
+
+
+template <int dim, int spacedim>
+void
+Manifold<dim, spacedim>::
+get_normals_at_vertices (const typename Triangulation<dim, spacedim>::face_iterator &face,
+                         FaceVertexNormals &n) const
+{
+  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
+    {
+      n[v] = normal_vector(face, face->vertex(v));
+      n[v] /= n[v].norm();
+    }
+}
+
+
+
+
 template <int dim, int spacedim>
 Point<spacedim>
 Manifold<dim, spacedim>::

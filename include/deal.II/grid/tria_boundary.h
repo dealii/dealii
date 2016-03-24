@@ -83,19 +83,6 @@ class Boundary : public FlatManifold<dim, spacedim>
 public:
 
   /**
-   * Type keeping information about the normals at the vertices of a face of a
-   * cell. Thus, there are <tt>GeometryInfo<dim>::vertices_per_face</tt>
-   * normal vectors, that define the tangent spaces of the boundary at the
-   * vertices. Note that the vectors stored in this object are not required to
-   * be normalized, nor to actually point outward, as one often will only want
-   * to check for orthogonality to define the tangent plane; if a function
-   * requires the normals to be normalized, then it must do so itself.
-   *
-   * For obvious reasons, this type is not useful in 1d.
-   */
-  typedef Tensor<1,spacedim> FaceVertexNormals[GeometryInfo<dim>::vertices_per_face];
-
-  /**
    * Destructor. Does nothing here, but needs to be declared to make it
    * virtual.
    */
@@ -159,51 +146,6 @@ public:
   void
   get_intermediate_points_on_face (const typename Triangulation<dim,spacedim>::face_iterator &face,
                                    std::vector<Point<spacedim> > &points) const;
-
-  /**
-   * Return the normal vector to the surface at the point p. If p is not in
-   * fact on the surface, but only close-by, try to return something
-   * reasonable, for example the normal vector at the surface point closest to
-   * p.  (The point p will in fact not normally lie on the actual surface, but
-   * rather be a quadrature point mapped by some polynomial mapping; the
-   * mapped surface, however, will not usually coincide with the actual
-   * surface.)
-   *
-   * The face iterator gives an indication which face this function is
-   * supposed to compute the normal vector for.  This is useful if the
-   * boundary of the domain is composed of different nondifferential pieces
-   * (for example when using the StraightBoundary class to approximate a
-   * geometry that is completely described by the coarse mesh, with piecewise
-   * (bi-)linear components between the vertices, but where the boundary may
-   * have a kink at the vertices itself).
-   *
-   * @note Implementations of this function should be able to assume that the
-   * point p lies within or close to the face described by the first argument.
-   * In turn, callers of this function should ensure that this is in fact the
-   * case.
-   */
-  virtual
-  Tensor<1,spacedim>
-  normal_vector (const typename Triangulation<dim,spacedim>::face_iterator &face,
-                 const Point<spacedim> &p) const;
-
-  /**
-   * Compute the normal vectors to the boundary at each vertex of the given
-   * face. It is not required that the normal vectors be normed somehow.
-   * Neither is it required that the normals actually point outward.
-   *
-   * This function is needed to compute data for C1 mappings. The default
-   * implementation is to throw an error, so you need not overload this
-   * function in case you do not intend to use C1 mappings.
-   *
-   * Note that when computing normal vectors at a vertex where the boundary is
-   * not differentiable, you have to make sure that you compute the one-sided
-   * limits, i.e. limit with respect to points inside the given face.
-   */
-  virtual
-  void
-  get_normals_at_vertices (const typename Triangulation<dim,spacedim>::face_iterator &face,
-                           FaceVertexNormals &face_vertex_normals) const;
 
   /**
    * Given a candidate point and a line segment characterized by the iterator,
