@@ -517,7 +517,6 @@ namespace LinearAlgebra
   inline
   ReadWriteVector<Number>::ReadWriteVector ()
     :
-    comm_pattern(NULL),
     val(NULL)
   {}
 
@@ -528,7 +527,6 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::ReadWriteVector (const ReadWriteVector<Number> &v)
     :
     Subscriptor(),
-    comm_pattern(NULL),
     val(NULL)
   {
     this->operator=(v);
@@ -540,7 +538,6 @@ namespace LinearAlgebra
   inline
   ReadWriteVector<Number>::ReadWriteVector (const size_type size)
     :
-    comm_pattern(NULL),
     val(NULL)
   {
     reinit (size, false);
@@ -552,7 +549,6 @@ namespace LinearAlgebra
   inline
   ReadWriteVector<Number>::ReadWriteVector (const IndexSet &locally_stored_indices)
     :
-    comm_pattern(NULL),
     val(NULL)
   {
     reinit (locally_stored_indices);
