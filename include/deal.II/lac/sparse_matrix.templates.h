@@ -73,13 +73,13 @@ SparseMatrix<number>::SparseMatrix (const SparseMatrix &m)
 template <typename number>
 SparseMatrix<number>::SparseMatrix (SparseMatrix<number> &&m)
   :
-  Subscriptor (m),
+  Subscriptor(),
   cols(m.cols),
   val(m.val),
   max_len(m.max_len)
 {
-  m.cols = 0;
-  m.val = 0;
+  m.cols = nullptr;
+  m.val = nullptr;
   m.max_len = 0;
 }
 #endif
@@ -109,8 +109,8 @@ SparseMatrix<number>::operator = (SparseMatrix<number> &&m)
   val = m.val;
   max_len = m.max_len;
 
-  m.cols = 0;
-  m.val = 0;
+  m.cols = nullptr;
+  m.val = nullptr;
   m.max_len = 0;
 
   return *this;
