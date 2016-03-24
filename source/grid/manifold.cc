@@ -69,7 +69,7 @@ Manifold<2, 2>::
 normal_vector (const typename Triangulation<2, 2>::face_iterator &face,
                const Point<2> &p) const
 {
-  const int spacedim=2, dim=2;
+  const int spacedim=2;
 
   Tensor<1,spacedim> tangent = ((p-face->vertex(0)).norm_square() > (p-face->vertex(1)).norm_square() ?
                                 -get_tangent_vector(p, face->vertex(0)) :
@@ -84,7 +84,7 @@ Manifold<3, 3>::
 normal_vector (const typename Triangulation<3, 3>::face_iterator &face,
                const Point<3> &p) const
 {
-  const int spacedim=3, dim=3;
+  const int spacedim=3;
   Tensor<1,spacedim> t1,t2;
 
   // Take the difference between p and all four vertices
@@ -167,8 +167,8 @@ normal_vector (const typename Triangulation<3, 3>::face_iterator &face,
 template <int dim, int spacedim>
 Tensor<1,spacedim>
 Manifold<dim, spacedim>::
-normal_vector (const typename Triangulation<dim, spacedim>::face_iterator &face,
-               const Point<spacedim> &p) const
+normal_vector (const typename Triangulation<dim, spacedim>::face_iterator &/*face*/,
+               const Point<spacedim> &/*p*/) const
 {
   Assert(false, ExcPureFunctionCalled());
   return Tensor<1,spacedim>();
