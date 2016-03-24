@@ -1,0 +1,24 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 1999 - 2014 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
+
+for (d : DIMENSIONS; d1 : DIMENSIONS; d2: DIMENSIONS; 
+     c : SPACE_DIMENSIONS ; s : SPACE_DIMENSIONS; s1 : SPACE_DIMENSIONS)
+  {
+#if d <= s && c <= s1 && s1 <= s
+    template class CompositionManifold<d,s,c,d1,d2,s1>;
+#endif
+  }
+
