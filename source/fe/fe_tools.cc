@@ -103,6 +103,12 @@ namespace FETools
     return new FE_DGQArbitraryNodes<1, 2>(quad);
   }
   template <>
+  FiniteElement<1, 3> *
+  FEFactory<FE_DGQ<1, 3> >::get (const Quadrature<1> &quad) const
+  {
+    return new FE_DGQArbitraryNodes<1, 3>(quad);
+  }
+  template <>
   FiniteElement<2, 2> *
   FEFactory<FE_DGQ<2> >::get (const Quadrature<1> &quad) const
   {
