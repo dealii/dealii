@@ -71,7 +71,7 @@ namespace LinearAlgebra
 
     // reset the communication patter
     source_stored_elements.clear();
-    comm_pattern = NULL;
+    comm_pattern.reset();
   }
 
 
@@ -91,7 +91,7 @@ namespace LinearAlgebra
 
     // reset the communication patter
     source_stored_elements.clear();
-    comm_pattern = NULL;
+    comm_pattern.reset();
   }
 
 
@@ -112,7 +112,7 @@ namespace LinearAlgebra
 
     // reset the communication patter
     source_stored_elements.clear();
-    comm_pattern = NULL;
+    comm_pattern.reset();
   }
 
 
