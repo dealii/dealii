@@ -20,6 +20,7 @@
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/std_cxx11/shared_ptr.h>
+#include <deal.II/lac/vector.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -81,7 +82,8 @@ namespace LinearAlgebra
      */
     virtual void import(const ReadWriteVector<Number> &V,
                         VectorOperation::values operation,
-                        std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern = NULL) = 0;
+                        std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern =
+                          std_cxx11::shared_ptr<const CommunicationPatternBase> ()) = 0;
 
     /**
      * Return the scalar product of two vectors.

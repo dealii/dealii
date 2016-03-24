@@ -33,16 +33,14 @@ namespace LinearAlgebra
   {
     Vector::Vector()
       :
-      vector(new Epetra_FEVector(Epetra_Map(0,0,0,Utilities::Trilinos::comm_self()))),
-      epetra_comm_pattern(NULL)
+      vector(new Epetra_FEVector(Epetra_Map(0,0,0,Utilities::Trilinos::comm_self())))
     {}
 
 
 
     Vector::Vector(const Vector &V)
       :
-      vector(new Epetra_FEVector(V.trilinos_vector())),
-      epetra_comm_pattern(NULL)
+      vector(new Epetra_FEVector(V.trilinos_vector()))
     {}
 
 
@@ -50,8 +48,7 @@ namespace LinearAlgebra
     Vector::Vector(const IndexSet &parallel_partitioner,
                    const MPI_Comm &communicator)
       :
-      vector(new Epetra_FEVector(parallel_partitioner.make_trilinos_map(communicator,false))),
-      epetra_comm_pattern(NULL)
+      vector(new Epetra_FEVector(parallel_partitioner.make_trilinos_map(communicator,false)))
     {}
 
 
