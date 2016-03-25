@@ -17,19 +17,8 @@
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
   {
-#if deal_II_dimension <= deal_II_space_dimension 	
+#if deal_II_dimension <= deal_II_space_dimension
     template class FE_DGQ<deal_II_dimension, deal_II_space_dimension>;
+    template class FE_DGQArbitraryNodes<deal_II_dimension, deal_II_space_dimension>;
 #endif
   }
-
-
-for (deal_II_dimension : DIMENSIONS)
-  {
-    template class FE_DGQArbitraryNodes<deal_II_dimension>;
-
-#if deal_II_dimension != 3
-    template class FE_DGQArbitraryNodes<deal_II_dimension, deal_II_dimension+1>;
-#endif
-
-  }
-

@@ -33,16 +33,14 @@ namespace LinearAlgebra
   {
     Vector::Vector()
       :
-      vector(new Epetra_FEVector(Epetra_Map(0,0,0,Utilities::Trilinos::comm_self()))),
-      epetra_comm_pattern(NULL)
+      vector(new Epetra_FEVector(Epetra_Map(0,0,0,Utilities::Trilinos::comm_self())))
     {}
 
 
 
     Vector::Vector(const Vector &V)
       :
-      vector(new Epetra_FEVector(V.trilinos_vector())),
-      epetra_comm_pattern(NULL)
+      vector(new Epetra_FEVector(V.trilinos_vector()))
     {}
 
 
@@ -50,8 +48,7 @@ namespace LinearAlgebra
     Vector::Vector(const IndexSet &parallel_partitioner,
                    const MPI_Comm &communicator)
       :
-      vector(new Epetra_FEVector(parallel_partitioner.make_trilinos_map(communicator,false))),
-      epetra_comm_pattern(NULL)
+      vector(new Epetra_FEVector(parallel_partitioner.make_trilinos_map(communicator,false)))
     {}
 
 
@@ -66,8 +63,8 @@ namespace LinearAlgebra
       else if (omit_zeroing_entries==false)
         {
           const int ierr = vector->PutScalar(0.);
-          (void) ierr;
           Assert(ierr==0, ExcTrilinosError(ierr));
+          (void) ierr;
         }
     }
 
@@ -89,6 +86,7 @@ namespace LinearAlgebra
 
               const int ierr = vector->Import(V.trilinos_vector(), data_exchange, Insert);
               Assert(ierr==0, ExcTrilinosError(ierr));
+              (void) ierr;
             }
           else
             vector.reset(new Epetra_FEVector(V.trilinos_vector()));
@@ -181,8 +179,8 @@ namespace LinearAlgebra
 #if DEAL_II_TRILINOS_VERSION_GTE(11,11,0)
           Epetra_Import data_exchange (vector->Map(), down_V.trilinos_vector().Map());
           int ierr = vector->Import(down_V.trilinos_vector(), data_exchange, Epetra_AddLocalAlso);
-          (void) ierr;
           Assert(ierr==0, ExcTrilinosError(ierr));
+          (void) ierr;
 #else
           // In versions older than 11.11 the Import function is broken for adding
           // Hence, we provide a workaround in this case
@@ -191,12 +189,12 @@ namespace LinearAlgebra
           Epetra_Import data_exchange(dummy.Map(), down_V.trilinos_vector().Map());
 
           int ierr = dummy.Import(down_V.trilinos_vector(), data_exchange, Insert);
-          (void) ierr;
           Assert(ierr==0, ExcTrilinosError(ierr));
+          (void) ierr;
 
           ierr = vector->Update(1.0, dummy, 1.0);
-          (void) ierr;
           Assert(ierr==0, ExcTrilinosError(ierr));
+          (void) ierr;
 #endif
         }
 
@@ -229,8 +227,8 @@ namespace LinearAlgebra
 
       double result(0.);
       const int ierr = vector->Dot(down_V.trilinos_vector(), &result);
-      (void) ierr;
       Assert(ierr==0, ExcTrilinosError(ierr));
+      (void) ierr;
 
       return result;
     }
@@ -261,6 +259,7 @@ namespace LinearAlgebra
 
       const int ierr = vector->Update(a, down_V.trilinos_vector(), 1.);
       Assert(ierr==0, ExcTrilinosError(ierr));
+      (void) ierr;
     }
 
 
@@ -289,6 +288,7 @@ namespace LinearAlgebra
       const int ierr = vector->Update(a, down_V.trilinos_vector(), b,
                                       down_W.trilinos_vector(), 1.);
       Assert(ierr==0, ExcTrilinosError(ierr));
+      (void) ierr;
     }
 
 
@@ -325,6 +325,7 @@ namespace LinearAlgebra
       const int ierr = vector->Multiply(1.0, down_scaling_factors.trilinos_vector(),
                                         *vector, 0.0);
       Assert(ierr==0, ExcTrilinosError(ierr));
+      (void) ierr;
     }
 
 
@@ -345,6 +346,7 @@ namespace LinearAlgebra
           // Otherwise, just update
           int ierr = vector->Update(a, down_V.trilinos_vector(), 0.);
           Assert(ierr==0, ExcTrilinosError(ierr));
+          (void) ierr;
         }
     }
 
@@ -355,6 +357,7 @@ namespace LinearAlgebra
       double norm(0.);
       int ierr = vector->Norm1(&norm);
       Assert(ierr==0, ExcTrilinosError(ierr));
+      (void) ierr;
 
       return norm;
     }
@@ -366,6 +369,7 @@ namespace LinearAlgebra
       double norm(0.);
       int ierr = vector->Norm2(&norm);
       Assert(ierr==0, ExcTrilinosError(ierr));
+      (void) ierr;
 
       return norm;
     }
@@ -377,6 +381,7 @@ namespace LinearAlgebra
       double norm(0.);
       int ierr = vector->NormInf(&norm);
       Assert(ierr==0, ExcTrilinosError(ierr));
+      (void) ierr;
 
       return norm;
     }
@@ -472,6 +477,7 @@ namespace LinearAlgebra
       int ierr = vector->ExtractView(&val, &leading_dimension);
 
       Assert(ierr==0, ExcTrilinosError(ierr));
+      (void) ierr;
       out.precision (precision);
       if (scientific)
         out.setf(std::ios::scientific, std::ios::floatfield);

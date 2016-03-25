@@ -6153,7 +6153,12 @@ void DataOutInterface<dim,spacedim>::write_vtu_in_parallel (const char *filename
   MPI_File fh;
   err = MPI_File_open(comm, const_cast<char *>(filename),
                       MPI_MODE_CREATE | MPI_MODE_WRONLY, info, &fh);
-  AssertThrow(err==0, ExcMessage("Unable to open file with MPI_File_open!"));
+  AssertThrow(err==0,
+              ExcMessage("Unable to open file <"
+                         + std::string(filename) +
+                         "> with MPI_File_open. The error code "
+                         "returned was "
+                         + Utilities::to_string(err) + "."));
 
 
   MPI_File_set_size(fh, 0); // delete the file contents

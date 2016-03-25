@@ -55,7 +55,7 @@ namespace LinearAlgebra
        */
       void reinit(const IndexSet &vector_space_vector_index_set,
                   const IndexSet &read_write_vector_index_set,
-                  const MPI_Comm &communicator) override;
+                  const MPI_Comm &communicator);
 
       /**
        * Return the underlying MPI communicator.

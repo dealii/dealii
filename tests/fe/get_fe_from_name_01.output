@@ -15,6 +15,14 @@ DEAL::FE_Q<3>(1)
 DEAL::FE_Q<1,2>(1)
 DEAL::FE_Q<1,3>(1)
 DEAL::FE_Q<2,3>(1)
+DEAL::Read FE_DGQArbitraryNodes(QGauss(2))
+DEAL::Generated :
+DEAL::FE_DGQArbitraryNodes<1>(QGauss(2))
+DEAL::FE_DGQArbitraryNodes<2>(QGauss(2))
+DEAL::FE_DGQArbitraryNodes<3>(QGauss(2))
+DEAL::FE_DGQArbitraryNodes<1,2>(QGauss(2))
+DEAL::FE_DGQArbitraryNodes<1,3>(QGauss(2))
+DEAL::FE_DGQArbitraryNodes<2,3>(QGauss(2))
 DEAL::Read FE_DGQ(2)
 DEAL::Generated :
 DEAL::FE_DGQ<1>(2)
@@ -31,6 +39,14 @@ DEAL::FE_Q<3>(2)
 DEAL::FE_Q<1,2>(2)
 DEAL::FE_Q<1,3>(2)
 DEAL::FE_Q<2,3>(2)
+DEAL::Read FE_DGQArbitraryNodes(QGauss(3))
+DEAL::Generated :
+DEAL::FE_DGQArbitraryNodes<1>(QGauss(3))
+DEAL::FE_DGQArbitraryNodes<2>(QGauss(3))
+DEAL::FE_DGQArbitraryNodes<3>(QGauss(3))
+DEAL::FE_DGQArbitraryNodes<1,2>(QGauss(3))
+DEAL::FE_DGQArbitraryNodes<1,3>(QGauss(3))
+DEAL::FE_DGQArbitraryNodes<2,3>(QGauss(3))
 DEAL::Read       FESystem[FE_DGQ(1)^2     -FE_DGQ(1)]
 DEAL::Generated :
 DEAL::FESystem<1>[FE_DGQ<1>(1)^2-FE_DGQ<1>(1)]
@@ -47,6 +63,22 @@ DEAL::FESystem<3>[FE_Q<3>(1)^2-FE_DGQ<3>(1)]
 DEAL::FESystem<1,2>[FE_Q<1,2>(1)^2-FE_DGQ<1,2>(1)]
 DEAL::FESystem<1,3>[FE_Q<1,3>(1)^2-FE_DGQ<1,3>(1)]
 DEAL::FESystem<2,3>[FE_Q<2,3>(1)^2-FE_DGQ<2,3>(1)]
+DEAL::Read FESystem[FE_Q(1)^2-FE_DGQArbitraryNodes(QGauss(2))]
+DEAL::Generated :
+DEAL::FESystem<1>[FE_Q<1>(1)^2-FE_DGQArbitraryNodes<1>(QGauss(2))]
+DEAL::FESystem<2>[FE_Q<2>(1)^2-FE_DGQArbitraryNodes<2>(QGauss(2))]
+DEAL::FESystem<3>[FE_Q<3>(1)^2-FE_DGQArbitraryNodes<3>(QGauss(2))]
+DEAL::FESystem<1,2>[FE_Q<1,2>(1)^2-FE_DGQArbitraryNodes<1,2>(QGauss(2))]
+DEAL::FESystem<1,3>[FE_Q<1,3>(1)^2-FE_DGQArbitraryNodes<1,3>(QGauss(2))]
+DEAL::FESystem<2,3>[FE_Q<2,3>(1)^2-FE_DGQArbitraryNodes<2,3>(QGauss(2))]
+DEAL::Read FESystem[FE_DGQArbitraryNodes(QGauss(2))^2-FE_Q(1)]
+DEAL::Generated :
+DEAL::FESystem<1>[FE_DGQArbitraryNodes<1>(QGauss(2))^2-FE_Q<1>(1)]
+DEAL::FESystem<2>[FE_DGQArbitraryNodes<2>(QGauss(2))^2-FE_Q<2>(1)]
+DEAL::FESystem<3>[FE_DGQArbitraryNodes<3>(QGauss(2))^2-FE_Q<3>(1)]
+DEAL::FESystem<1,2>[FE_DGQArbitraryNodes<1,2>(QGauss(2))^2-FE_Q<1,2>(1)]
+DEAL::FESystem<1,3>[FE_DGQArbitraryNodes<1,3>(QGauss(2))^2-FE_Q<1,3>(1)]
+DEAL::FESystem<2,3>[FE_DGQArbitraryNodes<2,3>(QGauss(2))^2-FE_Q<2,3>(1)]
 DEAL::Read FESystem[FE_DGQ(1)^2-FE_Q(1)]
 DEAL::Generated :
 DEAL::FESystem<1>[FE_DGQ<1>(1)^2-FE_Q<1>(1)]
