@@ -3842,6 +3842,101 @@ next_cell:
       }
   }
 
+  template<int dim, int spacedim>
+  std::pair<unsigned int, double>
+  get_longest_direction(typename Triangulation<dim, spacedim>::active_cell_iterator cell)
+  {
+    double max_ratio = 1;
+    unsigned int index = 0;
+
+    for (unsigned int i = 0; i < dim; ++i)
+      for (unsigned int j = i+1; j < dim; ++j)
+        {
+          unsigned int ax = i % dim;
+          unsigned int next_ax = j % dim;
+
+          double ratio =  cell->extent_in_direction(ax) / cell->extent_in_direction(next_ax);
+
+          if ( ratio > max_ratio )
+            {
+              max_ratio = ratio;
+              index = ax;
+            }
+          else if ( 1.0 /ratio > max_ratio )
+            {
+              max_ratio = 1.0 /ratio;
+              index = next_ax;
+            }
+        }
+    return std::make_pair(index, max_ratio);
+  }
+
+
+  template<int dim, int spacedim>
+  void
+  remove_hanging_nodes( Triangulation<dim,spacedim> &tria,
+                        const bool isotropic,
+                        const unsigned int max_iterations)
+  {
+    unsigned int iter = 0;
+    bool continue_refinement = true;
+
+    typename Triangulation<dim, spacedim>::active_cell_iterator
+    cell = tria.begin_active(),
+    endc = tria.end();
+
+    while ( continue_refinement && (iter < max_iterations) )
+      {
+        if (!(max_iterations == 0)) iter++;
+        continue_refinement = false;
+
+        for (cell=tria.begin_active(); cell!= endc; ++cell)
+          for (unsigned int j = 0; j < GeometryInfo<dim>::faces_per_cell; j++)
+            if (cell->at_boundary(j)==false && cell->neighbor(j)->has_children())
+              {
+                if (isotropic)
+                  {
+                    cell->set_refine_flag();
+                    continue_refinement = true;
+                  }
+                else
+                  continue_refinement |= cell->flag_for_face_refinement(j);
+              }
+
+        tria.execute_coarsening_and_refinement();
+      }
+  }
+
+  template<int dim, int spacedim>
+  void
+  remove_anisotropy(  Triangulation<dim,spacedim> &tria,
+                      const double max_ratio,
+                      const unsigned int max_iterations)
+  {
+    unsigned int iter = 0;
+    bool continue_refinement = true;
+
+    typename Triangulation<dim, spacedim>::active_cell_iterator
+    cell = tria.begin_active(),
+    endc = tria.end();
+
+    while ( continue_refinement && (iter<max_iterations) )
+      {
+        iter++;
+        continue_refinement = false;
+        for (cell=tria.begin_active(); cell!= endc; ++cell)
+          {
+            std::pair<unsigned int, double> info = GridTools::get_longest_direction<dim,spacedim>(cell);
+            if (info.second > max_ratio)
+              {
+                cell->set_refine_flag(RefinementCase<dim>::cut_axis(info.first));
+                continue_refinement = true;
+              }
+          }
+        tria.execute_coarsening_and_refinement ();
+      };
+  }
+
 } /* namespace GridTools */
 
 
