@@ -10,7 +10,7 @@
 
 
 // Test the combination of simple ChartManifolds: SphericalManifold +
-// Translation
+// Rotation
 
 #include "../tests.h"
 #include <fstream>
@@ -30,7 +30,11 @@ int main ()
   const int dim=2, spacedim=2;
 
   SphericalManifold<1,2>    F;
-  FunctionManifold<2,2,2> G("x;y+1", "x;y-1");
+  std::map<std::string, double> constants;
+  constants["k"] = numbers::PI/3;
+  FunctionManifold<2,2,2> G("cos( k)*x -sin( k)*y; sin( k)*x+cos( k)*y",
+                            "cos(-k)*x -sin(-k)*y; sin(-k)*x+cos(-k)*y",
+                            Point<2>(), constants);
 
   CompositionManifold<2,2,2,2,1> manifold(F,G);
 
@@ -58,7 +62,7 @@ int main ()
   out << "set size ratio -1" << std::endl
       << "plot '-' with vectors " << std::endl;
 
-  Point<2> center(0.0,1.0);
+  Point<2> center;
 
   out << center << " "
       << sp[0] << std::endl
