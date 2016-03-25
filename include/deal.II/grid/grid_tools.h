@@ -357,6 +357,77 @@ namespace GridTools
                        Triangulation<dim, spacedim> &triangulation,
                        const bool   keep_boundary=true);
 
+  /**
+   * Remove hanging nodes from a grid. If the @p isotropic parameter is set
+   * to @p false (default) this function detects cells with hanging nodes and
+   * refines the neighbours in the direction that removes hanging nodes.
+   * If the @p isotropic parameter is set
+   * to @p true, the neighbours refinement is made in each directions.
+   * In order to remove all hanging nodes this procedure has to be repeated:
+   * this could require a large number of iterations.
+   * To avoid this a max number (@p max_iterations) of iteration is provided.
+   *
+   * Consider the following grid:
+   * @image html remove_hanging_nodes-hanging.png
+   *
+   * @p isotropic == @p false would return:
+   * @image html remove_hanging_nodes-aniso.png
+   *
+   * @p isotropic == @p true would return:
+   * @image html remove_hanging_nodes-isotro.png
+   *
+   * @param[in,out] tria Triangulation to refine.
+   *
+   * @param[in] isotropic if true refine cells in each directions, otherwise
+   * (default value) refine the cell in the direction that removes hanging node.
+   *
+   * @param[in] max_iterations at each step only closest cells to hanging nodes
+   * are refined. The code may require a lot of iterations to to remove all
+   * hangind nodes. @p max_iterations is the maximum number of iteration
+   * allowed. If @p max_iterations == 0 this function continues refining until
+   * there are no hanging nodes.
+   *
+   * @note In the case of parallel codes, this function should be combined
+   * with GridGenerator::flatten_triangulation.
+   *
+   * @author Mauro Bardelloni, Luca Heltai, Andrea Mola, 2016
+   */
+  template<int dim, int spacedim>
+  void
+  remove_hanging_nodes( Triangulation<dim,spacedim> &tria,
+                        const bool isotropic = false,
+                        const unsigned int max_iterations = 100);
+
+  /**
+   * Refine a mesh anisotropically such that the resulting mesh is composed by
+   * cells with maximum ratio between dimensions less than @p max_ratio.
+   * This procedure is possibly infinite therefore it possible to set a maximum
+   * number of refinements, @p max_iterations.
+   *
+   * Starting from a cell like this:
+   * @image html remove_anisotropy-coarse.png
+   *
+   * This function would return:
+   * @image html remove_anisotropy-refined.png
+   *
+   * @param[in,out] tria Triangulation to refine.
+   *
+   * @param[in] max_ratio maximum value allowed among the ratio between
+   * the dimensions of each cell.
+   *
+   * @param[in] max_iterations maximum number of iterations allowed.
+   *
+   * @note In the case of parallel codes, this function should be combined
+   * with GridGenerator::flatten_triangulation and GridTools::remove_hanging_nodes.
+   *
+   * @author Mauro Bardelloni, Luca Heltai, Andrea Mola, 2016
+   */
+  template<int dim, int spacedim>
+  void
+  remove_anisotropy(  Triangulation<dim,spacedim> &tria,
+                      const double max_ratio = 1.6180339887,
+                      const unsigned int max_iterations = 5);
+
   /*@}*/
   /**
    * @name Finding cells and vertices of a triangulation
@@ -681,6 +752,21 @@ namespace GridTools
   compute_local_to_global_vertex_index_map(
     const parallel::distributed::Triangulation<dim,spacedim> &triangulation);
 
+  /**
+   * Return the highest value among ratios between dimensions of a
+   * @p cell. Moreover, return the dimension relative to the highest elongation.
+   *
+   * @param[in] cell an iterator pointing to the cell.
+   *
+   * @return  A std::pair<unsigned int, double> such that the @p first value
+   * is the dimension of the highest elongation and the @p second value is the
+   * ratio among the dimensions of the @p cell.
+   *
+   * @author Mauro Bardelloni, Luca Heltai, Andrea Mola, 2016
+   */
+  template<int dim, int spacedim>
+  std::pair<unsigned int, double>
+  get_longest_direction(typename Triangulation<dim, spacedim>::active_cell_iterator cell);
 
   /*@}*/
   /**
@@ -1694,89 +1780,6 @@ namespace GridTools
             }
         }
   }
-
-  /**
-   * Return the highest value among ratios between dimensions of a
-   * @p cell. Moreover, return the dimension relative to the highest elongation.
-   *
-   * @param[in] cell an iterator pointing to the cell.
-   *
-   * @return  A std::pair<unsigned int, double> such that the @p first value
-   * is the dimension of the highest elongation and the @p second value is the
-   * ratio among the dimensions of the @p cell.
-   *
-   * @note This function works in dimension 2 and 3.
-   */
-  template<int dim, int spacedim>
-  std::pair<unsigned int, double>
-  get_longest_direction(typename Triangulation<dim, spacedim>::active_cell_iterator cell);
-
-  /**
-   * Remove hanging nodes from a grid. If the @p isotropic parameter is set
-   * to @p false (default) this function detects cells with hanging nodes and
-   * refines the neighbours in the direction that removes hanging nodes.
-   * If the @p isotropic parameter is set
-   * to @p true, the neighbours refinement is made in each directions.
-   * In order to remove all hanging nodes this procedure has to be repeated:
-   * this could require a large number of iterations.
-   * To avoid this a max number (@p max_iterations) of iteration is provided.
-   *
-   * Consider the following grid:
-   * @image html remove_hanging_nodes-hanging.png
-   *
-   * @p isotropic == @p false would return:
-   * @image html remove_hanging_nodes-aniso.png
-   *
-   * @p isotropic == @p true would return:
-   * @image html remove_hanging_nodes-isotro.png
-   *
-   * @param[in,out] tria Triangulation to refine.
-   *
-   * @param[in] isotropic if true refine cells in each directions, otherwise
-   * (default value) refine the cell in the direction that removes hanging node.
-   *
-   * @param[in] max_iterations at each step only closest cells to hanging nodes
-   * are refined. The code may require a lot of iterations to to remove all
-   * hangind nodes. @p max_iterations is the maximum number of iteration
-   * allowed. If @p max_iterations == 0 this function continues refining until
-   * there are no hanging nodes.
-   *
-   * @note In the case of parallel codes, this function should be combined
-   * with GridGenerator::flatten_triangulation.
-   */
-  template<int dim, int spacedim>
-  void
-  remove_hanging_nodes( Triangulation<dim,spacedim> &tria,
-                        const bool isotropic = false,
-                        const unsigned int max_iterations = 100);
-
-  /**
-   * Refine a mesh anisotropically such that the resulting mesh is composed by
-   * cells with maximum ratio between dimensions less than @p max_ratio.
-   * This procedure is possibly infinite therefore it possible to set a maximum
-   * number of refinements, @p max_iterations.
-   *
-   * Starting from a cell like this:
-   * @image html remove_anisotropy-coarse.png
-   *
-   * This function would return:
-   * @image html remove_anisotropy-refined.png
-   *
-   * @param[in,out] tria Triangulation to refine.
-   *
-   * @param[in] max_ratio maximum value allowed among the ratio between
-   * the dimensions of each cell.
-   *
-   * @param[in] max_iterations maximum number of iterations allowed.
-   *
-   * @note In the case of parallel codes, this function should be combined
-   * with GridGenerator::flatten_triangulation and remove_hanging_nodes.
-   */
-  template<int dim, int spacedim>
-  void
-  remove_anisotropy(  Triangulation<dim,spacedim> &tria,
-                      const double max_ratio = 1.6180339887,
-                      const unsigned int max_iterations = 5);
 
 // declaration of explicit specializations
 
