@@ -1712,13 +1712,13 @@ namespace GridTools
   get_longest_direction(typename Triangulation<dim, spacedim>::active_cell_iterator cell);
 
   /**
-   * Remove hanging nodes from a grid. If the @p isotropic parameter is set 
-   * to @p false (default) this function detects cells with hanging nodes and 
+   * Remove hanging nodes from a grid. If the @p isotropic parameter is set
+   * to @p false (default) this function detects cells with hanging nodes and
    * refines the neighbours in the direction that removes hanging nodes.
-   * If the @p isotropic parameter is set 
+   * If the @p isotropic parameter is set
    * to @p true, the neighbours refinement is made in each directions.
-   * In order to remove all hanging nodes this procedure has to be repeated: 
-   * this could require a large number of iterations. 
+   * In order to remove all hanging nodes this procedure has to be repeated:
+   * this could require a large number of iterations.
    * To avoid this a max number (@p max_iterations) of iteration is provided.
    *
    * Consider the following grid:
@@ -1740,8 +1740,8 @@ namespace GridTools
    * hangind nodes. @p max_iterations is the maximum number of iteration
    * allowed. If @p max_iterations == 0 this function continues refining until
    * there are no hanging nodes.
-   * 
-   * @note In the case of parallel codes, this function should be combined 
+   *
+   * @note In the case of parallel codes, this function should be combined
    * with GridGenerator::flatten_triangulation.
    */
   template<int dim, int spacedim>
@@ -1769,7 +1769,7 @@ namespace GridTools
    *
    * @param[in] max_iterations maximum number of iterations allowed.
    *
-   * @note In the case of parallel codes, this function should be combined 
+   * @note In the case of parallel codes, this function should be combined
    * with GridGenerator::flatten_triangulation and remove_hanging_nodes.
    */
   template<int dim, int spacedim>
