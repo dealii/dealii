@@ -45,6 +45,9 @@ MACRO(EXPAND_INSTANTIATIONS _target _inst_in_files)
       SET(_dependency)
     ENDIF()
 
+    # create a .inst.tmp file first and only move to the correct name if the
+    # first call succeeds. Otherwise we might be generating an incomplete
+    # .inst file
     ADD_CUSTOM_COMMAND(
       OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_inst_file}
       DEPENDS ${_dependency}
@@ -53,7 +56,11 @@ MACRO(EXPAND_INSTANTIATIONS _target _inst_in_files)
       COMMAND ${_command}
       ARGS ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/template-arguments
            < ${CMAKE_CURRENT_SOURCE_DIR}/${_inst_in_file}
-           > ${CMAKE_CURRENT_BINARY_DIR}/${_inst_file}
+           > ${CMAKE_CURRENT_BINARY_DIR}/${_inst_file}.tmp
+      COMMAND ${CMAKE_COMMAND}
+      ARGS -E rename 
+           ${CMAKE_CURRENT_BINARY_DIR}/${_inst_file}.tmp
+           ${CMAKE_CURRENT_BINARY_DIR}/${_inst_file}
       )
 
     LIST(APPEND _inst_targets ${CMAKE_CURRENT_BINARY_DIR}/${_inst_file})
