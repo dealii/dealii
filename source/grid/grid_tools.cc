@@ -3887,7 +3887,7 @@ next_cell:
 
     while ( continue_refinement && (iter < max_iterations) )
       {
-        if (!(max_iterations == 0)) iter++;
+        if (max_iterations != numbers::invalid_unsigned_int) iter++;
         continue_refinement = false;
 
         for (cell=tria.begin_active(); cell!= endc; ++cell)
@@ -3934,7 +3934,7 @@ next_cell:
               }
           }
         tria.execute_coarsening_and_refinement ();
-      };
+      }
   }
 
 } /* namespace GridTools */

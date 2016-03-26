@@ -378,14 +378,14 @@ namespace GridTools
    *
    * @param[in,out] tria Triangulation to refine.
    *
-   * @param[in] isotropic if true refine cells in each directions, otherwise
+   * @param[in] isotropic If true refine cells in each directions, otherwise
    * (default value) refine the cell in the direction that removes hanging node.
    *
-   * @param[in] max_iterations at each step only closest cells to hanging nodes
+   * @param[in] max_iterations At each step only closest cells to hanging nodes
    * are refined. The code may require a lot of iterations to to remove all
    * hangind nodes. @p max_iterations is the maximum number of iteration
-   * allowed. If @p max_iterations == 0 this function continues refining until
-   * there are no hanging nodes.
+   * allowed. If @p max_iterations == numbers::invalid_unsigned_int this
+   * function continues refining until there are no hanging nodes.
    *
    * @note In the case of parallel codes, this function should be combined
    * with GridGenerator::flatten_triangulation.
@@ -401,8 +401,9 @@ namespace GridTools
   /**
    * Refine a mesh anisotropically such that the resulting mesh is composed by
    * cells with maximum ratio between dimensions less than @p max_ratio.
-   * This procedure is possibly infinite therefore it possible to set a maximum
-   * number of refinements, @p max_iterations.
+   * This procedure requires an algorithm that may not terminate. Consequently,
+   * it is possible to set a maximum number of iterations through the
+   * @p max_iterations parameter.
    *
    * Starting from a cell like this:
    * @image html remove_anisotropy-coarse.png
@@ -412,10 +413,10 @@ namespace GridTools
    *
    * @param[in,out] tria Triangulation to refine.
    *
-   * @param[in] max_ratio maximum value allowed among the ratio between
+   * @param[in] max_ratio Maximum value allowed among the ratio between
    * the dimensions of each cell.
    *
-   * @param[in] max_iterations maximum number of iterations allowed.
+   * @param[in] max_iterations Maximum number of iterations allowed.
    *
    * @note In the case of parallel codes, this function should be combined
    * with GridGenerator::flatten_triangulation and GridTools::remove_hanging_nodes.
@@ -753,8 +754,9 @@ namespace GridTools
     const parallel::distributed::Triangulation<dim,spacedim> &triangulation);
 
   /**
-   * Return the highest value among ratios between dimensions of a
-   * @p cell. Moreover, return the dimension relative to the highest elongation.
+   * Return the highest value among ratios between extents in each of the
+   * coordinate directions of a @p cell. Moreover, return the dimension
+   * relative to the highest elongation.
    *
    * @param[in] cell an iterator pointing to the cell.
    *
