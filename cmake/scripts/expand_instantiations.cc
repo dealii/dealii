@@ -456,7 +456,7 @@ void process_instantiations ()
           names_and_type = split_string_list (*s, ':');
           if (names_and_type.size() != 2)
             {
-              std::cerr << "Invalid instantiation header" << std::endl;
+              std::cerr << "Invalid instantiation header: '"<< *s << "'" << std::endl;
               std::exit (1);
             }
 
