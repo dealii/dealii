@@ -111,6 +111,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> New: The product of a rank-1 tensor (a vector) and a rank-2
+ symmetric tensor (a symmetric matrix) is now defined and yields
+ a rank-1 tensor (a vector). The opposite product was previously
+ already defined.
+ <br>
+ (Wolfgang Bangerth, 2016/03/25)
+ </li>
+
  <li> Fixed: DoFHandler::locally_owned_dofs() could create a segmentation
  fault in cases where some processors do not own any cells. This was caused
  by an incorrect computation in DoFTools::locally_owned_dofs_per_subdomain().
