@@ -464,6 +464,15 @@ FlatManifold<dim, spacedim>::project_to_manifold (const std::vector<Point<spaced
 
 
 template <int dim, int spacedim>
+const Point<spacedim> &
+FlatManifold<dim, spacedim>::get_periodicity() const
+{
+  return periodicity;
+}
+
+
+
+template <int dim, int spacedim>
 Tensor<1,spacedim>
 FlatManifold<dim, spacedim>::get_tangent_vector (const Point<spacedim> &x1,
                                                  const Point<spacedim> &x2) const
@@ -552,6 +561,13 @@ get_tangent_vector (const Point<spacedim> &x1,
   return result;
 }
 
+template <int dim, int spacedim, int chartdim>
+const Point<chartdim> &
+ChartManifold<dim,spacedim,chartdim>::
+get_periodicity() const
+{
+  return sub_manifold.get_periodicity();
+}
 
 // explicit instantiations
 #include "manifold.inst"

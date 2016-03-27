@@ -596,6 +596,11 @@ public:
   get_tangent_vector (const Point<spacedim> &x1,
                       const Point<spacedim> &x2) const;
 
+  /**
+   * Return the periodicity of this Manifold.
+   */
+  const Point<spacedim> &get_periodicity() const;
+
 private:
   /**
    * The periodicity of this Manifold. Periodicity affects the way a middle
@@ -847,6 +852,11 @@ public:
   Tensor<1,spacedim>
   get_tangent_vector (const Point<spacedim> &x1,
                       const Point<spacedim> &x2) const;
+
+  /**
+   * Return the periodicity associated with the submanifold.
+   */
+  const Point<chartdim> &get_periodicity() const;
 
 private:
   /**

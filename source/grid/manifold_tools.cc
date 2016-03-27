@@ -26,16 +26,22 @@ DEAL_II_NAMESPACE_OPEN
 
 /* -------------------------- CompositionManifold --------------------- */
 
-
-
 template <int dim, int spacedim, int chartdim, int intermediate_dim,
           int dim1, int dim2>
 CompositionManifold<dim,spacedim,chartdim,intermediate_dim,dim1,dim2>::CompositionManifold
 (const ChartManifold<dim1, intermediate_dim, chartdim> &F,
  const ChartManifold<dim2, spacedim, intermediate_dim> &G) :
+  ChartManifold<dim,spacedim,chartdim>(F.get_periodicity()),
   F(&F),
   G(&G)
-{}
+{
+  // We don't know what to do with a periodicity in the second manifold, so
+  // throw an assertion if the second manifold is periodic
+  Assert(G.get_periodicity().norm() == 0.0,
+         ExcMessage("The second manifold cannot be periodic."));
+}
+
+
 
 template <int dim, int spacedim, int chartdim, int intermediate_dim,
           int dim1, int dim2>
@@ -45,6 +51,8 @@ CompositionManifold<dim,spacedim,chartdim,intermediate_dim,dim1,dim2>::pull_back
   return F->pull_back(G->pull_back(space_point));
 }
 
+
+
 template <int dim, int spacedim, int chartdim, int intermediate_dim,
           int dim1, int dim2>
 Point<spacedim>
@@ -52,6 +60,7 @@ CompositionManifold<dim,spacedim,chartdim,intermediate_dim,dim1,dim2>::push_forw
 {
   return G->push_forward(F->push_forward(chart_point));
 }
+
 
 
 template <int dim, int spacedim, int chartdim, int intermediate_dim,
@@ -74,6 +83,7 @@ CompositionManifold<dim,spacedim,chartdim,intermediate_dim,dim1,dim2>::push_forw
 
   return DF_DG;
 }
+
 
 
 // explicit instantiations

@@ -34,7 +34,10 @@ DEAL_II_NAMESPACE_OPEN
  * CompositionManifold.  Take two ChartManifold objects, and make
  * their composition. The CompositionManifold object is a
  * ChartManifold going from the chart of the first ChartManifold to
- * the embedding space of the second ChartManifold.
+ * the embedding space of the second ChartManifold. If the first
+ * ChartManifold is periodic, so is the resulting ChartManifold, with
+ * the same periodicity. Notice however that periodicity on the second
+ * ChartManifold is lost during the composition.
  *
  * This class only works for dim <= chartdim <= intermediate_spacedim
  * <= spacedim. If you try to instantiate anything different, an

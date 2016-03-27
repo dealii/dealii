@@ -9,7 +9,8 @@
 //---------------------------- composition_manifold ---------------------------
 
 
-// Stress periodicity in CompositionManifold
+// Stress periodicity in CompositionManifold. Compose SphericalManifold with
+// the identity, and make sure periodicity is respected.
 
 #include "../tests.h"
 #include <fstream>
@@ -57,57 +58,47 @@ int main ()
 
   unsigned int n_intermediates = 32;
 
-  for (unsigned int n=0; n<2; ++n)
+  out << "set terminal aqua " << 0 << std::endl
+      << "set size ratio -1" << std::endl
+      << "plot '-' with vectors " << std::endl;
+
+  for (unsigned int v=0; v<sp.size(); ++v)
+    out << center << " "
+        << sp[v] << std::endl;
+
+
+  for (unsigned int i=0; i<n_intermediates+1; ++i)
     {
-      if (n == 1)
-        {
-          sp.push_back(manifold.push_forward(Point<2>(1.0, numbers::PI/4)));
-          sp.push_back(manifold.push_forward(Point<2>(1.0, numbers::PI*3/4)));
-          w.push_back(0);
-          w.push_back(0);
-        }
-      out << "set terminal aqua " << n << std::endl
-          << "set size ratio -1" << std::endl
-          << "plot '-' with vectors " << std::endl;
+      w[0] = 1.0-(double)i/((double)n_intermediates);
+      w[1] = 1.0 - w[0];
 
-      for (unsigned int v=0; v<sp.size(); ++v)
-        out << center << " "
-            << sp[v] << std::endl;
+      Point<spacedim> ip = manifold.get_new_point(Quadrature<spacedim>(sp, w));
+      Tensor<1,spacedim> t1 = manifold.get_tangent_vector(ip, sp[0]);
+      Tensor<1,spacedim> t2 = manifold.get_tangent_vector(ip, sp[1]);
 
-
-      for (unsigned int i=0; i<n_intermediates+1; ++i)
-        {
-          w[0] = 1.0-(double)i/((double)n_intermediates);
-          w[1] = 1.0 - w[0];
-
-          Point<spacedim> ip = manifold.get_new_point(Quadrature<spacedim>(sp, w));
-          Tensor<1,spacedim> t1 = manifold.get_tangent_vector(ip, sp[0]);
-          Tensor<1,spacedim> t2 = manifold.get_tangent_vector(ip, sp[1]);
-
-          out << ip << " "
-              << t2 << std::endl;
-        }
-
-      out << "e" << std::endl;
-
-      out << "set terminal aqua " << 2+n << std::endl
-          << "set size ratio -1" << std::endl
-          << "plot '-' w lp " << std::endl;
-
-      for (unsigned int i=0; i<n_intermediates+1; ++i)
-        {
-          w[0] = 1.0-(double)i/((double)n_intermediates);
-          w[1] = 1.0 - w[0];
-
-          Point<spacedim> ip = manifold.
-                               pull_back(manifold.get_new_point(Quadrature<spacedim>(sp, w)));
-
-          ip[0] = w[1];
-
-          out << ip << std::endl;
-        }
-      out << "e" << std::endl;
+      out << ip << " "
+          << t2 << std::endl;
     }
+
+  out << "e" << std::endl;
+
+  out << "set terminal aqua " << 1 << std::endl
+      << "set size ratio -1" << std::endl
+      << "plot '-' w lp " << std::endl;
+
+  for (unsigned int i=0; i<n_intermediates+1; ++i)
+    {
+      w[0] = 1.0-(double)i/((double)n_intermediates);
+      w[1] = 1.0 - w[0];
+
+      Point<spacedim> ip = manifold.
+                           pull_back(manifold.get_new_point(Quadrature<spacedim>(sp, w)));
+
+      ip[0] = w[1];
+
+      out << ip << std::endl;
+    }
+  out << "e" << std::endl;
 
   return 0;
 }
