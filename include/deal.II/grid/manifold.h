@@ -423,6 +423,19 @@ public:
                                        const Point<spacedim> &candidate) const;
 
   /**
+   * Given a point which lies close to the given manifold and to the given
+   * object, return one which lies on the Manifold.
+   *
+   * Internally this method calls the function project_to_manifold()
+   * passing the vertices of the object.
+   */
+  template<typename OBJ>
+  Point<spacedim>
+  project_to_manifold (const OBJ &obj,
+                       const Point<spacedim> &candidate) const;
+
+
+  /**
    * Backward compatibility interface.  Return the point which shall become
    * the new middle vertex of the two children of a regular line. In 2D, this
    * line is a line at the boundary, while in 3d, it is bounding a face at the
@@ -1234,6 +1247,17 @@ namespace Manifolds
     return points_weights;
   }
 }
+
+template <int dim, int spacedim>
+template <typename OBJ>
+Point<spacedim>
+Manifold<dim,spacedim>::project_to_manifold(const OBJ &obj,
+                                            const Point<spacedim> &candidate) const
+{
+  return project_to_manifold(Manifolds::get_default_quadrature(obj).get_points(),
+                             candidate);
+}
+
 
 #endif // DOXYGEN
 

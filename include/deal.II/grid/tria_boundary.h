@@ -162,11 +162,13 @@ public:
    * smoothing algorithms are used with a particular boundary object. The
    * default implementation of this function throws an exception of type
    * ExcPureFunctionCalled.
+   *
+   * @deprecated Use Manifold::project_to_manifold() instead.
    */
   virtual
   Point<spacedim>
   project_to_surface (const typename Triangulation<dim,spacedim>::line_iterator &line,
-                      const Point<spacedim> &candidate) const;
+                      const Point<spacedim> &candidate) const DEAL_II_DEPRECATED;
 
   /**
    * Same function as above but for a point that is to be projected onto the
@@ -175,11 +177,13 @@ public:
    * If spacedim<=2, then the surface represented by the quad iterator is the
    * entire space (i.e. it is a cell, not a part of the boundary), and the
    * returned point equals the given input point.
+   *
+   * @deprecated Use Manifold::project_to_manifold() instead.
    */
   virtual
   Point<spacedim>
   project_to_surface (const typename Triangulation<dim,spacedim>::quad_iterator &quad,
-                      const Point<spacedim> &candidate) const;
+                      const Point<spacedim> &candidate) const DEAL_II_DEPRECATED;
 
   /**
    * Same function as above but for a point that is to be projected onto the
@@ -188,11 +192,13 @@ public:
    * If spacedim<=3, then the manifold represented by the hex iterator is the
    * entire space (i.e. it is a cell, not a part of the boundary), and the
    * returned point equals the given input point.
+   *
+   * @deprecated Use Manifold::project_to_manifold() instead.
    */
   virtual
   Point<spacedim>
   project_to_surface (const typename Triangulation<dim,spacedim>::hex_iterator &hex,
-                      const Point<spacedim> &candidate) const;
+                      const Point<spacedim> &candidate) const DEAL_II_DEPRECATED;
 
 protected:
   /**
@@ -361,6 +367,14 @@ public:
   Point<spacedim>
   project_to_surface (const typename Triangulation<dim,spacedim>::hex_iterator &hex,
                       const Point<spacedim> &candidate) const;
+
+  /**
+   * Same function as above for arbitrary surrounding points.
+   */
+  virtual
+  Point<spacedim>
+  project_to_manifold (const std::vector<Point<spacedim> > &surrounding_points,
+                       const Point<spacedim> &candidate) const;
 };
 
 
