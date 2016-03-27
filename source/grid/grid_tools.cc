@@ -367,16 +367,31 @@ namespace GridTools
                           std::vector<CellData<dim> > &cells,
                           SubCellData                 &subcelldata)
   {
-    // first check which vertices are
-    // actually used
+    Assert(subcelldata.check_consistency(dim),
+           ExcMessage("Invalid SubCellData supplied according to ::check_consistency(). "
+                      "This is caused by data containing objects for the wrong dimension."));
+
+    // first check which vertices are actually used
     std::vector<bool> vertex_used (vertices.size(), false);
     for (unsigned int c=0; c<cells.size(); ++c)
       for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-        vertex_used[cells[c].vertices[v]] = true;
+        {
+          Assert(cells[c].vertices[v] < vertices.size(),
+                 ExcMessage("Invalid vertex index encountered! cells["
+                            + Utilities::int_to_string(c)
+                            + "].vertices["
+                            + Utilities::int_to_string(v)
+                            + "]="
+                            + Utilities::int_to_string(cells[c].vertices[v])
+                            + " is invalid, because only "
+                            + Utilities::int_to_string(vertices.size())
+                            + " vertices were supplied."));
+          vertex_used[cells[c].vertices[v]] = true;
+        }
 
-    // then renumber the vertices that
-    // are actually used in the same
-    // order as they were beforehand
+
+    // then renumber the vertices that are actually used in the same order as
+    // they were beforehand
     const unsigned int invalid_vertex = numbers::invalid_unsigned_int;
     std::vector<unsigned int> new_vertex_numbers (vertices.size(), invalid_vertex);
     unsigned int next_free_number = 0;
@@ -385,10 +400,9 @@ namespace GridTools
         {
           new_vertex_numbers[i] = next_free_number;
           ++next_free_number;
-        };
+        }
 
-    // next replace old vertex numbers
-    // by the new ones
+    // next replace old vertex numbers by the new ones
     for (unsigned int c=0; c<cells.size(); ++c)
       for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
         cells[c].vertices[v] = new_vertex_numbers[cells[c].vertices[v]];
@@ -396,17 +410,43 @@ namespace GridTools
     // same for boundary data
     for (unsigned int c=0; c<subcelldata.boundary_lines.size(); ++c)
       for (unsigned int v=0; v<GeometryInfo<1>::vertices_per_cell; ++v)
-        subcelldata.boundary_lines[c].vertices[v]
-          = new_vertex_numbers[subcelldata.boundary_lines[c].vertices[v]];
+        {
+          Assert(subcelldata.boundary_lines[c].vertices[v] < new_vertex_numbers.size(),
+                 ExcMessage("Invalid vertex index in subcelldata.boundary_lines. "
+                            "subcelldata.boundary_lines["
+                            + Utilities::int_to_string(c)
+                            + "].vertices["
+                            + Utilities::int_to_string(v)
+                            + "]="
+                            + Utilities::int_to_string(subcelldata.boundary_lines[c].vertices[v])
+                            + " is invalid, because only "
+                            + Utilities::int_to_string(vertices.size())
+                            + " vertices were supplied."));
+          subcelldata.boundary_lines[c].vertices[v]
+            = new_vertex_numbers[subcelldata.boundary_lines[c].vertices[v]];
+        }
+
     for (unsigned int c=0; c<subcelldata.boundary_quads.size(); ++c)
       for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
-        subcelldata.boundary_quads[c].vertices[v]
-          = new_vertex_numbers[subcelldata.boundary_quads[c].vertices[v]];
+        {
+          Assert(subcelldata.boundary_quads[c].vertices[v] < new_vertex_numbers.size(),
+                 ExcMessage("Invalid vertex index in subcelldata.boundary_quads. "
+                            "subcelldata.boundary_quads["
+                            + Utilities::int_to_string(c)
+                            + "].vertices["
+                            + Utilities::int_to_string(v)
+                            + "]="
+                            + Utilities::int_to_string(subcelldata.boundary_quads[c].vertices[v])
+                            + " is invalid, because only "
+                            + Utilities::int_to_string(vertices.size())
+                            + " vertices were supplied."));
 
-    // finally copy over the vertices
-    // which we really need to a new
-    // array and replace the old one by
-    // the new one
+          subcelldata.boundary_quads[c].vertices[v]
+            = new_vertex_numbers[subcelldata.boundary_quads[c].vertices[v]];
+        }
+
+    // finally copy over the vertices which we really need to a new array and
+    // replace the old one by the new one
     std::vector<Point<spacedim> > tmp;
     tmp.reserve (std::count(vertex_used.begin(), vertex_used.end(), true));
     for (unsigned int v=0; v<vertices.size(); ++v)
@@ -430,18 +470,24 @@ namespace GridTools
     // later on change that if necessary.
     std::vector<unsigned int> new_vertex_numbers(vertices.size());
     for (unsigned int i=0; i<vertices.size(); ++i)
-      new_vertex_numbers[i]=i;
+      new_vertex_numbers[i] = i;
 
     // if the considered_vertices vector is
     // empty, consider all vertices
     if (considered_vertices.size()==0)
-      considered_vertices=new_vertex_numbers;
+      considered_vertices = new_vertex_numbers;
+
+    Assert(considered_vertices.size() <= vertices.size(),
+           ExcInternalError());
+
 
     // now loop over all vertices to be
     // considered and try to find an identical
     // one
     for (unsigned int i=0; i<considered_vertices.size(); ++i)
       {
+        Assert(considered_vertices[i]<vertices.size(),
+               ExcInternalError());
         if (new_vertex_numbers[considered_vertices[i]]!=considered_vertices[i])
           // this vertex has been identified with
           // another one already, skip it in the
@@ -479,7 +525,7 @@ namespace GridTools
       for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
         cells[c].vertices[v]=new_vertex_numbers[cells[c].vertices[v]];
 
-    delete_unused_vertices(vertices,cells,subcelldata);
+    delete_unused_vertices(vertices, cells, subcelldata);
   }
 
 
