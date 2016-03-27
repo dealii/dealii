@@ -65,6 +65,16 @@ namespace Manifolds
    * of the object pointed to. An example of where this is necessary
    * is for mesh refinement, where (using the 2d situation as an example)
    * we need to first create new edge mid-points, and then a new cell-point.
+   *
+   * @param[in] iterator A mesh iterator that points to either a line, quad,
+   *   or hex.
+   * @param[in] with_laplace Whether or not to compute the quadrature weights
+   *   by solving a Laplace equation, as discussed above.
+   * @tparam MeshIteratorType An iterator type that corresponds to either
+   *   Triangulation::cell_iterator (or variants such as
+   *   Triangulation::active_cell_iterator or DoFHandler::cell_iterator) or
+   *   that is the result of statements such as
+   *   <code>cell-@>face(f)</code> or <code>cell-@>line(l)</code>.
    */
   template <typename MeshIteratorType>
   Quadrature<MeshIteratorType::AccessorType::space_dimension>
