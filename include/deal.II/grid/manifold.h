@@ -36,15 +36,40 @@ DEAL_II_NAMESPACE_OPEN
 namespace Manifolds
 {
   /**
-   * Given a general mesh iterator, construct a quadrature with the Laplace
-   * weights or with uniform weights according the parameter @p with_laplace,
-   * and with all relevant points of the iterator: vertices, line centers
-   * and/or face centers, which can be called when creating new vertices in
-   * the manifold routines.
+   * Given a general mesh iterator, construct a quadrature object that
+   * contains the following points:
+   * - If the iterator points to a line, then the quadrature points
+   *   are the two vertices of the line. This results in a quadrature
+   *   object with two points.
+   * - If the iterator points to a quad, then the quadrature points
+   *   are the vertices and line mid-points. This results in a quadrature
+   *   object with eight (4+4) points.
+   * - If the iterator points to a hex, then the quadrature points
+   *   are the vertices, the line mid-points, and the face mid-points.
+   *   This results in a quadrature object with 26 (8+12+6) points.
+   *
+   * The quadrature weights for these points are either chosen identically
+   * and equal to one over the number of quadrature points (if @p with_laplace
+   * is @p false), or in a way that gives points closer to the cell center
+   * (measured on the reference cell) a higher weight. These weights correspond
+   * to solving a Laplace equation and evaluating the solution at the quadrature
+   * points (if @p with_laplace is @p true).
+   *
+   * The function is primarily used to construct the input argument
+   * for the Manifold::get_new_point() function, which computes a new
+   * point on a manifold based on a weighted average of "surrounding"
+   * points represented by the quadrature points and weights stored in a
+   * Quadrature object. This function creates such an object based on
+   * the points that "surround" a cell, face, or edge, and weights
+   * are chosen in a way appropriate for computing the new "mid-point"
+   * of the object pointed to. An example of where this is necessary
+   * is for mesh refinement, where (using the 2d situation as an example)
+   * we need to first create new edge mid-points, and then a new cell-point.
    */
-  template <typename OBJECT>
-  Quadrature<OBJECT::AccessorType::space_dimension>
-  get_default_quadrature(const OBJECT &obj, bool with_laplace = false);
+  template <typename MeshIteratorType>
+  Quadrature<MeshIteratorType::AccessorType::space_dimension>
+  get_default_quadrature(const MeshIteratorType &iterator,
+                         const bool              with_laplace = false);
 }
 
 
@@ -871,11 +896,10 @@ get_new_point_on_hex (const Triangulation<3,3>::hex_iterator &) const;
 
 namespace Manifolds
 {
-
-  template <typename OBJECT>
-  Quadrature<OBJECT::AccessorType::space_dimension>
-  get_default_quadrature(const OBJECT &obj,
-                         const bool with_laplace)
+  template <typename MeshIteratorType>
+  Quadrature<MeshIteratorType::AccessorType::space_dimension>
+  get_default_quadrature(const MeshIteratorType &iterator,
+                         const bool              with_laplace)
   {
     const int spacedim = OBJECT::AccessorType::space_dimension;
     const int dim = OBJECT::AccessorType::structure_dimension;
@@ -893,9 +917,9 @@ namespace Manifolds
       case 1:
         sp.resize(2);
         wp.resize(2);
-        sp[0] = obj->vertex(0);
+        sp[0] = iterator->vertex(0);
         wp[0] = .5;
-        sp[1] = obj->vertex(1);
+        sp[1] = iterator->vertex(1);
         wp[1] = .5;
         break;
       case 2:
@@ -904,10 +928,10 @@ namespace Manifolds
 
         for (unsigned int i=0; i<4; ++i)
           {
-            sp[i] = obj->vertex(i);
-            sp[4+i] = ( obj->line(i)->has_children() ?
-                        obj->line(i)->child(0)->vertex(1) :
-                        obj->line(i)->get_manifold().get_new_point_on_line(obj->line(i)) );
+            sp[i] = iterator->vertex(i);
+            sp[4+i] = ( iterator->line(i)->has_children() ?
+                        iterator->line(i)->child(0)->vertex(1) :
+                        iterator->line(i)->get_manifold().get_new_point_on_line(iterator->line(i)) );
           }
 
         if (with_laplace)
@@ -921,7 +945,7 @@ namespace Manifolds
       case 3:
       {
         TriaIterator<TriaAccessor<3, 3, 3> > hex
-          = static_cast<TriaIterator<TriaAccessor<3, 3, 3> > >(obj);
+          = static_cast<TriaIterator<TriaAccessor<3, 3, 3> > >(iterator);
         const unsigned int np =
           GeometryInfo<dim>::vertices_per_cell+
           GeometryInfo<dim>::lines_per_cell+
