@@ -110,7 +110,18 @@ inconvenience this causes.
 <a name="specific"></a>
 <h3>Specific improvements</h3>
 
-<ol>
+<ol> 
+ <li> New: Add GridTools::remove_hanging_nodes() and 
+ GridTools::remove_anisotropy() in GridTools. GridTools::remove_hanging_nodes() 
+ detects cells with hanging nodes and refines the neighbours in the direction 
+ that removes hanging nodes or in everery directions. 
+ GridTools::remove_anisotropy() refines a mesh until the resulting mesh is 
+ composed by cells with ratio between the extension in each coordinate 
+ direction lower than a fixed value. 
+ <br>
+ (Mauro Bardelloni, 2016/03/28) 
+ </li>
+
  <li> New: The product of a rank-1 tensor (a vector) and a rank-2
  symmetric tensor (a symmetric matrix) is now defined and yields
  a rank-1 tensor (a vector). The opposite product was previously
