@@ -233,7 +233,8 @@ namespace LinearAlgebra
      */
     void import(const PETScWrappers::MPI::Vector &petsc_vec,
                 VectorOperation::values operation,
-                std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern = NULL);
+                std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern =
+                  std_cxx11::shared_ptr<const CommunicationPatternBase> ());
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -247,7 +248,8 @@ namespace LinearAlgebra
      */
     void import(const TrilinosWrappers::MPI::Vector &trilinos_vec,
                 VectorOperation::values operation,
-                std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern = NULL);
+                std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern =
+                  std_cxx11::shared_ptr<const CommunicationPatternBase> ());
 
     /**
      * Imports all the elements present in the vector's IndexSet from the input
@@ -259,7 +261,8 @@ namespace LinearAlgebra
      */
     void import(const EpetraWrappers::Vector &epetra_vec,
                 VectorOperation::values operation,
-                std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern = NULL);
+                std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern =
+                  std_cxx11::shared_ptr<const CommunicationPatternBase> ());
 #endif
 
     /**
