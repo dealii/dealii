@@ -13,9 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Check MappingManifold on faces. Create a sphere and make sure all
-// points returned by FEValues.get_quadrature_points are actually on
-// the circle.
+// Try to compute the area of a circle/sphere using JxW values.
 
 #include "../tests.h"
 
@@ -48,33 +46,33 @@ void test()
   triangulation.set_all_manifold_ids_on_boundary(0);
   triangulation.set_manifold (0, manifold);
 
-  MappingManifold<dim,spacedim> map_manifold;
-  FE_Q<dim,spacedim> fe(1);
-  const QGauss<dim-1> quad(5);
+  for (unsigned int cycle = 0; cycle<4; ++cycle)
+    {
+      MappingManifold<dim,spacedim> map_manifold;
+      FE_Q<dim,spacedim> fe(1);
+      const QGauss<dim-1> quad(3);
 
-  FEFaceValues<dim,spacedim> fe_v(map_manifold, fe, quad,
-                                  update_quadrature_points);
+      FEFaceValues<dim,spacedim> fe_v(map_manifold,
+                                      fe, quad,
+                                      update_JxW_values);
+      double area = 0;
 
-  out << "set size ratio -1" << std::endl
-      << "set terminal aqua " << dim+spacedim << std::endl
-      << (spacedim == 3 ? "s" : "") << "plot '-' w l " << std::endl;
-
-  for (typename Triangulation<dim,spacedim>::active_cell_iterator cell =
-         triangulation.begin_active(); cell != triangulation.end(); ++cell)
-    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-      if (cell->face(f)->at_boundary())
-        {
-          fe_v.reinit(cell, f);
-          const std::vector<Point<spacedim> > &qps = fe_v.get_quadrature_points();
-          for (unsigned int i=0; i<qps.size(); ++i)
+      for (typename Triangulation<dim,spacedim>::active_cell_iterator cell =
+             triangulation.begin_active(); cell != triangulation.end(); ++cell)
+        for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+          if (cell->face(f)->at_boundary())
             {
-              out << qps[i] << std::endl;
-              if (std::abs(qps[i].distance(center) -radius) > 1e-10)
-                out << "# Error! This should be on the sphere, but it's not!" << std::endl;
+              fe_v.reinit(cell, f);
+              for (unsigned int i=0; i<quad.size(); ++i)
+                area += fe_v.JxW(i);
             }
-          out << std::endl;
-        }
-  out << "e" << std::endl << std::endl;
+      deallog << "Cycle	      : " << cycle << std::endl;
+      deallog << "Surface Area  : " << area << std::endl;
+      deallog << "Error         : " << (area-(dim-1)*2*numbers::PI) << std::endl;
+
+      triangulation.refine_global(1);
+    }
+
 }
 
 
