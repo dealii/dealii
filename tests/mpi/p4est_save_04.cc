@@ -87,8 +87,12 @@ void test()
       for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); ++i)
         {
           unsigned int idx = locally_owned_dofs.nth_index_in_set (i);
+#ifdef PETSC_USE_COMPLEX
+          x (idx) = std::complex<double>(idx,0);
+#else
           x (idx) = idx;
-          deallog << '[' << idx << ']' << ' ' << x(idx) << std::endl;
+#endif
+          deallog << '[' << idx << ']' << ' ' << PetscRealPart(x(idx)) << std::endl;
         }
 
 
@@ -124,7 +128,7 @@ void test()
     DoFTools::extract_locally_relevant_dofs (dh, locally_relevant_dofs);
 
     PETScWrappers::MPI::Vector solution (locally_owned_dofs, com_all);
-    solution = 0;
+    solution = PetscScalar();
 
     parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector> soltrans (dh);
     soltrans.deserialize (solution);
@@ -132,7 +136,7 @@ void test()
     for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); ++i)
       {
         unsigned int idx = locally_owned_dofs.nth_index_in_set (i);
-        deallog << '[' << idx << ']' << ' ' << solution(idx) << std::endl;
+        deallog << '[' << idx << ']' << ' ' << PetscRealPart(solution(idx)) << std::endl;
       }
 
     deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
