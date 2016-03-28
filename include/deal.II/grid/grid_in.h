@@ -35,8 +35,11 @@ template <int dim> struct CellData;
  * grid structure into a triangulation object. At present, UCD (unstructured
  * cell data), DB Mesh, XDA, Gmsh, Tecplot, NetCDF, UNV, VTK, and Cubit are
  * supported as input format for grid data. Any numerical data other than
- * geometric (vertex locations) and topological (how vertices form cells)
- * information is ignored.
+ * geometric (vertex locations) and topological (how vertices form cells,
+ * faces, and edges) information is ignored, but the readers for the various
+ * formats generally do read information that associates material ids or
+ * boundary ids to cells or faces (see @ref GlossMaterialId "this" and
+ * @ref GlossBoundaryIndicator "this" glossary entry for more information).
  *
  * @note Since deal.II only supports line, quadrilateral and hexahedral
  * meshes, the functions in this class can only read meshes that consist
@@ -46,8 +49,8 @@ template <int dim> struct CellData;
  * http://code.google.com/p/tethex/wiki/Tethex .
  *
  * The mesh you read will form the coarsest level of a @p Triangulation
- * object. As such, it must not contain hanging nodes or other forms or
- * adaptive refinement and strange things will happen if the mesh represented
+ * object. As such, it must not contain hanging nodes or other forms of
+ * adaptive refinement, or strange things will happen if the mesh represented
  * by the input file does in fact have them. This is due to the fact that most
  * mesh description formats do not store neighborship information between
  * cells, so the grid reading functions have to regenerate it. They do so by
@@ -65,25 +68,25 @@ template <int dim> struct CellData;
  * has been adaptively refined, then this class is not your solution; rather
  * take a look at the PersistentTriangulation class.
  *
- * @note It is not uncommon to experience unexpected problems when reading
- * generated meshes for the first time using this class. If this applies to
- * you, be sure to read the documentation right until the end, and also read
- * the documentation of the GridReordering class.
+ * To read grid data, the triangulation to be filled has to be empty.
+ * Upon calling the functions of this class, the input file may
+ * contain only lines in one dimension; lines and quads in two
+ * dimensions; and lines, quads, and hexes in three dimensions. All
+ * other cell types (e.g. triangles in two dimensions, triangles or
+ * tetrahedra in 3d) are rejected.  (Here, the "dimension" refers to
+ * the dimensionality of the mesh; it may be embedded in a higher
+ * dimensional space, such as a mesh on the two-dimensional surface of
+ * the sphere embedded in 3d, or a 1d mesh that discretizes a line in
+ * 3d.) The result will be a triangulation that consists of the cells
+ * described in the input file, and to the degree possible with
+ * material indicators and boundary indicators correctly set as
+ * described in the input file.
  *
- * To read grid data, the triangulation to be fed with has to be empty. When
- * giving a file which does not contain the assumed information or which does
- * not keep to the right format, the state of the triangulation will be
- * undefined afterwards. Upon input, only lines in one dimension and line and
- * quads in two dimensions are accepted. All other cell types (e.g. triangles
- * in two dimensions, quads and hexes in 3d) are rejected. The vertex and cell
- * numbering in the input file, which need not be consecutively, is lost upon
- * transfer to the triangulation object, since this one needs consecutively
- * numbered elements.
- *
- * Material indicators are accepted to denote the material ID of cells and to
- * denote boundary part indication for lines in 2D. Read the according
- * sections in the documentation of the Triangulation class for further
- * details.
+ * @note You can not expect vertex and cell numbers in the triangulation
+ * to match those in the input file. (This is already clear based on the
+ * fact that we number cells and vertices separately, whereas this is not
+ * the case for some input file formats; some formats also do not require
+ * consecutive numbering, or start numbering at indices other than zero.)
  *
  *
  * <h3>Supported input formats</h3>
