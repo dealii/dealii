@@ -911,8 +911,8 @@ namespace Manifolds
   get_default_quadrature(const MeshIteratorType &iterator,
                          const bool              with_laplace)
   {
-    const int spacedim = OBJECT::AccessorType::space_dimension;
-    const int dim = OBJECT::AccessorType::structure_dimension;
+    const int spacedim = MeshIteratorType::AccessorType::space_dimension;
+    const int dim = MeshIteratorType::AccessorType::structure_dimension;
 
     std::vector<Point<spacedim> > sp;
     std::vector<double> wp;
