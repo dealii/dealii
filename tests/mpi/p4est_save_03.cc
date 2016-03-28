@@ -90,8 +90,8 @@ void test()
     for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); ++i)
       {
         unsigned int idx = locally_owned_dofs.nth_index_in_set (i);
-        x (idx) = idx;
-        x2 (idx) = 2 * idx;
+        x (idx) = static_cast<PETScWrappers::MPI::Vector::value_type>(idx);;
+        x2 (idx) = static_cast<PETScWrappers::MPI::Vector::value_type>(2 * idx);
 
 //  std::cout << '[' << idx << ']' << ' ' << solution(idx) << std::endl;
       }
@@ -138,7 +138,7 @@ void test()
     PETScWrappers::MPI::Vector solution2 (locally_owned_dofs, MPI_COMM_WORLD);
     parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector> soltrans (dh);
     parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector> soltrans2 (dh);
-    solution = 2;
+    solution = static_cast<PETScWrappers::MPI::Vector::value_type>(2);
     soltrans.deserialize (solution);
     soltrans2.deserialize (solution2);
 
@@ -146,8 +146,8 @@ void test()
       {
         unsigned int idx = locally_owned_dofs.nth_index_in_set (i);
         //std::cout << '[' << idx << ']' << ' ' << solution(idx) << std::endl;
-        AssertThrow (idx == solution (idx), ExcInternalError());
-        AssertThrow (2*idx == solution2 (idx), ExcInternalError());
+        AssertThrow (idx == PetscRealPart(solution (idx)), ExcInternalError());
+        AssertThrow (2*idx == PetscRealPart(solution2 (idx)), ExcInternalError());
       }
 
     double norm = solution.l1_norm();
