@@ -90,8 +90,8 @@ void test()
     for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); ++i)
       {
         unsigned int idx = locally_owned_dofs.nth_index_in_set (i);
-        x (idx) = static_cast<PETScWrappers::MPI::Vector::value_type>(idx);;
-        x2 (idx) = static_cast<PETScWrappers::MPI::Vector::value_type>(2 * idx);
+        x (idx) = idx;
+        x2 (idx) = 2 * idx;
 
 //  std::cout << '[' << idx << ']' << ' ' << solution(idx) << std::endl;
       }

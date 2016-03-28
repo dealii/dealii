@@ -86,11 +86,7 @@ void test()
     for (unsigned int i=0; i<locally_owned_dofs.n_elements(); ++i)
       {
         unsigned int idx = locally_owned_dofs.nth_index_in_set(i);
-#ifdef PETSC_USE_COMPLEX
-        x(idx)=std::complex<double>(idx,0);
-#else
         x(idx)=idx;
-#endif
 
 //  std::cout << '[' << idx << ']' << ' ' << solution(idx) << std::endl;
       }
@@ -131,11 +127,7 @@ void test()
 
     PETScWrappers::MPI::Vector solution(locally_owned_dofs, MPI_COMM_WORLD);
     parallel::distributed::SolutionTransfer<dim,PETScWrappers::MPI::Vector> soltrans(dh);
-#if PETSC_USE_COMPLEX
-    solution = std::complex<double>(2,0);
-#else
-    solution = 2;
-#endif
+    solution = 2.0;
     soltrans.deserialize(solution);
 
     for (unsigned int i=0; i<locally_owned_dofs.n_elements(); ++i)
