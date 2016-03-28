@@ -122,6 +122,13 @@ inconvenience this causes.
  (Mauro Bardelloni, 2016/03/28) 
  </li>
 
+ <li> New: When using C++11, a move constructor and assignment operator has
+ been added to SparseMatrix, so that these objects can be returned from
+ functions and packed into pairs and tuples.
+ <br>
+ (Daniel Shapero, 2016/03/27)
+ </li>
+
  <li> New: The product of a rank-1 tensor (a vector) and a rank-2
  symmetric tensor (a symmetric matrix) is now defined and yields
  a rank-1 tensor (a vector). The opposite product was previously
