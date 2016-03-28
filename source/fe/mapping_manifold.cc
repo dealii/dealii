@@ -160,8 +160,7 @@ initialize_face (const UpdateFlags      update_flags,
 
 template<int dim, int spacedim>
 MappingManifold<dim,spacedim>::MappingManifold ()
-{
-}
+{}
 
 
 
@@ -271,6 +270,15 @@ MappingManifold<dim,spacedim>::requires_update_flags (const UpdateFlags in) cons
       if (out & update_normal_vectors)
         out |= update_JxW_values;
     }
+
+  // Now throw an exception if we stumble upon something that was not
+  // implemented yet
+  Assert(!(out & (
+             update_jacobian_grads |
+             update_jacobian_pushed_forward_grads |
+             update_jacobian_pushed_forward_2nd_derivatives |
+             update_jacobian_pushed_forward_3rd_derivatives
+           )), ExcNotImplemented());
 
   return out;
 }

@@ -364,17 +364,6 @@ public:
   /**
    * @}
    */
-
-protected:
-
-  /**
-   * Transforms the point @p p on the real cell to the corresponding point on
-   * the unit cell @p cell by a Newton iteration.
-   */
-  // Point<dim>
-  // transform_real_to_unit_cell_internal (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  //                                       const Point<spacedim> &p,
-  //                                       const Point<dim> &initial_p_unit) const;
 };
 
 
