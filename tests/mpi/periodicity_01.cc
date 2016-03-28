@@ -81,7 +81,7 @@ namespace Step40
     void solve ();
     void refine_grid ();
     void get_point_value (const Point<dim> point, const int proc,
-                          Vector<double> &value) const;
+                          Vector<PetscScalar> &value) const;
     void check_periodicity (const unsigned int cycle) const;
     void output_results (const unsigned int cycle) const;
 
@@ -192,8 +192,8 @@ namespace Step40
     const unsigned int   dofs_per_cell = fe.dofs_per_cell;
     const unsigned int   n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
-    Vector<double>       cell_rhs (dofs_per_cell);
+    FullMatrix<PetscScalar>   cell_matrix (dofs_per_cell, dofs_per_cell);
+    Vector<PetscScalar>       cell_rhs (dofs_per_cell);
 
     std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
@@ -203,14 +203,14 @@ namespace Step40
     for (; cell!=endc; ++cell)
       if (cell->is_locally_owned())
         {
-          cell_matrix = 0;
-          cell_rhs = 0;
+          cell_matrix = PetscScalar();
+          cell_rhs = PetscScalar();
 
           fe_values.reinit (cell);
 
           for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
             {
-              double rhs_value
+              PetscScalar rhs_value
                 = (std::cos(2*numbers::PI*fe_values.quadrature_point(q_point)[0]) *
                    std::exp(-1*fe_values.quadrature_point(q_point)[0]) *
                    std::cos(2*numbers::PI*fe_values.quadrature_point(q_point)[1]) *
@@ -259,6 +259,7 @@ namespace Step40
 
     PETScWrappers::SolverCG solver(solver_control, mpi_communicator);
 
+#ifndef PETSC_USE_COMPLEX
     // Ask for a symmetric preconditioner by setting the first parameter in
     // AdditionalData to true.
     PETScWrappers::PreconditionBoomerAMG
@@ -267,6 +268,10 @@ namespace Step40
 
     solver.solve (system_matrix, completely_distributed_solution, system_rhs,
                   preconditioner);
+#else
+    solver.solve (system_matrix, completely_distributed_solution, system_rhs,
+                  PETScWrappers::PreconditionJacobi(system_matrix));
+#endif
 
     pcout << "   Solved in " << solver_control.last_step()
           << " iterations." << std::endl;
@@ -295,7 +300,7 @@ namespace Step40
 
   template <int dim>
   void LaplaceProblem<dim>::get_point_value
-  (const Point<dim> point, const int proc, Vector<double> &value) const
+  (const Point<dim> point, const int proc, Vector<PetscScalar> &value) const
   {
     typename DoFHandler<dim>::active_cell_iterator cell
       = GridTools::find_active_cell_around_point (dof_handler, point);
@@ -305,15 +310,34 @@ namespace Step40
                                 point, value);
 
     std::vector<double> tmp (value.size());
+    std::vector<double> tmp2 (value.size());
+#ifdef PETSC_USE_COMPLEX
+    std::vector<double> tmpI (value.size());
+    std::vector<double> tmp2I (value.size());
+
+    for (unsigned int i=0; i<value.size(); ++i)
+      {
+        tmp[i]=PetscRealPart(value[i]);
+        tmpI[i]=PetscImaginaryPart(value[i]);
+      }
+#else
     for (unsigned int i=0; i<value.size(); ++i)
       tmp[i]=value[i];
+#endif
 
-    std::vector<double> tmp2 (value.size());
     MPI_Reduce(&(tmp[0]), &(tmp2[0]), value.size(), MPI_DOUBLE,
                MPI_SUM, proc, mpi_communicator);
 
+#ifdef PETSC_USE_COMPELX
+    MPI_Reduce(&(tmpI[0]), &(tmp2I[0]), value.size(), MPI_DOUBLE,
+               MPI_SUM, proc, mpi_communicator);
+
+    for (unsigned int i=0; i<value.size(); ++i)
+      value[i]=std::complex<double>(tmp2[i],tmp2I[i]);
+#else
     for (unsigned int i=0; i<value.size(); ++i)
       value[i]=tmp2[i];
+#endif
   }
 
   template <int dim>
@@ -330,8 +354,8 @@ namespace Step40
 
     for (unsigned int i=1; i< n_points; i++)
       {
-        Vector<double> value1(1);
-        Vector<double> value2(1);
+        Vector<PetscScalar> value1(1);
+        Vector<PetscScalar> value2(1);
 
         Point <2> point1;
         point1(0)=1.*i/n_points;
@@ -345,13 +369,15 @@ namespace Step40
 
         if (Utilities::MPI::this_mpi_process(mpi_communicator)==0)
           {
-            pcout << point1 << "\t" << value1[0] << std::endl;
+            pcout << point1 << "\t" << PetscRealPart(value1[0]) << std::endl;
             if (std::abs(value2[0]-value1[0])>1e-8)
               {
                 std::cout<<point1<< "\t" << value1[0] << std::endl;
                 std::cout<<point2<< "\t" << value2[0] << std::endl;
                 Assert(false, ExcInternalError());
               }
+            Assert(std::fabs(PetscImaginaryPart(value1[0]))<1e-10,
+                   ExcInternalError());
           }
       }
   }
@@ -366,10 +392,10 @@ namespace Step40
     for (unsigned int i=1; i< n_points; i++)
       for (unsigned int j=1; j< n_points; j++)
         {
-          Vector<double> value1(1);
-          Vector<double> value2(1);
-          Vector<double> value3(1);
-          Vector<double> value4(1);
+          Vector<PetscScalar> value1(1);
+          Vector<PetscScalar> value2(1);
+          Vector<PetscScalar> value3(1);
+          Vector<PetscScalar> value4(1);
 
           Point <3> point1;
           point1(0)=1.*i/n_points;
@@ -395,20 +421,24 @@ namespace Step40
 
           if (Utilities::MPI::this_mpi_process(mpi_communicator)==0)
             {
-              pcout << point1 << "\t" << value1[0] << std::endl;
+              pcout << point1 << "\t" << PetscRealPart(value1[0]) << std::endl;
               if (std::abs(value2[0]-value1[0])>1e-8)
                 {
                   std::cout<<point1<< "\t" << value1[0] << std::endl;
                   std::cout<<point2<< "\t" << value2[0] << std::endl;
                   Assert(false, ExcInternalError());
                 }
-              pcout << point3 << "\t" << value3[0] << std::endl;
+              Assert(std::fabs(PetscImaginaryPart(value1[0]))<1e-10,
+                     ExcInternalError());
+              pcout << point3 << "\t" << PetscRealPart(value3[0]) << std::endl;
               if (std::abs(value4[0]-value3[0])>1e-8)
                 {
                   std::cout<<point3<< "\t" << value3[0] << std::endl;
                   std::cout<<point4<< "\t" << value4[0] << std::endl;
                   Assert(false, ExcInternalError());
                 }
+              Assert(std::fabs(PetscImaginaryPart(value3[0]))<1e-10,
+                     ExcInternalError());
             }
         }
   }
