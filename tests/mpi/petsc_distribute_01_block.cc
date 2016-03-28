@@ -112,19 +112,19 @@ void test()
 
   // verify correctness
   if (myid != 0)
-    AssertThrow (vec(vec.block(0).local_range().first+10) == vec.block(0).local_range().first-25,
+    AssertThrow (PetscRealPart(vec(vec.block(0).local_range().first+10)) == vec.block(0).local_range().first-25,
                  ExcInternalError());
 
   if (myid != n_processes-1)
-    AssertThrow (vec(vec.block(0).local_range().first+90) == vec.block(0).local_range().first+105,
+    AssertThrow (PetscRealPart(vec(vec.block(0).local_range().first+90)) == vec.block(0).local_range().first+105,
                  ExcInternalError());
 
   if (myid != 0)
-    AssertThrow (vec(vec.block(0).size()+vec.block(1).local_range().first+10) == vec.block(1).local_range().first-25,
+    AssertThrow (PetscRealPart(vec(vec.block(0).size()+vec.block(1).local_range().first+10)) == vec.block(1).local_range().first-25,
                  ExcInternalError());
 
   if (myid != n_processes-1)
-    AssertThrow (vec(vec.block(0).size()+vec.block(1).local_range().first+90) == vec.block(1).local_range().first+105,
+    AssertThrow (PetscRealPart(vec(vec.block(0).size()+vec.block(1).local_range().first+90)) == vec.block(1).local_range().first+105,
                  ExcInternalError());
 
 
@@ -134,8 +134,9 @@ void test()
           &&
           (i != vec.block(0).local_range().first+90))
         {
-          double val = vec.block(0)(i);
-          AssertThrow (std::fabs(val - i) <= 1e-6, ExcInternalError());
+          PetscScalar val = vec.block(0)(i);
+          AssertThrow (std::fabs(PetscRealPart(val) - i) <= 1e-6, ExcInternalError());
+          AssertThrow (PetscImaginaryPart(val) == 0.0, ExcInternalError());
         }
     }
   for (unsigned int i=vec.block(1).local_range().first; i<vec.block(1).local_range().second; ++i)
@@ -144,8 +145,9 @@ void test()
           &&
           (i != vec.block(1).local_range().first+90))
         {
-          double val = vec.block(1)(i);
-          AssertThrow (std::fabs(val - i) <= 1e-6, ExcInternalError());
+          PetscScalar val = vec.block(1)(i);
+          AssertThrow (std::fabs(PetscRealPart(val) - i) <= 1e-6, ExcInternalError());
+          AssertThrow ( PetscImaginaryPart(val) == 0.0, ExcInternalError());
         }
     }
 
