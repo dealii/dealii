@@ -41,17 +41,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
-template<int dim, int spacedim>
-const FE_Q<dim,spacedim>
-MappingManifold<dim,spacedim>::fe_q = FE_Q<dim,spacedim>(1);
-
-
-
 template<int dim, int spacedim>
 MappingManifold<dim,spacedim>::InternalData::InternalData ()
 {}
-
 
 
 template<int dim, int spacedim>
@@ -209,7 +201,7 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
   for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
     {
       vertices.push_back(cell->vertex(v));
-      weights.push_back(fe_q.shape_value(v,p));
+      weights.push_back(GeometryInfo<dim>::d_linear_shape_function(p,v));
     }
   return cell->get_manifold().get_new_point(Quadrature<spacedim>(vertices, weights));
 }
@@ -439,7 +431,7 @@ namespace internal
 
                   // Get the weights to compute the np point in real space
                   for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_cell; ++j)
-                    weights[j] = MappingManifold<dim,spacedim>::fe_q.shape_value(j, np);
+                    weights[j] = GeometryInfo<dim>::d_linear_shape_function(np, j);
 
                   Point<spacedim> NP=data.manifold->
                                      get_new_point(Quadrature<spacedim>(data.vertices, weights));

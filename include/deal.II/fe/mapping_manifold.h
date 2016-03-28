@@ -25,7 +25,6 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/fe/mapping.h>
-#include <deal.II/fe/fe_q.h>
 
 #include <cmath>
 
@@ -366,11 +365,6 @@ public:
    * @}
    */
 
-  /**
-   * An FE_Q object, used to compute weights for Manifold quadratures.
-   */
-  static const FE_Q<dim,spacedim> fe_q;
-
 protected:
 
   /**
@@ -413,7 +407,7 @@ MappingManifold<dim,spacedim>::InternalData::compute_manifold_quadrature_weights
     {
       for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
         {
-          cell_manifold_quadrature_weights[q][i] = fe_q.shape_value(i, quad.point(q));
+          cell_manifold_quadrature_weights[q][i] = GeometryInfo<dim>::d_linear_shape_function(quad.point(q), i);
         }
     }
 }
