@@ -13,7 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-// Check that MappingManifold and MappingQ1 are the same thing on a FlatManifold
+// Check that MappingManifold and MappingQ1 are the same thing on a
+// FlatManifold. Test on the quadrature points.
 
 #include "../tests.h"
 
@@ -64,10 +65,7 @@ void test()
 int
 main()
 {
-  std::ofstream logfile ("output");
-  deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
-
+  initlog();
 
   test<1,1>();
   test<2,2>();
