@@ -13,8 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
-// Check MappingManifold on faces. Create a sphere around a one cell
-// Triangulation, and make sure all points are on the circle.
+// Check MappingManifold on faces. Create a sphere and make sure all
+// points returned by FEValues.get_quadrature_points are actually on
+// the circle.
 
 #include "../tests.h"
 
@@ -29,20 +30,20 @@
 template<int dim, int spacedim>
 void test()
 {
-  deallog << "dim=" << dim << ", spacedim=" << spacedim << std::endl;
+  std::ostream &out = deallog.get_file_stream();
+
+  out << "# dim=" << dim << ", spacedim=" << spacedim << std::endl;
 
   Triangulation<dim, spacedim>   triangulation;
 
-  GridGenerator::hyper_cube (triangulation, 2.0, 3.0);
+  Point<spacedim> center;
+  center[0] = 1.5;
+  center[1] = 2.5;
 
-  typename Triangulation<dim,spacedim>::active_cell_iterator
-  cell = triangulation.begin_active();
+  double radius = 1.0;
 
-  // Center and radius of the Ball
-  Point<spacedim> center = cell->center();
-  double radius = center.distance(cell->vertex(0));
-
-  static  const SphericalManifold<dim,spacedim> manifold(cell->center());
+  static const SphericalManifold<dim,spacedim> manifold(center);
+  GridGenerator::hyper_ball (triangulation, center, radius);
 
   triangulation.set_all_manifold_ids_on_boundary(0);
   triangulation.set_manifold (0, manifold);
@@ -54,33 +55,35 @@ void test()
   FEFaceValues<dim,spacedim> fe_v(map_manifold, fe, quad,
                                   update_quadrature_points);
 
+  out << "set size ratio -1" << std::endl
+      << "set terminal aqua " << dim+spacedim << std::endl
+      << (spacedim == 3 ? "s" : "") << "plot '-' w l " << std::endl;
 
-
-  for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-    {
-      fe_v.reinit(cell, f);
-      const std::vector<Point<spacedim> > &qps = fe_v.get_quadrature_points();
-      for (unsigned int i=0; i<qps.size(); ++i)
-        if ( std::abs(qps[i].distance(center) - radius) > 1e-10)
-          {
-            deallog << "Expected radius: " << radius << ", got: "
-                    <<  qps[i].distance(center)
-                    << ", on point " << qps[i] << std::endl;
-          }
-    }
-  deallog << "OK" << std::endl;
+  for (typename Triangulation<dim,spacedim>::active_cell_iterator cell =
+         triangulation.begin_active(); cell != triangulation.end(); ++cell)
+    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      if (cell->face(f)->at_boundary())
+        {
+          fe_v.reinit(cell, f);
+          const std::vector<Point<spacedim> > &qps = fe_v.get_quadrature_points();
+          for (unsigned int i=0; i<qps.size(); ++i)
+            {
+              out << qps[i] << std::endl;
+              if (std::abs(qps[i].distance(center) -radius) > 1e-10)
+                out << "# Error! This should be on the sphere, but it's not!" << std::endl;
+            }
+          out << std::endl;
+        }
+  out << "e" << std::endl << std::endl;
 }
 
 
 int
 main()
 {
-  std::ofstream logfile ("output");
-  deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
+  initlog();
 
   test<2,2>();
-  test<2,3>();
 
   test<3,3>();
 
