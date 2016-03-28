@@ -46,17 +46,20 @@ void test ()
   PETScWrappers::MPI::Vector v(local_active, local_relevant, MPI_COMM_WORLD);
   PETScWrappers::MPI::Vector v2(local_active, local_relevant, MPI_COMM_WORLD);
 
-  vb = 1.5;
+  PetscScalar a = 1.5;
+  PetscScalar b = myid*2.0;
+  PetscScalar c = myid*2.0+1.0;
+  vb = a;
   v2 = vb;
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-    deallog << "ghost: " << v2(1) << std::endl;
-  Assert(v2(1) == 1.5, ExcInternalError());
-  Assert(v2(myid*2) == 1.5, ExcInternalError());
-  Assert(v2(myid*2+1) == 1.5, ExcInternalError());
+    deallog << "ghost: " << PetscRealPart(v2(1)) << std::endl;
+  Assert(PetscRealPart(v2(1)) == 1.5, ExcInternalError());
+  Assert(PetscRealPart(v2(myid*2)) == 1.5, ExcInternalError());
+  Assert(PetscRealPart(v2(myid*2+1)) == 1.5, ExcInternalError());
 
   // set local values
-  vb(myid*2)=myid*2.0;
-  vb(myid*2+1)=myid*2.0+1.0;
+  vb(myid*2)=b;
+  vb(myid*2+1)=c;
 
   vb.compress(VectorOperation::insert);
   vb*=2.0;
@@ -66,26 +69,26 @@ void test ()
   // check local values
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
-      deallog << myid*2 << ":" << v(myid*2) << std::endl;
-      deallog << myid*2+1 << ":" << v(myid*2+1) << std::endl;
+      deallog << myid*2 << ":" << PetscRealPart(v(myid*2)) << std::endl;
+      deallog << myid*2+1 << ":" << PetscRealPart(v(myid*2+1)) << std::endl;
     }
 
-  Assert(v(myid*2) == myid*4.0, ExcInternalError());
-  Assert(v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
+  Assert(PetscRealPart(v(myid*2)) == myid*4.0, ExcInternalError());
+  Assert(PetscRealPart(v(myid*2+1)) == myid*4.0+2.0, ExcInternalError());
 
 
   // check ghost values
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-    deallog << "ghost: " << v(1) << std::endl;
-  Assert(v(1) == 2.0, ExcInternalError());
+    deallog << "ghost: " << PetscRealPart(v(1)) << std::endl;
+  Assert(PetscRealPart(v(1)) == 2.0, ExcInternalError());
 
   //assignment from ghosted to ghosted
   v2 = v;
-  Assert(v2(1) == 2.0, ExcInternalError());
-  Assert(v2(myid*2) == myid*4.0, ExcInternalError());
-  Assert(v2(myid*2+1) == myid*4.0+2.0, ExcInternalError());
+  Assert(PetscRealPart(v2(1)) == 2.0, ExcInternalError());
+  Assert(PetscRealPart(v2(myid*2)) == myid*4.0, ExcInternalError());
+  Assert(PetscRealPart(v2(myid*2+1)) == myid*4.0+2.0, ExcInternalError());
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-    deallog << "ghost: " << v2(1) << std::endl;
+    deallog << "ghost: " << PetscRealPart(v2(1)) << std::endl;
 
   // done
   if (myid==0)
