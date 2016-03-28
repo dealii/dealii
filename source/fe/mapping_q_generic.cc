@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2015 by the deal.II authors
+// Copyright (C) 2000 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -769,7 +769,9 @@ initialize_face (const UpdateFlags      update_flags,
           const unsigned int nfaces = GeometryInfo<dim>::faces_per_cell;
           unit_tangentials.resize (nfaces*(dim-1),
                                    std::vector<Tensor<1,dim> > (n_original_q_points));
-          if (dim==2)
+          switch (dim)
+            {
+            case 2:
             {
               // ensure a counterclockwise
               // orientation of tangentials
@@ -781,8 +783,11 @@ initialize_face (const UpdateFlags      update_flags,
                   std::fill (unit_tangentials[i].begin(),
                              unit_tangentials[i].end(), tang);
                 }
+
+              break;
             }
-          else if (dim==3)
+
+            case 3:
             {
               for (unsigned int i=0; i<nfaces; ++i)
                 {
@@ -810,6 +815,12 @@ initialize_face (const UpdateFlags      update_flags,
                   std::fill (unit_tangentials[nfaces+i].begin(),
                              unit_tangentials[nfaces+i].end(), tang2);
                 }
+
+              break;
+            }
+
+            default:
+              Assert (false, ExcNotImplemented());
             }
         }
     }
