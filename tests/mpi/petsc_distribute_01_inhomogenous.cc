@@ -93,20 +93,12 @@ void test()
 
   // verify correctness
   if (myid != 0)
-    {
-      AssertThrow (PetscRealPart(vec(vec.local_range().first+10)) == vec.local_range().first-25+1,
-                   ExcInternalError());
-      AssertThrow (PetscImaginaryPart(vec(vec.local_range().first+10)) == 0.,
-                   ExcInternalError());
-    }
+    AssertThrow (get_real_assert_zero_imag(vec(vec.local_range().first+10)) == vec.local_range().first-25+1,
+                 ExcInternalError());
 
   if (myid != n_processes-1)
-    {
-      AssertThrow (PetscRealPart(vec(vec.local_range().first+90)) == vec.local_range().first+105-1,
-                   ExcInternalError());
-      AssertThrow (PetscImaginaryPart(vec(vec.local_range().first+90)) == 0.,
-                   ExcInternalError());
-    }
+    AssertThrow (get_real_assert_zero_imag(vec(vec.local_range().first+90)) == vec.local_range().first+105-1,
+                 ExcInternalError());
 
   for (unsigned int i=vec.local_range().first; i<vec.local_range().second; ++i)
     {
@@ -115,8 +107,7 @@ void test()
           (i != vec.local_range().first+90))
         {
           PetscScalar val = vec(i);
-          AssertThrow (std::fabs(PetscRealPart(val) - i) <= 1e-6, ExcInternalError());
-          AssertThrow (std::fabs(PetscImaginaryPart(val)) <= 1e-6, ExcInternalError());
+          AssertThrow (std::fabs(get_real_assert_zero_imag(val) - i) <= 1e-6, ExcInternalError());
         }
     }
 

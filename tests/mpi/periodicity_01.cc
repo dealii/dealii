@@ -317,7 +317,7 @@ namespace Step40
 
     for (unsigned int i=0; i<value.size(); ++i)
       {
-        tmp[i]=PetscRealPart(value[i]);
+        tmp[i]=get_real_assert_zero_imag(value[i]);
         tmpI[i]=PetscImaginaryPart(value[i]);
       }
 #else
@@ -369,15 +369,13 @@ namespace Step40
 
         if (Utilities::MPI::this_mpi_process(mpi_communicator)==0)
           {
-            pcout << point1 << "\t" << PetscRealPart(value1[0]) << std::endl;
+            pcout << point1 << "\t" << get_real_assert_zero_imag(value1[0]) << std::endl;
             if (std::abs(value2[0]-value1[0])>1e-8)
               {
                 std::cout<<point1<< "\t" << value1[0] << std::endl;
                 std::cout<<point2<< "\t" << value2[0] << std::endl;
                 Assert(false, ExcInternalError());
               }
-            Assert(std::fabs(PetscImaginaryPart(value1[0]))<1e-10,
-                   ExcInternalError());
           }
       }
   }
@@ -421,24 +419,20 @@ namespace Step40
 
           if (Utilities::MPI::this_mpi_process(mpi_communicator)==0)
             {
-              pcout << point1 << "\t" << PetscRealPart(value1[0]) << std::endl;
+              pcout << point1 << "\t" << get_real_assert_zero_imag(value1[0]) << std::endl;
               if (std::abs(value2[0]-value1[0])>1e-8)
                 {
                   std::cout<<point1<< "\t" << value1[0] << std::endl;
                   std::cout<<point2<< "\t" << value2[0] << std::endl;
                   Assert(false, ExcInternalError());
                 }
-              Assert(std::fabs(PetscImaginaryPart(value1[0]))<1e-10,
-                     ExcInternalError());
-              pcout << point3 << "\t" << PetscRealPart(value3[0]) << std::endl;
+              pcout << point3 << "\t" << get_real_assert_zero_imag(value3[0]) << std::endl;
               if (std::abs(value4[0]-value3[0])>1e-8)
                 {
                   std::cout<<point3<< "\t" << value3[0] << std::endl;
                   std::cout<<point4<< "\t" << value4[0] << std::endl;
                   Assert(false, ExcInternalError());
                 }
-              Assert(std::fabs(PetscImaginaryPart(value3[0]))<1e-10,
-                     ExcInternalError());
             }
         }
   }

@@ -88,7 +88,7 @@ void test()
         {
           unsigned int idx = locally_owned_dofs.nth_index_in_set (i);
           x (idx) = idx;
-          deallog << '[' << idx << ']' << ' ' << PetscRealPart(x(idx)) << std::endl;
+          deallog << '[' << idx << ']' << ' ' << get_real_assert_zero_imag(x(idx)) << std::endl;
         }
 
 
@@ -132,7 +132,7 @@ void test()
     for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); ++i)
       {
         unsigned int idx = locally_owned_dofs.nth_index_in_set (i);
-        deallog << '[' << idx << ']' << ' ' << PetscRealPart(solution(idx)) << std::endl;
+        deallog << '[' << idx << ']' << ' ' << get_real_assert_zero_imag(solution(idx)) << std::endl;
       }
 
     deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
