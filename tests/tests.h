@@ -78,6 +78,13 @@ PetscReal get_real_assert_zero_imag(const PETScWrappers::internal::VectorReferen
 #endif
 
 template<typename number>
+number get_real_assert_zero_imag(const std::complex<number> &a)
+{
+  Assert (a.imag() == 0.0, ExcInternalError());
+  return a.real();
+}
+
+template<typename number>
 number get_real_assert_zero_imag(const number &a)
 {
   return a;
