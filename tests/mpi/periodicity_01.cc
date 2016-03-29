@@ -311,33 +311,14 @@ namespace Step40
 
     std::vector<double> tmp (value.size());
     std::vector<double> tmp2 (value.size());
-#ifdef PETSC_USE_COMPLEX
-    std::vector<double> tmpI (value.size());
-    std::vector<double> tmp2I (value.size());
-
     for (unsigned int i=0; i<value.size(); ++i)
-      {
-        tmp[i]=get_real_assert_zero_imag(value[i]);
-        tmpI[i]=PetscImaginaryPart(value[i]);
-      }
-#else
-    for (unsigned int i=0; i<value.size(); ++i)
-      tmp[i]=value[i];
-#endif
+      tmp[i]=get_real_assert_zero_imag(value[i]);
 
     MPI_Reduce(&(tmp[0]), &(tmp2[0]), value.size(), MPI_DOUBLE,
                MPI_SUM, proc, mpi_communicator);
 
-#ifdef PETSC_USE_COMPELX
-    MPI_Reduce(&(tmpI[0]), &(tmp2I[0]), value.size(), MPI_DOUBLE,
-               MPI_SUM, proc, mpi_communicator);
-
-    for (unsigned int i=0; i<value.size(); ++i)
-      value[i]=std::complex<double>(tmp2[i],tmp2I[i]);
-#else
     for (unsigned int i=0; i<value.size(); ++i)
       value[i]=tmp2[i];
-#endif
   }
 
   template <int dim>
