@@ -127,7 +127,7 @@ void test()
 
     PETScWrappers::MPI::Vector solution(locally_owned_dofs, MPI_COMM_WORLD);
     parallel::distributed::SolutionTransfer<dim,PETScWrappers::MPI::Vector> soltrans(dh);
-    solution = 2.0;
+    solution = 2;
     soltrans.deserialize(solution);
 
     for (unsigned int i=0; i<locally_owned_dofs.n_elements(); ++i)
