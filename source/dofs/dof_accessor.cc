@@ -84,6 +84,43 @@ DoFCellAccessor<DoFHandlerType,lda>::neighbor_child_on_subface (const unsigned i
 
 
 
+template <typename DoFHandlerType, bool lda>
+TriaIterator<DoFCellAccessor<DoFHandlerType,lda> >
+DoFCellAccessor<DoFHandlerType,lda>::periodic_neighbor_child_on_subface (const unsigned int face,
+    const unsigned int subface) const
+{
+  const TriaIterator<CellAccessor<dim,spacedim> > q
+    = CellAccessor<dim,spacedim>::periodic_neighbor_child_on_subface (face, subface);
+  return TriaIterator<DoFCellAccessor<DoFHandlerType,lda> > (*q, this->dof_handler);
+}
+
+
+
+template <typename DoFHandlerType, bool lda>
+inline
+TriaIterator<DoFCellAccessor<DoFHandlerType,lda> >
+DoFCellAccessor<DoFHandlerType,lda>::periodic_neighbor (const unsigned int face) const
+{
+  const TriaIterator<CellAccessor<dim,spacedim> > q
+    = CellAccessor<dim,spacedim>::periodic_neighbor (face);
+  return TriaIterator<DoFCellAccessor<DoFHandlerType,lda> > (*q, this->dof_handler);
+}
+
+
+
+template <typename DoFHandlerType, bool lda>
+inline
+TriaIterator<DoFCellAccessor<DoFHandlerType,lda> >
+DoFCellAccessor<DoFHandlerType,lda>::neighbor_or_periodic_neighbor (const unsigned int face) const
+{
+  const TriaIterator<CellAccessor<dim,spacedim> > q
+    = CellAccessor<dim,spacedim>::neighbor_or_periodic_neighbor (face);
+  return TriaIterator<DoFCellAccessor<DoFHandlerType,lda> > (*q, this->dof_handler);
+}
+
+
+
+
 // --------------------------------------------------------------------------
 // explicit instantiations
 #include "dof_accessor.inst"
