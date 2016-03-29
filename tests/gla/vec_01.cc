@@ -64,18 +64,18 @@ void test ()
   // check local values
   if (myid==0)
     {
-      deallog << myid*2 << ":" << v(myid*2) << std::endl;
-      deallog << myid*2+1 << ":" << v(myid*2+1) << std::endl;
+      deallog << myid*2 << ":" << get_real_assert_zero_imag(v(myid*2)) << std::endl;
+      deallog << myid*2+1 << ":" << get_real_assert_zero_imag(v(myid*2+1)) << std::endl;
     }
 
-  Assert(v(myid*2) == myid*4.0, ExcInternalError());
-  Assert(v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
+  Assert(get_real_assert_zero_imag(v(myid*2)) == myid*4.0, ExcInternalError());
+  Assert(get_real_assert_zero_imag(v(myid*2+1)) == myid*4.0+2.0, ExcInternalError());
 
 
   // check ghost values
   if (myid==0)
-    deallog << "ghost: " << v(1) << std::endl;
-  Assert(v(1) == 2.0, ExcInternalError());
+    deallog << "ghost: " << get_real_assert_zero_imag(v(1)) << std::endl;
+  Assert(get_real_assert_zero_imag(v(1)) == 2.0, ExcInternalError());
 
   // done
   if (myid==0)
