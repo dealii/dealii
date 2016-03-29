@@ -2625,12 +2625,16 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                   }
                 else
                   {
-                    const unsigned int codim = spacedim-dim;
-                    (void)codim;
-
                     if (update_flags & update_normal_vectors)
                       {
-                        Assert( codim==1 , ExcMessage("There is no cell normal in codim 2."));
+                        Assert(spacedim == dim+1,
+                               ExcMessage("There is no (unique) cell normal for "
+                                          + Utilities::int_to_string(dim) +
+                                          "-dimensional cells in "
+                                          + Utilities::int_to_string(spacedim) +
+                                          "-dimensional space. This only works if the "
+                                          "space dimension is one greater than the "
+                                          "dimensionality of the mesh cells."));
 
                         if (dim==1)
                           output_data.normal_vectors[point] =
