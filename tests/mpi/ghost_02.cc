@@ -46,10 +46,7 @@ void test ()
   PETScWrappers::MPI::Vector v(local_active, local_relevant, MPI_COMM_WORLD);
   PETScWrappers::MPI::Vector v2(local_active, local_relevant, MPI_COMM_WORLD);
 
-  PetscScalar a = 1.5;
-  PetscScalar b = myid*2.0;
-  PetscScalar c = myid*2.0+1.0;
-  vb = a;
+  vb = 1.5;
   v2 = vb;
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "ghost: " << get_real_assert_zero_imag(v2(1)) << std::endl;
@@ -58,8 +55,8 @@ void test ()
   Assert(get_real_assert_zero_imag(v2(myid*2+1)) == 1.5, ExcInternalError());
 
   // set local values
-  vb(myid*2)=b;
-  vb(myid*2+1)=c;
+  vb(myid*2)=myid*2.0;
+  vb(myid*2+1)=myid*2.0+1.0;
 
   vb.compress(VectorOperation::insert);
   vb*=2.0;
