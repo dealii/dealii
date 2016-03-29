@@ -74,8 +74,8 @@ void test ()
   // check local values
   if (myid==0)
     {
-      deallog << "1,1 : " << mat(1,1) << std::endl;
-      deallog << "0,1 : " << mat(0,1) << std::endl;
+      deallog << "1,1 : " << get_real_assert_zero_imag(mat(1,1)) << std::endl;
+      deallog << "0,1 : " << get_real_assert_zero_imag(mat(0,1)) << std::endl;
     }
 
   // done
