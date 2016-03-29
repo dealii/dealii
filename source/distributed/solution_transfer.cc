@@ -200,7 +200,7 @@ namespace parallel
     unsigned int
     SolutionTransfer<dim, VectorType, DoFHandlerType>::get_data_size() const
     {
-      return sizeof(double)* DoFTools::max_dofs_per_cell(*dof_handler);
+      return sizeof(typename VectorType::value_type)* DoFTools::max_dofs_per_cell(*dof_handler);
     }
 
 
@@ -222,7 +222,6 @@ namespace parallel
            ++it)
         {
           cell->get_interpolated_dof_values(*(*it), dofvalues);
-          Assert (typeid(typename VectorType::value_type) == typeid(double), ExcNotImplemented());
           std::memcpy(data_store, &dofvalues(0), sizeof(typename VectorType::value_type)*dofs_per_cell);
           data_store += dofs_per_cell;
         }
@@ -248,7 +247,6 @@ namespace parallel
            it != all_out.end();
            ++it)
         {
-          Assert (typeid(typename VectorType::value_type) == typeid(double), ExcNotImplemented());
           std::memcpy(&dofvalues(0), data_store, sizeof(typename VectorType::value_type)*dofs_per_cell);
           cell->set_dof_values_by_interpolation(dofvalues, *(*it));
           data_store += dofs_per_cell;
