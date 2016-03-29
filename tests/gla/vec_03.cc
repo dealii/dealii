@@ -66,12 +66,12 @@ void test ()
 
   // check local values
   {
-    deallog << myid*2 << ": " << v(myid*2) << std::endl;
-    deallog << myid*2+1 << ": " << v(myid*2+1) << std::endl;
+    deallog << myid*2 << ": " << get_real_assert_zero_imag(v(myid*2)) << std::endl;
+    deallog << myid*2+1 << ": " << get_real_assert_zero_imag(v(myid*2+1)) << std::endl;
   }
 
-  Assert(v(myid*2) == myid*4.0, ExcInternalError());
-  Assert(v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
+  Assert(get_real_assert_zero_imag(v(myid*2)) == myid*4.0, ExcInternalError());
+  Assert(get_real_assert_zero_imag(v(myid*2+1)) == myid*4.0+2.0, ExcInternalError());
 
   ConstraintMatrix cm;
   cm.add_line(1);
@@ -79,10 +79,10 @@ void test ()
   cm.close();
 
   if (myid==0)
-    deallog << "before: " << vb(1) << std::endl;
+    deallog << "before: " << get_real_assert_zero_imag(vb(1)) << std::endl;
   cm.distribute(vb); // this should set x(1)= 3.0 * x(2) = 12.0
   if (myid==0)
-    deallog << "after: " << vb(1) << std::endl;
+    deallog << "after: " << get_real_assert_zero_imag(vb(1)) << std::endl;
 
   // done
   if (myid==0)
