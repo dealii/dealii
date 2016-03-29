@@ -77,8 +77,8 @@ void test ()
 
   if (myid==0)
     {
-      deallog << "(0,0) = " << matrix(0,0) << std::endl;
-      deallog << "(1,1) = " << matrix(1,1) << std::endl;
+      deallog << "(0,0) = " << get_real_assert_zero_imag(matrix(0,0)) << std::endl;
+      deallog << "(1,1) = " << get_real_assert_zero_imag(matrix(1,1)) << std::endl;
     }
 
   // done
