@@ -138,7 +138,7 @@ void test()
     PETScWrappers::MPI::Vector solution2 (locally_owned_dofs, MPI_COMM_WORLD);
     parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector> soltrans (dh);
     parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector> soltrans2 (dh);
-    solution = static_cast<PETScWrappers::MPI::Vector::value_type>(2);
+    solution = 2;
     soltrans.deserialize (solution);
     soltrans2.deserialize (solution2);
 
