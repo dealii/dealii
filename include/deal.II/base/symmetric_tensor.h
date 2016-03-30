@@ -3067,16 +3067,8 @@ double_contract (SymmetricTensor<2,3,Number> &tmp,
 
 
 /**
- * Multiplication operator performing a contraction of the last index of the
- * first argument and the first index of the second argument. This function
- * therefore does the same as the corresponding <tt>contract</tt> function,
- * but returns the result as a return value, rather than writing it into the
- * reference given as the first argument to the <tt>contract</tt> function.
- *
- * Note that for the <tt>Tensor</tt> class, the multiplication operator only
- * performs a contraction over a single pair of indices. This is in contrast
- * to the multiplication operator for symmetric tensors, which does the double
- * contraction.
+ * Multiply a symmetric rank-2 tensor (i.e., a matrix) by a rank-1 tensor
+ * (i.e., a vector). The result is a rank-1 tensor (i.e., a vector).
  *
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -3091,6 +3083,23 @@ operator * (const SymmetricTensor<2,dim,Number> &src1,
     for (unsigned int j=0; j<dim; ++j)
       dest[i] += src1[i][j] * src2[j];
   return dest;
+}
+
+
+/**
+ * Multiply a rank-1 tensor (i.e., a vector) by a symmetric rank-2 tensor
+ * (i.e., a matrix). The result is a rank-1 tensor (i.e., a vector).
+ *
+ * @relates SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+template <int dim, typename Number>
+Tensor<1,dim,Number>
+operator * (const Tensor<1,dim,Number> &src1,
+            const SymmetricTensor<2,dim,Number> &src2)
+{
+  // this is easy for symmetric tensors:
+  return src2 * src1;
 }
 
 
