@@ -1301,7 +1301,12 @@ FE_Q_Base<PolynomialType,dim,spacedim>
           double sum = 0;
           for (unsigned int col=0; col<this->dofs_per_cell; ++col)
             sum += prolongate(row,col);
-          Assert (std::fabs(sum-1.) < eps, ExcInternalError());
+
+          // check that the row sum of these matrices adds up to
+          // 1. there are dofs_per_cell terms in this sum, so make the
+          // tolerance proportional to this
+          Assert (std::fabs(sum-1.) < 1e-15*this->dofs_per_cell,
+                  ExcInternalError());
         }
 #endif
 
