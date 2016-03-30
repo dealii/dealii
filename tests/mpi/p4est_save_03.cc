@@ -146,8 +146,8 @@ void test()
       {
         unsigned int idx = locally_owned_dofs.nth_index_in_set (i);
         //std::cout << '[' << idx << ']' << ' ' << solution(idx) << std::endl;
-        AssertThrow (idx == solution (idx), ExcInternalError());
-        AssertThrow (2*idx == solution2 (idx), ExcInternalError());
+        AssertThrow (idx == get_real_assert_zero_imag(solution (idx)), ExcInternalError());
+        AssertThrow (2*idx == get_real_assert_zero_imag(solution2 (idx)), ExcInternalError());
       }
 
     double norm = solution.l1_norm();

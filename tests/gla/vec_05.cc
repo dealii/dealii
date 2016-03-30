@@ -78,7 +78,7 @@ void test ()
   x.reinit(g);
   Assert(x.has_ghost_elements(), ExcInternalError());
   Assert(x.size()==g.size(), ExcInternalError());
-  deallog << x(1) << std::endl;
+  deallog << get_real_assert_zero_imag(x(1)) << std::endl;
 
   x.reinit(v);
   Assert(!x.has_ghost_elements(), ExcInternalError());

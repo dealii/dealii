@@ -138,7 +138,7 @@ namespace Step40
                                       locally_relevant_dofs,
                                       mpi_communicator);
     system_rhs.reinit (locally_owned_dofs, mpi_communicator);
-    system_rhs = 0;
+    system_rhs = PetscScalar();
 
     constraints.clear ();
     constraints.reinit (locally_relevant_dofs);
@@ -182,8 +182,8 @@ namespace Step40
     const unsigned int   dofs_per_cell = fe.dofs_per_cell;
     const unsigned int   n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
-    Vector<double>       cell_rhs (dofs_per_cell);
+    FullMatrix<PetscScalar>   cell_matrix (dofs_per_cell, dofs_per_cell);
+    Vector<PetscScalar>       cell_rhs (dofs_per_cell);
 
     std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
@@ -193,8 +193,8 @@ namespace Step40
     for (; cell!=endc; ++cell)
       if (cell->is_locally_owned())
         {
-          cell_matrix = 0;
-          cell_rhs = 0;
+          cell_matrix = PetscScalar();
+          cell_rhs = PetscScalar();
 
           fe_values.reinit (cell);
 
@@ -248,6 +248,7 @@ namespace Step40
 
     PETScWrappers::SolverCG solver(solver_control, mpi_communicator);
 
+#ifndef PETSC_USE_COMPLEX
     PETScWrappers::PreconditionBoomerAMG
     preconditioner(system_matrix,
                    PETScWrappers::PreconditionBoomerAMG::AdditionalData(true));
@@ -256,6 +257,12 @@ namespace Step40
       solver.solve (system_matrix, completely_distributed_solution, system_rhs,
                     preconditioner),
       solver_control.last_step(), 10, 10);
+#else
+    check_solver_within_range(
+      solver.solve (system_matrix, completely_distributed_solution, system_rhs,
+                    PETScWrappers::PreconditionJacobi(system_matrix)),
+      solver_control.last_step(), 120, 260);
+#endif
 
     pcout << "   Solved in " << solver_control.last_step()
           << " iterations." << std::endl;

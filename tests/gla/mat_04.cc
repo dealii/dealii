@@ -65,7 +65,7 @@ void test ()
                               (dim==3) ? 96 : 12,
                               true);
 
-  FE_Q<dim>                                 temperature_fe(1);
+  FE_Q<dim> temperature_fe(1);
 
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs (temperature_fe);

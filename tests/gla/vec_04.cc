@@ -71,10 +71,10 @@ void test ()
     typename LA::MPI::Vector x;
     x=v; // x is empty so it should copy layout(with ghosts) and data
     Assert(x.has_ghost_elements(), ExcInternalError());
-    deallog << "ghosted value: " << x(1) << std::endl;
+    deallog << "ghosted value: " << get_real_assert_zero_imag(x(1)) << std::endl;
     x=vb; // import, so keep ghost elements
     Assert(x.has_ghost_elements(), ExcInternalError());
-    deallog << "ghosted value: " << x(1) << std::endl;
+    deallog << "ghosted value: " << get_real_assert_zero_imag(x(1)) << std::endl;
   }
   {
     typename LA::MPI::Vector x;
@@ -83,7 +83,7 @@ void test ()
     x=test;
     x=v;
     Assert(x.has_ghost_elements(), ExcInternalError());
-    deallog << "ghosted value: " << x(1) << std::endl;
+    deallog << "ghosted value: " << get_real_assert_zero_imag(x(1)) << std::endl;
   }
 
   // done

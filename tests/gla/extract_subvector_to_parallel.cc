@@ -53,7 +53,7 @@ void test (VectorType &vector)
   std::vector<typename VectorType::value_type> values1 (indices.size());
   vector.extract_subvector_to (indices, values1);
   for (unsigned int j=0; j<vector.size()/2; ++j)
-    AssertThrow (values1[j] == 2*j, ExcInternalError());
+    AssertThrow (get_real_assert_zero_imag(values1[j]) == 2*j, ExcInternalError());
 
   // do the same with the version of the function that takes iterators
   std::vector<typename VectorType::value_type> values2 (indices.size());
@@ -61,7 +61,7 @@ void test (VectorType &vector)
                                indices.end(),
                                values2.begin());
   for (unsigned int j=0; j<vector.size()/2; ++j)
-    AssertThrow (values2[j] == 2*j, ExcInternalError());
+    AssertThrow (get_real_assert_zero_imag(values2[j]) == 2*j, ExcInternalError());
 
   // done
   if (myid==0)
