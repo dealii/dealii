@@ -209,7 +209,7 @@ namespace MeshWorker
       for (unsigned int face_no=0; face_no < GeometryInfo<ITERATOR::AccessorType::Container::dimension>::faces_per_cell; ++face_no)
         {
           typename ITERATOR::AccessorType::Container::face_iterator face = cell->face(face_no);
-          if (cell->at_boundary(face_no))
+          if (cell->at_boundary(face_no) && !cell->has_periodic_neighbor(face_no))
             {
               // only integrate boundary faces of own cells
               if (integrate_boundary && own_cell)
@@ -223,7 +223,7 @@ namespace MeshWorker
           else if (integrate_interior_face)
             {
               // Interior face
-              TriaIterator<typename ITERATOR::AccessorType> neighbor = cell->neighbor(face_no);
+              TriaIterator<typename ITERATOR::AccessorType> neighbor = cell->neighbor_or_periodic_neighbor(face_no);
 
               types::subdomain_id neighbid = numbers::artificial_subdomain_id;
               if (neighbor->is_level_cell())
@@ -247,17 +247,12 @@ namespace MeshWorker
               if (own_cell != own_neighbor && loop_control.faces_to_ghost==LoopControl::never)
                 continue;
 
-              // Deal with
-              // refinement edges
-              // from the refined
-              // side. Assuming
-              // one-irregular
-              // meshes, this
-              // situation should
-              // only occur if
-              // both cells are
-              // active.
-              if (cell->neighbor_is_coarser(face_no))
+              // Deal with refinement edges from the refined side. Assuming one-irregular
+              // meshes, this situation should only occur if both cells are active.
+              const bool periodic_neighbor = cell->has_periodic_neighbor(face_no);
+
+              if ((!periodic_neighbor && cell->neighbor_is_coarser(face_no))
+                  ||(periodic_neighbor && cell->periodic_neighbor_is_coarser(face_no)))
                 {
                   Assert(!cell->has_children(), ExcInternalError());
                   Assert(!neighbor->has_children(), ExcInternalError());
@@ -269,7 +264,9 @@ namespace MeshWorker
                     continue;
 
                   const std::pair<unsigned int, unsigned int> neighbor_face_no
-                    = cell->neighbor_of_coarser_neighbor(face_no);
+                    = periodic_neighbor?
+                      cell->periodic_neighbor_of_coarser_periodic_neighbor(face_no):
+                      cell->neighbor_of_coarser_neighbor(face_no);
                   const typename ITERATOR::AccessorType::Container::face_iterator nface
                     = neighbor->face(neighbor_face_no.first);
 
@@ -321,8 +318,10 @@ namespace MeshWorker
                       && (neighbid < csid))
                     continue;
 
-                  const unsigned int neighbor_face_no = cell->neighbor_face_no(face_no);
-                  Assert (neighbor->face(neighbor_face_no) == face, ExcInternalError());
+                  const unsigned int neighbor_face_no = periodic_neighbor?
+                                                        cell->periodic_neighbor_face_no(face_no):
+                                                        cell->neighbor_face_no(face_no);
+                  Assert (periodic_neighbor || neighbor->face(neighbor_face_no) == face, ExcInternalError());
                   // Regular interior face
                   dof_info.interior_face_available[face_no] = true;
                   dof_info.exterior_face_available[face_no] = true;
