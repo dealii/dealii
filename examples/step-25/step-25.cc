@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2006 - 2015 by the deal.II authors
+ * Copyright (C) 2006 - 2016 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -397,7 +397,7 @@ namespace Step25
   // @sect4{SineGordonProblem::compute_nl_term}
 
   // This function computes the vector $S(\cdot,\cdot)$, which appears in the
-  // nonlinear term in the both equations of the split formulation. This
+  // nonlinear term in both equations of the split formulation. This
   // function not only simplifies the repeated computation of this term, but
   // it is also a fundamental part of the nonlinear iterative solver that we
   // use when the time stepping is implicit (i.e. $\theta\ne 0$). Moreover, we
