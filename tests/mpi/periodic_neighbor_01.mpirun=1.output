@@ -1,4 +1,4 @@
-JobId water.ices.utexas.edu Wed Mar 23 14:13:30 2016
+
 DEAL:0::First, we check the periodic faces on a uniformly refined mesh.
 DEAL:0::All of the cells with periodic neighbors on rank 0
 DEAL:0::2.00000 16.0000 is a periodic neighbor of 2.00000 0.00000. And periodic neighbor has the same level.
