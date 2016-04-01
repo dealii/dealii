@@ -62,6 +62,22 @@ Subscriptor::Subscriptor (const Subscriptor &)
 {}
 
 
+
+#ifdef DEAL_II_WITH_CXX11
+Subscriptor::Subscriptor (Subscriptor &&subscriptor)
+  :
+  counter(0),
+  object_info (subscriptor.object_info)
+{
+  // Explicitly invoke the destructor of `Subscriptor` for the object
+  // to be moved from in order to guarantee that we're not moving an
+  // object that has subscriptions.
+  subscriptor.~Subscriptor();
+}
+#endif
+
+
+
 Subscriptor::~Subscriptor ()
 {
   // check whether there are still
@@ -136,6 +152,13 @@ Subscriptor::~Subscriptor ()
   // do_unsubscribe below that the
   // object is unused now.
   counter = 0;
+
+#ifdef DEAL_II_WITH_CXX11
+  object_info = nullptr;
+#else
+  object_info = 0;
+#endif
+
 #endif
 }
 

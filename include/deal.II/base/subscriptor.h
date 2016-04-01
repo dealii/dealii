@@ -69,6 +69,16 @@ public:
    */
   Subscriptor(const Subscriptor &);
 
+#ifdef DEAL_II_WITH_CXX11
+  /**
+   * Move constructor.
+   *
+   * An object inheriting from Subscriptor can only be moved if no other
+   * objects are subscribing to it.
+   */
+  Subscriptor(Subscriptor&&);
+#endif
+
   /**
    * Destructor, asserting that the counter is zero.
    */
