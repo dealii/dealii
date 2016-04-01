@@ -110,7 +110,7 @@ inconvenience this causes.
 <a name="specific"></a>
 <h3>Specific improvements</h3>
 
-<ol> 
+<ol>
  <li> New: Add GridTools::remove_hanging_nodes() and 
  GridTools::remove_anisotropy() in GridTools. GridTools::remove_hanging_nodes() 
  detects cells with hanging nodes and refines the neighbours in the direction 
@@ -135,6 +135,12 @@ inconvenience this causes.
  already defined.
  <br>
  (Wolfgang Bangerth, 2016/03/25)
+ </li>
+
+ <li> New: Triangulation::add_periodicity allows for accessing neighbors across
+ periodic boundaries via new functions in TriaAccessor.
+ <br>
+ (Daniel Arndt, Ali Samii, 2016/03/23)
  </li>
 
  <li> Fixed: DoFHandler::locally_owned_dofs() could create a segmentation

@@ -1,0 +1,345 @@
+
+DEAL:0::First, we check the periodic faces on a uniformly refined mesh.
+DEAL:0::All of the cells with periodic neighbors on rank 0
+DEAL:0::2.00000 16.0000 is a periodic neighbor of 2.00000 0.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 2.00000 0.00000 should be equal to 2.00000 0.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::6.00000 16.0000 is a periodic neighbor of 6.00000 0.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 6.00000 0.00000 should be equal to 6.00000 0.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::10.0000 16.0000 is a periodic neighbor of 10.0000 0.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 10.0000 0.00000 should be equal to 10.0000 0.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::14.0000 16.0000 is a periodic neighbor of 14.0000 0.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 14.0000 0.00000 should be equal to 14.0000 0.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::2.00000 0.00000 is a periodic neighbor of 2.00000 16.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 2.00000 16.0000 should be equal to 2.00000 16.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::6.00000 0.00000 is a periodic neighbor of 6.00000 16.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 6.00000 16.0000 should be equal to 6.00000 16.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::10.0000 0.00000 is a periodic neighbor of 10.0000 16.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 10.0000 16.0000 should be equal to 10.0000 16.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::14.0000 0.00000 is a periodic neighbor of 14.0000 16.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 14.0000 16.0000 should be equal to 14.0000 16.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::Next, we check the periodic faces on an adaptively refined mesh.
+DEAL:0::All of the cells with periodic neighbors on rank 0
+DEAL:0::2.00000 16.0000 is a periodic neighbor of 2.00000 0.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 2.00000 0.00000 should be equal to 2.00000 0.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::14.0000 16.0000 is a periodic neighbor of 14.0000 0.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 14.0000 0.00000 should be equal to 14.0000 0.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::2.00000 0.00000 is a periodic neighbor of 2.00000 16.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 2.00000 16.0000 should be equal to 2.00000 16.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::14.0000 0.00000 is a periodic neighbor of 14.0000 16.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 14.0000 16.0000 should be equal to 14.0000 16.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::5.00000 0.00000 is a periodic neighbor of 5.00000 16.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 5.00000 16.0000 should be equal to 5.00000 16.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::5.00000 16.0000 is a periodic neighbor of 5.00000 0.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 5.00000 0.00000 should be equal to 5.00000 0.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::7.00000 16.0000 is a periodic neighbor of 7.00000 0.00000. And periodic neighbor is refined.
+DEAL:0::If the periodic neighbor is not coarser, 7.00000 0.00000 should be equal to 7.00000 0.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::9.00000 16.0000 is a periodic neighbor of 9.00000 0.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 9.00000 0.00000 should be equal to 9.00000 0.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::11.0000 16.0000 is a periodic neighbor of 11.0000 0.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 11.0000 0.00000 should be equal to 11.0000 0.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::9.00000 0.00000 is a periodic neighbor of 9.00000 16.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 9.00000 16.0000 should be equal to 9.00000 16.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::11.0000 0.00000 is a periodic neighbor of 11.0000 16.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 11.0000 16.0000 should be equal to 11.0000 16.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::7.00000 0.00000 is a periodic neighbor of 6.50000 16.0000. And periodic neighbor is coarser.
+DEAL:0::If the periodic neighbor is not coarser, 7.00000 16.0000 should be equal to 6.50000 16.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::7.00000 0.00000 is a periodic neighbor of 7.50000 16.0000. And periodic neighbor is coarser.
+DEAL:0::If the periodic neighbor is not coarser, 7.00000 16.0000 should be equal to 7.50000 16.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::First, we check the periodic faces on a uniformly refined mesh.
+DEAL:0::All of the cells with periodic neighbors on rank 0
+DEAL:0::2.00000 16.0000 2.00000 is a periodic neighbor of 2.00000 0.00000 2.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 2.00000 0.00000 2.00000 should be equal to 2.00000 0.00000 2.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::6.00000 16.0000 2.00000 is a periodic neighbor of 6.00000 0.00000 2.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 6.00000 0.00000 2.00000 should be equal to 6.00000 0.00000 2.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::2.00000 16.0000 6.00000 is a periodic neighbor of 2.00000 0.00000 6.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 2.00000 0.00000 6.00000 should be equal to 2.00000 0.00000 6.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::6.00000 16.0000 6.00000 is a periodic neighbor of 6.00000 0.00000 6.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 6.00000 0.00000 6.00000 should be equal to 6.00000 0.00000 6.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::10.0000 16.0000 2.00000 is a periodic neighbor of 10.0000 0.00000 2.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 10.0000 0.00000 2.00000 should be equal to 10.0000 0.00000 2.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::14.0000 16.0000 2.00000 is a periodic neighbor of 14.0000 0.00000 2.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 14.0000 0.00000 2.00000 should be equal to 14.0000 0.00000 2.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::10.0000 16.0000 6.00000 is a periodic neighbor of 10.0000 0.00000 6.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 10.0000 0.00000 6.00000 should be equal to 10.0000 0.00000 6.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::14.0000 16.0000 6.00000 is a periodic neighbor of 14.0000 0.00000 6.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 14.0000 0.00000 6.00000 should be equal to 14.0000 0.00000 6.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::2.00000 0.00000 2.00000 is a periodic neighbor of 2.00000 16.0000 2.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 2.00000 16.0000 2.00000 should be equal to 2.00000 16.0000 2.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::6.00000 0.00000 2.00000 is a periodic neighbor of 6.00000 16.0000 2.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 6.00000 16.0000 2.00000 should be equal to 6.00000 16.0000 2.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::2.00000 0.00000 6.00000 is a periodic neighbor of 2.00000 16.0000 6.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 2.00000 16.0000 6.00000 should be equal to 2.00000 16.0000 6.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::6.00000 0.00000 6.00000 is a periodic neighbor of 6.00000 16.0000 6.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 6.00000 16.0000 6.00000 should be equal to 6.00000 16.0000 6.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::10.0000 0.00000 2.00000 is a periodic neighbor of 10.0000 16.0000 2.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 10.0000 16.0000 2.00000 should be equal to 10.0000 16.0000 2.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::14.0000 0.00000 2.00000 is a periodic neighbor of 14.0000 16.0000 2.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 14.0000 16.0000 2.00000 should be equal to 14.0000 16.0000 2.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::10.0000 0.00000 6.00000 is a periodic neighbor of 10.0000 16.0000 6.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 10.0000 16.0000 6.00000 should be equal to 10.0000 16.0000 6.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::14.0000 0.00000 6.00000 is a periodic neighbor of 14.0000 16.0000 6.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 14.0000 16.0000 6.00000 should be equal to 14.0000 16.0000 6.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::2.00000 16.0000 10.0000 is a periodic neighbor of 2.00000 0.00000 10.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 2.00000 0.00000 10.0000 should be equal to 2.00000 0.00000 10.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::6.00000 16.0000 10.0000 is a periodic neighbor of 6.00000 0.00000 10.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 6.00000 0.00000 10.0000 should be equal to 6.00000 0.00000 10.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::2.00000 16.0000 14.0000 is a periodic neighbor of 2.00000 0.00000 14.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 2.00000 0.00000 14.0000 should be equal to 2.00000 0.00000 14.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::6.00000 16.0000 14.0000 is a periodic neighbor of 6.00000 0.00000 14.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 6.00000 0.00000 14.0000 should be equal to 6.00000 0.00000 14.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::10.0000 16.0000 10.0000 is a periodic neighbor of 10.0000 0.00000 10.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 10.0000 0.00000 10.0000 should be equal to 10.0000 0.00000 10.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::14.0000 16.0000 10.0000 is a periodic neighbor of 14.0000 0.00000 10.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 14.0000 0.00000 10.0000 should be equal to 14.0000 0.00000 10.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::10.0000 16.0000 14.0000 is a periodic neighbor of 10.0000 0.00000 14.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 10.0000 0.00000 14.0000 should be equal to 10.0000 0.00000 14.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::14.0000 16.0000 14.0000 is a periodic neighbor of 14.0000 0.00000 14.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 14.0000 0.00000 14.0000 should be equal to 14.0000 0.00000 14.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::2.00000 0.00000 10.0000 is a periodic neighbor of 2.00000 16.0000 10.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 2.00000 16.0000 10.0000 should be equal to 2.00000 16.0000 10.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::6.00000 0.00000 10.0000 is a periodic neighbor of 6.00000 16.0000 10.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 6.00000 16.0000 10.0000 should be equal to 6.00000 16.0000 10.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::2.00000 0.00000 14.0000 is a periodic neighbor of 2.00000 16.0000 14.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 2.00000 16.0000 14.0000 should be equal to 2.00000 16.0000 14.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::6.00000 0.00000 14.0000 is a periodic neighbor of 6.00000 16.0000 14.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 6.00000 16.0000 14.0000 should be equal to 6.00000 16.0000 14.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::10.0000 0.00000 10.0000 is a periodic neighbor of 10.0000 16.0000 10.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 10.0000 16.0000 10.0000 should be equal to 10.0000 16.0000 10.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::14.0000 0.00000 10.0000 is a periodic neighbor of 14.0000 16.0000 10.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 14.0000 16.0000 10.0000 should be equal to 14.0000 16.0000 10.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::10.0000 0.00000 14.0000 is a periodic neighbor of 10.0000 16.0000 14.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 10.0000 16.0000 14.0000 should be equal to 10.0000 16.0000 14.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::14.0000 0.00000 14.0000 is a periodic neighbor of 14.0000 16.0000 14.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 14.0000 16.0000 14.0000 should be equal to 14.0000 16.0000 14.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::Next, we check the periodic faces on an adaptively refined mesh.
+DEAL:0::All of the cells with periodic neighbors on rank 0
+DEAL:0::2.00000 16.0000 2.00000 is a periodic neighbor of 2.00000 0.00000 2.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 2.00000 0.00000 2.00000 should be equal to 2.00000 0.00000 2.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::6.00000 16.0000 2.00000 is a periodic neighbor of 6.00000 0.00000 2.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 6.00000 0.00000 2.00000 should be equal to 6.00000 0.00000 2.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::2.00000 16.0000 6.00000 is a periodic neighbor of 2.00000 0.00000 6.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 2.00000 0.00000 6.00000 should be equal to 2.00000 0.00000 6.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::10.0000 16.0000 2.00000 is a periodic neighbor of 10.0000 0.00000 2.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 10.0000 0.00000 2.00000 should be equal to 10.0000 0.00000 2.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::14.0000 16.0000 2.00000 is a periodic neighbor of 14.0000 0.00000 2.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 14.0000 0.00000 2.00000 should be equal to 14.0000 0.00000 2.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::14.0000 16.0000 6.00000 is a periodic neighbor of 14.0000 0.00000 6.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 14.0000 0.00000 6.00000 should be equal to 14.0000 0.00000 6.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::2.00000 0.00000 2.00000 is a periodic neighbor of 2.00000 16.0000 2.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 2.00000 16.0000 2.00000 should be equal to 2.00000 16.0000 2.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::6.00000 0.00000 2.00000 is a periodic neighbor of 6.00000 16.0000 2.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 6.00000 16.0000 2.00000 should be equal to 6.00000 16.0000 2.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::2.00000 0.00000 6.00000 is a periodic neighbor of 2.00000 16.0000 6.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 2.00000 16.0000 6.00000 should be equal to 2.00000 16.0000 6.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::10.0000 0.00000 2.00000 is a periodic neighbor of 10.0000 16.0000 2.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 10.0000 16.0000 2.00000 should be equal to 10.0000 16.0000 2.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::14.0000 0.00000 2.00000 is a periodic neighbor of 14.0000 16.0000 2.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 14.0000 16.0000 2.00000 should be equal to 14.0000 16.0000 2.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::14.0000 0.00000 6.00000 is a periodic neighbor of 14.0000 16.0000 6.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 14.0000 16.0000 6.00000 should be equal to 14.0000 16.0000 6.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::2.00000 16.0000 10.0000 is a periodic neighbor of 2.00000 0.00000 10.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 2.00000 0.00000 10.0000 should be equal to 2.00000 0.00000 10.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::2.00000 16.0000 14.0000 is a periodic neighbor of 2.00000 0.00000 14.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 2.00000 0.00000 14.0000 should be equal to 2.00000 0.00000 14.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::6.00000 16.0000 14.0000 is a periodic neighbor of 6.00000 0.00000 14.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 6.00000 0.00000 14.0000 should be equal to 6.00000 0.00000 14.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::14.0000 16.0000 10.0000 is a periodic neighbor of 14.0000 0.00000 10.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 14.0000 0.00000 10.0000 should be equal to 14.0000 0.00000 10.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::10.0000 16.0000 14.0000 is a periodic neighbor of 10.0000 0.00000 14.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 10.0000 0.00000 14.0000 should be equal to 10.0000 0.00000 14.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::14.0000 16.0000 14.0000 is a periodic neighbor of 14.0000 0.00000 14.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 14.0000 0.00000 14.0000 should be equal to 14.0000 0.00000 14.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::2.00000 0.00000 10.0000 is a periodic neighbor of 2.00000 16.0000 10.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 2.00000 16.0000 10.0000 should be equal to 2.00000 16.0000 10.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::2.00000 0.00000 14.0000 is a periodic neighbor of 2.00000 16.0000 14.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 2.00000 16.0000 14.0000 should be equal to 2.00000 16.0000 14.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::6.00000 0.00000 14.0000 is a periodic neighbor of 6.00000 16.0000 14.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 6.00000 16.0000 14.0000 should be equal to 6.00000 16.0000 14.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::14.0000 0.00000 10.0000 is a periodic neighbor of 14.0000 16.0000 10.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 14.0000 16.0000 10.0000 should be equal to 14.0000 16.0000 10.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::10.0000 0.00000 14.0000 is a periodic neighbor of 10.0000 16.0000 14.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 10.0000 16.0000 14.0000 should be equal to 10.0000 16.0000 14.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::14.0000 0.00000 14.0000 is a periodic neighbor of 14.0000 16.0000 14.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 14.0000 16.0000 14.0000 should be equal to 14.0000 16.0000 14.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::5.00000 0.00000 5.00000 is a periodic neighbor of 5.00000 16.0000 5.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 5.00000 16.0000 5.00000 should be equal to 5.00000 16.0000 5.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::7.00000 0.00000 5.00000 is a periodic neighbor of 7.00000 16.0000 5.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 7.00000 16.0000 5.00000 should be equal to 7.00000 16.0000 5.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::5.00000 0.00000 7.00000 is a periodic neighbor of 5.00000 16.0000 7.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 5.00000 16.0000 7.00000 should be equal to 5.00000 16.0000 7.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::5.00000 16.0000 5.00000 is a periodic neighbor of 5.00000 0.00000 5.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 5.00000 0.00000 5.00000 should be equal to 5.00000 0.00000 5.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::7.00000 16.0000 5.00000 is a periodic neighbor of 7.00000 0.00000 5.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 7.00000 0.00000 5.00000 should be equal to 7.00000 0.00000 5.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::5.00000 16.0000 7.00000 is a periodic neighbor of 5.00000 0.00000 7.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 5.00000 0.00000 7.00000 should be equal to 5.00000 0.00000 7.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::7.00000 16.0000 7.00000 is a periodic neighbor of 7.00000 0.00000 7.00000. And periodic neighbor is refined.
+DEAL:0::If the periodic neighbor is not coarser, 7.00000 0.00000 7.00000 should be equal to 7.00000 0.00000 7.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::9.00000 16.0000 5.00000 is a periodic neighbor of 9.00000 0.00000 5.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 9.00000 0.00000 5.00000 should be equal to 9.00000 0.00000 5.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::11.0000 16.0000 5.00000 is a periodic neighbor of 11.0000 0.00000 5.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 11.0000 0.00000 5.00000 should be equal to 11.0000 0.00000 5.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::9.00000 16.0000 7.00000 is a periodic neighbor of 9.00000 0.00000 7.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 9.00000 0.00000 7.00000 should be equal to 9.00000 0.00000 7.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::11.0000 16.0000 7.00000 is a periodic neighbor of 11.0000 0.00000 7.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 11.0000 0.00000 7.00000 should be equal to 11.0000 0.00000 7.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::9.00000 0.00000 5.00000 is a periodic neighbor of 9.00000 16.0000 5.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 9.00000 16.0000 5.00000 should be equal to 9.00000 16.0000 5.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::11.0000 0.00000 5.00000 is a periodic neighbor of 11.0000 16.0000 5.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 11.0000 16.0000 5.00000 should be equal to 11.0000 16.0000 5.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::9.00000 0.00000 7.00000 is a periodic neighbor of 9.00000 16.0000 7.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 9.00000 16.0000 7.00000 should be equal to 9.00000 16.0000 7.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::11.0000 0.00000 7.00000 is a periodic neighbor of 11.0000 16.0000 7.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 11.0000 16.0000 7.00000 should be equal to 11.0000 16.0000 7.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::5.00000 16.0000 9.00000 is a periodic neighbor of 5.00000 0.00000 9.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 5.00000 0.00000 9.00000 should be equal to 5.00000 0.00000 9.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::7.00000 16.0000 9.00000 is a periodic neighbor of 7.00000 0.00000 9.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 7.00000 0.00000 9.00000 should be equal to 7.00000 0.00000 9.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::5.00000 16.0000 11.0000 is a periodic neighbor of 5.00000 0.00000 11.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 5.00000 0.00000 11.0000 should be equal to 5.00000 0.00000 11.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::7.00000 16.0000 11.0000 is a periodic neighbor of 7.00000 0.00000 11.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 7.00000 0.00000 11.0000 should be equal to 7.00000 0.00000 11.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::9.00000 16.0000 9.00000 is a periodic neighbor of 9.00000 0.00000 9.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 9.00000 0.00000 9.00000 should be equal to 9.00000 0.00000 9.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::11.0000 16.0000 9.00000 is a periodic neighbor of 11.0000 0.00000 9.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 11.0000 0.00000 9.00000 should be equal to 11.0000 0.00000 9.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::9.00000 16.0000 11.0000 is a periodic neighbor of 9.00000 0.00000 11.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 9.00000 0.00000 11.0000 should be equal to 9.00000 0.00000 11.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::11.0000 16.0000 11.0000 is a periodic neighbor of 11.0000 0.00000 11.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 11.0000 0.00000 11.0000 should be equal to 11.0000 0.00000 11.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::5.00000 0.00000 9.00000 is a periodic neighbor of 5.00000 16.0000 9.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 5.00000 16.0000 9.00000 should be equal to 5.00000 16.0000 9.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::7.00000 0.00000 9.00000 is a periodic neighbor of 7.00000 16.0000 9.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 7.00000 16.0000 9.00000 should be equal to 7.00000 16.0000 9.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::5.00000 0.00000 11.0000 is a periodic neighbor of 5.00000 16.0000 11.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 5.00000 16.0000 11.0000 should be equal to 5.00000 16.0000 11.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::7.00000 0.00000 11.0000 is a periodic neighbor of 7.00000 16.0000 11.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 7.00000 16.0000 11.0000 should be equal to 7.00000 16.0000 11.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::9.00000 0.00000 9.00000 is a periodic neighbor of 9.00000 16.0000 9.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 9.00000 16.0000 9.00000 should be equal to 9.00000 16.0000 9.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::11.0000 0.00000 9.00000 is a periodic neighbor of 11.0000 16.0000 9.00000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 11.0000 16.0000 9.00000 should be equal to 11.0000 16.0000 9.00000
+DEAL:0::-------------------------------------------------------
+DEAL:0::9.00000 0.00000 11.0000 is a periodic neighbor of 9.00000 16.0000 11.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 9.00000 16.0000 11.0000 should be equal to 9.00000 16.0000 11.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::11.0000 0.00000 11.0000 is a periodic neighbor of 11.0000 16.0000 11.0000. And periodic neighbor has the same level.
+DEAL:0::If the periodic neighbor is not coarser, 11.0000 16.0000 11.0000 should be equal to 11.0000 16.0000 11.0000
+DEAL:0::-------------------------------------------------------
+DEAL:0::7.00000 0.00000 7.00000 is a periodic neighbor of 6.50000 16.0000 6.50000. And periodic neighbor is coarser.
+DEAL:0::If the periodic neighbor is not coarser, 7.00000 16.0000 7.00000 should be equal to 6.50000 16.0000 6.50000
+DEAL:0::-------------------------------------------------------
+DEAL:0::7.00000 0.00000 7.00000 is a periodic neighbor of 7.50000 16.0000 6.50000. And periodic neighbor is coarser.
+DEAL:0::If the periodic neighbor is not coarser, 7.00000 16.0000 7.00000 should be equal to 7.50000 16.0000 6.50000
+DEAL:0::-------------------------------------------------------
+DEAL:0::7.00000 0.00000 7.00000 is a periodic neighbor of 6.50000 16.0000 7.50000. And periodic neighbor is coarser.
+DEAL:0::If the periodic neighbor is not coarser, 7.00000 16.0000 7.00000 should be equal to 6.50000 16.0000 7.50000
+DEAL:0::-------------------------------------------------------
+DEAL:0::7.00000 0.00000 7.00000 is a periodic neighbor of 7.50000 16.0000 7.50000. And periodic neighbor is coarser.
+DEAL:0::If the periodic neighbor is not coarser, 7.00000 16.0000 7.00000 should be equal to 7.50000 16.0000 7.50000
+DEAL:0::-------------------------------------------------------

@@ -173,6 +173,7 @@ void check
   generate_grid(triangulation, orientation);
   set_periodicity(triangulation, reverse);
 
+  //first without refinement
   FE_Q<dim> fe(1);
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
@@ -230,6 +231,51 @@ void check
             << std::endl;
   AssertThrow(n_constraints == n_expected_constraints,
               ExcDimensionMismatch(n_constraints, n_expected_constraints));
+
+  //now refine and check if the neighboring faces are correctly found
+  typename Triangulation<dim>::active_cell_iterator cell;
+  for (cell = triangulation.begin_active(); cell != triangulation.end(); ++cell)
+    if (cell->is_locally_owned() && cell->center()(dim-1)>0)
+      cell->set_refine_flag();
+
+  triangulation.execute_coarsening_and_refinement();
+
+  typedef std::pair<typename Triangulation<dim>::cell_iterator, unsigned int> CellFace;
+  const typename std::map<CellFace, std::pair<CellFace, std::bitset<3> > > &face_map = triangulation.get_periodic_face_map();
+  typename std::map<CellFace, std::pair<CellFace, std::bitset<3> > >::const_iterator it;
+  int sum_of_pairs_local = face_map.size();
+  int sum_of_pairs_global;
+  MPI_Allreduce(&sum_of_pairs_local, &sum_of_pairs_global, 1, MPI_INT, MPI_SUM, triangulation.get_communicator());
+  Assert(sum_of_pairs_global>0, ExcInternalError());
+  for (it = face_map.begin(); it != face_map.end(); ++it)
+    {
+      const typename Triangulation<dim>::cell_iterator cell_1 = it->first.first;
+      const unsigned int face_no_1 = it->first.second;
+      const typename Triangulation<dim>::cell_iterator cell_2 = it->second.first.first;
+      const unsigned int face_no_2 = it->second.first.second;
+      const Point<dim> face_center_1 = cell_1->face(face_no_1)->center();
+      const Point<dim> face_center_2 = cell_2->face(face_no_2)->center();
+      Assert(std::min(std::abs(face_center_1(dim-1)-3.), std::abs(face_center_1(dim-1)+3.))<1.e-8, ExcInternalError());
+      Assert(std::min(std::abs(face_center_2(dim-1)-3.), std::abs(face_center_2(dim-1)+3.))<1.e-8, ExcInternalError());
+      if (cell_1->level()== cell_2->level())
+        for (unsigned int c = 0; c<dim-1; ++c)
+          if (std::abs(face_center_1(c)-face_center_2(c))>1.e-8)
+            {
+              std::cout << "face_center_1: " << face_center_1 << std::endl;
+              std::cout << "face_center_2: " << face_center_2 << std::endl;
+              typename std::map<CellFace, std::pair<CellFace, std::bitset<3> > >::const_iterator it;
+              for (it = triangulation.get_periodic_face_map().begin();
+                   it !=  triangulation.get_periodic_face_map().end(); ++it)
+                {
+                  std::cout << "The cell with center " << it->first.first->center()
+                            << " has on face " << it->first.second
+                            << " as neighbor the cell with center " << it->second.first.first->center()
+                            << " on face " << it->second.first.second
+                            << std::endl;
+                }
+              Assert(false, ExcInternalError());
+            }
+    }
 }
 
 int main (int argc, char *argv[])
