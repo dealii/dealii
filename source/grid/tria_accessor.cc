@@ -1943,7 +1943,9 @@ neighbor_or_periodic_neighbor (const unsigned int i_face) const
   else if (this->has_periodic_neighbor(i_face))
     return this->periodic_neighbor(i_face);
   else
-    Assert (false, TriaAccessorExceptions::ExcNoPeriodicNeighbor());
+    AssertThrow (false, TriaAccessorExceptions::ExcNoPeriodicNeighbor());
+  // we can't come here
+  return this->neighbor(i_face);
 }
 
 
