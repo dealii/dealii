@@ -76,7 +76,7 @@ public:
    * An object inheriting from Subscriptor can only be moved if no other
    * objects are subscribing to it.
    */
-  Subscriptor(Subscriptor&&);
+  Subscriptor(Subscriptor &&);
 #endif
 
   /**

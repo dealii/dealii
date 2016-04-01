@@ -115,11 +115,11 @@ int main()
       {
         SparseMatrix<double> B = std::move(A);
       }
-    catch (const Subscriptor::ExcInUse&)
+    catch (const Subscriptor::ExcInUse &)
       {
         need_to_catch_exc_in_use = false;
       }
-    catch(...)
+    catch (...)
       {
         return 1;
       }
