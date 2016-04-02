@@ -1164,8 +1164,7 @@ namespace DoFTools
    */
 
   /**
-   * @name Identifying subsets of degrees of freedom with particular
-   * properties
+   * @name Identifying subsets of degrees of freedom with particular properties
    * @{
    */
 
