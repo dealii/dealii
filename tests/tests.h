@@ -309,8 +309,7 @@ initlog(bool console=false)
   deallogname = "output";
   deallogfile.open(deallogname.c_str());
   deallog.attach(deallogfile);
-  if (!console)
-    deallog.depth_console(0);
+  deallog.depth_console(console?10:0);
 
 //TODO: Remove this line and replace by test_mode()
   deallog.threshold_float(1.e-8);
@@ -328,8 +327,7 @@ mpi_initlog(bool console=false)
       deallogname = "output";
       deallogfile.open(deallogname.c_str());
       deallog.attach(deallogfile);
-      if (!console)
-        deallog.depth_console(0);
+      deallog.depth_console(console?10:0);
 
 //TODO: Remove this line and replace by test_mode()
       deallog.threshold_float(1.e-8);
@@ -355,8 +353,7 @@ struct MPILogInitAll
       deallogname = deallogname + Utilities::int_to_string(myid);
     deallogfile.open(deallogname.c_str());
     deallog.attach(deallogfile);
-    if (!console)
-      deallog.depth_console(0);
+    deallog.depth_console(console?10:0);
 
 //TODO: Remove this line and replace by test_mode()
     deallog.threshold_float(1.e-8);
