@@ -1103,7 +1103,7 @@ namespace StandardExceptions
  * @ingroup Exceptions
  */
 #define AssertGlobalIndexRange(index,range) Assert((index) < (range), \
-                                                   ExcIndexRange<types::global_dof_index>((index),0,(range)))
+                                                   dealii::ExcIndexRange<types::global_dof_index>((index),0,(range)))
 
 /**
  * An assertion that checks whether a number is finite or not. We explicitly
@@ -1115,7 +1115,7 @@ namespace StandardExceptions
  * @author Wolfgang Bangerth, 2015
  */
 #define AssertIsFinite(number) Assert(dealii::numbers::is_finite(number), \
-                                      ExcNumberNotFinite(std::complex<double>(number)))
+                                      dealii::ExcNumberNotFinite(std::complex<double>(number)))
 
 using namespace StandardExceptions;
 
