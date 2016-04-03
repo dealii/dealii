@@ -21,6 +21,7 @@
 #include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <deal.II/base/std_cxx11/type_traits.h>
 #include <deal.II/base/std_cxx11/unique_ptr.h>
+#include <deal.II/base/std_cxx11/array.h>
 
 #include <string>
 #include <complex>
@@ -145,7 +146,7 @@ namespace MemoryConsumption
 
   /**
    * Determine the amount of memory in bytes consumed by a
-   * <tt>std::vector</tt> of elements of type <tt>T</tt> by recursively
+   * <tt>std::vector</tt> of elements of type <tt>T</tt> by
    * calling memory_consumption() for each entry.
    *
    * This function loops over all entries of the vector and determines their
@@ -173,6 +174,30 @@ namespace MemoryConsumption
   template <typename T>
   inline
   std::size_t memory_consumption (const std::vector<T> &v);
+
+  /**
+   * Determine the amount of memory in bytes consumed by a
+   * <tt>std_cxx11::array</tt> of <tt>N</tt> elements of type <tt>T</tt> by
+   * calling memory_consumption() for each entry.
+   *
+   * This function loops over all entries of the array and determines their
+   * sizes using memory_consumption() for each <tt>v[i]</tt>. If the entries
+   * are of constant size, there might be another global function
+   * memory_consumption() for this data type or if there is a member function
+   * of that class of that names that returns a constant value and the
+   * compiler will unroll this loop so that the operation is fast. If the size
+   * of the data elements is variable, for example if they do memory
+   * allocation themselves, then the operation will necessarily be more
+   * expensive.
+   *
+   * Using the algorithm, in particular the loop over all elements, it is
+   * possible to also compute the memory consumption of arrays of vectors,
+   * arrays of strings, etc, where the individual elements may have vastly
+   * different sizes.
+   */
+  template <typename T, int N>
+  inline
+  std::size_t memory_consumption (const std_cxx11::array<T,N> &v);
 
   /**
    * Estimate the amount of memory (in bytes) occupied by a C-style array.
@@ -310,6 +335,25 @@ namespace MemoryConsumption
             mem += memory_consumption(v[i]);
           }
         mem += (v.capacity() - v.size())*sizeof(T);
+        return mem;
+      }
+  }
+
+
+
+  template <typename T, std::size_t N>
+  std::size_t memory_consumption (const std_cxx11::array<T,N> &v)
+  {
+    // shortcut for types that do not allocate memory themselves
+    if (std_cxx11::is_fundamental<T>::value || std_cxx11::is_pointer<T>::value)
+      {
+        return sizeof(v);
+      }
+    else
+      {
+        std::size_t mem = 0;
+        for (std::size_t i=0; i<N; ++i)
+          mem += memory_consumption(v[i]);
         return mem;
       }
   }
