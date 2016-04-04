@@ -1,0 +1,38 @@
+Cycle 0:
+   Number of active cells:       94
+   Number of degrees of freedom: 129 (by level: 4, 9, 25, 45, 57, 57)
+mg_mat0 1.33333
+mg_interface_mat0 0
+mg_mat1 4
+mg_interface_mat1 0
+mg_mat2 9.56847
+mg_interface_mat2 0
+mg_mat3 14.15
+mg_interface_mat3 1.66667
+mg_mat4 15.7198
+mg_interface_mat4 2.44949
+mg_mat5 12.4007
+mg_interface_mat5 2.86744
+check3 iteration: 2.0047e-07
+   CG converged in 8 iterations.
+ sol: 0 - 0.0765196
+Cycle 1:
+   Number of active cells:       376
+   Number of degrees of freedom: 445 (by level: 4, 9, 25, 81, 153, 193, 177)
+mg_mat0 1.33333
+mg_interface_mat0 0
+mg_mat1 4
+mg_interface_mat1 0
+mg_mat2 9.56847
+mg_interface_mat2 0
+mg_mat3 20.8487
+mg_interface_mat3 0
+mg_mat4 30.1146
+mg_interface_mat4 2.60342
+mg_mat5 33.546
+mg_interface_mat5 3.74166
+mg_mat6 28.2686
+mg_interface_mat6 4.78423
+check3 iteration: 4.0548e-08
+   CG converged in 7 iterations.
+ sol: 0 - 0.0743542

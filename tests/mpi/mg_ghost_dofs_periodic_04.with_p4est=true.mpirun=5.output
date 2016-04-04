@@ -235,6 +235,8 @@ DEAL:1::Cell with center: 1.062 0.3125, owned by 2: 36 85 42 93
 DEAL:1::Cell with center: 1.062 0.4375, owned by 2: 42 93 44 95 
 DEAL:1::Cell with center: 1.062 0.5625, owned by 3: 44 95 70 121 
 DEAL:1::Level 4
+DEAL:1::Cell with center: 0.03125 0.03125, owned by 0: 0 1 2 3 
+DEAL:1::Cell with center: 0.09375 0.03125, owned by 0: 1 4 3 5 
 DEAL:1::Level 0
 DEAL:1::Cell with center: 0.5000 0.5000 0.5000, owned by 0: 0 1 2 3 4 5 6 7 
 DEAL:1::Level 1
@@ -312,6 +314,12 @@ DEAL:1::Cell with center: 0.8750 0.6250 0.8750, owned by 4: 97 98 117 118 103 10
 DEAL:1::Cell with center: 0.6250 0.8750 0.8750, owned by 4: 107 117 110 119 113 121 116 123 
 DEAL:1::Cell with center: 0.8750 0.8750 0.8750, owned by 4: 117 118 119 120 121 122 123 124 
 DEAL:1::Level 3
+DEAL:1::Cell with center: 0.06250 0.06250 0.06250, owned by 0: 0 1 2 3 4 5 6 7 
+DEAL:1::Cell with center: 0.1875 0.06250 0.06250, owned by 0: 1 8 3 9 5 10 7 11 
+DEAL:1::Cell with center: 0.06250 0.06250 0.1875, owned by 0: 4 5 6 7 18 19 20 21 
+DEAL:1::Cell with center: 0.1875 0.06250 0.1875, owned by 0: 5 10 7 11 19 22 21 23 
+DEAL:1::Cell with center: 0.8125 0.9375 0.9375, owned by 4: 33 34 41 42 47 48 51 52 
+DEAL:1::Cell with center: 0.9375 0.9375 0.9375, owned by 4: 34 38 42 44 48 50 52 53 
 
 
 DEAL:2::Level 0
@@ -482,6 +490,14 @@ DEAL:2::Cell with center: 0.8750 0.6250 0.8750, owned by 4: 97 98 117 118 103 10
 DEAL:2::Cell with center: 0.6250 0.8750 0.8750, owned by 4: 107 117 110 119 113 121 116 123 
 DEAL:2::Cell with center: 0.8750 0.8750 0.8750, owned by 4: 117 118 119 120 121 122 123 124 
 DEAL:2::Level 3
+DEAL:2::Cell with center: 0.06250 0.06250 0.06250, owned by 0: 0 1 2 3 4 5 6 7 
+DEAL:2::Cell with center: 0.1875 0.06250 0.06250, owned by 0: 1 8 3 9 5 10 7 11 
+DEAL:2::Cell with center: 0.06250 0.1875 0.06250, owned by 0: 2 3 12 13 6 7 14 15 
+DEAL:2::Cell with center: 0.1875 0.1875 0.06250, owned by 0: 3 9 13 16 7 11 15 17 
+DEAL:2::Cell with center: 0.8125 0.8125 0.9375, owned by 4: 31 32 33 34 45 46 47 48 
+DEAL:2::Cell with center: 0.9375 0.8125 0.9375, owned by 4: 32 37 34 38 46 49 48 50 
+DEAL:2::Cell with center: 0.8125 0.9375 0.9375, owned by 4: 33 34 41 42 47 48 51 52 
+DEAL:2::Cell with center: 0.9375 0.9375 0.9375, owned by 4: 34 38 42 44 48 50 52 53 
 
 
 DEAL:3::Level 0
@@ -569,6 +585,8 @@ DEAL:3::Cell with center: 0.9375 0.5625, owned by 2: 43 44 69 70
 DEAL:3::Cell with center: 0.9375 0.6875, owned by 2: 69 70 71 72 
 DEAL:3::Cell with center: 0.9375 0.8125, owned by 2: 71 72 77 78 
 DEAL:3::Level 4
+DEAL:3::Cell with center: 1.906 0.9688, owned by 4: 11 12 15 16 
+DEAL:3::Cell with center: 1.969 0.9688, owned by 4: 12 14 16 17 
 DEAL:3::Level 0
 DEAL:3::Cell with center: 0.5000 0.5000 0.5000, owned by 0: 0 1 2 3 4 5 6 7 
 DEAL:3::Level 1
@@ -646,6 +664,12 @@ DEAL:3::Cell with center: 0.8750 0.6250 0.8750, owned by 4: 97 98 117 118 103 10
 DEAL:3::Cell with center: 0.6250 0.8750 0.8750, owned by 4: 107 117 110 119 113 121 116 123 
 DEAL:3::Cell with center: 0.8750 0.8750 0.8750, owned by 4: 117 118 119 120 121 122 123 124 
 DEAL:3::Level 3
+DEAL:3::Cell with center: 0.06250 0.06250 0.06250, owned by 0: 0 1 2 3 4 5 6 7 
+DEAL:3::Cell with center: 0.1875 0.06250 0.06250, owned by 0: 1 8 3 9 5 10 7 11 
+DEAL:3::Cell with center: 0.8125 0.9375 0.8125, owned by 4: 29 30 39 40 33 34 41 42 
+DEAL:3::Cell with center: 0.9375 0.9375 0.8125, owned by 4: 30 36 40 43 34 38 42 44 
+DEAL:3::Cell with center: 0.8125 0.9375 0.9375, owned by 4: 33 34 41 42 47 48 51 52 
+DEAL:3::Cell with center: 0.9375 0.9375 0.9375, owned by 4: 34 38 42 44 48 50 52 53 
 
 
 DEAL:4::Level 0
