@@ -241,8 +241,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
       std::map< types::global_dof_index,std::vector<Container<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator> >
       get_dof_to_support_patch_map<Container<deal_II_dimension,deal_II_space_dimension> >
       (Container<deal_II_dimension,deal_II_space_dimension> &dof_handler);
-      
-      
+
     \}
 #endif
   }
@@ -257,19 +256,19 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
       std::vector<Container<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator>
       get_patch_around_cell<Container<deal_II_dimension,deal_II_space_dimension> >
       (const Container<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator &cell);
-      
+
       template
       std::vector< Container<deal_II_dimension,deal_II_space_dimension>::cell_iterator> 
       get_cells_at_coarsest_common_level <Container<deal_II_dimension,deal_II_space_dimension> > (
       const std::vector< Container<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator> & patch_cells);
-      
+
       template
       void build_triangulation_from_patch <Container<deal_II_dimension,deal_II_space_dimension> > (
       const std::vector<Container<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator>  &patch,
       Triangulation<Container<deal_II_dimension,deal_II_space_dimension>::dimension,Container<deal_II_dimension,deal_II_space_dimension>::space_dimension> &local_triangulation,
       std::map<Triangulation<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator,
       Container<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator > &patch_to_global_tria_map);
-      
+
     \}
 #endif
   }
@@ -388,14 +387,14 @@ for (deal_II_dimension : DIMENSIONS)
   std::pair<unsigned int, double>
   GridTools::
   get_longest_direction<deal_II_dimension,deal_II_dimension>
-  (typename Triangulation<deal_II_dimension>::active_cell_iterator);
+  (Triangulation<deal_II_dimension>::active_cell_iterator);
 
   template
-  void 
+  void
   GridTools::
   remove_hanging_nodes<deal_II_dimension,deal_II_dimension>
   (Triangulation<deal_II_dimension> &tria, bool, unsigned int);
-                        
+
   template
   void
   GridTools::
@@ -407,10 +406,10 @@ for (deal_II_dimension : DIMENSIONS)
   std::pair<unsigned int, double>
   GridTools::
   get_longest_direction<deal_II_dimension,deal_II_dimension+1>
-  (typename  Triangulation<deal_II_dimension,deal_II_dimension+1>::active_cell_iterator);
+  (Triangulation<deal_II_dimension,deal_II_dimension+1>::active_cell_iterator);
 
   template
-  void 
+  void
   GridTools::
   remove_hanging_nodes<deal_II_dimension,deal_II_dimension+1>
   (Triangulation<deal_II_dimension,deal_II_dimension+1> &tria, bool, unsigned int);
