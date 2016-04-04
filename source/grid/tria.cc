@@ -9023,6 +9023,9 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::set_all_manifold_ids (const types::manifold_id m_number)
 {
+  Assert(n_cells()>0,
+         ExcMessage("Error: set_all_manifold_ids() can not be called on an empty Triangulation."));
+
   typename Triangulation<dim,spacedim>::active_cell_iterator
   cell=this->begin_active(), endc=this->end();
 
@@ -9035,6 +9038,9 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary (const types::manifold_id m_number)
 {
+  Assert(n_cells()>0,
+         ExcMessage("Error: set_all_manifold_ids_on_boundary() can not be called on an empty Triangulation."));
+
   typename Triangulation<dim,spacedim>::active_cell_iterator
   cell=this->begin_active(), endc=this->end();
 
@@ -9050,6 +9056,9 @@ void
 Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary (const types::boundary_id b_id,
     const types::manifold_id m_number)
 {
+  Assert(n_cells()>0,
+         ExcMessage("Error: set_all_manifold_ids_on_boundary() can not be called on an empty Triangulation."));
+
   bool boundary_found = false;
   typename Triangulation<dim,spacedim>::active_cell_iterator
   cell=this->begin_active(), endc=this->end();
