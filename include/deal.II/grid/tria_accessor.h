@@ -2567,15 +2567,17 @@ public:
   periodic_neighbor_of_coarser_periodic_neighbor (const unsigned face_no) const;
 
   /**
-   * This function returns the index of the periodic neighbor. If there is
-   * no periodic neighbor at the given face, the returned value is -1.
+   * This function returns the index of the periodic neighbor at the
+   * @c ith face of the current cell. If there is no periodic neighbor
+   * at the given face, the returned value is -1.
    */
   int
   periodic_neighbor_index (const unsigned int i) const;
 
   /**
-   * This function returns the level of the periodic neighbor. If there is
-   * no periodic neighbor at the given face, the returned value is -1.
+   * This function returns the level of the periodic neighbor at the
+   * @c ith face of the current cell. If there is no periodic neighbor
+   * at the given face, the returned value is -1.
    */
   int
   periodic_neighbor_level (const unsigned int i) const;
