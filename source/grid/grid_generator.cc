@@ -2143,7 +2143,7 @@ namespace GridGenerator
 
     if (colorize)
       {
-        typename Triangulation<2>::cell_iterator cell = tria.begin();
+        Triangulation<2>::cell_iterator cell = tria.begin();
 
         cell->face(0)->set_boundary_id(0);
         cell->face(2)->set_boundary_id(1);
