@@ -68,12 +68,14 @@ install:
     - mkdir build 
     - cd build 
     - cmake -GNinja -DDEAL_II_WITH_MPI=$COMPILE_WITH_MPI -DDEAL_II_WITH_CXX11=$CXX11 ..
-    - ninja -j4
+    - ninja -j3 -k0 ; ninja -j3 -k0; ninja -j2 -k0 ; ninja -j2 -k0; ninja -j1 -k0 ; ninja -j1
+    - ninja -j4 install > /dev/null
 
-script: 
+
+script:
     - DEAL_II_DISABLE_AFFINITY_TEST=1 ninja -j2 test
     - ninja setup_tests_all-headers
-    - ctest -j4 -V -R all-headers
+    - ctest -j4 -VV -R all-headers
 
 branches:
   only:
