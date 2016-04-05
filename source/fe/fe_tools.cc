@@ -1540,6 +1540,23 @@ namespace FETools
                     const FEFactoryBase<dim,spacedim> *fef=dynamic_cast<const FEFactoryBase<dim,spacedim>*>(ptr);
                     return fef->get(QGauss<1>(tmp.first));
                   }
+                else  if (quadrature_name.compare("QIterated") == 0)
+                  {
+                    // find sub-quadrature
+                    position = name.find('(');
+                    const std::string subquadrature_name(name, 0, position);
+                    AssertThrow(subquadrature_name.compare("QTrapez") == 0,
+                                ExcNotImplemented("Could not detect quadrature of name " + subquadrature_name));
+                    // delete "QTrapez(),"
+                    name.erase(0,position+3);
+                    const std::pair<int,unsigned int> tmp
+                      = Utilities::get_integer_at_position (name, 0);
+                    // delete "))"
+                    name.erase(0, tmp.second+2);
+                    const Subscriptor *ptr = fe_name_map.find(name_part)->second.get();
+                    const FEFactoryBase<dim,spacedim> *fef=dynamic_cast<const FEFactoryBase<dim,spacedim>*>(ptr);
+                    return fef->get(QIterated<1>(QTrapez<1>(),tmp.first));
+                  }
                 else
                   {
                     AssertThrow (false,ExcNotImplemented());

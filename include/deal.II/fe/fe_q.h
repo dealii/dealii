@@ -30,7 +30,8 @@ DEAL_II_NAMESPACE_OPEN
  * Implementation of a scalar Lagrange finite element @p Qp that yields the
  * finite element space of continuous, piecewise polynomials of degree @p p in
  * each coordinate direction. This class is realized using tensor product
- * polynomials based on equidistant or given support points.
+ * polynomials based on 1D Lagrange polynomials with equidistant (degree up to
+ * 2), Gauss-Lobatto (starting from degree 3), or given support points.
  *
  * The standard constructor of this class takes the degree @p p of this finite
  * element. Alternatively, it can take a quadrature formula @p points defining
@@ -54,6 +55,35 @@ DEAL_II_NAMESPACE_OPEN
  * implemented only up to a certain degree and may not be available for very
  * high polynomial degree.
  *
+ * <h3>Unit support point distribution and conditioning of interpolation</h3>
+ *
+ * When constructing an FE_Q element at polynomial degrees one or two,
+ * equidistant support points at 0 and 1 (linear case) or 0, 0.5, and 1
+ * (quadratic case) are used. The unit support or nodal points
+ * <i>x<sub>i</sub></i> are those points where the <i>j</i>th Lagrange
+ * polynomial satisfies the $\delta_{ij}$ property, i.e., where one polynomial
+ * is one and all the others are zero.  For higher polynomial degrees, the
+ * support points are non-equidistant by default, and chosen to be the support
+ * points of the <tt>(degree+1)</tt>-order Gauss-Lobatto quadrature rule. This
+ * point distribution yields well-conditioned Lagrange interpolation at
+ * arbitrary polynomial degrees. By contrast, polynomials based on equidistant
+ * points get increasingly ill-conditioned as the polynomial degree
+ * increases. In interpolation, this effect is known as the Runge
+ * phenomenon. For Galerkin methods, the Runge phenomenon is typically not
+ * visible in the solution quality but rather in the condition number of the
+ * associated system matrices. For example, the elemental mass matrix of
+ * equidistant points at degree 10 has condition number 2.6e6, whereas the
+ * condition number for Gauss-Lobatto points is around 400.
+ *
+ * The Gauss-Lobatto points in 1D include the end points 0 and +1 of the unit
+ * interval. The interior points are shifted towards the end points, which
+ * gives a denser point distribution close to the element boundary.
+ *
+ * If combined with Gauss-Lobatto quadrature, FE_Q based on the default
+ * support points gives diagonal mass matrices. This case is demonstrated in
+ * step-48. However, this element can be combined with arbitrary quadrature
+ * rules through the usual FEValues approach, including full Gauss
+ * quadrature. In the general case, the mass matrix is non-diagonal.
  *
  * <h3>Numbering of the degrees of freedom (DoFs)</h3>
  *
@@ -523,19 +553,21 @@ class FE_Q : public FE_Q_Base<TensorProductPolynomials<dim>,dim,spacedim>
 {
 public:
   /**
-   * Constructor for tensor product polynomials of degree @p p.
+   * Constructor for tensor product polynomials of degree @p p based on
+   * Gauss-Lobatto support (node) points. For polynomial degrees of one and
+   * two, these are the usual equidistant points.
    */
   FE_Q (const unsigned int p);
 
   /**
    * Constructor for tensor product polynomials with support points @p points
    * based on a one-dimensional quadrature formula. The degree of the finite
-   * element is <tt>points.size()-1</tt>.  Note that the first point has to be
-   * 0 and the last one 1. If
-   * <tt>FE_Q<dim>(QGaussLobatto<1>(fe_degree+1))</tt> is specified, so-called
-   * Gauss-Lobatto elements are obtained which can give a diagonal mass matrix
-   * if combined with Gauss-Lobatto quadrature on the same points. Their use
-   * is shown in step-48.
+   * element is <tt>points.size()-1</tt>. Note that the first point has to be
+   * 0 and the last one 1. Constructing
+   * <tt>FE_Q<dim>(QGaussLobatto<1>(fe_degree+1))</tt> is equivalent to the
+   * constructor that specifies the polynomial degree only. For selecting
+   * equidistant nodes at <tt>fe_degree > 2</tt>, construct
+   * <tt>FE_Q<dim>(QIterated<1>(QTrapez<1>(),fe_degree))</tt>.
    */
   FE_Q (const Quadrature<1> &points);
 

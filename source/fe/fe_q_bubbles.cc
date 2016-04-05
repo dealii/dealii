@@ -172,7 +172,7 @@ template <int dim, int spacedim>
 FE_Q_Bubbles<dim,spacedim>::FE_Q_Bubbles (const unsigned int q_degree)
   :
   FE_Q_Base<TensorProductPolynomialsBubbles<dim>, dim, spacedim> (
-    TensorProductPolynomialsBubbles<dim>(Polynomials::LagrangeEquidistant::generate_complete_basis(q_degree)),
+    TensorProductPolynomialsBubbles<dim>(Polynomials::generate_complete_Lagrange_basis(QGaussLobatto<1>(q_degree+1).get_points())),
     FiniteElementData<dim>(get_dpo_vector(q_degree),
                            1, q_degree+1,
                            FiniteElementData<dim>::H1),
@@ -183,11 +183,7 @@ FE_Q_Bubbles<dim,spacedim>::FE_Q_Bubbles (const unsigned int q_degree)
           ExcMessage ("This element can only be used for polynomial degrees "
                       "greater than zero"));
 
-  std::vector<Point<1> > support_points_1d(q_degree+1);
-  for (unsigned int i=0; i<=q_degree; ++i)
-    support_points_1d[i][0] = static_cast<double>(i)/q_degree;
-
-  this->initialize(support_points_1d);
+  this->initialize(QGaussLobatto<1>(q_degree+1).get_points());
 
   // adjust unit support point for discontinuous node
   Point<dim> point;
@@ -221,9 +217,7 @@ FE_Q_Bubbles<dim,spacedim>::FE_Q_Bubbles (const Quadrature<1> &points)
     get_riaf_vector(points.size()-1)),
   n_bubbles((points.size()-1<=1)?1:dim)
 {
-  const unsigned int q_degree = points.size()-1;
-  (void) q_degree;
-  Assert (q_degree > 0,
+  Assert (points.size() > 1,
           ExcMessage ("This element can only be used for polynomial degrees "
                       "at least one"));
 
@@ -294,7 +288,16 @@ FE_Q_Bubbles<dim,spacedim>::get_name () const
       }
 
   if (type == true)
-    namebuf << "FE_Q_Bubbles<" << dim << ">(" << this->degree-1 << ")";
+    {
+      if (this->degree > 3)
+        namebuf << "FE_Q_Bubbles<"
+                << Utilities::dim_string(dim,spacedim)
+                << ">(QIterated(QTrapez()," << this->degree-1 << "))";
+      else
+        namebuf << "FE_Q_Bubbles<"
+                << Utilities::dim_string(dim,spacedim)
+                << ">(" << this->degree-1 << ")";
+    }
   else
     {
 
@@ -308,9 +311,9 @@ FE_Q_Bubbles<dim,spacedim>::get_name () const
             break;
           }
       if (type == true)
-        namebuf << "FE_Q_Bubbles<" << dim << ">(QGaussLobatto(" << this->degree << "))";
+        namebuf << "FE_Q_Bubbles<" << dim << ">(" << this->degree-1 << ")";
       else
-        namebuf << "FE_Q_Bubbles<" << dim << ">(QUnknownNodes(" << this->degree-1 << "))";
+        namebuf << "FE_Q_Bubbles<" << dim << ">(QUnknownNodes(" << this->degree << "))";
     }
   return namebuf.str();
 }
