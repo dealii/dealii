@@ -460,7 +460,7 @@ get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
 {
   const Tensor<1,dim> axis = x_1 - x_0;
 
-  for (unsigned int vertex = 0; vertex < GeometryInfo<dim>::vertices_per_cell; ++vertex)
+  for (unsigned int vertex = 0; vertex < GeometryInfo<dim>::vertices_per_face; ++vertex)
     {
       // Compute the orthogonal projection of the vertex onto the axis of the
       // cone.
