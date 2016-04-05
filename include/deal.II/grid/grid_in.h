@@ -366,8 +366,14 @@ public:
 
   /**
    * Read grid data from an ucd file. Numerical data is ignored.
+   * It is not possible to use a ucd file to set both boundary_id and
+   * manifold_id for the same cell. Yet it is possible to use
+   * the flag apply_all_indicators_to_manifolds to decide if
+   * the indicators in the file refer to manifolds (flag set to true)
+   * or boundaries (flag set to false).
    */
-  void read_ucd (std::istream &in);
+  void read_ucd (std::istream                                  &in,
+                 const bool apply_all_indicators_to_manifolds=false);
 
   /**
    * Read grid data from an Abaqus file. Numerical and constitutive data is

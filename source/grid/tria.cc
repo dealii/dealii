@@ -2068,13 +2068,32 @@ namespace internal
             // need to allow that
             if (boundary_line->boundary_id != numbers::internal_face_boundary_id)
               {
-                AssertThrow (! (line->boundary_id() == numbers::internal_face_boundary_id),
-                             ExcInteriorLineCantBeBoundary(line->vertex_index(0),
-                                                           line->vertex_index(1),
-                                                           boundary_line->boundary_id));
-                line->set_boundary_id (boundary_line->boundary_id);
+                if (line->boundary_id() == numbers::internal_face_boundary_id)
+                  {
+                    // if we are here, it means that we want to assign a boundary indicator
+                    // different from numbers::internal_face_boundary_id to an internal line.
+                    // As said, this would be not allowed, and an exception should be immediately
+                    // thrown. Still, there is the possibility that one only wants to specifiy a
+                    // manifold_id here. If that is the case (manifold_id !=  numbers::flat_manifold_id)
+                    // the operation is allowed. Otherwise, we really tried to specify a boundary_id
+                    // (and not a manifold_id) to an internal face. The exception must be thrown.
+                    if (boundary_line->manifold_id == numbers::flat_manifold_id)
+                      {
+                        // If we are here, this assertion will surely fail, for the aforementioned
+                        // reasons
+                        AssertThrow (! (line->boundary_id() == numbers::internal_face_boundary_id),
+                                     ExcInteriorLineCantBeBoundary(line->vertex_index(0),
+                                                                   line->vertex_index(1),
+                                                                   boundary_line->boundary_id));
+                      }
+                    else
+                      {
+                        line->set_manifold_id (boundary_line->manifold_id);
+                      }
+                  }
+                else
+                  line->set_boundary_id (boundary_line->boundary_id);
               }
-
             line->set_manifold_id (boundary_line->manifold_id);
           }
 
