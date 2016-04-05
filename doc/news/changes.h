@@ -38,6 +38,25 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Changed: The default nodal point distribution of FE_Q, FE_DGQ,
+  FE_Q_DG0, FE_Q_Bubbles, and FE_TraceQ has been changed from equidistant
+  points to the node points of the corresponding Gauss-Lobatto quadrature
+  formula. For degrees one and two, the Gauss-Lobatto quadrature is
+  equidistant and thus the unit support points are as before. However, the
+  Gauss-Lobatto points are more dense towards the element boundaries at higher
+  degrees. This gives well-conditioned interpolation at arbitrary orders and
+  much more stable computations. While these node distribution was available
+  before, it was not very visible and often lead to misunderstandings by
+  inexperienced users. Most codes will not be affected by this change, even
+  those using cubic and higher degree polynomials, apart from slightly
+  different (better) interpolation behavior and different entries in solution
+  vectors. If you explicitly need equidistant points, use the constructors
+  <tt>FE_Q<dim>(QIterated<1>(QTrapez<1>(),degree))</tt> or
+  <tt>FE_DGQArbitraryNodes<dim>(QIterated<1>(QTrapez<1>(),degree))</tt>.
+  <br>
+  (Martin Kronbichler, 2016/04/05)
+  </li>
+
   <li> Removed: Support for the legacy <code>Make.global_options</code>
   file has been removed.
   <br>
