@@ -273,6 +273,7 @@ MGLevelGlobalTransfer<VectorType>::copy_from_mg
  OutVector                       &dst,
  const MGLevelObject<VectorType> &src) const
 {
+  (void)mg_dof_handler;
   AssertIndexRange(src.max_level(), mg_dof_handler.get_triangulation().n_global_levels());
   AssertIndexRange(src.min_level(), src.max_level()+1);
   if (perform_plain_copy)
@@ -329,7 +330,7 @@ template <typename VectorType>
 template <int dim, class OutVector, int spacedim>
 void
 MGLevelGlobalTransfer<VectorType>::copy_from_mg_add
-(const DoFHandler<dim,spacedim>  &mg_dof_handler,
+(const DoFHandler<dim,spacedim>  &/*mg_dof_handler*/,
  OutVector                       &dst,
  const MGLevelObject<VectorType> &src) const
 {
@@ -448,6 +449,7 @@ MGLevelGlobalTransfer<parallel::distributed::Vector<Number> >::copy_from_mg
  parallel::distributed::Vector<Number2>                      &dst,
  const MGLevelObject<parallel::distributed::Vector<Number> > &src) const
 {
+  (void)mg_dof_handler;
   AssertIndexRange(src.max_level(), mg_dof_handler.get_triangulation().n_global_levels());
   AssertIndexRange(src.min_level(), src.max_level()+1);
   if (perform_plain_copy)
@@ -504,7 +506,7 @@ template <typename Number>
 template <int dim, typename Number2, int spacedim>
 void
 MGLevelGlobalTransfer<parallel::distributed::Vector<Number> >::copy_from_mg_add
-(const DoFHandler<dim,spacedim>                              &mg_dof_handler,
+(const DoFHandler<dim,spacedim>                              &/*mg_dof_handler*/,
  parallel::distributed::Vector<Number2>                      &dst,
  const MGLevelObject<parallel::distributed::Vector<Number> > &src) const
 {
