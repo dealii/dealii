@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2015 by the deal.II authors
+// Copyright (C) 2013 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -149,31 +149,32 @@ int main ()
 
   {
     // iterations taken from results at tolerance 1e-9
-    deallog.threshold_double(1.e-9);
+    deallog.threshold_double(1.e-8);
     deallog.push("2d");
     test<2,1>(FE_Q<2>(1), 15);
     test<2,1>(FE_DGQ<2>(1), 3);
     test<2,2>(FE_Q<2>(2), 34);
     test<2,2>(FE_DGQ<2>(2), 6);
-    test<2,4>(FE_Q<2>(4), 75);
-    test<2,4>(FE_Q<2>(QGaussLobatto<1>(5)), 56);
+    test<2,4>(FE_Q<2>(4), 56);
+    test<2,4>(FE_Q<2>(QIterated<1>(QTrapez<1>(),4)), 75);
     test<2,4>(FE_DGQ<2>(4), 18);
     test<2,4>(FE_Q_Hierarchical<2>(4), 736);
-    test<2,6>(FE_Q<2>(6), 161);
-    test<2,6>(FE_Q<2>(QGaussLobatto<1>(7)), 77);
-    test<2,6>(FE_DGQ<2>(6), 38);
-    test<2,6>(FE_DGQArbitraryNodes<2>(QGaussLobatto<1>(7)), 32);
-    test<2,10>(FE_Q<2>(10), 782);
-    test<2,10>(FE_Q<2>(QGaussLobatto<1>(11)), 108);
-    test<2,16>(FE_Q<2>(QGaussLobatto<1>(17)), 156);
+    test<2,6>(FE_Q<2>(6), 77);
+    test<2,6>(FE_Q<2>(QIterated<1>(QTrapez<1>(),6)), 161);
+    test<2,6>(FE_DGQ<2>(6), 32);
+    test<2,6>(FE_DGQArbitraryNodes<2>(QIterated<1>(QTrapez<1>(),6)), 38);
+    test<2,10>(FE_Q<2>(10), 108);
+    test<2,10>(FE_Q<2>(QIterated<1>(QTrapez<1>(),10)), 782);
+    test<2,10>(FE_DGQ<2>(10), 70);
+    test<2,10>(FE_DGQArbitraryNodes<2>(QIterated<1>(QTrapez<1>(),10)), 118);
+    test<2,16>(FE_Q<2>(16), 156);
+    test<2,25>(FE_Q<2>(25), 200);
     deallog.pop();
     deallog.push("3d");
     test<3,1>(FE_Q<3>(1), 37);
     test<3,2>(FE_Q<3>(2), 80);
-    test<3,5>(FE_Q<3>(5), 494);
-    test<3,5>(FE_Q<3>(QGaussLobatto<1>(6)), 187);
+    test<3,5>(FE_Q<3>(5), 187);
+    test<3,5>(FE_Q<3>(QIterated<1>(QTrapez<1>(),5)), 494);
     deallog.pop();
   }
 }
-
-

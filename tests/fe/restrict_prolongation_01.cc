@@ -92,12 +92,14 @@ check(const FiniteElement<dim, spacedim> &fe,
 
           for (unsigned int j=0; j<dpc; ++j)
             {
-              const unsigned int add =(fe.restriction_is_additive(j))?1:0;
+              const bool add = fe.restriction_is_additive(j);
               for (unsigned int i=0; i<dpc; ++i)
                 {
                   prolongation_global(ldi[i],j)=prolongation_local(i,j);
-                  restriction_global(j,ldi[i])*=add;
-                  restriction_global(j,ldi[i])+=restriction_local(j,i);
+                  if (add)
+                    restriction_global(j,ldi[i])+=restriction_local(j,i);
+                  else if (restriction_local(j,i) != 0)
+                    restriction_global(j,ldi[i]) =restriction_local(j,i);
                 }
             }
         }

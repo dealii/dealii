@@ -33,7 +33,7 @@ void check(const unsigned int fe_degree)
 {
   deallog.threshold_double(std::max(5e2*(double)std::numeric_limits<Number>::epsilon(),
                                     1e-11));
-  FE_Q<dim> fe(QGaussLobatto<1>(fe_degree+1));
+  FE_Q<dim> fe(fe_degree);
   deallog << "FE: " << fe.get_name() << std::endl;
 
   // run a few different sizes...

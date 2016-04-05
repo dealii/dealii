@@ -202,7 +202,7 @@ check ()
 int main ()
 {
   std::ofstream logfile ("output");
-  deallog << std::setprecision (2);
+  deallog << std::setprecision (4);
   deallog << std::fixed;
   deallog.attach(logfile);
 

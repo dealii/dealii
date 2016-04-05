@@ -153,8 +153,9 @@ void test ()
     // FE_Q
     new FE_Q<dim>(1),
     new FE_Q<dim>(2),
-    (dim<3 ? new FE_Q<dim>(3) : 0),
+    new FE_Q<dim>(3),
     (dim<2 ? new FE_Q<dim>(4) : 0),
+    (dim<2 ? new FE_Q<dim>(5) : 0),
 
     // FE_DGQ
     new FE_DGQ<dim>(0),
@@ -254,6 +255,3 @@ main()
 
   return 0;
 }
-
-
-

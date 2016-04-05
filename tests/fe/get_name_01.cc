@@ -48,7 +48,11 @@ main()
     test(fe);
   }
   {
-    FE_Q<2> fe(QGaussLobatto<1>(4));
+    FE_Q<2> fe(3);
+    test(fe);
+  }
+  {
+    FE_Q<2> fe(QIterated<1>(QTrapez<1>(),3));
     test(fe);
   }
   {
@@ -66,11 +70,13 @@ main()
     FE_DGQArbitraryNodes<2> fe(quadrature);
     test(fe);
   }
+  {
+    QIterated<1> quadrature(QTrapez<1>(), 3);
+    FE_DGQArbitraryNodes<2> fe(quadrature);
+    test(fe);
+  }
 
 
 
   return 0;
 }
-
-
-
