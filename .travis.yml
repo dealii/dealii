@@ -71,7 +71,7 @@ install:
     - ninja -j4
 
 script: 
-    - ninja test
+    - DEAL_II_DISABLE_AFFINITY_TEST=1 ninja -j2 test
     - ninja setup_tests_all-headers
     - ctest -j4 -V -R all-headers
 

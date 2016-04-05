@@ -57,6 +57,14 @@ bool getaffinity(unsigned int &bits_set,unsigned int &mask)
   return true;
 }
 
+
+bool test_disabled()
+{
+  const char *penv = getenv ("DEAL_II_DISABLE_AFFINITY_TEST");
+  return penv!=NULL;
+}
+
+
 int get_num_thread_env()
 {
   const char *penv = getenv ("DEAL_II_NUM_THREADS");
@@ -92,6 +100,12 @@ int main ()
   int env = get_num_thread_env();
   printf("aff_ncpus=%d, mask=%08X, nprocs=%d, tbb_threads=%d, DEAL_II_NUM_THREADS=%d\n",
          bits_set, mask, nprocs, tbbprocs, env );
+
+  if (test_disabled())
+    {
+      printf("Warning: test disabled.");
+      return 0;
+    }
 
   if (bits_set !=0  && bits_set!=nprocs)
     {
