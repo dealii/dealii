@@ -253,6 +253,14 @@ inconvenience this causes.
  (Daniel Shapero, 2016/04/19)
  </li>
 
+ <li> New: added function GridOut::write_mesh_per_processor_as_vtu. This allows 
+ the visualization of a parallel finite element mesh that can be seperated into each 
+ processor's owned and ghost cells. It also allows for the visualization of each level
+ of a multilevel mesh. 
+ <br>
+ (Conrad Clevenger, 2016/04/28)
+ </li>
+
  <li> Improved: The parallel loops in the deal.II Vector class for
  vector-vector operations have been revised for performance. This includes
  adjusting the minimum parallel grain size to 4096 vector entries and using an

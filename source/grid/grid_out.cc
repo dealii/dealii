@@ -19,11 +19,14 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/qprojector.h>
+#include <deal.II/base/geometry_info.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/fe/mapping.h>
+#include <deal.II/numerics/data_out.h>
 
+#include <fstream>
 #include <cstring>
 #include <iomanip>
 #include <algorithm>
@@ -2522,6 +2525,105 @@ void GridOut::write_vtu (const Triangulation<dim,spacedim> &tria,
                           out);
 
   AssertThrow (out, ExcIO ());
+}
+
+
+
+template <int dim, int spacedim>
+void GridOut::write_mesh_per_processor_as_vtu (const Triangulation<dim,spacedim> &tria,
+                                               const std::string                 &filename_without_extension,
+                                               const bool                        view_levels,
+                                               const bool                        include_artificial) const
+{
+  std::vector<DataOutBase::Patch<dim,spacedim> > patches;
+  const unsigned int n_datasets=4;
+  std::vector<std::string> data_names;
+  data_names.push_back("level");
+  data_names.push_back("subdomain");
+  data_names.push_back("level_subdomain");
+  data_names.push_back("proc_writing");
+
+  const unsigned int n_q_points = GeometryInfo<dim>::vertices_per_cell;
+
+  typename Triangulation<dim, spacedim>::cell_iterator cell, endc;
+  for (cell=tria.begin(), endc=tria.end();
+       cell != endc; ++cell)
+    {
+      if (!include_artificial && cell->level_subdomain_id() ==
+          numbers::artificial_subdomain_id)
+        continue;
+      if (!view_levels && cell->has_children())
+        continue;
+
+      DataOutBase::Patch<dim,spacedim> patch;
+      patch.data.reinit(n_datasets, n_q_points);
+      patch.points_are_available = false;
+
+      for (unsigned int vertex=0; vertex<n_q_points; ++vertex)
+        {
+          patch.vertices[vertex] = cell->vertex(vertex);
+          patch.data(0,vertex) = cell->level();
+          if (!cell->has_children())
+            patch.data(1,vertex) =
+              (double)static_cast<int>(cell->subdomain_id());
+          else
+            patch.data(1,vertex) = -1.0;
+          patch.data(2,vertex) =
+            (double)static_cast<int>(cell->level_subdomain_id());
+          patch.data(3,vertex) = tria.locally_owned_subdomain();
+        }
+
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+        patch.neighbors[f] = numbers::invalid_unsigned_int;
+      patches.push_back(patch);
+    }
+
+  const std::string new_file = (filename_without_extension + ".proc" +
+                                Utilities::int_to_string (tria.locally_owned_subdomain(), 4) +
+                                ".vtu");
+  std::ofstream out(new_file.c_str());
+  std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > vector_data_ranges;
+  DataOutBase::VtkFlags flags;
+  DataOutBase::write_vtu (patches,
+                          data_names,
+                          vector_data_ranges,
+                          flags,
+                          out);
+  //create .pvtu record
+  if (tria.locally_owned_subdomain() == 0)
+    {
+      std::vector<std::string> filenames;
+
+      //.pvtu needs to reference the files without a relative path because it will be written
+      //in the same directory. For this, remove any paths from filename.
+      std::size_t pos = filename_without_extension.find_last_of('/');
+      if (pos == std::string::npos)
+        pos = 0;
+      else
+        pos += 1;
+      for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
+        filenames.push_back (filename_without_extension.substr(pos) +
+                             ".proc" + Utilities::int_to_string(i, 4) +
+                             ".vtu");
+
+      const std::string pvtu_master_filename = (filename_without_extension + ".pvtu");
+      std::ofstream pvtu_master (pvtu_master_filename.c_str());
+
+      DataOut<dim, DoFHandler<dim,spacedim> > data_out;
+      data_out.attach_triangulation (tria);
+
+      //We need a dummy vector with the names of the data values in the .vtu files
+      //in order that the .pvtu contains reference these values
+      Vector<float> dummy_vector (tria.n_active_cells());
+      data_out.add_data_vector (dummy_vector, "level");
+      data_out.add_data_vector (dummy_vector, "subdomain");
+      data_out.add_data_vector (dummy_vector, "level_subdomain");
+      data_out.add_data_vector (dummy_vector, "proc_writing");
+
+      data_out.build_patches ();
+
+      data_out.write_pvtu_record (pvtu_master, filenames);
+    }
 }
 
 
