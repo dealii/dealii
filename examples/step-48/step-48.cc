@@ -322,7 +322,10 @@ namespace Step48
   // are convenient because in conjunction with a QGaussLobatto quadrature
   // rule of the same order they give a diagonal mass matrix without
   // compromising accuracy too much (note that the integration is inexact,
-  // though), see also the discussion in the introduction.
+  // though), see also the discussion in the introduction. Note that FE_Q
+  // selects the Gauss-Lobatto nodal points by default due to their improved
+  // conditioning versus equidistant points. To make things more explicit, we
+  // choose to state the selection of the nodal points nonetheless.
   template <int dim>
   SineGordonProblem<dim>::SineGordonProblem ()
     :

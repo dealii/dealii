@@ -15,20 +15,20 @@ International Conference on e-Science, 2011.  </i>
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
-This program demonstrates how to use the cell-based implementation of
-finite element operators with the MatrixFree class,
-first introduced in step-37, to solve nonlinear partial
-differential equations. Moreover, we demonstrate how the
-MatrixFree class handles constraints and how it can be
-parallelized over distributed nodes. Finally, we will use an explicit
-time-stepping method to solve the problem and introduce Gauss-Lobatto
-finite elements that are very convenient in this case since they have
-a diagonal, and thus trivially invertible, mass matrix. Moreover,
-this type of elements clusters the nodes towards the element
-boundaries which is why they have good properties for high-order
-discretization methods. Indeed, the condition number of standard FE_Q
-elements with equidistant nodes grows exponentially with the degree,
-which destroys any benefit for orders of about five and higher.
+This program demonstrates how to use the cell-based implementation of finite
+element operators with the MatrixFree class, first introduced in step-37, to
+solve nonlinear partial differential equations. Moreover, we demonstrate how
+the MatrixFree class handles constraints and how it can be parallelized over
+distributed nodes. Finally, we will use an explicit time-stepping method to
+solve the problem and introduce Gauss-Lobatto finite elements that are very
+convenient in this case since they have a diagonal, and thus trivially
+invertible, mass matrix. Moreover, this type of elements clusters the nodes
+towards the element boundaries which is why they have good properties for
+high-order discretization methods. Indeed, the condition number of an FE_Q
+elements with equidistant nodes grows exponentially with the degree, which
+destroys any benefit for orders of about five and higher. For this reason,
+Gauss-Lobatto points are actually the default for FE_Q (but at degrees one and
+two, those are equivalent to the equidistant points).
 
 <h3> Problem statement and discretization </h3>
 
@@ -73,7 +73,7 @@ of finite elements of degree <i>p</i> is <i>p+1</i>, the overall
 convergence properties are not disturbed by the quadrature error, in
 particular not when we use high orders.
 
-Apart from the fact, that we avoid solving linear systems with this
+Apart from the fact that we avoid solving linear systems with this
 type of elements when using explicit time-stepping, they come with two
 other advantages. When we are using the sum-factorization approach to
 evaluate the finite element operator (cf. step-37), we have to
@@ -84,7 +84,7 @@ of the function at the quadrature points is given by its one-dimensional
 coefficients. In this way, the complexity of a finite element operator
 evaluation is further reduced compared to equidistant elements.
 
-The third advantage is the fact that these elements are better conditioned as
+The third advantage is the fact that these elements are better conditioned than
 equidistant Lagrange polynomials for increasing order so that we can use
 higher order elements for an accurate solution of the equation. Lagrange
 elements FE_Q with equidistant points should not be used for polynomial
