@@ -119,8 +119,9 @@ initialize_face (const UpdateFlags      update_flags,
           const unsigned int nfaces = GeometryInfo<dim>::faces_per_cell;
           unit_tangentials.resize (nfaces*(dim-1),
                                    std::vector<Tensor<1,dim> > (n_original_q_points));
-          switch(dim) {
-          case 2:
+          switch (dim)
+            {
+            case 2:
             {
               // ensure a counterclockwise
               // orientation of tangentials
@@ -134,7 +135,7 @@ initialize_face (const UpdateFlags      update_flags,
                 }
               break;
             }
-          case 3:
+            case 3:
             {
               for (unsigned int i=0; i<nfaces; ++i)
                 {
@@ -164,10 +165,10 @@ initialize_face (const UpdateFlags      update_flags,
                 }
               break;
             }
-          default:
+            default:
               Assert(false,ExcNotImplemented());
+            }
         }
-      }
     }
 }
 
@@ -435,28 +436,33 @@ namespace internal
                                         get_new_point(Quadrature<spacedim>(data.vertices,
                                                       data.cell_manifold_quadrature_weights[point+data_set]));
 
-              // Always get the maximum length from the point to the
-              // boundary of the reference element, to compute the
-              // tangent vectors from the Manifold object
+              // To compute the Jacobian, we choose dim points aligned
+              // with with the dim reference axes, which are still in the
+              // given cell, and ask for the tangent vector in these
+              // directions. Choosing the points is somewhat arbitrary,
+              // so we try to be smart and we pick points which are
+              // on the opposite quadrant w.r.t. the evaluation
+              // point.
               for (unsigned int i=0; i<dim; ++i)
                 {
                   const Point<dim> ei = Point<dim>::unit_vector(i);
-                  const double ai = ei*p;
-                  Assert(ai >=0, ExcInternalError("Was expecting a quadrature point "
-                                                  "inside the unit reference element."));
-                  const Point<dim> np(ai > .5 ? p-ai *ei : p+(1-ai)*ei);
+                  const double pi = p[i];
+                  Assert(pi >=0 && pi <= 1.0,
+                         ExcInternalError("Was expecting a quadrature point "
+                                          "inside the unit reference element."));
+                  const Point<dim> np(pi > .5 ? p-pi *ei : p+(1-pi)*ei);
 
-                  // In the lenghts, we store also the direction sign,
+                  // In the length L, we store also the direction sign,
                   // which is positive, if the coordinate is < .5,
-                  double L = ai > .5 ? -ai: 1-ai;
+                  double L = pi > .5 ? -pi: 1-pi;
 
                   // Get the weights to compute the np point in real space
                   for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_cell; ++j)
                     data.vertex_weights[j] = GeometryInfo<dim>::d_linear_shape_function(np, j);
 
-                  Point<spacedim> NP=data.manifold->
-                                     get_new_point(Quadrature<spacedim>(data.vertices,
-                                                                        data.vertex_weights));
+                  const Point<spacedim> NP=
+                    data.manifold->get_new_point(Quadrature<spacedim>(data.vertices,
+                                                                      data.vertex_weights));
 
                   Tensor<1,spacedim> T = data.manifold->get_tangent_vector(P, NP);
 
@@ -563,7 +569,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                   G[i][j] = DX_t[i] * DX_t[j];
 
               output_data.JxW_values[point]
-                = sqrt(determinant(G)) * weights[point];
+                = std::sqrt(determinant(G)) * weights[point];
 
               if (cell_similarity == CellSimilarity::inverted_translation)
                 {
@@ -573,12 +579,16 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                 }
               else
                 {
-                  const unsigned int codim = spacedim-dim;
-                  (void)codim;
-
                   if (update_flags & update_normal_vectors)
                     {
-                      Assert( codim==1 , ExcMessage("There is no cell normal in codim 2."));
+                      Assert(spacedim == dim+1,
+                             ExcMessage("There is no (unique) cell normal for "
+                                        + Utilities::int_to_string(dim) +
+                                        "-dimensional cells in "
+                                        + Utilities::int_to_string(spacedim) +
+                                        "-dimensional space. This only works if the "
+                                        "space dimension is one greater than the "
+                                        "dimensionality of the mesh cells."));
 
                       if (dim==1)
                         output_data.normal_vectors[point] =
