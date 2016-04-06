@@ -206,6 +206,13 @@ private:
    * in between and store it here.
    */
   mutable const std::type_info *object_info;
+
+  /**
+   * Check that there are no objects subscribing to this object and throw an
+   * error if there are, in order to guarantee that it is safe to either move
+   * or destroy this object.
+   */
+  void check_no_subscribers () const;
 };
 
 //---------------------------------------------------------------------------

@@ -69,10 +69,9 @@ Subscriptor::Subscriptor (Subscriptor &&subscriptor)
   counter(0),
   object_info (subscriptor.object_info)
 {
-  // Explicitly invoke the destructor of `Subscriptor` for the object
-  // to be moved from in order to guarantee that we're not moving an
-  // object that has subscriptions.
-  subscriptor.~Subscriptor();
+  subscriptor.check_no_subscribers();
+  subscriptor.counter = 0;
+  subscriptor.counter_map.clear();
 }
 #endif
 
@@ -80,37 +79,40 @@ Subscriptor::Subscriptor (Subscriptor &&subscriptor)
 
 Subscriptor::~Subscriptor ()
 {
-  // check whether there are still
-  // subscriptions to this object. if
-  // so, output the actual name of
-  // the class to which this object
-  // belongs, i.e. the most derived
-  // class. note that the name may be
-  // mangled, so it need not be the
-  // clear-text class name. however,
-  // you can obtain the latter by
-  // running the c++filt program over
-  // the output.
+  check_no_subscribers();
+  counter = 0;
+  counter_map.clear();
+
+#ifdef DEAL_II_WITH_CXX11
+  object_info = nullptr;
+#else
+  object_info = 0;
+#endif
+}
+
+
+void Subscriptor::check_no_subscribers () const
+{
+  // Check whether there are still subscriptions to this object. If so, output
+  // the actual name of the class to which this object belongs, i.e. the most
+  // derived class. Note that the name may be mangled, so it need not be the
+  // clear-text class name. However, you can obtain the latter by running the
+  // c++filt program over the output.
 #ifdef DEBUG
 
-  // if there are still active pointers, show
-  // a message and kill the program. However,
-  // under some circumstances, this is not so
-  // desirable. For example, in code like this
+  // If there are still active pointers, show a message and kill the program.
+  // However, under some circumstances, this is not so desirable. For example,
+  // in code like this:
   //
-  // Triangulation tria;
-  // DoFHandler *dh = new DoFHandler(tria);
-  // ...some function that throws an exception
+  //     Triangulation tria;
+  //     DoFHandler *dh = new DoFHandler(tria);
+  //     ...some function that throws an exception
   //
-  // the exception will lead to the
-  // destruction of the triangulation, but
-  // since the dof_handler is on the heap it
-  // will not be destroyed. This will trigger
-  // an assertion in the triangulation. If we
-  // kill the program at this point, we will
-  // never be able to learn what caused the
-  // problem. In this situation, just display
-  // a message and continue the program.
+  // the exception will lead to the destruction of the triangulation, but since
+  // the dof_handler is on the heap it will not be destroyed. This will trigger
+  // an assertion in the triangulation. If we kill the program at this point, we
+  // will never be able to learn what caused the problem. In this situation,
+  // just display a message and continue the program.
   if (counter != 0)
     {
       if (std::uncaught_exception() == false)
@@ -147,17 +149,6 @@ Subscriptor::~Subscriptor ()
                     << std::endl;
         }
     }
-  // In case we do not abort
-  // on error, this will tell
-  // do_unsubscribe below that the
-  // object is unused now.
-  counter = 0;
-
-#ifdef DEAL_II_WITH_CXX11
-  object_info = nullptr;
-#else
-  object_info = 0;
-#endif
 
 #endif
 }

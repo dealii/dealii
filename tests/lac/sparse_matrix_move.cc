@@ -101,31 +101,5 @@ int main()
     deallog << A.empty() << std::endl;
   }
 
-  {
-    // Try to move a sparse matrix that has a subscription
-    SparseMatrix<double> A = graph_laplacian(sparsity);
-    SmartPointer<SparseMatrix<double> > smart_pointer_to_A(&A);
-
-    bool need_to_catch_exc_in_use = false;
-#ifdef DEBUG
-    need_to_catch_exc_in_use = true;
-#endif
-
-    try
-      {
-        SparseMatrix<double> B = std::move(A);
-      }
-    catch (const Subscriptor::ExcInUse &)
-      {
-        need_to_catch_exc_in_use = false;
-      }
-    catch (...)
-      {
-        return 1;
-      }
-
-    deallog << "Exception caught if in debug mode." << std::endl;
-  }
-
   return 0;
 }
