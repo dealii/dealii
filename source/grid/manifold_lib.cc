@@ -32,10 +32,10 @@ SphericalManifold<dim,spacedim>::SphericalManifold(const Point<spacedim> center)
 
 
 template <int dim, int spacedim>
-Point<spacedim>
+Tensor<1,spacedim>
 SphericalManifold<dim,spacedim>::get_periodicity()
 {
-  Point<spacedim> periodicity;
+  Tensor<1,spacedim> periodicity;
   periodicity[spacedim-1] = 2*numbers::PI; // theta and phi period.
   return periodicity;
 }
@@ -247,7 +247,7 @@ template <int dim, int spacedim, int chartdim>
 FunctionManifold<dim,spacedim,chartdim>::FunctionManifold
 (const Function<chartdim> &push_forward_function,
  const Function<spacedim> &pull_back_function,
- const Point<chartdim> periodicity,
+ const Tensor<1,chartdim> &periodicity,
  const double tolerance):
   ChartManifold<dim,spacedim,chartdim>(periodicity),
   push_forward_function(&push_forward_function),
@@ -263,7 +263,7 @@ template <int dim, int spacedim, int chartdim>
 FunctionManifold<dim,spacedim,chartdim>::FunctionManifold
 (const std::string push_forward_expression,
  const std::string pull_back_expression,
- const Point<chartdim> periodicity,
+ const Tensor<1,chartdim> &periodicity,
  const typename FunctionParser<spacedim>::ConstMap const_map,
  const std::string chart_vars,
  const std::string space_vars,

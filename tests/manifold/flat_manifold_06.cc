@@ -25,7 +25,7 @@ void test()
           << ", spacedim="<< spacedim << std::endl;
 
   // make the domain periodic in the first direction with periodicity 1.1
-  Point<spacedim> periodicity;
+  Tensor<1,spacedim> periodicity;
   periodicity[0] = 1.1;
   FlatManifold<dim,spacedim> manifold(periodicity);
 

@@ -122,7 +122,7 @@ private:
    * Helper function which returns the periodicity associated with this
    * coordinate system, according to dim, chartdim, and spacedim.
    */
-  static Point<spacedim> get_periodicity();
+  static Tensor<1,spacedim> get_periodicity();
 };
 
 
@@ -227,7 +227,7 @@ public:
    */
   FunctionManifold(const Function<chartdim> &push_forward_function,
                    const Function<spacedim> &pull_back_function,
-                   const Point<chartdim> periodicity=Point<chartdim>(),
+                   const Tensor<1,chartdim> &periodicity=Tensor<1,chartdim>(),
                    const double tolerance=1e-10);
 
   /**
@@ -246,7 +246,7 @@ public:
    */
   FunctionManifold(const std::string push_forward_expression,
                    const std::string pull_back_expression,
-                   const Point<chartdim> periodicity=Point<chartdim>(),
+                   const Tensor<1,chartdim> &periodicity=Tensor<1,chartdim>(),
                    const typename FunctionParser<spacedim>::ConstMap = typename FunctionParser<spacedim>::ConstMap(),
                    const std::string chart_vars=FunctionParser<chartdim>::default_variable_names(),
                    const std::string space_vars=FunctionParser<spacedim>::default_variable_names(),

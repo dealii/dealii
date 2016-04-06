@@ -529,7 +529,7 @@ public:
    * guaranteed to lie in the periodicity box plus or minus
    * tolerance*periodicity.norm().
    */
-  FlatManifold (const Point<spacedim> &periodicity = Point<spacedim>(),
+  FlatManifold (const Tensor<1,spacedim> &periodicity = Tensor<1,spacedim>(),
                 const double tolerance=1e-10);
 
   /**
@@ -599,7 +599,7 @@ public:
   /**
    * Return the periodicity of this Manifold.
    */
-  const Point<spacedim> &get_periodicity() const;
+  const Tensor<1,spacedim> &get_periodicity() const;
 
 private:
   /**
@@ -615,12 +615,12 @@ private:
    * A periodicity 0 along one direction means no periodicity. This is the
    * default value for all directions.
    */
-  const Point<spacedim> periodicity;
+  const Tensor<1,spacedim> periodicity;
 
-  DeclException4(ExcPeriodicBox, int, Point<spacedim>, Point<spacedim>, double,
+  DeclException4(ExcPeriodicBox, int, Point<spacedim>, double, double,
                  << "The component number " << arg1 << " of the point [ " << arg2
                  << " ] is not in the interval [ " << -arg4
-                 << ", " << arg3[arg4] << "), bailing out.");
+                 << ", " << arg3 << "), bailing out.");
 
   /**
    * Relative tolerance. This tolerance is used to compute distances in double
@@ -736,7 +736,7 @@ public:
    * of (2*pi-eps) and (eps) is not pi, but 2*pi (or zero), since, on the
    * manifold, these two points are at distance 2*eps and not (2*pi-eps)
    */
-  ChartManifold(const Point<chartdim> &periodicity = Point<chartdim>());
+  ChartManifold(const Tensor<1,chartdim> &periodicity = Tensor<1,chartdim>());
 
   /**
    * Destructor. Does nothing here, but needs to be declared to make it
@@ -856,7 +856,7 @@ public:
   /**
    * Return the periodicity associated with the submanifold.
    */
-  const Point<chartdim> &get_periodicity() const;
+  const Tensor<1,chartdim> &get_periodicity() const;
 
 private:
   /**

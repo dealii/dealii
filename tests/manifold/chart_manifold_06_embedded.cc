@@ -26,7 +26,7 @@ template <int dim, int spacedim>
 class MyFlatManifold : public ChartManifold<dim,spacedim,spacedim+1>
 {
 public:
-  MyFlatManifold (const Point<spacedim+1> &periodicity)
+  MyFlatManifold (const Tensor<1,spacedim+1> &periodicity)
     :
     ChartManifold<dim,spacedim,spacedim+1>(periodicity)
   {}
@@ -74,7 +74,7 @@ void test()
           << ", spacedim="<< spacedim << std::endl;
 
   // make the domain periodic in the first direction with periodicity 1.1
-  Point<spacedim+1> periodicity;
+  Tensor<1,spacedim+1> periodicity;
   periodicity[0] = 1.1;
   MyFlatManifold<dim,spacedim> manifold(periodicity);
 

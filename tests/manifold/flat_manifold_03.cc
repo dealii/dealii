@@ -31,7 +31,7 @@ void test(unsigned int ref=1)
   deallog << "Testing dim=" << dim
           << ", spacedim="<< spacedim << std::endl;
 
-  Point<spacedim> periodicity;
+  Tensor<1,spacedim> periodicity;
   periodicity[0] = 5.0;
 
   FlatManifold<dim,spacedim> manifold(periodicity);
