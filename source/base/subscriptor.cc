@@ -70,8 +70,6 @@ Subscriptor::Subscriptor (Subscriptor &&subscriptor)
   object_info (subscriptor.object_info)
 {
   subscriptor.check_no_subscribers();
-  subscriptor.counter = 0;
-  subscriptor.counter_map.clear();
 }
 #endif
 
@@ -80,8 +78,6 @@ Subscriptor::Subscriptor (Subscriptor &&subscriptor)
 Subscriptor::~Subscriptor ()
 {
   check_no_subscribers();
-  counter = 0;
-  counter_map.clear();
 
 #ifdef DEAL_II_WITH_CXX11
   object_info = nullptr;
