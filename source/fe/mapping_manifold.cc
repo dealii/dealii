@@ -173,6 +173,7 @@ initialize_face (const UpdateFlags      update_flags,
 }
 
 
+
 template<int dim, int spacedim>
 MappingManifold<dim,spacedim>::MappingManifold ()
 {}
@@ -223,6 +224,7 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
 }
 
 
+
 // In the code below, GCC tries to instantiate MappingManifold<3,4> when
 // seeing which of the overloaded versions of
 // do_transform_real_to_unit_cell_internal() to call. This leads to bad
@@ -233,6 +235,7 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
 template <>
 class MappingManifold<3,4>
 {};
+
 
 
 template<int dim, int spacedim>
@@ -363,6 +366,8 @@ namespace internal
       return cell->get_manifold();
     }
 
+
+
     /**
      * Some specialization for face Manifolds. The mapping argument is
      * only used to help the compiler infer dim and spacedim.
@@ -375,6 +380,8 @@ namespace internal
     {
       return cell->face(face_no)->get_manifold();
     }
+
+
 
     /**
      * Compute the locations of quadrature points on the object described by
@@ -402,6 +409,7 @@ namespace internal
             }
         }
     }
+
 
 
     /**
@@ -763,8 +771,8 @@ namespace internal
 
                     if (subface_no!=numbers::invalid_unsigned_int)
                       {
-                        const double area_ratio=GeometryInfo<dim>::subface_ratio(
-                                                  cell->subface_case(face_no), subface_no);
+                        const double area_ratio=GeometryInfo<dim>::subface_ratio(cell->subface_case(face_no),
+                                                                                 subface_no);
                         output_data.JxW_values[i] *= area_ratio;
                       }
                   }

@@ -52,8 +52,8 @@ void test()
   FE_Q<dim,spacedim> fe(1);
   const QGauss<dim-1> quad(5);
 
-  FEFaceValues<dim,spacedim> fe_v(map_manifold, fe, quad,
-                                  update_quadrature_points);
+  FEFaceValues<dim,spacedim> fe_v(map_manifold,  fe, quad,
+                                  update_quadrature_points | update_normal_vectors);
 
   out << "set size ratio -1" << std::endl
       << "set terminal aqua " << dim+spacedim << std::endl
@@ -66,6 +66,7 @@ void test()
         {
           fe_v.reinit(cell, f);
           const std::vector<Point<spacedim> > &qps = fe_v.get_quadrature_points();
+          const std::vector<Point<spacedim> > &nps = fe_v.get_normal_vectors();
           for (unsigned int i=0; i<qps.size(); ++i)
             {
               out << qps[i] << std::endl;
@@ -74,7 +75,32 @@ void test()
             }
           out << std::endl;
         }
+
+  out << "e" << std::endl << std::endl
+      << std::endl
+      << "set terminal aqua " << 2*(dim+spacedim) +1 << std::endl
+      << (spacedim == 3 ? "s" : "") << "plot '-' with vectors " << std::endl;
+
+  for (typename Triangulation<dim,spacedim>::active_cell_iterator cell =
+         triangulation.begin_active(); cell != triangulation.end(); ++cell)
+    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      if (cell->face(f)->at_boundary())
+        {
+          fe_v.reinit(cell, f);
+          const std::vector<Point<spacedim> > &qps = fe_v.get_quadrature_points();
+          const std::vector<Point<spacedim> > &nps = fe_v.get_normal_vectors();
+          for (unsigned int i=0; i<qps.size(); ++i)
+            {
+              out << qps[i] << " " << nps[i] << std::endl;
+              if (std::abs( (center+nps[i]-qps[i]).norm() ) > 1e-10)
+                out << "# Error! The normal vector should be radial! " << std::endl
+                    << "# Got " << center + nps[i]<< " instead of "
+                    << qps[i] << std::endl;
+            }
+          out << std::endl;
+        }
   out << "e" << std::endl << std::endl;
+
 }
 
 
