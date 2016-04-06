@@ -352,7 +352,7 @@ namespace MemoryConsumption
     else
       {
         std::size_t mem = 0;
-        for (std::size_t i=0; i<N; ++i)
+        for (std::size_t i=0; i!=N; ++i)
           mem += memory_consumption(v[i]);
         return mem;
       }
