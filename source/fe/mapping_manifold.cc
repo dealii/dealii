@@ -51,11 +51,17 @@ std::size_t
 MappingManifold<dim,spacedim>::InternalData::memory_consumption () const
 {
   return (Mapping<dim,spacedim>::InternalDataBase::memory_consumption() +
+          MemoryConsumption::memory_consumption (vertices) +
+          MemoryConsumption::memory_consumption (cell) +
+          MemoryConsumption::memory_consumption (quad) +
+          MemoryConsumption::memory_consumption (cell_manifold_quadrature_weights) +
+          MemoryConsumption::memory_consumption (vertex_weights) +
+          MemoryConsumption::memory_consumption (unit_tangentials) +
           MemoryConsumption::memory_consumption (covariant) +
           MemoryConsumption::memory_consumption (contravariant) +
-          MemoryConsumption::memory_consumption (unit_tangentials) +
           MemoryConsumption::memory_consumption (aux) +
-          MemoryConsumption::memory_consumption (volume_elements));
+          MemoryConsumption::memory_consumption (volume_elements) +
+          MemoryConsumption::memory_consumption (manifold) );
 }
 
 
@@ -74,6 +80,8 @@ initialize (const UpdateFlags      update_flags,
   this->quad = q;
   const unsigned int n_q_points = q.size();
 
+  // Resize the weights
+  this->vertex_weights.resize(GeometryInfo<dim>::vertices_per_cell);
 
   // see if we need the (transformation) shape function values
   // and/or gradients and resize the necessary arrays
@@ -111,7 +119,8 @@ initialize_face (const UpdateFlags      update_flags,
           const unsigned int nfaces = GeometryInfo<dim>::faces_per_cell;
           unit_tangentials.resize (nfaces*(dim-1),
                                    std::vector<Tensor<1,dim> > (n_original_q_points));
-          if (dim==2)
+          switch(dim) {
+          case 2:
             {
               // ensure a counterclockwise
               // orientation of tangentials
@@ -123,8 +132,9 @@ initialize_face (const UpdateFlags      update_flags,
                   std::fill (unit_tangentials[i].begin(),
                              unit_tangentials[i].end(), tang);
                 }
+              break;
             }
-          else if (dim==3)
+          case 3:
             {
               for (unsigned int i=0; i<nfaces; ++i)
                 {
@@ -152,8 +162,12 @@ initialize_face (const UpdateFlags      update_flags,
                   std::fill (unit_tangentials[nfaces+i].begin(),
                              unit_tangentials[nfaces+i].end(), tang2);
                 }
+              break;
             }
+          default:
+              Assert(false,ExcNotImplemented());
         }
+      }
     }
 }
 
@@ -170,13 +184,13 @@ MappingManifold<dim,spacedim>::MappingManifold (const MappingManifold<dim,spaced
 
 
 
-
 template<int dim, int spacedim>
 Mapping<dim,spacedim> *
 MappingManifold<dim,spacedim>::clone () const
 {
   return new MappingManifold<dim,spacedim>(*this);
 }
+
 
 
 template<int dim, int spacedim>
@@ -188,6 +202,8 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
   Assert(false, ExcNotImplemented());
   return Point<dim>();
 }
+
+
 
 template<int dim, int spacedim>
 Point<spacedim>
@@ -406,9 +422,6 @@ namespace internal
           std::fill(data.contravariant.begin(), data.contravariant.end(),
                     DerivativeForm<1,dim,spacedim>());
 
-          // Cache of weights used to compute points on the reference cell
-          std::vector<double> weights(GeometryInfo<dim>::vertices_per_cell);
-
           AssertDimension(GeometryInfo<dim>::vertices_per_cell,
                           data.vertices.size());
           for (unsigned int point=0; point<n_q_points; ++point)
@@ -427,11 +440,11 @@ namespace internal
               // tangent vectors from the Manifold object
               for (unsigned int i=0; i<dim; ++i)
                 {
-                  Point<dim> ei = Point<dim>::unit_vector(i);
-                  double ai = ei*p;
+                  const Point<dim> ei = Point<dim>::unit_vector(i);
+                  const double ai = ei*p;
                   Assert(ai >=0, ExcInternalError("Was expecting a quadrature point "
                                                   "inside the unit reference element."));
-                  Point<dim> np(ai > .5 ? p-ai *ei : p+(1-ai)*ei);
+                  const Point<dim> np(ai > .5 ? p-ai *ei : p+(1-ai)*ei);
 
                   // In the lenghts, we store also the direction sign,
                   // which is positive, if the coordinate is < .5,
@@ -439,10 +452,11 @@ namespace internal
 
                   // Get the weights to compute the np point in real space
                   for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_cell; ++j)
-                    weights[j] = GeometryInfo<dim>::d_linear_shape_function(np, j);
+                    data.vertex_weights[j] = GeometryInfo<dim>::d_linear_shape_function(np, j);
 
                   Point<spacedim> NP=data.manifold->
-                                     get_new_point(Quadrature<spacedim>(data.vertices, weights));
+                                     get_new_point(Quadrature<spacedim>(data.vertices,
+                                                                        data.vertex_weights));
 
                   Tensor<1,spacedim> T = data.manifold->get_tangent_vector(P, NP);
 

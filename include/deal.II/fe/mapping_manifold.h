@@ -257,6 +257,14 @@ public:
      */
     std::vector<std::vector<double> > cell_manifold_quadrature_weights;
 
+
+    /**
+     * Weights for vertices to use in Manifold::get_new_point().
+     *
+     * Computed each.
+     */
+    mutable std::vector<double> vertex_weights;
+
     /**
      * Unit tangential vectors. Used for the computation of boundary forms and
      * normal vectors.
