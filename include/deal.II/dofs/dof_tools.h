@@ -204,8 +204,7 @@ namespace DoFTools
   };
 
   /**
-   * @name Functions to support code that generically uses both DoFHandler and
-   * hp::DoFHandler
+   * @name Functions to support code that generically uses both DoFHandler and hp::DoFHandler
    * @{
    */
   /**
