@@ -14,11 +14,11 @@
 // ---------------------------------------------------------------------
 
 /**
-@page changes_after_8_4 Changes after Version 8.4.0
+@page changes_after_8_4_1 Changes after Version 8.4.1
 
 <p>
 This is the list of changes made after the release of deal.II version
-8.4.0. All entries are signed with the names of the authors.
+8.4.1. All entries are signed with the names of the authors.
 </p>
 
 
