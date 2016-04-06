@@ -276,7 +276,6 @@ namespace MeshWorker
        * Initialize the matrices #interface_in and #interface_out used for
        * local refinement with continuous Galerkin methods.
        */
-
       void initialize_interfaces(MGLevelObject<MatrixType> &interface_in,
                                  MGLevelObject<MatrixType> &interface_out);
       /**
@@ -519,18 +518,16 @@ namespace MeshWorker
       for (unsigned int k=0; k<residuals.size(); ++k)
         {
           VectorType *v = residuals.entry<VectorType *>(k);
-          if (constraints == 0)
+          for (unsigned int i=0; i != info.vector(k).n_blocks(); ++i)
             {
-              for (unsigned int i=0; i<info.vector(k).block(0).size(); ++i)
-                (*v)(info.indices[i]) += info.vector(k).block(0)(i);
-            }
-          else
-            {
-              if (info.indices_by_block.size() == 0)
-                constraints->distribute_local_to_global(info.vector(k).block(0), info.indices, *v);
+              const std::vector<types::global_dof_index>  &ldi = info.vector(k).n_blocks()==1?
+                                                                 info.indices:
+                                                                 info.indices_by_block[i];
+
+              if (constraints !=0)
+                constraints->distribute_local_to_global(info.vector(k).block(i), ldi, *v);
               else
-                for (unsigned int i=0; i != info.vector(k).n_blocks(); ++i)
-                  constraints->distribute_local_to_global(info.vector(k).block(i), info.indices_by_block[i], *v);
+                v->add(ldi, info.vector(k).block(i));
             }
         }
     }
@@ -541,41 +538,8 @@ namespace MeshWorker
     ResidualSimple<VectorType>::assemble(const DOFINFO &info1,
                                          const DOFINFO &info2)
     {
-      for (unsigned int k=0; k<residuals.size(); ++k)
-        {
-          VectorType *v = residuals.entry<VectorType *>(k);
-          if (constraints == 0)
-            {
-              for (unsigned int i=0; i<info1.vector(k).block(0).size(); ++i)
-                (*v)(info1.indices[i]) += info1.vector(k).block(0)(i);
-              for (unsigned int i=0; i<info2.vector(k).block(0).size(); ++i)
-                (*v)(info2.indices[i]) += info2.vector(k).block(0)(i);
-            }
-          else
-            {
-              if (info1.indices_by_block.size() == 0 && info2.indices_by_block.size() == 0)
-                {
-                  constraints->distribute_local_to_global
-                  (info1.vector(k).block(0), info1.indices, *v);
-                  constraints->distribute_local_to_global
-                  (info2.vector(k).block(0), info2.indices, *v);
-                }
-              else if (info1.indices_by_block.size() != 0 && info2.indices_by_block.size() != 0)
-                {
-                  for (unsigned int i=0; i<info1.vector(k).n_blocks(); ++i)
-                    {
-                      constraints->distribute_local_to_global
-                      (info1.vector(k).block(i), info1.indices_by_block[i], *v);
-                      constraints->distribute_local_to_global
-                      (info2.vector(k).block(i), info2.indices_by_block[i], *v);
-                    }
-                }
-              else
-                {
-                  Assert(false, ExcNotImplemented());
-                }
-            }
-        }
+      assemble(info1);
+      assemble(info2);
     }
 
 
