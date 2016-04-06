@@ -92,7 +92,7 @@ void test ()
       types::global_dof_index row = 21;
       unsigned int n_values = 4;
       types::global_dof_index cols[] = {21, 22, 23, 39};
-      double vals[] = {1, 201, 401, 101};
+      typename LA::MPI::SparseMatrix::value_type vals[] = {1, 201, 401, 101};
       matrix.add(row, n_values, cols, vals, false, true);
     }
 

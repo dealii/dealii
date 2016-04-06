@@ -98,6 +98,7 @@ void test ()
   DoFTools::make_sparsity_pattern (dof_handler, bcsp, constraints, false);
   SparsityTools::distribute_sparsity_pattern (bcsp, dof_handler.locally_owned_dofs_per_processor (), MPI_COMM_WORLD, locally_relevant_dofs);
 
+  typedef typename LA::MPI::BlockSparseMatrix::value_type number;
   typename LA::MPI::BlockSparseMatrix A;
   A.reinit(locally_owned_partitioning, bcsp, MPI_COMM_WORLD);
 
@@ -105,13 +106,13 @@ void test ()
   FEValues<3> fe_values (fe, quadrature, update_values);
 
   std::vector<types::global_dof_index>  local_dof_indices (fe.dofs_per_cell);
-  FullMatrix<double> local_matrix(fe.dofs_per_cell, fe.dofs_per_cell);
+  FullMatrix<number> local_matrix(fe.dofs_per_cell, fe.dofs_per_cell);
 
   for (DoFHandler<3>::active_cell_iterator cell = dof_handler.begin_active (); cell != dof_handler.end (); ++cell)
     if (cell->is_locally_owned ())
       {
         fe_values.reinit (cell);
-        local_matrix = 0.0;
+        local_matrix = number();
 
         for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
           {

@@ -66,7 +66,7 @@ get_new_point (const Quadrature<spacedim> &quad) const
 template <>
 Tensor<1,2>
 Manifold<2, 2>::
-normal_vector (const typename Triangulation<2, 2>::face_iterator &face,
+normal_vector (const Triangulation<2, 2>::face_iterator &face,
                const Point<2> &p) const
 {
   const int spacedim=2;
@@ -81,7 +81,7 @@ normal_vector (const typename Triangulation<2, 2>::face_iterator &face,
 template<>
 Tensor<1,3>
 Manifold<3, 3>::
-normal_vector (const typename Triangulation<3, 3>::face_iterator &face,
+normal_vector (const Triangulation<3, 3>::face_iterator &face,
                const Point<3> &p) const
 {
   const int spacedim=3;
@@ -179,7 +179,7 @@ normal_vector (const typename Triangulation<dim, spacedim>::face_iterator &/*fac
 template <>
 void
 Manifold<2, 2>::
-get_normals_at_vertices (const typename Triangulation<2, 2>::face_iterator &face,
+get_normals_at_vertices (const Triangulation<2, 2>::face_iterator &face,
                          FaceVertexNormals &n) const
 {
   n[0] = cross_product_2d(get_tangent_vector(face->vertex(0), face->vertex(1)));
@@ -193,7 +193,7 @@ get_normals_at_vertices (const typename Triangulation<2, 2>::face_iterator &face
 template <>
 void
 Manifold<3, 3>::
-get_normals_at_vertices (const typename Triangulation<3, 3>::face_iterator &face,
+get_normals_at_vertices (const Triangulation<3, 3>::face_iterator &face,
                          FaceVertexNormals &n) const
 {
   n[0] = cross_product_3d

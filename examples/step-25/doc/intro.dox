@@ -109,7 +109,7 @@ sine-Gordon equation under consideration here, we have that
   F(u^n_l) &=&  \left[ 1-k^2\theta^2\Delta \right] u^n_l -  
                  \left[ 1+k^2\theta(1-\theta)\Delta\right] u^{n-1} - k v^{n-1} 
                  + k^2\theta\sin\left[\theta u^n_l + (1-\theta) u^{n-1}\right],\\
-  F'(u^n_l) &=& 1-k^2\theta^2\Delta - k^2\theta^2\cos\left[\theta u^n_l 
+  F'(u^n_l) &=& 1-k^2\theta^2\Delta + k^2\theta^2\cos\left[\theta u^n_l 
                         + (1-\theta) u^{n-1}\right].
 \f}
 Notice that while $F(u^n_l)$ is a function, $F'(u^n_l)$ is an operator.
@@ -153,13 +153,13 @@ H^1(\Omega)$. Thus, the finite-dimensional version of the variational formulatio
         U^{n,l+1} = U^{n,l} + \delta U^{n,l}, \qquad U^{n,0} = U^{n-1}; \\
   MV^n &=& MV^{n-1} - k \theta AU^n -k (1-\theta) AU^{n-1} - k S(u^n,u^{n-1}).
 @f}
-Above, the matrix $F_h'(\cdot)$ and the vector $F_h(\cdot)$ denote the discrete versions of the gadgets discussed above, i.e.
+Above, the matrix $F_h'(\cdot)$ and the vector $F_h(\cdot)$ denote the discrete versions of the gadgets discussed above, i.e.,
 \f{eqnarray*}
   F_h(U^{n,l}) &=&  \left[ M+k^2\theta^2A \right] U^{n,l} -  
                 \left[ M-k^2\theta(1-\theta)A \right] U^{n-1} - k MV^{n-1} 
                 + k^2\theta S(u^n_l, u^{n-1}),\\
   F_h'(U^{n,l}) &=& M+k^2\theta^2A 
-                                - k^2\theta^2N(u^n_l,u^{n-1})
+                                + k^2\theta^2N(u^n_l,u^{n-1})
 \f}
 Again, note that the first matrix equation above is, in fact, the
 definition of an iterative procedure, so it is solved multiple times
@@ -177,7 +177,7 @@ What solvers can we use for the first equation? Let's look at the matrix we
 have to invert:
 @f[
   (M+k^2\theta^2(A-N))_{ij} = 
-  \int_\Omega (1-k^2\theta^2 \cos \alpha) 
+  \int_\Omega (1+k^2\theta^2 \cos \alpha) 
   \varphi_i\varphi_j \; dx+\int_\Omega \nabla\varphi_i\nabla\varphi_j \; dx,
 @f]
 for some $\alpha$ that depends on the present and previous solution. First,

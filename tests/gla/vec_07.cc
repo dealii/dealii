@@ -59,11 +59,11 @@ void test ()
   v=vb;
   Assert(v.has_ghost_elements(), ExcInternalError());
 
-  deallog << "ghosted value: " << v(1) << " (should be 2.0)" << std::endl;
+  deallog << "ghosted value: " << get_real_assert_zero_imag(v(1)) << " (should be 2.0)" << std::endl;
   v=0;
-  deallog << "ghosted value: " << v(1) << " (should be 0.0)" << std::endl;
+  deallog << "ghosted value: " << get_real_assert_zero_imag(v(1)) << " (should be 0.0)" << std::endl;
   v=42.1;
-  deallog << "ghosted value: " << v(1) << " (should be 42.1)" << std::endl;
+  deallog << "ghosted value: " << get_real_assert_zero_imag(v(1)) << " (should be 42.1)" << std::endl;
 
   // done
   if (myid==0)

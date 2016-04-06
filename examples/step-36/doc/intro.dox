@@ -190,14 +190,14 @@ system that operates only on boundary nodes -- nodes that are not
 real degrees of <i>freedom</i>.
 Of course, since the two matrices $D_A,D_M$ are diagonal, we can
 exactly quantify these spurious eigenvalues: they are
-$\varepsilon_{h,j}=A_{jj}/M_{jj}$ (where the indices
+$\varepsilon_{h,j}=D_{A,jj}/D_{M,jj}$ (where the indices
 $j$ corresponds exactly to the degrees of freedom that are constrained
 by Dirichlet boundary values).
 
 So how does one deal with them? The fist part is to recognize when our
 eigenvalue solver finds one of them. To this end, the program computes
 and prints an interval within which these eigenvalues lie, by computing
-the minimum and maximum of the expression $\varepsilon_{h,j}=A_{jj}/M_{jj}$
+the minimum and maximum of the expression $\varepsilon_{h,j}=D_{A,jj}/D_{M,jj}$
 over all constrained degrees of freedom. In the program below, this
 already suffices: we find that this interval lies outside the set of
 smallest eigenvalues and corresponding eigenfunctions we are interested

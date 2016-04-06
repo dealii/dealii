@@ -64,6 +64,33 @@ using namespace dealii;
 
 // ------------------------------ Utility functions used in tests -----------------------
 
+/**
+ * A function to return real part of the number and check that
+ * its imaginary part is zero.
+ */
+#ifdef DEAL_II_WITH_PETSC
+#include <deal.II/lac/petsc_vector_base.h>
+PetscReal get_real_assert_zero_imag(const PETScWrappers::internal::VectorReference &a)
+{
+  Assert (a.imag() == 0.0, ExcInternalError());
+  return a.real();
+}
+#endif
+
+template<typename number>
+number get_real_assert_zero_imag(const std::complex<number> &a)
+{
+  Assert (a.imag() == 0.0, ExcInternalError());
+  return a.real();
+}
+
+template<typename number>
+number get_real_assert_zero_imag(const number &a)
+{
+  return a;
+}
+
+
 // Cygwin has a different implementation for rand() which causes many tests to fail.
 // This here is a reimplementation that gives the same sequence of numbers as a program
 // that uses rand() on a typical linux machine.
@@ -282,8 +309,7 @@ initlog(bool console=false)
   deallogname = "output";
   deallogfile.open(deallogname.c_str());
   deallog.attach(deallogfile);
-  if (!console)
-    deallog.depth_console(0);
+  deallog.depth_console(console?10:0);
 
 //TODO: Remove this line and replace by test_mode()
   deallog.threshold_float(1.e-8);
@@ -301,8 +327,7 @@ mpi_initlog(bool console=false)
       deallogname = "output";
       deallogfile.open(deallogname.c_str());
       deallog.attach(deallogfile);
-      if (!console)
-        deallog.depth_console(0);
+      deallog.depth_console(console?10:0);
 
 //TODO: Remove this line and replace by test_mode()
       deallog.threshold_float(1.e-8);
@@ -328,8 +353,7 @@ struct MPILogInitAll
       deallogname = deallogname + Utilities::int_to_string(myid);
     deallogfile.open(deallogname.c_str());
     deallog.attach(deallogfile);
-    if (!console)
-      deallog.depth_console(0);
+    deallog.depth_console(console?10:0);
 
 //TODO: Remove this line and replace by test_mode()
     deallog.threshold_float(1.e-8);

@@ -69,7 +69,7 @@ void test ()
   deallog << "block(0).size: " << v.block(0).size() << std::endl;
   deallog << "block(1).size: " << v.block(1).size() << std::endl;
   if (block1.n_elements()>0)
-    deallog << "my first entry: " << v(block1.nth_index_in_set(0)) << std::endl;
+    deallog << "my first entry: " << get_real_assert_zero_imag(v(block1.nth_index_in_set(0))) << std::endl;
 
 
   ConstraintMatrix cm;
@@ -78,10 +78,10 @@ void test ()
   cm.close();
 
   if (myid==0)
-    deallog << "before: " << v(0) << std::endl;
+    deallog << "before: " << get_real_assert_zero_imag(v(0)) << std::endl;
   cm.distribute(v); // this should set x(0)= 3.0 * x(1) = 3.0
   if (myid==0)
-    deallog << "after: " << v(0) << std::endl;
+    deallog << "after: " << get_real_assert_zero_imag(v(0)) << std::endl;
 
   // done
   if (myid==0)

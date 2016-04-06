@@ -1,0 +1,97 @@
+
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       64
+DEAL::   Number of degrees of freedom: 81 (by level: 25, 81)
+DEAL::   Size of coarse grid matrix: 25
+DEAL:cg::Starting value 0.9798
+DEAL:cg::Convergence step 7 value 0
+DEAL:cg::Starting value 0.9938
+DEAL:cg::Convergence step 18 value 0
+DEAL:cg::Starting value 0.1094
+DEAL:cg::Convergence step 10 value 0
+DEAL::   10 CG iterations needed to obtain convergence.
+DEAL::Cycle 1:
+DEAL::   Number of active cells:       127
+DEAL::   Number of degrees of freedom: 160 (by level: 25, 81, 117)
+DEAL::   Size of coarse grid matrix: 25
+DEAL:cg::Starting value 0.9798
+DEAL:cg::Convergence step 7 value 0
+DEAL:cg::Starting value 0.9938
+DEAL:cg::Convergence step 18 value 0
+DEAL:cg::Starting value 0.9957
+DEAL:cg::Convergence step 15 value 0
+DEAL:cg::Starting value 0.09101
+DEAL:cg::Convergence step 13 value 0
+DEAL::   13 CG iterations needed to obtain convergence.
+DEAL::Cycle 2:
+DEAL::   Number of active cells:       256
+DEAL::   Number of degrees of freedom: 301 (by level: 25, 81, 245, 71)
+DEAL::   Size of coarse grid matrix: 25
+DEAL:cg::Starting value 0.9798
+DEAL:cg::Convergence step 7 value 0
+DEAL:cg::Starting value 0.9938
+DEAL:cg::Convergence step 18 value 0
+DEAL:cg::Starting value 0.9980
+DEAL:cg::Failure step 20 value 7.015e-05
+DEAL:cg::Starting value 0.9929
+DEAL:cg::Convergence step 11 value 0
+DEAL:cg::Starting value 0.06376
+DEAL:cg::Convergence step 12 value 0
+DEAL::   12 CG iterations needed to obtain convergence.
+DEAL::Cycle 3:
+DEAL::   Number of active cells:       493
+DEAL::   Number of degrees of freedom: 600 (by level: 25, 81, 265, 376, 119)
+DEAL::   Size of coarse grid matrix: 25
+DEAL:cg::Starting value 0.9798
+DEAL:cg::Convergence step 7 value 0
+DEAL:cg::Starting value 0.9938
+DEAL:cg::Convergence step 18 value 0
+DEAL:cg::Starting value 0.9981
+DEAL:cg::Failure step 20 value 0.0001644
+DEAL:cg::Starting value 0.9987
+DEAL:cg::Failure step 20 value 5.735e-09
+DEAL:cg::Starting value 0.9958
+DEAL:cg::Convergence step 12 value 0
+DEAL:cg::Starting value 0.05706
+DEAL:cg::Convergence step 15 value 0
+DEAL::   15 CG iterations needed to obtain convergence.
+DEAL::Cycle 4:
+DEAL::   Number of active cells:       979
+DEAL::   Number of degrees of freedom: 1093 (by level: 25, 81, 273, 791, 269, 88)
+DEAL::   Size of coarse grid matrix: 25
+DEAL:cg::Starting value 0.9798
+DEAL:cg::Convergence step 7 value 0
+DEAL:cg::Starting value 0.9938
+DEAL:cg::Convergence step 18 value 0
+DEAL:cg::Starting value 0.9982
+DEAL:cg::Failure step 20 value 0.0002935
+DEAL:cg::Starting value 0.9994
+DEAL:cg::Failure step 20 value 0.02813
+DEAL:cg::Starting value 0.9981
+DEAL:cg::Failure step 20 value 1.498e-09
+DEAL:cg::Starting value 0.9943
+DEAL:cg::Convergence step 7 value 0
+DEAL:cg::Starting value 0.04157
+DEAL:cg::Convergence step 15 value 0
+DEAL::   15 CG iterations needed to obtain convergence.
+DEAL::Cycle 5:
+DEAL::   Number of active cells:       1912
+DEAL::   Number of degrees of freedom: 2184 (by level: 25, 81, 277, 961, 1070, 501, 172)
+DEAL::   Size of coarse grid matrix: 25
+DEAL:cg::Starting value 0.9798
+DEAL:cg::Convergence step 7 value 0
+DEAL:cg::Starting value 0.9938
+DEAL:cg::Convergence step 18 value 0
+DEAL:cg::Starting value 0.9982
+DEAL:cg::Failure step 20 value 0.0004177
+DEAL:cg::Starting value 0.9995
+DEAL:cg::Failure step 20 value 0.05428
+DEAL:cg::Starting value 0.9995
+DEAL:cg::Failure step 20 value 0.0001063
+DEAL:cg::Starting value 0.9990
+DEAL:cg::Failure step 20 value 1.860e-09
+DEAL:cg::Starting value 0.9971
+DEAL:cg::Convergence step 13 value 0
+DEAL:cg::Starting value 0.03510
+DEAL:cg::Convergence step 15 value 0
+DEAL::   15 CG iterations needed to obtain convergence.
