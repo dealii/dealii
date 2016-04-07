@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2015 by the deal.II authors
+// Copyright (C) 2001 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -409,27 +409,27 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::compute_face_data
         {
           data.aux.resize (dim-1, std::vector<Tensor<1,spacedim> > (n_original_q_points));
 
-          // Compute tangentials to the
-          // unit cell.
-          const unsigned int nfaces = GeometryInfo<dim>::faces_per_cell;
-          data.unit_tangentials.resize (nfaces*(dim-1),
-                                        std::vector<Tensor<1,dim> > (n_original_q_points));
+          // Compute tangentials to the unit cell.
+          for (unsigned int i=0; i<data.unit_tangentials.size(); ++i)
+            data.unit_tangentials[i].resize (n_original_q_points);
+
           if (dim==2)
             {
               // ensure a counterclockwise
               // orientation of tangentials
               static const int tangential_orientation[4]= {-1,1,1,-1};
-              for (unsigned int i=0; i<nfaces; ++i)
+              for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
                 {
                   Tensor<1,dim> tang;
                   tang[1-i/2]=tangential_orientation[i];
                   std::fill (data.unit_tangentials[i].begin(),
-                             data.unit_tangentials[i].end(), tang);
+                             data.unit_tangentials[i].end(),
+                             tang);
                 }
             }
           else if (dim==3)
             {
-              for (unsigned int i=0; i<nfaces; ++i)
+              for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
                 {
                   Tensor<1,dim> tang1, tang2;
 
@@ -451,9 +451,11 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::compute_face_data
                   // for all quadrature
                   // points on this face
                   std::fill (data.unit_tangentials[i].begin(),
-                             data.unit_tangentials[i].end(), tang1);
-                  std::fill (data.unit_tangentials[nfaces+i].begin(),
-                             data.unit_tangentials[nfaces+i].end(), tang2);
+                             data.unit_tangentials[i].end(),
+                             tang1);
+                  std::fill (data.unit_tangentials[GeometryInfo<dim>::faces_per_cell+i].begin(),
+                             data.unit_tangentials[GeometryInfo<dim>::faces_per_cell+i].end(),
+                             tang2);
                 }
             }
         }
