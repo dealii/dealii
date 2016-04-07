@@ -269,7 +269,7 @@ public:
      * Unit tangential vectors. Used for the computation of boundary forms and
      * normal vectors.
      *
-     * This vector has (dim-1)GeometryInfo::faces_per_cell entries. The first
+     * This array has (dim-1)*GeometryInfo::faces_per_cell entries. The first
      * GeometryInfo::faces_per_cell contain the vectors in the first
      * tangential direction for each face; the second set of
      * GeometryInfo::faces_per_cell entries contain the vectors in the second
@@ -278,7 +278,7 @@ public:
      *
      * Filled once.
      */
-    std::vector<std::vector<Tensor<1,dim> > > unit_tangentials;
+    std_cxx11::array<std::vector<Tensor<1,dim> >, GeometryInfo<dim>::faces_per_cell *(dim-1)> unit_tangentials;
 
     /**
      * Tensors of covariant transformation at each of the quadrature points.
