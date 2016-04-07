@@ -78,7 +78,6 @@ initialize (const UpdateFlags      update_flags,
 
   // Store the quadrature
   this->quad = q;
-  const unsigned int n_q_points = q.size();
 
   // Resize the weights
   this->vertex_weights.resize(GeometryInfo<dim>::vertices_per_cell);
@@ -181,7 +180,7 @@ MappingManifold<dim,spacedim>::MappingManifold ()
 
 
 template<int dim, int spacedim>
-MappingManifold<dim,spacedim>::MappingManifold (const MappingManifold<dim,spacedim> &mapping)
+MappingManifold<dim,spacedim>::MappingManifold (const MappingManifold<dim,spacedim> &)
 {}
 
 
@@ -198,8 +197,8 @@ MappingManifold<dim,spacedim>::clone () const
 template<int dim, int spacedim>
 Point<dim>
 MappingManifold<dim,spacedim>::
-transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                             const Point<spacedim> &p) const
+transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &,
+                             const Point<spacedim> &) const
 {
   Assert(false, ExcNotImplemented());
   return Point<dim>();
