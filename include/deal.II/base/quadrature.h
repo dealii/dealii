@@ -125,6 +125,17 @@ public:
    */
   Quadrature (const Quadrature<dim> &q);
 
+#ifdef DEAL_II_WITH_CXX11
+  /**
+   * Move constructor. Construct a new quadrature object by transferring the
+   * internal data of another quadrature object.
+   *
+   * @note this constructor is only available if deal.II is configured with
+   * C++11 support.
+   */
+  Quadrature (Quadrature<dim> &&) = default;
+#endif
+
   /**
    * Construct a quadrature formula from given vectors of quadrature points
    * (which should really be in the unit cell) and the corresponding weights.

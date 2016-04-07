@@ -116,7 +116,12 @@ inconvenience this causes.
  <br>
  (Daniel Arndt, 2016/04/08)
  </li>
- 
+
+ <li> New: A move constructor has been added to Quadrature.
+ <br>
+ (Daniel Shapero, 2016/04/08)
+ </li>
+
  <li> Fixed: The multigrid transfer performed invalid data accesses on
  multigrid hierarchies that define the coarse level as a level larger than
  0. This has been fixed.
