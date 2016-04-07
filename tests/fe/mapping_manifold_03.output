@@ -1,0 +1,13 @@
+
+DEAL::dim=1, spacedim=1
+DEAL::OK
+DEAL::dim=1, spacedim=2
+DEAL::OK
+DEAL::dim=1, spacedim=3
+DEAL::OK
+DEAL::dim=2, spacedim=2
+DEAL::OK
+DEAL::dim=2, spacedim=3
+DEAL::OK
+DEAL::dim=3, spacedim=3
+DEAL::OK

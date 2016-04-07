@@ -1,0 +1,8 @@
+
+DEAL::dim: 3 FE_Q<3>(QGaussLobatto(5))
+DEAL::Mapping degree ||u-u_h||
+DEAL::1 6.8494e-13
+DEAL::2 6.8495e-13
+DEAL::3 6.8497e-13
+DEAL::4 6.8491e-13
+DEAL::5 6.8492e-13

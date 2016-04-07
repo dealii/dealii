@@ -1,0 +1,27 @@
+
+# dim=2, spacedim=2
+DEAL::Cycle	      : 0
+DEAL::Surface Area  : 6.28319
+DEAL::Error         : -1.77636e-15
+DEAL::Cycle	      : 1
+DEAL::Surface Area  : 6.28319
+DEAL::Error         : 0.00000
+DEAL::Cycle	      : 2
+DEAL::Surface Area  : 6.28319
+DEAL::Error         : 1.77636e-15
+DEAL::Cycle	      : 3
+DEAL::Surface Area  : 6.28319
+DEAL::Error         : -8.88178e-15
+# dim=3, spacedim=3
+DEAL::Cycle	      : 0
+DEAL::Surface Area  : 9.63008
+DEAL::Error         : -2.93629
+DEAL::Cycle	      : 1
+DEAL::Surface Area  : 12.2948
+DEAL::Error         : -0.271577
+DEAL::Cycle	      : 2
+DEAL::Surface Area  : 12.4659
+DEAL::Error         : -0.100470
+DEAL::Cycle	      : 3
+DEAL::Surface Area  : 12.5217
+DEAL::Error         : -0.0446494
