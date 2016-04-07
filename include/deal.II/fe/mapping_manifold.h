@@ -259,9 +259,18 @@ public:
 
 
     /**
-     * Weights for vertices to use in Manifold::get_new_point().
+     * A vector of weights for use in Manifold::get_new_point(). For
+     * each point (interior to a cell), we compute the weight each
+     * vertex has for this point. If the point lies at a vertex, then
+     * this vertex has weight one and all others have weight zero. If
+     * the point lies interior to a cell, then the weight every vertex
+     * has is just the $d$-linear shape functions associated with each
+     * vertex evaluated at that point.
      *
-     * Computed each.
+     * This array has size GeometryInfo<dim>::vertices_per_cell, but it
+     * can't be converted into a fixed size array because it is used
+     * as input for Manifold::get_new_point() which wants to see a
+     * std::vector<double> for the weights.
      */
     mutable std::vector<double> vertex_weights;
 
@@ -298,7 +307,7 @@ public:
      *
      * Computed on each cell.
      */
-    mutable std::vector< DerivativeForm<1,dim,spacedim> > contravariant;
+    mutable std::vector<DerivativeForm<1,dim,spacedim> > contravariant;
 
     /**
      * Auxiliary vectors for internal use.
