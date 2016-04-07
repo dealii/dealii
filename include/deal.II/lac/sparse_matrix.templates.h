@@ -73,7 +73,7 @@ SparseMatrix<number>::SparseMatrix (const SparseMatrix &m)
 template <typename number>
 SparseMatrix<number>::SparseMatrix (SparseMatrix<number> &&m)
   :
-  Subscriptor(),
+  Subscriptor(std::move(m)),
   cols(m.cols),
   val(m.val),
   max_len(m.max_len)

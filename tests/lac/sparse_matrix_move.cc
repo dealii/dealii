@@ -71,30 +71,35 @@ int main()
   testproblem.five_point_structure(sparsity);
   sparsity.compress();
 
-  // Return a sparse matrix, possibly using RVO or move constructor
-  SparseMatrix<double> A = graph_laplacian(sparsity);
-  deallog << A.n_nonzero_elements() << std::endl;
-
   Vector<double> x(dim), y(dim);
-  x = 1.0;
-  y = 1.0;
-  A.vmult(y, x);
 
-  deallog << y.l2_norm() << std::endl;
+  {
+    // Return a sparse matrix, possibly using RVO or move constructor
+    SparseMatrix<double> A = graph_laplacian(sparsity);
+    deallog << A.n_nonzero_elements() << std::endl;
 
-  // Return a sparse matrix using the move constructor
-  SparseMatrix<double> B = graph_laplacian_move_return(sparsity);
-  deallog << B.n_nonzero_elements() << std::endl;
-  y = 1.0;
-  B.vmult(y, x);
+    x = 1.0;
+    y = 1.0;
+    A.vmult(y, x);
 
-  deallog << y.l2_norm() << std::endl;
+    deallog << y.l2_norm() << std::endl;
+  }
 
-  // Explicitly move a sparse matrix
-  SparseMatrix<double> C;
-  C = std::move(B);
-  deallog << C.m() << std::endl;
-  deallog << B.empty() << std::endl;
+  {
+    // Return a sparse matrix using the move constructor
+    SparseMatrix<double> A = graph_laplacian_move_return(sparsity);
+    deallog << A.n_nonzero_elements() << std::endl;
+    y = 1.0;
+    A.vmult(y, x);
+
+    deallog << y.l2_norm() << std::endl;
+
+    // Explicitly move a sparse matrix
+    SparseMatrix<double> B;
+    B = std::move(A);
+    deallog << B.m() << std::endl;
+    deallog << A.empty() << std::endl;
+  }
 
   return 0;
 }
