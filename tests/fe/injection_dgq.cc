@@ -17,6 +17,7 @@
 
 char logname[] = "output";
 
+#include <deal.II/base/quadrature_lib.h>
 
 #include "injection_common.h"
 
@@ -28,5 +29,13 @@ void test ()
 
   for (unsigned int i=0; i<4; ++i)
     for (unsigned int j=i; j<4; ++j)
-      do_check (FE_DGQ<dim>(i), FE_DGQ<dim>(j));
+      if (i > 0 && j > 0)
+        do_check (FE_DGQArbitraryNodes<dim>(QIterated<1>(QTrapez<1>(),i)),
+                  FE_DGQArbitraryNodes<dim>(QIterated<1>(QTrapez<1>(),j)));
+      else if (j > 0)
+        do_check (FE_DGQ<dim>(0),
+                  FE_DGQArbitraryNodes<dim>(QIterated<1>(QTrapez<1>(),j)));
+      else
+        do_check (FE_DGQ<dim>(0),
+                  FE_DGQ<dim>(0));
 }

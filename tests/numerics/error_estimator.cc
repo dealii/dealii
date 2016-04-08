@@ -95,7 +95,7 @@ check ()
   if (dim==1)
     tr.refine_global(2);
 
-  FE_Q<dim> element(3);
+  FE_Q<dim> element(QIterated<1>(QTrapez<1>(),3));
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 

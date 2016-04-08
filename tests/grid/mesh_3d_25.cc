@@ -119,4 +119,3 @@ int main ()
   create_two_cubes_rotation(triangulation,1);
   test<3>(triangulation);
 }
-

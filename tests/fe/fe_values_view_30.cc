@@ -170,7 +170,7 @@ void test_hyper_sphere()
 
   const unsigned int order = 3;
 
-  test(tr, FESystem<dim> (FE_Q<dim>(order), dim) );
+  test(tr, FESystem<dim> (FE_Q<dim>(QIterated<1>(QTrapez<1>(),order)), dim) );
 }
 
 

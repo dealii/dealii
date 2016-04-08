@@ -71,7 +71,7 @@ int main ()
   hp::FECollection<3> fe;
   fe.push_back (FE_Q<3>(1));
   fe.push_back (FE_Q<3>(2));
-  fe.push_back (FE_Q<3>(3));
+  fe.push_back (FE_Q<3>(QIterated<1>(QTrapez<1>(),3)));
 
   hp::DoFHandler<3>        dof_handler(triangulation);
 
@@ -144,4 +144,3 @@ done:
 
   constraints.print (deallog.get_file_stream());
 }
-

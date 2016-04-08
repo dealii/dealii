@@ -29,6 +29,6 @@ char logname[] = "output";
 
 void test ()
 {
-  FESystem<2> fe (FE_Q_Bubbles<2>(3), 2);
+  FESystem<2> fe (FE_Q_Bubbles<2>(QIterated<1>(QTrapez<1>(),3)), 2);
   check (fe);
 }

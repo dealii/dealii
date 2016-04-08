@@ -73,9 +73,9 @@ check ()
   element.push_back (FESystem<dim> (FE_Q<dim>(1), 1,
                                     FE_Q<dim>(2), 1));
   element.push_back (FESystem<dim> (FE_Q<dim>(2), 1,
-                                    FE_Q<dim>(3), 1));
-  element.push_back (FESystem<dim> (FE_Q<dim>(3), 1,
-                                    FE_Q<dim>(4), 1));
+                                    FE_Q<dim>(QIterated<1>(QTrapez<1>(),3)), 1));
+  element.push_back (FESystem<dim> (FE_Q<dim>(QIterated<1>(QTrapez<1>(),3)), 1,
+                                    FE_Q<dim>(QIterated<1>(QTrapez<1>(),4)), 1));
 
   hp::DoFHandler<dim> dof(tr);
 

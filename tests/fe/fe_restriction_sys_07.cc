@@ -25,7 +25,7 @@ main()
   initlog();
   deallog.threshold_double(1.e-10);
 
-  CHECK_SYS2 (FE_DGQ<2>(3), 1,
+  CHECK_SYS2 (FE_DGQArbitraryNodes<2>(QIterated<1>(QTrapez<1>(),3)), 1,
               FE_Nedelec<2>(0), 2,
               2);
 }
