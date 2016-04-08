@@ -377,7 +377,10 @@ public:
 
   /**
    * Read grid data from an Abaqus file. Numerical and constitutive data is
-   * ignored.
+   * ignored. As in the case of the ucd file format, it is possible to use
+   * the flag apply_all_indicators_to_manifolds to decide if
+   * the indicators in the file refer to manifolds (flag set to true)
+   * or boundaries (flag set to false).
    *
    * @note The current implementation of this mesh reader is suboptimal, and
    * may therefore be slow for large meshes.
@@ -411,7 +414,8 @@ public:
    * ID's". An invalid file will encounter errors if this box is left checked.
    *     - Click apply.
    */
-  void read_abaqus (std::istream &in);
+  void read_abaqus (std::istream                                  &in,
+                    const bool apply_all_indicators_to_manifolds=false);
 
   /**
    * Read grid data from a file containing data in the DB mesh format.

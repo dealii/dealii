@@ -844,7 +844,8 @@ namespace
 }
 
 template <int dim, int spacedim>
-void GridIn<dim, spacedim>::read_abaqus (std::istream &in)
+void GridIn<dim, spacedim>::read_abaqus (std::istream                            &in,
+                                         const bool apply_all_indicators_to_manifolds)
 {
   Assert (tria != 0, ExcNoTriangulationSelected());
   Assert (dim==2 || dim==3, ExcNotImplemented());
@@ -864,7 +865,7 @@ void GridIn<dim, spacedim>::read_abaqus (std::istream &in)
   // and doesn't think that they've somehow called the wrong function.
   try
     {
-      read_ucd(in_ucd);
+      read_ucd(in_ucd, apply_all_indicators_to_manifolds);
     }
   catch (...)
     {
