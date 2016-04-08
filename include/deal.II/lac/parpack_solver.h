@@ -478,7 +478,7 @@ void PArpackSolver<VectorType>::reinit(const dealii::IndexSet &locally_owned_dof
   nloc = locally_owned_dofs.n_elements ();
   ncv  = additional_data.number_of_arnoldi_vectors;
 
-  Assert (local_indices.size() == nloc, ExcInternalError() );
+  Assert ((int)local_indices.size() == nloc, ExcInternalError() );
 
   // vectors
   ldv = nloc;
@@ -667,9 +667,9 @@ void PArpackSolver<VectorType>::solve
               const int shift_x = ipntr[0]-1;
               const int shift_y = ipntr[1]-1;
               Assert (shift_x>=0, dealii::ExcInternalError() );
-              Assert (shift_x+nloc <= workd.size(), dealii::ExcInternalError() );
+              Assert (shift_x+nloc <= (int)workd.size(), dealii::ExcInternalError() );
               Assert (shift_y>=0, dealii::ExcInternalError() );
-              Assert (shift_y+nloc <= workd.size(), dealii::ExcInternalError() );
+              Assert (shift_y+nloc <= (int)workd.size(), dealii::ExcInternalError() );
 
               src = 0.0;
               src.add (nloc,
@@ -702,13 +702,13 @@ void PArpackSolver<VectorType>::solve
               const int shift_b_x = ipntr[2]-1;
 
               Assert (shift_x>=0, dealii::ExcInternalError() );
-              Assert (shift_x+nloc <= workd.size(), dealii::ExcInternalError() );
+              Assert (shift_x+nloc <= (int)workd.size(), dealii::ExcInternalError() );
               Assert (shift_y>=0, dealii::ExcInternalError() );
-              Assert (shift_y+nloc <= workd.size(), dealii::ExcInternalError() );
+              Assert (shift_y+nloc <= (int)workd.size(), dealii::ExcInternalError() );
               Assert (shift_b_x>=0, dealii::ExcInternalError() );
-              Assert (shift_b_x+nloc <= workd.size(), dealii::ExcInternalError() );
+              Assert (shift_b_x+nloc <= (int)workd.size(), dealii::ExcInternalError() );
               Assert (shift_y>=0, dealii::ExcInternalError() );
-              Assert (shift_y+nloc <= workd.size(), dealii::ExcInternalError() );
+              Assert (shift_y+nloc <= (int)workd.size(), dealii::ExcInternalError() );
 
               src = 0.0; // B*X
               src.add (nloc,
@@ -743,9 +743,9 @@ void PArpackSolver<VectorType>::solve
               const int shift_x = ipntr[0]-1;
               const int shift_y = ipntr[1]-1;
               Assert (shift_x>=0, dealii::ExcInternalError() );
-              Assert (shift_x+nloc <= workd.size(), dealii::ExcInternalError() );
+              Assert (shift_x+nloc <= (int)workd.size(), dealii::ExcInternalError() );
               Assert (shift_y>=0, dealii::ExcInternalError() );
-              Assert (shift_y+nloc <= workd.size(), dealii::ExcInternalError() );
+              Assert (shift_y+nloc <= (int)workd.size(), dealii::ExcInternalError() );
 
               src = 0.0;
               src.add (nloc,
@@ -838,7 +838,7 @@ void PArpackSolver<VectorType>::solve
                                                eigenvalues_im[i]);
     }
 
-  Assert (iparam[4] == n_eigenvalues,
+  Assert (iparam[4] == (int)n_eigenvalues,
           PArpackExcConvergedEigenvectors(iparam[4], n_eigenvalues));
 
   // both PDNAUPD and PDSAUPD compute eigenpairs of inv[A - sigma*M]*M
