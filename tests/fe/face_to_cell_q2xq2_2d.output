@@ -1,21 +1,21 @@
 
 DEAL::Face=0
 DEAL::  flip=false
-DEAL::    0 - 1 - 4 - 5 - 8 - 9 - 
+DEAL::    0 - 1 - 4 - 5 - 8 - 9 -
 DEAL::  flip=true
-DEAL::    4 - 5 - 0 - 1 - 8 - 9 - 
+DEAL::    4 - 5 - 0 - 1 - 8 - 9 -
 DEAL::Face=1
 DEAL::  flip=false
-DEAL::    2 - 3 - 6 - 7 - 10 - 11 - 
+DEAL::    2 - 3 - 6 - 7 - 10 - 11 -
 DEAL::  flip=true
-DEAL::    6 - 7 - 2 - 3 - 10 - 11 - 
+DEAL::    6 - 7 - 2 - 3 - 10 - 11 -
 DEAL::Face=2
 DEAL::  flip=false
-DEAL::    0 - 1 - 2 - 3 - 12 - 13 - 
+DEAL::    0 - 1 - 2 - 3 - 12 - 13 -
 DEAL::  flip=true
-DEAL::    2 - 3 - 0 - 1 - 12 - 13 - 
+DEAL::    2 - 3 - 0 - 1 - 12 - 13 -
 DEAL::Face=3
 DEAL::  flip=false
-DEAL::    4 - 5 - 6 - 7 - 14 - 15 - 
+DEAL::    4 - 5 - 6 - 7 - 14 - 15 -
 DEAL::  flip=true
-DEAL::    6 - 7 - 4 - 5 - 14 - 15 - 
+DEAL::    6 - 7 - 4 - 5 - 14 - 15 -

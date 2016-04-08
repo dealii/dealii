@@ -103,7 +103,7 @@ DEAL::FE=FESystem<2>[FE_Q<2>(2)^2-FE_DGP<2>(3)], case=3
     166 = 0
     168 79:  0.414214
     174 85:  -0.414214
-DEAL::FE=FESystem<2>[FE_Q<2>(3)^2-FE_DGP<2>(4)], case=0
+DEAL::FE=FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))^2-FE_DGP<2>(4)], case=0
     193 0:  -1.00000
     194 = 0
     201 8:  -0.585786
@@ -128,7 +128,7 @@ DEAL::FE=FESystem<2>[FE_Q<2>(3)^2-FE_DGP<2>(4)], case=0
     359 166:  0.261204
     374 181:  -0.261204
     375 182:  -0.585786
-DEAL::FE=FESystem<2>[FE_Q<2>(3)^2-FE_DGP<2>(4)], case=1
+DEAL::FE=FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))^2-FE_DGP<2>(4)], case=1
     193 0:  -1.00000
     194 = 0
     201 8:  -0.585786
@@ -153,7 +153,7 @@ DEAL::FE=FESystem<2>[FE_Q<2>(3)^2-FE_DGP<2>(4)], case=1
     359 166:  0.261204
     374 181:  -0.261204
     375 182:  -0.585786
-DEAL::FE=FESystem<2>[FE_Q<2>(3)^2-FE_DGP<2>(4)], case=2
+DEAL::FE=FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))^2-FE_DGP<2>(4)], case=2
     193 0:  -1.00000
     194 = 0
     201 8:  -0.585786
@@ -178,7 +178,7 @@ DEAL::FE=FESystem<2>[FE_Q<2>(3)^2-FE_DGP<2>(4)], case=2
     359 166:  0.261204
     374 181:  -0.261204
     375 182:  -0.585786
-DEAL::FE=FESystem<2>[FE_Q<2>(3)^2-FE_DGP<2>(4)], case=3
+DEAL::FE=FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))^2-FE_DGP<2>(4)], case=3
     193 0:  -1.00000
     194 = 0
     201 8:  -0.585786
@@ -1343,7 +1343,7 @@ DEAL::FE=FESystem<3>[FE_Q<3>(2)^3-FE_DGP<3>(3)], case=5
     1024 1541:  -0.429360
     1030 513:  -0.429360
     1030 1547:  -0.429360
-DEAL::FE=FESystem<3>[FE_Q<3>(3)^3-FE_DGP<3>(4)], case=0
+DEAL::FE=FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))^3-FE_DGP<3>(4)], case=0
     3645 343:  -1.00000
     3645 1994:  -1.00000
     3646 1995:  -1.00000
@@ -1714,7 +1714,7 @@ DEAL::FE=FESystem<3>[FE_Q<3>(3)^3-FE_DGP<3>(4)], case=0
     3280 4931:  -0.595364
     3281 1630:  -0.606666
     3281 4932:  -0.606666
-DEAL::FE=FESystem<3>[FE_Q<3>(3)^3-FE_DGP<3>(4)], case=1
+DEAL::FE=FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))^3-FE_DGP<3>(4)], case=1
     3645 343:  -1.00000
     3645 1994:  -1.00000
     3646 1995:  -1.00000
@@ -2085,7 +2085,7 @@ DEAL::FE=FESystem<3>[FE_Q<3>(3)^3-FE_DGP<3>(4)], case=1
     3280 4931:  -0.595364
     3281 1630:  -0.606666
     3281 4932:  -0.606666
-DEAL::FE=FESystem<3>[FE_Q<3>(3)^3-FE_DGP<3>(4)], case=2
+DEAL::FE=FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))^3-FE_DGP<3>(4)], case=2
     3645 343:  -1.00000
     3645 1994:  -1.00000
     3646 1995:  -1.00000
@@ -2456,7 +2456,7 @@ DEAL::FE=FESystem<3>[FE_Q<3>(3)^3-FE_DGP<3>(4)], case=2
     3280 4931:  -0.595364
     3281 1630:  -0.606666
     3281 4932:  -0.606666
-DEAL::FE=FESystem<3>[FE_Q<3>(3)^3-FE_DGP<3>(4)], case=3
+DEAL::FE=FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))^3-FE_DGP<3>(4)], case=3
     3645 343:  -1.00000
     3645 1994:  -1.00000
     3646 1995:  -1.00000
@@ -2827,7 +2827,7 @@ DEAL::FE=FESystem<3>[FE_Q<3>(3)^3-FE_DGP<3>(4)], case=3
     3280 4931:  -0.595364
     3281 1630:  -0.606666
     3281 4932:  -0.606666
-DEAL::FE=FESystem<3>[FE_Q<3>(3)^3-FE_DGP<3>(4)], case=4
+DEAL::FE=FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))^3-FE_DGP<3>(4)], case=4
     3645 343:  -1.00000
     3645 1994:  -1.00000
     3646 1995:  -1.00000
@@ -3198,7 +3198,7 @@ DEAL::FE=FESystem<3>[FE_Q<3>(3)^3-FE_DGP<3>(4)], case=4
     3280 4931:  -0.595364
     3281 1630:  -0.606666
     3281 4932:  -0.606666
-DEAL::FE=FESystem<3>[FE_Q<3>(3)^3-FE_DGP<3>(4)], case=5
+DEAL::FE=FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))^3-FE_DGP<3>(4)], case=5
     3645 343:  -1.00000
     3645 1994:  -1.00000
     3646 1995:  -1.00000

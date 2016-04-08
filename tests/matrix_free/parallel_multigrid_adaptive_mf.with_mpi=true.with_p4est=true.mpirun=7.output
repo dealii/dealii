@@ -18,15 +18,15 @@ DEAL:cg::Convergence step 6 value 1.55925e-06
 DEAL::Testing FE_Q<2>(3)
 DEAL::Number of degrees of freedom: 4259
 DEAL:cg::Starting value 64.2573
-DEAL:cg::Convergence step 5 value 1.14788e-06
+DEAL:cg::Convergence step 5 value 1.63117e-06
 DEAL::Testing FE_Q<2>(3)
 DEAL::Number of degrees of freedom: 7457
 DEAL:cg::Starting value 83.1084
-DEAL:cg::Convergence step 5 value 6.03076e-06
+DEAL:cg::Convergence step 5 value 7.69301e-06
 DEAL::Testing FE_Q<2>(3)
 DEAL::Number of degrees of freedom: 18535
 DEAL:cg::Starting value 130.977
-DEAL:cg::Convergence step 5 value 4.58984e-06
+DEAL:cg::Convergence step 5 value 6.04333e-06
 DEAL::Testing FE_Q<3>(1)
 DEAL::Number of degrees of freedom: 186
 DEAL:cg::Starting value 12.3693
@@ -46,4 +46,4 @@ DEAL:cg::Convergence step 5 value 5.33421e-08
 DEAL::Testing FE_Q<3>(2)
 DEAL::Number of degrees of freedom: 4268
 DEAL:cg::Starting value 57.4891
-DEAL:cg::Convergence step 8 value 7.61055e-07
+DEAL:cg::Convergence step 8 value 7.61054e-07

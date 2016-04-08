@@ -72,33 +72,33 @@ DEAL::=============================================
 DEAL::
 DEAL::Number of DoFs:       49 / 33
 DEAL::Number of matrix nnz: 589 / 261
-DEAL:cg::Starting value 3.9
-DEAL:cg::Convergence step 20 value 0
-DEAL:cg::Starting value 0.30
-DEAL:cg::Convergence step 14 value 0
+DEAL:cg::Starting value 5.0
+DEAL:cg::Convergence step 18 value 0
+DEAL:cg::Starting value 0.29
+DEAL:cg::Convergence step 12 value 0
 DEAL::Number of DoFs:       146 / 94
 DEAL::Number of matrix nnz: 2378 / 1122
-DEAL:cg::Starting value 3.7
-DEAL:cg::Convergence step 32 value 0
-DEAL:cg::Starting value 3.3
-DEAL:cg::Convergence step 22 value 0
+DEAL:cg::Starting value 3.1
+DEAL:cg::Convergence step 31 value 0
+DEAL:cg::Starting value 3.2
+DEAL:cg::Convergence step 21 value 0
 DEAL::Number of DoFs:       342 / 218
 DEAL::Number of matrix nnz: 6126 / 2902
-DEAL:cg::Starting value 3.0
-DEAL:cg::Convergence step 47 value 0
-DEAL:cg::Starting value 3.0
-DEAL:cg::Convergence step 30 value 0
+DEAL:cg::Starting value 2.6
+DEAL:cg::Convergence step 46 value 0
+DEAL:cg::Starting value 2.8
+DEAL:cg::Convergence step 28 value 0
 DEAL::Number of DoFs:       630 / 386
 DEAL::Number of matrix nnz: 12314 / 5938
-DEAL:cg::Starting value 1.8
-DEAL:cg::Convergence step 65 value 0
-DEAL:cg::Starting value 2.0
-DEAL:cg::Convergence step 39 value 0
+DEAL:cg::Starting value 1.9
+DEAL:cg::Convergence step 64 value 0
+DEAL:cg::Starting value 2.1
+DEAL:cg::Convergence step 37 value 0
 DEAL::
 cycle cells dofs    L2        H1       L2 sc     H1 sc   
-0     4     49   3.566e-01 1.675e+00 3.566e-01 1.675e+00 
-1     13    146  1.336e-02 2.093e-01 1.336e-02 2.093e-01 
-2     31    342  7.824e-03 1.526e-01 7.824e-03 1.526e-01 
+0     4     49   3.603e-01 1.673e+00 3.603e-01 1.673e+00 
+1     13    146  1.334e-02 2.093e-01 1.334e-02 2.093e-01 
+2     31    342  7.854e-03 1.526e-01 7.854e-03 1.526e-01 
 3     61    630  1.181e-03 3.811e-02 1.181e-03 3.811e-02 
 DEAL::
 DEAL::Solving with Q4 elements, adaptive refinement
@@ -106,34 +106,34 @@ DEAL::=============================================
 DEAL::
 DEAL::Number of DoFs:       81 / 45
 DEAL::Number of matrix nnz: 1617 / 483
-DEAL:cg::Starting value 5.9
-DEAL:cg::Convergence step 30 value 0
-DEAL:cg::Starting value 0.75
-DEAL:cg::Convergence step 17 value 0
+DEAL:cg::Starting value 6.4
+DEAL:cg::Convergence step 25 value 0
+DEAL:cg::Starting value 0.72
+DEAL:cg::Convergence step 14 value 0
 DEAL::Number of DoFs:       247 / 130
 DEAL::Number of matrix nnz: 6311 / 2072
-DEAL:cg::Starting value 2.9
-DEAL:cg::Convergence step 49 value 0
-DEAL:cg::Starting value 2.8
-DEAL:cg::Convergence step 26 value 0
+DEAL:cg::Starting value 2.4
+DEAL:cg::Convergence step 44 value 0
+DEAL:cg::Starting value 2.7
+DEAL:cg::Convergence step 23 value 0
 DEAL::Number of DoFs:       583 / 304
 DEAL::Number of matrix nnz: 16071 / 5334
+DEAL:cg::Starting value 2.0
+DEAL:cg::Convergence step 65 value 0
 DEAL:cg::Starting value 2.5
-DEAL:cg::Convergence step 73 value 0
-DEAL:cg::Starting value 2.5
-DEAL:cg::Convergence step 35 value 0
+DEAL:cg::Convergence step 31 value 0
 DEAL::Number of DoFs:       1113 / 564
 DEAL::Number of matrix nnz: 32325 / 10914
 DEAL:cg::Starting value 1.5
-DEAL:cg::Convergence step 98 value 0
-DEAL:cg::Starting value 1.6
-DEAL:cg::Convergence step 46 value 0
+DEAL:cg::Convergence step 88 value 0
+DEAL:cg::Starting value 1.8
+DEAL:cg::Convergence step 41 value 0
 DEAL::
 cycle cells dofs    L2        H1       L2 sc     H1 sc   
-0     4     81   4.573e-02 5.591e-01 4.573e-02 5.591e-01 
-1     13    247  3.694e-03 8.184e-02 3.694e-03 8.184e-02 
-2     31    583  2.238e-03 5.906e-02 2.238e-03 5.906e-02 
-3     61    1113 1.549e-04 6.438e-03 1.549e-04 6.438e-03 
+0     4     81   4.689e-02 5.588e-01 4.689e-02 5.588e-01 
+1     13    247  3.691e-03 8.182e-02 3.691e-03 8.182e-02 
+2     31    583  2.240e-03 5.905e-02 2.240e-03 5.905e-02 
+3     61    1113 1.550e-04 6.438e-03 1.550e-04 6.438e-03 
 DEAL::
 DEAL::Solving with Q1 elements, global refinement
 DEAL::===========================================
@@ -208,33 +208,33 @@ DEAL::===========================================
 DEAL::
 DEAL::Number of DoFs:       49 / 33
 DEAL::Number of matrix nnz: 589 / 261
-DEAL:cg::Starting value 3.9
-DEAL:cg::Convergence step 20 value 0
-DEAL:cg::Starting value 0.30
-DEAL:cg::Convergence step 14 value 0
+DEAL:cg::Starting value 5.0
+DEAL:cg::Convergence step 18 value 0
+DEAL:cg::Starting value 0.29
+DEAL:cg::Convergence step 12 value 0
 DEAL::Number of DoFs:       169 / 105
 DEAL::Number of matrix nnz: 2941 / 1397
-DEAL:cg::Starting value 3.7
-DEAL:cg::Convergence step 34 value 0
-DEAL:cg::Starting value 3.3
-DEAL:cg::Convergence step 23 value 0
+DEAL:cg::Starting value 3.1
+DEAL:cg::Convergence step 32 value 0
+DEAL:cg::Starting value 3.1
+DEAL:cg::Convergence step 21 value 0
 DEAL::Number of DoFs:       625 / 369
 DEAL::Number of matrix nnz: 13045 / 6381
-DEAL:cg::Starting value 1.8
-DEAL:cg::Convergence step 63 value 0
-DEAL:cg::Starting value 2.0
-DEAL:cg::Convergence step 38 value 0
+DEAL:cg::Starting value 1.9
+DEAL:cg::Convergence step 61 value 0
+DEAL:cg::Starting value 2.1
+DEAL:cg::Convergence step 37 value 0
 DEAL::Number of DoFs:       2401 / 1377
 DEAL::Number of matrix nnz: 54853 / 27197
-DEAL:cg::Starting value 1.1
-DEAL:cg::Convergence step 120 value 0
 DEAL:cg::Starting value 1.2
-DEAL:cg::Convergence step 69 value 0
+DEAL:cg::Convergence step 117 value 0
+DEAL:cg::Starting value 1.3
+DEAL:cg::Convergence step 68 value 0
 DEAL::
 cycle cells dofs    L2        H1       L2 sc     H1 sc   
-0     4     49   3.566e-01 1.675e+00 3.566e-01 1.675e+00 
-1     16    169  9.770e-03 1.813e-01 9.770e-03 1.813e-01 
-2     64    625  9.013e-04 3.472e-02 9.013e-04 3.472e-02 
+0     4     49   3.603e-01 1.673e+00 3.603e-01 1.673e+00 
+1     16    169  9.813e-03 1.813e-01 9.813e-03 1.813e-01 
+2     64    625  9.016e-04 3.472e-02 9.016e-04 3.472e-02 
 3     256   2401 6.648e-05 5.054e-03 6.648e-05 5.054e-03 
 DEAL::
 DEAL::Solving with Q2 elements, adaptive refinement

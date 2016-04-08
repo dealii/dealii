@@ -1,5 +1,5 @@
 
-DEAL::FE=FESystem<2>[FE_Q<2>(1)-FE_Q<2>(2)^2-FE_DGQ<2>(3)^2]
+DEAL::FE=FESystem<2>[FE_Q<2>(1)-FE_Q<2>(2)^2-FE_DGQArbitraryNodes<2>(QIterated(QTrapez(),3))^2]
 DEAL::component=0
 DEAL::0.00 3.91 3.91 -4.51
 DEAL::-50.3 -8.13 -8.13 -197.
@@ -36,7 +36,7 @@ DEAL::1.85e-13 10.4 10.4 -12.0
 DEAL::1.71e-13 10.4 10.4 -12.0
 DEAL::2.27e-13 10.4 10.4 12.0
 DEAL::1.99e-13 10.4 10.4 12.0
-DEAL::FE=FESystem<3>[FE_Q<3>(1)-FE_Q<3>(2)^2-FE_DGQ<3>(3)^3]
+DEAL::FE=FESystem<3>[FE_Q<3>(1)-FE_Q<3>(2)^2-FE_DGQArbitraryNodes<3>(QIterated(QTrapez(),3))^3]
 DEAL::component=0
 DEAL::0.00 0.00 -3.55e-15 0.00 -1.48e-31 1.42e-14 -3.55e-15 1.42e-14 0.00
 DEAL::-808. 63.0 -543. 63.0 -598. -539. -543. -539. -627.

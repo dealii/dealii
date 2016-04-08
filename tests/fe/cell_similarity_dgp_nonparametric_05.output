@@ -5,45 +5,45 @@ DEAL::Mass matrices are not equal.
 DEAL::Laplace matrices are not equal.
 DEAL::cell=0
 DEAL::mass_matrix:
-DEAL::2.000 -0.9088 0 
-DEAL::-0.9088 3.941 0 
-DEAL::0 0 5.556 
+DEAL::2.000 -0.9088 0
+DEAL::-0.9088 3.941 0
+DEAL::0 0 5.556
 DEAL::laplace_matrix:
-DEAL::0 0 0 
-DEAL::0 24.00 0 
-DEAL::0 0 24.00 
+DEAL::0 0 0
+DEAL::0 24.00 0
+DEAL::0 0 24.00
 DEAL::cell=1
 DEAL::mass_matrix:
-DEAL::1.000 3.464 0 
-DEAL::3.464 13.00 0 
-DEAL::0 0 1.000 
+DEAL::1.000 3.464 0
+DEAL::3.464 13.00 0
+DEAL::0 0 1.000
 DEAL::laplace_matrix:
-DEAL::0 0 0 
-DEAL::0 12.00 0 
-DEAL::0 0 12.00 
+DEAL::0 0 0
+DEAL::0 12.00 0
+DEAL::0 0 12.00
 DEAL::FE=FE_DGPNonparametric<3>(1)
 DEAL::Mapping=Q2
 DEAL::Mass matrices are not equal.
 DEAL::Laplace matrices are not equal.
 DEAL::cell=0
 DEAL::mass_matrix:
-DEAL::1.936 -0.4737 0 0 
-DEAL::-0.4737 2.997 0 0 
-DEAL::0 0 4.038 0 
-DEAL::0 0 0 4.038 
+DEAL::1.936 -0.4737 0 0
+DEAL::-0.4737 2.997 0 0
+DEAL::0 0 4.038 0
+DEAL::0 0 0 4.038
 DEAL::laplace_matrix:
-DEAL::0 0 0 0 
-DEAL::0 23.23 0 0 
-DEAL::0 0 23.23 0 
-DEAL::0 0 0 23.23 
+DEAL::0 0 0 0
+DEAL::0 23.23 0 0
+DEAL::0 0 23.23 0
+DEAL::0 0 0 23.23
 DEAL::cell=1
 DEAL::mass_matrix:
-DEAL::1.000 3.464 0 0 
-DEAL::3.464 13.00 0 0 
-DEAL::0 0 1.000 0 
-DEAL::0 0 0 1.000 
+DEAL::1.000 3.464 0 0
+DEAL::3.464 13.00 0 0
+DEAL::0 0 1.000 0
+DEAL::0 0 0 1.000
 DEAL::laplace_matrix:
-DEAL::0 0 0 0 
-DEAL::0 12.00 0 0 
-DEAL::0 0 12.00 0 
-DEAL::0 0 0 12.00 
+DEAL::0 0 0 0
+DEAL::0 12.00 0 0
+DEAL::0 0 12.00 0
+DEAL::0 0 0 12.00

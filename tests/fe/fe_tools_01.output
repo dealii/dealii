@@ -7,7 +7,11 @@ DEAL::FE_Q<1>(2)
 DEAL::	3	1	1	0	0
 DEAL::FE_Q<1>(2)
 DEAL::	3	1	1	0	0
-DEAL::FE_Q<1>(QGaussLobatto(4))
+DEAL::FE_Q<1>(3)
+DEAL::	4	1	2	0	0
+DEAL::FE_Q<1>(3)
+DEAL::	4	1	2	0	0
+DEAL::FE_Q<1>(QIterated(QTrapez(),3))
 DEAL::	4	1	2	0	0
 DEAL::FE_Q<2>(1)
 DEAL::	4	1	0	0	0
@@ -23,7 +27,9 @@ DEAL::FE_RaviartThomas<2>(1)
 DEAL::	12	0	2	4	0
 DEAL::FE_Q<2>(2)
 DEAL::	9	1	1	1	0
-DEAL::FE_Q<2>(QGaussLobatto(4))
+DEAL::FE_Q<2>(3)
+DEAL::	16	1	2	4	0
+DEAL::FE_Q<2>(QIterated(QTrapez(),3))
 DEAL::	16	1	2	4	0
 DEAL::FE_Q<3>(1)
 DEAL::	8	1	0	0	0

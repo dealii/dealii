@@ -15,7 +15,7 @@ DEAL:2d::Error function Laplacians: 0
 DEAL:2d::Error function diagonal of Hessian: 0
 DEAL:2d::Error function Hessians: 0
 DEAL:2d::
-DEAL:2d::Testing FE_Q<2>(QGaussLobatto(4))
+DEAL:2d::Testing FE_Q<2>(3)
 DEAL:2d::Test with fe_degree 3
 DEAL:2d::Error function values: 0
 DEAL:2d::Error function gradients: 0
@@ -23,7 +23,7 @@ DEAL:2d::Error function Laplacians: 0
 DEAL:2d::Error function diagonal of Hessian: 0
 DEAL:2d::Error function Hessians: 0
 DEAL:2d::
-DEAL:2d::Testing FE_Q<2>(QGaussLobatto(5))
+DEAL:2d::Testing FE_Q<2>(4)
 DEAL:2d::Test with fe_degree 4
 DEAL:2d::Error function values: 0
 DEAL:2d::Error function gradients: 0

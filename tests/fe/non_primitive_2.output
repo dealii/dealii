@@ -1,5 +1,5 @@
 
-DEAL::Degree 0: 
+DEAL::Degree 0:
 DEAL::dim=2, n_cells=7
 DEAL::0 0
 DEAL::8 0
@@ -227,7 +227,7 @@ DEAL::4644 0
 DEAL::4671 0
 DEAL::4698 -0.0209440
 DEAL::4725 0
-DEAL::Degree 1: 
+DEAL::Degree 1:
 DEAL::dim=2, n_cells=7
 DEAL::0 0
 DEAL::8 0

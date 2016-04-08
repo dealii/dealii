@@ -1,6 +1,8 @@
 
 DEAL::FE_Q<2>(1)
-DEAL::FE_Q<2>(QGaussLobatto(4))
+DEAL::FE_Q<2>(3)
+DEAL::FE_Q<2>(QIterated(QTrapez(),3))
 DEAL::FE_DGQArbitraryNodes<2>(QGauss(5))
-DEAL::FE_DGQArbitraryNodes<2>(QGaussLobatto(5))
+DEAL::FE_DGQ<2>(4)
 DEAL::FE_DGQArbitraryNodes<2>(QGaussLog(3))
+DEAL::FE_DGQArbitraryNodes<2>(QIterated(QTrapez(),3))

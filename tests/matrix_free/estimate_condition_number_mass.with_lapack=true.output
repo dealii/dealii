@@ -20,19 +20,19 @@ DEAL:2d:cg::Failure step 6 value 0
 DEAL:2d:cg::Condition number estimate: 45.
 DEAL:2d::
 DEAL:2d::Testing FE_Q<2>(4)
-DEAL:2d:cg::Starting value 0.036
-DEAL:2d:cg::Failure step 75 value 0
-DEAL:2d:cg::Condition number estimate: 1.5e+02
-DEAL:2d::
-DEAL:2d::Testing FE_Q<2>(QGaussLobatto(5))
 DEAL:2d:cg::Starting value 0.035
 DEAL:2d:cg::Failure step 56 value 0
 DEAL:2d:cg::Condition number estimate: 75.
 DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(QIterated(QTrapez(),4))
+DEAL:2d:cg::Starting value 0.036
+DEAL:2d:cg::Failure step 75 value 0
+DEAL:2d:cg::Condition number estimate: 1.5e+02
+DEAL:2d::
 DEAL:2d::Testing FE_DGQ<2>(4)
 DEAL:2d:cg::Starting value 0.035
 DEAL:2d:cg::Failure step 18 value 0
-DEAL:2d:cg::Condition number estimate: 2.0e+02
+DEAL:2d:cg::Condition number estimate: 1.1e+02
 DEAL:2d::
 DEAL:2d::Testing FE_Q_Hierarchical<2>(4)
 DEAL:2d:cg::Starting value 0.24
@@ -40,39 +40,54 @@ DEAL:2d:cg::Failure step 736 value 0
 DEAL:2d:cg::Condition number estimate: 4.2e+05
 DEAL:2d::
 DEAL:2d::Testing FE_Q<2>(6)
-DEAL:2d:cg::Starting value 0.031
-DEAL:2d:cg::Failure step 161 value 0
-DEAL:2d:cg::Condition number estimate: 1.6e+03
-DEAL:2d::
-DEAL:2d::Testing FE_Q<2>(QGaussLobatto(7))
 DEAL:2d:cg::Starting value 0.024
 DEAL:2d:cg::Failure step 77 value 0
 DEAL:2d:cg::Condition number estimate: 1.4e+02
 DEAL:2d::
-DEAL:2d::Testing FE_DGQ<2>(6)
-DEAL:2d:cg::Starting value 0.030
-DEAL:2d:cg::Failure step 38 value 0
-DEAL:2d:cg::Condition number estimate: 2.0e+03
+DEAL:2d::Testing FE_Q<2>(QIterated(QTrapez(),6))
+DEAL:2d:cg::Starting value 0.031
+DEAL:2d:cg::Failure step 161 value 0
+DEAL:2d:cg::Condition number estimate: 1.6e+03
 DEAL:2d::
-DEAL:2d::Testing FE_DGQArbitraryNodes<2>(QGaussLobatto(7))
+DEAL:2d::Testing FE_DGQ<2>(6)
 DEAL:2d:cg::Starting value 0.024
 DEAL:2d:cg::Failure step 32 value 0
 DEAL:2d:cg::Condition number estimate: 1.9e+02
 DEAL:2d::
-DEAL:2d::Testing FE_Q<2>(10)
-DEAL:2d:cg::Starting value 0.17
-DEAL:2d:cg::Failure step 782 value 0
-DEAL:2d:cg::Condition number estimate: 2.2e+06
+DEAL:2d::Testing FE_DGQArbitraryNodes<2>(QIterated(QTrapez(),6))
+DEAL:2d:cg::Starting value 0.030
+DEAL:2d:cg::Failure step 38 value 0
+DEAL:2d:cg::Condition number estimate: 2.0e+03
 DEAL:2d::
-DEAL:2d::Testing FE_Q<2>(QGaussLobatto(11))
+DEAL:2d::Testing FE_Q<2>(10)
 DEAL:2d:cg::Starting value 0.015
 DEAL:2d:cg::Failure step 108 value 0
 DEAL:2d:cg::Condition number estimate: 3.3e+02
 DEAL:2d::
-DEAL:2d::Testing FE_Q<2>(QGaussLobatto(17))
+DEAL:2d::Testing FE_Q<2>(QIterated(QTrapez(),10))
+DEAL:2d:cg::Starting value 0.17
+DEAL:2d:cg::Failure step 782 value 0
+DEAL:2d:cg::Condition number estimate: 2.2e+06
+DEAL:2d::
+DEAL:2d::Testing FE_DGQ<2>(10)
+DEAL:2d:cg::Starting value 0.015
+DEAL:2d:cg::Failure step 70 value 0
+DEAL:2d:cg::Condition number estimate: 4.0e+02
+DEAL:2d::
+DEAL:2d::Testing FE_DGQArbitraryNodes<2>(QIterated(QTrapez(),10))
+DEAL:2d:cg::Starting value 0.17
+DEAL:2d:cg::Failure step 118 value 0
+DEAL:2d:cg::Condition number estimate: 2.6e+06
+DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(16)
 DEAL:2d:cg::Starting value 0.0094
 DEAL:2d:cg::Failure step 156 value 0
 DEAL:2d:cg::Condition number estimate: 7.6e+02
+DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(25)
+DEAL:2d:cg::Starting value 0.0061
+DEAL:2d:cg::Failure step 200 value 0
+DEAL:2d:cg::Condition number estimate: 1.7e+03
 DEAL:2d::
 DEAL:3d::Testing FE_Q<3>(1)
 DEAL:3d:cg::Starting value 0.035
@@ -85,12 +100,12 @@ DEAL:3d:cg::Failure step 80 value 0
 DEAL:3d:cg::Condition number estimate: 1.6e+02
 DEAL:3d::
 DEAL:3d::Testing FE_Q<3>(5)
-DEAL:3d:cg::Starting value 0.0043
-DEAL:3d:cg::Failure step 494 value 0
-DEAL:3d:cg::Condition number estimate: 8.9e+03
-DEAL:3d::
-DEAL:3d::Testing FE_Q<3>(QGaussLobatto(6))
 DEAL:3d:cg::Starting value 0.0049
 DEAL:3d:cg::Failure step 187 value 0
 DEAL:3d:cg::Condition number estimate: 1.1e+03
+DEAL:3d::
+DEAL:3d::Testing FE_Q<3>(QIterated(QTrapez(),5))
+DEAL:3d:cg::Starting value 0.0043
+DEAL:3d:cg::Failure step 494 value 0
+DEAL:3d:cg::Condition number estimate: 8.9e+03
 DEAL:3d::
