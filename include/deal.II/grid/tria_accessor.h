@@ -2683,6 +2683,18 @@ public:
    * Flag the cell pointed to for refinement. This function is only allowed
    * for active cells. Keeping the default value for @p ref_case will mark
    * this cell for isotropic refinement.
+   *
+   * If you choose anisotropic refinement, for example by passing as argument
+   * one of the flags RefinementCase::cut_x, RefinementCase::cut_y,
+   * RefinementCase::cut_z, or a combination of these, then keep in mind
+   * that refining in x-, y-, or z-direction happens with regard to the
+   * <em>local</em> coordinate system of the cell. In other words, these
+   * flags determine which edges and faces of the cell will be cut into new
+   * edges and faces. On the other hand, this process is independent of
+   * how the cell is oriented within the <em>global</em> coordinate system,
+   * and you should not assume any particular orientation of the cell's
+   * local coordinate system within the global coordinate system of the
+   * space it lives in.
    */
   void set_refine_flag (const RefinementCase<dim> ref_case = RefinementCase<dim>::isotropic_refinement) const;
 
