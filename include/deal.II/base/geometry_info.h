@@ -92,7 +92,7 @@ private:
  * refinement flags in the current space dimension.
  *
  * This general template is unused except in some weird template constructs.
- * Actual is made, however, of the specializations
+ * Actual use is made, however, of the specializations
  * <code>RefinementPossibilities@<1@></code>,
  * <code>RefinementPossibilities@<2@></code>, and
  * <code>RefinementPossibilities@<3@></code>.
@@ -123,6 +123,19 @@ struct RefinementPossibilities
    * In addition, the tag <code>isotropic_refinement</code> denotes isotropic
    * refinement in the space dimension selected by the template argument of
    * this class.
+   *
+   * If you choose anisotropic refinement, for example by passing as argument
+   * to CellIterator::set_refine_flag()
+   * one of the flags RefinementCase::cut_x, RefinementCase::cut_y,
+   * RefinementCase::cut_z, or a combination of these, then keep in mind
+   * that refining in x-, y-, or z-direction happens with regard to the
+   * <em>local</em> coordinate system of the cell. In other words, these
+   * flags determine which edges and faces of the cell will be cut into new
+   * edges and faces. On the other hand, this process is independent of
+   * how the cell is oriented within the <em>global</em> coordinate system,
+   * and you should not assume any particular orientation of the cell's
+   * local coordinate system within the global coordinate system of the
+   * space it lives in.
    */
   enum Possibilities
   {
@@ -167,6 +180,19 @@ struct RefinementPossibilities<1>
    * In addition, the tag <code>isotropic_refinement</code> denotes isotropic
    * refinement in the space dimension selected by the template argument of
    * this class.
+   *
+   * If you choose anisotropic refinement, for example by passing as argument
+   * to CellIterator::set_refine_flag()
+   * one of the flags RefinementCase::cut_x, RefinementCase::cut_y,
+   * RefinementCase::cut_z, or a combination of these, then keep in mind
+   * that refining in x-, y-, or z-direction happens with regard to the
+   * <em>local</em> coordinate system of the cell. In other words, these
+   * flags determine which edges and faces of the cell will be cut into new
+   * edges and faces. On the other hand, this process is independent of
+   * how the cell is oriented within the <em>global</em> coordinate system,
+   * and you should not assume any particular orientation of the cell's
+   * local coordinate system within the global coordinate system of the
+   * space it lives in.
    */
   enum Possibilities
   {
@@ -213,6 +239,19 @@ struct RefinementPossibilities<2>
    * In addition, the tag <code>isotropic_refinement</code> denotes isotropic
    * refinement in the space dimension selected by the template argument of
    * this class.
+   *
+   * If you choose anisotropic refinement, for example by passing as argument
+   * to CellIterator::set_refine_flag()
+   * one of the flags RefinementCase::cut_x, RefinementCase::cut_y,
+   * RefinementCase::cut_z, or a combination of these, then keep in mind
+   * that refining in x-, y-, or z-direction happens with regard to the
+   * <em>local</em> coordinate system of the cell. In other words, these
+   * flags determine which edges and faces of the cell will be cut into new
+   * edges and faces. On the other hand, this process is independent of
+   * how the cell is oriented within the <em>global</em> coordinate system,
+   * and you should not assume any particular orientation of the cell's
+   * local coordinate system within the global coordinate system of the
+   * space it lives in.
    */
   enum Possibilities
   {
@@ -261,6 +300,19 @@ struct RefinementPossibilities<3>
    * In addition, the tag <code>isotropic_refinement</code> denotes isotropic
    * refinement in the space dimension selected by the template argument of
    * this class.
+   *
+   * If you choose anisotropic refinement, for example by passing as argument
+   * to CellIterator::set_refine_flag()
+   * one of the flags RefinementCase::cut_x, RefinementCase::cut_y,
+   * RefinementCase::cut_z, or a combination of these, then keep in mind
+   * that refining in x-, y-, or z-direction happens with regard to the
+   * <em>local</em> coordinate system of the cell. In other words, these
+   * flags determine which edges and faces of the cell will be cut into new
+   * edges and faces. On the other hand, this process is independent of
+   * how the cell is oriented within the <em>global</em> coordinate system,
+   * and you should not assume any particular orientation of the cell's
+   * local coordinate system within the global coordinate system of the
+   * space it lives in.
    */
   enum Possibilities
   {
@@ -284,7 +336,8 @@ struct RefinementPossibilities<3>
  * an object with <code>dim</code> dimensions (for example, for a line
  * <code>dim=1</code> in whatever space dimension we are, for a quad
  * <code>dim=2</code>, etc.). Possible values of this class are the ones
- * listed in the enumeration declared within the class.
+ * listed in the enumeration declared within the base class; see there for
+ * more information.
  *
  * @ingroup aniso
  * @author Ralf Hartmann, 2005, Wolfgang Bangerth, 2007
