@@ -111,6 +111,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: Meshworker::Assembler::ResidualSimple now also works for
+ multiple blocks if no constraints are given.
+ <br>
+ (Daniel Arndt, 2016/04/08)
+ </li>
+ 
  <li> Fixed: The multigrid transfer performed invalid data accesses on
  multigrid hierarchies that define the coarse level as a level larger than
  0. This has been fixed.
