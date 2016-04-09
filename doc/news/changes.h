@@ -38,6 +38,13 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Changed: FlatManifold takes as argument a periodicity option. This
+  used to be a Point<dim>, but it should have been a Tensor<1,dim>. This
+  is now changed.
+  <br>
+  (Luca Heltai, 2016/04/09)
+  </li>
+
   <li> Changed: The default nodal point distribution of FE_Q, FE_DGQ,
   FE_Q_DG0, FE_Q_Bubbles, and FE_TraceQ has been changed from equidistant
   points to the node points of the corresponding Gauss-Lobatto quadrature
@@ -106,6 +113,13 @@ inconvenience this causes.
  function that computes the derivatives of the push forward operation.
  <br>
  (Luca Heltai, Wolfgang Bangerth, 2016/04/08)
+ </li>
+
+ <li> New: Added CompositionManifold to create new manifolds from two
+ ChartManifold objects. This can be used, for example, to rotate a
+ cylindrical Manifold, or to make a cylinders with parabolic sides.
+ <br>
+ (Luca Heltai, 2016/04/09)
  </li>
 
  <li> New: Added GridGenerator::torus() to generate the volume mesh of a

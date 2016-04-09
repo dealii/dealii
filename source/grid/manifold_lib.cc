@@ -36,7 +36,9 @@ Tensor<1,spacedim>
 SphericalManifold<dim,spacedim>::get_periodicity()
 {
   Tensor<1,spacedim> periodicity;
-  periodicity[spacedim-1] = 2*numbers::PI; // theta and phi period.
+  // In two dimensions, theta is periodic. In three dimensions the variable
+  // that is periodic is phi. We have no periodicity in theta in 3d.
+  periodicity[spacedim-1] = 2*numbers::PI;
   return periodicity;
 }
 
