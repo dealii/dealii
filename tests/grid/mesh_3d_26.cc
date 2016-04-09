@@ -121,4 +121,3 @@ int main ()
   triangulation.refine_global(1);
   test<3>(triangulation);
 }
-

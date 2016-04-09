@@ -51,7 +51,7 @@ check ()
   tr.execute_coarsening_and_refinement ();
 
 
-  FE_Q<dim,spacedim> element(3);
+  FE_Q<dim,spacedim> element(QIterated<1>(QTrapez<1>(),3));
   DoFHandler<dim,spacedim> dof(tr);
   dof.distribute_dofs(element);
 

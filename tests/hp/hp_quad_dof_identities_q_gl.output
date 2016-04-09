@@ -1,30 +1,30 @@
 
 DEAL::Identities for FE_Q<2>(1) and FE_Q<2>(1): 0
 DEAL::Identities for FE_Q<2>(1) and FE_Q<2>(2): 0
-DEAL::Identities for FE_Q<2>(1) and FE_Q<2>(QGaussLobatto(4)): 0
-DEAL::Identities for FE_Q<2>(1) and FE_Q<2>(QGaussLobatto(5)): 0
-DEAL::Identities for FE_Q<2>(1) and FE_Q<2>(QGaussLobatto(6)): 0
+DEAL::Identities for FE_Q<2>(1) and FE_Q<2>(3): 0
+DEAL::Identities for FE_Q<2>(1) and FE_Q<2>(4): 0
+DEAL::Identities for FE_Q<2>(1) and FE_Q<2>(5): 0
 DEAL::Identities for FE_Q<2>(2) and FE_Q<2>(1): 0
 DEAL::Identities for FE_Q<2>(2) and FE_Q<2>(2): 1
 DEAL::0 0
-DEAL::Identities for FE_Q<2>(2) and FE_Q<2>(QGaussLobatto(4)): 0
-DEAL::Identities for FE_Q<2>(2) and FE_Q<2>(QGaussLobatto(5)): 1
+DEAL::Identities for FE_Q<2>(2) and FE_Q<2>(3): 0
+DEAL::Identities for FE_Q<2>(2) and FE_Q<2>(4): 1
 DEAL::0 4
-DEAL::Identities for FE_Q<2>(2) and FE_Q<2>(QGaussLobatto(6)): 0
-DEAL::Identities for FE_Q<2>(QGaussLobatto(4)) and FE_Q<2>(1): 0
-DEAL::Identities for FE_Q<2>(QGaussLobatto(4)) and FE_Q<2>(2): 0
-DEAL::Identities for FE_Q<2>(QGaussLobatto(4)) and FE_Q<2>(QGaussLobatto(4)): 4
+DEAL::Identities for FE_Q<2>(2) and FE_Q<2>(5): 0
+DEAL::Identities for FE_Q<2>(3) and FE_Q<2>(1): 0
+DEAL::Identities for FE_Q<2>(3) and FE_Q<2>(2): 0
+DEAL::Identities for FE_Q<2>(3) and FE_Q<2>(3): 4
 DEAL::0 0
 DEAL::1 1
 DEAL::2 2
 DEAL::3 3
-DEAL::Identities for FE_Q<2>(QGaussLobatto(4)) and FE_Q<2>(QGaussLobatto(5)): 0
-DEAL::Identities for FE_Q<2>(QGaussLobatto(4)) and FE_Q<2>(QGaussLobatto(6)): 0
-DEAL::Identities for FE_Q<2>(QGaussLobatto(5)) and FE_Q<2>(1): 0
-DEAL::Identities for FE_Q<2>(QGaussLobatto(5)) and FE_Q<2>(2): 1
+DEAL::Identities for FE_Q<2>(3) and FE_Q<2>(4): 0
+DEAL::Identities for FE_Q<2>(3) and FE_Q<2>(5): 0
+DEAL::Identities for FE_Q<2>(4) and FE_Q<2>(1): 0
+DEAL::Identities for FE_Q<2>(4) and FE_Q<2>(2): 1
 DEAL::4 0
-DEAL::Identities for FE_Q<2>(QGaussLobatto(5)) and FE_Q<2>(QGaussLobatto(4)): 0
-DEAL::Identities for FE_Q<2>(QGaussLobatto(5)) and FE_Q<2>(QGaussLobatto(5)): 9
+DEAL::Identities for FE_Q<2>(4) and FE_Q<2>(3): 0
+DEAL::Identities for FE_Q<2>(4) and FE_Q<2>(4): 9
 DEAL::0 0
 DEAL::1 1
 DEAL::2 2
@@ -34,12 +34,12 @@ DEAL::5 5
 DEAL::6 6
 DEAL::7 7
 DEAL::8 8
-DEAL::Identities for FE_Q<2>(QGaussLobatto(5)) and FE_Q<2>(QGaussLobatto(6)): 0
-DEAL::Identities for FE_Q<2>(QGaussLobatto(6)) and FE_Q<2>(1): 0
-DEAL::Identities for FE_Q<2>(QGaussLobatto(6)) and FE_Q<2>(2): 0
-DEAL::Identities for FE_Q<2>(QGaussLobatto(6)) and FE_Q<2>(QGaussLobatto(4)): 0
-DEAL::Identities for FE_Q<2>(QGaussLobatto(6)) and FE_Q<2>(QGaussLobatto(5)): 0
-DEAL::Identities for FE_Q<2>(QGaussLobatto(6)) and FE_Q<2>(QGaussLobatto(6)): 16
+DEAL::Identities for FE_Q<2>(4) and FE_Q<2>(5): 0
+DEAL::Identities for FE_Q<2>(5) and FE_Q<2>(1): 0
+DEAL::Identities for FE_Q<2>(5) and FE_Q<2>(2): 0
+DEAL::Identities for FE_Q<2>(5) and FE_Q<2>(3): 0
+DEAL::Identities for FE_Q<2>(5) and FE_Q<2>(4): 0
+DEAL::Identities for FE_Q<2>(5) and FE_Q<2>(5): 16
 DEAL::0 0
 DEAL::1 1
 DEAL::2 2
@@ -58,27 +58,27 @@ DEAL::14 14
 DEAL::15 15
 DEAL::Identities for FE_Q<3>(1) and FE_Q<3>(1): 0
 DEAL::Identities for FE_Q<3>(1) and FE_Q<3>(2): 0
-DEAL::Identities for FE_Q<3>(1) and FE_Q<3>(QGaussLobatto(4)): 0
-DEAL::Identities for FE_Q<3>(1) and FE_Q<3>(QGaussLobatto(5)): 0
+DEAL::Identities for FE_Q<3>(1) and FE_Q<3>(3): 0
+DEAL::Identities for FE_Q<3>(1) and FE_Q<3>(4): 0
 DEAL::Identities for FE_Q<3>(2) and FE_Q<3>(1): 0
 DEAL::Identities for FE_Q<3>(2) and FE_Q<3>(2): 1
 DEAL::0 0
-DEAL::Identities for FE_Q<3>(2) and FE_Q<3>(QGaussLobatto(4)): 0
-DEAL::Identities for FE_Q<3>(2) and FE_Q<3>(QGaussLobatto(5)): 1
+DEAL::Identities for FE_Q<3>(2) and FE_Q<3>(3): 0
+DEAL::Identities for FE_Q<3>(2) and FE_Q<3>(4): 1
 DEAL::0 4
-DEAL::Identities for FE_Q<3>(QGaussLobatto(4)) and FE_Q<3>(1): 0
-DEAL::Identities for FE_Q<3>(QGaussLobatto(4)) and FE_Q<3>(2): 0
-DEAL::Identities for FE_Q<3>(QGaussLobatto(4)) and FE_Q<3>(QGaussLobatto(4)): 4
+DEAL::Identities for FE_Q<3>(3) and FE_Q<3>(1): 0
+DEAL::Identities for FE_Q<3>(3) and FE_Q<3>(2): 0
+DEAL::Identities for FE_Q<3>(3) and FE_Q<3>(3): 4
 DEAL::0 0
 DEAL::1 1
 DEAL::2 2
 DEAL::3 3
-DEAL::Identities for FE_Q<3>(QGaussLobatto(4)) and FE_Q<3>(QGaussLobatto(5)): 0
-DEAL::Identities for FE_Q<3>(QGaussLobatto(5)) and FE_Q<3>(1): 0
-DEAL::Identities for FE_Q<3>(QGaussLobatto(5)) and FE_Q<3>(2): 1
+DEAL::Identities for FE_Q<3>(3) and FE_Q<3>(4): 0
+DEAL::Identities for FE_Q<3>(4) and FE_Q<3>(1): 0
+DEAL::Identities for FE_Q<3>(4) and FE_Q<3>(2): 1
 DEAL::4 0
-DEAL::Identities for FE_Q<3>(QGaussLobatto(5)) and FE_Q<3>(QGaussLobatto(4)): 0
-DEAL::Identities for FE_Q<3>(QGaussLobatto(5)) and FE_Q<3>(QGaussLobatto(5)): 9
+DEAL::Identities for FE_Q<3>(4) and FE_Q<3>(3): 0
+DEAL::Identities for FE_Q<3>(4) and FE_Q<3>(4): 9
 DEAL::0 0
 DEAL::1 1
 DEAL::2 2

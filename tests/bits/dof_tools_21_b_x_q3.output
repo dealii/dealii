@@ -2,13 +2,13 @@
 DEAL::DoFs of face_1:
 DEAL::16 is located at 1.000 3.000
 DEAL::17 is located at -1.000 3.000
-DEAL::24 is located at 0.3333 3.000
-DEAL::25 is located at -0.3333 3.000
+DEAL::24 is located at 0.4472 3.000
+DEAL::25 is located at -0.4472 3.000
 DEAL::DoFs of face_2:
 DEAL::0 is located at -1.000 -3.000
 DEAL::1 is located at 1.000 -3.000
-DEAL::8 is located at -0.3333 -3.000
-DEAL::9 is located at 0.3333 -3.000
+DEAL::8 is located at -0.4472 -3.000
+DEAL::9 is located at 0.4472 -3.000
     16 1:  1.000
     17 0:  1.000
     24 9:  1.000

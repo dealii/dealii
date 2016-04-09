@@ -16,7 +16,6 @@
 
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/template_constraints.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_tools.h>
@@ -28,155 +27,35 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-// namespace for some functions that are used in this file. they are
-// specific to numbering conventions used for the FE_DGQ element, and
-// are thus not very interesting to the outside world
 namespace
 {
-  // given an integer N, compute its
-  // integer square root (if it
-  // exists, otherwise give up)
-  inline unsigned int int_sqrt (const unsigned int N)
+  std::vector<Point<1> >
+  get_QGaussLobatto_points (const unsigned int degree)
   {
-    for (unsigned int i=0; i<=N; ++i)
-      if (i*i == N)
-        return i;
-    Assert (false, ExcInternalError());
-    return numbers::invalid_unsigned_int;
-  }
-
-
-  // given an integer N, compute its
-  // integer cube root (if it
-  // exists, otherwise give up)
-  inline unsigned int int_cuberoot (const unsigned int N)
-  {
-    for (unsigned int i=0; i<=N; ++i)
-      if (i*i*i == N)
-        return i;
-    Assert (false, ExcInternalError());
-    return numbers::invalid_unsigned_int;
-  }
-
-
-  // given N, generate i=0...N-1
-  // equidistant points in the
-  // interior of the interval [0,1]
-  inline Point<1>
-  generate_unit_point (const unsigned int i,
-                       const unsigned int N,
-                       const dealii::internal::int2type<1>  )
-  {
-    Assert (i<N, ExcInternalError());
-    if (N==1)
-      return Point<1> (.5);
+    if (degree > 0)
+      return QGaussLobatto<1>(degree+1).get_points();
     else
-      {
-        const double h = 1./(N-1);
-        return Point<1>(i*h);
-      }
-  }
-
-
-  // given N, generate i=0...N-1
-  // equidistant points in the domain
-  // [0,1]^2
-  inline Point<2>
-  generate_unit_point (const unsigned int i,
-                       const unsigned int N,
-                       const dealii::internal::int2type<2>  )
-  {
-    Assert (i<N, ExcInternalError());
-
-    if (N==1)
-      return Point<2> (.5, .5);
-    else
-      {
-        Assert (N>=4, ExcInternalError());
-        const unsigned int N1d = int_sqrt(N);
-        const double h = 1./(N1d-1);
-
-        return Point<2> (i%N1d * h,
-                         i/N1d * h);
-      }
-  }
-
-
-
-
-  // given N, generate i=0...N-1
-  // equidistant points in the domain
-  // [0,1]^3
-  inline Point<3>
-  generate_unit_point (const unsigned int i,
-                       const unsigned int N,
-                       const dealii::internal::int2type<3>  )
-  {
-    Assert (i<N, ExcInternalError());
-    if (N==1)
-      return Point<3> (.5, .5, .5);
-    else
-      {
-        Assert (N>=8, ExcInternalError());
-
-        const unsigned int N1d = int_cuberoot(N);
-        const double h = 1./(N1d-1);
-
-        return Point<3> (i%N1d * h,
-                         (i/N1d)%N1d * h,
-                         i/(N1d*N1d) * h);
-      }
+      return std::vector<Point<1> >(1, Point<1>(0.5));
   }
 }
-
 
 
 
 template <int dim, int spacedim>
 FE_DGQ<dim, spacedim>::FE_DGQ (const unsigned int degree)
   :
-  FE_Poly<TensorProductPolynomials<dim>, dim, spacedim> (
-    TensorProductPolynomials<dim>(Polynomials::LagrangeEquidistant::generate_complete_basis(degree)),
-    FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
-    std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell, true),
-    std::vector<ComponentMask>(FiniteElementData<dim>(
-                                 get_dpo_vector(degree),1, degree).dofs_per_cell, std::vector<bool>(1,true)))
+  FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>
+  (TensorProductPolynomials<dim>(Polynomials::generate_complete_Lagrange_basis(get_QGaussLobatto_points(degree))),
+   FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
+   std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell, true),
+   std::vector<ComponentMask>(FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell, std::vector<bool>(1,true)))
 {
-  // fill in support points
-  if (degree == 0)
-    {
-      // constant elements, take
-      // midpoint
-      this->unit_support_points.resize(1);
-      for (unsigned int i=0; i<dim; ++i)
-        this->unit_support_points[0](i) = 0.5;
-    }
-  else
-    {
-      // number of points: (degree+1)^dim
-      unsigned int n = degree+1;
-      for (unsigned int i=1; i<dim; ++i)
-        n *= degree+1;
-
-      this->unit_support_points.resize(n);
-
-      const double step = 1./degree;
-      Point<dim> p;
-
-      unsigned int k=0;
-      for (unsigned int iz=0; iz <= ((dim>2) ? degree : 0) ; ++iz)
-        for (unsigned int iy=0; iy <= ((dim>1) ? degree : 0) ; ++iy)
-          for (unsigned int ix=0; ix<=degree; ++ix)
-            {
-              p(0) = ix * step;
-              if (dim>1)
-                p(1) = iy * step;
-              if (dim>2)
-                p(2) = iz * step;
-
-              this->unit_support_points[k++] = p;
-            };
-    };
+  // Compute support points, which are the tensor product of the Lagrange
+  // interpolation points in the constructor.
+  Quadrature<dim> support_quadrature(get_QGaussLobatto_points(degree));
+  Assert (support_quadrature.get_points().size() > 0,
+          (typename FiniteElement<dim, spacedim>::ExcFEHasNoSupportPoints ()));
+  this->unit_support_points = support_quadrature.get_points();
 
   // do not initialize embedding and restriction here. these matrices are
   // initialized on demand in get_restriction_matrix and
@@ -194,13 +73,10 @@ FE_DGQ<dim, spacedim>::FE_DGQ (const Quadrature<1> &points)
     TensorProductPolynomials<dim>(Polynomials::generate_complete_Lagrange_basis(points.get_points())),
     FiniteElementData<dim>(get_dpo_vector(points.size()-1), 1, points.size()-1, FiniteElementData<dim>::L2),
     std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(points.size()-1),1, points.size()-1).dofs_per_cell, true),
-    std::vector<ComponentMask>(FiniteElementData<dim>(
-                                 get_dpo_vector(points.size()-1),1, points.size()-1).dofs_per_cell, std::vector<bool>(1,true)))
+    std::vector<ComponentMask>(FiniteElementData<dim>(get_dpo_vector(points.size()-1),1, points.size()-1).dofs_per_cell, std::vector<bool>(1,true)))
 {
-  // Compute support points, which
-  // are the tensor product of the
-  // Lagrange interpolation points in
-  // the constructor.
+  // Compute support points, which are the tensor product of the Lagrange
+  // interpolation points in the constructor.
   Assert (points.size() > 0,
           (typename FiniteElement<dim, spacedim>::ExcFEHasNoSupportPoints ()));
   Quadrature<dim> support_quadrature(points);
@@ -218,12 +94,9 @@ template <int dim, int spacedim>
 std::string
 FE_DGQ<dim, spacedim>::get_name () const
 {
-  // note that the
-  // FETools::get_fe_from_name
-  // function depends on the
-  // particular format of the string
-  // this function returns, so they
-  // have to be kept in synch
+  // note that the FETools::get_fe_from_name function depends on the
+  // particular format of the string this function returns, so they have to be
+  // kept in sync
 
   std::ostringstream namebuf;
   namebuf << "FE_DGQ<"
@@ -378,8 +251,7 @@ get_interpolation_matrix (const FiniteElement<dim, spacedim> &x_source_fe,
       // generate a point on this
       // cell and evaluate the
       // shape functions there
-      const Point<dim> p = generate_unit_point (j, this->dofs_per_cell,
-                                                dealii::internal::int2type<dim>());
+      const Point<dim> p = this->unit_support_points[j];
       for (unsigned int i=0; i<this->dofs_per_cell; ++i)
         cell_interpolation(j,i)
           = this->poly_space.compute_value (i, p);
@@ -807,15 +679,20 @@ FE_DGQArbitraryNodes<dim,spacedim>::get_name () const
 
   // Check whether the support points are equidistant.
   for (unsigned int j=0; j<=this->degree; j++)
-    if (std::fabs(points[j] - (double)j/this->degree) > 1e-15)
+    if (std::abs(points[j] - (double)j/this->degree) > 1e-15)
       {
         equidistant = false;
         break;
       }
+  if (this->degree == 0 && std::abs(points[0]-0.5) < 1e-15)
+    equidistant = true;
 
   if (equidistant == true)
     {
-      namebuf << "FE_DGQ<" << Utilities::dim_string(dim,spacedim) << ">(" << this->degree << ")";
+      if (this->degree > 2)
+        namebuf << "FE_DGQArbitraryNodes<" << Utilities::dim_string(dim,spacedim) << ">(QIterated(QTrapez()," << this->degree << "))";
+      else
+        namebuf << "FE_DGQ<" << Utilities::dim_string(dim,spacedim) << ">(" << this->degree << ")";
       return namebuf.str();
     }
 
@@ -831,7 +708,7 @@ FE_DGQArbitraryNodes<dim,spacedim>::get_name () const
 
   if (gauss_lobatto == true)
     {
-      namebuf << "FE_DGQArbitraryNodes<" << Utilities::dim_string(dim,spacedim) << ">(QGaussLobatto(" << this->degree+1 << "))";
+      namebuf << "FE_DGQ<" << Utilities::dim_string(dim,spacedim) << ">(" << this->degree << ")";
       return namebuf.str();
     }
 

@@ -56,7 +56,7 @@ void test ()
   hp::QCollection<dim> q_collection;
   for (unsigned int i=1; i<=4; ++i)
     {
-      fe_collection.push_back(FE_Q<dim> (i));
+      fe_collection.push_back(FE_Q<dim> (QIterated<1>(QTrapez<1>(),i)));
       q_collection.push_back (QGauss<dim> (i+2));
     }
 

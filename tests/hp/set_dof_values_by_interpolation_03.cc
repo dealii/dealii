@@ -53,7 +53,7 @@ void test ()
 
   hp::FECollection<dim> fe;
   for (unsigned int i=1; i<5; ++i)
-    fe.push_back (FE_Q<dim>(i));
+    fe.push_back (FE_Q<dim>(QIterated<1>(QTrapez<1>(),i)));
 
   hp::DoFHandler<dim> dof_handler(tr);
   for (typename hp::DoFHandler<dim>::cell_iterator cell=dof_handler.begin();
@@ -103,6 +103,3 @@ main()
 
   return 0;
 }
-
-
-

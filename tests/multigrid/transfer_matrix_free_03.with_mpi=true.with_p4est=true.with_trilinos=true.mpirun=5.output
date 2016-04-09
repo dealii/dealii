@@ -185,7 +185,7 @@ DEAL::Diff restrict add l9: 0
 DEAL::Diff restrict     l10: 0
 DEAL::Diff restrict add l10: 0
 DEAL::
-DEAL::FE: FE_Q<2>(QGaussLobatto(4))
+DEAL::FE: FE_Q<2>(3)
 DEAL::no. cells: 12 on 2 levels
 DEAL::Diff prolongate   l1: 0
 DEAL::Diff restrict     l1: 0
@@ -470,7 +470,7 @@ DEAL::Diff restrict add l6: 0
 DEAL::Diff restrict     l7: 0
 DEAL::Diff restrict add l7: 0
 DEAL::
-DEAL::FE: FE_Q<3>(QGaussLobatto(4))
+DEAL::FE: FE_Q<3>(3)
 DEAL::no. cells: 34 on 2 levels
 DEAL::Diff prolongate   l1: 0
 DEAL::Diff restrict     l1: 0

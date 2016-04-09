@@ -85,7 +85,7 @@ check ()
   // of one Q1 and one Q2 element
   hp::FECollection<dim> element;
   for (unsigned int i=1; i<7-dim; ++i)
-    element.push_back (FE_Q<dim>(i));
+    element.push_back (FE_Q<dim>(QIterated<1>(QTrapez<1>(),i)));
   hp::DoFHandler<dim> dof(tr);
   for (typename hp::DoFHandler<dim>::active_cell_iterator
        cell = dof.begin_active(); cell!=dof.end(); ++cell)

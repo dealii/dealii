@@ -30,6 +30,7 @@
 #include <deal.II/dofs/dof_accessor.h>
 
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_tools.h>
 
@@ -46,7 +47,7 @@ void test ()
   hp::DoFHandler<dim>        dof_handler(triangulation);
   ConstraintMatrix     hanging_node_constraints;
 
-  FE_Q<dim> fe_1 (1), fe_2 (2), fe_3 (3), fe_4 (4);
+  FE_Q<dim> fe_1 (1), fe_2 (2), fe_3 (QIterated<1>(QTrapez<1>(),3)), fe_4 (QIterated<1>(QTrapez<1>(),4));
 
   fe.push_back (fe_1);
   fe.push_back (fe_2);

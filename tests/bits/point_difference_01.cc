@@ -110,7 +110,7 @@ check ()
   Triangulation<dim> tria;
   make_mesh (tria);
 
-  FE_Q<dim> element(3);
+  FE_Q<dim> element(QIterated<1>(QTrapez<1>(),3));
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(element);
 
@@ -151,12 +151,12 @@ check ()
         {
           VectorTools::point_difference (dof, v, function, difference, p[i]);
           deallog << difference(0) << std::endl;
-          Assert (difference(0) < 1e-4, ExcInternalError());
+          Assert (difference(0) < 2e-4, ExcInternalError());
 
           VectorTools::point_difference (dof, v, ZeroFunction<dim>(),
                                          difference, p[i]);
           deallog << difference(0) << std::endl;
-          Assert (std::abs(-difference(0) - function.value(p[i])) < 1e-4,
+          Assert (std::abs(-difference(0) - function.value(p[i])) < 2e-4,
                   ExcInternalError());
         }
     }

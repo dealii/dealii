@@ -75,9 +75,9 @@ void test ()
   hp::FECollection<dim> fe;
   fe.push_back (FE_Q<dim>(1));
   fe.push_back (FE_Q<dim>(2));
-  fe.push_back (FE_Q<dim>(3));
-  fe.push_back (FE_Q<dim>(4));
-  fe.push_back (FE_Q<dim>(5));
+  fe.push_back (FE_Q<dim>(QIterated<1>(QTrapez<1>(),3)));
+  fe.push_back (FE_Q<dim>(QIterated<1>(QTrapez<1>(),4)));
+  fe.push_back (FE_Q<dim>(QIterated<1>(QTrapez<1>(),5)));
 
   hp::DoFHandler<dim>        dof_handler(triangulation);
 
@@ -123,4 +123,3 @@ int main ()
   test<2> ();
   test<3> ();
 }
-

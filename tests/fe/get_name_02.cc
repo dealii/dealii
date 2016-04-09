@@ -65,11 +65,13 @@ main()
     FE_DGQArbitraryNodes<2,3> fe(quadrature);
     test(fe);
   }
+  {
+    QIterated<1> quadrature(QTrapez<1>(), 3);
+    FE_DGQArbitraryNodes<2,3> fe(quadrature);
+    test(fe);
+  }
 
 
 
   return 0;
 }
-
-
-

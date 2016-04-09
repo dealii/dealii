@@ -4,337 +4,337 @@ DEAL::Base elements:  2
 DEAL::Multiplicities: 1 1
 DEAL::First block   : 0 1
 DEAL::Blocks : 2
-DEAL::0  1  2  3  4  
+DEAL::0  1  2  3  4
 DEAL::Next two lines: block index_in_block
-DEAL::0  0  0  0  1  
-DEAL::0  1  2  3  0  
+DEAL::0  0  0  0  1
+DEAL::0  1  2  3  0
 DEAL::Next three lines: base block_in_base index_in_block
-DEAL::0  0  0  0  1  
-DEAL::0  0  0  0  0  
-DEAL::0  1  2  3  0  
+DEAL::0  0  0  0  1
+DEAL::0  0  0  0  0
+DEAL::0  1  2  3  0
 DEAL::Next two lines: component index_in_component
-DEAL::0  0  0  0  1  
-DEAL::0  1  2  3  0  
+DEAL::0  0  0  0  1
+DEAL::0  1  2  3  0
 DEAL::Next two lines: component_to_base
-DEAL::0  1  
-DEAL::0  0  
+DEAL::0  1
+DEAL::0  0
 DEAL::Next line: component_to_block_index
-DEAL::0  1  
+DEAL::0  1
 DEAL::FESystem<2>[FE_Q<2>(1)^2-FE_DGQ<2>(0)^3]
 DEAL::Base elements:  2
 DEAL::Multiplicities: 2 3
 DEAL::First block   : 0 2
 DEAL::Blocks : 5
-DEAL::0  1  2  3  4  5  6  7  8  9  10 
+DEAL::0  1  2  3  4  5  6  7  8  9  10
 DEAL::Next two lines: block index_in_block
-DEAL::0  1  0  1  0  1  0  1  2  3  4  
-DEAL::0  0  1  1  2  2  3  3  0  0  0  
+DEAL::0  1  0  1  0  1  0  1  2  3  4
+DEAL::0  0  1  1  2  2  3  3  0  0  0
 DEAL::Next three lines: base block_in_base index_in_block
-DEAL::0  0  0  0  0  0  0  0  1  1  1  
-DEAL::0  1  0  1  0  1  0  1  0  1  2  
-DEAL::0  0  1  1  2  2  3  3  0  0  0  
+DEAL::0  0  0  0  0  0  0  0  1  1  1
+DEAL::0  1  0  1  0  1  0  1  0  1  2
+DEAL::0  0  1  1  2  2  3  3  0  0  0
 DEAL::Next two lines: component index_in_component
-DEAL::0  1  0  1  0  1  0  1  2  3  4  
-DEAL::0  0  1  1  2  2  3  3  0  0  0  
+DEAL::0  1  0  1  0  1  0  1  2  3  4
+DEAL::0  0  1  1  2  2  3  3  0  0  0
 DEAL::Next two lines: component_to_base
-DEAL::0  0  1  1  1  
-DEAL::0  0  0  0  0  
+DEAL::0  0  1  1  1
+DEAL::0  0  0  0  0
 DEAL::Next line: component_to_block_index
-DEAL::0  1  2  3  4  
+DEAL::0  1  2  3  4
 DEAL::FESystem<2>[FE_DGQ<2>(1)^2-FE_DGQ<2>(0)^3]
 DEAL::Base elements:  2
 DEAL::Multiplicities: 2 3
 DEAL::First block   : 0 2
 DEAL::Blocks : 5
-DEAL::0  1  2  3  4  5  6  7  8  9  10 
+DEAL::0  1  2  3  4  5  6  7  8  9  10
 DEAL::Next two lines: block index_in_block
-DEAL::0  0  0  0  1  1  1  1  2  3  4  
-DEAL::0  1  2  3  0  1  2  3  0  0  0  
+DEAL::0  0  0  0  1  1  1  1  2  3  4
+DEAL::0  1  2  3  0  1  2  3  0  0  0
 DEAL::Next three lines: base block_in_base index_in_block
-DEAL::0  0  0  0  0  0  0  0  1  1  1  
-DEAL::0  0  0  0  1  1  1  1  0  1  2  
-DEAL::0  1  2  3  0  1  2  3  0  0  0  
+DEAL::0  0  0  0  0  0  0  0  1  1  1
+DEAL::0  0  0  0  1  1  1  1  0  1  2
+DEAL::0  1  2  3  0  1  2  3  0  0  0
 DEAL::Next two lines: component index_in_component
-DEAL::0  0  0  0  1  1  1  1  2  3  4  
-DEAL::0  1  2  3  0  1  2  3  0  0  0  
+DEAL::0  0  0  0  1  1  1  1  2  3  4
+DEAL::0  1  2  3  0  1  2  3  0  0  0
 DEAL::Next two lines: component_to_base
-DEAL::0  0  1  1  1  
-DEAL::0  0  0  0  0  
+DEAL::0  0  1  1  1
+DEAL::0  0  0  0  0
 DEAL::Next line: component_to_block_index
-DEAL::0  1  2  3  4  
+DEAL::0  1  2  3  4
 DEAL::FESystem<2>[FE_RaviartThomas<2>(1)-FE_DGQ<2>(1)]
 DEAL::Base elements:  2
 DEAL::Multiplicities: 1 1
 DEAL::First block   : 0 1
 DEAL::Blocks : 2
-DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 
+DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15
 DEAL::Next two lines: block index_in_block
-DEAL::0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  1  
-DEAL::0  1  2  3  4  5  6  7  8  9  10 11 0  1  2  3  
+DEAL::0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  1
+DEAL::0  1  2  3  4  5  6  7  8  9  10 11 0  1  2  3
 DEAL::Next three lines: base block_in_base index_in_block
-DEAL::0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  1  
-DEAL::0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
-DEAL::0  1  2  3  4  5  6  7  8  9  10 11 0  1  2  3  
+DEAL::0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  1
+DEAL::0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+DEAL::0  1  2  3  4  5  6  7  8  9  10 11 0  1  2  3
 DEAL::Next two lines: component index_in_component
-DEAL::x  x  x  x  x  x  x  x  x  x  x  x  2  2  2  2  
-DEAL::x  x  x  x  x  x  x  x  x  x  x  x  0  1  2  3  
+DEAL::x  x  x  x  x  x  x  x  x  x  x  x  2  2  2  2
+DEAL::x  x  x  x  x  x  x  x  x  x  x  x  0  1  2  3
 DEAL::Next two lines: component_to_base
-DEAL::0  0  1  
-DEAL::0  1  0  
+DEAL::0  0  1
+DEAL::0  1  0
 DEAL::Next line: component_to_block_index
-DEAL::0  0  1  
+DEAL::0  0  1
 DEAL::FESystem<2>[FE_RaviartThomas<2>(0)^2-FE_DGQ<2>(0)^3]
 DEAL::Base elements:  2
 DEAL::Multiplicities: 2 3
 DEAL::First block   : 0 2
 DEAL::Blocks : 5
-DEAL::0  1  2  3  4  5  6  7  8  9  10 
+DEAL::0  1  2  3  4  5  6  7  8  9  10
 DEAL::Next two lines: block index_in_block
-DEAL::0  1  0  1  0  1  0  1  2  3  4  
-DEAL::0  0  1  1  2  2  3  3  0  0  0  
+DEAL::0  1  0  1  0  1  0  1  2  3  4
+DEAL::0  0  1  1  2  2  3  3  0  0  0
 DEAL::Next three lines: base block_in_base index_in_block
-DEAL::0  0  0  0  0  0  0  0  1  1  1  
-DEAL::0  1  0  1  0  1  0  1  0  1  2  
-DEAL::0  0  1  1  2  2  3  3  0  0  0  
+DEAL::0  0  0  0  0  0  0  0  1  1  1
+DEAL::0  1  0  1  0  1  0  1  0  1  2
+DEAL::0  0  1  1  2  2  3  3  0  0  0
 DEAL::Next two lines: component index_in_component
-DEAL::x  x  x  x  x  x  x  x  4  5  6  
-DEAL::x  x  x  x  x  x  x  x  0  0  0  
+DEAL::x  x  x  x  x  x  x  x  4  5  6
+DEAL::x  x  x  x  x  x  x  x  0  0  0
 DEAL::Next two lines: component_to_base
-DEAL::0  0  0  0  1  1  1  
-DEAL::0  1  0  1  0  0  0  
+DEAL::0  0  0  0  1  1  1
+DEAL::0  1  0  1  0  0  0
 DEAL::Next line: component_to_block_index
-DEAL::0  0  1  1  2  3  4  
+DEAL::0  0  1  1  2  3  4
 DEAL::FESystem<2>[FE_RaviartThomas<2>(1)^2-FE_DGQ<2>(0)^3]
 DEAL::Base elements:  2
 DEAL::Multiplicities: 2 3
 DEAL::First block   : 0 2
 DEAL::Blocks : 5
-DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 
+DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
 DEAL::Next two lines: block index_in_block
-DEAL::0  0  1  1  0  0  1  1  0  0  1  1  0  0  1  1  0  0  0  0  1  1  1  1  2  3  4  
-DEAL::0  1  0  1  2  3  2  3  4  5  4  5  6  7  6  7  8  9  10 11 8  9  10 11 0  0  0  
+DEAL::0  0  1  1  0  0  1  1  0  0  1  1  0  0  1  1  0  0  0  0  1  1  1  1  2  3  4
+DEAL::0  1  0  1  2  3  2  3  4  5  4  5  6  7  6  7  8  9  10 11 8  9  10 11 0  0  0
 DEAL::Next three lines: base block_in_base index_in_block
-DEAL::0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  
-DEAL::0  0  1  1  0  0  1  1  0  0  1  1  0  0  1  1  0  0  0  0  1  1  1  1  0  1  2  
-DEAL::0  1  0  1  2  3  2  3  4  5  4  5  6  7  6  7  8  9  10 11 8  9  10 11 0  0  0  
+DEAL::0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1
+DEAL::0  0  1  1  0  0  1  1  0  0  1  1  0  0  1  1  0  0  0  0  1  1  1  1  0  1  2
+DEAL::0  1  0  1  2  3  2  3  4  5  4  5  6  7  6  7  8  9  10 11 8  9  10 11 0  0  0
 DEAL::Next two lines: component index_in_component
-DEAL::x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  4  5  6  
-DEAL::x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  0  0  0  
+DEAL::x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  4  5  6
+DEAL::x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  0  0  0
 DEAL::Next two lines: component_to_base
-DEAL::0  0  0  0  1  1  1  
-DEAL::0  1  0  1  0  0  0  
+DEAL::0  0  0  0  1  1  1
+DEAL::0  1  0  1  0  0  0
 DEAL::Next line: component_to_block_index
-DEAL::0  0  1  1  2  3  4  
+DEAL::0  0  1  1  2  3  4
 DEAL::FESystem<2>[FE_Q<2>(1)^2-FE_Q<2>(2)-FE_DGQ<2>(0)^2]
 DEAL::Base elements:  3
 DEAL::Multiplicities: 2 1 2
 DEAL::First block   : 0 2 3
 DEAL::Blocks : 5
-DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 
+DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18
 DEAL::Next two lines: block index_in_block
-DEAL::0  1  2  0  1  2  0  1  2  0  1  2  2  2  2  2  2  3  4  
-DEAL::0  0  0  1  1  1  2  2  2  3  3  3  4  5  6  7  8  0  0  
+DEAL::0  1  2  0  1  2  0  1  2  0  1  2  2  2  2  2  2  3  4
+DEAL::0  0  0  1  1  1  2  2  2  3  3  3  4  5  6  7  8  0  0
 DEAL::Next three lines: base block_in_base index_in_block
-DEAL::0  0  1  0  0  1  0  0  1  0  0  1  1  1  1  1  1  2  2  
-DEAL::0  1  0  0  1  0  0  1  0  0  1  0  0  0  0  0  0  0  1  
-DEAL::0  0  0  1  1  1  2  2  2  3  3  3  4  5  6  7  8  0  0  
+DEAL::0  0  1  0  0  1  0  0  1  0  0  1  1  1  1  1  1  2  2
+DEAL::0  1  0  0  1  0  0  1  0  0  1  0  0  0  0  0  0  0  1
+DEAL::0  0  0  1  1  1  2  2  2  3  3  3  4  5  6  7  8  0  0
 DEAL::Next two lines: component index_in_component
-DEAL::0  1  2  0  1  2  0  1  2  0  1  2  2  2  2  2  2  3  4  
-DEAL::0  0  0  1  1  1  2  2  2  3  3  3  4  5  6  7  8  0  0  
+DEAL::0  1  2  0  1  2  0  1  2  0  1  2  2  2  2  2  2  3  4
+DEAL::0  0  0  1  1  1  2  2  2  3  3  3  4  5  6  7  8  0  0
 DEAL::Next two lines: component_to_base
-DEAL::0  0  1  2  2  
-DEAL::0  0  0  0  0  
+DEAL::0  0  1  2  2
+DEAL::0  0  0  0  0
 DEAL::Next line: component_to_block_index
-DEAL::0  1  2  3  4  
+DEAL::0  1  2  3  4
 DEAL::FESystem<2>[FE_RaviartThomas<2>(1)^2-FE_Q<2>(2)-FE_DGQ<2>(0)^2]
 DEAL::Base elements:  3
 DEAL::Multiplicities: 2 1 2
 DEAL::First block   : 0 2 3
 DEAL::Blocks : 5
-DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 
+DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34
 DEAL::Next two lines: block index_in_block
-DEAL::2  2  2  2  0  0  1  1  2  0  0  1  1  2  0  0  1  1  2  0  0  1  1  2  0  0  0  0  1  1  1  1  2  3  4  
-DEAL::0  1  2  3  0  1  0  1  4  2  3  2  3  5  4  5  4  5  6  6  7  6  7  7  8  9  10 11 8  9  10 11 8  0  0  
+DEAL::2  2  2  2  0  0  1  1  2  0  0  1  1  2  0  0  1  1  2  0  0  1  1  2  0  0  0  0  1  1  1  1  2  3  4
+DEAL::0  1  2  3  0  1  0  1  4  2  3  2  3  5  4  5  4  5  6  6  7  6  7  7  8  9  10 11 8  9  10 11 8  0  0
 DEAL::Next three lines: base block_in_base index_in_block
-DEAL::1  1  1  1  0  0  0  0  1  0  0  0  0  1  0  0  0  0  1  0  0  0  0  1  0  0  0  0  0  0  0  0  1  2  2  
-DEAL::0  0  0  0  0  0  1  1  0  0  0  1  1  0  0  0  1  1  0  0  0  1  1  0  0  0  0  0  1  1  1  1  0  0  1  
-DEAL::0  1  2  3  0  1  0  1  4  2  3  2  3  5  4  5  4  5  6  6  7  6  7  7  8  9  10 11 8  9  10 11 8  0  0  
+DEAL::1  1  1  1  0  0  0  0  1  0  0  0  0  1  0  0  0  0  1  0  0  0  0  1  0  0  0  0  0  0  0  0  1  2  2
+DEAL::0  0  0  0  0  0  1  1  0  0  0  1  1  0  0  0  1  1  0  0  0  1  1  0  0  0  0  0  1  1  1  1  0  0  1
+DEAL::0  1  2  3  0  1  0  1  4  2  3  2  3  5  4  5  4  5  6  6  7  6  7  7  8  9  10 11 8  9  10 11 8  0  0
 DEAL::Next two lines: component index_in_component
-DEAL::4  4  4  4  x  x  x  x  4  x  x  x  x  4  x  x  x  x  4  x  x  x  x  4  x  x  x  x  x  x  x  x  4  5  6  
-DEAL::0  1  2  3  x  x  x  x  4  x  x  x  x  5  x  x  x  x  6  x  x  x  x  7  x  x  x  x  x  x  x  x  8  0  0  
+DEAL::4  4  4  4  x  x  x  x  4  x  x  x  x  4  x  x  x  x  4  x  x  x  x  4  x  x  x  x  x  x  x  x  4  5  6
+DEAL::0  1  2  3  x  x  x  x  4  x  x  x  x  5  x  x  x  x  6  x  x  x  x  7  x  x  x  x  x  x  x  x  8  0  0
 DEAL::Next two lines: component_to_base
-DEAL::0  0  0  0  1  2  2  
-DEAL::0  1  0  1  0  0  0  
+DEAL::0  0  0  0  1  2  2
+DEAL::0  1  0  1  0  0  0
 DEAL::Next line: component_to_block_index
-DEAL::0  0  1  1  2  3  4  
+DEAL::0  0  1  1  2  3  4
 DEAL::FESystem<2>[FE_RaviartThomas<2>(2)-FE_Q<2>(2)]
 DEAL::Base elements:  2
 DEAL::Multiplicities: 1 1
 DEAL::First block   : 0 1
 DEAL::Blocks : 2
-DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 
+DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32
 DEAL::Next two lines: block index_in_block
-DEAL::1  1  1  1  0  0  0  1  0  0  0  1  0  0  0  1  0  0  0  1  0  0  0  0  0  0  0  0  0  0  0  0  1  
-DEAL::0  1  2  3  0  1  2  4  3  4  5  5  6  7  8  6  9  10 11 7  12 13 14 15 16 17 18 19 20 21 22 23 8  
+DEAL::1  1  1  1  0  0  0  1  0  0  0  1  0  0  0  1  0  0  0  1  0  0  0  0  0  0  0  0  0  0  0  0  1
+DEAL::0  1  2  3  0  1  2  4  3  4  5  5  6  7  8  6  9  10 11 7  12 13 14 15 16 17 18 19 20 21 22 23 8
 DEAL::Next three lines: base block_in_base index_in_block
-DEAL::1  1  1  1  0  0  0  1  0  0  0  1  0  0  0  1  0  0  0  1  0  0  0  0  0  0  0  0  0  0  0  0  1  
-DEAL::0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
-DEAL::0  1  2  3  0  1  2  4  3  4  5  5  6  7  8  6  9  10 11 7  12 13 14 15 16 17 18 19 20 21 22 23 8  
+DEAL::1  1  1  1  0  0  0  1  0  0  0  1  0  0  0  1  0  0  0  1  0  0  0  0  0  0  0  0  0  0  0  0  1
+DEAL::0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+DEAL::0  1  2  3  0  1  2  4  3  4  5  5  6  7  8  6  9  10 11 7  12 13 14 15 16 17 18 19 20 21 22 23 8
 DEAL::Next two lines: component index_in_component
-DEAL::2  2  2  2  x  x  x  2  x  x  x  2  x  x  x  2  x  x  x  2  x  x  x  x  x  x  x  x  x  x  x  x  2  
-DEAL::0  1  2  3  x  x  x  4  x  x  x  5  x  x  x  6  x  x  x  7  x  x  x  x  x  x  x  x  x  x  x  x  8  
+DEAL::2  2  2  2  x  x  x  2  x  x  x  2  x  x  x  2  x  x  x  2  x  x  x  x  x  x  x  x  x  x  x  x  2
+DEAL::0  1  2  3  x  x  x  4  x  x  x  5  x  x  x  6  x  x  x  7  x  x  x  x  x  x  x  x  x  x  x  x  8
 DEAL::Next two lines: component_to_base
-DEAL::0  0  1  
-DEAL::0  1  0  
+DEAL::0  0  1
+DEAL::0  1  0
 DEAL::Next line: component_to_block_index
-DEAL::0  0  1  
+DEAL::0  0  1
 DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(0)]
 DEAL::Base elements:  2
 DEAL::Multiplicities: 1 1
 DEAL::First block   : 0 1
 DEAL::Blocks : 2
-DEAL::0  1  2  3  4  5  6  7  8  
+DEAL::0  1  2  3  4  5  6  7  8
 DEAL::Next two lines: block index_in_block
-DEAL::0  0  0  0  0  0  0  0  1  
-DEAL::0  1  2  3  4  5  6  7  0  
+DEAL::0  0  0  0  0  0  0  0  1
+DEAL::0  1  2  3  4  5  6  7  0
 DEAL::Next three lines: base block_in_base index_in_block
-DEAL::0  0  0  0  0  0  0  0  1  
-DEAL::0  0  0  0  0  0  0  0  0  
-DEAL::0  1  2  3  4  5  6  7  0  
+DEAL::0  0  0  0  0  0  0  0  1
+DEAL::0  0  0  0  0  0  0  0  0
+DEAL::0  1  2  3  4  5  6  7  0
 DEAL::Next two lines: component index_in_component
-DEAL::0  0  0  0  0  0  0  0  1  
-DEAL::0  1  2  3  4  5  6  7  0  
+DEAL::0  0  0  0  0  0  0  0  1
+DEAL::0  1  2  3  4  5  6  7  0
 DEAL::Next two lines: component_to_base
-DEAL::0  1  
-DEAL::0  0  
+DEAL::0  1
+DEAL::0  0
 DEAL::Next line: component_to_block_index
-DEAL::0  1  
+DEAL::0  1
 DEAL::FESystem<3>[FE_Q<3>(1)^2-FE_DGQ<3>(0)^3]
 DEAL::Base elements:  2
 DEAL::Multiplicities: 2 3
 DEAL::First block   : 0 2
 DEAL::Blocks : 5
-DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 
+DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18
 DEAL::Next two lines: block index_in_block
-DEAL::0  1  0  1  0  1  0  1  0  1  0  1  0  1  0  1  2  3  4  
-DEAL::0  0  1  1  2  2  3  3  4  4  5  5  6  6  7  7  0  0  0  
+DEAL::0  1  0  1  0  1  0  1  0  1  0  1  0  1  0  1  2  3  4
+DEAL::0  0  1  1  2  2  3  3  4  4  5  5  6  6  7  7  0  0  0
 DEAL::Next three lines: base block_in_base index_in_block
-DEAL::0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  
-DEAL::0  1  0  1  0  1  0  1  0  1  0  1  0  1  0  1  0  1  2  
-DEAL::0  0  1  1  2  2  3  3  4  4  5  5  6  6  7  7  0  0  0  
+DEAL::0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1
+DEAL::0  1  0  1  0  1  0  1  0  1  0  1  0  1  0  1  0  1  2
+DEAL::0  0  1  1  2  2  3  3  4  4  5  5  6  6  7  7  0  0  0
 DEAL::Next two lines: component index_in_component
-DEAL::0  1  0  1  0  1  0  1  0  1  0  1  0  1  0  1  2  3  4  
-DEAL::0  0  1  1  2  2  3  3  4  4  5  5  6  6  7  7  0  0  0  
+DEAL::0  1  0  1  0  1  0  1  0  1  0  1  0  1  0  1  2  3  4
+DEAL::0  0  1  1  2  2  3  3  4  4  5  5  6  6  7  7  0  0  0
 DEAL::Next two lines: component_to_base
-DEAL::0  0  1  1  1  
-DEAL::0  0  0  0  0  
+DEAL::0  0  1  1  1
+DEAL::0  0  0  0  0
 DEAL::Next line: component_to_block_index
-DEAL::0  1  2  3  4  
+DEAL::0  1  2  3  4
 DEAL::FESystem<3>[FE_DGQ<3>(1)^2-FE_DGQ<3>(0)^3]
 DEAL::Base elements:  2
 DEAL::Multiplicities: 2 3
 DEAL::First block   : 0 2
 DEAL::Blocks : 5
-DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 
+DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18
 DEAL::Next two lines: block index_in_block
-DEAL::0  0  0  0  0  0  0  0  1  1  1  1  1  1  1  1  2  3  4  
-DEAL::0  1  2  3  4  5  6  7  0  1  2  3  4  5  6  7  0  0  0  
+DEAL::0  0  0  0  0  0  0  0  1  1  1  1  1  1  1  1  2  3  4
+DEAL::0  1  2  3  4  5  6  7  0  1  2  3  4  5  6  7  0  0  0
 DEAL::Next three lines: base block_in_base index_in_block
-DEAL::0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  
-DEAL::0  0  0  0  0  0  0  0  1  1  1  1  1  1  1  1  0  1  2  
-DEAL::0  1  2  3  4  5  6  7  0  1  2  3  4  5  6  7  0  0  0  
+DEAL::0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1
+DEAL::0  0  0  0  0  0  0  0  1  1  1  1  1  1  1  1  0  1  2
+DEAL::0  1  2  3  4  5  6  7  0  1  2  3  4  5  6  7  0  0  0
 DEAL::Next two lines: component index_in_component
-DEAL::0  0  0  0  0  0  0  0  1  1  1  1  1  1  1  1  2  3  4  
-DEAL::0  1  2  3  4  5  6  7  0  1  2  3  4  5  6  7  0  0  0  
+DEAL::0  0  0  0  0  0  0  0  1  1  1  1  1  1  1  1  2  3  4
+DEAL::0  1  2  3  4  5  6  7  0  1  2  3  4  5  6  7  0  0  0
 DEAL::Next two lines: component_to_base
-DEAL::0  0  1  1  1  
-DEAL::0  0  0  0  0  
+DEAL::0  0  1  1  1
+DEAL::0  0  0  0  0
 DEAL::Next line: component_to_block_index
-DEAL::0  1  2  3  4  
+DEAL::0  1  2  3  4
 DEAL::FESystem<3>[FE_RaviartThomas<3>(1)-FE_DGQ<3>(1)]
 DEAL::Base elements:  2
 DEAL::Multiplicities: 1 1
 DEAL::First block   : 0 1
 DEAL::Blocks : 2
-DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 
+DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43
 DEAL::Next two lines: block index_in_block
-DEAL::0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  1  1  1  1  1  
-DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 0  1  2  3  4  5  6  7  
+DEAL::0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  1  1  1  1  1
+DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 0  1  2  3  4  5  6  7
 DEAL::Next three lines: base block_in_base index_in_block
-DEAL::0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  1  1  1  1  1  
-DEAL::0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
-DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 0  1  2  3  4  5  6  7  
+DEAL::0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  1  1  1  1  1
+DEAL::0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 0  1  2  3  4  5  6  7
 DEAL::Next two lines: component index_in_component
-DEAL::x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  3  3  3  3  3  3  3  3  
-DEAL::x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  0  1  2  3  4  5  6  7  
+DEAL::x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  3  3  3  3  3  3  3  3
+DEAL::x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  0  1  2  3  4  5  6  7
 DEAL::Next two lines: component_to_base
-DEAL::0  0  0  1  
-DEAL::0  1  2  0  
+DEAL::0  0  0  1
+DEAL::0  1  2  0
 DEAL::Next line: component_to_block_index
-DEAL::0  0  0  1  
+DEAL::0  0  0  1
 DEAL::FESystem<3>[FE_RaviartThomas<3>(0)^2-FE_DGQ<3>(0)^3]
 DEAL::Base elements:  2
 DEAL::Multiplicities: 2 3
 DEAL::First block   : 0 2
 DEAL::Blocks : 5
-DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 
+DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14
 DEAL::Next two lines: block index_in_block
-DEAL::0  1  0  1  0  1  0  1  0  1  0  1  2  3  4  
-DEAL::0  0  1  1  2  2  3  3  4  4  5  5  0  0  0  
+DEAL::0  1  0  1  0  1  0  1  0  1  0  1  2  3  4
+DEAL::0  0  1  1  2  2  3  3  4  4  5  5  0  0  0
 DEAL::Next three lines: base block_in_base index_in_block
-DEAL::0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  
-DEAL::0  1  0  1  0  1  0  1  0  1  0  1  0  1  2  
-DEAL::0  0  1  1  2  2  3  3  4  4  5  5  0  0  0  
+DEAL::0  0  0  0  0  0  0  0  0  0  0  0  1  1  1
+DEAL::0  1  0  1  0  1  0  1  0  1  0  1  0  1  2
+DEAL::0  0  1  1  2  2  3  3  4  4  5  5  0  0  0
 DEAL::Next two lines: component index_in_component
-DEAL::x  x  x  x  x  x  x  x  x  x  x  x  6  7  8  
-DEAL::x  x  x  x  x  x  x  x  x  x  x  x  0  0  0  
+DEAL::x  x  x  x  x  x  x  x  x  x  x  x  6  7  8
+DEAL::x  x  x  x  x  x  x  x  x  x  x  x  0  0  0
 DEAL::Next two lines: component_to_base
-DEAL::0  0  0  0  0  0  1  1  1  
-DEAL::0  1  2  0  1  2  0  0  0  
+DEAL::0  0  0  0  0  0  1  1  1
+DEAL::0  1  2  0  1  2  0  0  0
 DEAL::Next line: component_to_block_index
-DEAL::0  0  0  1  1  1  2  3  4  
+DEAL::0  0  0  1  1  1  2  3  4
 DEAL::FESystem<3>[FE_RaviartThomas<3>(1)^2-FE_DGQ<3>(0)^3]
 DEAL::Base elements:  2
 DEAL::Multiplicities: 2 3
 DEAL::First block   : 0 2
 DEAL::Blocks : 5
-DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 
+DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74
 DEAL::Next two lines: block index_in_block
-DEAL::0  0  0  0  1  1  1  1  0  0  0  0  1  1  1  1  0  0  0  0  1  1  1  1  0  0  0  0  1  1  1  1  0  0  0  0  1  1  1  1  0  0  0  0  1  1  1  1  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  1  1  1  1  1  1  1  1  1  2  3  4  
-DEAL::0  1  2  3  0  1  2  3  4  5  6  7  4  5  6  7  8  9  10 11 8  9  10 11 12 13 14 15 12 13 14 15 16 17 18 19 16 17 18 19 20 21 22 23 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 24 25 26 27 28 29 30 31 32 33 34 35 0  0  0  
+DEAL::0  0  0  0  1  1  1  1  0  0  0  0  1  1  1  1  0  0  0  0  1  1  1  1  0  0  0  0  1  1  1  1  0  0  0  0  1  1  1  1  0  0  0  0  1  1  1  1  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  1  1  1  1  1  1  1  1  1  2  3  4
+DEAL::0  1  2  3  0  1  2  3  4  5  6  7  4  5  6  7  8  9  10 11 8  9  10 11 12 13 14 15 12 13 14 15 16 17 18 19 16 17 18 19 20 21 22 23 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 24 25 26 27 28 29 30 31 32 33 34 35 0  0  0
 DEAL::Next three lines: base block_in_base index_in_block
-DEAL::0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  
-DEAL::0  0  0  0  1  1  1  1  0  0  0  0  1  1  1  1  0  0  0  0  1  1  1  1  0  0  0  0  1  1  1  1  0  0  0  0  1  1  1  1  0  0  0  0  1  1  1  1  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  1  1  1  1  1  1  1  1  1  0  1  2  
-DEAL::0  1  2  3  0  1  2  3  4  5  6  7  4  5  6  7  8  9  10 11 8  9  10 11 12 13 14 15 12 13 14 15 16 17 18 19 16 17 18 19 20 21 22 23 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 24 25 26 27 28 29 30 31 32 33 34 35 0  0  0  
+DEAL::0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1
+DEAL::0  0  0  0  1  1  1  1  0  0  0  0  1  1  1  1  0  0  0  0  1  1  1  1  0  0  0  0  1  1  1  1  0  0  0  0  1  1  1  1  0  0  0  0  1  1  1  1  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  1  1  1  1  1  1  1  1  1  0  1  2
+DEAL::0  1  2  3  0  1  2  3  4  5  6  7  4  5  6  7  8  9  10 11 8  9  10 11 12 13 14 15 12 13 14 15 16 17 18 19 16 17 18 19 20 21 22 23 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 24 25 26 27 28 29 30 31 32 33 34 35 0  0  0
 DEAL::Next two lines: component index_in_component
-DEAL::x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  6  7  8  
-DEAL::x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  0  0  0  
+DEAL::x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  6  7  8
+DEAL::x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  0  0  0
 DEAL::Next two lines: component_to_base
-DEAL::0  0  0  0  0  0  1  1  1  
-DEAL::0  1  2  0  1  2  0  0  0  
+DEAL::0  0  0  0  0  0  1  1  1
+DEAL::0  1  2  0  1  2  0  0  0
 DEAL::Next line: component_to_block_index
-DEAL::0  0  0  1  1  1  2  3  4  
+DEAL::0  0  0  1  1  1  2  3  4
 DEAL::FESystem<3>[FE_Q<3>(1)^2-FE_Q<3>(2)-FE_DGQ<3>(0)^2]
 DEAL::Base elements:  3
 DEAL::Multiplicities: 2 1 2
 DEAL::First block   : 0 2 3
 DEAL::Blocks : 5
-DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 
+DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44
 DEAL::Next two lines: block index_in_block
-DEAL::0  1  2  0  1  2  0  1  2  0  1  2  0  1  2  0  1  2  0  1  2  0  1  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  3  4  
-DEAL::0  0  0  1  1  1  2  2  2  3  3  3  4  4  4  5  5  5  6  6  6  7  7  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 0  0  
+DEAL::0  1  2  0  1  2  0  1  2  0  1  2  0  1  2  0  1  2  0  1  2  0  1  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  3  4
+DEAL::0  0  0  1  1  1  2  2  2  3  3  3  4  4  4  5  5  5  6  6  6  7  7  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 0  0
 DEAL::Next three lines: base block_in_base index_in_block
-DEAL::0  0  1  0  0  1  0  0  1  0  0  1  0  0  1  0  0  1  0  0  1  0  0  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  2  2  
-DEAL::0  1  0  0  1  0  0  1  0  0  1  0  0  1  0  0  1  0  0  1  0  0  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  
-DEAL::0  0  0  1  1  1  2  2  2  3  3  3  4  4  4  5  5  5  6  6  6  7  7  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 0  0  
+DEAL::0  0  1  0  0  1  0  0  1  0  0  1  0  0  1  0  0  1  0  0  1  0  0  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  2  2
+DEAL::0  1  0  0  1  0  0  1  0  0  1  0  0  1  0  0  1  0  0  1  0  0  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1
+DEAL::0  0  0  1  1  1  2  2  2  3  3  3  4  4  4  5  5  5  6  6  6  7  7  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 0  0
 DEAL::Next two lines: component index_in_component
-DEAL::0  1  2  0  1  2  0  1  2  0  1  2  0  1  2  0  1  2  0  1  2  0  1  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  3  4  
-DEAL::0  0  0  1  1  1  2  2  2  3  3  3  4  4  4  5  5  5  6  6  6  7  7  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 0  0  
+DEAL::0  1  2  0  1  2  0  1  2  0  1  2  0  1  2  0  1  2  0  1  2  0  1  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  3  4
+DEAL::0  0  0  1  1  1  2  2  2  3  3  3  4  4  4  5  5  5  6  6  6  7  7  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 0  0
 DEAL::Next two lines: component_to_base
-DEAL::0  0  1  2  2  
-DEAL::0  0  0  0  0  
+DEAL::0  0  1  2  2
+DEAL::0  0  0  0  0
 DEAL::Next line: component_to_block_index
-DEAL::0  1  2  3  4  
+DEAL::0  1  2  3  4
 DEAL::FESystem<3>[FE_RaviartThomas<3>(1)^2-FE_Q<3>(2)-FE_DGQ<3>(0)^2]
 DEAL::Base elements:  3
 DEAL::Multiplicities: 2 1 2
@@ -342,20 +342,20 @@ DEAL::First block   : 0 2 3
 DEAL::Blocks : 5
 DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100
 DEAL::Next two lines: block index_in_block
-DEAL::2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  0  0  0  0  1  1  1  1  2  0  0  0  0  1  1  1  1  2  0  0  0  0  1  1  1  1  2  0  0  0  0  1  1  1  1  2  0  0  0  0  1  1  1  1  2  0  0  0  0  1  1  1  1  2  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  1  1  1  1  1  1  1  1  1  2  3  4  
-DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 0  1  2  3  0  1  2  3  20 4  5  6  7  4  5  6  7  21 8  9  10 11 8  9  10 11 22 12 13 14 15 12 13 14 15 23 16 17 18 19 16 17 18 19 24 20 21 22 23 20 21 22 23 25 24 25 26 27 28 29 30 31 32 33 34 35 24 25 26 27 28 29 30 31 32 33 34 35 26 0  0  
+DEAL::2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  0  0  0  0  1  1  1  1  2  0  0  0  0  1  1  1  1  2  0  0  0  0  1  1  1  1  2  0  0  0  0  1  1  1  1  2  0  0  0  0  1  1  1  1  2  0  0  0  0  1  1  1  1  2  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  1  1  1  1  1  1  1  1  1  2  3  4
+DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 0  1  2  3  0  1  2  3  20 4  5  6  7  4  5  6  7  21 8  9  10 11 8  9  10 11 22 12 13 14 15 12 13 14 15 23 16 17 18 19 16 17 18 19 24 20 21 22 23 20 21 22 23 25 24 25 26 27 28 29 30 31 32 33 34 35 24 25 26 27 28 29 30 31 32 33 34 35 26 0  0
 DEAL::Next three lines: base block_in_base index_in_block
-DEAL::1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  2  2  
-DEAL::0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  1  0  0  0  0  0  1  1  1  1  0  0  0  0  0  1  1  1  1  0  0  0  0  0  1  1  1  1  0  0  0  0  0  1  1  1  1  0  0  0  0  0  1  1  1  1  0  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  1  1  1  1  1  1  1  1  1  0  0  1  
-DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 0  1  2  3  0  1  2  3  20 4  5  6  7  4  5  6  7  21 8  9  10 11 8  9  10 11 22 12 13 14 15 12 13 14 15 23 16 17 18 19 16 17 18 19 24 20 21 22 23 20 21 22 23 25 24 25 26 27 28 29 30 31 32 33 34 35 24 25 26 27 28 29 30 31 32 33 34 35 26 0  0  
+DEAL::1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  2  2
+DEAL::0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  1  0  0  0  0  0  1  1  1  1  0  0  0  0  0  1  1  1  1  0  0  0  0  0  1  1  1  1  0  0  0  0  0  1  1  1  1  0  0  0  0  0  1  1  1  1  0  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1  1  1  1  1  1  1  1  1  1  0  0  1
+DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 0  1  2  3  0  1  2  3  20 4  5  6  7  4  5  6  7  21 8  9  10 11 8  9  10 11 22 12 13 14 15 12 13 14 15 23 16 17 18 19 16 17 18 19 24 20 21 22 23 20 21 22 23 25 24 25 26 27 28 29 30 31 32 33 34 35 24 25 26 27 28 29 30 31 32 33 34 35 26 0  0
 DEAL::Next two lines: component index_in_component
-DEAL::6  6  6  6  6  6  6  6  6  6  6  6  6  6  6  6  6  6  6  6  x  x  x  x  x  x  x  x  6  x  x  x  x  x  x  x  x  6  x  x  x  x  x  x  x  x  6  x  x  x  x  x  x  x  x  6  x  x  x  x  x  x  x  x  6  x  x  x  x  x  x  x  x  6  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  6  7  8  
-DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 x  x  x  x  x  x  x  x  20 x  x  x  x  x  x  x  x  21 x  x  x  x  x  x  x  x  22 x  x  x  x  x  x  x  x  23 x  x  x  x  x  x  x  x  24 x  x  x  x  x  x  x  x  25 x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  26 0  0  
+DEAL::6  6  6  6  6  6  6  6  6  6  6  6  6  6  6  6  6  6  6  6  x  x  x  x  x  x  x  x  6  x  x  x  x  x  x  x  x  6  x  x  x  x  x  x  x  x  6  x  x  x  x  x  x  x  x  6  x  x  x  x  x  x  x  x  6  x  x  x  x  x  x  x  x  6  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  6  7  8
+DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 x  x  x  x  x  x  x  x  20 x  x  x  x  x  x  x  x  21 x  x  x  x  x  x  x  x  22 x  x  x  x  x  x  x  x  23 x  x  x  x  x  x  x  x  24 x  x  x  x  x  x  x  x  25 x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  26 0  0
 DEAL::Next two lines: component_to_base
-DEAL::0  0  0  0  0  0  1  2  2  
-DEAL::0  1  2  0  1  2  0  0  0  
+DEAL::0  0  0  0  0  0  1  2  2
+DEAL::0  1  2  0  1  2  0  0  0
 DEAL::Next line: component_to_block_index
-DEAL::0  0  0  1  1  1  2  3  4  
+DEAL::0  0  0  1  1  1  2  3  4
 DEAL::FESystem<3>[FE_RaviartThomas<3>(2)-FE_Q<3>(2)]
 DEAL::Base elements:  2
 DEAL::Multiplicities: 1 1
@@ -363,17 +363,17 @@ DEAL::First block   : 0 1
 DEAL::Blocks : 2
 DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100101102103104105106107108109110111112113114115116117118119120121122123124125126127128129130131132133134
 DEAL::Next two lines: block index_in_block
-DEAL::1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  
-DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 0  1  2  3  4  5  6  7  8  20 9  10 11 12 13 14 15 16 17 21 18 19 20 21 22 23 24 25 26 22 27 28 29 30 31 32 33 34 35 23 36 37 38 39 40 41 42 43 44 24 45 46 47 48 49 50 51 52 53 25 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 10010110210310410510610726 
+DEAL::1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1
+DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 0  1  2  3  4  5  6  7  8  20 9  10 11 12 13 14 15 16 17 21 18 19 20 21 22 23 24 25 26 22 27 28 29 30 31 32 33 34 35 23 36 37 38 39 40 41 42 43 44 24 45 46 47 48 49 50 51 52 53 25 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 10010110210310410510610726
 DEAL::Next three lines: base block_in_base index_in_block
-DEAL::1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  
-DEAL::0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  
-DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 0  1  2  3  4  5  6  7  8  20 9  10 11 12 13 14 15 16 17 21 18 19 20 21 22 23 24 25 26 22 27 28 29 30 31 32 33 34 35 23 36 37 38 39 40 41 42 43 44 24 45 46 47 48 49 50 51 52 53 25 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 10010110210310410510610726 
+DEAL::1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1
+DEAL::0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 0  1  2  3  4  5  6  7  8  20 9  10 11 12 13 14 15 16 17 21 18 19 20 21 22 23 24 25 26 22 27 28 29 30 31 32 33 34 35 23 36 37 38 39 40 41 42 43 44 24 45 46 47 48 49 50 51 52 53 25 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 10010110210310410510610726
 DEAL::Next two lines: component index_in_component
-DEAL::3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  x  x  x  x  x  x  x  x  x  3  x  x  x  x  x  x  x  x  x  3  x  x  x  x  x  x  x  x  x  3  x  x  x  x  x  x  x  x  x  3  x  x  x  x  x  x  x  x  x  3  x  x  x  x  x  x  x  x  x  3  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  3  
-DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 x  x  x  x  x  x  x  x  x  20 x  x  x  x  x  x  x  x  x  21 x  x  x  x  x  x  x  x  x  22 x  x  x  x  x  x  x  x  x  23 x  x  x  x  x  x  x  x  x  24 x  x  x  x  x  x  x  x  x  25 x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  26 
+DEAL::3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  x  x  x  x  x  x  x  x  x  3  x  x  x  x  x  x  x  x  x  3  x  x  x  x  x  x  x  x  x  3  x  x  x  x  x  x  x  x  x  3  x  x  x  x  x  x  x  x  x  3  x  x  x  x  x  x  x  x  x  3  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  3
+DEAL::0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 x  x  x  x  x  x  x  x  x  20 x  x  x  x  x  x  x  x  x  21 x  x  x  x  x  x  x  x  x  22 x  x  x  x  x  x  x  x  x  23 x  x  x  x  x  x  x  x  x  24 x  x  x  x  x  x  x  x  x  25 x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  26
 DEAL::Next two lines: component_to_base
-DEAL::0  0  0  1  
-DEAL::0  1  2  0  
+DEAL::0  0  0  1
+DEAL::0  1  2  0
 DEAL::Next line: component_to_block_index
-DEAL::0  0  0  1  
+DEAL::0  0  0  1

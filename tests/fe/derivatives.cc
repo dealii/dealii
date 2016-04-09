@@ -88,10 +88,10 @@ void plot_FE_Q_shape_functions()
   FE_Q<dim> q2(2);
   plot_derivatives(m, q2, "Q2");
 //  plot_face_shape_functions(m, q2, "Q2");
-  FE_Q<dim> q3(3);
+  FE_Q<dim> q3(QIterated<1>(QTrapez<1>(),3));
   plot_derivatives(m, q3, "Q3");
 //  plot_face_shape_functions(m, q3, "Q3");
-  FE_Q<dim> q4(4);
+  FE_Q<dim> q4(QIterated<1>(QTrapez<1>(),4));
   plot_derivatives(m, q4, "Q4");
 //  plot_face_shape_functions(m, q4, "Q4");
 //    FE_Q<dim> q5(5);
@@ -119,10 +119,10 @@ void plot_FE_DGQ_shape_functions()
   FE_DGQ<dim> q2(2);
   plot_derivatives(m, q2, "DGQ2");
 //  plot_face_shape_functions(m, q2, "DGQ2");
-  FE_DGQ<dim> q3(3);
+  FE_DGQArbitraryNodes<dim> q3(QIterated<1>(QTrapez<1>(),3));
   plot_derivatives(m, q3, "DGQ3");
 //  plot_face_shape_functions(m, q3, "DGQ3");
-  FE_DGQ<dim> q4(4);
+  FE_DGQArbitraryNodes<dim> q4(QIterated<1>(QTrapez<1>(),4));
   plot_derivatives(m, q4, "DGQ4");
 //  plot_face_shape_functions(m, q4, "DGQ4");
 //    FE_DGQ<dim> q5(5);
@@ -165,7 +165,7 @@ main()
   // FESystem test.
   MappingQGeneric<2> m(1);
   FESystem<2> q2_q3(FE_Q<2>(2), 1,
-                    FE_Q<2>(3), 1);
+                    FE_Q<2>(QIterated<1>(QTrapez<1>(),3)), 1);
 //  plot_derivatives(m, q2_q3, "Q2_Q3");
 
   return 0;

@@ -44,7 +44,7 @@ void test(unsigned int degree)
   const unsigned int spacedim = 1;
   Triangulation<dim, spacedim> tria;
   GridGenerator::hyper_cube(tria, 0, 1);
-  FE_Q<dim, spacedim> fe(degree);
+  FE_Q<dim, spacedim> fe(QIterated<1>(QTrapez<1>(),degree));
 
   DoFHandler<dim, spacedim> shift_dh(tria);
 
@@ -87,4 +87,3 @@ int main ()
   test(3);
   return 0;
 }
-

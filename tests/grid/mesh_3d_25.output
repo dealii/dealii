@@ -12,5 +12,5 @@ DEAL::FE_Q<3>(3), P_0, rel. error=0
 DEAL::FE_Q<3>(3), P_1, rel. error=0
 DEAL::FE_Q<3>(3), P_2, rel. error=0
 DEAL::FE_Q<3>(3), P_3, rel. error=0
-DEAL::FE_Q<3>(3), P_4, rel. error=0.000321938
-DEAL::FE_Q<3>(3), P_5, rel. error=0.000423313
+DEAL::FE_Q<3>(3), P_4, rel. error=0.000279964
+DEAL::FE_Q<3>(3), P_5, rel. error=0.000451454

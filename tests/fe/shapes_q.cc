@@ -43,12 +43,12 @@ void plot_FE_Q_shape_functions()
   // reduce run-time
   if (dim < 3)
     {
-      FE_Q<dim> q3(3);
+      FE_Q<dim> q3(QIterated<1>(QTrapez<1>(),3));
       plot_shape_functions(m, q3, "Q3");
       plot_face_shape_functions(m, q3, "Q3");
       test_compute_functions(m, q3, "Q3");
 
-      FE_Q<dim> q4(4);
+      FE_Q<dim> q4(QIterated<1>(QTrapez<1>(),4));
       plot_shape_functions(m, q4, "Q4");
       plot_face_shape_functions(m, q4, "Q4");
       test_compute_functions(m, q4, "Q4");

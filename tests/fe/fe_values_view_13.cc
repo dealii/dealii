@@ -98,7 +98,7 @@ void test_hyper_sphere()
 
   FESystem<dim> fe (FE_Q<dim>(1), 1,
                     FE_Q<dim>(2), 2,
-                    FE_DGQ<dim>(3), dim);
+                    FE_DGQArbitraryNodes<dim>(QIterated<1>(QTrapez<1>(),3)), dim);
   test(tr, fe);
 }
 

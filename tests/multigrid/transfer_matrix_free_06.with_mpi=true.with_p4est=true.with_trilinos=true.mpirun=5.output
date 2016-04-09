@@ -40,7 +40,7 @@ DEAL::Diff restrict add l5: 0
 DEAL::Diff restrict     l6: 0
 DEAL::Diff restrict add l6: 0
 DEAL::
-DEAL::FE: FESystem<2>[FE_Q<2>(QGaussLobatto(4))^2]
+DEAL::FE: FESystem<2>[FE_Q<2>(3)^2]
 DEAL::no. cells: 88
 DEAL::Diff prolongate   l1: 0
 DEAL::Diff prolongate   l2: 0
@@ -98,7 +98,7 @@ DEAL::Diff restrict add l3: 0
 DEAL::Diff restrict     l4: 0
 DEAL::Diff restrict add l4: 0
 DEAL::
-DEAL::FE: FESystem<3>[FE_Q<3>(QGaussLobatto(4))^2]
+DEAL::FE: FESystem<3>[FE_Q<3>(3)^2]
 DEAL::no. cells: 1
 DEAL::
 DEAL::no. cells: 223

@@ -14,7 +14,7 @@ DEAL::FE_Q<2>(2)  value 0 vector 0 Vector 0
 DEAL::FE_Q<2>(3)  value 0 vector 0 Vector 0
 DEAL::FE_DGQ<2>(2)  value 0 vector 0 Vector 0
 DEAL::FE_DGQ<2>(3)  value 0 vector 0 Vector 0
-DEAL::FE_DGQArbitraryNodes<2>(QGaussLobatto(4))  value 0 vector 0 Vector 0
+DEAL::FE_DGQ<2>(3)  value 0 vector 0 Vector 0
 DEAL::FE_Q<2>(3)  value 0 vector 0 Vector 0
 DEAL::FE_DGQ<3>(1)  value 0 vector 0 Vector 0
 DEAL::FE_Q<3>(1)  value 0 vector 0 Vector 0

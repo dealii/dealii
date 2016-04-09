@@ -131,7 +131,7 @@ LaplaceProblem<dim>::LaplaceProblem () :
 {
   for (unsigned int degree=2; degree<5; ++degree)
     {
-      fe_collection.push_back (FE_Q<dim>(degree));
+      fe_collection.push_back (FE_Q<dim>(QIterated<1>(QTrapez<1>(),degree)));
       quadrature_collection.push_back (QGauss<dim>(degree+2));
       face_quadrature_collection.push_back (QGauss<dim-1>(degree+2));
     }

@@ -33,7 +33,7 @@ template <int dim, int spacedim>
 FE_Q_DG0<dim,spacedim>::FE_Q_DG0 (const unsigned int degree)
   :
   FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim> (
-    TensorProductPolynomialsConst<dim>(Polynomials::LagrangeEquidistant::generate_complete_basis(degree)),
+    TensorProductPolynomialsConst<dim>(Polynomials::generate_complete_Lagrange_basis(QGaussLobatto<1>(degree+1).get_points())),
     FiniteElementData<dim>(get_dpo_vector(degree),
                            1, degree,
                            FiniteElementData<dim>::L2),
@@ -43,11 +43,7 @@ FE_Q_DG0<dim,spacedim>::FE_Q_DG0 (const unsigned int degree)
           ExcMessage ("This element can only be used for polynomial degrees "
                       "greater than zero"));
 
-  std::vector<Point<1> > support_points_1d(degree+1);
-  for (unsigned int i=0; i<=degree; ++i)
-    support_points_1d[i][0] = static_cast<double>(i)/degree;
-
-  this->initialize(support_points_1d);
+  this->initialize(QGaussLobatto<1>(degree+1).get_points());
 
   // adjust unit support point for discontinuous node
   Point<dim> point;
@@ -133,9 +129,16 @@ FE_Q_DG0<dim,spacedim>::get_name () const
       }
 
   if (type == true)
-    namebuf << "FE_Q_DG0<"
-            << Utilities::dim_string(dim,spacedim)
-            << ">(" << this->degree << ")";
+    {
+      if (this->degree > 2)
+        namebuf << "FE_Q_DG0<"
+                << Utilities::dim_string(dim,spacedim)
+                << ">(QIterated(QTrapez()," << this->degree << "))";
+      else
+        namebuf << "FE_Q_DG0<"
+                << Utilities::dim_string(dim,spacedim)
+                << ">(" << this->degree << ")";
+    }
   else
     {
 
@@ -151,7 +154,7 @@ FE_Q_DG0<dim,spacedim>::get_name () const
       if (type == true)
         namebuf << "FE_Q_DG0<"
                 << Utilities::dim_string(dim,spacedim)
-                << ">(QGaussLobatto(" << this->degree+1 << "))";
+                << ">(" << this->degree << ")";
       else
         namebuf << "FE_Q_DG0<"
                 << Utilities::dim_string(dim,spacedim)

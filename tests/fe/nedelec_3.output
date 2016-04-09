@@ -1,5 +1,5 @@
 
-DEAL::Degree 0: 
+DEAL::Degree 0:
 DEAL::2-D
 DEAL::  CELL 1.0
 DEAL::, xq=0.00 0.00, f=[2.00 0]
@@ -106,7 +106,7 @@ DEAL::, xq=1.00 0.50 1.00, f=[6.50 5.00 10.00]
 DEAL::, xq=0.50 1.00 1.00, f=[7.00 4.50 10.50]
 DEAL::, xq=1.00 1.00 1.00, f=[7.00 5.00 11.00]
 DEAL::
-DEAL::Degree 1: 
+DEAL::Degree 1:
 DEAL::2-D
 DEAL::  CELL 1.0
 DEAL::, xq=0.00 0.00, f=[-4.66 -1.73]

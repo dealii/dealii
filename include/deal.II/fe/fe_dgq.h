@@ -75,6 +75,30 @@ template <int dim> class Quadrature;
  * element are exactly the same as those of the FE_Q element where they are
  * shown visually.
  *
+ * <h3>Unit support point distribution and conditioning of interpolation</h3>
+ *
+ * When constructing an FE_DGQ element at polynomial degrees one or two,
+ * equidistant support points at 0 and 1 (linear case) or 0, 0.5, and 1
+ * (quadratic case) are used. The unit support or nodal points
+ * <i>x<sub>i</sub></i> are those points where the <i>j</i>th Lagrange
+ * polynomial satisfies the $\delta_{ij}$ property, i.e., where one polynomial
+ * is one and all the others are zero.  For higher polynomial degrees, the
+ * support points are non-equidistant by default, and chosen to be the support
+ * points of the <tt>(degree+1)</tt>-order Gauss-Lobatto quadrature rule. This
+ * point distribution yields well-conditioned Lagrange interpolation at
+ * arbitrary polynomial degrees. By contrast, polynomials based on equidistant
+ * points get increasingly ill-conditioned as the polynomial degree
+ * increases. In interpolation, this effect is known as the Runge
+ * phenomenon. For Galerkin methods, the Runge phenomenon is typically not
+ * visible in the solution quality but rather in the condition number of the
+ * associated system matrices. For example, the elemental mass matrix of
+ * equidistant points at degree 10 has condition number 2.6e6, whereas the
+ * condition number for Gauss-Lobatto points is around 400.
+ *
+ * The Gauss-Lobatto points in 1D include the end points 0 and +1 of the unit
+ * interval. The interior points are shifted towards the end points, which
+ * gives a denser point distribution close to the element boundary.
+ *
  * @author Ralf Hartmann, Guido Kanschat 2001, 2004
  */
 template <int dim, int spacedim=dim>
@@ -84,7 +108,7 @@ public:
   /**
    * Constructor for tensor product polynomials of degree <tt>p</tt>. The
    * shape functions created using this constructor correspond to Lagrange
-   * interpolation polynomials for equidistantly spaced support points in each
+   * interpolation polynomials for Gauss-Lobatto support (node) points in each
    * coordinate direction.
    */
   FE_DGQ (const unsigned int p);
@@ -360,7 +384,8 @@ private:
  * quadrature points. If this set of quadrature points is then also used in
  * integrating the mass matrix, then it will be diagonal. The number of
  * quadrature points automatically determines the polynomial degree chosen for
- * this element.
+ * this element. The typical applications are the Gauss quadrature or the
+ * Gauss-Lobatto quadrature (provided through the base class).
  *
  * See the base class documentation in FE_DGQ for details.
  *

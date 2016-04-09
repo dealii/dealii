@@ -1180,12 +1180,22 @@ FE_Q_Base<PolynomialType,dim,spacedim>
         {
           Assert (std::fabs (1.-this->poly_space.compute_value
                              (i, this->unit_support_points[i])) < eps,
-                  ExcInternalError());
+                  ExcInternalError("The Lagrange polynomial does not evaluate "
+                                   "to one or zero in a nodal point. "
+                                   "This typically indicates that the "
+                                   "polynomial interpolation is "
+                                   "ill-conditioned such that round-off "
+                                   "prevents the sum to be one."));
           for (unsigned int j=0; j<q_dofs_per_cell; ++j)
             if (j!=i)
               Assert (std::fabs (this->poly_space.compute_value
                                  (i, this->unit_support_points[j])) < eps,
-                      ExcInternalError());
+                      ExcInternalError("The Lagrange polynomial does not evaluate "
+                                       "to one or zero in a nodal point. "
+                                       "This typically indicates that the "
+                                       "polynomial interpolation is "
+                                       "ill-conditioned such that round-off "
+                                       "prevents the sum to be one."));
         }
 #endif
 
@@ -1301,7 +1311,14 @@ FE_Q_Base<PolynomialType,dim,spacedim>
           double sum = 0;
           for (unsigned int col=0; col<this->dofs_per_cell; ++col)
             sum += prolongate(row,col);
-          Assert (std::fabs(sum-1.) < eps, ExcInternalError());
+          Assert (std::fabs(sum-1.) <
+                  std::max(eps, 5e-16*std::sqrt(this->dofs_per_cell)),
+                  ExcInternalError("The entries in a row of the local "
+                                   "prolongation matrix do not add to one. "
+                                   "This typically indicates that the "
+                                   "polynomial interpolation is "
+                                   "ill-conditioned such that round-off "
+                                   "prevents the sum to be one."));
         }
 #endif
 
@@ -1343,27 +1360,23 @@ FE_Q_Base<PolynomialType,dim,spacedim>
       // distinguish q/q_dg0 case
       const unsigned int q_dofs_per_cell = Utilities::fixed_power<dim>(q_degree+1);
 
-      // for these Lagrange interpolation polynomials, construction of the
-      // restriction matrices is relatively simple. the reason is that the
-      // interpolation points on the mother cell are (except for the case with
-      // arbitrary nonequidistant nodes) always also interpolation points for
-      // some shape function on one or the other child, because we have chosen
-      // equidistant Lagrange interpolation points for the polynomials
+      // for Lagrange interpolation polynomials based on equidistant points,
+      // construction of the restriction matrices is relatively simple. the
+      // reason is that in this case the interpolation points on the mother
+      // cell are always also interpolation points for some shape function on
+      // one or the other child.
       //
-      // so the only thing we have to find out is: for each shape function on
-      // the mother cell, which is the child cell (possibly more than one) on
-      // which it is located, and which is the corresponding shape function
-      // there. rather than doing it for the shape functions on the mother
-      // cell, we take the interpolation points there
+      // in the general case with non-equidistant points, we need to actually
+      // do an interpolation. thus, we take the interpolation points on the
+      // mother cell and evaluate the shape functions of the child cell on
+      // those points. it does not hurt in the equidistant case because then
+      // simple one shape function evaluates to one and the others to zero.
       //
-      // note that the interpolation point of a shape function can be on the
-      // boundary between subcells. in that case, restriction from children to
-      // mother may produce two or more entries for a dof on the mother
-      // cell. however, this doesn't hurt: since the element is continuous,
-      // the contribution from each child should yield the same result, and
-      // since the element is non-additive we just overwrite one value
-      // (compute on one child) by the same value (compute on a later child),
-      // so we don't have to care about this
+      // this element is non-additive in all its degrees of freedom by
+      // default, which requires care in downstream use. fortunately, even the
+      // interpolation on non-equidistant points is invariant under the
+      // assumption that whenever a row makes a non-zero contribution to the
+      // mother's residual, the correct value is interpolated.
 
       const double eps = 1e-15*q_degree*dim;
       const std::vector<unsigned int> &index_map_inverse =
@@ -1427,8 +1440,14 @@ FE_Q_Base<PolynomialType,dim,spacedim>
                     }
                   FE_Q_Helper::increment_indices<dim> (j_indices, dofs1d);
                 }
-              Assert (std::fabs(sum_check-1) < eps,
-                      ExcInternalError());
+              Assert (std::fabs(sum_check-1) <
+                      std::max(eps, 5e-16*std::sqrt(this->dofs_per_cell)),
+                      ExcInternalError("The entries in a row of the local "
+                                       "restriction matrix do not add to one. "
+                                       "This typically indicates that the "
+                                       "polynomial interpolation is "
+                                       "ill-conditioned such that round-off "
+                                       "prevents the sum to be one."));
             }
 
           // part for FE_Q_DG0

@@ -141,9 +141,9 @@ check ()
   make_mesh (tria);
 
   hp::FECollection<dim> fe;
-  fe.push_back (FE_Q<dim>(3));
-  fe.push_back (FE_Q<dim>(4));
-  fe.push_back (FE_Q<dim>(5));
+  fe.push_back (FE_Q<dim>(QIterated<1>(QTrapez<1>(),3)));
+  fe.push_back (FE_Q<dim>(QIterated<1>(QTrapez<1>(),4)));
+  fe.push_back (FE_Q<dim>(QIterated<1>(QTrapez<1>(),5)));
 
   hp::MappingCollection<dim> mapping_1;
   mapping_1.push_back(MappingQGeneric<dim>(1));

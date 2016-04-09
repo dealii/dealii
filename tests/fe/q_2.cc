@@ -67,30 +67,22 @@ main()
   deallog.attach(logfile);
   deallog.threshold_double(1.e-10);
 
-  // Test the non-equidistant version as
-  // well
-  const QGaussLobatto<1> quad(5);
-
-  // we had the matrices precomputed
-  // up to Q4 for 1d, Q3 for 2d and
-  // Q2 for 3d
+  // we had the matrices precomputed up to Q4 for 1d, Q3 for 2d and Q2 for 3d
   for (unsigned int degree=1; degree<=4; ++degree)
-    test<1>(FE_Q<1>(degree));
+    test<1>(FE_Q<1>(QIterated<1>(QTrapez<1>(),degree)));
 
-  test<1>(FE_Q<1>(quad));
+  // test the standard version (non-equidistant) as well
+  test<1>(FE_Q<1>(4));
 
   for (unsigned int degree=1; degree<=3; ++degree)
-    test<2>(FE_Q<2>(degree));
+    test<2>(FE_Q<2>(QIterated<1>(QTrapez<1>(),degree)));
 
-  test<2>(FE_Q<2>(quad));
+  test<2>(FE_Q<2>(4));
 
   for (unsigned int degree=1; degree<=2; ++degree)
     test<3>(FE_Q<3>(degree));
 
-  test<3>(FE_Q<3>(quad));
+  test<3>(FE_Q<3>(4));
 
   return 0;
 }
-
-
-

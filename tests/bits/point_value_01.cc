@@ -109,7 +109,7 @@ check ()
   Triangulation<dim> tria;
   make_mesh (tria);
 
-  FE_Q<dim> element(3);
+  FE_Q<dim> element(QIterated<1>(QTrapez<1>(),3));
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(element);
 
@@ -151,11 +151,11 @@ check ()
           VectorTools::point_value (dof, v, p[i], value);
           deallog << -value(0) << std::endl;
 
-          Assert (std::abs(value(0) - function.value(p[i])) < 1e-4,
+          Assert (std::abs(value(0) - function.value(p[i])) < 2e-4,
                   ExcInternalError());
 
           const double scalar_value = VectorTools::point_value (dof, v, p[i]);
-          Assert (std::abs(value(0) - scalar_value) < 1e-4,
+          Assert (std::abs(value(0) - scalar_value) < 2e-4,
                   ExcInternalError());
         }
     }

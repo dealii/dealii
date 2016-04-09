@@ -1,15 +1,15 @@
 
 DEAL::p = 0
-cycle cells dofs  L2 Error  H(curl) Error 
-0     1     12   5.8761e-01 5.7154e-01    
-1     8     54   3.1310e-01 3.1132e-01    
-2     64    300  1.5881e-01 1.5860e-01    
+cycle cells dofs  L2 Error  H(curl) Error
+0     1     12   5.8761e-01 5.7154e-01
+1     8     54   3.1310e-01 3.1132e-01
+2     64    300  1.5881e-01 1.5860e-01
 DEAL::p = 1
-cycle cells dofs  L2 Error  H(curl) Error 
-0     1     54   1.3757e-01 1.4097e-01    
-1     8     300  3.4151e-02 3.5926e-02    
-2     64    1944 8.5308e-03 9.4069e-03    
+cycle cells dofs  L2 Error  H(curl) Error
+0     1     54   1.3757e-01 1.4097e-01
+1     8     300  3.4151e-02 3.5926e-02
+2     64    1944 8.5308e-03 9.4069e-03
 DEAL::p = 2
-cycle cells dofs  L2 Error  H(curl) Error 
-0     1     144  7.1663e-16 1.1556e-15    
-1     8     882  1.0834e-14 1.1559e-14    
+cycle cells dofs  L2 Error  H(curl) Error
+0     1     144  7.1663e-16 1.1556e-15
+1     8     882  1.0834e-14 1.1559e-14

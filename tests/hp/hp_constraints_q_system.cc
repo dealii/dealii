@@ -32,7 +32,7 @@ void test ()
   std::vector<unsigned int> degrees;
   for (unsigned int i=1; i<4; ++i)
     {
-      fe.push_back (FESystem<dim>(FE_Q<dim>(i), 1,
+      fe.push_back (FESystem<dim>(FE_Q<dim>(QIterated<1>(QTrapez<1>(),i)), 1,
                                   FE_DGQ<dim>(i+1), 1));
       degrees.push_back (i);
     }

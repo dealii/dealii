@@ -39,13 +39,12 @@ void plot_FE_DGQ_shape_functions()
   plot_face_shape_functions(m, q2, "DGQ2");
   test_compute_functions(m, q2, "DGQ2");
 
-  FE_DGQ<dim> q3(3);
+  FE_DGQArbitraryNodes<dim> q3(QIterated<1>(QTrapez<1>(),3));
   plot_shape_functions(m, q3, "DGQ3");
   plot_face_shape_functions(m, q3, "DGQ3");
   test_compute_functions(m, q3, "DGQ3");
 
-  QGaussLobatto<1> quadrature_gl(5);
-  FE_DGQArbitraryNodes<dim> qgl(quadrature_gl);
+  FE_DGQ<dim> qgl(4);
   plot_shape_functions(m, qgl, "DGQGL");
   plot_face_shape_functions(m, qgl, "DGQGL");
   test_compute_functions(m, qgl, "DGQGL");

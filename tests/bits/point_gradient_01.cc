@@ -138,7 +138,7 @@ check ()
   Triangulation<dim> tria;
   make_mesh (tria);
 
-  FE_Q<dim> element(3);
+  FE_Q<dim> element(QIterated<1>(QTrapez<1>(),3));
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(element);
 
