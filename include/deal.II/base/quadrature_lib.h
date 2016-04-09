@@ -294,6 +294,14 @@ public:
              const double alpha = 1,
              const bool factor_out_singular_weight=false);
 
+#ifdef DEAL_II_WITH_CXX11
+  /**
+   * Move constructor. We cannot rely on the move constructor for `Quadrature`,
+   * since it does not know about the additional member `fraction` of this class.
+   */
+  QGaussLogR(QGaussLogR<dim> &&) = default;
+#endif
+
 protected:
   /**
    * This is the length of interval $(0,origin)$, or 1 if either of the two
@@ -576,6 +584,14 @@ public:
   /// Generate a formula with <tt>n</tt> quadrature points
   QGaussRadauChebyshev(const unsigned int n,
                        EndPoint ep=QGaussRadauChebyshev::left);
+
+#ifdef DEAL_II_WITH_CXX11
+  /**
+   * Move constructor. We cannot rely on the move constructor for `Quadrature`,
+   * since it does not know about the additional member `ep` of this class.
+   */
+  QGaussRadauChebyshev(QGaussRadauChebyshev<dim> &&) = default;
+#endif
 
 private:
   const EndPoint ep;
