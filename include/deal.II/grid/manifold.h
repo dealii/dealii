@@ -617,10 +617,9 @@ private:
    */
   const Tensor<1,spacedim> periodicity;
 
-  DeclException4(ExcPeriodicBox, int, Point<spacedim>, double, double,
+  DeclException3(ExcPeriodicBox, int, Point<spacedim>, double,
                  << "The component number " << arg1 << " of the point [ " << arg2
-                 << " ] is not in the interval [ " << -arg4
-                 << ", " << arg3 << "), bailing out.");
+                 << " ] is not in the interval [ 0, " << arg3 << "), bailing out.");
 
   /**
    * Relative tolerance. This tolerance is used to compute distances in double

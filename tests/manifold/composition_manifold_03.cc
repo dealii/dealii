@@ -19,7 +19,7 @@
 
 // all include files you need here
 #include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/manifold_tools.h>
+#include <deal.II/grid/composition_manifold.h>
 
 
 int main ()
