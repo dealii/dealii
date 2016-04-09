@@ -423,9 +423,10 @@ get_new_point (const Quadrature<spacedim> &quad) const
     if (periodicity[d] > 0)
       for (unsigned int i=0; i<surrounding_points.size(); ++i)
         {
-          Assert( (surrounding_points[i][d] < periodicity[d]+tolerance*periodicity.norm()) ||
-                  (surrounding_points[i][d] >= -tolerance*periodicity.norm()),
-                  ExcPeriodicBox(d, surrounding_points[i], periodicity, tolerance*periodicity.norm()));
+          minP[d] = std::min(minP[d], surrounding_points[i][d]);
+          Assert( (surrounding_points[i][d] < periodicity[d]+tolerance*periodicity[d]) ||
+                  (surrounding_points[i][d] >= -tolerance*periodicity[d]),
+                  ExcPeriodicBox(d, surrounding_points[i], periodicity, tolerance*periodicity[d]));
         }
 
   // compute the weighted average point, possibly taking into account periodicity
