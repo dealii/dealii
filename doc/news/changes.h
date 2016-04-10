@@ -93,6 +93,21 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li> New: Manifold objects were previously only used to compute the
+ locations of individual new points on a manifold. Now, they are also
+ used to compute tangent vectors (via Manifold::get_tangent_vector()), and this
+ functionality provides the basis for computing normal vectors to manifolds
+ as well.
+ <br>
+ In many cases, tangent vectors can be computed quite easily if the
+ manifold has a functional description, i.e., if it can be
+ represented via the ChartManifold class. In those cases, it is only
+ necessary to overload the ChartManifold::push_forward_gradient()
+ function that computes the derivatives of the push forward operation.
+ <br>
+ (Luca Heltai, Wolfgang Bangerth, 2016/04/08)
+ </li>
+
  <li> New: Added GridGenerator::torus() to generate the volume mesh of a
  torus in three dimensions and a manifold description TorusManifold to
  go with it.
