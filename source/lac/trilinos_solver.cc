@@ -442,9 +442,15 @@ namespace TrilinosWrappers
 
 
 
-  void
-  SolverDirect::do_solve()
+  void SolverDirect::initialize (const SparseMatrix &A)
   {
+    // We need an Epetra_LinearProblem object to let the Amesos solver know
+    // about the matrix and vectors.
+    linear_problem.reset (new Epetra_LinearProblem ());
+
+    // Assign the matrix operator to the Epetra_LinearProblem object
+    linear_problem->SetOperator(const_cast<Epetra_CrsMatrix *>(&A.trilinos_matrix()));
+
     // Fetch return value of Amesos Solver functions
     int ierr;
 
@@ -480,6 +486,73 @@ namespace TrilinosWrappers
     verbose_cout << "Starting numeric factorization" << std::endl;
     ierr = solver->NumericFactorization();
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+  }
+
+
+  void SolverDirect::solve (VectorBase &x, const VectorBase &b)
+  {
+    // Assign the empty LHS vector to the Epetra_LinearProblem object
+    linear_problem->SetLHS(&x.trilinos_vector());
+
+    // Assign the RHS vector to the Epetra_LinearProblem object
+    linear_problem->SetRHS(const_cast<Epetra_MultiVector *>(&b.trilinos_vector()));
+
+    // Fetch return value of Amesos Solver functions
+    int ierr;
+
+    // First set whether we want to print the solver information to screen or
+    // not.
+    ConditionalOStream verbose_cout (std::cout,
+                                     additional_data.output_solver_details);
+
+
+    verbose_cout << "Starting solve" << std::endl;
+    ierr = solver->Solve ();
+    AssertThrow (ierr == 0, ExcTrilinosError (ierr));
+
+    // Finally, force the SolverControl object to report convergence
+    solver_control.check (0, 0);
+  }
+
+
+
+  void
+  SolverDirect::do_solve()
+  {
+    // Fetch return value of Amesos Solver functions
+    int ierr;
+
+    // First set whether we want to print the solver information to screen or
+    // not.
+    ConditionalOStream verbose_cout (std::cout,
+                                     additional_data.output_solver_details);
+
+    solver.reset ();
+
+    // Next allocate the Amesos solver, this is done in two steps, first we
+    // create a solver Factory and and generate with that the concrete Amesos
+    // solver, if possible.
+    Amesos Factory;
+
+    AssertThrow (Factory.Query (additional_data.solver_type.c_str ()),
+                 ExcMessage (std::
+                             string ("You tried to select the solver type <")
+                             + additional_data.solver_type +
+                             "> but this solver is not supported by Trilinos either "
+                             "because it does not exist, or because Trilinos was not "
+                             "configured for its use."));
+
+    solver.reset (Factory.
+                  Create (additional_data.solver_type.c_str (),
+                          *linear_problem));
+
+    verbose_cout << "Starting symbolic factorization" << std::endl;
+    ierr = solver->SymbolicFactorization ();
+    AssertThrow (ierr == 0, ExcTrilinosError (ierr));
+
+    verbose_cout << "Starting numeric factorization" << std::endl;
+    ierr = solver->NumericFactorization ();
+    AssertThrow (ierr == 0, ExcTrilinosError (ierr));
 
     verbose_cout << "Starting solve" << std::endl;
     ierr = solver->Solve();
