@@ -33,7 +33,7 @@ template <int dim, int spacedim>
 class MyFlatManifold : public ChartManifold<dim,spacedim,spacedim+1>
 {
 public:
-  MyFlatManifold (const Point<spacedim+1> &periodicity)
+  MyFlatManifold (const Tensor<1,spacedim+1> &periodicity)
     :
     ChartManifold<dim,spacedim,spacedim+1> (periodicity)
   {}
@@ -80,7 +80,7 @@ void test(unsigned int ref=1)
   deallog << "Testing dim=" << dim
           << ", spacedim="<< spacedim << std::endl;
 
-  Point<spacedim+1> periodicity;
+  Tensor<1,spacedim+1> periodicity;
   periodicity[0] = 5.0;
 
   MyFlatManifold<dim,spacedim> manifold(periodicity);

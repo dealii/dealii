@@ -399,7 +399,7 @@ Manifold<dim,spacedim>::get_tangent_vector(const Point<spacedim> &x1,
 
 
 template <int dim, int spacedim>
-FlatManifold<dim,spacedim>::FlatManifold (const Point<spacedim> &periodicity,
+FlatManifold<dim,spacedim>::FlatManifold (const Tensor<1,spacedim> &periodicity,
                                           const double tolerance)
   :
   periodicity(periodicity),
@@ -417,7 +417,7 @@ get_new_point (const Quadrature<spacedim> &quad) const
   const std::vector<Point<spacedim> > &surrounding_points = quad.get_points();
   const std::vector<double> &weights = quad.get_weights();
 
-  Point<spacedim> minP = periodicity;
+  Tensor<1,spacedim> minP = periodicity;
 
   for (unsigned int d=0; d<spacedim; ++d)
     if (periodicity[d] > 0)
@@ -426,7 +426,7 @@ get_new_point (const Quadrature<spacedim> &quad) const
           minP[d] = std::min(minP[d], surrounding_points[i][d]);
           Assert( (surrounding_points[i][d] < periodicity[d]+tolerance*periodicity[d]) ||
                   (surrounding_points[i][d] >= -tolerance*periodicity[d]),
-                  ExcPeriodicBox(d, surrounding_points[i], periodicity, tolerance*periodicity[d]));
+                  ExcPeriodicBox(d, surrounding_points[i], periodicity[i]));
         }
 
   // compute the weighted average point, possibly taking into account periodicity
@@ -459,6 +459,15 @@ FlatManifold<dim, spacedim>::project_to_manifold (const std::vector<Point<spaced
                                                   const Point<spacedim> &candidate) const
 {
   return candidate;
+}
+
+
+
+template <int dim, int spacedim>
+const Tensor<1,spacedim> &
+FlatManifold<dim, spacedim>::get_periodicity() const
+{
+  return periodicity;
 }
 
 
@@ -497,10 +506,11 @@ ChartManifold<dim,spacedim,chartdim>::~ChartManifold ()
 
 
 template <int dim, int spacedim, int chartdim>
-ChartManifold<dim,spacedim,chartdim>::ChartManifold (const Point<chartdim> &periodicity)
+ChartManifold<dim,spacedim,chartdim>::ChartManifold (const Tensor<1,chartdim> &periodicity)
   :
   sub_manifold(periodicity)
 {}
+
 
 
 template <int dim, int spacedim, int chartdim>
@@ -535,6 +545,7 @@ push_forward_gradient(const Point<chartdim> &) const
 }
 
 
+
 template <int dim, int spacedim, int chartdim>
 Tensor<1,spacedim>
 ChartManifold<dim,spacedim,chartdim>::
@@ -552,6 +563,14 @@ get_tangent_vector (const Point<spacedim> &x1,
   return result;
 }
 
+
+
+template <int dim, int spacedim, int chartdim>
+const Tensor<1, chartdim> &
+ChartManifold<dim, spacedim, chartdim>::get_periodicity() const
+{
+  return sub_manifold.get_periodicity();
+}
 
 // explicit instantiations
 #include "manifold.inst"

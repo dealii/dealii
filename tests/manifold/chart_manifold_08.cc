@@ -19,9 +19,7 @@
 #include <deal.II/grid/manifold.h>
 
 
-Point<3> periodicity (/*r=*/0,
-                            /*phi=*/2*numbers::PI,
-                            /*z=*/0);
+Tensor<1,3> periodicity(static_cast<Tensor<1,3> >(Point<3>(0,2*numbers::PI,0)));
 
 class MyCylinderManifold : public ChartManifold<2,3,3>
 {
