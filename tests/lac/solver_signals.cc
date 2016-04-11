@@ -56,6 +56,26 @@ void output_eigenvalues(const std::vector<NUMBER> &eigenvalues,const std::string
   deallog << std::endl;
 }
 
+template<class NUMBER>
+void output_hessenberg_matrix(const FullMatrix<NUMBER> &H,const std::string &text)
+{
+  deallog << text << std::endl;
+  for (unsigned int i=0; i<H.m(); ++i)
+    {
+      for (unsigned int j=0; j<H.n(); ++j)
+        deallog << H(i,j) << " ";
+      deallog << std::endl;
+    }
+}
+
+template<class NUMBER>
+void output_arnoldi_vectors_norms(const internal::SolverGMRES::TmpVectors<Vector<NUMBER> > &tmp_vector,const std::string &text)
+{
+  deallog << text << std::endl;
+  for (unsigned int i=0; i<tmp_vector.size(); ++i)
+    deallog << tmp_vector[i].l2_norm() << std::endl;
+}
+
 template<typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 void
 check_solve(SolverType         &solver,
@@ -128,6 +148,10 @@ int main()
         std_cxx11::bind(output_eigenvalues<std::complex<double> >,std_cxx11::_1,"Eigenvalues: "),true);
       solver_gmres.connect_eigenvalues_slot(
         std_cxx11::bind(output_eigenvalues<std::complex<double> >,std_cxx11::_1,"Final Eigenvalues: "));
+      solver_gmres.connect_hessenberg_slot(
+        std_cxx11::bind(output_hessenberg_matrix<double>,std_cxx11::_1,"Hessenberg matrix: "),false);
+      solver_gmres.connect_krylov_space_slot(
+        std_cxx11::bind(output_arnoldi_vectors_norms<double>,std_cxx11::_1,"Arnoldi vectors norms: "));
       solver_gmres.solve(A,u,f,PreconditionIdentity());
     }
   catch (std::exception &e)
