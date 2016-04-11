@@ -423,15 +423,27 @@ public:
                                        const Point<spacedim> &candidate) const;
 
   /**
-   * Given a point which lies close to the given manifold and to the given
-   * object, return one which lies on the Manifold.
+   * Given a point and a general mesh iterator, project the point on the
+   * Manifold, making sure it lies on the geometry with respect to the
+   * surrounding points associated with the manifold.
    *
-   * Internally this method calls the function project_to_manifold()
-   * passing the vertices of the object.
+   * This method calls internally the project_to_manifold() function, passing
+   * as arguments the vertices of the @p iterator argument, along with the
+   * @p candidate point.
+   *
+   * @param[in] iterator A mesh iterator that points to either a line, quad,
+   *   or hex.
+   * @param[in] candidate A candidate point to project on the iterator, respecting
+   *   the geometry.
+   * @tparam MeshIteratorType An iterator type that corresponds to either
+   *   Triangulation::cell_iterator (or variants such as
+   *   Triangulation::active_cell_iterator or DoFHandler::cell_iterator) or
+   *   that is the result of statements such as
+   *   <code>cell-@>face(f)</code> or <code>cell-@>line(l)</code>.
    */
-  template<typename OBJ>
+  template<typename MeshIteratorType>
   Point<spacedim>
-  project_to_manifold (const OBJ &obj,
+  project_to_manifold (const MeshIteratorType &iterator,
                        const Point<spacedim> &candidate) const;
 
 
@@ -1249,12 +1261,12 @@ namespace Manifolds
 }
 
 template <int dim, int spacedim>
-template <typename OBJ>
+template <typename MeshIteratorType>
 Point<spacedim>
-Manifold<dim,spacedim>::project_to_manifold(const OBJ &obj,
+Manifold<dim,spacedim>::project_to_manifold(const MeshIteratorType &iterator,
                                             const Point<spacedim> &candidate) const
 {
-  return project_to_manifold(Manifolds::get_default_quadrature(obj).get_points(),
+  return project_to_manifold(Manifolds::get_default_quadrature(iterator).get_points(),
                              candidate);
 }
 
