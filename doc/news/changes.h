@@ -100,6 +100,17 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+
+ <li> New: Added New option in the read_ucd function of the GridIn class.
+      A flag can now be assigned to the function, to decide wether the
+      indicators specified in a UCD file should be interpreted as
+      boundary_ids or as manifold_ids. This is particularly useful
+      when the indicators refer to internal faces, for which
+      boundary_ids cannot be used. 
+ <br>
+ (Andrea Mola, 2016/04/11)
+ </li>
+
  <li> New: Manifold objects were previously only used to compute the
  locations of individual new points on a manifold. Now, they are also
  used to compute tangent vectors (via Manifold::get_tangent_vector()), and this
