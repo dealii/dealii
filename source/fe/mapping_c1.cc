@@ -79,10 +79,10 @@ MappingC1<2>::MappingC1Generic::add_line_support_points (const Triangulation<2>:
         {
           // first get the normal vectors at the two vertices of this line
           // from the boundary description
-          const Manifold<dim> &boundary = line->get_manifold();
+          const Manifold<dim> &manifold = line->get_manifold();
 
           Manifold<dim>::FaceVertexNormals face_vertex_normals;
-          boundary.get_normals_at_vertices (line, face_vertex_normals);
+          manifold.get_normals_at_vertices (line, face_vertex_normals);
 
           // then transform them into interpolation points for a cubic
           // polynomial
