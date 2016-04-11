@@ -32,9 +32,17 @@ for (deal_II_dimension : DIMENSIONS)
 
 #if deal_II_dimension > 1
   template
-  void 
+  void
   DoFTools::extract_locally_relevant_dofs<DoFHandler<deal_II_dimension-1,deal_II_dimension > >
   (const DoFHandler<deal_II_dimension-1,deal_II_dimension > & dof_handler,
+   IndexSet & dof_set);
+#endif
+
+#if deal_II_dimension > 2
+  template
+  void
+  DoFTools::extract_locally_relevant_dofs<DoFHandler<deal_II_dimension-2,deal_II_dimension > >
+  (const DoFHandler<deal_II_dimension-2,deal_II_dimension > & dof_handler,
    IndexSet & dof_set);
 #endif
 
@@ -207,7 +215,7 @@ void
 DoFTools::extract_locally_relevant_dofs<DoFHandler<deal_II_dimension> >
 (const DoFHandler<deal_II_dimension> & dof_handler,
  IndexSet & dof_set);
- 
+
 template
 void
 DoFTools::extract_locally_relevant_dofs<hp::DoFHandler<deal_II_dimension> >
@@ -257,7 +265,7 @@ void
 DoFTools::get_subdomain_association<hp::DoFHandler<deal_II_dimension> >
 (const hp::DoFHandler<deal_II_dimension> &dof_handler,
  std::vector<types::subdomain_id>           &subdomain_association);
- 
+
 template
 std::vector<IndexSet>
 DoFTools::locally_owned_dofs_per_subdomain<DoFHandler<deal_II_dimension> >
@@ -368,7 +376,7 @@ void
 DoFTools::get_subdomain_association<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >
 (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_handler,
  std::vector<types::subdomain_id>           &subdomain_association);
- 
+
 template
 std::vector<IndexSet>
 DoFTools::locally_owned_dofs_per_subdomain<DoFHandler<deal_II_dimension,deal_II_dimension+1> >
@@ -422,7 +430,7 @@ void
 DoFTools::get_subdomain_association<hp::DoFHandler<1,3> >
 (const hp::DoFHandler<1,3> &dof_handler,
  std::vector<types::subdomain_id>           &subdomain_association);
- 
+
 template
 std::vector<IndexSet>
 DoFTools::locally_owned_dofs_per_subdomain<DoFHandler<1,3> >

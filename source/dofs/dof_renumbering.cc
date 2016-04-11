@@ -392,7 +392,12 @@ namespace DoFRenumbering
     // object will be empty and nothing happens
     ConstraintMatrix constraints;
     if (use_constraints)
-      DoFTools::make_hanging_node_constraints (dof_handler, constraints);
+      {
+        IndexSet relevant_dofs;
+        DoFTools::extract_locally_relevant_dofs(dof_handler, relevant_dofs);
+        constraints.reinit(relevant_dofs);
+        DoFTools::make_hanging_node_constraints (dof_handler, constraints);
+      }
     constraints.close ();
 
     const IndexSet locally_owned = dof_handler.locally_owned_dofs();
@@ -408,8 +413,7 @@ namespace DoFRenumbering
 
     // If the index set is not complete, need to get indices in local index
     // space.
-    if (locally_owned.n_elements() !=
-        locally_owned.size())
+    if (locally_owned.n_elements() != locally_owned.size())
       {
         // Create sparsity pattern from dsp by transferring its indices to
         // processor-local index space and doing Cuthill-McKee there
@@ -419,11 +423,14 @@ namespace DoFRenumbering
         for (unsigned int i=0; i<locally_owned.n_elements(); ++i)
           {
             const types::global_dof_index row = locally_owned.nth_index_in_set(i);
+            const unsigned int row_length = dsp.row_length(row);
             row_entries.clear();
-            for (DynamicSparsityPattern::iterator it =
-                   dsp.begin(row); it != dsp.end(row); ++it)
-              if (it->column() != row && locally_owned.is_element(it->column()))
-                row_entries.push_back(locally_owned.index_within_set(it->column()));
+            for (unsigned int j=0; j<row_length; ++j)
+              {
+                const unsigned int col = dsp.column_number(row, j);
+                if (col != row && locally_owned.is_element(col))
+                  row_entries.push_back(locally_owned.index_within_set(col));
+              }
             sparsity.add_entries(i, row_entries.begin(), row_entries.end(),
                                  true);
           }
