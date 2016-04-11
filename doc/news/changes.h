@@ -122,6 +122,18 @@ inconvenience this causes.
  (Luca Heltai, 2016/04/09)
  </li>
 
+ <li> New: Added a new Mapping class, MappingManifold, to use exact
+ geometrical information extracted from the Manifold description instead
+ of a polynomial approximation when computing transformations from the
+ reference to the real cell. This class allows the computation of
+ quadrature points, tangent vectors, and normal vectors which are exact
+ with respect to the geometrical description, and it uses the underlying
+ Manifold objects of the Triangulation. MappingManifold coincides with
+ MappingQ1 for the FlatManifold descriptor.
+ <br>
+ (Luca Heltai, 2016/04/09)
+ </li>
+
  <li> New: Added GridGenerator::torus() to generate the volume mesh of a
  torus in three dimensions and a manifold description TorusManifold to
  go with it.
