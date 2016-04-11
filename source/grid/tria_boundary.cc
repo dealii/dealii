@@ -109,16 +109,11 @@ get_intermediate_points_on_face (const Triangulation<1,3>::face_iterator &,
 template <int dim, int spacedim>
 Point<spacedim>
 Boundary<dim, spacedim>::
-project_to_surface (const typename Triangulation<dim, spacedim>::line_iterator &,
+project_to_surface (const typename Triangulation<dim, spacedim>::line_iterator &line,
                     const Point<spacedim>                                &trial_point) const
 {
-  if (spacedim <= 1)
-    return trial_point;
-  else
-    {
-      Assert (false, ExcPureFunctionCalled());
-      return Point<spacedim>();
-    }
+  return Manifold<dim,spacedim>::template project_to_manifold
+         <typename Triangulation<dim, spacedim>::line_iterator>(line, trial_point);
 }
 
 
@@ -126,16 +121,11 @@ project_to_surface (const typename Triangulation<dim, spacedim>::line_iterator &
 template <int dim, int spacedim>
 Point<spacedim>
 Boundary<dim, spacedim>::
-project_to_surface (const typename Triangulation<dim, spacedim>::quad_iterator &,
+project_to_surface (const typename Triangulation<dim, spacedim>::quad_iterator &quad,
                     const Point<spacedim>                                &trial_point) const
 {
-  if (spacedim <= 2)
-    return trial_point;
-  else
-    {
-      Assert (false, ExcPureFunctionCalled());
-      return Point<spacedim>();
-    }
+  return Manifold<dim,spacedim>::template
+         project_to_manifold<typename Triangulation<dim, spacedim>::quad_iterator>(quad, trial_point);
 }
 
 
@@ -143,16 +133,11 @@ project_to_surface (const typename Triangulation<dim, spacedim>::quad_iterator &
 template <int dim, int spacedim>
 Point<spacedim>
 Boundary<dim, spacedim>::
-project_to_surface (const typename Triangulation<dim, spacedim>::hex_iterator &,
+project_to_surface (const typename Triangulation<dim, spacedim>::hex_iterator &hex,
                     const Point<spacedim>                                &trial_point) const
 {
-  if (spacedim <= 3)
-    return trial_point;
-  else
-    {
-      Assert (false, ExcPureFunctionCalled());
-      return Point<spacedim>();
-    }
+  return Manifold<dim,spacedim>::template
+         project_to_manifold<typename Triangulation<dim, spacedim>::hex_iterator>(hex, trial_point);
 }
 
 
@@ -872,6 +857,16 @@ project_to_surface (const typename Triangulation<dim, spacedim>::hex_iterator &,
     }
 }
 
+
+template <int dim, int spacedim>
+Point<spacedim>
+StraightBoundary<dim, spacedim>::
+project_to_manifold(const std::vector<Point<spacedim> > &surrounding_points,
+                    const Point<spacedim> &trial_point) const
+{
+  Assert(false, ExcNotImplemented());
+  return Point<spacedim>();
+}
 
 
 // explicit instantiations

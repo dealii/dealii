@@ -333,7 +333,7 @@ public:
   virtual
   Point<spacedim>
   project_to_surface (const typename Triangulation<dim,spacedim>::line_iterator &line,
-                      const Point<spacedim> &candidate) const;
+                      const Point<spacedim> &candidate) const DEAL_II_DEPRECATED;
 
   /**
    * Same function as above but for a point that is to be projected onto the
@@ -349,7 +349,7 @@ public:
   virtual
   Point<spacedim>
   project_to_surface (const typename Triangulation<dim,spacedim>::quad_iterator &quad,
-                      const Point<spacedim> &candidate) const;
+                      const Point<spacedim> &candidate) const  DEAL_II_DEPRECATED;
 
   /**
    * Same function as above but for a point that is to be projected onto the
@@ -366,7 +366,7 @@ public:
   virtual
   Point<spacedim>
   project_to_surface (const typename Triangulation<dim,spacedim>::hex_iterator &hex,
-                      const Point<spacedim> &candidate) const;
+                      const Point<spacedim> &candidate) const  DEAL_II_DEPRECATED;
 
   /**
    * Same function as above for arbitrary surrounding points.
