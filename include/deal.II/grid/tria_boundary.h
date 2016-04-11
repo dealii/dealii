@@ -329,6 +329,8 @@ public:
    * If spacedim==1, then the line represented by the line iterator is the
    * entire space (i.e. it is a cell, not a part of the boundary), and the
    * returned point equals the given input point.
+   *
+   * @deprecated Use Manifold::project_to_manifold() instead.
    */
   virtual
   Point<spacedim>
@@ -345,6 +347,8 @@ public:
    * If spacedim<=2, then the surface represented by the quad iterator is the
    * entire space (i.e. it is a cell, not a part of the boundary), and the
    * returned point equals the given input point.
+   *
+   * @deprecated Use Manifold::project_to_manifold() instead.
    */
   virtual
   Point<spacedim>
@@ -362,6 +366,8 @@ public:
    * If spacedim<=3, then the manifold represented by the hex iterator is the
    * entire space (i.e. it is a cell, not a part of the boundary), and the
    * returned point equals the given input point.
+   *
+   * @deprecated Use Manifold::project_to_manifold() instead.
    */
   virtual
   Point<spacedim>
