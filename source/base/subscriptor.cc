@@ -159,6 +159,16 @@ Subscriptor &Subscriptor::operator = (const Subscriptor &s)
 
 
 
+#ifdef DEAL_II_WITH_CXX11
+Subscriptor &Subscriptor::operator = (Subscriptor &&s)
+{
+  s.check_no_subscribers();
+  object_info = s.object_info;
+  return *this;
+}
+#endif
+
+
 void
 Subscriptor::subscribe(const char *id) const
 {
