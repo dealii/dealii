@@ -182,6 +182,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+
+ <li> Fixed and improved: Fix algorithm for incomplete assignment of level
+ subdomain ids for parallel geometric multigrid. Also optimize algorithms
+ used for assignment and DoF communication.
+ <br>
+ (Timo Heister, Martin Kronbichler, 2016/04/12)
+ </li>
+
  <li> Improved: DoFRenumbering::compute_Cuthill_McKee when used with
  distributed triangulations contained parts that scaled as the global problem
  size, rather than the processor-local size. This prevented its use with more
