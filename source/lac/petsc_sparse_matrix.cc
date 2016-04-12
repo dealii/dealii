@@ -308,7 +308,24 @@ namespace PETScWrappers
       }
   }
 
+  size_t
+  SparseMatrix::m () const
+  {
+    PetscInt m,n;
+    PetscErrorCode ierr = MatGetSize(matrix, &m, &n); 
+    
+    return m;
+  }
 
+  size_t
+  SparseMatrix::n () const
+  {
+    PetscInt m,n;
+    PetscErrorCode ierr = MatGetSize(matrix, &m, &n); 
+    
+    return n;
+  }
+  
   // Explicit instantiations
   //
   template
