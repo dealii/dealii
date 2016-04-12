@@ -312,8 +312,8 @@ namespace PETScWrappers
   SparseMatrix::m () const
   {
     PetscInt m,n;
-    PetscErrorCode ierr = MatGetSize(matrix, &m, &n); 
-    
+    PetscErrorCode ierr = MatGetSize(matrix, &m, &n);
+
     return m;
   }
 
@@ -321,11 +321,11 @@ namespace PETScWrappers
   SparseMatrix::n () const
   {
     PetscInt m,n;
-    PetscErrorCode ierr = MatGetSize(matrix, &m, &n); 
-    
+    PetscErrorCode ierr = MatGetSize(matrix, &m, &n);
+
     return n;
   }
-  
+
   // Explicit instantiations
   //
   template

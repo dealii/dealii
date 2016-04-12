@@ -225,15 +225,15 @@ namespace PETScWrappers
     PetscScalar matrix_scalar_product (const VectorBase &u,
                                        const VectorBase &v) const;
 
-     /**
-      * Return the number of rows of this matrix.
-      */
-     size_t m() const;
+    /**
+     * Return the number of rows of this matrix.
+     */
+    size_t m() const;
 
-     /**
-      * Return the number of coloumns of this matrix.
-      */
-     size_t n() const;
+    /**
+     * Return the number of coloumns of this matrix.
+     */
+    size_t n() const;
 
   private:
 
