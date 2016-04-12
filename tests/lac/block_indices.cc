@@ -84,4 +84,8 @@ int main()
 
   BlockIndices bi2(v);
   test(bi2);
+
+  BlockIndices bi3 = std::move(bi2);
+  test(bi3);
+  deallog << "empty: " << bi2 << std::endl;
 }
