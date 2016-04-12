@@ -382,3 +382,44 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 #endif
   }
 
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
+  {
+#if deal_II_dimension < deal_II_space_dimension
+    // non-hp version of create_laplace_matrix
+    template
+      void MatrixCreator::create_laplace_matrix<deal_II_dimension,deal_II_space_dimension>
+      (const Mapping<deal_II_dimension,deal_II_space_dimension>       &mapping,
+       const DoFHandler<deal_II_dimension,deal_II_space_dimension>    &dof,
+       const Quadrature<deal_II_dimension>    &q,
+       SparseMatrix<double>     &matrix,
+       const Function<deal_II_space_dimension,double> * const coefficient,
+       const ConstraintMatrix   &constraints);
+    template
+      void MatrixCreator::create_laplace_matrix<deal_II_dimension,deal_II_space_dimension>
+      (const DoFHandler<deal_II_dimension,deal_II_space_dimension>    &dof,
+       const Quadrature<deal_II_dimension>    &q,
+       SparseMatrix<double>     &matrix,
+       const Function<deal_II_space_dimension,double> * const coefficient,
+       const ConstraintMatrix   &constraints);
+    template
+      void MatrixCreator::create_laplace_matrix<deal_II_dimension,deal_II_space_dimension>
+      (const Mapping<deal_II_dimension,deal_II_space_dimension>       &mapping,
+       const DoFHandler<deal_II_dimension,deal_II_space_dimension>    &dof,
+       const Quadrature<deal_II_dimension>    &q,
+       SparseMatrix<double>     &matrix,
+       const Function<deal_II_space_dimension,double>      &rhs,
+       Vector<double>           &rhs_vector,
+       const Function<deal_II_space_dimension,double> * const coefficient,
+       const ConstraintMatrix   &constraints);
+    template
+      void MatrixCreator::create_laplace_matrix<deal_II_dimension,deal_II_space_dimension>
+      (const DoFHandler<deal_II_dimension,deal_II_space_dimension>    &dof,
+       const Quadrature<deal_II_dimension>    &q,
+       SparseMatrix<double>     &matrix,
+       const Function<deal_II_space_dimension,double>      &rhs,
+       Vector<double>           &rhs_vector,
+       const Function<deal_II_space_dimension,double> * const coefficient,
+       const ConstraintMatrix   &constraints);
+#endif
+  }
+
