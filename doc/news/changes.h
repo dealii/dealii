@@ -101,6 +101,13 @@ inconvenience this causes.
 
 <ol>
 
+ <li> New: Added TensorProductManifold to create new manifolds from two
+ ChartManifold objects. This can be used, for example, to combine a
+ 2d manifold with a flat manifold for an extruded mesh.
+ <br>
+ (Timo Heister, 2016/04/12)
+ </li>
+
  <li> New: Added New option in the read_ucd function of the GridIn class.
       A flag can now be assigned to the function, to decide wether the
       indicators specified in a UCD file should be interpreted as
