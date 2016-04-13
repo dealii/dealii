@@ -100,6 +100,13 @@
  * InverseMatrixRichardson, SchurMatrix, ShiftedMatrix,
  * ShiftedMatrixGeneralized, TransposeMatrix
  *
+ * @note As explained below, when using LinearOperator as <code>res = op_a*x</code>
+ * a PackagedOperation class instance is generated behind-the-curtains.
+ * Consequently, the user program has to include header files for both classes
+ * for compilation to be successful. In an attempt to make easier the decision of which
+ * headers to include in what circumstances and to prevent hidden templates-related
+ * compiler errors, all headers relevant to LinearOperator are grouped in
+ * <deal.ii/lac/linear_operator_tools.h>.
  *
  * <h3>Packaged Operation</h3>
  *
