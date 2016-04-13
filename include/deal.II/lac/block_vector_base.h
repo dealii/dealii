@@ -577,6 +577,23 @@ public:
    */
   BlockVectorBase ();
 
+#ifdef DEAL_II_WITH_CXX11
+  /**
+   * Copy constructor.
+   */
+  BlockVectorBase (const BlockVectorBase &V) = default;
+
+  /**
+   * Move constructor. Each block of the vector @p V is moved into the current
+   * object if the underlying <code>VectorType</code> is move-constructible,
+   * otherwise they are copied.
+   *
+   * @note This constructor is only available if deal.II is configured with
+   * C++11 support.
+   */
+  BlockVectorBase (BlockVectorBase &&V) = default;
+#endif
+
   /**
    * Update internal structures after resizing vectors. Whenever you reinited
    * a block of a block vector, the internal data structures are corrupted.
@@ -722,6 +739,14 @@ public:
    */
   BlockVectorBase &
   operator= (const BlockVectorBase &V);
+
+#ifdef DEAL_II_WITH_CXX11
+  /**
+   * Move assignment operator. Move each block of the vector @p V into the
+   * current object if `VectorType` is move-constructible, otherwise copy them.
+   */
+  BlockVectorBase &operator= (BlockVectorBase &&V) = default;
+#endif
 
   /**
    * Copy operator for template arguments of different types.
@@ -1466,6 +1491,7 @@ namespace internal
   } // namespace BlockVectorIterators
 
 } //namespace internal
+
 
 
 template <class VectorType>
