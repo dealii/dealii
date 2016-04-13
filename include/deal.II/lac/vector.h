@@ -347,8 +347,9 @@ public:
 
 #ifdef DEAL_II_WITH_CXX11
   /**
-   * Move the given vector. This operator replaces the present vector with @p
-   * v by efficiently swapping the internal data structures.
+   * Move the given vector. This operator replaces the present vector with
+   * the internal data of the vector @p v and resets @p v to the state it would
+   * have after being newly default-constructed.
    *
    * @note This operator is only available if deal.II is configured with C++11
    * support.
@@ -1128,7 +1129,17 @@ inline
 Vector<Number> &
 Vector<Number>::operator= (Vector<Number> &&v)
 {
-  swap(v);
+  Subscriptor::operator=(std::move(v));
+
+  if (val) deallocate();
+
+  vec_size = v.vec_size;
+  max_vec_size = v.max_vec_size;
+  val = v.val;
+
+  v.vec_size = 0;
+  v.max_vec_size = 0;
+  v.val = nullptr;
 
   return *this;
 }

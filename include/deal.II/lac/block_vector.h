@@ -112,7 +112,7 @@ public:
    * @note This constructor is only available if deal.II is configured with
    * C++11 support.
    */
-  BlockVector (BlockVector<Number> &&v);
+  BlockVector (BlockVector<Number> &&v) = default;
 #endif
 
 
@@ -208,7 +208,7 @@ public:
    * @note This operator is only available if deal.II is configured with C++11
    * support.
    */
-  BlockVector<Number> &operator= (BlockVector<Number> &&v);
+  BlockVector<Number> &operator= (BlockVector<Number> &&v) = default;
 #endif
 
   /**
@@ -419,20 +419,6 @@ BlockVector<Number>::operator= (const BlockVector<Number> &v)
   BaseClass::operator= (v);
   return *this;
 }
-
-
-
-#ifdef DEAL_II_WITH_CXX11
-template <typename Number>
-inline
-BlockVector<Number> &
-BlockVector<Number>::operator= (BlockVector<Number> &&v)
-{
-  swap(v);
-
-  return *this;
-}
-#endif
 
 
 

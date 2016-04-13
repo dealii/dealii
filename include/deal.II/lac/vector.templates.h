@@ -650,12 +650,14 @@ Vector<Number>::Vector (const Vector<Number> &v)
 template <typename Number>
 Vector<Number>::Vector (Vector<Number> &&v)
   :
-  Subscriptor(),
-  vec_size(0),
-  max_vec_size(0),
-  val(0)
+  Subscriptor(std::move(v)),
+  vec_size(v.vec_size),
+  max_vec_size(v.max_vec_size),
+  val(v.val)
 {
-  swap(v);
+  v.vec_size = 0;
+  v.max_vec_size = 0;
+  v.val = nullptr;
 }
 #endif
 

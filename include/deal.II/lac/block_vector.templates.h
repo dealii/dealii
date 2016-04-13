@@ -61,17 +61,6 @@ BlockVector<Number>::BlockVector (const BlockVector<Number> &v)
 }
 
 
-#ifdef DEAL_II_WITH_CXX11
-template <typename Number>
-BlockVector<Number>::BlockVector (BlockVector<Number> &&v)
-  :
-  BlockVectorBase<Vector<Number> > ()
-{
-  swap(v);
-}
-#endif
-
-
 #ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
 
 template <typename Number>

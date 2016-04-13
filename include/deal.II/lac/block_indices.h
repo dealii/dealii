@@ -74,6 +74,22 @@ public:
    */
   BlockIndices (const std::vector<size_type> &block_sizes);
 
+#ifdef DEAL_II_WITH_CXX11
+  /**
+   * Move constructor. Initialize a new object by stealing the internal data of
+   * another BlockIndices object.
+   *
+   * @note This constructor is only available if deal.II is configured with
+   * C++11 support.
+   */
+  BlockIndices (BlockIndices &&b);
+
+  /**
+   * Copy constructor.
+   */
+  BlockIndices (const BlockIndices &) = default;
+#endif
+
   /**
    * Specialized constructor for a structure with blocks of equal size.
    */
@@ -164,6 +180,14 @@ public:
    * Copy operator.
    */
   BlockIndices &operator = (const BlockIndices &b);
+
+#ifdef DEAL_II_WITH_CXX11
+  /**
+   * Move assignment operator. Move another BlockIndices object onto the
+   * current one by transferring its contents.
+   */
+  BlockIndices &operator = (BlockIndices &&);
+#endif
 
   /**
    * Compare whether two objects are the same, i.e. whether the number of
@@ -285,6 +309,23 @@ BlockIndices::BlockIndices (const std::vector<size_type> &block_sizes)
 }
 
 
+
+#ifdef DEAL_II_WITH_CXX11
+
+inline
+BlockIndices::BlockIndices (BlockIndices &&b)
+  :
+  n_blocks(b.n_blocks),
+  start_indices(std::move(b.start_indices))
+{
+  b.n_blocks = 0;
+  b.start_indices = std::vector<size_type>(1, 0);
+}
+
+#endif
+
+
+
 inline
 void
 BlockIndices::push_back(const size_type sz)
@@ -388,6 +429,23 @@ BlockIndices::operator = (const BlockIndices &b)
   n_blocks = b.n_blocks;
   return *this;
 }
+
+
+
+#ifdef DEAL_II_WITH_CXX11
+inline
+BlockIndices &
+BlockIndices::operator = (BlockIndices &&b)
+{
+  start_indices = std::move(b.start_indices);
+  n_blocks = b.n_blocks;
+
+  b.start_indices = std::vector<size_type>(1, 0);
+  b.n_blocks = 0;
+
+  return *this;
+}
+#endif
 
 
 

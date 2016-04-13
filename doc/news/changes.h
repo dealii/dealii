@@ -101,6 +101,13 @@ inconvenience this causes.
 
 <ol>
 
+ <li> New: Added move operations to BlockIndices, BlockVectorBase and
+ BlockVector; Vector move operations nullify old object instead of
+ using swap.
+ <br>
+ (Daniel Shapero, 2016/04/13)
+ </li>
+
  <li> New: Added TensorProductManifold to create new manifolds from two
  ChartManifold objects. This can be used, for example, to combine a
  2d manifold with a flat manifold for an extruded mesh.
