@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 by the deal.II authors
+// Copyright (C) 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 // Test that it is possible to instantiate a LinearOperator object for all
-// different kinds of Trilinos matrices and vectors
+// different kinds of PETSc matrices and vectors
 // TODO: A bit more tests...
 
 #include "../tests.h"
@@ -22,11 +22,20 @@
 
 #include <deal.II/lac/linear_operator.h>
 
+// Vectors:
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
 
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
+
+// Block Matrix and Vectors:
+#include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/petsc_block_sparse_matrix.h>
+
+#include <deal.II/lac/petsc_parallel_block_vector.h>
+#include <deal.II/lac/petsc_parallel_block_sparse_matrix.h>
+
 
 using namespace dealii;
 
@@ -47,6 +56,15 @@ int main(int argc, char *argv[])
     auto op_a  = linear_operator<PETScWrappers::MPI::Vector>(a);
   }
 
+  {
+    PETScWrappers::BlockSparseMatrix a;
+    auto op_a  = linear_operator<PETScWrappers::BlockVector>(a);
+  }
+
+  {
+    PETScWrappers::MPI::BlockSparseMatrix a;
+    auto op_a  = linear_operator<PETScWrappers::MPI::BlockVector>(a);
+  }
 
   deallog << "OK" << std::endl;
 

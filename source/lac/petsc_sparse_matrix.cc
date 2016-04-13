@@ -313,6 +313,7 @@ namespace PETScWrappers
   {
     PetscInt m,n;
     PetscErrorCode ierr = MatGetSize(matrix, &m, &n);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return m;
   }
@@ -322,6 +323,7 @@ namespace PETScWrappers
   {
     PetscInt m,n;
     PetscErrorCode ierr = MatGetSize(matrix, &m, &n);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return n;
   }

@@ -387,7 +387,7 @@ namespace PETScWrappers
 
       /**
        * Return the partitioning of the range space of this matrix, i.e., the
-       * partitioning of the vectors that are result from matrix-vector
+       * partitioning of the vectors that result from matrix-vector
        * products.
        */
       IndexSet locally_owned_range_indices() const;

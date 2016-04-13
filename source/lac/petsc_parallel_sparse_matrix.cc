@@ -899,8 +899,11 @@ namespace PETScWrappers
       IS *cols = nullptr;
 
       ierr = MatGetSize (matrix, &n_rows, &n_cols);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
       ierr = MatGetOwnershipIS(matrix, rows, cols);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
       ierr = ISGetMinMax(*rows, &min, &max);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       IndexSet locally_owned_domain_indices(n_rows);
       locally_owned_domain_indices.add_range(min, max);
@@ -917,8 +920,11 @@ namespace PETScWrappers
       IS *cols = nullptr;
 
       ierr = MatGetSize (matrix, &n_rows, &n_cols);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
       ierr = MatGetOwnershipIS(matrix, rows, cols);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
       ierr = ISGetMinMax(*cols, &min, &max);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       IndexSet locally_owned_range_indices(n_cols);
       locally_owned_range_indices.add_range(min, max);

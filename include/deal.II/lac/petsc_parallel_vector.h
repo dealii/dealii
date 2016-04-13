@@ -589,8 +589,8 @@ namespace internal
     template <typename> class ReinitHelper;
 
     /**
-     * A helper class internally used in linear_operator.h. Specialization for
-     * TrilinosWrappers::MPI::Vector.
+     * A helper class used internally in linear_operator.h. Specialization for
+     * PETScWrappers::MPI::Vector.
      */
     template<>
     class ReinitHelper<PETScWrappers::MPI::Vector>

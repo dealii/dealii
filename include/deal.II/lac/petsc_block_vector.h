@@ -459,6 +459,42 @@ namespace PETScWrappers
 }
 
 
+namespace internal
+{
+  namespace LinearOperator
+  {
+    template <typename> class ReinitHelper;
+
+    /**
+     * A helper class used internally in linear_operator.h. Specialization for
+     * PETScWrappers::BlockVector.
+     */
+    template<>
+    class ReinitHelper<PETScWrappers::BlockVector>
+    {
+    public:
+      template <typename Matrix>
+      static
+      void reinit_range_vector (const Matrix &matrix,
+                                PETScWrappers::BlockVector &v,
+                                bool omit_zeroing_entries)
+      {
+        v.reinit(matrix.locally_range_sizes(), omit_zeroing_entries);
+      }
+
+      template <typename Matrix>
+      static
+      void reinit_domain_vector(const Matrix &matrix,
+                                PETScWrappers::BlockVector &v,
+                                bool omit_zeroing_entries)
+      {
+        v.reinit(matrix.locally_domain_sizes(), omit_zeroing_entries);
+      }
+    };
+
+  } /* namespace LinearOperator */
+} /* namespace internal */
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif  // DEAL_II_WITH_PETSC
