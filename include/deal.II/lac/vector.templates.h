@@ -122,10 +122,11 @@ namespace internal
   void vectorized_transform(Functor &functor,
                             size_type vec_size)
   {
-#ifndef DEAL_II_WITH_THREADS
-    functor(0,vec_size);
-#else
-    if (vec_size>internal::Vector::minimum_parallel_grain_size)
+#ifdef DEAL_II_WITH_THREADS
+    // only go to the parallel function in case there are at least 4 parallel
+    // items, otherwise the overhead is too large
+    if (vec_size >= 4*internal::Vector::minimum_parallel_grain_size &&
+        MultithreadInfo::n_threads() > 1)
       {
         tbb::parallel_for (tbb::blocked_range<size_type> (0,
                                                           vec_size,
@@ -134,12 +135,62 @@ namespace internal
                            tbb::auto_partitioner());
       }
     else if (vec_size > 0)
-      functor(0,vec_size);
 #endif
+      functor(0,vec_size);
   }
 
 
-  // Define the functors necessary to use SIMD with TBB.
+  // Define the functors necessary to use SIMD with TBB. we also include the
+  // simple copy and set operations
+
+  template <typename Number>
+  struct Vector_set
+  {
+    Number *dst;
+    Number value;
+
+#ifdef DEAL_II_WITH_THREADS
+    void operator() (const tbb::blocked_range<size_type> &range) const
+    {
+      operator()(range.begin(),range.end());
+    }
+#endif
+
+    void operator() (const size_type begin, const size_type end) const
+    {
+      if (value == Number())
+        std::memset (dst+begin,0,(end-begin)*sizeof(Number));
+      else
+        std::fill (dst+begin, dst+end, value);
+    }
+  };
+
+  template <typename Number, typename OtherNumber>
+  struct Vector_copy
+  {
+    const OtherNumber *src;
+    Number *dst;
+
+#ifdef DEAL_II_WITH_THREADS
+    void operator() (const tbb::blocked_range<size_type> &range) const
+    {
+      operator()(range.begin(),range.end());
+    }
+#endif
+
+    void operator() (const size_type begin, const size_type end) const
+    {
+      if (types_are_equal<Number,OtherNumber>::value)
+        std::memcpy(dst+begin, src+begin, (end-begin)*sizeof(Number));
+      else
+        {
+          DEAL_II_OPENMP_SIMD_PRAGMA
+          for (typename dealii::Vector<Number>::size_type i=begin; i<end; ++i)
+            dst[i] = src[i];
+        }
+    }
+  };
+
   template <typename Number>
   struct Vectorization_multiply_factor
   {
@@ -554,6 +605,26 @@ namespace internal
     }
   };
 
+  // function used in the header file
+  namespace Vector
+  {
+    template <typename T, typename U>
+    void copy_vector (const dealii::Vector<T> &src,
+                      dealii::Vector<U>       &dst)
+    {
+      if (PointerComparison::equal(&src, &dst))
+        return;
+
+      const typename dealii::Vector<T>::size_type vec_size = src.size();
+      const typename dealii::Vector<U>::size_type dst_size = dst.size();
+      if (dst_size != vec_size)
+        dst.reinit (src, true);
+      dealii::internal::Vector_copy<U,T> copier;
+      copier.dst = dst.begin();
+      copier.src = src.begin();
+      internal::vectorized_transform(copier,vec_size);
+    }
+  }
 }
 
 
@@ -761,76 +832,6 @@ Vector<Number>::is_non_negative () const
 
 
 
-namespace internal
-{
-  namespace Vector
-  {
-    template <typename T>
-    void set_subrange (const T            s,
-                       const typename dealii::Vector<T>::size_type begin,
-                       const typename dealii::Vector<T>::size_type end,
-                       dealii::Vector<T> &dst)
-    {
-      if (s == T())
-        std::memset ((dst.begin()+begin),0,(end-begin)*sizeof(T));
-      else
-        std::fill (&*(dst.begin()+begin), &*(dst.begin()+end), s);
-    }
-
-
-    template <typename T>
-    void copy_subrange (const typename dealii::Vector<T>::size_type         begin,
-                        const typename dealii::Vector<T>::size_type         end,
-                        const dealii::Vector<T> &src,
-                        dealii::Vector<T>       &dst)
-    {
-      memcpy(&*(dst.begin()+begin), &*(src.begin()+begin),
-             (end-begin)*sizeof(T));
-    }
-
-
-    template <typename T, typename U>
-    void copy_subrange (const typename dealii::Vector<T>::size_type         begin,
-                        const typename dealii::Vector<T>::size_type         end,
-                        const dealii::Vector<T> &src,
-                        dealii::Vector<U>       &dst)
-    {
-      const T *src_ptr = src.begin();
-      U *dst_ptr = dst.begin();
-      DEAL_II_OPENMP_SIMD_PRAGMA
-      for (typename dealii::Vector<T>::size_type i=begin; i<end; ++i)
-        dst_ptr[i] = src_ptr[i];
-    }
-
-
-    template <typename T, typename U>
-    void copy_vector (const dealii::Vector<T> &src,
-                      dealii::Vector<U>       &dst)
-    {
-      if (PointerComparison::equal(&src, &dst))
-        return;
-
-      const typename dealii::Vector<T>::size_type vec_size = src.size();
-      const typename dealii::Vector<U>::size_type dst_size = dst.size();
-      if (dst_size != vec_size)
-        dst.reinit (vec_size, true);
-      if (vec_size>internal::Vector::minimum_parallel_grain_size)
-        parallel::apply_to_subranges (0U, vec_size,
-                                      std_cxx11::bind(&internal::Vector::template
-                                                      copy_subrange <T,U>,
-                                                      std_cxx11::_1,
-                                                      std_cxx11::_2,
-                                                      std_cxx11::cref(src),
-                                                      std_cxx11::ref(dst)),
-                                      internal::Vector::minimum_parallel_grain_size);
-      else if (vec_size > 0)
-        copy_subrange (0U, vec_size, src, dst);
-    }
-  }
-}
-
-
-
 template <typename Number>
 Vector<Number> &
 Vector<Number>::operator= (const Number s)
@@ -838,14 +839,12 @@ Vector<Number>::operator= (const Number s)
   AssertIsFinite(s);
   if (s != Number())
     Assert (vec_size!=0, ExcEmptyObject());
-  if (vec_size>internal::Vector::minimum_parallel_grain_size)
-    parallel::apply_to_subranges (0U, vec_size,
-                                  std_cxx11::bind(&internal::Vector::template
-                                                  set_subrange<Number>,
-                                                  s, std_cxx11::_1, std_cxx11::_2, std_cxx11::ref(*this)),
-                                  internal::Vector::minimum_parallel_grain_size);
-  else if (vec_size > 0)
-    internal::Vector::set_subrange<Number>(s, 0U, vec_size, *this);
+
+  internal::Vector_set<Number> setter;
+  setter.dst = val;
+  setter.value = s;
+
+  internal::vectorized_transform(setter,vec_size);
 
   return *this;
 }
