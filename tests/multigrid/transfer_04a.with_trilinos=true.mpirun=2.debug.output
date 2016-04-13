@@ -79,7 +79,7 @@ DEAL:1::cell=0_2:23 level_subdomain_id=1
 DEAL:1::cell=0_3:000 level_subdomain_id=4294967294
 DEAL:1::cell=0_3:001 level_subdomain_id=4294967294
 DEAL:1::cell=0_3:002 level_subdomain_id=4294967294
-DEAL:1::cell=0_3:003 level_subdomain_id=4294967294
+DEAL:1::cell=0_3:003 level_subdomain_id=0
 DEAL:1::cell=0_3:010 level_subdomain_id=4294967294
 DEAL:1::cell=0_3:011 level_subdomain_id=0
 DEAL:1::cell=0_3:012 level_subdomain_id=0

@@ -1216,6 +1216,45 @@ namespace
               }
           }
 
+        // Special case: if this cell is active we might be a ghost neighbor
+        // to a locally owned cell across a vertex that is finer.
+        // Example (M= my, O=dealii_cell, owned by somebody else):
+        //         *------*
+        //         |      |
+        //         |  O   |
+        //         |      |
+        // *---*---*------*
+        // | M | M |
+        // *---*---*
+        // |   | M |
+        // *---*---*
+        if (!used && dealii_cell->active() && dealii_cell->is_artificial()==false
+            && dealii_cell->level()+1<static_cast<int>(marked_vertices.size()))
+          {
+            for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+              {
+                if (marked_vertices[dealii_cell->level()+1][dealii_cell->vertex_index(v)])
+                  {
+                    used = true;
+                    break;
+                  }
+              }
+          }
+
+        // Like above, but now the other way around
+        if (!used && dealii_cell->active() && dealii_cell->is_artificial()==false
+            && dealii_cell->level()>0)
+          {
+            for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+              {
+                if (marked_vertices[dealii_cell->level()-1][dealii_cell->vertex_index(v)])
+                  {
+                    used = true;
+                    break;
+                  }
+              }
+          }
+
         if (used)
           {
             int owner = internal::p4est::functions<dim>::comm_find_owner (&forest,
@@ -2808,6 +2847,44 @@ namespace parallel
                 && cell->level_subdomain_id() != this->locally_owned_subdomain())
               this->number_cache.level_ghost_owners.insert(cell->level_subdomain_id());
 
+#ifdef DEBUG
+          // Check that level_ghost_owners is symmetric by sending a message
+          // to everyone
+          {
+
+            MPI_Barrier(this->mpi_communicator);
+
+            // important: preallocate to avoid (re)allocation:
+            std::vector<MPI_Request> requests (this->number_cache.level_ghost_owners.size());
+            int dummy = 0;
+            unsigned int req_counter = 0;
+
+            for (std::set<unsigned int>::iterator it = this->number_cache.level_ghost_owners.begin();
+                 it != this->number_cache.level_ghost_owners.end();
+                 ++it, ++req_counter)
+              {
+                MPI_Isend(&dummy, 1, MPI_INT,
+                          *it, 9001, this->mpi_communicator,
+                          &requests[req_counter]);
+              }
+
+            for (std::set<unsigned int>::iterator it = this->number_cache.level_ghost_owners.begin();
+                 it != this->number_cache.level_ghost_owners.end();
+                 ++it)
+              {
+                int dummy;
+                MPI_Recv(&dummy, 1, MPI_INT,
+                         *it, 9001, this->mpi_communicator,
+                         MPI_STATUS_IGNORE);
+              }
+
+            if (requests.size() > 0)
+              MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+
+            MPI_Barrier(this->mpi_communicator);
+          }
+#endif
+
           Assert(this->number_cache.level_ghost_owners.size() < Utilities::MPI::n_mpi_processes(this->mpi_communicator), ExcInternalError());
         }
     }
@@ -3621,47 +3698,6 @@ namespace parallel
                 }
             }
 
-          //step 4: Special case: on each level we need all the face neighbors
-          // of our own level cells these are normally on the same level,
-          // unless the neighbor is active and coarser. It can end up on a
-          // different processor. Luckily, the level_subdomain_id can be
-          // figured out without communication, because the cell is active
-          // (and so level_subdomain_id=subdomain_id). Finally, also consider
-          // the opposite case: if we are the coarser neighbor for another
-          // processor, also mark them.
-          for (typename Triangulation<dim,spacedim>::cell_iterator cell = this->begin(); cell!=this->end(); ++cell)
-            {
-              bool cell_level_mine = cell->level_subdomain_id() == this->locally_owned_subdomain();
-
-              for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-                {
-                  if (cell->face(f)->at_boundary() || cell->neighbor(f)->level() >= cell->level())
-                    continue;
-
-                  bool neighbor_level_mine = cell->neighbor(f)->level_subdomain_id() == this->locally_owned_subdomain();
-
-                  if (cell_level_mine && !neighbor_level_mine)
-                    {
-                      // set the neighbor level_id up
-                      Assert(cell->neighbor(f)->active(), ExcInternalError());
-                      Assert(cell->neighbor(f)->subdomain_id() != numbers::artificial_subdomain_id, ExcInternalError());
-                      Assert(cell->neighbor(f)->level_subdomain_id() == numbers::artificial_subdomain_id
-                             || cell->neighbor(f)->level_subdomain_id() == cell->neighbor(f)->subdomain_id(), ExcInternalError());
-                      cell->neighbor(f)->set_level_subdomain_id(cell->neighbor(f)->subdomain_id());
-                    }
-                  else if (!cell_level_mine && neighbor_level_mine)
-                    {
-                      // set the current cell up because it is a neighbor for us
-                      Assert(cell->active(), ExcInternalError());
-                      Assert(cell->subdomain_id() != numbers::artificial_subdomain_id, ExcInternalError());
-                      Assert(cell->level_subdomain_id() == numbers::artificial_subdomain_id
-                             || cell->level_subdomain_id() == cell->subdomain_id(), ExcInternalError());
-                      cell->set_level_subdomain_id(cell->subdomain_id());
-                    }
-                }
-
-            }
-
         }
 
 
@@ -3862,6 +3898,53 @@ namespace parallel
           AssertThrow (false, ExcInternalError());
         }
 
+#ifdef DEBUG
+      // Check that we know the level subdomain ids of all our neighbors. This
+      // also involves coarser cells that share a vertex if they are active.
+      //
+      // Example (M= my, O=other):
+      //         *------*
+      //         |      |
+      //         |  O   |
+      //         |      |
+      // *---*---*------*
+      // | M | M |
+      // *---*---*
+      // |   | M |
+      // *---*---*
+      //  ^- the parent can be owned by somebody else, so O is not a neighbor
+      // one level coarser
+      if (settings & construct_multigrid_hierarchy)
+        {
+          for (unsigned int lvl=0; lvl<this->n_global_levels(); ++lvl)
+            {
+              std::vector<bool> active_verts = this->mark_locally_active_vertices_on_level(lvl);
+
+              const unsigned int maybe_coarser_lvl = (lvl>0) ? (lvl-1) : lvl;
+              typename Triangulation<dim, spacedim>::cell_iterator cell = this->begin(maybe_coarser_lvl),
+                                                                   endc = this->end(lvl);
+              for (; cell != endc; ++cell)
+                if (cell->level() == static_cast<int>(lvl) || cell->active())
+                  {
+                    const bool is_level_artificial =
+                      (cell->level_subdomain_id() == numbers::artificial_subdomain_id);
+                    bool need_to_know = false;
+                    for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
+                         ++vertex)
+                      if (active_verts[cell->vertex_index(vertex)])
+                        {
+                          need_to_know = true;
+                          break;
+                        }
+
+                    Assert(!need_to_know || !is_level_artificial,
+                           ExcMessage("Internal error: the owner of cell"
+                                      + cell->id().to_string()
+                                      + " is unknown even though it is needed for geometric multigrid."));
+                  }
+            }
+        }
+#endif
 
       refinement_in_progress = false;
       this->update_number_cache ();
