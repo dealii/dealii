@@ -21,6 +21,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/synchronous_iterator.h>
+#include <deal.II/base/thread_management.h>
 
 #include <deal.II/base/std_cxx11/tuple.h>
 #include <deal.II/base/std_cxx11/bind.h>
@@ -683,6 +684,78 @@ namespace parallel
 #endif
   }
 
+
+// --------------------- for loop affinity partitioner -----------------------
+
+  /**
+   * A class that wraps a TBB affinity partitioner in a thread-safe way. In
+   * Vector, we use a shared pointer to share an affinity partitioner
+   * between different vectors of the same size for improving data (and
+   * NUMA) locality. However, when an outer task does multiple vector
+   * operations, the shared pointer could lead to race conditions. This
+   * class only allows one instance to get a partitioner. The other objects
+   * cannot use that object and need to create their own copy.
+   */
+  namespace internal
+  {
+    class TBBPartitioner
+    {
+    public:
+      /**
+       * Constructor.
+       */
+      TBBPartitioner()
+#ifdef DEAL_II_WITH_THREADS
+        :
+        in_use(false)
+#endif
+      {}
+
+#ifdef DEAL_II_WITH_THREADS
+      /**
+       * Return a pointer to the affinity partitioner in case it is free. If
+       * it is already in use (i.e., someone else called acquire without
+       * releasing it afterwards), the null pointer is returned.
+       */
+      tbb::affinity_partitioner *acquire()
+      {
+        dealii::Threads::Mutex::ScopedLock lock(mutex);
+        if (in_use)
+          return NULL;
+
+        in_use = true;
+        return &partitioner;
+      }
+
+      /**
+       * After using the partitioner in a tbb loop through acquire(), this
+       * call makes the partitioner available again.
+       */
+      void release()
+      {
+        dealii::Threads::Mutex::ScopedLock lock(mutex);
+        in_use = false;
+      }
+
+    private:
+      /**
+       * The stored partitioner
+       */
+      tbb::affinity_partitioner partitioner;
+
+      /**
+       * A flag to indicate whether the partitioner has been acquired but not
+       * released yet, i.e., it is in use somewhere else.
+       */
+      bool in_use;
+
+      /**
+       * A mutex to guard the access to the in_use flag.
+       */
+      dealii::Threads::Mutex mutex;
+#endif
+    };
+  }
 }
 
 

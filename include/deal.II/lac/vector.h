@@ -61,6 +61,13 @@ template <typename> class BlockVector;
 
 template <typename> class VectorView;
 
+namespace parallel
+{
+  namespace internal
+  {
+    class TBBPartitioner;
+  }
+}
 
 
 
@@ -985,6 +992,12 @@ protected:
   Number *val;
 
   /**
+   * For parallel loops with TBB, this member variable stores the affinity
+   * information of loops.
+   */
+  std_cxx11::shared_ptr<parallel::internal::TBBPartitioner> thread_loop_partitioner;
+
+  /**
    * Make all other vector types friends.
    */
   template <typename Number2> friend class Vector;
@@ -1069,92 +1082,6 @@ Vector<Number>::~Vector ()
       deallocate();
       val=0;
     }
-}
-
-
-
-template <typename Number>
-inline
-void Vector<Number>::reinit (const size_type n,
-                             const bool omit_zeroing_entries)
-{
-  if (n==0)
-    {
-      if (val) deallocate();
-      val = 0;
-      max_vec_size = vec_size = 0;
-      return;
-    };
-
-  if (n>max_vec_size)
-    {
-      if (val) deallocate();
-      max_vec_size = n;
-      allocate();
-    };
-  vec_size = n;
-  if (omit_zeroing_entries == false)
-    *this = static_cast<Number>(0);
-}
-
-
-
-// declare function that is implemented in vector.templates.h
-namespace internal
-{
-  namespace Vector
-  {
-    template <typename T, typename U>
-    void copy_vector (const dealii::Vector<T> &src,
-                      dealii::Vector<U>       &dst);
-  }
-}
-
-
-
-template <typename Number>
-inline
-Vector<Number> &
-Vector<Number>::operator= (const Vector<Number> &v)
-{
-  dealii::internal::Vector::copy_vector (v, *this);
-  return *this;
-}
-
-
-
-#ifdef DEAL_II_WITH_CXX11
-template <typename Number>
-inline
-Vector<Number> &
-Vector<Number>::operator= (Vector<Number> &&v)
-{
-  Subscriptor::operator=(std::move(v));
-
-  if (val) deallocate();
-
-  vec_size = v.vec_size;
-  max_vec_size = v.max_vec_size;
-  val = v.val;
-
-  v.vec_size = 0;
-  v.max_vec_size = 0;
-  v.val = nullptr;
-
-  return *this;
-}
-#endif
-
-
-
-template <typename Number>
-template <typename Number2>
-inline
-Vector<Number> &
-Vector<Number>::operator= (const Vector<Number2> &v)
-{
-  internal::Vector::copy_vector (v, *this);
-  return *this;
 }
 
 
