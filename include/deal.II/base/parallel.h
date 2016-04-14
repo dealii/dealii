@@ -26,6 +26,7 @@
 #include <deal.II/base/std_cxx11/tuple.h>
 #include <deal.II/base/std_cxx11/bind.h>
 #include <deal.II/base/std_cxx11/function.h>
+#include <deal.II/base/std_cxx11/shared_ptr.h>
 
 #include <cstddef>
 
@@ -707,41 +708,60 @@ namespace parallel
       TBBPartitioner()
 #ifdef DEAL_II_WITH_THREADS
         :
+        my_partitioner(new tbb::affinity_partitioner()),
         in_use(false)
 #endif
       {}
 
 #ifdef DEAL_II_WITH_THREADS
       /**
-       * Return a pointer to the affinity partitioner in case it is free. If
-       * it is already in use (i.e., someone else called acquire without
-       * releasing it afterwards), the null pointer is returned.
+       * Destructor. Check that the object is not in use any more, i.e., all
+       * loops have been completed.
        */
-      tbb::affinity_partitioner *acquire()
+      ~TBBPartitioner()
       {
-        dealii::Threads::Mutex::ScopedLock lock(mutex);
-        if (in_use)
-          return NULL;
-
-        in_use = true;
-        return &partitioner;
+        Assert(in_use == false,
+               ExcInternalError("A vector partitioner goes out of scope, but "
+                                "it appears to be still in use."));
       }
 
       /**
-       * After using the partitioner in a tbb loop through acquire(), this
-       * call makes the partitioner available again.
+       * Return an affinity partitioner. In case the partitioner owned by the
+       * class is free, it is returned here. In case another thread has not
+       * released it yet, a new object is created. To free the partitioner
+       * again, return it by the release_one_partitioner() call.
        */
-      void release()
+      std_cxx11::shared_ptr<tbb::affinity_partitioner>
+      acquire_one_partitioner()
       {
         dealii::Threads::Mutex::ScopedLock lock(mutex);
-        in_use = false;
+        if (in_use)
+          return std_cxx11::shared_ptr<tbb::affinity_partitioner>(new tbb::affinity_partitioner());
+
+        in_use = true;
+        return my_partitioner;
+      }
+
+      /**
+       * After using the partitioner in a tbb loop through
+       * acquire_one_partitioner(), this call makes the partitioner available
+       * again.
+       */
+      void release_one_partitioner(std_cxx11::shared_ptr<tbb::affinity_partitioner> &p)
+      {
+        if (p.get() == my_partitioner.get())
+          {
+            dealii::Threads::Mutex::ScopedLock lock(mutex);
+            in_use = false;
+          }
       }
 
     private:
       /**
-       * The stored partitioner
+       * The stored partitioner that can accumulate knowledge over several
+       * runs of tbb::parallel_for
        */
-      tbb::affinity_partitioner partitioner;
+      std_cxx11::shared_ptr<tbb::affinity_partitioner> my_partitioner;
 
       /**
        * A flag to indicate whether the partitioner has been acquired but not

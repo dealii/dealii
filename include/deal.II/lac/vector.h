@@ -1040,7 +1040,9 @@ Vector<Number>::Vector ()
   vec_size(0),
   max_vec_size(0),
   val(0)
-{}
+{
+  reinit(0);
+}
 
 
 

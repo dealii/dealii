@@ -56,3 +56,4 @@ for (S1: REAL_SCALARS; S2: COMPLEX_SCALARS)
     template
       Vector<S2>& Vector<S2>::operator=<S1> (const Vector<S1> &);
   }
+
