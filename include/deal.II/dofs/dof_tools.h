@@ -1293,17 +1293,18 @@ namespace DoFTools
    * parallel triangulations, then you need to use the other
    * DoFTools::extract_boundary_dofs function.
    *
-   * @param dof_handler The object that describes which degrees of freedom
+   * @param[in] dof_handler The object that describes which degrees of freedom
    * live on which cell
-   * @param component_mask A mask denoting the vector components of the finite
+   * @param[in] component_mask A mask denoting the vector components of the finite
    * element that should be considered (see also
    * @ref GlossComponentMask).
-   * @param selected_dofs The IndexSet object that is returned and that will
-   * contain the indices of degrees of freedom that are located on the
+   * @param[out] selected_dofs A vector of booleans that is returned and for which
+   * an element will be @p true if the corresponding index is a
+   * degree of freedom that is located on the
    * boundary (and correspond to the selected vector components and boundary
    * indicators, depending on the values of the @p component_mask and @p
    * boundary_ids arguments).
-   * @param boundary_ids If empty, this function extracts the indices of the
+   * @param[in] boundary_ids If empty, this function extracts the indices of the
    * degrees of freedom for all parts of the boundary. If it is a non- empty
    * list, then the function only considers boundary faces with the boundary
    * indicators listed in this argument.
@@ -1330,17 +1331,17 @@ namespace DoFTools
    * the locally relevant set (see
    * @ref GlossLocallyRelevantDof "locally relevant DoFs").
    *
-   * @param dof_handler The object that describes which degrees of freedom
+   * @param[in] dof_handler The object that describes which degrees of freedom
    * live on which cell
-   * @param component_mask A mask denoting the vector components of the finite
+   * @param[in] component_mask A mask denoting the vector components of the finite
    * element that should be considered (see also
    * @ref GlossComponentMask).
-   * @param selected_dofs The IndexSet object that is returned and that will
+   * @param[out] selected_dofs The IndexSet object that is returned and that will
    * contain the indices of degrees of freedom that are located on the
    * boundary (and correspond to the selected vector components and boundary
    * indicators, depending on the values of the @p component_mask and @p
    * boundary_ids arguments).
-   * @param boundary_ids If empty, this function extracts the indices of the
+   * @param[in] boundary_ids If empty, this function extracts the indices of the
    * degrees of freedom for all parts of the boundary. If it is a non- empty
    * list, then the function only considers boundary faces with the boundary
    * indicators listed in this argument.
