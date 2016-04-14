@@ -893,10 +893,11 @@ namespace PETScWrappers
     IndexSet
     SparseMatrix::locally_owned_domain_indices () const
     {
-      PetscInt n_rows, n_cols, min, max;
+      PetscInt n_rows, n_cols, min, max, size;
       PetscErrorCode ierr;
       IS *rows = nullptr;
       IS *cols = nullptr;
+      IS *is = nullptr;
 
       ierr = MatGetSize (matrix, &n_rows, &n_cols);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -908,16 +909,21 @@ namespace PETScWrappers
       IndexSet locally_owned_domain_indices(n_rows);
       locally_owned_domain_indices.add_range(min, max);
 
+      ierr = ISGetLocalSize(*is, &size);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+      Assert(size==max-min+1, ExcMessage("PETSc is requiring non contiguous memory allocation."));
+
       return locally_owned_domain_indices;
     }
 
     IndexSet
     SparseMatrix::locally_owned_range_indices () const
     {
-      PetscInt n_rows, n_cols, min, max;
+      PetscInt n_rows, n_cols, min, max, size;
       PetscErrorCode ierr;
       IS *rows = nullptr;
       IS *cols = nullptr;
+      IS *is = nullptr;
 
       ierr = MatGetSize (matrix, &n_rows, &n_cols);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -928,6 +934,10 @@ namespace PETScWrappers
 
       IndexSet locally_owned_range_indices(n_cols);
       locally_owned_range_indices.add_range(min, max);
+
+      ierr = ISGetLocalSize(*is, &size);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+      Assert(size==max-min+1, ExcMessage("PETSc is requiring non contiguous memory allocation."));
 
       return locally_owned_range_indices;
     }
