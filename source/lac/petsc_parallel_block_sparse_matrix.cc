@@ -126,7 +126,27 @@ namespace PETScWrappers
       BaseClass::collect_sizes ();
     }
 
+    std::vector< IndexSet >
+    BlockSparseMatrix::locally_owned_domain_indices() const
+    {
+      std::vector< IndexSet > index_sets;
 
+      for ( unsigned int i=0; i<this->n_block_cols(); ++i)
+        index_sets.push_back(this->block(0,i).locally_owned_domain_indices());
+
+      return index_sets;
+    }
+
+    std::vector< IndexSet >
+    BlockSparseMatrix::locally_owned_range_indices() const
+    {
+      std::vector< IndexSet > index_sets;
+
+      for ( unsigned int i=0; i<this->n_block_rows(); ++i)
+        index_sets.push_back(this->block(i,0).locally_owned_range_indices());
+
+      return index_sets;
+    }
 
     const MPI_Comm &
     BlockSparseMatrix::get_mpi_communicator () const

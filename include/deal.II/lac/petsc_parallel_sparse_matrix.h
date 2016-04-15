@@ -379,6 +379,19 @@ namespace PETScWrappers
       PetscScalar matrix_scalar_product (const Vector &u,
                                          const Vector &v) const;
 
+      /**
+       * Return the partitioning of the domain space of this matrix, i.e., the
+       * partitioning of the vectors this matrix has to be multiplied with.
+       */
+      IndexSet locally_owned_domain_indices() const;
+
+      /**
+       * Return the partitioning of the range space of this matrix, i.e., the
+       * partitioning of the vectors that result from matrix-vector
+       * products.
+       */
+      IndexSet locally_owned_range_indices() const;
+
     private:
 
       /**

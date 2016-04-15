@@ -197,6 +197,12 @@ inconvenience this causes.
 
 <ol>
 
+ <li> New: added ReinitHelper for PETSc. This is required by LinearOperator
+ class to reinit vectors.
+ <br>
+ (Mauro Bardelloni, 2016/04/13)
+ </li>
+
  <li> Fixed and improved: Fix algorithm for incomplete assignment of level
  subdomain ids for parallel geometric multigrid. Also optimize algorithms
  used for assignment and DoF communication.

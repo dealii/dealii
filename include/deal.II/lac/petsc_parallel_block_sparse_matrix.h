@@ -235,6 +235,19 @@ namespace PETScWrappers
       void collect_sizes ();
 
       /**
+       * Return the partitioning of the domain space of this matrix, i.e., the
+       * partitioning of the vectors this matrix has to be multiplied with.
+       */
+      std::vector< IndexSet > locally_owned_domain_indices() const;
+
+      /**
+       * Return the partitioning of the range space of this matrix, i.e., the
+       * partitioning of the vectors that are result from matrix-vector
+       * products.
+       */
+      std::vector< IndexSet > locally_owned_range_indices() const;
+
+      /**
        * Return a reference to the MPI communicator object in use with this
        * matrix.
        */
