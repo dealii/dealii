@@ -17,7 +17,7 @@
 #define dealii__mg_base_h
 
 /*
- * This file contains MGLevelObject and some abstract base classes
+ * This file contains some abstract base classes
  * used by Multigrid.
  */
 
