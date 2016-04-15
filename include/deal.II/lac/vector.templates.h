@@ -129,8 +129,9 @@ namespace internal
     if (vec_size >= 4*internal::Vector::minimum_parallel_grain_size &&
         MultithreadInfo::n_threads() > 1)
       {
-        if (partitioner.get() == NULL)
-          partitioner.reset(new parallel::internal::TBBPartitioner());
+        Assert(partitioner.get() != NULL,
+               ExcInternalError("Unexpected initialization of Vector that does "
+                                "not set the TBB partitioner to a usable state."));
         std_cxx11::shared_ptr<tbb::affinity_partitioner> tbb_partitioner =
           partitioner->acquire_one_partitioner();
 
@@ -878,7 +879,7 @@ void Vector<Number>::reinit (const size_type n,
 
       // only reset the partitioner if we actually expect a significant vector
       // size
-      if (vec_size > 4*internal::Vector::minimum_parallel_grain_size)
+      if (vec_size >= 4*internal::Vector::minimum_parallel_grain_size)
         thread_loop_partitioner.reset(new parallel::internal::TBBPartitioner());
     }
 
