@@ -546,7 +546,7 @@ namespace OpenCASCADE
     return std_cxx11::get<0>(ref);
   }
 
-  std_cxx11::tuple<Point<3>, Point<3>, double>
+  std_cxx11::tuple<Point<3>, Point<3>, double, double>
   closest_point_and_differential_forms(const TopoDS_Shape &in_shape,
                                        const Point<3> &origin,
                                        const double tolerance)
@@ -601,7 +601,7 @@ namespace OpenCASCADE
     return Point<3>();
   }
 
-  std_cxx11::tuple<Point<3>, Point<3>, double >
+  std_cxx11::tuple<Point<3>, Point<3>, double, double>
   push_forward_and_differential_forms(const TopoDS_Face &face,
                                       const double u,
                                       const double v,
@@ -613,7 +613,8 @@ namespace OpenCASCADE
     Assert(props.IsNormalDefined(), ExcMessage("Normal is not well defined!"));
     gp_Dir Normal = props.Normal();
     Assert(props.IsCurvatureDefined(), ExcMessage("Curvature is not well defined!"));
-    Standard_Real Mean_Curvature = props.MeanCurvature();
+    Standard_Real Min_Curvature = props.MinCurvature();
+    Standard_Real Max_Curvature = props.MaxCurvature();
     Point<3> normal = Point<3>(Normal.X(),Normal.Y(),Normal.Z());
 
     // In the case your manifold changes from convex to concave or viceversa
@@ -623,10 +624,11 @@ namespace OpenCASCADE
     if (face.Orientation()==TopAbs_REVERSED)
       {
         normal *= -1;
-        Mean_Curvature *= -1;
+        Min_Curvature *= -1;
+        Max_Curvature *= -1;
       }
 
-    return std_cxx11::tuple<Point<3>, Point<3>, double>(point(Value), normal, Mean_Curvature);
+    return std_cxx11::tuple<Point<3>, Point<3>, double, double>(point(Value), normal, Min_Curvature, Max_Curvature);
   }
 
 
