@@ -120,7 +120,8 @@ namespace internal
 
   template <typename Functor>
   void vectorized_transform(Functor &functor,
-                            size_type vec_size)
+                            size_type vec_size,
+                            std_cxx11::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
   {
 #ifdef DEAL_II_WITH_THREADS
     // only go to the parallel function in case there are at least 4 parallel
@@ -128,15 +129,24 @@ namespace internal
     if (vec_size >= 4*internal::Vector::minimum_parallel_grain_size &&
         MultithreadInfo::n_threads() > 1)
       {
+        Assert(partitioner.get() != NULL,
+               ExcInternalError("Unexpected initialization of Vector that does "
+                                "not set the TBB partitioner to a usable state."));
+        std_cxx11::shared_ptr<tbb::affinity_partitioner> tbb_partitioner =
+          partitioner->acquire_one_partitioner();
+
         tbb::parallel_for (tbb::blocked_range<size_type> (0,
                                                           vec_size,
                                                           internal::Vector::minimum_parallel_grain_size),
                            functor,
-                           tbb::auto_partitioner());
+                           *tbb_partitioner);
+        partitioner->release_one_partitioner(tbb_partitioner);
       }
     else if (vec_size > 0)
-#endif
       functor(0,vec_size);
+#else
+    functor(0,vec_size);
+#endif
   }
 
 
@@ -604,27 +614,6 @@ namespace internal
         }
     }
   };
-
-  // function used in the header file
-  namespace Vector
-  {
-    template <typename T, typename U>
-    void copy_vector (const dealii::Vector<T> &src,
-                      dealii::Vector<U>       &dst)
-    {
-      if (PointerComparison::equal(&src, &dst))
-        return;
-
-      const typename dealii::Vector<T>::size_type vec_size = src.size();
-      const typename dealii::Vector<U>::size_type dst_size = dst.size();
-      if (dst_size != vec_size)
-        dst.reinit (src, true);
-      dealii::internal::Vector_copy<U,T> copier;
-      copier.dst = dst.begin();
-      copier.src = src.begin();
-      internal::vectorized_transform(copier,vec_size);
-    }
-  }
 }
 
 
@@ -653,7 +642,8 @@ Vector<Number>::Vector (Vector<Number> &&v)
   Subscriptor(std::move(v)),
   vec_size(v.vec_size),
   max_vec_size(v.max_vec_size),
-  val(v.val)
+  val(v.val),
+  thread_loop_partitioner(std::move(v.thread_loop_partitioner))
 {
   v.vec_size = 0;
   v.max_vec_size = 0;
@@ -796,11 +786,133 @@ Vector<Number>::Vector (const TrilinosWrappers::Vector &v)
 
 
 template <typename Number>
+inline
+Vector<Number> &
+Vector<Number>::operator= (const Vector<Number> &v)
+{
+  if (PointerComparison::equal(this, &v))
+    return *this;
+
+  thread_loop_partitioner = v.thread_loop_partitioner;
+  if (vec_size != v.vec_size)
+    reinit (v, true);
+
+  dealii::internal::Vector_copy<Number,Number> copier;
+  copier.dst = val;
+  copier.src = v.val;
+  internal::vectorized_transform(copier,vec_size,thread_loop_partitioner);
+
+  return *this;
+}
+
+
+
+#ifdef DEAL_II_WITH_CXX11
+template <typename Number>
+inline
+Vector<Number> &
+Vector<Number>::operator= (Vector<Number> &&v)
+{
+  Subscriptor::operator=(std::move(v));
+
+  if (val) deallocate();
+
+  vec_size = v.vec_size;
+  max_vec_size = v.max_vec_size;
+  val = v.val;
+  thread_loop_partitioner = std::move(v.thread_loop_partitioner);
+
+  v.vec_size = 0;
+  v.max_vec_size = 0;
+  v.val = nullptr;
+
+  return *this;
+}
+#endif
+
+
+
+template <typename Number>
+template <typename Number2>
+inline
+Vector<Number> &
+Vector<Number>::operator= (const Vector<Number2> &v)
+{
+  thread_loop_partitioner = v.thread_loop_partitioner;
+  if (vec_size != v.vec_size)
+    reinit (v, true);
+
+  dealii::internal::Vector_copy<Number,Number2> copier;
+  copier.dst = val;
+  copier.src = v.val;
+  internal::vectorized_transform(copier,vec_size,thread_loop_partitioner);
+
+  return *this;
+}
+
+
+
+template <typename Number>
+inline
+void Vector<Number>::reinit (const size_type n,
+                             const bool omit_zeroing_entries)
+{
+  if (n==0)
+    {
+      if (val) deallocate();
+      val = 0;
+      max_vec_size = vec_size = 0;
+      thread_loop_partitioner.reset(new parallel::internal::TBBPartitioner());
+      return;
+    };
+
+  if (n>max_vec_size)
+    {
+      if (val) deallocate();
+      max_vec_size = n;
+      allocate();
+    };
+
+  if (vec_size != n)
+    {
+      vec_size = n;
+
+      // only reset the partitioner if we actually expect a significant vector
+      // size
+      if (vec_size >= 4*internal::Vector::minimum_parallel_grain_size)
+        thread_loop_partitioner.reset(new parallel::internal::TBBPartitioner());
+    }
+
+  if (omit_zeroing_entries == false)
+    *this = static_cast<Number>(0);
+}
+
+
+
+template <typename Number>
 template <typename Number2>
 void Vector<Number>::reinit (const Vector<Number2> &v,
                              const bool omit_zeroing_entries)
 {
-  reinit (v.size(), omit_zeroing_entries);
+  thread_loop_partitioner = v.thread_loop_partitioner;
+
+  if (v.vec_size==0)
+    {
+      if (val) deallocate();
+      val = 0;
+      max_vec_size = vec_size = 0;
+      return;
+    };
+
+  if (v.vec_size>max_vec_size)
+    {
+      if (val) deallocate();
+      max_vec_size = v.vec_size;
+      allocate();
+    };
+  vec_size = v.vec_size;
+  if (omit_zeroing_entries == false)
+    *this = static_cast<Number>(0);
 }
 
 
@@ -846,7 +958,7 @@ Vector<Number>::operator= (const Number s)
   setter.dst = val;
   setter.value = s;
 
-  internal::vectorized_transform(setter,vec_size);
+  internal::vectorized_transform(setter,vec_size,thread_loop_partitioner);
 
   return *this;
 }
@@ -881,7 +993,7 @@ Vector<Number> &Vector<Number>::operator *= (const Number factor)
   vector_multiply.val = val;
   vector_multiply.factor = factor;
 
-  internal::vectorized_transform(vector_multiply,vec_size);
+  internal::vectorized_transform(vector_multiply,vec_size,thread_loop_partitioner);
 
   return *this;
 }
@@ -902,7 +1014,7 @@ Vector<Number>::add (const Number a,
   vector_add_av.val = val;
   vector_add_av.v_val = v.val;
   vector_add_av.factor = a;
-  internal::vectorized_transform(vector_add_av,vec_size);
+  internal::vectorized_transform(vector_add_av,vec_size,thread_loop_partitioner);
 }
 
 
@@ -924,7 +1036,7 @@ Vector<Number>::sadd (const Number x,
   vector_sadd_xav.v_val = v.val;
   vector_sadd_xav.a = a;
   vector_sadd_xav.x = x;
-  internal::vectorized_transform(vector_sadd_xav,vec_size);
+  internal::vectorized_transform(vector_sadd_xav,vec_size,thread_loop_partitioner);
 }
 
 
@@ -1540,7 +1652,7 @@ Vector<Number> &Vector<Number>::operator -= (const Vector<Number> &v)
   internal::Vectorization_subtract_v<Number> vector_subtract;
   vector_subtract.val = val;
   vector_subtract.v_val = v.val;
-  internal::vectorized_transform(vector_subtract,vec_size);
+  internal::vectorized_transform(vector_subtract,vec_size,thread_loop_partitioner);
 
   return *this;
 }
@@ -1555,7 +1667,7 @@ void Vector<Number>::add (const Number v)
   internal::Vectorization_add_factor<Number> vector_add;
   vector_add.val = val;
   vector_add.factor = v;
-  internal::vectorized_transform(vector_add,vec_size);
+  internal::vectorized_transform(vector_add,vec_size,thread_loop_partitioner);
 }
 
 
@@ -1569,7 +1681,7 @@ void Vector<Number>::add (const Vector<Number> &v)
   internal::Vectorization_add_v<Number> vector_add;
   vector_add.val = val;
   vector_add.v_val = v.val;
-  internal::vectorized_transform(vector_add,vec_size);
+  internal::vectorized_transform(vector_add,vec_size,thread_loop_partitioner);
 }
 
 
@@ -1591,7 +1703,7 @@ void Vector<Number>::add (const Number a, const Vector<Number> &v,
   vector_add.w_val = w.val;
   vector_add.a = a;
   vector_add.b = b;
-  internal::vectorized_transform(vector_add,vec_size);
+  internal::vectorized_transform(vector_add,vec_size,thread_loop_partitioner);
 }
 
 
@@ -1609,7 +1721,7 @@ void Vector<Number>::sadd (const Number x,
   vector_sadd.val = val;
   vector_sadd.v_val = v.val;
   vector_sadd.x = x;
-  internal::vectorized_transform(vector_sadd,vec_size);
+  internal::vectorized_transform(vector_sadd,vec_size,thread_loop_partitioner);
 }
 
 
@@ -1634,7 +1746,7 @@ void Vector<Number>::sadd (const Number x, const Number a,
   vector_sadd.x = x;
   vector_sadd.a = a;
   vector_sadd.b = b;
-  internal::vectorized_transform(vector_sadd,vec_size);
+  internal::vectorized_transform(vector_sadd,vec_size,thread_loop_partitioner);
 }
 
 
@@ -1659,7 +1771,7 @@ void Vector<Number>::scale (const Vector<Number> &s)
   internal::Vectorization_scale<Number> vector_scale;
   vector_scale.val = val;
   vector_scale.v_val = s.val;
-  internal::vectorized_transform(vector_scale,vec_size);
+  internal::vectorized_transform(vector_scale,vec_size,thread_loop_partitioner);
 }
 
 
@@ -1690,7 +1802,7 @@ void Vector<Number>::equ (const Number a,
   vector_equ.val = val;
   vector_equ.u_val = u.val;
   vector_equ.a = a;
-  internal::vectorized_transform(vector_equ,vec_size);
+  internal::vectorized_transform(vector_equ,vec_size,thread_loop_partitioner);
 }
 
 
@@ -1734,7 +1846,7 @@ void Vector<Number>::equ (const Number a, const Vector<Number> &u,
   vector_equ.v_val = v.val;
   vector_equ.a = a;
   vector_equ.b = b;
-  internal::vectorized_transform(vector_equ,vec_size);
+  internal::vectorized_transform(vector_equ,vec_size,thread_loop_partitioner);
 }
 
 
@@ -1756,7 +1868,7 @@ void Vector<Number>::equ (const Number a, const Vector<Number> &u,
   vector_equ.a = a;
   vector_equ.b = b;
   vector_equ.c = c;
-  internal::vectorized_transform(vector_equ,vec_size);
+  internal::vectorized_transform(vector_equ,vec_size,thread_loop_partitioner);
 }
 
 
@@ -1776,7 +1888,7 @@ void Vector<Number>::ratio (const Vector<Number> &a,
   vector_ratio.val = val;
   vector_ratio.a_val = a.val;
   vector_ratio.b_val = b.val;
-  internal::vectorized_transform(vector_ratio,vec_size);
+  internal::vectorized_transform(vector_ratio,vec_size,thread_loop_partitioner);
 }
 
 

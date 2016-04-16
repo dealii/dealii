@@ -22,14 +22,6 @@ for (SCALAR : REAL_SCALARS)
 
 for (S1, S2 : REAL_SCALARS)
   {
-    namespace internal
-    \{
-      namespace Vector
-      \{
-      template void copy_vector<S1,S2> (const dealii::Vector<S1>&,
-                                        dealii::Vector<S2>&);
-      \}
-    \}
     template
       bool
       Vector<S1>::operator==<S2>(const Vector<S2>&) const;
@@ -49,14 +41,6 @@ for (SCALAR : COMPLEX_SCALARS)
 
 for (S1, S2 : COMPLEX_SCALARS)
   {
-    namespace internal
-    \{
-      namespace Vector
-      \{
-      template void copy_vector<S1,S2> (const dealii::Vector<S1>&,
-                                        dealii::Vector<S2>&);
-      \}
-    \}
     template
       bool
       Vector<S1>::operator==<S2>(const Vector<S2>&) const;
@@ -69,11 +53,7 @@ for (S1, S2 : COMPLEX_SCALARS)
 
 for (S1: REAL_SCALARS; S2: COMPLEX_SCALARS)
   {
-    namespace internal
-    \{
-      namespace Vector
-      \{
-      template void copy_vector<S1,S2> (const dealii::Vector<S1>&,
-                                        dealii::Vector<S2>&);
-      \}
-    \}
+    template
+      Vector<S2>& Vector<S2>::operator=<S1> (const Vector<S1> &);
+  }
+

@@ -120,7 +120,7 @@ inconvenience this causes.
       indicators specified in a UCD file should be interpreted as
       boundary_ids or as manifold_ids. This is particularly useful
       when the indicators refer to internal faces, for which
-      boundary_ids cannot be used. 
+      boundary_ids cannot be used.
  <br>
  (Andrea Mola, 2016/04/11)
  </li>
@@ -196,6 +196,15 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+
+ <li> Improved: The parallel loops in the deal.II Vector class for
+ vector-vector operations have been revised for performance. This includes
+ adjusting the minimum parallel grain size to 4096 vector entries and using an
+ affinity partitioner provided by Threading Building Blocks for better data
+ locality, especially on multi-socket systems.
+ <br>
+ (Martin Kronbichler, 2016/04/14)
+ </li>
 
  <li> New: added ReinitHelper for PETSc. This is required by LinearOperator
  class to reinit vectors.

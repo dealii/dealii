@@ -21,17 +21,7 @@ DEAL_II_NAMESPACE_OPEN
 
 // instantiate for integers:
 template class Vector<int>;
-namespace internal
-{
-  namespace Vector
-  {
-    template void copy_vector<int,double> (const dealii::Vector<int> &,
-                                           dealii::Vector<double> &);
-
-    template void copy_vector<int,int> (const dealii::Vector<int> &,
-                                        dealii::Vector<int> &);
-  }
-}
+template Vector<double> &Vector<double>::operator=<int> (const dealii::Vector<int> &);
 
 template
 void Vector<int>::reinit<double>(const Vector<double> &, const bool);
@@ -42,8 +32,9 @@ void Vector<int>::reinit<double>(const Vector<double> &, const bool);
 // arguments is covered by the default copy constructor and copy operator that
 // is declared separately)
 
-#define TEMPL_COPY_CONSTRUCTOR(S1,S2)                   \
-  template Vector<S1>::Vector (const Vector<S2> &)
+#define TEMPL_COPY_CONSTRUCTOR(S1,S2)                           \
+  template Vector<S1>::Vector (const Vector<S2> &);             \
+  template Vector<S1>& Vector<S1>::operator=<S2> (const Vector<S2> &)
 
 #ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
 TEMPL_COPY_CONSTRUCTOR(double,float);
