@@ -1071,7 +1071,7 @@ namespace MeshWorker
                 assemble((*matrix)[level1], info1.matrix(k,false).matrix, info1.indices_by_block[row], info1.indices_by_block[column], level1);
                 if (level1>0)
                   {
-                    assemble_up((*flux_up)[level1],info1.matrix(k,true).matrix, info2.indices_by_block[row], info1.indices_by_block[column], level1);
+                    assemble_up((*flux_up)[level1],info1.matrix(k,true).matrix, info2.indices_by_block[column], info1.indices_by_block[row], level1);
                     assemble_down((*flux_down)[level1], info2.matrix(k,true).matrix, info2.indices_by_block[row], info1.indices_by_block[column], level1);
                   }
               }
