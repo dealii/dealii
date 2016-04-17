@@ -170,8 +170,8 @@ void test(FiniteElement<dim> &fe)
 
   for (unsigned int level=0; level<tr.n_levels(); ++level)
     {
-      const unsigned int prec = 6;
-      const unsigned int wd = 5;
+      const unsigned int prec = 3;
+      const unsigned int wd = 2;
 
       deallog << "Level " << level << std::endl << "mg" << std::endl;
       mg.matrix[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
@@ -202,16 +202,13 @@ int main()
   FE_RaviartThomas<2> rt1(1);
   FE_Q<2> q2(2);
 
-  // FESystem<2> sys1(p0, 2, p1, 1);
-  // FESystem<2> sys2(p0, 2, rt0, 1);
-  FESystem<2> sys3(rt0, 1, p0, 1);
-  // FESystem<2> sys4(p1, 2, q2, 2);
-  // FESystem<2> sys5(q2, 2, p1, 2);
+  FESystem<2> sys1(p0, 2, p0, 1);
+  FESystem<2> sys2(rt0, 1, p0, 1);
+  FESystem<2> sys3(rt1, 1, p1, 1);
+  FESystem<2> sys4(q2, 1, p0, 1);
 
-  test(rt0);
-  test(rt1);
-//  test(sys2);
+  test(sys1);
+  test(sys2);
   test(sys3);
-//  test(sys4);
-//  test(sys5);
+  test(sys4);
 }
