@@ -66,7 +66,7 @@ LaplaceMatrix<dim>::LaplaceMatrix()
 template <int dim>
 void LaplaceMatrix<dim>::cell(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info) const
 {
-  Laplace::cell_matrix(dinfo.matrix(0,false).matrix, info.fe_values());
+  Laplace::cell_matrix(dinfo.matrix(0,false).matrix, info.fe_values(0));
 }
 
 
@@ -74,8 +74,8 @@ template <int dim>
 void LaplaceMatrix<dim>::boundary(MeshWorker::DoFInfo<dim> &dinfo,
                                   typename MeshWorker::IntegrationInfo<dim> &info) const
 {
-  const unsigned int deg = info.fe_values().get_fe().tensor_degree();
-  Laplace::nitsche_matrix(dinfo.matrix(0,false).matrix, info.fe_values(),
+  const unsigned int deg = info.fe_values(0).get_fe().tensor_degree();
+  Laplace::nitsche_matrix(dinfo.matrix(0,false).matrix, info.fe_values(0),
                           Laplace::compute_penalty(dinfo, dinfo, deg, deg));
 }
 
@@ -85,21 +85,21 @@ void LaplaceMatrix<dim>::face(
   MeshWorker::DoFInfo<dim> &dinfo1, MeshWorker::DoFInfo<dim> &dinfo2,
   MeshWorker::IntegrationInfo<dim> &info1, MeshWorker::IntegrationInfo<dim> &info2) const
 {
-  if (info1.fe_values().get_fe().conforms(FiniteElementData<dim>::H1))
+  if (info1.fe_values(0).get_fe().conforms(FiniteElementData<dim>::H1))
     return;
 
-  const unsigned int deg = info1.fe_values().get_fe().tensor_degree();
+  const unsigned int deg = info1.fe_values(0).get_fe().tensor_degree();
 
-  if (info1.fe_values().get_fe().conforms(FiniteElementData<dim>::Hdiv) &&
-      !info1.fe_values().get_fe().conforms(FiniteElementData<dim>::Hcurl))
+  if (info1.fe_values(0).get_fe().conforms(FiniteElementData<dim>::Hdiv) &&
+      !info1.fe_values(0).get_fe().conforms(FiniteElementData<dim>::Hcurl))
     Laplace::ip_tangential_matrix(dinfo1.matrix(0,false).matrix, dinfo1.matrix(0,true).matrix,
                                   dinfo2.matrix(0,true).matrix, dinfo2.matrix(0,false).matrix,
-                                  info1.fe_values(), info2.fe_values(),
+                                  info1.fe_values(0), info2.fe_values(0),
                                   Laplace::compute_penalty(dinfo1, dinfo2, deg, deg));
   else
     Laplace::ip_matrix(dinfo1.matrix(0,false).matrix, dinfo1.matrix(0,true).matrix,
                        dinfo2.matrix(0,true).matrix, dinfo2.matrix(0,false).matrix,
-                       info1.fe_values(), info2.fe_values(),
+                       info1.fe_values(0), info2.fe_values(0),
                        Laplace::compute_penalty(dinfo1, dinfo2, deg, deg));
 }
 
@@ -119,9 +119,9 @@ void assemble_mg_matrix(DoFHandler<dim> &dof_handler,
   MeshWorker::IntegrationInfoBox<dim> info_box;
   UpdateFlags update_flags = update_values | update_gradients | update_hessians;
   info_box.add_update_flags_all(update_flags);
-  info_box.initialize(dof_handler.get_fe(), mapping);
+  info_box.initialize(dof_handler.get_fe(), mapping, &dof_handler.block_info());
 
-  MeshWorker::DoFInfo<dim> dof_info(dof_handler);
+  MeshWorker::DoFInfo<dim> dof_info(dof_handler.block_info());
 
   MeshWorker::Assembler::MGMatrixSimple<SparseMatrix<double> > assembler;
   assembler.initialize(mg_constraints);
@@ -162,6 +162,7 @@ void test(FiniteElement<dim> &fe)
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
   dof.distribute_mg_dofs(fe);
+  dof.initialize_local_block_info();
   mg::SparseMatrixCollection<double> mg;
   mg.resize(0,tr.n_levels()-1);
   mg.reinit(dof);
@@ -203,14 +204,14 @@ int main()
 
   // FESystem<2> sys1(p0, 2, p1, 1);
   // FESystem<2> sys2(p0, 2, rt0, 1);
-  // FESystem<2> sys3(rt0, 1, p0, 2);
+  FESystem<2> sys3(rt0, 1, p0, 1);
   // FESystem<2> sys4(p1, 2, q2, 2);
   // FESystem<2> sys5(q2, 2, p1, 2);
 
   test(rt0);
   test(rt1);
 //  test(sys2);
-//  test(sys3);
+  test(sys3);
 //  test(sys4);
 //  test(sys5);
 }
