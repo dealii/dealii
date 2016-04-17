@@ -169,7 +169,7 @@ namespace OpenCASCADE
       {
         for (unsigned int i=0; i<surrounding_points.size(); ++i)
           {
-            std_cxx11::tuple<Point<3>, Point<3>, double, double>
+            std_cxx11::tuple<Point<3>,  Tensor<1,3>, double, double>
             p_and_diff_forms =
               closest_point_and_differential_forms(sh,
                                                    surrounding_points[i],
