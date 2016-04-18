@@ -498,7 +498,7 @@ namespace PETScWrappers
 
     if (additional_data.output_details)
 #if PETSC_VERSION_GT(3,7,0)
-    PetscOptionsSetValue(OANULL, "-pc_hypre_boomeramg_agg_nl",
+    PetscOptionsSetValue(NULL, "-pc_hypre_boomeramg_agg_nl",
                  	 Utilities::int_to_string(
                          additional_data.aggressive_coarsening_num_levels
                          ).c_str());
