@@ -575,23 +575,20 @@ namespace internal
   struct Dot
   {
     static const bool vectorizes = types_are_equal<Number,Number2>::value &&
-                                   (types_are_equal<Number,double>::value ||
-                                    types_are_equal<Number,float>::value);
+                                   (VectorizedArray<Number>::n_array_elements > 1);
 
     Number
-    operator() (size_type &i) const
+    operator() (const size_type i) const
     {
-      Number xi = X[i];
-      return xi * Number(numbers::NumberTraits<Number2>::conjugate(Y[i++]));
+      return X[i] * Number(numbers::NumberTraits<Number2>::conjugate(Y[i]));
     }
 
     VectorizedArray<Number>
-    do_vectorized(size_type &i) const
+    do_vectorized(const size_type i) const
     {
       VectorizedArray<Number> x, y;
       x.load(X+i);
       y.load(Y+i);
-      i += VectorizedArray<Number>::n_array_elements;
       return x * y;
     }
 
@@ -602,21 +599,19 @@ namespace internal
   template <typename Number, typename RealType>
   struct Norm2
   {
-    static const bool vectorizes = types_are_equal<Number,double>::value ||
-                                   types_are_equal<Number,float>::value;
+    static const bool vectorizes = VectorizedArray<Number>::n_array_elements > 1;
 
     RealType
-    operator() (size_type &i) const
+    operator() (const size_type i) const
     {
-      return numbers::NumberTraits<Number>::abs_square(X[i++]);
+      return numbers::NumberTraits<Number>::abs_square(X[i]);
     }
 
     VectorizedArray<Number>
-    do_vectorized(size_type &i) const
+    do_vectorized(const size_type i) const
     {
       VectorizedArray<Number> x;
       x.load(X+i);
-      i += VectorizedArray<Number>::n_array_elements;
       return x * x;
     }
 
@@ -626,21 +621,19 @@ namespace internal
   template <typename Number, typename RealType>
   struct Norm1
   {
-    static const bool vectorizes = types_are_equal<Number,double>::value ||
-                                   types_are_equal<Number,float>::value;
+    static const bool vectorizes = VectorizedArray<Number>::n_array_elements > 1;
 
     RealType
-    operator() (size_type &i) const
+    operator() (const size_type i) const
     {
-      return numbers::NumberTraits<Number>::abs(X[i++]);
+      return numbers::NumberTraits<Number>::abs(X[i]);
     }
 
     VectorizedArray<Number>
-    do_vectorized(size_type &i) const
+    do_vectorized(const size_type i) const
     {
       VectorizedArray<Number> x;
       x.load(X+i);
-      i += VectorizedArray<Number>::n_array_elements;
       return std::abs(x);
     }
 
@@ -650,21 +643,19 @@ namespace internal
   template <typename Number, typename RealType>
   struct NormP
   {
-    static const bool vectorizes = types_are_equal<Number,double>::value ||
-                                   types_are_equal<Number,float>::value;
+    static const bool vectorizes = VectorizedArray<Number>::n_array_elements > 1;
 
     RealType
-    operator() (size_type &i) const
+    operator() (const size_type i) const
     {
-      return std::pow(numbers::NumberTraits<Number>::abs(X[i++]), p);
+      return std::pow(numbers::NumberTraits<Number>::abs(X[i]), p);
     }
 
     VectorizedArray<Number>
-    do_vectorized(size_type &i) const
+    do_vectorized(const size_type i) const
     {
       VectorizedArray<Number> x;
       x.load(X+i);
-      i += VectorizedArray<Number>::n_array_elements;
       return std::pow(std::abs(x),p);
     }
 
@@ -675,21 +666,19 @@ namespace internal
   template <typename Number>
   struct MeanValue
   {
-    static const bool vectorizes = types_are_equal<Number,double>::value ||
-                                   types_are_equal<Number,float>::value;
+    static const bool vectorizes = VectorizedArray<Number>::n_array_elements > 1;
 
     Number
-    operator() (size_type &i) const
+    operator() (const size_type i) const
     {
-      return X[i++];
+      return X[i];
     }
 
     VectorizedArray<Number>
-    do_vectorized(size_type &i) const
+    do_vectorized(const size_type i) const
     {
       VectorizedArray<Number> x;
       x.load(X+i);
-      i += VectorizedArray<Number>::n_array_elements;
       return x;
     }
 
@@ -699,19 +688,17 @@ namespace internal
   template <typename Number>
   struct AddAndDot
   {
-    static const bool vectorizes = types_are_equal<Number,double>::value ||
-                                   types_are_equal<Number,float>::value;
+    static const bool vectorizes = VectorizedArray<Number>::n_array_elements > 1;
 
     Number
-    operator() (size_type &i) const
+    operator() (const size_type i) const
     {
       X[i] += a * V[i];
-      Number xi = X[i];
-      return xi * Number(numbers::NumberTraits<Number>::conjugate(W[i++]));
+      return X[i] * Number(numbers::NumberTraits<Number>::conjugate(W[i]));
     }
 
     VectorizedArray<Number>
-    do_vectorized(size_type &i) const
+    do_vectorized(const size_type i) const
     {
       VectorizedArray<Number> x, w, v;
       x.load(X+i);
@@ -721,7 +708,6 @@ namespace internal
       // may only load from W after storing in X because the pointers might
       // point to the same memory
       w.load(W+i);
-      i += VectorizedArray<Number>::n_array_elements;
       return x * w;
     }
 
@@ -749,15 +735,16 @@ namespace internal
     for (size_type i=start_chunk; i<n_chunks; ++i)
       {
         ResultType r0 = op(index);
-        ResultType r1 = op(index);
-        ResultType r2 = op(index);
-        ResultType r3 = op(index);
-        for (size_type j=1; j<8; ++j)
+        ResultType r1 = op(index+1);
+        ResultType r2 = op(index+2);
+        ResultType r3 = op(index+3);
+        index += 4;
+        for (size_type j=1; j<8; ++j, index += 4)
           {
             r0 += op(index);
-            r1 += op(index);
-            r2 += op(index);
-            r3 += op(index);
+            r1 += op(index+1);
+            r2 += op(index+2);
+            r3 += op(index+3);
           }
         r0 += r1;
         r2 += r3;
@@ -780,19 +767,21 @@ namespace internal
                      Number (&outer_results)[128],
                      internal::bool2type<true>)
   {
-    const size_type regular_chunks = n_chunks/VectorizedArray<Number>::n_array_elements;
+    const unsigned int nvecs = VectorizedArray<Number>::n_array_elements;
+    const size_type regular_chunks = n_chunks/nvecs;
     for (size_type i=0; i<regular_chunks; ++i)
       {
         VectorizedArray<Number> r0 = op.do_vectorized(index);
-        VectorizedArray<Number> r1 = op.do_vectorized(index);
-        VectorizedArray<Number> r2 = op.do_vectorized(index);
-        VectorizedArray<Number> r3 = op.do_vectorized(index);
-        for (size_type j=1; j<8; ++j)
+        VectorizedArray<Number> r1 = op.do_vectorized(index+nvecs);
+        VectorizedArray<Number> r2 = op.do_vectorized(index+2*nvecs);
+        VectorizedArray<Number> r3 = op.do_vectorized(index+3*nvecs);
+        index += nvecs*4;
+        for (size_type j=1; j<8; ++j, index += nvecs*4)
           {
             r0 += op.do_vectorized(index);
-            r1 += op.do_vectorized(index);
-            r2 += op.do_vectorized(index);
-            r3 += op.do_vectorized(index);
+            r1 += op.do_vectorized(index+nvecs);
+            r2 += op.do_vectorized(index+2*nvecs);
+            r3 += op.do_vectorized(index+3*nvecs);
           }
         r0 += r1;
         r2 += r3;
@@ -808,12 +797,12 @@ namespace internal
       {
         VectorizedArray<Number> r0 = VectorizedArray<Number>(),
                                 r1 = VectorizedArray<Number>();
-        const size_type start_irreg = regular_chunks * VectorizedArray<Number>::n_array_elements;
+        const size_type start_irreg = regular_chunks * nvecs;
         for (size_type c=start_irreg; c<n_chunks; ++c)
-          for (size_type j=0; j<32; j+=2*VectorizedArray<Number>::n_array_elements)
+          for (size_type j=0; j<32; j+=2*nvecs, index+=2*nvecs)
             {
               r0 += op.do_vectorized(index);
-              r1 += op.do_vectorized(index);
+              r1 += op.do_vectorized(index+nvecs);
             }
         r0 += r1;
         r0.store(&outer_results[start_irreg]);
@@ -883,24 +872,24 @@ namespace internal
             switch (inner_chunks)
               {
               case 3:
-                r2 = op(index);
+                r2 = op(index++);
                 for (size_type j=1; j<8; ++j)
-                  r2 += op(index);
+                  r2 += op(index++);
               // no break
               case 2:
-                r1 = op(index);
+                r1 = op(index++);
                 for (size_type j=1; j<8; ++j)
-                  r1 += op(index);
+                  r1 += op(index++);
                 r1 += r2;
               // no break
               case 1:
-                r2 = op(index);
+                r2 = op(index++);
                 for (size_type j=1; j<8; ++j)
-                  r2 += op(index);
+                  r2 += op(index++);
               // no break
               default:
                 for (size_type j=0; j<remainder_inner; ++j)
-                  r0 += op(index);
+                  r0 += op(index++);
                 r0 += r2;
                 r0 += r1;
                 if (n_chunks == 128)
