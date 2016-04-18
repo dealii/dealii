@@ -142,8 +142,11 @@ namespace internal
       const unsigned int gs = internal::Vector::minimum_parallel_grain_size;
       n_chunks = std::min(4*MultithreadInfo::n_threads(), vec_size / gs);
       chunk_size = vec_size / n_chunks;
+
       // round to next multiple of 512 (or minimum grain size if that happens
-      // to be smaller)
+      // to be smaller). this is advantageous because our accumulation
+      // algorithms favor lengths of a power of 2 due to pairwise summation ->
+      // at most one 'oddly' sized chunk
       if (chunk_size > 512)
         chunk_size = ((chunk_size + 511)/512)*512;
       n_chunks = (vec_size + chunk_size - 1) / chunk_size;
@@ -718,6 +721,140 @@ namespace internal
 
 
 
+  // this is the main working loop for all vector sums using the templated
+  // operation above. it accumulates the sums using a block-wise summation
+  // algorithm with post-update. this blocked algorithm has been proposed in
+  // a similar form by Castaldo, Whaley and Chronopoulos (SIAM
+  // J. Sci. Comput. 31, 1156-1174, 2008) and we use the smallest possible
+  // block size, 2. Sometimes it is referred to as pairwise summation. The
+  // worst case error made by this algorithm is on the order O(eps *
+  // log2(vec_size)), whereas a naive summation is O(eps * vec_size). Even
+  // though the Kahan summation is even more accurate with an error O(eps)
+  // by carrying along remainders not captured by the main sum, that involves
+  // additional costs which are not worthwhile. See the Wikipedia article on
+  // the Kahan summation algorithm.
+
+  // The algorithm implemented here has the additional benefit that it is
+  // easily parallelized without changing the order of how the elements are
+  // added (floating point addition is not associative). For the same vector
+  // size and minimum_parallel_grainsize, the blocks are always the
+  // same and added pairwise.
+
+  // The depth of recursion is controlled by the 'magic' parameter
+  // vector_accumulation_recursion_threshold: If the length is below
+  // vector_accumulation_recursion_threshold * 32 (32 is the part of code we
+  // unroll), a straight loop instead of recursion will be used.  At the
+  // innermost level, eight values are added consecutively in order to better
+  // balance multiplications and additions.
+
+  // The code returns the result as the last argument in order to make
+  // spawning tasks simpler and use automatic template deduction.
+
+  const unsigned int vector_accumulation_recursion_threshold = 128;
+
+  template <typename Operation, typename ResultType>
+  void accumulate_recursive (const Operation   &op,
+                             const size_type    first,
+                             const size_type    last,
+                             ResultType        &result)
+  {
+    const size_type vec_size = last - first;
+    if (vec_size <= vector_accumulation_recursion_threshold * 32)
+      {
+        // the vector is short enough so we perform the summation. first
+        // work on the regular part. The innermost 32 values are expanded in
+        // order to obtain known loop bounds for most of the work.
+        size_type index = first;
+        ResultType outer_results [vector_accumulation_recursion_threshold];
+        size_type n_chunks = vec_size / 32;
+        const size_type remainder = vec_size % 32;
+        Assert (remainder == 0 || n_chunks < vector_accumulation_recursion_threshold,
+                ExcInternalError());
+
+        // Select between the regular version and vectorized version based
+        // on the number types we are given. To choose the vectorized
+        // version often enough, we need to have all tasks but the last one
+        // to be divisible by the vectorization length
+        accumulate_regular(op, n_chunks, index, outer_results,
+                           internal::bool2type<Operation::vectorizes>());
+
+        // now work on the remainder, i.e., the last up to 32 values. Use
+        // switch statement with fall-through to work on these values.
+        if (remainder > 0)
+          {
+            AssertIndexRange(n_chunks, vector_accumulation_recursion_threshold+1);
+            const size_type inner_chunks = remainder / 8;
+            Assert (inner_chunks <= 3, ExcInternalError());
+            const size_type remainder_inner = remainder % 8;
+            ResultType r0 = ResultType(), r1 = ResultType(),
+                       r2 = ResultType();
+            switch (inner_chunks)
+              {
+              case 3:
+                r2 = op(index++);
+                for (size_type j=1; j<8; ++j)
+                  r2 += op(index++);
+              // no break
+              case 2:
+                r1 = op(index++);
+                for (size_type j=1; j<8; ++j)
+                  r1 += op(index++);
+                r1 += r2;
+              // no break
+              case 1:
+                r2 = op(index++);
+                for (size_type j=1; j<8; ++j)
+                  r2 += op(index++);
+              // no break
+              default:
+                for (size_type j=0; j<remainder_inner; ++j)
+                  r0 += op(index++);
+                r0 += r2;
+                r0 += r1;
+                if (n_chunks == vector_accumulation_recursion_threshold)
+                  outer_results[vector_accumulation_recursion_threshold-1] += r0;
+                else
+                  {
+                    outer_results[n_chunks] = r0;
+                    n_chunks++;
+                  }
+                break;
+              }
+          }
+        AssertDimension(index, last);
+
+        // now sum the results from the chunks
+        // recursively
+        while (n_chunks > 1)
+          {
+            if (n_chunks % 2 == 1)
+              outer_results[n_chunks++] = ResultType();
+            for (size_type i=0; i<n_chunks; i+=2)
+              outer_results[i/2] = outer_results[i] + outer_results[i+1];
+            n_chunks /= 2;
+          }
+        result = outer_results[0];
+      }
+    else
+      {
+        // split vector into four pieces and work on the pieces
+        // recursively. Make pieces (except last) divisible by one fourth the
+        // recursion threshold.
+        const size_type new_size =
+          (vec_size / (vector_accumulation_recursion_threshold * 32)) *
+          vector_accumulation_recursion_threshold * 8;
+        ResultType r0, r1, r2, r3;
+        accumulate_recursive (op, first, first+new_size, r0);
+        accumulate_recursive (op, first+new_size, first+2*new_size, r1);
+        accumulate_recursive (op, first+2*new_size, first+3*new_size, r2);
+        accumulate_recursive (op, first+3*new_size, last, r3);
+        r0 += r1;
+        r2 += r3;
+        result = r0 + r2;
+      }
+  }
+
+
   // this is the inner working routine for the accumulation loops
   // below. This is the standard case where the loop bounds are known. We
   // pulled this function out of the regular accumulate routine because we
@@ -727,12 +864,10 @@ namespace internal
   accumulate_regular(const Operation &op,
                      size_type       &n_chunks,
                      size_type       &index,
-                     ResultType (&outer_results)[128],
-                     internal::bool2type<false>,
-                     const unsigned int start_chunk=0)
+                     ResultType (&outer_results)[vector_accumulation_recursion_threshold],
+                     internal::bool2type<false>)
   {
-    AssertIndexRange(start_chunk, n_chunks+1);
-    for (size_type i=start_chunk; i<n_chunks; ++i)
+    for (size_type i=0; i<n_chunks; ++i)
       {
         ResultType r0 = op(index);
         ResultType r1 = op(index+1);
@@ -764,7 +899,7 @@ namespace internal
   accumulate_regular(const Operation &op,
                      size_type       &n_chunks,
                      size_type       &index,
-                     Number (&outer_results)[128],
+                     Number (&outer_results)[vector_accumulation_recursion_threshold],
                      internal::bool2type<true>)
   {
     const unsigned int nvecs = VectorizedArray<Number>::n_array_elements;
@@ -812,140 +947,40 @@ namespace internal
 
 
 
-  // this is the main working loop for all vector sums using the templated
-  // operation above. it accumulates the sums using a block-wise summation
-  // algorithm with post-update. this blocked algorithm has been proposed in
-  // a similar form by Castaldo, Whaley and Chronopoulos (SIAM
-  // J. Sci. Comput. 31, 1156-1174, 2008) and we use the smallest possible
-  // block size, 2. Sometimes it is referred to as pairwise summation. The
-  // worst case error made by this algorithm is on the order O(eps *
-  // log2(vec_size)), whereas a naive summation is O(eps * vec_size). Even
-  // though the Kahan summation is even more accurate with an error O(eps)
-  // by carrying along remainders not captured by the main sum, that involves
-  // additional costs which are not worthwhile. See the Wikipedia article on
-  // the Kahan summation algorithm.
-
-  // The algorithm implemented here has the additional benefit that it is
-  // easily parallelized without changing the order of how the elements are
-  // added (floating point addition is not associative). For the same vector
-  // size and minimum_parallel_grainsize, the blocks are always the
-  // same and added pairwise. At the innermost level, eight values are added
-  // consecutively in order to better balance multiplications and additions.
-
-  // The code returns the result as the last argument in order to make
-  // spawning tasks simpler and use automatic template deduction.
-  template <typename Operation, typename ResultType>
-  void accumulate_recursive (const Operation   &op,
-                             const size_type    first,
-                             const size_type    last,
-                             ResultType        &result)
-  {
-    const size_type vec_size = last - first;
-    if (vec_size <= 4096)
-      {
-        // the vector is short enough so we perform the summation. first
-        // work on the regular part. The innermost 32 values are expanded in
-        // order to obtain known loop bounds for most of the work.
-        size_type index = first;
-        ResultType outer_results [128];
-        size_type n_chunks = vec_size / 32;
-        const size_type remainder = vec_size % 32;
-        Assert (remainder == 0 || n_chunks < 128, ExcInternalError());
-
-        // Select between the regular version and vectorized version based
-        // on the number types we are given. To choose the vectorized
-        // version often enough, we need to have all tasks but the last one
-        // to be divisible by the vectorization length
-        accumulate_regular(op, n_chunks, index, outer_results,
-                           internal::bool2type<Operation::vectorizes>());
-
-        // now work on the remainder, i.e., the last up to 32 values. Use
-        // switch statement with fall-through to work on these values.
-        if (remainder > 0)
-          {
-            AssertIndexRange(n_chunks, 129);
-            const size_type inner_chunks = remainder / 8;
-            Assert (inner_chunks <= 3, ExcInternalError());
-            const size_type remainder_inner = remainder % 8;
-            ResultType r0 = ResultType(), r1 = ResultType(),
-                       r2 = ResultType();
-            switch (inner_chunks)
-              {
-              case 3:
-                r2 = op(index++);
-                for (size_type j=1; j<8; ++j)
-                  r2 += op(index++);
-              // no break
-              case 2:
-                r1 = op(index++);
-                for (size_type j=1; j<8; ++j)
-                  r1 += op(index++);
-                r1 += r2;
-              // no break
-              case 1:
-                r2 = op(index++);
-                for (size_type j=1; j<8; ++j)
-                  r2 += op(index++);
-              // no break
-              default:
-                for (size_type j=0; j<remainder_inner; ++j)
-                  r0 += op(index++);
-                r0 += r2;
-                r0 += r1;
-                if (n_chunks == 128)
-                  outer_results[127] += r0;
-                else
-                  {
-                    outer_results[n_chunks] = r0;
-                    n_chunks++;
-                  }
-                break;
-              }
-          }
-        AssertDimension(index, last);
-
-        // now sum the results from the chunks
-        // recursively
-        while (n_chunks > 1)
-          {
-            if (n_chunks % 2 == 1)
-              outer_results[n_chunks++] = ResultType();
-            for (size_type i=0; i<n_chunks; i+=2)
-              outer_results[i/2] = outer_results[i] + outer_results[i+1];
-            n_chunks /= 2;
-          }
-        result = outer_results[0];
-      }
-    else
-      {
-        // split vector into four pieces and work on the pieces
-        // recursively. Make pieces (except last) divisible by 1024.
-        const size_type new_size = (vec_size / 4096) * 1024;
-        ResultType r0, r1, r2, r3;
-        accumulate_recursive (op, first, first+new_size, r0);
-        accumulate_recursive (op, first+new_size, first+2*new_size, r1);
-        accumulate_recursive (op, first+2*new_size, first+3*new_size, r2);
-        accumulate_recursive (op, first+3*new_size, last, r3);
-        r0 += r1;
-        r2 += r3;
-        result = r0 + r2;
-      }
-  }
-
-
-
 #ifdef DEAL_II_WITH_THREADS
   /**
    * This struct takes the loop range from the tbb parallel for loop and
    * translates it to the actual ranges of the reduction loop inside the
    * vector. It encodes the grain size but might choose larger values of
    * chunks than the minimum grain size. The minimum grain size given to tbb
-   * is then simple 1. For affinity reasons, the layout in this loop must be
-   * kept in sync with the respective class for plain for loops further up
+   * is 1. For affinity reasons, the layout in this loop must be kept in sync
+   * with the respective class for plain for loops further up.
+   *
+   * Due to this construction, TBB usually only sees a loop of length
+   * 4*num_threads with grain size 1. The actual ranges inside the vector are
+   * computed outside of TBB because otherwise TBB would split the ranges in
+   * some unpredictable position which destroys exact bitwise
+   * reproducibility. An important part of this is that inside
+   * TBBReduceFunctor::operator() the recursive calls to accumulate are done
+   * sequentially on one item a time (even though we could directly run it on
+   * the whole range given through the tbb::blocked_range times the chunk size
+   * - but that would be unpredictable). Thus, the values we cannot control
+   * are the positions in the array that gets filled - but up to that point
+   * the algorithm TBB sees is just a parallel for and nothing unpredictable
+   * can happen.
+   *
+   * To sum up: Once the number of threads and the vector size are fixed, we
+   * have an exact layout of how the calls into the recursive function will
+   * happen. Inside the recursive function, we again only depend on the
+   * length. Finally, the concurrent threads write into different positions in
+   * a result vector in a thread-safe way and the addition in the short array
+   * is again serial.
    */
   template <typename Operation, typename ResultType>
   struct TBBReduceFunctor
   {
+    static const unsigned int threshold_array_allocate = 512;
+
     TBBReduceFunctor(const Operation   &op,
                      const size_type    vec_size)
       :
@@ -958,14 +993,16 @@ namespace internal
       chunk_size = vec_size / n_chunks;
 
       // round to next multiple of 512 (or leave it at the minimum grain size
-      // if that happens to be smaller)
+      // if that happens to be smaller). this is advantageous because our
+      // algorithm favors lengths of a power of 2 due to pairwise summation ->
+      // at most one 'oddly' sized chunk
       if (chunk_size > 512)
         chunk_size = ((chunk_size + 511)/512)*512;
       n_chunks = (vec_size + chunk_size - 1) / chunk_size;
       AssertIndexRange((n_chunks-1)*chunk_size, vec_size);
       AssertIndexRange(vec_size, n_chunks*chunk_size+1);
 
-      if (n_chunks > 512)
+      if (n_chunks > threshold_array_allocate)
         {
           large_array.resize(n_chunks);
           array_ptr = &large_array[0];
@@ -999,8 +1036,10 @@ namespace internal
 
     mutable unsigned int n_chunks;
     unsigned int chunk_size;
-    ResultType small_array [512];
+    ResultType small_array [threshold_array_allocate];
     std::vector<ResultType> large_array;
+    // this variable either points to small_array or large_array depending on
+    // the number of threads we want to feed
     mutable ResultType *array_ptr;
   };
 #endif
