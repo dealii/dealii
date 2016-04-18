@@ -210,14 +210,14 @@ namespace PETScWrappers
      * Return the partitioning of the domain space of this matrix, i.e., the
      * partitioning of the vectors this matrix has to be multiplied with.
      */
-    std::vector< size_type > locally_domain_sizes() const;
+    std::vector< size_type > locally_owned_domain_sizes() const;
 
     /**
      * Return the partitioning of the range space of this matrix, i.e., the
      * partitioning of the vectors that are result from matrix-vector
      * products.
      */
-    std::vector< size_type > locally_range_sizes() const;
+    std::vector< size_type > locally_owned_range_sizes() const;
 
     /**
      * Make the clear() function in the base class visible, though it is

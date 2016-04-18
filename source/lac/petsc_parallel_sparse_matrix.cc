@@ -896,25 +896,23 @@ namespace PETScWrappers
 #if DEAL_II_PETSC_VERSION_LT(3,3,0)
       Assert(false,ExcNotImplemented());
 #else
-      PetscInt n_rows, n_cols, min, max, size;
+      PetscInt n_rows, n_cols, n_loc_rows, n_loc_cols, min, max, size;
       PetscErrorCode ierr;
-      IS rows, cols;
 
       ierr = MatGetSize (matrix, &n_rows, &n_cols);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      ierr = MatGetOwnershipIS(matrix, &rows, &cols);
+      ierr = MatGetLocalSize(matrix, &n_loc_rows, &n_loc_cols);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      ierr = ISGetMinMax(rows, &min, &max);
+      ierr = MatGetOwnershipRangeColumn(matrix, &min, &max);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      IndexSet indices(n_rows);
+      Assert(n_loc_cols==max-min, ExcMessage("PETSc is requiring non contiguous memory allocation."));
+
+      IndexSet indices(n_cols);
       indices.add_range(min, max);
-
-      ierr = ISGetLocalSize(rows, &size);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
-      Assert(size==max-min+1, ExcMessage("PETSc is requiring non contiguous memory allocation."));
+      indices.compress();
 
       return indices;
 #endif
@@ -926,25 +924,23 @@ namespace PETScWrappers
 #if DEAL_II_PETSC_VERSION_LT(3,3,0)
       Assert(false,ExcNotImplemented());
 #else
-      PetscInt n_rows, n_cols, min, max, size;
+      PetscInt n_rows, n_cols, n_loc_rows, n_loc_cols, min, max, size;
       PetscErrorCode ierr;
-      IS rows, cols;
 
       ierr = MatGetSize (matrix, &n_rows, &n_cols);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      ierr = MatGetOwnershipIS(matrix, &rows, &cols);
+      ierr = MatGetLocalSize(matrix, &n_loc_rows, &n_loc_cols);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      ierr = ISGetMinMax(cols, &min, &max);
+      ierr = MatGetOwnershipRange(matrix, &min, &max);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      IndexSet indices(n_cols);
+      Assert(n_loc_rows==max-min, ExcMessage("PETSc is requiring non contiguous memory allocation."));
+
+      IndexSet indices(n_rows);
       indices.add_range(min, max);
-
-      ierr = ISGetLocalSize(cols, &size);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
-      Assert(size==max-min+1, ExcMessage("PETSc is requiring non contiguous memory allocation."));
+      indices.compress();
 
       return indices;
 #endif

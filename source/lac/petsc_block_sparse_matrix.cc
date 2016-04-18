@@ -68,7 +68,7 @@ namespace PETScWrappers
 
   std::vector<BlockSparseMatrix::size_type >
   BlockSparseMatrix::
-  locally_domain_sizes() const
+  locally_owned_domain_sizes() const
   {
     std::vector< size_type > index_sets;
 
@@ -80,7 +80,7 @@ namespace PETScWrappers
 
   std::vector<BlockSparseMatrix::size_type >
   BlockSparseMatrix::
-  locally_range_sizes() const
+  locally_owned_range_sizes() const
   {
     std::vector< size_type > index_sets;
 
