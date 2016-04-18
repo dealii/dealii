@@ -893,6 +893,9 @@ namespace PETScWrappers
     IndexSet
     SparseMatrix::locally_owned_domain_indices () const
     {
+#if DEAL_II_PETSC_VERSION_LT(3,3,0)
+      Assert(false,ExcNotImplemented());
+#else
       PetscInt n_rows, n_cols, min, max, size;
       PetscErrorCode ierr;
       IS *rows = nullptr;
@@ -914,11 +917,15 @@ namespace PETScWrappers
       Assert(size==max-min+1, ExcMessage("PETSc is requiring non contiguous memory allocation."));
 
       return locally_owned_domain_indices;
+#endif
     }
 
     IndexSet
     SparseMatrix::locally_owned_range_indices () const
     {
+#if DEAL_II_PETSC_VERSION_LT(3,3,0)
+      Assert(false,ExcNotImplemented());
+#else
       PetscInt n_rows, n_cols, min, max, size;
       PetscErrorCode ierr;
       IS *rows = nullptr;
@@ -940,6 +947,7 @@ namespace PETScWrappers
       Assert(size==max-min+1, ExcMessage("PETSc is requiring non contiguous memory allocation."));
 
       return locally_owned_range_indices;
+#endif
     }
 
   }
