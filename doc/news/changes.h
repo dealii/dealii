@@ -38,6 +38,11 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Improved: MeshWorker treats periodic faces as interior faces.
+  <br>
+  (Daniel Arndt, 2016/04/18)
+  </li>
+  
   <li> Changed: FlatManifold takes as argument a periodicity option. This
   used to be a Point<dim>, but it should have been a Tensor<1,dim>. This
   is now changed.

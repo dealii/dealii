@@ -255,7 +255,7 @@ namespace Step40
                                      dof_handler.n_dofs(),
                                      dof_handler.n_locally_owned_dofs());
 
-    SolverControl solver_control (dof_handler.n_dofs(), 1e-12);
+    SolverControl solver_control (dof_handler.n_dofs(), 1e-12, false, false);
 
     PETScWrappers::SolverCG solver(solver_control, mpi_communicator);
 
@@ -272,9 +272,6 @@ namespace Step40
     solver.solve (system_matrix, completely_distributed_solution, system_rhs,
                   PETScWrappers::PreconditionJacobi(system_matrix));
 #endif
-
-    pcout << "   Solved in " << solver_control.last_step()
-          << " iterations." << std::endl;
 
     constraints.distribute (completely_distributed_solution);
 
@@ -353,12 +350,16 @@ namespace Step40
 
         if (Utilities::MPI::this_mpi_process(mpi_communicator)==0)
           {
-            pcout << point1 << "\t" << get_real_assert_zero_imag(value1[0]) << std::endl;
             if (std::abs(value2[0]-value1[0])>1e-8)
               {
+                pcout << point1 << "\t" << "fail" << std::endl;
                 std::cout<<point1<< "\t" << value1[0] << std::endl;
                 std::cout<<point2<< "\t" << value2[0] << std::endl;
                 Assert(false, ExcInternalError());
+              }
+            else
+              {
+                pcout << point1 << "\t" << "pass" << std::endl;
               }
           }
       }
@@ -406,20 +407,25 @@ namespace Step40
 
           if (Utilities::MPI::this_mpi_process(mpi_communicator)==0)
             {
-              pcout << point1 << "\t" << get_real_assert_zero_imag(value1[0]) << std::endl;
               if (std::abs(value2[0]-value1[0])>1e-8)
                 {
+                  pcout << point1 << "\t fail check 0" << std::endl;
                   std::cout<<point1<< "\t" << value1[0] << std::endl;
                   std::cout<<point2<< "\t" << value2[0] << std::endl;
                   Assert(false, ExcInternalError());
                 }
-              pcout << point3 << "\t" << get_real_assert_zero_imag(value3[0]) << std::endl;
+              else
+                pcout << point1 << "\t pass check 0" << std::endl;
+
               if (std::abs(value4[0]-value3[0])>1e-8)
                 {
+                  pcout << point3 << "\t fail check 1" << std::endl;
                   std::cout<<point3<< "\t" << value3[0] << std::endl;
                   std::cout<<point4<< "\t" << value4[0] << std::endl;
                   Assert(false, ExcInternalError());
                 }
+              else
+                pcout << point3 << "\t pass check 1" << std::endl;
             }
         }
   }
@@ -511,7 +517,9 @@ namespace Step40
         assemble_system ();
         solve ();
         //output_results (cycle);
+        deallog.push(Utilities::int_to_string(dof_handler.n_dofs(),5));
         check_periodicity(cycle);
+        deallog.pop();
       }
   }
 }

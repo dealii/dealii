@@ -2168,9 +2168,10 @@ CellAccessor<dim, spacedim>::periodic_neighbor_is_coarser (const unsigned int i_
    */
   Assert (nb_face_pair != this->tria->periodic_face_map.end(),
           TriaAccessorExceptions::ExcNoPeriodicNeighbor());
-  if (nb_face_pair->second.first.first->face(nb_face_pair->second.first.second)->has_children())
-    return true;
-  return false;
+  const unsigned int my_level = this->level();
+  const unsigned int neighbor_level = nb_face_pair->second.first.first->level();
+  Assert (my_level >= neighbor_level, ExcInternalError());
+  return my_level > neighbor_level;
 }
 
 

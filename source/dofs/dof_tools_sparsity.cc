@@ -553,13 +553,15 @@ namespace DoFTools
                ++face)
             {
               typename DoFHandlerType::face_iterator cell_face = cell->face(face);
-              if (! cell->at_boundary(face) )
+              const bool periodic_neighbor = cell->has_periodic_neighbor(face);
+              if (! cell->at_boundary(face) || periodic_neighbor)
                 {
-                  typename DoFHandlerType::level_cell_iterator neighbor = cell->neighbor(face);
+                  typename DoFHandlerType::level_cell_iterator neighbor
+                    = cell->neighbor_or_periodic_neighbor(face);
 
                   // in 1d, we do not need to worry whether the neighbor
                   // might have children and then loop over those children.
-                  // rather, we may as well go straight to to cell behind
+                  // rather, we may as well go straight to the cell behind
                   // this particular cell's most terminal child
                   if (DoFHandlerType::dimension==1)
                     while (neighbor->has_children())
@@ -571,9 +573,10 @@ namespace DoFTools
                            sub_nr != cell_face->number_of_children();
                            ++sub_nr)
                         {
-                          const typename DoFHandlerType::level_cell_iterator
-                          sub_neighbor
-                            = cell->neighbor_child_on_subface (face, sub_nr);
+                          const typename DoFHandlerType::level_cell_iterator sub_neighbor
+                            = periodic_neighbor?
+                              cell->periodic_neighbor_child_on_subface (face, sub_nr):
+                              cell->neighbor_child_on_subface (face, sub_nr);
 
                           const unsigned int n_dofs_on_neighbor
                             = sub_neighbor->get_fe().dofs_per_cell;
@@ -598,9 +601,10 @@ namespace DoFTools
                     {
                       // Refinement edges are taken care of by coarser
                       // cells
-                      if (cell->neighbor_is_coarser(face) &&
-                          neighbor->subdomain_id() == cell->subdomain_id())
-                        continue;
+                      if ((!periodic_neighbor && cell->neighbor_is_coarser(face)) ||
+                          (periodic_neighbor && cell->periodic_neighbor_is_coarser(face)))
+                        if (neighbor->subdomain_id() == cell->subdomain_id())
+                          continue;
 
                       const unsigned int n_dofs_on_neighbor
                         = neighbor->get_fe().dofs_per_cell;
@@ -616,7 +620,7 @@ namespace DoFTools
                       // is not locally owned - otherwise, we touch each
                       // face twice and hence put the indices the other way
                       // around
-                      if (!cell->neighbor(face)->active()
+                      if (!cell->neighbor_or_periodic_neighbor(face)->active()
                           ||
                           (neighbor->subdomain_id() != cell->subdomain_id()))
                         {
@@ -755,7 +759,9 @@ namespace DoFTools
                   const typename DoFHandlerType::face_iterator
                   cell_face = cell->face (face_n);
 
-                  if (cell->at_boundary (face_n))
+                  const bool periodic_neighbor = cell->has_periodic_neighbor (face_n);
+
+                  if (cell->at_boundary (face_n) && (!periodic_neighbor))
                     {
                       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
                         {
@@ -779,7 +785,7 @@ namespace DoFTools
                   else
                     {
                       typename DoFHandlerType::level_cell_iterator
-                      neighbor = cell->neighbor (face_n);
+                      neighbor = cell->neighbor_or_periodic_neighbor (face_n);
                       // If the cells are on the same level then only add to
                       // the sparsity pattern if the current cell is 'greater'
                       // in the total ordering.
@@ -796,7 +802,8 @@ namespace DoFTools
                       // if the neighbor is coarser than the current cell.
                       if (neighbor->level () != cell->level ()
                           &&
-                          !cell->neighbor_is_coarser (face_n))
+                          ((!periodic_neighbor && !cell->neighbor_is_coarser (face_n))
+                           ||(periodic_neighbor && !cell->periodic_neighbor_is_coarser (face_n))))
                         continue; // (the neighbor is finer)
 
                       const unsigned int
@@ -810,7 +817,9 @@ namespace DoFTools
                             {
                               const typename DoFHandlerType::level_cell_iterator
                               sub_neighbor
-                                = cell->neighbor_child_on_subface (face_n, sub_nr);
+                                = periodic_neighbor?
+                                  cell->periodic_neighbor_child_on_subface (face_n, sub_nr):
+                                  cell->neighbor_child_on_subface (face_n, sub_nr);
 
                               sub_neighbor->get_dof_indices (dofs_on_other_cell);
                               for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
@@ -1002,7 +1011,9 @@ namespace DoFTools
                 if (cell_face->user_flag_set ())
                   continue;
 
-                if (cell->at_boundary (face) )
+                const bool periodic_neighbor = cell->has_periodic_neighbor (face);
+
+                if (cell->at_boundary (face) && (!periodic_neighbor))
                   {
                     for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
                       for (unsigned int j=0; j<cell->get_fe().dofs_per_cell; ++j)
@@ -1019,14 +1030,17 @@ namespace DoFTools
                 else
                   {
                     typename dealii::hp::DoFHandler<dim,spacedim>::level_cell_iterator
-                    neighbor = cell->neighbor(face);
+                    neighbor = cell->neighbor_or_periodic_neighbor(face);
 
                     // Refinement edges are taken care of by coarser cells
-                    if (cell->neighbor_is_coarser(face))
+                    if ((!periodic_neighbor && cell->neighbor_is_coarser(face)) ||
+                        (periodic_neighbor && cell->periodic_neighbor_is_coarser(face)))
                       continue;
 
                     const unsigned int
-                    neighbor_face = cell->neighbor_of_neighbor(face);
+                    neighbor_face = periodic_neighbor?
+                                    cell->periodic_neighbor_of_periodic_neighbor(face):
+                                    cell->neighbor_of_neighbor(face);
 
                     if (cell_face->has_children())
                       {
@@ -1036,7 +1050,9 @@ namespace DoFTools
                           {
                             const typename dealii::hp::DoFHandler<dim,spacedim>::level_cell_iterator
                             sub_neighbor
-                              = cell->neighbor_child_on_subface (face, sub_nr);
+                              = periodic_neighbor?
+                                cell->periodic_neighbor_child_on_subface (face, sub_nr):
+                                cell->neighbor_child_on_subface (face, sub_nr);
 
                             dofs_on_other_cell.resize (sub_neighbor->get_fe().dofs_per_cell);
                             sub_neighbor->get_dof_indices (dofs_on_other_cell);

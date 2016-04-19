@@ -602,11 +602,18 @@ namespace MGTools
              face < GeometryInfo<dim>::faces_per_cell;
              ++face)
           {
-            if ( (! cell->at_boundary(face)) &&
-                 (static_cast<unsigned int>(cell->neighbor_level(face)) == level) )
+            bool use_face = false;
+            if ((! cell->at_boundary(face)) &&
+                (static_cast<unsigned int>(cell->neighbor_level(face)) == level))
+              use_face = true;
+            else if (cell->has_periodic_neighbor(face) &&
+                     (static_cast<unsigned int>(cell->periodic_neighbor_level(face)) == level))
+              use_face = true;
+
+            if (use_face)
               {
                 typename DoFHandler<dim,spacedim>::cell_iterator
-                neighbor = cell->neighbor(face);
+                neighbor = cell->neighbor_or_periodic_neighbor(face);
                 neighbor->get_mg_dof_indices (dofs_on_other_cell);
                 // only add one direction The other is taken care of by
                 // neighbor (except when the neighbor is not owned by the same
@@ -672,12 +679,18 @@ namespace MGTools
              ++face)
           {
             // Neighbor is coarser
+            bool use_face = false;
+            if ((! cell->at_boundary(face)) &&
+                (static_cast<unsigned int>(cell->neighbor_level(face)) != level))
+              use_face = true;
+            else if (cell->has_periodic_neighbor(face) &&
+                     (static_cast<unsigned int>(cell->periodic_neighbor_level(face)) != level))
+              use_face = true;
 
-            if ( (! cell->at_boundary(face)) &&
-                 (static_cast<unsigned int>(cell->neighbor_level(face)) != level) )
+            if (use_face)
               {
                 typename DoFHandler<dim,spacedim>::cell_iterator
-                neighbor = cell->neighbor(face);
+                neighbor = cell->neighbor_or_periodic_neighbor(face);
                 neighbor->get_mg_dof_indices (dofs_on_other_cell);
 
                 for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -773,7 +786,7 @@ namespace MGTools
             if (cell_face->user_flag_set ())
               continue;
 
-            if (cell->at_boundary (face) )
+            if (cell->at_boundary (face) && !cell->has_periodic_neighbor(face))
               {
                 for (unsigned int i=0; i<total_dofs; ++i)
                   {
@@ -795,12 +808,14 @@ namespace MGTools
             else
               {
                 typename DoFHandler<dim,spacedim>::cell_iterator
-                neighbor = cell->neighbor(face);
+                neighbor = cell->neighbor_or_periodic_neighbor(face);
 
                 if (neighbor->level() < cell->level())
                   continue;
 
-                unsigned int neighbor_face = cell->neighbor_of_neighbor(face);
+                unsigned int neighbor_face = cell->has_periodic_neighbor(face)?
+                                             cell->periodic_neighbor_of_periodic_neighbor(face):
+                                             cell->neighbor_of_neighbor(face);
 
                 neighbor->get_mg_dof_indices (dofs_on_other_cell);
                 for (unsigned int i=0; i<total_dofs; ++i)
@@ -933,12 +948,18 @@ namespace MGTools
              ++face)
           {
             // Neighbor is coarser
+            bool use_face = false;
+            if ((! cell->at_boundary(face)) &&
+                (static_cast<unsigned int>(cell->neighbor_level(face)) != level))
+              use_face = true;
+            else if (cell->has_periodic_neighbor(face) &&
+                     (static_cast<unsigned int>(cell->periodic_neighbor_level(face)) != level))
+              use_face = true;
 
-            if ( (! cell->at_boundary(face)) &&
-                 (static_cast<unsigned int>(cell->neighbor_level(face)) != level) )
+            if (use_face)
               {
                 typename DoFHandler<dim,spacedim>::cell_iterator
-                neighbor = cell->neighbor(face);
+                neighbor = cell->neighbor_or_periodic_neighbor(face);
                 neighbor->get_mg_dof_indices (dofs_on_other_cell);
 
                 for (unsigned int i=0; i<dofs_per_cell; ++i)
