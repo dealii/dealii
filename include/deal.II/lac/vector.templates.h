@@ -118,10 +118,60 @@ namespace internal
                                "into a vector of reals/doubles"));
   }
 
+
+
+#ifdef DEAL_II_WITH_THREADS
+  /**
+   * This struct takes the loop range from the tbb parallel for loop and
+   * translates it to the actual ranges of the for loop within the vector. It
+   * encodes the grain size but might choose larger values of chunks than the
+   * minimum grain size. The minimum grain size given to tbb is then simple
+   * 1. For affinity reasons, the layout in this loop must be kept in sync
+   * with the respective class for reductions further down.
+   */
   template <typename Functor>
-  void vectorized_transform(Functor &functor,
-                            size_type vec_size,
-                            std_cxx11::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
+  struct TBBForFunctor
+  {
+    TBBForFunctor(Functor &functor,
+                  const size_type vec_size)
+      :
+      functor(functor),
+      vec_size(vec_size)
+    {
+      // set chunk size for sub-tasks
+      const unsigned int gs = internal::Vector::minimum_parallel_grain_size;
+      n_chunks = std::min(4*MultithreadInfo::n_threads(), vec_size / gs);
+      chunk_size = vec_size / n_chunks;
+
+      // round to next multiple of 512 (or minimum grain size if that happens
+      // to be smaller). this is advantageous because our accumulation
+      // algorithms favor lengths of a power of 2 due to pairwise summation ->
+      // at most one 'oddly' sized chunk
+      if (chunk_size > 512)
+        chunk_size = ((chunk_size + 511)/512)*512;
+      n_chunks = (vec_size + chunk_size - 1) / chunk_size;
+      AssertIndexRange((n_chunks-1)*chunk_size, vec_size);
+      AssertIndexRange(vec_size, n_chunks*chunk_size+1);
+    };
+
+    void operator() (const tbb::blocked_range<size_type> &range) const
+    {
+      const size_type begin = range.begin()*chunk_size;
+      const size_type end = std::min(range.end()*chunk_size, vec_size);
+      functor(begin, end);
+    }
+
+    Functor &functor;
+    const size_type vec_size;
+    unsigned int n_chunks;
+    size_type chunk_size;
+  };
+#endif
+
+  template <typename Functor>
+  void parallel_for(Functor &functor,
+                    size_type vec_size,
+                    std_cxx11::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
   {
 #ifdef DEAL_II_WITH_THREADS
     // only go to the parallel function in case there are at least 4 parallel
@@ -135,10 +185,11 @@ namespace internal
         std_cxx11::shared_ptr<tbb::affinity_partitioner> tbb_partitioner =
           partitioner->acquire_one_partitioner();
 
+        TBBForFunctor<Functor> generic_functor(functor, vec_size);
         tbb::parallel_for (tbb::blocked_range<size_type> (0,
-                                                          vec_size,
-                                                          internal::Vector::minimum_parallel_grain_size),
-                           functor,
+                                                          generic_functor.n_chunks,
+                                                          1),
+                           generic_functor,
                            *tbb_partitioner);
         partitioner->release_one_partitioner(tbb_partitioner);
       }
@@ -159,13 +210,6 @@ namespace internal
     Number *dst;
     Number value;
 
-#ifdef DEAL_II_WITH_THREADS
-    void operator() (const tbb::blocked_range<size_type> &range) const
-    {
-      operator()(range.begin(),range.end());
-    }
-#endif
-
     void operator() (const size_type begin, const size_type end) const
     {
       if (value == Number())
@@ -180,13 +224,6 @@ namespace internal
   {
     const OtherNumber *src;
     Number *dst;
-
-#ifdef DEAL_II_WITH_THREADS
-    void operator() (const tbb::blocked_range<size_type> &range) const
-    {
-      operator()(range.begin(),range.end());
-    }
-#endif
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -206,13 +243,6 @@ namespace internal
   {
     Number *val;
     Number factor;
-
-#ifdef DEAL_II_WITH_THREADS
-    void operator() (const tbb::blocked_range<size_type> &range) const
-    {
-      operator()(range.begin(),range.end());
-    }
-#endif
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -236,12 +266,6 @@ namespace internal
     Number *val;
     Number *v_val;
     Number factor;
-#ifdef DEAL_II_WITH_THREADS
-    void operator() (const tbb::blocked_range<size_type> &range) const
-    {
-      operator()(range.begin(),range.end());
-    }
-#endif
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -266,12 +290,6 @@ namespace internal
     Number *v_val;
     Number a;
     Number x;
-#ifdef DEAL_II_WITH_THREADS
-    void operator() (const tbb::blocked_range<size_type> &range) const
-    {
-      operator()(range.begin(),range.end());
-    }
-#endif
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -294,12 +312,6 @@ namespace internal
   {
     Number *val;
     Number *v_val;
-#ifdef DEAL_II_WITH_THREADS
-    void operator() (const tbb::blocked_range<size_type> &range) const
-    {
-      operator()(range.begin(),range.end());
-    }
-#endif
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -322,12 +334,6 @@ namespace internal
   {
     Number *val;
     Number factor;
-#ifdef DEAL_II_WITH_THREADS
-    void operator() (const tbb::blocked_range<size_type> &range) const
-    {
-      operator()(range.begin(),range.end());
-    }
-#endif
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -350,12 +356,6 @@ namespace internal
   {
     Number *val;
     Number *v_val;
-#ifdef DEAL_II_WITH_THREADS
-    void operator() (const tbb::blocked_range<size_type> &range) const
-    {
-      operator()(range.begin(),range.end());
-    }
-#endif
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -381,12 +381,6 @@ namespace internal
     Number *w_val;
     Number a;
     Number b;
-#ifdef DEAL_II_WITH_THREADS
-    void operator() (const tbb::blocked_range<size_type> &range) const
-    {
-      operator()(range.begin(),range.end());
-    }
-#endif
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -410,12 +404,6 @@ namespace internal
     Number *val;
     Number *v_val;
     Number x;
-#ifdef DEAL_II_WITH_THREADS
-    void operator() (const tbb::blocked_range<size_type> &range) const
-    {
-      operator()(range.begin(),range.end());
-    }
-#endif
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -442,12 +430,6 @@ namespace internal
     Number x;
     Number a;
     Number b;
-#ifdef DEAL_II_WITH_THREADS
-    void operator() (const tbb::blocked_range<size_type> &range) const
-    {
-      operator()(range.begin(),range.end());
-    }
-#endif
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -470,12 +452,6 @@ namespace internal
   {
     Number *val;
     Number *v_val;
-#ifdef DEAL_II_WITH_THREADS
-    void operator() (const tbb::blocked_range<size_type> &range) const
-    {
-      operator()(range.begin(),range.end());
-    }
-#endif
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -499,12 +475,6 @@ namespace internal
     Number *val;
     Number *u_val;
     Number a;
-#ifdef DEAL_II_WITH_THREADS
-    void operator() (const tbb::blocked_range<size_type> &range) const
-    {
-      operator()(range.begin(),range.end());
-    }
-#endif
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -530,12 +500,6 @@ namespace internal
     Number *v_val;
     Number a;
     Number b;
-#ifdef DEAL_II_WITH_THREADS
-    void operator() (const tbb::blocked_range<size_type> &range) const
-    {
-      operator()(range.begin(),range.end());
-    }
-#endif
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -563,12 +527,6 @@ namespace internal
     Number a;
     Number b;
     Number c;
-#ifdef DEAL_II_WITH_THREADS
-    void operator() (const tbb::blocked_range<size_type> &range) const
-    {
-      operator()(range.begin(),range.end());
-    }
-#endif
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -592,12 +550,6 @@ namespace internal
     Number *val;
     Number *a_val;
     Number *b_val;
-#ifdef DEAL_II_WITH_THREADS
-    void operator() (const tbb::blocked_range<size_type> &range) const
-    {
-      operator()(range.begin(),range.end());
-    }
-#endif
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -614,6 +566,523 @@ namespace internal
         }
     }
   };
+
+
+
+  // All sums over all the vector entries (l2-norm, inner product, etc.) are
+  // performed with the same code, using a templated operation defined
+  // here. There are always two versions defined, a standard one that covers
+  // most cases and a vectorized one which is only for equal types and float
+  // and double.
+  template <typename Number, typename Number2>
+  struct Dot
+  {
+    static const bool vectorizes = types_are_equal<Number,Number2>::value &&
+                                   (VectorizedArray<Number>::n_array_elements > 1);
+
+    Number
+    operator() (const size_type i) const
+    {
+      return X[i] * Number(numbers::NumberTraits<Number2>::conjugate(Y[i]));
+    }
+
+    VectorizedArray<Number>
+    do_vectorized(const size_type i) const
+    {
+      VectorizedArray<Number> x, y;
+      x.load(X+i);
+      y.load(Y+i);
+      return x * y;
+    }
+
+    const Number  *X;
+    const Number2 *Y;
+  };
+
+  template <typename Number, typename RealType>
+  struct Norm2
+  {
+    static const bool vectorizes = VectorizedArray<Number>::n_array_elements > 1;
+
+    RealType
+    operator() (const size_type i) const
+    {
+      return numbers::NumberTraits<Number>::abs_square(X[i]);
+    }
+
+    VectorizedArray<Number>
+    do_vectorized(const size_type i) const
+    {
+      VectorizedArray<Number> x;
+      x.load(X+i);
+      return x * x;
+    }
+
+    const Number *X;
+  };
+
+  template <typename Number, typename RealType>
+  struct Norm1
+  {
+    static const bool vectorizes = VectorizedArray<Number>::n_array_elements > 1;
+
+    RealType
+    operator() (const size_type i) const
+    {
+      return numbers::NumberTraits<Number>::abs(X[i]);
+    }
+
+    VectorizedArray<Number>
+    do_vectorized(const size_type i) const
+    {
+      VectorizedArray<Number> x;
+      x.load(X+i);
+      return std::abs(x);
+    }
+
+    const Number *X;
+  };
+
+  template <typename Number, typename RealType>
+  struct NormP
+  {
+    static const bool vectorizes = VectorizedArray<Number>::n_array_elements > 1;
+
+    RealType
+    operator() (const size_type i) const
+    {
+      return std::pow(numbers::NumberTraits<Number>::abs(X[i]), p);
+    }
+
+    VectorizedArray<Number>
+    do_vectorized(const size_type i) const
+    {
+      VectorizedArray<Number> x;
+      x.load(X+i);
+      return std::pow(std::abs(x),p);
+    }
+
+    const Number *X;
+    RealType p;
+  };
+
+  template <typename Number>
+  struct MeanValue
+  {
+    static const bool vectorizes = VectorizedArray<Number>::n_array_elements > 1;
+
+    Number
+    operator() (const size_type i) const
+    {
+      return X[i];
+    }
+
+    VectorizedArray<Number>
+    do_vectorized(const size_type i) const
+    {
+      VectorizedArray<Number> x;
+      x.load(X+i);
+      return x;
+    }
+
+    const Number *X;
+  };
+
+  template <typename Number>
+  struct AddAndDot
+  {
+    static const bool vectorizes = VectorizedArray<Number>::n_array_elements > 1;
+
+    Number
+    operator() (const size_type i) const
+    {
+      X[i] += a * V[i];
+      return X[i] * Number(numbers::NumberTraits<Number>::conjugate(W[i]));
+    }
+
+    VectorizedArray<Number>
+    do_vectorized(const size_type i) const
+    {
+      VectorizedArray<Number> x, w, v;
+      x.load(X+i);
+      v.load(V+i);
+      x += a * v;
+      x.store(X+i);
+      // may only load from W after storing in X because the pointers might
+      // point to the same memory
+      w.load(W+i);
+      return x * w;
+    }
+
+    Number *X;
+    const Number *V, *W;
+    Number a;
+  };
+
+
+
+  // this is the main working loop for all vector sums using the templated
+  // operation above. it accumulates the sums using a block-wise summation
+  // algorithm with post-update. this blocked algorithm has been proposed in
+  // a similar form by Castaldo, Whaley and Chronopoulos (SIAM
+  // J. Sci. Comput. 31, 1156-1174, 2008) and we use the smallest possible
+  // block size, 2. Sometimes it is referred to as pairwise summation. The
+  // worst case error made by this algorithm is on the order O(eps *
+  // log2(vec_size)), whereas a naive summation is O(eps * vec_size). Even
+  // though the Kahan summation is even more accurate with an error O(eps)
+  // by carrying along remainders not captured by the main sum, that involves
+  // additional costs which are not worthwhile. See the Wikipedia article on
+  // the Kahan summation algorithm.
+
+  // The algorithm implemented here has the additional benefit that it is
+  // easily parallelized without changing the order of how the elements are
+  // added (floating point addition is not associative). For the same vector
+  // size and minimum_parallel_grainsize, the blocks are always the
+  // same and added pairwise.
+
+  // The depth of recursion is controlled by the 'magic' parameter
+  // vector_accumulation_recursion_threshold: If the length is below
+  // vector_accumulation_recursion_threshold * 32 (32 is the part of code we
+  // unroll), a straight loop instead of recursion will be used.  At the
+  // innermost level, eight values are added consecutively in order to better
+  // balance multiplications and additions.
+
+  // The code returns the result as the last argument in order to make
+  // spawning tasks simpler and use automatic template deduction.
+
+  const unsigned int vector_accumulation_recursion_threshold = 128;
+
+  template <typename Operation, typename ResultType>
+  void accumulate_recursive (const Operation   &op,
+                             const size_type    first,
+                             const size_type    last,
+                             ResultType        &result)
+  {
+    const size_type vec_size = last - first;
+    if (vec_size <= vector_accumulation_recursion_threshold * 32)
+      {
+        // the vector is short enough so we perform the summation. first
+        // work on the regular part. The innermost 32 values are expanded in
+        // order to obtain known loop bounds for most of the work.
+        size_type index = first;
+        ResultType outer_results [vector_accumulation_recursion_threshold];
+        size_type n_chunks = vec_size / 32;
+        const size_type remainder = vec_size % 32;
+        Assert (remainder == 0 || n_chunks < vector_accumulation_recursion_threshold,
+                ExcInternalError());
+
+        // Select between the regular version and vectorized version based
+        // on the number types we are given. To choose the vectorized
+        // version often enough, we need to have all tasks but the last one
+        // to be divisible by the vectorization length
+        accumulate_regular(op, n_chunks, index, outer_results,
+                           internal::bool2type<Operation::vectorizes>());
+
+        // now work on the remainder, i.e., the last up to 32 values. Use
+        // switch statement with fall-through to work on these values.
+        if (remainder > 0)
+          {
+            AssertIndexRange(n_chunks, vector_accumulation_recursion_threshold+1);
+            const size_type inner_chunks = remainder / 8;
+            Assert (inner_chunks <= 3, ExcInternalError());
+            const size_type remainder_inner = remainder % 8;
+            ResultType r0 = ResultType(), r1 = ResultType(),
+                       r2 = ResultType();
+            switch (inner_chunks)
+              {
+              case 3:
+                r2 = op(index++);
+                for (size_type j=1; j<8; ++j)
+                  r2 += op(index++);
+              // no break
+              case 2:
+                r1 = op(index++);
+                for (size_type j=1; j<8; ++j)
+                  r1 += op(index++);
+                r1 += r2;
+              // no break
+              case 1:
+                r2 = op(index++);
+                for (size_type j=1; j<8; ++j)
+                  r2 += op(index++);
+              // no break
+              default:
+                for (size_type j=0; j<remainder_inner; ++j)
+                  r0 += op(index++);
+                r0 += r2;
+                r0 += r1;
+                if (n_chunks == vector_accumulation_recursion_threshold)
+                  outer_results[vector_accumulation_recursion_threshold-1] += r0;
+                else
+                  {
+                    outer_results[n_chunks] = r0;
+                    n_chunks++;
+                  }
+                break;
+              }
+          }
+        AssertDimension(index, last);
+
+        // now sum the results from the chunks
+        // recursively
+        while (n_chunks > 1)
+          {
+            if (n_chunks % 2 == 1)
+              outer_results[n_chunks++] = ResultType();
+            for (size_type i=0; i<n_chunks; i+=2)
+              outer_results[i/2] = outer_results[i] + outer_results[i+1];
+            n_chunks /= 2;
+          }
+        result = outer_results[0];
+      }
+    else
+      {
+        // split vector into four pieces and work on the pieces
+        // recursively. Make pieces (except last) divisible by one fourth the
+        // recursion threshold.
+        const size_type new_size =
+          (vec_size / (vector_accumulation_recursion_threshold * 32)) *
+          vector_accumulation_recursion_threshold * 8;
+        ResultType r0, r1, r2, r3;
+        accumulate_recursive (op, first, first+new_size, r0);
+        accumulate_recursive (op, first+new_size, first+2*new_size, r1);
+        accumulate_recursive (op, first+2*new_size, first+3*new_size, r2);
+        accumulate_recursive (op, first+3*new_size, last, r3);
+        r0 += r1;
+        r2 += r3;
+        result = r0 + r2;
+      }
+  }
+
+
+  // this is the inner working routine for the accumulation loops
+  // below. This is the standard case where the loop bounds are known. We
+  // pulled this function out of the regular accumulate routine because we
+  // might do this thing vectorized (see specialized function below)
+  template <typename Operation, typename ResultType>
+  void
+  accumulate_regular(const Operation &op,
+                     size_type       &n_chunks,
+                     size_type       &index,
+                     ResultType (&outer_results)[vector_accumulation_recursion_threshold],
+                     internal::bool2type<false>)
+  {
+    for (size_type i=0; i<n_chunks; ++i)
+      {
+        ResultType r0 = op(index);
+        ResultType r1 = op(index+1);
+        ResultType r2 = op(index+2);
+        ResultType r3 = op(index+3);
+        index += 4;
+        for (size_type j=1; j<8; ++j, index += 4)
+          {
+            r0 += op(index);
+            r1 += op(index+1);
+            r2 += op(index+2);
+            r3 += op(index+3);
+          }
+        r0 += r1;
+        r2 += r3;
+        outer_results[i] = r0 + r2;
+      }
+  }
+
+
+
+  // this is the inner working routine for the accumulation loops
+  // below. This is the specialized case where the loop bounds are known and
+  // where we can vectorize. In that case, we request the 'do_vectorized'
+  // routine of the operation instead of the regular one which does several
+  // operations at once.
+  template <typename Operation, typename Number>
+  void
+  accumulate_regular(const Operation &op,
+                     size_type       &n_chunks,
+                     size_type       &index,
+                     Number (&outer_results)[vector_accumulation_recursion_threshold],
+                     internal::bool2type<true>)
+  {
+    const unsigned int nvecs = VectorizedArray<Number>::n_array_elements;
+    const size_type regular_chunks = n_chunks/nvecs;
+    for (size_type i=0; i<regular_chunks; ++i)
+      {
+        VectorizedArray<Number> r0 = op.do_vectorized(index);
+        VectorizedArray<Number> r1 = op.do_vectorized(index+nvecs);
+        VectorizedArray<Number> r2 = op.do_vectorized(index+2*nvecs);
+        VectorizedArray<Number> r3 = op.do_vectorized(index+3*nvecs);
+        index += nvecs*4;
+        for (size_type j=1; j<8; ++j, index += nvecs*4)
+          {
+            r0 += op.do_vectorized(index);
+            r1 += op.do_vectorized(index+nvecs);
+            r2 += op.do_vectorized(index+2*nvecs);
+            r3 += op.do_vectorized(index+3*nvecs);
+          }
+        r0 += r1;
+        r2 += r3;
+        r0 += r2;
+        r0.store(&outer_results[i*VectorizedArray<Number>::n_array_elements]);
+      }
+
+    // If we are treating a case where the vector length is not divisible by
+    // the vectorization length, need a cleanup loop
+    AssertIndexRange(VectorizedArray<Number>::n_array_elements,
+                     17);
+    if (n_chunks % VectorizedArray<Number>::n_array_elements != 0)
+      {
+        VectorizedArray<Number> r0 = VectorizedArray<Number>(),
+                                r1 = VectorizedArray<Number>();
+        const size_type start_irreg = regular_chunks * nvecs;
+        for (size_type c=start_irreg; c<n_chunks; ++c)
+          for (size_type j=0; j<32; j+=2*nvecs, index+=2*nvecs)
+            {
+              r0 += op.do_vectorized(index);
+              r1 += op.do_vectorized(index+nvecs);
+            }
+        r0 += r1;
+        r0.store(&outer_results[start_irreg]);
+        n_chunks = start_irreg + VectorizedArray<Number>::n_array_elements;
+      }
+  }
+
+
+
+#ifdef DEAL_II_WITH_THREADS
+  /**
+   * This struct takes the loop range from the tbb parallel for loop and
+   * translates it to the actual ranges of the reduction loop inside the
+   * vector. It encodes the grain size but might choose larger values of
+   * chunks than the minimum grain size. The minimum grain size given to tbb
+   * is 1. For affinity reasons, the layout in this loop must be kept in sync
+   * with the respective class for plain for loops further up.
+   *
+   * Due to this construction, TBB usually only sees a loop of length
+   * 4*num_threads with grain size 1. The actual ranges inside the vector are
+   * computed outside of TBB because otherwise TBB would split the ranges in
+   * some unpredictable position which destroys exact bitwise
+   * reproducibility. An important part of this is that inside
+   * TBBReduceFunctor::operator() the recursive calls to accumulate are done
+   * sequentially on one item a time (even though we could directly run it on
+   * the whole range given through the tbb::blocked_range times the chunk size
+   * - but that would be unpredictable). Thus, the values we cannot control
+   * are the positions in the array that gets filled - but up to that point
+   * the algorithm TBB sees is just a parallel for and nothing unpredictable
+   * can happen.
+   *
+   * To sum up: Once the number of threads and the vector size are fixed, we
+   * have an exact layout of how the calls into the recursive function will
+   * happen. Inside the recursive function, we again only depend on the
+   * length. Finally, the concurrent threads write into different positions in
+   * a result vector in a thread-safe way and the addition in the short array
+   * is again serial.
+   */
+  template <typename Operation, typename ResultType>
+  struct TBBReduceFunctor
+  {
+    static const unsigned int threshold_array_allocate = 512;
+
+    TBBReduceFunctor(const Operation   &op,
+                     const size_type    vec_size)
+      :
+      op(op),
+      vec_size(vec_size)
+    {
+      // set chunk size for sub-tasks
+      const unsigned int gs = internal::Vector::minimum_parallel_grain_size;
+      n_chunks = std::min(4*MultithreadInfo::n_threads(), vec_size / gs);
+      chunk_size = vec_size / n_chunks;
+
+      // round to next multiple of 512 (or leave it at the minimum grain size
+      // if that happens to be smaller). this is advantageous because our
+      // algorithm favors lengths of a power of 2 due to pairwise summation ->
+      // at most one 'oddly' sized chunk
+      if (chunk_size > 512)
+        chunk_size = ((chunk_size + 511)/512)*512;
+      n_chunks = (vec_size + chunk_size - 1) / chunk_size;
+      AssertIndexRange((n_chunks-1)*chunk_size, vec_size);
+      AssertIndexRange(vec_size, n_chunks*chunk_size+1);
+
+      if (n_chunks > threshold_array_allocate)
+        {
+          large_array.resize(n_chunks);
+          array_ptr = &large_array[0];
+        }
+      else
+        array_ptr = &small_array[0];
+    };
+
+    void operator() (const tbb::blocked_range<size_type> &range) const
+    {
+      for (size_type i = range.begin(); i < range.end(); ++i)
+        accumulate_recursive(op, i*chunk_size, std::min((i+1)*chunk_size, vec_size),
+                             array_ptr[i]);
+    }
+
+    ResultType do_sum() const
+    {
+      while (n_chunks > 1)
+        {
+          if (n_chunks % 2 == 1)
+            array_ptr[n_chunks++] = ResultType();
+          for (size_type i=0; i<n_chunks; i+=2)
+            array_ptr[i/2] = array_ptr[i] + array_ptr[i+1];
+          n_chunks /= 2;
+        }
+      return array_ptr[0];
+    }
+
+    const Operation &op;
+    const size_type vec_size;
+
+    mutable unsigned int n_chunks;
+    unsigned int chunk_size;
+    ResultType small_array [threshold_array_allocate];
+    std::vector<ResultType> large_array;
+    // this variable either points to small_array or large_array depending on
+    // the number of threads we want to feed
+    mutable ResultType *array_ptr;
+  };
+#endif
+
+
+
+  /**
+   * This is the general caller for parallel reduction operations that work in
+   * parallel.
+   */
+  template <typename Operation, typename ResultType>
+  void parallel_reduce (const Operation   &op,
+                        const size_type    vec_size,
+                        ResultType        &result,
+                        std_cxx11::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
+  {
+#ifdef DEAL_II_WITH_THREADS
+    // only go to the parallel function in case there are at least 4 parallel
+    // items, otherwise the overhead is too large
+    if (vec_size >= 4*internal::Vector::minimum_parallel_grain_size &&
+        MultithreadInfo::n_threads() > 1)
+      {
+        Assert(partitioner.get() != NULL,
+               ExcInternalError("Unexpected initialization of Vector that does "
+                                "not set the TBB partitioner to a usable state."));
+        std_cxx11::shared_ptr<tbb::affinity_partitioner> tbb_partitioner =
+          partitioner->acquire_one_partitioner();
+
+        TBBReduceFunctor<Operation,ResultType> generic_functor(op, vec_size);
+        tbb::parallel_for (tbb::blocked_range<size_type> (0,
+                                                          generic_functor.n_chunks,
+                                                          1),
+                           generic_functor,
+                           *tbb_partitioner);
+        partitioner->release_one_partitioner(tbb_partitioner);
+        result = generic_functor.do_sum();
+      }
+    else if (vec_size > 0)
+      accumulate_recursive(op,0,vec_size,result);
+#else
+    accumulate_recursive(op,0,vec_size,result);
+#endif
+  }
 }
 
 
@@ -800,7 +1269,7 @@ Vector<Number>::operator= (const Vector<Number> &v)
   dealii::internal::Vector_copy<Number,Number> copier;
   copier.dst = val;
   copier.src = v.val;
-  internal::vectorized_transform(copier,vec_size,thread_loop_partitioner);
+  internal::parallel_for(copier,vec_size,thread_loop_partitioner);
 
   return *this;
 }
@@ -845,7 +1314,7 @@ Vector<Number>::operator= (const Vector<Number2> &v)
   dealii::internal::Vector_copy<Number,Number2> copier;
   copier.dst = val;
   copier.src = v.val;
-  internal::vectorized_transform(copier,vec_size,thread_loop_partitioner);
+  internal::parallel_for(copier,vec_size,thread_loop_partitioner);
 
   return *this;
 }
@@ -958,7 +1427,7 @@ Vector<Number>::operator= (const Number s)
   setter.dst = val;
   setter.value = s;
 
-  internal::vectorized_transform(setter,vec_size,thread_loop_partitioner);
+  internal::parallel_for(setter,vec_size,thread_loop_partitioner);
 
   return *this;
 }
@@ -993,7 +1462,7 @@ Vector<Number> &Vector<Number>::operator *= (const Number factor)
   vector_multiply.val = val;
   vector_multiply.factor = factor;
 
-  internal::vectorized_transform(vector_multiply,vec_size,thread_loop_partitioner);
+  internal::parallel_for(vector_multiply,vec_size,thread_loop_partitioner);
 
   return *this;
 }
@@ -1014,7 +1483,7 @@ Vector<Number>::add (const Number a,
   vector_add_av.val = val;
   vector_add_av.v_val = v.val;
   vector_add_av.factor = a;
-  internal::vectorized_transform(vector_add_av,vec_size,thread_loop_partitioner);
+  internal::parallel_for(vector_add_av,vec_size,thread_loop_partitioner);
 }
 
 
@@ -1036,7 +1505,7 @@ Vector<Number>::sadd (const Number x,
   vector_sadd_xav.v_val = v.val;
   vector_sadd_xav.a = a;
   vector_sadd_xav.x = x;
-  internal::vectorized_transform(vector_sadd_xav,vec_size,thread_loop_partitioner);
+  internal::parallel_for(vector_sadd_xav,vec_size,thread_loop_partitioner);
 }
 
 
@@ -1045,389 +1514,6 @@ namespace internal
 {
   namespace Vector
   {
-    // All sums over all the vector entries (l2-norm, inner product, etc.) are
-    // performed with the same code, using a templated operation defined
-    // here. There are always two versions defined, a standard one that covers
-    // most cases and a vectorized one which is only for equal types and float
-    // and double.
-    template <typename Number, typename Number2>
-    struct Dot
-    {
-      Number
-      operator() (const Number *&X, const Number2 *&Y, const Number &, Number *&) const
-      {
-        return *X++ * Number(numbers::NumberTraits<Number2>::conjugate(*Y++));
-      }
-
-      VectorizedArray<Number>
-      do_vectorized(const Number *&X, const Number *&Y, const Number &, Number *&) const
-      {
-        VectorizedArray<Number> x, y;
-        x.load(X);
-        y.load(Y);
-        X += VectorizedArray<Number>::n_array_elements;
-        Y += VectorizedArray<Number>::n_array_elements;
-        return x * y;
-      }
-    };
-
-    template <typename Number, typename RealType>
-    struct Norm2
-    {
-      RealType
-      operator() (const Number  *&X, const Number  *&, const RealType &, Number *&) const
-      {
-        return numbers::NumberTraits<Number>::abs_square(*X++);
-      }
-
-      VectorizedArray<Number>
-      do_vectorized(const Number *&X, const Number *&, const Number &, Number *&) const
-      {
-        VectorizedArray<Number> x;
-        x.load(X);
-        X += VectorizedArray<Number>::n_array_elements;
-        return x * x;
-      }
-    };
-
-    template <typename Number, typename RealType>
-    struct Norm1
-    {
-      RealType
-      operator() (const Number  *&X, const Number  *&, const RealType &, Number *&) const
-      {
-        return numbers::NumberTraits<Number>::abs(*X++);
-      }
-
-      VectorizedArray<Number>
-      do_vectorized(const Number *&X, const Number *&, const Number &, Number *&) const
-      {
-        VectorizedArray<Number> x;
-        x.load(X);
-        X += VectorizedArray<Number>::n_array_elements;
-        return std::abs(x);
-      }
-    };
-
-    template <typename Number, typename RealType>
-    struct NormP
-    {
-      RealType
-      operator() (const Number  *&X, const Number  *&, const RealType &p, Number *&) const
-      {
-        return std::pow(numbers::NumberTraits<Number>::abs(*X++), p);
-      }
-
-      VectorizedArray<Number>
-      do_vectorized(const Number *&X, const Number *&, const Number &p, Number *&) const
-      {
-        VectorizedArray<Number> x;
-        x.load(X);
-        X += VectorizedArray<Number>::n_array_elements;
-        return std::pow(std::abs(x),p);
-      }
-    };
-
-    template <typename Number>
-    struct MeanValue
-    {
-      Number
-      operator() (const Number  *&X, const Number  *&, const Number &, Number *&) const
-      {
-        return *X++;
-      }
-
-      VectorizedArray<Number>
-      do_vectorized(const Number *&X, const Number *&, const Number &, Number *&) const
-      {
-        VectorizedArray<Number> x;
-        x.load(X);
-        X += VectorizedArray<Number>::n_array_elements;
-        return x;
-      }
-    };
-
-    template <typename Number>
-    struct AddAndDot
-    {
-      Number
-      operator() (const Number *&V, const Number *&W, const Number &a,
-                  Number *&X) const
-      {
-        *X += a **V++;
-        return *X++ * Number(numbers::NumberTraits<Number>::conjugate(*W++));
-      }
-
-      VectorizedArray<Number>
-      do_vectorized(const Number *&V, const Number *&W, const Number &a,
-                    Number *&X) const
-      {
-        VectorizedArray<Number> x, w, v;
-        x.load(X);
-        v.load(V);
-        x += a * v;
-        x.store(X);
-        // may only load from W after storing in X because the pointers might
-        // point to the same memory
-        w.load(W);
-        X += VectorizedArray<Number>::n_array_elements;
-        V += VectorizedArray<Number>::n_array_elements;
-        W += VectorizedArray<Number>::n_array_elements;
-        return x * w;
-      }
-    };
-
-
-
-    // this is the inner working routine for the accumulation loops
-    // below. This is the standard case where the loop bounds are known. We
-    // pulled this function out of the regular accumulate routine because we
-    // might do this thing vectorized (see specialized function below)
-    template <typename Operation, typename Number, typename Number2,
-              typename ResultType, typename size_type>
-    void
-    accumulate_regular(const Operation &op,
-                       const Number   *&X,
-                       const Number2  *&Y,
-                       const ResultType power,
-                       const size_type  n_chunks,
-                       Number         *&Z,
-                       ResultType (&outer_results)[128],
-                       internal::bool2type<false>,
-                       const unsigned int start_chunk=0)
-    {
-      AssertIndexRange(start_chunk, n_chunks+1);
-      for (size_type i=start_chunk; i<n_chunks; ++i)
-        {
-          ResultType r0 = op(X, Y, power, Z);
-          ResultType r1 = op(X, Y, power, Z);
-          ResultType r2 = op(X, Y, power, Z);
-          ResultType r3 = op(X, Y, power, Z);
-          for (size_type j=1; j<8; ++j)
-            {
-              r0 += op(X, Y, power, Z);
-              r1 += op(X, Y, power, Z);
-              r2 += op(X, Y, power, Z);
-              r3 += op(X, Y, power, Z);
-            }
-          r0 += r1;
-          r2 += r3;
-          outer_results[i] = r0 + r2;
-        }
-    }
-
-
-
-    // this is the inner working routine for the accumulation loops
-    // below. This is the specialized case where the loop bounds are known and
-    // where we can vectorize. In that case, we request the 'do_vectorized'
-    // routine of the operation instead of the regular one which does several
-    // operations at once.
-    template <typename Operation, typename Number, typename size_type>
-    void
-    accumulate_regular(const Operation &op,
-                       const Number   *&X,
-                       const Number   *&Y,
-                       const Number     power,
-                       const size_type  n_chunks,
-                       Number         *&Z,
-                       Number (&outer_results)[128],
-                       internal::bool2type<true>)
-    {
-      for (size_type i=0; i<n_chunks/VectorizedArray<Number>::n_array_elements; ++i)
-        {
-          VectorizedArray<Number> r0 = op.do_vectorized(X, Y, power, Z);
-          VectorizedArray<Number> r1 = op.do_vectorized(X, Y, power, Z);
-          VectorizedArray<Number> r2 = op.do_vectorized(X, Y, power, Z);
-          VectorizedArray<Number> r3 = op.do_vectorized(X, Y, power, Z);
-          for (size_type j=1; j<8; ++j)
-            {
-              r0 += op.do_vectorized(X, Y, power, Z);
-              r1 += op.do_vectorized(X, Y, power, Z);
-              r2 += op.do_vectorized(X, Y, power, Z);
-              r3 += op.do_vectorized(X, Y, power, Z);
-            }
-          r0 += r1;
-          r2 += r3;
-          r0 += r2;
-          r0.store(&outer_results[i*VectorizedArray<Number>::n_array_elements]);
-        }
-
-      // If we are treating a case where the vector length is not divisible by
-      // the vectorization length, need the other routine for the cleanup work
-      if (n_chunks % VectorizedArray<Number>::n_array_elements != 0)
-        accumulate_regular(op, X, Y, power, n_chunks, Z, outer_results,
-                           internal::bool2type<false>(),
-                           (n_chunks/VectorizedArray<Number>::n_array_elements)
-                           * VectorizedArray<Number>::n_array_elements);
-    }
-
-
-
-    // this is the main working loop for all vector sums using the templated
-    // operation above. it accumulates the sums using a block-wise summation
-    // algorithm with post-update. this blocked algorithm has been proposed in
-    // a similar form by Castaldo, Whaley and Chronopoulos (SIAM
-    // J. Sci. Comput. 31, 1156-1174, 2008) and we use the smallest possible
-    // block size, 2. Sometimes it is referred to as pairwise summation. The
-    // worst case error made by this algorithm is on the order O(eps *
-    // log2(vec_size)), whereas a naive summation is O(eps * vec_size). Even
-    // though the Kahan summation is even more accurate with an error O(eps)
-    // by carrying along remainders not captured by the main sum, that involves
-    // additional costs which are not worthwhile. See the Wikipedia article on
-    // the Kahan summation algorithm.
-
-    // The algorithm implemented here has the additional benefit that it is
-    // easily parallelized without changing the order of how the elements are
-    // added (floating point addition is not associative). For the same vector
-    // size and minimum_parallel_grainsize, the blocks are always the
-    // same and added pairwise. At the innermost level, eight values are added
-    // consecutively in order to better balance multiplications and additions.
-
-    // The code returns the result as the last argument in order to make
-    // spawning tasks simpler and use automatic template deduction.
-    template <typename Operation, typename Number, typename Number2,
-              typename ResultType, typename size_type>
-    void accumulate (const Operation   &op,
-                     const Number      *X,
-                     const Number2     *Y,
-                     const ResultType   power,
-                     const size_type    vec_size,
-                     Number            *Z,
-                     ResultType        &result,
-                     const int          depth = -1)
-    {
-      (void)depth;
-
-      if (vec_size <= 4096)
-        {
-          // the vector is short enough so we perform the summation. first
-          // work on the regular part. The innermost 32 values are expanded in
-          // order to obtain known loop bounds for most of the work.
-          const Number *X_original = X;
-          (void)X_original;
-          ResultType outer_results [128];
-          size_type n_chunks = vec_size / 32;
-          const size_type remainder = vec_size % 32;
-          Assert (remainder == 0 || n_chunks < 128, ExcInternalError());
-
-          // Select between the regular version and vectorized version based
-          // on the number types we are given. To choose the vectorized
-          // version often enough, we need to have all tasks but the last one
-          // to be divisible by the vectorization length
-          accumulate_regular(op, X, Y, power, n_chunks, Z, outer_results,
-                             internal::bool2type<(types_are_equal<Number,Number2>::value &&
-                                                  (types_are_equal<Number,double>::value ||
-                                                   types_are_equal<Number,float>::value))>());
-
-          // now work on the remainder, i.e., the last up to 32 values. Use
-          // switch statement with fall-through to work on these values.
-          if (remainder > 0)
-            {
-              const size_type inner_chunks = remainder / 8;
-              Assert (inner_chunks <= 3, ExcInternalError());
-              const size_type remainder_inner = remainder % 8;
-              ResultType r0 = ResultType(), r1 = ResultType(),
-                         r2 = ResultType();
-              switch (inner_chunks)
-                {
-                case 3:
-                  r2 = op(X, Y, power, Z);
-                  for (size_type j=1; j<8; ++j)
-                    r2 += op(X, Y, power, Z);
-                // no break
-                case 2:
-                  r1 = op(X, Y, power, Z);
-                  for (size_type j=1; j<8; ++j)
-                    r1 += op(X, Y, power, Z);
-                  r1 += r2;
-                // no break
-                case 1:
-                  r2 = op(X, Y, power, Z);
-                  for (size_type j=1; j<8; ++j)
-                    r2 += op(X, Y, power, Z);
-                // no break
-                default:
-                  for (size_type j=0; j<remainder_inner; ++j)
-                    r0 += op(X, Y, power, Z);
-                  r0 += r2;
-                  r0 += r1;
-                  outer_results[n_chunks] = r0;
-                  break;
-                }
-              n_chunks++;
-            }
-          AssertDimension(static_cast<size_type> (X - X_original), vec_size);
-
-          // now sum the results from the chunks
-          // recursively
-          while (n_chunks > 1)
-            {
-              if (n_chunks % 2 == 1)
-                outer_results[n_chunks++] = ResultType();
-              for (size_type i=0; i<n_chunks; i+=2)
-                outer_results[i/2] = outer_results[i] + outer_results[i+1];
-              n_chunks /= 2;
-            }
-          result = outer_results[0];
-        }
-#ifdef DEAL_II_WITH_THREADS
-      else if (MultithreadInfo::n_threads() > 1 &&
-               vec_size > 4 * internal::Vector::minimum_parallel_grain_size &&
-               depth != 0)
-        {
-          // split the vector into smaller pieces to be worked on recursively
-          // and create tasks for them. Make pieces divisible by 1024.
-          const size_type new_size = (vec_size / 4096) * 1024;
-          ResultType r0, r1, r2, r3;
-
-          // find out how many recursions we should make (avoid too deep
-          // hierarchies of tasks on large vectors), max use 8 *
-          // MultithreadInfo::n_threads()
-          int next_depth = depth;
-          if (depth == -1)
-            next_depth = 8 * MultithreadInfo::n_threads();
-          next_depth /= 4;
-
-          Threads::TaskGroup<> task_group;
-          task_group += Threads::new_task(&accumulate<Operation,Number,Number2,
-                                          ResultType,size_type>,
-                                          op, X, Y, power, new_size, Z, r0, next_depth);
-          task_group += Threads::new_task(&accumulate<Operation,Number,Number2,
-                                          ResultType,size_type>,
-                                          op, X+new_size, Y+new_size, power,
-                                          new_size, Z+new_size, r1, next_depth);
-          task_group += Threads::new_task(&accumulate<Operation,Number,Number2,
-                                          ResultType,size_type>,
-                                          op, X+2*new_size, Y+2*new_size, power,
-                                          new_size, Z+2*new_size, r2, next_depth);
-          task_group += Threads::new_task(&accumulate<Operation,Number,Number2,
-                                          ResultType,size_type>,
-                                          op, X+3*new_size, Y+3*new_size, power,
-                                          vec_size-3*new_size, Z+3*new_size, r3,
-                                          next_depth);
-          task_group.join_all();
-          r0 += r1;
-          r2 += r3;
-          result = r0 + r2;
-        }
-#endif
-      else
-        {
-          // split vector into four pieces and work on the pieces
-          // recursively. Make pieces (except last) divisible by 1024.
-          const size_type new_size = (vec_size / 4096) * 1024;
-          ResultType r0, r1, r2, r3;
-          accumulate (op, X, Y, power, new_size, Z, r0);
-          accumulate (op, X+new_size, Y+new_size, power, new_size, Z+new_size, r1);
-          accumulate (op, X+2*new_size, Y+2*new_size, power, new_size, Z+2*new_size, r2);
-          accumulate (op, X+3*new_size, Y+3*new_size, power, vec_size-3*new_size,
-                      Z+3*new_size, r3);
-          r0 += r1;
-          r2 += r3;
-          result = r0 + r2;
-        }
-    }
   }
 }
 
@@ -1446,8 +1532,10 @@ Number Vector<Number>::operator * (const Vector<Number2> &v) const
           ExcDimensionMismatch(vec_size, v.size()));
 
   Number sum;
-  internal::Vector::accumulate (internal::Vector::Dot<Number,Number2>(),
-                                val, v.val, Number(), vec_size, val, sum);
+  internal::Dot<Number,Number2> dot;
+  dot.X = val;
+  dot.Y = v.val;
+  internal::parallel_reduce (dot, vec_size, sum, thread_loop_partitioner);
   AssertIsFinite(sum);
 
   return sum;
@@ -1462,8 +1550,9 @@ Vector<Number>::norm_sqr () const
   Assert (vec_size!=0, ExcEmptyObject());
 
   real_type sum;
-  internal::Vector::accumulate (internal::Vector::Norm2<Number,real_type>(),
-                                val, val, real_type(), vec_size, val, sum);
+  internal::Norm2<Number,real_type> norm2;
+  norm2.X = val;
+  internal::parallel_reduce (norm2, vec_size, sum, thread_loop_partitioner);
 
   AssertIsFinite(sum);
 
@@ -1478,8 +1567,9 @@ Number Vector<Number>::mean_value () const
   Assert (vec_size!=0, ExcEmptyObject());
 
   Number sum;
-  internal::Vector::accumulate (internal::Vector::MeanValue<Number>(),
-                                val, val, Number(), vec_size, val, sum);
+  internal::MeanValue<Number> mean;
+  mean.X = val;
+  internal::parallel_reduce (mean, vec_size, sum, thread_loop_partitioner);
 
   return sum / real_type(size());
 }
@@ -1493,8 +1583,9 @@ Vector<Number>::l1_norm () const
   Assert (vec_size!=0, ExcEmptyObject());
 
   real_type sum;
-  internal::Vector::accumulate (internal::Vector::Norm1<Number,real_type>(),
-                                val, val, real_type(), vec_size, val, sum);
+  internal::Norm1<Number, real_type> norm1;
+  norm1.X = val;
+  internal::parallel_reduce (norm1, vec_size, sum, thread_loop_partitioner);
 
   return sum;
 }
@@ -1513,8 +1604,10 @@ Vector<Number>::l2_norm () const
   Assert (vec_size!=0, ExcEmptyObject());
 
   real_type norm_square;
-  internal::Vector::accumulate (internal::Vector::Norm2<Number,real_type>(),
-                                val, val, real_type(), vec_size, val, norm_square);
+  internal::Norm2<Number, real_type> norm2;
+  norm2.X = val;
+  internal::parallel_reduce (norm2, vec_size, norm_square,
+                             thread_loop_partitioner);
   if (numbers::is_finite(norm_square) &&
       norm_square >= std::numeric_limits<real_type>::min())
     return std::sqrt(norm_square);
@@ -1556,8 +1649,10 @@ Vector<Number>::lp_norm (const real_type p) const
     return l2_norm();
 
   real_type sum;
-  internal::Vector::accumulate (internal::Vector::NormP<Number,real_type>(),
-                                val, val, p, vec_size, val, sum);
+  internal::NormP<Number, real_type> normp;
+  normp.X = val;
+  normp.p = p;
+  internal::parallel_reduce (normp, vec_size, sum, thread_loop_partitioner);
 
   if (numbers::is_finite(sum) && sum >= std::numeric_limits<real_type>::min())
     return std::pow(sum, static_cast<real_type>(1./p));
@@ -1623,8 +1718,12 @@ Vector<Number>::add_and_dot (const Number          a,
   AssertDimension (vec_size, W.size());
 
   Number sum;
-  internal::Vector::accumulate (internal::Vector::AddAndDot<Number>(),
-                                V.val, W.val, a, vec_size, val, sum);
+  internal::AddAndDot<Number> adder;
+  adder.X = val;
+  adder.a = a;
+  adder.V = V.val;
+  adder.W = W.val;
+  internal::parallel_reduce (adder, vec_size, sum, thread_loop_partitioner);
   AssertIsFinite(sum);
 
   return sum;
@@ -1652,7 +1751,7 @@ Vector<Number> &Vector<Number>::operator -= (const Vector<Number> &v)
   internal::Vectorization_subtract_v<Number> vector_subtract;
   vector_subtract.val = val;
   vector_subtract.v_val = v.val;
-  internal::vectorized_transform(vector_subtract,vec_size,thread_loop_partitioner);
+  internal::parallel_for(vector_subtract,vec_size,thread_loop_partitioner);
 
   return *this;
 }
@@ -1667,7 +1766,7 @@ void Vector<Number>::add (const Number v)
   internal::Vectorization_add_factor<Number> vector_add;
   vector_add.val = val;
   vector_add.factor = v;
-  internal::vectorized_transform(vector_add,vec_size,thread_loop_partitioner);
+  internal::parallel_for(vector_add,vec_size,thread_loop_partitioner);
 }
 
 
@@ -1681,7 +1780,7 @@ void Vector<Number>::add (const Vector<Number> &v)
   internal::Vectorization_add_v<Number> vector_add;
   vector_add.val = val;
   vector_add.v_val = v.val;
-  internal::vectorized_transform(vector_add,vec_size,thread_loop_partitioner);
+  internal::parallel_for(vector_add,vec_size,thread_loop_partitioner);
 }
 
 
@@ -1703,7 +1802,7 @@ void Vector<Number>::add (const Number a, const Vector<Number> &v,
   vector_add.w_val = w.val;
   vector_add.a = a;
   vector_add.b = b;
-  internal::vectorized_transform(vector_add,vec_size,thread_loop_partitioner);
+  internal::parallel_for(vector_add,vec_size,thread_loop_partitioner);
 }
 
 
@@ -1721,7 +1820,7 @@ void Vector<Number>::sadd (const Number x,
   vector_sadd.val = val;
   vector_sadd.v_val = v.val;
   vector_sadd.x = x;
-  internal::vectorized_transform(vector_sadd,vec_size,thread_loop_partitioner);
+  internal::parallel_for(vector_sadd,vec_size,thread_loop_partitioner);
 }
 
 
@@ -1746,7 +1845,7 @@ void Vector<Number>::sadd (const Number x, const Number a,
   vector_sadd.x = x;
   vector_sadd.a = a;
   vector_sadd.b = b;
-  internal::vectorized_transform(vector_sadd,vec_size,thread_loop_partitioner);
+  internal::parallel_for(vector_sadd,vec_size,thread_loop_partitioner);
 }
 
 
@@ -1771,7 +1870,7 @@ void Vector<Number>::scale (const Vector<Number> &s)
   internal::Vectorization_scale<Number> vector_scale;
   vector_scale.val = val;
   vector_scale.v_val = s.val;
-  internal::vectorized_transform(vector_scale,vec_size,thread_loop_partitioner);
+  internal::parallel_for(vector_scale,vec_size,thread_loop_partitioner);
 }
 
 
@@ -1802,7 +1901,7 @@ void Vector<Number>::equ (const Number a,
   vector_equ.val = val;
   vector_equ.u_val = u.val;
   vector_equ.a = a;
-  internal::vectorized_transform(vector_equ,vec_size,thread_loop_partitioner);
+  internal::parallel_for(vector_equ,vec_size,thread_loop_partitioner);
 }
 
 
@@ -1846,7 +1945,7 @@ void Vector<Number>::equ (const Number a, const Vector<Number> &u,
   vector_equ.v_val = v.val;
   vector_equ.a = a;
   vector_equ.b = b;
-  internal::vectorized_transform(vector_equ,vec_size,thread_loop_partitioner);
+  internal::parallel_for(vector_equ,vec_size,thread_loop_partitioner);
 }
 
 
@@ -1868,7 +1967,7 @@ void Vector<Number>::equ (const Number a, const Vector<Number> &u,
   vector_equ.a = a;
   vector_equ.b = b;
   vector_equ.c = c;
-  internal::vectorized_transform(vector_equ,vec_size,thread_loop_partitioner);
+  internal::parallel_for(vector_equ,vec_size,thread_loop_partitioner);
 }
 
 
@@ -1888,7 +1987,7 @@ void Vector<Number>::ratio (const Vector<Number> &a,
   vector_ratio.val = val;
   vector_ratio.a_val = a.val;
   vector_ratio.b_val = b.val;
-  internal::vectorized_transform(vector_ratio,vec_size,thread_loop_partitioner);
+  internal::parallel_for(vector_ratio,vec_size,thread_loop_partitioner);
 }
 
 
