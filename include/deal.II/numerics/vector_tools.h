@@ -920,6 +920,14 @@ namespace VectorTools
    * boundary, $\Gamma$, for which we do the integration. The values of
    * $u_h|_\Gamma$, i.e., the nodal values of the degrees of freedom of this
    * function along the boundary, are then what is computed by this function.
+   * User note - in cases where non-primitive elements are being used,
+   * the conformity of the finite element will affect the behavior of this 
+   * function.  Specifically, if the finite element is H1 conforming, then
+   * the Trace Theorem allows a well defined mapping for all components
+   * of the element onto the boundary. Hdiv and Hcurl conforming elements, 
+   * however, only have sufficient regularity to ensure a well defined 
+   * projection to the boundary for the normal or tangential components
+   * of the element respectively.
    *
    * @param[in] mapping The mapping that will be used in the transformations
    * necessary to integrate along the boundary.
