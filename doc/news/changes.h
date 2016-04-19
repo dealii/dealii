@@ -202,6 +202,11 @@ inconvenience this causes.
 
 <ol>
 
+ <li> New: Added move operations to IndexSet.
+ <br>
+ (Daniel Shapero, 2016/04/19)
+ </li>
+
  <li> Improved: The parallel loops in the deal.II Vector class for
  vector-vector operations have been revised for performance. This includes
  adjusting the minimum parallel grain size to 4096 vector entries and using an
