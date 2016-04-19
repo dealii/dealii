@@ -252,7 +252,7 @@ namespace MeshWorker
               const bool periodic_neighbor = cell->has_periodic_neighbor(face_no);
 
               if ((!periodic_neighbor && cell->neighbor_is_coarser(face_no))
-                  ||(periodic_neighbor && cell->periodic_neighbor_is_coarser(face_no)))
+                  || (periodic_neighbor && cell->periodic_neighbor_is_coarser(face_no)))
                 {
                   Assert(!cell->has_children(), ExcInternalError());
                   Assert(!neighbor->has_children(), ExcInternalError());
