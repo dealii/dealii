@@ -274,9 +274,9 @@ namespace OpenCASCADE
   /**
    * Given a TopoDS_Face @p face and the reference coordinates within this
    * face, returns the corresponding point in real space, the normal to the
-   * surface at that point and the mean curvature as a tuple.
+   * surface at that point and the min and max curvatures as a tuple.
    */
-  std_cxx11::tuple<Point<3>, Point<3>, double >
+  std_cxx11::tuple<Point<3>,  Tensor<1,3>, double, double>
   push_forward_and_differential_forms(const TopoDS_Face &face,
                                       const double u,
                                       const double v,
@@ -285,12 +285,12 @@ namespace OpenCASCADE
 
   /**
    * Get the closest point to the given topological shape, together with the
-   * normal and the mean curvature at that point. If the shape is not
+   * normal and the min and max curvatures at that point. If the shape is not
    * elementary, all its sub-faces (only the faces) are iterated, faces first,
    * and only the closest point is returned. This function will throw an
    * exception if the @p in_shape does not contain at least one face.
    */
-  std_cxx11::tuple<Point<3>, Point<3>, double>
+  std_cxx11::tuple<Point<3>,  Tensor<1,3>, double, double>
   closest_point_and_differential_forms(const TopoDS_Shape &in_shape,
                                        const Point<3> &origin,
                                        const double tolerance=1e-7);
