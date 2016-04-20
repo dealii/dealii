@@ -1222,9 +1222,11 @@ inline
 void
 IndexSet::clear ()
 {
+  // reset so that there are no indices in the set any more; however,
+  // as documented, the index set retains its size
   ranges.clear ();
-  largest_range = 0;
   is_compressed = true;
+  largest_range = numbers::invalid_unsigned_int;
 }
 
 
