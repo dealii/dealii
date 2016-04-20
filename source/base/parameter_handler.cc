@@ -1332,7 +1332,8 @@ ParameterHandler::get_current_full_path (const std::string &name) const
 
 
 bool ParameterHandler::read_input (std::istream &input,
-                                   const std::string &filename)
+                                   const std::string &filename,
+                                   const std::string &last_line)
 {
   AssertThrow (input, ExcIO());
 
@@ -1351,6 +1352,12 @@ bool ParameterHandler::read_input (std::istream &input,
       // Trim the whitespace at the ends of the line here instead of in
       // scan_line. This makes the continuation line logic a lot simpler.
       input_line = Utilities::trim (input_line);
+
+      // If we see the line which is the same as @p last_line ,
+      // terminate the parsing.
+      if (last_line.length() != 0 &&
+          input_line == last_line)
+        break;
 
       // Check whether or not the current line should be joined with the next
       // line before calling scan_line.
@@ -1418,7 +1425,8 @@ bool ParameterHandler::read_input (std::istream &input,
 
 bool ParameterHandler::read_input (const std::string &filename,
                                    const bool optional,
-                                   const bool write_compact)
+                                   const bool write_compact,
+                                   const std::string &last_line)
 {
   PathSearch search("PARAMETERS");
 
@@ -1428,7 +1436,7 @@ bool ParameterHandler::read_input (const std::string &filename,
       std::ifstream file_stream (openname.c_str());
       AssertThrow(file_stream, ExcIO());
 
-      return read_input (file_stream, filename);
+      return read_input (file_stream, filename, last_line);
     }
   catch (const PathSearch::ExcFileNotFound &)
     {
@@ -1448,10 +1456,11 @@ bool ParameterHandler::read_input (const std::string &filename,
 
 
 
-bool ParameterHandler::read_input_from_string (const char *s)
+bool ParameterHandler::read_input_from_string (const char *s,
+                                               const std::string &last_line)
 {
   std::istringstream input_stream (s);
-  return read_input (input_stream, "input string");
+  return read_input (input_stream, "input string", last_line);
 }
 
 
