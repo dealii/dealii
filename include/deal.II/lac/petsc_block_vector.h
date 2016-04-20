@@ -479,7 +479,7 @@ namespace internal
                                 PETScWrappers::BlockVector &v,
                                 bool omit_zeroing_entries)
       {
-        v.reinit(matrix.locally_range_sizes(), omit_zeroing_entries);
+        v.reinit(matrix.locally_owned_range_sizes(), omit_zeroing_entries);
       }
 
       template <typename Matrix>
@@ -488,7 +488,7 @@ namespace internal
                                 PETScWrappers::BlockVector &v,
                                 bool omit_zeroing_entries)
       {
-        v.reinit(matrix.locally_domain_sizes(), omit_zeroing_entries);
+        v.reinit(matrix.locally_owned_domain_sizes(), omit_zeroing_entries);
       }
     };
 
