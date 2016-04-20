@@ -201,6 +201,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> New: Added an optional string parameter to the ParameterHandler::read_input ()
+ and ParameterHandler::read_input_from_string() functions.
+ When a line which equals this string is encountered, the parsing of parameters
+ is terminated.
+ <br>
+ (Denis Davydov, 2016/04/20)
+ </li>
+
 
  <li> New: Added move operations to IndexSet.
  <br>

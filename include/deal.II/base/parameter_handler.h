@@ -1576,10 +1576,15 @@ public:
    * the file (if that's what the input stream represents) we are reading
    * from; this is only used when creating output for error messages.
    *
+   * If non-empty @p last_line is provided, the ParameterHandler object
+   * will stop parsing lines after encountering @p last_line .
+   * This is handy when adding extra data that shall be parsed manually.
+   *
    * Return whether the read was successful.
    */
   virtual bool read_input (std::istream &input,
-                           const std::string &filename = "input file");
+                           const std::string &filename = "input file",
+                           const std::string &last_line = "");
 
   /**
    * Read input from a file the name of which is given. The PathSearch class
@@ -1591,18 +1596,28 @@ public:
    * automatically generate the requested file with default values if the file
    * did not exist. This file will not contain additional comments if
    * <tt>write_stripped_file</tt> is <tt>true</tt>.
+   *
+   * If non-empty @p last_line is provided, the ParameterHandler object
+   * will stop parsing lines after encountering @p last_line .
+   * This is handy when adding extra data that shall be parsed manually.
    */
   virtual bool read_input (const std::string &filename,
                            const bool optional = false,
-                           const bool write_stripped_file = false);
+                           const bool write_stripped_file = false,
+                           const std::string &last_line = "");
 
   /**
    * Read input from a string in memory. The lines in memory have to be
    * separated by <tt>@\n</tt> characters.
    *
+   * If non-empty @p last_line is provided, the ParameterHandler object
+   * will stop parsing lines after encountering @p last_line .
+   * This is handy when adding extra data that shall be parsed manually.
+   *
    * Return whether the read was successful.
    */
-  virtual bool read_input_from_string (const char *s);
+  virtual bool read_input_from_string (const char *s,
+                                       const std::string &last_line = "");
 
   /**
    * Read a parameter file in XML format. This could be from a file originally
