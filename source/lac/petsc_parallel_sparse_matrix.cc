@@ -896,7 +896,7 @@ namespace PETScWrappers
 #if DEAL_II_PETSC_VERSION_LT(3,3,0)
       Assert(false,ExcNotImplemented());
 #else
-      PetscInt n_rows, n_cols, n_loc_rows, n_loc_cols, min, max, size;
+      PetscInt n_rows, n_cols, n_loc_rows, n_loc_cols, min, max;
       PetscErrorCode ierr;
 
       ierr = MatGetSize (matrix, &n_rows, &n_cols);
@@ -924,7 +924,7 @@ namespace PETScWrappers
 #if DEAL_II_PETSC_VERSION_LT(3,3,0)
       Assert(false,ExcNotImplemented());
 #else
-      PetscInt n_rows, n_cols, n_loc_rows, n_loc_cols, min, max, size;
+      PetscInt n_rows, n_cols, n_loc_rows, n_loc_cols, min, max;
       PetscErrorCode ierr;
 
       ierr = MatGetSize (matrix, &n_rows, &n_cols);
