@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2015 by the deal.II authors
+// Copyright (C) 1999 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -107,12 +107,12 @@ public:
 #ifdef DEAL_II_WITH_CXX11
   /**
    * Move constructor. Creates a new vector by stealing the internal data of
-   * the vector @p v.
+   * the given argument vector.
    *
    * @note This constructor is only available if deal.II is configured with
    * C++11 support.
    */
-  BlockVector (BlockVector<Number> &&v) = default;
+  BlockVector (BlockVector<Number> &&/*v*/) = default;
 #endif
 
 
@@ -202,13 +202,13 @@ public:
 
 #ifdef DEAL_II_WITH_CXX11
   /**
-   * Move the given vector. This operator replaces the present vector with @p
-   * v by efficiently swapping the internal data structures.
+   * Move the given vector. This operator replaces the present vector with
+   * the contents of the given argument vector.
    *
    * @note This operator is only available if deal.II is configured with C++11
    * support.
    */
-  BlockVector<Number> &operator= (BlockVector<Number> &&v) = default;
+  BlockVector<Number> &operator= (BlockVector<Number> &&/*v*/) = default;
 #endif
 
   /**

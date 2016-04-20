@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2015 by the deal.II authors
+// Copyright (C) 2004 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -584,14 +584,14 @@ public:
   BlockVectorBase (const BlockVectorBase &V) = default;
 
   /**
-   * Move constructor. Each block of the vector @p V is moved into the current
+   * Move constructor. Each block of the argument vector is moved into the current
    * object if the underlying <code>VectorType</code> is move-constructible,
    * otherwise they are copied.
    *
    * @note This constructor is only available if deal.II is configured with
    * C++11 support.
    */
-  BlockVectorBase (BlockVectorBase &&V) = default;
+  BlockVectorBase (BlockVectorBase &&/*V*/) = default;
 #endif
 
   /**
@@ -742,10 +742,11 @@ public:
 
 #ifdef DEAL_II_WITH_CXX11
   /**
-   * Move assignment operator. Move each block of the vector @p V into the
-   * current object if `VectorType` is move-constructible, otherwise copy them.
+   * Move assignment operator. Move each block of the given argument
+   * vector into the current object if `VectorType` is
+   * move-constructible, otherwise copy them.
    */
-  BlockVectorBase &operator= (BlockVectorBase &&V) = default;
+  BlockVectorBase &operator= (BlockVectorBase &&/*V*/) = default;
 #endif
 
   /**
