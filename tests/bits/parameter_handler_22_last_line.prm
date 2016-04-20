@@ -1,0 +1,4 @@
+set var_1 = 1
+
+# end-of-parameter-section
+set var_2 = 1
