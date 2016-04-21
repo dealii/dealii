@@ -60,7 +60,7 @@
       reasonable configuration (we require MueLu starting from 12.0):
       <pre>
 
-	cd trilinos-12.0.1
+	cd trilinos-12.4.2
 	mkdir build
 	cd build
 
@@ -75,6 +75,7 @@
 	-D Trilinos_EXTRA_LINK_FLAGS="-lgfortran" \
 	-D CMAKE_VERBOSE_MAKEFILE=FALSE \
 	-D Trilinos_VERBOSE_CONFIGURE=FALSE \
+	-D Trilinos_ENABLE_EXPLICIT_INSTANTIATION=ON \
 	-D TPL_ENABLE_MPI=ON \
 	-D BUILD_SHARED_LIBS=ON \
 	-D CMAKE_INSTALL_PREFIX:PATH=$HOME/share/trilinos \
