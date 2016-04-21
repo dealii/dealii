@@ -1,0 +1,6 @@
+
+DEAL::A = 4 x 3
+DEAL::B = 3 x 5
+DEAL::A.B = 4 x 5
+DEAL::C = 4 x 5
+DEAL::At.C = 3 x 5
