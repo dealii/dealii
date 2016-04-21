@@ -140,7 +140,8 @@ namespace internal
     {
       // set chunk size for sub-tasks
       const unsigned int gs = internal::Vector::minimum_parallel_grain_size;
-      n_chunks = std::min(4*MultithreadInfo::n_threads(), vec_size / gs);
+      n_chunks = std::min(static_cast<size_type>(4*MultithreadInfo::n_threads()),
+                          vec_size / gs);
       chunk_size = vec_size / n_chunks;
 
       // round to next multiple of 512 (or minimum grain size if that happens
@@ -989,7 +990,8 @@ namespace internal
     {
       // set chunk size for sub-tasks
       const unsigned int gs = internal::Vector::minimum_parallel_grain_size;
-      n_chunks = std::min(4*MultithreadInfo::n_threads(), vec_size / gs);
+      n_chunks = std::min(static_cast<size_type>(4*MultithreadInfo::n_threads()),
+                          vec_size / gs);
       chunk_size = vec_size / n_chunks;
 
       // round to next multiple of 512 (or leave it at the minimum grain size
