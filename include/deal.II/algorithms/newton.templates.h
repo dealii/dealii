@@ -107,6 +107,7 @@ namespace Algorithms
     typename VectorMemory<VectorType>::Pointer Du(mem);
     typename VectorMemory<VectorType>::Pointer res(mem);
 
+    Du->reinit(u);
     res->reinit(u);
     AnyData src1;
     AnyData src2;
