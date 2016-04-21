@@ -42,7 +42,7 @@ inconvenience this causes.
   <br>
   (Daniel Arndt, 2016/04/18)
   </li>
-  
+
   <li> Changed: FlatManifold takes as argument a periodicity option. This
   used to be a Point<dim>, but it should have been a Tensor<1,dim>. This
   is now changed.
@@ -201,6 +201,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: The methods TrilinosWrappers::SparseMatrix::(T)mmult previously
+ produced invalid matrix sizes if the final matrix was non-square. This has
+ been fixed.
+ <br>
+ (Martin Kronbichler, Daniel Jodlbauer, 2016/04/21)
+ </li>
+
  <li> New: Added an optional string parameter to the ParameterHandler::read_input ()
  and ParameterHandler::read_input_from_string() functions.
  When a line which equals this string is encountered, the parsing of parameters
@@ -208,7 +215,6 @@ inconvenience this causes.
  <br>
  (Denis Davydov, 2016/04/20)
  </li>
-
 
  <li> New: Added move operations to IndexSet.
  <br>

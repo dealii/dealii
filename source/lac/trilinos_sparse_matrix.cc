@@ -2295,7 +2295,10 @@ namespace TrilinosWrappers
       // matrix that we got as a result.
       Epetra_CrsMatrix *C_mat;
       ML_Operator2EpetraCrsMatrix(C_, C_mat);
-      C_mat->FillComplete();
+      C_mat->FillComplete(mod_B->DomainMap(),
+                          transpose_left ?
+                          inputleft.trilinos_matrix().DomainMap() :
+                          inputleft.trilinos_matrix().RangeMap());
       C_mat->OptimizeStorage();
       result.reinit (*C_mat);
 
