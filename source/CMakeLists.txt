@@ -87,8 +87,6 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
     # versions:
     #
 
-    # FIXME: There is no INTERFACE_LINK_FLAGS yet... *sigh*
-
     SET_PROPERTY(TARGET ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
       PROPERTY INTERFACE_INCLUDE_DIRECTORIES
         $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include/>
@@ -115,7 +113,11 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
         ${DEAL_II_DEFINITIONS_${build}}
         )
 
+
+    # FIXME: There is no INTERFACE_LINK_FLAGS yet... *sigh*
+
     SET(_flags "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${build}}")
+    SET(_flags "${_flags} ${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${build}}")
     SEPARATE_ARGUMENTS(_flags)
     SET_PROPERTY(TARGET ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
       PROPERTY INTERFACE_COMPILE_OPTIONS ${_flags}
