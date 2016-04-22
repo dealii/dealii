@@ -91,6 +91,16 @@ public:
    */
   AlignedVector (const AlignedVector<T> &vec);
 
+#ifdef DEAL_II_WITH_CXX11
+  /**
+   * Move constructor. Create a new aligned vector by stealing the contents of
+   * @p vec.
+   *
+   * @note This constructor is only available if deal.II is built with C++11.
+   */
+  AlignedVector (AlignedVector<T> &&vec);
+#endif
+
   /**
    * Assignment to the input vector @p vec.
    *
@@ -98,6 +108,16 @@ public:
    */
   AlignedVector &
   operator = (const AlignedVector<T> &vec);
+
+#ifdef DEAL_II_WITH_CXX11
+  /**
+   * Move assignment operator.
+   *
+   * @note This operator is only available if deal.II is built with C++11.
+   */
+  AlignedVector &
+  operator = (AlignedVector<T> &&vec);
+#endif
 
   /**
    * Change the size of the vector. It keeps old elements previously available
@@ -502,6 +522,23 @@ AlignedVector<T>::AlignedVector (const AlignedVector<T> &vec)
 
 
 
+#ifdef DEAL_II_WITH_CXX11
+template < class T >
+inline
+AlignedVector<T>::AlignedVector (AlignedVector<T> &&vec)
+  :
+  _data (vec._data),
+  _end_data (vec._end_data),
+  _end_allocated (vec._end_allocated)
+{
+  vec._data = nullptr;
+  vec._end_data = nullptr;
+  vec._end_allocated = nullptr;
+}
+#endif
+
+
+
 template < class T >
 inline
 AlignedVector<T> &
@@ -512,6 +549,28 @@ AlignedVector<T>::operator = (const AlignedVector<T> &vec)
   internal::AlignedVectorMove<T> (vec._data, vec._end_data, _data, true);
   return *this;
 }
+
+
+
+#ifdef DEAL_II_WITH_CXX11
+template < class T >
+inline
+AlignedVector<T> &
+AlignedVector<T>::operator = (AlignedVector<T> &&vec)
+{
+  clear();
+
+  _data = vec._data;
+  _end_data = vec._end_data;
+  _end_allocated = vec._end_allocated;
+
+  vec._data = nullptr;
+  vec._end_data = nullptr;
+  vec._end_allocated = nullptr;
+
+  return *this;
+}
+#endif
 
 
 
