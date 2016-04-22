@@ -399,8 +399,8 @@ public:
    * - Files generated in Abaqus CAE 6.12 have been verified to be
    * correctly imported, but older (or newer) versions of Abaqus may also
    * generate valid input decks.
-   * - Files generated using Cubit 11.x, 12.x and 13.x are valid, but only
-   * when using a specific set of export steps. These are as follows:
+   * - Files generated using Cubit 11.x, 12.x, 13.x, 14.x and 15.x are valid,
+   * but only when using a specific set of export steps. These are as follows:
    *     - Go to "Analysis setup mode" by clicking on the disc icon in the
    * toolbar on the right.
    *     - Select "Export Mesh" under "Operation" by clicking on the
