@@ -2829,11 +2829,12 @@ MultipleParameterLoop::~MultipleParameterLoop ()
 
 
 bool MultipleParameterLoop::read_input (std::istream &input,
-                                        const std::string &filename)
+                                        const std::string &filename,
+                                        const std::string &last_line)
 {
   AssertThrow (input, ExcIO());
 
-  bool x = ParameterHandler::read_input (input, filename);
+  bool x = ParameterHandler::read_input (input, filename, last_line);
   if (x)
     init_branches ();
   return x;
