@@ -2285,13 +2285,18 @@ public:
    *
    * Return whether the read was successful.
    *
+   * If non-empty @p last_line is provided, the ParameterHandler object
+   * will stop parsing lines after encountering @p last_line .
+   * This is handy when adding extra data that shall be parsed manually.
+   *
    * @note Of the three <tt>read_input</tt> functions implemented by
    * ParameterHandler, this is the only one overridden with new behavior by
    * this class. This is because the other two <tt>read_input</tt> functions
    * just reformat their inputs and then call this version.
    */
   virtual bool read_input (std::istream &input,
-                           const std::string &filename = "input file");
+                           const std::string &filename = "input file",
+                           const std::string &last_line = "");
 
   /**
    * Overriding virtual functions which are overloaded (like
