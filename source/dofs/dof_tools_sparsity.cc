@@ -786,12 +786,17 @@ namespace DoFTools
                     {
                       typename DoFHandlerType::level_cell_iterator
                       neighbor = cell->neighbor_or_periodic_neighbor (face_n);
-                      // If the cells are on the same level then only add to
-                      // the sparsity pattern if the current cell is 'greater'
-                      // in the total ordering.
+                      // If the cells are on the same level (and both are
+                      // active, locally-owned cells) then only add to the
+                      // sparsity pattern if the current cell is 'greater' in
+                      // the total ordering.
                       if (neighbor->level () == cell->level ()
                           &&
-                          neighbor->index () > cell->index ())
+                          neighbor->index () > cell->index ()
+                          &&
+                          neighbor->active ()
+                          &&
+                          neighbor->is_locally_owned ())
                         continue;
                       // If we are more refined then the neighbor, then we
                       // will automatically find the active neighbor cell when
@@ -799,11 +804,17 @@ namespace DoFTools
                       // not true; if the neighbor is more refined then the
                       // call 'neighbor (face_n)' will *not* return an active
                       // cell. Hence, only add things to the sparsity pattern
-                      // if the neighbor is coarser than the current cell.
+                      // if (when the levels are different) the neighbor is
+                      // coarser than the current cell.
+                      //
+                      // Like above, do not use this optimization if the
+                      // neighbor is not locally owned.
                       if (neighbor->level () != cell->level ()
                           &&
                           ((!periodic_neighbor && !cell->neighbor_is_coarser (face_n))
-                           ||(periodic_neighbor && !cell->periodic_neighbor_is_coarser (face_n))))
+                           ||(periodic_neighbor && !cell->periodic_neighbor_is_coarser (face_n)))
+                          &&
+                          neighbor->is_locally_owned ())
                         continue; // (the neighbor is finer)
 
                       const unsigned int
