@@ -307,8 +307,12 @@ namespace TrilinosWrappers
        * dimension and the parallel distribution of the input vector, but does
        * not copy the elements in <tt>v</tt>. If <tt>omit_zeroing_entries</tt>
        * is not <tt>true</tt>, the elements in the vector are initialized with
-       * zero, otherwise the content will be left unchanged and the user has
-       * to set all elements.
+       * zero. If it is set to <tt>true</tt>, the vector entries are in an
+       * unspecified state and the user has to set all elements. In the
+       * current implementation, this method does not touch the vector entries
+       * in case the vector layout is unchanged from before, otherwise entries
+       * are set to zero.  Note that this behavior might change between
+       * releases without notification.
        *
        * This function has a third argument, <tt>allow_different_maps</tt>,
        * that allows for an exchange of data between two equal-sized vectors
@@ -567,7 +571,11 @@ namespace TrilinosWrappers
        * Reinit functionality. This function destroys the old vector content
        * and generates a new one based on the input partitioning.  The flag
        * <tt>omit_zeroing_entries</tt> determines whether the vector should be
-       * filled with zero (false) or left untouched (true).
+       * filled with zero (false). If the flag is set to <tt>true</tt>, the
+       * vector entries are in an unspecified state and the user has to set
+       * all elements. In the current implementation, this method still sets
+       * the entries to zero, but this might change between releases without
+       * notification.
        *
        *
        * Depending on whether the @p parallel_partitioning argument uniquely
@@ -796,7 +804,12 @@ namespace TrilinosWrappers
 
     /**
      * Reinit function that resizes the vector to the size specified by
-     * <tt>n</tt>.
+     * <tt>n</tt>. The flag <tt>omit_zeroing_entries</tt> specifies whether
+     * the vector entries should be initialized to zero (false). If it is set
+     * to <tt>true</tt>, the vector entries are in an unspecified state and
+     * the user has to set all elements. In the current implementation, this
+     * method still sets the entries to zero, but this might change between
+     * releases without notification.
      */
     void reinit (const size_type n,
                  const bool      omit_zeroing_entries = false);
@@ -808,7 +821,11 @@ namespace TrilinosWrappers
      * in the localized vector should be imported from a distributed vector
      * that has been initialized with the same communicator. The variable
      * <tt>omit_zeroing_entries</tt> determines whether the vector should be
-     * filled with zero or left untouched.
+     * filled with zero (false). If it is set to <tt>true</tt>, the vector
+     * entries are in an unspecified state and the user has to set all
+     * elements. In the current implementation, this method still sets the
+     * entries to zero, but this might change between releases without
+     * notification.
      *
      * Which element of the @p input_map argument are set is in fact ignored,
      * the only thing that matters is the size of the index space described by
@@ -824,7 +841,11 @@ namespace TrilinosWrappers
      * in the localized vector should be imported from a distributed vector
      * that has been initialized with the same communicator. The variable
      * <tt>omit_zeroing_entries</tt> determines whether the vector should be
-     * filled with zero (false) or left untouched (true).
+     * filled with zero (false). If it is set to <tt>true</tt>, the vector
+     * entries are in an unspecified state and the user has to set all
+     * elements. In the current implementation, this method still sets the
+     * entries to zero, but this might change between releases without
+     * notification.
      *
      * Which element of the @p input_map argument are set is in fact ignored,
      * the only thing that matters is the size of the index space described by
@@ -837,6 +858,15 @@ namespace TrilinosWrappers
     /**
      * Reinit function. Takes the information of a Vector and copies
      * everything to the calling vector, now also allowing different maps.
+     *
+     * If the optional flag <tt>omit_zeroing_entries</tt> is not
+     * <tt>true</tt>, the elements in the vector are initialized with zero. If
+     * it is set to <tt>true</tt>, the vector entries are in an unspecified
+     * state and the user has to set all elements. In the current
+     * implementation, this method does not touch the vector entries in case
+     * the vector layout is unchanged from before, otherwise entries are set
+     * to zero.  Note that this behavior might change between releases without
+     * notification.
      */
     void reinit (const VectorBase &V,
                  const bool        omit_zeroing_entries = false,

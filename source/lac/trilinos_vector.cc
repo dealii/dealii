@@ -199,18 +199,11 @@ namespace TrilinosWrappers
 
     void
     Vector::reinit (const Epetra_Map &input_map,
-                    const bool        omit_zeroing_entries)
+                    const bool      /*omit_zeroing_entries*/)
     {
       nonlocal_vector.reset();
 
-      if (vector->Map().SameAs(input_map)==false)
-        vector.reset (new Epetra_FEVector(input_map));
-      else if (omit_zeroing_entries == false)
-        {
-          const int ierr = vector->PutScalar(0.);
-          (void)ierr;
-          Assert (ierr == 0, ExcTrilinosError(ierr));
-        }
+      vector.reset (new Epetra_FEVector(input_map));
 
       has_ghosts = vector->Map().UniqueGIDs()==false;
       last_action = Zero;
@@ -244,7 +237,19 @@ namespace TrilinosWrappers
       // with the map in v, and generate the vector.
       if (allow_different_maps == false)
         {
-          if (vector->Map().SameAs(v.vector->Map()) == false)
+          // check equality for MPI communicators: We can only choose the fast
+          // version in case the underlying Epetra_MpiComm object is the same,
+          // otherwise we might access an MPI_Comm object that has been
+          // deleted
+#ifdef DEAL_II_WITH_MPI
+          const Epetra_MpiComm *my_comm = dynamic_cast<const Epetra_MpiComm *>(&vector->Comm());
+          const Epetra_MpiComm *v_comm = dynamic_cast<const Epetra_MpiComm *>(&v.vector->Comm());
+          const bool same_communicators = my_comm != NULL && v_comm != NULL &&
+                                          my_comm->DataPtr() == v_comm->DataPtr();
+#else
+          const bool same_communicators = true;
+#endif
+          if (!same_communicators || vector->Map().SameAs(v.vector->Map()) == false)
             {
               vector.reset (new Epetra_FEVector(v.vector->Map()));
               has_ghosts = v.has_ghosts;
@@ -252,11 +257,8 @@ namespace TrilinosWrappers
             }
           else if (omit_zeroing_entries == false)
             {
-              // old and new vectors
-              // have exactly the
-              // same map, i.e. size
-              // and parallel
-              // distribution
+              // old and new vectors have exactly the same map, i.e. size and
+              // parallel distribution
               int ierr;
               ierr = vector->GlobalAssemble (last_action);
               (void)ierr;
@@ -397,11 +399,22 @@ namespace TrilinosWrappers
     Vector &
     Vector::operator = (const Vector &v)
     {
+      // check equality for MPI communicators to avoid accessing a possibly
+      // invalid MPI_Comm object
+#ifdef DEAL_II_WITH_MPI
+      const Epetra_MpiComm *my_comm = dynamic_cast<const Epetra_MpiComm *>(&vector->Comm());
+      const Epetra_MpiComm *v_comm = dynamic_cast<const Epetra_MpiComm *>(&v.vector->Comm());
+      const bool same_communicators = my_comm != NULL && v_comm != NULL &&
+                                      my_comm->DataPtr() == v_comm->DataPtr();
+#else
+      const bool same_communicators = true;
+#endif
+
       // distinguish three cases. First case: both vectors have the same
       // layout (just need to copy the local data, not reset the memory and
       // the underlying Epetra_Map). The third case means that we have to
       // rebuild the calling vector.
-      if (vector->Map().SameAs(v.vector->Map()))
+      if (same_communicators && vector->Map().SameAs(v.vector->Map()))
         {
           *vector = *v.vector;
           if (v.nonlocal_vector.get() != 0)
@@ -562,24 +575,11 @@ namespace TrilinosWrappers
 
   void
   Vector::reinit (const size_type n,
-                  const bool      omit_zeroing_entries)
+                  const bool    /*omit_zeroing_entries*/)
   {
-    if (size() != n)
-      {
-        Epetra_LocalMap map ((TrilinosWrappers::types::int_type)n, 0,
-                             Utilities::Trilinos::comm_self());
-        vector.reset (new Epetra_FEVector (map));
-      }
-    else if (omit_zeroing_entries == false)
-      {
-        int ierr;
-        ierr = vector->GlobalAssemble(last_action);
-        (void)ierr;
-        Assert (ierr == 0, ExcTrilinosError(ierr));
-
-        ierr = vector->PutScalar(0.0);
-        Assert (ierr == 0, ExcTrilinosError(ierr));
-      }
+    Epetra_LocalMap map ((TrilinosWrappers::types::int_type)n, 0,
+                         Utilities::Trilinos::comm_self());
+    vector.reset (new Epetra_FEVector (map));
 
     last_action = Zero;
   }
@@ -588,25 +588,12 @@ namespace TrilinosWrappers
 
   void
   Vector::reinit (const Epetra_Map &input_map,
-                  const bool        omit_zeroing_entries)
+                  const bool     /*omit_zeroing_entries*/)
   {
-    if (n_global_elements(vector->Map()) != n_global_elements(input_map))
-      {
-        Epetra_LocalMap map (n_global_elements(input_map),
-                             input_map.IndexBase(),
-                             input_map.Comm());
-        vector.reset (new Epetra_FEVector (map));
-      }
-    else if (omit_zeroing_entries == false)
-      {
-        int ierr;
-        ierr = vector->GlobalAssemble(last_action);
-        (void)ierr;
-        Assert (ierr == 0, ExcTrilinosError(ierr));
-
-        ierr = vector->PutScalar(0.0);
-        Assert (ierr == 0, ExcTrilinosError(ierr));
-      }
+    Epetra_LocalMap map (n_global_elements(input_map),
+                         input_map.IndexBase(),
+                         input_map.Comm());
+    vector.reset (new Epetra_FEVector (map));
 
     last_action = Zero;
   }
@@ -616,31 +603,17 @@ namespace TrilinosWrappers
   void
   Vector::reinit (const IndexSet &partitioning,
                   const MPI_Comm &communicator,
-                  const bool      omit_zeroing_entries)
+                  const bool    /*omit_zeroing_entries*/)
   {
-    if (n_global_elements(vector->Map()) !=
-        static_cast<TrilinosWrappers::types::int_type>(partitioning.size()))
-      {
-        Epetra_LocalMap map (static_cast<TrilinosWrappers::types::int_type>(partitioning.size()),
-                             0,
+    Epetra_LocalMap map (static_cast<TrilinosWrappers::types::int_type>(partitioning.size()),
+                         0,
 #ifdef DEAL_II_WITH_MPI
-                             Epetra_MpiComm(communicator));
+                         Epetra_MpiComm(communicator));
 #else
-                             Epetra_SerialComm());
-        (void)communicator;
+                         Epetra_SerialComm());
+    (void)communicator;
 #endif
-        vector.reset (new Epetra_FEVector(map));
-      }
-    else if (omit_zeroing_entries == false)
-      {
-        int ierr;
-        ierr = vector->GlobalAssemble(last_action);
-        (void)ierr;
-        Assert (ierr == 0, ExcTrilinosError(ierr));
-
-        ierr = vector->PutScalar(0.0);
-        Assert (ierr == 0, ExcTrilinosError(ierr));
-      }
+    vector.reset (new Epetra_FEVector(map));
 
     last_action = Zero;
   }
@@ -659,17 +632,25 @@ namespace TrilinosWrappers
     // the vector, initialize our
     // map with the map in v, and
     // generate the vector.
-    (void)omit_zeroing_entries;
     if (allow_different_maps == false)
       {
-        if (local_range() != v.local_range())
+        // check equality for MPI communicators
+#ifdef DEAL_II_WITH_MPI
+        const Epetra_MpiComm *my_comm = dynamic_cast<const Epetra_MpiComm *>(&vector->Comm());
+        const Epetra_MpiComm *v_comm = dynamic_cast<const Epetra_MpiComm *>(&v.vector->Comm());
+        const bool same_communicators = my_comm != NULL && v_comm != NULL &&
+                                        my_comm->DataPtr() == v_comm->DataPtr();
+#else
+        const bool same_communicators = true;
+#endif
+        if (!same_communicators || local_range() != v.local_range())
           {
             Epetra_LocalMap map (global_length(*(v.vector)),
                                  v.vector->Map().IndexBase(),
                                  v.vector->Comm());
             vector.reset (new Epetra_FEVector(map));
           }
-        else
+        else if (omit_zeroing_entries)
           {
             int ierr;
             Assert (vector->Map().SameAs(v.vector->Map()) == true,

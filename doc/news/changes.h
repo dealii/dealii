@@ -201,6 +201,15 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: TrilinosWrappers::MPI::Vector and TrilinosWrappers::Vector could
+ access invalid memory in the reinit() method if the MPI communicator was
+ deleted before termination of the program. This usually happened when using
+ vectors from GrowingVectorMemory where a pool keeps vector alive. This has
+ been fixed.
+ <br>
+ (Martin Kronbichler, 2016/04/23)
+ </li>
+
  <li> Fixed: The methods TrilinosWrappers::SparseMatrix::(T)mmult previously
  produced invalid matrix sizes if the final matrix was non-square. This has
  been fixed.
