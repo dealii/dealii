@@ -198,6 +198,7 @@ namespace internal
       functor(0,vec_size);
 #else
     functor(0,vec_size);
+    (void)partitioner;
 #endif
   }
 
@@ -1083,6 +1084,7 @@ namespace internal
       accumulate_recursive(op,0,vec_size,result);
 #else
     accumulate_recursive(op,0,vec_size,result);
+    (void)partitioner;
 #endif
   }
 }
