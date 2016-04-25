@@ -201,6 +201,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: TrilinosWrappers::SparseMatrix will now exit early if there are no
+ entries to add to the matrix. This usually occurs when zero elision is on. This
+ fixes a bug where the matrix raises an exception if there are no entries to add
+ to a matrix and the provided row and column values are not locally stored.
+ <br>
+ (David Wells, 2016/04/24)
+ </li>
+
  <li> Fixed: TrilinosWrappers::MPI::Vector and TrilinosWrappers::Vector could
  access invalid memory in the reinit() method if the MPI communicator was
  deleted before termination of the program. This usually happened when using

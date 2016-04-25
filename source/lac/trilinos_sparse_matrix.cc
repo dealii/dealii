@@ -1656,6 +1656,11 @@ namespace TrilinosWrappers
         Assert(n_columns <= (TrilinosWrappers::types::int_type)n_cols, ExcInternalError());
 
       }
+    // Exit early if there is nothing to do
+    if (n_columns == 0)
+      {
+        return;
+      }
 
     // If the calling processor owns the row to which we want to add values, we
     // can directly call the Epetra_CrsMatrix input function, which is much
