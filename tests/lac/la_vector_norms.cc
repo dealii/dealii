@@ -108,10 +108,7 @@ int main()
 
   check_norms<float>();
   check_norms<double>();
-  check_norms<long double>();
   check_complex_norms<double>();
   check_complex_norms<float>();
   deallog << "OK" << std::endl;
 }
-
-

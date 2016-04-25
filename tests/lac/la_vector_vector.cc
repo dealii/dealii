@@ -142,7 +142,6 @@ int main()
 
   LinearAlgebra::Vector<double>      d1(N), d2(N);
   LinearAlgebra::Vector<float>       f1(N), f2(N);
-  LinearAlgebra::Vector<long double> l1(N), l2(N);
 
   // cross-tests with double/float
   // vectors at the same time are not
@@ -152,7 +151,4 @@ int main()
   // arguments
   check_vectors (d1, d2);
   check_vectors (f1, f2);
-  check_vectors (l1, l2);
 }
-
-

@@ -1,8 +1,7 @@
 BOOL            := { true; false }
-REAL_SCALARS    := { double; float; long double }
+REAL_SCALARS    := { double; float }
 COMPLEX_SCALARS := { std::complex<double>;
-                     std::complex<float>;
-                     std::complex<long double> }
+                     std::complex<float> }
 
 DERIVATIVE_TENSORS := { double;
                         Tensor<1,deal_II_dimension>;
@@ -12,19 +11,15 @@ DEAL_II_VEC_TEMPLATES := { Vector; BlockVector }
 
 SERIAL_VECTORS := { Vector<double>;
                     Vector<float> ;
-                    Vector<long double>;
 
                     BlockVector<double>;
                     BlockVector<float>;
-                    BlockVector<long double>;
 
                     parallel::distributed::Vector<double>;
                     parallel::distributed::Vector<float> ;
-                    parallel::distributed::Vector<long double>;
 
                     parallel::distributed::BlockVector<double>;
                     parallel::distributed::BlockVector<float> ;
-                    parallel::distributed::BlockVector<long double>;
 
                     @DEAL_II_EXPAND_TRILINOS_VECTOR@;
                     @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
@@ -39,24 +34,20 @@ SERIAL_VECTORS := { Vector<double>;
 
 REAL_SERIAL_VECTORS := { Vector<double>;
                     Vector<float> ;
-                    Vector<long double>;
 
                     BlockVector<double>;
                     BlockVector<float>;
-                    BlockVector<long double>;
 
                     parallel::distributed::Vector<double>;
                     parallel::distributed::Vector<float> ;
-                    parallel::distributed::Vector<long double>;
 
                     parallel::distributed::BlockVector<double>;
                     parallel::distributed::BlockVector<float> ;
-                    parallel::distributed::BlockVector<long double>;
 
                     @DEAL_II_EXPAND_TRILINOS_VECTOR@;
                     @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
                     @DEAL_II_EXPAND_PETSC_VECTOR_REAL@;
-                    @DEAL_II_EXPAND_PETSC_MPI_VECTOR_REAL@;                    
+                    @DEAL_II_EXPAND_PETSC_MPI_VECTOR_REAL@;
 
                     @DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR@;
                     @DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR@;
@@ -78,11 +69,9 @@ EXTERNAL_PARALLEL_VECTORS := { @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
 
 VECTORS_WITH_MATRIX := { Vector<double>;
                     Vector<float> ;
-                    Vector<long double>;
 
                     BlockVector<double>;
                     BlockVector<float>;
-                    BlockVector<long double>;
 
                     parallel::distributed::Vector<double>;
 

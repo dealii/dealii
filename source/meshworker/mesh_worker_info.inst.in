@@ -35,13 +35,6 @@ namespace MeshWorker
   template void IntegrationInfo<deal_II_dimension>::fill_local_data(
     const DoFInfo<deal_II_dimension, deal_II_dimension, double>&, bool);
 
-  template class DoFInfo<deal_II_dimension,deal_II_dimension,long double>;
-  template class DoFInfoBox<deal_II_dimension,
-                            DoFInfo<deal_II_dimension,deal_II_dimension,long double> >;
-
-  template void IntegrationInfo<deal_II_dimension>::fill_local_data(
-    const DoFInfo<deal_II_dimension, deal_II_dimension, long double>&, bool);
-
 //   template void IntegrationInfo<deal_II_dimension>
 //   ::initialize<FEValues<deal_II_dimension> >(
 //     const FiniteElement<deal_II_dimension>&, const Mapping<deal_II_dimension>&,

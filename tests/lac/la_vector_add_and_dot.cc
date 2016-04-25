@@ -83,9 +83,6 @@ int main()
 
   check<float>();
   check<double>();
-  check<long double>();
   check<std::complex<double> >();
   deallog << "OK" << std::endl;
 }
-
-

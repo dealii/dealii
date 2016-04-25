@@ -45,11 +45,9 @@ int main()
 
   MyFunction<1, std::complex<double> > function_1;
   MyFunction<2, std::complex<float> > function_2;
-  MyFunction<3, std::complex<long double> > function_3;
 
   MyTensorFunction<1, 1, std::complex<double> > tensor_function_1;
   MyTensorFunction<2, 2, std::complex<float> > tensor_function_2;
-  MyTensorFunction<3, 3, std::complex<long double> > tensor_function_3;
 
   deallog << "OK" << std::endl;
 }

@@ -1177,23 +1177,6 @@ namespace MatrixCreator
       Assert(false,ExcNotImplemented());
     }
 
-    template <>
-    void
-    inline
-    create_boundary_mass_matrix_1<1,3,long double> (DoFHandler<1,3>::active_cell_iterator const &/*cell*/,
-                                                    MatrixCreator::internal::AssemblerBoundary::Scratch const &,
-                                                    MatrixCreator::internal::AssemblerBoundary::CopyData<DoFHandler<1,
-                                                    3>,long double > &/*copy_data*/,
-                                                    Mapping<1,3> const &,
-                                                    FiniteElement<1,3> const &,
-                                                    Quadrature<0> const &,
-                                                    std::map<types::boundary_id, const Function<3,long double>*> const &/*boundary_functions*/,
-                                                    Function<3,long double> const *const /*coefficient*/,
-                                                    std::vector<unsigned int> const &/*component_mapping*/)
-    {
-      Assert(false,ExcNotImplemented());
-    }
-
   }
 
 
