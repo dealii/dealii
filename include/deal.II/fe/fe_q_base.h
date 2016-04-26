@@ -267,6 +267,17 @@ public:
   compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
   //@}
 
+  /**
+   * Attempt to construct an FE_Q object of degree 0
+   *
+   * @ingroup Exceptions
+   */
+  DeclExceptionMsg (ExcFEQCannotHaveDegree0,
+                    "FE_Q can only be used for polynomial degrees "
+                    "greater than zero. If you want an element of polynomial "
+                    "degree zero, then it cannot be continuous and you "
+                    "will want to use FE_DGQ<dim>(0).");
+
 protected:
   /**
    * Only for internal use. Its full name is @p get_dofs_per_object_vector

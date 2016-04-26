@@ -25,17 +25,17 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
+  template <int dim, int spacedim>
   std::vector<Point<1> >
   get_QGaussLobatto_points (const unsigned int degree)
   {
     if (degree > 0)
       return QGaussLobatto<1>(degree+1).get_points();
     else
-      AssertThrow(false,
-                  ExcMessage ("FE_Q can only be used for polynomial degrees "
-                              "greater than zero. If you want an element of polynomial "
-                              "degree zero, then it cannot be continuous and you "
-                              "will want to use FE_DGQ<dim>(0)."));
+      {
+        typedef FE_Q_Base<TensorProductPolynomials<dim>, dim, spacedim> FEQ;
+        AssertThrow(false, typename FEQ::ExcFEQCannotHaveDegree0());
+      }
     return std::vector<Point<1> >();
   }
 }
@@ -46,13 +46,13 @@ template <int dim, int spacedim>
 FE_Q<dim,spacedim>::FE_Q (const unsigned int degree)
   :
   FE_Q_Base<TensorProductPolynomials<dim>, dim, spacedim>
-  (TensorProductPolynomials<dim>(Polynomials::generate_complete_Lagrange_basis(get_QGaussLobatto_points(degree))),
+  (TensorProductPolynomials<dim>(Polynomials::generate_complete_Lagrange_basis(get_QGaussLobatto_points<dim,spacedim>(degree))),
    FiniteElementData<dim>(this->get_dpo_vector(degree),
                           1, degree,
                           FiniteElementData<dim>::H1),
    std::vector<bool> (1, false))
 {
-  this->initialize(get_QGaussLobatto_points(degree));
+  this->initialize(get_QGaussLobatto_points<dim,spacedim>(degree));
 }
 
 
@@ -67,12 +67,6 @@ FE_Q<dim,spacedim>::FE_Q (const Quadrature<1> &points)
                            FiniteElementData<dim>::H1),
     std::vector<bool> (1, false))
 {
-  const unsigned int degree = points.size()-1;
-  (void)degree;
-  Assert (degree > 0,
-          ExcMessage ("This element can only be used for polynomial degrees "
-                      "at least zero"));
-
   this->initialize(points.get_points());
 }
 
