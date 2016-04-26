@@ -25,6 +25,7 @@ SET(_src
   exceptions.cc
   flow_function.cc
   function.cc
+  function_cspline.cc
   function_derivative.cc
   function_lib.cc
   function_lib_cutoff.cc
