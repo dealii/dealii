@@ -1,2 +1,2 @@
 
-DEAL::ExcMessage("FE_Q needs to be of degree > 0.")
+DEAL::ExcFEQCannotHaveDegree0()
