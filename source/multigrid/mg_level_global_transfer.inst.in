@@ -45,9 +45,6 @@ for (deal_II_dimension : DIMENSIONS)
     template
       void MGLevelGlobalTransfer< parallel::distributed::Vector<float> >::fill_and_communicate_copy_indices<deal_II_dimension,deal_II_dimension>(
         const DoFHandler<deal_II_dimension,deal_II_dimension> &mg_dof);
-    template
-      void MGLevelGlobalTransfer< parallel::distributed::Vector<long double> >::fill_and_communicate_copy_indices<deal_II_dimension,deal_II_dimension>(
-        const DoFHandler<deal_II_dimension,deal_II_dimension> &mg_dof);
   }
 
 for (deal_II_dimension : DIMENSIONS; S1, S2 : REAL_SCALARS)

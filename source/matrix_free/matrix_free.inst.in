@@ -39,8 +39,5 @@ for (deal_II_dimension : DIMENSIONS)
   template void internal::MatrixFreeFunctions::ShapeInfo<float>::reinit
   <deal_II_dimension>(const Quadrature<1> &, const FiniteElement
                       <deal_II_dimension,deal_II_dimension> &, const unsigned int);
-  template void internal::MatrixFreeFunctions::ShapeInfo<long double>::reinit
-  <deal_II_dimension>(const Quadrature<1> &, const FiniteElement
-                      <deal_II_dimension,deal_II_dimension> &, const unsigned int);
 #endif
 }

@@ -579,10 +579,9 @@ MGLevelGlobalTransfer<parallel::distributed::Vector<Number> >::memory_consumptio
 // explicit instantiation
 #include "mg_level_global_transfer.inst"
 
-// create two additional instantiations currently not supported by the
-// automatic template instantiation scheme
+// create an additional instantiation currently not supported by the automatic
+// template instantiation scheme
 template class MGLevelGlobalTransfer<parallel::distributed::Vector<float> >;
-template class MGLevelGlobalTransfer<parallel::distributed::Vector<long double> >;
 
 
 DEAL_II_NAMESPACE_CLOSE

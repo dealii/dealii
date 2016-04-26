@@ -20,6 +20,18 @@ DEAL_II_NAMESPACE_OPEN
 
 #include "full_matrix.inst"
 
+// instantiate for long double manually because we use it in a few places
+// inside the library
+template class FullMatrix<long double>;
+template void FullMatrix<long double>::invert<long double> (const FullMatrix<long double> &);
+template void FullMatrix<long double>::mmult<long double> (FullMatrix<long double> &, const FullMatrix<long double> &, const bool) const;
+template void FullMatrix<long double>::Tmmult<long double> (FullMatrix<long double> &, const FullMatrix<long double> &, const bool) const;
+template void FullMatrix<long double>::mTmult<long double> (FullMatrix<long double> &, const FullMatrix<long double> &, const bool) const;
+template void FullMatrix<long double>::TmTmult<long double> (FullMatrix<long double> &, const FullMatrix<long double> &, const bool) const;
+template void FullMatrix<long double>::vmult<long double>(Vector<long double> &, const Vector<long double> &, bool) const;
+template void FullMatrix<long double>::Tvmult<long double>(Vector<long double> &, const Vector<long double> &, bool) const;
+template void FullMatrix<long double>::add<long double> (const long double, const FullMatrix<long double> &);
+
 // This is needed if PETSc was compiled with complex, though, it may
 // be used elsewhere too.
 template void dealii::FullMatrix<double>::vmult<std::complex<double> >(dealii::Vector<std::complex<double> > &, dealii::Vector<std::complex<double> > const &, bool) const;
@@ -36,21 +48,8 @@ template void dealii::FullMatrix<double>::vmult<std::complex<double> >(dealii::V
 TEMPL_OP_EQ(double,float);
 TEMPL_OP_EQ(float,double);
 
-TEMPL_OP_EQ(long double,double);
-TEMPL_OP_EQ(double,long double);
-
-TEMPL_OP_EQ(long double,float);
-TEMPL_OP_EQ(float,long double);
-
-
 TEMPL_OP_EQ(std::complex<double>,std::complex<float>);
 TEMPL_OP_EQ(std::complex<float>,std::complex<double>);
-
-TEMPL_OP_EQ(std::complex<long double>,std::complex<double>);
-TEMPL_OP_EQ(std::complex<double>,std::complex<long double>);
-
-TEMPL_OP_EQ(std::complex<long double>,std::complex<float>);
-TEMPL_OP_EQ(std::complex<float>,std::complex<long double>);
 
 #undef TEMPL_OP_EQ
 

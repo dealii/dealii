@@ -26,6 +26,5 @@ DEAL_II_NAMESPACE_OPEN
 
 template struct internal::MatrixFreeFunctions::ShapeInfo<double>;
 template struct internal::MatrixFreeFunctions::ShapeInfo<float>;
-template struct internal::MatrixFreeFunctions::ShapeInfo<long double>;
 
 DEAL_II_NAMESPACE_CLOSE

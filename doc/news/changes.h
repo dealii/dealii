@@ -38,6 +38,21 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Changed: deal.II used to create template instantiations for scalar
+  types <tt>double</tt>, <tt>float</tt>, and <tt>long double</tt>. Since
+  <tt>long double</tt> is rarely used and the additional precision does
+  usually not pay off because most of the other arithmetics in deal.II are
+  only done using <tt>double</tt> variables, it is not instantiated by default
+  any more. This reduces the library size by up to 20 percent. In case you
+  need instantiations of certain methods using <tt>long double</tt> data
+  structures and get linker errors stating undefined symbols involving
+  <tt>long double</tt>, include the respective <tt>.templates.h</tt> file(s)
+  with the code definitions. See the section on @ref Instantiations in the
+  manual for further information.
+  <br>
+  (Martin Kronbichler, 2016/04/26)
+  </li>
+
   <li> Improved: MeshWorker treats periodic faces as interior faces.
   <br>
   (Daniel Arndt, 2016/04/18)

@@ -26,6 +26,10 @@ template Vector<double> &Vector<double>::operator=<int> (const dealii::Vector<in
 template
 void Vector<int>::reinit<double>(const Vector<double> &, const bool);
 
+// instantiate for long double manually because we use it in a few places:
+template class Vector<long double>;
+template long double Vector<long double>::operator *<long double>(const Vector<long double> &) const;
+
 
 // do a few functions that currently don't fit the scheme because they have
 // two template arguments that need to be different (the case of same
@@ -40,21 +44,9 @@ void Vector<int>::reinit<double>(const Vector<double> &, const bool);
 TEMPL_COPY_CONSTRUCTOR(double,float);
 TEMPL_COPY_CONSTRUCTOR(float,double);
 
-TEMPL_COPY_CONSTRUCTOR(long double,double);
-TEMPL_COPY_CONSTRUCTOR(double,long double);
-
-TEMPL_COPY_CONSTRUCTOR(long double,float);
-TEMPL_COPY_CONSTRUCTOR(float,long double);
-
 
 TEMPL_COPY_CONSTRUCTOR(std::complex<double>,std::complex<float>);
 TEMPL_COPY_CONSTRUCTOR(std::complex<float>,std::complex<double>);
-
-TEMPL_COPY_CONSTRUCTOR(std::complex<long double>,std::complex<double>);
-TEMPL_COPY_CONSTRUCTOR(std::complex<double>,std::complex<long double>);
-
-TEMPL_COPY_CONSTRUCTOR(std::complex<long double>,std::complex<float>);
-TEMPL_COPY_CONSTRUCTOR(std::complex<float>,std::complex<long double>);
 
 #endif
 
@@ -68,21 +60,9 @@ TEMPL_COPY_CONSTRUCTOR(std::complex<float>,std::complex<long double>);
 TEMPL_OP_EQ(double,float);
 TEMPL_OP_EQ(float,double);
 
-TEMPL_OP_EQ(long double,double);
-TEMPL_OP_EQ(double,long double);
-
-TEMPL_OP_EQ(long double,float);
-TEMPL_OP_EQ(float,long double);
-
 
 TEMPL_OP_EQ(std::complex<double>,std::complex<float>);
 TEMPL_OP_EQ(std::complex<float>,std::complex<double>);
-
-TEMPL_OP_EQ(std::complex<long double>,std::complex<double>);
-TEMPL_OP_EQ(std::complex<double>,std::complex<long double>);
-
-TEMPL_OP_EQ(std::complex<long double>,std::complex<float>);
-TEMPL_OP_EQ(std::complex<float>,std::complex<long double>);
 
 #undef TEMPL_OP_EQ
 

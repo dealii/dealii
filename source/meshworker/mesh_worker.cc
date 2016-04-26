@@ -56,7 +56,6 @@ namespace MeshWorker
 
   template class LocalResults<float>;
   template class LocalResults<double>;
-  template class LocalResults<long double>;
 
   template <int dim, int spacedim, typename number>
   LocalIntegrator<dim, spacedim, number>::LocalIntegrator ()

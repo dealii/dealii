@@ -12,11 +12,6 @@ DEAL::Add and dot should be 13.40, is 13.40
 DEAL::Add and dot should be 26.50, is 26.50
 DEAL::Add and dot should be 39.61, is 39.61
 DEAL::Add and dot should be 52.71, is 52.71
-DEAL::Add and dot should be 0.30, is 0.30
-DEAL::Add and dot should be 13.40, is 13.40
-DEAL::Add and dot should be 26.50, is 26.50
-DEAL::Add and dot should be 39.61, is 39.61
-DEAL::Add and dot should be 52.71, is 52.71
 DEAL::Add and dot should be (0.30,0.00), is (0.30,0.00)
 DEAL::Add and dot should be (13.40,0.00), is (13.40,0.00)
 DEAL::Add and dot should be (26.50,0.00), is (26.50,0.00)

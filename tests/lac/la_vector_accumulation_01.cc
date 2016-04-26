@@ -58,9 +58,6 @@ int main()
 
   check_norms<float>();
   check_norms<double>();
-  check_norms<long double>();
   check_norms<std::complex<double> >();
   deallog << "OK" << std::endl;
 }
-
-
