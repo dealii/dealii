@@ -61,7 +61,7 @@
 #include <deal.II/lac/sparse_ilu.h>
 #include <deal.II/grid/grid_out.h>
 
-// We need to include this class for all of the timings between ILU and Multigrid
+// We need to include the followign file for all of the timings between ILU and Multigrid
 #include <deal.II/base/timer.h>
 
 // This includes the files necessary for us to use geometric Multigrid
@@ -80,7 +80,7 @@ namespace Step55
   using namespace dealii;
 
   // In order to make it easy to switch between the different solvers that are being
-  // used in Step-55, an enum was created that can be passed as an argument to the
+  // used in Step-55, we declare an enum that can be passed as an argument to the
   // constructor of the main class.
   struct SolverType
   {
@@ -95,13 +95,16 @@ namespace Step55
   // we decided to separate the implementations for 2d and 3d using
   // template specialization.  We do this to make it easier for us to debug
   // as well as its aesthetic value.
+  //
+  // Please note that the first dim components are the velocity components
+  // and the last is the pressure.
   template <int dim>
   class Solution : public Function<dim>
   {
   public:
     Solution () : Function<dim>(dim+1) {}
     virtual double value (const Point<dim> &p,
-                          const unsigned int component) const;
+                          const unsigned int component = 0) const;
     virtual Tensor<1,dim> gradient (const Point<dim> &p,
                                     const unsigned int component = 0) const;
   };
@@ -111,9 +114,11 @@ namespace Step55
   Solution<2>::value (const Point<2> &p,
                       const unsigned int component) const
   {
+	Assert (component <= dim, ExcIndexRange(component,0,dim+1));
+
     using numbers::PI;
-    double x = p(0);
-    double y = p(1);
+    const double x = p(0);
+    const double y = p(1);
 
     if (component == 0)
       return sin (PI * x);
@@ -122,7 +127,6 @@ namespace Step55
     if (component == 2)
       return sin (PI * x) * cos (PI * y);
 
-    Assert (false, ExcMessage ("Component out of range in Solution"));
     return 0;
   }
 
@@ -131,10 +135,12 @@ namespace Step55
   Solution<3>::value (const Point<3> &p,
                       const unsigned int component) const
   {
+	Assert (component <= dim, ExcIndexRange(component,0,dim+1));
+
     using numbers::PI;
-    double x = p(0);
-    double y = p(1);
-    double z = p(2);
+    const double x = p(0);
+    const double y = p(1);
+    const double z = p(2);
 
     if (component == 0)
       return 2.0 * sin (PI * x);
@@ -145,7 +151,6 @@ namespace Step55
     if (component == 3)
       return sin (PI * x) * cos (PI * y) * sin (PI * z);
 
-    Assert (false, ExcMessage ("Component out of range in Solution"));
     return 0;
   }
 
@@ -155,6 +160,8 @@ namespace Step55
   Solution<2>::gradient (const Point<2> &p,
                          const unsigned int component) const
   {
+	Assert (component <= dim, ExcIndexRange(component,0,dim+1));
+
     using numbers::PI;
     double x = p(0);
     double y = p(1);
@@ -174,8 +181,7 @@ namespace Step55
         return_value[0] = PI * cos (PI * x) * cos (PI * y);
         return_value[1] =  - PI * sin (PI * x) * sin(PI * y);
       }
-    else
-      Assert (false, ExcMessage ("Component out of range in Solution"));
+
     return return_value;
   }
 
@@ -184,6 +190,8 @@ namespace Step55
   Solution<3>::gradient (const Point<3> &p,
                          const unsigned int component) const
   {
+	Assert (component <= dim, ExcIndexRange(component,0,dim+1));
+
     using numbers::PI;
     double x = p(0);
     double y = p(1);
@@ -213,8 +221,7 @@ namespace Step55
         return_value[1] =  - PI * sin (PI * x) * sin(PI * y) * sin (PI * z);
         return_value[2] = PI * sin (PI * x) * cos (PI * y) * cos (PI * z);
       }
-    else
-      Assert (false, ExcMessage ("Component out of range in Solution"));
+
     return return_value;
   }
 
@@ -234,6 +241,8 @@ namespace Step55
   RightHandSide<2>::value (const Point<2> &p,
                            const unsigned int component) const
   {
+	Assert (component <= dim, ExcIndexRange(component,0,dim+1));
+
     using numbers::PI;
     double x = p(0);
     double y = p(1);
@@ -244,7 +253,6 @@ namespace Step55
     if (component == 2)
       return 0;
 
-    Assert (false, ExcMessage ("Component out of range in RightHandSide"));
     return 0;
 
   }
@@ -254,6 +262,8 @@ namespace Step55
   RightHandSide<3>::value (const Point<3>   &p,
                            const unsigned int component) const
   {
+	Assert (component <= dim, ExcIndexRange(component,0,dim+1));
+
     using numbers::PI;
     double x = p(0);
     double y = p(1);
@@ -267,7 +277,6 @@ namespace Step55
     if (component == 3)
       return 0;
 
-    Assert (false, ExcMessage ("Component out of range in RightHandSide"));
     return 0;
   }
 
@@ -432,30 +441,30 @@ namespace Step55
     void compute_errors ();
     void output_results (const unsigned int refinement_cycle) const;
 
-    const unsigned int   degree;
-    SolverType::type     solver_type;
+    const unsigned int      			  degree;
+    SolverType::type     				  solver_type;
 
-    Triangulation<dim>   triangulation;
-    FESystem<dim>        fe;
-    FESystem<dim>        velocity_fe;
-    DoFHandler<dim>      dof_handler;
-    DoFHandler<dim>      velocity_dof_handler;
+    Triangulation<dim> 					  triangulation;
+    FESystem<dim>      					  velocity_fe;
+    FESystem<dim>      					  fe;
+    DoFHandler<dim>    					  dof_handler;
+    DoFHandler<dim>    					  velocity_dof_handler;
 
-    ConstraintMatrix     constraints;
+    ConstraintMatrix    				  constraints;
 
-    BlockSparsityPattern      sparsity_pattern;
-    BlockSparseMatrix<double> system_matrix;
-    SparseMatrix<double> pressure_mass_matrix;
+    BlockSparsityPattern      			  sparsity_pattern;
+    BlockSparseMatrix<double>			  system_matrix;
+    SparseMatrix<double> 				  pressure_mass_matrix;
 
-    BlockVector<double> solution;
-    BlockVector<double> system_rhs;
+    BlockVector<double> 				  solution;
+    BlockVector<double> 				  system_rhs;
 
     MGLevelObject<SparsityPattern>        mg_sparsity_patterns;
-    MGLevelObject<SparseMatrix<double> >  mg_matrices;
-    MGLevelObject<SparseMatrix<double> >  mg_interface_matrices;
+    MGLevelObject<SparseMatrix<double> > mg_matrices;
+    MGLevelObject<SparseMatrix<double> > mg_interface_matrices;
     MGConstrainedDoFs                     mg_constrained_dofs;
 
-    TimerOutput computing_timer;
+    TimerOutput                           computing_timer;
   };
 
 
@@ -466,9 +475,9 @@ namespace Step55
     degree (degree),
     solver_type (solver_type),
     triangulation (Triangulation<dim>::maximum_smoothing),
-    fe (FE_Q<dim>(degree+1), dim, // Finite element for whole system
-        FE_Q<dim>(degree), 1),
     velocity_fe (FE_Q<dim>(degree+1), dim), // Finite element for velocity-only
+    fe (velocity_fe, 1, // Finite element for whole system
+          FE_Q<dim> (degree), 1),
     dof_handler (triangulation),
     velocity_dof_handler (triangulation),
     computing_timer (std::cout, TimerOutput::summary,
@@ -479,7 +488,7 @@ namespace Step55
 
 // @sect4{StokesProblem::setup_dofs}
 
-// This function sets up things differently based on if you want to use ILU or GMG as a preconditioner.
+// This function sets up things based on if you want to use ILU or GMG as a preconditioner.
   template <int dim>
   void StokesProblem<dim>::setup_dofs ()
   {
@@ -491,7 +500,10 @@ namespace Step55
     // We don't need the multigrid dofs for whole problem finite element
     dof_handler.distribute_dofs(fe);
 
-    // This first creates and array (0,0,1) which means that it first does everything with index 0 and then 1
+    // In the following code block, we first create an array of length dim+1
+    // that is initialized to all zeros; we then set the pressure vector
+    // component to 1.  This allows us to keep our velocities together
+    // and separate from the pressure.
     std::vector<unsigned int> block_component (dim+1,0);
     block_component[dim] = 1;
 
@@ -514,7 +526,9 @@ namespace Step55
         // Distribute only the dofs for velocity finite element
         velocity_dof_handler.distribute_dofs(velocity_fe);
 
-        // Multigrid only needs the dofs for velocity
+        // Multigrid only needs the dofs for velocity. This does not clear the
+        // mg_interface_matrices object.  Instead, it actually clears the level
+        // objects it stores.
         velocity_dof_handler.distribute_mg_dofs(velocity_fe);
 
         typename FunctionMap<dim>::type boundary_condition_function_map;
@@ -613,7 +627,9 @@ namespace Step55
     system_matrix=0;
     system_rhs=0;
 
-    double mass_factor = (solver_type == SolverType::UMFPACK) ? 0.0 : 1.0;
+    // The following bollean is used to signify when you want to assemble the mass matrix
+    // inside the (1,1) block, which is the case when you are not using UMFPACK
+    bool assemble_pressure_mass_matrix = (solver_type == SolverType::UMFPACK) ? false : true;
 
     QGauss<dim>   quadrature_formula(degree+2);
 
@@ -671,7 +687,7 @@ namespace Step55
                     local_matrix(i,j) += (2 * (symgrad_phi_u[i] * symgrad_phi_u[j])
                                           - div_phi_u[i] * phi_p[j]
                                           - phi_p[i] * div_phi_u[j]
-                                          + mass_factor * phi_p[i] * phi_p[j])
+                                          + (assemble_pressure_mass_matrix ? phi_p[i] * phi_p[j] : 0))
                                          * fe_values.JxW(q);
 
                   }
@@ -819,9 +835,11 @@ namespace Step55
 
 // @sect4{StokesProblem::solve}
 
-// This function sets up things differently based on if you want to use ILU or GMG as a preconditioner.  Both methods share
-// the same solver (GMRES) but require a different preconditioner to be assembled.  Here we time not only the entire solve
-// function, but we separately time the set-up of the preconditioner as well as the GMRES solve.
+// This function sets up things differently based on if you want to use ILU
+// or GMG as a preconditioner.  Both methods share the same solver (GMRES)
+// but require a different preconditioner to be assembled.  Here we time not
+// only the entire solve function, but we separately time the set-up of the
+// preconditioner as well as the GMRES solve.
   template <int dim>
   void StokesProblem<dim>::solve ()
   {
@@ -870,14 +888,14 @@ namespace Step55
         SparseILU<double> A_preconditioner;
         A_preconditioner.initialize (system_matrix.block(0,0));
 
-        SparseILU<double> pmass_preconditioner;
-        pmass_preconditioner.initialize (pressure_mass_matrix);
+        SparseILU<double> S_preconditioner;
+        S_preconditioner.initialize (pressure_mass_matrix);
 
         const BlockSchurPreconditioner<SparseILU<double>, SparseILU<double> >
         preconditioner (system_matrix,
                         pressure_mass_matrix,
                         A_preconditioner,
-                        pmass_preconditioner,
+                        S_preconditioner,
                         use_expensive);
 
         computing_timer.leave_subsection();
@@ -936,8 +954,8 @@ namespace Step55
         PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double> > >
         A_Multigrid(velocity_dof_handler, mg, mg_transfer);
 
-        SparseILU<double> pmass_preconditioner;
-        pmass_preconditioner.initialize (pressure_mass_matrix,
+        SparseILU<double> S_preconditioner;
+        S_preconditioner.initialize (pressure_mass_matrix,
                                          SparseILU<double>::AdditionalData());
 
         const BlockSchurPreconditioner<
@@ -946,7 +964,7 @@ namespace Step55
                        preconditioner (system_matrix,
                                        pressure_mass_matrix,
                                        A_Multigrid,
-                                       pmass_preconditioner,
+                                       S_preconditioner,
                                        use_expensive);
 
         computing_timer.leave_subsection();

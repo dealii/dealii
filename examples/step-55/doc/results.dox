@@ -150,9 +150,13 @@
 
 As can be seen from the table,
 
-1. UMFPACK uses large amounts of memory, especially in 3d. Also, UMFPACK timings do not scale with problem size.
+1. UMFPACK uses large amounts of memory, especially in 3d. Also,
+UMFPACK timings do not scale with problem size.
 
-2. The number of iterations for $A$ increase for ILU with refinement leading to worse then linear scaling in solve time. In contrast, the number of inner iterations for $A$ stay constant with GMG leading to nearly perfect scaling in solve time.
+2. The number of iterations for $A$ increase for ILU with refinement
+leading to worse then linear scaling in solve time. In contrast, the
+number of inner iterations for $A$ stay constant with GMG leading to
+nearly perfect scaling in solve time.
 
 3. GMG needs slightly more memory than ILU.
 
