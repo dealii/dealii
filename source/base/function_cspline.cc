@@ -16,6 +16,7 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/function_cspline.h>
 
+#ifdef DEAL_II_WITH_GSL
 #include <cmath>
 #include <algorithm>
 
@@ -97,3 +98,5 @@ namespace Functions
 }
 
 DEAL_II_NAMESPACE_CLOSE
+
+#endif

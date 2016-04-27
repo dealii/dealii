@@ -21,6 +21,7 @@
 #include <cmath>
 #include <deal.II/base/function_cspline.h>
 
+#ifdef DEAL_II_WITH_GSL
 template <int dim>
 void check()
 {
@@ -77,3 +78,15 @@ int main()
 
   check<1>();
 }
+#else
+
+int main()
+{
+  std::string logname = "output";
+  std::ofstream logfile(logname.c_str());
+  deallog.attach(logfile);
+  deallog.threshold_double(1.e-10);
+
+  deallog << "Ok"<< std::endl;
+}
+#endif

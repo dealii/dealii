@@ -1,4 +1,4 @@
-# This file contains project-specific configurations for the 
+# This file contains project-specific configurations for the
 # deal.II documentation.
 
 PROJECT_NAME           = "The deal.II Library"
@@ -167,6 +167,7 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_WITH_BOOST=1 \
                          DEAL_II_WITH_CXX11=1 \
                          DEAL_II_WITH_CXX14=1 \
+                         DEAL_II_WITH_GSL=1 \
                          DEAL_II_WITH_HDF5=1 \
                          DEAL_II_WITH_LAPACK=1 \
                          DEAL_II_WITH_METIS=1 \
