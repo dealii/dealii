@@ -43,9 +43,12 @@ int main ()
   cp[0][0] = 1.0;
   cp[1][0] = 1.0;
 
+  // Force roundoff errors on one side only
+  double eps=1e-10;
+
   // Last point
   cp[0][1] = -numbers::PI/4;
-  cp[1][1] =  numbers::PI/4;
+  cp[1][1] =  numbers::PI/4-eps;
 
   // Spacedim points
   std::vector<Point<spacedim> > sp(2);
