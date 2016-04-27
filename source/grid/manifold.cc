@@ -185,8 +185,13 @@ get_normals_at_vertices (const Triangulation<2, 2>::face_iterator &face,
   n[0] = cross_product_2d(get_tangent_vector(face->vertex(0), face->vertex(1)));
   n[1] = -cross_product_2d(get_tangent_vector(face->vertex(1), face->vertex(0)));
 
-  n[0] /= n[0].norm();
-  n[1] /= n[1].norm();
+  for (unsigned int i=0; i<2; ++i)
+    {
+      Assert(n[i].norm() != 0, ExcInternalError("Something went wrong. The "
+                                                "computed normals have "
+                                                "zero length."));
+      n[i] /= n[i].norm();
+    }
 }
 
 
@@ -213,7 +218,12 @@ get_normals_at_vertices (const Triangulation<3, 3>::face_iterator &face,
           get_tangent_vector(face->vertex(3), face->vertex(1)));
 
   for (unsigned int i=0; i<4; ++i)
-    n[i] /=n[i].norm();
+    {
+      Assert(n[i].norm() != 0, ExcInternalError("Something went wrong. The "
+                                                "computed normals have "
+                                                "zero length."));
+      n[i] /=n[i].norm();
+    }
 }
 
 
