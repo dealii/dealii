@@ -53,8 +53,13 @@ for (deal_II_dimension : DIMENSIONS)
        std::ostream&) const;       
     template void GridOut::write_vtu
       (const Triangulation<deal_II_dimension>&,
-       std::ostream&) const;       
-       
+       std::ostream&) const;
+    template void GridOut::write_mesh_per_processor_as_vtu
+      (const Triangulation<deal_II_dimension>&,
+       const std::string&,
+       const bool,
+       const bool) const;
+
     template void GridOut::write<deal_II_dimension>
       (const Triangulation<deal_II_dimension> &,
        std::ostream &, const OutputFormat,
@@ -83,6 +88,12 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
    template void GridOut::write_vtu
       (const Triangulation<deal_II_dimension,deal_II_space_dimension>&,
        std::ostream&) const;
+   template void GridOut::write_mesh_per_processor_as_vtu
+      (const Triangulation<deal_II_dimension,deal_II_space_dimension>&,
+       const std::string&,
+       const bool,
+       const bool) const;
+
 
     template void GridOut::write<deal_II_dimension,deal_II_space_dimension>
       (const Triangulation<deal_II_dimension,deal_II_space_dimension> &,

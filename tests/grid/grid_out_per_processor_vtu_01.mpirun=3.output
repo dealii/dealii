@@ -1,0 +1,278 @@
+
+DEAL:0:2d::hyper_cube
+<?xml version="1.0"?>
+<!--
+#This file was generated 
+-->
+<VTKFile type="PUnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <PUnstructuredGrid GhostLevel="0">
+    <PPointData Scalars="scalars">
+    <PDataArray type="Float64" Name="subdomain" format="ascii"/>
+    <PDataArray type="Float64" Name="proc_writing" format="ascii"/>
+    </PPointData>
+    <PPoints>
+      <PDataArray type="Float64" NumberOfComponents="3"/>
+    </PPoints>
+    <Piece Source="file1.proc0000.vtu"/>
+    <Piece Source="file1.proc0001.vtu"/>
+    <Piece Source="file1.proc0002.vtu"/>
+  </PUnstructuredGrid>
+</VTKFile>
+
+<?xml version="1.0" ?> 
+<!-- 
+# vtk DataFile Version 3.0
+#This file was generated 
+-->
+<VTKFile type="UnstructuredGrid" version="0.1" compressor="vtkZLibDataCompressor" byte_order="LittleEndian">
+<UnstructuredGrid>
+<Piece NumberOfPoints="196" NumberOfCells="49" >
+  <Points>
+    <DataArray type="Float64" NumberOfComponents="3" format="binary">
+AQAAAGASAABgEgAAbAEAAA==eNqlWDGuQzEI6824eo7AyMiQgSFDjtAp0v9RHYNge65rLEJ5pJ/P3wj59/hR+Y2f2IC/kzou77wb8G/8fN/ltz8H/AD8rM8gfORzN/0gnQ1wFENqn59nhN+h8tYd4NyH9Pyg/Ien0vODdJTgdxjxfec1gt/hJO8AfZutgxG+Ar5Kzw/ScXnXO9sPqK6Hb81+QDoq7/PM+kHnP+SNZ/0gHSV4th9QXiN4th+QjhfrYITvgO9NP0jHCX7HJH1z/+4mwe8IkneA91p2DkzCV8BX6flBOkHwOxap2513EZztZ0xnF+uwCF8BX6XnB+ns4hyYhG+Ab81+QDpRnAOT8B3wvelnkr3am/2A8i6CZ/sB6exiHRbhO+B7088q3neq+wCa64c/m/sA0lF5v0+yftDcHfLGs36G1O7L1X0A5TWCZ/cBpOPFOhjhB+BH048V7+nVeYjyToJn5yHSiWIdJuEH4EfTz0z/H/IFub2Npg==
+    </DataArray>
+  </Points>
+
+  <Cells>
+    <DataArray type="Int32" Name="connectivity" format="binary">
+AQAAABADAAAQAwAAPgEAAA==eNoNwwdXiAEAAMBPJVRm9iikZFdGJSuzorI32aPIXmVTMkIkI0KECNmJrP6Yu/cuCIKgg6GGGGZHOxluZ7sYaYRRdrW73exhT6PtZW/72M++9neAgxzoYIcYa4xDHWacwx1hvCNNMNFRjnG0Yx3nBMebZLITTXGSk011immmm+FUpzndmc5wlpnOcbZznecC55tltgvNcZG55pvnYpe4zKUud4WrXOlq17jOta53gwVudJOb3eoWt7ndne5wl7ststA97nWfxe73gIc86GGPeMyjHveEpZZ40lOe8bRnPecFz3vRMi9ZboWXveoVr1npDa970ypve8tq73jXGu9531of+NBHPrbOJz71mfU+t8GXvvCVjb7xtU2+9b3vbPaDn/zoZ7/4za+2+N0ftvrTNn/7yz/+td1//gef8Eqn
+    </DataArray>
+    <DataArray type="Int32" Name="offsets" format="binary">
+AQAAAMQAAADEAAAAcwAAAA==eNoNwxEXwmAAAMAPgiAIgiAYBEEQBEEQBINgEAyCYBAEQTAYBMEgCIIgCAZBEARBEOyHdffeNUIITVu27di1Z2TfgUNHjp04debc2IWJS1NXrs3cuHXn3tzCg0dLT569ePXm3cqHT1++/fj1Z+0fFp8TJQ==
+    </DataArray>
+    <DataArray type="UInt8" Name="types" format="binary">
+AQAAADEAAAAxAAAADAAAAA==eNrj5CQRAAArQgG6
+    </DataArray>
+  </Cells>
+  <PointData Scalars="scalars">
+    <DataArray type="Float64" Name="level" format="binary">
+AQAAACAGAAAgBgAAGwAAAA==eNpjYAADB4ZBTXOM0qP0KD1Kj9J0pgGhvDaB    </DataArray>
+    <DataArray type="Float64" Name="subdomain" format="binary">
+AQAAACAGAAAgBgAAMQAAAA==eNpjYACDAwyDmx4Fo2AAwQd7/DSh9Etr/ZTStHY/pTSt/TfY7WdwIEDTLPwBSdZmWQ==    </DataArray>
+    <DataArray type="Float64" Name="level_subdomain" format="binary">
+AQAAACAGAAAgBgAAMQAAAA==eNpjYACDAwyDmx4Fo2AAwQd7/DSh9Etr/ZTStHY/pTSt/TfY7WdwIEDTLPwBSdZmWQ==    </DataArray>
+    <DataArray type="Float64" Name="proc_writing" format="binary">
+AQAAACAGAAAgBgAAFQAAAA==eNpjYBgFo2AUjIJRMAowAQAGIAAB    </DataArray>
+  </PointData>
+ </Piece>
+ </UnstructuredGrid>
+</VTKFile>
+
+<?xml version="1.0"?>
+<!--
+#This file was generated 
+-->
+<VTKFile type="PUnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <PUnstructuredGrid GhostLevel="0">
+    <PPointData Scalars="scalars">
+    <PDataArray type="Float64" Name="subdomain" format="ascii"/>
+    <PDataArray type="Float64" Name="proc_writing" format="ascii"/>
+    </PPointData>
+    <PPoints>
+      <PDataArray type="Float64" NumberOfComponents="3"/>
+    </PPoints>
+    <Piece Source="file2.proc0000.vtu"/>
+    <Piece Source="file2.proc0001.vtu"/>
+    <Piece Source="file2.proc0002.vtu"/>
+  </PUnstructuredGrid>
+</VTKFile>
+
+<?xml version="1.0" ?> 
+<!-- 
+# vtk DataFile Version 3.0
+#This file was generated 
+-->
+<VTKFile type="UnstructuredGrid" version="0.1" compressor="vtkZLibDataCompressor" byte_order="LittleEndian">
+<UnstructuredGrid>
+<Piece NumberOfPoints="188" NumberOfCells="47" >
+  <Points>
+    <DataArray type="Float64" NumberOfComponents="3" format="binary">
+AQAAAKARAACgEQAASwEAAA==eNqtVjsSBSEI25vl6h6BkpLCwmKLPcKrbHwTPoN2xmzIALI+j7c+PKXzvY++28tQO997hmf9M50Pvl7WD4tv8PGsH6ZTzb+gdr73DM/Wl+kYfL2sHxZf4ONZP4I7/bkC32fcFeDZ/mc6XzEPK+Ab4Rt6ftal+yuo1WfzV7MfmI4FeDafTGfB75dzDdTO957h2fnDdAS+XtYPiz/g41k/A3fmpwa+z7ga4Nn5zHSsmAcN+EL4gp4fvfR/GajVZ/O12Q9MR+DXM+uH1X/Ax7N+Bu78fzXImxK+NvuB6VgxDxrwjfCt6UcvvU9m0DfnvZsBnn3/MJ1VnAMz4AvhC3p+5qX32xvk7Yz7Fn1GfCF8aeaT9e0M8Gw+mc4q3qMZ8I3wrZlP5vO9NM/Zvdz82ZznTEcCPDsPmY4GeHYeMh0L8Gw/MJ35h/8AciNj+g==
+    </DataArray>
+  </Points>
+
+  <Cells>
+    <DataArray type="Int32" Name="connectivity" format="binary">
+AQAAAPACAADwAgAAMgEAAA==eNoNwwdXDgAAAMAvSipbA9krUdlKSZnZMlIqpBAiyiqjRMosM4RoWaGyEn/O3XsXCAQCQQ51iMGGGOowhxtmhOGOcKSjHeUYxzrecUYaZYzRTnCisU5yslOc5lSnO8NZznS2c4xzrvOMd4HzTTDRhSa5yMUudYnLXG6yK0xxpWmmusp0M1xtpmtc51rXu8EsN7rJzW51i9vc7k53mO0u97jbveaY6z7z3G+B+RZ6wEMetMjDlljsEY9a6jGPe8IyT3rK056x3LNWeM5Kz3vBS160ymqveNmrXrPWGq9b501vWO8tG23wtne8513v+8Bmm3zoI5/42Kc+87ktvvClr2z1tW98a5vvbLfTDrvs9oPv/egne/zsF7/a6zf77PeH3/3pLwf87R8H/edf/wOe8USr
+    </DataArray>
+    <DataArray type="Int32" Name="offsets" format="binary">
+AQAAALwAAAC8AAAAbwAAAA==eNoNwxEXwmAAAMAPgiAIgiAIBkEQBIMgCIJgMBgEwSAIBkEwGARBEATBIAiCYBAE/bjdvXedEELXnn0HDh05NnLi1JlzYxcuXbl2Y2Jq5taduXsPFh49WVp59uLVm3cf1j59+fZj49eff1uAeBGh
+    </DataArray>
+    <DataArray type="UInt8" Name="types" format="binary">
+AQAAAC8AAAAvAAAADAAAAA==eNrj5CQJAAAn1wGo
+    </DataArray>
+  </Cells>
+  <PointData Scalars="scalars">
+    <DataArray type="Float64" Name="level" format="binary">
+AQAAAOAFAADgBQAAHgAAAA==eNpjYCAGfLAfWJrBYZSmJc0xSo/So/QwpAFNQ0DR    </DataArray>
+    <DataArray type="Float64" Name="subdomain" format="binary">
+AQAAAOAFAADgBQAAIgAAAA==eNpjYACBD/sZRukRTI+CUTCQ4IP9KE0JzeCAiwYAjdmcGQ==    </DataArray>
+    <DataArray type="Float64" Name="level_subdomain" format="binary">
+AQAAAOAFAADgBQAAKAAAAA==eNpjYKAH+GCPn2ZwIEAPckDIfwNND/XwHQXDGwz2/DN08zcABbROwQ==    </DataArray>
+    <DataArray type="Float64" Name="proc_writing" format="binary">
+AQAAAOAFAADgBQAAFAAAAA==eNpjYBgFo2AUjIJRMBwBAAXgAAE=    </DataArray>
+  </PointData>
+ </Piece>
+ </UnstructuredGrid>
+</VTKFile>
+
+
+<?xml version="1.0" ?> 
+<!-- 
+# vtk DataFile Version 3.0
+#This file was generated 
+-->
+<VTKFile type="UnstructuredGrid" version="0.1" compressor="vtkZLibDataCompressor" byte_order="LittleEndian">
+<UnstructuredGrid>
+<Piece NumberOfPoints="232" NumberOfCells="58" >
+  <Points>
+    <DataArray type="Float64" NumberOfComponents="3" format="binary">
+AQAAAMAVAADAFQAAqgEAAA==eNqlmDGSxSAMQ3MzX50jUFK6oKCg4AhbUSy7D5mxmz/R18gaxzFOvu8W1b6n//f1iQ/7/btjAb6vF/CXxXw2u/su9j+f8DNc5D11HPBXP1TnJvCoH9Jxu9f7xIu93Z/Nb0EdqgPpVLvfz6gfuv+b70k/pFMFHu0HytsEHu0H0vHHOjTBd+B70g/puMDP6KJvzueuC/yMIfIWmKvROdAFvwK/Ws5PF+cI4WdMUbcz7xT4GUvkLXB+ReswBb8Cv1rOD+msxznQBb8BvyX7gXTG4xzogu/A96Qf0hkCj/YD5Z0Cj/YD6azHOkzBd+B70g/pLLvP++g+QHN983tyHyCdavfzJOqH5m6xOx71QzpV4NF9gPI2gUf3AdLxxzo0wR/AH0k/pON2P2+j/UDn6ubPZD+QTrX7eR71Q+d/sTse9VPEe+5K9gPlbQKP9gPp+GMdmuAv4K+kH9JxgUf3AXruusCj+wDpjMc50AV/AH8k/XTxXWgk9wHKOwUe3QdIZz3WYQr+AP5I+pmP3+te+4Geuy7waD+QznicA13wF/BX0g/p/P0u+gPINeP8
+    </DataArray>
+  </Points>
+
+  <Cells>
+    <DataArray type="Int32" Name="connectivity" format="binary">
+AQAAAKADAACgAwAAbgEAAA==eNoNwwN3FgAAAMAvm1vLtm1sGYuLW9aytYxlrsWFLbfslm1by/wb3b13gUAgkMZ0pjW9GcxkRjObxWxmNbs5zGVOc5vHIPMabD7zG2IBC1rYQhaxqMUtZglLWtpSlrGs5S1nBSta2UpWsarVrWYNa1rbWtaxrvWtZwMb2thGNrGpoTYzzOa2tIWtbG1b29jO9obbwY52soud7Wo3uxthD3va2172MdK+RtnP/g50gIMc7FCHOMzhjjDakY5yjKMd6zgnON6JTnKKk53qNGc43RhnOttZznGu853nAhca6yIXu8RlLnW5K1zlSle7xnWuNc71bjDejW5yi5vdaoLb3eYOd5pkorvc7V73uM/9HvSAyR7yiIc96jFPeNyTnvKMpz3rOVM87wUvetlLXvGq173mDW9621ve8a73vecDH/rYRz7xqc995gtf+tpXvvGt733nBz+a6ic/+8VvfvW7P/zlT3/7x3/+9T8SCWit
+    </DataArray>
+    <DataArray type="Int32" Name="offsets" format="binary">
+AQAAAOgAAADoAAAAhAAAAA==eNoNw6ESAVEAAMAXBEEQBEEQBEEQBEEQBEEQBEEQBEEQBOGCIAiCIAiCIAiCIAiCIAiCIAiCIPgMuzMbCyHETZg0ZdqMWXPmLVi0ZNmKVWvWbdi0ZduOXXv2HTh05NjIiVNnzl24dOXajVt37j149OTZi1dv3n349OXbj19//gFcIBq9
+    </DataArray>
+    <DataArray type="UInt8" Name="types" format="binary">
+AQAAADoAAAA6AAAADAAAAA==eNrj5CQXAAA8YQIL
+    </DataArray>
+  </Cells>
+  <PointData Scalars="scalars">
+    <DataArray type="Float64" Name="level" format="binary">
+AQAAAEAHAABABwAAHQAAAA==eNpjYAADBwaKaI5RepQepUfpUXqUHlE0ABj2QQE=    </DataArray>
+    <DataArray type="Float64" Name="subdomain" format="binary">
+AQAAAEAHAABABwAANQAAAA==eNpjYACDAwyDmyYEaG0+pfbTGgyw/R/sR+lReuTSDA40pgnl76FuP6XlN63Nx0kDAIRbqqE=    </DataArray>
+    <DataArray type="Float64" Name="level_subdomain" format="binary">
+AQAAAEAHAABABwAANQAAAA==eNpjYACDAwyDmyYEaG0+pfbTGgyw/R/sR+lReuTSDA40pgnl76FuP6XlN63Nx0kDAIRbqqE=    </DataArray>
+    <DataArray type="Float64" Name="proc_writing" format="binary">
+AQAAAEAHAABABwAAHQAAAA==eNpjYACBD/YMo/QoPUqP0qP0KD1KE00DAEonEqg=    </DataArray>
+  </PointData>
+ </Piece>
+ </UnstructuredGrid>
+</VTKFile>
+
+<?xml version="1.0" ?> 
+<!-- 
+# vtk DataFile Version 3.0
+#This file was generated 
+-->
+<VTKFile type="UnstructuredGrid" version="0.1" compressor="vtkZLibDataCompressor" byte_order="LittleEndian">
+<UnstructuredGrid>
+<Piece NumberOfPoints="244" NumberOfCells="61" >
+  <Points>
+    <DataArray type="Float64" NumberOfComponents="3" format="binary">
+AQAAAOAWAADgFgAAqQEAAA==eNqtlzG27iAIhP+dsXWXQElpQUFh4RJu82zyzjhwMF3Il3FCIJjf73Zs+ZWun3N23zmm1K6fcxTP+kc6W+56WT9o/Sn3eNYP0kH5V6nl//AK1lVyH9NB66vc41k/Km/qJ4jv77pB4tn6RDq7mIcg/AT8lJ6feNRfKrX3c/ho1gPSmXJ/n1k/6P0r6d+sH5U3358geQvAR7MekM4u5iEIvwH/jdu/8wF0BuCr30/7xI+uJftlyD1uoE4sqYP6qPq8BtadRZ9GeORzNv1Y8XvixfnioK6iWIdOeAW8Ss+PP5qPi+Ttu+4i8ez8RTq7mIdFeAW8Ss/PerR/cMIb4K1ZD0gnin3qhEd9Opt+/NH+apG8GeCtWQ9IZxfzsAg/AT+bftaj/ecgvAPem/MU6ajc50nWD/ruDrnHs36GvNmfG8mbA96b8xrpzGIejPAB+Gj6sUf/L0Nq8/nwq1kPSEflPs+zftD8H3KPZ/0MefN/ZyRvC/CrWQ9IZxbzYIRH/1m7Oa9RXziJZ+c10olinzrhA/DRnKfI5yLx7DxFOvvR86I69P/ifwI48yA=
+    </DataArray>
+  </Points>
+
+  <Cells>
+    <DataArray type="Int32" Name="connectivity" format="binary">
+AQAAANADAADQAwAAewEAAA==eNoNwwN3FgAAAMAv23Zr2bZrLdu2bWMLa9m2bdu2bbv+QHfvXSAQCEQxmlGNbgxjGdPYxjGecY1vAhOZ0MQmMZlJTW4KU5nS1KYxnWlNbwYzmdHMBhlsFrOazRxmN6e5zGNu85rPAua3oIUsYmGLWswSFrekpSxjactazgqWt6KVrGJlqxpiqNWsbg1rWdPa1rGeda1vAxvZ0MY2sZlNbW4LW9nS1raxnW1tbwc72dHOdrGbXe1uD3vZ0972sZ997e8ABznQwQ5xmEMd7ghHOdLRjnGcYx3vBMMNc6KTnOJkI5zqNCOd7gxnOdPZznGec53vAhe50MUucZlLXe4KV7nS1a5xnWtd7wY3udHNbnGbW93uDne5093ucZ973e8BD3nQwx7xmEc97glPedLTnvGcZz3vBS950cte8ZpXve4Nb3nT297xnne97wMf+dDHPvGZT33uC1/50te+8Z1vfe8HP/nRz37xm1/97g9/+dPf/vGff/0P0ulzzw==
+    </DataArray>
+    <DataArray type="Int32" Name="offsets" format="binary">
+AQAAAPQAAAD0AAAAiQAAAA==eNoNw6ESQQEAALAXBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQfIDtbqEgCMJGjBozbsKkKdNmzJozb8GiJctWrFqzbsOmLdt27Nqz78ChI8dOnDpz7sKlK9du3Lpz78GjJ89evHrz7sOnL99+/PrzD7NrHY0=
+    </DataArray>
+    <DataArray type="UInt8" Name="types" format="binary">
+AQAAAD0AAAA9AAAADAAAAA==eNrj5KQAAABCuAIm
+    </DataArray>
+  </Cells>
+  <PointData Scalars="scalars">
+    <DataArray type="Float64" Name="level" format="binary">
+AQAAAKAHAACgBwAAIgAAAA==eNpjYCAGfLAfWJrBYZQeyjTHKD1Kj9Kj9ChNIg0AU5ZQMQ==    </DataArray>
+    <DataArray type="Float64" Name="subdomain" format="binary">
+AQAAAKAHAACgBwAAJQAAAA==eNpjYACBD/sZRulRmmb0KMAPPtiP0qP0yKUZHEZp7DQAAc/6lQ==    </DataArray>
+    <DataArray type="Float64" Name="level_subdomain" format="binary">
+AQAAAKAHAACgBwAALQAAAA==eNpjYKAH+GCPn2ZwIEAPMCDk/sFOEwxfWtOjYFinr1F6lB7S5dOgpQEhaaDF    </DataArray>
+    <DataArray type="Float64" Name="proc_writing" format="binary">
+AQAAAKAHAACgBwAAHQAAAA==eNpjYACBD/YMo/QoPUqP0qP0KD1KDxoaANQSINw=    </DataArray>
+  </PointData>
+ </Piece>
+ </UnstructuredGrid>
+</VTKFile>
+
+
+
+<?xml version="1.0" ?> 
+<!-- 
+# vtk DataFile Version 3.0
+#This file was generated 
+-->
+<VTKFile type="UnstructuredGrid" version="0.1" compressor="vtkZLibDataCompressor" byte_order="LittleEndian">
+<UnstructuredGrid>
+<Piece NumberOfPoints="196" NumberOfCells="49" >
+  <Points>
+    <DataArray type="Float64" NumberOfComponents="3" format="binary">
+AQAAAGASAABgEgAAXAEAAA==eNqlljGywzAIRH0zXf0fwSWlChUUKjhCKjf687QwqMv6ZdkhmOh5bucdT+n595n088xx9z2/N8fdL5uH6n/cHLmcLnzPui7084Soe/rEqPXBBG/AW9JniroGvDXz0O9oQs/mMTEnM9mHJfpmwFvSx0VdA96aeagPS+jZPOTjQj/7sEXfDHhL+oSoa8BbMw/1YQs9m4d8Ytz35an/CX4Bv5I+tAfI5wW9mof2+sd7Mw/5vELP7kOqa0LP7kPymcU+mOAdeG/mIZ857v/n2Xk437OT3815IJ8X9Goeur98fDTzkM8r9Ow8UF0TenYeyGcW+2CCD+CjmYd8ptCz9wF675bQs/cB8vHiHliCd+C9mYd8XOjZ+wDV3ULP3gfIJ4p92IJ34L2Zh3yiuAeW4DfwuzkP5OPFPbAEH8BHMw/5uNCz80B1t9Cz80A+UezDFnwAH8085BP/9B+M/6Hc
+    </DataArray>
+  </Points>
+
+  <Cells>
+    <DataArray type="Int32" Name="connectivity" format="binary">
+AQAAABADAAAQAwAAPgEAAA==eNoNwwdXiAEAAMBPJVRm9iikZFdGJSuzorI32aPIXmVTMkIkI0KECNmJrP6Yu/cuCIKgg6GGGGZHOxluZ7sYaYRRdrW73exhT6PtZW/72M++9neAgxzoYIcYa4xDHWacwx1hvCNNMNFRjnG0Yx3nBMebZLITTXGSk011immmm+FUpzndmc5wlpnOcbZznecC55tltgvNcZG55pvnYpe4zKUud4WrXOlq17jOta53gwVudJOb3eoWt7ndne5wl7ststA97nWfxe73gIc86GGPeMyjHveEpZZ40lOe8bRnPecFz3vRMi9ZboWXveoVr1npDa970ypve8tq73jXGu9531of+NBHPrbOJz71mfU+t8GXvvCVjb7xtU2+9b3vbPaDn/zoZ7/4za+2+N0ftvrTNn/7yz/+td1//gef8Eqn
+    </DataArray>
+    <DataArray type="Int32" Name="offsets" format="binary">
+AQAAAMQAAADEAAAAcwAAAA==eNoNwxEXwmAAAMAPgiAIgiAYBEEQBEEQBINgEAyCYBAEQTAYBMEgCIIgCAZBEARBEOyHdffeNUIITVu27di1Z2TfgUNHjp04debc2IWJS1NXrs3cuHXn3tzCg0dLT569ePXm3cqHT1++/fj1Z+0fFp8TJQ==
+    </DataArray>
+    <DataArray type="UInt8" Name="types" format="binary">
+AQAAADEAAAAxAAAADAAAAA==eNrj5CQRAAArQgG6
+    </DataArray>
+  </Cells>
+  <PointData Scalars="scalars">
+    <DataArray type="Float64" Name="level" format="binary">
+AQAAACAGAAAgBgAAGwAAAA==eNpjYAADB4ZBTXOM0qP0KD1Kj9J0pgGhvDaB    </DataArray>
+    <DataArray type="Float64" Name="subdomain" format="binary">
+AQAAACAGAAAgBgAALAAAAA==eNpjYACDAwwjmyYEKDT/gz1l9FC3n1L30dp/tLafYv0Oo/QoPRA0AEm6eVk=    </DataArray>
+    <DataArray type="Float64" Name="level_subdomain" format="binary">
+AQAAACAGAAAgBgAALAAAAA==eNpjYACDAwwjmyYEKDT/gz1l9FC3n1L30dp/tLafYv0Oo/QoPRA0AEm6eVk=    </DataArray>
+    <DataArray type="Float64" Name="proc_writing" format="binary">
+AQAAACAGAAAgBgAAGQAAAA==eNpjYAADB4ZRepQepUfpUXqURqIBi9sxAQ==    </DataArray>
+  </PointData>
+ </Piece>
+ </UnstructuredGrid>
+</VTKFile>
+
+<?xml version="1.0" ?> 
+<!-- 
+# vtk DataFile Version 3.0
+#This file was generated 
+-->
+<VTKFile type="UnstructuredGrid" version="0.1" compressor="vtkZLibDataCompressor" byte_order="LittleEndian">
+<UnstructuredGrid>
+<Piece NumberOfPoints="188" NumberOfCells="47" >
+  <Points>
+    <DataArray type="Float64" NumberOfComponents="3" format="binary">
+AQAAAKARAACgEQAARwEAAA==eNqtljESxDAIA/Mzf/2e4NIlBQUFBU+4ykU8owgGp8nE2ROKjhA/z9cR4ynd39fsd/uQUbu/r9F61j/SifGtl/WD6sv4Xs/6QToo/zne51NnAr6a/6ljpK4AXpI6Qep2/99JeAO8NfNEOgLWq35Qf07SP1k/c9zpfyO5GeCt2Q9IJ4o5GOED8NH0Y8X5sMb7fPpcgK/Oh1NHSV0BvCR1jNStzp9Tx0ldAbwkdYLUzfbzb7yf+3xPFfDZeVLthwXqStHnIjzyaU0/qzgHqnlu3gHvl/ju/F/kuRzw3swT6Ugxh0V4NCej6Wdd+j4qee8U8Nqch0jHiu+REt4Ab00/emn/4CQ3Bbw25znSiWIOTngDvDX9+KX9lRLeAe/NfkA6VpwDSvgAfDT96KX9p5PcHPDe7AekE8UcnPAB+Gj68fT+/A9ohZjI
+    </DataArray>
+  </Points>
+
+  <Cells>
+    <DataArray type="Int32" Name="connectivity" format="binary">
+AQAAAPACAADwAgAAMgEAAA==eNoNwwdXDgAAAMAvSipbA9krUdlKSZnZMlIqpBAiyiqjRMosM4RoWaGyEn/O3XsXCAQCQQ51iMGGGOowhxtmhOGOcKSjHeUYxzrecUYaZYzRTnCisU5yslOc5lSnO8NZznS2c4xzrvOMd4HzTTDRhSa5yMUudYnLXG6yK0xxpWmmusp0M1xtpmtc51rXu8EsN7rJzW51i9vc7k53mO0u97jbveaY6z7z3G+B+RZ6wEMetMjDlljsEY9a6jGPe8IyT3rK056x3LNWeM5Kz3vBS160ymqveNmrXrPWGq9b501vWO8tG23wtne8513v+8Bmm3zoI5/42Kc+87ktvvClr2z1tW98a5vvbLfTDrvs9oPv/egne/zsF7/a6zf77PeH3/3pLwf87R8H/edf/wOe8USr
+    </DataArray>
+    <DataArray type="Int32" Name="offsets" format="binary">
+AQAAALwAAAC8AAAAbwAAAA==eNoNwxEXwmAAAMAPgiAIgiAIBkEQBIMgCIJgMBgEwSAIBkEwGARBEATBIAiCYBAE/bjdvXedEELXnn0HDh05NnLi1JlzYxcuXbl2Y2Jq5taduXsPFh49WVp59uLVm3cf1j59+fZj49eff1uAeBGh
+    </DataArray>
+    <DataArray type="UInt8" Name="types" format="binary">
+AQAAAC8AAAAvAAAADAAAAA==eNrj5CQJAAAn1wGo
+    </DataArray>
+  </Cells>
+  <PointData Scalars="scalars">
+    <DataArray type="Float64" Name="level" format="binary">
+AQAAAOAFAADgBQAAHgAAAA==eNpjYCAGfLAfWJrBYZSmJc0xSo/So/QwpAFNQ0DR    </DataArray>
+    <DataArray type="Float64" Name="subdomain" format="binary">
+AQAAAOAFAADgBQAAIgAAAA==eNpjYACBD/sZRukRTBMCH+xHaUpoBodRepQeCBoAveCvGQ==    </DataArray>
+    <DataArray type="Float64" Name="level_subdomain" format="binary">
+AQAAAOAFAADgBQAAKAAAAA==eNpjYKAH+GCPn2ZwIEBTaP5A0wT9N9D0EA/f0fgfpUdpbDQAAW5lwQ==    </DataArray>
+    <DataArray type="Float64" Name="proc_writing" format="binary">
+AQAAAOAFAADgBQAAGAAAAA==eNpjYAADB4ZRepQepUfpUXpY0QCQ5y8B    </DataArray>
+  </PointData>
+ </Piece>
+ </UnstructuredGrid>
+</VTKFile>
+
+
