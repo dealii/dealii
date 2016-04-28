@@ -1,2 +1,2 @@
 
-DEAL::ExcFEQCannotHaveDegree0()
+DEAL::typename FEQ::ExcFEQCannotHaveDegree0()
