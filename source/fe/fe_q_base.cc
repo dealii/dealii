@@ -1120,7 +1120,8 @@ template <class PolynomialType, int dim, int spacedim>
 std::vector<unsigned int>
 FE_Q_Base<PolynomialType,dim,spacedim>::get_dpo_vector(const unsigned int degree)
 {
-  AssertThrow(degree>0, ExcFEQCannotHaveDegree0());
+  typedef FE_Q_Base<PolynomialType,dim,spacedim> FEQ;
+  AssertThrow(degree>0, typename FEQ::ExcFEQCannotHaveDegree0());
   std::vector<unsigned int> dpo(dim+1, 1U);
   for (unsigned int i=1; i<dpo.size(); ++i)
     dpo[i]=dpo[i-1]*(degree-1);
