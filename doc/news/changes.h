@@ -216,8 +216,8 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
- <li> New: added function GridOut::write_mesh_per_processor_as_vtu. This allows 
- the visualization of a parallel finite element mesh that can be seperated into each 
+ <li> New: Added function GridOut::write_mesh_per_processor_as_vtu. This allows 
+ the visualization of a parallel finite element mesh that can be separated into each 
  processor's owned and ghost cells. It also allows for the visualization of each level
  of a multilevel mesh. 
  <br>
