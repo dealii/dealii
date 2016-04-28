@@ -216,6 +216,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> New: added function GridOut::write_mesh_per_processor_as_vtu. This allows 
+ the visualization of a parallel finite element mesh that can be seperated into each 
+ processor's owned and ghost cells. It also allows for the visualization of each level
+ of a multilevel mesh. 
+ <br>
+ (Conrad Clevenger, 2016/04/28)
+ </li>
+
  <li> Fixed: TrilinosWrappers::SparseMatrix will now exit early if there are no
  entries to add to the matrix. This usually occurs when zero elision is on. This
  fixes a bug where the matrix raises an exception if there are no entries to add
@@ -251,14 +259,6 @@ inconvenience this causes.
  <li> New: Added move operations to IndexSet.
  <br>
  (Daniel Shapero, 2016/04/19)
- </li>
-
- <li> New: added function GridOut::write_mesh_per_processor_as_vtu. This allows 
- the visualization of a parallel finite element mesh that can be seperated into each 
- processor's owned and ghost cells. It also allows for the visualization of each level
- of a multilevel mesh. 
- <br>
- (Conrad Clevenger, 2016/04/28)
  </li>
 
  <li> Improved: The parallel loops in the deal.II Vector class for
