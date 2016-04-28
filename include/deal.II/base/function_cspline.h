@@ -27,19 +27,32 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Functions
 {
+  DeclException1 (ExcCSplineEmpty,
+                  int,
+                  << "Interpolation points vector size can not be <"<<arg1<<">."
+                 );
+
+  DeclException2 (ExcCSplineSizeMismatch,
+                  int,
+                  int,
+                  << "The size of interpolation points <"<<arg1<<"> is different from the size of interpolation values <" << arg2 <<">."
+                 );
+
+
   DeclException3 (ExcCSplineOrder,
                   int,
                   double,
                   double,
-                  << "CSpline: x[" << arg1 << "] = "<< arg2 <<" >= x["<<(arg1+1)<<" = "<<arg3
+                  << "The input interpolation points are not strictly ordered : " << std::endl << "x[" << arg1 << "] = "<< arg2 <<" >= x["<<(arg1+1)<<" = "<<arg3 <<"."
                  );
 
   DeclException3 (ExcCSplineRange,
                   double,
                   double,
                   double,
-                  << "CSpline: " << arg1 << " is not in ["<< arg2<<";"<<arg3<<"]."
+                  << "Spline function can not be evaluated outside of the interpolation range: "<< std::endl << arg1 << " is not in ["<< arg2<<";"<<arg3<<"]."
                  );
+
   /**
    * The cubic spline function using GNU Scientific Library.
    * The resulting curve is piecewise cubic on each interval, with matching first
@@ -56,11 +69,12 @@ namespace Functions
   {
   public:
     /**
-     * Constructor which should be provided with a set of points at which interpolation is to be done @p x
-     * and a set of function values @p f .
+     * Constructor which should be provided with a set of points at which
+     * interpolation is to be done @p interpolation_points and a set of function
+     * values @p interpolation_values .
      */
-    CSpline(const std::vector<double> &x,
-            const std::vector<double> &f);
+    CSpline(const std::vector<double> &interpolation_points,
+            const std::vector<double> &interpolation_values);
 
     /**
      * Virtual destructor.
@@ -79,22 +93,12 @@ namespace Functions
     /**
      * Points at which interpolation is provided
      */
-    const std::vector<double> x;
+    const std::vector<double> interpolation_points;
 
     /**
      * Values of the function at interpolation points
      */
-    const std::vector<double> y;
-
-    /**
-     * Maximum allowed value of x
-     */
-    const double x_max;
-
-    /**
-     * Minimum allowed value of x
-     */
-    const double x_min;
+    const std::vector<double> interpolation_values;
 
     /**
      * GSL accelerator for spline interpolation
@@ -102,7 +106,7 @@ namespace Functions
     gsl_interp_accel *acc;
 
     /**
-     * GSL cubic spline object
+     * GSL cubic spline interpolator
      */
     gsl_spline *cspline;
   };
