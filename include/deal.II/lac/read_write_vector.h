@@ -476,7 +476,7 @@ namespace LinearAlgebra
      */
     void resize_val (const size_type new_allocated_size);
 
-#ifdef DEAL_II_WITH_TRILINOS
+#if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
     /**
      * Return a EpetraWrappers::Communication pattern and store it for future
      * use.

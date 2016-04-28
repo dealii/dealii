@@ -173,7 +173,7 @@ namespace LinearAlgebra
 
 
 
-#ifdef DEAL_II_WITH_TRILINOS
+#if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
   template <typename Number>
   void
   ReadWriteVector<Number>::import(const Epetra_MultiVector        &multivector,
@@ -315,7 +315,7 @@ namespace LinearAlgebra
 
 
 
-#ifdef DEAL_II_WITH_TRILINOS
+#if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
   template <typename Number>
   EpetraWrappers::CommunicationPattern
   ReadWriteVector<Number>::create_epetra_comm_pattern(const IndexSet &source_index_set,
