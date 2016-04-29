@@ -2044,6 +2044,17 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   *
+   * @note This function needs to find the cell within which a point lies,
+   *   and this can only be done up to a certain numerical tolerance of course.
+   *   Consequently, for points that are on, or close to, the boundary of
+   *   a cell, you may get the value of the finite element field either
+   *   here or there, depending on which cell the point is found in. This
+   *   does not matter (to within the same tolerance) if the finite element
+   *   field is continuous. On the other hand, if the finite element in use
+   *   is <i>not</i> continuous, then you will get unpredictable values for
+   *   points on or close to the boundary of the cell, as one would expect
+   *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
   void
@@ -2057,6 +2068,17 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   *
+   * @note This function needs to find the cell within which a point lies,
+   *   and this can only be done up to a certain numerical tolerance of course.
+   *   Consequently, for points that are on, or close to, the boundary of
+   *   a cell, you may get the value of the finite element field either
+   *   here or there, depending on which cell the point is found in. This
+   *   does not matter (to within the same tolerance) if the finite element
+   *   field is continuous. On the other hand, if the finite element in use
+   *   is <i>not</i> continuous, then you will get unpredictable values for
+   *   points on or close to the boundary of the cell, as one would expect
+   *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
   void
@@ -2079,6 +2101,17 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   *
+   * @note This function needs to find the cell within which a point lies,
+   *   and this can only be done up to a certain numerical tolerance of course.
+   *   Consequently, for points that are on, or close to, the boundary of
+   *   a cell, you may get the value of the finite element field either
+   *   here or there, depending on which cell the point is found in. This
+   *   does not matter (to within the same tolerance) if the finite element
+   *   field is continuous. On the other hand, if the finite element in use
+   *   is <i>not</i> continuous, then you will get unpredictable values for
+   *   points on or close to the boundary of the cell, as one would expect
+   *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
   typename VectorType::value_type
@@ -2091,6 +2124,17 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   *
+   * @note This function needs to find the cell within which a point lies,
+   *   and this can only be done up to a certain numerical tolerance of course.
+   *   Consequently, for points that are on, or close to, the boundary of
+   *   a cell, you may get the value of the finite element field either
+   *   here or there, depending on which cell the point is found in. This
+   *   does not matter (to within the same tolerance) if the finite element
+   *   field is continuous. On the other hand, if the finite element in use
+   *   is <i>not</i> continuous, then you will get unpredictable values for
+   *   points on or close to the boundary of the cell, as one would expect
+   *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
   typename VectorType::value_type
@@ -2108,6 +2152,17 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   *
+   * @note This function needs to find the cell within which a point lies,
+   *   and this can only be done up to a certain numerical tolerance of course.
+   *   Consequently, for points that are on, or close to, the boundary of
+   *   a cell, you may get the value of the finite element field either
+   *   here or there, depending on which cell the point is found in. This
+   *   does not matter (to within the same tolerance) if the finite element
+   *   field is continuous. On the other hand, if the finite element in use
+   *   is <i>not</i> continuous, then you will get unpredictable values for
+   *   points on or close to the boundary of the cell, as one would expect
+   *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
   void
@@ -2122,6 +2177,17 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   *
+   * @note This function needs to find the cell within which a point lies,
+   *   and this can only be done up to a certain numerical tolerance of course.
+   *   Consequently, for points that are on, or close to, the boundary of
+   *   a cell, you may get the value of the finite element field either
+   *   here or there, depending on which cell the point is found in. This
+   *   does not matter (to within the same tolerance) if the finite element
+   *   field is continuous. On the other hand, if the finite element in use
+   *   is <i>not</i> continuous, then you will get unpredictable values for
+   *   points on or close to the boundary of the cell, as one would expect
+   *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
   void
@@ -2141,6 +2207,17 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   *
+   * @note This function needs to find the cell within which a point lies,
+   *   and this can only be done up to a certain numerical tolerance of course.
+   *   Consequently, for points that are on, or close to, the boundary of
+   *   a cell, you may get the value of the finite element field either
+   *   here or there, depending on which cell the point is found in. This
+   *   does not matter (to within the same tolerance) if the finite element
+   *   field is continuous. On the other hand, if the finite element in use
+   *   is <i>not</i> continuous, then you will get unpredictable values for
+   *   points on or close to the boundary of the cell, as one would expect
+   *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
   typename VectorType::value_type
@@ -2154,6 +2231,17 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   *
+   * @note This function needs to find the cell within which a point lies,
+   *   and this can only be done up to a certain numerical tolerance of course.
+   *   Consequently, for points that are on, or close to, the boundary of
+   *   a cell, you may get the value of the finite element field either
+   *   here or there, depending on which cell the point is found in. This
+   *   does not matter (to within the same tolerance) if the finite element
+   *   field is continuous. On the other hand, if the finite element in use
+   *   is <i>not</i> continuous, then you will get unpredictable values for
+   *   points on or close to the boundary of the cell, as one would expect
+   *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
   typename VectorType::value_type
@@ -2172,6 +2260,16 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   *
+   * @note This function needs to find the cell within which a point lies,
+   *   and this can only be done up to a certain numerical tolerance of course.
+   *   Consequently, for points that are on, or close to, the boundary of
+   *   a cell, you may get the gradient of the finite element field either
+   *   here or there, depending on which cell the point is found in. Since
+   *   the gradient is, for most elements, discontinuous from one cell or
+   *   the other, you will get unpredictable values for
+   *   points on or close to the boundary of the cell, as one would expect
+   *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
   void
@@ -2185,6 +2283,16 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   *
+   * @note This function needs to find the cell within which a point lies,
+   *   and this can only be done up to a certain numerical tolerance of course.
+   *   Consequently, for points that are on, or close to, the boundary of
+   *   a cell, you may get the gradient of the finite element field either
+   *   here or there, depending on which cell the point is found in. Since
+   *   the gradient is, for most elements, discontinuous from one cell or
+   *   the other, you will get unpredictable values for
+   *   points on or close to the boundary of the cell, as one would expect
+   *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
   void
@@ -2203,6 +2311,16 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   *
+   * @note This function needs to find the cell within which a point lies,
+   *   and this can only be done up to a certain numerical tolerance of course.
+   *   Consequently, for points that are on, or close to, the boundary of
+   *   a cell, you may get the gradient of the finite element field either
+   *   here or there, depending on which cell the point is found in. Since
+   *   the gradient is, for most elements, discontinuous from one cell or
+   *   the other, you will get unpredictable values for
+   *   points on or close to the boundary of the cell, as one would expect
+   *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
   Tensor<1, spacedim, typename VectorType::value_type>
@@ -2215,6 +2333,16 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+    *
+   * @note This function needs to find the cell within which a point lies,
+   *   and this can only be done up to a certain numerical tolerance of course.
+   *   Consequently, for points that are on, or close to, the boundary of
+   *   a cell, you may get the gradient of the finite element field either
+   *   here or there, depending on which cell the point is found in. Since
+   *   the gradient is, for most elements, discontinuous from one cell or
+   *   the other, you will get unpredictable values for
+   *   points on or close to the boundary of the cell, as one would expect
+   *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
   Tensor<1, spacedim, typename VectorType::value_type>
@@ -2232,6 +2360,16 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   *
+   * @note This function needs to find the cell within which a point lies,
+   *   and this can only be done up to a certain numerical tolerance of course.
+   *   Consequently, for points that are on, or close to, the boundary of
+   *   a cell, you may get the gradient of the finite element field either
+   *   here or there, depending on which cell the point is found in. Since
+   *   the gradient is, for most elements, discontinuous from one cell or
+   *   the other, you will get unpredictable values for
+   *   points on or close to the boundary of the cell, as one would expect
+   *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
   void
@@ -2246,6 +2384,16 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   *
+   * @note This function needs to find the cell within which a point lies,
+   *   and this can only be done up to a certain numerical tolerance of course.
+   *   Consequently, for points that are on, or close to, the boundary of
+   *   a cell, you may get the gradient of the finite element field either
+   *   here or there, depending on which cell the point is found in. Since
+   *   the gradient is, for most elements, discontinuous from one cell or
+   *   the other, you will get unpredictable values for
+   *   points on or close to the boundary of the cell, as one would expect
+   *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
   void
@@ -2265,6 +2413,16 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   *
+   * @note This function needs to find the cell within which a point lies,
+   *   and this can only be done up to a certain numerical tolerance of course.
+   *   Consequently, for points that are on, or close to, the boundary of
+   *   a cell, you may get the gradient of the finite element field either
+   *   here or there, depending on which cell the point is found in. Since
+   *   the gradient is, for most elements, discontinuous from one cell or
+   *   the other, you will get unpredictable values for
+   *   points on or close to the boundary of the cell, as one would expect
+   *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
   Tensor<1, spacedim, typename VectorType::value_type>
@@ -2278,6 +2436,16 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   *
+   * @note This function needs to find the cell within which a point lies,
+   *   and this can only be done up to a certain numerical tolerance of course.
+   *   Consequently, for points that are on, or close to, the boundary of
+   *   a cell, you may get the gradient of the finite element field either
+   *   here or there, depending on which cell the point is found in. Since
+   *   the gradient is, for most elements, discontinuous from one cell or
+   *   the other, you will get unpredictable values for
+   *   points on or close to the boundary of the cell, as one would expect
+   *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
   Tensor<1, spacedim, typename VectorType::value_type>
