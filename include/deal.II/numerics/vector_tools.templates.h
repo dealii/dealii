@@ -2343,7 +2343,12 @@ namespace VectorTools
                       level = cell->level();
                     else
                       {
-                        Assert (level == cell->level(), ExcNotImplemented());
+                        Assert (level == cell->level(),
+                                ExcMessage("The mesh you use in projecting boundary values "
+                                           "has hanging nodes at the boundary. This would require "
+                                           "dealing with hanging node constraints when solving "
+                                           "the linear system on the boundary, but this is not "
+                                           "currently implemented."));
                       }
                   }
               }
