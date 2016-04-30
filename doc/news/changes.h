@@ -121,6 +121,13 @@ inconvenience this causes.
 
 <ol>
 
+ <li> New: Added an interface to the GNU Scientific Library. Also introduce a
+ cubic spline interpolation function Functions::CSpline.
+ <br>
+ (Denis Davydov, 2016/04/28)
+ </li>
+
+
  <li> New: Added move operations to BlockIndices, BlockVectorBase and
  BlockVector; Vector move operations nullify old object instead of
  using swap.
