@@ -60,13 +60,24 @@ FOREACH(_component compat_files documentation examples parameter_gui)
     _add_custom_target(${_component})
   ELSE()
     STRING(TOUPPER ${_component} _componentuppercase)
+
+    SET(_error_description_message
+      "Error: Could not ${_description_string} disabled component ${_component}.")
+    DECORATE_WITH_STARS(${_error_description_message}
+      _decorated_error_description_message)
+
+    SET(_reconfiguration_help_message
+      "Please reconfigure with -DDEAL_II_COMPONENT_${_componentuppercase}=ON")
+    DECORATE_WITH_STARS(${_reconfiguration_help_message}
+      _decorated_reconfiguration_help_message)
+
     ADD_CUSTOM_TARGET(${_component}
       COMMAND
            ${CMAKE_COMMAND} -E echo ''
         && ${CMAKE_COMMAND} -E echo ''
         && ${CMAKE_COMMAND} -E echo '***************************************************************************'
-        && ${CMAKE_COMMAND} -E echo "**  Error: Could not ${_description_string} disabled component \"${_component}\"."
-        && ${CMAKE_COMMAND} -E echo "**  Please reconfigure with -DDEAL_II_COMPONENT_${_componentuppercase}=ON"
+        && ${CMAKE_COMMAND} -E echo "${_decorated_error_description_message}"
+        && ${CMAKE_COMMAND} -E echo "${_decorated_reconfiguration_help_message}"
         && ${CMAKE_COMMAND} -E echo '***************************************************************************'
         && ${CMAKE_COMMAND} -E echo ''
         && ${CMAKE_COMMAND} -E echo ''
@@ -81,8 +92,8 @@ IF(NOT DEAL_II_COMPONENT_PACKAGE)
          ${CMAKE_COMMAND} -E echo ''
       && ${CMAKE_COMMAND} -E echo ''
       && ${CMAKE_COMMAND} -E echo '***************************************************************************'
-      && ${CMAKE_COMMAND} -E echo "**  Error: Could not generate binary package. The component is disabled."
-      && ${CMAKE_COMMAND} -E echo "**  Please reconfigure with -DDEAL_II_COMPONENT_PACKAGE=ON"
+      && ${CMAKE_COMMAND} -E echo '**  Error: Could not generate binary package. The component is disabled. **'
+      && ${CMAKE_COMMAND} -E echo '**        Please reconfigure with -DDEAL_II_COMPONENT_PACKAGE=ON         **'
       && ${CMAKE_COMMAND} -E echo '***************************************************************************'
       && ${CMAKE_COMMAND} -E echo ''
       && ${CMAKE_COMMAND} -E echo ''
