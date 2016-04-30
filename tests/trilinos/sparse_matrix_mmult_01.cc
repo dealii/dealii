@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv);
 
-  mpi_initlog();
+  initlog();
 
   TrilinosWrappers::SparsityPattern P_A;
   TrilinosWrappers::SparseMatrix A;
