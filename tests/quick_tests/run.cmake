@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 by the deal.II authors
+## Copyright (C) 2013 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -60,5 +60,12 @@ recent version or use a different MPI library like MPICH.\n"
     ENDIF()
 
   ENDFOREACH()
+
+  # The CMake command MESSAGE(SEND_ERROR ...) is, to the best of the authors'
+  # knowledge, the only way to set the exit status of CMake to a nonzero value.
+  # If we used MESSAGE(SEND_ERROR ...) at the top (with the actual error
+  # message) then subsequent messages (i.e., the test specific help) would not
+  # be printed. Hence, do it down here.
+  MESSAGE(SEND_ERROR "")
 
 ENDIF()
