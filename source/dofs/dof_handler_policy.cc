@@ -97,10 +97,6 @@ namespace internal
                d<dof_handler.get_fe().dofs_per_line; ++d)
             cell->set_dof_index (d, next_free_dof++);
 
-          // note that this cell has been
-          // processed
-          cell->set_user_flag ();
-
           return next_free_dof;
         }
 
@@ -144,10 +140,6 @@ namespace internal
           if (dof_handler.get_fe().dofs_per_quad > 0)
             for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_quad; ++d)
               cell->set_dof_index (d, next_free_dof++);
-
-
-          // note that this cell has been processed
-          cell->set_user_flag ();
 
           return next_free_dof;
         }
@@ -208,11 +200,6 @@ namespace internal
             for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_hex; ++d)
               cell->set_dof_index (d, next_free_dof++);
 
-
-          // note that this cell has been
-          // processed
-          cell->set_user_flag ();
-
           return next_free_dof;
         }
 
@@ -230,17 +217,8 @@ namespace internal
                          const types::subdomain_id subdomain_id,
                          DoFHandler<dim,spacedim> &dof_handler)
         {
-          const dealii::Triangulation<dim,spacedim> &tria
-            = dof_handler.get_triangulation();
-          Assert (tria.n_levels() > 0, ExcMessage("Empty triangulation"));
-
-          // Clear user flags because we will need them. But first we save
-          // them and make sure that we restore them later such that at the
-          // end of this function the Triangulation will be in the same state
-          // as it was at the beginning of this function.
-          std::vector<bool> user_flags;
-          tria.save_user_flags(user_flags);
-          const_cast<dealii::Triangulation<dim,spacedim> &>(tria).clear_user_flags ();
+          Assert (dof_handler.get_triangulation().n_levels() > 0,
+                  ExcMessage("Empty triangulation"));
 
           types::global_dof_index next_free_dof = offset;
           typename DoFHandler<dim,spacedim>::active_cell_iterator
@@ -260,9 +238,6 @@ namespace internal
           for (cell = dof_handler.begin_active(); cell != endc; ++cell)
             if (!cell->is_artificial())
               cell->update_cell_dof_indices_cache ();
-
-          // finally restore the user flags
-          const_cast<dealii::Triangulation<dim,spacedim> &>(tria).load_user_flags(user_flags);
 
           return next_free_dof;
         }
