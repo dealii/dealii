@@ -520,6 +520,7 @@ namespace deal_II_exceptions
  * @ingroup Exceptions
  */
 #define DeclException0(Exception0)                                        \
+  /** @ingroup Exceptions */ \
   static dealii::ExceptionBase& Exception0 ()
 
 /**
@@ -531,6 +532,8 @@ namespace deal_II_exceptions
  * @ingroup Exceptions
  */
 #define DeclExceptionMsg(Exception, defaulttext)                          \
+  /** @ingroup Exceptions */ \
+  /** @note The error text is: @code defaulttext @endcode */  \
   static dealii::ExceptionBase& Exception ()
 
 /**
@@ -540,7 +543,9 @@ namespace deal_II_exceptions
  * @ingroup Exceptions
  */
 #define DeclException1(Exception1, type1, outsequence)                    \
-  static dealii::ExceptionBase& Exception1 (type1 arg1) throw (errortext outsequence)
+  /** @ingroup Exceptions */ \
+  /** @note The error text is: @code outsequence @endcode */              \
+  static dealii::ExceptionBase& Exception1 (type1 arg1)
 
 
 /**
@@ -550,7 +555,9 @@ namespace deal_II_exceptions
  * @ingroup Exceptions
  */
 #define DeclException2(Exception2, type1, type2, outsequence)             \
-  static dealii::ExceptionBase& Exception2 (type1 arg1, type2 arg2) throw (errortext outsequence)
+  /** @ingroup Exceptions */ \
+  /** @note The error text is: @code outsequence @endcode */              \
+  static dealii::ExceptionBase& Exception2 (type1 arg1, type2 arg2)
 
 
 /**
@@ -560,7 +567,9 @@ namespace deal_II_exceptions
  * @ingroup Exceptions
  */
 #define DeclException3(Exception3, type1, type2, type3, outsequence)      \
-  static dealii::ExceptionBase& Exception3 (type1 arg1, type2 arg2, type3 arg3) throw (errortext outsequence)
+  /** @ingroup Exceptions */ \
+  /** @note The error text is: @code outsequence @endcode */              \
+  static dealii::ExceptionBase& Exception3 (type1 arg1, type2 arg2, type3 arg3)
 
 
 /**
@@ -570,7 +579,9 @@ namespace deal_II_exceptions
  * @ingroup Exceptions
  */
 #define DeclException4(Exception4, type1, type2, type3, type4, outsequence) \
-  static dealii::ExceptionBase& Exception4 (type1 arg1, type2 arg2, type3 arg3, type4 arg4) throw (errortext outsequence)
+  /** @ingroup Exceptions */ \
+  /** @note The error text is: @code outsequence @endcode */                \
+  static dealii::ExceptionBase& Exception4 (type1 arg1, type2 arg2, type3 arg3, type4 arg4)
 
 
 /**
@@ -580,7 +591,9 @@ namespace deal_II_exceptions
  * @ingroup Exceptions
  */
 #define DeclException5(Exception5, type1, type2, type3, type4, type5, outsequence) \
-  static dealii::ExceptionBase& Exception5 (type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5) throw (errortext outsequence)
+  /** @ingroup Exceptions */ \
+  /** @note The error text is: @code outsequence @endcode */                       \
+  static dealii::ExceptionBase& Exception5 (type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5)
 
 #endif /*ifndef DOXYGEN*/
 
