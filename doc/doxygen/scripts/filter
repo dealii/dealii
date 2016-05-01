@@ -54,9 +54,6 @@ s/(?<![\"\\\/])step-(\d+)(?!\")/\@ref step_\1 \"step-\1\"/gi
 # latter
 s/\\(step-\d+)/\1/g;
 
-
-s#(static dealii::ExceptionBase\&)#\n//\! \@ingroup Exceptions\n \1#g;
-
 # doxygen version 1.7.1 and later have the habit of thinking that
 # everything that starts with "file:" is the beginning of a link,
 # but we occasionally use this in our tutorials in the form
