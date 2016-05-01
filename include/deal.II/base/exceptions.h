@@ -533,7 +533,7 @@ namespace deal_II_exceptions
  */
 #define DeclExceptionMsg(Exception, defaulttext)                          \
   /** @ingroup Exceptions */ \
-  /** @note The error text is: @code defaulttext @endcode */	\
+  /** @note The error text is: @code defaulttext @endcode */  \
   static dealii::ExceptionBase& Exception ()
 
 /**
