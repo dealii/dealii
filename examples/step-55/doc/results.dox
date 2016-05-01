@@ -24,20 +24,20 @@
   <tr>
     <td>3D, 4 global refinements</td>
     <td>8.38E-005</td>
-    <td>8.0073235678</td>
+    <td>8.0</td>
     <td>0.00088494</td>
-    <td>4.1283024838</td>
+    <td>4.1</td>
     <td>0.0103781</td>
-    <td>3.9959530164</td>
+    <td>4.0</td>
   </tr>
   <tr>
     <td>3D, 5 global refinements</td>
     <td>1.05E-005</td>
-    <td>8.0008689923</td>
+    <td>8.0</td>
     <td>0.000220253</td>
-    <td>4.0178340363</td>
+    <td>4.0</td>
     <td>0.00259519</td>
-    <td>3.9989750269</td>
+    <td>4.0</td>
 </th>
   </tr>
 </table>
@@ -151,7 +151,7 @@
 As can be seen from the table,
 
 1. UMFPACK uses large amounts of memory, especially in 3d. Also,
-UMFPACK timings do not scale with problem size.
+UMFPACK timings do not scale favorably with problem size.
 
 2. The number of iterations for $A$ increase for ILU with refinement
 leading to worse then linear scaling in solve time. In contrast, the
