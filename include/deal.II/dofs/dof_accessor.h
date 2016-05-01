@@ -177,7 +177,7 @@ namespace internal
  *
  * @tparam structdim The dimensionality of the objects the accessor
  *   represents. For example, points have @p structdim equal to zero,
- *   edges have @structdim equal to one, etc.
+ *   edges have @p structdim equal to one, etc.
  * @tparam DoFHandlerType The type of the DoF handler into which accessor
  *   of this type point. This is either the DoFHandler or hp::DoFHandler
  *   class. See also the @ref ConceptDoFHandlerType "DoFHandlerType concept".

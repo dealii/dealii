@@ -414,7 +414,7 @@ public:
    * arguments $t=0$ and $t=1$ are farther apart.
    *
    * The default implementation of this function approximates
-   * $\mathbf s'(0) \approx \frac{$\mathbf s(\epsilon)-\mathbf x_1}{\epsilon}$
+   * $\mathbf s'(0) \approx \frac{\mathbf s(\epsilon)-\mathbf x_1}{\epsilon}$
    * for a small value of $\epsilon$, and the evaluation of $\mathbf s(\epsilon)$
    * is done by calling get_new_point(). If possible, derived classes should
    * override this function by an implemention of the exact derivative.
