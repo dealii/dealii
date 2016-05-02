@@ -233,6 +233,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: Bug in the RelaxationBlock class function do_step. Before, the 
+ corrections were not added together, which leads to a wrong update whenever the
+ Jacobi blocks are overlapping. For SOR, SSOR and non-overlapping Jacobi this was 
+ not an issue.
+ <br>
+ (Joscha Gedicke, 2016/05/07)
+ </li>
+
  <li> New: Added function GridOut::write_mesh_per_processor_as_vtu. This allows 
  the visualization of a parallel finite element mesh that can be separated into each 
  processor's owned and ghost cells. It also allows for the visualization of each level

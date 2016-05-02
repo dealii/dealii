@@ -210,7 +210,7 @@ RelaxationBlock<MatrixType,inverse_type>::do_step (Vector<number2>       &dst,
           // Store in result vector
           row=additional_data->block_list.begin(block);
           for (size_type row_cell=0; row_cell<bs; ++row_cell, ++row)
-            dst(row->column()) = prev(row->column()) + additional_data->relaxation * x_cell(row_cell);
+            dst(row->column()) += additional_data->relaxation * x_cell(row_cell);
         }
     }
 }
