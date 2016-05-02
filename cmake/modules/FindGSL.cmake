@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II authors
+## Copyright (C) 2012 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -19,11 +19,11 @@
 # This module exports
 #
 #   GSL_LIBRARIES
-#   GSL_INCLUDE_LIBRARIES
+#   GSL_INCLUDE_DIRS
 #   GSL_LINKER_FLAGS
 #
 
-SET(GSL_DIR "" CACHE PATH "An optional hint to an GSL installation")
+SET(GSL_DIR "" CACHE PATH "An optional hint to a GSL installation")
 SET_IF_EMPTY(GSL_DIR "$ENV{GSL_DIR}")
 
 DEAL_II_FIND_LIBRARY(GSL_LIBRARY
