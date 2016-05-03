@@ -39,7 +39,6 @@
         <li><a href="#cmakeadvanced.globs">File globs</a></li>
         <li><a href="#cmakeadvanced.setup_target"><code>DEAL_II_SETUP_TARGET</code> revisited</a></li>
         <li><a href="#cmakeadvanced.cached_variables"><code>DEAL_II_INITIALIZE_CACHED_VARIABLES</code> revisited</a></li>
-        <li><a href="#cmakeadvanced.native_cmake">Use only native CMake commands</a></li>
         <li><a href="#cmakeadvanced.properties">Customizing include directories and compile definitions</a></li>
         <li><a href="#cmakeadvanced.external_libraries">External libraries</a></li>
         <li><a href="#cmakeadvanced.run">The "run" target revisited</a></li>
@@ -528,30 +527,6 @@ corresponding <code>DEAL_II_*</code> variable instead. See the
 documentation of <a
 href="#cmakeadvanced.setup_target"><code>DEAL_II_SETUP_TARGET</code></a>
 for further details.
-</p>
-
-<a name="cmakeadvanced.native_cmake"></a>
-<h3>Use only native CMake commands</h3>
-
-<p>
-In order to have the ultimate flexibility, it is also possible to configure a
-user project using only native CMake commands, that is avoid usage of
-<code>DEAL_II_INITIALIZE_CACHED_VARIABLES</code> and <code>DEAL_II_SETUP_TARGET</code> macros.
-This can be achieved, for example, by the following code
-<pre class="cmake">
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0.0)
-# Find and include deal.IIConfig.cmake
-FIND_PACKAGE(deal.II 8.5.0 REQUIRED
-  HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
-  )
-PROJECT(example)
-
-# Include deal.IITargets.cmake
-INCLUDE(${DEAL_II_TARGET_CONFIG})
-
-ADD_EXECUTABLE(example example.src)
-TARGET_LINK_LIBRARIES(example ${DEAL_II_TARGET})
-</pre>
 </p>
 
 <a name="cmakeadvanced.properties"></a>
