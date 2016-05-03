@@ -383,7 +383,8 @@ namespace LinearAlgebra
   void Vector<Number>::add(const Number a)
   {
     AssertIsFinite(a);
-    for (unsigned int i=0; i<this->size(); ++i)
+    const size_type size = this->size();
+    for (size_type i=0; i<size; ++i)
       this->val[i] += a;
   }
 
@@ -424,7 +425,7 @@ namespace LinearAlgebra
   inline
   void Vector<Number>::serialize(Archive &ar, const unsigned int)
   {
-    unsigned int current_size = this->size();
+    size_type current_size = this->size();
     ar &static_cast<Subscriptor &>(*this);
     ar &this->stored_elements;
     // If necessary, resize the vector during a read operation

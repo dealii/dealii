@@ -28,7 +28,8 @@ namespace LinearAlgebra
   Vector<Number> &Vector<Number>::operator*= (const Number factor)
   {
     AssertIsFinite(factor);
-    for (unsigned int i=0; i<this->size(); ++i)
+    const size_type size = this->size();
+    for (size_type i=0; i<size; ++i)
       this->val[i] *= factor;
 
     return *this;
@@ -58,7 +59,8 @@ namespace LinearAlgebra
     const Vector<Number> &down_V = dynamic_cast<const Vector<Number>&>(V);
     Assert(down_V.size()==this->size(),
            ExcMessage("Cannot add two vectors with different numbers of elements"));
-    for (unsigned int i=0; i<this->size(); ++i)
+    const size_type size = this->size();
+    for (size_type i=0; i<size; ++i)
       {
         AssertIsFinite(down_V[i]);
         this->val[i] += down_V[i];
@@ -79,7 +81,8 @@ namespace LinearAlgebra
     const Vector<Number> &down_V = dynamic_cast<const Vector<Number>&>(V);
     Assert(down_V.size()==this->size(),
            ExcMessage("Cannot subtract two vectors with different numbers of elements"));
-    for (unsigned int i=0; i<this->size(); ++i)
+    const size_type size = this->size();
+    for (size_type i=0; i<size; ++i)
       {
         AssertIsFinite(down_V[i]);
         this->val[i] -= down_V[i];
@@ -102,8 +105,9 @@ namespace LinearAlgebra
     Assert(down_V.size()==this->size(),
            ExcMessage("Cannot compute the scalar product "
                       "of two vectors with different numbers of elements"));
+    const size_type size = this->size();
     Number value = 0.;
-    for (unsigned int i=0; i<this->size(); ++i)
+    for (size_type i=0; i<size; ++i)
       {
         AssertIsFinite(down_V[i]);
         value += this->val[i]*down_V[i];
@@ -136,7 +140,8 @@ namespace LinearAlgebra
     AssertIsFinite(a);
     Assert(down_V.size()==this->size(),
            ExcMessage("Cannot add two vectors with different numbers of elements"));
-    for (unsigned int i=0; i<this->size(); ++i)
+    const size_type size = this->size();
+    for (size_type i=0; i<size; ++i)
       {
         AssertIsFinite(down_V[i]);
         this->val[i] += a*down_V[i];
@@ -166,7 +171,8 @@ namespace LinearAlgebra
     AssertIsFinite(b);
     Assert(down_W.size()==this->size(),
            ExcMessage("Cannot add two vectors with different numbers of elements"));
-    for (unsigned int i=0; i<this->size(); ++i)
+    const size_type size = this->size();
+    for (size_type i=0; i<size; ++i)
       {
         AssertIsFinite(down_V[i]);
         AssertIsFinite(down_W[i]);
@@ -206,7 +212,8 @@ namespace LinearAlgebra
       dynamic_cast<const Vector<Number>&>(scaling_factors);
     Assert(down_scaling_factors.size()==this->size(),
            ExcMessage("Cannot add two vectors with different numbers of elements"));
-    for (unsigned int i=0; i<this->size(); ++i)
+    const size_type size = this->size();
+    for (size_type i=0; i<size; ++i)
       {
         AssertIsFinite(down_scaling_factors[i]);
         this->val[i] *= down_scaling_factors[i];
@@ -264,7 +271,8 @@ namespace LinearAlgebra
       {
         real_type scale = 0.;
         real_type sum = 1.;
-        for (unsigned int i=0; i<this->size(); ++i)
+        const size_type size = this->size();
+        for (size_type i=0; i<size; ++i)
           {
             if (this->val[i] != Number())
               {
@@ -290,7 +298,8 @@ namespace LinearAlgebra
   typename VectorSpaceVector<Number>::real_type Vector<Number>::linfty_norm() const
   {
     typename ReadWriteVector<Number>::real_type norm = 0.;
-    for (unsigned int i=0; i<this->size(); ++i)
+    const size_type size = this->size();
+    for (size_type i=0; i<size; ++i)
       norm = std::max(std::abs(this->val[i]),norm);
 
     return norm;
