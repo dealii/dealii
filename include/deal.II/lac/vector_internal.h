@@ -17,6 +17,11 @@
 #ifndef dealii__vector_internal_h
 #define dealii__vector_internal_h
 
+#include <deal.II/base/multithread_info.h>
+#include <deal.II/base/parallel.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/base/vectorization.h>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace internal
@@ -208,7 +213,7 @@ namespace internal
       else
         {
           DEAL_II_OPENMP_SIMD_PRAGMA
-          for (typename dealii::Vector<Number>::size_type i=begin; i<end; ++i)
+          for (size_type i=begin; i<end; ++i)
             dst[i] = src[i];
         }
     }

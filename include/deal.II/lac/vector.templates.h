@@ -19,10 +19,6 @@
 
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/numbers.h>
-#include <deal.II/base/parallel.h>
-#include <deal.II/base/thread_management.h>
-#include <deal.II/base/multithread_info.h>
-#include <deal.II/base/vectorization.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/vector_internal.h>
@@ -464,15 +460,6 @@ Vector<Number>::sadd (const Number x,
   vector_sadd_xav.a = a;
   vector_sadd_xav.x = x;
   internal::parallel_for(vector_sadd_xav,vec_size,thread_loop_partitioner);
-}
-
-
-
-namespace internal
-{
-  namespace Vector
-  {
-  }
 }
 
 
