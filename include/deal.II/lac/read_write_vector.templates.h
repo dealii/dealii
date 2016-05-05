@@ -19,7 +19,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/lac/read_write_vector.h>
-#include <deal.II/lac/vector_internal.h>
+#include <deal.II/lac/vector_operations_internal.h>
 
 #ifdef DEAL_II_PETSC
 #  include <deal.II/lac/petsc_parallel_vector.h>
@@ -135,9 +135,7 @@ namespace LinearAlgebra
     if (n_elements() != in_vector.n_elements())
       reinit(in_vector, true);
 
-    dealii::internal::Vector_copy<Number,Number> copier;
-    copier.dst = val;
-    copier.src = in_vector.val;
+    dealii::internal::Vector_copy<Number,Number> copier(in_vector.val, val);
     internal::parallel_for(copier, n_elements(), thread_loop_partitioner);
 
     return *this;
@@ -154,9 +152,7 @@ namespace LinearAlgebra
     if (n_elements() != in_vector.n_elements())
       reinit(in_vector, true);
 
-    dealii::internal::Vector_copy<Number,Number2> copier;
-    copier.dst = val;
-    copier.src = in_vector.val;
+    dealii::internal::Vector_copy<Number,Number2> copier(in_vector.val, val);
     internal::parallel_for(copier, n_elements(), thread_loop_partitioner);
 
     return *this;
@@ -171,10 +167,7 @@ namespace LinearAlgebra
     Assert(s==static_cast<Number>(0), ExcMessage("Only 0 can be assigned to a vector."));
     (void)s;
 
-    internal::Vector_set<Number> setter;
-    setter.dst = val;
-    setter.value = Number();
-
+    internal::Vector_set<Number> setter(Number(), val);
     internal::parallel_for(setter, n_elements(), thread_loop_partitioner);
 
     return *this;

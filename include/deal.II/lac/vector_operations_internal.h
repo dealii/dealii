@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__vector_internal_h
-#define dealii__vector_internal_h
+#ifndef dealii__vector_operations_internal_h
+#define dealii__vector_operations_internal_h
 
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/parallel.h>
@@ -188,8 +188,11 @@ namespace internal
   template <typename Number>
   struct Vector_set
   {
-    Number *dst;
-    Number value;
+    Vector_set(Number value, Number *dst)
+      :
+      value(value),
+      dst(dst)
+    {}
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -198,13 +201,19 @@ namespace internal
       else
         std::fill (dst+begin, dst+end, value);
     }
+
+    Number value;
+    Number *dst;
   };
 
   template <typename Number, typename OtherNumber>
   struct Vector_copy
   {
-    const OtherNumber *src;
-    Number *dst;
+    Vector_copy(const OtherNumber *src, Number *dst)
+      :
+      src(src),
+      dst(dst)
+    {}
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -217,13 +226,19 @@ namespace internal
             dst[i] = src[i];
         }
     }
+
+    const OtherNumber *src;
+    Number *dst;
   };
 
   template <typename Number>
   struct Vectorization_multiply_factor
   {
-    Number *val;
-    Number factor;
+    Vectorization_multiply_factor(Number *val, Number factor)
+      :
+      val(val),
+      factor(factor)
+    {}
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -239,14 +254,20 @@ namespace internal
             val[i] *= factor;
         }
     }
+
+    Number *val;
+    Number factor;
   };
 
   template <typename Number>
   struct Vectorization_add_av
   {
-    Number *val;
-    Number *v_val;
-    Number factor;
+    Vectorization_add_av(Number *val, Number *v_val, Number factor)
+      :
+      val(val),
+      v_val(v_val),
+      factor(factor)
+    {}
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -262,15 +283,22 @@ namespace internal
             val[i] += factor*v_val[i];
         }
     }
+
+    Number *val;
+    Number *v_val;
+    Number factor;
   };
 
   template <typename Number>
   struct Vectorization_sadd_xav
   {
-    Number *val;
-    Number *v_val;
-    Number a;
-    Number x;
+    Vectorization_sadd_xav(Number *val, Number *v_val, Number a, Number x)
+      :
+      val(val),
+      v_val(v_val),
+      a(a),
+      x(x)
+    {}
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -286,13 +314,21 @@ namespace internal
             val[i] = x*val[i] + a*v_val[i];
         }
     }
+
+    Number *val;
+    Number *v_val;
+    Number a;
+    Number x;
   };
 
   template <typename Number>
   struct Vectorization_subtract_v
   {
-    Number *val;
-    Number *v_val;
+    Vectorization_subtract_v(Number *val, Number *v_val)
+      :
+      val(val),
+      v_val(v_val)
+    {}
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -308,13 +344,19 @@ namespace internal
             val[i] -= v_val[i];
         }
     }
+
+    Number *val;
+    Number *v_val;
   };
 
   template <typename Number>
   struct Vectorization_add_factor
   {
-    Number *val;
-    Number factor;
+    Vectorization_add_factor(Number *val, Number factor)
+      :
+      val(val),
+      factor(factor)
+    {}
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -330,13 +372,19 @@ namespace internal
             val[i] += factor;
         }
     }
+
+    Number *val;
+    Number factor;
   };
 
   template <typename Number>
   struct Vectorization_add_v
   {
-    Number *val;
-    Number *v_val;
+    Vectorization_add_v(Number *val, Number *v_val)
+      :
+      val(val),
+      v_val(v_val)
+    {}
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -352,16 +400,22 @@ namespace internal
             val[i] += v_val[i];
         }
     }
+
+    Number *val;
+    Number *v_val;
   };
 
   template <typename Number>
   struct Vectorization_add_avpbw
   {
-    Number *val;
-    Number *v_val;
-    Number *w_val;
-    Number a;
-    Number b;
+    Vectorization_add_avpbw(Number *val, Number *v_val, Number *w_val, Number a, Number b)
+      :
+      val(val),
+      v_val(v_val),
+      w_val(w_val),
+      a(a),
+      b(b)
+    {}
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -377,14 +431,23 @@ namespace internal
             val[i] = val[i] + a*v_val[i] + b*w_val[i];
         }
     }
+
+    Number *val;
+    Number *v_val;
+    Number *w_val;
+    Number a;
+    Number b;
   };
 
   template <typename Number>
   struct Vectorization_sadd_xv
   {
-    Number *val;
-    Number *v_val;
-    Number x;
+    Vectorization_sadd_xv(Number *val, Number *v_val, Number x)
+      :
+      val(val),
+      v_val(v_val),
+      x(x)
+    {}
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -400,39 +463,57 @@ namespace internal
             val[i] = x*val[i] + v_val[i];
         }
     }
+
+    Number *val;
+    Number *v_val;
+    Number x;
   };
 
   template <typename Number>
   struct Vectorization_sadd_xavbw
   {
+    Vectorization_sadd_xavbw(Number *val, Number *v_val, Number *w_val,
+                             Number x, Number a, Number b)
+      :
+      val(val),
+      v_val(v_val),
+      w_val(w_val),
+      x(x),
+      a(a),
+      b(b)
+    {}
+
+    void operator() (const size_type begin, const size_type end) const
+    {
+      if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        {
+          DEAL_II_OPENMP_SIMD_PRAGMA
+          for (size_type i=begin; i<end; ++i)
+            val[i] = x*val[i] + a*v_val[i] + b*w_val[i];
+        }
+      else
+        {
+          for (size_type i=begin; i<end; ++i)
+            val[i] = x*val[i] + a*v_val[i] + b*w_val[i];
+        }
+    }
+
     Number *val;
     Number *v_val;
     Number *w_val;
     Number x;
     Number a;
     Number b;
-
-    void operator() (const size_type begin, const size_type end) const
-    {
-      if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
-        {
-          DEAL_II_OPENMP_SIMD_PRAGMA
-          for (size_type i=begin; i<end; ++i)
-            val[i] = x*val[i] + a*v_val[i] + b*w_val[i];
-        }
-      else
-        {
-          for (size_type i=begin; i<end; ++i)
-            val[i] = x*val[i] + a*v_val[i] + b*w_val[i];
-        }
-    }
   };
 
   template <typename Number>
   struct Vectorization_scale
   {
-    Number *val;
-    Number *v_val;
+    Vectorization_scale(Number *val, Number *v_val)
+      :
+      val(val),
+      v_val(v_val)
+    {}
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -448,14 +529,20 @@ namespace internal
             val[i] *= v_val[i];
         }
     }
+
+    Number *val;
+    Number *v_val;
   };
 
   template <typename Number>
   struct Vectorization_equ_au
   {
-    Number *val;
-    Number *u_val;
-    Number a;
+    Vectorization_equ_au(Number *val, Number *u_val, Number a)
+      :
+      val(val),
+      u_val(u_val),
+      a(a)
+    {}
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -471,16 +558,24 @@ namespace internal
             val[i] = a*u_val[i];
         }
     }
+
+    Number *val;
+    Number *u_val;
+    Number a;
   };
 
   template <typename Number>
   struct Vectorization_equ_aubv
   {
-    Number *val;
-    Number *u_val;
-    Number *v_val;
-    Number a;
-    Number b;
+    Vectorization_equ_aubv(Number *val, Number *u_val, Number *v_val,
+                           Number a, Number b)
+      :
+      val(val),
+      u_val(u_val),
+      v_val(v_val),
+      a(a),
+      b(b)
+    {}
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -496,11 +591,44 @@ namespace internal
             val[i] = a*u_val[i] + b*v_val[i];
         }
     }
+
+    Number *val;
+    Number *u_val;
+    Number *v_val;
+    Number a;
+    Number b;
   };
 
   template <typename Number>
   struct Vectorization_equ_aubvcw
   {
+    Vectorization_equ_aubvcw(Number *val, Number *u_val, Number *v_val,
+                             Number *w_val, Number a, Number b, Number c)
+      :
+      val(val),
+      u_val(u_val),
+      v_val(v_val),
+      w_val(w_val),
+      a(a),
+      b(b),
+      c(c)
+    {}
+
+    void operator() (const size_type begin, const size_type end) const
+    {
+      if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        {
+          DEAL_II_OPENMP_SIMD_PRAGMA
+          for (size_type i=begin; i<end; ++i)
+            val[i] = a*u_val[i] + b*v_val[i] + c*w_val[i];
+        }
+      else
+        {
+          for (size_type i=begin; i<end; ++i)
+            val[i] = a*u_val[i] + b*v_val[i] + c*w_val[i];
+        }
+    }
+
     Number *val;
     Number *u_val;
     Number *v_val;
@@ -508,29 +636,17 @@ namespace internal
     Number a;
     Number b;
     Number c;
-
-    void operator() (const size_type begin, const size_type end) const
-    {
-      if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
-        {
-          DEAL_II_OPENMP_SIMD_PRAGMA
-          for (size_type i=begin; i<end; ++i)
-            val[i] = a*u_val[i] + b*v_val[i] + c*w_val[i];
-        }
-      else
-        {
-          for (size_type i=begin; i<end; ++i)
-            val[i] = a*u_val[i] + b*v_val[i] + c*w_val[i];
-        }
-    }
   };
 
   template <typename Number>
   struct Vectorization_ratio
   {
-    Number *val;
-    Number *a_val;
-    Number *b_val;
+    Vectorization_ratio(Number *val, Number *a_val, Number *b_val)
+      :
+      val(val),
+      a_val(a_val),
+      b_val(b_val)
+    {}
 
     void operator() (const size_type begin, const size_type end) const
     {
@@ -546,6 +662,10 @@ namespace internal
             val[i] = a_val[i]/b_val[i];
         }
     }
+
+    Number *val;
+    Number *a_val;
+    Number *b_val;
   };
 
 
@@ -560,6 +680,12 @@ namespace internal
   {
     static const bool vectorizes = types_are_equal<Number,Number2>::value &&
                                    (VectorizedArray<Number>::n_array_elements > 1);
+
+    Dot(const Number *X, const Number2 *Y)
+      :
+      X(X),
+      Y(Y)
+    {}
 
     Number
     operator() (const size_type i) const
@@ -585,6 +711,11 @@ namespace internal
   {
     static const bool vectorizes = VectorizedArray<Number>::n_array_elements > 1;
 
+    Norm2(const Number *X)
+      :
+      X(X)
+    {}
+
     RealType
     operator() (const size_type i) const
     {
@@ -607,6 +738,11 @@ namespace internal
   {
     static const bool vectorizes = VectorizedArray<Number>::n_array_elements > 1;
 
+    Norm1(const Number *X)
+      :
+      X(X)
+    {}
+
     RealType
     operator() (const size_type i) const
     {
@@ -628,6 +764,12 @@ namespace internal
   struct NormP
   {
     static const bool vectorizes = VectorizedArray<Number>::n_array_elements > 1;
+
+    NormP(const Number *X, RealType p)
+      :
+      X(X),
+      p(p)
+    {}
 
     RealType
     operator() (const size_type i) const
@@ -652,6 +794,11 @@ namespace internal
   {
     static const bool vectorizes = VectorizedArray<Number>::n_array_elements > 1;
 
+    MeanValue(const Number *X)
+      :
+      X(X)
+    {}
+
     Number
     operator() (const size_type i) const
     {
@@ -673,6 +820,14 @@ namespace internal
   struct AddAndDot
   {
     static const bool vectorizes = VectorizedArray<Number>::n_array_elements > 1;
+
+    AddAndDot(Number *X, const Number *V, const Number *W, Number a)
+      :
+      X(X),
+      V(V),
+      W(W),
+      a(a)
+    {}
 
     Number
     operator() (const size_type i) const

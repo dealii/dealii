@@ -531,7 +531,9 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::ReadWriteVector ()
     :
     val(NULL)
-  {}
+  {
+    reinit(0, true);
+  }
 
 
 
