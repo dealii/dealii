@@ -120,6 +120,14 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li> Improved: The method Triangulation::create_triangulation will now throw an
+ exception if any cells have negative measure. This check is not run if the
+ triangulation keeps track of distorted cells or if the codimension is not zero.
+ This check was previously only run in 3D.
+ <br>
+ (David Wells, 2016/05/07)
+ </li>
+
  <li> New: Add a collection of classes to manage user's quadrature point data:
  CellDataStorage, TransferableQuadraturePointData and
  parallel::distributed::ContinuousQuadratureDataTransfer.
