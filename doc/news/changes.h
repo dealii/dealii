@@ -120,6 +120,16 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li> New: Add a collection of classes to manage user's quadrature point data:
+ CellDataStorage, TransferableQuadraturePointData and
+ parallel::distributed::ContinuousQuadratureDataTransfer.
+ The implementation of CellDataStorage is flexible to support different types of
+ data object at different cells. parallel::distributed::ContinuousQuadratureDataTransfer
+ provides a convenient interface to transfer quadrature point data between cells
+ of parallel::distributed::Triangulation.
+ <br>
+ (Denis Davydov, Jean-Paul Pelteret, 2016/04/30)
+ </li>
 
  <li> New: Added an interface to the GNU Scientific Library. Also introduce a
  cubic spline interpolation function Functions::CSpline.
