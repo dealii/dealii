@@ -33,6 +33,14 @@ void test()
   // through MappingQEulerian
   Triangulation<dim> tria;
   std::vector<Point<dim> > points (4);
+  points[0][0] = 0.0;
+  points[0][1] = 0.0;
+  points[1][0] = 0.01;
+  points[1][1] = 0.0;
+  points[2][0] = 0.0;
+  points[2][1] = 0.01;
+  points[3][0] = 0.01;
+  points[3][1] = 0.01;
 
   std::vector<CellData<dim> > cells (1);
   cells[0].vertices[0] = 0;
@@ -92,6 +100,3 @@ main()
 
   return 0;
 }
-
-
-
