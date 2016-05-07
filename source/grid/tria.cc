@@ -1646,9 +1646,16 @@ namespace internal
           {
             for (unsigned int cell_no = 0; cell_no<cells.size(); ++cell_no)
               {
-                const double cell_measure = GridTools::cell_measure<1, spacedim>
-                  (triangulation.vertices, cells[cell_no].vertices);
-                AssertThrow(cell_measure > 0, ExcGridHasInvalidCell(cell_no));
+                // If we should check for distorted cells, then we permit them
+                // to exist. If a cell has negative measure, then it must be
+                // distorted (the converse is not necessarily true); hence
+                // throw an exception if no such cells should exist.
+                if (!triangulation.check_for_distorted_cells)
+                  {
+                    const double cell_measure = GridTools::cell_measure<1, spacedim>
+                                                (triangulation.vertices, cells[cell_no].vertices);
+                    AssertThrow(cell_measure > 0, ExcGridHasInvalidCell(cell_no));
+                  }
               }
           }
 #endif
@@ -1841,9 +1848,13 @@ namespace internal
           {
             for (unsigned int cell_no = 0; cell_no<cells.size(); ++cell_no)
               {
-                const double cell_measure = GridTools::cell_measure<2, spacedim>
-                  (triangulation.vertices, cells[cell_no].vertices);
-                AssertThrow(cell_measure > 0, ExcGridHasInvalidCell(cell_no));
+                // See the note in the 1D function on this if statement.
+                if (!triangulation.check_for_distorted_cells)
+                  {
+                    const double cell_measure = GridTools::cell_measure<2, spacedim>
+                                                (triangulation.vertices, cells[cell_no].vertices);
+                    AssertThrow(cell_measure > 0, ExcGridHasInvalidCell(cell_no));
+                  }
               }
           }
 #endif
@@ -2220,9 +2231,13 @@ namespace internal
         //TODO: The following code does not compile with MSVC. Find a way around it
         for (unsigned int cell_no = 0; cell_no<cells.size(); ++cell_no)
           {
-            const double cell_measure = GridTools::cell_measure<3, spacedim>
-              (triangulation.vertices, cells[cell_no].vertices);
-            AssertThrow(cell_measure > 0, ExcGridHasInvalidCell(cell_no));
+            // See the note in the 1D function on this if statement.
+            if (!triangulation.check_for_distorted_cells)
+              {
+                const double cell_measure = GridTools::cell_measure<3, spacedim>
+                                            (triangulation.vertices, cells[cell_no].vertices);
+                AssertThrow(cell_measure > 0, ExcGridHasInvalidCell(cell_no));
+              }
           }
 #endif
 
