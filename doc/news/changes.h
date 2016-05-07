@@ -249,6 +249,13 @@ inconvenience this causes.
  (Joscha Gedicke, 2016/05/07)
  </li>
 
+ <li> Fixed: The function GridGenerator::subdivided_parallelepiped and its
+ variants could generate two dimensional meshes with cells that had negative
+ Jacobians. This has been fixed.
+ <br>
+ (David Wells, 2016/05/07)
+ </li>
+
  <li> New: Added function GridOut::write_mesh_per_processor_as_vtu. This allows 
  the visualization of a parallel finite element mesh that can be separated into each 
  processor's owned and ghost cells. It also allows for the visualization of each level
