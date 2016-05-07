@@ -128,8 +128,8 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
         COMMAND
            ${CMAKE_COMMAND} -E echo ''
         && ${CMAKE_COMMAND} -E echo '***************************************************************************'
-        && ${CMAKE_COMMAND} -E echo '**  Error: No Mac OSX developer certificate specified'
-        && ${CMAKE_COMMAND} -E echo '**  Please reconfigure with -DOSX_CERTIFICATE_NAME="<...>"'
+        && ${CMAKE_COMMAND} -E echo '**           Error: No Mac OSX developer certificate specified           **'
+        && ${CMAKE_COMMAND} -E echo '**         Please reconfigure with -DOSX_CERTIFICATE_NAME="<...>"        **'
         && ${CMAKE_COMMAND} -E echo '***************************************************************************'
         && ${CMAKE_COMMAND} -E echo ''
         COMMENT "Digitally signing ${TARGET}"

@@ -24,7 +24,7 @@ EXECUTE_PROCESS(COMMAND ${CMAKE_CTEST_COMMAND} --force-new-ctest-process --outpu
 IF(NOT "${res_var}" STREQUAL "0")
   MESSAGE("
 ***************************************************************************
-**                 Error: Some of the quick tests failed.
+**                 Error: Some of the quick tests failed.                **
 ***************************************************************************
 
 Please scroll up or check the file tests/quick_tests/quicktests.log for the
