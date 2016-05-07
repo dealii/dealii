@@ -158,8 +158,8 @@ namespace GridTools
    * function also works for cells that do not exist except that you make it
    * up by naming its vertices from the list.
    */
-  template <int dim>
-  double cell_measure (const std::vector<Point<dim> > &all_vertices,
+  template <int dim, int spacedim=dim>
+  double cell_measure (const std::vector<Point<spacedim> > &all_vertices,
                        const unsigned int (&vertex_indices)[GeometryInfo<dim>::vertices_per_cell]);
 
   /*@}*/
@@ -1782,18 +1782,6 @@ namespace GridTools
             }
         }
   }
-
-// declaration of explicit specializations
-
-  template <>
-  double
-  cell_measure<3>(const std::vector<Point<3> > &all_vertices,
-                  const unsigned int (&vertex_indices) [GeometryInfo<3>::vertices_per_cell]);
-
-  template <>
-  double
-  cell_measure<2>(const std::vector<Point<2> > &all_vertices,
-                  const unsigned int (&vertex_indices) [GeometryInfo<2>::vertices_per_cell]);
 }
 
 #endif

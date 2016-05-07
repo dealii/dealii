@@ -167,10 +167,60 @@ namespace GridTools
   }
 
 
+
   template <>
   double
-  cell_measure<3>(const std::vector<Point<3> > &all_vertices,
-                  const unsigned int (&vertex_indices)[GeometryInfo<3>::vertices_per_cell])
+  cell_measure<1, 1>
+  (const std::vector<Point<1> > &all_vertices,
+   const unsigned int (&vertex_indices)[GeometryInfo<1>::vertices_per_cell])
+  {
+    return all_vertices[vertex_indices[1]][0]
+           - all_vertices[vertex_indices[0]][0];
+  }
+
+
+
+  template <>
+  double
+  cell_measure<1, 2>
+  (const std::vector<Point<2> > &,
+   const unsigned int (&)[GeometryInfo<1>::vertices_per_cell])
+  {
+    Assert(false, ExcNotImplemented());
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+
+
+
+  template <>
+  double
+  cell_measure<1, 3>
+  (const std::vector<Point<3> > &,
+   const unsigned int (&)[GeometryInfo<1>::vertices_per_cell])
+  {
+    Assert(false, ExcNotImplemented());
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+
+
+
+  template <>
+  double
+  cell_measure<2, 3>
+  (const std::vector<Point<3> > &,
+   const unsigned int (&)[GeometryInfo<2>::vertices_per_cell])
+  {
+    Assert(false, ExcNotImplemented());
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+
+
+
+  template <>
+  double
+  cell_measure<3, 3>
+  (const std::vector<Point<3> > &all_vertices,
+   const unsigned int (&vertex_indices)[GeometryInfo<3>::vertices_per_cell])
   {
     // note that this is the
     // cell_measure based on the new
@@ -292,8 +342,9 @@ namespace GridTools
 
   template <>
   double
-  cell_measure(const std::vector<Point<2> > &all_vertices,
-               const unsigned int (&vertex_indices) [GeometryInfo<2>::vertices_per_cell])
+  cell_measure<2, 2>
+  (const std::vector<Point<2> > &all_vertices,
+   const unsigned int (&vertex_indices) [GeometryInfo<2>::vertices_per_cell])
   {
     /*
       Get the computation of the measure by this little Maple script. We
@@ -346,19 +397,6 @@ namespace GridTools
     return (-x[1]*y[0]+x[1]*y[3]+y[0]*x[2]+x[0]*y[1]-x[0]*y[2]-y[1]*x[3]-x[2]*y[3]+x[3]*y[2])/2;
 
   }
-
-
-
-
-  template <int dim>
-  double
-  cell_measure(const std::vector<Point<dim> > &,
-               const unsigned int ( &) [GeometryInfo<dim>::vertices_per_cell])
-  {
-    Assert(false, ExcNotImplemented());
-    return 0.;
-  }
-
 
 
   template <int dim, int spacedim>
