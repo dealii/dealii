@@ -2505,6 +2505,9 @@ namespace VectorTools
    * equal to one, and the vector that is associated with the constant mode is
    * not equal to $(1,1,\ldots,1)^T$. For such elements, a different procedure
    * has to be used when subtracting the mean value.
+   *
+   * @warning This function is only implemented for Vector and BlockVector. It
+   * is not implemented for any of the distributed vector classes.
    */
   template <typename VectorType>
   void subtract_mean_value(VectorType              &v,

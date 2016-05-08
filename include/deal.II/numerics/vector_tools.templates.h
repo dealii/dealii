@@ -7086,15 +7086,8 @@ namespace VectorTools
       }
     else
       {
-        // This function is not implemented for distributed vectors, so
-        // if v is not a boring Vector or BlockVector:
-        Assert(   dynamic_cast<Vector<double> *>(& v)
-                  || dynamic_cast<Vector<float> *>(& v)
-                  || dynamic_cast<Vector<long double> *>(& v)
-                  || dynamic_cast<BlockVector<double> *>(& v)
-                  || dynamic_cast<BlockVector<float> *>(& v)
-                  || dynamic_cast<BlockVector<long double> *>(& v),
-                  ExcNotImplemented());
+        // This function is not implemented for distributed vectors.
+        Assert(!v.supports_distributed_data, ExcNotImplemented());
 
         const unsigned int n = v.size();
 
