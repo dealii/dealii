@@ -1,0 +1,20 @@
+
+DEAL::Size 33 Unknowns 1024
+DEAL::Block size 4
+DEAL:Jacobi:Relaxation::Starting value 32.00
+DEAL:Jacobi:Relaxation::Failure step 10 value 28.14
+DEAL:Jacobi:Relaxation::Starting value 32.00
+DEAL:Jacobi:Relaxation::Failure step 10 value 28.14
+DEAL:Jacobi::diff 0
+DEAL::Block size 8
+DEAL:Jacobi:Relaxation::Starting value 32.00
+DEAL:Jacobi:Relaxation::Failure step 10 value 26.83
+DEAL:Jacobi:Relaxation::Starting value 32.00
+DEAL:Jacobi:Relaxation::Failure step 10 value 26.83
+DEAL:Jacobi::diff 0
+DEAL::Block size 16
+DEAL:Jacobi:Relaxation::Starting value 32.00
+DEAL:Jacobi:Relaxation::Failure step 10 value 26.12
+DEAL:Jacobi:Relaxation::Starting value 32.00
+DEAL:Jacobi:Relaxation::Failure step 10 value 26.12
+DEAL:Jacobi::diff 0
