@@ -21,7 +21,7 @@
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/vector_operations_internal.h>
 
-#ifdef DEAL_II_PETSC
+#ifdef DEAL_II_WITH_PETSC
 #  include <deal.II/lac/petsc_parallel_vector.h>
 #endif
 
