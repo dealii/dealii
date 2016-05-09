@@ -751,7 +751,7 @@ namespace parallel
       unsigned int number_of_values = 0;
       // if triangulation has some active cells locally owned cells on this processor we can expect
       // data to be initialized. Do that to get the number:
-      for (typename parallel::distributed::Triangulation<dim>::cell_iterator it = triangulation->begin_active();
+      for (typename parallel::distributed::Triangulation<dim>::active_cell_iterator it = triangulation->begin_active();
            it != triangulation->end(); it++)
         if (it->is_locally_owned())
           {
