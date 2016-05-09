@@ -16,10 +16,12 @@
 #ifndef dealii__quadrature_point_data_h
 #define dealii__quadrature_point_data_h
 
+// must include config before checking for DEAL_II_WITH_CXX11
+#include <deal.II/base/config.h>
+
 #ifdef DEAL_II_WITH_CXX11
 
 #include <deal.II/base/quadrature.h>
-#include <deal.II/base/config.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
