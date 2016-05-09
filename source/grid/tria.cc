@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-
 //
 // Copyright (C) 1998 - 2016 by the deal.II authors
 //
@@ -1638,6 +1637,30 @@ namespace internal
         triangulation.vertices = v;
         triangulation.vertices_used = std::vector<bool> (v.size(), true);
 
+        // Check that all cells have positive volume. This check is not run in
+        // the codimension one or two cases since cell_measure is not
+        // implemented for those.
+#ifndef _MSC_VER
+        //TODO: The following code does not compile with MSVC. Find a way around it
+        if (dim == spacedim)
+          {
+            for (unsigned int cell_no = 0; cell_no<cells.size(); ++cell_no)
+              {
+                // If we should check for distorted cells, then we permit them
+                // to exist. If a cell has negative measure, then it must be
+                // distorted (the converse is not necessarily true); hence
+                // throw an exception if no such cells should exist.
+                if (!triangulation.check_for_distorted_cells)
+                  {
+                    const double cell_measure = GridTools::cell_measure<1, spacedim>
+                                                (triangulation.vertices, cells[cell_no].vertices);
+                    AssertThrow(cell_measure > 0, ExcGridHasInvalidCell(cell_no));
+                  }
+              }
+          }
+#endif
+
+
         // store the indices of the lines
         // which are adjacent to a given
         // vertex
@@ -1815,6 +1838,26 @@ namespace internal
         // copy vertices
         triangulation.vertices = v;
         triangulation.vertices_used = std::vector<bool> (v.size(), true);
+
+        // Check that all cells have positive volume. This check is not run in
+        // the codimension one or two cases since cell_measure is not
+        // implemented for those.
+#ifndef _MSC_VER
+        //TODO: The following code does not compile with MSVC. Find a way around it
+        if (dim == spacedim)
+          {
+            for (unsigned int cell_no = 0; cell_no<cells.size(); ++cell_no)
+              {
+                // See the note in the 1D function on this if statement.
+                if (!triangulation.check_for_distorted_cells)
+                  {
+                    const double cell_measure = GridTools::cell_measure<2, spacedim>
+                                                (triangulation.vertices, cells[cell_no].vertices);
+                    AssertThrow(cell_measure > 0, ExcGridHasInvalidCell(cell_no));
+                  }
+              }
+          }
+#endif
 
         // make up a list of the needed
         // lines each line is a pair of
@@ -2183,18 +2226,19 @@ namespace internal
         triangulation.vertices = v;
         triangulation.vertices_used = std::vector<bool> (v.size(), true);
 
-        // check that all cells have
-        // positive volume. if not call the
-        // invert_all_cells_of_negative_grid
-        // and reorder_cells function of
-        // GridReordering before creating
-        // the triangulation
+        // Check that all cells have positive volume.
 #ifndef _MSC_VER
         //TODO: The following code does not compile with MSVC. Find a way around it
         for (unsigned int cell_no = 0; cell_no<cells.size(); ++cell_no)
-          AssertThrow(dealii::GridTools::cell_measure(triangulation.vertices,
-                                                      cells[cell_no].vertices) >= 0,
-                      ExcGridHasInvalidCell(cell_no));
+          {
+            // See the note in the 1D function on this if statement.
+            if (!triangulation.check_for_distorted_cells)
+              {
+                const double cell_measure = GridTools::cell_measure<3, spacedim>
+                                            (triangulation.vertices, cells[cell_no].vertices);
+                AssertThrow(cell_measure > 0, ExcGridHasInvalidCell(cell_no));
+              }
+          }
 #endif
 
         ///////////////////////////////////////

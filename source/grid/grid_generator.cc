@@ -856,26 +856,43 @@ namespace GridGenerator
                              const std::vector<unsigned int> &subdivisions,
                              const bool colorize)
   {
-    if (subdivisions.size()==0)
+    // The provided edges and subdivisions may not be valid, so possibly
+    // recompute both of them.
+    std_cxx11::array<Tensor<1, spacedim>, dim> compute_edges = edges;
+    std::vector<unsigned int> compute_subdivisions = subdivisions;
+    if (compute_subdivisions.size() == 0)
       {
-        std::vector<unsigned int> new_subdivisions(dim, 1);
-        subdivided_parallelepiped<dim,spacedim>(tria, origin, edges, new_subdivisions, colorize);
-        return;
+        compute_subdivisions.resize(dim, 1);
       }
 
-    Assert(subdivisions.size()==dim, ExcMessage(""));
-
+    Assert(compute_subdivisions.size()==dim,
+           ExcMessage("One subdivision must be provided for each dimension."));
     // check subdivisions
     for (unsigned int i=0; i<dim; ++i)
       {
-        Assert (subdivisions[i]>0, ExcInvalidRepetitions(subdivisions[i]));
-        Assert (edges[i].norm()>0, ExcMessage("Edges in subdivided_parallelepiped() must not be degenerate."));
+        Assert (compute_subdivisions[i]>0, ExcInvalidRepetitions(subdivisions[i]));
+        Assert (edges[i].norm()>0,
+                ExcMessage("Edges in subdivided_parallelepiped() must not be degenerate."));
       }
+
+    /*
+     * Verify that the vectors are oriented in a counter clockwise direction in 2D.
+     */
+    if (dim == 2)
+      {
+        const double plane_normal = edges[0][0]*edges[1][1] - edges[0][1]*edges[1][0];
+        if (plane_normal < 0.0)
+          {
+            std::swap(compute_edges[0], compute_edges[1]);
+            std::swap(compute_subdivisions[0], compute_subdivisions[1]);
+          }
+      }
+
 
     // Check corners do not overlap (unique)
     for (unsigned int i=0; i<dim; ++i)
       for (unsigned int j=i+1; j<dim; ++j)
-        Assert ((edges[i]!=edges[j]),
+        Assert ((compute_edges[i]!=compute_edges[j]),
                 ExcMessage ("Degenerate edges of subdivided_parallelepiped encountered."));
 
     // Create a list of points
@@ -884,27 +901,27 @@ namespace GridGenerator
     switch (dim)
       {
       case 1:
-        for (unsigned int x=0; x<=subdivisions[0]; ++x)
-          points.push_back (origin + edges[0]/subdivisions[0]*x);
+        for (unsigned int x=0; x<=compute_subdivisions[0]; ++x)
+          points.push_back (origin + compute_edges[0]/compute_subdivisions[0]*x);
         break;
 
       case 2:
-        for (unsigned int y=0; y<=subdivisions[1]; ++y)
-          for (unsigned int x=0; x<=subdivisions[0]; ++x)
+        for (unsigned int y=0; y<=compute_subdivisions[1]; ++y)
+          for (unsigned int x=0; x<=compute_subdivisions[0]; ++x)
             points.push_back (origin
-                              + edges[0]/subdivisions[0]*x
-                              + edges[1]/subdivisions[1]*y);
+                              + compute_edges[0]/compute_subdivisions[0]*x
+                              + compute_edges[1]/compute_subdivisions[1]*y);
         break;
 
       case 3:
-        for (unsigned int z=0; z<=subdivisions[2]; ++z)
-          for (unsigned int y=0; y<=subdivisions[1]; ++y)
-            for (unsigned int x=0; x<=subdivisions[0]; ++x)
+        for (unsigned int z=0; z<=compute_subdivisions[2]; ++z)
+          for (unsigned int y=0; y<=compute_subdivisions[1]; ++y)
+            for (unsigned int x=0; x<=compute_subdivisions[0]; ++x)
               points.push_back (
                 origin
-                + edges[0]/subdivisions[0]*x
-                + edges[1]/subdivisions[1]*y
-                + edges[2]/subdivisions[2]*z);
+                + compute_edges[0]/compute_subdivisions[0]*x
+                + compute_edges[1]/compute_subdivisions[1]*y
+                + compute_edges[2]/compute_subdivisions[2]*z);
         break;
 
       default:
@@ -914,14 +931,14 @@ namespace GridGenerator
     // Prepare cell data
     unsigned int n_cells = 1;
     for (unsigned int i=0; i<dim; ++i)
-      n_cells *= subdivisions[i];
+      n_cells *= compute_subdivisions[i];
     std::vector<CellData<dim> > cells (n_cells);
 
     // Create fixed ordering of
     switch (dim)
       {
       case 1:
-        for (unsigned int x=0; x<subdivisions[0]; ++x)
+        for (unsigned int x=0; x<compute_subdivisions[0]; ++x)
           {
             cells[x].vertices[0] = x;
             cells[x].vertices[1] = x+1;
@@ -934,8 +951,8 @@ namespace GridGenerator
       case 2:
       {
         // Shorthand
-        const unsigned int n_dy = subdivisions[1];
-        const unsigned int n_dx = subdivisions[0];
+        const unsigned int n_dy = compute_subdivisions[1];
+        const unsigned int n_dx = compute_subdivisions[0];
 
         for (unsigned int y=0; y<n_dy; ++y)
           for (unsigned int x=0; x<n_dx; ++x)
@@ -955,9 +972,9 @@ namespace GridGenerator
       case 3:
       {
         // Shorthand
-        const unsigned int n_dz = subdivisions[2];
-        const unsigned int n_dy = subdivisions[1];
-        const unsigned int n_dx = subdivisions[0];
+        const unsigned int n_dz = compute_subdivisions[2];
+        const unsigned int n_dy = compute_subdivisions[1];
+        const unsigned int n_dx = compute_subdivisions[0];
 
         for (unsigned int z=0; z<n_dz; ++z)
           for (unsigned int y=0; y<n_dy; ++y)
