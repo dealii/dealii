@@ -887,8 +887,7 @@ namespace MatrixCreator
                                    std::vector<unsigned int> const &component_mapping)
 
     {
-      // All assertions for this function
-      // are in the calling function
+      // All assertions for this function are in the calling function
       // before creating threads.
       const unsigned int n_components = fe.n_components();
       const unsigned int n_function_components = boundary_functions.begin()->second->n_components;
@@ -906,9 +905,8 @@ namespace MatrixCreator
                                               update_quadrature_points);
       FEFaceValues<dim,spacedim> fe_values (mapping, fe, q, update_flags);
 
-      // two variables for the coefficient,
-      // one for the two cases indicated in
-      // the name
+      // two variables for the coefficient, one for the two cases
+      // indicated in the name
       std::vector<number>          coefficient_values (fe_values.n_quadrature_points, 1.);
       std::vector<Vector<number> > coefficient_vector_values (fe_values.n_quadrature_points,
                                                               Vector<number>(n_components));
@@ -924,16 +922,16 @@ namespace MatrixCreator
 
       std::vector<types::global_dof_index> dofs_on_face_vector (dofs_per_face);
 
-      // Because CopyData objects are reused and that push_back is used,
-      // dof_is_on_face, cell_matrix, and cell_vector must be cleared before
-      // they are reused
+      // Because CopyData objects are reused and that push_back is
+      // used, dof_is_on_face, cell_matrix, and cell_vector must be
+      // cleared before they are reused
       copy_data.dof_is_on_face.clear();
       copy_data.cell_matrix.clear();
       copy_data.cell_vector.clear();
 
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-        // check if this face is on that part of
-        // the boundary we are interested in
+        // check if this face is on that part of the boundary we are
+        // interested in
         if (boundary_functions.find(cell->face(face)->boundary_id()) !=
             boundary_functions.end())
           {
@@ -950,35 +948,25 @@ namespace MatrixCreator
                                              rhs_values_system);
 
                 if (coefficient_is_vector)
-                  // If coefficient is
-                  // vector valued, fill
-                  // all components
+                  // If coefficient is vector valued, fill all
+                  // components
                   coefficient->vector_value_list (fe_values.get_quadrature_points(),
                                                   coefficient_vector_values);
                 else
                   {
-                    // If a scalar
-                    // function is
-                    // given, update
-                    // the values, if
-                    // not, use the
-                    // default one set
-                    // in the
+                    // If a scalar function is given, update the
+                    // values, if not, use the default one set in the
                     // constructor above
                     if (coefficient != 0)
                       coefficient->value_list (fe_values.get_quadrature_points(),
                                                coefficient_values);
-                    // Copy scalar
-                    // values into vector
+                    // Copy scalar values into vector
                     for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
                       coefficient_vector_values[point] = coefficient_values[point];
                   }
 
-                // Special treatment
-                // for Hdiv and Hcurl
-                // elements, where only
-                // the normal or
-                // tangential component
+                // Special treatment for Hdiv and Hcurl elements,
+                // where only the normal or tangential component
                 // should be projected.
                 std::vector<std::vector<double> > normal_adjustment(fe_values.n_quadrature_points,
                                                                     std::vector<double>(n_components, 1.));
@@ -1063,11 +1051,11 @@ namespace MatrixCreator
 
 
             cell->face(face)->get_dof_indices (dofs_on_face_vector);
-            // for each dof on the cell, have a
-            // flag whether it is on the face
+            // for each dof on the cell, have a flag whether it is on
+            // the face
             copy_data.dof_is_on_face.push_back(std::vector<bool> (copy_data.dofs_per_cell));
-            // check for each of the dofs on this cell
-            // whether it is on the face
+            // check for each of the dofs on this cell whether it is
+            // on the face
             for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
               copy_data.dof_is_on_face.back()[i] = (std::find(dofs_on_face_vector.begin(),
                                                               dofs_on_face_vector.end(),
