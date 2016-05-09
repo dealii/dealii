@@ -856,9 +856,6 @@ namespace GridGenerator
                              const std::vector<unsigned int> &subdivisions,
                              const bool colorize)
   {
-    // The provided edges and subdivisions may not be valid, so possibly
-    // recompute both of them.
-    std_cxx11::array<Tensor<1, spacedim>, dim> compute_edges = edges;
     std::vector<unsigned int> compute_subdivisions = subdivisions;
     if (compute_subdivisions.size() == 0)
       {
@@ -876,23 +873,75 @@ namespace GridGenerator
       }
 
     /*
-     * Verify that the vectors are oriented in a counter clockwise direction in 2D.
+     * Verify that the edge points to the right in 1D, vectors are oriented in
+     * a counter clockwise direction in 2D, or form a right handed system in
+     * 3D.
      */
-    if (dim == 2)
+    bool twisted_data = false;
+    switch (dim)
       {
-        const double plane_normal = edges[0][0]*edges[1][1] - edges[0][1]*edges[1][0];
-        if (plane_normal < 0.0)
-          {
-            std::swap(compute_edges[0], compute_edges[1]);
-            std::swap(compute_subdivisions[0], compute_subdivisions[1]);
-          }
+      case 1:
+      {
+        twisted_data = (edges[0][0] < 0);
+        break;
       }
+      case 2:
+      {
+        if (spacedim == 2) // this check does not make sense otherwise
+          {
+            const double plane_normal = edges[0][0]*edges[1][1] - edges[0][1]*edges[1][0];
+            twisted_data = (plane_normal < 0.0);
+          }
+        break;
+      }
+      case 3:
+      {
+        // Check that the first two vectors are not linear combinations to
+        // avoid zero division later on.
+        Assert(std::abs(edges[0]*edges[1]
+                        /(edges[0].norm()*edges[1].norm())
+                        - 1.0) > 1.0e-15,
+               ExcMessage("Edges in subdivided_parallelepiped() must point in"
+                          " different directions."));
+        const Tensor<1, spacedim> plane_normal = cross_product_3d
+                                                 (edges[0], edges[1]);
 
+        /*
+         * Ensure that edges 1, 2, and 3 form a right-handed set of
+         * vectors. This works by applying the definition of the dot product
+         *
+         *     cos(theta) = dot(x, y)/(norm(x)*norm(y))
+         *
+         * and then, since the normal vector and third edge should both point
+         * away from the plane formed by the first two edges, the angle
+         * between them must be between 0 and pi/2; hence we just need
+         *
+         *     0 < dot(x, y).
+         */
+        twisted_data = (plane_normal*edges[2] < 0.0);
+        break;
+      }
+      default:
+        Assert(false, ExcInternalError());
+      }
+    (void)twisted_data; // make the static analyzer happy
+    Assert(!twisted_data,
+           ExcInvalidInputOrientation
+           ("The triangulation you are trying to create will consist of cells"
+            " with negative measures. This is usually the result of input data"
+            " that does not define a right-handed coordinate system. The usual"
+            " fix for this is to ensure that in 1D the given point is to the"
+            " right of the origin (or the given edge tensor is positive), in 2D"
+            " that the two edges (and their cross product) obey the right-hand"
+            " rule (which may usually be done by switching the order of the"
+            " points or edge tensors), or in 3D that the edges form a"
+            " right-handed coordinate system (which may also be accomplished by"
+            " switching the order of the first two points or edge tensors)."));
 
     // Check corners do not overlap (unique)
     for (unsigned int i=0; i<dim; ++i)
       for (unsigned int j=i+1; j<dim; ++j)
-        Assert ((compute_edges[i]!=compute_edges[j]),
+        Assert ((edges[i]!=edges[j]),
                 ExcMessage ("Degenerate edges of subdivided_parallelepiped encountered."));
 
     // Create a list of points
@@ -902,15 +951,15 @@ namespace GridGenerator
       {
       case 1:
         for (unsigned int x=0; x<=compute_subdivisions[0]; ++x)
-          points.push_back (origin + compute_edges[0]/compute_subdivisions[0]*x);
+          points.push_back (origin + edges[0]/compute_subdivisions[0]*x);
         break;
 
       case 2:
         for (unsigned int y=0; y<=compute_subdivisions[1]; ++y)
           for (unsigned int x=0; x<=compute_subdivisions[0]; ++x)
             points.push_back (origin
-                              + compute_edges[0]/compute_subdivisions[0]*x
-                              + compute_edges[1]/compute_subdivisions[1]*y);
+                              + edges[0]/compute_subdivisions[0]*x
+                              + edges[1]/compute_subdivisions[1]*y);
         break;
 
       case 3:
@@ -919,9 +968,9 @@ namespace GridGenerator
             for (unsigned int x=0; x<=compute_subdivisions[0]; ++x)
               points.push_back (
                 origin
-                + compute_edges[0]/compute_subdivisions[0]*x
-                + compute_edges[1]/compute_subdivisions[1]*y
-                + compute_edges[2]/compute_subdivisions[2]*z);
+                + edges[0]/compute_subdivisions[0]*x
+                + edges[1]/compute_subdivisions[1]*y
+                + edges[2]/compute_subdivisions[2]*z);
         break;
 
       default:

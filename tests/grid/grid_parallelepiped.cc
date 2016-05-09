@@ -51,8 +51,8 @@ void check_parallelepiped (bool colorize, bool log)
       break;
 
     case 2:
-      corners[0] = Point<dim> (0.0, 0.5);
-      corners[1] = Point<dim> (0.5, 0.0);
+      corners[0] = Point<dim> (0.5, 0.0);
+      corners[1] = Point<dim> (0.0, 0.5);
       break;
 
     case 3:
