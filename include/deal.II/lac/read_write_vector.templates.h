@@ -19,11 +19,15 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/lac/read_write_vector.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
-#include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/lac/trilinos_epetra_vector.h>
+#include <deal.II/lac/vector_operations_internal.h>
+
+#ifdef DEAL_II_PETSC
+#  include <deal.II/lac/petsc_parallel_vector.h>
+#endif
 
 #ifdef DEAL_II_WITH_TRILINOS
+#  include <deal.II/lac/trilinos_vector.h>
+#  include <deal.II/lac/trilinos_epetra_vector.h>
 #  include <deal.II/lac/trilinos_epetra_communication_pattern.h>
 #  include "Epetra_Import.h"
 #endif
@@ -42,6 +46,7 @@ namespace LinearAlgebra
         if (val != NULL)
           free(val);
         val = NULL;
+        thread_loop_partitioner.reset(new parallel::internal::TBBPartitioner());
       }
     else
       {
@@ -49,6 +54,8 @@ namespace LinearAlgebra
           free(val);
 
         Utilities::System::posix_memalign ((void **)&val, 64, sizeof(Number)*new_alloc_size);
+        if (new_alloc_size >= 4*internal::Vector::minimum_parallel_grain_size)
+          thread_loop_partitioner.reset(new parallel::internal::TBBPartitioner());
       }
   }
 
@@ -113,6 +120,57 @@ namespace LinearAlgebra
     // reset the communication patter
     source_stored_elements.clear();
     comm_pattern.reset();
+  }
+
+
+
+  template <typename Number>
+  ReadWriteVector<Number> &
+  ReadWriteVector<Number>::operator= (const ReadWriteVector<Number> &in_vector)
+  {
+    if (PointerComparison::equal(this, &in_vector))
+      return *this;
+
+    thread_loop_partitioner = in_vector.thread_loop_partitioner;
+    if (n_elements() != in_vector.n_elements())
+      reinit(in_vector, true);
+
+    dealii::internal::Vector_copy<Number,Number> copier(in_vector.val, val);
+    internal::parallel_for(copier, n_elements(), thread_loop_partitioner);
+
+    return *this;
+  }
+
+
+
+  template <typename Number>
+  template <typename Number2>
+  ReadWriteVector<Number> &
+  ReadWriteVector<Number>::operator= (const ReadWriteVector<Number2> &in_vector)
+  {
+    thread_loop_partitioner = in_vector.thread_loop_partitioner;
+    if (n_elements() != in_vector.n_elements())
+      reinit(in_vector, true);
+
+    dealii::internal::Vector_copy<Number,Number2> copier(in_vector.val, val);
+    internal::parallel_for(copier, n_elements(), thread_loop_partitioner);
+
+    return *this;
+  }
+
+
+
+  template <typename Number>
+  ReadWriteVector<Number> &
+  ReadWriteVector<Number>::operator= (const Number s)
+  {
+    Assert(s==static_cast<Number>(0), ExcMessage("Only 0 can be assigned to a vector."));
+    (void)s;
+
+    internal::Vector_set<Number> setter(Number(), val);
+    internal::parallel_for(setter, n_elements(), thread_loop_partitioner);
+
+    return *this;
   }
 
 
@@ -221,14 +279,16 @@ namespace LinearAlgebra
       {
         target_vector.Import(multivector, import, Insert);
         double *values = target_vector.Values();
-        for (int i=0; i<target_vector.MyLength(); ++i)
+        const int size = target_vector.MyLength();
+        for (int i=0; i<size; ++i)
           val[i] = values[i];
       }
     else
       {
         target_vector.Import(multivector, import, Add);
         double *values = target_vector.Values();
-        for (int i=0; i<target_vector.MyLength(); ++i)
+        const int size = target_vector.MyLength();
+        for (int i=0; i<size; ++i)
           val[i] += values[i];
       }
   }

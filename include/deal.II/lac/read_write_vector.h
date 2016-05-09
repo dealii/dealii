@@ -222,6 +222,12 @@ namespace LinearAlgebra
     ReadWriteVector<Number> &
     operator= (const ReadWriteVector<Number2> &in_vector);
 
+    /**
+     * Sets all elements of the vector to the scalar @p s. This operation is
+     * only allowed if @p s is equal to zero.
+     */
+    ReadWriteVector<Number> &operator = (const Number s);
+
 #ifdef DEAL_II_WITH_PETSC
     /**
      * Imports all the elements present in the vector's IndexSet from the input
@@ -264,12 +270,6 @@ namespace LinearAlgebra
                 std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern =
                   std_cxx11::shared_ptr<const CommunicationPatternBase> ());
 #endif
-
-    /**
-     * Sets all elements of the vector to the scalar @p s. This operation is
-     * only allowed if @p s is equal to zero.
-     */
-    ReadWriteVector<Number> &operator = (const Number s);
 
     /**
      * The value returned by this function denotes the dimension of the vector
@@ -505,8 +505,18 @@ namespace LinearAlgebra
     /**
      * Pointer to the array of local elements of this vector.
      */
-    // TODO: use AlignedVector here for storage
     Number *val;
+
+    /**
+     * For parallel loops with TBB, this member variable stores the affinity
+     * information of loops.
+     */
+    mutable std_cxx11::shared_ptr<parallel::internal::TBBPartitioner> thread_loop_partitioner;
+
+    /**
+     * Make all other ReadWriteVector types friends.
+     */
+    template <typename Number2> friend class ReadWriteVector;
   };
 
   /*@}*/
@@ -521,7 +531,9 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::ReadWriteVector ()
     :
     val(NULL)
-  {}
+  {
+    reinit(0, true);
+  }
 
 
 
@@ -564,35 +576,6 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::~ReadWriteVector ()
   {
     resize_val(0);
-  }
-
-
-
-  template <typename Number>
-  inline
-  ReadWriteVector<Number> &
-  ReadWriteVector<Number>::operator= (const ReadWriteVector<Number> &in_vector)
-  {
-    resize_val(in_vector.n_elements());
-    stored_elements = in_vector.get_stored_elements();
-    std::copy(in_vector.begin(),in_vector.end(),begin());
-
-    return *this;
-  }
-
-
-
-  template <typename Number>
-  template <typename Number2>
-  inline
-  ReadWriteVector<Number> &
-  ReadWriteVector<Number>::operator= (const ReadWriteVector<Number2> &in_vector)
-  {
-    resize_val(in_vector.n_elements());
-    stored_elements = in_vector.get_stored_elements();
-    std::copy(in_vector.begin(),in_vector.end(),begin());
-
-    return *this;
   }
 
 
@@ -761,21 +744,6 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  inline
-  ReadWriteVector<Number> &
-  ReadWriteVector<Number>::operator= (const Number s)
-  {
-    Assert(s==static_cast<Number>(0), ExcMessage("Only 0 can be assigned to a vector."));
-    (void)s;
-
-    std::fill(begin(),end(),Number());
-
-    return *this;
-  }
-
-
-
-  template <typename Number>
   template <typename Number2>
   inline
   void
@@ -795,7 +763,8 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::add (const std::vector<size_type>   &indices,
                                 const ReadWriteVector<Number2> &values)
   {
-    for (size_type i=0; i<indices.size(); ++i)
+    const size_type size = indices.size();
+    for (size_type i=0; i<size; ++i)
       {
         Assert (numbers::is_finite(values[i]),
                 ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));

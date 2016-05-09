@@ -268,23 +268,6 @@ namespace LinearAlgebra
 
   private:
     /**
-     * Compute the L1 norm in a recursive way by dividing the vector on
-     * smaller and smaller intervals. This reduces the numerical error on
-     * large vector.
-     */
-    typename VectorSpaceVector<Number>::real_type l1_norm_recursive(unsigned int i,
-        unsigned int j) const;
-
-    /**
-     * Compute the squared L2 norm in a recursive way by dividing the vector
-     * on smaller and smaller intervals. This reduces the numerical error on
-     * large vector.
-     */
-    typename VectorSpaceVector<Number>::real_type l2_norm_squared_recursive(
-      unsigned int i,
-      unsigned int j) const;
-
-    /**
      * Serialize the data of this object using boost. This function is
      * necessary to use boost::archive::text_iarchive and
      * boost::archive::text_oarchive.
@@ -293,6 +276,11 @@ namespace LinearAlgebra
     void serialize(Archive &ar, const unsigned int version);
 
     friend class boost::serialization::access;
+
+    /**
+     * Make all other ReadWriteVector types friends.
+     */
+    template <typename Number2> friend class Vector;
   };
 
   /*@}*/
@@ -341,56 +329,6 @@ namespace LinearAlgebra
 
   template <typename Number>
   inline
-  Vector<Number> &Vector<Number>::operator= (const Vector<Number> &in_vector)
-  {
-    this->reinit(in_vector.size(),true);
-    std::copy(in_vector.begin(), in_vector.end(), this->begin());
-
-    return *this;
-  }
-
-
-
-  template <typename Number>
-  template <typename Number2>
-  inline
-  Vector<Number> &Vector<Number>::operator= (const Vector<Number2> &in_vector)
-  {
-    this->reinit(in_vector.size(in_vector.size()),true);
-    std::copy(in_vector.begin(), in_vector.end(), this->begin());
-
-    return *this;
-  }
-
-
-
-  template <typename Number>
-  inline
-  Vector<Number> &Vector<Number>::operator= (const Number s)
-  {
-    Assert(s==static_cast<Number>(0), ExcMessage("Only 0 can be assigned to a vector."));
-    (void) s;
-
-    std::fill(this->begin(),this->end(),Number());
-
-    return *this;
-  }
-
-
-
-  template <typename Number>
-  inline
-  void Vector<Number>::add(const Number a)
-  {
-    AssertIsFinite(a);
-    for (unsigned int i=0; i<this->size(); ++i)
-      this->val[i] += a;
-  }
-
-
-
-  template <typename Number>
-  inline
   typename Vector<Number>::size_type Vector<Number>::size() const
   {
     return ReadWriteVector<Number>::size();
@@ -424,7 +362,7 @@ namespace LinearAlgebra
   inline
   void Vector<Number>::serialize(Archive &ar, const unsigned int)
   {
-    unsigned int current_size = this->size();
+    size_type current_size = this->size();
     ar &static_cast<Subscriptor &>(*this);
     ar &this->stored_elements;
     // If necessary, resize the vector during a read operation
