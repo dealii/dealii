@@ -57,6 +57,21 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
   #
 
   GET_PROPERTY(_objects GLOBAL PROPERTY DEAL_II_OBJECTS_${build})
+
+  #
+  # FIXME: Somehow the cuda object files lose the "generated" property.
+  # This is an ugly hack
+  #
+  FOREACH(_object ${_objects})
+    IF("${_object}" MATCHES "cu.o$")
+      SET_SOURCE_FILES_PROPERTIES("${_object}"
+        PROPERTIES
+        EXTERNAL_OBJECT TRUE
+        GENERATED TRUE
+        )
+    ENDIF()
+  ENDFOREACH()
+
   ADD_LIBRARY(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
     dummy.cc # Workaround for a bug in the Xcode generator
     ${_objects}
