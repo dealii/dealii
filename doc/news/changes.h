@@ -248,6 +248,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> New: Added PArpackSolver::reinit() when dealing with BlockVectors.
+ <br>
+ (Alberto Sartori, 2016/05/19)
+ </li>
+
  <li> Fixed: Corrected the sign of curl calculated in the functions:
  LocalIntegrators::curl_curl_matrix, LocalIntegrators::curl_matrix,
  LocalIntegrators::nitsche_curl_matrix and LocalIntegrators::ip_curl_matrix in
