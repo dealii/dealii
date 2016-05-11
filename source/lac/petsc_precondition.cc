@@ -491,22 +491,22 @@ namespace PETScWrappers
 
     if (additional_data.output_details)
 #if PETSC_VERSION_GT(3,7,0)
-    PetscOptionsSetValue(NULL, "-pc_hypre_boomeramg_print_statistics","1");
+      PetscOptionsSetValue(NULL, "-pc_hypre_boomeramg_print_statistics","1");
 #else
-    PetscOptionsSetValue("-pc_hypre_boomeramg_print_statistics","1");
+      PetscOptionsSetValue("-pc_hypre_boomeramg_print_statistics","1");
 #endif
 
     if (additional_data.output_details)
 #if PETSC_VERSION_GT(3,7,0)
-    PetscOptionsSetValue(NULL, "-pc_hypre_boomeramg_agg_nl",
-                 	 Utilities::int_to_string(
-                         additional_data.aggressive_coarsening_num_levels
-                         ).c_str());
+      PetscOptionsSetValue(NULL, "-pc_hypre_boomeramg_agg_nl",
+                           Utilities::int_to_string(
+                             additional_data.aggressive_coarsening_num_levels
+                           ).c_str());
 #else
-    PetscOptionsSetValue("-pc_hypre_boomeramg_agg_nl",
-			 Utilities::int_to_string(
-                         additional_data.aggressive_coarsening_num_levels
-                         ).c_str());
+      PetscOptionsSetValue("-pc_hypre_boomeramg_agg_nl",
+                           Utilities::int_to_string(
+                             additional_data.aggressive_coarsening_num_levels
+                           ).c_str());
 #endif
 
     std::stringstream ssStream;
@@ -540,7 +540,7 @@ namespace PETScWrappers
     else
       {
 #if PETSC_VERSION_GT(3,7,0)
-	PetscOptionsSetValue(NULL, "-pc_hypre_boomeramg_relax_type_up", "SOR/Jacobi");
+        PetscOptionsSetValue(NULL, "-pc_hypre_boomeramg_relax_type_up", "SOR/Jacobi");
         PetscOptionsSetValue(NULL, "-pc_hypre_boomeramg_relax_type_down", "SOR/Jacobi");
         PetscOptionsSetValue(NULL, "-pc_hypre_boomeramg_relax_type_coarse", "Gaussian-elimination");
 #else
