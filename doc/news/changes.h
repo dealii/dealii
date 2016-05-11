@@ -241,6 +241,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: Corrected the sign of curl calculated in the functions:
+ LocalIntegrators::curl_curl_matrix, LocalIntegrators::curl_matrix,
+ LocalIntegrators::nitsche_curl_matrix and LocalIntegrators::ip_curl_matrix in
+ integrators/maxwell.h.
+ <br>
+ (Jihuan Tian, 2016/05/09)
+ </li>
+
  <li> Fixed: Bug in the RelaxationBlock class function do_step. Before, the 
  corrections were not added together, which leads to a wrong update whenever the
  Jacobi blocks are overlapping. For SOR, SSOR and non-overlapping Jacobi this was 
@@ -287,7 +295,7 @@ inconvenience this causes.
  <br>
  (Martin Kronbichler, Daniel Jodlbauer, 2016/04/21)
  </li>
-
+ 
  <li> New: Added an optional string parameter to the ParameterHandler::read_input ()
  and ParameterHandler::read_input_from_string() functions.
  When a line which equals this string is encountered, the parsing of parameters
