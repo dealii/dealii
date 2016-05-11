@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II authors
+## Copyright (C) 2012 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -47,6 +47,28 @@ MACRO(DEAL_II_ADD_LIBRARY _library)
     SET_PROPERTY(GLOBAL APPEND PROPERTY DEAL_II_OBJECTS_${_build}
       "$<TARGET_OBJECTS:${_library}.${_build_lowercase}>"
       )
+
+    #
+    # Cuda specific target setup:
+    #
+    IF(DEAL_II_WITH_CUDA)
+      CUDA_WRAP_SRCS(${_library}.${_build_lowercase}
+        OBJ _generated_cuda_files ${ARGN} SHARED
+        )
+
+      ADD_CUSTOM_TARGET(${_library}.${_build_lowercase}_cuda
+        DEPENDS
+        ${_generated_cuda_files}
+        )
+      ADD_DEPENDENCIES(${_library}.${_build_lowercase}
+        ${_library}.${_build_lowercase}_cuda
+        )
+
+      SET_PROPERTY(GLOBAL APPEND PROPERTY DEAL_II_OBJECTS_${_build}
+        "${_generated_cuda_files}"
+        )
+    ENDIF()
+
   ENDFOREACH()
 
 ENDMACRO()
