@@ -157,8 +157,12 @@ namespace GridTools
    * get the same result using <code>cell-@>measure()</code>, but this
    * function also works for cells that do not exist except that you make it
    * up by naming its vertices from the list.
+   *
+   * @note Since <code>dim</code> does not explicitly appear in the function
+   * signature, you must explicitly specify both dimensions when using this
+   * function.
    */
-  template <int dim, int spacedim=dim>
+  template <int dim, int spacedim>
   double cell_measure (const std::vector<Point<spacedim> > &all_vertices,
                        const unsigned int (&vertex_indices)[GeometryInfo<dim>::vertices_per_cell]);
 
