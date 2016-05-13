@@ -157,30 +157,18 @@ namespace GridTools
    * get the same result using <code>cell-@>measure()</code>, but this
    * function also works for cells that do not exist except that you make it
    * up by naming its vertices from the list.
-   *
-   * @note Since <code>dim</code> does not explicitly appear in the function
-   * signature, you must explicitly specify both dimensions when using this
-   * function.
-   */
-  template <int dim, int spacedim>
-  double cell_measure (const std::vector<Point<spacedim> > &all_vertices,
-                       const unsigned int (&vertex_indices)[GeometryInfo<dim>::vertices_per_cell]);
-
-
-  /**
-   * Same as the last function, but for the codimension zero case. This extra
-   * function allows one to write
-   *
-   * @code
-   * cell_measure(vertices, indices);
-   * @endcode
-   *
-   * and have the template function argument (i.e. <code>dim</code>) inferred
-   * automatically.
    */
   template <int dim>
   double cell_measure (const std::vector<Point<dim> > &all_vertices,
                        const unsigned int (&vertex_indices)[GeometryInfo<dim>::vertices_per_cell]);
+
+  /**
+   * A version of the last function that can accept input for nonzero
+   * codimension cases. This function only exists to aid generic programming
+   * and calling it will just raise an exception.
+   */
+  template <int dim, typename T>
+  double cell_measure (const T &, ...);
 
   /*@}*/
   /**
@@ -1655,16 +1643,12 @@ namespace GridTools
 
 namespace GridTools
 {
-  // This function just wraps the general case: see the note in its
-  // documentation above.
-  template <int dim>
-  double cell_measure (const std::vector<Point<dim> > &all_vertices,
-                       const unsigned int (&vertex_indices)[GeometryInfo<dim>::vertices_per_cell])
+  template <int dim, typename T>
+  double cell_measure (const T &, ...)
   {
-    return cell_measure<dim, dim>(all_vertices, vertex_indices);
+    Assert(false, ExcNotImplemented());
+    return std::numeric_limits<double>::quiet_NaN();
   }
-
-
 
   template <int dim, typename Predicate, int spacedim>
   void transform (const Predicate    &predicate,

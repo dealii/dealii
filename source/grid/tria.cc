@@ -1652,7 +1652,7 @@ namespace internal
                 // throw an exception if no such cells should exist.
                 if (!triangulation.check_for_distorted_cells)
                   {
-                    const double cell_measure = GridTools::cell_measure<1, spacedim>
+                    const double cell_measure = GridTools::cell_measure<1>
                                                 (triangulation.vertices, cells[cell_no].vertices);
                     AssertThrow(cell_measure > 0, ExcGridHasInvalidCell(cell_no));
                   }
@@ -1851,7 +1851,7 @@ namespace internal
                 // See the note in the 1D function on this if statement.
                 if (!triangulation.check_for_distorted_cells)
                   {
-                    const double cell_measure = GridTools::cell_measure<2, spacedim>
+                    const double cell_measure = GridTools::cell_measure<2>
                                                 (triangulation.vertices, cells[cell_no].vertices);
                     AssertThrow(cell_measure > 0, ExcGridHasInvalidCell(cell_no));
                   }
@@ -2234,7 +2234,7 @@ namespace internal
             // See the note in the 1D function on this if statement.
             if (!triangulation.check_for_distorted_cells)
               {
-                const double cell_measure = GridTools::cell_measure<3, spacedim>
+                const double cell_measure = GridTools::cell_measure<3>
                                             (triangulation.vertices, cells[cell_no].vertices);
                 AssertThrow(cell_measure > 0, ExcGridHasInvalidCell(cell_no));
               }

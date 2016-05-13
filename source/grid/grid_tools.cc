@@ -170,7 +170,7 @@ namespace GridTools
 
   template <>
   double
-  cell_measure<1, 1>
+  cell_measure<1>
   (const std::vector<Point<1> > &all_vertices,
    const unsigned int (&vertex_indices)[GeometryInfo<1>::vertices_per_cell])
   {
@@ -182,43 +182,7 @@ namespace GridTools
 
   template <>
   double
-  cell_measure<1, 2>
-  (const std::vector<Point<2> > &,
-   const unsigned int (&)[GeometryInfo<1>::vertices_per_cell])
-  {
-    Assert(false, ExcNotImplemented());
-    return std::numeric_limits<double>::quiet_NaN();
-  }
-
-
-
-  template <>
-  double
-  cell_measure<1, 3>
-  (const std::vector<Point<3> > &,
-   const unsigned int (&)[GeometryInfo<1>::vertices_per_cell])
-  {
-    Assert(false, ExcNotImplemented());
-    return std::numeric_limits<double>::quiet_NaN();
-  }
-
-
-
-  template <>
-  double
-  cell_measure<2, 3>
-  (const std::vector<Point<3> > &,
-   const unsigned int (&)[GeometryInfo<2>::vertices_per_cell])
-  {
-    Assert(false, ExcNotImplemented());
-    return std::numeric_limits<double>::quiet_NaN();
-  }
-
-
-
-  template <>
-  double
-  cell_measure<3, 3>
+  cell_measure<3>
   (const std::vector<Point<3> > &all_vertices,
    const unsigned int (&vertex_indices)[GeometryInfo<3>::vertices_per_cell])
   {
@@ -342,7 +306,7 @@ namespace GridTools
 
   template <>
   double
-  cell_measure<2, 2>
+  cell_measure<2>
   (const std::vector<Point<2> > &all_vertices,
    const unsigned int (&vertex_indices) [GeometryInfo<2>::vertices_per_cell])
   {
