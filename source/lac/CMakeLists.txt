@@ -132,6 +132,14 @@ IF(DEAL_II_WITH_TRILINOS)
   )
 ENDIF()
 
+# Add CUDA wrapper files
+IF(DEAL_II_WITH_CUDA)
+  SET(_src
+    ${_src}
+    cuda_vector.cu
+  )
+ENDIF()
+
 
 
 FILE(GLOB _header
