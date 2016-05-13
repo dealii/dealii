@@ -14,7 +14,8 @@
  * ---------------------------------------------------------------------
 
  *
- * Author: Wolfgang Bangerth, Texas A&M University, 2006, 2007
+ * Authors: Wolfgang Bangerth, Texas A&M University, 2006, 2007;
+ *          Denis Davydov, University of Erlangen-Nuremberg, 2016.
  */
 
 
@@ -47,12 +48,14 @@
 
 // These are the new files we need. The first one provides an alternative to
 // the usual SparsityPattern class and the DynamicSparsityPattern class
-// already discussed in step-11 and step-18. The last two provide <i>hp</i>
+// already discussed in step-11 and step-18. The second and third provide <i>hp</i>
 // versions of the DoFHandler and FEValues classes as described in the
-// introduction of this program.
+// introduction of this program. The last one provides Fourier transformation
+// class on the unit cell.
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
+#include <deal.II/fe/fe_series.h>
 
 // The last set of include files are standard C++ headers. We need support for
 // complex numbers when we compute the Fourier transform.
@@ -98,8 +101,9 @@ namespace Step27
     void assemble_system ();
     void solve ();
     void create_coarse_grid ();
-    void estimate_smoothness (Vector<float> &smoothness_indicators) const;
+    void estimate_smoothness (Vector<float> &smoothness_indicators);
     void postprocess (const unsigned int cycle);
+    std::pair<bool,unsigned int> predicate(const TableIndices<dim> &indices);
 
     Triangulation<dim>   triangulation;
 
@@ -107,6 +111,11 @@ namespace Step27
     hp::FECollection<dim>    fe_collection;
     hp::QCollection<dim>     quadrature_collection;
     hp::QCollection<dim-1>   face_quadrature_collection;
+
+    hp::QCollection<dim> fourier_q_collection;
+    std_cxx11::shared_ptr<FESeries::Fourier<dim>> fourier;
+    std::vector<double> ln_k;
+    Table<dim,std::complex<double> > fourier_coefficients;
 
     ConstraintMatrix     constraints;
 
@@ -164,6 +173,23 @@ namespace Step27
   // face quadrature objects. We start with quadratic elements, and each
   // quadrature formula is chosen so that it is appropriate for the matching
   // finite element in the hp::FECollection object.
+  //
+  // Finally, we initialize FESeries::Fourier object which will be used to
+  // calculate coefficient in Fourier series as described in the introduction.
+  // In addition to the hp::FECollection, we need to provide quadrature rules
+  // hp::QCollection for integration on the reference cell.
+  //
+  // In order to resize fourier_coefficients Table, we use the following
+  // auxiliary function
+  template <int dim,typename T>
+  void resize(Table<dim,T> &coeff, const unsigned int N)
+  {
+    TableIndices<dim> size;
+    for (unsigned int d=0; d<dim; d++)
+      size[d] = N;
+    coeff.reinit(size);
+  }
+
   template <int dim>
   LaplaceProblem<dim>::LaplaceProblem ()
     :
@@ -176,6 +202,48 @@ namespace Step27
         quadrature_collection.push_back (QGauss<dim>(degree+1));
         face_quadrature_collection.push_back (QGauss<dim-1>(degree+1));
       }
+
+    // As described in the introduction, we define the Fourier vectors ${\bf
+    // k}$ for which we want to compute Fourier coefficients of the solution
+    // on each cell as follows. In 2d, we will need coefficients corresponding to
+    // vectors ${\bf k}=(2 \pi i, 2\pi j)^T$
+    // for which $\sqrt{i^2+j^2}\le N$, with $i,j$ integers and $N$ being the
+    // maximal polynomial degree we use for the finite elements in this
+    // program. The FESeries::Fourier class' constructor first parameter $N$ defines
+    // the number of coefficients in 1D with the total number of coefficients
+    // being $N^{dim}$. Although we will not use coefficients corresponding to
+    // $\sqrt{i^2+j^2}> N$ and $i+j==0$, the overhead of their calculation is minimal.
+    // The transformation matrices for each FiniteElement will be calculated only
+    // once the first time they are required in the course of hp-adaptive
+    // refinement. Because we work on the unit cell, we can do all this work without a
+    // mapping from reference to real cell and consequently can precalculate
+    // these matrices. The calculation of expansion
+    // coefficients for a particular set of local degrees of freedom on a given
+    // cell then follows as a simple matrix-vector product.
+    // The 3d case is handled analogously.
+    const unsigned int N = max_degree;
+
+    // We will need to assemble the matrices that do the Fourier transforms
+    // for each of the finite elements we deal with, i.e. the matrices ${\cal
+    // F}_{{\bf k},j}$ defined in the introduction. We have to do that for
+    // each of the finite elements in use. To that end we need a quadrature
+    // rule. In this example we use the same quadrature formula for each
+    // finite element, namely that is obtained by iterating a
+    // 2-point Gauss formula as many times as the maximal exponent we use for
+    // the term $e^{i{\bf k}\cdot{\bf x}}$:
+    QGauss<1>            base_quadrature (2);
+    QIterated<dim>       quadrature (base_quadrature, N);
+    for (unsigned int i = 0; i < fe_collection.size(); i++)
+      fourier_q_collection.push_back(quadrature);
+
+    // Now we are ready to set-up the FESeries::Fourier object
+    fourier = std_cxx11::make_shared<FESeries::Fourier<dim> >(N,
+                                                              fe_collection,
+                                                              fourier_q_collection);
+
+    // We need to resize the matrix of fourier coefficients according to the
+    // number of modes N.
+    resize(fourier_coefficients,N);
   }
 
 
@@ -612,6 +680,32 @@ namespace Step27
 
   // @sect4{LaplaceProblem::estimate_smoothness}
 
+  // As described in the introduction, we will need to take the maximum
+  // absolute value of fourier coefficients which correspond to $k$-vector
+  // $|{\bf k}|= const$. To filter the coefficients Table we
+  // will use the FESeries::process_coefficients() which requires a predicate
+  // to be specified. The predicate should operate on TableIndices and return
+  // a pair of <code>bool</code> and <code>unsigned int</code>. The latter
+  // is the value of the map from TableIndicies to unsigned int.  It is
+  // used to define subsets of coefficients from which we search for the one
+  // with highest absolute value, i.e. $l^\infty$-norm. The <code>bool</code>
+  // parameter defines which indices should be used in processing. In the
+  // current case we are interested in coefficients which correspond to
+  // $0 < i*i+j*j < N*N$ and $0 < i*i+j*j+k*k < N*N$ in 2D and 3D, respectively.
+  template <int dim>
+  std::pair<bool,unsigned int>
+  LaplaceProblem<dim>::
+  predicate(const TableIndices<dim> &ind)
+  {
+    unsigned int v = 0;
+    for (unsigned int i = 0; i <dim; i++)
+      v += ind[i]*ind[i];
+    if (v>0 && v < max_degree*max_degree)
+      return std::make_pair(true,v);
+    else
+      return std::make_pair(false,v);
+  }
+
   // This last function of significance implements the algorithm to estimate
   // the smoothness exponent using the algorithms explained in detail in the
   // introduction. We will therefore only comment on those points that are of
@@ -619,134 +713,18 @@ namespace Step27
   template <int dim>
   void
   LaplaceProblem<dim>::
-  estimate_smoothness (Vector<float> &smoothness_indicators) const
+  estimate_smoothness (Vector<float> &smoothness_indicators)
   {
-    // The first thing we need to do is to define the Fourier vectors ${\bf
-    // k}$ for which we want to compute Fourier coefficients of the solution
-    // on each cell. In 2d, we pick those vectors ${\bf k}=(\pi i, \pi j)^T$
-    // for which $\sqrt{i^2+j^2}\le N$, with $i,j$ integers and $N$ being the
-    // maximal polynomial degree we use for the finite elements in this
-    // program. The 3d case is handled analogously. 1d and dimensions higher
-    // than 3 are not implemented, and we guard our implementation by making
-    // sure that we receive an exception in case someone tries to compile the
-    // program for any of these dimensions.
-    //
-    // We exclude ${\bf k}=0$ to avoid problems computing $|{\bf k}|^{-mu}$
-    // and $\ln |{\bf k}|$. The other vectors are stored in the field
-    // <code>k_vectors</code>. In addition, we store the square of the
-    // magnitude of each of these vectors (up to a factor $\pi^2$) in the
-    // <code>k_vectors_magnitude</code> array -- we will need that when we
-    // attempt to find out which of those Fourier coefficients corresponding
-    // to Fourier vectors of the same magnitude is the largest:
-    const unsigned int N = max_degree;
-
-    std::vector<Tensor<1,dim> > k_vectors;
-    std::vector<unsigned int>   k_vectors_magnitude;
-    switch (dim)
-      {
-      case 2:
-      {
-        for (unsigned int i=0; i<N; ++i)
-          for (unsigned int j=0; j<N; ++j)
-            if (!((i==0) && (j==0))
-                &&
-                (i*i + j*j < N*N))
-              {
-                k_vectors.push_back (Point<dim>(numbers::PI * i,
-                                                numbers::PI * j));
-                k_vectors_magnitude.push_back (i*i+j*j);
-              }
-
-        break;
-      }
-
-      case 3:
-      {
-        for (unsigned int i=0; i<N; ++i)
-          for (unsigned int j=0; j<N; ++j)
-            for (unsigned int k=0; k<N; ++k)
-              if (!((i==0) && (j==0) && (k==0))
-                  &&
-                  (i*i + j*j + k*k < N*N))
-                {
-                  k_vectors.push_back (Point<dim>(numbers::PI * i,
-                                                  numbers::PI * j,
-                                                  numbers::PI * k));
-                  k_vectors_magnitude.push_back (i*i+j*j+k*k);
-                }
-
-        break;
-      }
-
-      default:
-        Assert (false, ExcNotImplemented());
-      }
-
-    // After we have set up the Fourier vectors, we also store their total
-    // number for simplicity, and compute the logarithm of the magnitude of
-    // each of these vectors since we will need it many times over further
-    // down below:
-    const unsigned n_fourier_modes = k_vectors.size();
-    std::vector<double> ln_k (n_fourier_modes);
-    for (unsigned int i=0; i<n_fourier_modes; ++i)
-      ln_k[i] = std::log (k_vectors[i].norm());
+    // Since most of the hard work is done for us in FESeries::Fourier and
+    // we set up the object of this class in the constructor, what we are left
+    // to do here is apply this class to calculate coefficients and then
+    // perform linear regression to fit their decay slope.
 
 
-    // Next, we need to assemble the matrices that do the Fourier transforms
-    // for each of the finite elements we deal with, i.e. the matrices ${\cal
-    // F}_{{\bf k},j}$ defined in the introduction. We have to do that for
-    // each of the finite elements in use. Note that these matrices are
-    // complex-valued, so we can't use the FullMatrix class. Instead, we use
-    // the Table class template.
-    std::vector<Table<2,std::complex<double> > >
-    fourier_transform_matrices (fe_collection.size());
-
-    // In order to compute them, we of course can't perform the Fourier
-    // transform analytically, but have to approximate it using quadrature. To
-    // this end, we use a quadrature formula that is obtained by iterating a
-    // 2-point Gauss formula as many times as the maximal exponent we use for
-    // the term $e^{i{\bf k}\cdot{\bf x}}$:
-    QGauss<1>      base_quadrature (2);
-    QIterated<dim> quadrature (base_quadrature, N);
-
-    // With this, we then loop over all finite elements in use, reinitialize
-    // the respective matrix ${\cal F}$ to the right size, and integrate each
-    // entry of the matrix numerically as ${\cal F}_{{\bf k},j}=\sum_q
-    // e^{i{\bf k}\cdot {\bf x}}\varphi_j({\bf x}_q) w_q$, where $x_q$ are the
-    // quadrature points and $w_q$ are the quadrature weights. Note that the
-    // imaginary unit $i=\sqrt{-1}$ is obtained from the standard C++ classes
-    // using <code>std::complex@<double@>(0,1)</code>.
-
-    // Because we work on the unit cell, we can do all this work without a
-    // mapping from reference to real cell and consequently do not need the
-    // FEValues class.
-    for (unsigned int fe=0; fe<fe_collection.size(); ++fe)
-      {
-        fourier_transform_matrices[fe].reinit (n_fourier_modes,
-                                               fe_collection[fe].dofs_per_cell);
-
-        for (unsigned int k=0; k<n_fourier_modes; ++k)
-          for (unsigned int j=0; j<fe_collection[fe].dofs_per_cell; ++j)
-            {
-              std::complex<double> sum = 0;
-              for (unsigned int q=0; q<quadrature.size(); ++q)
-                {
-                  const Point<dim> x_q = quadrature.point(q);
-                  sum += std::exp(std::complex<double>(0,1) *
-                                  (k_vectors[k] * x_q)) *
-                         fe_collection[fe].shape_value(j,x_q) *
-                         quadrature.weight(q);
-                }
-              fourier_transform_matrices[fe](k,j)
-                = sum / std::pow(2*numbers::PI, 1.*dim/2);
-            }
-      }
-
-    // The next thing is to loop over all cells and do our work there, i.e. to
+    // First thing to do is to loop over all cells and do our work there, i.e. to
     // locally do the Fourier transform and estimate the decay coefficient. We
-    // will use the following two arrays as scratch arrays in the loop and
-    // allocate them here to avoid repeated memory allocations:
-    std::vector<std::complex<double> > fourier_coefficients (n_fourier_modes);
+    // will use the following array as a scratch array in the loop to store
+    // local DoF values:
     Vector<double>                     local_dof_values;
 
     // Then here is the loop:
@@ -760,76 +738,58 @@ namespace Step27
         // <code>local_dof_values</code> array after setting it to the right
         // size) and then need to compute the Fourier transform by multiplying
         // this vector with the matrix ${\cal F}$ corresponding to this finite
-        // element. We need to write out the multiplication by hand because
-        // the objects holding the data do not have <code>vmult</code>-like
-        // functions declared:
+        // element. This is done by calling FESeries::Fourier::calculate(),
+        // that has to be provided with the <code>local_dof_values</code>,
+        // <code>cell->active_fe_index()</code> and a Table to store coefficients.
         local_dof_values.reinit (cell->get_fe().dofs_per_cell);
         cell->get_dof_values (solution, local_dof_values);
 
-        for (unsigned int f=0; f<n_fourier_modes; ++f)
-          {
-            fourier_coefficients[f] = 0;
-
-            for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
-              fourier_coefficients[f] +=
-                fourier_transform_matrices[cell->active_fe_index()](f,i)
-                *
-                local_dof_values(i);
-          }
+        fourier->calculate(local_dof_values,
+                           cell->active_fe_index(),
+                           fourier_coefficients);
 
         // The next thing, as explained in the introduction, is that we wanted
         // to only fit our exponential decay of Fourier coefficients to the
         // largest coefficients for each possible value of $|{\bf k}|$. To
-        // this end, we create a map that for each magnitude $|{\bf k}|$
-        // stores the largest $|\hat U_{{\bf k}}|$ found so far, i.e. we
-        // overwrite the existing value (or add it to the map) if no value for
-        // the current $|{\bf k}|$ exists yet, or if the current value is
-        // larger than the previously stored one:
-        std::map<unsigned int, double> k_to_max_U_map;
-        for (unsigned int f=0; f<n_fourier_modes; ++f)
-          if ((k_to_max_U_map.find (k_vectors_magnitude[f]) ==
-               k_to_max_U_map.end())
-              ||
-              (k_to_max_U_map[k_vectors_magnitude[f]] <
-               std::abs (fourier_coefficients[f])))
-            k_to_max_U_map[k_vectors_magnitude[f]]
-              = std::abs (fourier_coefficients[f]);
-        // Note that it comes in handy here that we have stored the magnitudes
-        // of vectors as integers, since this way we do not have to deal with
-        // round-off-sized differences between different values of $|{\bf
-        // k}|$.
-
-        // As the final task, we have to calculate the various contributions
-        // to the formula for $\mu$. We'll only take those Fourier
+        // this end, we use FESeries::process_coefficients() to rework coefficients
+        // into the desired format.
+        // We'll only take those Fourier
         // coefficients with the largest magnitude for a given value of $|{\bf
-        // k}|$ as explained above:
-        double  sum_1           = 0,
-                sum_ln_k        = 0,
-                sum_ln_k_square = 0,
-                sum_ln_U        = 0,
-                sum_ln_U_ln_k   = 0;
-        for (unsigned int f=0; f<n_fourier_modes; ++f)
-          if (k_to_max_U_map[k_vectors_magnitude[f]] ==
-              std::abs (fourier_coefficients[f]))
-            {
-              sum_1 += 1;
-              sum_ln_k += ln_k[f];
-              sum_ln_k_square += ln_k[f]*ln_k[f];
-              sum_ln_U += std::log (std::abs (fourier_coefficients[f]));
-              sum_ln_U_ln_k += std::log (std::abs (fourier_coefficients[f])) *
-                               ln_k[f];
-            }
+        // k}|$ and thereby need to use VectorTools::Linfty_norm:
+        std::pair<std::vector<unsigned int>, std::vector<double> > res =
+          FESeries::process_coefficients<dim>(fourier_coefficients,
+                                              std_cxx11::bind(&LaplaceProblem<dim>::predicate,
+                                                              this,
+                                                              std_cxx11::_1),
+                                              VectorTools::Linfty_norm);
 
-        // With these so-computed sums, we can now evaluate the formula for
-        // $\mu$ derived in the introduction:
-        const double mu
-          = (1./(sum_1*sum_ln_k_square - sum_ln_k*sum_ln_k)
-             *
-             (sum_ln_k*sum_ln_U - sum_1*sum_ln_U_ln_k));
+        Assert (res.first.size() == res.second.size(),
+                ExcInternalError());
+
+        // The first vector in the <code>std::pair</code> will store values of the predicate,
+        // that is $i*i+j*j= const$ or $i*i+j*j+k*k = const$
+        // in 2D or 3D respectively. This
+        // vector will be the same for all the cells so we can calculate
+        // logarithms of the corresponding Fourier vectors $|{\bf k}|$ only once
+        // in the whole hp-refinement cycle:
+        if (ln_k.size() == 0)
+          {
+            ln_k.resize(res.first.size(),0);
+            for (unsigned int f = 0; f < ln_k.size(); f++)
+              ln_k[f] = std::log (2.0*numbers::PI*std::sqrt(1.*res.first[f]));
+          }
+
+        // We have to calculate the logarithms of absolute
+        // values of coefficients and use it in linear regression fit to
+        // obtain $\mu$.
+        for (unsigned int f = 0; f < res.second.size(); f++)
+          res.second[f] = std::log(res.second[f]);
+
+        std::pair<double,double> fit = FESeries::linear_regression(ln_k,res.second);
 
         // The final step is to compute the Sobolev index $s=\mu-\frac d2$ and
         // store it in the vector of estimated values for each cell:
-        smoothness_indicators(cell->active_cell_index()) = mu - 1.*dim/2;
+        smoothness_indicators(cell->active_cell_index()) = -fit.first - 1.*dim/2;
       }
   }
 }

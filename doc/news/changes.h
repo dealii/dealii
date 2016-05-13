@@ -139,6 +139,17 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+
+ <li> New: Add new classes to expand a scalar finite element solution into
+ the orthogonal bases FESeries::Fourier and FESeries::Legendre. Also
+ provide auxiliary functions to calculate norms of subsets of expansion
+ coefficients FESeries::process_coefficients and linear regression
+ FESeries::linear_regression. Update step-27 to use this namespace to drive
+ the hp-adaptive FEM solution process.
+ <br>
+ (Denis Davydov, 2016/06/23)
+ </li>
+
  <li> New: The tutorial step-55 shows how to solve the Stokes system
  in parallel with PETSc or Trilinos.
  <br>

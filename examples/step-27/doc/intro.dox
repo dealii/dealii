@@ -312,27 +312,30 @@ Assuming that the cell $K$ is not degenerate, i.e. that the mapping from the
 unit cell to cell $K$ is sufficiently regular, above condition is of course
 equivalent to
 @f[
-	\int_{\hat K} |\nabla^s \hat u(\hat{\bf x})|^2 \; d\hat{\bf x} < \infty
+	\int_{\hat K} |\nabla^s \hat u(\hat{\bf x})|^2 \; d\hat{\bf x} < \infty\,,
 @f]
 where $\hat u(\hat{\bf x})$ is the function $u({\bf x})$ mapped back onto the unit cell
 $\hat K$. From here, we can do the following: first, let us define the
 Fourier series of $\hat u$ as
 @f[
-	\hat U_{\bf k}
-	= \frac 1{(2\pi)^{d/2}} \int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat u(\hat{\bf x}) d\hat{\bf x}
+	\hat u(\hat{\bf x})
+	= \sum_{\bf k} \hat U_{\bf k}\,e^{-i {\bf k}\cdot \hat{\bf x}},
 @f]
 with Fourier vectors ${\bf k}=(k_x,k_y)$ in 2d, ${\bf k}=(k_x,k_y,k_z)$
-in 3d, etc, and $k_x,k_y,k_z=0,\pi,2\pi,3\pi,\ldots$. If we re-compose $\hat u$
-from $\hat U$ using the formula
+in 3d, etc, and $k_x,k_y,k_z=0,2\pi,4\pi,\ldots$. The coefficients of expansion
+$\hat U_{\bf k}$ can be obtained using $L^2$-orthogonality of the exponential basis
 @f[
-	\hat u(\hat{\bf x})
-	= \frac 1{(2\pi)^{d/2}} \sum_{\bf k} e^{-i {\bf k}\cdot \hat{\bf x}} \hat U_{\bf k},
+\int_{\hat K} e^{-i {\bf m}\cdot \hat{\bf x}} e^{i {\bf n}\cdot \hat{\bf x}} d\hat{\bf x} = \delta_{\bf m \bf n},
 @f]
-then it becomes clear that we can write the $H^s$ norm of $\hat u$ as
+that leads to the following expression
+@f[
+	\hat U_{\bf k}
+	= \int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat u(\hat{\bf x}) d\hat{\bf x} \,.
+@f]
+It becomes clear that we can then write the $H^s$ norm of $\hat u$ as
 @f[
 	\int_{\hat K} |\nabla^s \hat u(\hat{\bf x})|^2 \; d\hat{\bf x}
 	=
-	\frac 1{(2\pi)^d}
 	\int_{\hat K}
 	\left|
 	  \sum_{\bf k} |{\bf k}|^s e^{-i{\bf k}\cdot \hat{\bf x}} \hat U_{\bf k}
@@ -347,12 +350,12 @@ In other words, if this norm is to be finite (i.e. for $\hat u(\hat{\bf x})$ to 
 	|\hat U_{\bf k}| = {\cal O}\left(|{\bf k}|^{-\left(s+1/2+\frac{d-1}{2}+\epsilon\right)}\right).
 @f]
 Put differently: the higher regularity $s$ we want, the faster the
-Fourier coefficients have to go to zero. (If you wonder where the
+Fourier coefficients have to go to zero. If you wonder where the
 additional exponent $\frac{d-1}2$ comes from: we would like to make
 use of the fact that $\sum_l a_l < \infty$ if the sequence $a_l =
 {\cal O}(l^{-1-\epsilon})$ for any $\epsilon>0$. The problem is that we
 here have a summation not only over a single variable, but over all
-the integer multiples of $\pi$ that are located inside the
+the integer multiples of $2\pi$ that are located inside the
 $d$-dimensional sphere, because we have vector components $k_x, k_y,
 \ldots$. In the same way as we prove that the sequence $a_l$ above
 converges by replacing the sum by an integral over the entire line, we
@@ -363,7 +366,7 @@ much the same way as we can transform the volume element $dx\;dy$ into
 $2\pi r\; dr$. Consequently, it is no longer $|{\bf k}|^{2s}|\hat
 U_{\bf k}|^2$ that has to decay as ${\cal O}(|{\bf k}|^{-1-\epsilon})$, but
 it is in fact $|{\bf k}|^{2s}|\hat U_{\bf k}|^2 |{\bf k}|^{d-1}$. A
-comparison of exponents yields the result.)
+comparison of exponents yields the result.
 
 We can turn this around: Assume we are given a function $\hat u$ of unknown
 smoothness. Let us compute its Fourier coefficients $\hat U_{\bf k}$
@@ -377,10 +380,10 @@ then consequently the function we had here was in $H^{\mu-d/2}$.
 <h4>What we have to do</h4>
 
 So what do we have to do to estimate the local smoothness of $u({\bf x})$ on
-a cell $K$? Clearly, the first step is to compute the Fourier series
+a cell $K$? Clearly, the first step is to compute the Fourier coefficients
 of our solution. Fourier series being infinite series, we simplify our
 task by only computing the first few terms of the series, such that
-$|{\bf k}|\le N$ with a cut-off $N$. (Let us parenthetically remark
+$|{\bf k}|\le 2\pi N$ with a cut-off $N$. Let us parenthetically remark
 that we want to choose $N$ large enough so that we capture at least
 the variation of those shape functions that vary the most. On the
 other hand, we should not choose $N$ too large: clearly, a finite
@@ -388,16 +391,16 @@ element function, being a polynomial, is in $C^\infty$ on any given
 cell, so the coefficients will have to decay exponentially at one
 point; since we want to estimate the smoothness of the function this
 polynomial approximates, not of the polynomial itself, we need to
-choose a reasonable cutoff for $N$.) Either way, computing this series
+choose a reasonable cutoff for $N$. Either way, computing this series
 is not particularly hard: from the definition
 @f[
 	\hat U_{\bf k}
-	= \frac 1{(2\pi)^{d/2}} \int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat u(\hat{\bf x}) d\hat{\bf x}
+	= \int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat u(\hat{\bf x}) d\hat{\bf x}
 @f]
 we see that we can compute the coefficient $\hat U_{\bf k}$ as
 @f[
 	\hat U_{\bf k}
-	= \frac 1{(2\pi)^{d/2}}
+	= 
           \sum_{i=0}^{\textrm{\tiny dofs per cell}}
           \left[\int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat \varphi_i(\hat{\bf x})
 	  d\hat{\bf x} \right] u_i,
@@ -411,12 +414,14 @@ cell. In other words, we can write it as a matrix-vector product
 with the matrix
 @f[
 	{\cal F}_{{\bf k},j}
-	= \frac 1{(2\pi)^{d/2}}
+	= 
 	\int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat \varphi_j(\hat{\bf x}) d\hat{\bf x}.
 @f]
 This matrix is easily computed for a given number of shape functions
 $\varphi_j$ and Fourier modes $N$. Consequently, finding the
 coefficients $\hat U_{\bf k}$ is a rather trivial job.
+To simplify our life even further, we will use FESeries::Fourier class which
+does exactly this.
 
 The next task is that we have to estimate how fast these coefficients
 decay with $|{\bf k}|$. The problem is that, of course, we have only
@@ -499,6 +504,8 @@ and
 	\right].
 @f]
 
+This is nothing else but linear regression fit and to do that we will use
+FESeries::linear_regression().
 While we are not particularly interested in the actual value of
 $\beta$, the formula above gives us a mean to calculate the value of
 the exponent $\mu$ that we can then use to determine that
