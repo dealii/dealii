@@ -120,6 +120,13 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li> New: Add functions to transform Cartesian coordinates to spherical and back:
+ GeometricUtilities::Coordinates::to_spherical and
+ GeometricUtilities::Coordinates::from_spherical.
+ <br>
+ (Denis Davydov, 2016/05/10)
+ </li>
+
  <li> Improved: The method Triangulation::create_triangulation will now throw an
  exception if any cells have negative measure. This check is not run if the
  triangulation keeps track of distorted cells or if the codimension is not zero.
