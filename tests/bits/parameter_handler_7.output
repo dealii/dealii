@@ -2,7 +2,7 @@
 Listing of Parameters:
 
 subsection Testing
-  set double       =   [Double -1.79769e+308...1.79769e+308 (inclusive)]
+  set double       =   [Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]
                        (docs 3)
   set int          =   [Integer range -2147483648...2147483647 (inclusive)]
   set string list  = 

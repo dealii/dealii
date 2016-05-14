@@ -1,0 +1,87 @@
+
+\subsection{Global parameters}
+\label{parameters:global}
+
+
+\begin{itemize}
+\item {\it Parameter name:} {\tt a}
+\phantomsection\label{parameters:a}
+
+
+\index[prmindex]{a}
+\index[prmindexfull]{a}
+{\it Value:} 1.2
+
+
+{\it Default:} 1.2
+
+
+{\it Description:} no limit
+
+
+{\it Possible values:} [Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]
+\item {\it Parameter name:} {\tt b}
+\phantomsection\label{parameters:b}
+
+
+\index[prmindex]{b}
+\index[prmindexfull]{b}
+{\it Value:} 1.2
+
+
+{\it Default:} 1.2
+
+
+{\it Description:} lower limit
+
+
+{\it Possible values:} [Double -2.13...MAX_DOUBLE (inclusive)]
+\item {\it Parameter name:} {\tt c}
+\phantomsection\label{parameters:c}
+
+
+\index[prmindex]{c}
+\index[prmindexfull]{c}
+{\it Value:} 1.2
+
+
+{\it Default:} 1.2
+
+
+{\it Description:} upper limit
+
+
+{\it Possible values:} [Double -MAX_DOUBLE...42 (inclusive)]
+\item {\it Parameter name:} {\tt d}
+\phantomsection\label{parameters:d}
+
+
+\index[prmindex]{d}
+\index[prmindexfull]{d}
+{\it Value:} 1.2
+
+
+{\it Default:} 1.2
+
+
+{\it Description:} both limits
+
+
+{\it Possible values:} [Double 0.2...42 (inclusive)]
+\item {\it Parameter name:} {\tt e}
+\phantomsection\label{parameters:e}
+
+
+\index[prmindex]{e}
+\index[prmindexfull]{e}
+{\it Value:} 1.2
+
+
+{\it Default:} 1.2
+
+
+{\it Description:} no limits
+
+
+{\it Possible values:} [Double]
+\end{itemize}

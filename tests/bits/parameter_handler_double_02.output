@@ -1,0 +1,9 @@
+
+DEAL::invalid -> NULL
+DEAL::[Double invalid] -> NULL
+DEAL::[Double -> NULL
+DEAL::[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)] -> [Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]
+DEAL::[Double -2.13...MAX_DOUBLE (inclusive)] -> [Double -2.13...MAX_DOUBLE (inclusive)]
+DEAL::[Double -MAX_DOUBLE...42 (inclusive)] -> [Double -MAX_DOUBLE...42 (inclusive)]
+DEAL::[Double 0.2...42 (inclusive)] -> [Double 0.2...42 (inclusive)]
+DEAL::[Double] -> [Double]
