@@ -23,7 +23,7 @@
 {\it Description:} docs 3
 
 
-{\it Possible values:} [Double -1.79769e+308...1.79769e+308 (inclusive)]
+{\it Possible values:} [Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]
 \item {\it Parameter name:} {\tt double_alias}
 \phantomsection\label{parameters:Testing/double_alias}
 
@@ -94,7 +94,7 @@ This parameter is an alias for the parameter ``\texttt{int}''.
 {\it Description:} docs 3
 
 
-{\it Possible values:} [Double -1.79769e+308...1.79769e+308 (inclusive)]
+{\it Possible values:} [Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]
 \item {\it Parameter name:} {\tt int 2}
 \phantomsection\label{parameters:Testing/Testing 2/int 2}
 

@@ -23,7 +23,7 @@
 {\it Description:} docs 3
 
 
-{\it Possible values:} [Double -1.79769e+308...1.79769e+308 (inclusive)]
+{\it Possible values:} [Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]
 \item {\it Parameter name:} {\tt int}
 \phantomsection\label{parameters:Testing/int}
 

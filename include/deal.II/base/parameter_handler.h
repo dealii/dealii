@@ -221,16 +221,14 @@ namespace Patterns
   {
   public:
     /**
-     * Minimal double value. If the <tt>std::numeric_limits</tt> class is
-     * available use this information to obtain the extremal values, otherwise
-     * set it so that this class understands that all values are allowed.
+     * Minimal double value used as default value, taken from
+     * <tt>std::numeric_limits</tt>.
      */
     static const double min_double_value;
 
     /**
-     * Maximal double value. If the numeric_limits class is available use this
-     * information to obtain the extremal values, otherwise set it so that
-     * this class understands that all values are allowed.
+     * Maximal double value used as default value, taken from
+     * <tt>std::numeric_limits</tt>.
      */
     static const double max_double_value;
 
@@ -264,9 +262,11 @@ namespace Patterns
     virtual PatternBase *clone () const;
 
     /**
-     * Creates new object if the start of description matches
-     * description_init.  Ownership of that object is transferred to the
-     * caller of this function.
+     * Creates a new object on the heap using @p new if the given
+     * @p description is a valid format (for example created by calling
+     * description() on an existing object), or NULL otherwise. Ownership of
+     * the returned object is transferred to the caller of this function,
+     * which should be freed using @p delete.
      */
     static Double *create (const std::string &description);
 
@@ -275,7 +275,7 @@ namespace Patterns
      * Value of the lower bound. A number that satisfies the
      * @ref match
      * operation of this class must be equal to this value or larger, if the
-     * bounds of the interval for a valid range.
+     * bounds of the interval form a valid range.
      */
     const double lower_bound;
 
@@ -283,7 +283,7 @@ namespace Patterns
      * Value of the upper bound. A number that satisfies the
      * @ref match
      * operation of this class must be equal to this value or less, if the
-     * bounds of the interval for a valid range.
+     * bounds of the interval form a valid range.
      */
     const double upper_bound;
 

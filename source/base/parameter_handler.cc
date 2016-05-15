@@ -35,6 +35,7 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #include <sstream>
 #include <cctype>
 #include <limits>
+#include <cstring>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -281,23 +282,28 @@ namespace Patterns
   {
     std::ostringstream description;
 
-    // check whether valid bounds
-    // were specified, and if so
-    // output their values
     if (lower_bound <= upper_bound)
       {
-        description << description_init
-                    << " "
-                    << lower_bound << "..." << upper_bound
-                    << " (inclusive)]";
+        // bounds are valid
+        description << description_init << " ";
+        // We really want to compare with ==, but -Wfloat-equal would create
+        // a warning here, so work around it.
+        if (0==std::memcmp(&lower_bound, &min_double_value, sizeof(lower_bound)))
+          description << "-MAX_DOUBLE";
+        else
+          description << lower_bound;
+        description << "...";
+        if (0==std::memcmp(&upper_bound, &max_double_value, sizeof(upper_bound)))
+          description << "MAX_DOUBLE";
+        else
+          description << upper_bound;
+        description << " (inclusive)]";
         return description.str();
       }
     else
-      // if no bounds were given, then
-      // return generic string
       {
-        description << description_init
-                    << "]";
+        // invalid bounds, assume unbounded double:
+        description << description_init << "]";
         return description.str();
       }
   }
@@ -313,31 +319,38 @@ namespace Patterns
 
   Double *Double::create (const std::string &description)
   {
-    if (description.compare(0, std::strlen(description_init), description_init) == 0)
-      {
-        std::istringstream is(description);
+    const std::string description_init_str = description_init;
+    if (description.compare(0, description_init_str.size(), description_init_str) != 0)
+      return NULL;
+    if (*description.rbegin() != ']')
+      return NULL;
 
-        if (is.str().size() > strlen(description_init) + 1)
-          {
-            double lower_bound, upper_bound;
+    std::string temp = description.substr(description_init_str.size());
+    if (temp == "]")
+      return new Double(1.0, -1.0); // return an invalid range
 
-            is.ignore(strlen(description_init) + strlen(" range "));
+    if (temp.find("...") != std::string::npos)
+      temp.replace(temp.find("..."), 3, " ");
 
-            if (!(is >> lower_bound))
-              return new Double();
+    double lower_bound = min_double_value,
+           upper_bound = max_double_value;
 
-            is.ignore(strlen("..."));
-
-            if (!(is >> upper_bound))
-              return new Double();
-
-            return new Double(lower_bound, upper_bound);
-          }
-        else
-          return new Double();
-      }
+    std::istringstream is(temp);
+    if (0 == temp.compare(0, std::strlen(" -MAX_DOUBLE"), " -MAX_DOUBLE"))
+      is.ignore(std::strlen(" -MAX_DOUBLE"));
     else
-      return 0;
+      {
+        // parse lower bound and give up if not a double
+        if (!(is >> lower_bound))
+          return NULL;
+      }
+
+    // ignore failure here and assume we got MAX_DOUBLE as upper bound:
+    is >> upper_bound;
+    if (is.fail())
+      upper_bound = max_double_value;
+
+    return new Double(lower_bound, upper_bound);
   }
 
 
