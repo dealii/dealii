@@ -467,7 +467,9 @@ namespace Step48
                                        QGauss<dim>(fe_degree+1),
                                        VectorTools::L2_norm);
     const double solution_norm =
-      std::sqrt(Utilities::MPI::sum (norm_per_cell.norm_sqr(), MPI_COMM_WORLD));
+      VectorTools::compute_global_error(triangulation,
+                                        norm_per_cell,
+                                        VectorTools::L2_norm);
 
     pcout << "   Time:"
           << std::setw(8) << std::setprecision(3) << time

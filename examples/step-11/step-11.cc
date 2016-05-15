@@ -367,9 +367,10 @@ namespace Step11
                                        VectorTools::H1_seminorm);
     // Then, the function just called returns its results as a vector of
     // values each of which denotes the norm on one cell. To get the global
-    // norm, a simple computation shows that we have to take the l2 norm of
-    // the vector:
-    const double norm = norm_per_cell.l2_norm();
+    // norm, we do the following:
+    const double norm = VectorTools::compute_global_error(triangulation,
+                                                          norm_per_cell,
+                                                          VectorTools::H1_seminorm);
 
     // Last task -- generate output:
     output_table.add_value ("cells", triangulation.n_active_cells());
