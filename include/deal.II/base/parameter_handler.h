@@ -115,9 +115,8 @@ namespace Patterns
    * can only be realized with inclusive bounds for non-integer values. We
    * thus stay consistent by always using closed intervals.
    *
-   * If the upper bound given to the constructor is smaller than the lower
-   * bound, then the infinite interval is implied, i.e. every integer is
-   * allowed.
+   * If the upper bound given to the constructor is smaller than the
+   * lower bound, then every integer is allowed.
    *
    * Giving bounds may be useful if for example a value can only be positive
    * and less than a reasonable upper bound (for example the number of
@@ -141,10 +140,11 @@ namespace Patterns
     static const int max_int_value;
 
     /**
-     * Constructor. Bounds can be specified within which a valid parameter has
-     * to be. If the upper bound is smaller than the lower bound, then the
-     * infinite interval is meant. The default values are chosen such that no
-     * bounds are enforced on parameters.
+     * Constructor. Bounds can be specified within which a valid
+     * parameter has to be. If the upper bound is smaller than the
+     * lower bound, then the entire set of integers is implied. The
+     * default values are chosen such that no bounds are enforced on
+     * parameters.
      */
     Integer (const int lower_bound = min_int_value,
              const int upper_bound = max_int_value);
@@ -208,9 +208,8 @@ namespace Patterns
    * can only be realized with inclusive bounds for non-integer values. We
    * thus stay consistent by always using closed intervals.
    *
-   * If the upper bound given to the constructor is smaller than the lower
-   * bound, then the infinite interval is implied, i.e. every integer is
-   * allowed.
+   * If the upper bound given to the constructor is smaller than the
+   * lower bound, then every double precision number is allowed.
    *
    * Giving bounds may be useful if for example a value can only be positive
    * and less than a reasonable upper bound (for example damping parameters
@@ -233,10 +232,11 @@ namespace Patterns
     static const double max_double_value;
 
     /**
-     * Constructor. Bounds can be specified within which a valid parameter has
-     * to be. If the upper bound is smaller than the lower bound, then the
-     * infinite interval is meant. The default values are chosen such that no
-     * bounds are enforced on parameters.
+     * Constructor. Bounds can be specified within which a valid
+     * parameter has to be. If the upper bound is smaller than the
+     * lower bound, then the entire set of double precision numbers is
+     * implied. The default values are chosen such that no bounds are
+     * enforced on parameters.
      */
     Double (const double lower_bound = min_double_value,
             const double upper_bound = max_double_value);
