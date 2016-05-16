@@ -18,10 +18,23 @@
 #
 
 MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
+
+  IF(NOT DEAL_II_WITH_CXX11)
+    MESSAGE(FATAL_ERROR "\n"
+      "CUDA only supported with C++11. Reconfigure with DEAL_II_WITH_CXX11=ON.\n"
+      )
+  ENDIF()
+
   FIND_PACKAGE(CUDA)
 
   IF(CUDA_FOUND)
     SET(CUDA_ATTACH_VS_BUILD_RULE_TO_CUDA_FILE FALSE)
+
+    # Activate C++11 since we require it above.
+
+    SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -std=c++11)
+
+    # FIXME: CUDA compiler NVCC doesn't support C++14.
 
     SET(${var} TRUE)
   ENDIF()
