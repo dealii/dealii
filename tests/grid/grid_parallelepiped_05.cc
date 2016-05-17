@@ -62,8 +62,8 @@ void check (bool subdivide)
       break;
 
     case 2:
-      edges[0] = point<spacedim>(0.15, 0.50, 0.03);
-      edges[1] = point<spacedim>(0.70, 0.25, -0.01);
+      edges[0] = point<spacedim>(0.70, 0.25, -0.01);
+      edges[1] = point<spacedim>(0.15, 0.50, 0.03);
       break;
 
     case 3:

@@ -71,8 +71,8 @@ void check_2d_parallelepiped_by_comparison (bool log)
   // build corners for this particular dim that are known to give the
   // same output order as parallelogram:
   Point<2> (corners) [2];
-  corners[0] = Point<2> (0.0, 0.5);
-  corners[1] = Point<2> (0.5, 0.0);
+  corners[0] = Point<2> (0.5, 0.0);
+  corners[1] = Point<2> (0.0, 0.5);
 
   Triangulation<2> triangulation_parallelepiped;
   GridGenerator::parallelepiped (triangulation_parallelepiped, corners, false);

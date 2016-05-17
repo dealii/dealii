@@ -265,10 +265,11 @@ inconvenience this causes.
  </li>
 
  <li> Fixed: The function GridGenerator::subdivided_parallelepiped and its
- variants could generate two dimensional meshes with cells that had negative
- Jacobians. This has been fixed.
+ variants could generate meshes with cells that had negative Jacobians.
+ The function now detects when this will happen and raises a descriptive
+ exception instead of going on to produce cells which may have negative measure.
  <br>
- (David Wells, 2016/05/07)
+ (David Wells, 2016/05/11)
  </li>
 
  <li> New: Added function GridOut::write_mesh_per_processor_as_vtu. This allows 

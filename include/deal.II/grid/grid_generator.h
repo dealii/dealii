@@ -1139,6 +1139,12 @@ namespace GridGenerator
                   << "The vector of repetitions  must have "
                   << arg1 <<" elements.");
 
+  /**
+   * Exception for input that is not properly oriented.
+   */
+  DeclExceptionMsg (ExcInvalidInputOrientation,
+                    "The input to this function is oriented in a way that will"
+                    " cause all cells to have negative measure.");
   ///@}
 }
 
