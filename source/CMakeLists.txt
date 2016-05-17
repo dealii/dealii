@@ -48,6 +48,7 @@ ADD_SUBDIRECTORY(integrators)
 ADD_SUBDIRECTORY(matrix_free)
 ADD_SUBDIRECTORY(meshworker)
 ADD_SUBDIRECTORY(opencascade)
+ADD_SUBDIRECTORY(python)
 
 FOREACH(build ${DEAL_II_BUILD_TYPES})
   STRING(TOLOWER ${build} build_lowercase)
