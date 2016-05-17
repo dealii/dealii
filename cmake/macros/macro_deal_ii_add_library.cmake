@@ -52,7 +52,7 @@ MACRO(DEAL_II_ADD_LIBRARY _library)
     # Cuda specific target setup:
     #
     IF(DEAL_II_WITH_CUDA)
-      CUDA_WRAP_SRCS(${_library}.${_build_lowercase}
+      CUDA_WRAP_SRCS(${_library}_${_build_lowercase}
         OBJ _generated_cuda_files ${ARGN} SHARED
         )
 
