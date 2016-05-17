@@ -123,7 +123,7 @@ namespace LinearAlgebra
     virtual Vector<Number> &operator+= (const VectorSpaceVector<Number> &V);
 
     /**
-     * Substract the vector @p V from the present one.
+     * Subtract the vector @p V from the present one.
      */
     virtual Vector<Number> &operator-= (const VectorSpaceVector<Number> &V);
 
@@ -168,12 +168,12 @@ namespace LinearAlgebra
     /**
      * Scale each element of this vector by the corresponding element in the
      * argument. This function is mostly meant to simulate multiplication (and
-     * immediate re-assignement) by a diagonal scaling matrix.
+     * immediate re-assignment) by a diagonal scaling matrix.
      */
     virtual void scale(const VectorSpaceVector<Number> &scaling_factors);
 
     /**
-     * Assignement <tt>*this = a*V</tt>.
+     * Assignment <tt>*this = a*V</tt>.
      */
     virtual void equ(const Number a, const VectorSpaceVector<Number> &V);
 
