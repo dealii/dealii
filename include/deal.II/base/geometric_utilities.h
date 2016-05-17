@@ -43,8 +43,8 @@ namespace GeometricUtilities
 
     /**
      * Returns spherical coordinates of a Cartesian point @p point.
-     * The returned array is filled with radius, azimuth angle \f$ \in [0,2 \pi) \f$
-     * and polar/inclination angle \f$ \in [0,\pi] \f$ (ommited in 2D).
+     * The returned array is filled with radius, azimuth angle $\in [0,2 \pi)$
+     * and polar/inclination angle $ \in [0,\pi]$ (ommited in 2D).
      */
     template <int dim>
     std_cxx11::array<double,dim>
@@ -52,8 +52,8 @@ namespace GeometricUtilities
 
     /**
      * Return the Cartesian coordinates of a spherical point defined by @p scoord
-     * which is filled with radius \f$ \in [0,\infty) \f$, azimuth angle
-     * \f$ \in [0,2 \pi) \f$ and polar/inclination angle \f$ \in [0,\pi] \f$
+     * which is filled with radius $\in [0,\infty)$, azimuth angle
+     * $\in [0,2 \pi)$ and polar/inclination angle $\in [0,\pi]$
      * (ommited in 2D).
      */
     template <std::size_t dim>
