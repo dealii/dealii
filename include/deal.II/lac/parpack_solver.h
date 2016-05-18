@@ -231,7 +231,16 @@ public:
   /**
    * Initialise internal variables.
    */
-  void reinit(const dealii::IndexSet &locally_owned_dofs );
+  void reinit(const IndexSet &locally_owned_dofs );
+
+  /**
+   * Initialize internal variables when working with BlockVectors.
+   * @p locally_owned_dofs is used to set the dimension of the problem,
+   * whereas @p partitioning is used for calling the reinit of the deal.II
+   * blockvectors used.
+   */
+  void reinit(const IndexSet &locally_owned_dofs,
+              const std::vector<IndexSet> &partitioning);
 
   /**
    * Set desired shift value.
@@ -370,6 +379,14 @@ protected:
 private:
 
   /**
+   * Initialize internal variables which depend on
+   * @p locally_owned_dofs.
+   *
+   * This function is called inside the reinit() functions
+   */
+  void internal_reinit(const IndexSet &locally_owned_dofs);
+
+  /**
    * PArpackExcInfoPdnaupds.
    */
   DeclException2 (PArpackExcConvergedEigenvectors, int, int,
@@ -469,7 +486,8 @@ void PArpackSolver<VectorType>::set_shift(const double s )
 }
 
 template <typename VectorType>
-void PArpackSolver<VectorType>::reinit(const dealii::IndexSet &locally_owned_dofs)
+void PArpackSolver<VectorType>::
+internal_reinit(const IndexSet &locally_owned_dofs)
 {
   // store local indices to write to vectors
   locally_owned_dofs.fill_index_vector(local_indices);
@@ -507,11 +525,30 @@ void PArpackSolver<VectorType>::reinit(const dealii::IndexSet &locally_owned_dof
   workev.resize (lworkev, 0.);
 
   select.resize (ncv, 0);
+}
+
+template <typename VectorType>
+void PArpackSolver<VectorType>::reinit(const IndexSet &locally_owned_dofs)
+{
+  internal_reinit(locally_owned_dofs);
 
   // deal.II vectors:
   src.reinit (locally_owned_dofs,mpi_communicator);
   dst.reinit (locally_owned_dofs,mpi_communicator);
   tmp.reinit (locally_owned_dofs,mpi_communicator);
+
+}
+
+template <typename VectorType>
+void PArpackSolver<VectorType>::reinit(const IndexSet &locally_owned_dofs,
+                                       const std::vector<IndexSet> &partitioning)
+{
+  internal_reinit(locally_owned_dofs);
+
+  // deal.II vectors:
+  src.reinit (partitioning,mpi_communicator);
+  dst.reinit (partitioning,mpi_communicator);
+  tmp.reinit (partitioning,mpi_communicator);
 
 }
 
