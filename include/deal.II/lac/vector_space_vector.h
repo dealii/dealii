@@ -24,9 +24,12 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-class CommunicationPatternBase;
 class IndexSet;
-template <typename Number> class ReadWriteVector;
+namespace LinearAlgebra
+{
+  class CommunicationPatternBase;
+  template <typename Number> class ReadWriteVector;
+}
 
 namespace LinearAlgebra
 {

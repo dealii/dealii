@@ -902,6 +902,11 @@ namespace internal
         // order to obtain known loop bounds for most of the work.
         size_type index = first;
         ResultType outer_results [vector_accumulation_recursion_threshold];
+
+        // set the zeroth element to zero to correctly handle the case where
+        // vec_size == 0
+        outer_results[0] = ResultType();
+
         size_type n_chunks = vec_size / 32;
         const size_type remainder = vec_size % 32;
         Assert (remainder == 0 || n_chunks < vector_accumulation_recursion_threshold,
@@ -1214,7 +1219,7 @@ namespace internal
         partitioner->release_one_partitioner(tbb_partitioner);
         result = generic_functor.do_sum();
       }
-    else if (vec_size > 0)
+    else
       accumulate_recursive(op,0,vec_size,result);
 #else
     accumulate_recursive(op,0,vec_size,result);

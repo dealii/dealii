@@ -22,6 +22,7 @@
 #include <deal.II/base/types.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/lac/communication_pattern_base.h>
 
 #include <limits>
 
@@ -58,7 +59,7 @@ namespace Utilities
      *
      * @author Katharina Kormann, Martin Kronbichler, 2010, 2011
      */
-    class Partitioner
+    class Partitioner : public ::dealii::LinearAlgebra::CommunicationPatternBase
     {
     public:
       /**
@@ -92,6 +93,17 @@ namespace Utilities
        */
       Partitioner (const IndexSet &locally_owned_indices,
                    const MPI_Comm  communicator_in);
+
+      /**
+       * Reinitialize the communication pattern. The first argument @p
+       * vector_space_vector_index_set is the index set associated to a
+       * VectorSpaceVector object. The second argument @p
+       * read_write_vector_index_set is the index set associated to a
+       * ReadWriteVector object.
+       */
+      virtual void reinit(const IndexSet &vector_space_vector_index_set,
+                          const IndexSet &read_write_vector_index_set,
+                          const MPI_Comm &communicator);
 
       /**
        * Sets the locally owned indices. Used in the constructor.
@@ -250,7 +262,12 @@ namespace Utilities
       /**
        * Returns the MPI communicator underlying the partitioner object.
        */
-      const MPI_Comm &get_communicator() const;
+      const MPI_Comm &get_communicator() const DEAL_II_DEPRECATED;
+
+      /**
+       * Returns the MPI communicator underlying the partitioner object.
+       */
+      virtual const MPI_Comm &get_mpi_communicator() const;
 
       /**
        * Returns whether ghost indices have been explicitly added as a @p
@@ -277,7 +294,7 @@ namespace Utilities
       /**
        * The global size of the vector over all processors
        */
-      const types::global_dof_index global_size;
+      types::global_dof_index global_size;
 
       /**
        * The range of the vector that is stored locally.
@@ -341,7 +358,7 @@ namespace Utilities
       /**
        * The MPI communicator involved in the problem
        */
-      const MPI_Comm communicator;
+      MPI_Comm communicator;
 
       /**
        * Stores whether the ghost indices have been explicitly set.
@@ -527,6 +544,15 @@ namespace Utilities
     inline
     const MPI_Comm &
     Partitioner::get_communicator() const
+    {
+      return communicator;
+    }
+
+
+
+    inline
+    const MPI_Comm &
+    Partitioner::get_mpi_communicator() const
     {
       return communicator;
     }

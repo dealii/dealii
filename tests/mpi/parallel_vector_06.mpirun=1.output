@@ -6,19 +6,7 @@ DEAL:0::linfty norm: 2.000
 DEAL:0::l2.2 norm: 2.000
 DEAL:0::Mean value: 1.000
 DEAL:0::Inner product: 4.000
-DEAL:0:: v==v2 ? 1
-DEAL:0:: v!=v2 ? 0
-DEAL:0:: v==v2 ? 0
-DEAL:0:: v!=v2 ? 1
-DEAL:0:: v==v2 ? 1
-DEAL:0:: v!=v2 ? 0
-DEAL:0:: v==v2 ? 0
-DEAL:0:: v!=v2 ? 1
 DEAL:0:: v==0 ? 0
 DEAL:0:: v2==0 ? 1
 DEAL:0:: v2==0 ? 0
-DEAL:0:: v>=0 ? 1
-DEAL:0:: v2>=0 ? 0
-DEAL:0:: v3>=0 ? 1
-DEAL:0:: v3>=0 ? 0
 DEAL:0::OK

@@ -17,9 +17,9 @@
 
 for (SCALAR : REAL_SCALARS)
 {
-  namespace parallel
+  namespace LinearAlgebra
   \{
-    namespace distributed
+    namespace parallel
     \{
       template class Vector<SCALAR>;
     \}
@@ -28,9 +28,9 @@ for (SCALAR : REAL_SCALARS)
 
 for (S1, S2 : REAL_SCALARS)
 {
-  namespace parallel
+  namespace LinearAlgebra
   \{
-    namespace distributed
+    namespace parallel
     \{
       template void Vector<S1>::reinit<S2> (const Vector<S2>&,
                                             const bool);

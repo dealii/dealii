@@ -529,7 +529,7 @@ namespace LinearAlgebra
      * For parallel loops with TBB, this member variable stores the affinity
      * information of loops.
      */
-    mutable std_cxx11::shared_ptr<parallel::internal::TBBPartitioner> thread_loop_partitioner;
+    mutable std_cxx11::shared_ptr<::dealii::parallel::internal::TBBPartitioner> thread_loop_partitioner;
 
     /**
      * Make all other ReadWriteVector types friends.

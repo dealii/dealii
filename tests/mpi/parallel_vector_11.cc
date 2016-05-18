@@ -73,7 +73,7 @@ void test ()
   if (myid==0) deallog << "OK" << std::endl;
 
   if (myid==0) deallog << "Check add (vector): ";
-  y.add (w);
+  y.add (1., w);
   for (int i=0; i<actual_local_size; ++i)
     AssertThrow (y.local_element(i) == 3*(i+my_start)+1042, ExcInternalError());
   if (myid==0) deallog << "OK" << std::endl;
@@ -104,7 +104,8 @@ void test ()
   if (myid==0) deallog << "OK" << std::endl;
 
   if (myid==0) deallog << "Check sadd (factor, factor, vector, factor, vector, factor, vector): ";
-  y.sadd (-1.,1.,v, 2., w, 2., x);
+  y.sadd (-1.,1.,v, 2., w);
+  y.add(2., x);
   for (int i=0; i<actual_local_size; ++i)
     AssertThrow (y.local_element(i) == 20000, ExcInternalError());
   if (myid==0) deallog << "OK" << std::endl;
@@ -147,7 +148,8 @@ void test ()
   if (myid==0) deallog << "OK" << std::endl;
 
   if (myid==0) deallog << "Check equ (factor, vector, factor, vector, factor, vector): ";
-  y. equ (10., v, -2., w, 3., x);
+  y. equ (10., v, -2., w);
+  y. add (3., x);
   for (int i=0; i<actual_local_size; ++i)
     AssertThrow (y.local_element(i) == 6.*(i+my_start)+28000, ExcInternalError());
   if (myid==0) deallog << "OK" << std::endl;
@@ -155,7 +157,7 @@ void test ()
   if (myid==0) deallog << "Check equ<float> (factor, vector): ";
   parallel::distributed::Vector<float> z;
   z = v;
-  y.equ (1., z);
+  y = z;
   for (int i=0; i<actual_local_size; ++i)
     AssertThrow (y.local_element(i) == i+my_start, ExcInternalError());
   if (myid==0) deallog << "OK" << std::endl;

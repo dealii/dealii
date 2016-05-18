@@ -34,9 +34,9 @@ DEAL_II_NAMESPACE_OPEN
 
 
 // forward declarations
-namespace parallel
+namespace LinearAlgebra
 {
-  namespace distributed
+  namespace parallel
   {
     template <typename> class Vector;
   }
@@ -2117,7 +2117,7 @@ namespace internal
   template <typename Number>
   inline
   Number &
-  vector_access (parallel::distributed::Vector<Number> &vec,
+  vector_access (LinearAlgebra::parallel::Vector<Number> &vec,
                  const unsigned int                     entry)
   {
     return vec.local_element(entry);
@@ -2131,7 +2131,7 @@ namespace internal
   template <typename Number>
   inline
   Number
-  vector_access (const parallel::distributed::Vector<Number> &vec,
+  vector_access (const LinearAlgebra::parallel::Vector<Number> &vec,
                  const unsigned int                           entry)
   {
     return vec.local_element(entry);
@@ -2155,7 +2155,7 @@ namespace internal
 
   template <typename Number>
   inline
-  void check_vector_compatibility (const parallel::distributed::Vector<Number>  &vec,
+  void check_vector_compatibility (const LinearAlgebra::parallel::Vector<Number>  &vec,
                                    const internal::MatrixFreeFunctions::DoFInfo &dof_info)
   {
     Assert (vec.partitioners_are_compatible(*dof_info.vector_partitioner),
