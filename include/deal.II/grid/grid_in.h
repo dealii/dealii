@@ -45,8 +45,8 @@ template <int dim> struct CellData;
  * meshes, the functions in this class can only read meshes that consist
  * exclusively of such cells. If you absolutely need to work with a mesh that
  * uses triangles or tetrahedra, then your only option is to convert the mesh
- * to quadrilaterals and hexahedra. A tool that can do this is tethex, see
- * http://code.google.com/p/tethex/wiki/Tethex .
+ * to quadrilaterals and hexahedra. A tool that can do this is tethex,
+ * available <a href="https://github.com/martemyev/tethex">here</a>.
  *
  * The mesh you read will form the coarsest level of a @p Triangulation
  * object. As such, it must not contain hanging nodes or other forms of
@@ -207,8 +207,9 @@ template <int dim> struct CellData;
  * <li> <tt>Cubit</tt> format: deal.II doesn't directly support importing from
  * Cubit at this time. However, Cubit can export in UCD format using a simple
  * plug-in, and the resulting UCD file can then be read by this class. The
- * plug-in script can be found on the deal.II wiki page,
- * http://code.google.com/p/dealii/wiki/MeshInputAndOutput .
+ * plug-in script can be found on the deal.II wiki page under
+ * <a href="https://github.com/dealii/dealii/wiki/Mesh-Input-And-Output">Mesh
+ * Input and Output</a>.
  *
  * Alternatively, Cubit can generate ABAQUS files that can be read in via the
  * read_abaqus() function. This may be a better option for geometries with
