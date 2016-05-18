@@ -2187,15 +2187,16 @@ namespace DoFTools
   }
 
 
-
   template <typename DoFHandlerType>
-  void make_vertex_patches (SparsityPattern       &block_list,
-                            const DoFHandlerType &dof_handler,
-                            const unsigned int    level,
-                            const bool            interior_only,
-                            const bool            boundary_patches,
-                            const bool            level_boundary_patches,
-                            const bool            single_cell_patches)
+  std::vector<unsigned int>
+  make_vertex_patches (SparsityPattern      &block_list,
+                       const DoFHandlerType &dof_handler,
+                       const unsigned int    level,
+                       const bool            interior_only,
+                       const bool            boundary_patches,
+                       const bool            level_boundary_patches,
+                       const bool            single_cell_patches,
+                       const bool            invert_vertex_mapping)
   {
     typename DoFHandlerType::level_cell_iterator cell;
     typename DoFHandlerType::level_cell_iterator endc = dof_handler.end(level);
@@ -2301,8 +2302,21 @@ namespace DoFTools
               }
           }
       }
-  }
 
+    if (invert_vertex_mapping)
+      {
+        // Compress vertex mapping
+        unsigned int n_vertex_count = 0;
+        for (unsigned int vg = 0; vg < vertex_mapping.size(); ++vg)
+          if (vertex_mapping[vg] != numbers::invalid_unsigned_int)
+            vertex_mapping[n_vertex_count++] = vg;
+
+        // Now we reduce it to the part we actually want
+        vertex_mapping.resize(n_vertex_count);
+      }
+
+    return vertex_mapping;
+  }
 
 
   template <typename DoFHandlerType>

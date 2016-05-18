@@ -29,47 +29,142 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   const unsigned int level = tr.n_levels()-1;
 
   {
-    deallog.push("tttt");
+    deallog.push("ttttt");
     SparsityPattern bl;
-    DoFTools::make_vertex_patches(bl, dof, level, true, true, true, true);
+    std::vector<unsigned int> vm;
+    vm = DoFTools::make_vertex_patches(bl, dof, level, true, true, true, true, true);
     bl.compress();
     print_patches(bl);
+    deallog.push("inv vertex mapping");
+    for (unsigned int i=0; i < vm.size(); ++i)
+      deallog << " "<< vm[i];
+    deallog << std::endl;
+    deallog.pop();
     deallog.pop();
     deallog << std::endl;
   }
   {
-    deallog.push("ttff");
+    deallog.push("ttfft");
     SparsityPattern bl;
-    DoFTools::make_vertex_patches(bl, dof, level, true, true, false);
+    std::vector<unsigned int> vm;
+    vm = DoFTools::make_vertex_patches(bl, dof, level, true, true, false, false, true);
     bl.compress();
     print_patches(bl);
+    deallog.push("inv vertex mapping");
+    for (unsigned int i=0; i < vm.size(); ++i)
+      deallog << " "<< vm[i];
+    deallog << std::endl;
+    deallog.pop();
     deallog.pop();
     deallog << std::endl;
   }
   {
-    deallog.push("tfff");
+    deallog.push("tffft");
     SparsityPattern bl;
-    DoFTools::make_vertex_patches(bl, dof, level, true, false, false);
+    std::vector<unsigned int> vm;
+    vm = DoFTools::make_vertex_patches(bl, dof, level, true, false, false, false, true);
     bl.compress();
     print_patches(bl);
+    deallog.push("inv vertex mapping");
+    for (unsigned int i=0; i < vm.size(); ++i)
+      deallog << " "<< vm[i];
+    deallog << std::endl;
+    deallog.pop();
     deallog.pop();
     deallog << std::endl;
   }
   {
-    deallog.push("fttt");
+    deallog.push("ftttt");
     SparsityPattern bl;
-    DoFTools::make_vertex_patches(bl, dof, level, false, true, true, true);
+    std::vector<unsigned int> vm;
+    vm = DoFTools::make_vertex_patches(bl, dof, level, false, true, true, true, true);
     bl.compress();
     print_patches(bl);
+    deallog.push("inv vertex mapping");
+    for (unsigned int i=0; i < vm.size(); ++i)
+      deallog << " "<< vm[i];
+    deallog << std::endl;
+    deallog.pop();
     deallog.pop();
     deallog << std::endl;
   }
   {
-    deallog.push("ffff");
+    deallog.push("fffft");
     SparsityPattern bl;
-    DoFTools::make_vertex_patches(bl, dof, level, false, false, false);
+    std::vector<unsigned int> vm;
+    vm = DoFTools::make_vertex_patches(bl, dof, level, false, false, false, false, true);
     bl.compress();
     print_patches(bl);
+    deallog.push("inv vertex mapping");
+    for (unsigned int i=0; i < vm.size(); ++i)
+      deallog << " "<< vm[i];
+    deallog << std::endl;
+    deallog.pop();
+    deallog.pop();
+    deallog << std::endl;
+  }
+  {
+    deallog.push("ttttf");
+    SparsityPattern bl;
+    std::vector<unsigned int> vm;
+    vm = DoFTools::make_vertex_patches(bl, dof, level, true, true, true, true, false);
+    deallog.push("vertex mapping");
+    for (unsigned int i=0; i < vm.size(); ++i)
+      deallog << " "<< vm[i];
+    deallog << std::endl;
+    deallog.pop();
+    deallog.pop();
+    deallog << std::endl;
+  }
+  {
+    deallog.push("ttfff");
+    SparsityPattern bl;
+    std::vector<unsigned int> vm;
+    vm = DoFTools::make_vertex_patches(bl, dof, level, true, true, false, false, false);
+    deallog.push("vertex mapping");
+    for (unsigned int i=0; i < vm.size(); ++i)
+      deallog << " "<< vm[i];
+    deallog << std::endl;
+    deallog.pop();
+    deallog.pop();
+    deallog << std::endl;
+  }
+  {
+    deallog.push("tffff");
+    SparsityPattern bl;
+    std::vector<unsigned int> vm;
+    vm = DoFTools::make_vertex_patches(bl, dof, level, true, false, false, false, false);
+    deallog.push("vertex mapping");
+    for (unsigned int i=0; i < vm.size(); ++i)
+      deallog << " "<< vm[i];
+    deallog << std::endl;
+    deallog.pop();
+    deallog.pop();
+    deallog << std::endl;
+  }
+  {
+    deallog.push("ftttf");
+    SparsityPattern bl;
+    std::vector<unsigned int> vm;
+    vm = DoFTools::make_vertex_patches(bl, dof, level, false, true, true, true, false);
+    deallog.push("vertex mapping");
+    for (unsigned int i=0; i < vm.size(); ++i)
+      deallog << " "<< vm[i];
+    deallog << std::endl;
+    deallog.pop();
+    deallog.pop();
+    deallog << std::endl;
+  }
+  {
+    deallog.push("fffff");
+    SparsityPattern bl;
+    std::vector<unsigned int> vm;
+    vm = DoFTools::make_vertex_patches(bl, dof, level, false, false, false, false, false);
+    deallog.push("vertex mapping");
+    for (unsigned int i=0; i < vm.size(); ++i)
+      deallog << " "<< vm[i];
+    deallog << std::endl;
+    deallog.pop();
     deallog.pop();
     deallog << std::endl;
   }
