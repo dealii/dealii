@@ -165,12 +165,11 @@ lines. Remember: Producing software is not the same as just writing code.
 To make your life easier on this journey let us point to three resources that
 are worthwhile browsing through before you start any large-scale programming:
 
-- The <a
-  href="http://code.google.com/p/dealii/wiki/FrequentlyAskedQuestions">deal.II
-  Frequently Asked Questions</a>: This page has a good number of questions
-  that pertain to particular aspects of deal.II, but also to more general
-  questions such as "How do I debug scientific computing codes?" or "Can I
-  train myself to write code that has fewer bugs?".
+- <a href="https://github.com/dealii/dealii/wiki/Frequently-Asked-Questions">
+  The deal.II FAQ</a> has a good number of answers to questions about
+  particular aspects of deal.II, but also to more general questions such as "How
+  do I debug scientific computing codes?" or "Can I train myself to write code
+  that has fewer bugs?".
 
 - The <a href="http://software-carpentry.org/">Software Carpentry project</a>
   that provides introductions to many topics that are important to dealing
