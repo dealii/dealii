@@ -212,9 +212,8 @@ template <int dim> struct CellData;
  *
  * Alternatively, Cubit can generate ABAQUS files that can be read in via the
  * read_abaqus() function. This may be a better option for geometries with
- * complex boundary condition surfaces and multiple materials
- *  - information which is currently not easily obtained through
- * Cubit's python interface.
+ * complex boundary condition surfaces and multiple materials - information
+ * which is currently not easily obtained through Cubit's python interface.
  *
  * </ul>
  *
