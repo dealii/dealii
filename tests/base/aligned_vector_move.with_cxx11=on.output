@@ -1,0 +1,9 @@
+
+DEAL::Size: 4
+DEAL::Size of new VEC: 4
+DEAL::Size of moved VEC: 0
+DEAL::Contents of new VEC: 2 2 2 2 
+DEAL::Size of moved VEC after resize: 6
+DEAL::Contents of new VEC: 42 42 42 42 42 42 
+DEAL::Size of move-assigned VEC: 4
+DEAL::Size of moved VEC: 0
