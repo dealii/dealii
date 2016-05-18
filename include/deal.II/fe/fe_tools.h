@@ -24,6 +24,7 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/symmetric_tensor.h>
+#include <deal.II/fe/component_mask.h>
 
 #include <vector>
 #include <string>
@@ -837,6 +838,99 @@ namespace FETools
   template <int dim>
   std::vector<unsigned int>
   lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe_data);
+
+
+  /**
+   * Take vectors of finite elements and multiplicities and multiply out
+   * how many degrees of freedom the composed element has per vertex,
+   * line, etc.
+   *
+   * If @p do_tensor_product is true, the returned number of components is sum of
+   * products of number of components in each finite elements times @p multiplicities.
+   * Otherwise the number of components is take from the first fine element
+   * with non-zero multiplicity.
+   */
+  template <int dim, int spacedim>
+  FiniteElementData<dim>
+  multiply_dof_numbers (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
+                        const std::vector<unsigned int>                       &multiplicities,
+                        const bool do_tensor_product = true);
+
+  /**
+   * Same as above but for a specific number of sub-elements.
+   */
+  template <int dim, int spacedim>
+  FiniteElementData<dim>
+  multiply_dof_numbers (const FiniteElement<dim,spacedim> *fe1,
+                        const unsigned int            N1,
+                        const FiniteElement<dim,spacedim> *fe2=NULL,
+                        const unsigned int            N2=0,
+                        const FiniteElement<dim,spacedim> *fe3=NULL,
+                        const unsigned int            N3=0,
+                        const FiniteElement<dim,spacedim> *fe4=NULL,
+                        const unsigned int            N4=0,
+                        const FiniteElement<dim,spacedim> *fe5=NULL,
+                        const unsigned int            N5=0);
+
+  /**
+   * Compute the named flags for a list of finite elements with multiplicities
+   * given in the second argument. This function is called from all the above
+   * functions.
+   */
+  template <int dim, int spacedim>
+  std::vector<bool>
+  compute_restriction_is_additive_flags (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
+                                         const std::vector<unsigned int>              &multiplicities);
+
+  /**
+   * Take a @p FiniteElement object
+   * and return an boolean vector including the @p
+   * restriction_is_additive_flags of the mixed element consisting of @p N
+   * elements of the sub-element @p fe.
+   */
+  template <int dim, int spacedim>
+  std::vector<bool>
+  compute_restriction_is_additive_flags (const FiniteElement<dim,spacedim> *fe1,
+                                         const unsigned int        N1,
+                                         const FiniteElement<dim,spacedim> *fe2=NULL,
+                                         const unsigned int        N2=0,
+                                         const FiniteElement<dim,spacedim> *fe3=NULL,
+                                         const unsigned int        N3=0,
+                                         const FiniteElement<dim,spacedim> *fe4=NULL,
+                                         const unsigned int        N4=0,
+                                         const FiniteElement<dim,spacedim> *fe5=NULL,
+                                         const unsigned int        N5=0);
+
+  /**
+   * Compute the nonzero components of a list of finite elements with
+   * multiplicities given in the second argument.
+   *
+   * If @p do_tensor_product is false, the number of components of the resulting
+   * component mask is the same as the first finite element with non-zero multiplicity.
+   * Otherwise the number of components equals the sum of number of components
+   * of a each finite element times the multiplicity.
+   */
+  template <int dim, int spacedim>
+  std::vector<ComponentMask>
+  compute_nonzero_components (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
+                              const std::vector<unsigned int>              &multiplicities,
+                              const bool do_tensor_product = true);
+
+  /**
+   * Compute the non-zero vector components of a composed finite element.
+   */
+  template <int dim, int spacedim>
+  std::vector<ComponentMask>
+  compute_nonzero_components (const FiniteElement<dim,spacedim> *fe1,
+                              const unsigned int        N1,
+                              const FiniteElement<dim,spacedim> *fe2=NULL,
+                              const unsigned int        N2=0,
+                              const FiniteElement<dim,spacedim> *fe3=NULL,
+                              const unsigned int        N3=0,
+                              const FiniteElement<dim,spacedim> *fe4=NULL,
+                              const unsigned int        N4=0,
+                              const FiniteElement<dim,spacedim> *fe5=NULL,
+                              const unsigned int        N5=0);
 
   /**
    * Parse the name of a finite element and generate a finite element object
