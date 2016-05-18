@@ -1,0 +1,23 @@
+
+DEAL::Sizes: 2, 3
+DEAL::Contents:
+DEAL::1 2 3 
+DEAL::4 5 6 
+DEAL::Sizes of moved-to table: 2, 3
+DEAL::Sizes of moved-from table: 0, 0
+DEAL::Contents of moved-to table:
+DEAL::1 2 3 
+DEAL::4 5 6 
+DEAL::Sizes of new table: 4, 2
+DEAL::Contents of new table:
+DEAL::1 2 
+DEAL::3 4 
+DEAL::5 6 
+DEAL::7 8 
+DEAL::Sizes of moved-to table: 4, 2
+DEAL::Sizes of moved-from table: 0, 0
+DEAL::Contents of moved-to table:
+DEAL::1 2 
+DEAL::3 4 
+DEAL::5 6 
+DEAL::7 8 
