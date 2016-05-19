@@ -950,11 +950,13 @@ namespace FETools
                     const bool do_tensor_product = true);
 
   /**
-   * build...
-   * @param face_system_to_base_table
-   * @param face_system_to_component_table
-   * @param finite_element
-   * @param do_tensor_product
+   * For a given (composite) @p finite_element build @p face_system_to_base_table,
+   * and @p face_system_to_component_table.
+   *
+   * If @p do_tensor_product is <code>true</code>, the underlying finite element
+   * is assumed to be build using the tensor product rule. That is, the number of
+   * composite components is the sum of components in each finite element times
+   * multiplicity.
    */
   template <int dim, int spacedim>
   void

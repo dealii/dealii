@@ -597,7 +597,7 @@ namespace FETools
         unsigned int comp_start = 0;
         for (unsigned int base=0; base<fe.n_base_elements(); ++base)
           for (unsigned int m=0; m<fe.element_multiplicity(base);
-               ++m, comp_start+=fe.base_element(base).n_components())
+               ++m, comp_start+=fe.base_element(base).n_components() * do_tensor_product)
             for (unsigned int local_index = 0;
                  local_index < fe.base_element(base).dofs_per_vertex;
                  ++local_index, ++total_index)
@@ -634,7 +634,7 @@ namespace FETools
           unsigned int comp_start = 0;
           for (unsigned int base=0; base<fe.n_base_elements(); ++base)
             for (unsigned int m=0; m<fe.element_multiplicity(base);
-                 ++m, comp_start+=fe.base_element(base).n_components())
+                 ++m, comp_start+=fe.base_element(base).n_components() * do_tensor_product)
               for (unsigned int local_index = 0;
                    local_index < fe.base_element(base).dofs_per_line;
                    ++local_index, ++total_index)
@@ -672,7 +672,7 @@ namespace FETools
           unsigned int comp_start = 0;
           for (unsigned int base=0; base<fe.n_base_elements(); ++base)
             for (unsigned int m=0; m<fe.element_multiplicity(base);
-                 ++m, comp_start += fe.base_element(base).n_components())
+                 ++m, comp_start += fe.base_element(base).n_components() * do_tensor_product)
               for (unsigned int local_index = 0;
                    local_index < fe.base_element(base).dofs_per_quad;
                    ++local_index, ++total_index)
@@ -710,7 +710,7 @@ namespace FETools
           unsigned int comp_start = 0;
           for (unsigned int base=0; base<fe.n_base_elements(); ++base)
             for (unsigned int m=0; m<fe.element_multiplicity(base);
-                 ++m, comp_start+=fe.base_element(base).n_components())
+                 ++m, comp_start+=fe.base_element(base).n_components() * do_tensor_product)
               for (unsigned int local_index = 0;
                    local_index < fe.base_element(base).dofs_per_hex;
                    ++local_index, ++total_index)
@@ -764,7 +764,7 @@ namespace FETools
         unsigned int comp_start = 0;
         for (unsigned int base=0; base<fe.n_base_elements(); ++base)
           for (unsigned int m=0; m<fe.element_multiplicity(base);
-               ++m, comp_start += fe.base_element(base).n_components())
+               ++m, comp_start += fe.base_element(base).n_components() * do_tensor_product)
             for (unsigned int local_index = 0;
                  local_index < fe.base_element(base).dofs_per_vertex;
                  ++local_index, ++total_index)
@@ -813,7 +813,7 @@ namespace FETools
           unsigned int comp_start = 0;
           for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
             for (unsigned int m=0; m<fe.element_multiplicity(base);
-                 ++m, comp_start += fe.base_element(base).n_components())
+                 ++m, comp_start += fe.base_element(base).n_components() * do_tensor_product)
               for (unsigned int local_index = 0;
                    local_index < fe.base_element(base).dofs_per_line;
                    ++local_index, ++total_index)
@@ -857,7 +857,7 @@ namespace FETools
           unsigned int comp_start = 0;
           for (unsigned int base=0; base<fe.n_base_elements(); ++base)
             for (unsigned int m=0; m<fe.element_multiplicity(base);
-                 ++m, comp_start += fe.base_element(base).n_components())
+                 ++m, comp_start += fe.base_element(base).n_components() * do_tensor_product)
               for (unsigned int local_index = 0;
                    local_index < fe.base_element(base).dofs_per_quad;
                    ++local_index, ++total_index)
