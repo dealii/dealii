@@ -82,6 +82,13 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
       	                 std::vector< std::pair< std::pair< unsigned int, unsigned int >, unsigned int > > &component_to_base_table,
                          const FiniteElement<deal_II_dimension,deal_II_space_dimension> &fe,
                          const bool do_tensor_product);
+       
+       template                  
+       void
+       build_face_tables(std::vector< std::pair< std::pair< unsigned int, unsigned int >, unsigned int > > &face_system_to_base_table,
+                         std::vector< std::pair< unsigned int, unsigned int > >                            &face_system_to_component_table,
+                         const FiniteElement<deal_II_dimension,deal_II_space_dimension> &fe,
+                         const bool do_tensor_product);
                         
       template
       void compute_block_renumbering (

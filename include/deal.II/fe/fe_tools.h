@@ -950,6 +950,20 @@ namespace FETools
                     const bool do_tensor_product = true);
 
   /**
+   * build...
+   * @param face_system_to_base_table
+   * @param face_system_to_component_table
+   * @param finite_element
+   * @param do_tensor_product
+   */
+  template <int dim, int spacedim>
+  void
+  build_face_tables(std::vector< std::pair< std::pair< unsigned int, unsigned int >, unsigned int > > &face_system_to_base_table,
+                    std::vector< std::pair< unsigned int, unsigned int > >                            &face_system_to_component_table,
+                    const FiniteElement<dim,spacedim> &finite_element,
+                    const bool do_tensor_product = true);
+
+  /**
    * Parse the name of a finite element and generate a finite element object
    * accordingly. The parser ignores space characters between words (things
    * matching the regular expression [A-Za-z0-9_]).
