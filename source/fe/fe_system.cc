@@ -1265,191 +1265,6 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
 }
 
 
-
-template <int dim, int spacedim>
-void
-FESystem<dim,spacedim>::build_cell_tables()
-{
-  // If the system is not primitive, these have not been initialized by
-  // FiniteElement
-  this->system_to_component_table.resize(this->dofs_per_cell);
-  this->face_system_to_component_table.resize(this->dofs_per_face);
-
-  unsigned int total_index = 0;
-
-  for (unsigned int base=0; base < this->n_base_elements(); ++base)
-    for (unsigned int m = 0; m < this->element_multiplicity(base); ++m)
-      {
-        for (unsigned int k=0; k<base_element(base).n_components(); ++k)
-          this->component_to_base_table[total_index++]
-            = std::make_pair(std::make_pair(base,k), m);
-      }
-  Assert (total_index == this->component_to_base_table.size(),
-          ExcInternalError());
-
-  // Initialize index tables.  Multi-component base elements have to be
-  // thought of. For non-primitive shape functions, have a special invalid
-  // index.
-  const std::pair<unsigned int, unsigned int>
-  non_primitive_index (numbers::invalid_unsigned_int,
-                       numbers::invalid_unsigned_int);
-
-  // First enumerate vertex indices, where we first enumerate all indices on
-  // the first vertex in the order of the base elements, then of the second
-  // vertex, etc
-  total_index = 0;
-  for (unsigned int vertex_number=0;
-       vertex_number<GeometryInfo<dim>::vertices_per_cell;
-       ++vertex_number)
-    {
-      unsigned int comp_start = 0;
-      for (unsigned int base=0; base<this->n_base_elements(); ++base)
-        for (unsigned int m=0; m<this->element_multiplicity(base);
-             ++m, comp_start+=base_element(base).n_components())
-          for (unsigned int local_index = 0;
-               local_index < base_element(base).dofs_per_vertex;
-               ++local_index, ++total_index)
-            {
-              const unsigned int index_in_base
-                = (base_element(base).dofs_per_vertex*vertex_number +
-                   local_index);
-
-              this->system_to_base_table[total_index]
-                = std::make_pair (std::make_pair(base, m), index_in_base);
-
-              if (base_element(base).is_primitive(index_in_base))
-                {
-                  const unsigned int comp_in_base
-                    = base_element(base).system_to_component_index(index_in_base).first;
-                  const unsigned int comp
-                    = comp_start + comp_in_base;
-                  const unsigned int index_in_comp
-                    = base_element(base).system_to_component_index(index_in_base).second;
-                  this->system_to_component_table[total_index]
-                    = std::make_pair (comp, index_in_comp);
-                }
-              else
-                this->system_to_component_table[total_index] = non_primitive_index;
-            }
-    }
-
-  // 2. Lines
-  if (GeometryInfo<dim>::lines_per_cell > 0)
-    for (unsigned int line_number= 0;
-         line_number != GeometryInfo<dim>::lines_per_cell;
-         ++line_number)
-      {
-        unsigned int comp_start = 0;
-        for (unsigned int base=0; base<this->n_base_elements(); ++base)
-          for (unsigned int m=0; m<this->element_multiplicity(base);
-               ++m, comp_start+=base_element(base).n_components())
-            for (unsigned int local_index = 0;
-                 local_index < base_element(base).dofs_per_line;
-                 ++local_index, ++total_index)
-              {
-                const unsigned int index_in_base
-                  = (base_element(base).dofs_per_line*line_number +
-                     local_index +
-                     base_element(base).first_line_index);
-
-                this->system_to_base_table[total_index]
-                  = std::make_pair (std::make_pair(base,m), index_in_base);
-
-                if (base_element(base).is_primitive(index_in_base))
-                  {
-                    const unsigned int comp_in_base
-                      = base_element(base).system_to_component_index(index_in_base).first;
-                    const unsigned int comp
-                      = comp_start + comp_in_base;
-                    const unsigned int index_in_comp
-                      = base_element(base).system_to_component_index(index_in_base).second;
-                    this->system_to_component_table[total_index]
-                      = std::make_pair (comp, index_in_comp);
-                  }
-                else
-                  this->system_to_component_table[total_index] = non_primitive_index;
-              }
-      }
-
-  // 3. Quads
-  if (GeometryInfo<dim>::quads_per_cell > 0)
-    for (unsigned int quad_number= 0;
-         quad_number != GeometryInfo<dim>::quads_per_cell;
-         ++quad_number)
-      {
-        unsigned int comp_start = 0;
-        for (unsigned int base=0; base<this->n_base_elements(); ++base)
-          for (unsigned int m=0; m<this->element_multiplicity(base);
-               ++m, comp_start += base_element(base).n_components())
-            for (unsigned int local_index = 0;
-                 local_index < base_element(base).dofs_per_quad;
-                 ++local_index, ++total_index)
-              {
-                const unsigned int index_in_base
-                  = (base_element(base).dofs_per_quad*quad_number +
-                     local_index +
-                     base_element(base).first_quad_index);
-
-                this->system_to_base_table[total_index]
-                  = std::make_pair (std::make_pair(base,m), index_in_base);
-
-                if (base_element(base).is_primitive(index_in_base))
-                  {
-                    const unsigned int comp_in_base
-                      = base_element(base).system_to_component_index(index_in_base).first;
-                    const unsigned int comp
-                      = comp_start + comp_in_base;
-                    const unsigned int index_in_comp
-                      = base_element(base).system_to_component_index(index_in_base).second;
-                    this->system_to_component_table[total_index]
-                      = std::make_pair (comp, index_in_comp);
-                  }
-                else
-                  this->system_to_component_table[total_index] = non_primitive_index;
-              }
-      }
-
-  // 4. Hexes
-  if (GeometryInfo<dim>::hexes_per_cell > 0)
-    for (unsigned int hex_number= 0;
-         hex_number != GeometryInfo<dim>::hexes_per_cell;
-         ++hex_number)
-      {
-        unsigned int comp_start = 0;
-        for (unsigned int base=0; base<this->n_base_elements(); ++base)
-          for (unsigned int m=0; m<this->element_multiplicity(base);
-               ++m, comp_start+=base_element(base).n_components())
-            for (unsigned int local_index = 0;
-                 local_index < base_element(base).dofs_per_hex;
-                 ++local_index, ++total_index)
-              {
-                const unsigned int index_in_base
-                  = (base_element(base).dofs_per_hex*hex_number +
-                     local_index +
-                     base_element(base).first_hex_index);
-
-                this->system_to_base_table[total_index]
-                  = std::make_pair (std::make_pair(base,m), index_in_base);
-
-                if (base_element(base).is_primitive(index_in_base))
-                  {
-                    const unsigned int comp_in_base
-                      = base_element(base).system_to_component_index(index_in_base).first;
-                    const unsigned int comp
-                      = comp_start + comp_in_base;
-                    const unsigned int index_in_comp
-                      = base_element(base).system_to_component_index(index_in_base).second;
-                    this->system_to_component_table[total_index]
-                      = std::make_pair (comp, index_in_comp);
-                  }
-                else
-                  this->system_to_component_table[total_index] = non_primitive_index;
-              }
-      }
-}
-
-
-
 template <int dim, int spacedim>
 void
 FESystem<dim,spacedim>::build_face_tables()
@@ -1831,7 +1646,18 @@ void FESystem<dim,spacedim>::initialize (const std::vector<const FiniteElement<d
 
   Assert(ind>0, ExcInternalError());
 
-  build_cell_tables();
+  {
+    // If the system is not primitive, these have not been initialized by
+    // FiniteElement
+    this->system_to_component_table.resize(this->dofs_per_cell);
+    this->face_system_to_component_table.resize(this->dofs_per_face);
+
+    FETools::build_cell_tables(this->system_to_base_table,
+                               this->system_to_component_table,
+                               this->component_to_base_table,
+                               *this);
+
+  }
   build_face_tables();
 
   // restriction and prolongation matrices are build on demand

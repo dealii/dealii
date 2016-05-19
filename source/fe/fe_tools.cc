@@ -558,6 +558,188 @@ namespace FETools
     return compute_nonzero_components (fe_list, multiplicities);
   }
 
+  template <int dim, int spacedim>
+  void
+  build_cell_tables(std::vector< std::pair< std::pair< unsigned int, unsigned int >, unsigned int > > &system_to_base_table,
+                    std::vector< std::pair< unsigned int, unsigned int > >  &system_to_component_table,
+                    std::vector< std::pair< std::pair< unsigned int, unsigned int >, unsigned int > > &component_to_base_table,
+                    const FiniteElement<dim,spacedim> &fe,
+                    const bool do_tensor_product)
+  {
+    unsigned int total_index = 0;
+
+    for (unsigned int base=0; base < fe.n_base_elements(); ++base)
+      for (unsigned int m = 0; m < fe.element_multiplicity(base); ++m)
+        {
+          for (unsigned int k=0; k<fe.base_element(base).n_components(); ++k)
+            component_to_base_table[total_index++]
+              = std::make_pair(std::make_pair(base,k), m);
+        }
+    Assert (total_index == component_to_base_table.size(),
+            ExcInternalError());
+
+
+    // Initialize index tables.  Multi-component base elements have to be
+    // thought of. For non-primitive shape functions, have a special invalid
+    // index.
+    const std::pair<unsigned int, unsigned int>
+    non_primitive_index (numbers::invalid_unsigned_int,
+                         numbers::invalid_unsigned_int);
+
+    // First enumerate vertex indices, where we first enumerate all indices on
+    // the first vertex in the order of the base elements, then of the second
+    // vertex, etc
+    total_index = 0;
+    for (unsigned int vertex_number=0;
+         vertex_number<GeometryInfo<dim>::vertices_per_cell;
+         ++vertex_number)
+      {
+        unsigned int comp_start = 0;
+        for (unsigned int base=0; base<fe.n_base_elements(); ++base)
+          for (unsigned int m=0; m<fe.element_multiplicity(base);
+               ++m, comp_start+=fe.base_element(base).n_components())
+            for (unsigned int local_index = 0;
+                 local_index < fe.base_element(base).dofs_per_vertex;
+                 ++local_index, ++total_index)
+              {
+                const unsigned int index_in_base
+                  = (fe.base_element(base).dofs_per_vertex*vertex_number +
+                     local_index);
+
+                system_to_base_table[total_index]
+                  = std::make_pair (std::make_pair(base, m), index_in_base);
+
+                if (fe.base_element(base).is_primitive(index_in_base))
+                  {
+                    const unsigned int comp_in_base
+                      = fe.base_element(base).system_to_component_index(index_in_base).first;
+                    const unsigned int comp
+                      = comp_start + comp_in_base;
+                    const unsigned int index_in_comp
+                      = fe.base_element(base).system_to_component_index(index_in_base).second;
+                    system_to_component_table[total_index]
+                      = std::make_pair (comp, index_in_comp);
+                  }
+                else
+                  system_to_component_table[total_index] = non_primitive_index;
+              }
+      }
+
+    // 2. Lines
+    if (GeometryInfo<dim>::lines_per_cell > 0)
+      for (unsigned int line_number= 0;
+           line_number != GeometryInfo<dim>::lines_per_cell;
+           ++line_number)
+        {
+          unsigned int comp_start = 0;
+          for (unsigned int base=0; base<fe.n_base_elements(); ++base)
+            for (unsigned int m=0; m<fe.element_multiplicity(base);
+                 ++m, comp_start+=fe.base_element(base).n_components())
+              for (unsigned int local_index = 0;
+                   local_index < fe.base_element(base).dofs_per_line;
+                   ++local_index, ++total_index)
+                {
+                  const unsigned int index_in_base
+                    = (fe.base_element(base).dofs_per_line*line_number +
+                       local_index +
+                       fe.base_element(base).first_line_index);
+
+                  system_to_base_table[total_index]
+                    = std::make_pair (std::make_pair(base,m), index_in_base);
+
+                  if (fe.base_element(base).is_primitive(index_in_base))
+                    {
+                      const unsigned int comp_in_base
+                        = fe.base_element(base).system_to_component_index(index_in_base).first;
+                      const unsigned int comp
+                        = comp_start + comp_in_base;
+                      const unsigned int index_in_comp
+                        = fe.base_element(base).system_to_component_index(index_in_base).second;
+                      system_to_component_table[total_index]
+                        = std::make_pair (comp, index_in_comp);
+                    }
+                  else
+                    system_to_component_table[total_index] = non_primitive_index;
+                }
+        }
+
+    // 3. Quads
+    if (GeometryInfo<dim>::quads_per_cell > 0)
+      for (unsigned int quad_number= 0;
+           quad_number != GeometryInfo<dim>::quads_per_cell;
+           ++quad_number)
+        {
+          unsigned int comp_start = 0;
+          for (unsigned int base=0; base<fe.n_base_elements(); ++base)
+            for (unsigned int m=0; m<fe.element_multiplicity(base);
+                 ++m, comp_start += fe.base_element(base).n_components())
+              for (unsigned int local_index = 0;
+                   local_index < fe.base_element(base).dofs_per_quad;
+                   ++local_index, ++total_index)
+                {
+                  const unsigned int index_in_base
+                    = (fe.base_element(base).dofs_per_quad*quad_number +
+                       local_index +
+                       fe.base_element(base).first_quad_index);
+
+                  system_to_base_table[total_index]
+                    = std::make_pair (std::make_pair(base,m), index_in_base);
+
+                  if (fe.base_element(base).is_primitive(index_in_base))
+                    {
+                      const unsigned int comp_in_base
+                        = fe.base_element(base).system_to_component_index(index_in_base).first;
+                      const unsigned int comp
+                        = comp_start + comp_in_base;
+                      const unsigned int index_in_comp
+                        = fe.base_element(base).system_to_component_index(index_in_base).second;
+                      system_to_component_table[total_index]
+                        = std::make_pair (comp, index_in_comp);
+                    }
+                  else
+                    system_to_component_table[total_index] = non_primitive_index;
+                }
+        }
+
+    // 4. Hexes
+    if (GeometryInfo<dim>::hexes_per_cell > 0)
+      for (unsigned int hex_number= 0;
+           hex_number != GeometryInfo<dim>::hexes_per_cell;
+           ++hex_number)
+        {
+          unsigned int comp_start = 0;
+          for (unsigned int base=0; base<fe.n_base_elements(); ++base)
+            for (unsigned int m=0; m<fe.element_multiplicity(base);
+                 ++m, comp_start+=fe.base_element(base).n_components())
+              for (unsigned int local_index = 0;
+                   local_index < fe.base_element(base).dofs_per_hex;
+                   ++local_index, ++total_index)
+                {
+                  const unsigned int index_in_base
+                    = (fe.base_element(base).dofs_per_hex*hex_number +
+                       local_index +
+                       fe.base_element(base).first_hex_index);
+
+                  system_to_base_table[total_index]
+                    = std::make_pair (std::make_pair(base,m), index_in_base);
+
+                  if (fe.base_element(base).is_primitive(index_in_base))
+                    {
+                      const unsigned int comp_in_base
+                        = fe.base_element(base).system_to_component_index(index_in_base).first;
+                      const unsigned int comp
+                        = comp_start + comp_in_base;
+                      const unsigned int index_in_comp
+                        = fe.base_element(base).system_to_component_index(index_in_base).second;
+                      system_to_component_table[total_index]
+                        = std::make_pair (comp, index_in_comp);
+                    }
+                  else
+                    system_to_component_table[total_index] = non_primitive_index;
+                }
+        }
+  }
+
   // Not implemented in the general case.
   template <class FE>
   FiniteElement<FE::dimension, FE::space_dimension> *

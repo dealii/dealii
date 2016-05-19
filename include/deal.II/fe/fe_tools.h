@@ -933,6 +933,23 @@ namespace FETools
                               const unsigned int        N5=0);
 
   /**
+   * For a given (composite) @p finite_element build @p system_to_component_table,
+   * @p system_to_base_table and @p component_to_base_table.
+   *
+   * If @p do_tensor_product is <code>true</code>, the underlying finite element
+   * is assumed to be build using the tensor product rule. That is, the number of
+   * composite components is the sum of components in each finite element times
+   * multiplicity.
+   */
+  template <int dim, int spacedim>
+  void
+  build_cell_tables(std::vector< std::pair< std::pair< unsigned int, unsigned int >, unsigned int > > &system_to_base_table,
+                    std::vector< std::pair< unsigned int, unsigned int > >  &system_to_component_table,
+                    std::vector< std::pair< std::pair< unsigned int, unsigned int >, unsigned int > > &component_to_base_table,
+                    const FiniteElement<dim,spacedim> &finite_element,
+                    const bool do_tensor_product = true);
+
+  /**
    * Parse the name of a finite element and generate a finite element object
    * accordingly. The parser ignores space characters between words (things
    * matching the regular expression [A-Za-z0-9_]).

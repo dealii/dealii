@@ -74,6 +74,14 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
                                   const unsigned int        N4,
                                   const FiniteElement<deal_II_dimension,deal_II_space_dimension> *fe5,
                                   const unsigned int        N5);
+                                  
+       template
+	   void
+       build_cell_tables(std::vector< std::pair< std::pair< unsigned int, unsigned int >, unsigned int > > &system_to_base_table,
+      	                 std::vector< std::pair< unsigned int, unsigned int > >  &system_to_component_table,
+      	                 std::vector< std::pair< std::pair< unsigned int, unsigned int >, unsigned int > > &component_to_base_table,
+                         const FiniteElement<deal_II_dimension,deal_II_space_dimension> &fe,
+                         const bool do_tensor_product);
                         
       template
       void compute_block_renumbering (

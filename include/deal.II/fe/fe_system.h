@@ -985,11 +985,6 @@ private:
   /**
    * Used by @p initialize.
    */
-  void build_cell_tables();
-
-  /**
-   * Used by @p initialize.
-   */
   void build_face_tables();
 
   /**
