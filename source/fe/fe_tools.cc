@@ -568,15 +568,26 @@ namespace FETools
   {
     unsigned int total_index = 0;
 
-    for (unsigned int base=0; base < fe.n_base_elements(); ++base)
-      for (unsigned int m = 0; m < fe.element_multiplicity(base); ++m)
-        {
-          for (unsigned int k=0; k<fe.base_element(base).n_components(); ++k)
-            component_to_base_table[total_index++]
-              = std::make_pair(std::make_pair(base,k), m);
-        }
-    Assert (total_index == component_to_base_table.size(),
-            ExcInternalError());
+    if (do_tensor_product)
+      {
+        for (unsigned int base=0; base < fe.n_base_elements(); ++base)
+          for (unsigned int m = 0; m < fe.element_multiplicity(base); ++m)
+            {
+              for (unsigned int k=0; k<fe.base_element(base).n_components(); ++k)
+                component_to_base_table[total_index++]
+                  = std::make_pair(std::make_pair(base,k), m);
+            }
+        Assert (total_index == component_to_base_table.size(),
+                ExcInternalError());
+      }
+    else
+      {
+        // The base element establishing a component does not make sense in this case.
+        // Set up to something meaningless:
+        for (unsigned int i = 0; i < component_to_base_table.size(); i++)
+          component_to_base_table[i] = std::make_pair(std::make_pair(numbers::invalid_unsigned_int,numbers::invalid_unsigned_int), numbers::invalid_unsigned_int);
+
+      }
 
 
     // Initialize index tables.  Multi-component base elements have to be
