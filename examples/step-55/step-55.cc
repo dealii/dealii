@@ -114,7 +114,7 @@ namespace Step55
   Solution<2>::value (const Point<2> &p,
                       const unsigned int component) const
   {
-	Assert (component <= dim, ExcIndexRange(component,0,dim+1));
+    Assert (component <= dim, ExcIndexRange(component,0,dim+1));
 
     using numbers::PI;
     const double x = p(0);
@@ -135,7 +135,7 @@ namespace Step55
   Solution<3>::value (const Point<3> &p,
                       const unsigned int component) const
   {
-	Assert (component <= dim, ExcIndexRange(component,0,dim+1));
+    Assert (component <= dim, ExcIndexRange(component,0,dim+1));
 
     using numbers::PI;
     const double x = p(0);
@@ -160,11 +160,11 @@ namespace Step55
   Solution<2>::gradient (const Point<2> &p,
                          const unsigned int component) const
   {
-	Assert (component <= dim, ExcIndexRange(component,0,dim+1));
+    Assert (component <= dim, ExcIndexRange(component,0,dim+1));
 
     using numbers::PI;
-    double x = p(0);
-    double y = p(1);
+    const double x = p(0);
+    const double y = p(1);
     Tensor<1,2> return_value;
     if (component == 0)
       {
@@ -190,12 +190,12 @@ namespace Step55
   Solution<3>::gradient (const Point<3> &p,
                          const unsigned int component) const
   {
-	Assert (component <= dim, ExcIndexRange(component,0,dim+1));
+    Assert (component <= dim, ExcIndexRange(component,0,dim+1));
 
     using numbers::PI;
-    double x = p(0);
-    double y = p(1);
-    double z = p(2);
+    const double x = p(0);
+    const double y = p(1);
+    const double z = p(2);
     Tensor<1,3> return_value;
     if (component == 0)
       {
@@ -241,7 +241,7 @@ namespace Step55
   RightHandSide<2>::value (const Point<2> &p,
                            const unsigned int component) const
   {
-	Assert (component <= dim, ExcIndexRange(component,0,dim+1));
+    Assert (component <= dim, ExcIndexRange(component,0,dim+1));
 
     using numbers::PI;
     double x = p(0);
@@ -262,7 +262,7 @@ namespace Step55
   RightHandSide<3>::value (const Point<3>   &p,
                            const unsigned int component) const
   {
-	Assert (component <= dim, ExcIndexRange(component,0,dim+1));
+    Assert (component <= dim, ExcIndexRange(component,0,dim+1));
 
     using numbers::PI;
     double x = p(0);
@@ -444,23 +444,23 @@ namespace Step55
     void compute_errors ();
     void output_results (const unsigned int refinement_cycle) const;
 
-    const unsigned int      			  degree;
-    SolverType::type     				  solver_type;
+    const unsigned int              degree;
+    SolverType::type              solver_type;
 
-    Triangulation<dim> 					  triangulation;
-    FESystem<dim>      					  velocity_fe;
-    FESystem<dim>      					  fe;
-    DoFHandler<dim>    					  dof_handler;
-    DoFHandler<dim>    					  velocity_dof_handler;
+    Triangulation<dim>            triangulation;
+    FESystem<dim>                 velocity_fe;
+    FESystem<dim>                 fe;
+    DoFHandler<dim>               dof_handler;
+    DoFHandler<dim>               velocity_dof_handler;
 
-    ConstraintMatrix    				  constraints;
+    ConstraintMatrix              constraints;
 
-    BlockSparsityPattern      			  sparsity_pattern;
-    BlockSparseMatrix<double>			  system_matrix;
-    SparseMatrix<double> 				  pressure_mass_matrix;
+    BlockSparsityPattern              sparsity_pattern;
+    BlockSparseMatrix<double>       system_matrix;
+    SparseMatrix<double>          pressure_mass_matrix;
 
-    BlockVector<double> 				  solution;
-    BlockVector<double> 				  system_rhs;
+    BlockVector<double>           solution;
+    BlockVector<double>           system_rhs;
 
     MGLevelObject<SparsityPattern>        mg_sparsity_patterns;
     MGLevelObject<SparseMatrix<double> > mg_matrices;
@@ -480,7 +480,7 @@ namespace Step55
     triangulation (Triangulation<dim>::maximum_smoothing),
     velocity_fe (FE_Q<dim>(degree+1), dim), // Finite element for velocity-only
     fe (velocity_fe, 1, // Finite element for whole system
-          FE_Q<dim> (degree), 1),
+        FE_Q<dim> (degree), 1),
     dof_handler (triangulation),
     velocity_dof_handler (triangulation),
     computing_timer (std::cout, TimerOutput::summary,
@@ -544,12 +544,11 @@ namespace Step55
 
         mg_interface_matrices.resize(0, n_levels-1);
         mg_interface_matrices.clear (); // In contrast to all other container classes' clear() functions which
-                                        // delete the contents of the container, this clear() function
-                                        // calls the clear function of all elements stored by this container.
+        // delete the contents of the container, this clear() function
+        // calls the clear function of all elements stored by this container.
         mg_matrices.resize(0, n_levels-1);
         mg_matrices.clear ();
         mg_sparsity_patterns.resize(0, n_levels-1);
-        //mg_sparsity_patterns.clear ();
 
         for (unsigned int level=0; level<n_levels; ++level)
           {
@@ -640,7 +639,7 @@ namespace Step55
 
     // The following bollean is used to signify when you want to assemble the mass matrix
     // inside the (1,1) block, which is the case when you are not using UMFPACK
-    bool assemble_pressure_mass_matrix = (solver_type == SolverType::UMFPACK) ? false : true;
+    const bool assemble_pressure_mass_matrix = (solver_type == SolverType::UMFPACK) ? false : true;
 
     QGauss<dim>   quadrature_formula(degree+2);
 
@@ -969,7 +968,7 @@ namespace Step55
 
         SparseILU<double> S_preconditioner;
         S_preconditioner.initialize (pressure_mass_matrix,
-                                         SparseILU<double>::AdditionalData());
+                                     SparseILU<double>::AdditionalData());
 
         const BlockSchurPreconditioner<
         PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double> > >,
@@ -1017,10 +1016,10 @@ namespace Step55
     // in a pressure with mean value zero. Here we make use of the fact that
     // the pressure is component $dim$ and that the finite element space
     // is nodal.
-    double mean_pressure = VectorTools::compute_mean_value (dof_handler,
-                                                            QGauss<dim>(degree+2),
-                                                            solution,
-                                                            dim);
+    const double mean_pressure = VectorTools::compute_mean_value (dof_handler,
+                                 QGauss<dim>(degree+2),
+                                 solution,
+                                 dim);
     solution.block(1).add(-mean_pressure);
     std::cout << "   Note: The mean value was adjusted by " << -mean_pressure << std::endl;
 
