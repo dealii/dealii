@@ -454,6 +454,10 @@ namespace Step18
     // point on those cells for which we are responsible (i.e. we don't store
     // history data for quadrature points on cells that are owned by other
     // processors).
+    // Note that, instead of storing and managing this data ourself, we
+    // could use the CellDataStorage class like is done in step-44. However,
+    // for the purpose of demonstration, in this case we manage the storage
+    // manually.
     std::vector<PointHistory<dim> > quadrature_point_history;
 
     // The way this object is accessed is through a <code>user pointer</code>

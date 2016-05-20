@@ -300,5 +300,10 @@ There are a number of obvious extensions for this work:
   (detection and stress calculations) itself. An alternative to
   additional penalty terms in the free-energy functional would be to
   use active set methods such as the one used in step-41.
+- The complete condensation procedure using LinearOperators has been 
+  coded into the linear solver routine. This could also have been 
+  achieved through the application of the schur_complement() 
+  operator to condense out one or more of the fields in a more
+  automated manner.
 - Finally, adaptive mesh refinement, as demonstrated in step-6 and
   step-18, could provide additional solution accuracy.
