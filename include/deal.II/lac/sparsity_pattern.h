@@ -762,7 +762,7 @@ public:
    * This function may only be called if the matrix struct is compressed. It
    * does not make too much sense otherwise anyway.
    */
-  size_type n_nonzero_elements () const;
+  std::size_t n_nonzero_elements () const;
 
   /**
    * Return whether the structure is compressed or not.
@@ -848,7 +848,7 @@ public:
    * of this function is <i>log(N)</i>.
    */
   std::pair<size_type, size_type>
-  matrix_position (const size_type global_index) const;
+  matrix_position (const std::size_t global_index) const;
 
   /**
    * Check if a value at a certain position may be non-zero.
@@ -1035,7 +1035,7 @@ private:
    * for the #rowstart array, i.e. it may be larger than the actually used
    * part of the array.
    */
-  size_type max_vec_len;
+  std::size_t max_vec_len;
 
   /**
    * Maximum number of elements per row. This is set to the value given to the
@@ -1400,7 +1400,7 @@ SparsityPattern::column_number (const size_type row,
 
 
 inline
-SparsityPattern::size_type
+std::size_t
 SparsityPattern::n_nonzero_elements () const
 {
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());

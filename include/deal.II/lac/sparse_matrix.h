@@ -685,7 +685,7 @@ public:
    * returns the number of entries in the sparsity pattern; if any of the
    * entries should happen to be zero, it is counted anyway.
    */
-  size_type n_nonzero_elements () const;
+  std::size_t n_nonzero_elements () const;
 
   /**
    * Return the number of actually nonzero elements of this matrix. It is
@@ -696,7 +696,7 @@ public:
    * count all entries of the sparsity pattern but only the ones that are
    * nonzero (or whose absolute value is greater than threshold).
    */
-  size_type n_actually_nonzero_elements (const double threshold = 0.) const;
+  std::size_t n_actually_nonzero_elements (const double threshold = 0.) const;
 
   /**
    * Return a (constant) reference to the underlying sparsity pattern of this
@@ -750,8 +750,8 @@ public:
    */
   template <typename number2>
   void set (const std::vector<size_type> &indices,
-            const FullMatrix<number2>       &full_matrix,
-            const bool                       elide_zero_values = false);
+            const FullMatrix<number2>    &full_matrix,
+            const bool                    elide_zero_values = false);
 
   /**
    * Same function as before, but now including the possibility to use
@@ -1045,7 +1045,7 @@ public:
    * @dealiiOperationIsMultithreaded
    */
   template <class OutVector, class InVector>
-  void vmult (OutVector &dst,
+  void vmult (OutVector      &dst,
               const InVector &src) const;
 
   /**
@@ -1064,7 +1064,7 @@ public:
    * Source and destination must not be the same vector.
    */
   template <class OutVector, class InVector>
-  void Tvmult (OutVector &dst,
+  void Tvmult (OutVector      &dst,
                const InVector &src) const;
 
   /**
@@ -1084,7 +1084,7 @@ public:
    * @dealiiOperationIsMultithreaded
    */
   template <class OutVector, class InVector>
-  void vmult_add (OutVector &dst,
+  void vmult_add (OutVector      &dst,
                   const InVector &src) const;
 
   /**
@@ -1103,7 +1103,7 @@ public:
    * Source and destination must not be the same vector.
    */
   template <class OutVector, class InVector>
-  void Tvmult_add (OutVector &dst,
+  void Tvmult_add (OutVector      &dst,
                    const InVector &src) const;
 
   /**
