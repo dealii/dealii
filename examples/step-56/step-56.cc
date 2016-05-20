@@ -75,12 +75,12 @@
 #include <fstream>
 #include <sstream>
 
-namespace Step55
+namespace Step56
 {
   using namespace dealii;
 
   // In order to make it easy to switch between the different solvers that are being
-  // used in Step-55, we declare an enum that can be passed as an argument to the
+  // used in step-56, we declare an enum that can be passed as an argument to the
   // constructor of the main class.
   struct SolverType
   {
@@ -1172,7 +1172,7 @@ int main ()
   try
     {
       using namespace dealii;
-      using namespace Step55;
+      using namespace Step56;
 
       const int degree = 1;
       const int dim = 3;

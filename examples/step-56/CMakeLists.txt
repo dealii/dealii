@@ -1,9 +1,9 @@
 ##
-#  CMake script for the step-55 tutorial program:
+#  CMake script for the step-56 tutorial program:
 ##
 
 # Set the name of the project and target:
-SET(TARGET "step-55")
+SET(TARGET "step-56")
 
 # Declare all source files the target consists of. Here, this is only
 # the one step-X.cc file, but as you expand your project you may wish
