@@ -1417,15 +1417,19 @@ namespace Patterns
  * We can think of the parameters so arranged as a file system in which every
  * parameter is a directory. The name of this directory is the name of the
  * parameter, and in this directory lie files that describe the parameter.
- * These files are: - <code>value</code>: The content of this file is the
- * current value of this parameter; initially, the content of the file equals
- * the default value of the parameter. - <code>default_value</code>: The
- * content of this file is the default value value of the parameter. -
- * <code>pattern</code>: A textual representation of the pattern that
- * describes the parameter's possible values. - <code>pattern_index</code>: A
- * number that indexes the Patterns::PatternBase object that is used to
- * describe the parameter. - <code>documentation</code>: The content of this
- * file is the documentation given for a parameter as the last argument of the
+ * These files are:
+ *
+ * - <code>value</code>: The content of this file is the current value of this
+ * parameter; initially, the content of the file equals the default value of
+ * the parameter.
+ * - <code>default_value</code>: The content of this file is the default value
+ * value of the parameter.
+ * - <code>pattern</code>: A textual representation of the pattern that
+ * describes the parameter's possible values.
+ * - <code>pattern_index</code>: A number that indexes the Patterns::PatternBase
+ * object that is used to describe the parameter.
+ * - <code>documentation</code>: The content of this file is the documentation
+ * given for a parameter as the last argument of the
  * ParameterHandler::declare_entry call. With the exception of the
  * <code>value</code> file, the contents of files are never changed after
  * declaration of a parameter.
