@@ -162,5 +162,5 @@ nearly perfect scaling in solve time.
 
 <h3> Possible extensions </h3>
 
-<h4> Extension 1 </h4>
-
+<h4> Use expensive or cheap preconditioner </h4>
+Currently, use_expensive is set to true, but if you set it to false, then you will not be using CG in your calculation of $\widetilde{A^{-1}}$ which is an approximation of $A^{-1}$.  Depending on if you chose to use ILU or GMG, you would just be using ILU or a few v-cycles of GMG, respectively, instead of using them as a preconditioner to CG.

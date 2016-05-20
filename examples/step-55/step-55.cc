@@ -316,10 +316,13 @@ namespace Step55
 
   // @sect3{ASPECT BlockSchurPreconditioner}
 
-  // This class, which is taken from ASPECT and then slightly modified,
-  // implements the block Schur preconditioner for the Stokes system discussed
-  // above. It is templated on the types
-  // for the preconditioner blocks for velocity and schur complement.
+  // In the following, we will implement a preconditioner that expands a
+  // little bit on the ideas discussed in the Results section of step-22.
+  // Specifically, we will do X, Y, and Z. A further iteration of this
+  // approach is also used in the ASPECT code
+  // (see http://aspect.dealii.org) that solves the Stokes equations in
+  // the context of simulating convection in the earth mantle, and which
+  // has been used to solve problems on many thousands of processors.
   //
   // The bool flag @p do_solve_A in the constructor allows us to either
   // apply the preconditioner for the velocity block once or use an inner
@@ -540,10 +543,13 @@ namespace Step55
         const unsigned int n_levels = triangulation.n_levels();
 
         mg_interface_matrices.resize(0, n_levels-1);
-        mg_interface_matrices.clear ();
+        mg_interface_matrices.clear (); // In contrast to all other container classes' clear() functions which
+                                        // delete the contents of the container, this clear() function
+                                        // calls the clear function of all elements stored by this container.
         mg_matrices.resize(0, n_levels-1);
         mg_matrices.clear ();
         mg_sparsity_patterns.resize(0, n_levels-1);
+        //mg_sparsity_patterns.clear ();
 
         for (unsigned int level=0; level<n_levels; ++level)
           {
@@ -574,6 +580,11 @@ namespace Step55
     const unsigned int n_u = dofs_per_block[0],
                        n_p = dofs_per_block[1];
 
+    // As discussed in the introduction, we need to fix one degree of freedom
+    // of the pressure variable to ensure solvability of the problem. We do this
+    // here by marking n_u as a constrained degree of freedom. But not making it
+    // dependent on any other degree of freedom, this implicitly means that the
+    // value of this degree of freedom will be forced to zero.
     if (solver_type == SolverType::UMFPACK)
       {
         TimerOutput::Scope umfpack_specific(computing_timer, "(UMFPACK specific)");
@@ -873,7 +884,9 @@ namespace Step55
     unsigned int n_iterations_S;
 
     // This is used to pass whether or not we want to solve for A inside
-    // the preconditioner
+    // the preconditioner.  One could change this to false to see if
+    // there is still convergence and if so does the program then run
+    // faster or slower
     const bool use_expensive = true;
 
     SolverFGMRES<BlockVector<double> > solver (solver_control);
