@@ -19,6 +19,77 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     namespace FETools
       \{
 #if deal_II_dimension <= deal_II_space_dimension
+	   template
+  	   FiniteElementData<deal_II_dimension>
+       multiply_dof_numbers (const std::vector<const FiniteElement<deal_II_dimension,deal_II_space_dimension>*> &fes,
+                             const std::vector<unsigned int>                       &multiplicities,
+                             bool);
+                             
+       template
+       FiniteElementData<deal_II_dimension>
+       multiply_dof_numbers (const FiniteElement<deal_II_dimension,deal_II_space_dimension> *fe1,
+                             const unsigned int            N1,
+                             const FiniteElement<deal_II_dimension,deal_II_space_dimension> *fe2,
+                             const unsigned int            N2,
+                             const FiniteElement<deal_II_dimension,deal_II_space_dimension> *fe3,
+                             const unsigned int            N3,
+                             const FiniteElement<deal_II_dimension,deal_II_space_dimension> *fe4,
+                             const unsigned int            N4,
+                             const FiniteElement<deal_II_dimension,deal_II_space_dimension> *fe5,
+                             const unsigned int            N5);
+                             
+      template
+      std::vector<bool>
+      compute_restriction_is_additive_flags (const std::vector<const FiniteElement<deal_II_dimension,deal_II_space_dimension>*> &fes,
+                                             const std::vector<unsigned int>              &multiplicities);
+                                             
+      template
+      std::vector<bool>
+      compute_restriction_is_additive_flags (const FiniteElement<deal_II_dimension,deal_II_space_dimension> *fe1,
+                                             const unsigned int        N1,
+                                             const FiniteElement<deal_II_dimension,deal_II_space_dimension> *fe2,
+                                             const unsigned int        N2,
+                                             const FiniteElement<deal_II_dimension,deal_II_space_dimension> *fe3,
+                                             const unsigned int        N3,
+                                             const FiniteElement<deal_II_dimension,deal_II_space_dimension> *fe4,
+                                             const unsigned int        N4,
+                                             const FiniteElement<deal_II_dimension,deal_II_space_dimension> *fe5,
+                                             const unsigned int        N5);
+                                             
+      template
+      std::vector<ComponentMask>
+      compute_nonzero_components (const std::vector<const FiniteElement<deal_II_dimension,deal_II_space_dimension>*> &fes,
+                                  const std::vector<unsigned int>              &multiplicities,
+                                  const bool do_tensor_product);
+                                  
+      template
+      std::vector<ComponentMask>
+      compute_nonzero_components (const FiniteElement<deal_II_dimension,deal_II_space_dimension> *fe1,
+                                  const unsigned int        N1,
+                                  const FiniteElement<deal_II_dimension,deal_II_space_dimension> *fe2,
+                                  const unsigned int        N2,
+                                  const FiniteElement<deal_II_dimension,deal_II_space_dimension> *fe3,
+                                  const unsigned int        N3,
+                                  const FiniteElement<deal_II_dimension,deal_II_space_dimension> *fe4,
+                                  const unsigned int        N4,
+                                  const FiniteElement<deal_II_dimension,deal_II_space_dimension> *fe5,
+                                  const unsigned int        N5);
+                                  
+       template
+	   void
+       build_cell_tables(std::vector< std::pair< std::pair< unsigned int, unsigned int >, unsigned int > > &system_to_base_table,
+      	                 std::vector< std::pair< unsigned int, unsigned int > >  &system_to_component_table,
+      	                 std::vector< std::pair< std::pair< unsigned int, unsigned int >, unsigned int > > &component_to_base_table,
+                         const FiniteElement<deal_II_dimension,deal_II_space_dimension> &fe,
+                         const bool do_tensor_product);
+       
+       template                  
+       void
+       build_face_tables(std::vector< std::pair< std::pair< unsigned int, unsigned int >, unsigned int > > &face_system_to_base_table,
+                         std::vector< std::pair< unsigned int, unsigned int > >                            &face_system_to_component_table,
+                         const FiniteElement<deal_II_dimension,deal_II_space_dimension> &fe,
+                         const bool do_tensor_product);
+                        
       template
       void compute_block_renumbering (
         const FiniteElement<deal_II_dimension,deal_II_space_dimension> & ,
