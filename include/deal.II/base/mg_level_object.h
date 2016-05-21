@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2015 by the deal.II authors
+// Copyright (C) 2003 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -106,9 +106,12 @@ public:
   MGLevelObject<Object> &operator = (const double d);
 
   /**
-   * Call @p clear on all objects stored by this object. This function is only
-   * implemented for some @p Object classes, e.g. the PreconditionBlockSOR and
-   * similar classes.
+   * Call @p clear on all objects stored by this object. This function
+   * is only implemented for some @p Object classes, e.g., matrix
+   * types or the PreconditionBlockSOR and similar classes. Using this
+   * function will fail with a compiler error if the @p Object
+   * template type to this class does not provide a
+   * <code>clear()</code> member function.
    */
   void clear();
 
