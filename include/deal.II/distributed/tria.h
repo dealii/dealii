@@ -698,7 +698,7 @@ namespace parallel
        * can be different than the coarsen and refine flags set by you). If it
        * is
        *
-       * - CELL_PERIST: the cell won't be refined/coarsened, but might be
+       * - CELL_PERSIST: the cell won't be refined/coarsened, but might be
        * moved to a different processor
        * - CELL_REFINE: this cell will be refined into 4/8 cells, you can not
        * access the children (because they don't exist yet)
