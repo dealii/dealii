@@ -185,8 +185,9 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_NAMESPACE_OPEN= \
                          DEAL_II_NAMESPACE_CLOSE= \
                          DEAL_II_ENABLE_EXTRA_DIAGNOSTICS= \
-                         DEAL_II_DISABLE_EXTRA_DIAGNOSTICS=
-
+                         DEAL_II_DISABLE_EXTRA_DIAGNOSTICS= \
+                         DEAL_II_P4EST_VERSION_GTE=1 \
+                         DEAL_II_TRILINOS_VERSION_GTE=1
 
 # do not expand exception declarations
 EXPAND_AS_DEFINED      = DeclExceptionMsg \
