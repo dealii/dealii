@@ -768,8 +768,9 @@ namespace Step34
                                        difference_per_cell,
                                        QGauss<(dim-1)>(2*fe.degree+1),
                                        VectorTools::L2_norm);
-    const double L2_error = difference_per_cell.l2_norm();
-
+    const double L2_error = VectorTools::compute_global_error(triangulation,
+                                                              difference_per_cell,
+                                                              VectorTools::L2_norm);
 
     // The error in the alpha vector can be computed directly using the
     // Vector::linfty_norm() function, since on each node, the value should be

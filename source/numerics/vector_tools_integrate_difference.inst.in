@@ -114,3 +114,24 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
       \}
 #endif
   }
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+  namespace VectorTools \{
+  template
+    double compute_global_error<deal_II_dimension,deal_II_space_dimension,Vector<float> >(
+    const Triangulation<deal_II_dimension,deal_II_space_dimension> &,
+        const Vector<float> &,
+        const NormType &,
+        const double);
+
+  template
+    double compute_global_error<deal_II_dimension,deal_II_space_dimension,Vector<double> >(
+    const Triangulation<deal_II_dimension,deal_II_space_dimension> &,
+        const Vector<double> &,
+        const NormType &,
+        const double);
+  \}
+#endif
+  }

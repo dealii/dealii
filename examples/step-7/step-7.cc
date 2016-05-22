@@ -867,22 +867,26 @@ namespace Step7
                                        difference_per_cell,
                                        QGauss<dim>(3),
                                        VectorTools::L2_norm);
-    const double L2_error = difference_per_cell.l2_norm();
+    const double L2_error = VectorTools::compute_global_error(triangulation,
+                                                              difference_per_cell,
+                                                              VectorTools::L2_norm);
 
     // By same procedure we get the H1 semi-norm. We re-use the
     // <code>difference_per_cell</code> vector since it is no longer used
     // after computing the <code>L2_error</code> variable above. The global
     // $H^1$ semi-norm error is then computed by taking the sum of squares
     // of the errors on each individual cell, and then the square root of
-    // it -- an operation that conveniently again coincides with taking
-    // the $l_2$ norm of the vector of error indicators.
+    // it -- an operation that is conveniently performed by
+    // VectorTools::compute_global_error.
     VectorTools::integrate_difference (dof_handler,
                                        solution,
                                        Solution<dim>(),
                                        difference_per_cell,
                                        QGauss<dim>(3),
                                        VectorTools::H1_seminorm);
-    const double H1_error = difference_per_cell.l2_norm();
+    const double H1_error = VectorTools::compute_global_error(triangulation,
+                                                              difference_per_cell,
+                                                              VectorTools::H1_seminorm);
 
     // Finally, we compute the maximum norm. Of course, we can't actually
     // compute the true maximum, but only the maximum at the quadrature
@@ -896,10 +900,8 @@ namespace Step7
     //
     // Using this special quadrature rule, we can then try to find the maximal
     // error on each cell. Finally, we compute the global L infinity error
-    // from the L infinite errors on each cell. Instead of summing squares, we
-    // now have to take the maximum value over all cell-wise entries, an
-    // operation that is conveniently done using the Vector::linfty()
-    // function:
+    // from the L infinity errors on each cell with a call to
+    // VectorTools::compute_global_error.
     const QTrapez<1>     q_trapez;
     const QIterated<dim> q_iterated (q_trapez, 5);
     VectorTools::integrate_difference (dof_handler,
@@ -908,7 +910,9 @@ namespace Step7
                                        difference_per_cell,
                                        q_iterated,
                                        VectorTools::Linfty_norm);
-    const double Linfty_error = difference_per_cell.linfty_norm();
+    const double Linfty_error = VectorTools::compute_global_error(triangulation,
+                                difference_per_cell,
+                                VectorTools::Linfty_norm);
 
     // After all these errors have been computed, we finally write some
     // output. In addition, we add the important data to the TableHandler by

@@ -6662,7 +6662,97 @@ namespace VectorTools
                               norm, weight, exponent);
   }
 
+  template <int dim, int spacedim, class InVector>
+  double compute_global_error(const Triangulation<dim,spacedim> &tria,
+                              const InVector &cellwise_error,
+                              const NormType &norm,
+                              const double exponent)
+  {
+    Assert( cellwise_error.size() == tria.n_active_cells(),
+            ExcMessage("input vector cell_error has invalid size!"));
+#ifdef DEBUG
+    {
+      // check that off-processor entries are zero. Otherwise we will compute
+      // wrong results below!
+      typename InVector::size_type i = 0;
+      typename Triangulation<dim,spacedim>::cell_iterator it = tria.begin_active();
+      for (; i<cellwise_error.size(); ++i, ++it)
+        if (!it->is_locally_owned())
+          Assert(std::fabs(cellwise_error[i]) <  1e-20,
+                 ExcMessage("cellwise_error of cells that are not locally owned need to be zero!"));
+    }
+#endif
 
+    MPI_Comm comm = MPI_COMM_SELF;
+#ifdef DEAL_II_WITH_MPI
+    if (const parallel::Triangulation<dim,spacedim> *ptria =
+          dynamic_cast<const parallel::Triangulation<dim,spacedim>*>(&tria))
+      comm = ptria->get_communicator();
+#endif
+
+    switch (norm)
+      {
+      case L2_norm:
+      case H1_seminorm:
+      case H1_norm:
+      case Hdiv_seminorm:
+      {
+        const double local = cellwise_error.l2_norm();
+        return std::sqrt (Utilities::MPI::sum (local * local, comm));
+      }
+
+      case L1_norm:
+      {
+        const double local = cellwise_error.l1_norm();
+        return Utilities::MPI::sum (local, comm);
+      }
+
+      case Linfty_norm:
+      case W1infty_seminorm:
+      {
+        const double local = cellwise_error.linfty_norm();
+        return Utilities::MPI::max (local, comm);
+      }
+
+      case W1infty_norm:
+      {
+        AssertThrow(false, ExcMessage(
+                      "compute_global_error() is impossible for "
+                      "the W1infty_norm. See the documentation for "
+                      "NormType::W1infty_norm for more information."));
+        return std::numeric_limits<double>::infinity();
+      }
+
+      case mean:
+      {
+        // Note: mean is defined as int_\Omega f = sum_K \int_K f, so we need
+        // the sum of the cellwise errors not the Euclidean mean value that
+        // is returned by Vector<>::mean_value().
+        const double local = cellwise_error.mean_value()
+                             * cellwise_error.size();
+        return Utilities::MPI::sum (local, comm);
+      }
+
+      case Lp_norm:
+      case W1p_norm:
+      case W1p_seminorm:
+      {
+        double local = 0;
+        typename InVector::size_type i;
+        typename Triangulation<dim,spacedim>::cell_iterator it = tria.begin_active();
+        for (i = 0; i<cellwise_error.size(); ++i, ++it)
+          if (it->is_locally_owned())
+            local += std::pow(cellwise_error[i], exponent);
+
+        return std::pow (Utilities::MPI::sum (local, comm), 1./exponent);
+      }
+
+      default:
+        AssertThrow(false, ExcNotImplemented());
+        break;
+      }
+    return 0.0;
+  }
 
   template <int dim, typename VectorType, int spacedim>
   void

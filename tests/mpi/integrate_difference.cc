@@ -87,15 +87,10 @@ void test()
                                      results,
                                      QGauss<dim>(3),
                                      VectorTools::L2_norm);
-  double local = results.l2_norm() * results.l2_norm();
-  double global;
-
-  MPI_Allreduce (&local, &global, 1, MPI_DOUBLE,
-                 MPI_SUM,
-                 tr.get_communicator());
+  double global = VectorTools::compute_global_error(tr, results, VectorTools::L2_norm);
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-    deallog << "difference = " << std::sqrt(global)
+    deallog << "difference = " << global
             << std::endl;
 
   // we have f(\vec x)=x, so the difference
@@ -105,7 +100,7 @@ void test()
   // note that we have used a quadrature
   // formula of sufficient order to get exact
   // results
-  Assert (std::fabs(std::sqrt(global) - 1./std::sqrt(3.)) < 1e-6,
+  Assert (std::fabs(global - 1./std::sqrt(3.)) < 1e-6,
           ExcInternalError());
 }
 

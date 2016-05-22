@@ -777,9 +777,9 @@ namespace Step20
   // frequently the case in mixed finite element applications). What we
   // therefore have to do is to `mask' the components that we are interested
   // in. This is easily done: the
-  // <code>VectorTools::integrate_difference</code> function takes as its last
-  // argument a pointer to a weight function (the parameter defaults to the
-  // null pointer, meaning unit weights). What we simply have to do is to pass
+  // <code>VectorTools::integrate_difference</code> function takes as one of its
+  // arguments a pointer to a weight function (the parameter defaults to the
+  // null pointer, meaning unit weights). What we have to do is to pass
   // a function object that equals one in the components we are interested in,
   // and zero in the other ones. For example, to compute the pressure error,
   // we should pass a function that represents the constant vector with a unit
@@ -829,13 +829,17 @@ namespace Step20
                                        cellwise_errors, quadrature,
                                        VectorTools::L2_norm,
                                        &pressure_mask);
-    const double p_l2_error = cellwise_errors.l2_norm();
+    const double p_l2_error = VectorTools::compute_global_error(triangulation,
+                                                                cellwise_errors,
+                                                                VectorTools::L2_norm);
 
     VectorTools::integrate_difference (dof_handler, solution, exact_solution,
                                        cellwise_errors, quadrature,
                                        VectorTools::L2_norm,
                                        &velocity_mask);
-    const double u_l2_error = cellwise_errors.l2_norm();
+    const double u_l2_error = VectorTools::compute_global_error(triangulation,
+                                                                cellwise_errors,
+                                                                VectorTools::L2_norm);
 
     std::cout << "Errors: ||e_p||_L2 = " << p_l2_error
               << ",   ||e_u||_L2 = " << u_l2_error
