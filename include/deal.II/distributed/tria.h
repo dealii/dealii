@@ -698,11 +698,12 @@ namespace parallel
        * can be different than the coarsen and refine flags set by you). If it
        * is
        *
-       * - CELL_PERIST: the cell won't be refined/coarsened, but might be
-       * moved to a different processor - CELL_REFINE: this cell will be
-       * refined into 4/8 cells, you can not access the children (because they
-       * don't exist yet) - CELL_COARSEN: the children of this cell will be
-       * coarsened into the given cell (you can access the active children!)
+       * - CELL_PERSIST: the cell won't be refined/coarsened, but might be
+       * moved to a different processor
+       * - CELL_REFINE: this cell will be refined into 4/8 cells, you can not
+       * access the children (because they don't exist yet)
+       * - CELL_COARSEN: the children of this cell will be coarsened into the
+       * given cell (you can access the active children!)
        *
        * When unpacking the data with notify_ready_to_unpack() you can access
        * the children of the cell if the status is CELL_REFINE but not for

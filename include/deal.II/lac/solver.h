@@ -405,9 +405,11 @@ private:
   /**
    * A class whose operator() combines two states indicating whether we should
    * continue iterating or stop, and returns a state that dominates. The rules
-   * are: - If one of the two states indicates failure, return failure. -
-   * Otherwise, if one of the two states indicates to continue iterating, then
-   * continue iterating. - Otherwise, return success.
+   * are:
+   * - If one of the two states indicates failure, return failure.
+   * - Otherwise, if one of the two states indicates to continue iterating, then
+   * continue iterating.
+   * - Otherwise, return success.
    */
   struct StateCombiner
   {

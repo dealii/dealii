@@ -135,10 +135,11 @@ struct CellData
   types::manifold_id manifold_id;
 
   /**
-   * Default constructor. Sets the member variables to the following values: -
-   * vertex indices to invalid values - boundary or material id zero (the
-   * default for boundary or material ids) - manifold id to
-   * numbers::invalid_manifold_id
+   * Default constructor. Sets the member variables to the following values:
+   *
+   * - vertex indices to invalid values
+   * - boundary or material id zero (the default for boundary or material ids)
+   * - manifold id to numbers::invalid_manifold_id
    */
   CellData ();
 };
