@@ -196,7 +196,7 @@ SparseMatrix<number>::operator = (const double d)
   // operator=. The grain size is chosen to reflect the number of rows in
   // minimum_parallel_grain_size, weighted by the number of nonzero entries
   // per row on average.
-  const size_type matrix_size = cols->n_nonzero_elements();
+  const std::size_t matrix_size = cols->n_nonzero_elements();
   const size_type grain_size =
     internal::SparseMatrix::minimum_parallel_grain_size *
     (cols->n_nonzero_elements()+m()) / m();
@@ -298,7 +298,7 @@ SparseMatrix<number>::get_row_length (const size_type row) const
 
 
 template <typename number>
-typename SparseMatrix<number>::size_type
+std::size_t
 SparseMatrix<number>::n_nonzero_elements () const
 {
   Assert (cols != 0, ExcNotInitialized());
@@ -308,13 +308,13 @@ SparseMatrix<number>::n_nonzero_elements () const
 
 
 template <typename number>
-typename SparseMatrix<number>::size_type
+std::size_t
 SparseMatrix<number>::n_actually_nonzero_elements (const double threshold) const
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (threshold >= 0, ExcMessage ("Negative threshold!"));
   size_type nnz = 0;
-  const size_type nnz_alloc = n_nonzero_elements();
+  const std::size_t nnz_alloc = n_nonzero_elements();
   for (size_type i=0; i<nnz_alloc; ++i)
     if (std::abs(val[i]) > threshold)
       ++nnz;

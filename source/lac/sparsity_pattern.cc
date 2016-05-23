@@ -760,7 +760,7 @@ SparsityPattern::row_position (const size_type i, const size_type j) const
 
 
 std::pair<SparsityPattern::size_type, SparsityPattern::size_type>
-SparsityPattern::matrix_position (const size_type global_index) const
+SparsityPattern::matrix_position (const std::size_t global_index) const
 {
   Assert (compressed == true, ExcNotCompressed());
   Assert (global_index < n_nonzero_elements(),

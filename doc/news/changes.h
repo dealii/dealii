@@ -255,6 +255,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: Fix a bug where the SparsityPattern could not have more than 4 
+ billions entries when using 32bit indices.
+ <br>
+ (Bruno Turcksin, 2016/05/22)
+  </li>
+
  <li> New: Added PArpackSolver::reinit() when dealing with BlockVectors.
  <br>
  (Alberto Sartori, 2016/05/19)
