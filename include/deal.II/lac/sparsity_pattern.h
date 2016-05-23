@@ -784,7 +784,7 @@ public:
   /**
    * Number of entries in a specific row.
    */
-  unsigned int row_length (const size_type row) const;
+  size_type row_length (const size_type row) const;
 
   /**
    * Return whether this object stores only those entries that have been added
@@ -1378,7 +1378,7 @@ SparsityPattern::stores_only_added_elements () const
 
 
 inline
-unsigned int
+SparsityPattern::size_type
 SparsityPattern::row_length (const size_type row) const
 {
   Assert(row<rows, ExcIndexRangeType<size_type>(row,0,rows));
