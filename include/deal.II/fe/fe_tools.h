@@ -845,10 +845,13 @@ namespace FETools
    * how many degrees of freedom the composed element has per vertex,
    * line, etc.
    *
-   * If @p do_tensor_product is true, the returned number of components is sum of
-   * products of number of components in each finite elements times @p multiplicities.
-   * Otherwise the number of components is take from the first fine element
-   * with non-zero multiplicity.
+   * If @p do_tensor_product is true, the number of components
+   * returned in the FiniteElementData object is the sum over the
+   * product of the number of components in each of the finite
+   * elements times the corresponding multiplicity.  Otherwise the
+   * number of components is taken from the first finite element with
+   * non-zero multiplicity, and all other elements with non-zero
+   * multiplicities need to have the same number of vector components.
    */
   template <int dim, int spacedim>
   FiniteElementData<dim>
@@ -873,9 +876,9 @@ namespace FETools
                         const unsigned int            N5=0);
 
   /**
-   * Compute the named flags for a list of finite elements with multiplicities
-   * given in the second argument. This function is called from all the above
-   * functions.
+   * Compute the "restriction is additive" flags (see the
+   * documentation of the FiniteElement class) for a list of finite
+   * elements with multiplicities given in the second argument.
    */
   template <int dim, int spacedim>
   std::vector<bool>
@@ -883,10 +886,11 @@ namespace FETools
                                          const std::vector<unsigned int>              &multiplicities);
 
   /**
-   * Take a @p FiniteElement object
-   * and return an boolean vector including the @p
-   * restriction_is_additive_flags of the mixed element consisting of @p N
-   * elements of the sub-element @p fe.
+   * Take a @p FiniteElement object and return a boolean vector
+   * describing the @p restriction_is_additive_flags (see the
+   * documentation of the FiniteElement class) for each shape function
+   * of the mixed element consisting of @p N1, @p N2, ... copies of
+   * the sub-elements @p fe1, @p fe2, ...
    */
   template <int dim, int spacedim>
   std::vector<bool>
@@ -902,13 +906,17 @@ namespace FETools
                                          const unsigned int        N5=0);
 
   /**
-   * Compute the nonzero components of a list of finite elements with
-   * multiplicities given in the second argument.
+   * Compute the nonzero components for each shape function of a
+   * composed finite element described by a list of finite elements
+   * with multiplicities given in the second argument.
    *
-   * If @p do_tensor_product is false, the number of components of the resulting
-   * component mask is the same as the first finite element with non-zero multiplicity.
-   * Otherwise the number of components equals the sum of number of components
-   * of a each finite element times the multiplicity.
+   * If @p do_tensor_product is true, the number of components (and
+   * thus the size of the ComponentMask objects) is the sum over the
+   * product of the number of components in each of the finite
+   * elements times the corresponding multiplicity.  Otherwise the
+   * number of components is taken from the first finite element with
+   * non-zero multiplicity, and all other elements with non-zero
+   * multiplicities need to have the same number of vector components.
    */
   template <int dim, int spacedim>
   std::vector<ComponentMask>
@@ -917,7 +925,11 @@ namespace FETools
                               const bool do_tensor_product = true);
 
   /**
-   * Compute the non-zero vector components of a composed finite element.
+   * Compute the non-zero vector components of a composed finite
+   * element. This function is similar to the previous one, except
+   * that the pointers indicate the elements to be composed, and the
+   * arguments @p N1, @p N2, ... the multiplicities. Null pointers
+   * indicate that an argument is to be skipped.
    */
   template <int dim, int spacedim>
   std::vector<ComponentMask>
@@ -933,13 +945,17 @@ namespace FETools
                               const unsigned int        N5=0);
 
   /**
-   * For a given (composite) @p finite_element build @p system_to_component_table,
-   * @p system_to_base_table and @p component_to_base_table.
+   * For a given (composite) @p finite_element build @p
+   * system_to_component_table, @p system_to_base_table and @p
+   * component_to_base_table.
    *
-   * If @p do_tensor_product is <code>true</code>, the underlying finite element
-   * is assumed to be build using the tensor product rule. That is, the number of
-   * composite components is the sum of components in each finite element times
-   * multiplicity.
+   * If @p do_tensor_product is true, the number of components
+   * used for the composite element is the sum over the
+   * product of the number of components in each of the finite
+   * elements times the corresponding multiplicity.  Otherwise the
+   * number of components is taken from the first finite element with
+   * non-zero multiplicity, and all other elements with non-zero
+   * multiplicities need to have the same number of vector components.
    */
   template <int dim, int spacedim>
   void
@@ -953,10 +969,13 @@ namespace FETools
    * For a given (composite) @p finite_element build @p face_system_to_base_table,
    * and @p face_system_to_component_table.
    *
-   * If @p do_tensor_product is <code>true</code>, the underlying finite element
-   * is assumed to be build using the tensor product rule. That is, the number of
-   * composite components is the sum of components in each finite element times
-   * multiplicity.
+   * If @p do_tensor_product is true, the number of components
+   * used for the composite element is the sum over the
+   * product of the number of components in each of the finite
+   * elements times the corresponding multiplicity.  Otherwise the
+   * number of components is taken from the first finite element with
+   * non-zero multiplicity, and all other elements with non-zero
+   * multiplicities need to have the same number of vector components.
    */
   template <int dim, int spacedim>
   void
