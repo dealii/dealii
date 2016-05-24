@@ -2,6 +2,19 @@
 
 <h3> Errors </h3>
 
+We first run the code and confirm that the manufactured solution converges
+with the correct rates as predicted by the error analysis of mixed finite
+element problems. Given sufficiently smooth exact solutions $u$ and $p$,
+the errors of the Taylor-Hood element Q_k-Q_{k-1} should be
+
+@f[
+\| u -u_h \|_0 + h ( \| u- u_h\|_1 + \|p - p_h \|_0)
+\leq C h^{k+1} ( \|u \|_{k+1} + \| p \|_k )
+@f]
+
+see for example Ern/Guermond "Theory and Practice of Finite Elements", Section
+4.2.5 p195. This is indeed what we observe:
+
 <table align="center" border="1">
   <tr>
     <th>&nbsp;</th>
@@ -43,6 +56,9 @@
 </table>
 
 <h3> Timing Results </h3>
+
+Here is a table summarizing the solver iterations and timings done for the
+various solver combinations implemented in the code:
 
 <table align="center" border="1">
   <tr>
@@ -150,17 +166,34 @@
 
 As can be seen from the table,
 
-1. UMFPACK uses large amounts of memory, especially in 3d. Also,
-UMFPACK timings do not scale favorably with problem size.
+1. UMFPACK uses large amounts of memory, especially in 3d. Also, UMFPACK
+timings do not scale favorably with problem size.
 
-2. The number of iterations for $A$ increase for ILU with refinement
-leading to worse then linear scaling in solve time. In contrast, the
-number of inner iterations for $A$ stay constant with GMG leading to
-nearly perfect scaling in solve time.
+2. Because we are using inner solvers for $A$ and $S$, ILU and GMG require the
+same number of outer iterations.
 
-3. GMG needs slightly more memory than ILU.
+3. The number of iterations for $A$ increase for ILU with refinement leading
+to worse than linear scaling in solve time. In contrast, the number of inner
+iterations for $A$ stay constant with GMG leading to nearly perfect scaling in
+solve time.
+
+4. GMG needs slightly more memory than ILU to store the level and interface
+matrices.
 
 <h3> Possible extensions </h3>
 
-<h4> Use expensive or cheap preconditioner </h4>
-Currently, use_expensive is set to true, but if you set it to false, then you will not be using CG in your calculation of $\widetilde{A^{-1}}$ which is an approximation of $A^{-1}$.  Depending on if you chose to use ILU or GMG, you would just be using ILU or a few v-cycles of GMG, respectively, instead of using them as a preconditioner to CG.
+<h4> Check higher order discretizations </h4>
+
+Experiment with higher order stable FE pairs and check that you observe the
+correct convergence rates.
+
+<h4> Compare with cheap preconditioner </h4>
+
+Currently, the boolean use_expensive in solve () is set to true. When set to false,
+$\widetilde{A^{-1}}$ will be a single preconditioner application instead of an inner
+CG with the GMG or ILU preconditioner, respectively.
+
+Notice that the number of FGMRES iterations stays constant under refinement if
+you use GMG (so $A^{-1}$ is approximated by a V-cycle). This means that the
+Multigrid is optimal and independent of $h$.
+
