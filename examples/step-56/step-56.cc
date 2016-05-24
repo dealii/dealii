@@ -491,7 +491,7 @@ namespace Step56
     fe (velocity_fe, 1, FE_Q<dim> (pressure_degree), 1),
     dof_handler (triangulation),
     velocity_dof_handler (triangulation),
-    computing_timer (std::cout, TimerOutput::summary,
+    computing_timer (std::cout, TimerOutput::never,
                      TimerOutput::wall_times)
   {}
 
@@ -1053,7 +1053,7 @@ namespace Step56
 
 // @sect4{StokesProblem::output_results}
 
-// This function generates graphical output like it is done in step-16.
+// This function generates graphical output like it is done in step-22.
   template <int dim>
   void
   StokesProblem<dim>::output_results (const unsigned int refinement_cycle)  const
@@ -1130,13 +1130,14 @@ namespace Step56
 
         compute_errors ();
 
+        output_results (refinement_cycle);
+
         Utilities::System::MemoryStats mem;
         Utilities::System::get_memory_stats(mem);
         std::cout << "   VM Peak: " << mem.VmPeak << std::endl;
 
         computing_timer.print_summary ();
         computing_timer.reset ();
-        output_results (refinement_cycle);
       }
   }
 }
