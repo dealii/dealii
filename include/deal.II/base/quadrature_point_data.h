@@ -480,10 +480,10 @@ namespace parallel
 //                         TransferableQuadraturePointData
 //--------------------------------------------------------------------
 inline TransferableQuadraturePointData::TransferableQuadraturePointData()
-{};
+{}
 
 inline TransferableQuadraturePointData::~TransferableQuadraturePointData()
-{};
+{}
 
 //--------------------------------------------------------------------
 //                         CellDataStorage
@@ -492,14 +492,14 @@ inline TransferableQuadraturePointData::~TransferableQuadraturePointData()
 template <typename CellIteratorType, typename DataType>
 CellDataStorage<CellIteratorType,DataType>::
 CellDataStorage()
-{};
+{}
 
 
 
 template <typename CellIteratorType, typename DataType>
 CellDataStorage<CellIteratorType,DataType>::
 ~CellDataStorage()
-{};
+{}
 
 
 
