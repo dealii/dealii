@@ -47,8 +47,9 @@ for (deal_II_dimension : DIMENSIONS)
 #endif
 
   template
-  void DoFTools::make_vertex_patches (SparsityPattern&, const DoFHandler<deal_II_dimension>&,
-  unsigned int, bool, bool, bool, bool);
+  std::vector<unsigned int>
+  DoFTools::make_vertex_patches (SparsityPattern&, const DoFHandler<deal_II_dimension>&,
+  unsigned int, bool, bool, bool, bool, bool);
 
   template
   void DoFTools::make_single_patch (SparsityPattern&, const DoFHandler<deal_II_dimension>&,

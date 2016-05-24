@@ -1715,10 +1715,18 @@ namespace DoFTools
    * are possible, in particular changing <tt>boundary_patches</tt> for non-
    * essential boundary conditions.
    *
+   * This function returns the <tt>vertex_mapping</tt>,
+   * that contains the mapping from the vertex indices to the block indices
+   * of the <tt>block_list</tt>. For vertices that do not lead to a vertex patch, the
+   * entry in <tt>vertex_mapping</tt> contains the value <tt>invalid_unsigned_int</tt>.
+   * If <tt>invert_vertex_mapping</tt> is set to <tt>true</tt>, then the
+   * <tt>vertex_mapping</tt> is inverted such that it contains the mapping from
+   * the block indices to the corresponding vertex indices.
+   *
    * @arg <tt>block_list</tt>: the SparsityPattern into which the patches will
    * be stored.
    *
-   * @arg <tt>dof_handler</tt>: The multilevel dof handler providing the
+   * @arg <tt>dof_handler</tt>: the multilevel dof handler providing the
    * topology operated on.
    *
    * @arg <tt>interior_dofs_only</tt>: for each patch of cells around a
@@ -1735,15 +1743,21 @@ namespace DoFTools
    *
    * @arg <tt>single_cell_patches</tt>: if not true, patches containing a
    * single cell are eliminated.
+   *
+   * @arg <tt>invert_vertex_mapping</tt>: if true, then the return value
+   * contains one vertex index for each block; if false, then the return value
+   * contains one block index or <tt>invalid_unsigned_int</tt> for each vertex.
    */
   template <typename DoFHandlerType>
-  void make_vertex_patches(SparsityPattern      &block_list,
-                           const DoFHandlerType &dof_handler,
-                           const unsigned int    level,
-                           const bool            interior_dofs_only,
-                           const bool            boundary_patches       = false,
-                           const bool            level_boundary_patches = false,
-                           const bool            single_cell_patches    = false);
+  std::vector<unsigned int>
+  make_vertex_patches(SparsityPattern      &block_list,
+                      const DoFHandlerType &dof_handler,
+                      const unsigned int    level,
+                      const bool            interior_dofs_only,
+                      const bool            boundary_patches       = false,
+                      const bool            level_boundary_patches = false,
+                      const bool            single_cell_patches    = false,
+                      const bool            invert_vertex_mapping = false);
 
   /**
    * Create an incidence matrix that for every cell on a given level of a
