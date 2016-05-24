@@ -768,7 +768,7 @@ namespace Step34
                                        difference_per_cell,
                                        QGauss<(dim-1)>(2*fe.degree+1),
                                        VectorTools::L2_norm);
-    const double L2_error = VectorTools::compute_global_error(triangulation,
+    const double L2_error = VectorTools::compute_global_error(tria,
                                                               difference_per_cell,
                                                               VectorTools::L2_norm);
 
