@@ -269,8 +269,9 @@ inconvenience this causes.
  (Bruno Turcksin, 2016/05/22)
   </li>
 
- <li> Move FESystem's auxiliary functions to FETools and extend them to cover
- a non-tensor product case used in the enriched finite element.
+ <li> New: There are now additional functions in the FETools namespace that build
+ finite elements out of simpler finite elements, either by forming tensor
+ products or by combining the set of shape functions.
  <br>
  (Denis Davydov, 2016/05/20)
  </li>
