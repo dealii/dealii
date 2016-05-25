@@ -255,7 +255,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
- <li> Fixed: Fix a bug where the SparsityPattern could not have more than 4 
+ <li> New: Return value std::vector<unsigned int> vertex_mapping for the
+ make_vertex_patches function, including the optional inversion of the
+ vertex mapping.
+ <br>
+ (Joscha Gedicke, 2016/05/25)
+ </li>
+
+ <li> Fixed: Fix a bug where the SparsityPattern could not have more than 4
  billions entries when using 32bit indices.
  <br>
  (Bruno Turcksin, 2016/05/22)
