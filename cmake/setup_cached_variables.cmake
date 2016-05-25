@@ -49,8 +49,8 @@
 #
 #     DEAL_II_WITH_64BIT_INDICES
 #     DEAL_II_DOXYGEN_USE_MATHJAX
-#     DEAL_II_CPACK_EXTERNAL_LIBS_TREE
-#
+#     DEAL_II_CPACK_BUNDLE_NAME
+#     DEAL_II_CPACK_EXTERNAL_LIBS
 #
 # *)  May also be set via environment variable (CXXFLAGS, LDFLAGS)
 #     (a nonempty cached variable has precedence and will not be
@@ -328,10 +328,15 @@ OPTION(DEAL_II_DOXYGEN_USE_MATHJAX
   )
 MARK_AS_ADVANCED(DEAL_II_DOXYGEN_USE_MATHJAX)
 
-SET(DEAL_II_CPACK_EXTERNAL_LIBS_TREE "" CACHE PATH
-    "Path to tree of external libraries that will be installed in bundle package."
+SET(DEAL_II_CPACK_EXTERNAL_LIBS "opt" CACHE STRING
+    "A relative path to tree of external libraries that will be installed in bundle package. The path is relative to the /Applications/${DEAL_II_CPACK_BUNDLE_NAME}.app/Contents/Resources directory. It defaults to opt, but you may want to use a different value, for example if you want to distribute a brew based package."
   )
-MARK_AS_ADVANCED(DEAL_II_CPACK_EXTERNAL_LIBS_TREE)
+MARK_AS_ADVANCED(DEAL_II_CPACK_EXTERNAL_LIBS)
+
+SET(DEAL_II_CPACK_BUNDLE_NAME "${DEAL_II_PACKAGE_NAME}" CACHE STRING
+    "Name of the application bundle to generate."
+  )
+MARK_AS_ADVANCED(DEAL_II_CPACK_BUNDLE_NAME)
 
 
 ########################################################################

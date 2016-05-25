@@ -5,11 +5,11 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
-	<string>@DEAL_II_PACKAGE_NAME@</string>
+	<string>@DEAL_II_CPACK_BUNDLE_NAME@</string>
 	<key>CFBundleGetInfoString</key>
-	<string>@DEAL_II_PACKAGE_VERSION@</string>
+	<string>@DEAL_II_CPACK_BUNDLE_NAME@-@DEAL_II_PACKAGE_VERSION@</string>
 	<key>CFBundleIconFile</key>
-	<string>deal.II</string>
+	<string>@DEAL_II_CPACK_BUNDLE_NAME@</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.dealii</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -19,12 +19,12 @@
 	<key>CFBundleShortVersionString</key>
 	<string>@DEAL_II_PACKAGE_VERSION@</string>
 	<key>CFBundleSignature</key>
-	<string>@DEAL_II_PACKAGE_NAME@</string>
+	<string>@DEAL_II_CPACK_BUNDLE_NAME@-@DEAL_II_PACKAGE_VERSION@</string>
 	<key>CFBundleVersion</key>
 	<string>@DEAL_II_PACKAGE_VERSION@</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>GPL</string>
 	<key>LSMinimumSystemVersion</key>
-	<string>10.9</string>
+	<string>10.11</string>
 </dict>
 </plist>

@@ -14,7 +14,7 @@
 
 # Make sure DEAL_II_BUNDLE is set correctly
 if [ -z "$DEAL_II_BUNDLE" ]; then
-    export DEAL_II_BUNDLE=/Applications/deal.II.app
+    export DEAL_II_BUNDLE=/Applications/@DEAL_II_CPACK_BUNDLE_NAME@.app
     if [ ! -d $DEAL_II_BUNDLE ]; then
     cat << EOF
 *** Warning: I did not find the deal.II installation in $DEAL_II_BUNDLE.
@@ -35,8 +35,8 @@ export PATH=$DEAL_II_RESOURCES/bin:$PATH
 export DEAL_II_DIR=$DEAL_II_RESOURCES
 
 # Do whatever the external library tells us to
-if [ -f $DEAL_II_RESOURCES/opt/external.conf ]; then
-    . $DEAL_II_RESOURCES/opt/external.conf
+if [ -f $DEAL_II_RESOURCES/@DEAL_II_CPACK_EXTERNAL_LIBS@/external.conf ]; then
+    . $DEAL_II_RESOURCES/@DEAL_II_CPACK_EXTERNAL_LIBS@/external.conf
 fi
 
 if [ -z "$DEAL_II_CONF_SILENT" ]; then
@@ -60,7 +60,7 @@ if [ -z "$DEAL_II_CONF_SILENT" ]; then
 This is a shell with PATHs and \${EXTERNAL_LIB}_DIR setup to work with Deal.II.
 All external libraries are located in 
 
-    $DEAL_II_RESOURCES/opt/
+    $DEAL_II_RESOURCES/@DEAL_II_CPACK_EXTERNAL_LIBS@/
 
 If you are new to Deal.II you probably want to have a look at
 
@@ -82,7 +82,7 @@ fi
 if ! [[ -x /usr/bin/xcodebuild ]]; then
     cat << EOF
 *** Warning: This package requires XCode to be installed in order to run.
-    Please install XCode from the OS X install disc before you continue.
+    Please install XCode before you continue.
 
 EOF
 fi

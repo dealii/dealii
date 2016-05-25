@@ -24,7 +24,7 @@ fi
 
 # Make sure DEAL_II_BUNDLE is set correctly
 if [ -z "$DEAL_II_BUNDLE" ]; then
-    export DEAL_II_BUNDLE=/Applications/deal.II.app
+    export DEAL_II_BUNDLE=/Applications/@DEAL_II_CPACK_BUNDLE_NAME@.app
     if [ ! -d $DEAL_II_BUNDLE ]; then
 	    return=`/usr/bin/osascript <<EOF
 tell app "System Events"
