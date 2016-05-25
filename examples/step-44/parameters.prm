@@ -28,12 +28,17 @@ subsection Linear solver
 
   # Linear solver residual (scaled by residual norm)
   set Residual                 = 1e-6
+  
+  # Use static condensation and solve a 1-block system, or solve
+  # the full 3-block system using Linear Operators and the Schur
+  # complement
+  set Use static condensation = true
 
- # Preconditioner type
- set Preconditioner type  = ssor
+  # Preconditioner type
+  set Preconditioner type  = ssor
 
- # Preconditioner relaxation value
- set Preconditioner relaxation  = 0.65
+  # Preconditioner relaxation value
+  set Preconditioner relaxation  = 0.65
 
   # Type of solver used to solve the linear system
   set Solver type              = CG

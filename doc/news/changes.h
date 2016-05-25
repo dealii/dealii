@@ -120,6 +120,13 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li> Improved: The step-44 tutorial now uses the new CellDataStorage class to
+ store and retrieve local quadrature point data. An alternative approach to
+ solving the linear system using the LinearOperator class has been implemented.
+ <br>
+ (Jean-Paul Pelteret, 2016/05/20)
+ </li>
+ 
  <li> New: Add VectorTools::compute_global_error that computes global
  errors from cellwise errors obtained by VectorTools::integrate_difference()
  and do MPI collectives if necessary.

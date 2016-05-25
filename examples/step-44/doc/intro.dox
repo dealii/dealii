@@ -30,7 +30,7 @@ Thereafter, various key stress measures are introduced and the constitutive mode
 We then describe the three-field formulation in detail prior to explaining the structure of the class used to manage the material. 
 The setup of the example problem is then presented.
 
-@note This tutorial has been developed for the problem of elasticity in three dimensions.
+@note This tutorial has been developed (and is described in the introduction) for the problem of elasticity in three dimensions.
  While the space dimension could be changed in the main() routine, care needs to be taken.
  Two-dimensional elasticity problems, in general, exist only as idealisations of three-dimensional ones.
  That is, they are either plane strain or plane stress. 
@@ -49,26 +49,38 @@ A nice overview of issues pertaining to incompressible elasticity (at small stra
 		Variational and projection methods for the volume constraint in finite deformation elasto-plasticity,
 		<em> Computer Methods in Applied Mechanics and Engineering </em>,
 		<strong> 51 </strong>, 1-3,
-		177-208;
+		177-208.
+		DOI: <a href="http://doi.org/10.1016/0045-7825(85)90033-7">10.1016/0045-7825(85)90033-7</a>;
 	<li> J.C. Simo and R.L. Taylor (1991),
   		Quasi-incompressible finite elasticity in principal stretches. Continuum
 			basis and numerical algorithms,
 		<em> Computer Methods in Applied Mechanics and Engineering </em>,
 		<strong> 85 </strong>, 3,
-		273-310;
+		273-310.
+		DOI: <a href="http://doi.org/10.1016/0045-7825(91)90100-K">10.1016/0045-7825(91)90100-K</a>;
 	<li> C. Miehe (1994),
-		Aspects of the formulation and finite element implementation of large 	strain isotropic elasticity
+		Aspects of the formulation and finite element implementation of large strain isotropic elasticity
 		<em> International Journal for Numerical Methods in Engineering </em>
 		<strong> 37 </strong>, 12,
-		1981-2004;
+		1981-2004.
+		DOI: <a href="http://doi.org/10.1002/nme.1620371202">10.1002/nme.1620371202</a>;
 	<li> G.A. Holzapfel (2001),
 		Nonlinear Solid Mechanics. A Continuum Approach for Engineering,
-		John Wiley & Sons;
+		John Wiley & Sons.
+		ISBN: 0-471-82304-X;
 	<li> T.J.R. Hughes (2000),
 		The Finite Element Method: Linear Static and Dynamic Finite Element Analysis,
 		Dover.
+		ISBN: 978-0486411811
 </ol>
 
+An example where this three-field formulation is used in a coupled problem is documented in
+<ol>
+	<li> J-P. V. Pelteret, D. Davydov, A. McBride, D. K. Vu, and P. Steinmann (2016),
+		Computational electro- and magneto-elasticity for quasi-incompressible media immersed in free space,
+		<em> International Journal for Numerical Methods in Engineering </em>.
+		DOI: <a href="http://doi.org/10.1002/nme.5254">10.1002/nme.5254</a>
+</ol>
 
 <h3> Notation </h3>
 
@@ -668,6 +680,7 @@ This benchmark problem is taken from
   <em> Computers and Structures </em>,
   <strong> 75 </strong>,
   291-304.
+  DOI: <a href="http://doi.org/10.1016/S0045-7949(99)00137-6">10.1016/S0045-7949(99)00137-6</a>
 
  <img src="https://www.dealii.org/images/steps/developer/step-44.setup.png" alt="">
 
