@@ -1021,6 +1021,17 @@ namespace FETools
      * that the pointers indicate the elements to be composed, and the
      * arguments @p N1, @p N2, ... the multiplicities. Null pointers
      * indicate that an argument is to be skipped.
+     *
+     * If @p do_tensor_product is true, the number of components (and
+     * thus the size of the ComponentMask objects) is the sum over the
+     * product of the number of components in each of the finite
+     * elements times the corresponding multiplicity.  Otherwise the
+     * number of components is taken from the first finite element with
+     * non-zero multiplicity, and all other elements with non-zero
+     * multiplicities need to have the same number of vector components.
+     *
+     * See the documentation of namespace FETools::Compositing for more
+     * information about the @p do_tensor_product argument.
      */
     template <int dim, int spacedim>
     std::vector<ComponentMask>
@@ -1033,7 +1044,8 @@ namespace FETools
                                 const FiniteElement<dim,spacedim> *fe4=NULL,
                                 const unsigned int        N4=0,
                                 const FiniteElement<dim,spacedim> *fe5=NULL,
-                                const unsigned int        N5=0);
+                                const unsigned int        N5=0,
+                                const bool do_tensor_product = true);
 
     /**
      * For a given (composite) @p finite_element build @p

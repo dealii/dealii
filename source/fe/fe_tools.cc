@@ -538,7 +538,8 @@ namespace FETools
                                 const FiniteElement<dim,spacedim> *fe4,
                                 const unsigned int        N4,
                                 const FiniteElement<dim,spacedim> *fe5,
-                                const unsigned int        N5)
+                                const unsigned int        N5,
+                                const bool               do_tensor_product)
     {
       std::vector<const FiniteElement<dim,spacedim>*> fe_list;
       std::vector<unsigned int>              multiplicities;
@@ -558,7 +559,8 @@ namespace FETools
       fe_list.push_back (fe5);
       multiplicities.push_back (N5);
 
-      return compute_nonzero_components (fe_list, multiplicities);
+      return compute_nonzero_components (fe_list, multiplicities,
+                                         do_tensor_product);
     }
 
     template <int dim, int spacedim>

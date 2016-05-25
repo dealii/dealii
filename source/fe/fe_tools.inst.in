@@ -75,7 +75,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
                                     const FiniteElement<deal_II_dimension,deal_II_space_dimension> *fe4,
                                     const unsigned int        N4,
                                     const FiniteElement<deal_II_dimension,deal_II_space_dimension> *fe5,
-                                    const unsigned int        N5);
+                                    const unsigned int        N5,
+                                    const bool);
 
          template
          void
