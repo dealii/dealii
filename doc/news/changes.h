@@ -257,8 +257,8 @@ inconvenience this causes.
 <ol>
 
  <li> New: Return value std::vector<unsigned int> vertex_mapping for the
- make_vertex_patches function, including the optional inversion of the
- vertex mapping.
+ DoFTools::make_vertex_patches() function, including the optional inversion
+ of the vertex mapping.
  <br>
  (Joscha Gedicke, 2016/05/25)
  </li>
