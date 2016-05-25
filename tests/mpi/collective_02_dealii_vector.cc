@@ -47,7 +47,7 @@ void test()
     Vector<double> values(2);
     values[0] = 1.5;
     values[1] = 2.5;
-    Vector<double> sums;
+    Vector<double> sums(2);
     Utilities::MPI::sum (values,
                          MPI_COMM_WORLD,
                          sums);

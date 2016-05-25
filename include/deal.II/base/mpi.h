@@ -489,26 +489,50 @@ namespace Utilities
 
       template <typename T>
       inline
-      T all_reduce (const MPI_Op &mpi_op,
-                    const T &t,
-                    const MPI_Comm &mpi_communicator)
+      void all_reduce (const MPI_Op      &mpi_op,
+                       const T *const    values,
+                       const MPI_Comm    &mpi_communicator,
+                       T                 *output,
+                       const std::size_t  size)
       {
 #ifdef DEAL_II_WITH_MPI
         if (job_supports_mpi())
           {
-            T output;
-            MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&t)),
-                           &output, 1, internal::mpi_type_id(&t), mpi_op,
+            MPI_Allreduce (values != output
+                           ?
+                           // TODO This const_cast is only needed for older
+                           // (e.g., openMPI 1.6, released in 2012)
+                           // implementations of MPI-2. It is not needed as of
+                           // MPI-3 and we should remove it at some point in
+                           // the future.
+                           const_cast<void *>(static_cast<const void *> (values))
+                           :
+                           MPI_IN_PLACE,
+                           static_cast<void *>(output),
+                           static_cast<int>(size),
+                           internal::mpi_type_id(values),
+                           mpi_op,
                            mpi_communicator);
-            return output;
           }
         else
 #endif
           {
             (void)mpi_op;
             (void)mpi_communicator;
-            return t;
+            for (std::size_t i=0; i<size; ++i)
+              output[i] = values[i];
           }
+      }
+
+      template <typename T>
+      inline
+      T all_reduce (const MPI_Op &mpi_op,
+                    const T &t,
+                    const MPI_Comm &mpi_communicator)
+      {
+        T output;
+        all_reduce(mpi_op, &t, mpi_communicator, &output, 1);
+        return output;
       }
 
       template <typename T, unsigned int N>
@@ -518,25 +542,7 @@ namespace Utilities
                        const MPI_Comm &mpi_communicator,
                        T (&output)[N])
       {
-#ifdef DEAL_II_WITH_MPI
-        if (job_supports_mpi())
-          {
-            MPI_Allreduce ((&values[0] != &output[0]
-                            ?
-                            const_cast<void *>(static_cast<const void *>(&values[0]))
-                            :
-                            MPI_IN_PLACE),
-                           &output[0], N, internal::mpi_type_id(values), mpi_op,
-                           mpi_communicator);
-          }
-        else
-#endif
-          {
-            (void)mpi_op;
-            (void)mpi_communicator;
-            for (unsigned int i=0; i<N; ++i)
-              output[i] = values[i];
-          }
+        all_reduce(mpi_op, values, mpi_communicator, output, N);
       }
 
       template <typename T>
@@ -546,25 +552,9 @@ namespace Utilities
                        const MPI_Comm       &mpi_communicator,
                        std::vector<T>       &output)
       {
-#ifdef DEAL_II_WITH_MPI
-        if (job_supports_mpi())
-          {
-            output.resize (values.size());
-            MPI_Allreduce ((&values[0] != &output[0]
-                            ?
-                            const_cast<void *>(static_cast<const void *>(&values[0]))
-                            :
-                            MPI_IN_PLACE),
-                           &output[0], values.size(), internal::mpi_type_id((T *)0), mpi_op,
-                           mpi_communicator);
-          }
-        else
-#endif
-          {
-            (void)mpi_op;
-            (void)mpi_communicator;
-            output = values;
-          }
+        Assert(values.size() == output.size(),
+               ExcDimensionMismatch(values.size(), output.size()));
+        all_reduce(mpi_op, &values[0], mpi_communicator, &output[0], values.size());
       }
 
       template <typename T>
@@ -574,31 +564,10 @@ namespace Utilities
                        const MPI_Comm  &mpi_communicator,
                        Vector<T>  &output)
       {
-#ifdef DEAL_II_WITH_MPI
-        if (job_supports_mpi())
-          {
-            if (values.begin() != output.begin())
-              output.reinit (values.size());
-
-            MPI_Allreduce ((values.begin() != output.begin()
-                            ?
-                            const_cast<void *>(static_cast<const void *>(values.begin()))
-                            :
-                            MPI_IN_PLACE),
-                           output.begin(), values.size(), internal::mpi_type_id((T *)0), mpi_op,
-                           mpi_communicator);
-          }
-        else
-#endif
-          {
-            (void)mpi_op;
-            (void)mpi_communicator;
-            output = values;
-          }
+        Assert(values.size() == output.size(),
+               ExcDimensionMismatch(values.size(), output.size()));
+        all_reduce(mpi_op, values.begin(), mpi_communicator, output.begin(), values.size());
       }
-
-
-
     }
 
 
