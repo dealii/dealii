@@ -1757,7 +1757,7 @@ namespace DoFTools
                       const bool            boundary_patches       = false,
                       const bool            level_boundary_patches = false,
                       const bool            single_cell_patches    = false,
-                      const bool            invert_vertex_mapping = false);
+                      const bool            invert_vertex_mapping  = false);
 
   /**
    * Create an incidence matrix that for every cell on a given level of a
