@@ -255,6 +255,7 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+
  <li> New: Return value std::vector<unsigned int> vertex_mapping for the
  make_vertex_patches function, including the optional inversion of the
  vertex mapping.
@@ -267,6 +268,12 @@ inconvenience this causes.
  <br>
  (Bruno Turcksin, 2016/05/22)
   </li>
+
+ <li> Move FESystem's auxiliary functions to FETools and extend them to cover
+ a non-tensor product case used in the enriched finite element.
+ <br>
+ (Denis Davydov, 2016/05/20)
+ </li>
 
  <li> New: Added PArpackSolver::reinit() when dealing with BlockVectors.
  <br>
