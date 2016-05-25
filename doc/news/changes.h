@@ -269,11 +269,11 @@ inconvenience this causes.
  (Bruno Turcksin, 2016/05/22)
   </li>
 
- <li> New: There are now additional functions in the FETools namespace that build
+ <li> New: There are now additional functions in the FETools::Compositing namespace that build
  finite elements out of simpler finite elements, either by forming tensor
  products or by combining the set of shape functions.
  <br>
- (Denis Davydov, 2016/05/20)
+ (Denis Davydov, Wolfgang Bangerth, 2016/05/20)
  </li>
 
  <li> New: Added PArpackSolver::reinit() when dealing with BlockVectors.
