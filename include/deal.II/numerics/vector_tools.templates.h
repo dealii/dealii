@@ -6675,7 +6675,7 @@ namespace VectorTools
       // check that off-processor entries are zero. Otherwise we will compute
       // wrong results below!
       typename InVector::size_type i = 0;
-      typename Triangulation<dim,spacedim>::cell_iterator it = tria.begin_active();
+      typename Triangulation<dim,spacedim>::active_cell_iterator it = tria.begin_active();
       for (; i<cellwise_error.size(); ++i, ++it)
         if (!it->is_locally_owned())
           Assert(std::fabs(cellwise_error[i]) <  1e-20,
@@ -6739,7 +6739,7 @@ namespace VectorTools
       {
         double local = 0;
         typename InVector::size_type i;
-        typename Triangulation<dim,spacedim>::cell_iterator it = tria.begin_active();
+        typename Triangulation<dim,spacedim>::active_cell_iterator it = tria.begin_active();
         for (i = 0; i<cellwise_error.size(); ++i, ++it)
           if (it->is_locally_owned())
             local += std::pow(cellwise_error[i], exponent);

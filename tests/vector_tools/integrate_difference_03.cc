@@ -64,7 +64,7 @@ void test(VectorTools::NormType norm, double value, double exp = 2.0)
 {
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);
-  tria.refine_global(2);
+  tria.refine_global(3);
 
   FESystem<dim> fe(FE_Q<dim>(4),dim);
   DoFHandler<dim> dofh(tria);
