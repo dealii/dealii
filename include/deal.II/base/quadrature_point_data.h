@@ -57,7 +57,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Denis Davydov, Jean-Paul Pelteret, 2016
  */
 template <typename CellIteratorType, typename DataType>
-class CellDataStorage
+class CellDataStorage : public Subscriptor
 {
 public:
   /**
@@ -492,6 +492,8 @@ inline TransferableQuadraturePointData::~TransferableQuadraturePointData()
 template <typename CellIteratorType, typename DataType>
 CellDataStorage<CellIteratorType,DataType>::
 CellDataStorage()
+  :
+  Subscriptor()
 {}
 
 
