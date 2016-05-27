@@ -841,8 +841,12 @@ namespace FETools
 
 
   /**
-   * A namespace that contains functions that help build more
-   * complex finite elements from simpler ("base") elements.
+   * A namespace that contains functions that help setting up internal
+   * data structures when implementing FiniteElement which are build
+   * from simpler ("base") elements, for example FESystem. The things
+   * computed by these functions typically serve as constructor
+   * arguments to the FiniteElement base class of the derived finite
+   * element object being constructed.
    *
    * There are generally two ways in which one can build more complex
    * elements, and this is reflected by several of the functions in
@@ -899,12 +903,13 @@ namespace FETools
    *
    * The element constructed above of course no longer has a linearly
    * independent set of shape functions. As a consequence, any matrix
-   * one creates by treating all shape functions the same will be
-   * singular. In practice, this strategy is therefore typically used
-   * in situations where one explicitly makes sure that certain shape
-   * functions are treated differently (e.g., by multiplying them with
-   * weight factors), or in cases where the shape functions one
-   * combines are not linearly dependent.
+   * one creates by treating all shape functions of the composed
+   * element in the same way will be singular. In practice, this
+   * strategy is therefore typically used in situations where one
+   * explicitly makes sure that certain shape functions are treated
+   * differently (e.g., by multiplying them with weight functions), or
+   * in cases where the shape functions one combines are not linearly
+   * dependent.
    *
    * </ol>
    */
