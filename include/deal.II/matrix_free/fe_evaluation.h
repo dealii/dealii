@@ -1800,10 +1800,10 @@ FEEvaluationBase<dim,n_components_,Number>
                     const unsigned int        first_selected_component,
                     const FEEvaluationBase<dim,n_components_other,Number> *other)
   :
-  quad_no            (-1),
+  quad_no            (numbers::invalid_unsigned_int),
   n_fe_components    (n_components_),
-  active_fe_index    (-1),
-  active_quad_index  (-1),
+  active_fe_index    (numbers::invalid_unsigned_int),
+  active_quad_index  (numbers::invalid_unsigned_int),
   matrix_info        (0),
   dof_info           (0),
   mapping_info       (0),
