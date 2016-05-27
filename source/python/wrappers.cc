@@ -13,9 +13,12 @@
 //
 // ---------------------------------------------------------------------
 
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
 #include <boost/python.hpp>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
+#include <fstream>
 
 char const *pydealii_docstring =
   "                                                             \n"
@@ -34,6 +37,22 @@ void generate_cube(dealii::Triangulation<2> &triangulation)
   dealii::GridGenerator::hyper_cube(triangulation);
 }
 
+void save(const dealii::Triangulation<2> &triangulation,
+    const std::string filename)
+{
+  std::ofstream ofs(filename);
+  boost::archive::text_oarchive oa(ofs);
+  oa << triangulation;
+}
+
+void load(dealii::Triangulation<2> &triangulation,
+    const std::string filename)
+{
+  std::ifstream ifs(filename);
+  boost::archive::text_iarchive ia(ifs);
+  ia >> triangulation;
+}
+
 BOOST_PYTHON_MODULE(PyDealII)
 {
   boost::python::scope().attr("__doc__") = pydealii_docstring;
@@ -45,7 +64,16 @@ BOOST_PYTHON_MODULE(PyDealII)
 
 
   boost::python::class_<dealii::Triangulation<2>> ("Triangulation")
-                                               .def("n_active_cells", &n_active_cells)
-                                               .def("generate_cube", &generate_cube)
-                                               .def("refine_global", &dealii::Triangulation<2>::refine_global);
+                                               .def("n_active_cells", &n_active_cells,
+                                                   "Return the number of active cells",
+                                                   boost::python::args("self"))
+                                               .def("generate_cube", &generate_cube,
+                                                   "Generate a hypercube", boost::python::args("self"))
+                                               .def("refine_global", &dealii::Triangulation<2>::refine_global,
+                                                   "Refine the mesh uniformly", 
+                                                   boost::python::args("self", "times"))
+                                               .def("save", &save, "Serialize and save the triangulation",
+                                                   boost::python::args("self", "filename"))
+                                               .def("load", &load, "Load and deserialize a triangulation",
+                                                   boost::python::args("self", "filename"));
 }
