@@ -34,7 +34,10 @@ DEAL_II_NAMESPACE_OPEN
  * one. To the outside world, the resulting object looks just like a usual
  * finite element object, which is composed of several other finite elements
  * that are possibly of different type. The result is then a vector-valued
- * finite element. %Vector valued elements are discussed in a number of
+ * finite element. An example is given in the documentation of namespace
+ * FETools::Compositing, when using the "tensor product" strategy.
+ *
+ * %Vector valued elements are discussed in a number of
  * tutorial programs, for example step-8, step-20, step-21, and in particular
  * in the
  * @ref vector_valued
