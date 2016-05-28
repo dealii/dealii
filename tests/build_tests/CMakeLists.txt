@@ -52,8 +52,8 @@ SET(_release_steps
   step-6  step-7  step-8  step-9  step-10
   step-11 step-12 step-13 step-14 step-16
   step-20 step-23 step-25 step-26 step-27
-  step-30 step-38 step-39 step-44 step-47
-  step-48 step-49
+  step-30 step-38 step-39 step-47 step-48
+  step-49
   )
 
 #
