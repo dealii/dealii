@@ -84,6 +84,7 @@
  */
 
 #include "../tests.h"
+#include <deal.II/base/utilities.h>
 #include <deal.II/distributed/grid_refinement.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -198,14 +199,14 @@ void periodicity_tests<dim>::write_grid()
   Grid1_Out.set_flags(svg_flags);
   if (dim == 2)
     {
-      std::ofstream Grid1_OutFile("Grid1" + std::to_string(refn_cycle) +
-                                  std::to_string(comm_rank) + ".svg");
+      std::ofstream Grid1_OutFile("Grid1" + dealii::Utilities::to_string(refn_cycle) +
+                                  dealii::Utilities::to_string(comm_rank) + ".svg");
       Grid1_Out.write_svg(the_grid, Grid1_OutFile);
     }
   else
     {
-      std::ofstream Grid1_OutFile("Grid1" + std::to_string(refn_cycle) +
-                                  std::to_string(comm_rank) + ".msh");
+      std::ofstream Grid1_OutFile("Grid1" + dealii::Utilities::to_string(refn_cycle) +
+                                  dealii::Utilities::to_string(comm_rank) + ".msh");
       Grid1_Out.write_msh(the_grid, Grid1_OutFile);
     }
 }
