@@ -690,13 +690,17 @@ public:
   operator [] (const unsigned int row);
 
   /**
-   * Access to an element where you specify the entire set of indices.
+   * Return an element by value.
+   *
+   * Exactly the same as operator().
    */
   Number
   operator [] (const TableIndices<rank> &indices) const;
 
   /**
-   * Access to an element where you specify the entire set of indices.
+   * Return a read-write reference to the indicated element.
+   *
+   * Exactly the same as operator().
    */
   Number &
   operator [] (const TableIndices<rank> &indices);
@@ -1651,7 +1655,7 @@ inline
 Number
 SymmetricTensor<rank,dim,Number>::operator [] (const TableIndices<rank> &indices) const
 {
-  return data[component_to_unrolled_index(indices)];
+  return operator()(indices);
 }
 
 
@@ -1661,7 +1665,7 @@ inline
 Number &
 SymmetricTensor<rank,dim,Number>::operator [] (const TableIndices<rank> &indices)
 {
-  return data[component_to_unrolled_index(indices)];
+  return operator()(indices);
 }
 
 
