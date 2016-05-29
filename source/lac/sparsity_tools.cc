@@ -25,6 +25,7 @@
 
 #ifdef DEAL_II_WITH_MPI
 #include <deal.II/base/utilities.h>
+#include <deal.II/base/mpi.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
 #endif

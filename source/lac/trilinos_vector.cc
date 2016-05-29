@@ -17,6 +17,7 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 
+#  include <deal.II/base/mpi.h>
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
 #  include <deal.II/lac/trilinos_block_vector.h>
 

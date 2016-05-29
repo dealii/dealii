@@ -33,6 +33,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, typename Number> class Point;
 template <int rank_, int dim, typename Number = double> class Tensor;
+template <typename Number> class Vector;
 
 #ifndef DOXYGEN
 // Overload invalid tensor types of negative rank that come up during
