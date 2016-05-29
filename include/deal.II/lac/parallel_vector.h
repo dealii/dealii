@@ -18,7 +18,6 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/base/mpi.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/types.h>
 #include <deal.II/base/utilities.h>

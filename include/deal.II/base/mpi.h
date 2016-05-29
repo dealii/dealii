@@ -17,6 +17,7 @@
 #define dealii__mpi_h
 
 #include <deal.II/base/config.h>
+
 #include <vector>
 
 #if !defined(DEAL_II_WITH_MPI) && !defined(DEAL_II_WITH_PETSC)

@@ -17,7 +17,6 @@
 #define dealii__vector_space_vector_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/mpi.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <deal.II/lac/vector.h>

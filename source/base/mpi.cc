@@ -22,7 +22,6 @@
 #include <deal.II/lac/parallel_block_vector.h>
 #include <deal.II/base/multithread_info.h>
 
-#include <cstddef>
 #include <iostream>
 
 #ifdef DEAL_II_WITH_TRILINOS
