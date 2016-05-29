@@ -443,7 +443,7 @@ namespace internal
  * as the location of the data. It is therefore possible to produce far more
  * efficient code than for matrices with runtime-dependent dimension. It is
  * also more efficient than using the more general <tt>Tensor</tt> class,
- * since less elements are stored, and the class automatically makes sure that
+ * since fewer elements are stored, and the class automatically makes sure that
  * the tensor represents a symmetric object.
  *
  * For tensors of higher rank, the savings in storage are even higher. For
@@ -464,11 +464,12 @@ namespace internal
  * symmetric rank-2 tensors and the colon indicates the common double-index
  * contraction that acts as a product for symmetric tensors.
  *
- * Symmetric tensors are most often used in structural and fluid mechanics,
- * where strains and stresses are usually symmetric tensors, and the stress-
- * strain relationship is given by a symmetric rank-4 tensor.
+ * Symmetric tensors are most often used in structural and fluid
+ * mechanics, where strains and stresses are usually symmetric
+ * tensors, and the stress-strain relationship is given by a symmetric
+ * rank-4 tensor.
  *
- * Note that symmetric tensors only exist with even numbers of indices. In
+ * @note Symmetric tensors only exist with even numbers of indices. In
  * other words, the only objects that you can use are
  * <tt>SymmetricTensor<2,dim></tt>, <tt>SymmetricTensor<4,dim></tt>, etc, but
  * <tt>SymmetricTensor<1,dim></tt> and <tt>SymmetricTensor<3,dim></tt> do not
