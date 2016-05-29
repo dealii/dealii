@@ -28,15 +28,7 @@ typedef int MPI_Comm;
 const int MPI_COMM_SELF = 0;
 typedef int MPI_Datatype;
 typedef int MPI_Op;
-namespace MPI
-{
-  static const unsigned int UNSIGNED = 0;
-  static const unsigned int LONG_DOUBLE = 0;
-  static const unsigned int LONG_DOUBLE_COMPLEX = 0;
-  static const unsigned int MAX = 0;
-  static const unsigned int MIN = 0;
-  static const unsigned int SUM = 0;
-}
+
 static const int MPI_MIN = 0;
 static const int MPI_MAX = 0;
 static const int MPI_SUM = 0;
