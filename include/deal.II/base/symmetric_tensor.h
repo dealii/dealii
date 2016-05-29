@@ -667,11 +667,7 @@ public:
   Number &operator() (const TableIndices<rank> &indices);
 
   /**
-   * Return the value of the indicated element as a read-only reference.
-   *
-   * We return the requested value as a constant reference rather than by
-   * value since this object may hold data types that may be large, and we
-   * don't know here whether copying is expensive or not.
+   * Return an element by value.
    */
   Number operator() (const TableIndices<rank> &indices) const;
 
