@@ -507,8 +507,24 @@ namespace Utilities
         }
 #endif
     }
-#include "mpi.inst"
+
+
+
+    bool job_supports_mpi ()
+    {
+#ifdef DEAL_II_WITH_MPI
+      int MPI_has_been_started = 0;
+      MPI_Initialized(&MPI_has_been_started);
+
+      return (MPI_has_been_started > 0);
+#else
+      return false;
+#endif
     }
+
+
+
+#include "mpi.inst"
   } // end of namespace MPI
 } // end of namespace Utilities
 
