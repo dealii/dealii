@@ -1,0 +1,60 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2016 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
+
+for (S : MPI_SCALARS)
+{
+  template
+  void sum<S> (const Vector<S> &, const MPI_Comm &, Vector<S> &);
+
+  template
+  S sum<S> (const S &, const MPI_Comm &);
+
+  template
+  void sum<S> (const std::vector<S> &, const MPI_Comm &, std::vector<S> &);
+
+  template
+  S max<S> (const S &, const MPI_Comm &);
+
+  template
+  void max<S> (const std::vector<S> &, const MPI_Comm &, std::vector<S> &);
+
+  template
+  S min<S> (const S &, const MPI_Comm &);
+
+  template
+  void min<S> (const std::vector<S> &, const MPI_Comm &, std::vector<S> &);
+}
+
+
+for (S : REAL_SCALARS; rank: RANKS; dim : SPACE_DIMENSIONS)
+{
+  template
+  Tensor<rank,dim,S>
+  sum<rank,dim,S> (const Tensor<rank,dim,S> &, const MPI_Comm &);
+}
+
+
+// Recall that SymmetricTensor only makes sense for rank 2 and 4
+for (S : REAL_SCALARS; dim : SPACE_DIMENSIONS)
+{
+  template
+  SymmetricTensor<2,dim,S>
+  sum<2,dim,S> (const SymmetricTensor<2,dim,S> &, const MPI_Comm &);
+
+  template
+  SymmetricTensor<4,dim,S>
+  sum<4,dim,S> (const SymmetricTensor<4,dim,S> &, const MPI_Comm &);
+}

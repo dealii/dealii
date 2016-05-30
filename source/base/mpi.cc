@@ -15,6 +15,7 @@
 
 
 #include <deal.II/base/mpi.h>
+#include <deal.II/base/mpi.templates.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/lac/vector_memory.h>
@@ -506,10 +507,9 @@ namespace Utilities
         }
 #endif
     }
-
-
+#include "mpi.inst"
+    }
   } // end of namespace MPI
-
 } // end of namespace Utilities
 
 DEAL_II_NAMESPACE_CLOSE

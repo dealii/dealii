@@ -2,6 +2,14 @@ BOOL            := { true; false }
 REAL_SCALARS    := { double; float }
 COMPLEX_SCALARS := { std::complex<double>;
                      std::complex<float> }
+MPI_SCALARS     := { int;
+                     long int;
+                     unsigned int;
+                     unsigned long int;
+                     unsigned long long int;
+                     float;
+                     double;
+                     long double }
 
 DERIVATIVE_TENSORS := { double;
                         Tensor<1,deal_II_dimension>;
