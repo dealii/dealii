@@ -14,7 +14,7 @@ Then configure, compile, and install the deal.II library with:
 
     $ mkdir build
     $ cd build
-    $ cmake -DCMAKE_INSTALL_PREFIX=/path/where/dealii/should/be/intalled/to /path/to/dealii/sources
+    $ cmake -DCMAKE_INSTALL_PREFIX=/path/where/dealii/should/be/installed/to /path/to/dealii/sources
     $ make install    (alternatively $ make -j<N> install)
     $ make test
 
