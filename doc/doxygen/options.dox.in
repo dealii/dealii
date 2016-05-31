@@ -83,6 +83,7 @@ ALIASES += dealiiRequiresUpdateFlags{1}="@note For this function to work properl
 
 ALIASES += dealiiOperationIsMultithreaded="@note If deal.II is configured with threads, this operation will run multi-threaded by splitting the work into smaller chunks (assuming there is enough work to make this worthwhile)."
 
+ALIASES += dealiiExceptionMessage{1}="@note The message that will be printed by this exception reads: @code \1 @endcode"
 
 #---------------------------------------------------------------------------
 # configuration options related to source browsing
