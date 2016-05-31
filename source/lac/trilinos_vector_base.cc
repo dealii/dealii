@@ -18,6 +18,8 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 
+#  include <deal.II/base/mpi.h>
+
 #  include <cmath>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS

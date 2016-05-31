@@ -17,6 +17,7 @@
 #define dealii__mpi_h
 
 #include <deal.II/base/config.h>
+
 #include <vector>
 
 #if !defined(DEAL_II_WITH_MPI) && !defined(DEAL_II_WITH_PETSC)
@@ -27,15 +28,7 @@ typedef int MPI_Comm;
 const int MPI_COMM_SELF = 0;
 typedef int MPI_Datatype;
 typedef int MPI_Op;
-namespace MPI
-{
-  static const unsigned int UNSIGNED = 0;
-  static const unsigned int LONG_DOUBLE = 0;
-  static const unsigned int LONG_DOUBLE_COMPLEX = 0;
-  static const unsigned int MAX = 0;
-  static const unsigned int MIN = 0;
-  static const unsigned int SUM = 0;
-}
+
 static const int MPI_MIN = 0;
 static const int MPI_MAX = 0;
 static const int MPI_SUM = 0;
@@ -433,296 +426,43 @@ namespace Utilities
      */
     bool job_supports_mpi ();
 
+#ifndef DOXYGEN
+    // declaration for an internal function that lives in mpi.templates.h
     namespace internal
     {
-#ifdef DEAL_II_WITH_MPI
-      /**
-       * Return the corresponding MPI data type id for the argument given.
-       */
-      inline MPI_Datatype mpi_type_id (const int *)
-      {
-        return MPI_INT;
-      }
-
-
-      inline MPI_Datatype mpi_type_id (const long int *)
-      {
-        return MPI_LONG;
-      }
-
-
-      inline MPI_Datatype mpi_type_id (const unsigned int *)
-      {
-        return MPI_UNSIGNED;
-      }
-
-
-      inline MPI_Datatype mpi_type_id (const unsigned long int *)
-      {
-        return MPI_UNSIGNED_LONG;
-      }
-
-
-      inline MPI_Datatype mpi_type_id (const unsigned long long int *)
-      {
-        return MPI_UNSIGNED_LONG_LONG;
-      }
-
-
-      inline MPI_Datatype mpi_type_id (const float *)
-      {
-        return MPI_FLOAT;
-      }
-
-
-      inline MPI_Datatype mpi_type_id (const double *)
-      {
-        return MPI_DOUBLE;
-      }
-
-
-      inline MPI_Datatype mpi_type_id (const long double *)
-      {
-        return MPI_LONG_DOUBLE;
-      }
-#endif
-
       template <typename T>
-      inline
       void all_reduce (const MPI_Op      &mpi_op,
                        const T *const    values,
                        const MPI_Comm    &mpi_communicator,
                        T                 *output,
-                       const std::size_t  size)
-      {
-#ifdef DEAL_II_WITH_MPI
-        if (job_supports_mpi())
-          {
-            MPI_Allreduce (values != output
-                           ?
-                           // TODO This const_cast is only needed for older
-                           // (e.g., openMPI 1.6, released in 2012)
-                           // implementations of MPI-2. It is not needed as of
-                           // MPI-3 and we should remove it at some point in
-                           // the future.
-                           const_cast<void *>(static_cast<const void *> (values))
-                           :
-                           MPI_IN_PLACE,
-                           static_cast<void *>(output),
-                           static_cast<int>(size),
-                           internal::mpi_type_id(values),
-                           mpi_op,
-                           mpi_communicator);
-          }
-        else
-#endif
-          {
-            (void)mpi_op;
-            (void)mpi_communicator;
-            for (std::size_t i=0; i<size; ++i)
-              output[i] = values[i];
-          }
-      }
-
-      template <typename T>
-      inline
-      T all_reduce (const MPI_Op &mpi_op,
-                    const T &t,
-                    const MPI_Comm &mpi_communicator)
-      {
-        T output;
-        all_reduce(mpi_op, &t, mpi_communicator, &output, 1);
-        return output;
-      }
-
-      template <typename T, unsigned int N>
-      inline
-      void all_reduce (const MPI_Op &mpi_op,
-                       const T (&values)[N],
-                       const MPI_Comm &mpi_communicator,
-                       T (&output)[N])
-      {
-        all_reduce(mpi_op, values, mpi_communicator, output, N);
-      }
-
-      template <typename T>
-      inline
-      void all_reduce (const MPI_Op &mpi_op,
-                       const std::vector<T> &values,
-                       const MPI_Comm       &mpi_communicator,
-                       std::vector<T>       &output)
-      {
-        Assert(values.size() == output.size(),
-               ExcDimensionMismatch(values.size(), output.size()));
-        all_reduce(mpi_op, &values[0], mpi_communicator, &output[0], values.size());
-      }
-
-      template <typename T>
-      inline
-      void all_reduce (const MPI_Op    &mpi_op,
-                       const Vector<T> &values,
-                       const MPI_Comm  &mpi_communicator,
-                       Vector<T>  &output)
-      {
-        Assert(values.size() == output.size(),
-               ExcDimensionMismatch(values.size(), output.size()));
-        all_reduce(mpi_op, values.begin(), mpi_communicator, output.begin(), values.size());
-      }
+                       const std::size_t  size);
     }
 
-
-    template <typename T>
-    inline
-    T sum (const T &t,
-           const MPI_Comm &mpi_communicator)
-    {
-      return internal::all_reduce(MPI_SUM, t, mpi_communicator);
-    }
-
-
+    // Since these depend on N they must live in the header file
     template <typename T, unsigned int N>
-    inline
     void sum (const T (&values)[N],
               const MPI_Comm &mpi_communicator,
               T (&sums)[N])
     {
-      internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
+      internal::all_reduce(MPI_SUM, values, mpi_communicator, sums, N);
     }
-
-
-    template <typename T>
-    inline
-    void sum (const std::vector<T> &values,
-              const MPI_Comm       &mpi_communicator,
-              std::vector<T>       &sums)
-    {
-      internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
-    }
-
-    template <typename T>
-    inline
-    void sum (const Vector<T> &values,
-              const MPI_Comm &mpi_communicator,
-              Vector<T> &sums)
-    {
-      internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
-    }
-
-
-    template <int rank, int dim, typename Number>
-    inline
-    Tensor<rank,dim,Number>
-    sum (const Tensor<rank,dim,Number> &local,
-         const MPI_Comm &mpi_communicator)
-    {
-      const unsigned int n_entries = Tensor<rank,dim,Number>::n_independent_components;
-      Number entries[ Tensor<rank,dim,Number>::n_independent_components ];
-
-      for (unsigned int i=0; i< n_entries; ++i)
-        entries[i] = local[ local.unrolled_to_component_indices(i) ];
-
-      Number global_entries[ Tensor<rank,dim,Number>::n_independent_components ];
-      dealii::Utilities::MPI::sum( entries, mpi_communicator, global_entries );
-
-      Tensor<rank,dim,Number> global;
-      for (unsigned int i=0; i< n_entries; ++i)
-        global[ global.unrolled_to_component_indices(i) ] = global_entries[i];
-
-      return global;
-    }
-
-    template <int rank, int dim, typename Number>
-    inline
-    SymmetricTensor<rank,dim,Number>
-    sum (const SymmetricTensor<rank,dim,Number> &local,
-         const MPI_Comm &mpi_communicator)
-    {
-      const unsigned int n_entries = SymmetricTensor<rank,dim,Number>::n_independent_components;
-      Number entries[ SymmetricTensor<rank,dim,Number>::n_independent_components ];
-
-      for (unsigned int i=0; i< n_entries; ++i)
-        entries[i] = local[ local.unrolled_to_component_indices(i) ];
-
-      Number global_entries[ SymmetricTensor<rank,dim,Number>::n_independent_components ];
-      dealii::Utilities::MPI::sum( entries, mpi_communicator, global_entries );
-
-      SymmetricTensor<rank,dim,Number> global;
-      for (unsigned int i=0; i< n_entries; ++i)
-        global[ global.unrolled_to_component_indices(i) ] = global_entries[i];
-
-      return global;
-    }
-
-    template <typename T>
-    inline
-    T max (const T &t,
-           const MPI_Comm &mpi_communicator)
-    {
-      return internal::all_reduce(MPI_MAX, t, mpi_communicator);
-    }
-
 
     template <typename T, unsigned int N>
-    inline
     void max (const T (&values)[N],
               const MPI_Comm &mpi_communicator,
               T (&maxima)[N])
     {
-      internal::all_reduce(MPI_MAX, values, mpi_communicator, maxima);
+      internal::all_reduce(MPI_MAX, values, mpi_communicator, maxima, N);
     }
-
-
-    template <typename T>
-    inline
-    void max (const std::vector<T> &values,
-              const MPI_Comm       &mpi_communicator,
-              std::vector<T>       &maxima)
-    {
-      internal::all_reduce(MPI_MAX, values, mpi_communicator, maxima);
-    }
-
-
-    template <typename T>
-    inline
-    T min (const T &t,
-           const MPI_Comm &mpi_communicator)
-    {
-      return internal::all_reduce(MPI_MIN, t, mpi_communicator);
-    }
-
 
     template <typename T, unsigned int N>
-    inline
     void min (const T (&values)[N],
               const MPI_Comm &mpi_communicator,
               T (&minima)[N])
     {
-      internal::all_reduce(MPI_MIN, values, mpi_communicator, minima);
+      internal::all_reduce(MPI_MIN, values, mpi_communicator, minima, N);
     }
-
-
-    template <typename T>
-    inline
-    void min (const std::vector<T> &values,
-              const MPI_Comm       &mpi_communicator,
-              std::vector<T>       &minima)
-    {
-      internal::all_reduce(MPI_MIN, values, mpi_communicator, minima);
-    }
-
-
-    inline
-    bool job_supports_mpi ()
-    {
-#ifdef DEAL_II_WITH_MPI
-      int MPI_has_been_started = 0;
-      MPI_Initialized(&MPI_has_been_started);
-
-      return (MPI_has_been_started > 0);
-#else
-      return false;
 #endif
-    }
   } // end of namespace MPI
 } // end of namespace Utilities
 

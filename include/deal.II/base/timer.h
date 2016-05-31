@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/conditional_ostream.h>
+#include <deal.II/base/mpi.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 

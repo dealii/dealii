@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/mpi.h>
 #include <deal.II/base/index_set.h>
 #include <list>
 
