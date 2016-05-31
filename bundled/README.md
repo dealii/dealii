@@ -51,4 +51,4 @@ licenses as explained in `umfpack/UMFPACK/Doc/License` and
 `umfpack/lgpl-2.1.txt`.
 
 A full version of UMFPACK can be downloaded at
-http://www.cise.ufl.edu/research/sparse/umfpack/.
+http://faculty.cse.tamu.edu/davis/suitesparse.html
