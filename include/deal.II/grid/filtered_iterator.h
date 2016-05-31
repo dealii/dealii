@@ -697,7 +697,7 @@ private:
 
     /**
      * Abstract function which in derived classes denotes the evaluation of
-     * the predicate on the give iterator.
+     * the predicate on the given iterator.
      */
     virtual bool operator () (const BaseIterator &bi) const = 0;
 

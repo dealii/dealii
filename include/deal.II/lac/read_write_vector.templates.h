@@ -124,6 +124,19 @@ namespace LinearAlgebra
 
 
 
+#ifdef DEAL_II_WITH_CXX11
+  template <typename Number>
+  template <typename Functor>
+  void
+  ReadWriteVector<Number>::apply(const Functor &func)
+  {
+    FunctorTemplate<Functor> functor(*this, func);
+    internal::parallel_for(functor, n_elements(), thread_loop_partitioner);
+  }
+#endif
+
+
+
   template <typename Number>
   ReadWriteVector<Number> &
   ReadWriteVector<Number>::operator= (const ReadWriteVector<Number> &in_vector)
