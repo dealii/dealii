@@ -140,6 +140,14 @@ while (<>)
     #         multiple lines
     ########################################################
 
+    # NOTE: The doxygen documentation says that "the filter must not
+    # add or remove lines; it is applied before the code is scanned,
+    # but not when the output code is generated. If lines are added or
+    # removed, the anchors will not be placed correctly."
+    #
+    # In other words, filters below can munch multiple lines, but they
+    # must print the result on as many lines as they were on before.
+
 
     # Finally output the last line of what has been substituted
     print;
