@@ -1019,7 +1019,9 @@ namespace Step56
                                        VectorTools::L2_norm,
                                        &velocity_mask);
 
-    const double Velocity_L2_error = difference_per_cell.l2_norm();
+    const double Velocity_L2_error = VectorTools::compute_global_error(triangulation,
+                                     difference_per_cell,
+                                     VectorTools::L2_norm);
 
     VectorTools::integrate_difference (dof_handler,
                                        solution,
@@ -1029,7 +1031,9 @@ namespace Step56
                                        VectorTools::L2_norm,
                                        &pressure_mask);
 
-    const double Pressure_L2_error = difference_per_cell.l2_norm();
+    const double Pressure_L2_error = VectorTools::compute_global_error(triangulation,
+                                     difference_per_cell,
+                                     VectorTools::L2_norm);
 
     VectorTools::integrate_difference (dof_handler,
                                        solution,
@@ -1039,7 +1043,9 @@ namespace Step56
                                        VectorTools::H1_norm,
                                        &velocity_mask);
 
-    const double Velocity_H1_error = difference_per_cell.l2_norm();
+    const double Velocity_H1_error = VectorTools::compute_global_error(triangulation,
+                                     difference_per_cell,
+                                     VectorTools::H1_norm);
 
     std::cout << std::endl
               << "   Velocity L2 Error: " << Velocity_L2_error
