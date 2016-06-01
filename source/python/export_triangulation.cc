@@ -23,17 +23,19 @@
 namespace PyDealII
 {
 
-  unsigned int n_active_cells(const dealii::Triangulation<2> &triangulation)
+  template <int dim>
+  unsigned int n_active_cells(const dealii::Triangulation<dim> &triangulation)
   {
     return triangulation.n_active_cells();
   }
 
 
 
-  void generate_hyper_cube(dealii::Triangulation<2> &triangulation,
-                           const double              left = 0.,
-                           const double              right = 0.,
-                           const bool                colorize = false)
+  template <int dim>
+  void generate_hyper_cube(dealii::Triangulation<dim> &triangulation,
+                           const double                left = 0.,
+                           const double                right = 0.,
+                           const bool                  colorize = false)
   {
     dealii::GridGenerator::hyper_cube(triangulation, left, right, colorize);
   }
@@ -55,10 +57,11 @@ namespace PyDealII
 
 
 
-  void generate_subdivided_hyper_cube(dealii::Triangulation<2> &triangulation,
-                                      const unsigned int        repetitions,
-                                      const double              left = 0.,
-                                      const double              right = 1.)
+  template <int dim>
+  void generate_subdivided_hyper_cube(dealii::Triangulation<dim> &triangulation,
+                                      const unsigned int          repetitions,
+                                      const double                left = 0.,
+                                      const double                right = 1.)
   {
     dealii::GridGenerator::subdivided_hyper_cube(triangulation, repetitions,
                                                  left, right);
@@ -66,10 +69,11 @@ namespace PyDealII
 
 
 
-  void generate_hyper_rectangle(dealii::Triangulation<2> &triangulation,
-                                const dealii::Point<2>   &p1,
-                                const dealii::Point<2>   &p2,
-                                const bool                colorize = false)
+  template <int dim>
+  void generate_hyper_rectangle(dealii::Triangulation<dim> &triangulation,
+                                const dealii::Point<dim>   &p1,
+                                const dealii::Point<dim>   &p2,
+                                const bool                  colorize = false)
   {
     dealii::GridGenerator::hyper_rectangle(triangulation, p1, p2, colorize);
   }
@@ -92,17 +96,19 @@ namespace PyDealII
 
 
 
-  void generate_hyper_ball(dealii::Triangulation<2> &triangulation,
-                           const dealii::Point<2>   &center = dealii::Point<2>(),
-                           const double              radius = 1.)
+  template <int dim>
+  void generate_hyper_ball(dealii::Triangulation<dim> &triangulation,
+                           const dealii::Point<dim>   &center = dealii::Point<dim>(),
+                           const double                radius = 1.)
   {
     dealii::GridGenerator::hyper_ball(triangulation, center, radius);
   }
 
 
 
-  void save(const dealii::Triangulation<2> &triangulation,
-            const std::string filename)
+  template <int dim>
+  void save(const dealii::Triangulation<dim> &triangulation,
+            const std::string                 filename)
   {
     std::ofstream ofs(filename);
     boost::archive::text_oarchive oa(ofs);
@@ -111,8 +117,9 @@ namespace PyDealII
 
 
 
-  void load(dealii::Triangulation<2> &triangulation,
-            const std::string filename)
+  template <int dim>
+  void load(dealii::Triangulation<dim> &triangulation,
+            const std::string           filename)
   {
     std::ifstream ifs(filename);
     boost::archive::text_iarchive ia(ifs);
@@ -135,21 +142,21 @@ namespace PyDealII
   void export_triangulation()
   {
     boost::python::class_<dealii::Triangulation<2>> ("Triangulation")
-                                                 .def("n_active_cells", n_active_cells,
+                                                 .def("n_active_cells", n_active_cells<2>,
                                                       "Return the number of active cells",
                                                       boost::python::args("self"))
-                                                 .def("generate_hyper_cube", generate_hyper_cube,
+                                                 .def("generate_hyper_cube", generate_hyper_cube<2>,
                                                       generate_hyper_cube_overloads(
                                                         boost::python::args("self", "left", "right", "colorize"),
                                                         "Generate a hyper_cube."))
                                                  .def("generate_simplex", generate_simplex,
                                                       "Generate a simplex.",
                                                       boost::python::args("self", "vertex_1", "vertex_2", "vertex_3"))
-                                                 .def("generate_subdivided_hyper_cube", generate_subdivided_hyper_cube,
+                                                 .def("generate_subdivided_hyper_cube", generate_subdivided_hyper_cube<2>,
                                                       generate_subdivided_hyper_cube_overloads(
                                                         boost::python::args("self", "repetitions", "left", "right"),
                                                         "Generate a subdivided hyper_cube."))
-                                                 .def("generate_hyper_rectangle", generate_hyper_rectangle,
+                                                 .def("generate_hyper_rectangle", generate_hyper_rectangle<2>,
                                                       generate_hyper_rectangle_overloads(
                                                         boost::python::args("self", "p1", "p2", "colorize"),
                                                         "Generate a hyper_rectangle."))
@@ -161,16 +168,16 @@ namespace PyDealII
                                                             "colorize"),
                                                         "Generate a subdivided hyper_rectangle."))
                                                  .def("generate_hyper_ball",
-                                                      generate_hyper_ball,
+                                                      generate_hyper_ball<2>,
                                                       generate_hyper_ball_overloads(
                                                         boost::python::args("self", "center", "radius"),
                                                         "Generate a hyper_ball."))
                                                  .def("refine_global", &dealii::Triangulation<2>::refine_global,
                                                       "Refine the mesh uniformly.",
                                                       boost::python::args("self", "times"))
-                                                 .def("save", save, "Serialize and save the triangulation.",
+                                                 .def("save", save<2>, "Serialize and save the triangulation.",
                                                       boost::python::args("self", "filename"))
-                                                 .def("load", load, "Load and deserialize a triangulation.",
+                                                 .def("load", load<2>, "Load and deserialize a triangulation.",
                                                       boost::python::args("self", "filename"));
   }
 

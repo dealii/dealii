@@ -19,12 +19,14 @@
 namespace PyDealII
 {
 
-  double get_x(const dealii::Point<2> &point)
+  template <int dim>
+  double get_x(const dealii::Point<dim> &point)
   {
     return point(0);
   }
 
-  double get_y(const dealii::Point<2> &point)
+  template <int dim>
+  double get_y(const dealii::Point<dim> &point)
   {
     return point(1);
   }
@@ -33,8 +35,8 @@ namespace PyDealII
   {
     boost::python::class_<dealii::Point<2>> ("Point", "Constructor. Requires x and y.",
                                              boost::python::init<double, double>())
-                                         .add_property("x", get_x, "Return the x component of the point.")
-                                         .add_property("y", get_y, "Return the y component of the point.");
+                                         .add_property("x", get_x<2>, "Return the x component of the point.")
+                                         .add_property("y", get_y<2>, "Return the y component of the point.");
   }
 
 }
