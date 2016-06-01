@@ -134,7 +134,7 @@ and integrate by parts over every element $K$ to obtain:
   (\mathbf{v}, \kappa^{-1} \mathbf{q})_K - (\nabla\cdot\mathbf{v}, u)_K
     + \left<\mathbf{v}\cdot\mathbf{n}, \hat{u}\right>_{\partial K} &=& 0, \\
   - (\nabla w, \mathbf{c} u + \mathbf{q})_K
-    + \left<(w, \widehat{\mathbf{c} u}+\hat{\mathbf{q}})\cdot\mathbf{n}\right>_{\partial K}
+    + \left<w, (\widehat{\mathbf{c} u}+\hat{\mathbf{q}})\cdot\mathbf{n}\right>_{\partial K}
     &=& (w,f)_K.
 @f}
 
