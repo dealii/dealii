@@ -199,7 +199,7 @@ Find $(\mathbf{q}_h, u_h, \hat{u}_h) \in
 \\
    - (\nabla w, \mathbf{c} u_h)_{\mathcal{T}}
    + (w, \nabla \cdot \mathbf{q}_h)_{\mathcal{T}}
-   + (w, (\mathbf{c}\cdot\mathbf{n}) \hat{u}_H)_{\partial \mathcal{T}}
+   + (w, (\mathbf{c}\cdot\mathbf{n}) \hat{u}_h)_{\partial \mathcal{T}}
     + \left<w, \tau (u_h - \hat{u}_h)\right>_{\partial \mathcal{T}}
     &=
     (w, f)_{\mathcal{T}},
