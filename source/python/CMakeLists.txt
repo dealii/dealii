@@ -21,6 +21,8 @@ INCLUDE_DIRECTORIES(SYSTEM ${PYTHON_INCLUDE_DIRS})
 
 SET(_src
   wrappers.cc
+  export_point.cc
+  export_triangulation.cc
   )
 
 FILE(GLOB _header
