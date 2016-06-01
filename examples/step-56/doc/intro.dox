@@ -7,7 +7,7 @@
 
 The purpose of this tutorial is to create an efficient linear solver
 for the Stokes equation and compare it to alternative
-approaches. Using FGMRES with geometric multigrid as a precondtioner
+approaches. Using FGMRES with geometric multigrid as a preconditioner
 for the velocity block, we see that the linear solvers used in step-22
 cannot keep up since multigrid is the only way to get $O(n)$ solve
 time. Using the Timer class, we collect some statistics to compare
@@ -25,7 +25,7 @@ and $p \in L_*^2 = \{ p \in L^2(\Omega), \int_\Omega p = 0
 @f}
 
 Note that we are using the deformation tensor instead of $\Delta u$ (a
-detailed desription of the difference between the two can be found in
+detailed description of the difference between the two can be found in
 step-22, but in summary, the deformation tensor is more physical as
 well as more expensive).
 
@@ -78,10 +78,10 @@ Since $P$ is aimed to be a preconditioner only, we shall use
 the approximations on the right in the equation above.
 
 As discussed in step-22, $-M_p^{-1}=\widetilde{S^{-1}} \approx
-S^{-1}$, where $M_p$ is the pressure mass matrix and is solved approximatively by using CG
+S^{-1}$, where $M_p$ is the pressure mass matrix and is solved approximately by using CG
 with ILU, and $\widetilde{A^{-1}}$ is obtained by one of
 multiple methods: CG with ILU as preconditioner, just using ILU, CG with GMG (Geometric
-Multigrid as described in step-16) as a precondtioner, or just performing a single V-cycle
+Multigrid as described in step-16) as a preconditioner, or just performing a single V-cycle
 of GMG.
 
 As a comparison, instead of FGMRES, we also use the direct solver
@@ -92,8 +92,8 @@ the one dimensional null space given by the constant pressures, we fix the first
 
 <h3> Reference Solution </h3>
 
-The testproblem is a "Manufactured Solution" (see step-7 for details).
-We apply Dirichlet boundary condtions for the velocity on the whole
+The test problem is a "Manufactured Solution" (see step-7 for details).
+We apply Dirichlet boundary conditions for the velocity on the whole
 boundary of the domain $\Omega=[0,1]\times[0,1]\times[0,1]$.
 To enforce the boundary conditions we can just use our reference solution that
 we will now define.
@@ -131,7 +131,7 @@ z) \sin(\pi x) \cos(\pi y)) @f}
 
 Because we do not enforce the mean
 pressure to be zero for our numerical solution in the linear system,
-we need to postprocess the solution after solving. To do this we use
+we need to post process the solution after solving. To do this we use
 the VectorTools::compute_mean_value() function to compute the mean value
 of the pressure to subtract it from the pressure.
 
@@ -142,7 +142,7 @@ finite element system for the velocity.  Since this is now part of the
 entire system, it is no longer easy to access.  The reason for this is
 that there is currently no way in deal.II to ask, "May I have just
 part of a DoFHandler?"  So in order to answer this request for our
-needs, we have to create a new DoFHandler for just the velocites and
+needs, we have to create a new DoFHandler for just the velocities and
 assure that it has the same ordering as the DoFHandler for the entire
 system so that we can copy over solution vectors element by element.
 
