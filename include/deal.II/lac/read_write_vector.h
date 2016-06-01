@@ -195,6 +195,24 @@ namespace LinearAlgebra
     void reinit (const IndexSet &locally_stored_indices,
                  const bool      omit_zeroing_entries = false);
 
+#ifdef DEAL_II_WITH_CXX11
+    /**
+     * Apply the functor @p func to each element of the vector. The functor
+     * should look like
+     * <code>
+     * struct Functor
+     * {
+     *    void operator() (Number &value);
+     * };
+     * </code>
+     *
+     * @note This function requires C++11 and read_write_vector.templates.h
+     * needs to be included.
+     */
+    template <typename Functor>
+    void apply(const Functor &func);
+#endif
+
     /**
      * Swap the contents of this vector and the other vector @p v. One could
      * do this operation with a temporary variable and copying over the data
@@ -517,6 +535,42 @@ namespace LinearAlgebra
      * Make all other ReadWriteVector types friends.
      */
     template <typename Number2> friend class ReadWriteVector;
+
+#ifdef DEAL_II_WITH_CXX11
+  private:
+    /**
+     * This class provides a wrapper around a Functor which acts on
+     * single elements of the vector. This is necessary to use
+     * tbb::parallel_for which requires a TBBForFunctor.
+     */
+    template <typename Functor>
+    class FunctorTemplate
+    {
+    public:
+      /**
+       * Constructor. Take a functor and store a copy of it.
+       */
+      FunctorTemplate(ReadWriteVector<Number> &parent,
+                      const Functor &functor);
+
+      /**
+       * Evaluate the element with the stored copy of the functor.
+       */
+      virtual void operator() (const size_type begin,
+                               const size_type end);
+
+    private:
+      /**
+       * Alias to the ReadWriteVector object that owns the FunctorTemplate.
+       */
+      ReadWriteVector &parent;
+
+      /**
+       * Copy of the functor.
+       */
+      const Functor &functor;
+    };
+#endif
   };
 
   /*@}*/
@@ -789,6 +843,33 @@ namespace LinearAlgebra
         this->operator()(indices[i]) += values[i];
       }
   }
+
+
+
+#ifdef DEAL_II_WITH_CXX11
+  template <typename Number>
+  template <typename Functor>
+  inline
+  ReadWriteVector<Number>::FunctorTemplate<Functor>::FunctorTemplate(
+    ReadWriteVector<Number> &parent,
+    const Functor &functor)
+    :
+    parent(parent),
+    functor(functor)
+  {}
+
+
+
+  template <typename Number>
+  template <typename Functor>
+  void
+  ReadWriteVector<Number>::FunctorTemplate<Functor>::operator() (const size_type begin,
+      const size_type end)
+  {
+    for (size_type i=begin; i<end; ++i)
+      functor(parent.val[i]);
+  }
+#endif
 
 #endif  // ifndef DOXYGEN
 
