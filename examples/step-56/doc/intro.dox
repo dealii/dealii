@@ -1,0 +1,162 @@
+<i>This program was contributed by Ryan Grove and Timo Heister.</i>
+
+<a name="Intro"></a> 
+<h1>Introduction</h1>
+
+<h3> Stokes Problem </h3>
+
+The purpose of this tutorial is to create an efficient linear solver for the
+Stokes equation and compare it to alternative approaches.  Here, we will use
+FGMRES with geometric multigrid as a preconditioner velocity block, and we
+will show in the results section that this is a fundamentally better approach
+than the linear solvers used in step-22 (including the scheme described in
+"Possible Extensions").  Fundamentally, this is because only with multigrid it
+is possible to get $O(n)$ solve time, where $n$ is the number of unknowns of
+the linear system. Using the Timer class, we collect some statistics to
+compare setup times, solve times, and number of iterations. We also compute
+errors to make sure that what we have implemented is correct.
+
+Let $u \in H_0^1 = \{ u \in H^1(\Omega), u|_{\partial \Omega} = 0 \}$
+and $p \in L_*^2 = \{ p \in L^2(\Omega), \int_\Omega p = 0
+\}$. The Stokes equations read as follows in non-dimensionalized form:
+
+@f{eqnarray*}
+ - 2 \text{div} \frac {1}{2} \left[ (\nabla \textbf{u})
+ + (\nabla \textbf{u})^T\right] + \nabla p & =& f \\
+ - \nabla \cdot u &=& 0 
+@f}
+
+Note that we are using the deformation tensor instead of $\Delta u$ (a
+detailed description of the difference between the two can be found in
+step-22, but in summary, the deformation tensor is more physical as
+well as more expensive).
+
+<h3> Linear Solver and Preconditioning Issues </h3>
+
+The weak form of
+the discrete equations naturally leads to the following linear system
+for the nodal values of the velocity and pressure fields:
+@f{eqnarray*} 
+\left(\begin{array}{cc} A & B^T \\ B & 0
+\end{array}\right) \left(\begin{array}{c} U \\ P \end{array}\right) =
+\left(\begin{array}{c} F \\ 0 \end{array}\right). 
+@f}
+
+Our goal is to compare several solution approaches.  While step-22
+solves the linear system using a "Schur complement approach" in two
+separate steps, we instead attack the
+block system at once using FMGRES with an efficient
+preconditioner, in the spirit of the approach outlined in the "Results"
+section of step-22. The idea is as follows: if we find a block
+preconditioner $P$ such that the matrix 
+
+@f{eqnarray*}
+\left(\begin{array}{cc} A & B^T \\ B & 0 \end{array}\right) P^{-1} 
+@f}
+
+is simple, then an iterative solver with that preconditioner will
+converge in a few iterations. Notice that we are doing right
+preconditioning for here.  Using the Schur complement $S=BA^{-1}B^T$,
+we find that
+
+@f{eqnarray*}
+P^{-1} = \left(\begin{array}{cc} A & B^T \\ 0 &
+ S \end{array}\right)^{-1} 
+@f}
+
+is a good choice. Let $\widetilde{A^{-1}}$ be an approximation of $A^{-1}$
+and $\widetilde{S^{-1}}$ of $S^{-1}$, we see
+@f{eqnarray*} 
+P^{-1} =
+\left(\begin{array}{cc} A^{-1} & 0 \\ 0 & I \end{array}\right)
+\left(\begin{array}{cc} I & B^T \\ 0 & -I \end{array}\right)
+\left(\begin{array}{cc} I & 0 \\ 0 & S^{-1} \end{array}\right).
+\approx
+\left(\begin{array}{cc} \widetilde{A^{-1}} & 0 \\ 0 & I \end{array}\right)
+\left(\begin{array}{cc} I & B^T \\ 0 & -I \end{array}\right)
+\left(\begin{array}{cc} I & 0 \\ 0 & \widetilde{S^{-1}} \end{array}\right).
+  @f}
+
+Since $P$ is aimed to be a preconditioner only, we shall use
+the approximations on the right in the equation above.
+
+As discussed in step-22, $-M_p^{-1}=\widetilde{S^{-1}} \approx
+S^{-1}$, where $M_p$ is the pressure mass matrix and is solved approximately by using CG
+with ILU, and $\widetilde{A^{-1}}$ is obtained by one of
+multiple methods: CG with ILU as preconditioner, just using ILU, CG with GMG (Geometric
+Multigrid as described in step-16) as a preconditioner, or just performing a single V-cycle
+of GMG.
+
+As a comparison, instead of FGMRES, we also use the direct solver
+UMFPACK on the whole system to compare our results with.  If you want to use 
+a direct solver (like UMFPACK), the system needs to be invertible. To avoid
+the one dimensional null space given by the constant pressures, we fix the first pressure unknown
+ to zero. This is not necessary for the iterative solvers.
+
+<h3> Reference Solution </h3>
+
+The test problem is a "Manufactured Solution" (see step-7 for details).
+We apply Dirichlet boundary conditions for the velocity on the whole
+boundary of the domain $\Omega=[0,1]\times[0,1]\times[0,1]$.
+To enforce the boundary conditions we can just use our reference solution that
+we will now define.
+
+Let $u=(u_1,u_2,u_3)=(2\sin (\pi x), - \pi y \cos (\pi x),- \pi z \cos
+(\pi x))$ and $p = \sin (\pi x)\cos (\pi y)\sin (\pi z)$.
+
+If you look up in the deal.II manual what is needed to create a class
+inherited from <code>Function@<dim@></code>, you will find not only a
+value function, but vector_value, value_list, etc.  Different things
+you use in your code will require one of these particular
+functions. This can be confusing at first, but luckily the only thing
+you actually have to implement is @p value.  The other ones have default
+implementations inside deal.II and will call your implementation of @p value
+by default.
+
+Notice that our reference solution fulfills $\nabla \cdot u = 0$. In
+addition, the pressure is chosen to have a mean value of zero.  For
+the "Method of Manufactured Solutions" of step-7, we need to find $\bf
+f$ such that:
+
+@f{align*}
+{\bf f} =   - 2 \text{div} \frac {1}{2} \left[ (\nabla \textbf{u}) + (\nabla \textbf{u})^T\right] + \nabla p. 
+@f}
+
+Using the reference solution above, we obtain:
+
+@f{eqnarray*} 
+{\bf f} &=& (2 \pi^2 \sin (\pi x),- \pi^3 y \cos(\pi
+x),- \pi^3 z \cos(\pi x))\\ & & + (\pi \cos(\pi x) \cos(\pi y)
+\sin(\pi z) ,- \pi \sin(\pi y) \sin(\pi x) \sin(\pi z), \pi \cos(\pi
+z) \sin(\pi x) \cos(\pi y)) @f}
+
+<h3> Computing Errors </h3> 
+
+Because we do not enforce the mean
+pressure to be zero for our numerical solution in the linear system,
+we need to post process the solution after solving. To do this we use
+the VectorTools::compute_mean_value() function to compute the mean value
+of the pressure to subtract it from the pressure.
+
+<h3> DoF Handlers </h3>
+ 
+Geometric multigrid needs to know about the
+finite element system for the velocity.  Since this is now part of the
+entire system, it is no longer easy to access.  The reason for this is
+that there is currently no way in deal.II to ask, "May I have just
+part of a DoFHandler?"  So in order to answer this request for our
+needs, we have to create a new DoFHandler for just the velocities and
+assure that it has the same ordering as the DoFHandler for the entire
+system so that we can copy over solution vectors element by element.
+
+<h3> Differences from Step-22 </h3>
+ 
+The main difference between
+step-56 and step-22 is that we use block solvers instead of the Schur
+Complement approach used in step-22. Details of this approach can be
+found under the "Block Schur complement preconditioner" subsection of
+the "Possible Extensions" section of step-22. For the preconditioner of
+the velocity block, we borrow a class from ASPECT called
+@p BlockSchurPreconditioner that has the option to solve for the inverse
+of $A$ or just apply one preconditioner sweep for it instead, which
+provides us with an expensive and cheap approach, respectively.

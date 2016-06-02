@@ -120,6 +120,12 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li> New: The tutorial step-56 demonstrates Geometric Multigrid for the
+ Stokes equations.
+ <br>
+ (Ryan Grove, Timo Heister, 2016/06/01)
+ </li>
+
  <li> Improved: The step-44 tutorial now uses the new CellDataStorage class to
  store and retrieve local quadrature point data. An alternative approach to
  solving the linear system using the LinearOperator class has been implemented.
