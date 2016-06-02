@@ -5,13 +5,15 @@
 
 <h3> Stokes Problem </h3>
 
-The purpose of this tutorial is to create an efficient linear solver
-for the Stokes equation and compare it to alternative
-approaches. Using FGMRES with geometric multigrid as a preconditioner
-for the velocity block, we see that the linear solvers used in step-22
-cannot keep up since multigrid is the only way to get $O(n)$ solve
-time. Using the Timer class, we collect some statistics to compare
-setup times, solve times, and number of iterations. We also compute
+The purpose of this tutorial is to create an efficient linear solver for the
+Stokes equation and compare it to alternative approaches.  Here, we will use
+FGMRES with geometric multigrid as a preconditioner velocity block, and we
+will show in the results section that this is a fundamentally better approach
+than the linear solvers used in step-22 (including the scheme described in
+"Possible Extensions").  Fundamentally, this is because only with multigrid it
+is possible to get $O(n)$ solve time, where $n$ is the number of unknowns of
+the linear system. Using the Timer class, we collect some statistics to
+compare setup times, solve times, and number of iterations. We also compute
 errors to make sure that what we have implemented is correct.
 
 Let $u \in H_0^1 = \{ u \in H^1(\Omega), u|_{\partial \Omega} = 0 \}$
@@ -44,7 +46,8 @@ Our goal is to compare several solution approaches.  While step-22
 solves the linear system using a "Schur complement approach" in two
 separate steps, we instead attack the
 block system at once using FMGRES with an efficient
-preconditioner. The idea is as follows: if we find a block
+preconditioner, in the spirit of the approach outlined in the "Results"
+section of step-22. The idea is as follows: if we find a block
 preconditioner $P$ such that the matrix 
 
 @f{eqnarray*}
