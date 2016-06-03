@@ -413,7 +413,7 @@ namespace Step56
     // or just apply one preconditioner sweep
     if (do_solve_A == true)
       {
-        SolverControl solver_control(10000, utmp.l2_norm()*1e-2, true);
+        SolverControl solver_control(10000, utmp.l2_norm()*1e-4);
         SolverCG<>    cg (solver_control);
 
         dst.block(0) = 0.0;

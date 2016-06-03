@@ -67,107 +67,116 @@ The following table summarizes solver iterations, timings, and virtual
 memory (VM) peak usage:
 
 <table align="center" border="1">
-  <tr>
-    <th>&nbsp;</th>
-    <th>&nbsp;</th>
-    <th>&nbsp;</th>
-    <th colspan="3">UMFPACK</th>
-    <th colspan="6">ILU</th>
-    <th colspan="6">GMG</th>
-  </tr>
-  <tr>
-    <th>&nbsp;</th>
-    <th>&nbsp;</th>
-    <th>&nbsp;</th>
-    <th>&nbsp;</th>
-    <th colspan="2">Timings</th>
-    <th>&nbsp;</th>
-    <th colspan="2">Timings</th>
-    <th colspan="3">Iterations</th>
-    <th>&nbsp;</th>
-    <th colspan="2">Timings</th>
-    <th colspan="3">Iterations</th>
-  </tr>
-  <tr>
-    <th>&nbsp;</th>
-    <th>Set-up</th>
-    <th>Assemble</th>
-    <th>VM Peak</th>
-    <th>Setup</th>
-    <th>Solve</th>
-    <th>VM Peak</th>
-    <th>Setup</th>
-    <th>Solve</th>
-    <th>Outer</th>
-    <th>Inner (A)</th>
-    <th>Inner (S)</th>
-    <th>VM Peak</th>
-    <th>Setup</th>
-    <th>Solve</th>
-    <th>Outer</th>
-    <th>Inner (A)</th>
-    <th>Inner (S)</th>
-  </tr>
-  <tr>
-    <td align="left">3D, 3 global refinements</td>
-    <th>&nbsp;</th>
-    <th>&nbsp;</th>
-    <td align="center">5305908</td>
-    <td align="center">2.16s</td>
-    <td align="center">2.2s</td>
-    <td align="center">5013308</td>
-    <td align="center">0.37s</td>
-    <td align="center">0.305s</td>
-    <td align="center">27</td>
-    <td align="center">107</td>
-    <td align="center">28</td>
-    <td align="center">5036092</td>
-    <td align="center">0.37s</td>
-    <td align="center">1.04s</td>
-    <td align="center">23</td>
-    <td align="center">47</td>
-    <td align="center">24</td>
-  </tr>
-  <tr>
-    <td align="left">3D, 4 global refinements</td>
-    <th>&nbsp;</th>
-    <th>&nbsp;</th>
-    <td align="center">11674656</td>
-    <td align="center">231s</td>
-    <td align="center">225s</td>
-    <td align="center">5365676</td>
-    <td align="center">3.15s</td>
-    <td align="center">8.21s</td>
-    <td align="center">29</td>
-    <td align="center">186</td>
-    <td align="center">30</td>
-    <td align="center">5689952</td>
-    <td align="center">2.72s</td>
-    <td align="center">9.14s</td>
-    <td align="center">23</td>
-    <td align="center">48</td>
-    <td align="center">24</td>
-  </tr>
-  <tr>
-    <td align="left">3D, 5 global refinements</td>
-    <th>&nbsp;</th>
-    <th>&nbsp;</th>
-    <td align="center">-</td>
-    <td align="center">-</td>
-    <td align="center">-</td>
-    <td align="center">8636760</td>
-    <td align="center">29.4s</td>
-    <td align="center">152s</td>
-    <td align="center">32</td>
-    <td align="center">361</td>
-    <td align="center">34</td>
-    <td align="center">11025296</td>
-    <td align="center">21s</td>
-    <td align="center">78.1s</td>
-    <td align="center">22</td>
-    <td align="center">46</td>
-    <td align="center">23</td>
-  </tr>
+<tr>
+  <th></th>
+  <th colspan="3">General</th>
+  <th colspan="6">GMG</th>
+  <th colspan="6">ILU</th>
+  <th colspan="3">UMFPACK</th>
+</tr>
+
+<tr>
+  <th></th>
+  <th></th>
+  <th colspan="2">Timings</th>
+  <th colspan="2">Timings</th>
+  <th colspan="3">Iterations</th>
+  <th></th>
+  <th colspan="2">Timings</th>
+  <th colspan="3">Iterations</th>
+  <th></th>
+  <th colspan="2">Timings</th>
+  <th></th>
+</tr>
+
+<tr>
+  <th>Cycle</th>
+  <th>DoFs</th>
+  <th>Setup</th>
+  <th>Assembly</th>
+  <th>Setup</th>
+  <th>Solve</th>
+  <th>Outer</th>
+  <th>Inner (A)</th>
+  <th>Inner (S)</th>
+  <th>VM Peak</th>
+  <th>Setup</th>
+  <th>Solve</th>
+  <th>Outer</th>
+  <th>Inner (A)</th>
+  <th>Inner (S)</th>
+  <th>VM Peak</th>
+  <th>Setup</th>
+  <th>Solve</th>
+  <th>VM Peak</th>
+</tr>
+
+<tr>
+  <td>0</td>
+  <td>15468</td>
+  <td>0.1s</td>
+  <td>0.3s</td>
+  <td>0.3s</td>
+  <td>1.3s</td>
+  <td>21</td>
+  <td>67</td>
+  <td>22</td>
+  <td>4805</td>
+  <td>0.3s</td>
+  <td>0.6s</td>
+  <td>21</td>
+  <td>180</td>
+  <td>22</td>
+  <td>4783</td>
+  <td>2.65s</td>
+  <td>2.8s</td>
+  <td>5054</td>
+</tr>
+
+<tr>
+  <td>1</td>
+  <td>112724</td>
+  <td>1.0s</td>
+  <td>2.4s</td>
+  <td>2.6s</td>
+  <td>14s</td>
+  <td>21</td>
+  <td>67</td>
+  <td>22</td>
+  <td>5441</td>
+  <td>2.8s</td>
+  <td>15.8s</td>
+  <td>21</td>
+  <td>320</td>
+  <td>22</td>
+  <td>5125</td>
+  <td>236s</td>
+  <td>237s</td>
+  <td>11288</td>
+</tr>
+
+<tr>
+  <td>2</td>
+  <td>859812</td>
+  <td>9.0s</td>
+  <td>20s</td>
+  <td>20s</td>
+  <td>101s</td>
+  <td>20</td>
+  <td>65</td>
+  <td>21</td>
+  <td>10641</td>
+  <td>27s</td>
+  <td>268s</td>
+  <td>21</td>
+  <td>592</td>
+  <td>22</td>
+  <td>8307</td>
+  <td>-</td>
+  <td>-</td>
+  <td>-</td>
+</tr>
+
 </table>
 
 As can be seen from the table,
