@@ -23,6 +23,7 @@ SET(_src
   wrappers.cc
   export_point.cc
   export_triangulation.cc
+  point_wrapper.cc
   )
 
 FILE(GLOB _header

@@ -13,18 +13,27 @@
 //
 // ---------------------------------------------------------------------
 
+#ifndef dealii__point_wrapper_h
+#define dealii__point_wrapper_h
 #include <boost/python.hpp>
-#include <deal.II/python/point_wrapper.h>
-#include <deal.II/base/point.h>
-#include <deal.II/base/exceptions.h>
 
 namespace PyDealII
 {
-  void export_point()
+  class PointWrapper
   {
-    boost::python::class_<PointWrapper> ("Point",boost::python::init<boost::python::list>())
-    .add_property("x", &PointWrapper::get_x, &PointWrapper::set_x, "Get the x component of the point.")
-    .add_property("y", &PointWrapper::get_y, &PointWrapper::set_y, "Get the y component of the point.")
-    .add_property("z", &PointWrapper::get_z, &PointWrapper::set_z, "Get the z component of the point.");
-  }
+  public:
+    PointWrapper(boost::python::list list);
+    double get_x();
+    void set_x(double x);
+    double get_y();
+    void set_y(double y);
+    double get_z();
+    void set_z(double z);
+
+  private:
+    int dim;
+    std::shared_ptr<void> point;
+  };
 }
+
+#endif
