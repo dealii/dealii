@@ -2,10 +2,10 @@
 
 <h3> Errors </h3>
 
-We first run the code and confirm that the manufactured solution converges
+We first run the code and confirm that the finite element solution converges
 with the correct rates as predicted by the error analysis of mixed finite
 element problems. Given sufficiently smooth exact solutions $u$ and $p$,
-the errors of the Taylor-Hood element Q_k-Q_{k-1} should be
+the errors of the Taylor-Hood element $Q_k \times Q_{k-1}$ should be
 
 @f[
 \| u -u_h \|_0 + h ( \| u- u_h\|_1 + \|p - p_h \|_0)
@@ -13,17 +13,19 @@ the errors of the Taylor-Hood element Q_k-Q_{k-1} should be
 @f]
 
 see for example Ern/Guermond "Theory and Practice of Finite Elements", Section
-4.2.5 p195. This is indeed what we observe:
+4.2.5 p195. This is indeed what we observe, using the $Q_2 \times Q_1$
+element as an example (this is what is done in the code, but is easily
+changed in <code>main()</code>):
 
 <table align="center" border="1">
   <tr>
     <th>&nbsp;</th>
     <th>L2 Velocity</th>
-    <th>Rate</th>
+    <th>Reduction</th>
     <th>L2 Pressure</th>
-    <th>Rate</th>
+    <th>Reduction</th>
     <th>H1 Velocity</th>
-    <th>Rate</th>
+    <th>Reduction</th>
   </tr>
   <tr>
     <td>3D, 3 global refinements</td>
@@ -57,8 +59,12 @@ see for example Ern/Guermond "Theory and Practice of Finite Elements", Section
 
 <h3> Timing Results </h3>
 
-Here is a table summarizing the solver iterations and timings done for the
-various solver combinations implemented in the code:
+Let us compare the direct solver approach using UMFPACK to the two
+methods in which we choose $\widetilde {A^{-1}}=A^{-1}$ and
+$\widetilde{S^{-1}}=S^{-1}$ by solving linear systems with $A,S$ using
+CG. The preconditioner for CG is then either ILU or GMG.
+The following table summarizes solver iterations, timings, and virtual
+memory (VM) peak usage:
 
 <table align="center" border="1">
   <tr>
@@ -172,9 +178,9 @@ timings do not scale favorably with problem size.
 2. Because we are using inner solvers for $A$ and $S$, ILU and GMG require the
 same number of outer iterations.
 
-3. The number of iterations for $A$ increase for ILU with refinement leading
+3. The number of (inner) iterations for $A$ increases for ILU with refinement, leading
 to worse than linear scaling in solve time. In contrast, the number of inner
-iterations for $A$ stay constant with GMG leading to nearly perfect scaling in
+iterations for $A$ stays constant with GMG leading to nearly perfect scaling in
 solve time.
 
 4. GMG needs slightly more memory than ILU to store the level and interface
@@ -189,11 +195,17 @@ correct convergence rates.
 
 <h4> Compare with cheap preconditioner </h4>
 
-Currently, the boolean use_expensive in solve () is set to true. When set to false,
-$\widetilde{A^{-1}}$ will be a single preconditioner application instead of an inner
-CG with the GMG or ILU preconditioner, respectively.
+The introduction also outlined another option to precondition the
+overall system, namely one in which we do not choose $\widetilde
+{A^{-1}}=A^{-1}$ as in the table above, but in which
+$\widetilde{A^{-1}}$ is only a single preconditioner application with
+GMG or ILU, respectively.
 
-Notice that the number of FGMRES iterations stays constant under refinement if
-you use GMG (so $A^{-1}$ is approximated by a V-cycle). This means that the
+This is in fact implemented in the code: Currently, the boolean
+<code>use_expensive</code> in <code>solve()</code> is set to @p true. The
+option mentioned above is obtained by setting it to @p false.
+
+What you will find is that the number of FGMRES iterations stays
+constant under refinement if you use GMG this way. This means that the
 Multigrid is optimal and independent of $h$.
 
