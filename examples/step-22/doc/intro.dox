@@ -564,8 +564,8 @@ matrix. It is therefore an operation that can efficiently also be computed in
 represent an exact inverse of the matrix $A$. Consequently, preconditioning
 with the ILU will still require more than one iteration, unlike
 preconditioning with the sparse direct solver. The inner solver will therefore
-take more time when multiplying with the Schur complement, a trade-off
-unavoidable.
+take more time when multiplying with the Schur complement: an unavoidable
+trade-off.
 </ol>
 
 In the program below, we will make use of the fact that the SparseILU and
