@@ -590,7 +590,7 @@ struct InnerPreconditioner<3>
 };
 @endcode
 
-From hereon, we can refer to the type <code>typename
+From here on, we can refer to the type <code>typename
 InnerPreconditioner@<dim@>::%type</code> and automatically get the correct
 preconditioner class. Because of the similarity of the interfaces of the two
 classes, we will be able to use them interchangeably using the same syntax in
