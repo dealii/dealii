@@ -238,16 +238,16 @@ possibilities for imposing boundary conditions:
       \\
       &=&
       (\textbf{n} \otimes \textbf{v},
-      p \textbf{1} - 2\; \varepsilon(\textbf{u}))_{\Gamma_N}.
+      p \textbf{I} - 2\; \varepsilon(\textbf{u}))_{\Gamma_N}.
       \\
       &=&
       (\textbf{v},
-       \textbf{n}\cdot [p \textbf{1} - 2\; \varepsilon(\textbf{u})])_{\Gamma_N}.
+       \textbf{n}\cdot [p \textbf{I} - 2\; \varepsilon(\textbf{u})])_{\Gamma_N}.
     @f}
     In other words, on the Neumann part of the boundary we can
     prescribe values for the total stress:
     @f{eqnarray*}
-      \textbf{n}\cdot [p \textbf{1} - 2\; \varepsilon(\textbf{u})]
+      \textbf{n}\cdot [p \textbf{I} - 2\; \varepsilon(\textbf{u})]
       =
       \textbf g_N \qquad\qquad \textrm{on}\ \Gamma_N.
     @f}
@@ -268,7 +268,7 @@ possibilities for imposing boundary conditions:
 <li>Robin-type boundary conditions: Robin boundary conditions are a mixture of
     Dirichlet and Neumann boundary conditions. They would read
     @f{eqnarray*}
-      \textbf{n}\cdot [p \textbf{1} - 2\; \varepsilon(\textbf{u})]
+      \textbf{n}\cdot [p \textbf{I} - 2\; \varepsilon(\textbf{u})]
       =
       \textbf S \textbf u \qquad\qquad \textrm{on}\ \Gamma_R,
     @f}
@@ -296,7 +296,7 @@ possibilities for imposing boundary conditions:
     @f{eqnarray*}
       \textbf u_{\textbf t} &=& 0,
       \\
-      \textbf n \cdot \left(\textbf{n}\cdot [p \textbf{1} - 2\;
+      \textbf n \cdot \left(\textbf{n}\cdot [p \textbf{I} - 2\;
       \varepsilon(\textbf{u})] \right)
       &=&
       0.
@@ -317,7 +317,7 @@ possibilities for imposing boundary conditions:
       \textbf{n}\cdot\textbf u &=& 0,
       \\
       (\textbf 1-\textbf n\otimes\textbf n)
-      \left(\textbf{n}\cdot [p \textbf{1} - 2\;
+      \left(\textbf{n}\cdot [p \textbf{I} - 2\;
       \varepsilon(\textbf{u})] \right)
       &=&
       0,
@@ -627,7 +627,7 @@ domain $\Omega=[-2,2]\times[0,1]\times[-1,0]$:
   \end{array}\right)
   \qquad\qquad \textrm{at}\ z=0, x=0,
 @f}
-and using natural boundary conditions $\textbf{n}\cdot [p \textbf{1} - 2
+and using natural boundary conditions $\textbf{n}\cdot [p \textbf{I} - 2
 \varepsilon(\textbf{u})] = 0$ everywhere else. In other words, at the
 left part of the top surface we prescribe that the fluid moves with the
 continental plate to the left at speed $-1$, that it moves to the right on the
