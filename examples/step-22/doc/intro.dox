@@ -818,8 +818,8 @@ shows how the profile looked at an early stage of optimizing this program:
 
 <img src="https://www.dealii.org/images/steps/developer/step-22.profile-3.original.png" alt="">
 
-As mentioned above, the runtime of this version was about four times as long
-as for the first profile, with the SparseILU decomposition taking up about
-30% of the instruction count, and operations on the ill-suited
-CompressedSparsityPattern about 10%. Both these bottlenecks have since been
+As mentioned above, the runtime of this version was about four times as long as
+for the first profile, with the SparseILU decomposition taking up about 30% of
+the instruction count, and operations an early, inefficient version of
+DynamicSparsityPattern about 10%. Both these bottlenecks have since been
 completely removed.
