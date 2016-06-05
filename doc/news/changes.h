@@ -269,6 +269,15 @@ inconvenience this causes.
 
 <ol>
 
+ <li> Fixed: The Tensor class was not explicitly instantiated. This did
+ not matter in almost all contexts because its members are all defined
+ as @p inline in the header file. The only cases where it matters if one
+ (or the compiler) were to take the address of one of the static member
+ variables.
+ <br>
+ (Wolfgang Bangerth, 2016/06/03)
+ </li>
+
  <li> New: Return value std::vector<unsigned int> vertex_mapping for the
  DoFTools::make_vertex_patches() function, including the optional inversion
  of the vertex mapping.

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II authors
+## Copyright (C) 2012 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -66,6 +66,7 @@ SET(_src
   tensor_product_polynomials_bubbles.cc
   tensor_product_polynomials_const.cc
   thread_management.cc
+  tensor.cc
   timer.cc
   time_stepping.cc
   utilities.cc
@@ -77,6 +78,7 @@ SET(_inst
   function_time.inst.in
   mpi.inst.in
   polynomials_rannacher_turek.inst.in
+  tensor.inst.in
   tensor_function.inst.in
   time_stepping.inst.in
   )
