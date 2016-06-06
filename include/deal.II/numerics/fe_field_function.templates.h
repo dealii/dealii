@@ -74,7 +74,7 @@ namespace Functions
       {
         const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DoFHandlerType>::type, Point<dim> > my_pair
           = GridTools::find_active_cell_around_point (mapping, *dh, p);
-        AssertThrow (my_pair.first->is_locally_owned(),
+        AssertThrow (!my_pair.first->is_artificial(),
                      VectorTools::ExcPointNotAvailableHere());
 
         cell = my_pair.first;
@@ -127,7 +127,7 @@ namespace Functions
       {
         const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DoFHandlerType>::type, Point<dim> > my_pair
           = GridTools::find_active_cell_around_point (mapping, *dh, p);
-        AssertThrow (my_pair.first->is_locally_owned(),
+        AssertThrow (!my_pair.first->is_artificial(),
                      VectorTools::ExcPointNotAvailableHere());
 
         cell = my_pair.first;
@@ -195,7 +195,7 @@ namespace Functions
       {
         const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DoFHandlerType>::type, Point<dim> > my_pair
           = GridTools::find_active_cell_around_point (mapping, *dh, p);
-        AssertThrow (my_pair.first->is_locally_owned(),
+        AssertThrow (!my_pair.first->is_artificial(),
                      VectorTools::ExcPointNotAvailableHere());
 
         cell = my_pair.first;
@@ -470,7 +470,7 @@ namespace Functions
           const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DoFHandlerType>::type, Point<dim> >
           my_pair  = GridTools::find_active_cell_around_point
                      (mapping, *dh, points[0]);
-          AssertThrow (my_pair.first->is_locally_owned(),
+          AssertThrow (!my_pair.first->is_artificial(),
                        VectorTools::ExcPointNotAvailableHere());
 
           cell = my_pair.first;
@@ -534,7 +534,7 @@ namespace Functions
           {
             const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DoFHandlerType>::type, Point<dim> > my_pair
               = GridTools::find_active_cell_around_point (mapping, *dh, points[first_outside]);
-            AssertThrow (my_pair.first->is_locally_owned(),
+            AssertThrow (!my_pair.first->is_artificial(),
                          VectorTools::ExcPointNotAvailableHere());
 
             cells.push_back(my_pair.first);
