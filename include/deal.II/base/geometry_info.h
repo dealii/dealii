@@ -1808,11 +1808,11 @@ struct GeometryInfo
 
   /**
    * Return true if the given point is inside the unit cell of the present
-   * space dimension. This * function accepts an additional * parameter which
-   * specifies how * much the point position may * actually be outside the
-   * true * unit cell. This is useful because in practice we may often not be
-   * able to compute the coordinates of a point in reference coordinates
-   * exactly, but only up to numerical roundoff.
+   * space dimension. This function accepts an additional parameter which
+   * specifies how much the point position may actually be outside the true
+   * unit cell. This is useful because in practice we may often not be able to
+   * compute the coordinates of a point in reference coordinates exactly, but
+   * only up to numerical roundoff.
    *
    * The tolerance parameter may be less than zero, indicating that the point
    * should be safely inside the cell.
