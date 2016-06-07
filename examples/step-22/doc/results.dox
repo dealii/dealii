@@ -5,8 +5,9 @@
 
 <h4>2D calculations</h4>
 
-Running the program with the space dimension set to 2 in <code>main()</code>
-yields the following output (in "release mode", @dealiiVideoLectureSeeAlso{18}):
+Running the program with the space dimension set to 2 in the <code>main</code>
+function yields the following output (in "release mode",
+@dealiiVideoLectureSeeAlso{18}):
 @code
 examples/\step-22> make run
 Refinement cycle 0

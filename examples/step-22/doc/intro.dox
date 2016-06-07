@@ -238,16 +238,16 @@ possibilities for imposing boundary conditions:
       \\
       &=&
       (\textbf{n} \otimes \textbf{v},
-      p \textbf{1} - 2\; \varepsilon(\textbf{u}))_{\Gamma_N}.
+      p \textbf{I} - 2\; \varepsilon(\textbf{u}))_{\Gamma_N}.
       \\
       &=&
       (\textbf{v},
-       \textbf{n}\cdot [p \textbf{1} - 2\; \varepsilon(\textbf{u})])_{\Gamma_N}.
+       \textbf{n}\cdot [p \textbf{I} - 2\; \varepsilon(\textbf{u})])_{\Gamma_N}.
     @f}
     In other words, on the Neumann part of the boundary we can
     prescribe values for the total stress:
     @f{eqnarray*}
-      \textbf{n}\cdot [p \textbf{1} - 2\; \varepsilon(\textbf{u})]
+      \textbf{n}\cdot [p \textbf{I} - 2\; \varepsilon(\textbf{u})]
       =
       \textbf g_N \qquad\qquad \textrm{on}\ \Gamma_N.
     @f}
@@ -268,7 +268,7 @@ possibilities for imposing boundary conditions:
 <li>Robin-type boundary conditions: Robin boundary conditions are a mixture of
     Dirichlet and Neumann boundary conditions. They would read
     @f{eqnarray*}
-      \textbf{n}\cdot [p \textbf{1} - 2\; \varepsilon(\textbf{u})]
+      \textbf{n}\cdot [p \textbf{I} - 2\; \varepsilon(\textbf{u})]
       =
       \textbf S \textbf u \qquad\qquad \textrm{on}\ \Gamma_R,
     @f}
@@ -296,7 +296,7 @@ possibilities for imposing boundary conditions:
     @f{eqnarray*}
       \textbf u_{\textbf t} &=& 0,
       \\
-      \textbf n \cdot \left(\textbf{n}\cdot [p \textbf{1} - 2\;
+      \textbf n \cdot \left(\textbf{n}\cdot [p \textbf{I} - 2\;
       \varepsilon(\textbf{u})] \right)
       &=&
       0.
@@ -317,7 +317,7 @@ possibilities for imposing boundary conditions:
       \textbf{n}\cdot\textbf u &=& 0,
       \\
       (\textbf 1-\textbf n\otimes\textbf n)
-      \left(\textbf{n}\cdot [p \textbf{1} - 2\;
+      \left(\textbf{n}\cdot [p \textbf{I} - 2\;
       \varepsilon(\textbf{u})] \right)
       &=&
       0,
@@ -564,8 +564,8 @@ matrix. It is therefore an operation that can efficiently also be computed in
 represent an exact inverse of the matrix $A$. Consequently, preconditioning
 with the ILU will still require more than one iteration, unlike
 preconditioning with the sparse direct solver. The inner solver will therefore
-take more time when multiplying with the Schur complement, a trade-off
-unavoidable.
+take more time when multiplying with the Schur complement: an unavoidable
+trade-off.
 </ol>
 
 In the program below, we will make use of the fact that the SparseILU and
@@ -590,7 +590,7 @@ struct InnerPreconditioner<3>
 };
 @endcode
 
-From hereon, we can refer to the type <code>typename
+From here on, we can refer to the type <code>typename
 InnerPreconditioner@<dim@>::%type</code> and automatically get the correct
 preconditioner class. Because of the similarity of the interfaces of the two
 classes, we will be able to use them interchangeably using the same syntax in
@@ -627,7 +627,7 @@ domain $\Omega=[-2,2]\times[0,1]\times[-1,0]$:
   \end{array}\right)
   \qquad\qquad \textrm{at}\ z=0, x=0,
 @f}
-and using natural boundary conditions $\textbf{n}\cdot [p \textbf{1} - 2
+and using natural boundary conditions $\textbf{n}\cdot [p \textbf{I} - 2
 \varepsilon(\textbf{u})] = 0$ everywhere else. In other words, at the
 left part of the top surface we prescribe that the fluid moves with the
 continental plate to the left at speed $-1$, that it moves to the right on the
@@ -818,8 +818,8 @@ shows how the profile looked at an early stage of optimizing this program:
 
 <img src="https://www.dealii.org/images/steps/developer/step-22.profile-3.original.png" alt="">
 
-As mentioned above, the runtime of this version was about four times as long
-as for the first profile, with the SparseILU decomposition taking up about
-30% of the instruction count, and operations on the ill-suited
-CompressedSparsityPattern about 10%. Both these bottlenecks have since been
+As mentioned above, the runtime of this version was about four times as long as
+for the first profile, with the SparseILU decomposition taking up about 30% of
+the instruction count, and operations an early, inefficient version of
+DynamicSparsityPattern about 10%. Both these bottlenecks have since been
 completely removed.
