@@ -269,6 +269,13 @@ inconvenience this causes.
 
 <ol>
 
+ <li> Fixed: FEFieldFunction now works correctly in distributed computations,
+ where before exceptions of type ExcPointNotAvailableHere could occur for
+ evaluation points on or close to a boundary to a ghost cell.
+ <br>
+ (Timo Heister, 2016/06/06)
+ </li>
+
  <li> Fixed: The Tensor class was not explicitly instantiated. This did
  not matter in almost all contexts because its members are all defined
  as @p inline in the header file. The only cases where it matters if one
