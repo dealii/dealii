@@ -9024,13 +9024,13 @@ Triangulation<dim, spacedim>::~Triangulation ()
 template <int dim, int spacedim>
 void Triangulation<dim, spacedim>::clear ()
 {
-  // clear all content of the triangulation...
+  // notify listeners that the triangulation is going down...
+  signals.clear();
+
+  // ...and then actually clear all content of it
   clear_despite_subscriptions();
   periodic_face_pairs_level_0.clear();
   periodic_face_map.clear();
-
-  // ...and then notify listeners to it
-  signals.clear();
 }
 
 
