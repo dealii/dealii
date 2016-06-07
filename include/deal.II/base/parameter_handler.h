@@ -2331,7 +2331,7 @@ private:
   {
   public:
     /**
-     * Declare what a multiple entry is: a variant * entry (in curly braces
+     * Declare what a multiple entry is: a variant entry (in curly braces
      * <tt>{</tt>, <tt>}</tt>) or an array (in double curly braces
      * <tt>{{</tt>, <tt>}}</tt>).
      */
