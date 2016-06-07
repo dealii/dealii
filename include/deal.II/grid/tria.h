@@ -2023,6 +2023,12 @@ public:
      * is called. This signal is also triggered when loading a triangulation
      * from an archive via Triangulation::load() as the previous content of
      * the triangulation is first destroyed.
+     *
+     * The signal is triggered before the data structures of the
+     * triangulation are destroyed. In other words, the functions
+     * attached to this signal get a last look at the triangulation,
+     * for example to save information stored as part of the
+     * triangulation.
      */
     boost::signals2::signal<void ()> clear;
 
