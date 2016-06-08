@@ -5,7 +5,7 @@ DEAL::tria_1 Create: 1
 DEAL::tria_1 Pre-refinement: 1
 DEAL::tria_1 Any change: 2
 DEAL::tria_1 Post-refinement: 2
-DEAL::tria_1 Any change: 0
+DEAL::tria_1 Any change: 2
 DEAL::tria_2 Copy: 1 1
 DEAL::tria_1 Any change: 1
 DEAL::tria_1 Create: 1
@@ -17,7 +17,7 @@ DEAL::tria_1 Create: 1
 DEAL::tria_1 Pre-refinement: 1
 DEAL::tria_1 Any change: 4
 DEAL::tria_1 Post-refinement: 4
-DEAL::tria_1 Any change: 0
+DEAL::tria_1 Any change: 4
 DEAL::tria_2 Copy: 1 1
 DEAL::tria_1 Any change: 1
 DEAL::tria_1 Create: 1
@@ -29,7 +29,7 @@ DEAL::tria_1 Create: 1
 DEAL::tria_1 Pre-refinement: 1
 DEAL::tria_1 Any change: 8
 DEAL::tria_1 Post-refinement: 8
-DEAL::tria_1 Any change: 0
+DEAL::tria_1 Any change: 8
 DEAL::tria_2 Copy: 1 1
 DEAL::tria_1 Any change: 1
 DEAL::tria_1 Create: 1

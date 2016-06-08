@@ -38,7 +38,16 @@ inconvenience this causes.
 </p>
 
 <ol>
-  <li> Changed: deal.II used to create template instantiations for scalar
+
+ <li> Changed: The Triangulation::Signals::clear signal is now triggered
+ <i>before</i>, not <i>after</i> the internal data structures of the
+ triangulation are destroyed. This allows functions attached to the signal to
+ save information associated with the triangulation.
+ <br>
+ (Wolfgang Bangerth, 2016/06/07)
+ </li>
+
+ <li> Changed: deal.II used to create template instantiations for scalar
   types <tt>double</tt>, <tt>float</tt>, and <tt>long double</tt>. Since
   <tt>long double</tt> is rarely used and the additional precision does
   usually not pay off because most of the other arithmetics in deal.II are
