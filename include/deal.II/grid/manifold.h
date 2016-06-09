@@ -273,6 +273,15 @@ public:
   /// @{
 
   /**
+   * TODO:
+   */
+  virtual
+  Point<spacedim>
+  get_new_point(  const Point<spacedim> &p1,
+                  const Point<spacedim> &p2,
+                  const double w) const;
+
+  /**
    * Return the point which shall become the new vertex surrounded by the
    * given points which make up the quadrature. We use a quadrature object,
    * which should be filled with the surrounding points together with

@@ -1,15 +1,20 @@
-//----------------------------  spherical_manifold_01.cc  ---------------------------
-//    Copyright (C) 2011 - 2015 by the mathLab team.
+// ---------------------------------------------------------------------
 //
-//    This file is subject to LGPL and may not be  distributed
-//    without copyright and license information. Please refer
-//    to the file deal.II/doc/license.html for the  text  and
-//    further information on this license.
+// Copyright (C) 2016 by the deal.II authors
 //
-//----------------------------  spherical_manifold_04.cc  ---------------------------
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
 
 
-// Test that the flat manifold does what it should on a sphere surface.
+// Test that the flat manifold does what it should on a sphere.
 
 #include "../tests.h"
 
@@ -25,18 +30,15 @@
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/grid_tools.h>
 
 // Helper function
 template <int dim, int spacedim>
 void test(unsigned int ref=1)
 {
-  SphericalManifold<dim,spacedim> manifold;
+  PolarManifold<dim,spacedim> manifold;
 
-  Triangulation<spacedim, spacedim> volume_tria;
-  Triangulation<dim, spacedim> tria;
-  GridGenerator::hyper_ball (volume_tria);
-  GridGenerator::extract_boundary_mesh(volume_tria, tria);
+  Triangulation<dim,spacedim> tria;
+  GridGenerator::hyper_ball (tria);
 
   typename Triangulation<dim,spacedim>::active_cell_iterator cell;
 
@@ -62,8 +64,8 @@ int main ()
   deallog.attach(logfile);
   deallog.threshold_double(1.e-10);
 
-  test<1,2>();
-  test<2,3>();
+  test<2,2>();
+  test<3,3>();
 
   return 0;
 }
