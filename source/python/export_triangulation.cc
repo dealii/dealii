@@ -13,172 +13,79 @@
 //
 // ---------------------------------------------------------------------
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
 #include <boost/python.hpp>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <fstream>
+#include <deal.II/python/triangulation_wrapper.h>
 
 namespace PyDealII
 {
 
-  template <int dim>
-  unsigned int n_active_cells(const dealii::Triangulation<dim> &triangulation)
-  {
-    return triangulation.n_active_cells();
-  }
-
-
-
-  template <int dim>
-  void generate_hyper_cube(dealii::Triangulation<dim> &triangulation,
-                           const double                left = 0.,
-                           const double                right = 0.,
-                           const bool                  colorize = false)
-  {
-    dealii::GridGenerator::hyper_cube(triangulation, left, right, colorize);
-  }
-
-
-
-  void generate_simplex(dealii::Triangulation<2> &triangulation,
-                        dealii::Point<2>          vertex_1,
-                        dealii::Point<2>          vertex_2,
-                        dealii::Point<2>          vertex_3)
-  {
-    std::vector<dealii::Point<2>> vertices(3);
-    vertices[0] = vertex_1;
-    vertices[1] = vertex_2;
-    vertices[2] = vertex_3;
-
-    dealii::GridGenerator::simplex(triangulation, vertices);
-  }
-
-
-
-  template <int dim>
-  void generate_subdivided_hyper_cube(dealii::Triangulation<dim> &triangulation,
-                                      const unsigned int          repetitions,
-                                      const double                left = 0.,
-                                      const double                right = 1.)
-  {
-    dealii::GridGenerator::subdivided_hyper_cube(triangulation, repetitions,
-                                                 left, right);
-  }
-
-
-
-  template <int dim>
-  void generate_hyper_rectangle(dealii::Triangulation<dim> &triangulation,
-                                const dealii::Point<dim>   &p1,
-                                const dealii::Point<dim>   &p2,
-                                const bool                  colorize = false)
-  {
-    dealii::GridGenerator::hyper_rectangle(triangulation, p1, p2, colorize);
-  }
-
-
-
-  void generate_subdivided_hyper_rectangle(dealii::Triangulation<2> &triangulation,
-                                           const unsigned int        repetition_x,
-                                           const unsigned int        repetition_y,
-                                           const dealii::Point<2>   &p1,
-                                           const dealii::Point<2>   &p2,
-                                           const bool                colorize = false)
-  {
-    std::vector<unsigned int> repetitions(2);
-    repetitions[0] = repetition_x;
-    repetitions[1] = repetition_y;
-    dealii::GridGenerator::subdivided_hyper_rectangle(triangulation, repetitions,
-                                                      p1, p2, colorize);
-  }
-
-
-
-  template <int dim>
-  void generate_hyper_ball(dealii::Triangulation<dim> &triangulation,
-                           const dealii::Point<dim>   &center = dealii::Point<dim>(),
-                           const double                radius = 1.)
-  {
-    dealii::GridGenerator::hyper_ball(triangulation, center, radius);
-  }
-
-
-
-  template <int dim>
-  void save(const dealii::Triangulation<dim> &triangulation,
-            const std::string                 filename)
-  {
-    std::ofstream ofs(filename);
-    boost::archive::text_oarchive oa(ofs);
-    oa << triangulation;
-  }
-
-
-
-  template <int dim>
-  void load(dealii::Triangulation<dim> &triangulation,
-            const std::string           filename)
-  {
-    std::ifstream ifs(filename);
-    boost::archive::text_iarchive ia(ifs);
-    ia >> triangulation;
-  }
-
-
-
 // Macro to enable default arguments
-  BOOST_PYTHON_FUNCTION_OVERLOADS(generate_hyper_cube_overloads, generate_hyper_cube, 1, 4)
-  BOOST_PYTHON_FUNCTION_OVERLOADS(generate_subdivided_hyper_cube_overloads,
-                                  generate_subdivided_hyper_cube, 2, 4)
-  BOOST_PYTHON_FUNCTION_OVERLOADS(generate_hyper_rectangle_overloads,
-                                  generate_hyper_rectangle, 3, 4)
-  BOOST_PYTHON_FUNCTION_OVERLOADS(generate_subdivided_hyper_rectangle_overloads,
-                                  generate_subdivided_hyper_rectangle, 5, 6)
-  BOOST_PYTHON_FUNCTION_OVERLOADS(generate_hyper_ball_overloads, generate_hyper_ball, 1, 3)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_hyper_cube_overloads, generate_hyper_cube, 0, 3)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_subdivided_hyper_cube_overloads,
+                                         generate_subdivided_hyper_cube, 1, 3)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_hyper_rectangle_overloads,
+                                         generate_hyper_rectangle, 2, 3)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_subdivided_hyper_rectangle_overloads,
+                                         generate_subdivided_hyper_rectangle, 3, 4)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_hyper_ball_overloads, generate_hyper_ball, 1, 2)
 
 
   void export_triangulation()
   {
-    boost::python::class_<dealii::Triangulation<2>> ("Triangulation")
-                                                 .def("n_active_cells", n_active_cells<2>,
-                                                      "Return the number of active cells",
-                                                      boost::python::args("self"))
-                                                 .def("generate_hyper_cube", generate_hyper_cube<2>,
-                                                      generate_hyper_cube_overloads(
-                                                        boost::python::args("self", "left", "right", "colorize"),
-                                                        "Generate a hyper_cube."))
-                                                 .def("generate_simplex", generate_simplex,
-                                                      "Generate a simplex.",
-                                                      boost::python::args("self", "vertex_1", "vertex_2", "vertex_3"))
-                                                 .def("generate_subdivided_hyper_cube", generate_subdivided_hyper_cube<2>,
-                                                      generate_subdivided_hyper_cube_overloads(
-                                                        boost::python::args("self", "repetitions", "left", "right"),
-                                                        "Generate a subdivided hyper_cube."))
-                                                 .def("generate_hyper_rectangle", generate_hyper_rectangle<2>,
-                                                      generate_hyper_rectangle_overloads(
-                                                        boost::python::args("self", "p1", "p2", "colorize"),
-                                                        "Generate a hyper_rectangle."))
-                                                 .def("generate_subdivided_hyper_rectangle",
-                                                      generate_subdivided_hyper_rectangle,
-                                                      generate_subdivided_hyper_rectangle_overloads(
-                                                        boost::python::args("self", "repetition_x",
-                                                            "repetition_y","p1", "p2",
-                                                            "colorize"),
-                                                        "Generate a subdivided hyper_rectangle."))
-                                                 .def("generate_hyper_ball",
-                                                      generate_hyper_ball<2>,
-                                                      generate_hyper_ball_overloads(
-                                                        boost::python::args("self", "center", "radius"),
-                                                        "Generate a hyper_ball."))
-                                                 .def("refine_global", &dealii::Triangulation<2>::refine_global,
-                                                      "Refine the mesh uniformly.",
-                                                      boost::python::args("self", "times"))
-                                                 .def("save", save<2>, "Serialize and save the triangulation.",
-                                                      boost::python::args("self", "filename"))
-                                                 .def("load", load<2>, "Load and deserialize a triangulation.",
-                                                      boost::python::args("self", "filename"));
+    boost::python::class_<TriangulationWrapper>("Triangulation", boost::python::init<const std::string &>())
+    .def("n_active_cells",
+         &TriangulationWrapper::n_active_cells,
+         "Return the number of active cells",
+         boost::python::args("self"))
+    .def("generate_hyper_cube",
+         &TriangulationWrapper::generate_hyper_cube,
+         generate_hyper_cube_overloads(
+           boost::python::args("self", "left", "right", "colorize"),
+           "Generate a hyper_cube (square in 2D and cube in 3D) with exactly one cell."))
+    .def("generate_simplex",
+         &TriangulationWrapper::generate_simplex,
+         "Generate a simplex with (dim+1) vertices and mesh cells.",
+         boost::python::args("self", "vertices"))
+    .def("generate_subdivided_hyper_cube",
+         &TriangulationWrapper::generate_subdivided_hyper_cube,
+         generate_subdivided_hyper_cube_overloads(
+           boost::python::args("self", "repetitions", "left", "right"),
+           "Same as hyper_cube but not only one cells is created but each coordinate direction is subdivdided in repetitions cells."))
+    .def("generate_hyper_rectangle",
+         &TriangulationWrapper::generate_hyper_rectangle,
+         generate_hyper_rectangle_overloads(
+           boost::python::args("self", "p1", "p2", "colorize"),
+           "Generate a coordinate-parallel brick from the two diagonally opposite corners points p1 and p2."))
+    .def("generate_subdivided_hyper_rectangle",
+         &TriangulationWrapper::generate_subdivided_hyper_rectangle,
+         generate_subdivided_hyper_rectangle_overloads(
+           boost::python::args("self", "repetitions",
+                               "p1", "p2", "colorize"),
+           "Generate a coordinate-parallel brick from the two diagonally opposite corners point @p1 and @p2. In direction i, repetitions[i] cells are created."))
+    .def("generate_hyper_ball",
+         &TriangulationWrapper::generate_hyper_ball,
+         generate_hyper_ball_overloads(
+           boost::python::args("self", "center", "radius"),
+           "Generate a hyperball, i.e. a circle or a ball around @p center with given @p radius."))
+    .def("shift",
+         &TriangulationWrapper::shift,
+         "Shift every vertex of the Triangulation by the given shift vector.",
+         boost::python::args("self", "shift"))
+    .def("merge_triangulations",
+         &TriangulationWrapper::merge_triangulations,
+         "Given two triangulations, create the triangulation that contains the cells of both triangulations.",
+         boost::python::args("self", "triangulation_1", "triangulation_2"))
+    .def("refine_global",
+         &TriangulationWrapper::refine_global,
+         "Refine all the cells times times.",
+         boost::python::args("self", "times"))
+    .def("save",
+         &TriangulationWrapper::save,
+         "Write the Triangulation to a file.",
+         boost::python::args("self", "filename"))
+    .def("load",
+         &TriangulationWrapper::load,
+         "Load the Triangulation from a file.",
+         boost::python::args("self", "filename"));
   }
-
 }

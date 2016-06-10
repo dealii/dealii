@@ -24,6 +24,7 @@ SET(_src
   export_point.cc
   export_triangulation.cc
   point_wrapper.cc
+  triangulation_wrapper.cc
   )
 
 FILE(GLOB _header

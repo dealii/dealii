@@ -22,18 +22,79 @@ namespace PyDealII
   class PointWrapper
   {
   public:
+    /**
+     * This constructor exists only so that a std::vector of PointWrapper can be
+     * created. This constructor should not be used.
+     */
+    PointWrapper();
+
+    /**
+     * Constructor. Use a list of double to initialize the Point.
+     */
     PointWrapper(boost::python::list list);
+
+    /**
+     * Destructpr.
+     */
+    ~PointWrapper();
+
+    /**
+     * Return the first component of the Point.
+     */
     double get_x();
+
+    /**
+     * Set the first component of the Point.
+     */
     void set_x(double x);
+
+    /**
+     * Return the second component of the Point.
+     */
     double get_y();
+
+    /**
+     * Set the second component of the Point.
+     */
     void set_y(double y);
+
+    /**
+     * Return the third component of the Point.
+     */
     double get_z();
+
+    /**
+     * Set the third component of the Point.
+     */
     void set_z(double z);
 
+    /**
+     * Return a pointer that can be casted to the underlying Point.
+     */
+    void *get_point();
+
   private:
+    /**
+     * Dimension of the Point.
+     */
     int dim;
-    std::shared_ptr<void> point;
+
+    /**
+     * Pointer to the underlying Point object.
+     */
+    void *point;
   };
+
+
+  //--------------------- Inline functions ----------------------//
+
+
+
+  inline
+  void *PointWrapper::get_point()
+  {
+    return point;
+  }
 }
 
 #endif

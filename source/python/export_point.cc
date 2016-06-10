@@ -22,7 +22,7 @@ namespace PyDealII
 {
   void export_point()
   {
-    boost::python::class_<PointWrapper> ("Point",boost::python::init<boost::python::list>())
+    boost::python::class_<PointWrapper> ("Point", boost::python::init<boost::python::list>())
     .add_property("x", &PointWrapper::get_x, &PointWrapper::set_x, "Get the x component of the point.")
     .add_property("y", &PointWrapper::get_y, &PointWrapper::set_y, "Get the y component of the point.")
     .add_property("z", &PointWrapper::get_z, &PointWrapper::set_z, "Get the z component of the point.");
