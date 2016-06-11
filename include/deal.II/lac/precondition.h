@@ -1021,7 +1021,7 @@ template<class VectorType>
 inline void
 PreconditionIdentity::vmult_add (VectorType &dst, const VectorType &src) const
 {
-  dst.add(src);
+  dst += src;
 }
 
 
@@ -1030,7 +1030,7 @@ template<class VectorType>
 inline void
 PreconditionIdentity::Tvmult_add (VectorType &dst, const VectorType &src) const
 {
-  dst.add(src);
+  dst += src;
 }
 
 inline PreconditionIdentity::size_type

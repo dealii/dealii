@@ -27,7 +27,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace LinearAlgebra
 {
-  namespace parallel
+  namespace distributed
   {
 #define TEMPL_COPY_CONSTRUCTOR(S1,S2)                                   \
   template Vector<S1>& Vector<S1>::operator=<S2> (const Vector<S2> &)

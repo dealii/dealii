@@ -139,7 +139,7 @@ namespace parallel
      *
      * @author Katharina Kormann, Martin Kronbichler, 2010, 2011
      */
-    using LinearAlgebra::parallel::Vector;
+    using LinearAlgebra::distributed::Vector;
   }
 }
 

@@ -23,8 +23,8 @@ SERIAL_VECTORS := { Vector<double>;
                     BlockVector<double>;
                     BlockVector<float>;
 
-                    parallel::distributed::Vector<double>;
-                    parallel::distributed::Vector<float> ;
+                    LinearAlgebra::distributed::Vector<double>;
+                    LinearAlgebra::distributed::Vector<float> ;
 
                     parallel::distributed::BlockVector<double>;
                     parallel::distributed::BlockVector<float> ;

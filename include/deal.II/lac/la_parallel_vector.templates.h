@@ -21,6 +21,8 @@
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/vector_operations_internal.h>
 #include <deal.II/lac/read_write_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -28,7 +30,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace LinearAlgebra
 {
-  namespace parallel
+  namespace distributed
   {
 
     template <typename Number>
@@ -384,6 +386,50 @@ namespace LinearAlgebra
 
 
 
+#ifdef DEAL_II_WITH_PETSC
+
+    template <typename Number>
+    Vector<Number> &
+    Vector<Number>::operator = (const PETScWrappers::MPI::Vector &petsc_vec)
+    {
+      IndexSet combined_set = partitioner->locally_owned_range();
+      combined_set.add_indices(partitioner->ghost_indices());
+      ReadWriteVector<Number> rw_vector(combined_set);
+      rw_vector.import(petsc_vec, VectorOperation::insert);
+      import(rw_vector, VectorOperation::insert);
+
+      if (vector_is_ghosted || petsc_vec.has_ghost_elements())
+        update_ghost_values();
+
+      return *this;
+    }
+
+#endif
+
+
+
+#ifdef DEAL_II_WITH_TRILINOS
+
+    template <typename Number>
+    Vector<Number> &
+    Vector<Number>::operator = (const TrilinosWrappers::MPI::Vector &trilinos_vec)
+    {
+      IndexSet combined_set = partitioner->locally_owned_range();
+      combined_set.add_indices(partitioner->ghost_indices());
+      ReadWriteVector<Number> rw_vector(combined_set);
+      rw_vector.import(trilinos_vec, VectorOperation::insert);
+      import(rw_vector, VectorOperation::insert);
+
+      if (vector_is_ghosted || trilinos_vec.has_ghost_elements())
+        update_ghost_values();
+
+      return *this;
+    }
+
+#endif
+
+
+
     template <typename Number>
     void
     Vector<Number>::compress (::dealii::VectorOperation::values operation)
@@ -576,10 +622,10 @@ namespace LinearAlgebra
             for ( ; my_imports!=part.import_indices().end(); ++my_imports)
               for (unsigned int j=my_imports->first; j<my_imports->second;
                    j++, read_position++)
-                Assert(*read_position == 0. ||
+                Assert(*read_position == Number() ||
                        std::abs(local_element(j) - *read_position) <=
                        std::abs(local_element(j)) * 1000. *
-                       std::numeric_limits<Number>::epsilon(),
+                       std::numeric_limits<real_type>::epsilon(),
                        ExcNonMatchingElements(*read_position, local_element(j),
                                               part.this_mpi_process()));
           AssertDimension(read_position-import_data,part.n_import_indices());
@@ -738,14 +784,15 @@ namespace LinearAlgebra
           comm_pattern =
             std_cxx11::dynamic_pointer_cast<const Utilities::MPI::Partitioner> (communication_pattern);
           AssertThrow(comm_pattern != NULL,
-                      ExcMessage(std::string("The communication pattern is not of type ") +
+                      ExcMessage("The communication pattern is not of type "
                                  "Utilities::MPI::Partitioner."));
         }
-      LinearAlgebra::parallel::Vector<Number> tmp_vector(comm_pattern);
+      Vector<Number> tmp_vector(comm_pattern);
 
       // fill entries from ReadWriteVector into the distributed vector,
       // including ghost entries. this is not really efficient right now
-      // because indices are translated twice, once for
+      // because indices are translated twice, once by nth_index_in_set(i) and
+      // once for operator() of tmp_vector
       const IndexSet &v_stored = V.get_stored_elements();
       for (size_type i=0; i<v_stored.n_elements(); ++i)
         tmp_vector(v_stored.nth_index_in_set(i)) = V.local_element(i);
@@ -1033,7 +1080,7 @@ namespace LinearAlgebra
     Vector<Number> &
     Vector<Number>::operator /= (const Number factor)
     {
-      operator *= (1./factor);
+      operator *= (static_cast<Number>(1.)/factor);
       return *this;
     }
 

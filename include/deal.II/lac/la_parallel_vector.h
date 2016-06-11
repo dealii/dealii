@@ -39,9 +39,29 @@ namespace LinearAlgebra
   template <typename> class ReadWriteVector;
 }
 
+#ifdef DEAL_II_WITH_PETSC
+namespace PETScWrappers
+{
+  namespace MPI
+  {
+    class Vector;
+  }
+}
+#endif
+
+#ifdef DEAL_II_WITH_TRILINOS
+namespace TrilinosWrappers
+{
+  namespace MPI
+  {
+    class Vector;
+  }
+}
+#endif
+
 namespace LinearAlgebra
 {
-  namespace parallel
+  namespace distributed
   {
     /*! @addtogroup Vectors
      *@{
@@ -335,6 +355,37 @@ namespace LinearAlgebra
       template <typename Number2>
       Vector<Number> &
       operator = (const Vector<Number2> &in_vector);
+
+#ifdef DEAL_II_WITH_PETSC
+      /**
+       * Copy the content of a PETSc vector into the calling vector. This
+       * function assumes that the vectors layouts have already been
+       * initialized to match.
+       *
+       * This operator is only available if deal.II was configured with PETSc.
+       *
+       * This function is deprecated. Use the interface through
+       * ReadWriteVector instead.
+       */
+      Vector<Number> &
+      operator = (const PETScWrappers::MPI::Vector &petsc_vec) DEAL_II_DEPRECATED;
+#endif
+
+#ifdef DEAL_II_WITH_TRILINOS
+      /**
+       * Copy the content of a Trilinos vector into the calling vector. This
+       * function assumes that the vectors layouts have already been
+       * initialized to match.
+       *
+       * This operator is only available if deal.II was configured with
+       * Trilinos.
+       *
+       * This function is deprecated. Use the interface through
+       * ReadWriteVector instead.
+       */
+      Vector<Number> &
+      operator = (const TrilinosWrappers::MPI::Vector &trilinos_vec) DEAL_II_DEPRECATED;
+#endif
       //@}
 
       /**
@@ -906,7 +957,7 @@ namespace LinearAlgebra
        * Exception
        */
       DeclException3 (ExcNonMatchingElements,
-                      double, double, unsigned int,
+                      Number, Number, unsigned int,
                       << "Called compress(VectorOperation::insert), but"
                       << " the element received from a remote processor, value "
                       << std::setprecision(16) << arg1
@@ -1372,8 +1423,8 @@ namespace LinearAlgebra
  */
 template <typename Number>
 inline
-void swap (LinearAlgebra::parallel::Vector<Number> &u,
-           LinearAlgebra::parallel::Vector<Number> &v)
+void swap (LinearAlgebra::distributed::Vector<Number> &u,
+           LinearAlgebra::distributed::Vector<Number> &v)
 {
   u.swap (v);
 }
