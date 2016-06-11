@@ -39,6 +39,19 @@ for (S : MPI_SCALARS)
 }
 
 
+for (S : COMPLEX_SCALARS)
+{
+  template
+  void sum<S> (const Vector<S> &, const MPI_Comm &, Vector<S> &);
+
+  template
+  S sum<S> (const S &, const MPI_Comm &);
+
+  template
+  void sum<S> (const std::vector<S> &, const MPI_Comm &, std::vector<S> &);
+}
+
+
 for (S : REAL_SCALARS; rank: RANKS; dim : SPACE_DIMENSIONS)
 {
   template

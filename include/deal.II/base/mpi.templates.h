@@ -122,6 +122,43 @@ namespace Utilities
       }
 
       template <typename T>
+      void all_reduce (const MPI_Op                   &mpi_op,
+                       const std::complex<T> *const    values,
+                       const MPI_Comm                 &mpi_communicator,
+                       std::complex<T>                *output,
+                       const std::size_t               size)
+      {
+#ifdef DEAL_II_WITH_MPI
+        if (job_supports_mpi())
+          {
+            T dummy_selector;
+            MPI_Allreduce (values != output
+                           ?
+                           // TODO This const_cast is only needed for older
+                           // (e.g., openMPI 1.6, released in 2012)
+                           // implementations of MPI-2. It is not needed as of
+                           // MPI-3 and we should remove it at some point in
+                           // the future.
+                           const_cast<void *>(static_cast<const void *>(values))
+                           :
+                           MPI_IN_PLACE,
+                           static_cast<void *>(output),
+                           static_cast<int>(size*2),
+                           internal::mpi_type_id(&dummy_selector),
+                           mpi_op,
+                           mpi_communicator);
+          }
+        else
+#endif
+          {
+            (void)mpi_op;
+            (void)mpi_communicator;
+            for (std::size_t i=0; i<size; ++i)
+              output[i] = values[i];
+          }
+      }
+
+      template <typename T>
       T all_reduce (const MPI_Op &mpi_op,
                     const T &t,
                     const MPI_Comm &mpi_communicator)
