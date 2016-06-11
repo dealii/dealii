@@ -45,7 +45,7 @@ namespace LinearAlgebra
       comm = std_cxx11::make_shared<const MPI_Comm>(communicator);
 
       Epetra_Map vector_space_vector_map = vector_space_vector_index_set.make_trilinos_map(*comm,
-                                           false);
+                                           true);
       Epetra_Map read_write_vector_map = read_write_vector_index_set.make_trilinos_map(*comm,
                                          true);
 
