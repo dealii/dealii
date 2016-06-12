@@ -388,19 +388,63 @@ namespace LinearAlgebra
 
 #ifdef DEAL_II_WITH_PETSC
 
+    namespace petsc_helpers
+    {
+      template <typename PETSC_Number, typename Number>
+      void copy_petsc_vector (const PETSC_Number *petsc_start_ptr,
+                              const PETSC_Number *petsc_end_ptr,
+                              Number *ptr)
+      {
+        std::copy(petsc_start_ptr, petsc_end_ptr, ptr);
+      }
+
+      template <typename PETSC_Number, typename Number>
+      void copy_petsc_vector (const std::complex<PETSC_Number> *petsc_start_ptr,
+                              const std::complex<PETSC_Number> *petsc_end_ptr,
+                              std::complex<Number> *ptr)
+      {
+        std::copy(petsc_start_ptr, petsc_end_ptr, ptr);
+      }
+
+      template <typename PETSC_Number, typename Number>
+      void copy_petsc_vector (const std::complex<PETSC_Number> * /*petsc_start_ptr*/,
+                              const std::complex<PETSC_Number> * /*petsc_end_ptr*/,
+                              Number * /*ptr*/)
+      {
+        AssertThrow(false, ExcMessage("Tried to copy complex -> real"));
+      }
+    }
+
     template <typename Number>
     Vector<Number> &
     Vector<Number>::operator = (const PETScWrappers::MPI::Vector &petsc_vec)
     {
-      IndexSet combined_set = partitioner->locally_owned_range();
-      combined_set.add_indices(partitioner->ghost_indices());
-      ReadWriteVector<Number> rw_vector(combined_set);
-      rw_vector.import(petsc_vec, VectorOperation::insert);
-      import(rw_vector, VectorOperation::insert);
+      // TODO: We would like to use the same compact infrastructure as for the
+      // Trilinos vector below, but the interface through ReadWriteVector does
+      // not support overlapping (ghosted) PETSc vectors, which we need for
+      // backward compatibility.
 
+      Assert(petsc_vec.locally_owned_elements() == locally_owned_elements(),
+             StandardExceptions::ExcInvalidState());
+
+      // get a representation of the vector and copy it
+      PetscScalar *start_ptr;
+      int ierr = VecGetArray (static_cast<const Vec &>(petsc_vec), &start_ptr);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      const size_type vec_size = local_size();
+      petsc_helpers::copy_petsc_vector (start_ptr, start_ptr + vec_size, begin());
+
+      // restore the representation of the vector
+      ierr = VecRestoreArray (static_cast<const Vec &>(petsc_vec), &start_ptr);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      // spread ghost values between processes?
       if (vector_is_ghosted || petsc_vec.has_ghost_elements())
         update_ghost_values();
 
+      // return a reference to this object per normal c++ operator overloading
+      // semantics
       return *this;
     }
 
