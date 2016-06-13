@@ -23,6 +23,145 @@
 
 namespace PyDealII
 {
+  namespace internal
+  {
+    template <int dim>
+    void generate_hyper_cube(const double left,
+                             const double right,
+                             const bool   colorize,
+                             void        *triangulation)
+    {
+      dealii::Triangulation<dim> *tria =
+        static_cast<dealii::Triangulation<dim>*>(triangulation);
+      tria->clear();
+      dealii::GridGenerator::hyper_cube(*tria, left, right, colorize);
+    }
+
+
+
+    template <int dim>
+    void generate_simplex(std::vector<PointWrapper> &wrapped_points,
+                          void                      *triangulation)
+    {
+      // Cast the PointWrapper objects to Point<dim>
+      std::vector<dealii::Point<dim>> points(dim);
+      for (int i=0; i<dim; ++i)
+        points[i] = *(static_cast<dealii::Point<dim>*>((wrapped_points[i]).get_point()));
+
+      dealii::Triangulation<dim> *tria =
+        static_cast<dealii::Triangulation<dim>*>(triangulation);
+      tria->clear();
+      dealii::GridGenerator::simplex(*tria, points);
+    }
+
+
+
+    template <int dim>
+    void generate_subdivided_hyper_cube(const unsigned int repetitions,
+                                        const double       left,
+                                        const double       right,
+                                        void              *triangulation)
+    {
+      dealii::Triangulation<dim> *tria =
+        static_cast<dealii::Triangulation<dim>*>(triangulation);
+      tria->clear();
+      dealii::GridGenerator::subdivided_hyper_cube(*tria, repetitions, left, right);
+    }
+
+
+
+    template <int dim>
+    void generate_hyper_rectangle(PointWrapper &p1,
+                                  PointWrapper &p2,
+                                  const bool    colorize,
+                                  void         *triangulation)
+    {
+      // Cast the PointWrapper object to Point<dim>
+      dealii::Point<dim> point_1 = *(static_cast<dealii::Point<dim>*>(p1.get_point()));
+      dealii::Point<dim> point_2 = *(static_cast<dealii::Point<dim>*>(p2.get_point()));
+
+      dealii::Triangulation<dim> *tria =
+        static_cast<dealii::Triangulation<dim>*>(triangulation);
+      tria->clear();
+      dealii::GridGenerator::hyper_rectangle(*tria, point_1, point_2, colorize);
+    }
+
+
+
+    template <int dim>
+    void generate_subdivided_hyper_rectangle(const std::vector<unsigned int> &repetitions,
+                                             PointWrapper                    &p1,
+                                             PointWrapper                    &p2,
+                                             const bool                       colorize,
+                                             void                            *triangulation)
+    {
+      // Cast the PointWrapper object to Point<dim>
+      dealii::Point<dim> point_1 = *(static_cast<dealii::Point<dim>*>(p1.get_point()));
+      dealii::Point<dim> point_2 = *(static_cast<dealii::Point<dim>*>(p2.get_point()));
+
+      dealii::Triangulation<dim> *tria =
+        static_cast<dealii::Triangulation<dim>*>(triangulation);
+      tria->clear();
+      dealii::GridGenerator::subdivided_hyper_rectangle(*tria, repetitions, point_1,
+                                                        point_2, colorize);
+    }
+
+
+
+    template <int dim>
+    void generate_hyper_ball(PointWrapper &center,
+                             const double  radius,
+                             void         *triangulation)
+    {
+      // Cast the PointWrapper object to Point<dim>
+      dealii::Point<dim> center_point = *(static_cast<dealii::Point<dim>*>(
+                                            center.get_point()));
+
+      dealii::Triangulation<dim> *tria =
+        static_cast<dealii::Triangulation<dim>*>(triangulation);
+      tria->clear();
+      dealii::GridGenerator::hyper_ball(*tria, center_point, radius);
+    }
+
+
+
+    template <int dim>
+    void shift(boost::python::list &shift_list,
+               void                *triangulation)
+    {
+      // Extract the shift vector from the python list
+      dealii::Tensor<1,dim> shift_vector;
+      for (int i=0; i<dim; ++i)
+        shift_vector[i] = boost::python::extract<double>(shift_list[i]);
+
+      dealii::Triangulation<dim> *tria =
+        static_cast<dealii::Triangulation<dim>*>(triangulation);
+      dealii::GridTools::shift(shift_vector, *tria);
+    }
+
+
+
+    template <int dim>
+    void merge_triangulations(TriangulationWrapper &triangulation_1,
+                              TriangulationWrapper &triangulation_2,
+                              void                 *triangulation)
+    {
+      dealii::Triangulation<dim> *tria =
+        static_cast<dealii::Triangulation<dim>*>(triangulation);
+      tria->clear();
+      dealii::Triangulation<dim> *tria_1 =
+        static_cast<dealii::Triangulation<dim>*>(triangulation_1.get_triangulation());
+      dealii::Triangulation<dim> *tria_2 =
+        static_cast<dealii::Triangulation<dim>*>(triangulation_2.get_triangulation());
+      dealii::GridGenerator::merge_triangulations(*tria_1, *tria_2, *tria);
+      // We need to reassign tria to triangulation because tria was cleared
+      // inside merge_triangulations.
+      triangulation = tria;
+    }
+  }
+
+
+
   TriangulationWrapper::TriangulationWrapper(const std::string &dimension)
     :
     triangulation(nullptr)
@@ -69,9 +208,7 @@ namespace PyDealII
   unsigned int TriangulationWrapper::n_active_cells() const
   {
     if (dim == 2)
-      {
-        return (*static_cast<dealii::Triangulation<2>*>(triangulation)).n_active_cells();
-      }
+      return (*static_cast<dealii::Triangulation<2>*>(triangulation)).n_active_cells();
     else
       return (*static_cast<dealii::Triangulation<3>*>(triangulation)).n_active_cells();
   }
@@ -83,19 +220,9 @@ namespace PyDealII
                                                  const bool   colorize)
   {
     if (dim == 2)
-      {
-        dealii::Triangulation<2> *tria =
-          static_cast<dealii::Triangulation<2>*>(triangulation);
-        tria->clear();
-        dealii::GridGenerator::hyper_cube(*tria, left, right, colorize);
-      }
+      internal::generate_hyper_cube<2>(left, right, colorize, triangulation);
     else
-      {
-        dealii::Triangulation<3> *tria =
-          static_cast<dealii::Triangulation<3>*>(triangulation);
-        tria->clear();
-        dealii::GridGenerator::hyper_cube(*tria, left, right, colorize);
-      }
+      internal::generate_hyper_cube<3>(left, right, colorize, triangulation);
   }
 
 
@@ -108,28 +235,9 @@ namespace PyDealII
       wrapped_points[i] = boost::python::extract<PointWrapper>(vertices[i]);
 
     if (dim == 2)
-      {
-        // Cast the PointWrapper objects to Point<dim>
-        std::vector<dealii::Point<2>> points(dim);
-        for (int i=0; i<dim; ++i)
-          points[i] = *(static_cast<dealii::Point<2>*>((wrapped_points[i]).get_point()));
-
-        dealii::Triangulation<2> *tria =
-          static_cast<dealii::Triangulation<2>*>(triangulation);
-        tria->clear();
-        dealii::GridGenerator::simplex(*tria, points);
-      }
+      internal::generate_simplex<2>(wrapped_points, triangulation);
     else
-      {
-        std::vector<dealii::Point<3>> points(dim);
-        for (int i=0; i<dim; ++i)
-          points[i] = *(static_cast<dealii::Point<3>*>((wrapped_points[i]).get_point()));
-
-        dealii::Triangulation<3> *tria =
-          static_cast<dealii::Triangulation<3>*>(triangulation);
-        tria->clear();
-        dealii::GridGenerator::simplex(*tria, points);
-      }
+      internal::generate_simplex<3>(wrapped_points, triangulation);
   }
 
 
@@ -139,19 +247,9 @@ namespace PyDealII
                                                             const double       right)
   {
     if (dim == 2)
-      {
-        dealii::Triangulation<2> *tria =
-          static_cast<dealii::Triangulation<2>*>(triangulation);
-        tria->clear();
-        dealii::GridGenerator::subdivided_hyper_cube(*tria, repetitions, left, right);
-      }
+      internal::generate_subdivided_hyper_cube<2>(repetitions, left, right, triangulation);
     else
-      {
-        dealii::Triangulation<3> *tria =
-          static_cast<dealii::Triangulation<3>*>(triangulation);
-        tria->clear();
-        dealii::GridGenerator::subdivided_hyper_cube(*tria, repetitions, left, right);
-      }
+      internal::generate_subdivided_hyper_cube<3>(repetitions, left, right, triangulation);
   }
 
 
@@ -161,27 +259,9 @@ namespace PyDealII
                                                       const bool    colorize)
   {
     if (dim == 2)
-      {
-        // Cast the PointWrapper object to Point<dim>
-        dealii::Point<2> point_1 = *(static_cast<dealii::Point<2>*>(p1.get_point()));
-        dealii::Point<2> point_2 = *(static_cast<dealii::Point<2>*>(p2.get_point()));
-
-        dealii::Triangulation<2> *tria =
-          static_cast<dealii::Triangulation<2>*>(triangulation);
-        tria->clear();
-        dealii::GridGenerator::hyper_rectangle(*tria, point_1, point_2, colorize);
-      }
+      internal::generate_hyper_rectangle<2>(p1, p2, colorize, triangulation);
     else
-      {
-        dealii::Point<3> point_1 = *(static_cast<dealii::Point<3>*>(p1.get_point()));
-        dealii::Point<3> point_2 = *(static_cast<dealii::Point<3>*>(p2.get_point()));
-
-        dealii::Triangulation<3> *tria =
-          static_cast<dealii::Triangulation<3>*>(triangulation);
-        tria->clear();
-        dealii::GridGenerator::hyper_rectangle(*tria, point_1, point_2, colorize);
-      }
-
+      internal::generate_hyper_rectangle<3>(p1, p2, colorize, triangulation);
   }
 
 
@@ -197,28 +277,11 @@ namespace PyDealII
       repetitions[i] = boost::python::extract<unsigned int>(repetition_list[i]);
 
     if (dim == 2)
-      {
-        // Cast the PointWrapper object to Point<dim>
-        dealii::Point<2> point_1 = *(static_cast<dealii::Point<2>*>(p1.get_point()));
-        dealii::Point<2> point_2 = *(static_cast<dealii::Point<2>*>(p2.get_point()));
-
-        dealii::Triangulation<2> *tria =
-          static_cast<dealii::Triangulation<2>*>(triangulation);
-        tria->clear();
-        dealii::GridGenerator::subdivided_hyper_rectangle(*tria, repetitions, point_1,
-                                                          point_2, colorize);
-      }
+      internal::generate_subdivided_hyper_rectangle<2>(repetitions, p1, p2, colorize,
+                                                       triangulation);
     else
-      {
-        dealii::Point<3> point_1 = *(static_cast<dealii::Point<3>*>(p1.get_point()));
-        dealii::Point<3> point_2 = *(static_cast<dealii::Point<3>*>(p2.get_point()));
-
-        dealii::Triangulation<3> *tria =
-          static_cast<dealii::Triangulation<3>*>(triangulation);
-        tria->clear();
-        dealii::GridGenerator::subdivided_hyper_rectangle(*tria, repetitions, point_1,
-                                                          point_2, colorize);
-      }
+      internal::generate_subdivided_hyper_rectangle<3>(repetitions, p1, p2, colorize,
+                                                       triangulation);
   }
 
 
@@ -227,26 +290,9 @@ namespace PyDealII
                                                  const double  radius)
   {
     if (dim == 2)
-      {
-        // Cast the PointWrapper object to Point<dim>
-        dealii::Point<2> center_point = *(static_cast<dealii::Point<2>*>(
-                                            center.get_point()));
-
-        dealii::Triangulation<2> *tria =
-          static_cast<dealii::Triangulation<2>*>(triangulation);
-        tria->clear();
-        dealii::GridGenerator::hyper_ball(*tria, center_point, radius);
-      }
+      internal::generate_hyper_ball<2>(center, radius, triangulation);
     else
-      {
-        dealii::Point<3> center_point = *(static_cast<dealii::Point<3>*>(
-                                            center.get_point()));
-
-        dealii::Triangulation<3> *tria =
-          static_cast<dealii::Triangulation<3>*>(triangulation);
-        tria->clear();
-        dealii::GridGenerator::hyper_ball(*tria, center_point, radius);
-      }
+      internal::generate_hyper_ball<3>(center, radius, triangulation);
   }
 
 
@@ -254,26 +300,9 @@ namespace PyDealII
   void TriangulationWrapper::shift(boost::python::list &shift_list)
   {
     if (dim == 2)
-      {
-        // Extract the shift vector from the python list
-        dealii::Tensor<1,2> shift_vector;
-        for (int i=0; i<dim; ++i)
-          shift_vector[i] = boost::python::extract<double>(shift_list[i]);
-
-        dealii::Triangulation<2> *tria =
-          static_cast<dealii::Triangulation<2>*>(triangulation);
-        dealii::GridTools::shift(shift_vector, *tria);
-      }
+      internal::shift<2>(shift_list, triangulation);
     else
-      {
-        dealii::Tensor<1,3> shift_vector;
-        for (int i=0; i<dim; ++i)
-          shift_vector[i] = boost::python::extract<double>(shift_list[i]);
-
-        dealii::Triangulation<3> *tria =
-          static_cast<dealii::Triangulation<3>*>(triangulation);
-        dealii::GridTools::shift(shift_vector, *tria);
-      }
+      internal::shift<3>(shift_list, triangulation);
   }
 
 
@@ -285,31 +314,9 @@ namespace PyDealII
                 dealii::ExcMessage("Triangulation_1 and Triangulation_2 should have the same dimension."));
 
     if (triangulation_1.get_dim() == 2)
-      {
-        dealii::Triangulation<2> *tria =
-          static_cast<dealii::Triangulation<2>*>(triangulation);
-        tria->clear();
-        dealii::Triangulation<2> *tria_1 =
-          static_cast<dealii::Triangulation<2>*>(triangulation_1.get_triangulation());
-        dealii::Triangulation<2> *tria_2 =
-          static_cast<dealii::Triangulation<2>*>(triangulation_2.get_triangulation());
-        dealii::GridGenerator::merge_triangulations(*tria_1, *tria_2, *tria);
-        // We need to reassign tria to triangulation because tria was cleared
-        // inside merge_triangulations.
-        triangulation = tria;
-      }
+      internal::merge_triangulations<2>(triangulation_1, triangulation_2, triangulation);
     else
-      {
-        dealii::Triangulation<3> *tria =
-          static_cast<dealii::Triangulation<3>*>(triangulation);
-        tria->clear();
-        dealii::Triangulation<3> *tria_1 =
-          static_cast<dealii::Triangulation<3>*>(triangulation_1.get_triangulation());
-        dealii::Triangulation<3> *tria_2 =
-          static_cast<dealii::Triangulation<3>*>(triangulation_2.get_triangulation());
-        dealii::GridGenerator::merge_triangulations(*tria_1, *tria_2, *tria);
-        triangulation = tria;
-      }
+      internal::merge_triangulations<3>(triangulation_1, triangulation_2, triangulation);
   }
 
 
