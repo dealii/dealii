@@ -41,7 +41,7 @@ namespace PyDealII
     /**
      * Return the first component of the Point.
      */
-    double get_x();
+    double get_x() const;
 
     /**
      * Set the first component of the Point.
@@ -51,7 +51,7 @@ namespace PyDealII
     /**
      * Return the second component of the Point.
      */
-    double get_y();
+    double get_y() const;
 
     /**
      * Set the second component of the Point.
@@ -61,7 +61,7 @@ namespace PyDealII
     /**
      * Return the third component of the Point.
      */
-    double get_z();
+    double get_z() const;
 
     /**
      * Set the third component of the Point.

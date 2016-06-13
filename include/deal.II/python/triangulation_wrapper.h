@@ -39,7 +39,7 @@ namespace PyDealII
     /**
      * Return the number of active cells.
      */
-    unsigned int n_active_cells();
+    unsigned int n_active_cells() const;
 
     /**
      * Generate a hyper cube (square in 2D and cube in 3D) with exactly one
@@ -100,14 +100,14 @@ namespace PyDealII
                               TriangulationWrapper &triangulation_2);
 
     /**
-     * Refine all the cells @p times times.
+     * Refine all the cells @p n times.
      */
-    void refine_global(const unsigned int times);
+    void refine_global(const unsigned int n);
 
     /**
      * Write the Triangulation in file.
      */
-    void save(const std::string &filename);
+    void save(const std::string &filename) const;
 
     /**
      * Load the Triangulation from a file.
@@ -117,7 +117,7 @@ namespace PyDealII
     /**
      * Return the dimension of the underlying Triangulation object.
      */
-    int get_dim();
+    int get_dim() const;
 
     /**
      * Return a pointer that can be casted to the underlying Triangulation
@@ -126,11 +126,6 @@ namespace PyDealII
     void *get_triangulation();
 
   private:
-    /**
-     * Reset the underlying Triangulation object.
-     */
-    void reset_triangulation();
-
     /**
      * Dimension of the underlying Triangulation object.
      */
@@ -148,7 +143,7 @@ namespace PyDealII
 
 
   inline
-  int TriangulationWrapper::get_dim()
+  int TriangulationWrapper::get_dim() const
   {
     return dim;
   }

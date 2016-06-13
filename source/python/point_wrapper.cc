@@ -65,7 +65,7 @@ namespace PyDealII
 
 
 
-  double PointWrapper::get_x()
+  double PointWrapper::get_x() const
   {
     if (dim == 2)
       return (*static_cast<dealii::Point<2>*>(point))(0);
@@ -85,7 +85,7 @@ namespace PyDealII
 
 
 
-  double PointWrapper::get_y()
+  double PointWrapper::get_y() const
   {
     if (dim == 2)
       return (*static_cast<dealii::Point<2>*>(point))(1);
@@ -105,7 +105,7 @@ namespace PyDealII
 
 
 
-  double PointWrapper::get_z()
+  double PointWrapper::get_z() const
   {
     if (dim == 3)
       return (*static_cast<dealii::Point<3>*>(point))(2);
