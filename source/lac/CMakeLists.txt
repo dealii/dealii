@@ -29,6 +29,7 @@ SET(_src
   lapack_full_matrix.cc
   la_vector.cc
   la_parallel_vector.cc
+  la_parallel_block_vector.cc
   matrix_lib.cc
   matrix_out.cc
   precondition_block.cc
@@ -63,6 +64,7 @@ SET(_inst
   lapack_full_matrix.inst.in
   la_vector.inst.in
   la_parallel_vector.inst.in
+  la_parallel_block_vector.inst.in
   precondition_block.inst.in
   relaxation_block.inst.in
   read_write_vector.inst.in

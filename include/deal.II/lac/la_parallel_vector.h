@@ -26,7 +26,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace parallel
+namespace LinearAlgebra
 {
   namespace distributed
   {
@@ -1105,7 +1105,7 @@ namespace LinearAlgebra
       /**
        * Make BlockVector type friends.
        */
-      template <typename Number2> friend class dealii::parallel::distributed::BlockVector;
+      template <typename Number2> friend class BlockVector;
     };
     /*@}*/
 

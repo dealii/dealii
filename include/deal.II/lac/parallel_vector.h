@@ -30,8 +30,6 @@ namespace parallel
 {
   namespace distributed
   {
-    template <typename Number> class BlockVector;
-
     /*! @addtogroup Vectors
      *@{
      */
@@ -140,6 +138,8 @@ namespace parallel
      * @author Katharina Kormann, Martin Kronbichler, 2010, 2011
      */
     using LinearAlgebra::distributed::Vector;
+
+    /*@}*/
   }
 }
 
