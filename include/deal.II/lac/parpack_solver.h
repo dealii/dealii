@@ -110,7 +110,21 @@ extern "C" {
  * of objects of type <code>V</code> that will contain the eigenvectors
  * computed. <code>OP</code> is an inverse operation for the matrix <code>A -
  * sigma * B</code>, where <code> sigma </code> is a shift value, set to zero
- * by default.
+ * by default. Note that (P)Arpack supports other transformations, but currently
+ * this class implements only shift-and-invert mode.
+ *
+ * The <code>OP</code> can be specified either using auxiliary Shift class together
+ * with IterativeInverse or by using LinearOperator
+ * @code
+ *   const double shift = 5.0;
+ *   const auto op_A = linear_operator<vector_t>(A);
+ *   const auto op_B = linear_operator<vector_t>(B);
+ *   const auto op_shift = op_A - shift * op_B;
+ *   SolverControl solver_control_lin (1000, 1e-10,false,false);
+ *
+ *   SolverCG<vector_t> cg(solver_control_lin);
+ *   const auto op_shift_invert = inverse_operator(op_shift, cg, PreconditionIdentity ());
+ * @endcode
  *
  * Through the AdditionalData the user can specify some of the parameters to
  * be set.
@@ -137,7 +151,9 @@ public:
 
   /**
    * An enum that lists the possible choices for which eigenvalues to compute
-   * in the solve() function.
+   * in the solve() function. Note, that this corresponds to the problem after
+   * shift-and-invert (the only currently supported spectral transformation)
+   * is applied.
    *
    * A particular choice is limited based on symmetric or non-symmetric matrix
    * <code>A</code> considered.
@@ -390,7 +406,7 @@ private:
    * PArpackExcInfoPdnaupds.
    */
   DeclException2 (PArpackExcConvergedEigenvectors, int, int,
-                  << arg1 << "eigenpairs were requested, but only"
+                  << arg1 << " eigenpairs were requested, but only "
                   << arg2 << " converged");
 
   DeclException2 (PArpackExcInvalidNumberofEigenvalues, int, int,
@@ -876,7 +892,7 @@ void PArpackSolver<VectorType>::solve
     }
 
   Assert (iparam[4] == (int)n_eigenvalues,
-          PArpackExcConvergedEigenvectors(iparam[4], n_eigenvalues));
+          PArpackExcConvergedEigenvectors(n_eigenvalues,iparam[4]));
 
   // both PDNAUPD and PDSAUPD compute eigenpairs of inv[A - sigma*M]*M
   // with respect to a semi-inner product defined by M.
