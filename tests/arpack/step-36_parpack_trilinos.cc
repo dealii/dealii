@@ -276,7 +276,8 @@ void test ()
                                                               additional_data);
     eigensolver.reinit(locally_owned_dofs);
     eigensolver.set_shift(shift);
-
+    eigenfunctions[0] = 1.;
+    eigensolver.set_initial_vector(eigenfunctions[0]);
     // avoid output of iterative solver:
     const unsigned int previous_depth = deallog.depth_file(0);
     eigensolver.solve (stiffness_matrix,

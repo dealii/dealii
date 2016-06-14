@@ -110,7 +110,21 @@ extern "C" {
  * of objects of type <code>V</code> that will contain the eigenvectors
  * computed. <code>OP</code> is an inverse operation for the matrix <code>A -
  * sigma * B</code>, where <code> sigma </code> is a shift value, set to zero
- * by default.
+ * by default. Note that (P)Arpack supports other transformations, but currently
+ * this class implements only shift-and-invert mode.
+ *
+ * The <code>OP</code> can be specified either using auxiliary Shift class together
+ * with IterativeInverse or by using LinearOperator
+ * @code
+ *   const double shift = 5.0;
+ *   const auto op_A = linear_operator<vector_t>(A);
+ *   const auto op_B = linear_operator<vector_t>(B);
+ *   const auto op_shift = op_A - shift * op_B;
+ *   SolverControl solver_control_lin (1000, 1e-10,false,false);
+ *
+ *   SolverCG<vector_t> cg(solver_control_lin);
+ *   const auto op_shift_invert = inverse_operator(op_shift, cg, PreconditionIdentity ());
+ * @endcode
  *
  * Through the AdditionalData the user can specify some of the parameters to
  * be set.
@@ -137,7 +151,9 @@ public:
 
   /**
    * An enum that lists the possible choices for which eigenvalues to compute
-   * in the solve() function.
+   * in the solve() function. Note, that this corresponds to the problem after
+   * shift-and-invert (the only currently supported spectral transformation)
+   * is applied.
    *
    * A particular choice is limited based on symmetric or non-symmetric matrix
    * <code>A</code> considered.
@@ -243,7 +259,13 @@ public:
               const std::vector<IndexSet> &partitioning);
 
   /**
-   * Set desired shift value.
+   * Set initial vector for building Krylov space.
+   */
+  void set_initial_vector(const VectorType &vec);
+
+  /**
+   * Set desired shift value. If this function is not called, the
+   * shift is assumed to be zero.
    */
   void set_shift(const double s );
 
@@ -329,6 +351,11 @@ protected:
   std::vector<double> v;
 
   /**
+   * An auxiliary flag which is set to true when initial vector is provided.
+   */
+  bool initial_vector_provided;
+
+  /**
    * The initial residual vector, possibly from a previous run.  On output, it
    * contains the final residual vector.
    */
@@ -390,7 +417,7 @@ private:
    * PArpackExcInfoPdnaupds.
    */
   DeclException2 (PArpackExcConvergedEigenvectors, int, int,
-                  << arg1 << "eigenpairs were requested, but only"
+                  << arg1 << " eigenpairs were requested, but only "
                   << arg2 << " converged");
 
   DeclException2 (PArpackExcInvalidNumberofEigenvalues, int, int,
@@ -475,6 +502,7 @@ PArpackSolver<VectorType>::PArpackSolver (SolverControl        &control,
   additional_data (data),
   mpi_communicator( mpi_communicator ),
   mpi_communicator_fortran ( MPI_Comm_c2f( mpi_communicator ) ),
+  initial_vector_provided(false),
   shift_value(0.0)
 
 {}
@@ -484,6 +512,19 @@ void PArpackSolver<VectorType>::set_shift(const double s )
 {
   shift_value = s;
 }
+
+template <typename VectorType>
+void PArpackSolver<VectorType>::
+set_initial_vector(const VectorType &vec)
+{
+  initial_vector_provided = true;
+  Assert (resid.size() == local_indices.size(),
+          ExcDimensionMismatch(resid.size(),local_indices.size()));
+  vec.extract_subvector_to (local_indices.begin(),
+                            local_indices.end(),
+                            &resid[0]);
+}
+
 
 template <typename VectorType>
 void PArpackSolver<VectorType>::
@@ -668,7 +709,7 @@ void PArpackSolver<VectorType>::solve
   //  possibly from a previous run.
   // Typical choices in this situation might be to use the final value
   // of the starting vector from the previous eigenvalue calculation
-  int info = 1;
+  int info = initial_vector_provided? 1 : 0;
 
   // Number of eigenvalues of OP to be computed. 0 < NEV < N.
   int nev = n_eigenvalues;
@@ -876,7 +917,7 @@ void PArpackSolver<VectorType>::solve
     }
 
   Assert (iparam[4] == (int)n_eigenvalues,
-          PArpackExcConvergedEigenvectors(iparam[4], n_eigenvalues));
+          PArpackExcConvergedEigenvectors(n_eigenvalues,iparam[4]));
 
   // both PDNAUPD and PDSAUPD compute eigenpairs of inv[A - sigma*M]*M
   // with respect to a semi-inner product defined by M.

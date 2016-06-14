@@ -286,6 +286,8 @@ void test ()
         mpi_communicator,
         additional_data);
     eigensolver.reinit(locally_owned_dofs);
+    eigenfunctions[0] = 1.;
+    eigensolver.set_initial_vector(eigenfunctions[0]);
     eigensolver.solve (stiffness_matrix,
                        mass_matrix,
                        inverse,
