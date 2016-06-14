@@ -259,7 +259,13 @@ public:
               const std::vector<IndexSet> &partitioning);
 
   /**
-   * Set desired shift value.
+   * Set initial vector for building Krylov space.
+   */
+  void set_initial_vector(const VectorType &vec);
+
+  /**
+   * Set desired shift value. If this function is not called, the
+   * shift is assumed to be zero.
    */
   void set_shift(const double s );
 
@@ -343,6 +349,11 @@ protected:
    * of Arnoldi basis vectors.
    */
   std::vector<double> v;
+
+  /**
+   * An auxiliary flag which is set to true when initial vector is provided.
+   */
+  bool initial_vector_provided;
 
   /**
    * The initial residual vector, possibly from a previous run.  On output, it
@@ -491,6 +502,7 @@ PArpackSolver<VectorType>::PArpackSolver (SolverControl        &control,
   additional_data (data),
   mpi_communicator( mpi_communicator ),
   mpi_communicator_fortran ( MPI_Comm_c2f( mpi_communicator ) ),
+  initial_vector_provided(false),
   shift_value(0.0)
 
 {}
@@ -500,6 +512,19 @@ void PArpackSolver<VectorType>::set_shift(const double s )
 {
   shift_value = s;
 }
+
+template <typename VectorType>
+void PArpackSolver<VectorType>::
+set_initial_vector(const VectorType &vec)
+{
+  initial_vector_provided = true;
+  Assert (resid.size() == local_indices.size(),
+          ExcDimensionMismatch(resid.size(),local_indices.size()));
+  vec.extract_subvector_to (local_indices.begin(),
+                            local_indices.end(),
+                            &resid[0]);
+}
+
 
 template <typename VectorType>
 void PArpackSolver<VectorType>::
@@ -684,7 +709,7 @@ void PArpackSolver<VectorType>::solve
   //  possibly from a previous run.
   // Typical choices in this situation might be to use the final value
   // of the starting vector from the previous eigenvalue calculation
-  int info = 1;
+  int info = initial_vector_provided? 1 : 0;
 
   // Number of eigenvalues of OP to be computed. 0 < NEV < N.
   int nev = n_eigenvalues;
