@@ -164,6 +164,7 @@ PREDEFINED             = DOXYGEN=1 \
                          DEBUG=1 \
                          DEAL_II_USE_MT_POSIX=1 \
                          DEAL_II_WITH_ARPACK=1 \
+                         DEAL_II_ARPACK_WITH_PARPACK=1 \
                          DEAL_II_WITH_BOOST=1 \
                          DEAL_II_WITH_CXX11=1 \
                          DEAL_II_WITH_CXX14=1 \
