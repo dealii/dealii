@@ -17,9 +17,6 @@
 #define dealii__communication_pattern_base_h
 
 #include <deal.II/base/config.h>
-
-#ifdef DEAL_II_WITH_MPI
-
 #include <deal.II/base/mpi.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -66,7 +63,5 @@ namespace LinearAlgebra
 } // end of namespace LinearAlgebra
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif
 
 #endif
