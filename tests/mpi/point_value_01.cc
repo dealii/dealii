@@ -23,7 +23,7 @@
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/index_set.h>
 
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -58,7 +58,7 @@ void test()
   dof_handler.distribute_dofs (fe);
 
   IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs ();
-  parallel::distributed::Vector<double> locally_owned_solution
+  LinearAlgebra::distributed::Vector<double> locally_owned_solution
   (locally_owned_dofs, MPI_COMM_WORLD);
 
   locally_owned_solution=1;

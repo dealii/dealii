@@ -1468,7 +1468,7 @@ namespace TrilinosWrappers
      * This function can be called with several different vector objects,
      * namely TrilinosWrappers::Vector, TrilinosWrappers::MPI::Vector as well
      * as deal.II's own vector classes Vector<double> and
-     * parallel::distributed::Vector<double>.
+     * LinearAlgebra::distributed::Vector<double>.
      *
      * Note that both vectors have to be distributed vectors generated using
      * the same Map as was used for the matrix in case you work on a
@@ -1494,7 +1494,7 @@ namespace TrilinosWrappers
      * This function can be called with several different vector objects,
      * namely TrilinosWrappers::Vector, TrilinosWrappers::MPI::Vector as well
      * as deal.II's own vector classes Vector<double> and
-     * parallel::distributed::Vector<double>.
+     * LinearAlgebra::distributed::Vector<double>.
      *
      * Note that both vectors have to be distributed vectors generated using
      * the same Map as was used for the matrix in case you work on a
@@ -1519,7 +1519,7 @@ namespace TrilinosWrappers
      * This function can be called with several different vector objects,
      * namely TrilinosWrappers::Vector, TrilinosWrappers::MPI::Vector as well
      * as deal.II's own vector classes Vector<double> and
-     * parallel::distributed::Vector<double>.
+     * LinearAlgebra::distributed::Vector<double>.
      *
      * When using a vector of type TrilinosWrappers::MPI::Vector, both vectors
      * have to be distributed vectors generated using the same Map as was used
@@ -1547,7 +1547,7 @@ namespace TrilinosWrappers
      * This function can be called with several different vector objects,
      * namely TrilinosWrappers::Vector, TrilinosWrappers::MPI::Vector as well
      * as deal.II's own vector classes Vector<double> and
-     * parallel::distributed::Vector<double>.
+     * LinearAlgebra::distributed::Vector<double>.
      *
      * When using a vector of type TrilinosWrappers::MPI::Vector, both vectors
      * have to be distributed vectors generated using the same Map as was used

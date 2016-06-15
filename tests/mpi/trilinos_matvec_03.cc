@@ -25,7 +25,7 @@
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 #include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -86,7 +86,7 @@ void test ()
   x.reinit (col_partitioning, MPI_COMM_WORLD);
   y.reinit (row_partitioning, MPI_COMM_WORLD);
 
-  parallel::distributed::Vector<double>
+  LinearAlgebra::distributed::Vector<double>
   dx (col_partitioning, col_partitioning, MPI_COMM_WORLD),
   dy (row_partitioning, row_partitioning, MPI_COMM_WORLD);
 

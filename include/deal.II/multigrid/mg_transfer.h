@@ -23,7 +23,7 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 
 #include <deal.II/lac/vector_memory.h>
 
@@ -58,7 +58,7 @@ namespace internal
 
 #ifdef DEAL_II_WITH_TRILINOS
   template <typename Number>
-  struct MatrixSelector<parallel::distributed::Vector<Number> >
+  struct MatrixSelector<LinearAlgebra::distributed::Vector<Number> >
   {
     typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
@@ -259,7 +259,7 @@ protected:
  * Implementation of transfer between the global vectors and the multigrid
  * levels for use in the derived class MGTransferPrebuilt and other classes.
  * This class is a specialization for the case of
- * parallel::distributed::Vector that requires a few different calling
+ * LinearAlgebra::distributed::Vector that requires a few different calling
  * routines as compared to the %parallel vectors in the PETScWrappers and
  * TrilinosWrappers namespaces.
  *
@@ -267,7 +267,7 @@ protected:
  * @date 2016
  */
 template <typename Number>
-class MGLevelGlobalTransfer<parallel::distributed::Vector<Number> > : public MGTransferBase<parallel::distributed::Vector<Number> >
+class MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> > : public MGTransferBase<LinearAlgebra::distributed::Vector<Number> >
 {
 public:
 
@@ -283,8 +283,8 @@ public:
   template <int dim, typename Number2, int spacedim>
   void
   copy_to_mg (const DoFHandler<dim,spacedim>                        &mg_dof,
-              MGLevelObject<parallel::distributed::Vector<Number> > &dst,
-              const parallel::distributed::Vector<Number2>          &src) const;
+              MGLevelObject<LinearAlgebra::distributed::Vector<Number> > &dst,
+              const LinearAlgebra::distributed::Vector<Number2>          &src) const;
 
   /**
    * Transfer from multi-level vector to normal vector.
@@ -296,8 +296,8 @@ public:
   template <int dim, typename Number2, int spacedim>
   void
   copy_from_mg (const DoFHandler<dim,spacedim>                              &mg_dof,
-                parallel::distributed::Vector<Number2>                      &dst,
-                const MGLevelObject<parallel::distributed::Vector<Number> > &src) const;
+                LinearAlgebra::distributed::Vector<Number2>                      &dst,
+                const MGLevelObject<LinearAlgebra::distributed::Vector<Number> > &src) const;
 
   /**
    * Add a multi-level vector to a normal vector.
@@ -307,8 +307,8 @@ public:
   template <int dim, typename Number2, int spacedim>
   void
   copy_from_mg_add (const DoFHandler<dim,spacedim>                              &mg_dof,
-                    parallel::distributed::Vector<Number2>                      &dst,
-                    const MGLevelObject<parallel::distributed::Vector<Number> > &src) const;
+                    LinearAlgebra::distributed::Vector<Number2>                      &dst,
+                    const MGLevelObject<LinearAlgebra::distributed::Vector<Number> > &src) const;
 
   /**
    * If this object operates on BlockVector objects, we need to describe how
@@ -398,20 +398,20 @@ protected:
   /**
    * The mg_constrained_dofs of the level systems.
    */
-  SmartPointer<const MGConstrainedDoFs, MGLevelGlobalTransfer<parallel::distributed::Vector<Number> > > mg_constrained_dofs;
+  SmartPointer<const MGConstrainedDoFs, MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> > > mg_constrained_dofs;
 
   /**
    * In the function copy_to_mg, we need to access ghosted entries of the
    * global vector for inserting into the level vectors. This vector is
    * populated with those entries.
    */
-  mutable parallel::distributed::Vector<Number> ghosted_global_vector;
+  mutable LinearAlgebra::distributed::Vector<Number> ghosted_global_vector;
 
   /**
    * In the function copy_from_mg, we access all level vectors with certain
    * ghost entries for inserting the result into a global vector.
    */
-  mutable MGLevelObject<parallel::distributed::Vector<Number> > ghosted_level_vector;
+  mutable MGLevelObject<LinearAlgebra::distributed::Vector<Number> > ghosted_level_vector;
 };
 
 

@@ -22,7 +22,7 @@
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -47,7 +47,7 @@ void test ()
   local_relevant.add_range(min_index+38,min_index+40);
   local_relevant.add_range(min_index+41,min_index+43);
 
-  parallel::distributed::Vector<double> v(local_owned, local_relevant, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(local_owned, local_relevant, MPI_COMM_WORLD);
 
   deallog << "Local range of proc 0: " << v.local_range().first << " "
           << v.local_range().second << std::endl;

@@ -19,7 +19,7 @@
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -38,7 +38,7 @@ void test ()
   IndexSet local_owned(numproc*2);
   local_owned.add_range(myid*2,myid*2+2);
 
-  parallel::distributed::Vector<double> v(local_owned, local_owned, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(local_owned, local_owned, MPI_COMM_WORLD);
 
   // set local values
   v(myid*2)=myid*2.0;

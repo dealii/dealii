@@ -14,14 +14,14 @@
 // ---------------------------------------------------------------------
 
 
-// check that parallel::distributed::Vector::reinit does not carry over any
+// check that LinearAlgebra::distributed::Vector::reinit does not carry over any
 // state that can lead to invalid memory access. In this test, the MPI
 // communicator is deleted.
 
 
 #include "../tests.h"
 #include <deal.II/base/mpi.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/vector_memory.h>
 
 template <typename VectorType>
@@ -103,5 +103,5 @@ int main (int argc, char **argv)
 
   initlog();
 
-  do_test<parallel::distributed::Vector<double> >();
+  do_test<LinearAlgebra::distributed::Vector<double> >();
 }

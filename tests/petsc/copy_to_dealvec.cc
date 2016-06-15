@@ -15,11 +15,11 @@
 
 
 
-// Test parallel::distributed::Vector::operator=(PETScWrappers::MPI::Vector&)
+// Test LinearAlgebra::distributed::Vector::operator=(PETScWrappers::MPI::Vector&)
 
 #include "../tests.h"
 #include <deal.II/lac/petsc_parallel_vector.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/base/index_set.h>
 #include <fstream>
 #include <iostream>
@@ -46,7 +46,7 @@ void test ()
   PETScWrappers::MPI::Vector vb(local_active, MPI_COMM_WORLD);
   PETScWrappers::MPI::Vector v(local_active, local_relevant, MPI_COMM_WORLD);
 
-  parallel::distributed::Vector<double> copied(local_active, local_relevant, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> copied(local_active, local_relevant, MPI_COMM_WORLD);
 
   // set local values
   vb(myid*2)=myid*2.0;

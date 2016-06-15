@@ -20,7 +20,7 @@
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -45,7 +45,7 @@ void test ()
   local_relevant = local_owned;
   local_relevant.add_range(1,2);
 
-  parallel::distributed::Vector<double> v(local_owned, local_owned, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(local_owned, local_owned, MPI_COMM_WORLD);
 
   // set local values
   if (myid < 8)
@@ -108,7 +108,7 @@ void test ()
     const double norm_sqr = v.l2_norm() * v.l2_norm();
     AssertThrow (std::fabs(v * v - norm_sqr) < 1e-15,
                  ExcInternalError());
-    parallel::distributed::Vector<double> v2;
+    LinearAlgebra::distributed::Vector<double> v2;
     v2 = v;
     AssertThrow (std::fabs(v2 * v - norm_sqr) < 1e-15,
                  ExcInternalError());
@@ -125,7 +125,7 @@ void test ()
     bool allzero = v.all_zero();
     if (myid == 0)
       deallog << " v==0 ? " << allzero << std::endl;
-    parallel::distributed::Vector<double> v2;
+    LinearAlgebra::distributed::Vector<double> v2;
     v2.reinit (v);
     allzero = v2.all_zero();
     if (myid == 0)

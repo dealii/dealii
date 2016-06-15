@@ -15,7 +15,7 @@
 
 #include <deal.II/lac/sparse_matrix.templates.h>
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 

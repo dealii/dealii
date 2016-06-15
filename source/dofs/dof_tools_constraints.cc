@@ -35,7 +35,7 @@
 #include <deal.II/dofs/dof_tools.h>
 
 #ifdef DEAL_II_WITH_MPI
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #endif
 
 #include <algorithm>
@@ -2504,7 +2504,7 @@ namespace DoFTools
         unsigned int                         dofs_per_cell;
         std::vector<types::global_dof_index> parameter_dof_indices;
 #ifdef DEAL_II_WITH_MPI
-        std::vector<dealii::parallel::distributed::Vector<double> > global_parameter_representation;
+        std::vector<dealii::LinearAlgebra::distributed::Vector<double> > global_parameter_representation;
 #else
         std::vector<dealii::Vector<double> > global_parameter_representation;
 #endif

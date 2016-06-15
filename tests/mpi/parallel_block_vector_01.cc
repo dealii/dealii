@@ -20,8 +20,8 @@
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/lac/parallel_block_vector.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_block_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -46,8 +46,8 @@ void test ()
   local_relevant = local_owned;
   local_relevant.add_range(1,2);
 
-  parallel::distributed::Vector<double> v(local_owned, local_relevant,
-                                          MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(local_owned, local_relevant,
+                                               MPI_COMM_WORLD);
 
   // set local values
   if (myid < 8)
@@ -63,7 +63,7 @@ void test ()
       AssertThrow (v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
     }
 
-  parallel::distributed::BlockVector<double> w(3);
+  LinearAlgebra::distributed::BlockVector<double> w(3);
   for (unsigned int i=0; i<3; ++i)
     w.block(i) = v;
   w.collect_sizes();
@@ -121,7 +121,7 @@ void test ()
     const double norm_sqr = w.l2_norm() * w.l2_norm();
     AssertThrow (std::fabs(w * w - norm_sqr) < 1e-12,
                  ExcInternalError());
-    parallel::distributed::BlockVector<double> w2;
+    LinearAlgebra::distributed::BlockVector<double> w2;
     w2 = w;
     AssertThrow (std::fabs(w2 * w - norm_sqr) < 1e-12,
                  ExcInternalError());
@@ -138,7 +138,7 @@ void test ()
     bool allzero = w.all_zero();
     if (myid == 0)
       deallog << " v==0 ? " << allzero << std::endl;
-    parallel::distributed::BlockVector<double> w2;
+    LinearAlgebra::distributed::BlockVector<double> w2;
     w2.reinit (w);
     allzero = w2.all_zero();
     if (myid == 0)

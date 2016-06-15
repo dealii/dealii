@@ -163,8 +163,8 @@ namespace TrilinosWrappers
 
   void
   SolverBase::solve (const SparseMatrix                                  &A,
-                     dealii::parallel::distributed::Vector<double>       &x,
-                     const dealii::parallel::distributed::Vector<double> &b,
+                     dealii::LinearAlgebra::distributed::Vector<double>       &x,
+                     const dealii::LinearAlgebra::distributed::Vector<double> &b,
                      const PreconditionBase                              &preconditioner)
   {
     linear_problem.reset();
@@ -192,8 +192,8 @@ namespace TrilinosWrappers
 
   void
   SolverBase::solve (Epetra_Operator                                     &A,
-                     dealii::parallel::distributed::Vector<double>       &x,
-                     const dealii::parallel::distributed::Vector<double> &b,
+                     dealii::LinearAlgebra::distributed::Vector<double>       &x,
+                     const dealii::LinearAlgebra::distributed::Vector<double> &b,
                      const PreconditionBase                              &preconditioner)
   {
     linear_problem.reset();
@@ -616,8 +616,8 @@ namespace TrilinosWrappers
 
   void
   SolverDirect::solve (const SparseMatrix                                  &A,
-                       dealii::parallel::distributed::Vector<double>       &x,
-                       const dealii::parallel::distributed::Vector<double> &b)
+                       dealii::LinearAlgebra::distributed::Vector<double>       &x,
+                       const dealii::LinearAlgebra::distributed::Vector<double> &b)
   {
     AssertDimension (static_cast<TrilinosWrappers::types::int_type>(x.local_size()),
                      A.domain_partitioner().NumMyElements());

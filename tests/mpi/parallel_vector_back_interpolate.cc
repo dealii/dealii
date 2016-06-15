@@ -19,7 +19,7 @@
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -58,7 +58,7 @@ void test ()
   DoFTools::extract_locally_relevant_dofs (dof2,
                                            locally_relevant_dofs2);
 
-  parallel::distributed::Vector<double>
+  LinearAlgebra::distributed::Vector<double>
   v2(dof2.locally_owned_dofs(), locally_relevant_dofs2, MPI_COMM_WORLD),
   v2_interpolated(v2);
 

@@ -19,8 +19,8 @@
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/parallel_vector.h>
-#include <deal.II/lac/parallel_block_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/petsc_block_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
@@ -385,7 +385,7 @@ MGLevelGlobalTransfer<VectorType>::memory_consumption () const
 template <typename Number>
 template <int dim, int spacedim>
 void
-MGLevelGlobalTransfer<parallel::distributed::Vector<Number> >::fill_and_communicate_copy_indices
+MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::fill_and_communicate_copy_indices
 (const DoFHandler<dim,spacedim> &mg_dof)
 {
   // first go to the usual routine...
@@ -516,7 +516,7 @@ MGLevelGlobalTransfer<parallel::distributed::Vector<Number> >::fill_and_communic
 
 template <typename Number>
 void
-MGLevelGlobalTransfer<parallel::distributed::Vector<Number> >::clear()
+MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::clear()
 {
   sizes.resize(0);
   copy_indices.clear();
@@ -532,7 +532,7 @@ MGLevelGlobalTransfer<parallel::distributed::Vector<Number> >::clear()
 
 template <typename Number>
 void
-MGLevelGlobalTransfer<parallel::distributed::Vector<Number> >::print_indices (std::ostream &os) const
+MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::print_indices (std::ostream &os) const
 {
   for (unsigned int level = 0; level<copy_indices.size(); ++level)
     {
@@ -559,7 +559,7 @@ MGLevelGlobalTransfer<parallel::distributed::Vector<Number> >::print_indices (st
 
 template <typename Number>
 std::size_t
-MGLevelGlobalTransfer<parallel::distributed::Vector<Number> >::memory_consumption () const
+MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::memory_consumption () const
 {
   std::size_t result = sizeof(*this);
   result += MemoryConsumption::memory_consumption(sizes);
@@ -581,7 +581,7 @@ MGLevelGlobalTransfer<parallel::distributed::Vector<Number> >::memory_consumptio
 
 // create an additional instantiation currently not supported by the automatic
 // template instantiation scheme
-template class MGLevelGlobalTransfer<parallel::distributed::Vector<float> >;
+template class MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<float> >;
 
 
 DEAL_II_NAMESPACE_CLOSE

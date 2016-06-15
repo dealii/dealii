@@ -15,7 +15,7 @@
 #include <deal.II/matrix_free/fe_evaluation.h>
 
 #include <deal.II/lac/vector.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 
 
 template <int dim, int fe_degree, typename VectorType>

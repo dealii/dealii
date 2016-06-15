@@ -814,7 +814,7 @@ public:
    * The reason this function exists is that this operation involves less
    * memory transfer than calling the two functions separately on deal.II's
    * vector classes (Vector<Number> and
-   * parallel::distributed::Vector<double>). This method only needs to load
+   * LinearAlgebra::distributed::Vector<double>). This method only needs to load
    * three vectors, @p this, @p V, @p W, whereas calling separate methods
    * means to load the calling vector @p this twice. Since most vector
    * operations are memory transfer limited, this reduces the time by 25\% (or

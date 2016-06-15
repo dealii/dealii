@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 // Similar to step-16-03 (starting the mg hierarchy at level 2 rather than
-// level 0) but for parallel::distributed::Vector that has a different code
+// level 0) but for LinearAlgebra::distributed::Vector that has a different code
 // path
 
 #include "../tests.h"
@@ -27,7 +27,7 @@
 #include <deal.II/base/mpi.h>
 
 #include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/solver_cg.h>
@@ -85,8 +85,8 @@ private:
   ConstraintMatrix     hanging_node_constraints;
   ConstraintMatrix     constraints;
 
-  parallel::distributed::Vector<double> solution;
-  parallel::distributed::Vector<double> system_rhs;
+  LinearAlgebra::distributed::Vector<double> solution;
+  LinearAlgebra::distributed::Vector<double> system_rhs;
 
   const unsigned int degree;
   const unsigned int min_level;
@@ -371,20 +371,20 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 template <int dim>
 void LaplaceProblem<dim>::solve ()
 {
-  MGTransferPrebuilt<parallel::distributed::Vector<double> >
+  MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double> >
   mg_transfer(hanging_node_constraints, mg_constrained_dofs);
   mg_transfer.build_matrices(mg_dof_handler);
 
   SolverControl coarse_solver_control (1000, 1e-10, false, false);
-  SolverCG<parallel::distributed::Vector<double> > coarse_solver(coarse_solver_control);
+  SolverCG<LinearAlgebra::distributed::Vector<double> > coarse_solver(coarse_solver_control);
   PreconditionIdentity id;
-  MGCoarseGridLACIteration<SolverCG<parallel::distributed::Vector<double> >,parallel::distributed::Vector<double> >
+  MGCoarseGridLACIteration<SolverCG<LinearAlgebra::distributed::Vector<double> >,LinearAlgebra::distributed::Vector<double> >
   coarse_grid_solver(coarse_solver, mg_matrices[min_level], id);
   deallog << "   Size of coarse grid matrix: " << mg_matrices[min_level].m() << std::endl;
 
-  typedef PreconditionChebyshev<SparseMatrix<double>,parallel::distributed::Vector<double> > Smoother;
-  GrowingVectorMemory<parallel::distributed::Vector<double> >   vector_memory;
-  MGSmootherPrecondition<SparseMatrix<double>, Smoother, parallel::distributed::Vector<double> >
+  typedef PreconditionChebyshev<SparseMatrix<double>,LinearAlgebra::distributed::Vector<double> > Smoother;
+  GrowingVectorMemory<LinearAlgebra::distributed::Vector<double> >   vector_memory;
+  MGSmootherPrecondition<SparseMatrix<double>, Smoother, LinearAlgebra::distributed::Vector<double> >
   mg_smoother;
   typename Smoother::AdditionalData smoother_data;
   smoother_data.smoothing_range = 20.;
@@ -392,24 +392,24 @@ void LaplaceProblem<dim>::solve ()
   smoother_data.eig_cg_n_iterations = 20;
   mg_smoother.initialize(mg_matrices, smoother_data);
 
-  mg::Matrix<parallel::distributed::Vector<double> > mg_matrix(mg_matrices);
-  mg::Matrix<parallel::distributed::Vector<double> > mg_interface_up(mg_interface_matrices);
-  mg::Matrix<parallel::distributed::Vector<double> > mg_interface_down(mg_interface_matrices);
+  mg::Matrix<LinearAlgebra::distributed::Vector<double> > mg_matrix(mg_matrices);
+  mg::Matrix<LinearAlgebra::distributed::Vector<double> > mg_interface_up(mg_interface_matrices);
+  mg::Matrix<LinearAlgebra::distributed::Vector<double> > mg_interface_down(mg_interface_matrices);
 
-  Multigrid<parallel::distributed::Vector<double> > mg(min_level,
-                                                       triangulation.n_global_levels()-1,
-                                                       mg_matrix,
-                                                       coarse_grid_solver,
-                                                       mg_transfer,
-                                                       mg_smoother,
-                                                       mg_smoother);
+  Multigrid<LinearAlgebra::distributed::Vector<double> > mg(min_level,
+                                                            triangulation.n_global_levels()-1,
+                                                            mg_matrix,
+                                                            coarse_grid_solver,
+                                                            mg_transfer,
+                                                            mg_smoother,
+                                                            mg_smoother);
   mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
-  PreconditionMG<dim, parallel::distributed::Vector<double>, MGTransferPrebuilt<parallel::distributed::Vector<double> > >
+  PreconditionMG<dim, LinearAlgebra::distributed::Vector<double>, MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double> > >
   preconditioner(mg_dof_handler, mg, mg_transfer);
 
   SolverControl solver_control (1000, 1e-12);
-  SolverCG<parallel::distributed::Vector<double> > cg (solver_control);
+  SolverCG<LinearAlgebra::distributed::Vector<double> > cg (solver_control);
 
   solution = 0;
 

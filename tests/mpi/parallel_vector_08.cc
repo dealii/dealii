@@ -20,7 +20,7 @@
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -61,8 +61,8 @@ void test ()
   // v has ghosts, w has none. set some entries
   // on w, copy into v and check if they are
   // there
-  parallel::distributed::Vector<double> v(local_owned, local_relevant, MPI_COMM_WORLD);
-  parallel::distributed::Vector<double> w(local_owned, local_owned, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(local_owned, local_relevant, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> w(local_owned, local_owned, MPI_COMM_WORLD);
 
   // set a few of the local elements
   for (unsigned i=0; i<local_size; ++i)

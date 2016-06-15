@@ -703,15 +703,15 @@ namespace TrilinosWrappers
   }
 
   void
-  PreconditionIdentity::vmult(parallel::distributed::Vector<double>       &dst,
-                              const parallel::distributed::Vector<double> &src) const
+  PreconditionIdentity::vmult(LinearAlgebra::distributed::Vector<double>       &dst,
+                              const LinearAlgebra::distributed::Vector<double> &src) const
   {
     dst = src;
   }
 
   void
-  PreconditionIdentity::Tvmult(parallel::distributed::Vector<double>       &dst,
-                               const parallel::distributed::Vector<double> &src) const
+  PreconditionIdentity::Tvmult(LinearAlgebra::distributed::Vector<double>       &dst,
+                               const LinearAlgebra::distributed::Vector<double> &src) const
   {
     dst = src;
   }

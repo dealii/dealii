@@ -19,7 +19,7 @@
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -57,7 +57,7 @@ void test ()
                                     };
   local_relevant.add_indices (&ghost_indices[0], &ghost_indices[0]+10);
 
-  parallel::distributed::Vector<double> v(local_owned, local_relevant, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(local_owned, local_relevant, MPI_COMM_WORLD);
 
   // check number of ghosts everywhere (counted
   // the above)

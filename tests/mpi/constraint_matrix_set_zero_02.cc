@@ -19,10 +19,10 @@
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/lac/parallel_block_vector.h>
+#include <deal.II/lac/la_parallel_block_vector.h>
 
 #include <fstream>
 
@@ -42,7 +42,7 @@ void test ()
   local_active[1].set_size(2*numproc);
   local_active[1].add_range(myid*2,myid*2+2);
 
-  parallel::distributed::BlockVector<double> v(2);
+  LinearAlgebra::distributed::BlockVector<double> v(2);
   v.block(0).reinit(local_active[0], complete_index_set(numproc), MPI_COMM_WORLD);
   v.block(1).reinit(local_active[1], complete_index_set(2*numproc), MPI_COMM_WORLD);
   v.collect_sizes();

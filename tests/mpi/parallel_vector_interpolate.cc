@@ -19,7 +19,7 @@
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -52,10 +52,10 @@ void test ()
   DoFTools::extract_locally_relevant_dofs (dof2,
                                            locally_relevant_dofs2);
 
-  parallel::distributed::Vector<double> v1(dof1.locally_owned_dofs(),
-                                           locally_relevant_dofs1,
-                                           MPI_COMM_WORLD),
-                                           v2(dof2.locally_owned_dofs(), locally_relevant_dofs2, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v1(dof1.locally_owned_dofs(),
+                                                locally_relevant_dofs1,
+                                                MPI_COMM_WORLD),
+                                                v2(dof2.locally_owned_dofs(), locally_relevant_dofs2, MPI_COMM_WORLD);
 
   // set first vector to 1
   VectorTools::interpolate(dof1, ConstantFunction<dim>(1.), v1);

@@ -19,8 +19,8 @@
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/lac/parallel_block_vector.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_block_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -43,8 +43,8 @@ void test ()
   local_relevant = local_owned;
   local_relevant.add_range(1,2);
 
-  parallel::distributed::Vector<double> v(local_owned, local_relevant,
-                                          MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(local_owned, local_relevant,
+                                               MPI_COMM_WORLD);
 
   // set local values
   if (myid < 8)
@@ -54,7 +54,7 @@ void test ()
     }
   v.compress(VectorOperation::insert);
 
-  parallel::distributed::BlockVector<double> w(3);
+  LinearAlgebra::distributed::BlockVector<double> w(3);
   for (unsigned int i=0; i<3; ++i)
     {
       w.block(i) = v;
@@ -95,7 +95,7 @@ void test ()
 
   // create a vector copy that gets the entries from w. First, it should not
   // have updated the ghosts because it is created from an empty state.
-  parallel::distributed::BlockVector<double> x(w);
+  LinearAlgebra::distributed::BlockVector<double> x(w);
   Assert(x.has_ghost_elements() == false, ExcInternalError());
   for (unsigned int i=0; i<3; ++i)
     if (myid == 0)

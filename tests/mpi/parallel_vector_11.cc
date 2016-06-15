@@ -20,7 +20,7 @@
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -49,10 +49,10 @@ void test ()
   local_relevant = local_owned;
   local_relevant.add_index (2);
 
-  parallel::distributed::Vector<double> v(local_owned, local_relevant,
-                                          MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(local_owned, local_relevant,
+                                               MPI_COMM_WORLD);
   AssertDimension (static_cast<unsigned int>(actual_local_size), v.local_size());
-  parallel::distributed::Vector<double> w (v), x(v), y(v);
+  LinearAlgebra::distributed::Vector<double> w (v), x(v), y(v);
 
   // set local elements
   for (int i=0; i<actual_local_size; ++i)
@@ -155,7 +155,7 @@ void test ()
   if (myid==0) deallog << "OK" << std::endl;
 
   if (myid==0) deallog << "Check equ<float> (factor, vector): ";
-  parallel::distributed::Vector<float> z;
+  LinearAlgebra::distributed::Vector<float> z;
   z = v;
   y = z;
   for (int i=0; i<actual_local_size; ++i)

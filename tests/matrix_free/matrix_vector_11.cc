@@ -26,7 +26,7 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/function.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_boundary_lib.h>
@@ -109,8 +109,8 @@ void test ()
     mf_data.reinit (dof, constraints, quad, data);
   }
 
-  MatrixFreeTest<dim,fe_degree,number,parallel::distributed::Vector<number> > mf (mf_data);
-  parallel::distributed::Vector<number> in, out, ref;
+  MatrixFreeTest<dim,fe_degree,number,LinearAlgebra::distributed::Vector<number> > mf (mf_data);
+  LinearAlgebra::distributed::Vector<number> in, out, ref;
   mf_data.initialize_dof_vector (in);
   out.reinit (in);
   ref.reinit (in);
@@ -152,7 +152,7 @@ void test ()
 
       data.tasks_block_size = 3;
       mf_data.reinit (dof, constraints, quad, data);
-      MatrixFreeTest<dim, fe_degree, number,parallel::distributed::Vector<number> > mf (mf_data);
+      MatrixFreeTest<dim, fe_degree, number,LinearAlgebra::distributed::Vector<number> > mf (mf_data);
       deallog << "Norm of difference:";
 
       // run 10 times to make a possible error more

@@ -26,7 +26,7 @@
 #include <deal.II/fe/mapping.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/lac/vector.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/block_vector_base.h>
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -506,7 +506,7 @@ public:
   /**
    * Initialize function for a general vector. The length of the vector is
    * equal to the total number of degrees in the DoFHandler. If the vector is
-   * of class parallel::distributed::Vector@<Number@>, the ghost entries are
+   * of class LinearAlgebra::distributed::Vector@<Number@>, the ghost entries are
    * set accordingly. For vector-valued problems with several DoFHandlers
    * underlying this class, the parameter @p vector_component defines which
    * component is to be used.
@@ -518,13 +518,13 @@ public:
   /**
    * Initialize function for a distributed vector. The length of the vector is
    * equal to the total number of degrees in the DoFHandler. If the vector is
-   * of class parallel::distributed::Vector@<Number@>, the ghost entries are
+   * of class LinearAlgebra::distributed::Vector@<Number@>, the ghost entries are
    * set accordingly. For vector-valued problems with several DoFHandlers
    * underlying this class, the parameter @p vector_component defines which
    * component is to be used.
    */
   template <typename Number2>
-  void initialize_dof_vector(parallel::distributed::Vector<Number2> &vec,
+  void initialize_dof_vector(LinearAlgebra::distributed::Vector<Number2> &vec,
                              const unsigned int vector_component=0) const;
 
   /**
@@ -953,7 +953,7 @@ template <int dim, typename Number>
 template <typename Number2>
 inline
 void
-MatrixFree<dim,Number>::initialize_dof_vector(parallel::distributed::Vector<Number2> &vec,
+MatrixFree<dim,Number>::initialize_dof_vector(LinearAlgebra::distributed::Vector<Number2> &vec,
                                               const unsigned int comp) const
 {
   AssertIndexRange (comp, n_components());
@@ -1685,7 +1685,7 @@ namespace internal
 
   template<typename Number>
   inline
-  bool update_ghost_values_start (const parallel::distributed::Vector<Number> &vec,
+  bool update_ghost_values_start (const LinearAlgebra::distributed::Vector<Number> &vec,
                                   const unsigned int                  channel = 0)
   {
     bool return_value = !vec.has_ghost_elements();
@@ -1749,11 +1749,11 @@ namespace internal
 
   template<typename Number>
   inline
-  void reset_ghost_values (const parallel::distributed::Vector<Number> &vec,
+  void reset_ghost_values (const LinearAlgebra::distributed::Vector<Number> &vec,
                            const bool zero_out_ghosts)
   {
     if (zero_out_ghosts)
-      const_cast<parallel::distributed::Vector<Number>&>(vec).zero_out_ghosts();
+      const_cast<LinearAlgebra::distributed::Vector<Number>&>(vec).zero_out_ghosts();
   }
 
 
@@ -1804,7 +1804,7 @@ namespace internal
 
   template <typename Number>
   inline
-  void update_ghost_values_finish (const parallel::distributed::Vector<Number> &vec)
+  void update_ghost_values_finish (const LinearAlgebra::distributed::Vector<Number> &vec)
   {
     vec.update_ghost_values_finish();
   }
@@ -1855,7 +1855,7 @@ namespace internal
 
   template <typename Number>
   inline
-  void compress_start (parallel::distributed::Vector<Number> &vec,
+  void compress_start (LinearAlgebra::distributed::Vector<Number> &vec,
                        const unsigned int           channel = 0)
   {
     vec.compress_start(channel);
@@ -1907,7 +1907,7 @@ namespace internal
 
   template <typename Number>
   inline
-  void compress_finish (parallel::distributed::Vector<Number> &vec)
+  void compress_finish (LinearAlgebra::distributed::Vector<Number> &vec)
   {
     vec.compress_finish(::dealii::VectorOperation::add);
   }

@@ -20,8 +20,8 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/parallel_vector.h>
-#include <deal.II/lac/parallel_block_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_block_vector.h>
 #include <deal.II/lac/petsc_parallel_block_vector.h>
@@ -471,21 +471,21 @@ namespace FETools
       }
 #endif
 
-      // special version for parallel::distributed::Vector
+      // special version for LinearAlgebra::distributed::Vector
       template <int dim, int spacedim, typename Number>
       void back_interpolate (const DoFHandler<dim,spacedim> &dof1,
                              const ConstraintMatrix &constraints1,
-                             const parallel::distributed::Vector<Number> &u1,
+                             const LinearAlgebra::distributed::Vector<Number> &u1,
                              const DoFHandler<dim,spacedim> &dof2,
                              const ConstraintMatrix &constraints2,
-                             parallel::distributed::Vector<Number> &u1_interpolated)
+                             LinearAlgebra::distributed::Vector<Number> &u1_interpolated)
       {
         IndexSet dof2_locally_owned_dofs = dof2.locally_owned_dofs();
         IndexSet dof2_locally_relevant_dofs;
         DoFTools::extract_locally_relevant_dofs (dof2,
                                                  dof2_locally_relevant_dofs);
 
-        parallel::distributed::Vector<Number>
+        LinearAlgebra::distributed::Vector<Number>
         u2 (dof2_locally_owned_dofs,
             dof2_locally_relevant_dofs,
             u1.get_mpi_communicator());

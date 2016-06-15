@@ -20,7 +20,7 @@
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -49,7 +49,7 @@ void test ()
   // and once where they have not
   for (unsigned int run = 0; run < 2; ++run)
     {
-      parallel::distributed::Vector<double> v(local_owned, local_relevant, MPI_COMM_WORLD);
+      LinearAlgebra::distributed::Vector<double> v(local_owned, local_relevant, MPI_COMM_WORLD);
 
       // set local values
       if (myid < 2)
@@ -60,7 +60,7 @@ void test ()
 
       v.compress(VectorOperation::insert);
 
-      parallel::distributed::Vector<double> w(v), u(v);
+      LinearAlgebra::distributed::Vector<double> w(v), u(v);
       u = 0;
 
       v*=2.0;
@@ -80,8 +80,8 @@ void test ()
         }
 
       // copy vector content to non-ghosted vectors, manually created.
-      parallel::distributed::Vector<double> v_dist(local_owned, MPI_COMM_WORLD),
-               w_dist(v_dist), u_dist(v_dist);
+      LinearAlgebra::distributed::Vector<double> v_dist(local_owned, MPI_COMM_WORLD),
+                    w_dist(v_dist), u_dist(v_dist);
 
       v_dist = v;
       w_dist = w;
