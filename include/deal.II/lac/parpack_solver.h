@@ -610,12 +610,14 @@ void PArpackSolver<VectorType>::solve
           PArpackExcInvalidEigenvalueSize(n_eigenvalues, eigenvalues.size()));
 
 
-  Assert (n_eigenvalues < mass_matrix.m(),
-          PArpackExcInvalidNumberofEigenvalues(n_eigenvalues, mass_matrix.m()));
+  // use eigenvectors to get the problem size so that it is possible to
+  // employ LinearOperator for mass_matrix.
+  Assert (n_eigenvalues < eigenvectors[0].size(),
+          PArpackExcInvalidNumberofEigenvalues(n_eigenvalues, eigenvectors[0].size()));
 
-  Assert (additional_data.number_of_arnoldi_vectors < mass_matrix.m(),
+  Assert (additional_data.number_of_arnoldi_vectors < eigenvectors[0].size(),
           PArpackExcInvalidNumberofArnoldiVectors(
-            additional_data.number_of_arnoldi_vectors, mass_matrix.m()));
+            additional_data.number_of_arnoldi_vectors, eigenvectors[0].size()));
 
   Assert (additional_data.number_of_arnoldi_vectors > 2*n_eigenvalues+1,
           PArpackExcSmallNumberofArnoldiVectors(
