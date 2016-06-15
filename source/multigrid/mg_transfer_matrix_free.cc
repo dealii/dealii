@@ -17,7 +17,7 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/function.h>
 
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -77,7 +77,7 @@ void MGTransferMatrixFree<dim,Number>::initialize_constraints
 template <int dim, typename Number>
 void MGTransferMatrixFree<dim,Number>::clear ()
 {
-  this->MGLevelGlobalTransfer<parallel::distributed::Vector<Number> >::clear();
+  this->MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::clear();
   fe_degree = 0;
   element_is_continuous = false;
   n_components = 0;
@@ -164,7 +164,7 @@ namespace
   reinit_ghosted_vector(const IndexSet &locally_owned,
                         std::vector<types::global_dof_index> &ghosted_level_dofs,
                         const MPI_Comm &communicator,
-                        parallel::distributed::Vector<Number> &ghosted_level_vector,
+                        LinearAlgebra::distributed::Vector<Number> &ghosted_level_vector,
                         std::vector<std::pair<unsigned int,unsigned int> > &copy_indices_global_mine)
   {
     std::sort(ghosted_level_dofs.begin(), ghosted_level_dofs.end());
@@ -547,8 +547,8 @@ void MGTransferMatrixFree<dim,Number>::build
 template <int dim, typename Number>
 void MGTransferMatrixFree<dim,Number>
 ::prolongate (const unsigned int                           to_level,
-              parallel::distributed::Vector<Number>       &dst,
-              const parallel::distributed::Vector<Number> &src) const
+              LinearAlgebra::distributed::Vector<Number>       &dst,
+              const LinearAlgebra::distributed::Vector<Number> &src) const
 {
   Assert ((to_level >= 1) && (to_level<=level_dof_indices.size()),
           ExcIndexRange (to_level, 1, level_dof_indices.size()+1));
@@ -610,8 +610,8 @@ void MGTransferMatrixFree<dim,Number>
 template <int dim, typename Number>
 void MGTransferMatrixFree<dim,Number>
 ::restrict_and_add (const unsigned int                           from_level,
-                    parallel::distributed::Vector<Number>       &dst,
-                    const parallel::distributed::Vector<Number> &src) const
+                    LinearAlgebra::distributed::Vector<Number>       &dst,
+                    const LinearAlgebra::distributed::Vector<Number> &src) const
 {
   Assert ((from_level >= 1) && (from_level<=level_dof_indices.size()),
           ExcIndexRange (from_level, 1, level_dof_indices.size()+1));
@@ -747,8 +747,8 @@ template <int dim, typename Number>
 template <int degree>
 void MGTransferMatrixFree<dim,Number>
 ::do_prolongate_add (const unsigned int                           to_level,
-                     parallel::distributed::Vector<Number>       &dst,
-                     const parallel::distributed::Vector<Number> &src) const
+                     LinearAlgebra::distributed::Vector<Number>       &dst,
+                     const LinearAlgebra::distributed::Vector<Number> &src) const
 {
   const unsigned int vec_size = VectorizedArray<Number>::n_array_elements;
   const unsigned int n_child_dofs_1d = 2*(fe_degree+1) - element_is_continuous;
@@ -835,8 +835,8 @@ template <int dim, typename Number>
 template <int degree>
 void MGTransferMatrixFree<dim,Number>
 ::do_restrict_add (const unsigned int                           from_level,
-                   parallel::distributed::Vector<Number>       &dst,
-                   const parallel::distributed::Vector<Number> &src) const
+                   LinearAlgebra::distributed::Vector<Number>       &dst,
+                   const LinearAlgebra::distributed::Vector<Number> &src) const
 {
   const unsigned int vec_size = VectorizedArray<Number>::n_array_elements;
   const unsigned int n_child_dofs_1d = 2*(fe_degree+1) - element_is_continuous;
@@ -928,7 +928,7 @@ template <int dim, typename Number>
 std::size_t
 MGTransferMatrixFree<dim,Number>::memory_consumption() const
 {
-  std::size_t memory = MGLevelGlobalTransfer<parallel::distributed::Vector<Number> >::memory_consumption();
+  std::size_t memory = MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::memory_consumption();
   memory += MemoryConsumption::memory_consumption(level_dof_indices);
   memory += MemoryConsumption::memory_consumption(parent_child_connect);
   memory += MemoryConsumption::memory_consumption(n_owned_level_cells);

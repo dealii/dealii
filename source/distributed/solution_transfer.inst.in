@@ -24,10 +24,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 #if deal_II_dimension > 1
 #if deal_II_dimension <= deal_II_space_dimension
     template class SolutionTransfer<deal_II_dimension,::dealii::Vector<double>, DoFHandler<deal_II_dimension,deal_II_space_dimension> >;
-    template class SolutionTransfer<deal_II_dimension,::dealii::parallel::distributed::Vector<double>, DoFHandler<deal_II_dimension,deal_II_space_dimension> >;
-    template class SolutionTransfer<deal_II_dimension,::dealii::parallel::distributed::Vector<float>, DoFHandler<deal_II_dimension,deal_II_space_dimension> >;
-    template class SolutionTransfer<deal_II_dimension,::dealii::parallel::distributed::BlockVector<double>, DoFHandler<deal_II_dimension,deal_II_space_dimension> >;
-    template class SolutionTransfer<deal_II_dimension,::dealii::parallel::distributed::BlockVector<float>, DoFHandler<deal_II_dimension,deal_II_space_dimension> >;
+    template class SolutionTransfer<deal_II_dimension,::dealii::LinearAlgebra::distributed::Vector<double>, DoFHandler<deal_II_dimension,deal_II_space_dimension> >;
+    template class SolutionTransfer<deal_II_dimension,::dealii::LinearAlgebra::distributed::Vector<float>, DoFHandler<deal_II_dimension,deal_II_space_dimension> >;
+    template class SolutionTransfer<deal_II_dimension,::dealii::LinearAlgebra::distributed::BlockVector<double>, DoFHandler<deal_II_dimension,deal_II_space_dimension> >;
+    template class SolutionTransfer<deal_II_dimension,::dealii::LinearAlgebra::distributed::BlockVector<float>, DoFHandler<deal_II_dimension,deal_II_space_dimension> >;
 
 
 #ifdef DEAL_II_WITH_PETSC
@@ -49,11 +49,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 
     template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::MPI::BlockVector, DoFHandler<deal_II_dimension,deal_II_space_dimension> >;
 #endif
-    
+
 #endif
 #endif
     \}
   \}
 
   }
-

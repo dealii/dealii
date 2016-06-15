@@ -13,21 +13,22 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__parallel_vector_templates_h
-#define dealii__parallel_vector_templates_h
+#ifndef dealii__la_parallel_vector_templates_h
+#define dealii__la_parallel_vector_templates_h
 
 
 #include <deal.II/base/config.h>
-#include <deal.II/lac/parallel_vector.h>
-#include <deal.II/lac/vector_view.h>
-
+#include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/vector_operations_internal.h>
+#include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
+
 
 DEAL_II_NAMESPACE_OPEN
 
 
-namespace parallel
+namespace LinearAlgebra
 {
   namespace distributed
   {
@@ -70,6 +71,7 @@ namespace parallel
           val = 0;
           allocated_size = 0;
         }
+      thread_loop_partitioner.reset(new ::dealii::parallel::internal::TBBPartitioner());
     }
 
 
@@ -80,11 +82,9 @@ namespace parallel
                             const bool      omit_zeroing_entries)
     {
       clear_mpi_requests();
+
       // check whether we need to reallocate
       resize_val (size);
-
-      // reset vector view
-      vector_view.reinit (size, val);
 
       // delete previous content in import data
       if (import_data != 0)
@@ -122,11 +122,7 @@ namespace parallel
           const size_type new_allocated_size = partitioner->local_size() +
                                                partitioner->n_ghost_indices();
           resize_val (new_allocated_size);
-          vector_view.reinit (partitioner->local_size(), val);
         }
-      else
-        Assert (vector_view.size() == partitioner->local_size(),
-                ExcInternalError());
 
       if (omit_zeroing_entries == false)
         this->operator= (Number());
@@ -143,6 +139,8 @@ namespace parallel
         }
 
       vector_is_ghosted = false;
+
+      thread_loop_partitioner = v.thread_loop_partitioner;
     }
 
 
@@ -187,7 +185,6 @@ namespace parallel
       const size_type new_allocated_size = partitioner->local_size() +
                                            partitioner->n_ghost_indices();
       resize_val (new_allocated_size);
-      vector_view.reinit (partitioner->local_size(), val);
 
       // initialize to zero
       this->operator= (Number());
@@ -208,9 +205,190 @@ namespace parallel
 
 
 
+    template <typename Number>
+    Vector<Number>::Vector ()
+      :
+      partitioner (new Utilities::MPI::Partitioner()),
+      allocated_size (0),
+      val (0),
+      import_data (0)
+    {
+      reinit(0);
+    }
+
+
+
+    template <typename Number>
+    Vector<Number>::Vector (const Vector<Number> &v)
+      :
+      Subscriptor(),
+      allocated_size (0),
+      val (0),
+      import_data (0),
+      vector_is_ghosted (false)
+    {
+      reinit (v, true);
+
+      thread_loop_partitioner = v.thread_loop_partitioner;
+      dealii::internal::Vector_copy<Number,Number> copier(v.val, val);
+      internal::parallel_for(copier, partitioner->local_size(),
+                             thread_loop_partitioner);
+
+      zero_out_ghosts();
+    }
+
+
+
+    template <typename Number>
+    Vector<Number>::Vector (const IndexSet &local_range,
+                            const IndexSet &ghost_indices,
+                            const MPI_Comm  communicator)
+      :
+      allocated_size (0),
+      val (0),
+      import_data (0),
+      vector_is_ghosted (false)
+    {
+      reinit (local_range, ghost_indices, communicator);
+    }
+
+
+
+    template <typename Number>
+    Vector<Number>::Vector (const IndexSet &local_range,
+                            const MPI_Comm  communicator)
+      :
+      allocated_size (0),
+      val (0),
+      import_data (0),
+      vector_is_ghosted (false)
+    {
+      reinit (local_range, communicator);
+    }
+
+
+
+    template <typename Number>
+    Vector<Number>::Vector (const size_type size)
+      :
+      allocated_size (0),
+      val (0),
+      import_data (0),
+      vector_is_ghosted (false)
+    {
+      reinit (size, false);
+    }
+
+
+
+    template <typename Number>
+    Vector<Number>::
+    Vector (const std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> &partitioner)
+      :
+      allocated_size (0),
+      val (0),
+      import_data (0),
+      vector_is_ghosted (false)
+    {
+      reinit (partitioner);
+    }
+
+
+
+    template <typename Number>
+    inline
+    Vector<Number>::~Vector ()
+    {
+      resize_val(0);
+
+      if (import_data != 0)
+        delete[] import_data;
+      import_data = 0;
+
+      clear_mpi_requests();
+    }
+
+
+
+    template <typename Number>
+    inline
+    Vector<Number> &
+    Vector<Number>::operator = (const Vector<Number> &c)
+    {
+#ifdef _MSC_VER
+      return this->operator=<Number>(c);
+#else
+      return this->template operator=<Number>(c);
+#endif
+    }
+
+
+
+    template <typename Number>
+    template <typename Number2>
+    inline
+    Vector<Number> &
+    Vector<Number>::operator = (const Vector<Number2> &c)
+    {
+      Assert (c.partitioner.get() != 0, ExcNotInitialized());
+
+      // we update ghost values whenever one of the input or output vector
+      // already held ghost values or when we import data from a vector with
+      // the same local range but different ghost layout
+      bool must_update_ghost_values = c.vector_is_ghosted;
+
+      // check whether the two vectors use the same parallel partitioner. if
+      // not, check if all local ranges are the same (that way, we can
+      // exchange data between different parallel layouts). One variant which
+      // is included here and necessary for compatibility with the other
+      // distributed vector classes (Trilinos, PETSc) is the case when vector
+      // c does not have any ghosts (constructed without ghost elements given)
+      // but the current vector does: In that case, we need to exchange data
+      // also when none of the two vector had updated its ghost values before.
+      if (partitioner.get() == 0)
+        reinit (c, true);
+      else if (partitioner.get() != c.partitioner.get())
+        {
+          // local ranges are also the same if both partitioners are empty
+          // (even if they happen to define the empty range as [0,0) or [c,c)
+          // for some c!=0 in a different way).
+          int local_ranges_are_identical =
+            (local_range() == c.local_range() ||
+             (local_range().second == local_range().first &&
+              c.local_range().second == c.local_range().first));
+          if ((c.partitioner->n_mpi_processes() > 1 &&
+               Utilities::MPI::min(local_ranges_are_identical,
+                                   c.partitioner->get_communicator()) == 0)
+              ||
+              !local_ranges_are_identical)
+            reinit (c, true);
+          else
+            must_update_ghost_values |= vector_is_ghosted;
+
+          must_update_ghost_values |=
+            (c.partitioner->ghost_indices_initialized() == false &&
+             partitioner->ghost_indices_initialized() == true);
+        }
+      else
+        must_update_ghost_values |= vector_is_ghosted;
+
+      thread_loop_partitioner = c.thread_loop_partitioner;
+      dealii::internal::Vector_copy<Number,Number2> copier(c.val, val);
+      internal::parallel_for(copier, partitioner->local_size(),
+                             thread_loop_partitioner);
+
+      if (must_update_ghost_values)
+        update_ghost_values();
+      else
+        zero_out_ghosts();
+      return *this;
+    }
+
+
+
 #ifdef DEAL_II_WITH_PETSC
 
-    namespace internal
+    namespace petsc_helpers
     {
       template <typename PETSC_Number, typename Number>
       void copy_petsc_vector (const PETSC_Number *petsc_start_ptr,
@@ -241,6 +419,11 @@ namespace parallel
     Vector<Number> &
     Vector<Number>::operator = (const PETScWrappers::MPI::Vector &petsc_vec)
     {
+      // TODO: We would like to use the same compact infrastructure as for the
+      // Trilinos vector below, but the interface through ReadWriteVector does
+      // not support overlapping (ghosted) PETSc vectors, which we need for
+      // backward compatibility.
+
       Assert(petsc_vec.locally_owned_elements() == locally_owned_elements(),
              StandardExceptions::ExcInvalidState());
 
@@ -250,7 +433,7 @@ namespace parallel
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       const size_type vec_size = local_size();
-      internal::copy_petsc_vector (start_ptr, start_ptr + vec_size, begin());
+      petsc_helpers::copy_petsc_vector (start_ptr, start_ptr + vec_size, begin());
 
       // restore the representation of the vector
       ierr = VecRestoreArray (static_cast<const Vec &>(petsc_vec), &start_ptr);
@@ -260,7 +443,7 @@ namespace parallel
       if (vector_is_ghosted || petsc_vec.has_ghost_elements())
         update_ghost_values();
 
-      // return a pointer to this object per normal c++ operator overloading
+      // return a reference to this object per normal c++ operator overloading
       // semantics
       return *this;
     }
@@ -275,35 +458,15 @@ namespace parallel
     Vector<Number> &
     Vector<Number>::operator = (const TrilinosWrappers::MPI::Vector &trilinos_vec)
     {
-      if (trilinos_vec.has_ghost_elements() == false)
-        {
-          Assert(trilinos_vec.locally_owned_elements() == locally_owned_elements(),
-                 StandardExceptions::ExcInvalidState());
-        }
-      else
-        // ghosted trilinos vector must contain the local range of this vector
-        // which is contiguous
-        {
-          Assert((trilinos_vec.locally_owned_elements() & locally_owned_elements())
-                 == locally_owned_elements(),
-                 StandardExceptions::ExcInvalidState());
-        }
+      IndexSet combined_set = partitioner->locally_owned_range();
+      combined_set.add_indices(partitioner->ghost_indices());
+      ReadWriteVector<Number> rw_vector(combined_set);
+      rw_vector.import(trilinos_vec, VectorOperation::insert);
+      import(rw_vector, VectorOperation::insert);
 
-      // create on trilinos data
-      const std::size_t start_index =
-        trilinos_vec.vector_partitioner().NumMyElements() > 0 ?
-        trilinos_vec.vector_partitioner().
-        LID(static_cast<TrilinosWrappers::types::int_type>(this->local_range().first)) : 0;
-      const VectorView<double> in_view (local_size(), trilinos_vec.begin()+start_index);
-      static_cast<dealii::Vector<Number>&>(vector_view) =
-        static_cast<const dealii::Vector<double>&>(in_view);
-
-      // spread ghost values between processes?
       if (vector_is_ghosted || trilinos_vec.has_ghost_elements())
         update_ghost_values();
 
-      // return a pointer to this object per normal c++ operator overloading
-      // semantics
       return *this;
     }
 
@@ -313,17 +476,32 @@ namespace parallel
 
     template <typename Number>
     void
-    Vector<Number>::copy_from (const Vector<Number> &c,
-                               const bool            call_update_ghost_values)
+    Vector<Number>::compress (::dealii::VectorOperation::values operation)
     {
-      AssertDimension (local_range().first, c.local_range().first);
-      AssertDimension (local_range().second, c.local_range().second);
-      AssertDimension (vector_view.size(), c.vector_view.size());
-      vector_view = c.vector_view;
-      if (call_update_ghost_values == true)
-        update_ghost_values();
-      else
-        vector_is_ghosted = false;
+      compress_start (0, operation);
+      compress_finish(operation);
+    }
+
+
+
+    template <typename Number>
+    void
+    Vector<Number>::update_ghost_values () const
+    {
+      update_ghost_values_start ();
+      update_ghost_values_finish ();
+    }
+
+
+
+    template <typename Number>
+    void
+    Vector<Number>::zero_out_ghosts ()
+    {
+      std::fill_n (&val[partitioner->local_size()],
+                   partitioner->n_ghost_indices(),
+                   Number());
+      vector_is_ghosted = false;
     }
 
 
@@ -396,7 +574,6 @@ namespace parallel
             }
           AssertDimension(current_index_start, part.n_import_indices());
 
-          Assert (part.local_size() == vector_view.size(), ExcInternalError());
           current_index_start = part.local_size();
           for (unsigned int i=0; i<n_ghost_targets; i++)
             {
@@ -489,10 +666,10 @@ namespace parallel
             for ( ; my_imports!=part.import_indices().end(); ++my_imports)
               for (unsigned int j=my_imports->first; j<my_imports->second;
                    j++, read_position++)
-                Assert(*read_position == 0. ||
+                Assert(*read_position == Number() ||
                        std::abs(local_element(j) - *read_position) <=
                        std::abs(local_element(j)) * 1000. *
-                       std::numeric_limits<Number>::epsilon(),
+                       std::numeric_limits<real_type>::epsilon(),
                        ExcNonMatchingElements(*read_position, local_element(j),
                                               part.this_mpi_process()));
           AssertDimension(read_position-import_data,part.n_import_indices());
@@ -539,8 +716,6 @@ namespace parallel
       // then actually send the data
       if (update_ghost_values_requests.size() == 0)
         {
-          Assert (part.local_size() == vector_view.size(),
-                  ExcInternalError());
           size_type current_index_start = part.local_size();
           update_ghost_values_requests.resize (n_import_targets+n_ghost_targets);
           for (unsigned int i=0; i<n_ghost_targets; i++)
@@ -635,6 +810,48 @@ namespace parallel
 
     template <typename Number>
     void
+    Vector<Number>::import(const ReadWriteVector<Number>                  &V,
+                           VectorOperation::values                         operation,
+                           std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern)
+    {
+      // If no communication pattern is given, create one. Otherwise, use the
+      // given one.
+      std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> comm_pattern;
+      if (communication_pattern.get() == NULL)
+        {
+          comm_pattern.reset(new Utilities::MPI::Partitioner(locally_owned_elements(),
+                                                             V.get_stored_elements(),
+                                                             get_mpi_communicator()));
+        }
+      else
+        {
+          comm_pattern =
+            std_cxx11::dynamic_pointer_cast<const Utilities::MPI::Partitioner> (communication_pattern);
+          AssertThrow(comm_pattern != NULL,
+                      ExcMessage("The communication pattern is not of type "
+                                 "Utilities::MPI::Partitioner."));
+        }
+      Vector<Number> tmp_vector(comm_pattern);
+
+      // fill entries from ReadWriteVector into the distributed vector,
+      // including ghost entries. this is not really efficient right now
+      // because indices are translated twice, once by nth_index_in_set(i) and
+      // once for operator() of tmp_vector
+      const IndexSet &v_stored = V.get_stored_elements();
+      for (size_type i=0; i<v_stored.n_elements(); ++i)
+        tmp_vector(v_stored.nth_index_in_set(i)) = V.local_element(i);
+
+      tmp_vector.compress(operation);
+
+      dealii::internal::Vector_copy<Number,Number> copier(tmp_vector.val, val);
+      internal::parallel_for(copier, partitioner->local_size(),
+                             thread_loop_partitioner);
+    }
+
+
+
+    template <typename Number>
+    void
     Vector<Number>::swap (Vector<Number> &v)
     {
 #ifdef DEAL_II_WITH_MPI
@@ -672,15 +889,575 @@ namespace parallel
 #endif
 
       std::swap (partitioner,       v.partitioner);
+      std::swap (thread_loop_partitioner, v.thread_loop_partitioner);
       std::swap (allocated_size,    v.allocated_size);
       std::swap (val,               v.val);
       std::swap (import_data,       v.import_data);
       std::swap (vector_is_ghosted, v.vector_is_ghosted);
+    }
 
-      // vector view cannot be swapped so reset it manually (without touching
-      // the vector elements)
-      vector_view.reinit (partitioner->local_size(), val);
-      v.vector_view.reinit (v.partitioner->local_size(), v.val);
+
+
+    template <typename Number>
+    Vector<Number> &
+    Vector<Number>::operator = (const Number s)
+    {
+      internal::Vector_set<Number> setter(s, val);
+
+      internal::parallel_for(setter, partitioner->local_size(),
+                             thread_loop_partitioner);
+
+      // if we call Vector::operator=0, we want to zero out all the entries
+      // plus ghosts.
+      if (s==Number())
+        zero_out_ghosts();
+
+      return *this;
+    }
+
+
+
+    template <typename Number>
+    Vector<Number> &
+    Vector<Number>::operator += (const VectorSpaceVector<Number> &vv)
+    {
+      // Downcast. Throws an exception if invalid.
+      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=NULL,
+             ExcVectorTypeNotCompatible());
+      const Vector<Number> &v = dynamic_cast<const Vector<Number> &>(vv);
+
+      AssertDimension (local_size(), v.local_size());
+
+      internal::Vectorization_add_v<Number> vector_add(val, v.val);
+      internal::parallel_for(vector_add, partitioner->local_size(),
+                             thread_loop_partitioner);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
+
+      return *this;
+    }
+
+
+
+    template <typename Number>
+    Vector<Number> &
+    Vector<Number>::operator -= (const VectorSpaceVector<Number> &vv)
+    {
+      // Downcast. Throws an exception if invalid.
+      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=NULL,
+             ExcVectorTypeNotCompatible());
+      const Vector<Number> &v = dynamic_cast<const Vector<Number> &>(vv);
+
+      AssertDimension (local_size(), v.local_size());
+
+      internal::Vectorization_subtract_v<Number> vector_subtract(val, v.val);
+      internal::parallel_for(vector_subtract, partitioner->local_size(),
+                             thread_loop_partitioner);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
+
+      return *this;
+    }
+
+
+
+    template <typename Number>
+    void
+    Vector<Number>::add (const Number a)
+    {
+      AssertIsFinite(a);
+
+      internal::Vectorization_add_factor<Number> vector_add(val, a);
+      internal::parallel_for(vector_add, partitioner->local_size(),
+                             thread_loop_partitioner);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
+    }
+
+
+
+    template <typename Number>
+    void
+    Vector<Number>::add (const Number a,
+                         const VectorSpaceVector<Number> &vv)
+    {
+      // Downcast. Throws an exception if invalid.
+      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=NULL,
+             ExcVectorTypeNotCompatible());
+      const Vector<Number> &v = dynamic_cast<const Vector<Number> &>(vv);
+
+      AssertIsFinite(a);
+      AssertDimension (local_size(), v.local_size());
+
+      internal::Vectorization_add_av<Number> vector_add(val, v.val, a);
+      internal::parallel_for(vector_add, partitioner->local_size(),
+                             thread_loop_partitioner);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
+    }
+
+
+
+    template <typename Number>
+    void
+    Vector<Number>::add (const Number a,
+                         const VectorSpaceVector<Number> &vv,
+                         const Number b,
+                         const VectorSpaceVector<Number> &ww)
+    {
+      // Downcast. Throws an exception if invalid.
+      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=NULL,
+             ExcVectorTypeNotCompatible());
+      const Vector<Number> &v = dynamic_cast<const Vector<Number> &>(vv);
+      Assert(dynamic_cast<const Vector<Number> *>(&ww)!=NULL,
+             ExcVectorTypeNotCompatible());
+      const Vector<Number> &w = dynamic_cast<const Vector<Number> &>(ww);
+
+      AssertIsFinite(a);
+      AssertIsFinite(b);
+
+      AssertDimension (local_size(), v.local_size());
+      AssertDimension (local_size(), w.local_size());
+
+      internal::Vectorization_add_avpbw<Number> vector_add(val, v.val, w.val, a, b);
+      internal::parallel_for(vector_add, partitioner->local_size(),
+                             thread_loop_partitioner);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
+    }
+
+
+
+    template <typename Number>
+    void
+    Vector<Number>::sadd (const Number x,
+                          const Vector<Number> &v)
+    {
+      AssertIsFinite(x);
+      AssertDimension (local_size(), v.local_size());
+
+      internal::Vectorization_sadd_xv<Number> vector_sadd(val, v.val, x);
+      internal::parallel_for(vector_sadd, partitioner->local_size(),
+                             thread_loop_partitioner);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
+    }
+
+
+
+    template <typename Number>
+    void
+    Vector<Number>::sadd (const Number x,
+                          const Number a,
+                          const VectorSpaceVector<Number> &vv)
+    {
+      // Downcast. Throws an exception if invalid.
+      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=NULL,
+             ExcVectorTypeNotCompatible());
+      const Vector<Number> &v = dynamic_cast<const Vector<Number> &>(vv);
+
+      AssertIsFinite(x);
+      AssertIsFinite(a);
+      AssertDimension (local_size(), v.local_size());
+
+      internal::Vectorization_sadd_xav<Number> vector_sadd(val, v.val, a, x);
+      internal::parallel_for(vector_sadd, partitioner->local_size(),
+                             thread_loop_partitioner);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
+    }
+
+
+
+    template <typename Number>
+    void
+    Vector<Number>::sadd (const Number x,
+                          const Number a,
+                          const Vector<Number> &v,
+                          const Number b,
+                          const Vector<Number> &w)
+    {
+      AssertIsFinite(x);
+      AssertIsFinite(a);
+      AssertIsFinite(b);
+
+      AssertDimension (local_size(), v.local_size());
+      AssertDimension (local_size(), w.local_size());
+
+      internal::Vectorization_sadd_xavbw<Number> vector_sadd(val, v.val, w.val,
+                                                             x, a, b);
+      internal::parallel_for(vector_sadd, partitioner->local_size(),
+                             thread_loop_partitioner);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
+    }
+
+
+
+    template <typename Number>
+    Vector<Number> &
+    Vector<Number>::operator *= (const Number factor)
+    {
+      AssertIsFinite(factor);
+      internal::Vectorization_multiply_factor<Number> vector_multiply(val, factor);
+
+      internal::parallel_for(vector_multiply, partitioner->local_size(),
+                             thread_loop_partitioner);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
+
+      return *this;
+    }
+
+
+
+    template <typename Number>
+    Vector<Number> &
+    Vector<Number>::operator /= (const Number factor)
+    {
+      operator *= (static_cast<Number>(1.)/factor);
+      return *this;
+    }
+
+
+
+    template <typename Number>
+    void
+    Vector<Number>::scale (const VectorSpaceVector<Number> &vv)
+    {
+      // Downcast. Throws an exception if invalid.
+      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=NULL,
+             ExcVectorTypeNotCompatible());
+      const Vector<Number> &v = dynamic_cast<const Vector<Number> &>(vv);
+
+      AssertDimension (local_size(), v.local_size());
+
+      internal::Vectorization_scale<Number> vector_scale(val, v.val);
+      internal::parallel_for(vector_scale, partitioner->local_size(),
+                             thread_loop_partitioner);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
+    }
+
+
+
+    template <typename Number>
+    void
+    Vector<Number>::equ (const Number a,
+                         const VectorSpaceVector<Number> &vv)
+    {
+      // Downcast. Throws an exception if invalid.
+      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=NULL,
+             ExcVectorTypeNotCompatible());
+      const Vector<Number> &v = dynamic_cast<const Vector<Number> &>(vv);
+
+      AssertIsFinite(a);
+      AssertDimension (local_size(), v.local_size());
+
+      internal::Vectorization_equ_au<Number> vector_equ(val, v.val, a);
+      internal::parallel_for(vector_equ, partitioner->local_size(),
+                             thread_loop_partitioner);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
+    }
+
+
+
+    template <typename Number>
+    void
+    Vector<Number>::equ (const Number a,
+                         const Vector<Number> &v,
+                         const Number b,
+                         const Vector<Number> &w)
+    {
+      AssertIsFinite(a);
+      AssertIsFinite(b);
+
+      AssertDimension (local_size(), v.local_size());
+      AssertDimension (local_size(), w.local_size());
+
+      internal::Vectorization_equ_aubv<Number> vector_equ(val, v.val, w.val, a, b);
+      internal::parallel_for(vector_equ, partitioner->local_size(),
+                             thread_loop_partitioner);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
+    }
+
+
+
+    template <typename Number>
+    bool
+    Vector<Number>::all_zero_local () const
+    {
+      const size_type local_size = partitioner->local_size();
+      for (size_type i=0; i<local_size; ++i)
+        if (val[i] != Number(0))
+          return false;
+      return true;
+    }
+
+
+
+    template <typename Number>
+    bool
+    Vector<Number>::all_zero () const
+    {
+      // use int instead of bool. in order to make global reduction operations
+      // work also when MPI_Init was not called, only call MPI_Allreduce
+      // commands when there is more than one processor (note that reinit()
+      // functions handle this case correctly through the job_supports_mpi()
+      // query). this is the same in all the reduce functions below
+      int local_result = -static_cast<int>(all_zero_local());
+      if (partitioner->n_mpi_processes() > 1)
+        return -Utilities::MPI::max(local_result,
+                                    partitioner->get_communicator());
+      else
+        return -local_result;
+    }
+
+
+
+    template <typename Number>
+    template <typename Number2>
+    Number
+    Vector<Number>::inner_product_local(const Vector<Number2> &v) const
+    {
+      if (PointerComparison::equal (this, &v))
+        return norm_sqr_local();
+
+      AssertDimension (partitioner->local_size(), v.partitioner->local_size());
+
+      Number sum;
+      internal::Dot<Number,Number2> dot(val, v.val);
+      internal::parallel_reduce (dot, partitioner->local_size(), sum,
+                                 thread_loop_partitioner);
+      AssertIsFinite(sum);
+
+      return sum;
+    }
+
+
+
+    template <typename Number>
+    Number
+    Vector<Number>::operator * (const VectorSpaceVector<Number> &vv) const
+    {
+      // Downcast. Throws an exception if invalid.
+      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=NULL,
+             ExcVectorTypeNotCompatible());
+      const Vector<Number> &v = dynamic_cast<const Vector<Number> &>(vv);
+
+      Number local_result = inner_product_local(v);
+      if (partitioner->n_mpi_processes() > 1)
+        return Utilities::MPI::sum (local_result,
+                                    partitioner->get_communicator());
+      else
+        return local_result;
+    }
+
+
+
+    template <typename Number>
+    typename Vector<Number>::real_type
+    Vector<Number>::norm_sqr_local () const
+    {
+      real_type sum;
+      internal::Norm2<Number,real_type> norm2(val);
+      internal::parallel_reduce (norm2, partitioner->local_size(), sum,
+                                 thread_loop_partitioner);
+      AssertIsFinite(sum);
+
+      return sum;
+    }
+
+
+
+    template <typename Number>
+    Number
+    Vector<Number>::mean_value_local () const
+    {
+      Assert(size() != 0, ExcEmptyObject());
+
+      if (partitioner->local_size() == 0)
+        return Number();
+
+      Number sum;
+      internal::MeanValue<Number> mean(val);
+      internal::parallel_reduce (mean, partitioner->local_size(), sum,
+                                 thread_loop_partitioner);
+
+      return sum / real_type(partitioner->local_size());
+    }
+
+
+
+    template <typename Number>
+    Number
+    Vector<Number>::mean_value () const
+    {
+      Number local_result = mean_value_local();
+      if (partitioner->n_mpi_processes() > 1)
+        return Utilities::MPI::sum (local_result *
+                                    (real_type)partitioner->local_size(),
+                                    partitioner->get_communicator())
+               /(real_type)partitioner->size();
+      else
+        return local_result;
+    }
+
+
+
+    template <typename Number>
+    typename Vector<Number>::real_type
+    Vector<Number>::l1_norm_local () const
+    {
+      real_type sum;
+      internal::Norm1<Number, real_type> norm1(val);
+      internal::parallel_reduce (norm1, partitioner->local_size(), sum,
+                                 thread_loop_partitioner);
+
+      return sum;
+    }
+
+
+
+    template <typename Number>
+    typename Vector<Number>::real_type
+    Vector<Number>::l1_norm () const
+    {
+      real_type local_result = l1_norm_local();
+      if (partitioner->n_mpi_processes() > 1)
+        return Utilities::MPI::sum(local_result,
+                                   partitioner->get_communicator());
+      else
+        return local_result;
+    }
+
+
+
+    template <typename Number>
+    typename Vector<Number>::real_type
+    Vector<Number>::l2_norm () const
+    {
+      real_type local_result = norm_sqr_local();
+      if (partitioner->n_mpi_processes() > 1)
+        return std::sqrt(Utilities::MPI::sum(local_result,
+                                             partitioner->get_communicator()));
+      else
+        return std::sqrt(local_result);
+    }
+
+
+
+    template <typename Number>
+    typename Vector<Number>::real_type
+    Vector<Number>::lp_norm_local (const real_type p) const
+    {
+      real_type sum;
+      internal::NormP<Number, real_type> normp(val, p);
+      internal::parallel_reduce (normp, partitioner->local_size(), sum,
+                                 thread_loop_partitioner);
+      return std::pow(sum, 1./p);
+    }
+
+
+
+    template <typename Number>
+    typename Vector<Number>::real_type
+    Vector<Number>::lp_norm (const real_type p) const
+    {
+      const real_type local_result = lp_norm_local(p);
+      if (partitioner->n_mpi_processes() > 1)
+        return std::pow (Utilities::MPI::sum(std::pow(local_result,p),
+                                             partitioner->get_communicator()),
+                         static_cast<real_type>(1.0/p));
+      else
+        return local_result;
+    }
+
+
+
+    template <typename Number>
+    typename Vector<Number>::real_type
+    Vector<Number>::linfty_norm_local () const
+    {
+      real_type max = 0.;
+
+      const size_type local_size = partitioner->local_size();
+      for (size_type i=0; i<local_size; ++i)
+        max = std::max (numbers::NumberTraits<Number>::abs(val[i]), max);
+
+      return max;
+    }
+
+
+
+    template <typename Number>
+    inline
+    typename Vector<Number>::real_type
+    Vector<Number>::linfty_norm () const
+    {
+      const real_type local_result = linfty_norm_local();
+      if (partitioner->n_mpi_processes() > 1)
+        return Utilities::MPI::max (local_result,
+                                    partitioner->get_communicator());
+      else
+        return local_result;
+    }
+
+
+
+    template <typename Number>
+    Number
+    Vector<Number>::add_and_dot_local(const Number          a,
+                                      const Vector<Number> &v,
+                                      const Vector<Number> &w)
+    {
+      const size_type vec_size = partitioner->local_size();
+      AssertDimension (vec_size, v.local_size());
+      AssertDimension (vec_size, w.local_size());
+
+      Number sum;
+      internal::AddAndDot<Number> adder(this->val, v.val, w.val, a);
+      internal::parallel_reduce (adder, vec_size, sum, thread_loop_partitioner);
+      AssertIsFinite(sum);
+      return sum;
+    }
+
+
+
+    template <typename Number>
+    Number
+    Vector<Number>::add_and_dot (const Number                     a,
+                                 const VectorSpaceVector<Number> &vv,
+                                 const VectorSpaceVector<Number> &ww)
+    {
+      // Downcast. Throws an exception if invalid.
+      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=NULL,
+             ExcVectorTypeNotCompatible());
+      const Vector<Number> &v = dynamic_cast<const Vector<Number> &>(vv);
+      Assert(dynamic_cast<const Vector<Number> *>(&ww)!=NULL,
+             ExcVectorTypeNotCompatible());
+      const Vector<Number> &w = dynamic_cast<const Vector<Number> &>(ww);
+
+      Number local_result = add_and_dot_local(a, v, w);
+      if (partitioner->n_mpi_processes() > 1)
+        return Utilities::MPI::sum (local_result,
+                                    partitioner->get_communicator());
+      else
+        return local_result;
     }
 
 

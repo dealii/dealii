@@ -14,13 +14,13 @@
 // ---------------------------------------------------------------------
 
 
-// check parallel::distributed::Vector::partitioners_are_compatible and
+// check LinearAlgebra::distributed::Vector::partitioners_are_compatible and
 // partitioners_are_globally_compatible
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -41,7 +41,7 @@ void test ()
   local_relevant = local_owned;
   local_relevant.add_range(1,2);
 
-  parallel::distributed::Vector<double> v1, v2, v3, v4, v5, v6;
+  LinearAlgebra::distributed::Vector<double> v1, v2, v3, v4, v5, v6;
   v1.reinit(local_owned, MPI_COMM_WORLD);
   v2.reinit(local_owned, local_relevant, MPI_COMM_WORLD);
   v3.reinit(local_owned, local_relevant, MPI_COMM_WORLD);

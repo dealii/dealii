@@ -14,12 +14,12 @@
 // ---------------------------------------------------------------------
 
 
-// check parallel::distributed::Vector::swap
+// check LinearAlgebra::distributed::Vector::swap
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -54,8 +54,8 @@ void test ()
   if (numproc > 2)
     local_relevant0.add_index(8);
 
-  parallel::distributed::Vector<double> v0(local_owned0, local_relevant0,
-                                           MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v0(local_owned0, local_relevant0,
+                                                MPI_COMM_WORLD);
 
   // vector1: local size 4
   const unsigned int local_size1 = 4;
@@ -76,8 +76,8 @@ void test ()
       local_relevant1.add_index(10);
     }
 
-  parallel::distributed::Vector<double> v1(local_owned1, local_relevant1,
-                                           MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v1(local_owned1, local_relevant1,
+                                                MPI_COMM_WORLD);
 
   v0 = 1;
   v1 = 2;
@@ -147,7 +147,7 @@ void test ()
   if (myid==0) deallog << "Ghost values after re-set OK" << std::endl;
 
   // swap with an empty vector
-  parallel::distributed::Vector<double> v2;
+  LinearAlgebra::distributed::Vector<double> v2;
   v2.swap (v0);
   AssertDimension (v0.size(), 0);
   AssertDimension (v2.size(), global_size1);

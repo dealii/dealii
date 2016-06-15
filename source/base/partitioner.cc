@@ -90,6 +90,19 @@ namespace Utilities
 
 
     void
+    Partitioner::reinit(const IndexSet &vector_space_vector_index_set,
+                        const IndexSet &read_write_vector_index_set,
+                        const MPI_Comm &communicator_in)
+    {
+      have_ghost_indices = false;
+      communicator = communicator_in;
+      set_owned_indices (vector_space_vector_index_set);
+      set_ghost_indices (read_write_vector_index_set);
+    }
+
+
+
+    void
     Partitioner::set_owned_indices (const IndexSet &locally_owned_indices)
     {
       if (Utilities::System::job_supports_mpi() == true)

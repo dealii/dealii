@@ -21,11 +21,11 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/lac/vector.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/parallel_block_vector.h>
+#include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/petsc_block_vector.h>
 #include <deal.II/lac/trilinos_block_vector.h>
 #include <deal.II/numerics/solution_transfer.h>

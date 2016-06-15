@@ -116,8 +116,8 @@ void test ()
     mf_data.reinit (dof, constraints, quad, data);
   }
 
-  MatrixFreeTest<dim,fe_degree,number,parallel::distributed::Vector<number> > mf (mf_data);
-  parallel::distributed::Vector<number> in, out, ref;
+  MatrixFreeTest<dim,fe_degree,number,LinearAlgebra::distributed::Vector<number> > mf (mf_data);
+  LinearAlgebra::distributed::Vector<number> in, out, ref;
   mf_data.initialize_dof_vector (in);
   out.reinit (in);
   ref.reinit (in);

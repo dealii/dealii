@@ -20,7 +20,7 @@
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -61,14 +61,14 @@ void test ()
   // v has ghosts, w has none. set some entries
   // on w, copy into v and check if they are
   // there
-  parallel::distributed::Vector<double> v(local_owned, local_relevant, MPI_COMM_WORLD);
-  parallel::distributed::Vector<double> w(local_owned, local_owned, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(local_owned, local_relevant, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> w(local_owned, local_owned, MPI_COMM_WORLD);
 
   // set a few of the local elements
   for (unsigned i=0; i<local_size; ++i)
     w.local_element(i) = 2.0 * (i + my_start);
 
-  v.copy_from(w);
+  v = w;
   v.update_ghost_values();
 
   // check local values for correctness
@@ -96,10 +96,11 @@ void test ()
       AssertThrow (v(ghost_indices[i])==v.local_element(local_size+i-5), ExcInternalError());
 
 
-  // now the same again, but import ghosts
-  // through the call to copy_from
+  // now the same again, but import ghosts automatically because v had ghosts
+  // set before calling operator =
   v.reinit (local_owned, local_relevant, MPI_COMM_WORLD);
-  v.copy_from(w, true);
+  v.update_ghost_values();
+  v = w;
 
   // check local values for correctness
   for (unsigned int i=0; i<local_size; ++i)
@@ -124,17 +125,6 @@ void test ()
   if (myid == 0)
     for (unsigned int i=5; i<10; ++i)
       AssertThrow (v(ghost_indices[i])==v.local_element(local_size+i-5), ExcInternalError());
-
-
-  // now do not call import_ghosts and check
-  // whether ghosts really are zero
-  v.reinit (local_owned, local_relevant, MPI_COMM_WORLD);
-  v.copy_from(w, false);
-
-  // check non-local entries on all processors
-  for (unsigned int i=0; i<10; ++i)
-    if (local_owned.is_element (ghost_indices[i]) == false)
-      AssertThrow (v(ghost_indices[i]) == 0., ExcInternalError());
 
   if (myid == 0)
     deallog << "OK" << std::endl;

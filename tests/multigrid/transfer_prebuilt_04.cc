@@ -21,7 +21,7 @@
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -84,7 +84,7 @@ void check()
           grid_out.write_svg (tr, grid_output);
         }
 
-      MGTransferPrebuilt<parallel::distributed::Vector<double> >
+      MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double> >
       transfer_ref(hanging_node_constraints, mg_constrained_dofs);
       transfer_ref.build_matrices(mgdof);
     }

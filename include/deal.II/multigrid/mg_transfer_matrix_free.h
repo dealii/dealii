@@ -18,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/multigrid/mg_base.h>
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/base/mg_level_object.h>
@@ -50,7 +50,7 @@ DEAL_II_NAMESPACE_OPEN
  * @date 2016
  */
 template <int dim, typename Number>
-class MGTransferMatrixFree : public MGLevelGlobalTransfer<parallel::distributed::Vector<Number> >
+class MGTransferMatrixFree : public MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >
 {
 public:
   /**
@@ -97,8 +97,8 @@ public:
    * finer level.
    */
   virtual void prolongate (const unsigned int                           to_level,
-                           parallel::distributed::Vector<Number>       &dst,
-                           const parallel::distributed::Vector<Number> &src) const;
+                           LinearAlgebra::distributed::Vector<Number>       &dst,
+                           const LinearAlgebra::distributed::Vector<Number> &src) const;
 
   /**
    * Restrict a vector from level <tt>from_level</tt> to level
@@ -116,8 +116,8 @@ public:
    * coarser level.
    */
   virtual void restrict_and_add (const unsigned int from_level,
-                                 parallel::distributed::Vector<Number>       &dst,
-                                 const parallel::distributed::Vector<Number> &src) const;
+                                 LinearAlgebra::distributed::Vector<Number>       &dst,
+                                 const LinearAlgebra::distributed::Vector<Number> &src) const;
 
   /**
    * Finite element does not provide prolongation matrices.
@@ -216,16 +216,16 @@ private:
    */
   template <int degree>
   void do_prolongate_add(const unsigned int                           to_level,
-                         parallel::distributed::Vector<Number>       &dst,
-                         const parallel::distributed::Vector<Number> &src) const;
+                         LinearAlgebra::distributed::Vector<Number>       &dst,
+                         const LinearAlgebra::distributed::Vector<Number> &src) const;
 
   /**
    * Performs templated restriction operation
    */
   template <int degree>
   void do_restrict_add(const unsigned int                           from_level,
-                       parallel::distributed::Vector<Number>       &dst,
-                       const parallel::distributed::Vector<Number> &src) const;
+                       LinearAlgebra::distributed::Vector<Number>       &dst,
+                       const LinearAlgebra::distributed::Vector<Number> &src) const;
 };
 
 

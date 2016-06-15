@@ -26,8 +26,8 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/block_sparse_matrix.h>
-#include <deal.II/lac/parallel_vector.h>
-#include <deal.II/lac/parallel_block_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
@@ -532,7 +532,7 @@ namespace internal
       }
 
       template<typename Number>
-      void set_zero_parallel(const std::vector<size_type> &cm, parallel::distributed::Vector<Number> &vec, size_type shift = 0)
+      void set_zero_parallel(const std::vector<size_type> &cm, LinearAlgebra::distributed::Vector<Number> &vec, size_type shift = 0)
       {
         for (typename std::vector<size_type>::const_iterator it = cm.begin();
              it != cm.end(); ++it)
@@ -777,15 +777,15 @@ namespace internal
 
     template <typename number>
     void
-    import_vector_with_ghost_elements (const parallel::distributed::Vector<number> &vec,
+    import_vector_with_ghost_elements (const LinearAlgebra::distributed::Vector<number> &vec,
                                        const IndexSet                              &locally_owned_elements,
                                        const IndexSet                              &needed_elements,
-                                       parallel::distributed::Vector<number>       &output,
+                                       LinearAlgebra::distributed::Vector<number>       &output,
                                        const internal::bool2type<false>             /*is_block_vector*/)
     {
       // TODO: the in vector might already have all elements. need to find a
       // way to efficiently avoid the copy then
-      const_cast<parallel::distributed::Vector<number>&>(vec).zero_out_ghosts();
+      const_cast<LinearAlgebra::distributed::Vector<number>&>(vec).zero_out_ghosts();
       output.reinit (locally_owned_elements, needed_elements, vec.get_mpi_communicator());
       output = vec;
       output.update_ghost_values();

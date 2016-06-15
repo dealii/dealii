@@ -37,7 +37,7 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/distributed/tria.h>
 
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
 
@@ -62,17 +62,17 @@ namespace Step48
     SineGordonOperation(const MatrixFree<dim,double> &data_in,
                         const double                      time_step);
 
-    void apply (parallel::distributed::Vector<double>                        &dst,
-                const std::vector<parallel::distributed::Vector<double>*> &src) const;
+    void apply (LinearAlgebra::distributed::Vector<double>                        &dst,
+                const std::vector<LinearAlgebra::distributed::Vector<double>*> &src) const;
 
   private:
     const MatrixFree<dim,double>         &data;
     const VectorizedArray<double>         delta_t_sqr;
-    parallel::distributed::Vector<double> inv_mass_matrix;
+    LinearAlgebra::distributed::Vector<double> inv_mass_matrix;
 
     void local_apply (const MatrixFree<dim,double>               &data,
-                      parallel::distributed::Vector<double>      &dst,
-                      const std::vector<parallel::distributed::Vector<double>*> &src,
+                      LinearAlgebra::distributed::Vector<double>      &dst,
+                      const std::vector<LinearAlgebra::distributed::Vector<double>*> &src,
                       const std::pair<unsigned int,unsigned int> &cell_range) const;
   };
 
@@ -118,8 +118,8 @@ namespace Step48
   template <int dim, int fe_degree>
   void SineGordonOperation<dim, fe_degree>::
   local_apply (const MatrixFree<dim>                 &data,
-               parallel::distributed::Vector<double>     &dst,
-               const std::vector<parallel::distributed::Vector<double>*> &src,
+               LinearAlgebra::distributed::Vector<double>     &dst,
+               const std::vector<LinearAlgebra::distributed::Vector<double>*> &src,
                const std::pair<unsigned int,unsigned int> &cell_range) const
   {
     AssertDimension (src.size(), 2);
@@ -155,8 +155,8 @@ namespace Step48
 
   template <int dim, int fe_degree>
   void SineGordonOperation<dim, fe_degree>::
-  apply (parallel::distributed::Vector<double>                        &dst,
-         const std::vector<parallel::distributed::Vector<double>*> &src) const
+  apply (LinearAlgebra::distributed::Vector<double>                        &dst,
+         const std::vector<LinearAlgebra::distributed::Vector<double>*> &src) const
   {
     dst = 0;
     data.cell_loop (&SineGordonOperation<dim,fe_degree>::local_apply,
@@ -209,7 +209,7 @@ namespace Step48
 
     MatrixFree<dim,double> matrix_free_data;
 
-    parallel::distributed::Vector<double> solution, old_solution, old_old_solution;
+    LinearAlgebra::distributed::Vector<double> solution, old_solution, old_old_solution;
 
     const unsigned int n_global_refinements;
     double time, time_step;
@@ -331,7 +331,7 @@ namespace Step48
                               old_solution);
     output_results (0);
 
-    std::vector<parallel::distributed::Vector<double>*> previous_solutions;
+    std::vector<LinearAlgebra::distributed::Vector<double>*> previous_solutions;
     previous_solutions.push_back(&old_solution);
     previous_solutions.push_back(&old_old_solution);
 

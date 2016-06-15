@@ -27,7 +27,7 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/function.h>
-#include <deal.II/lac/parallel_block_vector.h>
+#include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_boundary_lib.h>
@@ -46,8 +46,8 @@
 template <int dim, int fe_degree, typename Number>
 void
 helmholtz_operator (const MatrixFree<dim,Number>  &data,
-                    parallel::distributed::BlockVector<Number> &dst,
-                    const parallel::distributed::BlockVector<Number> &src,
+                    LinearAlgebra::distributed::BlockVector<Number> &dst,
+                    const LinearAlgebra::distributed::BlockVector<Number> &src,
                     const std::pair<unsigned int,unsigned int>  &cell_range)
 {
   FEEvaluation<dim,fe_degree,fe_degree+1,2,Number> fe_eval (data);
@@ -83,13 +83,13 @@ public:
     data (data_in)
   {};
 
-  void vmult (parallel::distributed::BlockVector<Number>       &dst,
-              const parallel::distributed::BlockVector<Number> &src) const
+  void vmult (LinearAlgebra::distributed::BlockVector<Number>       &dst,
+              const LinearAlgebra::distributed::BlockVector<Number> &src) const
   {
     dst = 0;
     const std_cxx11::function<void(const MatrixFree<dim,Number> &,
-                                   parallel::distributed::BlockVector<Number> &,
-                                   const parallel::distributed::BlockVector<Number> &,
+                                   LinearAlgebra::distributed::BlockVector<Number> &,
+                                   const LinearAlgebra::distributed::BlockVector<Number> &,
                                    const std::pair<unsigned int,unsigned int> &)>
     wrap = helmholtz_operator<dim,fe_degree,Number>;
     data.cell_loop (wrap, dst, src);
@@ -172,8 +172,8 @@ void test ()
   }
 
   MatrixFreeTest<dim,fe_degree,number> mf (mf_data);
-  parallel::distributed::Vector<number> ref;
-  parallel::distributed::BlockVector<number> in(2), out(2);
+  LinearAlgebra::distributed::Vector<number> ref;
+  LinearAlgebra::distributed::BlockVector<number> in(2), out(2);
   for (unsigned int i=0; i<2; ++i)
     {
       mf_data.initialize_dof_vector (in.block(i));

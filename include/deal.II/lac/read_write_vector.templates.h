@@ -20,6 +20,8 @@
 #include <deal.II/base/config.h>
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/vector_operations_internal.h>
+#include <deal.II/base/partitioner.h>
+#include <deal.II/lac/la_parallel_vector.h>
 
 #ifdef DEAL_II_WITH_PETSC
 #  include <deal.II/lac/petsc_parallel_vector.h>
@@ -184,6 +186,45 @@ namespace LinearAlgebra
     internal::parallel_for(setter, n_elements(), thread_loop_partitioner);
 
     return *this;
+  }
+
+
+
+  template <typename Number>
+  void
+  ReadWriteVector<Number>::import(const distributed::Vector<Number> &vec,
+                                  VectorOperation::values operation,
+                                  std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern)
+  {
+    // If no communication pattern is given, create one. Otherwise, use the
+    // given one.
+    std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> comm_pattern;
+    if (communication_pattern.get() == NULL)
+      {
+        comm_pattern.reset(new Utilities::MPI::Partitioner(vec.locally_owned_elements(),
+                                                           get_stored_elements(),
+                                                           vec.get_mpi_communicator()));
+      }
+    else
+      {
+        comm_pattern =
+          std_cxx11::dynamic_pointer_cast<const Utilities::MPI::Partitioner> (communication_pattern);
+        AssertThrow(comm_pattern != NULL,
+                    ExcMessage("The communication pattern is not of type "
+                               "Utilities::MPI::Partitioner."));
+      }
+    distributed::Vector<Number> tmp_vector(comm_pattern);
+
+    std::copy(vec.begin(), vec.end(), tmp_vector.begin());
+    tmp_vector.update_ghost_values();
+
+    const IndexSet &stored = get_stored_elements();
+    if (operation == VectorOperation::add)
+      for (size_type i=0; i<stored.n_elements(); ++i)
+        local_element(i) += tmp_vector(stored.nth_index_in_set(i));
+    else
+      for (size_type i=0; i<stored.n_elements(); ++i)
+        local_element(i) = tmp_vector(stored.nth_index_in_set(i));
   }
 
 

@@ -140,13 +140,13 @@ for (S1, S2, S3 : REAL_SCALARS;
 for (S1 : REAL_SCALARS)
   {
     template void SparseMatrix<S1>::
-      vmult (parallel::distributed::Vector<S1> &, const parallel::distributed::Vector<S1> &) const;
+      vmult (LinearAlgebra::distributed::Vector<S1> &, const LinearAlgebra::distributed::Vector<S1> &) const;
     template void SparseMatrix<S1>::
-      Tvmult (parallel::distributed::Vector<S1> &, const parallel::distributed::Vector<S1> &) const;
+      Tvmult (LinearAlgebra::distributed::Vector<S1> &, const LinearAlgebra::distributed::Vector<S1> &) const;
     template void SparseMatrix<S1>::
-      vmult_add (parallel::distributed::Vector<S1> &, const parallel::distributed::Vector<S1> &) const;
+      vmult_add (LinearAlgebra::distributed::Vector<S1> &, const LinearAlgebra::distributed::Vector<S1> &) const;
     template void SparseMatrix<S1>::
-      Tvmult_add (parallel::distributed::Vector<S1> &, const parallel::distributed::Vector<S1> &) const;
+      Tvmult_add (LinearAlgebra::distributed::Vector<S1> &, const LinearAlgebra::distributed::Vector<S1> &) const;
   }
 
 for (S1, S2, S3: REAL_SCALARS)

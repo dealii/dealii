@@ -1,0 +1,41 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2011 - 2014 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
+
+
+for (SCALAR : REAL_SCALARS)
+{
+  namespace LinearAlgebra
+  \{
+    namespace distributed
+    \{
+      template class BlockVector<SCALAR>;
+    \}
+  \}
+}
+
+for (S1, S2 : REAL_SCALARS)
+{
+  namespace LinearAlgebra
+  \{
+    namespace distributed
+    \{
+      template void BlockVector<S1>::reinit<S2> (const BlockVector<S2>&,
+                                                 const bool);
+      template void BlockVector<S1>::add<S2> (const std::vector<size_type> &,
+                                              const ::dealii::Vector<S2>&);
+    \}
+  \}
+}

@@ -20,7 +20,7 @@
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -45,7 +45,7 @@ void test ()
   local_relevant = local_owned;
   local_relevant.add_range(1,2);
 
-  parallel::distributed::Vector<double> v(local_owned, local_owned, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(local_owned, local_owned, MPI_COMM_WORLD);
 
   // set local values
   if (myid < 8)
@@ -105,10 +105,10 @@ void test ()
   }
   // check inner product
   {
-    const double norm_sqr = v.norm_sqr();
+    const double norm_sqr = v.l2_norm() * v.l2_norm();
     AssertThrow (std::fabs(v * v - norm_sqr) < 1e-15,
                  ExcInternalError());
-    parallel::distributed::Vector<double> v2;
+    LinearAlgebra::distributed::Vector<double> v2;
     v2 = v;
     AssertThrow (std::fabs(v2 * v - norm_sqr) < 1e-15,
                  ExcInternalError());
@@ -120,54 +120,12 @@ void test ()
       deallog << "Inner product: " << inner_prod << std::endl;
   }
 
-  // check operator ==
-  {
-    parallel::distributed::Vector<double> v2 (v);
-    bool equal = (v2 == v);
-    if (myid == 0)
-      deallog << " v==v2 ? " << equal << std::endl;
-
-    bool not_equal = (v2 != v);
-    if (myid == 0)
-      deallog << " v!=v2 ? " << not_equal << std::endl;
-
-    // change v2 on one proc only
-    if (myid == 0)
-      v2.local_element(1) = 2.2212;
-
-    equal = (v2 == v);
-    if (myid == 0)
-      deallog << " v==v2 ? " << equal << std::endl;
-    not_equal = (v2 != v);
-    if (myid == 0)
-      deallog << " v!=v2 ? " << not_equal << std::endl;
-
-    // reset
-    v2 = v;
-    equal = (v2 == v);
-    if (myid == 0)
-      deallog << " v==v2 ? " << equal << std::endl;
-    not_equal = (v2 != v);
-    if (myid == 0)
-      deallog << " v!=v2 ? " << not_equal << std::endl;
-
-    // change some value on all procs
-    if (myid < 8)
-      v2.local_element(0) = -1;
-    equal = (v2 == v);
-    if (myid == 0)
-      deallog << " v==v2 ? " << equal << std::endl;
-    not_equal = (v2 != v);
-    if (myid == 0)
-      deallog << " v!=v2 ? " << not_equal << std::endl;
-  }
-
   // check all_zero
   {
     bool allzero = v.all_zero();
     if (myid == 0)
       deallog << " v==0 ? " << allzero << std::endl;
-    parallel::distributed::Vector<double> v2;
+    LinearAlgebra::distributed::Vector<double> v2;
     v2.reinit (v);
     allzero = v2.all_zero();
     if (myid == 0)
@@ -179,38 +137,6 @@ void test ()
     allzero = v2.all_zero();
     if (myid == 0)
       deallog << " v2==0 ? " << allzero << std::endl;
-  }
-
-
-  // check all_non_negative
-  {
-    bool allnonneg = v.is_non_negative();
-    if (myid == 0)
-      deallog << " v>=0 ? " << allnonneg << std::endl;
-    parallel::distributed::Vector<double> v2, v3;
-
-    // vector where all processors have
-    // non-negative entries
-    v2 = v;
-    if (myid < 8)
-      v2.local_element(0) = -1;
-    allnonneg = v2.is_non_negative();
-    if (myid == 0)
-      deallog << " v2>=0 ? " << allnonneg << std::endl;
-
-    // zero vector
-    v3.reinit (v2);
-    allnonneg = v3.is_non_negative();
-    if (myid == 0)
-      deallog << " v3>=0 ? " << allnonneg << std::endl;
-
-    // only one processor has non-negative entry
-    v3 = v;
-    if (myid == 1 || numproc==1)
-      v3.local_element(0) = -1;
-    allnonneg = v3.is_non_negative();
-    if (myid == 0)
-      deallog << " v3>=0 ? " << allnonneg << std::endl;
   }
 
   if (myid == 0)

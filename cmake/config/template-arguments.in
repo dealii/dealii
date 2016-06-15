@@ -23,11 +23,11 @@ SERIAL_VECTORS := { Vector<double>;
                     BlockVector<double>;
                     BlockVector<float>;
 
-                    parallel::distributed::Vector<double>;
-                    parallel::distributed::Vector<float> ;
+                    LinearAlgebra::distributed::Vector<double>;
+                    LinearAlgebra::distributed::Vector<float> ;
 
-                    parallel::distributed::BlockVector<double>;
-                    parallel::distributed::BlockVector<float> ;
+                    LinearAlgebra::distributed::BlockVector<double>;
+                    LinearAlgebra::distributed::BlockVector<float> ;
 
                     @DEAL_II_EXPAND_TRILINOS_VECTOR@;
                     @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
@@ -46,11 +46,11 @@ REAL_SERIAL_VECTORS := { Vector<double>;
                     BlockVector<double>;
                     BlockVector<float>;
 
-                    parallel::distributed::Vector<double>;
-                    parallel::distributed::Vector<float> ;
+                    LinearAlgebra::distributed::Vector<double>;
+                    LinearAlgebra::distributed::Vector<float> ;
 
-                    parallel::distributed::BlockVector<double>;
-                    parallel::distributed::BlockVector<float> ;
+                    LinearAlgebra::distributed::BlockVector<double>;
+                    LinearAlgebra::distributed::BlockVector<float> ;
 
                     @DEAL_II_EXPAND_TRILINOS_VECTOR@;
                     @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
@@ -81,7 +81,7 @@ VECTORS_WITH_MATRIX := { Vector<double>;
                     BlockVector<double>;
                     BlockVector<float>;
 
-                    parallel::distributed::Vector<double>;
+                    LinearAlgebra::distributed::Vector<double>;
 
                     @DEAL_II_EXPAND_TRILINOS_VECTOR@;
                     @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;

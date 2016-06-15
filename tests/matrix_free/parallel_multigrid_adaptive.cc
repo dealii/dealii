@@ -22,7 +22,7 @@
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/grid/tria.h>
@@ -103,28 +103,28 @@ public:
       compute_inverse_diagonal();
   }
 
-  void vmult(parallel::distributed::Vector<number> &dst,
-             const parallel::distributed::Vector<number> &src) const
+  void vmult(LinearAlgebra::distributed::Vector<number> &dst,
+             const LinearAlgebra::distributed::Vector<number> &src) const
   {
     dst = 0;
     vmult_add(dst, src);
   }
 
-  void Tvmult(parallel::distributed::Vector<number> &dst,
-              const parallel::distributed::Vector<number> &src) const
+  void Tvmult(LinearAlgebra::distributed::Vector<number> &dst,
+              const LinearAlgebra::distributed::Vector<number> &src) const
   {
     dst = 0;
     vmult_add(dst, src);
   }
 
-  void Tvmult_add(parallel::distributed::Vector<number> &dst,
-                  const parallel::distributed::Vector<number> &src) const
+  void Tvmult_add(LinearAlgebra::distributed::Vector<number> &dst,
+                  const LinearAlgebra::distributed::Vector<number> &src) const
   {
     vmult_add(dst, src);
   }
 
-  void vmult_add(parallel::distributed::Vector<number> &dst,
-                 const parallel::distributed::Vector<number> &src) const
+  void vmult_add(LinearAlgebra::distributed::Vector<number> &dst,
+                 const LinearAlgebra::distributed::Vector<number> &src) const
   {
     Assert(src.partitioners_are_globally_compatible(*data.get_dof_info(0).vector_partitioner), ExcInternalError());
     Assert(dst.partitioners_are_globally_compatible(*data.get_dof_info(0).vector_partitioner), ExcInternalError());
@@ -136,7 +136,7 @@ public:
         edge_constrained_values[i] =
           std::pair<number,number>(src.local_element(edge_constrained_indices[i]),
                                    dst.local_element(edge_constrained_indices[i]));
-        const_cast<parallel::distributed::Vector<double>&>(src).local_element(edge_constrained_indices[i]) = 0.;
+        const_cast<LinearAlgebra::distributed::Vector<double>&>(src).local_element(edge_constrained_indices[i]) = 0.;
       }
 
     data.cell_loop (&LaplaceOperator::local_apply,
@@ -151,13 +151,13 @@ public:
     // destination
     for (unsigned int i=0; i<edge_constrained_indices.size(); ++i)
       {
-        const_cast<parallel::distributed::Vector<double>&>(src).local_element(edge_constrained_indices[i]) = edge_constrained_values[i].first;
+        const_cast<LinearAlgebra::distributed::Vector<double>&>(src).local_element(edge_constrained_indices[i]) = edge_constrained_values[i].first;
         dst.local_element(edge_constrained_indices[i]) = edge_constrained_values[i].second + edge_constrained_values[i].first;
       }
   }
 
-  void vmult_interface_down(parallel::distributed::Vector<double> &dst,
-                            const parallel::distributed::Vector<double> &src) const
+  void vmult_interface_down(LinearAlgebra::distributed::Vector<double> &dst,
+                            const LinearAlgebra::distributed::Vector<double> &src) const
   {
     Assert(src.partitioners_are_globally_compatible(*data.get_dof_info(0).vector_partitioner), ExcInternalError());
     Assert(dst.partitioners_are_globally_compatible(*data.get_dof_info(0).vector_partitioner), ExcInternalError());
@@ -172,7 +172,7 @@ public:
     for (unsigned int i=0; i<edge_constrained_indices.size(); ++i)
       {
         const double src_val = src.local_element(edge_constrained_indices[i]);
-        const_cast<parallel::distributed::Vector<double>&>(src).local_element(edge_constrained_indices[i]) = 0.;
+        const_cast<LinearAlgebra::distributed::Vector<double>&>(src).local_element(edge_constrained_indices[i]) = 0.;
         edge_constrained_values[i] = std::pair<number,number>(src_val,
                                                               dst.local_element(edge_constrained_indices[i]));
       }
@@ -188,14 +188,14 @@ public:
         ++c;
 
         // reset the src values
-        const_cast<parallel::distributed::Vector<double>&>(src).local_element(edge_constrained_indices[i]) = edge_constrained_values[i].first;
+        const_cast<LinearAlgebra::distributed::Vector<double>&>(src).local_element(edge_constrained_indices[i]) = edge_constrained_values[i].first;
       }
     for ( ; c<dst.local_size(); ++c)
       dst.local_element(c) = 0.;
   }
 
-  void vmult_interface_up(parallel::distributed::Vector<double> &dst,
-                          const parallel::distributed::Vector<double> &src) const
+  void vmult_interface_up(LinearAlgebra::distributed::Vector<double> &dst,
+                          const LinearAlgebra::distributed::Vector<double> &src) const
   {
     Assert(src.partitioners_are_globally_compatible(*data.get_dof_info(0).vector_partitioner), ExcInternalError());
     Assert(dst.partitioners_are_globally_compatible(*data.get_dof_info(0).vector_partitioner), ExcInternalError());
@@ -205,7 +205,7 @@ public:
     if (!have_interface_matrices)
       return;
 
-    parallel::distributed::Vector<double> src_cpy (src);
+    LinearAlgebra::distributed::Vector<double> src_cpy (src);
     unsigned int c=0;
     for (unsigned int i=0; i<edge_constrained_indices.size(); ++i)
       {
@@ -241,7 +241,7 @@ public:
   }
 
   void
-  initialize_dof_vector(parallel::distributed::Vector<number> &vector) const
+  initialize_dof_vector(LinearAlgebra::distributed::Vector<number> &vector) const
   {
     if (!vector.partitioners_are_compatible(*data.get_dof_info(0).vector_partitioner))
       data.initialize_dof_vector(vector);
@@ -249,7 +249,7 @@ public:
            ExcInternalError());
   }
 
-  const parallel::distributed::Vector<number> &
+  const LinearAlgebra::distributed::Vector<number> &
   get_matrix_diagonal_inverse() const
   {
     Assert(inverse_diagonal_entries.size() > 0, ExcNotInitialized());
@@ -260,8 +260,8 @@ public:
 private:
   void
   local_apply (const MatrixFree<dim,number>                &data,
-               parallel::distributed::Vector<number>       &dst,
-               const parallel::distributed::Vector<number> &src,
+               LinearAlgebra::distributed::Vector<number>       &dst,
+               const LinearAlgebra::distributed::Vector<number> &src,
                const std::pair<unsigned int,unsigned int>  &cell_range) const
   {
     FEEvaluation<dim,fe_degree,n_q_points_1d,1,number> phi (data);
@@ -305,7 +305,7 @@ private:
 
   void
   local_diagonal_cell (const MatrixFree<dim,number>                &data,
-                       parallel::distributed::Vector<number>       &dst,
+                       LinearAlgebra::distributed::Vector<number>       &dst,
                        const unsigned int &,
                        const std::pair<unsigned int,unsigned int>  &cell_range) const
   {
@@ -334,7 +334,7 @@ private:
   }
 
   MatrixFree<dim,number> data;
-  parallel::distributed::Vector<number> inverse_diagonal_entries;
+  LinearAlgebra::distributed::Vector<number> inverse_diagonal_entries;
   std::vector<unsigned int> edge_constrained_indices;
   mutable std::vector<std::pair<number,number> > edge_constrained_values;
   bool have_interface_matrices;
@@ -351,14 +351,14 @@ public:
     this->laplace = &laplace;
   }
 
-  void vmult (parallel::distributed::Vector<double> &dst,
-              const parallel::distributed::Vector<double> &src) const
+  void vmult (LinearAlgebra::distributed::Vector<double> &dst,
+              const LinearAlgebra::distributed::Vector<double> &src) const
   {
     laplace->vmult_interface_down(dst, src);
   }
 
-  void Tvmult (parallel::distributed::Vector<double> &dst,
-               const parallel::distributed::Vector<double> &src) const
+  void Tvmult (LinearAlgebra::distributed::Vector<double> &dst,
+               const LinearAlgebra::distributed::Vector<double> &src) const
   {
     laplace->vmult_interface_up(dst, src);
   }
@@ -370,15 +370,15 @@ private:
 
 
 template <typename LAPLACEOPERATOR>
-class MGTransferMF : public MGTransferPrebuilt<parallel::distributed::Vector<double> >
+class MGTransferMF : public MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double> >
 {
 public:
   MGTransferMF(const MGLevelObject<LAPLACEOPERATOR> &laplace,
                const ConstraintMatrix &hanging_node_constraints,
                const MGConstrainedDoFs &mg_constrained_dofs)
     :
-    MGTransferPrebuilt<parallel::distributed::Vector<double> >(hanging_node_constraints,
-                                                               mg_constrained_dofs),
+    MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double> >(hanging_node_constraints,
+        mg_constrained_dofs),
     laplace_operator (laplace)
   {
   }
@@ -391,13 +391,13 @@ public:
   template <int dim, class InVector, int spacedim>
   void
   copy_to_mg (const DoFHandler<dim,spacedim> &mg_dof_handler,
-              MGLevelObject<parallel::distributed::Vector<double> > &dst,
+              MGLevelObject<LinearAlgebra::distributed::Vector<double> > &dst,
               const InVector &src) const
   {
     for (unsigned int level=dst.min_level();
          level<=dst.max_level(); ++level)
       laplace_operator[level].initialize_dof_vector(dst[level]);
-    MGTransferPrebuilt<parallel::distributed::Vector<double> >::
+    MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double> >::
     copy_to_mg(mg_dof_handler, dst, src);
   }
 
@@ -408,7 +408,7 @@ private:
 
 
 template<typename MatrixType, typename Number>
-class MGCoarseIterative : public MGCoarseGridBase<parallel::distributed::Vector<Number> >
+class MGCoarseIterative : public MGCoarseGridBase<LinearAlgebra::distributed::Vector<Number> >
 {
 public:
   MGCoarseIterative() {}
@@ -419,11 +419,11 @@ public:
   }
 
   virtual void operator() (const unsigned int   level,
-                           parallel::distributed::Vector<double> &dst,
-                           const parallel::distributed::Vector<double> &src) const
+                           LinearAlgebra::distributed::Vector<double> &dst,
+                           const LinearAlgebra::distributed::Vector<double> &src) const
   {
     ReductionControl solver_control (1e4, 1e-50, 1e-10);
-    SolverCG<parallel::distributed::Vector<double> > solver_coarse (solver_control);
+    SolverCG<LinearAlgebra::distributed::Vector<double> > solver_coarse (solver_control);
     solver_coarse.solve (*coarse_matrix, dst, src, PreconditionIdentity());
   }
 
@@ -468,7 +468,7 @@ void do_test (const DoFHandler<dim>  &dof)
   fine_matrix.initialize(mapping, dof, mg_constrained_dofs, dirichlet_boundary,
                          numbers::invalid_unsigned_int);
 
-  parallel::distributed::Vector<number> in, sol;
+  LinearAlgebra::distributed::Vector<number> in, sol;
   fine_matrix.initialize_dof_vector(in);
   fine_matrix.initialize_dof_vector(sol);
 
@@ -500,8 +500,8 @@ void do_test (const DoFHandler<dim>  &dof)
   MGCoarseIterative<LevelMatrixType,number> mg_coarse;
   mg_coarse.initialize(mg_matrices[0]);
 
-  typedef PreconditionChebyshev<LevelMatrixType,parallel::distributed::Vector<number> > SMOOTHER;
-  MGSmootherPrecondition<LevelMatrixType, SMOOTHER, parallel::distributed::Vector<number> >
+  typedef PreconditionChebyshev<LevelMatrixType,LinearAlgebra::distributed::Vector<number> > SMOOTHER;
+  MGSmootherPrecondition<LevelMatrixType, SMOOTHER, LinearAlgebra::distributed::Vector<number> >
   mg_smoother;
 
   MGLevelObject<typename SMOOTHER::AdditionalData> smoother_data;
@@ -516,25 +516,25 @@ void do_test (const DoFHandler<dim>  &dof)
     }
   mg_smoother.initialize(mg_matrices, smoother_data);
 
-  mg::Matrix<parallel::distributed::Vector<double> >
+  mg::Matrix<LinearAlgebra::distributed::Vector<double> >
   mg_matrix(mg_matrices);
-  mg::Matrix<parallel::distributed::Vector<double> >
+  mg::Matrix<LinearAlgebra::distributed::Vector<double> >
   mg_interface(mg_interface_matrices);
 
-  Multigrid<parallel::distributed::Vector<double> > mg(dof,
-                                                       mg_matrix,
-                                                       mg_coarse,
-                                                       mg_transfer,
-                                                       mg_smoother,
-                                                       mg_smoother);
+  Multigrid<LinearAlgebra::distributed::Vector<double> > mg(dof,
+                                                            mg_matrix,
+                                                            mg_coarse,
+                                                            mg_transfer,
+                                                            mg_smoother,
+                                                            mg_smoother);
   mg.set_edge_matrices(mg_interface, mg_interface);
-  PreconditionMG<dim, parallel::distributed::Vector<double>,
+  PreconditionMG<dim, LinearAlgebra::distributed::Vector<double>,
                  MGTransferMF<LevelMatrixType> >
                  preconditioner(dof, mg, mg_transfer);
 
   {
     ReductionControl control(30, 1e-20, 1e-7);
-    SolverCG<parallel::distributed::Vector<double> > solver(control);
+    SolverCG<LinearAlgebra::distributed::Vector<double> > solver(control);
     solver.solve(fine_matrix, sol, in, preconditioner);
   }
 

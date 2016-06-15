@@ -39,6 +39,10 @@ DEAL_II_NAMESPACE_OPEN
 namespace LinearAlgebra
 {
   class CommunicationPatternBase;
+  namespace distributed
+  {
+    template <typename> class Vector;
+  }
 }
 
 #ifdef DEAL_II_WITH_PETSC
@@ -245,6 +249,19 @@ namespace LinearAlgebra
      * only allowed if @p s is equal to zero.
      */
     ReadWriteVector<Number> &operator = (const Number s);
+
+    /**
+     * Imports all the elements present in the vector's IndexSet from the
+     * input vector @p vec. VectorOperation::values @p operation
+     * is used to decide if the elements in @p V should be added to the
+     * current vector or replace the current elements. The last parameter can
+     * be used if the same communication pattern is used multiple times. This
+     * can be used to improve performance.
+     */
+    void import(const distributed::Vector<Number> &vec,
+                VectorOperation::values operation,
+                std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern =
+                  std_cxx11::shared_ptr<const CommunicationPatternBase> ());
 
 #ifdef DEAL_II_WITH_PETSC
     /**
@@ -529,7 +546,7 @@ namespace LinearAlgebra
      * For parallel loops with TBB, this member variable stores the affinity
      * information of loops.
      */
-    mutable std_cxx11::shared_ptr<parallel::internal::TBBPartitioner> thread_loop_partitioner;
+    mutable std_cxx11::shared_ptr<::dealii::parallel::internal::TBBPartitioner> thread_loop_partitioner;
 
     /**
      * Make all other ReadWriteVector types friends.

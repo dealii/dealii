@@ -23,8 +23,8 @@
 #include <deal.II/lac/sparse_matrix_ez.h>
 #include <deal.II/lac/chunk_sparse_matrix.h>
 #include <deal.II/lac/block_sparse_matrix_ez.h>
-#include <deal.II/lac/parallel_vector.h>
-#include <deal.II/lac/parallel_block_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/petsc_block_vector.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>

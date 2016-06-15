@@ -19,8 +19,8 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/lac/vector_memory.h>
-#include <deal.II/lac/parallel_vector.h>
-#include <deal.II/lac/parallel_block_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/base/multithread_info.h>
 
 #include <iostream>
@@ -439,13 +439,13 @@ namespace Utilities
 #ifdef DEAL_II_WITH_MPI
       // Start with the deal.II MPI vectors (need to do this before finalizing
       // PETSc because it finalizes MPI).  Delete vectors from the pools:
-      GrowingVectorMemory<parallel::distributed::Vector<double> >
+      GrowingVectorMemory<LinearAlgebra::distributed::Vector<double> >
       ::release_unused_memory ();
-      GrowingVectorMemory<parallel::distributed::BlockVector<double> >
+      GrowingVectorMemory<LinearAlgebra::distributed::BlockVector<double> >
       ::release_unused_memory ();
-      GrowingVectorMemory<parallel::distributed::Vector<float> >
+      GrowingVectorMemory<LinearAlgebra::distributed::Vector<float> >
       ::release_unused_memory ();
-      GrowingVectorMemory<parallel::distributed::BlockVector<float> >
+      GrowingVectorMemory<LinearAlgebra::distributed::BlockVector<float> >
       ::release_unused_memory ();
 
       // Next with Trilinos:

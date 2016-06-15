@@ -25,7 +25,7 @@
 #  include <deal.II/base/std_cxx11/shared_ptr.h>
 
 #  include <deal.II/lac/trilinos_vector_base.h>
-#  include <deal.II/lac/parallel_vector.h>
+#  include <deal.II/lac/la_parallel_vector.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  ifdef DEAL_II_WITH_MPI
@@ -142,15 +142,15 @@ namespace TrilinosWrappers
      * Apply the preconditioner on deal.II parallel data structures instead of
      * the ones provided in the Trilinos wrapper class.
      */
-    virtual void vmult (dealii::parallel::distributed::Vector<double>       &dst,
-                        const dealii::parallel::distributed::Vector<double> &src) const;
+    virtual void vmult (dealii::LinearAlgebra::distributed::Vector<double>       &dst,
+                        const dealii::LinearAlgebra::distributed::Vector<double> &src) const;
 
     /**
      * Apply the transpose preconditioner on deal.II parallel data structures
      * instead of the ones provided in the Trilinos wrapper class.
      */
-    virtual void Tvmult (dealii::parallel::distributed::Vector<double>       &dst,
-                         const dealii::parallel::distributed::Vector<double> &src) const;
+    virtual void Tvmult (dealii::LinearAlgebra::distributed::Vector<double>       &dst,
+                         const dealii::LinearAlgebra::distributed::Vector<double> &src) const;
 
     /**
      * Return a reference to the underlaying Trilinos Epetra_Operator. So you
@@ -1834,16 +1834,16 @@ namespace TrilinosWrappers
      * Apply the preconditioner on deal.II parallel data structures instead of
      * the ones provided in the Trilinos wrapper class, i.e., dst = src.
      */
-    void vmult (parallel::distributed::Vector<double>       &dst,
-                const dealii::parallel::distributed::Vector<double> &src) const;
+    void vmult (LinearAlgebra::distributed::Vector<double>       &dst,
+                const dealii::LinearAlgebra::distributed::Vector<double> &src) const;
 
     /**
      * Apply the transpose preconditioner on deal.II parallel data structures
      * instead of the ones provided in the Trilinos wrapper class, i.e., dst =
      * src.
      */
-    void Tvmult (parallel::distributed::Vector<double>       &dst,
-                 const dealii::parallel::distributed::Vector<double> &src) const;
+    void Tvmult (LinearAlgebra::distributed::Vector<double>       &dst,
+                 const dealii::LinearAlgebra::distributed::Vector<double> &src) const;
   };
 
 
@@ -1936,8 +1936,8 @@ namespace TrilinosWrappers
 
   inline
   void
-  PreconditionBase::vmult (parallel::distributed::Vector<double>       &dst,
-                           const parallel::distributed::Vector<double> &src) const
+  PreconditionBase::vmult (LinearAlgebra::distributed::Vector<double>       &dst,
+                           const LinearAlgebra::distributed::Vector<double> &src) const
   {
     AssertDimension (static_cast<TrilinosWrappers::types::int_type>(dst.local_size()),
                      preconditioner->OperatorDomainMap().NumMyElements());
@@ -1954,8 +1954,8 @@ namespace TrilinosWrappers
 
   inline
   void
-  PreconditionBase::Tvmult (parallel::distributed::Vector<double>       &dst,
-                            const parallel::distributed::Vector<double> &src) const
+  PreconditionBase::Tvmult (LinearAlgebra::distributed::Vector<double>       &dst,
+                            const LinearAlgebra::distributed::Vector<double> &src) const
   {
     AssertDimension (static_cast<TrilinosWrappers::types::int_type>(dst.local_size()),
                      preconditioner->OperatorDomainMap().NumMyElements());

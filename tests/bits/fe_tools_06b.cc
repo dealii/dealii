@@ -16,7 +16,7 @@
 
 #include "../tests.h"
 #include "fe_tools_common.h"
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/sparsity_pattern.h>
 
 // check
@@ -56,9 +56,9 @@ check_this (const FiniteElement<dim> &fe1,
   cm1.close ();
   cm2.close ();
 
-  parallel::distributed::Vector<double> in (dof1->n_dofs());
+  LinearAlgebra::distributed::Vector<double> in (dof1->n_dofs());
   for (unsigned int i=0; i<in.size(); ++i) in(i) = i;
-  parallel::distributed::Vector<double> out (dof1->n_dofs());
+  LinearAlgebra::distributed::Vector<double> out (dof1->n_dofs());
 
   FETools::back_interpolate (*dof1, cm1, in, *dof2, cm2, out);
   output_vector (out);

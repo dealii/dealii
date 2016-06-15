@@ -17,7 +17,7 @@
 
 for (SCALAR : REAL_SCALARS)
 {
-  namespace parallel
+  namespace LinearAlgebra
   \{
     namespace distributed
     \{
@@ -28,7 +28,31 @@ for (SCALAR : REAL_SCALARS)
 
 for (S1, S2 : REAL_SCALARS)
 {
-  namespace parallel
+  namespace LinearAlgebra
+  \{
+    namespace distributed
+    \{
+      template void Vector<S1>::reinit<S2> (const Vector<S2>&,
+                                            const bool);
+      template S1 Vector<S1>::inner_product_local<S2> (const Vector<S2>&) const;
+    \}
+  \}
+}
+
+for (SCALAR : COMPLEX_SCALARS)
+{
+  namespace LinearAlgebra
+  \{
+    namespace distributed
+    \{
+      template class Vector<SCALAR>;
+    \}
+  \}
+}
+
+for (S1, S2 : COMPLEX_SCALARS)
+{
+  namespace LinearAlgebra
   \{
     namespace distributed
     \{
