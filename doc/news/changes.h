@@ -39,6 +39,16 @@ inconvenience this causes.
 
 <ol>
 
+ <li> Changed: The deal.II distributed vector classes do now derive from
+ LinearAlgebra::VectorSpaceVector and have been moved to the
+ LinearAlgebra::distributed namespace. In the definition of the new
+ interfaces, several old vector functions have been marked as deprecated. The
+ methods <tt>operator==</tt>, <tt>operator!=</tt>, and
+ <tt>is_non_negative</tt> have been removed from the new interface.
+ <br>
+ (Martin Kronbichler, 2016/06/15)
+ </li>
+
  <li> Changed: The Triangulation::Signals::clear signal is now triggered
  <i>before</i>, not <i>after</i> the internal data structures of the
  triangulation are destroyed. This allows functions attached to the signal to
@@ -141,7 +151,7 @@ inconvenience this causes.
  <br>
  (Jean-Paul Pelteret, 2016/05/20)
  </li>
- 
+
  <li> New: Add VectorTools::compute_global_error that computes global
  errors from cellwise errors obtained by VectorTools::integrate_difference()
  and do MPI collectives if necessary.
@@ -327,9 +337,9 @@ inconvenience this causes.
  (Jihuan Tian, 2016/05/09)
  </li>
 
- <li> Fixed: Bug in the RelaxationBlock class function do_step. Before, the 
+ <li> Fixed: Bug in the RelaxationBlock class function do_step. Before, the
  corrections were not added together, which leads to a wrong update whenever the
- Jacobi blocks are overlapping. For SOR, SSOR and non-overlapping Jacobi this was 
+ Jacobi blocks are overlapping. For SOR, SSOR and non-overlapping Jacobi this was
  not an issue.
  <br>
  (Joscha Gedicke, 2016/05/07)
@@ -343,10 +353,10 @@ inconvenience this causes.
  (David Wells, 2016/05/11)
  </li>
 
- <li> New: Added function GridOut::write_mesh_per_processor_as_vtu. This allows 
- the visualization of a parallel finite element mesh that can be separated into each 
+ <li> New: Added function GridOut::write_mesh_per_processor_as_vtu. This allows
+ the visualization of a parallel finite element mesh that can be separated into each
  processor's owned and ghost cells. It also allows for the visualization of each level
- of a multilevel mesh. 
+ of a multilevel mesh.
  <br>
  (Conrad Clevenger, 2016/04/28)
  </li>
@@ -374,7 +384,7 @@ inconvenience this causes.
  <br>
  (Martin Kronbichler, Daniel Jodlbauer, 2016/04/21)
  </li>
- 
+
  <li> New: Added an optional string parameter to the ParameterHandler::read_input ()
  and ParameterHandler::read_input_from_string() functions.
  When a line which equals this string is encountered, the parsing of parameters
