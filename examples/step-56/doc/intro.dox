@@ -1,4 +1,15 @@
-<i>This program was contributed by Ryan Grove and Timo Heister.</i>
+<i>This program was contributed by Ryan Grove and Timo Heister.
+
+This material is based upon work partially supported by National Science
+Foundation grant DMS1522191 and the Computational Infrastructure in
+Geodynamics initiative (CIG), through the National Science Foundation under
+Award No. EAR-0949446 and The University of California-Davis.
+
+The authors would like to thank the Isaac Newton Institute for
+Mathematical Sciences, Cambridge, for support and hospitality during
+the programme Melt in the Mantle where work on this tutorial was
+undertaken. This work was supported by EPSRC grant no EP/K032208/1.
+</i>
 
 <a name="Intro"></a> 
 <h1>Introduction</h1>
