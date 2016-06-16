@@ -24,6 +24,8 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/lac/vector_space_vector.h>
 
+#include <iomanip>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace LinearAlgebra
