@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2015 by the deal.II authors
+// Copyright (C) 1998 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,7 +47,16 @@ style file is provided at
 </pre>
 </code>
 on each of your files. This will make sure indentation is conforming to the
-style guidelines outlined in this page.</p>
+style guidelines outlined in this page. Alternatively, if you are using a recent
+version of the library, you can run
+<code>
+<pre>
+  make indent
+</pre>
+</code>
+in whatever directory you set up the library to be compiled in to indent all
+source files.
+</p>
 
 <h3>Style issues</h3>
 
