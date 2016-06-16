@@ -34,9 +34,20 @@ namespace PyDealII
     PointWrapper(boost::python::list list);
 
     /**
-     * Destructpr.
+     * Copy constructor.
+     */
+    PointWrapper(const PointWrapper &other);
+
+    /**
+     * Destructor.
      */
     ~PointWrapper();
+
+    /**
+     * Assignment operator. The dimension of the point is changed if it is
+     * different that the one of @p other.
+     */
+    PointWrapper &operator= (const PointWrapper &other);
 
     /**
      * Return the first component of the Point.
@@ -69,11 +80,27 @@ namespace PyDealII
     void set_z(double z);
 
     /**
+     * Return the dimension of the underlying Point.
+     */
+    int get_dim() const;
+
+    /**
      * Return a pointer that can be casted to the underlying Point.
      */
     void *get_point();
 
   private:
+    /**
+     * Delete the underlying Point and free the memory.
+     */
+    void clear();
+
+
+    /**
+     * Copy @p other PointWrapper.
+     */
+    void copy(const PointWrapper &other);
+
     /**
      * Dimension of the Point.
      */
@@ -87,6 +114,14 @@ namespace PyDealII
 
 
   //--------------------- Inline functions ----------------------//
+
+
+
+  inline
+  int PointWrapper::get_dim() const
+  {
+    return dim;
+  }
 
 
 

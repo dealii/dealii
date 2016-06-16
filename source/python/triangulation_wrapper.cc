@@ -44,8 +44,8 @@ namespace PyDealII
                           void                      *triangulation)
     {
       // Cast the PointWrapper objects to Point<dim>
-      std::vector<dealii::Point<dim>> points(dim);
-      for (int i=0; i<dim; ++i)
+      std::vector<dealii::Point<dim>> points(dim+1);
+      for (int i=0; i<dim+1; ++i)
         points[i] = *(static_cast<dealii::Point<dim>*>((wrapped_points[i]).get_point()));
 
       dealii::Triangulation<dim> *tria =
@@ -76,6 +76,10 @@ namespace PyDealII
                                   const bool    colorize,
                                   void         *triangulation)
     {
+      AssertThrow(p1.get_dim() == dim,
+                  dealii::ExcMessage("Dimension of p1 is not the same as the dimension of the Triangulation."));
+      AssertThrow(p2.get_dim() == dim,
+                  dealii::ExcMessage("Dimension of p2 is not the same as the dimension of the Triangulation."));
       // Cast the PointWrapper object to Point<dim>
       dealii::Point<dim> point_1 = *(static_cast<dealii::Point<dim>*>(p1.get_point()));
       dealii::Point<dim> point_2 = *(static_cast<dealii::Point<dim>*>(p2.get_point()));
@@ -95,6 +99,10 @@ namespace PyDealII
                                              const bool                       colorize,
                                              void                            *triangulation)
     {
+      AssertThrow(p1.get_dim() == dim,
+                  dealii::ExcMessage("Dimension of p1 is not the same as the dimension of the Triangulation."));
+      AssertThrow(p2.get_dim() == dim,
+                  dealii::ExcMessage("Dimension of p2 is not the same as the dimension of the Triangulation."));
       // Cast the PointWrapper object to Point<dim>
       dealii::Point<dim> point_1 = *(static_cast<dealii::Point<dim>*>(p1.get_point()));
       dealii::Point<dim> point_2 = *(static_cast<dealii::Point<dim>*>(p2.get_point()));
@@ -229,10 +237,16 @@ namespace PyDealII
 
   void TriangulationWrapper::generate_simplex(boost::python::list &vertices)
   {
+    AssertThrow(boost::python::len(vertices) == dim+1,
+                dealii::ExcMessage("The number of vertices should be equal to dim+1."));
     // Extract the PointWrapper object from the python list
-    std::vector<PointWrapper> wrapped_points(dim);
-    for (int i=0; i<dim; ++i)
-      wrapped_points[i] = boost::python::extract<PointWrapper>(vertices[i]);
+    std::vector<PointWrapper> wrapped_points(dim+1);
+    for (int i=0; i<dim+1; ++i)
+      {
+        wrapped_points[i] = boost::python::extract<PointWrapper>(vertices[i]);
+        AssertThrow(wrapped_points[i].get_dim() == dim,
+                    dealii::ExcMessage("Point of wrong dimension."));
+      }
 
     if (dim == 2)
       internal::generate_simplex<2>(wrapped_points, triangulation);
@@ -271,6 +285,9 @@ namespace PyDealII
       PointWrapper        &p2,
       const bool           colorize)
   {
+    AssertThrow(boost::python::len(repetition_list) == dim,
+                dealii::ExcMessage("The list of repetitions must have the same length as the number of dimension."));
+
     // Extract the repetitions from the python list
     std::vector<unsigned int> repetitions(dim);
     for (int i=0; i<dim; ++i)

@@ -20,7 +20,7 @@ namespace PyDealII
 {
 
 // Macro to enable default arguments
-  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_hyper_cube_overloads, generate_hyper_cube, 0, 3)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_hyper_cube_overloads, generate_hyper_cube, 1, 3)
   BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_subdivided_hyper_cube_overloads,
                                          generate_subdivided_hyper_cube, 1, 3)
   BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_hyper_rectangle_overloads,

@@ -42,25 +42,27 @@ namespace PyDealII
 
 
 
+  PointWrapper::PointWrapper(const PointWrapper &other)
+  {
+    copy(other);
+  }
+
+
+
   PointWrapper::~PointWrapper()
   {
-    if (point != nullptr)
-      {
-        if (dim == 2)
-          {
-            // We cannot call delete on a void pointer so cast the void pointer back
-            // first.
-            dealii::Point<2> *tmp = static_cast<dealii::Point<2>*>(point);
-            delete tmp;
-          }
-        else
-          {
-            dealii::Point<3> *tmp = static_cast<dealii::Point<3>*>(point);
-            delete tmp;
-          }
-        point = nullptr;
-      }
+    clear();
     dim = -1;
+  }
+
+
+
+  PointWrapper &PointWrapper::operator= (const PointWrapper &other)
+  {
+    clear();
+    copy(other);
+
+    return *this;
   }
 
 
@@ -123,5 +125,48 @@ namespace PyDealII
     else
       AssertThrow(false,
                   dealii::ExcMessage("The z coordinate is only available for three-dimensional points"));
+  }
+
+
+
+
+  void PointWrapper::clear()
+  {
+    if (point != nullptr)
+      {
+        if (dim == 2)
+          {
+            // We cannot call delete on a void pointer so cast the void pointer back
+            // first.
+            dealii::Point<2> *tmp = static_cast<dealii::Point<2>*>(point);
+            delete tmp;
+          }
+        else
+          {
+            dealii::Point<3> *tmp = static_cast<dealii::Point<3>*>(point);
+            delete tmp;
+          }
+        point = nullptr;
+      }
+  }
+
+
+
+  void PointWrapper::copy(const PointWrapper &other)
+  {
+    dim = other.dim;
+
+    if (dim == 2)
+      {
+        dealii::Point<2> *other_point = static_cast<dealii::Point<2>*>(other.point);
+        point = new dealii::Point<2> ((*other_point)[0], (*other_point)[1]);
+      }
+    else if (dim == 3)
+      {
+        dealii::Point<3> *other_point = static_cast<dealii::Point<3>*>(other.point);
+        point = new dealii::Point<3> ((*other_point)[0], (*other_point)[1], (*other_point)[2]);
+      }
+    else
+      point = nullptr;
   }
 }
