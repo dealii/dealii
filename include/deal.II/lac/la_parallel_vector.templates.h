@@ -458,6 +458,7 @@ namespace LinearAlgebra
     Vector<Number> &
     Vector<Number>::operator = (const TrilinosWrappers::MPI::Vector &trilinos_vec)
     {
+#ifdef DEAL_II_WITH_MPI
       IndexSet combined_set = partitioner->locally_owned_range();
       combined_set.add_indices(partitioner->ghost_indices());
       ReadWriteVector<Number> rw_vector(combined_set);
@@ -466,6 +467,9 @@ namespace LinearAlgebra
 
       if (vector_is_ghosted || trilinos_vec.has_ghost_elements())
         update_ghost_values();
+#else
+      AssertThrow(false, ExcNotImplemented());
+#endif
 
       return *this;
     }
