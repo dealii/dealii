@@ -1,0 +1,237 @@
+<h1>Results</h1>
+
+As expected from the discussion above, the number of iterations is independent
+of the number of processors and only very slightly dependent on $h$:
+
+<table>
+<tr>
+  <th colspan="2">PETSc</th>
+  <th colspan="8">number of processors</th>
+</tr>
+<tr>
+  <th>cycle</th>
+  <th>dofs</th>
+  <th>1</th>
+  <th>2</th>
+  <th>4</th>
+  <th>8</th>
+  <th>16</th>
+  <th>32</th>
+  <th>64</th>
+  <th>128</th>
+</tr>
+<tr>
+  <td>0</td>
+  <td>659</td>
+  <td>49</td>
+  <td>49</td>
+  <td>49</td>
+  <td>51</td>
+  <td>51</td>
+  <td>51</td>
+  <td>49</td>
+  <td>49</td>
+</tr>
+<tr>
+  <td>1</td>
+  <td>2467</td>
+  <td>52</td>
+  <td>52</td>
+  <td>52</td>
+  <td>52</td>
+  <td>52</td>
+  <td>54</td>
+  <td>54</td>
+  <td>53</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td>9539</td>
+  <td>56</td>
+  <td>56</td>
+  <td>56</td>
+  <td>54</td>
+  <td>56</td>
+  <td>56</td>
+  <td>54</td>
+  <td>56</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td>37507</td>
+  <td>57</td>
+  <td>57</td>
+  <td>57</td>
+  <td>57</td>
+  <td>57</td>
+  <td>56</td>
+  <td>57</td>
+  <td>56</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td>148739</td>
+  <td>58</td>
+  <td>59</td>
+  <td>57</td>
+  <td>59</td>
+  <td>57</td>
+  <td>57</td>
+  <td>57</td>
+  <td>57</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td>592387</td>
+  <td>60</td>
+  <td>60</td>
+  <td>59</td>
+  <td>59</td>
+  <td>59</td>
+  <td>59</td>
+  <td>59</td>
+  <td>59</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td>2364419</td>
+  <td>62</td>
+  <td>62</td>
+  <td>61</td>
+  <td>61</td>
+  <td>61</td>
+  <td>61</td>
+  <td>61</td>
+  <td>61</td>
+</tr>
+</table>
+
+<table>
+<tr>
+  <th colspan="2">Trilinos</th>
+  <th colspan="8">number of processors</th>
+</tr>
+<tr>
+  <th>cycle</th>
+  <th>dofs</th>
+  <th>1</th>
+  <th>2</th>
+  <th>4</th>
+  <th>8</th>
+  <th>16</th>
+  <th>32</th>
+  <th>64</th>
+  <th>128</th>
+</tr>
+<tr>
+  <td>0</td>
+  <td>659</td>
+  <td>37</td>
+  <td>37</td>
+  <td>37</td>
+  <td>37</td>
+  <td>37</td>
+  <td>37</td>
+  <td>37</td>
+  <td>37</td>
+</tr>
+<tr>
+  <td>1</td>
+  <td>2467</td>
+  <td>92</td>
+  <td>89</td>
+  <td>89</td>
+  <td>82</td>
+  <td>86</td>
+  <td>81</td>
+  <td>78</td>
+  <td>78</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td>9539</td>
+  <td>102</td>
+  <td>99</td>
+  <td>96</td>
+  <td>95</td>
+  <td>95</td>
+  <td>88</td>
+  <td>83</td>
+  <td>95</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td>37507</td>
+  <td>107</td>
+  <td>105</td>
+  <td>104</td>
+  <td>99</td>
+  <td>100</td>
+  <td>96</td>
+  <td>96</td>
+  <td>90</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td>148739</td>
+  <td>112</td>
+  <td>112</td>
+  <td>111</td>
+  <td>111</td>
+  <td>127</td>
+  <td>126</td>
+  <td>115</td>
+  <td>117</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td>592387</td>
+  <td>116</td>
+  <td>115</td>
+  <td>114</td>
+  <td>112</td>
+  <td>118</td>
+  <td>120</td>
+  <td>131</td>
+  <td>130</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td>2364419</td>
+  <td>130</td>
+  <td>126</td>
+  <td>120</td>
+  <td>120</td>
+  <td>121</td>
+  <td>122</td>
+  <td>121</td>
+  <td>123</td>
+</tr>
+</table>
+
+While the PETSc results show a constant number of iterations, the iterations
+increase when using Trilinos. This is likely because of the different settings
+used for the AMG preconditioner. For performance reasons we do not allow
+coarsening below a couple thousand unknowns. As the coarse solver is an exact
+solve (we are using LU by default), a change in number of levels will
+influence the quality of a V-cycle. Therefore, a V-cycle is closer to an exact
+solver for smaller problem sizes.
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+<h4>Investigate Trilinos iterations</h4>
+
+Play with the smoothers, smoothing steps, and other properties for the
+Trilinos AMG to achieve an optimal preconditioner.
+
+<h4>Solve the Oseen problem instead of the Stokes system</h4>
+
+This change requires changing the outer solver to GMRES or BiCGStab, because
+the system is no longer symmetric.
+
+You can prescribe the the exact flow solution as $b$ in the convective term $b
+\cdot \nabla u$. This should give the same solution as the original problem,
+if you set the right hand side to zero.
+
+
