@@ -156,6 +156,9 @@ namespace PyDealII
   {
     dim = other.dim;
 
+    AssertThrow(other.point != nullptr,
+                dealii::ExcMessage("Underlying point does not exist."));
+
     if (dim == 2)
       {
         dealii::Point<2> *other_point = static_cast<dealii::Point<2>*>(other.point);
@@ -167,6 +170,7 @@ namespace PyDealII
         point = new dealii::Point<3> ((*other_point)[0], (*other_point)[1], (*other_point)[2]);
       }
     else
-      point = nullptr;
+      AssertThrow(false, 
+                  dealii::ExcMessage("The dimension of the point should be 2 or 3."));
   }
 }

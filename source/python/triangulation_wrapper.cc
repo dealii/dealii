@@ -25,14 +25,14 @@ namespace PyDealII
 {
   namespace internal
   {
-    template <int dim>
+    template <int dim, int spacedim>
     void generate_hyper_cube(const double left,
                              const double right,
                              const bool   colorize,
                              void        *triangulation)
     {
-      dealii::Triangulation<dim> *tria =
-        static_cast<dealii::Triangulation<dim>*>(triangulation);
+      dealii::Triangulation<dim,spacedim> *tria =
+        static_cast<dealii::Triangulation<dim,spacedim>*>(triangulation);
       tria->clear();
       dealii::GridGenerator::hyper_cube(*tria, left, right, colorize);
     }
@@ -56,21 +56,21 @@ namespace PyDealII
 
 
 
-    template <int dim>
+    template <int dim, int spacedim>
     void generate_subdivided_hyper_cube(const unsigned int repetitions,
                                         const double       left,
                                         const double       right,
                                         void              *triangulation)
     {
-      dealii::Triangulation<dim> *tria =
-        static_cast<dealii::Triangulation<dim>*>(triangulation);
+      dealii::Triangulation<dim,spacedim> *tria =
+        static_cast<dealii::Triangulation<dim,spacedim>*>(triangulation);
       tria->clear();
       dealii::GridGenerator::subdivided_hyper_cube(*tria, repetitions, left, right);
     }
 
 
 
-    template <int dim>
+    template <int dim, int spacedim>
     void generate_hyper_rectangle(PointWrapper &p1,
                                   PointWrapper &p2,
                                   const bool    colorize,
@@ -84,15 +84,15 @@ namespace PyDealII
       dealii::Point<dim> point_1 = *(static_cast<dealii::Point<dim>*>(p1.get_point()));
       dealii::Point<dim> point_2 = *(static_cast<dealii::Point<dim>*>(p2.get_point()));
 
-      dealii::Triangulation<dim> *tria =
-        static_cast<dealii::Triangulation<dim>*>(triangulation);
+      dealii::Triangulation<dim,spacedim> *tria =
+        static_cast<dealii::Triangulation<dim,spacedim>*>(triangulation);
       tria->clear();
       dealii::GridGenerator::hyper_rectangle(*tria, point_1, point_2, colorize);
     }
 
 
 
-    template <int dim>
+    template <int dim, int spacedim>
     void generate_subdivided_hyper_rectangle(const std::vector<unsigned int> &repetitions,
                                              PointWrapper                    &p1,
                                              PointWrapper                    &p2,
@@ -107,8 +107,8 @@ namespace PyDealII
       dealii::Point<dim> point_1 = *(static_cast<dealii::Point<dim>*>(p1.get_point()));
       dealii::Point<dim> point_2 = *(static_cast<dealii::Point<dim>*>(p2.get_point()));
 
-      dealii::Triangulation<dim> *tria =
-        static_cast<dealii::Triangulation<dim>*>(triangulation);
+      dealii::Triangulation<dim,spacedim> *tria =
+        static_cast<dealii::Triangulation<dim,spacedim>*>(triangulation);
       tria->clear();
       dealii::GridGenerator::subdivided_hyper_rectangle(*tria, repetitions, point_1,
                                                         point_2, colorize);
@@ -133,34 +133,34 @@ namespace PyDealII
 
 
 
-    template <int dim>
+    template <int dim, int spacedim>
     void shift(boost::python::list &shift_list,
                void                *triangulation)
     {
       // Extract the shift vector from the python list
-      dealii::Tensor<1,dim> shift_vector;
-      for (int i=0; i<dim; ++i)
+      dealii::Tensor<1,spacedim> shift_vector;
+      for (int i=0; i<spacedim; ++i)
         shift_vector[i] = boost::python::extract<double>(shift_list[i]);
 
-      dealii::Triangulation<dim> *tria =
-        static_cast<dealii::Triangulation<dim>*>(triangulation);
+      dealii::Triangulation<dim,spacedim> *tria =
+        static_cast<dealii::Triangulation<dim,spacedim>*>(triangulation);
       dealii::GridTools::shift(shift_vector, *tria);
     }
 
 
 
-    template <int dim>
+    template <int dim, int spacedim>
     void merge_triangulations(TriangulationWrapper &triangulation_1,
                               TriangulationWrapper &triangulation_2,
                               void                 *triangulation)
     {
-      dealii::Triangulation<dim> *tria =
-        static_cast<dealii::Triangulation<dim>*>(triangulation);
+      dealii::Triangulation<dim,spacedim> *tria =
+        static_cast<dealii::Triangulation<dim,spacedim>*>(triangulation);
       tria->clear();
-      dealii::Triangulation<dim> *tria_1 =
-        static_cast<dealii::Triangulation<dim>*>(triangulation_1.get_triangulation());
-      dealii::Triangulation<dim> *tria_2 =
-        static_cast<dealii::Triangulation<dim>*>(triangulation_2.get_triangulation());
+      dealii::Triangulation<dim,spacedim> *tria_1 =
+        static_cast<dealii::Triangulation<dim,spacedim>*>(triangulation_1.get_triangulation());
+      dealii::Triangulation<dim,spacedim> *tria_2 =
+        static_cast<dealii::Triangulation<dim,spacedim>*>(triangulation_2.get_triangulation());
       dealii::GridGenerator::merge_triangulations(*tria_1, *tria_2, *tria);
       // We need to reassign tria to triangulation because tria was cleared
       // inside merge_triangulations.
@@ -171,21 +171,21 @@ namespace PyDealII
 
 
   TriangulationWrapper::TriangulationWrapper(const std::string &dimension)
-    :
-    triangulation(nullptr)
   {
     if ((dimension.compare("2D")==0) || (dimension.compare("2d")==0))
-      {
-        dim = 2;
-        triangulation = new dealii::Triangulation<2>();
-      }
+      setup("2D", "2D");
     else if ((dimension.compare("3D")==0) || (dimension.compare("3d")==0))
-      {
-        dim = 3;
-        triangulation = new dealii::Triangulation<3>();
-      }
+      setup("3D", "3D");
     else
       AssertThrow(false, dealii::ExcMessage("Dimension needs to be 2D or 3D"));
+  }
+
+
+
+  TriangulationWrapper::TriangulationWrapper(const std::string &dimension, 
+                                             const std::string &spacedimension)
+  {
+    setup(dimension, spacedimension);
   }
 
 
@@ -193,21 +193,31 @@ namespace PyDealII
   TriangulationWrapper::~TriangulationWrapper()
   {
     if (triangulation != nullptr)
+    {
+      if (dim == 2)
       {
-        if (dim == 2)
-          {
-            // We cannot call delete on a void pointer so cast the void pointer back
-            // first.
-            dealii::Triangulation<2> *tmp = static_cast<dealii::Triangulation<2>*>(triangulation);
-            delete tmp;
-          }
+        if (spacedim == 2)
+        {
+          // We cannot call delete on a void pointer so cast the void pointer back
+          // first.
+          dealii::Triangulation<2,2> *tmp = 
+            static_cast<dealii::Triangulation<2,2>*>(triangulation);
+          delete tmp;
+        }
         else
-          {
-            dealii::Triangulation<3> *tmp = static_cast<dealii::Triangulation<3>*>(triangulation);
-            delete tmp;
-          }
-        triangulation = nullptr;
+        {
+          dealii::Triangulation<2,3> *tmp = 
+            static_cast<dealii::Triangulation<2,3>*>(triangulation);
+          delete tmp;
+        }
       }
+      else
+      {
+        dealii::Triangulation<3,3> *tmp = static_cast<dealii::Triangulation<3,3>*>(triangulation);
+        delete tmp;
+      }
+      triangulation = nullptr;
+    }
     dim = -1;
   }
 
@@ -215,10 +225,12 @@ namespace PyDealII
 
   unsigned int TriangulationWrapper::n_active_cells() const
   {
-    if (dim == 2)
-      return (*static_cast<dealii::Triangulation<2>*>(triangulation)).n_active_cells();
+    if ((dim == 2) && (spacedim == 2))
+      return (*static_cast<dealii::Triangulation<2,2>*>(triangulation)).n_active_cells();
+    else if ((dim == 2) && (spacedim == 3))
+      return (*static_cast<dealii::Triangulation<2,3>*>(triangulation)).n_active_cells();
     else
-      return (*static_cast<dealii::Triangulation<3>*>(triangulation)).n_active_cells();
+      return (*static_cast<dealii::Triangulation<3,3>*>(triangulation)).n_active_cells();
   }
 
 
@@ -227,10 +239,12 @@ namespace PyDealII
                                                  const double right,
                                                  const bool   colorize)
   {
-    if (dim == 2)
-      internal::generate_hyper_cube<2>(left, right, colorize, triangulation);
+    if ((dim == 2) && (spacedim == 2))
+      internal::generate_hyper_cube<2,2>(left, right, colorize, triangulation);
+    else if ((dim == 2) && (spacedim == 3))
+      internal::generate_hyper_cube<2,3>(left, right, colorize, triangulation);
     else
-      internal::generate_hyper_cube<3>(left, right, colorize, triangulation);
+      internal::generate_hyper_cube<3,3>(left, right, colorize, triangulation);
   }
 
 
@@ -239,6 +253,8 @@ namespace PyDealII
   {
     AssertThrow(boost::python::len(vertices) == dim+1,
                 dealii::ExcMessage("The number of vertices should be equal to dim+1."));
+    AssertThrow(dim == spacedim,
+                dealii::ExcMessage("This function is only implemented for dim equal to spacedim."));
     // Extract the PointWrapper object from the python list
     std::vector<PointWrapper> wrapped_points(dim+1);
     for (int i=0; i<dim+1; ++i)
@@ -260,10 +276,12 @@ namespace PyDealII
                                                             const double       left,
                                                             const double       right)
   {
-    if (dim == 2)
-      internal::generate_subdivided_hyper_cube<2>(repetitions, left, right, triangulation);
+    if ((dim == 2) && (spacedim == 2))
+      internal::generate_subdivided_hyper_cube<2,2>(repetitions, left, right, triangulation);
+    else if ((dim == 2) && (spacedim == 3))
+      internal::generate_subdivided_hyper_cube<2,3>(repetitions, left, right, triangulation);
     else
-      internal::generate_subdivided_hyper_cube<3>(repetitions, left, right, triangulation);
+      internal::generate_subdivided_hyper_cube<3,3>(repetitions, left, right, triangulation);
   }
 
 
@@ -272,10 +290,12 @@ namespace PyDealII
                                                       PointWrapper &p2,
                                                       const bool    colorize)
   {
-    if (dim == 2)
-      internal::generate_hyper_rectangle<2>(p1, p2, colorize, triangulation);
+    if ((dim == 2) && (spacedim == 2))
+      internal::generate_hyper_rectangle<2,2>(p1, p2, colorize, triangulation);
+    else if ((dim == 2) && (spacedim == 3))
+      internal::generate_hyper_rectangle<2,3>(p1, p2, colorize, triangulation);
     else
-      internal::generate_hyper_rectangle<3>(p1, p2, colorize, triangulation);
+      internal::generate_hyper_rectangle<3,3>(p1, p2, colorize, triangulation);
   }
 
 
@@ -293,12 +313,15 @@ namespace PyDealII
     for (int i=0; i<dim; ++i)
       repetitions[i] = boost::python::extract<unsigned int>(repetition_list[i]);
 
-    if (dim == 2)
-      internal::generate_subdivided_hyper_rectangle<2>(repetitions, p1, p2, colorize,
-                                                       triangulation);
+    if ((dim == 2) && (spacedim == 2))
+      internal::generate_subdivided_hyper_rectangle<2,2>(repetitions, p1, p2, colorize,
+                                                         triangulation);
+    else if ((dim == 2) && (spacedim == 3))
+      internal::generate_subdivided_hyper_rectangle<2,3>(repetitions, p1, p2, colorize,
+                                                         triangulation);
     else
-      internal::generate_subdivided_hyper_rectangle<3>(repetitions, p1, p2, colorize,
-                                                       triangulation);
+      internal::generate_subdivided_hyper_rectangle<3,3>(repetitions, p1, p2, colorize,
+                                                         triangulation);
   }
 
 
@@ -306,6 +329,8 @@ namespace PyDealII
   void TriangulationWrapper::generate_hyper_ball(PointWrapper &center,
                                                  const double  radius)
   {
+    AssertThrow(dim == spacedim,
+                dealii::ExcMessage("This function is only implemented for dim equal to spacedim."));
     if (dim == 2)
       internal::generate_hyper_ball<2>(center, radius, triangulation);
     else
@@ -316,10 +341,14 @@ namespace PyDealII
 
   void TriangulationWrapper::shift(boost::python::list &shift_list)
   {
-    if (dim == 2)
-      internal::shift<2>(shift_list, triangulation);
+    AssertThrow(boost::python::len(shift_list) == spacedim,
+                dealii::ExcMessage("Size of the shift vector is not equal to spacedim."));
+    if ((dim == 2) && (spacedim == 2))
+      internal::shift<2,2>(shift_list, triangulation);
+    else if ((dim ==2) && (spacedim == 3))
+      internal::shift<2,3>(shift_list, triangulation);
     else
-      internal::shift<3>(shift_list, triangulation);
+      internal::shift<3,3>(shift_list, triangulation);
   }
 
 
@@ -329,11 +358,43 @@ namespace PyDealII
   {
     AssertThrow(triangulation_1.get_dim() == triangulation_2.get_dim(),
                 dealii::ExcMessage("Triangulation_1 and Triangulation_2 should have the same dimension."));
+    AssertThrow(dim == triangulation_2.get_dim(),
+                dealii::ExcMessage("Triangulation and Triangulation_2 should have the same dimension."));
+    AssertThrow(triangulation_1.get_spacedim() == triangulation_2.get_spacedim(),
+                dealii::ExcMessage("Triangulation_1 and Triangulation_2 should have the same space dimension."));
+    AssertThrow(spacedim == triangulation_2.get_spacedim(),
+                dealii::ExcMessage("Triangulation and Triangulation_2 should have the same space dimension."));
 
-    if (triangulation_1.get_dim() == 2)
-      internal::merge_triangulations<2>(triangulation_1, triangulation_2, triangulation);
+    if ((triangulation_1.get_dim() == 2) && (triangulation_1.get_spacedim() == 2))
+      internal::merge_triangulations<2,2>(triangulation_1, triangulation_2, triangulation);
+    else if ((triangulation_1.get_dim() == 2) && (triangulation_1.get_spacedim() == 3))
+      internal::merge_triangulations<2,3>(triangulation_1, triangulation_2, triangulation);
     else
-      internal::merge_triangulations<3>(triangulation_1, triangulation_2, triangulation);
+      internal::merge_triangulations<3,3>(triangulation_1, triangulation_2, triangulation);
+  }
+
+
+
+  void TriangulationWrapper::refine_global(const unsigned int n)
+  {
+    if ((dim == 2) && (spacedim == 2))
+      {
+        dealii::Triangulation<2,2> *tria =
+          static_cast<dealii::Triangulation<2,2>*>(triangulation);
+        tria->refine_global(n);
+      }
+    else if ((dim == 2) && (spacedim == 3))
+      {
+        dealii::Triangulation<2,3> *tria =
+          static_cast<dealii::Triangulation<2,3>*>(triangulation);
+        tria->refine_global(n);
+      }
+    else
+      {
+        dealii::Triangulation<3,3> *tria =
+          static_cast<dealii::Triangulation<3,3>*>(triangulation);
+        tria->refine_global(n);
+      }
   }
 
 
@@ -343,17 +404,26 @@ namespace PyDealII
     std::ofstream ofs(filename);
     boost::archive::text_oarchive oa(ofs);
 
-    if (dim == 2)
+    if ((dim == 2) && (spacedim == 2))
       {
-        dealii::Triangulation<2> *tria =
-          static_cast<dealii::Triangulation<2>*>(triangulation);
+        dealii::Triangulation<2,2> *tria =
+          static_cast<dealii::Triangulation<2,2>*>(triangulation);
 
         oa << *tria;
       }
+    else if ((dim == 2) && (spacedim == 3))
+    {
+      {
+        dealii::Triangulation<2,3> *tria =
+          static_cast<dealii::Triangulation<2,3>*>(triangulation);
+
+        oa << *tria;
+      }
+    }
     else
       {
-        dealii::Triangulation<3> *tria =
-          static_cast<dealii::Triangulation<3>*>(triangulation);
+        dealii::Triangulation<3,3> *tria =
+          static_cast<dealii::Triangulation<3,3>*>(triangulation);
 
         oa << *tria;
       }
@@ -366,17 +436,24 @@ namespace PyDealII
     std::ifstream ifs(filename);
     boost::archive::text_iarchive ia(ifs);
 
-    if (dim == 2)
+    if ((dim == 2) && (spacedim == 2))
       {
-        dealii::Triangulation<2> *tria =
-          static_cast<dealii::Triangulation<2>*>(triangulation);
+        dealii::Triangulation<2,2> *tria =
+          static_cast<dealii::Triangulation<2,2>*>(triangulation);
+
+        ia >> *tria;
+      }
+    else if ((dim == 2) && (spacedim == 3))
+      {
+        dealii::Triangulation<2,3> *tria =
+          static_cast<dealii::Triangulation<2,3>*>(triangulation);
 
         ia >> *tria;
       }
     else
       {
         dealii::Triangulation<3> *tria =
-          static_cast<dealii::Triangulation<3>*>(triangulation);
+          static_cast<dealii::Triangulation<3,3>*>(triangulation);
 
         ia >> *tria;
       }
@@ -384,19 +461,38 @@ namespace PyDealII
 
 
 
-  void TriangulationWrapper::refine_global(const unsigned int n)
+  void TriangulationWrapper::setup(const std::string &dimension,
+                                   const std::string &spacedimension)
   {
-    if (dim == 2)
+    if ((dimension.compare("2D") == 0) || (dimension.compare("2d") == 0))
       {
-        dealii::Triangulation<2> *tria =
-          static_cast<dealii::Triangulation<2>*>(triangulation);
-        tria->refine_global(n);
+        dim = 2;
+        
+        if ((spacedimension.compare("2D") == 0) || 
+            (spacedimension.compare("2d") == 0))
+        {
+          spacedim = 2;
+          triangulation = new dealii::Triangulation<2,2>();
+        }
+        else if ((spacedimension.compare("3D") == 0) || 
+                 (spacedimension.compare("3d") == 0))
+        {
+          spacedim = 3;
+          triangulation = new dealii::Triangulation<2,3>();
+        }
+        else
+          AssertThrow(false, dealii::ExcMessage("Spacedimension needs to be 2D or 3D."));
+      }
+    else if ((dimension.compare("3D") == 0) || (dimension.compare("3d") == 0))
+      {
+        if ((spacedimension.compare("3D") != 0) && 
+            (spacedimension.compare("3d") != 0))           
+          AssertThrow(false, dealii::ExcMessage("Spacedimension needs to be 3D."));
+        dim = 3;
+        spacedim = 3;
+        triangulation = new dealii::Triangulation<3,3>();
       }
     else
-      {
-        dealii::Triangulation<3> *tria =
-          static_cast<dealii::Triangulation<3>*>(triangulation);
-        tria->refine_global(n);
-      }
+      AssertThrow(false, dealii::ExcMessage("Dimension needs to be 2D or 3D."));
   }
 }

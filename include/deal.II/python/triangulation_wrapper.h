@@ -32,6 +32,14 @@ namespace PyDealII
     TriangulationWrapper(const std::string &dim);
 
     /**
+     * Constructor. Takes a string @p dim with one of the following values
+     * "2D", "2d", "3D", or "3d" and a string @p spacedim with one of the
+     * following values "2D", "2d", "3D", or "3d". The dimension of @p spacedim
+     * must be larger than the dimension of @p dim
+     */
+    TriangulationWrapper(const std::string &dim, const std::string &spacedim);
+
+    /**
      * Destructor.
      */
     ~TriangulationWrapper();
@@ -120,6 +128,11 @@ namespace PyDealII
     int get_dim() const;
 
     /**
+     * Return the space dimension of the underlying Triangulation object.
+     */
+    int get_spacedim() const;
+
+    /**
      * Return a pointer that can be casted to the underlying Triangulation
      * object.
      */
@@ -127,9 +140,19 @@ namespace PyDealII
 
   private:
     /**
+     * Helper function for the contructors.
+     */
+    void setup(const std::string &dimension, const std::string &spacedimension);
+
+    /**
      * Dimension of the underlying Triangulation object.
      */
     int dim;
+
+    /**
+     * Space dimension of the underlying Triangulation object.
+     */
+    int spacedim;
 
     /**
      * Pointer that can be casted to the underlying Triangulation object.
@@ -146,6 +169,14 @@ namespace PyDealII
   int TriangulationWrapper::get_dim() const
   {
     return dim;
+  }
+
+
+
+  inline
+  int TriangulationWrapper::get_spacedim() const
+  {
+    return spacedim;
   }
 
 

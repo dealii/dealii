@@ -20,16 +20,16 @@ from pydealii.PyDealII import *
 class TestTriangulationWrapper(unittest.TestCase):
 
     def setUp(self):
-        self.dim = ['2D', '3D']
+        self.dim = [['2D', '2D'], ['2D', '3D'], ['3D', '3D']]
 
     def build_hyper_cube_triangulation(self, dim):
-        triangulation_1 = Triangulation(dim)
+        triangulation_1 = Triangulation(dim[0], dim[1])
         triangulation_1.generate_hyper_cube()
         return triangulation_1
 
     def build_hyper_rectangle_triangulation(self, dim):
-        triangulation_2 = Triangulation(dim)
-        if (dim == '2D'):
+        triangulation_2 = Triangulation(dim[0], dim[1])
+        if (dim[0] == '2D'):
             point_1 = Point([0., 0.])
             point_2 = Point([1., 1.])
         else:
@@ -46,8 +46,8 @@ class TestTriangulationWrapper(unittest.TestCase):
 
     def test_simplex(self):
         for dim in self.dim:
-            triangulation = Triangulation(dim)
-            if (dim == '2D'):
+            triangulation = Triangulation(dim[0])
+            if (dim[0] == '2D'):
                 point_1 = Point([0., 0.])
                 point_2 = Point([1., 0.])
                 point_3 = Point([1., 1.])
@@ -64,11 +64,11 @@ class TestTriangulationWrapper(unittest.TestCase):
 
     def test_subdivided_hyper_cube(self):
         for dim in self.dim:
-            triangulation = Triangulation(dim)
+            triangulation = Triangulation(dim[0], dim[1])
             repetitions = 2
             triangulation.generate_subdivided_hyper_cube(repetitions)
             n_cells = triangulation.n_active_cells()
-            if (dim == '2D'):
+            if (dim[0] == '2D'):
                 self.assertEqual(n_cells, 4)
             else:
                 self.assertEqual(n_cells, 8)
@@ -81,8 +81,8 @@ class TestTriangulationWrapper(unittest.TestCase):
 
     def test_subdivided_hyper_rectangle(self):
         for dim in self.dim:
-            triangulation = Triangulation(dim)
-            if (dim == '2D'):
+            triangulation = Triangulation(dim[0], dim[1])
+            if (dim[0] == '2D'):
                 repetitions = [6, 4]
                 point_1 = Point([0., 0.])
                 point_2 = Point([1., 1.])
@@ -98,8 +98,8 @@ class TestTriangulationWrapper(unittest.TestCase):
 
     def test_hyper_ball(self):
         for dim in self.dim:
-            triangulation = Triangulation(dim)
-            if (dim == '2D'):
+            triangulation = Triangulation(dim[0])
+            if (dim[0] == '2D'):
                 center = Point([0., 0.])
                 n_cells_ref = 5
             else:
@@ -113,11 +113,11 @@ class TestTriangulationWrapper(unittest.TestCase):
         for dim in self.dim:
             triangulation_1 = self.build_hyper_cube_triangulation(dim)
             triangulation_2 = self.build_hyper_rectangle_triangulation(dim)
-            if (dim == '2D'):
+            if (dim[1] == '2D'):
                 triangulation_2.shift([1., 0.])
             else:
                 triangulation_2.shift([1., 0., 0.])
-            triangulation = Triangulation(dim)
+            triangulation = Triangulation(dim[0], dim[1])
             triangulation.merge_triangulations(triangulation_1,
                                                triangulation_2)
             n_cells = triangulation.n_active_cells()
@@ -128,7 +128,7 @@ class TestTriangulationWrapper(unittest.TestCase):
             triangulation = self.build_hyper_cube_triangulation(dim)
             triangulation.refine_global(2)
             n_cells = triangulation.n_active_cells()
-            if (dim == '2D'):
+            if (dim[0] == '2D'):
                 self.assertEqual(n_cells, 16)
             else:
                 self.assertEqual(n_cells, 64)
@@ -138,10 +138,10 @@ class TestTriangulationWrapper(unittest.TestCase):
             triangulation_1 = self.build_hyper_cube_triangulation(dim)
             triangulation_1.refine_global(1)
             triangulation_1.save('mesh.output')
-            triangulation_2 = Triangulation(dim)
+            triangulation_2 = Triangulation(dim[0], dim[1])
             triangulation_2.load('mesh.output')
             n_cells = triangulation_2.n_active_cells()
-            if (dim == '2D'):
+            if (dim[0] == '2D'):
                 self.assertEqual(n_cells, 4)
             else:
                 self.assertEqual(n_cells, 8)

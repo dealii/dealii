@@ -45,7 +45,7 @@ namespace PyDealII
 
     /**
      * Assignment operator. The dimension of the point is changed if it is
-     * different that the one of @p other.
+     * different than the one of @p other.
      */
     PointWrapper &operator= (const PointWrapper &other);
 
