@@ -26,7 +26,7 @@
 
 #include <deal.II/lac/generic_linear_algebra.h>
 
-//#define FORCE_USE_OF_TRILINOS
+/* #define FORCE_USE_OF_TRILINOS */
 
 namespace LA
 {
