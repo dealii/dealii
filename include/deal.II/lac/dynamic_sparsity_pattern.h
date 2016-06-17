@@ -560,6 +560,11 @@ public:
 
 private:
   /**
+   * A flag that stores whether any entries have been added so far.
+   */
+  bool have_entries;
+
+  /**
    * Number of rows that this sparsity structure shall represent.
    */
   size_type rows;
@@ -947,6 +952,8 @@ DynamicSparsityPattern::add (const size_type i,
   if (rowset.size() > 0 && !rowset.is_element(i))
     return;
 
+  have_entries = true;
+
   const size_type rowindex =
     rowset.size()==0 ? i : rowset.index_within_set(i);
   lines[rowindex].add (j);
@@ -967,6 +974,9 @@ DynamicSparsityPattern::add_entries (const size_type row,
   if (rowset.size() > 0 && !rowset.is_element(row))
     return;
 
+  if (!have_entries && begin<end)
+    have_entries = true;
+
   const size_type rowindex =
     rowset.size()==0 ? row : rowset.index_within_set(row);
   lines[rowindex].add_entries (begin, end, indices_are_sorted);
@@ -985,6 +995,10 @@ types::global_dof_index
 DynamicSparsityPattern::row_length (const size_type row) const
 {
   Assert (row < n_rows(), ExcIndexRangeType<size_type> (row, 0, n_rows()));
+
+  if (!have_entries)
+    return 0;
+
   if (rowset.size() > 0 && !rowset.is_element(row))
     return 0;
 
@@ -1034,20 +1048,50 @@ DynamicSparsityPattern::begin (const size_type r) const
 {
   Assert (r<n_rows(), ExcIndexRangeType<size_type>(r,0,n_rows()));
 
-  // find the first row starting at r that has entries and return the
-  // begin iterator to it. also skip rows for which we do not have
-  // store anything based on the IndexSet given to the sparsity
-  // pattern
-  //
-  // note: row_length(row) returns zero if the row is not locally stored
-  //
-  // TODO: this is way too slow when used in parallel, so do not use it on
-  // non-owned rows
+  if (!have_entries)
+    return iterator(this);
+
+  if (rowset.size() > 0)
+    {
+      // We have an IndexSet that describes the locally owned set. For
+      // performance reasons we need to make sure that we don't do a
+      // linear search over 0..n_rows(). Instead, find the first entry
+      // >= row r in the locally owned set (this is done in log
+      // n_ranges time inside at()). From there, we move forward until
+      // we find a non-empty row. By iterating over the IndexSet instead
+      // of incrementing the row index, we potentially skip over entries
+      // not in the rowset.
+      IndexSet::ElementIterator it = rowset.at(r);
+      if (it == rowset.end())
+        return end(); // we don't own any row between r and the end
+
+      // Instead of using row_length(*it)==0 in the while loop below,
+      // which involves an expensive index_within_set() call, we
+      // look at the lines vector directly. This works, because we are
+      // walking over this vector entry by entry anyways.
+      size_type rowindex = rowset.index_within_set(*it);
+
+      while (it!=rowset.end()
+             && lines[rowindex].entries.size()==0)
+        {
+          ++it;
+          ++rowindex;
+        }
+
+      if (it == rowset.end())
+        return end();
+      else
+        return iterator(this, *it, 0);
+    }
+
+  // Without an index set we have to do a linear search starting at
+  // row r until we find a non-empty one
   size_type row = r;
-  while ((row<n_rows())
-         &&
-         (row_length(row)==0))
-    ++row;
+
+  while (row<n_rows() && row_length(row)==0)
+    {
+      ++row;
+    }
 
   if (row == n_rows())
     return iterator(this);
@@ -1063,22 +1107,11 @@ DynamicSparsityPattern::end (const size_type r) const
 {
   Assert (r<n_rows(), ExcIndexRangeType<size_type>(r,0,n_rows()));
 
-  // find the first row after r that has entries and return the begin
-  // iterator to it. also skip rows for which we do not have
-  // store anything based on the IndexSet given to the sparsity
-  // pattern
-  //
-  // note: row_length(row) returns zero if the row is not locally stored
   unsigned int row = r+1;
-  while ((row<n_rows())
-         &&
-         (row_length(row)==0))
-    ++row;
-
   if (row == n_rows())
     return iterator(this);
   else
-    return iterator(this, row, 0);
+    return begin(row);
 }
 
 

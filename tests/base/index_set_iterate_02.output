@@ -1,0 +1,11 @@
+
+DEAL::{[2,4], 9}
+DEAL::n=0 end?0 value=2
+DEAL::n=2 end?0 value=2
+DEAL::n=3 end?0 value=3
+DEAL::n=4 end?0 value=4
+DEAL::n=7 end?0 value=9
+DEAL::n=9 end?0 value=9
+DEAL::n=15 end?1
+DEAL::{}
+DEAL::n=6 end?1

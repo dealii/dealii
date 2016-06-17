@@ -288,6 +288,19 @@ inconvenience this causes.
 
 <ol>
 
+ <li> New: IndexSet::at(idx) returns an iterator pointing to the given index
+ or the next larger element in the set if idx is not contained.
+ <br>
+ (Timo Heister, 2016/06/21)
+ </li>
+
+ <li> Fixed: Performance of DynamicSparsityPattern::begin(r) and
+ DynamicSparsityPattern::end(r) has been improved dramatically in parallel
+ computations and if the pattern is empty.
+ <br>
+ (Timo Heister, 2016/06/21)
+ </li>
+
  <li> Fixed: FEFieldFunction now works correctly in distributed computations,
  where before exceptions of type ExcPointNotAvailableHere could occur for
  evaluation points on or close to a boundary to a ghost cell.

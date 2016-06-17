@@ -216,9 +216,10 @@ DynamicSparsityPattern::Line::memory_consumption () const
 
 DynamicSparsityPattern::DynamicSparsityPattern ()
   :
-  rows(0),
-  cols(0),
-  rowset(0)
+  have_entries (false),
+  rows (0),
+  cols (0),
+  rowset (0)
 {}
 
 
@@ -227,9 +228,10 @@ DynamicSparsityPattern::
 DynamicSparsityPattern (const DynamicSparsityPattern &s)
   :
   Subscriptor(),
-  rows(0),
-  cols(0),
-  rowset(0)
+  have_entries (false),
+  rows (0),
+  cols (0),
+  rowset (0)
 {
   (void)s;
   Assert (s.rows == 0, ExcInvalidConstructorCall());
@@ -243,9 +245,10 @@ DynamicSparsityPattern::DynamicSparsityPattern (const size_type m,
                                                 const IndexSet &rowset_
                                                )
   :
-  rows(0),
-  cols(0),
-  rowset(0)
+  have_entries (false),
+  rows (0),
+  cols (0),
+  rowset (0)
 {
   reinit (m,n, rowset_);
 }
@@ -253,6 +256,7 @@ DynamicSparsityPattern::DynamicSparsityPattern (const size_type m,
 
 DynamicSparsityPattern::DynamicSparsityPattern (const IndexSet &rowset_)
   :
+  have_entries (false),
   rows(0),
   cols(0),
   rowset(0)
@@ -263,6 +267,7 @@ DynamicSparsityPattern::DynamicSparsityPattern (const IndexSet &rowset_)
 
 DynamicSparsityPattern::DynamicSparsityPattern (const size_type n)
   :
+  have_entries (false),
   rows(0),
   cols(0),
   rowset(0)
@@ -292,6 +297,7 @@ DynamicSparsityPattern::reinit (const size_type m,
                                 const size_type n,
                                 const IndexSet &rowset_)
 {
+  have_entries = false;
   rows = m;
   cols = n;
   rowset=rowset_;
@@ -321,6 +327,9 @@ DynamicSparsityPattern::empty () const
 DynamicSparsityPattern::size_type
 DynamicSparsityPattern::max_entries_per_row () const
 {
+  if (!have_entries)
+    return 0;
+
   size_type m = 0;
   for (size_type i=0; i<lines.size(); ++i)
     {
@@ -339,6 +348,9 @@ DynamicSparsityPattern::exists (const size_type i,
   Assert (i<rows, ExcIndexRange(i, 0, rows));
   Assert (j<cols, ExcIndexRange(j, 0, cols));
   Assert( rowset.size()==0 || rowset.is_element(i), ExcInternalError());
+
+  if (!have_entries)
+    return false;
 
   const size_type rowindex =
     rowset.size()==0 ? i : rowset.index_within_set(i);
@@ -455,6 +467,9 @@ DynamicSparsityPattern::bandwidth () const
 DynamicSparsityPattern::size_type
 DynamicSparsityPattern::n_nonzero_elements () const
 {
+  if (!have_entries)
+    return 0;
+
   size_type n=0;
   for (size_type i=0; i<lines.size(); ++i)
     {
@@ -468,8 +483,10 @@ DynamicSparsityPattern::n_nonzero_elements () const
 DynamicSparsityPattern::size_type
 DynamicSparsityPattern::memory_consumption () const
 {
-  //TODO: IndexSet...
-  size_type mem = sizeof(DynamicSparsityPattern);
+  size_type mem = sizeof(DynamicSparsityPattern)
+                  + MemoryConsumption::memory_consumption(rowset)
+                  - sizeof(rowset);
+
   for (size_type i=0; i<lines.size(); ++i)
     mem += MemoryConsumption::memory_consumption (lines[i]);
 
