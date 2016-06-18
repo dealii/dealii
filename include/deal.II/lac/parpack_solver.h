@@ -543,7 +543,6 @@ internal_reinit(const IndexSet &locally_owned_dofs)
   ldv = nloc;
   v.resize (ldv*ncv, 0.0);
 
-  // TODO: add optional input for resid
   resid.resize(nloc, 1.0);
 
   // work arrays for ARPACK
@@ -611,12 +610,14 @@ void PArpackSolver<VectorType>::solve
           PArpackExcInvalidEigenvalueSize(n_eigenvalues, eigenvalues.size()));
 
 
-  Assert (n_eigenvalues < mass_matrix.m(),
-          PArpackExcInvalidNumberofEigenvalues(n_eigenvalues, mass_matrix.m()));
+  // use eigenvectors to get the problem size so that it is possible to
+  // employ LinearOperator for mass_matrix.
+  Assert (n_eigenvalues < eigenvectors[0].size(),
+          PArpackExcInvalidNumberofEigenvalues(n_eigenvalues, eigenvectors[0].size()));
 
-  Assert (additional_data.number_of_arnoldi_vectors < mass_matrix.m(),
+  Assert (additional_data.number_of_arnoldi_vectors < eigenvectors[0].size(),
           PArpackExcInvalidNumberofArnoldiVectors(
-            additional_data.number_of_arnoldi_vectors, mass_matrix.m()));
+            additional_data.number_of_arnoldi_vectors, eigenvectors[0].size()));
 
   Assert (additional_data.number_of_arnoldi_vectors > 2*n_eigenvalues+1,
           PArpackExcSmallNumberofArnoldiVectors(
@@ -715,6 +716,7 @@ void PArpackSolver<VectorType>::solve
   int nev = n_eigenvalues;
   int n_inside_arpack = nloc;
 
+  // IDO = 99: done
   while (ido != 99)
     {
       // call of ARPACK pdnaupd routine
@@ -737,10 +739,10 @@ void PArpackSolver<VectorType>::solve
         {
           switch (ido)
             {
-//            compute  Y = OP * X  where
-//            IPNTR(1) is the pointer into WORKD for X,
-//            IPNTR(2) is the pointer into WORKD for Y.
             case -1:
+              // compute  Y = OP * X  where
+              // IPNTR(1) is the pointer into WORKD for X,
+              // IPNTR(2) is the pointer into WORKD for Y.
             {
               const int shift_x = ipntr[0]-1;
               const int shift_y = ipntr[1]-1;
@@ -767,13 +769,13 @@ void PArpackSolver<VectorType>::solve
             }
             break;
 
-//            compute  Y = OP * X where
-//            IPNTR(1) is the pointer into WORKD for X,
-//            IPNTR(2) is the pointer into WORKD for Y.
-//            In mode 3,4 and 5, the vector B * X is already
-//            available in WORKD(ipntr(3)).  It does not
-//            need to be recomputed in forming OP * X.
             case  1:
+              // compute  Y = OP * X where
+              // IPNTR(1) is the pointer into WORKD for X,
+              // IPNTR(2) is the pointer into WORKD for Y.
+              // In mode 3,4 and 5, the vector B * X is already
+              // available in WORKD(ipntr(3)).  It does not
+              // need to be recomputed in forming OP * X.
             {
               const int shift_x   = ipntr[0]-1;
               const int shift_y   = ipntr[1]-1;
@@ -812,10 +814,10 @@ void PArpackSolver<VectorType>::solve
             }
             break;
 
-//            compute  Y = B * X  where
-//            IPNTR(1) is the pointer into WORKD for X,
-//            IPNTR(2) is the pointer into WORKD for Y.
             case  2:
+              // compute  Y = B * X  where
+              // IPNTR(1) is the pointer into WORKD for X,
+              // IPNTR(2) is the pointer into WORKD for Y.
             {
 
               const int shift_x = ipntr[0]-1;
@@ -843,20 +845,20 @@ void PArpackSolver<VectorType>::solve
             break;
 
             default:
-              Assert (false, PArpackExcIdo(ido));
+              AssertThrow (false, PArpackExcIdo(ido));
               break;
             }
         }
         break;
         default:
-          Assert (false, PArpackExcMode(mode));
+          AssertThrow (false, PArpackExcMode(mode));
           break;
         }
     }
 
   if (info<0)
     {
-      Assert (false, PArpackExcInfoPdnaupd(info));
+      AssertThrow (false, PArpackExcInfoPdnaupd(info));
     }
   else
     {
@@ -889,15 +891,15 @@ void PArpackSolver<VectorType>::solve
 
       if (info == 1)
         {
-          Assert (false, PArpackExcInfoMaxIt(control().max_steps()));
+          AssertThrow (false, PArpackExcInfoMaxIt(control().max_steps()));
         }
       else if (info == 3)
         {
-          Assert (false, PArpackExcNoShifts(1));
+          AssertThrow (false, PArpackExcNoShifts(1));
         }
       else if (info!=0)
         {
-          Assert (false, PArpackExcInfoPdneupd(info));
+          AssertThrow (false, PArpackExcInfoPdneupd(info));
         }
 
       for (size_type i=0; i<n_eigenvalues; ++i)
@@ -916,8 +918,9 @@ void PArpackSolver<VectorType>::solve
                                                eigenvalues_im[i]);
     }
 
-  Assert (iparam[4] == (int)n_eigenvalues,
-          PArpackExcConvergedEigenvectors(n_eigenvalues,iparam[4]));
+  // Throw an error if the solver did not converge.
+  AssertThrow (iparam[4] == (int)n_eigenvalues,
+               PArpackExcConvergedEigenvectors(n_eigenvalues,iparam[4]));
 
   // both PDNAUPD and PDSAUPD compute eigenpairs of inv[A - sigma*M]*M
   // with respect to a semi-inner product defined by M.
