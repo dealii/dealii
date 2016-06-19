@@ -139,6 +139,12 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li> New: The tutorial step-55 shows how to solve the Stokes system
+ in parallel with PETSc or Trilinos.
+ <br>
+ (Timo Heister, 2016/06/17)
+ </li>
+
  <li> New: The tutorial step-56 demonstrates Geometric Multigrid for the
  Stokes equations.
  <br>

@@ -1,0 +1,167 @@
+<br>
+
+<i>This program was contributed by Timo Heister. Special thanks to Sander
+Rhebergen for the inspiration to finally write this tutorial.
+ 
+This material is based upon work partially supported by National Science
+Foundation grant DMS1522191 and the Computational Infrastructure in
+Geodynamics initiative (CIG), through the National Science Foundation under
+Award No. EAR-0949446 and The University of California-Davis.
+
+The authors would like to thank the Isaac Newton Institute for
+Mathematical Sciences, Cambridge, for support and hospitality during
+the programme Melt in the Mantle where work on this tutorial was
+undertaken. This work was supported by EPSRC grant no EP/K032208/1.
+</i>
+
+
+@note As a prerequisite of this program, you need to have PETSc or Trilinos
+and the p4est library installed. The installation of deal.II together with
+these additional libraries is described in the <a href="../../readme.html"
+target="body">README</a> file.
+
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+Building on step-40, this tutorial shows how to solve linear PDEs with several
+components in parallel using MPI with PETSc or Trilinos for the linear
+algebra. For this, we return to the Stokes equations as discussed in
+step-22. The motivation for writing this tutorial is to provide an
+intermediate step (pun intended) between step-40 (parallel Laplace) and
+step-32 (parallel coupled Stokes with Boussinesq for a time dependent
+problem).
+
+The learning outcomes for this tutorial are:
+
+- You are able to solve PDEs with several variables in parallel and can
+  apply this to different problems.
+
+- You understand the concept of optimal preconditioners and are able to check
+  this for a particular problem.
+  
+- You are able to construct manufactured solutions using the free computer
+  algreba system SymPy (https://sympy.org).
+
+- You can implement various other tasks for parallel programs: error
+  computation, writing graphical output, etc.
+
+- You can visualize vector fields, stream lines, and contours of vector
+  quantities.
+
+We are solving for a velocity $\textbf{u}$ and pressure $p$ that satisfy the
+Stokes equation, which reads
+@f{eqnarray*}
+  - \triangle \textbf{u} + \nabla p &=& \textbf{f}, \\
+  -\textrm{div}\; \textbf{u} &=& 0.
+@f}
+
+
+<h3>Optimal preconditioners</h3>
+
+Make sure that you read (even better: try) what is described in "Block Schur
+complement preconditioner" in the "Possible Extensions" section in step-22.
+Like described there, we are going to solve the block system using a Krylov
+method and a block preconditioner.
+
+Our goal here is to construct a very simple (maybe the simplest?) optimal
+preconditioner for the linear system. A preconditioner is called "optimal" or
+"of optimal complexity", if the number of iterations of the preconditioned
+system is independent of the mesh size $h$. You can extend that definition to
+also require indepence of the number of processors used (we will discuss that
+in the results section), the computational domain and the mesh quality, the
+test case itself, the polynomial degree of the finite element space, and more.
+
+Why is a constant number of iterations considered to be "optimal"? Assume the
+discretized PDE gives a linear system with N unknowns. Because the matrix
+coming from the FEM discretization is sparse, a matrix-vector product can be
+done in O(N) time. A preconditioner application can also only be O(N) at best
+(for example doable with multigrid methods). If the number of iterations
+required to solve the linear system is independent of $h$ (and therefore N),
+the total cost of solving the system will be O(N). It is not possible to beat
+this complexity, because even looking at all the entries of the right-hand
+side already takes O(N) time.
+
+The preconditioner described here is even simpler than the one described in
+step-22 and will typically require more iterations and consequently time to
+solve. When considering preconditioners, optimality is not the only important
+metric. But an optimal and expensive preconditioner is typically more
+desirable than a cheaper, non-optimal one. This is because, eventually, as the
+mesh size becomes smaller and smaller and linear problems become bigger and
+bigger, the former will eventually beat the latter.
+
+<h3>The solver and preconditioner</h3>
+
+We precondition the linear system
+@f{eqnarray*}
+  \left(\begin{array}{cc}
+    A & B^T \\ B & 0
+  \end{array}\right)
+  \left(\begin{array}{c}
+    U \\ P
+  \end{array}\right)
+  =
+  \left(\begin{array}{c}
+    F \\ 0
+  \end{array}\right),
+@f}
+
+with the block diagonal preconditioner
+@f{eqnarray*}
+  P^{-1}
+  =
+  \left(\begin{array}{cc}
+    A & 0 \\ 0 & S
+  \end{array}\right) ^{-1},
+  =
+  \left(\begin{array}{cc}
+    A^{-1} & 0 \\ 0 & S^{-1}
+  \end{array}\right),
+@f}
+where $S=-BA^{-1} B^T$ is the Schur complement.
+
+With this choice of $P$, assuming that we handle $A^{-1}$ and $S^{-1}$ exactly
+(which is an "idealized" situation), the preconditioned linear system has
+three distinct eigenvalues independent of $h$ and is therefore "optimal".  See
+section 6.2.1 (especially p. 292) in "Finite Elements and Fast Iterative
+Solvers: with Applications in Incompressible Fluid Dynamics" by Elman,
+Silvester, and Wathen (Oxford University Press (UK), 2005). For comparison,
+using the ideal version of the upper block-triangular preconditioner in
+step-22 (also used in step-56) would have all eigenvalues be equal to one.
+
+We will use approximations of the inverse operations in $P^{-1}$ that are
+(nearly) independent of $h$. In this situation, one can again show, that the
+eigenvalues are independent of $h$. For the Krylov method we choose MINRES,
+which is attractive for the analysis (iteration count is proven to be
+independent of $h$, see the remainder of the chapter 6.2.1 in the book
+mentioned above), great from the computational standpoint (simpler and cheaper
+than GMRES for example), and applicable (matrix and preconditioner are
+symmetric).
+
+For the approximations we will use a CG solve with the mass matrix in the
+pressure space for approximating the action of $S^{-1}$. Note that the mass
+matrix is spectrally equivalent to $S$. We can expect the number of CG
+iterations to be independent of $h$, even with a simple preconditioner like
+ILU.
+
+For the approximation of the velocity block $A$ we will perform a single AMG
+V-cycle. In practice this choice is not exactly independent of $h$, which can
+explain the slight increase in iteration numbers. A possible explanation is
+that the coarsest level will be solved exactly and the number of levels and
+size of the coarsest matrix is not predictable.
+
+
+<h3>The testcase</h3>
+
+We will construct a manufactured solution based on the Kovasznay problem
+("Laminar flow behind a two-dimensional grid" by Kovasznay, 1948).  You can
+also check out http://www.cfm.brown.edu/crunch/nektar/Thesis.Html/node60.html
+for the test case.
+
+We have to cheat here, though, because we are not solving the non-linear
+Navier-Stokes equations, but the linear Stokes system without convective
+term. Therefore, to recreate the exact same solution, we use the method of
+manufactured solutions with the solution of the Kovasznay problem. This will
+effectively move the convective term into the right-hand side $f$.
+
+The right-hand side is computed using the script "reference.py" and we use
+the exact solution for boundary conditions and error computation.
