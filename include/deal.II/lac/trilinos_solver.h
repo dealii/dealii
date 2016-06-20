@@ -575,7 +575,7 @@ namespace TrilinosWrappers
      */
     void initialize (const SparseMatrix &A);
 
-    /*
+    /**
      * Solve the linear system <tt>Ax=b</tt> based on the
      * package set in intialize(). Note the matrix is not refactorized during
      * this call.
