@@ -1085,10 +1085,11 @@ DynamicSparsityPattern::begin (const size_type r) const
     }
 
   // Without an index set we have to do a linear search starting at
-  // row r until we find a non-empty one
+  // row r until we find a non-empty one. We will check the lines vector
+  // directly instead of going through the slower row_length() function
   size_type row = r;
 
-  while (row<n_rows() && row_length(row)==0)
+  while (row<n_rows() && lines[row].entries.size()==0)
     {
       ++row;
     }
