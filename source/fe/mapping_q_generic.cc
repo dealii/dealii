@@ -3479,7 +3479,7 @@ namespace
       {
       case 2:
       {
-        // If two points are passed, these are the two vertices, and
+        // If two points are passed, these are the two vertices, so
         // we can only compute degree-1 intermediate points.
         for (unsigned int i=0; i<n; ++i)
           {
@@ -3500,9 +3500,8 @@ namespace
         // is n a square number
         Assert(m*m==n, ExcInternalError());
 
-        // If four points are passed, these are the two vertices, and
-        // we can only compute (degree-1)*(degree-1) intermediate
-        // points.
+        // If m points are passed, two of them are the outer vertices, and we
+        // can only compute (degree-1)*(degree-1) intermediate points.
         for (unsigned int i=0; i<m; ++i)
           {
             const double y=line_support_points.point(1+i)[0];
@@ -3522,8 +3521,42 @@ namespace
       }
 
       case 8:
-        Assert(false, ExcNotImplemented());
+      {
+        Assert(spacedim >= 3, ExcImpossibleInDim(spacedim));
+        unsigned int m=1;
+        for ( ; m < n; ++m)
+          if (m*m*m == n)
+            break;
+        // is n a cube number
+        Assert(m*m*m==n, ExcInternalError());
+
+        // If m points are passed, two of them are the outer vertices, and we can
+        // only compute (degree-1)*(degree-1)*(degree-1) intermediate points.
+        for (unsigned int k=0, c=0; k<m; ++k)
+          {
+            const double z=line_support_points.point(1+k)[0];
+            for (unsigned int i=0; i<m; ++i)
+              {
+                const double y=line_support_points.point(1+i)[0];
+                for (unsigned int j=0; j<m; ++j, ++c)
+                  {
+                    const double x=line_support_points.point(1+j)[0];
+
+                    w[0] = (1-x)*(1-y)*(1-z);
+                    w[1] =     x*(1-y)*(1-z);
+                    w[2] = (1-x)*y    *(1-z);
+                    w[3] =     x*y    *(1-z);
+                    w[4] = (1-x)*(1-y)*z    ;
+                    w[5] =     x*(1-y)*z    ;
+                    w[6] = (1-x)*y    *z    ;
+                    w[7] =     x*y    *z    ;
+                    Quadrature<spacedim> quadrature(surrounding_points, w);
+                    points[c]=manifold.get_new_point(quadrature);
+                  }
+              }
+          }
         break;
+      }
       default:
         Assert(false, ExcInternalError());
         break;
@@ -3737,9 +3770,10 @@ add_quad_support_points(const Triangulation<3,3>::cell_iterator &cell,
                ExcInternalError());
 #endif
 
-      // if face at boundary, then ask boundary object to return intermediate
-      // points on it
-      if (face->at_boundary())
+      // if face at boundary or if it belongs to a manifold, then ask the
+      // boundary/manifold object to return intermediate points on it
+      if (face->at_boundary() ||
+          dynamic_cast<const Boundary<3,3> *>(&face->get_manifold()) == NULL)
         {
           get_intermediate_points_on_object(face->get_manifold(), line_support_points, face, quad_points);
 
@@ -3877,6 +3911,13 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
         // manifold, otherwise compute them from the points around it
         if (dim != spacedim)
           add_quad_support_points(cell, a);
+        else if (dynamic_cast<const Boundary<dim,dim> *>(&cell->get_manifold()) == NULL)
+          {
+            std::vector<Point<spacedim> > quad_points (Utilities::fixed_power<dim>(polynomial_degree-1));
+            get_intermediate_points_on_object(cell->get_manifold(), line_support_points, cell, quad_points);
+            for (unsigned int i=0; i<quad_points.size(); ++i)
+              a.push_back(quad_points[i]);
+          }
         else
           add_weighted_interior_points (support_point_weights_on_quad, a);
         break;
@@ -3888,7 +3929,15 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
         add_quad_support_points (cell, a);
 
         // then compute the interior points
-        add_weighted_interior_points (support_point_weights_on_hex, a);
+        if (dynamic_cast<const Boundary<dim,dim> *>(&cell->get_manifold()) == NULL)
+          {
+            std::vector<Point<spacedim> > hex_points (Utilities::fixed_power<dim>(polynomial_degree-1));
+            get_intermediate_points_on_object(cell->get_manifold(), line_support_points, cell, hex_points);
+            for (unsigned int i=0; i<hex_points.size(); ++i)
+              a.push_back(hex_points[i]);
+          }
+        else
+          add_weighted_interior_points (support_point_weights_on_hex, a);
         break;
       }
 
