@@ -353,9 +353,9 @@ namespace LinearAlgebra
           // (even if they happen to define the empty range as [0,0) or [c,c)
           // for some c!=0 in a different way).
           int local_ranges_are_identical =
-            (local_range() == c.local_range() ||
-             (local_range().second == local_range().first &&
-              c.local_range().second == c.local_range().first));
+            (partitioner->local_range() == c.partitioner->local_range() ||
+             (partitioner->local_range().second == partitioner->local_range().first &&
+              c.partitioner->local_range().second == c.partitioner->local_range().first));
           if ((c.partitioner->n_mpi_processes() > 1 &&
                Utilities::MPI::min(local_ranges_are_identical,
                                    c.partitioner->get_communicator()) == 0)

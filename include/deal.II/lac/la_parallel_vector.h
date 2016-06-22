@@ -1176,7 +1176,8 @@ namespace LinearAlgebra
     {
       IndexSet is (size());
 
-      is.add_range (local_range().first, local_range().second);
+      is.add_range (partitioner->local_range().first,
+                    partitioner->local_range().second);
 
       return is;
     }
@@ -1258,13 +1259,13 @@ namespace LinearAlgebra
     Number
     Vector<Number>::operator() (const size_type global_index) const
     {
-      Assert (in_local_range (global_index) ||
+      Assert (partitioner->in_local_range (global_index) ||
               partitioner->ghost_indices().is_element(global_index),
-              ExcAccessToNonLocalElement(global_index, local_range().first,
-                                         local_range().second,
+              ExcAccessToNonLocalElement(global_index, partitioner->local_range().first,
+                                         partitioner->local_range().second,
                                          partitioner->ghost_indices().n_elements()));
       // do not allow reading a vector which is not in ghost mode
-      Assert (in_local_range (global_index) || vector_is_ghosted == true,
+      Assert (partitioner->in_local_range (global_index) || vector_is_ghosted == true,
               ExcMessage("You tried to read a ghost element of this vector, "
                          "but it has not imported its ghost values."));
       return val[partitioner->global_to_local(global_index)];
@@ -1277,10 +1278,10 @@ namespace LinearAlgebra
     Number &
     Vector<Number>::operator() (const size_type global_index)
     {
-      Assert (in_local_range (global_index) ||
+      Assert (partitioner->in_local_range (global_index) ||
               partitioner->ghost_indices().is_element(global_index),
-              ExcAccessToNonLocalElement(global_index, local_range().first,
-                                         local_range().second,
+              ExcAccessToNonLocalElement(global_index, partitioner->local_range().first,
+                                         partitioner->local_range().second,
                                          partitioner->ghost_indices().n_elements()));
       // we would like to prevent reading ghosts from a vector that does not
       // have them imported, but this is not possible because we might be in a
