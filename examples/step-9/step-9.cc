@@ -1307,7 +1307,7 @@ namespace Step9
     // difficult:
     *(std_cxx11::get<1>(*cell)) = (std::pow(std_cxx11::get<0>(*cell)->diameter(),
                                             1+1.0*dim/2) *
-                                            std::sqrt(gradient.norm_square()));
+                                   std::sqrt(gradient.norm_square()));
 
   }
 }
