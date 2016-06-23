@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2015 by the deal.II authors
+// Copyright (C) 2005 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -125,5 +125,18 @@ invert<3,double> (const SymmetricTensor<4,3,double> &t)
 
   return tmp;
 }
+
+
+
+// provide definitions for static members
+template <int rank, int dim, typename Number>
+const unsigned int SymmetricTensor<rank,dim,Number>::dimension;
+
+template <int rank, int dim, typename Number>
+const unsigned int SymmetricTensor<rank,dim,Number>::n_independent_components;
+
+
+#include "symmetric_tensor.inst"
+
 
 DEAL_II_NAMESPACE_CLOSE

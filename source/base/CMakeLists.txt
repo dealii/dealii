@@ -78,6 +78,7 @@ SET(_inst
   function_time.inst.in
   mpi.inst.in
   polynomials_rannacher_turek.inst.in
+  symmetric_tensor.inst.in
   tensor.inst.in
   tensor_function.inst.in
   time_stepping.inst.in
