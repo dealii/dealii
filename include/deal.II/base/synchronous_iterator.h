@@ -88,6 +88,34 @@ SynchronousIterators (const SynchronousIterators &i)
 
 
 /**
+ * Return a const reference to the tuple of iterators stored in the
+ * synchronous iterator.
+ */
+template <typename Iterators>
+inline
+const Iterators &
+operator* (const SynchronousIterators<Iterators> &a)
+{
+  return a.iterators;
+}
+
+
+
+/**
+ * Return a reference to the tuple of iterators stored in the
+ * synchronous iterator.
+ */
+template <typename Iterators>
+inline
+Iterators &
+operator* (SynchronousIterators<Iterators> &a)
+{
+  return a.iterators;
+}
+
+
+
+/**
  * Return whether the first element of the first argument is less than the
  * first element of the second argument. Since the objects compared march
  * forward all elements at the same time, comparing the first element is
@@ -101,7 +129,7 @@ bool
 operator< (const SynchronousIterators<Iterators> &a,
            const SynchronousIterators<Iterators> &b)
 {
-  return std_cxx11::get<0>(a.iterators) < std_cxx11::get<0>(b.iterators);
+  return std_cxx11::get<0>(*a) < std_cxx11::get<0>(*b);
 }
 
 
@@ -119,11 +147,11 @@ std::size_t
 operator- (const SynchronousIterators<Iterators> &a,
            const SynchronousIterators<Iterators> &b)
 {
-  Assert (std::distance (std_cxx11::get<0>(b.iterators),
-                         std_cxx11::get<0>(a.iterators)) >= 0,
+  Assert (std::distance (std_cxx11::get<0>(*b),
+                         std_cxx11::get<0>(*a)) >= 0,
           ExcInternalError());
-  return std::distance (std_cxx11::get<0>(b.iterators),
-                        std_cxx11::get<0>(a.iterators));
+  return std::distance (std_cxx11::get<0>(*b),
+                        std_cxx11::get<0>(*a));
 }
 
 
@@ -232,7 +260,7 @@ operator + (const SynchronousIterators<Iterators> &a,
             const std::size_t                      n)
 {
   SynchronousIterators<Iterators> x (a);
-  dealii::advance (x.iterators, n);
+  dealii::advance (*x, n);
   return x;
 }
 
@@ -246,7 +274,7 @@ inline
 SynchronousIterators<Iterators>
 operator ++ (SynchronousIterators<Iterators> &a)
 {
-  dealii::advance_by_one (a.iterators);
+  dealii::advance_by_one (*a);
   return a;
 }
 
@@ -263,8 +291,8 @@ bool
 operator != (const SynchronousIterators<Iterators> &a,
              const SynchronousIterators<Iterators> &b)
 {
-  return (std_cxx11::get<0>(a.iterators) !=
-          std_cxx11::get<0>(b.iterators));
+  return (std_cxx11::get<0>(*a) !=
+          std_cxx11::get<0>(*b));
 }
 
 DEAL_II_NAMESPACE_CLOSE
