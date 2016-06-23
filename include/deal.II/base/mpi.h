@@ -145,7 +145,6 @@ namespace Utilities
      * Input and output arrays may be the same.
      */
     template <typename T, unsigned int N>
-    inline
     void sum (const T (&values)[N],
               const MPI_Comm &mpi_communicator,
               T (&sums)[N]);
@@ -158,7 +157,6 @@ namespace Utilities
      * Input and output vectors may be the same.
      */
     template <typename T>
-    inline
     void sum (const std::vector<T> &values,
               const MPI_Comm &mpi_communicator,
               std::vector<T> &sums);
@@ -170,7 +168,6 @@ namespace Utilities
      * Input and output vectors may be the same.
      */
     template <typename T>
-    inline
     void sum (const Vector<T> &values,
               const MPI_Comm &mpi_communicator,
               Vector<T> &sums);
@@ -182,7 +179,6 @@ namespace Utilities
      * @relates SymmetricTensor
      */
     template <int rank, int dim, typename Number>
-    inline
     SymmetricTensor<rank,dim,Number>
     sum (const SymmetricTensor<rank,dim,Number> &local,
          const MPI_Comm &mpi_communicator);
@@ -193,7 +189,6 @@ namespace Utilities
      * @relates Tensor
      */
     template <int rank, int dim, typename Number>
-    inline
     Tensor<rank,dim,Number>
     sum (const Tensor<rank,dim,Number> &local,
          const MPI_Comm &mpi_communicator);
@@ -230,7 +225,6 @@ namespace Utilities
      * Input and output arrays may be the same.
      */
     template <typename T, unsigned int N>
-    inline
     void max (const T (&values)[N],
               const MPI_Comm &mpi_communicator,
               T (&maxima)[N]);
@@ -244,7 +238,6 @@ namespace Utilities
      * Input and output vectors may be the same.
      */
     template <typename T>
-    inline
     void max (const std::vector<T> &values,
               const MPI_Comm &mpi_communicator,
               std::vector<T> &maxima);
@@ -281,7 +274,6 @@ namespace Utilities
      * Input and output arrays may be the same.
      */
     template <typename T, unsigned int N>
-    inline
     void min (const T (&values)[N],
               const MPI_Comm &mpi_communicator,
               T (&minima)[N]);
@@ -295,7 +287,6 @@ namespace Utilities
      * Input and output vectors may be the same.
      */
     template <typename T>
-    inline
     void min (const std::vector<T> &values,
               const MPI_Comm &mpi_communicator,
               std::vector<T> &minima);
