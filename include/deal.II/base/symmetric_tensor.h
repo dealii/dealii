@@ -704,7 +704,7 @@ public:
 
   /**
    * Access to an element according to unrolled index. The function
-   * <tt>s.access_raw_entry(i)</tt> does the same as
+   * <tt>s.access_raw_entry(unrolled_index)</tt> does the same as
    * <tt>s[s.unrolled_to_component_indices(i)]</tt>, but more efficiently.
    */
   Number
@@ -712,7 +712,7 @@ public:
 
   /**
    * Access to an element according to unrolled index. The function
-   * <tt>s.access_raw_entry(i)</tt> does the same as
+   * <tt>s.access_raw_entry(unrolled_index)</tt> does the same as
    * <tt>s[s.unrolled_to_component_indices(i)]</tt>, but more efficiently.
    */
   Number &
@@ -1016,12 +1016,48 @@ inline
 SymmetricTensor<rank,dim,Number> &
 SymmetricTensor<rank,dim,Number>::operator = (const Number d)
 {
-  Assert (d==0, ExcMessage ("Only assignment with zero is allowed"));
+  Assert (d==Number(), ExcMessage ("Only assignment with zero is allowed"));
   (void) d;
 
   data = 0;
 
   return *this;
+}
+
+
+namespace internal
+{
+  namespace SymmetricTensor
+  {
+    template <int dim, typename Number>
+    dealii::Tensor<2,dim,Number>
+    convert_to_tensor (const dealii::SymmetricTensor<2,dim,Number> &s)
+    {
+      Number t[dim][dim];
+
+      // diagonal entries are stored first
+      for (unsigned int d=0; d<dim; ++d)
+        t[d][d] = s.access_raw_entry(d);
+
+      // off-diagonal entries come next, row by row
+      for (unsigned int d=0, c=0; d<dim; ++d)
+        for (unsigned int e=d+1; e<dim; ++e, ++c)
+          {
+            t[d][e] = s.access_raw_entry(dim+c);
+            t[e][d] = s.access_raw_entry(dim+c);
+          }
+      return dealii::Tensor<2,dim,Number>(t);
+    }
+
+
+    template <int dim, typename Number>
+    dealii::Tensor<4,dim,Number>
+    convert_to_tensor (const dealii::SymmetricTensor<4,dim,Number> &)
+    {
+      Assert (false, ExcNotImplemented());
+      return dealii::Tensor<4,dim,Number>();
+    }
+  }
 }
 
 
@@ -1031,17 +1067,7 @@ inline
 SymmetricTensor<rank,dim,Number>::
 operator Tensor<rank,dim,Number> () const
 {
-  Assert (rank == 2, ExcNotImplemented());
-  Number t[dim][dim];
-  for (unsigned int d=0; d<dim; ++d)
-    t[d][d] = data[d];
-  for (unsigned int d=0, c=0; d<dim; ++d)
-    for (unsigned int e=d+1; e<dim; ++e, ++c)
-      {
-        t[d][e] = data[dim+c];
-        t[e][d] = data[dim+c];
-      }
-  return Tensor<2,dim,Number>(t);
+  return internal::SymmetricTensor::convert_to_tensor (*this);
 }
 
 
@@ -1165,8 +1191,9 @@ inline
 std::size_t
 SymmetricTensor<rank,dim,Number>::memory_consumption ()
 {
-  return
-    internal::SymmetricTensorAccessors::StorageType<rank,dim,Number>::memory_consumption ();
+  // all memory consists of statically allocated memory of the current
+  // object, no pointers
+  return sizeof(SymmetricTensor<rank,dim,Number>);
 }
 
 
@@ -1187,7 +1214,7 @@ namespace internal
       case 2:
         return (data[0] * sdata[0] +
                 data[1] * sdata[1] +
-                2*data[2] * sdata[2]);
+                Number(2.) * data[2] * sdata[2]);
       default:
         // Start with the non-diagonal part to avoid some multiplications by
         // 2.
@@ -1231,7 +1258,7 @@ namespace internal
         for (unsigned int d=0; d<dim; ++d)
           tmp[i] += data[d] * sdata[d][i];
         for (unsigned int d=dim; d<(dim*(dim+1)/2); ++d)
-          tmp[i] += 2 * data[d] * sdata[d][i];
+          tmp[i] += 2. * data[d] * sdata[d][i];
       }
     return tmp;
   }
@@ -1253,7 +1280,7 @@ namespace internal
           for (unsigned int d=0; d<dim; ++d)
             tmp[i][j] += data[i][d] * sdata[d][j];
           for (unsigned int d=dim; d<(dim*(dim+1)/2); ++d)
-            tmp[i][j] += 2 * data[i][d] * sdata[d][j];
+            tmp[i][j] += 2. * data[i][d] * sdata[d][j];
         }
     return tmp;
   }
@@ -1667,13 +1694,42 @@ SymmetricTensor<rank,dim,Number>::operator [] (const TableIndices<rank> &indices
 
 
 
+
+namespace internal
+{
+  namespace SymmetricTensor
+  {
+    template <int dim, typename Number>
+    unsigned int
+    entry_to_indices (const dealii::SymmetricTensor<2,dim,Number> &,
+                      const unsigned int index)
+    {
+      return index;
+    }
+
+
+    template <int dim, typename Number>
+    dealii::TableIndices<2>
+    entry_to_indices (const dealii::SymmetricTensor<4,dim,Number> &,
+                      const unsigned int index)
+    {
+      return
+        internal::SymmetricTensorAccessors::StorageType<4,dim,Number>::base_tensor_type::
+        unrolled_to_component_indices(index);
+    }
+
+  }
+}
+
+
+
 template <int rank, int dim, typename Number>
 inline
 Number
 SymmetricTensor<rank,dim,Number>::access_raw_entry (const unsigned int index) const
 {
   AssertIndexRange (index, data.dimension);
-  return data[index];
+  return data[internal::SymmetricTensor::entry_to_indices(*this, index)];
 }
 
 
@@ -1684,7 +1740,7 @@ Number &
 SymmetricTensor<rank,dim,Number>::access_raw_entry (const unsigned int index)
 {
   AssertIndexRange (index, data.dimension);
-  return data[index];
+  return data[internal::SymmetricTensor::entry_to_indices(*this, index)];
 }
 
 
@@ -1704,19 +1760,21 @@ namespace internal
         break;
       case 2:
         return_value = std::sqrt(data[0]*data[0] + data[1]*data[1] +
-                                 2*data[2]*data[2]);
+                                 Number(2.) * data[2]*data[2]);
         break;
       case 3:
         return_value =  std::sqrt(data[0]*data[0] + data[1]*data[1] +
-                                  data[2]*data[2] + 2*data[3]*data[3] +
-                                  2*data[4]*data[4] + 2*data[5]*data[5]);
+                                  data[2]*data[2] +
+                                  Number(2.) * data[3]*data[3] +
+                                  Number(2.) * data[4]*data[4] +
+                                  Number(2.) * data[5]*data[5]);
         break;
       default:
         return_value = Number();
         for (unsigned int d=0; d<dim; ++d)
           return_value += data[d] * data[d];
         for (unsigned int d=dim; d<(dim*dim+dim)/2; ++d)
-          return_value += 2 * data[d] * data[d];
+          return_value += Number(2.) * data[d] * data[d];
         return_value = std::sqrt(return_value);
       }
     return return_value;
@@ -1744,13 +1802,13 @@ namespace internal
             return_value += data[i][j] * data[i][j];
         for (unsigned int i=0; i<dim; ++i)
           for (unsigned int j=dim; j<n_independent_components; ++j)
-            return_value += 2 * data[i][j] * data[i][j];
+            return_value += Number(2.) * data[i][j] * data[i][j];
         for (unsigned int i=dim; i<n_independent_components; ++i)
           for (unsigned int j=0; j<dim; ++j)
-            return_value += 2 * data[i][j] * data[i][j];
+            return_value += Number(2.) * data[i][j] * data[i][j];
         for (unsigned int i=dim; i<n_independent_components; ++i)
           for (unsigned int j=dim; j<n_independent_components; ++j)
-            return_value += 4 * data[i][j] * data[i][j];
+            return_value += 4. * data[i][j] * data[i][j];
         return_value = std::sqrt(return_value);
       }
 
@@ -2097,7 +2155,7 @@ Number determinant (const SymmetricTensor<2,dim,Number> &t)
                -t.data[0]*t.data[5]*t.data[5]
                -t.data[1]*t.data[4]*t.data[4]
                -t.data[2]*t.data[3]*t.data[3]
-               +2*t.data[3]*t.data[4]*t.data[5] );
+               +Number(2.) * t.data[3]*t.data[4]*t.data[5] );
     default:
       Assert (false, ExcNotImplemented());
       return 0;
