@@ -42,6 +42,7 @@ SET(_src
   fe_rannacher_turek.cc
   fe_raviart_thomas.cc
   fe_raviart_thomas_nodal.cc
+  fe_series.cc
   fe_system.cc
   fe_tools.cc
   fe_tools_interpolate.cc
