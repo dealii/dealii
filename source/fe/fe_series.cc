@@ -205,6 +205,7 @@ namespace FESeries
   double Lh(const Point<dim>  &x_q,
             const TableIndices<dim> &indices)
   {
+#ifdef DEAL_II_WITH_GSL
     double res = 1.0;
     for (unsigned int d = 0; d < dim; d++)
       {
@@ -212,14 +213,18 @@ namespace FESeries
         Assert ( (x_q[d] <= 1.0) && (x_q[d] >= 0.),
                  ExcLegendre(d,x_q[d]));
         const int ind = indices[d];
-#ifdef DEAL_II_WITH_GSL
         res *= sqrt(2.0) * gsl_sf_legendre_Pl (ind, x);
-#else
-        AssertThrow(false, ExcMessage("deal.II has to be configured with GSL"
-                                      "in order to use Legendre transformation."));
-#endif
       }
     return res;
+
+#else
+
+    (void)x_q;
+    (void)indices;
+    AssertThrow(false, ExcMessage("deal.II has to be configured with GSL"
+                                  "in order to use Legendre transformation."));
+    return 0;
+#endif
   }
 
   /*
