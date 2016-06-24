@@ -937,19 +937,19 @@ namespace DerivativeApproximation
      const unsigned int                  component)
     {
       // if the cell is not locally owned, then there is nothing to do
-      if (std_cxx11::get<0>(cell.iterators)->is_locally_owned() == false)
-        *std_cxx11::get<1>(cell.iterators) = 0;
+      if (std_cxx11::get<0>(*cell)->is_locally_owned() == false)
+        *std_cxx11::get<1>(*cell) = 0;
       else
         {
           typename DerivativeDescription::Derivative derivative;
           // call the function doing the actual
           // work on this cell
           approximate_cell<DerivativeDescription,dim,DoFHandlerType,InputVector, spacedim>
-          (mapping,dof_handler,solution,component,std_cxx11::get<0>(cell.iterators),derivative);
+          (mapping,dof_handler,solution,component,std_cxx11::get<0>(*cell),derivative);
 
           // evaluate the norm and fill the vector
           //*derivative_norm_on_this_cell
-          *std_cxx11::get<1>(cell.iterators) = DerivativeDescription::derivative_norm (derivative);
+          *std_cxx11::get<1>(*cell) = DerivativeDescription::derivative_norm (derivative);
         }
     }
 
