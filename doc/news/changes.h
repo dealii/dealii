@@ -305,6 +305,13 @@ inconvenience this causes.
 
 <ol>
 
+ <li> New: Added an operator* to SynchronousIterators which returns a
+ reference to the stored tuple of iterators iterators. The iterators member
+ may be made private in a future release.
+ <br>
+ (Daniel Shapero, 2016/06/24)
+ </li>
+
  <li> New: IndexSet::at(idx) returns an iterator pointing to the given index
  or the next larger element in the set if idx is not contained.
  <br>
