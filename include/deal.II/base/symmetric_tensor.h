@@ -1756,7 +1756,7 @@ namespace internal
     switch (dim)
       {
       case 1:
-        return_value = std::fabs(data[0]);
+        return_value = std::abs(data[0]);
         break;
       case 2:
         return_value = std::sqrt(data[0]*data[0] + data[1]*data[1] +
@@ -1793,7 +1793,7 @@ namespace internal
     switch (dim)
       {
       case 1:
-        return_value = std::fabs (data[0][0]);
+        return_value = std::abs (data[0][0]);
         break;
       default:
         return_value = Number();
