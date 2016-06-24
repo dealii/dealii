@@ -888,11 +888,11 @@ namespace Step35
                                  InitGradScratchData &scratch,
                                  InitGradPerTaskData &data)
   {
-    scratch.fe_val_vel.reinit (std_cxx11::get<0> (SI.iterators));
-    scratch.fe_val_pres.reinit (std_cxx11::get<1> (SI.iterators));
+    scratch.fe_val_vel.reinit (std_cxx11::get<0> (*SI));
+    scratch.fe_val_pres.reinit (std_cxx11::get<1> (*SI));
 
-    std_cxx11::get<0> (SI.iterators)->get_dof_indices (data.vel_local_dof_indices);
-    std_cxx11::get<1> (SI.iterators)->get_dof_indices (data.pres_local_dof_indices);
+    std_cxx11::get<0> (*SI)->get_dof_indices (data.vel_local_dof_indices);
+    std_cxx11::get<1> (*SI)->get_dof_indices (data.pres_local_dof_indices);
 
     data.local_grad = 0.;
     for (unsigned int q=0; q<scratch.nqp; ++q)

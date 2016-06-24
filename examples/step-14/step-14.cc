@@ -2443,7 +2443,7 @@ namespace Step14
       // First task on each cell is to compute the cell residual
       // contributions of this cell, and put them into the
       // <code>error_indicators</code> variable:
-      active_cell_iterator cell = std_cxx11::get<0>(cell_and_error.iterators);
+      active_cell_iterator cell = std_cxx11::get<0>(*cell_and_error);
 
       integrate_over_cell (cell_and_error,
                            scratch_data.primal_solution,
@@ -2532,7 +2532,7 @@ namespace Step14
       // error estimation formula: first get the right hand side and Laplacian
       // of the numerical solution at the quadrature points for the cell
       // residual,
-      cell_data.fe_values.reinit (std_cxx11::get<0>(cell_and_error.iterators));
+      cell_data.fe_values.reinit (std_cxx11::get<0>(*cell_and_error));
       cell_data.right_hand_side
       ->value_list (cell_data.fe_values.get_quadrature_points(),
                     cell_data.rhs_values);
@@ -2550,7 +2550,7 @@ namespace Step14
         sum += ((cell_data.rhs_values[p]+cell_data.cell_laplacians[p]) *
                 cell_data.dual_weights[p] *
                 cell_data.fe_values.JxW (p));
-      *(std_cxx11::get<1>(cell_and_error.iterators)) += sum;
+      *(std_cxx11::get<1>(*cell_and_error)) += sum;
     }
 
 
