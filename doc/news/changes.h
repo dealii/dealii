@@ -304,6 +304,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> New: GnuplotFlags now supports user specified space dimension labels
+ through a member variable.
+ <br>
+ (David Wells, 2016/06/24)
+ </li>
 
  <li> New: IndexSet::at(idx) returns an iterator pointing to the given index
  or the next larger element in the set if idx is not contained.
