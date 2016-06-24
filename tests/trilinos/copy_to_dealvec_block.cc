@@ -85,7 +85,7 @@ void test ()
       Assert(copied.block(bl)(myid*2+1) == myid*4.0+2.0, ExcInternalError());
     }
 
-  copied = v;
+  copied.update_ghost_values();
 
   // check ghost values
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
