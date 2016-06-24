@@ -170,7 +170,7 @@ namespace PyDealII
         point = new dealii::Point<3> ((*other_point)[0], (*other_point)[1], (*other_point)[2]);
       }
     else
-      AssertThrow(false, 
+      AssertThrow(false,
                   dealii::ExcMessage("The dimension of the point should be 2 or 3."));
   }
 }

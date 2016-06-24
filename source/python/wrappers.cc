@@ -17,6 +17,7 @@
 
 namespace PyDealII
 {
+  void export_cell_accessor();
   void export_point();
   void export_triangulation();
 }
@@ -37,6 +38,7 @@ BOOST_PYTHON_MODULE(PyDealII)
   doc_options.enable_py_signatures();
   doc_options.disable_cpp_signatures();
 
+  PyDealII::export_cell_accessor();
   PyDealII::export_point();
   PyDealII::export_triangulation();
 }

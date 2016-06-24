@@ -22,9 +22,13 @@
 
 namespace PyDealII
 {
+  class CellAccessorWrapper;
+
   class TriangulationWrapper
   {
   public:
+    typedef std::vector<CellAccessorWrapper>::iterator iterator;
+
     /**
      * Constructor. Takes a string @p dim with one of the following values
      * "2D", "2d", "3D", or "3d".
@@ -138,11 +142,32 @@ namespace PyDealII
      */
     void *get_triangulation();
 
+    /**
+     * Iterator to the first active cell of the underlying Triangulation.
+     */
+    iterator begin();
+
+    /**
+     * Iterator past the end.
+     */
+    iterator end();
+
   private:
     /**
      * Helper function for the contructors.
      */
     void setup(const std::string &dimension, const std::string &spacedimension);
+
+    /**
+     * Build the vector of CellAccessorWrapper. This allows access to the
+     * CellAccessor associated to the underlying Triangulation.
+     */
+    void build_cells_vector();
+
+    /**
+     * Flag is true if the vector cells has been updated.
+     */
+    bool updated;
 
     /**
      * Dimension of the underlying Triangulation object.
@@ -158,6 +183,11 @@ namespace PyDealII
      * Pointer that can be casted to the underlying Triangulation object.
      */
     void *triangulation;
+
+    /**
+     * Vector of all the cells of the Triangulation.
+     */
+    std::vector<CellAccessorWrapper> cells;
   };
 
 

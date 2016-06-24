@@ -17,6 +17,7 @@
 #define dealii__point_wrapper_h
 #include <boost/python.hpp>
 
+
 namespace PyDealII
 {
   class PointWrapper

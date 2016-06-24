@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/python/triangulation_wrapper.h>
+#include <deal.II/python/cell_accessor_wrapper.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
@@ -166,11 +167,27 @@ namespace PyDealII
       // inside merge_triangulations.
       triangulation = tria;
     }
+
+
+
+    template <int dim, int spacedim>
+    void build_cells_vector(TriangulationWrapper             &triangulation_wrapper,
+                            std::vector<CellAccessorWrapper> &cells)
+    {
+      dealii::Triangulation<dim,spacedim> *tria =
+        static_cast<dealii::Triangulation<dim,spacedim>*>(
+          triangulation_wrapper.get_triangulation());
+      for (auto cell : tria->active_cell_iterators())
+        cells.push_back(CellAccessorWrapper(triangulation_wrapper, cell->level(),
+                                            cell->index()));
+    }
   }
 
 
 
   TriangulationWrapper::TriangulationWrapper(const std::string &dimension)
+    :
+    updated(false)
   {
     if ((dimension.compare("2D")==0) || (dimension.compare("2d")==0))
       setup("2D", "2D");
@@ -182,8 +199,10 @@ namespace PyDealII
 
 
 
-  TriangulationWrapper::TriangulationWrapper(const std::string &dimension, 
+  TriangulationWrapper::TriangulationWrapper(const std::string &dimension,
                                              const std::string &spacedimension)
+    :
+    updated(false)
   {
     setup(dimension, spacedimension);
   }
@@ -193,31 +212,31 @@ namespace PyDealII
   TriangulationWrapper::~TriangulationWrapper()
   {
     if (triangulation != nullptr)
-    {
-      if (dim == 2)
       {
-        if (spacedim == 2)
-        {
-          // We cannot call delete on a void pointer so cast the void pointer back
-          // first.
-          dealii::Triangulation<2,2> *tmp = 
-            static_cast<dealii::Triangulation<2,2>*>(triangulation);
-          delete tmp;
-        }
+        if (dim == 2)
+          {
+            if (spacedim == 2)
+              {
+                // We cannot call delete on a void pointer so cast the void pointer back
+                // first.
+                dealii::Triangulation<2,2> *tmp =
+                  static_cast<dealii::Triangulation<2,2>*>(triangulation);
+                delete tmp;
+              }
+            else
+              {
+                dealii::Triangulation<2,3> *tmp =
+                  static_cast<dealii::Triangulation<2,3>*>(triangulation);
+                delete tmp;
+              }
+          }
         else
-        {
-          dealii::Triangulation<2,3> *tmp = 
-            static_cast<dealii::Triangulation<2,3>*>(triangulation);
-          delete tmp;
-        }
+          {
+            dealii::Triangulation<3,3> *tmp = static_cast<dealii::Triangulation<3,3>*>(triangulation);
+            delete tmp;
+          }
+        triangulation = nullptr;
       }
-      else
-      {
-        dealii::Triangulation<3,3> *tmp = static_cast<dealii::Triangulation<3,3>*>(triangulation);
-        delete tmp;
-      }
-      triangulation = nullptr;
-    }
     dim = -1;
   }
 
@@ -399,6 +418,30 @@ namespace PyDealII
 
 
 
+  TriangulationWrapper::iterator TriangulationWrapper::begin()
+  {
+    // Build the vector containing all the CellAccessorWrapper when the iterator
+    // is called. This way, we don't need to keep track of the changes on the
+    // Triangulation.
+    build_cells_vector();
+
+    return cells.begin();
+  }
+
+
+
+  TriangulationWrapper::iterator TriangulationWrapper::end()
+  {
+    // Python seems to call end() before begin() so call build_cells_vector in
+    // both begin() and end(). The updated flag makes sure that the vector of
+    // CellAccessorWrapper is only build once.
+    build_cells_vector();
+
+    return cells.end();
+  }
+
+
+
   void TriangulationWrapper::save(const std::string &filename) const
   {
     std::ofstream ofs(filename);
@@ -412,14 +455,14 @@ namespace PyDealII
         oa << *tria;
       }
     else if ((dim == 2) && (spacedim == 3))
-    {
       {
-        dealii::Triangulation<2,3> *tria =
-          static_cast<dealii::Triangulation<2,3>*>(triangulation);
+        {
+          dealii::Triangulation<2,3> *tria =
+            static_cast<dealii::Triangulation<2,3>*>(triangulation);
 
-        oa << *tria;
+          oa << *tria;
+        }
       }
-    }
     else
       {
         dealii::Triangulation<3,3> *tria =
@@ -467,26 +510,26 @@ namespace PyDealII
     if ((dimension.compare("2D") == 0) || (dimension.compare("2d") == 0))
       {
         dim = 2;
-        
-        if ((spacedimension.compare("2D") == 0) || 
+
+        if ((spacedimension.compare("2D") == 0) ||
             (spacedimension.compare("2d") == 0))
-        {
-          spacedim = 2;
-          triangulation = new dealii::Triangulation<2,2>();
-        }
-        else if ((spacedimension.compare("3D") == 0) || 
+          {
+            spacedim = 2;
+            triangulation = new dealii::Triangulation<2,2>();
+          }
+        else if ((spacedimension.compare("3D") == 0) ||
                  (spacedimension.compare("3d") == 0))
-        {
-          spacedim = 3;
-          triangulation = new dealii::Triangulation<2,3>();
-        }
+          {
+            spacedim = 3;
+            triangulation = new dealii::Triangulation<2,3>();
+          }
         else
           AssertThrow(false, dealii::ExcMessage("Spacedimension needs to be 2D or 3D."));
       }
     else if ((dimension.compare("3D") == 0) || (dimension.compare("3d") == 0))
       {
-        if ((spacedimension.compare("3D") != 0) && 
-            (spacedimension.compare("3d") != 0))           
+        if ((spacedimension.compare("3D") != 0) &&
+            (spacedimension.compare("3d") != 0))
           AssertThrow(false, dealii::ExcMessage("Spacedimension needs to be 3D."));
         dim = 3;
         spacedim = 3;
@@ -494,5 +537,24 @@ namespace PyDealII
       }
     else
       AssertThrow(false, dealii::ExcMessage("Dimension needs to be 2D or 3D."));
+  }
+
+
+
+  void TriangulationWrapper::build_cells_vector()
+  {
+    if (updated == false)
+      {
+        cells.clear();
+        if ((dim == 2) && (spacedim == 2))
+          internal::build_cells_vector<2,2>(*this, cells);
+        else if ((dim == 2) && (spacedim == 3))
+          internal::build_cells_vector<2,3>(*this, cells);
+        else
+          internal::build_cells_vector<3,3>(*this, cells);
+        updated = true;
+      }
+    else
+      updated = false;
   }
 }

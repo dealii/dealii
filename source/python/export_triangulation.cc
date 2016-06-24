@@ -15,6 +15,7 @@
 
 #include <boost/python.hpp>
 #include <deal.II/python/triangulation_wrapper.h>
+#include <deal.II/python/cell_accessor_wrapper.h>
 
 namespace PyDealII
 {
@@ -33,7 +34,8 @@ namespace PyDealII
   void export_triangulation()
   {
     boost::python::class_<TriangulationWrapper>("Triangulation", boost::python::init<const std::string &>())
-    .def(boost::python::init<const std::string&, const std::string&>())
+    .def(boost::python::init<const std::string &, const std::string &>())
+    .def("__iter__", boost::python::iterator<TriangulationWrapper>())
     .def("n_active_cells",
          &TriangulationWrapper::n_active_cells,
          "Return the number of active cells",
