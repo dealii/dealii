@@ -355,43 +355,28 @@ namespace Step25
     compute_nl_matrix (old_solution, solution, tmp_matrix);
     system_matrix.add (std::pow(time_step*theta,2), tmp_matrix);
 
-    // Then, we compute the right-hand side vector $-F_h(U^{n,l})$.
-    //
-    // We have to first build up the matrix
-    // $M+k^2\theta^2 A$, which we put into <code>tmp_matrix</code>
-    // use it to compute a contribution to the right hand side vector, and
-    // then build the matrix $M-k^2\theta(1-\theta) A$. We could
-    // build it in the same way as before, i.e., using code like
-    // @code
-    // tmp_matrix.copy_from (mass_matrix);
-    // tmp_matrix.add (-std::pow(time_step,2)*theta*(1-theta), laplace_matrix);
-    // @endcode
-    // but we can save the expense of the <code>copy_from</code> operation
-    // by starting from what is already in the <code>tmp_matrix</code>
-    // variable (i.e., $M+k^2\theta^2 A$) and subtracting from this
-    // $k^2\theta^2 A+k^2\theta(1-\theta) A=k^2\theta A$ when computing the
-    // second matrix:
-    system_rhs = 0;
-
-    tmp_matrix.copy_from (mass_matrix);
-    tmp_matrix.add (std::pow(time_step*theta,2), laplace_matrix);
+    // Next we compute the right-hand side vector. This is just the
+    // combination of matrix-vector products implied by the description of
+    // $-F_h(U^{n,l})$ in the introduction.
+    system_rhs = 0.;
 
     Vector<double> tmp_vector (solution.size());
-    tmp_matrix.vmult (tmp_vector, solution);
-    system_rhs += tmp_vector;
 
+    mass_matrix.vmult (system_rhs, solution);
+    laplace_matrix.vmult (tmp_vector, solution);
+    system_rhs.add (std::pow(time_step*theta, 2), tmp_vector);
 
-    tmp_matrix.add(-std::pow(time_step, 2) * theta, laplace_matrix);
-
-    tmp_matrix.vmult (tmp_vector, old_solution);
-    system_rhs -= tmp_vector;
+    mass_matrix.vmult (tmp_vector, old_solution);
+    system_rhs.add (-1.0, tmp_vector);
+    laplace_matrix.vmult (tmp_vector, old_solution);
+    system_rhs.add (std::pow(time_step,2)*theta*(1 - theta), tmp_vector);
 
     system_rhs.add (-time_step, M_x_velocity);
 
     compute_nl_term (old_solution, solution, tmp_vector);
     system_rhs.add (std::pow(time_step,2)*theta, tmp_vector);
 
-    system_rhs *= -1;
+    system_rhs *= -1.;
   }
 
   // @sect4{SineGordonProblem::compute_nl_term}
