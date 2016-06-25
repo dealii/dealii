@@ -176,9 +176,10 @@ i.e. $N_{ij}(f,g) = \left( \cos\left[ \theta f + (1-\theta) g\right]\varphi_i,
 What solvers can we use for the first equation? Let's look at the matrix we
 have to invert:
 @f[
-  (M+k^2\theta^2(A-N))_{ij} = 
-  \int_\Omega (1+k^2\theta^2 \cos \alpha) 
-  \varphi_i\varphi_j \; dx+\int_\Omega \nabla\varphi_i\nabla\varphi_j \; dx,
+  (M+k^2\theta^2(A + N))_{ij} =
+  \int_\Omega (1+k^2\theta^2 \cos \alpha)
+  \varphi_i\varphi_j \; dx
+  + k^2 \theta^2 \int_\Omega \nabla\varphi_i\nabla\varphi_j \; dx,
 @f]
 for some $\alpha$ that depends on the present and previous solution. First,
 note that the matrix is symmetric. In addition, if the time step $k$ is small
