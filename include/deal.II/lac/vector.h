@@ -205,7 +205,7 @@ public:
    * vector class. This copy constructor is only available if PETSc was
    * detected during configuration time.
    */
-  Vector (const PETScWrappers::Vector &v);
+  explicit Vector (const PETScWrappers::Vector &v);
 
   /**
    * Another copy constructor: copy the values from a parallel PETSc wrapper
@@ -217,7 +217,7 @@ public:
    * possible for only one process to obtain a copy of a parallel vector while
    * the other jobs do something else.
    */
-  Vector (const PETScWrappers::MPI::Vector &v);
+  explicit Vector (const PETScWrappers::MPI::Vector &v);
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -232,14 +232,14 @@ public:
    * vector while the other jobs do something else. This call will rather
    * result in a copy of the vector on all processors.
    */
-  Vector (const TrilinosWrappers::MPI::Vector &v);
+  explicit Vector (const TrilinosWrappers::MPI::Vector &v);
 
   /**
    * Another copy constructor: copy the values from a localized Trilinos
    * wrapper vector. This copy constructor is only available if Trilinos was
    * detected during configuration time.
    */
-  Vector (const TrilinosWrappers::Vector &v);
+  explicit Vector (const TrilinosWrappers::Vector &v);
 #endif
 
   /**
