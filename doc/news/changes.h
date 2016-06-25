@@ -322,6 +322,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> New: The MappingFEField class was previously only instantiated
+ if the vector type was dealii::Vector. It is now also instantiated
+ for PETSc and Trilinos wrapper vector types.
+ <br>
+ (Wolfgang Bangerth, 2016/06/25)
+ </li>
+
  <li> New: GnuplotFlags now supports user specified space dimension labels
  through a member variable.
  <br>
