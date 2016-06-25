@@ -30,6 +30,17 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, class EulerVectorType, int spacedim>
 MappingQ1Eulerian<dim, EulerVectorType, spacedim>::
+MappingQ1Eulerian (const DoFHandler<dim,spacedim> &shiftmap_dof_handler,
+                   const EulerVectorType  &euler_transform_vectors)
+  :
+  MappingQGeneric<dim,spacedim>(1),
+  euler_transform_vectors(&euler_transform_vectors),
+  shiftmap_dof_handler(&shiftmap_dof_handler)
+{}
+
+
+template <int dim, class EulerVectorType, int spacedim>
+MappingQ1Eulerian<dim, EulerVectorType, spacedim>::
 MappingQ1Eulerian (const EulerVectorType  &euler_transform_vectors,
                    const DoFHandler<dim,spacedim> &shiftmap_dof_handler)
   :

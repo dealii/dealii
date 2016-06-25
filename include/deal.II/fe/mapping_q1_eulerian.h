@@ -31,7 +31,9 @@ template <typename> class Vector;
 /*@{*/
 
 /**
- * Eulerian mapping of general unit cells by $d$-linear shape functions. Each
+ * This class provides a mapping that adds to the location of each cell
+ * a $d$-linear displacement field. (The generalization to higher order
+ * polynomials is provided in the MappingQEulerian class.) Each
  * cell is thus shifted in space by values given to the mapping through a
  * finite element field.
  *
@@ -90,19 +92,29 @@ template <int dim, typename VectorType = Vector<double>, int spacedim=dim >
 class MappingQ1Eulerian : public MappingQGeneric<dim,spacedim>
 {
 public:
+  /**
+   * Constructor.
+   *
+   * @param[in] euler_dof_handler A DoFHandler object that defines a finite
+   * element space. This space needs to have exactly dim components
+   * and these will be considered displacements
+   * relative to the original positions of the cells of the triangulation.
+   * This DoFHandler must be based on a <code>FESystem(FE_Q(1),dim)</code>
+   * finite element.
+   * @param[in] euler_vector A finite element function in the space defined by
+   * the first argument. The dim components of this function will be
+   * interpreted as the displacement we use in defining the mapping, relative
+   * to the location of cells of the underlying triangulation.
+   */
+  MappingQ1Eulerian (const DoFHandler<dim,spacedim> &euler_dof_handler,
+                     const VectorType               &euler_vector);
 
   /**
-   * Constructor. It takes a <tt>Vector<double> &</tt> as its first argument
-   * to specify the transformation of the whole problem from the reference to
-   * the current configuration. The organization of the elements in the @p
-   * Vector must follow the concept how deal.II stores solutions that are
-   * associated to a triangulation.  This is automatically the case if the @p
-   * Vector represents the solution of the previous step of a nonlinear
-   * problem. Alternatively, the @p Vector can be initialized by
-   * <tt>DoFAccessor::set_dof_values()</tt>.
+   * @deprecated Use the constructor with the reverse order of first and
+   * second argument.
    */
-  MappingQ1Eulerian (const VectorType  &euler_transform_vectors,
-                     const DoFHandler<dim,spacedim> &shiftmap_dof_handler);
+  MappingQ1Eulerian (const VectorType               &euler_vector,
+                     const DoFHandler<dim,spacedim> &euler_dof_handler) DEAL_II_DEPRECATED;
 
   /**
    * Return the mapped vertices of the cell. For the current class, this
