@@ -193,15 +193,15 @@ namespace Step25
 
       case 3:
       {
-        double theta  = numbers::PI/4;
-        double phi = numbers::PI/4;
-        double tau = 1.;
-        double c0  = 1.;
-        double s   = 1.;
-        double arg = p[0]*std::cos(theta) +
-                     p[1]*std::sin(theta) * std::cos(phi) +
-                     std::sin(theta) * std::sin(phi) *
-                     (p[2]*std::cosh(tau)+t*std::sinh(tau));
+        const double theta  = numbers::PI/4;
+        const double phi = numbers::PI/4;
+        const double tau = 1.;
+        const double c0  = 1.;
+        const double s   = 1.;
+        const double arg = p[0]*std::cos(theta) +
+                           p[1]*std::sin(theta) * std::cos(phi) +
+                           std::sin(theta) * std::sin(phi) *
+                           (p[2]*std::cosh(tau)+t*std::sinh(tau));
         return 4.*std::atan(c0*std::exp(s*arg));
       }
 
