@@ -353,7 +353,7 @@ namespace Step25
 
     SparseMatrix<double> tmp_matrix (sparsity_pattern);
     compute_nl_matrix (old_solution, solution, tmp_matrix);
-    system_matrix.add (-std::pow(time_step*theta,2), tmp_matrix);
+    system_matrix.add (std::pow(time_step*theta,2), tmp_matrix);
 
     // Then, we compute the right-hand side vector $-F_h(U^{n,l})$.
     //
