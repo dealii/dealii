@@ -37,7 +37,7 @@ template <typename> class Vector;
 
 /**
  * This class is an extension of the MappingQ1Eulerian class to higher order
- * Qp mappings.  It is useful when one wants to calculate shape function
+ * $Q_p$ mappings.  It is useful when one wants to calculate shape function
  * information on a domain that is deforming as the computation proceeds.
  *
  * <h3>Usage</h3>
