@@ -553,14 +553,14 @@ private:
    * Update internal degrees of freedom.
    */
   void update_internal_dofs(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                            const typename MappingFEField<dim, spacedim>::InternalData &data) const;
+                            const typename MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::InternalData &data) const;
 
   /**
    * See the documentation of the base class for detailed information.
    */
   virtual void
   compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
-                          typename MappingFEField<dim, spacedim>::InternalData &data) const;
+                          typename MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::InternalData &data) const;
 
   /*
    * Which components to use for the mapping.

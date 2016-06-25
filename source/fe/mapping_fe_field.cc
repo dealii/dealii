@@ -22,6 +22,10 @@
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/std_cxx11/unique_ptr.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_boundary.h>
 #include <deal.II/dofs/dof_accessor.h>
@@ -252,8 +256,8 @@ MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::preserves_vertex_locatio
 template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
-compute_shapes_virtual (const std::vector<Point<dim> >                       &unit_points,
-                        typename MappingFEField<dim, spacedim>::InternalData &data) const
+compute_shapes_virtual (const std::vector<Point<dim> >                    &unit_points,
+                        typename MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::InternalData &data) const
 {
   const unsigned int n_points=unit_points.size();
 
@@ -518,10 +522,10 @@ namespace internal
      * have already been set), but only if the update_flags of the @p data
      * argument indicate so.
      */
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
     void
     maybe_compute_q_points (const typename dealii::QProjector<dim>::DataSetDescriptor data_set,
-                            const typename dealii::MappingFEField<dim,spacedim>::InternalData &data,
+                            const typename dealii::MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData &data,
                             const FiniteElement<dim, spacedim>   &fe,
                             const ComponentMask                  &fe_mask,
                             const std::vector<unsigned int>      &fe_to_real,
@@ -555,11 +559,11 @@ namespace internal
      *
      * Skip the computation if possible as indicated by the first argument.
      */
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
     void
     maybe_update_Jacobians (const CellSimilarity::Similarity    cell_similarity,
                             const typename dealii::QProjector<dim>::DataSetDescriptor  data_set,
-                            const typename dealii::MappingFEField<dim,spacedim>::InternalData &data,
+                            const typename dealii::MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData &data,
                             const FiniteElement<dim, spacedim> &fe,
                             const ComponentMask                &fe_mask,
                             const std::vector<unsigned int>    &fe_to_real)
@@ -624,11 +628,11 @@ namespace internal
      *
      * Skip the computation if possible as indicated by the first argument.
      */
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
     void
     maybe_update_jacobian_grads (const CellSimilarity::Similarity              cell_similarity,
                                  const typename dealii::QProjector<dim>::DataSetDescriptor data_set,
-                                 const typename dealii::MappingFEField<dim,spacedim>::InternalData &data,
+                                 const typename dealii::MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData &data,
                                  const FiniteElement<dim, spacedim>           &fe,
                                  const ComponentMask                          &fe_mask,
                                  const std::vector<unsigned int>              &fe_to_real,
@@ -675,12 +679,12 @@ namespace internal
      *
      * Skip the computation if possible as indicated by the first argument.
      */
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
     void
     maybe_update_jacobian_pushed_forward_grads (
       const CellSimilarity::Similarity              cell_similarity,
       const typename dealii::QProjector<dim>::DataSetDescriptor data_set,
-      const typename dealii::MappingFEField<dim,spacedim>::InternalData &data,
+      const typename dealii::MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData &data,
       const FiniteElement<dim, spacedim>           &fe,
       const ComponentMask                          &fe_mask,
       const std::vector<unsigned int>              &fe_to_real,
@@ -750,11 +754,11 @@ namespace internal
      *
      * Skip the computation if possible as indicated by the first argument.
      */
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
     void
     maybe_update_jacobian_2nd_derivatives (const CellSimilarity::Similarity              cell_similarity,
                                            const typename dealii::QProjector<dim>::DataSetDescriptor data_set,
-                                           const typename dealii::MappingFEField<dim,spacedim>::InternalData &data,
+                                           const typename dealii::MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData &data,
                                            const FiniteElement<dim, spacedim>           &fe,
                                            const ComponentMask                          &fe_mask,
                                            const std::vector<unsigned int>              &fe_to_real,
@@ -803,12 +807,12 @@ namespace internal
      *
      * Skip the computation if possible as indicated by the first argument.
      */
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
     void
     maybe_update_jacobian_pushed_forward_2nd_derivatives (
       const CellSimilarity::Similarity              cell_similarity,
       const typename dealii::QProjector<dim>::DataSetDescriptor data_set,
-      const typename dealii::MappingFEField<dim,spacedim>::InternalData &data,
+      const typename dealii::MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData &data,
       const FiniteElement<dim, spacedim>           &fe,
       const ComponentMask                          &fe_mask,
       const std::vector<unsigned int>              &fe_to_real,
@@ -896,11 +900,11 @@ namespace internal
    *
    * Skip the computation if possible as indicated by the first argument.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
   void
   maybe_update_jacobian_3rd_derivatives (const CellSimilarity::Similarity              cell_similarity,
                                          const typename dealii::QProjector<dim>::DataSetDescriptor data_set,
-                                         const typename dealii::MappingFEField<dim,spacedim>::InternalData &data,
+                                         const typename dealii::MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData &data,
                                          const FiniteElement<dim, spacedim>           &fe,
                                          const ComponentMask                          &fe_mask,
                                          const std::vector<unsigned int>              &fe_to_real,
@@ -952,12 +956,12 @@ namespace internal
    *
    * Skip the computation if possible as indicated by the first argument.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
   void
   maybe_update_jacobian_pushed_forward_3rd_derivatives (
     const CellSimilarity::Similarity              cell_similarity,
     const typename dealii::QProjector<dim>::DataSetDescriptor data_set,
-    const typename dealii::MappingFEField<dim,spacedim>::InternalData &data,
+    const typename dealii::MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData &data,
     const FiniteElement<dim, spacedim>           &fe,
     const ComponentMask                          &fe_mask,
     const std::vector<unsigned int>              &fe_to_real,
@@ -1067,14 +1071,14 @@ namespace internal
    *
    * The resulting data is put into the @p output_data argument.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
   void
-  maybe_compute_face_data (const dealii::MappingFEField<dim,spacedim> &mapping,
+  maybe_compute_face_data (const dealii::Mapping<dim,spacedim> &mapping,
                            const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
                            const unsigned int               face_no,
                            const unsigned int               subface_no,
                            const std::vector<double>        &weights,
-                           const typename dealii::MappingFEField<dim,spacedim>::InternalData &data,
+                           const typename dealii::MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData &data,
                            internal::FEValues::MappingRelatedData<dim,spacedim>         &output_data)
   {
     const UpdateFlags update_flags = data.update_each;
@@ -1205,70 +1209,79 @@ namespace internal
    * 'data_set' to differentiate whether we will work on a face (and if so,
    * which one) or subface.
    */
-  template<int dim, int spacedim>
+  template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
   void
-  do_fill_fe_face_values (const dealii::MappingFEField<dim,spacedim>                        &mapping,
+  do_fill_fe_face_values (const dealii::Mapping<dim,spacedim>                               &mapping,
                           const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
                           const unsigned int                                                 face_no,
                           const unsigned int                                                 subface_no,
                           const typename dealii::QProjector<dim>::DataSetDescriptor          data_set,
                           const Quadrature<dim-1>                                           &quadrature,
-                          const typename dealii::MappingFEField<dim,spacedim>::InternalData &data,
+                          const typename dealii::MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData    &data,
                           const FiniteElement<dim, spacedim>                                &fe,
                           const ComponentMask                                               &fe_mask,
                           const std::vector<unsigned int>                                   &fe_to_real,
                           internal::FEValues::MappingRelatedData<dim,spacedim>              &output_data)
   {
-    maybe_compute_q_points<dim,spacedim> (data_set,
-                                          data,
-                                          fe, fe_mask, fe_to_real,
-                                          output_data.quadrature_points);
+    maybe_compute_q_points<dim,spacedim,VectorType,DoFHandlerType>
+    (data_set,
+     data,
+     fe, fe_mask, fe_to_real,
+     output_data.quadrature_points);
 
-    maybe_update_Jacobians<dim,spacedim> (CellSimilarity::none,
-                                          data_set,
-                                          data,
-                                          fe, fe_mask, fe_to_real);
+    maybe_update_Jacobians<dim,spacedim,VectorType,DoFHandlerType>
+    (CellSimilarity::none,
+     data_set,
+     data,
+     fe, fe_mask, fe_to_real);
 
-    maybe_update_jacobian_grads<dim,spacedim> (CellSimilarity::none,
-                                               data_set,
-                                               data,
-                                               fe, fe_mask, fe_to_real,
-                                               output_data.jacobian_grads);
+    maybe_update_jacobian_grads<dim,spacedim,VectorType,DoFHandlerType>
+    (CellSimilarity::none,
+     data_set,
+     data,
+     fe, fe_mask, fe_to_real,
+     output_data.jacobian_grads);
 
-    maybe_update_jacobian_pushed_forward_grads<dim,spacedim> (CellSimilarity::none,
-                                                              data_set,
-                                                              data,
-                                                              fe, fe_mask, fe_to_real,
-                                                              output_data.jacobian_pushed_forward_grads);
+    maybe_update_jacobian_pushed_forward_grads<dim,spacedim,VectorType,DoFHandlerType>
+    (CellSimilarity::none,
+     data_set,
+     data,
+     fe, fe_mask, fe_to_real,
+     output_data.jacobian_pushed_forward_grads);
 
-    maybe_update_jacobian_2nd_derivatives<dim,spacedim> (CellSimilarity::none,
-                                                         data_set,
-                                                         data,
-                                                         fe, fe_mask, fe_to_real,
-                                                         output_data.jacobian_2nd_derivatives);
+    maybe_update_jacobian_2nd_derivatives<dim,spacedim,VectorType,DoFHandlerType>
+    (CellSimilarity::none,
+     data_set,
+     data,
+     fe, fe_mask, fe_to_real,
+     output_data.jacobian_2nd_derivatives);
 
-    maybe_update_jacobian_pushed_forward_2nd_derivatives<dim,spacedim> (CellSimilarity::none,
-        data_set,
-        data,
-        fe, fe_mask, fe_to_real,
-        output_data.jacobian_pushed_forward_2nd_derivatives);
+    maybe_update_jacobian_pushed_forward_2nd_derivatives<dim,spacedim,VectorType,DoFHandlerType>
+    (CellSimilarity::none,
+     data_set,
+     data,
+     fe, fe_mask, fe_to_real,
+     output_data.jacobian_pushed_forward_2nd_derivatives);
 
-    maybe_update_jacobian_3rd_derivatives<dim,spacedim> (CellSimilarity::none,
-                                                         data_set,
-                                                         data,
-                                                         fe, fe_mask, fe_to_real,
-                                                         output_data.jacobian_3rd_derivatives);
+    maybe_update_jacobian_3rd_derivatives<dim,spacedim,VectorType,DoFHandlerType>
+    (CellSimilarity::none,
+     data_set,
+     data,
+     fe, fe_mask, fe_to_real,
+     output_data.jacobian_3rd_derivatives);
 
-    maybe_update_jacobian_pushed_forward_3rd_derivatives<dim,spacedim> (CellSimilarity::none,
-        data_set,
-        data,
-        fe, fe_mask, fe_to_real,
-        output_data.jacobian_pushed_forward_3rd_derivatives);
+    maybe_update_jacobian_pushed_forward_3rd_derivatives<dim,spacedim,VectorType,DoFHandlerType>
+    (CellSimilarity::none,
+     data_set,
+     data,
+     fe, fe_mask, fe_to_real,
+     output_data.jacobian_pushed_forward_3rd_derivatives);
 
-    maybe_compute_face_data (mapping,
-                             cell, face_no, subface_no,
-                             quadrature.get_weights(), data,
-                             output_data);
+    maybe_compute_face_data<dim,spacedim,VectorType,DoFHandlerType>
+    (mapping,
+     cell, face_no, subface_no,
+     quadrature.get_weights(), data,
+     output_data);
   }
 }
 
@@ -1299,13 +1312,15 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 
   update_internal_dofs(cell, data);
 
-  internal::maybe_compute_q_points(QProjector<dim>::DataSetDescriptor::cell (),
-                                   data, *fe, fe_mask, fe_to_real,
-                                   output_data.quadrature_points);
+  internal::maybe_compute_q_points<dim,spacedim,VectorType,DoFHandlerType>
+  (QProjector<dim>::DataSetDescriptor::cell (),
+   data, *fe, fe_mask, fe_to_real,
+   output_data.quadrature_points);
 
-  internal::maybe_update_Jacobians(cell_similarity,
-                                   QProjector<dim>::DataSetDescriptor::cell (),
-                                   data, *fe, fe_mask, fe_to_real);
+  internal::maybe_update_Jacobians<dim,spacedim,VectorType,DoFHandlerType>
+  (cell_similarity,
+   QProjector<dim>::DataSetDescriptor::cell (),
+   data, *fe, fe_mask, fe_to_real);
 
   const UpdateFlags update_flags = data.update_each;
   const std::vector<double> &weights=quadrature.get_weights();
@@ -1406,41 +1421,47 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
     }
 
   // calculate derivatives of the Jacobians
-  internal::maybe_update_jacobian_grads(cell_similarity,
-                                        QProjector<dim>::DataSetDescriptor::cell(),
-                                        data, *fe, fe_mask, fe_to_real,
-                                        output_data.jacobian_grads);
+  internal::maybe_update_jacobian_grads<dim,spacedim,VectorType,DoFHandlerType>
+  (cell_similarity,
+   QProjector<dim>::DataSetDescriptor::cell(),
+   data, *fe, fe_mask, fe_to_real,
+   output_data.jacobian_grads);
 
   // calculate derivatives of the Jacobians pushed forward to real cell coordinates
-  internal::maybe_update_jacobian_pushed_forward_grads(cell_similarity,
-                                                       QProjector<dim>::DataSetDescriptor::cell(),
-                                                       data, *fe, fe_mask, fe_to_real,
-                                                       output_data.jacobian_pushed_forward_grads);
+  internal::maybe_update_jacobian_pushed_forward_grads<dim,spacedim,VectorType,DoFHandlerType>
+  (cell_similarity,
+   QProjector<dim>::DataSetDescriptor::cell(),
+   data, *fe, fe_mask, fe_to_real,
+   output_data.jacobian_pushed_forward_grads);
 
   // calculate hessians of the Jacobians
-  internal::maybe_update_jacobian_2nd_derivatives(cell_similarity,
-                                                  QProjector<dim>::DataSetDescriptor::cell(),
-                                                  data, *fe, fe_mask, fe_to_real,
-                                                  output_data.jacobian_2nd_derivatives);
+  internal::maybe_update_jacobian_2nd_derivatives<dim,spacedim,VectorType,DoFHandlerType>
+  (cell_similarity,
+   QProjector<dim>::DataSetDescriptor::cell(),
+   data, *fe, fe_mask, fe_to_real,
+   output_data.jacobian_2nd_derivatives);
 
   // calculate hessians of the Jacobians pushed forward to real cell coordinates
-  internal::maybe_update_jacobian_pushed_forward_2nd_derivatives(cell_similarity,
-      QProjector<dim>::DataSetDescriptor::cell(),
-      data, *fe, fe_mask, fe_to_real,
-      output_data.jacobian_pushed_forward_2nd_derivatives);
+  internal::maybe_update_jacobian_pushed_forward_2nd_derivatives<dim,spacedim,VectorType,DoFHandlerType>
+  (cell_similarity,
+   QProjector<dim>::DataSetDescriptor::cell(),
+   data, *fe, fe_mask, fe_to_real,
+   output_data.jacobian_pushed_forward_2nd_derivatives);
 
   // calculate gradients of the hessians of the Jacobians
-  internal::maybe_update_jacobian_3rd_derivatives(cell_similarity,
-                                                  QProjector<dim>::DataSetDescriptor::cell(),
-                                                  data, *fe, fe_mask, fe_to_real,
-                                                  output_data.jacobian_3rd_derivatives);
+  internal::maybe_update_jacobian_3rd_derivatives<dim,spacedim,VectorType,DoFHandlerType>
+  (cell_similarity,
+   QProjector<dim>::DataSetDescriptor::cell(),
+   data, *fe, fe_mask, fe_to_real,
+   output_data.jacobian_3rd_derivatives);
 
   // calculate gradients of the hessians of the Jacobians pushed forward to real
   // cell coordinates
-  internal::maybe_update_jacobian_pushed_forward_3rd_derivatives(cell_similarity,
-      QProjector<dim>::DataSetDescriptor::cell(),
-      data, *fe, fe_mask, fe_to_real,
-      output_data.jacobian_pushed_forward_3rd_derivatives);
+  internal::maybe_update_jacobian_pushed_forward_3rd_derivatives<dim,spacedim,VectorType,DoFHandlerType>
+  (cell_similarity,
+   QProjector<dim>::DataSetDescriptor::cell(),
+   data, *fe, fe_mask, fe_to_real,
+   output_data.jacobian_pushed_forward_3rd_derivatives);
 
   return updated_cell_similarity;
 }
@@ -1464,18 +1485,19 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
 
   update_internal_dofs(cell, data);
 
-  internal::do_fill_fe_face_values (*this,
-                                    cell, face_no, numbers::invalid_unsigned_int,
-                                    QProjector<dim>::DataSetDescriptor::
-                                    face (face_no,
-                                          cell->face_orientation(face_no),
-                                          cell->face_flip(face_no),
-                                          cell->face_rotation(face_no),
-                                          quadrature.size()),
-                                    quadrature,
-                                    data,
-                                    *fe, fe_mask, fe_to_real,
-                                    output_data);
+  internal::do_fill_fe_face_values<dim,spacedim,VectorType,DoFHandlerType>
+  (*this,
+   cell, face_no, numbers::invalid_unsigned_int,
+   QProjector<dim>::DataSetDescriptor::
+   face (face_no,
+         cell->face_orientation(face_no),
+         cell->face_flip(face_no),
+         cell->face_rotation(face_no),
+         quadrature.size()),
+   quadrature,
+   data,
+   *fe, fe_mask, fe_to_real,
+   output_data);
 }
 
 
@@ -1497,19 +1519,20 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 
   update_internal_dofs(cell, data);
 
-  internal::do_fill_fe_face_values (*this,
-                                    cell, face_no, numbers::invalid_unsigned_int,
-                                    QProjector<dim>::DataSetDescriptor::
-                                    subface (face_no, subface_no,
-                                             cell->face_orientation(face_no),
-                                             cell->face_flip(face_no),
-                                             cell->face_rotation(face_no),
-                                             quadrature.size(),
-                                             cell->subface_case(face_no)),
-                                    quadrature,
-                                    data,
-                                    *fe, fe_mask, fe_to_real,
-                                    output_data);
+  internal::do_fill_fe_face_values<dim,spacedim,VectorType,DoFHandlerType>
+  (*this,
+   cell, face_no, numbers::invalid_unsigned_int,
+   QProjector<dim>::DataSetDescriptor::
+   subface (face_no, subface_no,
+            cell->face_orientation(face_no),
+            cell->face_flip(face_no),
+            cell->face_rotation(face_no),
+            quadrature.size(),
+            cell->subface_case(face_no)),
+   quadrature,
+   data,
+   *fe, fe_mask, fe_to_real,
+   output_data);
 }
 
 
@@ -1947,7 +1970,7 @@ template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::update_internal_dofs
 (const typename Triangulation<dim,spacedim>::cell_iterator  &cell,
- const typename MappingFEField<dim, spacedim>::InternalData &data) const
+ const typename MappingFEField<dim, spacedim,VectorType,DoFHandlerType>::InternalData &data) const
 {
   Assert(euler_dof_handler != 0, ExcMessage("euler_dof_handler is empty"));
 
