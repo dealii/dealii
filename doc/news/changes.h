@@ -39,6 +39,17 @@ inconvenience this causes.
 
 <ol>
 
+ <li> Changed: The conversion constructors of class Vector from the
+ PETScWrappers::Vector, PETScWrappers::MPI::Vector,
+ TrilinosWrappers::Vector, and TrilinosWrappers::MPI::Vector classes
+ are now marked as <code>explicit</code>, i.e., they will no longer
+ allow implicit, silent conversions. Such conversions lead to awkward
+ errors that are hard to debug, and in cases where they are necessary,
+ are best described in code through explicit casts.
+ <br>
+ (Wolfgang Bangerth, 2016/06/25)
+ </li>
+
  <li> Changed: The deal.II distributed vector classes do now derive from
  LinearAlgebra::VectorSpaceVector and have been moved to the
  LinearAlgebra::distributed namespace. In the definition of the new
