@@ -7,7 +7,7 @@ The goal of this program is to solve the sine-Gordon soliton equation
 in 1, 2 or 3 spatial dimensions. The motivation for solving this
 equation is that very little is known about the nature of the
 solutions in 2D and 3D, even though the 1D case has been studied
-extensively. 
+extensively.
 
 Rather facetiously, the sine-Gordon equation's moniker is a pun on the
 so-called Klein-Gordon equation, which is a relativistic version of
@@ -28,14 +28,14 @@ inverse scattering transform and other methods for finding analytical
 soliton equations, the reader should consult the following "classical"
 references on the subject: G. L. Lamb's <i>Elements of Soliton
 Theory</i> (Chapter 5, Section 2) and G. B. Whitham's <i>Linear and
-Nonlinear Waves</i> (Chapter 17, Sections 10-13). 
+Nonlinear Waves</i> (Chapter 17, Sections 10-13).
 
 <h3>Statement of the problem</h3>
 The sine-Gordon initial-boundary-value problem (IBVP) we wish to solve
 consists of the following equations:
 \f{eqnarray*}
   u_{tt}-\Delta u &=& -\sin(u) \quad\mbox{for}\quad (x,t) \in \Omega \times (t_0,t_f],\\
-  {\mathbf n} \cdot \nabla u &=& 0 \quad\mbox{for}\quad (x,t) \in \partial\Omega 
+  {\mathbf n} \cdot \nabla u &=& 0 \quad\mbox{for}\quad (x,t) \in \partial\Omega
            \times (t_0,t_f],\\
   u(x,t_0) &=& u_0(x).
 \f}
@@ -46,7 +46,7 @@ to reflect off the boundaries of our domain. It should be noted, however, that
 Dirichlet boundary conditions are not appropriate for this problem. Even
 though the solutions to the sine-Gordon equation are localized, it only makes
 sense to specify (Dirichlet) boundary conditions at $x=\pm\infty$, otherwise
-either a solution does not exist or only the trivial solution $u=0$ exists. 
+either a solution does not exist or only the trivial solution $u=0$ exists.
 
 However, the form of the equation above is not ideal for numerical
 discretization. If we were to discretize the second-order time
@@ -54,13 +54,13 @@ derivative directly and accurately, then  we would need a large
 stencil (i.e., several time steps would need to be kept in the
 memory), which could become expensive. Therefore, in complete analogy
 to what we did in step-23 and step-24,
-we split the 
+we split the
 second-order (in time) sine-Gordon equation into a system of two
 first-order (in time) equations, which we call the split, or velocity,
 formulation. To this end, by setting $v = u_t$, it is easy to see that the sine-Gordon equation is equivalent to
 \f{eqnarray*}
   u_t - v &=& 0,\\
-  v_t - \Delta u &=& -\sin(u). 
+  v_t - \Delta u &=& -\sin(u).
 \f}
 
 <h3>Discretization of the equations in time</h3>
@@ -78,13 +78,13 @@ the split formulation of the time-discretized sine-Gordon equation becomes
 \f{eqnarray*}
   \frac{u^n - u^{n-1}}{k} - \left[\theta v^n + (1-\theta) v^{n-1}\right] &=& 0,\\
   \frac{v^n - v^{n-1}}{k} - \Delta\left[\theta u^n + (1-\theta) u^{n-1}\right]
-  &=& -\sin\left[\theta u^n + (1-\theta) u^{n-1}\right]. 
+  &=& -\sin\left[\theta u^n + (1-\theta) u^{n-1}\right].
 \f}
 
 We can simplify the latter via a bit of algebra. Eliminating $v^n$ from the first equation and rearranging, we obtain
 \f{eqnarray*}
   \left[ 1-k^2\theta^2\Delta \right] u^n &=&
-         \left[ 1+k^2\theta(1-\theta)\Delta\right] u^{n-1} + k v^{n-1} 
+         \left[ 1+k^2\theta(1-\theta)\Delta\right] u^{n-1} + k v^{n-1}
          - k^2\theta\sin\left[\theta u^n + (1-\theta) u^{n-1}\right],\\
    v^n &=& v^{n-1} + k\Delta\left[ \theta u^n + (1-\theta) u^{n-1}\right]
          - k\sin\left[ \theta u^n + (1-\theta) u^{n-1} \right].
@@ -94,22 +94,22 @@ It may seem as though we can just proceed to discretize the equations
 in space at this point. While this is true for the second equation
 (which is linear in $v^n$), this would not work for all $\theta$ since the
 first equation above is nonlinear. Therefore, a nonlinear solver must be
-implemented, then the equations can be discretized in space and solved. 
+implemented, then the equations can be discretized in space and solved.
 
 To this end, we can use Newton's method. Given the nonlinear equation $F(u^n) = 0$, we produce successive approximations to $u^n$ as follows:
 \f{eqnarray*}
-  \mbox{ Find } \delta u^n_l \mbox{ s.t. } F'(u^n_l)\delta u^n_l = -F(u^n_l) 
+  \mbox{ Find } \delta u^n_l \mbox{ s.t. } F'(u^n_l)\delta u^n_l = -F(u^n_l)
   \mbox{, set }  u^n_{l+1} = u^n_l + \delta u^n_l.
 \f}
-The iteration can be initialized with the old time step, i.e. $u^n_0 = u^{n-1}$, 
+The iteration can be initialized with the old time step, i.e. $u^n_0 = u^{n-1}$,
 and eventually it will produce a solution to the first equation of
 the split formulation (see above). For the time discretization of the
-sine-Gordon equation under consideration here, we have that 
+sine-Gordon equation under consideration here, we have that
 \f{eqnarray*}
-  F(u^n_l) &=&  \left[ 1-k^2\theta^2\Delta \right] u^n_l -  
-                 \left[ 1+k^2\theta(1-\theta)\Delta\right] u^{n-1} - k v^{n-1} 
+  F(u^n_l) &=&  \left[ 1-k^2\theta^2\Delta \right] u^n_l -
+                 \left[ 1+k^2\theta(1-\theta)\Delta\right] u^{n-1} - k v^{n-1}
                  + k^2\theta\sin\left[\theta u^n_l + (1-\theta) u^{n-1}\right],\\
-  F'(u^n_l) &=& 1-k^2\theta^2\Delta + k^2\theta^2\cos\left[\theta u^n_l 
+  F'(u^n_l) &=& 1-k^2\theta^2\Delta + k^2\theta^2\cos\left[\theta u^n_l
                         + (1-\theta) u^{n-1}\right].
 \f}
 Notice that while $F(u^n_l)$ is a function, $F'(u^n_l)$ is an operator.
@@ -117,14 +117,14 @@ Notice that while $F(u^n_l)$ is a function, $F'(u^n_l)$ is an operator.
 <h3>Weak formulation of the time-discretized equations</h3>
 With hindsight, we choose both the solution and the test space to be $H^1(\Omega)$. Hence, multiplying by a test function $\varphi$ and integrating, we obtain the following variational (or weak) formulation of the split formulation (including the nonlinear solver for the first equation) at each time step:
 \f{eqnarray*}
-  &\mbox{ Find}& \delta u^n_l \in H^1(\Omega) \mbox{ s.t. } 
-  \left( F'(u^n_l)\delta u^n_l, \varphi \right)_{\Omega} 
+  &\mbox{ Find}& \delta u^n_l \in H^1(\Omega) \mbox{ s.t. }
+  \left( F'(u^n_l)\delta u^n_l, \varphi \right)_{\Omega}
   = -\left(F(u^n_l), \varphi \right)_{\Omega} \;\forall\varphi\in H^1(\Omega),
   \mbox{ set } u^n_{l+1} = u^n_l + \delta u^n_l,\; u^n_0 = u^{n-1}.\\
   &\mbox{ Find}& v^n \in H^1(\Omega) \mbox{ s.t. }
-  \left( v^n, \varphi \right)_{\Omega} = \left( v^{n-1}, \varphi \right)_{\Omega} 
-         - k\theta\left( \nabla u^n, \nabla\varphi \right)_{\Omega} 
-         - k (1-\theta)\left( \nabla u^{n-1}, \nabla\varphi \right)_{\Omega} 
+  \left( v^n, \varphi \right)_{\Omega} = \left( v^{n-1}, \varphi \right)_{\Omega}
+         - k\theta\left( \nabla u^n, \nabla\varphi \right)_{\Omega}
+         - k (1-\theta)\left( \nabla u^{n-1}, \nabla\varphi \right)_{\Omega}
          - k\left(\sin\left[ \theta u^n + (1-\theta) u^{n-1} \right],
          \varphi \right)_{\Omega} \;\forall\varphi\in H^1(\Omega).
 \f}
@@ -135,7 +135,7 @@ and $(\cdot,\cdot)_{\Omega}$ denotes the usual $L^2$ inner product
 over the domain $\Omega$, i.e. $(f,g)_{\Omega} = \int_\Omega fg
 \,\mathrm{d}x$. Finally, notice that the first equation is, in fact,
 the definition of an iterative procedure, so it is solved multiple
-times during each time step until a stopping criterion is met. 
+times during each time step until a stopping criterion is met.
 
 <h3>Discretization of the weak formulation in space</h3>
 Using the Finite Element Method, we discretize the variational
@@ -155,10 +155,10 @@ H^1(\Omega)$. Thus, the finite-dimensional version of the variational formulatio
 @f}
 Above, the matrix $F_h'(\cdot)$ and the vector $F_h(\cdot)$ denote the discrete versions of the gadgets discussed above, i.e.,
 \f{eqnarray*}
-  F_h(U^{n,l}) &=&  \left[ M+k^2\theta^2A \right] U^{n,l} -  
-                \left[ M-k^2\theta(1-\theta)A \right] U^{n-1} - k MV^{n-1} 
+  F_h(U^{n,l}) &=&  \left[ M+k^2\theta^2A \right] U^{n,l} -
+                \left[ M-k^2\theta(1-\theta)A \right] U^{n-1} - k MV^{n-1}
                 + k^2\theta S(u^n_l, u^{n-1}),\\
-  F_h'(U^{n,l}) &=& M+k^2\theta^2A 
+  F_h'(U^{n,l}) &=& M+k^2\theta^2A
                                 + k^2\theta^2N(u^n_l,u^{n-1})
 \f}
 Again, note that the first matrix equation above is, in fact, the
@@ -176,9 +176,10 @@ i.e. $N_{ij}(f,g) = \left( \cos\left[ \theta f + (1-\theta) g\right]\varphi_i,
 What solvers can we use for the first equation? Let's look at the matrix we
 have to invert:
 @f[
-  (M+k^2\theta^2(A-N))_{ij} = 
-  \int_\Omega (1+k^2\theta^2 \cos \alpha) 
-  \varphi_i\varphi_j \; dx+\int_\Omega \nabla\varphi_i\nabla\varphi_j \; dx,
+  (M+k^2\theta^2(A + N))_{ij} =
+  \int_\Omega (1+k^2\theta^2 \cos \alpha)
+  \varphi_i\varphi_j \; dx
+  + k^2 \theta^2 \int_\Omega \nabla\varphi_i\nabla\varphi_j \; dx,
 @f]
 for some $\alpha$ that depends on the present and previous solution. First,
 note that the matrix is symmetric. In addition, if the time step $k$ is small
@@ -233,7 +234,7 @@ these:
 <ul>
   <li>In 1D:
   @f[
-  u(x,t) = 
+  u(x,t) =
   -4 \arctan\left[
      \frac{m}{\sqrt{1-m^2}}
      \frac{\sin\left(\sqrt{1-m^2}t+c_2\right)}
@@ -272,4 +273,4 @@ Since it makes it easier to play around, the <code>InitialValues</code> class
 that is used to set &mdash; surprise! &mdash; the initial values of our
 simulation simply queries the class that describes the exact solution for the
 value at the initial time, rather than duplicating the effort to implement a
-solution function. 
+solution function.
