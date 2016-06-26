@@ -68,8 +68,8 @@ template <typename> class Vector;
  *    FESystem<dim> fe(FE_Q<dim>(1), dim);
  *    DoFHandler<dim> flowfield_dof_handler(triangulation);
  *    flowfield_dof_handler.distribute_dofs(fe);
- *    Vector<double> map_points(flowfield_dof_handler.n_dofs());
- *    MappingQ1Eulerian<dim> mymapping(map_points, flowfield_dof_handler);
+ *    Vector<double> displacement_field(flowfield_dof_handler.n_dofs());
+ *    MappingQ1Eulerian<dim> mymapping(flowfield_dof_handler, displacement_field);
  * @endcode
  *
  * Note that since the vector of shift values and the dof handler are only
@@ -77,11 +77,8 @@ template <typename> class Vector;
  * whenever you use this object, the given objects still represent valid data.
  *
  * To enable the use of the MappingQ1Eulerian class also in the context of
- * parallel codes using the PETSc wrapper classes, the type of the vector can
- * be specified as template parameter <tt>EulerVectorType</tt> Not specifying
- * this template argument in applications using the PETSc vector classes leads
- * to the construction of a copy of the vector which is not acccessible
- * afterwards!
+ * parallel codes using the PETSc or Trilinos wrapper classes, the type of
+ * the vector can be specified as template parameter <tt>VectorType</tt>.
  *
  * For more information about the <tt>spacedim</tt> template parameter check
  * the documentation of FiniteElement or the one of Triangulation.

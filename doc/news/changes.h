@@ -139,8 +139,8 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
- <li> Changed: As MappingQEulerian before, MappingQ1Eulerian has gained
- a second constructor that reverts the order of the arguments to indicate
+ <li> Changed: Similar to MappingQEulerian, MappingQ1Eulerian has gained
+ a second constructor that reverses the order of the arguments to indicate
  which DoFHandler a vector is based on. The old constructor is now
  deprecated and will be removed in a future version.
  <br>

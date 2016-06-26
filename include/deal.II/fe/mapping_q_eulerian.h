@@ -81,11 +81,8 @@ template <typename> class Vector;
  * data.
  *
  * To enable the use of the MappingQ1Eulerian class also in the context of
- * parallel codes using the PETSc wrapper classes, the type of the vector can
- * be specified as template parameter <tt>EulerVectorType</tt> Not specifying
- * this template argument in applications using the PETSc vector classes leads
- * to the construction of a copy of the vector which is not accessible
- * afterwards!
+ * parallel codes using the PETSc or Trilinos wrapper classes, the type
+ * of the vector can be specified as template parameter <tt>VectorType</tt>.
  *
  * @author Joshua White, 2008
  */
