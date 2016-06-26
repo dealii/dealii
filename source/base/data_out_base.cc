@@ -1620,6 +1620,14 @@ namespace DataOutBase
 
 
 
+  std::size_t
+  GnuplotFlags::memory_consumption () const
+  {
+    return MemoryConsumption::memory_consumption(space_dimension_labels);
+  }
+
+
+
   PovrayFlags::PovrayFlags (const bool smooth,
                             const bool bicubic_patch,
                             const bool external_data)
