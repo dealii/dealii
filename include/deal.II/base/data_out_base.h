@@ -546,6 +546,12 @@ namespace DataOutBase
     std::vector<std::string> space_dimension_labels;
 
     /**
+     * Return an estimate for the memory consumption, in bytes, of this
+     * object.
+     */
+    std::size_t memory_consumption () const;
+
+    /**
      * Exception to raise when there are not enough specified dimension
      * labels.
      */
