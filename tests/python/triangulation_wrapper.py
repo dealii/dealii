@@ -123,6 +123,20 @@ class TestTriangulationWrapper(unittest.TestCase):
             n_cells = triangulation.n_active_cells()
             self.assertEqual(n_cells, 2)
 
+    def test_adaptive_refinement(self):
+        for dim in self.dim:
+            triangulation = self.build_hyper_cube_triangulation(dim)
+            triangulation.refine_global(1)
+            for cell in triangulation:
+                cell.refine_flag = 'isotropic'
+                break
+            triangulation.execute_coarsening_and_refinement()
+            n_cells = triangulation.n_active_cells()
+            if (dim[0] == '2D'):
+                self.assertEqual(n_cells, 7)
+            else:
+                self.assertEqual(n_cells, 15)
+
     def test_refine_global(self):
         for dim in self.dim:
             triangulation = self.build_hyper_cube_triangulation(dim)

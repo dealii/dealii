@@ -17,6 +17,7 @@
 #include <deal.II/python/cell_accessor_wrapper.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
@@ -180,6 +181,46 @@ namespace PyDealII
       for (auto cell : tria->active_cell_iterators())
         cells.push_back(CellAccessorWrapper(triangulation_wrapper, cell->level(),
                                             cell->index()));
+    }
+
+
+
+    template <int dim, int spacedim>
+    void write(const std::string &filename,
+               const std::string &format,
+               void              *triangulation)
+    {
+      dealii::Triangulation<dim,spacedim> *tria =
+        static_cast<dealii::Triangulation<dim,spacedim>*>(triangulation);
+
+      dealii::GridOut::OutputFormat output_format;
+      if (format.compare("dx") == 0)
+        output_format = dealii::GridOut::OutputFormat::dx;
+      else if (format.compare("gnuplot") == 0)
+        output_format = dealii::GridOut::OutputFormat::gnuplot;
+      else if (format.compare("eps") == 0)
+        output_format = dealii::GridOut::OutputFormat::eps;
+      else if (format.compare("ucd") == 0)
+        output_format = dealii::GridOut::OutputFormat::ucd;
+      else if (format.compare("xfig") == 0)
+        output_format = dealii::GridOut::OutputFormat::xfig;
+      else if (format.compare("msh") == 0)
+        output_format = dealii::GridOut::OutputFormat::msh;
+      else if (format.compare("svg") == 0)
+        output_format = dealii::GridOut::OutputFormat::svg;
+      else if (format.compare("mathgl") == 0)
+        output_format = dealii::GridOut::OutputFormat::mathgl;
+      else if (format.compare("vtk") == 0)
+        output_format = dealii::GridOut::OutputFormat::vtk;
+      else if (format.compare("vtu") == 0)
+        output_format = dealii::GridOut::OutputFormat::vtu;
+      else
+        output_format = dealii::GridOut::OutputFormat::none;
+
+      dealii::GridOut mesh_writer;
+      std::ofstream ofs(filename);
+      mesh_writer.write(*tria, ofs, output_format);
+      ofs.close();
     }
   }
 
@@ -418,26 +459,39 @@ namespace PyDealII
 
 
 
-  TriangulationWrapper::iterator TriangulationWrapper::begin()
+  void TriangulationWrapper::execute_coarsening_and_refinement()
   {
-    // Build the vector containing all the CellAccessorWrapper when the iterator
-    // is called. This way, we don't need to keep track of the changes on the
-    // Triangulation.
-    build_cells_vector();
-
-    return cells.begin();
+    if ((dim == 2) && (spacedim == 2))
+      {
+        dealii::Triangulation<2,2> *tria =
+          static_cast<dealii::Triangulation<2,2>*>(triangulation);
+        tria->execute_coarsening_and_refinement();
+      }
+    else if ((dim == 2) && (spacedim == 3))
+      {
+        dealii::Triangulation<2,3> *tria =
+          static_cast<dealii::Triangulation<2,3>*>(triangulation);
+        tria->execute_coarsening_and_refinement();
+      }
+    else
+      {
+        dealii::Triangulation<3,3> *tria =
+          static_cast<dealii::Triangulation<3,3>*>(triangulation);
+        tria->execute_coarsening_and_refinement();
+      }
   }
 
 
 
-  TriangulationWrapper::iterator TriangulationWrapper::end()
+  void TriangulationWrapper::write(const std::string &filename,
+                                   const std::string  format) const
   {
-    // Python seems to call end() before begin() so call build_cells_vector in
-    // both begin() and end(). The updated flag makes sure that the vector of
-    // CellAccessorWrapper is only build once.
-    build_cells_vector();
-
-    return cells.end();
+    if ((dim == 2) && (spacedim == 2))
+      internal::write<2,2>(filename, format, triangulation);
+    else if ((dim == 2) && (spacedim == 3))
+      internal::write<2,3>(filename, format, triangulation);
+    else
+      internal::write<3,3>(filename, format, triangulation);
   }
 
 
@@ -500,6 +554,30 @@ namespace PyDealII
 
         ia >> *tria;
       }
+  }
+
+
+
+  TriangulationWrapper::iterator TriangulationWrapper::begin()
+  {
+    // Build the vector containing all the CellAccessorWrapper when the iterator
+    // is called. This way, we don't need to keep track of the changes on the
+    // Triangulation.
+    build_cells_vector();
+
+    return cells.begin();
+  }
+
+
+
+  TriangulationWrapper::iterator TriangulationWrapper::end()
+  {
+    // Python seems to call end() before begin() so call build_cells_vector in
+    // both begin() and end(). The updated flag makes sure that the vector of
+    // CellAccessorWrapper is only build once.
+    build_cells_vector();
+
+    return cells.end();
   }
 
 

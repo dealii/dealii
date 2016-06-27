@@ -82,6 +82,14 @@ namespace PyDealII
          &TriangulationWrapper::refine_global,
          "Refine all the cells times times.",
          boost::python::args("self", "times"))
+    .def("execute_coarsening_and_refinement",
+         &TriangulationWrapper::execute_coarsening_and_refinement,
+         "Execute both refinement and coarsening of the Triangulation.",
+         boost::python::args("self"))
+    .def("write",
+         &TriangulationWrapper::write,
+         "Write grid to the output file according to the given data format. The possible formats are: none, dx, gnuplot, eps, ucd, xfig, msh, svg, mathgl, vtk, and vtu.",
+         boost::python::args("self", "filename", "format"))
     .def("save",
          &TriangulationWrapper::save,
          "Write the Triangulation to a file.",

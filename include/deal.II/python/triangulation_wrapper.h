@@ -117,6 +117,16 @@ namespace PyDealII
     void refine_global(const unsigned int n);
 
     /**
+     * Execute both refinement and coarsening of the Triangulation.
+     */
+    void execute_coarsening_and_refinement();
+
+    /**
+     * Write grid to the output file @filename according to the given data format.
+     */
+    void write(const std::string &filename, const std::string format) const;
+
+    /**
      * Write the Triangulation in file.
      */
     void save(const std::string &filename) const;
