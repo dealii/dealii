@@ -13,30 +13,43 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // tests Trilinos direct solvers on a 2D Poisson equation for linear elements
 
 #include "../tests.h"
-#include <deal.II/lac/trilinos_sparse_matrix.h>
+
+#include <deal.II/base/function.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/base/index_set.h>
+#include <deal.II/base/conditional_ostream.h>
+
+#include <deal.II/distributed/tria.h>
+
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/dofs/dof_handler.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+
+#include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/lac/solver_cg.h>
+
 #include <deal.II/lac/trilinos_solver.h>
-#include <deal.II/dofs/dof_tools.h>
-#include <deal.II/numerics/vector_tools.h>
 #include <deal.II/lac/trilinos_precondition.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/base/function.h>
-#include <deal.II/grid/tria.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/trilinos_vector.h>
+
+#include <deal.II/numerics/vector_tools.h>
 
 #include <fstream>
 #include <iomanip>
 
+using namespace dealii;
 
 template <int dim>
 class Step4
@@ -51,16 +64,18 @@ private:
   void assemble_system ();
   void solve ();
 
-  Triangulation<dim>   triangulation;
-  FE_Q<dim>            fe;
-  DoFHandler<dim>      dof_handler;
+  parallel::distributed::Triangulation<dim>   triangulation;
+  FE_Q<dim>                                   fe;
+  DoFHandler<dim>                             dof_handler;
 
-  ConstraintMatrix     constraints;
+  ConstraintMatrix                            constraints;
+  SparsityPattern                             sparsity_pattern;
 
-  TrilinosWrappers::SparseMatrix system_matrix;
+  TrilinosWrappers::SparseMatrix              system_matrix;
 
-  Vector<double>       solution;
-  Vector<double>       system_rhs;
+  TrilinosWrappers::MPI::Vector               solution;
+  TrilinosWrappers::MPI::Vector               system_rhs;
+  TrilinosWrappers::MPI::Vector               system_rhs_two;
 };
 
 
@@ -73,6 +88,18 @@ public:
   virtual double value (const Point<dim>   &p,
                         const unsigned int  component = 0) const;
 };
+
+
+template <int dim>
+class RightHandSideTwo : public Function<dim>
+{
+public:
+  RightHandSideTwo () : Function<dim>() {}
+
+  virtual double value (const Point<dim>   &p,
+                        const unsigned int  component = 0) const;
+};
+
 
 
 
@@ -95,11 +122,22 @@ double RightHandSide<dim>::value (const Point<dim> &p,
 {
   double return_value = 0;
   for (unsigned int i=0; i<dim; ++i)
-    return_value += 4*std::pow(p(i), 4);
+    return_value += 2*std::pow(p(i), 2);
 
   return return_value;
 }
 
+
+template <int dim>
+double RightHandSideTwo<dim>::value (const Point<dim> &p,
+                                     const unsigned int /*component*/) const
+{
+  double return_value = 0;
+  for (unsigned int i=0; i<dim; ++i)
+    return_value += 4*std::pow(p(i), 4);
+
+  return return_value;
+}
 
 
 template <int dim>
@@ -114,6 +152,10 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
 template <int dim>
 Step4<dim>::Step4 ()
   :
+  triangulation(MPI_COMM_WORLD,
+                typename Triangulation<dim>::MeshSmoothing
+                (Triangulation<dim>::smoothing_on_refinement |
+                 Triangulation<dim>::smoothing_on_coarsening)),
   fe (1),
   dof_handler (triangulation)
 {}
@@ -141,12 +183,38 @@ void Step4<dim>::setup_system ()
                                             constraints);
   constraints.close();
 
-  CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
-  DoFTools::make_sparsity_pattern (dof_handler, c_sparsity, constraints, false);
-  system_matrix.reinit (c_sparsity);
+  IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
+  IndexSet locally_relevant_dofs;
 
-  solution.reinit (dof_handler.n_dofs());
-  system_rhs.reinit (dof_handler.n_dofs());
+  DoFTools::extract_locally_relevant_dofs(dof_handler,
+                                          locally_relevant_dofs);
+
+
+  DynamicSparsityPattern dsp(dof_handler.n_dofs());
+  DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints, false);
+  SparsityTools::distribute_sparsity_pattern(dsp,
+                                             dof_handler.n_locally_owned_dofs_per_processor(),
+                                             MPI_COMM_WORLD,
+                                             locally_relevant_dofs);
+
+  system_matrix.reinit (locally_owned_dofs,
+                        locally_owned_dofs,
+                        dsp,
+                        MPI_COMM_WORLD);
+
+  solution.reinit (locally_relevant_dofs,
+                   MPI_COMM_WORLD);
+
+  system_rhs.reinit (locally_owned_dofs,
+                     locally_relevant_dofs,
+                     MPI_COMM_WORLD,
+                     true);
+
+  system_rhs_two.reinit (locally_owned_dofs,
+                         locally_relevant_dofs,
+                         MPI_COMM_WORLD,
+                         true);
+
 }
 
 
@@ -166,6 +234,7 @@ void Step4<dim>::assemble_system ()
 
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
+  Vector<double>       cell_rhs_two (dofs_per_cell);
 
   std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
@@ -175,29 +244,44 @@ void Step4<dim>::assemble_system ()
 
   for (; cell!=endc; ++cell)
     {
-      fe_values.reinit (cell);
-      cell_matrix = 0;
-      cell_rhs = 0;
+      if (cell->is_locally_owned())
+        {
+          fe_values.reinit (cell);
+          cell_matrix = 0;
+          cell_rhs = 0;
+          cell_rhs_two = 0;
 
-      for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
-          {
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
-              cell_matrix(i,j) += (fe_values.shape_grad (i, q_point) *
-                                   fe_values.shape_grad (j, q_point) *
-                                   fe_values.JxW (q_point));
+          for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+            for (unsigned int i=0; i<dofs_per_cell; ++i)
+              {
+                for (unsigned int j=0; j<dofs_per_cell; ++j)
+                  cell_matrix(i,j) += (fe_values.shape_grad (i, q_point) *
+                                       fe_values.shape_grad (j, q_point) *
+                                       fe_values.JxW (q_point));
 
-            cell_rhs(i) += (fe_values.shape_value (i, q_point) *
-                            right_hand_side.value (fe_values.quadrature_point (q_point)) *
-                            fe_values.JxW (q_point));
-          }
+                cell_rhs(i) += (fe_values.shape_value (i, q_point) *
+                                right_hand_side.value (fe_values.quadrature_point (q_point)) *
+                                fe_values.JxW (q_point));
 
-      cell->get_dof_indices (local_dof_indices);
-      constraints.distribute_local_to_global(cell_matrix, cell_rhs,
-                                             local_dof_indices,
-                                             system_matrix, system_rhs);
+                cell_rhs_two(i) += (fe_values.shape_value (i, q_point) *
+                                    right_hand_side.value (fe_values.quadrature_point (q_point)) *
+                                    fe_values.JxW (q_point));
+
+              }
+
+          cell->get_dof_indices (local_dof_indices);
+          constraints.distribute_local_to_global(cell_matrix, cell_rhs,
+                                                 local_dof_indices,
+                                                 system_matrix, system_rhs);
+
+          constraints.distribute_local_to_global(cell_rhs_two,
+                                                 local_dof_indices,
+                                                 system_rhs_two);
+        }
     }
   system_matrix.compress(VectorOperation::add);
+  system_rhs.compress(VectorOperation::add);
+  system_rhs_two.compress(VectorOperation::add);
 }
 
 
@@ -207,79 +291,79 @@ void Step4<dim>::solve ()
 {
   // Compute 'reference' solution with CG solver and SSOR preconditioner
   TrilinosWrappers::PreconditionSSOR preconditioner;
-  solution = 0;
-  SolverControl           solver_control (1000, 1e-12);
-  SolverCG<>              solver (solver_control);
   preconditioner.initialize(system_matrix);
-  solver.solve (system_matrix, solution, system_rhs,
+  TrilinosWrappers::MPI::Vector      temp_solution(system_rhs);
+  temp_solution = 0;
+  SolverControl           solver_control (1000, 1e-12);
+  SolverCG<TrilinosWrappers::MPI::Vector>  solver (solver_control);
+
+  solver.solve (system_matrix, temp_solution, system_rhs,
                 preconditioner);
 
-  Vector<double> output(solution);
-  {
-    deallog.push("DirectKLU");
-    TrilinosWrappers::SolverDirect::AdditionalData data;
-    data.solver_type = "Amesos_Klu";
-    SolverControl           solver_control (1000, 1e-10);
-    TrilinosWrappers::SolverDirect solver(solver_control, data);
-    solver.initialize (system_matrix);
-    solver.solve (system_matrix, output, system_rhs);
-    output -= solution;
-    deallog << "Norm of error in direct solve: " << output.l2_norm()
-            << std::endl;
-    deallog.pop();
-  }
+  constraints.distribute(temp_solution);
+  solution = temp_solution;
 
-  {
-    deallog.push("DirectLAPACK");
-    TrilinosWrappers::SolverDirect::AdditionalData data;
-    data.solver_type = "Amesos_Lapack";
-    SolverControl           solver_control (1000, 1e-10);
-    TrilinosWrappers::SolverDirect solver(solver_control, data);
-    solver.initialize (system_matrix);
-    solver.solve (output, system_rhs);
-    output -= solution;
-    deallog << "Norm of error in direct solve: " << output.l2_norm()
-            << std::endl;
-    deallog.pop();
-  }
+  TrilinosWrappers::MPI::Vector output(temp_solution);
 
-  {
-    deallog.push("DirectDscpack");
-    TrilinosWrappers::SolverDirect::AdditionalData data;
-    data.solver_type = "Amesos_Dscpack";
-    SolverControl           solver_control (1000, 1e-10);
-    TrilinosWrappers::SolverDirect solver(solver_control, data);
-    try
-      {
-        solver.initialize (system_matrix);
-        solver.solve (output, system_rhs);
-      }
-    catch (dealii::ExceptionBase &exc)
-      {
-        deallog << "Error: " << std::endl;
-        exc.print_info(deallog.get_file_stream());
-      }
-    deallog.pop();
-  }
+  // do CG solve for new rhs
+  temp_solution = 0;
+  solution = 0;
+  solver.solve (system_matrix, temp_solution, system_rhs_two,
+                preconditioner);
 
-  {
-    deallog.push("Dummy");
-    TrilinosWrappers::SolverDirect::AdditionalData data;
-    data.solver_type = "DummySolver";
-    SolverControl           solver_control (1000, 1e-10);
-    TrilinosWrappers::SolverDirect solver(solver_control, data);
-    try
-      {
-        solver.initialize (system_matrix);
-        solver.solve (output, system_rhs);
-      }
-    catch (dealii::ExceptionBase &exc)
-      {
-        deallog << "Error: " << std::endl;
-        exc.print_info(deallog.get_file_stream());
-      }
-    deallog.pop();
-  }
+  constraints.distribute(temp_solution);
+  solution = temp_solution;
+
+  TrilinosWrappers::MPI::Vector output_two(temp_solution);
+
+  // factorize matrix for direct solver
+  temp_solution = 0;
+  solution = 0;
+
+  deallog.push("DirectKLU");
+  TrilinosWrappers::SolverDirect::AdditionalData data;
+  data.solver_type = "Amesos_Klu";
+  TrilinosWrappers::SolverDirect direct_solver(solver_control, data);
+  direct_solver.initialize (system_matrix);
+
+  // do solve 1
+  direct_solver.solve (temp_solution, system_rhs);
+
+  constraints.distribute(temp_solution);
+  solution = temp_solution;
+
+  // calculate l2 errors
+  output.add(-1.0,temp_solution);
+
+  const double local_error = output.l2_norm();
+  const double global_error = std::sqrt(Utilities::MPI::sum(
+                                          local_error * local_error,
+                                          MPI_COMM_WORLD));
+
+  deallog << "Norm of error in direct solve 1: " << global_error
+          << std::endl;
+
+  // do solve 2 without refactorizing
+  temp_solution = 0;
+  solution = 0;
+  direct_solver.solve (temp_solution, system_rhs_two);
+
+  constraints.distribute(temp_solution);
+  solution = temp_solution;
+
+  // calculate l2 errors
+  output_two.add(-1.0,temp_solution);
+
+  const double local_error_two = output_two.l2_norm();
+  const double global_error_two = std::sqrt(Utilities::MPI::sum(
+                                              local_error_two * local_error_two,
+                                              MPI_COMM_WORLD));
+
+  deallog << "Norm of error in direct solve 2: " << global_error_two
+          << std::endl;
+
+  deallog.pop();
+
 }
 
 

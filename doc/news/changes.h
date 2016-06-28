@@ -139,6 +139,12 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li> New: Added TrilinosWrappers::SolveDirect::Initialize and
+ TrilinosWrappers::SolverDirect::Solve to solve distributed linear systems 
+ with multiple right hand sides without needing to refactorize the matrix
+ everytime. Also, added unit test for testing the new functionality.
+ (Michael Harmon, 2016/06/30)
+ </li>
 
  <li> New: Add new classes to expand a scalar finite element solution into
  the orthogonal bases FESeries::Fourier and FESeries::Legendre. Also
