@@ -25,16 +25,16 @@ namespace PyDealII
                                                boost::python::init<TriangulationWrapper &, const int, const int> ())
     .add_property("refine_flag", &CellAccessorWrapper::get_refine_flag,
                   &CellAccessorWrapper::set_refine_flag,
-                  "Get the refine_flag of the cell. The possibilities are in 2D: isotropic, no_refinement, cut_x, cut_y, and cut_xy and in 3D: isotropic, no_refinement, cut_x, cut_y, cut_z, cut_xy, cut_xz, cut_yz, and cut_xyz.")
+                  "Get/Set the refine_flag of the cell. The possibilities are in 2D: isotropic, no_refinement, cut_x, cut_y, and cut_xy and in 3D: isotropic, no_refinement, cut_x, cut_y, cut_z, cut_xy, cut_xz, cut_yz, and cut_xyz.")
     .add_property("coarsen_flag", &CellAccessorWrapper::get_coarsen_flag,
                   &CellAccessorWrapper::set_coarsen_flag,
-                  "Get the coarsen_flag of the cell.")
+                  "Get/Set the coarsen_flag of the cell.")
     .add_property("material_id", &CellAccessorWrapper::get_material_id,
                   &CellAccessorWrapper::set_material_id,
-                  "Get the material_id of the cell.")
+                  "Get/Set the material_id of the cell.")
     .add_property("manifold_id", &CellAccessorWrapper::get_manifold_id,
                   &CellAccessorWrapper::set_manifold_id,
-                  "Get the manifold_id of the cell.")
+                  "Get/Set the manifold_id of the cell.")
     .def("barycenter", &CellAccessorWrapper::get_barycenter,
          "Return the barycenter of the current cell.",
          boost::python::args("self"))

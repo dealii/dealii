@@ -188,10 +188,10 @@ namespace PyDealII
     template <int dim, int spacedim>
     void write(const std::string &filename,
                const std::string &format,
-               void              *triangulation)
+               const void        *triangulation)
     {
-      dealii::Triangulation<dim,spacedim> *tria =
-        static_cast<dealii::Triangulation<dim,spacedim>*>(triangulation);
+      const dealii::Triangulation<dim,spacedim> *tria =
+        static_cast<const dealii::Triangulation<dim,spacedim>*>(triangulation);
 
       dealii::GridOut::OutputFormat output_format;
       if (format.compare("dx") == 0)

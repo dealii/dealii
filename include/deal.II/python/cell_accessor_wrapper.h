@@ -56,7 +56,7 @@ namespace PyDealII
     /**
      * Get the refine flag.
      */
-    std::string get_refine_flag();
+    std::string get_refine_flag() const;
 
     /**
      * Set the coarsen flag to true or false.
@@ -66,12 +66,12 @@ namespace PyDealII
     /**
      * Get the coarsen flag.
      */
-    bool get_coarsen_flag();
+    bool get_coarsen_flag() const;
 
     /**
      * Get the barycenter of the cell.
      */
-    PointWrapper get_barycenter();
+    PointWrapper get_barycenter() const;
 
     /**
      * Set the material id.
@@ -81,7 +81,7 @@ namespace PyDealII
     /**
      * Get the material id.
      */
-    int get_material_id();
+    int get_material_id() const;
 
     /**
      * Set the ith vertex of the cell to @p point_wrapper.
@@ -91,7 +91,7 @@ namespace PyDealII
     /**
      * Return the ith vertex of the cell.
      */
-    PointWrapper get_vertex(const int i);
+    PointWrapper get_vertex(const int i) const;
 
     /**
      * Set the manifold id.
@@ -101,7 +101,16 @@ namespace PyDealII
     /**
      * Get the manifold id.
      */
-    int get_manifold_id();
+    int get_manifold_id() const;
+
+    /**
+     * Exception.
+     */
+    DeclException2(ExcVertexDoesNotExist,
+                   int, int,
+                   << "Requested vertex number " << arg1
+                   << "does not exist. The largest vertex number "
+                   << "acceptable is "<< arg2-1);
 
   private:
     /**

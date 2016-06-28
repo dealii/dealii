@@ -88,7 +88,7 @@ namespace PyDealII
          boost::python::args("self"))
     .def("write",
          &TriangulationWrapper::write,
-         "Write grid to the output file according to the given data format. The possible formats are: none, dx, gnuplot, eps, ucd, xfig, msh, svg, mathgl, vtk, and vtu.",
+         "Write the mesh to the output file according to the given data format. The possible formats are: none, dx, gnuplot, eps, ucd, xfig, msh, svg, mathgl, vtk, and vtu.",
          boost::python::args("self", "filename", "format"))
     .def("save",
          &TriangulationWrapper::save,

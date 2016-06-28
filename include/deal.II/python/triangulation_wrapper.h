@@ -122,7 +122,7 @@ namespace PyDealII
     void execute_coarsening_and_refinement();
 
     /**
-     * Write grid to the output file @filename according to the given data format.
+     * Write mesh to the output file @filename according to the given data format.
      */
     void write(const std::string &filename, const std::string format) const;
 

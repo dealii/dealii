@@ -47,33 +47,17 @@ namespace PyDealII
                          dealii::RefinementPossibilities<dim>::Possibilities::cut_xy));
 #if dim==3
       else if (refinement_case.compare("cut_z") == 0)
-        {
-          AssertThrow(dim == 3,
-                      dealii::ExcMessage("cut_z can only be use for dim equals to 3."));
-          ref_case.reset(new dealii::RefinementCase<3>(
-                           dealii::RefinementPossibilities<3>::Possibilities::cut_z));
-        }
+        ref_case.reset(new dealii::RefinementCase<3>(
+                         dealii::RefinementPossibilities<3>::Possibilities::cut_z));
       else if (refinement_case.compare("cut_xz") == 0)
-        {
-          AssertThrow(dim == 3,
-                      dealii::ExcMessage("cut_xz can only be use for dim equals to 3."));
-          ref_case.reset(new dealii::RefinementCase<3>(
-                           dealii::RefinementPossibilities<3>::Possibilities::cut_xz));
-        }
+        ref_case.reset(new dealii::RefinementCase<3>(
+                         dealii::RefinementPossibilities<3>::Possibilities::cut_xz));
       else if (refinement_case.compare("cut_yz") == 0)
-        {
-          AssertThrow(dim == 3,
-                      dealii::ExcMessage("cut_yz can only be use for dim equals to 3."));
-          ref_case.reset(new dealii::RefinementCase<3>(
-                           dealii::RefinementPossibilities<3>::Possibilities::cut_yz));
-        }
+        ref_case.reset(new dealii::RefinementCase<3>(
+                         dealii::RefinementPossibilities<3>::Possibilities::cut_yz));
       else if (refinement_case.compare("cut_xyz") == 0)
-        {
-          AssertThrow(dim == 3,
-                      dealii::ExcMessage("cut_xyz can only be use for dim equals to 3."));
-          ref_case.reset(new dealii::RefinementCase<3>(
-                           dealii::RefinementPossibilities<3>::Possibilities::cut_xyz));
-        }
+        ref_case.reset(new dealii::RefinementCase<3>(
+                         dealii::RefinementPossibilities<3>::Possibilities::cut_xyz));
 #endif
       else
         AssertThrow(false,
@@ -85,10 +69,10 @@ namespace PyDealII
 
 
     template <int dim, int spacedim>
-    std::string get_refine_flag(void *cell_accessor)
+    std::string get_refine_flag(const void *cell_accessor)
     {
-      dealii::CellAccessor<dim,spacedim> *cell =
-        static_cast<dealii::CellAccessor<dim,spacedim>*>(cell_accessor);
+      const dealii::CellAccessor<dim,spacedim> *cell =
+        static_cast<const dealii::CellAccessor<dim,spacedim>*>(cell_accessor);
 
       std::string refine_flag;
       dealii::RefinementCase<dim> ref_case = cell->refine_flag_set();
@@ -159,10 +143,10 @@ namespace PyDealII
 
 
     template <int dim, int spacedim>
-    bool get_coarsen_flag(void *cell_accessor)
+    bool get_coarsen_flag(const void *cell_accessor)
     {
-      dealii::CellAccessor<dim,spacedim> *cell =
-        static_cast<dealii::CellAccessor<dim,spacedim>*>(cell_accessor);
+      const dealii::CellAccessor<dim,spacedim> *cell =
+        static_cast<const dealii::CellAccessor<dim,spacedim>*>(cell_accessor);
 
       return cell->coarsen_flag_set();
     }
@@ -170,10 +154,10 @@ namespace PyDealII
 
 
     template <int dim, int spacedim>
-    PointWrapper get_barycenter(void *cell_accessor)
+    PointWrapper get_barycenter(const void *cell_accessor)
     {
-      dealii::CellAccessor<dim,spacedim> *cell =
-        static_cast<dealii::CellAccessor<dim,spacedim>*>(cell_accessor);
+      const dealii::CellAccessor<dim,spacedim> *cell =
+        static_cast<const dealii::CellAccessor<dim,spacedim>*>(cell_accessor);
       dealii::Point<spacedim> barycenter = cell->barycenter();
       boost::python::list barycenter_list;
       for (int i=0; i<dim; ++i)
@@ -195,10 +179,10 @@ namespace PyDealII
 
 
     template <int dim, int spacedim>
-    int get_material_id(void *cell_accessor)
+    int get_material_id(const void *cell_accessor)
     {
-      dealii::CellAccessor<dim,spacedim> *cell =
-        static_cast<dealii::CellAccessor<dim,spacedim>*>(cell_accessor);
+      const dealii::CellAccessor<dim,spacedim> *cell =
+        static_cast<const dealii::CellAccessor<dim,spacedim>*>(cell_accessor);
 
       return cell->material_id();
     }
@@ -221,10 +205,10 @@ namespace PyDealII
 
 
     template <int dim, int spacedim>
-    PointWrapper get_vertex(const int i, void *cell_accessor)
+    PointWrapper get_vertex(const int i, const void *cell_accessor)
     {
-      dealii::CellAccessor<dim,spacedim> *cell =
-        static_cast<dealii::CellAccessor<dim,spacedim>*>(cell_accessor);
+      const dealii::CellAccessor<dim,spacedim> *cell =
+        static_cast<const dealii::CellAccessor<dim,spacedim>*>(cell_accessor);
       dealii::Point<spacedim> vertex = cell->vertex(i);
 
       boost::python::list coordinates;
@@ -247,10 +231,10 @@ namespace PyDealII
 
 
     template <int dim, int spacedim>
-    int get_manifold_id(void *cell_accessor)
+    int get_manifold_id(const void *cell_accessor)
     {
-      dealii::CellAccessor<dim,spacedim> *cell =
-        static_cast<dealii::CellAccessor<dim,spacedim>*>(cell_accessor);
+      const dealii::CellAccessor<dim,spacedim> *cell =
+        static_cast<const dealii::CellAccessor<dim,spacedim>*>(cell_accessor);
       cell->manifold_id();
     }
   }
@@ -260,7 +244,7 @@ namespace PyDealII
   CellAccessorWrapper::CellAccessorWrapper(const CellAccessorWrapper &other)
     :
     dim(other.dim),
-    spacedim(other.dim)
+    spacedim(other.spacedim)
   {
     if ((dim == 2) && (spacedim == 2))
       {
@@ -362,7 +346,7 @@ namespace PyDealII
 
 
 
-  std::string CellAccessorWrapper::get_refine_flag()
+  std::string CellAccessorWrapper::get_refine_flag() const
   {
     if ((dim == 2) && (spacedim == 2))
       return internal::get_refine_flag<2,2>(cell_accessor);
@@ -386,7 +370,7 @@ namespace PyDealII
 
 
 
-  bool CellAccessorWrapper::get_coarsen_flag()
+  bool CellAccessorWrapper::get_coarsen_flag() const
   {
     if ((dim == 2) && (spacedim == 2))
       return internal::get_coarsen_flag<2,2>(cell_accessor);
@@ -397,7 +381,7 @@ namespace PyDealII
   }
 
 
-  PointWrapper CellAccessorWrapper::get_barycenter()
+  PointWrapper CellAccessorWrapper::get_barycenter() const
   {
     if ((dim == 2) && (spacedim == 2))
       return internal::get_barycenter<2,2>(cell_accessor);
@@ -423,7 +407,7 @@ namespace PyDealII
 
 
 
-  int CellAccessorWrapper::get_material_id()
+  int CellAccessorWrapper::get_material_id() const
   {
     if ((dim == 2) && (spacedim == 2))
       return internal::get_material_id<2,2>(cell_accessor);
@@ -439,7 +423,7 @@ namespace PyDealII
                                        PointWrapper &point_wrapper)
   {
     AssertThrow(i<std::pow(2,dim),
-                dealii::ExcMessage("The vertex does not exist."));
+                ExcVertexDoesNotExist(i, std::pow(2,dim)));
     if ((dim == 2) && (spacedim == 2))
       internal::set_vertex<2,2>(i, point_wrapper, cell_accessor);
     else if ((dim == 2) && (spacedim == 3))
@@ -450,10 +434,10 @@ namespace PyDealII
 
 
 
-  PointWrapper CellAccessorWrapper::get_vertex(const int i)
+  PointWrapper CellAccessorWrapper::get_vertex(const int i) const
   {
     AssertThrow(i<std::pow(2,dim),
-                dealii::ExcMessage("The vertex does not exist."));
+                ExcVertexDoesNotExist(i, std::pow(2,dim)));
     if ((dim == 2) && (spacedim == 2))
       return internal::get_vertex<2,2>(i, cell_accessor);
     else if ((dim == 2) && (spacedim == 3))
@@ -476,7 +460,7 @@ namespace PyDealII
 
 
 
-  int CellAccessorWrapper::get_manifold_id()
+  int CellAccessorWrapper::get_manifold_id() const
   {
     if ((dim == 2) && (spacedim == 2))
       internal::get_manifold_id<2,2>(cell_accessor);
