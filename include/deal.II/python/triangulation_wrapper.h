@@ -19,6 +19,7 @@
 #include <boost/python.hpp>
 #include <deal.II/python/point_wrapper.h>
 #include <string>
+#include <vector>
 
 namespace PyDealII
 {
@@ -122,6 +123,12 @@ namespace PyDealII
     void execute_coarsening_and_refinement();
 
     /**
+     * Return the list of active cell accessors associated to the underlying
+     * Triangulation.
+     */
+    boost::python::list active_cells();
+
+    /**
      * Write mesh to the output file @filename according to the given data format.
      */
     void write(const std::string &filename, const std::string format) const;
@@ -152,27 +159,11 @@ namespace PyDealII
      */
     void *get_triangulation();
 
-    /**
-     * Iterator to the first active cell of the underlying Triangulation.
-     */
-    iterator begin();
-
-    /**
-     * Iterator past the end.
-     */
-    iterator end();
-
   private:
     /**
      * Helper function for the contructors.
      */
     void setup(const std::string &dimension, const std::string &spacedimension);
-
-    /**
-     * Build the vector of CellAccessorWrapper. This allows access to the
-     * CellAccessor associated to the underlying Triangulation.
-     */
-    void build_cells_vector();
 
     /**
      * Flag is true if the vector cells has been updated.
@@ -193,11 +184,6 @@ namespace PyDealII
      * Pointer that can be casted to the underlying Triangulation object.
      */
     void *triangulation;
-
-    /**
-     * Vector of all the cells of the Triangulation.
-     */
-    std::vector<CellAccessorWrapper> cells;
   };
 
 

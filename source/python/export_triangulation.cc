@@ -35,7 +35,6 @@ namespace PyDealII
   {
     boost::python::class_<TriangulationWrapper>("Triangulation", boost::python::init<const std::string &>())
     .def(boost::python::init<const std::string &, const std::string &>())
-    .def("__iter__", boost::python::iterator<TriangulationWrapper>())
     .def("n_active_cells",
          &TriangulationWrapper::n_active_cells,
          "Return the number of active cells",
@@ -85,6 +84,10 @@ namespace PyDealII
     .def("execute_coarsening_and_refinement",
          &TriangulationWrapper::execute_coarsening_and_refinement,
          "Execute both refinement and coarsening of the Triangulation.",
+         boost::python::args("self"))
+    .def("active_cells",
+         &TriangulationWrapper::active_cells,
+         "Return the list of active cell accessors of the Triangulation.",
          boost::python::args("self"))
     .def("write",
          &TriangulationWrapper::write,

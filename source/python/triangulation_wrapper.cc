@@ -172,15 +172,17 @@ namespace PyDealII
 
 
     template <int dim, int spacedim>
-    void build_cells_vector(TriangulationWrapper             &triangulation_wrapper,
-                            std::vector<CellAccessorWrapper> &cells)
+    boost::python::list active_cells(TriangulationWrapper &triangulation_wrapper)
     {
       dealii::Triangulation<dim,spacedim> *tria =
         static_cast<dealii::Triangulation<dim,spacedim>*>(
           triangulation_wrapper.get_triangulation());
+      boost::python::list cells;
       for (auto cell : tria->active_cell_iterators())
-        cells.push_back(CellAccessorWrapper(triangulation_wrapper, cell->level(),
-                                            cell->index()));
+        cells.append(CellAccessorWrapper(triangulation_wrapper, cell->level(),
+                                         cell->index()));
+
+      return cells;
     }
 
 
@@ -558,28 +560,15 @@ namespace PyDealII
 
 
 
-  TriangulationWrapper::iterator TriangulationWrapper::begin()
+  boost::python::list TriangulationWrapper::active_cells()
   {
-    // Build the vector containing all the CellAccessorWrapper when the iterator
-    // is called. This way, we don't need to keep track of the changes on the
-    // Triangulation.
-    build_cells_vector();
-
-    return cells.begin();
+    if ((dim == 2) && (spacedim == 2))
+      return internal::active_cells<2,2>(*this);
+    else if ((dim == 2) && (spacedim == 3))
+      return internal::active_cells<2,3>(*this);
+    else
+      return internal::active_cells<3,3>(*this);
   }
-
-
-
-  TriangulationWrapper::iterator TriangulationWrapper::end()
-  {
-    // Python seems to call end() before begin() so call build_cells_vector in
-    // both begin() and end(). The updated flag makes sure that the vector of
-    // CellAccessorWrapper is only build once.
-    build_cells_vector();
-
-    return cells.end();
-  }
-
 
 
   void TriangulationWrapper::setup(const std::string &dimension,
@@ -615,24 +604,5 @@ namespace PyDealII
       }
     else
       AssertThrow(false, dealii::ExcMessage("Dimension needs to be 2D or 3D."));
-  }
-
-
-
-  void TriangulationWrapper::build_cells_vector()
-  {
-    if (updated == false)
-      {
-        cells.clear();
-        if ((dim == 2) && (spacedim == 2))
-          internal::build_cells_vector<2,2>(*this, cells);
-        else if ((dim == 2) && (spacedim == 3))
-          internal::build_cells_vector<2,3>(*this, cells);
-        else
-          internal::build_cells_vector<3,3>(*this, cells);
-        updated = true;
-      }
-    else
-      updated = false;
   }
 }

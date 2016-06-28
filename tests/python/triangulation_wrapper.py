@@ -127,7 +127,7 @@ class TestTriangulationWrapper(unittest.TestCase):
         for dim in self.dim:
             triangulation = self.build_hyper_cube_triangulation(dim)
             triangulation.refine_global(1)
-            for cell in triangulation:
+            for cell in triangulation.active_cells():
                 cell.refine_flag = 'isotropic'
                 break
             triangulation.execute_coarsening_and_refinement()
