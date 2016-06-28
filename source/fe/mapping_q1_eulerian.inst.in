@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2015 by the deal.II authors
+// Copyright (C) 1998 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,29 +14,11 @@
 // ---------------------------------------------------------------------
 
 
-
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS; VEC : REAL_SERIAL_VECTORS)
   {
 #if deal_II_dimension <= deal_II_space_dimension 	
-    template class MappingQ1Eulerian<deal_II_dimension, Vector<double>,	deal_II_space_dimension>;
-    template class MappingQ1Eulerian<deal_II_dimension, Vector<float>,	deal_II_space_dimension>;
-#  ifdef DEAL_II_WITH_PETSC
-#  ifndef PETSC_USE_COMPLEX 
-    template class MappingQ1Eulerian<deal_II_dimension,
-			 	    PETScWrappers::Vector, deal_II_space_dimension>;
-    template class MappingQ1Eulerian<deal_II_dimension,
-				    PETScWrappers::MPI::Vector, deal_II_space_dimension>;
-#  endif
-#  endif   
-#  ifdef DEAL_II_WITH_TRILINOS
-    template class MappingQ1Eulerian<deal_II_dimension,
-                                    TrilinosWrappers::Vector, deal_II_space_dimension>;
-    template class MappingQ1Eulerian<deal_II_dimension,
-                                    TrilinosWrappers::MPI::Vector, deal_II_space_dimension>;
-    template class MappingQ1Eulerian<deal_II_dimension,
-                                    TrilinosWrappers::BlockVector, deal_II_space_dimension>;
-    template class MappingQ1Eulerian<deal_II_dimension,
-                                    TrilinosWrappers::MPI::BlockVector, deal_II_space_dimension>;
-#  endif
+    template class MappingQ1Eulerian<deal_II_dimension, VEC, deal_II_space_dimension>;
 #endif
   }
+
+
