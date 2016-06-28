@@ -137,7 +137,7 @@ void test()
 int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  mpi_initlog();
+  initlog();
 
   test<2>();
 }
@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  mpi_initlog();
+  initlog();
   deallog << "Ok" << std::endl;
 }
 #endif
