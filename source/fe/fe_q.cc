@@ -33,7 +33,7 @@ namespace
     else
       {
         typedef FE_Q_Base<TensorProductPolynomials<1>, 1, 1> FEQ;
-        AssertThrow(false, typename FEQ::ExcFEQCannotHaveDegree0());
+        AssertThrow(false, FEQ::ExcFEQCannotHaveDegree0());
       }
     return std::vector<Point<1> >();
   }
