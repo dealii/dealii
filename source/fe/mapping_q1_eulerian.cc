@@ -32,10 +32,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int dim, class EulerVectorType, int spacedim>
-MappingQ1Eulerian<dim, EulerVectorType, spacedim>::
+template <int dim, class VectorType, int spacedim>
+MappingQ1Eulerian<dim, VectorType, spacedim>::
 MappingQ1Eulerian (const DoFHandler<dim,spacedim> &shiftmap_dof_handler,
-                   const EulerVectorType  &euler_transform_vectors)
+                   const VectorType               &euler_transform_vectors)
   :
   MappingQGeneric<dim,spacedim>(1),
   euler_transform_vectors(&euler_transform_vectors),
@@ -43,9 +43,9 @@ MappingQ1Eulerian (const DoFHandler<dim,spacedim> &shiftmap_dof_handler,
 {}
 
 
-template <int dim, class EulerVectorType, int spacedim>
-MappingQ1Eulerian<dim, EulerVectorType, spacedim>::
-MappingQ1Eulerian (const EulerVectorType  &euler_transform_vectors,
+template <int dim, class VectorType, int spacedim>
+MappingQ1Eulerian<dim, VectorType, spacedim>::
+MappingQ1Eulerian (const VectorType               &euler_transform_vectors,
                    const DoFHandler<dim,spacedim> &shiftmap_dof_handler)
   :
   MappingQGeneric<dim,spacedim>(1),
@@ -55,9 +55,9 @@ MappingQ1Eulerian (const EulerVectorType  &euler_transform_vectors,
 
 
 
-template <int dim, class EulerVectorType, int spacedim>
+template <int dim, class VectorType, int spacedim>
 std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
-MappingQ1Eulerian<dim, EulerVectorType, spacedim>::
+MappingQ1Eulerian<dim, VectorType, spacedim>::
 get_vertices
 (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
 {
@@ -104,9 +104,9 @@ get_vertices
 
 
 
-template<int dim, class EulerVectorType, int spacedim>
+template<int dim, class VectorType, int spacedim>
 std::vector<Point<spacedim> >
-MappingQ1Eulerian<dim,EulerVectorType,spacedim>::
+MappingQ1Eulerian<dim,VectorType,spacedim>::
 compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
 {
   const std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
@@ -123,18 +123,18 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
 
 
 
-template <int dim, class EulerVectorType, int spacedim>
-MappingQ1Eulerian<dim,EulerVectorType,spacedim> *
-MappingQ1Eulerian<dim, EulerVectorType, spacedim>::clone () const
+template <int dim, class VectorType, int spacedim>
+MappingQ1Eulerian<dim,VectorType,spacedim> *
+MappingQ1Eulerian<dim, VectorType, spacedim>::clone () const
 {
-  return new MappingQ1Eulerian<dim,EulerVectorType,spacedim>(*this);
+  return new MappingQ1Eulerian<dim,VectorType,spacedim>(*this);
 }
 
 
 
-template<int dim, class EulerVectorType, int spacedim>
+template<int dim, class VectorType, int spacedim>
 CellSimilarity::Similarity
-MappingQ1Eulerian<dim,EulerVectorType,spacedim>::
+MappingQ1Eulerian<dim,VectorType,spacedim>::
 fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                 const CellSimilarity::Similarity                           ,
                 const Quadrature<dim>                                     &quadrature,
