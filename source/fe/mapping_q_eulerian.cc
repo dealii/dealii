@@ -38,10 +38,10 @@ DEAL_II_NAMESPACE_OPEN
 
 // .... MAPPING Q EULERIAN CONSTRUCTOR
 
-template <int dim, class EulerVectorType, int spacedim>
-MappingQEulerian<dim, EulerVectorType, spacedim>::MappingQEulerianGeneric::
-MappingQEulerianGeneric (const unsigned int degree,
-                         const MappingQEulerian<dim, EulerVectorType, spacedim> &mapping_q_eulerian)
+template <int dim, class VectorType, int spacedim>
+MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
+MappingQEulerianGeneric (const unsigned int                                 degree,
+                         const MappingQEulerian<dim, VectorType, spacedim> &mapping_q_eulerian)
   :
   MappingQGeneric<dim,spacedim>(degree),
   mapping_q_eulerian (mapping_q_eulerian),
@@ -51,10 +51,10 @@ MappingQEulerianGeneric (const unsigned int degree,
             update_values | update_q_points)
 {}
 
-template <int dim, class EulerVectorType, int spacedim>
-MappingQEulerian<dim, EulerVectorType, spacedim>::
-MappingQEulerian (const unsigned int degree,
-                  const EulerVectorType &euler_vector,
+template <int dim, class VectorType, int spacedim>
+MappingQEulerian<dim, VectorType, spacedim>::
+MappingQEulerian (const unsigned int              degree,
+                  const VectorType               &euler_vector,
                   const DoFHandler<dim,spacedim> &euler_dof_handler)
   :
   MappingQ<dim,spacedim>(degree, true),
@@ -64,7 +64,7 @@ MappingQEulerian (const unsigned int degree,
   // reset the q1 mapping we use for interior cells (and previously
   // set by the MappingQ constructor) to a MappingQ1Eulerian with the
   // current vector
-  this->q1_mapping.reset (new MappingQ1Eulerian<dim,EulerVectorType,spacedim>(euler_vector,
+  this->q1_mapping.reset (new MappingQ1Eulerian<dim,VectorType,spacedim>(euler_vector,
                           euler_dof_handler));
 
   // also reset the qp mapping pointer with our own class
@@ -73,11 +73,11 @@ MappingQEulerian (const unsigned int degree,
 
 
 
-template <int dim, class EulerVectorType, int spacedim>
-MappingQEulerian<dim, EulerVectorType, spacedim>::
-MappingQEulerian (const unsigned int degree,
+template <int dim, class VectorType, int spacedim>
+MappingQEulerian<dim, VectorType, spacedim>::
+MappingQEulerian (const unsigned int              degree,
                   const DoFHandler<dim,spacedim> &euler_dof_handler,
-                  const EulerVectorType &euler_vector)
+                  const VectorType               &euler_vector)
   :
   MappingQ<dim,spacedim>(degree, true),
   euler_vector(&euler_vector),
@@ -86,7 +86,7 @@ MappingQEulerian (const unsigned int degree,
   // reset the q1 mapping we use for interior cells (and previously
   // set by the MappingQ constructor) to a MappingQ1Eulerian with the
   // current vector
-  this->q1_mapping.reset (new MappingQ1Eulerian<dim,EulerVectorType,spacedim>(euler_vector,
+  this->q1_mapping.reset (new MappingQ1Eulerian<dim,VectorType,spacedim>(euler_vector,
                           euler_dof_handler));
 
   // also reset the qp mapping pointer with our own class
@@ -95,21 +95,21 @@ MappingQEulerian (const unsigned int degree,
 
 
 
-template <int dim, class EulerVectorType, int spacedim>
+template <int dim, class VectorType, int spacedim>
 Mapping<dim,spacedim> *
-MappingQEulerian<dim, EulerVectorType, spacedim>::clone () const
+MappingQEulerian<dim, VectorType, spacedim>::clone () const
 {
-  return new MappingQEulerian<dim,EulerVectorType,spacedim>(this->get_degree(),
-                                                            *euler_vector,
-                                                            *euler_dof_handler);
+  return new MappingQEulerian<dim,VectorType,spacedim>(this->get_degree(),
+                                                       *euler_vector,
+                                                       *euler_dof_handler);
 }
 
 
 
 // .... SUPPORT QUADRATURE CONSTRUCTOR
 
-template <int dim, class EulerVectorType, int spacedim>
-MappingQEulerian<dim,EulerVectorType,spacedim>::MappingQEulerianGeneric::
+template <int dim, class VectorType, int spacedim>
+MappingQEulerian<dim,VectorType,spacedim>::MappingQEulerianGeneric::
 SupportQuadrature::
 SupportQuadrature (const unsigned int map_degree)
   :
@@ -141,9 +141,9 @@ SupportQuadrature (const unsigned int map_degree)
 
 // .... COMPUTE MAPPING SUPPORT POINTS
 
-template <int dim, class EulerVectorType, int spacedim>
+template <int dim, class VectorType, int spacedim>
 std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
-MappingQEulerian<dim, EulerVectorType, spacedim>::
+MappingQEulerian<dim, VectorType, spacedim>::
 get_vertices
 (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
 {
@@ -161,9 +161,9 @@ get_vertices
 
 
 
-template <int dim, class EulerVectorType, int spacedim>
+template <int dim, class VectorType, int spacedim>
 std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
-MappingQEulerian<dim, EulerVectorType, spacedim>::MappingQEulerianGeneric::
+MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
 get_vertices
 (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
 {
@@ -173,9 +173,9 @@ get_vertices
 
 
 
-template <int dim, class EulerVectorType, int spacedim>
+template <int dim, class VectorType, int spacedim>
 std::vector<Point<spacedim> >
-MappingQEulerian<dim, EulerVectorType, spacedim>::MappingQEulerianGeneric::
+MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
 compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
 {
   // first, basic assertion with respect to vector size,
@@ -211,9 +211,9 @@ compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell
 
   Assert (n_components >= spacedim, ExcDimensionMismatch(n_components, spacedim) );
 
-  std::vector<Vector<typename EulerVectorType::value_type> >
+  std::vector<Vector<typename VectorType::value_type> >
   shift_vector(n_support_pts,
-               Vector<typename EulerVectorType::value_type>(n_components));
+               Vector<typename VectorType::value_type>(n_components));
 
   // fill shift vector for each support point using an fe_values object. make
   // sure that the fe_values variable isn't used simultaneously from different
@@ -237,9 +237,9 @@ compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell
 
 
 
-template<int dim, class EulerVectorType, int spacedim>
+template<int dim, class VectorType, int spacedim>
 CellSimilarity::Similarity
-MappingQEulerian<dim,EulerVectorType,spacedim>::
+MappingQEulerian<dim,VectorType,spacedim>::
 fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                 const CellSimilarity::Similarity                           ,
                 const Quadrature<dim>                                     &quadrature,
