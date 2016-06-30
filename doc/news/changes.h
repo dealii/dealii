@@ -150,6 +150,14 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+
+ <li> New: Added TrilinosWrappers::SolveDirect::Initialize and
+ TrilinosWrappers::SolverDirect::Solve to solve distributed linear systems 
+ with multiple right hand sides without needing to refactorize the matrix
+ everytime. Also, added unit test for testing the new functionality.
+ (Michael Harmon, 2016/06/30)
+ </li>
+
  <li> Changed: Similar to MappingQEulerian, MappingQ1Eulerian has gained
  a second constructor that reverses the order of the arguments to indicate
  which DoFHandler a vector is based on. The old constructor is now
