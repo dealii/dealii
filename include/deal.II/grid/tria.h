@@ -1041,7 +1041,7 @@ namespace internal
  * computers that aren't very reliable (e.g. on very large clusters where
  * individual nodes occasionally fail and then bring down an entire MPI job).
  *
- * For technical reasons, writing and restoring a Triangulation object is not-
+ * For technical reasons, writing and restoring a Triangulation object is not
  * trivial. The primary reason is that unlike many other objects,
  * triangulations rely on many other objects to which they store pointers or
  * with which they interface; for example, triangulations store pointers to
