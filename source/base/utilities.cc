@@ -244,7 +244,7 @@ namespace Utilities
     errno = 0;
     const double d = std::strtod(s.c_str(), &p);
     AssertThrow ( !((errno != 0) || (s.size() == 0) || ((s.size()>0) && (*p != '\0'))),
-                  ExcMessage ("Can't convert <" + s + "> to an integer."));
+                  ExcMessage ("Can't convert <" + s + "> to a double."));
 
     return d;
   }

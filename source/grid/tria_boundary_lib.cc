@@ -601,8 +601,17 @@ HyperBallBoundary<dim,spacedim>::get_intermediate_points_between_points (
   else
     r = radius;
 
-  Assert(std::fabs(v0*v0-r*r)<eps*r*r, ExcInternalError());
-  Assert(std::fabs(v1*v1-r*r)<eps*r*r, ExcInternalError());
+  Assert((std::fabs(v0*v0-r*r)<eps*r*r)
+         &&
+         (std::fabs(v1*v1-r*r)<eps*r*r),
+         ExcMessage("In computing the location of midpoints of an edge of a "
+                    "HyperBallBoundary, one of the vertices of the edge "
+                    "does not have the expected distance from the center "
+                    "of the sphere. This may happen if the geometry has "
+                    "been deformed, or if the HyperBallBoundary object has "
+                    "been assigned to a part of the boundary that is not "
+                    "in fact a sphere (e.g., the sides of a quarter shell "
+                    "or one octant of a ball)."));
 
   const double alpha=std::acos((v0*v1)/std::sqrt((v0*v0)*(v1*v1)));
   const Tensor<1,spacedim> pm=0.5*(v0+v1);

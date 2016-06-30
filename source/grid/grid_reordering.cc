@@ -170,52 +170,6 @@ namespace internal
 
 
 
-    struct MSide::SideRectify : public std::unary_function<MSide,void>
-    {
-      void operator() (MSide &s) const
-      {
-        if (s.v0>s.v1)
-          std::swap (s.v0, s.v1);
-      }
-    };
-
-
-    struct MSide::SideSortLess : public std::binary_function<MSide,MSide,bool>
-    {
-      bool operator()(const MSide &s1, const MSide &s2) const
-      {
-        int s1vmin,s1vmax;
-        int s2vmin,s2vmax;
-        if (s1.v0<s1.v1)
-          {
-            s1vmin = s1.v0;
-            s1vmax = s1.v1;
-          }
-        else
-          {
-            s1vmin = s1.v1;
-            s1vmax = s1.v0;
-          }
-        if (s2.v0<s2.v1)
-          {
-            s2vmin = s2.v0;
-            s2vmax = s2.v1;
-          }
-        else
-          {
-            s2vmin = s2.v1;
-            s2vmax = s2.v0;
-          }
-
-        if (s1vmin<s2vmin)
-          return true;
-        if (s1vmin>s2vmin)
-          return false;
-        return s1vmax<s2vmax;
-      }
-    };
-
-
     /**
      * Returns an MSide corresponding to the
      * specified side of a deal.II CellData<2> object.
@@ -231,8 +185,12 @@ namespace internal
     /**
      * Wrapper class for the quadside() function
      */
-    struct QuadSide: public std::binary_function<CellData<2>,int,MSide>
+    struct QuadSide
     {
+      typedef CellData<2> first_argument_type;
+      typedef int second_argument_type;
+      typedef MSide result_type;
+
       MSide operator()(const CellData<2> &q, int i) const
       {
         return quadside(q,i);
@@ -301,6 +259,44 @@ namespace internal
 
     namespace
     {
+      void side_rectify (MSide &s)
+      {
+        if (s.v0>s.v1)
+          std::swap (s.v0, s.v1);
+      }
+
+      bool side_sort_less(const MSide &s1, const MSide &s2)
+      {
+        int s1vmin,s1vmax;
+        int s2vmin,s2vmax;
+        if (s1.v0<s1.v1)
+          {
+            s1vmin = s1.v0;
+            s1vmax = s1.v1;
+          }
+        else
+          {
+            s1vmin = s1.v1;
+            s1vmax = s1.v0;
+          }
+        if (s2.v0<s2.v1)
+          {
+            s2vmin = s2.v0;
+            s2vmax = s2.v1;
+          }
+        else
+          {
+            s2vmin = s2.v1;
+            s2vmax = s2.v0;
+          }
+
+        if (s1vmin<s2vmin)
+          return true;
+        if (s1vmin>s2vmin)
+          return false;
+        return s1vmax<s2vmax;
+      }
+
       /**
        * Create an MQuad object from the
        * indices of the four vertices by
@@ -314,7 +310,7 @@ namespace internal
         // sides that bound this quad. note
         // that the incoming list elist is
         // sorted with regard to the
-        // MSide::SideSortLess criterion
+        // side_sort_less criterion
         unsigned int edges[4] = { numbers::invalid_unsigned_int,
                                   numbers::invalid_unsigned_int,
                                   numbers::invalid_unsigned_int,
@@ -325,7 +321,7 @@ namespace internal
           edges[i] = (Utilities::lower_bound (elist.begin(),
                                               elist.end(),
                                               quadside(q,i),
-                                              MSide::SideSortLess())
+                                              side_sort_less)
                       -
                       elist.begin());
 
@@ -360,12 +356,10 @@ namespace internal
         }
 
       //Change each edge so that v0<v1
-      std::for_each(sides.begin(),sides.end(),
-                    MSide::SideRectify() );
+      std::for_each(sides.begin(),sides.end(), side_rectify);
 
       //Sort them by Sidevertices.
-      std::sort(sides.begin(),sides.end(),
-                MSide::SideSortLess());
+      std::sort(sides.begin(),sides.end(), side_sort_less);
 
       //Remove duplicates
       sides.erase(std::unique(sides.begin(),sides.end()),

@@ -116,10 +116,13 @@ SphericalManifold<dim,spacedim>::pull_back(const Point<spacedim> &space_point) c
   switch (spacedim)
     {
     case 2:
+    {
       p[1] = atan2(R[1],R[0]);
       if (p[1] < 0)
         p[1] += 2*numbers::PI;
       break;
+    }
+
     case 3:
     {
       const double z = R[2];
@@ -127,10 +130,11 @@ SphericalManifold<dim,spacedim>::pull_back(const Point<spacedim> &space_point) c
       if (p[2] < 0)
         p[2] += 2*numbers::PI; // phi is periodic
       p[1] = atan2(sqrt(R[0]*R[0]+R[1]*R[1]),z);  // theta
+      break;
     }
-    break;
+
     default:
-      Assert(false, ExcInternalError());
+      Assert(false, ExcNotImplemented());
     }
   return p;
 }
@@ -140,7 +144,7 @@ template <int dim, int spacedim>
 DerivativeForm<1,spacedim,spacedim>
 SphericalManifold<dim,spacedim>::push_forward_gradient(const Point<spacedim> &spherical_point) const
 {
-  Assert(spherical_point[0] >=0.0,
+  Assert(spherical_point[0] >= 0.0,
          ExcMessage("Negative radius for given point."));
   const double rho = spherical_point[0];
   const double theta = spherical_point[1];
@@ -150,11 +154,14 @@ SphericalManifold<dim,spacedim>::push_forward_gradient(const Point<spacedim> &sp
     switch (spacedim)
       {
       case 2:
+      {
         DX[0][0] = cos(theta);
         DX[0][1] = -rho*sin(theta);
         DX[1][0] = sin(theta);
         DX[1][1] = rho*cos(theta);
         break;
+      }
+
       case 3:
       {
         const double phi= spherical_point[2];
@@ -171,8 +178,9 @@ SphericalManifold<dim,spacedim>::push_forward_gradient(const Point<spacedim> &sp
         DX[2][2] = 0;
         break;
       }
+
       default:
-        Assert(false, ExcInternalError());
+        Assert(false, ExcNotImplemented());
       }
   return DX;
 }

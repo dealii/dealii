@@ -1,7 +1,7 @@
 
 DEAL:Newton::Step 0
 DEAL:Newton::solution 10.0000
-DEAL:Newton::update
+DEAL:Newton::update 0
 DEAL:Newton::residual 98.0000
 DEAL:Newton::
 DEAL:Newton::Check 0	98.0000

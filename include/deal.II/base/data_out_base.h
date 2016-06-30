@@ -511,13 +511,54 @@ namespace DataOutBase
   };
 
   /**
-   * Flags controlling the details of output in Gnuplot format. At present no
-   * flags are implemented.
+   * Flags controlling the details of output in Gnuplot format.
    *
    * @ingroup output
    */
   struct GnuplotFlags : public OutputFlagsBase<GnuplotFlags>
-  {};
+  {
+    /**
+     * Default constructor. Sets up the dimension labels with the default values
+     of <tt>"x"</tt>, <tt>"y"</tt>, and <tt>"z"</tt>.
+     */
+    GnuplotFlags();
+
+    /**
+     * Constructor which sets up non-default values for the dimension labels.
+     */
+    GnuplotFlags(const std::vector<std::string> &space_dimension_labels);
+
+    /**
+     * Labels to use in each spatial dimension. These default to <tt>"x"</tt>,
+     * <tt>"y"</tt>, and <tt>"z"</tt>. Labels are printed to the Gnuplot file
+     * surrounded by angle brackets: For example, if the space dimension is 2
+     * and the labels are <tt>"x"</tt> and <tt>"t"</tt>, then the relevant
+     * line will start with
+     @verbatim
+     # <x> <t>
+     @endverbatim
+     * Any extra labels will be ignored.
+     *
+     * If you specify these labels yourself then there should be at least
+     * <tt>spacedim</tt> labels, where <tt>spacedim</tt> is the spatial
+     * dimension of the output data.
+     */
+    std::vector<std::string> space_dimension_labels;
+
+    /**
+     * Return an estimate for the memory consumption, in bytes, of this
+     * object.
+     */
+    std::size_t memory_consumption () const;
+
+    /**
+     * Exception to raise when there are not enough specified dimension
+     * labels.
+     */
+    DeclExceptionMsg(ExcNotEnoughSpaceDimensionLabels,
+                     "There should be at least one space dimension per spatial "
+                     "dimension (extras are ignored).");
+  };
 
   /**
    * Flags controlling the details of output in Povray format. Several flags

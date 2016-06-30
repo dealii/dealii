@@ -113,7 +113,7 @@ namespace Step27
     hp::QCollection<dim-1>   face_quadrature_collection;
 
     hp::QCollection<dim> fourier_q_collection;
-    std_cxx11::shared_ptr<FESeries::Fourier<dim>> fourier;
+    std_cxx11::shared_ptr<FESeries::Fourier<dim> > fourier;
     std::vector<double> ln_k;
     Table<dim,std::complex<double> > fourier_coefficients;
 

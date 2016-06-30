@@ -7,7 +7,7 @@ DEAL::Memory consumption -- Triangulation: 3090
 DEAL::Memory consumption -- DoFHandler:    976
 DEAL::Memory consumption -- FE:            1488
 DEAL::Memory consumption -- Constraints:   78
-DEAL::Memory consumption -- Sparsity:      448
+DEAL::Memory consumption -- Sparsity:      456
 DEAL::Memory consumption -- Matrix:        632
 DEAL::Memory consumption -- Solution:      240
 DEAL::Memory consumption -- Rhs:           240
@@ -18,7 +18,7 @@ DEAL::Memory consumption -- Triangulation: 4026
 DEAL::Memory consumption -- DoFHandler:    1164
 DEAL::Memory consumption -- FE:            1488
 DEAL::Memory consumption -- Constraints:   78
-DEAL::Memory consumption -- Sparsity:      568
+DEAL::Memory consumption -- Sparsity:      576
 DEAL::Memory consumption -- Matrix:        824
 DEAL::Memory consumption -- Solution:      288
 DEAL::Memory consumption -- Rhs:           288
@@ -29,7 +29,7 @@ DEAL::Memory consumption -- Triangulation: 4946
 DEAL::Memory consumption -- DoFHandler:    1356
 DEAL::Memory consumption -- FE:            1488
 DEAL::Memory consumption -- Constraints:   78
-DEAL::Memory consumption -- Sparsity:      728
+DEAL::Memory consumption -- Sparsity:      736
 DEAL::Memory consumption -- Matrix:        1080
 DEAL::Memory consumption -- Solution:      352
 DEAL::Memory consumption -- Rhs:           352
@@ -40,11 +40,11 @@ DEAL::Memory consumption -- Triangulation: 6090
 DEAL::Memory consumption -- DoFHandler:    1584
 DEAL::Memory consumption -- FE:            1488
 DEAL::Memory consumption -- Constraints:   78
-DEAL::Memory consumption -- Sparsity:      928
+DEAL::Memory consumption -- Sparsity:      936
 DEAL::Memory consumption -- Matrix:        1400
 DEAL::Memory consumption -- Solution:      432
 DEAL::Memory consumption -- Rhs:           432
-DEAL::Memory consumption -- DataOut:       3336
+DEAL::Memory consumption -- DataOut:       3394
 DEAL::2d
 DEAL::Cycle 0:
 DEAL::   Number of active cells:       20
@@ -53,7 +53,7 @@ DEAL::Memory consumption -- Triangulation: 5431
 DEAL::Memory consumption -- DoFHandler:    1936
 DEAL::Memory consumption -- FE:            3904
 DEAL::Memory consumption -- Constraints:   78
-DEAL::Memory consumption -- Sparsity:      5728
+DEAL::Memory consumption -- Sparsity:      5736
 DEAL::Memory consumption -- Matrix:        10616
 DEAL::Memory consumption -- Solution:      816
 DEAL::Memory consumption -- Rhs:           816
@@ -64,7 +64,7 @@ DEAL::Memory consumption -- Triangulation: 11215
 DEAL::Memory consumption -- DoFHandler:    3728
 DEAL::Memory consumption -- FE:            3904
 DEAL::Memory consumption -- Constraints:   3102
-DEAL::Memory consumption -- Sparsity:      13984
+DEAL::Memory consumption -- Sparsity:      13992
 DEAL::Memory consumption -- Matrix:        26168
 DEAL::Memory consumption -- Solution:      1776
 DEAL::Memory consumption -- Rhs:           1776
@@ -75,7 +75,7 @@ DEAL::Memory consumption -- Triangulation: 21927
 DEAL::Memory consumption -- DoFHandler:    7184
 DEAL::Memory consumption -- FE:            3904
 DEAL::Memory consumption -- Constraints:   10734
-DEAL::Memory consumption -- Sparsity:      31232
+DEAL::Memory consumption -- Sparsity:      31240
 DEAL::Memory consumption -- Matrix:        58744
 DEAL::Memory consumption -- Solution:      3696
 DEAL::Memory consumption -- Rhs:           3696
@@ -86,11 +86,11 @@ DEAL::Memory consumption -- Triangulation: 44055
 DEAL::Memory consumption -- DoFHandler:    14672
 DEAL::Memory consumption -- FE:            3904
 DEAL::Memory consumption -- Constraints:   19966
-DEAL::Memory consumption -- Sparsity:      64160
+DEAL::Memory consumption -- Sparsity:      64168
 DEAL::Memory consumption -- Matrix:        120824
 DEAL::Memory consumption -- Solution:      7472
 DEAL::Memory consumption -- Rhs:           7472
-DEAL::Memory consumption -- DataOut:       42796
+DEAL::Memory consumption -- DataOut:       42854
 DEAL::3d
 DEAL::Cycle 0:
 DEAL::   Number of active cells:       56
@@ -99,7 +99,7 @@ DEAL::Memory consumption -- Triangulation: 25043
 DEAL::Memory consumption -- DoFHandler:    9760
 DEAL::Memory consumption -- FE:            12280
 DEAL::Memory consumption -- Constraints:   78
-DEAL::Memory consumption -- Sparsity:      120272
+DEAL::Memory consumption -- Sparsity:      120280
 DEAL::Memory consumption -- Matrix:        236280
 DEAL::Memory consumption -- Solution:      4240
 DEAL::Memory consumption -- Rhs:           4240
@@ -110,7 +110,7 @@ DEAL::Memory consumption -- Triangulation: 98569
 DEAL::Memory consumption -- DoFHandler:    37996
 DEAL::Memory consumption -- FE:            12280
 DEAL::Memory consumption -- Constraints:   55262
-DEAL::Memory consumption -- Sparsity:      567144
+DEAL::Memory consumption -- Sparsity:      567152
 DEAL::Memory consumption -- Matrix:        1116424
 DEAL::Memory consumption -- Solution:      17840
 DEAL::Memory consumption -- Rhs:           17840
@@ -121,7 +121,7 @@ DEAL::Memory consumption -- Triangulation: 395091
 DEAL::Memory consumption -- DoFHandler:    151280
 DEAL::Memory consumption -- FE:            12280
 DEAL::Memory consumption -- Constraints:   367086
-DEAL::Memory consumption -- Sparsity:      2517200
+DEAL::Memory consumption -- Sparsity:      2517208
 DEAL::Memory consumption -- Matrix:        4959288
 DEAL::Memory consumption -- Solution:      75088
 DEAL::Memory consumption -- Rhs:           75088
@@ -132,8 +132,8 @@ DEAL::Memory consumption -- Triangulation: 1390359
 DEAL::Memory consumption -- DoFHandler:    542008
 DEAL::Memory consumption -- FE:            12280
 DEAL::Memory consumption -- Constraints:   1307806
-DEAL::Memory consumption -- Sparsity:      8321760
+DEAL::Memory consumption -- Sparsity:      8321768
 DEAL::Memory consumption -- Matrix:        16383928
 DEAL::Memory consumption -- Solution:      259568
 DEAL::Memory consumption -- Rhs:           259568
-DEAL::Memory consumption -- DataOut:       1159732
+DEAL::Memory consumption -- DataOut:       1159790

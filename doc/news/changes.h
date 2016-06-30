@@ -39,6 +39,17 @@ inconvenience this causes.
 
 <ol>
 
+ <li> Changed: The conversion constructors of class Vector from the
+ PETScWrappers::Vector, PETScWrappers::MPI::Vector,
+ TrilinosWrappers::Vector, and TrilinosWrappers::MPI::Vector classes
+ are now marked as <code>explicit</code>, i.e., they will no longer
+ allow implicit, silent conversions. Such conversions lead to awkward
+ errors that are hard to debug, and in cases where they are necessary,
+ are best described in code through explicit casts.
+ <br>
+ (Wolfgang Bangerth, 2016/06/25)
+ </li>
+
  <li> Changed: The deal.II distributed vector classes do now derive from
  LinearAlgebra::VectorSpaceVector and have been moved to the
  LinearAlgebra::distributed namespace. In the definition of the new
@@ -139,11 +150,20 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+
  <li> New: Added TrilinosWrappers::SolveDirect::Initialize and
  TrilinosWrappers::SolverDirect::Solve to solve distributed linear systems 
  with multiple right hand sides without needing to refactorize the matrix
  everytime. Also, added unit test for testing the new functionality.
  (Michael Harmon, 2016/06/30)
+ </li>
+
+ <li> Changed: Similar to MappingQEulerian, MappingQ1Eulerian has gained
+ a second constructor that reverses the order of the arguments to indicate
+ which DoFHandler a vector is based on. The old constructor is now
+ deprecated and will be removed in a future version.
+ <br>
+ (Wolfgang Bangerth, 2016/06/25)
  </li>
 
  <li> New: Add new classes to expand a scalar finite element solution into
@@ -310,6 +330,25 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> New: The MappingFEField class was previously only instantiated
+ if the vector type was dealii::Vector. It is now also instantiated
+ for PETSc and Trilinos wrapper vector types.
+ <br>
+ (Wolfgang Bangerth, 2016/06/25)
+ </li>
+
+ <li> New: GnuplotFlags now supports user specified space dimension labels
+ through a member variable.
+ <br>
+ (David Wells, 2016/06/24)
+ </li>
+
+ <li> New: Added an operator* to SynchronousIterators which returns a
+ reference to the stored tuple of iterators iterators. The iterators member
+ may be made private in a future release.
+ <br>
+ (Daniel Shapero, 2016/06/24)
+ </li>
 
  <li> New: IndexSet::at(idx) returns an iterator pointing to the given index
  or the next larger element in the set if idx is not contained.
