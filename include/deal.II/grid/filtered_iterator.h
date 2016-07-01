@@ -824,7 +824,7 @@ namespace internal
  *   DoFHandler<dim> dof_handler;
  *   ...
  *   for (auto cell : filter_iterators(dof_handler.active_cell_iterators(),
- *                                    IteratorFilters::LocallyOwned())
+ *                                    IteratorFilters::LocallyOwnedCell())
  *     {
  *       fe_values.reinit (cell);
  *       ...do the local integration on 'cell'...;
@@ -871,7 +871,7 @@ filter_iterators (IteratorRange<BaseIterator> i,
  *   DoFHandler<dim> dof_handler;
  *   ...
  *   for (auto cell : filter_iterators(dof_handler.active_cell_iterators(),
- *                                    IteratorFilters::LocallyOwned(),
+ *                                    IteratorFilters::LocallyOwnedCell(),
  *                                    IteratorFilters::AtBoundary())
  *     {
  *       fe_values.reinit (cell);
