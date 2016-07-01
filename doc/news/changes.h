@@ -322,6 +322,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: The function DoFTools::dof_couplings_from_component_couplings
+ for hp::FECollection arguments was compiled but not exported from the
+ object file. This is now fixed.
+ <br>
+ (Wolfgang Bangerth, 2016/07/01)
+ </li>
+
  <li> New: The MappingFEField class was previously only instantiated
  if the vector type was dealii::Vector. It is now also instantiated
  for PETSc and Trilinos wrapper vector types.
