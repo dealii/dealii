@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2015 by the deal.II authors
+// Copyright (C) 2009 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -348,5 +348,11 @@ for (deal_II_dimension : DIMENSIONS)
   Table<2,DoFTools::Coupling>
   DoFTools::dof_couplings_from_component_couplings
   (const FiniteElement<deal_II_dimension> &fe,
+   const Table<2,DoFTools::Coupling> &component_couplings);
+
+  template
+  std::vector<Table<2,DoFTools::Coupling> >
+  DoFTools::dof_couplings_from_component_couplings
+  (const hp::FECollection<deal_II_dimension> &fe,
    const Table<2,DoFTools::Coupling> &component_couplings);
 }
