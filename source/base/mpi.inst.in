@@ -36,6 +36,27 @@ for (S : MPI_SCALARS)
 
   template
   void min<S> (const std::vector<S> &, const MPI_Comm &, std::vector<S> &);
+
+  // The fixed-length array (i.e., things declared like T(&values)[N])
+  // versions of the functions above live in the header file mpi.h since the
+  // length (N) is a compile-time constant. Those functions all call
+  // Utilities::MPI::internal::all_reduce, which is declared in
+  // mpi.templates.h, so that function (all_reduce) must be present in the
+  // compiled library.
+  //
+  // Note for the curious: it turns out that most compilers and most compiler
+  // settings will not inline this function, meaning that it consistently
+  // shows up in the shared object files without this explicit instantiation
+  // in debug mode and usually in release mode. In particular, GCC 6 does not
+  // inline it (so this instantiation is not necessary) but clang 3.8 does (so
+  // this instantiation is necessary). Some versions of GCC (5.3 but not 4.8)
+  // seem to inline it with the '-march=native' flag.
+  template
+  void Utilities::MPI::internal::all_reduce<S> (const MPI_Op    &,
+                                                const S *const,
+                                                const MPI_Comm  &,
+                                                S               *,
+                                                const std::size_t);
 }
 
 
