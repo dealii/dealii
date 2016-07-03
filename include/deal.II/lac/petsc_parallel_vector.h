@@ -339,7 +339,7 @@ namespace PETScWrappers
                    const bool    omit_zeroing_entries = false);
 
       /**
-       * Reinit as a vector without ghost elements. See the constructor with
+       * Reinit as a vector with ghost elements. See the constructor with
        * same signature for more details.
        *
        * @see
