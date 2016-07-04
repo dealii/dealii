@@ -1020,7 +1020,8 @@ namespace TrilinosWrappers
     bool in_local_range (const size_type index) const;
 
     /**
-     * Return the number of nonzero elements of this matrix.
+     * Return the total number of nonzero elements of this matrix (summed
+     * over all MPI processes).
      */
     size_type n_nonzero_elements () const;
 
