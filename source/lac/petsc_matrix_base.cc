@@ -470,8 +470,8 @@ namespace PETScWrappers
 
 
   MatrixBase &
-  MatrixBase::add (const MatrixBase &other,
-                   const PetscScalar factor)
+  MatrixBase::add (const PetscScalar factor,
+                   const MatrixBase &other)
   {
     const int ierr = MatAXPY (matrix, factor,
                               other, DIFFERENT_NONZERO_PATTERN);
@@ -480,6 +480,15 @@ namespace PETScWrappers
     Assert (ierr == 0, ExcPETScError(ierr));
 
     return *this;
+  }
+
+
+
+  MatrixBase &
+  MatrixBase::add (const MatrixBase &other,
+                   const PetscScalar factor)
+  {
+    return add(factor, other);
   }
 
 
