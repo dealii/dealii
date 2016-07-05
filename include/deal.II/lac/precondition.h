@@ -35,7 +35,7 @@ template <typename number> class Vector;
 template <typename number> class SparseMatrix;
 namespace LinearAlgebra
 {
-  namespace parallel
+  namespace distributed
   {
     template <typename number> class Vector;
   }
@@ -1715,14 +1715,14 @@ namespace internal
     template <typename Number>
     inline
     void
-    vector_updates (const LinearAlgebra::parallel::Vector<Number> &src,
-                    const LinearAlgebra::parallel::Vector<Number> &matrix_diagonal_inverse,
+    vector_updates (const LinearAlgebra::distributed::Vector<Number> &src,
+                    const LinearAlgebra::distributed::Vector<Number> &matrix_diagonal_inverse,
                     const bool    start_zero,
                     const double  factor1,
                     const double  factor2,
-                    LinearAlgebra::parallel::Vector<Number> &update1,
-                    LinearAlgebra::parallel::Vector<Number> &update2,
-                    LinearAlgebra::parallel::Vector<Number> &dst)
+                    LinearAlgebra::distributed::Vector<Number> &update1,
+                    LinearAlgebra::distributed::Vector<Number> &update2,
+                    LinearAlgebra::distributed::Vector<Number> &dst)
     {
       VectorUpdater<Number> upd(src.begin(), matrix_diagonal_inverse.begin(),
                                 start_zero, factor1, factor2,
