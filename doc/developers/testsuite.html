@@ -728,6 +728,18 @@ $ ctest [...] -V -S ../tests/run_testsuite.cmake
     </p>
 
     <p>
+      It is possible to run tests and submit results for an already installed library by
+<pre>
+mkdir build && cd build
+cp $DEAL_II_SOURCE_DIR/CTestConfig.cmake .
+ctest \
+  -DCTEST_SOURCE_DIRECTORY=$DEAL_II_SOURCE_DIR/tests \
+  -DDEAL_II_DIR=$DEAL_II_DIR \
+  [...] -S $DEAL_II_SOURCE_DIR/tests/run_testsuite.cmake -V
+</pre>
+    </p>
+
+    <p>
       <b>Note:</b> The default output in script mode is very minimal.
       Therefore, it is recommended to specify <code>-V</code> which will
       give the same level of verbosity as the non-script mode.
