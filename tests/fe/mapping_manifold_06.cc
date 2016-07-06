@@ -57,7 +57,7 @@ void test()
 
   out << "set size ratio -1" << std::endl
       << "set terminal aqua " << dim+spacedim << std::endl
-      << (spacedim == 3 ? "s" : "") << "plot '-' w l " << std::endl;
+      << (spacedim == 3 ? "s" : "") << "plot '-' w l" << std::endl;
 
   for (typename Triangulation<dim,spacedim>::active_cell_iterator cell =
          triangulation.begin_active(); cell != triangulation.end(); ++cell)
@@ -79,7 +79,7 @@ void test()
   out << "e" << std::endl << std::endl
       << std::endl
       << "set terminal aqua " << 2*(dim+spacedim) +1 << std::endl
-      << (spacedim == 3 ? "s" : "") << "plot '-' with vectors " << std::endl;
+      << (spacedim == 3 ? "s" : "") << "plot '-' with vectors" << std::endl;
 
   for (typename Triangulation<dim,spacedim>::active_cell_iterator cell =
          triangulation.begin_active(); cell != triangulation.end(); ++cell)
