@@ -24,7 +24,11 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/symmetric_tensor.h>
+#include <deal.II/distributed/tria.h>
 #include <deal.II/fe/component_mask.h>
+#include <deal.II/lac/parallel_vector.h>
+
+
 
 #include <vector>
 #include <string>

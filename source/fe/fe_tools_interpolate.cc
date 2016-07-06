@@ -2052,7 +2052,7 @@ namespace FETools
         Vector<typename OutVector::value_type> dof_values(dofs_per_cell);
 
         // then traverse grid bottom up
-        for (unsigned int level=0; level<dof1.get_triangulation().n_levels()-1; ++level)
+        for (unsigned int level=0; level<dof2.get_triangulation().n_levels()-1; ++level)
           {
             typename DoFHandler<dim,spacedim>::cell_iterator cell=dof2.begin(level),
                                                              endc=dof2.end(level);
