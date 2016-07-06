@@ -49,7 +49,9 @@ processor cores within a single machine (with parallelization based on
 threads). This program's main job is therefore to introduce the changes that are
 necessary to utilize the availability of these %parallel compute
 resources. In this regard, it builds on the step-40 program that first
-introduces the necessary classes for much of the %parallel functionality.
+introduces the necessary classes for much of the %parallel
+functionality, and on step-55 that shows how this is done for a
+vector-valued problem.
 
 In addition to these changes, we also use a slightly different
 preconditioner, and we will have to make a number of changes that have
@@ -650,9 +652,11 @@ code). Consequently, we need to parallelize it.
 Parallelization of scientific codes across multiple machines in a cluster of
 computers is almost always done using the Message Passing Interface
 (MPI). This program is no exception to that, and it follows the general spirit
-of step-17 and step-18 programs in this though in practice it borrows more
+of the step-17 and step-18 programs in this though in practice it borrows more
 from step-40 in which we first introduced the classes and strategies we use
-when we want to <i>completely</i> distribute all computations: including, for
+when we want to <i>completely</i> distribute all computations, and
+step-55 that shows how to do that for 
+@ref vector_valued "vector-valued problems": including, for
 example, splitting the mesh up into a number of parts so that each processor
 only stores its own share plus some ghost cells, and using strategies where no
 processor potentially has enough memory to hold the entries of the combined
@@ -660,8 +664,8 @@ solution vector locally. The goal is to run this code on hundreds or maybe
 even thousands of processors, at reasonable scalability.
 
 @note Even though it has a larger number, step-40 comes logically before the
-current program. You will probably want to look at step-40 before you try to
-understand the what we do here.
+current program. The same is true for step-55. You will probably want
+to look at these programs before you try to understand what we do here.
 
 MPI is a rather awkward interface to program with. It is a semi-object
 oriented set of functions, and while one uses it to send data around a
@@ -671,7 +675,7 @@ objects rather than deducing the data type automatically through overloading
 or templates. We've already seen in step-17 and step-18 how to avoid almost
 all of MPI by putting all the communication necessary into either the deal.II
 library or, in those programs, into PETSc. We'll do something similar here:
-like in step-40, deal.II and the underlying p4est library are responsible for
+like in step-40 and step-55, deal.II and the underlying p4est library are responsible for
 all the communication necessary for distributing the mesh, and we will let the
 Trilinos library (along with the wrappers in namespace TrilinosWrappers) deal
 with parallelizing the linear algebra components. We have already used
@@ -730,7 +734,7 @@ are part of Trilinos' Epetra library of basic linear algebra and tool classes:
 
 There are a number of other concepts relevant to distributing the mesh
 to a number of processors; you may want to take a look at the @ref
-distributed module and step-40 before trying to understand this
+distributed module and step-40 or step-55 before trying to understand this
 program.  The rest of the program is almost completely agnostic about
 the fact that we don't store all objects completely locally. There
 will be a few points where we have to limit loops over all cells to
@@ -1052,10 +1056,10 @@ the following quantities:
     \left\{
       \begin{array}{ll}
         -\frac{4}{3}\pi G \rho \|\mathbf x\| \frac{\mathbf x}{\|\mathbf x\|}
-	& \text{for} \ \|\mathbf x\|<R_1, \\
+        & \text{for} \ \|\mathbf x\|<R_1, \\
         -\frac{4}{3}\pi G \rho R^3 \frac{1}{\|\mathbf x\|^2}
         \frac{\mathbf x}{\|\mathbf x\|}
-	& \text{for} \ \|\mathbf x\|\ge R_1.
+        & \text{for} \ \|\mathbf x\|\ge R_1.
       \end{array}
     \right.
   @f]
@@ -1068,8 +1072,8 @@ the following quantities:
         -\frac{4}{3}\pi G \rho \|\mathbf x\| \frac{\mathbf x}{\|\mathbf x\|}
         =
         -\frac{4}{3}\pi G \rho \mathbf x
-	=
-	- 9.81 \frac{\mathbf x}{R_1} \frac{\text{m}}{\text{s}^2},
+        =
+        - 9.81 \frac{\mathbf x}{R_1} \frac{\text{m}}{\text{s}^2},
   @f]
   where we can infer the last expression because we know Earth's gravity at
   the surface (where $\|x\|=R_1$).
