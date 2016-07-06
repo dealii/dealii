@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2015 by the deal.II authors
+// Copyright (C) 2009 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -75,7 +75,8 @@
  * concise definition of many of the terms that are used here and in other
  * places of the library related to distributed computing.  The step-40
  * tutorial program shows an application of the classes and methods of this
- * namespace to the Laplace equation, while step-32 extends the step-31
+ * namespace to the Laplace equation, while step-55 does so for a vector-valued problem.
+ * step-32 extends the step-31
  * program to massively parallel computations and thereby explains the use of
  * the topic discussed here to more complicated applications.
  *
@@ -296,7 +297,7 @@
  * owned by another processor.
  *
  * You can copy between vectors with and without ghost
- * elements (you can see this in step-40 and step-32) using operator=.
+ * elements (you can see this in step-40, step-55, and step-32) using operator=.
  *
  *
  * <h5>Sparsity patterns</h5>
@@ -362,7 +363,7 @@
  * DoFTools::extract_locally_active_dofs() . This is also affordable since the
  * set of locally relevant degrees of freedom is only marginally larger than
  * the set of locally active degrees of freedom. We choose this strategy in
- * both step-32 and step-40.
+ * step-32, step-40, and step-55.
  *
  *
  * <h4>Postprocessing</h4>
