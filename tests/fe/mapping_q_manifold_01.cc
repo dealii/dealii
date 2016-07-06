@@ -182,7 +182,7 @@ void test(const FiniteElement<dim> &fe)
               << diff.l2_norm() << std::endl;
 
       DataOut<dim> data_out;
-      std::ofstream output("output_" + Utilities::int_to_string(mapping_p) + ".vtk");
+      std::ofstream output(("output_" + Utilities::int_to_string(mapping_p) + ".vtk").c_str());
       data_out.attach_dof_handler (dof_handler);
       data_out.add_data_vector(v, "v");
       data_out.add_data_vector(diff, "e");
