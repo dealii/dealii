@@ -24,10 +24,6 @@
 #   "Enable configuration and installation of the example steps. This adds a COMPONENT \"examples\" to the build system."
 #   )
 #
-# SET(DEAL_II_COMPONENT_PARAMETER_GUI OFF CACHE BOOL
-#   "Build and install the parameter_gui. This adds a COMPONENT \"parameter_gui\" to the build system."
-#   )
-#
 
 
 #

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2015 by the deal.II authors
+## Copyright (C) 2013 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -268,7 +268,7 @@ ENDIF()
 GET_CMAKE_PROPERTY(_variables VARIABLES)
 FOREACH(_var ${_variables})
   IF( _var MATCHES "^(TEST|DEAL_II|ALLOW|WITH|FORCE|COMPONENT)_" OR
-      _var MATCHES "^(DOCUMENTATION|EXAMPLES|PARAMETER_GUI)" OR
+      _var MATCHES "^(DOCUMENTATION|EXAMPLES)" OR
       _var MATCHES "^(ARPACK|BOOST|OPENCASCADE|MUPARSER|HDF5|METIS|MPI)_" OR
       _var MATCHES "^(NETCDF|P4EST|PETSC|SLEPC|THREADS|TBB|TRILINOS)_" OR
       _var MATCHES "^(UMFPACK|ZLIB|LAPACK|MUPARSER)_" OR
