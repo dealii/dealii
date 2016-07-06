@@ -70,24 +70,33 @@ template<int dim>
 class PushForward : public Function<dim>
 {
 public:
-  PushForward () : Function<dim>(dim, 0.) {} //,component(component) {}
+  PushForward ()
+  :
+  Function<dim>(dim, 0.),
+  h (0.028),
+  x_max (4.5*h),
+  y_max (2.036*h),
+  z_max (4.5*h),
+  y_FoR (h)
+    {}
 
   virtual ~PushForward() {};
 
   virtual double value (const Point<dim> &p,const unsigned int component = 0) const;
 
 private:
-  const double h = 0.028;
+  const double h;
 
   // data from initial block
-  const double x_max = 4.5*h;//9.0*h;
-  const double y_max = 2.036*h;
-  const double z_max = 4.5*h;
+  const double x_max;
+  const double y_max;
+  const double z_max;
 
-  const double y_FoR = h;
+  const double y_FoR;
 
 
 };
+
 
 template<int dim>
 double PushForward<dim>::value(const Point<dim> &p,const unsigned int component) const
@@ -119,19 +128,28 @@ template<int dim>
 class PullBack : public Function<dim>
 {
 public:
-  PullBack () : Function<dim>(dim, 0.) {} //,component(component) {}
+  PullBack ()
+  :
+  Function<dim>(dim, 0.),
+  h (0.028),
+  x_max (4.5*h),
+  y_max (2.036*h),
+  z_max (4.5*h),
+  y_FoR (h)
+    {}
 
   virtual ~PullBack() {};
 
   virtual double value (const Point<dim> &p,const unsigned int component = 0) const;
 
 private:
-  const double h = 0.028;
-  const double x_max = 4.5*h;//9.0*h;
-  const double y_max = 2.036*h;
-  const double z_max = 4.5*h;
+  const double h;
 
-  const double y_FoR = h;
+  const double x_max;
+  const double y_max;
+  const double z_max;
+
+  const double y_FoR;
 };
 
 template<int dim>
