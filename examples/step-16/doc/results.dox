@@ -78,6 +78,13 @@ it becomes even more difficult if the program is to run in %parallel on
 machines coupled through MPI, for example. In that case, it would be
 simpler if one could use a black-box preconditioner that uses some
 sort of multigrid hierarchy for good performance but can figure out
-level matrices and similar things out by itself. Algebraic multigrid
+level matrices and similar things by itself. Algebraic multigrid
 methods do exactly this, and we will use them in
-step-31 for the solution of a Stokes problem.
+step-31 for the solution of a Stokes problemm and in step-32 and
+step-40 for a parallel variation.
+
+Finally, one may want to think how to use geometric multigrid for
+other kinds of problems, specifically 
+@ref vector_valued "vector valued problems". This is the topic of
+step-56 where we use the techniques shown here for the Stokes
+equation.

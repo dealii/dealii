@@ -727,12 +727,15 @@ because GMRES(k) scales worse with the problem size than CG, as we discussed
 above.  Nonetheless, the improvement by a factor of 3-6 for moderate problem
 sizes is quite impressive.
 
-<h5>Combining block preconditioner and multigrid</h5>
+
+<h5>Combining the block preconditioner and multigrid</h5>
 An ultimate linear solver for this problem could be imagined as a
 combination of an optimal
 preconditioner for $A$ (e.g. multigrid) and the block preconditioner
 described above, which is the approach taken in the step-31
-tutorial program.
+and step-32 tutorial programs (where we use an algebraic multigrid
+method) and step-56 (where we use a geometric multigrid method).
+
 
 <h5>No block matrices and vectors</h5>
 Another possibility that can be taken into account is to not set up a block
