@@ -70,7 +70,7 @@ double Lh(const Point<dim>  &x_q,
       const double x = 2.0*(x_q[d]-0.5);
       Assert ( (x_q[d] <= 1.0) && (x_q[d] >= 0.),
                ExcMessage("x_q is not in [0,1]" +
-                          std::to_string(x_q[d])));
+                          Utilities::to_string(x_q[d])));
       const int ind = indices[d];
       res *= sqrt(2.0) * gsl_sf_legendre_Pl (ind, x);
     }

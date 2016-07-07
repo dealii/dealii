@@ -322,7 +322,7 @@ void test ()
           stiffness_matrix.vmult(Ax,eigenfunctions[i]);
           Ax.add(-1.0*std::real(lambda[i]),Bx);
           Assert (Ax.l2_norm() < precision,
-                  ExcMessage(std::to_string(Ax.l2_norm())));
+                  ExcMessage(Utilities::to_string(Ax.l2_norm())));
         }
     }
   }
