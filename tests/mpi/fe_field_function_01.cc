@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2015 by the deal.II authors
+// Copyright (C) 2009 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -106,8 +106,10 @@ void test()
           point_found = false;
         }
 
-      Assert (Utilities::MPI::sum(point_found ? 1 : 0, MPI_COMM_WORLD) == 1,
-              ExcInternalError());
+      // the point should be found at least once (it  might also be found
+      // in the ghost layer)
+      Assert(Utilities::MPI::sum(point_found ? 1 : 0, MPI_COMM_WORLD) >= 1,
+             ExcInternalError());
     }
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
