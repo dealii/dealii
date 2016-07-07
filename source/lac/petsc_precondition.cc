@@ -520,7 +520,9 @@ namespace PETScWrappers
     ierr = PCSetFromOptions (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 #else
-    Assert(false, ExcMessage("Complex-valued PETSc does not support BoomerAMG preconditioner."));
+    Assert (false,
+            ExcMessage ("Your PETSc installation does not include a copy of "
+                        "the hypre package necessary for this preconditioner."));
 #endif
   }
 
