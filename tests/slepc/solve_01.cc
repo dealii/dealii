@@ -27,6 +27,7 @@
 #include <iostream>
 #include <iomanip>
 #include <deal.II/base/logstream.h>
+#include <deal.II/lac/petsc_compatibility.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/petsc_solver.h>
@@ -110,9 +111,9 @@ int main(int argc, char **argv)
                                           PETScWrappers::Vector(dim));
     std::vector<PetscScalar> v(n_eigenvalues);
 
-    PetscOptionsSetValue("-st_ksp_type","cg");
-    PetscOptionsSetValue("-st_pc_type", "jacobi");
-    PetscOptionsSetValue("-st_ksp_tol", "1e-15");
+    PETScWrappers::set_option_value("-st_ksp_type","cg");
+    PETScWrappers::set_option_value("-st_pc_type", "jacobi");
+    PETScWrappers::set_option_value("-st_ksp_tol", "1e-15");
 
     {
       SLEPcWrappers::SolverKrylovSchur solver(control);
@@ -129,7 +130,7 @@ int main(int argc, char **argv)
       check_solve (solver, control, A,B,u,v);
     }
 
-    PetscOptionsSetValue("-st_ksp_type","preonly");
+    PETScWrappers::set_option_value("-st_ksp_type","preonly");
     {
       SLEPcWrappers::SolverGeneralizedDavidson solver(control);
       check_solve (solver, control, A,B,u,v);
@@ -141,8 +142,8 @@ int main(int argc, char **argv)
       check_solve (solver, control, A,B,u,v);
     }
 
-    PetscOptionsSetValue("-st_ksp_type","cg");
-    PetscOptionsSetValue("-st_ksp_max_it", "10");
+    PETScWrappers::set_option_value("-st_ksp_type","cg");
+    PETScWrappers::set_option_value("-st_ksp_max_it", "10");
     {
       SLEPcWrappers::SolverJacobiDavidson solver(control);
       check_solve (solver, control, A,B,u,v);

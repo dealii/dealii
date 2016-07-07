@@ -150,6 +150,12 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li> New: The library is now compatible with PETSc 3.7.0. Part of this change
+ included adding a new header, <tt>petsc_compatibility.h</tt>, which provides
+ some version-independent functions for using common PETSc functions.
+ <br>
+ (David Wells, 2016/07/07)
+ </li>
 
  <li> New: Added TrilinosWrappers::SolveDirect::Initialize and
  TrilinosWrappers::SolverDirect::Solve to solve distributed linear systems 
