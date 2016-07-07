@@ -40,6 +40,9 @@ private:
   get_nonzero_component();
 
 
+  /**
+   * Return the vector consists of the numbers of degrees of freedom per objects.
+   */
   static
   std::vector<unsigned int>
   get_dpo_vector ();
@@ -55,7 +58,9 @@ private:
     Table<2,Tensor<2,2> > shape_hessians;
   };
 
-
+  /**
+   * Compute the data on the reference domain.
+   */
 virtual FiniteElement<2,2>::InternalDataBase *
   get_data (const UpdateFlags update_flags,
             const Mapping<2,2> &,
@@ -65,6 +70,9 @@ virtual FiniteElement<2,2>::InternalDataBase *
 
 
 
+/**
+ * Compute the data on the current cell.
+ */
   virtual
   void
   fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell,
@@ -79,6 +87,9 @@ virtual FiniteElement<2,2>::InternalDataBase *
 
 
 
+  /**
+   * Compute the data on the face of the current cell.
+   */
   virtual
   void
   fill_fe_face_values (const Triangulation<2,2>::cell_iterator           &cell,
@@ -93,6 +104,9 @@ virtual FiniteElement<2,2>::InternalDataBase *
 
 
 
+  /**
+   * Compute the data on the subface of the current cell.
+   */
   virtual
   void
   fill_fe_subface_values (const Triangulation<2,2>::cell_iterator           &cell,
@@ -108,40 +122,72 @@ virtual FiniteElement<2,2>::InternalDataBase *
 
 
 public:
+  /**
+   * Constructor for parametric version of P1 nonconforming element.
+   */
   FE_P1NCParametric() ;
 
 
-
+  /**
+   * Return the name of the class for the element.
+   */
   virtual std::string get_name () const ;
 
+  /**
+   * Return the update flags which are needed.
+   */
   virtual UpdateFlags     requires_update_flags (const UpdateFlags flags) const ;
 
+  /**
+   * Return the unit face support points.
+   */
   const std::vector<Point<1> > &get_unit_face_support_points () const ;
 
+  /**
+   * Return the unit face support point with given index.
+   */
   Point<1> unit_face_support_point (const unsigned index) const ;
 
   bool has_face_support_points () const ;
 
+  /**
+   * Copy constructor.
+   */
   virtual FiniteElement<2,2> *clone () const ;
 
+  /**
+   * Destructor.
+   */
   virtual ~FE_P1NCParametric ();
 
 
 
 
-
+  /**
+   * The value of the basis function with index i at given point.
+   */
   virtual double shape_value (const unsigned int i,
                               const Point<2>    &p) const ;
 
+  /**
+   * The gradient of the basis function with index i at given point.
+   */
   virtual Tensor<1,2> shape_grad (const unsigned int i,
                                   const Point<2>    &p) const ;
 
+  /**
+   * The Hessian matrix of the basis function with index i at given point.
+   * Notice that it always returns the trivial matrix because the element space contains polynomials upto the degree 1.
+   */
   virtual Tensor<2,2> shape_grad_grad (const unsigned int i,
 				       const Point<2>    &p) const ;
 
 
 protected:
 
+  /**
+   * Create the constraints matrix for hanging edges.
+   */
   void initialize_constraints () ;
 
 };
@@ -166,12 +212,20 @@ private:
   get_nonzero_component();
 
 
+  /**
+   * Return the vector consists of the numbers of degrees of freedom per objects.
+   */
   static
   std::vector<unsigned int>
   get_dpo_vector ();
 
 
 
+  /**
+   * Do the work which is needed before cellwise data computation.
+   * Since the basis functions are constructed independently on each cell,
+   * the data on the reference cell is not necessary.
+   */
   virtual FiniteElement<2,2>::InternalDataBase *
   get_data (const UpdateFlags update_flags,
             const Mapping<2,2> &,
@@ -181,6 +235,9 @@ private:
 
 
 
+  /**
+   * Compute the data on the current cell.
+   */
    virtual
   void
   fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell,
@@ -194,7 +251,9 @@ private:
 
 
 
-
+  /**
+   * Compute the data on the face of the current cell.
+   */
   virtual
   void
   fill_fe_face_values (const Triangulation<2,2>::cell_iterator           &cell,
@@ -209,6 +268,9 @@ private:
 
 
 
+  /**
+   * Compute the data on the subface of the current cell.
+   */
   virtual
   void
   fill_fe_subface_values (const Triangulation<2,2>::cell_iterator           &cell,
@@ -224,19 +286,37 @@ private:
 
 
 public:
+  /**
+   * Constructor for nonparametric version of P1 nonconforming element.
+   */
   FE_P1NCNonparametric() ;
 
+  /**
+   * Return the name of the class for the element.
+   */
   virtual std::string get_name () const ;
 
+  /**
+   * Return the update flags which are needed.
+   */
   virtual UpdateFlags     requires_update_flags (const UpdateFlags flags) const ;
 
+  /**
+   * Copy constructor.
+   */
   virtual FiniteElement<2,2> *clone () const ;
 
+  /**
+   * Destructor.
+   */
   virtual ~FE_P1NCNonparametric ();
 
 
 protected:
 
+  /**
+   * Create the constraints matrix for hanging edges.
+   */
   void initialize_constraints () ;
 
 };
