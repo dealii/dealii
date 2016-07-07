@@ -115,7 +115,10 @@ FOREACH(_category ${_categories})
   IF(DEAL_II_MSVC)
     SET(_command ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options} ${_category_dir})
   ELSE()
-    SET(_command ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options} ${_category_dir} > /dev/null)
+    # Do not pass the generator with -G so that we use make instead of ninja
+    # for the test projects. This is because calling ninja several times in
+    # parallel for the same project will break the configuration.
+    SET(_command ${CMAKE_COMMAND} ${_options} ${_category_dir} > /dev/null)
   ENDIF()
 
   ADD_CUSTOM_TARGET(setup_tests_${_category}
