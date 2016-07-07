@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2015 by the deal.II authors
+// Copyright (C) 1998 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -813,7 +813,7 @@ public:
    * In image space, i.e., in the space in which we operate, this
    * leads to the curve
    * @f{align*}{
-   *   \mathbf s(t) &= F(s(t)
+   *   \mathbf s(t) &= F(\zeta(t))
    *  \\          &= F(\xi_1 +  t (\xi_2-\xi_1))
    *  \\          &= F\left(F^{-1}(\mathbf x_1) + t\left[F^{-1}(\mathbf x_2)
    *                                     -F^{-1}(\mathbf x_1)\right]\right).
