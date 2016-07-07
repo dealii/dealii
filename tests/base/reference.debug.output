@@ -12,6 +12,5 @@ DEAL::Construct D
 DEAL::Destruct D
 DEAL::Exception: ExcInUse (counter, object_info->name(), infostring)
 DEAL::Destruct C
-DEAL::Exception: ExcNoSubscriber(object_info->name(), name)
 DEAL::Destruct B
 DEAL::Destruct A
