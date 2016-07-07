@@ -480,7 +480,7 @@ namespace PETScWrappers
   void
   PreconditionBoomerAMG::initialize ()
   {
-#ifndef PETSC_USE_COMPLEX
+#ifdef PETSC_HAVE_HYPRE
     int ierr;
     ierr = PCSetType (pc, const_cast<char *>(PCHYPRE));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
