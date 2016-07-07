@@ -1,98 +1,12 @@
 
 DEAL::Schur complement
 DEAL:SC_SparseMatrix::SparseMatrix 1
-DEAL:SC_SparseMatrix:cg::Starting value 5.000000000
-DEAL:SC_SparseMatrix:cg::Convergence step 1 value 0.000000000
-DEAL:SC_SparseMatrix:cg::Starting value 9.000000000
-DEAL:SC_SparseMatrix:cg:cg::Starting value 4.500000000
-DEAL:SC_SparseMatrix:cg:cg::Convergence step 1 value 0.000000000
-DEAL:SC_SparseMatrix:cg::Convergence step 1 value 0.000000000
-DEAL:SC_SparseMatrix:cg::Starting value 4.000000000
-DEAL:SC_SparseMatrix:cg::Convergence step 1 value 0.000000000
 DEAL:SC_SparseMatrix::Solution vector: x: -4.000000000 
 DEAL:SC_SparseMatrix::Solution vector: y: 4.500000000 
 DEAL:SC_SparseMatrix::SparseMatrix OK
 DEAL:SC_SparseMatrix:SC_BlockSparseMatrix::BlockSparseMatrix 1
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg::Starting value 46.74398357
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg::Convergence step 1 value 0.000000000
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg::Starting value 21.00919703
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 33.27448540
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 0.000000000
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 45.97490107
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 1.776356839e-15
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 28.96138274
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 1.776356839e-15
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 15.19528992
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 0.000000000
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 7.010434694
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 1.444357125e-15
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 2.860158624
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 1.146493431e-16
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 1.013942270
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 0.000000000
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 0.3017508708
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 0.000000000
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 0.07094905937
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 0.000000000
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 0.01140752780
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 2.179388120e-18
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 2.200743662e-06
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 0.000000000
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg::Convergence step 11 value 4.773887375e-11
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg::Starting value 622.4076906
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg::Convergence step 1 value 2.929642751e-14
 DEAL:SC_SparseMatrix:SC_BlockSparseMatrix::Solution vector: x = s.block(1): -3.333333333 -6.000000000 -8.666666667 -11.33333333 -14.00000000 -16.66666667 -19.33333333 -22.00000000 -24.66666667 -27.33333333 
 DEAL:SC_SparseMatrix:SC_BlockSparseMatrix::Solution vector: y = s.block(0): 8.333333333 11.00000000 13.66666667 16.33333333 19.00000000 21.66666667 24.33333333 27.00000000 29.66666667 32.33333333 
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg::Starting value 46.74398357
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg::Convergence step 1 value 0.000000000
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg::Starting value 21.00919703
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 21.00919703
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 17.45229624
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 124.2796216
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 7.105427358e-15
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 17.45229624
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 14.35782789
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 100.0213190
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 0.000000000
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 12.34050766
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 8.991986820
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 129.0184156
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 2.587940646e-14
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 7.482680505
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 4.974308439
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 107.8383444
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 0.000000000
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 3.923140398
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 2.361041089
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 71.20654792
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 0.000000000
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 1.772116736
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 0.9501693577
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 38.95216224
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 0.000000000
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 0.6799243772
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 0.3167664073
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 17.69780734
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 3.148515104e-15
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 0.2154366229
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 0.08362844279
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 6.528344074
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 2.775557892e-17
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 0.05331266845
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 0.01584789371
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 1.854052160
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 3.565310485e-16
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 0.008945562859
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 0.001552120499
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 0.3527279632
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 6.947697991e-17
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 4.183032022e-07
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 8.661810558e-12
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Starting value 1.882364435e-06
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg:cg::Convergence step 1 value 2.908056841e-26
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg::Convergence step 11 value 4.323638387e-12
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg::Starting value 622.4076906
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix:cg::Convergence step 1 value 7.105427358e-15
 DEAL:SC_SparseMatrix:SC_BlockSparseMatrix::Solution vector: x = s.block(1): -3.333333333 -6.000000000 -8.666666667 -11.33333333 -14.00000000 -16.66666667 -19.33333333 -22.00000000 -24.66666667 -27.33333333 
 DEAL:SC_SparseMatrix:SC_BlockSparseMatrix::Solution vector: y = s.block(0): 8.333333333 11.00000000 13.66666667 16.33333333 19.00000000 21.66666667 24.33333333 27.00000000 29.66666667 32.33333333 
 DEAL:SC_SparseMatrix:SC_BlockSparseMatrix::BlockSparseMatrix OK
