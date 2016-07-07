@@ -444,7 +444,7 @@ namespace internal
                                                       data.cell_manifold_quadrature_weights[point+data_set]));
 
               // To compute the Jacobian, we choose dim points aligned
-              // with with the dim reference axes, which are still in the
+              // with the dim reference axes, which are still in the
               // given cell, and ask for the tangent vector in these
               // directions. Choosing the points is somewhat arbitrary,
               // so we try to be smart and we pick points which are
@@ -461,7 +461,7 @@ namespace internal
 
                   // In the length L, we store also the direction sign,
                   // which is positive, if the coordinate is < .5,
-                  double L = pi > .5 ? -pi: 1-pi;
+                  const double L = pi > .5 ? -pi: 1-pi;
 
                   // Get the weights to compute the np point in real space
                   for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_cell; ++j)
@@ -471,7 +471,7 @@ namespace internal
                     data.manifold->get_new_point(Quadrature<spacedim>(data.vertices,
                                                                       data.vertex_weights));
 
-                  Tensor<1,spacedim> T = data.manifold->get_tangent_vector(P, NP);
+                  const Tensor<1,spacedim> T = data.manifold->get_tangent_vector(P, NP);
 
                   for (unsigned int d=0; d<spacedim; ++d)
                     data.contravariant[point][d][i] = T[d]/L;
@@ -735,15 +735,19 @@ namespace internal
 
               for (unsigned int point=0; point<n_q_points; ++point)
                 {
-                  if (dim==1)
+                  switch (dim)
+                    {
+                    case 1:
                     {
                       // J is a tangent vector
                       output_data.boundary_forms[point] = data.contravariant[point].transpose()[0];
                       output_data.boundary_forms[point] /=
                         (face_no == 0 ? -1. : +1.) * output_data.boundary_forms[point].norm();
+
+                      break;
                     }
 
-                  if (dim==2)
+                    case 2:
                     {
                       const DerivativeForm<1,spacedim,dim> DX_t =
                         data.contravariant[point].transpose();
@@ -756,6 +760,12 @@ namespace internal
                       // and the cell normal:
                       output_data.boundary_forms[point] =
                         cross_product_3d(data.aux[0][point], cell_normal);
+
+                      break;
+                    }
+
+                    default:
+                      Assert (false, ExcNotImplemented());
                     }
                 }
             }
