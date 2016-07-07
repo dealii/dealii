@@ -71,14 +71,14 @@ class PushForward : public Function<dim>
 {
 public:
   PushForward ()
-  :
-  Function<dim>(dim, 0.),
-  h (0.028),
-  x_max (4.5*h),
-  y_max (2.036*h),
-  z_max (4.5*h),
-  y_FoR (h)
-    {}
+    :
+    Function<dim>(dim, 0.),
+    h (0.028),
+    x_max (4.5*h),
+    y_max (2.036*h),
+    z_max (4.5*h),
+    y_FoR (h)
+  {}
 
   virtual ~PushForward() {};
 
@@ -129,14 +129,14 @@ class PullBack : public Function<dim>
 {
 public:
   PullBack ()
-  :
-  Function<dim>(dim, 0.),
-  h (0.028),
-  x_max (4.5*h),
-  y_max (2.036*h),
-  z_max (4.5*h),
-  y_FoR (h)
-    {}
+    :
+    Function<dim>(dim, 0.),
+    h (0.028),
+    x_max (4.5*h),
+    y_max (2.036*h),
+    z_max (4.5*h),
+    y_FoR (h)
+  {}
 
   virtual ~PullBack() {};
 
