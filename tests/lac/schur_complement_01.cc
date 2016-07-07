@@ -109,7 +109,10 @@ int main()
                                              preconditioner_S);
 
       auto rhs = condense_schur_rhs (lo_A_inv,lo_C,f,g);
-      y = lo_S_inv * rhs; // Solve for y
+      check_solver_within_range(
+        y = lo_S_inv * rhs, // Solve for y
+        solver_control_S.last_step(), 1, 1);
+
       x = postprocess_schur_solution (lo_A_inv,lo_B,y,f);
 
       PRINTME("x", x);
@@ -208,7 +211,10 @@ int main()
                                                preconditioner_S);
 
         auto rhs = condense_schur_rhs (lo_A_inv,lo_C,f,g);
-        y = lo_S_inv * rhs; // Solve for y
+        check_solver_within_range(
+          y = lo_S_inv * rhs, // Solve for y
+          solver_control_S.last_step(), 11, 11);
+
         x = postprocess_schur_solution (lo_A_inv,lo_B,y,f);
 
         PRINTME("x = s.block(1)", x);
@@ -238,7 +244,10 @@ int main()
                                                lo_S_inv_approx);
 
         auto rhs = condense_schur_rhs (lo_A_inv,lo_C,f,g);
-        y = lo_S_inv * rhs; // Solve for y
+        check_solver_within_range(
+          y = lo_S_inv * rhs,// Solve for y
+          solver_control_S.last_step(), 11, 11);
+
         x = postprocess_schur_solution (lo_A_inv,lo_B,y,f);
 
         PRINTME("x = s.block(1)", x);
