@@ -128,14 +128,25 @@ namespace GridGenerator
    * Create a coordinate-parallel brick from the two diagonally opposite
    * corner points @p p1 and @p p2.
    *
-   * If the @p colorize flag is set, the @p boundary_ids of the surfaces are
+   * If the @p colorize flag is @p true, the @p boundary_ids of the boundary faces are
    * assigned, such that the lower one in @p x-direction is 0, the upper one
    * is 1. The indicators for the surfaces in @p y-direction are 2 and 3, the
-   * ones for @p z are 4 and 5. Additionally, material ids are assigned to the
+   * ones for @p z are 4 and 5. This corresponds to the numbers of faces
+   * of the unit square of cube as laid out in the documentation of the
+   * GeometryInfo class. Importantly, however, in 3d colorization does not
+   * set @p boundary_ids of <i>edges</i>, but only of <i>faces</i>, because
+   * each boundary edge is shared between two faces and it is not clear how
+   * the boundary id of an edge should be set in that case. This may later on
+   * lead to problems if one wants to assign boundary or manifold objects to
+   * parts of the boundary with certain boundary indicators since then the
+   * boundary object may not apply to the edges bounding the face it is meant
+   * to describe.
+   *
+   * Additionally, if @p colorize is @p true, material ids are assigned to the
    * cells according to the octant their center is in: being in the right half
-   * plane for any coordinate direction <i>x<sub>i</sub></i> adds
-   * 2<sup>i</sup>. For instance, the center point (1,-1,1) yields a material
-   * id 5.
+   * space for any coordinate direction <i>x<sub>i</sub></i> adds
+   * 2<sup>i</sup>. For instance, a cell with center point (1,-1,1) yields a material
+   * id 5, assuming that the center of the hyper rectangle lies at the origin.
    *
    * If @p dim < @p spacedim, this will create a @p dim dimensional object in
    * the first @p dim coordinate directions embedded into the @p spacedim
@@ -196,7 +207,8 @@ namespace GridGenerator
    *
    * @param p2 Second corner opposite to @p p1.
    *
-   * @param colorize Assign different boundary ids if set to true.
+   * @param colorize Assign different boundary ids if set to true. The
+   *   same comments apply as for the hyper_rectangle() function.
    *
    */
   template <int dim, int spacedim>
