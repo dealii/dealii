@@ -887,13 +887,6 @@ namespace PETScWrappers
     /**
      * Exception
      */
-    DeclException1 (ExcPETScError,
-                    int,
-                    << "An error with error number " << arg1
-                    << " occurred while calling a PETSc function");
-    /**
-     * Exception
-     */
     DeclException0 (ExcSourceEqualsDestination);
 
     /**

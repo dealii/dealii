@@ -17,6 +17,7 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
+#  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/petsc_full_matrix.h>
 #  include <deal.II/lac/petsc_sparse_matrix.h>
 #  include <deal.II/lac/petsc_parallel_sparse_matrix.h>
@@ -52,7 +53,7 @@ namespace PETScWrappers
       int ierr;
       (void)ierr;
       ierr = MatGetRow(*matrix, this->a_row, &ncols, &colnums, &values);
-      AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       // copy it into our caches if the line
       // isn't empty. if it is, then we've
@@ -66,7 +67,7 @@ namespace PETScWrappers
 
       // and finally restore the matrix
       ierr = MatRestoreRow(*matrix, this->a_row, &ncols, &colnums, &values);
-      AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
     }
   }
 
@@ -355,7 +356,7 @@ namespace PETScWrappers
 //query this information from PETSc
     int ierr;
     ierr = MatGetRow(*this, row, &ncols, &colnums, &values);
-    AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // then restore the matrix and return the number of columns in this row as
     // queried previously. Starting with PETSc 3.4, MatRestoreRow actually
@@ -364,7 +365,7 @@ namespace PETScWrappers
     // and return the saved value.
     const PetscInt ncols_saved = ncols;
     ierr = MatRestoreRow(*this, row, &ncols, &colnums, &values);
-    AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return ncols_saved;
   }
@@ -644,7 +645,7 @@ namespace PETScWrappers
       {
         int ierr = MatGetRow(*this, row, &ncols, &colnums, &values);
         (void)ierr;
-        AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
 
         for (PetscInt col = 0; col < ncols; ++col)
           {
@@ -652,7 +653,7 @@ namespace PETScWrappers
           }
 
         ierr = MatRestoreRow(*this, row, &ncols, &colnums, &values);
-        AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
       }
 
     AssertThrow (out, ExcIO());

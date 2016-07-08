@@ -18,6 +18,7 @@
 #ifdef DEAL_II_WITH_PETSC
 
 #  include <deal.II/base/memory_consumption.h>
+#  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/petsc_vector.h>
 #  include <deal.II/lac/petsc_parallel_vector.h>
 #  include <cmath>
