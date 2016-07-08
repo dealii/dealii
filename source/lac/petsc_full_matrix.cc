@@ -17,7 +17,7 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
-#  include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/exceptions.h>
 
 DEAL_II_NAMESPACE_OPEN
 

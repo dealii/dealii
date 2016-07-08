@@ -18,6 +18,8 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
+#include <deal.II/lac/exceptions.h>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers

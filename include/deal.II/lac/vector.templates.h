@@ -19,6 +19,7 @@
 
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/numbers.h>
+#include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/vector_operations_internal.h>

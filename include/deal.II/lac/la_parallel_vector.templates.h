@@ -18,6 +18,7 @@
 
 
 #include <deal.II/base/config.h>
+#include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/vector_operations_internal.h>
 #include <deal.II/lac/read_write_vector.h>

@@ -154,14 +154,6 @@ namespace PETScWrappers
        * the referenced element of the vector.
        */
       operator PetscScalar () const;
-
-      /**
-       * Exception
-       */
-      DeclException1 (ExcPETScError,
-                      int,
-                      << "An error with error number " << arg1
-                      << " occurred while calling a PETSc function");
       /**
        * Exception
        */
