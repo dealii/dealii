@@ -1,0 +1,16 @@
+
+DEAL::check rank 2 tensors
+DEAL::dim=1, T=double 8
+DEAL::dim=1, T=complex<double> 16
+DEAL::dim=2, T=double 24
+DEAL::dim=2, T=complex<double> 48
+DEAL::dim=3, T=double 48
+DEAL::dim=3, T=complex<double> 96
+DEAL::check rank 4 tensors
+DEAL::dim=1, T=double 8
+DEAL::dim=1, T=complex<double> 16
+DEAL::dim=2, T=double 72
+DEAL::dim=2, T=complex<double> 144
+DEAL::dim=3, T=double 288
+DEAL::dim=3, T=complex<double> 576
+DEAL::OK

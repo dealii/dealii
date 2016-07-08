@@ -1,0 +1,10 @@
+
+DEAL::check rank 2 tensors
+DEAL::1.00 1.00 1.41
+DEAL::4.80 4.80 6.78
+DEAL::13.0 13.0 18.3
+DEAL::check rank 4 tensors
+DEAL::1.00 1.00 1.41
+DEAL::26.2 26.2 37.0
+DEAL::217. 217. 307.
+DEAL::OK
