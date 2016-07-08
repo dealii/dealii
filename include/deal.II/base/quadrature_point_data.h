@@ -32,7 +32,7 @@
 
 #include <vector>
 #include <map>
-#include <typeinfo>
+#include <type_traits>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -89,7 +89,7 @@ public:
    * in different parts of the domain.
    *
    * @pre The type @p T needs to either equal @p DataType, or be a class derived
-   * from @p DataType.
+   * from @p DataType. @p T needs to be default constructible.
    */
   template<typename T=DataType>
   void initialize(const CellIteratorType &cell,
@@ -507,8 +507,6 @@ void CellDataStorage<CellIteratorType,DataType>::initialize(const CellIteratorTy
 {
   static_assert(std::is_base_of<DataType, T>::value,
                 "User's T class should be derived from user's DataType class");
-  static_assert(std::is_default_constructible<T>::value,
-                "Class T requires default-constructible elements");
 
   if (map.find(cell) == map.end())
     {
