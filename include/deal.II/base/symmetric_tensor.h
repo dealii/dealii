@@ -1728,7 +1728,7 @@ inline
 Number
 SymmetricTensor<rank,dim,Number>::access_raw_entry (const unsigned int index) const
 {
-  AssertIndexRange (index, data.dimension);
+  AssertIndexRange (index, n_independent_components);
   return data[internal::SymmetricTensor::entry_to_indices(*this, index)];
 }
 
@@ -1739,7 +1739,7 @@ inline
 Number &
 SymmetricTensor<rank,dim,Number>::access_raw_entry (const unsigned int index)
 {
-  AssertIndexRange (index, data.dimension);
+  AssertIndexRange (index, n_independent_components);
   return data[internal::SymmetricTensor::entry_to_indices(*this, index)];
 }
 
