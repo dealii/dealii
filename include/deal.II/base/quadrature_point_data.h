@@ -61,11 +61,6 @@ class CellDataStorage : public Subscriptor
 {
 public:
   /**
-   * A typedef for a vector of shared pointers with arbitrary data type @p T .
-   */
-  template <typename T> using CellVector = std::vector<std::shared_ptr<T> >;
-
-  /**
    * Default constructor.
    */
   CellDataStorage();
@@ -156,7 +151,7 @@ private:
   /**
    * A map to store a vector of data on a cell.
    */
-  std::map<CellIteratorType, CellVector<DataType> > map;
+  std::map<CellIteratorType, std::vector<std::shared_ptr<DataType>>> map;
 
 };
 
@@ -520,7 +515,7 @@ void CellDataStorage<CellIteratorType,DataType>::initialize(const CellIteratorTy
       map[cell] = std::vector<std::shared_ptr<DataType> >(n_q_points);
       // we need to initialise one-by-one as the std::vector<>(q, T())
       // will end with a single same T object stored in each element of the vector:
-      typename std::map<CellIteratorType,CellVector<DataType> >::iterator it = map.find(cell);
+      auto it = map.find(cell);
       for (unsigned int q=0; q < n_q_points; q++)
         it->second[q] = std::make_shared<T>();
     }
@@ -544,7 +539,7 @@ void CellDataStorage<CellIteratorType,DataType>::initialize(const CellIteratorTy
 template <typename CellIteratorType, typename DataType>
 bool CellDataStorage<CellIteratorType,DataType>::erase(const CellIteratorType &cell)
 {
-  const typename std::map<CellIteratorType,CellVector<DataType> >::const_iterator it = map.find(cell);
+  const auto it = map.find(cell);
   for (unsigned int i = 0; i < it->second.size(); i++)
     {
       Assert(it->second[i].unique(),
@@ -563,7 +558,7 @@ void CellDataStorage<CellIteratorType,DataType>::clear()
   // Do not call
   // map.clear();
   // as we want to be sure no one uses the stored objects. Loop manually:
-  typename std::map<CellIteratorType,CellVector<DataType> >::iterator it = map.begin();
+  auto it = map.begin();
   while (it != map.end())
     {
       // loop over all objects and see if noone is using them
@@ -581,20 +576,20 @@ void CellDataStorage<CellIteratorType,DataType>::clear()
 
 template <typename CellIteratorType, typename DataType>
 template <typename T>
-CellDataStorage<CellIteratorType,DataType>::CellVector<T>
+std::vector<std::shared_ptr<T> >
 CellDataStorage<CellIteratorType,DataType>::get_data(const CellIteratorType &cell)
 {
   static_assert(std::is_base_of<DataType, T>::value,
                 "User's T class should be derived from user's DataType class");
 
-  typename std::map<CellIteratorType,CellVector<DataType> >::iterator it = map.find(cell);
+  auto it = map.find(cell);
   Assert(it != map.end(), ExcMessage("Could not find data for the cell"));
 
   // It would be nice to have a specialized version of this function for T==DataType.
   // However explicit (i.e full) specialization of a member template is only allowed
   // when the enclosing class is also explicitly (i.e fully) specialized.
   // Thus, stick with copying of shared pointers even when the T==DataType:
-  CellVector<T> res (it->second.size());
+  std::vector<std::shared_ptr<T>> res (it->second.size());
   for (unsigned int q = 0; q < res.size(); q++)
     res[q] = std::dynamic_pointer_cast<T>(it->second[q]);
   return res;
@@ -605,19 +600,19 @@ CellDataStorage<CellIteratorType,DataType>::get_data(const CellIteratorType &cel
 
 template <typename CellIteratorType, typename DataType>
 template <typename T>
-CellDataStorage<CellIteratorType,DataType>::CellVector<const T>
+std::vector<std::shared_ptr<const T> >
 CellDataStorage<CellIteratorType,DataType>::get_data(const CellIteratorType &cell) const
 {
   static_assert(std::is_base_of<DataType, T>::value,
                 "User's T class should be derived from user's DataType class");
 
-  const typename std::map<CellIteratorType,CellVector<DataType> >::const_iterator it = map.find(cell);
+  auto it = map.find(cell);
   Assert(it != map.end(), ExcMessage("Could not find QP data for the cell"));
 
   // Cast base class to the desired class. This has to be done irrespectively of
   // T==DataType as we need to return shapred_ptr<const T> to make sure the user
   // does not modify the content of QP objects
-  CellVector<const T> res (it->second.size());
+  std::vector<std::shared_ptr<const T>> res (it->second.size());
   for (unsigned int q = 0; q < res.size(); q++)
     res[q] = std::dynamic_pointer_cast<const T>(it->second[q]);
   return res;
