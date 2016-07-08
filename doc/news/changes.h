@@ -336,6 +336,18 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: SymmetricTensor::access_raw_entry() erroneously produced
+ an indexing error for rank-4 symmetric tensors. This is now fixed.
+ <br>
+ (Wolfgang Bangerth, 2016/07/08)
+ </li>
+
+ <li> Fixed: SymmetricTensor::norm() did not work correctly for complex
+ underlying scalar types. This is now fixed.
+ <br>
+ (Wolfgang Bangerth, 2016/07/08)
+ </li>
+
  <li> Fixed: The function DoFTools::dof_couplings_from_component_couplings
  for hp::FECollection arguments was compiled but not exported from the
  object file. This is now fixed.
