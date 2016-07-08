@@ -26,17 +26,23 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_face.h>
+#include <deal.II/fe/fe_q_iso_q1.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_q_dg0.h>
+#include <deal.II/fe/fe_q_bubbles.h>
 #include <deal.II/fe/fe_bernstein.h>
 #include <deal.II/fe/fe_q_hierarchical.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_dgp_monomial.h>
 #include <deal.II/fe/fe_dgp_nonparametric.h>
+#include <deal.II/fe/fe_dg_vector.h>
 #include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_abf.h>
 #include <deal.II/fe/fe_bdm.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
+#include <deal.II/fe/fe_rannacher_turek.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
@@ -945,6 +951,46 @@ namespace FETools
     return new FE_Q<3>(quad);
   }
 
+  // Specializations for FE_Q_DG0.
+  template <>
+  FiniteElement<1, 1> *
+  FEFactory<FE_Q_DG0<1, 1> >::get (const Quadrature<1> &quad) const
+  {
+    return new FE_Q_DG0<1>(quad);
+  }
+  template <>
+  FiniteElement<2, 2> *
+  FEFactory<FE_Q_DG0<2, 2> >::get (const Quadrature<1> &quad) const
+  {
+    return new FE_Q_DG0<2>(quad);
+  }
+  template <>
+  FiniteElement<3, 3> *
+  FEFactory<FE_Q_DG0<3, 3> >::get (const Quadrature<1> &quad) const
+  {
+    return new FE_Q_DG0<3>(quad);
+  }
+
+  // Specializations for FE_Q_Bubbles.
+  template <>
+  FiniteElement<1, 1> *
+  FEFactory<FE_Q_Bubbles<1, 1> >::get (const Quadrature<1> &quad) const
+  {
+    return new FE_Q_Bubbles<1>(quad);
+  }
+  template <>
+  FiniteElement<2, 2> *
+  FEFactory<FE_Q_Bubbles<2, 2> >::get (const Quadrature<1> &quad) const
+  {
+    return new FE_Q_Bubbles<2>(quad);
+  }
+  template <>
+  FiniteElement<3, 3> *
+  FEFactory<FE_Q_Bubbles<3, 3> >::get (const Quadrature<1> &quad) const
+  {
+    return new FE_Q_Bubbles<3>(quad);
+  }
+
 
   // Specializations for FE_DGQArbitraryNodes.
   template <>
@@ -1004,8 +1050,16 @@ namespace
       = FEFactoryPointer(new FETools::FEFactory<FE_Q_Hierarchical<dim> >);
     result["FE_ABF"]
       = FEFactoryPointer(new FETools::FEFactory<FE_ABF<dim> >);
+    result["FE_Bernstein"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_Bernstein<dim> >);
     result["FE_BDM"]
       = FEFactoryPointer(new FETools::FEFactory<FE_BDM<dim> >);
+    result["FE_DGBDM"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGBDM<dim> >);
+    result["FE_DGNedelec"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGNedelec<dim> >);
+    result["FE_DGRaviartThomas"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGRaviartThomas<dim> >);
     result["FE_RaviartThomas"]
       = FEFactoryPointer(new FETools::FEFactory<FE_RaviartThomas<dim> >);
     result["FE_RaviartThomasNodal"]
@@ -1022,12 +1076,22 @@ namespace
       = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim> >);
     result["FE_DGQArbitraryNodes"]
       = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim> >);
+    result["FE_FaceQ"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_FaceQ<dim> >);
+    result["FE_FaceP"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_FaceP<dim> >);
     result["FE_Q"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Q<dim> >);
-    result["FE_Bernstein"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_Bernstein<dim> >);
+    result["FE_Q_DG0"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_Q_DG0<dim> >);
+    result["FE_Q_Bubbles"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_Q_Bubbles<dim> >);
+    result["FE_Q_iso_Q1"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_Q_iso_Q1<dim> >);
     result["FE_Nothing"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Nothing<dim> >);
+    result["FE_RannacherTurek"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_RannacherTurek<dim> >);
   }
 
   // This function fills a map from names to finite elements for any
@@ -1039,12 +1103,22 @@ namespace
   {
     typedef std_cxx11::shared_ptr<const Subscriptor> FEFactoryPointer;
 
+    result["FE_Bernstein"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_Bernstein<dim,spacedim> >);
     result["FE_DGP"]
       = FEFactoryPointer(new FETools::FEFactory<FE_DGP<dim,spacedim> >);
     result["FE_DGQ"]
       = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim,spacedim> >);
+    result["FE_Nothing"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_Nothing<dim,spacedim> >);
     result["FE_DGQArbitraryNodes"]
       = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim,spacedim> >);
+    result["FE_Q_Bubbles"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_Q_Bubbles<dim,spacedim> >);
+    result["FE_Q_DG0"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_Q_DG0<dim,spacedim> >);
+    result["FE_Q_iso_Q1"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_Q_iso_Q1<dim,spacedim> >);
     result["FE_Q"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Q<dim,spacedim> >);
     result["FE_Bernstein"]
