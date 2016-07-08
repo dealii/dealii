@@ -18,6 +18,7 @@
 
 
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/table_indices.h>
 #include <deal.II/base/template_constraints.h>
 
@@ -727,7 +728,8 @@ public:
    * upper right as well as lower left entries, not just one of them, although
    * they are equal for symmetric tensors).
    */
-  Number norm () const;
+  typename numbers::NumberTraits<Number>::real_type
+  norm () const;
 
   /**
    * Tensors can be unrolled by simply pasting all elements into one long
@@ -1749,70 +1751,77 @@ namespace internal
 {
   template <int dim, typename Number>
   inline
-  Number
+  typename numbers::NumberTraits<Number>::real_type
   compute_norm (const typename SymmetricTensorAccessors::StorageType<2,dim,Number>::base_tensor_type &data)
   {
-    Number return_value;
     switch (dim)
       {
       case 1:
-        return_value = std::abs(data[0]);
-        break;
+        return numbers::NumberTraits<Number>::abs(data[0]);
+
       case 2:
-        return_value = std::sqrt(data[0]*data[0] + data[1]*data[1] +
-                                 Number(2.) * data[2]*data[2]);
-        break;
+        return std::sqrt(numbers::NumberTraits<Number>::abs_square(data[0]) +
+                         numbers::NumberTraits<Number>::abs_square(data[1]) +
+                         2. * numbers::NumberTraits<Number>::abs_square(data[2]));
+
       case 3:
-        return_value =  std::sqrt(data[0]*data[0] + data[1]*data[1] +
-                                  data[2]*data[2] +
-                                  Number(2.) * data[3]*data[3] +
-                                  Number(2.) * data[4]*data[4] +
-                                  Number(2.) * data[5]*data[5]);
-        break;
+        return std::sqrt(numbers::NumberTraits<Number>::abs_square(data[0]) +
+                         numbers::NumberTraits<Number>::abs_square(data[1]) +
+                         numbers::NumberTraits<Number>::abs_square(data[2]) +
+                         2. * numbers::NumberTraits<Number>::abs_square(data[3]) +
+                         2. * numbers::NumberTraits<Number>::abs_square(data[4]) +
+                         2. * numbers::NumberTraits<Number>::abs_square(data[5]));
+
       default:
-        return_value = Number();
+      {
+        typename numbers::NumberTraits<Number>::real_type return_value
+          = typename numbers::NumberTraits<Number>::real_type();
+
         for (unsigned int d=0; d<dim; ++d)
-          return_value += data[d] * data[d];
+          return_value += numbers::NumberTraits<Number>::abs_square(data[d]);
         for (unsigned int d=dim; d<(dim*dim+dim)/2; ++d)
-          return_value += Number(2.) * data[d] * data[d];
-        return_value = std::sqrt(return_value);
+          return_value += 2. * numbers::NumberTraits<Number>::abs_square(data[d]);
+
+        return std::sqrt(return_value);
       }
-    return return_value;
+      }
   }
 
 
 
   template <int dim, typename Number>
   inline
-  Number
+  typename numbers::NumberTraits<Number>::real_type
   compute_norm (const typename SymmetricTensorAccessors::StorageType<4,dim,Number>::base_tensor_type &data)
   {
-    Number return_value;
-    const unsigned int n_independent_components = data.dimension;
-
     switch (dim)
       {
       case 1:
-        return_value = std::abs (data[0][0]);
-        break;
-      default:
-        return_value = Number();
-        for (unsigned int i=0; i<dim; ++i)
-          for (unsigned int j=0; j<dim; ++j)
-            return_value += data[i][j] * data[i][j];
-        for (unsigned int i=0; i<dim; ++i)
-          for (unsigned int j=dim; j<n_independent_components; ++j)
-            return_value += Number(2.) * data[i][j] * data[i][j];
-        for (unsigned int i=dim; i<n_independent_components; ++i)
-          for (unsigned int j=0; j<dim; ++j)
-            return_value += Number(2.) * data[i][j] * data[i][j];
-        for (unsigned int i=dim; i<n_independent_components; ++i)
-          for (unsigned int j=dim; j<n_independent_components; ++j)
-            return_value += 4. * data[i][j] * data[i][j];
-        return_value = std::sqrt(return_value);
-      }
+        return numbers::NumberTraits<Number>::abs (data[0][0]);
 
-    return return_value;
+      default:
+      {
+        typename numbers::NumberTraits<Number>::real_type return_value
+          = typename numbers::NumberTraits<Number>::real_type();
+
+        const unsigned int n_independent_components = data.dimension;
+
+        for (unsigned int i=0; i<dim; ++i)
+          for (unsigned int j=0; j<dim; ++j)
+            return_value += numbers::NumberTraits<Number>::abs_square(data[i][j]);
+        for (unsigned int i=0; i<dim; ++i)
+          for (unsigned int j=dim; j<n_independent_components; ++j)
+            return_value += 2. * numbers::NumberTraits<Number>::abs_square(data[i][j]);
+        for (unsigned int i=dim; i<n_independent_components; ++i)
+          for (unsigned int j=0; j<dim; ++j)
+            return_value += 2. * numbers::NumberTraits<Number>::abs_square(data[i][j]);
+        for (unsigned int i=dim; i<n_independent_components; ++i)
+          for (unsigned int j=dim; j<n_independent_components; ++j)
+            return_value += 4. * numbers::NumberTraits<Number>::abs_square(data[i][j]);
+
+        return std::sqrt(return_value);
+      }
+      }
   }
 
 } // end of namespace internal
@@ -1821,7 +1830,7 @@ namespace internal
 
 template <int rank, int dim, typename Number>
 inline
-Number
+typename numbers::NumberTraits<Number>::real_type
 SymmetricTensor<rank,dim,Number>::norm () const
 {
   return internal::compute_norm<dim,Number> (data);
