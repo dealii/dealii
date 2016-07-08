@@ -119,10 +119,11 @@ namespace GridGenerator
       typename Triangulation<dim,spacedim>::face_iterator face = tria.begin_face(),
                                                           endface = tria.end_face();
       for (; face!=endface; ++face)
-        {
+        if (face->at_boundary())
           if (face->boundary_id() == 0)
             {
               const Point<spacedim> center (face->center());
+
               if (std::abs(center(0)-p1[0]) < epsilon)
                 face->set_boundary_id(0);
               else if (std::abs(center(0) - p2[0]) < epsilon)
@@ -143,13 +144,14 @@ namespace GridGenerator
                 Assert (false, ExcInternalError());
 
             }
-        }
+
       for (typename Triangulation<dim,spacedim>::cell_iterator cell = tria.begin();
            cell != tria.end(); ++cell)
         {
           char id = 0;
           for (unsigned int d=0; d<dim; ++d)
-            if (cell->center()(d) > 0) id += 1 << d;
+            if (cell->center()(d) > 0)
+              id += (1 << d);
           cell->set_material_id(id);
         }
     }
