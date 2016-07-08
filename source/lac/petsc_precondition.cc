@@ -19,6 +19,7 @@
 
 #  include <deal.II/base/utilities.h>
 #  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/petsc_compatibility.h>
 #  include <deal.II/lac/petsc_matrix_base.h>
 #  include <deal.II/lac/petsc_vector_base.h>
 #  include <deal.II/lac/petsc_solver.h>
