@@ -25,6 +25,7 @@
 #ifdef DEAL_II_WITH_PETSC
 
 #include <petscconf.h>
+#include <petscksp.h>
 #include <petscmat.h>
 #include <petscpc.h>
 
@@ -74,6 +75,28 @@ namespace PETScWrappers
     return MatDestroy (matrix);
 #else
     return MatDestroy (&matrix);
+#endif
+  }
+
+
+
+  /**
+   * Destroy a Krylov Subspace (KSP) PETSc solver. This function wraps
+   * KSPDestroy with a version check (the signature of this function changed
+   * in PETSc 3.2.0).
+   *
+   * @warning Since the primary intent of this function is to enable RAII
+   * semantics in the PETSc wrappers, this function will not throw an
+   * exception if an error occurs, but instead just returns the error code
+   * given by MatDestroy.
+   */
+  inline PetscErrorCode destroy_krylov_solver (KSP &krylov_solver)
+  {
+    // PETSc will check whether or not matrix is NULL.
+#if DEAL_II_PETSC_VERSION_LT(3, 2, 0)
+    return KSPDestroy (krylov_solver);
+#else
+    return KSPDestroy (&krylov_solver);
 #endif
   }
 }
