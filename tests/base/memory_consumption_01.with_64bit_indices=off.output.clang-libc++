@@ -1,0 +1,139 @@
+
+DEAL::1d
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       8
+DEAL::   Number of degrees of freedom: 17
+DEAL::Memory consumption -- Triangulation: 2842
+DEAL::Memory consumption -- DoFHandler:    928
+DEAL::Memory consumption -- FE:            1232
+DEAL::Memory consumption -- Constraints:   78
+DEAL::Memory consumption -- Sparsity:      432
+DEAL::Memory consumption -- Matrix:        608
+DEAL::Memory consumption -- Solution:      216
+DEAL::Memory consumption -- Rhs:           216
+DEAL::Cycle 1:
+DEAL::   Number of active cells:       11
+DEAL::   Number of degrees of freedom: 23
+DEAL::Memory consumption -- Triangulation: 3650
+DEAL::Memory consumption -- DoFHandler:    1116
+DEAL::Memory consumption -- FE:            1232
+DEAL::Memory consumption -- Constraints:   78
+DEAL::Memory consumption -- Sparsity:      552
+DEAL::Memory consumption -- Matrix:        800
+DEAL::Memory consumption -- Solution:      264
+DEAL::Memory consumption -- Rhs:           264
+DEAL::Cycle 2:
+DEAL::   Number of active cells:       15
+DEAL::   Number of degrees of freedom: 31
+DEAL::Memory consumption -- Triangulation: 4506
+DEAL::Memory consumption -- DoFHandler:    1308
+DEAL::Memory consumption -- FE:            1232
+DEAL::Memory consumption -- Constraints:   78
+DEAL::Memory consumption -- Sparsity:      712
+DEAL::Memory consumption -- Matrix:        1056
+DEAL::Memory consumption -- Solution:      328
+DEAL::Memory consumption -- Rhs:           328
+DEAL::Cycle 3:
+DEAL::   Number of active cells:       20
+DEAL::   Number of degrees of freedom: 41
+DEAL::Memory consumption -- Triangulation: 5602
+DEAL::Memory consumption -- DoFHandler:    1536
+DEAL::Memory consumption -- FE:            1232
+DEAL::Memory consumption -- Constraints:   78
+DEAL::Memory consumption -- Sparsity:      912
+DEAL::Memory consumption -- Matrix:        1376
+DEAL::Memory consumption -- Solution:      408
+DEAL::Memory consumption -- Rhs:           408
+DEAL::Memory consumption -- DataOut:       2978
+DEAL::2d
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       20
+DEAL::   Number of degrees of freedom: 89
+DEAL::Memory consumption -- Triangulation: 5231
+DEAL::Memory consumption -- DoFHandler:    1888
+DEAL::Memory consumption -- FE:            3168
+DEAL::Memory consumption -- Constraints:   78
+DEAL::Memory consumption -- Sparsity:      5712
+DEAL::Memory consumption -- Matrix:        10592
+DEAL::Memory consumption -- Solution:      792
+DEAL::Memory consumption -- Rhs:           792
+DEAL::Cycle 1:
+DEAL::   Number of active cells:       44
+DEAL::   Number of degrees of freedom: 209
+DEAL::Memory consumption -- Triangulation: 10951
+DEAL::Memory consumption -- DoFHandler:    3680
+DEAL::Memory consumption -- FE:            3168
+DEAL::Memory consumption -- Constraints:   3102
+DEAL::Memory consumption -- Sparsity:      13968
+DEAL::Memory consumption -- Matrix:        26144
+DEAL::Memory consumption -- Solution:      1752
+DEAL::Memory consumption -- Rhs:           1752
+DEAL::Cycle 2:
+DEAL::   Number of active cells:       92
+DEAL::   Number of degrees of freedom: 449
+DEAL::Memory consumption -- Triangulation: 21599
+DEAL::Memory consumption -- DoFHandler:    7136
+DEAL::Memory consumption -- FE:            3168
+DEAL::Memory consumption -- Constraints:   10734
+DEAL::Memory consumption -- Sparsity:      31216
+DEAL::Memory consumption -- Matrix:        58720
+DEAL::Memory consumption -- Solution:      3672
+DEAL::Memory consumption -- Rhs:           3672
+DEAL::Cycle 3:
+DEAL::   Number of active cells:       200
+DEAL::   Number of degrees of freedom: 921
+DEAL::Memory consumption -- Triangulation: 43727
+DEAL::Memory consumption -- DoFHandler:    14624
+DEAL::Memory consumption -- FE:            3168
+DEAL::Memory consumption -- Constraints:   19966
+DEAL::Memory consumption -- Sparsity:      64144
+DEAL::Memory consumption -- Matrix:        120800
+DEAL::Memory consumption -- Solution:      7448
+DEAL::Memory consumption -- Rhs:           7448
+DEAL::Memory consumption -- DataOut:       38118
+DEAL::3d
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       56
+DEAL::   Number of degrees of freedom: 517
+DEAL::Memory consumption -- Triangulation: 24699
+DEAL::Memory consumption -- DoFHandler:    9712
+DEAL::Memory consumption -- FE:            10104
+DEAL::Memory consumption -- Constraints:   78
+DEAL::Memory consumption -- Sparsity:      120256
+DEAL::Memory consumption -- Matrix:        236256
+DEAL::Memory consumption -- Solution:      4216
+DEAL::Memory consumption -- Rhs:           4216
+DEAL::Cycle 1:
+DEAL::   Number of active cells:       217
+DEAL::   Number of degrees of freedom: 2217
+DEAL::Memory consumption -- Triangulation: 98113
+DEAL::Memory consumption -- DoFHandler:    37948
+DEAL::Memory consumption -- FE:            10104
+DEAL::Memory consumption -- Constraints:   55262
+DEAL::Memory consumption -- Sparsity:      567128
+DEAL::Memory consumption -- Matrix:        1116400
+DEAL::Memory consumption -- Solution:      17816
+DEAL::Memory consumption -- Rhs:           17816
+DEAL::Cycle 2:
+DEAL::   Number of active cells:       896
+DEAL::   Number of degrees of freedom: 9373
+DEAL::Memory consumption -- Triangulation: 394523
+DEAL::Memory consumption -- DoFHandler:    151232
+DEAL::Memory consumption -- FE:            10104
+DEAL::Memory consumption -- Constraints:   367086
+DEAL::Memory consumption -- Sparsity:      2517184
+DEAL::Memory consumption -- Matrix:        4959264
+DEAL::Memory consumption -- Solution:      75064
+DEAL::Memory consumption -- Rhs:           75064
+DEAL::Cycle 3:
+DEAL::   Number of active cells:       3248
+DEAL::   Number of degrees of freedom: 32433
+DEAL::Memory consumption -- Triangulation: 1389679
+DEAL::Memory consumption -- DoFHandler:    541960
+DEAL::Memory consumption -- FE:            10104
+DEAL::Memory consumption -- Constraints:   1307806
+DEAL::Memory consumption -- Sparsity:      8321744
+DEAL::Memory consumption -- Matrix:        16383904
+DEAL::Memory consumption -- Solution:      259544
+DEAL::Memory consumption -- Rhs:           259544
+DEAL::Memory consumption -- DataOut:       1081902
