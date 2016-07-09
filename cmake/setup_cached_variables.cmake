@@ -265,6 +265,7 @@ FOREACH(_flag ${DEAL_II_USED_FLAGS})
   #
   SET(${_flag} "${${_flag}}" CACHE STRING
     "The user supplied cache variable will be appended _at the end_ of the configuration step to the auto generated ${_flag} variable"
+    FORCE
     )
   MARK_AS_ADVANCED(${_flag})
 
