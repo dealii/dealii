@@ -33,6 +33,12 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers
 {
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
+  typedef PetscTruth PetscBooleanType;
+#else
+  typedef PetscBool PetscBooleanType;
+#endif
+
   /**
    * Set an option in the global PETSc database. This function just wraps
    * PetscOptionsSetValue with a version check (the signature of this function

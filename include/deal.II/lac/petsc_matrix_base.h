@@ -22,8 +22,9 @@
 #ifdef DEAL_II_WITH_PETSC
 
 #  include <deal.II/base/subscriptor.h>
-#  include <deal.II/lac/full_matrix.h>
 #  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/full_matrix.h>
+#  include <deal.II/lac/petsc_compatibility.h>
 #  include <deal.II/lac/vector.h>
 
 #  include <petscmat.h>
@@ -841,11 +842,7 @@ namespace PETScWrappers
      * Test whether a matrix is symmetric.  Default tolerance is
      * $1000\times32$-bit machine precision.
      */
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    PetscTruth
-#else
-    PetscBool
-#endif
+    PetscBooleanType
     is_symmetric (const double tolerance = 1.e-12);
 
     /**
@@ -853,11 +850,7 @@ namespace PETScWrappers
      * its transpose. Default tolerance is $1000\times32$-bit machine
      * precision.
      */
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    PetscTruth
-#else
-    PetscBool
-#endif
+    PetscBooleanType
     is_hermitian (const double tolerance = 1.e-12);
 
     /**

@@ -18,6 +18,7 @@
 #ifdef DEAL_II_WITH_PETSC
 
 #  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/petsc_compatibility.h>
 #  include <deal.II/lac/petsc_full_matrix.h>
 #  include <deal.II/lac/petsc_sparse_matrix.h>
 #  include <deal.II/lac/petsc_parallel_sparse_matrix.h>
@@ -574,19 +575,10 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-  PetscTruth
-#else
-  PetscBool
-#endif
+  PetscBooleanType
   MatrixBase::is_symmetric (const double tolerance)
   {
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    PetscTruth
-#else
-    PetscBool
-#endif
-    truth;
+    PetscBooleanType truth;
     assert_is_compressed ();
     int ierr = MatIsSymmetric (matrix, tolerance, &truth);
     (void)ierr;
@@ -594,19 +586,10 @@ namespace PETScWrappers
     return truth;
   }
 
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-  PetscTruth
-#else
-  PetscBool
-#endif
+  PetscBooleanType
   MatrixBase::is_hermitian (const double tolerance)
   {
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    PetscTruth
-#else
-    PetscBool
-#endif
-    truth;
+    PetscBooleanType truth;
 
     assert_is_compressed ();
     int ierr = MatIsHermitian (matrix, tolerance, &truth);
