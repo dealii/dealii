@@ -1,0 +1,15 @@
+
+DEAL::check rank 2 tensors
+DEAL::1.00 vs 1.00
+DEAL::1.00 vs (1.00,0.00)
+DEAL::1.41 vs (1.41,0.00)
+DEAL::
+DEAL::4.80 vs 4.80
+DEAL::4.80 vs (4.80,0.00)
+DEAL::6.78 vs (6.78,0.00)
+DEAL::
+DEAL::13.0 vs 13.0
+DEAL::13.0 vs (13.0,0.00)
+DEAL::18.3 vs (18.3,0.00)
+DEAL::
+DEAL::OK
