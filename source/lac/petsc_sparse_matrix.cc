@@ -18,6 +18,7 @@
 #ifdef DEAL_II_WITH_PETSC
 
 #  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/petsc_compatibility.h>
 #  include <deal.II/lac/petsc_vector.h>
 #  include <deal.II/lac/sparsity_pattern.h>
 #  include <deal.II/lac/dynamic_sparsity_pattern.h>
@@ -85,12 +86,8 @@ namespace PETScWrappers
   {
     // get rid of old matrix and generate a
     // new one
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    const int ierr = MatDestroy (matrix);
-#else
-    const int ierr = MatDestroy (&matrix);
-#endif
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    const PetscErrorCode ierr = destroy_matrix (matrix);
+    AssertThrow (ierr == 0, ExcPETScError (ierr));
 
     do_reinit (m, n, n_nonzero_per_row, is_symmetric);
   }
@@ -105,12 +102,8 @@ namespace PETScWrappers
   {
     // get rid of old matrix and generate a
     // new one
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    const int ierr = MatDestroy (matrix);
-#else
-    const int ierr = MatDestroy (&matrix);
-#endif
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    const PetscErrorCode ierr = destroy_matrix (matrix);
+    AssertThrow (ierr == 0, ExcPETScError (ierr));
 
     do_reinit (m, n, row_lengths, is_symmetric);
   }
@@ -125,12 +118,8 @@ namespace PETScWrappers
   {
     // get rid of old matrix and generate a
     // new one
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    const int ierr = MatDestroy (matrix);
-#else
-    const int ierr = MatDestroy (&matrix);
-#endif
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    const PetscErrorCode ierr = destroy_matrix (matrix);
+    AssertThrow (ierr == 0, ExcPETScError (ierr));
 
     do_reinit (sparsity_pattern, preset_nonzero_locations);
   }

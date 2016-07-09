@@ -83,12 +83,7 @@ namespace PETScWrappers
 
   MatrixBase::~MatrixBase ()
   {
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    const int ierr = MatDestroy (matrix);
-#else
-    const int ierr = MatDestroy (&matrix);
-#endif
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    destroy_matrix (matrix);
   }
 
 
@@ -97,17 +92,16 @@ namespace PETScWrappers
   MatrixBase::clear ()
   {
     // destroy the matrix...
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    int ierr = MatDestroy (matrix);
-#else
-    int ierr = MatDestroy (&matrix);
-#endif
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    {
+      const PetscErrorCode ierr = destroy_matrix (matrix);
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
+    }
+
     // ...and replace it by an empty
     // sequential matrix
     const int m=0, n=0, n_nonzero_per_row=0;
-    ierr = MatCreateSeqAIJ(PETSC_COMM_SELF, m, n, n_nonzero_per_row,
-                           0, &matrix);
+    const int ierr = MatCreateSeqAIJ(PETSC_COMM_SELF, m, n, n_nonzero_per_row,
+                                     0, &matrix);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 

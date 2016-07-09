@@ -25,6 +25,7 @@
 #ifdef DEAL_II_WITH_PETSC
 
 #include <petscconf.h>
+#include <petscmat.h>
 #include <petscpc.h>
 
 #include <string>
@@ -51,6 +52,28 @@ namespace PETScWrappers
     PetscOptionsSetValue (name.c_str (), value.c_str ());
 #else
     PetscOptionsSetValue (NULL, name.c_str (), value.c_str ());
+#endif
+  }
+
+
+
+  /**
+   * Destroy a PETSc matrix. This function wraps MatDestroy with a version
+   * check (the signature of this function changed in PETSc 3.2.0).
+   *
+   * @warning Since the primary intent of this function is to enable RAII
+   * semantics in the PETSc wrappers, this function will not throw an
+   * exception if an error occurs, but instead just returns the error code
+   * given by MatDestroy.
+   *
+   */
+  inline PetscErrorCode destroy_matrix (Mat &matrix)
+  {
+    // PETSc will check whether or not matrix is NULL.
+#if DEAL_II_PETSC_VERSION_LT(3, 2, 0)
+    return MatDestroy (matrix);
+#else
+    return MatDestroy (&matrix);
 #endif
   }
 }
