@@ -21,6 +21,7 @@
 #define dealii__petsc_compatibility_h
 
 #include <deal.II/base/config.h>
+#include <deal.II/lac/exceptions.h>
 
 #ifdef DEAL_II_WITH_PETSC
 
@@ -97,6 +98,67 @@ namespace PETScWrappers
     return KSPDestroy (krylov_solver);
 #else
     return KSPDestroy (&krylov_solver);
+#endif
+  }
+
+
+
+  /**
+   * Set a PETSc matrix option. This function wraps MatSetOption with a
+   * version check.
+   *
+   * @warning The argument option_value is ignored in versions of PETSc
+   * before 3.0.0 since the corresponding function did not take this argument.
+   */
+  inline void set_matrix_option (Mat &matrix,
+                                 const MatOption option_name,
+                                 const PetscBooleanType option_value = PETSC_FALSE)
+  {
+#if DEAL_II_PETSC_VERSION_LT(3,0,0)
+    const int ierr = MatSetOption (matrix, option_name);
+#else
+    const int ierr = MatSetOption (matrix, option_name, option_value);
+#endif
+
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+  }
+
+
+
+  /**
+   * Tell PETSc that we are not planning on adding new entries to the
+   * matrix. Generate errors in debug mode.
+   */
+  inline void close_matrix (Mat &matrix)
+  {
+#if DEAL_II_PETSC_VERSION_LT(3, 0, 0)
+#  ifdef DEBUG
+    set_matrix_option (matrix, MAT_NEW_NONZERO_LOCATION_ERR);
+#  else
+    set_matrix_option (matrix, MAT_NO_NEW_NONZERO_LOCATIONS);
+#  endif
+#else
+#  ifdef DEBUG
+    set_matrix_option (matrix, MAT_NEW_NONZERO_LOCATION_ERR, PETSC_TRUE);
+#  else
+    set_matrix_option (matrix, MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
+#  endif
+#endif
+  }
+
+
+
+  /**
+   * Tell PETSc to keep the SparsityPattern entries even if we delete a
+   * row with clear_rows() which calls MatZeroRows(). Otherwise one can
+   * not write into that row afterwards.
+   */
+  inline void set_keep_zero_rows (Mat &matrix)
+  {
+#if DEAL_II_PETSC_VERSION_LT(3, 1, 0)
+    set_matrix_option (matrix, MAT_KEEP_ZEROED_ROWS, PETSC_TRUE);
+#else
+    set_matrix_option (matrix, MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
 #endif
   }
 }

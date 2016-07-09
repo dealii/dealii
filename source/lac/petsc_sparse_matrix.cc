@@ -153,15 +153,7 @@ namespace PETScWrappers
     // set symmetric flag, if so requested
     if (is_symmetric == true)
       {
-#if DEAL_II_PETSC_VERSION_LT(3,0,0)
-        const int ierr
-          = MatSetOption (matrix, MAT_SYMMETRIC);
-#else
-        const int ierr
-          = MatSetOption (matrix, MAT_SYMMETRIC, PETSC_TRUE);
-#endif
-
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
+        set_matrix_option (matrix, MAT_SYMMETRIC, PETSC_TRUE);
       }
   }
 
@@ -195,15 +187,7 @@ namespace PETScWrappers
     // set symmetric flag, if so requested
     if (is_symmetric == true)
       {
-#if DEAL_II_PETSC_VERSION_LT(3,0,0)
-        const int ierr
-          = MatSetOption (matrix, MAT_SYMMETRIC);
-#else
-        const int ierr
-          = MatSetOption (matrix, MAT_SYMMETRIC, PETSC_TRUE);
-#endif
-
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
+        set_matrix_option(matrix, MAT_SYMMETRIC, PETSC_TRUE);
       }
   }
 
@@ -253,48 +237,8 @@ namespace PETScWrappers
           }
         compress (VectorOperation::insert);
 
-
-        // Tell PETSc that we are not
-        // planning on adding new entries
-        // to the matrix. Generate errors
-        // in debug mode.
-        int ierr;
-#if DEAL_II_PETSC_VERSION_LT(3,0,0)
-#ifdef DEBUG
-        ierr = MatSetOption (matrix, MAT_NEW_NONZERO_LOCATION_ERR);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
-#else
-        ierr = MatSetOption (matrix, MAT_NO_NEW_NONZERO_LOCATIONS);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
-#endif
-#else
-#ifdef DEBUG
-        ierr = MatSetOption (matrix, MAT_NEW_NONZERO_LOCATION_ERR, PETSC_TRUE);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
-#else
-        ierr = MatSetOption (matrix, MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
-#endif
-#endif
-
-        // Tell PETSc to keep the
-        // SparsityPattern entries even if
-        // we delete a row with
-        // clear_rows() which calls
-        // MatZeroRows(). Otherwise one can
-        // not write into that row
-        // afterwards.
-#if DEAL_II_PETSC_VERSION_LT(3,0,0)
-        ierr = MatSetOption (matrix, MAT_KEEP_ZEROED_ROWS);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
-#elif DEAL_II_PETSC_VERSION_LT(3,1,0)
-        ierr = MatSetOption (matrix, MAT_KEEP_ZEROED_ROWS, PETSC_TRUE);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
-#else
-        ierr = MatSetOption (matrix, MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
-#endif
-
+        close_matrix (matrix);
+        set_keep_zero_rows (matrix);
       }
   }
 
