@@ -1165,7 +1165,7 @@ namespace
   static
   Threads::Mutex fe_name_map_lock;
 
-  // This is the map used by FETools::get_fe_from_name and
+  // This is the map used by FETools::get_fe_by_name and
   // FETools::add_fe_name. It is only accessed by functions in this
   // file, so it is safe to make it a static variable here. It must be
   // static so that we can link several dimensions together.
@@ -2262,10 +2262,10 @@ namespace FETools
       // smarter?
       template <int dim, int spacedim>
       FiniteElement<dim,spacedim> *
-      get_fe_from_name_ext (std::string &name,
-                            const std::map<std::string,
-                            std_cxx11::shared_ptr<const Subscriptor> >
-                            &fe_name_map)
+      get_fe_by_name_ext (std::string &name,
+                          const std::map<std::string,
+                          std_cxx11::shared_ptr<const Subscriptor> >
+                          &fe_name_map)
       {
         // Extract the name of the
         // finite element class, which only
@@ -2309,8 +2309,8 @@ namespace FETools
                     // Now, the name of the
                     // first base element is
                     // first... Let's get it
-                    base_fes.push_back (get_fe_from_name_ext<dim,spacedim> (name,
-                                                                            fe_name_map));
+                    base_fes.push_back (get_fe_by_name_ext<dim,spacedim> (name,
+                                                                          fe_name_map));
                     // next check whether
                     // FESystem placed a
                     // multiplicity after
@@ -2511,9 +2511,9 @@ namespace FETools
 
 
       template <int dim,int spacedim>
-      FiniteElement<dim,spacedim> *get_fe_from_name (std::string &name)
+      FiniteElement<dim,spacedim> *get_fe_by_name (std::string &name)
       {
-        return get_fe_from_name_ext<dim,spacedim> (name, fe_name_map[dim][spacedim]);
+        return get_fe_by_name_ext<dim,spacedim> (name, fe_name_map[dim][spacedim]);
       }
     }
   }
@@ -2591,7 +2591,7 @@ namespace FETools
 
     try
       {
-        FiniteElement<dim,spacedim> *fe = internal::get_fe_from_name<dim,spacedim> (name);
+        FiniteElement<dim,spacedim> *fe = internal::get_fe_by_name<dim,spacedim> (name);
 
         // Make sure the auxiliary function
         // ate up all characters of the name.
@@ -2613,7 +2613,7 @@ namespace FETools
 
   template <int dim>
   FiniteElement<dim> *
-  get_fe_from_name (const std::string &parameter_name)
+  get_fe_by_name (const std::string &parameter_name)
   {
     return get_fe_by_name<dim,dim> (parameter_name);
   }

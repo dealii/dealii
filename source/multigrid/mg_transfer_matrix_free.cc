@@ -235,7 +235,7 @@ void MGTransferMatrixFree<dim,Number>::build
     fe_name[template_starts+1] = '1';
   }
   std_cxx11::shared_ptr<FiniteElement<1> > fe_1d
-  (FETools::get_fe_from_name<1>(fe_name));
+  (FETools::get_fe_by_name<1,1>(fe_name));
   const FiniteElement<1> &fe = *fe_1d;
   unsigned int n_child_dofs_1d = numbers::invalid_unsigned_int;
 

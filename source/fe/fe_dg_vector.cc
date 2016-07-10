@@ -32,9 +32,7 @@ template <int dim, int spacedim>
 std::string
 FE_DGNedelec<dim, spacedim>::get_name () const
 {
-  // note that the
-  // FETools::get_fe_from_name
-  // function depends on the
+  // note that the FETools::get_fe_by_nam function depends on the
   // particular format of the string
   // this function returns, so they
   // have to be kept in synch
@@ -59,7 +57,7 @@ std::string
 FE_DGRaviartThomas<dim, spacedim>::get_name () const
 {
   // note that the
-  // FETools::get_fe_from_name
+  // FETools::get_fe_by_name
   // function depends on the
   // particular format of the string
   // this function returns, so they
@@ -85,7 +83,7 @@ std::string
 FE_DGBDM<dim, spacedim>::get_name () const
 {
   // note that the
-  // FETools::get_fe_from_name
+  // FETools::get_fe_by_name
   // function depends on the
   // particular format of the string
   // this function returns, so they

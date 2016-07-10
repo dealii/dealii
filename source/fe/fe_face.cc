@@ -114,7 +114,7 @@ template <int dim, int spacedim>
 std::string
 FE_FaceQ<dim,spacedim>::get_name () const
 {
-  // note that the FETools::get_fe_from_name function depends on the
+  // note that the FETools::get_fe_by_name function depends on the
   // particular format of the string this function returns, so they have to be
   // kept in synch
   std::ostringstream namebuf;
@@ -341,7 +341,7 @@ template <int spacedim>
 std::string
 FE_FaceQ<1,spacedim>::get_name () const
 {
-  // note that the FETools::get_fe_from_name function depends on the
+  // note that the FETools::get_fe_by_name function depends on the
   // particular format of the string this function returns, so they have to be
   // kept in synch
   std::ostringstream namebuf;
@@ -539,7 +539,7 @@ template <int dim, int spacedim>
 std::string
 FE_FaceP<dim,spacedim>::get_name () const
 {
-  // note that the FETools::get_fe_from_name function depends on the
+  // note that the FETools::get_fe_by_name function depends on the
   // particular format of the string this function returns, so they have to be
   // kept in synch
   std::ostringstream namebuf;
@@ -763,7 +763,7 @@ template <int spacedim>
 std::string
 FE_FaceP<1,spacedim>::get_name () const
 {
-  // note that the FETools::get_fe_from_name function depends on the
+  // note that the FETools::get_fe_by_name function depends on the
   // particular format of the string this function returns, so they have to be
   // kept in synch
   std::ostringstream namebuf;

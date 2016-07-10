@@ -30,7 +30,7 @@
 template <int dim>
 void test_fe(const char *name)
 {
-  FiniteElement<dim> *fe = FETools::get_fe_from_name<dim>(std::string(name));
+  FiniteElement<dim> *fe = FETools::get_fe_by_name<dim, dim>(std::string(name));
 
   deallog << fe->get_name() << std::endl
           << '\t' << fe->dofs_per_cell
