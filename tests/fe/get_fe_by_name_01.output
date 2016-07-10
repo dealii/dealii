@@ -8,6 +8,9 @@ DEAL::FE_Q_Hierarchical<2>(1)
 DEAL::Read FE_Q_Hierarchical(1)
 DEAL::Generated :
 DEAL::FE_Q_Hierarchical<3>(1)
+DEAL::Read FE_ABF(0)
+DEAL::Generated :
+DEAL::FE_ABF<2>(0)
 DEAL::Read FE_BDM(1)
 DEAL::Generated :
 DEAL::FE_BDM<2>(1)
@@ -98,6 +101,9 @@ DEAL::FE_Q_Hierarchical<2>(2)
 DEAL::Read FE_Q_Hierarchical(2)
 DEAL::Generated :
 DEAL::FE_Q_Hierarchical<3>(2)
+DEAL::Read FE_ABF(2)
+DEAL::Generated :
+DEAL::FE_ABF<2>(2)
 DEAL::Read FE_BDM(2)
 DEAL::Generated :
 DEAL::FE_BDM<2>(2)

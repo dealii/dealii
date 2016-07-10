@@ -72,7 +72,7 @@ int main ()
 
   //generate_all_dim
   gen.generate_all_dim("FE_Q_Hierarchical(1)");
-//  gen.generate<2,2>("FE_ABF(1)");
+  gen.generate<2,2>("FE_ABF(0)");
 //  gen.generate<3,3>("FE_ABF(1)");
   gen.generate<2,2>("FE_BDM(1)");
   gen.generate<3,3>("FE_BDM(1)");
@@ -94,7 +94,7 @@ int main ()
   gen.generate_all_dim("FE_FaceP(1)");
   gen.generate<2,2>("FE_RannacherTurek(0)");
   gen.generate_all_dim("FE_Q_Hierarchical(2)");
-//  gen.generate<2,2>("FE_ABF(2)");
+  gen.generate<2,2>("FE_ABF(2)");
 //  gen.generate<3,3>("FE_ABF(2)");
   gen.generate<2,2>("FE_BDM(2)");
   gen.generate<3,3>("FE_BDM(2)");
