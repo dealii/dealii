@@ -362,6 +362,12 @@ inconvenience this causes.
  (Wolfgang Bangerth, Jean-Paul Pelteret, Rajat Arora, 2016/07/11)
  </li>
 
+ <li> Fixed: Allow to use FETools::get_fe_by_name for all
+ availabale FiniteElements.
+ <br>
+ (Daniel Arndt, 2016/07/10)
+ </li>
+
  <li> Fixed: SymmetricTensor::access_raw_entry() erroneously produced
  an indexing error for rank-4 symmetric tensors. This is now fixed.
  <br>
