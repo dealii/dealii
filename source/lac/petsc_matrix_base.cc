@@ -127,32 +127,8 @@ namespace PETScWrappers
   MatrixBase::clear_row (const size_type   row,
                          const PetscScalar new_diag_value)
   {
-    assert_is_compressed ();
-
-    // now set all the entries of this row to zero
-    const PetscInt petsc_row = row;
-
-    IS index_set;
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    ISCreateGeneral (get_mpi_communicator(), 1, &petsc_row, &index_set);
-#else
-    ISCreateGeneral (get_mpi_communicator(), 1, &petsc_row, PETSC_COPY_VALUES, &index_set);
-#endif
-
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    const int ierr
-      = MatZeroRowsIS(matrix, index_set, new_diag_value);
-#else
-    const int ierr
-      = MatZeroRowsIS(matrix, index_set, new_diag_value, PETSC_NULL, PETSC_NULL);
-#endif
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    ISDestroy (index_set);
-#else
-    ISDestroy (&index_set);
-#endif
+    std::vector<size_type> rows (1, row);
+    clear_rows(rows, new_diag_value);
   }
 
 
