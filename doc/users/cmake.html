@@ -921,7 +921,6 @@ ${CMAKE_INSTALL_PREFIX}/
     lib${LIB_SUFFIX}
     lib${LIB_SUFFIX}/cmake/deal.II
     share/deal.II/
-    share/deal.II/cmake/macros
     ./
     doc
     examples
@@ -933,14 +932,14 @@ ${CMAKE_INSTALL_PREFIX}/
       The default directory structure can be changed by setting the
       following variables:
 <pre class="cmake">
-DEAL_II_EXECUTABLE_RELDIR
-DEAL_II_INCLUDE_RELDIR
-DEAL_II_LIBRARY_RELDIR
-DEAL_II_PROJECT_CONFIG_RELDIR
-DEAL_II_SHARE_RELDIR
-DEAL_II_DOCREADME_RELDIR
-DEAL_II_DOCHTML_RELDIR
-DEAL_II_EXAMPLES_RELDIR
+DEAL_II_EXECUTABLE_RELDIR       default: bin
+DEAL_II_INCLUDE_RELDIR          default: include
+DEAL_II_LIBRARY_RELDIR          default: lib${LIB_SUFFIX}
+DEAL_II_PROJECT_CONFIG_RELDIR   default: lib${LIB_SUFFIX}/cmake/deal.II
+DEAL_II_SHARE_RELDIR            default: share/deal.II/
+DEAL_II_DOCREADME_RELDIR        default: ./
+DEAL_II_DOCHTML_RELDIR          default: doc
+DEAL_II_EXAMPLES_RELDIR         default: examples
 </pre>
     </p>
 
