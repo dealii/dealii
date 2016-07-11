@@ -343,7 +343,7 @@ inconvenience this causes.
  locations changed between the two calls to FEValues::reinit().
  This is now fixed.
  <br>
- (Wolfgang Bangerth, Rajat Arora 2016/07/11)
+ (Wolfgang Bangerth, Jean-Paul Pelteret, Rajat Arora, 2016/07/11)
  </li>
 
  <li> Fixed: SymmetricTensor::access_raw_entry() erroneously produced
