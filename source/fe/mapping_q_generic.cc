@@ -2542,20 +2542,18 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 
   const unsigned int n_q_points=quadrature.size();
 
-  // if necessary, recompute the support points of the transformation of this cell
-  // (note that we need to first check the triangulation pointer, since otherwise
-  // the second test might trigger an exception if the triangulations are not the
-  // same)
-  if ((data.mapping_support_points.size() == 0)
-      ||
-      (&cell->get_triangulation() !=
-       &data.cell_of_current_support_points->get_triangulation())
-      ||
-      (cell != data.cell_of_current_support_points))
-    {
-      data.mapping_support_points = this->compute_mapping_support_points(cell);
-      data.cell_of_current_support_points = cell;
-    }
+  // recompute the support points of the transformation of this
+  // cell. we tried to be clever here in an earlier version of the
+  // library by checking whether the cell is the same as the one we
+  // had visited last, but it turns out to be difficult to determine
+  // that because a cell for the purposes of a mapping is
+  // characterized not just by its (triangulation, level, index)
+  // triple, but also by the locations of its vertices, the manifold
+  // object attached to the cell and all of its bounding faces/edges,
+  // etc. to reliably test that the "cell" we are on is, therefore,
+  // not easily done
+  data.mapping_support_points = this->compute_mapping_support_points(cell);
+  data.cell_of_current_support_points = cell;
 
   internal::maybe_compute_q_points<dim,spacedim> (QProjector<dim>::DataSetDescriptor::cell (),
                                                   data,
