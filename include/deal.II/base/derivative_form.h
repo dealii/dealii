@@ -110,7 +110,14 @@ public:
   DerivativeForm<1, spacedim, dim, Number> transpose () const;
 
   /**
-   * Computes the volume element associated with the jacobian of the
+   * Compute the Frobenius norm of this form, i.e., the expression
+   * $\sqrt{\sum_{ij} |DF_{ij}|^2}$.
+   */
+  typename numbers::NumberTraits<Number>::real_type
+  norm () const;
+
+  /**
+   * Compute the volume element associated with the jacobian of the
    * transformation F. That is to say if $DF$ is square, it computes
    * $\det(DF)$, in case DF is not square returns $\sqrt{\det(DF^T * DF)}$.
    */
@@ -319,6 +326,20 @@ DerivativeForm<order,dim,spacedim,Number>::times_T_t (const Tensor<2,dim,Number>
 }
 
 
+
+template <int order, int dim, int spacedim, typename Number>
+inline
+typename numbers::NumberTraits<Number>::real_type
+DerivativeForm<order,dim,spacedim,Number>::norm () const
+{
+  typename numbers::NumberTraits<Number>::real_type sum_of_squares = 0;
+  for (unsigned int i=0; i<spacedim; ++i)
+    sum_of_squares += tensor[i].norm_square();
+  return std::sqrt(sum_of_squares);
+}
+
+
+
 template <int order, int dim, int spacedim, typename Number>
 inline
 double
@@ -340,9 +361,7 @@ DerivativeForm<order,dim,spacedim,Number>::determinant () const
           G[i][j] = DF_t[i] * DF_t[j];
 
       return ( sqrt(dealii::determinant(G)) );
-
     }
-
 }
 
 
