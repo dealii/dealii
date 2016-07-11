@@ -336,6 +336,16 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: FEValues::reinit() would sometimes try to be overly
+ clever and not re-compute information when called with the same
+ cell twice in a row, even if the underlying triangulation had
+ been moved, translated, stretched, or otherwise had its vertex
+ locations changed between the two calls to FEValues::reinit().
+ This is now fixed.
+ <br>
+ (Wolfgang Bangerth, Rajat Arora 2016/07/11)
+ </li>
+
  <li> Fixed: SymmetricTensor::access_raw_entry() erroneously produced
  an indexing error for rank-4 symmetric tensors. This is now fixed.
  <br>
