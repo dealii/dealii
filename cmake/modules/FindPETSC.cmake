@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II authors
+## Copyright (C) 2012 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -26,9 +26,10 @@
 #     PETSC_VERSION_MINOR
 #     PETSC_VERSION_SUBMINOR
 #     PETSC_VERSION_PATCH
-#     PETSC_WITH_MPIUNI
 #     PETSC_WITH_64BIT_INDICES
 #     PETSC_WITH_COMPLEX
+#     PETSC_WITH_MPIUNI
+#     PETSC_WITH_MUMPS
 #
 
 SET(PETSC_DIR "" CACHE PATH "An optional hint to a PETSc directory")
@@ -52,39 +53,23 @@ DEAL_II_FIND_PATH(PETSC_INCLUDE_DIR_ARCH petscconf.h
 )
 
 SET(PETSC_PETSCCONF_H "${PETSC_INCLUDE_DIR_ARCH}/petscconf.h")
+
+MACRO(_petsc_feature_check _var _regex)
+  FILE(STRINGS "${PETSC_PETSCCONF_H}" PETSC_${_var}_STRING
+    REGEX "${_regex}")
+  MESSAGE(STATUS "PETSC_${_var}_STRING -- ${PETSC_${_var}_STRING}")
+  IF("${PETSC_${_var}_STRING}" STREQUAL "")
+    SET(PETSC_WITH_${_var} FALSE)
+  ELSE()
+    SET(PETSC_WITH_${_var} TRUE)
+  ENDIF()
+ENDMACRO()
+
 IF(EXISTS ${PETSC_PETSCCONF_H})
-  #
-  # Is petsc compiled with support for MPIUNI?
-  #
-  FILE(STRINGS "${PETSC_PETSCCONF_H}" PETSC_MPIUNI_STRING
-    REGEX "#define.*PETSC_HAVE_MPIUNI 1")
-  IF("${PETSC_MPIUNI_STRING}" STREQUAL "")
-    SET(PETSC_WITH_MPIUNI FALSE)
-  ELSE()
-    SET(PETSC_WITH_MPIUNI TRUE)
-  ENDIF()
-
-  #
-  # Is petsc compiled with support for 64BIT_INDICES?
-  #
-  FILE(STRINGS "${PETSC_PETSCCONF_H}" PETSC_64BIT_INDICES_STRING
-    REGEX "#define.*PETSC_USE_64BIT_INDICES 1")
-  IF("${PETSC_64BIT_INDICES_STRING}" STREQUAL "")
-    SET(PETSC_WITH_64BIT_INDICES FALSE)
-  ELSE()
-    SET(PETSC_WITH_64BIT_INDICES TRUE)
-  ENDIF()
-
-  #
-  # Is petsc compiled with support for COMPLEX numbers?
-  #
-  FILE(STRINGS "${PETSC_PETSCCONF_H}" PETSC_COMPLEX_STRING
-    REGEX "#define.*PETSC_USE_COMPLEX 1")
-  IF("${PETSC_COMPLEX_STRING}" STREQUAL "")
-    SET(PETSC_WITH_COMPLEX FALSE)
-  ELSE()
-    SET(PETSC_WITH_COMPLEX TRUE)
-  ENDIF()
+  _petsc_feature_check(64BIT_INDICES "#define.*PETSC_USE_64BIT_INDICES 1")
+  _petsc_feature_check(COMPLEX "#define.*PETSC_USE_COMPLEX 1")
+  _petsc_feature_check(MPIUNI "#define.*PETSC_HAVE_MPIUNI 1")
+  _petsc_feature_check(MUMPS "#define.*PETSC_HAVE_MUMPS 1")
 ENDIF()
 
 #
