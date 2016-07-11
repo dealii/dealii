@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II authors
+## Copyright (C) 2012 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -126,18 +126,21 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
   #
   SET(DEAL_II_MSVC TRUE)
 
+
   #
   # Shared library handling:
   #
+  IF(NOT "${CMAKE_VERSION}" VERSION_LESS "3.4")
+    #
+    # CMake version 3.4 or newer supports automatic symbol exports under
+    # Windows. Enable this feature for all targets unconditionally:
+    #
+    SET(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 
-  IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    # With MinGW we're lucky:
-    ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--export-all-symbols")
-    ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--enable-auto-import")
-    ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--allow-multiple-definition")
   ELSE()
-    # Otherwise disable shared libraries:
+
     MESSAGE(WARNING "\n"
+      "CMake 3.4 or newer is required for shared libraries under Windows\n"
       "BUILD_SHARED_LIBS forced to OFF\n\n"
       )
     SET(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
