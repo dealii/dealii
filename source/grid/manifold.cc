@@ -563,6 +563,16 @@ get_tangent_vector (const Point<spacedim> &x1,
                     const Point<spacedim> &x2) const
 {
   const DerivativeForm<1,chartdim,spacedim> F_prime = push_forward_gradient(pull_back(x1));
+
+  // ensure that the chart is not singular by asserting that its
+  // derivative has a positive determinant. we need to make this
+  // comparison relative to the size of the derivative. since the
+  // determinant is the product of chartdim factors, take the
+  // chartdim-th root of it in comparing against the size of the
+  // derivative
+  Assert (std::pow(F_prime.determinant(), 1./chartdim) >= 1e-12 * F_prime.norm(),
+          ExcMessage("The derivative of a chart function must not be singular."));
+
   const Tensor<1,chartdim>                  delta   = sub_manifold.get_tangent_vector(pull_back(x1),
                                                       pull_back(x2));
 
