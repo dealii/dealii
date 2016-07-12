@@ -273,13 +273,36 @@ public:
   /// @{
 
   /**
+   * Return an intermediate point between two given
+   * points. Overloading this function allows the default recursive
+   * implementation of the method get_new_point() that takes a
+   * Quadrature object as input to work properly.
+   *
+   * An implementation of this function should returns a parametric
+   * curve on the manifold, joining the points `p1` and `p2`, with
+   * parameter `w` in the interval [0,1]. In particular
+   * `get_new_point(p1, p2, 0.0)` should return `p1` and
+   * `get_new_point(p1, p2, 1.0)` should return `p2`.
+   *
+   * In its default implementation, this function calls the
+   * project_to_manifold() method with the convex combination of `p1`
+   * and `p2`. User classes can get away by simply implementing the
+   * project_to_manifold() method.
+   */
+  virtual
+  Point<spacedim>
+  get_new_point(  const Point<spacedim> &p1,
+                  const Point<spacedim> &p2,
+                  const double w) const;
+
+  /**
    * Return the point which shall become the new vertex surrounded by the
    * given points which make up the quadrature. We use a quadrature object,
    * which should be filled with the surrounding points together with
    * appropriate weights.
    *
-   * In its default implementation it calls internally the function
-   * project_to_manifold. User classes can get away by simply implementing
+   * In its default implementation it calls recursively the function
+   * get_new_point(). User classes can get away by simply implementing
    * that method.
    */
   virtual
