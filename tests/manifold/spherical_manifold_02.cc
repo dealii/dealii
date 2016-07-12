@@ -1,67 +1,184 @@
-//----------------------------  spherical_manifold_01.cc  ---------------------------
-//    Copyright (C) 2011 - 2015 by the mathLab team.
+// ---------------------------------------------------------------------
 //
-//    This file is subject to LGPL and may not be  distributed
-//    without copyright and license information. Please refer
-//    to the file deal.II/doc/license.html for the  text  and
-//    further information on this license.
+// Copyright (C) 2016 by the deal.II authors
 //
-//----------------------------  spherical_manifold_02.cc  ---------------------------
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
 
-
-// Test that the flat manifold does what it should on a sphere.
+// Check SphericalManifold for get_new_point and get_tangent_vector issues.
 
 #include "../tests.h"
 
-#include <fstream>
-#include <deal.II/base/logstream.h>
-
-
-// all include files you need here
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/grid/manifold_lib.h>
+
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/function.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q.h>
+#include <deal.II/fe/mapping_manifold.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/vector_tools.h>
 
-// Helper function
-template <int dim, int spacedim>
-void test(unsigned int ref=1)
+#include <fstream>
+#include <iostream>
+
+#include <deal.II/grid/manifold.h>
+
+using namespace dealii;
+
+struct MappingEnum
 {
-  SphericalManifold<dim,spacedim> manifold;
+  enum type
+  {
+    MappingManifold,
+    MappingQ
+  };
+};
 
-  Triangulation<dim,spacedim> tria;
-  GridGenerator::hyper_ball (tria);
+void test (MappingEnum::type mapping_name, unsigned int refinements=1)
+{
+  using namespace dealii;
 
-  typename Triangulation<dim,spacedim>::active_cell_iterator cell;
+  deallog.depth_console (0);
 
-  for (cell = tria.begin_active(); cell != tria.end(); ++cell)
-    cell->set_all_manifold_ids(1);
+  const unsigned int degree = 2;   // Degree of shape functions
 
-  for (cell = tria.begin_active(); cell != tria.end(); ++cell)
+  Triangulation<2,3>   triangulation;
+
+  FE_Q<2,3>            fe(degree);
+  DoFHandler<2,3>      dof_handler(triangulation);
+  QGaussLobatto<2>     cell_quadrature(degree+1);
+
+
+
+  const double radius           = 1.0;
+  Point<3>                      center(0.0, 0.0, 0.0);
+  GridGenerator::hyper_sphere(triangulation, center, radius);
+
+  static const SphericalManifold<2,3> sphere;
+  triangulation.set_manifold (0, sphere);
+  // static const RotatedSphericalManifold rotated_sphere;
+  // triangulation.set_manifold (1, rotated_sphere);
+
+  for (typename Triangulation<2,3>::active_cell_iterator
+       cell=triangulation.begin_active();
+       cell!=triangulation.end(); ++cell)
     {
-      if (cell->center().distance(Point<spacedim>()) < 1e-10)
-        cell->set_all_manifold_ids(0);
+      cell->set_all_manifold_ids(0);
+      // deallog << "Setting SphericalManifold\n";
     }
 
-  tria.set_manifold(1, manifold);
-  tria.refine_global(2);
+  triangulation.refine_global(refinements);
+  dof_handler.distribute_dofs (fe);
 
-  GridOut gridout;
-  gridout.write_msh(tria, deallog.get_file_stream());
+  {
+    // Save mesh to file for visualization
+    GridOut grid_out;
+    std::ofstream grid_file("grid.vtk");
+    grid_out.write_vtk(triangulation, grid_file);
+    // deallog << "Grid has been saved into grid.vtk" << std::endl;
+  }
+
+  // deallog << "Surface mesh has " << triangulation.n_active_cells()
+  //           << " cells."
+  //           << std::endl;
+  // deallog << "Surface mesh has " << dof_handler.n_dofs()
+  //           << " degrees of freedom."
+  //           << std::endl;
+
+  std::shared_ptr<Mapping<2,3> > mapping;
+  switch (mapping_name)
+    {
+    case MappingEnum::MappingManifold:
+      // deallog << " MappingManifold" << std::endl;
+      mapping = std::unique_ptr<Mapping<2,3> >(
+                  new MappingManifold<2,3 >());
+      break;
+    case MappingEnum::MappingQ:
+      // deallog << " MappingQ" << std::endl;
+      mapping = std::unique_ptr<Mapping<2,3> >(
+                  new  MappingQ<2,3>(fe.degree));
+      break;
+    }
+
+  FEValues<2,3> fe_values (*mapping, fe, cell_quadrature,
+                           update_values            |
+                           update_gradients         |
+                           update_quadrature_points |
+                           update_JxW_values);
+  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int n_q_points    = cell_quadrature.size();
+
+  double surface_area = 0;
+  for (typename DoFHandler<2,3>::active_cell_iterator
+       cell = dof_handler.begin_active(),
+       endc = dof_handler.end();
+       cell!=endc; ++cell)
+    {
+      double patch_surface = 0;
+      fe_values.reinit (cell);
+      const auto &qp = fe_values.get_quadrature_points();
+
+
+      for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+        {
+          patch_surface += fe_values.JxW(q_point);
+          // deallog << "--> " << qp[q_point] << std::endl;
+        }
+      // deallog  << " Patch area       = "
+      //            << patch_surface << std::endl;
+      surface_area += patch_surface;
+    }
+
+  deallog << " Ref      = " << std::setw(5) << refinements;
+  // deallog << " Surface area     = "
+  //         << surface_area << std::endl;
+  deallog << "  RelErr  = "
+          << (surface_area - 4 * numbers::PI * radius * radius) /
+          (4 * numbers::PI * radius * radius)
+          << std::endl;
+
+  return;
 }
 
-int main ()
+int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
+  initlog();
 
-  test<2,2>();
-  test<3,3>();
+  std::string bar(35,'-');
+
+  deallog << bar << std::endl;
+  for (unsigned int i = 1; i<8; ++i)
+    test(MappingEnum::MappingManifold, i);
+  deallog << bar << std::endl;
+  for (unsigned int i = 1; i<8; ++i)
+    test(MappingEnum::MappingQ, i);
+  deallog << bar << std::endl;
 
   return 0;
 }
+
+
 

@@ -25,37 +25,37 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * Manifold description for a spherical space coordinate system.
+ * Manifold description for a polar coordinate system.
  *
  * You can use this Manifold object to describe any sphere, circle,
- * hypersphere or hyperdisc in two or three dimensions, both as a co-dimension
- * one manifold descriptor or as co-dimension zero manifold descriptor.
+ * hypersphere or hyperdisc in two or three dimensions, both as a
+ * co-dimension one manifold descriptor or as co-dimension zero
+ * manifold descriptor, provided that the north and south poles (in
+ * three dimensions) are excluded from the Manifold (as they are
+ * singular).
  *
  * The two template arguments match the meaning of the two template arguments
  * in Triangulation<dim, spacedim>, however this Manifold can be used to
  * describe both thin and thick objects, and the behavior is identical when
- * dim <= spacedim, i.e., the functionality of SphericalManifold<2,3> is
- * identical to SphericalManifold<3,3>.
+ * dim <= spacedim, i.e., the functionality of PolarManifold<2,3> is
+ * identical to PolarManifold<3,3>.
  *
- * The two dimensional implementation of this class works by transforming
- * points to spherical coordinates, taking the average in that coordinate
- * system, and then transforming back the point to Cartesian coordinates. For
- * the three dimensional case, we use a simpler approach: we take the average
- * of the norm of the points, and use this value to shift the average point
- * along the radial direction. In order for this manifold to work correctly,
- * it cannot be attached to cells containing the center of the coordinate
- * system. This point is a singular point of the coordinate transformation,
- * and there taking averages does not make any sense.
- *
- * This class is used in step-1 and step-2 to describe the boundaries of
- * circles. Its use is also discussed in the results section of step-6.
+ * This class works by transforming points to polar coordinates (in
+ * both two and three dimensions), taking the average in that
+ * coordinate system, and then transforming back the point to
+ * Cartesian coordinates. In order for this manifold to work
+ * correctly, it cannot be attached to cells containing the center of
+ * the coordinate system or the north and south poles in three
+ * dimensions. These points are singular points of the coordinate
+ * transformation, and taking averages around these points does not
+ * make any sense.
  *
  * @ingroup manifold
  *
- * @author Luca Heltai, 2014
+ * @author Luca Heltai, Mauro Bardelloni, 2014-2016
  */
 template <int dim, int spacedim = dim>
-class SphericalManifold : public ChartManifold<dim, spacedim, spacedim>
+class PolarManifold : public ChartManifold<dim, spacedim, spacedim>
 {
 public:
   /**
@@ -66,7 +66,7 @@ public:
    * it takes the middle point, and project it along the radius using the
    * average radius of the surrounding points.
    */
-  SphericalManifold(const Point<spacedim> center = Point<spacedim>());
+  PolarManifold(const Point<spacedim> center = Point<spacedim>());
 
   /**
    * Pull back the given point from the Euclidean space. Will return the polar
@@ -84,7 +84,6 @@ public:
   virtual Point<spacedim>
   push_forward(const Point<spacedim> &chart_point) const;
 
-
   /**
    * Given a point in the spacedim dimensional Euclidean space, this
    * method returns the derivatives of the function $F$ that maps from
@@ -101,17 +100,6 @@ public:
   DerivativeForm<1,spacedim,spacedim>
   push_forward_gradient(const Point<spacedim> &chart_point) const;
 
-
-  /**
-   * Let the new point be the average sum of surrounding vertices.
-   *
-   * In the two dimensional implementation, we use the pull_back and
-   * push_forward mechanism. For three dimensions, this does not work well, so
-   * we overload the get_new_point function directly.
-   */
-  virtual Point<spacedim>
-  get_new_point(const Quadrature<spacedim> &quad) const;
-
   /**
    * The center of the spherical coordinate system.
    */
@@ -123,6 +111,110 @@ private:
    * coordinate system, according to dim, chartdim, and spacedim.
    */
   static Tensor<1,spacedim> get_periodicity();
+};
+
+
+/**
+ * Manifold description for a spherical space coordinate system.
+ *
+ * You can use this Manifold object to describe any sphere, circle,
+ * hypersphere or hyperdisc in two or three dimensions, both as a co-dimension
+ * one manifold descriptor or as co-dimension zero manifold descriptor.
+ *
+ * The two template arguments match the meaning of the two template arguments
+ * in Triangulation<dim, spacedim>, however this Manifold can be used to
+ * describe both thin and thick objects, and the behavior is identical when
+ * dim <= spacedim, i.e., the functionality of SphericalManifold<2,3> is
+ * identical to SphericalManifold<3,3>.
+ *
+ * While PolarManifold reflects the usual notion of polar coordinates,
+ * it may not be suitable for domains that contain either the north or
+ * south poles.
+ * Consider for istance the pair of points \f$x_1=(1,\pi/3,0)\f$ and
+ * \f$x_2=(1,\pi/3,\pi)\f$.
+ * These two points would be connented (using a PolarManifold) by the curve
+ * \$[
+ * \begin{align}
+ *   s: [0,1]  & \rightarrow &  \mathbb S^3 \\
+ *           t & \mapsto     &  (1,\pi/3,0) + (0,0,t\pi)
+ * \$]
+ * This curve is not a geodesic on the sphere, and it is not how we
+ * would choose a curve on the sphere. A better one would be the one
+ * passing through the North pole:
+ * \[
+ *  s(t) = x_1 \cos(\alpha(t)) + \kappa \times x_1 \sin(\alpha(t)) +
+ *  \kappa ( \kappa \cdot x_1) (1-\cos(\alpha(t))).
+ * \]
+ * where $\kappa = \frac{x_1 \times \x_2}{\Vert x_1 \times \x_2 \Vert}$
+ * and $\alpha(t) = t * \arccos(x_1 * x_2) $ for $t\in[0,1]$.
+ * Indeed, this is a geodesic, and it is the natural choice when
+ * connecting points on the surface of the sphere.
+ *
+ * This class implements a Manifold that joins any two points in space
+ * by first projecting them on the surface of a sphere with unit
+ * radius, then connecting them with a geodesic, and finally rescaling
+ * the final radius so that the resulting one is the weighted average
+ * of the starting radii. This Manifold is identical to PolarManifold
+ * in dimension two, while for dimension three it returns points that
+ * are more uniformly distributed on the sphere, and it is invariant
+ * with respect to rotations of the coordinate system, therefore
+ * avoiding the problems that PolarManifold has at the poles.
+ *
+ * For mathematical reasons, it is impossible to construct a unique
+ * map of a sphere using only geodesic curves, and therefore, using
+ * this class with MappingManifold is discouraged. If you use this
+ * Manifold to describe the geometry of a sphere, you should use
+ * MappingQ as the underlying mapping, and not MappingManifold.
+ *
+ * @ingroup manifold
+ *
+ * @author Mauro Bardelloni, Luca Heltai, 2016
+ */
+template <int dim, int spacedim = dim>
+class SphericalManifold : public Manifold<dim, spacedim>
+{
+public:
+  /**
+   * The Constructor takes the center of the spherical coordinates.
+   */
+  SphericalManifold(const Point<spacedim> center = Point<spacedim>());
+
+  /**
+   * Given any two points in space, first project them on the surface
+   * of a sphere with unit radius, then connect them with a geodesic
+   * and find the intermediate point, and finally rescale the final
+   * radius so that the resulting one is the convex combination of the
+   * starting radii.
+   */
+  virtual
+  Point<spacedim>
+  get_new_point(const Point<spacedim> &p1,
+                const Point<spacedim> &p2,
+                const double w) const;
+
+  /**
+   * Compute the derivative of the get_new_point function with
+   * parameter w equal to zero.
+   */
+  virtual
+  Tensor<1,spacedim>
+  get_tangent_vector (const Point<spacedim> &x1,
+                      const Point<spacedim> &x2) const;
+
+  
+  /**
+   * Return a point on the spherical manifold which is intermediate
+   * with respect to the surrounding points.
+   */
+  virtual
+  Point<spacedim>
+  project_to_manifold (const std::vector<Point<spacedim> > &vertices,
+                       const Point<spacedim> &candidate) const;
+
+  /**
+   * The center of the spherical coordinate system.
+   */
+  const Point<spacedim> center;
 };
 
 

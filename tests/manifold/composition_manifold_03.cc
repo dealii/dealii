@@ -1,15 +1,15 @@
-//----------------------------  function_manifold_chart ---------------------------
-//    Copyright (C) 2011 - 2015 by the mathLab team.
+//-------------------------------------------------------------------
+//    Copyright (C) 2016 by the deal.II authors.
 //
 //    This file is subject to LGPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//---------------------------- composition_manifold ---------------------------
+//-------------------------------------------------------------------
 
 
-// Test the combination of simple ChartManifolds: SphericalManifold +
+// Test the combination of simple ChartManifolds: PolarManifold +
 // Rotation
 
 #include "../tests.h"
@@ -29,7 +29,7 @@ int main ()
 
   const int dim=2, spacedim=2;
 
-  SphericalManifold<1,2>    F;
+  PolarManifold<1,2>    F;
   std::map<std::string, double> constants;
   constants["k"] = numbers::PI/3;
   FunctionManifold<2,2,2> G("cos( k)*x -sin( k)*y; sin( k)*x+cos( k)*y",

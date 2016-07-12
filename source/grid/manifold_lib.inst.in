@@ -17,6 +17,7 @@
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
+    template class PolarManifold<deal_II_dimension, deal_II_space_dimension>;
     template class SphericalManifold<deal_II_dimension, deal_II_space_dimension>;
     template class CylindricalManifold<deal_II_dimension, deal_II_space_dimension>;
     template class FunctionManifold<deal_II_dimension, deal_II_space_dimension, 1>;			  

@@ -32,7 +32,7 @@ void test()
   deallog << "dim=" << dim << ", spacedim=" << spacedim << std::endl;
 
   Point<spacedim> center;
-  static  const SphericalManifold<dim,spacedim> manifold(center);
+  static  const PolarManifold<dim,spacedim> manifold(center);
 
   // Go from 0,1 to 1,0
   Point<spacedim> p0,p1;
