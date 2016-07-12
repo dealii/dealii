@@ -1,7 +1,0 @@
-<!DOCTYPE RCC><RCC version="1.0">
- <qresource>
-     <file>images/logo_dealii_64.png</file>
-     <file>images/logo_dealii_gui.png</file>
-     <file>images/logo_dealii_gui_128.png</file>
- </qresource>
- </RCC>

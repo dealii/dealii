@@ -20,7 +20,6 @@
 #   compat_files
 #   documentation
 #   examples
-#   parameter_gui
 #
 
 
@@ -54,7 +53,7 @@ ENDIF()
 # The library can always be compiled and/or installed unconditionally ;-)
 _add_custom_target(library)
 
-FOREACH(_component compat_files documentation examples parameter_gui)
+FOREACH(_component compat_files documentation examples)
   STRING(TOUPPER "${_component}" _component_uppercase)
   IF(DEAL_II_COMPONENT_${_component_uppercase})
     _add_custom_target(${_component})
@@ -141,7 +140,6 @@ FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 #    documentation  - ${_description_string} component 'documentation'
 #    examples       - ${_description_string} component 'examples'
 #    library        - ${_description_string} component 'library'
-#    parameter_gui  - ${_description_string} component 'parameter_gui'
 #    package        - build binary package
 #
 #    test           - run a minimal set of tests
@@ -156,7 +154,7 @@ FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 # Provide "relocate" target to run install_name_tool on all external libraries
 # under ${DEAL_II_CPACK_EXTERNAL_LIBS_TREE}
 #
-IF(CMAKE_SYSTEM_NAME MATCHES "Darwin" AND 
+IF(CMAKE_SYSTEM_NAME MATCHES "Darwin" AND
   NOT "${DEAL_II_CPACK_EXTERNAL_LIBS_TREE}" STREQUAL "")
   ADD_CUSTOM_TARGET(relocate
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}

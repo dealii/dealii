@@ -165,10 +165,18 @@ inconvenience this causes.
  (David Wells, 2016/07/07)
  </li>
 
+ <li> Refactored: The contrib/ directory has been cleaned up and the
+ Parameter GUI has be reloacted into its own repository:
+ https://github.com/dealii/parameter_gui
+ <br>
+ (Matthias Maier, Timo Heister, 2016/07/06)
+ </li>
+
  <li> New: Added TrilinosWrappers::SolveDirect::Initialize and
  TrilinosWrappers::SolverDirect::Solve to solve distributed linear systems
  with multiple right hand sides without needing to refactorize the matrix
  everytime. Also, added unit test for testing the new functionality.
+ <br>
  (Michael Harmon, 2016/06/30)
  </li>
 

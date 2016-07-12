@@ -103,19 +103,15 @@ LIST(APPEND _doxygen_input
   ${CMAKE_BINARY_DIR}/include/
   ${CMAKE_SOURCE_DIR}/doc/news/
   ${CMAKE_CURRENT_BINARY_DIR}/tutorial/tutorial.h
-  ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/
   )
 
 # Add other directories in which to find images
 SET(_doxygen_image_path
   ${CMAKE_CURRENT_SOURCE_DIR}/images
-  ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/images
   )
 
 file(GLOB _doxygen_depend
   ${CMAKE_CURRENT_SOURCE_DIR}/headers/*.h
-  ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/*.h
-  ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/main.cpp
   ${CMAKE_SOURCE_DIR}/doc/news/*.h
   ${CMAKE_SOURCE_DIR}/include/deal.II/**/*.h
   )
