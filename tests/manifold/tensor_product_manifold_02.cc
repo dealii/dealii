@@ -33,7 +33,7 @@ void test()
   std::ostream &out = deallog.get_file_stream();
 
   FunctionManifold<1,1> F("x","x");
-  SphericalManifold<2,2> G;
+  PolarManifold<2,2> G;
 
   TensorProductManifold<2, 1,1,1, 2,2,2> manifold(F, G);
 

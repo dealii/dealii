@@ -125,15 +125,19 @@ namespace Manifolds
  * @note Unlike almost all other cases in the library, we here interpret the points
  * in the quadrature object to be in real space, not on the reference cell.
  *
- * Manifold::get_new_point() has a default implementation that can simplify
- * this process somewhat:
- * Internally, the function calls the Manifold::project_to_manifold()
- * function after computing the weighted average of the quadrature points.
- * This allows derived classes to only overload Manifold::project_to_manifold()
- * for simple situations. This is often useful when describing manifolds that
- * are embedded in higher dimensional space, e.g., the surface of a sphere.
- * In those cases, the desired new point is simply the (weighted) average
- * of the provided point, projected back out onto the sphere.
+ * Manifold::get_new_point() has a default implementation that can
+ * simplify this process somewhat: Internally, the function calls the
+ * Manifold::get_intermediate_point() to compute pair-wise
+ * intermediate points. Internally the
+ * Manifold::get_intermediate_point() calls the
+ * Manifold::project_to_manifold() function after computing the convex
+ * conbination of the given points.  This allows derived classes to
+ * only overload Manifold::project_to_manifold() for simple
+ * situations. This is often useful when describing manifolds that are
+ * embedded in higher dimensional space, e.g., the surface of a
+ * sphere.  In those cases, the desired new point maybe computed
+ * simply by the (weighted) average of the provided point, projected
+ * back out onto the sphere.
  *
  *
  * <h3>Common use case: Computing tangent vectors</h3>
@@ -273,18 +277,48 @@ public:
   /// @{
 
   /**
+   * Return an intermediate point between two given
+   * points. Overloading this function allows the default pair-wise
+   * reduction implementation of the method get_new_point() that takes
+   * a Quadrature object as input to work properly.
+   *
+   * An implementation of this function should returns a parametric
+   * curve on the manifold, joining the points `p1` and `p2`, with
+   * parameter `w` in the interval [0,1]. In particular
+   * `get_intermediate_point(p1, p2, 0.0)` should return `p1` and
+   * `get_intermediate_point(p1, p2, 1.0)` should return `p2`.
+   *
+   * In its default implementation, this function calls the
+   * project_to_manifold() method with the convex combination of `p1`
+   * and `p2`. User classes can get away by simply implementing the
+   * project_to_manifold() method.
+   */
+  virtual
+  Point<spacedim>
+  get_intermediate_point (const Point<spacedim> &p1,
+                          const Point<spacedim> &p2,
+                          const double w) const;
+
+  /**
    * Return the point which shall become the new vertex surrounded by the
    * given points which make up the quadrature. We use a quadrature object,
    * which should be filled with the surrounding points together with
    * appropriate weights.
    *
-   * In its default implementation it calls internally the function
-   * project_to_manifold. User classes can get away by simply implementing
-   * that method.
+   * In its default implementation it uses a pair-wise reduction of
+   * the points in the quadrature formula by calling the function
+   * get_intermediate_point() on the first two points, then on the
+   * resulting point and the next, untill all points in the quadrature
+   * have been taken into account. User classes can get away by simply
+   * implementing the get_intermediate_point() function. Notice that
+   * by default the get_intermediate_point() function calls the
+   * project_to_manifold() function with the convex combination of its
+   * arguments. For simple situations you may get away by implementing
+   * only the project_to_manifold() function.
    */
   virtual
   Point<spacedim>
-  get_new_point(const Quadrature<spacedim> &quad) const;
+  get_new_point (const Quadrature<spacedim> &quad) const;
 
   /**
    * Given a point which lies close to the given manifold, it modifies it and

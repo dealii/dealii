@@ -88,9 +88,9 @@ void test()
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f))
         cell->face(f)->set_all_manifold_ids (numbers::invalid_manifold_id);
-  static const HyperShellBoundary<dim> boundary_shell;
-  tr.set_boundary (0, boundary_shell);
-  tr.set_boundary (1, boundary_shell);
+  //  static const HyperShellBoundary<dim> boundary_shell;
+  //  tr.set_boundary (0, boundary_shell);
+  //  tr.set_boundary (1, boundary_shell);
 
   tr.refine_global ((dim==2)?3:1);
 
@@ -158,6 +158,8 @@ void test()
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;
+
+  tr.set_manifold(99);
 }
 
 

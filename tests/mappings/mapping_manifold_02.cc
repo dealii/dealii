@@ -47,7 +47,7 @@ void test()
                               center, inner_radius, outer_radius);
 
 
-  static  const SphericalManifold<dim> manifold(center);
+  static  const PolarManifold<dim> manifold(center);
 
   triangulation.set_all_manifold_ids(0);
   triangulation.set_manifold (0, manifold);

@@ -32,7 +32,7 @@ void test(unsigned int ref=1)
   deallog << "Testing dim " << dim
           << ", spacedim " << spacedim << std::endl;
 
-  SphericalManifold<dim,spacedim> manifold;
+  PolarManifold<dim,spacedim> manifold;
 
   Triangulation<dim,spacedim> tria;
   GridGenerator::hyper_shell (tria, Point<spacedim>(), .3, .6, 12);
