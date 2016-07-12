@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II authors
+## Copyright (C) 2012 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -139,3 +139,4 @@ ENDMACRO()
 
 CONFIGURE_FEATURE(PETSC)
 SET(DEAL_II_PETSC_WITH_COMPLEX ${PETSC_WITH_COMPLEX})
+SET(DEAL_II_PETSC_WITH_MUMPS ${PETSC_WITH_MUMPS})

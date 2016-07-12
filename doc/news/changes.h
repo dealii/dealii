@@ -150,6 +150,14 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li> Improved: The testsuite now supports fine grained feature constraints
+ of the form <code>test.with_[feature]_with_[...]=true</code> corresponding
+ to variables <code>DEAL_II_<FEATURE>_WITH_[...]</code> exported to
+ <code>deal.IIConfig.cmake</code>.
+ <br>
+ (Matthias Maier, 2016/07/11)
+ </li>
+
  <li> New: The library is now compatible with PETSc 3.7.0. Part of this change
  included adding a new header, <tt>petsc_compatibility.h</tt>, which provides
  some version-independent functions for using common PETSc functions.
@@ -158,7 +166,7 @@ inconvenience this causes.
  </li>
 
  <li> New: Added TrilinosWrappers::SolveDirect::Initialize and
- TrilinosWrappers::SolverDirect::Solve to solve distributed linear systems 
+ TrilinosWrappers::SolverDirect::Solve to solve distributed linear systems
  with multiple right hand sides without needing to refactorize the matrix
  everytime. Also, added unit test for testing the new functionality.
  (Michael Harmon, 2016/06/30)

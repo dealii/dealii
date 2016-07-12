@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2015 by the deal.II authors
+## Copyright (C) 2013 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -180,12 +180,18 @@ MACRO(DEAL_II_PICKUP_TESTS)
       #
       # Valid feature?
       #
-      IF(NOT DEFINED DEAL_II_WITH_${_feature})
-        MESSAGE(FATAL_ERROR "
+      # We support two variables: DEAL_II_WITH_<FEATURE> and DEAL_II_<FEATURE>
+      #
+      SET(_variable "DEAL_II_WITH_${_feature}")
+      IF(NOT DEFINED ${_variable})
+        SET(_variable "DEAL_II_${_feature}")
+        IF(NOT DEFINED ${_variable})
+          MESSAGE(FATAL_ERROR "
 Invalid feature constraint \"${_match}\" in file
 \"${_comparison}\":
-The feature \"DEAL_II_${_feature}\" does not exist.\n"
-          )
+The feature \"DEAL_II_WITH_${_feature}\" (or \"DEAL_II_${_feature}\") does not exist.\n"
+            )
+        ENDIF()
       ENDIF()
 
       #
@@ -201,8 +207,8 @@ Comparison operator \"=\" expected for boolean match.\n"
         ENDIF()
 
         # This is why I hate CMake :-/
-        IF( (DEAL_II_WITH_${_feature} AND NOT ${_boolean}) OR
-            (NOT DEAL_II_WITH_${_feature} AND ${_boolean}) )
+        IF( (${_variable} AND NOT ${_boolean}) OR
+            (NOT ${_variable} AND ${_boolean}) )
           SET(_define_test FALSE)
         ENDIF()
       ENDIF()

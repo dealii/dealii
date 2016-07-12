@@ -113,7 +113,6 @@ private:
 
 void test ()
 {
-#ifdef DEAL_II_ARPACK_WITH_PARPACK
   const unsigned int global_mesh_refinement_steps = 5;
   const unsigned int number_of_eigenvalues        = 5;
 
@@ -329,14 +328,6 @@ void test ()
 
 
   dof_handler.clear ();
-#else
-  // just output expected results:
-  deallog <<"4.93877"<<std::endl;
-  deallog <<"12.3707"<<std::endl;
-  deallog <<"12.3707"<<std::endl;
-  deallog <<"19.8027"<<std::endl;
-  deallog <<"24.8370"<<std::endl;
-#endif
   dealii::deallog << "Ok"<<std::endl;
 }
 
