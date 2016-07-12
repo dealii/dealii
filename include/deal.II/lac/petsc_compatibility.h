@@ -51,10 +51,12 @@ namespace PETScWrappers
                                 const std::string &value)
   {
 #if DEAL_II_PETSC_VERSION_LT(3, 7, 0)
-    PetscOptionsSetValue (name.c_str (), value.c_str ());
+    const PetscErrorCode ierr = PetscOptionsSetValue (name.c_str (), value.c_str ());
 #else
-    PetscOptionsSetValue (NULL, name.c_str (), value.c_str ());
+    const PetscErrorCode ierr = PetscOptionsSetValue (NULL, name.c_str (), value.c_str ());
 #endif
+    (void)ierr;
+    Assert (ierr == 0, ExcPETScError(ierr));
   }
 
 
