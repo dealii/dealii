@@ -45,11 +45,9 @@ check_solve( SOLVER &solver, const MATRIX &A,
     {
       solver.solve(A,u,f,P);
     }
-  catch (std::exception &e)
+  catch (dealii::SolverControl::NoConvergence &e)
     {
-      deallog << e.what() << std::endl;
-      // just like for Richardson: we end up
-      // here normally for this solver
+      deallog << "Exception: " << e.get_exc_name() << std::endl;
     }
 
   deallog << "Solver stopped after " << solver.control().last_step()
@@ -92,4 +90,3 @@ int main(int argc, char **argv)
   }
 
 }
-
