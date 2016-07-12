@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Check SphericalManifold on faces.
+// Check PolarManifold on faces.
 
 #include "../tests.h"
 
@@ -47,7 +47,7 @@ void test()
   Point<spacedim> center = cell->center();
   double radius = center.distance(cell->vertex(0));
 
-  static  const SphericalManifold<dim,spacedim> manifold(cell->center());
+  static  const PolarManifold<dim,spacedim> manifold(cell->center());
 
   triangulation.set_all_manifold_ids(0);
   triangulation.set_manifold (0, manifold);
