@@ -71,6 +71,39 @@ public:
   FE_Bernstein (const unsigned int p);
 
   /**
+   * FE_Bernstein is not interpolatory in the element interior, which prevents
+   * this element from defining an interpolation matrix. An exception will be
+   * thrown.
+   *
+   * Overrides the implementation from FE_Q_Base.
+   */
+  virtual void
+  get_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
+                            FullMatrix<double>       &matrix) const;
+
+  /**
+   * FE_Bernstein is not interpolatory in the element interior, which prevents
+   * this element from defining a restriction matrix. An exception will be
+   * thrown.
+   *
+   * Overrides the implementation from FE_Q_Base.
+   */
+  virtual const FullMatrix<double> &
+  get_restriction_matrix (const unsigned int child,
+                          const RefinementCase<dim> &refinement_case=RefinementCase<dim>::isotropic_refinement) const;
+
+  /**
+   * FE_Bernstein is not interpolatory in the element interior, which prevents
+   * this element from defining a prolongation matrix. An exception will be
+   * thrown.
+   *
+   * Overrides the implementation from FE_Q_Base.
+   */
+  virtual const FullMatrix<double> &
+  get_prolongation_matrix (const unsigned int child,
+                           const RefinementCase<dim> &refinement_case=RefinementCase<dim>::isotropic_refinement) const;
+
+  /**
    * Return the matrix interpolating from a face of one element to the face of
    * the neighboring element.  The size of the matrix is then
    * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>. The
