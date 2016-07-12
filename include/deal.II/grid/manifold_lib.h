@@ -201,7 +201,7 @@ public:
   get_tangent_vector (const Point<spacedim> &x1,
                       const Point<spacedim> &x2) const;
 
-  
+
   /**
    * Return a point on the spherical manifold which is intermediate
    * with respect to the surrounding points.

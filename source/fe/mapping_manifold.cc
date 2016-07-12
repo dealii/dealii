@@ -461,7 +461,7 @@ namespace internal
                   // In the length L, we store also the direction sign,
                   // which is positive, if the coordinate is < .5,
                   const double L = pi > .5 ? -pi: 1-pi;
-                                          
+
                   const Point<dim> np(p + L*ei);
 
                   // Get the weights to compute the np point in real space
