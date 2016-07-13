@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II authors
+## Copyright (C) 2012 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -71,33 +71,26 @@
 # Check the user provided CXX flags:
 #
 
-IF(NOT "${DEAL_II_CXX_FLAGS_SAVED}" STREQUAL "${CACHED_DEAL_II_CXX_FLAGS_SAVED}"
-   OR NOT "${DEAL_II_LINKER_FLAGS_SAVED}" STREQUAL "${CACHED_DEAL_II_LINKER_FLAGS_SAVED}")
-  # Rerun this test if cxx flags changed:
-  UNSET(DEAL_II_HAVE_USABLE_CXX_FLAGS CACHE)
-ELSE()
-  SET(DEAL_II_HAVE_USABLE_CXX_FLAGS TRUE CACHE INTERNAL "")
-ENDIF()
-SET(CACHED_DEAL_II_CXX_FLAGS_SAVED "${DEAL_II_CXX_FLAGS_SAVED}" CACHE INTERNAL "" FORCE)
-SET(CACHED_DEAL_II_LINKER_FLAGS_SAVED "${DEAL_II_LINKER_FLAGS_SAVED}" CACHE INTERNAL "" FORCE)
+FOREACH(build ${DEAL_II_BUILD_TYPES})
+  SET(_cxx_flags_${build} "${DEAL_II_CXX_FLAGS_SAVED} ${DEAL_II_CXX_FLAGS_${build}_SAVED}")
+  SET(_linker_flags_${build} "${DEAL_II_CXX_FLAGS_SAVED} ${DEAL_II_CXX_FLAGS_${build}_SAVED}")
 
-# Initialize all CMAKE_REQUIRED_* variables a this point:
-RESET_CMAKE_REQUIRED()
-
-CHECK_CXX_SOURCE_COMPILES(
-  "int main(){ return 0; }"
-  DEAL_II_HAVE_USABLE_CXX_FLAGS)
-
-IF(NOT DEAL_II_HAVE_USABLE_CXX_FLAGS)
-  UNSET(DEAL_II_HAVE_USABLE_CXX_FLAGS CACHE)
-  MESSAGE(FATAL_ERROR "
-Configuration error: Cannot compile with the user supplied flags:
-CXX flags: ${DEAL_II_CXX_FLAGS_SAVED}
-LD flags: ${DEAL_II_LINKER_FLAGS_SAVED}
-Please check the CMake variables DEAL_II_CXX_FLAGS, DEAL_II_LINKER_FLAGS
-and the environment variables CXXFLAGS, LDFLAGS.\n\n"
+  CHECK_COMPILER_FLAGS(_cxx_flags_${build} _linker_flags_${build}
+    DEAL_II_HAVE_USABLE_USER_FLAGS_${build}
     )
-ENDIF()
+
+  IF(NOT DEAL_II_HAVE_USABLE_USER_FLAGS_${build})
+    MESSAGE(FATAL_ERROR "
+  Configuration error: Cannot compile with the user supplied flags:
+  CXX flags (${build}): ${_cxx_flags_${build}}
+  LD flags  (${build}): ${_linker_flags_${build}}
+  Please check the CMake variables
+    DEAL_II_CXX_FLAGS, DEAL_II_CXX_FLAGS_${build},
+    DEAL_II_LINKER_FLAGS, DEAL_II_CXX_FLAGS_${build}
+  and the environment variables CXXFLAGS, LDFLAGS.\n\n"
+      )
+  ENDIF()
+ENDFOREACH()
 
 
 ########################################################################
