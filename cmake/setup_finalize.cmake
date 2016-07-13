@@ -84,10 +84,9 @@ ENDFOREACH()
 #
 
 FOREACH(build ${DEAL_II_BUILD_TYPES})
-  SET(_cxx_flags_${build} "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${build}}")
-  SET(_linker_flags_${build} "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${build}}")
-
-  CHECK_COMPILER_SETUP(_cxx_flags_${build} _linker_flags_${build}
+  CHECK_COMPILER_SETUP(
+    "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${build}}"
+    "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${build}}"
     DEAL_II_HAVE_USABLE_FLAGS_${build}
     ${DEAL_II_LIBRARIES} ${DEAL_II_LIBRARIES_${build}}
     )
@@ -96,8 +95,8 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
     MESSAGE(FATAL_ERROR "
   Configuration error: Cannot compile a test program with the final set of
   compiler and linker flags:
-    CXX flags (${build}): ${_cxx_flags_${build}}
-    LD flags  (${build}): ${_linker_flags_${build}}
+    CXX flags (${build}): ${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${build}}
+    LD flags  (${build}): ${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${build}}
     LIBRARIES (${build}): ${DEAL_II_LIBRARIES};${DEAL_II_LIBRARIES_${build}}
   \n\n"
       )
