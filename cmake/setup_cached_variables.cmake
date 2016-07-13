@@ -104,7 +104,7 @@ OPTION(DEAL_II_FORCE_AUTODETECTION
 
 ########################################################################
 #                                                                      #
-#                       Compilation and linking:                       #
+#           Configuration options for Compilation and linking:         #
 #                                                                      #
 ########################################################################
 
@@ -183,27 +183,11 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH "ON" CACHE BOOL
 MARK_AS_ADVANCED(CMAKE_INSTALL_RPATH_USE_LINK_PATH)
 
 
-#
-# Translate CMake specific variables to deal.II naming:
-#
-
-FOREACH(_flag CXX_FLAGS CXX_FLAGS_RELEASE CXX_FLAGS_DEBUG)
-  IF(NOT "${CMAKE_${_flag}}" STREQUAL "")
-    MESSAGE(STATUS
-      "Prepending \${CMAKE_${_flag}} to \${DEAL_II_${_flag}}"
-      )
-    SET(DEAL_II_${_flag} "${CMAKE_${_flag}} ${DEAL_II_${_flag}}")
-  ENDIF()
-ENDFOREACH()
-
-FOREACH(_flag LINKER_FLAGS LINKER_FLAGS_DEBUG LINKER_FLAGS_RELEASE)
-  IF(NOT "${CMAKE_SHARED_${_flag}}" STREQUAL "")
-    MESSAGE(STATUS
-      "Prepending \${CMAKE_SHARED_${_flag}} to \${DEAL_II_${_flag}}"
-      )
-    SET(DEAL_II_${_flag} "${CMAKE_${_flag}} ${DEAL_II_${_flag}}")
-  ENDIF()
-ENDFOREACH()
+########################################################################
+#                                                                      #
+#                       Compilation and linking:                       #
+#                                                                      #
+########################################################################
 
 #
 # Hide all unused CMake variables:
@@ -232,12 +216,13 @@ SET(DEAL_II_REMOVED_FLAGS
   CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO
   )
 FOREACH(_flag ${DEAL_II_REMOVED_FLAGS})
-  # Go away...
+  #
+  # Promote all variables to internal cache. This prevents CMake from
+  # populating these variables with default values. Further, store the
+  # actual content of the variables such that users can still use
+  # CMAKE_CXX_FLAGS(|_RELEASE|_DEBUG).
+  #
   SET(${_flag} ${${_flag}} CACHE INTERNAL "" FORCE)
-  # Also set it to an empty string for the configuration run so that it
-  # does not confuse the build system (to unset is not an option - it is
-  # cached...)
-  SET(${_flag} "")
 ENDFOREACH()
 
 #
@@ -253,15 +238,51 @@ SET(DEAL_II_USED_FLAGS
   DEAL_II_LINKER_FLAGS_RELEASE
   )
 FOREACH(_flag ${DEAL_II_USED_FLAGS})
-  #
-  # Promote to cache:
-  #
   SET(${_flag} "${${_flag}}" CACHE STRING
     "The user supplied cache variable will be appended _at the end_ of the configuration step to the auto generated ${_flag} variable"
-    FORCE
     )
   MARK_AS_ADVANCED(${_flag})
+ENDFOREACH()
 
+FOREACH(_variable
+  DEAL_II_DEFINITIONS
+  DEAL_II_DEFINITIONS_DEBUG
+  DEAL_II_DEFINITIONS_RELEASE
+  )
+  SET(${_variable} ${${_variable}} CACHE STRING
+    "Additional, user supplied compile definitions"
+    )
+  MARK_AS_ADVANCED(${_variable})
+ENDFOREACH()
+
+#
+# Translate CMake specific variables to deal.II naming:
+#
+
+FOREACH(_flag CXX_FLAGS CXX_FLAGS_RELEASE CXX_FLAGS_DEBUG)
+  IF(NOT "${CMAKE_${_flag}}" STREQUAL "")
+    MESSAGE(STATUS
+      "Prepending \${CMAKE_${_flag}} to \${DEAL_II_${_flag}}"
+      )
+    SET(DEAL_II_${_flag} "${CMAKE_${_flag}} ${DEAL_II_${_flag}}")
+  ENDIF()
+ENDFOREACH()
+
+FOREACH(_flag LINKER_FLAGS LINKER_FLAGS_DEBUG LINKER_FLAGS_RELEASE)
+  IF(NOT "${CMAKE_SHARED_${_flag}}" STREQUAL "")
+    MESSAGE(STATUS
+      "Prepending \${CMAKE_SHARED_${_flag}} to \${DEAL_II_${_flag}}"
+      )
+    SET(DEAL_II_${_flag} "${CMAKE_${_flag}} ${DEAL_II_${_flag}}")
+  ENDIF()
+ENDFOREACH()
+
+#
+# Store user supplied flags in ${_flag}_SAVED and clear configuration
+# variables.
+#
+
+FOREACH(_flag ${DEAL_II_USED_FLAGS})
   #
   # The order of compiler and linker flags is important. In order to
   # provide an override mechanism we have to save the initial (cached)
@@ -274,20 +295,14 @@ FOREACH(_flag ${DEAL_II_USED_FLAGS})
   SET(${_flag} "")
 ENDFOREACH()
 
-FOREACH(_variable
-  DEAL_II_DEFINITIONS
-  DEAL_II_DEFINITIONS_DEBUG
-  DEAL_II_DEFINITIONS_RELEASE
-  )
-  #
-  # Promote to cache:
-  #
-  SET(${_variable} ${${_variable}} CACHE STRING
-    "Additional, user supplied compile definitions"
-    )
-  MARK_AS_ADVANCED(${_variable})
+#
+# Also set all unused CMAKE_* flags to an empty string for the
+# configuration run so that it does not confuse the build system (to unset
+# is not an option - it is cached...)
+#
+FOREACH(_flag ${DEAL_II_REMOVED_FLAGS})
+  SET(${_flag} "")
 ENDFOREACH()
-
 
 #
 # Finally, read in CXXFLAGS and LDFLAGS from environment and prepend them
@@ -296,6 +311,7 @@ ENDFOREACH()
 # Also strip leading and trailing whitespace from linker flags to make
 # old cmake versions happy
 #
+
 SET(DEAL_II_CXX_FLAGS_SAVED "$ENV{CXXFLAGS} ${DEAL_II_CXX_FLAGS_SAVED}")
 STRING(STRIP "${DEAL_II_CXX_FLAGS_SAVED}" DEAL_II_CXX_FLAGS_SAVED)
 SET(DEAL_II_LINKER_FLAGS_SAVED "$ENV{LDFLAGS} ${DEAL_II_LINKER_FLAGS_SAVED}")
