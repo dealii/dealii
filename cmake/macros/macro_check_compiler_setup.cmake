@@ -15,20 +15,25 @@
 
 #
 # Usage:
-#   CHECK_COMPILER_FLAGS(_compiler_flags_variable _linker_flags_variable _var)
+#   CHECK_COMPILER_SETUP(
+#     _compiler_flags_variable _linker_flags_variable _var
+#     [libraries]
+#     )
 #
 # This macro tries to compile and link a simple "int main(){ return 0; }
 # with the given set of compiler and flags provided in
-# _compiler_flags_variable and _linker_flags_variable. If the test is
-# succesful the variable ${_var} is set to true, otherwise to false.
+# _compiler_flags_variable and _linker_flags_variable and an optional list
+# of libraries to link against. If the test is succesful the variable
+# ${_var} is set to true, otherwise to false.
 #
 
-MACRO(CHECK_COMPILER_FLAGS _compiler_flags_variable _linker_flags_variable _var)
+MACRO(CHECK_COMPILER_SETUP _compiler_flags_variable _linker_flags_variable _var)
   #
   # Rerun this test if flags have changed:
   #
   IF(NOT "${${_compiler_flags_variable}}" STREQUAL "${CACHED_${_var}_${_compiler_flags_variable}}"
-     OR NOT "${${_linker_flags_variable}}" STREQUAL "${CACHED_${_var}_${_linker_flags_variable}}")
+     OR NOT "${${_linker_flags_variable}}" STREQUAL "${CACHED_${_var}_${_linker_flags_variable}}"
+     OR NOT "${ARGN}" STREQUAL "${CACHED_${_var}_ARGN}")
     UNSET(${_var} CACHE)
   ENDIF()
 
@@ -38,9 +43,10 @@ MACRO(CHECK_COMPILER_FLAGS _compiler_flags_variable _linker_flags_variable _var)
   SET(CACHED_${_var}_${_linker_flags_variable} "${${_linker_flags_variable}}"
     CACHE INTERNAL "" FORCE
     )
+  SET(CACHED_${_var}_ARGN "${ARGN}" CACHE INTERNAL "" FORCE)
 
   SET(CMAKE_REQUIRED_FLAGS ${${_compiler_flags_variable}})
-  SET(CMAKE_REQUIRED_LIBRARIES ${${_linker_flags_variable}})
+  SET(CMAKE_REQUIRED_LIBRARIES ${${_linker_flags_variable}} ${ARGN})
   CHECK_CXX_SOURCE_COMPILES("int main(){ return 0; }" ${_var})
   RESET_CMAKE_REQUIRED()
 

@@ -75,15 +75,17 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
   SET(_cxx_flags_${build} "${DEAL_II_CXX_FLAGS_SAVED} ${DEAL_II_CXX_FLAGS_${build}_SAVED}")
   SET(_linker_flags_${build} "${DEAL_II_CXX_FLAGS_SAVED} ${DEAL_II_CXX_FLAGS_${build}_SAVED}")
 
-  CHECK_COMPILER_FLAGS(_cxx_flags_${build} _linker_flags_${build}
+  CHECK_COMPILER_SETUP(_cxx_flags_${build} _linker_flags_${build}
     DEAL_II_HAVE_USABLE_USER_FLAGS_${build}
+    ${DEAL_II_LIBRARIES} ${DEAL_II_LIBRARIES_${build}}
     )
 
   IF(NOT DEAL_II_HAVE_USABLE_USER_FLAGS_${build})
     MESSAGE(FATAL_ERROR "
   Configuration error: Cannot compile with the user supplied flags:
-  CXX flags (${build}): ${_cxx_flags_${build}}
-  LD flags  (${build}): ${_linker_flags_${build}}
+    CXX flags (${build}): ${_cxx_flags_${build}}
+    LD flags  (${build}): ${_linker_flags_${build}}
+    LIBRARIES (${build}): ${DEAL_II_LIBRARIES};${DEAL_II_LIBRARIES_${build}}
   Please check the CMake variables
     DEAL_II_CXX_FLAGS, DEAL_II_CXX_FLAGS_${build},
     DEAL_II_LINKER_FLAGS, DEAL_II_CXX_FLAGS_${build}
