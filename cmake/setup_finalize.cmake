@@ -80,6 +80,29 @@ FOREACH(_suffix ${DEAL_II_LIST_SUFFIXES})
 ENDFOREACH()
 
 #
+# Sanity check: Can we compile with the final setup?
+#
+
+FOREACH(build ${DEAL_II_BUILD_TYPES})
+  SET(_cxx_flags_${build} "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${build}}")
+  SET(_linker_flags_${build} "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${build}}")
+
+  CHECK_COMPILER_FLAGS(_cxx_flags_${build} _linker_flags_${build}
+    DEAL_II_HAVE_USABLE_FLAGS_${build}
+    )
+
+  IF(NOT DEAL_II_HAVE_USABLE_FLAGS_${build})
+    MESSAGE(FATAL_ERROR "
+  Configuration error: Cannot compile a test program with the final set of
+  compiler and linker flags:
+    CXX flags (${build}): ${_final_cxx_flags_${build}}
+    LD flags  (${build}): ${_final_linker_flags_${build}}
+  \n\n"
+      )
+  ENDIF()
+ENDFOREACH()
+
+#
 # Clean up deal.IITargets.cmake in the build directory:
 #
 FILE(REMOVE
