@@ -187,26 +187,24 @@ LIST(SORT _deal_ii_features_sorted)
 FOREACH(_name ${_deal_ii_features_sorted})
   SET(_var DEAL_II_WITH_${_name})
 
-  #
-  # Do not pollute deal.IIConfig.cmake with package details of unconfigured
-  # features.
-  #
-  IF(NOT ${_var})
-    CONTINUE()
-  ENDIF()
-
   FOREACH(_file ${_files})
     FILE(APPEND ${_file} "SET(${_var} ${${_var}})\n")
-    IF(NOT "${${_name}_VERSION}" STREQUAL "")
-      FILE(APPEND ${_file}
-        "SET(DEAL_II_${_name}_VERSION \"${${_name}_VERSION}\")\n"
-        )
-    ENDIF()
-    FOREACH(_additional ${_additional_config_variables})
-      IF(_additional MATCHES "DEAL_II_${_name}_WITH")
-        FILE(APPEND ${_file} "SET(${_additional} ${${_additional}})\n")
+    #
+    # Do not pollute deal.IIConfig.cmake with package details of
+    # unconfigured features.
+    #
+    IF(${_var})
+      IF(NOT "${${_name}_VERSION}" STREQUAL "")
+        FILE(APPEND ${_file}
+          "SET(DEAL_II_${_name}_VERSION \"${${_name}_VERSION}\")\n"
+          )
       ENDIF()
-    ENDFOREACH()
+      FOREACH(_additional ${_additional_config_variables})
+        IF(_additional MATCHES "DEAL_II_${_name}_WITH")
+          FILE(APPEND ${_file} "SET(${_additional} ${${_additional}})\n")
+        ENDIF()
+      ENDFOREACH()
+    ENDIF()
   ENDFOREACH()
 ENDFOREACH()
 
