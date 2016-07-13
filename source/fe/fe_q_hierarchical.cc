@@ -110,7 +110,7 @@ std::string
 FE_Q_Hierarchical<dim>::get_name () const
 {
   // note that the
-  // FETools::get_fe_from_name
+  // FETools::get_fe_by_name
   // function depends on the
   // particular format of the string
   // this function returns, so they

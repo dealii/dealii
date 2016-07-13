@@ -54,7 +54,7 @@ template <int dim, int spacedim>
 std::string
 FE_Q_iso_Q1<dim,spacedim>::get_name () const
 {
-  // note that the FETools::get_fe_from_name function depends on the
+  // note that the FETools::get_fe_by_name function depends on the
   // particular format of the string this function returns, so they have to be
   // kept in sync
 

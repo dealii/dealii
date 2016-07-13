@@ -19,7 +19,7 @@
 #include <deal.II/lac/sparsity_pattern.h>
 
 // check
-//   FETools::get_fe_from_name
+//   FETools::get_fe_by_name
 
 
 std::string output_file_name = "output";
@@ -39,7 +39,7 @@ check_this (const FiniteElement<dim> &fe1,
   // pretty good indication that the
   // two FEs are actually the same
   deallog << fe1.get_name();
-  p1 = FETools::get_fe_from_name<dim> (fe1.get_name());
+  p1 = FETools::get_fe_by_name<dim, dim> (fe1.get_name());
   AssertThrow (fe1.get_name() == p1->get_name(),
                ExcInternalError());
   deallog << " ok" << std::endl;
@@ -47,7 +47,7 @@ check_this (const FiniteElement<dim> &fe1,
 
   // same for fe2
   deallog << fe2.get_name();
-  p2 = FETools::get_fe_from_name<dim> (fe2.get_name());
+  p2 = FETools::get_fe_by_name<dim, dim> (fe2.get_name());
   AssertThrow (fe2.get_name() == p2->get_name(),
                ExcInternalError());
   deallog << " ok" << std::endl;
