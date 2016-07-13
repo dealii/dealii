@@ -178,19 +178,17 @@ MACRO(DEAL_II_PICKUP_TESTS)
       STRING(REGEX MATCH "([0-9]+(\\.[0-9]+)*)$" _version ${_match})
 
       #
-      # Valid feature?
-      #
       # We support two variables: DEAL_II_WITH_<FEATURE> and DEAL_II_<FEATURE>
       #
       SET(_variable "DEAL_II_WITH_${_feature}")
       IF(NOT DEFINED ${_variable})
         SET(_variable "DEAL_II_${_feature}")
         IF(NOT DEFINED ${_variable})
-          MESSAGE(FATAL_ERROR "
-Invalid feature constraint \"${_match}\" in file
-\"${_comparison}\":
-The feature \"DEAL_II_WITH_${_feature}\" (or \"DEAL_II_${_feature}\") does not exist.\n"
-            )
+          #
+          # If a variable is undefined, assume that we cannot configure a
+          # given test
+          #
+          SET(_define_test FALSE)
         ENDIF()
       ENDIF()
 
