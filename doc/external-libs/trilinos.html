@@ -55,36 +55,53 @@
     </p>
 
     <p>
+      deal.II uses the following libraries from Trilinos and will fail to
+      compile with Trilinos if they are not present:
+      <ul>
+        <li> Amesos,
+        <li> AztecOO,
+        <li> Epetra,
+        <li> Ifpack,
+        <li> ML,
+        <li> MueLu (if using Trilinos 11.14 or newer),
+        <li> Sacado, and
+        <li> Teuchos.
+      </ul>
+
       Trilinos uses <a href="http://cmake.org/">cmake</a> to configure and
       build. The following slightly longish set of commands will set up a
       reasonable configuration (we require MueLu starting from 12.0):
       <pre>
 
-	cd trilinos-12.4.2
-	mkdir build
-	cd build
+    cd trilinos-12.4.2
+    mkdir build
+    cd build
 
-	cmake \
-	-D Trilinos_ENABLE_Sacado=ON \
-	-D Trilinos_ENABLE_MueLu:BOOL=ON \
-	-D Trilinos_ENABLE_Stratimikos=ON \
-	-D CMAKE_BUILD_TYPE=RELEASE \
-	-D CMAKE_CXX_FLAGS="-g -O3" \
-	-D CMAKE_C_FLAGS="-g -O3" \
-	-D CMAKE_FORTRAN_FLAGS="-g -O5" \
-	-D Trilinos_EXTRA_LINK_FLAGS="-lgfortran" \
-	-D CMAKE_VERBOSE_MAKEFILE=FALSE \
-	-D Trilinos_VERBOSE_CONFIGURE=FALSE \
-	-D Trilinos_ENABLE_EXPLICIT_INSTANTIATION=ON \
-	-D TPL_ENABLE_MPI=ON \
-	-D BUILD_SHARED_LIBS=ON \
-	-D CMAKE_INSTALL_PREFIX:PATH=$HOME/share/trilinos \
-	..
+    cmake                                            \
+    -DTrilinos_ENABLE_Amesos=ON                      \
+    -DTrilinos_ENABLE_Epetra=ON                      \
+    -DTrilinos_ENABLE_Ifpack=ON                      \
+    -DTrilinos_ENABLE_AztecOO=ON                     \
+    -DTrilinos_ENABLE_Sacado=ON                      \
+    -DTrilinos_ENABLE_Teuchos=ON                     \
+    -DTrilinos_ENABLE_MueLu=ON                       \
+    -DTrilinos_ENABLE_ML=ON                          \
+    -DTrilinos_VERBOSE_CONFIGURE=OFF                 \
+    -DTPL_ENABLE_MPI=ON                              \
+    -DBUILD_SHARED_LIBS=ON                           \
+    -DCMAKE_VERBOSE_MAKEFILE=OFF                     \
+    -DCMAKE_BUILD_TYPE=RELEASE                       \
+    -DCMAKE_INSTALL_PREFIX:PATH=$HOME/share/trilinos \
+    ../
 
-	make install
+    make install
       </pre>
       You will need to adjust the path into which you want to install Trilinos
-      in the CMAKE_INSTALL_PREFIX line.
+      in the CMAKE_INSTALL_PREFIX line. If you do not have MPI installed you
+      should use <code>-DTPL_ENABLE_MPI=OFF</code> instead. Additionally, if
+      your computer has enough memory available, it may also be useful to pass
+      the flag <code>-DTrilinos_ENABLE_EXPLICIT_INSTANTIATION=ON</code>, which
+      will improve compilation times of deal.II programs that use Trilinos.
     </p>
 
 
