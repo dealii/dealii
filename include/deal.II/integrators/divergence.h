@@ -83,10 +83,9 @@ namespace LocalIntegrators
       const FEValuesBase<dim> &fetest,
       double factor = 1.)
     {
-      unsigned int fecomp = fe.get_fe().n_components();
       const unsigned int n_dofs = fe.dofs_per_cell;
       const unsigned int t_dofs = fetest.dofs_per_cell;
-      AssertDimension(fecomp, dim);
+      AssertDimension(fe.get_fe().n_components(), dim);
       AssertDimension(fetest.get_fe().n_components(), 1);
       AssertDimension(M.m(), t_dofs);
       AssertDimension(M.n(), n_dofs);
@@ -194,11 +193,10 @@ namespace LocalIntegrators
       const FEValuesBase<dim> &fetest,
       double factor = 1.)
     {
-      unsigned int fecomp = fetest.get_fe().n_components();
       const unsigned int t_dofs = fetest.dofs_per_cell;
       const unsigned int n_dofs = fe.dofs_per_cell;
 
-      AssertDimension(fecomp, dim);
+      AssertDimension(fetest.get_fe().n_components(), dim);
       AssertDimension(fe.get_fe().n_components(), 1);
       AssertDimension(M.m(), t_dofs);
       AssertDimension(M.n(), n_dofs);
@@ -303,11 +301,10 @@ namespace LocalIntegrators
       const FEValuesBase<dim> &fetest,
       double factor = 1.)
     {
-      unsigned int fecomp = fe.get_fe().n_components();
       const unsigned int n_dofs = fe.dofs_per_cell;
       const unsigned int t_dofs = fetest.dofs_per_cell;
 
-      AssertDimension(fecomp, dim);
+      AssertDimension(fe.get_fe().n_components(), dim);
       AssertDimension(fetest.get_fe().n_components(), 1);
       AssertDimension(M.m(), t_dofs);
       AssertDimension(M.n(), n_dofs);
@@ -342,10 +339,9 @@ namespace LocalIntegrators
       const VectorSlice<const std::vector<std::vector<double> > > &data,
       double factor = 1.)
     {
-      unsigned int fecomp = fe.get_fe().n_components();
       const unsigned int t_dofs = fetest.dofs_per_cell;
 
-      AssertDimension(fecomp, dim);
+      AssertDimension(fe.get_fe().n_components(), dim);
       AssertDimension(fetest.get_fe().n_components(), 1);
       AssertDimension(result.size(), t_dofs);
       AssertVectorVectorDimension (data, dim, fe.n_quadrature_points);
@@ -604,9 +600,7 @@ namespace LocalIntegrators
     double norm(const FEValuesBase<dim> &fe,
                 const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > > &Du)
     {
-      unsigned int fecomp = fe.get_fe().n_components();
-
-      AssertDimension(fecomp, dim);
+      AssertDimension(fe.get_fe().n_components(), dim);
       AssertVectorVectorDimension (Du, dim, fe.n_quadrature_points);
 
       double result = 0;
