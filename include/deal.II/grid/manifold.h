@@ -125,15 +125,19 @@ namespace Manifolds
  * @note Unlike almost all other cases in the library, we here interpret the points
  * in the quadrature object to be in real space, not on the reference cell.
  *
- * Manifold::get_new_point() has a default implementation that can simplify
- * this process somewhat:
- * Internally, the function calls the Manifold::project_to_manifold()
- * function after computing the weighted average of the quadrature points.
- * This allows derived classes to only overload Manifold::project_to_manifold()
- * for simple situations. This is often useful when describing manifolds that
- * are embedded in higher dimensional space, e.g., the surface of a sphere.
- * In those cases, the desired new point is simply the (weighted) average
- * of the provided point, projected back out onto the sphere.
+ * Manifold::get_new_point() has a default implementation that can
+ * simplify this process somewhat: Internally, the function calls the
+ * Manifold::get_intermediate_point() to compute pair-wise
+ * intermediate points. Internally the
+ * Manifold::get_intermediate_point() calls the
+ * Manifold::project_to_manifold() function after computing the convex
+ * conbination of the given points.  This allows derived classes to
+ * only overload Manifold::project_to_manifold() for simple
+ * situations. This is often useful when describing manifolds that are
+ * embedded in higher dimensional space, e.g., the surface of a
+ * sphere.  In those cases, the desired new point maybe computed
+ * simply by the (weighted) average of the provided point, projected
+ * back out onto the sphere.
  *
  *
  * <h3>Common use case: Computing tangent vectors</h3>
@@ -291,9 +295,9 @@ public:
    */
   virtual
   Point<spacedim>
-  get_new_point (const Point<spacedim> &p1,
-                 const Point<spacedim> &p2,
-                 const double w) const;
+  get_intermediate_point (const Point<spacedim> &p1,
+                          const Point<spacedim> &p2,
+                          const double w) const;
 
   /**
    * Return the point which shall become the new vertex surrounded by the

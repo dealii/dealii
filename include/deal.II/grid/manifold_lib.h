@@ -208,9 +208,9 @@ public:
    */
   virtual
   Point<spacedim>
-  get_new_point(const Point<spacedim> &p1,
-                const Point<spacedim> &p2,
-                const double w) const;
+  get_intermediate_point(const Point<spacedim> &p1,
+                         const Point<spacedim> &p2,
+                         const double w) const;
 
   /**
    * Compute the derivative of the get_new_point function with

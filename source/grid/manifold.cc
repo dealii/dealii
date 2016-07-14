@@ -45,9 +45,9 @@ project_to_manifold (const std::vector<Point<spacedim> > &,
 template <int dim, int spacedim>
 Point<spacedim>
 Manifold<dim, spacedim>::
-get_new_point (const Point<spacedim> &p1,
-               const Point<spacedim> &p2,
-               const double w) const
+get_intermediate_point (const Point<spacedim> &p1,
+                        const Point<spacedim> &p2,
+                        const double w) const
 {
   std::vector<Point<spacedim> > vertices;
   vertices.push_back(p1);
@@ -73,7 +73,7 @@ get_new_point (const Quadrature<spacedim> &quad) const
   for (unsigned int i=1; i<sorted_quad.size(); ++i)
     {
       if ( w != 0 )
-        p = get_new_point(p, sorted_quad.point(i) , w/(sorted_quad.weight(i) + w) );
+        p = get_intermediate_point(p, sorted_quad.point(i) , w/(sorted_quad.weight(i) + w) );
       w += sorted_quad.weight(i);
     }
 

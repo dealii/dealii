@@ -171,9 +171,9 @@ SphericalManifold<dim,spacedim>::SphericalManifold(const Point<spacedim> center)
 template <int dim, int spacedim>
 Point<spacedim>
 SphericalManifold<dim,spacedim>::
-get_new_point (const Point<spacedim> &p1,
-               const Point<spacedim> &p2,
-               const double w) const
+get_intermediate_point (const Point<spacedim> &p1,
+                        const Point<spacedim> &p2,
+                        const double w) const
 {
   Assert(w >=0.0 && w <= 1.0,
          ExcMessage("w should be in the range [0.0,1.0]."));

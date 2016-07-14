@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Check SphericalManifold for get_new_point and get_tangent_vector issues.
+// Check SphericalManifold for get_intermediate_point and get_tangent_vector issues.
 
 #include "../tests.h"
 
@@ -36,24 +36,24 @@ main()
     Point<2> P1(1.0, 0.0);
     Point<2> P2(0.0, 1.0);
 
-    Point<2> Q = manifold.get_new_point(P1, P2, .5);
+    Point<2> Q = manifold.get_intermediate_point(P1, P2, .5);
 
     deallog << "=================================" << std::endl;;
-    deallog << manifold.get_new_point(P1, P2, .125) << std::endl;
-    deallog << manifold.get_new_point(P1, P2, .25) << std::endl;
-    deallog << manifold.get_new_point(P1, P2, .375) << std::endl;
-    deallog << manifold.get_new_point(P1, P2, .5) << std::endl;
-    deallog << manifold.get_new_point(P1, P2, .625) << std::endl;
-    deallog << manifold.get_new_point(P1, P2, .75) << std::endl;
-    deallog << manifold.get_new_point(P1, P2, .875) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .125) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .25) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .375) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .5) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .625) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .75) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .875) << std::endl;
     deallog << "=================================" << std::endl;
-    deallog << manifold.get_new_point(P1, Q, .25) << std::endl;
-    deallog << manifold.get_new_point(P1, Q, .5) << std::endl;
-    deallog << manifold.get_new_point(P1, Q, .75) << std::endl;
-    deallog << manifold.get_new_point(P1, P2,.5) << std::endl;
-    deallog << manifold.get_new_point(Q, P2, .25) << std::endl;
-    deallog << manifold.get_new_point(Q, P2, .5) << std::endl;
-    deallog << manifold.get_new_point(Q, P2, .75) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, Q, .25) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, Q, .5) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, Q, .75) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2,.5) << std::endl;
+    deallog << manifold.get_intermediate_point(Q, P2, .25) << std::endl;
+    deallog << manifold.get_intermediate_point(Q, P2, .5) << std::endl;
+    deallog << manifold.get_intermediate_point(Q, P2, .75) << std::endl;
     deallog << "=================================" << std::endl;
   }
 
@@ -64,24 +64,24 @@ main()
     Point<2> P1(1.0, 0.0);
     Point<2> P2(0.0, 1.0);
 
-    Point<2> Q = manifold.get_new_point(P1, P2, .5);
+    Point<2> Q = manifold.get_intermediate_point(P1, P2, .5);
 
     deallog << "=================================" << std::endl;;
-    deallog << manifold.get_new_point(P1, P2, .125) << std::endl;
-    deallog << manifold.get_new_point(P1, P2, .25) << std::endl;
-    deallog << manifold.get_new_point(P1, P2, .375) << std::endl;
-    deallog << manifold.get_new_point(P1, P2, .5) << std::endl;
-    deallog << manifold.get_new_point(P1, P2, .625) << std::endl;
-    deallog << manifold.get_new_point(P1, P2, .75) << std::endl;
-    deallog << manifold.get_new_point(P1, P2, .875) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .125) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .25) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .375) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .5) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .625) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .75) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .875) << std::endl;
     deallog << "=================================" << std::endl;
-    deallog << manifold.get_new_point(P1, Q, .25) << std::endl;
-    deallog << manifold.get_new_point(P1, Q, .5) << std::endl;
-    deallog << manifold.get_new_point(P1, Q, .75) << std::endl;
-    deallog << manifold.get_new_point(P1, P2,.5) << std::endl;
-    deallog << manifold.get_new_point(Q, P2, .25) << std::endl;
-    deallog << manifold.get_new_point(Q, P2, .5) << std::endl;
-    deallog << manifold.get_new_point(Q, P2, .75) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, Q, .25) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, Q, .5) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, Q, .75) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2,.5) << std::endl;
+    deallog << manifold.get_intermediate_point(Q, P2, .25) << std::endl;
+    deallog << manifold.get_intermediate_point(Q, P2, .5) << std::endl;
+    deallog << manifold.get_intermediate_point(Q, P2, .75) << std::endl;
     deallog << "=================================" << std::endl;
   }
 
@@ -92,24 +92,24 @@ main()
     Point<3> P1(1.0, 0.0, 0.0);
     Point<3> P2(0.0, 0.0, 1.0);
 
-    Point<3> Q = manifold.get_new_point(P1, P2, .5);
+    Point<3> Q = manifold.get_intermediate_point(P1, P2, .5);
 
     deallog << "=================================" << std::endl;;
-    deallog << manifold.get_new_point(P1, P2, .125) << std::endl;
-    deallog << manifold.get_new_point(P1, P2, .25) << std::endl;
-    deallog << manifold.get_new_point(P1, P2, .375) << std::endl;
-    deallog << manifold.get_new_point(P1, P2, .5) << std::endl;
-    deallog << manifold.get_new_point(P1, P2, .625) << std::endl;
-    deallog << manifold.get_new_point(P1, P2, .75) << std::endl;
-    deallog << manifold.get_new_point(P1, P2, .875) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .125) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .25) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .375) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .5) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .625) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .75) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .875) << std::endl;
     deallog << "=================================" << std::endl;
-    deallog << manifold.get_new_point(P1, Q, .25) << std::endl;
-    deallog << manifold.get_new_point(P1, Q, .5) << std::endl;
-    deallog << manifold.get_new_point(P1, Q, .75) << std::endl;
-    deallog << manifold.get_new_point(P1, P2,.5) << std::endl;
-    deallog << manifold.get_new_point(Q, P2, .25) << std::endl;
-    deallog << manifold.get_new_point(Q, P2, .5) << std::endl;
-    deallog << manifold.get_new_point(Q, P2, .75) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, Q, .25) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, Q, .5) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, Q, .75) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2,.5) << std::endl;
+    deallog << manifold.get_intermediate_point(Q, P2, .25) << std::endl;
+    deallog << manifold.get_intermediate_point(Q, P2, .5) << std::endl;
+    deallog << manifold.get_intermediate_point(Q, P2, .75) << std::endl;
     deallog << "=================================" << std::endl;
   }
 
@@ -120,12 +120,12 @@ main()
     Point<3> P1(2.0, 0.0, 0.0);
     Point<3> P2(0.0, std::sqrt(2), std::sqrt(2) );
 
-    Point<3> Q = manifold.get_new_point(P1, P2, .5);
+    Point<3> Q = manifold.get_intermediate_point(P1, P2, .5);
 
     const unsigned int num_points = 20;
     deallog << "=================================" << std::endl;;
     for (unsigned int i = 0; i<num_points; i++)
-      deallog << manifold.get_new_point(P1, P2, (1.0*i)/(num_points-1)) << std::endl;
+      deallog << manifold.get_intermediate_point(P1, P2, (1.0*i)/(num_points-1)) << std::endl;
     deallog << "=================================" << std::endl;
   }
 
@@ -168,7 +168,7 @@ main()
 
     Point<3> P5(0.707107, 0.707107, 0.0);
     Point<3> P4(0.0, 0.0, 1.0);
-    Point<3> R = manifold.get_new_point(P5, P4, 2.0/3.0);
+    Point<3> R = manifold.get_intermediate_point(P5, P4, 2.0/3.0);
 
     deallog << "=================================" << std::endl;;
     deallog << Q << std::endl;
