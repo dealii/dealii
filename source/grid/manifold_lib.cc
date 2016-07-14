@@ -227,8 +227,8 @@ get_tangent_vector (const Point<spacedim> &p1,
   const Tensor<1,spacedim> e2 = (p2 - center)/r2;
 
   Assert(e1*e2 + 1.0 > 1e-10,
-         ExcMessage("p1 and p2 cannot lie on the same diameter and be opposite
-                    respect to the center."));
+         ExcMessage("p1 and p2 cannot lie on the same diameter and be opposite "
+                    "respect to the center."));
 
   // Tangent vector to the unit sphere along the geodesic given by e1 and e2.
   Tensor<1,spacedim> tg = (e2-(e2*e1)*e1);
