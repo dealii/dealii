@@ -182,11 +182,10 @@ namespace LocalIntegrators
       const double factor = 1.)
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
-      const unsigned int fe_components = fe.get_fe().n_components();
       const unsigned int n_components = input.size();
 
       AssertDimension(result.size(), n_dofs);
-      AssertDimension(input.size(), fe_components);
+      AssertDimension(input.size(), fe.get_fe().n_components());
 
       for (unsigned int k=0; k<fe.n_quadrature_points; ++k)
         for (unsigned int i=0; i<n_dofs; ++i)
