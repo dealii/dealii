@@ -57,7 +57,7 @@ check()
   GridGenerator::hyper_cube (triangulation, 0., 1.);
   GridTools::transform (&affine<dim>, triangulation) ;
 
-  FE_P1NCNonparametric fe;
+  FE_P1NC fe;
   DoFHandler<dim> dof_handler (triangulation);
   dof_handler.distribute_dofs(fe);
 
