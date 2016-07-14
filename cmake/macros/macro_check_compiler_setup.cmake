@@ -21,7 +21,7 @@
 #
 # This macro tries to compile and link a simple "int main(){ return 0; }
 # with the given set of provided compiler and linker flags  and an optional
-# list of libraries to link against. If the test is succesful the variable
+# list of libraries to link against. If the test is successful the variable
 # ${_var} is set to true, otherwise it is set to false.
 #
 
