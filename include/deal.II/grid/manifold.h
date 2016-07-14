@@ -274,9 +274,9 @@ public:
 
   /**
    * Return an intermediate point between two given
-   * points. Overloading this function allows the default recursive
-   * implementation of the method get_new_point() that takes a
-   * Quadrature object as input to work properly.
+   * points. Overloading this function allows the default pair-wise
+   * reduction implementation of the method get_new_point() that takes
+   * a Quadrature object as input to work properly.
    *
    * An implementation of this function should returns a parametric
    * curve on the manifold, joining the points `p1` and `p2`, with
@@ -291,9 +291,9 @@ public:
    */
   virtual
   Point<spacedim>
-  get_new_point(  const Point<spacedim> &p1,
-                  const Point<spacedim> &p2,
-                  const double w) const;
+  get_new_point (const Point<spacedim> &p1,
+                 const Point<spacedim> &p2,
+                 const double w) const;
 
   /**
    * Return the point which shall become the new vertex surrounded by the
@@ -301,13 +301,17 @@ public:
    * which should be filled with the surrounding points together with
    * appropriate weights.
    *
-   * In its default implementation it calls recursively the function
-   * get_new_point(). User classes can get away by simply implementing
-   * that method.
+   * In its default implementation it uses a pair-wise reduction of
+   * the points in the quadrature formula by calling the function
+   * get_new_point() that takes three arguments on the first two
+   * points, then on the resulting point and the next, untill all
+   * points in the quadrature have been taken into account. User
+   * classes can get away by simply implementing the get_new_point()
+   * function that takes three arguments.
    */
   virtual
   Point<spacedim>
-  get_new_point(const Quadrature<spacedim> &quad) const;
+  get_new_point (const Quadrature<spacedim> &quad) const;
 
   /**
    * Given a point which lies close to the given manifold, it modifies it and

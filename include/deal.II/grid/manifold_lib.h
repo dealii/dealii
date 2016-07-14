@@ -129,9 +129,13 @@ private:
  *
  * While PolarManifold reflects the usual notion of polar coordinates,
  * it may not be suitable for domains that contain either the north or
- * south poles.
- * Consider for istance the pair of points \f$x_1=(1,\pi/3,0)\f$ and
- * \f$x_2=(1,\pi/3,\pi)\f$.
+ * south poles.  Consider for instance the pair of points
+ * \f$x_1=(1,\pi/3,0)\f$ and \f$x_2=(1,\pi/3,\pi)\f$ in polar
+ * coordinates (laying on the surface of a sphere with radius one, on
+ * a parallel at at height $\pi/3$. In this case connecting the points
+ * with a straight line in polar coordinates would take the long road
+ * around the globe, without passing through the north pole.
+ *
  * These two points would be connented (using a PolarManifold) by the curve
  * \$[
  * \begin{align}
@@ -139,7 +143,7 @@ private:
  *           t & \mapsto     &  (1,\pi/3,0) + (0,0,t\pi)
  * \$]
  * This curve is not a geodesic on the sphere, and it is not how we
- * would choose a curve on the sphere. A better one would be the one
+ * would connect those two points. A better curve, would be the one
  * passing through the North pole:
  * \[
  *  s(t) = x_1 \cos(\alpha(t)) + \kappa \times x_1 \sin(\alpha(t)) +
@@ -150,21 +154,37 @@ private:
  * Indeed, this is a geodesic, and it is the natural choice when
  * connecting points on the surface of the sphere.
  *
- * This class implements a Manifold that joins any two points in space
- * by first projecting them on the surface of a sphere with unit
- * radius, then connecting them with a geodesic, and finally rescaling
- * the final radius so that the resulting one is the weighted average
- * of the starting radii. This Manifold is identical to PolarManifold
- * in dimension two, while for dimension three it returns points that
- * are more uniformly distributed on the sphere, and it is invariant
- * with respect to rotations of the coordinate system, therefore
- * avoiding the problems that PolarManifold has at the poles.
+ * If the codimension of the Manifold is one, than this Manifold
+ * connects points using geodesics. In all other cases it is a
+ * continuus extension of the codimension one case.
+ *
+ * In particular, this class implements a Manifold that joins any two
+ * points in space by first projecting them onto the surface of a
+ * sphere with unit radius, then connecting them with a geodesic, and
+ * finally rescaling the final radius so that the resulting one is the
+ * weighted average of the starting radii. This Manifold is identical
+ * to PolarManifold in dimension two, while for dimension three it
+ * returns points that are more uniformly distributed on the sphere,
+ * and it is invariant with respect to rotations of the coordinate
+ * system, therefore avoiding the problems that PolarManifold has at
+ * the poles. Notice, in particular, that computing tangent vectors at
+ * the poles with a PolarManifold is not well defined, while it is
+ * perfectly fine with this class.
  *
  * For mathematical reasons, it is impossible to construct a unique
  * map of a sphere using only geodesic curves, and therefore, using
  * this class with MappingManifold is discouraged. If you use this
  * Manifold to describe the geometry of a sphere, you should use
  * MappingQ as the underlying mapping, and not MappingManifold.
+ *
+ * This Manifold can be used *only* on geometries where a finite ball
+ * is removed from the center. Indeed, the center is a singular point
+ * for this manifold, and if you try to connect two points across the
+ * center, they would travel on spherical coordinates, avoiding the
+ * center.
+ *
+ * The ideal geometry for this Manifold is an HyperShell. If you plan
+ * to use this Manifold on a Sphere
  *
  * @ingroup manifold
  *
