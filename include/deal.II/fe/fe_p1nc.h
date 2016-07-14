@@ -31,8 +31,36 @@ DEAL_II_NAMESPACE_OPEN
 
 class FE_P1NC : public FiniteElement<2,2>
 {
-private:
 
+public:
+  /**
+   * Constructor for nonparametric version of P1 nonconforming element.
+   */
+  FE_P1NC() ;
+
+  /**
+   * Return the name of the class for the element.
+   */
+  virtual std::string get_name () const ;
+
+  /**
+   * Return the update flags which are needed.
+   */
+  virtual UpdateFlags     requires_update_flags (const UpdateFlags flags) const ;
+
+  /**
+   * Copy constructor.
+   */
+  virtual FiniteElement<2,2> *clone () const ;
+
+  /**
+   * Destructor.
+   */
+  virtual ~FE_P1NC ();
+
+
+
+private:
 
   static
   std::vector<ComponentMask>
@@ -45,6 +73,19 @@ private:
   static
   std::vector<unsigned int>
   get_dpo_vector ();
+
+
+  /**
+   * Compute the linear shape functions phi(x,y) = ax + by + c
+   * such that each midpoint value on two connecting edges is a half,
+   * and two other midpoint values are all zero.
+   */
+  static
+  void
+  get_linear_shape (const Triangulation<2,2>::cell_iterator &cell,
+                    std::vector<double> &a,
+                    std::vector<double> &b,
+                    std::vector<double> &c);
 
 
 
@@ -65,13 +106,13 @@ private:
   /**
    * Compute the data on the current cell.
    */
-   virtual
+  virtual
   void
   fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell,
                   const CellSimilarity::Similarity                   ,
                   const Quadrature<2>                               &quadrature,
                   const Mapping<2,2>                                &mapping,
-                  const Mapping<2,2>::InternalDataBase              &,
+                  const Mapping<2,2>::InternalDataBase &,
                   const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
                   const FiniteElement<2,2>::InternalDataBase        &fe_internal,
                   internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;
@@ -111,35 +152,6 @@ private:
                           dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;
 
 
-
-public:
-  /**
-   * Constructor for nonparametric version of P1 nonconforming element.
-   */
-  FE_P1NC() ;
-
-  /**
-   * Return the name of the class for the element.
-   */
-  virtual std::string get_name () const ;
-
-  /**
-   * Return the update flags which are needed.
-   */
-  virtual UpdateFlags     requires_update_flags (const UpdateFlags flags) const ;
-
-  /**
-   * Copy constructor.
-   */
-  virtual FiniteElement<2,2> *clone () const ;
-
-  /**
-   * Destructor.
-   */
-  virtual ~FE_P1NC ();
-
-
-protected:
 
   /**
    * Create the constraints matrix for hanging edges.
