@@ -40,15 +40,36 @@ MACRO(FEATURE_MPI_FIND_EXTERNAL var)
       )
 
     IF(NOT MPI_WORKING_COMPILER)
-      MESSAGE(STATUS "Could not find a sufficient MPI installation: "
-        "Unable to compile a simple test program."
+      #
+      # Try a workaround and drop "-fuse-ld=gold" (if present) from the
+      # linker invocation
+      #
+      MESSAGE(STATUS "Unable to compile a simple test program. "
+        "Try to drop \"-fuse-ld=gold\" from the linker flags."
         )
-      SET(MPI_ADDITIONAL_ERROR_STRING
-        ${MPI_ADDITIONAL_ERROR_STRING}
-        "Unable to compile and link a simple test program with your MPI installation. \n"
+      STRING(REPLACE "-fuse-ld=gold" "" _filtered_flags "${DEAL_II_LINKER_FLAGS}")
+
+      CHECK_COMPILER_SETUP(
+        "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_SAVED} ${MPI_CXX_FLAGS}"
+        "${_filtered_flags} ${DEAL_II_LINKER_FLAGS_SAVED} ${MPI_LINKER_FLAGS}"
+        MPI_WORKING_COMPILER
+        ${DEAL_II_LIBRARIES} ${MPI_LIBRARIES}
         )
-      SET(${var} FALSE)
+
+      IF(MPI_WORKING_COMPILER)
+        SET(DEAL_II_LINKER_FLAGS "${_filtered_flags}")
+      ELSE()
+        MESSAGE(STATUS "Could not find a sufficient MPI installation: "
+          "Unable to compile a simple test program."
+          )
+        SET(MPI_ADDITIONAL_ERROR_STRING
+          ${MPI_ADDITIONAL_ERROR_STRING}
+          "Unable to compile and link a simple test program with your MPI installation. \n"
+          )
+        SET(${var} FALSE)
+      ENDIF()
     ENDIF()
+
   ENDIF()
 ENDMACRO()
 
