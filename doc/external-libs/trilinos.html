@@ -126,10 +126,10 @@
       following flags to the call above:
       <pre>
 
-	-D BLAS_LIBRARY_NAMES:STRING=goto \
-	-D BLAS_LIBRARY_DIRS:STRING=/apps/GotoBLAS/lib64 \
-	-D LAPACK_LIBRARY_NAMES:STRING=lapack \
-	-D LAPACK_LIBRARY_DIRS:STRING=/apps/lapack-3.2.1/lib64
+	-DBLAS_LIBRARY_NAMES:STRING=goto \
+	-DBLAS_LIBRARY_DIRS:STRING=/apps/GotoBLAS/lib64 \
+	-DLAPACK_LIBRARY_NAMES:STRING=lapack \
+	-DLAPACK_LIBRARY_DIRS:STRING=/apps/lapack-3.2.1/lib64
       </pre>
     </p>
 
@@ -149,26 +149,26 @@
       solvers:
       <pre>
 
-        -D TPL_ENABLE_UMFPACK:BOOL=ON \
-        -D TPL_ENABLE_SuperLU:BOOL=ON \
-        -D TPL_ENABLE_SuperLUDist:BOOL=ON \
-        -D TPL_UMFPACK_INCLUDE_DIRS="/usr/include" \
-        -D SuperLUDist_INCLUDE_DIRS:FILEPATH="/path/to/SuperLU_DIST_3.2/SRC" \
-	-D TPL_SuperLUDist_LIBRARIES:FILEPATH="/path/to/SuperLU_DIST_3.2/lib/libsuperlu_dist.a" \
-        -D SuperLU_INCLUDE_DIRS:FILEPATH="/path/to/SuperLU_4.3/SRC" \
-        -D TPL_SuperLU_LIBRARIES:FILEPATH="/path/to/SuperLU_4.3/lib/libsuperlu_4.3.a"
+        -DTPL_ENABLE_UMFPACK:BOOL=ON \
+        -DTPL_ENABLE_SuperLU:BOOL=ON \
+        -DTPL_ENABLE_SuperLUDist:BOOL=ON \
+        -DTPL_UMFPACK_INCLUDE_DIRS="/usr/include" \
+        -DSuperLUDist_INCLUDE_DIRS:FILEPATH="/path/to/SuperLU_DIST_3.2/SRC" \
+        -DTPL_SuperLUDist_LIBRARIES:FILEPATH="/path/to/SuperLU_DIST_3.2/lib/libsuperlu_dist.a" \
+        -DSuperLU_INCLUDE_DIRS:FILEPATH="/path/to/SuperLU_4.3/SRC" \
+        -DTPL_SuperLU_LIBRARIES:FILEPATH="/path/to/SuperLU_4.3/lib/libsuperlu_4.3.a"
       </pre>
       Similarly, to enable MUMPS, commands should include
       <pre>
 
-        -D TPL_ENABLE_MUMPS:BOOL=ON \
-        -D TPL_ENABLE_SCALAPACK:BOOL=ON
+        -DTPL_ENABLE_MUMPS:BOOL=ON \
+        -DTPL_ENABLE_SCALAPACK:BOOL=ON
       </pre>
       and possibly followed by
       <pre>
 
-        -D TPL_MUMPS_INCLUDE_DIRS:PATH=/usr/include/openmpi-x86_64 \
-        -D SCALAPACK_LIBRARY_DIRS:PATH=/lib64/openmpi/lib \
+        -DTPL_MUMPS_INCLUDE_DIRS:PATH=/usr/include/openmpi-x86_64 \
+        -DSCALAPACK_LIBRARY_DIRS:PATH=/lib64/openmpi/lib \
       </pre>
       where you need to adjust the exact paths, of course.
     </p>
