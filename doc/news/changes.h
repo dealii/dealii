@@ -365,8 +365,15 @@ inconvenience this causes.
    "-fuse-ld=gold" linker flag if openmpi is incompatible with it.
  <br>
  (Wolfgang Bangerth, Martin Kronbichler, Matthias Maier, 2016/07/13)
-
  </li>
+
+ <li> Fixed: CMake now handles mixed compiler and linker setup via
+ <code>DEAL_II_CXX_FLAGS*</code> / <code>DEAL_II_LINKER_FLAGS*</code> and
+ <code>CMAKE_CXX_FLAGS*</code> properly.
+ <br>
+ (Matthias Maier, 2016/07/13)
+ </li>
+
  <li> Fixed: FEValues::reinit() would sometimes try to be overly
  clever and not re-compute information when called with the same
  cell twice in a row, even if the underlying triangulation had
