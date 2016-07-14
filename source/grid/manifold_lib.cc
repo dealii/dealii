@@ -188,10 +188,10 @@ get_new_point (const Point<spacedim> &p1,
   // Find the angle gamma described by v1 and v2:
   const double gamma = std::acos((v1*v2)/(r1*r2));
 
-  // Find the angle sigma that correspont to archlengh equal to w
+  // Find the angle sigma that corresponds to arclength equal to w
   const double sigma = (1-w) * gamma;
 
-  // Versor with the same direction of v1
+  // Unit vector with the same direction of v1
   const Tensor<1,spacedim> t = v1/r1;
   // Normal to v1 in the plane described by v1,v2,and the origin.
   Tensor<1,spacedim> n = v2 - (v2*t)*t;
