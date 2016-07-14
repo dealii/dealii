@@ -57,7 +57,6 @@ SET(PETSC_PETSCCONF_H "${PETSC_INCLUDE_DIR_ARCH}/petscconf.h")
 MACRO(_petsc_feature_check _var _regex)
   FILE(STRINGS "${PETSC_PETSCCONF_H}" PETSC_${_var}_STRING
     REGEX "${_regex}")
-  MESSAGE(STATUS "PETSC_${_var}_STRING -- ${PETSC_${_var}_STRING}")
   IF("${PETSC_${_var}_STRING}" STREQUAL "")
     SET(PETSC_WITH_${_var} FALSE)
   ELSE()
