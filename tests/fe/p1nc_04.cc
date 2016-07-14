@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2016 by the deal.II authors
+// Copyright (C) 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,7 @@
 
 
 
-// check the P1NC element on a genuine quadrilateral.
+// check the P1NC nonparametric element on a genuine quadrilateral.
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -57,7 +57,7 @@ check()
   GridGenerator::hyper_cube (triangulation, 0., 1.);
   GridTools::transform (&bilinear<dim>, triangulation) ;
 
-  FE_P1NC fe;
+  FE_P1NCNonparametric fe;
   DoFHandler<dim> dof_handler (triangulation);
   dof_handler.distribute_dofs(fe);
 
