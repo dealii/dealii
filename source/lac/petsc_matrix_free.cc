@@ -19,6 +19,7 @@
 #ifdef DEAL_II_WITH_PETSC
 
 #include <deal.II/lac/exceptions.h>
+#include <deal.II/lac/petsc_compatibility.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -105,14 +106,9 @@ namespace PETScWrappers
   {
     this->communicator = communicator;
 
-    // destroy the matrix and
-    // generate a new one
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    int ierr = MatDestroy (matrix);
-#else
-    int ierr = MatDestroy (&matrix);
-#endif
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    // destroy the matrix and generate a new one
+    const PetscErrorCode ierr = destroy_matrix (matrix);
+    AssertThrow (ierr == 0, ExcPETScError (ierr));
 
     do_reinit (m, n, local_rows, local_columns);
   }
@@ -133,13 +129,8 @@ namespace PETScWrappers
             ExcInternalError());
 
     this->communicator = communicator;
-
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    int ierr = MatDestroy (matrix);
-#else
-    int ierr = MatDestroy (&matrix);
-#endif
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    const PetscErrorCode ierr = destroy_matrix (matrix);
+    AssertThrow (ierr != 0, ExcPETScError (ierr));
 
     do_reinit (m, n,
                local_rows_per_process[this_process],
@@ -171,12 +162,8 @@ namespace PETScWrappers
 
   void MatrixFree::clear ()
   {
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    int ierr = MatDestroy (matrix);
-#else
-    int ierr = MatDestroy (&matrix);
-#endif
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    const PetscErrorCode ierr = destroy_matrix (matrix);
+    AssertThrow (ierr == 0, ExcPETScError (ierr));
 
     const int m=0;
     do_reinit (m, m, m, m);

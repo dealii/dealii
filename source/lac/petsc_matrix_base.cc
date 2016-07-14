@@ -18,6 +18,7 @@
 #ifdef DEAL_II_WITH_PETSC
 
 #  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/petsc_compatibility.h>
 #  include <deal.II/lac/petsc_full_matrix.h>
 #  include <deal.II/lac/petsc_sparse_matrix.h>
 #  include <deal.II/lac/petsc_parallel_sparse_matrix.h>
@@ -82,12 +83,7 @@ namespace PETScWrappers
 
   MatrixBase::~MatrixBase ()
   {
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    const int ierr = MatDestroy (matrix);
-#else
-    const int ierr = MatDestroy (&matrix);
-#endif
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    destroy_matrix (matrix);
   }
 
 
@@ -96,17 +92,16 @@ namespace PETScWrappers
   MatrixBase::clear ()
   {
     // destroy the matrix...
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    int ierr = MatDestroy (matrix);
-#else
-    int ierr = MatDestroy (&matrix);
-#endif
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    {
+      const PetscErrorCode ierr = destroy_matrix (matrix);
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
+    }
+
     // ...and replace it by an empty
     // sequential matrix
     const int m=0, n=0, n_nonzero_per_row=0;
-    ierr = MatCreateSeqAIJ(PETSC_COMM_SELF, m, n, n_nonzero_per_row,
-                           0, &matrix);
+    const int ierr = MatCreateSeqAIJ(PETSC_COMM_SELF, m, n, n_nonzero_per_row,
+                                     0, &matrix);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -132,32 +127,8 @@ namespace PETScWrappers
   MatrixBase::clear_row (const size_type   row,
                          const PetscScalar new_diag_value)
   {
-    assert_is_compressed ();
-
-    // now set all the entries of this row to zero
-    const PetscInt petsc_row = row;
-
-    IS index_set;
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    ISCreateGeneral (get_mpi_communicator(), 1, &petsc_row, &index_set);
-#else
-    ISCreateGeneral (get_mpi_communicator(), 1, &petsc_row, PETSC_COPY_VALUES, &index_set);
-#endif
-
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    const int ierr
-      = MatZeroRowsIS(matrix, index_set, new_diag_value);
-#else
-    const int ierr
-      = MatZeroRowsIS(matrix, index_set, new_diag_value, PETSC_NULL, PETSC_NULL);
-#endif
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    ISDestroy (index_set);
-#else
-    ISDestroy (&index_set);
-#endif
+    std::vector<size_type> rows (1, row);
+    clear_rows(rows, new_diag_value);
   }
 
 
@@ -574,19 +545,10 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-  PetscTruth
-#else
-  PetscBool
-#endif
+  PetscBooleanType
   MatrixBase::is_symmetric (const double tolerance)
   {
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    PetscTruth
-#else
-    PetscBool
-#endif
-    truth;
+    PetscBooleanType truth;
     assert_is_compressed ();
     int ierr = MatIsSymmetric (matrix, tolerance, &truth);
     (void)ierr;
@@ -594,19 +556,10 @@ namespace PETScWrappers
     return truth;
   }
 
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-  PetscTruth
-#else
-  PetscBool
-#endif
+  PetscBooleanType
   MatrixBase::is_hermitian (const double tolerance)
   {
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    PetscTruth
-#else
-    PetscBool
-#endif
-    truth;
+    PetscBooleanType truth;
 
     assert_is_compressed ();
     int ierr = MatIsHermitian (matrix, tolerance, &truth);
