@@ -150,6 +150,14 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li> Improved: The build system now checks for usable compiler/linker
+ flags during various stages of the configure run. This should catch the
+ majority of issues by user supplied flags/libraries and unusable final
+ link interfaces before we actually proceed to compile the library.
+ <br>
+ (Matthias Maier, 2016/07/13)
+ </li>
+
  <li> Improved: The testsuite now supports fine grained feature constraints
  of the form <code>test.with_[feature]_with_[...]=true</code> corresponding
  to variables <code>DEAL_II_<FEATURE>_WITH_[...]</code> exported to
@@ -352,6 +360,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: Work around an issue with the OpenMPI installation on certain
+   Ubuntu versions: The build system now automatically drops the
+   "-fuse-ld=gold" linker flag if openmpi is incompatible with it.
+ <br>
+ (Wolfgang Bangerth, Martin Kronbichler, Matthias Maier, 2016/07/13)
+
+ </li>
  <li> Fixed: FEValues::reinit() would sometimes try to be overly
  clever and not re-compute information when called with the same
  cell twice in a row, even if the underlying triangulation had

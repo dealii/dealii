@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II authors
+## Copyright (C) 2012 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -28,9 +28,48 @@ MACRO(FEATURE_MPI_FIND_EXTERNAL var)
         "Could not find a sufficient MPI version: "
         "Your MPI implementation must define MPI_SEEK_SET.")
       SET(MPI_ADDITIONAL_ERROR_STRING
-        "Your MPI implementation must define MPI_SEEK_SET.")
+        "Your MPI implementation must define MPI_SEEK_SET.\n")
       SET(${var} FALSE)
     ENDIF()
+
+    CHECK_COMPILER_SETUP(
+      "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_SAVED} ${MPI_CXX_FLAGS}"
+      "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_SAVED} ${MPI_LINKER_FLAGS}"
+      MPI_WORKING_COMPILER
+      ${DEAL_II_LIBRARIES} ${MPI_LIBRARIES}
+      )
+
+    IF(NOT MPI_WORKING_COMPILER)
+      #
+      # Try a workaround and drop "-fuse-ld=gold" (if present) from the
+      # linker invocation
+      #
+      MESSAGE(STATUS "Unable to compile a simple test program. "
+        "Try to drop \"-fuse-ld=gold\" from the linker flags."
+        )
+      STRING(REPLACE "-fuse-ld=gold" "" _filtered_flags "${DEAL_II_LINKER_FLAGS}")
+
+      CHECK_COMPILER_SETUP(
+        "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_SAVED} ${MPI_CXX_FLAGS}"
+        "${_filtered_flags} ${DEAL_II_LINKER_FLAGS_SAVED} ${MPI_LINKER_FLAGS}"
+        MPI_WORKING_COMPILER
+        ${DEAL_II_LIBRARIES} ${MPI_LIBRARIES}
+        )
+
+      IF(MPI_WORKING_COMPILER)
+        SET(DEAL_II_LINKER_FLAGS "${_filtered_flags}")
+      ELSE()
+        MESSAGE(STATUS "Could not find a sufficient MPI installation: "
+          "Unable to compile a simple test program."
+          )
+        SET(MPI_ADDITIONAL_ERROR_STRING
+          ${MPI_ADDITIONAL_ERROR_STRING}
+          "Unable to compile and link a simple test program with your MPI installation. \n"
+          )
+        SET(${var} FALSE)
+      ENDIF()
+    ENDIF()
+
   ENDIF()
 ENDMACRO()
 
