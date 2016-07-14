@@ -30,8 +30,9 @@ void test (PETScWrappers::Vector &v)
   double norm = 0;
   for (unsigned int k=0; k<v.size(); k+=1+k)
     {
-      v(k) = PetscScalar (k,2.*k);
-      norm += std::fabs (1.*k+2.*k);
+      const PetscScalar  s(1.*k,2.*k);
+      v(k) = s;
+      norm += std::abs (s);
     }
   v.compress (VectorOperation::insert);
 
