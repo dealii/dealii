@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II authors
+## Copyright (C) 2012 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -232,5 +232,5 @@ DEAL_II_PACKAGE_HANDLE(TRILINOS
     OPTIONAL Trilinos_TPL_INCLUDE_DIRS
   CLEAR
     TRILINOS_CONFIG_DIR EPETRA_CONFIG_H SACADO_CMATH_HPP ${_libraries}
-    TRILINOS_SUPPORTS_CPP11 TRILINOS_HAS_C99_TR1_WORKAROUND
+    TRILINOS_SUPPORTS_CPP11 TRILINOS_HAS_C99_TR1_WORKAROUND SACADO_CONFIG_H
   )
