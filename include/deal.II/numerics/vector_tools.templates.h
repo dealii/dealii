@@ -80,14 +80,22 @@ namespace VectorTools
   void interpolate (const Mapping<dim,spacedim>        &mapping,
                     const DoFHandlerType<dim,spacedim> &dof,
                     const Function<spacedim, typename VectorType::value_type>           &function,
-                    VectorType                         &vec)
+                    VectorType                         &vec,
+                    const ComponentMask                &component_mask)
   {
     typedef typename VectorType::value_type number;
+    Assert (component_mask.represents_n_components(dof.get_fe().n_components()),
+            ExcMessage("The number of components in the mask has to be either "
+                       "zero or equal to the number of components in the finite "
+                       "element.") );
+
     Assert (vec.size() == dof.n_dofs(),
             ExcDimensionMismatch (vec.size(), dof.n_dofs()));
     Assert (dof.get_fe().n_components() == function.n_components,
             ExcDimensionMismatch(dof.get_fe().n_components(),
                                  function.n_components));
+    Assert (component_mask.n_selected_components(dof.get_fe().n_components()) > 0,
+            ComponentMask::ExcNoComponentSelected());
 
     const hp::FECollection<dim,spacedim> fe (dof.get_fe());
     const unsigned int          n_components = fe.n_components();
@@ -247,9 +255,12 @@ namespace VectorTools
                     {
                       const unsigned int component
                         = fe[fe_index].system_to_component_index(i).first;
-                      const unsigned int rep_dof=dof_to_rep_index_table[fe_index][i];
-                      vec(dofs_on_cell[i])
-                        = function_values_system[fe_index][rep_dof](component);
+                      if (component_mask[component] == true)
+                        {
+                          const unsigned int rep_dof=dof_to_rep_index_table[fe_index][i];
+                          vec(dofs_on_cell[i])
+                            = function_values_system[fe_index][rep_dof](component);
+                        }
                     }
                 }
               else
@@ -277,13 +288,15 @@ namespace VectorTools
   template <typename VectorType, typename DoFHandlerType>
   void interpolate (const DoFHandlerType                            &dof,
                     const Function<DoFHandlerType::space_dimension,typename VectorType::value_type> &function,
-                    VectorType                                      &vec)
+                    VectorType                                      &vec,
+                    const ComponentMask                             &component_mask)
   {
     interpolate(StaticMappingQ1<DoFHandlerType::dimension,
                 DoFHandlerType::space_dimension>::mapping,
                 dof,
                 function,
-                vec);
+                vec,
+                component_mask);
   }
 
 

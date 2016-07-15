@@ -150,6 +150,13 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li>
+ Improved: VectorTools:interpolate now takes a ComponentMask to select the
+ components to interpolate.
+ <br>
+ (Jonathan Robey, 2016/07/21)
+ </li>
+
  <li> Improved: Split out pattern descriptions for LaTeX and Description
  ParameterHandler OutputStyles, and add better description text.
  <br>
