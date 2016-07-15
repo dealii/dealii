@@ -1316,7 +1316,7 @@
  * No program is truly scalable in this theoretical sense. Rather, all programs
  * cease to scale once either $N$ or $P$ grows larger than certain limits.
  * We therefore often say things such as "the program scales up to
- * 4,000 cores", or "the program scales up to $10^{8}$ unknowns". There are
+ * 4,000 cores", or "the program scales up to 100,000,000 unknowns". There are
  * a number of reasons why programs cannot scale without limit; these can
  * all be illustrated by just looking at the (relatively simple) step-17
  * tutorial program:
