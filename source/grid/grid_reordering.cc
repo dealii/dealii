@@ -1704,7 +1704,25 @@ GridReordering<3>::invert_all_cells_of_negative_grid(
   // grids with both kind of cells
   // are very likely to be
   // broken. Check for this here.
-  AssertThrow(n_negative_cells==0 || n_negative_cells==cells.size(), ExcInternalError());
+  AssertThrow(n_negative_cells==0 || n_negative_cells==cells.size(),
+              ExcMessage("While sorting the cells that will be passed for "
+                         "creating a Triangulation object, deal.II found that "
+                         "some but not all cells have a negative volume. (If "
+                         "all cells had a negative volume, they would simply "
+                         "all have been inverted.) This usually happens in "
+                         "hand-generated meshes if one accidentally uses an "
+                         "incorrect convention for ordering the vertices in "
+                         "one or more cells; in that case, you may want to "
+                         "double check that you specified the vertex indices "
+                         "in their correct order. If you are reading a mesh "
+                         "that was created by a mesh generator, then this "
+                         "exception indicates that some of the cells created "
+                         "are so badly distorted that their volume becomes "
+                         "negative; this commonly occurs at complex geometric "
+                         "features, and you may see if the problem can be "
+                         "fixed by playing with the parameters that control "
+                         "mesh properties in your mesh generator, such as "
+                         "the number of cells, the mesh density, etc."));
 }
 
 
