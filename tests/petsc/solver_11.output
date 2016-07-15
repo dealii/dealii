@@ -1,5 +1,3 @@
 
 DEAL::Size 32 Unknowns 961
-DEAL::Solver type: N6dealii13PETScWrappers10SolverLSQRE
-DEAL::Catched exception dealii::SolverControl::NoConvergence
-DEAL::Solver stopped after 100 iterations
+DEAL::Solver stopped within 171 - 175 iterations
