@@ -1154,23 +1154,35 @@ public:
    * optional vector argument is given, <tt>C = A * diag(V) * B</tt>, where
    * <tt>diag(V)</tt> defines a diagonal matrix with the vector entries.
    *
-   * This function assumes that the calling matrix <tt>A</tt> and <tt>B</tt>
-   * have compatible sizes. The size of <tt>C</tt> will be set within this
-   * function.
+   * This function assumes that the calling matrix @p A and the argument @p B
+   * have compatible sizes. By default, the output matrix @p C will be
+   * resized appropriately.
    *
-   * The content as well as the sparsity pattern of the matrix C will be
-   * changed by this function, so make sure that the sparsity pattern is not
-   * used somewhere else in your program. This is an expensive operation, so
-   * think twice before you use this function.
+   * By default, i.e., if the optional argument @p rebuild_sparsity_pattern
+   * is @p true, the sparsity pattern of the matrix C will be
+   * changed to ensure that all entries that result from the product $AB$
+   * can be stored in $C$. This is an expensive operation, and if there is
+   * a way to predict the sparsity pattern up front, you should probably
+   * build it yourself before calling this function with @p false as last
+   * argument. In this case, the rebuilding of the sparsity pattern is
+   * bypassed.
    *
-   * There is an optional flag <tt>rebuild_sparsity_pattern</tt> that can be
-   * used to bypass the creation of a new sparsity pattern and instead uses
-   * the sparsity pattern stored in <tt>C</tt>. In that case, make sure that
-   * it really fits. The default is to rebuild the sparsity pattern.
+   * When setting @p rebuild_sparsity_pattern to @p true (i.e., leaving it
+   * at the default value), it is important to realize that the matrix
+   * @p C passed as first argument still has to be initialized with a
+   * sparsity pattern (either at the time of creation of the SparseMatrix
+   * object, or via the SparseMatrix::reinit() function). This is because
+   * we could create a sparsity pattern inside the current function, and
+   * then associate @p C with it, but there would be no way to transfer
+   * ownership of this sparsity pattern to anyone once the current function
+   * finishes. Consequently, the function requires that @p C be already
+   * associated with a sparsity pattern object, and this object is then
+   * reset to fit the product of @p A and @p B.
    *
-   * @note Rebuilding the sparsity pattern requires changing it. This means
-   * that all other matrices that are associated with this sparsity pattern
-   * will then have invalid entries.
+   * As a consequence of this, however, it is also important to realize
+   * that the sparsity pattern of @p C is modified and that this would
+   * render invalid <i>all other SparseMatrix objects</i> that happen
+   * to <i>also</i> use that sparsity pattern object.
    */
   template <typename numberB, typename numberC>
   void mmult (SparseMatrix<numberC>       &C,
