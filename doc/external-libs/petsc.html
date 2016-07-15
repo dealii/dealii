@@ -113,7 +113,12 @@
 
     <p>
       This automatically builds PETSc with both MPI and the algebraic
-      multigrid preconditioner package Hypre (which we use in step-40).
+      multigrid preconditioner package Hypre (which we use in step-40). If you
+      would like to use PETSc with MPI then we recommend that you install MPI
+      through your package manager instead of letting PETSc install it: put
+      another way, installing PETSc with the flag <code>--download-mpich</code>
+      often causes problems (such as linking errors or poor performance)
+      that may be avoided by using whatever your system provides instead.
       <br>
       Now let PETSc check his own sanity:
       <pre>
