@@ -19,30 +19,87 @@
 
 namespace PyDealII
 {
+  const char refine_flag_docstring [] =
+    "Get/Set the refine_flag of the cell. In 2D, the possibilities are: \n"
+    "  - isotropic                                                      \n"
+    "  - no_refinement                                                  \n"
+    "  - cut_x                                                          \n"
+    "  - cut_y                                                          \n"
+    "  - cut_xy                                                         \n"
+    "In 3D, the possibilities are:                                      \n"
+    "  - isotropic                                                      \n"
+    "  - no_refinement                                                  \n"
+    "  - cut_x                                                          \n"
+    "  - cut_y                                                          \n"
+    "  - cut_z                                                          \n"
+    "  - cut_xy                                                         \n"
+    "  - cut_xz                                                         \n"
+    "  - cut_yz                                                         \n"
+    "  - cut_xyz                                                        \n"
+    ;
+
+
+
+  const char coarsen_flag_docstring [] =
+    "Get/Set the coarsen_flag of the cell                               \n"
+    ;
+
+
+
+  const char material_id_docstring [] =
+    "Get/Set the material_id of the cell                                \n"
+    ;
+
+
+
+  const char manifold_id_docstring [] =
+    "Get/Set the manifold_id of the cell                                \n"
+    ;
+
+
+
+  const char barycenter_docstring [] =
+    "Return the barycenter of the current cell                          \n"
+    ;
+
+
+
+  const char set_vertex_docstring [] =
+    " Set the ith vertex of the cell to point_wrapper                   \n"
+    ;
+
+
+
+  const char get_vertex_docstring [] =
+    " Get the ith vertex of the cell                                    \n"
+    ;
+
+
+
   void export_cell_accessor()
   {
     boost::python::class_<CellAccessorWrapper>("CellAccessor",
                                                boost::python::init<TriangulationWrapper &, const int, const int> ())
     .add_property("refine_flag", &CellAccessorWrapper::get_refine_flag,
                   &CellAccessorWrapper::set_refine_flag,
-                  "Get/Set the refine_flag of the cell. The possibilities are in 2D: isotropic, no_refinement, cut_x, cut_y, and cut_xy and in 3D: isotropic, no_refinement, cut_x, cut_y, cut_z, cut_xy, cut_xz, cut_yz, and cut_xyz.")
+                  refine_flag_docstring)
     .add_property("coarsen_flag", &CellAccessorWrapper::get_coarsen_flag,
                   &CellAccessorWrapper::set_coarsen_flag,
-                  "Get/Set the coarsen_flag of the cell.")
+                  coarsen_flag_docstring)
     .add_property("material_id", &CellAccessorWrapper::get_material_id,
                   &CellAccessorWrapper::set_material_id,
-                  "Get/Set the material_id of the cell.")
+                  material_id_docstring)
     .add_property("manifold_id", &CellAccessorWrapper::get_manifold_id,
                   &CellAccessorWrapper::set_manifold_id,
-                  "Get/Set the manifold_id of the cell.")
+                  manifold_id_docstring)
     .def("barycenter", &CellAccessorWrapper::get_barycenter,
-         "Return the barycenter of the current cell.",
+         barycenter_docstring,
          boost::python::args("self"))
     .def("set_vertex", &CellAccessorWrapper::set_vertex,
-         "Set the ith vertex of the cell to point_wrapper",
+         set_vertex_docstring,
          boost::python::args("self", "i", "point_wrapper"))
     .def("get_vertex", &CellAccessorWrapper::get_vertex,
-         "Get the ith vertex of the cell",
+         get_vertex_docstring,
          boost::python::args("self", "i"));
   }
 }
