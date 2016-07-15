@@ -7177,7 +7177,7 @@ namespace VectorTools
     else
       {
         // This function is not implemented for distributed vectors.
-        Assert(!v.supports_distributed_data, ExcNotImplemented());
+        Assert(!v.supports_distributed_data(), ExcNotImplemented());
 
         const unsigned int n = v.size();
 

@@ -39,6 +39,13 @@ inconvenience this causes.
 
 <ol>
 
+ <li> Changed: The static variable supports_distributed_data, which is part
+ of the Vector interface, has been replaced by the member function 
+ supports_distributed_data() for all the vectors.
+ <br>
+ (Bruno Turcksin, 2016/07/15)
+ </li>
+
  <li> Changed: The conversion constructors of class Vector from the
  PETScWrappers::Vector, PETScWrappers::MPI::Vector,
  TrilinosWrappers::Vector, and TrilinosWrappers::MPI::Vector classes

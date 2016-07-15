@@ -521,6 +521,12 @@ namespace LinearAlgebra
                                  const VectorSpaceVector<Number> &W);
 
       /**
+       * A variable that indicates whether this vector supports distributed
+       * data storage.
+       */
+      virtual bool supports_distributed_data() const;
+
+      /**
        * Return the global size of the vector, equal to the sum of the number of
        * locally owned indices among all processors.
        */

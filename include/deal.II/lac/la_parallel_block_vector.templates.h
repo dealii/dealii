@@ -703,6 +703,15 @@ namespace LinearAlgebra
 
 
     template <typename Number>
+    inline
+    bool BlockVector<Number>::supports_distributed_data() const
+    {
+      return true;
+    }
+
+
+
+    template <typename Number>
     typename BlockVector<Number>::size_type
     BlockVector<Number>::size () const
     {
