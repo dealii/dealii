@@ -465,6 +465,10 @@ namespace PETScWrappers
 
     /**
      * $l_1$-norm of the vector. The sum of the absolute values.
+     *
+     * @note In complex-valued PETSc priori to 3.7.0 this norm is implemented
+     * as the sum of absolute values of real and imaginary parts of elements
+     * of a complex vector.
      */
     real_type l1_norm () const;
 
