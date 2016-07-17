@@ -1388,16 +1388,3 @@ int main ()
 
   return 0;
 }
-
-
-// What comes here is basically just an annoyance that you can ignore if you
-// are not working on an AIX system: on this system, static member variables
-// are not instantiated automatically when their enclosing class is
-// instantiated. This leads to linker errors if these variables are not
-// explicitly instantiated. As said, this is, strictly C++ standards speaking,
-// not necessary, but it doesn't hurt either on other systems, and since it is
-// necessary to get things running on AIX, why not do it:
-namespace Step7
-{
-  template const double SolutionBase<2>::width;
-}
