@@ -94,155 +94,25 @@ private:
 };
 
 
-// @sect3{Nonconstant coefficients, using <code>Assert</code>}
+// @sect3{Working with nonconstant coefficients}
 
 // In step-4, we showed how to use non-constant boundary values and right hand
 // side.  In this example, we want to use a variable coefficient in the
-// elliptic operator instead. Of course, the suitable object is a
-// <code>Function</code>, as we have used for the right hand side and boundary
-// values in the last example. We will use it again, but we implement another
-// function <code>value_list</code> which takes a list of points and returns
-// the values of the function at these points as a list. The reason why such a
-// function is reasonable although we can get all the information from the
-// <code>value</code> function as well will be explained below when assembling
-// the matrix.
-//
-// The need to declare a seemingly useless default constructor exists here
-// just as in the previous example.
-template <int dim>
-class Coefficient : public Function<dim>
-{
-public:
-  Coefficient ()  : Function<dim>() {}
-
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
-
-  virtual void value_list (const std::vector<Point<dim> > &points,
-                           std::vector<double>            &values,
-                           const unsigned int              component = 0) const;
-};
-
-
+// elliptic operator instead. Since we have a function which just depends on
+// the point in space we can do things a bit more simply and use a plain
+// function instead of inheriting from Function.
 
 // This is the implementation of the coefficient function for a single
 // point. We let it return 20 if the distance to the origin is less than 0.5,
-// and 1 otherwise. As in the previous example, we simply ignore the second
-// parameter of the function that is used to denote different components of
-// vector-valued functions (we deal only with a scalar function here, after
-// all):
+// and 1 otherwise.
 template <int dim>
-double Coefficient<dim>::value (const Point<dim> &p,
-                                const unsigned int /*component*/) const
+double coefficient (const Point<dim> &p)
 {
   if (p.square() < 0.5*0.5)
     return 20;
   else
     return 1;
 }
-
-
-
-// And this is the function that returns the value of the coefficient at a
-// whole list of points at once. Of course, we need to make sure that the
-// values are the same as if we would ask the <code>value</code> function for
-// each point individually.
-//
-// This method takes three parameters: a list of points at which to evaluate
-// the function, a list that will hold the values at these points, and the
-// vector component that should be zero here since we only have a single
-// scalar function.  Now, of course the size of the output array
-// (<code>values</code>) must be the same as that of the input array
-// (<code>points</code>), and we could simply assume that. However, in
-// practice, it turns out that more than 90 per cent of programming errors are
-// invalid function parameters such as invalid array sizes, etc, so we should
-// try to make sure that the parameters are valid. For this, the
-// <code>Assert</code> macro is a good means, since it makes sure that the
-// condition which is given as first argument is valid, and if not throws an
-// exception (its second argument) which will usually terminate the program
-// giving information where the error occurred and what the reason was. This
-// generally reduces the time to find programming errors dramatically and we
-// have found assertions an invaluable means to program fast.
-//
-// On the other hand, all these checks (there are more than 4200 of them in
-// the library at present) should not slow down the program too much if you
-// want to do large computations. To this end, the <code>Assert</code> macro
-// is only used in debug mode and expands to nothing if in optimized
-// mode. Therefore, while you test your program on small problems and debug
-// it, the assertions will tell you where the problems are.  Once your program
-// is stable, you can switch off debugging and the program will run your real
-// computations without the assertions and at maximum speed. (In fact, it
-// turns out the switching off all the checks in the library that prevent you
-// from calling functions with the wrong arguments by switching to optimized
-// mode, makes most programs run faster by about a factor of four. This
-// should, however, not try to induce you to always run in optimized mode:
-// Most people who have tried that soon realize that they introduce lots of
-// errors that would have easily been caught had they run the program in debug
-// mode while developing.) For those who want to try: The way to switch from
-// debug mode to optimized mode is to recompile your program with the command
-// <code>make release</code>. The output of the <code>make</code> program should
-// now indicate to you that the program is now compiled in optimized mode, and
-// it will later also be linked to libraries that have been compiled for
-// optimized mode. In order to switch back to debug mode, simply recompile with
-// the command <code>make debug</code>.
-//
-// Here, as has been said above, we would like to make sure that the size of
-// the two arrays is equal, and if not throw an exception. Comparing the sizes
-// of two arrays is one of the most frequent checks, which is why there is
-// already an exception class <code>ExcDimensionMismatch</code> that takes the
-// sizes of two vectors and prints some output in case the condition is
-// violated:
-
-template <int dim>
-void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
-                                   std::vector<double>            &values,
-                                   const unsigned int              component) const
-{
-  Assert (values.size() == points.size(),
-          ExcDimensionMismatch (values.size(), points.size()));
-  // Since examples are not very good if they do not demonstrate their point,
-  // we will show how to trigger this exception at the end of the main
-  // program, and what output results from this (see the <code>Results</code>
-  // section of this example program). You will certainly notice that the
-  // output is quite well suited to quickly find what the problem is and what
-  // parameters are expected. An additional plus is that if the program is run
-  // inside a debugger, it will stop at the point where the exception is
-  // triggered, so you can go up the call stack to immediately find the place
-  // where the the array with the wrong size was set up.
-
-  // While we're at it, we can do another check: the coefficient is a scalar,
-  // but the <code>Function</code> class also represents vector-valued
-  // function. A scalar function must therefore be considered as a
-  // vector-valued function with only one component, so the only valid
-  // component for which a user might ask is zero (we always count from
-  // zero). The following assertion checks this. If the condition in the
-  // <code>Assert</code> call is violated, an exception of type
-  // <code>ExcRange</code> will be triggered; that class takes the violating
-  // index as first argument, and the second and third arguments denote a
-  // range that includes the left point but is open at the right, i.e. here
-  // the interval [0,1). For integer arguments, this means that the only value
-  // in the range is the zero, of course. (The interval is half open since we
-  // also want to write exceptions like <code>ExcRange(i,0,v.size())</code>,
-  // where an index must be between zero but less than the size of an
-  // array. To save us the effort of writing <code>v.size()-1</code> in many
-  // places, the range is defined as half-open.)
-  Assert (component == 0,
-          ExcIndexRange (component, 0, 1));
-
-  // The rest of the function is uneventful: we define <code>n_q_points</code>
-  // as an abbreviation for the number of points for which function values are
-  // requested, and then simply fill the output value:
-  const unsigned int n_points = points.size();
-
-  for (unsigned int i=0; i<n_points; ++i)
-    {
-      if (points[i].square() < 0.5*0.5)
-        values[i] = 20;
-      else
-        values[i] = 1;
-    }
-}
-
 
 // @sect3{The <code>Step5</code> class implementation}
 
@@ -292,11 +162,10 @@ void Step5<dim>::setup_system ()
 // two optimizations at some places.
 //
 // What we will show here is how we can avoid calls to the shape_value,
-// shape_grad, and quadrature_point functions of the FEValues object, and in
-// particular optimize away most of the virtual function calls of the Function
-// object. The way to do so will be explained in the following, while those
-// parts of this function that are not changed with respect to the previous
-// example are not commented on.
+// shape_grad, and quadrature_point functions of the FEValues object. The way
+// to do so will be explained in the following, while those parts of this
+// function that are not changed with respect to the previous example are not
+// commented on.
 //
 // The first parts of the function are completely unchanged from before:
 template <int dim>
@@ -316,46 +185,11 @@ void Step5<dim>::assemble_system ()
 
   std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
-  // Here is one difference: for this program, we will again use a constant
-  // right hand side function and zero boundary values, but a variable
-  // coefficient. We have already declared the class that represents this
-  // coefficient above, so we only have to declare a corresponding object
-  // here.
-  //
-  // Then, below, we will ask the <code>coefficient</code> function object to
-  // compute the values of the coefficient at all quadrature points on one
-  // cell at once. The reason for this is that, if you look back at how we did
-  // this in step-4, you will realize that we called the function computing
-  // the right hand side value inside nested loops over all degrees of freedom
-  // and over all quadrature points, i.e. dofs_per_cell*n_q_points times. For
-  // the coefficient that is used inside the matrix, this would actually be
-  // dofs_per_cell*dofs_per_cell*n_q_points. On the other hand, the function
-  // will of course return the same value every time it is called with the
-  // same quadrature point, independently of what shape function we presently
-  // treat; secondly, these are virtual function calls, so are rather
-  // expensive. Obviously, there are only n_q_point different values, and we
-  // shouldn't call the function more often than that. Or, even better than
-  // this, compute all of these values at once, and get away with a single
-  // function call per cell.
-  //
-  // This is exactly what we are going to do. For this, we need some space to
-  // store the values in. We therefore also have to declare an array to hold
-  // these values:
-  const Coefficient<dim> coefficient;
-  std::vector<double>    coefficient_values (n_q_points);
-
   // Next is the typical loop over all cells to compute local contributions
-  // and then to transfer them into the global matrix and vector.
-  //
-  // The only two things in which this loop differs from step-4 is that we
-  // want to compute the value of the coefficient in all quadrature points on
-  // the present cell at the beginning, and then use it in the computation of
-  // the local contributions. This is what we do in the call to
-  // <code>coefficient.value_list</code> in the fourth line of the loop.
-  //
-  // The second change is how we make use of this coefficient in computing the
-  // cell matrix contributions. This is in the obvious way, and not worth more
-  // comments. For the right hand side, we use a constant value again.
+  // and then to transfer them into the global matrix and vector. The only
+  // change in this part, compared to step-4, is that we will use the
+  // <code>coefficient</code> function defined above to compute the
+  // coefficient value at each quadrature point.
   typename DoFHandler<dim>::active_cell_iterator
   cell = dof_handler.begin_active(),
   endc = dof_handler.end();
@@ -366,22 +200,23 @@ void Step5<dim>::assemble_system ()
 
       fe_values.reinit (cell);
 
-      coefficient.value_list (fe_values.get_quadrature_points(),
-                              coefficient_values);
-
       for (unsigned int q_index=0; q_index<n_q_points; ++q_index)
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
-          {
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
-              cell_matrix(i,j) += (coefficient_values[q_index] *
-                                   fe_values.shape_grad(i,q_index) *
-                                   fe_values.shape_grad(j,q_index) *
-                                   fe_values.JxW(q_index));
+        {
+          const double current_coefficient = coefficient<dim>
+                                             (fe_values.quadrature_point (q_index));
+          for (unsigned int i=0; i<dofs_per_cell; ++i)
+            {
+              for (unsigned int j=0; j<dofs_per_cell; ++j)
+                cell_matrix(i,j) += (current_coefficient *
+                                     fe_values.shape_grad(i,q_index) *
+                                     fe_values.shape_grad(j,q_index) *
+                                     fe_values.JxW(q_index));
 
-            cell_rhs(i) += (fe_values.shape_value(i,q_index) *
-                            1.0 *
-                            fe_values.JxW(q_index));
-          }
+              cell_rhs(i) += (fe_values.shape_value(i,q_index) *
+                              1.0 *
+                              fe_values.JxW(q_index));
+            }
+        }
 
 
       cell->get_dof_indices (local_dof_indices);
@@ -632,23 +467,5 @@ int main ()
 {
   Step5<2> laplace_problem_2d;
   laplace_problem_2d.run ();
-
-  // Finally, we have promised to trigger an exception in the
-  // <code>Coefficient</code> class through the <code>Assert</code> macro we
-  // have introduced there. For this, we have to call its
-  // <code>value_list</code> function with two arrays of different size (the
-  // number in parentheses behind the declaration of the object). We have
-  // commented out these lines in order to allow the program to exit
-  // gracefully in normal situations (we use the program in day-to-day testing
-  // of changes to the library as well), so you will only get the exception by
-  // un-commenting the following lines. Take a look at the Results section of
-  // the program to see what happens when the code is actually run:
-  /*
-    Coefficient<2>    coefficient;
-    std::vector<Point<2> > points (2);
-    std::vector<double>    coefficient_values (1);
-    coefficient.value_list (points, coefficient_values);
-  */
-
   return 0;
 }
