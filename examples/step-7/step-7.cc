@@ -64,11 +64,6 @@
 // the same file as the FEValues class:
 #include <deal.II/fe/fe_values.h>
 
-// We need one more include from standard C++, which is necessary when we try
-// to find out the actual type behind a pointer to a base class. We will
-// explain this in slightly more detail below. The other two include files are
-// obvious then:
-#include <typeinfo>
 #include <fstream>
 #include <iostream>
 
