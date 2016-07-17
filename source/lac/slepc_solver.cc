@@ -257,6 +257,13 @@ namespace SLEPcWrappers
     Assert ((false),
             ExcMessage ("Your PETSc/SLEPc installation was configured with scalar-type complex "
                         "but this function is not defined for complex types."));
+
+    // Cast to void to silence compiler warnings
+    (void) index;
+    (void) real_eigenvalues;
+    (void) imag_eigenvalues;
+    (void) real_eigenvectors;
+    (void) imag_eigenvectors;
 #endif
   }
 
