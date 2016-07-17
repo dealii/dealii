@@ -404,7 +404,43 @@ void Step5<dim>::run ()
   // two-dimensional triangulation, while this function is a template for
   // arbitrary dimension. Since this is only a demonstration program, we will
   // not use different input files for the different dimensions, but rather
-  // kill the whole program if we are not in 2D:
+  // quickly kill the whole program if we are not in 2D. Of course, since the
+  // main function below assumes that we are working in two dimensions we
+  // could skip this check, in this version of the program, without any ill
+  // effects.
+  //
+  // It turns out that more than 90 per cent of programming errors are invalid
+  // function parameters such as invalid array sizes, etc, so we use
+  // assertions heavily throughout deal.II to catch such mistakes. For this,
+  // the <code>Assert</code> macro is a good choice, since it makes sure that
+  // the condition which is given as first argument is valid, and if not
+  // throws an exception (its second argument) which will usually terminate
+  // the program giving information where the error occurred and what the
+  // reason was. This generally reduces the time to find programming errors
+  // dramatically and we have found assertions an invaluable means to program
+  // fast.
+  //
+  // On the other hand, all these checks (there are over 9000 of them in the
+  // library at present) should not slow down the program too much if you want
+  // to do large computations. To this end, the <code>Assert</code> macro is
+  // only used in debug mode and expands to nothing if in optimized
+  // mode. Therefore, while you test your program on small problems and debug
+  // it, the assertions will tell you where the problems are. Once your
+  // program is stable, you can switch off debugging and the program will run
+  // your real computations without the assertions and at maximum speed. More
+  // precisely: turning off all the checks in the library (which prevent you
+  // from calling functions with wrong arguments, walking off of arrays, etc.)
+  // by compiling your program in optimized mode usually makes things run
+  // about four times faster. Even though optimized programs are more
+  // performant, we still recommend developing in debug mode since it allows
+  // the library to find lots of common programming errors automatically. For
+  // those who want to try: The way to switch from debug mode to optimized
+  // mode is to recompile your program with the command <code>make
+  // release</code>. The output of the <code>make</code> program should now
+  // indicate to you that the program is now compiled in optimized mode, and
+  // it will later also be linked to libraries that have been compiled for
+  // optimized mode. In order to switch back to debug mode, simply recompile
+  // with the command <code>make debug</code>.
   Assert (dim==2, ExcInternalError());
   // ExcInternalError is a globally defined exception, which may be thrown
   // whenever something is terribly wrong. Usually, one would like to use more
