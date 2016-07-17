@@ -14,19 +14,19 @@ Cycle 2:
    Number of degrees of freedom: 449
 Cycle 3:
    Number of active cells:       200
-   Number of degrees of freedom: 961
+   Number of degrees of freedom: 921
 Cycle 4:
    Number of active cells:       440
-   Number of degrees of freedom: 2033
+   Number of degrees of freedom: 2017
 Cycle 5:
-   Number of active cells:       932
-   Number of degrees of freedom: 4465
+   Number of active cells:       956
+   Number of degrees of freedom: 4425
 Cycle 6:
    Number of active cells:       1916
-   Number of degrees of freedom: 9113
+   Number of degrees of freedom: 8993
 Cycle 7:
-   Number of active cells:       3884
-   Number of degrees of freedom: 18401
+   Number of active cells:       3860
+   Number of degrees of freedom: 18353
 @endcode
 
 
