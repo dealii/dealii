@@ -131,26 +131,8 @@ private:
 
 // The implementation of nonconstant coefficients is copied verbatim from
 // step-5:
-
 template <int dim>
-class Coefficient : public Function<dim>
-{
-public:
-  Coefficient () : Function<dim>() {}
-
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
-
-  virtual void value_list (const std::vector<Point<dim> > &points,
-                           std::vector<double>            &values,
-                           const unsigned int              component = 0) const;
-};
-
-
-
-template <int dim>
-double Coefficient<dim>::value (const Point<dim> &p,
-                                const unsigned int) const
+double coefficient (const Point<dim> &p)
 {
   if (p.square() < 0.5*0.5)
     return 20;
@@ -158,29 +140,6 @@ double Coefficient<dim>::value (const Point<dim> &p,
     return 1;
 }
 
-
-
-template <int dim>
-void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
-                                   std::vector<double>            &values,
-                                   const unsigned int              component) const
-{
-  const unsigned int n_points = points.size();
-
-  Assert (values.size() == n_points,
-          ExcDimensionMismatch (values.size(), n_points));
-
-  Assert (component == 0,
-          ExcIndexRange (component, 0, 1));
-
-  for (unsigned int i=0; i<n_points; ++i)
-    {
-      if (points[i].square() < 0.5*0.5)
-        values[i] = 20;
-      else
-        values[i] = 1;
-    }
-}
 
 
 // @sect3{The <code>Step6</code> class implementation}
@@ -407,9 +366,6 @@ void Step6<dim>::assemble_system ()
 
   std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
-  const Coefficient<dim> coefficient;
-  std::vector<double>    coefficient_values (n_q_points);
-
   typename DoFHandler<dim>::active_cell_iterator
   cell = dof_handler.begin_active(),
   endc = dof_handler.end();
@@ -420,22 +376,23 @@ void Step6<dim>::assemble_system ()
 
       fe_values.reinit (cell);
 
-      coefficient.value_list (fe_values.get_quadrature_points(),
-                              coefficient_values);
-
       for (unsigned int q_index=0; q_index<n_q_points; ++q_index)
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
-          {
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
-              cell_matrix(i,j) += (coefficient_values[q_index] *
-                                   fe_values.shape_grad(i,q_index) *
-                                   fe_values.shape_grad(j,q_index) *
-                                   fe_values.JxW(q_index));
+        {
+          const double current_coefficient = coefficient<dim>
+                                             (fe_values.quadrature_point (q_index));
+          for (unsigned int i=0; i<dofs_per_cell; ++i)
+            {
+              for (unsigned int j=0; j<dofs_per_cell; ++j)
+                cell_matrix(i,j) += (current_coefficient *
+                                     fe_values.shape_grad(i,q_index) *
+                                     fe_values.shape_grad(j,q_index) *
+                                     fe_values.JxW(q_index));
 
-            cell_rhs(i) += (fe_values.shape_value(i,q_index) *
-                            1.0 *
-                            fe_values.JxW(q_index));
-          }
+              cell_rhs(i) += (fe_values.shape_value(i,q_index) *
+                              1.0 *
+                              fe_values.JxW(q_index));
+            }
+        }
 
       // Finally, transfer the contributions from @p cell_matrix and
       // @p cell_rhs into the global objects.
