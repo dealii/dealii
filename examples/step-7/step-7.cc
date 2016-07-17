@@ -166,7 +166,20 @@ namespace Step7
   // base class. Note that the gradient of a function in <code>dim</code>
   // space dimensions is a vector of size <code>dim</code>, i.e. a tensor of
   // rank 1 and dimension <code>dim</code>. As for so many other things, the
-  // library provides a suitable class for this.
+  // library provides a suitable class for this. One new thing about this
+  // class is that it explicitly uses the Tensor objects, which previously
+  // appeared as intermediate terms in step-3 and step-4. A tensor is a
+  // generalization of scalars (rank zero tensors), vectors (rank one
+  // tensors), and matrices (rank two tensors), as well as higher dimensional
+  // objects. The Tensor class requires two template arguments: the tensor
+  // rank and tensor dimension. For example, here we use tensors of rank one
+  // (vectors) with dimension <code>dim</code> (so they have <code>dim</code>
+  // entries.) While this is a bit less flexible than using Vector, the
+  // compiler can generate faster code when the length of the vector is known
+  // at compile time. Additionally, specifying a Tensor of rank one and
+  // dimension <code>dim</code> guarantees that the tensor will have the right
+  // shape (since it is built into the type of the object itself), so the
+  // compiler can catch most size-related mistakes for us.
   //
   // Just as in previous examples, we are forced by the C++ language
   // specification to declare a seemingly useless default constructor.
