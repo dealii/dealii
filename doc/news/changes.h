@@ -150,6 +150,13 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li> New: Added GridGenerator::quarter_hyper_ball() to generate the 
+ intersection of a hyper ball with the positive orthant relative
+ to its center.
+ <br>
+ (Daniel Arndt, 2016/07/19)
+ </li>
+
  <li> Improved: The build system now checks for usable compiler/linker
  flags during various stages of the configure run. This should catch the
  majority of issues by user supplied flags/libraries and unusable final
