@@ -1434,6 +1434,37 @@ namespace MGTools
 
   template <int dim, int spacedim>
   void
+  make_boundary_list(const DoFHandler<dim,spacedim> &dof,
+                     const std::vector<types::boundary_id> &boundary_indicators,
+                     std::vector<IndexSet> &boundary_indices,
+                     const ComponentMask &component_mask)
+  {
+    Assert (boundary_indices.size() == dof.get_triangulation().n_global_levels(),
+            ExcDimensionMismatch (boundary_indices.size(),
+                                  dof.get_triangulation().n_global_levels()));
+
+    std::vector<std::set<types::global_dof_index> >
+    my_boundary_indices (dof.get_triangulation().n_global_levels());
+
+    //TODO get rid off this
+    typename FunctionMap<dim>::type homogen_bc;
+    ZeroFunction<dim> zero_function (dim);
+    for (unsigned int i=0;i<boundary_indicators.size();++i)
+	homogen_bc[i] = &zero_function;
+
+    make_boundary_list (dof, homogen_bc, my_boundary_indices, component_mask);
+    for (unsigned int i=0; i<dof.get_triangulation().n_global_levels(); ++i)
+      {
+        if (boundary_indices[i].size()!=dof.n_dofs(i))
+          boundary_indices[i] = IndexSet (dof.n_dofs(i));
+        boundary_indices[i].add_indices (my_boundary_indices[i].begin(),
+                                         my_boundary_indices[i].end());
+      }
+  }
+
+
+  template <int dim, int spacedim>
+  void
   extract_non_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
                               std::vector<std::set<types::global_dof_index> >  &non_interface_dofs)
   {

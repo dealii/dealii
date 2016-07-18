@@ -197,6 +197,17 @@ namespace MGTools
                       std::vector<IndexSet>                 &boundary_indices,
                       const ComponentMask               &component_mask = ComponentMask());
 
+   /**
+   * The same function as above, but return an IndexSet rather than a
+   * std::set<unsigned int> on each level.
+   */
+  template <int dim, int spacedim>
+  void
+  make_boundary_list (const DoFHandler<dim,spacedim>      &mg_dof,
+                      const std::vector<types::boundary_id> &boundary_indicators,
+                      std::vector<IndexSet>                 &boundary_indices,
+                      const ComponentMask               &component_mask = ComponentMask());
+
   /**
    * For each level in a multigrid hierarchy, produce an IndexSet that
    * indicates which of the degrees of freedom are along interfaces of this
