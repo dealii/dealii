@@ -157,7 +157,7 @@ void Step5<dim>::setup_system ()
 // As in the previous examples, this function is not changed much with regard
 // to its functionality, but there are still some optimizations which we will
 // show. For this, it is important to note that if efficient solvers are used
-// (such as the preconditions CG method), assembling the matrix and right hand
+// (such as the preconditioned CG method), assembling the matrix and right hand
 // side can take a comparable time, and you should think about using one or
 // two optimizations at some places.
 //
