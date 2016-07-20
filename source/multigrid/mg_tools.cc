@@ -1179,20 +1179,6 @@ namespace MGTools
   }
 
 
-
-  template <>
-  void
-  make_boundary_list(
-    const DoFHandler<1,2> &,
-    const FunctionMap<1>::type &,
-    std::vector<std::set<types::global_dof_index> > &,
-    const ComponentMask &)
-  {
-    Assert(false, ExcNotImplemented());
-  }
-
-
-
   template <int dim, int spacedim>
   void
   make_boundary_list(
@@ -1205,20 +1191,17 @@ namespace MGTools
             ExcDimensionMismatch (boundary_indices.size(),
                                   dof.get_triangulation().n_global_levels()));
 
-    std::vector<types::boundary_id> boundary_indicators;
+    std::set<types::boundary_id> boundary_ids;
     typename std::map<types::boundary_id, const Function<dim>* >::const_iterator it
       = function_map.begin();
     for (; it!=function_map.end(); ++it)
-      boundary_indicators.push_back(it->first);
+      boundary_ids.insert(it->first);
 
     std::vector<IndexSet>  boundary_indexset;
-    make_boundary_list(dof, boundary_indicators, boundary_indexset, component_mask);
+    make_boundary_list(dof, boundary_ids, boundary_indexset, component_mask);
     for (unsigned int i=0; i<dof.get_triangulation().n_global_levels(); ++i)
-      {
-        IndexSet::ElementIterator it_element = boundary_indexset[i].begin();
-        for (; it_element != boundary_indexset[i].end(); ++it_element)
-          boundary_indices[i].insert(*it_element);
-      }
+      boundary_indices[i].insert(boundary_indexset[i].begin(),
+                                 boundary_indexset[i].end());
   }
 
 
@@ -1233,12 +1216,12 @@ namespace MGTools
             ExcDimensionMismatch (boundary_indices.size(),
                                   dof.get_triangulation().n_global_levels()));
 
-    std::vector<types::boundary_id> boundary_indicators;
+    std::set<types::boundary_id> boundary_ids;
     typename std::map<types::boundary_id, const Function<dim>* >::const_iterator it = function_map.begin();
     for (; it!=function_map.end(); ++it)
-      boundary_indicators.push_back(it->first);
+      boundary_ids.insert(it->first);
 
-    make_boundary_list (dof, boundary_indicators, boundary_indices, component_mask);
+    make_boundary_list (dof, boundary_ids, boundary_indices, component_mask);
   }
 
 
@@ -1246,20 +1229,7 @@ namespace MGTools
   void
   make_boundary_list(
     const DoFHandler<1,1> &,
-    const std::vector<types::boundary_id> &,
-    std::vector<IndexSet> &,
-    const ComponentMask &)
-  {
-    Assert(false, ExcNotImplemented());
-  }
-
-
-
-  template <>
-  void
-  make_boundary_list(
-    const DoFHandler<1,2> &,
-    const std::vector<types::boundary_id> &,
+    const std::set<types::boundary_id> &,
     std::vector<IndexSet> &,
     const ComponentMask &)
   {
@@ -1270,14 +1240,14 @@ namespace MGTools
   template <int dim, int spacedim>
   void
   make_boundary_list(const DoFHandler<dim,spacedim> &dof,
-                     const std::vector<types::boundary_id> &boundary_indicators,
+                     const std::set<types::boundary_id> &boundary_ids,
                      std::vector<IndexSet> &boundary_indices,
                      const ComponentMask &component_mask)
   {
     boundary_indices.resize(dof.get_triangulation().n_global_levels());
 
-    // if for whatever reason we were passed an empty vector, return immediately
-    if (boundary_indicators.size() == 0)
+    // if for whatever reason we were passed an empty set, return immediately
+    if (boundary_ids.size() == 0)
       return;
 
     for (unsigned int i=0; i<dof.get_triangulation().n_global_levels(); ++i)
@@ -1293,7 +1263,7 @@ namespace MGTools
                local_dofs.end (),
                DoFHandler<dim,spacedim>::invalid_dof_index);
 
-    // First, deal with the simpler case when we have to identif all boundary dofs
+    // First, deal with the simpler case when we have to identify all boundary dofs
     if (component_mask.n_selected_components(n_components) == n_components)
       {
         typename DoFHandler<dim,spacedim>::cell_iterator
@@ -1316,7 +1286,7 @@ namespace MGTools
                   face = cell->face(face_no);
                   const types::boundary_id bi = face->boundary_id();
                   // Face is listed in boundary map
-                  if (std::find(boundary_indicators.begin(), boundary_indicators.end(), bi) != boundary_indicators.end())
+                  if (boundary_ids.find(bi) != boundary_ids.end())
                     {
                       face->get_mg_dof_indices(level, local_dofs);
                       boundary_indices[level].add_indices(local_dofs.begin(), local_dofs.end());
@@ -1346,8 +1316,7 @@ namespace MGTools
 
                 typename DoFHandler<dim,spacedim>::face_iterator face = cell->face(face_no);
                 const types::boundary_id boundary_component = face->boundary_id();
-                if (std::find(boundary_indicators.begin(), boundary_indicators.end(), boundary_component)
-                    != boundary_indicators.end())
+                if (boundary_ids.find(boundary_component) != boundary_ids.end())
                   // we want to constrain this boundary
                   {
 
@@ -1378,9 +1347,6 @@ namespace MGTools
                     face->get_mg_dof_indices (level, local_dofs);
                     if (fe_is_system)
                       {
-                        // enter those dofs into the list that match the component
-                        // signature. avoid the usual complication that we can't
-                        // just use *_system_to_component_index for non-primitive FEs
                         for (unsigned int i=0; i<local_dofs.size(); ++i)
                           {
                             unsigned int component = numbers::invalid_unsigned_int;
@@ -1406,8 +1372,7 @@ namespace MGTools
                           }
                       }
                     else
-                      for (unsigned int i=0; i<local_dofs.size(); ++i)
-                        boundary_indices[level].add_indices(local_dofs.begin(), local_dofs.end());
+                      boundary_indices[level].add_indices(local_dofs.begin(), local_dofs.end());
                   }
               }
       }

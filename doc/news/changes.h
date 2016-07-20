@@ -360,9 +360,10 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
- <li> Improved: Replace by a std::vector for initializing
- the constrained boundary DoFs, since the function values
- where not used. Allow for non-primitive FiniteElements.   
+ <li> Improved: Allow for initializing the constrained
+ boundary DoFs in MGConstrainedDoFs using a std::set
+ instead of a FunctionMap whose function values were not used.
+ Allow for non-primitive FiniteElements.
  <br>
  (Daniel Arndt, 2016/07/20)
  </li>

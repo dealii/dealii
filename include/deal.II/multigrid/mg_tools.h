@@ -178,6 +178,9 @@ namespace MGTools
    * indices of degrees of freedom for each level that are at the part of the
    * boundary identified by the function_map argument. Its length has to match
    * the number of levels in the dof handler object.
+   *
+   * Previous content in @p boundary_indices is not overwritten,
+   * but added to.
    */
   template <int dim, int spacedim>
   void
@@ -189,6 +192,9 @@ namespace MGTools
   /**
    * The same function as above, but return an IndexSet rather than a
    * std::set<unsigned int> on each level.
+   *
+   * Previous content in @p boundary_indices is not overwritten,
+   * but added to.
    */
   template <int dim, int spacedim>
   void
@@ -199,12 +205,16 @@ namespace MGTools
 
   /**
   * The same function as above, but return an IndexSet rather than a
-  * std::set<unsigned int> on each level.
+  * std::set<unsigned int> on each level and use a std::set of
+  * boundary_ids as input.
+  *
+  * Previous content in @p boundary_indices is not overwritten,
+  * but added to.
   */
   template <int dim, int spacedim>
   void
   make_boundary_list (const DoFHandler<dim,spacedim>      &mg_dof,
-                      const std::vector<types::boundary_id> &boundary_indicators,
+                      const std::set<types::boundary_id> &boundary_ids,
                       std::vector<IndexSet>                 &boundary_indices,
                       const ComponentMask               &component_mask = ComponentMask());
 

@@ -55,10 +55,12 @@ void check_fe(FiniteElement<dim> &fe, ComponentMask &component_mask)
   dofh.distribute_dofs(fe);
   dofh.distribute_mg_dofs(fe);
 
-  MGConstrainedDoFs                    mg_constrained_dofs;
-  std::vector<types::boundary_id>      boundary_indicators(1,0);
+  MGConstrainedDoFs                 mg_constrained_dofs;
+  std::set<types::boundary_id>      boundary_indicators;
+
+  boundary_indicators.insert(0);
   mg_constrained_dofs.initialize(dofh);
-  mg_constrained_dofs.set_zero_boundary_dofs(dofh, boundary_indicators, component_mask);
+  mg_constrained_dofs.make_zero_boundary_constraints(dofh, boundary_indicators, component_mask);
 
   const unsigned int n_levels = tr.n_global_levels();
   for (unsigned int level = 0; level < n_levels; ++level)

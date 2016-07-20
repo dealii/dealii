@@ -103,10 +103,10 @@ for (deal_II_dimension : DIMENSIONS)
 	const ComponentMask &);
 
     template void  make_boundary_list(
-       const DoFHandler<deal_II_dimension> &dof,
-       const std::vector<types::boundary_id> &boundary_indicators,
-        std::vector<IndexSet> &boundary_indices,
-        const ComponentMask &component_mask);
+        const DoFHandler<deal_II_dimension> &,
+        const std::set<types::boundary_id> &,
+        std::vector<IndexSet> &,
+        const ComponentMask &);
 
 
       template
