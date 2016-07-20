@@ -160,6 +160,14 @@ void test(std::ostream &out)
     }
   if (dim>1)
     {
+      deallog << "quarter_hyper_ball" << std::endl;
+      Triangulation<dim> tr;
+      GridGenerator::quarter_hyper_ball(tr, p1, 3.);
+      if (tr.n_cells() > 0)
+        go.write(tr, out, format);
+    }
+  if (dim>1)
+    {
       deallog << "half_hyper_ball" << std::endl;
       Triangulation<dim> tr;
       GridGenerator::half_hyper_ball(tr, p1, 3.);

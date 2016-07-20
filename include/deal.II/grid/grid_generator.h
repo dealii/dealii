@@ -474,6 +474,22 @@ namespace GridGenerator
                      const double        radius = 1.);
 
   /**
+   * This class produces a hyper-ball intersected with the positive orthant
+   * relative to @p center, which contains three elements in 2d and four in 3d.
+   *
+   * The boundary indicators for the final triangulation are 0 for the curved
+   * boundary and 1 for the cut plane.
+   *
+   * The appropriate boundary class is HyperBallBoundary.
+   *
+   * @note The triangulation needs to be void upon calling this function.
+   */
+  template <int dim>
+  void quarter_hyper_ball (Triangulation<dim> &tria,
+                           const Point<dim>   &center = Point<dim>(),
+                           const double        radius = 1.);
+
+  /**
    * This class produces a half hyper-ball around @p center, which contains
    * four elements in 2d and 6 in 3d. The cut plane is perpendicular to the
    * <i>x</i>-axis.
