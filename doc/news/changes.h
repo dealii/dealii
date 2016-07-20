@@ -360,6 +360,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Improved: Replace by a std::vector for initializing
+ the constrained boundary DoFs, since the function values
+ where not used. Allow for non-primitive FiniteElements.   
+ <br>
+ (Daniel Arndt, 2016/07/20)
+ </li>
+
  <li> Fixed: Work around an issue with the OpenMPI installation on certain
    Ubuntu versions: The build system now automatically drops the
    "-fuse-ld=gold" linker flag if openmpi is incompatible with it.
