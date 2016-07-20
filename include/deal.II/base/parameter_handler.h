@@ -68,9 +68,34 @@ namespace Patterns
     virtual bool match (const std::string &test_string) const = 0;
 
     /**
+     * List of possible description output formats.
+     *
+     * Capitalization chosen for similarity to ParameterHandler::OutputStyle.
+     */
+    enum OutputStyle
+    {
+      /**
+       * Simple text suitable for machine parsing in the static public member
+       * functions for all of the built in inheriting classes.
+       *
+       * Preferably human readable, but machine parsing is more critical.
+       */
+      Machine,
+      /**
+       * Easily human readable plain text format suitable for plain text
+       * documentation.
+       */
+      Text,
+      /**
+       * Easily human readable LaTeX format suitable for printing in manuals.
+       */
+      LaTeX
+    };
+
+    /**
      * Return a string describing the pattern.
      */
-    virtual std::string description () const = 0;
+    virtual std::string description (const OutputStyle style=Machine) const = 0;
 
     /**
      * Return a pointer to an exact copy of the object. This is necessary
@@ -160,7 +185,7 @@ namespace Patterns
      * match. If bounds were specified to the constructor, then include them
      * into this description.
      */
-    virtual std::string description () const;
+    virtual std::string description (const OutputStyle style=Machine) const;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
@@ -252,7 +277,7 @@ namespace Patterns
      * match. If bounds were specified to the constructor, then include them
      * into this description.
      */
-    virtual std::string description () const;
+    virtual std::string description (const OutputStyle style=Machine) const;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
@@ -322,7 +347,7 @@ namespace Patterns
      * match. Here, this is the list of valid strings passed to the
      * constructor.
      */
-    virtual std::string description () const;
+    virtual std::string description (const OutputStyle style=Machine) const;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
@@ -403,7 +428,7 @@ namespace Patterns
      * Return a description of the pattern that valid strings are expected to
      * match.
      */
-    virtual std::string description () const;
+    virtual std::string description (const OutputStyle style=Machine) const;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
@@ -518,7 +543,7 @@ namespace Patterns
      * Return a description of the pattern that valid strings are expected to
      * match.
      */
-    virtual std::string description () const;
+    virtual std::string description (const OutputStyle style=Machine) const;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
@@ -612,7 +637,7 @@ namespace Patterns
      * match. Here, this is the list of valid strings passed to the
      * constructor.
      */
-    virtual std::string description () const;
+    virtual std::string description (const OutputStyle style=Machine) const;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
@@ -676,7 +701,7 @@ namespace Patterns
      * Return a description of the pattern that valid strings are expected to
      * match.
      */
-    virtual std::string description () const;
+    virtual std::string description (const OutputStyle style=Machine) const;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
@@ -721,7 +746,7 @@ namespace Patterns
      * Return a description of the pattern that valid strings are expected to
      * match. Here, this is the string <tt>"[Anything]"</tt>.
      */
-    virtual std::string description () const;
+    virtual std::string description (const OutputStyle style=Machine) const;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
@@ -784,7 +809,7 @@ namespace Patterns
      * Return a description of the pattern that valid strings are expected to
      * match. Here, this is the string <tt>"[Filename]"</tt>.
      */
-    virtual std::string description () const;
+    virtual std::string description (const OutputStyle style=Machine) const;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
@@ -843,7 +868,7 @@ namespace Patterns
      * Return a description of the pattern that valid strings are expected to
      * match. Here, this is the string <tt>"[Filename]"</tt>.
      */
-    virtual std::string description () const;
+    virtual std::string description (const OutputStyle style=Machine) const;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
