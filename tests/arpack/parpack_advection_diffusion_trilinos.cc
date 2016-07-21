@@ -13,13 +13,12 @@
  *
  * ---------------------------------------------------------------------
 
+ * This file tests the non-symmetric interface to PARPACK for an advection-diffussion
+ * operator with Trilinos mpi vectors.
  *
- * This file tests the PARPACK interface for a symmetric operator taken from step-36
- * using Trilinos mpi vectors.
- *
- * We test that the computed vectors are eigenvectors and mass-orthonormal, i.e.
+ * We test that the computed vectors are eigenvectors and mass-normal, i.e.
  * a) (A*x_i-\lambda*B*x_i).L2() == 0
- * b) x_j*B*x_i = \delta_{i,j}
+ * b) x_i*B*x_i = 1
  *
  */
 
@@ -54,8 +53,6 @@
 
 #include <fstream>
 #include <iostream>
-
-// test Parpack on Step-36 with Trilinos algebra
 
 const unsigned int dim = 2;//run in 2d to save time
 
@@ -115,7 +112,7 @@ locally_owned_dofs_per_subdomain (const DoFHandlerType  &dof_handler)
 void test ()
 {
   const unsigned int global_mesh_refinement_steps = 5;
-  const unsigned int number_of_eigenvalues        = 5;
+  const unsigned int number_of_eigenvalues        = 4;
 
   MPI_Comm mpi_communicator = MPI_COMM_WORLD;
   const unsigned int n_mpi_processes = Utilities::MPI::n_mpi_processes(mpi_communicator);
@@ -130,7 +127,8 @@ void test ()
   IndexSet locally_relevant_dofs;
 
   std::vector<TrilinosWrappers::MPI::Vector> eigenfunctions;
-  std::vector<double>                                eigenvalues;
+  std::vector<TrilinosWrappers::MPI::Vector>  arpack_vectors;
+  std::vector<std::complex<double>>              eigenvalues;
   TrilinosWrappers::SparseMatrix             stiffness_matrix, mass_matrix;
 
   GridGenerator::hyper_cube (triangulation, -1, 1);
@@ -201,12 +199,15 @@ void test ()
                       csp,
                       mpi_communicator);
 
-  eigenfunctions.resize (5);
+  eigenvalues.resize (number_of_eigenvalues);
+
+  arpack_vectors.resize (number_of_eigenvalues+1);
+  for (unsigned int i=0; i<arpack_vectors.size (); ++i)
+    arpack_vectors[i].reinit (locally_owned_dofs, mpi_communicator);//without ghost dofs
+
+  eigenfunctions.resize (2*number_of_eigenvalues);
   for (unsigned int i=0; i<eigenfunctions.size (); ++i)
     eigenfunctions[i].reinit (locally_owned_dofs, mpi_communicator);//without ghost dofs
-
-  eigenvalues.resize (eigenfunctions.size ());
-
 
   // ready for assembly
   stiffness_matrix = 0;
@@ -238,30 +239,39 @@ void test ()
         cell_mass_matrix      = 0;
 
         for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
-              {
-                cell_stiffness_matrix (i, j)
-                += (fe_values.shape_grad (i, q_point) *
-                    fe_values.shape_grad (j, q_point)
-                   ) * fe_values.JxW (q_point);
+          {
+            const Point<dim> cur_point = fe_values.quadrature_point(q_point);
+            Tensor<1,dim> advection;
+            advection[0] = 10.;
+            advection[1] = 10.*cur_point[0];
+            for (unsigned int i=0; i<dofs_per_cell; ++i)
+              for (unsigned int j=0; j<dofs_per_cell; ++j)
+                {
+                  cell_stiffness_matrix (i, j)
+                  += (fe_values.shape_grad (i, q_point) *
+                      fe_values.shape_grad (j, q_point)
+                      +
+                      (advection * fe_values.shape_grad (i, q_point)) *
+                      fe_values.shape_value (j, q_point)
+                     ) * fe_values.JxW (q_point);
 
-                cell_mass_matrix (i, j)
-                += (fe_values.shape_value (i, q_point) *
-                    fe_values.shape_value (j, q_point)
-                   ) * fe_values.JxW (q_point);
-              }
+                  cell_mass_matrix (i, j)
+                  += (fe_values.shape_value (i, q_point) *
+                      fe_values.shape_value (j, q_point)
+                     ) * fe_values.JxW (q_point);
+                }
 
-        cell->get_dof_indices (local_dof_indices);
+            cell->get_dof_indices (local_dof_indices);
 
-        constraints
-        .distribute_local_to_global (cell_stiffness_matrix,
-                                     local_dof_indices,
-                                     stiffness_matrix);
-        constraints
-        .distribute_local_to_global (cell_mass_matrix,
-                                     local_dof_indices,
-                                     mass_matrix);
+            constraints
+            .distribute_local_to_global (cell_stiffness_matrix,
+                                         local_dof_indices,
+                                         stiffness_matrix);
+            constraints
+            .distribute_local_to_global (cell_mass_matrix,
+                                         local_dof_indices,
+                                         mass_matrix);
+          }
       }
 
   stiffness_matrix.compress (VectorOperation::add);
@@ -282,7 +292,7 @@ void test ()
     TrilinosWrappers::PreconditionIdentity preconditioner;
     IterativeInverse<TrilinosWrappers::MPI::Vector > shift_and_invert;
     shift_and_invert.initialize(shifted_matrix,preconditioner);
-    shift_and_invert.solver.select("cg");
+    shift_and_invert.solver.select("gmres");
     static ReductionControl inner_control_c(/*maxiter*/stiffness_matrix.m(),
                                                        /*tolerance (global)*/ 0.0,
                                                        /*reduce (w.r.t. initial)*/ 1.e-13);
@@ -292,57 +302,81 @@ void test ()
 
     PArpackSolver<TrilinosWrappers::MPI::Vector>::AdditionalData
     additional_data(num_arnoldi_vectors,
-                    PArpackSolver<TrilinosWrappers::MPI::Vector>::largest_magnitude,
-                    true);
+                    PArpackSolver<TrilinosWrappers::MPI::Vector>::largest_real_part,
+                    false);
 
     PArpackSolver<TrilinosWrappers::MPI::Vector> eigensolver (solver_control,
                                                               mpi_communicator,
                                                               additional_data);
     eigensolver.reinit(locally_owned_dofs);
     eigensolver.set_shift(shift);
-    eigenfunctions[0] = 1.;
-    eigensolver.set_initial_vector(eigenfunctions[0]);
+    arpack_vectors[0] = 1.;
+    eigensolver.set_initial_vector(arpack_vectors[0]);
     // avoid output of iterative solver:
     const unsigned int previous_depth = deallog.depth_file(0);
     eigensolver.solve (stiffness_matrix,
                        mass_matrix,
                        shift_and_invert,
-                       lambda,
-                       eigenfunctions,
+                       eigenvalues,
+                       arpack_vectors,
                        eigenvalues.size());
     deallog.depth_file(previous_depth);
 
-    for (unsigned int i = 0; i < lambda.size(); i++)
-      eigenvalues[i] = lambda[i].real();
+    // extract real and complex components of eigenvectors
+    for (unsigned int i = 0; i < eigenvalues.size(); ++i)
+      {
+        eigenfunctions[i] = arpack_vectors[i];
+        if (eigenvalues[i].imag() != 0.)
+          {
+            eigenfunctions[i + eigenvalues.size()] = arpack_vectors[i+1];
+            if ( i+1 < eigenvalues.size())
+              {
+                eigenfunctions[i+1] = arpack_vectors[i];
+                eigenfunctions[i+1 + eigenvalues.size()] = arpack_vectors[i+1];
+                eigenfunctions[i+1 + eigenvalues.size()] *= -1;
+                ++i;
+              }
+          }
+      }
 
     for (unsigned int i=0; i < eigenvalues.size(); i++)
       deallog << eigenvalues[i] << std::endl;
 
-    // make sure that we have eigenvectors and they are mass-orthonormal:
+    // make sure that we have eigenvectors and they are mass-normal:
     // a) (A*x_i-\lambda*B*x_i).L2() == 0
-    // b) x_j*B*x_i=\delta_{ij}
+    // b) x_i*B*x_i=1
     {
       const double precision = 1e-7;
       TrilinosWrappers::MPI::Vector Ax(eigenfunctions[0]), Bx(eigenfunctions[0]);
-      for (unsigned int i=0; i < eigenfunctions.size(); ++i)
+      TrilinosWrappers::MPI::Vector Ay(eigenfunctions[0]), By(eigenfunctions[0]);
+      for (unsigned int i=0; i < eigenvalues.size(); ++i)
         {
-          mass_matrix.vmult(Bx,eigenfunctions[i]);
-
-          for (unsigned int j=0; j < eigenfunctions.size(); j++)
-            Assert( std::abs( eigenfunctions[j] * Bx - (i==j))< precision,
-                    ExcMessage("Eigenvectors " +
-                               Utilities::int_to_string(i) +
-                               " and " +
-                               Utilities::int_to_string(j) +
-                               " are not orthonormal!"));
-
           stiffness_matrix.vmult(Ax,eigenfunctions[i]);
-          Ax.add(-1.0*std::real(lambda[i]),Bx);
-          Assert (Ax.l2_norm() < precision,
-                  ExcMessage("Returned vector " +
-                             Utilities::int_to_string(i) +
-                             " is not an eigenvector!"));
+          stiffness_matrix.vmult(Ay,eigenfunctions[i + eigenvalues.size()]);
+          mass_matrix.vmult(Bx,eigenfunctions[i]);
+          mass_matrix.vmult(By,eigenfunctions[i + eigenvalues.size()]);
+
+          Ax.add(-1.0*std::real(eigenvalues[i]),Bx);
+          Ax.add(std::imag(eigenvalues[i]),By);
+          Ay.add(-1.0*std::real(eigenvalues[i]),By);
+          Ay.add(-1.0*std::imag(eigenvalues[i]),Bx);
+          TrilinosWrappers::MPI::Vector tmpx(Ax), tmpy(Ay);
+          tmpx.scale(Ax);
+          tmpy.scale(Ay);
+          tmpx+=tmpy;
+          if (std::sqrt(tmpx.l1_norm()) > precision)
+            deallog << "Returned vector " << i << " is not an eigenvector!"
+                    << " L2 norm of the residual is " << std::sqrt(tmpx.l1_norm())
+                    << std::endl;
+
+          const double tmp =
+            std::abs( eigenfunctions[i] * Bx +  eigenfunctions[i+eigenvalues.size()] * By - 1.) +
+            std::abs( eigenfunctions[i+eigenvalues.size()] * Bx -  eigenfunctions[i] * By);
+          if ( tmp > precision)
+            deallog << "Eigenvector " << i << " is not normal! failing norm is "
+                    << tmp << std::endl;
         }
+
     }
   }
 

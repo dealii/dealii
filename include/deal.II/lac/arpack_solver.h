@@ -28,23 +28,38 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-extern "C" void dnaupd_(int *ido, char *bmat, const unsigned int *n, char *which,
-                        const unsigned int *nev, const double *tol, double *resid, int *ncv,
+extern "C" void dnaupd_(int *ido, char *bmat, unsigned int *n, char *which,
+                        unsigned int *nev, const double *tol, double *resid, int *ncv,
+                        double *v, int *ldv, int *iparam, int *ipntr,
+                        double *workd, double *workl, int *lworkl,
+                        int *info);
+
+extern "C" void dsaupd_(int *ido, char *bmat, unsigned int *n, char *which,
+                        unsigned int *nev, double *tol, double *resid, int *ncv,
                         double *v, int *ldv, int *iparam, int *ipntr,
                         double *workd, double *workl, int *lworkl,
                         int *info);
 
 extern "C" void dneupd_(int *rvec, char *howmany, int *select, double *d,
                         double *di, double *z, int *ldz, double *sigmar,
-                        double *sigmai, double *workev, char *bmat,const unsigned int *n, char *which,
-                        const unsigned int *nev, const double *tol, double *resid, int *ncv,
+                        double *sigmai, double *workev, char *bmat, unsigned int *n, char *which,
+                        unsigned int *nev, double *tol, double *resid, int *ncv,
+                        double *v, int *ldv, int *iparam, int *ipntr,
+                        double *workd, double *workl, int *lworkl, int *info);
+
+extern "C" void dseupd_(int *rvec, char *howmany, int *select, double *d,
+                        double *z, int *ldz, double *sigmar,
+                        char *bmat, unsigned int *n, char *which,
+                        unsigned int *nev, double *tol, double *resid, int *ncv,
                         double *v, int *ldv, int *iparam, int *ipntr,
                         double *workd, double *workl, int *lworkl, int *info);
 
 /**
  * Interface for using ARPACK. ARPACK is a collection of Fortran77 subroutines
  * designed to solve large scale eigenvalue problems.  Here we interface to
- * the routines <code>dneupd</code> and <code>dnaupd</code> of ARPACK.  The
+ * the routines <code>dnaupd</code> and <code>dneupd</code> of ARPACK.
+ * If the operator is specified to be symmetric we use the symmetric interface
+ * <code>dsaupd</code> and <code>dseupd</code> of ARPACK instead.  The
  * package is designed to compute a few eigenvalues and corresponding
  * eigenvectors of a general n by n matrix A. It is most appropriate for large
  * sparse matrices A.
@@ -72,8 +87,9 @@ extern "C" void dneupd_(int *rvec, char *howmany, int *select, double *d,
  * Through the AdditionalData the user can specify some of the parameters to
  * be set.
  *
- * For further information on how the ARPACK routines <code>dneupd</code> and
- * <code>dnaupd</code> work and also how to set the parameters appropriately
+ * For further information on how the ARPACK routines <code>dsaupd</code>,
+ * <code>dseupd</code>, <code>dnaupd</code> and <code>dneupd</code> work
+ * and also how to set the parameters appropriately
  * please take a look into the ARPACK manual.
  *
  * @note Whenever you eliminate degrees of freedom using ConstraintMatrix, you
@@ -85,7 +101,7 @@ extern "C" void dneupd_(int *rvec, char *howmany, int *select, double *d,
  * @ref step_36 "step-36"
  * for an example.
  *
- * @author Baerbel Janssen, Agnieszka Miedlar, 2010, Guido Kanschat 2015
+ * @author Baerbel Janssen, Agnieszka Miedlar, 2010, Guido Kanschat 2015, Joscha Gedicke 2016
  */
 class ArpackSolver : public Subscriptor
 {
@@ -121,9 +137,11 @@ public:
   {
     const unsigned int number_of_arnoldi_vectors;
     const WhichEigenvalues eigenvalue_of_interest;
+    const bool symmetric;
     AdditionalData(
       const unsigned int number_of_arnoldi_vectors = 15,
-      const WhichEigenvalues eigenvalue_of_interest = largest_magnitude);
+      const WhichEigenvalues eigenvalue_of_interest = largest_magnitude,
+      const bool symmetric = false);
   };
 
   /**
@@ -138,14 +156,27 @@ public:
                const AdditionalData &data = AdditionalData());
 
   /**
+   * Set initial vector for building Krylov space.
+   */
+  template <typename VectorType>
+  void set_initial_vector(const VectorType &vec);
+
+  /**
    * Solve the generalized eigensprectrum problem $A x=\lambda B x$ by calling
-   * the <code>dneupd</code> and <code>dnaupd</code> functions of ARPACK.
+   * the <code>dsaupd</code> and <code>dseupd</code> or
+   * <code>dnaupd</code> and <code>dneupd</code> functions of ARPACK.
    *
    * The function returns a vector of eigenvalues of length <i>n</i> and a
-   * vector of eigenvectors, where the latter should be twice the size of the
-   * eigenvalue vector. The first <i>n</i> vectors in
-   * <code>eigenvectors</code> will be the real parts of the eigenvectors, the
-   * second <i>n</i> the imaginary parts.
+   * vector of eigenvectors of length <i>n</i> in the symmetric case
+   * and of length <i>n+1</i> in the non-symmetric case. In the symmetric case
+   * all eigenvectors are real. In the non-symmetric case complex eigenvalues
+   * always occur as complex conjugate pairs. Therefore the eigenvector for an
+   * eigenvalue with nonzero complex part is stored by putting the real and
+   * the imaginary parts in consecutive real-valued vectors. The eigenvector
+   * of the complex conjugate eigenvalue does not need to be stored, since it
+   * is just the complex conjugate of the stored eigenvector. Thus, if the last
+   * n-th eigenvalue has a nonzero imaginary part, Arpack needs in total n+1
+   * real-valued vectors to store real and imaginary parts of the eigenvectors.
    *
    * @param A The operator for which we want to compute eigenvalues. Actually,
    * this parameter is entirely unused.
@@ -163,9 +194,16 @@ public:
    * eigenvalues are returned.
    *
    * @param eigenvectors is a <b>real</b> vector of eigenvectors, containing
-   * alternatingly the real parts and the imaginary parts of the eigenvectors.
-   * Therefore, its length should be twice the number of eigenvalues. The
-   * vectors have to be initialized to match the matrices.
+   * the real parts of all eigenvectors and the imaginary parts of the eigenvectors
+   * corresponding to complex conjugate eigenvalue pairs.
+   * Therefore, its length should be <i>n</i> in the symmetric case and <i>n+1</i>
+   * in the non-symmetric case. In the non-symmetric case the storage scheme
+   * leads for example to the following pattern. Suppose that the first two
+   * eigenvalues are real and the third and fourth are a complex conjugate
+   * pair. Asking for three eigenpairs results in <i>[real(v1),real(v2),
+   * real(v3),imag(v3)]</i>. Note that we get the same pattern if we ask for four
+   * eigenpairs in this example, since the fourth eigenvector is simply the
+   * complex conjugate of the third one.
    *
    * @param n_eigenvalues The purpose of this parameter is not clear, but it
    * is safe to set it to the size of <code>eigenvalues</code> or greater.
@@ -194,43 +232,70 @@ protected:
    */
   const AdditionalData additional_data;
 
+  /**
+   * Store an initial vector
+   */
+  bool initial_vector_provided;
+  std::vector<double> resid;
+
 private:
 
   /**
    * Exceptions.
    */
-  DeclException2 (ExcInvalidNumberofEigenvalues, int, int,
+  DeclException2 (ArpackExcInvalidNumberofEigenvalues, int, int,
                   << "Number of wanted eigenvalues " << arg1
                   << " is larger that the size of the matrix " << arg2);
 
-  DeclException2 (ExcInvalidNumberofArnoldiVectors, int, int,
+  DeclException2 (ArpackExcInvalidEigenvectorSize, int, int,
+                  << "Number of wanted eigenvalues " << arg1
+                  << " is larger that the size of eigenvectors " << arg2);
+
+  DeclException2 (ArpackExcInvalidEigenvectorSizeNonsymmetric, int, int,
+                  << "To store the real and complex parts of " << arg1
+                  << " eigenvectors in real-valued vectors, their size (currently set to " << arg2
+                  << ") should be greater than or equal to " << arg1+1);
+
+  DeclException2 (ArpackExcInvalidEigenvalueSize, int, int,
+                  << "Number of wanted eigenvalues " << arg1
+                  << " is larger that the size of eigenvalues " << arg2);
+
+  DeclException2 (ArpackExcInvalidNumberofArnoldiVectors, int, int,
                   << "Number of Arnoldi vectors " << arg1
                   << " is larger that the size of the matrix " << arg2);
 
-  DeclException2 (ExcSmallNumberofArnoldiVectors, int, int,
+  DeclException2 (ArpackExcSmallNumberofArnoldiVectors, int, int,
                   << "Number of Arnoldi vectors " << arg1
                   << " is too small to obtain " << arg2
                   << " eigenvalues");
 
-  DeclException1 (ExcArpackIdo, int, << "This ido " << arg1
+  DeclException1 (ArpackExcArpackIdo, int, << "This ido " << arg1
                   << " is not supported. Check documentation of ARPACK");
 
-  DeclException1 (ExcArpackMode, int, << "This mode " << arg1
+  DeclException1 (ArpackExcArpackMode, int, << "This mode " << arg1
                   << " is not supported. Check documentation of ARPACK");
 
-  DeclException1 (ExcArpackInfodsaupd, int,
+  DeclException1 (ArpackExcArpackInfodsaupd, int,
                   << "Error with dsaupd, info " << arg1
                   << ". Check documentation of ARPACK");
 
-  DeclException1 (ExcArpackInfodneupd, int,
+  DeclException1 (ArpackExcArpackInfodnaupd, int,
+                  << "Error with dnaupd, info " << arg1
+                  << ". Check documentation of ARPACK");
+
+  DeclException1 (ArpackExcArpackInfodseupd, int,
+                  << "Error with dseupd, info " << arg1
+                  << ". Check documentation of ARPACK");
+
+  DeclException1 (ArpackExcArpackInfodneupd, int,
                   << "Error with dneupd, info " << arg1
                   << ". Check documentation of ARPACK");
 
-  DeclException1 (ExcArpackInfoMaxIt, int,
+  DeclException1 (ArpackExcArpackInfoMaxIt, int,
                   << "Maximum number " << arg1
                   << " of iterations reached.");
 
-  DeclExceptionMsg (ExcArpackNoShifts,
+  DeclExceptionMsg (ArpackExcArpackNoShifts,
                     "No shifts could be applied during implicit"
                     " Arnoldi update, try increasing the number of"
                     " Arnoldi vectors.");
@@ -240,10 +305,12 @@ private:
 inline
 ArpackSolver::AdditionalData::
 AdditionalData (const unsigned int number_of_arnoldi_vectors,
-                const WhichEigenvalues eigenvalue_of_interest)
+                const WhichEigenvalues eigenvalue_of_interest,
+                const bool symmetric)
   :
   number_of_arnoldi_vectors(number_of_arnoldi_vectors),
-  eigenvalue_of_interest(eigenvalue_of_interest)
+  eigenvalue_of_interest(eigenvalue_of_interest),
+  symmetric(symmetric)
 {}
 
 
@@ -252,9 +319,20 @@ ArpackSolver::ArpackSolver (SolverControl &control,
                             const AdditionalData &data)
   :
   solver_control (control),
-  additional_data (data)
-
+  additional_data (data),
+  initial_vector_provided(false)
 {}
+
+template <typename VectorType>
+inline
+void ArpackSolver::
+set_initial_vector(const VectorType &vec)
+{
+  initial_vector_provided = true;
+  resid.resize(vec.size());
+  for (size_type i = 0; i < vec.size(); ++i)
+    resid[i] = vec[i];
+}
 
 
 template <typename VectorType, typename MatrixType1,
@@ -267,31 +345,43 @@ void ArpackSolver::solve (const MatrixType1                  &/*system_matrix*/,
                           std::vector<VectorType>            &eigenvectors,
                           const unsigned int                  n_eigenvalues)
 {
-  //inside the routines of ARPACK the
-  //values change magically, so store
-  //them here
+  // Problem size
+  unsigned int n = eigenvectors[0].size();
 
-  const unsigned int n = eigenvectors[0].size();
-  const unsigned int n_inside_arpack = eigenvectors[0].size();
+  // Number of eigenvalues
+  const unsigned int nev_const = (n_eigenvalues == 0) ? eigenvalues.size() : n_eigenvalues;
+  // nev for arpack, which might change by plus one during dneupd
+  unsigned int nev = nev_const;
 
-  // Number of eigenvalues for arpack
-  const unsigned int nev = (n_eigenvalues == 0) ? eigenvalues.size() : n_eigenvalues;
-  AssertIndexRange(eigenvalues.size()-1, nev);
-  /*
-  if(n < 0 || nev <0 || p < 0 || maxit < 0 )
-       std:cout << "All input parameters have to be positive.\n";
-       */
-  Assert (n_eigenvalues < n,
-          ExcInvalidNumberofEigenvalues(nev, n));
+  // check input sizes
+  if (additional_data.symmetric)
+    {
+      Assert (nev <= eigenvectors.size(),
+              ArpackExcInvalidEigenvectorSize(nev, eigenvectors.size()));
+    }
+  else
+    Assert (nev+1 <= eigenvectors.size(),
+            ArpackExcInvalidEigenvectorSizeNonsymmetric(nev, eigenvectors.size()));
+
+  Assert (nev <= eigenvalues.size(),
+          ArpackExcInvalidEigenvalueSize(nev, eigenvalues.size()));
+
+  // check large enough problem size
+  Assert (nev < n,
+          ArpackExcInvalidNumberofEigenvalues(nev, n));
 
   Assert (additional_data.number_of_arnoldi_vectors < n,
-          ExcInvalidNumberofArnoldiVectors(
+          ArpackExcInvalidNumberofArnoldiVectors(
             additional_data.number_of_arnoldi_vectors, n));
 
+  // check whether we have enough Arnoldi vectors
   Assert (additional_data.number_of_arnoldi_vectors > 2*nev+1,
-          ExcSmallNumberofArnoldiVectors(
+          ArpackExcSmallNumberofArnoldiVectors(
             additional_data.number_of_arnoldi_vectors, nev));
-  // ARPACK mode for dnaupd, here only mode 3
+
+  /* ARPACK mode for dsaupd/dnaupd, here only mode 3,
+   * i.e. shift-invert mode
+   */
   int mode = 3;
 
   // reverse communication parameter
@@ -342,10 +432,11 @@ void ArpackSolver::solve (const MatrixType1                  &/*system_matrix*/,
     }
 
   // tolerance for ARPACK
-  const double tol = control().tolerance();
+  double tol = control().tolerance();
 
   // if the starting vector is used it has to be in resid
-  std::vector<double> resid(n, 1.);
+  if (!initial_vector_provided || resid.size() != n)
+    resid.resize(n, 1.);
 
   // number of Arnoldi basis vectors specified
   // in additional_data
@@ -371,23 +462,24 @@ void ArpackSolver::solve (const MatrixType1                  &/*system_matrix*/,
   std::vector<int> ipntr (14, 0);
 
   // work arrays for ARPACK
-  double *workd;
-  workd = new double[3*n];
-
-  for (unsigned int i=0; i<3*n; ++i)
-    workd[i] = 0.0;
-
-  int lworkl = 3*ncv*(ncv + 6);
+  std::vector<double> workd (3*n, 0.);
+  int lworkl = additional_data.symmetric ? ncv*ncv + 8*ncv : 3*ncv*ncv+6*ncv;
   std::vector<double> workl (lworkl, 0.);
+
   //information out of the iteration
   int info = 1;
 
   while (ido != 99)
     {
-      // call of ARPACK dnaupd routine
-      dnaupd_(&ido, bmat, &n_inside_arpack, which, &nev, &tol,
-              &resid[0], &ncv, &v[0], &ldv, &iparam[0], &ipntr[0],
-              workd, &workl[0], &lworkl, &info);
+      // call of ARPACK dsaupd/dnaupd routine
+      if (additional_data.symmetric)
+        dsaupd_(&ido, bmat, &n, which, &nev, &tol,
+                &resid[0], &ncv, &v[0], &ldv, &iparam[0], &ipntr[0],
+                &workd[0], &workl[0], &lworkl, &info);
+      else
+        dnaupd_(&ido, bmat, &n, which, &nev, &tol,
+                &resid[0], &ncv, &v[0], &ldv, &iparam[0], &ipntr[0],
+                &workd[0], &workl[0], &lworkl, &info);
 
       if (ido == 99)
         break;
@@ -408,7 +500,7 @@ void ArpackSolver::solve (const MatrixType1                  &/*system_matrix*/,
 
 
               for (size_type i=0; i<src.size(); ++i)
-                src(i) = *(workd+ipntr[0]-1+i);
+                src(i) = workd[ipntr[0]-1+i];
 
               // multiplication with mass matrix M
               mass_matrix.vmult(tmp, src);
@@ -416,7 +508,7 @@ void ArpackSolver::solve (const MatrixType1                  &/*system_matrix*/,
               inverse.vmult(dst,tmp);
 
               for (size_type i=0; i<dst.size(); ++i)
-                *(workd+ipntr[1]-1+i) = dst(i);
+                workd[ipntr[1]-1+i] = dst(i);
             }
             break;
 
@@ -431,14 +523,14 @@ void ArpackSolver::solve (const MatrixType1                  &/*system_matrix*/,
 
               for (size_type i=0; i<src.size(); ++i)
                 {
-                  src(i) = *(workd+ipntr[2]-1+i);
-                  tmp(i) = *(workd+ipntr[0]-1+i);
+                  src(i) = workd[ipntr[2]-1+i];
+                  tmp(i) = workd[ipntr[0]-1+i];
                 }
               // solving linear system
               inverse.vmult(dst,src);
 
               for (size_type i=0; i<dst.size(); ++i)
-                *(workd+ipntr[1]-1+i) = dst(i);
+                workd[ipntr[1]-1+i] = dst(i);
             }
             break;
 
@@ -450,32 +542,37 @@ void ArpackSolver::solve (const MatrixType1                  &/*system_matrix*/,
               dst.reinit(src);
 
               for (size_type i=0; i<src.size(); ++i)
-                src(i) = *(workd+ipntr[0]-1+i);
+                src(i) = workd[ipntr[0]-1+i];
 
               // Multiplication with mass matrix M
               mass_matrix.vmult(dst, src);
 
               for (size_type i=0; i<dst.size(); ++i)
-                *(workd+ipntr[1]-1+i) = dst(i);
+                workd[ipntr[1]-1+i] = dst(i);
 
             }
             break;
 
             default:
-              Assert (false, ExcArpackIdo(ido));
+              Assert (false, ArpackExcArpackIdo(ido));
               break;
             }
         }
         break;
         default:
-          Assert (false, ExcArpackMode(mode));
+          Assert (false, ArpackExcArpackMode(mode));
           break;
         }
     }
 
   if (info<0)
     {
-      Assert (false, ExcArpackInfodsaupd(info));
+      if (additional_data.symmetric)
+        {
+          Assert (false, ArpackExcArpackInfodsaupd(info));
+        }
+      else
+        Assert (false, ArpackExcArpackInfodnaupd(info));
     }
   else
     {
@@ -491,49 +588,54 @@ void ArpackSolver::solve (const MatrixType1                  &/*system_matrix*/,
 
       int ldz = n;
 
-      std::vector<double> z (ldz*ncv, 0.);
-
       double sigmar = 0.0; // real part of the shift
       double sigmai = 0.0; // imaginary part of the shift
 
-      int lworkev = 3*ncv;
-      std::vector<double> workev (lworkev, 0.);
+      std::vector<double> eigenvalues_real (nev+1, 0.);
+      std::vector<double> eigenvalues_im (nev+1, 0.);
 
-      std::vector<double> eigenvalues_real (nev, 0.);
-      std::vector<double> eigenvalues_im (nev, 0.);
-
-      // call of ARPACK dneupd routine
-      dneupd_(&rvec, &howmany, &select[0], &eigenvalues_real[0],
-              &eigenvalues_im[0], &z[0], &ldz, &sigmar, &sigmai,
-              &workev[0], bmat, &n_inside_arpack, which, &nev, &tol,
-              &resid[0], &ncv, &v[0], &ldv,
-              &iparam[0], &ipntr[0], workd, &workl[0], &lworkl, &info);
+      // call of ARPACK dseupd/dneupd routine
+      if (additional_data.symmetric)
+        {
+          std::vector<double> z (ldz*nev, 0.);
+          dseupd_(&rvec, &howmany, &select[0], &eigenvalues_real[0],
+                  &z[0], &ldz, &sigmar, bmat, &n, which, &nev, &tol,
+                  &resid[0], &ncv, &v[0], &ldv,
+                  &iparam[0], &ipntr[0], &workd[0], &workl[0], &lworkl, &info);
+        }
+      else
+        {
+          std::vector<double> workev (3*ncv, 0.);
+          dneupd_(&rvec, &howmany, &select[0], &eigenvalues_real[0],
+                  &eigenvalues_im[0], &v[0], &ldz, &sigmar, &sigmai,
+                  &workev[0], bmat, &n, which, &nev, &tol,
+                  &resid[0], &ncv, &v[0], &ldv,
+                  &iparam[0], &ipntr[0], &workd[0], &workl[0], &lworkl, &info);
+        }
 
       if (info == 1)
         {
-          Assert (false, ExcArpackInfoMaxIt(control().max_steps()));
+          Assert (false, ArpackExcArpackInfoMaxIt(control().max_steps()));
         }
       else if (info == 3)
         {
-          Assert (false, ExcArpackNoShifts());
+          Assert (false, ArpackExcArpackNoShifts());
         }
       else if (info!=0)
         {
-          Assert (false, ExcArpackInfodneupd(info));
+          if (additional_data.symmetric)
+            {
+              Assert (false, ArpackExcArpackInfodseupd(info));
+            }
+          else
+            Assert (false, ArpackExcArpackInfodneupd(info));
         }
 
-
-      const unsigned int n_eigenvecs = eigenvectors.size();
-      for (size_type i=0; i<n_eigenvecs; ++i)
+      for (unsigned int i=0; i<nev; ++i)
         for (unsigned int j=0; j<n; ++j)
           eigenvectors[i](j) = v[i*n+j];
 
-      delete[] workd;
-
-      AssertDimension (eigenvalues.size(), eigenvalues_real.size());
-      AssertDimension (eigenvalues.size(), eigenvalues_im.size());
-
-      for (size_type i=0; i<eigenvalues.size(); ++i)
+      for (unsigned int i=0; i<nev_const; ++i)
         eigenvalues[i] = std::complex<double> (eigenvalues_real[i],
                                                eigenvalues_im[i]);
     }
