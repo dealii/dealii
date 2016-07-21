@@ -380,6 +380,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Improved: Allow for including dofs for individual components on 
+   boundary in DoFTools::make_vertex_patches().
+ <br>
+ (Ryan Grove, Daniel Arndt, 2016/07/21)
+ </li>
+
  <li> Improved: Allow for initializing the constrained
  boundary DoFs in MGConstrainedDoFs using a std::set
  instead of a FunctionMap whose function values were not used.

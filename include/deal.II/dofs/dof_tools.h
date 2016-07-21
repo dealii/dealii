@@ -1763,7 +1763,7 @@ namespace DoFTools
    *  Same as above but allows boundary dofs on blocks to be excluded individually.
    *
    *  This is helpful if you want to use, for example, Taylor Hood elements
-   *  as it allows you to not include the boundary DoFs for the velocity 
+   *  as it allows you to not include the boundary DoFs for the velocity
    *  block on the patches while also letting you include the boundary DoFs
    *  for the pressure block.
    *
