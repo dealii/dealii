@@ -2,10 +2,8 @@
 Listing of Parameters:
 
 subsection Testing
-  set double       =   [Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]
+  set double       =   A floating point number v such that -MAX_DOUBLE <= v <= MAX_DOUBLE
                        (docs 3)
-  set int          =   [Integer range -2147483648...2147483647 (inclusive)]
-  set string list  = 
-        [List list of <[Selection a|b|c|d|e|f|g
-        h ]> of length 0...4294967295 (inclusive)]
+  set int          =   An integer n such that -2147483648 <= n <= 2147483647
+  set string list  =   A list of 0 to 4294967295 elements where each element is [Any one of a, b, c, d, e, f, g, h]
                        (docs 1)

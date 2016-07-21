@@ -23,7 +23,7 @@
 {\it Description:} docs 3
 
 
-{\it Possible values:} [Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]
+{\it Possible values:} A floating point number $v$ such that $-\text{MAX\_DOUBLE} \leq v \leq \text{MAX\_DOUBLE}$
 \item {\it Parameter name:} {\tt int}
 \phantomsection\label{parameters:Testing/int}
 
@@ -36,7 +36,7 @@
 {\it Default:} 1
 
 
-{\it Possible values:} [Integer range -2147483648...2147483647 (inclusive)]
+{\it Possible values:} An integer $n$ such that $-2147483648\leq n \leq 2147483647$
 \item {\it Parameter name:} {\tt string list}
 \phantomsection\label{parameters:Testing/string list}
 
@@ -52,7 +52,7 @@
 {\it Description:} docs 1
 
 
-{\it Possible values:} [List list of <[Selection a|b|c|d|e|f|g|h ]> of length 0...4294967295 (inclusive)]
+{\it Possible values:} A list of 0 to 4294967295 elements where each element is [Any one of a, b, c, d, e, f, g, h]
 \end{itemize}
 
 
@@ -76,7 +76,7 @@
 {\it Description:} docs 3
 
 
-{\it Possible values:} [Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]
+{\it Possible values:} A floating point number $v$ such that $-\text{MAX\_DOUBLE} \leq v \leq \text{MAX\_DOUBLE}$
 \item {\it Parameter name:} {\tt int 2}
 \phantomsection\label{parameters:Testing/Testing 2/int 2}
 
@@ -89,7 +89,7 @@
 {\it Default:} 1
 
 
-{\it Possible values:} [Integer range -2147483648...2147483647 (inclusive)]
+{\it Possible values:} An integer $n$ such that $-2147483648\leq n \leq 2147483647$
 \item {\it Parameter name:} {\tt string list 2}
 \phantomsection\label{parameters:Testing/Testing 2/string list 2}
 
@@ -105,5 +105,5 @@
 {\it Description:} docs 1
 
 
-{\it Possible values:} [List list of <[Selection a|b|c|d|e|f|g|h ]> of length 0...4294967295 (inclusive)]
+{\it Possible values:} A list of 0 to 4294967295 elements where each element is [Any one of a, b, c, d, e, f, g, h]
 \end{itemize}
