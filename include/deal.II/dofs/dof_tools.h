@@ -1760,6 +1760,30 @@ namespace DoFTools
                       const bool            invert_vertex_mapping  = false);
 
   /**
+   *  Same as above but allows boundary dofs on blocks to be excluded individually.
+   *
+   *  This is helpful if you want to use, for example, Taylor Hood elements
+   *  as it allows you to not include the boundary DoFs for the velocity 
+   *  block on the patches while also letting you include the boundary DoFs
+   *  for the pressure block.
+   *
+   * @param exclude_boundary_dofs For each patch of cells around a
+   * vertex, collect all of the interior degrees of freedom of the patch and
+   * disregard those on the boundary of the patch if the boolean value for
+   * the corresponding block in the BlockMask is false.
+   */
+  template <typename DoFHandlerType>
+  std::vector<unsigned int>
+  make_vertex_patches(SparsityPattern      &block_list,
+                      const DoFHandlerType &dof_handler,
+                      const unsigned int    level,
+                      const BlockMask      &exclude_boundary_dofs  = BlockMask(),
+                      const bool            boundary_patches       = false,
+                      const bool            level_boundary_patches = false,
+                      const bool            single_cell_patches    = false,
+                      const bool            invert_vertex_mapping  = false);
+
+  /**
    * Create an incidence matrix that for every cell on a given level of a
    * multilevel DoFHandler flags which degrees of freedom are associated with
    * children of this cell. This data structure is conveniently represented by

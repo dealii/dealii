@@ -2186,13 +2186,35 @@ namespace DoFTools
       }
   }
 
-
   template <typename DoFHandlerType>
   std::vector<unsigned int>
   make_vertex_patches (SparsityPattern      &block_list,
                        const DoFHandlerType &dof_handler,
                        const unsigned int    level,
                        const bool            interior_only,
+                       const bool            boundary_patches,
+                       const bool            level_boundary_patches,
+                       const bool            single_cell_patches,
+                       const bool            invert_vertex_mapping)
+  {
+    const unsigned int n_blocks = dof_handler.get_fe().n_blocks();
+    BlockMask exclude_boundary_dofs = BlockMask(n_blocks,interior_only);
+    return make_vertex_patches(block_list,
+                               dof_handler,
+                               level,
+                               exclude_boundary_dofs,
+                               boundary_patches,
+                               level_boundary_patches,
+                               single_cell_patches,
+                               invert_vertex_mapping);
+  }
+
+  template <typename DoFHandlerType>
+  std::vector<unsigned int>
+  make_vertex_patches (SparsityPattern      &block_list,
+                       const DoFHandlerType &dof_handler,
+                       const unsigned int    level,
+                       const BlockMask      &exclude_boundary_dofs,
                        const bool            boundary_patches,
                        const bool            level_boundary_patches,
                        const bool            single_cell_patches,
@@ -2276,7 +2298,9 @@ namespace DoFTools
             if (block == numbers::invalid_unsigned_int)
               continue;
 
-            if (interior_only)
+            // Collect excluded dofs for some block(s) if boundary dofs
+            // for a block are decided to be excluded
+            if (exclude_boundary_dofs.size()==0 || exclude_boundary_dofs.n_selected_blocks() != 0)
               {
                 // Exclude degrees of freedom on faces opposite to the
                 // vertex
@@ -2289,7 +2313,11 @@ namespace DoFTools
                     const unsigned int a_face = GeometryInfo<DoFHandlerType::dimension>::vertex_to_face[v][d];
                     const unsigned int face = GeometryInfo<DoFHandlerType::dimension>::opposite_face[a_face];
                     for (unsigned int i=0; i<dpf; ++i)
-                      exclude[fe.face_to_cell_index(i,face)] = true;
+                      {
+                        // For each dof, get the block it is in and decide to exclude it or not
+                        if (exclude_boundary_dofs[fe.system_to_block_index(fe.face_to_cell_index(i,face)).first]==true)
+                          exclude[fe.face_to_cell_index(i,face)] = true;
+                      }
                   }
                 for (unsigned int j=0; j<indices.size(); ++j)
                   if (!exclude[j])
