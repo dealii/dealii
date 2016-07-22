@@ -13,10 +13,24 @@
 ##
 ## ---------------------------------------------------------------------
 
-FIND_LIBRARY(Boost_PYTHON_LIBRARY boost_python PATH ${Boost_LIBRARY_DIRS} NO_DEFAULT_PATH)
+#
+# Find Python:
+#
+
 INCLUDE(FindPythonLibs)
 INCLUDE(FindPythonInterp)
-INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+
+#
+# FIXME: Once finalized, reconsider moving this definitions into
+# cmake/setup_dealii.cmake
+#
+# Best effort guess on site-packages location:
+#
+
+SET(DEAL_II_PYTHON_RELDIR
+  ${DEAL_II_LIBRARY_RELDIR}/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages/pydealii
+  )
+
 INCLUDE_DIRECTORIES(
   ${CMAKE_BINARY_DIR}/include/
   ${CMAKE_SOURCE_DIR}/include/
@@ -24,6 +38,12 @@ INCLUDE_DIRECTORIES(
   ${DEAL_II_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}/contrib/python-bindings/include/
   )
+
+#
+# Build a variant of the wrapper library for all configured build types in
+# DEAL_II_BUILD_TYPES (usually PyDealIIDebug and PyDealIIRelease)
+#
+
 INCLUDE_DIRECTORIES(SYSTEM ${PYTHON_INCLUDE_DIRS})
 
 SET(_src
@@ -36,39 +56,62 @@ SET(_src
   triangulation_wrapper.cc
   )
 
-PYTHON_ADD_MODULE(PyDealII ${_src})
+FOREACH(_build ${DEAL_II_BUILD_TYPES})
+  STRING(TOLOWER ${_build} _build_lowercase)
 
-SET(PYTHON_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages)
+  PYTHON_ADD_MODULE(PyDealII_${_build_lowercase} ${_src})
 
-TARGET_LINK_LIBRARIES(PyDealII deal_II.g)
-TARGET_LINK_LIBRARIES(PyDealII ${Boost_PYTHON_LIBRARY})
-TARGET_LINK_LIBRARIES(PyDealII ${PYTHON_LIBRARIES})
+  SET_TARGET_PROPERTIES(PyDealII_${_build_lowercase} PROPERTIES
+    VERSION "${DEAL_II_PACKAGE_VERSION}"
+    SOVERSION "${DEAL_II_PACKAGE_VERSION}"
+    LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
+    LINKER_LANGUAGE "CXX"
+    COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${_build}}"
+    COMPILE_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_PYTHON_RELDIR}"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_PYTHON_RELDIR}"
+    )
+  IF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+    SET_TARGET_PROPERTIES(PyDealII_${_build_lowercase} PROPERTIES
+      MACOSX_RPATH OFF
+      BUILD_WITH_INSTALL_RPATH OFF
+      INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${DEAL_II_PYTHON_RELDIR}"
+      )
+  ENDIF()
 
-SET_TARGET_PROPERTIES(PyDealII PROPERTIES
-  CXX_STANDARD 11
+  TARGET_LINK_LIBRARIES(PyDealII_${_build_lowercase}
+    ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
+    ${PYTHON_LIBRARIES}
+    ${Boost_LIBRARIES}
+    )
+
+  EXPORT(TARGETS PyDealII_${_build_lowercase}
+    FILE ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake
+    APPEND
+    )
+
+  INSTALL(TARGETS  PyDealII_${_build_lowercase}
+    COMPONENT python_bindings
+    EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
+    LIBRARY DESTINATION ${DEAL_II_PYTHON_RELDIR}
+    ARCHIVE DESTINATION ${DEAL_II_PYTHON_RELDIR}
+    )
+
+  ADD_DEPENDENCIES(python_bindings PyDealII_${_build_lowercase})
+ENDFOREACH()
+
+#
+# Copy python sources to binary directory and set up installation:
+#
+
+SET(_python_sources
+  __init__.py
+  )
+FILE(COPY ${_python_sources}
+  DESTINATION ${CMAKE_BINARY_DIR}/${DEAL_II_PYTHON_RELDIR}
+  )
+INSTALL(FILES ${_python_sources}
+  DESTINATION ${DEAL_II_PYTHON_RELDIR}
+  COMPONENT python_bindings
   )
 
-INSTALL(TARGETS PyDealII DESTINATION ${PYTHON_INSTALL_PREFIX}/pydealii)
-
-SET(PYTHON_SOURCES
-  __init__.py
-  )                                                                                                                                                                                                               
-
-FOREACH(PYTHON_SOURCE ${PYTHON_SOURCES})                                                                                                                                                                            
-  ADD_CUSTOM_COMMAND(                                                                                                                                                                                             
-    OUTPUT ${CMAKE_BINARY_DIR}/python/pydealii/${PYTHON_SOURCE}                                                                                                                                                    
-    DEPENDS ${CMAKE_SOURCE_DIR}/contrib/python-bindings/source/${PYTHON_SOURCE}
-    COMMAND ${CMAKE_COMMAND}                                                                                                                                                                                    
-    ARGS -E copy ${CMAKE_SOURCE_DIR}/contrib/python-bindings/source/${PYTHON_SOURCE} ${CMAKE_BINARY_DIR}/python/pydealii/${PYTHON_SOURCE}
-    COMMENT "Copying ${PYTHON_SOURCE}"                                                                                                                                                                          
-    )                                                                                                                                                                                                           
-  ADD_CUSTOM_TARGET(                                                                                                                                                                                              
-    ${PYTHON_SOURCE} ALL
-    DEPENDS ${CMAKE_BINARY_DIR}/python/pydealii/${PYTHON_SOURCE}                                                                                                                                                   
-    )                                                                                                                                                                                                           
-ENDFOREACH()                                                                                                                                                                                                        
-INSTALL(                                                                                                                                                                                                            
-  DIRECTORY ${CMAKE_BINARY_DIR}/python/pydealii
-  DESTINATION ${PYTHON_INSTALL_PREFIX}                                                                                                                                                                            
-  FILES_MATCHING PATTERN "*.py"                                                                                                                                                                                   
-  ) 
