@@ -14,6 +14,9 @@
 // ---------------------------------------------------------------------
 
 #include <point_wrapper.h>
+
+#ifdef DEAL_II_WITH_CXX11
+
 #include <deal.II/base/point.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -178,3 +181,5 @@ namespace python
 }
 
 DEAL_II_NAMESPACE_CLOSE
+
+#endif

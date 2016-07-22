@@ -13,9 +13,12 @@
 //
 // ---------------------------------------------------------------------
 
+#include <cell_accessor_wrapper.h>
+
+#ifdef DEAL_II_WITH_CXX11
+
 #include <point_wrapper.h>
 #include <triangulation_wrapper.h>
-#include <cell_accessor_wrapper.h>
 #include <boost/python.hpp>
 
 DEAL_II_NAMESPACE_OPEN
@@ -474,3 +477,5 @@ namespace python
 }
 
 DEAL_II_NAMESPACE_CLOSE
+
+#endif

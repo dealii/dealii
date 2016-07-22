@@ -16,6 +16,10 @@
 #ifndef dealii__triangulation_wrapper_h
 #define dealii__triangulation_wrapper_h
 
+#include <deal.II/base/config.h>
+
+#ifdef DEAL_II_WITH_CXX11
+
 #include <point_wrapper.h>
 #include <boost/python.hpp>
 #include <string>
@@ -217,5 +221,7 @@ namespace python
 }
 
 DEAL_II_NAMESPACE_CLOSE
+
+#endif
 
 #endif

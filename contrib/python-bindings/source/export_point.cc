@@ -14,6 +14,9 @@
 // ---------------------------------------------------------------------
 
 #include <point_wrapper.h>
+
+#ifdef DEAL_II_WITH_CXX11
+
 #include <deal.II/base/point.h>
 #include <deal.II/base/exceptions.h>
 #include <boost/python.hpp>
@@ -36,3 +39,5 @@ namespace python
 }
 
 DEAL_II_NAMESPACE_CLOSE
+
+#endif
