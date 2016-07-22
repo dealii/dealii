@@ -15,10 +15,13 @@
 
 #ifndef dealii__point_wrapper_h
 #define dealii__point_wrapper_h
+
+#include <deal.II/base/config.h>
 #include <boost/python.hpp>
 
+DEAL_II_NAMESPACE_OPEN
 
-namespace PyDealII
+namespace python
 {
   class PointWrapper
   {
@@ -132,5 +135,7 @@ namespace PyDealII
     return point;
   }
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

@@ -21,7 +21,9 @@
 #include <string>
 #include <vector>
 
-namespace PyDealII
+DEAL_II_NAMESPACE_OPEN
+
+namespace python
 {
   class CellAccessorWrapper;
 
@@ -213,5 +215,7 @@ namespace PyDealII
     return triangulation;
   }
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

@@ -13,14 +13,19 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
 #include <boost/python.hpp>
 
-namespace PyDealII
+DEAL_II_NAMESPACE_OPEN
+
+namespace python
 {
   void export_cell_accessor();
   void export_point();
   void export_triangulation();
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 char const *pydealii_docstring =
   "                                                             \n"
@@ -38,7 +43,7 @@ BOOST_PYTHON_MODULE(PyDealII)
   doc_options.enable_py_signatures();
   doc_options.disable_cpp_signatures();
 
-  PyDealII::export_cell_accessor();
-  PyDealII::export_point();
-  PyDealII::export_triangulation();
+  dealii::python::export_cell_accessor();
+  dealii::python::export_point();
+  dealii::python::export_triangulation();
 }

@@ -18,7 +18,9 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/exceptions.h>
 
-namespace PyDealII
+DEAL_II_NAMESPACE_OPEN
+
+namespace python
 {
   void export_point()
   {
@@ -32,3 +34,5 @@ namespace PyDealII
                   "Get the z component of the point.");
   }
 }
+
+DEAL_II_NAMESPACE_CLOSE

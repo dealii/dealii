@@ -17,7 +17,9 @@
 #include <deal.II/python/triangulation_wrapper.h>
 #include <deal.II/python/cell_accessor_wrapper.h>
 
-namespace PyDealII
+DEAL_II_NAMESPACE_OPEN
+
+namespace python
 {
 
 // Macro to enable default arguments
@@ -216,3 +218,5 @@ namespace PyDealII
          boost::python::args("self", "filename"));
   }
 }
+
+DEAL_II_NAMESPACE_CLOSE

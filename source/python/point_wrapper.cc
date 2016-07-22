@@ -16,7 +16,9 @@
 #include <deal.II/python/point_wrapper.h>
 #include <deal.II/base/point.h>
 
-namespace PyDealII
+DEAL_II_NAMESPACE_OPEN
+
+namespace python
 {
   PointWrapper::PointWrapper()
     :
@@ -29,15 +31,15 @@ namespace PyDealII
   {
     dim = boost::python::len(coord);
     if (dim == 2)
-      point = new dealii::Point<2> (boost::python::extract<double>(coord[0]),
-                                    boost::python::extract<double>(coord[1]));
+      point = new Point<2> (boost::python::extract<double>(coord[0]),
+                            boost::python::extract<double>(coord[1]));
     else if (dim == 3)
-      point = new dealii::Point<3> (boost::python::extract<double>(coord[0]),
-                                    boost::python::extract<double>(coord[1]),
-                                    boost::python::extract<double>(coord[2]));
+      point = new Point<3> (boost::python::extract<double>(coord[0]),
+                            boost::python::extract<double>(coord[1]),
+                            boost::python::extract<double>(coord[2]));
     else
       AssertThrow(false,
-                  dealii::ExcMessage("The list of coordinates must contain two or three elements."));
+                  ExcMessage("The list of coordinates must contain two or three elements."));
   }
 
 
@@ -70,9 +72,9 @@ namespace PyDealII
   double PointWrapper::get_x() const
   {
     if (dim == 2)
-      return (*static_cast<dealii::Point<2>*>(point))(0);
+      return (*static_cast<Point<2>*>(point))(0);
     else
-      return (*static_cast<dealii::Point<3>*>(point))(0);
+      return (*static_cast<Point<3>*>(point))(0);
   }
 
 
@@ -80,9 +82,9 @@ namespace PyDealII
   void PointWrapper::set_x(double x)
   {
     if (dim == 2)
-      (*static_cast<dealii::Point<2>*>(point))(0) = x;
+      (*static_cast<Point<2>*>(point))(0) = x;
     else
-      (*static_cast<dealii::Point<3>*>(point))(0) = x;
+      (*static_cast<Point<3>*>(point))(0) = x;
   }
 
 
@@ -90,9 +92,9 @@ namespace PyDealII
   double PointWrapper::get_y() const
   {
     if (dim == 2)
-      return (*static_cast<dealii::Point<2>*>(point))(1);
+      return (*static_cast<Point<2>*>(point))(1);
     else
-      return (*static_cast<dealii::Point<3>*>(point))(1);
+      return (*static_cast<Point<3>*>(point))(1);
   }
 
 
@@ -100,9 +102,9 @@ namespace PyDealII
   void PointWrapper::set_y(double y)
   {
     if (dim == 2)
-      (*static_cast<dealii::Point<2>*>(point))(1) = y;
+      (*static_cast<Point<2>*>(point))(1) = y;
     else
-      (*static_cast<dealii::Point<3>*>(point))(1) = y;
+      (*static_cast<Point<3>*>(point))(1) = y;
   }
 
 
@@ -110,10 +112,10 @@ namespace PyDealII
   double PointWrapper::get_z() const
   {
     if (dim == 3)
-      return (*static_cast<dealii::Point<3>*>(point))(2);
+      return (*static_cast<Point<3>*>(point))(2);
     else
       AssertThrow(false,
-                  dealii::ExcMessage("The z coordinate is only available for three-dimensional points"));
+                  ExcMessage("The z coordinate is only available for three-dimensional points"));
   }
 
 
@@ -121,10 +123,10 @@ namespace PyDealII
   void PointWrapper::set_z(double z)
   {
     if (dim == 3)
-      (*static_cast<dealii::Point<3>*>(point))(2) = z;
+      (*static_cast<Point<3>*>(point))(2) = z;
     else
       AssertThrow(false,
-                  dealii::ExcMessage("The z coordinate is only available for three-dimensional points"));
+                  ExcMessage("The z coordinate is only available for three-dimensional points"));
   }
 
 
@@ -138,12 +140,12 @@ namespace PyDealII
           {
             // We cannot call delete on a void pointer so cast the void pointer back
             // first.
-            dealii::Point<2> *tmp = static_cast<dealii::Point<2>*>(point);
+            Point<2> *tmp = static_cast<Point<2>*>(point);
             delete tmp;
           }
         else
           {
-            dealii::Point<3> *tmp = static_cast<dealii::Point<3>*>(point);
+            Point<3> *tmp = static_cast<Point<3>*>(point);
             delete tmp;
           }
         point = nullptr;
@@ -157,20 +159,22 @@ namespace PyDealII
     dim = other.dim;
 
     AssertThrow(other.point != nullptr,
-                dealii::ExcMessage("Underlying point does not exist."));
+                ExcMessage("Underlying point does not exist."));
 
     if (dim == 2)
       {
-        dealii::Point<2> *other_point = static_cast<dealii::Point<2>*>(other.point);
-        point = new dealii::Point<2> ((*other_point)[0], (*other_point)[1]);
+        Point<2> *other_point = static_cast<Point<2>*>(other.point);
+        point = new Point<2> ((*other_point)[0], (*other_point)[1]);
       }
     else if (dim == 3)
       {
-        dealii::Point<3> *other_point = static_cast<dealii::Point<3>*>(other.point);
-        point = new dealii::Point<3> ((*other_point)[0], (*other_point)[1], (*other_point)[2]);
+        Point<3> *other_point = static_cast<Point<3>*>(other.point);
+        point = new Point<3> ((*other_point)[0], (*other_point)[1], (*other_point)[2]);
       }
     else
       AssertThrow(false,
-                  dealii::ExcMessage("The dimension of the point should be 2 or 3."));
+                  ExcMessage("The dimension of the point should be 2 or 3."));
   }
 }
+
+DEAL_II_NAMESPACE_CLOSE

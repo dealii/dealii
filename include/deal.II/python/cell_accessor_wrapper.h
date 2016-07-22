@@ -18,7 +18,9 @@
 
 #include <deal.II/grid/tria_accessor.h>
 
-namespace PyDealII
+DEAL_II_NAMESPACE_OPEN
+
+namespace python
 {
   class PointWrapper;
   class TriangulationWrapper;
@@ -130,5 +132,7 @@ namespace PyDealII
 
   };
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

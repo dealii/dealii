@@ -17,7 +17,9 @@
 #include <deal.II/python/cell_accessor_wrapper.h>
 #include <deal.II/python/triangulation_wrapper.h>
 
-namespace PyDealII
+DEAL_II_NAMESPACE_OPEN
+
+namespace python
 {
   const char refine_flag_docstring [] =
     "Get/Set the refine_flag of the cell. In 2D, the possibilities are: \n"
@@ -104,3 +106,4 @@ namespace PyDealII
   }
 }
 
+DEAL_II_NAMESPACE_CLOSE
