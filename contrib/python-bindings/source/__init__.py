@@ -13,17 +13,7 @@
 #
 # ---------------------------------------------------------------------
 
-"""This a dummy module that contains a global function and a class."""
+from .PyDealII import *
 
-__all__ = ['Dummy', 'bar']
-
-def bar():
-    """Print bar."""
-    print('bar')
-
-class Dummy:
-    """This a dummy class that has only one member function."""
-    
-    def foo(self):
-        """Print foo."""
-        print('foo')
+__all__ = ['PyDealII']
+__doc__ = PyDealII.__doc__

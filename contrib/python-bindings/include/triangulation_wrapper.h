@@ -16,8 +16,8 @@
 #ifndef dealii__triangulation_wrapper_h
 #define dealii__triangulation_wrapper_h
 
+#include <point_wrapper.h>
 #include <boost/python.hpp>
-#include <deal.II/python/point_wrapper.h>
 #include <string>
 #include <vector>
 

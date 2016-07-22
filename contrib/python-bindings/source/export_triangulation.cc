@@ -13,9 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
+#include <triangulation_wrapper.h>
+#include <cell_accessor_wrapper.h>
 #include <boost/python.hpp>
-#include <deal.II/python/triangulation_wrapper.h>
-#include <deal.II/python/cell_accessor_wrapper.h>
 
 DEAL_II_NAMESPACE_OPEN
 

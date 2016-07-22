@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/python/triangulation_wrapper.h>
-#include <deal.II/python/cell_accessor_wrapper.h>
+#include <triangulation_wrapper.h>
+#include <cell_accessor_wrapper.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>

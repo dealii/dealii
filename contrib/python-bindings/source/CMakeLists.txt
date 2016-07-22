@@ -17,6 +17,13 @@ FIND_LIBRARY(Boost_PYTHON_LIBRARY boost_python PATH ${Boost_LIBRARY_DIRS} NO_DEF
 INCLUDE(FindPythonLibs)
 INCLUDE(FindPythonInterp)
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+INCLUDE_DIRECTORIES(
+  ${CMAKE_BINARY_DIR}/include/
+  ${CMAKE_SOURCE_DIR}/include/
+  ${DEAL_II_BUNDLED_INCLUDE_DIRS}
+  ${DEAL_II_INCLUDE_DIRS}
+  ${CMAKE_SOURCE_DIR}/contrib/python-bindings/include/
+  )
 INCLUDE_DIRECTORIES(SYSTEM ${PYTHON_INCLUDE_DIRS})
 
 SET(_src
@@ -28,11 +35,6 @@ SET(_src
   point_wrapper.cc
   triangulation_wrapper.cc
   )
-
-FILE(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/python/*.h
-  )
-
 
 PYTHON_ADD_MODULE(PyDealII ${_src})
 
@@ -50,14 +52,14 @@ INSTALL(TARGETS PyDealII DESTINATION ${PYTHON_INSTALL_PREFIX}/pydealii)
 
 SET(PYTHON_SOURCES
   __init__.py
-  dummy.py
   )                                                                                                                                                                                                               
+
 FOREACH(PYTHON_SOURCE ${PYTHON_SOURCES})                                                                                                                                                                            
   ADD_CUSTOM_COMMAND(                                                                                                                                                                                             
     OUTPUT ${CMAKE_BINARY_DIR}/python/pydealii/${PYTHON_SOURCE}                                                                                                                                                    
-    DEPENDS ${CMAKE_SOURCE_DIR}/source/python/${PYTHON_SOURCE}                                                                                                                                                  
+    DEPENDS ${CMAKE_SOURCE_DIR}/contrib/python-bindings/source/${PYTHON_SOURCE}
     COMMAND ${CMAKE_COMMAND}                                                                                                                                                                                    
-    ARGS -E copy ${CMAKE_SOURCE_DIR}/source/python/${PYTHON_SOURCE} ${CMAKE_BINARY_DIR}/python/pydealii/${PYTHON_SOURCE}                                                                                           
+    ARGS -E copy ${CMAKE_SOURCE_DIR}/contrib/python-bindings/source/${PYTHON_SOURCE} ${CMAKE_BINARY_DIR}/python/pydealii/${PYTHON_SOURCE}
     COMMENT "Copying ${PYTHON_SOURCE}"                                                                                                                                                                          
     )                                                                                                                                                                                                           
   ADD_CUSTOM_TARGET(                                                                                                                                                                                              
