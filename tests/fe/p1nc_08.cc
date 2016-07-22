@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 by the deal.II authors
+// Copyright (C) 2015 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,7 @@
 
 
 
-// check the P1NC nonparametric element's gradient on a genuine quadrilateral.
+// check the P1NC element's gradient on a genuine quadrilateral.
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
