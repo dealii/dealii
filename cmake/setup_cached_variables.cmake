@@ -25,6 +25,7 @@
 #     DEAL_II_COMPONENT_DOCUMENTATION
 #     DEAL_II_COMPONENT_EXAMPLES
 #     DEAL_II_COMPONENT_PACKAGE
+#     DEAL_II_COMPONENT_PYTHON_BINDINGS
 #     DEAL_II_FORCE_AUTODETECTION
 #
 # Options regarding compilation and linking:
@@ -90,6 +91,12 @@ OPTION(DEAL_II_COMPONENT_PACKAGE
   OFF
   )
 LIST(APPEND DEAL_II_COMPONENTS PACKAGE)
+
+OPTION(DEAL_II_COMPONENT_PYTHON_BINDINGS
+  "Enable configuration and installation of the python bindings. This adds a COMPONENT \"PYTHON_BINDINGS\" to the build system."
+  OFF
+  )
+LIST(APPEND DEAL_II_COMPONENTS PYTHON_BINDINGS)
 
 OPTION(DEAL_II_ALLOW_AUTODETECTION
   "Allow to automatically set up features by setting all undefined DEAL_II_WITH_* variables to ON or OFF"
