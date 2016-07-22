@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 by the deal.II authors
+// Copyright (C) 2015 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,7 @@
 
 
 
-// check the P1NC nonparametric element on a square
+// check the P1NC element on a square
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
