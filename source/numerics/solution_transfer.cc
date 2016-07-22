@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2015 by the deal.II authors
+// Copyright (C) 1999 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,10 +15,11 @@
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/grid/tria_accessor.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
+#include <deal.II/distributed/tria.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
@@ -35,12 +36,22 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template<int dim, typename VectorType, typename DoFHandlerType>
-SolutionTransfer<dim, VectorType, DoFHandlerType>::SolutionTransfer(const DoFHandlerType &dof)
+SolutionTransfer<dim, VectorType, DoFHandlerType>::
+SolutionTransfer(const DoFHandlerType &dof)
   :
   dof_handler(&dof, typeid(*this).name()),
   n_dofs_old(0),
   prepared_for(none)
-{}
+{
+  Assert ((dynamic_cast<const parallel::distributed::Triangulation<DoFHandlerType::dimension, DoFHandlerType::space_dimension>*>
+           (&dof_handler->get_tria())
+           == 0),
+          ExcMessage ("You are calling the dealii::SolutionTransfer class "
+                      "with a DoF handler that is built on a "
+                      "parallel::distributed::Triangulation. This will not "
+                      "work for parallel computations. You probably want to "
+                      "use the parallel::distributed::SolutionTransfer class."));
+}
 
 
 
