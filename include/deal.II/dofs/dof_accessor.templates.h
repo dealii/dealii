@@ -2302,6 +2302,24 @@ DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::get_dof_indices
 
 template <template <int, int> class DoFHandlerType, int spacedim, bool level_dof_access>
 inline
+void
+DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::
+get_mg_dof_indices (const int,
+                    std::vector<types::global_dof_index> &dof_indices,
+                    const unsigned int fe_index) const
+{
+  Assert (this->dof_handler != 0, ExcInvalidObject ());
+  Assert (dof_indices.size () ==
+          this->dof_handler->get_fe ()[fe_index].dofs_per_vertex,
+          ExcVectorDoesNotMatch ());
+
+  Assert (false, ExcNotImplemented());
+}
+
+
+
+template <template <int, int> class DoFHandlerType, int spacedim, bool level_dof_access>
+inline
 types::global_dof_index
 DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::
 vertex_dof_index (const unsigned int vertex,
