@@ -179,25 +179,65 @@ namespace Patterns
 
 
 
-  std::string Integer::description () const
+  std::string Integer::description (const OutputStyle style) const
   {
-    // check whether valid bounds
-    // were specified, and if so
-    // output their values
-    if (lower_bound <= upper_bound)
+    switch (style)
       {
-        std::ostringstream description;
+      case Machine:
+      {
+        // check whether valid bounds
+        // were specified, and if so
+        // output their values
+        if (lower_bound <= upper_bound)
+          {
+            std::ostringstream description;
 
-        description << description_init
-                    <<" range "
-                    << lower_bound << "..." << upper_bound
-                    << " (inclusive)]";
-        return description.str();
+            description << description_init
+                        <<" range "
+                        << lower_bound << "..." << upper_bound
+                        << " (inclusive)]";
+            return description.str();
+          }
+        else
+          // if no bounds were given, then
+          // return generic string
+          return "[Integer]";
       }
-    else
-      // if no bounds were given, then
-      // return generic string
-      return "[Integer]";
+      case Text:
+      {
+        if (lower_bound <= upper_bound)
+          {
+            std::ostringstream description;
+
+            description << "An integer n such that "
+                        << lower_bound << " <= n <= " << upper_bound;
+
+            return description.str();
+          }
+        else
+          return "An integer";
+      }
+      case LaTeX:
+      {
+        if (lower_bound <= upper_bound)
+          {
+            std::ostringstream description;
+
+            description << "An integer $n$ such that $"
+                        << lower_bound << "\\leq n \\leq " << upper_bound
+                        << "$";
+
+            return description.str();
+          }
+        else
+          return "An integer";
+      }
+      default:
+        AssertThrow(false, ExcNotImplemented());
+      }
+    // Should never occur without an exception, but prevent compiler from
+    // complaining
+    return "";
   }
 
 
@@ -278,34 +318,90 @@ namespace Patterns
 
 
 
-  std::string Double::description () const
+  std::string Double::description (const OutputStyle style) const
   {
-    std::ostringstream description;
+    switch (style)
+      {
+      case Machine:
+      {
+        std::ostringstream description;
 
-    if (lower_bound <= upper_bound)
-      {
-        // bounds are valid
-        description << description_init << " ";
-        // We really want to compare with ==, but -Wfloat-equal would create
-        // a warning here, so work around it.
-        if (0==std::memcmp(&lower_bound, &min_double_value, sizeof(lower_bound)))
-          description << "-MAX_DOUBLE";
+        if (lower_bound <= upper_bound)
+          {
+            // bounds are valid
+            description << description_init << " ";
+            // We really want to compare with ==, but -Wfloat-equal would create
+            // a warning here, so work around it.
+            if (0==std::memcmp(&lower_bound, &min_double_value, sizeof(lower_bound)))
+              description << "-MAX_DOUBLE";
+            else
+              description << lower_bound;
+            description << "...";
+            if (0==std::memcmp(&upper_bound, &max_double_value, sizeof(upper_bound)))
+              description << "MAX_DOUBLE";
+            else
+              description << upper_bound;
+            description << " (inclusive)]";
+            return description.str();
+          }
         else
-          description << lower_bound;
-        description << "...";
-        if (0==std::memcmp(&upper_bound, &max_double_value, sizeof(upper_bound)))
-          description << "MAX_DOUBLE";
-        else
-          description << upper_bound;
-        description << " (inclusive)]";
-        return description.str();
+          {
+            // invalid bounds, assume unbounded double:
+            description << description_init << "]";
+            return description.str();
+          }
       }
-    else
+      case Text:
       {
-        // invalid bounds, assume unbounded double:
-        description << description_init << "]";
-        return description.str();
+        if (lower_bound <= upper_bound)
+          {
+            std::ostringstream description;
+
+            description << "A floating point number v such that ";
+            if (0==std::memcmp(&lower_bound, &min_double_value, sizeof(lower_bound)))
+              description << "-MAX_DOUBLE";
+            else
+              description << lower_bound;
+            description << " <= v <= ";
+            if (0==std::memcmp(&upper_bound, &max_double_value, sizeof(upper_bound)))
+              description << "MAX_DOUBLE";
+            else
+              description << upper_bound;
+
+            return description.str();
+          }
+        else
+          return "A floating point number";
       }
+      case LaTeX:
+      {
+        if (lower_bound <= upper_bound)
+          {
+            std::ostringstream description;
+
+            description << "A floating point number $v$ such that $";
+            if (0==std::memcmp(&lower_bound, &min_double_value, sizeof(lower_bound)))
+              description << "-\\text{MAX\\_DOUBLE}";
+            else
+              description << lower_bound;
+            description << " \\leq v \\leq ";
+            if (0==std::memcmp(&upper_bound, &max_double_value, sizeof(upper_bound)))
+              description << "\\text{MAX\\_DOUBLE}";
+            else
+              description << upper_bound;
+            description << "$";
+
+            return description.str();
+          }
+        else
+          return "A floating point number";
+      }
+      default:
+        AssertThrow(false, ExcNotImplemented());
+      }
+    // Should never occur without an exception, but prevent compiler from
+    // complaining
+    return "";
   }
 
 
@@ -392,16 +488,37 @@ namespace Patterns
 
 
 
-  std::string Selection::description () const
+  std::string Selection::description (const OutputStyle style) const
   {
-    std::ostringstream description;
+    switch (style)
+      {
+      case Machine:
+      {
+        std::ostringstream description;
 
-    description << description_init
-                << " "
-                << sequence
-                << " ]";
+        description << description_init
+                    << " "
+                    << sequence
+                    << " ]";
 
-    return description.str();
+        return description.str();
+      }
+      case Text:
+      case LaTeX:
+      {
+        std::ostringstream description;
+
+        description << "Any one of "
+                    << Utilities::replace_in_string(sequence,"|",", ");
+
+        return description.str();
+      }
+      default:
+        AssertThrow(false, ExcNotImplemented());
+      }
+    // Should never occur without an exception, but prevent compiler from
+    // complaining
+    return "";
   }
 
 
@@ -516,19 +633,46 @@ namespace Patterns
 
 
 
-  std::string List::description () const
+  std::string List::description (const OutputStyle style) const
   {
-    std::ostringstream description;
+    switch (style)
+      {
+      case Machine:
+      {
+        std::ostringstream description;
 
-    description << description_init
-                << " list of <" << pattern->description() << ">"
-                << " of length " << min_elements << "..." << max_elements
-                << " (inclusive)";
-    if (separator != ",")
-      description << " separated by <" << separator << ">";
-    description << "]";
+        description << description_init
+                    << " list of <" << pattern->description(style) << ">"
+                    << " of length " << min_elements << "..." << max_elements
+                    << " (inclusive)";
+        if (separator != ",")
+          description << " separated by <" << separator << ">";
+        description << "]";
 
-    return description.str();
+        return description.str();
+      }
+      case Text:
+      case LaTeX:
+      {
+        std::ostringstream description;
+
+        description << "A list of "
+                    << min_elements << " to " << max_elements
+                    << " elements ";
+        if (separator != ",")
+          description << "separated by <" << separator << "> ";
+        description  << "where each element is ["
+                     << pattern->description(style)
+                     << "]";
+
+        return description.str();
+      }
+      default:
+        AssertThrow(false, ExcNotImplemented());
+      }
+    // Should never occur without an exception, but prevent compiler from
+    // complaining
+    return "";
   }
 
 
@@ -693,21 +837,51 @@ namespace Patterns
 
 
 
-  std::string Map::description () const
+  std::string Map::description (const OutputStyle style) const
   {
-    std::ostringstream description;
+    switch (style)
+      {
+      case Machine:
+      {
+        std::ostringstream description;
 
-    description << description_init
-                << " map of <"
-                << key_pattern->description() << ":"
-                << value_pattern->description() << ">"
-                << " of length " << min_elements << "..." << max_elements
-                << " (inclusive)";
-    if (separator != ",")
-      description << " separated by <" << separator << ">";
-    description << "]";
+        description << description_init
+                    << " map of <"
+                    << key_pattern->description(style) << ":"
+                    << value_pattern->description(style) << ">"
+                    << " of length " << min_elements << "..." << max_elements
+                    << " (inclusive)";
+        if (separator != ",")
+          description << " separated by <" << separator << ">";
+        description << "]";
 
-    return description.str();
+        return description.str();
+      }
+      case Text:
+      case LaTeX:
+      {
+        std::ostringstream description;
+
+        description << "A key-value map of "
+                    << min_elements << " to " << max_elements
+                    << " elements ";
+        if (separator != ",")
+          description << " separated by <" << separator << "> ";
+        description << " where each key is ["
+                    << key_pattern->description(style)
+                    << "]"
+                    << " and each value is ["
+                    << value_pattern->description(style)
+                    << "]";
+
+        return description.str();
+      }
+      default:
+        AssertThrow(false, ExcNotImplemented());
+      }
+    // Should never occur without an exception, but prevent compiler from
+    // complaining
+    return "";
   }
 
 
@@ -859,16 +1033,37 @@ namespace Patterns
 
 
 
-  std::string MultipleSelection::description () const
+  std::string MultipleSelection::description (const OutputStyle style) const
   {
-    std::ostringstream description;
+    switch (style)
+      {
+      case Machine:
+      {
+        std::ostringstream description;
 
-    description << description_init
-                << " "
-                << sequence
-                << " ]";
+        description << description_init
+                    << " "
+                    << sequence
+                    << " ]";
 
-    return description.str();
+        return description.str();
+      }
+      case Text:
+      case LaTeX:
+      {
+        std::ostringstream description;
+
+        description << "A comma-separated list of any of "
+                    << Utilities::replace_in_string(sequence,"|",", ");
+
+        return description.str();
+      }
+      default:
+        AssertThrow(false, ExcNotImplemented());
+      }
+    // Should never occur without an exception, but prevent compiler from
+    // complaining
+    return "";
   }
 
 
@@ -916,14 +1111,30 @@ namespace Patterns
 
 
 
-  std::string Bool::description () const
+  std::string Bool::description (const OutputStyle style) const
   {
-    std::ostringstream description;
+    switch (style)
+      {
+      case Machine:
+      {
+        std::ostringstream description;
 
-    description << description_init
-                << "]";
+        description << description_init
+                    << "]";
 
-    return description.str();
+        return description.str();
+      }
+      case Text:
+      case LaTeX:
+      {
+        return "A boolean value (true or false)";
+      }
+      default:
+        AssertThrow(false, ExcNotImplemented());
+      }
+    // Should never occur without an exception, but prevent compiler from
+    // complaining
+    return "";
   }
 
 
@@ -961,14 +1172,30 @@ namespace Patterns
 
 
 
-  std::string Anything::description () const
+  std::string Anything::description (const OutputStyle style) const
   {
-    std::ostringstream description;
+    switch (style)
+      {
+      case Machine:
+      {
+        std::ostringstream description;
 
-    description << description_init
-                << "]";
+        description << description_init
+                    << "]";
 
-    return description.str();
+        return description.str();
+      }
+      case Text:
+      case LaTeX:
+      {
+        return "Any string";
+      }
+      default:
+        AssertThrow(false, ExcNotImplemented());
+      }
+    // Should never occur without an exception, but prevent compiler from
+    // complaining
+    return "";
   }
 
 
@@ -1007,18 +1234,37 @@ namespace Patterns
 
 
 
-  std::string FileName::description () const
+  std::string FileName::description (const OutputStyle style) const
   {
-    std::ostringstream description;
+    switch (style)
+      {
+      case Machine:
+      {
+        std::ostringstream description;
 
-    description << description_init;
+        description << description_init;
 
-    if (file_type == input)
-      description << " (Type: input)]";
-    else
-      description << " (Type: output)]";
+        if (file_type == input)
+          description << " (Type: input)]";
+        else
+          description << " (Type: output)]";
 
-    return description.str();
+        return description.str();
+      }
+      case Text:
+      case LaTeX:
+      {
+        if (file_type == input)
+          return "an input filename";
+        else
+          return "an output filename";
+      }
+      default:
+        AssertThrow(false, ExcNotImplemented());
+      }
+    // Should never occur without an exception, but prevent compiler from
+    // complaining
+    return "";
   }
 
 
@@ -1071,13 +1317,29 @@ namespace Patterns
 
 
 
-  std::string DirectoryName::description () const
+  std::string DirectoryName::description (const OutputStyle style) const
   {
-    std::ostringstream description;
+    switch (style)
+      {
+      case Machine:
+      {
+        std::ostringstream description;
 
-    description << description_init << "]";
+        description << description_init << "]";
 
-    return description.str();
+        return description.str();
+      }
+      case Text:
+      case LaTeX:
+      {
+        return "A directory name";
+      }
+      default:
+        AssertThrow(false, ExcNotImplemented());
+      }
+    // Should never occur without an exception, but prevent compiler from
+    // complaining
+    return "";
   }
 
 
@@ -2274,8 +2536,10 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                       << std::endl;
 
                 // also output possible values
+                const unsigned int pattern_index = p->second.get<unsigned int> ("pattern");
+                const std::string desc_str = patterns[pattern_index]->description (Patterns::PatternBase::LaTeX);
                 out << "{\\it Possible values:} "
-                    << p->second.get<std::string> ("pattern_description")
+                    << desc_str
                     << std::endl;
               }
             else if (is_alias_node (p->second) == true)
@@ -2358,9 +2622,10 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                 << " = ";
 
             // print possible values:
+            const unsigned int pattern_index = p->second.get<unsigned int> ("pattern");
+            const std::string full_desc_str = patterns[pattern_index]->description (Patterns::PatternBase::Text);
             const std::vector<std::string> description_str
-              = Utilities::break_text_into_lines (p->second.get<std::string>
-                                                  ("pattern_description"),
+              = Utilities::break_text_into_lines (full_desc_str,
                                                   78 - overall_indent_level*2 - 2, '|');
             if (description_str.size() > 1)
               {

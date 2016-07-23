@@ -150,6 +150,12 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li> Improved: Split out pattern descriptions for LaTeX and Description
+ ParameterHandler OutputStyles, and add better description text.
+ <br>
+ (Jonathan Robey, 2016/07/21)
+ </li>
+
  <li> New: Added GridGenerator::quarter_hyper_ball() to generate the 
  intersection of a hyper ball with the positive orthant relative
  to its center.
