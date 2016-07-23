@@ -1179,20 +1179,6 @@ namespace MGTools
   }
 
 
-
-  template <>
-  void
-  make_boundary_list(
-    const DoFHandler<1,2> &,
-    const FunctionMap<1>::type &,
-    std::vector<std::set<types::global_dof_index> > &,
-    const ComponentMask &)
-  {
-    Assert(false, ExcNotImplemented());
-  }
-
-
-
   template <int dim, int spacedim>
   void
   make_boundary_list(
@@ -1201,21 +1187,75 @@ namespace MGTools
     std::vector<std::set<types::global_dof_index> > &boundary_indices,
     const ComponentMask &component_mask)
   {
-    // if for whatever reason we were
-    // passed an empty map, return
-    // immediately
-    if (function_map.size() == 0)
+    Assert (boundary_indices.size() == dof.get_triangulation().n_global_levels(),
+            ExcDimensionMismatch (boundary_indices.size(),
+                                  dof.get_triangulation().n_global_levels()));
+
+    std::set<types::boundary_id> boundary_ids;
+    typename std::map<types::boundary_id, const Function<dim>* >::const_iterator it
+      = function_map.begin();
+    for (; it!=function_map.end(); ++it)
+      boundary_ids.insert(it->first);
+
+    std::vector<IndexSet>  boundary_indexset;
+    make_boundary_list(dof, boundary_ids, boundary_indexset, component_mask);
+    for (unsigned int i=0; i<dof.get_triangulation().n_global_levels(); ++i)
+      boundary_indices[i].insert(boundary_indexset[i].begin(),
+                                 boundary_indexset[i].end());
+  }
+
+
+  template <int dim, int spacedim>
+  void
+  make_boundary_list(const DoFHandler<dim,spacedim> &dof,
+                     const typename FunctionMap<dim>::type &function_map,
+                     std::vector<IndexSet> &boundary_indices,
+                     const ComponentMask &component_mask)
+  {
+    Assert (boundary_indices.size() == dof.get_triangulation().n_global_levels(),
+            ExcDimensionMismatch (boundary_indices.size(),
+                                  dof.get_triangulation().n_global_levels()));
+
+    std::set<types::boundary_id> boundary_ids;
+    typename std::map<types::boundary_id, const Function<dim>* >::const_iterator it = function_map.begin();
+    for (; it!=function_map.end(); ++it)
+      boundary_ids.insert(it->first);
+
+    make_boundary_list (dof, boundary_ids, boundary_indices, component_mask);
+  }
+
+
+  template <>
+  void
+  make_boundary_list(
+    const DoFHandler<1,1> &,
+    const std::set<types::boundary_id> &,
+    std::vector<IndexSet> &,
+    const ComponentMask &)
+  {
+    Assert(false, ExcNotImplemented());
+  }
+
+
+  template <int dim, int spacedim>
+  void
+  make_boundary_list(const DoFHandler<dim,spacedim> &dof,
+                     const std::set<types::boundary_id> &boundary_ids,
+                     std::vector<IndexSet> &boundary_indices,
+                     const ComponentMask &component_mask)
+  {
+    boundary_indices.resize(dof.get_triangulation().n_global_levels());
+
+    // if for whatever reason we were passed an empty set, return immediately
+    if (boundary_ids.size() == 0)
       return;
 
-    const unsigned int n_levels = dof.get_triangulation().n_global_levels();
-
-    (void)n_levels;
-
+    for (unsigned int i=0; i<dof.get_triangulation().n_global_levels(); ++i)
+      if (boundary_indices[i].size() == 0)
+        boundary_indices[i] = IndexSet (dof.n_dofs(i));
 
     const unsigned int n_components = DoFTools::n_components(dof);
-    const bool          fe_is_system = (n_components != 1);
-
-    AssertDimension (boundary_indices.size(), n_levels);
+    const bool         fe_is_system = (n_components != 1);
 
     std::vector<types::global_dof_index> local_dofs;
     local_dofs.reserve (DoFTools::max_dofs_per_face(dof));
@@ -1223,9 +1263,7 @@ namespace MGTools
                local_dofs.end (),
                DoFHandler<dim,spacedim>::invalid_dof_index);
 
-    // First, deal with the simpler
-    // case when we have to identify
-    // all boundary dofs
+    // First, deal with the simpler case when we have to identify all boundary dofs
     if (component_mask.n_selected_components(n_components) == n_components)
       {
         typename DoFHandler<dim,spacedim>::cell_iterator
@@ -1247,13 +1285,11 @@ namespace MGTools
                   const typename DoFHandler<dim,spacedim>::face_iterator
                   face = cell->face(face_no);
                   const types::boundary_id bi = face->boundary_id();
-                  // Face is listed in
-                  // boundary map
-                  if (function_map.find(bi) != function_map.end())
+                  // Face is listed in boundary map
+                  if (boundary_ids.find(bi) != boundary_ids.end())
                     {
                       face->get_mg_dof_indices(level, local_dofs);
-                      for (unsigned int i=0; i<fe.dofs_per_face; ++i)
-                        boundary_indices[level].insert(local_dofs[i]);
+                      boundary_indices[level].add_indices(local_dofs.begin(), local_dofs.end());
                     }
                 }
           }
@@ -1278,156 +1314,67 @@ namespace MGTools
                 const FiniteElement<dim> &fe = cell->get_fe();
                 const unsigned int level = cell->level();
 
-                // we can presently deal only with
-                // primitive elements for boundary
-                // values. this does not preclude
-                // us using non-primitive elements
-                // in components that we aren't
-                // interested in, however. make
-                // sure that all shape functions
-                // that are non-zero for the
-                // components we are interested in,
-                // are in fact primitive
-                for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
-                  {
-                    const ComponentMask &nonzero_component_array
-                      = cell->get_fe().get_nonzero_components (i);
-                    for (unsigned int c=0; c<n_components; ++c)
-                      if ((nonzero_component_array[c] == true)
-                          &&
-                          (component_mask[c] == true))
-                        Assert (cell->get_fe().is_primitive (i),
-                                ExcMessage ("This function can only deal with requested boundary "
-                                            "values that correspond to primitive (scalar) base "
-                                            "elements"));
-                  }
-
                 typename DoFHandler<dim,spacedim>::face_iterator face = cell->face(face_no);
                 const types::boundary_id boundary_component = face->boundary_id();
-                if (function_map.find(boundary_component) != function_map.end())
-                  // face is of the right component
+                if (boundary_ids.find(boundary_component) != boundary_ids.end())
+                  // we want to constrain this boundary
                   {
-                    // get indices, physical location and
-                    // boundary values of dofs on this
-                    // face
+
+                    for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
+                      {
+                        const ComponentMask &nonzero_component_array
+                          = cell->get_fe().get_nonzero_components (i);
+                        // if we want to constrain one of the nonzero components,
+                        // we have to constrain all of them
+
+                        bool selected = false;
+                        for (unsigned int c=0; c<n_components; ++c)
+                          if (nonzero_component_array[c] == true
+                              && component_mask[c]== true)
+                            {
+                              selected = true;
+                              break;
+                            }
+                        if (selected)
+                          for (unsigned int c=0; c<n_components; ++c)
+                            Assert (nonzero_component_array[c] == false || component_mask[c] == true,
+                                    ExcMessage ("You are using a non-primitive FiniteElement "
+                                                "and try to constrain just some of its components!"));
+                      }
+
+                    // get indices, physical location and boundary values of dofs on this face
                     local_dofs.resize (fe.dofs_per_face);
                     face->get_mg_dof_indices (level, local_dofs);
                     if (fe_is_system)
                       {
-                        // enter those dofs
-                        // into the list that
-                        // match the
-                        // component
-                        // signature. avoid
-                        // the usual
-                        // complication that
-                        // we can't just use
-                        // *_system_to_component_index
-                        // for non-primitive
-                        // FEs
                         for (unsigned int i=0; i<local_dofs.size(); ++i)
                           {
-                            unsigned int component;
+                            unsigned int component = numbers::invalid_unsigned_int;
                             if (fe.is_primitive())
                               component = fe.face_system_to_component_index(i).first;
                             else
                               {
-                                // non-primitive
-                                // case. make
-                                // sure that
-                                // this
-                                // particular
-                                // shape
-                                // function
-                                // _is_
-                                // primitive,
-                                // and get at
-                                // it's
-                                // component. use
-                                // usual
-                                // trick to
-                                // transfer
-                                // face dof
-                                // index to
-                                // cell dof
-                                // index
-                                const unsigned int cell_i
-                                  = (dim == 1 ?
-                                     i
-                                     :
-                                     (dim == 2 ?
-                                      (i<2*fe.dofs_per_vertex ? i : i+2*fe.dofs_per_vertex)
-                                      :
-                                      (dim == 3 ?
-                                       (i<4*fe.dofs_per_vertex ?
-                                        i
-                                        :
-                                        (i<4*fe.dofs_per_vertex+4*fe.dofs_per_line ?
-                                         i+4*fe.dofs_per_vertex
-                                         :
-                                         i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
-                                       :
-                                       numbers::invalid_unsigned_int)));
-                                Assert (cell_i < fe.dofs_per_cell, ExcInternalError());
-
-                                // make sure
-                                // that if
-                                // this is
-                                // not a
-                                // primitive
-                                // shape function,
-                                // then all
-                                // the
-                                // corresponding
-                                // components
-                                // in the
-                                // mask are
-                                // not set
-//                         if (!fe.is_primitive(cell_i))
-//                           for (unsigned int c=0; c<n_components; ++c)
-//                             if (fe.get_nonzero_components(cell_i)[c])
-//                               Assert (component_mask[c] == false,
-//                                       ExcFENotPrimitive());
-
-// let's pick the first of possibly more than one non-zero
-// components. if shape function is non-primitive, then we will ignore
-// the result in the following anyway, otherwise there's only one
-// non-zero component which we will use
-                                component = fe.get_nonzero_components(cell_i).first_selected_component();
+                                // Just pick the first of the components
+                                // We already know that either all or none
+                                // of the components are selected
+                                const ComponentMask &nonzero_component_array
+                                  = cell->get_fe().get_nonzero_components (i);
+                                for (unsigned int c=0; c<n_components; ++c)
+                                  if (nonzero_component_array[c] == true)
+                                    {
+                                      component = c;
+                                      break;
+                                    }
                               }
-
+                            Assert(component!=numbers::invalid_unsigned_int, ExcInternalError());
                             if (component_mask[component] == true)
-                              boundary_indices[level].insert(local_dofs[i]);
+                              boundary_indices[level].add_index(local_dofs[i]);
                           }
                       }
                     else
-                      for (unsigned int i=0; i<local_dofs.size(); ++i)
-                        boundary_indices[level].insert(local_dofs[i]);
+                      boundary_indices[level].add_indices(local_dofs.begin(), local_dofs.end());
                   }
               }
-      }
-  }
-
-
-  template <int dim, int spacedim>
-  void
-  make_boundary_list(const DoFHandler<dim,spacedim> &dof,
-                     const typename FunctionMap<dim>::type &function_map,
-                     std::vector<IndexSet> &boundary_indices,
-                     const ComponentMask &component_mask)
-  {
-    Assert (boundary_indices.size() == dof.get_triangulation().n_global_levels(),
-            ExcDimensionMismatch (boundary_indices.size(),
-                                  dof.get_triangulation().n_global_levels()));
-
-    std::vector<std::set<types::global_dof_index> >
-    my_boundary_indices (dof.get_triangulation().n_global_levels());
-    make_boundary_list (dof, function_map, my_boundary_indices, component_mask);
-    for (unsigned int i=0; i<dof.get_triangulation().n_global_levels(); ++i)
-      {
-        boundary_indices[i] = IndexSet (dof.n_dofs(i));
-        boundary_indices[i].add_indices (my_boundary_indices[i].begin(),
-                                         my_boundary_indices[i].end());
       }
   }
 

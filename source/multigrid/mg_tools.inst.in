@@ -102,6 +102,13 @@ for (deal_II_dimension : DIMENSIONS)
 	std::vector<IndexSet>&,
 	const ComponentMask &);
 
+    template void  make_boundary_list(
+        const DoFHandler<deal_II_dimension> &,
+        const std::set<types::boundary_id> &,
+        std::vector<IndexSet> &,
+        const ComponentMask &);
+
+
       template
 	void
 	extract_inner_interface_dofs (const DoFHandler<deal_II_dimension> &mg_dof_handler,
