@@ -151,6 +151,8 @@ namespace FETools
                                      block_indices);
     }
 
+
+
     template <int dim, int spacedim>
     FiniteElementData<dim>
     multiply_dof_numbers (const FiniteElement<dim,spacedim> *fe1,
@@ -179,6 +181,8 @@ namespace FETools
       mult.push_back(N5);
       return multiply_dof_numbers(fes, mult);
     }
+
+
 
     template <int dim, int spacedim>
     std::vector<bool>
@@ -530,6 +534,7 @@ namespace FETools
     }
 
 
+
     /**
      * Compute the non-zero vector components of a composed finite element.
      */
@@ -568,6 +573,8 @@ namespace FETools
       return compute_nonzero_components (fe_list, multiplicities,
                                          do_tensor_product);
     }
+
+
 
     template <int dim, int spacedim>
     void
@@ -762,6 +769,8 @@ namespace FETools
           }
     }
 
+
+
     template <int dim, int spacedim>
     void
     build_face_tables(std::vector< std::pair< std::pair< unsigned int, unsigned int >, unsigned int > > &face_system_to_base_table,
@@ -922,6 +931,7 @@ namespace FETools
   }
 
 
+
   // Not implemented in the general case.
   template <class FE>
   FiniteElement<FE::dimension, FE::space_dimension> *
@@ -938,12 +948,14 @@ namespace FETools
   {
     return new FE_Q<1>(quad);
   }
+
   template <>
   FiniteElement<2, 2> *
   FEFactory<FE_Q<2, 2> >::get (const Quadrature<1> &quad) const
   {
     return new FE_Q<2>(quad);
   }
+
   template <>
   FiniteElement<3, 3> *
   FEFactory<FE_Q<3, 3> >::get (const Quadrature<1> &quad) const
@@ -958,12 +970,14 @@ namespace FETools
   {
     return new FE_Q_DG0<1>(quad);
   }
+
   template <>
   FiniteElement<2, 2> *
   FEFactory<FE_Q_DG0<2, 2> >::get (const Quadrature<1> &quad) const
   {
     return new FE_Q_DG0<2>(quad);
   }
+
   template <>
   FiniteElement<3, 3> *
   FEFactory<FE_Q_DG0<3, 3> >::get (const Quadrature<1> &quad) const
@@ -978,19 +992,20 @@ namespace FETools
   {
     return new FE_Q_Bubbles<1>(quad);
   }
+
   template <>
   FiniteElement<2, 2> *
   FEFactory<FE_Q_Bubbles<2, 2> >::get (const Quadrature<1> &quad) const
   {
     return new FE_Q_Bubbles<2>(quad);
   }
+
   template <>
   FiniteElement<3, 3> *
   FEFactory<FE_Q_Bubbles<3, 3> >::get (const Quadrature<1> &quad) const
   {
     return new FE_Q_Bubbles<3>(quad);
   }
-
 
   // Specializations for FE_DGQArbitraryNodes.
   template <>
@@ -999,24 +1014,28 @@ namespace FETools
   {
     return new FE_DGQArbitraryNodes<1>(quad);
   }
+
   template <>
   FiniteElement<1, 2> *
   FEFactory<FE_DGQ<1, 2> >::get (const Quadrature<1> &quad) const
   {
     return new FE_DGQArbitraryNodes<1, 2>(quad);
   }
+
   template <>
   FiniteElement<1, 3> *
   FEFactory<FE_DGQ<1, 3> >::get (const Quadrature<1> &quad) const
   {
     return new FE_DGQArbitraryNodes<1, 3>(quad);
   }
+
   template <>
   FiniteElement<2, 2> *
   FEFactory<FE_DGQ<2> >::get (const Quadrature<1> &quad) const
   {
     return new FE_DGQArbitraryNodes<2>(quad);
   }
+
   template <>
   FiniteElement<2, 3> *
   FEFactory<FE_DGQ<2, 3> >::get (const Quadrature<1> &quad) const
@@ -1093,6 +1112,8 @@ namespace
     result["FE_RannacherTurek"]
       = FEFactoryPointer(new FETools::FEFactory<FE_RannacherTurek<dim> >);
   }
+
+
 
   // This function fills a map from names to finite elements for any
   // dimension and codimension for those elements which support
@@ -1222,6 +1243,7 @@ namespace
   }
 
 
+
   template <int dim, typename number, int spacedim>
   inline
   void gim_forwarder (const FiniteElement<dim,spacedim> &fe1,
@@ -1288,6 +1310,7 @@ namespace FETools
   template <int dim, int spacedim>
   FEFactoryBase<dim,spacedim>::~FEFactoryBase()
   {}
+
 
 
   template<int dim, int spacedim>
@@ -1579,6 +1602,7 @@ namespace FETools
   }
 
 
+
   template<int dim, int spacedim>
   void
   compute_node_matrix(
@@ -1714,6 +1738,7 @@ namespace FETools
     }
 
 
+
     template<int dim, typename number, int spacedim>
     void
     compute_embedding_matrices_for_refinement_case (
@@ -1835,6 +1860,7 @@ namespace FETools
               ExcInternalError ());
     }
   }
+
 
 
   template <int dim, typename number, int spacedim>
@@ -2520,6 +2546,13 @@ namespace FETools
 
 
 
+  template <int dim>
+  FiniteElement<dim> *
+  get_fe_from_name (const std::string &parameter_name)
+  {
+    return get_fe_by_name<dim,dim> (parameter_name);
+  }
+
 
 
   template <int dim, int spacedim>
@@ -2611,12 +2644,14 @@ namespace FETools
   }
 
 
+
   template <int dim>
   FiniteElement<dim> *
   get_fe_by_name (const std::string &parameter_name)
   {
     return get_fe_by_name<dim,dim> (parameter_name);
   }
+
 
 
   template <int dim, int spacedim>
@@ -3058,6 +3093,8 @@ namespace FETools
     hierarchic_to_lexicographic_numbering<dim> (fe.dofs_per_line+1, h2l);
     return (h2l);
   }
+
+
 
   template <int dim>
   void
