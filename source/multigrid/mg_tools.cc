@@ -1167,17 +1167,6 @@ namespace MGTools
   }
 
 
-  template <>
-  void
-  make_boundary_list(
-    const DoFHandler<1,1> &,
-    const FunctionMap<1>::type &,
-    std::vector<std::set<types::global_dof_index> > &,
-    const ComponentMask &)
-  {
-    Assert(false, ExcNotImplemented());
-  }
-
 
   template <int dim, int spacedim>
   void
@@ -1224,17 +1213,6 @@ namespace MGTools
     make_boundary_list (dof, boundary_ids, boundary_indices, component_mask);
   }
 
-
-  template <>
-  void
-  make_boundary_list(
-    const DoFHandler<1,1> &,
-    const std::set<types::boundary_id> &,
-    std::vector<IndexSet> &,
-    const ComponentMask &)
-  {
-    Assert(false, ExcNotImplemented());
-  }
 
 
   template <int dim, int spacedim>
