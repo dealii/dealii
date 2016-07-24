@@ -906,6 +906,17 @@ public:
   void get_dof_indices (std::vector<types::global_dof_index> &dof_indices,
                         const unsigned int fe_index = AccessorData::default_fe_index) const;
 
+
+  /**
+   * Return the global multilevel indices of the degrees of freedom that live
+   * on the current object with respect to the given level within the
+   * multigrid hierarchy. The indices refer to the local numbering for the
+   * level this line lives on.
+   */
+  void get_mg_dof_indices (const int level,
+                           std::vector<types::global_dof_index> &dof_indices,
+                           const unsigned int fe_index = AccessorData::default_fe_index) const;
+
   /**
    * Global DoF index of the <i>i</i> degree associated with the @p vertexth
    * vertex of the present cell.
