@@ -122,29 +122,21 @@ namespace VectorTools
           {
             if (component_mask[component_index] == true)
               {
-                std::pair<unsigned int, unsigned int> base_index = fe[fe_index].component_to_base_index(component_index);
-
-                AssertThrow ((fe[fe_index].base_element(base_index.first).has_support_points()) ||
-                             (fe[fe_index].base_element(base_index.first).dofs_per_cell == 0),
-                             ExcNonInterpolatingFE());
+                Assert ((fe[fe_index].base_element(fe[fe_index].component_to_base_index(component_index).first).has_support_points()) ||
+                        (fe[fe_index].base_element(fe[fe_index].component_to_base_index(component_index).first).dofs_per_cell == 0),
+                        ExcNonInterpolatingFE());
               }
           }
       }
 
-    // Find the support points on a cell that
-    // are mentioned multiple times, and ony add
-    // each once.
-    // Each multiple point gets to know the dof
-    // index of its representative point by the
-    // dof_to_rep_dof_table.
+    // Find the support points on a cell that are mentioned multiple times, and
+    // only add each once.  Each multiple point gets to know the dof index of
+    // its representative point by the dof_to_rep_dof_table.
 
     // the following vector collects all unit support points p[i],
-    // 0<=i<fe.dofs_per_cell, for that
-    // unit_support_point(i)
-    // is a representative one. i.e.
-    // the following vector collects all rep dofs.
-    // the position of a rep dof within this vector
-    // is called rep index.
+    // 0<=i<fe.dofs_per_cell, for which unit_support_point(i) is unique
+    // (representative). The position of a support point within this vector is
+    // called the rep index.
     std::vector<std::vector<Point<dim> > > rep_unit_support_points (fe.size());
     // the following table converts a dof i
     // to the rep index.
@@ -160,7 +152,7 @@ namespace VectorTools
               = fe[fe_index].system_to_component_index(i).first;
             if (component_mask[component] == true)
               {
-                Point<dim> dof_support_point = fe[fe_index].unit_support_point(i);
+                const Point<dim> dof_support_point = fe[fe_index].unit_support_point(i);
 
                 bool representative=true;
                 // the following loop is looped
