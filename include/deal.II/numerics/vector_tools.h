@@ -2792,7 +2792,8 @@ namespace VectorTools
                     "You are attempting an operation that requires the "
                     "finite element involved to be 'interpolating', i.e., "
                     "it needs to have support points. The finite element "
-                    "you are using here does not appear to have those.");
+                    "you are using here does not appear to have those for "
+                    "the required components.");
 
   /**
    * Exception
