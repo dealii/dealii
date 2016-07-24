@@ -140,6 +140,9 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
       template class FEFactoryBase<deal_II_dimension>;
 
       template FiniteElement<deal_II_dimension> *
+      get_fe_from_name<deal_II_dimension> (const std::string &);
+
+      template FiniteElement<deal_II_dimension> *
       get_fe_by_name<deal_II_dimension> (const std::string &);
 
       template
