@@ -66,13 +66,21 @@ namespace hp
     QCollection (const QCollection<dim> &q_collection);
 
     /**
-     * Adds a new quadrature rule to the QCollection.  The quadrature rules
-     * have to be added in the same order as for the FECollection for which
-     * this quadrature rule collection is meant. Thus the reference to the
-     * quadrature rule for active_fe_index 0 has to be added first, followed
-     * by the quadrature rule for active_fe_index 1.
+     * Adds a new quadrature rule to the QCollection. In most cases, you will
+     * want to add quadrature rules in the same order as the elements were
+     * added to the hp::FECollection for which this quadrature rule collection is
+     * meant. If done this way, the hp::FEValues objects with which you will
+     * use both hp::FECollection and hp::QCollection objects will automatically
+     * choose corresponding elements and quadrature formulas. On the other hand,
+     * it is possible to use arbitrary combinations of elements and quadrature
+     * formulas in hp::FECollection and hp::QCollection objects when specifically
+     * specifying appropriate indices in calls to hp::FEValues::reinit()
+     * or hp::FEFaceValues::reinit(). In those cases, there need not be a
+     * correspondence between elements of the hp::FECollection and
+     * hp::QCollection objects; they need not even be of the same size in this
+     * case.
      *
-     * This class creates a copy of the given quadrature object, i.e. you can
+     * This class creates a copy of the given quadrature object, i.e., you can
      * do things like <tt>push_back(QGauss<dim>(3));</tt>. The internal copy
      * is later destroyed by this object upon destruction of the entire
      * collection.
