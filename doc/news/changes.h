@@ -151,6 +151,13 @@ inconvenience this causes.
 
 <ol>
  <li>
+ Improved: A few of the introductory examples (steps five through eight) no
+ longer use the Function class; they use plain functions instead.
+ <br>
+ (David Wells, 2016/07/25)
+ </li>
+
+ <li>
  Improved: VectorTools::interpolate() may now be used on FESystems with mixed
  interpolating and non-interpolating FEs, if all of the selected components for
  interpolation originate from interpolating FEs.
