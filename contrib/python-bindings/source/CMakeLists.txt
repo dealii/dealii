@@ -24,11 +24,26 @@ INCLUDE(FindPythonInterp)
 # FIXME: Once finalized, reconsider moving this definitions into
 # cmake/setup_dealii.cmake
 #
-# Best effort guess on site-packages location:
+# General information about deal.II:
+#
+#     PYTHON_BINDINGS_BASE_NAME       *)
+#     PYTHON_BINDINGS_DEBUG_NAME      *)
+#     PYTHON_BINDINGS_RELEASE_NAME    *)
+#
+# Information about paths, install locations and names:
+#
+#     DEAL_II_PYTHON_RELDIR           *) **)
+#
+# *)  Can be overwritten by the command line via -D<...>
+# **) We do a best effort guess on site-packages location...
 #
 
-SET(DEAL_II_PYTHON_RELDIR
-  ${DEAL_II_LIBRARY_RELDIR}/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages/pydealii
+SET_IF_EMPTY(PYTHON_BINDINGS_BASE_NAME "PyDealII")
+SET_IF_EMPTY(PYTHON_BINDINGS_DEBUG_NAME "Debug")
+SET_IF_EMPTY(PYTHON_BINDINGS_RELEASE_NAME "Release")
+
+SET_IF_EMPTY(DEAL_II_PYTHON_RELDIR
+  "${DEAL_II_LIBRARY_RELDIR}/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages/${PYTHON_BINDINGS_BASE_NAME}"
   )
 
 INCLUDE_DIRECTORIES(
@@ -62,6 +77,7 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
   PYTHON_ADD_MODULE(PyDealII_${_build_lowercase} ${_src})
 
   SET_TARGET_PROPERTIES(PyDealII_${_build_lowercase} PROPERTIES
+    OUTPUT_NAME "${PYTHON_BINDINGS_${_build}_NAME}"
     VERSION "${DEAL_II_PACKAGE_VERSION}"
     SOVERSION "${DEAL_II_PACKAGE_VERSION}"
     LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
