@@ -195,7 +195,7 @@ namespace MemoryConsumption
    * arrays of strings, etc, where the individual elements may have vastly
    * different sizes.
    */
-  template <typename T, int N>
+  template <typename T, std::size_t N>
   inline
   std::size_t memory_consumption (const std_cxx11::array<T,N> &v);
 
