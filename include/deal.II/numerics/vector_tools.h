@@ -587,7 +587,8 @@ namespace VectorTools
   void interpolate (const Mapping<dim,spacedim>        &mapping,
                     const DoFHandlerType<dim,spacedim> &dof,
                     const Function<spacedim,typename VectorType::value_type>    &function,
-                    VectorType                         &vec);
+                    VectorType                         &vec,
+                    const ComponentMask                &component_mask = ComponentMask());
 
   /**
    * Calls the @p interpolate() function above with
@@ -596,7 +597,8 @@ namespace VectorTools
   template <typename VectorType, typename DoFHandlerType>
   void interpolate (const DoFHandlerType                                   &dof,
                     const Function<DoFHandlerType::space_dimension,typename VectorType::value_type> &function,
-                    VectorType                                             &vec);
+                    VectorType                                             &vec,
+                    const ComponentMask                                    &component_mask = ComponentMask());
 
   /**
    * Interpolate different finite element spaces. The interpolation of vector
