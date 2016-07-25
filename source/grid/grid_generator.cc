@@ -2440,8 +2440,8 @@ namespace GridGenerator
       cells,
       SubCellData());       // no boundary information
 
-    typename Triangulation<dim>::cell_iterator cell = tria.begin();
-    typename Triangulation<dim>::cell_iterator end = tria.end();
+    Triangulation<dim>::cell_iterator cell = tria.begin();
+    Triangulation<dim>::cell_iterator end = tria.end();
 
     while (cell != end)
       {
@@ -3211,8 +3211,8 @@ namespace GridGenerator
       cells,
       SubCellData());       // no boundary information
 
-    typename Triangulation<dim>::cell_iterator cell = tria.begin();
-    typename Triangulation<dim>::cell_iterator end = tria.end();
+    Triangulation<dim>::cell_iterator cell = tria.begin();
+    Triangulation<dim>::cell_iterator end = tria.end();
 
     while (cell != end)
       {
