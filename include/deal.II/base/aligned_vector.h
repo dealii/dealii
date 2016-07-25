@@ -348,6 +348,9 @@ namespace internal
     virtual void apply_to_subrange (const std::size_t begin,
                                     const std::size_t end) const
     {
+      if (end == begin)
+        return;
+
       // for classes trivial assignment can use memcpy. cast element to
       // (void*) to silence compiler warning for virtual classes (they will
       // never arrive here because they are non-trivial).
