@@ -74,10 +74,16 @@ namespace hp
     MappingCollection (const MappingCollection<dim,spacedim> &mapping_collection);
 
     /**
-     * Adds a new mapping to the MappingCollection.  The mappings have to be
-     * added in the order of the active_fe_indices. Thus the reference to the
-     * mapping object for active_fe_index 0 has to be added first, followed by
-     * the mapping object for active_fe_index 1.
+     * Adds a new mapping to the MappingCollection. Generally, you will
+     * want to use the same order for mappings as for the elements of
+     * the hp::FECollection object you use. However, the same
+     * considerations as discussed with the hp::QCollection::push_back()
+     * function also apply in the current context.
+     *
+     * This class creates a copy of the given mapping object, i.e., you can
+     * do things like <tt>push_back(MappingQ<dim>(3));</tt>. The internal copy
+     * is later destroyed by this object upon destruction of the entire
+     * collection.
      */
     void push_back (const Mapping<dim,spacedim> &new_mapping);
 

@@ -80,6 +80,10 @@ namespace hp
      * hp::QCollection objects; they need not even be of the same size in this
      * case.
      *
+     * The same arguments about the order of elements of collections can, by
+     * the way, also be made about the elements of hp::MappingCollection
+     * objects.
+     *
      * This class creates a copy of the given quadrature object, i.e., you can
      * do things like <tt>push_back(QGauss<dim>(3));</tt>. The internal copy
      * is later destroyed by this object upon destruction of the entire
