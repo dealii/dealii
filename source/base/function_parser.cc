@@ -23,6 +23,7 @@
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/random.hpp>
+#include <boost/math/special_functions/erf.hpp>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #ifdef DEAL_II_WITH_MUPARSER
@@ -182,7 +183,7 @@ namespace internal
 
   double mu_erfc(double value)
   {
-    return erfc(value);
+    return boost::math::erfc(value);
   }
 
   // returns a random value in the range [0,1] initializing the generator
