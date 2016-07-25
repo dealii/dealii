@@ -119,6 +119,8 @@ namespace python
     else
       AssertThrow(false,
                   ExcMessage("The z coordinate is only available for three-dimensional points"));
+    // Silence a warning
+    return 0.;
   }
 
 

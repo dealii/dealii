@@ -34,10 +34,14 @@ char const *pydealii_docstring =
   "                                                             \n"
   "PyDealII                                                     \n"
   "========                                                     \n"
-  "Some interesting doc.                                        \n"
+  "This module contains the python bindings to deal.II.         \n"
+  "The Debug module uses deal.II compiled in Debug mode while   \n"
+  "the Release module uses deal.II compiled in Release mode.    \n"
   ;
 
-BOOST_PYTHON_MODULE(PyDealII)
+#ifdef DEBUG
+
+BOOST_PYTHON_MODULE(Debug)
 {
   boost::python::scope().attr("__doc__") = pydealii_docstring;
 
@@ -50,5 +54,23 @@ BOOST_PYTHON_MODULE(PyDealII)
   dealii::python::export_point();
   dealii::python::export_triangulation();
 }
+
+#else
+
+BOOST_PYTHON_MODULE(Release)
+{
+  boost::python::scope().attr("__doc__") = pydealii_docstring;
+
+  boost::python::docstring_options doc_options;
+  doc_options.enable_user_defined();
+  doc_options.enable_py_signatures();
+  doc_options.disable_cpp_signatures();
+
+  dealii::python::export_cell_accessor();
+  dealii::python::export_point();
+  dealii::python::export_triangulation();
+}
+
+#endif
 
 #endif

@@ -14,7 +14,7 @@
 # ---------------------------------------------------------------------
 
 import unittest
-from pydealii.PyDealII import *
+from PyDealII.Debug import *
 
 
 class TestTriangulationWrapper(unittest.TestCase):

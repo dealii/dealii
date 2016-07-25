@@ -240,7 +240,7 @@ namespace python
     {
       const CellAccessor<dim,spacedim> *cell =
         static_cast<const CellAccessor<dim,spacedim>*>(cell_accessor);
-      cell->manifold_id();
+      return cell->manifold_id();
     }
   }
 
@@ -468,11 +468,11 @@ namespace python
   int CellAccessorWrapper::get_manifold_id() const
   {
     if ((dim == 2) && (spacedim == 2))
-      internal::get_manifold_id<2,2>(cell_accessor);
+      return internal::get_manifold_id<2,2>(cell_accessor);
     else if ((dim== 2) && (spacedim == 3))
-      internal::get_manifold_id<2,3>(cell_accessor);
+      return internal::get_manifold_id<2,3>(cell_accessor);
     else
-      internal::get_manifold_id<3,3>(cell_accessor);
+      return internal::get_manifold_id<3,3>(cell_accessor);
   }
 }
 
