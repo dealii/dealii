@@ -2309,6 +2309,7 @@ get_mg_dof_indices (const int,
                     const unsigned int fe_index) const
 {
   (void) dof_indices;
+  (void) fe_index;
   Assert (this->dof_handler != 0, ExcInvalidObject ());
   Assert (dof_indices.size () ==
           this->dof_handler->get_fe ()[fe_index].dofs_per_vertex,
