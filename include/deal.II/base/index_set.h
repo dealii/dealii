@@ -22,6 +22,8 @@
 #include <boost/serialization/vector.hpp>
 #include <vector>
 #include <algorithm>
+#include <iterator>
+
 
 #ifdef DEAL_II_WITH_TRILINOS
 #  include <Epetra_Map.h>
@@ -496,7 +498,7 @@ public:
    * Class that represents an iterator pointing to a contiguous interval
    * $[a,b[$ as returned by IndexSet::begin_interval().
    */
-  class IntervalIterator
+  class IntervalIterator : public std::iterator<std::forward_iterator_tag,IntervalAccessor>
   {
   public:
     /**
@@ -579,14 +581,16 @@ public:
    * Class that represents an iterator pointing to a single element in the
    * IndexSet as returned by IndexSet::begin().
    */
-  class ElementIterator
+  class ElementIterator : public std::iterator<std::forward_iterator_tag,size_type>
   {
   public:
     /**
      * Construct an iterator pointing to the global index @p index in the
      * interval @p range_idx
      */
-    ElementIterator(const IndexSet *idxset, const size_type range_idx, const size_type index);
+    ElementIterator(const IndexSet *idxset,
+                    const size_type range_idx,
+                    const size_type index);
 
     /**
      * Construct an iterator pointing to the end of the IndexSet.
@@ -1129,7 +1133,7 @@ inline
 IndexSet::ElementIterator
 IndexSet::ElementIterator::operator++ (int)
 {
-  IndexSet::ElementIterator it = *this;
+  const IndexSet::ElementIterator it = *this;
   advance();
   return it;
 }
