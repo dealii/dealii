@@ -1690,97 +1690,7 @@ namespace VectorTools
 
   namespace
   {
-    // interpolate boundary values in
-    // 1d. in higher dimensions, we
-    // use FEValues to figure out
-    // what to do on faces, but in 1d
-    // faces are points and it is far
-    // easier to simply work on
-    // individual vertices
     template <typename number, typename DoFHandlerType, template <int,int> class M_or_MC>
-    static inline
-    void do_interpolate_boundary_values
-    (const M_or_MC<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &,
-     const DoFHandlerType                                                                        &dof,
-     const std::map<types::boundary_id, const Function<DoFHandlerType::space_dimension,number>*> &function_map,
-     std::map<types::global_dof_index,number>                                                    &boundary_values,
-     const ComponentMask                                                                         &component_mask,
-     const dealii::internal::int2type<1>)
-    {
-      const unsigned int dim = DoFHandlerType::dimension;
-      const unsigned int spacedim = DoFHandlerType::space_dimension;
-
-      Assert (component_mask.represents_n_components(dof.get_fe().n_components()),
-              ExcMessage ("The number of components in the mask has to be either "
-                          "zero or equal to the number of components in the finite "
-                          "element."));
-
-      // if for whatever reason we were
-      // passed an empty map, return
-      // immediately
-      if (function_map.size() == 0)
-        return;
-
-      for (typename DoFHandlerType::active_cell_iterator cell = dof.begin_active();
-           cell != dof.end(); ++cell)
-        for (unsigned int direction=0;
-             direction<GeometryInfo<dim>::faces_per_cell; ++direction)
-          if (cell->at_boundary(direction)
-              &&
-              (function_map.find(cell->face(direction)->boundary_id()) != function_map.end()))
-            {
-              const Function<DoFHandlerType::space_dimension,number> &boundary_function
-                = *function_map.find(cell->face(direction)->boundary_id())->second;
-
-              // get the FE corresponding to this
-              // cell
-              const FiniteElement<dim,spacedim> &fe = cell->get_fe();
-              Assert (fe.n_components() == boundary_function.n_components,
-                      ExcDimensionMismatch(fe.n_components(),
-                                           boundary_function.n_components));
-
-              Assert (component_mask.n_selected_components(fe.n_components()) > 0,
-                      ComponentMask::ExcNoComponentSelected());
-
-              // now set the value of
-              // the vertex degree of
-              // freedom. setting
-              // also creates the
-              // entry in the map if
-              // it did not exist
-              // beforehand
-              //
-              // save some time by
-              // requesting values
-              // only once for each
-              // point, irrespective
-              // of the number of
-              // components of the
-              // function
-              Vector<number> function_values (fe.n_components());
-              if (fe.n_components() == 1)
-                function_values(0)
-                  = boundary_function.value (cell->vertex(direction));
-              else
-                boundary_function.vector_value (cell->vertex(direction),
-                                                function_values);
-
-              for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
-                if (component_mask[fe.face_system_to_component_index(i).first])
-                  boundary_values[cell->
-                                  vertex_dof_index(direction,i,
-                                                   cell->active_fe_index())]
-                    = function_values(fe.face_system_to_component_index(i).first);
-            }
-    }
-
-
-
-    // template for the case dim!=1. Since the function has a template argument
-    // dim_, it is clearly less specialized than the 1d function above and
-    // whenever possible (i.e., if dim==1), the function template above
-    // will be used
-    template <typename number, typename DoFHandlerType, template <int,int> class M_or_MC, int dim_>
     static inline
     void
     do_interpolate_boundary_values
@@ -1788,8 +1698,7 @@ namespace VectorTools
      const DoFHandlerType                                                                        &dof,
      const std::map<types::boundary_id, const Function<DoFHandlerType::space_dimension,number>*> &function_map,
      std::map<types::global_dof_index,number>                                                    &boundary_values,
-     const ComponentMask                                                                         &component_mask,
-     const dealii::internal::int2type<dim_>)
+     const ComponentMask                                                                         &component_mask)
     {
       const unsigned int dim = DoFHandlerType::dimension;
       const unsigned int spacedim=DoFHandlerType::space_dimension;
@@ -1810,214 +1719,267 @@ namespace VectorTools
                          "for interior faces in your function map."));
 
       const unsigned int        n_components = DoFTools::n_components(dof);
-      const bool                fe_is_system = (n_components != 1);
-
       for (typename std::map<types::boundary_id, const Function<spacedim,number>*>::const_iterator i=function_map.begin();
            i!=function_map.end(); ++i)
         Assert (n_components == i->second->n_components,
                 ExcDimensionMismatch(n_components, i->second->n_components));
 
-      // field to store the indices
-      std::vector<types::global_dof_index> face_dofs;
-      face_dofs.reserve (DoFTools::max_dofs_per_face(dof));
 
-      std::vector<Point<spacedim> >  dof_locations;
-      dof_locations.reserve (DoFTools::max_dofs_per_face(dof));
-
-      // array to store the values of the boundary function at the boundary
-      // points. have two arrays for scalar and vector functions to use the
-      // more efficient one respectively
-      std::vector<number>          dof_values_scalar;
-      std::vector<Vector<number> > dof_values_system;
-      dof_values_scalar.reserve (DoFTools::max_dofs_per_face (dof));
-      dof_values_system.reserve (DoFTools::max_dofs_per_face (dof));
-
-      // before we start with the loop over all cells create an hp::FEValues
-      // object that holds the interpolation points of all finite elements
-      // that may ever be in use
-      dealii::hp::FECollection<dim,spacedim> finite_elements (dof.get_fe());
-      dealii::hp::QCollection<dim-1>  q_collection;
-      for (unsigned int f=0; f<finite_elements.size(); ++f)
+      // interpolate boundary values in 1d. in higher dimensions, we
+      // use FEValues to figure out what to do on faces, but in 1d
+      // faces are points and it is far easier to simply work on
+      // individual vertices
+      if (dim == 1)
         {
-          const FiniteElement<dim,spacedim> &fe = finite_elements[f];
-
-          // generate a quadrature rule on the face from the unit support
-          // points. this will be used to obtain the quadrature points on the
-          // real cell's face
-          //
-          // to do this, we check whether the FE has support points on the
-          // face at all:
-          if (fe.has_face_support_points())
-            q_collection.push_back (Quadrature<dim-1>(fe.get_unit_face_support_points()));
-          else
-            {
-              // if not, then we should try a more clever way. the idea is
-              // that a finite element may not offer support points for all
-              // its shape functions, but maybe only some. if it offers
-              // support points for the components we are interested in in
-              // this function, then that's fine. if not, the function we call
-              // in the finite element will raise an exception. the support
-              // points for the other shape functions are left uninitialized
-              // (well, initialized by the default constructor), since we
-              // don't need them anyway.
-              //
-              // As a detour, we must make sure we only query
-              // face_system_to_component_index if the index corresponds to a
-              // primitive shape function. since we know that all the
-              // components we are interested in are primitive (by the above
-              // check), we can safely put such a check in front
-              std::vector<Point<dim-1> > unit_support_points (fe.dofs_per_face);
-
-              for (unsigned int i=0; i<fe.dofs_per_face; ++i)
-                if (fe.is_primitive (fe.face_to_cell_index(i,0)))
-                  if (component_mask[fe.face_system_to_component_index(i).first]
-                      == true)
-                    unit_support_points[i] = fe.unit_face_support_point(i);
-
-              q_collection.push_back (Quadrature<dim-1>(unit_support_points));
-            }
-        }
-      // now that we have a q_collection object with all the right quadrature
-      // points, create an hp::FEFaceValues object that we can use to evaluate
-      // the boundary values at
-      dealii::hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
-      dealii::hp::FEFaceValues<dim,spacedim> x_fe_values (mapping_collection, finite_elements, q_collection,
-                                                          update_quadrature_points);
-
-      typename DoFHandlerType::active_cell_iterator cell = dof.begin_active(),
-                                                    endc = dof.end();
-      for (; cell!=endc; ++cell)
-        if (!cell->is_artificial())
-          for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
-               ++face_no)
-            {
-              const FiniteElement<dim,spacedim> &fe = cell->get_fe();
-
-              // we can presently deal only with primitive elements for
-              // boundary values. this does not preclude us using
-              // non-primitive elements in components that we aren't
-              // interested in, however. make sure that all shape functions
-              // that are non-zero for the components we are interested in,
-              // are in fact primitive
-              for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
-                {
-                  const ComponentMask &nonzero_component_array
-                    = cell->get_fe().get_nonzero_components (i);
-                  for (unsigned int c=0; c<n_components; ++c)
-                    if ((nonzero_component_array[c] == true)
-                        &&
-                        (component_mask[c] == true))
-                      Assert (cell->get_fe().is_primitive (i),
-                              ExcMessage ("This function can only deal with requested boundary "
-                                          "values that correspond to primitive (scalar) base "
-                                          "elements"));
-                }
-
-              const typename DoFHandlerType::face_iterator face = cell->face(face_no);
-              const types::boundary_id boundary_component = face->boundary_id();
-
-              // see if this face is part of the boundaries for which we are
-              // supposed to do something, and also see if the finite element
-              // in use here has DoFs on the face at all
-              if ((function_map.find(boundary_component) != function_map.end())
+          for (typename DoFHandlerType::active_cell_iterator cell = dof.begin_active();
+               cell != dof.end(); ++cell)
+            for (unsigned int direction=0;
+                 direction<GeometryInfo<dim>::faces_per_cell; ++direction)
+              if (cell->at_boundary(direction)
                   &&
-                  (cell->get_fe().dofs_per_face > 0))
+                  (function_map.find(cell->face(direction)->boundary_id()) != function_map.end()))
                 {
-                  // face is of the right component
-                  x_fe_values.reinit(cell, face_no);
-                  const dealii::FEFaceValues<dim,spacedim> &fe_values =
-                    x_fe_values.get_present_fe_values();
+                  const Function<DoFHandlerType::space_dimension,number> &boundary_function
+                    = *function_map.find(cell->face(direction)->boundary_id())->second;
 
-                  // get indices, physical location and boundary values of
-                  // dofs on this face
-                  face_dofs.resize (fe.dofs_per_face);
-                  face->get_dof_indices (face_dofs, cell->active_fe_index());
-                  const std::vector<Point<spacedim> > &dof_locations
-                    = fe_values.get_quadrature_points ();
+                  // get the FE corresponding to this cell
+                  const FiniteElement<dim,spacedim> &fe = cell->get_fe();
+                  Assert (fe.n_components() == boundary_function.n_components,
+                          ExcDimensionMismatch(fe.n_components(),
+                                               boundary_function.n_components));
 
-                  if (fe_is_system)
+                  Assert (component_mask.n_selected_components(fe.n_components()) > 0,
+                          ComponentMask::ExcNoComponentSelected());
+
+                  // now set the value of the vertex degree of
+                  // freedom. setting also creates the entry in the
+                  // map if it did not exist beforehand
+                  //
+                  // save some time by requesting values only once for
+                  // each point, irrespective of the number of
+                  // components of the function
+                  Vector<number> function_values (fe.n_components());
+                  if (fe.n_components() == 1)
+                    function_values(0)
+                      = boundary_function.value (cell->vertex(direction));
+                  else
+                    boundary_function.vector_value (cell->vertex(direction),
+                                                    function_values);
+
+                  for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
+                    if (component_mask[fe.face_system_to_component_index(i).first])
+                      boundary_values[cell->
+                                      vertex_dof_index(direction,i,
+                                                       cell->active_fe_index())]
+                        = function_values(fe.face_system_to_component_index(i).first);
+                }
+        }
+      else  // dim > 1
+        {
+          const bool                fe_is_system = (n_components != 1);
+
+          // field to store the indices
+          std::vector<types::global_dof_index> face_dofs;
+          face_dofs.reserve (DoFTools::max_dofs_per_face(dof));
+
+          std::vector<Point<spacedim> >  dof_locations;
+          dof_locations.reserve (DoFTools::max_dofs_per_face(dof));
+
+          // array to store the values of the boundary function at the boundary
+          // points. have two arrays for scalar and vector functions to use the
+          // more efficient one respectively
+          std::vector<number>          dof_values_scalar;
+          std::vector<Vector<number> > dof_values_system;
+          dof_values_scalar.reserve (DoFTools::max_dofs_per_face (dof));
+          dof_values_system.reserve (DoFTools::max_dofs_per_face (dof));
+
+          // before we start with the loop over all cells create an hp::FEValues
+          // object that holds the interpolation points of all finite elements
+          // that may ever be in use
+          dealii::hp::FECollection<dim,spacedim> finite_elements (dof.get_fe());
+          dealii::hp::QCollection<dim-1>  q_collection;
+          for (unsigned int f=0; f<finite_elements.size(); ++f)
+            {
+              const FiniteElement<dim,spacedim> &fe = finite_elements[f];
+
+              // generate a quadrature rule on the face from the unit support
+              // points. this will be used to obtain the quadrature points on the
+              // real cell's face
+              //
+              // to do this, we check whether the FE has support points on the
+              // face at all:
+              if (fe.has_face_support_points())
+                q_collection.push_back (Quadrature<dim-1>(fe.get_unit_face_support_points()));
+              else
+                {
+                  // if not, then we should try a more clever way. the idea is
+                  // that a finite element may not offer support points for all
+                  // its shape functions, but maybe only some. if it offers
+                  // support points for the components we are interested in in
+                  // this function, then that's fine. if not, the function we call
+                  // in the finite element will raise an exception. the support
+                  // points for the other shape functions are left uninitialized
+                  // (well, initialized by the default constructor), since we
+                  // don't need them anyway.
+                  //
+                  // As a detour, we must make sure we only query
+                  // face_system_to_component_index if the index corresponds to a
+                  // primitive shape function. since we know that all the
+                  // components we are interested in are primitive (by the above
+                  // check), we can safely put such a check in front
+                  std::vector<Point<dim-1> > unit_support_points (fe.dofs_per_face);
+
+                  for (unsigned int i=0; i<fe.dofs_per_face; ++i)
+                    if (fe.is_primitive (fe.face_to_cell_index(i,0)))
+                      if (component_mask[fe.face_system_to_component_index(i).first]
+                          == true)
+                        unit_support_points[i] = fe.unit_face_support_point(i);
+
+                  q_collection.push_back (Quadrature<dim-1>(unit_support_points));
+                }
+            }
+          // now that we have a q_collection object with all the right quadrature
+          // points, create an hp::FEFaceValues object that we can use to evaluate
+          // the boundary values at
+          dealii::hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
+          dealii::hp::FEFaceValues<dim,spacedim> x_fe_values (mapping_collection, finite_elements, q_collection,
+                                                              update_quadrature_points);
+
+          typename DoFHandlerType::active_cell_iterator cell = dof.begin_active(),
+                                                        endc = dof.end();
+          for (; cell!=endc; ++cell)
+            if (!cell->is_artificial())
+              for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
+                   ++face_no)
+                {
+                  const FiniteElement<dim,spacedim> &fe = cell->get_fe();
+
+                  // we can presently deal only with primitive elements for
+                  // boundary values. this does not preclude us using
+                  // non-primitive elements in components that we aren't
+                  // interested in, however. make sure that all shape functions
+                  // that are non-zero for the components we are interested in,
+                  // are in fact primitive
+                  for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
                     {
-                      // resize array. avoid construction of a memory
-                      // allocating temporary if possible
-                      if (dof_values_system.size() < fe.dofs_per_face)
-                        dof_values_system.resize (fe.dofs_per_face,
-                                                  Vector<number>(fe.n_components()));
-                      else
-                        dof_values_system.resize (fe.dofs_per_face);
+                      const ComponentMask &nonzero_component_array
+                        = cell->get_fe().get_nonzero_components (i);
+                      for (unsigned int c=0; c<n_components; ++c)
+                        if ((nonzero_component_array[c] == true)
+                            &&
+                            (component_mask[c] == true))
+                          Assert (cell->get_fe().is_primitive (i),
+                                  ExcMessage ("This function can only deal with requested boundary "
+                                              "values that correspond to primitive (scalar) base "
+                                              "elements"));
+                    }
 
-                      function_map.find(boundary_component)->second
-                      ->vector_value_list (dof_locations, dof_values_system);
+                  const typename DoFHandlerType::face_iterator face = cell->face(face_no);
+                  const types::boundary_id boundary_component = face->boundary_id();
 
-                      // enter those dofs into the list that match the
-                      // component signature. avoid the usual complication
-                      // that we can't just use *_system_to_component_index
-                      // for non-primitive FEs
-                      for (unsigned int i=0; i<face_dofs.size(); ++i)
+                  // see if this face is part of the boundaries for which we are
+                  // supposed to do something, and also see if the finite element
+                  // in use here has DoFs on the face at all
+                  if ((function_map.find(boundary_component) != function_map.end())
+                      &&
+                      (cell->get_fe().dofs_per_face > 0))
+                    {
+                      // face is of the right component
+                      x_fe_values.reinit(cell, face_no);
+                      const dealii::FEFaceValues<dim,spacedim> &fe_values =
+                        x_fe_values.get_present_fe_values();
+
+                      // get indices, physical location and boundary values of
+                      // dofs on this face
+                      face_dofs.resize (fe.dofs_per_face);
+                      face->get_dof_indices (face_dofs, cell->active_fe_index());
+                      const std::vector<Point<spacedim> > &dof_locations
+                        = fe_values.get_quadrature_points ();
+
+                      if (fe_is_system)
                         {
-                          unsigned int component;
-                          if (fe.is_primitive())
-                            component = fe.face_system_to_component_index(i).first;
+                          // resize array. avoid construction of a memory
+                          // allocating temporary if possible
+                          if (dof_values_system.size() < fe.dofs_per_face)
+                            dof_values_system.resize (fe.dofs_per_face,
+                                                      Vector<number>(fe.n_components()));
                           else
+                            dof_values_system.resize (fe.dofs_per_face);
+
+                          function_map.find(boundary_component)->second
+                          ->vector_value_list (dof_locations, dof_values_system);
+
+                          // enter those dofs into the list that match the
+                          // component signature. avoid the usual complication
+                          // that we can't just use *_system_to_component_index
+                          // for non-primitive FEs
+                          for (unsigned int i=0; i<face_dofs.size(); ++i)
                             {
-                              // non-primitive case. make sure that this
-                              // particular shape function _is_ primitive, and
-                              // get at it's component. use usual trick to
-                              // transfer face dof index to cell dof index
-                              const unsigned int cell_i
-                                = (dim == 1 ?
-                                   i
-                                   :
-                                   (dim == 2 ?
-                                    (i<2*fe.dofs_per_vertex ? i : i+2*fe.dofs_per_vertex)
-                                    :
-                                    (dim == 3 ?
-                                     (i<4*fe.dofs_per_vertex ?
-                                      i
-                                      :
-                                      (i<4*fe.dofs_per_vertex+4*fe.dofs_per_line ?
-                                       i+4*fe.dofs_per_vertex
+                              unsigned int component;
+                              if (fe.is_primitive())
+                                component = fe.face_system_to_component_index(i).first;
+                              else
+                                {
+                                  // non-primitive case. make sure that this
+                                  // particular shape function _is_ primitive, and
+                                  // get at it's component. use usual trick to
+                                  // transfer face dof index to cell dof index
+                                  const unsigned int cell_i
+                                    = (dim == 1 ?
+                                       i
                                        :
-                                       i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
-                                     :
-                                     numbers::invalid_unsigned_int)));
-                              Assert (cell_i < fe.dofs_per_cell, ExcInternalError());
+                                       (dim == 2 ?
+                                        (i<2*fe.dofs_per_vertex ? i : i+2*fe.dofs_per_vertex)
+                                        :
+                                        (dim == 3 ?
+                                         (i<4*fe.dofs_per_vertex ?
+                                          i
+                                          :
+                                          (i<4*fe.dofs_per_vertex+4*fe.dofs_per_line ?
+                                           i+4*fe.dofs_per_vertex
+                                           :
+                                           i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
+                                         :
+                                         numbers::invalid_unsigned_int)));
+                                  Assert (cell_i < fe.dofs_per_cell, ExcInternalError());
 
-                              // make sure that if this is not a primitive
-                              // shape function, then all the corresponding
-                              // components in the mask are not set
-                              if (!fe.is_primitive(cell_i))
-                                for (unsigned int c=0; c<n_components; ++c)
-                                  if (fe.get_nonzero_components(cell_i)[c])
-                                    Assert (component_mask[c] == false,
-                                            FETools::ExcFENotPrimitive());
+                                  // make sure that if this is not a primitive
+                                  // shape function, then all the corresponding
+                                  // components in the mask are not set
+                                  if (!fe.is_primitive(cell_i))
+                                    for (unsigned int c=0; c<n_components; ++c)
+                                      if (fe.get_nonzero_components(cell_i)[c])
+                                        Assert (component_mask[c] == false,
+                                                FETools::ExcFENotPrimitive());
 
-                              // let's pick the first of possibly more than
-                              // one non-zero components. if shape function is
-                              // non-primitive, then we will ignore the result
-                              // in the following anyway, otherwise there's
-                              // only one non-zero component which we will use
-                              component = fe.get_nonzero_components(cell_i).first_selected_component();
+                                  // let's pick the first of possibly more than
+                                  // one non-zero components. if shape function is
+                                  // non-primitive, then we will ignore the result
+                                  // in the following anyway, otherwise there's
+                                  // only one non-zero component which we will use
+                                  component = fe.get_nonzero_components(cell_i).first_selected_component();
+                                }
+
+                              if (component_mask[component] == true)
+                                boundary_values[face_dofs[i]] = dof_values_system[i](component);
                             }
+                        }
+                      else
+                        // fe has only one component, so save some computations
+                        {
+                          // get only the one component that this function has
+                          dof_values_scalar.resize (fe.dofs_per_face);
+                          function_map.find(boundary_component)->second
+                          ->value_list (dof_locations, dof_values_scalar, 0);
 
-                          if (component_mask[component] == true)
-                            boundary_values[face_dofs[i]] = dof_values_system[i](component);
+                          // enter into list
+
+                          for (unsigned int i=0; i<face_dofs.size(); ++i)
+                            boundary_values[face_dofs[i]] = dof_values_scalar[i];
                         }
                     }
-                  else
-                    // fe has only one component, so save some computations
-                    {
-                      // get only the one component that this function has
-                      dof_values_scalar.resize (fe.dofs_per_face);
-                      function_map.find(boundary_component)->second
-                      ->value_list (dof_locations, dof_values_scalar, 0);
-
-                      // enter into list
-
-                      for (unsigned int i=0; i<face_dofs.size(); ++i)
-                        boundary_values[face_dofs[i]] = dof_values_scalar[i];
-                    }
                 }
-            }
+        }
     } // end of interpolate_boundary_values
   } // end of namespace internal
 
@@ -2033,8 +1995,7 @@ namespace VectorTools
    const ComponentMask                                                                         &component_mask_)
   {
     do_interpolate_boundary_values (mapping, dof, function_map, boundary_values,
-                                    component_mask_,
-                                    dealii::internal::int2type<DoFHandlerType::dimension>());
+                                    component_mask_);
   }
 
 
@@ -2066,8 +2027,7 @@ namespace VectorTools
    const ComponentMask                                                  &component_mask_)
   {
     do_interpolate_boundary_values (mapping, dof, function_map, boundary_values,
-                                    component_mask_,
-                                    dealii::internal::int2type<dim>());
+                                    component_mask_);
   }
 
 
