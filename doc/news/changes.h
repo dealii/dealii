@@ -151,6 +151,14 @@ inconvenience this causes.
 
 <ol>
  <li>
+ Improved: VectorTools::interpolate() may now be used on FESystems with mixed
+ interpolating and non-interpolating FEs, if all of the selected components for
+ interpolation originate from interpolating FEs.
+ <br>
+ (Jonathan Robey, 2016/07/24)
+ </li>
+
+ <li>
  Improved: VectorTools::interpolate() now takes a ComponentMask to select the
  components to interpolate.
  <br>
