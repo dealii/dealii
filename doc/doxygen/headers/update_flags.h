@@ -173,7 +173,8 @@
  * 
  * To accommodate this structure, both mappings and finite element classes
  * may internally split the update flags into two sets commonly referenced as
- * <code>update_once</code> and <code>update_each</code>. The former contains
+ * <code>update_once</code> and <code>update_each</code> (though these names
+ * do not appear in any public interfaces). The former contains
  * all those pieces of information that can be pre-computed once at the
  * time the FEValues object starts to interact with a mapping or
  * finite element, whereas the latter contains those flags corresponding to
@@ -236,7 +237,7 @@
  * 
  * Once initialization is over and we call FEValues::reinit, FEFaceValues::reinit
  * or FESubfaceValues::reinit to move to a concrete cell or face, we need
- * to calculate the update_each kinds of data. This done in the following
+ * to calculate the "update_each" kinds of data. This is done in the following
  * functions:
  * <ul>
  * <li>FEValues::reinit() calls Mapping::fill_fe_values(), then FiniteElement::fill_fe_values()
@@ -245,7 +246,7 @@
  * thenFiniteElement::fill_fe_subface_values()
  * </ul>
  * 
- * This is, where the actual data fields for FEValues, stored in
+ * This is where the actual data fields for FEValues, stored in
  * internal::FEValues::MappingRelatedData and
  * internal::FEValues::FiniteElementRelatedData objects, are
  * computed. These functions call the function in Mapping first, such
