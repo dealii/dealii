@@ -2645,18 +2645,8 @@ namespace FETools
 
 
 
-  template <int dim>
-  FiniteElement<dim> *
-  get_fe_by_name (const std::string &parameter_name)
-  {
-    return get_fe_by_name<dim,dim> (parameter_name);
-  }
-
-
-
   template <int dim, int spacedim>
   void
-
   compute_projection_from_quadrature_points_matrix (const FiniteElement<dim,spacedim> &fe,
                                                     const Quadrature<dim>    &lhs_quadrature,
                                                     const Quadrature<dim>    &rhs_quadrature,
