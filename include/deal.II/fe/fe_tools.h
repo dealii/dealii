@@ -1145,7 +1145,7 @@ namespace FETools
    */
   template <int dim>
   FiniteElement<dim,dim> *
-  get_fe_from_name (const std::string &name);
+  get_fe_from_name (const std::string &name) DEAL_II_DEPRECATED;
 
 
   /**
