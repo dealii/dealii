@@ -130,7 +130,7 @@ template <typename> class Vector;
  * An example of time dependent scalar function is the following:
  * @code
  *    // Empty constants object
- *    std::map<std::string> constants;
+ *    std::map<std::string,double> constants;
  *
  *    // Variables that will be used inside the expressions
  *    std::string variables = "x,y,t";
