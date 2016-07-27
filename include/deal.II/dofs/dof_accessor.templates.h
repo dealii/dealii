@@ -1460,11 +1460,18 @@ namespace internal
 
         for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_cell; ++line)
           for (unsigned int dof = 0; dof < fe.dofs_per_line; ++dof)
-            accessor.line(line)->set_mg_dof_index(level, dof, *next++);
+            accessor.line (line)->set_mg_dof_index
+            (level, fe.adjust_line_dof_index_for_line_orientation(dof,accessor.line_orientation(line)), *next++);
 
         for (unsigned int quad = 0; quad < GeometryInfo<3>::quads_per_cell; ++quad)
           for (unsigned int dof = 0; dof < fe.dofs_per_quad; ++dof)
-            accessor.quad(quad)->set_mg_dof_index(level, dof, *next++);
+            accessor.quad (quad)->set_mg_dof_index
+            (level, fe.adjust_quad_dof_index_for_face_orientation
+             (dof,
+              accessor.face_orientation(quad),
+              accessor.face_flip(quad),
+              accessor.face_rotation(quad)),
+             *next++);
 
         for (unsigned int dof = 0; dof < fe.dofs_per_hex; ++dof)
           accessor.set_mg_dof_index(level, dof, *next++);
@@ -1883,11 +1890,17 @@ namespace internal
 
       for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_cell; ++line)
         for (unsigned int dof = 0; dof < fe.dofs_per_line; ++dof)
-          *next++ = accessor.line (line)->mg_dof_index (level, dof);
+          *next++ = accessor.line (line)->mg_dof_index
+                    (level, accessor.get_fe(fe_index).adjust_line_dof_index_for_line_orientation(dof,accessor.line_orientation(line)));
 
       for (unsigned int quad = 0; quad < GeometryInfo<3>::quads_per_cell; ++quad)
         for (unsigned int dof = 0; dof < fe.dofs_per_quad; ++dof)
-          *next++ = accessor.quad (quad)->mg_dof_index (level, dof);
+          *next++ = accessor.quad (quad)->mg_dof_index
+                    (level, accessor.get_fe(fe_index).adjust_quad_dof_index_for_face_orientation
+                     (dof,
+                      accessor.face_orientation(quad),
+                      accessor.face_flip(quad),
+                      accessor.face_rotation(quad)));
 
       for (unsigned int dof = 0; dof < fe.dofs_per_hex; ++dof)
         *next++ = accessor.mg_dof_index (level, dof);
