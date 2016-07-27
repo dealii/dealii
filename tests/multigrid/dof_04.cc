@@ -51,7 +51,7 @@ void check()
       cell->get_mg_dof_indices(mg_dof_indices);
       bool has_error = false;
       // dof indices should have the same order on both the mg dofs and the
-      // usual dofs becuse there is only one level
+      // usual dofs because there is only one level
       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
         if (dof_indices[i] != mg_dof_indices[i])
           has_error = true;
