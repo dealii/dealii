@@ -376,11 +376,11 @@ namespace IteratorFilters
  * @endcode
  * then
  * @code
- *   std::bind2nd (std::ptr_fun(&level_equal_to<active_cell_iterator>), 3)
+ *   std_cxx11::bind (std::ptr_fun(&level_equal_to<active_cell_iterator>), std_cxx11::_1, 3)
  * @endcode
  * is another valid predicate (here: a function that returns true if either
  * the iterator is past the end or the level is equal to the second argument;
- * this second argument is bound to a fixed value using the @p std::bind2nd
+ * this second argument is bound to a fixed value using the @p std::bind
  * function).
  *
  * Finally, classes can be predicates. The following class is one:
