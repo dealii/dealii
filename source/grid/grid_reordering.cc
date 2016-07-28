@@ -352,7 +352,7 @@ namespace internal
       for (int i = 0; i<4; ++i)
         {
           std::transform(inquads.begin(),inquads.end(),
-                         std::back_inserter(sides), std::bind2nd(QuadSide(),i));
+                         std::back_inserter(sides), std_cxx11::bind(QuadSide(),std_cxx11::_1,i));
         }
 
       //Change each edge so that v0<v1
