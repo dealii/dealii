@@ -634,7 +634,7 @@ namespace DoFTools
    *
    * In fact, this function takes two such masks, one describing which
    * variables couple with each other in the cell integrals that make up your
-   * bilinear form, and which variables coupld with each other in the face
+   * bilinear form, and which variables couple with each other in the face
    * integrals. If you passed masks consisting of only 1s to both of these,
    * then you would get the same sparsity pattern as if you had called the
    * first of the make_sparsity_pattern() functions above. By setting some of
@@ -645,10 +645,28 @@ namespace DoFTools
    */
   template <typename DoFHandlerType, typename SparsityPatternType>
   void
-  make_flux_sparsity_pattern (const DoFHandlerType    &dof,
-                              SparsityPatternType     &sparsity,
-                              const Table<2,Coupling> &cell_integrals_mask,
-                              const Table<2,Coupling> &face_integrals_mask);
+  make_flux_sparsity_pattern (const DoFHandlerType      &dof,
+                              SparsityPatternType       &sparsity,
+                              const Table<2,Coupling>   &cell_integrals_mask,
+                              const Table<2,Coupling>   &face_integrals_mask,
+                              const types::subdomain_id  subdomain_id = numbers::invalid_subdomain_id);
+  /**
+   * This function does essentially the same as the previous
+   * make_flux_sparsity_pattern() function but allows the application of
+   * a constraint matrix. This is useful in the case where some components
+   * of a finite element are continuous and some discontinuous, allowing
+   * constraints to be imposed on the continuous part while also building
+   * the flux terms needed for the discontinuous part.
+   */
+  template <typename DoFHandlerType, typename SparsityPatternType>
+  void
+  make_flux_sparsity_pattern (const DoFHandlerType      &dof,
+                              SparsityPatternType       &sparsity,
+                              const ConstraintMatrix    &constraints,
+                              const bool                 keep_constrained_dofs,
+                              const Table<2,Coupling>   &couplings,
+                              const Table<2,Coupling>   &face_couplings,
+                              const types::subdomain_id  subdomain_id);
 
   /**
    * Create the sparsity pattern for boundary matrices. See the general

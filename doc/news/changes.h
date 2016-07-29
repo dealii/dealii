@@ -388,6 +388,16 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> New: There is now a new DoFTools::make_flux_sparsity_pattern()
+ which takes a constraint matrix and flux and internal dof masks, in
+ parallel. This is useful in the case where some components of a
+ finite element are continuous and some discontinuous, allowing
+ constraints to be imposed on the continuous part while also building
+ building the flux terms needed for the discontinuous part.
+ <br>
+ (Sam Cox, 2016/07/25)
+ </li>
+
  <li> Fixed: Level indices for geometric multigrid queried through
  DoFAccessor::get_mg_dof_indices() would return wrong indices on lines
  and faces in non-standard orientation in 3D. This is now fixed.
