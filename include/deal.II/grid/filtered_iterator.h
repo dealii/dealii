@@ -376,7 +376,7 @@ namespace IteratorFilters
  * @endcode
  * then
  * @code
- *   std_cxx11::bind (std::ptr_fun(&level_equal_to<active_cell_iterator>), std_cxx11::_1, 3)
+ *   std_cxx11::bind (&level_equal_to<active_cell_iterator>, std_cxx11::_1, 3)
  * @endcode
  * is another valid predicate (here: a function that returns true if either
  * the iterator is past the end or the level is equal to the second argument;

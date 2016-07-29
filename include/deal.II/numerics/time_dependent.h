@@ -284,7 +284,7 @@ template <int dim, int spacedim> class Triangulation;
  *
  *   do_loop (mem_fun (&TimeStepBase_Tria<dim>::init_for_refinement),
  *            std_cxx11::bind (&TimeStepBase_Wave<dim>::refine_grid,
- *                             std_cxx11::_1
+ *                             std_cxx11::_1,
  *                             TimeStepBase_Tria<dim>::RefinementData (top_threshold,
  *                                                                     bottom_threshold)),
  *            TimeDependent::TimeSteppingData (0,1),
