@@ -406,6 +406,13 @@ inconvenience this causes.
  (Martin Kronbichler, 2016/07/30)
  </li>
 
+ <li> Fixed: CMake now tries to pick up the full link interface for gsl.
+ This works around an underlinkage issue with libgsl.so not correctly
+ stating all shared object dependencies.
+ <br>
+ (Matthias Maier, 2016/07/28)
+ </li>
+
  <li> Fixed: Level indices for geometric multigrid queried through
  DoFAccessor::get_mg_dof_indices() would return wrong indices on lines
  and faces in non-standard orientation in 3D. This is now fixed.
