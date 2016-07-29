@@ -136,6 +136,17 @@ IF( NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND
 ENDIF()
 
 #
+# Force exactly one build type for multi-configuration generators.
+# Unfortunately CMake doesn't support custom configuration types so we just
+# call "DebugRelease" a "Release" build as well.
+#
+IF(CMAKE_BUILD_TYPE MATCHES "^(Release|DebugRelease)$")
+  SET(CMAKE_CONFIGURATION_TYPES "Release" CACHE STRING "" FORCE)
+ELSE()
+  SET(CMAKE_CONFIGURATION_TYPES "Debug" CACHE STRING "" FORCE)
+ENDIF()
+
+#
 # Configuration behaviour:
 #
 
