@@ -181,8 +181,8 @@ namespace Step7
   // shape (since it is built into the type of the object itself), so the
   // compiler can catch most size-related mistakes for us.
   //
-  // Just as in previous examples, we are forced by the C++ language
-  // specification to declare a seemingly useless default constructor.
+  // Like in step-4, for compatibility with some compilers we explicitly
+  // declare the default constructor:
   template <int dim>
   class Solution : public Function<dim>,
     protected SolutionBase<dim>
