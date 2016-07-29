@@ -525,10 +525,9 @@ public:
    * the TimeStepBase class.
    *
    * Instead of using the above form, you can equally well use
-   * <tt>std_cxx11::bind(&X::unary_function, std_cxx11::_1, arg)</tt> which lets the @p
-   * do_loop function call the given function with the specified parameter.
-   * Note that you need to bind the second parameter since the first one
-   * implicitly contains the object which the function is to be called for.
+   * <tt>std_cxx11::bind(&X::unary_function, std_cxx11::_1, args...)</tt> which
+   * lets the @p do_loop function call the given function with the specified
+   * parameters.
    */
   template <typename InitFunctionObject, typename LoopFunctionObject>
   void do_loop (InitFunctionObject      init_function,
