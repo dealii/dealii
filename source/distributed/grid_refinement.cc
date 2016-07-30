@@ -15,6 +15,7 @@
 
 
 #include <deal.II/base/utilities.h>
+#include <deal.II/base/std_cxx11/bind.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/petsc_vector.h>
