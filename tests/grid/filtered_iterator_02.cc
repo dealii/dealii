@@ -139,10 +139,10 @@ void test ()
       bool (*predicate) (const active_cell_iterator, const unsigned int)
         = &level_equal_to<active_cell_iterator>;
       FilteredIterator<active_cell_iterator>
-      begin (std_cxx11::bind (std::ptr_fun(predicate), std_cxx11::_1, 3),
+      begin (std_cxx11::bind (predicate, std_cxx11::_1, 3),
              tria.begin_active (3)),
-                               end   (std_cxx11::bind (std::ptr_fun(predicate), std_cxx11::_1, 3),
-                                      tria.end());
+                               end  (std_cxx11::bind(predicate, std_cxx11::_1, 3),
+                                     tria.end());
 
       Assert (std::distance (begin, end) ==
               static_cast<signed int>(tria.n_active_cells (3)),
@@ -163,15 +163,15 @@ void test ()
 
       bool (*predicate) (const active_cell_iterator, const unsigned int)
         = &level_equal_to<active_cell_iterator>;
-      Assert (std::distance (FI(std_cxx11::bind (std::ptr_fun(predicate), std_cxx11::_1, 3))
+      Assert (std::distance (FI(std_cxx11::bind (predicate, std_cxx11::_1, 3))
                              .set_to_next_positive(tria.begin_active()),
-                             FI(std_cxx11::bind (std::ptr_fun(predicate), std_cxx11::_1, 3), tria.end())) ==
+                             FI(std_cxx11::bind (predicate, std_cxx11::_1, 3), tria.end())) ==
               static_cast<signed int>(tria.n_active_cells (3)),
               ExcInternalError());
       logfile << "Check 4: "
-              << (std::distance (FI(std_cxx11::bind (std::ptr_fun(predicate), std_cxx11::_1, 3))
+              << (std::distance (FI(std_cxx11::bind (predicate, std_cxx11::_1, 3))
                                  .set_to_next_positive(tria.begin_active()),
-                                 FI(std_cxx11::bind (std::ptr_fun(predicate), std_cxx11::_1, 3), tria.end())) ==
+                                 FI(std_cxx11::bind (predicate, std_cxx11::_1, 3), tria.end())) ==
                   static_cast<signed int>(tria.n_active_cells (3))
                   ?
                   "OK" : "Failed")
