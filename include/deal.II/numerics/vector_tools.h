@@ -775,21 +775,21 @@ namespace VectorTools
    * @note This function is not implemented for MPI parallel computations,
    * see step-32 for a way to do a projection in parallel.
    *
-   * @param mapping The mapping object to use.
-   * @param dof The DoFHandler the describes the finite element space to
+   * @param[in] mapping The mapping object to use.
+   * @param[in] dof The DoFHandler the describes the finite element space to
    * project into and that corresponds to @p vec.
-   * @param constraints Constraints to be used when assembling the mass
+   * @param[in] constraints Constraints to be used when assembling the mass
    * matrix, typically needed when you have hanging nodes.
-   * @param quadrature The quadrature formula to be used for assembling the
+   * @param[in] quadrature The quadrature formula to be used for assembling the
    * mass matrix.
-   * @param function The function to project into the finite element space.
+   * @param[in] function The function to project into the finite element space.
    * @param[out] vec The output vector where the projected function will be
    * stored in. This vector is required to be already initialized.
-   * @param enforce_zero_boundary If true, @p vec will have zero boundary
+   * @param[in] enforce_zero_boundary If true, @p vec will have zero boundary
    * conditions.
-   * @param q_boundary Quadrature rule to be used if @p project_to_boundary_first
+   * @param[in] q_boundary Quadrature rule to be used if @p project_to_boundary_first
    * is true.
-   * @param project_to_boundary_first If true, perform a projection on the
+   * @param[in] project_to_boundary_first If true, perform a projection on the
    * boundary before projecting the interior of the function.
    */
   template <int dim, typename VectorType, int spacedim>
