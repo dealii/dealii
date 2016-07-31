@@ -24,7 +24,7 @@
 // comment on them further.
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
+#include <deal.II/base/tensor.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -111,61 +111,9 @@ namespace Step8
   // @sect3{Right hand side values}
 
   // Before going over to the implementation of the main class, we declare and
-  // define the class which describes the right hand side. This time, the
+  // define the function which describes the right hand side. This time, the
   // right hand side is vector-valued, as is the solution, so we will describe
   // the changes required for this in some more detail.
-  //
-  // The first thing is that vector-valued functions have to have a
-  // constructor, since they need to pass down to the base class of how many
-  // components the function consists. The default value in the constructor of
-  // the base class is one (i.e.: a scalar function), which is why we did not
-  // need not define a constructor for the scalar function used in previous
-  // programs.
-  template <int dim>
-  class RightHandSide :  public Function<dim>
-  {
-  public:
-    RightHandSide ();
-
-    // The next change is that we want a replacement for the
-    // <code>value</code> function of the previous examples. There, a second
-    // parameter <code>component</code> was given, which denoted which
-    // component was requested. Here, we implement a function that returns the
-    // whole vector of values at the given place at once, in the second
-    // argument of the function. The obvious name for such a replacement
-    // function is <code>vector_value</code>.
-    //
-    // Secondly, in analogy to the <code>value_list</code> function, there is
-    // a function <code>vector_value_list</code>, which returns the values of
-    // the vector-valued function at several points at once:
-    virtual void vector_value (const Point<dim> &p,
-                               Vector<double>   &values) const;
-
-    virtual void vector_value_list (const std::vector<Point<dim> > &points,
-                                    std::vector<Vector<double> >   &value_list) const;
-  };
-
-
-  // This is the constructor of the right hand side class. As said above, it
-  // only passes down to the base class the number of components, which is
-  // <code>dim</code> in the present case (one force component in each of the
-  // <code>dim</code> space directions).
-  //
-  // Some people would have moved the definition of such a short function
-  // right into the class declaration. We do not do that, as a matter of
-  // style: the deal.II style guides require that class declarations contain
-  // only declarations, and that definitions are always to be found
-  // outside. This is, obviously, as much as matter of taste as indentation,
-  // but we try to be consistent in this direction.
-  template <int dim>
-  RightHandSide<dim>::RightHandSide ()
-    :
-    Function<dim> (dim)
-  {}
-
-
-  // Next the function that returns the whole vector of values at the point
-  // <code>p</code> at once.
   //
   // To prevent cases where the return vector has not previously been set to
   // the right size we test for this case and otherwise throw an exception at
@@ -187,12 +135,11 @@ namespace Step8
   // we terminate the program in the second assertion. The program will work
   // just fine in 3d, however.
   template <int dim>
-  inline
-  void RightHandSide<dim>::vector_value (const Point<dim> &p,
-                                         Vector<double>   &values) const
+  void right_hand_side (const std::vector<Point<dim> > &points,
+                        std::vector<Tensor<1, dim> >   &values)
   {
-    Assert (values.size() == dim,
-            ExcDimensionMismatch (values.size(), dim));
+    Assert (values.size() == points.size(),
+            ExcDimensionMismatch (values.size(), points.size()));
     Assert (dim >= 2, ExcNotImplemented());
 
     // The rest of the function implements computing force values. We will use
@@ -208,77 +155,24 @@ namespace Step8
     point_1(0) = 0.5;
     point_2(0) = -0.5;
 
-    // If now the point <code>p</code> is in a circle (sphere) of radius 0.2
-    // around one of these points, then set the force in x-direction to one,
-    // otherwise to zero:
-    if (((p-point_1).norm_square() < 0.2*0.2) ||
-        ((p-point_2).norm_square() < 0.2*0.2))
-      values(0) = 1;
-    else
-      values(0) = 0;
+    for (unsigned int point_n = 0; point_n < points.size(); ++point_n)
+      {
+        // If <code>points[point_n]</code> is in a circle (sphere) of radius
+        // 0.2 around one of these points, then set the force in x-direction
+        // to one, otherwise to zero:
+        if (((points[point_n]-point_1).norm_square() < 0.2*0.2) ||
+            ((points[point_n]-point_2).norm_square() < 0.2*0.2))
+          values[point_n][0] = 1.0;
+        else
+          values[point_n][0] = 0.0;
 
-    // Likewise, if <code>p</code> is in the vicinity of the origin, then set
-    // the y-force to 1, otherwise to zero:
-    if (p.norm_square() < 0.2*0.2)
-      values(1) = 1;
-    else
-      values(1) = 0;
-  }
-
-
-
-  // Now, this is the function of the right hand side class that returns the
-  // values at several points at once. The function starts out with checking
-  // that the number of input and output arguments is equal (the sizes of the
-  // individual output vectors will be checked in the function that we call
-  // further down below). Next, we define an abbreviation for the number of
-  // points which we shall work on, to make some things simpler below.
-  template <int dim>
-  void RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &points,
-                                              std::vector<Vector<double> >   &value_list) const
-  {
-    Assert (value_list.size() == points.size(),
-            ExcDimensionMismatch (value_list.size(), points.size()));
-
-    const unsigned int n_points = points.size();
-
-    // Finally we treat each of the points. In one of the previous examples,
-    // we have explained why the
-    // <code>value_list</code>/<code>vector_value_list</code> function had
-    // been introduced: to prevent us from calling virtual functions too
-    // frequently. On the other hand, we now need to implement the same
-    // function twice, which can lead to confusion if one function is changed
-    // but the other is not.
-    //
-    // We can prevent this situation by calling
-    // <code>RightHandSide::vector_value</code> on each point in the input
-    // list. Note that by giving the full name of the function, including the
-    // class name, we instruct the compiler to explicitly call this function,
-    // and not to use the virtual function call mechanism that would be used
-    // if we had just called <code>vector_value</code>. This is important,
-    // since the compiler generally can't make any assumptions which function
-    // is called when using virtual functions, and it therefore can't inline
-    // the called function into the site of the call. On the contrary, here we
-    // give the fully qualified name, which bypasses the virtual function
-    // call, and consequently the compiler knows exactly which function is
-    // called and will inline above function into the present location. (Note
-    // that we have declared the <code>vector_value</code> function above
-    // <code>inline</code>, though modern compilers are also able to inline
-    // functions even if they have not been declared as inline).
-    //
-    // It is worth noting why we go to such length explaining what we
-    // do. Using this construct, we manage to avoid any inconsistency: if we
-    // want to change the right hand side function, it would be difficult to
-    // always remember that we always have to change two functions in the same
-    // way. Using this forwarding mechanism, we only have to change a single
-    // place (the <code>vector_value</code> function), and the second place
-    // (the <code>vector_value_list</code> function) will always be consistent
-    // with it. At the same time, using virtual function call bypassing, the
-    // code is no less efficient than if we had written it twice in the first
-    // place:
-    for (unsigned int p=0; p<n_points; ++p)
-      RightHandSide<dim>::vector_value (points[p],
-                                        value_list[p]);
+        // Likewise, if <code>points[point_n]</code> is in the vicinity of the
+        // origin, then set the y-force to one, otherwise to zero:
+        if (points[point_n].norm_square() < 0.2*0.2)
+          values[point_n][1] = 1.0;
+        else
+          values[point_n][1] = 0.0;
+      }
   }
 
 
@@ -405,16 +299,9 @@ namespace Step8
     // demonstration.
     ConstantFunction<dim> lambda(1.), mu(1.);
 
-    // Then again, we need to have the same for the right hand side. This is
-    // exactly as before in previous examples. However, we now have a
-    // vector-valued right hand side, which is why the data type of the
-    // <code>rhs_values</code> array is changed. We initialize it by
-    // <code>n_q_points</code> elements, each of which is a
-    // <code>Vector@<double@></code> with <code>dim</code> elements.
-    RightHandSide<dim>      right_hand_side;
-    std::vector<Vector<double> > rhs_values (n_q_points,
-                                             Vector<double>(dim));
-
+    // Like the two constant functions above, we will call the function
+    // right_hand_side just once per cell to make things simpler.
+    std::vector<Tensor<1, dim> > rhs_values (n_q_points);
 
     // Now we can begin with the loop over all cells:
     typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
@@ -430,9 +317,7 @@ namespace Step8
         // points. Likewise for the right hand side:
         lambda.value_list (fe_values.get_quadrature_points(), lambda_values);
         mu.value_list     (fe_values.get_quadrature_points(), mu_values);
-
-        right_hand_side.vector_value_list (fe_values.get_quadrature_points(),
-                                           rhs_values);
+        right_hand_side (fe_values.get_quadrature_points(), rhs_values);
 
         // Then assemble the entries of the local stiffness matrix and right
         // hand side vector. This follows almost one-to-one the pattern
@@ -522,7 +407,7 @@ namespace Step8
 
             for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
               cell_rhs(i) += fe_values.shape_value(i,q_point) *
-                             rhs_values[q_point](component_i) *
+                             rhs_values[q_point][component_i] *
                              fe_values.JxW(q_point);
           }
 

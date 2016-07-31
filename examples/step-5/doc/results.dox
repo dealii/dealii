@@ -1,8 +1,7 @@
 <h1>Results</h1>
 
 
-When the last block in <code>main()</code> is commented in, the output
-of the program looks as follows:
+Here is the console output:
 @code
 Cycle 0:
    Number of active cells: 20
@@ -34,28 +33,10 @@ Cycle 5:
    Total number of cells: 27300
    Number of degrees of freedom: 20609
    182 CG iterations needed to obtain convergence.
---------------------------------------------------------
-An error occurred in line <273> of file <\step-5.cc> in function
-    void Coefficient<dim>::value_list(const std::vector<Point<dim>, std::allocator<Point<dim> > >&, std::vector<double, std::allocator<double> >&, unsigned int)
- const [with int dim = 2]
-The violated condition was:
-    values.size() == points.size()
-The name and call sequence of the exception was:
-    ExcDimensionMismatch (values.size(), points.size())
-Additional Information:
-Dimension 1 not equal to 2
-
-Stacktrace:
------------
-#0  ./\step-5: Coefficient<2>::value_list(std::vector<Point<2>, std::allocator<Point<2> > > const&, std::vector<double, std::allocator<double> >&, unsigned) const
-#1  ./\step-5: main
---------------------------------------------------------
-make: *** [run] Aborted
 @endcode
 
 
 
-Let's first focus on the things before the error:
 In each cycle, the number of cells quadruples and the number of CG
 iterations roughly doubles.
 Also, in each cycle, the program writes one output graphic file in EPS
@@ -100,63 +81,3 @@ the solution is flattened. The gradient of the solution is
 discontinuous there, although this is not very clearly visible in the
 pictures above. We will look at this in more detail in the next
 example.
-
-
-
-
-As for the error &mdash; let's look at it again:
-@code
---------------------------------------------------------
-An error occurred in line <273> of file <\step-5.cc> in function
-    void Coefficient<dim>::value_list(const std::vector<Point<dim>, std::allocator<Point<dim> > >&, std::vector<double, std::allocator<double> >&, unsigned int)
- const [with int dim = 2]
-The violated condition was:
-    values.size() == points.size()
-The name and call sequence of the exception was:
-    ExcDimensionMismatch (values.size(), points.size())
-Additional Information:
-Dimension 1 not equal to 2
-
-Stacktrace:
------------
-#0  ./\step-5: Coefficient<2>::value_list(std::vector<Point<2>, std::allocator<Point<2> > > const&, std::vector<double, std::allocator<double> >&, unsigned) const
-#1  ./\step-5: main
---------------------------------------------------------
-make: *** [run] Aborted
-@endcode
-
-
-
-What we see is that the error was triggered in line 273 of the
-step-5.cc file (as we modify tutorial programs over time, these line
-numbers change, so you should check what line number you actually get
-in your output). That's already good information if you want to look up
-in the code what exactly happened. But the text tells you even
-more. First, it prints the function this happens in, and then the
-plain text version of the condition that was violated. This will
-almost always be enough already to let you know what exactly went wrong.
-
-
-
-But that's not all yet. You get to see the name of the exception
-(<code>ExcDimensionMismatch</code>) and this exception even prints the
-values of the two array sizes. If you go back to the code in
-<code>main()</code>, you will remember that we gave the two variables
-sizes 1 and 2, which of course are the ones that you find in the
-output again.
-
-
-
-So now we know pretty exactly where the error happened and what went
-wrong. What we don't know yet is how exactly we got there. The
-stacktrace at the bottom actually tells us what happened: the problem
-happened in
-<code>Coefficient::value_list</code> (stackframe 0) and that it was
-called from <code>main()</code> (stackframe 1). In realistic programs,
-there would be many more functions in between these two. For example,
-we might have made the mistake in the <code>assemble_system</code>
-function, in which case stack frame 1 would be
-<code>Step5::assemble_system</code>, stack frame 2
-would be <code>Step5::run</code>, and stack frame 3
-would be <code>main()</code> &mdash; you get the idea.
-

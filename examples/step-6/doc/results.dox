@@ -14,19 +14,19 @@ Cycle 2:
    Number of degrees of freedom: 449
 Cycle 3:
    Number of active cells:       200
-   Number of degrees of freedom: 961
+   Number of degrees of freedom: 921
 Cycle 4:
    Number of active cells:       440
-   Number of degrees of freedom: 2033
+   Number of degrees of freedom: 2017
 Cycle 5:
-   Number of active cells:       932
-   Number of degrees of freedom: 4465
+   Number of active cells:       956
+   Number of degrees of freedom: 4425
 Cycle 6:
    Number of active cells:       1916
-   Number of degrees of freedom: 9113
+   Number of degrees of freedom: 8993
 Cycle 7:
-   Number of active cells:       3884
-   Number of degrees of freedom: 18401
+   Number of active cells:       3860
+   Number of degrees of freedom: 18353
 @endcode
 
 
@@ -109,51 +109,48 @@ from the optimal square.
 
 
 
-
 For completeness, we show what happens if the code we commented about
 in the destructor of the <code>Step6</code> class is omitted
 from this example.
 
 @code
 --------------------------------------------------------
-An error occurred in line <79> of file <source/subscriptor.cc> in function
-    virtual Subscriptor::~Subscriptor()
+An error occurred in line <128> of file <source/base/subscriptor.cc> in function
+    void dealii::Subscriptor::check_no_subscribers() const
 The violated condition was:
     counter == 0
 The name and call sequence of the exception was:
-    ExcInUse(counter, object_info->name(), infostring)
+    ExcInUse (counter, object_info->name(), infostring)
 Additional Information:
-Object of class 4FE_QILi2EE is still used by 1 other objects.
-  from Subscriber 10DoFHandlerILi2EE
+Object of class N6dealii4FE_QILi2ELi2EEE is still used by 1 other objects.
+
+(Additional information: <none>)
+
+See the entry in the Frequently Asked Questions of deal.II (linked to from
+http://www.dealii.org/) for a lot more information on what this error means and
+how to fix programs in which it happens.
 
 Stacktrace:
 -----------
-#0  /u/bangerth/p/deal.II/1/deal.II/lib/libbase.g.so: Subscriptor::~Subscriptor()
-#1  /u/bangerth/p/deal.II/1/deal.II/lib/libdeal_II_2d.g.so: FiniteElement<2>::~FiniteElement()
-#2  ./\step-6: FE_Poly<TensorProductPolynomials<2>, 2>::~FE_Poly()
-#3  ./\step-6: FE_Q<2>::~FE_Q()
-#4  ./\step-6: Step6<2>::~Step6()
-#5  ./\step-6: main
+#0  /lib/libdeal_II.g.so: dealii::Subscriptor::check_no_subscribers() const
+#1  /lib/libdeal_II.g.so: dealii::Subscriptor::~Subscriptor()
+#2  /lib/libdeal_II.g.so: dealii::FiniteElement<2, 2>::~FiniteElement()
+#3  ./step-6: Step6<2>::~Step6()
+#4  ./step-6: main
 --------------------------------------------------------
-make: *** [run] Aborted
 @endcode
 
+From the above error message, we conclude that something is still using an
+object with type <code>N6dealii4FE_QILi2EE</code>. This is of course the <a
+href="http://en.wikipedia.org/wiki/Name_mangling">"mangled" name</a> for
+<code>FE_Q</code>. The mangling works as follows: the <code>N6</code> indicates
+a namespace with six characters (i.e., <code>dealii</code>) and the
+<code>4</code> indicates the number of characters of the template class (i.e.,
+<code>FE_Q</code>).
 
-
-From the above error message, we conclude that an object of type
-<code>10DoFHandlerILi2EE</code> is still using the object of type
-<code>4FE_QILi2EE</code>. These are of course <a
-href="http://en.wikipedia.org/wiki/Name_mangling">"mangled" names</a> for
-<code>DoFHandler</code> and <code>FE_Q</code>. The mangling works as
-follows: the first number indicates the number of characters of the
-template class, i.e. 10 for <code>DoFHandler</code> and 4
-for <code>FE_Q</code>; the rest of the text is then template
-arguments. From this we can already glean a little bit who's the
-culprit here, and who the victim:
-The one object that still uses the finite element is the
-<code>dof_handler</code> object.
-
-
+The rest of the text is then template arguments. From this we can already glean
+a little bit who's the culprit here, and who the victim: The one object that
+still uses the finite element is the <code>dof_handler</code> object.
 
 The stacktrace gives an indication of where the problem happened. We
 see that the exception was triggered in the

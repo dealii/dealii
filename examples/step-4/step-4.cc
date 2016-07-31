@@ -117,11 +117,19 @@ private:
 // where we want to evaluate the function. A value for the component can then
 // simply be omitted for scalar functions.
 //
-// Note that the C++ language forces us to declare and define a constructor to
-// the following classes even though they are empty. This is due to the fact
-// that the base class has no default constructor (i.e. one without
-// arguments), even though it has a constructor which has default values for
-// all arguments.
+// Function objects are used in lots of places in the library (for example, in
+// step-2 we used a ZeroFunction instance as an argument to
+// VectorTools::interpolate_boundary_values) and this is the first step where
+// we define a new class that inherits from Function. Since we only ever call
+// Function::value, we could get away with just a plain function (and this is
+// what is done in step-5), but since this is a tutorial we inherit from
+// Function for the sake of example.
+//
+// Unfortunately, some compilers (notably clang 3.8) have a bug where they
+// cannot figure out the default constructor (that is, the constructor which
+// takes no arguments) of classes derived from Function. For portability we
+// provide such constructors in all the tutorial programs so that all
+// supported compilers are happy.
 template <int dim>
 class RightHandSide : public Function<dim>
 {
