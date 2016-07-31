@@ -1149,7 +1149,8 @@ namespace DoFTools
       = (dynamic_cast<const parallel::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *>
          (&dof_handler.get_triangulation()) == 0
          ?
-         1
+         (1+*std::max_element (subdomain_association.begin (),
+                               subdomain_association.end ()))
          :
          Utilities::MPI::n_mpi_processes
          (dynamic_cast<const parallel::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *>
