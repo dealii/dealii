@@ -1482,12 +1482,10 @@ void TimeDependent::do_loop (InitFunctionObject      init_function,
     switch (direction)
       {
       case forward:
-        init_function (static_cast<typename InitFunctionObject::argument_type>
-                       (&*timesteps[step]));
+        init_function ((&*timesteps[step]));
         break;
       case backward:
-        init_function (static_cast<typename InitFunctionObject::argument_type>
-                       (&*timesteps[n_timesteps-step-1]));
+        init_function ((&*timesteps[n_timesteps-step-1]));
         break;
       };
 
@@ -1532,12 +1530,10 @@ void TimeDependent::do_loop (InitFunctionObject      init_function,
       switch (direction)
         {
         case forward:
-          loop_function (static_cast<typename LoopFunctionObject::argument_type>
-                         (&*timesteps[step]));
+          loop_function ((&*timesteps[step]));
           break;
         case backward:
-          loop_function (static_cast<typename LoopFunctionObject::argument_type>
-                         (&*timesteps[n_timesteps-step-1]));
+          loop_function ((&*timesteps[n_timesteps-step-1]));
           break;
         };
 
