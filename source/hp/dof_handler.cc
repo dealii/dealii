@@ -3235,13 +3235,16 @@ namespace hp
           std::transform (tria->levels[i]->cells.children.begin (),
                           tria->levels[i]->cells.children.end (),
                           has_children_level->begin (),
-                          std::bind2nd (std::not_equal_to<int>(), -1));
+                          std_cxx11::bind(std::not_equal_to<int>(),
+                                          std_cxx11::_1,
+                                          -1));
         else
           std::transform (tria->levels[i]->cells.refinement_cases.begin (),
                           tria->levels[i]->cells.refinement_cases.end (),
                           has_children_level->begin (),
-                          std::bind2nd (std::not_equal_to<unsigned char>(),
-                                        static_cast<unsigned char>(RefinementCase<dim>::no_refinement)));
+                          std_cxx11::bind (std::not_equal_to<unsigned char>(),
+                                           std_cxx11::_1,
+                                           static_cast<unsigned char>(RefinementCase<dim>::no_refinement)));
 
         has_children.push_back (has_children_level);
       }

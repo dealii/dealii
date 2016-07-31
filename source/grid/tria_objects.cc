@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/std_cxx11/bind.h>
 #include <deal.II/grid/tria_objects.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -170,7 +171,7 @@ namespace internal
       const unsigned int new_size = new_hexes +
                                     std::count_if (used.begin(),
                                                    used.end(),
-                                                   std::bind2nd (std::equal_to<bool>(), true));
+                                                   std_cxx11::bind (std::equal_to<bool>(), std_cxx11::_1, true));
 
       // see above...
       if (new_size>cells.size())

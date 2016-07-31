@@ -3199,7 +3199,7 @@ namespace DoFTools
     // now compute the requested representation
     const types::global_dof_index n_global_parm_dofs
       = std::count_if (weight_mapping.begin(), weight_mapping.end(),
-                       std::bind2nd (std::not_equal_to<types::global_dof_index> (), numbers::invalid_dof_index));
+                       std_cxx11::bind (std::not_equal_to<types::global_dof_index>(), std_cxx11::_1, numbers::invalid_dof_index));
 
     // first construct the inverse mapping of weight_mapping
     std::vector<types::global_dof_index> inverse_weight_mapping (n_global_parm_dofs,

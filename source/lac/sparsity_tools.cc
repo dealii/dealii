@@ -226,8 +226,9 @@ namespace SparsityTools
         last_round_dofs[i] = numbers::invalid_size_type;
 
     std::remove_if (last_round_dofs.begin(), last_round_dofs.end(),
-                    std::bind2nd(std::equal_to<DynamicSparsityPattern::size_type>(),
-                                 numbers::invalid_size_type));
+                    std_cxx11::bind(std::equal_to<DynamicSparsityPattern::size_type>(),
+                                    std_cxx11::_1,
+                                    numbers::invalid_size_type));
 
     // now if no valid points remain: find dof with lowest coordination number
     if (last_round_dofs.empty())

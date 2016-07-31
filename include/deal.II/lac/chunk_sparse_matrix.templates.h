@@ -519,7 +519,7 @@ ChunkSparseMatrix<number>::n_actually_nonzero_elements () const
   return std::count_if(&val[0],
                        &val[cols->sparsity_pattern.n_nonzero_elements () *
                             chunk_size * chunk_size],
-                       std::bind2nd(std::not_equal_to<double>(), 0));
+                       std_cxx11::bind(std::not_equal_to<double>(), std_cxx11::_1, 0));
 }
 
 

@@ -89,8 +89,9 @@ FiniteElement (const FiniteElementData<dim> &fe_data,
 {
   this->set_primitivity(std::find_if (n_nonzero_components_table.begin(),
                                       n_nonzero_components_table.end(),
-                                      std::bind2nd(std::not_equal_to<unsigned int>(),
-                                                   1U))
+                                      std_cxx11::bind (std::not_equal_to<unsigned int>(),
+                                                       std_cxx11::_1,
+                                                       1U))
                         == n_nonzero_components_table.end());
 
 
