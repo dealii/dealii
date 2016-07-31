@@ -395,6 +395,20 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: The TrilinosWrappers::SparsityPattern::print() and
+ TrilinosWrappers::SparsityPattern::print_gnuplot() methods did not produce
+ correct output on distributed computations. This is now fixed.
+ <br>
+ (Martin Kronbichler, 2016/07/30)
+ </li>
+
+ <li> Fixed: Level indices for geometric multigrid queried through
+ DoFAccessor::get_mg_dof_indices() would return wrong indices on lines
+ and faces in non-standard orientation in 3D. This is now fixed.
+ <br>
+ (Martin Kronbichler, 2016/07/27)
+ </li>
+
  <li> New: There is now a new DoFTools::make_flux_sparsity_pattern()
  which takes a constraint matrix and flux and internal dof masks, in
  parallel. This is useful in the case where some components of a
@@ -403,13 +417,6 @@ inconvenience this causes.
  building the flux terms needed for the discontinuous part.
  <br>
  (Sam Cox, 2016/07/25)
- </li>
-
- <li> Fixed: Level indices for geometric multigrid queried through
- DoFAccessor::get_mg_dof_indices() would return wrong indices on lines
- and faces in non-standard orientation in 3D. This is now fixed.
- <br>
- (Martin Kronbichler, 2016/07/27)
  </li>
 
  <li> Improved: Allow for including dofs for individual components on
