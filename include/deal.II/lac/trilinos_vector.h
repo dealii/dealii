@@ -259,18 +259,6 @@ namespace TrilinosWrappers
       typedef dealii::types::global_dof_index size_type;
 
       /**
-       * A variable that indicates whether this vector supports distributed
-       * data storage. If true, then this vector also needs an appropriate
-       * compress() function that allows communicating recent set or add
-       * operations to individual elements to be communicated to other
-       * processors.
-       *
-       * For the current class, the variable equals true, since it does
-       * support parallel data storage.
-       */
-      static const bool supports_distributed_data = true;
-
-      /**
        * @name Basic constructors and initialization.
        */
       //@{
@@ -619,6 +607,15 @@ namespace TrilinosWrappers
                    const IndexSet &ghost_entries,
                    const MPI_Comm &communicator = MPI_COMM_WORLD,
                    const bool      vector_writable = false);
+
+      /**
+       * A variable that indicates whether this vector supports distributed
+       * data storage.
+       *
+       * For the current class, the variable equals true, since it does
+       * support parallel data storage.
+       */
+      bool supports_distributed_data() const;
 //@}
     };
 
@@ -715,6 +712,12 @@ namespace TrilinosWrappers
     }
 
 
+
+    inline
+    bool Vector::supports_distributed_data() const
+    {
+      return true;
+    }
 #endif /* DOXYGEN */
 
   } /* end of namespace MPI */
@@ -741,18 +744,6 @@ namespace TrilinosWrappers
      * Declare type for container size.
      */
     typedef dealii::types::global_dof_index size_type;
-
-    /**
-     * A variable that indicates whether this vector supports distributed data
-     * storage. If true, then this vector also needs an appropriate compress()
-     * function that allows communicating recent set or add operations to
-     * individual elements to be communicated to other processors.
-     *
-     * For the current class, the variable equals false, since it does not
-     * support parallel data storage.  If you do need parallel data storage,
-     * use TrilinosWrappers::MPI::Vector.
-     */
-    static const bool supports_distributed_data = false;
 
     /**
      * Default constructor that generates an empty (zero size) vector. The
@@ -910,6 +901,16 @@ namespace TrilinosWrappers
      * thus an empty function.
      */
     void update_ghost_values () const;
+
+    /**
+     * A variable that indicates whether this vector supports distributed data
+     * storage.
+     *
+     * For the current class, the variable equals false, since it does not
+     * support parallel data storage.  If you do need parallel data storage,
+     * use TrilinosWrappers::MPI::Vector.
+     */
+    bool supports_distributed_data() const;
   };
 
 
@@ -990,6 +991,13 @@ namespace TrilinosWrappers
   Vector::update_ghost_values () const
   {}
 
+
+
+  inline
+  bool Vector::supports_distributed_data() const
+  {
+    return false;
+  }
 
 #endif
 

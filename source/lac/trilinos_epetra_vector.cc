@@ -399,6 +399,13 @@ namespace LinearAlgebra
 
 
 
+    bool Vector::supports_distributed_data() const
+    {
+      return true;
+    }
+
+
+
     Vector::size_type Vector::size() const
     {
 #ifndef DEAL_II_WITH_64BIT_INDICES

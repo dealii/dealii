@@ -208,6 +208,11 @@ namespace LinearAlgebra
       virtual double add_and_dot(const double a,
                                  const VectorSpaceVector<double> &V,
                                  const VectorSpaceVector<double> &W);
+      /**
+       * A variable that indicates whether this vector supports distributed data
+       * storage.
+       */
+      virtual bool supports_distributed_data() const;
 
       /**
        * Returns the global size of the vector, equal to the sum of the number of

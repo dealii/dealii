@@ -851,7 +851,7 @@ ConstraintMatrix::distribute (VectorType &vec) const
   // call compress() finally. the first case here is for the complicated case,
   // the last else is for the simple case (sequential vector)
   const IndexSet vec_owned_elements = vec.locally_owned_elements();
-  if (vec.supports_distributed_data == true)
+  if (vec.supports_distributed_data() == true)
     {
       // This processor owns only part of the vector. one may think that
       // every processor should be able to simply communicate those elements

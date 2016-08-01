@@ -59,18 +59,6 @@ namespace PETScWrappers
     typedef types::global_dof_index size_type;
 
     /**
-     * A variable that indicates whether this vector supports distributed data
-     * storage. If true, then this vector also needs an appropriate compress()
-     * function that allows communicating recent set or add operations to
-     * individual elements to be communicated to other processors.
-     *
-     * For the current class, the variable equals false, since it does not
-     * support parallel data storage. If you do need parallel data storage,
-     * use PETScWrappers::MPI::Vector.
-     */
-    static const bool supports_distributed_data = false;
-
-    /**
      * Default constructor. Initialize the vector as empty.
      */
     Vector ();
@@ -182,6 +170,16 @@ namespace PETScWrappers
      */
     void reinit (const Vector &v,
                  const bool    omit_zeroing_entries = false);
+
+    /**
+     * A variable that indicates whether this vector supports distributed data
+     * storage.
+     *
+     * For the current class, the variable equals false, since it does not
+     * support parallel data storage. If you do need parallel data storage,
+     * use PETScWrappers::MPI::Vector.
+     */
+    bool supports_distributed_data() const;
 
   protected:
     /**
@@ -386,6 +384,14 @@ namespace PETScWrappers
     compress (::dealii::VectorOperation::insert);
 
     return *this;
+  }
+
+
+
+  inline
+  bool Vector::supports_distributed_data() const
+  {
+    return false;
   }
 #endif // DOXYGEN
 

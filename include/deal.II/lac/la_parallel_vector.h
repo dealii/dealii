@@ -187,18 +187,6 @@ namespace LinearAlgebra
       typedef typename numbers::NumberTraits<Number>::real_type real_type;
 
       /**
-       * A variable that indicates whether this vector supports distributed
-       * data storage. If true, then this vector also needs an appropriate
-       * compress() function that allows communicating recent set or add
-       * operations to individual elements to be communicated to other
-       * processors.
-       *
-       * For the current class, the variable equals true, since it does
-       * support parallel data storage.
-       */
-      static const bool supports_distributed_data = true;
-
-      /**
        * @name 1: Basic Object-handling
        */
       //@{
@@ -640,6 +628,15 @@ namespace LinearAlgebra
       virtual Number add_and_dot(const Number a,
                                  const VectorSpaceVector<Number> &V,
                                  const VectorSpaceVector<Number> &W);
+
+      /**
+       * A variable that indicates whether this vector supports distributed
+       * data storage.
+       *
+       * For the current class, the variable equals true, since it does
+       * support parallel data storage.
+       */
+      virtual bool supports_distributed_data() const;
 
       /**
        * Return the global size of the vector, equal to the sum of the number of
@@ -1125,6 +1122,14 @@ namespace LinearAlgebra
       return vector_is_ghosted;
     }
 
+
+    template <typename Number>
+    inline
+    bool
+    Vector<Number>::supports_distributed_data() const
+    {
+      return true;
+    }
 
 
     template <typename Number>

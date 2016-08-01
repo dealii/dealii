@@ -562,17 +562,6 @@ public:
   typedef typename BlockType::real_type real_type;
 
   /**
-   * A variable that indicates whether this vector supports distributed data
-   * storage. If true, then this vector also needs an appropriate compress()
-   * function that allows communicating recent set or add operations to
-   * individual elements to be communicated to other processors.
-   *
-   * For the current class, the variable equals the value declared for the
-   * type of the individual blocks.
-   */
-  static const bool supports_distributed_data = BlockType::supports_distributed_data;
-
-  /**
    * Default constructor.
    */
   BlockVectorBase ();
@@ -973,6 +962,15 @@ public:
    * an empty function.
    */
   void update_ghost_values () const;
+
+  /**
+   * A variable that indicates whether this vector supports distributed data
+   * storage.
+   *
+   * For the current class, the variable equals the value declared for the
+   * type of the individual blocks.
+   */
+  bool supports_distributed_data() const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -2262,6 +2260,17 @@ void BlockVectorBase<VectorType>::extract_subvector_to (ForwardIterator         
       indices_begin++;
       values_begin++;
     }
+}
+
+
+template <typename VectorType>
+inline
+bool BlockVectorBase<VectorType>::supports_distributed_data() const
+{
+  // Create a dummy vector of type VectorType to check
+  // supports_distributed_data even if BlockVectorBase contains no block
+  VectorType dummy;
+  return dummy.supports_distributed_data();
 }
 
 #endif // DOXYGEN

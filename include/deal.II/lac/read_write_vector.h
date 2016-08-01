@@ -467,6 +467,11 @@ namespace LinearAlgebra
     void add (const size_type  n_elements,
               const size_type *indices,
               const Number2   *values);
+    /**
+     * A variable that indicates whether this vector supports distributed data
+     * storage.
+     */
+    virtual bool supports_distributed_data() const;
 
     /**
      * Prints the vector to the output stream @p out.
@@ -879,12 +884,22 @@ namespace LinearAlgebra
 
   template <typename Number>
   template <typename Functor>
+  inline
   void
   ReadWriteVector<Number>::FunctorTemplate<Functor>::operator() (const size_type begin,
       const size_type end)
   {
     for (size_type i=begin; i<end; ++i)
       functor(parent.val[i]);
+  }
+
+
+
+  template <typename Number>
+  inline
+  bool ReadWriteVector<Number>::supports_distributed_data() const
+  {
+    return false;
   }
 #endif
 
