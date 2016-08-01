@@ -1131,6 +1131,9 @@ namespace DoFTools
   std::vector<IndexSet>
   locally_owned_dofs_per_subdomain (const DoFHandlerType  &dof_handler)
   {
+    Assert(dof_handler.n_dofs() > 0,
+           ExcMessage("The given DoFHandler has no DoFs."));
+
     // If the Triangulation is distributed, the only thing we can usefully
     // ask is for its locally owned subdomain
     Assert ((dynamic_cast<const parallel::distributed::
@@ -1141,10 +1144,15 @@ namespace DoFTools
                         "related to a subdomain other than the locally owned one does "
                         "not make sense."));
 
-    //the following is a random process (flip of a coin), thus should be called once only.
+    // The following is a random process (flip of a coin), thus should be called once only.
     std::vector< dealii::types::subdomain_id > subdomain_association (dof_handler.n_dofs ());
     dealii::DoFTools::get_subdomain_association (dof_handler, subdomain_association);
 
+    // We have no MPI communicator with a serial computation and the subdomains
+    // can be set to arbitrary values. In case of a parallel Triangulation,
+    // we can check that we don't have more subdomains than processors.
+    // Note that max_element is well-defined because subdomain_association
+    // is non-empty (n_dofs()>0).
     const unsigned int n_subdomains
       = (dynamic_cast<const parallel::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *>
          (&dof_handler.get_triangulation()) == 0
