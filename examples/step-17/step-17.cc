@@ -377,7 +377,7 @@ namespace Step17
     hanging_node_constraints.close ();
 
     // Now we create the sparsity pattern for the system matrix. Note that we
-    // again compute and store all constraints and not only the ones relevant
+    // again compute and store all entries and not only the ones relevant
     // to this process (see step-18 or step-40 for a more efficient way to
     // handle this).
     DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
@@ -399,8 +399,8 @@ namespace Step17
     // as vectors are partitioned with which the matrix is multiplied, while
     // rows have to partitioned in the same way as destination vectors of
     // matrix-vector multiplications:
-    std::vector<IndexSet> locally_owned_dofs_per_proc = DoFTools::locally_owned_dofs_per_subdomain(dof_handler);
-    IndexSet locally_owned_dofs = locally_owned_dofs_per_proc[this_mpi_process];
+    const std::vector<IndexSet> locally_owned_dofs_per_proc = DoFTools::locally_owned_dofs_per_subdomain(dof_handler);
+    const IndexSet locally_owned_dofs = locally_owned_dofs_per_proc[this_mpi_process];
 
     system_matrix.reinit (locally_owned_dofs,
                           locally_owned_dofs,
