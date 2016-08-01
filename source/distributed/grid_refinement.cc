@@ -295,7 +295,7 @@ namespace
           unsigned int
           my_count = std::count_if (criteria.begin(),
                                     criteria.end(),
-                                    std_cxx11::bind (&std::greater<double>,
+                                    std_cxx11::bind (std::greater<double>(),
                                                      std_cxx11::_1,
                                                      test_threshold));
 
