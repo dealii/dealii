@@ -1871,9 +1871,8 @@ namespace DoFRenumbering
     for (unsigned int i=0; i<n_dofs; ++i)
       new_indices[i] = i;
 
-    // shuffle the elements; the following is essentially the
-    // std::random_shuffle algorithm but uses a predictable
-    // random number generator
+    // shuffle the elements; the following is essentially std::shuffle (which
+    // is new in C++11) but with a boost URNG
     ::boost::mt19937 random_number_generator;
     for (unsigned int i=1; i<n_dofs; ++i)
       {
