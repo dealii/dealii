@@ -108,8 +108,7 @@ $(u^0,p^0,\phi^0=0)$ and $(u^1,p^1,\phi^1=p^1-p^0)$. Then the projection method 
     </ul>
 </ul>
 
-Without going into details, which can be found in the corresponding literature, let us remark a few things about the
-projection methods that we have just described:
+Without going into details, let us remark a few things about the projection methods that we have just described:
 <ul>
   <li> The advection term $u\cdot\nabla u$ is replaced by its <i>skew symmetric form</i>
   @f[
@@ -142,6 +141,35 @@ projection methods that we have just described:
   the standard form is the one that should be used if, for instance, the viscosity $\nu$ is variable.
 </ul>
 
+
+<p>
+The standard incremental scheme and the rotational incremental scheme were first considered by van Kan in
+<ul>
+  <li> J. van Kan, "A second-order accurate pressure-correction scheme for viscous incompressible flow",
+       SIAM Journal on Scientific and Statistical Computing, vol. 7, no. 3, pp. 870–891, 1986
+</ul>
+and is analyzed by Guermond in
+<ul>
+  <li> J.-L. Guermond, "Un résultat de convergence d’ordre deux en temps pour
+                        l’approximation des équations de Navier–Stokes par une technique de projection incrémentale",
+       ESAIM: Mathematical Modelling and Numerical Analysis, vol. 33, no. 1, pp. 169–189, 1999
+</ul>
+for the case $\nu = 1$.
+It turns out that this technique suffers from unphysical boundary conditions for the kinematic pressure that
+lead to reduced rates of convergence. To prevent this, Timmermans et al. proposed in
+<ul>
+  <li> L. Timmermans, P. Minev, and F. Van De Vosse,
+       "An approximate projection scheme for incompressible flow using spectral elements",
+       International Journal for Numerical Methods in Fluids, vol. 22, no. 7, pp. 673–688, 1996
+</ul>
+the rotational pressure-correction projection method that uses a divergence correction for the kinematic pressure.
+A thorough analysis for scheme has first been performed in
+<ul>
+  <li> J.-L. Guermond and J. Shen, "On the error estimates for the rotational pressure-correction projection methods",
+       Mathematics of Computation, vol. 73, no. 248, pp. 1719–1737, 2004
+</ul>
+for the Stokes problem.
+</p>
 
 <a name ="fullydiscrete"></a>
 <h3> The Fully Discrete Setting </h3>
