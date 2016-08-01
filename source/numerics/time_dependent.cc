@@ -175,8 +175,8 @@ TimeDependent::solve_dual_problem ()
 void
 TimeDependent::postprocess ()
 {
-  do_loop (std_cxx11::bind(&TimeStepBase::init_for_postprocessing, std_cxx11),
-           std_cxx11::bind(&TimeStepBase::postprocess_timestep, std_cxx11),
+  do_loop (std_cxx11::bind(&TimeStepBase::init_for_postprocessing, std_cxx11::_1),
+           std_cxx11::bind(&TimeStepBase::postprocess_timestep, std_cxx11::_1),
            timestepping_data_postprocess,
            forward);
 }
