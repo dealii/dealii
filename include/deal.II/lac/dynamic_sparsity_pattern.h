@@ -342,7 +342,9 @@ public:
                           const IndexSet &rowset = IndexSet());
 
   /**
-   * Create a square SparsityPattern using the index set.
+   * Create a square SparsityPattern using the given index set. The total size
+   * is given by the size of @p indexset and only rows corresponding to
+   * indices in @p indexset are stored on the current processor.
    */
   DynamicSparsityPattern (const IndexSet &indexset);
 
