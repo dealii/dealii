@@ -395,6 +395,10 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: (P)ARPACK interface for non-symmetric matrices.
+ <br>
+ (Joscha Gedicke, 2016/08/01)
+
  <li> Fixed: The TrilinosWrappers::SparsityPattern::print() and
  TrilinosWrappers::SparsityPattern::print_gnuplot() methods did not produce
  correct output on distributed computations. This is now fixed.
