@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2015 by the deal.II authors
+// Copyright (C) 2009 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,12 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
+// Test DoFTools::make_cell_patches with parallel::distributed::Triangulation
+
 
 #include "block_list.h"
 
 template <int dim>
 void
-test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
+test_block_list(const parallel::distributed::Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
 
@@ -28,7 +30,7 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
   const unsigned int level = tr.n_levels()-1;
 
-  SparsityPattern bl(tr.n_cells(level), dof.n_dofs(level), fe.dofs_per_cell);
+  SparsityPattern bl;
   DoFTools::make_cell_patches(bl, dof, level);
   bl.compress();
 
@@ -48,13 +50,15 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 }
 
 
-int main()
+int main(int argc, char **argv)
 {
-  initlog();
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+
+  MPILogInitAll all;
   deallog.push("2D");
-  test_global_refinement<Triangulation<2> >(&test_block_list<2>);
+  test_global_refinement_parallel<2>(&test_block_list<2>);
   deallog.pop();
   deallog.push("3D");
-  test_global_refinement<Triangulation<3> >(&test_block_list<3>);
+  test_global_refinement_parallel<3>(&test_block_list<3>);
   deallog.pop();
 }

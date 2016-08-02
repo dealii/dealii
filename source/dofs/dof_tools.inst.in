@@ -14,19 +14,6 @@
 // ---------------------------------------------------------------------
 
 
-
-
-
-
-for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
-  {
-   template void
-   DoFTools::make_cell_patches<DoFHandler<deal_II_dimension>,SP>
-   (SP&, const DoFHandler<deal_II_dimension>&, const unsigned int, const std::vector<bool>&, types::global_dof_index);
-  }
-
-
-
 for (deal_II_dimension : DIMENSIONS)
 {
 
@@ -46,6 +33,10 @@ for (deal_II_dimension : DIMENSIONS)
    IndexSet & dof_set);
 #endif
 
+  template void
+  DoFTools::make_cell_patches<DoFHandler<deal_II_dimension> >
+  (SparsityPattern&, const DoFHandler<deal_II_dimension>&, const unsigned int, const std::vector<bool>&, types::global_dof_index);
+ 
   template
   std::vector<unsigned int>
   DoFTools::make_vertex_patches (SparsityPattern&, const DoFHandler<deal_II_dimension>&,
