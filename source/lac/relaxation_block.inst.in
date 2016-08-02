@@ -24,7 +24,7 @@ for (S1, S2 : REAL_SCALARS)
 }
 
 
-for (S1, S2, S3 : REAL_SCALARS)
+for (S1, S2, S3: REAL_SCALARS)
 {
 // ------------ RelaxationBlockJacobi -----------------
     template
@@ -49,5 +49,32 @@ for (S1, S2, S3 : REAL_SCALARS)
     template
     void RelaxationBlockSSOR<SparseMatrix<S1>, S2>::Tstep<S3>
     (Vector<S3> &, const Vector<S3> &) const;
+}
+
+
+for (S2 : REAL_SCALARS)
+{
+#ifdef DEAL_II_WITH_TRILINOS
+    template class RelaxationBlock<TrilinosWrappers::SparseMatrix, S2>;
+    template class RelaxationBlockJacobi<TrilinosWrappers::SparseMatrix, S2>;
+    template class RelaxationBlockSOR<TrilinosWrappers::SparseMatrix, S2>;
+    template class RelaxationBlockSSOR<TrilinosWrappers::SparseMatrix, S2>;
+    
+    template void RelaxationBlockJacobi<TrilinosWrappers::SparseMatrix, S2>::step
+      (TrilinosWrappers::MPI::Vector &, const TrilinosWrappers::MPI::Vector &) const;
+    template void RelaxationBlockJacobi<TrilinosWrappers::SparseMatrix, S2>::Tstep
+      (TrilinosWrappers::MPI::Vector &, const TrilinosWrappers::MPI::Vector &) const;
+
+    template void RelaxationBlockSOR<TrilinosWrappers::SparseMatrix, S2>::step
+      (TrilinosWrappers::MPI::Vector &, const TrilinosWrappers::MPI::Vector &) const;
+    template void RelaxationBlockSOR<TrilinosWrappers::SparseMatrix, S2>::Tstep
+      (TrilinosWrappers::MPI::Vector &, const TrilinosWrappers::MPI::Vector &) const;
+
+// ------------ RelaxationBlockSSOR -----------------
+    template void RelaxationBlockSSOR<TrilinosWrappers::SparseMatrix, S2>::step
+      (TrilinosWrappers::MPI::Vector &, const TrilinosWrappers::MPI::Vector &) const;
+    template void RelaxationBlockSSOR<TrilinosWrappers::SparseMatrix, S2>::Tstep
+      (TrilinosWrappers::MPI::Vector &, const TrilinosWrappers::MPI::Vector &) const;
+#endif
 }
 
