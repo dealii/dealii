@@ -2069,13 +2069,15 @@ namespace DoFTools
     unsigned int i=0;
 
     for (cell=dof_handler.begin(level); cell != endc; ++cell)
-      if (cell->is_locally_owned())
+      if (cell->is_locally_owned_on_level())
         ++i;
     block_list.reinit(i, dof_handler.n_dofs(), dof_handler.get_fe().dofs_per_cell);
     i=0;
     for (cell=dof_handler.begin(level); cell != endc; ++cell)
       {
-        if (!cell->is_locally_owned()) continue;
+        if (!cell->is_locally_owned_on_level())
+          continue;
+
         indices.resize(cell->get_fe().dofs_per_cell);
         cell->get_mg_dof_indices(indices);
 

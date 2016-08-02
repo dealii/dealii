@@ -28,24 +28,25 @@ test_block_list(const parallel::distributed::Triangulation<dim> &tr, const Finit
   dof.initialize(tr, fe);
   dof.distribute_mg_dofs (fe);
 
-  const unsigned int level = tr.n_levels()-1;
-
-  SparsityPattern bl;
-  DoFTools::make_cell_patches(bl, dof, level);
-  bl.compress();
-
-  for (unsigned int i=0; i<bl.n_rows(); ++i)
+  for (unsigned int level=0; level<tr.n_global_levels(); ++level)
     {
-      deallog << "Block " << std::setw(3) << i;
-      std::vector<unsigned int> entries;
-      for (SparsityPattern::iterator b = bl.begin(i); b != bl.end(i); ++b)
-        entries.push_back(b->column());
+      SparsityPattern bl;
+      DoFTools::make_cell_patches(bl, dof, level);
+      bl.compress();
 
-      std::sort(entries.begin(), entries.end());
+      for (unsigned int i=0; i<bl.n_rows(); ++i)
+        {
+          deallog << "Level " << level << " Block " << std::setw(3) << i;
+          std::vector<unsigned int> entries;
+          for (SparsityPattern::iterator b = bl.begin(i); b != bl.end(i); ++b)
+            entries.push_back(b->column());
 
-      for (unsigned int i=0; i<entries.size(); ++i)
-        deallog << ' ' << std::setw(4) << entries[i];
-      deallog << std::endl;
+          std::sort(entries.begin(), entries.end());
+
+          for (unsigned int i=0; i<entries.size(); ++i)
+            deallog << ' ' << std::setw(4) << entries[i];
+          deallog << std::endl;
+        }
     }
 }
 
