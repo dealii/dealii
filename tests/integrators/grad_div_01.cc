@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Test the functions in integrators/elasticity.h
+// Test the functions in integrators/grad_div.h
 // Output matrices and assert consistency of residuals
 
 #include "../tests.h"

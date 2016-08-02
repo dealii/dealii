@@ -40,33 +40,6 @@ namespace LocalIntegrators
   namespace GradDiv
   {
     /**
-     * Auxiliary function. Computes the grad-div-operator from a set of
-     * Hessians.
-     *
-     * @note The third tensor argument is not used in two dimensions and can
-     * for instance duplicate one of the previous.
-     *
-     * @author Guido Kanschat
-     * @date 2011
-     */
-    template <int dim>
-    Tensor<1,dim>
-    grad_div(
-      const Tensor<2,dim> &h0,
-      const Tensor<2,dim> &h1,
-      const Tensor<2,dim> &h2)
-    {
-      Tensor<1,dim> result;
-      for (unsigned int d=0; d<dim; ++d)
-        {
-          result[d] += h0[d][0];
-          if (dim >=2) result[d] += h1[d][1];
-          if (dim >=3) result[d] += h2[d][2];
-        }
-      return result;
-    }
-
-    /**
      * The weak form of the grad-div operator penalizing volume changes
      * @f[
      *  \int_Z \nabla\!\cdot\!u \nabla\!\cdot\!v \,dx
@@ -93,15 +66,10 @@ namespace LocalIntegrators
           for (unsigned int i=0; i<n_dofs; ++i)
             for (unsigned int j=0; j<n_dofs; ++j)
               {
-                double dv = 0.;
-                double du = 0.;
-                for (unsigned int d=0; d<dim; ++d)
-                  {
-                    dv += fe.shape_grad_component(i,k,d)[d];
-                    du += fe.shape_grad_component(j,k,d)[d];
-                  }
-		
-                M(i,j) += dx * du * dv;
+                const double divu = fe[FEValuesExtractors::Vector(0)].divergence(j,k);
+                const double divv = fe[FEValuesExtractors::Vector(0)].divergence(i,k);
+
+                M(i,j) += dx * divu * divv;
               }
         }
     }
@@ -123,28 +91,25 @@ namespace LocalIntegrators
       const double factor = 1.)
     {
       const unsigned int n_dofs = fetest.dofs_per_cell;
-      
+
       AssertDimension(fetest.get_fe().n_components(), dim);
       AssertVectorVectorDimension(input, dim, fetest.n_quadrature_points);
-      
+
       for (unsigned int k=0; k<fetest.n_quadrature_points; ++k)
         {
           const double dx = factor * fetest.JxW(k);
           for (unsigned int i=0; i<n_dofs; ++i)
             {
-              double dv = 0.;
+              const double divv = fetest[FEValuesExtractors::Vector(0)].divergence(i,k);
               double du = 0.;
               for (unsigned int d=0; d<dim; ++d)
-                {
-                  dv += fetest.shape_grad_component(i,k,d)[d];
-                  du += input[d][k][d];
-                }
-	      
-              result(i) += dx * du * dv;
+                du += input[d][k][d];
+
+              result(i) += dx * du * divv;
             }
         }
     }
-    
+
     /**
      * The matrix for the weak boundary condition of Nitsche type for linear elasticity:
      * @f[
@@ -172,13 +137,13 @@ namespace LocalIntegrators
           for (unsigned int i=0; i<n_dofs; ++i)
             for (unsigned int j=0; j<n_dofs; ++j)
               {
-                double un = 0., vn = 0., divu = 0., divv = 0.;
+                const double divu = fe[FEValuesExtractors::Vector(0)].divergence(j,k);
+                const double divv = fe[FEValuesExtractors::Vector(0)].divergence(i,k);
+                double un = 0., vn = 0.;
                 for (unsigned int d=0; d<dim; ++d)
                   {
                     un += fe.shape_value_component(j,k,d) * n[d];
                     vn += fe.shape_value_component(i,k,d) * n[d];
-                    divu += fe.shape_grad_component(j,k,d)[d];
-                    divv += fe.shape_grad_component(i,k,d)[d];
                   }
 
                 M(i,j) += dx * 2. * penalty * un * vn;
@@ -217,7 +182,7 @@ namespace LocalIntegrators
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
       AssertDimension(fe.get_fe().n_components(), dim)
-	AssertVectorVectorDimension(input, dim, fe.n_quadrature_points);
+      AssertVectorVectorDimension(input, dim, fe.n_quadrature_points);
       AssertVectorVectorDimension(Dinput, dim, fe.n_quadrature_points);
       AssertVectorVectorDimension(data, dim, fe.n_quadrature_points);
 
@@ -225,30 +190,27 @@ namespace LocalIntegrators
         {
           const double dx = factor * fe.JxW(k);
           const Tensor<1,dim> n = fe.normal_vector(k);
-	  
-	  double umgn = 0.;
-	  double divu = 0.;
-	  for (unsigned int d=0; d<dim; ++d)
-	    {
-	      umgn += (input[d][k] - data[d][k]) * n[d];
-	      divu += Dinput[d][k][d];
-	    }
-	  
+
+          double umgn = 0.;
+          double divu = 0.;
+          for (unsigned int d=0; d<dim; ++d)
+            {
+              umgn += (input[d][k] - data[d][k]) * n[d];
+              divu += Dinput[d][k][d];
+            }
+
           for (unsigned int i=0; i<n_dofs; ++i)
-	    {
-	      double vn = 0.;
-	      double divv = 0.;
-	      for (unsigned int d=0; d<dim; ++d)
-		{
-		  vn += fe.shape_value_component(i,k,d) * n[d];
-		  divv += fe.shape_grad_component(i,k,d)[d];
-		}
-	      
-	      result(i) += dx*(2.*penalty*umgn*vn - divv*umgn - divu*vn);
-	    }
+            {
+              double vn = 0.;
+              const double divv = fe[FEValuesExtractors::Vector(0)].divergence(i,k);
+              for (unsigned int d=0; d<dim; ++d)
+                vn += fe.shape_value_component(i,k,d) * n[d];
+
+              result(i) += dx*(2.*penalty*umgn*vn - divv*umgn - divu*vn);
+            }
         }
     }
-    
+
     /**
      * The interior penalty flux for the grad-div operator. See
      * ip_residual() for details.
@@ -288,34 +250,30 @@ namespace LocalIntegrators
           const double dx = fe1.JxW(k);
           const Tensor<1,dim> n = fe1.normal_vector(k);
           for (unsigned int i=0; i<n_dofs; ++i)
-	    for (unsigned int j=0; j<n_dofs; ++j)
-	      {
-		double uni = 0.;
-		double une = 0.;
-		double vni = 0.;
-		double vne = 0.;
-		double divui = 0.;
-		double divue = 0.;
-		double divvi = 0.;
-		double divve = 0.;
-		
-		for (unsigned int d=0; d<dim; ++d)
-		  {
-		    uni += fe1.shape_value_component(j,k,d) * n[d];
-		    une += fe2.shape_value_component(j,k,d) * n[d];
-		    vni += fe1.shape_value_component(i,k,d) * n[d];
-		    vne += fe2.shape_value_component(i,k,d) * n[d];
-		    divui += fe1.shape_grad_component(j,k,d)[d];
-		    divue += fe2.shape_grad_component(j,k,d)[d];
-		    divvi += fe1.shape_grad_component(i,k,d)[d];
-		    divve += fe2.shape_grad_component(i,k,d)[d];
-		  }
-		M11(i,j) += dx*(-.5*fi*divvi*uni-.5*fi*divui*vni+f*penalty*uni*vni);
-		M12(i,j) += dx*( .5*fi*divvi*une-.5*fe*divue*vni-f*penalty*vni*une);
-		M21(i,j) += dx*(-.5*fe*divve*uni+.5*fi*divui*vne-f*penalty*uni*vne);
-		M22(i,j) += dx*( .5*fe*divve*une+.5*fe*divue*vne+f*penalty*une*vne);
-	      }
-	}
+            for (unsigned int j=0; j<n_dofs; ++j)
+              {
+                double uni = 0.;
+                double une = 0.;
+                double vni = 0.;
+                double vne = 0.;
+                const double divui = fe1[FEValuesExtractors::Vector(0)].divergence(j,k);
+                const double divue = fe2[FEValuesExtractors::Vector(0)].divergence(j,k);
+                const double divvi = fe1[FEValuesExtractors::Vector(0)].divergence(i,k);
+                const double divve = fe2[FEValuesExtractors::Vector(0)].divergence(i,k);
+
+                for (unsigned int d=0; d<dim; ++d)
+                  {
+                    uni += fe1.shape_value_component(j,k,d) * n[d];
+                    une += fe2.shape_value_component(j,k,d) * n[d];
+                    vni += fe1.shape_value_component(i,k,d) * n[d];
+                    vne += fe2.shape_value_component(i,k,d) * n[d];
+                  }
+                M11(i,j) += dx*(-.5*fi*divvi*uni-.5*fi*divui*vni+f*penalty*uni*vni);
+                M12(i,j) += dx*( .5*fi*divvi*une-.5*fe*divue*vni-f*penalty*vni*une);
+                M21(i,j) += dx*(-.5*fe*divve*uni+.5*fi*divui*vne-f*penalty*uni*vne);
+                M22(i,j) += dx*( .5*fe*divve*une+.5*fe*divue*vne+f*penalty*une*vne);
+              }
+        }
     }
 
     /**
@@ -364,37 +322,35 @@ namespace LocalIntegrators
         {
           const double dx = fe1.JxW(k);
           const Tensor<1,dim> n = fe1.normal_vector(k);
-	  double uni = 0.;
-	  double une = 0.;
-	  double divui = 0.;
-	  double divue = 0.;
-	  for (unsigned int d=0; d<dim; ++d)
-	    {
-	      uni += input1[d][k]*n[d];
-	      une += input2[d][k]*n[d];
-	      divui += Dinput1[d][k][d];
-	      divue += Dinput2[d][k][d];	      
-	    }
-	  
+          double uni = 0.;
+          double une = 0.;
+          double divui = 0.;
+          double divue = 0.;
+          for (unsigned int d=0; d<dim; ++d)
+            {
+              uni += input1[d][k]*n[d];
+              une += input2[d][k]*n[d];
+              divui += Dinput1[d][k][d];
+              divue += Dinput2[d][k][d];
+            }
+
           for (unsigned int i=0; i<n1; ++i)
-	    {
-	      double vni = 0.;
-	      double vne = 0.;
-	      double divvi = 0.;
-	      double divve = 0.;
-	      for (unsigned int d=0; d<dim; ++d)
-		{
-		  vni += fe1.shape_value_component(i,k,d)*n[d];
-		  vne += fe2.shape_value_component(i,k,d)*n[d];
-		  divvi += fe1.shape_grad_component(i,k,d)[d];
-		  divve += fe2.shape_grad_component(i,k,d)[d];	      
-		}
-	      
-	      result1(i) += dx*(-.5*fi*divvi*uni-.5*fi*divui*vni+penalty*uni*vni);
-	      result1(i) += dx*( .5*fi*divvi*une-.5*fe*divue*vni-penalty*vni*une);
-	      result2(i) += dx*(-.5*fe*divve*uni+.5*fi*divui*vne-penalty*uni*vne);
-	      result2(i) += dx*( .5*fe*divve*une+.5*fe*divue*vne+penalty*une*vne);
-	    }
+            {
+              double vni = 0.;
+              double vne = 0.;
+              const double divvi = fe1[FEValuesExtractors::Vector(0)].divergence(i,k);
+              const double divve = fe2[FEValuesExtractors::Vector(0)].divergence(i,k);
+              for (unsigned int d=0; d<dim; ++d)
+                {
+                  vni += fe1.shape_value_component(i,k,d)*n[d];
+                  vne += fe2.shape_value_component(i,k,d)*n[d];
+                }
+
+              result1(i) += dx*(-.5*fi*divvi*uni-.5*fi*divui*vni+penalty*uni*vni);
+              result1(i) += dx*( .5*fi*divvi*une-.5*fe*divue*vni-penalty*vni*une);
+              result2(i) += dx*(-.5*fe*divve*uni+.5*fi*divui*vne-penalty*uni*vne);
+              result2(i) += dx*( .5*fe*divve*une+.5*fe*divue*vne+penalty*une*vne);
+            }
         }
     }
   }

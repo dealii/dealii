@@ -24,6 +24,7 @@
 #include <deal.II/fe/mapping.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/meshworker/dof_info.h>
+#include <deal.II/integrators/grad_div.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -39,35 +40,6 @@ namespace LocalIntegrators
    */
   namespace Divergence
   {
-    /**
-     * @deprecated Use LocalIntegrators::GradDiv::
-     * Auxiliary function. Computes the grad-div-operator from a set of
-     * Hessians.
-     *
-     * @note The third tensor argument is not used in two dimensions and can
-     * for instance duplicate one of the previous.
-     *
-     * @author Guido Kanschat
-     * @date 2011
-     */
-    template <int dim>
-    Tensor<1,dim>
-    grad_div(
-      const Tensor<2,dim> &h0,
-      const Tensor<2,dim> &h1,
-      const Tensor<2,dim> &h2)
-    {
-      Tensor<1,dim> result;
-      for (unsigned int d=0; d<dim; ++d)
-        {
-          result[d] += h0[d][0];
-          if (dim >=2) result[d] += h1[d][1];
-          if (dim >=3) result[d] += h2[d][2];
-        }
-      return result;
-    }
-
-
     /**
      * Cell matrix for divergence. The derivative is on the trial function.
      * \f[ \int_Z v\nabla \cdot \mathbf u \,dx \f] This is the strong
@@ -452,77 +424,41 @@ namespace LocalIntegrators
     }
 
     /**
-     * @deprecated Use LocalIntegrators::GradDiv::cell_matrix()
-     * instead.
-     *
-     * @author Guido Kanschat
-     * @date 2011
+     * @deprecated Use LocalIntegrators::GradDiv::cell_matrix() instead.
      */
     template <int dim>
     void grad_div_matrix (
       FullMatrix<double> &M,
       const FEValuesBase<dim> &fe,
-      double factor = 1.) DEAL_II_DEPRECATED
+      const double factor = 1.) DEAL_II_DEPRECATED;
+
+    template <int dim>
+    void grad_div_matrix (
+      FullMatrix<double> &M,
+      const FEValuesBase<dim> &fe,
+      const double factor)
     {
-      const unsigned int n_dofs = fe.dofs_per_cell;
-
-      AssertDimension(fe.get_fe().n_components(), dim);
-      AssertDimension(M.m(), n_dofs);
-      AssertDimension(M.n(), n_dofs);
-
-      for (unsigned int k=0; k<fe.n_quadrature_points; ++k)
-        {
-          const double dx = factor * fe.JxW(k);
-          for (unsigned int i=0; i<n_dofs; ++i)
-            for (unsigned int j=0; j<n_dofs; ++j)
-              {
-                double dv = 0.;
-                double du = 0.;
-                for (unsigned int d=0; d<dim; ++d)
-                  {
-                    dv += fe.shape_grad_component(i,k,d)[d];
-                    du += fe.shape_grad_component(j,k,d)[d];
-                  }
-
-                M(i,j) += dx * du * dv;
-              }
-        }
+      GradDiv::cell_matrix(M, fe, factor);
     }
 
     /**
      * @deprecated Use LocalIntegrators::GradDiv::cell_residual() instead.
-     *
-     * @author Guido Kanschat
-     * @date 2014
      */
     template <int dim, typename number>
     void grad_div_residual (
       Vector<number> &result,
       const FEValuesBase<dim> &fetest,
       const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > > &input,
-      const double factor = 1.) DEAL_II_DEPRECATED
+      const double factor = 1.) DEAL_II_DEPRECATED;
+
+    template <int dim, typename number>
+    void grad_div_residual (
+      Vector<number> &result,
+      const FEValuesBase<dim> &fetest,
+      const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > > &input,
+      const double factor)
     {
-      const unsigned int n_dofs = fetest.dofs_per_cell;
-
-      AssertDimension(fetest.get_fe().n_components(), dim);
-      AssertVectorVectorDimension(input, dim, fetest.n_quadrature_points);
-
-      for (unsigned int k=0; k<fetest.n_quadrature_points; ++k)
-        {
-          const double dx = factor * fetest.JxW(k);
-          for (unsigned int i=0; i<n_dofs; ++i)
-            {
-              double dv = 0.;
-              double du = 0.;
-              for (unsigned int d=0; d<dim; ++d)
-                {
-                  dv += fetest.shape_grad_component(i,k,d)[d];
-                  du += input[d][k][d];
-                }
-
-              result(i) += dx * du * dv;
-            }
-        }
+      GradDiv::cell_residual(result, fetest, input, factor);
     }
 
     /**
