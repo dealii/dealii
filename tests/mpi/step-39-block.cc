@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 /*
- * Author: Guido Kanschat, Texas A&M University, 2009
+ * Test RelaxationBlockJacobi in parallel
  */
 
 #include "../tests.h"
@@ -565,24 +565,35 @@ namespace Step39
     MGCoarseGridLACIteration<SolverCG<TrilinosWrappers::MPI::Vector>,TrilinosWrappers::MPI::Vector>
     coarse_grid_solver(coarse_solver, coarse_matrix, identity);
 
-    typedef RelaxationBlockJacobi<TrilinosWrappers::SparseMatrix, double>
+    typedef RelaxationBlockJacobi<TrilinosWrappers::SparseMatrix, double, TrilinosWrappers::MPI::Vector>
     Smoother;
 
     MGLevelObject<typename Smoother::AdditionalData> smoother_data;
     smoother_data.resize(0, triangulation.n_levels() - 1);
     mg::SmootherRelaxation<Smoother, TrilinosWrappers::MPI::Vector> mg_smoother;
 
+    MGLevelObject<TrilinosWrappers::MPI::Vector> temp_vectors(0, triangulation.n_levels() - 1);
+
+
     for (unsigned int l = smoother_data.min_level() + 1; l <= smoother_data.max_level(); ++l)
       {
         DoFTools::make_cell_patches(smoother_data[l].block_list, this->dof_handler, l);
-        smoother_data[l].block_list.compress();
+        if (smoother_data[l].block_list.n_rows()>0)
+          smoother_data[l].block_list.compress();
         smoother_data[l].relaxation = 0.7;
         smoother_data[l].inversion = PreconditionBlockBase<double>::svd;
+        TrilinosWrappers::MPI::Vector *ghost = &(temp_vectors[l]);
+        IndexSet relevant_dofs;
+        DoFTools::extract_locally_relevant_level_dofs(dof_handler, l, relevant_dofs);
+        ghost->reinit(dof_handler.locally_owned_mg_dofs(l),
+                      relevant_dofs,
+                      MPI_COMM_WORLD);
+        smoother_data[l].temp_ghost_vector = ghost;
       }
 
     mg_smoother.initialize(mg_matrix, smoother_data);
-    mg_smoother.set_steps(1);
-    mg_smoother.set_variable(true);
+    mg_smoother.set_steps(2);
+    mg_smoother.set_variable(false);
 
     mg::Matrix<TrilinosWrappers::MPI::Vector> mgmatrix(mg_matrix);
     mg::Matrix<TrilinosWrappers::MPI::Vector> mgdown(mg_matrix_dg_down);
@@ -712,35 +723,8 @@ int main(int argc, char *argv[])
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
   MPILogInitAll log;
 
-  try
-    {
-      FE_DGQ<2> fe1(2);
-      InteriorPenaltyProblem<2> test1(fe1);
-      test1.run(6);
-    }
-  catch (std::exception &exc)
-    {
-      std::cerr << std::endl << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      std::cerr << "Exception on processing: " << std::endl
-                << exc.what() << std::endl
-                << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      return 1;
-    }
-  catch (...)
-    {
-      std::cerr << std::endl << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      std::cerr << "Unknown exception!" << std::endl
-                << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      return 1;
-    }
-
+  FE_DGQ<2> fe1(2);
+  InteriorPenaltyProblem<2> test1(fe1);
+  test1.run(6);
   return 0;
 }

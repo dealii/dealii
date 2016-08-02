@@ -428,6 +428,12 @@ SparsityPattern.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> New: RelaxationBlock classes for geometric multigrid now support parallel
+ computations using Trilinos.
+ <br>
+ (Timo Heister, Guido Kanschat, 2016/08/08)
+ </li>
+
  <li> Improved: The regular and hp versions of
  DoFTools::make_flux_sparsity_pattern() no longer use the user flags of the
  underlying triangulation to determine if entries along a certain face have been
