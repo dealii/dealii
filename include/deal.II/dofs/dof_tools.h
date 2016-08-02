@@ -1704,8 +1704,8 @@ namespace DoFTools
    * level. This pattern can be used in RelaxationBlock classes as
    * block list for additive and multiplicative Schwarz methods.
    *
-   * The row index in this pattern is the cell index resulting
-   * from standard iteration through the Triangulation. For a
+   * The row index in this pattern is the cell index resulting from
+   * standard iteration through a level of the Triangulation. For a
    * parallel::distributed::Triangulation, only locally owned cells
    * are entered.
    *
@@ -1715,12 +1715,12 @@ namespace DoFTools
    *
    * <tt>selected_dofs</tt> is a vector indexed by the local degrees
    * of freedom on a cell. If it is used, only such dofs are entered
-   * into the block, which are selected. This allows for instance the
-   * exclusion of components or of dofs on the boundary.
+   * into the block list which are selected. This allows for instance
+   * the exclusion of components or of dofs on the boundary.
    */
-  template <typename DoFHandlerType>
+  template <int dim, int spacedim=dim>
   void make_cell_patches(SparsityPattern         &block_list,
-                         const DoFHandlerType    &dof_handler,
+                         const DoFHandler<dim,spacedim> &dof_handler,
                          const unsigned int       level,
                          const std::vector<bool> &selected_dofs = std::vector<bool>(),
                          types::global_dof_index  offset        = 0);

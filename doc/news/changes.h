@@ -47,6 +47,10 @@ pattern classes, so no generic function would be possible. On the
 other hand, the block list is an object, which only extends over
 locally owned grid cells and its size can be determined efficiently
 upon initialization. Therefore, SparsityPattern is a good choice here.
+
+At the same time, we changed the dof handler template to the type
+DoFHandler, since hp::DoFHandler requires a different setup of the
+SparsityPattern.
 <br>
 (Guido Kanschat, 2016/08/02)
 </li>
