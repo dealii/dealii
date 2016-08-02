@@ -39,6 +39,13 @@ inconvenience this causes.
 
 <ol>
 
+ <li> Changed: Several operators from LocalIntegrators::Divergence got moved
+ to LocalIntegrators::GradDiv and the never used/tested
+ LocalIntegrators::Divergence::grad_div() function got removed.
+ <br>
+ (Timo Heister, Guido Kanschat, 2016/08/02)
+ </li>
+
 <li> Changed: DoFTools::make_cell_patches() only accepts block lists
 of type SparsityPattern. The reason is that it has to initialize the
 size of the pattern on distributed triangulations by computing the
@@ -167,6 +174,13 @@ SparsityPattern.
 <h3>General</h3>
 
 <ol>
+
+ <li> New: Introduce operators for residuals and interior penalty terms for
+ the Grad-Div operator in LocalIntegrators::GradDiv.
+ <br>
+ (Timo Heister, Guido Kanschat, 2016/08/02)
+ </li>
+
  <li>
  New: Added a new PolarManifold descriptor, that uses a polar coordinate
  system to compute new points, and modified the existing SphericalManifold 
