@@ -530,6 +530,114 @@ namespace LocalIntegrators
     }
 
     /**
+     * The matrix for the weak boundary condition of Nitsche type for linear elasticity:
+     * @f[
+     * \int_F \Bigl(\gamma (u \cdot n)(v \cdot n)  - \nabla\cdot u
+     * v\cdot n - u \cdot n \nabla \cdot v \Bigr)\;ds.
+     * @f]
+     */
+    template <int dim>
+    inline void nitsche_matrix (
+      FullMatrix<double> &M,
+      const FEValuesBase<dim> &fe,
+      double penalty,
+      double factor = 1.)
+    {
+      const unsigned int n_dofs = fe.dofs_per_cell;
+
+      AssertDimension(fe.get_fe().n_components(), dim);
+      AssertDimension(M.m(), n_dofs);
+      AssertDimension(M.n(), n_dofs);
+
+      for (unsigned int k=0; k<fe.n_quadrature_points; ++k)
+        {
+          const double dx = factor * fe.JxW(k);
+          const Tensor<1,dim> n = fe.normal_vector(k);
+          for (unsigned int i=0; i<n_dofs; ++i)
+            for (unsigned int j=0; j<n_dofs; ++j)
+              {
+                double un = 0., vn = 0., divu = 0., divv = 0.;
+                for (unsigned int d=0; d<dim; ++d)
+                  {
+                    un += fe.shape_value_component(j,k,d) * n[d];
+                    vn += fe.shape_value_component(i,k,d) * n[d];
+                    divu += fe.shape_grad_component(j,k,d)[d];
+                    divv += fe.shape_grad_component(i,k,d)[d];
+                  }
+
+                M(i,j) += dx * 2. * penalty * un * vn;
+                M(i,j) -= dx*(divu*vn+divv*un);
+              }
+        }
+    }
+
+    /**
+     * The interior penalty flux for 
+     */
+    template <int dim>
+    void ip_matrix (
+      FullMatrix<double> &M11,
+      FullMatrix<double> &M12,
+      FullMatrix<double> &M21,
+      FullMatrix<double> &M22,
+      const FEValuesBase<dim> &fe1,
+      const FEValuesBase<dim> &fe2,
+      double penalty,
+      double factor1 = 1.,
+      double factor2 = -1.)
+    {
+      const unsigned int n_dofs = fe1.dofs_per_cell;
+      AssertDimension(M11.n(), n_dofs);
+      AssertDimension(M11.m(), n_dofs);
+      AssertDimension(M12.n(), n_dofs);
+      AssertDimension(M12.m(), n_dofs);
+      AssertDimension(M21.n(), n_dofs);
+      AssertDimension(M21.m(), n_dofs);
+      AssertDimension(M22.n(), n_dofs);
+      AssertDimension(M22.m(), n_dofs);
+
+      const double nui = factor1;
+      const double nue = (factor2 < 0) ? factor1 : factor2;
+      const double nu = .5*(nui+nue);
+
+      for (unsigned int k=0; k<fe1.n_quadrature_points; ++k)
+        {
+          const double dx = fe1.JxW(k);
+          const Tensor<1,dim> n = fe1.normal_vector(k);
+          for (unsigned int i=0; i<n_dofs; ++i)
+            {
+              for (unsigned int j=0; j<n_dofs; ++j)
+                {
+                  double uni = 0.;
+                  double une = 0.;
+                  double vni = 0.;
+                  double vne = 0.;
+                  double divui = 0.;
+                  double divue = 0.;
+                  double divvi = 0.;
+                  double divve = 0.;
+
+                  for (unsigned int d=0; d<dim; ++d)
+                    {
+                      uni += fe1.shape_value_component(j,k,d) * n[d];
+                      une += fe2.shape_value_component(j,k,d) * n[d];
+                      vni += fe1.shape_value_component(i,k,d) * n[d];
+                      vne += fe2.shape_value_component(i,k,d) * n[d];
+                      divui += fe1.shape_grad_component(j,k,d)[d];
+                      divue += fe2.shape_grad_component(j,k,d)[d];
+                      divvi += fe1.shape_grad_component(i,k,d)[d];
+                      divve += fe2.shape_grad_component(i,k,d)[d];
+                    }
+                  M11(i,j) += dx*(-.5*nui*divvi*uni-.5*nui*divui*vni+nu*penalty*uni*vni);
+                  M12(i,j) += dx*( .5*nui*divvi*une-.5*nue*divue*vni-nu*penalty*vni*une);
+                  M21(i,j) += dx*(-.5*nue*divve*uni+.5*nui*divui*vne-nu*penalty*uni*vne);
+                  M22(i,j) += dx*( .5*nue*divve*une+.5*nue*divue*vne+nu*penalty*une*vne);
+                }
+            }
+        }
+    }
+
+    /**
      * The jump of the normal component
      * @f[
      * \int_F
