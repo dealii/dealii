@@ -1024,8 +1024,6 @@ namespace DoFTools
                 {
                   const typename dealii::hp::DoFHandler<dim,spacedim>::face_iterator
                   cell_face = cell->face(face);
-                  if (cell_face->user_flag_set ())
-                    continue;
 
                   const bool periodic_neighbor = cell->has_periodic_neighbor (face);
 
@@ -1048,15 +1046,37 @@ namespace DoFTools
                       typename dealii::hp::DoFHandler<dim,spacedim>::level_cell_iterator
                       neighbor = cell->neighbor_or_periodic_neighbor(face);
 
-                      // Refinement edges are taken care of by coarser cells
-                      if ((!periodic_neighbor && cell->neighbor_is_coarser(face)) ||
-                          (periodic_neighbor && cell->periodic_neighbor_is_coarser(face)))
+                      // Like the non-hp case: If the cells are on the same
+                      // level (and both are active, locally-owned cells) then
+                      // only add to the sparsity pattern if the current cell
+                      // is 'greater' in the total ordering.
+                      if (neighbor->level () == cell->level ()
+                          &&
+                          neighbor->index () > cell->index ()
+                          &&
+                          neighbor->active ()
+                          &&
+                          neighbor->is_locally_owned ())
                         continue;
-
-                      const unsigned int
-                      neighbor_face = periodic_neighbor?
-                                      cell->periodic_neighbor_of_periodic_neighbor(face):
-                                      cell->neighbor_of_neighbor(face);
+                      // Again, like the non-hp case: If we are more refined
+                      // then the neighbor, then we will automatically find
+                      // the active neighbor cell when we call 'neighbor
+                      // (face)' above. The opposite is not true; if the
+                      // neighbor is more refined then the call 'neighbor
+                      // (face)' will *not* return an active cell. Hence,
+                      // only add things to the sparsity pattern if (when the
+                      // levels are different) the neighbor is coarser than
+                      // the current cell.
+                      //
+                      // Like above, do not use this optimization if the
+                      // neighbor is not locally owned.
+                      if (neighbor->level () != cell->level ()
+                          &&
+                          ((!periodic_neighbor && !cell->neighbor_is_coarser (face))
+                           ||(periodic_neighbor && !cell->periodic_neighbor_is_coarser (face)))
+                          &&
+                          neighbor->is_locally_owned ())
+                        continue; // (the neighbor is finer)
 
                       if (cell_face->has_children())
                         {
@@ -1114,7 +1134,6 @@ namespace DoFTools
                                         }
                                     }
                                 }
-                              sub_neighbor->face(neighbor_face)->set_user_flag ();
                             }
                         }
                       else
@@ -1162,7 +1181,6 @@ namespace DoFTools
                                     }
                                 }
                             }
-                          neighbor->face(neighbor_face)->set_user_flag ();
                         }
                     }
                 }
@@ -1234,23 +1252,10 @@ namespace DoFTools
                   "associated DoF handler objects, asking for any subdomain other "
                   "than the locally owned one does not make sense."));
 
-    // Clear user flags because we will need them. But first we save them
-    // and make sure that we restore them later such that at the end of
-    // this function the Triangulation will be in the same state as it was
-    // at the beginning of this function.
-    std::vector<bool> user_flags;
-    dof.get_triangulation().save_user_flags(user_flags);
-    const_cast<Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &>
-    (dof.get_triangulation()).clear_user_flags ();
-
     internal::make_flux_sparsity_pattern (dof, sparsity,
                                           constraints, keep_constrained_dofs,
                                           int_mask, flux_mask,
                                           subdomain_id);
-
-    // finally restore the user flags
-    const_cast<Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &>
-    (dof.get_triangulation()).load_user_flags(user_flags);
   }
 
 
