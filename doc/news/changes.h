@@ -168,6 +168,14 @@ SparsityPattern.
 
 <ol>
  <li>
+ New: Added Python bindings to generate and manipulate a Triangulation from 
+ Python. The Triangulation generated in Python can be saved and later, loaded 
+ inside a C++ code.
+ <br>
+ (Bruno Turcksin, 2016/08/03)
+ </li>
+
+ <li>
  Improved: A few of the introductory examples (steps five through eight) no
  longer use the Function class; they use plain functions instead.
  <br>
