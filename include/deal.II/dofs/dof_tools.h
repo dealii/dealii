@@ -1699,19 +1699,28 @@ namespace DoFTools
    */
   //@{
   /**
-   * Create an incidence matrix that for every cell on a given level of a
-   * multilevel DoFHandler flags which degrees of freedom are associated with
-   * the corresponding cell. This data structure is a matrix with as many rows
-   * as there are cells on a given level, as many columns as there are degrees
-   * of freedom on this level, and entries that are either true or false. This
-   * data structure is conveniently represented by a SparsityPattern object.
+   * Creates a sparsity pattern, which lists
+   * the degrees of freedom associated to each cell on the given
+   * level. This pattern can be used in RelaxationBlock classes as
+   * block list for additive and multiplicative Schwarz methods.
    *
-   * @note The ordering of rows (cells) follows the ordering of the standard
-   * cell iterators.
+   * The row index in this pattern is the cell index resulting from
+   * standard iteration through a level of the Triangulation. For a
+   * parallel::distributed::Triangulation, only locally owned cells
+   * are entered.
+   *
+   * The sparsity pattern is resized in this function to contain as
+   * many rows as there are locally owned cells on a given level, as
+   * many columns as there are degrees of freedom on this level.
+   *
+   * <tt>selected_dofs</tt> is a vector indexed by the local degrees
+   * of freedom on a cell. If it is used, only such dofs are entered
+   * into the block list which are selected. This allows for instance
+   * the exclusion of components or of dofs on the boundary.
    */
-  template <typename DoFHandlerType, class SparsityPatternType>
-  void make_cell_patches(SparsityPatternType     &block_list,
-                         const DoFHandlerType    &dof_handler,
+  template <int dim, int spacedim=dim>
+  void make_cell_patches(SparsityPattern         &block_list,
+                         const DoFHandler<dim,spacedim> &dof_handler,
                          const unsigned int       level,
                          const std::vector<bool> &selected_dofs = std::vector<bool>(),
                          types::global_dof_index  offset        = 0);

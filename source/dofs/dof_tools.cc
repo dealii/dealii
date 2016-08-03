@@ -2055,8 +2055,8 @@ namespace DoFTools
 
 
 
-  template <typename DoFHandlerType, class Sparsity>
-  void make_cell_patches(Sparsity                &block_list,
+  template <typename DoFHandlerType>
+  void make_cell_patches(SparsityPattern         &block_list,
                          const DoFHandlerType    &dof_handler,
                          const unsigned int       level,
                          const std::vector<bool> &selected_dofs,
@@ -2067,8 +2067,17 @@ namespace DoFTools
     std::vector<types::global_dof_index> indices;
 
     unsigned int i=0;
-    for (cell=dof_handler.begin(level); cell != endc; ++i, ++cell)
+
+    for (cell=dof_handler.begin(level); cell != endc; ++cell)
+      if (cell->is_locally_owned_on_level())
+        ++i;
+    block_list.reinit(i, dof_handler.n_dofs(), dof_handler.get_fe().dofs_per_cell);
+    i=0;
+    for (cell=dof_handler.begin(level); cell != endc; ++cell)
       {
+        if (!cell->is_locally_owned_on_level())
+          continue;
+
         indices.resize(cell->get_fe().dofs_per_cell);
         cell->get_mg_dof_indices(indices);
 
@@ -2085,6 +2094,7 @@ namespace DoFTools
                   block_list.add(i,indices[j]-offset);
               }
           }
+        ++i;
       }
   }
 

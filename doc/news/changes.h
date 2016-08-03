@@ -39,6 +39,23 @@ inconvenience this causes.
 
 <ol>
 
+<li> Changed: DoFTools::make_cell_patches() only accepts block lists
+of type SparsityPattern. The reason is that it has to initialize the
+size of the pattern on distributed triangulations by computing the
+number of locally owned cells. Initialization differs between sparsity
+pattern classes, so no generic function would be possible. On the
+other hand, the block list is an object, which only extends over
+locally owned grid cells and its size can be determined efficiently
+upon initialization. Therefore, SparsityPattern is a good choice here.
+
+At the same time, we changed the dof handler template to the type
+DoFHandler, since hp::DoFHandler requires a different setup of the
+SparsityPattern.
+<br>
+(Guido Kanschat, 2016/08/02)
+</li>
+
+</li>
  <li> Changed: The conversion constructors of class Vector from the
  PETScWrappers::Vector, PETScWrappers::MPI::Vector,
  TrilinosWrappers::Vector, and TrilinosWrappers::MPI::Vector classes
@@ -395,6 +412,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Improved: DoFTools::make_cell_patches() can create block lists
+ only extending over local cells of distributed triangulations.
+ <br>
+ (Guido Kanschat, 2016/08/02)
+ </li>
+
  <li> Fixed: (P)ARPACK interface for non-symmetric matrices.
  <br>
  (Joscha Gedicke, 2016/08/01)
