@@ -412,6 +412,14 @@ SparsityPattern.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Improved: The regular and hp versions of
+ DoFTools::make_flux_sparsity_pattern() no longer use the user flags of the
+ underlying triangulation to determine if entries along a certain face have been
+ added to the sparsity pattern.
+ <br>
+ (David Wells, 2016/03/02 - 2016/08/02)
+ </li>
+
  <li> Improved: DoFTools::make_cell_patches() can create block lists
  only extending over local cells of distributed triangulations.
  <br>

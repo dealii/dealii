@@ -1252,23 +1252,10 @@ namespace DoFTools
                   "associated DoF handler objects, asking for any subdomain other "
                   "than the locally owned one does not make sense."));
 
-    // Clear user flags because we will need them. But first we save them
-    // and make sure that we restore them later such that at the end of
-    // this function the Triangulation will be in the same state as it was
-    // at the beginning of this function.
-    std::vector<bool> user_flags;
-    dof.get_triangulation().save_user_flags(user_flags);
-    const_cast<Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &>
-    (dof.get_triangulation()).clear_user_flags ();
-
     internal::make_flux_sparsity_pattern (dof, sparsity,
                                           constraints, keep_constrained_dofs,
                                           int_mask, flux_mask,
                                           subdomain_id);
-
-    // finally restore the user flags
-    const_cast<Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &>
-    (dof.get_triangulation()).load_user_flags(user_flags);
   }
 
 
