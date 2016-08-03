@@ -52,7 +52,7 @@ ENDIF()
 # The library can always be compiled and/or installed unconditionally ;-)
 _add_custom_target(library)
 
-FOREACH(_component documentation examples)
+FOREACH(_component documentation examples python_bindings)
   STRING(TOUPPER "${_component}" _component_uppercase)
   IF(DEAL_II_COMPONENT_${_component_uppercase})
     _add_custom_target(${_component})
