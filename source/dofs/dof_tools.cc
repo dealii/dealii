@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2015 by the deal.II authors
+// Copyright (C) 1999 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -2074,28 +2074,26 @@ namespace DoFTools
     block_list.reinit(i, dof_handler.n_dofs(), dof_handler.get_fe().dofs_per_cell);
     i=0;
     for (cell=dof_handler.begin(level); cell != endc; ++cell)
-      {
-        if (!cell->is_locally_owned_on_level())
-          continue;
+      if (cell->is_locally_owned_on_level())
+        {
+          indices.resize(cell->get_fe().dofs_per_cell);
+          cell->get_mg_dof_indices(indices);
 
-        indices.resize(cell->get_fe().dofs_per_cell);
-        cell->get_mg_dof_indices(indices);
+          if (selected_dofs.size()!=0)
+            AssertDimension(indices.size(), selected_dofs.size());
 
-        if (selected_dofs.size()!=0)
-          AssertDimension(indices.size(), selected_dofs.size());
-
-        for (types::global_dof_index j=0; j<indices.size(); ++j)
-          {
-            if (selected_dofs.size() == 0)
-              block_list.add(i,indices[j]-offset);
-            else
-              {
-                if (selected_dofs[j])
-                  block_list.add(i,indices[j]-offset);
-              }
-          }
-        ++i;
-      }
+          for (types::global_dof_index j=0; j<indices.size(); ++j)
+            {
+              if (selected_dofs.size() == 0)
+                block_list.add(i,indices[j]-offset);
+              else
+                {
+                  if (selected_dofs[j])
+                    block_list.add(i,indices[j]-offset);
+                }
+            }
+          ++i;
+        }
   }
 
 
