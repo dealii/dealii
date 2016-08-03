@@ -665,7 +665,7 @@ private:
  * tangent to a surface embedded in higher dimensional space, or simply the
  * three unit vectors of ${\mathbb R}^3$), one needs to also have access
  * to the <i>gradient</i> of the push-forward function $F$. The gradient
- * is the matrix ${\nabla F)_{ij}=\partial_j F_i$, where we take the derivative
+ * is the matrix $(\nabla F)_{ij}=\partial_j F_i$, where we take the derivative
  * with regard to the chartdim reference coordinates on the flat Euclidean
  * space in which $\mathcal B$ is located. In other words, at a point
  * $\mathbf x$, $\nabla F(\mathbf x)$ is a matrix of size @p spacedim
