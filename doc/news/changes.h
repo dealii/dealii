@@ -168,6 +168,14 @@ SparsityPattern.
 
 <ol>
  <li>
+ New: Added a new PolarManifold descriptor, that uses a polar coordinate
+ system to compute new points, and modified the existing SphericalManifold 
+ descriptor to use geodesics on the surface of the sphere. 
+ <br>
+ (Luca Heltai, Mauro Bardelloni, 2016/08/04)
+ </li>
+
+ <li>
  New: Added Python bindings to generate and manipulate a Triangulation from 
  Python. The Triangulation generated in Python can be saved and later, loaded 
  inside a C++ code.
