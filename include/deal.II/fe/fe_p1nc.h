@@ -53,14 +53,18 @@ DEAL_II_NAMESPACE_OPEN
  * It means that the genuine number of independent dofs on a quad is 3,
  * and it is the same number to the dimension of the linear polynomial space in 2D.
  *
- * The canonical basis functions are given as any three shape functions of
+
+ * For each vertex v_j, there are two edges of which v_j is one of the end points.
+ * Consider the linear function such that one half at two midpoints of such edges,
+ * and zero at two midpoints of other edges.
+ * Note that this situation satisfies the dice rule which is described above.
+ * We denote such a function by \phi_j.
+
+ * The canonical (local) basis functions are given as any three shape functions of
  * the following four linear functions:
  *
  * \phi_1, \phi_2, \phi_3, \phi_4.
  *
- * for each vertex v_j, there are two edges of which v_j is one of the end points.
- * Consider the linear function such that one half at two midpoints of such edges,
- * and zero at two midpoints of other edges.
 
 
  * 2 -------|------- 3
@@ -74,6 +78,13 @@ DEAL_II_NAMESPACE_OPEN
  * |                 |
  * |                 |
  * 0 -------|------- 1
+
+
+
+ * The (global) basis function associated with a node is defined by the composition of
+ * (local) basis functions associated with the node on each element.
+ * In case of the problem with homogeneous Dirichlet boundary condition, 
+ * the number of DOFs is equal to the number of interior nodes.
 
 
  * You can find the paper about the P1NC element at
