@@ -28,6 +28,58 @@ DEAL_II_NAMESPACE_OPEN
 /*!@addtogroup fe */
 /*@{*/
 
+/**
+ * Implementation for the scalar version of the P1 nonconforming finite
+ * element, a piecewise linear finite element on quadrilaterals.
+ *
+ * Unlike any continuous conforming finite element,
+ * it does not have the continuity across edges.
+ * But it requires the continuity in weak sense:
+ * a function in the space should have the same integral values on two sides of the common edge shared by two adjacent elements.
+ *
+ * Since any function in the space is piecewise linear on each element,
+ * the continuity of the integral value across the edge is equivalent to
+ * the continuity of the value at the midpoint of the edge.
+ *
+ * The degrees of freedom on a quadrilateral are given by midpoint values on edges.
+ * However these four dofs in 2D are not independent in fact.
+ * The simple observation reads that any linear function on a quadrilateral
+ * satisfies 'the dice rule': the sum of two function values at two midpoints of the edge pair on opposite
+ * position is equal to the sum of those on the another edge pair.
+ *
+ * \phi(m_0) + \phi(m_1) = \phi(m_2) + \phi(m_3).
+ *
+ * Due to the dice rule, three values at any three midpoints determine the last value at the last midpoint.
+ * It means that the genuine number of independent dofs on a quad is 3,
+ * and it is the same number to the dimension of the linear polynomial space in 2D.
+ *
+ * The canonical basis functions are given as any three shape functions of
+ * the following four linear functions:
+ *
+ * \phi_1, \phi_2, \phi_3, \phi_4.
+ *
+ * for each vertex v_j, there are two edges of which v_j is one of the end points.
+ * Consider the linear function such that one half at two midpoints of such edges,
+ * and zero at two midpoints of other edges.
+
+
+ * 2 -------|------- 3
+ * |                 |
+ * |                 |
+ * |                 |
+ * |                 |
+ * -                 -
+ * |                 |
+ * |                 |
+ * |                 |
+ * |                 |
+ * 0 -------|------- 1
+
+
+ * You can find the paper about the P1NC element at
+ * http://epubs.siam.org/doi/abs/10.1137/S0036142902404923.
+
+ **/
 
 class FE_P1NC : public FiniteElement<2,2>
 {
