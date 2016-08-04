@@ -178,31 +178,47 @@ get_intermediate_point (const Point<spacedim> &p1,
   Assert(w >=0.0 && w <= 1.0,
          ExcMessage("w should be in the range [0.0,1.0]."));
 
-  if ( p1 == p2 ) return p1;
+  const double tol = 1e-10;
+
+  if ( p1.distance(p2) < tol || w < tol)
+    return p1;
+  else if (w > 1.0 - tol)
+    return p2;
 
   const Tensor<1,spacedim> v1 = p1 - center;
   const Tensor<1,spacedim> v2 = p2 - center;
   const double r1 = v1.norm();
   const double r2 = v2.norm();
 
+  Assert(r1 > tol && r2 > tol,
+         ExcMessage("p1 and p2 cannot coincide with the center."));
+
+  const Tensor<1,spacedim> e1 = v1/r1;
+  const Tensor<1,spacedim> e2 = v2/r2;
+
+  if ((e1 - e2).norm() < tol)
+    return Point<spacedim>(center + w*v2 + (1-w)*v1);
+
   // Find the angle gamma described by v1 and v2:
-  const double gamma = std::acos((v1*v2)/(r1*r2));
+  const double gamma = std::acos(e1*e2);
 
   // Find the angle sigma that corresponds to arclength equal to w
-  const double sigma = (1-w) * gamma;
+  const double sigma = w * gamma;
 
-  // Unit vector with the same direction of v1
-  const Tensor<1,spacedim> t = v1/r1;
   // Normal to v1 in the plane described by v1,v2,and the origin.
-  Tensor<1,spacedim> n = v2 - (v2*t)*t;
+  // Since p1 and p2 do not coincide n is not zero and well defined.
+  Tensor<1,spacedim> n = v2 - (v2*e1)*e1;
+  Assert( n.norm() > 0,
+          ExcInternalError("n should be different from the null vector."
+                           "Probably this means v1==v2 or v2==0."));
   n = n/n.norm();
 
   // Find the point Q along O,v1 such that
   // P1,V,P2 has measure sigma.
-  const Tensor<1,spacedim> P = std::cos(sigma) * t + std::sin(sigma) * n;
+  const Tensor<1,spacedim> P = std::cos(sigma) * e1 + std::sin(sigma) * n;
 
   // Project this point on the manifold.
-  return Point<spacedim>(center + (w*r1+(1-w)*r2)*P);
+  return Point<spacedim>(center + (w*r2+(1.0-w)*r1)*P);
 }
 
 template <int dim, int spacedim>
@@ -484,7 +500,7 @@ TorusManifold<dim>::push_forward_gradient(const Point<3> &chart_point) const
 
   DX[1][0] = 0;
   DX[1][1] = r*w*cos(theta);
-  DX[1][2] = r*cos(theta);
+  DX[1][2] = r*sin(theta);
 
   DX[2][0] = cos(phi)*R + r*w*cos(theta)*cos(phi);
   DX[2][1] = -r*w*sin(theta)*sin(phi);

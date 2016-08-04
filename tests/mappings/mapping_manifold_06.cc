@@ -42,7 +42,7 @@ void test()
 
   double radius = 1.0;
 
-  static const SphericalManifold<dim,spacedim> manifold(center);
+  static const PolarManifold<dim,spacedim> manifold(center);
   GridGenerator::hyper_ball (triangulation, center, radius);
 
   triangulation.set_all_manifold_ids_on_boundary(0);
@@ -62,19 +62,25 @@ void test()
   for (typename Triangulation<dim,spacedim>::active_cell_iterator cell =
          triangulation.begin_active(); cell != triangulation.end(); ++cell)
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-      if (cell->face(f)->at_boundary())
-        {
-          fe_v.reinit(cell, f);
-          const std::vector<Point<spacedim> > &qps = fe_v.get_quadrature_points();
-          const std::vector<Point<spacedim> > &nps = fe_v.get_normal_vectors();
-          for (unsigned int i=0; i<qps.size(); ++i)
-            {
-              out << qps[i] << std::endl;
-              if (std::abs(qps[i].distance(center) -radius) > 1e-10)
-                out << "# Error! This should be on the sphere, but it's not!" << std::endl;
-            }
-          out << std::endl;
-        }
+      {
+        const double xc = cell->face(f)->center()[0] - 1.5;
+        const double yc = cell->face(f)->center()[1] - 2.5;
+        const double rc = xc*xc + yc*yc;
+
+        if (cell->face(f)->at_boundary() && rc > 0.1)
+          {
+            fe_v.reinit(cell, f);
+            const std::vector<Point<spacedim> > &qps = fe_v.get_quadrature_points();
+            const std::vector<Point<spacedim> > &nps = fe_v.get_normal_vectors();
+            for (unsigned int i=0; i<qps.size(); ++i)
+              {
+                out << qps[i] << std::endl;
+                if (std::abs(qps[i].distance(center) -radius) > 1e-10)
+                  out << "# Error! This should be on the sphere, but it's not!" << std::endl;
+              }
+            out << std::endl;
+          }
+      }
 
   out << "e" << std::endl << std::endl
       << std::endl
@@ -84,21 +90,28 @@ void test()
   for (typename Triangulation<dim,spacedim>::active_cell_iterator cell =
          triangulation.begin_active(); cell != triangulation.end(); ++cell)
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-      if (cell->face(f)->at_boundary())
-        {
-          fe_v.reinit(cell, f);
-          const std::vector<Point<spacedim> > &qps = fe_v.get_quadrature_points();
-          const std::vector<Point<spacedim> > &nps = fe_v.get_normal_vectors();
-          for (unsigned int i=0; i<qps.size(); ++i)
-            {
-              out << qps[i] << " " << nps[i] << std::endl;
-              if (std::abs( (center+nps[i]-qps[i]).norm() ) > 1e-10)
-                out << "# Error! The normal vector should be radial! " << std::endl
-                    << "# Got " << center + nps[i]<< " instead of "
-                    << qps[i] << std::endl;
-            }
-          out << std::endl;
-        }
+      {
+
+        const double xc = cell->face(f)->center()[0] - 1.5;
+        const double yc = cell->face(f)->center()[1] - 2.5;
+        const double rc = xc*xc + yc*yc;
+
+        if (cell->face(f)->at_boundary() && rc > 0.1)
+          {
+            fe_v.reinit(cell, f);
+            const std::vector<Point<spacedim> > &qps = fe_v.get_quadrature_points();
+            const std::vector<Point<spacedim> > &nps = fe_v.get_normal_vectors();
+            for (unsigned int i=0; i<qps.size(); ++i)
+              {
+                out << qps[i] << " " << nps[i] << std::endl;
+                if (std::abs( (center+nps[i]-qps[i]).norm() ) > 1e-10)
+                  out << "# Error! The normal vector should be radial! " << std::endl
+                      << "# Got " << center + nps[i]<< " instead of "
+                      << qps[i] << std::endl;
+              }
+            out << std::endl;
+          }
+      }
   out << "e" << std::endl << std::endl;
 
 }

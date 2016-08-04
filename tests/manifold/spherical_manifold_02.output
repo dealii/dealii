@@ -1,5 +1,22 @@
 
 DEAL::-----------------------------------
+<<<<<<< HEAD
+DEAL:: Ref      = 1      RelErr  = 0.0180739
+DEAL:: Ref      = 2      RelErr  = 0.00484274
+DEAL:: Ref      = 3      RelErr  = 0.00123590
+DEAL:: Ref      = 4      RelErr  = 0.000310883
+DEAL:: Ref      = 5      RelErr  = 7.78766e-05
+DEAL:: Ref      = 6      RelErr  = 1.94834e-05
+DEAL:: Ref      = 7      RelErr  = 4.87229e-06
+DEAL::-----------------------------------
+DEAL:: Ref      = 1      RelErr  = -0.00299732
+DEAL:: Ref      = 2      RelErr  = -0.000192565
+DEAL:: Ref      = 3      RelErr  = -1.21078e-05
+DEAL:: Ref      = 4      RelErr  = -7.58070e-07
+DEAL:: Ref      = 5      RelErr  = -4.74089e-08
+DEAL:: Ref      = 6      RelErr  = -2.96380e-09
+DEAL:: Ref      = 7      RelErr  = -1.85254e-10
+=======
 DEAL::Grid has been saved into grid.vtk
 DEAL:: MappingManifold
 DEAL:: Surface area     = 12.5058
@@ -9,4 +26,5 @@ DEAL::Grid has been saved into grid.vtk
 DEAL:: MappingQ
 DEAL:: Surface area     = 12.5664
 DEAL::  Relative error  = 4.23599e-09
+>>>>>>> origin/master
 DEAL::-----------------------------------

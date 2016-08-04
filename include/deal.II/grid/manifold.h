@@ -285,8 +285,8 @@ public:
    * An implementation of this function should returns a parametric
    * curve on the manifold, joining the points `p1` and `p2`, with
    * parameter `w` in the interval [0,1]. In particular
-   * `get_new_point(p1, p2, 0.0)` should return `p1` and
-   * `get_new_point(p1, p2, 1.0)` should return `p2`.
+   * `get_intermediate_point(p1, p2, 0.0)` should return `p1` and
+   * `get_intermediate_point(p1, p2, 1.0)` should return `p2`.
    *
    * In its default implementation, this function calls the
    * project_to_manifold() method with the convex combination of `p1`
@@ -307,11 +307,14 @@ public:
    *
    * In its default implementation it uses a pair-wise reduction of
    * the points in the quadrature formula by calling the function
-   * get_new_point() that takes three arguments on the first two
-   * points, then on the resulting point and the next, until all
-   * points in the quadrature have been taken into account. User
-   * classes can get away by simply implementing the get_new_point()
-   * function that takes three arguments.
+   * get_intermediate_point() on the first two points, then on the
+   * resulting point and the next, untill all points in the quadrature
+   * have been taken into account. User classes can get away by simply
+   * implementing the get_intermediate_point() function. Notice that
+   * by default the get_intermediate_point() function calls the
+   * project_to_manifold() function with the convex combination of its
+   * arguments. For simple situations you may get away by implementing
+   * only the project_to_manifold() function.
    */
   virtual
   Point<spacedim>

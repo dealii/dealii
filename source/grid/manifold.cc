@@ -60,10 +60,12 @@ Point<spacedim>
 Manifold<dim, spacedim>::
 get_new_point (const Quadrature<spacedim> &quad) const
 {
+  const double tol = 1e-10;
+
   Assert(quad.size() > 0,
          ExcMessage("Quadrature should have at least one point."));
 
-  Assert(std::abs(std::accumulate(quad.get_weights().begin(), quad.get_weights().end(), 0.0)-1.0) < 1e-10,
+  Assert(std::abs(std::accumulate(quad.get_weights().begin(), quad.get_weights().end(), 0.0)-1.0) < tol,
          ExcMessage("The weights for the individual points should sum to 1!"));
 
   QSorted<spacedim> sorted_quad(quad);
@@ -72,8 +74,13 @@ get_new_point (const Quadrature<spacedim> &quad) const
 
   for (unsigned int i=1; i<sorted_quad.size(); ++i)
     {
-      if ( w != 0 )
-        p = get_intermediate_point(p, sorted_quad.point(i) , w/(sorted_quad.weight(i) + w) );
+      double weight = 0.0;
+      if ( (sorted_quad.weight(i) + w) < tol )
+        weight = 0.0;
+      else
+        weight =  w/(sorted_quad.weight(i) + w);
+
+      p = get_intermediate_point(p, sorted_quad.point(i),1.0 - weight );
       w += sorted_quad.weight(i);
     }
 
@@ -589,7 +596,7 @@ get_tangent_vector (const Point<spacedim> &x1,
   // determinant is the product of chartdim factors, take the
   // chartdim-th root of it in comparing against the size of the
   // derivative
-  Assert (std::pow(F_prime.determinant(), 1./chartdim) >= 1e-12 * F_prime.norm(),
+  Assert (std::pow(std::abs(F_prime.determinant()), 1./chartdim) >= 1e-12 * F_prime.norm(),
           ExcMessage("The derivative of a chart function must not be singular."));
 
   const Tensor<1,chartdim>                  delta   = sub_manifold.get_tangent_vector(pull_back(x1),

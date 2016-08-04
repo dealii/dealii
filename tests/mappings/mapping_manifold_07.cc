@@ -40,7 +40,7 @@ void test()
 
   double radius = 1.0;
 
-  static const SphericalManifold<dim,spacedim> manifold(center);
+  static const PolarManifold<dim,spacedim> manifold(center);
   GridGenerator::hyper_ball (triangulation, center, radius);
 
   triangulation.set_all_manifold_ids_on_boundary(0);

@@ -31,8 +31,9 @@ DEAL_II_NAMESPACE_OPEN
  * hypersphere or hyperdisc in two or three dimensions, both as a
  * co-dimension one manifold descriptor or as co-dimension zero
  * manifold descriptor, provided that the north and south poles (in
- * three dimensions) are excluded from the Manifold (as they are
- * singular).
+ * three dimensions) and the center (in both two and three dimensions)
+ * are excluded from the Manifold (as they are singular points of the
+ * polar change of coordinates).
  *
  * The two template arguments match the meaning of the two template arguments
  * in Triangulation<dim, spacedim>, however this Manifold can be used to
@@ -182,14 +183,15 @@ private:
  * Manifold to describe the geometry of a sphere, you should use
  * MappingQ as the underlying mapping, and not MappingManifold.
  *
- * This Manifold can be used *only* on geometries where a finite ball
- * is removed from the center. Indeed, the center is a singular point
- * for this manifold, and if you try to connect two points across the
- * center, they would travel on spherical coordinates, avoiding the
- * center.
+ * This Manifold can be used *only* on geometries where a ball with
+ * finite radius is removed from the center. Indeed, the center is a
+ * singular point for this manifold, and if you try to connect two
+ * points across the center, they would travel on spherical
+ * coordinates, avoiding the center.
  *
  * The ideal geometry for this Manifold is an HyperShell. If you plan
- * to use this Manifold on a Sphere
+ * to use this Manifold on a HyperBall, you have to make sure you do
+ * not attach this Manifold to the cell containing the center.
  *
  * @ingroup manifold
  *
@@ -218,8 +220,8 @@ public:
                          const double w) const;
 
   /**
-   * Compute the derivative of the get_new_point function with
-   * parameter w equal to zero.
+   * Compute the derivative of the get_intermediate_point() function
+   * with parameter w equal to zero.
    */
   virtual
   Tensor<1,spacedim>
