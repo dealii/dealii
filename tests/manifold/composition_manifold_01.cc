@@ -1,12 +1,12 @@
-//----------------------------  function_manifold_chart ---------------------------
-//    Copyright (C) 2011 - 2015 by the mathLab team.
+//-------------------------------------------------------------------
+//    Copyright (C) 2016 by the deal.II authors.
 //
 //    This file is subject to LGPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//---------------------------- composition_manifold ---------------------------
+//-------------------------------------------------------------------
 
 
 // Test the combination of simple ChartManifolds: parabolic + translation

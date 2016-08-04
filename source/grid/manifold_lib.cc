@@ -23,17 +23,19 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// ============================================================
+// PolarManifold
+// ============================================================
+
 template <int dim, int spacedim>
-SphericalManifold<dim,spacedim>::SphericalManifold(const Point<spacedim> center):
-  ChartManifold<dim,spacedim,spacedim>(SphericalManifold<dim,spacedim>::get_periodicity()),
+PolarManifold<dim,spacedim>::PolarManifold(const Point<spacedim> center):
+  ChartManifold<dim,spacedim,spacedim>(PolarManifold<dim,spacedim>::get_periodicity()),
   center(center)
 {}
 
-
-
 template <int dim, int spacedim>
 Tensor<1,spacedim>
-SphericalManifold<dim,spacedim>::get_periodicity()
+PolarManifold<dim,spacedim>::get_periodicity()
 {
   Tensor<1,spacedim> periodicity;
   // In two dimensions, theta is periodic.
@@ -45,36 +47,9 @@ SphericalManifold<dim,spacedim>::get_periodicity()
   return periodicity;
 }
 
-
 template <int dim, int spacedim>
 Point<spacedim>
-SphericalManifold<dim,spacedim>::get_new_point(const Quadrature<spacedim> &quad) const
-{
-  if (spacedim == 2)
-    return ChartManifold<dim,spacedim,spacedim>::get_new_point(quad);
-  else
-    {
-      double rho_average = 0;
-      Point<spacedim> mid_point;
-      for (unsigned int i=0; i<quad.size(); ++i)
-        {
-          rho_average += quad.weight(i)*(quad.point(i)-center).norm();
-          mid_point += quad.weight(i)*quad.point(i);
-        }
-      // Project the mid_point back to the right location
-      Tensor<1,spacedim> R = mid_point-center;
-      // Scale it to have radius rho_average
-      R *= rho_average/R.norm();
-      // And return it.
-      return center+R;
-    }
-}
-
-
-
-template <int dim, int spacedim>
-Point<spacedim>
-SphericalManifold<dim,spacedim>::push_forward(const Point<spacedim> &spherical_point) const
+PolarManifold<dim,spacedim>::push_forward(const Point<spacedim> &spherical_point) const
 {
   Assert(spherical_point[0] >=0.0,
          ExcMessage("Negative radius for given point."));
@@ -105,7 +80,7 @@ SphericalManifold<dim,spacedim>::push_forward(const Point<spacedim> &spherical_p
 
 template <int dim, int spacedim>
 Point<spacedim>
-SphericalManifold<dim,spacedim>::pull_back(const Point<spacedim> &space_point) const
+PolarManifold<dim,spacedim>::pull_back(const Point<spacedim> &space_point) const
 {
   const Tensor<1,spacedim> R = space_point-center;
   const double rho = R.norm();
@@ -139,10 +114,9 @@ SphericalManifold<dim,spacedim>::pull_back(const Point<spacedim> &space_point) c
   return p;
 }
 
-
 template <int dim, int spacedim>
 DerivativeForm<1,spacedim,spacedim>
-SphericalManifold<dim,spacedim>::push_forward_gradient(const Point<spacedim> &spherical_point) const
+PolarManifold<dim,spacedim>::push_forward_gradient(const Point<spacedim> &spherical_point) const
 {
   Assert(spherical_point[0] >= 0.0,
          ExcMessage("Negative radius for given point."));
@@ -183,6 +157,99 @@ SphericalManifold<dim,spacedim>::push_forward_gradient(const Point<spacedim> &sp
         Assert(false, ExcNotImplemented());
       }
   return DX;
+}
+
+// ============================================================
+// SphericalManifold
+// ============================================================
+
+template <int dim, int spacedim>
+SphericalManifold<dim,spacedim>::SphericalManifold(const Point<spacedim> center):
+  center(center)
+{}
+
+template <int dim, int spacedim>
+Point<spacedim>
+SphericalManifold<dim,spacedim>::
+get_intermediate_point (const Point<spacedim> &p1,
+                        const Point<spacedim> &p2,
+                        const double w) const
+{
+  Assert(w >=0.0 && w <= 1.0,
+         ExcMessage("w should be in the range [0.0,1.0]."));
+
+  if ( p1 == p2 ) return p1;
+
+  const Tensor<1,spacedim> v1 = p1 - center;
+  const Tensor<1,spacedim> v2 = p2 - center;
+  const double r1 = v1.norm();
+  const double r2 = v2.norm();
+
+  // Find the angle gamma described by v1 and v2:
+  const double gamma = std::acos((v1*v2)/(r1*r2));
+
+  // Find the angle sigma that corresponds to arclength equal to w
+  const double sigma = (1-w) * gamma;
+
+  // Unit vector with the same direction of v1
+  const Tensor<1,spacedim> t = v1/r1;
+  // Normal to v1 in the plane described by v1,v2,and the origin.
+  Tensor<1,spacedim> n = v2 - (v2*t)*t;
+  n = n/n.norm();
+
+  // Find the point Q along O,v1 such that
+  // P1,V,P2 has measure sigma.
+  const Tensor<1,spacedim> P = std::cos(sigma) * t + std::sin(sigma) * n;
+
+  // Project this point on the manifold.
+  return Point<spacedim>(center + (w*r1+(1-w)*r2)*P);
+}
+
+template <int dim, int spacedim>
+Tensor<1,spacedim>
+SphericalManifold<dim,spacedim>::
+get_tangent_vector (const Point<spacedim> &p1,
+                    const Point<spacedim> &p2) const
+{
+  Assert(p1 != p2,
+         ExcMessage("p1 and p2 should not concide."));
+
+  const double r1 = (p1 - center).norm();
+  const double r2 = (p2 - center).norm();
+
+  Assert(r1 > 1e-10,
+         ExcMessage("p1 cannot coincide with the center."));
+
+  Assert(r2 > 1e-10,
+         ExcMessage("p2 cannot coincide with the center."));
+
+  const Tensor<1,spacedim> e1 = (p1 - center)/r1;
+  const Tensor<1,spacedim> e2 = (p2 - center)/r2;
+
+  Assert(e1*e2 + 1.0 > 1e-10,
+         ExcMessage("p1 and p2 cannot lie on the same diameter and be opposite "
+                    "respect to the center."));
+
+  // Tangent vector to the unit sphere along the geodesic given by e1 and e2.
+  Tensor<1,spacedim> tg = (e2-(e2*e1)*e1);
+  tg = tg / tg.norm();
+
+  const double gamma = std::acos(e1*e2);
+
+  return (r1-r2)*e1 + r1*gamma*tg;
+}
+
+template <int dim, int spacedim>
+Point<spacedim>
+SphericalManifold<dim,spacedim>::
+project_to_manifold (const std::vector<Point<spacedim> > &vertices,
+                     const Point<spacedim> &candidate) const
+{
+  double rho = 0.0;
+  for (unsigned int i = 0; i<vertices.size(); i++)
+    rho += (vertices[i]-center).norm();
+  rho /= (1.0*vertices.size());
+  return center+(rho/(candidate-center).norm())*(candidate-center);
 }
 
 // ============================================================

@@ -32,8 +32,6 @@ template <int dim, int spacedim>
 Manifold<dim, spacedim>::~Manifold ()
 {}
 
-
-
 template <int dim, int spacedim>
 Point<spacedim>
 Manifold<dim, spacedim>::
@@ -44,21 +42,42 @@ project_to_manifold (const std::vector<Point<spacedim> > &,
   return Point<spacedim>();
 }
 
-
+template <int dim, int spacedim>
+Point<spacedim>
+Manifold<dim, spacedim>::
+get_intermediate_point (const Point<spacedim> &p1,
+                        const Point<spacedim> &p2,
+                        const double w) const
+{
+  std::vector<Point<spacedim> > vertices;
+  vertices.push_back(p1);
+  vertices.push_back(p2);
+  return project_to_manifold(vertices, w * p1 + (1-w)*p2 );
+}
 
 template <int dim, int spacedim>
 Point<spacedim>
 Manifold<dim, spacedim>::
 get_new_point (const Quadrature<spacedim> &quad) const
 {
+  Assert(quad.size() > 0,
+         ExcMessage("Quadrature should have at least one point."));
+
   Assert(std::abs(std::accumulate(quad.get_weights().begin(), quad.get_weights().end(), 0.0)-1.0) < 1e-10,
          ExcMessage("The weights for the individual points should sum to 1!"));
 
-  Point<spacedim> p;
-  for (unsigned int i=0; i<quad.size(); ++i)
-    p += quad.weight(i) * quad.point(i);
+  QSorted<spacedim> sorted_quad(quad);
+  Point<spacedim> p = sorted_quad.point(0);
+  double w = sorted_quad.weight(0);
 
-  return project_to_manifold(quad.get_points(), p);
+  for (unsigned int i=1; i<sorted_quad.size(); ++i)
+    {
+      if ( w != 0 )
+        p = get_intermediate_point(p, sorted_quad.point(i) , w/(sorted_quad.weight(i) + w) );
+      w += sorted_quad.weight(i);
+    }
+
+  return p;
 }
 
 

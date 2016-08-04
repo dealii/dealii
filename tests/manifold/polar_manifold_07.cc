@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// test get_normals_at_vertices for a SphericalManifold.
+// test get_normals_at_vertices for a PolarManifold.
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -35,7 +35,7 @@ void test ()
 
   GridGenerator::hyper_ball(triangulation);
 
-  static const SphericalManifold<dim, spacedim> manifold;
+  static const PolarManifold<dim, spacedim> manifold;
   triangulation.set_all_manifold_ids_on_boundary(0);
   triangulation.set_manifold (0, manifold);
 

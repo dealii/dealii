@@ -1,12 +1,17 @@
-//----------------------------  spherical_manifold_01.cc  ---------------------------
-//    Copyright (C) 2011 - 2015 by the mathLab team.
+// ---------------------------------------------------------------------
 //
-//    This file is subject to LGPL and may not be  distributed
-//    without copyright and license information. Please refer
-//    to the file deal.II/doc/license.html for the  text  and
-//    further information on this license.
+// Copyright (C) 2016 by the deal.II authors
 //
-//----------------------------  spherical_manifold_01.cc  ---------------------------
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
 
 
 // Test spherical manifold on hyper shells.
@@ -45,14 +50,13 @@ void test(unsigned int ref=1)
   tria.set_manifold(1, manifold);
   tria.refine_global(1);
 
-  for (typename Triangulation<dim,spacedim>::active_cell_iterator cell = tria.begin_active(); cell != tria.end(); ++cell)
-    {
-      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-        if (cell->face(f)->at_boundary())
-          deallog << "Center: " << cell->face(f)->center(true)
-                  << ", Norm: " << cell->face(f)->center(true).norm() << std::endl;
-    }
+  GridOut gridout;
+  gridout.write_msh(tria, deallog.get_file_stream());
 
+  // char fname[50];
+  // sprintf(fname, "mesh_%d_%d.msh", dim, spacedim);
+  // std::ofstream of(fname);
+  // gridout.write_msh(tria, of);
 }
 
 int main ()

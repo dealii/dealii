@@ -457,11 +457,12 @@ namespace internal
                   Assert(pi >=0 && pi <= 1.0,
                          ExcInternalError("Was expecting a quadrature point "
                                           "inside the unit reference element."));
-                  const Point<dim> np(pi > .5 ? p-pi *ei : p+(1-pi)*ei);
 
                   // In the length L, we store also the direction sign,
                   // which is positive, if the coordinate is < .5,
                   const double L = pi > .5 ? -pi: 1-pi;
+
+                  const Point<dim> np(p + L*ei);
 
                   // Get the weights to compute the np point in real space
                   for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_cell; ++j)
