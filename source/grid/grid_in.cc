@@ -2530,7 +2530,7 @@ void GridIn<dim, spacedim>::skip_empty_lines (std::istream &in)
       // if not put the whole thing
       // back and return
       if (std::find_if (line.begin(), line.end(),
-                        std::bind2nd (std::not_equal_to<char>(),' '))
+                        std_cxx11::bind (std::not_equal_to<char>(),std_cxx11::_1,' '))
           != line.end())
         {
           in.putback ('\n');

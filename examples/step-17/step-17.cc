@@ -29,6 +29,8 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
@@ -324,8 +326,9 @@ namespace Step17
   // particular enumeration can be obtained by re-ordering degrees of
   // freedom indices using DoFRenumbering::subdomain_wise().
   //
-  // The final step of this initial setup is that we get ourselves a
-  // variable that indicates how many degrees of freedom the current
+  // The final step of this initial setup is that we get ourselves an
+  // IndexSet that indicates the subset of the global number of unknowns
+  // this
   // process is responsible for. (Note that a degree of freedom is not
   // necessarily owned by the process that owns a cell just because
   // the degree of freedom lives on this cell: some degrees of freedom
@@ -362,51 +365,50 @@ namespace Step17
     dof_handler.distribute_dofs (fe);
     DoFRenumbering::subdomain_wise (dof_handler);
 
-    const types::global_dof_index n_local_dofs
-      = DoFTools::count_dofs_with_subdomain_association (dof_handler,
-                                                         this_mpi_process);
-
-    // Then we initialize the system matrix, solution, and right hand
-    // side vectors. Since they all need to work in parallel, we have
-    // to pass them an MPI communication object, as well as their
-    // global sizes (both dimensions are equal to the <i>total</i>
-    // number of degrees of freedom), and also how many rows out of
-    // this global size are to be stored locally
-    // (<code>n_local_dofs</code>). In addition, PETSc needs to know
-    // how to partition the columns in the chunk of the matrix that is
-    // stored locally; for square matrices, the columns should be
-    // partitioned in the same way as the rows (indicated by the
-    // second <code>n_local_dofs</code> in the call) but in the case
-    // of rectangular matrices one has to partition the columns in the
-    // same way as vectors are partitioned with which the matrix is
-    // multiplied, while rows have to partitioned in the same way as
-    // destination vectors of matrix-vector multiplications:
-    system_matrix.reinit (mpi_communicator,
-                          dof_handler.n_dofs(),
-                          dof_handler.n_dofs(),
-                          n_local_dofs,
-                          n_local_dofs,
-                          dof_handler.max_couplings_between_dofs());
-
-    solution.reinit (mpi_communicator, dof_handler.n_dofs(), n_local_dofs);
-    system_rhs.reinit (mpi_communicator, dof_handler.n_dofs(), n_local_dofs);
-
-    // Finally, we need to initialize the objects denoting hanging
-    // node constraints for the present grid. As with the
-    // triangulation and DoFHandler objects, we will simply store
-    // <i>all</i> constraints on each process; again, this will not
-    // scale, but we show in step-40 how one can work around this by
-    // only storing on each MPI process the constraints for degrees of
-    // freedom that actually matter on this particular process.
-    //
-    // Since PETSc handles the
-    // sparsity pattern internally to the matrix, there is no need to set up
-    // an independent sparsity pattern here, and to condense it for
-    // constraints, as we have done in all other example programs.
+    // We need to initialize the objects denoting hanging node constraints for
+    // the present grid. As with the triangulation and DoFHandler objects, we
+    // will simply store <i>all</i> constraints on each process; again, this
+    // will not scale, but we show in step-40 how one can work around this by
+    // only storing on each MPI process the constraints for degrees of freedom
+    // that actually matter on this particular process.
     hanging_node_constraints.clear ();
     DoFTools::make_hanging_node_constraints (dof_handler,
                                              hanging_node_constraints);
     hanging_node_constraints.close ();
+
+    // Now we create the sparsity pattern for the system matrix. Note that we
+    // again compute and store all entries and not only the ones relevant
+    // to this process (see step-18 or step-40 for a more efficient way to
+    // handle this).
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern (dof_handler, dsp,
+                                     hanging_node_constraints,
+                                     false);
+
+    // Now we determine the set of locally owned DoFs and use that to
+    // initialize parallel vectors and matrix. Since the matrix and vectors
+    // need to work in parallel, we have to pass them an MPI communication
+    // object, as well as information about the partitioning contained in the
+    // IndexSet @p locally_owned_dofs.  The IndexSet contains information
+    // about the global size (the <i>total</i> number of degrees of freedom)
+    // and also what subset of rows is to be stored locally.  Note that the
+    // system matrix needs that partitioning information for the rows and
+    // columns. For square matrices, as it is the case here, the columns
+    // should be partitioned in the same way as the rows, but in the case of
+    // rectangular matrices one has to partition the columns in the same way
+    // as vectors are partitioned with which the matrix is multiplied, while
+    // rows have to partitioned in the same way as destination vectors of
+    // matrix-vector multiplications:
+    const std::vector<IndexSet> locally_owned_dofs_per_proc = DoFTools::locally_owned_dofs_per_subdomain(dof_handler);
+    const IndexSet locally_owned_dofs = locally_owned_dofs_per_proc[this_mpi_process];
+
+    system_matrix.reinit (locally_owned_dofs,
+                          locally_owned_dofs,
+                          dsp,
+                          mpi_communicator);
+
+    solution.reinit (locally_owned_dofs, mpi_communicator);
+    system_rhs.reinit (locally_owned_dofs, mpi_communicator);
   }
 
 

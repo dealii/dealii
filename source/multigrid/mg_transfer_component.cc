@@ -668,8 +668,9 @@ void MGTransferSelect<number>::build_matrices (
       // global to level dofs
       const types::global_dof_index n_active_dofs =
         std::count_if (temp_copy_indices.begin(), temp_copy_indices.end(),
-                       std::bind2nd(std::not_equal_to<types::global_dof_index>(),
-                                    numbers::invalid_dof_index));
+                       std_cxx11::bind (std::not_equal_to<types::global_dof_index>(),
+                                        std_cxx11::_1,
+                                        numbers::invalid_dof_index));
       copy_to_and_from_indices[level].resize (n_active_dofs);
       types::global_dof_index counter = 0;
       for (types::global_dof_index i=0; i<temp_copy_indices.size(); ++i)

@@ -15,6 +15,7 @@
 
 
 #include <deal.II/base/utilities.h>
+#include <deal.II/base/std_cxx11/bind.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/petsc_vector.h>
@@ -294,8 +295,9 @@ namespace
           unsigned int
           my_count = std::count_if (criteria.begin(),
                                     criteria.end(),
-                                    std::bind2nd (std::greater<double>(),
-                                                  test_threshold));
+                                    std_cxx11::bind (std::greater<double>(),
+                                                     std_cxx11::_1,
+                                                     test_threshold));
 
           unsigned int total_count;
           MPI_Reduce (&my_count, &total_count, 1, MPI_UNSIGNED,

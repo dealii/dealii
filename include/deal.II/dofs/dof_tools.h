@@ -634,7 +634,7 @@ namespace DoFTools
    *
    * In fact, this function takes two such masks, one describing which
    * variables couple with each other in the cell integrals that make up your
-   * bilinear form, and which variables coupld with each other in the face
+   * bilinear form, and which variables couple with each other in the face
    * integrals. If you passed masks consisting of only 1s to both of these,
    * then you would get the same sparsity pattern as if you had called the
    * first of the make_sparsity_pattern() functions above. By setting some of
@@ -645,10 +645,28 @@ namespace DoFTools
    */
   template <typename DoFHandlerType, typename SparsityPatternType>
   void
-  make_flux_sparsity_pattern (const DoFHandlerType    &dof,
-                              SparsityPatternType     &sparsity,
-                              const Table<2,Coupling> &cell_integrals_mask,
-                              const Table<2,Coupling> &face_integrals_mask);
+  make_flux_sparsity_pattern (const DoFHandlerType      &dof,
+                              SparsityPatternType       &sparsity,
+                              const Table<2,Coupling>   &cell_integrals_mask,
+                              const Table<2,Coupling>   &face_integrals_mask,
+                              const types::subdomain_id  subdomain_id = numbers::invalid_subdomain_id);
+  /**
+   * This function does essentially the same as the previous
+   * make_flux_sparsity_pattern() function but allows the application of
+   * a constraint matrix. This is useful in the case where some components
+   * of a finite element are continuous and some discontinuous, allowing
+   * constraints to be imposed on the continuous part while also building
+   * the flux terms needed for the discontinuous part.
+   */
+  template <typename DoFHandlerType, typename SparsityPatternType>
+  void
+  make_flux_sparsity_pattern (const DoFHandlerType      &dof,
+                              SparsityPatternType       &sparsity,
+                              const ConstraintMatrix    &constraints,
+                              const bool                 keep_constrained_dofs,
+                              const Table<2,Coupling>   &couplings,
+                              const Table<2,Coupling>   &face_couplings,
+                              const types::subdomain_id  subdomain_id);
 
   /**
    * Create the sparsity pattern for boundary matrices. See the general
@@ -1681,19 +1699,28 @@ namespace DoFTools
    */
   //@{
   /**
-   * Create an incidence matrix that for every cell on a given level of a
-   * multilevel DoFHandler flags which degrees of freedom are associated with
-   * the corresponding cell. This data structure is a matrix with as many rows
-   * as there are cells on a given level, as many columns as there are degrees
-   * of freedom on this level, and entries that are either true or false. This
-   * data structure is conveniently represented by a SparsityPattern object.
+   * Creates a sparsity pattern, which lists
+   * the degrees of freedom associated to each cell on the given
+   * level. This pattern can be used in RelaxationBlock classes as
+   * block list for additive and multiplicative Schwarz methods.
    *
-   * @note The ordering of rows (cells) follows the ordering of the standard
-   * cell iterators.
+   * The row index in this pattern is the cell index resulting from
+   * standard iteration through a level of the Triangulation. For a
+   * parallel::distributed::Triangulation, only locally owned cells
+   * are entered.
+   *
+   * The sparsity pattern is resized in this function to contain as
+   * many rows as there are locally owned cells on a given level, as
+   * many columns as there are degrees of freedom on this level.
+   *
+   * <tt>selected_dofs</tt> is a vector indexed by the local degrees
+   * of freedom on a cell. If it is used, only such dofs are entered
+   * into the block list which are selected. This allows for instance
+   * the exclusion of components or of dofs on the boundary.
    */
-  template <typename DoFHandlerType, class SparsityPatternType>
-  void make_cell_patches(SparsityPatternType     &block_list,
-                         const DoFHandlerType    &dof_handler,
+  template <int dim, int spacedim=dim>
+  void make_cell_patches(SparsityPattern         &block_list,
+                         const DoFHandler<dim,spacedim> &dof_handler,
                          const unsigned int       level,
                          const std::vector<bool> &selected_dofs = std::vector<bool>(),
                          types::global_dof_index  offset        = 0);

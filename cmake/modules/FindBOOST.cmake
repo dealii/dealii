@@ -43,7 +43,13 @@ ENDIF()
 
 # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
 LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
-FIND_PACKAGE(Boost 1.54 COMPONENTS iostreams serialization system thread)
+SET(_boost_python "")
+IF(DEAL_II_COMPONENT_PYTHON_BINDINGS)
+  SET(_boost_python "python")
+ENDIF()
+FIND_PACKAGE(Boost 1.54 COMPONENTS
+  iostreams serialization system thread ${_boost_python}
+  )
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
 #

@@ -428,6 +428,11 @@ private:
                   << "Number of wanted eigenvalues " << arg1
                   << " is larger that the size of eigenvectors " << arg2);
 
+  DeclException2 (PArpackExcInvalidEigenvectorSizeNonsymmetric, int, int,
+                  << "To store the real and complex parts of " << arg1
+                  << " eigenvectors in real-valued vectors, their size (currently set to " << arg2
+                  << ") should be greater than or equal to " << arg1+1);
+
   DeclException2 (PArpackExcInvalidEigenvalueSize, int, int,
                   << "Number of wanted eigenvalues " << arg1
                   << " is larger that the size of eigenvalues " << arg2);
@@ -603,8 +608,14 @@ void PArpackSolver<VectorType>::solve
  const unsigned int                  n_eigenvalues)
 {
 
-  Assert (n_eigenvalues <= eigenvectors.size(),
-          PArpackExcInvalidEigenvectorSize(n_eigenvalues, eigenvectors.size()));
+  if (additional_data.symmetric)
+    {
+      Assert (n_eigenvalues <= eigenvectors.size(),
+              PArpackExcInvalidEigenvectorSize(n_eigenvalues, eigenvectors.size()));
+    }
+  else
+    Assert (n_eigenvalues+1 <= eigenvectors.size(),
+            PArpackExcInvalidEigenvectorSizeNonsymmetric(n_eigenvalues, eigenvectors.size()));
 
   Assert (n_eigenvalues <= eigenvalues.size(),
           PArpackExcInvalidEigenvalueSize(n_eigenvalues, eigenvalues.size()));
@@ -872,8 +883,8 @@ void PArpackSolver<VectorType>::solve
       double sigmar = shift_value; // real part of the shift
       double sigmai = 0.0; // imaginary part of the shift
 
-      std::vector<double> eigenvalues_real (n_eigenvalues, 0.);
-      std::vector<double> eigenvalues_im (n_eigenvalues, 0.);
+      std::vector<double> eigenvalues_real (n_eigenvalues+1, 0.);
+      std::vector<double> eigenvalues_im (n_eigenvalues+1, 0.);
 
       // call of ARPACK pdneupd routine
       if (additional_data.symmetric)
@@ -884,7 +895,7 @@ void PArpackSolver<VectorType>::solve
                  &iparam[0], &ipntr[0], &workd[0], &workl[0], &lworkl, &info);
       else
         pdneupd_(&mpi_communicator_fortran, &rvec, howmany, &select[0], &eigenvalues_real[0],
-                 &eigenvalues_im[0], &z[0], &ldz, &sigmar, &sigmai,
+                 &eigenvalues_im[0], &v[0], &ldz, &sigmar, &sigmai,
                  &workev[0], bmat, &n_inside_arpack, which, &nev, &tol,
                  &resid[0], &ncv, &v[0], &ldv,
                  &iparam[0], &ipntr[0], &workd[0], &workl[0], &lworkl, &info);
@@ -902,7 +913,7 @@ void PArpackSolver<VectorType>::solve
           AssertThrow (false, PArpackExcInfoPdneupd(info));
         }
 
-      for (size_type i=0; i<n_eigenvalues; ++i)
+      for (size_type i=0; i<nev; ++i)
         {
           eigenvectors[i] = 0.0;
           Assert (i*nloc + nloc <= v.size(), dealii::ExcInternalError() );
@@ -919,7 +930,7 @@ void PArpackSolver<VectorType>::solve
     }
 
   // Throw an error if the solver did not converge.
-  AssertThrow (iparam[4] == (int)n_eigenvalues,
+  AssertThrow (iparam[4] >= (int)n_eigenvalues,
                PArpackExcConvergedEigenvectors(n_eigenvalues,iparam[4]));
 
   // both PDNAUPD and PDSAUPD compute eigenpairs of inv[A - sigma*M]*M

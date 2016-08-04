@@ -17,7 +17,6 @@
 # Add convenience targets that build and install only a specific component:
 #
 #   library
-#   compat_files
 #   documentation
 #   examples
 #
@@ -53,7 +52,7 @@ ENDIF()
 # The library can always be compiled and/or installed unconditionally ;-)
 _add_custom_target(library)
 
-FOREACH(_component compat_files documentation examples)
+FOREACH(_component documentation examples python_bindings)
   STRING(TOUPPER "${_component}" _component_uppercase)
   IF(DEAL_II_COMPONENT_${_component_uppercase})
     _add_custom_target(${_component})
@@ -136,7 +135,6 @@ FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 #                     and reruns the configure and generate phases of CMake
 #    rebuild_cache  - rerun the configure and generate phases of CMake
 #
-#    compat_files   - ${_description_string} component 'compat_files'
 #    documentation  - ${_description_string} component 'documentation'
 #    examples       - ${_description_string} component 'examples'
 #    library        - ${_description_string} component 'library'

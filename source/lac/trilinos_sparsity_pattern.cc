@@ -67,9 +67,9 @@ namespace TrilinosWrappers
       return graph.NumGlobalEntries();
     }
 
-    int global_row_index(const Epetra_CrsGraph &graph, int i)
+    int local_to_global_index(const Epetra_BlockMap &map, int i)
     {
-      return graph.GRID(i);
+      return map.GID(i);
     }
 #else
     long long int n_global_elements (const Epetra_BlockMap &map)
@@ -102,9 +102,9 @@ namespace TrilinosWrappers
       return graph.NumGlobalEntries64();
     }
 
-    long long int global_row_index(const Epetra_CrsGraph &graph, int i)
+    long long int local_to_global_index(const Epetra_BlockMap &map, int i)
     {
-      return graph.GRID64(i);
+      return map.GID64(i);
     }
 #endif
   }
@@ -1097,7 +1097,8 @@ namespace TrilinosWrappers
           {
             graph->ExtractMyRowView (i, num_entries, indices);
             for (int j=0; j<num_entries; ++j)
-              out << "(" << i << "," << indices[global_row_index(*graph,j)] << ") "
+              out << "(" << local_to_global_index(graph->RowMap(), i)
+                  << "," << local_to_global_index(graph->ColMap(), indices[j]) << ") "
                   << std::endl;
           }
       }
@@ -1117,14 +1118,14 @@ namespace TrilinosWrappers
         int num_entries;
         graph->ExtractMyRowView (row, num_entries, indices);
 
-        for (unsigned int j=0; j<(unsigned int)num_entries; ++j)
+        for (int j=0; j<num_entries; ++j)
           // while matrix entries are usually
           // written (i,j), with i vertical and
           // j horizontal, gnuplot output is
           // x-y, that is we have to exchange
           // the order of output
-          out << indices[global_row_index(*graph,static_cast<int>(j))]
-              << " " << -static_cast<signed int>(row) << std::endl;
+          out << static_cast<int>(local_to_global_index(graph->ColMap(), indices[j]))
+              << " " << -static_cast<int>(local_to_global_index(graph->RowMap(), row)) << std::endl;
       }
 
     AssertThrow (out, ExcIO());

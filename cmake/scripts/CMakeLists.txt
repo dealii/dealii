@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II authors
+## Copyright (C) 2012 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -37,6 +37,13 @@ SET_TARGET_PROPERTIES(expand_instantiations_exe PROPERTIES
   OUTPUT_NAME expand_instantiations
   RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}
   )
+
+IF (DEAL_II_MSVC)
+  SET_TARGET_PROPERTIES(expand_instantiations_exe PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
+    )
+ENDIF()
 
 SET(_scripts
   ${CMAKE_CURRENT_SOURCE_DIR}/normalize.pl

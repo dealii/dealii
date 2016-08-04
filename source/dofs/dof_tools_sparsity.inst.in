@@ -183,6 +183,23 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
     (const hp::DoFHandler<deal_II_dimension> &dof,
      SP    &sparsity);
 
+    template void
+    DoFTools::make_flux_sparsity_pattern<DoFHandler<deal_II_dimension>,SP>
+    (const DoFHandler<deal_II_dimension> &dof,
+     SP    &sparsity,
+     const Table<2,Coupling>&,
+     const Table<2,Coupling>&,
+     const unsigned int);
+
+    template void
+    DoFTools::make_flux_sparsity_pattern<DoFHandler<deal_II_dimension>,SP>
+    (const DoFHandler<deal_II_dimension> &dof,
+     SP    &sparsity,
+     const ConstraintMatrix &constraints,
+     const bool,
+     const Table<2,Coupling>&,
+     const Table<2,Coupling>&,
+     const unsigned int);
 
     template void
     DoFTools::make_flux_sparsity_pattern<DoFHandler<deal_II_dimension>,SP>
@@ -197,21 +214,27 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
      SP    &sparsity,
      const ConstraintMatrix &constraints,
      const bool, const unsigned int);
-
-    template void
-    DoFTools::make_flux_sparsity_pattern<DoFHandler<deal_II_dimension>,SP>
-    (const DoFHandler<deal_II_dimension> &dof,
-     SP    &,
-     const Table<2,Coupling>&,
-     const Table<2,Coupling>&);
 
 #if deal_II_dimension > 1
+
     template void
     DoFTools::make_flux_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SP>
     (const hp::DoFHandler<deal_II_dimension> &dof,
-     SP    &,
+     SP    &sparsity,
      const Table<2,Coupling>&,
-     const Table<2,Coupling>&);
+     const Table<2,Coupling>&,
+     const unsigned int);
+
+    template void
+    DoFTools::make_flux_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SP>
+    (const hp::DoFHandler<deal_II_dimension> &dof,
+     SP    &sparsity,
+     const ConstraintMatrix &constraints,
+     const bool,
+     const Table<2,Coupling>&,
+     const Table<2,Coupling>&,
+     const unsigned int);
+
 #endif
 
 #if deal_II_dimension < 3

@@ -179,8 +179,9 @@ void test ()
 
       // check std::transform
       std::transform (v1.begin(), v1.end(), v2.begin(),
-                      std::bind2nd (std::multiplies<double>(),
-                                    2.0));
+                      std::bind (std::multiplies<double>(),
+                                 std_cxx11::_1,
+                                 2.0));
       v2 *= 1./2.;
       deallog << "Check 7: " << (v1 == v2 ? "true" : "false") << std::endl;
 

@@ -60,7 +60,6 @@ Point<spacedim>
 Manifold<dim, spacedim>::
 get_new_point (const Quadrature<spacedim> &quad) const
 {
-
   const double tol = 1e-10;
 
   Assert(quad.size() > 0,

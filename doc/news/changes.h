@@ -39,6 +39,23 @@ inconvenience this causes.
 
 <ol>
 
+<li> Changed: DoFTools::make_cell_patches() only accepts block lists
+of type SparsityPattern. The reason is that it has to initialize the
+size of the pattern on distributed triangulations by computing the
+number of locally owned cells. Initialization differs between sparsity
+pattern classes, so no generic function would be possible. On the
+other hand, the block list is an object, which only extends over
+locally owned grid cells and its size can be determined efficiently
+upon initialization. Therefore, SparsityPattern is a good choice here.
+
+At the same time, we changed the dof handler template to the type
+DoFHandler, since hp::DoFHandler requires a different setup of the
+SparsityPattern.
+<br>
+(Guido Kanschat, 2016/08/02)
+</li>
+
+</li>
  <li> Changed: The conversion constructors of class Vector from the
  PETScWrappers::Vector, PETScWrappers::MPI::Vector,
  TrilinosWrappers::Vector, and TrilinosWrappers::MPI::Vector classes
@@ -150,6 +167,29 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li>
+ New: Added a new PolarManifold descriptor, that uses a polar coordinate
+ system to compute new points, and modified the existing SphericalManifold 
+ descriptor to use geodesics on the surface of the sphere. 
+ <br>
+ (Luca Heltai, Mauro Bardelloni, 2016/08/04)
+ </li>
+
+ <li>
+ New: Added Python bindings to generate and manipulate a Triangulation from 
+ Python. The Triangulation generated in Python can be saved and later, loaded 
+ inside a C++ code.
+ <br>
+ (Bruno Turcksin, 2016/08/03)
+ </li>
+
+ <li>
+ Improved: A few of the introductory examples (steps five through eight) no
+ longer use the Function class; they use plain functions instead.
+ <br>
+ (David Wells, 2016/07/25)
+ </li>
+
  <li>
  Improved: VectorTools::interpolate() may now be used on FESystems with mixed
  interpolating and non-interpolating FEs, if all of the selected components for
@@ -388,11 +428,53 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Improved: The regular and hp versions of
+ DoFTools::make_flux_sparsity_pattern() no longer use the user flags of the
+ underlying triangulation to determine if entries along a certain face have been
+ added to the sparsity pattern.
+ <br>
+ (David Wells, 2016/03/02 - 2016/08/02)
+ </li>
+
+ <li> Improved: DoFTools::make_cell_patches() can create block lists
+ only extending over local cells of distributed triangulations.
+ <br>
+ (Guido Kanschat, 2016/08/02)
+ </li>
+
+ <li> Fixed: (P)ARPACK interface for non-symmetric matrices.
+ <br>
+ (Joscha Gedicke, 2016/08/01)
+
+ <li> Fixed: The TrilinosWrappers::SparsityPattern::print() and
+ TrilinosWrappers::SparsityPattern::print_gnuplot() methods did not produce
+ correct output on distributed computations. This is now fixed.
+ <br>
+ (Martin Kronbichler, 2016/07/30)
+ </li>
+
+ <li> Fixed: CMake now tries to pick up the full link interface for gsl.
+ This works around an underlinkage issue with libgsl.so not correctly
+ stating all shared object dependencies.
+ <br>
+ (Matthias Maier, 2016/07/28)
+ </li>
+
  <li> Fixed: Level indices for geometric multigrid queried through
  DoFAccessor::get_mg_dof_indices() would return wrong indices on lines
  and faces in non-standard orientation in 3D. This is now fixed.
  <br>
  (Martin Kronbichler, 2016/07/27)
+ </li>
+
+ <li> New: There is now a new DoFTools::make_flux_sparsity_pattern()
+ which takes a constraint matrix and flux and internal dof masks, in
+ parallel. This is useful in the case where some components of a
+ finite element are continuous and some discontinuous, allowing
+ constraints to be imposed on the continuous part while also building
+ building the flux terms needed for the discontinuous part.
+ <br>
+ (Sam Cox, 2016/07/25)
  </li>
 
  <li> Improved: Allow for including dofs for individual components on

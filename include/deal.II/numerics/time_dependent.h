@@ -251,8 +251,8 @@ template <int dim, int spacedim> class Triangulation;
  *   void
  *   TimeDependent::solve_primal_problem ()
  *   {
- *     do_loop (mem_fun(&TimeStepBase::init_for_primal_problem),
- *              mem_fun(&TimeStepBase::solve_primal_problem),
+ *     do_loop (std_cxx11::bind(&TimeStepBase::init_for_primal_problem, std_cxx11::_1),
+ *              std_cxx11::bind(&TimeStepBase::solve_primal_problem, std_cxx11::_1),
  *              timestepping_data_primal,
  *              forward);
  *   };
@@ -273,7 +273,7 @@ template <int dim, int spacedim> class Triangulation;
  * look-back and the last one denotes in which direction the loop is to be
  * run.
  *
- * Using function pointers through the @p mem_fun functions provided by the
+ * Using function pointers through the @p std_cxx11::bind functions provided by the
  * <tt>C++</tt> standard library, it is possible to do neat tricks, like the
  * following, also taken from the wave program, in this case from the function
  * @p refine_grids:
@@ -282,10 +282,11 @@ template <int dim, int spacedim> class Triangulation;
  *   compute the thresholds for refinement
  *   ...
  *
- *   do_loop (mem_fun (&TimeStepBase_Tria<dim>::init_for_refinement),
- *            bind2nd (mem_fun1 (&TimeStepBase_Wave<dim>::refine_grid),
- *                     TimeStepBase_Tria<dim>::RefinementData (top_threshold,
- *                                                             bottom_threshold)),
+ *   do_loop (std_cxx11::bind(&TimeStepBase_Tria<dim>::init_for_refinement, std_cxx11::_1),
+ *            std_cxx11::bind(&TimeStepBase_Wave<dim>::refine_grid,
+ *                            std_cxx11::_1,
+ *                            TimeStepBase_Tria<dim>::RefinementData (top_threshold,
+ *                                                                    bottom_threshold)),
  *            TimeDependent::TimeSteppingData (0,1),
  *            TimeDependent::forward);
  * @endcode
@@ -511,8 +512,8 @@ public:
    *
    * To see how this function work, note that the function @p
    * solve_primal_problem only consists of a call to <tt>do_loop
-   * (mem_fun(&TimeStepBase::init_for_primal_problem),
-   * mem_fun(&TimeStepBase::solve_primal_problem), timestepping_data_primal,
+   * (std_cxx11::bind(&TimeStepBase::init_for_primal_problem, std_cxx11::_1),
+   * std_cxx11::bind(&TimeStepBase::solve_primal_problem, std_cxx11::_1), timestepping_data_primal,
    * forward);</tt>.
    *
    * Note also, that the given class from which the two functions are taken
@@ -524,10 +525,9 @@ public:
    * the TimeStepBase class.
    *
    * Instead of using the above form, you can equally well use
-   * <tt>bind2nd(mem_fun1(&X::unary_function), arg)</tt> which lets the @p
-   * do_loop function call the given function with the specified parameter.
-   * Note that you need to bind the second parameter since the first one
-   * implicitly contains the object which the function is to be called for.
+   * <tt>std_cxx11::bind(&X::unary_function, std_cxx11::_1, args...)</tt> which
+   * lets the @p do_loop function call the given function with the specified
+   * parameters.
    */
   template <typename InitFunctionObject, typename LoopFunctionObject>
   void do_loop (InitFunctionObject      init_function,
@@ -1482,12 +1482,10 @@ void TimeDependent::do_loop (InitFunctionObject      init_function,
     switch (direction)
       {
       case forward:
-        init_function (static_cast<typename InitFunctionObject::argument_type>
-                       (&*timesteps[step]));
+        init_function ((&*timesteps[step]));
         break;
       case backward:
-        init_function (static_cast<typename InitFunctionObject::argument_type>
-                       (&*timesteps[n_timesteps-step-1]));
+        init_function ((&*timesteps[n_timesteps-step-1]));
         break;
       };
 
@@ -1532,12 +1530,10 @@ void TimeDependent::do_loop (InitFunctionObject      init_function,
       switch (direction)
         {
         case forward:
-          loop_function (static_cast<typename LoopFunctionObject::argument_type>
-                         (&*timesteps[step]));
+          loop_function ((&*timesteps[step]));
           break;
         case backward:
-          loop_function (static_cast<typename LoopFunctionObject::argument_type>
-                         (&*timesteps[n_timesteps-step-1]));
+          loop_function ((&*timesteps[n_timesteps-step-1]));
           break;
         };
 
