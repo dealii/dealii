@@ -118,8 +118,12 @@ private:
  * Manifold description for a spherical space coordinate system.
  *
  * You can use this Manifold object to describe any sphere, circle,
- * hypersphere or hyperdisc in two or three dimensions, both as a co-dimension
- * one manifold descriptor or as co-dimension zero manifold descriptor.
+ * hypersphere or hyperdisc in two or three dimensions. This manifold
+ * can be used as a co-dimension one manifold descriptor of a
+ * spherical surface embedded in a higher dimensional space, or as a
+ * co-dimension zero manifold descriptor for a body with positive
+ * volume, provided that the center of the spherical space is excluded
+ * from the domain.
  *
  * The two template arguments match the meaning of the two template arguments
  * in Triangulation<dim, spacedim>, however this Manifold can be used to
@@ -131,8 +135,8 @@ private:
  * it may not be suitable for domains that contain either the north or
  * south poles.  Consider for instance the pair of points
  * \f$x_1=(1,\pi/3,0)\f$ and \f$x_2=(1,\pi/3,\pi)\f$ in polar
- * coordinates (laying on the surface of a sphere with radius one, on
- * a parallel at at height $\pi/3$. In this case connecting the points
+ * coordinates (lying on the surface of a sphere with radius one, on
+ * a parallel at at height $\pi/3$). In this case connecting the points
  * with a straight line in polar coordinates would take the long road
  * around the globe, without passing through the north pole.
  *
@@ -152,11 +156,12 @@ private:
  * where $\kappa = \frac{x_1 \times \x_2}{\Vert x_1 \times \x_2 \Vert}$
  * and $\alpha(t) = t * \arccos(x_1 * x_2) $ for $t\in[0,1]$.
  * Indeed, this is a geodesic, and it is the natural choice when
- * connecting points on the surface of the sphere.
- *
- * If the codimension of the Manifold is one, than this Manifold
- * connects points using geodesics. In all other cases it is a
- * continuus extension of the codimension one case.
+ * connecting points on the surface of the sphere. In the examples above,
+ * the PolarManifold class implements the first way of connecting two
+ * points on the surface of a sphere, while SphericalManifold implements
+ * the second way, i.e., if the codimension of the Manifold is one,
+ * than this Manifold connects points using geodesics. In all other cases
+ * it is a continuus extension of the codimension one case.
  *
  * In particular, this class implements a Manifold that joins any two
  * points in space by first projecting them onto the surface of a

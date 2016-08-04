@@ -135,8 +135,8 @@ namespace Manifolds
  * only overload Manifold::project_to_manifold() for simple
  * situations. This is often useful when describing manifolds that are
  * embedded in higher dimensional space, e.g., the surface of a
- * sphere.  In those cases, the desired new point maybe computed
- * simply by the (weighted) average of the provided point, projected
+ * sphere.  In those cases, the desired new point may be computed
+ * simply by the (weighted) average of the provided points, projected
  * back out onto the sphere.
  *
  *
@@ -308,7 +308,7 @@ public:
    * In its default implementation it uses a pair-wise reduction of
    * the points in the quadrature formula by calling the function
    * get_new_point() that takes three arguments on the first two
-   * points, then on the resulting point and the next, untill all
+   * points, then on the resulting point and the next, until all
    * points in the quadrature have been taken into account. User
    * classes can get away by simply implementing the get_new_point()
    * function that takes three arguments.
