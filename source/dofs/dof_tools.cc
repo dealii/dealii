@@ -2055,15 +2055,15 @@ namespace DoFTools
 
 
 
-  template <typename DoFHandlerType>
-  void make_cell_patches(SparsityPattern         &block_list,
-                         const DoFHandlerType    &dof_handler,
-                         const unsigned int       level,
-                         const std::vector<bool> &selected_dofs,
-                         types::global_dof_index  offset)
+  template <int dim, int spacedim>
+  void make_cell_patches(SparsityPattern                &block_list,
+                         const DoFHandler<dim,spacedim> &dof_handler,
+                         const unsigned int             level,
+                         const std::vector<bool>        &selected_dofs,
+                         const types::global_dof_index  offset)
   {
-    typename DoFHandlerType::level_cell_iterator cell;
-    typename DoFHandlerType::level_cell_iterator endc = dof_handler.end(level);
+    typename DoFHandler<dim,spacedim>::level_cell_iterator cell;
+    typename DoFHandler<dim,spacedim>::level_cell_iterator endc = dof_handler.end(level);
     std::vector<types::global_dof_index> indices;
 
     unsigned int i=0;
