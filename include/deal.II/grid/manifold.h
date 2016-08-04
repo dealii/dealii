@@ -308,7 +308,7 @@ public:
    * In its default implementation it uses a pair-wise reduction of
    * the points in the quadrature formula by calling the function
    * get_intermediate_point() on the first two points, then on the
-   * resulting point and the next, untill all points in the quadrature
+   * resulting point and the next, until all points in the quadrature
    * have been taken into account. User classes can get away by simply
    * implementing the get_intermediate_point() function. Notice that
    * by default the get_intermediate_point() function calls the
