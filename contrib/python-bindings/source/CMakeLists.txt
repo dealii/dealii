@@ -20,6 +20,31 @@
 INCLUDE(FindPythonLibs)
 INCLUDE(FindPythonInterp)
 
+IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
+  MESSAGE(FATAL_ERROR
+    "DEAL_II_COMPONENT_PYTHON_BINDINGS has unmet configuration requirements: "
+    "Python bindings require an external boost library, but deal.II was "
+    "configured with bundled boost."
+    )
+ENDIF()
+
+#
+# Unset Boost_Found and run the low level FindBOOST.cmake module again to
+# pick up libboost_python.so
+#
+LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+SET(Boost_FOUND)
+# Use the low level _FIND_PACKAGE function instead of our wrapper
+_FIND_PACKAGE(Boost 1.54 COMPONENTS python)
+LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+
+IF(NOT Boost_FOUND)
+  MESSAGE(FATAL_ERROR
+    "DEAL_II_COMPONENT_PYTHON_BINDINGS has unmet configuration requirements: "
+    "The external boost library does not provide Boost.Python"
+    )
+ENDIF()
+
 #
 # FIXME: Once finalized, reconsider moving this definitions into
 # cmake/setup_dealii.cmake
@@ -95,8 +120,8 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
 
   TARGET_LINK_LIBRARIES(PyDealII_${_build_lowercase}
     ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
-    ${PYTHON_LIBRARIES}
     ${Boost_LIBRARIES}
+    ${PYTHON_LIBRARIES}
     )
 
   EXPORT(TARGETS PyDealII_${_build_lowercase}
