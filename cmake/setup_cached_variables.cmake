@@ -406,7 +406,7 @@ FOREACH(_var ${_res})
   #
   # Same for components:
   #
-  IF(_var MATCHES "^(DOCUMENTATION|EXAMPLES|PACKAGE)")
+  IF(_var MATCHES "^(DOCUMENTATION|EXAMPLES|PACKAGE|PYTHON_BINDINGS)")
     SET(DEAL_II_COMPONENT_${_var} ${${_var}} CACHE BOOL "" FORCE)
     UNSET(${_var} CACHE)
   ENDIF()
