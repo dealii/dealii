@@ -1718,12 +1718,12 @@ namespace DoFTools
    * into the block list which are selected. This allows for instance
    * the exclusion of components or of dofs on the boundary.
    */
-  template <int dim, int spacedim=dim>
+  template <int dim, int spacedim>
   void make_cell_patches(SparsityPattern         &block_list,
                          const DoFHandler<dim,spacedim> &dof_handler,
                          const unsigned int       level,
                          const std::vector<bool> &selected_dofs = std::vector<bool>(),
-                         types::global_dof_index  offset        = 0);
+                         const types::global_dof_index  offset        = 0);
 
   /**
    * Create an incidence matrix that for every vertex on a given level of a
