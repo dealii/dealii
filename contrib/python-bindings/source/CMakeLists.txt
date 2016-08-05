@@ -20,6 +20,14 @@
 INCLUDE(FindPythonLibs)
 INCLUDE(FindPythonInterp)
 
+IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
+  MESSAGE(FATAL_ERROR
+    "DEAL_II_COMPONENT_PYTHON_BINDINGS has unmet configuration requirements: "
+    "Python bindings require an external boost library, but deal.II was "
+    "configured with bundled boost."
+    )
+ENDIF()
+
 #
 # Unset Boost_Found and run the low level FindBOOST.cmake module again to
 # pick up libboost_python.so
@@ -29,6 +37,13 @@ SET(Boost_FOUND)
 # Use the low level _FIND_PACKAGE function instead of our wrapper
 _FIND_PACKAGE(Boost 1.54 COMPONENTS python)
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+
+IF(NOT Boost_FOUND)
+  MESSAGE(FATAL_ERROR
+    "DEAL_II_COMPONENT_PYTHON_BINDINGS has unmet configuration requirements: "
+    "The external boost library does not provide Boost.Python"
+    )
+ENDIF()
 
 #
 # FIXME: Once finalized, reconsider moving this definitions into
