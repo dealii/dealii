@@ -105,8 +105,8 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
 
   TARGET_LINK_LIBRARIES(PyDealII_${_build_lowercase}
     ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
-    ${PYTHON_LIBRARIES}
     ${Boost_LIBRARIES}
+    ${PYTHON_LIBRARIES}
     )
 
   EXPORT(TARGETS PyDealII_${_build_lowercase}
