@@ -16,28 +16,28 @@
 
 for (deal_II_dimension : DIMENSIONS)
 {
-  template class MatrixFree<deal_II_dimension,double>;
-  template class MatrixFree<deal_II_dimension,float>;
+    template class MatrixFree<deal_II_dimension,double>;
+    template class MatrixFree<deal_II_dimension,float>;
 
-  template void MatrixFree<deal_II_dimension,double>::
-  print_memory_consumption<std::ostream> (std::ostream &) const;
-  template void MatrixFree<deal_II_dimension,double>::
-  print_memory_consumption<ConditionalOStream> (ConditionalOStream &) const;
+    template void MatrixFree<deal_II_dimension,double>::
+    print_memory_consumption<std::ostream> (std::ostream &) const;
+    template void MatrixFree<deal_II_dimension,double>::
+    print_memory_consumption<ConditionalOStream> (ConditionalOStream &) const;
 
-  template void MatrixFree<deal_II_dimension,float>::
-  print_memory_consumption<std::ostream> (std::ostream &) const;
-  template void MatrixFree<deal_II_dimension,float>::
-  print_memory_consumption<ConditionalOStream> (ConditionalOStream &) const;
+    template void MatrixFree<deal_II_dimension,float>::
+    print_memory_consumption<std::ostream> (std::ostream &) const;
+    template void MatrixFree<deal_II_dimension,float>::
+    print_memory_consumption<ConditionalOStream> (ConditionalOStream &) const;
 
-  template struct internal::MatrixFreeFunctions::MappingInfo<deal_II_dimension,double>;
-  template struct internal::MatrixFreeFunctions::MappingInfo<deal_II_dimension,float>;
+    template struct internal::MatrixFreeFunctions::MappingInfo<deal_II_dimension,double>;
+    template struct internal::MatrixFreeFunctions::MappingInfo<deal_II_dimension,float>;
 
 #ifndef DEAL_II_MSVC
-  template void internal::MatrixFreeFunctions::ShapeInfo<double>::reinit
-  <deal_II_dimension>(const Quadrature<1> &, const FiniteElement
-                      <deal_II_dimension,deal_II_dimension> &, const unsigned int);
-  template void internal::MatrixFreeFunctions::ShapeInfo<float>::reinit
-  <deal_II_dimension>(const Quadrature<1> &, const FiniteElement
-                      <deal_II_dimension,deal_II_dimension> &, const unsigned int);
+    template void internal::MatrixFreeFunctions::ShapeInfo<double>::reinit
+    <deal_II_dimension>(const Quadrature<1> &, const FiniteElement
+                        <deal_II_dimension,deal_II_dimension> &, const unsigned int);
+    template void internal::MatrixFreeFunctions::ShapeInfo<float>::reinit
+    <deal_II_dimension>(const Quadrature<1> &, const FiniteElement
+                        <deal_II_dimension,deal_II_dimension> &, const unsigned int);
 #endif
 }

@@ -16,6 +16,6 @@
 
 
 for (S : SERIAL_VECTORS)
-  {
+{
     template class Solver<S>;
-  }
+}

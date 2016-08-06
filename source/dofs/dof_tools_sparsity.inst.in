@@ -14,21 +14,21 @@
 // ---------------------------------------------------------------------
 
 for (scalar: REAL_SCALARS; SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
-  {
+{
     template void
     DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,SP,scalar>
     (const DoFHandler<deal_II_dimension>& dof,
      const std::map<types::boundary_id, const Function<deal_II_dimension,scalar>*> &boundary_ids,
      const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
      SP    &sparsity);
-     
+
     template void
     DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SP,scalar>
     (const hp::DoFHandler<deal_II_dimension>& dof,
      const std::map<types::boundary_id, const Function<deal_II_dimension,scalar>*> &boundary_ids,
      const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
      SP    &sparsity);
-     
+
 #if deal_II_dimension < 3
     template void
     DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP,scalar>
@@ -36,7 +36,7 @@ for (scalar: REAL_SCALARS; SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSION
      const std::map<types::boundary_id, const Function<deal_II_dimension+1,scalar>*>  &boundary_ids,
      const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
      SP    &sparsity);
-     
+
     template void
     DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP,scalar>
     (const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
@@ -50,8 +50,8 @@ for (scalar: REAL_SCALARS; SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSION
     // const std::map<types::boundary_id, const Function<deal_II_dimension+1,scalar>*> &boundary_ids,
     // const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
     // SP    &sparsity);
-  
-#endif     
+
+#endif
 
 #if deal_II_dimension == 1
     template void
@@ -60,7 +60,7 @@ for (scalar: REAL_SCALARS; SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSION
      const std::map<types::boundary_id, const Function<deal_II_dimension+2,scalar>*>  &boundary_ids,
      const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
      SP    &sparsity);
-     
+
     template void
     DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+2>,SP,scalar>
     (const DoFHandler<deal_II_dimension,deal_II_dimension+2>& dof,
@@ -68,25 +68,25 @@ for (scalar: REAL_SCALARS; SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSION
      const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
      SP    &sparsity);
 #endif
-     
-  }
+
+}
 
 for (scalar: COMPLEX_SCALARS; SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
-  {
+{
     template void
     DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,SP,scalar>
     (const DoFHandler<deal_II_dimension>& dof,
      const std::map<types::boundary_id, const Function<deal_II_dimension,scalar>*> &boundary_ids,
      const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
      SP    &sparsity);
-     
+
     template void
     DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SP,scalar>
     (const hp::DoFHandler<deal_II_dimension>& dof,
      const std::map<types::boundary_id, const Function<deal_II_dimension,scalar>*> &boundary_ids,
      const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
      SP    &sparsity);
-     
+
 #if deal_II_dimension < 3
     template void
     DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP,scalar>
@@ -94,7 +94,7 @@ for (scalar: COMPLEX_SCALARS; SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENS
      const std::map<types::boundary_id, const Function<deal_II_dimension+1,scalar>*>  &boundary_ids,
      const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
      SP    &sparsity);
-     
+
     template void
     DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP,scalar>
     (const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
@@ -108,13 +108,13 @@ for (scalar: COMPLEX_SCALARS; SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENS
     // const std::map<types::boundary_id, const Function<deal_II_dimension+1,scalar>*> &boundary_ids,
     // const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
     // SP    &sparsity);
-  
-#endif     
-     
-  }
+
+#endif
+
+}
 
 for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
-  {
+{
     template void
     DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension>, SP>
     (const DoFHandler<deal_II_dimension,deal_II_dimension> &dof,
@@ -362,20 +362,20 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
 
 #endif
 
-  }
+}
 
 
 for (deal_II_dimension : DIMENSIONS)
 {
-  template
-  Table<2,DoFTools::Coupling>
-  DoFTools::dof_couplings_from_component_couplings
-  (const FiniteElement<deal_II_dimension> &fe,
-   const Table<2,DoFTools::Coupling> &component_couplings);
+    template
+    Table<2,DoFTools::Coupling>
+    DoFTools::dof_couplings_from_component_couplings
+    (const FiniteElement<deal_II_dimension> &fe,
+     const Table<2,DoFTools::Coupling> &component_couplings);
 
-  template
-  std::vector<Table<2,DoFTools::Coupling> >
-  DoFTools::dof_couplings_from_component_couplings
-  (const hp::FECollection<deal_II_dimension> &fe,
-   const Table<2,DoFTools::Coupling> &component_couplings);
+    template
+    std::vector<Table<2,DoFTools::Coupling> >
+    DoFTools::dof_couplings_from_component_couplings
+    (const hp::FECollection<deal_II_dimension> &fe,
+     const Table<2,DoFTools::Coupling> &component_couplings);
 }

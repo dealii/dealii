@@ -15,14 +15,14 @@
 
 
 for (VEC : SERIAL_VECTORS)
-  {
+{
     template <int dim, int spacedim>
     template <typename CI>
     void
     FEValuesBase<dim,spacedim>::CellIterator<CI>::
     get_interpolated_dof_values (const VEC      &in,
-			         Vector<VEC::value_type> &out) const
-    \{
-      cell->get_interpolated_dof_values (in, out);
+                                 Vector<VEC::value_type> &out) const
+    {   //
+        cell->get_interpolated_dof_values (in, out);
     \}
-  }
+}

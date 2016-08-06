@@ -16,5 +16,5 @@
 
 for (VEC : REAL_SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
 {
-  template class DoFOutputOperator<VEC, deal_II_dimension, deal_II_dimension>;
+    template class DoFOutputOperator<VEC, deal_II_dimension, deal_II_dimension>;
 }

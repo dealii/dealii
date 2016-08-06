@@ -16,16 +16,16 @@
 
 
 for (VECTOR : SERIAL_VECTORS)
-  {
+{
     template class VectorMemory<VECTOR>;
     template class GrowingVectorMemory<VECTOR>;
-  }
+}
 
- for (SCALAR : COMPLEX_SCALARS)
-  {
+for (SCALAR : COMPLEX_SCALARS)
+{
     template class VectorMemory<Vector<SCALAR> >;
     template class GrowingVectorMemory<Vector<SCALAR> >;
 
     template class VectorMemory<BlockVector<SCALAR> >;
     template class GrowingVectorMemory<BlockVector<SCALAR> >;
-  }
+}

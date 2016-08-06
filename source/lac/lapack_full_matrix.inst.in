@@ -16,16 +16,16 @@
 
 
 for (S : REAL_SCALARS)
-  {
+{
     template class LAPACKFullMatrix<S>;
     template class PreconditionLU<S>;
-  }
+}
 
 for (S1, S2 : REAL_SCALARS)
-  {
+{
     template LAPACKFullMatrix<S1> &
     LAPACKFullMatrix<S1>::operator = (const FullMatrix<S2> &M);
 
     template LAPACKFullMatrix<S1> &
     LAPACKFullMatrix<S1>::operator = (const SparseMatrix<S2> &M);
-  }
+}
