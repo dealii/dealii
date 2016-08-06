@@ -752,8 +752,8 @@ namespace Step37
     setup_time = 0;
 
     system_matrix.clear();
-    mg_matrices.clear();
-    mg_constraints.clear();
+    mg_matrices.clear_elements();
+    mg_constraints.clear_elements();
 
     dof_handler.distribute_dofs (fe);
     dof_handler.distribute_mg_dofs (fe);

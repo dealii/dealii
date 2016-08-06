@@ -63,15 +63,15 @@ namespace mg
   SparseMatrixCollection<number>::resize(const unsigned int minlevel, const unsigned  int maxlevel)
   {
     matrix.resize(minlevel, maxlevel);
-    matrix.clear();
+    matrix.clear_elements();
     matrix_up.resize(minlevel+1, maxlevel);
-    matrix_up.clear();
+    matrix_up.clear_elements();
     matrix_down.resize(minlevel+1, maxlevel);
-    matrix_down.clear();
+    matrix_down.clear_elements();
     matrix_in.resize(minlevel, maxlevel);
-    matrix_in.clear();
+    matrix_in.clear_elements();
     matrix_out.resize(minlevel, maxlevel);
-    matrix_out.clear();
+    matrix_out.clear_elements();
     sparsity.resize(minlevel, maxlevel);
     sparsity_edge.resize(minlevel, maxlevel);
   }

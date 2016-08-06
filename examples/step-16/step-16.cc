@@ -319,11 +319,11 @@ namespace Step16
     const unsigned int n_levels = triangulation.n_levels();
 
     mg_interface_in.resize(0, n_levels-1);
-    mg_interface_in.clear ();
+    mg_interface_in.clear_elements ();
     mg_interface_out.resize(0, n_levels-1);
-    mg_interface_out.clear ();
+    mg_interface_out.clear_elements ();
     mg_matrices.resize(0, n_levels-1);
-    mg_matrices.clear ();
+    mg_matrices.clear_elements ();
     mg_sparsity_patterns.resize(0, n_levels-1);
 
     // Now, we have to provide a matrix on each level. To this end, we first

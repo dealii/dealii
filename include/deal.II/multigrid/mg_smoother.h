@@ -586,7 +586,7 @@ namespace mg
   inline void
   SmootherRelaxation<RelaxationType, VectorType>::clear ()
   {
-    MGLevelObject<RelaxationType>::clear();
+    MGLevelObject<RelaxationType>::clear_elements();
   }
 
 
@@ -687,7 +687,7 @@ template <typename MatrixType, class RelaxationType, typename VectorType>
 inline void
 MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::clear ()
 {
-  smoothers.clear();
+  smoothers.clear_elements();
 
   unsigned int i=matrices.min_level(),
                max_level=matrices.max_level();
@@ -854,7 +854,7 @@ template <typename MatrixType, typename PreconditionerType, typename VectorType>
 inline void
 MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::clear ()
 {
-  smoothers.clear();
+  smoothers.clear_elements();
 
   unsigned int i=matrices.min_level(),
                max_level=matrices.max_level();

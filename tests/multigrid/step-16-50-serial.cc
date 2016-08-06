@@ -196,9 +196,9 @@ void LaplaceProblem<dim>::setup_system ()
   const unsigned int n_levels = triangulation.n_levels();
 
   mg_interface_matrices.resize(0, n_levels-1);
-  mg_interface_matrices.clear ();
+  mg_interface_matrices.clear_elements ();
   mg_matrices.resize(0, n_levels-1);
-  mg_matrices.clear ();
+  mg_matrices.clear_elements ();
   mg_sparsity_patterns.resize(0, n_levels-1);
 
   for (unsigned int level=0; level<n_levels; ++level)
