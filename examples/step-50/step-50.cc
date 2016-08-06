@@ -287,8 +287,10 @@ namespace Step50
     DoFTools::make_hanging_node_constraints (mg_dof_handler, hanging_node_constraints);
     DoFTools::make_hanging_node_constraints (mg_dof_handler, constraints);
 
+    std::set<types::boundary_id>         dirichlet_boundary_ids;
     typename FunctionMap<dim>::type      dirichlet_boundary;
     ConstantFunction<dim>                    homogeneous_dirichlet_bc (1.0);
+    dirichlet_boundary_ids.insert(0);
     dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
     VectorTools::interpolate_boundary_values (mg_dof_handler,
                                               dirichlet_boundary,
@@ -307,7 +309,8 @@ namespace Step50
     // pass the <code>dirichlet_boundary</code>
     // here as well.
     mg_constrained_dofs.clear();
-    mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
+    mg_constrained_dofs.initialize(mg_dof_handler);
+    mg_constrained_dofs.make_zero_boundary_constraints(mg_dof_handler, dirichlet_boundary_ids);
 
 
     // Now for the things that concern the
