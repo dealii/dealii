@@ -18,6 +18,7 @@
 #include "../tests.h"
 
 #include <deal.II/base/utilities.h>
+#include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <deal.II/grid/manifold_lib.h>
 
 #include <deal.II/base/quadrature_lib.h>
@@ -108,18 +109,16 @@ void test (MappingEnum::type mapping_name, unsigned int refinements=1)
   //           << " degrees of freedom."
   //           << std::endl;
 
-  std::shared_ptr<Mapping<2,3> > mapping;
+  std_cxx11::shared_ptr<Mapping<2,3> > mapping;
   switch (mapping_name)
     {
     case MappingEnum::MappingManifold:
       // deallog << " MappingManifold" << std::endl;
-      mapping = std::unique_ptr<Mapping<2,3> >(
-                  new MappingManifold<2,3 >());
+      mapping.reset(new MappingManifold<2,3 >());
       break;
     case MappingEnum::MappingQ:
       // deallog << " MappingQ" << std::endl;
-      mapping = std::unique_ptr<Mapping<2,3> >(
-                  new  MappingQ<2,3>(fe.degree));
+      mapping.reset(new MappingQ<2,3>(fe.degree));
       break;
     }
 
@@ -139,7 +138,7 @@ void test (MappingEnum::type mapping_name, unsigned int refinements=1)
     {
       double patch_surface = 0;
       fe_values.reinit (cell);
-      const auto &qp = fe_values.get_quadrature_points();
+      const std::vector<Point<3> > &qp = fe_values.get_quadrature_points();
 
 
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
