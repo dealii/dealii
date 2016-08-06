@@ -16,7 +16,7 @@
 
 
 for (deal_II_dimension : DIMENSIONS)
-  {
+{
 #if deal_II_dimension > 1
     template class FE_PolyFace<TensorProductPolynomials<deal_II_dimension-1> >;
     template class FE_PolyFace<PolynomialSpace<deal_II_dimension-1>, deal_II_dimension>;
@@ -24,5 +24,5 @@ for (deal_II_dimension : DIMENSIONS)
 #endif
     template class FE_FaceQ<deal_II_dimension,deal_II_dimension>;
     template class FE_FaceP<deal_II_dimension,deal_II_dimension>;
-  }
+}
 

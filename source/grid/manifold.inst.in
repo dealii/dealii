@@ -16,7 +16,7 @@
 
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-  {
+{
 #if deal_II_dimension <= deal_II_space_dimension
     template class Manifold<deal_II_dimension, deal_II_space_dimension>;
     template class FlatManifold<deal_II_dimension, deal_II_space_dimension>;
@@ -25,7 +25,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     template class ChartManifold<deal_II_dimension, deal_II_space_dimension, 2>;
     template class ChartManifold<deal_II_dimension, deal_II_space_dimension, 3>;
 #endif
-  }
+}
 
 
 

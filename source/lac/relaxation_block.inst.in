@@ -16,38 +16,38 @@
 
 
 for (S1, S2 : REAL_SCALARS)
-  {
+{
     template class RelaxationBlock<SparseMatrix<S1>, S2>;
     template class RelaxationBlockJacobi<SparseMatrix<S1>, S2>;
     template class RelaxationBlockSOR<SparseMatrix<S1>, S2>;
     template class RelaxationBlockSSOR<SparseMatrix<S1>, S2>;
-  }
+}
 
 
 for (S1, S2, S3 : REAL_SCALARS)
-  {
+{
 // ------------ RelaxationBlockJacobi -----------------
     template
-      void RelaxationBlockJacobi<SparseMatrix<S1>, S2>::step<S3>
-      (Vector<S3> &, const Vector<S3> &) const;
+    void RelaxationBlockJacobi<SparseMatrix<S1>, S2>::step<S3>
+    (Vector<S3> &, const Vector<S3> &) const;
     template
-      void RelaxationBlockJacobi<SparseMatrix<S1>, S2>::Tstep<S3>
-      (Vector<S3> &, const Vector<S3> &) const;
+    void RelaxationBlockJacobi<SparseMatrix<S1>, S2>::Tstep<S3>
+    (Vector<S3> &, const Vector<S3> &) const;
 
 // ------------ RelaxationBlockSOR -----------------
     template
-      void RelaxationBlockSOR<SparseMatrix<S1>, S2>::step<S3>
-      (Vector<S3> &, const Vector<S3> &) const;
+    void RelaxationBlockSOR<SparseMatrix<S1>, S2>::step<S3>
+    (Vector<S3> &, const Vector<S3> &) const;
     template
-      void RelaxationBlockSOR<SparseMatrix<S1>, S2>::Tstep<S3>
-      (Vector<S3> &, const Vector<S3> &) const;
+    void RelaxationBlockSOR<SparseMatrix<S1>, S2>::Tstep<S3>
+    (Vector<S3> &, const Vector<S3> &) const;
 
 // ------------ RelaxationBlockSSOR -----------------
     template
-      void RelaxationBlockSSOR<SparseMatrix<S1>, S2>::step<S3>
-      (Vector<S3> &, const Vector<S3> &) const;
+    void RelaxationBlockSSOR<SparseMatrix<S1>, S2>::step<S3>
+    (Vector<S3> &, const Vector<S3> &) const;
     template
-      void RelaxationBlockSSOR<SparseMatrix<S1>, S2>::Tstep<S3>
-      (Vector<S3> &, const Vector<S3> &) const;
-  }
+    void RelaxationBlockSSOR<SparseMatrix<S1>, S2>::Tstep<S3>
+    (Vector<S3> &, const Vector<S3> &) const;
+}
 

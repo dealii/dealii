@@ -16,9 +16,9 @@
 
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
-  {
-  namespace parallel
-  \{
+{
+    namespace parallel
+    \{
     namespace distributed
     \{
 #if deal_II_dimension > 1
@@ -53,6 +53,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 #endif
 #endif
     \}
-  \}
+    \}
 
-  }
+}

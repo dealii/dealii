@@ -17,25 +17,25 @@
 
 for (SCALAR : REAL_SCALARS)
 {
-  namespace LinearAlgebra
-  \{
+    namespace LinearAlgebra
+    \{
     namespace distributed
     \{
-      template class BlockVector<SCALAR>;
+    template class BlockVector<SCALAR>;
     \}
-  \}
+    \}
 }
 
 for (S1, S2 : REAL_SCALARS)
 {
-  namespace LinearAlgebra
-  \{
+    namespace LinearAlgebra
+    \{
     namespace distributed
     \{
-      template void BlockVector<S1>::reinit<S2> (const BlockVector<S2>&,
-                                                 const bool);
-      template void BlockVector<S1>::add<S2> (const std::vector<size_type> &,
-                                              const ::dealii::Vector<S2>&);
+    template void BlockVector<S1>::reinit<S2> (const BlockVector<S2>&,
+            const bool);
+    template void BlockVector<S1>::add<S2> (const std::vector<size_type> &,
+                                            const ::dealii::Vector<S2>&);
     \}
-  \}
+    \}
 }

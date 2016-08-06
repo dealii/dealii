@@ -44,3 +44,23 @@ fi
 # with up to 10 in parallel
 find tests include source examples \( -name '*.cc' -o -name '*.h' \) -print | xargs -n 50 -P 10 astyle --options=contrib/utilities/astyle.rc
 
+# format .inst.in files. We need to replace \{ and \} because it confuses
+# astyle.
+format_inst()
+{
+    f=$1
+    cp $f $f.tmp
+    sed -i 's#\\{#{ //#g' $f.tmp
+    sed -i 's#\\}#} //#g' $f.tmp
+    astyle --quiet $f.tmp
+    sed -i 's#{ //#\\{#g' $f.tmp
+    sed -i 's#} //#\\}#g' $f.tmp
+    if ! diff -q $f $f.tmp >/dev/null
+    then
+	cp $f.tmp $f
+    fi
+    rm $f.tmp
+}
+
+export -f format_inst
+find source -name '*.inst.in' | xargs -n 1 -P 10 -I % bash -c 'format_inst "$@"' _ %

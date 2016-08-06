@@ -16,62 +16,62 @@
 
 
 for (V1 : VECTORS_WITH_MATRIX)
-  {
+{
     template class MGLevelGlobalTransfer< V1 >;
-  }
+}
 
 for (deal_II_dimension : DIMENSIONS; V1 : VECTORS_WITH_MATRIX)
-  {
+{
     template
-      void MGLevelGlobalTransfer< V1 >::fill_and_communicate_copy_indices<deal_II_dimension,deal_II_dimension>(
+    void MGLevelGlobalTransfer< V1 >::fill_and_communicate_copy_indices<deal_II_dimension,deal_II_dimension>(
         const DoFHandler<deal_II_dimension,deal_II_dimension> &mg_dof);
-  }
+}
 
 for (deal_II_dimension : DIMENSIONS; V1,V2 : DEAL_II_VEC_TEMPLATES; S1, S2 : REAL_SCALARS)
-  {
+{
     template void
-      MGLevelGlobalTransfer<V1<S1> >::copy_to_mg (
+    MGLevelGlobalTransfer<V1<S1> >::copy_to_mg (
         const DoFHandler<deal_II_dimension>&, MGLevelObject<V1<S1> >&, const V2<S2>&) const;
     template void
-      MGLevelGlobalTransfer<V1<S1> >::copy_from_mg (const DoFHandler<deal_II_dimension>&, V2<S2>&,
-                                                    const MGLevelObject<V1<S1> >&) const;
+    MGLevelGlobalTransfer<V1<S1> >::copy_from_mg (const DoFHandler<deal_II_dimension>&, V2<S2>&,
+            const MGLevelObject<V1<S1> >&) const;
     template void
-      MGLevelGlobalTransfer<V1<S1> >::copy_from_mg_add (const DoFHandler<deal_II_dimension>&, V2<S2>&,
-                                                        const MGLevelObject<V1<S1> >&) const;
-  }
+    MGLevelGlobalTransfer<V1<S1> >::copy_from_mg_add (const DoFHandler<deal_II_dimension>&, V2<S2>&,
+            const MGLevelObject<V1<S1> >&) const;
+}
 
 for (deal_II_dimension : DIMENSIONS)
-  {
+{
     template
-      void MGLevelGlobalTransfer< LinearAlgebra::distributed::Vector<float> >::fill_and_communicate_copy_indices<deal_II_dimension,deal_II_dimension>(
+    void MGLevelGlobalTransfer< LinearAlgebra::distributed::Vector<float> >::fill_and_communicate_copy_indices<deal_II_dimension,deal_II_dimension>(
         const DoFHandler<deal_II_dimension,deal_II_dimension> &mg_dof);
-  }
+}
 
 for (deal_II_dimension : DIMENSIONS; S1, S2 : REAL_SCALARS)
-  {
+{
     template void
-      MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<S1> >::copy_to_mg (
+    MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<S1> >::copy_to_mg (
         const DoFHandler<deal_II_dimension>&, MGLevelObject<LinearAlgebra::distributed::Vector<S1> >&, const LinearAlgebra::distributed::Vector<S2>&) const;
     template void
-      MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<S1> >::copy_from_mg (const DoFHandler<deal_II_dimension>&, LinearAlgebra::distributed::Vector<S2>&,
-        const MGLevelObject<LinearAlgebra::distributed::Vector<S1> >&) const;
+    MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<S1> >::copy_from_mg (const DoFHandler<deal_II_dimension>&, LinearAlgebra::distributed::Vector<S2>&,
+            const MGLevelObject<LinearAlgebra::distributed::Vector<S1> >&) const;
     template void
-      MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<S1> >::copy_from_mg_add (const DoFHandler<deal_II_dimension>&, LinearAlgebra::distributed::Vector<S2>&,
-        const MGLevelObject<LinearAlgebra::distributed::Vector<S1> >&) const;
-  }
+    MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<S1> >::copy_from_mg_add (const DoFHandler<deal_II_dimension>&, LinearAlgebra::distributed::Vector<S2>&,
+            const MGLevelObject<LinearAlgebra::distributed::Vector<S1> >&) const;
+}
 
 for(deal_II_dimension : DIMENSIONS)
-  {
+{
 #ifdef DEAL_II_WITH_TRILINOS
 
     template void
-      MGLevelGlobalTransfer<TrilinosWrappers::MPI::Vector>::copy_to_mg (
+    MGLevelGlobalTransfer<TrilinosWrappers::MPI::Vector>::copy_to_mg (
         const DoFHandler<deal_II_dimension>&, MGLevelObject<TrilinosWrappers::MPI::Vector>&, const TrilinosWrappers::MPI::Vector&) const;
     template void
-      MGLevelGlobalTransfer<TrilinosWrappers::MPI::Vector>::copy_from_mg (const DoFHandler<deal_II_dimension>&, TrilinosWrappers::MPI::Vector&,
-        const MGLevelObject<TrilinosWrappers::MPI::Vector>&) const;
+    MGLevelGlobalTransfer<TrilinosWrappers::MPI::Vector>::copy_from_mg (const DoFHandler<deal_II_dimension>&, TrilinosWrappers::MPI::Vector&,
+            const MGLevelObject<TrilinosWrappers::MPI::Vector>&) const;
     template void
-      MGLevelGlobalTransfer<TrilinosWrappers::MPI::Vector>::copy_from_mg_add (const DoFHandler<deal_II_dimension>&, TrilinosWrappers::MPI::Vector&,
-        const MGLevelObject<TrilinosWrappers::MPI::Vector>&) const;
+    MGLevelGlobalTransfer<TrilinosWrappers::MPI::Vector>::copy_from_mg_add (const DoFHandler<deal_II_dimension>&, TrilinosWrappers::MPI::Vector&,
+            const MGLevelObject<TrilinosWrappers::MPI::Vector>&) const;
 #endif
-  }
+}

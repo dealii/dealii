@@ -17,36 +17,36 @@
 
 for (SCALAR : REAL_SCALARS)
 {
-  namespace LinearAlgebra
-  \{
+    namespace LinearAlgebra
+    \{
     template class ReadWriteVector<SCALAR>;
-  \}
+    \}
 }
 
 for (S1, S2 : REAL_SCALARS)
 {
-  namespace LinearAlgebra
-  \{
+    namespace LinearAlgebra
+    \{
     template void ReadWriteVector<S1>::reinit<S2> (const ReadWriteVector<S2>&,
-                                          const bool);
-  \}
+            const bool);
+    \}
 }
 
 
 for (SCALAR : COMPLEX_SCALARS)
 {
-  namespace LinearAlgebra
-  \{
+    namespace LinearAlgebra
+    \{
     template class ReadWriteVector<SCALAR>;
-  \}
+    \}
 }
 
 for (S1, S2 : COMPLEX_SCALARS)
 {
-  namespace LinearAlgebra
-  \{
+    namespace LinearAlgebra
+    \{
     template void ReadWriteVector<S1>::reinit<S2> (const ReadWriteVector<S2>&,
-                                          const bool);
-  \}
+            const bool);
+    \}
 }
 

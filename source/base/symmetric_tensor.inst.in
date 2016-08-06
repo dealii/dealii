@@ -16,18 +16,18 @@
 
 for (deal_II_dimension : DIMENSIONS; number : REAL_SCALARS)
 {
-  template
-  class SymmetricTensor<2,deal_II_dimension,number>;
+    template
+    class SymmetricTensor<2,deal_II_dimension,number>;
 
-  template
-  class SymmetricTensor<4,deal_II_dimension,number>;
+    template
+    class SymmetricTensor<4,deal_II_dimension,number>;
 }
 
 for (deal_II_dimension : DIMENSIONS; number : COMPLEX_SCALARS)
 {
-  template
-  class SymmetricTensor<2,deal_II_dimension,number>;
+    template
+    class SymmetricTensor<2,deal_II_dimension,number>;
 
-  template
-  class SymmetricTensor<4,deal_II_dimension,number>;
+    template
+    class SymmetricTensor<4,deal_II_dimension,number>;
 }

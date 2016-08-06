@@ -19,13 +19,13 @@
 // and derived classes
 
 for (VEC : SERIAL_VECTORS)
-  {
-				      /// Call
-				      /// @p get_interpolated_dof_values
-				      /// of the iterator with the
-				      /// given arguments.
+{
+    /// Call
+    /// @p get_interpolated_dof_values
+    /// of the iterator with the
+    /// given arguments.
     virtual
     void
     get_interpolated_dof_values (const VEC &in,
-				 Vector<VEC::value_type> &out) const = 0;
-  }
+                                 Vector<VEC::value_type> &out) const = 0;
+}

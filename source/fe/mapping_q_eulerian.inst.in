@@ -15,10 +15,10 @@
 
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS; VEC : REAL_SERIAL_VECTORS)
-  {
-#if deal_II_dimension <= deal_II_space_dimension 	
+{
+#if deal_II_dimension <= deal_II_space_dimension
     template class MappingQEulerian<deal_II_dimension, VEC, deal_II_space_dimension>;
 #endif
-  }
+}
 
 

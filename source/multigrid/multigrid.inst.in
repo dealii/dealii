@@ -16,5 +16,5 @@
 
 for (VEC : SERIAL_VECTORS)
 {
-  template class Multigrid< VEC >;
+    template class Multigrid< VEC >;
 }

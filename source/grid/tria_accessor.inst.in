@@ -16,7 +16,7 @@
 
 
 for (deal_II_dimension : DIMENSIONS)
-  {
+{
     template class TriaAccessorBase<1,deal_II_dimension>;
 #if deal_II_dimension >= 2
     template class TriaAccessorBase<2,deal_II_dimension>;
@@ -90,4 +90,4 @@ for (deal_II_dimension : DIMENSIONS)
 #endif
 
 #endif
-  }
+}
