@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2015 by the deal.II authors
+// Copyright (C) 2000 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,6 +17,7 @@
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/std_cxx11/bind.h>
 #include <deal.II/lac/block_vector.h>
 #include <fstream>
 #include <iomanip>
@@ -176,9 +177,9 @@ void test ()
 
       // check std::transform
       std::transform (v1.begin(), v1.end(), v2.begin(),
-                      std::bind (std::multiplies<double>(),
-                                 std::placeholders::_1,
-                                 2.0));
+                      std_cxx11::bind (std::multiplies<double>(),
+                                       std_cxx11::_1,
+                                       2.0));
       v2 *= 1./2;
       deallog << "Check 7: " << (v1 == v2 ? "true" : "false") << std::endl;
 
