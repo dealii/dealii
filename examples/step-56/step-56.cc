@@ -554,12 +554,12 @@ namespace Step56
         // sparsity patterns and matrices for each level. The resize()
         // function of MGLevelObject<T> will destroy all existing contained
         // objects.
-        typename FunctionMap<dim>::type boundary_condition_function_map;
-        BoundaryValuesForVelocity<dim> velocity_boundary_condition;
-        boundary_condition_function_map[0] = &velocity_boundary_condition;
+        std::set<types::boundary_id> zero_boundary_ids;
+        zero_boundary_ids.insert(0);
 
         mg_constrained_dofs.clear();
-        mg_constrained_dofs.initialize(velocity_dof_handler, boundary_condition_function_map);
+        mg_constrained_dofs.initialize(velocity_dof_handler);
+        mg_constrained_dofs.make_zero_boundary_constraints(velocity_dof_handler, zero_boundary_ids);
         const unsigned int n_levels = triangulation.n_levels();
 
         mg_interface_matrices.resize(0, n_levels-1);

@@ -288,8 +288,10 @@ namespace Step16
     DoFTools::make_hanging_node_constraints (dof_handler, hanging_node_constraints);
     DoFTools::make_hanging_node_constraints (dof_handler, constraints);
 
+    std::set<types::boundary_id>         dirichlet_boundary_ids;
     typename FunctionMap<dim>::type      dirichlet_boundary_functions;
     ZeroFunction<dim>                    homogeneous_dirichlet_bc (1);
+    dirichlet_boundary_ids.insert(0);
     dirichlet_boundary_functions[0] = &homogeneous_dirichlet_bc;
     VectorTools::interpolate_boundary_values (static_cast<const DoFHandler<dim>&>(dof_handler),
                                               dirichlet_boundary_functions,
@@ -304,7 +306,8 @@ namespace Step16
     // about the boundary values as well, so we pass the
     // <code>dirichlet_boundary</code> here as well.
     mg_constrained_dofs.clear();
-    mg_constrained_dofs.initialize(dof_handler, dirichlet_boundary_functions);
+    mg_constrained_dofs.initialize(dof_handler);
+    mg_constrained_dofs.make_zero_boundary_constraints(dof_handler, dirichlet_boundary_ids);
 
 
     // Now for the things that concern the multigrid data structures. First,

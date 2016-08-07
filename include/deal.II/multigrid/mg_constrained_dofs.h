@@ -62,7 +62,7 @@ public:
    * constrains degrees on the external boundary of the domain by calling
    * MGTools::make_boundary_list() with the given second and third argument.
    *
-   * @deprecated Use initialize() followed by set_zero_boundary_dofs() instead
+   * @deprecated Use initialize() followed by make_zero_boundary_constraints() instead
    */
   template <int dim, int spacedim>
   void initialize(const DoFHandler<dim,spacedim> &dof,
