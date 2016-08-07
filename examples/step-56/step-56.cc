@@ -280,38 +280,6 @@ namespace Step56
     return 0;
   }
 
-  // Sadly, we need a separate function for the boundary conditions
-  // to be used in the geometric multigrid. This is because it needs
-  // to be a function with $dim$ components, whereas Solution has
-  // $dim+1$ components. Rather than copying the implementation of
-  // Solution, we forward the calls to Solution::value. For that we need
-  // an instance of the class Solution, which you can find as a private
-  // member.
-  template <int dim>
-  class BoundaryValuesForVelocity : public Function<dim>
-  {
-  public:
-    BoundaryValuesForVelocity () : Function<dim>(dim) {}
-
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
-
-  private:
-    Solution<dim> solution;
-  };
-
-
-  template <int dim>
-  double
-  BoundaryValuesForVelocity<dim>::value (const Point<dim>  &p,
-                                         const unsigned int component) const
-  {
-    Assert (component < this->n_components,
-            ExcIndexRange (component, 0, this->n_components));
-
-    return solution.value(p, component);
-  }
-
 
 
   // @sect3{ASPECT BlockSchurPreconditioner}
