@@ -913,10 +913,10 @@ void PArpackSolver<VectorType>::solve
           AssertThrow (false, PArpackExcInfoPdneupd(info));
         }
 
-      for (size_type i=0; i<nev; ++i)
+      for (int i=0; i<nev; ++i)
         {
           eigenvectors[i] = 0.0;
-          Assert (i*nloc + nloc <= v.size(), dealii::ExcInternalError() );
+          Assert (i*nloc + nloc <= (int)v.size(), dealii::ExcInternalError() );
 
           eigenvectors[i].add (nloc,
                                &local_indices[0],
