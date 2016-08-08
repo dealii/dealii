@@ -994,7 +994,7 @@ namespace DataOutBase
      * this number is used only to verify that the format we are writing is
      * what the current readers and writers understand.
      */
-    static const unsigned int format_version = 3;
+    static unsigned int format_version;
   };
 
   /**

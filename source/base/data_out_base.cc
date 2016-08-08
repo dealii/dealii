@@ -1501,7 +1501,7 @@ namespace DataOutBase
   template <int dim, int spacedim>
   const unsigned int Patch<dim,spacedim>::space_dim;
 
-  const unsigned int Deal_II_IntermediateFlags::format_version;
+  unsigned int Deal_II_IntermediateFlags::format_version = 3;
 
 
 
