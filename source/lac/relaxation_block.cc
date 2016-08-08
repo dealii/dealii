@@ -15,6 +15,7 @@
 
 #include <deal.II/lac/relaxation_block.templates.h>
 #include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
 
 DEAL_II_NAMESPACE_OPEN
 #include "relaxation_block.inst"

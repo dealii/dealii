@@ -19,28 +19,33 @@
 #include <deal.II/lac/relaxation_block.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector_memory.h>
+#include <deal.II/lac/trilinos_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 
-template <typename MatrixType, typename inverse_type>
+template <typename MatrixType, typename InverseNumberType, typename VectorType>
 inline
-RelaxationBlock<MatrixType,inverse_type>::AdditionalData::AdditionalData
+RelaxationBlock<MatrixType, InverseNumberType, VectorType>::AdditionalData::AdditionalData
 (const double relaxation,
  const bool   invert_diagonal,
- const bool   same_diagonal)
+ const bool   same_diagonal,
+ const typename PreconditionBlockBase<InverseNumberType>::Inversion inversion,
+ const double threshold,
+ VectorType *temp_ghost_vector)
   :
   relaxation(relaxation),
   invert_diagonal(invert_diagonal),
   same_diagonal(same_diagonal),
-  inversion(PreconditionBlockBase<inverse_type>::gauss_jordan),
-  threshold(0.)
+  inversion(inversion),
+  threshold(threshold),
+  temp_ghost_vector (temp_ghost_vector)
 {}
 
 
-template <typename MatrixType, typename inverse_type>
+template <typename MatrixType, typename InverseNumberType, typename VectorType>
 inline
 std::size_t
-RelaxationBlock<MatrixType,inverse_type>::AdditionalData::memory_consumption() const
+RelaxationBlock<MatrixType, InverseNumberType, VectorType>::AdditionalData::memory_consumption() const
 {
   std::size_t result = sizeof(*this)
                        + block_list.memory_consumption()
@@ -51,11 +56,11 @@ RelaxationBlock<MatrixType,inverse_type>::AdditionalData::memory_consumption() c
 }
 
 
-template <typename MatrixType, typename inverse_type>
+template <typename MatrixType, typename InverseNumberType, typename VectorType>
 inline
 void
-RelaxationBlock<MatrixType,inverse_type>::initialize (const MatrixType     &M,
-                                                      const AdditionalData &parameters)
+RelaxationBlock<MatrixType, InverseNumberType, VectorType>::initialize (const MatrixType     &M,
+    const AdditionalData &parameters)
 {
   Assert (parameters.invert_diagonal, ExcNotImplemented());
 
@@ -73,24 +78,24 @@ RelaxationBlock<MatrixType,inverse_type>::initialize (const MatrixType     &M,
 }
 
 
-template <typename MatrixType, typename inverse_type>
+template <typename MatrixType, typename InverseNumberType, typename VectorType>
 inline
 void
-RelaxationBlock<MatrixType,inverse_type>::clear ()
+RelaxationBlock<MatrixType, InverseNumberType, VectorType>::clear ()
 {
   A = 0;
   additional_data = 0;
-  PreconditionBlockBase<inverse_type>::clear ();
+  PreconditionBlockBase<InverseNumberType>::clear ();
 }
 
 
-template <typename MatrixType, typename inverse_type>
+template <typename MatrixType, typename InverseNumberType, typename VectorType>
 inline
 void
-RelaxationBlock<MatrixType,inverse_type>::invert_diagblocks ()
+RelaxationBlock<MatrixType, InverseNumberType, VectorType>::invert_diagblocks ()
 {
   const MatrixType &M=*A;
-  FullMatrix<inverse_type> M_cell;
+  FullMatrix<InverseNumberType> M_cell;
 
   if (this->same_diagonal())
     {
@@ -131,14 +136,14 @@ RelaxationBlock<MatrixType,inverse_type>::invert_diagblocks ()
             }
           switch (this->inversion)
             {
-            case PreconditionBlockBase<inverse_type>::gauss_jordan:
+            case PreconditionBlockBase<InverseNumberType>::gauss_jordan:
               this->inverse(block).reinit(bs, bs);
               this->inverse(block).invert(M_cell);
               break;
-            case PreconditionBlockBase<inverse_type>::householder:
+            case PreconditionBlockBase<InverseNumberType>::householder:
               this->inverse_householder(block).initialize(M_cell);
               break;
-            case PreconditionBlockBase<inverse_type>::svd:
+            case PreconditionBlockBase<InverseNumberType>::svd:
               this->inverse_svd(block).reinit(bs, bs);
               this->inverse_svd(block) = M_cell;
               this->inverse_svd(block).compute_inverse_svd(additional_data->threshold);
@@ -151,20 +156,59 @@ RelaxationBlock<MatrixType,inverse_type>::invert_diagblocks ()
   this->inverses_computed(true);
 }
 
+namespace internal
+{
+  /**
+   * Default implementation for serial vectors. Here we don't need to make a
+   * copy into a ghosted vector, so just return a reference to @p prev.
+   */
+  template <class VectorType>
+  const VectorType &
+  prepare_ghost_vector(
+    const VectorType &prev,
+    VectorType *other)
+  {
+    // If the following Assertion triggers, you either set temp_ghost_vector
+    // for a serial computation (don't!), or nobody implemented, instantiated, and
+    // tested the parallel version for your vector type.
+    Assert(other==NULL, ExcNotImplemented());
+    (void)other;
+    return prev;
+  }
 
-template <typename MatrixType, typename inverse_type>
-template <typename number2>
+  /**
+   * Specialization for Trilinos. Use the ghosted vector.
+   */
+  template <>
+  const TrilinosWrappers::MPI::Vector &
+  prepare_ghost_vector(
+    const TrilinosWrappers::MPI::Vector &prev,
+    TrilinosWrappers::MPI::Vector *other)
+  {
+    Assert(other!=NULL,
+           ExcMessage("You need to provide a ghosted vector in RelaxationBlock::AdditionalData::temp_trilinos_ghost_vector."));
+    Assert(other->size()==prev.size(), ExcInternalError());
+
+    // import ghost values:
+    *other = prev;
+    return *other;
+  }
+} // end namespace internal
+
+template <typename MatrixType, typename InverseNumberType, typename VectorType>
 inline
 void
-RelaxationBlock<MatrixType,inverse_type>::do_step (Vector<number2>       &dst,
-                                                   const Vector<number2> &prev,
-                                                   const Vector<number2> &src,
-                                                   const bool             backward) const
+RelaxationBlock<MatrixType, InverseNumberType, VectorType>::do_step (VectorType       &dst,
+    const VectorType &prev,
+    const VectorType &src,
+    const bool             backward) const
 {
   Assert (additional_data->invert_diagonal, ExcNotImplemented());
 
+  const VectorType &ghosted_prev = internal::prepare_ghost_vector(prev, additional_data->temp_ghost_vector);
+
   const MatrixType &M=*this->A;
-  Vector<number2> b_cell, x_cell;
+  Vector<typename VectorType::value_type> b_cell, x_cell;
 
   const bool permutation_empty = additional_data->order.size() == 0;
   const unsigned int n_permutations = (permutation_empty)
@@ -197,7 +241,7 @@ RelaxationBlock<MatrixType,inverse_type>::do_step (Vector<number2>       &dst,
               b_cell(row_cell) = src(row->column());
               for (typename MatrixType::const_iterator entry = M.begin(row->column());
                    entry != M.end(row->column()); ++entry)
-                b_cell(row_cell) -= entry->value() * prev(entry->column());
+                b_cell(row_cell) -= entry->value() * ghosted_prev(entry->column());
             }
           // Apply inverse diagonal
           this->inverse_vmult(block, x_cell, b_cell);
@@ -208,38 +252,37 @@ RelaxationBlock<MatrixType,inverse_type>::do_step (Vector<number2>       &dst,
             }
 #endif
           // Store in result vector
-          row=additional_data->block_list.begin(block);
+          row = additional_data->block_list.begin(block);
           for (size_type row_cell=0; row_cell<bs; ++row_cell, ++row)
             dst(row->column()) += additional_data->relaxation * x_cell(row_cell);
         }
     }
+  dst.compress(dealii::VectorOperation::add);
 }
 
 
 //----------------------------------------------------------------------//
 
-template <typename MatrixType, typename inverse_type>
-template <typename number2>
-void RelaxationBlockJacobi<MatrixType,inverse_type>::step
-(Vector<number2>       &dst,
- const Vector<number2> &src) const
+template <typename MatrixType, typename InverseNumberType, typename VectorType>
+void RelaxationBlockJacobi<MatrixType, InverseNumberType, VectorType>::step
+(VectorType       &dst,
+ const VectorType &src) const
 {
-  GrowingVectorMemory<Vector<number2> > mem;
-  typename VectorMemory<Vector<number2> >::Pointer aux = mem;
+  GrowingVectorMemory<VectorType> mem;
+  typename VectorMemory<VectorType>::Pointer aux = mem;
   aux->reinit(dst, false);
   *aux = dst;
   this->do_step(dst, *aux, src, false);
 }
 
 
-template <typename MatrixType, typename inverse_type>
-template <typename number2>
-void RelaxationBlockJacobi<MatrixType,inverse_type>::Tstep
-(Vector<number2>       &dst,
- const Vector<number2> &src) const
+template <typename MatrixType, typename InverseNumberType, typename VectorType>
+void RelaxationBlockJacobi<MatrixType, InverseNumberType, VectorType>::Tstep
+(VectorType       &dst,
+ const VectorType &src) const
 {
-  GrowingVectorMemory<Vector<number2> > mem;
-  typename VectorMemory<Vector<number2> >::Pointer aux = mem;
+  GrowingVectorMemory<VectorType> mem;
+  typename VectorMemory<VectorType>::Pointer aux = mem;
   aux->reinit(dst, false);
   *aux = dst;
   this->do_step(dst, *aux, src, true);
@@ -248,21 +291,19 @@ void RelaxationBlockJacobi<MatrixType,inverse_type>::Tstep
 
 //----------------------------------------------------------------------//
 
-template <typename MatrixType, typename inverse_type>
-template <typename number2>
-void RelaxationBlockSOR<MatrixType,inverse_type>::step
-(Vector<number2> &dst,
- const Vector<number2> &src) const
+template <typename MatrixType, typename InverseNumberType, typename VectorType>
+void RelaxationBlockSOR<MatrixType, InverseNumberType, VectorType>::step
+(VectorType &dst,
+ const VectorType &src) const
 {
   this->do_step(dst, dst, src, false);
 }
 
 
-template <typename MatrixType, typename inverse_type>
-template <typename number2>
-void RelaxationBlockSOR<MatrixType,inverse_type>::Tstep
-(Vector<number2>       &dst,
- const Vector<number2> &src) const
+template <typename MatrixType, typename InverseNumberType, typename VectorType>
+void RelaxationBlockSOR<MatrixType, InverseNumberType, VectorType>::Tstep
+(VectorType       &dst,
+ const VectorType &src) const
 {
   this->do_step(dst, dst, src, true);
 }
@@ -270,22 +311,20 @@ void RelaxationBlockSOR<MatrixType,inverse_type>::Tstep
 
 //----------------------------------------------------------------------//
 
-template <typename MatrixType, typename inverse_type>
-template <typename number2>
-void RelaxationBlockSSOR<MatrixType,inverse_type>::step
-(Vector<number2>       &dst,
- const Vector<number2> &src) const
+template <typename MatrixType, typename InverseNumberType, typename VectorType>
+void RelaxationBlockSSOR<MatrixType, InverseNumberType, VectorType>::step
+(VectorType       &dst,
+ const VectorType &src) const
 {
   this->do_step(dst, dst, src, false);
   this->do_step(dst, dst, src, true);
 }
 
 
-template <typename MatrixType, typename inverse_type>
-template <typename number2>
-void RelaxationBlockSSOR<MatrixType,inverse_type>::Tstep
-(Vector<number2>       &dst,
- const Vector<number2> &src) const
+template <typename MatrixType, typename InverseNumberType, typename VectorType>
+void RelaxationBlockSSOR<MatrixType, InverseNumberType, VectorType>::Tstep
+(VectorType       &dst,
+ const VectorType &src) const
 {
   this->do_step(dst, dst, src, true);
   this->do_step(dst, dst, src, false);
