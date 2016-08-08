@@ -125,11 +125,11 @@ private:
 // what is done in step-5), but since this is a tutorial we inherit from
 // Function for the sake of example.
 //
-// Unfortunately, some compilers (notably clang 3.8) have a bug where they
-// cannot figure out the default constructor (that is, the constructor which
-// takes no arguments) of classes derived from Function. For portability we
-// provide such constructors in all the tutorial programs so that all
-// supported compilers are happy.
+// Unfortunately, we have to explicitly provide a default constructor for this
+// class (even though we do not need the constructor to do anything unusual)
+// to satisfy a strict reading of the C++ language standard. Some compilers
+// (like GCC from version 4.3 onwards) do not require this, but we provide the
+// default constructor so that all supported compilers are happy.
 template <int dim>
 class RightHandSide : public Function<dim>
 {
