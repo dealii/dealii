@@ -1,0 +1,65 @@
+# Gnuplot script to plot velocity profiles together
+# with reference data.
+
+set term svg size 800,900 dynamic
+set style fill solid 0.25 border
+
+set size 1.0,1.0
+set tmargin at screen 0.95
+set bmargin at screen 0.10
+set rmargin at screen 0.95
+set lmargin at screen 0.10
+
+set style line  1 lt 1 lc rgb '#0c0887' # blue
+set style line  2 lt 1 lc rgb '#4b03a1' # purple-blue
+set style line  3 lt 1 lc rgb '#7d03a8' # purple
+set style line  4 lt 1 lc rgb '#a82296' # purple
+set style line  5 lt 1 lc rgb '#cb4679' # magenta
+set style line  6 lt 1 lc rgb '#e56b5d' # red
+set style line  7 lt 1 lc rgb '#f89441' # orange
+set style line  8 lt 1 lc rgb '#fdc328' # orange
+set style line  9 lt 1 lc rgb '#f0f921' # yellow
+set style line  10 lt 1 lc rgb '#00a000' # dark green
+set style line  11 lt 1 lc rgb '#d00000' # dark red
+
+
+
+set output "step-57.compare-Re400.svg"
+set xlabel "horizonal velocity"
+set ylabel "y coordinate"
+set xrange [-0.5: 1.0]
+set title "horizontal velocity at x=0.5, Re=400"
+set key right bottom
+plot "400-line-4.txt" using 2:1 w l title "Numerical Solution", \
+"ref_2d_ghia_u.txt" using 3:1 ls 10 pt 4 w p  title "Reference [Ghia 82]"
+
+
+
+
+set output "step-57.compare-Re7500.svg"
+set xlabel "horizonal velocity"
+set ylabel "y coordinate"
+set xrange [-0.5: 1.0]
+set title "horizontal velocity at x=0.5, Re=7500"
+set key right bottom
+plot "7500-line-4.txt" using 2:1 w l title "Numerical Solution", \
+"ref_2d_ghia_u.txt" using 7:1 ls 10 pt 4 w p  title "Reference [Ghia 82]", \
+"ref_2d_erturk_u.txt" using 5:1 ls 11 pt 6 w p  title "Reference [Erturk]"
+
+
+
+set output "step-57.converge-Re7500.svg"
+set xlabel "horizonal velocity"
+set ylabel "y coordinate"
+set xrange [-0.5: 1.0]
+set title "horizontal velocity at x=0.5, Re=7500"
+set key right bottom
+plot "7500-line-0.txt" using 2:1 w l ls 1 title "Refinement 0", \
+"7500-line-1.txt" using 2:1 w l ls 2 title "Refinement 1", \
+"7500-line-2.txt" using 2:1 w l ls 3 title "Refinement 2", \
+"7500-line-3.txt" using 2:1 w l ls 4 title "Refinement 3", \
+"7500-line-4.txt" using 2:1 w l ls 5 title "Refinement 4", \
+"ref_2d_ghia_u.txt" using 7:1 ls 10 pt 4 w p  title "Reference [Ghia 82]", \
+"ref_2d_erturk_u.txt" using 5:1 ls 11 pt 6 w p  title "Reference [Erturk]"
+
+
