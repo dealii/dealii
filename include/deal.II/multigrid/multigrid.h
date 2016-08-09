@@ -25,6 +25,7 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/multigrid/mg_base.h>
 #include <deal.II/base/mg_level_object.h>
+#include <deal.II/distributed/tria.h>
 
 #include <vector>
 
@@ -399,6 +400,21 @@ public:
   void Tvmult_add (OtherVectorType       &dst,
                    const OtherVectorType &src) const;
 
+  /**
+   * Return the partitioning of the range space of this preconditioner, i.e., the partitioning of the vectors that are result from matrix-vector products.
+   */
+  IndexSet locally_owned_range_indices() const;
+
+  /**
+   * Return the partitioning of the domain space of this preconditioner, i.e., the partitioning of the vectors this matrix has to be multiplied with.
+   */
+  IndexSet locally_owned_domain_indices() const;
+
+  /**
+   * Return the MPI communicator object in use with this preconditioner.
+   */
+  MPI_Comm get_mpi_communicator() const;
+
 private:
   /**
    * Associated @p DoFHandler.
@@ -506,6 +522,35 @@ PreconditionMG<dim, VectorType, TRANSFER>::vmult
   transfer->copy_from_mg(*dof_handler,
                          dst,
                          multigrid->solution);
+}
+
+
+template<int dim, typename VectorType, class TRANSFER>
+IndexSet
+PreconditionMG<dim, VectorType, TRANSFER>::locally_owned_range_indices() const
+{
+  return dof_handler->locally_owned_dofs();
+}
+
+
+template<int dim, typename VectorType, class TRANSFER>
+IndexSet
+PreconditionMG<dim, VectorType, TRANSFER>::locally_owned_domain_indices() const
+{
+  return dof_handler->locally_owned_dofs();
+}
+
+
+template<int dim, typename VectorType, class TRANSFER>
+MPI_Comm
+PreconditionMG<dim, VectorType, TRANSFER>::get_mpi_communicator() const
+{
+  // currently parallel GMG works with distributed Triangulation only,
+  // so it should be a safe bet to use it to query MPI communicator:
+  const Triangulation<dim> &tria = dof_handler->get_triangulation();
+  const parallel::distributed::Triangulation<dim> *ptria = dynamic_cast<const parallel::distributed::Triangulation<dim> *>(&tria);
+  Assert (ptria != NULL, ExcInternalError());
+  return ptria->get_communicator ();
 }
 
 
