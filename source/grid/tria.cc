@@ -8996,13 +8996,56 @@ Triangulation (const Triangulation<dim, spacedim> &other)
 
 
 
+#ifdef DEAL_II_WITH_CXX11
+template <int dim, int spacedim>
+Triangulation<dim, spacedim>::
+Triangulation (Triangulation<dim, spacedim> &&tria)
+  :
+  Subscriptor(tria),
+  smooth_grid(tria.smooth_grid),
+  periodic_face_pairs_level_0(std::move(tria.periodic_face_pairs_level_0)),
+  periodic_face_map(std::move(tria.periodic_face_map)),
+  levels(std::move(tria.levels)),
+  faces(std::move(tria.faces)),
+  vertices(std::move(tria.vertices)),
+  vertices_used(std::move(tria.vertices_used)),
+  manifold(std::move(tria.manifold)),
+  anisotropic_refinement(tria.anisotropic_refinement),
+  check_for_distorted_cells(tria.check_for_distorted_cells),
+  number_cache(tria.number_cache),
+  vertex_to_boundary_id_map_1d(tria.vertex_to_boundary_id_map_1d),
+  vertex_to_manifold_id_map_1d(tria.vertex_to_manifold_id_map_1d)
+{
+  for (unsigned int i=0; i<tria.levels.size(); ++i)
+    tria.levels[i] = nullptr;
+
+  tria.faces = nullptr;
+
+  tria.number_cache = internal::Triangulation::NumberCache<dim>();
+
+  tria.vertex_to_boundary_id_map_1d = nullptr;
+  tria.vertex_to_manifold_id_map_1d = nullptr;
+}
+#endif
+
+
+
 template <int dim, int spacedim>
 Triangulation<dim, spacedim>::~Triangulation ()
 {
   for (unsigned int i=0; i<levels.size(); ++i)
-    delete levels[i];
+    if (levels[i])
+      {
+        delete levels[i];
+        levels[i] = 0;
+      }
   levels.clear ();
-  delete faces;
+
+  if (faces)
+    {
+      delete faces;
+      faces = 0;
+    }
 
   // the vertex_to_boundary_id_map_1d field
   // should be unused except in 1d
@@ -9010,14 +9053,23 @@ Triangulation<dim, spacedim>::~Triangulation ()
           ||
           (vertex_to_boundary_id_map_1d == 0),
           ExcInternalError());
-  delete vertex_to_boundary_id_map_1d;
+  if (vertex_to_boundary_id_map_1d)
+    {
+      delete vertex_to_boundary_id_map_1d;
+      vertex_to_boundary_id_map_1d = 0;
+    }
+
   // the vertex_to_manifold_id_map_1d field
   // should be unused except in 1d
   Assert ((dim == 1)
           ||
           (vertex_to_manifold_id_map_1d == 0),
           ExcInternalError());
-  delete vertex_to_manifold_id_map_1d;
+  if (vertex_to_manifold_id_map_1d)
+    {
+      delete vertex_to_manifold_id_map_1d;
+      vertex_to_manifold_id_map_1d = 0;
+    }
 }
 
 
