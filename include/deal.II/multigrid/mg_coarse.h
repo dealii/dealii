@@ -28,9 +28,8 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * Coarse grid solver using preconditioners only. This is a little wrapper,
- * transforming a preconditioner into
- * a coarse grid solver.
+ * Coarse grid solver using smoother only. This is a little wrapper,
+ * transforming a smoother into a coarse grid solver.
  *
  * @author Denis Davydov, 2016.
  */
@@ -44,7 +43,7 @@ public:
   MGCoarseGridApplySmoother ();
 
   /**
-   * Constructor. Store preconditioner for later use.
+   * Constructor. Store a pointer to the smoother for later use.
    */
   MGCoarseGridApplySmoother (const MGSmootherBase<VectorType> &coarse_smooth);
 
@@ -62,7 +61,7 @@ public:
 
 private:
   /**
-   * Reference to the preconditioner.
+   * Reference to the smoother.
    */
   SmartPointer<const MGSmootherBase<VectorType>,Multigrid<VectorType> > coarse_smooth;
 };
