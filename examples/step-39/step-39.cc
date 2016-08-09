@@ -511,11 +511,11 @@ namespace Step39
     // The global system is set up, now we attend to the level matrices. We
     // resize all matrix objects to hold one matrix per level.
     mg_matrix.resize(0, n_levels-1);
-    mg_matrix.clear();
+    mg_matrix.clear_elements();
     mg_matrix_dg_up.resize(0, n_levels-1);
-    mg_matrix_dg_up.clear();
+    mg_matrix_dg_up.clear_elements();
     mg_matrix_dg_down.resize(0, n_levels-1);
-    mg_matrix_dg_down.clear();
+    mg_matrix_dg_down.clear_elements();
     // It is important to update the sparsity patterns after <tt>clear()</tt>
     // was called for the level matrices, since the matrices lock the sparsity
     // pattern through the SmartPointer and Subscriptor mechanism.

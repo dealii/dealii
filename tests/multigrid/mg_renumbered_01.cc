@@ -237,9 +237,9 @@ void LaplaceProblem<dim>::setup_system ()
     }
 
   mg_matrices.resize(0, nlevels-1);
-  mg_matrices.clear ();
+  mg_matrices.clear_elements ();
   mg_matrices_renumbered.resize(0, nlevels-1);
-  mg_matrices_renumbered.clear ();
+  mg_matrices_renumbered.clear_elements ();
   mg_sparsity.resize(0, nlevels-1);
   mg_sparsity_renumbered.resize(0, nlevels-1);
 

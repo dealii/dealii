@@ -411,13 +411,13 @@ namespace Step39
 
     const unsigned int n_levels = triangulation.n_levels();
     mg_matrix.resize(0, n_levels-1);
-    mg_matrix.clear();
+    mg_matrix.clear_elements();
     mg_matrix_dg_up.resize(0, n_levels-1);
-    mg_matrix_dg_up.clear();
+    mg_matrix_dg_up.clear_elements();
     mg_matrix_dg_down.resize(0, n_levels-1);
-    mg_matrix_dg_down.clear();
+    mg_matrix_dg_down.clear_elements();
     mg_matrix_in_out.resize(0, n_levels-1);
-    mg_matrix_in_out.clear();
+    mg_matrix_in_out.clear_elements();
     mg_sparsity.resize(0, n_levels-1);
     mg_sparsity_dg_interface.resize(0, n_levels-1);
 
