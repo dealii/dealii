@@ -28,6 +28,47 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
+ * Coarse grid solver using preconditioners only. This is a little wrapper,
+ * transforming a preconditioner into
+ * a coarse grid solver.
+ *
+ * @author Denis Davydov, 2016.
+ */
+template<class VectorType = Vector<double> >
+class MGCoarseGridApplySmoother :  public MGCoarseGridBase<VectorType>
+{
+public:
+  /**
+   * Default constructor.
+   */
+  MGCoarseGridApplySmoother ();
+
+  /**
+   * Constructor. Store preconditioner for later use.
+   */
+  MGCoarseGridApplySmoother (const MGSmootherBase<VectorType> &coarse_smooth);
+
+  /**
+   * Initialize new data.
+   */
+  void initialize (const MGSmootherBase<VectorType> &coarse_smooth);
+
+  /**
+   * Implementation of the abstract function.
+   */
+  void operator() (const unsigned int level,
+                   VectorType         &dst,
+                   const VectorType   &src) const;
+
+private:
+  /**
+   * Reference to the preconditioner.
+   */
+  SmartPointer<const MGSmootherBase<VectorType>,Multigrid<VectorType> > coarse_smooth;
+};
+
+
+/**
  * Coarse grid solver using LAC iterative methods. This is a little wrapper,
  * transforming a triplet of iterative solver, matrix and preconditioner into
  * a coarse grid solver.
@@ -185,6 +226,39 @@ private:
 /*@}*/
 
 #ifndef DOXYGEN
+/* ------------------ Functions for MGCoarseGridApplySmoother -----------*/
+template<class VectorType>
+MGCoarseGridApplySmoother<VectorType>::MGCoarseGridApplySmoother ()
+  : coarse_smooth(NULL)
+{
+}
+
+template<class VectorType>
+MGCoarseGridApplySmoother<VectorType>::MGCoarseGridApplySmoother (const MGSmootherBase<VectorType> &coarse_smooth)
+  : coarse_smooth(NULL)
+{
+  initialize(coarse_smooth);
+}
+
+
+template<class VectorType>
+void
+MGCoarseGridApplySmoother<VectorType>::initialize (const MGSmootherBase<VectorType> &coarse_smooth_)
+{
+  coarse_smooth =
+    SmartPointer<const MGSmootherBase<VectorType>,Multigrid<VectorType> >
+    (&coarse_smooth_,typeid(*this).name());
+}
+
+template<class VectorType>
+void
+MGCoarseGridApplySmoother<VectorType>::operator() (const unsigned int level,
+                                                   VectorType         &dst,
+                                                   const VectorType   &src) const
+{
+  coarse_smooth->smooth(level, dst, src);
+}
+
 /* ------------------ Functions for MGCoarseGridLACIteration ------------ */
 
 
