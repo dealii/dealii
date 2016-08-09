@@ -39,6 +39,13 @@ inconvenience this causes.
 
 <ol>
 
+<li> Deprecated: MGLevelObject::clear() deprectated in favor of
+MGLevelObject::clear_elements() due to clear() being inconsistent with behavior
+of other container objects.
+<br>
+(Jonathan Robey, 2016/08/08)
+</li>
+
  <li> Changed: Several operators from LocalIntegrators::Divergence got moved
  to LocalIntegrators::GradDiv and the never used/tested
  LocalIntegrators::Divergence::grad_div() function got removed.
