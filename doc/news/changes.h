@@ -428,6 +428,17 @@ SparsityPattern.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> New: Implement MGCoarseGridApplySmoother class to do a few steps of a
+ smoother at the coarsest level.
+ <br>
+ (Denis Davydov, 2016/08/09)
+ </li>
+
+ <li> New: PreconditionMG can now be used as a LinearOperator.
+ <br>
+ (Denis Davydov, 2016/08/09)
+ </li>
+
  <li> New: RelaxationBlock classes for geometric multigrid now support parallel
  computations using Trilinos.
  <br>
