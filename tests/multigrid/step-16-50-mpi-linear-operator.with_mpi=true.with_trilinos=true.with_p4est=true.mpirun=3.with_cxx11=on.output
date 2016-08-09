@@ -1,0 +1,5 @@
+
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       256
+DEAL::   Number of degrees of freedom: 289 (by level: 4, 9, 25, 81, 289)
+DEAL::Ok.
