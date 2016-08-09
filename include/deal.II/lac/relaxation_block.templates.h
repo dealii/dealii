@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2015 by the deal.II authors
+// Copyright (C) 1999 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -176,6 +176,7 @@ namespace internal
     return prev;
   }
 
+#ifdef DEAL_II_WITH_TRILINOS
   /**
    * Specialization for Trilinos. Use the ghosted vector.
    */
@@ -193,6 +194,7 @@ namespace internal
     *other = prev;
     return *other;
   }
+#endif // DEAL_II_WITH_TRILINOS
 } // end namespace internal
 
 template <typename MatrixType, typename InverseNumberType, typename VectorType>
