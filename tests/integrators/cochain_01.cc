@@ -47,6 +47,7 @@
 
 #include <deal.II/integrators/l2.h>
 #include <deal.II/integrators/divergence.h>
+#include <deal.II/integrators/grad_div.h>
 #include <deal.II/integrators/laplace.h>
 #include <deal.II/integrators/maxwell.h>
 #include <deal.II/integrators/elasticity.h>
@@ -77,7 +78,7 @@ void cell_matrix(
     {
       ++de;
       L2::mass_matrix(dinfo.matrix(dm++,false).matrix, info.fe_values(de));
-      Divergence::grad_div_matrix(dinfo.matrix(dm++,false).matrix, info.fe_values(de));
+      GradDiv::cell_matrix(dinfo.matrix(dm++,false).matrix, info.fe_values(de));
       Divergence::cell_matrix(dinfo.matrix(dm++,false).matrix, info.fe_values(de), info.fe_values(de+1));
     }
 
