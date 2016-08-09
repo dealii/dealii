@@ -15,7 +15,7 @@
  */
 
 // Same as step-16-50, but use Jacobi smoother at the coarsest grid via MGCoarseGridApplySmoother.
-// In this particular case, the number of iterations untill convergence is
+// In this particular case, the number of iterations until convergence is
 // exactly the same as for MGCoarseGridLACIteration.
 
 #include "../tests.h"
