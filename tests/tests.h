@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2015 by the deal.II authors
+// Copyright (C) 2004 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -98,7 +98,8 @@ number get_real_assert_zero_imag(const number &a)
 // we put this into a namespace to not conflict with stdlib
 namespace Testing
 {
-  int rand(bool reseed=false, int seed=1) throw()
+  int rand(const bool reseed=false,
+           const int seed=1)
   {
     static int r[32];
     static int k;
@@ -138,7 +139,7 @@ namespace Testing
   }
 
 // reseed our random number generator
-  void srand(int seed) throw()
+  void srand(const int seed)
   {
     rand(true, seed);
   }
