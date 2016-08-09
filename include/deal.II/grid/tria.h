@@ -1516,6 +1516,16 @@ public:
    */
   Triangulation (const Triangulation<dim, spacedim> &t);
 
+#ifdef DEAL_II_WITH_CXX11
+  /**
+   * Move constructor.
+   *
+   * Create a new triangulation by stealing the internal data of another
+   * triangulation.
+   */
+  Triangulation (Triangulation<dim, spacedim> &&tria);
+#endif
+
   /**
    * Delete the object and all levels of the hierarchy.
    */
