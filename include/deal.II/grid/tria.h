@@ -3405,7 +3405,7 @@ private:
    * this field (that can be modified by TriaAccessor::set_boundary_id) were
    * not a pointer.
    */
-  std::map<unsigned int, types::boundary_id> *vertex_to_boundary_id_map_1d;
+  std_cxx11::unique_ptr<std::map<unsigned int, types::boundary_id> > vertex_to_boundary_id_map_1d;
 
 
   /**
@@ -3427,7 +3427,7 @@ private:
    * this field (that can be modified by TriaAccessor::set_boundary_id) were
    * not a pointer.
    */
-  std::map<unsigned int, types::manifold_id> *vertex_to_manifold_id_map_1d;
+  std_cxx11::unique_ptr<std::map<unsigned int, types::manifold_id> > vertex_to_manifold_id_map_1d;
 
   // make a couple of classes friends
   template <int,int,int> friend class TriaAccessorBase;
