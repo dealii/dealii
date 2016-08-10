@@ -63,7 +63,7 @@ private:
   /**
    * Reference to the smoother.
    */
-  SmartPointer<const MGSmootherBase<VectorType>,Multigrid<VectorType> > coarse_smooth;
+  SmartPointer<const MGSmootherBase<VectorType>, MGCoarseGridApplySmoother<VectorType> > coarse_smooth;
 };
 
 
@@ -245,7 +245,7 @@ void
 MGCoarseGridApplySmoother<VectorType>::initialize (const MGSmootherBase<VectorType> &coarse_smooth_)
 {
   coarse_smooth =
-    SmartPointer<const MGSmootherBase<VectorType>,Multigrid<VectorType> >
+    SmartPointer<const MGSmootherBase<VectorType>, MGCoarseGridApplySmoother<VectorType> >
     (&coarse_smooth_,typeid(*this).name());
 }
 
