@@ -1962,7 +1962,7 @@ namespace internal
 
         // reserve enough space
         triangulation.levels.push_back (new internal::Triangulation::TriaLevel<dim>);
-        triangulation.faces = new internal::Triangulation::TriaFaces<dim>;
+        triangulation.faces.reset (new internal::Triangulation::TriaFaces<dim>);
         triangulation.levels[0]->reserve_space (cells.size(), dim, spacedim);
         triangulation.faces->lines.reserve_space (0,needed_lines.size());
         triangulation.levels[0]->cells.reserve_space (0,cells.size());
@@ -2336,7 +2336,7 @@ namespace internal
         // for the lines
         // reserve enough space
         triangulation.levels.push_back (new internal::Triangulation::TriaLevel<dim>);
-        triangulation.faces = new internal::Triangulation::TriaFaces<dim>;
+        triangulation.faces.reset (new internal::Triangulation::TriaFaces<dim>);
         triangulation.levels[0]->reserve_space (cells.size(), dim, spacedim);
         triangulation.faces->lines.reserve_space (0,needed_lines.size());
 
@@ -8956,7 +8956,6 @@ Triangulation (const MeshSmoothing smooth_grid,
                const bool check_for_distorted_cells)
   :
   smooth_grid(smooth_grid),
-  faces(NULL),
   anisotropic_refinement(false),
   check_for_distorted_cells(check_for_distorted_cells),
   vertex_to_boundary_id_map_1d (0),
@@ -9019,8 +9018,6 @@ Triangulation (Triangulation<dim, spacedim> &&tria)
   for (unsigned int i=0; i<tria.levels.size(); ++i)
     tria.levels[i] = nullptr;
 
-  tria.faces = nullptr;
-
   tria.number_cache = internal::Triangulation::NumberCache<dim>();
 
   tria.vertex_to_boundary_id_map_1d = nullptr;
@@ -9040,12 +9037,6 @@ Triangulation<dim, spacedim>::~Triangulation ()
         levels[i] = 0;
       }
   levels.clear ();
-
-  if (faces)
-    {
-      delete faces;
-      faces = 0;
-    }
 
   // the vertex_to_boundary_id_map_1d field
   // should be unused except in 1d
@@ -9323,7 +9314,8 @@ copy_triangulation (const Triangulation<dim, spacedim> &old_tria)
   anisotropic_refinement = old_tria.anisotropic_refinement;
   smooth_grid            = old_tria.smooth_grid;
 
-  faces         = new internal::Triangulation::TriaFaces<dim>(*old_tria.faces);
+  if (dim > 1)
+    faces.reset (new internal::Triangulation::TriaFaces<dim>(*old_tria.faces));
 
   typename std::map<types::manifold_id,
            SmartPointer<const Manifold<dim,spacedim> , Triangulation<dim, spacedim> > >::const_iterator
@@ -9780,7 +9772,7 @@ void Triangulation<dim,spacedim>::clear_user_data ()
 {
   // let functions in anonymous namespace do their work
   dealii::clear_user_data (levels);
-  dealii::clear_user_data (faces);
+  dealii::clear_user_data (faces.get());
 }
 
 
@@ -9806,7 +9798,7 @@ namespace
 template <int dim, int spacedim>
 void Triangulation<dim,spacedim>::clear_user_flags_line ()
 {
-  dealii::clear_user_flags_line (levels, faces);
+  dealii::clear_user_flags_line (levels, faces.get());
 }
 
 
@@ -9838,7 +9830,7 @@ namespace
 template <int dim, int spacedim>
 void Triangulation<dim,spacedim>::clear_user_flags_quad ()
 {
-  dealii::clear_user_flags_quad (levels, faces);
+  dealii::clear_user_flags_quad (levels, faces.get());
 }
 
 
@@ -9870,7 +9862,7 @@ namespace
 template <int dim, int spacedim>
 void Triangulation<dim,spacedim>::clear_user_flags_hex ()
 {
-  dealii::clear_user_flags_hex (levels, faces);
+  dealii::clear_user_flags_hex (levels, faces.get());
 }
 
 
@@ -12003,8 +11995,7 @@ Triangulation<dim, spacedim>::clear_despite_subscriptions()
     delete levels[i];
   levels.clear ();
 
-  delete faces;
-  faces = NULL;
+  faces.reset ();
 
   vertices.clear ();
   vertices_used.clear ();
