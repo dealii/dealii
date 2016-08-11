@@ -449,6 +449,12 @@ SparsityPattern.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> New: Rank-4 symmetric tensors of type SymmetricTensor can now
+ be converted to rank-4 tensors of type Tensor.
+ <br>
+ (Wolfgang Bangerth, 2016/08/11)
+ </li>
+
  <li> New: Implement MGCoarseGridApplySmoother class to do a few steps of a
  smoother at the coarsest level.
  <br>
