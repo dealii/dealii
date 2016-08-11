@@ -1054,10 +1054,24 @@ namespace internal
 
     template <int dim, typename Number>
     dealii::Tensor<4,dim,Number>
-    convert_to_tensor (const dealii::SymmetricTensor<4,dim,Number> &)
+    convert_to_tensor (const dealii::SymmetricTensor<4,dim,Number> &st)
     {
-      Assert (false, ExcNotImplemented());
-      return dealii::Tensor<4,dim,Number>();
+      // utilize the symmetry properties of SymmetricTensor<4,dim>
+      // discussed in the class documentation to avoid accessing all
+      // independent elements of the input tensor more than once
+      dealii::Tensor<4,dim,Number> t;
+
+      for (unsigned int i=0; i<dim; ++i)
+        for (unsigned int j=i; j<dim; ++j)
+          for (unsigned int k=0; k<dim; ++k)
+            for (unsigned int l=k; l<dim; ++l)
+              t[TableIndices<4>(i,j,k,l)]
+                = t[TableIndices<4>(i,j,l,k)]
+                  = t[TableIndices<4>(j,i,k,l)]
+                    = t[TableIndices<4>(j,i,l,k)]
+                      = st[TableIndices<4>(i,j,k,l)];
+
+      return t;
     }
   }
 }
