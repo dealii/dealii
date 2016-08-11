@@ -267,6 +267,23 @@
 
 
 /***********************************************************************
+ * A macro that is used to mark function as not throwing any exceptions.
+ * The appropriate way to do this in C++98 was to say
+ *     void foo () throw ();
+ * but in C++11, this is now
+ *     void foo () noexcept;
+ * Furthermore, the first of these two methods is being deprecated, so
+ * we want to use the latter when possible.
+ */
+
+#ifdef DEAL_II_WITH_CXX11
+#  define DEAL_II_NOEXCEPT noexcept
+#else
+#  define DEAL_II_NOEXCEPT throw()
+#endif
+
+
+/***********************************************************************
  * Two macros to guard external header includes.
  *
  * Selectively disable diagnostics set by "-Wextra" (and similar flags) for
