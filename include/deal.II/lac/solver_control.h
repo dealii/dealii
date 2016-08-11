@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2015 by the deal.II authors
+// Copyright (C) 1998 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -99,7 +99,7 @@ public:
       : last_step (last_step), last_residual(last_residual)
     {}
 
-    virtual ~NoConvergence () throw () {}
+    virtual ~NoConvergence () DEAL_II_NOEXCEPT {}
 
     virtual void print_info (std::ostream &out) const
     {

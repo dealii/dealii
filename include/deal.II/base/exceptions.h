@@ -55,7 +55,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~ExceptionBase () throw();
+  virtual ~ExceptionBase () DEAL_II_NOEXCEPT;
 
   /**
    * Set the file name and line of where the exception appeared as well as the
@@ -72,7 +72,7 @@ public:
   /**
    * Override the standard function that returns the description of the error.
    */
-  virtual const char *what() const throw();
+  virtual const char *what() const DEAL_II_NOEXCEPT;
 
   /**
    * Get exception name.
@@ -391,7 +391,7 @@ namespace deal_II_exceptions
   {                                                                       \
   public:                                                                 \
     Exception (const std::string &msg = defaulttext) : arg (msg) {}       \
-    virtual ~Exception () throw () {}                                     \
+    virtual ~Exception () DEAL_II_NOEXCEPT {}                             \
     virtual void print_info (std::ostream &out) const {                   \
       out << arg << std::endl;                                            \
     }                                                                     \
@@ -409,7 +409,7 @@ namespace deal_II_exceptions
   class Exception1 : public dealii::ExceptionBase {                       \
   public:                                                                 \
     Exception1 (const type1 a1) : arg1 (a1) {}                            \
-    virtual ~Exception1 () throw () {}                                    \
+    virtual ~Exception1 () DEAL_II_NOEXCEPT {}                            \
     virtual void print_info (std::ostream &out) const {                   \
       out outsequence << std::endl;                                       \
     }                                                                     \
@@ -429,7 +429,7 @@ namespace deal_II_exceptions
   public:                                                                 \
     Exception2 (const type1 a1, const type2 a2) :                         \
       arg1 (a1), arg2(a2) {}                                              \
-    virtual ~Exception2 () throw () {}                                    \
+    virtual ~Exception2 () DEAL_II_NOEXCEPT {}                            \
     virtual void print_info (std::ostream &out) const {                   \
       out outsequence << std::endl;                                       \
     }                                                                     \
@@ -450,7 +450,7 @@ namespace deal_II_exceptions
   public:                                                                 \
     Exception3 (const type1 a1, const type2 a2, const type3 a3) :         \
       arg1 (a1), arg2(a2), arg3(a3) {}                                    \
-    virtual ~Exception3 () throw () {}                                    \
+    virtual ~Exception3 () DEAL_II_NOEXCEPT {}                            \
     virtual void print_info (std::ostream &out) const {                   \
       out outsequence << std::endl;                                       \
     }                                                                     \
@@ -473,7 +473,7 @@ namespace deal_II_exceptions
     Exception4 (const type1 a1, const type2 a2,                           \
                 const type3 a3, const type4 a4) :                         \
       arg1 (a1), arg2(a2), arg3(a3), arg4(a4) {}                          \
-    virtual ~Exception4 () throw () {}                                    \
+    virtual ~Exception4 () DEAL_II_NOEXCEPT {}                            \
     virtual void print_info (std::ostream &out) const {                   \
       out outsequence << std::endl;                                       \
     }                                                                     \
@@ -497,7 +497,7 @@ namespace deal_II_exceptions
     Exception5 (const type1 a1, const type2 a2, const type3 a3,           \
                 const type4 a4, const type5 a5) :                         \
       arg1 (a1), arg2(a2), arg3(a3), arg4(a4), arg5(a5) {}                \
-    virtual ~Exception5 () throw () {}                                    \
+    virtual ~Exception5 () DEAL_II_NOEXCEPT {}                            \
     virtual void print_info (std::ostream &out) const {                   \
       out outsequence << std::endl;                                       \
     }                                                                     \
