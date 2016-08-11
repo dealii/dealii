@@ -182,6 +182,13 @@ SparsityPattern.
 
 <ol>
 
+ <li> New: deal.II no longer uses features of the C++ language that
+ were deprecated with C++11, C++14, or that are scheduled to be
+ deprecated for C++17.
+ <br>
+ (David Wells, Jonathan Robey, Wolfgang Bangerth, 2016/08/11)
+ </li>
+
  <li> New: Introduce operators for residuals and interior penalty terms for
  the Grad-Div operator in LocalIntegrators::GradDiv.
  <br>
