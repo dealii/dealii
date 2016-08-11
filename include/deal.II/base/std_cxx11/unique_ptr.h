@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 by the deal.II authors
+// Copyright (C) 2015, 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,6 +32,8 @@ DEAL_II_NAMESPACE_CLOSE
 #else
 
 #include <boost/scoped_ptr.hpp>
+#include <boost/serialization/scoped_ptr.hpp>
+
 
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx11
@@ -65,6 +67,31 @@ namespace std_cxx11
       boost::scoped_ptr<T>(p)
     {}
   };
+
+
+  template<class Archive, class T>
+  void save(Archive &ar,
+            const unique_ptr< T > &t,
+            const unsigned int version)
+  {
+    boost::serialization::save (ar, static_cast<boost::scoped_ptr<T>&>(t), version);
+  }
+
+  template<class Archive, class T>
+  void load(Archive &ar,
+            unique_ptr< T > &t,
+            const unsigned int version)
+  {
+    boost::serialization::load (ar, static_cast<boost::scoped_ptr<T>&>(t), version);
+  }
+
+  template<class Archive, class T>
+  void serialize(Archive &ar,
+                 unique_ptr< T > &t,
+                 const unsigned int version)
+  {
+    boost::serialization::serialize (ar, static_cast<boost::scoped_ptr<T>&>(t), version);
+  }
 
 }
 DEAL_II_NAMESPACE_CLOSE
