@@ -13584,11 +13584,12 @@ Triangulation<dim, spacedim>::memory_consumption () const
 
 
 template<int dim, int spacedim>
-Triangulation<dim, spacedim>::DistortedCellList::~DistortedCellList () throw ()
+Triangulation<dim, spacedim>::DistortedCellList::~DistortedCellList () DEAL_II_NOEXCEPT
 {
   // don't do anything here. the compiler will automatically convert
   // any exceptions created by the destructors of the member variables
-  // into abort() in order to satisfy the throw() specification
+  // into abort() in order to satisfy the throw()/noexcept
+  // specification
 }
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -87,7 +87,7 @@ ExceptionBase::ExceptionBase (const ExceptionBase &exc)
 
 
 
-ExceptionBase::~ExceptionBase () throw ()
+ExceptionBase::~ExceptionBase () DEAL_II_NOEXCEPT
 {
   free (stacktrace); // free(NULL) is allowed
   stacktrace = NULL;
@@ -117,7 +117,7 @@ void ExceptionBase::set_fields (const char *f,
 #endif
 }
 
-const char *ExceptionBase::what() const throw()
+const char *ExceptionBase::what() const DEAL_II_NOEXCEPT
 {
   // If no error c_string was generated so far, do it now:
   if (what_str == "")
