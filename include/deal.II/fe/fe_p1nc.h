@@ -30,7 +30,7 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * Implementation for the scalar version of the P1 nonconforming finite
- * element, a piecewise linear finite element on quadrilaterals.
+ * element, a piecewise linear finite element on quadrilaterals in 2D.
  *
  * Unlike any continuous conforming finite element,
  * it does not have the continuity across edges.
@@ -52,7 +52,21 @@ DEAL_II_NAMESPACE_OPEN
  * Due to the dice rule, three values at any three midpoints determine the last value at the last midpoint.
  * It means that the genuine number of independent dofs on a quad is 3,
  * and it is the same number to the dimension of the linear polynomial space in 2D.
- *
+
+
+ * Shape functions
+
+ *  2---------|---------3
+ *  |                   |
+ *  |                   |
+ *  |                   |
+ *  |                   |
+ *  -                   -
+ *  |                   |
+ *  |                   |
+ *  |                   |
+ *  |                   |
+ *  0---------|---------1
 
  * For each vertex v_j, there are two edges of which v_j is one of the end points.
  * Consider the linear function such that one half at two midpoints of such edges,
@@ -62,33 +76,79 @@ DEAL_II_NAMESPACE_OPEN
 
  * The canonical (local) basis functions are given as any three shape functions of
  * the following four linear functions:
- *
- * \phi_1, \phi_2, \phi_3, \phi_4.
- *
+
+ * shape function \phi_0
+
+ *  +--------0.0--------+
+ *  |                   |
+ *  |                   |
+ *  |                   |
+ *  |                   |
+ * 0.5                 0.0
+ *  |                   |
+ *  |                   |
+ *  |                   |
+ *  |                   |
+ *  +--------0.5--------+
+
+ * shape function \phi_1
+
+ *  +--------0.0--------+
+ *  |                   |
+ *  |                   |
+ *  |                   |
+ *  |                   |
+ * 0.0                 0.5
+ *  |                   |
+ *  |                   |
+ *  |                   |
+ *  |                   |
+ *  +--------0.5--------+
+
+ * shape function \phi_2
+
+ *  +--------0.5--------+
+ *  |                   |
+ *  |                   |
+ *  |                   |
+ *  |                   |
+ * 0.5                 0.0
+ *  |                   |
+ *  |                   |
+ *  |                   |
+ *  |                   |
+ *  +--------0.0--------+
+
+ * shape function \phi_3
+
+ *  +--------0.5--------+
+ *  |                   |
+ *  |                   |
+ *  |                   |
+ *  |                   |
+ * 0.0                 0.5
+ *  |                   |
+ *  |                   |
+ *  |                   |
+ *  |                   |
+ *  +--------0.0--------+
 
 
- * 2 -------|------- 3
- * |                 |
- * |                 |
- * |                 |
- * |                 |
- * -                 -
- * |                 |
- * |                 |
- * |                 |
- * |                 |
- * 0 -------|------- 1
-
-
+ * Note that this shape functions are constructed on each cell, not on the reference cell only.
+ * get_linear_shape computes the coefficients for shape functions when fill_fe_values is called on each cell. 
 
  * The (global) basis function associated with a node is defined by the composition of
  * (local) basis functions associated with the node on each element.
  * In case of the problem with homogeneous Dirichlet boundary condition, 
  * the number of DOFs is equal to the number of interior nodes.
 
+ * (TODO: unit_support_points)
 
  * You can find the paper about the P1NC element at
  * http://epubs.siam.org/doi/abs/10.1137/S0036142902404923.
+
+
+
 
  **/
 
