@@ -59,8 +59,11 @@ void
 Multigrid<VectorType>::reinit (const unsigned int min_level,
                                const unsigned int max_level)
 {
+  Assert (min_level <= max_level,
+          ExcLowerRangeType<unsigned int>(max_level, min_level));
   minlevel=min_level;
   maxlevel=max_level;
+  // solution, t and defect2 are resized in cycle()
   defect.resize(minlevel, maxlevel);
 }
 
@@ -69,9 +72,7 @@ template <typename VectorType>
 void
 Multigrid<VectorType>::set_maxlevel (const unsigned int l)
 {
-  Assert (l <= maxlevel, ExcIndexRange(l,minlevel,maxlevel+1));
-  Assert (l >= minlevel, ExcIndexRange(l,minlevel,maxlevel+1));
-  maxlevel = l;
+  reinit(minlevel, l);
 }
 
 
@@ -80,10 +81,10 @@ void
 Multigrid<VectorType>::set_minlevel (const unsigned int l,
                                      const bool relative)
 {
-  Assert (l <= maxlevel, ExcIndexRange(l,minlevel,maxlevel+1));
-  minlevel = (relative)
-             ? (maxlevel-l)
-             : l;
+  const unsigned int new_minlevel = (relative)
+                                    ? (maxlevel-l)
+                                    : l;
+  reinit(new_minlevel, maxlevel);
 }
 
 

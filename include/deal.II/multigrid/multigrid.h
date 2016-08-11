@@ -99,9 +99,8 @@ public:
             Cycle                              cycle = v_cycle);
 
   /**
-   * Experimental constructor for cases in which no DoFHandler is available.
-   *
-   * @warning Not intended for general use.
+   * Constructor. Same as above but you can determine the multigrid
+   * levels to use yourself.
    */
   Multigrid(const unsigned int                 minlevel,
             const unsigned int                 maxlevel,
@@ -178,9 +177,8 @@ public:
 
   /**
    * Set the highest level for which the multilevel method is performed. By
-   * default, this is the finest level of the Triangulation; therefore, this
-   * function will only accept arguments smaller than the current #maxlevel
-   * and not smaller than the current #minlevel.
+   * default, this is the finest level of the Triangulation. Accepted are
+   * values not smaller than the current #minlevel.
    */
   void set_maxlevel (const unsigned int);
 
