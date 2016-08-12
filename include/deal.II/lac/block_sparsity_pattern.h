@@ -24,9 +24,7 @@
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
-#include <deal.II/lac/compressed_set_sparsity_pattern.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/block_indices.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -450,7 +448,7 @@ public:
  * rather acts as a @p typedef to introduce the name of this class, without
  * requiring the user to specify the templated name of the base class. For
  * information on the interface of this class refer to the base class. The
- * individual blocks are based on the CompressedSparsityPattern class.
+ * individual blocks are based on the DynamicSparsityPattern class.
  *
  * This class is an example of the "dynamic" type of
  * @ref Sparsity.
@@ -567,23 +565,6 @@ public:
    */
   using BlockSparsityPatternBase<DynamicSparsityPattern>::reinit;
 };
-
-/**
- * @deprecated Use  BlockDynamicSparsityPattern instead.
- */
-typedef BlockDynamicSparsityPattern BlockCompressedSparsityPattern DEAL_II_DEPRECATED;
-
-/**
- * @deprecated Use  BlockDynamicSparsityPattern instead.
- */
-typedef BlockDynamicSparsityPattern BlockCompressedSetSparsityPattern DEAL_II_DEPRECATED;
-
-/**
- * @deprecated Use  BlockDynamicSparsityPattern instead.
- */
-typedef BlockDynamicSparsityPattern BlockCompressedSimpleSparsityPattern DEAL_II_DEPRECATED;
-
-
 
 
 #ifdef DEAL_II_WITH_TRILINOS

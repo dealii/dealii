@@ -101,7 +101,7 @@ namespace PETScWrappers
      *
      * The only way to avoid this is to tell PETSc where the actual entries of
      * the matrix will be. For this, there are constructors and reinit()
-     * functions of this class that take a CompressedSparsityPattern object
+     * functions of this class that take a DynamicSparsityPattern object
      * containing all this information. While in the general case it is
      * sufficient if the constructors and reinit() functions know the number
      * of local rows and columns, the functions getting a sparsity pattern
