@@ -645,35 +645,16 @@ memory for all computations.
 
 A solution to the problem has already been discussed in step-11
 and step-18. It used an intermediate object of type
-CompressedSparsityPattern. This class uses a different memory storage scheme
+DynamicSparsityPattern. This class uses a different memory storage scheme
 that is optimized to <i>creating</i> a sparsity pattern when maximal numbers
 of entries per row are not accurately available, but is unsuitable for use as
 the sparsity pattern actually underlying a sparse matrix. After building the
 intermediate object, it is therefore copied into a true SparsityPattern
 object, something that can be done very efficient and without having to
 over-allocate memory. Typical code doing this is shown in the documentation of
-the CompressedSparsityPattern class. This solution is slower than directly
+the DynamicSparsityPattern class. This solution is slower than directly
 building a SparsityPattern object, but only uses as much memory as is really
 necessary.
-
-As it now turns out, the storage format used in the
-CompressedSparsityPattern class is not very good for matrices with
-truly large numbers of entries per row &mdash; where truly large
-numbers mean in the hundreds. This isn't typically the case for lower
-order elements even in 3d, but happens for high order elements in 3d;
-for example, a vertex degree of freedom of a $Q_5$ element in 3d may
-couple to as many as 1700 other degrees of freedom. In such a case
-CompressedSparsityPattern will work, but by tuning the memory storage
-format used internally in that class a bit will make it work several
-times faster. This is what we did with the
-CompressedSetSparsityPattern class &mdash; it has exactly the same
-interface as the CompressedSparsityPattern class but internally stores
-things somewhat differently. For most cases, there is not much of a
-difference in performance in the classes (though the old class has a
-slight advantage for lower order elements in 3d), but for high order
-and $hp$ elements in 3d, the CompressedSetSparsityPattern has a
-definite edge. We will therefore use it later when we build the
-sparsity pattern in this tutorial program.
 
 
 <h4>Eliminating constrained degrees of freedom</h4>
