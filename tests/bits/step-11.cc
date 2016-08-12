@@ -47,7 +47,7 @@ std::ofstream logfile("output");
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
 
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <algorithm>
 #include <iomanip>
@@ -123,8 +123,8 @@ void LaplaceProblem<dim>::setup_system ()
                                         i, -1);
   mean_value_constraints.close ();
 
-  CompressedSparsityPattern csp (dof_handler.n_dofs(),
-                                 dof_handler.n_dofs());
+  DynamicSparsityPattern csp (dof_handler.n_dofs(),
+                              dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, csp);
   mean_value_constraints.condense (csp);
 

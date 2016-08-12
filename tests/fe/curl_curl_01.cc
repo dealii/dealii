@@ -43,7 +43,7 @@
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/sparse_direct.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/grid/tria.h>
@@ -272,7 +272,7 @@ void MaxwellProblem<dim>::setup_system ()
   VectorTools::project_boundary_values_curl_conforming(dof_handler, 0, ExactSolution<dim>(), 0, constraints);
 
   constraints.close ();
-  CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
+  DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern(dof_handler,
                                   c_sparsity,
                                   constraints,false);

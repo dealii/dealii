@@ -94,7 +94,7 @@ void test ()
   ConstraintMatrix constraints(locally_relevant_dofs);
   constraints.close();
 
-  BlockCompressedSimpleSparsityPattern bcsp (locally_relevant_partitioning);
+  BlockDynamicSparsityPattern bcsp (locally_relevant_partitioning);
   DoFTools::make_sparsity_pattern (dof_handler, bcsp, constraints, false);
   SparsityTools::distribute_sparsity_pattern (bcsp, dof_handler.locally_owned_dofs_per_processor (), MPI_COMM_WORLD, locally_relevant_dofs);
 

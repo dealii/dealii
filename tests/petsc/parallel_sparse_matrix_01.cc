@@ -15,7 +15,7 @@
 
 
 
-// PETScWrappers::MPI::SparseMatrix::reinit(CompressedSparsityPattern) should
+// PETScWrappers::MPI::SparseMatrix::reinit(DynamicSparsityPattern) should
 // create a matrix that, when filled with elements that match the sparsity
 // pattern, doesn't require any more memory allocation any more. This is
 // tricky to get right, though, and took a while until it worked.
@@ -28,7 +28,7 @@
 
 #include "../tests.h"
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <fstream>
 #include <cstdlib>
 
@@ -75,7 +75,7 @@ void test ()
   // used to allocate additional memory for 2
   // processes. note that only one of the
   // four blocks uses Inodes
-  CompressedSparsityPattern csp (N,N);
+  DynamicSparsityPattern csp (N,N);
   for (unsigned int i=0; i<N; ++i)
     for (unsigned int j=0; j<N; ++j)
       {

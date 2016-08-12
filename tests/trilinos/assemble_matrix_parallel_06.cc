@@ -17,7 +17,7 @@
 
 // tests thread safety of parallel Trilinos block matrices. Same test as
 // parallel_matrix_assemble_04 but initializing the matrix from
-// BlockCompressedSimpleSparsityPattern instead of a Trilinos sparsity pattern.
+// BlockDynamicSparsityPattern instead of a Trilinos sparsity pattern.
 
 #include "../tests.h"
 
@@ -49,7 +49,7 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/error_estimator.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <fstream>
 #include <iostream>
@@ -281,7 +281,7 @@ void LaplaceProblem<dim>::setup_system ()
     reference_rhs.reinit (locally_owned, MPI_COMM_WORLD);
   }
   {
-    BlockCompressedSimpleSparsityPattern csp(relevant_set);
+    BlockDynamicSparsityPattern csp(relevant_set);
     DoFTools::make_sparsity_pattern (dof_handler, csp,
                                      constraints, false);
     test_matrix.reinit (locally_owned, csp, MPI_COMM_WORLD, true);

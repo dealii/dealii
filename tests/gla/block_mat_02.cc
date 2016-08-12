@@ -103,7 +103,7 @@ void test ()
   cm.close();
 
 
-  BlockCompressedSimpleSparsityPattern sp(stokes_relevant_partitioning);
+  BlockDynamicSparsityPattern sp(stokes_relevant_partitioning);
 
   Table<2,DoFTools::Coupling> coupling (1+1, 1+1);
   coupling[0][0] = DoFTools::always;

@@ -19,7 +19,7 @@
 // printing all nonzero entries
 
 #include "../tests.h"
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -63,8 +63,8 @@ void test ()
 
   // then set up a sparsity pattern and a
   // matrix on top of it
-  CompressedSparsityPattern sparsity (dof_handler.n_dofs(),
-                                      dof_handler.n_dofs());
+  DynamicSparsityPattern sparsity (dof_handler.n_dofs(),
+                                   dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, sparsity);
   constraints.condense (sparsity);
 

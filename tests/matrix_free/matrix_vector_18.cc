@@ -31,7 +31,7 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/numerics/vector_tools.h>
@@ -145,7 +145,7 @@ void do_test (const DoFHandler<dim> &dof,
   // assemble sparse matrix with (\nabla v, \nabla u + 3.2221 * \nabla^2 u * ones) + (v, 10 * u)
   SparsityPattern sparsity;
   {
-    CompressedSimpleSparsityPattern csp(dof.n_dofs(), dof.n_dofs());
+    DynamicSparsityPattern csp(dof.n_dofs(), dof.n_dofs());
     DoFTools::make_sparsity_pattern (dof, csp, constraints, true);
     sparsity.copy_from(csp);
   }

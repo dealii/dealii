@@ -24,7 +24,7 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/compressed_set_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -102,7 +102,7 @@ check ()
   // second way: via direct elimination of
   // constraints
   SparsityPattern sparsity_2;
-  CompressedSetSparsityPattern csp_2 (dof.n_dofs());
+  DynamicSparsityPattern csp_2 (dof.n_dofs());
   DoFTools::make_sparsity_pattern (dof, csp_2, constraints);
   sparsity_2.copy_from (csp_2);
 
@@ -136,7 +136,7 @@ check ()
   sparsity_3.compress ();
 
   BlockSparsityPattern sparsity_4;
-  BlockCompressedSetSparsityPattern csp_4(2,2);
+  BlockDynamicSparsityPattern csp_4(2,2);
   csp_4.block(0,0).reinit (n1,n1);
   csp_4.block(1,0).reinit (n2,n1);
   csp_4.block(0,1).reinit (n1,n2);

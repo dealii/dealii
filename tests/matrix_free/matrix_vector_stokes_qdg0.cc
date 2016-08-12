@@ -169,7 +169,7 @@ void test ()
   //          << std::endl;
 
   {
-    BlockCompressedSimpleSparsityPattern csp (dim+1,dim+1);
+    BlockDynamicSparsityPattern csp (dim+1,dim+1);
 
     for (unsigned int d=0; d<dim+1; ++d)
       for (unsigned int e=0; e<dim+1; ++e)

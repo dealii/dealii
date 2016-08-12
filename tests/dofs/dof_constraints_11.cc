@@ -20,7 +20,7 @@
 // algorithm.
 
 #include "../tests.h"
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/grid/tria.h>
@@ -70,7 +70,7 @@ void test ()
   block_sizes[0] = dof_handler.n_dofs()/3;
   block_sizes[1] = dof_handler.n_dofs() - block_sizes[0];
 
-  BlockCompressedSparsityPattern sparsity(2,2);
+  BlockDynamicSparsityPattern sparsity(2,2);
   for (unsigned int i=0; i<2; ++i)
     for (unsigned int j=0; j<2; ++j)
       sparsity.block(i,j).reinit (block_sizes[i], block_sizes[j]);

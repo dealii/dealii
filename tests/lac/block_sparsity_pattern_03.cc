@@ -32,7 +32,7 @@ int main()
   row_blocks[0] = 10;
   row_blocks[1] = 5;
 
-  BlockCompressedSimpleSparsityPattern csp (row_blocks, row_blocks);
+  BlockDynamicSparsityPattern csp (row_blocks, row_blocks);
 
   csp.reinit(2,2);
   csp.block(0,0).reinit(10,10);

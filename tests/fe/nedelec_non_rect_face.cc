@@ -45,7 +45,7 @@
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/sparse_direct.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/constraint_matrix.h>
 
 #include <deal.II/grid/tria.h>
@@ -281,7 +281,7 @@ namespace Maxwell
 
     constraints.close ();
 
-    CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
+    DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern(dof_handler,
                                     c_sparsity,
                                     constraints,false);

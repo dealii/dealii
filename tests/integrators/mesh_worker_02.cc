@@ -21,7 +21,7 @@
 #include <deal.II/meshworker/loop.h>
 
 #include <deal.II/base/logstream.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/grid/grid_generator.h>
@@ -235,8 +235,8 @@ test_simple(DoFHandler<dim> &mgdofs)
   for (unsigned int level=mg_sparsity.min_level();
        level<=mg_sparsity.max_level(); ++level)
     {
-      CompressedSparsityPattern c_sparsity(mgdofs.n_dofs(level));
-      CompressedSparsityPattern ci_sparsity;
+      DynamicSparsityPattern c_sparsity(mgdofs.n_dofs(level));
+      DynamicSparsityPattern ci_sparsity;
       if (level>0)
         ci_sparsity.reinit(mgdofs.n_dofs(level-1), mgdofs.n_dofs(level));
 

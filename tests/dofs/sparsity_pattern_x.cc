@@ -18,14 +18,14 @@
 /* Author: Wolfgang Bangerth, University of Heidelberg, 2001 */
 
 // check that the direct generation of the sparsity pattern and that
-// via the CompressedSetSparsityPattern result in the same
+// via the DynamicSparsityPattern result in the same
 
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/compressed_set_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -75,9 +75,9 @@ check_boundary (const DoFHandler<dim> &dof)
                                             sparsity_1);
   sparsity_1.compress ();
 
-  // second way: via a CompressedSetSparsityPattern
+  // second way: via a DynamicSparsityPattern
   SparsityPattern sparsity_2;
-  CompressedSetSparsityPattern csp(dof.n_boundary_dofs());
+  DynamicSparsityPattern csp(dof.n_boundary_dofs());
   DoFTools::make_boundary_sparsity_pattern (dof,
                                             dof_to_boundary_mapping,
                                             csp);
@@ -140,10 +140,9 @@ check ()
   constraints.condense (sparsity_1);
   sparsity_1.compress ();
 
-  // second way: via
-  // CompressedSetSparsityPattern
+  // second way: via Dynamic SparsityPattern
   SparsityPattern sparsity_2;
-  CompressedSetSparsityPattern csp_2 (dof.n_dofs());
+  DynamicSparsityPattern csp_2 (dof.n_dofs());
   DoFTools::make_sparsity_pattern (dof, mask, csp_2);
   constraints.condense (csp_2);
   sparsity_2.copy_from (csp_2);
@@ -178,7 +177,7 @@ check ()
   sparsity_3.compress ();
 
   BlockSparsityPattern sparsity_4;
-  BlockCompressedSetSparsityPattern csp_4(2,2);
+  BlockDynamicSparsityPattern csp_4(2,2);
   csp_4.block(0,0).reinit (n1,n1);
   csp_4.block(1,0).reinit (n2,n1);
   csp_4.block(0,1).reinit (n1,n2);

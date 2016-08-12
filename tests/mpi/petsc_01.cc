@@ -22,7 +22,7 @@
 
 #include "../tests.h"
 
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 #include <deal.II/base/logstream.h>
@@ -40,7 +40,7 @@ void test()
   if (myid==0)
     deallog << "Running on " << numprocs << " CPU(s)." << std::endl;
 
-  CompressedSimpleSparsityPattern csp(2*numprocs);
+  DynamicSparsityPattern csp(2*numprocs);
   for (unsigned int i=0; i<numprocs*2; ++i)
     csp.add(i,i);
   csp.add(1,0);

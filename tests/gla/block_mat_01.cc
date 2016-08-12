@@ -60,7 +60,7 @@ void test ()
   partitioning.push_back(block2);
 
   //LA::MPI::CompressedBlockSparsityPattern sp(partitioning);
-  BlockCompressedSimpleSparsityPattern sp(partitioning);
+  BlockDynamicSparsityPattern sp(partitioning);
   for (unsigned int i=0; i<15; ++i)
     {
       sp.add(i,i);

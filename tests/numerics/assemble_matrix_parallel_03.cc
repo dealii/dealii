@@ -264,7 +264,7 @@ void LaplaceProblem<dim>::setup_system ()
                                              (std_cxx11::bind(&LaplaceProblem<dim>::get_conflict_indices, this,std_cxx11::_1)));
 
 
-  BlockCompressedSimpleSparsityPattern csp (2, 2);
+  BlockDynamicSparsityPattern csp (2, 2);
   for (unsigned int i=0; i<2; ++i)
     for (unsigned int j=0; j<2; ++j)
       csp.block(i,j).reinit(i==0 ? 30 : dof_handler.n_dofs() - 30,

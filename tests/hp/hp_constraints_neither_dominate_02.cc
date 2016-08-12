@@ -45,7 +45,7 @@
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/lac/sparsity_tools.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/hp/fe_values.h>
 
 #include <deal.II/lac/petsc_parallel_vector.h>

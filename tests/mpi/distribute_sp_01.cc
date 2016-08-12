@@ -23,7 +23,7 @@
 
 #include <deal.II/base/index_set.h>
 #include <deal.II/lac/sparsity_tools.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <fstream>
 
@@ -52,7 +52,7 @@ void test_mpi()
   if (myid<numprocs-1)
     locally_rel.add_range((myid+1)*num_local, (myid+2)*num_local);
 
-  CompressedSimpleSparsityPattern csp(n,n, locally_rel);
+  DynamicSparsityPattern csp(n,n, locally_rel);
 
   for (unsigned int i=0; i<n; ++i)
     csp.add(i, myid);

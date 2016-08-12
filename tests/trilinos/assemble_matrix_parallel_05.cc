@@ -17,7 +17,7 @@
 
 // tests thread safety of parallel Trilinos matrices. Same test as
 // parallel_matrix_assemble_02 but initializing the matrix from
-// CompressedSimpleSparsityPattern instead of a Trilinos sparsity pattern.
+// DynamicSparsityPattern instead of a Trilinos sparsity pattern.
 
 #include "../tests.h"
 
@@ -32,7 +32,7 @@
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -48,7 +48,7 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/error_estimator.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <fstream>
 #include <iostream>
@@ -267,8 +267,8 @@ void LaplaceProblem<dim>::setup_system ()
   {
     IndexSet relevant_set;
     DoFTools::extract_locally_relevant_dofs (dof_handler, relevant_set);
-    CompressedSimpleSparsityPattern csp(dof_handler.n_dofs(), dof_handler.n_dofs(),
-                                        relevant_set);
+    DynamicSparsityPattern csp(dof_handler.n_dofs(), dof_handler.n_dofs(),
+                               relevant_set);
     DoFTools::make_sparsity_pattern (dof_handler, csp,
                                      constraints, false);
     test_matrix.reinit (locally_owned, csp, MPI_COMM_WORLD, true);

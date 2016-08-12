@@ -20,9 +20,6 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
-#include <deal.II/lac/compressed_set_sparsity_pattern.h>
 #include <deal.II/lac/chunk_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
 #include "testmatrix.h"
@@ -55,7 +52,7 @@ void do_reinit (ChunkSparsityPattern &sp)
 
 
 
-void do_reinit (CompressedSimpleSparsityPattern &sp,
+void do_reinit (DynamicSparsityPattern &sp,
                 const IndexSet &index_set = IndexSet())
 {
   sp.reinit((N-1)*(N-1), (N-1)*(N-1), index_set);

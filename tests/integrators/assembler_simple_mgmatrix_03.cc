@@ -84,7 +84,7 @@ void test(FiniteElement<dim> &fe)
 
   for (unsigned int level=0; level<tr.n_levels(); ++level)
     {
-      CompressedSparsityPattern csp(dof.n_dofs(level),dof.n_dofs(level));
+      DynamicSparsityPattern csp(dof.n_dofs(level),dof.n_dofs(level));
       MGTools::make_flux_sparsity_pattern(dof, csp, level);
       sparsity[level].copy_from(csp);
       matrix[level].reinit(sparsity[level]);

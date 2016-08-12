@@ -425,7 +425,7 @@ int main()
     const unsigned int rc=10;
     BlockSparsityPattern sparsity_pattern;
     {
-      BlockCompressedSimpleSparsityPattern csp(blks, blks);
+      BlockDynamicSparsityPattern csp(blks, blks);
       for (unsigned int bi=0; bi<blks; ++bi)
         for (unsigned int bj=0; bj<blks; ++bj)
           csp.block(bi,bj).reinit(rc,rc);

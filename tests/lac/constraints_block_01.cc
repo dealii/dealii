@@ -34,7 +34,7 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/sparse_direct.h>
 #include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/constraint_matrix.h>
 
@@ -157,7 +157,7 @@ int main ()
 
   BlockSparsityPattern   block_sparsity_pattern;
   {
-    BlockCompressedSimpleSparsityPattern  csp(3,3);
+    BlockDynamicSparsityPattern  csp(3,3);
     csp.block(0,0).reinit (dofs_per_block[0],dofs_per_block[0]);//solid-solid
     csp.block(0,1).reinit (dofs_per_block[0],dofs_per_block[1]);//solid-fluid
     csp.block(0,2).reinit (dofs_per_block[0],dofs_per_block[2]);//solid-mesh

@@ -74,7 +74,7 @@ void test ()
   IndexSet relevant;
   DoFTools::extract_locally_relevant_dofs (dof_handler, relevant);
 
-  CompressedSimpleSparsityPattern sp (relevant);
+  DynamicSparsityPattern sp (relevant);
   typename LA::MPI::SparseMatrix matrix;
   DoFTools::make_sparsity_pattern (dof_handler, sp,
                                    cm, false,

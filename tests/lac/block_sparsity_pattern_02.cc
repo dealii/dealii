@@ -45,7 +45,7 @@ int main()
   col_blocks[1] = 3;
   col_blocks[2] = 2;
 
-  BlockCompressedSparsityPattern bcsp (row_blocks, col_blocks);
+  BlockDynamicSparsityPattern bcsp (row_blocks, col_blocks);
 
   BlockSparsityPattern bsp;
 
