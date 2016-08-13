@@ -1737,7 +1737,6 @@ next_cell:
                         // Store the information that will be sent to the adjacent cells
                         // on other subdomains
                         adjacent_cell = vertex_to_cell[cell->vertex_index(i)].begin();
-                        std::vector<types::subdomain_id> subdomain_ids;
                         for (; adjacent_cell!=end_adj_cell; ++adjacent_cell)
                           if ((*adjacent_cell)->subdomain_id()!=cell->subdomain_id())
                             {

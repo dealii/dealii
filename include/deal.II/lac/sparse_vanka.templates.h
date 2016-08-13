@@ -532,7 +532,6 @@ SparseBlockVanka<number>::compute_dof_masks (const SparseMatrix<number> &M,
       // be used to store the
       // indices each Lagrange dof
       // accesses
-      std::map<size_type, size_type> local_index;
       const SparsityPattern &structure = M.get_sparsity_pattern();
 
       for (size_type row=0; row<M.m(); ++row)

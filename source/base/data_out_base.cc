@@ -5535,8 +5535,6 @@ namespace DataOutBase
     for (; patch != patches.end(); ++patch)
       {
         n_subdivisions = patch->n_subdivisions;
-        n = n_subdivisions + 1;
-
         for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
           {
             for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
@@ -5606,7 +5604,6 @@ namespace DataOutBase
     for (patch = patches.begin(); patch != patches.end(); ++patch)
       {
         n_subdivisions = patch->n_subdivisions;
-        n = n_subdivisions + 1;
 
         for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
           {

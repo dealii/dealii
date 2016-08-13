@@ -191,11 +191,6 @@ void PointValueHistory<dim>
   // points locations are dofs locations
   AssertThrow (dof_handler->get_fe ().has_support_points (), ExcNotImplemented ());
 
-  // FEValues object to extract quadrature
-  // points from
-  std::vector <Point <dim> >
-  unit_support_points = dof_handler->get_fe ().get_unit_support_points ();
-
   // While in general quadrature points seems
   // to refer to Gauss quadrature points, in
   // this case the quadrature points are
@@ -341,10 +336,6 @@ void PointValueHistory<dim>
   // Implementation assumes that support
   // points locations are dofs locations
   AssertThrow (dof_handler->get_fe ().has_support_points (), ExcNotImplemented ());
-
-  // FEValues object to extract quadrature
-  // points from
-  std::vector <Point <dim> > unit_support_points = dof_handler->get_fe ().get_unit_support_points ();
 
   // While in general quadrature points seems
   // to refer to Gauss quadrature points, in

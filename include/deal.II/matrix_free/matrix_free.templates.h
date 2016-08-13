@@ -473,10 +473,8 @@ void MatrixFree<dim,Number>::initialize_indices
   AssertDimension (n_fe, constraint.size());
 
   std::vector<types::global_dof_index> local_dof_indices;
-  std::vector<std::vector<std::vector<unsigned int> > > lexicographic_inv(n_fe);
 
   internal::MatrixFreeFunctions::ConstraintValues<double> constraint_values;
-  std::vector<unsigned int> constraint_indices;
 
   for (unsigned int no=0; no<n_fe; ++no)
     {
