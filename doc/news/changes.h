@@ -39,12 +39,19 @@ inconvenience this causes.
 
 <ol>
 
-<li> Deprecated: MGLevelObject::clear() deprectated in favor of
-MGLevelObject::clear_elements() due to clear() being inconsistent with behavior
-of other container objects.
-<br>
-(Jonathan Robey, 2016/08/08)
-</li>
+ <li> Removed: deprecated classes CompressedSparsityPattern,
+ CompressedSimpleSparsityPattern, CompressedSetSparsityPattern, and their
+ block variants got removed.
+ <br>
+ (Timo Heister, 2016/08/13)
+ </li>
+
+ <li> Deprecated: MGLevelObject::clear() deprecated in favor of
+ MGLevelObject::clear_elements() due to clear() being inconsistent with
+ behavior of other container objects.
+ <br>
+ (Jonathan Robey, 2016/08/08)
+ </li>
 
  <li> Changed: Several operators from LocalIntegrators::Divergence got moved
  to LocalIntegrators::GradDiv and the never used/tested
@@ -53,23 +60,21 @@ of other container objects.
  (Timo Heister, Guido Kanschat, 2016/08/02)
  </li>
 
-<li> Changed: DoFTools::make_cell_patches() only accepts block lists
-of type SparsityPattern. The reason is that it has to initialize the
-size of the pattern on distributed triangulations by computing the
-number of locally owned cells. Initialization differs between sparsity
-pattern classes, so no generic function would be possible. On the
-other hand, the block list is an object, which only extends over
-locally owned grid cells and its size can be determined efficiently
-upon initialization. Therefore, SparsityPattern is a good choice here.
+ <li> Changed: DoFTools::make_cell_patches() only accepts block lists of type
+ SparsityPattern. The reason is that it has to initialize the size of the
+ pattern on distributed triangulations by computing the number of locally
+ owned cells. Initialization differs between sparsity pattern classes, so no
+ generic function would be possible. On the other hand, the block list is an
+ object, which only extends over locally owned grid cells and its size can be
+ determined efficiently upon initialization. Therefore, SparsityPattern is a
+ good choice here.
+ <br>
+ At the same time, we changed the dof handler template to the type DoFHandler,
+ since hp::DoFHandler requires a different setup of the SparsityPattern.
+ <br>
+ (Guido Kanschat, 2016/08/02)
+ </li>
 
-At the same time, we changed the dof handler template to the type
-DoFHandler, since hp::DoFHandler requires a different setup of the
-SparsityPattern.
-<br>
-(Guido Kanschat, 2016/08/02)
-</li>
-
-</li>
  <li> Changed: The conversion constructors of class Vector from the
  PETScWrappers::Vector, PETScWrappers::MPI::Vector,
  TrilinosWrappers::Vector, and TrilinosWrappers::MPI::Vector classes
