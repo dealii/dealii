@@ -190,10 +190,7 @@ namespace VectorTools
                ExcInternalError());
       }
 
-    const unsigned int max_rep_points = *std::max_element (n_rep_points.begin(),
-                                                           n_rep_points.end());
     std::vector<types::global_dof_index> dofs_on_cell (fe.max_dofs_per_cell());
-    std::vector<Point<spacedim> >  rep_points (max_rep_points);
 
     // get space for the values of the
     // function at the rep support points.

@@ -468,7 +468,6 @@ namespace Patterns
 
   bool Selection::match (const std::string &test_string) const
   {
-    std::vector<std::string> choices;
     std::string tmp(sequence);
     // check the different possibilities
     while (tmp.find('|') != std::string::npos)
@@ -2020,8 +2019,6 @@ ParameterHandler::declare_alias(const std::string &existing_entry_name,
 
 void ParameterHandler::enter_subsection (const std::string &subsection)
 {
-  const std::string current_path = get_current_path ();
-
   // if necessary create subsection
   if (!entries->get_child_optional (get_current_full_path(subsection)))
     entries->add_child (get_current_full_path(subsection),
@@ -2612,8 +2609,6 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
            p != current_section.not_found(); ++p)
         if (is_parameter_node (p->second) == true)
           {
-            const std::string value = p->second.get<std::string>("value");
-
             // print name and value
             out << std::setw(overall_indent_level*2) << ""
                 << "set "
