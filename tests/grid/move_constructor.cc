@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2015 by the deal.II authors
+// Copyright (C) 2003 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -87,8 +87,7 @@ void test_periodic_cube()
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria, -1.0, 1.0, true);
 
-  using periodic_face_pair =
-    GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>;
+  typedef GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator> periodic_face_pair;
   std::vector<periodic_face_pair> periodicity_vector;
   GridTools::collect_periodic_faces(tria, 0, 1, 0, periodicity_vector);
   tria.add_periodicity(periodicity_vector);
