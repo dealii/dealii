@@ -377,7 +377,7 @@ FESeries::process_coefficients(const Table<dim,T> &coefficients,
 
   // now go through the map and populate the @p norm_values based on @p norm:
   for (typename std::map<unsigned int, std::vector<T> >::const_iterator it = pred_to_values.begin();
-       it != pred_to_values.end(); it++)
+       it != pred_to_values.end(); ++it)
     {
       predicate_values.push_back(it->first);
       Vector<T> values(it->second.begin(),

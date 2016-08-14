@@ -639,7 +639,7 @@ namespace SparsityTools
                 {
                   Assert(ptr!=end, ExcInternalError());
                   dsp.add(row, *ptr);
-                  ptr++;
+                  ++ptr;
                 }
             }
           Assert(ptr==end, ExcInternalError());
@@ -761,7 +761,7 @@ namespace SparsityTools
                 {
                   Assert(ptr!=end, ExcInternalError());
                   dsp.add(row, *ptr);
-                  ptr++;
+                  ++ptr;
                 }
             }
           Assert(ptr==end, ExcInternalError());
