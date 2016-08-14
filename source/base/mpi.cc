@@ -247,6 +247,7 @@ namespace Utilities
       AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
 
       ierr = MPI_Type_commit(&type);
+      AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
       ierr = MPI_Allreduce (&in, &result, 1, type, op, mpi_communicator);
       AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
 
