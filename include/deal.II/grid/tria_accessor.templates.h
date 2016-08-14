@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2015 by the deal.II authors
+// Copyright (C) 1999 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -381,7 +381,7 @@ TriaAccessorBase<structdim,dim,spacedim>::objects() const
     // get sub-objects. note that the
     // current class is only used for
     // objects that are *not* cells
-    return *dealii::internal::TriaAccessorBase::get_objects (this->tria->faces,
+    return *dealii::internal::TriaAccessorBase::get_objects (this->tria->faces.get(),
                                                              dealii::internal::int2type<structdim> ());
   else
     return *dealii::internal::TriaAccessorBase::get_objects (&this->tria->levels[this->present_level]->cells,

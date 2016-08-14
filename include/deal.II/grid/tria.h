@@ -24,6 +24,7 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/iterator_range.h>
 #include <deal.II/base/std_cxx11/function.h>
+#include <deal.II/base/std_cxx11/unique_ptr.h>
 #include <deal.II/grid/tria_iterator_selector.h>
 
 // Ignore deprecation warnings for auto_ptr.
@@ -31,6 +32,11 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/signals2.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/map.hpp>
+#ifdef DEAL_II_WITH_CXX11
+#  include <boost/serialization/unique_ptr.hpp>
+#else
+#  include <boost/serialization/scoped_ptr.hpp>
+#endif
 #include <boost/serialization/split_member.hpp>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
@@ -3342,7 +3348,7 @@ private:
    * in 2D it contains data concerning lines and in 3D quads and lines.  All
    * of these have no level and are therefore treated separately.
    */
-  dealii::internal::Triangulation::TriaFaces<dim> *faces;
+  std_cxx11::unique_ptr<dealii::internal::Triangulation::TriaFaces<dim> > faces;
 
 
   /**
@@ -3399,7 +3405,7 @@ private:
    * this field (that can be modified by TriaAccessor::set_boundary_id) were
    * not a pointer.
    */
-  std::map<unsigned int, types::boundary_id> *vertex_to_boundary_id_map_1d;
+  std_cxx11::unique_ptr<std::map<unsigned int, types::boundary_id> > vertex_to_boundary_id_map_1d;
 
 
   /**
@@ -3421,7 +3427,7 @@ private:
    * this field (that can be modified by TriaAccessor::set_boundary_id) were
    * not a pointer.
    */
-  std::map<unsigned int, types::manifold_id> *vertex_to_manifold_id_map_1d;
+  std_cxx11::unique_ptr<std::map<unsigned int, types::manifold_id> > vertex_to_manifold_id_map_1d;
 
   // make a couple of classes friends
   template <int,int,int> friend class TriaAccessorBase;
