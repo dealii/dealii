@@ -322,6 +322,7 @@ namespace PETScWrappers
         PetscInt begin, end;
 
         ierr = VecGetOwnershipRange (vector, &begin, &end);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
 
         Assert(local_size==(size_type)(end-begin), ExcInternalError());
 

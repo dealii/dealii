@@ -192,6 +192,7 @@ namespace PETScWrappers
     // dealii::PETScWrappers::*::Vector:
     const char  *vec_type;
     int ierr = VecGetType (src, &vec_type);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     PetscInt  local_size;
     ierr = VecGetLocalSize (src, &local_size);
