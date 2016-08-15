@@ -890,7 +890,8 @@ void PointValueHistory<dim>
 
 template <int dim>
 void PointValueHistory<dim>
-::write_gnuplot (const std::string &base_name, const std::vector <Point <dim> > postprocessor_locations)
+::write_gnuplot (const std::string &base_name,
+                 const std::vector <Point <dim> > &postprocessor_locations)
 {
   AssertThrow (closed, ExcInvalidState ());
   AssertThrow (!cleared, ExcInvalidState ());

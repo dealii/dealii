@@ -105,7 +105,7 @@ namespace LocalIntegrators
     void weighted_mass_matrix (
       FullMatrix<double> &M,
       const FEValuesBase<dim> &fe,
-      const std::vector<double> weights)
+      const std::vector<double> &weights)
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
       const unsigned int n_components = fe.get_fe().n_components();
