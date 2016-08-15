@@ -16,7 +16,7 @@
 // test the PETSc Chebychev solver
 
 #include "../tests.h"
-#include "../lac/testmatrix.h"
+#include "../testmatrix.h"
 
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/petsc_vector.h>
