@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2015 by the deal.II authors
+// Copyright (C) 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -95,12 +95,7 @@ int main (int argc, char **argv)
 
   test<PETScWrappers::PreconditionJacobi> ();
   test<PETScWrappers::PreconditionBlockJacobi> ();
-  //test<PETScWrappers::PreconditionSOR> ();
-  //test<PETScWrappers::PreconditionSSOR> ();
   test<PETScWrappers::PreconditionEisenstat> ();
-  //test<PETScWrappers::PreconditionICC> ();
-  //test<PETScWrappers::PreconditionILU> ();
-  //test<PETScWrappers::PreconditionLU> ();
   test<PETScWrappers::PreconditionBoomerAMG> ();
   test<PETScWrappers::PreconditionParaSails> ();
   test<PETScWrappers::PreconditionNone> ();

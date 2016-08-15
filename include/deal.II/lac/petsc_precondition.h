@@ -380,7 +380,8 @@ namespace PETScWrappers
 
   /**
    * A class that implements the interface to use the PETSc Eisenstat
-   * preconditioner, which implements SSOR on each processor.
+   * preconditioner, which implements SSOR on the diagonal block owned by
+   * each processor.
    *
    * See the comment in the base class
    * @ref PreconditionerBase
