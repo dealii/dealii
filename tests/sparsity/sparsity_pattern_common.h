@@ -22,7 +22,7 @@
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/chunk_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
-#include "testmatrix.h"
+#include "../testmatrix.h"
 #include <fstream>
 #include <sstream>
 #include <iomanip>

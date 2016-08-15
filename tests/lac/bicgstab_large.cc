@@ -21,7 +21,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iomanip>
-#include "testmatrix.h"
+#include "../testmatrix.h"
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/solver_bicgstab.h>

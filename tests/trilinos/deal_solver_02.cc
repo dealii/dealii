@@ -20,7 +20,7 @@
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
-#include "../lac/testmatrix.h"
+#include "../testmatrix.h"
 #include <cmath>
 #include <fstream>
 #include <iostream>
