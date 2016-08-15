@@ -661,6 +661,7 @@ namespace TrilinosWrappers
     {
       *this = Vector(parallel_partitioner.make_trilinos_map (communicator, true),
                      v);
+      owned_elements = parallel_partitioner;
     }
 
 
@@ -671,9 +672,7 @@ namespace TrilinosWrappers
                          const dealii::Vector<number> &v)
     {
       if (vector.get() == 0 || vector->Map().SameAs(parallel_partitioner) == false)
-        vector.reset (new Epetra_FEVector(parallel_partitioner));
-
-      has_ghosts = vector->Map().UniqueGIDs()==false;
+        reinit(parallel_partitioner);
 
       const int size = parallel_partitioner.NumMyElements();
 
@@ -681,6 +680,7 @@ namespace TrilinosWrappers
       // that a direct access is not possible.
       for (int i=0; i<size; ++i)
         (*vector)[0][i] = v(gid(parallel_partitioner,i));
+
     }
 
 
@@ -966,6 +966,7 @@ namespace TrilinosWrappers
         Epetra_LocalMap map ((TrilinosWrappers::types::int_type)v.size(), 0,
                              Utilities::Trilinos::comm_self());
         vector.reset (new Epetra_FEVector(map));
+        owned_elements = v.locally_owned_elements();
       }
 
     const Epetra_Map &map = vector_partitioner();
