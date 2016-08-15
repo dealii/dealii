@@ -81,8 +81,11 @@ public:
   typedef const VectorType const_vector_type;
 
   /**
-   * Constructor. The DoFHandler is used to determine the highest possible
-   * level. <tt>transfer</tt> is an object performing prolongation and
+   * Constructor. The DoFHandler is used to check whether the provided
+   * minlevel and maxlevel are in the range of valid levels.
+   * If maxlevel is set to the default value, the highest valid
+   * level is used.
+   * <tt>transfer</tt> is an object performing prolongation and
    * restriction.
    *
    * This function already initializes the vectors which will be used later in
@@ -96,11 +99,12 @@ public:
             const MGTransferBase<VectorType>   &transfer,
             const MGSmootherBase<VectorType>   &pre_smooth,
             const MGSmootherBase<VectorType>   &post_smooth,
-            Cycle                              cycle = v_cycle);
+            Cycle                              cycle = v_cycle,
+            const unsigned int                 minlevel = 0,
+            const unsigned int                 maxlevel = numbers::invalid_unsigned_int);
 
   /**
-   * Constructor. Same as above but you can determine the multigrid
-   * levels to use yourself.
+   * Constructor. Same as above but without checking validity of minlevel and maxlevel.
    */
   Multigrid(const unsigned int                 minlevel,
             const unsigned int                 maxlevel,
@@ -422,21 +426,18 @@ private:
 
 template <typename VectorType>
 template <int dim>
-Multigrid<VectorType>::Multigrid (const DoFHandler<dim>          &mg_dof_handler,
+Multigrid<VectorType>::Multigrid (const DoFHandler<dim>              &mg_dof_handler,
                                   const MGMatrixBase<VectorType>     &matrix,
                                   const MGCoarseGridBase<VectorType> &coarse,
                                   const MGTransferBase<VectorType>   &transfer,
                                   const MGSmootherBase<VectorType>   &pre_smooth,
                                   const MGSmootherBase<VectorType>   &post_smooth,
-                                  Cycle                              cycle)
+                                  Cycle                              cycle,
+                                  const unsigned int                 min_level,
+                                  const unsigned int                 max_level)
   :
   cycle_type(cycle),
-  minlevel(0),
-  maxlevel(mg_dof_handler.get_triangulation().n_global_levels()-1),
-  defect(minlevel,maxlevel),
-  solution(minlevel,maxlevel),
-  t(minlevel,maxlevel),
-  defect2(minlevel,maxlevel),
+  minlevel(min_level),
   matrix(&matrix, typeid(*this).name()),
   coarse(&coarse, typeid(*this).name()),
   transfer(&transfer, typeid(*this).name()),
@@ -445,7 +446,24 @@ Multigrid<VectorType>::Multigrid (const DoFHandler<dim>          &mg_dof_handler
   edge_down(0, typeid(*this).name()),
   edge_up(0, typeid(*this).name()),
   debug(0)
-{}
+{
+  const unsigned int dof_handler_max_level
+    = mg_dof_handler.get_triangulation().n_global_levels()-1;
+  if (max_level == numbers::invalid_unsigned_int)
+    maxlevel = dof_handler_max_level;
+  else
+    maxlevel = max_level;
+
+  Assert (maxlevel <= dof_handler_max_level,
+          ExcLowerRangeType<unsigned int>(dof_handler_max_level, max_level));
+  Assert (minlevel <= maxlevel,
+          ExcLowerRangeType<unsigned int>(max_level, min_level));
+
+  defect.resize(minlevel,maxlevel);
+  solution.resize(minlevel,maxlevel);
+  t.resize(minlevel,maxlevel);
+  defect2.resize(minlevel,maxlevel);
+}
 
 
 

@@ -384,13 +384,15 @@ void LaplaceProblem<dim>::solve ()
   mg::Matrix<> mg_interface_up(mg_interface_matrices);
   mg::Matrix<> mg_interface_down(mg_interface_matrices);
 
-  Multigrid<Vector<double> > mg(min_level,
-                                triangulation.n_global_levels()-1,
+  Multigrid<Vector<double> > mg(mg_dof_handler,
                                 mg_matrix,
                                 coarse_grid_solver,
                                 mg_transfer,
                                 mg_smoother,
-                                mg_smoother);
+                                mg_smoother,
+                                Multigrid<Vector<double> >::v_cycle,
+                                min_level,
+                                triangulation.n_global_levels()-1);
   mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
   PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double> > >
