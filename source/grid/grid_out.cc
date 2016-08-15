@@ -3552,17 +3552,17 @@ namespace internal
     {
       typedef std::list<LineEntry> LineList;
 
-      // get a pointer to the flags
-      // common to all dimensions, in
-      // order to avoid the recurring
-      // distinctions between
-      // eps_flags_1, eps_flags_2, ...
-      const GridOutFlags::EpsFlagsBase
-      &eps_flags_base = (dim==2 ?
-                         static_cast<const GridOutFlags::EpsFlagsBase &>(eps_flags_2) :
-                         (dim==3 ?
-                          static_cast<const GridOutFlags::EpsFlagsBase &>(eps_flags_3) :
-                          *static_cast<const GridOutFlags::EpsFlagsBase *>(0)));
+      // We should never get here in 1D since this function is overloaded for
+      // all dim == 1 cases.
+      Assert(dim == 2 || dim == 3, ExcInternalError());
+
+      // Copy, with an object slice, something containing the flags common to
+      // all dimensions in order to avoid the recurring distinctions between
+      // the different eps_flags present.
+      const GridOutFlags::EpsFlagsBase eps_flags_base =
+        dim == 2 ?
+        static_cast<const GridOutFlags::EpsFlagsBase &>(eps_flags_2) :
+        static_cast<const GridOutFlags::EpsFlagsBase &>(eps_flags_3);
 
       AssertThrow (out, ExcIO());
       const unsigned int n_points = eps_flags_base.n_boundary_face_points;
