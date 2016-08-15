@@ -16,7 +16,7 @@
 // test the PETSc LSQR solver
 
 #include "../tests.h"
-#include "../lac/testmatrix.h"
+#include "../testmatrix.h"
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>

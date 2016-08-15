@@ -19,7 +19,7 @@
 // Note: This is (almost) a clone of the tests/petsc/solver_02.cc
 
 #include "../tests.h"
-#include "../lac/testmatrix.h"
+#include "../testmatrix.h"
 
 #include <deal.II/lac/petsc_precondition.h>
 #include <deal.II/lac/petsc_solver.h>

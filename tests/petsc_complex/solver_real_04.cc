@@ -19,7 +19,7 @@
 // Note: This is (almost) a clone of the tests/petsc/solver_03.cc
 
 #include "../tests.h"
-#include "../lac/testmatrix.h"
+#include "../testmatrix.h"
 #include <cmath>
 #include <fstream>
 #include <iostream>
