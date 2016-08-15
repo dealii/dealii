@@ -390,9 +390,9 @@ void LaplaceProblem<dim>::solve ()
                                 mg_transfer,
                                 mg_smoother,
                                 mg_smoother,
-                                Multigrid<Vector<double> >::v_cycle,
                                 min_level,
-                                triangulation.n_global_levels()-1);
+                                triangulation.n_global_levels()-1,
+                                Multigrid<Vector<double> >::v_cycle);
   mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
   PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double> > >

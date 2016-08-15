@@ -91,6 +91,9 @@ public:
    * This function already initializes the vectors which will be used later in
    * the course of the computations. You should therefore create objects of
    * this type as late as possible.
+   *
+   * @deprecated Use the other constructor instead.
+   * The DoFHandler is actually not needed.
    */
   template <int dim>
   Multigrid(const DoFHandler<dim>              &mg_dof_handler,
@@ -99,20 +102,26 @@ public:
             const MGTransferBase<VectorType>   &transfer,
             const MGSmootherBase<VectorType>   &pre_smooth,
             const MGSmootherBase<VectorType>   &post_smooth,
-            Cycle                              cycle = v_cycle,
             const unsigned int                 minlevel = 0,
-            const unsigned int                 maxlevel = numbers::invalid_unsigned_int);
+            const unsigned int                 maxlevel = numbers::invalid_unsigned_int,
+            Cycle                              cycle = v_cycle) DEAL_II_DEPRECATED;
 
   /**
-   * Constructor. Same as above but without checking validity of minlevel and maxlevel.
+   * Constructor. <tt>transfer</tt> is an object performing prolongation and
+   * restriction. For levels in [minlevel, maxlevel] matrix has to contain
+   * valid matrices. By default the maxlevel is set to the maximal valid level.
+   *
+   * This function already initializes the vectors which will be used later in
+   * the course of the computations. You should therefore create objects of
+   * this type as late as possible.
    */
-  Multigrid(const unsigned int                 minlevel,
-            const unsigned int                 maxlevel,
-            const MGMatrixBase<VectorType>     &matrix,
+  Multigrid(const MGMatrixBase<VectorType>     &matrix,
             const MGCoarseGridBase<VectorType> &coarse,
             const MGTransferBase<VectorType>   &transfer,
             const MGSmootherBase<VectorType>   &pre_smooth,
             const MGSmootherBase<VectorType>   &post_smooth,
+            const unsigned int                 minlevel = 0,
+            const unsigned int                 maxlevel = numbers::invalid_unsigned_int,
             Cycle                              cycle = v_cycle);
 
   /**
@@ -432,9 +441,9 @@ Multigrid<VectorType>::Multigrid (const DoFHandler<dim>              &mg_dof_han
                                   const MGTransferBase<VectorType>   &transfer,
                                   const MGSmootherBase<VectorType>   &pre_smooth,
                                   const MGSmootherBase<VectorType>   &post_smooth,
-                                  Cycle                              cycle,
                                   const unsigned int                 min_level,
-                                  const unsigned int                 max_level)
+                                  const unsigned int                 max_level,
+                                  Cycle                              cycle)
   :
   cycle_type(cycle),
   minlevel(min_level),
@@ -454,15 +463,38 @@ Multigrid<VectorType>::Multigrid (const DoFHandler<dim>              &mg_dof_han
   else
     maxlevel = max_level;
 
-  Assert (maxlevel <= dof_handler_max_level,
-          ExcLowerRangeType<unsigned int>(dof_handler_max_level, max_level));
-  Assert (minlevel <= maxlevel,
-          ExcLowerRangeType<unsigned int>(max_level, min_level));
+  reinit(minlevel, maxlevel);
+}
 
-  defect.resize(minlevel,maxlevel);
-  solution.resize(minlevel,maxlevel);
-  t.resize(minlevel,maxlevel);
-  defect2.resize(minlevel,maxlevel);
+
+
+template <typename VectorType>
+Multigrid<VectorType>::Multigrid (const MGMatrixBase<VectorType>        &matrix,
+                                  const MGCoarseGridBase<VectorType>    &coarse,
+                                  const MGTransferBase<VectorType>      &transfer,
+                                  const MGSmootherBase<VectorType>      &pre_smooth,
+                                  const MGSmootherBase<VectorType>      &post_smooth,
+                                  const unsigned int                    min_level,
+                                  const unsigned int                    max_level,
+                                  Cycle                                 cycle)
+  :
+  cycle_type(cycle),
+  matrix(&matrix, typeid(*this).name()),
+  coarse(&coarse, typeid(*this).name()),
+  transfer(&transfer, typeid(*this).name()),
+  pre_smooth(&pre_smooth, typeid(*this).name()),
+  post_smooth(&post_smooth, typeid(*this).name()),
+  edge_out(0, typeid(*this).name()),
+  edge_in(0, typeid(*this).name()),
+  edge_down(0, typeid(*this).name()),
+  edge_up(0, typeid(*this).name()),
+  debug(0)
+{
+  if (max_level == numbers::invalid_unsigned_int)
+    maxlevel = matrix.get_maxlevel();
+  else
+    maxlevel = max_level;
+  reinit(min_level, maxlevel);
 }
 
 

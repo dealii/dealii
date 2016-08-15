@@ -72,6 +72,8 @@ namespace mg
     virtual void vmult_add (const unsigned int level, VectorType &dst, const VectorType &src) const;
     virtual void Tvmult (const unsigned int level, VectorType &dst, const VectorType &src) const;
     virtual void Tvmult_add (const unsigned int level, VectorType &dst, const VectorType &src) const;
+    virtual unsigned int get_minlevel() const;
+    virtual unsigned int get_maxlevel() const;
 
     /**
      * Memory used by this object.
@@ -181,6 +183,7 @@ namespace mg
   }
 
 
+
   template <typename VectorType>
   template <typename MatrixType>
   inline
@@ -190,10 +193,12 @@ namespace mg
   }
 
 
+
   template <typename VectorType>
   inline
   Matrix<VectorType>::Matrix ()
   {}
+
 
 
   template <typename VectorType>
@@ -203,6 +208,7 @@ namespace mg
   {
     return *matrices[level];
   }
+
 
 
   template <typename VectorType>
@@ -215,6 +221,7 @@ namespace mg
   }
 
 
+
   template <typename VectorType>
   void
   Matrix<VectorType>::vmult_add (const unsigned int level,
@@ -223,6 +230,7 @@ namespace mg
   {
     matrices[level]->vmult_add(dst, src);
   }
+
 
 
   template <typename VectorType>
@@ -235,6 +243,7 @@ namespace mg
   }
 
 
+
   template <typename VectorType>
   void
   Matrix<VectorType>::Tvmult_add (const unsigned int level,
@@ -243,6 +252,25 @@ namespace mg
   {
     matrices[level]->Tvmult_add(dst, src);
   }
+
+
+
+  template <typename VectorType>
+  unsigned int
+  Matrix<VectorType>::get_minlevel() const
+  {
+    return matrices.min_level();
+  }
+
+
+
+  template <typename VectorType>
+  unsigned int
+  Matrix<VectorType>::get_maxlevel() const
+  {
+    return matrices.max_level();
+  }
+
 
 
   template <typename VectorType>
@@ -278,6 +306,7 @@ MGMatrixSelect<MatrixType, number>::set_matrix (MGLevelObject<MatrixType> *p)
 }
 
 
+
 template <typename MatrixType, typename number>
 void
 MGMatrixSelect<MatrixType, number>::
@@ -287,6 +316,7 @@ select_block (const unsigned int brow,
   row = brow;
   col = bcol;
 }
+
 
 
 template <typename MatrixType, typename number>
@@ -303,6 +333,7 @@ vmult  (const unsigned int    level,
 }
 
 
+
 template <typename MatrixType, typename number>
 void
 MGMatrixSelect<MatrixType, number>::
@@ -317,6 +348,7 @@ vmult_add  (const unsigned int    level,
 }
 
 
+
 template <typename MatrixType, typename number>
 void
 MGMatrixSelect<MatrixType, number>::
@@ -329,6 +361,7 @@ Tvmult  (const unsigned int    level,
   const MGLevelObject<MatrixType> &m = *matrix;
   m[level].block(row, col).Tvmult(dst, src);
 }
+
 
 
 template <typename MatrixType, typename number>

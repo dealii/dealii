@@ -79,6 +79,16 @@ public:
   virtual void Tvmult_add (const unsigned int level,
                            VectorType         &dst,
                            const VectorType   &src) const = 0;
+
+  /**
+   * Return the minimal level for which matrices are stored.
+   */
+  virtual unsigned int get_minlevel() const = 0;
+
+  /**
+   * Return the minimal level for which matrices are stored.
+   */
+  virtual unsigned int get_maxlevel() const = 0;
 };
 
 
