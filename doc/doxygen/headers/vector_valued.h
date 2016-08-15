@@ -458,7 +458,7 @@
                                     fe_values[velocities].divergence (j, q)) *
                                     fe_values.JxW(q);
 
-            local_rhs(i) += fe_values[pressure].value (i, q)
+            local_rhs(i) += - fe_values[pressure].value (i, q) *
                             rhs_values[q] *
                             fe_values.JxW(q);
           }
