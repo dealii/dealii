@@ -35,9 +35,16 @@ namespace PETScWrappers
     pc(NULL), matrix(NULL)
   {}
 
-
   PreconditionerBase::~PreconditionerBase ()
   {
+    clear();
+  }
+
+  void
+  PreconditionerBase::clear ()
+  {
+    matrix = NULL;
+
     if (pc!=NULL)
       {
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
@@ -45,6 +52,7 @@ namespace PETScWrappers
 #else
         int ierr = PCDestroy(&pc);
 #endif
+        pc = NULL;
         AssertThrow (ierr == 0, ExcPETScError(ierr));
       }
   }
@@ -128,6 +136,8 @@ namespace PETScWrappers
   void
   PreconditionJacobi::initialize()
   {
+    AssertThrow (pc != NULL, StandardExceptions::ExcInvalidState ());
+
     int ierr;
     ierr = PCSetType (pc, const_cast<char *>(PCJACOBI));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -140,6 +150,8 @@ namespace PETScWrappers
   PreconditionJacobi::initialize (const MatrixBase     &matrix_,
                                   const AdditionalData &additional_data_)
   {
+    clear ();
+
     matrix = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
 
@@ -191,6 +203,8 @@ namespace PETScWrappers
   PreconditionBlockJacobi::initialize (const MatrixBase     &matrix_,
                                        const AdditionalData &additional_data_)
   {
+    clear ();
+
     matrix = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
 
@@ -226,6 +240,8 @@ namespace PETScWrappers
   PreconditionSOR::initialize (const MatrixBase     &matrix_,
                                const AdditionalData &additional_data_)
   {
+    clear ();
+
     matrix = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
 
@@ -271,6 +287,8 @@ namespace PETScWrappers
   PreconditionSSOR::initialize (const MatrixBase     &matrix_,
                                 const AdditionalData &additional_data_)
   {
+    clear ();
+
     matrix = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
 
@@ -320,6 +338,8 @@ namespace PETScWrappers
   PreconditionEisenstat::initialize (const MatrixBase     &matrix_,
                                      const AdditionalData &additional_data_)
   {
+    clear ();
+
     matrix = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
 
@@ -366,6 +386,8 @@ namespace PETScWrappers
   PreconditionICC::initialize (const MatrixBase     &matrix_,
                                const AdditionalData &additional_data_)
   {
+    clear ();
+
     matrix = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
 
@@ -411,6 +433,8 @@ namespace PETScWrappers
   PreconditionILU::initialize (const MatrixBase     &matrix_,
                                const AdditionalData &additional_data_)
   {
+    clear ();
+
     matrix = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
 
@@ -531,10 +555,12 @@ namespace PETScWrappers
   PreconditionBoomerAMG::initialize (const MatrixBase     &matrix_,
                                      const AdditionalData &additional_data_)
   {
+#ifdef PETSC_HAVE_HYPRE
+    clear ();
+
     matrix = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
 
-#ifdef PETSC_HAVE_HYPRE
     create_pc();
     initialize ();
 
@@ -542,7 +568,8 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
 #else // PETSC_HAVE_HYPRE
-    (void)pc;
+    (void)matrix_;
+    (void)additional_data_;
     Assert (false,
             ExcMessage ("Your PETSc installation does not include a copy of "
                         "the hypre package necessary for this preconditioner."));
@@ -582,6 +609,8 @@ namespace PETScWrappers
   PreconditionParaSails::initialize (const MatrixBase     &matrix_,
                                      const AdditionalData &additional_data_)
   {
+    clear ();
+
     matrix = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
 
@@ -677,6 +706,8 @@ namespace PETScWrappers
   PreconditionNone::initialize (const MatrixBase     &matrix_,
                                 const AdditionalData &additional_data_)
   {
+    clear ();
+
     matrix = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
 
@@ -722,6 +753,8 @@ namespace PETScWrappers
   PreconditionLU::initialize (const MatrixBase     &matrix_,
                               const AdditionalData &additional_data_)
   {
+    clear ();
+
     matrix = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
 

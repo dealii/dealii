@@ -66,6 +66,12 @@ namespace PETScWrappers
     virtual ~PreconditionerBase ();
 
     /**
+     * Destroys the preconditioner, leaving an object like just after having
+     * called the constructor.
+     */
+    void clear ();
+
+    /**
      * Apply the preconditioner once to the given src vector.
      */
     void vmult (VectorBase       &dst,
@@ -256,9 +262,7 @@ namespace PETScWrappers
    * A class that implements the interface to use the PETSc SOR
    * preconditioner.
    *
-   * See the comment in the base class
-   * @ref PreconditionerBase
-   * for when this preconditioner may or may not work.
+   * @note Only works in serial with a PETScWrappers::SparseMatrix.
    *
    * @ingroup PETScWrappers
    * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
@@ -318,9 +322,7 @@ namespace PETScWrappers
    * A class that implements the interface to use the PETSc SSOR
    * preconditioner.
    *
-   * See the comment in the base class
-   * @ref PreconditionerBase
-   * for when this preconditioner may or may not work.
+   * @note Only works in serial with a PETScWrappers::SparseMatrix.
    *
    * @ingroup PETScWrappers
    * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
@@ -378,7 +380,8 @@ namespace PETScWrappers
 
   /**
    * A class that implements the interface to use the PETSc Eisenstat
-   * preconditioner.
+   * preconditioner, which implements SSOR on the diagonal block owned by
+   * each processor.
    *
    * See the comment in the base class
    * @ref PreconditionerBase
@@ -442,9 +445,7 @@ namespace PETScWrappers
    * A class that implements the interface to use the PETSc Incomplete
    * Cholesky preconditioner.
    *
-   * See the comment in the base class
-   * @ref PreconditionerBase
-   * for when this preconditioner may or may not work.
+   * @note Only works in serial with a PETScWrappers::SparseMatrix.
    *
    * @ingroup PETScWrappers
    * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
@@ -504,9 +505,7 @@ namespace PETScWrappers
    * A class that implements the interface to use the PETSc ILU
    * preconditioner.
    *
-   * See the comment in the base class
-   * @ref PreconditionerBase
-   * for when this preconditioner may or may not work.
+   * @note Only works in serial with a PETScWrappers::SparseMatrix.
    *
    * @ingroup PETScWrappers
    * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
@@ -567,9 +566,7 @@ namespace PETScWrappers
    * The LU decomposition is only implemented for single processor machines.
    * It should provide a convenient interface to another direct solver.
    *
-   * See the comment in the base class
-   * @ref PreconditionerBase
-   * for when this preconditioner may or may not work.
+   * @note Only works in serial with a PETScWrappers::SparseMatrix.
    *
    * @ingroup PETScWrappers
    * @author Oliver Kayser-Herold, 2004
