@@ -19,7 +19,7 @@
 
 #include "../tests.h"
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
-#include "../lac/testmatrix.h"
+#include "../testmatrix.h"
 
 const unsigned int N = 15;
 

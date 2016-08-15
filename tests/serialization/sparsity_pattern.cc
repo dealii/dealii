@@ -17,7 +17,7 @@
 // check serialization for SparsityPattern
 
 #include "serialization.h"
-#include "../lac/testmatrix.h"
+#include "../testmatrix.h"
 #include <deal.II/lac/sparsity_pattern.h>
 
 

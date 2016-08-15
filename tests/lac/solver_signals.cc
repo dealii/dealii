@@ -19,7 +19,7 @@
 
 
 #include "../tests.h"
-#include "testmatrix.h"
+#include "../testmatrix.h"
 #include <cmath>
 #include <complex>
 #include <fstream>

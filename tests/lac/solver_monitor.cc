@@ -18,7 +18,7 @@
 
 
 #include "../tests.h"
-#include "testmatrix.h"
+#include "../testmatrix.h"
 #include <cmath>
 #include <fstream>
 #include <iomanip>

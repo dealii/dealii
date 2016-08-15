@@ -26,7 +26,7 @@
 #include <deal.II/lac/relaxation_block.h>
 
 #include "../tests.h"
-#include "testmatrix.h"
+#include "../testmatrix.h"
 #include <cmath>
 #include <fstream>
 #include <iomanip>

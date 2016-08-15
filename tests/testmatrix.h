@@ -1,5 +1,5 @@
 
-#include "../tests.h"
+#include "tests.h"
 #include <deal.II/base/exceptions.h>
 #include <iostream>
 #include <deal.II/lac/sparse_matrix.h>
