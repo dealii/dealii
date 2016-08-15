@@ -44,7 +44,7 @@ void test ()
   IndexSet local_relevant= local_active;
   local_relevant.add_range(0,1);
 
-  CompressedSimpleSparsityPattern csp (local_relevant);
+  DynamicSparsityPattern csp (local_relevant);
 
   for (unsigned int i=0; i<2*numproc; ++i)
     if (local_relevant.is_element(i))

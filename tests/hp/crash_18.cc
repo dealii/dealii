@@ -34,7 +34,7 @@ char logname[] = "output";
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/grid/tria.h>
@@ -184,8 +184,8 @@ void LaplaceProblem<dim>::setup_system ()
     }
   else
     {
-      CompressedSparsityPattern csp (dof_handler.n_dofs(),
-                                     dof_handler.n_dofs());
+      DynamicSparsityPattern csp (dof_handler.n_dofs(),
+                                  dof_handler.n_dofs());
       DoFTools::make_sparsity_pattern (dof_handler, csp);
 
       condense.reset();

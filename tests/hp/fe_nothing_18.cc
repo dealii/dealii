@@ -30,7 +30,7 @@
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_direct.h>     //direct solver
 #include <deal.II/lac/sparse_matrix.h>     //definition of the sparse matrix
-#include <deal.II/lac/compressed_sparsity_pattern.h> //for the intermediate sparsity pattern structure
+#include <deal.II/lac/dynamic_sparsity_pattern.h> //for the intermediate sparsity pattern structure
 #include <deal.II/lac/solver_cg.h>         //CG solver
 #include <deal.II/lac/precondition.h>      //and a preconditioner
 #include <deal.II/lac/constraint_matrix.h> //conform hanging nodes DoF to certain constrains to make the solution continuous
@@ -326,15 +326,15 @@ void ElasticProblem<dim>::setup_system ()
 
   //(4) create block sparsity pattern (define which elements in sparse matrix are non-zero; prescribe coupling between blocks)
   // following step-22 use of simple compressed block sparsity pattern for efficiency
-  BlockCompressedSparsityPattern compressed_sparsity_pattern(n_blocks,
-                                                             n_blocks);
+  BlockDynamicSparsityPattern dynamic_sparsity_pattern(n_blocks,
+                                                       n_blocks);
 
-  compressed_sparsity_pattern.block(u_block     ,u_block     ).reinit(dofs_per_block[u_block]     ,dofs_per_block[u_block]);
-  compressed_sparsity_pattern.block(u_block     ,lambda_block).reinit(dofs_per_block[u_block]     ,dofs_per_block[lambda_block]);
-  compressed_sparsity_pattern.block(lambda_block,u_block     ).reinit(dofs_per_block[lambda_block],dofs_per_block[u_block]);
-  compressed_sparsity_pattern.block(lambda_block,lambda_block).reinit(dofs_per_block[lambda_block],dofs_per_block[lambda_block]);
+  dynamic_sparsity_pattern.block(u_block     ,u_block     ).reinit(dofs_per_block[u_block]     ,dofs_per_block[u_block]);
+  dynamic_sparsity_pattern.block(u_block     ,lambda_block).reinit(dofs_per_block[u_block]     ,dofs_per_block[lambda_block]);
+  dynamic_sparsity_pattern.block(lambda_block,u_block     ).reinit(dofs_per_block[lambda_block],dofs_per_block[u_block]);
+  dynamic_sparsity_pattern.block(lambda_block,lambda_block).reinit(dofs_per_block[lambda_block],dofs_per_block[lambda_block]);
 
-  compressed_sparsity_pattern.collect_sizes();
+  dynamic_sparsity_pattern.collect_sizes();
 
   Table<2, DoFTools::Coupling> coupling(n_components, n_components);
   for (unsigned int ii = 0; ii< n_components; ++ii)
@@ -348,15 +348,15 @@ void ElasticProblem<dim>::setup_system ()
           coupling[ii][jj] = DoFTools::always;//full coupling (u,u), (u,lambda)
       }
 
-  hanging_node_constraints.condense (compressed_sparsity_pattern);
+  hanging_node_constraints.condense (dynamic_sparsity_pattern);
 
   DoFTools::make_sparsity_pattern (dof_handler,
                                    coupling,
-                                   compressed_sparsity_pattern,
+                                   dynamic_sparsity_pattern,
                                    hanging_node_constraints,
                                    false);
 
-  compressed_sparsity_pattern.print (deallog.get_file_stream());
+  dynamic_sparsity_pattern.print (deallog.get_file_stream());
   hanging_node_constraints.print (deallog.get_file_stream());
 }
 

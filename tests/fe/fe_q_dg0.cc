@@ -471,7 +471,7 @@ namespace Step22
             << std::endl;
 
     {
-      BlockCompressedSimpleSparsityPattern csp (2,2);
+      BlockDynamicSparsityPattern csp (2,2);
 
       csp.block(0,0).reinit (n_u, n_u);
       csp.block(1,0).reinit (n_p, n_u);

@@ -15,12 +15,11 @@
 
 
 
-// simply check what happens when condensing compressed set sparsity
-// patterns. This test was written when I changed a few things in the
-// algorithm.
+// simply check what happens when condensing DynamicSparsityPattern. This test
+// was written when I changed a few things in the algorithm.
 
 #include "../tests.h"
-#include <deal.II/lac/compressed_set_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -65,8 +64,8 @@ void test ()
 
   // then set up a sparsity pattern and a
   // matrix on top of it
-  CompressedSetSparsityPattern sparsity (dof_handler.n_dofs(),
-                                         dof_handler.n_dofs());
+  DynamicSparsityPattern sparsity (dof_handler.n_dofs(),
+                                   dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, sparsity);
   constraints.condense (sparsity);
 

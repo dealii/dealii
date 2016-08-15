@@ -27,7 +27,7 @@
 
 #include "../tests.h"
 
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>

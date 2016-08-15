@@ -25,7 +25,7 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/function_lib.h>
 #include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -85,7 +85,7 @@ check ()
   // not couple, so use pattern
   SparsityPattern sparsity;
   {
-    CompressedSparsityPattern csp(dof.n_dofs(), dof.n_dofs());
+    DynamicSparsityPattern csp(dof.n_dofs(), dof.n_dofs());
     DoFTools::make_sparsity_pattern (dof, csp, constraints);
     sparsity.copy_from(csp);
   }

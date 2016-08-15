@@ -31,7 +31,7 @@ std::ofstream logfile("output");
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/grid/tria.h>
@@ -268,7 +268,7 @@ void HelmholtzProblem<dim>::setup_system ()
   constraints.close ();
 
   {
-    CompressedSimpleSparsityPattern csp (dof_handler.n_dofs());
+    DynamicSparsityPattern csp (dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern (dof_handler, csp, constraints, false);
     sparsity_pattern.copy_from(csp);
   }
@@ -291,7 +291,7 @@ void HelmholtzProblem<dim>::setup_system ()
   constraints_trace.close ();
 
   {
-    CompressedSimpleSparsityPattern csp (dof_handler_trace.n_dofs());
+    DynamicSparsityPattern csp (dof_handler_trace.n_dofs());
     DoFTools::make_sparsity_pattern (dof_handler_trace, csp, constraints_trace, false);
     sparsity_pattern_trace.copy_from(csp);
   }

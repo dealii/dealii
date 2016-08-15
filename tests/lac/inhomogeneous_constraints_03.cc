@@ -49,7 +49,7 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/error_estimator.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <fstream>
 #include <iostream>
@@ -73,7 +73,7 @@ void test(bool use_inhomogeneity_for_rhs)
   cm.print(logfile);
 
 
-  CompressedSimpleSparsityPattern csp(8,8);
+  DynamicSparsityPattern csp(8,8);
   for (unsigned int i=0; i<8; ++i)
     csp.add(i,i);
 

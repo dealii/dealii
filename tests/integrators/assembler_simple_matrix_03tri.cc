@@ -77,7 +77,7 @@ void test(FiniteElement<dim> &fe)
   typename DoFHandler<dim>::face_iterator face = cell->face(1);
   typename DoFHandler<dim>::active_cell_iterator neighbor = cell->neighbor(1);
 
-  CompressedSparsityPattern csp(dof.n_dofs(),dof.n_dofs());
+  DynamicSparsityPattern csp(dof.n_dofs(),dof.n_dofs());
   DoFTools::make_flux_sparsity_pattern(dof, csp);
   TrilinosWrappers::SparsityPattern sparsity;
   sparsity.copy_from(csp);

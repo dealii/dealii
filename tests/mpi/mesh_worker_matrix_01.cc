@@ -131,7 +131,7 @@ test_simple(DoFHandler<dim> &dofs, bool faces)
   TrilinosWrappers::SparseMatrix matrix;
 
   const FiniteElement<dim> &fe = dofs.get_fe();
-  CompressedSimpleSparsityPattern csp(dofs.n_dofs(), dofs.n_dofs());
+  DynamicSparsityPattern csp(dofs.n_dofs(), dofs.n_dofs());
   DoFTools::make_flux_sparsity_pattern (dofs, csp);
   matrix.reinit (dofs.locally_owned_dofs(), csp, MPI_COMM_WORLD, true);
 

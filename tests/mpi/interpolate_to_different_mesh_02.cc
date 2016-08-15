@@ -14,7 +14,7 @@
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
@@ -122,7 +122,7 @@ void SeventhProblem<dim>::setup_system ()
                                             ZeroFunction<dim>(),
                                             constraints);
   constraints.close ();
-  CompressedSimpleSparsityPattern csp (locally_relevant_dofs);
+  DynamicSparsityPattern csp (locally_relevant_dofs);
   DoFTools::make_sparsity_pattern (dof_handler, csp,
                                    constraints, false);
   SparsityTools::distribute_sparsity_pattern (csp,

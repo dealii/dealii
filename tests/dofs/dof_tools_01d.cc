@@ -21,7 +21,7 @@
 // check
 //   DoFTools::
 //   make_sparsity_pattern (const DoFHandler<dim> &,
-//                      BlockCompressedSparsityPattern  &);
+//                      BlockDynamicSparsityPattern  &);
 
 std::string output_file_name = "output";
 
@@ -41,8 +41,8 @@ check_this (const DoFHandler<dim> &dof_handler)
 
   // create sparsity pattern
   const unsigned int n_components = dof_handler.get_fe().n_components();
-  BlockCompressedSparsityPattern sp (n_components,
-                                     n_components);
+  BlockDynamicSparsityPattern sp (n_components,
+                                  n_components);
   std::vector<types::global_dof_index> dofs_per_component(n_components);
   DoFTools::count_dofs_per_component (dof_handler,
                                       dofs_per_component);
@@ -79,7 +79,7 @@ check_this (const DoFHandler<dim> &dof_handler)
   for (unsigned int r=0; r<n_components; ++r)
     for (unsigned int c=0; c<n_components; ++c)
       {
-        const CompressedSparsityPattern &x = sp.block(r,c);
+        const DynamicSparsityPattern &x = sp.block(r,c);
         deallog << x.bandwidth () << std::endl
                 << x.max_entries_per_row () << std::endl
                 << x.n_nonzero_elements () << std::endl;

@@ -63,7 +63,7 @@ void test ()
   SparsityPattern sparsity;
   SparseMatrix<double> system_matrix;
   {
-    CompressedSimpleSparsityPattern csp (dof.n_dofs(), dof.n_dofs());
+    DynamicSparsityPattern csp (dof.n_dofs(), dof.n_dofs());
     DoFTools::make_sparsity_pattern (static_cast<const DoFHandler<dim>&>(dof),
                                      csp, constraints, false);
     sparsity.copy_from (csp);
@@ -97,7 +97,7 @@ void test ()
       data.level_mg_handler = level;
       mg_matrices[level].reinit(dof, mg_constraints[level], quad, data);
 
-      CompressedSimpleSparsityPattern csp;
+      DynamicSparsityPattern csp;
       csp.reinit (dof.n_dofs(level), dof.n_dofs(level));
       MGTools::make_sparsity_pattern (dof, csp, level);
       mg_sparsities[level].copy_from (csp);

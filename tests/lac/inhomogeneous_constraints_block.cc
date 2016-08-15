@@ -154,7 +154,7 @@ void AdvectionProblem<dim>::setup_system ()
   hanging_nodes_only.close ();
   test_all_constraints.close ();
 
-  BlockCompressedSimpleSparsityPattern csp (2,2);
+  BlockDynamicSparsityPattern csp (2,2);
   {
     const unsigned int dofs_per_block = dof_handler.n_dofs() / 2;
     csp.block(0,0).reinit (dofs_per_block, dofs_per_block);

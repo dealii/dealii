@@ -40,7 +40,7 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/error_estimator.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 
@@ -259,8 +259,8 @@ void LaplaceProblem<dim>::setup_system ()
                                              (std_cxx11::bind(&LaplaceProblem<dim>::get_conflict_indices, this,std_cxx11::_1)));
 
 
-  CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
-                                       dof_handler.n_dofs());
+  DynamicSparsityPattern csp (dof_handler.n_dofs(),
+                              dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, csp,
                                    constraints, false);
   reference_matrix.reinit (dof_handler.locally_owned_dofs(), csp, MPI_COMM_WORLD);

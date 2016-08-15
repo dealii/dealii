@@ -24,7 +24,7 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/trilinos_solver.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -141,7 +141,7 @@ void Step4<dim>::setup_system ()
                                             constraints);
   constraints.close();
 
-  CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
+  DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, c_sparsity, constraints, false);
   system_matrix.reinit (c_sparsity);
 

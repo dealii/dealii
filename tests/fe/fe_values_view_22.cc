@@ -118,7 +118,7 @@ void MixedElastoPlasticity<dim>::make_grid_and_dofs()
           << std::endl;
 
   {
-    BlockCompressedSimpleSparsityPattern csp(2, 2);
+    BlockDynamicSparsityPattern csp(2, 2);
 
     csp.block(0, 0).reinit(n_stress_dof, n_stress_dof);
     csp.block(1, 0).reinit(n_gamma_dof, n_stress_dof);

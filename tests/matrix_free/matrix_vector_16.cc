@@ -28,7 +28,7 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
@@ -121,7 +121,7 @@ void do_test (const DoFHandler<dim>  &dof,
   // (v, 10 * u)
   SparsityPattern sparsity;
   {
-    CompressedSimpleSparsityPattern csp(dof.n_dofs(), dof.n_dofs());
+    DynamicSparsityPattern csp(dof.n_dofs(), dof.n_dofs());
     DoFTools::make_sparsity_pattern (dof, csp, constraints, true);
     sparsity.copy_from(csp);
   }

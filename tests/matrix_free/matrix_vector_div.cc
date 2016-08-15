@@ -151,7 +151,7 @@ void test ()
 
   const unsigned int dofs_per_block = dof_handler_sca.n_dofs();
   {
-    BlockCompressedSimpleSparsityPattern csp (dim,dim);
+    BlockDynamicSparsityPattern csp (dim,dim);
     for (unsigned int d=0; d<dim; ++d)
       for (unsigned int e=0; e<dim; ++e)
         csp.block(d,e).reinit (dofs_per_block, dofs_per_block);

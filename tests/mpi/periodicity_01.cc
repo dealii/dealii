@@ -34,7 +34,7 @@
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_solver.h>
@@ -162,9 +162,9 @@ namespace Step40
     DoFTools::make_hanging_node_constraints (dof_handler, constraints);
     constraints.close ();
 
-    CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
-                                         dof_handler.n_dofs(),
-                                         locally_relevant_dofs);
+    DynamicSparsityPattern csp (dof_handler.n_dofs(),
+                                dof_handler.n_dofs(),
+                                locally_relevant_dofs);
     DoFTools::make_sparsity_pattern (dof_handler,
                                      csp,
                                      constraints, false);

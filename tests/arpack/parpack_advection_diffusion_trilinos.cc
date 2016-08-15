@@ -35,7 +35,7 @@
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/lac/sparsity_tools.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <deal.II/lac/iterative_inverse.h>
 
@@ -173,7 +173,7 @@ void test ()
                                             constraints);
   constraints.close ();
 
-  CompressedSimpleSparsityPattern csp (locally_relevant_dofs);
+  DynamicSparsityPattern csp (locally_relevant_dofs);
   // Fill in ignoring all cells that are not locally owned
   DoFTools::make_sparsity_pattern (dof_handler, csp,
                                    constraints,

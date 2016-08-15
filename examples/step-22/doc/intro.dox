@@ -766,11 +766,11 @@ comparison of their results.
 
 Apart from this, many other algorithms have been tested and improved during
 the creation of this program. For example, in building the sparsity pattern,
-we originally used a BlockCompressedSparsityPattern object that added one
-element at a time; however, its data structures are poorly adapted for the
-large numbers of nonzero entries per row created by our discretization in
-3d, leading to a quadratic behavior. Replacing the internal algorithms in
-deal.II to set many elements at a time, and using a
+we originally used a (now no longer existing) BlockCompressedSparsityPattern 
+object that added one element at a time; however, its data structures were poorly
+adapted for the large numbers of nonzero entries per row created by our 
+discretization in 3d, leading to a quadratic behavior. Replacing the internal 
+algorithms in deal.II to set many elements at a time, and using a
 BlockCompressedSimpleSparsityPattern (which has, as of early 2015, been in turn
 replaced by BlockDynamicSparsityPattern) as a better adapted data structure,
 removed this bottleneck at the price of a slightly higher memory

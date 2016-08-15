@@ -151,8 +151,8 @@ void test ()
                                             ZeroFunction<dim>(),
                                             constraints);
   constraints.close ();
-  CompressedSimpleSparsityPattern csp (dof.n_dofs(),
-                                       dof.n_dofs());
+  DynamicSparsityPattern csp (dof.n_dofs(),
+                              dof.n_dofs());
   DoFTools::make_sparsity_pattern (dof, csp, constraints, false);
   SparsityPattern sparsity;
   sparsity.copy_from (csp);

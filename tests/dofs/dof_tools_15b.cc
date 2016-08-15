@@ -16,13 +16,13 @@
 
 #include "../tests.h"
 #include "dof_tools_common.h"
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 // check
 //   DoFTools::
 //   make_boundary_sparsity_pattern (const DoFHandler<dim>     &,
 //                                   const std::vector<unsigned int> &
-//                               CompressedSparsityPattern &);
+//                               DynamicSparsityPattern &);
 
 std::string output_file_name = "output";
 
@@ -40,7 +40,7 @@ check_this (const DoFHandler<dim> &dof_handler)
   DoFTools::map_dof_to_boundary_indices (dof_handler, map);
 
   // create sparsity pattern
-  CompressedSparsityPattern sp (dof_handler.n_boundary_dofs());
+  DynamicSparsityPattern sp (dof_handler.n_boundary_dofs());
   DoFTools::make_boundary_sparsity_pattern (dof_handler, map, sp);
   sp.compress ();
 

@@ -27,7 +27,7 @@ int main ()
   deallog.attach(logfile);
   deallog.threshold_double(1.e-10);
 
-  copy_from_2<SparsityPattern, CompressedSparsityPattern> ();
+  copy_from_2<SparsityPattern, DynamicSparsityPattern> ();
 }
 
 

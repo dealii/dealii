@@ -36,7 +36,7 @@
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/lac/sparsity_tools.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
@@ -198,7 +198,7 @@ void test ()
                                                     constraints);
   constraints.close ();
 
-  dealii::CompressedSimpleSparsityPattern csp (locally_relevant_dofs);
+  dealii::DynamicSparsityPattern csp (locally_relevant_dofs);
   // Fill in ignoring all cells that are not locally owned
   dealii::DoFTools::make_sparsity_pattern (dof_handler, csp,
                                            constraints,

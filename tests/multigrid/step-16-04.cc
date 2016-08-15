@@ -202,7 +202,7 @@ void LaplaceProblem<dim>::setup_system ()
 
   for (unsigned int level=min_level; level<n_levels; ++level)
     {
-      CompressedSparsityPattern csp;
+      DynamicSparsityPattern csp;
       csp.reinit(mg_dof_handler.n_dofs(level),
                  mg_dof_handler.n_dofs(level));
       MGTools::make_sparsity_pattern(mg_dof_handler, csp, level);
