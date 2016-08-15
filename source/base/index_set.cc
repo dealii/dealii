@@ -486,6 +486,7 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
                              const bool overlapping) const
 {
   compress ();
+  (void)communicator;
 
 #ifdef DEBUG
   if (!overlapping)
@@ -520,10 +521,11 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
                        TrilinosWrappers::types::int_type(n_elements()),
                        0,
 #ifdef DEAL_II_WITH_MPI
-                       Epetra_MpiComm(communicator));
+                       Epetra_MpiComm(communicator)
 #else
-                       Epetra_SerialComm());
+                       Epetra_SerialComm()
 #endif
+                      );
   else
     {
       std::vector<size_type> indices;
@@ -538,11 +540,11 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
                           0),
                          0,
 #ifdef DEAL_II_WITH_MPI
-                         Epetra_MpiComm(communicator));
+                         Epetra_MpiComm(communicator)
 #else
-                         Epetra_SerialComm());
-      (void)communicator;
+                         Epetra_SerialComm()
 #endif
+                        );
     }
 }
 
