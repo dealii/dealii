@@ -102,8 +102,7 @@ namespace TrilinosWrappers
     has_ghosts  (v.has_ghosts),
     vector(new Epetra_FEVector(*v.vector))
   {
-    owned_elements.set_size(v.size());
-    owned_elements.add_range(0,v.size());
+    owned_elements = complete_index_set(v.size());
   }
 
 

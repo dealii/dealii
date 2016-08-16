@@ -230,6 +230,14 @@ namespace TrilinosWrappers
             owned_elements.compress();
           }
       }
+#ifdef DEBUG
+      const MPI_Comm mpi_communicator
+        = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()))->Comm();
+      const size_type n_elements_global
+        = Utilities::MPI::sum (owned_elements.n_elements(), mpi_communicator);
+
+      Assert (has_ghosts || n_elements_global == size(), ExcInternalError());
+#endif
 
       last_action = Zero;
     }
@@ -250,7 +258,23 @@ namespace TrilinosWrappers
 
       has_ghosts = vector->Map().UniqueGIDs()==false;
 
-      owned_elements = parallel_partitioner;
+      // If the IndexSets are overlapping, we don't really know
+      // which process owns what. So we decide that no process
+      // owns anything in that case.
+      if (has_ghosts)
+      {
+        owned_elements.clear();
+        owned_elements.set_size(parallel_partitioner.size());
+      }
+      else
+        owned_elements = parallel_partitioner;
+
+#ifdef DEBUG
+      const size_type n_elements_global
+        = Utilities::MPI::sum (owned_elements.n_elements(), communicator);
+
+      Assert (has_ghosts || n_elements_global == size(), ExcInternalError());
+#endif
 
       last_action = Zero;
     }
@@ -325,7 +349,14 @@ namespace TrilinosWrappers
 
           last_action = Insert;
         }
+#ifdef DEBUG
+      const MPI_Comm mpi_communicator
+        = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()))->Comm();
+      const size_type n_elements_global
+        = Utilities::MPI::sum (owned_elements.n_elements(), mpi_communicator);
 
+      Assert (has_ghosts || n_elements_global == size(), ExcInternalError());
+#endif
     }
 
 
@@ -336,6 +367,7 @@ namespace TrilinosWrappers
     {
       nonlocal_vector.reset();
       owned_elements.clear();
+      owned_elements.set_size(v.size());
 
       // In case we do not allow to have different maps, this call means that
       // we have to reset the vector. So clear the vector, initialize our map
@@ -349,17 +381,16 @@ namespace TrilinosWrappers
       for (size_type block=0; block<v.n_blocks(); ++block)
         n_elements += v.block(block).local_size();
       std::vector<TrilinosWrappers::types::int_type> global_ids (n_elements, -1);
-      size_type max_size = 0;
       for (size_type block=0; block<v.n_blocks(); ++block)
         {
           TrilinosWrappers::types::int_type *glob_elements =
             my_global_elements(v.block(block).vector_partitioner());
           for (size_type i=0; i<v.block(block).local_size(); ++i)
             global_ids[added_elements++] = glob_elements[i] + block_offset;
+          owned_elements.add_indices(v.block(block).locally_owned_elements(),
+                                     block_offset);
           block_offset += v.block(block).size();
-          max_size = std::max(max_size, v.block(block).size());
         }
-      owned_elements.set_size(max_size);
 
       Assert (n_elements == added_elements, ExcInternalError());
       Epetra_Map new_map (v.size(), n_elements, &global_ids[0], 0,
@@ -380,7 +411,6 @@ namespace TrilinosWrappers
         {
           v.block(block).trilinos_vector().ExtractCopy (entries, 0);
           entries += v.block(block).local_size();
-          owned_elements.add_indices(v.block(block).locally_owned_elements());
         }
 
       if (import_data == true)
@@ -397,6 +427,14 @@ namespace TrilinosWrappers
 
           last_action = Insert;
         }
+#ifdef DEBUG
+      const MPI_Comm mpi_communicator
+        = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()))->Comm();
+      const size_type n_elements_global
+        = Utilities::MPI::sum (owned_elements.n_elements(), mpi_communicator);
+
+      Assert (has_ghosts || n_elements_global == size(), ExcInternalError());
+#endif
     }
 
 
@@ -436,6 +474,12 @@ namespace TrilinosWrappers
               nonlocal_vector.reset(new Epetra_MultiVector(nonlocal_map, 1));
             }
         }
+#ifdef DEBUG
+      const size_type n_elements_global
+        = Utilities::MPI::sum (owned_elements.n_elements(), communicator);
+
+      Assert (has_ghosts || n_elements_global == size(), ExcInternalError());
+#endif
     }
 
 
@@ -605,9 +649,7 @@ namespace TrilinosWrappers
   Vector::reinit (const size_type n,
                   const bool    /*omit_zeroing_entries*/)
   {
-    owned_elements.clear();
-    owned_elements.set_size(n);
-    owned_elements.add_range(0, n);
+    owned_elements = complete_index_set(n);
     Epetra_LocalMap map ((TrilinosWrappers::types::int_type)n, 0,
                          Utilities::Trilinos::comm_self());
     vector.reset (new Epetra_FEVector (map));
@@ -625,8 +667,7 @@ namespace TrilinosWrappers
                          input_map.IndexBase(),
                          input_map.Comm());
     vector.reset (new Epetra_FEVector(map));
-    owned_elements.set_size(n_global_elements(input_map));
-    owned_elements.add_range(0, n_global_elements(input_map));
+    owned_elements = complete_index_set(n_global_elements(input_map));
 
     last_action = Zero;
   }
