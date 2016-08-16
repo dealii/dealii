@@ -1,0 +1,15 @@
+
+DEAL:0::block size: 6
+DEAL:0::block size[0]: 2
+DEAL:0::block size[1]: 4
+{0, [2,3]}
+DEAL:0::size: 6
+{0, [2,3]}
+
+DEAL:1::block size: 6
+DEAL:1::block size[0]: 2
+DEAL:1::block size[1]: 4
+{1, [4,5]}
+DEAL:1::size: 6
+{1, [4,5]}
+

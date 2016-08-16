@@ -583,6 +583,10 @@ namespace TrilinosWrappers
        * or may not have ghost elements. See the general documentation of this
        * class for more information.
        *
+       * In case @p parallel_partitioning is overlapping, it is not clear which
+       * process should own which elements. Hence, locally_owned_elements()
+       * returns an empty IndexSet in this case.
+       *
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
        */

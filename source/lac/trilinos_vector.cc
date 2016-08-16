@@ -262,10 +262,10 @@ namespace TrilinosWrappers
       // which process owns what. So we decide that no process
       // owns anything in that case.
       if (has_ghosts)
-      {
-        owned_elements.clear();
-        owned_elements.set_size(parallel_partitioner.size());
-      }
+        {
+          owned_elements.clear();
+          owned_elements.set_size(parallel_partitioner.size());
+        }
       else
         owned_elements = parallel_partitioner;
 
