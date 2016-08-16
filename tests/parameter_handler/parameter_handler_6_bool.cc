@@ -41,7 +41,7 @@ int main ()
                          "docs 1");
       prm.leave_subsection ();
 
-      prm.read_input("prm");
+      prm.read_input(SOURCE_DIR "/prm/parameter_handler_6_bool.prm");
 
       // now set the parameter to a different
       // value
