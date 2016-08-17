@@ -1862,6 +1862,7 @@ namespace
 
 bool ParameterHandler::read_input_from_xml (std::istream &in)
 {
+  AssertThrow(in, ExcIO());
   // read the XML tree assuming that (as we
   // do in print_parameters(XML) it has only
   // a single top-level node called
