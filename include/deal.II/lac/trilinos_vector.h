@@ -881,13 +881,13 @@ namespace TrilinosWrappers
     Vector &operator= (const TrilinosScalar s);
 
     /**
-     * Sets the left hand argument to the (parallel) Trilinos Vector.
+     * Set the left hand argument to the (parallel) Trilinos Vector.
      * Equivalent to the @p reinit function.
      */
     Vector &operator= (const MPI::Vector &v);
 
     /**
-     * Sets the left hand argument to the deal.II vector.
+     * Set the left hand argument to the deal.II vector.
      */
     template <typename Number>
     Vector &operator= (const ::dealii::Vector<Number> &v);

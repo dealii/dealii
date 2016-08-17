@@ -681,7 +681,7 @@ public:
   std::vector<unsigned int> get_embedding_dofs (const unsigned int sub_degree) const;
 
   /**
-   * Returns a list of constant modes of the element. For this element, the
+   * Return a list of constant modes of the element. For this element, the
    * list consists of true arguments for the first vertex shape functions and
    * false for the remaining ones.
    */

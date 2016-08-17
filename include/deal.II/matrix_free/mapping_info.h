@@ -69,7 +69,7 @@ namespace internal
       MappingInfo();
 
       /**
-       * Computes the information in the given cells. The cells are specified
+       * Compute the information in the given cells. The cells are specified
        * by the level and the index within the level (as given by
        * CellIterator::level() and CellIterator::index(), in order to allow
        * for different kinds of iterators, e.g. standard DoFHandler,
@@ -93,22 +93,22 @@ namespace internal
                               std::vector<dealii::hp::QCollection<1> >());
 
       /**
-       * Returns the type of a given cell as detected during initialization.
+       * Return the type of a given cell as detected during initialization.
        */
       CellType get_cell_type (const unsigned int cell_chunk_no) const;
 
       /**
-       * Returns the type of a given cell as detected during initialization.
+       * Return the type of a given cell as detected during initialization.
        */
       unsigned int get_cell_data_index (const unsigned int cell_chunk_no) const;
 
       /**
-       * Clears all data fields in this class.
+       * Clear all data fields in this class.
        */
       void clear ();
 
       /**
-       * Returns the memory consumption of this class in bytes.
+       * Return the memory consumption of this class in bytes.
        */
       std::size_t memory_consumption() const;
 
@@ -261,7 +261,7 @@ namespace internal
         std::vector<unsigned int> quad_index_conversion;
 
         /**
-         * Returns the quadrature index for a given number of quadrature
+         * Return the quadrature index for a given number of quadrature
          * points. If not in hp mode or if the index is not found, this
          * function always returns index 0. Hence, this function does not
          * check whether the given degree is actually present.
@@ -279,7 +279,7 @@ namespace internal
                                       const SizeInfo &size_info) const;
 
         /**
-         * Returns the memory consumption in bytes.
+         * Return the memory consumption in bytes.
          */
         std::size_t memory_consumption () const;
       };

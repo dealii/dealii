@@ -163,7 +163,7 @@ public:
     {};
 
     /**
-     * Sets the MPI communicator that the parallel layout of the operator
+     * Set the MPI communicator that the parallel layout of the operator
      * should be based upon. Defaults to MPI_COMM_SELF, but should be set to a
      * communicator similar to the one used for a distributed triangulation in
      * order to inform this class over all cells that are present.
@@ -171,7 +171,7 @@ public:
     MPI_Comm            mpi_communicator;
 
     /**
-     * Sets the scheme for task parallelism. There are four options available.
+     * Set the scheme for task parallelism. There are four options available.
      * If set to @p none, the operator application is done in serial without
      * shared memory parallelism. If this class is used together with MPI and
      * MPI is also used for parallelism within the nodes, this flag should be
@@ -201,7 +201,7 @@ public:
     TasksParallelScheme tasks_parallel_scheme;
 
     /**
-     * Sets the number of so-called macro cells that should form one
+     * Set the number of so-called macro cells that should form one
      * partition. If zero size is given, the class tries to find a good size
      * for the blocks based on MultithreadInfo::n_threads() and the number of
      * cells present. Otherwise, the given number is used. If the given number
@@ -409,7 +409,7 @@ public:
   void copy_from (const MatrixFree<dim,Number> &matrix_free_base);
 
   /**
-   * Clears all data fields and brings the class into a condition similar to
+   * Clear all data fields and brings the class into a condition similar to
    * after having called the default constructor.
    */
   void clear();
@@ -528,7 +528,7 @@ public:
                              const unsigned int vector_component=0) const;
 
   /**
-   * Returns the partitioner that represents the locally owned data and the
+   * Return the partitioner that represents the locally owned data and the
    * ghost indices where access is needed to for the cell loop. The
    * partitioner is constructed from the locally owned dofs and ghost dofs
    * given by the respective fields. If you want to have specific information
@@ -541,19 +541,19 @@ public:
   get_vector_partitioner (const unsigned int vector_component=0) const;
 
   /**
-   * Returns the set of cells that are oned by the processor.
+   * Return the set of cells that are oned by the processor.
    */
   const IndexSet &
   get_locally_owned_set (const unsigned int fe_component = 0) const;
 
   /**
-   * Returns the set of ghost cells needed but not owned by the processor.
+   * Return the set of ghost cells needed but not owned by the processor.
    */
   const IndexSet &
   get_ghost_set (const unsigned int fe_component = 0) const;
 
   /**
-   * Returns a list of all degrees of freedom that are constrained. The list
+   * Return a list of all degrees of freedom that are constrained. The list
    * is returned in MPI-local index space for the locally owned range of the
    * vector, not in global MPI index space that spans all MPI processors. To
    * get numbers in global index space, call
@@ -578,12 +578,12 @@ public:
    */
   //@{
   /**
-   * Returns the number of different DoFHandlers specified at initialization.
+   * Return the number of different DoFHandlers specified at initialization.
    */
   unsigned int n_components () const;
 
   /**
-   * Returns the number of cells this structure is based on. If you are using
+   * Return the number of cells this structure is based on. If you are using
    * a usual DoFHandler, it corresponds to the number of (locally owned)
    * active cells. Note that most data structures in this class do not
    * directly act on this number but rather on n_macro_cells() which gives the
@@ -593,7 +593,7 @@ public:
   unsigned int n_physical_cells () const;
 
   /**
-   * Returns the number of macro cells that this structure works on, i.e., the
+   * Return the number of macro cells that this structure works on, i.e., the
    * number of cell chunks that are worked on after the application of
    * vectorization which in general works on several cells at once. The cell
    * range in @p cell_loop runs from zero to n_macro_cells() (exclusive), so
@@ -668,21 +668,21 @@ public:
   n_components_filled (const unsigned int macro_cell_number) const;
 
   /**
-   * Returns the number of degrees of freedom per cell for a given hp index.
+   * Return the number of degrees of freedom per cell for a given hp index.
    */
   unsigned int
   get_dofs_per_cell (const unsigned int fe_component = 0,
                      const unsigned int hp_active_fe_index = 0) const;
 
   /**
-   * Returns the number of quadrature points per cell for a given hp index.
+   * Return the number of quadrature points per cell for a given hp index.
    */
   unsigned int
   get_n_q_points (const unsigned int quad_index = 0,
                   const unsigned int hp_active_fe_index = 0) const;
 
   /**
-   * Returns the number of degrees of freedom on each face of the cell for
+   * Return the number of degrees of freedom on each face of the cell for
    * given hp index.
    */
   unsigned int
@@ -690,7 +690,7 @@ public:
                      const unsigned int hp_active_fe_index = 0) const;
 
   /**
-   * Returns the number of quadrature points on each face of the cell for
+   * Return the number of quadrature points on each face of the cell for
    * given hp index.
    */
   unsigned int
@@ -698,14 +698,14 @@ public:
                        const unsigned int hp_active_fe_index = 0) const;
 
   /**
-   * Returns the quadrature rule for given hp index.
+   * Return the quadrature rule for given hp index.
    */
   const Quadrature<dim> &
   get_quadrature (const unsigned int quad_index = 0,
                   const unsigned int hp_active_fe_index = 0) const;
 
   /**
-   * Returns the quadrature rule for given hp index.
+   * Return the quadrature rule for given hp index.
    */
   const Quadrature<dim-1> &
   get_face_quadrature (const unsigned int quad_index = 0,
@@ -724,7 +724,7 @@ public:
   bool mapping_initialized () const;
 
   /**
-   * Returns an approximation of the memory consumption of this class in
+   * Return an approximation of the memory consumption of this class in
    * bytes.
    */
   std::size_t memory_consumption() const;
@@ -749,43 +749,43 @@ public:
    */
   //@{
   /**
-   * Returns information on task graph.
+   * Return information on task graph.
    */
   const internal::MatrixFreeFunctions::TaskInfo &
   get_task_info () const;
 
   /**
-   * Returns information on system size.
+   * Return information on system size.
    */
   const internal::MatrixFreeFunctions::SizeInfo &
   get_size_info () const;
 
   /*
-   * Returns geometry-dependent information on the cells.
+   * Return geometry-dependent information on the cells.
    */
   const internal::MatrixFreeFunctions::MappingInfo<dim,Number> &
   get_mapping_info () const;
 
   /**
-   * Returns information on indexation degrees of freedom.
+   * Return information on indexation degrees of freedom.
    */
   const internal::MatrixFreeFunctions::DoFInfo &
   get_dof_info (const unsigned int fe_component = 0) const;
 
   /**
-   * Returns the number of weights in the constraint pool.
+   * Return the number of weights in the constraint pool.
    */
   unsigned int n_constraint_pool_entries() const;
 
   /**
-   * Returns a pointer to the first number in the constraint pool data with
+   * Return a pointer to the first number in the constraint pool data with
    * index @p pool_index (to be used together with @p constraint_pool_end()).
    */
   const Number *
   constraint_pool_begin (const unsigned int pool_index) const;
 
   /**
-   * Returns a pointer to one past the last number in the constraint pool data
+   * Return a pointer to one past the last number in the constraint pool data
    * with index @p pool_index (to be used together with @p
    * constraint_pool_begin()).
    */
@@ -793,7 +793,7 @@ public:
   constraint_pool_end (const unsigned int pool_index) const;
 
   /**
-   * Returns the unit cell information for given hp index.
+   * Return the unit cell information for given hp index.
    */
   const internal::MatrixFreeFunctions::ShapeInfo<Number> &
   get_shape_info (const unsigned int fe_component = 0,

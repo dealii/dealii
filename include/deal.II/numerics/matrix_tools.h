@@ -244,7 +244,7 @@ namespace MatrixCreator
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
-   * Calls the create_mass_matrix() function, see above, with
+   * Call the create_mass_matrix() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim, typename number>
@@ -281,7 +281,7 @@ namespace MatrixCreator
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
-   * Calls the create_mass_matrix() function, see above, with
+   * Call the create_mass_matrix() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim, typename number>
@@ -375,7 +375,7 @@ namespace MatrixCreator
 
 
   /**
-   * Calls the create_boundary_mass_matrix() function, see above, with
+   * Call the create_boundary_mass_matrix() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim, typename number>
@@ -440,7 +440,7 @@ namespace MatrixCreator
                               const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
-   * Calls the create_laplace_matrix() function, see above, with
+   * Call the create_laplace_matrix() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim>
@@ -476,7 +476,7 @@ namespace MatrixCreator
                               const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
-   * Calls the create_laplace_matrix() function, see above, with
+   * Call the create_laplace_matrix() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim>

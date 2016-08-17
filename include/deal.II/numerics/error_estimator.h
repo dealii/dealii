@@ -341,7 +341,7 @@ public:
    const Strategy                              strategy       = cell_diameter_over_24);
 
   /**
-   * Calls the @p estimate function, see above, with
+   * Call the @p estimate function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <typename InputVector, typename DoFHandlerType>
@@ -387,7 +387,7 @@ public:
    const Strategy                              strategy       = cell_diameter_over_24);
 
   /**
-   * Calls the @p estimate function, see above, with
+   * Call the @p estimate function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <typename InputVector, typename DoFHandlerType>
@@ -586,7 +586,7 @@ public:
    const types::material_id                    material_id    = numbers::invalid_material_id);
 
   /**
-   * Calls the @p estimate function, see above, with
+   * Call the @p estimate function, see above, with
    * <tt>mapping=MappingQGeneric1<1>()</tt>.
    */
   template <typename InputVector, typename DoFHandlerType>
@@ -630,7 +630,7 @@ public:
    const types::material_id                    material_id    = numbers::invalid_material_id);
 
   /**
-   * Calls the @p estimate function, see above, with
+   * Call the @p estimate function, see above, with
    * <tt>mapping=MappingQGeneric1<1>()</tt>.
    */
   template <typename InputVector, typename DoFHandlerType>

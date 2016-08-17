@@ -732,7 +732,7 @@ public:
   unit_face_support_point (const unsigned int index) const;
 
   /**
-   * Returns a list of constant modes of the element. The returns table has as
+   * Return a list of constant modes of the element. The returns table has as
    * many rows as there are components in the element and dofs_per_cell
    * columns. To each component of the finite element, the row in the returned
    * table contains a basis representation of the constant function 1 on the

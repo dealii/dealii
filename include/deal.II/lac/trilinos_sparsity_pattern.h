@@ -829,7 +829,7 @@ namespace TrilinosWrappers
 //@{
 
     /**
-     * Returns the state of the sparsity pattern, i.e., whether compress()
+     * Return the state of the sparsity pattern, i.e., whether compress()
      * needs to be called after an operation requiring data exchange.
      */
     bool is_compressed () const;

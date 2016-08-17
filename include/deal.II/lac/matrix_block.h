@@ -359,7 +359,7 @@ public:
   void reinit(const BlockSparsityPattern &sparsity);
 
   /**
-   * Clears the object.
+   * Clear the object.
    *
    * Since often only clearing of the individual matrices is desired, but not
    * removing the blocks themselves, there is an optional argument. If the
@@ -471,7 +471,7 @@ public:
   void reinit_edge_flux(const MGLevelObject<BlockSparsityPattern> &sparsity);
 
   /**
-   * Clears the object.
+   * Clear the object.
    *
    * Since often only clearing of the individual matrices is desired, but not
    * removing the blocks themselves, there is an optional argument. If the

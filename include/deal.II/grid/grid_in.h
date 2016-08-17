@@ -453,7 +453,7 @@ public:
   void read_tecplot (std::istream &in);
 
   /**
-   * Returns the standard suffix for a file in this format.
+   * Return the standard suffix for a file in this format.
    */
   static std::string default_suffix (const Format format);
 

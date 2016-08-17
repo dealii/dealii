@@ -322,7 +322,7 @@ namespace Polynomials
   private:
 
     /**
-     * Computes the <tt>coefficients</tt> of the base class Polynomial. This
+     * Compute the <tt>coefficients</tt> of the base class Polynomial. This
      * function is <tt>static</tt> to allow to be called in the constructor.
      */
     static

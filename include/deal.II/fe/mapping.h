@@ -324,7 +324,7 @@ public:
   get_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
   /**
-   * Returns whether the mapping preserves vertex locations. In other words,
+   * Return whether the mapping preserves vertex locations. In other words,
    * this function returns whether the mapped location of the reference cell
    * vertices (given by GeometryInfo::unit_cell_vertex()) equals the result of
    * <code>cell-@>vertex()</code> (i.e., information stored by the

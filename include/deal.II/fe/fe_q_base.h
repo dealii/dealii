@@ -197,7 +197,7 @@ public:
                                    const bool face_rotation    = false) const;
 
   /**
-   * Returns a list of constant modes of the element. For this element, the
+   * Return a list of constant modes of the element. For this element, the
    * list consists of true arguments for all components.
    */
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >

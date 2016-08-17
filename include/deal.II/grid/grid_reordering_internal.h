@@ -242,18 +242,18 @@ namespace internal
                         const unsigned int localsidenum);
 
       /**
-       * Returns true if all sides of the quad quadnum are oriented.
+       * Return true if all sides of the quad quadnum are oriented.
        */
       bool is_fully_oriented_quad (const unsigned int quadnum) const;
 
       /**
-       * Returns true if the side lsn of the quad quadnum is oriented.
+       * Return true if the side lsn of the quad quadnum is oriented.
        */
       bool is_oriented_side (const unsigned int quadnum,
                              const unsigned int lsn) const;
 
       /**
-       * Returns true is the side is oriented in the "default" direction
+       * Return true is the side is oriented in the "default" direction
        */
       bool is_side_default_oriented (const unsigned int qnum,
                                      const unsigned int lsn) const;
@@ -490,7 +490,7 @@ namespace internal
       std::vector<Cell> cell_list;
 
       /**
-       * Checks whether every cell in the mesh is sensible.
+       * Check whether every cell in the mesh is sensible.
        */
       void sanity_check() const;
 
@@ -537,7 +537,7 @@ namespace internal
        * This function is the single entry point to the functionality of this
        * class.
        *
-       * Returns, whether a consistent orientation of lines was possible for
+       * Return, whether a consistent orientation of lines was possible for
        * the given mesh.
        */
       static
@@ -592,7 +592,7 @@ namespace internal
       /**
        * Orient all the edges of a mesh.
        *
-       * Returns, whether this action was carried out successfully.
+       * Return, whether this action was carried out successfully.
        */
       bool orient_edges ();
 

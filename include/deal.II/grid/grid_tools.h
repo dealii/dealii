@@ -331,7 +331,7 @@ namespace GridTools
                           const Function<dim,double> *coefficient = 0);
 
   /**
-   * Returns a std::map with all vertices of faces located in the boundary
+   * Return a std::map with all vertices of faces located in the boundary
    *
    * @param[in] tria The Triangulation object.
    */

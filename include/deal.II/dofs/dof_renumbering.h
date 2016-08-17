@@ -438,7 +438,7 @@ namespace DoFRenumbering
                    const bool      use_constraints    = false);
 
     /**
-     * Computes the renumbering vector needed by the Cuthill_McKee() function.
+     * Compute the renumbering vector needed by the Cuthill_McKee() function.
      * Does not perform the renumbering on the DoFHandler dofs but returns the
      * renumbering vector.
      */
@@ -549,7 +549,7 @@ namespace DoFRenumbering
                  = std::vector<types::global_dof_index>());
 
   /**
-   * Computes the renumbering vector needed by the Cuthill_McKee() function.
+   * Compute the renumbering vector needed by the Cuthill_McKee() function.
    * Does not perform the renumbering on the DoFHandler dofs but returns the
    * renumbering vector.
    */
@@ -644,7 +644,7 @@ namespace DoFRenumbering
                   = std::vector<unsigned int>());
 
   /**
-   * Computes the renumbering vector needed by the component_wise() functions.
+   * Compute the renumbering vector needed by the component_wise() functions.
    * Does not perform the renumbering on the DoFHandler dofs but returns the
    * renumbering vector.
    */
@@ -707,7 +707,7 @@ namespace DoFRenumbering
   block_wise (hp::DoFHandler<dim,spacedim> &dof_handler);
 
   /**
-   * Computes the renumbering vector needed by the block_wise() functions.
+   * Compute the renumbering vector needed by the block_wise() functions.
    * Does not perform the renumbering on the DoFHandler dofs but returns the
    * renumbering vector.
    */
@@ -878,7 +878,7 @@ namespace DoFRenumbering
               const bool                                    dof_wise_renumbering = false);
 
   /**
-   * Computes the renumbering vector needed by the downstream() function. Does
+   * Compute the renumbering vector needed by the downstream() function. Does
    * not perform the renumbering on the DoFHandler dofs but returns the
    * renumbering vector.
    */
@@ -891,7 +891,7 @@ namespace DoFRenumbering
                       const bool                                    dof_wise_renumbering);
 
   /**
-   * Computes the renumbering vector needed by the downstream() function. Does
+   * Compute the renumbering vector needed by the downstream() function. Does
    * not perform the renumbering on the DoFHandler dofs but returns the
    * renumbering vector.
    */
@@ -930,7 +930,7 @@ namespace DoFRenumbering
                 const bool                                    counter = false);
 
   /**
-   * Computes the renumbering vector needed by the clockwise_dg() functions.
+   * Compute the renumbering vector needed by the clockwise_dg() functions.
    * Does not perform the renumbering on the DoFHandler dofs but returns the
    * renumbering vector.
    */
@@ -981,7 +981,7 @@ namespace DoFRenumbering
                            const unsigned int       level);
 
   /**
-   * Computes the renumbering vector needed by the sort_selected_dofs_back()
+   * Compute the renumbering vector needed by the sort_selected_dofs_back()
    * function. Does not perform the renumbering on the DoFHandler dofs but
    * returns the renumbering vector.
    *
@@ -1025,7 +1025,7 @@ namespace DoFRenumbering
   random (DoFHandlerType &dof_handler);
 
   /**
-   * Computes the renumbering vector needed by the random() function. See
+   * Compute the renumbering vector needed by the random() function. See
    * there for more information on the computed random renumbering.
    *
    * This function does not perform the renumbering on the DoFHandler dofs but
@@ -1068,7 +1068,7 @@ namespace DoFRenumbering
   subdomain_wise (DoFHandlerType &dof_handler);
 
   /**
-   * Computes the renumbering vector needed by the subdomain_wise() function.
+   * Compute the renumbering vector needed by the subdomain_wise() function.
    * Does not perform the renumbering on the @p DoFHandler dofs but returns
    * the renumbering vector.
    */

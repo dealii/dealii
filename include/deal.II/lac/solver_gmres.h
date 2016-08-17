@@ -84,7 +84,7 @@ namespace internal
                               const VectorType   &temp);
 
       /**
-       * Returns size of data vector. It is used in the solver to store
+       * Return size of data vector. It is used in the solver to store
        * the Arnoldi vectors.
        */
       unsigned int size() const;

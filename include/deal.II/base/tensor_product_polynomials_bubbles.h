@@ -63,7 +63,7 @@ public:
   TensorProductPolynomialsBubbles (const std::vector<Pol> &pols);
 
   /**
-   * Computes the value and the first and second derivatives of each tensor
+   * Compute the value and the first and second derivatives of each tensor
    * product polynomial at <tt>unit_point</tt>.
    *
    * The size of the vectors must either be equal 0 or equal n(). In the first
@@ -82,7 +82,7 @@ public:
                 std::vector<Tensor<4,dim> > &fourth_derivatives) const;
 
   /**
-   * Computes the value of the <tt>i</tt>th tensor product polynomial at
+   * Compute the value of the <tt>i</tt>th tensor product polynomial at
    * <tt>unit_point</tt>. Here <tt>i</tt> is given in tensor product
    * numbering.
    *
@@ -97,7 +97,7 @@ public:
                         const Point<dim> &p) const;
 
   /**
-   * Computes the order @p order derivative of the <tt>i</tt>th tensor product
+   * Compute the order @p order derivative of the <tt>i</tt>th tensor product
    * polynomial at <tt>unit_point</tt>. Here <tt>i</tt> is given in tensor
    * product numbering.
    *
@@ -113,7 +113,7 @@ public:
                                         const Point<dim> &p) const;
 
   /**
-   * Computes the grad of the <tt>i</tt>th tensor product polynomial at
+   * Compute the grad of the <tt>i</tt>th tensor product polynomial at
    * <tt>unit_point</tt>. Here <tt>i</tt> is given in tensor product
    * numbering.
    *
@@ -128,7 +128,7 @@ public:
                               const Point<dim> &p) const;
 
   /**
-   * Computes the second derivative (grad_grad) of the <tt>i</tt>th tensor
+   * Compute the second derivative (grad_grad) of the <tt>i</tt>th tensor
    * product polynomial at <tt>unit_point</tt>. Here <tt>i</tt> is given in
    * tensor product numbering.
    *
@@ -143,7 +143,7 @@ public:
                                    const Point<dim> &p) const;
 
   /**
-   * Returns the number of tensor product polynomials plus the bubble
+   * Return the number of tensor product polynomials plus the bubble
    * enrichments. For <i>n</i> 1d polynomials this is <i>n<sup>dim</sup>+1</i>
    * if the maximum degree of the polynomials is one and
    * <i>n<sup>dim</sup>+dim</i> otherwise.

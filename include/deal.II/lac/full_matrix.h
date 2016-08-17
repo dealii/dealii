@@ -545,7 +545,7 @@ public:
   real_type relative_symmetry_norm2 () const;
 
   /**
-   * Computes the determinant of a matrix.  This is only implemented for one,
+   * Compute the determinant of a matrix.  This is only implemented for one,
    * two, and three dimensions, since for higher dimensions the numerical work
    * explodes.  Obviously, the matrix needs to be quadratic for this function.
    */

@@ -402,7 +402,7 @@ public:
                            const unsigned int fe_index = DoFHandlerType::default_fe_index) const;
 
   /**
-   * Sets the level DoF indices that are returned by get_mg_dof_indices.
+   * Set the level DoF indices that are returned by get_mg_dof_indices.
    */
   void set_mg_dof_indices (const int level,
                            const std::vector<types::global_dof_index> &dof_indices,
@@ -431,7 +431,7 @@ public:
    const unsigned int fe_index = DoFHandlerType::default_fe_index) const;
 
   /**
-   * Returns the global DoF index of the <code>i</code>th degree of freedom
+   * Return the global DoF index of the <code>i</code>th degree of freedom
    * associated with the <code>vertex</code>th vertex on level @p level. Also
    * see vertex_dof_index().
    */
@@ -473,7 +473,7 @@ public:
    const unsigned int fe_index = DoFHandlerType::default_fe_index) const;
 
   /**
-   * Returns the dof_index on the given level. Also see dof_index.
+   * Return the dof_index on the given level. Also see dof_index.
    */
   types::global_dof_index mg_dof_index (const int level, const unsigned int i) const;
 
@@ -1684,7 +1684,7 @@ public:
   get_fe () const;
 
   /**
-   * Returns the index inside the hp::FECollection of the FiniteElement used
+   * Return the index inside the hp::FECollection of the FiniteElement used
    * for this cell. This function is only useful if the DoF handler object
    * associated with the current cell is an hp::DoFHandler.
    *
@@ -1698,7 +1698,7 @@ public:
   unsigned int active_fe_index () const;
 
   /**
-   * Sets the index of the FiniteElement used for this cell. This determines
+   * Set the index of the FiniteElement used for this cell. This determines
    * which element in an hp::FECollection to use. This function is only useful
    * if the DoF handler object associated with the current cell is an
    * hp::DoFHandler.

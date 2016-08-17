@@ -308,7 +308,7 @@ public:
                                     const unsigned int face_index) const;
 
   /**
-   * Returns a list of constant modes of the element. For this element, there
+   * Return a list of constant modes of the element. For this element, there
    * are two constant modes despite the element is scalar: The first constant
    * mode is all ones for the usual FE_Q basis and the second one only using
    * the discontinuous part.
@@ -327,7 +327,7 @@ protected:
 private:
 
   /**
-   * Returns the restriction_is_additive flags. Only the last component is
+   * Return the restriction_is_additive flags. Only the last component is
    * true.
    */
   static std::vector<bool> get_riaf_vector(const unsigned int degree);

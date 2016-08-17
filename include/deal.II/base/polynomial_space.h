@@ -120,13 +120,13 @@ public:
   void output_indices(StreamType &out) const;
 
   /**
-   * Sets the ordering of the polynomials. Requires
+   * Set the ordering of the polynomials. Requires
    * <tt>renumber.size()==n()</tt>. Stores a copy of <tt>renumber</tt>.
    */
   void set_numbering(const std::vector<unsigned int> &renumber);
 
   /**
-   * Computes the value and the first and second derivatives of each
+   * Compute the value and the first and second derivatives of each
    * polynomial at <tt>unit_point</tt>.
    *
    * The size of the vectors must either be equal 0 or equal n(). In the first
@@ -146,7 +146,7 @@ public:
                 std::vector<Tensor<4,dim> > &fourth_derivatives) const;
 
   /**
-   * Computes the value of the <tt>i</tt>th polynomial at unit point
+   * Compute the value of the <tt>i</tt>th polynomial at unit point
    * <tt>p</tt>.
    *
    * Consider using compute() instead.
@@ -155,7 +155,7 @@ public:
                         const Point<dim> &p) const;
 
   /**
-   * Computes the <tt>order</tt>th derivative of the <tt>i</tt>th polynomial
+   * Compute the <tt>order</tt>th derivative of the <tt>i</tt>th polynomial
    * at unit point <tt>p</tt>.
    *
    * Consider using compute() instead.
@@ -167,7 +167,7 @@ public:
                                         const Point<dim> &p) const;
 
   /**
-   * Computes the gradient of the <tt>i</tt>th polynomial at unit point
+   * Compute the gradient of the <tt>i</tt>th polynomial at unit point
    * <tt>p</tt>.
    *
    * Consider using compute() instead.
@@ -176,7 +176,7 @@ public:
                               const Point<dim> &p) const;
 
   /**
-   * Computes the second derivative (grad_grad) of the <tt>i</tt>th polynomial
+   * Compute the second derivative (grad_grad) of the <tt>i</tt>th polynomial
    * at unit point <tt>p</tt>.
    *
    * Consider using compute() instead.

@@ -87,17 +87,17 @@ namespace MeshWorker
     bool empty () const;
 
     /**
-     * Returns true if values are selected for any vector.
+     * Return true if values are selected for any vector.
      */
     bool has_values () const;
 
     /**
-     * Returns true if gradients are selected for any vector.
+     * Return true if gradients are selected for any vector.
      */
     bool has_gradients () const;
 
     /**
-     * Returns true if hessians are selected for any vector.
+     * Return true if hessians are selected for any vector.
      */
     bool has_hessians () const;
 

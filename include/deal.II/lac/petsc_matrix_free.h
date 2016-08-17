@@ -153,7 +153,7 @@ namespace PETScWrappers
                  const unsigned int  this_process);
 
     /**
-     * Calls the @p reinit() function above with <tt>communicator =
+     * Call the @p reinit() function above with <tt>communicator =
      * MPI_COMM_WORLD</tt>.
      */
     void reinit (const unsigned int  m,
@@ -162,7 +162,7 @@ namespace PETScWrappers
                  const unsigned int  local_columns);
 
     /**
-     * Calls the @p reinit() function above with <tt>communicator =
+     * Call the @p reinit() function above with <tt>communicator =
      * MPI_COMM_WORLD</tt>.
      */
     void reinit (const unsigned int  m,

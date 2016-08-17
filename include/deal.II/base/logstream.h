@@ -63,7 +63,7 @@ DEAL_II_NAMESPACE_OPEN
  * can be set via <tt>LogStream::Prefix p("loopname");</tt>. The destructor of
  * the prefix will pop the prefix text from the stack.
  *
- * Writes via the <tt>&lt;&lt;</tt> operator, <tt> deallog << "This is a log
+ * Write via the <tt>&lt;&lt;</tt> operator, <tt> deallog << "This is a log
  * notice";</tt> will be buffered thread locally until a <tt>std::flush</tt>
  * or <tt>std::endl</tt> is encountered, which will trigger a writeout to the
  * console and, if set up, the log file.

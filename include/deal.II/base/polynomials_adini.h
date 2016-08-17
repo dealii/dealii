@@ -45,7 +45,7 @@ public:
    */
   PolynomialsAdini ();
   /**
-   * Computes the value and the first and second derivatives of each
+   * Compute the value and the first and second derivatives of each
    * polynomial at <tt>unit_point</tt>.
    *
    * The size of the vectors must either be equal 0 or equal n(). In the first
@@ -64,7 +64,7 @@ public:
                 std::vector< Tensor<2,2> > &grad_grads) const;
 
   /**
-   * Computes the value of the <tt>i</tt>th polynomial at <tt>unit_point</tt>.
+   * Compute the value of the <tt>i</tt>th polynomial at <tt>unit_point</tt>.
    *
    * Consider using compute() instead.
    */
@@ -73,7 +73,7 @@ public:
                         const Point<2> &p) const;
 
   /**
-   * Computes the gradient of the <tt>i</tt>th polynomial at
+   * Compute the gradient of the <tt>i</tt>th polynomial at
    * <tt>unit_point</tt>.
    *
    * Consider using compute() instead.
@@ -82,7 +82,7 @@ public:
   Tensor<1,2> compute_grad (const unsigned int i,
                             const Point<2> &p) const;
   /**
-   * Computes the second derivative (grad_grad) of the <tt>i</tt>th polynomial
+   * Compute the second derivative (grad_grad) of the <tt>i</tt>th polynomial
    * at <tt>unit_point</tt>.
    *
    * Consider using compute() instead.

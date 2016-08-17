@@ -34,7 +34,7 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * @relates LinearOperator
  *
- * Returns a LinearOperator that performs the operations associated with the
+ * Return a LinearOperator that performs the operations associated with the
  * Schur complement. There are two additional helper functions,
  * condense_schur_rhs() and postprocess_schur_solution(), that are likely
  * necessary to be used in order to perform any useful tasks in linear algebra

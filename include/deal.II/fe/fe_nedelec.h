@@ -263,7 +263,7 @@ public:
   const;
 
   /**
-   * Returns a list of constant modes of the element.
+   * Return a list of constant modes of the element.
    */
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
   get_constant_modes () const;

@@ -226,13 +226,13 @@ public:
 
 protected:
   /**
-   * Sets the points of the quadrature formula.
+   * Set the points of the quadrature formula.
    */
   std::vector<double>
   set_quadrature_points(const unsigned int n) const;
 
   /**
-   * Sets the weights of the quadrature formula.
+   * Set the weights of the quadrature formula.
    */
   std::vector<double>
   set_quadrature_weights(const unsigned int n) const;

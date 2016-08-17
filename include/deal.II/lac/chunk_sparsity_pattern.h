@@ -80,7 +80,7 @@ namespace ChunkSparsityPatternIterators
     unsigned int row () const;
 
     /**
-     * Returns the global index from the reduced sparsity pattern.
+     * Return the global index from the reduced sparsity pattern.
      */
     std::size_t reduced_index() const;
 

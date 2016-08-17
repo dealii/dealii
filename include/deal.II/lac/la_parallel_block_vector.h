@@ -328,7 +328,7 @@ namespace LinearAlgebra
       void zero_out_ghosts ();
 
       /**
-       * Returns if this Vector contains ghost elements.
+       * Return if this Vector contains ghost elements.
        */
       bool has_ghost_elements() const;
 
@@ -374,7 +374,7 @@ namespace LinearAlgebra
       bool all_zero () const;
 
       /**
-       * Computes the mean value of all the entries in the vector.
+       * Compute the mean value of all the entries in the vector.
        */
       Number mean_value () const;
 

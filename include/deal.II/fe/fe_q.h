@@ -572,7 +572,7 @@ public:
   FE_Q (const Quadrature<1> &points);
 
   /**
-   * Constructs a FE_Q_isoQ1 element. That element shares large parts of code
+   * Construct a FE_Q_isoQ1 element. That element shares large parts of code
    * with FE_Q so most of the construction work is done in this routine,
    * whereas the public constructor is in the class FE_Q_isoQ1.
    */

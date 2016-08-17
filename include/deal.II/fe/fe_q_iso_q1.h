@@ -108,7 +108,7 @@ class FE_Q_iso_Q1 : public FE_Q_Base<TensorProductPolynomials<dim, Polynomials::
 {
 public:
   /**
-   * Constructs a FE_Q_iso_Q1 element with a given number of subdivisions. The
+   * Construct a FE_Q_iso_Q1 element with a given number of subdivisions. The
    * number of subdivision is similar to the degree in FE_Q in the sense that
    * both elements produce the same number of degrees of freedom.
    */

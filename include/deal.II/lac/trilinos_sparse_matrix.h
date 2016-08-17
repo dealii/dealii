@@ -1031,7 +1031,7 @@ namespace TrilinosWrappers
     unsigned int row_length (const size_type row) const;
 
     /**
-     * Returns the state of the matrix, i.e., whether compress() needs to be
+     * Return the state of the matrix, i.e., whether compress() needs to be
      * called after an operation requiring data exchange. A call to compress()
      * is also needed when the method set() has been called (even when working
      * in serial).

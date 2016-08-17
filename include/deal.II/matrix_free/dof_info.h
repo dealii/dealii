@@ -70,61 +70,61 @@ namespace internal
       DoFInfo (const DoFInfo &dof_info);
 
       /**
-       * Clears all data fields in this class.
+       * Clear all data fields in this class.
        */
       void clear ();
 
 
       /**
-       * Returns a pointer to the first index in the DoF row @p row.
+       * Return a pointer to the first index in the DoF row @p row.
        */
       const unsigned int *begin_indices (const unsigned int row) const;
 
       /**
-       * Returns a pointer to the one past the last DoF index in the row @p
+       * Return a pointer to the one past the last DoF index in the row @p
        * row.
        */
       const unsigned int *end_indices (const unsigned int row) const;
 
       /**
-       * Returns the number of entries in the indices field for the given row.
+       * Return the number of entries in the indices field for the given row.
        */
       unsigned int row_length_indices (const unsigned int row) const;
 
       /**
-       * Returns a pointer to the first constraint indicator in the row @p
+       * Return a pointer to the first constraint indicator in the row @p
        * row.
        */
       const std::pair<unsigned short,unsigned short> *
       begin_indicators (const unsigned int row) const;
 
       /**
-       * Returns a pointer to the one past the last constraint indicator in
+       * Return a pointer to the one past the last constraint indicator in
        * the row @p row.
        */
       const std::pair<unsigned short,unsigned short> *
       end_indicators (const unsigned int row) const;
 
       /**
-       * Returns the number of entries in the constraint indicator field for
+       * Return the number of entries in the constraint indicator field for
        * the given row.
        */
       unsigned int row_length_indicators (const unsigned int row) const;
 
       /**
-       * Returns a pointer to the first index in the DoF row @p row for plain
+       * Return a pointer to the first index in the DoF row @p row for plain
        * indices (i.e., the entries where constraints are not embedded).
        */
       const unsigned int *begin_indices_plain (const unsigned int row) const;
 
       /**
-       * Returns a pointer to the one past the last DoF index in the row @p
+       * Return a pointer to the one past the last DoF index in the row @p
        * row (i.e., the entries where constraints are not embedded).
        */
       const unsigned int *end_indices_plain (const unsigned int row) const;
 
       /**
-       * Returns the FE index for a given finite element degree. If not in hp
+       * Return the FE index for a given finite element degree. If not in hp
        * mode, this function always returns index 0. If an index is not found
        * in hp mode, it returns max_fe_degree, i.e., one index past the last
        * valid one.
@@ -133,7 +133,7 @@ namespace internal
 
 
       /**
-       * Returns the FE index for a given finite element degree. If not in hp
+       * Return the FE index for a given finite element degree. If not in hp
        * mode or if the index is not found, this function always returns index
        * 0. Hence, this function does not check whether the given degree is
        * actually present.
@@ -186,7 +186,7 @@ namespace internal
                                        std::vector<unsigned int> &irregular_cells);
 
       /**
-       * Computes the initial renumbering of cells such that all cells with
+       * Compute the initial renumbering of cells such that all cells with
        * ghosts are put first. This is the first step before building the
        * thread graph and used to overlap computations and communication.
        */
@@ -276,7 +276,7 @@ namespace internal
       void renumber_dofs (std::vector<types::global_dof_index> &renumbering);
 
       /**
-       * Returns the memory consumption in bytes of this class.
+       * Return the memory consumption in bytes of this class.
        */
       std::size_t memory_consumption() const;
 

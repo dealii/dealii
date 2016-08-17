@@ -176,7 +176,7 @@ protected:
 private:
 
   /**
-   * Returns the restriction_is_additive flags. Only the last components for
+   * Return the restriction_is_additive flags. Only the last components for
    * the bubble enrichments are true.
    */
   static std::vector<bool> get_riaf_vector(const unsigned int degree);

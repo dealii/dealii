@@ -113,7 +113,7 @@ namespace parallel
 
 
     /**
-     * Returns the global maximum level. This may be bigger than the number
+     * Return the global maximum level. This may be bigger than the number
      * dealii::Triangulation::n_levels() (a function in this class's base
      * class) returns if the current processor only stores cells in parts of
      * the domain that are not very refined, but if other processors store
@@ -130,7 +130,7 @@ namespace parallel
     types::subdomain_id locally_owned_subdomain () const;
 
     /**
-     * Returns a set of MPI ranks of the processors that have at least one
+     * Return a set of MPI ranks of the processors that have at least one
      * ghost cell adjacent to the cells of the local processor. In other
      * words, this is the set of subdomain_id() for all ghost cells.
      *
@@ -140,7 +140,7 @@ namespace parallel
     const std::set<unsigned int> &ghost_owners () const;
 
     /**
-     * Returns a set of MPI ranks of the processors that have at least one
+     * Return a set of MPI ranks of the processors that have at least one
      * level ghost cell adjacent to our cells used in geometric multigrid. In
      * other words, this is the set of level_subdomain_id() for all level
      * ghost cells.

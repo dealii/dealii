@@ -294,7 +294,7 @@ public:
                                     const unsigned int face_index) const;
 
   /**
-   * Returns a list of constant modes of the element. For this element, it
+   * Return a list of constant modes of the element. For this element, it
    * simply returns one row with all entries set to true.
    */
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >

@@ -127,7 +127,7 @@ namespace Patterns
   };
 
   /**
-   * Returns pointer to the correct derived class based on description.
+   * Return pointer to the correct derived class based on description.
    */
   PatternBase *pattern_factory (const std::string &description);
 

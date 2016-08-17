@@ -198,7 +198,7 @@ namespace TrilinosWrappers
                  const double                               drop_tolerance=1e-13);
 
     /**
-     * Returns the state of the matrix, i.e., whether compress() needs to be
+     * Return the state of the matrix, i.e., whether compress() needs to be
      * called after an operation requiring data exchange. Does only return
      * non-true values when used in <tt>debug</tt> mode, since it is quite
      * expensive to keep track of all operations that lead to the need for

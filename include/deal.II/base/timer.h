@@ -102,7 +102,7 @@ public:
          const bool sync_wall_time = false);
 
   /**
-   * Returns a reference to the data structure with global timing information.
+   * Return a reference to the data structure with global timing information.
    * Filled after calling stop().
    */
   const Utilities::MPI::MinMaxAvg &get_data() const;
@@ -123,7 +123,7 @@ public:
   void start ();
 
   /**
-   * Sets the current time as next starting time and return the elapsed time
+   * Set the current time as next starting time and return the elapsed time
    * in seconds.
    */
   double stop ();
@@ -152,7 +152,7 @@ public:
   double wall_time () const;
 
   /**
-   * Returns the last lap time; the time taken between the last start()/stop()
+   * Return the last lap time; the time taken between the last start()/stop()
    * call.
    */
   double get_lap_time () const;

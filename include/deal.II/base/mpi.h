@@ -308,7 +308,7 @@ namespace Utilities
     };
 
     /**
-     * Returns sum, average, minimum, maximum, processor id of minimum and
+     * Return sum, average, minimum, maximum, processor id of minimum and
      * maximum as a collective operation of on the given MPI
      * @ref GlossMPICommunicator "communicator"
      * @p mpi_communicator. Each processor's value is given in @p my_value and

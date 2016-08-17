@@ -211,7 +211,7 @@ public:
   bool can_store_line (const size_type line_index) const;
 
   /**
-   * Returns the index set describing locally relevant lines if any are
+   * Return the index set describing locally relevant lines if any are
    * present. Note that if no local lines were given, this represents an empty
    * IndexSet, whereas otherwise it contains the global problem size and the
    * local range.
@@ -449,27 +449,27 @@ public:
   size_type max_constraint_indirections () const;
 
   /**
-   * Returns <tt>true</tt> in case the dof is constrained and there is a non-
+   * Return <tt>true</tt> in case the dof is constrained and there is a non-
    * trivial inhomogeneous values set to the dof.
    */
   bool is_inhomogeneously_constrained (const size_type index) const;
 
   /**
-   * Returns <tt>false</tt> if all constraints in the ConstraintMatrix are
+   * Return <tt>false</tt> if all constraints in the ConstraintMatrix are
    * homogeneous ones, and <tt>true</tt> if there is at least one
    * inhomogeneity.
    */
   bool has_inhomogeneities () const;
 
   /**
-   * Returns a pointer to the the vector of entries if a line is constrained,
+   * Return a pointer to the the vector of entries if a line is constrained,
    * and a zero pointer in case the dof is not constrained.
    */
   const std::vector<std::pair<size_type,double> > *
   get_constraint_entries (const size_type line) const;
 
   /**
-   * Returns the value of the inhomogeneity stored in the constrained dof @p
+   * Return the value of the inhomogeneity stored in the constrained dof @p
    * line. Unconstrained dofs also return a zero value.
    */
   double get_inhomogeneity (const size_type line) const;
@@ -623,7 +623,7 @@ public:
                  BlockVectorType           &vector) const;
 
   /**
-   * Sets the values of all constrained DoFs in a vector to zero.  The @p
+   * Set the values of all constrained DoFs in a vector to zero.  The @p
    * VectorType may be a Vector<float>, Vector<double>,
    * BlockVector<tt><...></tt>, a PETSc or Trilinos vector wrapper class, or
    * any other type having the same interface.

@@ -133,7 +133,7 @@ namespace internal
 
 
     /**
-     * Returns whether q1 and q2 are equal
+     * Return whether q1 and q2 are equal
      */
     template <int dim>
     bool
@@ -605,7 +605,7 @@ namespace parallel
 
 
       /**
-       * Returns true if the triangulation has hanging nodes.
+       * Return true if the triangulation has hanging nodes.
        *
        * In the context of parallel distributed triangulations, every
        * processor stores only that part of the triangulation it locally owns.
@@ -988,7 +988,7 @@ namespace parallel
       virtual ~Triangulation ();
 
       /**
-       * Returns a permutation vector for the order the coarse cells are
+       * Return a permutation vector for the order the coarse cells are
        * handed of to p4est. For example the first element i in this vector
        * denotes that the first cell in hierarchical ordering is the ith deal
        * cell starting from begin(0).

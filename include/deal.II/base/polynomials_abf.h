@@ -69,7 +69,7 @@ public:
   ~PolynomialsABF ();
 
   /**
-   * Computes the value and the first and second derivatives of each Raviart-
+   * Compute the value and the first and second derivatives of each Raviart-
    * Thomas polynomial at @p unit_point.
    *
    * The size of the vectors must either be zero or equal <tt>n()</tt>.  In
@@ -88,12 +88,12 @@ public:
                 std::vector<Tensor<5,dim> > &fourth_derivatives) const;
 
   /**
-   * Returns the number of ABF polynomials.
+   * Return the number of ABF polynomials.
    */
   unsigned int n () const;
 
   /**
-   * Returns the degree of the ABF space, which is two less than the highest
+   * Return the degree of the ABF space, which is two less than the highest
    * polynomial degree.
    */
   unsigned int degree () const;

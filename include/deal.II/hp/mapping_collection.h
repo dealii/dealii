@@ -88,7 +88,7 @@ namespace hp
     void push_back (const Mapping<dim,spacedim> &new_mapping);
 
     /**
-     * Returns the mapping object which was specified by the user for the
+     * Return the mapping object which was specified by the user for the
      * active_fe_index which is provided as a parameter to this method.
      *
      * @pre @p index must be between zero and the number of elements of the
@@ -98,7 +98,7 @@ namespace hp
     operator[] (const unsigned int index) const;
 
     /**
-     * Returns the number of mapping objects stored in this container.
+     * Return the number of mapping objects stored in this container.
      */
     unsigned int size () const;
 

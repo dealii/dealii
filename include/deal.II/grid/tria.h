@@ -1546,7 +1546,7 @@ public:
   virtual void clear ();
 
   /**
-   * Sets the mesh smoothing to @p mesh_smoothing. This overrides the
+   * Set the mesh smoothing to @p mesh_smoothing. This overrides the
    * MeshSmoothing given to the constructor. It is allowed to call this
    * function only if the triangulation is empty.
    */
@@ -1703,7 +1703,7 @@ public:
   const Manifold<dim,spacedim> &get_manifold (const types::manifold_id number) const;
 
   /**
-   * Returns a vector containing all boundary indicators assigned to boundary
+   * Return a vector containing all boundary indicators assigned to boundary
    * faces of this Triangulation object. Note, that each boundary indicator is
    * reported only once. The size of the return vector will represent the
    * number of different indicators (which is greater or equal one).
@@ -1716,7 +1716,7 @@ public:
   std::vector<types::boundary_id> get_boundary_ids() const;
 
   /**
-   * Returns a vector containing all manifold indicators assigned to the
+   * Return a vector containing all manifold indicators assigned to the
    * objects of this Triangulation. Note, that each manifold indicator is
    * reported only once. The size of the return vector will represent the
    * number of different indicators (which is greater or equal one).

@@ -120,7 +120,7 @@ public:
   compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
 
   /**
-   * Returns a list of constant modes of the element. For this element, it
+   * Return a list of constant modes of the element. For this element, it
    * simply returns one row with all entries set to true.
    */
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
@@ -225,7 +225,7 @@ public:
   compare_for_face_domination (const FiniteElement<1,spacedim> &fe_other) const;
 
   /**
-   * Returns a list of constant modes of the element. For this element, it
+   * Return a list of constant modes of the element. For this element, it
    * simply returns one row with all entries set to true.
    */
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
@@ -422,7 +422,7 @@ public:
   compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
 
   /**
-   * Returns a list of constant modes of the element. For this element, the
+   * Return a list of constant modes of the element. For this element, the
    * first entry on each face is true, all other are false (as the constant
    * function is represented by the first base function of Legendre
    * polynomials).
@@ -452,7 +452,7 @@ public:
   FE_FaceP (const unsigned int p);
 
   /**
-   * Returns the name of the element
+   * Return the name of the element
    */
   std::string get_name() const;
 };

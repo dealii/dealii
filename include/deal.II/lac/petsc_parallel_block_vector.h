@@ -248,7 +248,7 @@ namespace PETScWrappers
       void reinit (const unsigned int num_blocks);
 
       /**
-       * Returns if this vector is a ghosted vector (and thus read-only).
+       * Return if this vector is a ghosted vector (and thus read-only).
        */
       bool has_ghost_elements() const;
 
