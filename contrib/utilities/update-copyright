@@ -1,7 +1,7 @@
 #!/bin/bash
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2015 by the deal.II authors
+## Copyright (C) 2015, 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -32,6 +32,7 @@ files="`echo include/deal.II/*/*h \
        `find cmake/ | egrep '\.(cmake|in|cc)$'`
        `find . -name CMakeLists.txt`
        `find tests/ | egrep '\.(h|cc)$'`
+       `find doc/ | egrep '\.html$'`
        "
 
 for i in $files ; do
