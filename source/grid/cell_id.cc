@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 by the deal.II authors
+// Copyright (C) 2015,2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,8 @@
 
 #include <deal.II/grid/cell_id.h>
 
+#include <deal.II/grid/tria.h>
+
 #include <sstream>
 
 DEAL_II_NAMESPACE_OPEN
@@ -26,5 +28,20 @@ CellId::to_string() const
   ss << *this;
   return ss.str();
 }
+
+template<int dim, int spacedim>
+typename Triangulation<dim,spacedim>::cell_iterator
+CellId::to_cell(const Triangulation<dim,spacedim> &tria) const
+{
+  typename Triangulation<dim,spacedim>::cell_iterator cell (&tria,0,coarse_cell_id);
+
+  for (unsigned int i = 0; i < id.size(); ++i)
+    cell = cell->child(static_cast<unsigned int> (id[i]));
+
+  return cell;
+}
+
+// explicit instantiations
+#include "cell_id.inst"
 
 DEAL_II_NAMESPACE_CLOSE

@@ -37,6 +37,7 @@ SET(_src
   )
 
 SET(_inst
+  cell_id.inst.in
   grid_generator.inst.in
   grid_in.inst.in
   grid_out.inst.in

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2015 by the deal.II authors
+// Copyright (C) 1998 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,6 +25,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+template <int, int> class Triangulation;
 
 /**
  * A class to represent a unique ID for a cell in a Triangulation.  This class
@@ -73,6 +74,13 @@ public:
    * Return a string representation of this CellId.
    */
   std::string to_string() const;
+
+  /**
+   * Return a cell_iterator to the cell represented by this CellId.
+   */
+  template<int dim, int spacedim>
+  typename Triangulation<dim,spacedim>::cell_iterator
+  to_cell(const Triangulation<dim,spacedim> &tria) const;
 
   /**
    * compare two CellIds
