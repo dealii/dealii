@@ -993,7 +993,7 @@
   pages =        {4/1--4/31}
 }
  * @endcode
- * It is available from <a href="http://www.math.tamu.edu/~bangerth/publications.html">http://www.math.tamu.edu/~bangerth/publications.html</a>, also see <a href="https://www.dealii.org/publications.html#details">deal.II publications</a> for details.
+ * It is available from <a href="http://www.math.colostate.edu/~bangerth/publications.html">http://www.math.colostate.edu/~bangerth/publications.html</a>, also see <a href="https://www.dealii.org/publications.html#details">deal.II publications</a> for details.
  *
  * The numerical examples shown in that paper are generated with a slightly
  * modified version of step-27. The main difference to that
@@ -1698,10 +1698,10 @@
   author =       {Bruno Turcksin and Martin Kronbichler and Wolfgang Bangerth},
   title =        {\textit{WorkStream} -- a design pattern for multicore-enabled finite element computations},
   journal =      {accepted for publication in the ACM Trans. Math. Softw.},
-  year =         2015
+  year =         2016
 }
  * @endcode
- * It is available from <a href="http://www.math.tamu.edu/~bangerth/publications.html">http://www.math.tamu.edu/~bangerth/publications.html</a>, also see <a href="https://www.dealii.org/publications.html#details">deal.II publications</a> for details.
+ * It is available from <a href="http://www.math.colostate.edu/~bangerth/publications.html">http://www.math.colostate.edu/~bangerth/publications.html</a>, also see <a href="https://www.dealii.org/publications.html#details">deal.II publications</a> for details.
  * </dd>
  *
  * </dl>

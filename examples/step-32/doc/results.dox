@@ -304,7 +304,7 @@ The last two images show the grid as well as the partitioning of the
 mesh for a computation with 10 subdomains on 10 processors. The full dynamics
 of this simulation are really only visible by looking at
 an animation, for example the one <a
-href="http://www.math.tamu.edu/~bangerth/images/pictures/convection-outward/\step-32.2d.convection.gif">shown on
+href="http://www.math.colostate.edu/~bangerth/images/pictures/convection-outward/\step-32.2d.convection.gif">shown on
 this site</a>. Beware that this animation is
 about 20MB large, though it is well worth watching due to its almost
 artistic quality.

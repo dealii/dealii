@@ -115,7 +115,7 @@ to other useful pieces of information.
 
 This and several of the other tutorial programs are also discussed and
 demonstrated in <a
-href="http://www.math.tamu.edu/~bangerth/videos.html">Wolfgang
+href="http://www.math.colostate.edu/~bangerth/videos.html">Wolfgang
 Bangerth's video lectures</a> on deal.II and computational science. In
 particular, you can see the steps he executes to run this and other
 programs, and you will get a much better idea of the tools that can be
