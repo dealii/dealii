@@ -332,25 +332,25 @@ public:
   void print(StreamType &out) const;
 
   /**
-   * Writes the IndexSet into a text based file format, that can be read in
+   * Write the IndexSet into a text based file format, that can be read in
    * again using the read() function.
    */
   void write(std::ostream &out) const;
 
   /**
-   * Constructs the IndexSet from a text based representation given by the
+   * Construct the IndexSet from a text based representation given by the
    * stream @p in written by the write() function.
    */
   void read(std::istream &in);
 
   /**
-   * Writes the IndexSet into a binary, compact representation, that can be
+   * Write the IndexSet into a binary, compact representation, that can be
    * read in again using the block_read() function.
    */
   void block_write(std::ostream &out) const;
 
   /**
-   * Constructs the IndexSet from a binary representation given by the stream
+   * Construct the IndexSet from a binary representation given by the stream
    * @p in written by the write_block() function.
    */
   void block_read(std::istream &in);

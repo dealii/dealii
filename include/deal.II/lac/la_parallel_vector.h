@@ -213,13 +213,13 @@ namespace LinearAlgebra
       Vector (const Vector<Number> &in_vector);
 
       /**
-       * Constructs a parallel vector of the given global size without any
+       * Construct a parallel vector of the given global size without any
        * actual parallel distribution.
        */
       Vector (const size_type size);
 
       /**
-       * Constructs a parallel vector. The local range is specified by @p
+       * Construct a parallel vector. The local range is specified by @p
        * locally_owned_set (note that this must be a contiguous interval,
        * multiple intervals are not possible). The IndexSet @p ghost_indices
        * specifies ghost indices, i.e., indices which one might need to read
@@ -258,7 +258,7 @@ namespace LinearAlgebra
       virtual ~Vector ();
 
       /**
-       * Sets the global size of the vector to @p size without any actual
+       * Set the global size of the vector to @p size without any actual
        * parallel distribution.
        */
       void reinit (const size_type size,
@@ -512,7 +512,7 @@ namespace LinearAlgebra
       void zero_out_ghosts ();
 
       /**
-       * Returns whether the vector currently is in a state where ghost values
+       * Return whether the vector currently is in a state where ghost values
        * can be read or not. This is the same functionality as other parallel
        * vectors have. If this method returns false, this only means that
        * read-access to ghost elements is prohibited whereas write access is
@@ -729,13 +729,13 @@ namespace LinearAlgebra
       //@{
 
       /**
-       * Returns the local size of the vector, i.e., the number of indices
+       * Return the local size of the vector, i.e., the number of indices
        * owned locally.
        */
       size_type local_size() const;
 
       /**
-       * Returns the half-open interval that specifies the locally owned range
+       * Return the half-open interval that specifies the locally owned range
        * of the vector. Note that <code>local_size() == local_range().second -
        * local_range().first</code>.
        *
@@ -744,7 +744,7 @@ namespace LinearAlgebra
       std::pair<size_type, size_type> local_range () const DEAL_II_DEPRECATED;
 
       /**
-       * Returns true if the given global index is in the local range of this
+       * Return true if the given global index is in the local range of this
        * processor.
        *
        * This function is deprecated.
@@ -752,7 +752,7 @@ namespace LinearAlgebra
       bool in_local_range (const size_type global_index) const DEAL_II_DEPRECATED;
 
       /**
-       * Returns the number of ghost elements present on the vector.
+       * Return the number of ghost elements present on the vector.
        *
        * This function is deprecated.
        */
@@ -768,7 +768,7 @@ namespace LinearAlgebra
       const IndexSet &ghost_elements() const DEAL_II_DEPRECATED;
 
       /**
-       * Returns whether the given global index is a ghost index on the
+       * Return whether the given global index is a ghost index on the
        * present processor. Returns false for indices that are owned locally
        * and for indices not present at all.
        *
@@ -888,7 +888,7 @@ namespace LinearAlgebra
       bool all_zero () const;
 
       /**
-       * Computes the mean value of all the entries in the vector.
+       * Compute the mean value of all the entries in the vector.
        */
       Number mean_value () const;
 
@@ -920,7 +920,7 @@ namespace LinearAlgebra
       get_partitioner () const;
 
       /**
-       * Checks whether the given partitioner is compatible with the
+       * Check whether the given partitioner is compatible with the
        * partitioner used for this vector. Two partitioners are compatible if
        * they have the same local size and the same ghost indices. They do not
        * necessarily need to be the same data field of the shared pointer.
@@ -932,7 +932,7 @@ namespace LinearAlgebra
       partitioners_are_compatible (const Utilities::MPI::Partitioner &part) const;
 
       /**
-       * Checks whether the given partitioner is compatible with the
+       * Check whether the given partitioner is compatible with the
        * partitioner used for this vector. Two partitioners are compatible if
        * they have the same local size and the same ghost indices. They do not
        * necessarily need to be the same data field. As opposed to

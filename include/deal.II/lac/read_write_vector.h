@@ -148,13 +148,13 @@ namespace LinearAlgebra
     ReadWriteVector (const ReadWriteVector<Number> &in_vector);
 
     /**
-     * Constructs a vector given the size, the stored elements have their
+     * Construct a vector given the size, the stored elements have their
      * index in [0,size).
      */
     explicit ReadWriteVector (const size_type size);
 
     /**
-     * Constructs a vector whose stored elements indices are given by the
+     * Construct a vector whose stored elements indices are given by the
      * IndexSet @p locally_stored_indices.
      */
     explicit ReadWriteVector (const IndexSet &locally_stored_indices);
@@ -165,7 +165,7 @@ namespace LinearAlgebra
     ~ReadWriteVector ();
 
     /**
-     * Sets the global size of the vector to @p size. The stored elements have
+     * Set the global size of the vector to @p size. The stored elements have
      * their index in [0,size).
      *
      * If the flag @p omit_zeroing_entries is set to false, the memory will be
@@ -336,19 +336,19 @@ namespace LinearAlgebra
     iterator begin ();
 
     /**
-     * Returns constant iterator to the start of the locally stored elements
+     * Return constant iterator to the start of the locally stored elements
      * of the vector.
      */
     const_iterator begin () const;
 
     /**
-     * Returns an iterator pointing to the element past the end of the array
+     * Return an iterator pointing to the element past the end of the array
      * of locally stored entries.
      */
     iterator end ();
 
     /**
-     * Returns a constant iterator pointing to the element past the end of the
+     * Return a constant iterator pointing to the element past the end of the
      * array of the locally stored entries.
      */
     const_iterator end () const;
@@ -476,7 +476,7 @@ namespace LinearAlgebra
                 const bool          scientific = true) const;
 
     /**
-     * Returns the memory consumption of this class in bytes.
+     * Return the memory consumption of this class in bytes.
      */
     std::size_t memory_consumption () const;
     //@}

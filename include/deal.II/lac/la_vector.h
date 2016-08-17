@@ -255,7 +255,7 @@ namespace LinearAlgebra
     void block_read (std::istream &in);
 
     /**
-     * Returns the memory consumption of this class in bytes.
+     * Return the memory consumption of this class in bytes.
      */
     virtual std::size_t memory_consumption() const;
 

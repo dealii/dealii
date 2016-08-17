@@ -138,7 +138,7 @@ public:
     const VectorSlice<const std::vector<std::vector<double> > > &values) const;
 
   /**
-   * Returns a list of constant modes of the element. This method is currently
+   * Return a list of constant modes of the element. This method is currently
    * not correctly implemented because it returns ones for all components.
    */
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >

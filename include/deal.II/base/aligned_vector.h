@@ -71,7 +71,7 @@ public:
   AlignedVector ();
 
   /**
-   * Sets the vector size to the given size and initializes all elements with
+   * Set the vector size to the given size and initializes all elements with
    * T().
    *
    * @dealiiOperationIsMultithreaded
@@ -164,12 +164,12 @@ public:
   void push_back (const T in_data);
 
   /**
-   * Returns the last element of the vector (read and write access).
+   * Return the last element of the vector (read and write access).
    */
   reference back ();
 
   /**
-   * Returns the last element of the vector (read-only access).
+   * Return the last element of the vector (read-only access).
    */
   const_reference back () const;
 
@@ -197,17 +197,17 @@ public:
   void swap (AlignedVector<T> &vec);
 
   /**
-   * Returns whether the vector is empty, i.e., its size is zero.
+   * Return whether the vector is empty, i.e., its size is zero.
    */
   bool empty () const;
 
   /**
-   * Returns the size of the vector.
+   * Return the size of the vector.
    */
   size_type size () const;
 
   /**
-   * Returns the capacity of the vector, i.e., the size this vector can hold
+   * Return the capacity of the vector, i.e., the size this vector can hold
    * without reallocation. Note that capacity() >= size().
    */
   size_type capacity () const;
@@ -224,27 +224,27 @@ public:
   const_reference operator [] (const size_type index) const;
 
   /**
-   * Returns a read and write pointer to the beginning of the data array.
+   * Return a read and write pointer to the beginning of the data array.
    */
   iterator begin ();
 
   /**
-   * Returns a read and write pointer to the end of the data array.
+   * Return a read and write pointer to the end of the data array.
    */
   iterator end ();
 
   /**
-   * Returns a read-only pointer to the beginning of the data array.
+   * Return a read-only pointer to the beginning of the data array.
    */
   const_iterator begin () const;
 
   /**
-   * Returns a read-only pointer to the end of the data array.
+   * Return a read-only pointer to the end of the data array.
    */
   const_iterator end () const;
 
   /**
-   * Returns the memory consumption of the allocated memory in this class. If
+   * Return the memory consumption of the allocated memory in this class. If
    * the underlying type @p T allocates memory by itself, this memory is not
    * counted.
    */

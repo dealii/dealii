@@ -470,7 +470,7 @@ namespace FETools
                                                      FullMatrix<double>       &I_q);
 
   /**
-   * Computes the projection of tensorial (first-order tensor) data stored at
+   * Compute the projection of tensorial (first-order tensor) data stored at
    * the quadrature points @p vector_of_tensors_at_qp to data @p
    * vector_of_tensors_at_nodes at the support points of the cell.  The data
    * in @p vector_of_tensors_at_qp is ordered sequentially following the

@@ -123,7 +123,7 @@ public:
                    const VectorType   &src) const;
 
   /**
-   * Sets the matrix. This gives the possibility to replace the matrix that
+   * Set the matrix. This gives the possibility to replace the matrix that
    * was given to the constructor by a new matrix.
    */
   template <typename MatrixType>

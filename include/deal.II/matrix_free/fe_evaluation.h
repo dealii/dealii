@@ -135,7 +135,7 @@ public:
   unsigned int get_cell_data_number() const;
 
   /**
-   * Returns the type of the cell the @p reinit function has been called for.
+   * Return the type of the cell the @p reinit function has been called for.
    * Valid values are @p cartesian for Cartesian cells (which allows for
    * considerable data compression), @p affine for cells with affine mappings,
    * and @p general for general cells without any compressed storage applied.
@@ -143,7 +143,7 @@ public:
   internal::MatrixFreeFunctions::CellType get_cell_type() const;
 
   /**
-   * Returns a reference to the ShapeInfo object currently in use.
+   * Return a reference to the ShapeInfo object currently in use.
    */
   const internal::MatrixFreeFunctions::ShapeInfo<Number> &
   get_shape_info() const;
@@ -285,7 +285,7 @@ public:
                                    const unsigned int       first_index=0) const;
 
   /**
-   * Writes data to several vectors. Same as other function with std::vector,
+   * Write data to several vectors. Same as other function with std::vector,
    * but accepts a vector of pointers to vectors.
    */
   template<typename VectorType>
@@ -325,7 +325,7 @@ public:
                        const unsigned int       first_index=0) const;
 
   /**
-   * Writes data to several vectors. Same as other function with std::vector,
+   * Write data to several vectors. Same as other function with std::vector,
    * but accepts a vector of pointers to vectors.
    */
   template<typename VectorType>
@@ -339,7 +339,7 @@ public:
    */
   //@{
   /**
-   * Returns the value stored for the local degree of freedom with index @p
+   * Return the value stored for the local degree of freedom with index @p
    * dof. If the object is vector-valued, a vector-valued return argument is
    * given. Note that when vectorization is enabled, values from several cells
    * are grouped together. If @p set_dof_values was called last, the value
@@ -367,7 +367,7 @@ public:
                          const unsigned int dof);
 
   /**
-   * Returns the value of a finite element function at quadrature point number
+   * Return the value of a finite element function at quadrature point number
    * @p q_point after a call to @p evaluate(true,...), or the value that has
    * been stored there with a call to @p submit_value. If the object is
    * vector-valued, a vector-valued return argument is given. Note that when
@@ -394,7 +394,7 @@ public:
                      const unsigned int q_point);
 
   /**
-   * Returns the gradient of a finite element function at quadrature point
+   * Return the gradient of a finite element function at quadrature point
    * number @p q_point after a call to @p evaluate(...,true,...), or the value
    * that has been stored there with a call to @p submit_gradient.
    *
@@ -420,7 +420,7 @@ public:
                        const unsigned int  q_point);
 
   /**
-   * Returns the Hessian of a finite element function at quadrature point
+   * Return the Hessian of a finite element function at quadrature point
    * number @p q_point after a call to @p evaluate(...,true). If only the
    * diagonal or even the trace of the Hessian, the Laplacian, is needed, use
    * the other functions below.
@@ -433,7 +433,7 @@ public:
   get_hessian (const unsigned int q_point) const;
 
   /**
-   * Returns the diagonal of the Hessian of a finite element function at
+   * Return the diagonal of the Hessian of a finite element function at
    * quadrature point number @p q_point after a call to @p evaluate(...,true).
    *
    * Note that the derived class FEEvaluationAccess overloads this operation
@@ -443,7 +443,7 @@ public:
   gradient_type get_hessian_diagonal (const unsigned int q_point) const;
 
   /**
-   * Returns the Laplacian (i.e., the trace of the Hessian) of a finite
+   * Return the Laplacian (i.e., the trace of the Hessian) of a finite
    * element function at quadrature point number @p q_point after a call to @p
    * evaluate(...,true). Compared to the case when computing the full Hessian,
    * some operations can be saved when only the Laplacian is requested.
@@ -471,7 +471,7 @@ public:
    */
   //@{
   /**
-   * Returns a read-only pointer to the first field of the dof values. This is
+   * Return a read-only pointer to the first field of the dof values. This is
    * the data field the read_dof_values() functions write into. First come the
    * the dof values for the first component, then all values for the second
    * component, and so on. This is related to the internal data structures
@@ -481,7 +481,7 @@ public:
   const VectorizedArray<Number> *begin_dof_values () const;
 
   /**
-   * Returns a read and write pointer to the first field of the dof values.
+   * Return a read and write pointer to the first field of the dof values.
    * This is the data field the read_dof_values() functions write into. First
    * come the the dof values for the first component, then all values for the
    * second component, and so on. This is related to the internal data
@@ -491,7 +491,7 @@ public:
   VectorizedArray<Number> *begin_dof_values ();
 
   /**
-   * Returns a read-only pointer to the first field of function values on
+   * Return a read-only pointer to the first field of function values on
    * quadrature points. First come the function values on all quadrature
    * points for the first component, then all values for the second component,
    * and so on. This is related to the internal data structures used in this
@@ -503,7 +503,7 @@ public:
   const VectorizedArray<Number> *begin_values () const;
 
   /**
-   * Returns a read and write pointer to the first field of function values on
+   * Return a read and write pointer to the first field of function values on
    * quadrature points. First come the function values on all quadrature
    * points for the first component, then all values for the second component,
    * and so on. This is related to the internal data structures used in this
@@ -515,7 +515,7 @@ public:
   VectorizedArray<Number> *begin_values ();
 
   /**
-   * Returns a read-only pointer to the first field of function gradients on
+   * Return a read-only pointer to the first field of function gradients on
    * quadrature points. First comes the x-component of the gradient for the
    * first component on all quadrature points, then the y-component, and so
    * on. Next comes the x-component of the second component, and so on. This
@@ -528,7 +528,7 @@ public:
   const VectorizedArray<Number> *begin_gradients () const;
 
   /**
-   * Returns a read and write pointer to the first field of function gradients
+   * Return a read and write pointer to the first field of function gradients
    * on quadrature points. First comes the x-component of the gradient for the
    * first component on all quadrature points, then the y-component, and so
    * on. Next comes the x-component of the second component, and so on. This
@@ -541,7 +541,7 @@ public:
   VectorizedArray<Number> *begin_gradients ();
 
   /**
-   * Returns a read-only pointer to the first field of function hessians on
+   * Return a read-only pointer to the first field of function hessians on
    * quadrature points. First comes the xx-component of the hessian for the
    * first component on all quadrature points, then the yy-component, zz-
    * component in (3D), then the xy-component, and so on. Next comes the xx-
@@ -555,7 +555,7 @@ public:
   const VectorizedArray<Number> *begin_hessians () const;
 
   /**
-   * Returns a read and write pointer to the first field of function hessians
+   * Return a read and write pointer to the first field of function hessians
    * on quadrature points. First comes the xx-component of the hessian for the
    * first component on all quadrature points, then the yy-component, zz-
    * component in (3D), then the xy-component, and so on. Next comes the xx-
@@ -569,7 +569,7 @@ public:
   VectorizedArray<Number> *begin_hessians ();
 
   /**
-   * Returns the numbering of local degrees of freedom within the evaluation
+   * Return the numbering of local degrees of freedom within the evaluation
    * routines of FEEvaluation in terms of the standard numbering on finite
    * elements.
    */
@@ -968,7 +968,7 @@ public:
   typedef FEEvaluationBase<dim,1,Number>         BaseClass;
 
   /**
-   * Returns the value stored for the local degree of freedom with index @p
+   * Return the value stored for the local degree of freedom with index @p
    * dof. If the object is vector-valued, a vector-valued return argument is
    * given. Note that when vectorization is enabled, values from several cells
    * are grouped together. If @p set_dof_values was called last, the value
@@ -986,7 +986,7 @@ public:
                          const unsigned int dof);
 
   /**
-   * Returns the value of a finite element function at quadrature point number
+   * Return the value of a finite element function at quadrature point number
    * @p q_point after a call to @p evaluate(true,...), or the value that has
    * been stored there with a call to @p submit_value. If the object is
    * vector-valued, a vector-valued return argument is given. Note that when
@@ -1005,7 +1005,7 @@ public:
                      const unsigned int q_point);
 
   /**
-   * Returns the gradient of a finite element function at quadrature point
+   * Return the gradient of a finite element function at quadrature point
    * number @p q_point after a call to @p evaluate(...,true,...), or the value
    * that has been stored there with a call to @p submit_gradient.
    */
@@ -1023,7 +1023,7 @@ public:
                        const unsigned int  q_point);
 
   /**
-   * Returns the Hessian of a finite element function at quadrature point
+   * Return the Hessian of a finite element function at quadrature point
    * number @p q_point after a call to @p evaluate(...,true). If only the
    * diagonal part of the Hessian or its trace, the Laplacian, are needed, use
    * the respective functions below.
@@ -1032,13 +1032,13 @@ public:
   get_hessian (unsigned int q_point) const;
 
   /**
-   * Returns the diagonal of the Hessian of a finite element function at
+   * Return the diagonal of the Hessian of a finite element function at
    * quadrature point number @p q_point after a call to @p evaluate(...,true).
    */
   gradient_type get_hessian_diagonal (const unsigned int q_point) const;
 
   /**
-   * Returns the Laplacian of a finite element function at quadrature point
+   * Return the Laplacian of a finite element function at quadrature point
    * number @p q_point after a call to @p evaluate(...,true).
    */
   value_type get_laplacian (const unsigned int q_point) const;
@@ -1108,19 +1108,19 @@ public:
   typedef FEEvaluationBase<dim,dim,Number> BaseClass;
 
   /**
-   * Returns the gradient of a finite element function at quadrature point
+   * Return the gradient of a finite element function at quadrature point
    * number @p q_point after a call to @p evaluate(...,true,...).
    */
   gradient_type get_gradient (const unsigned int q_point) const;
 
   /**
-   * Returns the divergence of a vector-valued finite element at quadrature
+   * Return the divergence of a vector-valued finite element at quadrature
    * point number @p q_point after a call to @p evaluate(...,true,...).
    */
   VectorizedArray<Number> get_divergence (const unsigned int q_point) const;
 
   /**
-   * Returns the symmetric gradient of a vector-valued finite element at
+   * Return the symmetric gradient of a vector-valued finite element at
    * quadrature point number @p q_point after a call to @p
    * evaluate(...,true,...). It corresponds to <tt>0.5
    * (grad+grad<sup>T</sup>)</tt>.
@@ -1129,14 +1129,14 @@ public:
   get_symmetric_gradient (const unsigned int q_point) const;
 
   /**
-   * Returns the curl of the vector field, $nabla \times v$ after a call to @p
+   * Return the curl of the vector field, $nabla \times v$ after a call to @p
    * evaluate(...,true,...).
    */
   Tensor<1,(dim==2?1:dim),VectorizedArray<Number> >
   get_curl (const unsigned int q_point) const;
 
   /**
-   * Returns the Hessian of a finite element function at quadrature point
+   * Return the Hessian of a finite element function at quadrature point
    * number @p q_point after a call to @p evaluate(...,true). If only the
    * diagonal of the Hessian or its trace, the Laplacian, is needed, use the
    * respective functions.
@@ -1145,7 +1145,7 @@ public:
   get_hessian (const unsigned int q_point) const;
 
   /**
-   * Returns the diagonal of the Hessian of a finite element function at
+   * Return the diagonal of the Hessian of a finite element function at
    * quadrature point number @p q_point after a call to @p evaluate(...,true).
    */
   gradient_type get_hessian_diagonal (const unsigned int q_point) const;
@@ -1254,7 +1254,7 @@ public:
   typedef FEEvaluationBase<1,1,Number>           BaseClass;
 
   /**
-   * Returns the value stored for the local degree of freedom with index @p
+   * Return the value stored for the local degree of freedom with index @p
    * dof. If the object is vector-valued, a vector-valued return argument is
    * given. Note that when vectorization is enabled, values from several cells
    * are grouped together. If @p set_dof_values was called last, the value
@@ -1272,7 +1272,7 @@ public:
                          const unsigned int dof);
 
   /**
-   * Returns the value of a finite element function at quadrature point number
+   * Return the value of a finite element function at quadrature point number
    * @p q_point after a call to @p evaluate(true,...), or the value that has
    * been stored there with a call to @p submit_value. If the object is
    * vector-valued, a vector-valued return argument is given. Note that when
@@ -1291,7 +1291,7 @@ public:
                      const unsigned int q_point);
 
   /**
-   * Returns the gradient of a finite element function at quadrature point
+   * Return the gradient of a finite element function at quadrature point
    * number @p q_point after a call to @p evaluate(...,true,...), or the value
    * that has been stored there with a call to @p submit_gradient.
    */
@@ -1309,7 +1309,7 @@ public:
                        const unsigned int  q_point);
 
   /**
-   * Returns the Hessian of a finite element function at quadrature point
+   * Return the Hessian of a finite element function at quadrature point
    * number @p q_point after a call to @p evaluate(...,true). If only the
    * diagonal part of the Hessian or its trace, the Laplacian, are needed, use
    * the respective functions below.
@@ -1318,13 +1318,13 @@ public:
   get_hessian (unsigned int q_point) const;
 
   /**
-   * Returns the diagonal of the Hessian of a finite element function at
+   * Return the diagonal of the Hessian of a finite element function at
    * quadrature point number @p q_point after a call to @p evaluate(...,true).
    */
   gradient_type get_hessian_diagonal (const unsigned int q_point) const;
 
   /**
-   * Returns the Laplacian of a finite element function at quadrature point
+   * Return the Laplacian of a finite element function at quadrature point
    * number @p q_point after a call to @p evaluate(...,true).
    */
   value_type get_laplacian (const unsigned int q_point) const;
@@ -1637,7 +1637,7 @@ public:
                   const bool integrate_grad);
 
   /**
-   * Returns the q-th quadrature point stored in MappingInfo.
+   * Return the q-th quadrature point stored in MappingInfo.
    */
   Point<dim,VectorizedArray<Number> >
   quadrature_point (const unsigned int q_point) const;
@@ -1662,7 +1662,7 @@ private:
   void check_template_arguments(const unsigned int fe_no);
 
   /**
-   * Sets the pointers of the base class to my_data_array.
+   * Set the pointers of the base class to my_data_array.
    */
   void set_data_pointers();
 

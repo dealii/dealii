@@ -92,7 +92,7 @@ namespace hp
     void push_back (const Quadrature<dim> &new_quadrature);
 
     /**
-     * Returns a reference to the quadrature rule specified by the argument.
+     * Return a reference to the quadrature rule specified by the argument.
      *
      * @pre @p index must be between zero and the number of elements of the
      * collection.
@@ -101,7 +101,7 @@ namespace hp
     operator[] (const unsigned int index) const;
 
     /**
-     * Returns the number of quadrature pointers stored in this object.
+     * Return the number of quadrature pointers stored in this object.
      */
     unsigned int size () const;
 

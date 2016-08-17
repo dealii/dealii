@@ -908,14 +908,14 @@ public:
                    const AdditionalData &additional_data = AdditionalData());
 
   /**
-   * Computes the action of the preconditioner on <tt>src</tt>, storing the
+   * Compute the action of the preconditioner on <tt>src</tt>, storing the
    * result in <tt>dst</tt>.
    */
   void vmult (VectorType       &dst,
               const VectorType &src) const;
 
   /**
-   * Computes the action of the transposed preconditioner on <tt>src</tt>,
+   * Compute the action of the transposed preconditioner on <tt>src</tt>,
    * storing the result in <tt>dst</tt>.
    */
   void Tvmult (VectorType       &dst,

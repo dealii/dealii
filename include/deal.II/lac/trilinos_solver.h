@@ -83,7 +83,7 @@ namespace TrilinosWrappers
     struct AdditionalData
     {
       /**
-       * Sets the additional data field to the desired output format and puts
+       * Set the additional data field to the desired output format and puts
        * the restart parameter in case the derived class is GMRES.
        *
        * TODO: Find a better way for setting the GMRES restart parameter since
@@ -275,7 +275,7 @@ namespace TrilinosWrappers
     struct AdditionalData
     {
       /**
-       * Sets the additional data field to the desired output format.
+       * Set the additional data field to the desired output format.
        */
       explicit
       AdditionalData (const bool output_solver_details = false);
@@ -321,7 +321,7 @@ namespace TrilinosWrappers
     struct AdditionalData
     {
       /**
-       * Sets the additional data field to the desired output format.
+       * Set the additional data field to the desired output format.
        */
       explicit
       AdditionalData (const bool output_solver_details = false);
@@ -421,7 +421,7 @@ namespace TrilinosWrappers
     struct AdditionalData
     {
       /**
-       * Sets the additional data field to the desired output format.
+       * Set the additional data field to the desired output format.
        */
       explicit
       AdditionalData (const bool output_solver_details = false);
@@ -468,7 +468,7 @@ namespace TrilinosWrappers
     struct AdditionalData
     {
       /**
-       * Sets the additional data field to the desired output format.
+       * Set the additional data field to the desired output format.
        */
       explicit
       AdditionalData (const bool output_solver_details = false);
@@ -523,7 +523,7 @@ namespace TrilinosWrappers
     struct AdditionalData
     {
       /**
-       * Sets the additional data field to the desired output format.
+       * Set the additional data field to the desired output format.
        */
       explicit
       AdditionalData (const bool output_solver_details = false,

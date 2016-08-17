@@ -466,7 +466,7 @@ public:
   };
 
   /**
-   * Returns a list of constant modes of the element. For this element, the
+   * Return a list of constant modes of the element. For this element, the
    * first entry is true, all other are false.
    */
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >

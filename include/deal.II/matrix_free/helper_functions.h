@@ -46,12 +46,12 @@ namespace internal
       TaskInfo ();
 
       /**
-       * Clears all the data fields and resets them to zero.
+       * Clear all the data fields and resets them to zero.
        */
       void clear ();
 
       /**
-       * Returns the memory consumption of the class.
+       * Return the memory consumption of the class.
        */
       std::size_t memory_consumption () const;
 
@@ -90,7 +90,7 @@ namespace internal
       SizeInfo ();
 
       /**
-       * Clears all data fields and resets the sizes to zero.
+       * Clear all data fields and resets the sizes to zero.
        */
       void clear();
 

@@ -196,7 +196,7 @@ public:
 
 protected:
   /**
-   * Returns the support points of the Gauss-Lobatto quadrature formula used
+   * Return the support points of the Gauss-Lobatto quadrature formula used
    * for intermediate points.
    *
    * @note Since the boundary description is closely tied to the unit cell

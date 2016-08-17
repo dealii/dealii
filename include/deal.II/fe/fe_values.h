@@ -1672,7 +1672,7 @@ public:
   //@{
 
   /**
-   * Returns the values of a finite element function restricted to the current
+   * Return the values of a finite element function restricted to the current
    * cell, face or subface selected the last time the <tt>reinit</tt> function
    * of the derived class was called, at the quadrature points.
    *

@@ -873,7 +873,7 @@ namespace PETScWrappers
                 const bool    alternative_output = false) const;
 
     /**
-     * Returns the number bytes consumed by this matrix on this CPU.
+     * Return the number bytes consumed by this matrix on this CPU.
      */
     std::size_t memory_consumption() const;
 

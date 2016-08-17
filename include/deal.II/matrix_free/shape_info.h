@@ -85,7 +85,7 @@ namespace internal
                    const unsigned int base_element = 0);
 
       /**
-       * Returns the memory consumption of this class in bytes.
+       * Return the memory consumption of this class in bytes.
        */
       std::size_t memory_consumption () const;
 
@@ -216,13 +216,13 @@ namespace internal
       unsigned int dofs_per_face;
 
       /**
-       * Checks whether we have symmetries in the shape values. In that case,
+       * Check whether we have symmetries in the shape values. In that case,
        * also fill the shape_???_evenodd fields.
        */
       bool check_1d_shapes_symmetric(const unsigned int n_q_points_1d);
 
       /**
-       * Checks whether symmetric 1D basis functions are such that the shape
+       * Check whether symmetric 1D basis functions are such that the shape
        * values form a diagonal matrix, which allows to use specialized
        * algorithms that save some operations.
        */

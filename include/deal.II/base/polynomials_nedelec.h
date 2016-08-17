@@ -62,7 +62,7 @@ public:
   PolynomialsNedelec (const unsigned int k);
 
   /**
-   * Computes the value and the first and second derivatives of each Nédélec
+   * Compute the value and the first and second derivatives of each Nédélec
    * polynomial at @p unit_point.
    *
    * The size of the vectors must either be zero or equal <tt>n()</tt>.  In
@@ -80,12 +80,12 @@ public:
                 std::vector<Tensor<5,dim> > &fourth_derivatives) const;
 
   /**
-   * Returns the number of Nédélec polynomials.
+   * Return the number of Nédélec polynomials.
    */
   unsigned int n () const;
 
   /**
-   * Returns the degree of the Nédélec space, which is one less than the
+   * Return the degree of the Nédélec space, which is one less than the
    * highest polynomial degree.
    */
   unsigned int degree () const;

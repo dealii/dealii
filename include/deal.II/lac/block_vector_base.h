@@ -825,7 +825,7 @@ public:
                           const BlockVectorBase &W);
 
   /**
-   * Returns true if the given global index is in the local range of this
+   * Return true if the given global index is in the local range of this
    * processor. Asks the corresponding block.
    */
   bool in_local_range (const size_type global_index) const;

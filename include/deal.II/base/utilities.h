@@ -452,7 +452,7 @@ namespace Utilities
   namespace Trilinos
   {
     /**
-     * Returns a Trilinos Epetra_Comm object needed for creation of
+     * Return a Trilinos Epetra_Comm object needed for creation of
      * Epetra_Maps.
      *
      * If deal.II has been configured to use a compiler that does not support
@@ -463,7 +463,7 @@ namespace Utilities
     const Epetra_Comm &comm_world();
 
     /**
-     * Returns a Trilinos Epetra_Comm object needed for creation of
+     * Return a Trilinos Epetra_Comm object needed for creation of
      * Epetra_Maps.
      *
      * If deal.II has been configured to use a compiler that does not support

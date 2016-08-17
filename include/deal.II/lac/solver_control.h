@@ -277,7 +277,7 @@ public:
   void log_history (const bool);
 
   /**
-   * Returns the @p log_history flag.
+   * Return the @p log_history flag.
    */
   bool log_history () const;
 
@@ -292,7 +292,7 @@ public:
   void log_result (const bool);
 
   /**
-   * Returns the @p log_result flag.
+   * Return the @p log_result flag.
    */
   bool log_result () const;
 

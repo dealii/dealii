@@ -82,7 +82,7 @@ namespace internal
       void reinit(typename dealii::Triangulation<dim>::cell_iterator cell);
 
       /**
-       * Returns whether reinit() has been called at least once, i.e., a cell
+       * Return whether reinit() has been called at least once, i.e., a cell
        * has been set.
        */
       bool is_initialized() const;

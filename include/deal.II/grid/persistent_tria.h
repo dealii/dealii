@@ -168,7 +168,7 @@ public:
   void restore (const unsigned int step_no);
 
   /**
-   * Returns the number of refinement and coarsening steps. This is given by
+   * Return the number of refinement and coarsening steps. This is given by
    * the size of the @p refine_flags vector.
    */
   unsigned int n_refinement_steps () const;
@@ -204,7 +204,7 @@ public:
     const SubCellData                 &subcelldata);
 
   /**
-   * Writes all refine and coarsen flags to the ostream @p out.
+   * Write all refine and coarsen flags to the ostream @p out.
    */
   virtual void write_flags(std::ostream &out) const;
 
@@ -216,7 +216,7 @@ public:
   virtual void read_flags(std::istream &in);
 
   /**
-   * Clears all flags. Retains the same coarse grid.
+   * Clear all flags. Retains the same coarse grid.
    */
   virtual void clear_flags();
 

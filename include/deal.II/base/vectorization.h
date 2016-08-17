@@ -213,7 +213,7 @@ public:
   }
 
   /**
-   * Loads @p n_array_elements from memory into the calling class, starting at
+   * Load @p n_array_elements from memory into the calling class, starting at
    * the given address. The memory need not be aligned by the amount of bytes
    * in the vectorized array, as opposed to casting a double address to
    * VectorizedArray<double>*.
@@ -224,7 +224,7 @@ public:
   }
 
   /**
-   * Writes the content of the calling class into memory in form of @p
+   * Write the content of the calling class into memory in form of @p
    * n_array_elements to the given address. The memory need not be aligned by
    * the amount of bytes in the vectorized array, as opposed to casting a
    * double address to VectorizedArray<double>*.
@@ -242,7 +242,7 @@ public:
 
 private:
   /**
-   * Returns the square root of this field. Not for use in user code. Use
+   * Return the square root of this field. Not for use in user code. Use
    * sqrt(x) instead.
    */
   VectorizedArray
@@ -254,7 +254,7 @@ private:
   }
 
   /**
-   * Returns the absolute value of this field. Not for use in user code. Use
+   * Return the absolute value of this field. Not for use in user code. Use
    * abs(x) instead.
    */
   VectorizedArray
@@ -266,7 +266,7 @@ private:
   }
 
   /**
-   * Returns the component-wise maximum of this field and another one. Not for
+   * Return the component-wise maximum of this field and another one. Not for
    * use in user code. Use max(x,y) instead.
    */
   VectorizedArray
@@ -278,7 +278,7 @@ private:
   }
 
   /**
-   * Returns the component-wise minimum of this field and another one. Not for
+   * Return the component-wise minimum of this field and another one. Not for
    * use in user code. Use min(x,y) instead.
    */
   VectorizedArray
@@ -529,7 +529,7 @@ public:
   }
 
   /**
-   * Loads @p n_array_elements from memory into the calling class, starting at
+   * Load @p n_array_elements from memory into the calling class, starting at
    * the given address. The memory need not be aligned by 64 bytes, as opposed
    * to casting a double address to VectorizedArray<double>*.
    */
@@ -539,7 +539,7 @@ public:
   }
 
   /**
-   * Writes the content of the calling class into memory in form of @p
+   * Write the content of the calling class into memory in form of @p
    * n_array_elements to the given address. The memory need not be aligned by
    * 64 bytes, as opposed to casting a double address to
    * VectorizedArray<double>*.
@@ -557,7 +557,7 @@ public:
 
 private:
   /**
-   * Returns the square root of this field. Not for use in user code. Use
+   * Return the square root of this field. Not for use in user code. Use
    * sqrt(x) instead.
    */
   VectorizedArray
@@ -569,7 +569,7 @@ private:
   }
 
   /**
-   * Returns the absolute value of this field. Not for use in user code. Use
+   * Return the absolute value of this field. Not for use in user code. Use
    * abs(x) instead.
    */
   VectorizedArray
@@ -587,7 +587,7 @@ private:
   }
 
   /**
-   * Returns the component-wise maximum of this field and another one. Not for
+   * Return the component-wise maximum of this field and another one. Not for
    * use in user code. Use max(x,y) instead.
    */
   VectorizedArray
@@ -599,7 +599,7 @@ private:
   }
 
   /**
-   * Returns the component-wise minimum of this field and another one. Not for
+   * Return the component-wise minimum of this field and another one. Not for
    * use in user code. Use min(x,y) instead.
    */
   VectorizedArray
@@ -728,7 +728,7 @@ public:
   }
 
   /**
-   * Loads @p n_array_elements from memory into the calling class, starting at
+   * Load @p n_array_elements from memory into the calling class, starting at
    * the given address. The memory need not be aligned by 64 bytes, as opposed
    * to casting a float address to VectorizedArray<float>*.
    */
@@ -738,7 +738,7 @@ public:
   }
 
   /**
-   * Writes the content of the calling class into memory in form of @p
+   * Write the content of the calling class into memory in form of @p
    * n_array_elements to the given address. The memory need not be aligned by
    * 64 bytes, as opposed to casting a float address to
    * VectorizedArray<float>*.
@@ -757,7 +757,7 @@ public:
 private:
 
   /**
-   * Returns the square root of this field. Not for use in user code. Use
+   * Return the square root of this field. Not for use in user code. Use
    * sqrt(x) instead.
    */
   VectorizedArray
@@ -769,7 +769,7 @@ private:
   }
 
   /**
-   * Returns the absolute value of this field. Not for use in user code. Use
+   * Return the absolute value of this field. Not for use in user code. Use
    * abs(x) instead.
    */
   VectorizedArray
@@ -787,7 +787,7 @@ private:
   }
 
   /**
-   * Returns the component-wise maximum of this field and another one. Not for
+   * Return the component-wise maximum of this field and another one. Not for
    * use in user code. Use max(x,y) instead.
    */
   VectorizedArray
@@ -799,7 +799,7 @@ private:
   }
 
   /**
-   * Returns the component-wise minimum of this field and another one. Not for
+   * Return the component-wise minimum of this field and another one. Not for
    * use in user code. Use min(x,y) instead.
    */
   VectorizedArray
@@ -930,7 +930,7 @@ public:
   }
 
   /**
-   * Loads @p n_array_elements from memory into the calling class, starting at
+   * Load @p n_array_elements from memory into the calling class, starting at
    * the given address. The memory need not be aligned by 32 bytes, as opposed
    * to casting a double address to VectorizedArray<double>*.
    */
@@ -940,7 +940,7 @@ public:
   }
 
   /**
-   * Writes the content of the calling class into memory in form of @p
+   * Write the content of the calling class into memory in form of @p
    * n_array_elements to the given address. The memory need not be aligned by
    * 32 bytes, as opposed to casting a double address to
    * VectorizedArray<double>*.
@@ -958,7 +958,7 @@ public:
 
 private:
   /**
-   * Returns the square root of this field. Not for use in user code. Use
+   * Return the square root of this field. Not for use in user code. Use
    * sqrt(x) instead.
    */
   VectorizedArray
@@ -970,7 +970,7 @@ private:
   }
 
   /**
-   * Returns the absolute value of this field. Not for use in user code. Use
+   * Return the absolute value of this field. Not for use in user code. Use
    * abs(x) instead.
    */
   VectorizedArray
@@ -986,7 +986,7 @@ private:
   }
 
   /**
-   * Returns the component-wise maximum of this field and another one. Not for
+   * Return the component-wise maximum of this field and another one. Not for
    * use in user code. Use max(x,y) instead.
    */
   VectorizedArray
@@ -998,7 +998,7 @@ private:
   }
 
   /**
-   * Returns the component-wise minimum of this field and another one. Not for
+   * Return the component-wise minimum of this field and another one. Not for
    * use in user code. Use min(x,y) instead.
    */
   VectorizedArray
@@ -1243,7 +1243,7 @@ public:
   }
 
   /**
-   * Loads @p n_array_elements from memory into the calling class, starting at
+   * Load @p n_array_elements from memory into the calling class, starting at
    * the given address. The memory need not be aligned by 32 bytes, as opposed
    * to casting a float address to VectorizedArray<float>*.
    */
@@ -1253,7 +1253,7 @@ public:
   }
 
   /**
-   * Writes the content of the calling class into memory in form of @p
+   * Write the content of the calling class into memory in form of @p
    * n_array_elements to the given address. The memory need not be aligned by
    * 32 bytes, as opposed to casting a float address to
    * VectorizedArray<float>*.
@@ -1272,7 +1272,7 @@ public:
 private:
 
   /**
-   * Returns the square root of this field. Not for use in user code. Use
+   * Return the square root of this field. Not for use in user code. Use
    * sqrt(x) instead.
    */
   VectorizedArray
@@ -1284,7 +1284,7 @@ private:
   }
 
   /**
-   * Returns the absolute value of this field. Not for use in user code. Use
+   * Return the absolute value of this field. Not for use in user code. Use
    * abs(x) instead.
    */
   VectorizedArray
@@ -1300,7 +1300,7 @@ private:
   }
 
   /**
-   * Returns the component-wise maximum of this field and another one. Not for
+   * Return the component-wise maximum of this field and another one. Not for
    * use in user code. Use max(x,y) instead.
    */
   VectorizedArray
@@ -1312,7 +1312,7 @@ private:
   }
 
   /**
-   * Returns the component-wise minimum of this field and another one. Not for
+   * Return the component-wise minimum of this field and another one. Not for
    * use in user code. Use min(x,y) instead.
    */
   VectorizedArray
@@ -1605,7 +1605,7 @@ public:
   }
 
   /**
-   * Loads @p n_array_elements from memory into the calling class, starting at
+   * Load @p n_array_elements from memory into the calling class, starting at
    * the given address. The memory need not be aligned by 16 bytes, as opposed
    * to casting a double address to VectorizedArray<double>*.
    */
@@ -1615,7 +1615,7 @@ public:
   }
 
   /**
-   * Writes the content of the calling class into memory in form of @p
+   * Write the content of the calling class into memory in form of @p
    * n_array_elements to the given address. The memory need not be aligned by
    * 16 bytes, as opposed to casting a double address to
    * VectorizedArray<double>*.
@@ -1633,7 +1633,7 @@ public:
 
 private:
   /**
-   * Returns the square root of this field. Not for use in user code. Use
+   * Return the square root of this field. Not for use in user code. Use
    * sqrt(x) instead.
    */
   VectorizedArray
@@ -1645,7 +1645,7 @@ private:
   }
 
   /**
-   * Returns the absolute value of this field. Not for use in user code. Use
+   * Return the absolute value of this field. Not for use in user code. Use
    * abs(x) instead.
    */
   VectorizedArray
@@ -1662,7 +1662,7 @@ private:
   }
 
   /**
-   * Returns the component-wise maximum of this field and another one. Not for
+   * Return the component-wise maximum of this field and another one. Not for
    * use in user code. Use max(x,y) instead.
    */
   VectorizedArray
@@ -1674,7 +1674,7 @@ private:
   }
 
   /**
-   * Returns the component-wise minimum of this field and another one. Not for
+   * Return the component-wise minimum of this field and another one. Not for
    * use in user code. Use min(x,y) instead.
    */
   VectorizedArray
@@ -1875,7 +1875,7 @@ public:
   }
 
   /**
-   * Loads @p n_array_elements from memory into the calling class, starting at
+   * Load @p n_array_elements from memory into the calling class, starting at
    * the given address. The memory need not be aligned by 16 bytes, as opposed
    * to casting a float address to VectorizedArray<float>*.
    */
@@ -1885,7 +1885,7 @@ public:
   }
 
   /**
-   * Writes the content of the calling class into memory in form of @p
+   * Write the content of the calling class into memory in form of @p
    * n_array_elements to the given address. The memory need not be aligned by
    * 16 bytes, as opposed to casting a float address to
    * VectorizedArray<float>*.
@@ -1903,7 +1903,7 @@ public:
 
 private:
   /**
-   * Returns the square root of this field. Not for use in user code. Use
+   * Return the square root of this field. Not for use in user code. Use
    * sqrt(x) instead.
    */
   VectorizedArray
@@ -1915,7 +1915,7 @@ private:
   }
 
   /**
-   * Returns the absolute value of this field. Not for use in user code. Use
+   * Return the absolute value of this field. Not for use in user code. Use
    * abs(x) instead.
    */
   VectorizedArray
@@ -1931,7 +1931,7 @@ private:
   }
 
   /**
-   * Returns the component-wise maximum of this field and another one. Not for
+   * Return the component-wise maximum of this field and another one. Not for
    * use in user code. Use max(x,y) instead.
    */
   VectorizedArray
@@ -1943,7 +1943,7 @@ private:
   }
 
   /**
-   * Returns the component-wise minimum of this field and another one. Not for
+   * Return the component-wise minimum of this field and another one. Not for
    * use in user code. Use min(x,y) instead.
    */
   VectorizedArray
@@ -2460,7 +2460,7 @@ DEAL_II_NAMESPACE_CLOSE
 namespace std
 {
   /**
-   * Computes the sine of a vectorized data field. The result is returned as
+   * Compute the sine of a vectorized data field. The result is returned as
    * vectorized array in the form <tt>{sin(x[0]), sin(x[1]), ...,
    * sin(x[n_array_elements-1])}</tt>.
    *
@@ -2487,7 +2487,7 @@ namespace std
 
 
   /**
-   * Computes the cosine of a vectorized data field. The result is returned as
+   * Compute the cosine of a vectorized data field. The result is returned as
    * vectorized array in the form <tt>{cos(x[0]), cos(x[1]), ...,
    * cos(x[n_array_elements-1])}</tt>.
    *
@@ -2509,7 +2509,7 @@ namespace std
 
 
   /**
-   * Computes the tangent of a vectorized data field. The result is returned
+   * Compute the tangent of a vectorized data field. The result is returned
    * as vectorized array in the form <tt>{tan(x[0]), tan(x[1]), ...,
    * tan(x[n_array_elements-1])}</tt>.
    *
@@ -2531,7 +2531,7 @@ namespace std
 
 
   /**
-   * Computes the exponential of a vectorized data field. The result is
+   * Compute the exponential of a vectorized data field. The result is
    * returned as vectorized array in the form <tt>{exp(x[0]), exp(x[1]), ...,
    * exp(x[n_array_elements-1])}</tt>.
    *
@@ -2553,7 +2553,7 @@ namespace std
 
 
   /**
-   * Computes the natural logarithm of a vectorized data field. The result is
+   * Compute the natural logarithm of a vectorized data field. The result is
    * returned as vectorized array in the form <tt>{log(x[0]), log(x[1]), ...,
    * log(x[n_array_elements-1])}</tt>.
    *
@@ -2575,7 +2575,7 @@ namespace std
 
 
   /**
-   * Computes the square root of a vectorized data field. The result is
+   * Compute the square root of a vectorized data field. The result is
    * returned as vectorized array in the form <tt>{sqrt(x[0]), sqrt(x[1]),
    * ..., sqrt(x[n_array_elements-1])}</tt>.
    *
@@ -2615,7 +2615,7 @@ namespace std
 
 
   /**
-   * Computes the absolute value (modulus) of a vectorized data field. The
+   * Compute the absolute value (modulus) of a vectorized data field. The
    * result is returned as vectorized array in the form <tt>{abs(x[0]),
    * abs(x[1]), ..., abs(x[n_array_elements-1])}</tt>.
    *
@@ -2632,7 +2632,7 @@ namespace std
 
 
   /**
-   * Computes the componentwise maximum of two vectorized data fields. The
+   * Compute the componentwise maximum of two vectorized data fields. The
    * result is returned as vectorized array in the form <tt>{max(x[0],y[0]),
    * max(x[1],y[1]), ...}</tt>.
    *
@@ -2650,7 +2650,7 @@ namespace std
 
 
   /**
-   * Computes the componentwise minimum of two vectorized data fields. The
+   * Compute the componentwise minimum of two vectorized data fields. The
    * result is returned as vectorized array in the form <tt>{min(x[0],y[0]),
    * min(x[1],y[1]), ...}</tt>.
    *

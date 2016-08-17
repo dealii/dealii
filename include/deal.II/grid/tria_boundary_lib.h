@@ -525,7 +525,7 @@ public:
   /**
    * Constructor. The center of the spheres defaults to the origin.
    *
-   * Calls the constructor of its base @p HyperBallBoundary class with a dummy
+   * Call the constructor of its base @p HyperBallBoundary class with a dummy
    * radius as argument. This radius will be ignored
    */
   HyperShellBoundary (const Point<dim> &center = Point<dim>());

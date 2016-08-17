@@ -1831,7 +1831,7 @@ struct GeometryInfo
   project_to_unit_cell (const Point<dim> &p);
 
   /**
-   * Returns the infinity norm of the vector between a given point @p p
+   * Return the infinity norm of the vector between a given point @p p
    * outside the unit cell to the closest unit cell boundary. For points
    * inside the cell, this is defined as zero.
    */

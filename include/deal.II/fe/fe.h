@@ -1707,7 +1707,7 @@ public:
   block_mask (const ComponentMask &component_mask) const;
 
   /**
-   * Returns a list of constant modes of the element. The number of rows in
+   * Return a list of constant modes of the element. The number of rows in
    * the resulting table depends on the elements in use. For standard
    * elements, the table has as many rows as there are components in the
    * element and dofs_per_cell columns. To each component of the finite
@@ -1857,7 +1857,7 @@ public:
   get_generalized_support_points () const;
 
   /**
-   * Returns <tt>true</tt> if the class provides nonempty vectors either from
+   * Return <tt>true</tt> if the class provides nonempty vectors either from
    * get_unit_support_points() or get_generalized_support_points().
    *
    * See the

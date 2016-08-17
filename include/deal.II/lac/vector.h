@@ -915,7 +915,7 @@ public:
   //@{
 
   /**
-   * Returns true if the given global index is in the local range of this
+   * Return true if the given global index is in the local range of this
    * processor.  Since this is not a distributed vector the method always
    * returns true.
    */

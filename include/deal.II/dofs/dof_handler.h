@@ -759,14 +759,14 @@ public:
   const IndexSet &locally_owned_dofs() const;
 
   /**
-   * Returns an IndexSet describing the set of locally owned DoFs used for the
+   * Return an IndexSet describing the set of locally owned DoFs used for the
    * given multigrid level as a subset of 0..n_dofs(level).
    */
   const IndexSet &locally_owned_mg_dofs(const unsigned int level) const;
 
 
   /**
-   * Returns a vector that stores the locally owned DoFs of each processor. If
+   * Return a vector that stores the locally owned DoFs of each processor. If
    * you are only interested in the number of elements each processor owns
    * then n_locally_owned_dofs_per_processor() is a better choice.
    *

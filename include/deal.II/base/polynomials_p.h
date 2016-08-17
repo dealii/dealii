@@ -61,7 +61,7 @@ public:
   PolynomialsP (const unsigned int p);
 
   /**
-   * Returns the degree <tt>p</tt> of the polynomial space <tt>P_p</tt>.
+   * Return the degree <tt>p</tt> of the polynomial space <tt>P_p</tt>.
    *
    * Note, that this number is <tt>PolynomialSpace::degree()-1</tt>, compare
    * definition in PolynomialSpace.

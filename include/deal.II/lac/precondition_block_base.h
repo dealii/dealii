@@ -135,7 +135,7 @@ public:
   bool inverses_ready () const;
 
   /**
-   * Checks whether the object is empty.
+   * Check whether the object is empty.
    */
   bool empty () const;
 

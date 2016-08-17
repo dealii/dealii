@@ -194,7 +194,7 @@ public:
   void clear();
 
   /**
-   * Checks whether the object is empty.
+   * Check whether the object is empty.
    */
   bool empty () const;
 

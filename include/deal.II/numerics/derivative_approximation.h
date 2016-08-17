@@ -179,7 +179,7 @@ namespace DerivativeApproximation
                         const unsigned int                  component = 0);
 
   /**
-   * Calls the @p interpolate function, see above, with
+   * Call the @p interpolate function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, template <int, int> class DoFHandlerType, class InputVector, int spacedim>
@@ -215,7 +215,7 @@ namespace DerivativeApproximation
                                  const unsigned int                  component = 0);
 
   /**
-   * Calls the @p interpolate function, see above, with
+   * Call the @p interpolate function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, template <int, int> class DoFHandlerType, class InputVector, int spacedim>

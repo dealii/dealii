@@ -591,7 +591,7 @@ namespace VectorTools
                     const ComponentMask                &component_mask = ComponentMask());
 
   /**
-   * Calls the @p interpolate() function above with
+   * Call the @p interpolate() function above with
    * <tt>mapping=MappingQGeneric1@<dim>@()</tt>.
    */
   template <typename VectorType, typename DoFHandlerType>
@@ -806,7 +806,7 @@ namespace VectorTools
                 const bool                      project_to_boundary_first = false);
 
   /**
-   * Calls the project() function above, with
+   * Call the project() function above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, typename VectorType, int spacedim>
@@ -839,7 +839,7 @@ namespace VectorTools
                 const bool                                 project_to_boundary_first = false);
 
   /**
-   * Calls the project() function above, with a collection of $Q_1$ mapping
+   * Call the project() function above, with a collection of $Q_1$ mapping
    * objects, i.e., with hp::StaticMappingQ1::mapping_collection.
    */
   template <int dim, typename VectorType, int spacedim>
@@ -945,7 +945,7 @@ namespace VectorTools
    const ComponentMask                                                      &component_mask = ComponentMask());
 
   /**
-   * Calls the other interpolate_boundary_values() function, see above, with
+   * Call the other interpolate_boundary_values() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>. The same comments
    * apply as for the previous function, in particular about the use of the
    * component mask and the requires size of the function object.
@@ -964,7 +964,7 @@ namespace VectorTools
 
 
   /**
-   * Calls the other interpolate_boundary_values() function, see above, with
+   * Call the other interpolate_boundary_values() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>. The same comments
    * apply as for the previous function, in particular about the use of the
    * component mask and the requires size of the function object.
@@ -1070,7 +1070,7 @@ namespace VectorTools
    const ComponentMask                                                      &component_mask = ComponentMask());
 
   /**
-   * Calls the other interpolate_boundary_values() function, see above, with
+   * Call the other interpolate_boundary_values() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>. The same comments
    * apply as for the previous function, in particular about the use of the
    * component mask and the requires size of the function object.
@@ -1091,7 +1091,7 @@ namespace VectorTools
 
 
   /**
-   * Calls the other interpolate_boundary_values() function, see above, with
+   * Call the other interpolate_boundary_values() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>. The same comments
    * apply as for the previous function, in particular about the use of the
    * component mask and the requires size of the function object.
@@ -1166,7 +1166,7 @@ namespace VectorTools
                                 std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
-   * Calls the project_boundary_values() function, see above, with
+   * Call the project_boundary_values() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>.
    */
   template <int dim, int spacedim, typename number>
@@ -1188,7 +1188,7 @@ namespace VectorTools
                                 std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
-   * Calls the project_boundary_values() function, see above, with
+   * Call the project_boundary_values() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>.
    */
   template <int dim, int spacedim, typename number>
@@ -1245,7 +1245,7 @@ namespace VectorTools
                                 std::vector<unsigned int>       component_mapping = std::vector<unsigned int>());
 
   /**
-   * Calls the project_boundary_values() function, see above, with
+   * Call the project_boundary_values() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim,spacedim@>(1)</tt>.
    *
    * @ingroup constraints
@@ -1843,7 +1843,7 @@ namespace VectorTools
                                Vector<double>        &rhs_vector);
 
   /**
-   * Calls the create_right_hand_side() function, see above, with
+   * Call the create_right_hand_side() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim>
@@ -1886,7 +1886,7 @@ namespace VectorTools
                                   Vector<double>        &rhs_vector);
 
   /**
-   * Calls the create_point_source_vector() function, see above, with
+   * Call the create_point_source_vector() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim>
@@ -1939,7 +1939,7 @@ namespace VectorTools
                                   Vector<double>                 &rhs_vector);
 
   /**
-   * Calls the create_point_source_vector() function for vector-valued finite
+   * Call the create_point_source_vector() function for vector-valued finite
    * elements, see above, with <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim>
@@ -1988,7 +1988,7 @@ namespace VectorTools
                                         const std::set<types::boundary_id> &boundary_ids = std::set<types::boundary_id>());
 
   /**
-   * Calls the create_boundary_right_hand_side() function, see above, with
+   * Call the create_boundary_right_hand_side() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    *
    * @see
@@ -2016,7 +2016,7 @@ namespace VectorTools
                                         const std::set<types::boundary_id> &boundary_ids = std::set<types::boundary_id>());
 
   /**
-   * Calls the create_boundary_right_hand_side() function, see above, with a
+   * Call the create_boundary_right_hand_side() function, see above, with a
    * single Q1 mapping as collection. This function therefore will only work
    * if the only active fe index in use is zero.
    *
@@ -2135,7 +2135,7 @@ namespace VectorTools
                              const double exponent = 2.);
 
   /**
-   * Calls the integrate_difference() function, see above, with
+   * Call the integrate_difference() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
@@ -2163,7 +2163,7 @@ namespace VectorTools
                              const double exponent = 2.);
 
   /**
-   * Calls the integrate_difference() function, see above, with
+   * Call the integrate_difference() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
@@ -2758,7 +2758,7 @@ namespace VectorTools
                       const unsigned int             component);
 
   /**
-   * Calls the other compute_mean_value() function, see above, with
+   * Call the other compute_mean_value() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, typename VectorType, int spacedim>

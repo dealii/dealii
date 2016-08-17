@@ -1249,12 +1249,12 @@ public:
   double extent_in_direction (const unsigned int axis) const;
 
   /**
-   * Returns the minimal distance between any two vertices.
+   * Return the minimal distance between any two vertices.
    */
   double minimum_vertex_distance () const;
 
   /**
-   * Returns a point belonging to the Manifold<dim,spacedim> where this object
+   * Return a point belonging to the Manifold<dim,spacedim> where this object
    * lives, given its parametric coordinates on the reference @p structdim
    * cell. This function queries the underlying manifold object, and can be
    * used to obtain the exact geometrical location of arbitrary points on this
@@ -2537,7 +2537,7 @@ public:
   neighbor_or_periodic_neighbor (const unsigned int i) const;
 
   /**
-   * Returns an iterator to the periodic neighbor of the cell at a given
+   * Return an iterator to the periodic neighbor of the cell at a given
    * face and subface number. The general guidelines for using this function
    * is similar to the function neighbor_child_on_subface(). The
    * implementation of this function is consistent with

@@ -523,7 +523,7 @@ public:
   void unroll (Vector<OtherNumber> &result) const;
 
   /**
-   * Returns an unrolled index in the range [0,dim^rank-1] for the element of
+   * Return an unrolled index in the range [0,dim^rank-1] for the element of
    * the tensor indexed by the argument to the function.
    */
   static
@@ -1707,7 +1707,7 @@ outer_product(const Tensor<rank_1, dim, Number> &src1,
 
 
 /**
- * Returns the cross product in 2d. This is just a rotation by 90 degrees
+ * Return the cross product in 2d. This is just a rotation by 90 degrees
  * clockwise to compute the outer normal from a tangential vector. This
  * function is defined for all space dimensions to allow for dimension
  * independent programming (e.g. within switches over the space dimension),
@@ -1734,7 +1734,7 @@ cross_product_2d (const Tensor<1,dim,Number> &src)
 
 
 /**
- * Returns the cross product of 2 vectors in 3d. This function is defined for
+ * Return the cross product of 2 vectors in 3d. This function is defined for
  * all space dimensions to allow for dimension independent programming (e.g.
  * within switches over the space dimension), but may only be called if the
  * actual dimension of the arguments is three (e.g. from the <tt>dim==3</tt>

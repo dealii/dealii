@@ -59,7 +59,7 @@ public:
   static unsigned int n_cores ();
 
   /**
-   * Returns the number of threads to use. This is initially set to the number
+   * Return the number of threads to use. This is initially set to the number
    * of cores the system has (see n_cores()) but can be further restricted by
    * set_thread_limit() and the environment variable DEAL_II_NUM_THREADS.
    */
@@ -87,7 +87,7 @@ public:
   static void set_thread_limit (const unsigned int max_threads = numbers::invalid_unsigned_int);
 
   /**
-   * Returns if the TBB is running using a single thread either because of
+   * Return if the TBB is running using a single thread either because of
    * thread affinity or because it is set via a call to set_thread_limit. This
    * is used in the PETScWrappers to avoid using the interface that is not
    * thread-safe.

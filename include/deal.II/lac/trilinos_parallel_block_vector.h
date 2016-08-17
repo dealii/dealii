@@ -290,7 +290,7 @@ namespace TrilinosWrappers
                                         const BlockVector                         &v);
 
       /**
-       * Returns the state of the vector, i.e., whether compress() needs to be
+       * Return the state of the vector, i.e., whether compress() needs to be
        * called after an operation requiring data exchange. Does only return
        * non-true values when used in <tt>debug</tt> mode, since it is quite
        * expensive to keep track of all operations that lead to the need for
@@ -301,7 +301,7 @@ namespace TrilinosWrappers
       bool is_compressed () const DEAL_II_DEPRECATED;
 
       /**
-       * Returns if this Vector contains ghost elements.
+       * Return if this Vector contains ghost elements.
        *
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"

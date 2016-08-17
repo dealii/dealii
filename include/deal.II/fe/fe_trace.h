@@ -75,7 +75,7 @@ public:
                                     const unsigned int face_index) const;
 
   /**
-   * Returns a list of constant modes of the element. For this element, it
+   * Return a list of constant modes of the element. For this element, it
    * simply returns one row with all entries set to true.
    */
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
@@ -152,7 +152,7 @@ public:
   FE_TraceQ (const unsigned int p);
 
   /**
-   * Returns the name of the element
+   * Return the name of the element
    */
   std::string get_name() const;
 };

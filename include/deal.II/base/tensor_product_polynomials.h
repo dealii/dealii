@@ -85,7 +85,7 @@ public:
   void output_indices(std::ostream &out) const;
 
   /**
-   * Sets the ordering of the polynomials. Requires
+   * Set the ordering of the polynomials. Requires
    * <tt>renumber.size()==n()</tt>.  Stores a copy of <tt>renumber</tt>.
    */
   void set_numbering(const std::vector<unsigned int> &renumber);
@@ -101,7 +101,7 @@ public:
   const std::vector<unsigned int> &get_numbering_inverse() const;
 
   /**
-   * Computes the value and the first and second derivatives of each tensor
+   * Compute the value and the first and second derivatives of each tensor
    * product polynomial at <tt>unit_point</tt>.
    *
    * The size of the vectors must either be equal 0 or equal n(). In the first
@@ -120,7 +120,7 @@ public:
                 std::vector<Tensor<4,dim> > &fourth_derivatives) const;
 
   /**
-   * Computes the value of the <tt>i</tt>th tensor product polynomial at
+   * Compute the value of the <tt>i</tt>th tensor product polynomial at
    * <tt>unit_point</tt>. Here <tt>i</tt> is given in tensor product
    * numbering.
    *
@@ -135,7 +135,7 @@ public:
                         const Point<dim> &p) const;
 
   /**
-   * Computes the <tt>order</tt>th derivative of the <tt>i</tt>th tensor
+   * Compute the <tt>order</tt>th derivative of the <tt>i</tt>th tensor
    * product polynomial at <tt>unit_point</tt>. Here <tt>i</tt> is given in
    * tensor product numbering.
    *
@@ -153,7 +153,7 @@ public:
                                         const Point<dim> &p) const;
 
   /**
-   * Computes the grad of the <tt>i</tt>th tensor product polynomial at
+   * Compute the grad of the <tt>i</tt>th tensor product polynomial at
    * <tt>unit_point</tt>. Here <tt>i</tt> is given in tensor product
    * numbering.
    *
@@ -168,7 +168,7 @@ public:
                               const Point<dim> &p) const;
 
   /**
-   * Computes the second derivative (grad_grad) of the <tt>i</tt>th tensor
+   * Compute the second derivative (grad_grad) of the <tt>i</tt>th tensor
    * product polynomial at <tt>unit_point</tt>. Here <tt>i</tt> is given in
    * tensor product numbering.
    *
@@ -183,7 +183,7 @@ public:
                                    const Point<dim> &p) const;
 
   /**
-   * Returns the number of tensor product polynomials. For <i>n</i> 1d
+   * Return the number of tensor product polynomials. For <i>n</i> 1d
    * polynomials this is <i>n<sup>dim</sup></i>.
    */
   unsigned int n () const;
@@ -255,7 +255,7 @@ public:
   AnisotropicPolynomials (const std::vector<std::vector<Polynomials::Polynomial<double> > > &pols);
 
   /**
-   * Computes the value and the first and second derivatives of each tensor
+   * Compute the value and the first and second derivatives of each tensor
    * product polynomial at <tt>unit_point</tt>.
    *
    * The size of the vectors must either be equal <tt>0</tt> or equal
@@ -275,7 +275,7 @@ public:
                 std::vector<Tensor<4,dim> > &fourth_derivatives) const;
 
   /**
-   * Computes the value of the <tt>i</tt>th tensor product polynomial at
+   * Compute the value of the <tt>i</tt>th tensor product polynomial at
    * <tt>unit_point</tt>. Here <tt>i</tt> is given in tensor product
    * numbering.
    *
@@ -290,7 +290,7 @@ public:
                         const Point<dim> &p) const;
 
   /**
-   * Computes the <tt>order</tt>th derivative of the <tt>i</tt>th tensor
+   * Compute the <tt>order</tt>th derivative of the <tt>i</tt>th tensor
    * product polynomial at <tt>unit_point</tt>. Here <tt>i</tt> is given in
    * tensor product numbering.
    *
@@ -308,7 +308,7 @@ public:
                                         const Point<dim> &p) const;
 
   /**
-   * Computes the grad of the <tt>i</tt>th tensor product polynomial at
+   * Compute the grad of the <tt>i</tt>th tensor product polynomial at
    * <tt>unit_point</tt>. Here <tt>i</tt> is given in tensor product
    * numbering.
    *
@@ -323,7 +323,7 @@ public:
                               const Point<dim> &p) const;
 
   /**
-   * Computes the second derivative (grad_grad) of the <tt>i</tt>th tensor
+   * Compute the second derivative (grad_grad) of the <tt>i</tt>th tensor
    * product polynomial at <tt>unit_point</tt>. Here <tt>i</tt> is given in
    * tensor product numbering.
    *
@@ -338,7 +338,7 @@ public:
                                    const Point<dim> &p) const;
 
   /**
-   * Returns the number of tensor product polynomials. It is the product of
+   * Return the number of tensor product polynomials. It is the product of
    * the number of polynomials in each coordinate direction.
    */
   unsigned int n () const;

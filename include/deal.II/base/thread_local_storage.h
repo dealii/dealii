@@ -153,7 +153,7 @@ namespace Threads
     void clear ();
 
     /**
-     * Returns a reference to the internal Threading Building Blocks
+     * Return a reference to the internal Threading Building Blocks
      * implementation. This function is really only useful if deal.II has been
      * configured with multithreading and has no useful purpose otherwise.
      */

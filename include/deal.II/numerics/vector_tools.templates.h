@@ -605,7 +605,7 @@ namespace VectorTools
   namespace internal
   {
     /**
-     * Returns whether the cell and all of its descendants are locally owned.
+     * Return whether the cell and all of its descendants are locally owned.
      */
     template <typename cell_iterator>
     bool is_locally_owned(const cell_iterator &cell)

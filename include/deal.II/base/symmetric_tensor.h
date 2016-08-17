@@ -2453,7 +2453,7 @@ deviator_tensor ()
 
 
 /**
- * Returns the fourth-order symmetric identity tensor which maps symmetric
+ * Return the fourth-order symmetric identity tensor which maps symmetric
  * second-order tensors to themselves.
  *
  * Note that this tensor, even though it is the identity, has a somewhat funny

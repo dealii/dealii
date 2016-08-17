@@ -170,19 +170,19 @@ namespace LinearAlgebra
 
 
       /**
-       * Returns the l<sub>1</sub> norm of the vector (i.e., the sum of the
+       * Return the l<sub>1</sub> norm of the vector (i.e., the sum of the
        * absolute values of all entries among all processors).
        */
       virtual double l1_norm() const;
 
       /**
-       * Returns the l<sub>2</sub> norm of the vector (i.e., the square root of
+       * Return the l<sub>2</sub> norm of the vector (i.e., the square root of
        * the sum of the square of all entries among all processors).
        */
       virtual double l2_norm() const;
 
       /**
-       * Returns the maximum norm of the vector (i.e., the maximum absolute value
+       * Return the maximum norm of the vector (i.e., the maximum absolute value
        * among all entries and among all processors).
        */
       virtual double linfty_norm() const;
@@ -210,7 +210,7 @@ namespace LinearAlgebra
                                  const VectorSpaceVector<double> &W);
 
       /**
-       * Returns the global size of the vector, equal to the sum of the number of
+       * Return the global size of the vector, equal to the sum of the number of
        * locally owned indices among all processors.
        */
       virtual size_type size() const;
@@ -253,7 +253,7 @@ namespace LinearAlgebra
                          const bool across=true) const;
 
       /**
-       * Returns the memory consumption of this class in bytes.
+       * Return the memory consumption of this class in bytes.
        */
       virtual std::size_t memory_consumption() const;
 

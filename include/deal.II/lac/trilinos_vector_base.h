@@ -285,7 +285,7 @@ namespace TrilinosWrappers
     void compress (::dealii::VectorOperation::values operation);
 
     /**
-     * Returns the state of the vector, i.e., whether compress() has already
+     * Return the state of the vector, i.e., whether compress() has already
      * been called after an operation requiring data exchange.
      *
      * This function is deprecated.

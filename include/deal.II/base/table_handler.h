@@ -383,7 +383,7 @@ public:
   void set_column_order (const std::vector<std::string> &new_order);
 
   /**
-   * Sets the <tt>precision</tt> e.g. double or float variables are written
+   * Set the <tt>precision</tt> e.g. double or float variables are written
    * with. <tt>precision</tt> is the same as in calling
    * <tt>out<<setprecision(precision)</tt>.
    */
@@ -391,14 +391,14 @@ public:
                       const unsigned int precision);
 
   /**
-   * Sets the <tt>scientific_flag</tt>. True means scientific, false means
+   * Set the <tt>scientific_flag</tt>. True means scientific, false means
    * fixed point notation.
    */
   void set_scientific (const std::string &key,
                        const bool         scientific);
 
   /**
-   * Sets the caption of the column <tt>key</tt> for tex output. You may want
+   * Set the caption of the column <tt>key</tt> for tex output. You may want
    * to chose this different from <tt>key</tt>, if it contains formulas or
    * similar constructs.
    */
@@ -406,17 +406,17 @@ public:
                         const std::string &tex_caption);
 
   /**
-   * Sets the tex caption of the entire <tt>table</tt> for tex output.
+   * Set the tex caption of the entire <tt>table</tt> for tex output.
    */
   void set_tex_table_caption (const std::string &table_caption);
 
   /**
-   * Sets the label of this <tt>table</tt> for tex output.
+   * Set the label of this <tt>table</tt> for tex output.
    */
   void set_tex_table_label (const std::string &table_label);
 
   /**
-   * Sets the caption the the supercolumn <tt>superkey</tt> for tex output.
+   * Set the caption the the supercolumn <tt>superkey</tt> for tex output.
    * You may want to chose this different from <tt>superkey</tt>, if it
    * contains formulas or similar constructs.
    */
@@ -424,7 +424,7 @@ public:
                              const std::string &tex_supercaption);
 
   /**
-   * Sets the tex output format of a column, e.g. <tt>c</tt>, <tt>r</tt>,
+   * Set the tex output format of a column, e.g. <tt>c</tt>, <tt>r</tt>,
    * <tt>l</tt>, or <tt>p{3cm}</tt>. The default is <tt>c</tt>. Also if this
    * function is not called for a column, the default is preset to be
    * <tt>c</tt>.
@@ -455,7 +455,7 @@ public:
   void write_tex (std::ostream &file, const bool with_header=true) const;
 
   /**
-   * Clears the rows of the table, i.e. calls clear() on all the underlying
+   * Clear the rows of the table, i.e. calls clear() on all the underlying
    * storage data structures.
    */
   void clear ();

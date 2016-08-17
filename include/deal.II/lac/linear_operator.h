@@ -585,7 +585,7 @@ operator*(const LinearOperator<Range, Intermediate> &first_op,
 /**
  * @relates LinearOperator
  *
- * Returns the transpose linear operations of @p op.
+ * Return the transpose linear operations of @p op.
  *
  * @ingroup LAOperators
  */
@@ -609,7 +609,7 @@ transpose_operator(const LinearOperator<Range, Domain> &op)
 /**
  * @relates LinearOperator
  *
- * Returns an object representing the inverse of the LinearOperator @p op.
+ * Return an object representing the inverse of the LinearOperator @p op.
  *
  * The function takes references @p solver and @p preconditioner to an
  * iterative solver and a preconditioner that are used in the
@@ -688,7 +688,7 @@ inverse_operator(const LinearOperator<typename Solver::vector_type, typename Sol
 /**
  * @relates LinearOperator
  *
- * Returns a LinearOperator that is the identity of the vector space @p Range.
+ * Return a LinearOperator that is the identity of the vector space @p Range.
  *
  * The function takes an <code>std::function</code> object @p reinit_vector as
  * an argument to initialize the <code>reinit_range_vector</code> and
@@ -732,7 +732,7 @@ identity_operator(const std::function<void(Range &, bool)> &reinit_vector)
 /**
  * @relates LinearOperator
  *
- * Returns a nulled variant of the LinearOperator @p op, i.e. with optimized
+ * Return a nulled variant of the LinearOperator @p op, i.e. with optimized
  * LinearOperator::vmult, LinearOperator::vmult_add, etc. functions and with
  * LinearOperator::is_null_operator set to true.
  *
