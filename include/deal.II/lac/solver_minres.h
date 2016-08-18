@@ -203,8 +203,6 @@ SolverMinRes<VectorType>::solve (const MatrixType         &A,
                                  const VectorType         &b,
                                  const PreconditionerType &precondition)
 {
-  SolverControl::State conv=SolverControl::iterate;
-
   deallog.push("minres");
 
   // Memory allocation
@@ -274,8 +272,7 @@ SolverMinRes<VectorType>::solve (const MatrixType         &A,
   m[1]->reinit(b);
   m[2]->reinit(b);
 
-  conv = this->iteration_status(0, r_l2, x);
-
+  SolverControl::State conv = this->iteration_status(0, r_l2, x);
   while (conv==SolverControl::iterate)
     {
       if (delta[1]!=0)
