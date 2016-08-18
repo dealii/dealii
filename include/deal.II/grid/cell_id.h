@@ -126,7 +126,11 @@ std::ostream &operator<< (std::ostream &os,
 {
   os << cid.coarse_cell_id << '_' << cid.child_indices.size() << ':';
   for (unsigned int i=0; i<cid.child_indices.size(); ++i)
-    os << static_cast<int>(cid.child_indices[i]);
+    // write the child indices. because they are between 0 and 2^dim-1, they all
+    // just have one digit, so we could write them as integers. it's
+    // probably clearer to write them as one-digit characters starting
+    // at '0'
+    os << static_cast<unsigned char>(cid.child_indices[i] + '0');
   return os;
 }
 
@@ -157,6 +161,8 @@ std::istream &operator>> (std::istream &is,
   cid.child_indices.clear();
   for (unsigned int i=0; i<idsize; ++i)
     {
+      // read the one-digit child index (as an integer number) and
+      // convert it back into unsigned char
       is >> value;
       cid.child_indices.push_back(value-'0');
     }
