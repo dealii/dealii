@@ -438,13 +438,13 @@ public:
   /**
    * The constructor takes an arbitrary quadrature formula.
    */
-  QSorted (const Quadrature<dim>);
+  QSorted (const Quadrature<dim> &quad);
 
   /**
    * A rule to reorder pairs of points and weights.
    */
-  bool operator()(const std::pair<double, Point<dim> > &a,
-                  const std::pair<double, Point<dim> > &b);
+  bool operator()(const std::size_t &a,
+                  const std::size_t &b) const;
 };
 
 /**

@@ -932,27 +932,26 @@ QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
 
 
 template <int dim>
-QSorted<dim>::QSorted(Quadrature<dim> quad) :
-  Quadrature<dim>(quad.size())
+QSorted<dim>::QSorted(const Quadrature<dim> &quad) :
+  Quadrature<dim>(quad)
 {
-  std::vector< std::pair<double, Point<dim> > > wp;
-  for (unsigned int i=0; i<quad.size(); ++i)
-    wp.push_back(std::pair<double, Point<dim> >(quad.weight(i),
-                                                quad.point(i)));
-  sort(wp.begin(), wp.end(), *this);
+  std::vector<std::size_t> permutation(quad.size());
+  std::iota(permutation.begin(), permutation.end(), 0);
+  std::sort(permutation.begin(), permutation.end(), *this);
+
   for (unsigned int i=0; i<quad.size(); ++i)
     {
-      this->weights[i] = wp[i].first;
-      this->quadrature_points[i] = wp[i].second;
+      this->weights[i]           = quad.weight(permutation[i]);
+      this->quadrature_points[i] = quad.point(permutation[i]);
     }
 }
 
 
 template <int dim>
-bool QSorted<dim>::operator()(const std::pair<double, Point<dim> > &a,
-                              const std::pair<double, Point<dim> > &b)
+bool QSorted<dim>::operator()(const std::size_t &a,
+                              const std::size_t &b) const
 {
-  return (a.first < b.first);
+  return (this->weights[a] < this->weights[b]);
 }
 
 
