@@ -108,7 +108,7 @@ private:
    * refinement level to the next, starting with the coarse cell,
    * until we get to the cell represented by the current object.
    */
-  std::vector<unsigned char> id;
+  std::vector<unsigned char> child_indices;
 
   friend std::istream &operator>> (std::istream &is, CellId &cid);
   friend std::ostream &operator<< (std::ostream &os, const CellId &cid);
@@ -124,9 +124,9 @@ inline
 std::ostream &operator<< (std::ostream &os,
                           const CellId &cid)
 {
-  os << cid.coarse_cell_id << '_' << cid.id.size() << ':';
-  for (unsigned int i=0; i<cid.id.size(); ++i)
-    os << static_cast<int>(cid.id[i]);
+  os << cid.coarse_cell_id << '_' << cid.child_indices.size() << ':';
+  for (unsigned int i=0; i<cid.child_indices.size(); ++i)
+    os << static_cast<int>(cid.child_indices[i]);
   return os;
 }
 
@@ -154,11 +154,11 @@ std::istream &operator>> (std::istream &is,
   Assert(dummy==':', ExcMessage("invalid CellId"));
 
   char value;
-  cid.id.clear();
+  cid.child_indices.clear();
   for (unsigned int i=0; i<idsize; ++i)
     {
       is >> value;
-      cid.id.push_back(value-'0');
+      cid.child_indices.push_back(value-'0');
     }
   return is;
 }
@@ -169,7 +169,7 @@ CellId::CellId(const unsigned int coarse_cell_id,
                const std::vector<unsigned char> &id)
   :
   coarse_cell_id(coarse_cell_id),
-  id(id)
+  child_indices(id)
 {}
 
 
@@ -186,7 +186,7 @@ CellId::operator== (const CellId &other) const
 {
   if (this->coarse_cell_id != other.coarse_cell_id)
     return false;
-  return id == other.id;
+  return child_indices == other.child_indices;
 }
 
 
@@ -206,18 +206,18 @@ bool CellId::operator<(const CellId &other) const
     return this->coarse_cell_id < other.coarse_cell_id;
 
   unsigned int idx = 0;
-  while (idx < id.size())
+  while (idx < child_indices.size())
     {
-      if (idx>=other.id.size())
+      if (idx>=other.child_indices.size())
         return false;
 
-      if (id[idx] != other.id[idx])
-        return id[idx] < other.id[idx];
+      if (child_indices[idx] != other.child_indices[idx])
+        return child_indices[idx] < other.child_indices[idx];
 
       ++idx;
     }
 
-  if (id.size() == other.id.size())
+  if (child_indices.size() == other.child_indices.size())
     return false;
   return true; // other.id is longer
 }
