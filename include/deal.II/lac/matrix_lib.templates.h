@@ -76,8 +76,6 @@ MeanValueFilter::filter(BlockVector<number> &v) const
   for (unsigned int i=0; i<v.n_blocks(); ++i)
     if (i == component)
       vmult(v.block(i), v.block(i));
-    else
-      v.block(i) = v.block(i);
 }
 
 

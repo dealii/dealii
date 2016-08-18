@@ -3688,8 +3688,8 @@ namespace parallel
                           {
                             //at least one of the children belongs to us, so
                             //make sure we set the level subdomain id
-                            types::subdomain_id mark = numbers::artificial_subdomain_id;
-                            mark = cell->child(0)->level_subdomain_id();
+                            const types::subdomain_id mark =
+                              cell->child(0)->level_subdomain_id();
                             Assert(mark != numbers::artificial_subdomain_id, ExcInternalError()); //we should know the child(0)
                             cell->set_level_subdomain_id(mark);
                             break;

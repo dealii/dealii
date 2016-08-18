@@ -475,6 +475,7 @@ SolverBicgstab<VectorType>::solve(const MatrixType         &A,
           break;
         }
       state = iterate(A, precondition);
+      ++step;
     }
   while (state.breakdown == true);
 
