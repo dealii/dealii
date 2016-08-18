@@ -39,6 +39,15 @@ inconvenience this causes.
 
 <ol>
 
+ <li> New: It is now possible to generate a cell_iterator to a cell
+ that is identified by a CellId. CellIds are unique even across
+ processes in distributed computations, therefore this change allows
+ to identify a particular cell (e.g. a ghost cell of the local process) in
+ another domain.
+ <br>
+ (Rene Gassmoeller, 2016/08/17)
+ </li>
+
  <li> Removed: deprecated classes CompressedSparsityPattern,
  CompressedSimpleSparsityPattern, CompressedSetSparsityPattern, and their
  block variants got removed.
