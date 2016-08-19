@@ -16,6 +16,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/geometry_info.h>
 
+#include <deal.II/base/std_cxx11/bind.h>
 
 #include <cmath>
 #include <limits>
@@ -932,27 +933,33 @@ QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
 
 
 template <int dim>
-QSorted<dim>::QSorted(Quadrature<dim> quad) :
-  Quadrature<dim>(quad.size())
+QSorted<dim>::QSorted(const Quadrature<dim> &quad) :
+  Quadrature<dim>(quad)
 {
-  std::vector< std::pair<double, Point<dim> > > wp;
+  std::vector<unsigned int> permutation(quad.size());
   for (unsigned int i=0; i<quad.size(); ++i)
-    wp.push_back(std::pair<double, Point<dim> >(quad.weight(i),
-                                                quad.point(i)));
-  sort(wp.begin(), wp.end(), *this);
+    permutation[i] = i;
+
+  std::sort(permutation.begin(),
+            permutation.end(),
+            std_cxx11::bind(&QSorted<dim>::compare_weights,
+                            std_cxx11::ref(*this),
+                            std_cxx11::_1,
+                            std_cxx11::_2));
+
   for (unsigned int i=0; i<quad.size(); ++i)
     {
-      this->weights[i] = wp[i].first;
-      this->quadrature_points[i] = wp[i].second;
+      this->weights[i]           = quad.weight(permutation[i]);
+      this->quadrature_points[i] = quad.point(permutation[i]);
     }
 }
 
 
 template <int dim>
-bool QSorted<dim>::operator()(const std::pair<double, Point<dim> > &a,
-                              const std::pair<double, Point<dim> > &b)
+bool QSorted<dim>::compare_weights(const unsigned int a,
+                                   const unsigned int b) const
 {
-  return (a.first < b.first);
+  return (this->weights[a] < this->weights[b]);
 }
 
 
