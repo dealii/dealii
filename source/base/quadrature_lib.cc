@@ -16,6 +16,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/geometry_info.h>
 
+#include <deal.II/base/std_cxx11/bind.h>
 
 #include <cmath>
 #include <limits>
@@ -935,9 +936,16 @@ template <int dim>
 QSorted<dim>::QSorted(const Quadrature<dim> &quad) :
   Quadrature<dim>(quad)
 {
-  std::vector<std::size_t> permutation(quad.size());
-  std::iota(permutation.begin(), permutation.end(), 0);
-  std::sort(permutation.begin(), permutation.end(), *this);
+  std::vector<unsigned int> permutation(quad.size());
+  for (unsigned int i=0; i<quad.size(); ++i)
+    permutation[i] = i;
+
+  std::sort(permutation.begin(),
+            permutation.end(),
+            std_cxx11::bind(&QSorted<dim>::compare_weights,
+                            std_cxx11::ref(*this),
+                            std_cxx11::_1,
+                            std_cxx11::_2));
 
   for (unsigned int i=0; i<quad.size(); ++i)
     {
@@ -948,8 +956,8 @@ QSorted<dim>::QSorted(const Quadrature<dim> &quad) :
 
 
 template <int dim>
-bool QSorted<dim>::operator()(const std::size_t &a,
-                              const std::size_t &b) const
+bool QSorted<dim>::compare_weights(const unsigned int a,
+                                   const unsigned int b) const
 {
   return (this->weights[a] < this->weights[b]);
 }

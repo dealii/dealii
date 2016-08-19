@@ -436,15 +436,19 @@ class QSorted : public Quadrature<dim>
 {
 public:
   /**
-   * The constructor takes an arbitrary quadrature formula.
+   * The constructor takes an arbitrary quadrature formula @p quad and sorts
+   * its points and weights according to ascending weights.
    */
   QSorted (const Quadrature<dim> &quad);
 
+private:
   /**
-   * A rule to reorder pairs of points and weights.
+   * A rule for std::sort to reorder pairs of points and weights.
+   * @p a and @p b are indices into the weights array and the result will
+   * be determined by comparing the weights.
    */
-  bool operator()(const std::size_t &a,
-                  const std::size_t &b) const;
+  bool compare_weights(const unsigned int a,
+                       const unsigned int b) const;
 };
 
 /**
