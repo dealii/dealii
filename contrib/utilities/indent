@@ -62,5 +62,6 @@ format_inst()
     rm $f.tmp $f.tmp.orig
 }
 
-export -f format_inst
-find source -name '*.inst.in' | xargs -n 1 -P 10 -I % bash -c 'format_inst "$@"' _ %
+for i in `find source -name '*.inst.in'` ; do
+  format_inst $i
+done
