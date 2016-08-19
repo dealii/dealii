@@ -3484,8 +3484,7 @@ namespace
             const double x = line_support_points.point(i+1)[0];
             w[1] = x;
             w[0] = (1-x);
-            Quadrature<spacedim> quadrature(surrounding_points, w);
-            points[i] = manifold.get_new_point(quadrature);
+            points[i] = manifold.get_new_point(surrounding_points, w);
           }
         break;
       }
@@ -3511,8 +3510,7 @@ namespace
                 for (unsigned int l=0; l<4; ++l)
                   w[l] = GeometryInfo<2>::d_linear_shape_function(p, l);
 
-                Quadrature<spacedim> quadrature(surrounding_points, w);
-                points[c]=manifold.get_new_point(quadrature);
+                points[c]=manifold.get_new_point(surrounding_points, w);
               }
           }
         break;
@@ -3542,8 +3540,7 @@ namespace
                     for (unsigned int l=0; l<8; ++l)
                       w[l] = GeometryInfo<3>::d_linear_shape_function(p, l);
 
-                    Quadrature<spacedim> quadrature(surrounding_points, w);
-                    points[c]=manifold.get_new_point(quadrature);
+                    points[c]=manifold.get_new_point(surrounding_points, w);
                   }
               }
           }

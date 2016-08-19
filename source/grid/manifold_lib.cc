@@ -308,11 +308,20 @@ Point<spacedim>
 CylindricalManifold<dim,spacedim>::
 get_new_point (const Quadrature<spacedim> &quad) const
 {
-  const std::vector<Point<spacedim> > &surrounding_points = quad.get_points();
-  const std::vector<double> &weights = quad.get_weights();
+  return get_new_point(quad.get_points(),quad.get_weights());
+}
 
+
+
+template <int dim, int spacedim>
+Point<spacedim>
+CylindricalManifold<dim,spacedim>::
+get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
+               const std::vector<double>           &weights) const
+{
   // compute a proposed new point
-  Point<spacedim> middle = flat_manifold.get_new_point(quad);
+  const Point<spacedim> middle = flat_manifold.get_new_point(surrounding_points,
+                                                             weights);
 
   double radius = 0;
   Tensor<1,spacedim> on_plane;

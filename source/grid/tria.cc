@@ -4098,9 +4098,8 @@ namespace internal
                         ps[1] = cell->face(GeometryInfo<dim>
                                            ::opposite_face[boundary_face])
                                 ->child(0)->vertex(1);
-                        Quadrature<spacedim> qs(ps,ws);
                         triangulation.vertices[next_unused_vertex]
-                          = cell->get_manifold().get_new_point(qs);
+                          = cell->get_manifold().get_new_point(ps,ws);
                       }
                   }
               }

@@ -66,7 +66,7 @@ main()
           weights[0] = (double)i/((double)n_intermediates-1);
           weights[1] = 1.0-weights[0];
 
-          deallog << manifold.get_new_point(Quadrature<2>(points, weights)) << std::endl;
+          deallog << manifold.get_new_point(points, weights) << std::endl;
         }
     }
 

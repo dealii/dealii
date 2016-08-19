@@ -219,7 +219,7 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
       vertices.push_back(cell->vertex(v));
       weights.push_back(GeometryInfo<dim>::d_linear_shape_function(p,v));
     }
-  return cell->get_manifold().get_new_point(Quadrature<spacedim>(vertices, weights));
+  return cell->get_manifold().get_new_point(vertices, weights);
 }
 
 
@@ -403,8 +403,8 @@ namespace internal
           for (unsigned int point=0; point<quadrature_points.size(); ++point)
             {
               quadrature_points[point] = data.manifold->
-                                         get_new_point(Quadrature<spacedim>(data.vertices,
-                                                       data.cell_manifold_quadrature_weights[point+data_set]));
+                                         get_new_point(data.vertices,
+                                                       data.cell_manifold_quadrature_weights[point+data_set]);
             }
         }
     }
@@ -440,8 +440,8 @@ namespace internal
 
               // And get its image on the manifold:
               const Point<spacedim> P = data.manifold->
-                                        get_new_point(Quadrature<spacedim>(data.vertices,
-                                                      data.cell_manifold_quadrature_weights[point+data_set]));
+                                        get_new_point(data.vertices,
+                                                      data.cell_manifold_quadrature_weights[point+data_set]);
 
               // To compute the Jacobian, we choose dim points aligned
               // with the dim reference axes, which are still in the
@@ -469,8 +469,8 @@ namespace internal
                     data.vertex_weights[j] = GeometryInfo<dim>::d_linear_shape_function(np, j);
 
                   const Point<spacedim> NP=
-                    data.manifold->get_new_point(Quadrature<spacedim>(data.vertices,
-                                                                      data.vertex_weights));
+                    data.manifold->get_new_point(data.vertices,
+                                                 data.vertex_weights);
 
                   const Tensor<1,spacedim> T = data.manifold->get_tangent_vector(P, NP);
 

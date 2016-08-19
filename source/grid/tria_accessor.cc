@@ -1050,8 +1050,10 @@ namespace
     else
       {
         TriaRawIterator<TriaAccessor<structdim, dim, spacedim> > it(obj);
-        Quadrature<spacedim> quadrature = Manifolds::get_default_quadrature(it, use_laplace);
-        return obj.get_manifold().get_new_point(quadrature);
+        const std::pair<std::vector<Point<spacedim> >,
+              std::vector<double> > points_and_weights = Manifolds::get_default_points_and_weights(it, use_laplace);
+        return obj.get_manifold().get_new_point(points_and_weights.first,
+                                                points_and_weights.second);
       }
   }
 }
@@ -1216,8 +1218,7 @@ TriaAccessor<structdim, dim, spacedim>::intermediate_point (const Point<structdi
       w[i] = fe.shape_value(i, coordinates);
     }
 
-  Quadrature<spacedim> quadrature(p, w);
-  return this->get_manifold().get_new_point(quadrature);
+  return this->get_manifold().get_new_point(p, w);
 }
 
 
