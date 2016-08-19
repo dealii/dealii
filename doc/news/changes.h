@@ -196,6 +196,14 @@ inconvenience this causes.
 
 <ol>
 
+ <li> New: There are 6 new video lectures that explain the
+ basics of Linux and the command line, how mesh refinement works, and some
+ more complicated time stepping schemes.
+ (@dealiiVideoLectureSeeAlso{2.9,2.91,17.25,17.5,17.75,30.25})
+ <br>
+ (Wolfgang Bangerth, 2016/08/19)
+ </li>
+
  <li> New: deal.II no longer uses features of the C++ language that
  were deprecated with C++11, C++14, or that are scheduled to be
  deprecated for C++17.

@@ -121,6 +121,12 @@ particular, you can see the steps he executes to run this and other
 programs, and you will get a much better idea of the tools that can be
 used to work with deal.II. In particular, lectures 2 and 4 give an overview of
 deal.II and of the building blocks of any finite element code.
+(@dealiiVideoLectureSeeAlso{2,4})
+
+If you are not yet familiar with using Linux and running things on the
+command line, you may be interested in watching lectures 2.9 and 2.91.
+(@dealiiVideoLectureSeeAlso{2.9,2.91}) These give overviews over the command
+line and on what happens when compiling programs, respectively.
 
 
 <h3> What this program does </h3>

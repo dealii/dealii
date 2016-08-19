@@ -1,7 +1,7 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
-@dealiiVideoLecture{15,16,17}
+@dealiiVideoLecture{15,16,17,17.25,17.5,17.75}
 
 The main emphasis in this example is the handling of locally refined
 grids. The approach to adaptivity chosen in deal.II is to use grids in which
