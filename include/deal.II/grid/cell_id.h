@@ -57,18 +57,15 @@ class CellId
 {
 public:
   /**
-   * construct CellId with a given coarse_cell_index and list of child indices
+   * Construct a CellId object with a given @p coarse_cell_index and list of child indices.
    */
-  explicit CellId(unsigned int coarse_cell_id_, std::vector<unsigned char> id_)
-    : coarse_cell_id(coarse_cell_id_), id(id_)
-  {}
+  CellId(const unsigned int coarse_cell_id,
+         const std::vector<unsigned char> &child_indices);
 
   /**
-   * construct an empty CellId.
+   * Construct an invalid CellId.
    */
-  CellId()
-    : coarse_cell_id(static_cast<unsigned int>(-1))
-  {}
+  CellId();
 
   /**
    * Return a string representation of this CellId.
@@ -83,42 +80,68 @@ public:
   to_cell(const Triangulation<dim,spacedim> &tria) const;
 
   /**
-   * compare two CellIds
+   * Compare two CellId objects for equality.
    */
   bool operator== (const CellId &other) const;
 
   /**
-   * compare two CellIds
+   * Compare two CellIds for inequality.
    */
   bool operator!= (const CellId &other) const;
 
   /**
-   * compare two CellIds
+   * Compare two CellIds with regard to an ordering. The details of this
+   * ordering are unspecified except that the operation provides a
+   * total ordering among all cells.
    */
   bool operator<(const CellId &other) const;
 
+private:
+  /**
+   * The number of the coarse cell within whose tree the cell
+   * represented by the current object is located.
+   */
+  unsigned int coarse_cell_id;
+
+  /**
+   * A list of integers that denote which child to pick from one
+   * refinement level to the next, starting with the coarse cell,
+   * until we get to the cell represented by the current object.
+   */
+  std::vector<unsigned char> child_indices;
+
   friend std::istream &operator>> (std::istream &is, CellId &cid);
   friend std::ostream &operator<< (std::ostream &os, const CellId &cid);
-private:
-  unsigned int coarse_cell_id;
-  std::vector<unsigned char> id;
 };
 
+
+
+
 /**
- * output CellId into a stream
+ * Write a CellId object into a stream.
  */
-inline std::ostream &operator<< (std::ostream &os, const CellId &cid)
+inline
+std::ostream &operator<< (std::ostream &os,
+                          const CellId &cid)
 {
-  os << cid.coarse_cell_id << '_' << cid.id.size() << ':';
-  for (unsigned int i=0; i<cid.id.size(); ++i)
-    os << static_cast<int>(cid.id[i]);
+  os << cid.coarse_cell_id << '_' << cid.child_indices.size() << ':';
+  for (unsigned int i=0; i<cid.child_indices.size(); ++i)
+    // write the child indices. because they are between 0 and 2^dim-1, they all
+    // just have one digit, so we could write them as integers. it's
+    // probably clearer to write them as one-digit characters starting
+    // at '0'
+    os << static_cast<unsigned char>(cid.child_indices[i] + '0');
   return os;
 }
 
+
+
 /**
- * read CellId from a stream
+ * Read a CellId object from a stream.
  */
-inline std::istream &operator>> (std::istream &is, CellId &cid)
+inline
+std::istream &operator>> (std::istream &is,
+                          CellId &cid)
 {
   unsigned int cellid;
   is >> cellid;
@@ -135,28 +158,52 @@ inline std::istream &operator>> (std::istream &is, CellId &cid)
   Assert(dummy==':', ExcMessage("invalid CellId"));
 
   char value;
-  cid.id.clear();
+  cid.child_indices.clear();
   for (unsigned int i=0; i<idsize; ++i)
     {
+      // read the one-digit child index (as an integer number) and
+      // convert it back into unsigned char
       is >> value;
-      cid.id.push_back(value-'0');
+      cid.child_indices.push_back(value-'0');
     }
   return is;
 }
+
+
+inline
+CellId::CellId(const unsigned int coarse_cell_id,
+               const std::vector<unsigned char> &id)
+  :
+  coarse_cell_id(coarse_cell_id),
+  child_indices(id)
+{}
+
+
+inline
+CellId::CellId()
+  :
+  coarse_cell_id(static_cast<unsigned int>(-1))
+{}
+
+
 
 inline bool
 CellId::operator== (const CellId &other) const
 {
   if (this->coarse_cell_id != other.coarse_cell_id)
     return false;
-  return id == other.id;
+  return child_indices == other.child_indices;
 }
+
+
 
 inline bool
 CellId::operator!= (const CellId &other) const
 {
   return !(*this == other);
 }
+
+
 
 inline
 bool CellId::operator<(const CellId &other) const
@@ -165,18 +212,18 @@ bool CellId::operator<(const CellId &other) const
     return this->coarse_cell_id < other.coarse_cell_id;
 
   unsigned int idx = 0;
-  while (idx < id.size())
+  while (idx < child_indices.size())
     {
-      if (idx>=other.id.size())
+      if (idx>=other.child_indices.size())
         return false;
 
-      if (id[idx] != other.id[idx])
-        return id[idx] < other.id[idx];
+      if (child_indices[idx] != other.child_indices[idx])
+        return child_indices[idx] < other.child_indices[idx];
 
       ++idx;
     }
 
-  if (id.size() == other.id.size())
+  if (child_indices.size() == other.child_indices.size())
     return false;
   return true; // other.id is longer
 }

@@ -35,8 +35,8 @@ CellId::to_cell(const Triangulation<dim,spacedim> &tria) const
 {
   typename Triangulation<dim,spacedim>::cell_iterator cell (&tria,0,coarse_cell_id);
 
-  for (unsigned int i = 0; i < id.size(); ++i)
-    cell = cell->child(static_cast<unsigned int> (id[i]));
+  for (unsigned int i = 0; i < child_indices.size(); ++i)
+    cell = cell->child(static_cast<unsigned int> (child_indices[i]));
 
   return cell;
 }
