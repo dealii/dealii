@@ -302,7 +302,7 @@ void PointValueHistory<dim>
 
   std::map <std::string, std::vector <std::vector <double> > >::iterator
   data_store_begin = data_store.begin ();
-  for (; data_store_begin != data_store.end (); data_store_begin++)
+  for (; data_store_begin != data_store.end (); ++data_store_begin)
     {
       // add an extra row to each vector
       // entry
@@ -422,7 +422,7 @@ void PointValueHistory<dim>
 
       std::map <std::string, std::vector <std::vector <double> > >::iterator
       data_store_begin = data_store.begin ();
-      for (; data_store_begin != data_store.end (); data_store_begin++)
+      for (; data_store_begin != data_store.end (); ++data_store_begin)
         {
           // add an extra row to each vector
           // entry
@@ -582,7 +582,7 @@ void PointValueHistory<dim>
   unsigned int n_stored = mask->second.n_selected_components(dof_handler->get_fe ().n_components ());
 
   typename std::vector <internal::PointValueHistory::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
-  for (unsigned int data_store_index = 0; point != point_geometry_data.end (); point++, data_store_index++)
+  for (unsigned int data_store_index = 0; point != point_geometry_data.end (); ++point, ++data_store_index)
     {
       // Look up the components to add
       // in the component_mask, and
@@ -636,7 +636,7 @@ void PointValueHistory<dim>
 
   // Loop over points and find correct cell
   typename std::vector <internal::PointValueHistory::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
-  for (unsigned int data_store_index = 0; point != point_geometry_data.end (); point++, data_store_index++)
+  for (unsigned int data_store_index = 0; point != point_geometry_data.end (); ++point, ++data_store_index)
     {
       // we now have a point to query,
       // need to know what cell it is in
@@ -762,7 +762,7 @@ void PointValueHistory<dim>
       // we now have the data and need to save it
       // loop over data names
       typename std::vector<std::string>::const_iterator name = vector_names.begin();
-      for (; name != vector_names.end(); name++)
+      for (; name != vector_names.end(); ++name)
         {
           typename std::map <std::string, std::vector <std::vector <double> > >::iterator data_store_field = data_store.find(*name);
           Assert (data_store_field != data_store.end(), ExcMessage("vector_name not in class"));
@@ -834,7 +834,7 @@ void PointValueHistory<dim>
 
   typename std::vector <internal::PointValueHistory::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
   Vector <number> value (dof_handler->get_fe().n_components());
-  for (unsigned int data_store_index = 0; point != point_geometry_data.end (); point++, data_store_index++)
+  for (unsigned int data_store_index = 0; point != point_geometry_data.end (); ++point, ++data_store_index)
     {
       // Make a Vector <double> for the value
       // at the point. It will have as many
@@ -961,7 +961,7 @@ void PointValueHistory<dim>
       //AssertThrow (!triangulation_changed, ExcDoFHandlerChanged ());
 
       typename std::vector <internal::PointValueHistory::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
-      for (unsigned int data_store_index = 0; point != point_geometry_data.end (); point++, data_store_index++)
+      for (unsigned int data_store_index = 0; point != point_geometry_data.end (); ++point, ++data_store_index)
         {
           // for each point, open a file to
           // be written to
@@ -1081,7 +1081,7 @@ Vector<double> PointValueHistory<dim>
   Vector<double> dof_vector (dof_handler->n_dofs ());
 
   typename std::vector <internal::PointValueHistory::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
-  for (; point != point_geometry_data.end (); point++)
+  for (; point != point_geometry_data.end (); ++point)
     {
       for (unsigned int component = 0; component < dof_handler->get_fe ().n_components (); component++)
         {
@@ -1103,7 +1103,7 @@ void PointValueHistory<dim>
   std::vector <std::vector <Point <dim> > > actual_points;
   typename std::vector <internal::PointValueHistory::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
 
-  for (; point != point_geometry_data.end (); point++)
+  for (; point != point_geometry_data.end (); ++point)
     {
       actual_points.push_back (point->support_point_locations);
     }
@@ -1134,7 +1134,7 @@ void PointValueHistory<dim>
 
   // Loop over points and find correct cell
   typename std::vector <internal::PointValueHistory::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
-  for (unsigned int data_store_index = 0; point != point_geometry_data.end (); point++, data_store_index++)
+  for (unsigned int data_store_index = 0; point != point_geometry_data.end (); ++point, ++data_store_index)
     {
       // we now have a point to query,
       // need to know what cell it is in
@@ -1180,7 +1180,7 @@ void PointValueHistory<dim>
     {
       if (!cleared)
         {
-          for (; point != point_geometry_data.end (); point++)
+          for (; point != point_geometry_data.end (); ++point)
             {
               out << "# Requested location: " << point->requested_location << "\n";
               out << "# DoF_index : Support location (for each component)\n";
@@ -1222,7 +1222,7 @@ void PointValueHistory<dim>
     {
       out << "Mnemonic: data set size (mask size, n true components) : n data sets\n";
     }
-  for (; data_store_begin != data_store.end (); data_store_begin++)
+  for (; data_store_begin != data_store.end (); ++data_store_begin)
     {
       // Find field mnemonic
       std::string vector_name = data_store_begin->first;
@@ -1278,7 +1278,7 @@ bool PointValueHistory<dim>
       data_store_begin = data_store.begin ();
       if (have_dof_handler)
         {
-          for (; data_store_begin != data_store.end (); data_store_begin++)
+          for (; data_store_begin != data_store.end (); ++data_store_begin)
             {
               Assert (data_store_begin->second.size() > 0,
                       ExcInternalError());
@@ -1306,7 +1306,7 @@ bool PointValueHistory<dim>
     {
       std::map <std::string, std::vector <std::vector <double> > >::iterator
       data_store_begin = data_store.begin ();
-      for (; data_store_begin != data_store.end (); data_store_begin++)
+      for (; data_store_begin != data_store.end (); ++data_store_begin)
         {
           Assert (data_store_begin->second.size() > 0,
                   ExcInternalError());

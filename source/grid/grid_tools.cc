@@ -3589,7 +3589,7 @@ next_cell:
       {
         for (std::set<unsigned int>::iterator it = face2_vertices.begin();
              it != face2_vertices.end();
-             it++)
+             ++it)
           {
             if (orthogonal_equality(face1->vertex(i),face2->vertex(*it),
                                     direction, offset, matrix))

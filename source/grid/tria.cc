@@ -1940,7 +1940,7 @@ namespace internal
           std::vector<unsigned short int> vertex_touch_count (v.size(), 0);
           typename std::map<std::pair<int,int>,
                    typename Triangulation<dim,spacedim>::line_iterator>::iterator i;
-          for (i=needed_lines.begin(); i!=needed_lines.end(); i++)
+          for (i=needed_lines.begin(); i!=needed_lines.end(); ++i)
             {
               // touch the vertices of
               // this line
@@ -2310,7 +2310,7 @@ namespace internal
           std::vector<unsigned short int> vertex_touch_count (v.size(), 0);
           typename std::map<std::pair<int,int>,
                    typename Triangulation<dim,spacedim>::line_iterator>::iterator i;
-          for (i=needed_lines.begin(); i!=needed_lines.end(); i++)
+          for (i=needed_lines.begin(); i!=needed_lines.end(); ++i)
             {
               // touch the vertices of
               // this line
@@ -9305,7 +9305,7 @@ copy_triangulation (const Triangulation<dim, spacedim> &old_tria)
   typename std::map<types::manifold_id,
            SmartPointer<const Manifold<dim,spacedim> , Triangulation<dim, spacedim> > >::const_iterator
            bdry_iterator = old_tria.manifold.begin();
-  for (; bdry_iterator != old_tria.manifold.end() ; bdry_iterator++)
+  for (; bdry_iterator != old_tria.manifold.end() ; ++bdry_iterator)
     manifold[bdry_iterator->first] = bdry_iterator->second;
 
 
