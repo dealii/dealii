@@ -20,7 +20,7 @@
 # include <unistd.h>
 #endif
 
-#ifdef DEAM_II_MSVC
+#ifdef DEAL_II_MSVC
 #  include <WinSock2.h>
 #endif
 

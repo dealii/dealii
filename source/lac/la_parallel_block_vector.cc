@@ -18,6 +18,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+
+// disable instantiation for MSVC for now because of a compiler bug,
+// see https://github.com/dealii/dealii/issues/2875
+#ifndef DEAL_II_MSVC
+
 #include "la_parallel_block_vector.inst"
 
 // do a few functions that currently don't fit the scheme because they have
@@ -42,5 +47,6 @@ namespace LinearAlgebra
   }
 }
 
+#endif // ! DEAL_II_MSVC
 
 DEAL_II_NAMESPACE_CLOSE
