@@ -170,7 +170,7 @@ void test()
     {
       for (unsigned int i=5; i<10; ++i)
         AssertThrow(2.*read_write_2[i]==read_write_3[i],
-                    ExcMessage("Problem in scale."));
+                    ExcMessage("Problem in equ."));
     }
 
 

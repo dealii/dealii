@@ -206,6 +206,13 @@ namespace LinearAlgebra
                                                               blockIdx.x*(blockDim.x*CHUNK_SIZE);
         const typename Vector<Number>::size_type local_idx = threadIdx.x;
 
+        if (global_idx<N)
+          result_buffer[local_idx] = v[global_idx];
+        else
+          result_buffer[local_idx] = Operation::null_value();
+
+        __syncthreads();
+
         reduce<Number,Operation> (result, result_buffer, local_idx, global_idx, N);
       }
 
@@ -422,6 +429,11 @@ namespace LinearAlgebra
                 res_buf[local_idx] += v1[idx]*v3[idx];
               }
           }
+
+        __syncthreads();
+
+        reduce<Number, DotProduct<Number>> (res, res_buf, local_idx,
+                                            global_idx, N);
       }
     }
 
