@@ -335,6 +335,7 @@ mpi_initlog(bool console=false)
       deallog.threshold_float(1.e-8);
     }
 #else
+  (void)console;
   // can't use this function if not using MPI
   Assert (false, ExcInternalError());
 #endif
@@ -361,6 +362,7 @@ struct MPILogInitAll
     deallog.threshold_float(1.e-8);
     deallog.push(Utilities::int_to_string(myid));
 #else
+    (void)console;
     // can't use this function if not using MPI
     Assert (false, ExcInternalError());
 #endif
