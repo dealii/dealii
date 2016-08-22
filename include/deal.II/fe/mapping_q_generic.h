@@ -377,7 +377,7 @@ public:
      * The polynomial degree of the mapping. Since the objects here are also
      * used (with minor adjustments) by MappingQ, we need to store this.
      */
-    unsigned int polynomial_degree;
+    const unsigned int polynomial_degree;
 
     /**
      * Number of shape functions. If this is a Q1 mapping, then it is simply
