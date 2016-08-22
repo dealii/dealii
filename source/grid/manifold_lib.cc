@@ -196,7 +196,7 @@ get_intermediate_point (const Point<spacedim> &p1,
   const Tensor<1,spacedim> e1 = v1/r1;
   const Tensor<1,spacedim> e2 = v2/r2;
 
-  if ((e1 - e2).norm() < tol)
+  if ((e1 - e2).norm_square() < tol*tol)
     return Point<spacedim>(center + w*v2 + (1-w)*v1);
 
   // Find the angle gamma described by v1 and v2:
@@ -211,7 +211,8 @@ get_intermediate_point (const Point<spacedim> &p1,
   Assert( n.norm() > 0,
           ExcInternalError("n should be different from the null vector."
                            "Probably this means v1==v2 or v2==0."));
-  n = n/n.norm();
+
+  n /= n.norm();
 
   // Find the point Q along O,v1 such that
   // P1,V,P2 has measure sigma.
