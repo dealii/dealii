@@ -38,17 +38,18 @@ inconvenience this causes.
 </p>
 
 <ol>
-
- <li> New: It is now possible to generate a cell_iterator to a cell
- that is identified by a CellId. CellIds are unique even across
- processes in distributed computations, therefore this change allows
- to identify a particular cell (e.g. a ghost cell of the local process) in
- another domain.
+ <li> New: deal.II now requires at least BOOST version 1.56, rather than the
+ previous minimal version of 1.54. This is because 1.54 does not support
+ serializing objects of type std::unique_ptr if C++11 is used, but we now
+ use such objects in a variety of places in classes that can be serialized.
+ BOOST 1.56, on the other hand, supports this. deal.II bundles BOOST 1.56
+ for cases where no or no sufficiently new version of BOOST is found on
+ a system.
  <br>
- (Rene Gassmoeller, 2016/08/17)
+ (Wolfgang Bangerth, 2016/08/22)
  </li>
 
- <li> Removed: deprecated classes CompressedSparsityPattern,
+ <li> Removed: Deprecated classes CompressedSparsityPattern,
  CompressedSimpleSparsityPattern, CompressedSetSparsityPattern, and their
  block variants got removed.
  <br>
@@ -202,6 +203,15 @@ inconvenience this causes.
  (@dealiiVideoLectureSeeAlso{2.9,2.91,17.25,17.5,17.75,30.25})
  <br>
  (Wolfgang Bangerth, 2016/08/19)
+ </li>
+
+ <li> New: It is now possible to generate a cell_iterator to a cell
+ that is identified by a CellId. CellIds are unique even across
+ processes in distributed computations, therefore this change allows
+ to identify a particular cell (e.g. a ghost cell of the local process) in
+ another domain.
+ <br>
+ (Rene Gassmoeller, 2016/08/17)
  </li>
 
  <li> New: deal.II no longer uses features of the C++ language that
