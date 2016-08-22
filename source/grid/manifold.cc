@@ -68,20 +68,19 @@ get_new_point (const Quadrature<spacedim> &quad) const
   Assert(std::abs(std::accumulate(quad.get_weights().begin(), quad.get_weights().end(), 0.0)-1.0) < tol,
          ExcMessage("The weights for the individual points should sum to 1!"));
 
-  QSorted<spacedim> sorted_quad(quad);
-  Point<spacedim> p = sorted_quad.point(0);
-  double w = sorted_quad.weight(0);
+  Point<spacedim> p = quad.point(0);
+  double w = quad.weight(0);
 
-  for (unsigned int i=1; i<sorted_quad.size(); ++i)
+  for (unsigned int i=1; i<quad.size(); ++i)
     {
       double weight = 0.0;
-      if ( (sorted_quad.weight(i) + w) < tol )
+      if ( (quad.weight(i) + w) < tol )
         weight = 0.0;
       else
-        weight =  w/(sorted_quad.weight(i) + w);
+        weight =  w/(quad.weight(i) + w);
 
-      p = get_intermediate_point(p, sorted_quad.point(i),1.0 - weight );
-      w += sorted_quad.weight(i);
+      p = get_intermediate_point(p, quad.point(i),1.0 - weight );
+      w += quad.weight(i);
     }
 
   return p;
