@@ -390,6 +390,16 @@ public:
      */
     const unsigned int n_shape_functions;
 
+    /*
+     * The default line support points. Is used in when the shape function
+     * values are computed.
+     *
+     * The number of quadrature points depends on the degree of this
+     * class, and it matches the number of degrees of freedom of an
+     * FE_Q<1>(this->degree).
+     */
+    QGaussLobatto<1> line_support_points;
+
     /**
      * Tensors of covariant transformation at each of the quadrature points.
      * The matrix stored is the Jacobian * G^{-1}, where G = Jacobian^{t} *

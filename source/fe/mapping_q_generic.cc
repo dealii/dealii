@@ -665,7 +665,8 @@ template<int dim, int spacedim>
 MappingQGeneric<dim,spacedim>::InternalData::InternalData (const unsigned int polynomial_degree)
   :
   polynomial_degree (polynomial_degree),
-  n_shape_functions (Utilities::fixed_power<dim>(polynomial_degree+1))
+  n_shape_functions (Utilities::fixed_power<dim>(polynomial_degree+1)),
+  line_support_points (polynomial_degree + 1)
 {}
 
 
@@ -862,7 +863,6 @@ compute_shape_function_values (const std::vector<Point<dim> > &unit_points)
 
       // Construct the tensor product polynomials used as shape functions for the
       // Qp mapping of cells at the boundary.
-      const QGaussLobatto<1> line_support_points (polynomial_degree + 1);
       const TensorProductPolynomials<dim>
       tensor_pols (Polynomials::generate_complete_Lagrange_basis(line_support_points.get_points()));
       Assert (n_shape_functions==tensor_pols.n(),
