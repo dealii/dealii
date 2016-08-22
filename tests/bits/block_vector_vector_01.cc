@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2015 by the deal.II authors
+// Copyright (C) 2004 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,16 +22,16 @@
 // now autoconf'ed.
 
 #include "../tests.h"
-#include <deal.II/lac/vector.h>
+#include <deal.II/lac/block_vector.h>
 #include <fstream>
 #include <iomanip>
 
 
-void test (Vector<double> &v)
+void test (BlockVector<double> &v)
 {
   for (unsigned int i=0; i<v.size(); ++i)
     v(i) = i+1.;
-  Vector<float> w(v);
+  BlockVector<float> w(v);
 
   AssertThrow (w==v, ExcInternalError());
 
@@ -48,7 +48,8 @@ int main ()
 
   try
     {
-      Vector<double> v (100);
+      std::vector<unsigned int> block_sizes(2, 50);
+      BlockVector<double> v (block_sizes);
       test (v);
     }
   catch (std::exception &exc)
