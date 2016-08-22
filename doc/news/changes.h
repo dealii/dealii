@@ -38,17 +38,7 @@ inconvenience this causes.
 </p>
 
 <ol>
-
- <li> New: It is now possible to generate a cell_iterator to a cell
- that is identified by a CellId. CellIds are unique even across
- processes in distributed computations, therefore this change allows
- to identify a particular cell (e.g. a ghost cell of the local process) in
- another domain.
- <br>
- (Rene Gassmoeller, 2016/08/17)
- </li>
-
- <li> Removed: deprecated classes CompressedSparsityPattern,
+ <li> Removed: Deprecated classes CompressedSparsityPattern,
  CompressedSimpleSparsityPattern, CompressedSetSparsityPattern, and their
  block variants got removed.
  <br>
@@ -202,6 +192,15 @@ inconvenience this causes.
  (@dealiiVideoLectureSeeAlso{2.9,2.91,17.25,17.5,17.75,30.25})
  <br>
  (Wolfgang Bangerth, 2016/08/19)
+ </li>
+
+ <li> New: It is now possible to generate a cell_iterator to a cell
+ that is identified by a CellId. CellIds are unique even across
+ processes in distributed computations, therefore this change allows
+ to identify a particular cell (e.g. a ghost cell of the local process) in
+ another domain.
+ <br>
+ (Rene Gassmoeller, 2016/08/17)
  </li>
 
  <li> New: deal.II no longer uses features of the C++ language that
