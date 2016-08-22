@@ -166,13 +166,46 @@ public:
   active_cell_iterator;
 
   /**
-   * Enumeration describing the region of the domain in which curved cells
-   * shall be created.
+   * Enumeration describing the part of the domain in which cells
+   * should be written with curved boundaries. In reality, no file
+   * format we are aware of really supports curved boundaries, but
+   * this can be emulated by plotting edges as a sequence of straight
+   * lines (and faces in 3d as a collection of bilinear patches) if
+   * DataOut::build_patches() is called with a number of subdivisions
+   * greater than 1.
+   *
+   * The elements of this enumeration then describe for which cells
+   * DataOut::build_patches() will query the manifold or boundary
+   * description for curved geometries.
    */
   enum CurvedCellRegion
   {
+    /**
+     * The geometry or boundary description
+     * will never be queried for curved geometries. This means that even
+     * if you have more than one subdivision per cell (see
+     * DataOut::build_patches() for what exactly this means) and even
+     * if the geometry really is curved, each cell will still be
+     * subdivided as if it was just a bi- or trilinear cell.
+     */
     no_curved_cells,
+
+    /**
+     * The geometry or boundary description
+     * will be queried for curved geometries for cells located
+     * at the boundary, i.e., for cells that have at least one
+     * face at the boundary. This is sufficient if you have not
+     * attached a manifold description to the interiors of cells
+     * but only to faces at the boundary.
+     */
     curved_boundary,
+
+    /**
+     * The geometry description will be
+     * queried for all cells and all faces, whether they are
+     * at the boundary or not. This option is appropriate if you
+     * have attached a manifold object to cells (not only to faces).
+     */
     curved_inner_cells
   };
 
@@ -223,15 +256,20 @@ public:
    * mapping that is to be used in the generation of output. If
    * <tt>n_subdivisions>1</tt>, the points interior of subdivided patches
    * which originate from cells at the boundary of the domain can be computed
-   * using the mapping, i.e. a higher order mapping leads to a representation
+   * using the mapping, i.e., a higher order mapping leads to a representation
    * of a curved boundary by using more subdivisions. Some mappings like
    * MappingQEulerian result in curved cells in the interior of the domain.
-   * However, there is nor easy way to get this information from the Mapping.
-   * Thus the last argument @p curved_region take one of three values
+   * The same is true if you have attached a manifold description to
+   * the cells of a triangulation (see @ref "Manifolds" manifold for more
+   * information). However, there is no easy way to query the mapping
+   * or manifold whether it really does lead to curved cells.
+   * Thus the last argument @p curved_region takes one of three values
    * resulting in no curved cells at all, curved cells at the boundary
-   * (default) or curved cells in the whole domain.
+   * (default) or curved cells in the whole domain. For more information
+   * about these three options, see the CurvedCellRegion enum's
+   * description.
    *
-   * Even for non-curved cells the mapping argument can be used for the
+   * Even for non-curved cells, the mapping argument can be used for
    * Eulerian mappings (see class MappingQ1Eulerian) where a mapping is used
    * not only to determine the position of points interior to a cell, but also
    * of the vertices.  It offers an opportunity to watch the solution on a
