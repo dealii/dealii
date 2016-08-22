@@ -38,6 +38,17 @@ inconvenience this causes.
 </p>
 
 <ol>
+ <li> New: deal.II now requires at least BOOST version 1.56, rather than the
+ previous minimal version of 1.54. This is because 1.54 does not support
+ serializing objects of type std::unique_ptr if C++11 is used, but we now
+ use such objects in a variety of places in classes that can be serialized.
+ BOOST 1.56, on the other hand, supports this. deal.II bundles BOOST 1.56
+ for cases where no or no sufficiently new version of BOOST is found on
+ a system.
+ <br>
+ (Wolfgang Bangerth, 2016/08/22)
+ </li>
+
  <li> Removed: Deprecated classes CompressedSparsityPattern,
  CompressedSimpleSparsityPattern, CompressedSetSparsityPattern, and their
  block variants got removed.
