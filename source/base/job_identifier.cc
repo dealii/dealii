@@ -20,10 +20,6 @@
 # include <unistd.h>
 #endif
 
-#ifdef DEAM_II_MSVC
-#  include <WinSock2.h>
-#endif
-
 DEAL_II_NAMESPACE_OPEN
 
 

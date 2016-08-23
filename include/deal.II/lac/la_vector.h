@@ -383,4 +383,8 @@ namespace LinearAlgebra
 
 DEAL_II_NAMESPACE_CLOSE
 
+#ifdef DEAL_II_MSVC
+#include <deal.II/lac/la_vector.templates.h>
+#endif
+
 #endif

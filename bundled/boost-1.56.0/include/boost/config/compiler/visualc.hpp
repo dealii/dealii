@@ -264,7 +264,8 @@
 //
 // last known and checked version is 18.00.20827.3 (VC12 RC, aka 2013 RC):
 // tjhei: change 180020827 to 190023506 (vs 2015 update 1)
-#if (_MSC_VER > 1800 && _MSC_FULL_VER > 190023506)
+// tjhei: change to 190024213 (vs 2015 update 3)
+#if (_MSC_VER > 1800 && _MSC_FULL_VER > 190024213)
 #  if defined(BOOST_ASSERT_CONFIG)
 #     error "Unknown compiler version - please run the configure tests and report the results"
 #  else
