@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2014 by the deal.II authors
+// Copyright (C) 2007 - 2014, 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,11 +31,35 @@ template <typename number>
 void
 check ()
 {
-  const std::complex<number> array[] = { 1, 2, 3, 4, 5,
-                                         6, 7, 8, 9, 0,
-                                         1, 2, 3, 4, 5,
-                                         6, 7, 8, 9, 0,
-                                         1, 2, 3, 4, 5
+  const std::complex<number> array[] = { std::complex<number>(1.,1.+1),
+                                         std::complex<number>(2.,2.+1),
+                                         std::complex<number>(3.,3.+1),
+                                         std::complex<number>(4.,4.+1),
+                                         std::complex<number>(5.,5.+1),
+
+                                         std::complex<number>(6.,6.+1),
+                                         std::complex<number>(7.,7.+1),
+                                         std::complex<number>(8.,8.+1),
+                                         std::complex<number>(9.,9.+1),
+                                         std::complex<number>(0.,0.+1),
+
+                                         std::complex<number>(1.,1.+1),
+                                         std::complex<number>(2.,2.+1),
+                                         std::complex<number>(3.,3.+1),
+                                         std::complex<number>(4.,4.+1),
+                                         std::complex<number>(5.,5.+1),
+
+                                         std::complex<number>(6.,6.+1),
+                                         std::complex<number>(7.,7.+1),
+                                         std::complex<number>(8.,8.+1),
+                                         std::complex<number>(9.,9.+1),
+                                         std::complex<number>(0.,0.+1),
+
+                                         std::complex<number>(1.,1.+1),
+                                         std::complex<number>(2.,2.+1),
+                                         std::complex<number>(3.,3.+1),
+                                         std::complex<number>(4.,4.+1),
+                                         std::complex<number>(5.,5.+1)
                                        };
 
   FullMatrix<std::complex<number> > m (5,5,array);
