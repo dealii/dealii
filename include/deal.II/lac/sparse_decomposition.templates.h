@@ -118,7 +118,8 @@ void SparseLUDecomposition<number>::initialize (
 
   // now use this sparsity pattern
   Assert (sparsity_pattern_to_use->n_rows()==sparsity_pattern_to_use->n_cols(),
-          typename SparsityPattern::ExcDiagonalNotOptimized());
+          ExcMessage ("It is not possible to compute this matrix decomposition for "
+                      "matrices that are not square."));
   {
     std::vector<const size_type *> tmp;
     tmp.swap (prebuilt_lower_bound);

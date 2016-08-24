@@ -979,22 +979,20 @@ public:
    * The operation is only allowed after the SparsityPattern has been set up
    * and compress() was called.
    */
-  DeclException0 (ExcNotCompressed);
+  DeclExceptionMsg (ExcNotCompressed,
+                    "The operation you attempted is only allowed after the SparsityPattern "
+                    "has been set up and compress() was called.");
   /**
    * This operation changes the structure of the SparsityPattern and is not
    * possible after compress() has been called.
    */
-  DeclException0 (ExcMatrixIsCompressed);
+  DeclExceptionMsg (ExcMatrixIsCompressed,
+                    "The operation you attempted changes the structure of the SparsityPattern "
+                    "and is not possible after compress() has been called.");
   /**
    * Exception
    */
   DeclException0 (ExcInvalidConstructorCall);
-  /**
-   * This exception is thrown if the matrix does not follow the convention of
-   * storing diagonal elements first in row. Refer to
-   * SparityPattern::optimize_diagonal() for more information.
-   */
-  DeclException0 (ExcDiagonalNotOptimized);
   /**
    * Exception
    */
