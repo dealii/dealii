@@ -734,13 +734,19 @@ public:
                   << "(Maximum number of entries for this row: "
                   << arg2 << "; maybe the matrix is already compressed?)");
   /**
-   * Exception
+   * The operation is only allowed after the SparsityPattern has been set up
+   * and compress() was called.
    */
-  DeclException0 (ExcNotCompressed);
+  DeclExceptionMsg (ExcNotCompressed,
+                    "The operation you attempted is only allowed after the SparsityPattern "
+                    "has been set up and compress() was called.");
   /**
-   * Exception
+   * This operation changes the structure of the SparsityPattern and is not
+   * possible after compress() has been called.
    */
-  DeclException0 (ExcMatrixIsCompressed);
+  DeclExceptionMsg (ExcMatrixIsCompressed,
+                    "The operation you attempted changes the structure of the SparsityPattern "
+                    "and is not possible after compress() has been called.");
   /**
    * Exception
    */

@@ -225,7 +225,10 @@ namespace SparsityTools
   /**
    * Exception
    */
-  DeclException0 (ExcMETISNotInstalled);
+  DeclExceptionMsg (ExcMETISNotInstalled,
+                    "The function you called requires METIS, but you did not "
+                    "configure deal.II with METIS.");
+
   /**
    * Exception
    */
