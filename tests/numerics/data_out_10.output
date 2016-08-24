@@ -1,0 +1,12 @@
+
+!TIME 0.00000
+!TIME 0.500000
+!TIME 1.00000
+!NBLOCKS 2.00000
+subdomain-01.time_step_0.vtk
+subdomain-02.time_step_0.vtk
+subdomain-01.time_step_1.vtk
+subdomain-02.time_step_1.vtk
+subdomain-01.time_step_2.vtk
+subdomain-02.time_step_2.vtk
+DEAL::OK

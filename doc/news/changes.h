@@ -38,6 +38,13 @@ inconvenience this causes.
 </p>
 
 <ol>
+ <li> New: There is now the possibility to store information about the
+ time of an output time step within the .visit file created by
+ the DataOutInterface<dim,spacedim>::write_visit_record function.
+ <br>
+ (Rene Gassmoeller, Juliane Dannberg, 2016/08/24)
+ </li>
+
  <li> New: deal.II now requires at least BOOST version 1.56, rather than the
  previous minimal version of 1.54. This is because 1.54 does not support
  serializing objects of type std::unique_ptr if C++11 is used, but we now
