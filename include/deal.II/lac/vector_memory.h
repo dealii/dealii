@@ -106,10 +106,17 @@ public:
 
   //@}
   /**
-   * Pointer to vectors allocated from VectorMemory objects. This pointer is
-   * safe in the sense that it automatically calls free() when it is
-   * destroyed, thus relieving the user from using vector management functions
-   * at all.
+   * A class that looks like a pointer for all practical purposes and that
+   * upon construction time allocates a vector from a VectorMemory object
+   * (or an object of a derived class) that is passed to the constructor.
+   * The destructor then automatically returns the vector's ownership to
+   * the same VectorMemory object.
+   *
+   * Pointers of this type are therefore safe in the sense that they automatically
+   * call VectorMemory::free() when they are destroyed, whether that happens
+   * at the end of a code block or because local variables are destroyed during
+   * exception unwinding. These kinds of object thus relieve the user from
+   * using vector management functions explicitly.
    *
    * @author Guido Kanschat, 2009
    */
@@ -139,11 +146,13 @@ public:
      * Dereferencing operator.
      */
     VectorType *operator -> () const;
+
   private:
     /**
      * The memory pool used.
      */
     SmartPointer<VectorMemory<VectorType>,Pointer> pool;
+
     /**
      * The pointer to the vector.
      */
