@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "language.dtd">
+<language name="deal.II prm" version="1.05" kateversion="2.4"
+          section="Configuration" extensions="*.prm">
+  <highlighting>
+    <list name="keywords">
+      <item> set </item>
+      <item> include </item>
+      <item> subsection </item>
+      <item> end> </item>
+    </list>
+
+    <contexts>
+      <context attribute="Normal Text" lineEndContext="#stay" name="Normal">
+        <RegExpr String="subsection \[.*\]$" attribute="Language" context="#stay" beginRegion="Section"/>
+
+        <RegExpr String="subsection" beginRegion="Section" attribute="Language" context="Section Name" firstNonSpace="true"/>
+        <RegExpr String="end" endRegion="Section" attribute="Language" context="#stay"/>
+	<StringDetect String="set" attribute="Keyword" context="Attribute"/>
+	<DetectChar char="#" attribute="Comment" context="Comment"/>
+        <DetectChar char="=" attribute="Normal Text" context="Value"/>
+	<RegExpr String="include" attribute="Keyword" context="Include" />
+      </context>
+
+      <context attribute="Filename" lineEndContext="#pop" name="Include" />
+
+      <context attribute="Key" lineEndContext="#pop" name="Attribute">
+	<DetectChar char="=" attribute="Keyword" context="Value"/>
+      </context>
+      <context attribute="Key" lineEndContext="#pop" name="Section Name"/>
+      <context attribute="Normal Text" lineEndContext="#pop" name="Value">
+	<DetectChar char="#" attribute="Comment" context="Comment"/>
+      </context>
+      <context attribute="Comment" lineEndContext="#pop" name="Comment"/>
+    </contexts>
+    <itemDatas>
+      <itemData name="Normal Text" defStyleNum="dsNormal"/>
+      <itemData name="Section"  defStyleNum="dsString" bold="1"/>
+      <itemData name="Filename"  defStyleNum="dsImport" />
+      <itemData name="Keyword"   defStyleNum="dsKeyword" spellChecking="0"/>
+       <itemData name="Key"  defStyleNum="dsDataType"/>
+      <itemData name="Language"  defStyleNum="dsDecVal" bold="1"/>
+      <itemData name="Comment" defStyleNum="dsComment"/>
+    </itemDatas>
+  </highlighting>
+  <general>
+    <comments>
+      <comment name="singleLine" start="#"/>
+    </comments>
+  </general>
+</language>

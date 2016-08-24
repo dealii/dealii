@@ -19,8 +19,8 @@ if test ! -d source -o ! -d include -o ! -d examples ; then
   exit 1
 fi
 
-if test ! -f contrib/utilities/astyle.rc ; then
-  echo "*** No style file contrib/utilities/astyle.rc found."
+if test ! -f contrib/styles/astyle.rc ; then
+  echo "*** No style file contrib/styles/astyle.rc found."
   exit 1
 fi
 
@@ -42,7 +42,7 @@ fi
 
 # collect all header and source files and process them in batches of 50 files
 # with up to 10 in parallel
-find tests include source examples \( -name '*.cc' -o -name '*.h' \) -print | xargs -n 50 -P 10 astyle --options=contrib/utilities/astyle.rc
+find tests include source examples \( -name '*.cc' -o -name '*.h' \) -print | xargs -n 50 -P 10 astyle --options=contrib/styles/astyle.rc
 
 # format .inst.in files. We need to replace \{ and \} because it confuses
 # astyle.
