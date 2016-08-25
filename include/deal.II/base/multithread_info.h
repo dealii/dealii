@@ -94,11 +94,6 @@ public:
    */
   static bool is_running_single_threaded ();
 
-  /**
-   * Exception
-   */
-  DeclException0(ExcProcNotPresent);
-
 private:
 
 

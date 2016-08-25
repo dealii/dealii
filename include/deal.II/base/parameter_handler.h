@@ -1950,7 +1950,9 @@ public:
   /**
    * Exception
    */
-  DeclException0 (ExcAlreadyAtTopLevel);
+  DeclExceptionMsg (ExcAlreadyAtTopLevel,
+                    "You can't leave a subsection if you are already at the top level "
+                    "of the subsection hierarchy.");
   /**
    * Exception
    */
