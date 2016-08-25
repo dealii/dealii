@@ -308,10 +308,6 @@ public:
                   int, int, int, int,
                   << "The blocks [" << arg1 << ',' << arg2 << "] and ["
                   << arg3 << ',' << arg4 << "] have differing column numbers.");
-  /**
-   * Exception
-   */
-  DeclException0 (ExcInvalidConstructorCall);
   //@}
 
 protected:

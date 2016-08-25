@@ -992,10 +992,6 @@ public:
   /**
    * Exception
    */
-  DeclException0 (ExcInvalidConstructorCall);
-  /**
-   * Exception
-   */
   DeclException2 (ExcIteratorRange,
                   int, int,
                   << "The iterators denote a range of " << arg1
