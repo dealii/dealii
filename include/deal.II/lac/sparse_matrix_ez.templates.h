@@ -43,8 +43,11 @@ SparseMatrixEZ<number>::SparseMatrixEZ(const SparseMatrixEZ<number> &m)
   Subscriptor (m),
   n_columns (0)
 {
-  Assert(m.n() == 0, ExcNotImplemented());
-  Assert(m.m() == 0, ExcNotImplemented());
+  Assert (m.m()==0 && m.n()==0,
+          ExcMessage("This constructor can only be called if the provided argument "
+                     "is an empty matrix. This constructor can not be used to "
+                     "copy-construct a non-empty matrix. Use the "
+                     "SparseMatrixEZ::copy_from() function for that purpose."));
 }
 
 
@@ -68,7 +71,11 @@ SparseMatrixEZ<number> &
 SparseMatrixEZ<number>::operator= (const SparseMatrixEZ<number> &m)
 {
   (void)m;
-  Assert (m.empty(), ExcInvalidConstructorCall());
+  Assert (m.empty(),
+          ExcMessage("This operator can only be called if the provided right "
+                     "hand side is an empty matrix. This operator can not be "
+                     "used to copy a non-empty matrix. Use the "
+                     "SparseMatrixEZ::copy_from() function for that purpose."));
   return *this;
 }
 

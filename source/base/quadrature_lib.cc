@@ -1208,12 +1208,24 @@ QGaussRadauChebyshev<1>::get_quadrature_points(const unsigned int n,
     // would be -cos(2i Pi/(2N+1))
     // put + Pi so we start from the smallest point
     // then map from [-1,1] to [0,1]
-    if (ep == QGaussRadauChebyshev::left)
-      points[i] = 1./2.*(1.-std::cos(numbers::PI*(1+2*double(i)/(2*double(n-1)+1.))));
-    else
+    switch (ep)
       {
-        Assert(ep==QGaussRadauChebyshev::right,ExcInvalidConstructorCall());
+      case QGaussRadauChebyshev::left:
+      {
+        points[i] = 1./2.*(1.-std::cos(numbers::PI*(1+2*double(i)/(2*double(n-1)+1.))));
+        break;
+      }
+
+      case QGaussRadauChebyshev::right:
+      {
         points[i] = 1./2.*(1.-std::cos(numbers::PI*(2*double(n-1-i)/(2*double(n-1)+1.))));
+        break;
+      }
+
+      default:
+        Assert (false, ExcMessage ("This constructor can only be called with either "
+                                   "QGaussRadauChebyshev::left or QGaussRadauChebyshev::right as "
+                                   "second argument."));
       }
 
   return points;

@@ -541,7 +541,8 @@ public:
    */
   template <typename MatrixType>
   SparseMatrixEZ<number> &
-  copy_from (const MatrixType &source, const bool elide_zero_values = true);
+  copy_from (const MatrixType &source,
+             const bool elide_zero_values = true);
 
   /**
    * Add @p matrix scaled by @p factor to this matrix.

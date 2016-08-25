@@ -234,8 +234,10 @@ DynamicSparsityPattern (const DynamicSparsityPattern &s)
   rowset (0)
 {
   (void)s;
-  Assert (s.rows == 0, ExcInvalidConstructorCall());
-  Assert (s.cols == 0, ExcInvalidConstructorCall());
+  Assert (s.rows==0 && s.cols==0,
+          ExcMessage("This constructor can only be called if the provided argument "
+                     "is the sparsity pattern for an empty matrix. This constructor can "
+                     "not be used to copy-construct a non-empty sparsity pattern."));
 }
 
 
@@ -281,11 +283,14 @@ DynamicSparsityPattern &
 DynamicSparsityPattern::operator = (const DynamicSparsityPattern &s)
 {
   (void)s;
-  Assert (s.rows == 0, ExcInvalidConstructorCall());
-  Assert (s.cols == 0, ExcInvalidConstructorCall());
+  Assert (s.rows==0 && s.cols==0,
+          ExcMessage("This operator can only be called if the provided argument "
+                     "is the sparsity pattern for an empty matrix. This operator can "
+                     "not be used to copy a non-empty sparsity pattern."));
 
-  Assert (rows == 0, ExcInvalidConstructorCall());
-  Assert (cols == 0, ExcInvalidConstructorCall());
+  Assert (rows==0 && cols==0,
+          ExcMessage("This operator can only be called if the current object is"
+                     "empty."));
 
   return *this;
 }
@@ -302,7 +307,13 @@ DynamicSparsityPattern::reinit (const size_type m,
   cols = n;
   rowset=rowset_;
 
-  Assert(rowset.size()==0 || rowset.size() == m, ExcInvalidConstructorCall());
+  Assert(rowset.size()==0 || rowset.size() == m,
+         ExcMessage("The IndexSet argument to this function needs to either "
+                    "be empty (indicating the complete set of rows), or have size "
+                    "equal to the desired number of rows as specified by the "
+                    "first argument to this function. (Of course, the number "
+                    "of indices in this IndexSet may be less than the number "
+                    "of rows, but the *size* of the IndexSet must be equal.)"));
 
   std::vector<Line> new_lines (rowset.size()==0 ? rows : rowset.n_elements());
   lines.swap (new_lines);

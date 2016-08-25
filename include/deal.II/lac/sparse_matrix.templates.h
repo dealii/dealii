@@ -62,9 +62,11 @@ SparseMatrix<number>::SparseMatrix (const SparseMatrix &m)
   val(0),
   max_len(0)
 {
-  Assert (m.cols==0, ExcInvalidConstructorCall());
-  Assert (m.val==0, ExcInvalidConstructorCall());
-  Assert (m.max_len==0, ExcInvalidConstructorCall());
+  Assert (m.cols==0 && m.val==0 && m.max_len==0,
+          ExcMessage("This constructor can only be called if the provided argument "
+                     "is an empty matrix. This constructor can not be used to "
+                     "copy-construct a non-empty matrix. Use the "
+                     "SparseMatrix::copy_from() function for that purpose."));
 }
 
 
@@ -91,9 +93,11 @@ SparseMatrix<number> &
 SparseMatrix<number>::operator = (const SparseMatrix<number> &m)
 {
   (void)m;
-  Assert (m.cols==0, ExcInvalidConstructorCall());
-  Assert (m.val==0, ExcInvalidConstructorCall());
-  Assert (m.max_len==0, ExcInvalidConstructorCall());
+  Assert (m.cols==0 && m.val==0 && m.max_len==0,
+          ExcMessage("This operator can only be called if the provided right "
+                     "hand side is an empty matrix. This operator can not be "
+                     "used to copy a non-empty matrix. Use the "
+                     "SparseMatrix::copy_from() function for that purpose."));
 
   return *this;
 }
