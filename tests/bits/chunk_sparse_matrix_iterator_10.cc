@@ -42,7 +42,7 @@ void test (const unsigned int chunk_size)
 
   // and loop over the elements of it
   for (ChunkSparseMatrix<double>::const_iterator k=A.begin();
-       k!=A.end(); ++k)
+       k!=A.end(); k++)
     deallog << k->row() << ' ' << k->column() << ' ' << k->value()
             << std::endl;
 }
