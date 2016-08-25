@@ -263,12 +263,23 @@ template <int dim, typename Number>
 inline
 Point<dim,Number>::Point (const Number x)
 {
+  Assert (dim==1,
+          ExcMessage ("You can only initialize Point<1> objects using the constructor "
+                      "that takes only one argument. Point<dim> objects with dim!=1 "
+                      "require initialization with the constructor that takes 'dim' "
+                      "arguments."));
+
+  // we can only get here if we pass the assertion. use the switch anyway so
+  // as to avoid compiler warnings about uninitialized elements or writing
+  // beyond the end of the 'values' array
   switch (dim)
     {
     case 1:
       this->values[0] = x;
+      break;
+
     default:
-      Assert (dim==1, StandardExceptions::ExcInvalidConstructorCall());
+      ;
     }
 }
 
@@ -276,15 +287,26 @@ Point<dim,Number>::Point (const Number x)
 
 template <int dim, typename Number>
 inline
-Point<dim,Number>::Point (const Number x, const Number y)
+Point<dim,Number>::Point (const Number x,
+                          const Number y)
 {
+  Assert (dim==2,
+          ExcMessage ("You can only initialize Point<2> objects using the constructor "
+                      "that takes two arguments. Point<dim> objects with dim!=2 "
+                      "require initialization with the constructor that takes 'dim' "
+                      "arguments."));
+  // we can only get here if we pass the assertion. use the switch anyway so
+  // as to avoid compiler warnings about uninitialized elements or writing
+  // beyond the end of the 'values' array
   switch (dim)
     {
     case 2:
       this->values[0] = x;
       this->values[1] = y;
+      break;
+
     default:
-      Assert (dim==2, StandardExceptions::ExcInvalidConstructorCall());
+      ;
     }
 }
 
@@ -292,16 +314,29 @@ Point<dim,Number>::Point (const Number x, const Number y)
 
 template <int dim, typename Number>
 inline
-Point<dim,Number>::Point (const Number x, const Number y, const Number z)
+Point<dim,Number>::Point (const Number x,
+                          const Number y,
+                          const Number z)
 {
+  Assert (dim==3,
+          ExcMessage ("You can only initialize Point<3> objects using the constructor "
+                      "that takes three arguments. Point<dim> objects with dim!=3 "
+                      "require initialization with the constructor that takes 'dim' "
+                      "arguments."));
+
+  // we can only get here if we pass the assertion. use the switch anyway so
+  // as to avoid compiler warnings about uninitialized elements or writing
+  // beyond the end of the 'values' array
   switch (dim)
     {
     case 3:
       this->values[0] = x;
       this->values[1] = y;
       this->values[2] = z;
+      break;
+
     default:
-      Assert (dim==3, StandardExceptions::ExcInvalidConstructorCall());
+      ;
     }
 }
 
