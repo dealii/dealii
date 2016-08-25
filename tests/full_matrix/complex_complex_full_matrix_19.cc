@@ -33,12 +33,19 @@ check ()
 {
   for (unsigned int n=1; n<=3; ++n)
     {
-      const std::complex<number> array[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+      const std::complex<number> array[] = { std::complex<number>(1.0, 5.0),
+                                             std::complex<number>(2.0, 3.0),
+                                             std::complex<number>(4.0, 1.0),
+                                             std::complex<number>(3.0, 7.0),
+                                             std::complex<number>(5.0, 5.0),
+                                             std::complex<number>(7.0, 3.0),
+                                             std::complex<number>(1.0, 4.0),
+                                             std::complex<number>(3.0, 2.0),
+                                             std::complex<number>(5.0, 1.0)
+                                           };
 
       FullMatrix<std::complex<number> > m(n,n, array);
       print_matrix (m);
       deallog << m.determinant () << std::endl;
     }
 }
-
-
