@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/lac/cuda_vector.h>
+#include <deal.II/lac/cuda_atomic.cuh>
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/base/exceptions.h>
 #include <cmath>
@@ -97,12 +98,17 @@ namespace LinearAlgebra
       {
         __device__ static Number reduction_op(const Number a, const Number b)
         {
-          return std::abs(a) + std::abs(b);
+          return (a + b);
         }
 
-        __device__ static void atomic_op(Number *dst, const Number a)
+        __device__ static Number atomic_op(Number *dst, const Number a)
         {
-          *dst = std::abs(*dst) + std::abs(a);
+          return atomicAdd_wrapper(dst, a);
+        }
+
+        __device__ static Number element_wise_op(const Number a)
+        {
+          return std::fabs(a);
         }
 
         __device__ static Number null_value()
@@ -117,18 +123,20 @@ namespace LinearAlgebra
       {
         __device__ static Number reduction_op(const Number a, const Number b)
         {
-          if  (std::abs(a) > std::abs(b))
-            return std::abs(a);
+          if  (a > b)
+            return a;
           else
-            return std::abs(b);
+            return b;
         }
 
-        __device__ static void atomic_op(Number *dst, const Number a)
+        __device__ static Number atomic_op(Number *dst, const Number a)
         {
-          if (std::abs(*dst) < std::abs(a))
-            *dst = std::abs(a);
-          else
-            *dst = std::abs(*dst);
+          return atomicMax_wrapper(dst, a);
+        }
+
+        __device__ static Number element_wise_op(const Number a)
+        {
+          return std::fabs(a);
         }
 
         __device__ static Number null_value()
@@ -207,7 +215,7 @@ namespace LinearAlgebra
         const typename Vector<Number>::size_type local_idx = threadIdx.x;
 
         if (global_idx<N)
-          result_buffer[local_idx] = v[global_idx];
+          result_buffer[local_idx] = Operation::element_wise_op(v[global_idx]);
         else
           result_buffer[local_idx] = Operation::null_value();
 
@@ -231,9 +239,9 @@ namespace LinearAlgebra
           return a+b;
         }
 
-        __device__ static void atomic_op(Number *dst, const Number a)
+        __device__ static Number atomic_op(Number *dst, const Number a)
         {
-          *dst += a;
+          return atomicAdd_wrapper(dst, a);
         }
 
         __device__ static Number null_value()
