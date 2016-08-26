@@ -6385,6 +6385,37 @@ DataOutInterface<dim,spacedim>::write_visit_record (std::ostream &out,
 
 
 template <int dim, int spacedim>
+void
+DataOutInterface<dim,spacedim>::write_visit_record (std::ostream &out,
+                                                    const std::vector<std::pair<double,std::vector<std::string> > > &times_and_piece_names) const
+{
+  AssertThrow (out, ExcIO());
+
+  if (times_and_piece_names.size() == 0)
+    return;
+
+  const double nblocks = times_and_piece_names[0].second.size();
+  Assert(nblocks > 0, ExcMessage("time_and_piece_names should contain nonempty vectors of filenames for every timestep.") )
+
+  for (std::vector<std::pair<double,std::vector<std::string> > >::const_iterator domain = times_and_piece_names.begin();
+       domain != times_and_piece_names.end(); ++domain)
+    out << "!TIME " << domain->first << '\n';
+
+  out << "!NBLOCKS " << nblocks << '\n';
+  for (std::vector<std::pair<double,std::vector<std::string> > >::const_iterator domain = times_and_piece_names.begin();
+       domain != times_and_piece_names.end(); ++domain)
+    {
+      Assert(domain->second.size() == nblocks, ExcMessage("piece_names should be a vector of equal sized vectors.") )
+      for (std::vector<std::string>::const_iterator subdomain = domain->second.begin(); subdomain != domain->second.end(); ++subdomain)
+        out << *subdomain << '\n';
+    }
+
+  out << std::flush;
+}
+
+
+
+template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::
 write_deal_II_intermediate (std::ostream &out) const
 {
