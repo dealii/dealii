@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2015 by the deal.II authors
+// Copyright (C) 2000 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,10 +62,10 @@ SparsityPattern::SparsityPattern (const SparsityPattern &s)
   store_diagonal_first_in_row(false)
 {
   (void)s;
-  Assert (s.rowstart == 0, ExcInvalidConstructorCall());
-  Assert (s.colnums == 0, ExcInvalidConstructorCall());
-  Assert (s.rows == 0, ExcInvalidConstructorCall());
-  Assert (s.cols == 0, ExcInvalidConstructorCall());
+  Assert (s.rows==0 && s.cols==0 && s.rowstart==0 && s.colnums==0,
+          ExcMessage("This constructor can only be called if the provided argument "
+                     "is the sparsity pattern for an empty matrix. This constructor can "
+                     "not be used to copy-construct a non-empty sparsity pattern."));
 
   reinit (0,0,0);
 }
@@ -226,15 +226,14 @@ SparsityPattern &
 SparsityPattern::operator = (const SparsityPattern &s)
 {
   (void)s;
-  Assert (s.rowstart == 0, ExcInvalidConstructorCall());
-  Assert (s.colnums == 0, ExcInvalidConstructorCall());
-  Assert (s.rows == 0, ExcInvalidConstructorCall());
-  Assert (s.cols == 0, ExcInvalidConstructorCall());
+  Assert (s.rows==0 && s.cols==0 && s.rowstart==0 && s.colnums==0,
+          ExcMessage("This operator can only be called if the provided argument "
+                     "is the sparsity pattern for an empty matrix. This operator can "
+                     "not be used to copy a non-empty sparsity pattern."));
 
-  Assert (rowstart == 0, ExcInvalidConstructorCall());
-  Assert (colnums == 0, ExcInvalidConstructorCall());
-  Assert (rows == 0, ExcInvalidConstructorCall());
-  Assert (cols == 0, ExcInvalidConstructorCall());
+  Assert (rows==0 && cols==0 && rowstart==0 && cols==0,
+          ExcMessage("This operator can only be called if the current object is "
+                     "empty."));
 
   return *this;
 }

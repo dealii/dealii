@@ -47,14 +47,15 @@ template <class SparsityPatternBase>
 BlockSparsityPatternBase<SparsityPatternBase>::
 BlockSparsityPatternBase (const BlockSparsityPatternBase &s)
   :
-  Subscriptor ()
+  Subscriptor (),
+  rows (0),
+  columns (0)
 {
   (void)s;
-  Assert(s.rows==0, ExcInvalidConstructorCall());
-  Assert(s.columns==0, ExcInvalidConstructorCall());
-
-  rows = 0;
-  columns=0;
+  Assert (s.rows==0 && s.columns==0,
+          ExcMessage("This constructor can only be called if the provided argument "
+                     "is the sparsity pattern for an empty matrix. This constructor can "
+                     "not be used to copy-construct a non-empty sparsity pattern."));
 }
 
 
