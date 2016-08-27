@@ -4432,6 +4432,11 @@ namespace GridGenerator
                              MeshType<dim-1,spacedim>           &surface_mesh,
                              const std::set<types::boundary_id> &boundary_ids)
   {
+    Assert ((dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
+             (&volume_mesh.get_triangulation())
+             == 0),
+            ExcNotImplemented());
+
 // This function works using the following assumption:
 //    Triangulation::create_triangulation(...) will create cells that preserve
 //    the order of cells passed in using the CellData argument; also,
