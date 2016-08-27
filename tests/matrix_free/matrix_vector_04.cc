@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2014 by the deal.II authors
+// Copyright (C) 2013 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,12 +30,12 @@ std::ofstream logfile("output");
 template <int dim, int fe_degree>
 void test ()
 {
+  const SphericalManifold<dim> manifold;
   Triangulation<dim> tria;
   GridGenerator::hyper_shell (tria, Point<dim>(),
                               0.5, 1., 96, true);
-  static const HyperShellBoundary<dim> boundary;
-  tria.set_boundary (0, boundary);
-  tria.set_boundary (1, boundary);
+  tria.set_all_manifold_ids(0);
+  tria.set_manifold (0, manifold);
   if (dim == 2)
     tria.refine_global (2);
 
@@ -46,5 +46,5 @@ void test ()
   DoFTools::make_hanging_node_constraints(dof, constraints);
   constraints.close();
 
-  do_test<dim, fe_degree, double> (dof, constraints);
+  do_test<dim, fe_degree, double, fe_degree+1> (dof, constraints);
 }

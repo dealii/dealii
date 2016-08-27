@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2015 by the deal.II authors
+// Copyright (C) 2013 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,10 +34,17 @@ std::ofstream logfile("output");
 template <int dim, int fe_degree>
 void test ()
 {
+  const SphericalManifold<dim> manifold;
   Triangulation<dim> tria;
   GridGenerator::hyper_ball (tria);
-  static const HyperBallBoundary<dim> boundary;
-  tria.set_boundary (0, boundary);
+  typename Triangulation<dim>::active_cell_iterator
+  cell = tria.begin_active (),
+  endc = tria.end();
+  for (; cell!=endc; ++cell)
+    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      if (cell->at_boundary(f))
+        cell->face(f)->set_all_manifold_ids(0);
+  tria.set_manifold (0, manifold);
   tria.refine_global(5-dim);
 
   FE_Q<dim> fe (fe_degree);
@@ -57,9 +64,10 @@ void test ()
   //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
 
   // set up MatrixFree
+  MappingQGeneric<dim> mapping(fe_degree);
   QGauss<1> quad (fe_degree+1);
   MatrixFree<dim> mf_data;
-  mf_data.reinit (dof, constraints, quad);
+  mf_data.reinit (mapping, dof, constraints, quad);
   SparsityPattern sparsity;
   SparseMatrix<double> system_matrix;
   {
@@ -95,7 +103,7 @@ void test ()
       mg_constraints[level].close();
       typename MatrixFree<dim>::AdditionalData data;
       data.level_mg_handler = level;
-      mg_matrices[level].reinit(dof, mg_constraints[level], quad, data);
+      mg_matrices[level].reinit(mapping, dof, mg_constraints[level], quad, data);
 
       DynamicSparsityPattern csp;
       csp.reinit (dof.n_dofs(level), dof.n_dofs(level));
@@ -109,7 +117,7 @@ void test ()
   // discretization and on all levels
   {
     QGauss<dim> quad (fe_degree+1);
-    FEValues<dim> fe_values (fe, quad,
+    FEValues<dim> fe_values (mapping, fe, quad,
                              update_values    |  update_gradients |
                              update_JxW_values);
     const unsigned int n_quadrature_points = quad.size();
@@ -213,4 +221,3 @@ void test ()
     }
   deallog << std::endl;
 }
-
