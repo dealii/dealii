@@ -22,7 +22,6 @@
 
 
 #include "../tests.h"
-#include "coarse_grid_common.h"
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>

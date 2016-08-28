@@ -18,7 +18,6 @@
 // make sure only one processor finds a locally-owned cell around a point
 
 #include "../tests.h"
-#include "coarse_grid_common.h"
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>

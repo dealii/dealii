@@ -27,7 +27,6 @@
 // stores 0/84/172 cells in 2d, rather than the expected 4/126/126
 
 #include "../tests.h"
-#include "coarse_grid_common.h"
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>

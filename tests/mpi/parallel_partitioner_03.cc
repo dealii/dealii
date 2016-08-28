@@ -17,7 +17,6 @@
 // let processors write ghost_targets, import_indices, import_targets to file
 
 #include "../tests.h"
-#include "coarse_grid_common.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/partitioner.h>

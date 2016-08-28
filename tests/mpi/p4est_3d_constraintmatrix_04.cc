@@ -19,7 +19,6 @@
 // Mesh: hypercube where 7 of 8 octants are refined.
 
 #include "../tests.h"
-#include "coarse_grid_common.h"
 #include <deal.II/distributed/tria.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>

@@ -24,7 +24,6 @@
 //[t500u:16597] [22] ./p4est_3d_refine_02/exe(_Z4testILi3EEvv+0x109) [0x410f1c]
 
 #include "../tests.h"
-#include "coarse_grid_common.h"
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>

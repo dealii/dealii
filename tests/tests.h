@@ -32,6 +32,7 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <vector>
 
 #if defined(DEBUG) && defined(DEAL_II_HAVE_FP_EXCEPTIONS)
 #  include <cfenv>
@@ -521,6 +522,39 @@ struct SetGrainSizes
 } set_grain_sizes;
 
 DEAL_II_NAMESPACE_CLOSE
+
+/*
+ * Do not use a template here to work around an overload resolution issue with clang and
+ * enabled  C++11 mode.
+ *
+ * - Maier 2013
+ */
+LogStream &
+operator << (LogStream &out,
+             const std::vector<unsigned int> &v)
+{
+  for (unsigned int i=0; i<v.size(); ++i)
+    out << v[i] << (i == v.size()-1 ? "" : " ");
+  return out;
+}
+
+LogStream &
+operator << (LogStream &out,
+             const std::vector<long long unsigned int> &v)
+{
+  for (unsigned int i=0; i<v.size(); ++i)
+    out << v[i] << (i == v.size()-1 ? "" : " ");
+  return out;
+}
+
+LogStream &
+operator << (LogStream &out,
+             const std::vector<double> &v)
+{
+  for (unsigned int i=0; i<v.size(); ++i)
+    out << v[i] << (i == v.size()-1 ? "" : " ");
+  return out;
+}
 
 
 #endif // dealii__tests_h
