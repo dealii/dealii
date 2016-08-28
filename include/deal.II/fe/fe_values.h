@@ -2834,14 +2834,15 @@ public:
    * Return a reference to this very object.
    *
    * Though it seems that it is not very useful, this function is there to
-   * provide capability to the hpFEValues class, in which case it provides the
-   * FEValues object for the present cell (remember that for hp finite
+   * provide capability to the hp::FEValues class, in which case it provides
+   * the FEValues object for the present cell (remember that for hp finite
    * elements, the actual FE object used may change from cell to cell, so we
    * also need different FEValues objects for different cells; once you
-   * reinitialize the hpFEValues object for a specific cell, it retrieves the
-   * FEValues object for the FE on that cell and returns it through a function
-   * of the same name as this one; this function here therefore only provides
-   * the same interface so that one can templatize on FEValues/hpFEValues).
+   * reinitialize the hp::FEValues object for a specific cell, it retrieves
+   * the FEValues object for the FE on that cell and returns it through a
+   * function of the same name as this one; this function here therefore only
+   * provides the same interface so that one can templatize on FEValues and
+   * hp::FEValues).
    */
   const FEValues<dim,spacedim> &get_present_fe_values () const;
 
@@ -3033,14 +3034,15 @@ public:
    * Return a reference to this very object.
    *
    * Though it seems that it is not very useful, this function is there to
-   * provide capability to the hpFEValues class, in which case it provides the
-   * FEValues object for the present cell (remember that for hp finite
+   * provide capability to the hp::FEValues class, in which case it provides
+   * the FEValues object for the present cell (remember that for hp finite
    * elements, the actual FE object used may change from cell to cell, so we
    * also need different FEValues objects for different cells; once you
-   * reinitialize the hpFEValues object for a specific cell, it retrieves the
-   * FEValues object for the FE on that cell and returns it through a function
-   * of the same name as this one; this function here therefore only provides
-   * the same interface so that one can templatize on FEValues/hpFEValues).
+   * reinitialize the hp::FEValues object for a specific cell, it retrieves
+   * the FEValues object for the FE on that cell and returns it through a
+   * function of the same name as this one; this function here therefore only
+   * provides the same interface so that one can templatize on FEValues and
+   * hp::FEValues).
    */
   const FEFaceValues<dim,spacedim> &get_present_fe_values () const;
 private:
@@ -3147,14 +3149,15 @@ public:
    * Return a reference to this very object.
    *
    * Though it seems that it is not very useful, this function is there to
-   * provide capability to the hpFEValues class, in which case it provides the
-   * FEValues object for the present cell (remember that for hp finite
+   * provide capability to the hp::FEValues class, in which case it provides
+   * the FEValues object for the present cell (remember that for hp finite
    * elements, the actual FE object used may change from cell to cell, so we
    * also need different FEValues objects for different cells; once you
-   * reinitialize the hpFEValues object for a specific cell, it retrieves the
-   * FEValues object for the FE on that cell and returns it through a function
-   * of the same name as this one; this function here therefore only provides
-   * the same interface so that one can templatize on FEValues/hpFEValues).
+   * reinitialize the hp::FEValues object for a specific cell, it retrieves
+   * the FEValues object for the FE on that cell and returns it through a
+   * function of the same name as this one; this function here therefore only
+   * provides the same interface so that one can templatize on FEValues and
+   * hp::FEValues).
    */
   const FESubfaceValues<dim,spacedim> &get_present_fe_values () const;
 
