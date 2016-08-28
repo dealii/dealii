@@ -18,7 +18,6 @@
 // test DoFTools::extract_constant_modes with FE_Q_DG0
 
 #include "../tests.h"
-#include "coarse_grid_common.h"
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>

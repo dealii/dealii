@@ -18,7 +18,6 @@
 // Test DoFTools::extract_boundary_dofs for parallel DoFHandlers
 
 #include "../tests.h"
-#include "coarse_grid_common.h"
 #include <deal.II/base/logstream.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/grid_generator.h>

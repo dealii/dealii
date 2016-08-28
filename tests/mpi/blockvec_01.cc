@@ -18,7 +18,6 @@
 // Test constructor/reinit of BlockVector with IndexSets
 
 #include "../tests.h"
-#include "coarse_grid_common.h"
 #include <deal.II/lac/petsc_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/base/index_set.h>
