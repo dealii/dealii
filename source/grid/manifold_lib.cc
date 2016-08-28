@@ -185,6 +185,11 @@ get_intermediate_point (const Point<spacedim> &p1,
   else if (w > 1.0 - tol)
     return p2;
 
+  // If the points are one dimensional then there is no need for anything but
+  // a linear combination.
+  if (spacedim == 1)
+    return Point<spacedim>(w*p2 + (1-w)*p1);
+
   const Tensor<1,spacedim> v1 = p1 - center;
   const Tensor<1,spacedim> v2 = p2 - center;
   const double r1 = v1.norm();
