@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2014-2014 by the deal.II authors
+// Copyright (C) 2013 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,13 +35,18 @@ std::ofstream logfile("output");
 template <int dim, int fe_degree>
 void test ()
 {
+  const SphericalManifold<dim> manifold;
   Triangulation<dim> tria;
   GridGenerator::hyper_ball (tria);
-  static const HyperBallBoundary<dim> boundary;
-  tria.set_boundary (0, boundary);
   typename Triangulation<dim>::active_cell_iterator
   cell = tria.begin_active (),
   endc = tria.end();
+  for (; cell!=endc; ++cell)
+    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      if (cell->at_boundary(f))
+        cell->face(f)->set_all_manifold_ids(0);
+  tria.set_manifold (0, manifold);
+  cell = tria.begin_active();
   for (; cell!=endc; ++cell)
     if (cell->center().norm()<1e-8)
       cell->set_refine_flag();
@@ -83,8 +88,8 @@ void test ()
                                             constraints);
   constraints.close();
 
-  do_test<dim, fe_degree, double> (dof, constraints);
+  do_test<dim, fe_degree, double, fe_degree+1> (dof, constraints);
 
   // test with coloring only as well
-  do_test<dim, fe_degree, double> (dof, constraints, 2);
+  do_test<dim, fe_degree, double, fe_degree+1> (dof, constraints, 2);
 }

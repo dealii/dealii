@@ -40,6 +40,6 @@ void test ()
   ConstraintMatrix constraints;
   constraints.close();
 
-  do_test<dim, fe_degree, double> (dof, constraints);
+  do_test<dim, fe_degree, double, fe_degree+1> (dof, constraints);
 }
 

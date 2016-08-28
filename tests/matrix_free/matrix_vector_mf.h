@@ -1,7 +1,17 @@
-//------------------  matrix_vector_common.h  ------------------------
-//    Version: $Name$
+// ---------------------------------------------------------------------
 //
-//------------------  matrix_vector_common.h  ------------------------
+// Copyright (C) 2013 - 2016 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
 
 
 // this is a template for matrix-vector products with the Helmholtz equation
@@ -18,7 +28,7 @@
 #include <deal.II/lac/la_parallel_vector.h>
 
 
-template <int dim, int fe_degree, typename VectorType>
+template <int dim, int fe_degree, typename VectorType, int n_q_points_1d>
 void
 helmholtz_operator (const MatrixFree<dim,typename VectorType::value_type> &data,
                     VectorType                                            &dst,
@@ -26,7 +36,7 @@ helmholtz_operator (const MatrixFree<dim,typename VectorType::value_type> &data,
                     const std::pair<unsigned int,unsigned int>            &cell_range)
 {
   typedef typename VectorType::value_type Number;
-  FEEvaluation<dim,fe_degree,fe_degree+1,1,Number> fe_eval (data);
+  FEEvaluation<dim,fe_degree,n_q_points_1d,1,Number> fe_eval (data);
   const unsigned int n_q_points = fe_eval.n_q_points;
 
   for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
@@ -46,7 +56,7 @@ helmholtz_operator (const MatrixFree<dim,typename VectorType::value_type> &data,
 
 
 
-template <int dim, int fe_degree, typename Number, typename VectorType=Vector<Number> >
+template <int dim, int fe_degree, typename Number, typename VectorType=Vector<Number>, int n_q_points_1d=fe_degree+1>
 class MatrixFreeTest
 {
 public:
@@ -64,7 +74,7 @@ public:
                                    VectorType &,
                                    const VectorType &,
                                    const std::pair<unsigned int,unsigned int> &)>
-    wrap = helmholtz_operator<dim,fe_degree,VectorType>;
+    wrap = helmholtz_operator<dim,fe_degree,VectorType,n_q_points_1d>;
     data.cell_loop (wrap, dst, src);
   };
 

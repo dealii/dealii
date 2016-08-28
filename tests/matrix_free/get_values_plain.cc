@@ -30,7 +30,7 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/lac/constraint_matrix.h>
@@ -140,11 +140,11 @@ void do_test (const DoFHandler<dim> &dof,
 template <int dim, int fe_degree>
 void test ()
 {
+  const SphericalManifold<dim> manifold;
   Triangulation<dim> tria;
   GridGenerator::hyper_shell (tria, Point<dim>(), 1., 2., 96, true);
-  static const HyperShellBoundary<dim> boundary;
-  tria.set_boundary (0, boundary);
-  tria.set_boundary (1, boundary);
+  tria.set_all_manifold_ids(0);
+  tria.set_manifold (0, manifold);
 
   // refine a few cells
   for (unsigned int i=0; i<11-3*dim; ++i)
@@ -191,4 +191,3 @@ int main ()
     deallog.pop();
   }
 }
-

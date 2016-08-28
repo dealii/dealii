@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2016 by the deal.II authors
+// Copyright (C) 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,10 +15,8 @@
 
 
 
-// this function tests the correctness of the implementation of matrix free
-// matrix-vector products by comparing with the result of deal.II sparse
-// matrix. The mesh uses a hypershell mesh without hanging nodes (only cell
-// type: 2)
+// Same as matrix_vector_04, but using more quadrature points than the FE
+// degree would suggest
 
 #include "../tests.h"
 
@@ -46,5 +44,5 @@ void test ()
   DoFTools::make_hanging_node_constraints(dof, constraints);
   constraints.close();
 
-  do_test<dim, fe_degree, double, fe_degree+1> (dof, constraints);
+  do_test<dim, fe_degree, double, fe_degree+3> (dof, constraints);
 }
