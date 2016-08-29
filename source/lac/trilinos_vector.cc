@@ -208,28 +208,35 @@ namespace TrilinosWrappers
 
       has_ghosts = vector->Map().UniqueGIDs()==false;
 
-      {
-        owned_elements.clear();
-        owned_elements.set_size(size());
+      // If the IndexSets are overlapping, we don't really know
+      // which process owns what. So we decide that no process
+      // owns anything in that case. In particular asking for
+      // the locally owned elements is not allowed.
+      owned_elements.clear();
+      if (has_ghosts)
+        owned_elements.set_size(0);
+      else
+        {
+          owned_elements.set_size(size());
 
-        // easy case: local range is contiguous
-        if (vector->Map().LinearMap())
-          {
-            const std::pair<size_type, size_type> x = local_range();
-            owned_elements.add_range (x.first, x.second);
-          }
-        else if (vector->Map().NumMyElements() > 0)
-          {
-            const size_type n_indices = vector->Map().NumMyElements();
+          // easy case: local range is contiguous
+          if (vector->Map().LinearMap())
+            {
+              const std::pair<size_type, size_type> x = local_range();
+              owned_elements.add_range (x.first, x.second);
+            }
+          else if (vector->Map().NumMyElements() > 0)
+            {
+              const size_type n_indices = vector->Map().NumMyElements();
 #ifndef DEAL_II_WITH_64BIT_INDICES
-            unsigned int *vector_indices = (unsigned int *)vector->Map().MyGlobalElements();
+              unsigned int *vector_indices = (unsigned int *)vector->Map().MyGlobalElements();
 #else
-            size_type *vector_indices = (size_type *)vector->Map().MyGlobalElements64();
+              size_type *vector_indices = (size_type *)vector->Map().MyGlobalElements64();
 #endif
-            owned_elements.add_indices(vector_indices, vector_indices+n_indices);
-            owned_elements.compress();
-          }
-      }
+              owned_elements.add_indices(vector_indices, vector_indices+n_indices);
+              owned_elements.compress();
+            }
+        }
 #ifdef DEBUG
       const MPI_Comm mpi_communicator
         = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()))->Comm();
@@ -260,11 +267,12 @@ namespace TrilinosWrappers
 
       // If the IndexSets are overlapping, we don't really know
       // which process owns what. So we decide that no process
-      // owns anything in that case.
+      // owns anything in that case. In particular asking for
+      // the locally owned elements is not allowed.
       if (has_ghosts)
         {
           owned_elements.clear();
-          owned_elements.set_size(parallel_partitioner.size());
+          owned_elements.set_size(0);
         }
       else
         owned_elements = parallel_partitioner;
