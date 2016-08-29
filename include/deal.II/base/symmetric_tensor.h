@@ -2198,7 +2198,7 @@ Number determinant (const SymmetricTensor<2,dim,Number> &t)
  */
 template <int dim, typename Number>
 inline
-double third_invariant (const SymmetricTensor<2,dim,Number> &t)
+Number third_invariant (const SymmetricTensor<2,dim,Number> &t)
 {
   return determinant (t);
 }
