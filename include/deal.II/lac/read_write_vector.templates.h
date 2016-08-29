@@ -393,7 +393,7 @@ namespace LinearAlgebra
         cudaError_t error_code = cudaMemcpy(&val[0], cuda_vec.get_values(),
                                             n_elements*sizeof(Number),
                                             cudaMemcpyDeviceToHost);
-        CudaAssert(error_code);
+        AssertCuda(error_code);
       }
     else
       {
@@ -402,7 +402,7 @@ namespace LinearAlgebra
         cudaError_t error_code = cudaMemcpy(&tmp[0], cuda_vec.get_values(),
                                             n_elements*sizeof(Number),
                                             cudaMemcpyDeviceToHost);
-        CudaAssert(error_code);
+        AssertCuda(error_code);
 
         // Add the two vectors
         for (unsigned int i=0; i<n_elements; ++i)

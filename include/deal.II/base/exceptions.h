@@ -1065,7 +1065,17 @@ namespace StandardExceptions
                     "find a valid muparser library on your system and also did "
                     "not choose the one that comes bundled with deal.II.");
 
-
+#ifdef DEAL_II_WITH_CUDA
+  /**
+   * This exception is raised if an error happened in a CUDA kernel.
+   *
+   * The constructor takes a single <tt>char*</tt>, the output of
+   * cudaGetErrorString.
+   */
+  DeclException1 (ExcCudaError,
+                  char *,
+                  << arg1);
+#endif
 //@}
 } /*namespace StandardExceptions*/
 
@@ -1142,15 +1152,10 @@ namespace StandardExceptions
  * @ingroup Exceptions
  * @author Bruno Turcksin, 2016
  */
-#define CudaAssert(error_code)                                                \
-  {                                                                           \
-    if (error_code != cudaSuccess)                                            \
-      {                                                                       \
-        fprintf(stderr,"Error in %s (%d): %s\n",__FILE__,                     \
-                __LINE__,cudaGetErrorString(error_code));                     \
-        exit(1);                                                              \
-      }                                                                       \
-  }
+// For now use AssertThrow instead of Assert because macros are not passed
+// correctly to nvcc.
+#define AssertCuda(error_code) AssertThrow(error_code == cudaSuccess, \
+                                           dealii::ExcCudaError(cudaGetErrorString(error_code)))
 #endif
 
 using namespace StandardExceptions;

@@ -463,11 +463,11 @@ namespace LinearAlgebra
     {
       // Allocate the memory
       cudaError_t error_code = cudaMalloc(&val, n_elements*sizeof(Number));
-      CudaAssert(error_code);
+      AssertCuda(error_code);
       // Copy the values.
       error_code = cudaMemcpy(val, V.val,n_elements*sizeof(Number),
                               cudaMemcpyDeviceToDevice);
-      CudaAssert(error_code);
+      AssertCuda(error_code);
     }
 
 
@@ -479,7 +479,7 @@ namespace LinearAlgebra
     {
       // Allocate the memory
       cudaError_t error_code = cudaMalloc(&val, n_elements*sizeof(Number));
-      CudaAssert(error_code);
+      AssertCuda(error_code);
     }
 
 
@@ -490,7 +490,7 @@ namespace LinearAlgebra
       if (val != nullptr)
         {
           cudaError_t error_code = cudaFree(val);
-          CudaAssert(error_code);
+          AssertCuda(error_code);
           val = nullptr;
           n_elements = 0;
         }
@@ -508,7 +508,7 @@ namespace LinearAlgebra
           if (val != nullptr)
             {
               cudaError_t error_code = cudaFree(val);
-              CudaAssert(error_code);
+              AssertCuda(error_code);
               val = nullptr;
             }
         }
@@ -517,18 +517,18 @@ namespace LinearAlgebra
           if (n_elements != n)
             {
               cudaError_t error_code = cudaFree(val);
-              CudaAssert(error_code);
+              AssertCuda(error_code);
             }
 
           cudaError_t error_code = cudaMalloc(&val, n*sizeof(Number));
-          CudaAssert(error_code);
+          AssertCuda(error_code);
 
           // If necessary set the elements to zero
           if (omit_zeroing_entries == false)
             {
               cudaError_t error_code = cudaMemset(val, 0,
                                                   n_elements*sizeof(Number));
-              CudaAssert(error_code);
+              AssertCuda(error_code);
             }
         }
       n_elements = n;
@@ -546,19 +546,19 @@ namespace LinearAlgebra
           cudaError_t error_code = cudaMemcpy(val, V.begin(),
                                               n_elements*sizeof(Number),
                                               cudaMemcpyHostToDevice);
-          CudaAssert(error_code);
+          AssertCuda(error_code);
         }
       else
         {
           // Create a temporary vector on the device
           Number *tmp;
           cudaError_t error_code = cudaMalloc(&tmp, n_elements*sizeof(Number));
-          CudaAssert(error_code);
+          AssertCuda(error_code);
 
           // Copy the vector from the host to the temporary vector on the device
           error_code = cudaMemcpy(&tmp[0], V.begin(), n_elements*sizeof(Number),
                                   cudaMemcpyHostToDevice);
-          CudaAssert(error_code);
+          AssertCuda(error_code);
 
           // Add the two vectors
           const int n_blocks = 1 + (n_elements-1)/(CHUNK_SIZE*BLOCK_SIZE);
@@ -566,13 +566,13 @@ namespace LinearAlgebra
           internal::vector_bin_op<Number,internal::Binop_Addition>
           <<<n_blocks,BLOCK_SIZE>>>(val, tmp, n_elements);
           // Check that the kernel was launched correctly
-          CudaAssert(cudaGetLastError());
+          AssertCuda(cudaGetLastError());
           // Check that there was no problem during the execution of the kernel
-          CudaAssert(cudaDeviceSynchronize());
+          AssertCuda(cudaDeviceSynchronize());
 
           // Delete the temporary vector
           error_code = cudaFree(tmp);
-          CudaAssert(error_code);
+          AssertCuda(error_code);
         }
     }
 
@@ -587,9 +587,9 @@ namespace LinearAlgebra
                                                             factor, n_elements);
 
       // Check that the kernel was launched correctly
-      CudaAssert(cudaGetLastError());
+      AssertCuda(cudaGetLastError());
       // Check that there was no problem during the execution of the kernel
-      CudaAssert(cudaDeviceSynchronize());
+      AssertCuda(cudaDeviceSynchronize());
 
       return *this;
     }
@@ -606,9 +606,9 @@ namespace LinearAlgebra
                                                             1./factor, n_elements);
 
       // Check that the kernel was launched correctly
-      CudaAssert(cudaGetLastError());
+      AssertCuda(cudaGetLastError());
       // Check that there was no problem during the execution of the kernel
-      CudaAssert(cudaDeviceSynchronize());
+      AssertCuda(cudaDeviceSynchronize());
 
       return *this;
     }
@@ -633,9 +633,9 @@ namespace LinearAlgebra
       <<<n_blocks,BLOCK_SIZE>>>(val, down_V.val, n_elements);
 
       // Check that the kernel was launched correctly
-      CudaAssert(cudaGetLastError());
+      AssertCuda(cudaGetLastError());
       // Check that there was no problem during the execution of the kernel
-      CudaAssert(cudaDeviceSynchronize());
+      AssertCuda(cudaDeviceSynchronize());
 
       return *this;
     }
@@ -660,9 +660,9 @@ namespace LinearAlgebra
       <<<n_blocks,BLOCK_SIZE>>>(val, down_V.val, n_elements);
 
       // Check that the kernel was launched correctly
-      CudaAssert(cudaGetLastError());
+      AssertCuda(cudaGetLastError());
       // Check that there was no problem during the execution of the kernel
-      CudaAssert(cudaDeviceSynchronize());
+      AssertCuda(cudaDeviceSynchronize());
 
       return *this;
     }
@@ -683,7 +683,7 @@ namespace LinearAlgebra
 
       Number *result_device;
       cudaError_t error_code = cudaMalloc(&result_device, n_elements*sizeof(Number));
-      CudaAssert(error_code);
+      AssertCuda(error_code);
       error_code = cudaMemset(result_device, Number(), sizeof(Number));
 
       const int n_blocks = 1 + (n_elements-1)/(CHUNK_SIZE*BLOCK_SIZE);
@@ -696,10 +696,10 @@ namespace LinearAlgebra
       Number result;
       error_code = cudaMemcpy(&result, result_device, sizeof(Number),
                               cudaMemcpyDeviceToHost);
-      CudaAssert(error_code);
+      AssertCuda(error_code);
       // Free the memory on the device
       error_code = cudaFree(result_device);
-      CudaAssert(error_code);
+      AssertCuda(error_code);
 
       return result;
     }
@@ -715,9 +715,9 @@ namespace LinearAlgebra
                                                           n_elements);
 
       // Check that the kernel was launched correctly
-      CudaAssert(cudaGetLastError());
+      AssertCuda(cudaGetLastError());
       // Check that there was no problem during the execution of the kernel
-      CudaAssert(cudaDeviceSynchronize());
+      AssertCuda(cudaDeviceSynchronize());
     }
 
 
@@ -741,9 +741,9 @@ namespace LinearAlgebra
           a, down_V.val, n_elements);
 
       // Check that the kernel was launched correctly
-      CudaAssert(cudaGetLastError());
+      AssertCuda(cudaGetLastError());
       // Check that there was no problem during the execution of the kernel
-      CudaAssert(cudaDeviceSynchronize());
+      AssertCuda(cudaDeviceSynchronize());
     }
 
 
@@ -778,9 +778,9 @@ namespace LinearAlgebra
           a, down_V.val, b, down_W.val, n_elements);
 
       // Check that the kernel was launched correctly
-      CudaAssert(cudaGetLastError());
+      AssertCuda(cudaGetLastError());
       // Check that there was no problem during the execution of the kernel
-      CudaAssert(cudaDeviceSynchronize());
+      AssertCuda(cudaDeviceSynchronize());
     }
 
 
@@ -806,9 +806,9 @@ namespace LinearAlgebra
           a, down_V.val, n_elements);
 
       // Check that the kernel was launched correctly
-      CudaAssert(cudaGetLastError());
+      AssertCuda(cudaGetLastError());
       // Check that there was no problem during the execution of the kernel
-      CudaAssert(cudaDeviceSynchronize());
+      AssertCuda(cudaDeviceSynchronize());
     }
 
 
@@ -831,9 +831,9 @@ namespace LinearAlgebra
           down_scaling_factors.val, n_elements);
 
       // Check that the kernel was launched correctly
-      CudaAssert(cudaGetLastError());
+      AssertCuda(cudaGetLastError());
       // Check that there was no problem during the execution of the kernel
-      CudaAssert(cudaDeviceSynchronize());
+      AssertCuda(cudaDeviceSynchronize());
     }
 
 
@@ -857,9 +857,9 @@ namespace LinearAlgebra
           down_V.val, n_elements);
 
       // Check that the kernel was launched correctly
-      CudaAssert(cudaGetLastError());
+      AssertCuda(cudaGetLastError());
       // Check that there was no problem during the execution of the kernel
-      CudaAssert(cudaDeviceSynchronize());
+      AssertCuda(cudaDeviceSynchronize());
     }
 
 
@@ -869,7 +869,7 @@ namespace LinearAlgebra
     {
       Number *result_device;
       cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
-      CudaAssert(error_code);
+      AssertCuda(error_code);
       error_code = cudaMemset(result_device, Number(), sizeof(Number));
 
       const int n_blocks = 1 + (n_elements-1)/(CHUNK_SIZE*BLOCK_SIZE);
@@ -882,10 +882,10 @@ namespace LinearAlgebra
       Number result;
       error_code = cudaMemcpy(&result, result_device, sizeof(Number),
                               cudaMemcpyDeviceToHost);
-      CudaAssert(error_code);
+      AssertCuda(error_code);
       // Free the memory on the device
       error_code = cudaFree(result_device);
-      CudaAssert(error_code);
+      AssertCuda(error_code);
 
       return result;
     }
@@ -905,7 +905,7 @@ namespace LinearAlgebra
     {
       Number *result_device;
       cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
-      CudaAssert(error_code);
+      AssertCuda(error_code);
       error_code = cudaMemset(result_device, Number(), sizeof(Number));
 
       const int n_blocks = 1 + (n_elements-1)/(CHUNK_SIZE*BLOCK_SIZE);
@@ -918,10 +918,10 @@ namespace LinearAlgebra
       Number result;
       error_code = cudaMemcpy(&result, result_device, sizeof(Number),
                               cudaMemcpyDeviceToHost);
-      CudaAssert(error_code);
+      AssertCuda(error_code);
       // Free the memory on the device
       error_code = cudaFree(result_device);
-      CudaAssert(error_code);
+      AssertCuda(error_code);
 
       return result;
     }
@@ -951,9 +951,9 @@ namespace LinearAlgebra
 
       Number *res_d;
       cudaError_t error_code = cudaMalloc(&res_d, sizeof(Number));
-      CudaAssert(error_code);
+      AssertCuda(error_code);
       error_code = cudaMemset(res_d, 0., sizeof(Number));
-      CudaAssert(error_code);
+      AssertCuda(error_code);
 
       const int n_blocks = 1 + (n_elements-1)/(CHUNK_SIZE*BLOCK_SIZE);
       internal::add_and_dot<Number> <<<dim3(n_blocks,1),dim3(BLOCK_SIZE)>>>(
@@ -961,7 +961,7 @@ namespace LinearAlgebra
 
       Number res;
       error_code = cudaMemcpy(&res, res_d, sizeof(Number), cudaMemcpyDeviceToHost);
-      CudaAssert(error_code);
+      AssertCuda(error_code);
       error_code = cudaFree(res_d);
 
       return res;
@@ -994,7 +994,7 @@ namespace LinearAlgebra
       cudaError_t error_code = cudaMemcpy(cpu_val, val,
                                           n_elements*sizeof(Number),
                                           cudaMemcpyHostToDevice);
-      CudaAssert(error_code);
+      AssertCuda(error_code);
       for (unsigned int i=0; i<n_elements; ++i)
         out << cpu_val[i] << std::endl;
       out << std::flush;
