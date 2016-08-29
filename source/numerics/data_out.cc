@@ -338,6 +338,8 @@ void DataOut<dim,DoFHandlerType>::build_patches
   Assert (n_subdivisions >= 1,
           Exceptions::DataOut::ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
+  this->validate_dataset_names();
+
   // First count the cells we want to create patches of. Also fill the object
   // that maps the cell indices to the patch numbers, as this will be needed
   // for generation of neighborship information.

@@ -7247,6 +7247,52 @@ DataOutInterface<dim,spacedim>::get_vector_data_ranges () const
 }
 
 
+template <int dim, int spacedim>
+void
+DataOutInterface<dim,spacedim>::
+validate_dataset_names () const
+{
+#ifdef DEBUG
+  {
+    // Check that names for datasets are only used once. This is somewhat
+    // complicated, because vector ranges might have a name or not.
+    std::set<std::string> all_names;
+
+    const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >
+    ranges = this->get_vector_data_ranges();
+    const std::vector<std::string> data_names = this->get_dataset_names();
+    const unsigned int n_data_sets = data_names.size();
+    std::vector<bool> data_set_written (n_data_sets, false);
+
+    for (unsigned int n_th_vector=0; n_th_vector<ranges.size(); ++n_th_vector)
+      {
+        const std::string &name = std_cxx11::get<2>(ranges[n_th_vector]);
+        if (name != "")
+          {
+            Assert(all_names.find(name) == all_names.end(),
+            ExcMessage("Error: names of fields in DataOut need to be unique, "
+            "but '" + name +  "' is used more than once."));
+            all_names.insert(name);
+            for (unsigned int i=std_cxx11::get<0>(ranges[n_th_vector]);
+            i<=std_cxx11::get<1>(ranges[n_th_vector]);
+            ++i)
+              data_set_written[i] = true;
+          }
+      }
+
+    for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
+      if (data_set_written[data_set] == false)
+        {
+          const std::string &name =  data_names[data_set];
+          Assert(all_names.find(name) == all_names.end(),
+                 ExcMessage("Error: names of fields in DataOut need to be unique, "
+                            "but '" + name +  "' is used more than once."));
+          all_names.insert(name);
+        }
+  }
+#endif
+}
+
 
 
 // ---------------------------------------------- DataOutReader ----------

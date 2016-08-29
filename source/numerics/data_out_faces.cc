@@ -294,6 +294,8 @@ void DataOutFaces<dim,DoFHandlerType>::build_patches (const Mapping<dimension> &
   Assert (this->triangulation != 0,
           Exceptions::DataOut::ExcNoTriangulationSelected());
 
+  this->validate_dataset_names();
+
   unsigned int n_datasets     = this->cell_data.size();
   for (unsigned int i=0; i<this->dof_data.size(); ++i)
     n_datasets += this->dof_data[i]->n_output_variables;

@@ -414,6 +414,8 @@ void DataOutRotation<dim,DoFHandlerType>::build_patches (const unsigned int n_pa
   Assert (n_subdivisions >= 1,
           Exceptions::DataOut::ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
+  this->validate_dataset_names();
+
   unsigned int n_datasets=this->cell_data.size();
   for (unsigned int i=0; i<this->dof_data.size(); ++i)
     n_datasets+= this->dof_data[i]->n_output_variables;
