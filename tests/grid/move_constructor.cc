@@ -67,10 +67,11 @@ void test_hyper_shell()
 {
   deallog << "Dimension: " << dim << std::endl;
 
+  const SphericalManifold<dim> boundary;
+
   Triangulation<dim> tria;
   GridGenerator::hyper_ball(tria);
 
-  const SphericalManifold<dim> boundary;
   tria.set_all_manifold_ids_on_boundary(0);
   tria.set_manifold(0, boundary);
 
