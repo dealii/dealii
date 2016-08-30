@@ -2156,24 +2156,11 @@ namespace internal
           if (initialized == false)
             {
               sc_init (MPI_COMM_WORLD,
-                       0, 0, 0, SC_LP_SILENT);
+                       0, 0, NULL, SC_LP_SILENT);
+              sc_finalize ();
               p4est_init (0, SC_LP_SILENT);
 
               initialized = true;
-            }
-        }
-
-        ~Singleton ()
-        {
-          // same here
-          static bool deinitialized = false;
-
-          if (deinitialized == false)
-            {
-              // p4est has no p4est_finalize function
-              sc_finalize ();
-
-              deinitialized = true;
             }
         }
       };
