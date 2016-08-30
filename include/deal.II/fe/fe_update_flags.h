@@ -207,7 +207,31 @@ enum UpdateFlags
   /**
    * Combination of the flags needed for Piola transform of Hdiv elements.
    */
-  update_piola = update_volume_elements | update_contravariant_transformation
+  update_piola = update_volume_elements | update_contravariant_transformation,
+  /**
+   * Combination of the flags that require a mapping calculation
+   */
+  update_mapping =
+    // Direct data
+    update_quadrature_points |
+    update_JxW_values |
+    update_jacobians |
+    update_jacobian_grads |
+    update_jacobian_pushed_forward_grads |
+    update_jacobian_2nd_derivatives |
+    update_jacobian_pushed_forward_2nd_derivatives |
+    update_jacobian_3rd_derivatives |
+    update_jacobian_pushed_forward_3rd_derivatives |
+    update_inverse_jacobians |
+    update_boundary_forms |
+    update_normal_vectors |
+    // Transformation dependence
+    update_covariant_transformation |
+    update_contravariant_transformation |
+    update_transformation_values |
+    update_transformation_gradients |
+    // Volume data
+    update_volume_elements
 };
 
 
