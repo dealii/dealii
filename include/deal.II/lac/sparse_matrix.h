@@ -1007,8 +1007,7 @@ public:
 
   /**
    * Return the main diagonal element in the <i>i</i>th row. This function
-   * throws an error if the matrix is not quadratic (see
-   * SparsityPattern::optimize_diagonal()).
+   * throws an error if the matrix is not quadratic.
    *
    * This function is considerably faster than the operator()(), since for
    * quadratic matrices, the diagonal entry may be the first to be stored in
