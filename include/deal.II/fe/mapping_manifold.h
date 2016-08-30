@@ -50,6 +50,10 @@ template <int,int> class MappingQ;
  * geometry using a polynomial of some order, and then computes the
  * normals and tangents using the approximated surface.
  *
+ * @warning It is not possible, for mathematical reasons, for one to use this
+ * class with a geometry described by a SphericalManifold: see the note in
+ * that class for more information.
+ *
  * @author Luca Heltai, Wolfgang Bangerth, Alberto Sartori 2016
  */
 template <int dim, int spacedim=dim>
