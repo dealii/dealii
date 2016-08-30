@@ -2155,8 +2155,8 @@ namespace internal
 
           if (initialized == false)
             {
-              sc_init (MPI_COMM_WORLD,
-                       0, 0, 0, SC_LP_SILENT);
+              sc_init (MPI_COMM_NULL,
+                       0, 0, NULL, SC_LP_SILENT);
               p4est_init (0, SC_LP_SILENT);
 
               initialized = true;
