@@ -68,20 +68,20 @@ void EvaluateNormal2 (DoFHandler<2> *dof_handler,
 
   FEFaceValues<2> fe_v_face (dof_handler->get_fe (), quad,
                              UpdateFlags(update_values    |
-                                         update_q_points  |
+                                         update_quadrature_points  |
                                          update_gradients |
                                          update_normal_vectors |
                                          update_JxW_values));
 
   FEValues<2> fe_v (dof_handler->get_fe (), qproject,
                     UpdateFlags(update_values    |
-                                update_q_points  |
+                                update_quadrature_points  |
                                 update_gradients |
                                 update_JxW_values));
 
   FEValues<2> fe_v_n (dof_handler->get_fe (), qproject,
                       UpdateFlags(update_values    |
-                                  update_q_points  |
+                                  update_quadrature_points  |
                                   update_gradients |
                                   update_JxW_values));
 
@@ -184,14 +184,14 @@ void EvaluateNormal (DoFHandler<2> *dof_handler,
   QGauss<1> quad (6);
   FEFaceValues<2> fe_v_face (dof_handler->get_fe (), quad,
                              UpdateFlags(update_values    |
-                                         update_q_points  |
+                                         update_quadrature_points  |
                                          update_gradients |
                                          update_normal_vectors |
                                          update_JxW_values));
 
   FEFaceValues<2> fe_v_face_n (dof_handler->get_fe (), quad,
                                UpdateFlags(update_values    |
-                                           update_q_points  |
+                                           update_quadrature_points  |
                                            update_gradients |
                                            update_normal_vectors |
                                            update_JxW_values));

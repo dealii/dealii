@@ -409,11 +409,11 @@ void DGMethod<dim>::assemble_system1 ()
 
   const UpdateFlags update_flags = update_values
                                    | update_gradients
-                                   | update_q_points
+                                   | update_quadrature_points
                                    | update_JxW_values;
 
   const UpdateFlags face_update_flags = update_values
-                                        | update_q_points
+                                        | update_quadrature_points
                                         | update_JxW_values
                                         | update_normal_vectors;
 
@@ -575,11 +575,11 @@ void DGMethod<dim>::assemble_system2 ()
 
   const UpdateFlags update_flags = update_values
                                    | update_gradients
-                                   | update_q_points
+                                   | update_quadrature_points
                                    | update_JxW_values;
 
   const UpdateFlags face_update_flags = update_values
-                                        | update_q_points
+                                        | update_quadrature_points
                                         | update_JxW_values
                                         | update_normal_vectors;
 

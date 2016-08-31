@@ -45,11 +45,11 @@ void check (const Triangulation<dim> &tria)
 
   FEFaceValues<dim>    fe_face_values (fe, q_face,
                                        update_normal_vectors |
-                                       update_q_points |
+                                       update_quadrature_points |
                                        update_JxW_values);
   FESubfaceValues<dim> fe_subface_values (fe, q_face,
                                           update_normal_vectors |
-                                          update_q_points |
+                                          update_quadrature_points |
                                           update_JxW_values);
 
   double v1=0, v2=0;

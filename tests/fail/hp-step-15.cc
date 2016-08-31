@@ -192,7 +192,7 @@ void MinimizationProblem<dim>::assemble_step ()
   hp::QCollection<dim>  quadrature_formula(QGauss<dim>(4));
   hp::FEValues<dim> fe_values (fe, quadrature_formula,
                                update_values   | update_gradients |
-                               update_q_points | update_JxW_values);
+                               update_quadrature_points | update_JxW_values);
 
   const unsigned int dofs_per_cell = fe[0].dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula[0].size();
@@ -400,7 +400,7 @@ void MinimizationProblem<1>::refine_grid ()
   hp::FEValues<dim> fe_values (fe, quadrature,
                                update_values   | update_gradients |
                                update_second_derivatives |
-                               update_q_points | update_JxW_values);
+                               update_quadrature_points | update_JxW_values);
 
   hp::FEValues<dim> neighbor_fe_values (fe, quadrature,
                                         update_gradients);
@@ -521,7 +521,7 @@ MinimizationProblem<dim>::energy (const hp::DoFHandler<dim> &dof_handler,
   hp::QCollection<dim>  quadrature_formula(QGauss<dim>(4));
   hp::FEValues<dim> fe_values (dof_handler.get_fe(), quadrature_formula,
                                update_values   | update_gradients |
-                               update_q_points | update_JxW_values);
+                               update_quadrature_points | update_JxW_values);
 
   const unsigned int   n_q_points    = quadrature_formula[0].size();
 

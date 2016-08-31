@@ -124,8 +124,8 @@ plot_face_shape_functions(
 
   QTrapez<1> q_trapez;
   QIterated<dim-1> q(q_trapez, div);
-  FEFaceValues<dim> fe(mapping, finel, q, UpdateFlags(uflags | update_q_points));
-  FESubfaceValues<dim> sub(mapping, finel, q, UpdateFlags(uflags | update_q_points));
+  FEFaceValues<dim> fe(mapping, finel, q, UpdateFlags(uflags | update_quadrature_points));
+  FESubfaceValues<dim> sub(mapping, finel, q, UpdateFlags(uflags | update_quadrature_points));
 
   sprintf(fname, "Face%dd-%s", dim, name);
   deallog.push(fname);

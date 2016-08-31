@@ -72,7 +72,7 @@ void EvaluateDerivative (DoFHandler<2> *dof_handler,
   QGauss<2> quad (3);
   FEValues<2> fe_values (dof_handler->get_fe (), quad,
                          UpdateFlags(update_values    |
-                                     update_q_points  |
+                                     update_quadrature_points  |
                                      update_gradients |
                                      update_JxW_values));
 
@@ -145,9 +145,9 @@ void create_mass_matrix (const Mapping<dim>       &mapping,
                          Vector<double>        &rhs_vector,
                          const Function<dim> *const coefficient = 0)
 {
-  UpdateFlags update_flags = UpdateFlags(update_values | update_JxW_values | update_q_points);
+  UpdateFlags update_flags = UpdateFlags(update_values | update_JxW_values | update_quadrature_points);
   if (coefficient != 0)
-    update_flags = UpdateFlags (update_flags | update_q_points);
+    update_flags = UpdateFlags (update_flags | update_quadrature_points);
 
   FEValues<dim> fe_values (mapping, dof.get_fe(), q, update_flags);
 
@@ -344,7 +344,7 @@ void create_right_hand_side (const Mapping<dim>    &mapping,
   rhs_vector = 0;
 
   UpdateFlags update_flags = UpdateFlags(update_values   |
-                                         update_q_points |
+                                         update_quadrature_points |
                                          update_JxW_values);
   FEValues<dim> fe_values (mapping, fe, quadrature, update_flags);
 

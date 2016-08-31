@@ -70,7 +70,7 @@ void test (const Triangulation<dim> &tr,
   const std::vector<Point<dim-1> > &
   unit_support_points = fe.get_unit_face_support_points();
   Quadrature<dim-1> quadrature(unit_support_points);
-  FEFaceValues<dim, dim> fe_face_values(fe, quadrature, update_q_points);
+  FEFaceValues<dim, dim> fe_face_values(fe, quadrature, update_quadrature_points);
   typename DoFHandler<dim>::active_cell_iterator
   cell = dof.begin_active(),
   endc = dof.end();

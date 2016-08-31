@@ -370,7 +370,7 @@ double TestProjection (Mapping<2> &mapping,
       QGauss<2> quad (6);
       FEValues<2> fe_values (mapping, dof_handler->get_fe (), quad,
                              UpdateFlags(update_values    |
-                                         update_q_points  |
+                                         update_quadrature_points  |
                                          update_gradients |
                                          update_JxW_values|
                                          update_contravariant_transformation));

@@ -5334,7 +5334,7 @@ namespace VectorTools
     hp::FEFaceValues<dim,spacedim> x_fe_face_values (mapping_collection,
                                                      fe_collection,
                                                      face_quadrature_collection,
-                                                     update_q_points |
+                                                     update_quadrature_points |
                                                      update_normal_vectors);
 
     // have a map that stores normal vectors for each vector-dof tuple we want
@@ -5920,7 +5920,7 @@ namespace VectorTools
     hp::FEFaceValues<dim,spacedim> x_fe_face_values (mapping_collection,
                                                      fe_collection,
                                                      face_quadrature_collection,
-                                                     update_q_points |
+                                                     update_quadrature_points |
                                                      update_normal_vectors);
 
     // Extract a list that collects all vector components that belong to the

@@ -107,11 +107,11 @@ plot (const Triangulation<dim> &tr, const unsigned int p)
 
   MappingCartesian<dim> mapping;
   FEFaceValues<dim> feface(mapping, fe_ned, quadrature,
-                           update_values|update_q_points|update_normal_vectors);
+                           update_values|update_quadrature_points|update_normal_vectors);
   FEFaceValues<dim> feneighbor(mapping, fe_ned, quadrature,
-                               update_values|update_q_points|update_normal_vectors);
+                               update_values|update_quadrature_points|update_normal_vectors);
   FESubfaceValues<dim> fesubface(mapping, fe_ned, quadrature,
-                                 update_values|update_q_points|update_normal_vectors);
+                                 update_values|update_quadrature_points|update_normal_vectors);
 
 
   for (typename DoFHandler<dim>::active_cell_iterator

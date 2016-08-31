@@ -48,7 +48,7 @@ MappingQEulerianGeneric (const unsigned int                                 degr
   support_quadrature(degree),
   fe_values(mapping_q_eulerian.euler_dof_handler->get_fe(),
             support_quadrature,
-            update_values | update_q_points)
+            update_values | update_quadrature_points)
 {}
 
 template <int dim, class VectorType, int spacedim>

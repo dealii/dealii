@@ -117,7 +117,7 @@ check ()
 
   FEValues<dim> fe (mapping, element, quadrature,
                     update_values | update_gradients
-                    | update_q_points | update_JxW_values);
+                    | update_quadrature_points | update_JxW_values);
 
   std::vector <types::global_dof_index> global_dofs (element.dofs_per_cell);
   std::vector <double> function (quadrature.size());

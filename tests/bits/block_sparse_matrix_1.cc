@@ -101,7 +101,7 @@ int main()
   FEValues<2> fe_values (dof_handler.get_fe(),
                          qr, UpdateFlags(update_values    |
                                          update_gradients |
-                                         update_q_points  |
+                                         update_quadrature_points  |
                                          update_JxW_values));
 
   MatrixTools::create_laplace_matrix (dof_handler, qr, B.block(0,0));

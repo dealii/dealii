@@ -284,10 +284,10 @@ void HelmholtzProblem<dim>::assemble_system ()
 
   FEValues<dim>  x_fe_values (*fe, quadrature_formula,
                               update_values   | update_gradients |
-                              update_q_points | update_JxW_values);
+                              update_quadrature_points | update_JxW_values);
 
   FEFaceValues<dim> x_fe_face_values (*fe, face_quadrature_formula,
-                                      update_values         | update_q_points  |
+                                      update_values         | update_quadrature_points  |
                                       update_normal_vectors | update_JxW_values);
 
   const RightHandSide<dim> right_hand_side;
