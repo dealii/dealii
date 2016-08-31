@@ -27,6 +27,7 @@
 #include <iostream>
 #include <iomanip>
 #include <deal.II/base/logstream.h>
+#include <deal.II/lac/petsc_compatibility.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/petsc_solver.h>
@@ -133,9 +134,9 @@ int main(int argc, char **argv)
 
     // set extra settings for JD; Otherwise, at least on OSX,
     // the number of eigensolver iterations is different between debug and release modes!
-    PetscOptionsSetValue("-st_ksp_type","cg");
-    PetscOptionsSetValue("-st_pc_type", "jacobi");
-    PetscOptionsSetValue("-st_ksp_max_it", "10");
+    PETScWrappers::set_option_value("-st_ksp_type","cg");
+    PETScWrappers::set_option_value("-st_pc_type", "jacobi");
+    PETScWrappers::set_option_value("-st_ksp_max_it", "10");
     {
       SLEPcWrappers::SolverJacobiDavidson solver(control);
       check_solve (solver, control, A,u,v);
