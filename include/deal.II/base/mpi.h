@@ -332,9 +332,13 @@ namespace Utilities
      * program and to shut it down again at the end. It also allows you to
      * control the number threads used in each MPI task.
      *
-     * If deal.II is configured with PETSc, the library will also be
+     * If deal.II is configured with PETSc, the library will be
      * initialized in the beginning and destroyed at the end automatically
      * (internally by calling PetscInitialize() and PetscFinalize()).
+     *
+     * If deal.II is configured with p4est, that library will also be
+     * initialized in the beginning, and destroyed at the end automatically
+     * (internally by calling sc_init(), p4est_init(), and sc_finalize()).
      *
      * If a program uses MPI one would typically just create an object of this
      * type at the beginning of <code>main()</code>. The constructor of this

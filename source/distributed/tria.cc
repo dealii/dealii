@@ -2137,59 +2137,6 @@ namespace
 }
 
 
-// initialize p4est
-namespace internal
-{
-  namespace p4est
-  {
-    struct InitFinalize
-    {
-    private:
-      struct Singleton
-      {
-        Singleton ()
-        {
-          // ensure that the initialization code is run only once, even if we
-          // link with 1d, 2d, and 3d libraries
-          static bool initialized = false;
-
-          if (initialized == false)
-            {
-              sc_init (MPI_COMM_WORLD,
-                       0, 0, 0, SC_LP_SILENT);
-              p4est_init (0, SC_LP_SILENT);
-
-              initialized = true;
-            }
-        }
-
-        ~Singleton ()
-        {
-          // same here
-          static bool deinitialized = false;
-
-          if (deinitialized == false)
-            {
-              // p4est has no p4est_finalize function
-              sc_finalize ();
-
-              deinitialized = true;
-            }
-        }
-      };
-
-    public:
-      // do run the initialization code, at least the first time around we get
-      // to this function
-      static void do_initialize ()
-      {
-        static Singleton singleton;
-      }
-    };
-  }
-}
-
-
 namespace parallel
 {
   namespace distributed
@@ -2218,11 +2165,6 @@ namespace parallel
       n_attached_datas(0),
       n_attached_deserialize(0)
     {
-      // initialize p4est. do this in a separate function since it has to
-      // happen only once, even if we have triangulation objects for several
-      // different space dimensions
-      dealii::internal::p4est::InitFinalize::do_initialize ();
-
       parallel_ghost = 0;
     }
 
