@@ -523,6 +523,46 @@ SparsityPattern::copy_from (const SparsityPatternType &dsp)
 
 
 
+// Use a special implementation for DynamicSparsityPattern where we can use
+// the column_number method to gain faster access to the
+// entries. DynamicSparsityPattern::iterator can show quadratic complexity in
+// case many rows are empty and the begin() method needs to jump to the next
+// free row. Otherwise, the code is exactly the same as above.
+template <>
+void
+SparsityPattern::copy_from (const DynamicSparsityPattern &dsp)
+{
+  const bool do_diag_optimize = (dsp.n_rows() == dsp.n_cols());
+  std::vector<unsigned int> row_lengths (dsp.n_rows());
+  for (size_type i=0; i<dsp.n_rows(); ++i)
+    {
+      row_lengths[i] = dsp.row_length(i);
+      if (do_diag_optimize && !dsp.exists(i,i))
+        ++row_lengths[i];
+    }
+  reinit (dsp.n_rows(), dsp.n_cols(), row_lengths);
+
+  if (n_rows() != 0 && n_cols() != 0)
+    for (size_type row = 0; row<dsp.n_rows(); ++row)
+      {
+        size_type *cols = &colnums[rowstart[row]] + (do_diag_optimize ? 1 : 0);
+        const unsigned int row_length = dsp.row_length(row);
+        for (unsigned int index=0; index < row_length; ++index)
+          {
+            const size_type col = dsp.column_number(row, index);
+            if ((col!=row) || !do_diag_optimize)
+              *cols++ = col;
+          }
+      }
+
+  // do not need to compress the sparsity pattern since we already have
+  // allocated the right amount of data, and the SparsityPatternType data is sorted,
+  // too.
+  compressed = true;
+}
+
+
+
 template <typename number>
 void SparsityPattern::copy_from (const FullMatrix<number> &matrix)
 {
@@ -998,7 +1038,6 @@ SparsityPattern::memory_consumption () const
 
 // explicit instantiations
 template void SparsityPattern::copy_from<SparsityPattern> (const SparsityPattern &);
-template void SparsityPattern::copy_from<DynamicSparsityPattern> (const DynamicSparsityPattern &);
 template void SparsityPattern::copy_from<float> (const FullMatrix<float> &);
 template void SparsityPattern::copy_from<double> (const FullMatrix<double> &);
 

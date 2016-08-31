@@ -236,15 +236,15 @@ inconvenience this causes.
 
  <li>
  New: Added a new PolarManifold descriptor, that uses a polar coordinate
- system to compute new points, and modified the existing SphericalManifold 
- descriptor to use geodesics on the surface of the sphere. 
+ system to compute new points, and modified the existing SphericalManifold
+ descriptor to use geodesics on the surface of the sphere.
  <br>
  (Luca Heltai, Mauro Bardelloni, 2016/08/04)
  </li>
 
  <li>
- New: Added Python bindings to generate and manipulate a Triangulation from 
- Python. The Triangulation generated in Python can be saved and later, loaded 
+ New: Added Python bindings to generate and manipulate a Triangulation from
+ Python. The Triangulation generated in Python can be saved and later, loaded
  inside a C++ code.
  <br>
  (Bruno Turcksin, 2016/08/03)
@@ -495,6 +495,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Improved: SparsityPattern::copy_from() copying from a
+ DynamicSparsityPattern argument had quadratic complexity in the number of
+ rows for sparsity patterns where most of the rows are of length zero. The bad
+ algorithm has been replaced by a linear complexity one.
+ <br>
+ (Dustin Kumor, Martin Kronbichler, 2016/08/31)
+ </li>
+
  <li> New: Rank-4 symmetric tensors of type SymmetricTensor can now
  be converted to rank-4 tensors of type Tensor.
  <br>
