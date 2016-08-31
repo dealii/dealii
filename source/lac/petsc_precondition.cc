@@ -18,6 +18,7 @@
 #ifdef DEAL_II_WITH_PETSC
 
 #  include <deal.II/base/utilities.h>
+#  include <deal.II/lac/petsc_compatibility.h>
 #  include <deal.II/lac/petsc_matrix_base.h>
 #  include <deal.II/lac/petsc_vector_base.h>
 #  include <deal.II/lac/petsc_solver.h>
@@ -487,32 +488,32 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     if (additional_data.output_details)
-      PetscOptionsSetValue("-pc_hypre_boomeramg_print_statistics","1");
+      {
+        set_option_value("-pc_hypre_boomeramg_print_statistics", "1");
+      }
 
-    PetscOptionsSetValue("-pc_hypre_boomeramg_agg_nl",
-                         Utilities::int_to_string(
-                           additional_data.aggressive_coarsening_num_levels
-                         ).c_str());
+    set_option_value("-pc_hypre_boomeramg_agg_nl",
+                     Utilities::to_string(additional_data.aggressive_coarsening_num_levels));
 
     std::stringstream ssStream;
     ssStream << additional_data.max_row_sum;
-    PetscOptionsSetValue("-pc_hypre_boomeramg_max_row_sum", ssStream.str().c_str());
+    set_option_value("-pc_hypre_boomeramg_max_row_sum", ssStream.str());
 
     ssStream.str(""); // empty the stringstream
     ssStream << additional_data.strong_threshold;
-    PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", ssStream.str().c_str());
+    set_option_value("-pc_hypre_boomeramg_strong_threshold", ssStream.str());
 
     if (additional_data.symmetric_operator)
       {
-        PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_up", "symmetric-SOR/Jacobi");
-        PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_down", "symmetric-SOR/Jacobi");
-        PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_coarse", "Gaussian-elimination");
+        set_option_value("-pc_hypre_boomeramg_relax_type_up", "symmetric-SOR/Jacobi");
+        set_option_value("-pc_hypre_boomeramg_relax_type_down", "symmetric-SOR/Jacobi");
+        set_option_value("-pc_hypre_boomeramg_relax_type_coarse", "Gaussian-elimination");
       }
     else
       {
-        PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_up", "SOR/Jacobi");
-        PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_down", "SOR/Jacobi");
-        PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_coarse", "Gaussian-elimination");
+        set_option_value("-pc_hypre_boomeramg_relax_type_up", "SOR/Jacobi");
+        set_option_value("-pc_hypre_boomeramg_relax_type_down", "SOR/Jacobi");
+        set_option_value("-pc_hypre_boomeramg_relax_type_coarse", "Gaussian-elimination");
       }
 
     ierr = PCSetFromOptions (pc);
@@ -588,7 +589,9 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     if (additional_data.output_details)
-      PetscOptionsSetValue("-pc_hypre_parasails_logging","1");
+      {
+        set_option_value("-pc_hypre_parasails_logging","1");
+      }
 
     Assert ((additional_data.symmetric == 0 ||
              additional_data.symmetric == 1 ||
@@ -622,20 +625,18 @@ namespace PETScWrappers
                 ExcMessage("ParaSails parameter symmetric can only be equal to 0, 1, 2!"));
       };
 
-    PetscOptionsSetValue("-pc_hypre_parasails_sym",ssStream.str().c_str());
+    set_option_value("-pc_hypre_parasails_sym",ssStream.str());
 
-    PetscOptionsSetValue("-pc_hypre_parasails_nlevels",
-                         Utilities::int_to_string(
-                           additional_data.n_levels
-                         ).c_str());
+    set_option_value ("-pc_hypre_parasails_nlevels",
+                      Utilities::to_string(additional_data.n_levels));
 
     ssStream.str(""); // empty the stringstream
     ssStream << additional_data.threshold;
-    PetscOptionsSetValue("-pc_hypre_parasails_thresh", ssStream.str().c_str());
+    set_option_value("-pc_hypre_parasails_thresh", ssStream.str());
 
     ssStream.str(""); // empty the stringstream
     ssStream << additional_data.filter;
-    PetscOptionsSetValue("-pc_hypre_parasails_filter", ssStream.str().c_str());
+    set_option_value("-pc_hypre_parasails_filter", ssStream.str());
 
     ierr = PCSetFromOptions (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
