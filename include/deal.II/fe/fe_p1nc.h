@@ -33,13 +33,20 @@ DEAL_II_NAMESPACE_OPEN
  * element, a piecewise linear finite element on quadrilaterals in 2D.
  *
  * Unlike any continuous conforming finite element,
- * it does not have the continuity across edges.
- * But it requires the continuity in weak sense:
- * a function in the space should have the same integral values on two sides of the common edge shared by two adjacent elements.
- *
- * Since any function in the space is piecewise linear on each element,
- * the continuity of the integral value across the edge is equivalent to
- * the continuity of the value at the midpoint of the edge.
+ * it does not enforce the continuity across edges.
+ * But it requires the continuity just in weak sense:
+ * any function in the space should have the same integral values on two sides of the common edge shared by two adjacent elements.
+
+ * Thus any function in the nonconforming element spaces is discontinuous, not included in H^1_0, as the case of DG finite elements. 
+ * Although any function in DG finite element space has nonconformity also, it is completely discontinuous across edges.
+ * It is the reason why usual weak formulations for DG schemes contain additional penalty terms for jump across edges to stabilize.
+ * However the nonconforming elements usually do not need additional terms in their weak formulations due to the continuity in integral on edges. 
+
+ * <h3>DOFs and Dice Rule</h3>
+ * Since any function in the P1 nonconforming space is piecewise linear on each element,
+ * the function value at the mipoint of the edge is same to the mean value on the edge.
+ * Thus the continuity of the integral value across the edge is equivalent to
+ * the continuity of the midpoint value of the edge in this case.
  *
  * The degrees of freedom on a quadrilateral are given by midpoint values on edges.
  * However these four dofs in 2D are not independent in fact.
@@ -49,13 +56,17 @@ DEAL_II_NAMESPACE_OPEN
  *
  * \phi(m_0) + \phi(m_1) = \phi(m_2) + \phi(m_3).
  *
+ * Conversely if just 4 values at midpoints satisfying the dice rule are given,
+ * then there always exists the unique linear function which coincides with 4 midpoints values.
+ *
  * Due to the dice rule, three values at any three midpoints determine the last value at the last midpoint.
  * It means that the genuine number of independent dofs on a quad is 3,
  * and it is the same number to the dimension of the linear polynomial space in 2D.
 
 
- * Shape functions
+ * <h3>Shape functions</h3>
 
+ *  @verbatim
  *  2---------|---------3
  *  |                   |
  *  |                   |
@@ -67,6 +78,7 @@ DEAL_II_NAMESPACE_OPEN
  *  |                   |
  *  |                   |
  *  0---------|---------1
+ *  @endverbatim
 
  * For each vertex v_j, there are two edges of which v_j is one of the end points.
  * Consider the linear function such that one half at two midpoints of such edges,
@@ -77,8 +89,9 @@ DEAL_II_NAMESPACE_OPEN
  * The canonical (local) basis functions are given as any three shape functions of
  * the following four linear functions:
 
- * shape function \phi_0
-
+ * <ul>
+ * <li> shape function \phi_0:
+ *  @verbatim
  *  +--------0.0--------+
  *  |                   |
  *  |                   |
@@ -90,9 +103,10 @@ DEAL_II_NAMESPACE_OPEN
  *  |                   |
  *  |                   |
  *  +--------0.5--------+
+ *  @endverbatim
 
- * shape function \phi_1
-
+ * <li> shape function \phi_1:
+ *  @verbatim
  *  +--------0.0--------+
  *  |                   |
  *  |                   |
@@ -104,9 +118,10 @@ DEAL_II_NAMESPACE_OPEN
  *  |                   |
  *  |                   |
  *  +--------0.5--------+
+ *  @endverbatim
 
- * shape function \phi_2
-
+ * <li> shape function \phi_2:
+ *  @verbatim
  *  +--------0.5--------+
  *  |                   |
  *  |                   |
@@ -118,9 +133,10 @@ DEAL_II_NAMESPACE_OPEN
  *  |                   |
  *  |                   |
  *  +--------0.0--------+
+ *  @endverbatim
 
- * shape function \phi_3
-
+ * <li> shape function \phi_3:
+ *  @verbatim
  *  +--------0.5--------+
  *  |                   |
  *  |                   |
@@ -132,23 +148,28 @@ DEAL_II_NAMESPACE_OPEN
  *  |                   |
  *  |                   |
  *  +--------0.0--------+
+ *  @endverbatim
 
+ * </ul>
 
- * Note that this shape functions are constructed on each cell, not on the reference cell only.
- * get_linear_shape computes the coefficients for shape functions when fill_fe_values is called on each cell. 
+ * Note that above shape functions are constructed on each cell, not on the reference cell only.
+ * @p get_linear_shape computes the coefficients for shape functions when @p fill_fe_values is called on each cell. 
 
  * The (global) basis function associated with a node is defined by the composition of
  * (local) basis functions associated with the node on each element.
  * In case of the problem with homogeneous Dirichlet boundary condition, 
- * the number of DOFs is equal to the number of interior nodes.
+ * the number of DOFs is equal to the number of interior nodes, as the standard bilinear finite element @p Q_1.
 
- * (TODO: unit_support_points)
+ * <h3>Unit support points</h3>
+ * Contrast with ordinary Lagrange finite elements, the DOF value with respect to the P1 nonconforming element at given node does not coincide with the function value at that node.
+ * For instance, the shape function \phi_0 which is associated with vertex 0 has 0.75 at vertex 0, not 1.0.
+ * Thus we need a interpolation operator which maps any smooth function into a function with proper DOF values in the P1 element space.
+ * One natural interpolant associated with given smooth function is the linear function whose midpoint value at each edge is defined by 
+ * the average of two values at endpoints of the edge.
+ * In other word, it provides appropriate weights used in @p unit_support_points.
 
  * You can find the paper about the P1NC element at
  * http://epubs.siam.org/doi/abs/10.1137/S0036142902404923.
-
-
-
 
  **/
 
@@ -286,7 +307,7 @@ private:
 
 
 
-/** @}*/
+/*@}*/
 
 DEAL_II_NAMESPACE_CLOSE
 
