@@ -196,7 +196,7 @@ enum UpdateFlags
    */
   update_jacobian_pushed_forward_3rd_derivatives = 0x1000000,
   /**
-   * @deprecated Update quadrature points
+   * @deprecated Use #update_quadrature_points instead.
    */
   update_q_points = update_quadrature_points,
   /**
