@@ -500,6 +500,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: Fix MPI_InitFinalize by correctly initializing and destroying
+   all p4est/libsc related objects by calls to sc_init(), p4est_init(), and
+   sc_finalize(); compatibility with p4est versions >1.1.
+ <br>
+ (Jonathan Perry-Houts, 2016/08/31)
+ </li>
+
  <li> Improved: SparsityPattern::copy_from() copying from a
  DynamicSparsityPattern argument had quadratic complexity in the number of
  rows for sparsity patterns where most of the rows are of length zero. The bad
