@@ -58,8 +58,8 @@ FE_PolyFace<PolynomialType,dim,spacedim>::requires_update_flags (const UpdateFla
     out |= update_gradients | update_covariant_transformation;
   if (flags & update_hessians)
     out |= update_hessians | update_covariant_transformation;
-  if (flags & update_cell_normal_vectors)
-    out |= update_cell_normal_vectors | update_JxW_values;
+  if (flags & update_normal_vectors)
+    out |= update_normal_vectors | update_JxW_values;
 
   return out;
 }
