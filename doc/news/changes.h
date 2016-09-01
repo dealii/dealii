@@ -204,6 +204,11 @@ inconvenience this causes.
 
 <ol>
 
+ <li> Fixed: The build system now uses -fPIC instead of -fpic
+ <br>
+ (Matthias Maier, 2016/08/31)
+ </li>
+
  <li> New: There are 6 new video lectures that explain the
  basics of Linux and the command line, how mesh refinement works, and some
  more complicated time stepping schemes.

@@ -46,7 +46,7 @@ ENDIF()
 #
 # Set the pic flag.
 #
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-fpic")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-fPIC")
 
 #
 # Check whether the -as-needed flag is available. If so set it to link
