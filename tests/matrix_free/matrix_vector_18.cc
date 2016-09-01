@@ -120,7 +120,7 @@ void do_test (const DoFHandler<dim> &dof,
           MatrixFree<dim,number>::AdditionalData::partition_partition;
       }
     data.tasks_block_size = 7;
-    data.mapping_update_flags |= update_second_derivatives;
+    data.mapping_update_flags |= update_hessians;
 
     mf_data.reinit (dof, constraints, quad, data);
   }
@@ -155,7 +155,7 @@ void do_test (const DoFHandler<dim> &dof,
 
     FEValues<dim> fe_values (dof.get_fe(), quadrature_formula,
                              update_values    |  update_gradients |
-                             update_JxW_values | update_second_derivatives);
+                             update_JxW_values | update_hessians);
 
     const unsigned int   dofs_per_cell = dof.get_fe().dofs_per_cell;
     const unsigned int   n_q_points    = quadrature_formula.size();

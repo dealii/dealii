@@ -44,7 +44,7 @@ plot_shape_functions(Mapping<dim> &mapping,
   QIterated<dim> q(q_trapez, div);
   FEValues<dim> fe(mapping, finel, q, UpdateFlags(update_values
                                                   | update_gradients
-                                                  | update_second_derivatives));
+                                                  | update_hessians));
 
   sprintf(fname, "Cell%dd-%s", dim, name);
 //  cerr << "\n" << fname << "\n";
@@ -106,7 +106,7 @@ plot_face_shape_functions(
   const char *name,
   UpdateFlags uflags = UpdateFlags(update_values
                                    | update_gradients
-                                   | update_second_derivatives))
+                                   | update_hessians))
 {
   Triangulation<dim> tr;
   DoFHandler<dim> dof(tr);
@@ -389,7 +389,7 @@ void test_compute_functions (const Mapping<dim> &mapping,
   dof.distribute_dofs(fe);
 
   const UpdateFlags update_all = (update_values | update_gradients |
-                                  update_second_derivatives);
+                                  update_hessians);
 
   // first check this for FEValues
   // objects

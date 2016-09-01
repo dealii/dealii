@@ -135,7 +135,7 @@ void do_test (const DoFHandler<dim> &dof,
     const QGauss<1> quad (fe_degree+1);
     typename MatrixFree<dim,number>::AdditionalData data;
     data.tasks_parallel_scheme = MatrixFree<dim,number>::AdditionalData::none;
-    data.mapping_update_flags = update_gradients | update_second_derivatives;
+    data.mapping_update_flags = update_gradients | update_hessians;
     data.initialize_indices = false;
     mf_data.reinit (dof, constraints, quad, data);
   }

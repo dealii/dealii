@@ -118,7 +118,7 @@ check (const unsigned int level,
 
   FEValues<dim> fe2 (mapping, element, quadrature,
                      update_values | update_gradients
-                     | update_second_derivatives
+                     | update_hessians
                      | update_quadrature_points | update_JxW_values);
 
   double l2 = 0.;

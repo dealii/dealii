@@ -399,7 +399,7 @@ void MinimizationProblem<1>::refine_grid ()
   hp::QCollection<dim> quadrature(q);
   hp::FEValues<dim> fe_values (fe, quadrature,
                                update_values   | update_gradients |
-                               update_second_derivatives |
+                               update_hessians |
                                update_quadrature_points | update_JxW_values);
 
   hp::FEValues<dim> neighbor_fe_values (fe, quadrature,

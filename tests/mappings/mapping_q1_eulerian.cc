@@ -65,7 +65,7 @@ show_values(FiniteElement<dim> &fe,
                           UpdateFlags(update_values |
                                       update_JxW_values |
                                       update_gradients |
-                                      update_second_derivatives));
+                                      update_hessians));
   typename DoFHandler<dim>::cell_iterator c = dof.begin();
   fe_values.reinit(c);
 
