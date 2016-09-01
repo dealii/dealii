@@ -49,8 +49,8 @@ void test (const unsigned int degree,
   FEFaceValues<dim> fe_values (fe, q,
                                update_values |
                                update_gradients |
-                               update_second_derivatives |
-                               update_q_points |
+                               update_hessians |
+                               update_quadrature_points |
                                update_jacobians);
   fe_values.reinit (dof_handler.begin_active(), 0);
 

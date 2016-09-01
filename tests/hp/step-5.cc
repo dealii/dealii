@@ -173,7 +173,7 @@ void LaplaceProblem<dim>::assemble_system ()
 
   hp::FEValues<dim> x_fe_values (fe, quadrature_formula,
                                  update_values    |  update_gradients |
-                                 update_q_points  |  update_JxW_values);
+                                 update_quadrature_points  |  update_JxW_values);
 
   const unsigned int   dofs_per_cell = fe[0].dofs_per_cell;
   const unsigned int   n_q_points    = quadrature_formula[0].size();

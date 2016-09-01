@@ -190,7 +190,7 @@ namespace Evaluation
     QTrapez<dim>  vertex_quadrature;
     FEValues<dim> fe_values (dof_handler.get_fe(),
                              vertex_quadrature,
-                             update_gradients | update_q_points);
+                             update_gradients | update_quadrature_points);
     std::vector<Tensor<1,dim> >
     solution_gradients (vertex_quadrature.size());
 
@@ -670,7 +670,7 @@ namespace LaplaceSolver
   assemble_rhs (Vector<double> &rhs) const
   {
     FEValues<dim> fe_values (*this->fe, *this->quadrature,
-                             update_values  | update_q_points  |
+                             update_values  | update_quadrature_points  |
                              update_JxW_values);
 
     const unsigned int   dofs_per_cell = this->fe->dofs_per_cell;
@@ -1223,7 +1223,7 @@ namespace DualFunctional
     QGauss<dim> quadrature(4);
     FEValues<dim>  fe_values (dof_handler.get_fe(), quadrature,
                               update_gradients |
-                              update_q_points  |
+                              update_quadrature_points  |
                               update_JxW_values);
     const unsigned int n_q_points = fe_values.n_quadrature_points;
     const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
@@ -1474,8 +1474,8 @@ namespace LaplaceSolver
     :
     fe_values (fe, quadrature,
                update_values             |
-               update_second_derivatives |
-               update_q_points           |
+               update_hessians |
+               update_quadrature_points           |
                update_JxW_values),
     right_hand_side (&right_hand_side)
   {

@@ -49,7 +49,7 @@ plot_derivatives(Mapping<dim> &mapping,
   QGauss<dim-1> q(1);
 //  QIterated<dim> q(q_trapez, div);
   FEFaceValues<dim> fe(mapping, finel, q, UpdateFlags(update_gradients
-                                                      | update_second_derivatives));
+                                                      | update_hessians));
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
     {
       fe.reinit(c, face);

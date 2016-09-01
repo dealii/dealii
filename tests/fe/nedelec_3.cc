@@ -82,7 +82,7 @@ check (const unsigned int p)
   std::vector<Vector<double> > shape_values (quadrature.size(),
                                              Vector<double>(dim));
   FEValues<dim> fe(fe_ned, quadrature,
-                   update_values|update_q_points);
+                   update_values|update_quadrature_points);
 
   for (typename DoFHandler<dim>::active_cell_iterator
        c = dof.begin_active();

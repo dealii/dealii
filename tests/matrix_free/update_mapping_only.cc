@@ -82,7 +82,7 @@ void test ()
         const QGauss<1> quad (fe_degree+1);
         typename MatrixFree<dim,double>::AdditionalData data;
         data.tasks_parallel_scheme = MatrixFree<dim,double>::AdditionalData::none;
-        data.mapping_update_flags = update_gradients | update_second_derivatives;
+        data.mapping_update_flags = update_gradients | update_hessians;
         if (i==1)
           data.initialize_indices = false;
         mf_data.reinit (mapping, dof, constraints, quad, data);

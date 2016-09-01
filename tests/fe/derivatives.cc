@@ -51,7 +51,7 @@ plot_derivatives(Mapping<dim> &mapping,
   QTrapez<dim> q;
 //  QIterated<dim> q(q_trapez, div);
   FEValues<dim> fe(mapping, finel, q, UpdateFlags(update_gradients
-                                                  | update_second_derivatives));
+                                                  | update_hessians));
   fe.reinit(c);
 
   unsigned int k=0;

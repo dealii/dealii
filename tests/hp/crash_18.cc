@@ -205,7 +205,7 @@ void LaplaceProblem<dim>::assemble_system ()
   hp::FEValues<dim> hp_fe_values (fe_collection,
                                   quadrature_collection,
                                   update_values    |  update_gradients |
-                                  update_q_points  |  update_JxW_values);
+                                  update_quadrature_points  |  update_JxW_values);
 
   const RightHandSide<dim> rhs_function;
 

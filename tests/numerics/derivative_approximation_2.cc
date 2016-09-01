@@ -153,7 +153,7 @@ void derivatives()
   Vector<double> solution;
   MappingQGeneric<dim> mapping(1);
   QMidpoint<dim> q_midpoint;
-  FEValues<dim> fe_values(mapping, fe, q_midpoint, update_q_points);
+  FEValues<dim> fe_values(mapping, fe, q_midpoint, update_quadrature_points);
 
   dof_handler.distribute_dofs (fe);
   solution.reinit(dof_handler.n_dofs());

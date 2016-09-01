@@ -43,10 +43,10 @@ FE_DGQ<3> fe(1);
 QGauss<2> quadrature(3);
 MappingQ<3> mapping(2);
 FEFaceValues<3> fe_face_values1 (mapping, fe, quadrature,
-                                 update_q_points | update_JxW_values |
+                                 update_quadrature_points | update_JxW_values |
                                  update_normal_vectors);
 FESubfaceValues<3> fe_face_values2 (mapping, fe, quadrature,
-                                    update_q_points | update_JxW_values |
+                                    update_quadrature_points | update_JxW_values |
                                     update_normal_vectors);
 
 void check_this (Triangulation<3> &tria)

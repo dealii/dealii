@@ -41,7 +41,7 @@ void sub_test (const DoFHandler<dim> &dof,
   MappingQ<dim> mapping (2);
   typename MatrixFree<dim,number>::AdditionalData data;
   data.tasks_parallel_scheme = MatrixFree<dim,number>::AdditionalData::none;
-  data.mapping_update_flags = update_gradients | update_second_derivatives;
+  data.mapping_update_flags = update_gradients | update_hessians;
   mf_data.reinit (mapping, dof, constraints, quad, data);
   MatrixFreeTest<dim,fe_degree,n_q_points_1d,number> mf (mf_data, mapping);
   mf.test_functions (solution);

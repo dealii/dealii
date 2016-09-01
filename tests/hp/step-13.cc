@@ -524,7 +524,7 @@ namespace LaplaceSolver
   assemble_rhs (Vector<double> &rhs) const
   {
     hp::FEValues<dim> fe_values (*this->fe, *this->quadrature,
-                                 update_values | update_q_points  |
+                                 update_values | update_quadrature_points  |
                                  update_JxW_values);
 
     const unsigned int   dofs_per_cell = (*this->fe)[0].dofs_per_cell;

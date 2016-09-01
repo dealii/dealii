@@ -53,7 +53,7 @@ plot_transformation(Mapping<dim> &mapping,
   QTrapez<1> q_trapez;
   QIterated<dim> q(q_trapez, div);
   FEValues<dim> fe_values(mapping, fe, q,
-                          UpdateFlags(update_q_points
+                          UpdateFlags(update_quadrature_points
                                       | update_JxW_values));
 
   fe_values.reinit(cell);
@@ -94,7 +94,7 @@ plot_faces(Mapping<dim> &mapping,
   const unsigned int nq = (unsigned int) (.01 + std::pow(q.size(), 1./(dim-1)));
 
   FEFaceValues<dim> fe_values(mapping, fe, q,
-                              UpdateFlags(update_q_points
+                              UpdateFlags(update_quadrature_points
                                           | update_JxW_values
                                           | update_normal_vectors));
 
@@ -138,7 +138,7 @@ plot_subfaces(Mapping<dim> &mapping,
   const unsigned int nq = (unsigned int) (.01 + std::pow(q.size(), 1./(dim-1)));
 
   FESubfaceValues<dim> fe_values(mapping, fe, q,
-                                 UpdateFlags(update_q_points
+                                 UpdateFlags(update_quadrature_points
                                              | update_normal_vectors));
   for (unsigned int face_nr=0;
        face_nr < GeometryInfo<dim>::faces_per_cell;

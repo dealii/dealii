@@ -199,8 +199,8 @@ FE_Poly<PolynomialType,dim,spacedim>::requires_update_flags (const UpdateFlags f
            | update_hessians | update_gradients
            | update_jacobian_pushed_forward_grads
            | update_jacobian_pushed_forward_2nd_derivatives;
-  if (flags & update_cell_normal_vectors)
-    out |= update_cell_normal_vectors | update_JxW_values;
+  if (flags & update_normal_vectors)
+    out |= update_normal_vectors | update_JxW_values;
 
   return out;
 }

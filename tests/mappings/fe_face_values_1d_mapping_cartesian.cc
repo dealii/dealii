@@ -54,7 +54,7 @@ plot_faces(Mapping<dim> &mapping,
   Assert (q.size() == 1, ExcInternalError());
 
   FEFaceValues<dim> fe_values(mapping, fe, q,
-                              UpdateFlags(update_q_points
+                              UpdateFlags(update_quadrature_points
                                           | update_JxW_values
                                           | update_values
                                           | update_gradients
@@ -100,7 +100,7 @@ plot_subfaces(Mapping<dim> &mapping,
   Assert (q.size() == 1, ExcInternalError());
 
   FESubfaceValues<dim> fe_values(mapping, fe, q,
-                                 UpdateFlags(update_q_points
+                                 UpdateFlags(update_quadrature_points
                                              | update_JxW_values
                                              | update_values
                                              | update_gradients

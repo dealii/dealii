@@ -80,9 +80,9 @@ void check (Triangulation<3> &tria)
   QGauss<2> quadrature(3);
   FE_Q<3> fe(1);
   FEFaceValues<3> fe_face_values1 (fe, quadrature,
-                                   update_q_points | update_JxW_values);
+                                   update_quadrature_points | update_JxW_values);
   FEFaceValues<3> fe_face_values2 (fe, quadrature,
-                                   update_q_points | update_JxW_values);
+                                   update_quadrature_points | update_JxW_values);
 
   DoFHandler<3> dof_handler (tria);
   dof_handler.distribute_dofs (fe);

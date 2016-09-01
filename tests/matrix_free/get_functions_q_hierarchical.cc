@@ -88,7 +88,7 @@ void test ()
   MappingQ<dim> mapping (4);
   typename MatrixFree<dim,number>::AdditionalData data;
   data.tasks_parallel_scheme = MatrixFree<dim,number>::AdditionalData::none;
-  data.mapping_update_flags = update_gradients | update_second_derivatives;
+  data.mapping_update_flags = update_gradients | update_hessians;
   mf_data.reinit (mapping, dof, constraints, quad, data);
   MatrixFreeTest<dim,fe_degree,fe_degree+1,number> mf (mf_data, mapping);
   mf.test_functions (solution);
