@@ -37,7 +37,7 @@ DEAL_II_NAMESPACE_OPEN
  * But it requires the continuity just in integral sense:
  * any function in the space should have the same integral values on two sides of the common edge shared by two adjacent elements.
 
- * Thus each function in the nonconforming element space can be discontinuous, not included in H^1_0, as functions in Discontinuous Galerkin (DG) finite element spaces. 
+ * Thus each function in the nonconforming element space can be discontinuous, not included in H^1_0, as functions in Discontinuous Galerkin (DG) finite element spaces.
  * Although any function in DG element space also has nonconformity, it is completely discontinuous across edges without any relation.
  * It is a reason why usual weak formulations for DG schemes contain additional penalty terms for jump across edges to control discontinuity.
  * However nonconforming elements usually do not need additional terms in their weak formulations due to the continuity in integral on edges.
@@ -153,7 +153,7 @@ DEAL_II_NAMESPACE_OPEN
  * </ul>
 
  * Note that above shape functions are constructed on each cell, not on the reference cell only.
- * @p get_linear_shape computes the coefficients for shape functions when @p fill_fe_values is called on each cell. 
+ * @p get_linear_shape computes the coefficients for shape functions when @p fill_fe_values is called on each cell.
 
  * The (global) basis function associated with a node is defined by the composition of
  * (local) basis functions associated with the node on each element.
@@ -164,7 +164,7 @@ DEAL_II_NAMESPACE_OPEN
  * Contrast with ordinary Lagrange finite elements, DOF value with respect to the P1 nonconforming element at given node does not coincide with the function value at that node.
  * For instance, the (global) basis function associated with a node has 0.75 at that node, not 1.0.
  * Thus we need an interpolation operator which maps any smooth function into a function with proper DOF values in the P1 element space.
- * One natural interpolant associated with given smooth function is the linear function whose midpoint value at each edge is defined by 
+ * One natural interpolant associated with given smooth function is the linear function whose midpoint value at each edge is defined by
  * the average of two values at endpoints of the edge.
  * It provides appropriate weights used in @p unit_support_points.
 
