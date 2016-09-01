@@ -30,37 +30,37 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * Implementation for the scalar version of the P1 nonconforming finite
- * element, a piecewise linear finite element on quadrilaterals in 2D.
+ * element, a piecewise linear element on quadrilaterals in 2D.
  *
- * Unlike any continuous conforming finite element,
- * it does not enforce the continuity across edges.
- * But it requires the continuity just in weak sense:
+ * Unlike any continuous conforming finite element belongs to H^1_0,
+ * the P1 nonconforming element does not enforce the continuity across edges.
+ * But it requires the continuity just in integral sense:
  * any function in the space should have the same integral values on two sides of the common edge shared by two adjacent elements.
 
- * Thus any function in the nonconforming element spaces is discontinuous, not included in H^1_0, as the case of DG finite elements. 
- * Although any function in DG finite element space has nonconformity also, it is completely discontinuous across edges.
- * It is the reason why usual weak formulations for DG schemes contain additional penalty terms for jump across edges to stabilize.
- * However the nonconforming elements usually do not need additional terms in their weak formulations due to the continuity in integral on edges. 
+ * Thus each function in the nonconforming element space can be discontinuous, not included in H^1_0, as functions in Discontinuous Galerkin (DG) finite element spaces. 
+ * Although any function in DG element space also has nonconformity, it is completely discontinuous across edges without any relation.
+ * It is a reason why usual weak formulations for DG schemes contain additional penalty terms for jump across edges to control discontinuity.
+ * However nonconforming elements usually do not need additional terms in their weak formulations due to the continuity in integral on edges.
 
  * <h3>DOFs and Dice Rule</h3>
  * Since any function in the P1 nonconforming space is piecewise linear on each element,
- * the function value at the mipoint of the edge is same to the mean value on the edge.
- * Thus the continuity of the integral value across the edge is equivalent to
- * the continuity of the midpoint value of the edge in this case.
+ * the function value at the mipoint of each edge is same to the mean value on the edge.
+ * Thus the continuity of the integral value across each edge is equivalent to
+ * the continuity of the midpoint value of each edge in this case.
  *
- * The degrees of freedom on a quadrilateral are given by midpoint values on edges.
- * However these four dofs in 2D are not independent in fact.
+ * The degrees of freedom (DOFs) on a quadrilateral are defined by midpoint values on edges.
+ * But these four DOFs are not independent in fact.
  * The simple observation reads that any linear function on a quadrilateral
- * satisfies 'the dice rule': the sum of two function values at two midpoints of the edge pair on opposite
- * position is equal to the sum of those on the another edge pair.
+ * satisfies 'dice rule': the sum of two function values at two midpoints of the edge pair on opposite
+ * position is equal to the sum of those of the another edge pair.
  *
  * \phi(m_0) + \phi(m_1) = \phi(m_2) + \phi(m_3).
  *
- * Conversely if just 4 values at midpoints satisfying the dice rule are given,
+ * Conversely if 4 values at midpoints satisfying the dice rule are just given,
  * then there always exists the unique linear function which coincides with 4 midpoints values.
  *
- * Due to the dice rule, three values at any three midpoints determine the last value at the last midpoint.
- * It means that the genuine number of independent dofs on a quad is 3,
+ * Due to the dice rule, three values at any three midpoints can determine the last value at the last midpoint.
+ * It means that the genuine number of (independent) DOFs on a quad is 3,
  * and it is the same number to the dimension of the linear polynomial space in 2D.
 
 
@@ -80,11 +80,11 @@ DEAL_II_NAMESPACE_OPEN
  *  0---------|---------1
  *  @endverbatim
 
- * For each vertex v_j, there are two edges of which v_j is one of the end points.
- * Consider the linear function such that one half at two midpoints of such edges,
- * and zero at two midpoints of other edges.
- * Note that this situation satisfies the dice rule which is described above.
- * We denote such a function by \phi_j.
+ * For each vertex v_j of given quad, there are two edges of which v_j is one of end points.
+ * Consider a linear function such that 0.5 value at two midpoints of such edges,
+ * and 0.0 at two midpoints of other edges.
+ * Note that the set of these values satisfies the dice rule which is described above.
+ * We denote such a function assoicated with vertex v_j by \phi_j.
 
  * The canonical (local) basis functions are given as any three shape functions of
  * the following four linear functions:
@@ -157,17 +157,18 @@ DEAL_II_NAMESPACE_OPEN
 
  * The (global) basis function associated with a node is defined by the composition of
  * (local) basis functions associated with the node on each element.
- * In case of the problem with homogeneous Dirichlet boundary condition, 
- * the number of DOFs is equal to the number of interior nodes, as the standard bilinear finite element @p Q_1.
+ * When a problem with homogeneous Dirichlet boundary condition is dealt,
+ * the total number of DOFs is equal to the number of interior nodes, as the standard bilinear finite element @p Q_1.
 
  * <h3>Unit support points</h3>
- * Contrast with ordinary Lagrange finite elements, the DOF value with respect to the P1 nonconforming element at given node does not coincide with the function value at that node.
- * For instance, the shape function \phi_0 which is associated with vertex 0 has 0.75 at vertex 0, not 1.0.
- * Thus we need a interpolation operator which maps any smooth function into a function with proper DOF values in the P1 element space.
+ * Contrast with ordinary Lagrange finite elements, DOF value with respect to the P1 nonconforming element at given node does not coincide with the function value at that node.
+ * For instance, the (global) basis function associated with a node has 0.75 at that node, not 1.0.
+ * Thus we need an interpolation operator which maps any smooth function into a function with proper DOF values in the P1 element space.
  * One natural interpolant associated with given smooth function is the linear function whose midpoint value at each edge is defined by 
  * the average of two values at endpoints of the edge.
- * In other word, it provides appropriate weights used in @p unit_support_points.
+ * It provides appropriate weights used in @p unit_support_points.
 
+ * <h3>References</h3>
  * You can find the paper about the P1NC element at
  * http://epubs.siam.org/doi/abs/10.1137/S0036142902404923.
 
