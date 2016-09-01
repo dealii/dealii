@@ -50,6 +50,10 @@
 #  endif
 #endif
 
+#ifdef DEAL_II_WITH_P4EST
+#   include <p4est_bits.h>
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -356,6 +360,12 @@ namespace Utilities
 #  endif
 #endif
 
+#ifdef DEAL_II_WITH_P4EST
+      //Initialize p4est and libsc components
+      sc_init(MPI_COMM_WORLD, 0, 0, NULL, SC_LP_SILENT);
+      p4est_init (0, SC_LP_SILENT);
+#endif
+
       constructor_has_already_run = true;
 
 
@@ -483,6 +493,12 @@ namespace Utilities
           PetscFinalize();
 #  endif
         }
+#endif
+
+#ifdef DEAL_II_WITH_P4EST
+      // now end p4est and libsc
+      // Note: p4est has no finalize function
+      sc_finalize ();
 #endif
 
 
