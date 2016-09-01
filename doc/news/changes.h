@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 /**
-@page changes_after_8_4_1 Changes after Version 8.4.1
+@page changes_after_8_4_2 Changes after Version 8.4.2
 
 <p>
 This is the list of changes made after the release of deal.II version
