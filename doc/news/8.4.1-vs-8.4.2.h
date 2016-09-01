@@ -29,6 +29,13 @@ author.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: Fix MPI_InitFinalize by correctly initializing and destroying
+   all p4est/libsc related objects by calls to sc_init(), p4est_init(), and
+   sc_finalize(); compatibility with p4est versions >1.1.
+ <br>
+ (Jonathan Perry-Houts, 2016/08/31)
+ </li>
+
  <li> Fixed: The build system now uses -fPIC instead of -fpic
  <br>
  (Matthias Maier, 2016/08/31)
