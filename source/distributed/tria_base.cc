@@ -217,7 +217,6 @@ namespace parallel
   types::subdomain_id
   Triangulation<dim,spacedim>::locally_owned_subdomain () const
   {
-    Assert (dim > 1, ExcNotImplemented());
     return my_subdomain;
   }
 
