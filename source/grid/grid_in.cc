@@ -867,6 +867,18 @@ void GridIn<dim, spacedim>::read_abaqus (std::istream                           
     {
       read_ucd(in_ucd, apply_all_indicators_to_manifolds);
     }
+  catch (std::exception &exc)
+    {
+      std::cerr
+          << "Exception on processing internal UCD data: " << std::endl
+          << exc.what()
+          << std::endl;
+
+      AssertThrow(false, ExcMessage("Internal conversion from ABAQUS file to UCD format was unsuccessful. \
+                                   More information is provided in an error message printed above. \
+                                   Are you sure that your ABAQUS mesh file conforms with the requirements \
+                                   listed in the documentation?"));
+    }
   catch (...)
     {
       AssertThrow(false, ExcMessage("Internal conversion from ABAQUS file to UCD format was unsuccessful. \
