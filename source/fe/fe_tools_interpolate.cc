@@ -44,21 +44,10 @@
 
 #include <deal.II/base/index_set.h>
 
-#ifdef DEAL_II_WITH_P4EST
-#  include <p4est_bits.h>
-#  include <p4est_extended.h>
-#  include <p4est_vtk.h>
-#  include <p4est_ghost.h>
-#  include <p4est_communication.h>
-#  include <p4est_iterate.h>
-
-#  include <p8est_bits.h>
-#  include <p8est_extended.h>
-#  include <p8est_vtk.h>
-#  include <p8est_ghost.h>
-#  include <p8est_communication.h>
-#  include <p8est_iterate.h>
-#endif
+namespace
+{
+#include <deal.II/distributed/p4est_wrappers.h>
+}
 
 #include <iostream>
 
@@ -731,105 +720,8 @@ namespace FETools
 
 
 
-  template <int dim, class InVector, class OutVector, int spacedim>
-  void extrapolate(const DoFHandler<dim,spacedim> &dof1,
-                   const InVector &u1,
-                   const DoFHandler<dim,spacedim> &dof2,
-                   OutVector &u2)
-  {
-    ConstraintMatrix dummy;
-    dummy.close();
-    extrapolate(dof1, u1, dof2, dummy, u2);
-  }
-
-
-
   namespace internal
   {
-    namespace p4est
-    {
-      /**
-       * A structure whose explicit specializations contain pointers to the
-       * relevant p4est_* and p8est_* functions. Using this structure, for
-       * example by saying functions<dim>::quadrant_compare, we can write code
-       * in a dimension independent way, either calling p4est_quadrant_compare
-       * or p8est_quadrant_compare, depending on template argument.
-       */
-      template <int dim> struct functions;
-
-      template <>
-      struct functions<2>
-      {
-        static
-        int (&quadrant_compare) (const void *v1, const void *v2);
-
-        static
-        int (&quadrant_overlaps_tree) (dealii::internal::p4est::types<2>::tree *tree,
-                                       const dealii::internal::p4est::types<2>::quadrant *q);
-
-        static
-        int (&comm_find_owner) (dealii::internal::p4est::types<2>::forest *p4est,
-                                const dealii::internal::p4est::types<2>::locidx which_tree,
-                                const dealii::internal::p4est::types<2>::quadrant *q,
-                                const int guess);
-      };
-
-      int (&functions<2>::quadrant_compare) (const void *v1, const void *v2)
-        = p4est_quadrant_compare;
-
-      int (&functions<2>::quadrant_overlaps_tree) (dealii::internal::p4est::types<2>::tree *tree,
-                                                   const dealii::internal::p4est::types<2>::quadrant *q)
-        = p4est_quadrant_overlaps_tree;
-
-      int (&functions<2>::comm_find_owner) (dealii::internal::p4est::types<2>::forest *p4est,
-                                            const dealii::internal::p4est::types<2>::locidx which_tree,
-                                            const dealii::internal::p4est::types<2>::quadrant *q,
-                                            const int guess)
-        = p4est_comm_find_owner;
-
-      template <>
-      struct functions<3>
-      {
-        static
-        int (&quadrant_compare) (const void *v1, const void *v2);
-
-        static
-        int (&quadrant_overlaps_tree) (dealii::internal::p4est::types<3>::tree *tree,
-                                       const dealii::internal::p4est::types<3>::quadrant *q);
-
-        static
-        int (&comm_find_owner) (dealii::internal::p4est::types<3>::forest *p4est,
-                                const dealii::internal::p4est::types<3>::locidx which_tree,
-                                const dealii::internal::p4est::types<3>::quadrant *q,
-                                const int guess);
-      };
-
-      int (&functions<3>::quadrant_compare) (const void *v1, const void *v2)
-        = p8est_quadrant_compare;
-
-      int (&functions<3>::quadrant_overlaps_tree) (dealii::internal::p4est::types<3>::tree *tree,
-                                                   const dealii::internal::p4est::types<3>::quadrant *q)
-        = p8est_quadrant_overlaps_tree;
-
-      int (&functions<3>::comm_find_owner) (dealii::internal::p4est::types<3>::forest *p4est,
-                                            const dealii::internal::p4est::types<3>::locidx which_tree,
-                                            const dealii::internal::p4est::types<3>::quadrant *q,
-                                            const int guess)
-        = p8est_comm_find_owner;
-
-      template <int dim, int spacedim>
-      bool
-      tree_exists_locally (const typename dealii::internal::p4est::types<dim>::forest *parallel_forest,
-                           const typename dealii::internal::p4est::types<dim>::topidx coarse_grid_cell)
-      {
-        Assert (coarse_grid_cell < parallel_forest->connectivity->num_trees,
-                ExcInternalError());
-        return ((coarse_grid_cell >= parallel_forest->first_local_tree)
-                &&
-                (coarse_grid_cell <= parallel_forest->last_local_tree));
-      }
-    }
-
     /**
      * Implementation of the @p extrapolate function
      * on parallel distributed grids.
@@ -871,7 +763,7 @@ namespace FETools
 
         bool operator < (const CellData &rhs) const
         {
-          if (p4est::functions<dim>::quadrant_compare (&quadrant, &rhs.quadrant) < 0)
+          if (dealii::internal::p4est::functions<dim>::quadrant_compare (&quadrant, &rhs.quadrant) < 0)
             return true;
 
           return false;
@@ -1110,6 +1002,68 @@ namespace FETools
       std::vector<CellData>  available_cells;
     };
 
+    template <>
+    class ExtrapolateImplementation<1,1>
+    {
+    public:
+
+      ExtrapolateImplementation ()
+      {
+        AssertThrow(false, ExcNotImplemented())
+      }
+
+      ~ExtrapolateImplementation ()
+      {}
+
+      template <class InVector,class OutVector>
+      void extrapolate_parallel (const InVector &u2_relevant,
+                                 const DoFHandler<1,1> &dof2,
+                                 OutVector &u2)
+      {}
+    };
+
+    template <>
+    class ExtrapolateImplementation<1,2>
+    {
+    public:
+
+      ExtrapolateImplementation ()
+      {
+        AssertThrow(false, ExcNotImplemented())
+      }
+
+      ~ExtrapolateImplementation ()
+      {}
+
+      template <class InVector,class OutVector>
+      void extrapolate_parallel (const InVector &u2_relevant,
+                                 const DoFHandler<1,2> &dof2,
+                                 OutVector &u2)
+      {}
+    };
+
+    template <>
+    class ExtrapolateImplementation<1,3>
+    {
+    public:
+
+      ExtrapolateImplementation ()
+      {
+        AssertThrow(false, ExcNotImplemented())
+      }
+
+      ~ExtrapolateImplementation ()
+      {}
+
+      template <class InVector,class OutVector>
+      void extrapolate_parallel (const InVector &u2_relevant,
+                                 const DoFHandler<1,3> &dof2,
+                                 OutVector &u2)
+      {}
+    };
+
+
+
     template <int dim,int spacedim>
     ExtrapolateImplementation<dim,spacedim>::
     ExtrapolateImplementation ()
@@ -1159,10 +1113,10 @@ namespace FETools
       // check if this cell exists in the local p4est
       int idx = sc_array_bsearch(const_cast<sc_array_t *>(&tree.quadrants),
                                  &p4est_cell,
-                                 p4est::functions<dim>::quadrant_compare);
+                                 dealii::internal::p4est::functions<dim>::quadrant_compare);
 
       // this cell and none of it's children belongs to us
-      if (idx == -1 && (p4est::functions<dim>::
+      if (idx == -1 && (dealii::internal::p4est::functions<dim>::
                         quadrant_overlaps_tree (const_cast<typename dealii::internal::p4est::types<dim>::tree *>(&tree),
                                                 &p4est_cell)
                         == false))
@@ -1299,7 +1253,7 @@ namespace FETools
           bool found_child = true;
           for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
             {
-              if (p4est::functions<dim>::
+              if (dealii::internal::p4est::functions<dim>::
                   quadrant_overlaps_tree (const_cast<typename dealii::internal::p4est::types<dim>::tree *>(&tree),
                                           &p4est_child[c])
                   == false)
@@ -1442,8 +1396,8 @@ namespace FETools
       endc=dof2.end(0);
       for (; cell!=endc; ++cell)
         {
-          if (p4est::tree_exists_locally<dim,spacedim> (tr->parallel_forest,
-                                                        tr->coarse_cell_to_p4est_tree_permutation[cell->index()])
+          if (dealii::internal::p4est::tree_exists_locally<dim> (tr->parallel_forest,
+                                                                 tr->coarse_cell_to_p4est_tree_permutation[cell->index()])
               == false)
             continue;
 
@@ -1461,7 +1415,7 @@ namespace FETools
           {
             int idx = sc_array_bsearch(const_cast<sc_array_t *>(&tree->quadrants),
                                        &p4est_coarse_cell,
-                                       p4est::functions<dim>::quadrant_compare);
+                                       dealii::internal::p4est::functions<dim>::quadrant_compare);
 
             AssertThrow (idx == -1, ExcGridNotRefinedAtLeastOnce ());
           }
@@ -1490,10 +1444,10 @@ namespace FETools
       // check if this cell exists in the local p4est
       int idx = sc_array_bsearch(const_cast<sc_array_t *>(&tree.quadrants),
                                  &p4est_cell,
-                                 p4est::functions<dim>::quadrant_compare);
+                                 dealii::internal::p4est::functions<dim>::quadrant_compare);
 
       // this cell and none of it's children belongs to us
-      if (idx == -1 && (p4est::functions<dim>::
+      if (idx == -1 && (dealii::internal::p4est::functions<dim>::
                         quadrant_overlaps_tree (const_cast<typename dealii::internal::p4est::types<dim>::tree *>(&tree),
                                                 &p4est_cell)
                         == false))
@@ -1580,7 +1534,7 @@ namespace FETools
               // check if this child
               // is locally available
               // in the p4est
-              if (p4est::functions<dim>::
+              if (dealii::internal::p4est::functions<dim>::
                   quadrant_overlaps_tree (const_cast<typename dealii::internal::p4est::types<dim>::tree *>(&tree),
                                           &p4est_child[c])
                   == false)
@@ -1646,8 +1600,8 @@ namespace FETools
 
           if ((trees.find (tree_index) == trees.end ())
               ||
-              (p4est::tree_exists_locally<dim,spacedim> (tr->parallel_forest,
-                                                         tree_index)
+              (dealii::internal::p4est::tree_exists_locally<dim> (tr->parallel_forest,
+                                                                  tree_index)
                == false))
             continue;
 
@@ -1690,10 +1644,10 @@ namespace FETools
       // check if this cell exists in the local p4est
       int idx = sc_array_bsearch(const_cast<sc_array_t *>(&tree.quadrants),
                                  &p4est_cell,
-                                 p4est::functions<dim>::quadrant_compare);
+                                 dealii::internal::p4est::functions<dim>::quadrant_compare);
 
       // this cell and none of it's children belongs to us
-      if (idx == -1 && (p4est::functions<dim>::
+      if (idx == -1 && (dealii::internal::p4est::functions<dim>::
                         quadrant_overlaps_tree (const_cast<typename dealii::internal::p4est::types<dim>::tree *>(&tree),
                                                 &p4est_cell)
                         == false))
@@ -1843,7 +1797,7 @@ namespace FETools
       CellData  cell_data (dofs_per_cell);
       cell_data.quadrant = p4est_cell;
       cell_data.tree_index = tree_index;
-      cell_data.receiver = p4est::functions<dim>::
+      cell_data.receiver = dealii::internal::p4est::functions<dim>::
                            comm_find_owner (const_cast<typename dealii::internal::p4est::types<dim>::forest *> (&forest),
                                             tree_index,
                                             &p4est_cell,
@@ -2016,8 +1970,8 @@ namespace FETools
       endc=dof2.end(0);
       for (; cell!=endc; ++cell)
         {
-          if (p4est::tree_exists_locally<dim,spacedim> (tr->parallel_forest,
-                                                        tr->coarse_cell_to_p4est_tree_permutation[cell->index()])
+          if (dealii::internal::p4est::tree_exists_locally<dim> (tr->parallel_forest,
+                                                                 tr->coarse_cell_to_p4est_tree_permutation[cell->index()])
               == false)
             continue;
 
@@ -2090,41 +2044,13 @@ namespace FETools
 
 
       template <int dim, class InVector, class OutVector, int spacedim>
-      void extrapolate(const DoFHandler<dim,spacedim> &dof1,
-                       const InVector &u1,
-                       const DoFHandler<dim,spacedim> &dof2,
-                       const ConstraintMatrix &constraints,
-                       OutVector &u2)
-      {
-        // make sure that each cell on the
-        // coarsest level is at least once
-        // refined, otherwise, these cells
-        // can't be treated and would
-        // generate a bogus result
-        {
-          typename DoFHandler<dim,spacedim>::cell_iterator cell = dof2.begin(0),
-                                                           endc = dof2.end(0);
-          for (; cell!=endc; ++cell)
-            Assert (cell->has_children(), ExcGridNotRefinedAtLeastOnce());
-        }
-
-        OutVector u3;
-        u3.reinit(u2);
-        interpolate(dof1, u1, dof2, constraints, u3);
-
-        extrapolate_serial (u3, dof2, u2);
-      }
-
-
-
-      template <int dim, class InVector, class OutVector, int spacedim>
       void extrapolate_parallel(const InVector &u2_relevant,
                                 const DoFHandler<dim,spacedim> &dof2,
                                 OutVector &u2)
       {
         if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dof2.get_tria()) != 0)
           {
-            internal::ExtrapolateImplementation<dim,spacedim>  implementation;
+            ExtrapolateImplementation<dim,spacedim>  implementation;
             implementation.extrapolate_parallel (u2_relevant, dof2, u2);
           }
         else
@@ -2132,86 +2058,20 @@ namespace FETools
             extrapolate_serial (u2_relevant, dof2, u2);
           }
       }
-
-
-
-      // special version for PETSc
-#ifdef DEAL_II_WITH_PETSC
-      template <int dim,int spacedim>
-      void extrapolate(const DoFHandler<dim,spacedim> &dof1,
-                       const PETScWrappers::MPI::Vector &u1,
-                       const DoFHandler<dim,spacedim> &dof2,
-                       const ConstraintMatrix &constraints2,
-                       PETScWrappers::MPI::Vector &u2)
-      {
-        IndexSet  dof2_locally_owned_dofs = dof2.locally_owned_dofs();
-        IndexSet  dof2_locally_relevant_dofs;
-        DoFTools::extract_locally_relevant_dofs (dof2,
-                                                 dof2_locally_relevant_dofs);
-
-        PETScWrappers::MPI::Vector u3 (dof2_locally_owned_dofs,
-                                       u1.get_mpi_communicator ());
-        interpolate (dof1, u1, dof2, constraints2, u3);
-        PETScWrappers::MPI::Vector u3_relevant (dof2_locally_owned_dofs,
-                                                dof2_locally_relevant_dofs,
-                                                u1.get_mpi_communicator ());
-        u3_relevant = u3;
-
-        extrapolate_parallel (u3_relevant, dof2, u2);
-      }
-#endif
-
-
-
-      // special version for Trilinos
-#ifdef DEAL_II_WITH_TRILINOS
-      template <int dim,int spacedim>
-      void extrapolate(const DoFHandler<dim,spacedim> &dof1,
-                       const TrilinosWrappers::MPI::Vector &u1,
-                       const DoFHandler<dim,spacedim> &dof2,
-                       const ConstraintMatrix &constraints2,
-                       TrilinosWrappers::MPI::Vector &u2)
-      {
-        IndexSet  dof2_locally_owned_dofs = dof2.locally_owned_dofs();
-        IndexSet  dof2_locally_relevant_dofs;
-        DoFTools::extract_locally_relevant_dofs (dof2,
-                                                 dof2_locally_relevant_dofs);
-
-        TrilinosWrappers::MPI::Vector u3 (dof2_locally_owned_dofs,
-                                          u1.get_mpi_communicator ());
-        interpolate (dof1, u1, dof2, constraints2, u3);
-        TrilinosWrappers::MPI::Vector u3_relevant (dof2_locally_relevant_dofs,
-                                                   u1.get_mpi_communicator ());
-        u3_relevant = u3;
-
-        extrapolate_parallel (u3_relevant, dof2, u2);
-      }
-#endif
-
-
-      // special version for parallel::distributed::Vector
-      template <int dim,int spacedim,typename Number>
-      void extrapolate(const DoFHandler<dim,spacedim> &dof1,
-                       const parallel::distributed::Vector<Number> &u1,
-                       const DoFHandler<dim,spacedim> &dof2,
-                       const ConstraintMatrix &constraints2,
-                       parallel::distributed::Vector<Number> &u2)
-      {
-        IndexSet  dof2_locally_owned_dofs = dof2.locally_owned_dofs();
-        IndexSet  dof2_locally_relevant_dofs;
-        DoFTools::extract_locally_relevant_dofs (dof2,
-                                                 dof2_locally_relevant_dofs);
-
-        parallel::distributed::Vector<Number>  u3 (dof2_locally_owned_dofs,
-                                                   dof2_locally_relevant_dofs,
-                                                   u2.get_mpi_communicator ());
-
-        interpolate (dof1, u1, dof2, constraints2, u3);
-        u3.update_ghost_values ();
-
-        extrapolate_parallel (u3, dof2, u2);
-      }
     }
+  }
+
+
+
+  template <int dim, class InVector, class OutVector, int spacedim>
+  void extrapolate(const DoFHandler<dim,spacedim> &dof1,
+                   const InVector &u1,
+                   const DoFHandler<dim,spacedim> &dof2,
+                   OutVector &u2)
+  {
+    ConstraintMatrix dummy;
+    dummy.close();
+    extrapolate(dof1, u1, dof2, dummy, u2);
   }
 
 
@@ -2225,14 +2085,109 @@ namespace FETools
   {
     Assert(dof1.get_fe().n_components() == dof2.get_fe().n_components(),
            ExcDimensionMismatch(dof1.get_fe().n_components(), dof2.get_fe().n_components()));
-    Assert(&dof1.get_tria()==&dof2.get_tria(), ExcTriangulationMismatch());
+    Assert(&dof1.get_triangulation()==&dof2.get_triangulation(), ExcTriangulationMismatch());
     Assert(u1.size()==dof1.n_dofs(), ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
     Assert(u2.size()==dof2.n_dofs(), ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
 
-    internal::extrapolate (dof1, u1, dof2, constraints, u2);
+    // make sure that each cell on the
+    // coarsest level is at least once
+    // refined, otherwise, these cells
+    // can't be treated and would
+    // generate a bogus result
+    {
+      typename DoFHandler<dim,spacedim>::cell_iterator cell = dof2.begin(0),
+                                                       endc = dof2.end(0);
+      for (; cell!=endc; ++cell)
+        Assert (cell->has_children(), ExcGridNotRefinedAtLeastOnce());
+    }
 
-    // Apply hanging node constraints.
+    OutVector u3;
+    u3.reinit(u2);
+    interpolate(dof1, u1, dof2, constraints, u3);
+
+    internal::extrapolate_serial (u3, dof2, u2);
+
     constraints.distribute(u2);
+  }
+
+
+
+  // special version for PETSc
+#ifdef DEAL_II_WITH_PETSC
+  template <int dim,int spacedim>
+  void extrapolate(const DoFHandler<dim,spacedim> &dof1,
+                   const PETScWrappers::MPI::Vector &u1,
+                   const DoFHandler<dim,spacedim> &dof2,
+                   const ConstraintMatrix &constraints2,
+                   PETScWrappers::MPI::Vector &u2)
+  {
+    IndexSet  dof2_locally_owned_dofs = dof2.locally_owned_dofs();
+    IndexSet  dof2_locally_relevant_dofs;
+    DoFTools::extract_locally_relevant_dofs (dof2,
+                                             dof2_locally_relevant_dofs);
+
+    PETScWrappers::MPI::Vector u3 (dof2_locally_owned_dofs,
+                                   u1.get_mpi_communicator ());
+    interpolate (dof1, u1, dof2, constraints2, u3);
+    PETScWrappers::MPI::Vector u3_relevant (dof2_locally_owned_dofs,
+                                            dof2_locally_relevant_dofs,
+                                            u1.get_mpi_communicator ());
+    u3_relevant = u3;
+
+    internal::extrapolate_parallel (u3_relevant, dof2, u2);
+  }
+#endif
+
+
+
+  // special version for Trilinos
+#ifdef DEAL_II_WITH_TRILINOS
+  template <int dim,int spacedim>
+  void extrapolate(const DoFHandler<dim,spacedim> &dof1,
+                   const TrilinosWrappers::MPI::Vector &u1,
+                   const DoFHandler<dim,spacedim> &dof2,
+                   const ConstraintMatrix &constraints2,
+                   TrilinosWrappers::MPI::Vector &u2)
+  {
+    IndexSet  dof2_locally_owned_dofs = dof2.locally_owned_dofs();
+    IndexSet  dof2_locally_relevant_dofs;
+    DoFTools::extract_locally_relevant_dofs (dof2,
+                                             dof2_locally_relevant_dofs);
+
+    TrilinosWrappers::MPI::Vector u3 (dof2_locally_owned_dofs,
+                                      u1.get_mpi_communicator ());
+    interpolate (dof1, u1, dof2, constraints2, u3);
+    TrilinosWrappers::MPI::Vector u3_relevant (dof2_locally_relevant_dofs,
+                                               u1.get_mpi_communicator ());
+    u3_relevant = u3;
+
+    internal::extrapolate_parallel (u3_relevant, dof2, u2);
+  }
+#endif
+
+
+
+  // special version for LinearAlgebra::distributed::Vector
+  template <int dim,int spacedim,typename Number>
+  void extrapolate(const DoFHandler<dim,spacedim> &dof1,
+                   const parallel::distributed::Vector<Number> &u1,
+                   const DoFHandler<dim,spacedim> &dof2,
+                   const ConstraintMatrix &constraints2,
+                   parallel::distributed::Vector<Number> &u2)
+  {
+    IndexSet  dof2_locally_owned_dofs = dof2.locally_owned_dofs();
+    IndexSet  dof2_locally_relevant_dofs;
+    DoFTools::extract_locally_relevant_dofs (dof2,
+                                             dof2_locally_relevant_dofs);
+
+    LinearAlgebra::distributed::Vector<Number>  u3 (dof2_locally_owned_dofs,
+                                                    dof2_locally_relevant_dofs,
+                                                    u2.get_mpi_communicator ());
+
+    interpolate (dof1, u1, dof2, constraints2, u3);
+    u3.update_ghost_values ();
+
+    internal::extrapolate_parallel (u3, dof2, u2);
   }
 
 } // end of namespace FETools
