@@ -720,9 +720,9 @@ namespace FETools
   }
 
 
-
   namespace internal
   {
+#ifdef DEAL_II_WITH_P4EST
     /**
      * Implementation of the @p extrapolate function
      * on parallel distributed grids.
@@ -2075,8 +2075,7 @@ namespace FETools
 
       u2.compress(VectorOperation::insert);
     }
-
-
+#endif //DEAL_II_WITH_P4EST
 
     namespace
     {
@@ -2126,6 +2125,7 @@ namespace FETools
 
 
 
+#ifdef DEAL_II_WITH_P4EST
       template <int dim, class InVector, class OutVector, int spacedim>
       void extrapolate_parallel(const InVector &u2_relevant,
                                 const DoFHandler<dim,spacedim> &dof2,
@@ -2141,10 +2141,9 @@ namespace FETools
             extrapolate_serial (u2_relevant, dof2, u2);
           }
       }
+#endif //DEAL_II_WITH_P4EST
     }
   }
-
-
 
   template <int dim, class InVector, class OutVector, int spacedim>
   void extrapolate(const DoFHandler<dim,spacedim> &dof1,
@@ -2194,7 +2193,7 @@ namespace FETools
   }
 
 
-
+#ifdef DEAL_II_WITH_P4EST
   template <int dim, class VectorType, int spacedim>
   void extrapolate_parallel(const DoFHandler<dim,spacedim> &dof1,
                             const VectorType &u1,
@@ -2243,7 +2242,7 @@ namespace FETools
 
     constraints2.distribute(u2);
   }
-
+#endif //DEAL_II_WITH_P4EST
 
 } // end of namespace FETools
 

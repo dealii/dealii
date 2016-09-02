@@ -783,6 +783,7 @@ namespace FETools
                     const ConstraintMatrix         &constraints,
                     OutVector                      &z2);
 
+#ifdef DEAL_II_WITH_P4EST
   /*
    * Same as above for external parallel VectorTypes
    * on a parallel::distributed::Triangulation
@@ -804,6 +805,7 @@ namespace FETools
                             const DoFHandler<dim,spacedim> &dof2,
                             const ConstraintMatrix &constraints2,
                             LinearAlgebra::distributed::Vector<Number> &u2);
+#endif //DEAL_II_WITH_P4EST
 
   //@}
   /**

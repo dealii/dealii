@@ -114,6 +114,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
 {
+#ifdef DEAL_II_WITH_P4EST
     namespace FETools
     \{
 #if deal_II_dimension == deal_II_space_dimension
@@ -140,10 +141,12 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 
 #endif
     \}
+#endif //DEAL_II_WITH_P4EST
 }
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS; scalar : REAL_SCALARS)
 {
+#ifdef DEAL_II_WITH_P4EST
     namespace FETools
     \{
 #if deal_II_dimension == deal_II_space_dimension
@@ -156,4 +159,5 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
      LinearAlgebra::distributed::Vector<scalar> &);
 #endif
     \}
+#endif //DEAL_II_WITH_P4EST
 }
