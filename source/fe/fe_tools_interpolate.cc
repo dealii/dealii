@@ -744,6 +744,32 @@ namespace FETools
     private:
 
       /**
+       * A structure holding all data to
+       * set dofs recursively on cells of arbitrary level
+       */
+      struct WorkPackage
+      {
+        const typename dealii::internal::p4est::types<dim>::forest    forest;
+        const typename dealii::internal::p4est::types<dim>::tree      tree;
+        const typename dealii::internal::p4est::types<dim>::locidx    tree_index;
+        const typename DoFHandler<dim,spacedim>::cell_iterator        dealii_cell;
+        const typename dealii::internal::p4est::types<dim>::quadrant  p4est_cell;
+
+        WorkPackage(const typename dealii::internal::p4est::types<dim>::forest    &forest_,
+                    const typename dealii::internal::p4est::types<dim>::tree      &tree_,
+                    const typename dealii::internal::p4est::types<dim>::locidx    &tree_index_,
+                    const typename DoFHandler<dim,spacedim>::cell_iterator        &dealii_cell_,
+                    const typename dealii::internal::p4est::types<dim>::quadrant  &p4est_cell_)
+          :
+          forest(forest_),
+          tree(tree_),
+          tree_index(tree_index_),
+          dealii_cell(dealii_cell_),
+          p4est_cell(p4est_cell_)
+        {}
+      };
+
+      /**
        * A structure holding all data
        * of cells needed from other processes
        * for the extrapolate algorithm.
@@ -1337,7 +1363,7 @@ namespace FETools
                   const bool on_refined_neighbor
                     = (dofs_on_refined_neighbors.find(indices[j])!=dofs_on_refined_neighbors.end());
                   if (!(on_refined_neighbor && dofs_on_refined_neighbors[indices[j]]>dealii_cell->level()))
-                      u(indices[j]) = local_values(j);
+                    u(indices[j]) = local_values(j);
                 }
             }
         }
@@ -1902,15 +1928,15 @@ namespace FETools
               // correct receivers
               // then delete this received
               // need from the list
-              typename std::vector<CellData>::iterator recv=std::begin (received_needs);
-              while (recv != std::end (received_needs))
+              typename std::vector<CellData>::iterator recv=received_needs.begin();
+              while (recv != received_needs.end())
                 {
                   if (dealii::internal::p4est::quadrant_is_equal<dim>(recv->quadrant, comp->quadrant))
                     {
                       recv->dof_values = comp->dof_values;
                       cells_to_send.push_back (*recv);
                       received_needs.erase (recv);
-                      recv = std::begin (received_needs);
+                      recv = received_needs.begin();
                     }
                   else
                     ++recv;
@@ -1974,16 +2000,16 @@ namespace FETools
                     {
                       const typename DoFHandler<dim,spacedim>::cell_iterator neighbor = cell->neighbor(face);
                       if (neighbor->level() != cell->level())
-                          for (unsigned int i=0; i<dofs_per_face; ++i)
-                            {
-                              const types::global_dof_index index = indices[fe.face_to_cell_index(i,face)];;
-                              const bool index_stored
-                                = (dofs_on_refined_neighbors.find(index)!=dofs_on_refined_neighbors.end());
-                              const unsigned int level = index_stored ?
-                                                         std::max(cell->level(), dofs_on_refined_neighbors[index]) :
-                                                         cell->level();
-                              dofs_on_refined_neighbors[index] = level;
-                            }
+                        for (unsigned int i=0; i<dofs_per_face; ++i)
+                          {
+                            const types::global_dof_index index = indices[fe.face_to_cell_index(i,face)];;
+                            const bool index_stored
+                              = (dofs_on_refined_neighbors.find(index)!=dofs_on_refined_neighbors.end());
+                            const unsigned int level = index_stored ?
+                                                       std::max(cell->level(), dofs_on_refined_neighbors[index]) :
+                                                       cell->level();
+                            dofs_on_refined_neighbors[index] = level;
+                          }
                     }
               }
         }
@@ -1993,28 +2019,6 @@ namespace FETools
       // are computed, start
       // the interpolation
       u2 = 0;
-
-      struct WorkPackage
-      {
-        const typename dealii::internal::p4est::types<dim>::forest    forest;
-        const typename dealii::internal::p4est::types<dim>::tree      tree;
-        const typename dealii::internal::p4est::types<dim>::locidx    tree_index;
-        const typename DoFHandler<dim,spacedim>::cell_iterator        dealii_cell;
-        const typename dealii::internal::p4est::types<dim>::quadrant  p4est_cell;
-
-        WorkPackage(const typename dealii::internal::p4est::types<dim>::forest    &forest_,
-                    const typename dealii::internal::p4est::types<dim>::tree      &tree_,
-                    const typename dealii::internal::p4est::types<dim>::locidx    &tree_index_,
-                    const typename DoFHandler<dim,spacedim>::cell_iterator        &dealii_cell_,
-                    const typename dealii::internal::p4est::types<dim>::quadrant  &p4est_cell_)
-          :
-          forest(forest_),
-          tree(tree_),
-          tree_index(tree_index_),
-          dealii_cell(dealii_cell_),
-          p4est_cell(p4est_cell_)
-        {}
-      };
 
       std::queue<WorkPackage> queue;
       {

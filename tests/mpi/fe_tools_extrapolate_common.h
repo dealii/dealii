@@ -125,7 +125,7 @@ check_this (const FiniteElement<dim> &fe1,
 {
   deallog << std::setprecision (10);
 
-  // only check if both elements have support points. 
+  // only check if both elements have support points.
   // otherwise, interpolation doesn't really work
   if ((fe1.get_unit_support_points().size() == 0) ||
       (fe2.get_unit_support_points().size() == 0))
@@ -246,7 +246,7 @@ check_this_dealii (const FiniteElement<dim> &fe1,
 {
   deallog << std::setprecision (10);
 
-  // only check if both elements have support points. 
+  // only check if both elements have support points.
   // otherwise, interpolation doesn't really work
   if ((fe1.get_unit_support_points().size() == 0) ||
       (fe2.get_unit_support_points().size() == 0))
