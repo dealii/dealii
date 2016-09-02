@@ -150,11 +150,11 @@ namespace Manifolds
  * vertex' coordinates through the following function call:
  *   @code
  *     ...
- *     Point<spacedim> new_vertex = manifold.get_new_point (quadrature);
+ *     Point<spacedim> new_vertex = manifold.get_new_point (points,weights);
  *     ...
  *   @endcode
- * Here, @p quadrature is a Quadrature<spacedim> object, which contains a collection
- * of points in @p spacedim dimension, and a collection of weights. The points
+ * Here, @p points is a collection of points in @p spacedim dimension,
+ * and @p a collection of corresponding weights. The points
  * in this context will then be the vertices of the cell, face, or edge, and
  * the weights are typically one over the number of points when a new midpoint
  * of the cell, face, or edge is needed. Derived classes then will implement the
@@ -170,7 +170,7 @@ namespace Manifolds
  *
  *
  * @note Unlike almost all other cases in the library, we here interpret the points
- * in the quadrature object to be in real space, not on the reference cell.
+ * to be in real space, not on the reference cell.
  *
  * Manifold::get_new_point() has a default implementation that can
  * simplify this process somewhat: Internally, the function calls the
