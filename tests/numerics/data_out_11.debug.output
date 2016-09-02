@@ -1,0 +1,4 @@
+
+DEAL::Exceptions::DataOut::ExcInvalidNumberOfNames (names.size(), dof_handler.get_fe().n_components())
+DEAL::Exceptions::DataOut::ExcInvalidNumberOfNames (names.size(), dofs->get_fe().n_components())
+DEAL::OK

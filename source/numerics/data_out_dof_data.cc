@@ -1108,6 +1108,9 @@ add_data_vector
 
   Assert (data.size() == dof_handler.n_dofs(),
           ExcDimensionMismatch (data.size(), dof_handler.n_dofs()));
+  Assert (names.size() == dof_handler.get_fe().n_components(),
+          Exceptions::DataOut::ExcInvalidNumberOfNames (names.size(),
+                                                        dof_handler.get_fe().n_components()));
 
   const std::vector<DataComponentInterpretation::DataComponentInterpretation> &
   data_component_interpretation
