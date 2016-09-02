@@ -44,12 +44,9 @@
 
 #include <deal.II/base/index_set.h>
 
-namespace
-{
 #include <deal.II/distributed/p4est_wrappers.h>
-}
-
 #include <iostream>
+#include <queue>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -91,11 +88,12 @@ namespace FETools
     Assert(u2.size()==dof2.n_dofs(),
            ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
 
+
+    const IndexSet u2_elements = u2.locally_owned_elements();
 #ifdef DEBUG
     const IndexSet &dof1_local_dofs = dof1.locally_owned_dofs();
     const IndexSet &dof2_local_dofs = dof2.locally_owned_dofs();
     const IndexSet u1_elements = u1.locally_owned_elements();
-    const IndexSet u2_elements = u2.locally_owned_elements();
     Assert(u1_elements == dof1_local_dofs,
            ExcMessage("The provided vector and DoF handler should have the same"
                       " index sets."));
@@ -198,8 +196,13 @@ namespace FETools
 
           for (unsigned int i=0; i<dofs_per_cell2; ++i)
             {
-              u2(dofs[i])+=u2_local(i);
-              touch_count(dofs[i]) += 1;
+              // if dof is locally_owned
+              const types::global_dof_index gdi = dofs[i];
+              if (u2_elements.is_element(gdi))
+                {
+                  u2(dofs[i])+=u2_local(i);
+                  touch_count(dofs[i]) += 1;
+                }
             }
         }
     // cell1 is at the end, so should
@@ -301,8 +304,6 @@ namespace FETools
           cell->set_dof_values(u1_int_local, u1_interpolated);
         }
 
-    // if we work on a parallel PETSc vector
-    // we have to finish the work
     u1_interpolated.compress(VectorOperation::insert);
   }
 
@@ -1000,6 +1001,10 @@ namespace FETools
       // a vector of all cells this process has
       // computed or received data
       std::vector<CellData>  available_cells;
+
+      // stores the indices of dofs on more refined ghosted cells along
+      // with the maximum level
+      std::map<types::global_dof_index, int> dofs_on_refined_neighbors;
     };
 
     template <>
@@ -1016,9 +1021,9 @@ namespace FETools
       {}
 
       template <class InVector,class OutVector>
-      void extrapolate_parallel (const InVector &u2_relevant,
-                                 const DoFHandler<1,1> &dof2,
-                                 OutVector &u2)
+      void extrapolate_parallel (const InVector &/*u2_relevant*/,
+                                 const DoFHandler<1,1> &/*dof2*/,
+                                 OutVector &/*u2*/)
       {}
     };
 
@@ -1036,9 +1041,9 @@ namespace FETools
       {}
 
       template <class InVector,class OutVector>
-      void extrapolate_parallel (const InVector &u2_relevant,
-                                 const DoFHandler<1,2> &dof2,
-                                 OutVector &u2)
+      void extrapolate_parallel (const InVector &/*u2_relevant*/,
+                                 const DoFHandler<1,2> &/*dof2*/,
+                                 OutVector &/*u2*/)
       {}
     };
 
@@ -1056,9 +1061,9 @@ namespace FETools
       {}
 
       template <class InVector,class OutVector>
-      void extrapolate_parallel (const InVector &u2_relevant,
-                                 const DoFHandler<1,3> &dof2,
-                                 OutVector &u2)
+      void extrapolate_parallel (const InVector &/*u2_relevant*/,
+                                 const DoFHandler<1,3> &/*dof2*/,
+                                 OutVector &/*u2*/)
       {}
     };
 
@@ -1115,7 +1120,7 @@ namespace FETools
                                  &p4est_cell,
                                  dealii::internal::p4est::functions<dim>::quadrant_compare);
 
-      // this cell and none of it's children belongs to us
+      // if neither this cell nor one of it's children belongs to us, don't do anything
       if (idx == -1 && (dealii::internal::p4est::functions<dim>::
                         quadrant_overlaps_tree (const_cast<typename dealii::internal::p4est::types<dim>::tree *>(&tree),
                                                 &p4est_cell)
@@ -1129,9 +1134,7 @@ namespace FETools
         {
           Assert (dealii_cell->has_children (), ExcInternalError ());
 
-          // check if at least one
-          // child is locally owned
-          // on our process
+          // check if at least one child is locally owned on our process
           for (unsigned int child_n=0; child_n<dealii_cell->n_children(); ++child_n)
             if (dealii_cell->child(child_n)->active())
               if (dealii_cell->child(child_n)->is_locally_owned())
@@ -1170,26 +1173,8 @@ namespace FETools
                                            u2);
         }
 
-      // traverse recursively over this tree
-      if (p4est_has_children)
-        {
-          typename dealii::internal::p4est::types<dim>::quadrant
-          p4est_child[GeometryInfo<dim>::max_children_per_cell];
 
-          dealii::internal::p4est::init_quadrant_children<dim> (p4est_cell,
-                                                                p4est_child);
 
-          for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
-            {
-              interpolate_recursively (forest,
-                                       tree,
-                                       tree_index,
-                                       dealii_cell->child(c),
-                                       p4est_child[c],
-                                       u1,
-                                       u2);
-            }
-        }
     }
 
 
@@ -1261,7 +1246,7 @@ namespace FETools
                   // this is a cell this process needs
                   // data from another process
 
-                  // check if this cell
+                  // check if this cell is
                   // available from other
                   // computed patches
                   CellData  cell_data;
@@ -1291,7 +1276,7 @@ namespace FETools
               else
                 {
                   // get the values from the present child, if necessary by
-                  // interpolation itself either from its own children or
+                  // interpolation either from its own children or
                   // by interpolating from the finite element on an active
                   // child to the finite element space requested here
                   get_interpolated_dof_values (forest,
@@ -1311,10 +1296,13 @@ namespace FETools
 
                   // and add up or set them in the output vector
                   for (unsigned int i=0; i<dofs_per_cell; ++i)
-                    if (restriction_is_additive[i])
-                      interpolated_values(i) += tmp2(i);
-                    else if (tmp2(i) != number())
-                      interpolated_values(i) = tmp2(i);
+                    if (tmp2(i) != number())
+                      {
+                        if (restriction_is_additive[i])
+                          interpolated_values(i) += tmp2(i);
+                        else
+                          interpolated_values(i) = tmp2(i);
+                      }
                 }
             }
 
@@ -1334,20 +1322,27 @@ namespace FETools
                                      const Vector<number>                                          &local_values,
                                      OutVector                                                     &u)
     {
+      const FiniteElement<dim,spacedim> &fe            = dealii_cell->get_dof_handler().get_fe();
+      const unsigned int                 dofs_per_cell = fe.dofs_per_cell;
+
       if (!dealii_cell->has_children ())
         {
           if (dealii_cell->is_locally_owned ())
             {
-              // if this is one of our cells,
-              // set dof values in output vector
-              dealii_cell->set_dof_values (local_values, u);
+              std::vector<types::global_dof_index> indices(dofs_per_cell);
+              dealii_cell->get_dof_indices(indices);
+              for (unsigned int j=0; j<dofs_per_cell; ++j)
+                {
+                  // don't set this dof if there is a more refined ghosted neighbor setting this dof.
+                  const bool on_refined_neighbor
+                    = (dofs_on_refined_neighbors.find(indices[j])!=dofs_on_refined_neighbors.end());
+                  if (!(on_refined_neighbor && dofs_on_refined_neighbors[indices[j]]>dealii_cell->level()))
+                      u(indices[j]) = local_values(j);
+                }
             }
         }
       else
         {
-          const FiniteElement<dim,spacedim> &fe            = dealii_cell->get_dof_handler().get_fe();
-          const unsigned int                 dofs_per_cell = fe.dofs_per_cell;
-
           Assert (&fe != 0,
                   ExcNotInitialized());
           Assert (local_values.size() == dofs_per_cell,
@@ -1446,7 +1441,7 @@ namespace FETools
                                  &p4est_cell,
                                  dealii::internal::p4est::functions<dim>::quadrant_compare);
 
-      // this cell and none of it's children belongs to us
+      // if neither this cell nor one of it's children belongs to us, don't do anything
       if (idx == -1 && (dealii::internal::p4est::functions<dim>::
                         quadrant_overlaps_tree (const_cast<typename dealii::internal::p4est::types<dim>::tree *>(&tree),
                                                 &p4est_cell)
@@ -1539,8 +1534,8 @@ namespace FETools
                                           &p4est_child[c])
                   == false)
                 {
-                  // this is a cell this process needs
-                  // data from another process
+                  // this is a cell for which this process
+                  // needs data from another process
                   // so add the cell to the list
                   add_new_need (forest,
                                 tree_index,
@@ -1646,7 +1641,7 @@ namespace FETools
                                  &p4est_cell,
                                  dealii::internal::p4est::functions<dim>::quadrant_compare);
 
-      // this cell and none of it's children belongs to us
+      // if neither this cell nor one one of it's children belongs to us, don't do anything
       if (idx == -1 && (dealii::internal::p4est::functions<dim>::
                         quadrant_overlaps_tree (const_cast<typename dealii::internal::p4est::types<dim>::tree *>(&tree),
                                                 &p4est_cell)
@@ -1859,31 +1854,31 @@ namespace FETools
           computed_cells,
           cells_to_send;
 
-      // compute all the cells needed
-      // from other processes
+      // Compute all the cells needed
+      // from other processes.
       compute_needs (dof2, cells_we_need);
 
-      // send the cells needed to there
-      // owners and receive a list other
-      // processes need from us
+      // Send the cells needed to there
+      // owners and receive a list of cells other
+      // processes need from us.
       send_cells (cells_we_need, received_needs);
 
-      // the list of received needs can contain
-      // some cells more than ones because different
-      // processes may need data from the same cell
-      // to compute data only ones, generate a vector
-      // with unique entries and distribute computed
+      // The list of received needs can contain
+      // some cells more than once because different
+      // processes may need data from the same cell.
+      // To compute data only once, generate a vector
+      // with unique entries and distribute the computed
       // data afterwards back to a vector with correct
-      // receivers to send the data back
-      // computing cell_data can cause some new cells
-      // needed for this ones
-      // if a cell is computed send it back to
+      // receivers.
+      // Computing cell_data can cause a need for
+      // data from some new cells.
+      // If a cell is computed, send it back to
       // their senders, maybe receive new needs and
       // compute again, do not wait that all cells
-      // are computed or all needs are collected,
-      // otherwise we can run into a deadlock if
+      // are computed or all needs are collected.
+      // Otherwise we can run into a deadlock if
       // a cell needed from another process,
-      // itself needs some data from us
+      // itself needs some data from us.
       unsigned int ready = 0;
       do
         {
@@ -1953,11 +1948,45 @@ namespace FETools
         = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
            (&dof2.get_tria()));
 
-      Assert (tr != 0, ExcMessage ("Exrapolate in parallel only works for parallel distributed triangulations!"));
+      Assert (tr != 0,
+              ExcMessage ("Extrapolate in parallel only works for parallel distributed triangulations!"));
 
       communicator = tr->get_communicator ();
 
       compute_all_non_local_data (dof2, u2_relevant);
+
+      // exclude dofs on more refined ghosted cells
+      const FiniteElement<dim,spacedim> &fe  = dof2.get_fe();
+      const unsigned int dofs_per_face = fe.dofs_per_face;
+      if (dofs_per_face > 0)
+        {
+          const unsigned int dofs_per_cell = fe.dofs_per_cell;
+          std::vector<types::global_dof_index> indices (dofs_per_cell);
+          typename DoFHandler<dim,spacedim>::active_cell_iterator
+          cell=dof2.begin_active(),
+          endc=dof2.end();
+          for (; cell!=endc; ++cell)
+            if (cell->is_ghost())
+              {
+                cell->get_dof_indices(indices);
+                for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+                  if (!cell->at_boundary(face))
+                    {
+                      const typename DoFHandler<dim,spacedim>::cell_iterator neighbor = cell->neighbor(face);
+                      if (neighbor->level() != cell->level())
+                          for (unsigned int i=0; i<dofs_per_face; ++i)
+                            {
+                              const types::global_dof_index index = indices[fe.face_to_cell_index(i,face)];;
+                              const bool index_stored
+                                = (dofs_on_refined_neighbors.find(index)!=dofs_on_refined_neighbors.end());
+                              const unsigned int level = index_stored ?
+                                                         std::max(cell->level(), dofs_on_refined_neighbors[index]) :
+                                                         cell->level();
+                              dofs_on_refined_neighbors[index] = level;
+                            }
+                    }
+              }
+        }
 
       // after all dof values on
       // not owned patch cells
@@ -1965,30 +1994,80 @@ namespace FETools
       // the interpolation
       u2 = 0;
 
-      typename DoFHandler<dim,spacedim>::cell_iterator
-      cell=dof2.begin(0),
-      endc=dof2.end(0);
-      for (; cell!=endc; ++cell)
+      struct WorkPackage
+      {
+        const typename dealii::internal::p4est::types<dim>::forest    forest;
+        const typename dealii::internal::p4est::types<dim>::tree      tree;
+        const typename dealii::internal::p4est::types<dim>::locidx    tree_index;
+        const typename DoFHandler<dim,spacedim>::cell_iterator        dealii_cell;
+        const typename dealii::internal::p4est::types<dim>::quadrant  p4est_cell;
+
+        WorkPackage(const typename dealii::internal::p4est::types<dim>::forest    &forest_,
+                    const typename dealii::internal::p4est::types<dim>::tree      &tree_,
+                    const typename dealii::internal::p4est::types<dim>::locidx    &tree_index_,
+                    const typename DoFHandler<dim,spacedim>::cell_iterator        &dealii_cell_,
+                    const typename dealii::internal::p4est::types<dim>::quadrant  &p4est_cell_)
+          :
+          forest(forest_),
+          tree(tree_),
+          tree_index(tree_index_),
+          dealii_cell(dealii_cell_),
+          p4est_cell(p4est_cell_)
+        {}
+      };
+
+      std::queue<WorkPackage> queue;
+      {
+        typename DoFHandler<dim,spacedim>::cell_iterator
+        cell=dof2.begin(0),
+        endc=dof2.end(0);
+        for (; cell!=endc; ++cell)
+          {
+            if (dealii::internal::p4est::tree_exists_locally<dim> (tr->parallel_forest,
+                                                                   tr->coarse_cell_to_p4est_tree_permutation[cell->index()])
+                == false)
+              continue;
+
+            typename dealii::internal::p4est::types<dim>::quadrant p4est_coarse_cell;
+            const unsigned int tree_index = tr->coarse_cell_to_p4est_tree_permutation[cell->index()];
+            typename dealii::internal::p4est::types<dim>::tree *tree = tr->init_tree(cell->index());
+
+            dealii::internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
+
+            const WorkPackage data (*tr->parallel_forest, *tree,tree_index,cell,p4est_coarse_cell);
+
+            queue.push(data);
+          }
+      }
+
+      while (!queue.empty())
         {
-          if (dealii::internal::p4est::tree_exists_locally<dim> (tr->parallel_forest,
-                                                                 tr->coarse_cell_to_p4est_tree_permutation[cell->index()])
-              == false)
-            continue;
+          const WorkPackage &data = queue.front();
 
-          typename dealii::internal::p4est::types<dim>::quadrant p4est_coarse_cell;
-          const unsigned int tree_index = tr->coarse_cell_to_p4est_tree_permutation[cell->index()];
-          typename dealii::internal::p4est::types<dim>::tree *tree = tr->init_tree(cell->index());
+          const typename dealii::internal::p4est::types<dim>::forest    &forest = data.forest;
+          const typename dealii::internal::p4est::types<dim>::tree      &tree = data.tree;
+          const typename dealii::internal::p4est::types<dim>::locidx    &tree_index= data.tree_index;
+          const typename DoFHandler<dim,spacedim>::cell_iterator        &dealii_cell = data.dealii_cell;
+          const typename dealii::internal::p4est::types<dim>::quadrant  &p4est_cell = data.p4est_cell;
 
-          dealii::internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
+          interpolate_recursively (forest, tree, tree_index, dealii_cell, p4est_cell, u2_relevant, u2);
 
-          interpolate_recursively (*tr->parallel_forest,
-                                   *tree,
-                                   tree_index,
-                                   cell,
-                                   p4est_coarse_cell,
-                                   u2_relevant,
-                                   u2);
+          // traverse recursively over this tree
+          if (dealii_cell->has_children())
+            {
+              Assert(dealii_cell->has_children(), ExcInternalError());
+              typename dealii::internal::p4est::types<dim>::quadrant
+              p4est_child[GeometryInfo<dim>::max_children_per_cell];
+
+              dealii::internal::p4est::init_quadrant_children<dim> (p4est_cell,
+                                                                    p4est_child);
+
+              for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
+                queue.push(WorkPackage(forest, tree, tree_index, dealii_cell->child(c), p4est_child[c]));
+            }
+          queue.pop();
         }
+
 
       u2.compress(VectorOperation::insert);
     }
@@ -2112,83 +2191,55 @@ namespace FETools
 
 
 
-  // special version for PETSc
-#ifdef DEAL_II_WITH_PETSC
-  template <int dim,int spacedim>
-  void extrapolate(const DoFHandler<dim,spacedim> &dof1,
-                   const PETScWrappers::MPI::Vector &u1,
-                   const DoFHandler<dim,spacedim> &dof2,
-                   const ConstraintMatrix &constraints2,
-                   PETScWrappers::MPI::Vector &u2)
+  template <int dim, class VectorType, int spacedim>
+  void extrapolate_parallel(const DoFHandler<dim,spacedim> &dof1,
+                            const VectorType &u1,
+                            const DoFHandler<dim,spacedim> &dof2,
+                            const ConstraintMatrix &constraints2,
+                            VectorType &u2)
   {
     IndexSet  dof2_locally_owned_dofs = dof2.locally_owned_dofs();
     IndexSet  dof2_locally_relevant_dofs;
     DoFTools::extract_locally_relevant_dofs (dof2,
                                              dof2_locally_relevant_dofs);
 
-    PETScWrappers::MPI::Vector u3 (dof2_locally_owned_dofs,
-                                   u1.get_mpi_communicator ());
+    VectorType u3 (dof2_locally_owned_dofs, u1.get_mpi_communicator ());
     interpolate (dof1, u1, dof2, constraints2, u3);
-    PETScWrappers::MPI::Vector u3_relevant (dof2_locally_owned_dofs,
-                                            dof2_locally_relevant_dofs,
-                                            u1.get_mpi_communicator ());
+    VectorType u3_relevant (dof2_locally_owned_dofs,
+                            dof2_locally_relevant_dofs,
+                            u1.get_mpi_communicator ());
     u3_relevant = u3;
 
     internal::extrapolate_parallel (u3_relevant, dof2, u2);
+
+    constraints2.distribute(u2);
   }
-#endif
 
 
 
-  // special version for Trilinos
-#ifdef DEAL_II_WITH_TRILINOS
-  template <int dim,int spacedim>
-  void extrapolate(const DoFHandler<dim,spacedim> &dof1,
-                   const TrilinosWrappers::MPI::Vector &u1,
-                   const DoFHandler<dim,spacedim> &dof2,
-                   const ConstraintMatrix &constraints2,
-                   TrilinosWrappers::MPI::Vector &u2)
+  template <int dim, int spacedim, typename Number>
+  void extrapolate_parallel(const DoFHandler<dim,spacedim> &dof1,
+                            const LinearAlgebra::distributed::Vector<Number> &u1,
+                            const DoFHandler<dim,spacedim> &dof2,
+                            const ConstraintMatrix &constraints2,
+                            LinearAlgebra::distributed::Vector<Number> &u2)
   {
     IndexSet  dof2_locally_owned_dofs = dof2.locally_owned_dofs();
     IndexSet  dof2_locally_relevant_dofs;
     DoFTools::extract_locally_relevant_dofs (dof2,
                                              dof2_locally_relevant_dofs);
 
-    TrilinosWrappers::MPI::Vector u3 (dof2_locally_owned_dofs,
-                                      u1.get_mpi_communicator ());
+    LinearAlgebra::distributed::Vector<Number> u3(dof2_locally_owned_dofs,
+                                                  dof2_locally_relevant_dofs,
+                                                  u1.get_mpi_communicator ());
     interpolate (dof1, u1, dof2, constraints2, u3);
-    TrilinosWrappers::MPI::Vector u3_relevant (dof2_locally_relevant_dofs,
-                                               u1.get_mpi_communicator ());
-    u3_relevant = u3;
-
-    internal::extrapolate_parallel (u3_relevant, dof2, u2);
-  }
-#endif
-
-
-
-  // special version for LinearAlgebra::distributed::Vector
-  template <int dim,int spacedim,typename Number>
-  void extrapolate(const DoFHandler<dim,spacedim> &dof1,
-                   const parallel::distributed::Vector<Number> &u1,
-                   const DoFHandler<dim,spacedim> &dof2,
-                   const ConstraintMatrix &constraints2,
-                   parallel::distributed::Vector<Number> &u2)
-  {
-    IndexSet  dof2_locally_owned_dofs = dof2.locally_owned_dofs();
-    IndexSet  dof2_locally_relevant_dofs;
-    DoFTools::extract_locally_relevant_dofs (dof2,
-                                             dof2_locally_relevant_dofs);
-
-    LinearAlgebra::distributed::Vector<Number>  u3 (dof2_locally_owned_dofs,
-                                                    dof2_locally_relevant_dofs,
-                                                    u2.get_mpi_communicator ());
-
-    interpolate (dof1, u1, dof2, constraints2, u3);
-    u3.update_ghost_values ();
+    u3.update_ghost_values();
 
     internal::extrapolate_parallel (u3, dof2, u2);
+
+    constraints2.distribute(u2);
   }
+
 
 } // end of namespace FETools
 
