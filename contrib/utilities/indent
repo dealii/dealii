@@ -52,7 +52,7 @@ format_inst()
     cp $f $f.tmp
     sed -i.orig 's#\\{#{ //#g' $f.tmp
     sed -i.orig 's#\\}#} //#g' $f.tmp
-    astyle --quiet $f.tmp
+    astyle --options=none --quiet $f.tmp
     sed -i.orig 's#{ //#\\{#g' $f.tmp
     sed -i.orig 's#} //#\\}#g' $f.tmp
     if ! diff -q $f $f.tmp >/dev/null
