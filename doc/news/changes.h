@@ -38,6 +38,14 @@ inconvenience this causes.
 </p>
 
 <ol>
+ <li> Changed: The template parameter order in many VectorTools functions is now
+ different; this was done so that the order is the same across similar functions.
+ This will only effect code that explicitly specifies template parameters for
+ overloaded VectorTools functions (no known deal.II-based projects do this).
+ <br>
+ (David Wells, 2016/09/06)
+ </li>
+
  <li> New: There is now the possibility to store information about the
  time of an output time step within the .visit file created by
  the DataOutInterface<dim,spacedim>::write_visit_record function.
