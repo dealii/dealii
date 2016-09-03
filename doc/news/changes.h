@@ -397,6 +397,12 @@ inconvenience this causes.
  (Luca Heltai, 2016/10/01)
  </li>
 
+ <li> New: FETools::extrapolate allows for using the
+ extrapolate algorithm on parallel::distributed::Triangulations.
+ <br>
+ (Daniel Arndt, Martin Steigemann, 2016/09/28)
+ </li>
+
  <li> Improved: Some parts of mesh refinement are now parallelized.
  <br>
  (Wolfgang Bangerth, 2016/09/27)
