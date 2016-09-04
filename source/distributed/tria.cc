@@ -4801,12 +4801,11 @@ namespace parallel
     template <int dim, int spacedim>
     void
     Triangulation<dim,spacedim>::
-    copy_triangulation (const dealii::Triangulation<dim, spacedim> &old_tria)
+    copy_triangulation (const dealii::Triangulation<dim, spacedim> &other_tria)
     {
       try
         {
-          dealii::Triangulation<dim,spacedim>::
-          copy_triangulation (old_tria);
+          dealii::parallel::Triangulation<dim,spacedim>::copy_triangulation (other_tria);
         }
       catch (const typename dealii::Triangulation<dim,spacedim>::DistortedCellList &)
         {
@@ -4820,26 +4819,23 @@ namespace parallel
       // separate)
       triangulation_has_content = true;
 
-      Assert (old_tria.n_levels() == 1,
+      Assert (other_tria.n_levels() == 1,
               ExcMessage ("Parallel distributed triangulations can only be copied, "
                           "if they are not refined!"));
 
       if (const dealii::parallel::distributed::Triangulation<dim,spacedim> *
-          old_tria_x = dynamic_cast<const dealii::parallel::distributed::Triangulation<dim,spacedim> *>(&old_tria))
+          other_tria_x = dynamic_cast<const dealii::parallel::distributed::Triangulation<dim,spacedim> *>(&other_tria))
         {
-          Assert (!old_tria_x->refinement_in_progress,
+          Assert (!other_tria_x->refinement_in_progress,
                   ExcMessage ("Parallel distributed triangulations can only "
                               "be copied, if no refinement is in progress!"));
 
-          // duplicate MPI communicator, stored in the base class
-          dealii::parallel::Triangulation<dim,spacedim>::copy_triangulation (old_tria);
+          coarse_cell_to_p4est_tree_permutation = other_tria_x->coarse_cell_to_p4est_tree_permutation;
+          p4est_tree_to_coarse_cell_permutation = other_tria_x->p4est_tree_to_coarse_cell_permutation;
+          attached_data_size = other_tria_x->attached_data_size;
+          n_attached_datas   = other_tria_x->n_attached_datas;
 
-          coarse_cell_to_p4est_tree_permutation = old_tria_x->coarse_cell_to_p4est_tree_permutation;
-          p4est_tree_to_coarse_cell_permutation = old_tria_x->p4est_tree_to_coarse_cell_permutation;
-          attached_data_size = old_tria_x->attached_data_size;
-          n_attached_datas   = old_tria_x->n_attached_datas;
-
-          settings           = old_tria_x->settings;
+          settings           = other_tria_x->settings;
         }
       else
         {

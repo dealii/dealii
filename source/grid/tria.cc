@@ -9276,15 +9276,15 @@ Triangulation<dim, spacedim>::get_manifold_ids () const
 template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::
-copy_triangulation (const Triangulation<dim, spacedim> &old_tria)
+copy_triangulation (const Triangulation<dim, spacedim> &other_tria)
 {
   Assert ((vertices.size() == 0) &&
           (levels.size () == 0) &&
           (faces == NULL),
           ExcTriangulationNotEmpty(vertices.size(), levels.size()));
-  Assert ((old_tria.levels.size() != 0) &&
-          (old_tria.vertices.size() != 0) &&
-          (dim == 1 || old_tria.faces != NULL),
+  Assert ((other_tria.levels.size() != 0) &&
+          (other_tria.vertices.size() != 0) &&
+          (dim == 1 || other_tria.faces != NULL),
           ExcMessage("When calling Triangulation::copy_triangulation(), "
                      "the target triangulation must be empty but the source "
                      "triangulation (the argument to this function) must contain "
@@ -9293,42 +9293,42 @@ copy_triangulation (const Triangulation<dim, spacedim> &old_tria)
 
 
   // copy normal elements
-  vertices               = old_tria.vertices;
-  vertices_used          = old_tria.vertices_used;
-  anisotropic_refinement = old_tria.anisotropic_refinement;
-  smooth_grid            = old_tria.smooth_grid;
+  vertices               = other_tria.vertices;
+  vertices_used          = other_tria.vertices_used;
+  anisotropic_refinement = other_tria.anisotropic_refinement;
+  smooth_grid            = other_tria.smooth_grid;
 
   if (dim > 1)
-    faces.reset (new internal::Triangulation::TriaFaces<dim>(*old_tria.faces));
+    faces.reset (new internal::Triangulation::TriaFaces<dim>(*other_tria.faces));
 
   typename std::map<types::manifold_id,
            SmartPointer<const Manifold<dim,spacedim> , Triangulation<dim, spacedim> > >::const_iterator
-           bdry_iterator = old_tria.manifold.begin();
-  for (; bdry_iterator != old_tria.manifold.end() ; ++bdry_iterator)
+           bdry_iterator = other_tria.manifold.begin();
+  for (; bdry_iterator != other_tria.manifold.end() ; ++bdry_iterator)
     manifold[bdry_iterator->first] = bdry_iterator->second;
 
 
-  levels.reserve (old_tria.levels.size());
-  for (unsigned int level=0; level<old_tria.levels.size(); ++level)
+  levels.reserve (other_tria.levels.size());
+  for (unsigned int level=0; level<other_tria.levels.size(); ++level)
     levels.push_back (new
                       internal::Triangulation::
-                      TriaLevel<dim>(*old_tria.levels[level]));
+                      TriaLevel<dim>(*other_tria.levels[level]));
 
-  number_cache = old_tria.number_cache;
+  number_cache = other_tria.number_cache;
 
   if (dim == 1)
     {
       vertex_to_boundary_id_map_1d
       .reset(new std::map<unsigned int, types::boundary_id>
-             (*old_tria.vertex_to_boundary_id_map_1d));
+             (*other_tria.vertex_to_boundary_id_map_1d));
 
       vertex_to_manifold_id_map_1d
       .reset(new std::map<unsigned int, types::manifold_id>
-             (*old_tria.vertex_to_manifold_id_map_1d));
+             (*other_tria.vertex_to_manifold_id_map_1d));
     }
 
-  // inform those who are listening on old_tria of the copy operation
-  old_tria.signals.copy (*this);
+  // inform those who are listening on other_tria of the copy operation
+  other_tria.signals.copy (*this);
   // also inform all listeners of the current triangulation that the
   // triangulation has been created
   signals.create();

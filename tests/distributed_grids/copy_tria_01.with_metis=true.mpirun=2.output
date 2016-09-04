@@ -1,0 +1,91 @@
+
+DEAL:0:2d:: n_active_cells: 4
+
+DEAL:0:2d:: n_active_cells: 4
+ locally_owned_subdomain(): 0
+ n_locally_owned_active_cells: 2
+ n_global_active_cells: 4
+
+DEAL:0:2d:: n_active_cells: 4
+ locally_owned_subdomain(): 0
+ n_locally_owned_active_cells: 2
+ n_global_active_cells: 4
+
+DEAL:0:2d:: n_active_cells: 4
+ locally_owned_subdomain(): 0
+ n_locally_owned_active_cells: 2
+ n_global_active_cells: 4
+
+DEAL:0:2d:: n_active_cells: 4
+ locally_owned_subdomain(): 0
+ n_locally_owned_active_cells: 2
+ n_global_active_cells: 4
+
+DEAL:0:3d:: n_active_cells: 8
+
+DEAL:0:3d:: n_active_cells: 8
+ locally_owned_subdomain(): 0
+ n_locally_owned_active_cells: 4
+ n_global_active_cells: 8
+
+DEAL:0:3d:: n_active_cells: 8
+ locally_owned_subdomain(): 0
+ n_locally_owned_active_cells: 4
+ n_global_active_cells: 8
+
+DEAL:0:3d:: n_active_cells: 8
+ locally_owned_subdomain(): 0
+ n_locally_owned_active_cells: 4
+ n_global_active_cells: 8
+
+DEAL:0:3d:: n_active_cells: 8
+ locally_owned_subdomain(): 0
+ n_locally_owned_active_cells: 4
+ n_global_active_cells: 8
+
+
+DEAL:1:2d:: n_active_cells: 4
+
+DEAL:1:2d:: n_active_cells: 4
+ locally_owned_subdomain(): 1
+ n_locally_owned_active_cells: 2
+ n_global_active_cells: 4
+
+DEAL:1:2d:: n_active_cells: 4
+ locally_owned_subdomain(): 1
+ n_locally_owned_active_cells: 2
+ n_global_active_cells: 4
+
+DEAL:1:2d:: n_active_cells: 4
+ locally_owned_subdomain(): 1
+ n_locally_owned_active_cells: 2
+ n_global_active_cells: 4
+
+DEAL:1:2d:: n_active_cells: 4
+ locally_owned_subdomain(): 1
+ n_locally_owned_active_cells: 2
+ n_global_active_cells: 4
+
+DEAL:1:3d:: n_active_cells: 8
+
+DEAL:1:3d:: n_active_cells: 8
+ locally_owned_subdomain(): 1
+ n_locally_owned_active_cells: 4
+ n_global_active_cells: 8
+
+DEAL:1:3d:: n_active_cells: 8
+ locally_owned_subdomain(): 1
+ n_locally_owned_active_cells: 4
+ n_global_active_cells: 8
+
+DEAL:1:3d:: n_active_cells: 8
+ locally_owned_subdomain(): 1
+ n_locally_owned_active_cells: 4
+ n_global_active_cells: 8
+
+DEAL:1:3d:: n_active_cells: 8
+ locally_owned_subdomain(): 1
+ n_locally_owned_active_cells: 4
+ n_global_active_cells: 8
+
+

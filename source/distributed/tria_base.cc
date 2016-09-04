@@ -57,15 +57,18 @@ namespace parallel
 
   template <int dim, int spacedim>
   void
-  Triangulation<dim,spacedim>::copy_triangulation (const dealii::Triangulation<dim, spacedim> &old_tria)
+  Triangulation<dim,spacedim>::copy_triangulation (const dealii::Triangulation<dim, spacedim> &other_tria)
   {
 #ifndef DEAL_II_WITH_MPI
     Assert(false, ExcNotImplemented());
 #endif
+    dealii::Triangulation<dim,spacedim>::copy_triangulation (other_tria);
+
     if (const dealii::parallel::Triangulation<dim,spacedim> *
-        old_tria_x = dynamic_cast<const dealii::parallel::Triangulation<dim,spacedim> *>(&old_tria))
+        other_tria_x = dynamic_cast<const dealii::parallel::Triangulation<dim,spacedim> *>(&other_tria))
       {
-        mpi_communicator = Utilities::MPI::duplicate_communicator (old_tria_x->get_communicator ());
+        MPI_Comm_free (&this->mpi_communicator);
+        mpi_communicator = Utilities::MPI::duplicate_communicator (other_tria_x->get_communicator ());
       }
   }
 

@@ -209,6 +209,12 @@ inconvenience this causes.
  haven been clarified and improved.
  <br>
  (Timo Heister, 2016/09/06)
+
+ <li> Fixed: Reimplement copy_triangulation and load in
+ dealii::parallel::shared::Triangulation, this avoids the loss of
+ partition information which causes p::s::Triangulation to be in an invalid state.
+ <br>
+ (Ce Qin, 2016/09/05)
  </li>
 
  <li> Fixed: The build system now uses -fPIC instead of -fpic

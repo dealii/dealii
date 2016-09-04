@@ -104,11 +104,34 @@ namespace parallel
        * Create a triangulation.
        *
        * This function also partitions triangulation based on the MPI
-       * communicator provided to constructor.
+       * communicator provided to the constructor.
        */
       virtual void create_triangulation (const std::vector< Point< spacedim > > &vertices,
                                          const std::vector< CellData< dim > > &cells,
                                          const SubCellData &subcelldata);
+
+      /**
+       * Copy @p other_tria to this triangulation.
+       *
+       * This function also partitions triangulation based on the MPI
+       * communicator provided to the constructor.
+       *
+       * @note This function can not be used with parallel::distributed::Triangulation,
+       * since it only stores those cells that it owns, one layer of ghost cells around
+       * the ones it locally owns, and a number of artificial cells.
+       */
+      virtual void copy_triangulation (const dealii::Triangulation<dim, spacedim> &other_tria);
+
+      /**
+       * Read the data of this object from a stream for the purpose of
+       * serialization. Throw away the previous content.
+       *
+       * This function first does the same work as in dealii::Triangulation::load,
+       * then partitions the triangulation based on the MPI communicator
+       * provided to the constructor.
+       */
+      template <class Archive>
+      void load (Archive &ar, const unsigned int version);
 
       /**
        * Return a vector of length Triangulation::n_active_cells() where each
@@ -151,6 +174,17 @@ namespace parallel
        */
       std::vector<types::subdomain_id> true_subdomain_ids_of_cells;
     };
+
+    template <int dim, int spacedim>
+    template <class Archive>
+    void
+    Triangulation<dim,spacedim>::load (Archive &ar,
+                                       const unsigned int version)
+    {
+      dealii::Triangulation<dim,spacedim>::load (ar, version);
+      partition();
+      this->update_number_cache ();
+    }
   }
 #else
 
