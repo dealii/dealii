@@ -106,8 +106,7 @@ void test ()
   // now the actual test
   DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
-  std::vector<std::string> names (dim, "displacement");
-  data_out.add_data_vector(displacements,names);
+  data_out.add_data_vector(displacements, "displacement");
 
   // output with all cells curved
   data_out.build_patches(euler,5,DataOut<dim>::curved_inner_cells);
