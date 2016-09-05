@@ -75,7 +75,7 @@ int main ()
       w[0] = 1.0-(double)i/((double)n_intermediates);
       w[1] = 1.0 - w[0];
 
-      Point<spacedim> ip = manifold.get_new_point(Quadrature<spacedim>(sp, w));
+      Point<spacedim> ip = manifold.get_new_point(sp, w);
       Tensor<1,spacedim> t1 = manifold.get_tangent_vector(ip, sp[0]);
       Tensor<1,spacedim> t2 = manifold.get_tangent_vector(ip, sp[1]);
 
@@ -95,7 +95,7 @@ int main ()
       w[1] = 1.0 - w[0];
 
       Point<spacedim> ip = manifold.
-                           pull_back(manifold.get_new_point(Quadrature<spacedim>(sp, w)));
+                           pull_back(manifold.get_new_point(sp, w));
 
       ip[0] = w[1];
 

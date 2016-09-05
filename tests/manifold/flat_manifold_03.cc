@@ -78,8 +78,7 @@ void test(unsigned int ref=1)
 
   for (unsigned int i=0; i<ps.size(); ++i)
     {
-      quad = Quadrature<spacedim>(ps[i],ws);
-      middle = manifold.get_new_point(quad);
+      middle = manifold.get_new_point(ps[i],ws);
       deallog << "P0: " << ps[i][0] << " , P1: " << ps[i][1] << " , Middle: " << middle << std::endl;
     }
 

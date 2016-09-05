@@ -289,7 +289,15 @@ public:
    * the base class for a detailed description of what this function does.
    */
   virtual Point<spacedim>
-  get_new_point(const Quadrature<spacedim> &quad) const;
+  get_new_point(const Quadrature<spacedim> &quad) const DEAL_II_DEPRECATED;
+
+  /**
+   * Compute new points on the CylindricalManifold. See the documentation of
+   * the base class for a detailed description of what this function does.
+   */
+  virtual Point<spacedim>
+  get_new_point(const std::vector<Point<spacedim> > &surrounding_points,
+                const std::vector<double>           &weights) const;
 
 protected:
   /**

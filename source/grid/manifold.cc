@@ -60,28 +60,66 @@ Point<spacedim>
 Manifold<dim, spacedim>::
 get_new_point (const Quadrature<spacedim> &quad) const
 {
+  return get_new_point(quad.get_points(),quad.get_weights());
+}
+
+template <int dim, int spacedim>
+Point<spacedim>
+Manifold<dim, spacedim>::
+get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
+               const std::vector<double>           &weights) const
+{
   const double tol = 1e-10;
+  const unsigned int n_points = surrounding_points.size();
 
-  Assert(quad.size() > 0,
-         ExcMessage("Quadrature should have at least one point."));
+  Assert(n_points > 0,
+         ExcMessage("There should be at least one point."));
 
-  Assert(std::abs(std::accumulate(quad.get_weights().begin(), quad.get_weights().end(), 0.0)-1.0) < tol,
+  Assert(n_points == weights.size(),
+         ExcMessage("There should be as many surrounding points as weights given."));
+
+  Assert(std::abs(std::accumulate(weights.begin(), weights.end(), 0.0)-1.0) < tol,
          ExcMessage("The weights for the individual points should sum to 1!"));
 
-  QSorted<spacedim> sorted_quad(quad);
-  Point<spacedim> p = sorted_quad.point(0);
-  double w = sorted_quad.weight(0);
+  // The number of points is small (at most 26 in 3D), therefore try to minize
+  // overhead and use a very simple search of O(N^2) to find the order in which
+  // to loop over points.
+  std::vector<unsigned int> permutation(n_points);
+  std::vector<bool> found(n_points,false);
 
-  for (unsigned int i=1; i<sorted_quad.size(); ++i)
+  unsigned int min_index = numbers::invalid_unsigned_int;
+  for (unsigned int i=0; i < n_points; ++i)
+    {
+      double min_weight = std::numeric_limits<double>::max();
+
+      for (unsigned int j=0; j < n_points; ++j)
+        {
+          if ((!found[j]) && (weights[j] < min_weight))
+            {
+              min_weight = weights[j];
+              min_index = j;
+            }
+        }
+      permutation[i] = min_index;
+      found[min_index] = true;
+    }
+
+  // Now loop over points in the order of their weights. This is done to
+  // produce unique points even if get_intermediate_points is not
+  // associative (as for the SphericalManifold).
+  Point<spacedim> p = surrounding_points[permutation[0]];
+  double w = weights[permutation[0]];
+
+  for (unsigned int i=1; i<n_points; ++i)
     {
       double weight = 0.0;
-      if ( (sorted_quad.weight(i) + w) < tol )
+      if ( (weights[permutation[i]] + w) < tol )
         weight = 0.0;
       else
-        weight =  w/(sorted_quad.weight(i) + w);
+        weight =  w/(weights[permutation[i]] + w);
 
-      p = get_intermediate_point(p, sorted_quad.point(i),1.0 - weight );
-      w += sorted_quad.weight(i);
+      p = get_intermediate_point(p, surrounding_points[permutation[i]],1.0 - weight );
+      w += weights[permutation[i]];
     }
 
   return p;
@@ -274,7 +312,8 @@ Point<spacedim>
 Manifold<dim, spacedim>::
 get_new_point_on_line (const typename Triangulation<dim, spacedim>::line_iterator &line) const
 {
-  return get_new_point (get_default_quadrature(line));
+  const std::pair<std::vector<Point<spacedim> >, std::vector<double> > points_weights(get_default_points_and_weights(line));
+  return get_new_point (points_weights.first,points_weights.second);
 }
 
 
@@ -284,7 +323,8 @@ Point<spacedim>
 Manifold<dim, spacedim>::
 get_new_point_on_quad (const typename Triangulation<dim, spacedim>::quad_iterator &quad) const
 {
-  return get_new_point (get_default_quadrature(quad));
+  const std::pair<std::vector<Point<spacedim> >, std::vector<double> > points_weights(get_default_points_and_weights(quad));
+  return get_new_point (points_weights.first,points_weights.second);
 }
 
 
@@ -407,7 +447,8 @@ Point<3>
 Manifold<3,3>::
 get_new_point_on_hex (const Triangulation<3, 3>::hex_iterator &hex) const
 {
-  return get_new_point(get_default_quadrature(hex, true));
+  const std::pair<std::vector<Point<3> >, std::vector<double> > points_weights(get_default_points_and_weights(hex,true));
+  return get_new_point (points_weights.first,points_weights.second);
 }
 
 
@@ -427,7 +468,7 @@ Manifold<dim,spacedim>::get_tangent_vector(const Point<spacedim> &x1,
   w.push_back(epsilon);
   w.push_back(1.0-epsilon);
 
-  const Tensor<1,spacedim> neighbor_point = get_new_point (Quadrature<spacedim>(q, w));
+  const Tensor<1,spacedim> neighbor_point = get_new_point (q, w);
   return (neighbor_point-x1)/epsilon;
 }
 
@@ -447,11 +488,19 @@ Point<spacedim>
 FlatManifold<dim, spacedim>::
 get_new_point (const Quadrature<spacedim> &quad) const
 {
-  Assert(std::abs(std::accumulate(quad.get_weights().begin(), quad.get_weights().end(), 0.0)-1.0) < 1e-10,
-         ExcMessage("The weights for the individual points should sum to 1!"));
+  return get_new_point(quad.get_points(),quad.get_weights());
+}
 
-  const std::vector<Point<spacedim> > &surrounding_points = quad.get_points();
-  const std::vector<double> &weights = quad.get_weights();
+
+
+template <int dim, int spacedim>
+Point<spacedim>
+FlatManifold<dim, spacedim>::
+get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
+               const std::vector<double>           &weights) const
+{
+  Assert(std::abs(std::accumulate(weights.begin(), weights.end(), 0.0)-1.0) < 1e-10,
+         ExcMessage("The weights for the individual points should sum to 1!"));
 
   Tensor<1,spacedim> minP = periodicity;
 
@@ -554,15 +603,23 @@ Point<spacedim>
 ChartManifold<dim,spacedim,chartdim>::
 get_new_point (const Quadrature<spacedim> &quad) const
 {
-  const std::vector<Point<spacedim> > &surrounding_points = quad.get_points();
-  const std::vector<double> &weights = quad.get_weights();
+  return get_new_point(quad.get_points(),quad.get_weights());
+}
+
+
+
+template <int dim, int spacedim, int chartdim>
+Point<spacedim>
+ChartManifold<dim,spacedim,chartdim>::
+get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
+               const std::vector<double>           &weights) const
+{
   std::vector<Point<chartdim> > chart_points(surrounding_points.size());
 
   for (unsigned int i=0; i<surrounding_points.size(); ++i)
     chart_points[i] = pull_back(surrounding_points[i]);
 
-  const Quadrature<chartdim> chart_quad(chart_points, weights);
-  const Point<chartdim> p_chart = sub_manifold.get_new_point(chart_quad);
+  const Point<chartdim> p_chart = sub_manifold.get_new_point(chart_points,weights);
 
   return push_forward(p_chart);
 }

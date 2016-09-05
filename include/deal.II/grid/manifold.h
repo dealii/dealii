@@ -79,7 +79,54 @@ namespace Manifolds
   template <typename MeshIteratorType>
   Quadrature<MeshIteratorType::AccessorType::space_dimension>
   get_default_quadrature(const MeshIteratorType &iterator,
-                         const bool              with_laplace = false);
+                         const bool              with_laplace = false) DEAL_II_DEPRECATED;
+
+  /**
+   * Given a general mesh iterator, construct vectors of quadrature points and
+   * weights that contain the following points:
+   * - If the iterator points to a line, then the quadrature points
+   *   are the two vertices of the line. This results in a point vector
+   *   with two points.
+   * - If the iterator points to a quad, then the quadrature points
+   *   are the vertices and line mid-points. This results in a point vector
+   *   with eight (4+4) points.
+   * - If the iterator points to a hex, then the quadrature points
+   *   are the vertices, the line mid-points, and the face mid-points.
+   *   This results in a points vector with 26 (8+12+6) points.
+   *
+   * The quadrature weights for these points are either chosen identically
+   * and equal to one over the number of quadrature points (if @p with_laplace
+   * is @p false), or in a way that gives points closer to the cell center
+   * (measured on the reference cell) a higher weight. These weights correspond
+   * to solving a Laplace equation and evaluating the solution at the quadrature
+   * points (if @p with_laplace is @p true).
+   *
+   * The function is primarily used to construct the input argument
+   * for the Manifold::get_new_point() function, which computes a new
+   * point on a manifold based on a weighted average of "surrounding"
+   * points represented by the quadrature points and weights stored in the
+   * returned pair of vectors. This function creates such an object based on
+   * the points that "surround" a cell, face, or edge, and weights
+   * are chosen in a way appropriate for computing the new "mid-point"
+   * of the object pointed to. An example of where this is necessary
+   * is for mesh refinement, where (using the 2d situation as an example)
+   * we need to first create new edge mid-points, and then a new cell-point.
+   *
+   * @param[in] iterator A mesh iterator that points to either a line, quad,
+   *   or hex.
+   * @param[in] with_laplace Whether or not to compute the quadrature weights
+   *   by solving a Laplace equation, as discussed above.
+   * @tparam MeshIteratorType An iterator type that corresponds to either
+   *   Triangulation::cell_iterator (or variants such as
+   *   Triangulation::active_cell_iterator or DoFHandler::cell_iterator) or
+   *   that is the result of statements such as
+   *   <code>cell-@>face(f)</code> or <code>cell-@>line(l)</code>.
+   */
+  template <typename MeshIteratorType>
+  std::pair<std::vector<Point<MeshIteratorType::AccessorType::space_dimension> >,
+      std::vector<double> >
+      get_default_points_and_weights(const MeshIteratorType &iterator,
+                                     const bool              with_laplace = false);
 }
 
 
@@ -103,11 +150,11 @@ namespace Manifolds
  * vertex' coordinates through the following function call:
  *   @code
  *     ...
- *     Point<spacedim> new_vertex = manifold.get_new_point (quadrature);
+ *     Point<spacedim> new_vertex = manifold.get_new_point (points,weights);
  *     ...
  *   @endcode
- * Here, @p quadrature is a Quadrature<spacedim> object, which contains a collection
- * of points in @p spacedim dimension, and a collection of weights. The points
+ * Here, @p points is a collection of points in @p spacedim dimension,
+ * and @p a collection of corresponding weights. The points
  * in this context will then be the vertices of the cell, face, or edge, and
  * the weights are typically one over the number of points when a new midpoint
  * of the cell, face, or edge is needed. Derived classes then will implement the
@@ -123,7 +170,7 @@ namespace Manifolds
  *
  *
  * @note Unlike almost all other cases in the library, we here interpret the points
- * in the quadrature object to be in real space, not on the reference cell.
+ * to be in real space, not on the reference cell.
  *
  * Manifold::get_new_point() has a default implementation that can
  * simplify this process somewhat: Internally, the function calls the
@@ -318,7 +365,28 @@ public:
    */
   virtual
   Point<spacedim>
-  get_new_point (const Quadrature<spacedim> &quad) const;
+  get_new_point (const Quadrature<spacedim> &quad) const DEAL_II_DEPRECATED;
+
+  /**
+   * Return the point which shall become the new vertex surrounded by the
+   * given points @p surrounding_points. @p weights contains appropriate
+   * weights for the surrounding points according to which the manifold
+   * determines the new point's position.
+   *
+   * In its default implementation it uses a pair-wise reduction of
+   * the points by calling the function get_intermediate_point() on the first
+   * two points, then on the resulting point and the next, until all points in
+   * the vector have been taken into account. User classes can get away by
+   * simply implementing the get_intermediate_point() function. Notice that
+   * by default the get_intermediate_point() function calls the
+   * project_to_manifold() function with the convex combination of its
+   * arguments. For simple situations you may get away by implementing
+   * only the project_to_manifold() function.
+   */
+  virtual
+  Point<spacedim>
+  get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
+                 const std::vector<double>           &weights) const;
 
   /**
    * Given a point which lies close to the given manifold, it modifies it and
@@ -589,7 +657,33 @@ public:
    */
   virtual
   Point<spacedim>
-  get_new_point(const Quadrature<spacedim> &quad) const;
+  get_new_point(const Quadrature<spacedim> &quad) const DEAL_II_DEPRECATED;
+
+  /**
+   * Let the new point be the average sum of surrounding vertices.
+   *
+   * This particular implementation constructs the weighted average of the
+   * surrounding points, and then calls internally the function
+   * project_to_manifold(). The reason why we do it this way, is to allow lazy
+   * programmers to implement only the project_to_manifold() function for their
+   * own Manifold classes which are small (or trivial) perturbations of a flat
+   * manifold. This is the case whenever the coarse mesh is a decent
+   * approximation of the manifold geometry. In this case, the middle point of
+   * a cell is close to true middle point of the manifold, and a projection
+   * may suffice.
+   *
+   * For most simple geometries, it is possible to get reasonable results by
+   * deriving your own Manifold class from FlatManifold, and write a new
+   * interface only for the project_to_manifold function. You will have good
+   * approximations also with large deformations, as long as in the coarsest
+   * mesh size you are trying to refine, the middle point is not too far from
+   * the manifold mid point, i.e., as long as the coarse mesh size is small
+   * enough.
+   */
+  virtual
+  Point<spacedim>
+  get_new_point(const std::vector<Point<spacedim> > &surrounding_points,
+                const std::vector<double>           &weights) const;
 
 
   /**
@@ -784,7 +878,16 @@ public:
    */
   virtual
   Point<spacedim>
-  get_new_point(const Quadrature<spacedim> &quad) const;
+  get_new_point(const Quadrature<spacedim> &quad) const DEAL_II_DEPRECATED;
+
+  /**
+   * Refer to the general documentation of this class and the documentation of
+   * the base class for more information.
+   */
+  virtual
+  Point<spacedim>
+  get_new_point(const std::vector<Point<spacedim> > &surrounding_points,
+                const std::vector<double>           &weights) const;
 
   /**
    * Pull back the given point in spacedim to the Euclidean chartdim
@@ -954,11 +1057,24 @@ namespace Manifolds
   get_default_quadrature(const MeshIteratorType &iterator,
                          const bool              with_laplace)
   {
+    const std::pair<std::vector<Point<MeshIteratorType::AccessorType::space_dimension> >,
+          std::vector<double> > points_and_weights = get_default_points_and_weights(iterator,
+                                                     with_laplace);
+    return Quadrature<MeshIteratorType::AccessorType::space_dimension>(points_and_weights.first,
+           points_and_weights.second);
+  }
+
+  template <typename MeshIteratorType>
+  std::pair<std::vector<Point<MeshIteratorType::AccessorType::space_dimension> >,
+      std::vector<double> >
+      get_default_points_and_weights(const MeshIteratorType &iterator,
+                                     const bool              with_laplace)
+  {
     const int spacedim = MeshIteratorType::AccessorType::space_dimension;
     const int dim = MeshIteratorType::AccessorType::structure_dimension;
 
-    std::vector<Point<spacedim> > sp;
-    std::vector<double> wp;
+    std::pair<std::vector<Point<spacedim> >,
+        std::vector<double> > points_weights;
 
 
     // note that the exact weights are chosen such as to minimize the
@@ -968,32 +1084,32 @@ namespace Manifolds
     switch (dim)
       {
       case 1:
-        sp.resize(2);
-        wp.resize(2);
-        sp[0] = iterator->vertex(0);
-        wp[0] = .5;
-        sp[1] = iterator->vertex(1);
-        wp[1] = .5;
+        points_weights.first.resize(2);
+        points_weights.second.resize(2);
+        points_weights.first[0] = iterator->vertex(0);
+        points_weights.second[0] = .5;
+        points_weights.first[1] = iterator->vertex(1);
+        points_weights.second[1] = .5;
         break;
       case 2:
-        sp.resize(8);
-        wp.resize(8);
+        points_weights.first.resize(8);
+        points_weights.second.resize(8);
 
         for (unsigned int i=0; i<4; ++i)
           {
-            sp[i] = iterator->vertex(i);
-            sp[4+i] = ( iterator->line(i)->has_children() ?
-                        iterator->line(i)->child(0)->vertex(1) :
-                        iterator->line(i)->get_manifold().get_new_point_on_line(iterator->line(i)) );
+            points_weights.first[i] = iterator->vertex(i);
+            points_weights.first[4+i] = ( iterator->line(i)->has_children() ?
+                                          iterator->line(i)->child(0)->vertex(1) :
+                                          iterator->line(i)->get_manifold().get_new_point_on_line(iterator->line(i)) );
           }
 
         if (with_laplace)
           {
-            std::fill(wp.begin(), wp.begin()+4, 1.0/16.0);
-            std::fill(wp.begin()+4, wp.end(), 3.0/16.0);
+            std::fill(points_weights.second.begin(), points_weights.second.begin()+4, 1.0/16.0);
+            std::fill(points_weights.second.begin()+4, points_weights.second.end(), 3.0/16.0);
           }
         else
-          std::fill(wp.begin(), wp.end(), 1.0/8.0);
+          std::fill(points_weights.second.begin(), points_weights.second.end(), 1.0/8.0);
         break;
       case 3:
       {
@@ -1003,9 +1119,9 @@ namespace Manifolds
           GeometryInfo<dim>::vertices_per_cell+
           GeometryInfo<dim>::lines_per_cell+
           GeometryInfo<dim>::faces_per_cell;
-        sp.resize(np);
-        wp.resize(np);
-        std::vector<Point<3> > *sp3 = reinterpret_cast<std::vector<Point<3> > *>(&sp);
+        points_weights.first.resize(np);
+        points_weights.second.resize(np);
+        std::vector<Point<3> > *sp3 = reinterpret_cast<std::vector<Point<3> > *>(&points_weights.first);
 
         unsigned int j=0;
 
@@ -1016,33 +1132,33 @@ namespace Manifolds
         for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i, ++j)
           {
             (*sp3)[j] = hex->vertex(i);
-            wp[j] = 1.0/128.0;
+            points_weights.second[j] = 1.0/128.0;
           }
         for (unsigned int i=0; i<GeometryInfo<dim>::lines_per_cell; ++i, ++j)
           {
             (*sp3)[j] = (hex->line(i)->has_children() ?
                          hex->line(i)->child(0)->vertex(1) :
                          hex->line(i)->get_manifold().get_new_point_on_line(hex->line(i)));
-            wp[j] = 7.0/192.0;
+            points_weights.second[j] = 7.0/192.0;
           }
         for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i, ++j)
           {
             (*sp3)[j] = (hex->quad(i)->has_children() ?
                          hex->quad(i)->isotropic_child(0)->vertex(3) :
                          hex->quad(i)->get_manifold().get_new_point_on_quad(hex->quad(i)));
-            wp[j] = 1.0/12.0;
+            points_weights.second[j] = 1.0/12.0;
           }
         // Overwrite the weights with 1/np if we don't want to use
         // laplace vectors.
         if (with_laplace == false)
-          std::fill(wp.begin(), wp.end(), 1.0/np);
+          std::fill(points_weights.second.begin(), points_weights.second.end(), 1.0/np);
       }
       break;
       default:
         Assert(false, ExcInternalError());
         break;
       }
-    return Quadrature<spacedim>(sp,wp);
+    return points_weights;
   }
 }
 
