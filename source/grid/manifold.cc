@@ -25,8 +25,26 @@ DEAL_II_NAMESPACE_OPEN
 
 using namespace Manifolds;
 
-/* -------------------------- Manifold --------------------- */
+// This structure is used as comparison function for std::sort when sorting
+// points according to their weight.
+struct CompareWeights
+{
+public:
+  CompareWeights(const std::vector<double> &weights)
+    :
+    compare_weights(&weights)
+  {}
 
+  bool operator() (unsigned int a, unsigned int b) const
+  {
+    return (*compare_weights)[a] < (*compare_weights)[b];
+  }
+
+private:
+  const std::vector<double> *compare_weights;
+};
+
+/* -------------------------- Manifold --------------------- */
 
 template <int dim, int spacedim>
 Manifold<dim, spacedim>::~Manifold ()
@@ -81,32 +99,18 @@ get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
   Assert(std::abs(std::accumulate(weights.begin(), weights.end(), 0.0)-1.0) < tol,
          ExcMessage("The weights for the individual points should sum to 1!"));
 
-  // The number of points is small (at most 26 in 3D), therefore try to minize
-  // overhead and use a very simple search of O(N^2) to find the order in which
-  // to loop over points.
-  std::vector<unsigned int> permutation(n_points);
-  std::vector<bool> found(n_points,false);
-
-  unsigned int min_index = numbers::invalid_unsigned_int;
-  for (unsigned int i=0; i < n_points; ++i)
-    {
-      double min_weight = std::numeric_limits<double>::max();
-
-      for (unsigned int j=0; j < n_points; ++j)
-        {
-          if ((!found[j]) && (weights[j] < min_weight))
-            {
-              min_weight = weights[j];
-              min_index = j;
-            }
-        }
-      permutation[i] = min_index;
-      found[min_index] = true;
-    }
-
-  // Now loop over points in the order of their weights. This is done to
+  // First sort points in the order of their weights. This is done to
   // produce unique points even if get_intermediate_points is not
   // associative (as for the SphericalManifold).
+  std::vector<unsigned int> permutation(n_points);
+  for (unsigned int i=0; i<n_points; ++i)
+    permutation[i] = i;
+
+  std::sort(permutation.begin(),
+            permutation.end(),
+            CompareWeights(weights));
+
+  // Now loop over points in the order of their associated weight
   Point<spacedim> p = surrounding_points[permutation[0]];
   double w = weights[permutation[0]];
 
