@@ -1553,6 +1553,11 @@ public:
   virtual void set_mesh_smoothing (const MeshSmoothing mesh_smoothing);
 
   /**
+   * Return the mesh smoothing requirements that are obeyed.
+   */
+  virtual const Triangulation<dim, spacedim>::MeshSmoothing &get_mesh_smoothing() const;
+
+  /**
    * If @p dim==spacedim, assign a boundary object to a certain part of the
    * boundary of a the triangulation. If a face with boundary number @p number
    * is refined, this object is used to find the location of new vertices on
