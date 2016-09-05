@@ -214,6 +214,7 @@ INSTALL(FILES
 
 INSTALL(FILES
   ${CMAKE_SOURCE_DIR}/doc/deal.ico
+  ${CMAKE_SOURCE_DIR}/doc/doxygen/custom.js
   DESTINATION ${DEAL_II_DOCHTML_RELDIR}/doxygen/deal.II
   COMPONENT documentation
   )
