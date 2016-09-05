@@ -183,7 +183,7 @@ namespace SparsityTools
    *
    * @param rows_per_cpu A vector containing the number of of rows per CPU for
    * determining ownership. This is typically the value returned by
-   * DoFHandler::locally_owned_dofs_per_processor.
+   * DoFHandler::n_locally_owned_dofs_per_processor.
    *
    * @param mpi_comm The MPI communicator shared between the processors that
    * participate in this operation.
