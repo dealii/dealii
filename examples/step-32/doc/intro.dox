@@ -831,8 +831,9 @@ processors busy and you won't get any additional speedup from using
 threads. For example, if your cluster nodes have 8 cores as they often have at
 the time of writing this, and if your batch scheduler puts 8 MPI processes on
 each node, then using threads doesn't make the program any
-faster. Consequently, you probably want to either configure your deal.II without threads, or set the number of threads in MPI_InitFinalize to 1 (third argument), or "export DEAL_II_NUM_THREADS=1" before running.
-That said, at
+faster. Consequently, you probably want to either configure your deal.II without
+threads, or set the number of threads in Utilities::MPI::MPI_InitFinalize to 1
+(third argument), or "export DEAL_II_NUM_THREADS=1" before running. That said, at
 the time of writing this, we only use the WorkStream class for assembling
 (parts of) linear systems, while 75% or more of the run time of the program is
 spent in the linear solvers that are not parallelized &mdash; in other words,
