@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2016-2015 by the deal.II authors
+// Copyright (C) 2014 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -548,7 +548,8 @@ template <int dim, int fe_degree>
 void test ()
 {
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD,
-                                                 dealii::Triangulation<dim>::none,parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
+                                                 Triangulation<dim>::limit_level_difference_at_vertices,
+                                                 parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
   GridGenerator::hyper_cube (tria);
   tria.refine_global(6-dim);
   const unsigned int n_runs = fe_degree == 1 ? 6-dim : 5-dim;

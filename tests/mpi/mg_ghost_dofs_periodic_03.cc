@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2015 by the deal.II authors
+// Copyright (C) 2015 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,7 +32,7 @@ void test()
 {
   Assert(dim == 2, ExcNotImplemented());
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD,
-                                                 Triangulation<dim>::none,
+                                                 Triangulation<dim>:: limit_level_difference_at_vertices,
                                                  parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
   for (unsigned int run=0; run<2; ++run)
     {

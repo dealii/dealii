@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2015 by the deal.II authors
+// Copyright (C) 2005 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -88,6 +88,7 @@ private:
 
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
+  triangulation(limit_level_difference_at_vertices),
   fe (1),
   mg_dof_handler (triangulation)
 {}

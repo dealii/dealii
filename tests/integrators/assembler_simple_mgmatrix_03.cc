@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2015 by the deal.II authors
+// Copyright (C) 2012 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,7 +62,7 @@ void test(FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
 
-  Triangulation<dim> tr;
+  Triangulation<dim> tr(Triangulation<dim>:: limit_level_difference_at_vertices);
   GridGenerator::hyper_cube(tr);
   tr.refine_global(1);
 

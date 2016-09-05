@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2015 by the deal.II authors
+// Copyright (C) 2006 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -119,7 +119,7 @@ void check_fe(FiniteElement<dim> &fe)
   deallog << fe.get_name() << std::endl;
 
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
-                                               Triangulation<dim>::none,
+                                               Triangulation<dim>::limit_level_difference_at_vertices,
                                                parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
   setup_tria(tr);
 
@@ -135,7 +135,7 @@ void check_fe(FiniteElement<dim> &fe)
   {
     // reorder
     parallel::distributed::Triangulation<dim> tr(MPI_COMM_SELF,
-                                                 Triangulation<dim>::none,
+                                                 Triangulation<dim>::limit_level_difference_at_vertices,
                                                  parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
     setup_tria(tr);
 

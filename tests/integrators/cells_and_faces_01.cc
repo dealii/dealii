@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2015 by the deal.II authors
+// Copyright (C) 2000 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -160,7 +160,7 @@ template<int dim>
 void
 test(const FiniteElement<dim> &fe)
 {
-  Triangulation<dim> tr;
+  Triangulation<dim> tr(Triangulation<dim>::limit_level_difference_at_vertices);
   DoFHandler<dim> dofs(tr);
   GridGenerator::hyper_cube(tr);
   tr.refine_global(1);

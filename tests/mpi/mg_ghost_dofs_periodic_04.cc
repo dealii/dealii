@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2015 by the deal.II authors
+// Copyright (C) 2015 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +30,7 @@ template <int dim>
 void test()
 {
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD,
-                                                 Triangulation<dim>::none,
+                                                 Triangulation<dim>:: limit_level_difference_at_vertices,
                                                  parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
   std::vector<unsigned int> subdivisions(dim);
   Point<dim> p1, p2;

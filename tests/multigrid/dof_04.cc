@@ -32,7 +32,7 @@ void check()
   // need cubic polynomials that have two dofs on lines
   FE_Q<dim> fe(3);
 
-  Triangulation<dim> tr;
+  Triangulation<dim> tr(Triangulation<dim>::limit_level_difference_at_vertices);
   if (dim > 1)
     GridGenerator::hyper_shell(tr, Point<dim>(), 0.5, 1, 12);
   else
