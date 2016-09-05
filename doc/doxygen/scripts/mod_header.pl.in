@@ -7,6 +7,7 @@ $year += 1900;
 if (m'</head>')
 {
     print '<link rel="SHORTCUT ICON" href="deal.ico"></link>', "\n";
+    print '<script type="text/javascript" src="$relpath^custom.js"></script>', "\n";
     print '<meta name="author" content="The deal.II Authors <authors@dealii.org>"></meta>', "\n";
     print '<meta name="copyright" content="Copyright (C) 1998 - ', $year, ' by the deal.II authors"></meta>', "\n";
     print '<meta name="deal.II-version" content="@DEAL_II_PACKAGE_VERSION@"></meta>', "\n";
