@@ -81,8 +81,9 @@ public:
    *
    * This routine is executed automatically with the default argument before
    * your code in main() is running (using a static constructor). It is also
-   * executed by MPI_InitFinalize. Use the appropriate argument of the
-   * constructor of MPI_InitFinalize if you have an MPI based code.
+   * executed by Utilities::MPI::MPI_InitFinalize. Use the appropriate
+   * argument of the constructor of Utilities::MPI::MPI_InitFinalize if you
+   * have an MPI based code.
    */
   static void set_thread_limit (const unsigned int max_threads = numbers::invalid_unsigned_int);
 
