@@ -505,8 +505,8 @@ public:
    */
   DeclException4 (ExcWrongNumberOfDataEntries,
                   std::string, int, std::string, int,
-                  << "Column <" << arg1 << "> has got " << arg2
-                  << " rows, but Column <" << arg3 << "> has got " << arg4 << ".");
+                  << "Column <" << arg1 << "> has " << arg2
+                  << " rows, but Column <" << arg3 << "> has " << arg4 << " rows.");
 
   /**
    * Exception

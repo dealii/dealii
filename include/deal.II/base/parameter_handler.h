@@ -1939,14 +1939,14 @@ public:
    */
   DeclException1 (ExcEntryAlreadyExists,
                   std::string,
-                  << "The following entry already exists: " << arg1);
+                  << "The following entry already exists: " << arg1 << ".");
   /**
    * Exception
    */
   DeclException2 (ExcValueDoesNotMatchPattern,
                   std::string, std::string,
                   << "The string <" << arg1
-                  << "> does not match the given pattern <" << arg2 << ">");
+                  << "> does not match the given pattern <" << arg2 << ">.");
   /**
    * Exception
    */
@@ -1958,7 +1958,7 @@ public:
    */
   DeclException1 (ExcEntryUndeclared,
                   std::string,
-                  << "You can't ask for entry <" << arg1 << "> you have not yet declared");
+                  << "You can't ask for entry <" << arg1 << "> you have not yet declared.");
   //@}
 private:
   /**
