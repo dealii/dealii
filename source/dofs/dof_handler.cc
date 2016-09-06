@@ -1156,7 +1156,8 @@ void DoFHandler<dim, spacedim>::distribute_mg_dofs (const FiniteElement<dim, spa
   (void)old_fe;
   Assert(old_fe == &fe, ExcMessage("You are required to use the same FE for level and active DoFs!") );
 
-  Assert((tria->get_mesh_smoothing() & Triangulation<dim, spacedim>::limit_level_difference_at_vertices)==true,
+  Assert(((tria->get_mesh_smoothing() & Triangulation<dim, spacedim>::limit_level_difference_at_vertices)
+          != Triangulation<dim, spacedim>::none),
          ExcMessage("The mesh smoothing requirement 'limit_level_difference_at_vertices' has to be set for using multigrid!"));
 
   clear_mg_space();
