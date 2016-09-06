@@ -510,6 +510,15 @@ public:
   /**
    * Exception
    */
+  DeclException3 (ExcInvalidVertexIndexGmsh,
+                  int, int, int,
+                  << "While creating cell " << arg1
+                  << " (which is numbered as " << arg2
+                  << " in the input file), you are referencing a vertex with index " << arg3
+                  << " but no vertex with this index has been described in the input file.");
+  /**
+   * Exception
+   */
   DeclException0 (ExcInvalidDBMeshFormat);
   /**
    * Exception
