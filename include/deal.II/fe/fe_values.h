@@ -2539,13 +2539,12 @@ public:
    */
   DeclException1 (ExcAccessToUninitializedField,
                   char *,
-                  << ("You are requesting information from an FEValues/FEFaceValues/FESubfaceValues "
-                      "object for which this kind of information has not been computed. What "
-                      "information these objects compute is determined by the update_* flags you "
-                      "pass to the constructor. Here, the operation you are attempting requires "
-                      "the <")
-                  << arg1
-                  << "> flag to be set, but it was apparently not specified upon construction.");
+                  << "You are requesting information from an FEValues/FEFaceValues/FESubfaceValues "
+                  << "object for which this kind of information has not been computed. What "
+                  << "information these objects compute is determined by the update_* flags you "
+                  << "pass to the constructor. Here, the operation you are attempting requires "
+                  << "the <" << arg1 << "> flag to be set, but it was apparently not specified "
+                  << "upon construction.");
   /**
    * @todo Document this
    *

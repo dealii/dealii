@@ -639,7 +639,7 @@ namespace StandardExceptions
                   << "value is a finite number (as opposed to plus or minus infinity, or "
                   << "NaN/Not a Number). In the current function, we encountered a number "
                   << "that is not finite (its value is " << arg1 << " and therefore "
-                  << "violates the current assertion.\n\n"
+                  << "violates the current assertion).\n\n"
                   << "This may be due to the fact that some operation in this function "
                   << "created such a value, or because one of the arguments you passed "
                   << "to the function already had this value from some previous "
@@ -682,7 +682,7 @@ namespace StandardExceptions
    */
   DeclException1 (ExcMemoryLeak, int,
                   << "Destroying memory handler while " << arg1
-                  << " objects are still allocated");
+                  << " objects are still allocated.");
 
   /**
    * An error occurred reading or writing a file.
@@ -718,7 +718,7 @@ namespace StandardExceptions
    */
   DeclException1 (ExcFileNotOpen,
                   char *,
-                  << "Could not open file " << arg1);
+                  << "Could not open file " << arg1 << ".");
 
   /**
    * Exception denoting a part of the library or application program that has
@@ -883,7 +883,7 @@ namespace StandardExceptions
    */
   DeclException2 (ExcDimensionMismatch,
                   std::size_t, std::size_t,
-                  << "Dimension " << arg1 << " not equal to " << arg2);
+                  << "Dimension " << arg1 << " not equal to " << arg2 << ".");
 
   /**
    * The first dimension should be either equal to the second or the third,
@@ -892,7 +892,7 @@ namespace StandardExceptions
   DeclException3 (ExcDimensionMismatch2,
                   int, int, int,
                   << "Dimension " << arg1 << " neither equal to " << arg2
-                  << " nor to " << arg3);
+                  << " nor to " << arg3 << ".");
 
   /**
    * This exception indicates that an index is not within the expected range.
@@ -923,7 +923,7 @@ namespace StandardExceptions
    * For example, it may be that you are trying to access an element of a
    * vector which does not exist.
    *
-   * The constructor takes three <tt>int</tt> arguments, namely
+   * The constructor takes three arguments, namely
    * <ol>
    * <li> the violating index
    * <li> the lower bound
@@ -952,7 +952,7 @@ namespace StandardExceptions
   DeclException2 (ExcLowerRange,
                   int, int,
                   << "Number " << arg1 << " must be larger than or equal "
-                  << arg2 << ").");
+                  << arg2 << ".");
 
   /**
    * A generic exception definition for the ExcLowerRange above.
@@ -970,7 +970,7 @@ namespace StandardExceptions
   DeclException2 (ExcNotMultiple,
                   int, int,
                   << "Division " << arg1 << " by " << arg2
-                  << " has remainder different from zero");
+                  << " has remainder different from zero.");
 
   /**
    * This exception is thrown if the iterator you access has corrupted data.

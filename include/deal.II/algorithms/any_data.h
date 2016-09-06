@@ -178,14 +178,14 @@ public:
                  char *, char *,
                  << "The requested type " << arg1
                  << " and the stored type " << arg2
-                 << " must coincide");
+                 << " must coincide.");
 
   /**
    * Exception indicating that a function expected a vector to have a certain
    * name, but we store a different name in that position.
    */
   DeclException2(ExcNameMismatch, int, std::string,
-                 << "Name at position " << arg1 << " is not equal to " << arg2);
+                 << "Name at position " << arg1 << " is not equal to " << arg2 << ".");
 private:
   /// The stored data
   std::vector<boost::any> data;

@@ -204,6 +204,13 @@ inconvenience this causes.
 
 <ol>
 
+ <li> Improved: the doxygen documentation now contains nicely formatted
+ boxes containing the text message of each exception. Several messages
+ haven been clarified and improved.
+ <br>
+ (Timo Heister, 2016/09/06)
+ </li>
+
  <li> Fixed: The build system now uses -fPIC instead of -fpic
  <br>
  (Matthias Maier, 2016/08/31)

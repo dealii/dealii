@@ -177,7 +177,7 @@ public:
                  std::string,
                  << "The class "
                  << arg1
-                 << " must be registered before referring it in PathSearch");
+                 << " must be registered before referring it in PathSearch.");
   /**
    * The PathSearch class could not find a file with this name in its path
    * list.
@@ -185,9 +185,8 @@ public:
    */
   DeclException2(ExcFileNotFound,
                  std::string, std::string,
-                 << "The file \"" << arg1
-                 << "\" was not found in the path for files of class "
-                 << arg2);
+                 << "The file \"" << arg1 << "\" was not found in the path for "
+                 << "files of class " << arg2 << ".");
 
 private:
   /**

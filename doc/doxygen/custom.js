@@ -3,6 +3,7 @@ $( document ).ready( function() {
     $('.doxygen-generated-exception-message').each(function(i, obj) {
 	var s = $(this).html();
 	s=s.replace(/\\n|std::endl/g,"<br/>");
+	s=s.replace(/\\"/g,"'");
 	s=s.replace(/"|&lt;&lt;/g,"");
 	s=s.replace(/arg1/g,"<i>arg1</i>");
 	s=s.replace(/arg2/g,"<i>arg2</i>");

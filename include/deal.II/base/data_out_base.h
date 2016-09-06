@@ -1872,7 +1872,7 @@ namespace DataOutBase
   DeclException1 (ExcErrorOpeningTecplotFile,
                   char *,
                   << "There was an error opening Tecplot file " << arg1
-                  << " for output");
+                  << " for output.");
 
   //@}
 }

@@ -1579,7 +1579,7 @@ namespace GridTools
    */
   DeclException1 (ExcScalingFactorNotPositive,
                   double,
-                  << "The scaling factor must be positive, but is " << arg1);
+                  << "The scaling factor must be positive, but it is " << arg1 << ".");
   /**
    * Exception
    */
@@ -1604,8 +1604,8 @@ namespace GridTools
    */
   DeclException1 (ExcVertexNotUsed,
                   unsigned int,
-                  << "The given vertex " << arg1
-                  << " is not used in the given triangulation");
+                  << "The given vertex with index " << arg1
+                  << " is not used in the given triangulation.");
 
 
   /*@}*/
