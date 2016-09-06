@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2015 by the deal.II authors
+// Copyright (C) 1999 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1348,7 +1348,8 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
         material id.
       */
 
-      in >> dummy          // ELM-NUMBER
+      unsigned int elm_number;
+      in >> elm_number     // ELM-NUMBER
          >> cell_type;     // ELM-TYPE
 
       switch (gmsh_file_format)
@@ -1430,7 +1431,8 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
             {
               AssertThrow (vertex_indices.find (cells.back().vertices[i]) !=
                            vertex_indices.end(),
-                           ExcInvalidVertexIndex(cell, cells.back().vertices[i]));
+                           ExcInvalidVertexIndexGmsh(cell, elm_number,
+                                                     cells.back().vertices[i]));
 
               // vertex with this index exists
               cells.back().vertices[i] = vertex_indices[cells.back().vertices[i]];
