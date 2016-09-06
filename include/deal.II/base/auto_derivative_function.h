@@ -204,10 +204,6 @@ public:
   DifferenceFormula
   get_formula_of_order (const unsigned int ord);
 
-  /**
-   * Exception.
-   */
-  DeclException0(ExcInvalidFormula);
 
 private:
 
