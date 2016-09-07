@@ -47,7 +47,7 @@ void check_fe(FiniteElement<dim> &fe, ComponentMask &component_mask)
 {
   deallog << fe.get_name() << std::endl;
 
-  Triangulation<dim> tr;
+  Triangulation<dim> tr(Triangulation<dim>::limit_level_difference_at_vertices);
   GridGenerator::hyper_cube(tr);
   tr.refine_global(1);
 

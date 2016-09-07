@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2015 by the deal.II authors
+// Copyright (C) 2013 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -385,6 +385,7 @@ namespace Step39
   template <int dim>
   InteriorPenaltyProblem<dim>::InteriorPenaltyProblem(const FiniteElement<dim> &fe)
     :
+    triangulation(Triangulation<dim>::limit_level_difference_at_vertices),
     mapping(1),
     fe(fe),
     dof_handler(triangulation),

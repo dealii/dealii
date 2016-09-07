@@ -32,7 +32,7 @@ void check()
   // need cubic polynomials that have two dofs on lines
   FE_Q<dim> fe(3);
 
-  parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD, Triangulation<dim>::none,
+  parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD, Triangulation<dim>::limit_level_difference_at_vertices,
                                                parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
   GridGenerator::hyper_shell(tr, Point<dim>(), 0.5, 1, 12);
   tr.refine_global(1);

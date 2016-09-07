@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2015 by the deal.II authors
+// Copyright (C) 2012 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -395,6 +395,7 @@ namespace Step37
   template <int dim>
   LaplaceProblem<dim>::LaplaceProblem ()
     :
+    triangulation (Triangulation<dim>::limit_level_difference_at_vertices),
     fe (degree_finite_element),
     dof_handler (triangulation)
   {}

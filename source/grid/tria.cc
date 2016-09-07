@@ -9075,6 +9075,15 @@ Triangulation<dim, spacedim>::set_mesh_smoothing(const MeshSmoothing mesh_smooth
 
 
 template <int dim, int spacedim>
+const typename Triangulation<dim, spacedim>::MeshSmoothing &
+Triangulation<dim,spacedim>::get_mesh_smoothing() const
+{
+  return smooth_grid;
+}
+
+
+
+template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::set_boundary (const types::manifold_id m_number,
                                             const Boundary<dim, spacedim> &boundary_object)
@@ -11831,6 +11840,7 @@ Triangulation<dim,spacedim>::get_triangulation () const
 }
 
 
+
 template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::add_periodicity
@@ -11846,6 +11856,8 @@ Triangulation<dim, spacedim>::add_periodicity
   update_periodic_face_map();
 }
 
+
+
 template <int dim, int spacedim>
 const typename std::map<std::pair<typename Triangulation<dim, spacedim>::cell_iterator, unsigned int>,
       std::pair<std::pair<typename Triangulation<dim, spacedim>::cell_iterator, unsigned int>, std::bitset<3> > > &
@@ -11853,6 +11865,7 @@ const typename std::map<std::pair<typename Triangulation<dim, spacedim>::cell_it
 {
   return periodic_face_map;
 }
+
 
 
 template <int dim, int spacedim>

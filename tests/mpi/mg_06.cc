@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2015 by the deal.II authors
+// Copyright (C) 2009 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -87,7 +87,7 @@ void test()
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
-                                               Triangulation<dim>::none,
+                                               Triangulation<dim>:: limit_level_difference_at_vertices,
                                                parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
   GridGenerator::hyper_cube_slit(tr,-1,1);
   tr.refine_global(2);

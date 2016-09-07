@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2015 by the deal.II authors
+// Copyright (C) 2000 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -71,7 +71,7 @@ void check (const FiniteElement<dim> &fe, const unsigned int selected_block)
 {
   deallog << fe.get_name() << std::endl;
 
-  Triangulation<dim> tr;
+  Triangulation<dim> tr(Triangulation<dim>::limit_level_difference_at_vertices);
   std::vector<unsigned int> subdivisions (dim, 1);
   subdivisions[0] = 2;
 

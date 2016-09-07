@@ -414,6 +414,9 @@ namespace parallel
        * the kinds of smoothing operations that can be applied.
        *
        * @param settings See the description of the Settings enumerator.
+       * Providing <code>construct_multigrid_hierarchy</code> enforces
+       * <code>Triangulation::limit_level_difference_at_vertices</code>
+       * for smooth_grid.
        *
        * @note This class does not currently support the
        * <code>check_for_distorted_cells</code> argument provided by the base

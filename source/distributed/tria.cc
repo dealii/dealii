@@ -2151,9 +2151,14 @@ namespace parallel
                    const typename dealii::Triangulation<dim,spacedim>::MeshSmoothing smooth_grid,
                    const Settings settings_)
       :
-      // do not check for distorted cells
+      // Do not check for distorted cells.
+      // For multigrid, we need limit_level_difference_at_vertices
+      // to make sure the transfer operators only need to consider two levels.
       dealii::parallel::Triangulation<dim,spacedim>
       (mpi_communicator,
+       (settings_ & construct_multigrid_hierarchy) ?
+       static_cast<typename dealii::Triangulation<dim,spacedim>::MeshSmoothing>
+       (smooth_grid | Triangulation<dim,spacedim>::limit_level_difference_at_vertices) :
        smooth_grid,
        false),
       settings(settings_),
@@ -3380,9 +3385,11 @@ namespace parallel
       // We will refine manually to match the p4est further down, which
       // obeys a level difference of 2 at each vertex (see the balance call
       // to p4est). We can disable this here so we store fewer artificial
-      // cells (in some cases). For geometric multigrid it turns out that
+      // cells (in some cases).
+      // For geometric multigrid it turns out that
       // we will miss level cells at shared vertices if we ignore this.
-      // See tests/mpi/mg_06.
+      // See tests/mpi/mg_06. In particular, the flag is still necessary
+      // even though we force it for the original smooth_grid in the constructor.
       if (settings & construct_multigrid_hierarchy)
         this->smooth_grid = dealii::Triangulation<dim,spacedim>::limit_level_difference_at_vertices;
       else

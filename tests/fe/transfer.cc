@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2015 by the deal.II authors
+// Copyright (C) 1998 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,12 +79,12 @@ main()
   deallog << std::setprecision(7);
   deallog.threshold_double(1.e-10);
 
-  Triangulation<2> tr2;
+  Triangulation<2> tr2(Triangulation<2>::limit_level_difference_at_vertices);
 
   GridGenerator::hyper_cube(tr2, -1., 1.);
   tr2.refine_global(2);
 
-  Triangulation<3> tr3;
+  Triangulation<3> tr3(Triangulation<3>::limit_level_difference_at_vertices);
 
   GridGenerator::hyper_cube(tr3, -1., 1.);
   tr3.refine_global(3);

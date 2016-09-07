@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2015 by the deal.II authors
+// Copyright (C) 2009 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -136,7 +136,8 @@ template <int dim>
 void test_global_refinement(
   void (*test_block_list)(const Triangulation<dim> &tr, const FiniteElement<dim> &fe))
 {
-  Triangulation<dim> trc, trl;
+  Triangulation<dim> trc(Triangulation<dim>::limit_level_difference_at_vertices);
+  Triangulation<dim> trl(Triangulation<dim>::limit_level_difference_at_vertices);
   GridGenerator::hyper_cube(trc);
   trc.refine_global(2);
   GridGenerator::hyper_L(trl);
