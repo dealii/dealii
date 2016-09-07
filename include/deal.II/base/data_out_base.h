@@ -2474,6 +2474,15 @@ protected:
   get_vector_data_ranges () const;
 
   /**
+   * Validate that the names of the datasets returned by get_dataset_names() and
+   * get_vector_data_ranges() are valid. This currently consists of checking
+   * that names are not used more than once. If an invalid state is encountered,
+   * an Assert() will be triggered in debug mode.
+   */
+  void validate_dataset_names () const;
+
+
+  /**
    * The default number of subdivisions for patches. This is filled by
    * parse_parameters() and should be obeyed by build_patches() in derived
    * classes.

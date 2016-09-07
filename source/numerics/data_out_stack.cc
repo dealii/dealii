@@ -246,6 +246,8 @@ void DataOutStack<dim,spacedim,DoFHandlerType>::build_patches (const unsigned in
   Assert (dof_handler != 0,
           Exceptions::DataOut::ExcNoDoFHandlerSelected());
 
+  this->validate_dataset_names();
+
   const unsigned int n_components   = dof_handler->get_fe().n_components();
   const unsigned int n_datasets     = dof_data.size() * n_components +
                                       cell_data.size();
