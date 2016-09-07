@@ -27,8 +27,9 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * A finite element, which is the trace of FE_Q elements, that is a tensor
  * product of polynomials on the faces, undefined in the interior of the cells
- * and continuous. The basis functions on the faces are from
- * Polynomials::LagrangeEquidistant
+ * and continuous. The basis functions on the faces are formed by a tensor
+ * product of 1D Lagrange polynomials with equidistant points up to degree 2
+ * and Gauss-Lobatto points starting from degree 3.
  *
  * This finite element is the trace space of FE_Q on the faces.
  *
@@ -37,9 +38,6 @@ DEAL_II_NAMESPACE_OPEN
  * polynomial. In order to make the use of FESystem simpler, FEValues objects
  * will not fail using this finite element space, but all shape function
  * values extracted will equal to zero.
- *
- * @todo Polynomials::LagrangeEquidistant should be and will be replaced by
- * Polynomials::LagrangeGaussLobatto as soon as such a polynomial set exists.
  */
 
 template <int dim, int spacedim=dim>
