@@ -57,6 +57,19 @@ template <int dim>
 void
 FunctionDerivative<dim>::set_formula (typename AutoDerivativeFunction<dim>::DifferenceFormula form)
 {
+  // go through all known formulas, reject ones we don't know about
+  // and don't handle in the member functions of this class
+  switch (form)
+    {
+    case AutoDerivativeFunction<dim>::Euler:
+    case AutoDerivativeFunction<dim>::UpwindEuler:
+    case AutoDerivativeFunction<dim>::FourthOrder:
+      break;
+    default:
+      Assert(false, ExcMessage("The argument passed to this function does not "
+                               "match any known difference formula."));
+    }
+
   formula = form;
 }
 
@@ -91,7 +104,7 @@ FunctionDerivative<dim>::value (const Point<dim>   &p,
       return (-f.value(p+2*incr[0], component) + 8*f.value(p+incr[0], component)
               -8*f.value(p-incr[0], component) + f.value(p-2*incr[0], component))/(12*h);
     default:
-      Assert(false, ExcInvalidFormula());
+      Assert(false, ExcNotImplemented());
     }
   return 0.;
 }
@@ -134,7 +147,7 @@ FunctionDerivative<dim>::vector_value (
       result/=(12.*h);
       return;
     default:
-      Assert(false, ExcInvalidFormula());
+      Assert(false, ExcNotImplemented());
     }
 }
 
@@ -200,7 +213,7 @@ FunctionDerivative<dim>::value_list (const std::vector<Point<dim> > &points,
         values[i] = (values[i] - 8.*aux[i])/(12*h);
       return;
     default:
-      Assert(false, ExcInvalidFormula());
+      Assert(false, ExcNotImplemented());
     }
 }
 

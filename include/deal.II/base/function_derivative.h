@@ -101,16 +101,6 @@ public:
    */
   std::size_t memory_consumption () const;
 
-  /**
-   * @addtogroup Exceptions
-   * @{
-   */
-
-  /**
-   * Exception.
-   */
-  DeclException0(ExcInvalidFormula);
-  //@}
 private:
   /**
    * Function for differentiation.
