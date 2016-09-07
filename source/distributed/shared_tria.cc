@@ -22,6 +22,7 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/distributed/shared_tria.h>
+#include <deal.II/distributed/tria.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -130,6 +131,19 @@ namespace parallel
           // cells
           AssertThrow (false, ExcInternalError());
         }
+      partition();
+      this->update_number_cache ();
+    }
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::
+    copy_triangulation (const dealii::Triangulation<dim, spacedim> &other_tria)
+    {
+      Assert ((dynamic_cast<const dealii::parallel::distributed::Triangulation<dim,spacedim> *>(&other_tria) == NULL),
+              ExcMessage("Cannot use this function on parallel::distributed::Triangulation."));
+
+      dealii::parallel::Triangulation<dim,spacedim>::copy_triangulation (other_tria);
       partition();
       this->update_number_cache ();
     }

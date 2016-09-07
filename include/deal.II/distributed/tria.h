@@ -452,7 +452,7 @@ namespace parallel
       /**
        * Implementation of the same function as in the base class.
        */
-      virtual void copy_triangulation (const dealii::Triangulation<dim, spacedim> &old_tria);
+      virtual void copy_triangulation (const dealii::Triangulation<dim, spacedim> &other_tria);
 
       /**
        * Create a triangulation as documented in the base class.

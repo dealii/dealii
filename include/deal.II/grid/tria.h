@@ -1729,7 +1729,7 @@ public:
   std::vector<types::manifold_id> get_manifold_ids() const;
 
   /**
-   * Copy @p old_tria to this triangulation. This operation is not cheap, so
+   * Copy @p other_tria to this triangulation. This operation is not cheap, so
    * you should be careful with using this. We do not implement this function
    * as a copy constructor, since it makes it easier to maintain collections
    * of triangulations if you can assign them values later on.
@@ -1745,7 +1745,7 @@ public:
    * The function is made @p virtual since some derived classes might want to
    * disable or extend the functionality of this function.
    *
-   * @note Calling this function triggers the 'copy' signal on old_tria, i.e.
+   * @note Calling this function triggers the 'copy' signal on other_tria, i.e.
    * the triangulation being copied <i>from</i>.  It also triggers the
    * 'create' signal of the current triangulation. See the section on signals
    * in the general documentation for more information.
@@ -1755,7 +1755,7 @@ public:
    * how the old triangulation changes, not how any triangulation it may be
    * copied to changes.
    */
-  virtual void copy_triangulation (const Triangulation<dim, spacedim> &old_tria);
+  virtual void copy_triangulation (const Triangulation<dim, spacedim> &other_tria);
 
   /**
    * Create a triangulation from a list of vertices and a list of cells, each

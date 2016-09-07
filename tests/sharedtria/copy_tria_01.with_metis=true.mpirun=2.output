@@ -1,0 +1,51 @@
+
+DEAL:0:2d:: n_active_cells: 16
+
+DEAL:0:2d:: n_active_cells: 16
+ locally_owned_subdomain(): 0
+ n_locally_owned_active_cells: 8
+ n_global_active_cells: 16
+
+DEAL:0:2d:: n_active_cells: 16
+ locally_owned_subdomain(): 0
+ n_locally_owned_active_cells: 8
+ n_global_active_cells: 16
+
+DEAL:0:3d:: n_active_cells: 64
+
+DEAL:0:3d:: n_active_cells: 64
+ locally_owned_subdomain(): 0
+ n_locally_owned_active_cells: 32
+ n_global_active_cells: 64
+
+DEAL:0:3d:: n_active_cells: 64
+ locally_owned_subdomain(): 0
+ n_locally_owned_active_cells: 32
+ n_global_active_cells: 64
+
+
+DEAL:1:2d:: n_active_cells: 16
+
+DEAL:1:2d:: n_active_cells: 16
+ locally_owned_subdomain(): 1
+ n_locally_owned_active_cells: 8
+ n_global_active_cells: 16
+
+DEAL:1:2d:: n_active_cells: 16
+ locally_owned_subdomain(): 1
+ n_locally_owned_active_cells: 8
+ n_global_active_cells: 16
+
+DEAL:1:3d:: n_active_cells: 64
+
+DEAL:1:3d:: n_active_cells: 64
+ locally_owned_subdomain(): 1
+ n_locally_owned_active_cells: 32
+ n_global_active_cells: 64
+
+DEAL:1:3d:: n_active_cells: 64
+ locally_owned_subdomain(): 1
+ n_locally_owned_active_cells: 32
+ n_global_active_cells: 64
+
+
