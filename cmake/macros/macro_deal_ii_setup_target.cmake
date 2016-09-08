@@ -38,12 +38,16 @@
 #   "${DEAL_II_USER_DEFINITIONS};${DEAL_II_USER_DEFINITIONS_<build type>}"
 #
 # If no "DEBUG" or "RELEASE" keyword is specified after the target, the
-# current CMAKE_BUILD_TYPE is used instead: Every build type that (case
-# insensitively) matches "debug" is considered a debug build.
+# current CMAKE_BUILD_TYPE is used instead. A CMAKE_BUILD_TYPE "Debug" is
+# equivalent to the DEBUG keyword, a CMAKE_BUILD_TYPE "Release" is
+# equivalent to the RELEASE keyword.
+#
+# This macro throws a FATAL_ERROR in case no DEBUG/RELEASE keyword is set
+# and the build type is different from "Debug", or "Release".
 #
 # If the requested build type is not available (e.g. DEBUG request but
-# deal.II was compiled with release mode only), the other available will be
-# used instead.
+# deal.II was compiled with release mode only), the macro throws a
+# FATAL_ERROR.
 #
 
 MACRO(DEAL_II_SETUP_TARGET _target)
@@ -65,26 +69,32 @@ MACRO(DEAL_II_SETUP_TARGET _target)
   CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 
   #
-  # Every build type that (case insensitively) matches "debug" is
-  # considered a debug build:
-  #
-  SET(_build "RELEASE")
-  STRING(TOLOWER "${CMAKE_BUILD_TYPE}" _cmake_build_type)
-  IF("${_cmake_build_type}" MATCHES "debug")
-    SET(_build "DEBUG")
-  ENDIF()
-
-  #
-  # Override _on_debug_build if ${ARGN} is set:
+  # Set build type with the help of the specified keyword, or
+  # CMAKE_BUILD_TYPE:
   #
   IF("${ARGN}" MATCHES "^(DEBUG|RELEASE)$")
     SET(_build "${ARGN}")
-  ELSEIF(NOT "${ARGN}" STREQUAL "")
+  ELSEIF("${ARGN}" STREQUAL "")
+    IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
+      SET(_build "DEBUG")
+    ELSEIF(CMAKE_BUILD_TYPE STREQUAL "Release")
+      SET(_build "RELEASE")
+    ELSE()
+      MESSAGE(FATAL_ERROR
+        "\nDEAL_II_SETUP_TARGET cannot determine DEBUG, or RELEASE flavor "
+        "for target. CMAKE_BUILD_TYPE \"${CMAKE_BUILD_TYPE}\" is neither "
+        "equal to \"Debug\", nor \"Release\"\n"
+        "Set CMAKE_BUILD_TYPE accordingly, or use an explicit annotation: "
+        "  DEAL_II_SETUP_TARGET(<target> DEBUG|RELEASE)\n\n"
+        )
+    ENDIF()
+  ELSE()
     MESSAGE(FATAL_ERROR
-      "\nDEAL_II_SETUP_TARGET called with invalid second argument.
-      Valid arguments are (empty), DEBUG, or RELEASE\n\n"
+      "\nDEAL_II_SETUP_TARGET called with invalid second argument. "
+      "Valid arguments are (empty), DEBUG, or RELEASE\n\n"
       )
   ENDIF()
+
 
   #
   # We can only append DEBUG link flags and compile definitions if deal.II
