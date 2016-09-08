@@ -42,7 +42,6 @@ protected:
     ) : 
         m_eti(& eti)
     {
-        BOOST_ASSERT(NULL != & eti);
     }
 public:
     inline bool 
