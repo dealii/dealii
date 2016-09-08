@@ -60,8 +60,9 @@ namespace parallel
   Triangulation<dim,spacedim>::copy_triangulation (const dealii::Triangulation<dim, spacedim> &other_tria)
   {
 #ifndef DEAL_II_WITH_MPI
-    Assert(false, ExcNotImplemented());
-#endif
+    Assert(false, ExcMessage("You compiled deal.II without MPI support, for "
+                             "which parallel::Triangulation is not available."));
+#else
     dealii::Triangulation<dim,spacedim>::copy_triangulation (other_tria);
 
     if (const dealii::parallel::Triangulation<dim,spacedim> *
@@ -70,6 +71,7 @@ namespace parallel
         MPI_Comm_free (&this->mpi_communicator);
         mpi_communicator = Utilities::MPI::duplicate_communicator (other_tria_x->get_communicator ());
       }
+#endif
   }
 
 
