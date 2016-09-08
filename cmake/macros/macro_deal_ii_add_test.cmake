@@ -48,6 +48,13 @@
 #  - valid build configurations
 #  - expected test stage
 #
+# This macro expects the CMAKE_BUILD_TYPE to be either "Debug", "Release",
+# or "DebugRelease". For the first two build types, this macro will set up
+# one test (linking against the corresponding deal.II library variant). In
+# case of the build type "DebugRelease" two tests against both library
+# variants will be set up. This macro throws a FATAL_ERROR if the deal.II
+# installation does not support the requested library variant(s).
+#
 # The following variables must be set:
 #
 #   NUMDIFF_EXECUTABLE, DIFF_EXECUTABLE
@@ -117,16 +124,32 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
   ENDIF()
 
   #
-  # Determine for which build types a test should be defined. Every deal.II
-  # build type (given by the list DEAL_II_BUILD_TYPES) that is a  (case
-  # insensitive) substring of CMAKE_BUILD_TYPE:
+  # Determine for which build types a test should be defined.
   #
-  SET(_build_types "")
-  FOREACH(_build ${DEAL_II_BUILD_TYPES})
-    STRING(TOLOWER ${_build} _build_lowercase)
-    STRING(TOLOWER ${CMAKE_BUILD_TYPE} _cmake_build_type)
-    IF("${_cmake_build_type}" MATCHES "${_build_lowercase}")
-      LIST(APPEND _build_types ${_build})
+  # Every deal.II build type (given by the list DEAL_II_BUILD_TYPES) that
+  # is a (case insensitive) substring of CMAKE_BUILD_TYPE:
+  #
+  IF("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    SET(_build_types DEBUG)
+  ELSEIF("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+    SET(_build_types RELEASE)
+  ELSEIF("${CMAKE_BUILD_TYPE}" STREQUAL "DebugRelease")
+    SET(_build_types DEBUG RELEASE)
+  ELSE()
+    MESSAGE(FATAL_ERROR
+      "\nDEAL_II_ADD_TEST requires CMAKE_BUILD_TYPE to be set to "
+      "\"Debug\", \"Release\", or \"DebugRelease\"\n\n"
+      )
+  ENDIF()
+
+  FOREACH(_build ${_build_types})
+    LIST(FIND DEAL_II_BUILD_TYPES ${_build} _match)
+    IF("${_match}" STREQUAL "-1")
+      MESSAGE(FATAL_ERROR
+        "\nDEAL_II_ADD_TEST cannot set up a test with CMAKE_BUILD_TYPE "
+        "\"${CMAKE_BUILD_TYPE}\". deal.II was build with CMAKE_BUILD_TYPE "
+        "\"${DEAL_II_BUILD_TYPE}\"\n\n"
+        )
     ENDIF()
   ENDFOREACH()
 
