@@ -26,6 +26,7 @@
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_face.h>
+#include <deal.II/fe/fe_trace.h>
 #include <deal.II/fe/fe_nedelec.h>
 #include <fstream>
 
@@ -110,6 +111,8 @@ void face_check()
 {
   check1 (FE_FaceQ<dim>(2));
   check2 (FE_FaceQ<dim>(2), 0);
+  check1 (FE_TraceQ<dim>(2));
+  check2 (FE_TraceQ<dim>(2), 0);
 }
 
 

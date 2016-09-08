@@ -49,6 +49,14 @@ FE_TraceQ<dim,spacedim>::FE_TraceQ (const unsigned int degree)
 
   // Initialize face support points
   this->unit_face_support_points = fe_q.get_unit_face_support_points();
+
+  // initialize unit support points (this makes it possible to assign initial
+  // values to FE_TraceQ). Note that we simply take the points of fe_q but
+  // skip the last ones which are associated with the interior of FE_Q.
+  this->unit_support_points.resize(this->dofs_per_cell);
+  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+    this->unit_support_points[i] = fe_q.get_unit_support_points()[i];
+
   // Initialize constraint matrices
   this->interface_constraints = fe_q.constraints();
 }

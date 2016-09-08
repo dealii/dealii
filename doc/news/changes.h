@@ -513,6 +513,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: FE_TraceQ now provides unit support points.
+ <br>
+ (Martin Kronbichler, 2016/09/08)
+ </li>
+
  <li> Fixed: Fix MPI_InitFinalize by correctly initializing and destroying
    all p4est/libsc related objects by calls to sc_init(), p4est_init(), and
    sc_finalize(); compatibility with p4est versions >1.1.
