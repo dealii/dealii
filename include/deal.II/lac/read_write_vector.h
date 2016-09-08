@@ -73,6 +73,16 @@ namespace LinearAlgebra
 }
 #endif
 
+#ifdef DEAL_II_WITH_CUDA
+namespace LinearAlgebra
+{
+  namespace CUDAWrappers
+  {
+    template <typename> class Vector;
+  }
+}
+#endif
+
 namespace LinearAlgebra
 {
   /*! @addtogroup Vectors
@@ -301,6 +311,19 @@ namespace LinearAlgebra
      * performance.
      */
     void import(const EpetraWrappers::Vector &epetra_vec,
+                VectorOperation::values operation,
+                std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern =
+                  std_cxx11::shared_ptr<const CommunicationPatternBase> ());
+#endif
+
+#ifdef DEAL_II_WITH_CUDA
+    /**
+     * Import all the elements present in the vector's IndexSet from the input
+     * vector @p cuda_vec. VectorOperation::values @p operation is used to
+     * decide if the elements in @p V should be added to the current vector or
+     * replace the current elements. The last parameter is not used.
+     */
+    void import(const CUDAWrappers::Vector<Number> &cuda_vec,
                 VectorOperation::values operation,
                 std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern =
                   std_cxx11::shared_ptr<const CommunicationPatternBase> ());

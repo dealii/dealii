@@ -42,7 +42,7 @@ fi
 
 # collect all header and source files and process them in batches of 50 files
 # with up to 10 in parallel
-find tests include source examples \( -name '*.cc' -o -name '*.h' \) -print | xargs -n 50 -P 10 astyle --options=contrib/styles/astyle.rc
+find tests include source examples \( -name '*.cc' -o -name '*.h' -o -name '*.cu' -o -name '*.cuh' \) -print | xargs -n 50 -P 10 astyle --options=contrib/styles/astyle.rc
 
 # format .inst.in files. We need to replace \{ and \} because it confuses
 # astyle.

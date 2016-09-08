@@ -36,6 +36,11 @@
 #  include "Epetra_Import.h"
 #endif
 
+#ifdef DEAL_II_WITH_CUDA
+#  include <deal.II/lac/cuda_vector.h>
+#  include <cuda_runtime_api.h>
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -370,6 +375,39 @@ namespace LinearAlgebra
   {
     import(trilinos_vec.trilinos_vector(), trilinos_vec.locally_owned_elements(),
            operation, trilinos_vec.get_mpi_communicator(), communication_pattern);
+  }
+#endif
+
+
+
+#ifdef DEAL_II_WITH_CUDA
+  template <typename Number>
+  void
+  ReadWriteVector<Number>::import(const LinearAlgebra::CUDAWrappers::Vector<Number> &cuda_vec,
+                                  VectorOperation::values                            operation,
+                                  std_cxx11::shared_ptr<const CommunicationPatternBase> )
+  {
+    const unsigned int n_elements = stored_elements.n_elements();
+    if (operation == VectorOperation::insert)
+      {
+        cudaError_t error_code = cudaMemcpy(&val[0], cuda_vec.get_values(),
+                                            n_elements*sizeof(Number),
+                                            cudaMemcpyDeviceToHost);
+        AssertCuda(error_code);
+      }
+    else
+      {
+        // Copy the vector from the device to a temporary vector on the host
+        std::vector<Number> tmp(n_elements);
+        cudaError_t error_code = cudaMemcpy(&tmp[0], cuda_vec.get_values(),
+                                            n_elements*sizeof(Number),
+                                            cudaMemcpyDeviceToHost);
+        AssertCuda(error_code);
+
+        // Add the two vectors
+        for (unsigned int i=0; i<n_elements; ++i)
+          val[i] += tmp[i];
+      }
   }
 #endif
 
