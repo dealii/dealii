@@ -483,3 +483,102 @@ want, is a complex topic in itself. You can find much more on this in
 step-49, step-53, and step-54, among other tutorial programs that cover
 the issue. Information on curved domains can also be found in the
 documentation module on @ref manifold "Manifold descriptions".
+
+
+
+<h4>Playing with the regularity of the solution</h4>
+
+From a mathematical perspective, solutions of the Laplace equation
+@f[
+  -\Delta u = f
+@f]
+on smoothly bounded, convex domains are known to be smooth themselves. The exact degree
+of smoothness, i.e., the function space in which the solution lives, depends
+on how smooth exactly the boundary of the domain is, and how smooth the right
+hand side is. Some regularity of the solution may be lost at the boundary, but
+one generally has that the solution is twice more differentiable in
+compact subsets of the domain than the right hand side.
+If, in particular, the right hand side satisfies $f\in C^\infty(\Omega)$, then   
+$u \in C^\infty(\Omega_i)$ where $\Omega_i$ is any compact subset of $\Omega$
+($\Omega$ is an open domain, so a compact subset needs to keep a positive distance
+from $\partial\Omega$).
+
+The situation we chose for the current example is different, however: we look
+at an equation with a non-constant coefficient $a(\mathbf x)$:
+@f[
+  -\nabla \cdot (a \nabla u) = f.
+@f]
+Here, if $a$ is not smooth, then the solution will not be smooth either, 
+regardless of $f$. In particular, we expect that wherever $a$ is discontinuous
+along a line (or along a plane in 3d),
+the solution will have a kink. This is easy to see: if for example $f$
+is continuous, then $f=-\nabla \cdot (a \nabla u)$ needs to be 
+continuous. This means that $a \nabla u$ must be continuously differentiable 
+(not have a kink). Consequently, if $a$ has a discontinuity, then $\nabla u$
+must have an opposite discontinuity so that the two exactly cancel and their
+product yields a function without a discontinuity. But for $\nabla u$ to have
+a discontinuity, $u$ must have a kink. This is of course exactly what is
+happening in the current example, and easy to observe in the pictures of the
+solution.
+
+In general, if the coefficient $a(\mathbf x)$ is discontinuous along a line in 2d,
+or a plane in 3d, then the solution may have a kink, but the gradient of the
+solution will not go to infinity. That means, that the solution is at least
+still in the space $W^{1,\infty}$. On the other hand, we know that in the most
+extreme cases -- i.e., where the domain has reentrant corners, the
+right hand side only satisfies $f\in H^{-1}$, or the coefficient $a$ is only in
+$L^\infty$ -- all we can expect is that $u\in H^1$, a much larger space than
+$W^{1,\infty}$. It is not very difficult to create cases where
+the solution is in a space $H^{1+s}$ where we can get $s$ to become as small
+as we want. Such cases are often used to test adaptive finite element
+methods because the mesh will have to resolve the singularity that causes
+the solution to not be in $W^{1,\infty}$ any more. 
+
+The typical example one uses for this is called the <i>Kellogg problem</i>
+(referring to the paper "On the Poisson equation with intersecting interfaces"
+by R. B. Kellogg, Applicable Analysis, vol. 4, pp. 101-129, 1974), which
+in the commonly used form has a coefficient $a(\mathbf x)$ that has different values
+in the four quadrants of the plane (or eight different values in the octants
+of ${\mathbb R}^3$). The exact degree of regularity (the $s$ in the
+index of the Sobolev space above) depends on the values of $a(\mathbf x)$ coming
+together at the origin, and by choosing the jumps large enough, the
+regularity of the solution can be made as close as desired to $H^1$.
+
+To implement something like this, one could replace the coefficient
+function by the following (shown here only for the 2d case):
+@code
+template <int dim>
+double coefficient (const Point<dim> &p)
+{
+  if ((p[0] < 0) && (p[1] < 0))           // lower left quadrant
+    return 1;
+  else if ((p[0] >= 0) && (p[1] < 0))     // lower right quadrant
+    return 10;
+  else if ((p[0] < 0) && (p[1] >= 0))     // upper left quadrant
+    return 100;
+  else if ((p[0] >= 0) && (p[1] >= 0))    // upper right quadrant
+    return 1000;
+  else
+    {
+      Assert (false, ExcInternalError());
+      return 0;
+    }
+}
+@endcode
+(Adding the <code>Assert</code> at the end ensures that an exception
+is thrown if we ever get to that point -- which of course we shouldn't,
+but this is a good way to insure yourself: we all make mistakes by
+sometimes not thinking of all cases, for example by checking
+for <code>p[0]</code> to be less than and greater than zero,
+rather than greater-or-equal to zero, and thereby forgetting
+some cases that would otherwise lead to bugs that are awkward
+to find. The <code>return 0;</code> at the end is only there to
+avoid compiler warnings that the function does not end in a
+<code>return</code> statement -- the compiler cannot see that the
+function would never actually get to that point because of the
+preceding <code>Assert</code> statement.)
+
+By playing with such cases where four or more sectors come
+together and on which the coefficient has different values, one can
+construct cases where the solution has singularities at the
+origin. One can also see how the meshes are refined in such cases.
