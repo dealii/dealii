@@ -38,9 +38,8 @@
 #   "${DEAL_II_USER_DEFINITIONS};${DEAL_II_USER_DEFINITIONS_<build type>}"
 #
 # If no "DEBUG" or "RELEASE" keyword is specified after the target, the
-# current CMAKE_BUILD_TYPE determines which compiler and linker flags as
-# well as compile definitions to use and against which deal.II library it
-# should be linked against.
+# current CMAKE_BUILD_TYPE is used instead: Every build type that (case
+# insensitively) matches "debug" is considered a debug build.
 #
 # If the requested build type is not available (e.g. DEBUG request but
 # deal.II was compiled with release mode only), the other available will be
@@ -80,6 +79,11 @@ MACRO(DEAL_II_SETUP_TARGET _target)
   #
   IF("${ARGN}" MATCHES "^(DEBUG|RELEASE)$")
     SET(_build "${ARGN}")
+  ELSEIF(NOT "${ARGN}" STREQUAL "")
+    MESSAGE(FATAL_ERROR
+      "\nDEAL_II_SETUP_TARGET called with invalid second argument.
+      Valid arguments are (empty), DEBUG, or RELEASE\n\n"
+      )
   ENDIF()
 
   #
