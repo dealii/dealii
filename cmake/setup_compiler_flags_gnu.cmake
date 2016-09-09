@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II authors
+## Copyright (C) 2012 - 2016 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -71,6 +71,13 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Woverloaded-virtual")
 # with disabled C++11 support:
 #
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-long-long")
+
+#
+# Disable Wplacement-new that will trigger a lot of warnings
+# in the BOOST function classes that we include via the
+# BOOST signals classes:
+#
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-placement-new")
 
 #
 # Disable deprecation warnings
