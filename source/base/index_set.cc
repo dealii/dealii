@@ -512,11 +512,88 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
     }
 #endif
 
-  // Check that all the processors have a contiguous range of values. Otherwise,
-  // we risk to call different Epetra_Map on different processors and the code
-  // hangs.
+  // Find out if the IndexSet is linear
+  // If there is only one process, the IndexSet is always linear
+  const unsigned int n_ranks = Utilities::MPI::n_mpi_processes(communicator);
+  bool is_linear = (n_ranks==1);
   const bool all_contiguous = (Utilities::MPI::min (is_contiguous() ? 1 : 0, communicator) == 1);
-  if ((all_contiguous) && (!overlapping))
+  // overlapping IndexSets or non_contiguous IndexSets can't be linear
+  if ((all_contiguous) && (!overlapping) && (!is_linear))
+    {
+      is_linear = true;
+      // we know that there is only one interval
+      types::global_dof_index first_local_dof
+        = (n_elements()>0) ? *(begin_intervals()->begin()) : numbers::invalid_dof_index ;
+      types::global_dof_index last_local_dof
+        = (n_elements()>0) ? begin_intervals()->last() : numbers::invalid_dof_index;
+
+      // sent and receive the elements to the neighbors
+      const unsigned int my_rank = Utilities::MPI::this_mpi_process(communicator);
+      if (my_rank == 0)
+        {
+          types::global_dof_index first_neighbor_dof = last_local_dof;
+          MPI_Status last_send_status, first_recv_status;
+          MPI_Request last_send_request, first_recv_request;
+          MPI_Isend(&last_local_dof, 1, DEAL_II_DOF_INDEX_MPI_TYPE,
+                    my_rank+1,1,MPI_COMM_WORLD,&last_send_request);
+          MPI_Irecv(&first_neighbor_dof, 1, DEAL_II_DOF_INDEX_MPI_TYPE,
+                    my_rank+1,0,MPI_COMM_WORLD,&first_recv_request);
+          MPI_Wait(&last_send_request,&last_send_status);
+          MPI_Wait(&first_recv_request,&first_recv_status);
+          if (last_local_dof != numbers::invalid_dof_index &&
+              first_neighbor_dof !=  numbers::invalid_dof_index &&
+              last_local_dof != first_neighbor_dof+1)
+            is_linear = false;
+        }
+      else if (my_rank == n_ranks-1)
+        {
+          types::global_dof_index last_neighbor_dof = first_local_dof;
+          MPI_Status first_send_status, last_recv_status;
+          MPI_Request first_send_request, last_recv_request;
+          MPI_Isend(&first_local_dof, 1, DEAL_II_DOF_INDEX_MPI_TYPE,
+                    my_rank-1,0,MPI_COMM_WORLD,&first_send_request);
+          MPI_Irecv(&last_neighbor_dof, 1, DEAL_II_DOF_INDEX_MPI_TYPE,
+                    my_rank-1,1,MPI_COMM_WORLD,&last_recv_request);
+          MPI_Wait(&first_send_request,&first_send_status);
+          MPI_Wait(&last_recv_request,&last_recv_status);
+          if (first_local_dof != numbers::invalid_dof_index &&
+              last_neighbor_dof != numbers::invalid_dof_index &&
+              first_local_dof != last_neighbor_dof-1)
+            is_linear = false;
+        }
+      else
+        {
+          types::global_dof_index first_neighbor_dof = last_local_dof;
+          types::global_dof_index last_neighbor_dof = first_local_dof;
+          MPI_Status first_send_status, last_send_status;
+          MPI_Status first_recv_status, last_recv_status;
+          MPI_Request first_send_request, last_send_request;
+          MPI_Request first_recv_request, last_recv_request;
+          MPI_Isend(&first_local_dof, 1, DEAL_II_DOF_INDEX_MPI_TYPE,
+                    my_rank-1,0,MPI_COMM_WORLD,&first_send_request);
+          MPI_Isend(&last_local_dof, 1, DEAL_II_DOF_INDEX_MPI_TYPE,
+                    my_rank+1,1,MPI_COMM_WORLD,&last_send_request);
+          MPI_Irecv(&first_neighbor_dof, 1, DEAL_II_DOF_INDEX_MPI_TYPE,
+                    my_rank+1,0,MPI_COMM_WORLD,&first_recv_request);
+          MPI_Irecv(&last_neighbor_dof, 1, DEAL_II_DOF_INDEX_MPI_TYPE,
+                    my_rank-1,1,MPI_COMM_WORLD,&last_recv_request);
+          MPI_Wait(&first_send_request,&first_send_status);
+          MPI_Wait(&last_send_request,&last_send_status);
+          MPI_Wait(&first_recv_request,&first_recv_status);
+          MPI_Wait(&last_recv_request,&last_recv_status);
+          if (first_local_dof != numbers::invalid_dof_index &&
+              last_neighbor_dof != numbers::invalid_dof_index &&
+              first_local_dof != last_neighbor_dof-1)
+            is_linear = false;
+          if (last_local_dof != numbers::invalid_dof_index &&
+              first_neighbor_dof != numbers::invalid_dof_index &&
+              last_local_dof != first_neighbor_dof+1)
+            is_linear = false;
+        }
+    }
+  const bool all_linear = (Utilities::MPI::min (is_linear ? 1 : 0, communicator) == 1);
+
+  if (all_linear)
     return Epetra_Map (TrilinosWrappers::types::int_type(size()),
                        TrilinosWrappers::types::int_type(n_elements()),
                        0,
@@ -530,7 +607,6 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
     {
       std::vector<size_type> indices;
       fill_index_vector(indices);
-
       return Epetra_Map (TrilinosWrappers::types::int_type(-1),
                          TrilinosWrappers::types::int_type(n_elements()),
                          (n_elements() > 0
