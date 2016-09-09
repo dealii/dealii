@@ -19,6 +19,7 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/vector.h>
+#include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
@@ -615,7 +616,7 @@ namespace FETools
                                      OutVector &u1_difference)
       {
         back_interpolate(dof1, constraints1, u1, dof2, constraints2, u1_difference);
-        u1_difference.sadd(-1, u1);
+        u1_difference.sadd(-1., 1., u1);
       }
 
       // special version for Trilinos

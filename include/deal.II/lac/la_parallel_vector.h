@@ -890,7 +890,7 @@ namespace LinearAlgebra
       /**
        * Compute the mean value of all the entries in the vector.
        */
-      Number mean_value () const;
+      virtual Number mean_value () const;
 
       /**
        * $l_p$-norm of the vector. The pth root of the sum of the pth powers

@@ -352,6 +352,19 @@ namespace LinearAlgebra
 
 
 
+    double Vector::mean_value() const
+    {
+      double mean_value(0.);
+
+      int ierr = vector->MeanValue(&mean_value);
+      Assert(ierr==0, ExcTrilinosError(ierr));
+      (void) ierr;
+
+      return mean_value;
+    }
+
+
+
     double Vector::l1_norm() const
     {
       double norm(0.);

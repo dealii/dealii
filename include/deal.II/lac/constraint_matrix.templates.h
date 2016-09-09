@@ -26,6 +26,7 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
@@ -851,7 +852,12 @@ ConstraintMatrix::distribute (VectorType &vec) const
   // call compress() finally. the first case here is for the complicated case,
   // the last else is for the simple case (sequential vector)
   const IndexSet vec_owned_elements = vec.locally_owned_elements();
-  if (vec.supports_distributed_data == true)
+  if ((typeid(vec) != typeid(Vector<double>)) &&
+      (typeid(vec) != typeid(Vector<float>)) &&
+      (typeid(vec) != typeid(BlockVector<double>)) &&
+      (typeid(vec) != typeid(BlockVector<float>)) &&
+      (typeid(vec) != typeid(LinearAlgebra::Vector<double>)) &&
+      (typeid(vec) != typeid(LinearAlgebra::Vector<float>)))
     {
       // This processor owns only part of the vector. one may think that
       // every processor should be able to simply communicate those elements

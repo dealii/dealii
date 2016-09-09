@@ -129,6 +129,11 @@ namespace LinearAlgebra
     virtual void equ(const Number a, const VectorSpaceVector<Number> &V) = 0;
 
     /**
+     * Return the mean value of the element of this vector.
+     */
+    virtual value_type mean_value() const = 0;
+
+    /**
      * Return the l<sub>1</sub> norm of the vector (i.e., the sum of the
      * absolute values of all entries among all processors).
      */
@@ -165,6 +170,11 @@ namespace LinearAlgebra
     virtual Number add_and_dot(const Number a,
                                const VectorSpaceVector<Number> &V,
                                const VectorSpaceVector<Number> &W) = 0;
+
+    /**
+     * This function does nothing and only exists for backward compatibility.
+     */
+    virtual void compress(VectorOperation::values) {}
 
     /**
      * Return the global size of the vector, equal to the sum of the number of

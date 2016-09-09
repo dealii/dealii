@@ -23,6 +23,9 @@ SERIAL_VECTORS := { Vector<double>;
                     BlockVector<double>;
                     BlockVector<float>;
 
+                    LinearAlgebra::Vector<double>;
+                    LinearAlgebra::Vector<float> ;
+
                     LinearAlgebra::distributed::Vector<double>;
                     LinearAlgebra::distributed::Vector<float> ;
 
@@ -45,6 +48,9 @@ REAL_SERIAL_VECTORS := { Vector<double>;
 
                     BlockVector<double>;
                     BlockVector<float>;
+
+                    LinearAlgebra::Vector<double>;
+                    LinearAlgebra::Vector<float> ;
 
                     LinearAlgebra::distributed::Vector<double>;
                     LinearAlgebra::distributed::Vector<float> ;
