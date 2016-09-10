@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 by the deal.II authors
+// Copyright (C) 2015, 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,11 +55,15 @@ namespace parallel
     number_cache.n_locally_owned_active_cells.resize (n_subdomains);
   }
 
+
+
   template <int dim, int spacedim>
   void
-  Triangulation<dim,spacedim>::copy_triangulation (const dealii::Triangulation<dim, spacedim> &other_tria)
+  Triangulation<dim,spacedim>::
+  copy_triangulation (const dealii::Triangulation<dim, spacedim> &other_tria)
   {
 #ifndef DEAL_II_WITH_MPI
+    (void)other_tria;
     Assert(false, ExcMessage("You compiled deal.II without MPI support, for "
                              "which parallel::Triangulation is not available."));
 #else
