@@ -64,11 +64,11 @@ namespace GridRefinement
    * default value of this argument is to impose no limit on the number of
    * cells.
    *
-   * @param[in] top_fraction_of_cells The requested fraction of cells to be
-   * refined.
+   * @param[in] top_fraction_of_cells The requested fraction of active
+   * cells to be refined.
    *
-   * @param[in] bottom_fraction_of_cells The requested fraction of cells to be
-   * coarsened.
+   * @param[in] bottom_fraction_of_cells The requested fraction of
+   * active cells to be coarsened.
    *
    * @note Usually you do not need to call this function explicitly. Pass @p
    * max_n_cells to function refine_and_coarsen_fixed_number() or function
@@ -83,8 +83,8 @@ namespace GridRefinement
                                              const double        bottom_fraction_of_cells);
 
   /**
-   * This function provides a refinement strategy with predictable growth of
-   * the mesh.
+   * This function provides a refinement strategy with predictable growth in
+   * the size of the mesh by refining a given fraction of all cells.
    *
    * The function takes a vector of refinement @p criteria and two values
    * between zero and one denoting the fractions of cells to be refined and
@@ -96,31 +96,29 @@ namespace GridRefinement
    *
    * <li> Sort the cells according to descending values of @p criteria.
    *
-   * <li> Set the refinement threshold to be the criterion belonging to the
-   * cell at position @p top_fraction_of_cells times
-   * Triangulation::n_active_cells().
+   * <li> Mark the @p top_fraction_of_cells times
+   * Triangulation::n_active_cells() active cells with the largest
+   * refinement criteria for refinement.
    *
-   * <li> Set the coarsening threshold accordingly using the cell @p
-   * bottom_fraction_of_cells times Triangulation::n_active_cells() from the
-   * end of the sorted list.
-   *
-   * <li> Use these two thresholds in calls to refine() and coarsen(),
-   * respectively.
+   * <li> Mark the @p bottom_fraction_of_cells times
+   * Triangulation::n_active_cells() active cells with the smallest
+   * refinement criteria for coarsening.
    *
    * </ol>
    *
    * As an example, with no coarsening, setting @p top_fraction_of_cells to
    * 1/3 will result in approximately doubling the number of cells in two
-   * dimensions. The same effect in three dimensions is achieved by refining
-   * 1/7th of the cells. These values are good initial guesses, but should be
-   * adjusted depending on the singularity of approximated function.
-   *
-   * The sorting of criteria is not done actually, since we only need the
-   * threshold values in order to call refine() and coarsen(). The order of
-   * cells with higher and of those with lower criteria is irrelevant. Getting
-   * this value is accomplished by the @p nth_element function of the
-   * <tt>C++</tt> standard library, which takes only linear time in the number
-   * of elements, rather than <tt>N log N</tt> for sorting all values.
+   * dimensions. That is because each of these 1/3 of cells will be replaced by
+   * its four children, resulting in $4\times \frac 13 N$ cells, whereas the
+   * remaining 2/3 of cells remains untouched -- thus yielding a total of
+   * $4\times \frac 13 N + \frac 23 N = 2N$ cells.
+   * The same effect in three dimensions is achieved by refining
+   * 1/7th of the cells. These values are therefore frequently used because
+   * they ensure that the cost of computations on subsequent meshes become
+   * expensive sufficiently quickly that the fraction of time spent on
+   * the coarse meshes is not too large. On the other hand, the fractions
+   * are small enough that mesh adaptation does not refine too many cells
+   * in each step.
    *
    * @note This function only sets the coarsening and refinement flags. The
    * mesh is not changed until you call
@@ -160,11 +158,11 @@ namespace GridRefinement
    * This function provides a refinement strategy controlling the reduction of
    * the error estimate.
    *
-   * Also known as the <b>bulk criterion</b>, this function computes the
-   * thresholds for refinement and coarsening such that the @p criteria of
-   * cells getting flagged for refinement make up for a certain fraction of
-   * the total error. We explain its operation for refinement, coarsening
-   * works analogously.
+   * Also known as the <b>bulk criterion</b> or D&ouml;rfler marking,
+   * this function computes the thresholds for refinement and coarsening
+   * such that the @p criteria of cells getting flagged for refinement make
+   * up for a certain fraction of the total error. We explain its operation
+   * for refinement, coarsening works analogously.
    *
    * Let <i>c<sub>K</sub></i> be the criterion of cell <i>K</i>. Then the
    * total error estimate is computed by the formula
