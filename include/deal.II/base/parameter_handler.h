@@ -1104,7 +1104,7 @@ namespace Patterns
  * An alternative to using the hand-written input files shown above is to use
  * the graphical user interface (GUI) that accompanies this class.
  *
- * See <a href="https://github.com/dealii/parameter_gui>the parameter_gui
+ * See <a href="https://github.com/dealii/parameter_gui">the parameter_gui
  * github repository</a> for further details.
  *
  * <h3>Getting entry values out of a %ParameterHandler object</h3>
