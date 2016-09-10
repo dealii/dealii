@@ -419,7 +419,8 @@ public:
    * then this is always the case.
    *
    * Since this is an extremely common operation, the result is cached in the
-   * #cached_primitivity variable which is computed in the constructor.
+   * #cached_primitivity variable which is computed in the constructor of the
+   * derived class FiniteElement.
    */
   bool is_primitive () const;
 

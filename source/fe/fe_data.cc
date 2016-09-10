@@ -61,7 +61,12 @@ FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
                      ?
                      BlockIndices(1, dofs_per_cell)
                      :
-                     block_indices)
+                     block_indices),
+  // the following field is only set in the FiniteElement
+  // constructor by calling set_primitivity() of this base
+  // class. however, to ensure that we always have boolean
+  // values, initialize it with the safe choice
+  cached_primitivity (false)
 {
   Assert(dofs_per_object.size()==dim+1, ExcDimensionMismatch(dofs_per_object.size()-1,dim));
 }
