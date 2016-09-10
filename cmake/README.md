@@ -17,7 +17,6 @@ config
 Contains configuration templates for
 
   * the project configuration (deal.IIConfig.cmake)
-  * the legacy Make.global_options mechanism
   * the C++ template expansion mechanism (template-arguments)
 
 configure
