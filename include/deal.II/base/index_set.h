@@ -218,6 +218,15 @@ public:
   bool is_contiguous () const;
 
   /**
+   * Return whether the index set stored by this object defines a linear
+   * range, i.e., each index is contained in exactly one IndexSet,
+   * the first indices are contained in the IndexSet of the first MPI process,
+   * the second indices are contained in the IndexSet of the second MPI process
+   * and so on.
+   */
+  bool is_linear() const;
+
+  /**
    * Return the number of elements stored in this index set.
    */
   size_type n_elements () const;

@@ -522,78 +522,46 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
     {
       is_linear = true;
       // we know that there is only one interval
-      types::global_dof_index first_local_dof
-        = (n_elements()>0) ? *(begin_intervals()->begin()) : numbers::invalid_dof_index ;
-      types::global_dof_index last_local_dof
-        = (n_elements()>0) ? begin_intervals()->last() : numbers::invalid_dof_index;
+      types::global_dof_index local_dofs[2];
+      local_dofs[0] = (n_elements()>0) ? *(begin_intervals()->begin())
+                      : numbers::invalid_dof_index ;
+      local_dofs[1] = (n_elements()>0) ? begin_intervals()->last()
+                      : numbers::invalid_dof_index;
 
-      // sent and receive the elements to the neighbors
       const unsigned int my_rank = Utilities::MPI::this_mpi_process(communicator);
+      // first gather all information on process 0
+      const unsigned int gather_size = (my_rank==0)?2*n_ranks:1;
+      std::vector<types::global_dof_index> global_dofs(gather_size);
+
+      MPI_Gather(local_dofs, 2, DEAL_II_DOF_INDEX_MPI_TYPE,
+                 &(global_dofs[0]), 2, DEAL_II_DOF_INDEX_MPI_TYPE, 0,
+                 communicator);
       if (my_rank == 0)
         {
-          types::global_dof_index first_neighbor_dof = last_local_dof;
-          MPI_Status last_send_status, first_recv_status;
-          MPI_Request last_send_request, first_recv_request;
-          MPI_Isend(&last_local_dof, 1, DEAL_II_DOF_INDEX_MPI_TYPE,
-                    my_rank+1,1,MPI_COMM_WORLD,&last_send_request);
-          MPI_Irecv(&first_neighbor_dof, 1, DEAL_II_DOF_INDEX_MPI_TYPE,
-                    my_rank+1,0,MPI_COMM_WORLD,&first_recv_request);
-          MPI_Wait(&last_send_request,&last_send_status);
-          MPI_Wait(&first_recv_request,&first_recv_status);
-          if (last_local_dof != numbers::invalid_dof_index &&
-              first_neighbor_dof !=  numbers::invalid_dof_index &&
-              last_local_dof != first_neighbor_dof+1)
-            is_linear = false;
-        }
-      else if (my_rank == n_ranks-1)
-        {
-          types::global_dof_index last_neighbor_dof = first_local_dof;
-          MPI_Status first_send_status, last_recv_status;
-          MPI_Request first_send_request, last_recv_request;
-          MPI_Isend(&first_local_dof, 1, DEAL_II_DOF_INDEX_MPI_TYPE,
-                    my_rank-1,0,MPI_COMM_WORLD,&first_send_request);
-          MPI_Irecv(&last_neighbor_dof, 1, DEAL_II_DOF_INDEX_MPI_TYPE,
-                    my_rank-1,1,MPI_COMM_WORLD,&last_recv_request);
-          MPI_Wait(&first_send_request,&first_send_status);
-          MPI_Wait(&last_recv_request,&last_recv_status);
-          if (first_local_dof != numbers::invalid_dof_index &&
-              last_neighbor_dof != numbers::invalid_dof_index &&
-              first_local_dof != last_neighbor_dof-1)
-            is_linear = false;
-        }
-      else
-        {
-          types::global_dof_index first_neighbor_dof = last_local_dof;
-          types::global_dof_index last_neighbor_dof = first_local_dof;
-          MPI_Status first_send_status, last_send_status;
-          MPI_Status first_recv_status, last_recv_status;
-          MPI_Request first_send_request, last_send_request;
-          MPI_Request first_recv_request, last_recv_request;
-          MPI_Isend(&first_local_dof, 1, DEAL_II_DOF_INDEX_MPI_TYPE,
-                    my_rank-1,0,MPI_COMM_WORLD,&first_send_request);
-          MPI_Isend(&last_local_dof, 1, DEAL_II_DOF_INDEX_MPI_TYPE,
-                    my_rank+1,1,MPI_COMM_WORLD,&last_send_request);
-          MPI_Irecv(&first_neighbor_dof, 1, DEAL_II_DOF_INDEX_MPI_TYPE,
-                    my_rank+1,0,MPI_COMM_WORLD,&first_recv_request);
-          MPI_Irecv(&last_neighbor_dof, 1, DEAL_II_DOF_INDEX_MPI_TYPE,
-                    my_rank-1,1,MPI_COMM_WORLD,&last_recv_request);
-          MPI_Wait(&first_send_request,&first_send_status);
-          MPI_Wait(&last_send_request,&last_send_status);
-          MPI_Wait(&first_recv_request,&first_recv_status);
-          MPI_Wait(&last_recv_request,&last_recv_status);
-          if (first_local_dof != numbers::invalid_dof_index &&
-              last_neighbor_dof != numbers::invalid_dof_index &&
-              first_local_dof != last_neighbor_dof-1)
-            is_linear = false;
-          if (last_local_dof != numbers::invalid_dof_index &&
-              first_neighbor_dof != numbers::invalid_dof_index &&
-              last_local_dof != first_neighbor_dof+1)
-            is_linear = false;
+          // find out if the received std::vector is linear
+          types::global_dof_index old_dof = global_dofs[0], new_dof = 0;
+          types::global_dof_index index = 0;
+          while (global_dofs[index] == numbers::invalid_dof_index)
+            ++index;
+          old_dof = global_dofs[index++];
+          for (; index<global_dofs.size(); ++index)
+            {
+              new_dof = global_dofs[index];
+              if (new_dof == numbers::invalid_dof_index)
+                new_dof = old_dof;
+              else if (new_dof<=old_dof)
+                {
+                  is_linear = false;
+                  break;
+                }
+            }
         }
     }
-  const bool all_linear = (Utilities::MPI::min (is_linear ? 1 : 0, communicator) == 1);
 
-  if (all_linear)
+  // now broadcast the result
+  MPI_Bcast(&is_linear, 1, MPI::BOOL, 0, communicator);
+
+  if (is_linear)
     return Epetra_Map (TrilinosWrappers::types::int_type(size()),
                        TrilinosWrappers::types::int_type(n_elements()),
                        0,
