@@ -275,6 +275,8 @@ AnyData::try_read_ptr(const unsigned int i) const
   const type *const *p = boost::any_cast<type *>(&data[i]);
   if (p==0)
     p = boost::any_cast<const type *>(&data[i]);
+  if (p==0)
+    return 0;
   return *p;
 }
 
