@@ -218,13 +218,14 @@ public:
   bool is_contiguous () const;
 
   /**
-   * Return whether the index set stored by this object defines a linear
-   * range, i.e., each index is contained in exactly one IndexSet,
+   * Return whether the IndexSets are ascending with respect to MPI process
+   * number, i.e., each index is contained in exactly one IndexSet,
    * the first indices are contained in the IndexSet of the first MPI process,
    * the second indices are contained in the IndexSet of the second MPI process
    * and so on.
+   * In case there is only one MPI process, this is always true.
    */
-  bool is_linear() const;
+  bool is_globally_ascending() const;
 
   /**
    * Return the number of elements stored in this index set.
