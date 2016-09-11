@@ -1176,39 +1176,44 @@ namespace Patterns
  *
  * This is the code:
  *   @code
- *     #include <iostream>
- *     #include "../include/parameter_handler.h"
+ *   #include <deal.II/base/parameter_handler.h>
  *
- *     using namespace dealii;
+ *   #include <iostream>
+ *   #include <string>
  *
- *     class LinEq
+ *   using namespace dealii;
+ *   class LinearEquation
+ *   {
+ *   public:
+ *     static void declare_parameters (ParameterHandler &prm);
+ *     void get_parameters (ParameterHandler &prm);
+ *   private:
+ *     std::string method;
+ *     int         max_iterations;
+ *   };
+ *
+ *
+ *
+ *   class Problem
+ *   {
+ *   private:
+ *     LinearEquation eq1, eq2;
+ *     std::string matrix1, matrix2;
+ *     std::string outfile;
+ *   public:
+ *     static void declare_parameters (ParameterHandler &prm);
+ *     void get_parameters (ParameterHandler &prm);
+ *
+ *     void do_something ();
+ *   };
+ *
+ *
+ *
+ *   void LinearEquation::declare_parameters (ParameterHandler &prm)
+ *   {
+ *     // declare parameters for the linear solver in a subsection
+ *     prm.enter_subsection ("Linear solver");
  *     {
- *     public:
- *       static void declare_parameters (ParameterHandler &prm);
- *       void get_parameters (ParameterHandler &prm);
- *     private:
- *       std::string Method;
- *       int    MaxIterations;
- *     };
- *
- *
- *     class Problem
- *     {
- *     private:
- *       LinEq eq1, eq2;
- *       std::string Matrix1, Matrix2;
- *       std::string outfile;
- *     public:
- *       static void declare_parameters (ParameterHandler &prm);
- *       void get_parameters (ParameterHandler &prm);
- *     };
- *
- *
- *
- *     void LinEq::declare_parameters (ParameterHandler &prm)
- *     {
- *       // declare parameters for the linear solver in a subsection
- *       prm.enter_subsection ("Linear solver");
  *       prm.declare_entry ("Solver",
  *                          "CG",
  *                          Patterns::Selection("CG|BiCGStab|GMRES"),
@@ -1216,172 +1221,205 @@ namespace Patterns
  *       prm.declare_entry ("Maximum number of iterations",
  *                          "20",
  *                          Patterns::Integer());
- *       prm.leave_subsection ();
  *     }
+ *     prm.leave_subsection ();
+ *   }
  *
  *
- *     void LinEq::get_parameters (ParameterHandler &prm)
+ *
+ *   void LinearEquation::get_parameters (ParameterHandler &prm)
+ *   {
+ *     prm.enter_subsection ("Linear solver");
  *     {
- *       prm.enter_subsection ("Linear solver");
- *       Method        = prm.get ("Solver");
- *       MaxIterations = prm.get_integer ("Maximum number of iterations");
- *       prm.leave_subsection ();
- *       std::cout << "  LinEq: Method=" << Method << ", MaxIterations=" << MaxIterations << std::endl;
+ *       method         = prm.get ("Solver");
+ *       max_iterations = prm.get_integer ("Maximum number of iterations");
  *     }
+ *     prm.leave_subsection ();
+ *     std::cout << "  LinearEquation: method=" << method
+ *               << ", max_iterations=" << max_iterations
+ *               << std::endl;
+ *   }
  *
  *
  *
- *     void Problem::declare_parameters (ParameterHandler &prm)
+ *   void Problem::declare_parameters (ParameterHandler &prm)
+ *   {
+ *     // first some global parameter entries
+ *     prm.declare_entry ("Output file",
+ *                        "out",
+ *                        Patterns::Anything(),
+ *                        "Name of the output file, either relative to the present "
+ *                        "path or absolute");
+ *     prm.declare_entry ("Equation 1",
+ *                        "Laplace",
+ *                        Patterns::Anything(),
+ *                        "String identifying the equation we want to solve");
+ *     prm.declare_entry ("Equation 2",
+ *                        "Elasticity",
+ *                        Patterns::Anything());
+ *
+ *     // declare parameters for the first equation
+ *     prm.enter_subsection ("Equation 1 Settings");
  *     {
- *       // first some global parameter entries
- *       prm.declare_entry ("Output file",
- *                          "out",
- *                          Patterns::Anything(),
- *                          "Name of the output file, either relative to the present"
- *                          "path or absolute");
- *       prm.declare_entry ("Equation 1",
- *                          "Laplace",
- *                          Patterns::Anything(),
- *                          "String identifying the equation we want to solve");
- *       prm.declare_entry ("Equation 2",
- *                          "Elasticity",
- *                          Patterns::Anything());
- *
- *       // declare parameters for the first equation
- *       prm.enter_subsection ("Equation 1");
  *       prm.declare_entry ("Matrix type",
  *                          "Sparse",
  *                          Patterns::Selection("Full|Sparse|Diagonal"),
- *                          "Type of the matrix to be used, either full,"
+ *                          "Type of the matrix to be used, either full, "
  *                          "sparse, or diagonal");
- *       LinEq::declare_parameters (prm);  // for eq1
- *       prm.leave_subsection ();
+ *       LinearEquation::declare_parameters (prm);  // for eq1
+ *     }
+ *     prm.leave_subsection ();
  *
- *       // declare parameters for the second equation
- *       prm.enter_subsection ("Equation 2");
+ *     // declare parameters for the second equation
+ *     prm.enter_subsection ("Equation 2 Settings");
+ *     {
  *       prm.declare_entry ("Matrix type",
  *                          "Sparse",
  *                          Patterns::Selection("Full|Sparse|Diagonal"));
- *       LinEq::declare_parameters (prm);  // for eq2
- *       prm.leave_subsection ();
+ *       LinearEquation::declare_parameters (prm);  // for eq2
  *     }
+ *     prm.leave_subsection ();
+ *   }
  *
  *
- *     void Problem::get_parameters (ParameterHandler &prm)
+ *
+ *   void Problem::get_parameters (ParameterHandler &prm)
+ *   {
+ *     // entries of the problem class
+ *     outfile = prm.get ("Output file");
+ *     std::string equation1 = prm.get ("Equation 1"),
+ *                 equation2 = prm.get ("Equation 2");
+ *
+ *     // get parameters for the first equation
+ *     prm.enter_subsection ("Equation 1 Settings");
  *     {
- *       // entries of the problem class
- *       outfile = prm.get ("Output file");
- *
- *       std::string equation1 = prm.get ("Equation 1"),
- *              equation2 = prm.get ("Equation 2");
- *
- *       // get parameters for the first equation
- *       prm.enter_subsection ("Equation 1");
- *       Matrix1 = prm.get ("Matrix type");
+ *       matrix1 = prm.get ("Matrix type");
  *       eq1.get_parameters (prm); // for eq1
- *       prm.leave_subsection ();
- *
- *       // get parameters for the second equation
- *       prm.enter_subsection ("Equation 2");
- *       Matrix2 = prm.get ("Matrix type");
- *       eq2.get_parameters (prm); // for eq2
- *       prm.leave_subsection ();
- *
- *       std::cout << "  Problem: outfile=" << outfile << '\n'
- *                 << "           eq1="     << equation1 << ", eq2=" << equation2 << '\n'
- *                 << "           Matrix1=" << Matrix1 << ", Matrix2=" << Matrix2 << std::endl;
  *     }
+ *     prm.leave_subsection ();
  *
- *
- *
- *
- *     int main ()
+ *     // get parameters for the second equation
+ *     prm.enter_subsection ("Equation 2 Settings");
  *     {
- *       ParameterHandler prm;
- *       Problem p;
- *
- *       p.declare_parameters (prm);
- *
- *       // read input from "prmtest.prm"; giving argv[1] would also be a
- *       // good idea
- *       prm.read_input ("prmtest.prm");
- *
- *       // print parameters to std::cout as ASCII text
- *       std::cout << std::endl << std::endl;
- *       prm.print_parameters (std::cout, ParameterHandler::Text);
- *
- *       // get parameters into the program
- *       std::cout << std::endl << std::endl
- *                 << "Getting parameters:" << std::endl;
- *       p.get_parameters (prm);
- *
- *       // now run the program with these input parameters
- *       p.do_something ();
+ *       matrix2 = prm.get ("Matrix type");
+ *       eq2.get_parameters (prm); // for eq2
  *     }
+ *     prm.leave_subsection ();
+ *     std::cout << "  Problem: outfile=" << outfile << '\n'
+ *               << "           eq1="     << equation1 << ", eq2=" << equation2 << '\n'
+ *               << "           matrix1=" << matrix1 << ", matrix2=" << matrix2
+ *               << std::endl;
+ *   }
+ *
+ *
+ *
+ *   void Problem::do_something ()
+ *   {
+ *     // While this example does nothing here, at this point in the program
+ *     // all of the parameters are known so we can start doing computations.
+ *   }
+ *
+ *
+ *
+ *   int main ()
+ *   {
+ *     ParameterHandler prm;
+ *     Problem p;
+ *     p.declare_parameters (prm);
+ *     // read input from "prmtest.prm"; giving argv[1] would also be a
+ *     // good idea
+ *     prm.read_input ("prmtest.prm");
+ *     // print parameters to std::cout as ASCII text
+ *     std::cout << "\n\n";
+ *     prm.print_parameters (std::cout, ParameterHandler::Text);
+ *     // get parameters into the program
+ *     std::cout << "\n\n" << "Getting parameters:" << std::endl;
+ *     p.get_parameters (prm);
+ *     // now run the program with these input parameters
+ *     p.do_something ();
+ *   }
  *   @endcode
  *
  *
  * This is the input file (named "prmtest.prm"):
  *   @code
- *     # first declare the types of equations
- *     set Equation 1 = Poisson
- *     set Equation 2 = Navier-Stokes
+ *   # first declare the types of equations
+ *   set Equation 1 = Poisson
+ *   set Equation 2 = Stokes
  *
- *     subsection Equation 1
- *       set Matrix type = Sparse
- *       subsection Linear solver # parameters for linear solver 1
- *         set Solver                       = Gauss-Seidel
- *         set Maximum number of iterations = 40
- *       end
+ *   subsection Equation 1 Settings
+ *     set Matrix type = Sparse
+ *     subsection Linear solver # parameters for linear solver 1
+ *       set Solver                       = Gauss-Seidel
+ *       set Maximum number of iterations = 40
  *     end
+ *   end
  *
- *     subsection Equation 2
- *       set Matrix type = Full
- *       subsection Linear solver
- *         set Solver                       = CG
- *         set Maximum number of iterations = 100
- *       end
+ *   subsection Equation 2 Settings
+ *     set Matrix type = Full
+ *     subsection Linear solver
+ *       set Solver                       = CG
+ *       set Maximum number of iterations = 100
  *     end
+ *   end
  *   @endcode
  *
  * And here is the output of the program:
  *   @code
- *     Line 8:
- *         The entry value
- *             Gauss-Seidel
- *         for the entry named
- *             Solver
- *         does not match the given regular expression
- *             CG|BiCGStab|GMRES
+ *   Line <8> of file <prmtest.prm>:
+ *       The entry value
+ *           Gauss-Seidel
+ *       for the entry named
+ *           Solver
+ *       does not match the given pattern
+ *           [Selection CG|BiCGStab|GMRES ]
  *
  *
- *     Listing of Parameters
- *     ---------------------
- *       set Equation 1  = Poisson  # Laplace
- *       set Equation 2  = Navier-Stokes  # Elasticity
- *       set Output file = out
- *       subsection Equation 1
- *         set Matrix type = Sparse  # Sparse
- *         subsection Linear solver
- *           set Maximum number of iterations = 40  # 20
- *           set Solver                       = CG
- *         end
- *       end
- *       subsection Equation 2
- *         set Matrix type = Full  # Sparse
- *         subsection Linear solver
- *           set Maximum number of iterations = 100  # 20
- *           set Solver                       = CG   # CG
- *         end
- *       end
+ *   # Listing of Parameters
+ *   # ---------------------
+ *   # String identifying the equation we want to solve
+ *   set Equation 1  = Poisson # default: Laplace
+ *   set Equation 2  = Stokes  # default: Elasticity
+ *
+ *   # Name of the output file, either relative to the present path or absolute
+ *   set Output file = out
  *
  *
- *     Getting parameters:
- *       LinEq: Method=CG, MaxIterations=40
- *       LinEq: Method=CG, MaxIterations=100
- *       Problem: outfile=out
- *                eq1=Poisson, eq2=Navier-Stokes
- *                Matrix1=Sparse, Matrix2=Full
+ *   subsection Equation 1 Settings
+ *     # Type of the matrix to be used, either full, sparse, or diagonal
+ *     set Matrix type = Sparse
+ *
+ *
+ *     subsection Linear solver
+ *       set Maximum number of iterations = 40 # default: 20
+ *       # Name of a linear solver for the inner iteration
+ *       set Solver                       = CG
+ *     end
+ *
+ *   end
+ *
+ *
+ *   subsection Equation 2 Settings
+ *     set Matrix type = Full # default: Sparse
+ *
+ *
+ *     subsection Linear solver
+ *       set Maximum number of iterations = 100 # default: 20
+ *       # Name of a linear solver for the inner iteration
+ *       set Solver                       = CG
+ *     end
+ *
+ *   end
+ *
+ *
+ *
+ *
+ *   Getting parameters:
+ *     LinearEquation: method=CG, max_iterations=40
+ *     LinearEquation: method=CG, max_iterations=100
+ *     Problem: outfile=out
+ *              eq1=Poisson, eq2=Stokes
+ *              matrix1=Sparse, matrix2=Full
  *   @endcode
  *
  *
