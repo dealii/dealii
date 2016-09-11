@@ -48,7 +48,7 @@ int main ()
 
   try
     {
-      std::vector<unsigned int> block_sizes(2, 50);
+      std::vector<types::global_dof_index> block_sizes(2, 50);
       BlockVector<double> v (block_sizes);
       test (v);
     }
