@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2015 by the deal.II authors
+// Copyright (C) 1998 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -85,16 +85,14 @@ FiniteElement (const FiniteElementData<dim> &fe_data,
                       std::vector<ComponentMask> (fe_data.dofs_per_cell, nonzero_c[0])
                       :
                       nonzero_c),
-  n_nonzero_components_table (compute_n_nonzero_components(nonzero_components))
+  n_nonzero_components_table (compute_n_nonzero_components(nonzero_components)),
+  cached_primitivity (std::find_if (n_nonzero_components_table.begin(),
+                                    n_nonzero_components_table.end(),
+                                    std_cxx11::bind (std::not_equal_to<unsigned int>(),
+                                                     std_cxx11::_1,
+                                                     1U))
+                      == n_nonzero_components_table.end())
 {
-  this->set_primitivity(std::find_if (n_nonzero_components_table.begin(),
-                                      n_nonzero_components_table.end(),
-                                      std_cxx11::bind (std::not_equal_to<unsigned int>(),
-                                                       std_cxx11::_1,
-                                                       1U))
-                        == n_nonzero_components_table.end());
-
-
   Assert (restriction_is_additive_flags.size() == this->dofs_per_cell,
           ExcDimensionMismatch(restriction_is_additive_flags.size(),
                                this->dofs_per_cell));

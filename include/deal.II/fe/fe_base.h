@@ -414,17 +414,6 @@ public:
   const BlockIndices &block_indices() const;
 
   /**
-   * Return whether the entire finite element is primitive, in the sense that
-   * all its shape functions are primitive. If the finite element is scalar,
-   * then this is always the case.
-   *
-   * Since this is an extremely common operation, the result is cached in the
-   * #cached_primitivity variable which is computed in the constructor of the
-   * derived class FiniteElement.
-   */
-  bool is_primitive () const;
-
-  /**
    * Maximal polynomial degree of a shape function in a single coordinate
    * direction.
    *
@@ -444,24 +433,6 @@ public:
    * Comparison operator.
    */
   bool operator == (const FiniteElementData &) const;
-
-protected:
-
-  /**
-   * Set the primitivity of the element. This is usually done by the
-   * constructor of a derived class.  See
-   * @ref GlossPrimitive "primitive"
-   * for details.
-   */
-  void set_primitivity(const bool value);
-
-private:
-  /**
-   * Store whether all shape functions are primitive. Since finding this out
-   * is a very common operation, we cache the result, i.e. compute the value
-   * in the constructor for simpler access.
-   */
-  bool cached_primitivity;
 };
 
 
@@ -615,24 +586,6 @@ FiniteElementData<dim>::n_components () const
   return components;
 }
 
-
-
-template <int dim>
-inline
-bool
-FiniteElementData<dim>::is_primitive () const
-{
-  return cached_primitivity;
-}
-
-
-template <int dim>
-inline
-void
-FiniteElementData<dim>::set_primitivity (const bool value)
-{
-  cached_primitivity = value;
-}
 
 
 template <int dim>
