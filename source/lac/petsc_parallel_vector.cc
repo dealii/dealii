@@ -72,7 +72,7 @@ namespace PETScWrappers
       :
       communicator (communicator)
     {
-      Assert(local.is_contiguous(), ExcNotImplemented());
+      Assert(local.is_ascending_and_one_to_one(communicator), ExcNotImplemented());
 
       IndexSet ghost_set = ghost;
       ghost_set.subtract_set(local);
@@ -87,7 +87,7 @@ namespace PETScWrappers
       :
       communicator (communicator)
     {
-      Assert(local.is_contiguous(), ExcNotImplemented());
+      Assert(local.is_ascending_and_one_to_one(communicator), ExcNotImplemented());
       Vector::create_vector(local.size(), local.n_elements());
     }
 
@@ -189,7 +189,7 @@ namespace PETScWrappers
 
       communicator = comm;
 
-      Assert(local.is_contiguous(), ExcNotImplemented());
+      Assert(local.is_ascending_and_one_to_one(comm), ExcNotImplemented());
 
       IndexSet ghost_set = ghost;
       ghost_set.subtract_set(local);
@@ -211,7 +211,7 @@ namespace PETScWrappers
 
       communicator = comm;
 
-      Assert(local.is_contiguous(), ExcNotImplemented());
+      Assert(local.is_ascending_and_one_to_one(comm), ExcNotImplemented());
       Assert(local.size()>0, ExcMessage("can not create vector of size 0."));
       create_vector(local.size(), local.n_elements());
     }

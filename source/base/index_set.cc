@@ -512,11 +512,11 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
     }
 #endif
 
-  // Check that all the processors have a contiguous range of values. Otherwise,
-  // we risk to call different Epetra_Map on different processors and the code
-  // hangs.
-  const bool all_contiguous = (Utilities::MPI::min (is_contiguous() ? 1 : 0, communicator) == 1);
-  if ((all_contiguous) && (!overlapping))
+  // Find out if the IndexSet is ascending and 1:1. This correspinds to a
+  // linear EpetraMap. Overlapping IndexSets are never 1:1.
+  const bool linear = overlapping ? false : is_ascending_and_one_to_one(communicator);
+
+  if (linear)
     return Epetra_Map (TrilinosWrappers::types::int_type(size()),
                        TrilinosWrappers::types::int_type(n_elements()),
                        0,
@@ -530,7 +530,6 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
     {
       std::vector<size_type> indices;
       fill_index_vector(indices);
-
       return Epetra_Map (TrilinosWrappers::types::int_type(-1),
                          TrilinosWrappers::types::int_type(n_elements()),
                          (n_elements() > 0
@@ -547,9 +546,68 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
                         );
     }
 }
-
-
 #endif
+
+
+
+bool
+IndexSet::is_ascending_and_one_to_one (const MPI_Comm &communicator) const
+{
+  // If the sum of local elements does not add up to the total size,
+  // the IndexSet can't be complete.
+  const size_type n_global_elements
+    = Utilities::MPI::sum (n_elements(), communicator);
+  if (n_global_elements != size())
+    return false;
+
+  // Non-contiguous IndexSets can't be linear.
+  const bool all_contiguous = (Utilities::MPI::min (is_contiguous() ? 1 : 0, communicator) == 1);
+  if (!all_contiguous)
+    return false;
+
+  bool is_globally_ascending = true;
+  // we know that there is only one interval
+  types::global_dof_index first_local_dof
+    = (n_elements()>0) ? *(begin_intervals()->begin())
+      : numbers::invalid_dof_index ;
+
+  const unsigned int my_rank = Utilities::MPI::this_mpi_process(communicator);
+  const unsigned int n_ranks = Utilities::MPI::n_mpi_processes(communicator);
+  // first gather all information on process 0
+  const unsigned int gather_size = (my_rank==0)?n_ranks:1;
+  std::vector<types::global_dof_index> global_dofs(gather_size);
+
+  MPI_Gather(&first_local_dof, 1, DEAL_II_DOF_INDEX_MPI_TYPE,
+             &(global_dofs[0]), 1, DEAL_II_DOF_INDEX_MPI_TYPE, 0,
+             communicator);
+  if (my_rank == 0)
+    {
+      // find out if the received std::vector is ascending
+      types::global_dof_index old_dof = global_dofs[0], new_dof = 0;
+      types::global_dof_index index = 0;
+      while (global_dofs[index] == numbers::invalid_dof_index)
+        ++index;
+      old_dof = global_dofs[index++];
+      for (; index<global_dofs.size(); ++index)
+        {
+          new_dof = global_dofs[index];
+          if (new_dof == numbers::invalid_dof_index)
+            new_dof = old_dof;
+          else if (new_dof<=old_dof)
+            {
+              is_globally_ascending = false;
+              break;
+            }
+        }
+    }
+
+  // now broadcast the result
+  int is_ascending = is_globally_ascending ? 1 : 0;
+  MPI_Bcast(&is_ascending, 1, MPI_INT, 0, communicator);
+
+  return (is_ascending==1);
+}
+
 
 
 std::size_t

@@ -317,7 +317,7 @@ namespace PETScWrappers
        * Create a matrix where the size() of the IndexSets determine the
        * global number of rows and columns and the entries of the IndexSet
        * give the rows and columns for the calling processor. Note that only
-       * contiguous IndexSets are supported.
+       * ascending, 1:1 IndexSets are supported.
        */
       template <typename SparsityPatternType>
       void reinit (const IndexSet            &local_rows,

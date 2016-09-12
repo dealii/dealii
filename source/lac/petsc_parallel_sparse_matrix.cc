@@ -354,6 +354,7 @@ namespace PETScWrappers
              ExcMessage("SparsityPattern and IndexSet have different number of columns"));
       Assert(local_rows.is_contiguous() && local_columns.is_contiguous(),
              ExcMessage("PETSc only supports contiguous row/column ranges"));
+      Assert(local_rows.is_ascending_and_one_to_one(communicator), ExcNotImplemented());
 
 #ifdef DEBUG
       {

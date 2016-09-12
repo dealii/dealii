@@ -218,6 +218,17 @@ public:
   bool is_contiguous () const;
 
   /**
+   * Return whether the IndexSets are ascending with respect to MPI process
+   * number and 1:1, i.e., each index is contained in exactly one IndexSet
+   * (among those stored on the different processes), each process stores
+   * contiguous subset of indices, and the index set on process $p+1$ starts
+   * at the index one larger than the last one stored on process $p$.
+   * In case there is only one MPI process, this just means that the IndexSet
+   * is complete.
+   */
+  bool is_ascending_and_one_to_one(const MPI_Comm &communicator) const;
+
+  /**
    * Return the number of elements stored in this index set.
    */
   size_type n_elements () const;

@@ -521,6 +521,20 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: IndexSet::make_trilinos_map now treats non-ascending but
+ contiguous IndexSets correctly. It creates a linear EpetraMap only
+ if the IndexSets are ascending and 1:1.
+ <br>
+ (Daniel Arndt, 2016/09/11)
+ </li>
+
+ <li> New: IndexSet::is_ascending_and_one_to_one allows to find out 
+ whether the nth range of indices is stored on the nth process in case 
+ the IndexSets are contiguous.
+ <br>
+ (Daniel Arndt, 2016/09/11)
+ </li>
+
  <li> Fixed: FE_TraceQ now provides unit support points.
  <br>
  (Martin Kronbichler, 2016/09/08)

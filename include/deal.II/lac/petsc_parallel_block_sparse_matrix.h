@@ -149,8 +149,8 @@ namespace PETScWrappers
        * the BlockSparsityPattern of the Simple type can efficiently store
        * large sparsity patterns in parallel, so this is the only supported
        * argument. The IndexSets describe the locally owned range of DoFs for
-       * each block. Note that each IndexSet needs to be contiguous. For a
-       * symmetric structure hand in the same vector for the first two
+       * each block. Note that the IndexSets needs to be ascending and 1:1.
+       * For a symmetric structure hand in the same vector for the first two
        * arguments.
        */
       void reinit(const std::vector<IndexSet> &rows,
