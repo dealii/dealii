@@ -1427,6 +1427,16 @@ public:
   n_nonzero_components (const unsigned int i) const;
 
   /**
+   * Return whether the entire finite element is primitive, in the sense that
+   * all its shape functions are primitive. If the finite element is scalar,
+   * then this is always the case.
+   *
+   * Since this is an extremely common operation, the result is cached and
+   * returned by this function.
+   */
+  bool is_primitive () const;
+
+  /**
    * Return whether the @p ith shape function is primitive in the sense that
    * the shape function is non-zero in only one vector component. Non-
    * primitive shape functions would then, for example, be those of divergence
@@ -1438,12 +1448,6 @@ public:
    */
   bool
   is_primitive (const unsigned int i) const;
-
-  /**
-   * Import function that is overloaded by the one above and would otherwise
-   * be hidden.
-   */
-  using FiniteElementData<dim>::is_primitive;
 
   /**
    * Number of base elements in a mixed discretization.
@@ -2279,6 +2283,13 @@ protected:
   const std::vector<unsigned int> n_nonzero_components_table;
 
   /**
+   * Store whether all shape functions are primitive. Since finding this out
+   * is a very common operation, we cache the result, i.e. compute the value
+   * in the constructor for simpler access.
+   */
+  const bool cached_primitivity;
+
+  /**
    * Return the size of interface constraint matrices. Since this is needed in
    * every derived finite element class when initializing their size, it is
    * placed into this function, to avoid having to recompute the dimension-
@@ -2921,6 +2932,16 @@ FiniteElement<dim,spacedim>::n_nonzero_components (const unsigned int i) const
 {
   Assert (i < this->dofs_per_cell, ExcIndexRange (i, 0, this->dofs_per_cell));
   return n_nonzero_components_table[i];
+}
+
+
+
+template <int dim, int spacedim>
+inline
+bool
+FiniteElement<dim,spacedim>::is_primitive () const
+{
+  return cached_primitivity;
 }
 
 

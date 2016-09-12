@@ -5,7 +5,7 @@ DEAL::   Number of active cells:       8
 DEAL::   Number of degrees of freedom: 17
 DEAL::Memory consumption -- Triangulation: 3090
 DEAL::Memory consumption -- DoFHandler:    1280
-DEAL::Memory consumption -- FE:            1488
+DEAL::Memory consumption -- FE:            1480
 DEAL::Memory consumption -- Constraints:   82
 DEAL::Memory consumption -- Sparsity:      792
 DEAL::Memory consumption -- Matrix:        632
@@ -16,7 +16,7 @@ DEAL::   Number of active cells:       11
 DEAL::   Number of degrees of freedom: 23
 DEAL::Memory consumption -- Triangulation: 4026
 DEAL::Memory consumption -- DoFHandler:    1576
-DEAL::Memory consumption -- FE:            1488
+DEAL::Memory consumption -- FE:            1480
 DEAL::Memory consumption -- Constraints:   82
 DEAL::Memory consumption -- Sparsity:      1032
 DEAL::Memory consumption -- Matrix:        824
@@ -27,7 +27,7 @@ DEAL::   Number of active cells:       15
 DEAL::   Number of degrees of freedom: 31
 DEAL::Memory consumption -- Triangulation: 4946
 DEAL::Memory consumption -- DoFHandler:    1912
-DEAL::Memory consumption -- FE:            1488
+DEAL::Memory consumption -- FE:            1480
 DEAL::Memory consumption -- Constraints:   82
 DEAL::Memory consumption -- Sparsity:      1352
 DEAL::Memory consumption -- Matrix:        1080
@@ -38,7 +38,7 @@ DEAL::   Number of active cells:       20
 DEAL::   Number of degrees of freedom: 41
 DEAL::Memory consumption -- Triangulation: 6090
 DEAL::Memory consumption -- DoFHandler:    2320
-DEAL::Memory consumption -- FE:            1488
+DEAL::Memory consumption -- FE:            1480
 DEAL::Memory consumption -- Constraints:   82
 DEAL::Memory consumption -- Sparsity:      1752
 DEAL::Memory consumption -- Matrix:        1400
@@ -51,7 +51,7 @@ DEAL::   Number of active cells:       20
 DEAL::   Number of degrees of freedom: 89
 DEAL::Memory consumption -- Triangulation: 5431
 DEAL::Memory consumption -- DoFHandler:    3288
-DEAL::Memory consumption -- FE:            3904
+DEAL::Memory consumption -- FE:            3888
 DEAL::Memory consumption -- Constraints:   82
 DEAL::Memory consumption -- Sparsity:      11352
 DEAL::Memory consumption -- Matrix:        10616
@@ -62,7 +62,7 @@ DEAL::   Number of active cells:       44
 DEAL::   Number of degrees of freedom: 209
 DEAL::Memory consumption -- Triangulation: 11215
 DEAL::Memory consumption -- DoFHandler:    6808
-DEAL::Memory consumption -- FE:            3904
+DEAL::Memory consumption -- FE:            3888
 DEAL::Memory consumption -- Constraints:   4594
 DEAL::Memory consumption -- Sparsity:      27864
 DEAL::Memory consumption -- Matrix:        26168
@@ -73,7 +73,7 @@ DEAL::   Number of active cells:       92
 DEAL::   Number of degrees of freedom: 449
 DEAL::Memory consumption -- Triangulation: 21927
 DEAL::Memory consumption -- DoFHandler:    13672
-DEAL::Memory consumption -- FE:            3904
+DEAL::Memory consumption -- FE:            3888
 DEAL::Memory consumption -- Constraints:   15250
 DEAL::Memory consumption -- Sparsity:      62360
 DEAL::Memory consumption -- Matrix:        58744
@@ -84,7 +84,7 @@ DEAL::   Number of active cells:       200
 DEAL::   Number of degrees of freedom: 921
 DEAL::Memory consumption -- Triangulation: 44055
 DEAL::Memory consumption -- DoFHandler:    28648
-DEAL::Memory consumption -- FE:            3904
+DEAL::Memory consumption -- FE:            3888
 DEAL::Memory consumption -- Constraints:   28082
 DEAL::Memory consumption -- Sparsity:      128216
 DEAL::Memory consumption -- Matrix:        120824
@@ -97,7 +97,7 @@ DEAL::   Number of active cells:       56
 DEAL::   Number of degrees of freedom: 517
 DEAL::Memory consumption -- Triangulation: 25043
 DEAL::Memory consumption -- DoFHandler:    18912
-DEAL::Memory consumption -- FE:            12280
+DEAL::Memory consumption -- FE:            12264
 DEAL::Memory consumption -- Constraints:   82
 DEAL::Memory consumption -- Sparsity:      240440
 DEAL::Memory consumption -- Matrix:        236280
@@ -108,7 +108,7 @@ DEAL::   Number of active cells:       217
 DEAL::   Number of degrees of freedom: 2217
 DEAL::Memory consumption -- Triangulation: 98569
 DEAL::Memory consumption -- DoFHandler:    75320
-DEAL::Memory consumption -- FE:            12280
+DEAL::Memory consumption -- FE:            12264
 DEAL::Memory consumption -- Constraints:   78450
 DEAL::Memory consumption -- Sparsity:      1134184
 DEAL::Memory consumption -- Matrix:        1116424
@@ -119,7 +119,7 @@ DEAL::   Number of active cells:       896
 DEAL::   Number of degrees of freedom: 9373
 DEAL::Memory consumption -- Triangulation: 395091
 DEAL::Memory consumption -- DoFHandler:    301840
-DEAL::Memory consumption -- FE:            12280
+DEAL::Memory consumption -- FE:            12264
 DEAL::Memory consumption -- Constraints:   487314
 DEAL::Memory consumption -- Sparsity:      5034296
 DEAL::Memory consumption -- Matrix:        4959288
@@ -130,7 +130,7 @@ DEAL::   Number of active cells:       3248
 DEAL::   Number of degrees of freedom: 32433
 DEAL::Memory consumption -- Triangulation: 1390359
 DEAL::Memory consumption -- DoFHandler:    1083216
-DEAL::Memory consumption -- FE:            12280
+DEAL::Memory consumption -- FE:            12264
 DEAL::Memory consumption -- Constraints:   1729778
 DEAL::Memory consumption -- Sparsity:      16643416
 DEAL::Memory consumption -- Matrix:        16383928
