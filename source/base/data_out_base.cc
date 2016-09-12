@@ -7420,8 +7420,8 @@ merge (const DataOutReader<dim,spacedim> &source)
 
 
   const std::vector<Patch> source_patches = source.get_patches ();
-  Assert (patches.size () != 0,        ExcNoPatches ());
-  Assert (source_patches.size () != 0, ExcNoPatches ());
+  Assert (patches.size () != 0,        DataOutBase::ExcNoPatches ());
+  Assert (source_patches.size () != 0, DataOutBase::ExcNoPatches ());
   // check equality of component
   // names
   Assert (get_dataset_names() == source.get_dataset_names(),

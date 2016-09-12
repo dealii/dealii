@@ -1861,11 +1861,17 @@ namespace DataOutBase
   /**
    * An output function did not receive any patches for writing.
    */
-  DeclException0 (ExcNoPatches);
+  DeclExceptionMsg (ExcNoPatches,
+                    "You are trying to write graphical data into a file, but "
+                    "no data is available in the intermediate format that "
+                    "the DataOutBase functions require. Did you forget to "
+                    "call a function such as DataOut::build_patches()?");
   /**
    * Exception
    */
-  DeclException0 (ExcTecplotAPIError);
+  DeclExceptionMsg (ExcTecplotAPIError,
+                    "The error code of one of the Tecplot functions was "
+                    "not zero as expected.");
   /**
    * Exception
    */
@@ -2644,10 +2650,6 @@ public:
    */
   void merge (const DataOutReader<dim,spacedim> &other);
 
-  /**
-   * Exception
-   */
-  DeclException0 (ExcNoPatches);
   /**
    * Exception
    */
