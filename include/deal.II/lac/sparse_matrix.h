@@ -2383,6 +2383,13 @@ SparseMatrix<number>::end (const size_type r)
   return iterator(this, cols->rowstart[r+1]);
 }
 
+template<>
+template<class StreamType>
+void SparseMatrix<std::complex<double>>::print_matrix_market(StreamType &out,
+							     const double threshold) const
+{
+  AssertThrow(false, ExcNotImplemented() );
+}
 
 template <typename number>
 template <class StreamType>
@@ -2395,7 +2402,7 @@ void SparseMatrix<number>::print_matrix_market(StreamType &out,
 
   //Print the header
   out << "%%MatrixMarket matrix coordinate real general\n";
-  const size_type = n_actually_nonzero_elements(threshold);
+  const size_type nnz = n_actually_nonzero_elements(threshold);
   out << m() << ' ' << n() << ' ' << nnz << '\n';
 
   //Print the body
