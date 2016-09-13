@@ -1468,6 +1468,13 @@ public:
               const bool  diagonal_first = true) const;
 
   /**
+   * Print the matrix to the given stream in the "Matrix Market" format.
+   */
+  template <class StreamType>
+  void print_matrix_market(StreamType &out,
+			   const number threshold = 1e-10) const;
+
+  /**
    * Print the matrix in the usual format, i.e. as a matrix and not as a list
    * of nonzero elements. For better readability, elements not in the matrix
    * are displayed as empty space, while matrix elements which are explicitly
@@ -2376,6 +2383,35 @@ SparseMatrix<number>::end (const size_type r)
   return iterator(this, cols->rowstart[r+1]);
 }
 
+
+template <typename number>
+template <class StreamType>
+void SparseMatrix<number>::print_matrix_market(StreamType &out,
+					       const number threshold) const
+{
+  Assert(cols != 0, ExcNotInitialized());
+  Assert(val != 0, ExcNotInitialized());
+  Assert( threshold > 0, dealii::ExcMessage("Negative threshold!") ); 
+
+  //Print the header
+  out << "%%MatrixMarket matrix coordinate real general\n";
+  const auto nnz = n_actually_nonzero_elements(threshold);
+  out << m() << ' ' << n() << ' ' << nnz << '\n';
+
+  //Print the body
+  for(unsigned int i = 0; i < m(); ++i)
+    for(auto it = begin(i); it != end(i); ++it)
+      {
+	const number value = it->value();
+	if(std::fabs<number>(value) > threshold)
+	  {
+	    const unsigned int j = it->column();
+	    //the following " + 1"s are to convert to ones
+	    //based indexing.
+	    out << i + 1 << ' ' << j + 1 << ' ' << value << '\n';
+	  }
+      }
+}
 
 
 template <typename number>
