@@ -34,7 +34,6 @@ FE_P1NC::FE_P1NC()
   unit_face_support_points[0][0] = 0.0 ;
   unit_face_support_points[1][0] = 1.0 ;
 
-
   // initialize constraints matrix
   initialize_constraints () ;
 }
@@ -47,7 +46,8 @@ std::string FE_P1NC::get_name () const
 }
 
 
-UpdateFlags     FE_P1NC::requires_update_flags (const UpdateFlags flags) const
+
+UpdateFlags FE_P1NC::requires_update_flags (const UpdateFlags flags) const
 {
   UpdateFlags out = update_default;
 
@@ -59,11 +59,10 @@ UpdateFlags     FE_P1NC::requires_update_flags (const UpdateFlags flags) const
     out |= update_cell_normal_vectors | update_JxW_values;
   if (flags & update_hessians)
     out |= update_hessians;
-  if (flags & update_hessians)
-    out |= update_hessians;
 
   return out;
 }
+
 
 
 FiniteElement<2,2> *FE_P1NC::clone () const
@@ -71,7 +70,10 @@ FiniteElement<2,2> *FE_P1NC::clone () const
   return new FE_P1NC(*this);
 }
 
+
+
 FE_P1NC::~FE_P1NC () {}
+
 
 
 std::vector<ComponentMask>
@@ -85,6 +87,7 @@ FE_P1NC::get_nonzero_component()
 }
 
 
+
 std::vector<unsigned int>
 FE_P1NC::get_dpo_vector ()
 {
@@ -94,6 +97,7 @@ FE_P1NC::get_dpo_vector ()
   dpo[2] = 0; // quad
   return dpo;
 }
+
 
 
 void
@@ -122,8 +126,6 @@ FE_P1NC::get_linear_shape (const Triangulation<2,2>::cell_iterator &cell,
   cpt(0) = (mpt[0](0) + mpt[1](0) + mpt[2](0) + mpt[3](0))/4.0 ;
   cpt(1) = (mpt[0](1) + mpt[1](1) + mpt[2](1) + mpt[3](1))/4.0 ;
 
-
-
   double det ;
   det = (mpt[0](0)-mpt[1](0))*(mpt[2](1)-mpt[3](1)) - (mpt[2](0)-mpt[3](0))*(mpt[0](1)-mpt[1](1)) ;
 
@@ -141,9 +143,7 @@ FE_P1NC::get_linear_shape (const Triangulation<2,2>::cell_iterator &cell,
   c[1] = 0.25 - cpt(0)*a[1] - cpt(1)*b[1] ;
   c[2] = 0.25 - cpt(0)*a[2] - cpt(1)*b[2] ;
   c[3] = 0.25 - cpt(0)*a[3] - cpt(1)*b[3] ;
-
 }
-
 
 
 
@@ -158,10 +158,6 @@ FE_P1NC::get_data (const UpdateFlags update_flags,
   data->update_each = requires_update_flags(update_flags);
 
   return data;
-
-
-
-
 }
 
 
@@ -208,7 +204,6 @@ FE_P1NC::fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell
                 output_data.shape_gradients[k][i] = grads[k];
               }
           }
-
       }
 
   // hessian
@@ -242,11 +237,10 @@ FE_P1NC::fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell
             realquadrature = mapping.transform_unit_to_real_cell(cell, quadrature.point(i)) ;
             values[k] = a[k]*realquadrature(0) + b[k]*realquadrature(1) + c[k] ;
             output_data.shape_values[k][i] = values[k];
-
           }
     }
-
 }
+
 
 
 void
@@ -320,15 +314,9 @@ FE_P1NC::fill_fe_face_values (const Triangulation<2,2>::cell_iterator           
                 grads[k][1] = b[k] ;
                 output_data.shape_gradients[k][i] = grads[k];
               }
-
           }
-
     }
-
 }
-
-
-
 
 
 
@@ -376,7 +364,6 @@ FE_P1NC::fill_fe_subface_values (const Triangulation<2,2>::cell_iterator        
                 output_data.shape_gradients[k][i] = grads[k];
               }
           }
-
       }
 
   // When this function is called for computation of facial jump residual,
@@ -404,11 +391,10 @@ FE_P1NC::fill_fe_subface_values (const Triangulation<2,2>::cell_iterator        
                 grads[k][1] = b[k] ;
                 output_data.shape_gradients[k][i] = grads[k];
               }
-
           }
-
     }
 }
+
 
 
 void FE_P1NC::initialize_constraints ()
@@ -423,16 +409,10 @@ void FE_P1NC::initialize_constraints ()
   interface_constraints
   .TableBase<2,double>::reinit (interface_constraints_size());
 
-
   interface_constraints(0,0) = 0.5 ;
   interface_constraints(0,1) = 0.5 ;
 
 }
-
-
-
-
-
 
 
 DEAL_II_NAMESPACE_CLOSE
