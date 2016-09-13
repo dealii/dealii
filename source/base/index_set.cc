@@ -560,6 +560,7 @@ IndexSet::is_ascending_and_one_to_one (const MPI_Comm &communicator) const
   if (n_global_elements != size())
     return false;
 
+#ifdef DEAL_II_WITH_MPI
   // Non-contiguous IndexSets can't be linear.
   const bool all_contiguous = (Utilities::MPI::min (is_contiguous() ? 1 : 0, communicator) == 1);
   if (!all_contiguous)
@@ -606,6 +607,9 @@ IndexSet::is_ascending_and_one_to_one (const MPI_Comm &communicator) const
   MPI_Bcast(&is_ascending, 1, MPI_INT, 0, communicator);
 
   return (is_ascending==1);
+#else
+  return true;
+#endif //DEAL_II_WITH_MPI
 }
 
 
