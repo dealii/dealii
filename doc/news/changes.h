@@ -38,6 +38,13 @@ inconvenience this causes.
 </p>
 
 <ol>
+
+ <li> Deprecated: MGCoarseGridLACIteration got deprecated in favor of
+ MGCoarseGridIterativeSolver.
+ <br>
+ (Timo Heister, 2016/09/14)
+ </li>
+
  <li> Changed: The template parameter order in many VectorTools functions is now
  different; this was done so that the order is the same across similar functions.
  This will only effect code that explicitly specifies template parameters for
@@ -522,9 +529,16 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+
  <li> New: LinearAlgebra::Vector is now instantiated for float and double.
  <br>
  (Bruno Turcksin, 2016/09/15)
+ </li>
+
+ <li> New: The class MGCoarseGridIterativeSolver is replacing
+ MGCoarseGridLACIteration with a simpler interface.
+ <br>
+ (Timo Heister, 2016/09/14)
  </li>
 
  <li> Improved: FEValues no longer generates the mapping's internal database if
