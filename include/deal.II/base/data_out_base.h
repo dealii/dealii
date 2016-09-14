@@ -2653,11 +2653,16 @@ public:
   /**
    * Exception
    */
-  DeclException0 (ExcIncompatibleDatasetNames);
+  DeclExceptionMsg (ExcIncompatibleDatasetNames,
+                    "You are trying to merge two sets of patches for which the "
+                    "declared names of the variables do not match.");
   /**
    * Exception
    */
-  DeclException0 (ExcIncompatiblePatchLists);
+  DeclExceptionMsg (ExcIncompatiblePatchLists,
+                    "You are trying to merge two sets of patches for which the "
+                    "number of subdivisions or the number of vector components "
+                    "do not match.");
   /**
    * Exception
    */
