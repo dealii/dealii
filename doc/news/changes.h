@@ -217,6 +217,7 @@ inconvenience this causes.
  haven been clarified and improved.
  <br>
  (Timo Heister, 2016/09/06)
+</li>
 
  <li> Fixed: Reimplement copy_triangulation and load in
  dealii::parallel::shared::Triangulation, this avoids the loss of
@@ -521,6 +522,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Improved: FEValues no longer generates the mapping's internal database if
+ the mapping will not be required for the set of update flags specified.
+ <br>
+ (Jonathan Robey, 2016/09/14)
+ </li>
+
  <li> Fixed: Instantiating class Vector with non-standard template
  arguments did not work because of duplicate function symbols. This
  is now fixed.
@@ -541,7 +548,6 @@ inconvenience this causes.
  <br>
  (Daniel Arndt, 2016/09/11)
  </li>
-
  <li> Fixed: FE_TraceQ now provides unit support points.
  <br>
  (Martin Kronbichler, 2016/09/08)

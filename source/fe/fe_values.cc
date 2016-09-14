@@ -3653,7 +3653,8 @@ FEValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
   const UpdateFlags flags = this->compute_update_flags (update_flags);
 
   // initialize the base classes
-  this->mapping_output.initialize(this->n_quadrature_points, flags);
+  if (flags & update_mapping)
+    this->mapping_output.initialize(this->n_quadrature_points, flags);
   this->finite_element_output.initialize(this->n_quadrature_points, *this->fe, flags);
 
   // then get objects into which the FE and the Mapping can store
@@ -3666,16 +3667,19 @@ FEValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
                                    quadrature,
                                    this->finite_element_output);
   Threads::Task<typename Mapping<dim,spacedim>::InternalDataBase *>
-  mapping_get_data = Threads::new_task (&Mapping<dim,spacedim>::get_data,
-                                        *this->mapping,
-                                        flags,
-                                        quadrature);
+  mapping_get_data;
+  if (flags & update_mapping)
+    mapping_get_data = Threads::new_task (&Mapping<dim,spacedim>::get_data,
+                                          *this->mapping,
+                                          flags,
+                                          quadrature);
 
   this->update_flags = flags;
 
   // then collect answers from the two task above
   this->fe_data.reset (fe_get_data.return_value());
-  this->mapping_data.reset (mapping_get_data.return_value());
+  if (flags & update_mapping)
+    this->mapping_data.reset (mapping_get_data.return_value());
 }
 
 
@@ -3772,12 +3776,15 @@ void FEValues<dim,spacedim>::do_reinit ()
   // specific to the mapping. also let it inspect the
   // cell similarity flag and, if necessary, update
   // it
-  this->cell_similarity
-    = this->get_mapping().fill_fe_values(*this->present_cell,
-                                         this->cell_similarity,
-                                         quadrature,
-                                         *this->mapping_data,
-                                         this->mapping_output);
+  if (this->update_flags & update_mapping)
+    {
+      this->cell_similarity
+        = this->get_mapping().fill_fe_values(*this->present_cell,
+                                             this->cell_similarity,
+                                             quadrature,
+                                             *this->mapping_data,
+                                             this->mapping_output);
+    }
 
   // then call the finite element and, with the data
   // already filled by the mapping, let it compute the
@@ -3895,7 +3902,8 @@ FEFaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
   const UpdateFlags flags = this->compute_update_flags (update_flags);
 
   // initialize the base classes
-  this->mapping_output.initialize(this->n_quadrature_points, flags);
+  if (flags & update_mapping)
+    this->mapping_output.initialize(this->n_quadrature_points, flags);
   this->finite_element_output.initialize(this->n_quadrature_points, *this->fe, flags);
 
   // then get objects into which the FE and the Mapping can store
@@ -3908,16 +3916,19 @@ FEFaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
                                    this->quadrature,
                                    this->finite_element_output);
   Threads::Task<typename Mapping<dim,spacedim>::InternalDataBase *>
-  mapping_get_data = Threads::new_task (&Mapping<dim,spacedim>::get_face_data,
-                                        *this->mapping,
-                                        flags,
-                                        this->quadrature);
+  mapping_get_data;
+  if (flags & update_mapping)
+    mapping_get_data = Threads::new_task (&Mapping<dim,spacedim>::get_face_data,
+                                          *this->mapping,
+                                          flags,
+                                          this->quadrature);
 
   this->update_flags = flags;
 
   // then collect answers from the two task above
   this->fe_data.reset (fe_get_data.return_value());
-  this->mapping_data.reset (mapping_get_data.return_value());
+  if (flags & update_mapping)
+    this->mapping_data.reset (mapping_get_data.return_value());
 }
 
 
@@ -3986,11 +3997,14 @@ void FEFaceValues<dim,spacedim>::do_reinit (const unsigned int face_no)
   const typename Triangulation<dim,spacedim>::cell_iterator cell=*this->present_cell;
   this->present_face_index=cell->face_index(face_no);
 
-  this->get_mapping().fill_fe_face_values(*this->present_cell,
-                                          face_no,
-                                          this->quadrature,
-                                          *this->mapping_data,
-                                          this->mapping_output);
+  if (this->update_flags & update_mapping)
+    {
+      this->get_mapping().fill_fe_face_values(*this->present_cell,
+                                              face_no,
+                                              this->quadrature,
+                                              *this->mapping_data,
+                                              this->mapping_output);
+    }
 
   this->get_fe().fill_fe_face_values(*this->present_cell,
                                      face_no,
@@ -4054,7 +4068,8 @@ FESubfaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
   const UpdateFlags flags = this->compute_update_flags (update_flags);
 
   // initialize the base classes
-  this->mapping_output.initialize(this->n_quadrature_points, flags);
+  if (flags & update_mapping)
+    this->mapping_output.initialize(this->n_quadrature_points, flags);
   this->finite_element_output.initialize(this->n_quadrature_points, *this->fe, flags);
 
   // then get objects into which the FE and the Mapping can store
@@ -4068,16 +4083,19 @@ FESubfaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
                                    this->quadrature,
                                    this->finite_element_output);
   Threads::Task<typename Mapping<dim,spacedim>::InternalDataBase *>
-  mapping_get_data = Threads::new_task (&Mapping<dim,spacedim>::get_subface_data,
-                                        *this->mapping,
-                                        flags,
-                                        this->quadrature);
+  mapping_get_data;
+  if (flags & update_mapping)
+    mapping_get_data = Threads::new_task (&Mapping<dim,spacedim>::get_subface_data,
+                                          *this->mapping,
+                                          flags,
+                                          this->quadrature);
 
   this->update_flags = flags;
 
   // then collect answers from the two task above
   this->fe_data.reset (fe_get_data.return_value());
-  this->mapping_data.reset (mapping_get_data.return_value());
+  if (flags & update_mapping)
+    this->mapping_data.reset (mapping_get_data.return_value());
 }
 
 
@@ -4230,12 +4248,15 @@ void FESubfaceValues<dim,spacedim>::do_reinit (const unsigned int face_no,
     }
 
   // now ask the mapping and the finite element to do the actual work
-  this->get_mapping().fill_fe_subface_values(*this->present_cell,
-                                             face_no,
-                                             subface_no,
-                                             this->quadrature,
-                                             *this->mapping_data,
-                                             this->mapping_output);
+  if (this->update_flags & update_mapping)
+    {
+      this->get_mapping().fill_fe_subface_values(*this->present_cell,
+                                                 face_no,
+                                                 subface_no,
+                                                 this->quadrature,
+                                                 *this->mapping_data,
+                                                 this->mapping_output);
+    }
 
   this->get_fe().fill_fe_subface_values(*this->present_cell,
                                         face_no,
