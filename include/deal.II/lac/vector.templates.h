@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2015 by the deal.II authors
+// Copyright (C) 1999 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -304,7 +304,7 @@ void Vector<Number>::reinit (const size_type n,
     }
 
   if (omit_zeroing_entries == false)
-    *this = static_cast<Number>(0);
+    *this = Number(0);
 }
 
 
@@ -332,7 +332,7 @@ void Vector<Number>::reinit (const Vector<Number2> &v,
     };
   vec_size = v.vec_size;
   if (omit_zeroing_entries == false)
-    *this = static_cast<Number>(0);
+    *this = Number(0);
 }
 
 
