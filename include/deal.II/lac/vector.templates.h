@@ -383,23 +383,6 @@ Vector<Number>::operator= (const Number s)
 
 
 
-#ifdef DEAL_II_BOOST_BIND_COMPILER_BUG
-template <>
-Vector<std::complex<float> > &
-Vector<std::complex<float> >::operator= (const std::complex<float> s)
-{
-  AssertIsFinite(s);
-  if (s != std::complex<float>())
-    Assert (vec_size!=0, ExcEmptyObject());
-  if (vec_size!=0)
-    std::fill (begin(), end(), s);
-
-  return *this;
-}
-#endif
-
-
-
 template <typename Number>
 Vector<Number> &Vector<Number>::operator *= (const Number factor)
 {
@@ -600,16 +583,6 @@ Vector<Number>::lp_norm (const real_type p) const
         }
       return scale * std::pow(sum, static_cast<real_type>(1./p));
     }
-}
-
-
-
-template <>
-Vector<int>::real_type
-Vector<int>::lp_norm (const real_type) const
-{
-  Assert(false, ExcMessage("No lp norm for integer vectors"));
-  return -1;
 }
 
 
