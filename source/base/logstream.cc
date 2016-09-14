@@ -260,7 +260,9 @@ LogStream::get_console()
 std::ostream &
 LogStream::get_file_stream()
 {
-  Assert(file, ExcNoFileStreamGiven());
+  Assert(file,
+         ExcMessage("You can't ask for the std::ostream object for the output "
+                    "file if none had been set before."));
   return *file;
 }
 
