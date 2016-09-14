@@ -521,6 +521,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: Instantiating class Vector with non-standard template
+ arguments did not work because of duplicate function symbols. This
+ is now fixed.
+ <br>
+ (Dragan Nikolic, 2016/09/14)
+ </li>
+
  <li> Fixed: IndexSet::make_trilinos_map now treats non-ascending but
  contiguous IndexSets correctly. It creates a linear EpetraMap only
  if the IndexSets are ascending and 1:1.

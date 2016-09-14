@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2015 by the deal.II authors
+// Copyright (C) 1999 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -304,7 +304,7 @@ void Vector<Number>::reinit (const size_type n,
     }
 
   if (omit_zeroing_entries == false)
-    *this = static_cast<Number>(0);
+    *this = Number();
 }
 
 
@@ -332,7 +332,7 @@ void Vector<Number>::reinit (const Vector<Number2> &v,
     };
   vec_size = v.vec_size;
   if (omit_zeroing_entries == false)
-    *this = static_cast<Number>(0);
+    *this = Number();
 }
 
 
@@ -344,7 +344,7 @@ Vector<Number>::all_zero () const
   Assert (vec_size!=0, ExcEmptyObject());
 
   for (size_type i=0; i<vec_size; ++i)
-    if (val[i] != Number(0))
+    if (val[i] != Number())
       return false;
   return true;
 }
@@ -380,23 +380,6 @@ Vector<Number>::operator= (const Number s)
 
   return *this;
 }
-
-
-
-#ifdef DEAL_II_BOOST_BIND_COMPILER_BUG
-template <>
-Vector<std::complex<float> > &
-Vector<std::complex<float> >::operator= (const std::complex<float> s)
-{
-  AssertIsFinite(s);
-  if (s != std::complex<float>())
-    Assert (vec_size!=0, ExcEmptyObject());
-  if (vec_size!=0)
-    std::fill (begin(), end(), s);
-
-  return *this;
-}
-#endif
 
 
 
@@ -600,16 +583,6 @@ Vector<Number>::lp_norm (const real_type p) const
         }
       return scale * std::pow(sum, static_cast<real_type>(1./p));
     }
-}
-
-
-
-template <>
-Vector<int>::real_type
-Vector<int>::lp_norm (const real_type) const
-{
-  Assert(false, ExcMessage("No lp norm for integer vectors"));
-  return -1;
 }
 
 
