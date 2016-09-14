@@ -304,7 +304,7 @@ void Vector<Number>::reinit (const size_type n,
     }
 
   if (omit_zeroing_entries == false)
-    *this = Number(0);
+    *this = Number();
 }
 
 
@@ -332,7 +332,7 @@ void Vector<Number>::reinit (const Vector<Number2> &v,
     };
   vec_size = v.vec_size;
   if (omit_zeroing_entries == false)
-    *this = Number(0);
+    *this = Number();
 }
 
 
@@ -344,7 +344,7 @@ Vector<Number>::all_zero () const
   Assert (vec_size!=0, ExcEmptyObject());
 
   for (size_type i=0; i<vec_size; ++i)
-    if (val[i] != Number(0))
+    if (val[i] != Number())
       return false;
   return true;
 }
