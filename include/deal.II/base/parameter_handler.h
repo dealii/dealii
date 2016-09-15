@@ -1997,6 +1997,59 @@ public:
   DeclException1 (ExcEntryUndeclared,
                   std::string,
                   << "You can't ask for entry <" << arg1 << "> you have not yet declared.");
+
+  /**
+   * Exception for when there are an unequal number of 'subsection' and 'end'
+   * statements.
+   */
+  DeclException1 (ExcUnbalancedSubsections,
+                  std::string,
+                  << "There are unequal numbers of 'subsection' and 'end' "
+                  "statements in the parameter file <" << arg1 << ">.");
+
+  /**
+   * Exception for when, during parsing of a parameter file, the parser
+   * encounters a subsection in the file that was not previously declared.
+   */
+  DeclException3 (ExcNoSubsection,
+                  int, std::string, std::string,
+                  << "Line <" << arg1 << "> of file <" << arg2 << ": There is "
+                  "no such subsection to be entered: " << arg3);
+
+  /**
+   * General exception for a line that could not be parsed, taking, as
+   * arguments, the line number, file name, and a brief description of why the
+   * line cannot be parsed.
+   */
+  DeclException3 (ExcCannotParseLine,
+                  int, std::string, std::string, << "Line <" << arg1 <<
+                  "> of file <" << arg2 << ">: " << arg3);
+
+  /**
+   * Exception for an an entry in a parameter file that does not match the
+   * provided pattern. The arguments are, in order, the line number, file
+   * name, entry value, entry name, and a description of the pattern.
+   */
+  DeclException5 (ExcInvalidEntryForPattern,
+                  int, std::string, std::string, std::string, std::string,
+                  << "Line <" << arg1 << "> of file <" << arg2 << ">:\n"
+                  "    The entry value \n" << "        " << arg3 << '\n' <<
+                  "    for the entry named\n" << "        " << arg4 << '\n' <<
+                  "    does not match the given pattern:\n" << "        " <<
+                  arg5);
+
+  /**
+   * Exception for when the file given in an include statement cannot be
+   * open. The arguments are, in order, the line number of the include
+   * statement, current parameter file name, and the name of the file intended
+   * for inclusion.
+   */
+  DeclException3 (ExcCannotOpenIncludeStatementFile,
+                  int, std::string, std::string,
+                  << "Line <" << arg1 << "> of file <" << arg2 << ">: This line "
+                  "contains an 'include' or 'INCLUDE' statement, but the given "
+                  "file to include <" << arg3 << "> cannot be opened.");
+
   //@}
 private:
   /**
@@ -2052,18 +2105,17 @@ private:
 
   /**
    * Scan one line of input. <tt>input_filename</tt> and
-   * <tt>current_line_n</tt> are the name of the input file and the current
-   * number of the line presently scanned (for the logs if there are
-   * messages). Return <tt>false</tt> if line contained stuff that could not
-   * be understood, the uppermost subsection was to be left by an <tt>END</tt>
-   * or <tt>end</tt> statement, a value for a non-declared entry was given or
-   * the entry value did not match the regular expression. <tt>true</tt>
-   * otherwise.
+   * <tt>current_line_n</tt> are the name of the input file and the number of
+   * the line presently scanned (these are used in exception messages to show
+   * where parse errors occurred). This function will raise an exception if
+   * the line contains an undeclared subsection or entry, if the line's entry
+   * does not match its given pattern, or if the line could not be understood
+   * as a valid parameter file expression.
    *
    * The function modifies its argument, but also takes it by value, so the
    * caller's variable is not changed.
    */
-  bool scan_line (std::string         line,
+  void scan_line (std::string         line,
                   const std::string  &input_filename,
                   const unsigned int  current_line_n);
 

@@ -1664,7 +1664,7 @@ bool ParameterHandler::read_input (std::istream &input,
 
       if (!is_concatenated)
         {
-          status &= scan_line (fully_concatenated_line, filename, current_logical_line_n);
+          scan_line (fully_concatenated_line, filename, current_logical_line_n);
           fully_concatenated_line.clear();
         }
     }
@@ -1673,7 +1673,7 @@ bool ParameterHandler::read_input (std::istream &input,
   // the last line to end in a backslash.
   if (is_concatenated)
     {
-      status &= scan_line (fully_concatenated_line, filename, current_line_n);
+      scan_line (fully_concatenated_line, filename, current_line_n);
     }
 
   if (status && (saved_path != subsection_path))
@@ -2843,11 +2843,14 @@ ParameterHandler::log_parameters_section (LogStream &out)
 
 
 
-bool
+void
 ParameterHandler::scan_line (std::string         line,
                              const std::string  &input_filename,
                              const unsigned int  current_line_n)
 {
+  // save a copy for some error messages
+  const std::string original_line = line;
+
   // if there is a comment, delete it
   if (line.find('#') != std::string::npos)
     line.erase (line.find("#"), std::string::npos);
@@ -2861,11 +2864,12 @@ ParameterHandler::scan_line (std::string         line,
 
   // if line is now empty: leave
   if (line.length() == 0)
-    return true;
-
+    {
+      return;
+    }
   // enter subsection
-  if ((line.find ("SUBSECTION ") == 0) ||
-      (line.find ("subsection ") == 0))
+  else if ((line.find ("SUBSECTION ") == 0) ||
+           (line.find ("subsection ") == 0))
     {
       // delete this prefix
       line.erase (0, std::string("subsection").length()+1);
@@ -2873,71 +2877,44 @@ ParameterHandler::scan_line (std::string         line,
       const std::string subsection = Utilities::trim(line);
 
       // check whether subsection exists
-      if (!entries->get_child_optional (get_current_full_path(subsection)))
-        {
-          std::cerr << "Line <" << current_line_n
-                    << "> of file <" << input_filename
-                    << ">: There is no such subsection to be entered: "
-                    << demangle(get_current_full_path(subsection)) << std::endl;
-          for (unsigned int i=0; i<subsection_path.size(); ++i)
-            std::cerr << std::setw(i*2+4) << " "
-                      << "subsection " << subsection_path[i] << std::endl;
-          std::cerr << std::setw(subsection_path.size()*2+4) << " "
-                    << "subsection " << subsection << std::endl;
-          return false;
-        }
+      AssertThrow (entries->get_child_optional (get_current_full_path(subsection)),
+                   ExcNoSubsection (current_line_n,
+                                    input_filename,
+                                    demangle(get_current_full_path(subsection))));
 
       // subsection exists
       subsection_path.push_back (subsection);
-      return true;
     }
-
   // exit subsection
-  if ((line.find ("END") == 0) ||
-      (line.find ("end") == 0))
+  else if ((line.find ("END") == 0) ||
+           (line.find ("end") == 0))
     {
       line.erase (0, 3);
       while ((line.size() > 0) && (std::isspace(line[0])))
         line.erase (0, 1);
 
-      if (line.size()>0)
-        {
-          std::cerr << "Line <" << current_line_n
-                    << "> of file <" << input_filename
-                    << ">: invalid content after 'end'!" << std::endl;
-          return false;
-        }
-
-      if (subsection_path.size() == 0)
-        {
-          std::cerr << "Line <" << current_line_n
-                    << "> of file <" << input_filename
-                    << ">: There is no subsection to leave here!" << std::endl;
-          return false;
-        }
-      else
-        {
-          leave_subsection ();
-          return true;
-        }
-
+      AssertThrow (line.size() == 0,
+                   ExcCannotParseLine (current_line_n,
+                                       input_filename,
+                                       "Invalid content after 'end' or 'END' statement."));
+      AssertThrow (subsection_path.size() != 0,
+                   ExcCannotParseLine (current_line_n,
+                                       input_filename,
+                                       "There is no subsection to leave here."));
+      leave_subsection ();
     }
-
   // regular entry
-  if ((line.find ("SET ") == 0) ||
-      (line.find ("set ") == 0))
+  else if ((line.find ("SET ") == 0) ||
+           (line.find ("set ") == 0))
     {
       // erase "set" statement
       line.erase (0, 4);
 
       std::string::size_type pos = line.find("=");
-      if (pos == std::string::npos)
-        {
-          std::cerr << "Line <" << current_line_n
-                    << "> of file <" << input_filename
-                    << ">: invalid format of set expression!" << std::endl;
-          return false;
-        }
+      AssertThrow (pos != std::string::npos,
+                   ExcCannotParseLine (current_line_n,
+                                       input_filename,
+                                       "Invalid format of 'set' or 'SET' statement."));
 
       // extract entry name and value and trim
       std::string entry_name = Utilities::trim(std::string(line, 0, pos));
@@ -2974,45 +2951,29 @@ ParameterHandler::scan_line (std::string         line,
             {
               const unsigned int pattern_index
                 = entries->get<unsigned int> (path + path_separator + "pattern");
-              if (!patterns[pattern_index]->match(entry_value))
-                {
-                  std::cerr << "Line <" << current_line_n
-                            << "> of file <" << input_filename
-                            << ">:" << std::endl
-                            << "    The entry value" << std::endl
-                            << "        " << entry_value << std::endl
-                            << "    for the entry named" << std::endl
-                            << "        " << entry_name << std::endl
-                            << "    does not match the given pattern" << std::endl
-                            << "        " << patterns[pattern_index]->description()
-                            << std::endl;
-                  return false;
-                }
+              AssertThrow (patterns[pattern_index]->match (entry_value),
+                           ExcInvalidEntryForPattern (current_line_n,
+                                                      input_filename,
+                                                      entry_value,
+                                                      entry_name,
+                                                      patterns[pattern_index]->description()));
             }
 
           entries->put (path + path_separator + "value",
                         entry_value);
-          return true;
         }
       else
         {
-          std::cerr << "Line <" << current_line_n
-                    << "> of file <" << input_filename
-                    << ">: No such entry was declared:" << std::endl
-                    << "    " << entry_name << std::endl
-                    << "    <Present subsection:" << std::endl;
-          for (unsigned int i=0; i<subsection_path.size(); ++i)
-            std::cerr << std::setw(i*2+8) << " "
-                      << "subsection " << subsection_path[i] << std::endl;
-          std::cerr << "    >" << std::endl;
-
-          return false;
+          AssertThrow (false,
+                       ExcCannotParseLine(current_line_n,
+                                          input_filename,
+                                          ("No entry with name <" + entry_name +
+                                           "> was declared in the current subsection.")));
         }
     }
-
   // an include statement?
-  if ((line.find ("INCLUDE ") == 0) ||
-      (line.find ("include ") == 0))
+  else if ((line.find ("INCLUDE ") == 0) ||
+           (line.find ("include ") == 0))
     {
       // erase "include " statement and eliminate spaces
       line.erase (0, 7);
@@ -3020,37 +2981,33 @@ ParameterHandler::scan_line (std::string         line,
         line.erase (0, 1);
 
       // the remainder must then be a filename
-      if (line.size() == 0)
-        {
-          std::cerr << "Line <" << current_line_n
-                    << "> of file <" << input_filename
-                    << "> is an include statement but does not name a file!"
-                    << std::endl;
-
-          return false;
-        }
+      AssertThrow (line.size() !=0,
+                   ExcCannotParseLine (current_line_n,
+                                       input_filename,
+                                       "The current line is an 'include' or "
+                                       "'INCLUDE' statement, but it does not "
+                                       "name a file for inclusion."));
 
       std::ifstream input (line.c_str());
-      if (!input)
-        {
-          std::cerr << "Line <" << current_line_n
-                    << "> of file <" << input_filename
-                    << "> is an include statement but the file <"
-                    << line << "> could not be opened!"
-                    << std::endl;
-
-          return false;
-        }
-      else
-        return read_input (input);
+      AssertThrow (input, ExcCannotOpenIncludeStatementFile (current_line_n,
+                                                             input_filename,
+                                                             line));
+      read_input (input);
     }
-
-  // this line matched nothing known
-  std::cerr << "Line <" << current_line_n
-            << "> of file <" << input_filename
-            << ">: This line matched nothing known ('set' or 'subsection' missing!?):" << std::endl
-            << "    " << line << std::endl;
-  return false;
+  else
+    {
+      AssertThrow (false,
+                   ExcCannotParseLine (current_line_n,
+                                       input_filename,
+                                       "The line\n\n"
+                                       "        <"
+                                       + original_line
+                                       + ">\n\n"
+                                       "could not be parsed: please check to "
+                                       "make sure that the file is not missing a "
+                                       "'set', 'include', 'subsection', or 'end' "
+                                       "statement."));
+    }
 }
 
 

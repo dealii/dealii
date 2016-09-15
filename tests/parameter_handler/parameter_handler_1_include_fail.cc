@@ -30,9 +30,18 @@ void check (const char *p)
                      Patterns::List(Patterns::Integer(-1,1),2,3));
 
   std::ifstream in(p);
-  bool status = prm.read_input (in);
-  Assert (status == false, ExcInternalError());
+  try
+    {
+      prm.read_input (in);
+    }
+  catch (ParameterHandler::ExcCannotOpenIncludeStatementFile &exc)
+    {
+      deallog << exc.get_exc_name() << std::endl;
+      exc.print_info(deallog.get_file_stream());
+    }
 
+  // Even though the parameter handler failed to finish parsing, it should
+  // have still picked up the first statement:
   deallog << "test_1=" << prm.get ("test_1") << std::endl;
 }
 

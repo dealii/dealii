@@ -51,26 +51,34 @@ int main ()
 
 
       // test both relevant read_input functions
-      if (i == 0)
+      try
         {
-          prm.read_input(SOURCE_DIR "/prm/parameter_handler_backslash_05.prm");
+          if (i == 0)
+            {
+              prm.read_input(SOURCE_DIR "/prm/parameter_handler_backslash_05.prm");
+            }
+          else
+            {
+              std::ifstream input_stream
+              (SOURCE_DIR "/prm/parameter_handler_backslash_05.prm");
+              prm.read_input(input_stream);
+            }
+
+          std::string list_1;
+          std::string list_2;
+          prm.enter_subsection ("Testing");
+          list_1 = prm.get ("Function_1");
+          list_2 = prm.get ("Function_2");
+          prm.leave_subsection ();
+
+          deallog << list_1 << std::endl;
+          deallog << list_2 << std::endl;
         }
-      else
+      catch (ParameterHandler::ExcCannotParseLine &exc)
         {
-          std::ifstream input_stream
-          (SOURCE_DIR "/prm/parameter_handler_backslash_05.prm");
-          prm.read_input(input_stream);
+          deallog << exc.get_exc_name() << std::endl;
+          exc.print_info(deallog.get_file_stream());
         }
-
-      std::string list_1;
-      std::string list_2;
-      prm.enter_subsection ("Testing");
-      list_1 = prm.get ("Function_1");
-      list_2 = prm.get ("Function_2");
-      prm.leave_subsection ();
-
-      deallog << list_1 << std::endl;
-      deallog << list_2 << std::endl;
     }
 
   return 0;

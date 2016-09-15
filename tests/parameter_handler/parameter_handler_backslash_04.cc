@@ -41,25 +41,33 @@ int main ()
                          Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")));
       prm.leave_subsection ();
 
-      // test both relevant read_input functions
-      if (i == 0)
+      // test both relevant read_input functions. They should fail with a
+      // specific exception.
+      try
         {
-          prm.read_input(SOURCE_DIR "/prm/parameter_handler_backslash_04.prm");
+          if (i == 0)
+            {
+              prm.read_input(SOURCE_DIR "/prm/parameter_handler_backslash_04.prm");
+            }
+          else
+            {
+              std::ifstream input_stream
+              (SOURCE_DIR "/prm/parameter_handler_backslash_04.prm");
+              prm.read_input(input_stream);
+            }
+
+          std::string list;
+          prm.enter_subsection ("Testing");
+          list = prm.get ("Function");
+          prm.leave_subsection ();
+
+          deallog << list << std::endl;
         }
-      else
+      catch (ParameterHandler::ExcInvalidEntryForPattern &exc)
         {
-          std::ifstream input_stream
-          (SOURCE_DIR "/prm/parameter_handler_backslash_04.prm");
-          prm.read_input(input_stream);
+          deallog << exc.get_exc_name() << std::endl;
+          exc.print_info(deallog.get_file_stream());
         }
-
-
-      std::string list;
-      prm.enter_subsection ("Testing");
-      list = prm.get ("Function");
-      prm.leave_subsection ();
-
-      deallog << list << std::endl;
     }
 
   return 0;

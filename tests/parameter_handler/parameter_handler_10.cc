@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2015 by the deal.II authors
+// Copyright (C) 2002 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,10 +29,19 @@ void check (const char *p)
   prm.declare_entry ("test_1", "3", Patterns::Integer());
 
   std::ifstream in(p);
-  const bool result = prm.read_input (in);
+  try
+    {
+      prm.read_input (in);
 
-  deallog << result << std::endl;
-  deallog << "test_1=" << prm.get ("test_1") << std::endl;
+      // The first line in the parameter file should not match the given
+      // pattern, so we should not get here
+      deallog << "test_1=" << prm.get ("test_1") << std::endl;
+    }
+  catch (ParameterHandler::ExcInvalidEntryForPattern &exc)
+    {
+      deallog << exc.get_exc_name() << std::endl;
+      exc.print_info(deallog.get_file_stream());
+    }
 }
 
 

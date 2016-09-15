@@ -34,17 +34,20 @@ void check (const char *content)
 
   std::stringstream ss(content);
 
-  if (!foo.read_input(ss))
+  try
     {
-      deallog << "read_input() failed" << std::endl;
-      return;
+      foo.read_input(ss);
+      deallog << "input: ";
+      foo.enter_subsection("bar");
+      deallog << foo.get_double ("val") << " ";
+      foo.leave_subsection();
+      deallog << foo.get_double ("val2") << std::endl;
     }
 
-  deallog << "input: ";
-  foo.enter_subsection("bar");
-  deallog << foo.get_double ("val") << " ";
-  foo.leave_subsection();
-  deallog << foo.get_double ("val2") << std::endl;
+  catch (ParameterHandler::ExcCannotParseLine &)
+    {
+      deallog << "read_input() failed" << std::endl;
+    }
 }
 
 int main ()
