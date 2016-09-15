@@ -279,7 +279,8 @@ Multigrid<VectorType>::level_step(const unsigned int level,
   // from two levels above in
   // defect2. This is subtracted from
   // the original defect.
-  t[level].equ(-1.,defect2[level],1.,defect[level]);
+  t[level].equ(-1.,defect2[level]);
+  t[level] += defect[level];
 
   if (debug>2)
     deallog << cychar << "-cycle defect norm    " << t[level].l2_norm()
@@ -357,7 +358,8 @@ Multigrid<VectorType>::level_step(const unsigned int level,
   if (edge_up != 0)
     edge_up->Tvmult(level, t[level], solution[level-1]);
 
-  t[level].sadd(-1.,-1.,defect2[level],1.,defect[level]);
+  t[level].sadd(-1.,-1.,defect2[level]);
+  t[level] += defect[level];
 
   if (debug>2)
     deallog << cychar << "-cycle  Defect norm    " << t[level].l2_norm()

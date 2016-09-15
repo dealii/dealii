@@ -283,6 +283,21 @@ namespace LinearAlgebra
 
 
   template <typename Number>
+  typename VectorSpaceVector<Number>::value_type Vector<Number>::mean_value() const
+  {
+    Assert (this->size(), ExcEmptyObject());
+
+    typedef typename VectorSpaceVector<Number>::real_type real_type;
+    value_type sum;
+    internal::MeanValue<Number> mean_value(this->val);
+    internal::parallel_reduce(mean_value, this->size(), sum, this->thread_loop_partitioner);
+
+    return sum/static_cast<real_type>(this->size());
+  }
+
+
+
+  template <typename Number>
   typename VectorSpaceVector<Number>::real_type Vector<Number>::l1_norm() const
   {
     Assert (this->size(), ExcEmptyObject());

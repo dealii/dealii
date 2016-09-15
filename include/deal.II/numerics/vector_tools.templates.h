@@ -23,6 +23,7 @@
 #include <deal.II/base/qprojector.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/petsc_vector.h>
@@ -68,6 +69,7 @@
 #include <limits>
 #include <set>
 #include <list>
+#include <typeinfo>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -7220,7 +7222,13 @@ namespace VectorTools
     else
       {
         // This function is not implemented for distributed vectors.
-        Assert(!v.supports_distributed_data, ExcNotImplemented());
+        Assert(typeid(v) == typeid(Vector<double>) ||
+               typeid(v) == typeid(Vector<float>) ||
+               typeid(v) == typeid(BlockVector<double>) ||
+               typeid(v) == typeid(BlockVector<float>) ||
+               typeid(v) == typeid(LinearAlgebra::Vector<double>) ||
+               typeid(v) == typeid(LinearAlgebra::Vector<float>),
+               ExcNotImplemented());
 
         const unsigned int n = v.size();
 

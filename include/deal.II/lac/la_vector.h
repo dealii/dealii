@@ -54,6 +54,7 @@ namespace LinearAlgebra
   {
   public:
     typedef types::global_dof_index size_type;
+    typedef typename ReadWriteVector<Number>::value_type value_type;
 
     /**
      * Constructor. Create a vector of dimension zero.
@@ -176,6 +177,11 @@ namespace LinearAlgebra
      * Assignment <tt>*this = a*V</tt>.
      */
     virtual void equ(const Number a, const VectorSpaceVector<Number> &V);
+
+    /**
+     * Return the mean value of the element of this vector.
+     */
+    virtual typename VectorSpaceVector<Number>::value_type mean_value() const;
 
     /**
      * Return the l<sub>1</sub> norm of the vector (i.e., the sum of the

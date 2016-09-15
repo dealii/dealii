@@ -168,6 +168,10 @@ namespace LinearAlgebra
        */
       virtual void equ(const double a, const VectorSpaceVector<double> &V);
 
+      /**
+       * Return the mean value of the element of this vector.
+       */
+      virtual double mean_value() const;
 
       /**
        * Return the l<sub>1</sub> norm of the vector (i.e., the sum of the
