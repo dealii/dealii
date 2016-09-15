@@ -102,7 +102,19 @@ namespace Polynomials
                              std::vector<number> &values) const
   {
     Assert (values.size() > 0, ExcZero());
-    const unsigned int values_size=values.size();
+
+    value(x,values.size(),&values[0]);
+  }
+
+
+
+  template <typename number>
+  void
+  Polynomial<number>::value (const number         x,
+                             const unsigned int values_size,
+                             number *values) const
+  {
+    Assert(values_size > 0, ExcZero());
 
     // evaluate Lagrange polynomial and derivatives
     if (in_lagrange_product_form == true)

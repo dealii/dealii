@@ -104,6 +104,20 @@ namespace Polynomials
                 std::vector<number> &values) const;
 
     /**
+     * Return the values and the derivatives of the Polynomial at point
+     * <tt>x</tt>.  <tt>values[i], i=0,...,values_size-1</tt> includes the
+     * <tt>i</tt>th derivative. The number of derivatives to be computed is
+     * determined by @p values_size and @p values has to provide sufficient
+     * space for @p values_size values.
+     *
+     * This function uses the Horner scheme for numerical stability of the
+     * evaluation.
+     */
+    void value (const number         x,
+                const unsigned int values_size,
+                number *values) const;
+
+    /**
      * Degree of the polynomial. This is the degree reflected by the number of
      * coefficients provided by the constructor. Leading non-zero coefficients
      * are not treated separately.

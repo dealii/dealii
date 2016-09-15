@@ -46,7 +46,19 @@ namespace Polynomials
                                       std::vector<number> &values) const
   {
     Assert (values.size() > 0, ExcZero());
-    const unsigned int values_size=values.size();
+
+    value(x,values.size(),&values[0]);
+  }
+
+
+
+  template <typename number>
+  void
+  PiecewisePolynomial<number>::value (const number         x,
+                                      const unsigned int values_size,
+                                      number *values) const
+  {
+    Assert (values_size > 0, ExcZero());
 
     // shift polynomial if necessary
     number y = x;
@@ -60,7 +72,7 @@ namespace Polynomials
             const double offset = step * interval;
             if (x<offset || x>offset+step+step)
               {
-                for (unsigned int k=0; k<values.size(); ++k)
+                for (unsigned int k=0; k<values_size; ++k)
                   values[k] = 0;
                 return;
               }
@@ -77,7 +89,7 @@ namespace Polynomials
             const double offset = step * interval;
             if (x<offset || x>offset+step)
               {
-                for (unsigned int k=0; k<values.size(); ++k)
+                for (unsigned int k=0; k<values_size; ++k)
                   values[k] = 0;
                 return;
               }
@@ -100,7 +112,7 @@ namespace Polynomials
           }
       }
 
-    polynomial.value(y, values);
+    polynomial.value(y, values_size, values);
 
     // change sign if necessary
     for (unsigned int j=1; j<values_size; j+=2)
