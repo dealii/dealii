@@ -1674,9 +1674,20 @@ public:
    * method and then modified by the graphical parameter GUI (see the general
    * documentation of this class).
    *
-   * Return whether the read was successful.
+   * @deprecated This function has been deprecated in favor of the replacement
+   * ParameterHandler::parse_input_from_xml, which raises exceptions to indicate
+   * errors instead of returning an error code.
    */
-  virtual bool read_input_from_xml (std::istream &input);
+  virtual bool read_input_from_xml (std::istream &input) DEAL_II_DEPRECATED;
+
+  /**
+   * Parse input from an XML stream to populate known parameter fields. This
+   * could be from a file originally written by the print_parameters() function
+   * using the XML output style and then modified by hand as necessary, or from
+   * a file written using this method and then modified by the graphical
+   * parameter GUI (see the general documentation of this class).
+   */
+  virtual void parse_input_from_xml (std::istream &input);
 
   /**
    * Clear all contents.
@@ -2037,6 +2048,27 @@ public:
                   "    for the entry named\n" << "        " << arg4 << '\n' <<
                   "    does not match the given pattern:\n" << "        " <<
                   arg5);
+
+  /**
+   * Exception for when an XML file cannot be read at all. This happens when
+   * there is no top-level XML element called "ParameterHandler" or when there
+   * are multiple top level elements.
+   */
+  DeclExceptionMsg (ExcInvalidXMLParameterFile,
+                    "The provided file could not be parsed as a "
+                    "ParameterHandler description.");
+
+  /**
+   * Exception for when an entry in an XML parameter file does not match the
+   * provided pattern. The arguments are, in order, the entry value, entry
+   * name, and a description of the pattern.
+   */
+  DeclException3 (ExcInvalidEntryForPatternXML,
+                  std::string, std::string, std::string,
+                  << "    The entry value \n" << "        " << arg1 << '\n' <<
+                  "    for the entry named\n" << "        " << arg2 << '\n' <<
+                  "    does not match the given pattern:\n" << "        " <<
+                  arg3);
 
   /**
    * Exception for when the file given in an include statement cannot be

@@ -1,2 +1,3 @@
 
-DEAL::OK
+DEAL::ExcInvalidXMLParameterFile ("There are " + Utilities::to_string(n_top_level_elements) + " top-level elements, but there " "should only be one.")
+There are 2 top-level elements, but there should only be one.

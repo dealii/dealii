@@ -15,7 +15,7 @@
 
 
 
-// check ParameterHandler::read_input_from_xml
+// check ParameterHandler::parse_input_from_xml
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -75,8 +75,7 @@ int main ()
 
   // read from XML
   std::ifstream in (SOURCE_DIR "/prm/parameter_handler_read_xml.prm");
-  bool result = prm.read_input_from_xml (in);
-  AssertThrow (result == true, ExcInternalError());
+  prm.parse_input_from_xml (in);
 
   // write it out again
   prm.print_parameters (deallog.get_file_stream(), ParameterHandler::XML);

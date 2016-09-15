@@ -1746,15 +1746,12 @@ bool ParameterHandler::read_input_from_string (const char *s,
 
 namespace
 {
-  // Recursively go through the 'source' tree
-  // and see if we can find corresponding
-  // entries in the 'destination' tree. If
-  // not, error out (i.e. we have just read
-  // an XML file that has entries that
-  // weren't declared in the ParameterHandler
-  // object); if so, copy the value of these
+  // Recursively go through the 'source' tree and see if we can find
+  // corresponding entries in the 'destination' tree. If not, error out
+  // (i.e. we have just read an XML file that has entries that weren't
+  // declared in the ParameterHandler object); if so, copy the value of these
   // nodes into the destination object
-  bool
+  void
   read_xml_recursively (const boost::property_tree::ptree &source,
                         const std::string                 &current_path,
                         const char                         path_separator,
@@ -1765,107 +1762,81 @@ namespace
     for (boost::property_tree::ptree::const_iterator p = source.begin();
          p != source.end(); ++p)
       {
-        // a sub-tree must either be a
-        // parameter node or a subsection
+        // a sub-tree must either be a parameter node or a subsection
         if (p->second.get_optional<std::string>("value"))
           {
-            // make sure we have a
-            // corresponding entry in the
-            // destination object as well
+            // make sure we have a corresponding entry in the destination
+            // object as well
             const std::string full_path
               = (current_path == ""
                  ?
                  p->first
                  :
                  current_path + path_separator + p->first);
-            if (destination.get_optional<std::string> (full_path)
-                &&
-                destination.get_optional<std::string> (full_path +
-                                                       path_separator +
-                                                       "value"))
-              {
-                // first make sure that the
-                // new entry actually
-                // satisfies its constraints
-                const std::string new_value
-                  = p->second.get<std::string>("value");
 
-                const unsigned int pattern_index
-                  = destination.get<unsigned int> (full_path +
-                                                   path_separator +
-                                                   "pattern");
-                if (patterns[pattern_index]->match(new_value) == false)
-                  {
-                    std::cerr << "    The entry value" << std::endl
-                              << "        " << new_value << std::endl
-                              << "    for the entry named" << std::endl
-                              << "        " << full_path << std::endl
-                              << "    does not match the given pattern" << std::endl
-                              << "        " << patterns[pattern_index]->description()
-                              << std::endl;
-                    return false;
-                  }
+            const std::string new_value
+              = p->second.get<std::string>("value");
+            AssertThrow (destination.get_optional<std::string> (full_path)
+                         &&
+                         destination.get_optional<std::string>
+                         (full_path + path_separator + "value"),
+                         ParameterHandler::ExcEntryUndeclared (p->first));
 
-                // set the found parameter in
-                // the destination argument
-                destination.put (full_path + path_separator + "value",
-                                 new_value);
+            // first make sure that the new entry actually satisfies its
+            // constraints
+            const unsigned int pattern_index
+              = destination.get<unsigned int> (full_path +
+                                               path_separator +
+                                               "pattern");
+            AssertThrow (patterns[pattern_index]->match(new_value),
+                         ParameterHandler::ExcInvalidEntryForPatternXML
+                         // XML entries sometimes have extra surrounding
+                         // newlines
+                         (Utilities::trim(new_value),
+                          p->first,
+                          patterns[pattern_index]->description()));
 
-                // this node might have
-                // sub-nodes in addition to
-                // "value", such as
-                // "default_value",
-                // "documentation", etc. we
-                // might at some point in the
-                // future want to make sure
-                // that if they exist that
-                // they match the ones in the
-                // 'destination' tree
-              }
-            else
-              {
-                std::cerr << "The entry <" << full_path
-                          << "> with value <"
-                          << p->second.get<std::string>("value")
-                          << "> has not been declared."
-                          << std::endl;
-                return false;
-              }
+            // set the found parameter in the destination argument
+            destination.put (full_path + path_separator + "value",
+                             new_value);
+
+            // this node might have sub-nodes in addition to "value", such as
+            // "default_value", "documentation", etc. we might at some point
+            // in the future want to make sure that if they exist that they
+            // match the ones in the 'destination' tree
           }
         else if (p->second.get_optional<std::string>("alias"))
           {
-            // it is an alias node. alias nodes are static and
-            // there is nothing to do here (but the same applies as
-            // mentioned in the comment above about the static
-            // nodes inside parameter nodes
+            // it is an alias node. alias nodes are static and there is
+            // nothing to do here (but the same applies as mentioned in the
+            // comment above about the static nodes inside parameter nodes
           }
         else
           {
             // it must be a subsection
-            const bool result
-              = read_xml_recursively (p->second,
-                                      (current_path == "" ?
-                                       p->first :
-                                       current_path + path_separator + p->first),
-                                      path_separator,
-                                      patterns,
-                                      destination);
-
-            // see if the recursive read
-            // succeeded. if yes, continue,
-            // otherwise exit now
-            if (result == false)
-              return false;
+            read_xml_recursively (p->second,
+                                  (current_path == "" ?
+                                   p->first :
+                                   current_path + path_separator + p->first),
+                                  path_separator,
+                                  patterns,
+                                  destination);
           }
       }
-
-    return true;
   }
 }
 
 
 
-bool ParameterHandler::read_input_from_xml (std::istream &in)
+bool ParameterHandler::read_input_from_xml(std::istream &in)
+{
+  parse_input_from_xml(in);
+  return true;
+}
+
+
+
+void ParameterHandler::parse_input_from_xml (std::istream &in)
 {
   AssertThrow(in, ExcIO());
   // read the XML tree assuming that (as we
@@ -1873,47 +1844,29 @@ bool ParameterHandler::read_input_from_xml (std::istream &in)
   // a single top-level node called
   // "ParameterHandler"
   boost::property_tree::ptree single_node_tree;
-  try
-    {
-      read_xml (in, single_node_tree);
-    }
-  catch (...)
-    {
-      std::cerr << "This input stream appears not to be valid XML"
-                << std::endl;
-      return false;
-    }
+  // This boost function will raise an exception if this is not a valid XML
+  // file.
+  read_xml (in, single_node_tree);
 
-  // make sure there is a top-level element
+  // make sure there is a single top-level element
   // called "ParameterHandler"
-  if (!single_node_tree.get_optional<std::string>("ParameterHandler"))
-    {
-      std::cerr << "There is no top-level XML element called \"ParameterHandler\"."
-                << std::endl;
-      return false;
-    }
+  AssertThrow (single_node_tree.get_optional<std::string>("ParameterHandler"),
+               ExcInvalidXMLParameterFile ("There is no top-level XML element "
+                                           "called \"ParameterHandler\"."));
 
-  // ensure that there is only a single
-  // top-level element
-  if (std::distance (single_node_tree.begin(), single_node_tree.end()) != 1)
-    {
-      std::cerr << "The top-level XML element \"ParameterHandler\" is "
-                << "not the only one."
-                << std::endl;
-      std::cerr << "(There are "
-                << std::distance (single_node_tree.begin(),
-                                  single_node_tree.end())
-                << " top-level elements.)"
-                << std::endl;
-      return false;
-    }
+  const std::size_t n_top_level_elements = std::distance (single_node_tree.begin(),
+                                                          single_node_tree.end());
+  AssertThrow (n_top_level_elements == 1,
+               ExcInvalidXMLParameterFile ("There are "
+                                           + Utilities::to_string(n_top_level_elements)
+                                           + " top-level elements, but there "
+                                           "should only be one."));
 
   // read the child elements recursively
   const boost::property_tree::ptree
   &my_entries = single_node_tree.get_child("ParameterHandler");
 
-  return read_xml_recursively (my_entries, "", path_separator, patterns,
-                               *entries);
+  read_xml_recursively (my_entries, "", path_separator, patterns, *entries);
 }
 
 
