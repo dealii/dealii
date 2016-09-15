@@ -522,6 +522,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> New: LinearAlgebra::Vector is now instantiated for float and double.
+ <br>
+ (Bruno Turcksin, 2016/09/15)
+ </li>
+
  <li> Improved: FEValues no longer generates the mapping's internal database if
  the mapping will not be required for the set of update flags specified.
  <br>
