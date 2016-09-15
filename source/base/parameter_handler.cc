@@ -1616,12 +1616,18 @@ bool ParameterHandler::read_input (std::istream &input,
   std::string input_line;
   std::string fully_concatenated_line;
   bool is_concatenated = false;
+  // Maintain both the current line number and the current logical line
+  // number, where the latter refers to the line number where (possibly) the
+  // current line continuation started.
   unsigned int current_line_n = 0;
+  unsigned int current_logical_line_n = 0;
   bool status = true;
 
   while (std::getline (input, input_line))
     {
       ++current_line_n;
+      if (!is_concatenated)
+        current_logical_line_n = current_line_n;
       // Trim the whitespace at the ends of the line here instead of in
       // scan_line. This makes the continuation line logic a lot simpler.
       input_line = Utilities::trim (input_line);
@@ -1658,7 +1664,7 @@ bool ParameterHandler::read_input (std::istream &input,
 
       if (!is_concatenated)
         {
-          status &= scan_line (fully_concatenated_line, filename, current_line_n);
+          status &= scan_line (fully_concatenated_line, filename, current_logical_line_n);
           fully_concatenated_line.clear();
         }
     }
