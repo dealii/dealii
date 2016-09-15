@@ -145,31 +145,23 @@ Multigrid<VectorType>::level_v_step (const unsigned int level)
 //  std::cout<<std::endl;
 //  t[level].print(std::cout, 2,false);
 
-  // make t rhs of lower level The
-  // non-refined parts of the
-  // coarse-level defect already
-  // contain the global defect, the
-  // refined parts its restriction.
-  for (unsigned int l = level; l>minlevel; --l)
+  if (edge_out != 0)
     {
-      t[l-1] = 0.;
-      if (l==level && edge_out != 0)
-        {
-          edge_out->vmult_add(level, t[level], solution[level]);
-          if (debug>2)
-            deallog << "Norm     t[" << level << "] " << t[level].l2_norm() << std::endl;
-        }
-
-      if (l==level && edge_down != 0)
-        edge_down->vmult(level, t[level-1], solution[level]);
-
-      transfer->restrict_and_add (l, t[l-1], t[l]);
-      if (debug>3)
-        deallog << "restrict t[" << l-1 << "] " << t[l-1].l2_norm() << std::endl;
-      defect[l-1] -= t[l-1];
-      if (debug>3)
-        deallog << "defect   d[" << l-1 << "] " << defect[l-1].l2_norm() << std::endl;
+      edge_out->vmult_add(level, t[level], solution[level]);
+      if (debug>2)
+        deallog << "Norm     t[" << level << "] " << t[level].l2_norm() << std::endl;
     }
+
+  t[level].sadd(-1.0, 1.0, defect[level]);
+
+  // transfer the residual to the coarser level
+  if (edge_down != 0)
+    {
+      edge_down->vmult(level, t[level-1], solution[level]);
+      defect[level-1] -= t[level-1];
+    }
+
+  transfer->restrict_and_add(level, defect[level-1], t[level]);
 
   // do recursion
   solution[level-1] = 0.;

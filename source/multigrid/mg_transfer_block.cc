@@ -137,16 +137,12 @@ MGTransferBlockSelect<number>::copy_to_mg (
   // multilevel block is always the
   // first, since only one block is
   // selected.
-  bool first = true;
   for (unsigned int level=mg_dof_handler.get_triangulation().n_levels(); level != 0;)
     {
       --level;
       for (IT i= copy_indices[selected_block][level].begin();
            i != copy_indices[selected_block][level].end(); ++i)
         dst[level](i->second) = src.block(selected_block)(i->first);
-      if (!first)
-        restrict_and_add (level+1, dst[level], dst[level+1]);
-      first = false;
     }
 }
 
@@ -164,16 +160,12 @@ MGTransferBlockSelect<number>::copy_to_mg (
   // For MGTransferBlockSelect, the
   // multilevel block is always the
   // first, since only one block is selected.
-  bool first = true;
   for (unsigned int level=mg_dof_handler.get_triangulation().n_levels(); level != 0;)
     {
       --level;
       for (IT i= copy_indices[selected_block][level].begin();
            i != copy_indices[selected_block][level].end(); ++i)
         dst[level](i->second) = src(i->first);
-      if (!first)
-        restrict_and_add (level+1, dst[level], dst[level+1]);
-      first = false;
     }
 }
 
@@ -188,7 +180,6 @@ MGTransferBlock<number>::copy_to_mg (
   const BlockVector<number2> &src) const
 {
   reinit_vector_by_blocks(mg_dof_handler, dst, selected, sizes);
-  bool first = true;
   for (unsigned int level=mg_dof_handler.get_triangulation().n_levels(); level != 0;)
     {
       --level;
@@ -197,9 +188,6 @@ MGTransferBlock<number>::copy_to_mg (
           for (IT i= copy_indices[block][level].begin();
                i != copy_indices[block][level].end(); ++i)
             dst[level].block(mg_block[block])(i->second) = src.block(block)(i->first);
-      if (!first)
-        restrict_and_add (level+1, dst[level], dst[level+1]);
-      first = false;
     }
 }
 
