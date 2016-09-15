@@ -1061,7 +1061,7 @@ namespace Patterns
  *   @endcode
  * The file so referenced is searched for relative to the current directory
  * (not relative to the directory in which the including parameter file is
- * located, since this is not known to all three versions of the read_input()
+ * located, since this is not known to all three versions of the parse_input()
  * function).
  *
  *
@@ -1076,12 +1076,12 @@ namespace Patterns
  *     ...
  *     // declaration of entries
  *     ...
- *     prm.read_input (cin);         // read input from standard in,
+ *     prm.parse_input (std::cin); // read input from standard in,
  *     // or
- *     prm.read_input ("simulation.in");
+ *     prm.parse_input ("simulation.prm");
  *     // or
  *     char *in = "set Time step size = 0.3 \n ...";
- *     prm.read_input_from_string (in);
+ *     prm.parse_input_from_string (in);
  *     ...
  *   @endcode
  * You can use several sources of input successively. Entries which are
@@ -1089,7 +1089,7 @@ namespace Patterns
  *
  * You should not try to declare entries using declare_entry() and
  * enter_subsection() with as yet unknown subsection names after using
- * read_input(). The results in this case are unspecified.
+ * parse_input(). The results in this case are unspecified.
  *
  * If an error occurs upon reading the input, error messages are written to
  * <tt>std::cerr</tt> and the reader function returns with a return value of
@@ -1328,7 +1328,7 @@ namespace Patterns
  *     p.declare_parameters (prm);
  *     // read input from "prmtest.prm"; giving argv[1] would also be a
  *     // good idea
- *     prm.read_input ("prmtest.prm");
+ *     prm.parse_input ("prmtest.prm");
  *     // print parameters to std::cout as ASCII text
  *     std::cout << "\n\n";
  *     prm.print_parameters (std::cout, ParameterHandler::Text);
@@ -1628,11 +1628,28 @@ public:
    * will stop parsing lines after encountering @p last_line .
    * This is handy when adding extra data that shall be parsed manually.
    *
-   * Return whether the read was successful.
+   * @deprecated This function has been deprecated in favor of the replacement
+   * ParameterHandler::parse_input, which raises exceptions to indicate errors
+   * instead of returning an error code.
    */
   virtual bool read_input (std::istream &input,
                            const std::string &filename = "input file",
-                           const std::string &last_line = "");
+                           const std::string &last_line = "") DEAL_II_DEPRECATED;
+
+  /**
+   * Parse each line from a stream until the stream returns the <tt>eof</tt>
+   * condition or error to provide values for known parameter fields. The second
+   * argument can be used to denote the name of the file (if that's what the
+   * input stream represents) we are reading from; this is only used when
+   * creating output for exceptions.
+   *
+   * If non-empty @p last_line is provided, the ParameterHandler object
+   * will stop parsing lines after encountering @p last_line .
+   * This is handy when adding extra data that shall be parsed manually.
+   */
+  virtual void parse_input (std::istream &input,
+                            const std::string &filename = "input file",
+                            const std::string &last_line = "");
 
   /**
    * Read input from a file the name of which is given. The PathSearch class
@@ -1662,10 +1679,23 @@ public:
    * will stop parsing lines after encountering @p last_line .
    * This is handy when adding extra data that shall be parsed manually.
    *
-   * Return whether the read was successful.
+   * @deprecated This function has been deprecated in favor of the replacement
+   * ParameterHandler::parse_input_from_string, which raises exceptions to
+   * indicate errors instead of returning an error code.
    */
   virtual bool read_input_from_string (const char *s,
                                        const std::string &last_line = "");
+
+  /**
+   * Parse input from a string to populate known parameter fields. The lines
+   * in the string must be separated by <tt>@\n</tt> characters.
+   *
+   * If non-empty @p last_line is provided, the ParameterHandler object
+   * will stop parsing lines after encountering @p last_line .
+   * This is handy when adding extra data that shall be parsed manually.
+   */
+  virtual void parse_input_from_string (const char *s,
+                                        const std::string &last_line = "");
 
   /**
    * Read a parameter file in XML format. This could be from a file originally
@@ -2011,12 +2041,15 @@ public:
 
   /**
    * Exception for when there are an unequal number of 'subsection' and 'end'
-   * statements.
+   * statements. The first argument is the name of the file and the second
+   * argument is a formatted list of the subsection path before and after
+   * entering the parser.
    */
-  DeclException1 (ExcUnbalancedSubsections,
-                  std::string,
+  DeclException2 (ExcUnbalancedSubsections,
+                  std::string, std::string,
                   << "There are unequal numbers of 'subsection' and 'end' "
-                  "statements in the parameter file <" << arg1 << ">.");
+                  "statements in the parameter file <" << arg1 << ">."
+                  << (arg2.size() > 0 ? "\n" + arg2 : ""));
 
   /**
    * Exception for when, during parsing of a parameter file, the parser
@@ -2254,7 +2287,7 @@ private:
  *       class MultipleParameterLoop prm;
  *       HelperClass h;
  *       HelperClass::declare_parameters (prm);
- *       prm.read_input ("prmtest.prm");
+ *       prm.parse_input ("prmtest.prm");
  *       prm.loop (h);
  *       return 0;
  *     }
@@ -2424,20 +2457,51 @@ public:
    * This is handy when adding extra data that shall be parsed manually.
    *
    * @note Of the three <tt>read_input</tt> functions implemented by
-   * ParameterHandler, this is the only one overridden with new behavior by
-   * this class. This is because the other two <tt>read_input</tt> functions
-   * just reformat their inputs and then call this version.
+   * ParameterHandler, this method and its replacement
+   * (MultipleParameterLoop::parse_input) are the only ones overridden with
+   * new behavior by this class. This is because the other two
+   * <tt>read_input</tt> functions just reformat their inputs and then call
+   * this version.
+   *
+   * @deprecated This function has been deprecated in favor of the replacement
+   * MultipleParameterLoop::parse_input, which raises exceptions to indicate
+   * errors instead of returning an error code.
    */
   virtual bool read_input (std::istream &input,
                            const std::string &filename = "input file",
-                           const std::string &last_line = "");
+                           const std::string &last_line = "") DEAL_II_DEPRECATED;
+
+  /**
+   * Read input from a stream until the stream returns the <tt>eof</tt>
+   * condition or error. The second argument can be used to denote the name of
+   * the file (if that's what the input stream represents) we are reading
+   * from; this is only used when creating output for error messages.
+   *
+   * If non-empty @p last_line is provided, the ParameterHandler object
+   * will stop parsing lines after encountering @p last_line .
+   * This is handy when adding extra data that shall be parsed manually.
+   *
+   * @note Of the three <tt>parse_input</tt> functions implemented by
+   * ParameterHandler, this method and the deprecated method
+   * MultipleParameterLoop::read_input are the only ones overridden with new
+   * behavior by this class. This is because the other two <tt>parse_input</tt>
+   * functions just reformat their inputs and then call this version.
+   */
+  virtual void parse_input (std::istream &input,
+                            const std::string &filename = "input file",
+                            const std::string &last_line = "");
 
   /**
    * Overriding virtual functions which are overloaded (like
-   * ParameterHandler::read_input, which has two different sets of input
+   * ParameterHandler::parse_input, which has two different sets of input
    * argument types) causes the non-overridden functions to be hidden. Get
    * around this by explicitly using both variants of
-   * ParameterHandler::read_input and then overriding the one we care about.
+   * ParameterHandler::parse_input and then overriding the one we care about.
+   */
+  using ParameterHandler::parse_input;
+
+  /**
+   * For backwards compatibility also include the deprecated read functions.
    */
   using ParameterHandler::read_input;
 

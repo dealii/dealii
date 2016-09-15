@@ -48,7 +48,7 @@ namespace Functions
    *   ParsedFunction<dim> my_vector_function(dim);
    *
    *   // Parse an input file.
-   *   prm.read_input(some_input_file);
+   *   prm.parse_input(some_input_file);
    *
    *   // Initialize the ParsedFunction object with the given file
    *   prm.enter_subsection("My vector function");

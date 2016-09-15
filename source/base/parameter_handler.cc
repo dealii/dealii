@@ -1608,6 +1608,16 @@ bool ParameterHandler::read_input (std::istream &input,
                                    const std::string &filename,
                                    const std::string &last_line)
 {
+  parse_input(input, filename, last_line);
+  return true;
+}
+
+
+
+void ParameterHandler::parse_input (std::istream &input,
+                                    const std::string &filename,
+                                    const std::string &last_line)
+{
   AssertThrow (input, ExcIO());
 
   // store subsections we are currently in
@@ -1621,7 +1631,6 @@ bool ParameterHandler::read_input (std::istream &input,
   // current line continuation started.
   unsigned int current_line_n = 0;
   unsigned int current_logical_line_n = 0;
-  bool status = true;
 
   while (std::getline (input, input_line))
     {
@@ -1676,28 +1685,34 @@ bool ParameterHandler::read_input (std::istream &input,
       scan_line (fully_concatenated_line, filename, current_line_n);
     }
 
-  if (status && (saved_path != subsection_path))
+  if (saved_path != subsection_path)
     {
-      std::cerr << "Unbalanced 'subsection'/'end' in file <" << filename
-                << ">." << std::endl;
-      if (saved_path.size()>0)
+      std::stringstream paths_message;
+      if (saved_path.size() > 0)
         {
-          std::cerr << "Path before loading input:" << std::endl;
-          for (unsigned int i=0; i<saved_path.size(); ++i)
-            std::cerr << std::setw(i*2+4) << " "
-                      << "subsection " << saved_path[i] << std::endl;
+          paths_message << "Path before loading input:\n";
+          for (unsigned int i=0; i < subsection_path.size(); ++i)
+            {
+              paths_message << std::setw(i*2 + 4)
+                            << " "
+                            << "subsection "
+                            << saved_path[i]
+                            << '\n';
+            }
+          paths_message << "Current path:\n";
+          for (unsigned int i=0; i < subsection_path.size(); ++i)
+            {
+              paths_message << std::setw(i*2 + 4)
+                            << " "
+                            << "subsection "
+                            << subsection_path[i]
+                            << (i == subsection_path.size() - 1 ? "" : "\n");
+            }
         }
-      std::cerr << "Current path:" << std::endl;
-      for (unsigned int i=0; i<subsection_path.size(); ++i)
-        std::cerr << std::setw(i*2+4) << " "
-                  << "subsection " << subsection_path[i] << std::endl;
-
-      // restore subsection we started with and return failure:
+      // restore subsection we started with before throwing the exception:
       subsection_path = saved_path;
-      return false;
+      AssertThrow (false, ExcUnbalancedSubsections (filename, paths_message.str()));
     }
-
-  return status;
 }
 
 
@@ -1715,7 +1730,7 @@ bool ParameterHandler::read_input (const std::string &filename,
       std::ifstream file_stream (openname.c_str());
       AssertThrow(file_stream, ExcIO());
 
-      return read_input (file_stream, filename, last_line);
+      parse_input (file_stream, filename, last_line);
     }
   catch (const PathSearch::ExcFileNotFound &)
     {
@@ -1735,11 +1750,22 @@ bool ParameterHandler::read_input (const std::string &filename,
 
 
 
-bool ParameterHandler::read_input_from_string (const char *s,
-                                               const std::string &last_line)
+bool
+ParameterHandler::read_input_from_string (const char *s,
+                                          const std::string &last_line)
+{
+  parse_input_from_string(s, last_line);
+  return true;
+}
+
+
+
+void
+ParameterHandler::parse_input_from_string (const char *s,
+                                           const std::string &last_line)
 {
   std::istringstream input_stream (s);
-  return read_input (input_stream, "input string", last_line);
+  parse_input (input_stream, "input string", last_line);
 }
 
 
@@ -2945,7 +2971,7 @@ ParameterHandler::scan_line (std::string         line,
       AssertThrow (input, ExcCannotOpenIncludeStatementFile (current_line_n,
                                                              input_filename,
                                                              line));
-      read_input (input);
+      parse_input (input);
     }
   else
     {
@@ -3017,16 +3043,29 @@ MultipleParameterLoop::~MultipleParameterLoop ()
 
 
 
-bool MultipleParameterLoop::read_input (std::istream &input,
-                                        const std::string &filename,
-                                        const std::string &last_line)
+bool
+MultipleParameterLoop::read_input (std::istream &input,
+                                   const std::string &filename,
+                                   const std::string &last_line)
+{
+  MultipleParameterLoop::parse_input(input, filename, last_line);
+  return true;
+}
+
+
+
+void
+MultipleParameterLoop::parse_input (std::istream &input,
+                                    const std::string &filename,
+                                    const std::string &last_line)
 {
   AssertThrow (input, ExcIO());
 
-  bool x = ParameterHandler::read_input (input, filename, last_line);
-  if (x)
-    init_branches ();
-  return x;
+  // Note that (to avoid infinite recursion) we have to explicitly call the
+  // base class version of parse_input and *not* a wrapper (which may be
+  // virtual and lead us back here)
+  ParameterHandler::parse_input (input, filename, last_line);
+  init_branches ();
 }
 
 
