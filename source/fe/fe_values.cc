@@ -3681,6 +3681,8 @@ FEValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
   this->fe_data.reset (fe_get_data.return_value());
   if (flags & update_mapping)
     this->mapping_data.reset (mapping_get_data.return_value());
+  else
+    this->mapping_data.reset (new typename Mapping<dim,spacedim>::InternalDataBase());
 }
 
 
@@ -3930,6 +3932,8 @@ FEFaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
   this->fe_data.reset (fe_get_data.return_value());
   if (flags & update_mapping)
     this->mapping_data.reset (mapping_get_data.return_value());
+  else
+    this->mapping_data.reset (new typename Mapping<dim,spacedim>::InternalDataBase());
 }
 
 
@@ -4097,6 +4101,8 @@ FESubfaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
   this->fe_data.reset (fe_get_data.return_value());
   if (flags & update_mapping)
     this->mapping_data.reset (mapping_get_data.return_value());
+  else
+    this->mapping_data.reset (new typename Mapping<dim,spacedim>::InternalDataBase());
 }
 
 
