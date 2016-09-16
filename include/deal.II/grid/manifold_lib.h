@@ -135,27 +135,26 @@ private:
  * While PolarManifold reflects the usual notion of polar coordinates,
  * it may not be suitable for domains that contain either the north or
  * south poles.  Consider for instance the pair of points
- * \f$x_1=(1,\pi/3,0)\f$ and \f$x_2=(1,\pi/3,\pi)\f$ in polar
+ * $x_1=(1,\pi/3,0)$ and $x_2=(1,\pi/3,\pi)$ in polar
  * coordinates (lying on the surface of a sphere with radius one, on
  * a parallel at at height $\pi/3$). In this case connecting the points
  * with a straight line in polar coordinates would take the long road
  * around the globe, without passing through the north pole.
  *
  * These two points would be connented (using a PolarManifold) by the curve
- * \$[
- * \begin{align}
+ * @f{align*}{
  *   s: [0,1]  & \rightarrow &  \mathbb S^3 \\
  *           t & \mapsto     &  (1,\pi/3,0) + (0,0,t\pi)
- * \$]
+ * @f}
  * This curve is not a geodesic on the sphere, and it is not how we
  * would connect those two points. A better curve, would be the one
  * passing through the North pole:
- * \[
+ * @f[
  *  s(t) = x_1 \cos(\alpha(t)) + \kappa \times x_1 \sin(\alpha(t)) +
  *  \kappa ( \kappa \cdot x_1) (1-\cos(\alpha(t))).
- * \]
- * where $\kappa = \frac{x_1 \times \x_2}{\Vert x_1 \times \x_2 \Vert}$
- * and $\alpha(t) = t * \arccos(x_1 * x_2) $ for $t\in[0,1]$.
+ * @f]
+ * where $\kappa = \frac{x_1 \times x_2}{\Vert x_1 \times x_2 \Vert}$
+ * and $\alpha(t) = t \cdot \arccos(x_1 \cdot x_2)$ for $t\in[0,1]$.
  * Indeed, this is a geodesic, and it is the natural choice when
  * connecting points on the surface of the sphere. In the examples above,
  * the PolarManifold class implements the first way of connecting two
