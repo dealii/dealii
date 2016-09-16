@@ -2081,7 +2081,12 @@ namespace Step31
     temperature_solution = tmp[0];
     old_temperature_solution = tmp[1];
 
+    temperature_constraints.distribute(temperature_solution);
+    temperature_constraints.distribute(old_temperature_solution);
+
     stokes_trans.interpolate (x_stokes, stokes_solution);
+
+    stokes_constraints.distribute(stokes_solution);
 
     rebuild_stokes_matrix         = true;
     rebuild_temperature_matrices  = true;
