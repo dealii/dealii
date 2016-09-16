@@ -530,6 +530,13 @@ inconvenience this causes.
 
 <ol>
 
+ <li> Fixed: TrilinosWrappers::MPI::Vector::locally_owned_elements()
+ now returns the correct IndexSet also if initialized with two
+ IndexSets. 
+ <br>
+ (Daniel Arndt, 2016/09/16)
+ </li>
+
  <li> New: LinearAlgebra::Vector is now instantiated for float and double.
  <br>
  (Bruno Turcksin, 2016/09/15)
