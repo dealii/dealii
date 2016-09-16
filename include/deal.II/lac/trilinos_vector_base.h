@@ -1087,6 +1087,10 @@ namespace TrilinosWrappers
   IndexSet
   VectorBase::locally_owned_elements() const
   {
+    Assert(owned_elements.size()==size(),
+           ExcMessage("The locally owned elements have not been properly initialized!"
+                      " This happens for example if this object has been initialized"
+                      " with exactly one overlapping IndexSet."));
     return owned_elements;
   }
 
@@ -1204,7 +1208,7 @@ namespace TrilinosWrappers
     if (v.nonlocal_vector.get() != 0)
       nonlocal_vector.reset(new Epetra_MultiVector(v.nonlocal_vector->Map(), 1));
 
-    owned_elements = v.locally_owned_elements();
+    owned_elements = v.owned_elements;
   }
 
 

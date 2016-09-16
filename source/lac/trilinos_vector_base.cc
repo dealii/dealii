@@ -141,7 +141,7 @@ namespace TrilinosWrappers
         last_action = Zero;
         vector.reset (new Epetra_FEVector(*v.vector));
         has_ghosts = v.has_ghosts;
-        owned_elements = v.locally_owned_elements();
+        owned_elements = v.owned_elements;
       }
     else
       {

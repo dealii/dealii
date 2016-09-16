@@ -1,2 +1,2 @@
 
-DEAL:0:2d::Exception: ExcGhostsPresent()
+DEAL:0:2d::Exception: ExcMessage("The locally owned elements have not been properly initialized!" " This happens for example if this object has been initialized" " with exactly one overlapping IndexSet.")

@@ -122,7 +122,7 @@ namespace TrilinosWrappers
       last_action = Zero;
       vector.reset (new Epetra_FEVector(*v.vector));
       has_ghosts = v.has_ghosts;
-      owned_elements = v.locally_owned_elements();
+      owned_elements = v.owned_elements;
     }
 
 
@@ -318,7 +318,7 @@ namespace TrilinosWrappers
               vector.reset (new Epetra_FEVector(v.vector->Map()));
               has_ghosts = v.has_ghosts;
               last_action = Zero;
-              owned_elements = v.locally_owned_elements();
+              owned_elements = v.owned_elements;
             }
           else if (omit_zeroing_entries == false)
             {
@@ -395,7 +395,7 @@ namespace TrilinosWrappers
             my_global_elements(v.block(block).vector_partitioner());
           for (size_type i=0; i<v.block(block).local_size(); ++i)
             global_ids[added_elements++] = glob_elements[i] + block_offset;
-          owned_elements.add_indices(v.block(block).locally_owned_elements(),
+          owned_elements.add_indices(v.block(block).owned_elements,
                                      block_offset);
           block_offset += v.block(block).size();
         }
@@ -532,7 +532,7 @@ namespace TrilinosWrappers
           vector.reset (new Epetra_FEVector(*v.vector));
           last_action = Zero;
           has_ghosts = v.has_ghosts;
-          owned_elements = v.locally_owned_elements();
+          owned_elements = v.owned_elements;
         }
 
       if (v.nonlocal_vector.get() != 0)
@@ -732,7 +732,7 @@ namespace TrilinosWrappers
                                  v.vector->Map().IndexBase(),
                                  v.vector->Comm());
             vector.reset (new Epetra_FEVector(map));
-            owned_elements = v.locally_owned_elements();
+            owned_elements = v.owned_elements;
           }
         else if (omit_zeroing_entries)
           {
@@ -806,7 +806,7 @@ namespace TrilinosWrappers
                              v.vector->Map().IndexBase(),
                              v.vector->Comm());
         vector.reset (new Epetra_FEVector(map));
-        owned_elements = v.locally_owned_elements();
+        owned_elements = v.owned_elements;
       }
 
     const int ierr = vector->Update(1.0, *v.vector, 0.0);

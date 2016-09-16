@@ -513,7 +513,7 @@ namespace TrilinosWrappers
        *
        * In case the provided IndexSet forms an overlapping partitioning,
        * it it not clear which elements are owned by which process and
-       * locally_owned_elements will return an IndexSet of size zero.
+       * locally_owned_elements() will return an IndexSet of size zero.
        *
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
