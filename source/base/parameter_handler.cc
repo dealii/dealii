@@ -1730,7 +1730,7 @@ bool ParameterHandler::read_input (const std::string &filename,
       std::ifstream file_stream (openname.c_str());
       AssertThrow(file_stream, ExcIO());
 
-      parse_input (file_stream, filename, last_line);
+      return read_input (file_stream, filename, last_line);
     }
   catch (const PathSearch::ExcFileNotFound &)
     {
@@ -1746,6 +1746,18 @@ bool ParameterHandler::read_input (const std::string &filename,
         }
     }
   return false;
+}
+
+
+
+void ParameterHandler::parse_input (const std::string &filename,
+                                    const std::string &last_line)
+{
+  PathSearch search("PARAMETERS");
+
+  std::string openname = search.find(filename);
+  std::ifstream file_stream (openname.c_str());
+  parse_input (file_stream, filename, last_line);
 }
 
 

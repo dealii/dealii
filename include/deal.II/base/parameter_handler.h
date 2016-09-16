@@ -1655,8 +1655,6 @@ public:
    * Read input from a file the name of which is given. The PathSearch class
    * "PARAMETERS" is used to find the file.
    *
-   * Return whether the read was successful.
-   *
    * Unless <tt>optional</tt> is <tt>true</tt>, this function will
    * automatically generate the requested file with default values if the file
    * did not exist. This file will not contain additional comments if
@@ -1665,11 +1663,30 @@ public:
    * If non-empty @p last_line is provided, the ParameterHandler object
    * will stop parsing lines after encountering @p last_line .
    * This is handy when adding extra data that shall be parsed manually.
+   *
+   * @deprecated This function has been deprecated in favor of the replacement
+   * ParameterHandler::parse_input, which raises exceptions to indicate errors
+   * instead of returning an error code. ParameterHandler::parse_input does
+   * not have the capability to write default values to a file on failure: if
+   * you wish to duplicate that old behavior then you should catch the
+   * PathSearch::ExcFileNotFound exception and then call
+   * ParameterHandler::print_parameters.
    */
   virtual bool read_input (const std::string &filename,
                            const bool optional = false,
                            const bool write_stripped_file = false,
-                           const std::string &last_line = "");
+                           const std::string &last_line = "") DEAL_II_DEPRECATED;
+
+  /**
+   * Parse the given file to provide values for known parameter fields. The
+   * PathSearch class "PARAMETERS" is used to find the file.
+   *
+   * If non-empty @p last_line is provided, the ParameterHandler object
+   * will stop parsing lines after encountering @p last_line .
+   * This is handy when adding extra data that shall be parsed manually.
+   */
+  virtual void parse_input (const std::string &filename,
+                            const std::string &last_line = "");
 
   /**
    * Read input from a string in memory. The lines in memory have to be
