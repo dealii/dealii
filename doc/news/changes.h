@@ -388,7 +388,7 @@ inconvenience this causes.
  (Timo Heister, 2016/09/16)
  </li>
 
- <li> Fixed: EmbeddedRungeKutta methods now correctly increase delta_t_guess 
+ <li> Fixed: EmbeddedRungeKutta methods now correctly increase delta_t_guess
  when the error is below coarsen_tol.
  </br>
  (Vaibhav Palkar, Bruno Turcksin, 2016/09/16)
@@ -396,9 +396,24 @@ inconvenience this causes.
 
  <li> Fixed: TrilinosWrappers::MPI::Vector::locally_owned_elements()
  now returns the correct IndexSet also if initialized with two
- IndexSets. 
+ IndexSets.
  <br>
  (Daniel Arndt, 2016/09/16)
+ </li>
+
+ <li> Improved: The multigrid V-cycle has been rewritten for performance on
+ large-scale machines. Rather than transferring parts of the defect
+ immediately to all coarser levels with a complexity of O(n_levels) global
+ communication steps per V-cycle, we now transfer the full defect once to the
+ next coarser level only, resulting in crossing all processors only once.
+ <br>
+ (Martin Kronbichler, 2016/09/16)
+ </li>
+
+ <li> Fixed: The Multigrid W-cycle and F-cycle have been fixed (for uniform
+ grids).
+ <br>
+ (Martin Kronbichler, 2016/09/16)
  </li>
 
  <li> New: LinearAlgebra::Vector is now instantiated for float and double.
@@ -432,8 +447,8 @@ inconvenience this causes.
  (Daniel Arndt, 2016/09/11)
  </li>
 
- <li> New: IndexSet::is_ascending_and_one_to_one allows to find out 
- whether the nth range of indices is stored on the nth process in case 
+ <li> New: IndexSet::is_ascending_and_one_to_one allows to find out
+ whether the nth range of indices is stored on the nth process in case
  the IndexSets are contiguous.
  <br>
  (Daniel Arndt, 2016/09/11)
