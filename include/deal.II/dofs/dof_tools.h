@@ -29,6 +29,8 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <ostream>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -51,7 +53,6 @@ namespace GridTools
   template <typename CellIterator> struct PeriodicFacePair;
 }
 
-//TODO: map_support_points_to_dofs should generate a multimap, rather than just a map, since several dofs may be located at the same support point
 
 /**
  * This is a collection of functions operating on, and manipulating the
@@ -2188,6 +2189,11 @@ namespace DoFTools
    * Just as with the function above, it is assumed that the finite element in
    * use here actually supports the notion of support points of all its
    * components.
+   *
+   * @todo This function should generate a multimap, rather than just a map,
+   * since several dofs may be located at the same support point. Currently,
+   * only the last value in the map returned by map_dofs_to_support_points() for
+   * each point will be returned.
    */
   template <typename DoFHandlerType, class Comp>
   void
@@ -2195,6 +2201,37 @@ namespace DoFTools
   (const Mapping<DoFHandlerType::dimension, DoFHandlerType::space_dimension>       &mapping,
    const DoFHandlerType                                                            &dof_handler,
    std::map<Point<DoFHandlerType::space_dimension>, types::global_dof_index, Comp> &point_to_index_map);
+
+  /**
+   * Generate text output readable by gnuplot with point data based on the
+   * given map @p support_points.  For each support point location, a string
+   * label containing a list of all DoFs from the map is generated.  The map
+   * can be generated with a call to map_dofs_to_support_points() and is useful
+   * to visualize location and global numbering of unknowns.
+   *
+   * An example for the format of each line in the output is:
+   * @code
+   * x [y] [z] "dof1, dof2"
+   * @endcode
+   * where x, y, and z (present only in corresponding dimension) are the
+   * coordinates of the support point, followed by a list of DoF numbers.
+   *
+   * The points with labels can be plotted as follows in gnuplot:
+   * @code
+   * plot "./points.gpl" using 1:2:3 with labels point offset 1,1
+   * @endcode
+   *
+   * Examples (this also includes the grid written separately using GridOut):
+   * <p ALIGN="center">
+   * @image html support_point_dofs1.png
+   * @image html support_point_dofs2.png
+   * </p>
+   */
+  template <int spacedim>
+  void
+  write_gnuplot_dof_support_point_info(std::ostream &out,
+                                       const std::map<types::global_dof_index, Point<spacedim> > &support_points);
+
 
   /**
    * Map a coupling table from the user friendly organization by components to
