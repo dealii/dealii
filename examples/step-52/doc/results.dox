@@ -23,18 +23,18 @@ SDIRK:                    error=0.0042349
 Embedded %explicit methods:
 Heun-Euler:               error=0.0073012
                 steps performed=284
-Bogacki-Shampine:         error=0.000207511
-                steps performed=200
-Dopri:                    error=4.01774e-09
-                steps performed=200
-Fehlberg:                 error=9.89504e-09
-                steps performed=200
-Cash-Karp:                error=2.55791e-10
-                steps performed=200
+Bogacki-Shampine:         error=0.000403281
+                steps performed=181
+Dopri:                    error=0.0165485
+                steps performed=119
+Fehlberg:                 error=0.00104926
+                steps performed=106
+Cash-Karp:                error=8.59366e-07
+                steps performed=107
+
 @endcode
 
 As expected the higher order methods give (much) more accurate solutions. We
-also see that the (rather inaccurate) Heun-Euler method adapted the number of
+also see that the (rather inaccurate) Heun-Euler method increased the number of
 time steps in order to satisfy the tolerance. On the other hand, the other
-embedded methods did not need to change the number of time steps as they are
-easily able to reach the desired tolerance with the given time step size.
+embedded methods used a lot less time steps than what was prescribed.

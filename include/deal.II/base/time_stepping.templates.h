@@ -727,7 +727,7 @@ namespace TimeStepping
             else
               {
                 status.exit_delta_t = DELTA_T;
-                status.delta_t_guess = delta_t;
+                status.delta_t_guess = new_delta_t;
               }
           }
         // Check if the norm of error is less than the refining tolerance

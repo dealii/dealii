@@ -529,6 +529,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: EmbeddedRungeKutta methods now correctly increase delta_t_guess 
+ when the error is below coarsen_tol.
+ </br>
+ (Vaibhav Palkar, Bruno Turcksin, 2016/09/16)
+ </li>
 
  <li> New: LinearAlgebra::Vector is now instantiated for float and double.
  <br>
