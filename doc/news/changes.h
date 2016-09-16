@@ -529,6 +529,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: EmbeddedRungeKutta methods now correctly increase delta_t_guess 
+ when the error is below coarsen_tol.
+ </br>
+ (Vaibhav Palkar, Bruno Turcksin, 2016/09/16)
+ </li>
 
  <li> Fixed: TrilinosWrappers::MPI::Vector::locally_owned_elements()
  now returns the correct IndexSet also if initialized with two
