@@ -209,7 +209,7 @@ namespace Step35
       std::ifstream file (filename);
       AssertThrow (file, ExcFileNotOpen (filename));
 
-      prm.read_input (file);
+      prm.parse_input (file);
 
       if (prm.get ("Method_Form") == std::string ("rotational"))
         form = METHOD_ROTATIONAL;

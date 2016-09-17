@@ -270,7 +270,7 @@ namespace Step19
             args.pop_front ();
 
             // Now read the input file:
-            prm.read_input (parameter_file);
+            prm.parse_input (parameter_file);
 
             // Both the output file name as well as the format can be
             // specified on the command line. We have therefore given them

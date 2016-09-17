@@ -1378,7 +1378,7 @@ namespace Step33
     ParameterHandler prm;
     Parameters::AllParameters<dim>::declare_parameters (prm);
 
-    prm.read_input (input_filename);
+    prm.parse_input (input_filename);
     parameters.parse_parameters (prm);
 
     verbose_cout.set_condition (parameters.output == Parameters::Solver::verbose);

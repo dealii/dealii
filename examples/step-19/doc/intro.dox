@@ -68,7 +68,7 @@ that might later give an explanation of what the parameter stands for.
 
 
 Once all parameters have been declared, parameters can be read, using the
-<code>ParameterHandler::read_input</code> family of functions. There are
+<code>ParameterHandler::parse_input</code> family of functions. There are
 versions of this function that can read from a file stream, that take a file
 name, or that simply take a string and parse it. When reading parameters, the
 class makes sure that only parameters are listed in the input that have been
@@ -118,4 +118,3 @@ The rest of the story is probably best told by looking at the source of step-19
 itself. Let us, however, end this introduction by pointing the reader at the
 extensive class documentation of the <code>ParameterHandler</code> class for
 more information on specific details of that class.
-

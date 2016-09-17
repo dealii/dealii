@@ -1054,9 +1054,7 @@ namespace Step32
         AssertThrow (false, ExcMessage (message.str().c_str()));
       }
 
-    const bool success = prm.read_input (parameter_file);
-    AssertThrow (success, ExcMessage ("Invalid input parameter file."));
-
+    prm.parse_input (parameter_file);
     parse_parameters (prm);
   }
 
