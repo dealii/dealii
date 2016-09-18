@@ -789,16 +789,16 @@ private:
                                              const std::vector<FullMatrix<double> > &dofs_subcell);
 
   /**
-   * Initialize the @p unit_support_points field of the FiniteElement class.
+   * Initialize the @p generalized_support_points field of the FiniteElement class.
    * Called from the constructor.
    */
-  void initialize_unit_support_points ();
+  void initialize_generalized_support_points ();
 
   /**
-   * Initialize the @p unit_face_support_points field of the FiniteElement
+   * Initialize the @p generalized_face_support_points field of the FiniteElement
    * class. Called from the constructor.
    */
-  void initialize_unit_face_support_points ();
+  void initialize_generalized_face_support_points ();
 
   /**
    * Mapping from lexicographic to shape function numbering on first face.
@@ -819,7 +819,7 @@ private:
 /* -------------- declaration of explicit specializations ------------- */
 
 template <>
-void FE_Q_Hierarchical<1>::initialize_unit_face_support_points ();
+void FE_Q_Hierarchical<1>::initialize_generalized_face_support_points ();
 
 template <>
 bool

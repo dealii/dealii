@@ -99,8 +99,8 @@ FE_Q_Hierarchical<dim>::FE_Q_Hierarchical (const unsigned int degree)
 
   // finally fill in support points
   // on cell and face
-  initialize_unit_support_points ();
-  initialize_unit_face_support_points ();
+  initialize_generalized_support_points ();
+  initialize_generalized_face_support_points ();
 }
 
 
@@ -740,14 +740,14 @@ initialize_embedding_and_restriction (const std::vector<FullMatrix<double> > &do
 
 
 template <int dim>
-void FE_Q_Hierarchical<dim>::initialize_unit_support_points ()
+void FE_Q_Hierarchical<dim>::initialize_generalized_support_points ()
 {
   // number of points: (degree+1)^dim
   unsigned int n = this->degree+1;
   for (unsigned int i=1; i<dim; ++i)
     n *= this->degree+1;
 
-  this->unit_support_points.resize(n);
+  this->generalized_support_points.resize(n);
 
   const std::vector<unsigned int> &index_map_inverse=
     this->poly_space.get_numbering_inverse();
@@ -809,14 +809,14 @@ void FE_Q_Hierarchical<dim>::initialize_unit_support_points ()
               else
                 p(2) = .5;
             }
-          this->unit_support_points[index_map_inverse[k++]] = p;
+          this->generalized_support_points[index_map_inverse[k++]] = p;
         };
 }
 
 
 
 template <>
-void FE_Q_Hierarchical<1>::initialize_unit_face_support_points ()
+void FE_Q_Hierarchical<1>::initialize_generalized_face_support_points ()
 {
   // no faces in 1d, so nothing to do
 }
@@ -1627,7 +1627,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 
 
 template <int dim>
-void FE_Q_Hierarchical<dim>::initialize_unit_face_support_points ()
+void FE_Q_Hierarchical<dim>::initialize_generalized_face_support_points ()
 {
   const unsigned int codim = dim-1;
 
@@ -1636,7 +1636,7 @@ void FE_Q_Hierarchical<dim>::initialize_unit_face_support_points ()
   for (unsigned int i=1; i<codim; ++i)
     n *= this->degree+1;
 
-  this->unit_face_support_points.resize(n);
+  this->generalized_face_support_points.resize(n);
 
   Point<codim> p;
 
@@ -1669,7 +1669,7 @@ void FE_Q_Hierarchical<dim>::initialize_unit_face_support_points ()
               else
                 p(2) = .5;
             }
-          this->unit_face_support_points[face_renumber[k++]] = p;
+          this->generalized_face_support_points[face_renumber[k++]] = p;
         };
 }
 
