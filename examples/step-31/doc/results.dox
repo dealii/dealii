@@ -183,9 +183,9 @@ Timestep 0:  t=0
    Rebuilding Stokes preconditioner...
    Solving...
    0 GMRES iterations for Stokes subsystem.
-   Time step: 2.60417
-   22 CG iterations for temperature.
-   Temperature range: -0.717838 5.25595
+   Time step: 2.45098
+   9 CG iterations for temperature.
+   Temperature range: -0.675683 4.94725
 
 Number of active cells: 288 (on 4 levels)
 Number of degrees of freedom: 12379 (8943+455+2981)
@@ -195,9 +195,9 @@ Timestep 0:  t=0
    Rebuilding Stokes preconditioner...
    Solving...
    0 GMRES iterations for Stokes subsystem.
-   Time step: 1.30208
-   27 CG iterations for temperature.
-   Temperature range: -0.560342 2.39811
+   Time step: 1.22549
+   9 CG iterations for temperature.
+   Temperature range: -0.527701 2.25764
 
 Number of active cells: 1296 (on 5 levels)
 Number of degrees of freedom: 51497 (37305+1757+12435)
@@ -207,29 +207,29 @@ Timestep 0:  t=0
    Rebuilding Stokes preconditioner...
    Solving...
    0 GMRES iterations for Stokes subsystem.
-   Time step: 0.651042
-   28 CG iterations for temperature.
-   Temperature range: -0.527408 0.900169
+   Time step: 0.612745
+   10 CG iterations for temperature.
+   Temperature range: -0.496942 0.847395
 
-Number of active cells: 5104 (on 6 levels)
-Number of degrees of freedom: 194273 (140913+6389+46971)
+Number of active cells: 5048 (on 6 levels)
+Number of degrees of freedom: 192425 (139569+6333+46523)
 
 Timestep 0:  t=0
    Assembling...
    Rebuilding Stokes preconditioner...
    Solving...
    0 GMRES iterations for Stokes subsystem.
-   Time step: 0.325521
-   28 CG iterations for temperature.
-   Temperature range: -0.283877 0.528447
+   Time step: 0.306373
+   10 CG iterations for temperature.
+   Temperature range: -0.267683 0.497739
 
-Timestep 1:  t=0.325521
+Timestep 1:  t=0.306373
    Assembling...
    Solving...
-   55 GMRES iterations for Stokes subsystem.
-   Time step: 0.325521
-   26 CG iterations for temperature.
-   Temperature range: -0.488053 1.02071
+   27 GMRES iterations for Stokes subsystem.
+   Time step: 0.306373
+   10 CG iterations for temperature.
+   Temperature range: -0.461787 0.958679
 
 ...
 </pre>
