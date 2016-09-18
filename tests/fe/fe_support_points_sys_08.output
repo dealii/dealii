@@ -4,3 +4,8 @@ DEAL::FE_Nedelec<2>(0)1FESystem<2>(FE_DGQ<2>(3),3)1FESystem<2>(FE_Q<2>(2),3, FE_
 DEAL::FE_Nedelec<2>(0)1FESystem<2>(FE_DGQ<2>(3),3)1FESystem<2>(FE_Q<2>(2),3, FE_Nedelec<2>(0),2)2<2> face 1 support points
 DEAL::FE_Nedelec<2>(0)1FESystem<2>(FE_DGQ<2>(3),3)1FESystem<2>(FE_Q<2>(2),3, FE_Nedelec<2>(0),2)2<2> face 2 support points
 DEAL::FE_Nedelec<2>(0)1FESystem<2>(FE_DGQ<2>(3),3)1FESystem<2>(FE_Q<2>(2),3, FE_Nedelec<2>(0),2)2<2> face 3 support points
+DEAL::FE_Nedelec<2>(0)1FESystem<2>(FE_DGQ<2>(3),3)1FESystem<2>(FE_Q<2>(2),3, FE_Nedelec<2>(0),2)2<2> cell generalized support points
+DEAL::FE_Nedelec<2>(0)1FESystem<2>(FE_DGQ<2>(3),3)1FESystem<2>(FE_Q<2>(2),3, FE_Nedelec<2>(0),2)2<2> face 0 generalized support points
+DEAL::FE_Nedelec<2>(0)1FESystem<2>(FE_DGQ<2>(3),3)1FESystem<2>(FE_Q<2>(2),3, FE_Nedelec<2>(0),2)2<2> face 1 generalized support points
+DEAL::FE_Nedelec<2>(0)1FESystem<2>(FE_DGQ<2>(3),3)1FESystem<2>(FE_Q<2>(2),3, FE_Nedelec<2>(0),2)2<2> face 2 generalized support points
+DEAL::FE_Nedelec<2>(0)1FESystem<2>(FE_DGQ<2>(3),3)1FESystem<2>(FE_Q<2>(2),3, FE_Nedelec<2>(0),2)2<2> face 3 generalized support points
