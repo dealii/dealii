@@ -75,11 +75,20 @@ CONFIGURE_FILE(
 
 
 #
-# Generate header, footer and style files for doxygen
+# Generate header, footer and style files for doxygen.
+#
+# A bug in (at least) doxygen 1.8.12 required that these files already exist
+# if they are listed in the options.dox file, even though the -w command is
+# specifically intended to create them. See
+#    https://bugzilla.gnome.org/show_bug.cgi?id=771606
+# To work around this, do a 'touch' operation in them first to ensure they're
+# there before we call "doxygen -w".
 #
 ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/header.html
-    ${CMAKE_CURRENT_BINARY_DIR}/footer.html
+         ${CMAKE_CURRENT_BINARY_DIR}/footer.html
+  COMMAND ${CMAKE_COMMAND} -E touch header.html
+  COMMAND ${CMAKE_COMMAND} -E touch footer.html
   COMMAND ${DOXYGEN_EXECUTABLE} -w html header.html footer.html style.css options.dox
   COMMAND ${PERL_EXECUTABLE} -pi~ ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_header.pl header.html
   COMMAND ${PERL_EXECUTABLE} -pi~ ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_footer.pl footer.html
