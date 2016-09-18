@@ -118,6 +118,9 @@ the color scale used for the temperature is not always the same):
   </tr>
 </table>
 
+The visualizations shown here were generated using a version of the example
+which did not enforce the constraints after transferring the mesh.
+
 As can be seen, we have three heat sources that heat fluid and
 therefore produce a buoyancy effect that lets hots pockets of fluid
 rise up and swirl around. By a chimney effect, the three streams are
@@ -285,13 +288,14 @@ following plots:
   </tr>
 </table>
 
-That the first picture looks like three hedgehogs stems from
-the fact that our scheme essentially projects the source times the
-first time step size onto the mesh to obtain the temperature field in
-the first time step. Since the source function is discontinuous, we
-need to expect over- and undershoots from this project. This is in
-fact what happens (it's easier to check this in 2d) and leads to the
-crumpled appearance of the isosurfaces.
+That the first picture looks like three hedgehogs stems from the fact that our
+scheme essentially projects the source times the first time step size onto the
+mesh to obtain the temperature field in the first time step. Since the source
+function is discontinuous, we need to expect over- and undershoots from this
+project. This is in fact what happens (it's easier to check this in 2d) and
+leads to the crumpled appearance of the isosurfaces.  The visualizations shown
+here were generated using a version of the example which did not enforce the
+constraints after transferring the mesh.
 
 
 
