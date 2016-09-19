@@ -19,6 +19,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_accessor.templates.h>
 #include <deal.II/grid/tria_iterator.templates.h>
+#include <deal.II/base/std_cxx11/array.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/grid/grid_tools.h>
@@ -1631,6 +1632,45 @@ void CellAccessor<dim, spacedim>::set_neighbor (const unsigned int i,
       neighbors[this->present_index*GeometryInfo<dim>::faces_per_cell+i].second
         = -1;
     };
+}
+
+
+
+template <int dim, int spacedim>
+CellId
+CellAccessor<dim,spacedim>::id() const
+{
+  std_cxx11::array<unsigned char,30> id;
+
+  CellAccessor<dim,spacedim> ptr = *this;
+  const unsigned int n_child_indices = ptr.level();
+
+  while (ptr.level()>0)
+    {
+      const TriaIterator<CellAccessor<dim,spacedim> > parent = ptr.parent();
+      const unsigned int n_children = parent->n_children();
+
+      // determine which child we are
+      unsigned char v = static_cast<unsigned char> (-1);
+      for (unsigned int c=0; c<n_children; ++c)
+        {
+          if (parent->child_index(c)==ptr.index())
+            {
+              v = c;
+              break;
+            }
+        }
+
+      Assert(v != static_cast<unsigned char> (-1), ExcInternalError());
+      id[ptr.level()-1] = v;
+
+      ptr.copy_from(*parent);
+    }
+
+  Assert(ptr.level()==0, ExcInternalError());
+  const unsigned int coarse_index = ptr.index();
+
+  return CellId(coarse_index, n_child_indices, &(id[0]));
 }
 
 

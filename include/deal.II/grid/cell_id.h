@@ -18,10 +18,14 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/std_cxx11/array.h>
 
 #include <vector>
 #include <iostream>
 
+#ifdef DEAL_II_WITH_P4EST
+#include <deal.II/distributed/p4est_wrappers.h>
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -48,19 +52,50 @@ template <int, int> class Triangulation;
  *
  * @note How this data is internally represented is not of importance (and not
  * exposed on purpose).
- *
- * @todo Does it make sense to implement a more efficient representation
- * (internally and/or as a string)? If yes, something like a 64bit int as in
- * p4est would be a good option.
  */
 class CellId
 {
 public:
   /**
-   * Construct a CellId object with a given @p coarse_cell_index and list of child indices.
+   * A type that is used to encode the CellId data in a compact and fast way
+   * (e.g. for MPI transfer to other processes). Note that it limits the
+   * number of children that can be transferred to 20 in 3D and 30 in 2D
+   * (using 2 times 32 bit for storage), a limitation that is identical to
+   * the one used by p4est.
+   */
+  typedef std_cxx11::array<unsigned int, 4> binary_type;
+
+  /**
+   * Construct a CellId object with a given @p coarse_cell_id and vector of
+   * child indices. @p child_indices is
+   * interpreted identical to the member variable with the same name, namely
+   * each entry denotes which child to pick from one refinement level to the
+   * next, starting with the coarse cell, until we get to the cell represented
+   * by the current object. Therefore, each entry should be a number between 0
+   * and the number of children of a cell in the current space dimension.
    */
   CellId(const unsigned int coarse_cell_id,
          const std::vector<unsigned char> &child_indices);
+
+  /**
+   * Construct a CellId object with a given @p coarse_cell_id and array of
+   * child indices provided in @p child_indices. @p child_indices is
+   * interpreted identical to the member variable with the same name, namely
+   * each entry denotes which child to pick from one refinement level to the
+   * next, starting with the coarse cell, until we get to the cell represented
+   * by the current object. Therefore, each entry should be a number between 0
+   * and the number of children of a cell in the current space dimension.
+   * @p child_indices shall have at least @p n_child_indices valid entries.
+   */
+  CellId(const unsigned int coarse_cell_id,
+         const unsigned int n_child_indices,
+         const unsigned char *child_indices);
+
+  /**
+   * Construct a CellId object with a given binary representation that was
+   * previously constructed by CellId::to_binary.
+   */
+  CellId(const binary_type &binary_representation);
 
   /**
    * Construct an invalid CellId.
@@ -68,9 +103,15 @@ public:
   CellId();
 
   /**
-   * Return a string representation of this CellId.
+   * Return a human readable string representation of this CellId.
    */
   std::string to_string() const;
+
+  /**
+   * Return a compact and fast binary representation of this CellId.
+   */
+  template<int dim>
+  binary_type to_binary() const;
 
   /**
    * Return a cell_iterator to the cell represented by this CellId.
@@ -104,11 +145,25 @@ private:
   unsigned int coarse_cell_id;
 
   /**
-   * A list of integers that denote which child to pick from one
+   * The number of child indices stored in the child_indices array. This is
+   * equivalent to (level-1) of the current cell.
+   */
+  unsigned int n_child_indices;
+
+  /**
+   * An array of integers that denotes which child to pick from one
    * refinement level to the next, starting with the coarse cell,
    * until we get to the cell represented by the current object.
+   * Only the first n_child_indices entries are used, but we use a statically
+   * allocated array instead of a vector of size n_child_indices to speed up
+   * creation of this object. If the given dimensions ever become a limitation
+   * the array can be extended.
    */
-  std::vector<unsigned char> child_indices;
+#ifdef DEAL_II_WITH_P4EST
+  std_cxx11::array<char,internal::p4est::functions<2>::max_level> child_indices;
+#else
+  std_cxx11::array<char,30> child_indices;
+#endif
 
   friend std::istream &operator>> (std::istream &is, CellId &cid);
   friend std::ostream &operator<< (std::ostream &os, const CellId &cid);
@@ -124,8 +179,8 @@ inline
 std::ostream &operator<< (std::ostream &os,
                           const CellId &cid)
 {
-  os << cid.coarse_cell_id << '_' << cid.child_indices.size() << ':';
-  for (unsigned int i=0; i<cid.child_indices.size(); ++i)
+  os << cid.coarse_cell_id << '_' << cid.n_child_indices << ':';
+  for (unsigned int i=0; i<cid.n_child_indices; ++i)
     // write the child indices. because they are between 0 and 2^dim-1, they all
     // just have one digit, so we could write them as integers. it's
     // probably clearer to write them as one-digit characters starting
@@ -152,38 +207,20 @@ std::istream &operator>> (std::istream &is,
   char dummy;
   is >> dummy;
   Assert(dummy=='_', ExcMessage("invalid CellId"));
-  unsigned int idsize;
-  is >> idsize;
+  is >> cid.n_child_indices;
   is >> dummy;
   Assert(dummy==':', ExcMessage("invalid CellId"));
 
   char value;
-  cid.child_indices.clear();
-  for (unsigned int i=0; i<idsize; ++i)
+  for (unsigned int i=0; i<cid.n_child_indices; ++i)
     {
       // read the one-digit child index (as an integer number) and
       // convert it back into unsigned char
       is >> value;
-      cid.child_indices.push_back(value-'0');
+      cid.child_indices[i] = value-'0';
     }
   return is;
 }
-
-
-inline
-CellId::CellId(const unsigned int coarse_cell_id,
-               const std::vector<unsigned char> &id)
-  :
-  coarse_cell_id(coarse_cell_id),
-  child_indices(id)
-{}
-
-
-inline
-CellId::CellId()
-  :
-  coarse_cell_id(static_cast<unsigned int>(-1))
-{}
 
 
 
@@ -192,7 +229,14 @@ CellId::operator== (const CellId &other) const
 {
   if (this->coarse_cell_id != other.coarse_cell_id)
     return false;
-  return child_indices == other.child_indices;
+  if (n_child_indices != other.n_child_indices)
+    return false;
+
+  for (unsigned int i=0; i<n_child_indices; ++i)
+    if (child_indices[i] != other.child_indices[i])
+      return false;
+
+  return true;
 }
 
 
@@ -212,9 +256,9 @@ bool CellId::operator<(const CellId &other) const
     return this->coarse_cell_id < other.coarse_cell_id;
 
   unsigned int idx = 0;
-  while (idx < child_indices.size())
+  while (idx < n_child_indices)
     {
-      if (idx>=other.child_indices.size())
+      if (idx>=other.n_child_indices)
         return false;
 
       if (child_indices[idx] != other.child_indices[idx])
@@ -223,7 +267,7 @@ bool CellId::operator<(const CellId &other) const
       ++idx;
     }
 
-  if (child_indices.size() == other.child_indices.size())
+  if (n_child_indices == other.n_child_indices)
     return false;
   return true; // other.id is longer
 }

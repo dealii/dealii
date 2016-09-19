@@ -3234,39 +3234,6 @@ CellAccessor (const TriaAccessor<structdim2,dim2,spacedim2> &)
                       "the conversion is not valid in the current context."));
 }
 
-template <int dim, int spacedim>
-CellId
-CellAccessor<dim,spacedim>::id() const
-{
-  std::vector<unsigned char> id(this->level(), -1);
-  unsigned int coarse_index;
-
-  CellAccessor<dim,spacedim> ptr = *this;
-  while (ptr.level()>0)
-    {
-      // determine which child we are
-      unsigned char v = static_cast<unsigned char>(-1);
-      for (unsigned int c=0; c<ptr.parent()->n_children(); ++c)
-        {
-          if (ptr.parent()->child_index(c)==ptr.index())
-            {
-              v = c;
-              break;
-            }
-        }
-
-      Assert(v != (unsigned char)-1, ExcInternalError());
-      id[ptr.level()-1] = v;
-
-      ptr.copy_from( *(ptr.parent()));
-    }
-
-  Assert(ptr.level()==0, ExcInternalError());
-  coarse_index = ptr.index();
-
-  return CellId(coarse_index, id);
-}
-
 
 #ifndef DOXYGEN
 
