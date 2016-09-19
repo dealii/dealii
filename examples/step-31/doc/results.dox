@@ -14,9 +14,9 @@ Timestep 0:  t=0
    Rebuilding Stokes preconditioner...
    Solving...
    0 GMRES iterations for Stokes subsystem.
-   Time step: 0.976562
-   19 CG iterations for temperature.
-   Temperature range: -0.17714 1.38103
+   Time step: 0.919118
+   9 CG iterations for temperature.
+   Temperature range: -0.16687 1.30011
 
 Number of active cells: 280 (on 6 levels)
 Number of degrees of freedom: 4062 (2490+327+1245)
@@ -26,9 +26,9 @@ Timestep 0:  t=0
    Rebuilding Stokes preconditioner...
    Solving...
    0 GMRES iterations for Stokes subsystem.
-   Time step: 0.488281
-   19 CG iterations for temperature.
-   Temperature range: -0.10423 0.635684
+   Time step: 0.459559
+   9 CG iterations for temperature.
+   Temperature range: -0.0982971 0.598503
 
 Number of active cells: 520 (on 7 levels)
 Number of degrees of freedom: 7432 (4562+589+2281)
@@ -38,9 +38,9 @@ Timestep 0:  t=0
    Rebuilding Stokes preconditioner...
    Solving...
    0 GMRES iterations for Stokes subsystem.
-   Time step: 0.244141
-   18 CG iterations for temperature.
-   Temperature range: -0.0583624 0.312553
+   Time step: 0.229779
+   9 CG iterations for temperature.
+   Temperature range: -0.0551098 0.294493
 
 Number of active cells: 1072 (on 8 levels)
 Number of degrees of freedom: 15294 (9398+1197+4699)
@@ -50,29 +50,29 @@ Timestep 0:  t=0
    Rebuilding Stokes preconditioner...
    Solving...
    0 GMRES iterations for Stokes subsystem.
-   Time step: 0.12207
-   17 CG iterations for temperature.
-   Temperature range: -0.0288897 0.166335
+   Time step: 0.11489
+   9 CG iterations for temperature.
+   Temperature range: -0.0273524 0.156861
 
-Number of active cells: 2128 (on 9 levels)
-Number of degrees of freedom: 30270 (18614+2349+9307)
+Number of active cells: 2116 (on 9 levels)
+Number of degrees of freedom: 30114 (18518+2337+9259)
 
 Timestep 0:  t=0
    Assembling...
    Rebuilding Stokes preconditioner...
    Solving...
    0 GMRES iterations for Stokes subsystem.
-   Time step: 0.0610352
-   17 CG iterations for temperature.
-   Temperature range: -0.0156055 0.0781987
+   Time step: 0.0574449
+   9 CG iterations for temperature.
+   Temperature range: -0.014993 0.0738328
 
-Timestep 1:  t=0.0610352
+Timestep 1:  t=0.0574449
    Assembling...
    Solving...
-   33 GMRES iterations for Stokes subsystem.
-   Time step: 0.0610352
-   16 CG iterations for temperature.
-   Temperature range: -0.0285735 0.153308
+   56 GMRES iterations for Stokes subsystem.
+   Time step: 0.0574449
+   9 CG iterations for temperature.
+   Temperature range: -0.0273934 0.14488
 
 ...
 </pre>
@@ -117,6 +117,9 @@ the color scale used for the temperature is not always the same):
     </td>
   </tr>
 </table>
+
+The visualizations shown here were generated using a version of the example
+which did not enforce the constraints after transferring the mesh.
 
 As can be seen, we have three heat sources that heat fluid and
 therefore produce a buoyancy effect that lets hots pockets of fluid
@@ -183,9 +186,9 @@ Timestep 0:  t=0
    Rebuilding Stokes preconditioner...
    Solving...
    0 GMRES iterations for Stokes subsystem.
-   Time step: 2.60417
-   22 CG iterations for temperature.
-   Temperature range: -0.717838 5.25595
+   Time step: 2.45098
+   9 CG iterations for temperature.
+   Temperature range: -0.675683 4.94725
 
 Number of active cells: 288 (on 4 levels)
 Number of degrees of freedom: 12379 (8943+455+2981)
@@ -195,9 +198,9 @@ Timestep 0:  t=0
    Rebuilding Stokes preconditioner...
    Solving...
    0 GMRES iterations for Stokes subsystem.
-   Time step: 1.30208
-   27 CG iterations for temperature.
-   Temperature range: -0.560342 2.39811
+   Time step: 1.22549
+   9 CG iterations for temperature.
+   Temperature range: -0.527701 2.25764
 
 Number of active cells: 1296 (on 5 levels)
 Number of degrees of freedom: 51497 (37305+1757+12435)
@@ -207,29 +210,29 @@ Timestep 0:  t=0
    Rebuilding Stokes preconditioner...
    Solving...
    0 GMRES iterations for Stokes subsystem.
-   Time step: 0.651042
-   28 CG iterations for temperature.
-   Temperature range: -0.527408 0.900169
+   Time step: 0.612745
+   10 CG iterations for temperature.
+   Temperature range: -0.496942 0.847395
 
-Number of active cells: 5104 (on 6 levels)
-Number of degrees of freedom: 194273 (140913+6389+46971)
+Number of active cells: 5048 (on 6 levels)
+Number of degrees of freedom: 192425 (139569+6333+46523)
 
 Timestep 0:  t=0
    Assembling...
    Rebuilding Stokes preconditioner...
    Solving...
    0 GMRES iterations for Stokes subsystem.
-   Time step: 0.325521
-   28 CG iterations for temperature.
-   Temperature range: -0.283877 0.528447
+   Time step: 0.306373
+   10 CG iterations for temperature.
+   Temperature range: -0.267683 0.497739
 
-Timestep 1:  t=0.325521
+Timestep 1:  t=0.306373
    Assembling...
    Solving...
-   55 GMRES iterations for Stokes subsystem.
-   Time step: 0.325521
-   26 CG iterations for temperature.
-   Temperature range: -0.488053 1.02071
+   27 GMRES iterations for Stokes subsystem.
+   Time step: 0.306373
+   10 CG iterations for temperature.
+   Temperature range: -0.461787 0.958679
 
 ...
 </pre>
@@ -285,13 +288,14 @@ following plots:
   </tr>
 </table>
 
-That the first picture looks like three hedgehogs stems from
-the fact that our scheme essentially projects the source times the
-first time step size onto the mesh to obtain the temperature field in
-the first time step. Since the source function is discontinuous, we
-need to expect over- and undershoots from this project. This is in
-fact what happens (it's easier to check this in 2d) and leads to the
-crumpled appearance of the isosurfaces.
+That the first picture looks like three hedgehogs stems from the fact that our
+scheme essentially projects the source times the first time step size onto the
+mesh to obtain the temperature field in the first time step. Since the source
+function is discontinuous, we need to expect over- and undershoots from this
+project. This is in fact what happens (it's easier to check this in 2d) and
+leads to the crumpled appearance of the isosurfaces.  The visualizations shown
+here were generated using a version of the example which did not enforce the
+constraints after transferring the mesh.
 
 
 
