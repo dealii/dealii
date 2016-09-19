@@ -81,7 +81,7 @@ CONFIGURE_FILE(
 # if they are listed in the options.dox file, even though the -w command is
 # specifically intended to create them. See
 #    https://bugzilla.gnome.org/show_bug.cgi?id=771606
-# To work around this, do a 'touch' operation in them first to ensure they're
+# To work around this, do a 'touch' operation on them first to ensure they're
 # there before we call "doxygen -w".
 #
 ADD_CUSTOM_COMMAND(
