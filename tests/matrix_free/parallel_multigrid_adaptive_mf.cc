@@ -57,11 +57,15 @@ public:
                    const DoFHandler<dim> &dof_handler,
                    const MGConstrainedDoFs &mg_constrained_dofs,
                    const typename FunctionMap<dim>::type &dirichlet_boundary,
-                   const unsigned int level = numbers::invalid_unsigned_int)
+                   const unsigned int level,
+                   const bool threaded)
   {
     const QGauss<1> quad (n_q_points_1d);
     typename MatrixFree<dim,number>::AdditionalData addit_data;
-    addit_data.tasks_parallel_scheme = MatrixFree<dim,number>::AdditionalData::none;
+    if (threaded)
+      addit_data.tasks_parallel_scheme = MatrixFree<dim,number>::AdditionalData::partition_partition;
+    else
+      addit_data.tasks_parallel_scheme = MatrixFree<dim,number>::AdditionalData::none;
     addit_data.tasks_block_size = 3;
     addit_data.level_mg_handler = level;
     addit_data.mpi_communicator = MPI_COMM_WORLD;
@@ -431,7 +435,7 @@ public:
 
 
 template <int dim, int fe_degree, int n_q_points_1d, typename number>
-void do_test (const DoFHandler<dim>  &dof)
+void do_test (const DoFHandler<dim>  &dof, const bool threaded)
 {
   deallog << "Testing " << dof.get_fe().get_name();
   deallog << std::endl;
@@ -453,7 +457,7 @@ void do_test (const DoFHandler<dim>  &dof)
   MappingQ<dim> mapping(fe_degree+1);
   LaplaceOperator<dim,fe_degree,n_q_points_1d,double> fine_matrix;
   fine_matrix.initialize(mapping, dof, mg_constrained_dofs, dirichlet_boundary,
-                         numbers::invalid_unsigned_int);
+                         numbers::invalid_unsigned_int, threaded);
 
   LinearAlgebra::distributed::Vector<double> in, sol;
   fine_matrix.initialize_dof_vector(in);
@@ -472,7 +476,7 @@ void do_test (const DoFHandler<dim>  &dof)
   for (unsigned int level = 0; level<dof.get_triangulation().n_global_levels(); ++level)
     {
       mg_matrices[level].initialize(mapping, dof, mg_constrained_dofs,
-                                    dirichlet_boundary, level);
+                                    dirichlet_boundary, level, threaded);
     }
   MGLevelObject<MGInterfaceMatrix<LevelMatrixType> > mg_interface_matrices;
   mg_interface_matrices.resize(0, dof.get_triangulation().n_global_levels()-1);
@@ -524,7 +528,7 @@ void do_test (const DoFHandler<dim>  &dof)
 
   {
     // avoid output from inner (coarse-level) solver
-    deallog.depth_file(2);
+    deallog.depth_file(3);
     ReductionControl control(30, 1e-20, 1e-7);
     SolverCG<LinearAlgebra::distributed::Vector<double> > solver(control);
     solver.solve(fine_matrix, sol, in, preconditioner);
@@ -547,8 +551,8 @@ void test ()
       for (typename Triangulation<dim>::active_cell_iterator cell=tria.begin_active();
            cell != tria.end(); ++cell)
         if (cell->is_locally_owned() &&
-            (cell->center().norm() < 0.5 && (cell->level() < 5 ||
-                                             cell->center().norm() > 0.45)
+            ((cell->center().norm() < 0.5 && (cell->level() < 5 ||
+                                              cell->center().norm() > 0.45))
              ||
              (dim == 2 && cell->center().norm() > 1.2)))
           cell->set_refine_flag();
@@ -558,7 +562,12 @@ void test ()
       dof.distribute_dofs(fe);
       dof.distribute_mg_dofs(fe);
 
-      do_test<dim, fe_degree, fe_degree+1, Number> (dof);
+      deallog.push("nothread");
+      do_test<dim, fe_degree, fe_degree+1, Number> (dof, false);
+      deallog.pop();
+      deallog.push("threaded");
+      do_test<dim, fe_degree, fe_degree+1, Number> (dof, true);
+      deallog.pop();
     }
 }
 
