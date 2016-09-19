@@ -1,49 +1,97 @@
 
-DEAL::Testing FE_Q<2>(1)
-DEAL::Number of degrees of freedom: 507
-DEAL:cg::Starting value 21.9317
-DEAL:cg::Convergence step 5 value 7.81205e-07
-DEAL::Testing FE_Q<2>(1)
-DEAL::Number of degrees of freedom: 881
-DEAL:cg::Starting value 27.7669
-DEAL:cg::Convergence step 6 value 9.24482e-07
-DEAL::Testing FE_Q<2>(1)
-DEAL::Number of degrees of freedom: 2147
-DEAL:cg::Starting value 43.2551
-DEAL:cg::Convergence step 6 value 1.14520e-06
-DEAL::Testing FE_Q<2>(1)
-DEAL::Number of degrees of freedom: 6517
-DEAL:cg::Starting value 76.9220
-DEAL:cg::Convergence step 6 value 1.55925e-06
-DEAL::Testing FE_Q<2>(3)
-DEAL::Number of degrees of freedom: 4259
-DEAL:cg::Starting value 64.2573
-DEAL:cg::Convergence step 5 value 1.63117e-06
-DEAL::Testing FE_Q<2>(3)
-DEAL::Number of degrees of freedom: 7457
-DEAL:cg::Starting value 83.1084
-DEAL:cg::Convergence step 5 value 7.69301e-06
-DEAL::Testing FE_Q<2>(3)
-DEAL::Number of degrees of freedom: 18535
-DEAL:cg::Starting value 130.977
-DEAL:cg::Convergence step 5 value 6.04333e-06
-DEAL::Testing FE_Q<3>(1)
-DEAL::Number of degrees of freedom: 186
-DEAL:cg::Starting value 12.3693
-DEAL:cg::Convergence step 3 value 8.40297e-08
-DEAL::Testing FE_Q<3>(1)
-DEAL::Number of degrees of freedom: 648
-DEAL:cg::Starting value 21.1424
-DEAL:cg::Convergence step 6 value 1.05183e-07
-DEAL::Testing FE_Q<3>(1)
-DEAL::Number of degrees of freedom: 2930
-DEAL:cg::Starting value 47.1699
-DEAL:cg::Convergence step 7 value 1.64836e-06
-DEAL::Testing FE_Q<3>(2)
-DEAL::Number of degrees of freedom: 1106
-DEAL:cg::Starting value 30.8707
-DEAL:cg::Convergence step 5 value 5.33421e-08
-DEAL::Testing FE_Q<3>(2)
-DEAL::Number of degrees of freedom: 4268
-DEAL:cg::Starting value 57.4891
-DEAL:cg::Convergence step 7 value 1.03521e-06
+DEAL:nothread::Testing FE_Q<2>(1)
+DEAL:nothread::Number of degrees of freedom: 507
+DEAL:nothread:cg::Starting value 21.9317
+DEAL:nothread:cg::Convergence step 5 value 7.81205e-07
+DEAL:threaded::Testing FE_Q<2>(1)
+DEAL:threaded::Number of degrees of freedom: 507
+DEAL:threaded:cg::Starting value 21.9317
+DEAL:threaded:cg::Convergence step 5 value 7.81205e-07
+DEAL:nothread::Testing FE_Q<2>(1)
+DEAL:nothread::Number of degrees of freedom: 881
+DEAL:nothread:cg::Starting value 27.7669
+DEAL:nothread:cg::Convergence step 6 value 9.24482e-07
+DEAL:threaded::Testing FE_Q<2>(1)
+DEAL:threaded::Number of degrees of freedom: 881
+DEAL:threaded:cg::Starting value 27.7669
+DEAL:threaded:cg::Convergence step 6 value 9.24482e-07
+DEAL:nothread::Testing FE_Q<2>(1)
+DEAL:nothread::Number of degrees of freedom: 2147
+DEAL:nothread:cg::Starting value 43.2551
+DEAL:nothread:cg::Convergence step 6 value 1.14520e-06
+DEAL:threaded::Testing FE_Q<2>(1)
+DEAL:threaded::Number of degrees of freedom: 2147
+DEAL:threaded:cg::Starting value 43.2551
+DEAL:threaded:cg::Convergence step 6 value 1.14520e-06
+DEAL:nothread::Testing FE_Q<2>(1)
+DEAL:nothread::Number of degrees of freedom: 6517
+DEAL:nothread:cg::Starting value 76.9220
+DEAL:nothread:cg::Convergence step 6 value 1.55925e-06
+DEAL:threaded::Testing FE_Q<2>(1)
+DEAL:threaded::Number of degrees of freedom: 6517
+DEAL:threaded:cg::Starting value 76.9220
+DEAL:threaded:cg::Convergence step 6 value 1.55925e-06
+DEAL:nothread::Testing FE_Q<2>(3)
+DEAL:nothread::Number of degrees of freedom: 4259
+DEAL:nothread:cg::Starting value 64.2573
+DEAL:nothread:cg::Convergence step 5 value 1.63125e-06
+DEAL:threaded::Testing FE_Q<2>(3)
+DEAL:threaded::Number of degrees of freedom: 4259
+DEAL:threaded:cg::Starting value 64.2573
+DEAL:threaded:cg::Convergence step 5 value 1.63120e-06
+DEAL:nothread::Testing FE_Q<2>(3)
+DEAL:nothread::Number of degrees of freedom: 7457
+DEAL:nothread:cg::Starting value 83.1084
+DEAL:nothread:cg::Convergence step 5 value 7.69258e-06
+DEAL:threaded::Testing FE_Q<2>(3)
+DEAL:threaded::Number of degrees of freedom: 7457
+DEAL:threaded:cg::Starting value 83.1084
+DEAL:threaded:cg::Convergence step 5 value 7.69315e-06
+DEAL:nothread::Testing FE_Q<2>(3)
+DEAL:nothread::Number of degrees of freedom: 18535
+DEAL:nothread:cg::Starting value 130.977
+DEAL:nothread:cg::Convergence step 5 value 6.04397e-06
+DEAL:threaded::Testing FE_Q<2>(3)
+DEAL:threaded::Number of degrees of freedom: 18535
+DEAL:threaded:cg::Starting value 130.977
+DEAL:threaded:cg::Convergence step 5 value 6.04357e-06
+DEAL:nothread::Testing FE_Q<3>(1)
+DEAL:nothread::Number of degrees of freedom: 186
+DEAL:nothread:cg::Starting value 12.3693
+DEAL:nothread:cg::Convergence step 3 value 8.40297e-08
+DEAL:threaded::Testing FE_Q<3>(1)
+DEAL:threaded::Number of degrees of freedom: 186
+DEAL:threaded:cg::Starting value 12.3693
+DEAL:threaded:cg::Convergence step 3 value 8.40297e-08
+DEAL:nothread::Testing FE_Q<3>(1)
+DEAL:nothread::Number of degrees of freedom: 648
+DEAL:nothread:cg::Starting value 21.1424
+DEAL:nothread:cg::Convergence step 6 value 1.05183e-07
+DEAL:threaded::Testing FE_Q<3>(1)
+DEAL:threaded::Number of degrees of freedom: 648
+DEAL:threaded:cg::Starting value 21.1424
+DEAL:threaded:cg::Convergence step 6 value 1.05183e-07
+DEAL:nothread::Testing FE_Q<3>(1)
+DEAL:nothread::Number of degrees of freedom: 2930
+DEAL:nothread:cg::Starting value 47.1699
+DEAL:nothread:cg::Convergence step 7 value 1.64836e-06
+DEAL:threaded::Testing FE_Q<3>(1)
+DEAL:threaded::Number of degrees of freedom: 2930
+DEAL:threaded:cg::Starting value 47.1699
+DEAL:threaded:cg::Convergence step 7 value 1.64836e-06
+DEAL:nothread::Testing FE_Q<3>(2)
+DEAL:nothread::Number of degrees of freedom: 1106
+DEAL:nothread:cg::Starting value 30.8707
+DEAL:nothread:cg::Convergence step 5 value 5.33407e-08
+DEAL:threaded::Testing FE_Q<3>(2)
+DEAL:threaded::Number of degrees of freedom: 1106
+DEAL:threaded:cg::Starting value 30.8707
+DEAL:threaded:cg::Convergence step 5 value 5.33448e-08
+DEAL:nothread::Testing FE_Q<3>(2)
+DEAL:nothread::Number of degrees of freedom: 4268
+DEAL:nothread:cg::Starting value 57.4891
+DEAL:nothread:cg::Convergence step 7 value 1.03521e-06
+DEAL:threaded::Testing FE_Q<3>(2)
+DEAL:threaded::Number of degrees of freedom: 4268
+DEAL:threaded:cg::Starting value 57.4891
+DEAL:threaded:cg::Convergence step 7 value 1.03521e-06

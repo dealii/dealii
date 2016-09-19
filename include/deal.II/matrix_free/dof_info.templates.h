@@ -1218,6 +1218,7 @@ no_constraint:
 
               // adjust end of boundary cells to the remainder
               size_info.boundary_cells_end += (remainder+vectorization_length-1)/vectorization_length;
+              start_nonboundary = 0;
             }
           else
             {
