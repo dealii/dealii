@@ -8991,6 +8991,7 @@ Triangulation (const Triangulation<dim, spacedim> &other)
 
 
 #ifdef DEAL_II_WITH_CXX11
+
 template <int dim, int spacedim>
 Triangulation<dim, spacedim>::
 Triangulation (Triangulation<dim, spacedim> &&tria)
@@ -9015,6 +9016,35 @@ Triangulation (Triangulation<dim, spacedim> &&tria)
 
   tria.number_cache = internal::Triangulation::NumberCache<dim>();
 }
+
+
+template <int dim, int spacedim>
+Triangulation<dim, spacedim> &
+Triangulation<dim, spacedim>::operator= (Triangulation<dim, spacedim> &&tria)
+{
+  Subscriptor::operator=(std::move(tria));
+
+  smooth_grid = tria.smooth_grid;
+  periodic_face_pairs_level_0 = std::move(tria.periodic_face_pairs_level_0);
+  periodic_face_map = std::move(tria.periodic_face_map);
+  levels = std::move(tria.levels);
+  faces = std::move(tria.faces);
+  vertices = std::move(tria.vertices);
+  vertices_used = std::move(tria.vertices_used);
+  manifold = std::move(tria.manifold);
+  anisotropic_refinement = tria.anisotropic_refinement;
+  number_cache = tria.number_cache;
+  vertex_to_boundary_id_map_1d = std::move(tria.vertex_to_boundary_id_map_1d);
+  vertex_to_manifold_id_map_1d = std::move(tria.vertex_to_manifold_id_map_1d);
+
+  for (unsigned int i=0; i<tria.levels.size(); ++i)
+    tria.levels[i] = nullptr;
+
+  tria.number_cache = internal::Triangulation::NumberCache<dim>();
+
+  return *this;
+}
+
 #endif
 
 

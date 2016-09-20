@@ -1530,6 +1530,11 @@ public:
    * triangulation.
    */
   Triangulation (Triangulation<dim, spacedim> &&tria);
+
+  /**
+   * Move assignment operator.
+   */
+  Triangulation &operator = (Triangulation<dim, spacedim> &&tria);
 #endif
 
   /**
