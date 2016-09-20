@@ -598,18 +598,32 @@ namespace GridGenerator
 
   /**
    * Initialize the given triangulation with a hyper-L (in 2d or 3d)
-   * consisting of exactly <tt>2^dim-1</tt> cells. It produces the hypercube
-   * with the interval [<i>left,right</i>] without the hypercube made out of
-   * the interval [<i>(left+right)/2,right</i>] for each coordinate. If the
-   * @p colorize flag is set, the @p boundary_ids of the surfaces are
-   * assigned, such that the left boundary is 0, and the others are set with
-   * growing number accordingly to the counterclockwise. Colorize option works
-   * only with 2-dimensional problem. This function will create the classical
-   * L-shape in 2d and it will look like the following in 3d:
+   * consisting of exactly <tt>2^dim-1</tt> cells. It produces the
+   * hypercube with the interval [<i>left,right</i>] without the
+   * hypercube made out of the interval [<i>(left+right)/2,right</i>]
+   * for each coordinate. Because the domain is about the simplest one
+   * with a reentrant (i.e., non-convex) corner, solutions of many
+   * partial differential equation have singularities at this
+   * corner. That is, at the corner, the gradient or a higher
+   * derivative (depending on the boundary conditions chosen) does not
+   * remain bounded. As a consequence, this domain is often used to
+   * test convergence of schemes when the solution lacks regularity.
+   *
+   * If the @p colorize flag is set, the @p boundary_ids of the
+   * surfaces are assigned, such that the left boundary is 0, and the
+   * others are set with growing number accordingly to the
+   * counterclockwise. Colorize option works only with 2-dimensional
+   * problem. This function will create the classical L-shape in 2d
+   * and it will look like the following in 3d:
    *
    * @image html hyper_l.png
    *
-   * This function is declared to exist for triangulations of all space
+   * @note The 3d domain is also often referred to as the "Fichera corner",
+   * named after Gaetano Fichera (1922-1996) who first computed an
+   * approximation of the corner singularity exponent of the lowest
+   * eigenfunction of the domain.
+   *
+   * This function exists for triangulations of all space
    * dimensions, but throws an error if called in 1d.
    *
    * @note The triangulation needs to be void upon calling this function.
