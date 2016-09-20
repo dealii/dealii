@@ -8991,6 +8991,7 @@ Triangulation (const Triangulation<dim, spacedim> &other)
 
 
 #ifdef DEAL_II_WITH_CXX11
+
 template <int dim, int spacedim>
 Triangulation<dim, spacedim>::
 Triangulation (Triangulation<dim, spacedim> &&tria)
@@ -9030,9 +9031,13 @@ Triangulation<dim, spacedim>::operator= (Triangulation<dim, spacedim> &&tria)
   faces = std::move(tria.faces);
   vertices = std::move(tria.vertices);
   vertices_used = std::move(tria.vertices_used);
+
+  // NOTE: this is actually a copy operation to ensure that the left-hand
+  // side Triangulation subscribes to the manifold object(s) of the source
+  // Triangulation.
   manifold = std::move(tria.manifold);
+
   anisotropic_refinement = tria.anisotropic_refinement;
-  //check_for_distorted_cells = tria.check_for_distorted_cells;
   number_cache = tria.number_cache;
   vertex_to_boundary_id_map_1d = std::move(tria.vertex_to_boundary_id_map_1d);
   vertex_to_manifold_id_map_1d = std::move(tria.vertex_to_manifold_id_map_1d);
@@ -9044,6 +9049,7 @@ Triangulation<dim, spacedim>::operator= (Triangulation<dim, spacedim> &&tria)
 
   return *this;
 }
+
 #endif
 
 
