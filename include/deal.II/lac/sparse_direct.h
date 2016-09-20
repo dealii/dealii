@@ -226,12 +226,14 @@ public:
    * If @p transpose is set to true this function solves for the transpose of
    * the matrix, i.e. $x=A^{-T}b$.
    */
-  void solve (Vector<double> &rhs_and_solution, bool transpose = false) const;
+  void solve (Vector<double> &rhs_and_solution,
+              const bool      transpose = false) const;
 
   /**
    * Same as before, but for block vectors.
    */
-  void solve (BlockVector<double> &rhs_and_solution, bool transpose = false) const;
+  void solve (BlockVector<double> &rhs_and_solution,
+              const bool           transpose = false) const;
 
   /**
    * Call the two functions factorize() and solve() in that order, i.e.
@@ -242,7 +244,7 @@ public:
   template <class Matrix>
   void solve (const Matrix   &matrix,
               Vector<double> &rhs_and_solution,
-              bool            transpose = false);
+              const bool      transpose = false);
 
   /**
    * Same as before, but for block vectors.
@@ -250,7 +252,7 @@ public:
   template <class Matrix>
   void solve (const Matrix        &matrix,
               BlockVector<double> &rhs_and_solution,
-              bool                 transpose = false);
+              const bool           transpose = false);
 
   /**
    * @}
