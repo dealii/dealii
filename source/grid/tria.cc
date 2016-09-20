@@ -9018,7 +9018,7 @@ Triangulation (Triangulation<dim, spacedim> &&tria)
 
 
 template <int dim, int spacedim>
-Triangulation<dim, spacedim>&
+Triangulation<dim, spacedim> &
 Triangulation<dim, spacedim>::operator= (Triangulation<dim, spacedim> &&tria)
 {
   Subscriptor::operator=(std::move(tria));
