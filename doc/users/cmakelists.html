@@ -198,7 +198,7 @@ executables.
 <code>CMAKE_BUILD_TYPE</code>. If it is set to <code>Debug</code>
 executables and libraries specified in your <code>CMakeLists.txt</code>
 file will be compiled in debug mode and linked against the debug version of
-the deal.II library. Contrary <code>Release</code> will build in optimized
+the deal.II library. Contrary, <code>Release</code> will build in optimized
 mode and link against the optimized release version of deal.II. You can set
 <code>CMAKE_BUILD_TYPE</code> with the help of <code>ccmake</code> or via
 <code>cmake</code> on the command line: </p>
@@ -464,8 +464,9 @@ source file you have to touch a <code>CMakeLists.txt</code> file or to run
   additional argument <code>DEBUG</code>, or <code>RELEASE</code>, after
   the target name to explicitly state the library flavor the target should
   be set up for. If the parameter is omitted, the correct choice is deduced
-  from the current build type (with <code>DEBUG</code> taking precedence in
-  case of <code>DebugRelease</code> as build type).
+  from the current build type. (This is supported for the build types
+  <code>Debug</code>, and <code>Release</code>. In case of
+  <code>DebugRelease</code> the additional argument is always required.)
 </p>
 
 <p>
@@ -506,11 +507,11 @@ DEAL_II_INITIALIZE_CACHED_VARIABLES()
 PROJECT(myproject)
 </pre>
 The macro will set an uninitialized <code>CMAKE_BUILD_TYPE</code> variable
-to <code>Debug</code> (or <code>Release</code> if the debug library is not
-available). If <code>CMAKE_BUILD_TYPE</code> is specified it will
-automatically be reset if the given value is unsupported by the deal.II
-installation (i.e., if it is not equal to <code>Debug</code>,
-<code>Release</code>, or <code>DebugRelease</code>).
+to the the build type of deal.II, i.e. <code>DEAL_II_BUILD_TYPE</code>. If
+<code>CMAKE_BUILD_TYPE</code> is specified it will automatically be reset
+if the given value is unsupported by the deal.II installation (i.e., if it
+is not equal to <code>Debug</code>, <code>Release</code>, or
+<code>DebugRelease</code>).
 </p>
 <p>
 Furthermore, this macro sets the C++ compiler to the one used for compiling
