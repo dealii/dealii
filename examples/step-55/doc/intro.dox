@@ -153,9 +153,11 @@ size of the coarsest matrix is not predictable.
 <h3>The testcase</h3>
 
 We will construct a manufactured solution based on the Kovasznay problem
-("Laminar flow behind a two-dimensional grid" by Kovasznay, 1948).  You can
-also check out http://www.cfm.brown.edu/crunch/nektar/Thesis.Html/node60.html
-for the test case.
+("Laminar flow behind a two-dimensional grid" by Kovasznay, 1948). Here
+is an image of the solution colored by the x velocity including 
+streamlines of the velocity:
+
+ <img src="https://www.dealii.org/images/steps/developer/step-55.solution.png" alt="">
 
 We have to cheat here, though, because we are not solving the non-linear
 Navier-Stokes equations, but the linear Stokes system without convective
