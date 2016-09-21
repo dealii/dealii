@@ -219,19 +219,27 @@ inconvenience this causes.
 
 <ol>
 
+ <li> New: DoFTools::write_gnuplot_dof_support_point_info outputs
+ support point locations and dof indices to a format readable by
+ gnuplot.
+ <br>
+ (Timo Heister, 2016/09/16)
+ </li>
+
  <li> Fixed: The CMake macros <code>DEAL_II_(ADD_TEST|SETUP_TARGET)</code>
  now enforce a stricter <code>CMAKE_BUILD_TYPE</code> handling. This helps
  to avoid situations where targets with different build flavors might
  accidentally get linked against each other.
  <br>
  (Matthias Maier, 2016/09/08)
+ </li>
 
  <li> Improved: the doxygen documentation now contains nicely formatted
  boxes containing the text message of each exception. Several messages
  haven been clarified and improved.
  <br>
  (Timo Heister, 2016/09/06)
-</li>
+ </li>
 
  <li> Fixed: Reimplement copy_triangulation and load in
  dealii::parallel::shared::Triangulation, this avoids the loss of
