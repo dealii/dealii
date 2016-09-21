@@ -473,6 +473,7 @@ namespace Step39
   template <int dim>
   InteriorPenaltyProblem<dim>::InteriorPenaltyProblem(const FiniteElement<dim> &fe)
     :
+    triangulation (Triangulation<dim>::limit_level_difference_at_vertices),
     mapping(),
     fe(fe),
     dof_handler(triangulation),

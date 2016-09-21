@@ -725,6 +725,7 @@ namespace Step37
   template <int dim>
   LaplaceProblem<dim>::LaplaceProblem ()
     :
+    triangulation (Triangulation<dim>::limit_level_difference_at_vertices),
     fe (degree_finite_element),
     dof_handler (triangulation),
     time_details (std::cout, false)
