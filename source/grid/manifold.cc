@@ -70,7 +70,7 @@ get_intermediate_point (const Point<spacedim> &p1,
   std::vector<Point<spacedim> > vertices;
   vertices.push_back(p1);
   vertices.push_back(p2);
-  return project_to_manifold(vertices, w * p1 + (1-w)*p2 );
+  return project_to_manifold(vertices, w * p2 + (1-w)*p1 );
 }
 
 template <int dim, int spacedim>

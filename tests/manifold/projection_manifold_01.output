@@ -1,0 +1,16 @@
+
+DEAL::Testing dim=1, spacedim=1
+DEAL::p2(0.5): 0.500000
+DEAL::p2(0.2): 0.200000
+DEAL::Testing dim=1, spacedim=2
+DEAL::p2(0.5): 0.500000 1.00000
+DEAL::p2(0.2): 0.200000 0.640000
+DEAL::Testing dim=2, spacedim=2
+DEAL::p2(0.5): 0.500000 1.00000
+DEAL::p2(0.2): 0.200000 0.640000
+DEAL::Testing dim=2, spacedim=3
+DEAL::p2(0.5): 0.500000 1.00000 0.00000
+DEAL::p2(0.2): 0.200000 0.640000 0.00000
+DEAL::Testing dim=3, spacedim=3
+DEAL::p2(0.5): 0.500000 1.00000 0.00000
+DEAL::p2(0.2): 0.200000 0.640000 0.00000
