@@ -768,7 +768,7 @@ namespace StandardExceptions
                     "example would be that the first part of an algorithm "
                     "sorts elements of an array in ascending order, and "
                     "a second part of the algorithm later encounters an "
-                    "an element that is not larger than the previous one."
+                    "element that is not larger than the previous one."
                     "\n\n"
                     "There is usually not very much you can do if you "
                     "encounter such an exception since it indicates an error "
