@@ -529,6 +529,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Improved: MGSmootherBlock is now able to use the shared memory pool for
+ temporary vector allocation. The constructor requiring an external memory
+ allocation has therefore been deprecated.
+ <br/>
+ (Jonathan Robey, 2016/09/21)
+ </li>
+
  <li> Fixed: EmbeddedRungeKutta methods now correctly increase delta_t_guess 
  when the error is below coarsen_tol.
  </br>
