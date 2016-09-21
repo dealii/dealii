@@ -12039,7 +12039,7 @@ Triangulation<dim,spacedim>::execute_refinement ()
   cells_with_distorted_children
     =
       internal::Triangulation::Implementation::
-      execute_refinement (*this,check_for_distorted_cells);
+      execute_refinement (*this, check_for_distorted_cells);
 
 
 
@@ -12051,15 +12051,10 @@ Triangulation<dim,spacedim>::execute_refinement ()
   for (unsigned int level=0; level<levels.size(); ++level)
     levels[level]->cells.monitor_memory (dim);
 
-  // check whether really all
-  // refinement flags are reset (also
-  // of previously non-active cells
-  // which we may not have
-  // touched. If the refinement flag
-  // of a non-active cell is set,
-  // something went wrong since the
-  // cell-accessors should have
-  // caught this)
+  // check whether really all refinement flags are reset (also of
+  // previously non-active cells which we may not have touched. If the
+  // refinement flag of a non-active cell is set, something went wrong
+  // since the cell-accessors should have caught this)
   cell_iterator cell = begin(),
                 endc = end();
   while (cell != endc)
@@ -12074,30 +12069,23 @@ Triangulation<dim,spacedim>::execute_refinement ()
 template <int dim, int spacedim>
 void Triangulation<dim, spacedim>::execute_coarsening ()
 {
-  // create a vector counting for each line how
-  // many cells contain this line. in 3D, this
-  // is used later on to decide which lines can
-  // be deleted after coarsening a cell. in
-  // other dimensions it will be ignored
+  // create a vector counting for each line how many cells contain
+  // this line. in 3D, this is used later on to decide which lines can
+  // be deleted after coarsening a cell. in other dimensions it will
+  // be ignored
   std::vector<unsigned int> line_cell_count = count_cells_bounded_by_line (*this);
   std::vector<unsigned int> quad_cell_count = count_cells_bounded_by_quad (*this);
 
-  // loop over all cells. Flag all
-  // cells of which all children are
-  // flagged for
-  // coarsening and delete the childrens'
-  // flags. In effect, only those
-  // cells are flagged of which originally
-  // all children were flagged and for which
-  // all children are on the same refinement
-  // level. For flagging, the user flags are
-  // used, to avoid confusion and because
-  // non-active cells can't be flagged for
-  // coarsening. Note that because of the
-  // effects of @p{fix_coarsen_flags}, of a
-  // cell either all or no children must
-  // be flagged for coarsening, so it is
-  // ok to only check the first child
+  // loop over all cells. Flag all cells of which all children are
+  // flagged for coarsening and delete the childrens' flags. In
+  // effect, only those cells are flagged of which originally all
+  // children were flagged and for which all children are on the same
+  // refinement level. For flagging, the user flags are used, to avoid
+  // confusion and because non-active cells can't be flagged for
+  // coarsening. Note that because of the effects of
+  // @p{fix_coarsen_flags}, of a cell either all or no children must
+  // be flagged for coarsening, so it is ok to only check the first
+  // child
   clear_user_flags ();
 
   cell_iterator cell = begin(),
@@ -12116,18 +12104,12 @@ void Triangulation<dim, spacedim>::execute_coarsening ()
         }
 
 
-  // now do the actual coarsening
-  // step. Since the loop goes over
-  // used cells we only need not
-  // worry about deleting some cells
-  // since the ++operator will then
-  // just hop over them if we should
-  // hit one. Do the loop in the
-  // reverse way since we may only
-  // delete some cells if their
-  // neighbors have already been
-  // deleted (if the latter are on a
-  // higher level for example)
+  // now do the actual coarsening step. Since the loop goes over used
+  // cells we only need not worry about deleting some cells since the
+  // ++operator will then just hop over them if we should hit one. Do
+  // the loop in the reverse way since we may only delete some cells
+  // if their neighbors have already been deleted (if the latter are
+  // on a higher level for example)
   //
   // since we delete the *children* of cells, we can ignore cells
   // on the highest level, i.e., level must be less than or equal
@@ -12138,21 +12120,16 @@ void Triangulation<dim, spacedim>::execute_coarsening ()
         {
           // inform all listeners that cell coarsening is going to happen
           signals.pre_coarsening_on_cell(cell);
-          // use a separate function,
-          // since this is dimension
-          // specific
+          // use a separate function, since this is dimension specific
           internal::Triangulation::Implementation
           ::delete_children (*this, cell, line_cell_count, quad_cell_count);
         }
 
-  // re-compute number of lines and
-  // quads
+  // re-compute number of lines and quads
   internal::Triangulation::Implementation
   ::compute_number_cache (*this, levels.size(), number_cache);
 
-  // in principle no user flags
-  // should be
-  // set any more at this point
+  // in principle no user flags should be set any more at this point
 #if DEBUG
   for (cell=begin(); cell!=endc; ++cell)
     Assert (cell->user_flag_set() == false, ExcInternalError());
