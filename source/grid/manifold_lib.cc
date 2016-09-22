@@ -264,13 +264,17 @@ get_tangent_vector (const Point<spacedim> &p1,
 template <int dim, int spacedim>
 Point<spacedim>
 SphericalManifold<dim,spacedim>::
-project_to_manifold (const std::vector<Point<spacedim> > &vertices,
-                     const Point<spacedim> &candidate) const
+get_new_point (const std::vector<Point<spacedim> > &vertices,
+               const std::vector<double> &weights) const
 {
   double rho = 0.0;
+  Point<spacedim> candidate;
   for (unsigned int i = 0; i<vertices.size(); i++)
-    rho += (vertices[i]-center).norm();
-  rho /= (1.0*vertices.size());
+    {
+      rho += (vertices[i]-center).norm()*weights[i];
+      candidate += (vertices[i]-center)*weights[i];
+    }
+
   return center+(rho/(candidate-center).norm())*(candidate-center);
 }
 

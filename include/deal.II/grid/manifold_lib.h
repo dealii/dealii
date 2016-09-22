@@ -234,8 +234,8 @@ public:
    */
   virtual
   Point<spacedim>
-  project_to_manifold (const std::vector<Point<spacedim> > &vertices,
-                       const Point<spacedim> &candidate) const;
+  get_new_point (const std::vector<Point<spacedim> > &vertices,
+                 const std::vector<double> &weights) const;
 
   /**
    * The center of the spherical coordinate system.
