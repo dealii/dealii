@@ -2191,7 +2191,7 @@ Number determinant (const SymmetricTensor<2,dim,Number> &t)
  * Compute the determinant of a tensor or rank 2. This function therefore
  * computes the same value as the <tt>determinant()</tt> functions and is only
  * provided for greater notational simplicity (since there are also functions
- * <tt>first_invariant</tt> and <tt>second_invariant</tt>).
+ * first_invariant() and second_invariant()).
  *
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -2226,7 +2226,7 @@ Number trace (const SymmetricTensor<2,dim,Number> &d)
  * Compute the trace of a tensor or rank 2. This function therefore computes
  * the same value as the <tt>trace()</tt> functions and is only provided for
  * greater notational simplicity (since there are also functions
- * <tt>second_invariant</tt> and <tt>third_invariant</tt>).
+ * second_invariant() and third_invariant()).
  *
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -2240,8 +2240,13 @@ Number first_invariant (const SymmetricTensor<2,dim,Number> &t)
 
 
 /**
- * Compute the second invariant of a tensor of rank 2. The second invariant is
- * defined as <tt>I2 = 1/2[ (trace sigma)^2 - trace (sigma^2) ]</tt>.
+ * Compute the second invariant of a tensor of rank 2. The second invariant of
+ * a tensor $\sigma$ is defined as
+ * $II(\sigma) = \frac 12 \left[ (\text{trace}\ \sigma)^2
+ *                               -\text{trace}\ (\sigma^2) \right]$.
+ *
+ * For the kind of arguments to this function, i.e., a rank-2 tensor of
+ * size 1, the result is simply zero.
  *
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005, 2010
@@ -2256,8 +2261,21 @@ Number second_invariant (const SymmetricTensor<2,1,Number> &)
 
 
 /**
- * Compute the second invariant of a tensor of rank 2. The second invariant is
- * defined as <tt>I2 = 1/2[ (trace sigma)^2 - trace (sigma^2) ]</tt>.
+ * Compute the second invariant of a tensor of rank 2. The second invariant of
+ * a tensor $\sigma$ is defined as
+ * $II(\sigma) = \frac 12 \left[ (\text{trace}\ \sigma)^2
+ *                               -\text{trace}\ (\sigma^2) \right]$.
+ *
+ * For the kind of arguments to this function, i.e., a rank-2 tensor of
+ * size 2, the result is (counting indices starting at one)
+ * $II(\sigma) = \frac 12 \left[ (\sigma_{11} + \sigma_{22})^2
+ *                               -(\sigma_{11}^2+2\sigma_{12}^2+\sigma_{22}^2) \right]
+ *             = \sigma_{11}\sigma_{22} - \sigma_{12}^2$.
+ * As expected, for the $2\times 2$ symmetric tensors this function handles,
+ * this equals the determinant of the tensor. (This is so because for
+ * $2\times 2$ symmetric tensors, there really are only two invariants, so
+ * the second and third invariant are the same; the determinant is the third
+ * invariant.)
  *
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005, 2010
@@ -2272,8 +2290,10 @@ Number second_invariant (const SymmetricTensor<2,2,Number> &t)
 
 
 /**
- * Compute the second invariant of a tensor of rank 2. The second invariant is
- * defined as <tt>I2 = 1/2[ (trace sigma)^2 - trace (sigma^2) ]</tt>.
+ * Compute the second invariant of a tensor of rank 2. The second invariant of
+ * a tensor $\sigma$ is defined as
+ * $II(\sigma) = \frac 12 \left[ (\text{trace}\ \sigma)^2
+ *                               -\text{trace}\ (\sigma^2) \right]$.
  *
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005, 2010
