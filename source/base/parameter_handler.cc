@@ -31,7 +31,6 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #include <iomanip>
 #include <cstdlib>
 #include <algorithm>
-#include <list>
 #include <sstream>
 #include <cctype>
 #include <limits>
@@ -971,7 +970,7 @@ namespace Patterns
   bool MultipleSelection::match (const std::string &test_string_list) const
   {
     std::string tmp = test_string_list;
-    std::list<std::string> split_list;
+    std::vector<std::string> split_names;
 
     // first split the input list
     while (tmp.length() != 0)
@@ -993,13 +992,13 @@ namespace Patterns
         while (std::isspace (name[name.length()-1]))
           name.erase (name.length()-1, 1);
 
-        split_list.push_back (name);
+        split_names.push_back (name);
       };
 
 
     // check the different possibilities
-    for (std::list<std::string>::const_iterator test_string = split_list.begin();
-         test_string != split_list.end(); ++test_string)
+    for (std::vector<std::string>::const_iterator test_string = split_names.begin();
+         test_string != split_names.end(); ++test_string)
       {
         bool string_found = false;
 
