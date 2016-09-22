@@ -374,11 +374,9 @@ class MGTransferMF : public MGTransferPrebuilt<LinearAlgebra::distributed::Vecto
 {
 public:
   MGTransferMF(const MGLevelObject<LAPLACEOPERATOR> &laplace,
-               const ConstraintMatrix &hanging_node_constraints,
                const MGConstrainedDoFs &mg_constrained_dofs)
     :
-    MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double> >(hanging_node_constraints,
-        mg_constrained_dofs),
+    MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double> >(mg_constrained_dofs),
     laplace_operator (laplace)
   {
   }
@@ -493,7 +491,6 @@ void do_test (const DoFHandler<dim>  &dof)
     mg_interface_matrices[level].initialize(mg_matrices[level]);
 
   MGTransferMF<LevelMatrixType> mg_transfer(mg_matrices,
-                                            hanging_node_constraints,
                                             mg_constrained_dofs);
   mg_transfer.build_matrices(dof);
 

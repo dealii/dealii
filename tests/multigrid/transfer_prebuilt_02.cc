@@ -58,14 +58,10 @@ void check_simple(const FiniteElement<dim> &fe)
   mgdof.distribute_dofs(fe);
   mgdof.distribute_mg_dofs(fe);
 
-  ConstraintMatrix     hanging_node_constraints;
-  DoFTools::make_hanging_node_constraints (mgdof, hanging_node_constraints);
-  hanging_node_constraints.close ();
-
   MGConstrainedDoFs mg_constrained_dofs;
   mg_constrained_dofs.initialize(mgdof);
 
-  MGTransferPrebuilt<Vector<double> > transfer(hanging_node_constraints, mg_constrained_dofs);
+  MGTransferPrebuilt<Vector<double> > transfer(mg_constrained_dofs);
   transfer.build_matrices(mgdof);
 
   transfer.print_matrices(deallog.get_file_stream());

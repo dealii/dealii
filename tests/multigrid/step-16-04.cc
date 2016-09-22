@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2015 by the deal.II authors
+// Copyright (C) 2003 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,7 +82,6 @@ private:
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;
 
-  ConstraintMatrix     hanging_node_constraints;
   ConstraintMatrix     constraints;
 
   LinearAlgebra::distributed::Vector<double> solution;
@@ -173,9 +172,7 @@ void LaplaceProblem<dim>::setup_system ()
   system_rhs.reinit (mg_dof_handler.n_dofs());
 
   constraints.clear ();
-  hanging_node_constraints.clear ();
   DoFTools::make_hanging_node_constraints (mg_dof_handler, constraints);
-  DoFTools::make_hanging_node_constraints (mg_dof_handler, hanging_node_constraints);
   typename FunctionMap<dim>::type      dirichlet_boundary;
   ZeroFunction<dim>                    homogeneous_dirichlet_bc (1);
   dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
@@ -185,7 +182,6 @@ void LaplaceProblem<dim>::setup_system ()
                                             dirichlet_boundary,
                                             constraints);
   constraints.close ();
-  hanging_node_constraints.close ();
   constraints.condense (sparsity_pattern);
   sparsity_pattern.compress();
   system_matrix.reinit (sparsity_pattern);
@@ -372,7 +368,7 @@ template <int dim>
 void LaplaceProblem<dim>::solve ()
 {
   MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double> >
-  mg_transfer(hanging_node_constraints, mg_constrained_dofs);
+  mg_transfer(mg_constrained_dofs);
   mg_transfer.build_matrices(mg_dof_handler);
 
   SolverControl coarse_solver_control (1000, 1e-10, false, false);

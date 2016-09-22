@@ -109,7 +109,6 @@ namespace Step50
 
     IndexSet locally_relevant_set;
 
-    ConstraintMatrix     hanging_node_constraints;
     ConstraintMatrix     constraints;
 
     vector_t       solution;
@@ -205,8 +204,6 @@ namespace Step50
     solution.reinit(mg_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
     system_rhs.reinit(mg_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
     constraints.reinit (locally_relevant_set);
-    hanging_node_constraints.reinit (locally_relevant_set);
-    DoFTools::make_hanging_node_constraints (mg_dof_handler, hanging_node_constraints);
     DoFTools::make_hanging_node_constraints (mg_dof_handler, constraints);
 
     typename FunctionMap<dim>::type      dirichlet_boundary;
@@ -216,7 +213,6 @@ namespace Step50
                                               dirichlet_boundary,
                                               constraints);
     constraints.close ();
-    hanging_node_constraints.close ();
 
     DynamicSparsityPattern dsp(mg_dof_handler.n_dofs(), mg_dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern (mg_dof_handler, dsp, constraints);
@@ -422,7 +418,7 @@ namespace Step50
   template <int dim>
   void LaplaceProblem<dim>::solve ()
   {
-    MGTransferPrebuilt<vector_t> mg_transfer(hanging_node_constraints, mg_constrained_dofs);
+    MGTransferPrebuilt<vector_t> mg_transfer(mg_constrained_dofs);
     mg_transfer.build_matrices(mg_dof_handler);
 
     matrix_t &coarse_matrix = mg_matrices[0];

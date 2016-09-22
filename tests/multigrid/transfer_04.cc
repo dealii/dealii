@@ -131,7 +131,7 @@ void check_fe(FiniteElement<dim> &fe)
   DoFTools::make_hanging_node_constraints (dofh, hanging_node_constraints);
   hanging_node_constraints.close();
 
-  MGTransferPrebuilt<vector_t> transfer(hanging_node_constraints, mg_constrained_dofs);
+  MGTransferPrebuilt<vector_t> transfer(mg_constrained_dofs);
   transfer.build_matrices(dofh);
   //transfer.print_indices(deallog.get_file_stream());
 
