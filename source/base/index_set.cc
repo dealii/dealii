@@ -16,7 +16,8 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/index_set.h>
-#include <list>
+
+#include <vector>
 
 #ifdef DEAL_II_WITH_TRILINOS
 #  ifdef DEAL_II_WITH_MPI
@@ -274,10 +275,9 @@ IndexSet::subtract_set (const IndexSet &other)
   is_compressed = false;
 
 
-  // we save new ranges to be added to our IndexSet in an temporary list and
-  // add all of them in one go at the end. This is necessary because a growing
-  // ranges vector invalidates iterators.
-  std::list<Range> temp_list;
+  // we save new ranges to be added to our IndexSet in an temporary vector and
+  // add all of them in one go at the end.
+  std::vector<Range> new_ranges;
 
   std::vector<Range>::iterator own_it = ranges.begin();
   std::vector<Range>::iterator other_it = other.ranges.begin();
@@ -303,7 +303,7 @@ IndexSet::subtract_set (const IndexSet &other)
         {
           Range r(own_it->begin, other_it->begin);
           r.nth_index_in_set = 0; //fix warning of unused variable
-          temp_list.push_back(r);
+          new_ranges.push_back(r);
         }
       // change own_it to the sub range behind other_it. Do not delete own_it
       // in any case. As removal would invalidate iterators, we just shrink
@@ -331,9 +331,9 @@ IndexSet::subtract_set (const IndexSet &other)
     }
 
   // done, now add the temporary ranges
-  for (std::list<Range>::iterator it = temp_list.begin();
-       it != temp_list.end();
-       ++it)
+  const std::vector<Range>::iterator end = new_ranges.end();
+  for (std::vector<Range>::iterator it = new_ranges.begin();
+       it != end; ++it)
     add_range(it->begin, it->end);
 
   compress();
