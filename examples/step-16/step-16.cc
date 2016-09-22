@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2003 - 2015 by the deal.II authors
+ * Copyright (C) 2003 - 2016 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -195,11 +195,6 @@ namespace Step16
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
 
-    // We need an additional object for the hanging nodes constraints. They
-    // are handed to the transfer object in the multigrid. Since we call a
-    // compress inside the multigrid these constraints are not allowed to be
-    // inhomogeneous so we store them in different ConstraintMatrix objects.
-    ConstraintMatrix     hanging_node_constraints;
     ConstraintMatrix     constraints;
 
     Vector<double>       solution;
@@ -284,8 +279,6 @@ namespace Step16
     system_rhs.reinit (dof_handler.n_dofs());
 
     constraints.clear ();
-    hanging_node_constraints.clear ();
-    DoFTools::make_hanging_node_constraints (dof_handler, hanging_node_constraints);
     DoFTools::make_hanging_node_constraints (dof_handler, constraints);
 
     std::set<types::boundary_id>         dirichlet_boundary_ids;
@@ -297,7 +290,6 @@ namespace Step16
                                               dirichlet_boundary_functions,
                                               constraints);
     constraints.close ();
-    hanging_node_constraints.close ();
     constraints.condense (dsp);
     sparsity_pattern.copy_from (dsp);
     system_matrix.reinit (sparsity_pattern);
@@ -487,7 +479,7 @@ namespace Step16
   template <int dim>
   void LaplaceProblem<dim>::solve ()
   {
-    MGTransferPrebuilt<Vector<double> > mg_transfer(hanging_node_constraints, mg_constrained_dofs);
+    MGTransferPrebuilt<Vector<double> > mg_transfer(mg_constrained_dofs);
     mg_transfer.build_matrices(dof_handler);
 
     FullMatrix<double> coarse_matrix;

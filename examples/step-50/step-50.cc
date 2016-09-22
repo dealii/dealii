@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2003 - 2015 by the deal.II authors
+ * Copyright (C) 2003 - 2016 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -131,7 +131,6 @@ namespace Step50
 
     IndexSet locally_relevant_set;
 
-    ConstraintMatrix     hanging_node_constraints;
     ConstraintMatrix     constraints;
 
     vector_t       solution;
@@ -283,8 +282,6 @@ namespace Step50
     // right away, without the need for a later
     // clean-up stage:
     constraints.reinit (locally_relevant_set);
-    hanging_node_constraints.reinit (locally_relevant_set);
-    DoFTools::make_hanging_node_constraints (mg_dof_handler, hanging_node_constraints);
     DoFTools::make_hanging_node_constraints (mg_dof_handler, constraints);
 
     std::set<types::boundary_id>         dirichlet_boundary_ids;
@@ -296,7 +293,6 @@ namespace Step50
                                               dirichlet_boundary,
                                               constraints);
     constraints.close ();
-    hanging_node_constraints.close ();
 
     DynamicSparsityPattern dsp(mg_dof_handler.n_dofs(), mg_dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern (mg_dof_handler, dsp, constraints);
@@ -697,9 +693,8 @@ namespace Step50
   void LaplaceProblem<dim>::solve ()
   {
     // Create the object that deals with the transfer between
-    // different refinement levels. We need to pass it the hanging
-    // node constraints.
-    MGTransferPrebuilt<vector_t> mg_transfer(hanging_node_constraints, mg_constrained_dofs);
+    // different refinement levels.
+    MGTransferPrebuilt<vector_t> mg_transfer(mg_constrained_dofs);
     // Now the prolongation matrix has to be built.  This matrix needs
     // to take the boundary values on each level into account and
     // needs to know about the indices at the refinement edges. The
