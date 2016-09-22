@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2015 by the deal.II authors
+// Copyright (C) 1999 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,56 +23,32 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
-template <typename VectorType>
-Multigrid<VectorType>::Multigrid (const unsigned int                    minlevel,
-                                  const unsigned int                    maxlevel,
-                                  const MGMatrixBase<VectorType>        &matrix,
-                                  const MGCoarseGridBase<VectorType>    &coarse,
-                                  const MGTransferBase<VectorType>      &transfer,
-                                  const MGSmootherBase<VectorType>      &pre_smooth,
-                                  const MGSmootherBase<VectorType>      &post_smooth,
-                                  typename Multigrid<VectorType>::Cycle cycle)
-  :
-  cycle_type(cycle),
-  minlevel(minlevel),
-  maxlevel(maxlevel),
-  defect(minlevel,maxlevel),
-  solution(minlevel,maxlevel),
-  t(minlevel,maxlevel),
-  matrix(&matrix, typeid(*this).name()),
-  coarse(&coarse, typeid(*this).name()),
-  transfer(&transfer, typeid(*this).name()),
-  pre_smooth(&pre_smooth, typeid(*this).name()),
-  post_smooth(&post_smooth, typeid(*this).name()),
-  edge_out(0, typeid(*this).name()),
-  edge_in(0, typeid(*this).name()),
-  edge_down(0, typeid(*this).name()),
-  edge_up(0, typeid(*this).name()),
-  debug(0)
-{}
-
-
-
 template <typename VectorType>
 void
 Multigrid<VectorType>::reinit (const unsigned int min_level,
                                const unsigned int max_level)
 {
+  Assert (min_level >= matrix->get_minlevel(),
+          ExcLowerRangeType<unsigned int>(min_level, matrix->get_minlevel()));
+  Assert (max_level <= matrix->get_maxlevel(),
+          ExcLowerRangeType<unsigned int>(matrix->get_maxlevel(), max_level));
+  Assert (min_level <= max_level,
+          ExcLowerRangeType<unsigned int>(max_level, min_level));
   minlevel=min_level;
   maxlevel=max_level;
+  // solution, t and defect2 are resized in cycle()
   defect.resize(minlevel, maxlevel);
 }
+
 
 
 template <typename VectorType>
 void
 Multigrid<VectorType>::set_maxlevel (const unsigned int l)
 {
-  Assert (l <= maxlevel, ExcIndexRange(l,minlevel,maxlevel+1));
-  Assert (l >= minlevel, ExcIndexRange(l,minlevel,maxlevel+1));
-  maxlevel = l;
+  reinit(minlevel, l);
 }
+
 
 
 template <typename VectorType>
@@ -80,11 +56,12 @@ void
 Multigrid<VectorType>::set_minlevel (const unsigned int l,
                                      const bool relative)
 {
-  Assert (l <= maxlevel, ExcIndexRange(l,minlevel,maxlevel+1));
-  minlevel = (relative)
-             ? (maxlevel-l)
-             : l;
+  const unsigned int new_minlevel = (relative)
+                                    ? (maxlevel-l)
+                                    : l;
+  reinit(new_minlevel, maxlevel);
 }
+
 
 
 template <typename VectorType>
@@ -95,12 +72,14 @@ Multigrid<VectorType>::set_cycle(typename Multigrid<VectorType>::Cycle c)
 }
 
 
+
 template <typename VectorType>
 void
 Multigrid<VectorType>::set_debug (const unsigned int d)
 {
   debug = d;
 }
+
 
 
 template <typename VectorType>
@@ -113,6 +92,7 @@ Multigrid<VectorType>::set_edge_matrices (const MGMatrixBase<VectorType> &down,
 }
 
 
+
 template <typename VectorType>
 void
 Multigrid<VectorType>::set_edge_flux_matrices (const MGMatrixBase<VectorType> &down,
@@ -121,6 +101,7 @@ Multigrid<VectorType>::set_edge_flux_matrices (const MGMatrixBase<VectorType> &d
   edge_down = &down;
   edge_up = &up;
 }
+
 
 
 template <typename VectorType>
@@ -375,6 +356,7 @@ Multigrid<VectorType>::level_step(const unsigned int level,
 }
 
 
+
 template <typename VectorType>
 void
 Multigrid<VectorType>::cycle()
@@ -400,6 +382,7 @@ Multigrid<VectorType>::cycle()
   else
     level_step (maxlevel, cycle_type);
 }
+
 
 
 template <typename VectorType>
