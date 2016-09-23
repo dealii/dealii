@@ -32,7 +32,7 @@ void check (const char *p)
   std::ifstream in(p);
   try
     {
-      prm.read_input (in);
+      prm.parse_input (in);
     }
   catch (ParameterHandler::ExcCannotOpenIncludeStatementFile &exc)
     {

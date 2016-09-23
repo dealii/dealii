@@ -1608,8 +1608,23 @@ bool ParameterHandler::read_input (std::istream &input,
                                    const std::string &filename,
                                    const std::string &last_line)
 {
-  parse_input(input, filename, last_line);
-  return true;
+  try
+    {
+      parse_input(input, filename, last_line);
+      return true;
+    }
+  catch (const ExcIO &exc)
+    {
+      throw;
+    }
+  // This catch block more or less duplicates the old behavior of this function,
+  // which was to print something to stderr for every parsing error (which are
+  // now exceptions) and then return false.
+  catch (const ExceptionBase &exc)
+    {
+      std::cerr << exc.what() << std::endl;
+    }
+  return false;
 }
 
 
@@ -1766,8 +1781,23 @@ bool
 ParameterHandler::read_input_from_string (const char *s,
                                           const std::string &last_line)
 {
-  parse_input_from_string(s, last_line);
-  return true;
+  try
+    {
+      parse_input_from_string (s, last_line);
+      return true;
+    }
+  catch (const ExcIO &exc)
+    {
+      throw;
+    }
+  // This catch block more or less duplicates the old behavior of this function,
+  // which was to print something to stderr for every parsing error (which are
+  // now exceptions) and then return false.
+  catch (const ExceptionBase &exc)
+    {
+      std::cerr << exc.what() << std::endl;
+    }
+  return false;
 }
 
 
@@ -1868,8 +1898,20 @@ namespace
 
 bool ParameterHandler::read_input_from_xml(std::istream &in)
 {
-  parse_input_from_xml(in);
-  return true;
+  try
+    {
+      parse_input_from_xml (in);
+      return true;
+    }
+  catch (const ExcIO &exc)
+    {
+      throw;
+    }
+  catch (const ExceptionBase &exc)
+    {
+      std::cerr << exc.what() << std::endl;
+    }
+  return false;
 }
 
 
@@ -3060,8 +3102,24 @@ MultipleParameterLoop::read_input (std::istream &input,
                                    const std::string &filename,
                                    const std::string &last_line)
 {
-  MultipleParameterLoop::parse_input(input, filename, last_line);
-  return true;
+
+  try
+    {
+      MultipleParameterLoop::parse_input(input, filename, last_line);
+      return true;
+    }
+  catch (const ExcIO &exc)
+    {
+      throw;
+    }
+  // This catch block more or less duplicates the old behavior of this function,
+  // which was to print something to stderr for every parsing error (which are
+  // now exceptions) and then return false.
+  catch (const ExceptionBase &exc)
+    {
+      std::cerr << exc.what() << std::endl;
+    }
+  return false;
 }
 
 

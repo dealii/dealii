@@ -36,7 +36,7 @@ void check (const char *content)
 
   try
     {
-      foo.read_input(ss);
+      foo.parse_input(ss);
       deallog << "input: ";
       foo.enter_subsection("bar");
       deallog << foo.get_double ("val") << " ";
@@ -46,7 +46,7 @@ void check (const char *content)
 
   catch (ParameterHandler::ExcCannotParseLine &)
     {
-      deallog << "read_input() failed" << std::endl;
+      deallog << "parse_input() failed" << std::endl;
     }
 }
 

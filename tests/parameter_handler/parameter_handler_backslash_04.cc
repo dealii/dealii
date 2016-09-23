@@ -44,19 +44,19 @@ int main ()
       // We need a local path for the file to get consistent output messages.
       const int chdir_return_code = chdir (SOURCE_DIR);
       AssertThrow (chdir_return_code == 0, ExcInternalError());
-      // test both relevant read_input functions. They should fail with a
+      // test both relevant parse_input functions. They should fail with a
       // specific exception.
       try
         {
           if (i == 0)
             {
-              prm.read_input("prm/parameter_handler_backslash_04.prm");
+              prm.parse_input("prm/parameter_handler_backslash_04.prm");
             }
           else
             {
               std::ifstream input_stream
               ("prm/parameter_handler_backslash_04.prm");
-              prm.read_input(input_stream);
+              prm.parse_input(input_stream);
             }
 
           std::string list;
