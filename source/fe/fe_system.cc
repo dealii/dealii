@@ -1506,7 +1506,7 @@ void FESystem<dim,spacedim>::initialize (const std::vector<const FiniteElement<d
 
   }
 
-  // restriction and prolongation matrices are build on demand
+  // restriction and prolongation matrices are built on demand
 
   // now set up the interface constraints.  this is kind'o hairy, so don't try
   // to do it dimension independent
