@@ -443,8 +443,16 @@ public:
    * Constructor with constraints. Equivalent to the default constructor
    * followed by initialize_constraints().
    */
+  MGTransferPrebuilt (const MGConstrainedDoFs &mg_constrained_dofs);
+
+  /**
+   * Constructor with constraints. Equivalent to the default constructor
+   * followed by initialize_constraints().
+   *
+   * @deprecated @p constraints is unused.
+   */
   MGTransferPrebuilt (const ConstraintMatrix &constraints,
-                      const MGConstrainedDoFs &mg_constrained_dofs);
+                      const MGConstrainedDoFs &mg_constrained_dofs) DEAL_II_DEPRECATED;
 
   /**
    * Destructor.
@@ -454,8 +462,15 @@ public:
   /**
    * Initialize the constraints to be used in build_matrices().
    */
+  void initialize_constraints (const MGConstrainedDoFs &mg_constrained_dofs);
+
+  /**
+   * Initialize the constraints to be used in build_matrices().
+   *
+   * @deprecated @p constraints is unused.
+   */
   void initialize_constraints (const ConstraintMatrix &constraints,
-                               const MGConstrainedDoFs &mg_constrained_dofs);
+                               const MGConstrainedDoFs &mg_constrained_dofs) DEAL_II_DEPRECATED;
 
   /**
    * Reset the object to the state it had right after the default constructor.
@@ -541,11 +556,6 @@ private:
    * boundary.
    */
   std::vector<std::vector<bool> > interface_dofs;
-
-  /**
-   * The constraints of the global system.
-   */
-  SmartPointer<const ConstraintMatrix, MGTransferPrebuilt<VectorType> > constraints;
 };
 
 

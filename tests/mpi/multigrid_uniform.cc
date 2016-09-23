@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2015 by the deal.II authors
+// Copyright (C) 2008 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -95,7 +95,6 @@ namespace Step50
 
     matrix_t system_matrix;
 
-    ConstraintMatrix     hanging_node_constraints;
     ConstraintMatrix     constraints;
 
     vector_t       solution;
@@ -186,8 +185,6 @@ namespace Step50
     system_rhs.reinit(mg_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
 
     constraints.clear ();
-    hanging_node_constraints.clear ();
-    DoFTools::make_hanging_node_constraints (mg_dof_handler, hanging_node_constraints);
     DoFTools::make_hanging_node_constraints (mg_dof_handler, constraints);
 
     typename FunctionMap<dim>::type      dirichlet_boundary;
@@ -197,7 +194,6 @@ namespace Step50
                                               dirichlet_boundary,
                                               constraints);
     constraints.close ();
-    hanging_node_constraints.close ();
 
     DynamicSparsityPattern csp(mg_dof_handler.n_dofs(), mg_dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern (mg_dof_handler, csp, constraints);
@@ -375,7 +371,7 @@ namespace Step50
   template <int dim>
   void LaplaceProblem<dim>::solve ()
   {
-    MGTransferPrebuilt<vector_t> mg_transfer(hanging_node_constraints, mg_constrained_dofs);
+    MGTransferPrebuilt<vector_t> mg_transfer(mg_constrained_dofs);
     mg_transfer.build_matrices(mg_dof_handler);
 
     matrix_t coarse_matrix;

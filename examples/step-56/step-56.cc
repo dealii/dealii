@@ -881,7 +881,7 @@ namespace Step56
         computing_timer.enter_subsection ("Solve - Set-up Preconditioner");
 
         // Transfer operators between levels
-        MGTransferPrebuilt<Vector<double> > mg_transfer(constraints, mg_constrained_dofs);
+        MGTransferPrebuilt<Vector<double> > mg_transfer(mg_constrained_dofs);
         mg_transfer.build_matrices(velocity_dof_handler);
 
         // Setup coarse grid solver

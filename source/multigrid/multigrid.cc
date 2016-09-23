@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,10 +39,18 @@ MGTransferBlockBase::MGTransferBlockBase ()
 {}
 
 
+
 MGTransferBlockBase::MGTransferBlockBase (
-  const ConstraintMatrix &c, const MGConstrainedDoFs &mg_c)
+  const MGConstrainedDoFs &mg_c)
   :
-  constraints(&c),
+  mg_constrained_dofs(&mg_c)
+{}
+
+
+
+MGTransferBlockBase::MGTransferBlockBase (
+  const ConstraintMatrix &/*c*/, const MGConstrainedDoFs &mg_c)
+  :
   mg_constrained_dofs(&mg_c)
 {}
 
@@ -218,6 +226,7 @@ void MGTransferSelect<number>::prolongate (
 }
 
 
+
 template <typename number>
 void MGTransferSelect<number>::restrict_and_add (
   const unsigned int   from_level,
@@ -240,15 +249,27 @@ MGTransferBlockSelect<number>::MGTransferBlockSelect ()
 {}
 
 
+
 template <typename number>
 MGTransferBlockSelect<number>::MGTransferBlockSelect (
-  const ConstraintMatrix &c, const MGConstrainedDoFs &mg_c)
-  : MGTransferBlockBase(c, mg_c)
+  const MGConstrainedDoFs &mg_c)
+  : MGTransferBlockBase(mg_c)
 {}
+
+
+
+template <typename number>
+MGTransferBlockSelect<number>::MGTransferBlockSelect (
+  const ConstraintMatrix &/*c*/, const MGConstrainedDoFs &mg_c)
+  : MGTransferBlockBase(mg_c)
+{}
+
+
 
 template <typename number>
 MGTransferBlockSelect<number>::~MGTransferBlockSelect ()
 {}
+
 
 
 template <typename number>

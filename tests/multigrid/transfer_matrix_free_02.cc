@@ -82,13 +82,6 @@ void check(const unsigned int fe_degree)
       mgdof.distribute_dofs(fe);
       mgdof.distribute_mg_dofs(fe);
 
-      ConstraintMatrix hanging_node_constraints;
-      IndexSet relevant_dofs;
-      DoFTools::extract_locally_relevant_dofs(mgdof, relevant_dofs);
-      hanging_node_constraints.reinit(relevant_dofs);
-      DoFTools::make_hanging_node_constraints(mgdof, hanging_node_constraints);
-      hanging_node_constraints.close();
-
       MGConstrainedDoFs mg_constrained_dofs;
       ZeroFunction<dim> zero_function;
       typename FunctionMap<dim>::type dirichlet_boundary;
@@ -97,7 +90,7 @@ void check(const unsigned int fe_degree)
 
       // build reference
       MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double> >
-      transfer_ref(hanging_node_constraints, mg_constrained_dofs);
+      transfer_ref(mg_constrained_dofs);
       transfer_ref.build_matrices(mgdof);
 
       // build matrix-free transfer

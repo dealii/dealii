@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2015 by the deal.II authors
+// Copyright (C) 2001 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -65,11 +65,20 @@ public:
    * discontinuous finite elements or with no local refinement.
    */
   MGTransferBlockBase ();
+
   /**
    * Constructor with constraint matrices as well as mg_constrained_dofs.
    */
+  MGTransferBlockBase (const MGConstrainedDoFs &mg_constrained_dofs);
+
+  /**
+   * Constructor with constraint matrices as well as mg_constrained_dofs.
+   *
+   * @deprecated @p constraints is unused.
+   */
   MGTransferBlockBase (const ConstraintMatrix &constraints,
-                       const MGConstrainedDoFs &mg_constrained_dofs);
+                       const MGConstrainedDoFs &mg_constrained_dofs) DEAL_II_DEPRECATED;
+
   /**
    * Memory used by this object.
    */
@@ -150,10 +159,7 @@ protected:
    */
   std::vector<std::vector<std::vector<std::pair<unsigned int, unsigned int> > > >
   copy_indices;
-  /**
-   * The constraints of the global system.
-   */
-  SmartPointer<const ConstraintMatrix, MGTransferBlockBase> constraints;
+
   /**
    * The mg_constrained_dofs of the level systems.
    */
@@ -299,11 +305,20 @@ public:
    * discontinuous finite elements or with no local refinement.
    */
   MGTransferBlockSelect ();
+
   /**
    * Constructor with constraint matrices as well as mg_constrained_dofs.
    */
+  MGTransferBlockSelect (const MGConstrainedDoFs &mg_constrained_dofs);
+
+  /**
+   * Constructor with constraint matrices as well as mg_constrained_dofs.
+   *
+   * @deprecated @p constraints is unused.
+   */
   MGTransferBlockSelect (const ConstraintMatrix &constraints,
-                         const MGConstrainedDoFs &mg_constrained_dofs);
+                         const MGConstrainedDoFs &mg_constrained_dofs) DEAL_II_DEPRECATED;
+
   /**
    * Destructor.
    */
