@@ -19,6 +19,10 @@
 #include <deal.II/base/parameter_handler.h>
 #include <fstream>
 
+// header for chdir is platform dependent; when the day comes that we support
+// Windows in the test suite then conditionally include direction.h
+#include <unistd.h>
+
 /*
  * Test that ParameterHandler does not join lines for things like
  *
@@ -43,18 +47,21 @@ int main ()
                          Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")));
       prm.leave_subsection ();
 
+      // We need a local path for the file to get consistent output messages.
+      const int chdir_return_code = chdir (SOURCE_DIR);
+      AssertThrow (chdir_return_code == 0, ExcInternalError());
       // test both relevant read_input functions. They should fail with a
       // specific exception.
       try
         {
           if (i == 0)
             {
-              prm.read_input(SOURCE_DIR "/prm/parameter_handler_backslash_03.prm");
+              prm.read_input("prm/parameter_handler_backslash_03.prm");
             }
           else
             {
               std::ifstream input_stream
-              (SOURCE_DIR "/prm/parameter_handler_backslash_03.prm");
+              ("prm/parameter_handler_backslash_03.prm");
               prm.read_input(input_stream);
             }
 

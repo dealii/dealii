@@ -1,6 +1,6 @@
 
 DEAL::ExcInvalidEntryForPattern (current_line_n, input_filename, entry_value, entry_name, patterns[pattern_index]->description())
-Line <4> of file <./prm/parameter_handler_backslash_03.prm>:
+Line <4> of file <prm/parameter_handler_backslash_03.prm>:
     The entry value
         a,\
     for the entry named
