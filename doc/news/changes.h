@@ -309,6 +309,12 @@ inconvenience this causes.
  (Denis Davydov, 2016/09/28)
  </li>
 
+ <li> New: The Tensor class has two new functions implemented, namely those
+ that return its Tensor::adjoint() and Tensor::cofactor().
+ <br>
+ (Jean-Paul Pelteret, 2016/09/25)
+ </li>
+
  <li> Improved: The doxygen documentation now contains nicely formatted
  boxes containing the text message of each exception. Several messages
  haven been clarified and improved.
