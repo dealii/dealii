@@ -53,13 +53,6 @@ inconvenience this causes.
  (David Wells, 2016/09/06)
  </li>
 
- <li> New: There is now the possibility to store information about the
- time of an output time step within the .visit file created by
- the DataOutInterface<dim,spacedim>::write_visit_record function.
- <br>
- (Rene Gassmoeller, Juliane Dannberg, 2016/08/24)
- </li>
-
  <li> New: deal.II now requires at least BOOST version 1.56, rather than the
  previous minimal version of 1.54. This is because 1.54 does not support
  serializing objects of type std::unique_ptr if C++11 is used, but we now
@@ -87,7 +80,7 @@ inconvenience this causes.
 
  <li> Changed: Several operators from LocalIntegrators::Divergence got moved
  to LocalIntegrators::GradDiv and the never used/tested
- LocalIntegrators::Divergence::grad_div() function got removed.
+ LocalIntegrators::Divergence::grad_div() function was removed.
  <br>
  (Timo Heister, Guido Kanschat, 2016/08/02)
  </li>
@@ -149,11 +142,6 @@ inconvenience this causes.
   manual for further information.
   <br>
   (Martin Kronbichler, 2016/04/26)
-  </li>
-
-  <li> Improved: MeshWorker treats periodic faces as interior faces.
-  <br>
-  (Daniel Arndt, 2016/04/18)
   </li>
 
   <li> Changed: FlatManifold takes as argument a periodicity option. This
@@ -621,6 +609,13 @@ inconvenience this causes.
  (Dustin Kumor, Martin Kronbichler, 2016/08/31)
  </li>
 
+ <li> New: There is now the possibility to store information about the
+ time of an output time step within the .visit file created by
+ the DataOutInterface<dim,spacedim>::write_visit_record function.
+ <br>
+ (Rene Gassmoeller, Juliane Dannberg, 2016/08/24)
+ </li>
+
  <li> New: Rank-4 symmetric tensors of type SymmetricTensor can now
  be converted to rank-4 tensors of type Tensor.
  <br>
@@ -907,6 +902,11 @@ inconvenience this causes.
  <li> New: Added move operations to IndexSet.
  <br>
  (Daniel Shapero, 2016/04/19)
+ </li>
+
+ <li> Improved: MeshWorker treats periodic faces as interior faces.
+ <br>
+ (Daniel Arndt, 2016/04/18)
  </li>
 
  <li> Improved: The parallel loops in the deal.II Vector class for
