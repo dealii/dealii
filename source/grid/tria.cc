@@ -1294,18 +1294,14 @@ namespace internal
     struct Implementation
     {
       /**
-       * For a given Triangulation, update the
-       * number cache for lines. For 1d, we have
-       * to deal with the fact that lines have
-       * levels, whereas for higher dimensions
+       * For a given Triangulation, update that part of the number
+       * cache that relates to lines. For 1d, we have to deal with the
+       * fact that lines have levels, whereas for higher dimensions
        * they do not.
        *
-       * The second argument indicates
-       * for how many levels the
-       * Triangulation has objects,
-       * though the highest levels need
-       * not contain active cells if they
-       * have previously all been
+       * The second argument indicates for how many levels the
+       * Triangulation has objects, though the highest levels need not
+       * contain active cells if they have previously all been
        * coarsened away.
        */
       template <int dim, int spacedim>
@@ -1321,9 +1317,7 @@ namespace internal
 
         number_cache.n_levels = 0;
         if (level_objects > 0)
-          // find the last level
-          // on which there are
-          // used cells
+          // find the last level on which there are used cells
           for (unsigned int level=0; level<level_objects; ++level)
             if (triangulation.begin(level) !=
                 triangulation.end(level))
@@ -1333,18 +1327,16 @@ namespace internal
         Assert (number_cache.n_levels > 0, ExcInternalError());
 
         ///////////////////////////////////
-        // update the number of lines
-        // on the different levels in
-        // the cache
+        // update the number of lines on the different levels in the
+        // cache
         number_cache.n_lines_level.resize (number_cache.n_levels);
         number_cache.n_lines = 0;
 
         number_cache.n_active_lines_level.resize (number_cache.n_levels);
         number_cache.n_active_lines = 0;
 
-        // for 1d, lines have levels so take
-        // count the objects per level and
-        // globally
+        // for 1d, lines have levels so take count the objects per
+        // level and globally
         if (dim == 1)
           {
             for (unsigned int level=0; level<number_cache.n_levels; ++level)
@@ -1363,8 +1355,7 @@ namespace internal
                 number_cache.n_lines += number_cache.n_lines_level[level];
               }
 
-            // do the update for the number of
-            // active lines as well
+            // do the update for the number of active lines as well
             for (unsigned int level=0; level<number_cache.n_levels; ++level)
               {
                 // count lines on this level
@@ -1381,8 +1372,7 @@ namespace internal
           }
         else
           {
-            // for dim>1, there are no
-            // levels for lines
+            // for dim>1, there are no levels for lines
             {
               line_iterator line = triangulation.begin_line (),
                             endc = triangulation.end_line();
@@ -1400,23 +1390,18 @@ namespace internal
       }
 
       /**
-       * For a given Triangulation, update the
-       * number cache for quads. For 2d, we have
-       * to deal with the fact that quads have
-       * levels, whereas for higher dimensions
+       * For a given Triangulation, update that part of the number
+       * cache that relates to quads. For 2d, we have to deal with the
+       * fact that quads have levels, whereas for higher dimensions
        * they do not.
        *
-       * The second argument indicates
-       * for how many levels the
-       * Triangulation has objects,
-       * though the highest levels need
-       * not contain active cells if they
-       * have previously all been
+       * The second argument indicates for how many levels the
+       * Triangulation has objects, though the highest levels need not
+       * contain active cells if they have previously all been
        * coarsened away.
        *
-       * At the beginning of the function, we call the
-       * respective function to update the number
-       * cache for lines.
+       * At the beginning of the function, we call the respective
+       * function to update the number cache for lines.
        */
       template <int dim, int spacedim>
       static
@@ -1436,18 +1421,16 @@ namespace internal
         typename Triangulation<dim,spacedim>::active_quad_iterator active_quad_iterator;
 
         ///////////////////////////////////
-        // update the number of quads
-        // on the different levels in
-        // the cache
+        // update the number of quads on the different levels in the
+        // cache
         number_cache.n_quads_level.resize (number_cache.n_levels);
         number_cache.n_quads = 0;
 
         number_cache.n_active_quads_level.resize (number_cache.n_levels);
         number_cache.n_active_quads = 0;
 
-        // for 2d, quads have levels so take
-        // count the objects per level and
-        // globally
+        // for 2d, quads have levels so take count the objects per
+        // level and globally
         if (dim == 2)
           {
             for (unsigned int level=0; level<number_cache.n_levels; ++level)
@@ -1466,8 +1449,7 @@ namespace internal
                 number_cache.n_quads += number_cache.n_quads_level[level];
               }
 
-            // do the update for the number of
-            // active quads as well
+            // do the update for the number of active quads as well
             for (unsigned int level=0; level<number_cache.n_levels; ++level)
               {
                 // count quads on this level
@@ -1484,8 +1466,7 @@ namespace internal
           }
         else
           {
-            // for dim>2, there are no
-            // levels for quads
+            // for dim>2, there are no levels for quads
             {
               quad_iterator quad = triangulation.begin_quad (),
                             endc = triangulation.end_quad();
@@ -1503,23 +1484,18 @@ namespace internal
       }
 
       /**
-       * For a given Triangulation, update the
-       * number cache for hexes. For 3d, we have
-       * to deal with the fact that hexes have
-       * levels, whereas for higher dimensions
+       * For a given Triangulation, update that part of the number
+       * cache that relates to hexes. For 3d, we have to deal with the
+       * fact that hexes have levels, whereas for higher dimensions
        * they do not.
        *
-       * The second argument indicates
-       * for how many levels the
-       * Triangulation has objects,
-       * though the highest levels need
-       * not contain active cells if they
-       * have previously all been
+       * The second argument indicates for how many levels the
+       * Triangulation has objects, though the highest levels need not
+       * contain active cells if they have previously all been
        * coarsened away.
        *
-       * At the end of the function, we call the
-       * respective function to update the number
-       * cache for quads, which will in turn call
+       * At the end of the function, we call the respective function
+       * to update the number cache for quads, which will in turn call
        * the respective function for lines.
        */
       template <int dim, int spacedim>
@@ -1540,18 +1516,16 @@ namespace internal
         typename Triangulation<dim,spacedim>::active_hex_iterator active_hex_iterator;
 
         ///////////////////////////////////
-        // update the number of hexes
-        // on the different levels in
-        // the cache
+        // update the number of hexes on the different levels in the
+        // cache
         number_cache.n_hexes_level.resize (number_cache.n_levels);
         number_cache.n_hexes = 0;
 
         number_cache.n_active_hexes_level.resize (number_cache.n_levels);
         number_cache.n_active_hexes = 0;
 
-        // for 3d, hexes have levels so take
-        // count the objects per level and
-        // globally
+        // for 3d, hexes have levels so take count the objects per
+        // level and globally
         if (dim == 3)
           {
             for (unsigned int level=0; level<number_cache.n_levels; ++level)
@@ -1570,8 +1544,7 @@ namespace internal
                 number_cache.n_hexes += number_cache.n_hexes_level[level];
               }
 
-            // do the update for the number of
-            // active hexes as well
+            // do the update for the number of active hexes as well
             for (unsigned int level=0; level<number_cache.n_levels; ++level)
               {
                 // count hexes on this level
@@ -1588,8 +1561,7 @@ namespace internal
           }
         else
           {
-            // for dim>3, there are no
-            // levels for hexs
+            // for dim>3, there are no levels for hexs
             {
               hex_iterator hex  = triangulation.begin_hex (),
                            endc = triangulation.end_hex();
