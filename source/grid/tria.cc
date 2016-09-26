@@ -1294,9 +1294,10 @@ namespace internal
     struct Implementation
     {
       /**
-       * For a given Triangulation, update the number cache for
-       * lines. For 1d, we have to deal with the fact that lines have
-       * levels, whereas for higher dimensions they do not.
+       * For a given Triangulation, update that part of the number
+       * cache that relates to lines. For 1d, we have to deal with the
+       * fact that lines have levels, whereas for higher dimensions
+       * they do not.
        *
        * The second argument indicates for how many levels the
        * Triangulation has objects, though the highest levels need not
@@ -1389,9 +1390,10 @@ namespace internal
       }
 
       /**
-       * For a given Triangulation, update the number cache for
-       * quads. For 2d, we have to deal with the fact that quads have
-       * levels, whereas for higher dimensions they do not.
+       * For a given Triangulation, update that part of the number
+       * cache that relates to quads. For 2d, we have to deal with the
+       * fact that quads have levels, whereas for higher dimensions
+       * they do not.
        *
        * The second argument indicates for how many levels the
        * Triangulation has objects, though the highest levels need not
@@ -1482,9 +1484,10 @@ namespace internal
       }
 
       /**
-       * For a given Triangulation, update the number cache for
-       * hexes. For 3d, we have to deal with the fact that hexes have
-       * levels, whereas for higher dimensions they do not.
+       * For a given Triangulation, update that part of the number
+       * cache that relates to hexes. For 3d, we have to deal with the
+       * fact that hexes have levels, whereas for higher dimensions
+       * they do not.
        *
        * The second argument indicates for how many levels the
        * Triangulation has objects, though the highest levels need not
