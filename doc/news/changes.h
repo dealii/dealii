@@ -53,13 +53,6 @@ inconvenience this causes.
  (David Wells, 2016/09/06)
  </li>
 
- <li> New: There is now the possibility to store information about the
- time of an output time step within the .visit file created by
- the DataOutInterface<dim,spacedim>::write_visit_record function.
- <br>
- (Rene Gassmoeller, Juliane Dannberg, 2016/08/24)
- </li>
-
  <li> New: deal.II now requires at least BOOST version 1.56, rather than the
  previous minimal version of 1.54. This is because 1.54 does not support
  serializing objects of type std::unique_ptr if C++11 is used, but we now
@@ -87,7 +80,7 @@ inconvenience this causes.
 
  <li> Changed: Several operators from LocalIntegrators::Divergence got moved
  to LocalIntegrators::GradDiv and the never used/tested
- LocalIntegrators::Divergence::grad_div() function got removed.
+ LocalIntegrators::Divergence::grad_div() function was removed.
  <br>
  (Timo Heister, Guido Kanschat, 2016/08/02)
  </li>
@@ -149,11 +142,6 @@ inconvenience this causes.
   manual for further information.
   <br>
   (Martin Kronbichler, 2016/04/26)
-  </li>
-
-  <li> Improved: MeshWorker treats periodic faces as interior faces.
-  <br>
-  (Daniel Arndt, 2016/04/18)
   </li>
 
   <li> Changed: FlatManifold takes as argument a periodicity option. This
@@ -219,38 +207,11 @@ inconvenience this causes.
 
 <ol>
 
- <li> New: DoFTools::write_gnuplot_dof_support_point_info outputs
- support point locations and dof indices to a format readable by
- gnuplot.
- <br>
- (Timo Heister, 2016/09/16)
- </li>
-
- <li> Fixed: The CMake macros <code>DEAL_II_(ADD_TEST|SETUP_TARGET)</code>
- now enforce a stricter <code>CMAKE_BUILD_TYPE</code> handling. This helps
- to avoid situations where targets with different build flavors might
- accidentally get linked against each other.
- <br>
- (Matthias Maier, 2016/09/08)
- </li>
-
- <li> Improved: the doxygen documentation now contains nicely formatted
+ <li> Improved: The doxygen documentation now contains nicely formatted
  boxes containing the text message of each exception. Several messages
  haven been clarified and improved.
  <br>
  (Timo Heister, 2016/09/06)
- </li>
-
- <li> Fixed: Reimplement copy_triangulation and load in
- dealii::parallel::shared::Triangulation, this avoids the loss of
- partition information which causes p::s::Triangulation to be in an invalid state.
- <br>
- (Ce Qin, 2016/09/05)
- </li>
-
- <li> Fixed: The build system now uses -fPIC instead of -fpic
- <br>
- (Matthias Maier, 2016/08/31)
  </li>
 
  <li> New: There are 6 new video lectures that explain the
@@ -261,34 +222,11 @@ inconvenience this causes.
  (Wolfgang Bangerth, 2016/08/19)
  </li>
 
- <li> New: It is now possible to generate a cell_iterator to a cell
- that is identified by a CellId. CellIds are unique even across
- processes in distributed computations, therefore this change allows
- to identify a particular cell (e.g. a ghost cell of the local process) in
- another domain.
- <br>
- (Rene Gassmoeller, 2016/08/17)
- </li>
-
  <li> New: deal.II no longer uses features of the C++ language that
  were deprecated with C++11, C++14, or that are scheduled to be
  deprecated for C++17.
  <br>
  (David Wells, Jonathan Robey, Wolfgang Bangerth, 2016/08/11)
- </li>
-
- <li> New: Introduce operators for residuals and interior penalty terms for
- the Grad-Div operator in LocalIntegrators::GradDiv.
- <br>
- (Timo Heister, Guido Kanschat, 2016/08/02)
- </li>
-
- <li>
- New: Added a new PolarManifold descriptor, that uses a polar coordinate
- system to compute new points, and modified the existing SphericalManifold
- descriptor to use geodesics on the surface of the sphere.
- <br>
- (Luca Heltai, Mauro Bardelloni, 2016/08/04)
  </li>
 
  <li>
@@ -304,34 +242,6 @@ inconvenience this causes.
  longer use the Function class; they use plain functions instead.
  <br>
  (David Wells, 2016/07/25)
- </li>
-
- <li>
- Improved: VectorTools::interpolate() may now be used on FESystems with mixed
- interpolating and non-interpolating FEs, if all of the selected components for
- interpolation originate from interpolating FEs.
- <br>
- (Jonathan Robey, 2016/07/24)
- </li>
-
- <li>
- Improved: VectorTools::interpolate() now takes a ComponentMask to select the
- components to interpolate.
- <br>
- (Jonathan Robey, 2016/07/21)
- </li>
-
- <li> Improved: Split out pattern descriptions for LaTeX and Description
- ParameterHandler OutputStyles, and add better description text.
- <br>
- (Jonathan Robey, 2016/07/21)
- </li>
-
- <li> New: Added GridGenerator::quarter_hyper_ball() to generate the
- intersection of a hyper ball with the positive orthant relative
- to its center.
- <br>
- (Daniel Arndt, 2016/07/19)
  </li>
 
  <li> Improved: The build system now checks for usable compiler/linker
@@ -364,22 +274,6 @@ inconvenience this causes.
  (Matthias Maier, Timo Heister, 2016/07/06)
  </li>
 
- <li> New: Added TrilinosWrappers::SolveDirect::Initialize and
- TrilinosWrappers::SolverDirect::Solve to solve distributed linear systems
- with multiple right hand sides without needing to refactorize the matrix
- everytime. Also, added unit test for testing the new functionality.
- <br>
- (Michael Harmon, 2016/06/30)
- </li>
-
- <li> Changed: Similar to MappingQEulerian, MappingQ1Eulerian has gained
- a second constructor that reverses the order of the arguments to indicate
- which DoFHandler a vector is based on. The old constructor is now
- deprecated and will be removed in a future version.
- <br>
- (Wolfgang Bangerth, 2016/06/25)
- </li>
-
  <li> New: Add new classes to expand a scalar finite element solution into
  the orthogonal bases FESeries::Fourier and FESeries::Legendre. Also
  provide auxiliary functions to calculate norms of subsets of expansion
@@ -409,28 +303,6 @@ inconvenience this causes.
  (Jean-Paul Pelteret, 2016/05/20)
  </li>
 
- <li> New: Add VectorTools::compute_global_error that computes global
- errors from cellwise errors obtained by VectorTools::integrate_difference()
- and do MPI collectives if necessary.
- <br>
- (Timo Heister, 2016/05/15)
- </li>
-
- <li> New: Add functions to transform Cartesian coordinates to spherical and back:
- GeometricUtilities::Coordinates::to_spherical and
- GeometricUtilities::Coordinates::from_spherical.
- <br>
- (Denis Davydov, 2016/05/10)
- </li>
-
- <li> Improved: The method Triangulation::create_triangulation will now throw an
- exception if any cells have negative measure. This check is not run if the
- triangulation keeps track of distorted cells or if the codimension is not zero.
- This check was previously only run in 3D.
- <br>
- (David Wells, 2016/05/07)
- </li>
-
  <li> New: Add a collection of classes to manage user's quadrature point data:
  CellDataStorage, TransferableQuadraturePointData and
  parallel::distributed::ContinuousQuadratureDataTransfer.
@@ -448,29 +320,11 @@ inconvenience this causes.
  (Denis Davydov, 2016/04/28)
  </li>
 
-
  <li> New: Added move operations to BlockIndices, BlockVectorBase and
  BlockVector; Vector move operations nullify old object instead of
  using swap.
  <br>
  (Daniel Shapero, 2016/04/13)
- </li>
-
- <li> New: Added TensorProductManifold to create new manifolds from two
- ChartManifold objects. This can be used, for example, to combine a
- 2d manifold with a flat manifold for an extruded mesh.
- <br>
- (Timo Heister, 2016/04/12)
- </li>
-
- <li> New: Added New option in the read_ucd function of the GridIn class.
-      A flag can now be assigned to the function, to decide wether the
-      indicators specified in a UCD file should be interpreted as
-      boundary_ids or as manifold_ids. This is particularly useful
-      when the indicators refer to internal faces, for which
-      boundary_ids cannot be used.
- <br>
- (Andrea Mola, 2016/04/11)
  </li>
 
  <li> New: Manifold objects were previously only used to compute the
@@ -488,13 +342,6 @@ inconvenience this causes.
  (Luca Heltai, Wolfgang Bangerth, 2016/04/08)
  </li>
 
- <li> New: Added CompositionManifold to create new manifolds from two
- ChartManifold objects. This can be used, for example, to rotate a
- cylindrical Manifold, or to make a cylinders with parabolic sides.
- <br>
- (Luca Heltai, 2016/04/09)
- </li>
-
  <li> New: Added a new Mapping class, MappingManifold, to use exact
  geometrical information extracted from the Manifold description instead
  of a polynomial approximation when computing transformations from the
@@ -505,28 +352,6 @@ inconvenience this causes.
  MappingQ1 for the FlatManifold descriptor.
  <br>
  (Luca Heltai, 2016/04/09)
- </li>
-
- <li> New: Added GridGenerator::torus() to generate the volume mesh of a
- torus in three dimensions and a manifold description TorusManifold to
- go with it.
- <br>
- (Timo Heister, 2016/03/21)
- </li>
-
- <li> New: Added GridTools::rotate() in three space dimensions.
- <br>
- (Timo Heister, 2016/03/18)
- </li>
-
- <li> New: Added unit tests for complex-valued PETSc and SLEPc.
- <br>
- (Toby D. Young, Denis Davydov, 2016/03/11)
- </li>
-
- <li> New: Added another scaling factor to Kelly error estimator, namely h_K.
- <br>
- (Denis Davydov, 2016/03/05)
  </li>
 
  <li> New: Added indent target to indent all headers and source
@@ -549,6 +374,13 @@ inconvenience this causes.
  allocation has therefore been deprecated.
  <br/>
  (Jonathan Robey, 2016/09/21)
+ </li>
+
+ <li> New: DoFTools::write_gnuplot_dof_support_point_info outputs
+ support point locations and dof indices to a format readable by
+ gnuplot.
+ <br>
+ (Timo Heister, 2016/09/16)
  </li>
 
  <li> Fixed: EmbeddedRungeKutta methods now correctly increase delta_t_guess 
@@ -601,9 +433,30 @@ inconvenience this causes.
  <br>
  (Daniel Arndt, 2016/09/11)
  </li>
+
+ <li> Fixed: The CMake macros <code>DEAL_II_(ADD_TEST|SETUP_TARGET)</code>
+ now enforce a stricter <code>CMAKE_BUILD_TYPE</code> handling. This helps
+ to avoid situations where targets with different build flavors might
+ accidentally get linked against each other.
+ <br>
+ (Matthias Maier, 2016/09/08)
+ </li>
+
  <li> Fixed: FE_TraceQ now provides unit support points.
  <br>
  (Martin Kronbichler, 2016/09/08)
+ </li>
+
+ <li> Fixed: Reimplement copy_triangulation and load in
+ dealii::parallel::shared::Triangulation, this avoids the loss of
+ partition information which causes parallel::shared::Triangulation to be in an invalid state.
+ <br>
+ (Ce Qin, 2016/09/05)
+ </li>
+
+ <li> Fixed: The build system now uses -fPIC instead of -fpic
+ <br>
+ (Matthias Maier, 2016/08/31)
  </li>
 
  <li> Fixed: Fix MPI_InitFinalize by correctly initializing and destroying
@@ -619,6 +472,22 @@ inconvenience this causes.
  algorithm has been replaced by a linear complexity one.
  <br>
  (Dustin Kumor, Martin Kronbichler, 2016/08/31)
+ </li>
+
+ <li> New: There is now the possibility to store information about the
+ time of an output time step within the .visit file created by
+ the DataOutInterface<dim,spacedim>::write_visit_record function.
+ <br>
+ (Rene Gassmoeller, Juliane Dannberg, 2016/08/24)
+ </li>
+
+ <li> New: It is now possible to generate a cell_iterator to a cell
+ that is identified by a CellId. CellIds are unique even across
+ processes in distributed computations, therefore this change allows
+ to identify a particular cell (e.g. a ghost cell of the local process) in
+ another domain.
+ <br>
+ (Rene Gassmoeller, 2016/08/17)
  </li>
 
  <li> New: Rank-4 symmetric tensors of type SymmetricTensor can now
@@ -644,12 +513,26 @@ inconvenience this causes.
  (Timo Heister, Guido Kanschat, 2016/08/08)
  </li>
 
+ <li>
+ New: Added a new PolarManifold descriptor, that uses a polar coordinate
+ system to compute new points, and modified the existing SphericalManifold
+ descriptor to use geodesics on the surface of the sphere.
+ <br>
+ (Luca Heltai, Mauro Bardelloni, 2016/08/04)
+ </li>
+
  <li> Improved: The regular and hp versions of
  DoFTools::make_flux_sparsity_pattern() no longer use the user flags of the
  underlying triangulation to determine if entries along a certain face have been
  added to the sparsity pattern.
  <br>
  (David Wells, 2016/03/02 - 2016/08/02)
+ </li>
+
+ <li> New: Introduce operators for residuals and interior penalty terms for
+ the Grad-Div operator in LocalIntegrators::GradDiv.
+ <br>
+ (Timo Heister, Guido Kanschat, 2016/08/02)
  </li>
 
  <li> Improved: DoFTools::make_cell_patches() can create block lists
@@ -693,6 +576,27 @@ inconvenience this causes.
  (Sam Cox, 2016/07/25)
  </li>
 
+ <li>
+ Improved: VectorTools::interpolate() may now be used on FESystems with mixed
+ interpolating and non-interpolating FEs, if all of the selected components for
+ interpolation originate from interpolating FEs.
+ <br>
+ (Jonathan Robey, 2016/07/24)
+ </li>
+
+ <li>
+ Improved: VectorTools::interpolate() now takes a ComponentMask to select the
+ components to interpolate.
+ <br>
+ (Jonathan Robey, 2016/07/21)
+ </li>
+
+ <li> Improved: Split out pattern descriptions for LaTeX and Description
+ ParameterHandler OutputStyles, and add better description text.
+ <br>
+ (Jonathan Robey, 2016/07/21)
+ </li>
+
  <li> Improved: Allow for including dofs for individual components on
    boundary in DoFTools::make_vertex_patches().
  <br>
@@ -705,6 +609,13 @@ inconvenience this causes.
  Allow for non-primitive FiniteElements.
  <br>
  (Daniel Arndt, 2016/07/20)
+ </li>
+
+ <li> New: Added GridGenerator::quarter_hyper_ball() to generate the
+ intersection of a hyper ball with the positive orthant relative
+ to its center.
+ <br>
+ (Daniel Arndt, 2016/07/19)
  </li>
 
  <li> Fixed: Work around an issue with the OpenMPI installation on certain
@@ -764,6 +675,22 @@ inconvenience this causes.
  object file. This is now fixed.
  <br>
  (Wolfgang Bangerth, 2016/07/01)
+ </li>
+
+ <li> New: Added TrilinosWrappers::SolveDirect::initialize and
+ TrilinosWrappers::SolverDirect::solve to solve distributed linear systems
+ with multiple right hand sides without needing to refactorize the matrix
+ everytime.
+ <br>
+ (Michael Harmon, 2016/06/30)
+ </li>
+
+ <li> Changed: Similar to MappingQEulerian, MappingQ1Eulerian has gained
+ a second constructor that reverses the order of the arguments to indicate
+ which DoFHandler a vector is based on. The old constructor is now
+ deprecated and will be removed in a future version.
+ <br>
+ (Wolfgang Bangerth, 2016/06/25)
  </li>
 
  <li> New: The MappingFEField class was previously only instantiated
@@ -840,12 +767,34 @@ inconvenience this causes.
  (Alberto Sartori, 2016/05/19)
  </li>
 
+ <li> New: Add VectorTools::compute_global_error that computes global
+ errors from cellwise errors obtained by VectorTools::integrate_difference()
+ and do MPI collectives if necessary.
+ <br>
+ (Timo Heister, 2016/05/15)
+ </li>
+
+ <li> New: Add functions to transform Cartesian coordinates to spherical and back:
+ GeometricUtilities::Coordinates::to_spherical and
+ GeometricUtilities::Coordinates::from_spherical.
+ <br>
+ (Denis Davydov, 2016/05/10)
+ </li>
+
  <li> Fixed: Corrected the sign of curl calculated in the functions:
  LocalIntegrators::curl_curl_matrix, LocalIntegrators::curl_matrix,
  LocalIntegrators::nitsche_curl_matrix and LocalIntegrators::ip_curl_matrix in
  integrators/maxwell.h.
  <br>
  (Jihuan Tian, 2016/05/09)
+ </li>
+
+ <li> Improved: The method Triangulation::create_triangulation will now throw an
+ exception if any cells have negative measure. This check is not run if the
+ triangulation keeps track of distorted cells or if the codimension is not zero.
+ This check was previously only run in 3D.
+ <br>
+ (David Wells, 2016/05/07)
  </li>
 
  <li> Fixed: Bug in the RelaxationBlock class function do_step. Before, the
@@ -909,6 +858,11 @@ inconvenience this causes.
  (Daniel Shapero, 2016/04/19)
  </li>
 
+ <li> Improved: MeshWorker treats periodic faces as interior faces.
+ <br>
+ (Daniel Arndt, 2016/04/18)
+ </li>
+
  <li> Improved: The parallel loops in the deal.II Vector class for
  vector-vector operations have been revised for performance. This includes
  adjusting the minimum parallel grain size to 4096 vector entries and using an
@@ -924,11 +878,28 @@ inconvenience this causes.
  (Mauro Bardelloni, 2016/04/13)
  </li>
 
+ <li> New: Added TensorProductManifold to create new manifolds from two
+ ChartManifold objects. This can be used, for example, to combine a
+ 2d manifold with a flat manifold for an extruded mesh.
+ <br>
+ (Timo Heister, 2016/04/12)
+ </li>
+
  <li> Fixed and improved: Fix algorithm for incomplete assignment of level
  subdomain ids for parallel geometric multigrid. Also optimize algorithms
  used for assignment and DoF communication.
  <br>
  (Timo Heister, Martin Kronbichler, 2016/04/12)
+ </li>
+
+ <li> New: Added New option in the read_ucd function of the GridIn class.
+      A flag can now be assigned to the function, to decide wether the
+      indicators specified in a UCD file should be interpreted as
+      boundary_ids or as manifold_ids. This is particularly useful
+      when the indicators refer to internal faces, for which
+      boundary_ids cannot be used.
+ <br>
+ (Andrea Mola, 2016/04/11)
  </li>
 
  <li> Improved: DoFRenumbering::compute_Cuthill_McKee when used with
@@ -945,6 +916,13 @@ inconvenience this causes.
  generated by the Arnoldi algorithm.
  <br>
  (Giuseppe Pitton, Luca Heltai, 2016/04/11)
+ </li>
+
+ <li> New: Added CompositionManifold to create new manifolds from two
+ ChartManifold objects. This can be used, for example, to rotate a
+ cylindrical Manifold, or to make a cylinders with parabolic sides.
+ <br>
+ (Luca Heltai, 2016/04/09)
  </li>
 
  <li> Fixed: Meshworker::Assembler::ResidualSimple now also works for
@@ -997,6 +975,13 @@ inconvenience this causes.
  (Daniel Arndt, Ali Samii, 2016/03/23)
  </li>
 
+ <li> New: Added GridGenerator::torus() to generate the volume mesh of a
+ torus in three dimensions and a manifold description TorusManifold to
+ go with it.
+ <br>
+ (Timo Heister, 2016/03/21)
+ </li>
+
  <li> Fixed: DoFHandler::locally_owned_dofs() could create a segmentation
  fault in cases where some processors do not own any cells. This was caused
  by an incorrect computation in DoFTools::locally_owned_dofs_per_subdomain().
@@ -1012,12 +997,22 @@ inconvenience this causes.
  (Martin Kronbichler, 2016/03/18)
  </li>
 
+ <li> New: Added GridTools::rotate() in three space dimensions.
+ <br>
+ (Timo Heister, 2016/03/18)
+ </li>
+
  <li> New: Added custom target "relocate" to Mac OS X builds, that runs
  a script to make all paths absolute in the shared libraries included
  in the deal.II package (only enabled when building a package, and when
  including external libraries to the package)
  <br>
  (Luca Heltai, 2016/03/14)
+ </li>
+
+ <li> New: Added unit tests for complex-valued PETSc and SLEPc.
+ <br>
+ (Toby D. Young, Denis Davydov, 2016/03/11)
  </li>
 
  <li> New: Add NURBSPatchManifold. This class is a child of ChartManifold and
@@ -1034,6 +1029,11 @@ inconvenience this causes.
  that takes the same kind of argument.
  <br>
  (Wolfgang Bangerth, 2016/03/07)
+ </li>
+
+ <li> New: Added another scaling factor to Kelly error estimator, namely h_K.
+ <br>
+ (Denis Davydov, 2016/03/05)
  </li>
 
  <li> New: When using C++11, the function filter_iterators() allows to filter a
