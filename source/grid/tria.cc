@@ -1342,50 +1342,36 @@ namespace internal
             for (unsigned int level=0; level<number_cache.n_levels; ++level)
               {
                 // count lines on this level
-                number_cache.n_lines_level[level] = 0;
+                number_cache.n_lines_level[level]        = 0;
+                number_cache.n_active_lines_level[level] = 0;
 
                 line_iterator line = triangulation.begin_line (level),
                               endc = (level == number_cache.n_levels-1 ?
                                       line_iterator(triangulation.end_line()) :
                                       triangulation.begin_line (level+1));
                 for (; line!=endc; ++line)
-                  ++number_cache.n_lines_level[level];
+                  {
+                    ++number_cache.n_lines_level[level];
+                    if (line->has_children() == false)
+                      ++number_cache.n_active_lines_level[level];
+                  }
 
                 // update total number of lines
-                number_cache.n_lines += number_cache.n_lines_level[level];
-              }
-
-            // do the update for the number of active lines as well
-            for (unsigned int level=0; level<number_cache.n_levels; ++level)
-              {
-                // count lines on this level
-                number_cache.n_active_lines_level[level] = 0;
-
-                active_line_iterator line = triangulation.begin_active_line (level),
-                                     endc = triangulation.end_line ();
-                for (; (line!=endc) && (line->level() == static_cast<signed int>(level)); ++line)
-                  ++number_cache.n_active_lines_level[level];
-
-                // update total number of lines
+                number_cache.n_lines        += number_cache.n_lines_level[level];
                 number_cache.n_active_lines += number_cache.n_active_lines_level[level];
               }
           }
         else
           {
             // for dim>1, there are no levels for lines
-            {
-              line_iterator line = triangulation.begin_line (),
-                            endc = triangulation.end_line();
-              for (; line!=endc; ++line)
+            line_iterator line = triangulation.begin_line (),
+                          endc = triangulation.end_line();
+            for (; line!=endc; ++line)
+              {
                 ++number_cache.n_lines;
-            }
-
-            {
-              active_line_iterator line = triangulation.begin_active_line (),
-                                   endc = triangulation.end_line();
-              for (; line!=endc; ++line)
-                ++number_cache.n_active_lines;
-            }
+                if (line->has_children() == false)
+                  ++number_cache.n_active_lines;
+              }
           }
       }
 
@@ -1456,50 +1442,36 @@ namespace internal
             for (unsigned int level=0; level<n_levels; ++level)
               {
                 // count quads on this level
-                number_cache.n_quads_level[level] = 0;
+                number_cache.n_quads_level[level]        = 0;
+                number_cache.n_active_quads_level[level] = 0;
 
                 quad_iterator quad = triangulation.begin_quad (level),
                               endc = (level == n_levels-1 ?
                                       quad_iterator(triangulation.end_quad()) :
                                       triangulation.begin_quad (level+1));
                 for (; quad!=endc; ++quad)
-                  ++number_cache.n_quads_level[level];
+                  {
+                    ++number_cache.n_quads_level[level];
+                    if (quad->has_children() == false)
+                      ++number_cache.n_active_quads_level[level];
+                  }
 
                 // update total number of quads
-                number_cache.n_quads += number_cache.n_quads_level[level];
-              }
-
-            // do the update for the number of active quads as well
-            for (unsigned int level=0; level<n_levels; ++level)
-              {
-                // count quads on this level
-                number_cache.n_active_quads_level[level] = 0;
-
-                active_quad_iterator quad = triangulation.begin_active_quad (level),
-                                     endc = triangulation.end_quad ();
-                for (; (quad!=endc) && (quad->level() == static_cast<signed int>(level)); ++quad)
-                  ++number_cache.n_active_quads_level[level];
-
-                // update total number of quads
+                number_cache.n_quads        += number_cache.n_quads_level[level];
                 number_cache.n_active_quads += number_cache.n_active_quads_level[level];
               }
           }
         else
           {
             // for dim>2, there are no levels for quads
-            {
-              quad_iterator quad = triangulation.begin_quad (),
-                            endc = triangulation.end_quad();
-              for (; quad!=endc; ++quad)
+            quad_iterator quad = triangulation.begin_quad (),
+                          endc = triangulation.end_quad();
+            for (; quad!=endc; ++quad)
+              {
                 ++number_cache.n_quads;
-            }
-
-            {
-              active_quad_iterator quad = triangulation.begin_active_quad (),
-                                   endc = triangulation.end_quad();
-              for (; quad!=endc; ++quad)
-                ++number_cache.n_active_quads;
-            }
+                if (quad->has_children() == false)
+                  ++number_cache.n_active_quads;
+              }
           }
 
         // wait for the background computation for lines
@@ -1574,50 +1546,36 @@ namespace internal
             for (unsigned int level=0; level<n_levels; ++level)
               {
                 // count hexes on this level
-                number_cache.n_hexes_level[level] = 0;
+                number_cache.n_hexes_level[level]        = 0;
+                number_cache.n_active_hexes_level[level] = 0;
 
                 hex_iterator hex = triangulation.begin_hex (level),
                              endc = (level == n_levels-1 ?
                                      hex_iterator(triangulation.end_hex()) :
                                      triangulation.begin_hex (level+1));
                 for (; hex!=endc; ++hex)
-                  ++number_cache.n_hexes_level[level];
+                  {
+                    ++number_cache.n_hexes_level[level];
+                    if (hex->has_children() == false)
+                      ++number_cache.n_active_hexes_level[level];
+                  }
 
                 // update total number of hexes
-                number_cache.n_hexes += number_cache.n_hexes_level[level];
-              }
-
-            // do the update for the number of active hexes as well
-            for (unsigned int level=0; level<n_levels; ++level)
-              {
-                // count hexes on this level
-                number_cache.n_active_hexes_level[level] = 0;
-
-                active_hex_iterator hex = triangulation.begin_active_hex (level),
-                                    endc = triangulation.end_hex ();
-                for (; (hex!=endc) && (hex->level() == static_cast<signed int>(level)); ++hex)
-                  ++number_cache.n_active_hexes_level[level];
-
-                // update total number of hexes
+                number_cache.n_hexes        += number_cache.n_hexes_level[level];
                 number_cache.n_active_hexes += number_cache.n_active_hexes_level[level];
               }
           }
         else
           {
             // for dim>3, there are no levels for hexs
-            {
-              hex_iterator hex  = triangulation.begin_hex (),
-                           endc = triangulation.end_hex();
-              for (; hex!=endc; ++hex)
+            hex_iterator hex  = triangulation.begin_hex (),
+                         endc = triangulation.end_hex();
+            for (; hex!=endc; ++hex)
+              {
                 ++number_cache.n_hexes;
-            }
-
-            {
-              active_hex_iterator hex  = triangulation.begin_active_hex (),
-                                  endc = triangulation.end_hex();
-              for (; hex!=endc; ++hex)
-                ++number_cache.n_active_hexes;
-            }
+                if (hex->has_children() == false)
+                  ++number_cache.n_active_hexes;
+              }
           }
 
         // wait for the background computation for quads
