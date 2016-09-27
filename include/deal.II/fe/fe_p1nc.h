@@ -267,16 +267,11 @@ private:
   static std::vector<unsigned int> get_dpo_vector ();
 
   /**
-   * Compute the values of the variables a,b and c which are for the coefficients of
-   * the standard linear shape function $\phi_j(x,y) = a_j x + b_j y + c_j$ on given cell.
-   * Since there are 4 local shape functions on each cell,
-   * each variable is an array consisting of 4 values which are coefficients corresponding to 4 shape functions, respectively.
+   * Return the coefficients of 4 local linear shape functions $\phi_j(x,y) = a x + b y + c$ on given cell.
+   * For each local shape function, the array consists of three coefficients is in order of a,b and c.
    */
-  static void
-  get_linear_shape (const Triangulation<2,2>::cell_iterator &cell,
-                    std::vector<double> &a,
-                    std::vector<double> &b,
-                    std::vector<double> &c);
+  static std_cxx11::array<std_cxx11::array<double,3>,4>
+  get_linear_shape_coefficients (const Triangulation<2,2>::cell_iterator &cell);
 
   /**
    * Do the work which is needed before cellwise data computation.

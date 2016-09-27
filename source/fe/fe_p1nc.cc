@@ -100,49 +100,48 @@ FE_P1NC::get_dpo_vector ()
 
 
 
-void
-FE_P1NC::get_linear_shape (const Triangulation<2,2>::cell_iterator &cell,
-                           std::vector<double> &a,
-                           std::vector<double> &b,
-                           std::vector<double> &c)
+std_cxx11::array<std_cxx11::array<double,3>,4>
+FE_P1NC::get_linear_shape_coefficients (const Triangulation<2,2>::cell_iterator &cell)
 {
   // edge midpoints
-  std::vector<Point<2> > mpt(4) ;
+  Point<2> mpt[4];
 
-  mpt[0](0) = (cell->vertex(0)(0) + cell->vertex(2)(0))/2.0 ;
-  mpt[0](1) = (cell->vertex(0)(1) + cell->vertex(2)(1))/2.0 ;
+  mpt[0](0) = (cell->vertex(0)(0) + cell->vertex(2)(0))*0.5;
+  mpt[0](1) = (cell->vertex(0)(1) + cell->vertex(2)(1))*0.5;
 
-  mpt[1](0) = (cell->vertex(1)(0) + cell->vertex(3)(0))/2.0 ;
-  mpt[1](1) = (cell->vertex(1)(1) + cell->vertex(3)(1))/2.0 ;
+  mpt[1](0) = (cell->vertex(1)(0) + cell->vertex(3)(0))*0.5;
+  mpt[1](1) = (cell->vertex(1)(1) + cell->vertex(3)(1))*0.5;
 
-  mpt[2](0) = (cell->vertex(0)(0) + cell->vertex(1)(0))/2.0 ;
-  mpt[2](1) = (cell->vertex(0)(1) + cell->vertex(1)(1))/2.0 ;
+  mpt[2](0) = (cell->vertex(0)(0) + cell->vertex(1)(0))*0.5;
+  mpt[2](1) = (cell->vertex(0)(1) + cell->vertex(1)(1))*0.5;
 
-  mpt[3](0) = (cell->vertex(2)(0) + cell->vertex(3)(0))/2.0 ;
-  mpt[3](1) = (cell->vertex(2)(1) + cell->vertex(3)(1))/2.0 ;
+  mpt[3](0) = (cell->vertex(2)(0) + cell->vertex(3)(0))*0.5;
+  mpt[3](1) = (cell->vertex(2)(1) + cell->vertex(3)(1))*0.5;
 
   // center point
   Point<2> cpt ;
-  cpt(0) = (mpt[0](0) + mpt[1](0) + mpt[2](0) + mpt[3](0))/4.0 ;
-  cpt(1) = (mpt[0](1) + mpt[1](1) + mpt[2](1) + mpt[3](1))/4.0 ;
+  cpt(0) = (mpt[0](0) + mpt[1](0) + mpt[2](0) + mpt[3](0))*0.25;
+  cpt(1) = (mpt[0](1) + mpt[1](1) + mpt[2](1) + mpt[3](1))*0.25;
 
-  double det ;
-  det = (mpt[0](0)-mpt[1](0))*(mpt[2](1)-mpt[3](1)) - (mpt[2](0)-mpt[3](0))*(mpt[0](1)-mpt[1](1)) ;
+  const double det = (mpt[0](0)-mpt[1](0))*(mpt[2](1)-mpt[3](1)) - (mpt[2](0)-mpt[3](0))*(mpt[0](1)-mpt[1](1));
 
-  a[0] = ((mpt[2](1)-mpt[3](1))*(0.5) -(mpt[0](1)-mpt[1](1))*(0.5))/det ;
-  a[1] = ((mpt[2](1)-mpt[3](1))*(-0.5) -(mpt[0](1)-mpt[1](1))*(0.5))/det ;
-  a[2] = ((mpt[2](1)-mpt[3](1))*(0.5) -(mpt[0](1)-mpt[1](1))*(-0.5))/det ;
-  a[3] = ((mpt[2](1)-mpt[3](1))*(-0.5) -(mpt[0](1)-mpt[1](1))*(-0.5))/det ;
+  std_cxx11::array<std_cxx11::array<double,3>,4> coeffs;
+  coeffs[0][0] = ((mpt[2](1)-mpt[3](1))*(0.5) -(mpt[0](1)-mpt[1](1))*(0.5))/det;
+  coeffs[1][0] = ((mpt[2](1)-mpt[3](1))*(-0.5) -(mpt[0](1)-mpt[1](1))*(0.5))/det;
+  coeffs[2][0] = ((mpt[2](1)-mpt[3](1))*(0.5) -(mpt[0](1)-mpt[1](1))*(-0.5))/det;
+  coeffs[3][0] = ((mpt[2](1)-mpt[3](1))*(-0.5) -(mpt[0](1)-mpt[1](1))*(-0.5))/det;
 
-  b[0] = (-(mpt[2](0)-mpt[3](0))*(0.5) +(mpt[0](0)-mpt[1](0))*(0.5))/det ;
-  b[1] = (-(mpt[2](0)-mpt[3](0))*(-0.5) +(mpt[0](0)-mpt[1](0))*(0.5))/det ;
-  b[2] = (-(mpt[2](0)-mpt[3](0))*(0.5) +(mpt[0](0)-mpt[1](0))*(-0.5))/det ;
-  b[3] = (-(mpt[2](0)-mpt[3](0))*(-0.5) +(mpt[0](0)-mpt[1](0))*(-0.5))/det ;
+  coeffs[0][1] = (-(mpt[2](0)-mpt[3](0))*(0.5) +(mpt[0](0)-mpt[1](0))*(0.5))/det;
+  coeffs[1][1] = (-(mpt[2](0)-mpt[3](0))*(-0.5) +(mpt[0](0)-mpt[1](0))*(0.5))/det;
+  coeffs[2][1] = (-(mpt[2](0)-mpt[3](0))*(0.5) +(mpt[0](0)-mpt[1](0))*(-0.5))/det;
+  coeffs[3][1] = (-(mpt[2](0)-mpt[3](0))*(-0.5) +(mpt[0](0)-mpt[1](0))*(-0.5))/det;
 
-  c[0] = 0.25 - cpt(0)*a[0] - cpt(1)*b[0] ;
-  c[1] = 0.25 - cpt(0)*a[1] - cpt(1)*b[1] ;
-  c[2] = 0.25 - cpt(0)*a[2] - cpt(1)*b[2] ;
-  c[3] = 0.25 - cpt(0)*a[3] - cpt(1)*b[3] ;
+  coeffs[0][2] = 0.25 - cpt(0)*coeffs[0][0] - cpt(1)*coeffs[0][1];
+  coeffs[1][2] = 0.25 - cpt(0)*coeffs[1][0] - cpt(1)*coeffs[1][1];
+  coeffs[2][2] = 0.25 - cpt(0)*coeffs[2][0] - cpt(1)*coeffs[2][1];
+  coeffs[3][2] = 0.25 - cpt(0)*coeffs[3][0] - cpt(1)*coeffs[3][1];
+
+  return coeffs;
 }
 
 
@@ -179,11 +178,8 @@ FE_P1NC::fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell
   std::vector<double> values(flags & update_values ? this->dofs_per_cell : 0);
   std::vector<Tensor<1,2> > grads(flags & update_gradients ? this->dofs_per_cell : 0);
 
-
-  // linear shape with a half value: phi(x,y) = ax + by + c
-  std::vector<double> a(4), b(4), c(4);
-  get_linear_shape (cell, a, b, c);
-
+  // linear shape functions
+  std_cxx11::array<std_cxx11::array<double,3>,4> coeffs = get_linear_shape_coefficients (cell);
 
   // compute basis functions
   if (flags & (update_values | update_gradients))
@@ -193,14 +189,14 @@ FE_P1NC::fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell
           {
             if (flags & update_values)
               {
-                values[k] = a[k]*mapping_data.quadrature_points[i](0) + b[k]*mapping_data.quadrature_points[i](1) + c[k] ;
+                values[k] = coeffs[k][0]*mapping_data.quadrature_points[i](0) + coeffs[k][1]*mapping_data.quadrature_points[i](1) + coeffs[k][2] ;
                 output_data.shape_values[k][i] = values[k];
               }
 
             if (flags & update_gradients)
               {
-                grads[k][0] = a[k] ;
-                grads[k][1] = b[k] ;
+                grads[k][0] = coeffs[k][0] ;
+                grads[k][1] = coeffs[k][1] ;
                 output_data.shape_gradients[k][i] = grads[k];
               }
           }
@@ -235,7 +231,7 @@ FE_P1NC::fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell
             Point<2> realquadrature ;
 
             realquadrature = mapping.transform_unit_to_real_cell(cell, quadrature.point(i)) ;
-            values[k] = a[k]*realquadrature(0) + b[k]*realquadrature(1) + c[k] ;
+            values[k] = coeffs[k][0]*realquadrature(0) + coeffs[k][1]*realquadrature(1) + coeffs[k][2] ;
             output_data.shape_values[k][i] = values[k];
           }
     }
@@ -261,11 +257,8 @@ FE_P1NC::fill_fe_face_values (const Triangulation<2,2>::cell_iterator           
   std::vector<double> values(flags & update_values ? this->dofs_per_cell : 0);
   std::vector<Tensor<1,2> > grads(flags & update_gradients ? this->dofs_per_cell : 0);
 
-
-  // linear shape with a half value: phi(x,y) = ax + by + c
-  std::vector<double> a(4), b(4), c(4);
-  get_linear_shape (cell, a, b, c);
-
+  // linear shape functions
+  std_cxx11::array<std_cxx11::array<double,3>,4> coeffs = get_linear_shape_coefficients (cell);
 
   // compute basis functions
   if (flags & (update_values | update_gradients))
@@ -275,14 +268,14 @@ FE_P1NC::fill_fe_face_values (const Triangulation<2,2>::cell_iterator           
           {
             if (flags & update_values)
               {
-                values[k] = a[k]*mapping_data.quadrature_points[i](0) + b[k]*mapping_data.quadrature_points[i](1) + c[k] ;
+                values[k] = coeffs[k][0]*mapping_data.quadrature_points[i](0) + coeffs[k][1]*mapping_data.quadrature_points[i](1) + coeffs[k][2] ;
                 output_data.shape_values[k][i] = values[k];
               }
 
             if (flags & update_gradients)
               {
-                grads[k][0] = a[k] ;
-                grads[k][1] = b[k] ;
+                grads[k][0] = coeffs[k][0] ;
+                grads[k][1] = coeffs[k][1] ;
                 output_data.shape_gradients[k][i] = grads[k];
               }
           }
@@ -304,14 +297,14 @@ FE_P1NC::fill_fe_face_values (const Triangulation<2,2>::cell_iterator           
                 Point<2> realquadrature ;
 
                 realquadrature = mapping.transform_unit_to_real_cell(cell, cellquadrature.point(i)) ;
-                values[k] = a[k]*realquadrature(0) + b[k]*realquadrature(1) + c[k] ;
+                values[k] = coeffs[k][0]*realquadrature(0) + coeffs[k][1]*realquadrature(1) + coeffs[k][2] ;
                 output_data.shape_values[k][i] = values[k];
               }
 
             if (flags & update_gradients)
               {
-                grads[k][0] = a[k] ;
-                grads[k][1] = b[k] ;
+                grads[k][0] = coeffs[k][0] ;
+                grads[k][1] = coeffs[k][1] ;
                 output_data.shape_gradients[k][i] = grads[k];
               }
           }
@@ -339,11 +332,8 @@ FE_P1NC::fill_fe_subface_values (const Triangulation<2,2>::cell_iterator        
   std::vector<double> values(flags & update_values ? this->dofs_per_cell : 0);
   std::vector<Tensor<1,2> > grads(flags & update_gradients ? this->dofs_per_cell : 0);
 
-
-  // linear shape with a half value: phi(x,y) = ax + by + c
-  std::vector<double> a(4), b(4), c(4);
-  get_linear_shape (cell, a, b, c);
-
+  // linear shape functions
+  std_cxx11::array<std_cxx11::array<double,3>,4> coeffs = get_linear_shape_coefficients (cell);
 
   // compute basis functions
   if (flags & (update_values | update_gradients))
@@ -353,14 +343,14 @@ FE_P1NC::fill_fe_subface_values (const Triangulation<2,2>::cell_iterator        
           {
             if (flags & update_values)
               {
-                values[k] = a[k]*mapping_data.quadrature_points[i](0) + b[k]*mapping_data.quadrature_points[i](1) + c[k] ;
+                values[k] = coeffs[k][0]*mapping_data.quadrature_points[i](0) + coeffs[k][1]*mapping_data.quadrature_points[i](1) + coeffs[k][2] ;
                 output_data.shape_values[k][i] = values[k];
               }
 
             if (flags & update_gradients)
               {
-                grads[k][0] = a[k] ;
-                grads[k][1] = b[k] ;
+                grads[k][0] = coeffs[k][0] ;
+                grads[k][1] = coeffs[k][1] ;
                 output_data.shape_gradients[k][i] = grads[k];
               }
           }
@@ -381,14 +371,14 @@ FE_P1NC::fill_fe_subface_values (const Triangulation<2,2>::cell_iterator        
                 Point<2> realquadrature ;
 
                 realquadrature = mapping.transform_unit_to_real_cell(cell, cellquadrature.point(i)) ;
-                values[k] = a[k]*realquadrature(0) + b[k]*realquadrature(1) + c[k] ;
+                values[k] = coeffs[k][0]*realquadrature(0) + coeffs[k][1]*realquadrature(1) + coeffs[k][2] ;
                 output_data.shape_values[k][i] = values[k];
               }
 
             if (flags & update_gradients)
               {
-                grads[k][0] = a[k] ;
-                grads[k][1] = b[k] ;
+                grads[k][0] = coeffs[k][0] ;
+                grads[k][1] = coeffs[k][1] ;
                 output_data.shape_gradients[k][i] = grads[k];
               }
           }
