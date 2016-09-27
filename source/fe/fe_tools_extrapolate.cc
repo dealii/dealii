@@ -21,6 +21,7 @@
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
@@ -342,6 +343,9 @@ namespace FETools
       // stores the indices of dofs on more refined ghosted cells along
       // with the maximum level
       std::map<types::global_dof_index, int> dofs_on_refined_neighbors;
+
+      // counts the send/receive round we are in
+      unsigned int round;
     };
 
     template <>
@@ -409,6 +413,7 @@ namespace FETools
     template <int dim,int spacedim>
     ExtrapolateImplementation<dim,spacedim>::
     ExtrapolateImplementation ()
+      : round(0)
     {}
 
 
@@ -1069,7 +1074,7 @@ namespace FETools
           MPI_Isend (&(*buffer)[0], buffer->size(),
                      MPI_BYTE,
                      it->receiver,
-                     123,
+                     round,
                      communicator,
                      &requests[idx]);
         }
@@ -1086,7 +1091,7 @@ namespace FETools
         {
           MPI_Status status;
           int len;
-          MPI_Probe(MPI_ANY_SOURCE, 123, communicator, &status);
+          MPI_Probe(MPI_ANY_SOURCE, round, communicator, &status);
           MPI_Get_count(&status, MPI_BYTE, &len);
           receive.resize (len);
 
@@ -1191,31 +1196,27 @@ namespace FETools
           computed_cells,
           cells_to_send;
 
-      // Compute all the cells needed
-      // from other processes.
+      // reset the round count we will use in send_cells
+      round = 0;
+
+      // Compute all the cells needed from other processes.
       compute_needs (dof2, cells_we_need);
 
-      // Send the cells needed to there
-      // owners and receive a list of cells other
-      // processes need from us.
+      // Send the cells needed to their owners and receive
+      // a list of cells other processes need from us.
       send_cells (cells_we_need, received_needs);
 
-      // The list of received needs can contain
-      // some cells more than once because different
-      // processes may need data from the same cell.
-      // To compute data only once, generate a vector
-      // with unique entries and distribute the computed
-      // data afterwards back to a vector with correct
-      // receivers.
-      // Computing cell_data can cause a need for
-      // data from some new cells.
-      // If a cell is computed, send it back to
-      // their senders, maybe receive new needs and
-      // compute again, do not wait that all cells
-      // are computed or all needs are collected.
-      // Otherwise we can run into a deadlock if
-      // a cell needed from another process,
-      // itself needs some data from us.
+      // The list of received needs can contain some cells more than once
+      // because different processes may need data from the same cell.
+      // To compute data only once, generate a vector with unique entries
+      // and distribute the computed data afterwards back to a vector with
+      // correct receivers.
+      // Computing cell_data can cause a need for data from some new cells.
+      // If a cell is computed, send it back to their senders, maybe receive
+      // new needs and compute again, do not wait that all cells are computed
+      // or all needs are collected.
+      // Otherwise we can run into a deadlock if a cell needed from another
+      // process itself needs some data from us.
       unsigned int ready = 0;
       do
         {
@@ -1231,14 +1232,11 @@ namespace FETools
                comp != computed_cells.end ();
                ++comp)
             {
-              // store computed cells
+              // store computed cells...
               cell_data_insert (*comp, available_cells);
 
-              // and generate a vector
-              // of computed cells with
-              // correct receivers
-              // then delete this received
-              // need from the list
+              // ...and generate a vector of computed cells with correct
+              // receivers, then delete this received need from the list
               typename std::vector<CellData>::iterator recv=received_needs.begin();
               while (recv != received_needs.end())
                 {
@@ -1254,9 +1252,13 @@ namespace FETools
                 }
             }
 
+          // increase the round counter, such that we are sure to only send
+          // and receive data from the correct call
+          ++round;
+
           send_cells (cells_to_send, received_cells);
 
-          // strore received cell_data
+          // store received cell_data
           for (typename std::vector<CellData>::const_iterator recv=received_cells.begin ();
                recv != received_cells.end ();
                ++recv)
@@ -1264,8 +1266,11 @@ namespace FETools
               cell_data_insert (*recv, available_cells);
             }
 
-          // finally send and receive new
-          // needs and start a new round
+          // increase the round counter, such that we are sure to only send
+          // and receive data from the correct call
+          ++round;
+
+          // finally send and receive new needs and start a new round
           send_cells (new_needs, received_needs);
         }
       while (ready != 0);
