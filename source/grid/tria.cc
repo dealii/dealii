@@ -1329,16 +1329,16 @@ namespace internal
         ///////////////////////////////////
         // update the number of lines on the different levels in the
         // cache
-        number_cache.n_lines_level.resize (number_cache.n_levels);
         number_cache.n_lines = 0;
-
-        number_cache.n_active_lines_level.resize (number_cache.n_levels);
         number_cache.n_active_lines = 0;
 
         // for 1d, lines have levels so take count the objects per
         // level and globally
         if (dim == 1)
           {
+            number_cache.n_lines_level.resize (number_cache.n_levels);
+            number_cache.n_active_lines_level.resize (number_cache.n_levels);
+
             for (unsigned int level=0; level<number_cache.n_levels; ++level)
               {
                 // count lines on this level
@@ -1364,6 +1364,9 @@ namespace internal
         else
           {
             // for dim>1, there are no levels for lines
+            number_cache.n_lines_level.clear ();
+            number_cache.n_active_lines_level.clear ();
+
             line_iterator line = triangulation.begin_line (),
                           endc = triangulation.end_line();
             for (; line!=endc; ++line)
@@ -1413,32 +1416,31 @@ namespace internal
         typedef
         typename Triangulation<dim,spacedim>::active_quad_iterator active_quad_iterator;
 
-        // count the number of levels; the function we called above
-        // for lines also does this and puts it into
-        // number_cache.n_levels, but this datum may not yet be
-        // available as we call the function on a separate task
-        unsigned int n_levels = 0;
-        if (level_objects > 0)
-          // find the last level on which there are used cells
-          for (unsigned int level=0; level<level_objects; ++level)
-            if (triangulation.begin(level) !=
-                triangulation.end(level))
-              n_levels = level+1;
-
-
         ///////////////////////////////////
         // update the number of quads on the different levels in the
         // cache
-        number_cache.n_quads_level.resize (n_levels);
         number_cache.n_quads = 0;
-
-        number_cache.n_active_quads_level.resize (n_levels);
         number_cache.n_active_quads = 0;
 
         // for 2d, quads have levels so take count the objects per
         // level and globally
         if (dim == 2)
           {
+            // count the number of levels; the function we called above
+            // on a separate Task for lines also does this and puts it into
+            // number_cache.n_levels, but this datum may not yet be
+            // available as we call the function on a separate task
+            unsigned int n_levels = 0;
+            if (level_objects > 0)
+              // find the last level on which there are used cells
+              for (unsigned int level=0; level<level_objects; ++level)
+                if (triangulation.begin(level) !=
+                    triangulation.end(level))
+                  n_levels = level+1;
+
+            number_cache.n_quads_level.resize (n_levels);
+            number_cache.n_active_quads_level.resize (n_levels);
+
             for (unsigned int level=0; level<n_levels; ++level)
               {
                 // count quads on this level
@@ -1464,6 +1466,9 @@ namespace internal
         else
           {
             // for dim>2, there are no levels for quads
+            number_cache.n_quads_level.clear ();
+            number_cache.n_active_quads_level.clear ();
+
             quad_iterator quad = triangulation.begin_quad (),
                           endc = triangulation.end_quad();
             for (; quad!=endc; ++quad)
@@ -1517,32 +1522,32 @@ namespace internal
         typedef
         typename Triangulation<dim,spacedim>::active_hex_iterator active_hex_iterator;
 
-        // count the number of levels; the function we called above
-        // for quads (recursively, via the lines function) also does
-        // this and puts it into number_cache.n_levels, but this datum
-        // may not yet be available as we call the function on a
-        // separate task
-        unsigned int n_levels = 0;
-        if (level_objects > 0)
-          // find the last level on which there are used cells
-          for (unsigned int level=0; level<level_objects; ++level)
-            if (triangulation.begin(level) !=
-                triangulation.end(level))
-              n_levels = level+1;
-
         ///////////////////////////////////
         // update the number of hexes on the different levels in the
         // cache
-        number_cache.n_hexes_level.resize (n_levels);
         number_cache.n_hexes = 0;
-
-        number_cache.n_active_hexes_level.resize (n_levels);
         number_cache.n_active_hexes = 0;
 
         // for 3d, hexes have levels so take count the objects per
         // level and globally
         if (dim == 3)
           {
+            // count the number of levels; the function we called
+            // above on a separate Task for quads (recursively, via
+            // the lines function) also does this and puts it into
+            // number_cache.n_levels, but this datum may not yet be
+            // available as we call the function on a separate task
+            unsigned int n_levels = 0;
+            if (level_objects > 0)
+              // find the last level on which there are used cells
+              for (unsigned int level=0; level<level_objects; ++level)
+                if (triangulation.begin(level) !=
+                    triangulation.end(level))
+                  n_levels = level+1;
+
+            number_cache.n_hexes_level.resize (n_levels);
+            number_cache.n_active_hexes_level.resize (n_levels);
+
             for (unsigned int level=0; level<n_levels; ++level)
               {
                 // count hexes on this level
@@ -1567,7 +1572,10 @@ namespace internal
           }
         else
           {
-            // for dim>3, there are no levels for hexs
+            // for dim>3, there are no levels for hexes
+            number_cache.n_hexes_level.clear ();
+            number_cache.n_active_hexes_level.clear ();
+
             hex_iterator hex  = triangulation.begin_hex (),
                          endc = triangulation.end_hex();
             for (; hex!=endc; ++hex)
