@@ -1855,42 +1855,29 @@ namespace internal
 
             for (unsigned int line=0; line<GeometryInfo<dim>::faces_per_cell; ++line)
               {
-                // given a line vertex number
-                // (0,1) on a specific line we
-                // get the cell vertex number
-                // (0-4) through the
-                // line_to_cell_vertices
-                // function
+                // given a line vertex number (0,1) on a specific line
+                // we get the cell vertex number (0-4) through the
+                // line_to_cell_vertices function
                 std::pair<int,int> line_vertices(
                   cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 0)],
                   cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 1)]);
 
-                // assert that the line was
-                // not already inserted in
-                // reverse order. This
-                // happens in spite of the
-                // vertex rotation above,
-                // if the sense of the cell
-                // was incorrect.
+                // assert that the line was not already inserted in
+                // reverse order. This happens in spite of the vertex
+                // rotation above, if the sense of the cell was
+                // incorrect.
                 //
-                // Here is what usually
-                // happened when this
-                // exception is thrown:
-                // consider these two cells
-                // and the vertices
+                // Here is what usually happened when this exception
+                // is thrown: consider these two cells and the
+                // vertices
                 //  3---4---5
                 //  |   |   |
                 //  0---1---2
-                // If in the input vector
-                // the two cells are given
-                // with vertices <0 1 4 3>
-                // and <4 1 2 5>, in the
-                // first cell the middle
-                // line would have
-                // direction 1->4, while in
-                // the second it would be
-                // 4->1.  This will cause
-                // the exception.
+                // If in the input vector the two cells are given with
+                // vertices <0 1 3 4> and <4 1 5 2>, in the first cell
+                // the middle line would have direction 1->4, while in
+                // the second it would be 4->1.  This will cause the
+                // exception.
                 AssertThrow (needed_lines.find(std::make_pair(line_vertices.second,
                                                               line_vertices.first))
                              ==
