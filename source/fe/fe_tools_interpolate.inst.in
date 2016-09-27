@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -97,67 +97,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     void project_dg<deal_II_dimension>
     (const DoFHandler<deal_II_dimension> &, const VEC &,
      const DoFHandler<deal_II_dimension> &, VEC &);
-
-    template
-    void extrapolate<deal_II_dimension>
-    (const DoFHandler<deal_II_dimension> &, const VEC &,
-     const DoFHandler<deal_II_dimension> &, VEC &);
-
-    template
-    void extrapolate<deal_II_dimension>
-    (const DoFHandler<deal_II_dimension> &, const VEC &,
-     const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-     VEC &);
 #endif
     \}
-}
-
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-{
-#ifdef DEAL_II_WITH_P4EST
-    namespace FETools
-    \{
-#if deal_II_dimension == deal_II_space_dimension
-
-#ifdef DEAL_II_WITH_PETSC
-    template
-    void extrapolate_parallel<deal_II_dimension, PETScWrappers::MPI::Vector, deal_II_space_dimension>
-    (const DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
-     const PETScWrappers::MPI::Vector &,
-     const DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
-     const ConstraintMatrix &,
-     PETScWrappers::MPI::Vector &);
-#endif
-
-#ifdef DEAL_II_WITH_TRILINOS
-    template
-    void extrapolate_parallel <deal_II_dimension, TrilinosWrappers::MPI::Vector, deal_II_space_dimension>
-    (const DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
-     const TrilinosWrappers::MPI::Vector &,
-     const DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
-     const ConstraintMatrix &,
-     TrilinosWrappers::MPI::Vector &);
-#endif
-
-#endif
-    \}
-#endif //DEAL_II_WITH_P4EST
-}
-
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS; scalar : REAL_SCALARS)
-{
-#ifdef DEAL_II_WITH_P4EST
-    namespace FETools
-    \{
-#if deal_II_dimension == deal_II_space_dimension
-    template
-    void extrapolate_parallel <deal_II_dimension, deal_II_space_dimension, scalar>
-    (const DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
-     const LinearAlgebra::distributed::Vector<scalar> &,
-     const DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
-     const ConstraintMatrix &,
-     LinearAlgebra::distributed::Vector<scalar> &);
-#endif
-    \}
-#endif //DEAL_II_WITH_P4EST
 }

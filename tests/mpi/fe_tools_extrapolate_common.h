@@ -73,7 +73,8 @@ parallel::distributed::Triangulation<dim> *make_tria ()
       cell = tria->begin_active();
       cell->set_refine_flag();
       ++cell;
-      cell->set_refine_flag();
+      if (cell != tria->end())
+        cell->set_refine_flag();
 
       tria->execute_coarsening_and_refinement ();
     }
@@ -98,8 +99,6 @@ template <unsigned int dim, typename VectorType>
 void
 output_vector (const VectorType &v, const std::string &output_name, const DoFHandler<dim> &dof_handler)
 {
-  //v.print(deallog.get_file_stream());
-
   DataOut<dim> data_out;
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (v, output_name, DataOut<dim>::type_dof_data);
