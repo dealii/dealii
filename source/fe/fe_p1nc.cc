@@ -218,23 +218,6 @@ FE_P1NC::fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell
             }
         }
     }
-
-  // When this function is called for the graphic out,
-  // MappingRelatedData does not work properly.
-  // In this case, the quadrature points on the real cell is computed in manual sense, using 'mapping' and 'quadrature'.
-  // This is a temporary solution. It needs to be fixed fundamentally.
-  if (n_q_points==0)
-    {
-      for (unsigned int i=0; i<quadrature.size(); ++i)
-        for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-          {
-            Point<2> realquadrature ;
-
-            realquadrature = mapping.transform_unit_to_real_cell(cell, quadrature.point(i)) ;
-            values[k] = coeffs[k][0]*realquadrature(0) + coeffs[k][1]*realquadrature(1) + coeffs[k][2] ;
-            output_data.shape_values[k][i] = values[k];
-          }
-    }
 }
 
 
@@ -281,34 +264,6 @@ FE_P1NC::fill_fe_face_values (const Triangulation<2,2>::cell_iterator           
           }
 
       }
-
-  // When this function is called for computation of facial jump residual,
-  // MappingRelatedData does not work properly.
-  // In this case, the quadrature points on the real cell is computed in manual sense, using 'mapping' and 'quadrature'.
-  // This is a temporary solution. It needs to be fixed fundamentally.
-  if (n_q_points==0)
-    {
-      Quadrature<2> cellquadrature = QProjector<2>::project_to_face(quadrature, face_no) ;
-      for (unsigned int i=0; i<cellquadrature.size(); ++i)
-        for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-          {
-            if (flags & update_values)
-              {
-                Point<2> realquadrature ;
-
-                realquadrature = mapping.transform_unit_to_real_cell(cell, cellquadrature.point(i)) ;
-                values[k] = coeffs[k][0]*realquadrature(0) + coeffs[k][1]*realquadrature(1) + coeffs[k][2] ;
-                output_data.shape_values[k][i] = values[k];
-              }
-
-            if (flags & update_gradients)
-              {
-                grads[k][0] = coeffs[k][0] ;
-                grads[k][1] = coeffs[k][1] ;
-                output_data.shape_gradients[k][i] = grads[k];
-              }
-          }
-    }
 }
 
 
@@ -355,34 +310,6 @@ FE_P1NC::fill_fe_subface_values (const Triangulation<2,2>::cell_iterator        
               }
           }
       }
-
-  // When this function is called for computation of facial jump residual,
-  // MappingRelatedData does not work properly.
-  // In this case, the quadrature points on the real cell is computed in manual sense, using 'mapping' and 'quadrature'.
-  // This is a temporary solution. It needs to be fixed fundamentally.
-  if (n_q_points==0)
-    {
-      Quadrature<2> cellquadrature = QProjector<2>::project_to_subface(quadrature, face_no, sub_no) ;
-      for (unsigned int i=0; i<cellquadrature.size(); ++i)
-        for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-          {
-            if (flags & update_values)
-              {
-                Point<2> realquadrature ;
-
-                realquadrature = mapping.transform_unit_to_real_cell(cell, cellquadrature.point(i)) ;
-                values[k] = coeffs[k][0]*realquadrature(0) + coeffs[k][1]*realquadrature(1) + coeffs[k][2] ;
-                output_data.shape_values[k][i] = values[k];
-              }
-
-            if (flags & update_gradients)
-              {
-                grads[k][0] = coeffs[k][0] ;
-                grads[k][1] = coeffs[k][1] ;
-                output_data.shape_gradients[k][i] = grads[k];
-              }
-          }
-    }
 }
 
 
