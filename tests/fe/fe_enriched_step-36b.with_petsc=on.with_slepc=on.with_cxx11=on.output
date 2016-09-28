@@ -1,0 +1,12 @@
+Cycle 0
+   Number of active cells:       120
+     FE / POUFE :                120 / 8
+   Number of degrees of freedom: 1432
+
+      Eigenvalue 0 : -0.483398
+Cycle 1
+   Number of active cells:       176
+     FE / POUFE :                120 / 72
+   Number of degrees of freedom: 2206
+
+      Eigenvalue 0 : -0.498786

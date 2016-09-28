@@ -1,0 +1,11 @@
+
+DEAL::FEValues.get_function_values()
+DEAL::for same underlying FEs: f(qp) * N_{fe}(qp) == N_{pou}(qp)
+DEAL:: qp=0.2113 0.2113 0.2113 f(qp)=0.6935 U_fe(qp)=0.9811 U_pou(qp)=0.6804 U_[fe+pou](qp)=1.6615
+DEAL:: qp=0.7887 0.2113 0.2113 f(qp)=0.4302 U_fe(qp)=0.2629 U_pou(qp)=0.1131 U_[fe+pou](qp)=0.3760
+DEAL:: qp=0.2113 0.7887 0.2113 f(qp)=0.4302 U_fe(qp)=0.2629 U_pou(qp)=0.1131 U_[fe+pou](qp)=0.3760
+DEAL:: qp=0.7887 0.7887 0.2113 f(qp)=0.3214 U_fe(qp)=0.0704 U_pou(qp)=0.0226 U_[fe+pou](qp)=0.0931
+DEAL:: qp=0.2113 0.2113 0.7887 f(qp)=0.4302 U_fe(qp)=0.2629 U_pou(qp)=0.1131 U_[fe+pou](qp)=0.3760
+DEAL:: qp=0.7887 0.2113 0.7887 f(qp)=0.3214 U_fe(qp)=0.0704 U_pou(qp)=0.0226 U_[fe+pou](qp)=0.0931
+DEAL:: qp=0.2113 0.7887 0.7887 f(qp)=0.3214 U_fe(qp)=0.0704 U_pou(qp)=0.0226 U_[fe+pou](qp)=0.0931
+DEAL:: qp=0.7887 0.7887 0.7887 f(qp)=0.2551 U_fe(qp)=0.0189 U_pou(qp)=0.0048 U_[fe+pou](qp)=0.0237

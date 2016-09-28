@@ -44,6 +44,7 @@ SET(_src
   fe_raviart_thomas_nodal.cc
   fe_series.cc
   fe_system.cc
+  fe_enriched.cc
   fe_tools.cc
   fe_tools_interpolate.cc
   fe_trace.cc
@@ -86,6 +87,7 @@ SET(_inst
   fe_raviart_thomas.inst.in
   fe_raviart_thomas_nodal.inst.in
   fe_system.inst.in
+  fe_enriched.inst.in
   fe_tools.inst.in
   fe_tools_interpolate.inst.in
   fe_trace.inst.in

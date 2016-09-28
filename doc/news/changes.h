@@ -206,6 +206,12 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li> New: FE_Enriched finite element class implements the partition of unitity
+ method which allows to enrich the finite element space based on a priori
+ knowledge about solution.
+ <br>
+ (Denis Davydov, 2016/09/28)
+ </li>
 
  <li> Improved: The doxygen documentation now contains nicely formatted
  boxes containing the text message of each exception. Several messages
