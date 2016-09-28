@@ -369,6 +369,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Improved: Some parts of mesh refinement are now parallelized.
+ <br/>
+ (Wolfgang Bangerth, 2016/09/27)
+ </li>
+
  <li> Improved: MGSmootherBlock is now able to use the shared memory pool for
  temporary vector allocation. The constructor requiring an external memory
  allocation has therefore been deprecated.

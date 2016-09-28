@@ -1409,37 +1409,57 @@ namespace internal
                                  const unsigned int                       level_objects,
                                  internal::Triangulation::NumberCache<2> &number_cache)
       {
-        // update lines and n_levels
-        compute_number_cache (triangulation,
-                              level_objects,
-                              static_cast<internal::Triangulation::NumberCache<1>&>
-                              (number_cache));
+        // update lines and n_levels in number_cache. since we don't
+        // access any of these numbers, we can do this in the
+        // background
+        Threads::Task<void> update_lines
+          = Threads::new_task ((void (*)(const Triangulation<dim,spacedim> &,
+                                         const unsigned int,
+                                         internal::Triangulation::NumberCache<1> &))
+                               (&compute_number_cache<dim,spacedim>),
+                               triangulation,
+                               level_objects,
+                               static_cast<internal::Triangulation::NumberCache<1>&>
+                               (number_cache));
 
         typedef
         typename Triangulation<dim,spacedim>::quad_iterator quad_iterator;
         typedef
         typename Triangulation<dim,spacedim>::active_quad_iterator active_quad_iterator;
 
+        // count the number of levels; the function we called above
+        // for lines also does this and puts it into
+        // number_cache.n_levels, but this datum may not yet be
+        // available as we call the function on a separate task
+        unsigned int n_levels = 0;
+        if (level_objects > 0)
+          // find the last level on which there are used cells
+          for (unsigned int level=0; level<level_objects; ++level)
+            if (triangulation.begin(level) !=
+                triangulation.end(level))
+              n_levels = level+1;
+
+
         ///////////////////////////////////
         // update the number of quads on the different levels in the
         // cache
-        number_cache.n_quads_level.resize (number_cache.n_levels);
+        number_cache.n_quads_level.resize (n_levels);
         number_cache.n_quads = 0;
 
-        number_cache.n_active_quads_level.resize (number_cache.n_levels);
+        number_cache.n_active_quads_level.resize (n_levels);
         number_cache.n_active_quads = 0;
 
         // for 2d, quads have levels so take count the objects per
         // level and globally
         if (dim == 2)
           {
-            for (unsigned int level=0; level<number_cache.n_levels; ++level)
+            for (unsigned int level=0; level<n_levels; ++level)
               {
                 // count quads on this level
                 number_cache.n_quads_level[level] = 0;
 
                 quad_iterator quad = triangulation.begin_quad (level),
-                              endc = (level == number_cache.n_levels-1 ?
+                              endc = (level == n_levels-1 ?
                                       quad_iterator(triangulation.end_quad()) :
                                       triangulation.begin_quad (level+1));
                 for (; quad!=endc; ++quad)
@@ -1450,7 +1470,7 @@ namespace internal
               }
 
             // do the update for the number of active quads as well
-            for (unsigned int level=0; level<number_cache.n_levels; ++level)
+            for (unsigned int level=0; level<n_levels; ++level)
               {
                 // count quads on this level
                 number_cache.n_active_quads_level[level] = 0;
@@ -1481,6 +1501,9 @@ namespace internal
                 ++number_cache.n_active_quads;
             }
           }
+
+        // wait for the background computation for lines
+        update_lines.join ();
       }
 
       /**
@@ -1504,37 +1527,57 @@ namespace internal
                                  const unsigned int                       level_objects,
                                  internal::Triangulation::NumberCache<3> &number_cache)
       {
-        // update quads, lines and n_levels
-        compute_number_cache (triangulation,
-                              level_objects,
-                              static_cast<internal::Triangulation::NumberCache<2>&>
-                              (number_cache));
+        // update quads, lines and n_levels in number_cache. since we
+        // don't access any of these numbers, we can do this in the
+        // background
+        Threads::Task<void> update_quads_and_lines
+          = Threads::new_task ((void (*)(const Triangulation<dim,spacedim> &,
+                                         const unsigned int,
+                                         internal::Triangulation::NumberCache<2> &))
+                               (&compute_number_cache<dim,spacedim>),
+                               triangulation,
+                               level_objects,
+                               static_cast<internal::Triangulation::NumberCache<2>&>
+                               (number_cache));
 
         typedef
         typename Triangulation<dim,spacedim>::hex_iterator hex_iterator;
         typedef
         typename Triangulation<dim,spacedim>::active_hex_iterator active_hex_iterator;
 
+        // count the number of levels; the function we called above
+        // for quads (recursively, via the lines function) also does
+        // this and puts it into number_cache.n_levels, but this datum
+        // may not yet be available as we call the function on a
+        // separate task
+        unsigned int n_levels = 0;
+        if (level_objects > 0)
+          // find the last level on which there are used cells
+          for (unsigned int level=0; level<level_objects; ++level)
+            if (triangulation.begin(level) !=
+                triangulation.end(level))
+              n_levels = level+1;
+
         ///////////////////////////////////
         // update the number of hexes on the different levels in the
         // cache
-        number_cache.n_hexes_level.resize (number_cache.n_levels);
+        number_cache.n_hexes_level.resize (n_levels);
         number_cache.n_hexes = 0;
 
-        number_cache.n_active_hexes_level.resize (number_cache.n_levels);
+        number_cache.n_active_hexes_level.resize (n_levels);
         number_cache.n_active_hexes = 0;
 
         // for 3d, hexes have levels so take count the objects per
         // level and globally
         if (dim == 3)
           {
-            for (unsigned int level=0; level<number_cache.n_levels; ++level)
+            for (unsigned int level=0; level<n_levels; ++level)
               {
                 // count hexes on this level
                 number_cache.n_hexes_level[level] = 0;
 
                 hex_iterator hex = triangulation.begin_hex (level),
-                             endc = (level == number_cache.n_levels-1 ?
+                             endc = (level == n_levels-1 ?
                                      hex_iterator(triangulation.end_hex()) :
                                      triangulation.begin_hex (level+1));
                 for (; hex!=endc; ++hex)
@@ -1545,7 +1588,7 @@ namespace internal
               }
 
             // do the update for the number of active hexes as well
-            for (unsigned int level=0; level<number_cache.n_levels; ++level)
+            for (unsigned int level=0; level<n_levels; ++level)
               {
                 // count hexes on this level
                 number_cache.n_active_hexes_level[level] = 0;
@@ -1576,6 +1619,9 @@ namespace internal
                 ++number_cache.n_active_hexes;
             }
           }
+
+        // wait for the background computation for quads
+        update_quads_and_lines.join ();
       }
 
 
