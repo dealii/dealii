@@ -39,7 +39,27 @@ namespace FETools
 
   namespace internal
   {
-#ifdef DEAL_II_WITH_P4EST
+#ifndef DEAL_II_WITH_P4EST
+    // Dummy implementation in case p4est is not available.
+    template <int dim,int spacedim>
+    class ExtrapolateImplementation
+    {
+    public:
+
+      ExtrapolateImplementation ()
+      {
+        Assert(false, ExcNotImplemented());
+      };
+
+      template <class InVector,class OutVector>
+      void extrapolate_parallel (const InVector &/*u2_relevant*/,
+                                 const DoFHandler<dim,spacedim> &/*dof2*/,
+                                 OutVector &/*u2*/)
+      {
+        Assert(false, ExcNotImplemented())
+      };
+    };
+#else
     // Implementation of the @p extrapolate function
     // on parallel distributed grids.
     template <int dim,int spacedim>
@@ -1395,6 +1415,110 @@ namespace FETools
 
     namespace
     {
+      template <class VectorType, class DH>
+      void reinit_distributed(const DH &/*dh*/,
+                              VectorType &/*vector*/)
+      {
+        Assert(false, ExcNotImplemented());
+      }
+
+#ifdef DEAL_II_WITH_PETSC
+      template <int dim, int spacedim>
+      void reinit_distributed(const DoFHandler<dim, spacedim> &dh,
+                              PETScWrappers::MPI::Vector &vector)
+      {
+        const parallel::distributed::Triangulation<dim,spacedim> *parallel_tria =
+          dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_tria());
+        Assert (parallel_tria !=0, ExcNotImplemented());
+
+        const IndexSet locally_owned_dofs = dh.locally_owned_dofs();
+        vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
+      }
+#endif //DEAL_II_WITH_PETSC
+
+#ifdef DEAL_II_WITH_TRILINOS
+      template <int dim, int spacedim>
+      void reinit_distributed(const DoFHandler<dim, spacedim> &dh,
+                              TrilinosWrappers::MPI::Vector &vector)
+      {
+        const parallel::distributed::Triangulation<dim,spacedim> *parallel_tria =
+          dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_tria());
+        Assert (parallel_tria !=0, ExcNotImplemented());
+
+        const IndexSet locally_owned_dofs = dh.locally_owned_dofs();
+        vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
+      }
+#endif //DEAL_II_WITH_TRILINOS
+
+      template <int dim, int spacedim, typename Number>
+      void reinit_distributed(const DoFHandler<dim, spacedim> &dh,
+                              LinearAlgebra::distributed::Vector<Number> &vector)
+      {
+        const parallel::distributed::Triangulation<dim,spacedim> *parallel_tria =
+          dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_tria());
+        Assert (parallel_tria !=0, ExcNotImplemented());
+
+        const IndexSet locally_owned_dofs = dh.locally_owned_dofs();
+        vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
+      }
+
+
+
+      template <class VectorType, class DH>
+      void reinit_ghosted(const DH &/*dh*/,
+                          VectorType &/*vector*/)
+      {
+        Assert(false, ExcNotImplemented());
+      }
+
+#ifdef DEAL_II_WITH_PETSC
+      template <int dim, int spacedim>
+      void reinit_ghosted(const DoFHandler<dim, spacedim> &dh,
+                          PETScWrappers::MPI::Vector &vector)
+      {
+        const parallel::distributed::Triangulation<dim,spacedim> *parallel_tria =
+          dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_tria());
+        Assert(parallel_tria !=0, ExcNotImplemented());
+        const IndexSet  locally_owned_dofs = dh.locally_owned_dofs();
+        IndexSet  locally_relevant_dofs;
+        DoFTools::extract_locally_relevant_dofs (dh, locally_relevant_dofs);
+        vector.reinit (locally_owned_dofs, locally_relevant_dofs,
+                       parallel_tria->get_communicator());
+      }
+#endif //DEAL_II_WITH_PETSC
+
+#ifdef DEAL_II_WITH_TRILINOS
+      template <int dim, int spacedim>
+      void reinit_ghosted(const DoFHandler<dim, spacedim> &dh,
+                          TrilinosWrappers::MPI::Vector &vector)
+      {
+        const parallel::distributed::Triangulation<dim,spacedim> *parallel_tria =
+          dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_tria());
+        Assert (parallel_tria !=0, ExcNotImplemented());
+        const IndexSet  locally_owned_dofs = dh.locally_owned_dofs();
+        IndexSet  locally_relevant_dofs;
+        DoFTools::extract_locally_relevant_dofs (dh, locally_relevant_dofs);
+        vector.reinit (locally_owned_dofs, locally_relevant_dofs,
+                       parallel_tria->get_communicator());
+      }
+#endif //DEAL_II_WITH_TRILINOS
+
+      template <int dim, int spacedim, typename Number>
+      void reinit_ghosted(const DoFHandler<dim, spacedim> &dh,
+                          LinearAlgebra::distributed::Vector<Number> &vector)
+      {
+        const parallel::distributed::Triangulation<dim,spacedim> *parallel_tria =
+          dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_tria());
+        Assert (parallel_tria !=0, ExcNotImplemented());
+        const IndexSet  locally_owned_dofs = dh.locally_owned_dofs();
+        IndexSet  locally_relevant_dofs;
+        DoFTools::extract_locally_relevant_dofs (dh, locally_relevant_dofs);
+        vector.reinit (locally_owned_dofs, locally_relevant_dofs,
+                       parallel_tria->get_communicator());
+      }
+
+
+
       template <int dim, class InVector, class OutVector, int spacedim>
       void extrapolate_serial(const InVector &u3,
                               const DoFHandler<dim,spacedim> &dof2,
@@ -1438,26 +1562,6 @@ namespace FETools
                 }
           }
       }
-
-
-
-#ifdef DEAL_II_WITH_P4EST
-      template <int dim, class InVector, class OutVector, int spacedim>
-      void extrapolate_parallel(const InVector &u2_relevant,
-                                const DoFHandler<dim,spacedim> &dof2,
-                                OutVector &u2)
-      {
-        if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dof2.get_tria()) != 0)
-          {
-            ExtrapolateImplementation<dim,spacedim>  implementation;
-            implementation.extrapolate_parallel (u2_relevant, dof2, u2);
-          }
-        else
-          {
-            extrapolate_serial (u2_relevant, dof2, u2);
-          }
-      }
-#endif //DEAL_II_WITH_P4EST
     }
   }
 
@@ -1487,79 +1591,38 @@ namespace FETools
     Assert(u1.size()==dof1.n_dofs(), ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
     Assert(u2.size()==dof2.n_dofs(), ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
 
-    // make sure that each cell on the
-    // coarsest level is at least once
-    // refined, otherwise, these cells
-    // can't be treated and would
-    // generate a bogus result
+    // make sure that each cell on the coarsest level is at least once refined, otherwise, these cells
+    // can't be treated and would generate a bogus result
     {
       typename DoFHandler<dim,spacedim>::cell_iterator cell = dof2.begin(0),
                                                        endc = dof2.end(0);
       for (; cell!=endc; ++cell)
-        Assert (cell->has_children(), ExcGridNotRefinedAtLeastOnce());
+        Assert (cell->has_children() || cell->is_artificial(), ExcGridNotRefinedAtLeastOnce());
     }
 
-    OutVector u3;
-    u3.reinit(u2);
-    interpolate(dof1, u1, dof2, constraints, u3);
 
-    internal::extrapolate_serial (u3, dof2, u2);
+    OutVector u3;
+    internal::reinit_distributed(dof2, u3);
+    if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dof2.get_tria()) != 0)
+      {
+        interpolate(dof1, u1, dof2, constraints, u3);
+
+        OutVector u3_relevant;
+        internal::reinit_ghosted(dof2, u3_relevant);
+        u3_relevant = u3;
+
+        internal::ExtrapolateImplementation<dim,spacedim>  implementation;
+        implementation.extrapolate_parallel (u3_relevant, dof2, u2);
+      }
+    else
+      {
+        interpolate(dof1, u1, dof2, constraints, u3);
+
+        internal::extrapolate_serial (u3, dof2, u2);
+      }
 
     constraints.distribute(u2);
   }
-
-
-#ifdef DEAL_II_WITH_P4EST
-  template <int dim, class VectorType, int spacedim>
-  void extrapolate_parallel(const DoFHandler<dim,spacedim> &dof1,
-                            const VectorType &u1,
-                            const DoFHandler<dim,spacedim> &dof2,
-                            const ConstraintMatrix &constraints2,
-                            VectorType &u2)
-  {
-    IndexSet  dof2_locally_owned_dofs = dof2.locally_owned_dofs();
-    IndexSet  dof2_locally_relevant_dofs;
-    DoFTools::extract_locally_relevant_dofs (dof2,
-                                             dof2_locally_relevant_dofs);
-
-    VectorType u3 (dof2_locally_owned_dofs, u1.get_mpi_communicator ());
-    interpolate (dof1, u1, dof2, constraints2, u3);
-    VectorType u3_relevant (dof2_locally_owned_dofs,
-                            dof2_locally_relevant_dofs,
-                            u1.get_mpi_communicator ());
-    u3_relevant = u3;
-
-    internal::extrapolate_parallel (u3_relevant, dof2, u2);
-
-    constraints2.distribute(u2);
-  }
-
-
-
-  template <int dim, int spacedim, typename Number>
-  void extrapolate_parallel(const DoFHandler<dim,spacedim> &dof1,
-                            const LinearAlgebra::distributed::Vector<Number> &u1,
-                            const DoFHandler<dim,spacedim> &dof2,
-                            const ConstraintMatrix &constraints2,
-                            LinearAlgebra::distributed::Vector<Number> &u2)
-  {
-    IndexSet  dof2_locally_owned_dofs = dof2.locally_owned_dofs();
-    IndexSet  dof2_locally_relevant_dofs;
-    DoFTools::extract_locally_relevant_dofs (dof2,
-                                             dof2_locally_relevant_dofs);
-
-    LinearAlgebra::distributed::Vector<Number> u3(dof2_locally_owned_dofs,
-                                                  dof2_locally_relevant_dofs,
-                                                  u1.get_mpi_communicator ());
-    interpolate (dof1, u1, dof2, constraints2, u3);
-    u3.update_ghost_values();
-
-    internal::extrapolate_parallel (u3, dof2, u2);
-
-    constraints2.distribute(u2);
-  }
-#endif //DEAL_II_WITH_P4EST
-
 } // end of namespace FETools
 
 

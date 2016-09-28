@@ -783,28 +783,6 @@ namespace FETools
                     const ConstraintMatrix         &constraints,
                     OutVector                      &z2);
 
-  /**
-   * Same as above for external parallel VectorTypes
-   * on a parallel::distributed::Triangulation
-   */
-  template <int dim, class VectorType, int spacedim>
-  void extrapolate_parallel(const DoFHandler<dim,spacedim> &dof1,
-                            const VectorType &u1,
-                            const DoFHandler<dim,spacedim> &dof2,
-                            const ConstraintMatrix &constraints2,
-                            VectorType &u2);
-
-  /**
-   * Same as above for deal.II parallel Vectors
-   * on a parallel::distributed::Triangulation
-   */
-  template <int dim, int spacedim, typename Number>
-  void extrapolate_parallel(const DoFHandler<dim,spacedim> &dof1,
-                            const LinearAlgebra::distributed::Vector<Number> &u1,
-                            const DoFHandler<dim,spacedim> &dof2,
-                            const ConstraintMatrix &constraints2,
-                            LinearAlgebra::distributed::Vector<Number> &u2);
-
   //@}
   /**
    * The numbering of the degrees of freedom in continuous finite elements is

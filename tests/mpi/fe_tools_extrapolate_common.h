@@ -37,6 +37,7 @@
 #include <iomanip>
 #include <string>
 
+//#define DEBUG_OUTPUT_VTK
 
 template <int dim>
 class  TestFunction : public Function<dim>
@@ -176,9 +177,11 @@ check_this (const FiniteElement<dim> &fe1,
   const double global_error_before
     = std::sqrt(Utilities::MPI::sum(std::pow(local_error_before,2.), MPI_COMM_WORLD));
 
-  /*output_vector<dim, VectorType> (in_ghosted,
+#ifdef DEBUG_OUTPUT_VTK
+  output_vector<dim, VectorType> (in_ghosted,
                                   Utilities::int_to_string(fe1.degree,1)+Utilities::int_to_string(dim,1)+std::string("in"),
-                                  *dof1);*/
+                                  *dof1);
+#endif
   {
     const double l1_norm = in_distributed.l1_norm();
     const double l2_norm = in_distributed.l2_norm();
@@ -189,13 +192,14 @@ check_this (const FiniteElement<dim> &fe1,
               << linfty_norm << std::endl;
   }
 
-  FETools::extrapolate_parallel (*dof1, in_ghosted, *dof2, cm2, out_distributed);
+  FETools::extrapolate (*dof1, in_ghosted, *dof2, cm2, out_distributed);
   out_distributed.compress(VectorOperation::insert);
   out_ghosted = out_distributed;
-
-  /*output_vector<dim, VectorType> (out_ghosted,
+#ifdef DEBUG_OUTPUT_VTK
+  output_vector<dim, VectorType> (out_ghosted,
                                   Utilities::int_to_string(fe2.degree,1)+Utilities::int_to_string(dim,1)+std::string("out"),
-                                  *dof2);*/
+                                  *dof2);
+#endif
 
   {
     const double l1_norm = out_distributed.l1_norm();
@@ -297,10 +301,11 @@ check_this_dealii (const FiniteElement<dim> &fe1,
   const double local_error_before = difference_before.l2_norm();
   const double global_error_before
     = std::sqrt(Utilities::MPI::sum(std::pow(local_error_before,2.), MPI_COMM_WORLD));
-
-  /*output_vector<dim, VectorType> (in_ghosted,
+#ifdef DEBUG_OUTPUT_VTK
+  output_vector<dim, VectorType> (in_ghosted,
                                   Utilities::int_to_string(fe1.degree,1)+Utilities::int_to_string(dim,1)+std::string("in"),
-                                  *dof1);*/
+                                  *dof1);
+#endif
   {
     const double l1_norm = in_ghosted.l1_norm();
     const double l2_norm = in_ghosted.l2_norm();
@@ -311,16 +316,14 @@ check_this_dealii (const FiniteElement<dim> &fe1,
               << linfty_norm << std::endl;
   }
 
-  if (Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)==1)
-    FETools::extrapolate (*dof1, in_ghosted, *dof2, cm2, out_ghosted);
-  else
-    FETools::extrapolate_parallel (*dof1, in_ghosted, *dof2, cm2, out_ghosted);
+  FETools::extrapolate (*dof1, in_ghosted, *dof2, cm2, out_ghosted);
 
   out_ghosted.update_ghost_values();
-
-  /*output_vector<dim, VectorType> (out_ghosted,
+#ifdef DEBUG_OUTPUT_VTK
+  output_vector<dim, VectorType> (out_ghosted,
                                   Utilities::int_to_string(fe2.degree,1)+Utilities::int_to_string(dim,1)+std::string("out"),
-                                  *dof2);*/
+                                  *dof2);
+#endif
   {
     const double l1_norm = out_ghosted.l1_norm();
     const double l2_norm = out_ghosted.l2_norm();
