@@ -259,8 +259,6 @@ public:
 
 private:
 
-  static std::vector<ComponentMask> get_nonzero_component();
-
   /**
    * Return the vector consists of the numbers of degrees of freedom per objects.
    */
@@ -329,6 +327,12 @@ private:
    * Create the constraints matrix for hanging edges.
    */
   void initialize_constraints () ;
+
+  class InternalData : public FiniteElement<2,2>::InternalDataBase
+  {
+  public:
+    Table<2,Tensor<2,2> > shape_hessians;
+  };
 
 };
 

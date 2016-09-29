@@ -26,7 +26,7 @@ FE_P1NC::FE_P1NC()
                                           1,
                                           FiniteElementData<2>::L2),
                      std::vector<bool> (1, false),
-                     get_nonzero_component())
+                     std::vector<ComponentMask>(4, ComponentMask(1,true)))
 {
 
   // face support points: 2 end vertices
@@ -73,18 +73,6 @@ FiniteElement<2,2> *FE_P1NC::clone () const
 
 
 FE_P1NC::~FE_P1NC () {}
-
-
-
-std::vector<ComponentMask>
-FE_P1NC::get_nonzero_component()
-{
-  const unsigned int dofs_per_cell = 4;
-  std::vector<ComponentMask> masks (dofs_per_cell);
-  for (unsigned int i=0; i<dofs_per_cell; ++i)
-    masks[i] = ComponentMask(1,true);
-  return masks;
-}
 
 
 
@@ -149,12 +137,20 @@ FE_P1NC::get_linear_shape_coefficients (const Triangulation<2,2>::cell_iterator 
 FiniteElement<2,2>::InternalDataBase *
 FE_P1NC::get_data (const UpdateFlags update_flags,
                    const Mapping<2,2> &,
-                   const Quadrature<2> &,
+                   const Quadrature<2> &quadrature,
                    dealii::internal::FEValues::FiniteElementRelatedData<2,2> &) const
 {
-  FiniteElement<2,2>::InternalDataBase *data = new FiniteElement<2,2>::InternalDataBase;
+  InternalData *data = new InternalData;
 
   data->update_each = requires_update_flags(update_flags);
+
+  // hessian
+  if (data->update_each & update_hessians)
+    {
+      const unsigned int n_q_points = quadrature.size();
+      data->shape_hessians.reinit (this->dofs_per_cell, n_q_points);
+      data->shape_hessians.fill(Tensor<2,2>());
+    }
 
   return data;
 }
@@ -171,6 +167,9 @@ FE_P1NC::fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell
                          const FiniteElement<2,2>::InternalDataBase        &fe_internal,
                          internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
 {
+  Assert (dynamic_cast<const InternalData *> (&fe_internal) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
+
   const UpdateFlags flags(fe_internal.update_each) ;
 
   const unsigned int n_q_points = mapping_data.quadrature_points.size();
@@ -203,21 +202,9 @@ FE_P1NC::fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell
       }
 
   // hessian
-  std::vector<Tensor<2,2> > hessians(flags & update_hessians ? this->dofs_per_cell : 0);
   if (flags & update_hessians)
-    {
-      for (unsigned int i=0; i<n_q_points; ++i)
-        {
-          for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-            {
-              hessians[k][0][0] = 0.0 ;
-              hessians[k][0][1] = 0.0 ;
-              hessians[k][1][0] = 0.0 ;
-              hessians[k][1][1] = 0.0 ;
-              output_data.shape_hessians[k][i] = hessians[k];
-            }
-        }
-    }
+    output_data.shape_hessians = fe_data.shape_hessians;
+
 }
 
 
