@@ -428,8 +428,43 @@ namespace internal
     {
       const unsigned int dim = 2;
 
-      // choose the direction of the first edge by chance
-      edges[cells[cell].edge_indices[local_edge]].orientation_status = Edge<dim>::forward;
+      // choose the direction of the first edge. we have free choice
+      // here and could simply choose "forward" if that's what pleases
+      // us. however, for backward compatibility with the previous
+      // implementation used till 2016, let us just choose the
+      // direction so that it matches what we have in the given cell.
+      //
+      // in fact, in what can only be assumed to be a bug in the
+      // original implementation, after orienting all edges, the code
+      // that rotates the cells so that they match edge orientations
+      // (see the rotate_cell() function below) rotated the cell two
+      // more times by 90 degrees. this is ok -- it simply flips all
+      // edge orientations, which leaves them valid. rather than do
+      // the same in the current implementation, we can achieve the
+      // same effect by modifying the rule above to choose the
+      // direction of the starting edge of this parallel set
+      // *opposite* to what it looks like in the current cell
+      if (edges[cells[cell].edge_indices[local_edge]].vertex_indices[0]
+          ==
+          cells[cell].vertex_indices[GeometryInfo<dim>::line_to_cell_vertices (local_edge, 0)])
+        // orient initial edge *opposite* to the way it is in the cell
+        // (see above for the reason)
+        edges[cells[cell].edge_indices[local_edge]].orientation_status = Edge<dim>::backward;
+      else
+        {
+          Assert (edges[cells[cell].edge_indices[local_edge]].vertex_indices[0]
+                  ==
+                  cells[cell].vertex_indices[GeometryInfo<dim>::line_to_cell_vertices (local_edge, 1)],
+                  ExcInternalError());
+          Assert (edges[cells[cell].edge_indices[local_edge]].vertex_indices[1]
+                  ==
+                  cells[cell].vertex_indices[GeometryInfo<dim>::line_to_cell_vertices (local_edge, 0)],
+                  ExcInternalError());
+
+          // orient initial edge *opposite* to the way it is in the cell
+          // (see above for the reason)
+          edges[cells[cell].edge_indices[local_edge]].orientation_status = Edge<dim>::forward;
+        }
 
       // walk outward from the given edge as described in
       // the algorithm in the paper that documents all of
