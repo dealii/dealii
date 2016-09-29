@@ -242,13 +242,13 @@ public:
    * Constructor for the P1 nonconforming element.
    * It is only for 2D and codimension = 0.
    */
-  FE_P1NC() ;
+  FE_P1NC();
 
-  virtual std::string get_name () const ;
+  virtual std::string get_name () const;
 
-  virtual UpdateFlags requires_update_flags (const UpdateFlags flags) const ;
+  virtual UpdateFlags requires_update_flags (const UpdateFlags flags) const;
 
-  virtual FiniteElement<2,2> *clone () const ;
+  virtual FiniteElement<2,2> *clone () const;
 
   /**
    * Destructor.
@@ -281,7 +281,7 @@ private:
   get_data (const UpdateFlags update_flags,
             const Mapping<2,2> &,
             const Quadrature<2> &,
-            dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const ;
+            dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;
 
   /**
    * Compute the data on the current cell.
@@ -326,7 +326,7 @@ private:
   /**
    * Create the constraints matrix for hanging edges.
    */
-  void initialize_constraints () ;
+  void initialize_constraints ();
 
   class InternalData : public FiniteElement<2,2>::InternalDataBase
   {

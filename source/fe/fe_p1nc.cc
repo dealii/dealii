@@ -31,11 +31,11 @@ FE_P1NC::FE_P1NC()
 
   // face support points: 2 end vertices
   unit_face_support_points.resize(2);
-  unit_face_support_points[0][0] = 0.0 ;
-  unit_face_support_points[1][0] = 1.0 ;
+  unit_face_support_points[0][0] = 0.0;
+  unit_face_support_points[1][0] = 1.0;
 
   // initialize constraints matrix
-  initialize_constraints () ;
+  initialize_constraints ();
 }
 
 
@@ -52,9 +52,9 @@ UpdateFlags FE_P1NC::requires_update_flags (const UpdateFlags flags) const
   UpdateFlags out = update_default;
 
   if (flags & update_values)
-    out |= update_values | update_quadrature_points ;
+    out |= update_values | update_quadrature_points;
   if (flags & update_gradients)
-    out |= update_gradients ;
+    out |= update_gradients;
   if (flags & update_cell_normal_vectors)
     out |= update_cell_normal_vectors | update_JxW_values;
   if (flags & update_hessians)
@@ -107,7 +107,7 @@ FE_P1NC::get_linear_shape_coefficients (const Triangulation<2,2>::cell_iterator 
   mpt[3](1) = (cell->vertex(2)(1) + cell->vertex(3)(1))*0.5;
 
   // center point
-  Point<2> cpt ;
+  Point<2> cpt;
   cpt(0) = (mpt[0](0) + mpt[1](0) + mpt[2](0) + mpt[3](0))*0.25;
   cpt(1) = (mpt[0](1) + mpt[1](1) + mpt[2](1) + mpt[3](1))*0.25;
 
@@ -170,7 +170,7 @@ FE_P1NC::fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell
   Assert (dynamic_cast<const InternalData *> (&fe_internal) != 0, ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
-  const UpdateFlags flags(fe_internal.update_each) ;
+  const UpdateFlags flags(fe_internal.update_each);
 
   const unsigned int n_q_points = mapping_data.quadrature_points.size();
 
@@ -188,14 +188,14 @@ FE_P1NC::fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell
           {
             if (flags & update_values)
               {
-                values[k] = coeffs[k][0]*mapping_data.quadrature_points[i](0) + coeffs[k][1]*mapping_data.quadrature_points[i](1) + coeffs[k][2] ;
+                values[k] = coeffs[k][0]*mapping_data.quadrature_points[i](0) + coeffs[k][1]*mapping_data.quadrature_points[i](1) + coeffs[k][2];
                 output_data.shape_values[k][i] = values[k];
               }
 
             if (flags & update_gradients)
               {
-                grads[k][0] = coeffs[k][0] ;
-                grads[k][1] = coeffs[k][1] ;
+                grads[k][0] = coeffs[k][0];
+                grads[k][1] = coeffs[k][1];
                 output_data.shape_gradients[k][i] = grads[k];
               }
           }
@@ -220,7 +220,7 @@ FE_P1NC::fill_fe_face_values (const Triangulation<2,2>::cell_iterator           
                               dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
 
 {
-  const UpdateFlags flags(fe_internal.update_each) ;
+  const UpdateFlags flags(fe_internal.update_each);
 
   const unsigned int n_q_points = mapping_data.quadrature_points.size();
 
@@ -238,14 +238,14 @@ FE_P1NC::fill_fe_face_values (const Triangulation<2,2>::cell_iterator           
           {
             if (flags & update_values)
               {
-                values[k] = coeffs[k][0]*mapping_data.quadrature_points[i](0) + coeffs[k][1]*mapping_data.quadrature_points[i](1) + coeffs[k][2] ;
+                values[k] = coeffs[k][0]*mapping_data.quadrature_points[i](0) + coeffs[k][1]*mapping_data.quadrature_points[i](1) + coeffs[k][2];
                 output_data.shape_values[k][i] = values[k];
               }
 
             if (flags & update_gradients)
               {
-                grads[k][0] = coeffs[k][0] ;
-                grads[k][1] = coeffs[k][1] ;
+                grads[k][0] = coeffs[k][0];
+                grads[k][1] = coeffs[k][1];
                 output_data.shape_gradients[k][i] = grads[k];
               }
           }
@@ -267,7 +267,7 @@ FE_P1NC::fill_fe_subface_values (const Triangulation<2,2>::cell_iterator        
                                  dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
 
 {
-  const UpdateFlags flags(fe_internal.update_each) ;
+  const UpdateFlags flags(fe_internal.update_each);
 
   const unsigned int n_q_points = mapping_data.quadrature_points.size();
 
@@ -285,14 +285,14 @@ FE_P1NC::fill_fe_subface_values (const Triangulation<2,2>::cell_iterator        
           {
             if (flags & update_values)
               {
-                values[k] = coeffs[k][0]*mapping_data.quadrature_points[i](0) + coeffs[k][1]*mapping_data.quadrature_points[i](1) + coeffs[k][2] ;
+                values[k] = coeffs[k][0]*mapping_data.quadrature_points[i](0) + coeffs[k][1]*mapping_data.quadrature_points[i](1) + coeffs[k][2];
                 output_data.shape_values[k][i] = values[k];
               }
 
             if (flags & update_gradients)
               {
-                grads[k][0] = coeffs[k][0] ;
-                grads[k][1] = coeffs[k][1] ;
+                grads[k][0] = coeffs[k][0];
+                grads[k][1] = coeffs[k][1];
                 output_data.shape_gradients[k][i] = grads[k];
               }
           }
@@ -313,8 +313,8 @@ void FE_P1NC::initialize_constraints ()
   interface_constraints
   .TableBase<2,double>::reinit (interface_constraints_size());
 
-  interface_constraints(0,0) = 0.5 ;
-  interface_constraints(0,1) = 0.5 ;
+  interface_constraints(0,0) = 0.5;
+  interface_constraints(0,1) = 0.5;
 
 }
 
