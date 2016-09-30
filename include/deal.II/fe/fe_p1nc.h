@@ -275,7 +275,8 @@ private:
    * Do the work which is needed before cellwise data computation.
    * Since the shape functions are constructed independently on each cell,
    * the data on the reference cell is not necessary.
-   * It returns an empty variable type of @ InternalDataBase and updates @ update_flags.
+   * It returns an empty variable type of @ InternalDataBase and updates @ update_flags,
+   * and computes trivially zero Hessian for each cell if it is needed.
    */
   virtual FiniteElement<2,2>::InternalDataBase *
   get_data (const UpdateFlags update_flags,
@@ -283,15 +284,27 @@ private:
             const Quadrature<2> &quadrature,
             dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;
 
+  virtual FiniteElement<2,2>::InternalDataBase *
+  get_face_data (const UpdateFlags update_flags,
+		 const Mapping<2,2> &,
+		 const Quadrature<1> &quadrature,
+		 dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;
+
+  virtual FiniteElement<2,2>::InternalDataBase *
+  get_subface_data (const UpdateFlags update_flags,
+		    const Mapping<2,2> &,
+		    const Quadrature<1> &quadrature,
+		    dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;
+
   /**
    * Compute the data on the current cell.
    */
   virtual void
   fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell,
-                  const CellSimilarity::Similarity,
-                  const Quadrature<2> &,
-                  const Mapping<2,2> &,
-                  const Mapping<2,2>::InternalDataBase &,
+                  const CellSimilarity::Similarity                   cell_similarity,
+                  const Quadrature<2>                               &quadrature,
+                  const Mapping<2,2>                                &mapping,
+                  const Mapping<2,2>::InternalDataBase              &mapping_internal,
                   const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
                   const FiniteElement<2,2>::InternalDataBase        &fe_internal,
                   internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;

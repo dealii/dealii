@@ -154,12 +154,54 @@ FE_P1NC::get_data (const UpdateFlags update_flags,
 
 
 
+FiniteElement<2,2>::InternalDataBase *
+FE_P1NC::get_face_data (const UpdateFlags update_flags,
+			const Mapping<2,2> &,
+			const Quadrature<1> &quadrature,
+			dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
+{
+  FiniteElement<2,2>::InternalDataBase *data = new FiniteElement<2,2>::InternalDataBase;
+
+  data->update_each = requires_update_flags(update_flags);
+
+  // hessian
+  const unsigned int n_q_points = quadrature.size();
+  output_data.initialize (n_q_points, FE_P1NC(), data->update_each);
+  if (data->update_each & update_hessians)
+    output_data.shape_hessians.fill(Tensor<2,2>());
+
+  return data;
+}
+
+
+
+FiniteElement<2,2>::InternalDataBase *
+FE_P1NC::get_subface_data (const UpdateFlags update_flags,
+			   const Mapping<2,2> &,
+			   const Quadrature<1> &quadrature,
+			   dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
+{
+  FiniteElement<2,2>::InternalDataBase *data = new FiniteElement<2,2>::InternalDataBase;
+
+  data->update_each = requires_update_flags(update_flags);
+
+  // hessian
+  const unsigned int n_q_points = quadrature.size();
+  output_data.initialize (n_q_points, FE_P1NC(), data->update_each);
+  if (data->update_each & update_hessians)
+    output_data.shape_hessians.fill(Tensor<2,2>());
+
+  return data;
+}
+
+
+
 void
 FE_P1NC::fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell,
-                         const CellSimilarity::Similarity,
-                         const Quadrature<2> &,
-                         const Mapping<2,2> &,
-                         const Mapping<2,2>::InternalDataBase &,
+                         const CellSimilarity::Similarity                   cell_similarity,
+                         const Quadrature<2>                               &quadrature,
+                         const Mapping<2,2>                                &mapping,
+                         const Mapping<2,2>::InternalDataBase              &mapping_internal,
                          const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
                          const FiniteElement<2,2>::InternalDataBase        &fe_internal,
                          internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
@@ -174,7 +216,7 @@ FE_P1NC::fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell
   // linear shape functions
   std_cxx11::array<std_cxx11::array<double,3>,4> coeffs = get_linear_shape_coefficients (cell);
 
-  // compute basis functions
+  // compute on the cell
   if (flags & (update_values | update_gradients))
     for (unsigned int i=0; i<n_q_points; ++i)
       {
@@ -218,26 +260,28 @@ FE_P1NC::fill_fe_face_values (const Triangulation<2,2>::cell_iterator           
   // linear shape functions
   std_cxx11::array<std_cxx11::array<double,3>,4> coeffs = get_linear_shape_coefficients (cell);
 
-  // compute basis functions
-  if (flags & (update_values | update_gradients))
-    for (unsigned int i=0; i<n_q_points; ++i)
-      {
-        for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-          {
-            if (flags & update_values)
-              {
-                values[k] = coeffs[k][0]*mapping_data.quadrature_points[i](0) + coeffs[k][1]*mapping_data.quadrature_points[i](1) + coeffs[k][2];
-                output_data.shape_values[k][i] = values[k];
-              }
+  // compute on the face
+  Quadrature<2> quadrature_on_face = QProjector<2>::project_to_face(quadrature, face_no);
+  Point<2> quadrature_point;
+  for (unsigned int i=0; i<quadrature_on_face.size(); ++i)
+    {
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+	{
+	  if (flags & update_values)
+	    {
+	      quadrature_point = mapping.transform_unit_to_real_cell(cell, quadrature_on_face.point(i));
+	      values[k] = coeffs[k][0]*quadrature_point(0) + coeffs[k][1]*quadrature_point(1) + coeffs[k][2];
+	      output_data.shape_values[k][i] = values[k];
+	    }
 
-            if (flags & update_gradients)
-              {
-                grads[k][0] = coeffs[k][0];
-                grads[k][1] = coeffs[k][1];
-                output_data.shape_gradients[k][i] = grads[k];
-              }
-          }
-      }
+	  if (flags & update_gradients)
+	    {
+	      grads[k][0] = coeffs[k][0];
+	      grads[k][1] = coeffs[k][1];
+	      output_data.shape_gradients[k][i] = grads[k];
+	    }
+	}
+    }
 }
 
 
@@ -263,26 +307,28 @@ FE_P1NC::fill_fe_subface_values (const Triangulation<2,2>::cell_iterator        
   // linear shape functions
   std_cxx11::array<std_cxx11::array<double,3>,4> coeffs = get_linear_shape_coefficients (cell);
 
-  // compute basis functions
-  if (flags & (update_values | update_gradients))
-    for (unsigned int i=0; i<n_q_points; ++i)
-      {
-        for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-          {
-            if (flags & update_values)
-              {
-                values[k] = coeffs[k][0]*mapping_data.quadrature_points[i](0) + coeffs[k][1]*mapping_data.quadrature_points[i](1) + coeffs[k][2];
-                output_data.shape_values[k][i] = values[k];
-              }
+  // compute on the subface
+  Quadrature<2> quadrature_on_subface = QProjector<2>::project_to_subface(quadrature, face_no, sub_no);
+  Point<2> quadrature_point;
+  for (unsigned int i=0; i<quadrature_on_subface.size(); ++i)
+    {
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+	{
+	  if (flags & update_values)
+	    {
+	      quadrature_point = mapping.transform_unit_to_real_cell(cell, quadrature_on_subface.point(i));
+	      values[k] = coeffs[k][0]*quadrature_point(0) + coeffs[k][1]*quadrature_point(1) + coeffs[k][2];
+	      output_data.shape_values[k][i] = values[k];
+	    }
 
-            if (flags & update_gradients)
-              {
-                grads[k][0] = coeffs[k][0];
-                grads[k][1] = coeffs[k][1];
-                output_data.shape_gradients[k][i] = grads[k];
-              }
-          }
-      }
+	  if (flags & update_gradients)
+	    {
+	      grads[k][0] = coeffs[k][0];
+	      grads[k][1] = coeffs[k][1];
+	      output_data.shape_gradients[k][i] = grads[k];
+	    }
+	}
+    }
 }
 
 
