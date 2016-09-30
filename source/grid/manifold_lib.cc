@@ -263,6 +263,14 @@ get_tangent_vector (const Point<spacedim> &p1,
 
 template <int dim, int spacedim>
 Point<spacedim>
+SphericalManifold<dim, spacedim>::
+get_new_point (const Quadrature<spacedim> &quad) const
+{
+  return get_new_point(quad.get_points(),quad.get_weights());
+}
+
+template <int dim, int spacedim>
+Point<spacedim>
 SphericalManifold<dim,spacedim>::
 get_new_point (const std::vector<Point<spacedim> > &vertices,
                const std::vector<double> &weights) const
