@@ -227,6 +227,15 @@ public:
   get_tangent_vector (const Point<spacedim> &x1,
                       const Point<spacedim> &x2) const;
 
+  /**
+   * Return a point on the spherical manifold which is intermediate
+   * with respect to the surrounding points.
+   *
+   * @deprecated Use the other function that takes points and weights separately instead.
+   */
+  virtual
+  Point<spacedim>
+  get_new_point(const dealii::Quadrature<spacedim> &quadrature) const DEAL_II_DEPRECATED;
 
   /**
    * Return a point on the spherical manifold which is intermediate
