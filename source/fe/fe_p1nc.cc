@@ -28,7 +28,6 @@ FE_P1NC::FE_P1NC()
                      std::vector<bool> (1, false),
                      std::vector<ComponentMask>(4, ComponentMask(1,true)))
 {
-
   // face support points: 2 end vertices
   unit_face_support_points.resize(2);
   unit_face_support_points[0][0] = 0.0;
@@ -159,7 +158,7 @@ FE_P1NC::get_data (const UpdateFlags update_flags,
 
 void
 FE_P1NC::fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell,
-                         const CellSimilarity::Similarity                   ,
+                         const CellSimilarity::Similarity,
                          const Quadrature<2>                               &quadrature,
                          const Mapping<2,2>                                &mapping,
                          const Mapping<2,2>::InternalDataBase &,
@@ -204,21 +203,19 @@ FE_P1NC::fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell
   // hessian
   if (flags & update_hessians)
     output_data.shape_hessians = fe_data.shape_hessians;
-
 }
 
 
 
 void
-FE_P1NC::fill_fe_face_values (const Triangulation<2,2>::cell_iterator           &cell,
-                              const unsigned int                                 face_no,
-                              const Quadrature<1>                                             &quadrature,
-                              const Mapping<2,2>                                         &mapping,
-                              const Mapping<2,2>::InternalDataBase              &mapping_internal,
+FE_P1NC::fill_fe_face_values (const Triangulation<2,2>::cell_iterator                   &cell,
+                              const unsigned int                                         face_no,
+                              const Quadrature<1>                                       &quadrature,
+                              const Mapping<2,2>                                        &mapping,
+                              const Mapping<2,2>::InternalDataBase                      &mapping_internal,
                               const dealii::internal::FEValues::MappingRelatedData<2,2> &mapping_data,
-                              const InternalDataBase                                              &fe_internal,
+                              const InternalDataBase                                    &fe_internal,
                               dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
-
 {
   const UpdateFlags flags(fe_internal.update_each);
 
@@ -249,23 +246,21 @@ FE_P1NC::fill_fe_face_values (const Triangulation<2,2>::cell_iterator           
                 output_data.shape_gradients[k][i] = grads[k];
               }
           }
-
       }
 }
 
 
 
 void
-FE_P1NC::fill_fe_subface_values (const Triangulation<2,2>::cell_iterator           &cell,
-                                 const unsigned int                                                  face_no,
-                                 const unsigned int                                                   sub_no,
-                                 const Quadrature<1>                                             &quadrature,
-                                 const Mapping<2,2>                                         &mapping,
-                                 const Mapping<2,2>::InternalDataBase              &mapping_internal,
+FE_P1NC::fill_fe_subface_values (const Triangulation<2,2>::cell_iterator                   &cell,
+                                 const unsigned int                                         face_no,
+                                 const unsigned int                                         sub_no,
+                                 const Quadrature<1>                                       &quadrature,
+                                 const Mapping<2,2>                                        &mapping,
+                                 const Mapping<2,2>::InternalDataBase                      &mapping_internal,
                                  const dealii::internal::FEValues::MappingRelatedData<2,2> &mapping_data,
-                                 const InternalDataBase                                              &fe_internal,
+                                 const InternalDataBase                                    &fe_internal,
                                  dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
-
 {
   const UpdateFlags flags(fe_internal.update_each);
 
@@ -303,7 +298,6 @@ FE_P1NC::fill_fe_subface_values (const Triangulation<2,2>::cell_iterator        
 
 void FE_P1NC::initialize_constraints ()
 {
-
   std::vector<Point<1> > constraint_points;
 
   // Add midpoint
@@ -315,7 +309,6 @@ void FE_P1NC::initialize_constraints ()
 
   interface_constraints(0,0) = 0.5;
   interface_constraints(0,1) = 0.5;
-
 }
 
 
