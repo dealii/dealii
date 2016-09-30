@@ -32,8 +32,7 @@ void check (const char *p, std::string last_line)
                      Patterns::Integer(-1,1));
 
   std::ifstream in(p);
-  bool status = prm.read_input (in, "input file", last_line);
-  Assert (status == true, ExcInternalError());
+  prm.parse_input (in, "input file", last_line);
 
   deallog << "var_1=" << prm.get ("var_1") << std::endl
           << "var_2=" << prm.get ("var_2") << std::endl;

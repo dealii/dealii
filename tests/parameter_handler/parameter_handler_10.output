@@ -1,3 +1,9 @@
 
-DEAL::0
-DEAL::test_1=3
+DEAL::ExcInvalidEntryForPattern (current_line_n, input_filename, entry_value, entry_name, patterns[pattern_index]->description())
+Line <1> of file <input file>:
+    The entry value
+        3.1415
+    for the entry named
+        test_1
+    does not match the given pattern
+        [Integer range -2147483648...2147483647 (inclusive)]

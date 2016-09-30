@@ -1608,6 +1608,31 @@ bool ParameterHandler::read_input (std::istream &input,
                                    const std::string &filename,
                                    const std::string &last_line)
 {
+  try
+    {
+      parse_input(input, filename, last_line);
+      return true;
+    }
+  catch (const ExcIO &exc)
+    {
+      throw;
+    }
+  // This catch block more or less duplicates the old behavior of this function,
+  // which was to print something to stderr for every parsing error (which are
+  // now exceptions) and then return false.
+  catch (const ExceptionBase &exc)
+    {
+      std::cerr << exc.what() << std::endl;
+    }
+  return false;
+}
+
+
+
+void ParameterHandler::parse_input (std::istream &input,
+                                    const std::string &filename,
+                                    const std::string &last_line)
+{
   AssertThrow (input, ExcIO());
 
   // store subsections we are currently in
@@ -1616,12 +1641,17 @@ bool ParameterHandler::read_input (std::istream &input,
   std::string input_line;
   std::string fully_concatenated_line;
   bool is_concatenated = false;
+  // Maintain both the current line number and the current logical line
+  // number, where the latter refers to the line number where (possibly) the
+  // current line continuation started.
   unsigned int current_line_n = 0;
-  bool status = true;
+  unsigned int current_logical_line_n = 0;
 
   while (std::getline (input, input_line))
     {
       ++current_line_n;
+      if (!is_concatenated)
+        current_logical_line_n = current_line_n;
       // Trim the whitespace at the ends of the line here instead of in
       // scan_line. This makes the continuation line logic a lot simpler.
       input_line = Utilities::trim (input_line);
@@ -1658,7 +1688,7 @@ bool ParameterHandler::read_input (std::istream &input,
 
       if (!is_concatenated)
         {
-          status &= scan_line (fully_concatenated_line, filename, current_line_n);
+          scan_line (fully_concatenated_line, filename, current_logical_line_n);
           fully_concatenated_line.clear();
         }
     }
@@ -1667,31 +1697,37 @@ bool ParameterHandler::read_input (std::istream &input,
   // the last line to end in a backslash.
   if (is_concatenated)
     {
-      status &= scan_line (fully_concatenated_line, filename, current_line_n);
+      scan_line (fully_concatenated_line, filename, current_line_n);
     }
 
-  if (status && (saved_path != subsection_path))
+  if (saved_path != subsection_path)
     {
-      std::cerr << "Unbalanced 'subsection'/'end' in file <" << filename
-                << ">." << std::endl;
-      if (saved_path.size()>0)
+      std::stringstream paths_message;
+      if (saved_path.size() > 0)
         {
-          std::cerr << "Path before loading input:" << std::endl;
-          for (unsigned int i=0; i<saved_path.size(); ++i)
-            std::cerr << std::setw(i*2+4) << " "
-                      << "subsection " << saved_path[i] << std::endl;
+          paths_message << "Path before loading input:\n";
+          for (unsigned int i=0; i < subsection_path.size(); ++i)
+            {
+              paths_message << std::setw(i*2 + 4)
+                            << " "
+                            << "subsection "
+                            << saved_path[i]
+                            << '\n';
+            }
+          paths_message << "Current path:\n";
+          for (unsigned int i=0; i < subsection_path.size(); ++i)
+            {
+              paths_message << std::setw(i*2 + 4)
+                            << " "
+                            << "subsection "
+                            << subsection_path[i]
+                            << (i == subsection_path.size() - 1 ? "" : "\n");
+            }
         }
-      std::cerr << "Current path:" << std::endl;
-      for (unsigned int i=0; i<subsection_path.size(); ++i)
-        std::cerr << std::setw(i*2+4) << " "
-                  << "subsection " << subsection_path[i] << std::endl;
-
-      // restore subsection we started with and return failure:
+      // restore subsection we started with before throwing the exception:
       subsection_path = saved_path;
-      return false;
+      AssertThrow (false, ExcUnbalancedSubsections (filename, paths_message.str()));
     }
-
-  return status;
 }
 
 
@@ -1729,26 +1765,61 @@ bool ParameterHandler::read_input (const std::string &filename,
 
 
 
-bool ParameterHandler::read_input_from_string (const char *s,
-                                               const std::string &last_line)
+void ParameterHandler::parse_input (const std::string &filename,
+                                    const std::string &last_line)
+{
+  PathSearch search("PARAMETERS");
+
+  std::string openname = search.find(filename);
+  std::ifstream file_stream (openname.c_str());
+  parse_input (file_stream, filename, last_line);
+}
+
+
+
+bool
+ParameterHandler::read_input_from_string (const char *s,
+                                          const std::string &last_line)
+{
+  try
+    {
+      parse_input_from_string (s, last_line);
+      return true;
+    }
+  catch (const ExcIO &exc)
+    {
+      throw;
+    }
+  // This catch block more or less duplicates the old behavior of this function,
+  // which was to print something to stderr for every parsing error (which are
+  // now exceptions) and then return false.
+  catch (const ExceptionBase &exc)
+    {
+      std::cerr << exc.what() << std::endl;
+    }
+  return false;
+}
+
+
+
+void
+ParameterHandler::parse_input_from_string (const char *s,
+                                           const std::string &last_line)
 {
   std::istringstream input_stream (s);
-  return read_input (input_stream, "input string", last_line);
+  parse_input (input_stream, "input string", last_line);
 }
 
 
 
 namespace
 {
-  // Recursively go through the 'source' tree
-  // and see if we can find corresponding
-  // entries in the 'destination' tree. If
-  // not, error out (i.e. we have just read
-  // an XML file that has entries that
-  // weren't declared in the ParameterHandler
-  // object); if so, copy the value of these
+  // Recursively go through the 'source' tree and see if we can find
+  // corresponding entries in the 'destination' tree. If not, error out
+  // (i.e. we have just read an XML file that has entries that weren't
+  // declared in the ParameterHandler object); if so, copy the value of these
   // nodes into the destination object
-  bool
+  void
   read_xml_recursively (const boost::property_tree::ptree &source,
                         const std::string                 &current_path,
                         const char                         path_separator,
@@ -1759,107 +1830,93 @@ namespace
     for (boost::property_tree::ptree::const_iterator p = source.begin();
          p != source.end(); ++p)
       {
-        // a sub-tree must either be a
-        // parameter node or a subsection
+        // a sub-tree must either be a parameter node or a subsection
         if (p->second.get_optional<std::string>("value"))
           {
-            // make sure we have a
-            // corresponding entry in the
-            // destination object as well
+            // make sure we have a corresponding entry in the destination
+            // object as well
             const std::string full_path
               = (current_path == ""
                  ?
                  p->first
                  :
                  current_path + path_separator + p->first);
-            if (destination.get_optional<std::string> (full_path)
-                &&
-                destination.get_optional<std::string> (full_path +
-                                                       path_separator +
-                                                       "value"))
-              {
-                // first make sure that the
-                // new entry actually
-                // satisfies its constraints
-                const std::string new_value
-                  = p->second.get<std::string>("value");
 
-                const unsigned int pattern_index
-                  = destination.get<unsigned int> (full_path +
-                                                   path_separator +
-                                                   "pattern");
-                if (patterns[pattern_index]->match(new_value) == false)
-                  {
-                    std::cerr << "    The entry value" << std::endl
-                              << "        " << new_value << std::endl
-                              << "    for the entry named" << std::endl
-                              << "        " << full_path << std::endl
-                              << "    does not match the given pattern" << std::endl
-                              << "        " << patterns[pattern_index]->description()
-                              << std::endl;
-                    return false;
-                  }
+            const std::string new_value
+              = p->second.get<std::string>("value");
+            AssertThrow (destination.get_optional<std::string> (full_path)
+                         &&
+                         destination.get_optional<std::string>
+                         (full_path + path_separator + "value"),
+                         ParameterHandler::ExcEntryUndeclared (p->first));
 
-                // set the found parameter in
-                // the destination argument
-                destination.put (full_path + path_separator + "value",
-                                 new_value);
+            // first make sure that the new entry actually satisfies its
+            // constraints
+            const unsigned int pattern_index
+              = destination.get<unsigned int> (full_path +
+                                               path_separator +
+                                               "pattern");
+            AssertThrow (patterns[pattern_index]->match(new_value),
+                         ParameterHandler::ExcInvalidEntryForPatternXML
+                         // XML entries sometimes have extra surrounding
+                         // newlines
+                         (Utilities::trim(new_value),
+                          p->first,
+                          patterns[pattern_index]->description()));
 
-                // this node might have
-                // sub-nodes in addition to
-                // "value", such as
-                // "default_value",
-                // "documentation", etc. we
-                // might at some point in the
-                // future want to make sure
-                // that if they exist that
-                // they match the ones in the
-                // 'destination' tree
-              }
-            else
-              {
-                std::cerr << "The entry <" << full_path
-                          << "> with value <"
-                          << p->second.get<std::string>("value")
-                          << "> has not been declared."
-                          << std::endl;
-                return false;
-              }
+            // set the found parameter in the destination argument
+            destination.put (full_path + path_separator + "value",
+                             new_value);
+
+            // this node might have sub-nodes in addition to "value", such as
+            // "default_value", "documentation", etc. we might at some point
+            // in the future want to make sure that if they exist that they
+            // match the ones in the 'destination' tree
           }
         else if (p->second.get_optional<std::string>("alias"))
           {
-            // it is an alias node. alias nodes are static and
-            // there is nothing to do here (but the same applies as
-            // mentioned in the comment above about the static
-            // nodes inside parameter nodes
+            // it is an alias node. alias nodes are static and there is
+            // nothing to do here (but the same applies as mentioned in the
+            // comment above about the static nodes inside parameter nodes
           }
         else
           {
             // it must be a subsection
-            const bool result
-              = read_xml_recursively (p->second,
-                                      (current_path == "" ?
-                                       p->first :
-                                       current_path + path_separator + p->first),
-                                      path_separator,
-                                      patterns,
-                                      destination);
-
-            // see if the recursive read
-            // succeeded. if yes, continue,
-            // otherwise exit now
-            if (result == false)
-              return false;
+            read_xml_recursively (p->second,
+                                  (current_path == "" ?
+                                   p->first :
+                                   current_path + path_separator + p->first),
+                                  path_separator,
+                                  patterns,
+                                  destination);
           }
       }
-
-    return true;
   }
 }
 
 
 
-bool ParameterHandler::read_input_from_xml (std::istream &in)
+bool ParameterHandler::read_input_from_xml(std::istream &in)
+{
+  try
+    {
+      parse_input_from_xml (in);
+      return true;
+    }
+  catch (const ExcIO &exc)
+    {
+      throw;
+    }
+  catch (const ExceptionBase &exc)
+    {
+      std::cerr << exc.what() << std::endl;
+    }
+  return false;
+}
+
+
+
+void ParameterHandler::parse_input_from_xml (std::istream &in)
 {
   AssertThrow(in, ExcIO());
   // read the XML tree assuming that (as we
@@ -1867,47 +1924,29 @@ bool ParameterHandler::read_input_from_xml (std::istream &in)
   // a single top-level node called
   // "ParameterHandler"
   boost::property_tree::ptree single_node_tree;
-  try
-    {
-      read_xml (in, single_node_tree);
-    }
-  catch (...)
-    {
-      std::cerr << "This input stream appears not to be valid XML"
-                << std::endl;
-      return false;
-    }
+  // This boost function will raise an exception if this is not a valid XML
+  // file.
+  read_xml (in, single_node_tree);
 
-  // make sure there is a top-level element
+  // make sure there is a single top-level element
   // called "ParameterHandler"
-  if (!single_node_tree.get_optional<std::string>("ParameterHandler"))
-    {
-      std::cerr << "There is no top-level XML element called \"ParameterHandler\"."
-                << std::endl;
-      return false;
-    }
+  AssertThrow (single_node_tree.get_optional<std::string>("ParameterHandler"),
+               ExcInvalidXMLParameterFile ("There is no top-level XML element "
+                                           "called \"ParameterHandler\"."));
 
-  // ensure that there is only a single
-  // top-level element
-  if (std::distance (single_node_tree.begin(), single_node_tree.end()) != 1)
-    {
-      std::cerr << "The top-level XML element \"ParameterHandler\" is "
-                << "not the only one."
-                << std::endl;
-      std::cerr << "(There are "
-                << std::distance (single_node_tree.begin(),
-                                  single_node_tree.end())
-                << " top-level elements.)"
-                << std::endl;
-      return false;
-    }
+  const std::size_t n_top_level_elements = std::distance (single_node_tree.begin(),
+                                                          single_node_tree.end());
+  AssertThrow (n_top_level_elements == 1,
+               ExcInvalidXMLParameterFile ("There are "
+                                           + Utilities::to_string(n_top_level_elements)
+                                           + " top-level elements, but there "
+                                           "should only be one."));
 
   // read the child elements recursively
   const boost::property_tree::ptree
   &my_entries = single_node_tree.get_child("ParameterHandler");
 
-  return read_xml_recursively (my_entries, "", path_separator, patterns,
-                               *entries);
+  read_xml_recursively (my_entries, "", path_separator, patterns, *entries);
 }
 
 
@@ -2837,11 +2876,14 @@ ParameterHandler::log_parameters_section (LogStream &out)
 
 
 
-bool
+void
 ParameterHandler::scan_line (std::string         line,
                              const std::string  &input_filename,
                              const unsigned int  current_line_n)
 {
+  // save a copy for some error messages
+  const std::string original_line = line;
+
   // if there is a comment, delete it
   if (line.find('#') != std::string::npos)
     line.erase (line.find("#"), std::string::npos);
@@ -2855,11 +2897,12 @@ ParameterHandler::scan_line (std::string         line,
 
   // if line is now empty: leave
   if (line.length() == 0)
-    return true;
-
+    {
+      return;
+    }
   // enter subsection
-  if ((line.find ("SUBSECTION ") == 0) ||
-      (line.find ("subsection ") == 0))
+  else if ((line.find ("SUBSECTION ") == 0) ||
+           (line.find ("subsection ") == 0))
     {
       // delete this prefix
       line.erase (0, std::string("subsection").length()+1);
@@ -2867,71 +2910,44 @@ ParameterHandler::scan_line (std::string         line,
       const std::string subsection = Utilities::trim(line);
 
       // check whether subsection exists
-      if (!entries->get_child_optional (get_current_full_path(subsection)))
-        {
-          std::cerr << "Line <" << current_line_n
-                    << "> of file <" << input_filename
-                    << ">: There is no such subsection to be entered: "
-                    << demangle(get_current_full_path(subsection)) << std::endl;
-          for (unsigned int i=0; i<subsection_path.size(); ++i)
-            std::cerr << std::setw(i*2+4) << " "
-                      << "subsection " << subsection_path[i] << std::endl;
-          std::cerr << std::setw(subsection_path.size()*2+4) << " "
-                    << "subsection " << subsection << std::endl;
-          return false;
-        }
+      AssertThrow (entries->get_child_optional (get_current_full_path(subsection)),
+                   ExcNoSubsection (current_line_n,
+                                    input_filename,
+                                    demangle(get_current_full_path(subsection))));
 
       // subsection exists
       subsection_path.push_back (subsection);
-      return true;
     }
-
   // exit subsection
-  if ((line.find ("END") == 0) ||
-      (line.find ("end") == 0))
+  else if ((line.find ("END") == 0) ||
+           (line.find ("end") == 0))
     {
       line.erase (0, 3);
       while ((line.size() > 0) && (std::isspace(line[0])))
         line.erase (0, 1);
 
-      if (line.size()>0)
-        {
-          std::cerr << "Line <" << current_line_n
-                    << "> of file <" << input_filename
-                    << ">: invalid content after 'end'!" << std::endl;
-          return false;
-        }
-
-      if (subsection_path.size() == 0)
-        {
-          std::cerr << "Line <" << current_line_n
-                    << "> of file <" << input_filename
-                    << ">: There is no subsection to leave here!" << std::endl;
-          return false;
-        }
-      else
-        {
-          leave_subsection ();
-          return true;
-        }
-
+      AssertThrow (line.size() == 0,
+                   ExcCannotParseLine (current_line_n,
+                                       input_filename,
+                                       "Invalid content after 'end' or 'END' statement."));
+      AssertThrow (subsection_path.size() != 0,
+                   ExcCannotParseLine (current_line_n,
+                                       input_filename,
+                                       "There is no subsection to leave here."));
+      leave_subsection ();
     }
-
   // regular entry
-  if ((line.find ("SET ") == 0) ||
-      (line.find ("set ") == 0))
+  else if ((line.find ("SET ") == 0) ||
+           (line.find ("set ") == 0))
     {
       // erase "set" statement
       line.erase (0, 4);
 
       std::string::size_type pos = line.find("=");
-      if (pos == std::string::npos)
-        {
-          std::cerr << "Line <" << current_line_n
-                    << "> of file <" << input_filename
-                    << ">: invalid format of set expression!" << std::endl;
-          return false;
-        }
+      AssertThrow (pos != std::string::npos,
+                   ExcCannotParseLine (current_line_n,
+                                       input_filename,
+                                       "Invalid format of 'set' or 'SET' statement."));
 
       // extract entry name and value and trim
       std::string entry_name = Utilities::trim(std::string(line, 0, pos));
@@ -2968,45 +2984,29 @@ ParameterHandler::scan_line (std::string         line,
             {
               const unsigned int pattern_index
                 = entries->get<unsigned int> (path + path_separator + "pattern");
-              if (!patterns[pattern_index]->match(entry_value))
-                {
-                  std::cerr << "Line <" << current_line_n
-                            << "> of file <" << input_filename
-                            << ">:" << std::endl
-                            << "    The entry value" << std::endl
-                            << "        " << entry_value << std::endl
-                            << "    for the entry named" << std::endl
-                            << "        " << entry_name << std::endl
-                            << "    does not match the given pattern" << std::endl
-                            << "        " << patterns[pattern_index]->description()
-                            << std::endl;
-                  return false;
-                }
+              AssertThrow (patterns[pattern_index]->match (entry_value),
+                           ExcInvalidEntryForPattern (current_line_n,
+                                                      input_filename,
+                                                      entry_value,
+                                                      entry_name,
+                                                      patterns[pattern_index]->description()));
             }
 
           entries->put (path + path_separator + "value",
                         entry_value);
-          return true;
         }
       else
         {
-          std::cerr << "Line <" << current_line_n
-                    << "> of file <" << input_filename
-                    << ">: No such entry was declared:" << std::endl
-                    << "    " << entry_name << std::endl
-                    << "    <Present subsection:" << std::endl;
-          for (unsigned int i=0; i<subsection_path.size(); ++i)
-            std::cerr << std::setw(i*2+8) << " "
-                      << "subsection " << subsection_path[i] << std::endl;
-          std::cerr << "    >" << std::endl;
-
-          return false;
+          AssertThrow (false,
+                       ExcCannotParseLine(current_line_n,
+                                          input_filename,
+                                          ("No entry with name <" + entry_name +
+                                           "> was declared in the current subsection.")));
         }
     }
-
   // an include statement?
-  if ((line.find ("INCLUDE ") == 0) ||
-      (line.find ("include ") == 0))
+  else if ((line.find ("INCLUDE ") == 0) ||
+           (line.find ("include ") == 0))
     {
       // erase "include " statement and eliminate spaces
       line.erase (0, 7);
@@ -3014,37 +3014,33 @@ ParameterHandler::scan_line (std::string         line,
         line.erase (0, 1);
 
       // the remainder must then be a filename
-      if (line.size() == 0)
-        {
-          std::cerr << "Line <" << current_line_n
-                    << "> of file <" << input_filename
-                    << "> is an include statement but does not name a file!"
-                    << std::endl;
-
-          return false;
-        }
+      AssertThrow (line.size() !=0,
+                   ExcCannotParseLine (current_line_n,
+                                       input_filename,
+                                       "The current line is an 'include' or "
+                                       "'INCLUDE' statement, but it does not "
+                                       "name a file for inclusion."));
 
       std::ifstream input (line.c_str());
-      if (!input)
-        {
-          std::cerr << "Line <" << current_line_n
-                    << "> of file <" << input_filename
-                    << "> is an include statement but the file <"
-                    << line << "> could not be opened!"
-                    << std::endl;
-
-          return false;
-        }
-      else
-        return read_input (input);
+      AssertThrow (input, ExcCannotOpenIncludeStatementFile (current_line_n,
+                                                             input_filename,
+                                                             line));
+      parse_input (input);
     }
-
-  // this line matched nothing known
-  std::cerr << "Line <" << current_line_n
-            << "> of file <" << input_filename
-            << ">: This line matched nothing known ('set' or 'subsection' missing!?):" << std::endl
-            << "    " << line << std::endl;
-  return false;
+  else
+    {
+      AssertThrow (false,
+                   ExcCannotParseLine (current_line_n,
+                                       input_filename,
+                                       "The line\n\n"
+                                       "        <"
+                                       + original_line
+                                       + ">\n\n"
+                                       "could not be parsed: please check to "
+                                       "make sure that the file is not missing a "
+                                       "'set', 'include', 'subsection', or 'end' "
+                                       "statement."));
+    }
 }
 
 
@@ -3101,16 +3097,45 @@ MultipleParameterLoop::~MultipleParameterLoop ()
 
 
 
-bool MultipleParameterLoop::read_input (std::istream &input,
-                                        const std::string &filename,
-                                        const std::string &last_line)
+bool
+MultipleParameterLoop::read_input (std::istream &input,
+                                   const std::string &filename,
+                                   const std::string &last_line)
+{
+
+  try
+    {
+      MultipleParameterLoop::parse_input(input, filename, last_line);
+      return true;
+    }
+  catch (const ExcIO &exc)
+    {
+      throw;
+    }
+  // This catch block more or less duplicates the old behavior of this function,
+  // which was to print something to stderr for every parsing error (which are
+  // now exceptions) and then return false.
+  catch (const ExceptionBase &exc)
+    {
+      std::cerr << exc.what() << std::endl;
+    }
+  return false;
+}
+
+
+
+void
+MultipleParameterLoop::parse_input (std::istream &input,
+                                    const std::string &filename,
+                                    const std::string &last_line)
 {
   AssertThrow (input, ExcIO());
 
-  bool x = ParameterHandler::read_input (input, filename, last_line);
-  if (x)
-    init_branches ();
-  return x;
+  // Note that (to avoid infinite recursion) we have to explicitly call the
+  // base class version of parse_input and *not* a wrapper (which may be
+  // virtual and lead us back here)
+  ParameterHandler::parse_input (input, filename, last_line);
+  init_branches ();
 }
 
 

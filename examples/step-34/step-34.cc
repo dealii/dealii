@@ -417,7 +417,7 @@ namespace Step34
     // After declaring all these parameters to the ParameterHandler object,
     // let's read an input file that will give the parameters their values. We
     // then proceed to extract these values from the ParameterHandler object:
-    prm.read_input(filename);
+    prm.parse_input(filename);
 
     n_cycles = prm.get_integer("Number of cycles");
     external_refinement = prm.get_integer("External refinement");

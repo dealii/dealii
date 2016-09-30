@@ -1,0 +1,13 @@
+
+DEAL::ExcCannotParseLine (current_line_n, input_filename, "The line\n\n" "        <" + original_line + ">\n\n" "could not be parsed: please check to " "make sure that the file is not missing a " "'set', 'include', 'subsection', or 'end' " "statement.")
+Line <8> of file <prm/parameter_handler_backslash_05.prm>: The line
+
+        <b, c>
+
+could not be parsed: please check to make sure that the file is not missing a 'set', 'include', 'subsection', or 'end' statement.
+DEAL::ExcCannotParseLine (current_line_n, input_filename, "The line\n\n" "        <" + original_line + ">\n\n" "could not be parsed: please check to " "make sure that the file is not missing a " "'set', 'include', 'subsection', or 'end' " "statement.")
+Line <8> of file <input file>: The line
+
+        <b, c>
+
+could not be parsed: please check to make sure that the file is not missing a 'set', 'include', 'subsection', or 'end' statement.

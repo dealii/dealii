@@ -1756,7 +1756,7 @@ int main (int argc, char **argv)
       NeutronDiffusionProblem<dim>::Parameters parameters;
       parameters.declare_parameters (parameter_handler);
 
-      parameter_handler.read_input (filename);
+      parameter_handler.parse_input (filename);
 
       parameters.get_parameters (parameter_handler);
 

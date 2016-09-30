@@ -406,7 +406,7 @@ namespace Step44
     {
       ParameterHandler prm;
       declare_parameters(prm);
-      prm.read_input(input_file);
+      prm.parse_input(input_file);
       parse_parameters(prm);
     }
 

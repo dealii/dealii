@@ -38,6 +38,15 @@ inconvenience this causes.
 </p>
 
 <ol>
+ <li> Deprecated: ParameterHandler::read_input,
+ ParameterHandler::read_input_from_xml, and
+ ParameterHandler::read_input_from_string are now deprecated in favor of
+ ParameterHandler::parse_input, ParameterHandler::parse_input_from_xml, and
+ ParameterHandler::parse_input_from_string. These new functions throw
+ exceptions to indicate failure instead of using return codes.
+ <br>
+ (David Wells, 2016/09/15)
+ </li>
 
  <li> Deprecated: MGCoarseGridLACIteration got deprecated in favor of
  MGCoarseGridIterativeSolver.
