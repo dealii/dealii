@@ -237,7 +237,7 @@ namespace TrilinosWrappers
               owned_elements.compress();
             }
         }
-#ifdef DEBUG
+#if defined(DEBUG) && defined(DEAL_II_WITH_MPI)
       const MPI_Comm mpi_communicator
         = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()))->Comm();
       const size_type n_elements_global
@@ -357,7 +357,7 @@ namespace TrilinosWrappers
 
           last_action = Insert;
         }
-#ifdef DEBUG
+#if defined(DEBUG) && defined(DEAL_II_WITH_MPI)
       const MPI_Comm mpi_communicator
         = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()))->Comm();
       const size_type n_elements_global
@@ -435,7 +435,7 @@ namespace TrilinosWrappers
 
           last_action = Insert;
         }
-#ifdef DEBUG
+#if defined(DEBUG) && defined(DEAL_II_WITH_MPI)
       const MPI_Comm mpi_communicator
         = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()))->Comm();
       const size_type n_elements_global
