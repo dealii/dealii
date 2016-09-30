@@ -137,19 +137,17 @@ FiniteElement<2,2>::InternalDataBase *
 FE_P1NC::get_data (const UpdateFlags update_flags,
                    const Mapping<2,2> &,
                    const Quadrature<2> &quadrature,
-                   dealii::internal::FEValues::FiniteElementRelatedData<2,2> &) const
+                   dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
 {
-  InternalData *data = new InternalData;
+  FiniteElement<2,2>::InternalDataBase *data = new FiniteElement<2,2>::InternalDataBase;
 
   data->update_each = requires_update_flags(update_flags);
 
   // hessian
+  const unsigned int n_q_points = quadrature.size();
+  output_data.initialize (n_q_points, FE_P1NC(), data->update_each);
   if (data->update_each & update_hessians)
-    {
-      const unsigned int n_q_points = quadrature.size();
-      data->shape_hessians.reinit (this->dofs_per_cell, n_q_points);
-      data->shape_hessians.fill(Tensor<2,2>());
-    }
+    output_data.shape_hessians.fill(Tensor<2,2>());
 
   return data;
 }
@@ -159,16 +157,13 @@ FE_P1NC::get_data (const UpdateFlags update_flags,
 void
 FE_P1NC::fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell,
                          const CellSimilarity::Similarity,
-                         const Quadrature<2>                               &quadrature,
-                         const Mapping<2,2>                                &mapping,
+                         const Quadrature<2> &,
+                         const Mapping<2,2> &,
                          const Mapping<2,2>::InternalDataBase &,
                          const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
                          const FiniteElement<2,2>::InternalDataBase        &fe_internal,
                          internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
 {
-  Assert (dynamic_cast<const InternalData *> (&fe_internal) != 0, ExcInternalError());
-  const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
-
   const UpdateFlags flags(fe_internal.update_each);
 
   const unsigned int n_q_points = mapping_data.quadrature_points.size();
@@ -199,10 +194,6 @@ FE_P1NC::fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell
               }
           }
       }
-
-  // hessian
-  if (flags & update_hessians)
-    output_data.shape_hessians = fe_data.shape_hessians;
 }
 
 

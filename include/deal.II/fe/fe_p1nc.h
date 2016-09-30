@@ -280,7 +280,7 @@ private:
   virtual FiniteElement<2,2>::InternalDataBase *
   get_data (const UpdateFlags update_flags,
             const Mapping<2,2> &,
-            const Quadrature<2> &,
+            const Quadrature<2> &quadrature,
             dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;
 
   /**
@@ -289,8 +289,8 @@ private:
   virtual void
   fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell,
                   const CellSimilarity::Similarity,
-                  const Quadrature<2>                               &quadrature,
-                  const Mapping<2,2>                                &mapping,
+                  const Quadrature<2> &,
+                  const Mapping<2,2> &,
                   const Mapping<2,2>::InternalDataBase &,
                   const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
                   const FiniteElement<2,2>::InternalDataBase        &fe_internal,
@@ -327,12 +327,6 @@ private:
    * Create the constraints matrix for hanging edges.
    */
   void initialize_constraints ();
-
-  class InternalData : public FiniteElement<2,2>::InternalDataBase
-  {
-  public:
-    Table<2,Tensor<2,2> > shape_hessians;
-  };
 
 };
 
