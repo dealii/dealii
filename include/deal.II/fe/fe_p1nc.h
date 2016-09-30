@@ -29,25 +29,27 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * Implementation for the scalar version of the P1 nonconforming finite
+ * Implementation of the scalar version of the P1 nonconforming finite
  * element, a piecewise linear element on quadrilaterals in 2D.
- * This implementation is only for 2D and codimension = 0.
+ * This implementation is only for 2D cells in a 2D space (i.e., codimension 0).
  *
- * Unlike any continuous conforming finite element which belongs to $H^1_0$,
- * the P1 nonconforming element does not enforce the continuity across edges.
- * But it requires the continuity just in integral sense:
+ * Unlike the usual continuous, $H^1$ conforming finite elements,
+ * the P1 nonconforming element does not enforce continuity across edges.
+ * However, it requires the continuity in an integral sense:
  * any function in the space should have the same integral values
  * on two sides of the common edge shared by two adjacent elements.
  *
- * Thus each function in the nonconforming element space can be discontinuous,
- * not included in $H^1_0$, as functions in Discontinuous Galerkin (DG) finite
- * element spaces.
- * Although any function in DG space also has nonconformity,
- * it is completely discontinuous across edges without any relation.
- * This is a reason why usual weak formulations for DG schemes contain
- * additional penalty terms for jump across edges to control discontinuity.
- * However nonconforming elements usually do not need additional terms
- * in their weak formulations due to the continuity in integral on edges.
+ * Thus, each function in the nonconforming element space can be
+ * discontinuous, and consequently not included in $H^1_0$, just like
+ * the basis functions in Discontinuous Galerkin (DG) finite element
+ * spaces. On the other hand, basis functions in DG spaces are
+ * completely discontinuous across edges without any relation between
+ * the values from both sides.  This is a reason why usual weak
+ * formulations for DG schemes contain additional penalty terms for
+ * jump across edges to control discontinuity.  However, nonconforming
+ * elements usually do not need additional terms in their weak
+ * formulations because their integrals along edges are the same from
+ * both sides, i.e., there is <i>some level</i> of continuity.
  *
  * <h3>Dice Rule</h3>
  * Since any function in the P1 nonconforming space is piecewise linear on each element,
@@ -56,35 +58,35 @@ DEAL_II_NAMESPACE_OPEN
  * the continuity of the midpoint value of each edge in this case.
  *
  * Thus for the P1 nonconforming element, the function values at midpoints on edges of a cell are important.
- * The first attempt to define (local) degrees of freedom (DOFs) on a quadrilateral
+ * The first attempt to define (local) degrees of freedom (DoFs) on a quadrilateral
  * is by using midpoint values of a function.
  *
  * However, these 4 functionals are not linearly independent
  * because a linear function on 2D is uniquely determined by only 3 independent values.
- * A simple observation reads that any linear function on a quadrilateral should satisfies the 'dice rule':
- * the sum of two function values at two midpoints of the edge pair on opposite
- * position is equal to the sum of those of the other edge pair.
+ * A simple observation reads that any linear function on a quadrilateral should satisfy the 'dice rule':
+ * the sum of two function values at the midpoints of the edge pair on opposite
+ * sides of a cell is equal to the sum of those at the midpoints of the other edge pair.
  * This is called the 'dice rule' because the number of points on opposite sides of a dice always
  * adds up to the same number as well (in the case of dice, to seven).
  *
  * In formulas, the dice rule is written as $\phi(m_0) + \phi(m_1) = \phi(m_2) + \phi(m_3)$
  * for all $\phi$ in the function space where $m_j$ is the midpoint of the edge $e_j$.
  * Here, we assume the standard numbering convention for edges used in deal.II
- * and described for class GeometryInfo.
+ * and described in class GeometryInfo.
  *
- * Conversely if 4 values at midpoints satisfying the dice rule are just given,
+ * Conversely if 4 values at midpoints satisfying the dice rule are given,
  * then there always exists the unique linear function which coincides with 4 midpoints values.
  *
  * Due to the dice rule, three values at any three midpoints can determine
  * the last value at the last midpoint.
  * It means that the number of independent local functionals on a cell is 3,
- * and it is same as the dimension of the linear polynomial space on a cell in 2D.
+ * and this is also the dimension of the linear polynomial space on a cell in 2D.
  *
  * <h3>Shape functions</h3>
- * Before introduction of the DOFs, we present 4 local shape functions on a cell.
+ * Before introducing the degrees of freedom, we present 4 local shape functions on a cell.
  * Due to the dice rule, we need a special construction for shape functions.
  * Although the following 4 shape functions are not linearly independent within a cell,
- * they are helpful to define the global basis functions which are linearly independent on whole domain.
+ * they are helpful to define the global basis functions which are linearly independent on the whole domain.
  * Again, we assume the standard numbering for vertices used in deal.II.
  *
  *  @verbatim
@@ -102,13 +104,17 @@ DEAL_II_NAMESPACE_OPEN
  *  @endverbatim
  *
  * For each vertex $v_j$ of given cell, there are two edges of which $v_j$ is one of end points.
- * Consider a linear function such that 0.5 value at two midpoints of such edges,
- * and 0.0 at two midpoints of other edges.
+ * Consider a linear function such that it has value 0.5 at the midpoints of two adjacent edges,
+ * and 0.0 at the two midpoints of the other edges.
  * Note that the set of these values satisfies the dice rule which is described above.
  * We denote such a function associated with vertex $v_j$ by $\phi_j$.
  * Then the set of 4 shape functions is a partition of unity on a cell: $\sum_{j=0}^{3} \phi_j = 1$.
+ * (This is easy to see: at each edge midpoint, the sum of the four function adds up to one
+ * because two functions have value 0.5 and the other value 0.0. Because the function is globally
+ * linear, the only function that can have value 1 at four points must also be globally
+ * equal to one.)
  *
- * The following figures represent $\phi_j$ for $j=0,\cdots,3$ with its midpoint values.
+ * The following figures represent $\phi_j$ for $j=0,\cdots,3$ with their midpoint values:
  *
  * <ul>
  * <li> shape function $\phi_0$:
@@ -173,61 +179,63 @@ DEAL_II_NAMESPACE_OPEN
  *
  * </ul>
  *
- * The local DOFs are defined by the coefficients of the shape functions associated vertices, respectively.
- * Although these 4 local DOFs are not linearly independent within a single cell as well,
- * this definition is a good start point for the definition of the global DOFs.
+ * The local DoFs are defined by the coefficients of the shape functions associated with vertices, respectively.
+ * Although these 4 local DoFs are not linearly independent within a single cell,
+ * this definition is a good start point for the definition of the global DoFs.
  *
  * We want to emphasize that the shape functions are constructed on each cell, not on the reference cell only.
  * Usual finite elements are defined based on a 'parametric' concept.
- * It means that a function space for a finite element is defined on one reference cell, and it is transfomed
+ * It means that a function space for a finite element is defined on one reference cell, and it is transformed
  * into each cell via a mapping from the reference cell.
  * However the P1 nonconforming element does not follow such concept. It defines a function space with
  * linear shape functions on each cell without any help of a function space on the reference cell.
  * In other words, the element is defined in real space, not via a mapping from a reference cell.
+ * In this, it is similar to the FE_DGPNonparametric element.
  *
  * Thus this implementation does not have to compute shape values on the reference cell.
- * Rather than, the shape values are computed by construction of the shape functions
+ * Rather, the shape values are computed by construction of the shape functions
  * on each cell independently.
  *
- * <h3>DOFs</h3>
- * We have to consider the basis function for the element space in global domain
- * because the system of equations which we have to solve at last is for a global system, not local.
- * The global basis function associated with a node is defined by a cell-wise composition of
+ * <h3>Degrees of freedom</h3>
+ * We next have to consider the <i>global</i> basis functions for the element
+ * because the system of equations which we ultimately have to solve is for a global system, not local.
+ * The global basis functions associated with a node are defined by a cell-wise composition of
  * local shape functions associated with the node on each element.
- * And we define a global DOF associated with a node by a coefficient of the basis function associated with that node.
  *
  * There is a theoretical result about the linear independency of the global basis functions
  * depending on the type of the boundary condition we consider.
  *
- * When the homogeneous Dirichlet boundary condition is given,
+ * When homogeneous Dirichlet boundary conditions are given,
  * the global basis functions associated with interior nodes are linearly independent.
- * And the number of DOFs is equal to the number of interior nodes,
- * same as the number of DOFs for the standard bilinear finite element @p Q_1.
+ * Then, the number of DoFs is equal to the number of interior nodes,
+ * and consequently the same as the number of DoFs for the standard bilinear $Q_1$ finite element.
  *
- * When the Neumann boundary condition is given,
+ * When Neumann boundary conditions are given,
  * the global basis functions associated with all nodes (including boundary nodes)
  * are actually not linearly independent. There exists one redundancy.
- * Thus in this case, the number of DOFs is equal to the number of all nodes minus 1.
+ * Thus in this case, the number of DoFs is equal to the number of all nodes minus 1. This is, again
+ * as for the regular $Q_1$ element.
  *
  * <h3>Unit support points</h3>
  * For a smooth function, we construct a piecewise linear function which belongs to the element space by
- * using its nodal values as DOF values.
+ * using its nodal values as DoF values.
  *
  * Note that for the P1 nonconforming element two nodal values of a smooth function and its interpolant do not
- * coincide in general, contrast with ordinary Lagrange finite elements.
+ * coincide in general, in contrast with ordinary Lagrange finite elements.
  * Of course, it is meaningless to refer 'nodal value' because the element space has nonconformity.
- * But it is also true even though the single global basis function associated a node is considered
- * with the unique 'nodal value' at the node.
+ * But it is also true even though the single global basis function associated with a node is considered
+ * the unique 'nodal value' at the node.
  * For instance, consider the basis function associated with a node.
  * Consider two lines representing the level sets for value 0.5 and 0, respectively, by connecting two midpoints.
  * Then we cut the quad into two sub-triangles by the diagonal which is placed along those two lines.
  * It gives another level set for value 0.25 which coincides with the cutting diagonal.
  * Therefore these three level sets are all parallel in the quad and it gives the value 0.75 at the base node, not value 1.
- * Even though a general quad is given, this is also true.
+ * This is true whether the quadrilateral is a rectangle, parallelogram, or any other shape.
  *
  * <h3>References</h3>
- * You can find the original paper for the P1 nonconforming element which is
- * accessible at http://epubs.siam.org/doi/abs/10.1137/S0036142902404923.
+ * The original paper for the P1 nonconforming element is
+ * accessible at http://epubs.siam.org/doi/abs/10.1137/S0036142902404923
+ * and has the following complete reference:
  * @code(.bib)
  * @article{park2003p,
  *   title =     {P 1-nonconforming quadrilateral finite element methods for second-order elliptic problems},
@@ -241,6 +249,7 @@ DEAL_II_NAMESPACE_OPEN
  * }
  * @endcode
  *
+ * @author Jaeryun Yim, 2015, 2016.
  */
 class FE_P1NC : public FiniteElement<2,2>
 {
