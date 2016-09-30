@@ -475,14 +475,26 @@ public:
   double get_inhomogeneity (const size_type line) const;
 
   /**
-   * Print the constraint lines. Mainly for debugging purposes.
+   * Print the constraints represented by the current object to the
+   * given stream.
    *
-   * This function writes out all entries in the constraint matrix lines with
-   * their value in the form <tt>row col : value</tt>. Unconstrained lines
-   * containing only one identity entry are not stored in this object and are
-   * not printed.
+   * For each constraint of the form
+   * @f[
+   *  x_{42} = 0.5 x_2 + 0.25 x_{14} + 2.75
+   * @f]
+   * this function will write a sequence of lines that look like this:
+   * @code
+   *   42 2 : 0.5
+   *   42 14 : 0.25
+   *   42 : 2.75
+   * @endcode
+   * The last line is only shown if the inhomogeneity (here: 2.75) is
+   * nonzero.
+   *
+   * A block of lines such as the one above is repeated for each
+   * constrained degree of freedom.
    */
-  void print (std::ostream &) const;
+  void print (std::ostream &out) const;
 
   /**
    * Write the graph of constraints in 'dot' format. 'dot' is a program that
