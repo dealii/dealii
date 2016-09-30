@@ -30,8 +30,6 @@
 #include <fstream>
 #include <string>
 
-#define PRECISION 5
-
 
 
 template<int dim>
@@ -64,7 +62,7 @@ int
 main()
 {
   std::ofstream logfile ("output");
-  deallog << std::setprecision(PRECISION);
+  deallog << std::setprecision(5);
   deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
@@ -72,6 +70,3 @@ main()
 
   check<2>();
 }
-
-
-

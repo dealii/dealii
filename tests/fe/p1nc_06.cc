@@ -31,16 +31,15 @@
 #include <fstream>
 #include <string>
 
-#define PRECISION 5
 
 
 template<int dim>
 Point<dim> stretch (const Point<dim> &p)
 {
-  Point<dim> q = p ;
-  q(dim-1) *= 2. ;
+  Point<dim> q = p;
+  q(dim-1) *= 2.;
 
-  return q ;
+  return q;
 }
 
 
@@ -51,7 +50,7 @@ check()
 {
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube (triangulation, 0., 5.);
-  GridTools::transform (&stretch<dim>, triangulation) ;
+  GridTools::transform (&stretch<dim>, triangulation);
 
   FE_P1NC fe;
   DoFHandler<dim> dof_handler (triangulation);
@@ -76,7 +75,7 @@ int
 main()
 {
   std::ofstream logfile ("output");
-  deallog << std::setprecision(PRECISION);
+  deallog << std::setprecision(5);
   deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
@@ -84,6 +83,3 @@ main()
 
   check<2>();
 }
-
-
-
