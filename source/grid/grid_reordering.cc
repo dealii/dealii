@@ -147,7 +147,7 @@ namespace internal
 
 
     template <int dim>
-    struct Edge;
+    class Edge;
 
     /**
      * A class that describes all of the relevant properties of an
@@ -159,8 +159,10 @@ namespace internal
      * the second, the other way around, or so far undetermined.
      */
     template <>
-    struct Edge<2>
+    class Edge<2>
     {
+    public:
+
       static const unsigned int dim = 2;
 
       /**
@@ -172,14 +174,6 @@ namespace internal
       {
         for (unsigned int i=0; i<2; ++i)
           vertex_indices[i] = numbers::invalid_unsigned_int;
-
-        for (unsigned int i=0; i<2; ++i)
-          {
-            static const AdjacentCell invalid_cell = { numbers::invalid_unsigned_int,
-                                                       numbers::invalid_unsigned_int
-                                                     };
-            adjacent_cells[i] = invalid_cell;
-          }
       }
 
       /**
@@ -201,14 +195,6 @@ namespace internal
         // bring them into standard orientation
         if (vertex_indices[0] > vertex_indices[1])
           std::swap (vertex_indices[0], vertex_indices[1]);
-
-        for (unsigned int i=0; i<2; ++i)
-          {
-            static const AdjacentCell invalid_cell = { numbers::invalid_unsigned_int,
-                                                       numbers::invalid_unsigned_int
-                                                     };
-            adjacent_cells[i] = invalid_cell;
-          }
       }
 
       /**
@@ -240,7 +226,7 @@ namespace internal
       void add_adjacent_cell (const unsigned int cell_index,
                               const unsigned int edge_within_cell)
       {
-        const AdjacentCell adjacent_cell = { cell_index, edge_within_cell };
+        const AdjacentCell adjacent_cell (cell_index, edge_within_cell);
         if (adjacent_cells[0].cell_index == numbers::invalid_unsigned_int)
           adjacent_cells[0] = adjacent_cell;
         else
@@ -276,6 +262,26 @@ namespace internal
        */
       struct AdjacentCell
       {
+        /**
+         * Default constructor. Initialize the fields with invalid values.
+         */
+        AdjacentCell ()
+          :
+          cell_index (numbers::invalid_unsigned_int),
+          edge_within_cell (numbers::invalid_unsigned_int)
+        {}
+
+        /**
+         * Constructor. Initialize the fields with the given values.
+         */
+        AdjacentCell (const unsigned int cell_index,
+                      const unsigned int edge_within_cell)
+          :
+          cell_index (cell_index),
+          edge_within_cell (edge_within_cell)
+        {}
+
+
         unsigned int cell_index;
         unsigned int edge_within_cell;
       };
@@ -304,10 +310,9 @@ namespace internal
       }
 
       /**
-       * Construct a Cell object from a CellData object. Also take a (sorted)
-       * list of edges and to point into from the current object.
-       * @param c
-       * @param edge_list
+       * Construct a Cell object from a CellData object. Also take a
+       * (sorted) list of edges and to point the edges of the current
+       * object into this list of edges.
        */
       Cell (const CellData<dim>           &c,
             const std::vector<Edge<dim> > &edge_list)
@@ -417,7 +422,7 @@ namespace internal
 
     /**
      * Given a set of cells and edges, orient all edges that are
-     * (globall) parallel to the one identified by the @p cell and
+     * (global) parallel to the one identified by the @p cell and
      * within it the one with index @p local_edge.
      */
     void
