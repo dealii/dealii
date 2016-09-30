@@ -242,7 +242,6 @@ DEAL_II_NAMESPACE_OPEN
  * @endcode
  *
  */
-
 class FE_P1NC : public FiniteElement<2,2>
 {
 
