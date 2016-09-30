@@ -97,6 +97,8 @@ DEAL_II_NAMESPACE_OPEN
  * operations for several cells with one CPU instruction and is one of the
  * main features of this framework.
  *
+ * For details on usage of this class, see the description of FEEvaluation.
+ *
  * @author Katharina Kormann, Martin Kronbichler, 2010, 2011
  */
 
