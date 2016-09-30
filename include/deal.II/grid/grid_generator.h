@@ -875,7 +875,7 @@ namespace GridGenerator
    * before gluing the loop together.
    * @param R           The radius of the circle, which forms the middle line
    * of the torus containing the loop of cells. Must be greater than @p r.
-   * @param r           The radius of the cylinder bend together as loop.
+   * @param r           The radius of the cylinder bent together as a loop.
    */
   void moebius (Triangulation<3,3> &tria,
                 const unsigned int  n_cells,
