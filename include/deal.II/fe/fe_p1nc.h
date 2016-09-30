@@ -286,15 +286,15 @@ private:
 
   virtual FiniteElement<2,2>::InternalDataBase *
   get_face_data (const UpdateFlags update_flags,
-		 const Mapping<2,2> &,
-		 const Quadrature<1> &quadrature,
-		 dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;
+                 const Mapping<2,2> &,
+                 const Quadrature<1> &quadrature,
+                 dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;
 
   virtual FiniteElement<2,2>::InternalDataBase *
   get_subface_data (const UpdateFlags update_flags,
-		    const Mapping<2,2> &,
-		    const Quadrature<1> &quadrature,
-		    dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;
+                    const Mapping<2,2> &,
+                    const Quadrature<1> &quadrature,
+                    dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const;
 
   /**
    * Compute the data on the current cell.

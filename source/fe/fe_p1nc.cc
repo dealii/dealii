@@ -156,9 +156,9 @@ FE_P1NC::get_data (const UpdateFlags update_flags,
 
 FiniteElement<2,2>::InternalDataBase *
 FE_P1NC::get_face_data (const UpdateFlags update_flags,
-			const Mapping<2,2> &,
-			const Quadrature<1> &quadrature,
-			dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
+                        const Mapping<2,2> &,
+                        const Quadrature<1> &quadrature,
+                        dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
 {
   FiniteElement<2,2>::InternalDataBase *data = new FiniteElement<2,2>::InternalDataBase;
 
@@ -177,9 +177,9 @@ FE_P1NC::get_face_data (const UpdateFlags update_flags,
 
 FiniteElement<2,2>::InternalDataBase *
 FE_P1NC::get_subface_data (const UpdateFlags update_flags,
-			   const Mapping<2,2> &,
-			   const Quadrature<1> &quadrature,
-			   dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
+                           const Mapping<2,2> &,
+                           const Quadrature<1> &quadrature,
+                           dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
 {
   FiniteElement<2,2>::InternalDataBase *data = new FiniteElement<2,2>::InternalDataBase;
 
@@ -266,21 +266,21 @@ FE_P1NC::fill_fe_face_values (const Triangulation<2,2>::cell_iterator           
   for (unsigned int i=0; i<quadrature_on_face.size(); ++i)
     {
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-	{
-	  if (flags & update_values)
-	    {
-	      quadrature_point = mapping.transform_unit_to_real_cell(cell, quadrature_on_face.point(i));
-	      values[k] = coeffs[k][0]*quadrature_point(0) + coeffs[k][1]*quadrature_point(1) + coeffs[k][2];
-	      output_data.shape_values[k][i] = values[k];
-	    }
+        {
+          if (flags & update_values)
+            {
+              quadrature_point = mapping.transform_unit_to_real_cell(cell, quadrature_on_face.point(i));
+              values[k] = coeffs[k][0]*quadrature_point(0) + coeffs[k][1]*quadrature_point(1) + coeffs[k][2];
+              output_data.shape_values[k][i] = values[k];
+            }
 
-	  if (flags & update_gradients)
-	    {
-	      grads[k][0] = coeffs[k][0];
-	      grads[k][1] = coeffs[k][1];
-	      output_data.shape_gradients[k][i] = grads[k];
-	    }
-	}
+          if (flags & update_gradients)
+            {
+              grads[k][0] = coeffs[k][0];
+              grads[k][1] = coeffs[k][1];
+              output_data.shape_gradients[k][i] = grads[k];
+            }
+        }
     }
 }
 
@@ -313,21 +313,21 @@ FE_P1NC::fill_fe_subface_values (const Triangulation<2,2>::cell_iterator        
   for (unsigned int i=0; i<quadrature_on_subface.size(); ++i)
     {
       for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-	{
-	  if (flags & update_values)
-	    {
-	      quadrature_point = mapping.transform_unit_to_real_cell(cell, quadrature_on_subface.point(i));
-	      values[k] = coeffs[k][0]*quadrature_point(0) + coeffs[k][1]*quadrature_point(1) + coeffs[k][2];
-	      output_data.shape_values[k][i] = values[k];
-	    }
+        {
+          if (flags & update_values)
+            {
+              quadrature_point = mapping.transform_unit_to_real_cell(cell, quadrature_on_subface.point(i));
+              values[k] = coeffs[k][0]*quadrature_point(0) + coeffs[k][1]*quadrature_point(1) + coeffs[k][2];
+              output_data.shape_values[k][i] = values[k];
+            }
 
-	  if (flags & update_gradients)
-	    {
-	      grads[k][0] = coeffs[k][0];
-	      grads[k][1] = coeffs[k][1];
-	      output_data.shape_gradients[k][i] = grads[k];
-	    }
-	}
+          if (flags & update_gradients)
+            {
+              grads[k][0] = coeffs[k][0];
+              grads[k][1] = coeffs[k][1];
+              output_data.shape_gradients[k][i] = grads[k];
+            }
+        }
     }
 }
 
