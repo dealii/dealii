@@ -57,7 +57,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Thus for the P1 nonconforming element, the function values at midpoints on edges of a cell are important.
  * The first attempt to define (local) degrees of freedom (DOFs) on a quadrilateral
- * is by using midpoint values of a function as usual nonconforming finite elements.
+ * is by using midpoint values of a function.
  *
  * However, these 4 functionals are not linearly independent
  * because a linear function on 2D is uniquely determined by only 3 independent values.
@@ -81,7 +81,7 @@ DEAL_II_NAMESPACE_OPEN
  * and it is same as the dimension of the linear polynomial space on a cell in 2D.
  *
  * <h3>Shape functions</h3>
- * Before introducing the DOFs, we present 4 local shape functions on a cell.
+ * Before introduction of the DOFs, we present 4 local shape functions on a cell.
  * Due to the dice rule, we need a special construction for shape functions.
  * Although the following 4 shape functions are not linearly independent within a cell,
  * they are helpful to define the global basis functions which are linearly independent on whole domain.
@@ -108,7 +108,7 @@ DEAL_II_NAMESPACE_OPEN
  * We denote such a function associated with vertex $v_j$ by $\phi_j$.
  * Then the set of 4 shape functions is a partition of unity on a cell: $\sum_{j=0}^{3} \phi_j = 1$.
  *
- * The following figures represent $\phi_j$, $j=0,\cdots,3$ with its values at midpoints.
+ * The following figures represent $\phi_j$ for $j=0,\cdots,3$ with its midpoint values.
  *
  * <ul>
  * <li> shape function $\phi_0$:
@@ -179,7 +179,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * We want to emphasize that the shape functions are constructed on each cell, not on the reference cell only.
  * Usual finite elements are defined based on a 'parametric' concept.
- * That means, a function space for a finite element is defined on one reference cell, and it is transfomed
+ * It means that a function space for a finite element is defined on one reference cell, and it is transfomed
  * into each cell via a mapping from the reference cell.
  * However the P1 nonconforming element does not follow such concept. It defines a function space with
  * linear shape functions on each cell without any help of a function space on the reference cell.
@@ -206,31 +206,40 @@ DEAL_II_NAMESPACE_OPEN
  *
  * When the Neumann boundary condition is given,
  * the global basis functions associated with all nodes (including boundary nodes)
- * are actually not linearly independent. There exists 1 redundancy.
+ * are actually not linearly independent. There exists one redundancy.
  * Thus in this case, the number of DOFs is equal to the number of all nodes minus 1.
  *
  * <h3>Unit support points</h3>
  * For a smooth function, we construct a piecewise linear function which belongs to the element space by
  * using its nodal values as DOF values.
- * This interpolation is implemented by using appropriate @p unit_support_points.
  *
- * Note that two nodal values of a smooth function and its interpolant do not coincide in general,
- * contrast with ordinary Lagrange finite elements.
+ * Note that for the P1 nonconforming element two nodal values of a smooth function and its interpolant do not
+ * coincide in general, contrast with ordinary Lagrange finite elements.
  * Of course, it is meaningless to refer 'nodal value' because the element space has nonconformity.
  * But it is also true even though the single global basis function associated a node is considered
- * with a valid expression 'nodal value'.
+ * with the unique 'nodal value' at the node.
  * For instance, consider the basis function associated with a node.
  * Consider two lines representing the level sets for value 0.5 and 0, respectively, by connecting two midpoints.
  * Then we cut the quad into two sub-triangles by the diagonal which is placed along those two lines.
  * It gives another level set for value 0.25 which coincides with the cutting diagonal.
- * Therefore these three level sets are all parallel and it gives the value 0.75 at the base node, not value 1.
+ * Therefore these three level sets are all parallel in the quad and it gives the value 0.75 at the base node, not value 1.
  * Even though a general quad is given, this is also true.
  *
  * <h3>References</h3>
- * You can find the paper about the P1NC element
- * Park & Sheen (2003). P1-nonconforming quadrilateral finite element methods for second-order elliptic problems.
- * SIAM Journal on Numerical Analysis, 41(2), 624-640,
- * available at http://epubs.siam.org/doi/abs/10.1137/S0036142902404923.
+ * You can find the original paper for the P1 nonconforming element which is
+ * accessible at http://epubs.siam.org/doi/abs/10.1137/S0036142902404923.
+ * @code(.bib)
+ * @article{park2003p,
+ *   title =     {P 1-nonconforming quadrilateral finite element methods for second-order elliptic problems},
+ *   author =    {Park, Chunjae and Sheen, Dongwoo},
+ *   journal =   {SIAM Journal on Numerical Analysis},
+ *   volume =    {41},
+ *   number =    {2},
+ *   pages =     {624--640},
+ *   year =      {2003},
+ *   publisher = {SIAM}
+ * }
+ * @endcode
  *
  */
 
