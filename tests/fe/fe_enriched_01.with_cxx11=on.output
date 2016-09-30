@@ -1,0 +1,6 @@
+
+DEAL::Test basic functions:
+DEAL::FE_Enriched<3>[FE_Q<3>(1)-FE_Q<3>(1)]
+DEAL::2
+DEAL::1
+DEAL::16

@@ -28,6 +28,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+template <int dim, int spacedim> class FE_Enriched;
+
 
 /**
  * This class provides an interface to group several elements together into
@@ -959,7 +961,6 @@ private:
       unsigned int> >
       base_elements;
 
-
   /**
    * Initialize the @p unit_support_points field of the FiniteElement class.
    * Called from the constructor.
@@ -1071,6 +1072,8 @@ private:
    * Mutex for protecting initialization of restriction and embedding matrix.
    */
   mutable Threads::Mutex mutex;
+
+  friend class FE_Enriched<dim,spacedim>;
 };
 
 
