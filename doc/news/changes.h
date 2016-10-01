@@ -384,15 +384,21 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: SphericalManifold now behaves correctly also when R>>1
+ and the center is not the origin. 
+ <br>
+ (Luca Heltai, 2016/10/01)
+ </li>
+
  <li> Improved: Some parts of mesh refinement are now parallelized.
- <br/>
+ <br>
  (Wolfgang Bangerth, 2016/09/27)
  </li>
 
  <li> Improved: MGSmootherBlock is now able to use the shared memory pool for
  temporary vector allocation. The constructor requiring an external memory
  allocation has therefore been deprecated.
- <br/>
+ <br>
  (Jonathan Robey, 2016/09/21)
  </li>
 
