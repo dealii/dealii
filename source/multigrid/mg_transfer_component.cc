@@ -238,7 +238,6 @@ MGTransferSelect<number>::do_copy_to_mg (
   // next finer level, which we then
   // already have built.
 
-  bool first = true;
   for (unsigned int level=mg_dof_handler.get_triangulation().n_levels(); level!=0;)
     {
       --level;
@@ -247,14 +246,6 @@ MGTransferSelect<number>::do_copy_to_mg (
       for (IT i=copy_to_and_from_indices[level].begin();
            i != copy_to_and_from_indices[level].end(); ++i)
         dst[level](i->second) = src(i->first);
-      // for that part of the level
-      // which is further refined:
-      // get the defect by
-      // restriction of the defect on
-      // one level higher
-      if (!first)
-        restrict_and_add (level+1, dst[level], dst[level+1]);
-      first = false;
     }
 }
 
