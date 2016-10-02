@@ -215,6 +215,13 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li> New: Add a new FiniteElement class, FE_P1NC, to implement the scalar
+ version of the P1 nonconforming finite element which is a piecewise linear
+ element on quadrilaterals in 2d.
+ <br>
+ (Jaeryun Yim, 2016/10/01)
+ </li>
+
  <li> New: FE_Enriched finite element class implements the partition of unitity
  method which allows to enrich the finite element space based on a priori
  knowledge about solution.
