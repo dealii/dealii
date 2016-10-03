@@ -48,6 +48,7 @@ SET(_src
   fe_enriched.cc
   fe_tools.cc
   fe_tools_interpolate.cc
+  fe_tools_extrapolate.cc
   fe_trace.cc
   fe_values.cc
   fe_values_inst2.cc
@@ -91,6 +92,7 @@ SET(_inst
   fe_enriched.inst.in
   fe_tools.inst.in
   fe_tools_interpolate.inst.in
+  fe_tools_extrapolate.inst.in
   fe_trace.inst.in
   fe_values.decl.1.inst.in
   fe_values.decl.2.inst.in

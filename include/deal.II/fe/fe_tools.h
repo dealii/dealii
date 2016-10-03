@@ -24,7 +24,11 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/symmetric_tensor.h>
+#include <deal.II/distributed/tria.h>
 #include <deal.II/fe/component_mask.h>
+#include <deal.II/lac/parallel_vector.h>
+
+
 
 #include <vector>
 #include <string>
@@ -710,28 +714,29 @@ namespace FETools
    * corresponding cell of `dof2` using the interpolation matrix of the finite
    * element spaces used on these cells and provided by the finite element
    * objects involved. This step is done using the FETools::interpolate()
-   * function. - It then performs a loop over all non-active cells of `dof2`.
+   * function.
+   * - It then performs a loop over all non-active cells of `dof2`.
    * If such a non-active cell has at least one active child, then we call the
    * children of this cell a "patch". We then interpolate from the children of
    * this patch to the patch, using the finite element space associated with
    * `dof2` and immediately interpolate back to the children. In essence, this
    * information throws away all information in the solution vector that lives
-   * on a scale smaller than the patch cell. - Since we traverse non-active
-   * cells from the coarsest to the finest levels, we may find patches that
-   * correspond to child cells of previously treated patches if the mesh had
-   * been refined adaptively (this cannot happen if the mesh has been refined
-   * globally because there the children of a patch are all active). We also
-   * perform the operation described above on these patches, but it is easy to
-   * see that on patches that are children of previously treated patches, the
-   * operation is now the identity operation (since it interpolates from the
-   * children of the current patch a function that had previously been
-   * interpolated to these children from an even coarser patch). Consequently,
-   * this does not alter the solution vector any more.
+   * on a scale smaller than the patch cell.
+   * - Since we traverse non-active cells from the coarsest to the finest
+   * levels, we may find patches that correspond to child cells of previously
+   * treated patches if the mesh had been refined adaptively (this cannot
+   * happen if the  mesh has been refined globally because there the children
+   * of a patch are all active). We also perform the operation described above
+   * on these patches, but it is easy to see that on patches that are children
+   * of previously treated patches, the operation is now the identity operation
+   * (since it interpolates from the children of the current patch a function
+   * that had previously been interpolated to these children from an even coarser
+   * patch). Consequently, this does not alter the solution vector any more.
    *
    * The name of the function originates from the fact that it can be used to
    * construct a representation of a function of higher polynomial degree on a
    * once coarser mesh. For example, if you imagine that you start with a
-   * $Q_1$ function on globally refined mesh, and that @p dof2 is associated
+   * $Q_1$ function on a globally refined mesh, and that @p dof2 is associated
    * with a $Q_2$ element, then this function computes the equivalent of the
    * operator $I_{2h}^{(2)}$ interpolating the original piecewise linear
    * function onto a quadratic function on a once coarser mesh with mesh size
@@ -777,6 +782,7 @@ namespace FETools
                     const DoFHandler<dim,spacedim> &dof2,
                     const ConstraintMatrix         &constraints,
                     OutVector                      &z2);
+
   //@}
   /**
    * The numbering of the degrees of freedom in continuous finite elements is

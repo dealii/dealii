@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2015 by the deal.II authors
+// Copyright (C) 2000 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -86,11 +86,12 @@ namespace FETools
     Assert(u2.size()==dof2.n_dofs(),
            ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
 
+
+    const IndexSet u2_elements = u2.locally_owned_elements();
 #ifdef DEBUG
     const IndexSet &dof1_local_dofs = dof1.locally_owned_dofs();
     const IndexSet &dof2_local_dofs = dof2.locally_owned_dofs();
     const IndexSet u1_elements = u1.locally_owned_elements();
-    const IndexSet u2_elements = u2.locally_owned_elements();
     Assert(u1_elements == dof1_local_dofs,
            ExcMessage("The provided vector and DoF handler should have the same"
                       " index sets."));
@@ -193,8 +194,13 @@ namespace FETools
 
           for (unsigned int i=0; i<dofs_per_cell2; ++i)
             {
-              u2(dofs[i])+=u2_local(i);
-              touch_count(dofs[i]) += 1;
+              // if dof is locally_owned
+              const types::global_dof_index gdi = dofs[i];
+              if (u2_elements.is_element(gdi))
+                {
+                  u2(dofs[i])+=u2_local(i);
+                  touch_count(dofs[i]) += 1;
+                }
             }
         }
     // cell1 is at the end, so should
@@ -296,8 +302,6 @@ namespace FETools
           cell->set_dof_values(u1_int_local, u1_interpolated);
         }
 
-    // if we work on a parallel PETSc vector
-    // we have to finish the work
     u1_interpolated.compress(VectorOperation::insert);
   }
 
@@ -497,6 +501,7 @@ namespace FETools
       }
     }
   }
+
 
 
   template <int dim, class InVector, class OutVector, int spacedim>
@@ -711,92 +716,6 @@ namespace FETools
         ++cell2;
       }
   }
-
-
-  template <int dim, class InVector, class OutVector, int spacedim>
-  void extrapolate(const DoFHandler<dim,spacedim> &dof1,
-                   const InVector &u1,
-                   const DoFHandler<dim,spacedim> &dof2,
-                   OutVector &u2)
-  {
-    ConstraintMatrix dummy;
-    dummy.close();
-    extrapolate(dof1, u1, dof2, dummy, u2);
-  }
-
-
-
-  template <int dim, class InVector, class OutVector, int spacedim>
-  void extrapolate(const DoFHandler<dim,spacedim> &dof1,
-                   const InVector &u1,
-                   const DoFHandler<dim,spacedim> &dof2,
-                   const ConstraintMatrix &constraints,
-                   OutVector &u2)
-  {
-    Assert(dof1.get_fe().n_components() == dof2.get_fe().n_components(),
-           ExcDimensionMismatch(dof1.get_fe().n_components(), dof2.get_fe().n_components()));
-    Assert(&dof1.get_triangulation()==&dof2.get_triangulation(), ExcTriangulationMismatch());
-    Assert(u1.size()==dof1.n_dofs(), ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
-    Assert(u2.size()==dof2.n_dofs(), ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
-
-    OutVector u3;
-    u3.reinit(u2);
-    interpolate(dof1, u1, dof2, constraints, u3);
-
-    const unsigned int dofs_per_cell  = dof2.get_fe().dofs_per_cell;
-    Vector<typename OutVector::value_type> dof_values(dofs_per_cell);
-
-    // make sure that each cell on the
-    // coarsest level is at least once
-    // refined. otherwise, we can't
-    // treat these cells and would
-    // generate a bogus result
-    {
-      typename DoFHandler<dim,spacedim>::cell_iterator cell = dof2.begin(0),
-                                                       endc = dof2.end(0);
-      for (; cell!=endc; ++cell)
-        Assert (cell->has_children(), ExcGridNotRefinedAtLeastOnce());
-    }
-
-    // then traverse grid bottom up
-    for (unsigned int level=0; level<dof1.get_triangulation().n_levels()-1; ++level)
-      {
-        typename DoFHandler<dim,spacedim>::cell_iterator cell=dof2.begin(level),
-                                                         endc=dof2.end(level);
-
-        for (; cell!=endc; ++cell)
-          if (!cell->active())
-            {
-              // check whether this
-              // cell has active
-              // children
-              bool active_children=false;
-              for (unsigned int child_n=0; child_n<cell->n_children(); ++child_n)
-                if (cell->child(child_n)->active())
-                  {
-                    active_children=true;
-                    break;
-                  }
-
-              // if there are active
-              // children, the we have
-              // to work on this
-              // cell. get the data
-              // from the one vector
-              // and set it on the
-              // other
-              if (active_children)
-                {
-                  cell->get_interpolated_dof_values(u3, dof_values);
-                  cell->set_dof_values_by_interpolation(dof_values, u2);
-                }
-            }
-      }
-
-    // Apply hanging node constraints.
-    constraints.distribute(u2);
-  }
-
 } // end of namespace FETools
 
 

@@ -1,0 +1,60 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2016 - 2016 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
+
+for (deal_II_dimension : DIMENSIONS)
+{
+#   ifdef DEAL_II_WITH_P4EST
+
+    namespace internal
+    \{
+    namespace p4est
+    \{
+#if     deal_II_dimension > 1
+
+    template
+    void
+    init_quadrant_children<deal_II_dimension>
+    (const types<deal_II_dimension>::quadrant & p4est_cell,
+     types<deal_II_dimension>::quadrant (&p4est_children)[GeometryInfo<deal_II_dimension>::max_children_per_cell]);
+
+    template
+    void
+    init_coarse_quadrant<deal_II_dimension>
+    (types<deal_II_dimension>::quadrant & quad);
+
+    template
+    bool
+    quadrant_is_equal<deal_II_dimension>
+    (const types<deal_II_dimension>::quadrant & q1,
+     const types<deal_II_dimension>::quadrant & q2);
+
+    template
+    bool
+    quadrant_is_ancestor<deal_II_dimension>
+    (const types<deal_II_dimension>::quadrant & q1,
+     const types<deal_II_dimension>::quadrant & q2);
+
+    template
+    bool
+    tree_exists_locally<deal_II_dimension>
+    (const types<deal_II_dimension>::forest *parallel_forest,
+     const types<deal_II_dimension>::topidx coarse_grid_cell);
+
+#      endif
+    \}
+    \}
+#   endif // DEAL_II_WITH_P4EST
+}

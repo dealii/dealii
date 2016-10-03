@@ -21,6 +21,7 @@ SET(_src
   tria.cc
   tria_base.cc
   shared_tria.cc
+  p4est_wrappers.cc
   )
 
 SET(_inst
@@ -29,6 +30,7 @@ SET(_inst
   tria.inst.in
   shared_tria.inst.in
   tria_base.inst.in
+  p4est_wrappers.inst.in
   )
 
 FILE(GLOB _header
