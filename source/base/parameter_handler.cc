@@ -1753,8 +1753,8 @@ bool ParameterHandler::read_input (const std::string &filename,
                 << filename << "> for reading." << std::endl;
       if (!optional)
         {
-          std:: cerr << "Trying to make file <"
-                     << filename << "> with default values for you." << std::endl;
+          std::cerr << "Trying to make file <"
+                    << filename << "> with default values for you." << std::endl;
           std::ofstream output (filename.c_str());
           if (output)
             print_parameters (output, (write_compact ? ShortText : Text));

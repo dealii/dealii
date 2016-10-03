@@ -1092,7 +1092,7 @@ namespace internal
                           std::vector<NumberCache> &number_caches) const
       {
         // first, call the sequential function to distribute dofs
-        Sequential<dim,spacedim>:: distribute_mg_dofs (dof_handler, number_caches);
+        Sequential<dim,spacedim>::distribute_mg_dofs (dof_handler, number_caches);
         // now we need to update the number cache.
         // This part is not yet implemented.
         AssertThrow(false,ExcNotImplemented());
