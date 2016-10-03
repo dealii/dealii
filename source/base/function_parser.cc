@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2015 by the deal.II authors
+// Copyright (C) 2005 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -218,8 +218,9 @@ namespace internal
 }
 
 
+
 template <int dim>
-void FunctionParser<dim>:: init_muparser() const
+void FunctionParser<dim>::init_muparser() const
 {
   // check that we have not already initialized the parser on the
   // current thread, i.e., that the current function is only called
