@@ -103,15 +103,18 @@ namespace hp
    * hp::DoFHandler::distribute_dofs(), and then assemble a linear system and
    * solve a problem on this finite element space. However, one can skip
    * assigning active FE indices upon mesh refinement in certain
-   * circumstances. In particular, the following rules apply: - Upon mesh
-   * refinement, child cells inherit the active FE index of the parent. - On
-   * the other hand, when coarsening cells, the (now active) parent cell will
-   * not have an active FE index set and you will have to set it explicitly
-   * before calling hp::DoFHandler::distribute_dofs(). In particular, to avoid
-   * stale information to be used by accident, this class deletes the active
-   * FE index of cells that are refined after inheriting this index to the
-   * children; this implies that if the children are coarsened away, the old
-   * value is no longer available on the parent cell.
+   * circumstances. In particular, the following rules apply:
+   * - Upon mesh refinement, child cells inherit the active FE index of
+   *   the parent.
+   * - On the other hand, when coarsening cells, the (now active)
+   *   parent cell will not have an active FE index set and you will
+   *   have to set it explicitly before calling
+   *   hp::DoFHandler::distribute_dofs(). In particular, to avoid
+   *   stale information to be used by accident, this class deletes
+   *   the active FE index of cells that are refined after inheriting
+   *   this index to the children; this implies that if the children
+   *   are coarsened away, the old value is no longer available on the
+   *   parent cell.
    *
    * @ingroup dofs
    * @ingroup hp
