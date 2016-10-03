@@ -1416,10 +1416,10 @@ namespace FETools
     namespace
     {
       template <class VectorType, class DH>
-      void reinit_distributed(const DH &/*dh*/,
-                              VectorType &/*vector*/)
+      void reinit_distributed(const DH &dh,
+                              VectorType &vector)
       {
-        Assert(false, ExcNotImplemented());
+        vector.reinit(dh.n_dofs());
       }
 
 #ifdef DEAL_II_WITH_PETSC
