@@ -1,6 +1,6 @@
 
 DEAL::ParameterHandler::ExcInvalidEntryForPatternXML (Utilities::trim(new_value), p->first, patterns[pattern_index]->description())
-    The entry value
+    The entry value 
         2x
     for the entry named
         int1
