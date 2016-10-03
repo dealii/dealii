@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2015 by the deal.II authors
+// Copyright (C) 1999 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1342,7 +1342,7 @@ TorusBoundary<2,3>::get_new_point_on_quad (const Triangulation<2,3>::quad_iterat
 //Normal field without unit length
 template <>
 Point<3>
-TorusBoundary<2,3>:: get_surf_norm_from_sp(const Point<2> &surfP) const
+TorusBoundary<2,3>::get_surf_norm_from_sp(const Point<2> &surfP) const
 {
 
   Point<3> n;

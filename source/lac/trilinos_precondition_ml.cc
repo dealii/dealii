@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2015 by the deal.II authors
+// Copyright (C) 2008 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -110,8 +110,8 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionAMG:: initialize (const SparseMatrix   &matrix,
-                                const AdditionalData &additional_data)
+  PreconditionAMG::initialize (const SparseMatrix   &matrix,
+                               const AdditionalData &additional_data)
   {
     initialize(matrix.trilinos_matrix(), additional_data);
   }
@@ -119,8 +119,8 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionAMG:: initialize (const Epetra_RowMatrix &matrix,
-                                const AdditionalData   &additional_data)
+  PreconditionAMG::initialize (const Epetra_RowMatrix &matrix,
+                               const AdditionalData   &additional_data)
   {
     // Build the AMG preconditioner.
     Teuchos::ParameterList parameter_list;
