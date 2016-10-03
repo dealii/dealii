@@ -749,6 +749,33 @@ namespace GridGenerator
     tria.set_all_manifold_ids_on_boundary(0);
   }
 
+
+
+  template <int dim>
+  void
+  general_cell (Triangulation<dim> &tria,
+                const std::vector<Point<dim> > &vertices,
+                const bool colorize)
+  {
+    Assert (vertices.size() == dealii::GeometryInfo<dim>::vertices_per_cell,
+            ExcMessage("Wrong number of vertices."));
+
+    // First create a hyper_rectangle and then deform it.
+    hyper_cube(tria, 0, 1, colorize);
+
+    typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
+    for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+      cell->vertex(i) = vertices[i];
+
+    // Check that the order of the vertices makes sense, i.e., the volume of the
+    // cell is positive.
+    Assert(GridTools::volume(tria) > 0.,
+           ExcMessage("The volume of the cell is not greater than zero. "
+                      "This could be due to the wrong ordering of the vertices."));
+  }
+
+
+
   template<>
   void
   parallelogram (Triangulation<3> &,
