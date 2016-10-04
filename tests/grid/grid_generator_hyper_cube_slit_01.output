@@ -1,0 +1,15 @@
+
+DEAL::dim = 2
+DEAL::cell:
+DEAL::boundary id = 1 center = 0.00000 -0.500000 faceidx = 1
+DEAL::cell:
+DEAL::boundary id = 2 center = 0.00000 -0.500000 faceidx = 0
+DEAL::cell:
+DEAL::cell:
+DEAL::dim = 3
+DEAL::cell:
+DEAL::boundary id = 1 center = 0.00000 -0.500000 0.00000 faceidx = 1
+DEAL::cell:
+DEAL::boundary id = 2 center = 0.00000 -0.500000 0.00000 faceidx = 0
+DEAL::cell:
+DEAL::cell:
