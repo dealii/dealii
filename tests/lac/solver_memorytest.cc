@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2015 by the deal.II authors
+// Copyright (C) 1998 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -97,7 +97,7 @@ int main()
       check_solve<SolverQMRS<> >(A,u,f);
 
       // test use_default_residual=false case
-      check_solve<SolverGMRES<> >(A,u,f, typename SolverGMRES<>::AdditionalData(30, false, false));
+      check_solve<SolverGMRES<> >(A,u,f, SolverGMRES<>::AdditionalData(30, false, false));
 
       deallog.pop();
     }
