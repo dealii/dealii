@@ -2166,7 +2166,7 @@ namespace GridGenerator
         Triangulation<2>::cell_iterator cell = tria.begin();
         cell->face(1)->set_boundary_id(1);
         ++cell;
-        cell->face(3)->set_boundary_id(2);
+        cell->face(0)->set_boundary_id(2);
       }
   }
 
@@ -2765,11 +2765,10 @@ namespace GridGenerator
 
     if (colorize)
       {
-        Assert(false, ExcNotImplemented());
         Triangulation<3>::cell_iterator cell = tria.begin();
         cell->face(1)->set_boundary_id(1);
         ++cell;
-        cell->face(3)->set_boundary_id(2);
+        cell->face(0)->set_boundary_id(2);
       }
   }
 

@@ -391,6 +391,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+
+ <li> Fixed: GridGenerator::hyper_cube_slit() with colorized set to
+ true is now working correctly.
+ <br>
+ (Timo Heister, 2016/10/04)
+ </li>
+
  <li> Fixed: SphericalManifold now behaves correctly also when R>>1
  and the center is not the origin. 
  <br>

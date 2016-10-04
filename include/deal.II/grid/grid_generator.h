@@ -667,6 +667,9 @@ namespace GridGenerator
    * declared to exist for triangulations of all space dimensions, but throws
    * an error if called in 1d.
    *
+   * If @p colorize is set to @p true, the faces forming the slit are marked
+   * with boundary id 1 and 2, respectively.
+   *
    * @note The triangulation needs to be void upon calling this function.
    */
   template <int dim>
