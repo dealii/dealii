@@ -66,7 +66,7 @@ Multigrid<VectorType>::set_minlevel (const unsigned int l,
 
 template <typename VectorType>
 void
-Multigrid<VectorType>::set_cycle(typename Multigrid<VectorType>::Cycle c)
+Multigrid<VectorType>::set_cycle (typename Multigrid<VectorType>::Cycle c)
 {
   cycle_type = c;
 }
@@ -125,10 +125,7 @@ Multigrid<VectorType>::level_v_step (const unsigned int level)
   // smoothing of the residual
   if (debug>1)
     deallog << "Smoothing on     level " << level << std::endl;
-  // defect[level].print(std::cout, 2,false);
-  // std::cout<<std::endl;
   pre_smooth->smooth(level, solution[level], defect[level]);
-  // solution[level].print(std::cout, 2,false);
 
   if (debug>2)
     deallog << "Solution norm          " << solution[level].l2_norm()
@@ -138,8 +135,6 @@ Multigrid<VectorType>::level_v_step (const unsigned int level)
   if (debug>1)
     deallog << "Residual on      level " << level << std::endl;
   matrix->vmult(level, t[level], solution[level]);
-  // std::cout<<std::endl;
-  // t[level].print(std::cout, 2,false);
   if (edge_out != 0)
     {
       edge_out->vmult_add(level, t[level], solution[level]);
@@ -218,6 +213,8 @@ Multigrid<VectorType>::level_step(const unsigned int level,
     case w_cycle:
       cychar = 'W';
       break;
+    default:
+      Assert(false, ExcNotImplemented());
     }
 
   if (debug>0)
@@ -271,11 +268,10 @@ Multigrid<VectorType>::level_step(const unsigned int level,
 
   transfer->restrict_and_add (level, defect2[level-1], t[level]);
 
-  // Every cycle needs one recursion, the V-cycle, which is included here for
-  // the sake of the F-cycle, needs only one. As opposed to the V-cycle above
-  // where we do not need to set the solution vector to zero (as that has been
-  // done in the init functions), we also need to set the content in the
-  // solution from previous cycles to zero.
+  // Every cycle starts with a recursion of its type. As opposed to the
+  // V-cycle above where we do not need to set the solution vector to zero (as
+  // that has been done in the init functions), we need to zero out the values
+  // from previous cycles.
   solution[level-1] = 0;
   level_step(level-1, cycle);
 
@@ -283,13 +279,13 @@ Multigrid<VectorType>::level_step(const unsigned int level,
   // for the coarse solver which we invoke just once
   if (level>minlevel+1)
     {
-      // while the W-cycle repeats itself
+      // while the W-cycle repeats itself, ...
       if (cycle == w_cycle)
         level_step(level-1, cycle);
-
-      // the F-cycle does a V-cycle after an F-cycle.
+      // ... the F-cycle does a V-cycle after an F-cycle, ...
       else if (cycle == f_cycle)
         level_step(level-1, v_cycle);
+      // ... and the V-cycle does nothing.
     }
 
   // do coarse grid correction
