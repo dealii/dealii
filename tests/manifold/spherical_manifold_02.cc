@@ -124,10 +124,7 @@ void test (MappingEnum::type mapping_name, unsigned int refinements=1)
 
   FEValues<2,3> fe_values (*mapping, fe, cell_quadrature,
                            update_values            |
-                           update_gradients         |
-                           update_quadrature_points |
                            update_JxW_values);
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = cell_quadrature.size();
 
   double surface_area = 0;
@@ -138,7 +135,6 @@ void test (MappingEnum::type mapping_name, unsigned int refinements=1)
     {
       double patch_surface = 0;
       fe_values.reinit (cell);
-      const std::vector<Point<3> > &qp = fe_values.get_quadrature_points();
 
 
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
