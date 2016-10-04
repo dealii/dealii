@@ -83,7 +83,7 @@ void test (MappingEnum::type mapping_name, unsigned int refinements=1)
   // static const RotatedSphericalManifold rotated_sphere;
   // triangulation.set_manifold (1, rotated_sphere);
 
-  for (typename Triangulation<2,3>::active_cell_iterator
+  for (Triangulation<2,3>::active_cell_iterator
        cell=triangulation.begin_active();
        cell!=triangulation.end(); ++cell)
     {
@@ -131,7 +131,7 @@ void test (MappingEnum::type mapping_name, unsigned int refinements=1)
   const unsigned int n_q_points    = cell_quadrature.size();
 
   double surface_area = 0;
-  for (typename DoFHandler<2,3>::active_cell_iterator
+  for (DoFHandler<2,3>::active_cell_iterator
        cell = dof_handler.begin_active(),
        endc = dof_handler.end();
        cell!=endc; ++cell)
