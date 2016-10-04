@@ -1345,6 +1345,11 @@ public:
 
 private:
   /**
+   * Like set_boundary_id but without checking for internal faces or invalid ids.
+   */
+  void set_boundary_id_internal(const types::boundary_id id) const;
+
+  /**
    * Copy the data of the given object into the internal data structures of a
    * triangulation.
    */

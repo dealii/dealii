@@ -1851,6 +1851,23 @@ set_boundary_id (const types::boundary_id boundary_ind) const
 {
   Assert (structdim<dim, ExcImpossibleInDim(dim));
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  Assert (boundary_ind != numbers::internal_face_boundary_id,
+          ExcMessage("You are trying to set the boundary_id to an illegal value (numbers::internal_face_boundary_id is reserved)."));
+  Assert (this->at_boundary(),
+          ExcMessage("You are trying to set the boundary_id of an internal object, which is illegal!"));
+
+  this->objects().boundary_or_material_id[this->present_index].boundary_id = boundary_ind;
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+void
+TriaAccessor<structdim, dim, spacedim>::
+set_boundary_id_internal (const types::boundary_id boundary_ind) const
+{
+  Assert (structdim<dim, ExcImpossibleInDim(dim));
+  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
 
   this->objects().boundary_or_material_id[this->present_index].boundary_id = boundary_ind;
 }

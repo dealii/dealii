@@ -2032,15 +2032,9 @@ namespace internal
                                          "of freedom at these lines have the same "
                                          "value, using the ConstraintMatrix class."));
 
-            // if only one cell: line is at
-            // boundary -> give it the
-            // boundary indicator zero by
-            // default
-            if (n_adj_cells == 1)
-              line->set_boundary_id (0);
-            else
-              // interior line -> numbers::internal_face_boundary_id
-              line->set_boundary_id (numbers::internal_face_boundary_id);
+            // if only one cell: line is at boundary -> give it the boundary
+            // indicator zero by default
+            line->set_boundary_id_internal((n_adj_cells == 1) ? 0 : numbers::internal_face_boundary_id);
             line->set_manifold_id(numbers::flat_manifold_id);
           }
 
@@ -2106,7 +2100,7 @@ namespace internal
                       }
                   }
                 else
-                  line->set_boundary_id (boundary_line->boundary_id);
+                  line->set_boundary_id_internal(boundary_line->boundary_id);
               }
             line->set_manifold_id (boundary_line->manifold_id);
           }
@@ -2791,18 +2785,11 @@ namespace internal
                          (n_adj_cells <= 2),
                          ExcInternalError());
 
-            // if only one cell: quad is at
-            // boundary -> give it the
-            // boundary indicator zero by
-            // default
-            if (n_adj_cells == 1)
-              quad->set_boundary_id (0);
-            else
-              // interior quad -> numbers::internal_face_boundary_id
-              quad->set_boundary_id (numbers::internal_face_boundary_id);
-            // Manifold ids are set
-            // independently of where
-            // they are
+            // if only one cell: quad is at boundary -> give it the boundary
+            // indicator zero by default
+            quad->set_boundary_id_internal((n_adj_cells == 1) ? 0 : numbers::internal_face_boundary_id);
+
+            // Manifold ids are set independently of where they are
             quad->set_manifold_id(numbers::flat_manifold_id);
           }
 
@@ -2816,7 +2803,7 @@ namespace internal
         for (typename Triangulation<dim,spacedim>::line_iterator
              line=triangulation.begin_line(); line!=triangulation.end_line(); ++line)
           {
-            line->set_boundary_id (numbers::internal_face_boundary_id);
+            line->set_boundary_id_internal(numbers::internal_face_boundary_id);
             line->set_manifold_id(numbers::flat_manifold_id);
           }
 
@@ -2841,8 +2828,13 @@ namespace internal
         for (typename Triangulation<dim,spacedim>::quad_iterator
              quad=triangulation.begin_quad(); quad!=triangulation.end_quad(); ++quad)
           if (quad->at_boundary())
-            for (unsigned int l=0; l<4; ++l)
-              quad->line(l)->set_boundary_id (0);
+            {
+              for (unsigned int l=0; l<4; ++l)
+                {
+                  typename Triangulation<dim,spacedim>::line_iterator line = quad->line(l);
+                  line->set_boundary_id_internal(0);
+                }
+            }
 
         ///////////////////////////////////////
         // now set boundary indicators
@@ -2893,7 +2885,7 @@ namespace internal
                            ExcMessage ("Duplicate boundary lines are only allowed "
                                        "if they carry the same boundary indicator."));
 
-            line->set_boundary_id (boundary_line->boundary_id);
+            line->set_boundary_id_internal(boundary_line->boundary_id);
             // Set manifold id if given
             line->set_manifold_id(boundary_line->manifold_id);
           }
@@ -3031,7 +3023,7 @@ namespace internal
                            ExcMessage ("Duplicate boundary quads are only allowed "
                                        "if they carry the same boundary indicator."));
 
-            quad->set_boundary_id (boundary_quad->boundary_id);
+            quad->set_boundary_id_internal (boundary_quad->boundary_id);
             quad->set_manifold_id (boundary_quad->manifold_id);
           }
 
@@ -3667,7 +3659,7 @@ namespace internal
                           switch_1->set_line_orientation(1, switch_2->line_orientation(1));
                           switch_1->set_line_orientation(2, switch_2->line_orientation(2));
                           switch_1->set_line_orientation(3, switch_2->line_orientation(3));
-                          switch_1->set_boundary_id(switch_2->boundary_id());
+                          switch_1->set_boundary_id_internal(switch_2->boundary_id());
                           switch_1->set_manifold_id(switch_2->manifold_id());
                           switch_1->set_user_index(switch_2->user_index());
                           if (switch_2->user_flag_set())
@@ -3683,7 +3675,7 @@ namespace internal
                           switch_2->set_line_orientation(1, switch_1_line_orientations[1]);
                           switch_2->set_line_orientation(2, switch_1_line_orientations[2]);
                           switch_2->set_line_orientation(3, switch_1_line_orientations[3]);
-                          switch_2->set_boundary_id(switch_1_boundary_id);
+                          switch_2->set_boundary_id_internal(switch_1_boundary_id);
                           switch_2->set_manifold_id(switch_1->manifold_id());
                           switch_2->set_user_index(switch_1_user_index);
                           if (switch_1_user_flag)
@@ -4184,7 +4176,7 @@ namespace internal
             new_lines[l]->clear_user_data();
             new_lines[l]->clear_children();
             // interior line
-            new_lines[l]->set_boundary_id(numbers::internal_face_boundary_id);
+            new_lines[l]->set_boundary_id_internal(numbers::internal_face_boundary_id);
             new_lines[l]->set_manifold_id(cell->manifold_id());
           }
 
@@ -4860,8 +4852,9 @@ namespace internal
                   children[0]->clear_user_flag();
                   children[1]->clear_user_flag();
 
-                  children[0]->set_boundary_id (line->boundary_id());
-                  children[1]->set_boundary_id (line->boundary_id());
+
+                  children[0]->set_boundary_id_internal(line->boundary_id());
+                  children[1]->set_boundary_id_internal(line->boundary_id());
 
                   children[0]->set_manifold_id (line->manifold_id());
                   children[1]->set_manifold_id (line->manifold_id());
@@ -5299,8 +5292,8 @@ namespace internal
                   children[0]->clear_user_flag();
                   children[1]->clear_user_flag();
 
-                  children[0]->set_boundary_id (line->boundary_id());
-                  children[1]->set_boundary_id (line->boundary_id());
+                  children[0]->set_boundary_id_internal(line->boundary_id());
+                  children[1]->set_boundary_id_internal(line->boundary_id());
 
                   children[0]->set_manifold_id (line->manifold_id());
                   children[1]->set_manifold_id (line->manifold_id());
@@ -5414,7 +5407,7 @@ namespace internal
                     new_line->clear_user_flag();
                     new_line->clear_user_data();
                     new_line->clear_children();
-                    new_line->set_boundary_id(quad->boundary_id());
+                    new_line->set_boundary_id_internal(quad->boundary_id());
                     new_line->set_manifold_id(quad->manifold_id());
 
                     // child 0 and 1 of a line are switched if the
@@ -5475,7 +5468,7 @@ namespace internal
                         new_quads[i]->clear_user_flag();
                         new_quads[i]->clear_user_data();
                         new_quads[i]->clear_children();
-                        new_quads[i]->set_boundary_id (quad->boundary_id());
+                        new_quads[i]->set_boundary_id_internal(quad->boundary_id());
                         new_quads[i]->set_manifold_id (quad->manifold_id());
                         // set all line orientations to true, change
                         // this after the loop, as we have to consider
@@ -5576,7 +5569,7 @@ namespace internal
 
                                 new_child[i]->set(internal::Triangulation::TriaObject<1>(old_child[i]->vertex_index(0),
                                                                                          old_child[i]->vertex_index(1)));
-                                new_child[i]->set_boundary_id(old_child[i]->boundary_id());
+                                new_child[i]->set_boundary_id_internal(old_child[i]->boundary_id());
                                 new_child[i]->set_manifold_id(old_child[i]->manifold_id());
                                 new_child[i]->set_user_index(old_child[i]->user_index());
                                 if (old_child[i]->user_flag_set())
@@ -5679,7 +5672,7 @@ namespace internal
                             switch_1->set_line_orientation(1, switch_2->line_orientation(1));
                             switch_1->set_line_orientation(2, switch_2->line_orientation(2));
                             switch_1->set_line_orientation(3, switch_2->line_orientation(3));
-                            switch_1->set_boundary_id(switch_2->boundary_id());
+                            switch_1->set_boundary_id_internal(switch_2->boundary_id());
                             switch_1->set_manifold_id(switch_2->manifold_id());
                             switch_1->set_user_index(switch_2->user_index());
                             if (switch_2->user_flag_set())
@@ -5702,7 +5695,7 @@ namespace internal
                             switch_2->set_line_orientation(1, switch_1_line_orientations[1]);
                             switch_2->set_line_orientation(2, switch_1_line_orientations[2]);
                             switch_2->set_line_orientation(3, switch_1_line_orientations[3]);
-                            switch_2->set_boundary_id(switch_1_boundary_id);
+                            switch_2->set_boundary_id_internal(switch_1_boundary_id);
                             switch_2->set_manifold_id(switch_1->manifold_id());
                             switch_2->set_user_index(switch_1_user_index);
                             if (switch_1_user_flag)
@@ -5830,8 +5823,8 @@ namespace internal
                             children[0]->clear_user_flag();
                             children[1]->clear_user_flag();
 
-                            children[0]->set_boundary_id (middle_line->boundary_id());
-                            children[1]->set_boundary_id (middle_line->boundary_id());
+                            children[0]->set_boundary_id_internal (middle_line->boundary_id());
+                            children[1]->set_boundary_id_internal (middle_line->boundary_id());
 
                             children[0]->set_manifold_id (middle_line->manifold_id());
                             children[1]->set_manifold_id (middle_line->manifold_id());
@@ -5945,7 +5938,7 @@ namespace internal
                         new_lines[i]->clear_user_flag();
                         new_lines[i]->clear_user_data();
                         new_lines[i]->clear_children();
-                        new_lines[i]->set_boundary_id(quad->boundary_id());
+                        new_lines[i]->set_boundary_id_internal(quad->boundary_id());
                         new_lines[i]->set_manifold_id(quad->manifold_id());
                       }
 
@@ -6045,7 +6038,7 @@ namespace internal
                         new_quads[i]->clear_user_flag();
                         new_quads[i]->clear_user_data();
                         new_quads[i]->clear_children();
-                        new_quads[i]->set_boundary_id (quad->boundary_id());
+                        new_quads[i]->set_boundary_id_internal (quad->boundary_id());
                         new_quads[i]->set_manifold_id (quad->manifold_id());
                         // set all line orientations to true, change
                         // this after the loop, as we have to consider
@@ -6157,7 +6150,7 @@ namespace internal
                       new_lines[i]->clear_user_data();
                       new_lines[i]->clear_children();
                       // interior line
-                      new_lines[i]->set_boundary_id(numbers::internal_face_boundary_id);
+                      new_lines[i]->set_boundary_id_internal(numbers::internal_face_boundary_id);
                       // they inherit geometry description of the hex they belong to
                       new_lines[i]->set_manifold_id(hex->manifold_id());
                     }
@@ -6177,7 +6170,7 @@ namespace internal
                       new_quads[i]->clear_user_data();
                       new_quads[i]->clear_children();
                       // interior quad
-                      new_quads[i]->set_boundary_id (numbers::internal_face_boundary_id);
+                      new_quads[i]->set_boundary_id_internal(numbers::internal_face_boundary_id);
                       // they inherit geometry description of the hex they belong to
                       new_quads[i]->set_manifold_id (hex->manifold_id());
                       // set all line orientation flags to true by
