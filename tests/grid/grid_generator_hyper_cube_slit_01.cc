@@ -34,20 +34,20 @@ void test()
   Triangulation<dim> tr;
   GridGenerator::hyper_cube_slit(tr, -1, 1, true);
   typename Triangulation<dim>::active_cell_iterator
-    cell = tr.begin_active(),
-    endc = tr.end();
+  cell = tr.begin_active(),
+  endc = tr.end();
   for (; cell!=endc; ++cell)
     {
       deallog << "cell:" << std::endl;
-      
+
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	{
-	  if (cell->face(face)->at_boundary() && cell->face(face)->boundary_id() != 0)
-	    deallog << "boundary id = " << (int)cell->face(face)->boundary_id()
-		    << " center = " << cell->face(face)->center()
-		    << " faceidx = " << face
-		    << std::endl;
-	}
+        {
+          if (cell->face(face)->at_boundary() && cell->face(face)->boundary_id() != 0)
+            deallog << "boundary id = " << (int)cell->face(face)->boundary_id()
+                    << " center = " << cell->face(face)->center()
+                    << " faceidx = " << face
+                    << std::endl;
+        }
     }
 }
 
