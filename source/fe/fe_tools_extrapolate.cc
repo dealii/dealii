@@ -576,8 +576,6 @@ namespace FETools
           const FiniteElement<dim,spacedim> &fe            = dealii_cell->get_dof_handler().get_fe();
           const unsigned int                 dofs_per_cell = fe.dofs_per_cell;
 
-          Assert (&fe != 0,
-                  ExcNotInitialized());
           Assert (interpolated_values.size() == dofs_per_cell,
                   ExcDimensionMismatch(interpolated_values.size(), dofs_per_cell));
           Assert (u.size() == dealii_cell->get_dof_handler().n_dofs(),
@@ -705,8 +703,6 @@ namespace FETools
         }
       else
         {
-          Assert (&fe != 0,
-                  ExcNotInitialized());
           Assert (local_values.size() == dofs_per_cell,
                   ExcDimensionMismatch(local_values.size(), dofs_per_cell));
           Assert (u.size() == dealii_cell->get_dof_handler().n_dofs(),
@@ -1148,8 +1144,6 @@ namespace FETools
     {
       const FiniteElement<dim,spacedim> &fe            = dealii_cell->get_dof_handler().get_fe();
       const unsigned int                 dofs_per_cell = fe.dofs_per_cell;
-
-      Assert (&fe != 0, ExcNotInitialized());
 
       CellData  cell_data (dofs_per_cell);
       cell_data.quadrant = p4est_cell;
