@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 by the deal.II authors
+// Copyright (C) 2015, 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,16 +47,16 @@ int main()
   deallog.threshold_double(1.e-10);
 
   check<double,double,double>();
-  deallog << typename ProductType<double,double>::type(2.345)*typename ProductType<double,double>::type(3.456)
+  deallog << ProductType<double,double>::type(2.345)*ProductType<double,double>::type(3.456)
           << ' '
-          << typename ProductType<double,double>::type(2.345*3.456)
+          << ProductType<double,double>::type(2.345*3.456)
           << std::endl;
 
   check<std::complex<double>,std::complex<double>,std::complex<double> >();
-  deallog << (typename ProductType<std::complex<double>,std::complex<double> >::type(2.345, 1.23) *
-              typename ProductType<std::complex<double>,std::complex<double> >::type(3.456, 2.45))
+  deallog << (ProductType<std::complex<double>,std::complex<double> >::type(2.345, 1.23) *
+              ProductType<std::complex<double>,std::complex<double> >::type(3.456, 2.45))
           << ' '
-          << (typename ProductType<std::complex<double>,std::complex<double> >::type
+          << (ProductType<std::complex<double>,std::complex<double> >::type
               (std::complex<double>(2.345, 1.23) *
                std::complex<double>(3.456, 2.45)))
           << std::endl;
