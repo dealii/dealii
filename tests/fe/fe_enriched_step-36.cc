@@ -77,6 +77,8 @@ template<int dim>
 double PotentialFunction<dim>::value(const dealii::Point<dim> &p,
                                      const unsigned int ) const
 {
+  Assert (p.square() > 0.,
+          ExcDivideByZero());
   return -1.0 / std::sqrt(p.square());
 }
 
@@ -114,6 +116,8 @@ public:
   {
     Tensor<1,dim> dist = p-origin;
     const double r = dist.norm();
+    Assert (r > 0.,
+            ExcDivideByZero());
     dist/=r;
     return -Z*std::exp(-Z*r)*dist;
   }
