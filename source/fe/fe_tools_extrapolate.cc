@@ -41,7 +41,7 @@ namespace FETools
   {
 #ifndef DEAL_II_WITH_P4EST
     // Dummy implementation in case p4est is not available.
-    template <int dim,int spacedim>
+    template <int dim,int spacedim,class OutVector>
     class ExtrapolateImplementation
     {
     public:
@@ -51,7 +51,7 @@ namespace FETools
         Assert(false, ExcNotImplemented());
       };
 
-      template <class InVector,class OutVector>
+      template <class InVector>
       void extrapolate_parallel (const InVector &/*u2_relevant*/,
                                  const DoFHandler<dim,spacedim> &/*dof2*/,
                                  OutVector &/*u2*/)
@@ -62,7 +62,7 @@ namespace FETools
 #else
     // Implementation of the @p extrapolate function
     // on parallel distributed grids.
-    template <int dim,int spacedim>
+    template <int dim,int spacedim,class OutVector>
     class ExtrapolateImplementation
     {
     public:
@@ -71,12 +71,14 @@ namespace FETools
 
       ~ExtrapolateImplementation ();
 
-      template <class InVector,class OutVector>
+      template <class InVector>
       void extrapolate_parallel (const InVector &u2_relevant,
                                  const DoFHandler<dim,spacedim> &dof2,
                                  OutVector &u2);
 
     private:
+      // A shortcut for the type of the OutVector
+      typedef typename OutVector::value_type value_type;
 
       // A structure holding all data to
       // set dofs recursively on cells of arbitrary level
@@ -112,7 +114,7 @@ namespace FETools
 
         CellData (const unsigned int dofs_per_cell);
 
-        Vector<double>  dof_values;
+        Vector<value_type>  dof_values;
 
         unsigned int tree_index;
 
@@ -131,7 +133,7 @@ namespace FETools
         unsigned int bytes_for_buffer () const
         {
           return (sizeof(unsigned int) +                                              // dofs_per_cell
-                  dof_values.size() * sizeof(double) +                                // dof_values
+                  dof_values.size() * sizeof(value_type) +                            // dof_values
                   sizeof(unsigned int) +                                              // tree_index
                   sizeof(typename dealii::internal::p4est::types<dim>::quadrant));    // quadrant
         }
@@ -146,8 +148,8 @@ namespace FETools
           std::memcpy(ptr, &n_dofs, sizeof(unsigned int));
           ptr += sizeof(unsigned int);
 
-          std::memcpy(ptr,dof_values.begin(),n_dofs*sizeof(double));
-          ptr += n_dofs*sizeof(double);
+          std::memcpy(ptr,dof_values.begin(),n_dofs*sizeof(value_type));
+          ptr += n_dofs*sizeof(value_type);
 
           std::memcpy(ptr,&tree_index,sizeof(unsigned int));
           ptr += sizeof(unsigned int);
@@ -167,8 +169,8 @@ namespace FETools
           ptr += sizeof(unsigned int);
 
           dof_values.reinit(n_dofs);
-          std::memcpy(dof_values.begin(),ptr,n_dofs * sizeof(double));
-          ptr += n_dofs * sizeof(double);
+          std::memcpy(dof_values.begin(),ptr,n_dofs * sizeof(value_type));
+          ptr += n_dofs * sizeof(value_type);
 
           std::memcpy(&tree_index,ptr,sizeof(unsigned int));
           ptr += sizeof(unsigned int);
@@ -237,7 +239,7 @@ namespace FETools
       // the cells of this tree and
       // interpolate over patches which
       // are part of this process
-      template <class InVector,class OutVector>
+      template <class InVector>
       void interpolate_recursively (const typename dealii::internal::p4est::types<dim>::forest    &forest,
                                     const typename dealii::internal::p4est::types<dim>::tree      &tree,
                                     const typename dealii::internal::p4est::types<dim>::locidx    &tree_index,
@@ -251,22 +253,21 @@ namespace FETools
       // if a child is reached which
       // is not part of this process
       // a new need is created
-      template <class InVector,typename number>
+      template <class InVector>
       void get_interpolated_dof_values (const typename dealii::internal::p4est::types<dim>::forest    &forest,
                                         const typename dealii::internal::p4est::types<dim>::tree      &tree,
                                         const typename dealii::internal::p4est::types<dim>::locidx    &tree_index,
                                         const typename DoFHandler<dim,spacedim>::cell_iterator        &dealii_cell,
                                         const typename dealii::internal::p4est::types<dim>::quadrant  &p4est_cell,
                                         const InVector                                                &u,
-                                        Vector<number>                                                &interpolated_values,
+                                        Vector<value_type>                                            &interpolated_values,
                                         std::vector<CellData>                                         &new_needs);
 
       // set dof values for this
       // cell by interpolation
-      template <class OutVector,typename number>
       void set_dof_values_by_interpolation (const typename DoFHandler<dim,spacedim>::cell_iterator        &dealii_cell,
                                             const typename dealii::internal::p4est::types<dim>::quadrant  &p4est_cell,
-                                            const Vector<number>                                          &interpolated_values,
+                                            const Vector<value_type>                                      &interpolated_values,
                                             OutVector                                                     &u);
 
       // compute all cell_data
@@ -368,8 +369,8 @@ namespace FETools
       unsigned int round;
     };
 
-    template <>
-    class ExtrapolateImplementation<1,1>
+    template <class OutVector>
+    class ExtrapolateImplementation<1,1,OutVector>
     {
     public:
 
@@ -381,15 +382,15 @@ namespace FETools
       ~ExtrapolateImplementation ()
       {}
 
-      template <class InVector,class OutVector>
+      template <class InVector>
       void extrapolate_parallel (const InVector &/*u2_relevant*/,
                                  const DoFHandler<1,1> &/*dof2*/,
                                  OutVector &/*u2*/)
       {}
     };
 
-    template <>
-    class ExtrapolateImplementation<1,2>
+    template <class OutVector>
+    class ExtrapolateImplementation<1,2,OutVector>
     {
     public:
 
@@ -401,15 +402,15 @@ namespace FETools
       ~ExtrapolateImplementation ()
       {}
 
-      template <class InVector,class OutVector>
+      template <class InVector>
       void extrapolate_parallel (const InVector &/*u2_relevant*/,
                                  const DoFHandler<1,2> &/*dof2*/,
                                  OutVector &/*u2*/)
       {}
     };
 
-    template <>
-    class ExtrapolateImplementation<1,3>
+    template <class OutVector>
+    class ExtrapolateImplementation<1,3,OutVector>
     {
     public:
 
@@ -421,7 +422,7 @@ namespace FETools
       ~ExtrapolateImplementation ()
       {}
 
-      template <class InVector,class OutVector>
+      template <class InVector>
       void extrapolate_parallel (const InVector &/*u2_relevant*/,
                                  const DoFHandler<1,3> &/*dof2*/,
                                  OutVector &/*u2*/)
@@ -430,23 +431,23 @@ namespace FETools
 
 
 
-    template <int dim,int spacedim>
-    ExtrapolateImplementation<dim,spacedim>::
+    template <int dim,int spacedim,class OutVector>
+    ExtrapolateImplementation<dim,spacedim,OutVector>::
     ExtrapolateImplementation ()
       : round(0)
     {}
 
 
 
-    template <int dim,int spacedim>
-    ExtrapolateImplementation<dim,spacedim>::
+    template <int dim,int spacedim,class OutVector>
+    ExtrapolateImplementation<dim,spacedim,OutVector>::
     ~ExtrapolateImplementation ()
     {}
 
 
 
-    template <int dim,int spacedim>
-    ExtrapolateImplementation<dim,spacedim>::
+    template <int dim,int spacedim,class OutVector>
+    ExtrapolateImplementation<dim,spacedim,OutVector>::
     CellData::CellData ()
       : tree_index (0),
         receiver (0)
@@ -454,8 +455,8 @@ namespace FETools
 
 
 
-    template <int dim,int spacedim>
-    ExtrapolateImplementation<dim,spacedim>::
+    template <int dim,int spacedim,class OutVector>
+    ExtrapolateImplementation<dim,spacedim,OutVector>::
     CellData::CellData (const unsigned int dofs_per_cell)
       : tree_index (0),
         receiver (0)
@@ -465,10 +466,10 @@ namespace FETools
 
 
 
-    template <int dim,int spacedim>
-    template <class InVector,class OutVector>
+    template <int dim,int spacedim,class OutVector>
+    template <class InVector>
     void
-    ExtrapolateImplementation<dim,spacedim>::
+    ExtrapolateImplementation<dim,spacedim,OutVector>::
     interpolate_recursively (const typename dealii::internal::p4est::types<dim>::forest    &forest,
                              const typename dealii::internal::p4est::types<dim>::tree      &tree,
                              const typename dealii::internal::p4est::types<dim>::locidx    &tree_index,
@@ -541,17 +542,17 @@ namespace FETools
 
 
 
-    template <int dim,int spacedim>
-    template <class InVector,typename number>
+    template <int dim,int spacedim, class OutVector>
+    template <class InVector>
     void
-    ExtrapolateImplementation<dim,spacedim>::
+    ExtrapolateImplementation<dim,spacedim,OutVector>::
     get_interpolated_dof_values (const typename dealii::internal::p4est::types<dim>::forest    &forest,
                                  const typename dealii::internal::p4est::types<dim>::tree      &tree,
                                  const typename dealii::internal::p4est::types<dim>::locidx    &tree_index,
                                  const typename DoFHandler<dim,spacedim>::cell_iterator        &dealii_cell,
                                  const typename dealii::internal::p4est::types<dim>::quadrant  &p4est_cell,
                                  const InVector                                                &u,
-                                 Vector<number>                                                &interpolated_values,
+                                 Vector<value_type>                                            &interpolated_values,
                                  std::vector<CellData>                                         &new_needs)
     {
       if (!dealii_cell->has_children ())
@@ -581,8 +582,8 @@ namespace FETools
           Assert (u.size() == dealii_cell->get_dof_handler().n_dofs(),
                   ExcDimensionMismatch(u.size(), dealii_cell->get_dof_handler().n_dofs()));
 
-          Vector<number> tmp1(dofs_per_cell);
-          Vector<number> tmp2(dofs_per_cell);
+          Vector<value_type> tmp1(dofs_per_cell);
+          Vector<value_type> tmp2(dofs_per_cell);
 
           interpolated_values = 0;
           std::vector<bool> restriction_is_additive (dofs_per_cell);
@@ -656,7 +657,7 @@ namespace FETools
 
                   // and add up or set them in the output vector
                   for (unsigned int i=0; i<dofs_per_cell; ++i)
-                    if (tmp2(i) != number())
+                    if (tmp2(i) != value_type())
                       {
                         if (restriction_is_additive[i])
                           interpolated_values(i) += tmp2(i);
@@ -673,13 +674,12 @@ namespace FETools
 
 
 
-    template <int dim,int spacedim>
-    template <class OutVector,typename number>
+    template <int dim,int spacedim,class OutVector>
     void
-    ExtrapolateImplementation<dim,spacedim>::
+    ExtrapolateImplementation<dim,spacedim,OutVector>::
     set_dof_values_by_interpolation (const typename DoFHandler<dim,spacedim>::cell_iterator        &dealii_cell,
                                      const typename dealii::internal::p4est::types<dim>::quadrant  &p4est_cell,
-                                     const Vector<number>                                          &local_values,
+                                     const Vector<value_type>                                      &local_values,
                                      OutVector                                                     &u)
     {
       const FiniteElement<dim,spacedim> &fe            = dealii_cell->get_dof_handler().get_fe();
@@ -708,7 +708,7 @@ namespace FETools
           Assert (u.size() == dealii_cell->get_dof_handler().n_dofs(),
                   ExcDimensionMismatch(u.size(), dealii_cell->get_dof_handler().n_dofs()));
 
-          Vector<number> tmp(dofs_per_cell);
+          Vector<value_type> tmp(dofs_per_cell);
 
           typename dealii::internal::p4est::types<dim>::quadrant
           p4est_child[GeometryInfo<dim>::max_children_per_cell];
@@ -732,9 +732,9 @@ namespace FETools
 
 
 
-    template <int dim,int spacedim>
+    template <int dim,int spacedim,class OutVector>
     void
-    ExtrapolateImplementation<dim,spacedim>::
+    ExtrapolateImplementation<dim,spacedim,OutVector>::
     compute_needs (const DoFHandler<dim,spacedim> &dof2,
                    std::vector<CellData>          &new_needs)
     {
@@ -784,9 +784,9 @@ namespace FETools
 
 
 
-    template <int dim,int spacedim>
+    template <int dim,int spacedim,class OutVector>
     void
-    ExtrapolateImplementation<dim,spacedim>::
+    ExtrapolateImplementation<dim,spacedim,OutVector>::
     traverse_tree_recursively (const typename dealii::internal::p4est::types<dim>::forest    &forest,
                                const typename dealii::internal::p4est::types<dim>::tree      &tree,
                                const typename dealii::internal::p4est::types<dim>::locidx    &tree_index,
@@ -862,9 +862,9 @@ namespace FETools
 
 
 
-    template <int dim,int spacedim>
+    template <int dim,int spacedim,class OutVector>
     void
-    ExtrapolateImplementation<dim,spacedim>::
+    ExtrapolateImplementation<dim,spacedim,OutVector>::
     traverse_patch_recursively (const typename dealii::internal::p4est::types<dim>::forest    &forest,
                                 const typename dealii::internal::p4est::types<dim>::tree      &tree,
                                 const typename dealii::internal::p4est::types<dim>::locidx    &tree_index,
@@ -919,11 +919,10 @@ namespace FETools
 
 
 
-
-    template <int dim,int spacedim>
+    template <int dim,int spacedim,class OutVector>
     template <class InVector>
     void
-    ExtrapolateImplementation<dim,spacedim>::
+    ExtrapolateImplementation<dim,spacedim,OutVector>::
     compute_cells (const DoFHandler<dim,spacedim> &dof2,
                    const InVector                 &u,
                    std::vector<CellData>          &cells_to_compute,
@@ -977,10 +976,10 @@ namespace FETools
 
 
 
-    template <int dim,int spacedim>
+    template <int dim,int spacedim,class OutVector>
     template <class InVector>
     void
-    ExtrapolateImplementation<dim,spacedim>::
+    ExtrapolateImplementation<dim,spacedim,OutVector>::
     compute_cells_in_tree_recursively (const typename dealii::internal::p4est::types<dim>::forest    &forest,
                                        const typename dealii::internal::p4est::types<dim>::tree      &tree,
                                        const typename dealii::internal::p4est::types<dim>::locidx    &tree_index,
@@ -1067,9 +1066,9 @@ namespace FETools
 
 
 
-    template <int dim,int spacedim>
+    template <int dim,int spacedim,class OutVector>
     void
-    ExtrapolateImplementation<dim,spacedim>::
+    ExtrapolateImplementation<dim,spacedim,OutVector>::
     send_cells (const std::vector<CellData>  &cells_to_send,
                 std::vector<CellData>        &received_cells) const
     {
@@ -1133,9 +1132,9 @@ namespace FETools
 
 
 
-    template <int dim,int spacedim>
+    template <int dim,int spacedim,class OutVector>
     void
-    ExtrapolateImplementation<dim,spacedim>::
+    ExtrapolateImplementation<dim,spacedim,OutVector>::
     add_new_need (const typename dealii::internal::p4est::types<dim>::forest    &forest,
                   const typename dealii::internal::p4est::types<dim>::locidx    &tree_index,
                   const typename DoFHandler<dim,spacedim>::cell_iterator        &dealii_cell,
@@ -1159,9 +1158,9 @@ namespace FETools
 
 
 
-    template <int dim,int spacedim>
+    template <int dim,int spacedim,class OutVector>
     int
-    ExtrapolateImplementation<dim,spacedim>::
+    ExtrapolateImplementation<dim,spacedim,OutVector>::
     cell_data_search (const CellData               &cell_data,
                       const std::vector<CellData>  &cells_list)
     {
@@ -1178,9 +1177,9 @@ namespace FETools
 
 
 
-    template <int dim,int spacedim>
+    template <int dim,int spacedim,class OutVector>
     void
-    ExtrapolateImplementation<dim,spacedim>::
+    ExtrapolateImplementation<dim,spacedim,OutVector>::
     cell_data_insert (const CellData         &cell_data,
                       std::vector<CellData>  &cells_list)
     {
@@ -1195,10 +1194,10 @@ namespace FETools
 
 
 
-    template <int dim,int spacedim>
+    template <int dim,int spacedim,class OutVector>
     template <class InVector>
     void
-    ExtrapolateImplementation<dim,spacedim>::
+    ExtrapolateImplementation<dim,spacedim,OutVector>::
     compute_all_non_local_data (const DoFHandler<dim,spacedim> &dof2,
                                 const InVector                 &u)
     {
@@ -1292,10 +1291,10 @@ namespace FETools
 
 
 
-    template <int dim,int spacedim>
-    template <class InVector,class OutVector>
+    template <int dim,int spacedim,class OutVector>
+    template <class InVector>
     void
-    ExtrapolateImplementation<dim,spacedim>::
+    ExtrapolateImplementation<dim,spacedim,OutVector>::
     extrapolate_parallel (const InVector &u2_relevant,
                           const DoFHandler<dim,spacedim> &dof2,
                           OutVector &u2)
@@ -1605,7 +1604,7 @@ namespace FETools
         internal::reinit_ghosted(dof2, u3_relevant);
         u3_relevant = u3;
 
-        internal::ExtrapolateImplementation<dim,spacedim>  implementation;
+        internal::ExtrapolateImplementation<dim,spacedim,OutVector>  implementation;
         implementation.extrapolate_parallel (u3_relevant, dof2, u2);
       }
     else

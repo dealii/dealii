@@ -68,7 +68,7 @@ namespace FETools
 {
   namespace internal
   {
-    template <int, int> class ExtrapolateImplementation;
+    template <int, int, class> class ExtrapolateImplementation;
   }
 }
 
@@ -887,7 +887,7 @@ namespace parallel
 
       template <int, int> friend class dealii::internal::DoFHandler::Policy::ParallelDistributed;
 
-      template <int,int> friend class dealii::FETools::internal::ExtrapolateImplementation;
+      template <int,int,class> friend class dealii::FETools::internal::ExtrapolateImplementation;
     };
 
 
