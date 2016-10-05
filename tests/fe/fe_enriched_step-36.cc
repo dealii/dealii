@@ -62,21 +62,23 @@ using namespace dealii;
  * Coulomb potential
  */
 template<int dim>
-class PotentialFunction : public dealii::Function<dim>
+class PotentialFunction : public Function<dim>
 {
 public:
   PotentialFunction()
-    : dealii::Function<dim>(1)
+    : Function<dim>(1)
   {}
 
-  virtual double value(const dealii::Point<dim> &point,
+  virtual double value(const Point<dim> &point,
                        const unsigned int component = 0 ) const;
 };
 
 template<int dim>
-double PotentialFunction<dim>::value(const dealii::Point<dim> &p,
+double PotentialFunction<dim>::value(const Point<dim> &p,
                                      const unsigned int ) const
 {
+  Assert (p.square() > 0.,
+          ExcDivideByZero());
   return -1.0 / std::sqrt(p.square());
 }
 
@@ -114,6 +116,8 @@ public:
   {
     Tensor<1,dim> dist = p-origin;
     const double r = dist.norm();
+    Assert (r > 0.,
+            ExcDivideByZero());
     dist/=r;
     return -Z*std::exp(-Z*r)*dist;
   }
@@ -155,7 +159,6 @@ namespace Step36
     std::pair<unsigned int, unsigned int> setup_system ();
     void assemble_system ();
     std::pair<unsigned int, double> solve ();
-    void constrain_pou_dofs();
     void estimate_error ();
     void refine_grid ();
     void output_results (const unsigned int cycle) const;
@@ -188,11 +191,9 @@ namespace Step36
     EnrichmentFunction<dim> enrichment;
 
     const FEValuesExtractors::Scalar fe_extractor;
-    const unsigned int               fe_group;
     const unsigned int               fe_fe_index;
     const unsigned int               fe_material_id;
     const FEValuesExtractors::Scalar pou_extractor;
-    const unsigned int               pou_group;
     const unsigned int               pou_fe_index;
     const unsigned int               pou_material_id;
 
@@ -205,8 +206,8 @@ namespace Step36
     :
     dof_handler (triangulation),
     mpi_communicator(MPI_COMM_WORLD),
-    n_mpi_processes(dealii::Utilities::MPI::n_mpi_processes(mpi_communicator)),
-    this_mpi_process(dealii::Utilities::MPI::this_mpi_process(mpi_communicator)),
+    n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator)),
+    this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator)),
     pcout (std::cout,
            (this_mpi_process == 0)),
     number_of_eigenvalues(1),
@@ -214,15 +215,13 @@ namespace Step36
            /*Z*/1.0,
            /*radius*/2.5), // radius is set such that 8 cells are marked as enriched
     fe_extractor(/*dofs start at...*/0),
-    fe_group(/*in FE*/0),
     fe_fe_index(0),
     fe_material_id(0),
     pou_extractor(/*dofs start at (scalar fields!)*/1),
-    pou_group(/*FE*/1),
     pou_fe_index(1),
     pou_material_id(1)
   {
-    dealii::GridGenerator::hyper_cube (triangulation, -10, 10);
+    GridGenerator::hyper_cube (triangulation, -10, 10);
     triangulation.refine_global (2); // 64 cells
 
     for (auto cell= triangulation.begin_active(); cell != triangulation.end(); ++cell)
@@ -359,49 +358,6 @@ namespace Step36
     return cell->material_id() == pou_material_id;
   }
 
-  template <int dim>
-  void
-  EigenvalueProblem<dim>::constrain_pou_dofs()
-  {
-    std::vector<unsigned int> local_face_dof_indices(fe_collection[pou_fe_index].dofs_per_face);
-    for (typename hp::DoFHandler<dim>::active_cell_iterator
-         cell = dof_handler.begin_active();
-         cell != dof_handler.end(); ++cell)
-      if (cell_is_pou(cell))
-        for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-          if (!cell->at_boundary(f))
-            {
-              bool face_is_on_interface = false;
-              if ((cell->neighbor(f)->has_children() == false /* => it is active */)
-                  &&
-                  (! cell_is_pou(cell->neighbor(f))))
-                face_is_on_interface = true;
-              else if (cell->neighbor(f)->has_children() == true)
-                {
-                  // The neighbor does
-                  // have
-                  // children. See if
-                  // any of the cells
-                  // on the other
-                  // side are vanilla FEM
-                  for (unsigned int sf=0; sf<cell->face(f)->n_children(); ++sf)
-                    if (!cell_is_pou (cell->neighbor_child_on_subface(f, sf)))
-                      {
-                        face_is_on_interface = true;
-                        break;
-                      }
-                }
-              // add constraints
-              if (face_is_on_interface)
-                {
-                  cell->face(f)->get_dof_indices (local_face_dof_indices, pou_fe_index);
-                  for (unsigned int i=0; i<local_face_dof_indices.size(); ++i)
-                    if (fe_collection[pou_fe_index].face_system_to_base_index(i).first.first == pou_group)
-                      //if (fe_collection[1].face_system_to_component_index(i).first /*component*/ > 0)
-                      constraints.add_line (local_face_dof_indices[i]);
-                }
-            }
-  }
 
   template <int dim>
   void
@@ -410,13 +366,10 @@ namespace Step36
     stiffness_matrix = 0;
     mass_matrix = 0;
 
-    dealii::FullMatrix<double> cell_stiffness_matrix;
-    dealii::FullMatrix<double> cell_mass_matrix;
+    FullMatrix<double> cell_stiffness_matrix;
+    FullMatrix<double> cell_mass_matrix;
     std::vector<types::global_dof_index> local_dof_indices;
     std::vector<double> potential_values;
-    std::vector<double> enrichment_values;
-    std::vector<Tensor<1,dim>> enrichment_gradients;
-
     hp::FEValues<dim> fe_values_hp(fe_collection, q_collection,
                                    update_values | update_gradients |
                                    update_quadrature_points | update_JxW_values);
@@ -435,8 +388,6 @@ namespace Step36
           const unsigned int &n_q_points    = fe_values.n_quadrature_points;
 
           potential_values.resize(n_q_points);
-          enrichment_values.resize(n_q_points);
-          enrichment_gradients.resize(n_q_points);
 
           local_dof_indices.resize     (dofs_per_cell);
           cell_stiffness_matrix.reinit (dofs_per_cell,dofs_per_cell);
@@ -488,17 +439,17 @@ namespace Step36
                                        mass_matrix);
         }
 
-    stiffness_matrix.compress (dealii::VectorOperation::add);
-    mass_matrix.compress (dealii::VectorOperation::add);
+    stiffness_matrix.compress (VectorOperation::add);
+    mass_matrix.compress (VectorOperation::add);
   }
 
   template<int dim>
   std::pair<unsigned int, double>
   EigenvalueProblem<dim>::solve()
   {
-    dealii::SolverControl solver_control (dof_handler.n_dofs(), 1e-9,false,false);
-    dealii::SLEPcWrappers::SolverKrylovSchur eigensolver (solver_control,
-                                                          mpi_communicator);
+    SolverControl solver_control (dof_handler.n_dofs(), 1e-9,false,false);
+    SLEPcWrappers::SolverKrylovSchur eigensolver (solver_control,
+                                                  mpi_communicator);
 
     eigensolver.set_which_eigenpairs (EPS_SMALLEST_REAL);
     eigensolver.set_problem_type (EPS_GHEP);
@@ -529,7 +480,7 @@ namespace Step36
   {
     {
       std::vector<const PETScWrappers::MPI::Vector *> sol (number_of_eigenvalues);
-      std::vector<dealii::Vector<float> *>   error (number_of_eigenvalues);
+      std::vector<Vector<float> *>   error (number_of_eigenvalues);
 
       for (unsigned int i = 0; i < number_of_eigenvalues; i++)
         {
@@ -538,8 +489,8 @@ namespace Step36
         }
 
       hp::QCollection<dim-1> face_quadrature_formula;
-      face_quadrature_formula.push_back (dealii::QGauss<dim-1>(3));
-      face_quadrature_formula.push_back (dealii::QGauss<dim-1>(3));
+      face_quadrature_formula.push_back (QGauss<dim-1>(3));
+      face_quadrature_formula.push_back (QGauss<dim-1>(3));
 
       KellyErrorEstimator<dim>::estimate (dof_handler,
                                           face_quadrature_formula,
@@ -572,61 +523,11 @@ namespace Step36
   }
 
   template <int dim>
-  class Postprocessor : public DataPostprocessorScalar<dim>
-  {
-  public:
-    Postprocessor(const EnrichmentFunction<dim> &enrichment);
-
-    virtual
-    void
-    compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
-                                       const std::vector<std::vector<Tensor<1,dim> > > &duh,
-                                       const std::vector<std::vector<Tensor<2,dim> > > &dduh,
-                                       const std::vector<Point<dim> >                  &normals,
-                                       const std::vector<Point<dim> >                  &evaluation_points,
-                                       std::vector<Vector<double> >                    &computed_quantities) const;
-
-  private:
-    const EnrichmentFunction<dim> &enrichment;
-  };
-
-  template <int dim>
-  Postprocessor<dim>::Postprocessor(const EnrichmentFunction<dim> &enrichment)
-    :
-    DataPostprocessorScalar<dim> ("total_solution",
-                                  update_values | update_q_points),
-    enrichment(enrichment)
-  {}
-
-  template <int dim>
-  void
-  Postprocessor<dim>::
-  compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
-                                     const std::vector<std::vector<Tensor<1,dim> > > &/*duh*/,
-                                     const std::vector<std::vector<Tensor<2,dim> > > &/*dduh*/,
-                                     const std::vector<Point<dim> >                  &/*normals*/,
-                                     const std::vector<Point<dim> >                  &evaluation_points,
-                                     std::vector<Vector<double> >                    &computed_quantities) const
-  {
-    const unsigned int n_quadrature_points = uh.size();
-    Assert (computed_quantities.size() == n_quadrature_points,  ExcInternalError());
-    for (unsigned int q=0; q<n_quadrature_points; ++q)
-      {
-        Assert(uh[q].size() == 2, ExcDimensionMismatch (uh[q].size(), 2)); // FESystem with 2 components
-
-        computed_quantities[q](0)
-          = (uh[q](0)
-             +
-             uh[q](1) * enrichment.value(evaluation_points[q])); // for FE_Nothing uh[q](1) will be zero
-      }
-  }
-
-  template <int dim>
   void EigenvalueProblem<dim>::output_results (const unsigned int cycle) const
   {
-    dealii::Vector<float> fe_index(triangulation.n_active_cells());
+    Vector<float> fe_index(triangulation.n_active_cells());
     {
-      typename dealii::hp::DoFHandler<dim>::active_cell_iterator
+      typename hp::DoFHandler<dim>::active_cell_iterator
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
       for (unsigned int index=0; cell!=endc; ++cell, ++index)
@@ -641,7 +542,6 @@ namespace Step36
         filename += ".vtk";
         std::ofstream output (filename.c_str());
 
-        Postprocessor<dim> postprocessor(enrichment); // has to live until the DataOut object is destroyed; objects are destroyed in reverse order of declaration
         DataOut<dim,hp::DoFHandler<dim> > data_out;
         data_out.attach_dof_handler (dof_handler);
         data_out.add_data_vector (eigenfunctions_locally_relevant[0], "solution");
@@ -740,14 +640,14 @@ int main (int argc,char **argv)
 
   try
     {
-      dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
         Step36::EigenvalueProblem<dim> step36;
-        dealii::PETScWrappers::set_option_value("-eps_target","-1.0");
-        dealii::PETScWrappers::set_option_value("-st_type","sinvert");
-        dealii::PETScWrappers::set_option_value("-st_ksp_type","cg");
-        dealii::PETScWrappers::set_option_value("-st_pc_type", "gamg");
-        dealii::PETScWrappers::set_option_value("-st_ksp_tol", "1e-11");
+        PETScWrappers::set_option_value("-eps_target","-1.0");
+        PETScWrappers::set_option_value("-st_type","sinvert");
+        PETScWrappers::set_option_value("-st_ksp_type","cg");
+        PETScWrappers::set_option_value("-st_pc_type", "gamg");
+        PETScWrappers::set_option_value("-st_ksp_tol", "1e-11");
         step36.run();
       }
 
