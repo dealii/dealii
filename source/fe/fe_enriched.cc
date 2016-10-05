@@ -188,12 +188,10 @@ FE_Enriched<dim,spacedim>::FE_Enriched (const std::vector< const FiniteElement< 
         continue;
 
       const unsigned int base_m  = this->system_to_base_table[system_index].first.second;
-      const unsigned int
-      base_index = this->system_to_base_table[system_index].second;
 
       Assert (base_m < base_no_mult_local_enriched_dofs[base_no].size(),
               ExcMessage("Size mismatch for base_no_mult_local_enriched_dofs: "
-                         "base_index = " + std::to_string(base_index) +
+                         "base_index = " + std::to_string(this->system_to_base_table[system_index].second) +
                          "; base_no = " + std::to_string(base_no) +
                          "; base_m = " + std::to_string(base_m) +
                          "; system_index = " + std::to_string(system_index)));
