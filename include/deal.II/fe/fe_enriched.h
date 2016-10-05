@@ -18,7 +18,11 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_CXX11
+// We require c++14 here even though we only need features that are part of
+// c++11, but it turns out that gcc 4.6.x and 4.7.x don't support c++11
+// features like delegating constructors.
+
+#ifdef DEAL_II_WITH_CXX14
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_nothing.h>
@@ -607,7 +611,7 @@ private:
 //}
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // CXX11
+#endif // CXX14
 
 #endif // dealii__fe_enriched_h
 

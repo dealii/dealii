@@ -13,7 +13,8 @@
 //
 // ---------------------------------------------------------------------
 #include <deal.II/fe/fe_enriched.h>
-#ifdef DEAL_II_WITH_CXX11
+
+#ifdef DEAL_II_WITH_CXX14
 
 #include <deal.II/fe/fe_tools.h>
 
@@ -921,4 +922,4 @@ InternalData::get_fe_output_object (const unsigned int base_no) const
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // CXX11
+#endif // CXX14
