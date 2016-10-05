@@ -173,14 +173,14 @@ void ExceptionBase::print_exc_data (std::ostream &out) const
         << "    " << exc  << std::endl;
 
   // finally print the additional information the exception provides:
-  out << "Additional Information: " << std::endl;
+  out << "Additional information: " << std::endl;
 }
 
 
 
 void ExceptionBase::print_info (std::ostream &out) const
 {
-  out << "(none)" << std::endl;
+  out << "    (none)" << std::endl;
 }
 
 

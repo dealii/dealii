@@ -393,7 +393,7 @@ namespace deal_II_exceptions
     Exception (const std::string &msg = defaulttext) : arg (msg) {}       \
     virtual ~Exception () DEAL_II_NOEXCEPT {}                             \
     virtual void print_info (std::ostream &out) const {                   \
-      out << arg << std::endl;                                            \
+      out << "    " << arg << std::endl;                                  \
     }                                                                     \
   private:                                                                \
     const std::string arg;                                                \
@@ -411,7 +411,7 @@ namespace deal_II_exceptions
     Exception1 (const type1 a1) : arg1 (a1) {}                            \
     virtual ~Exception1 () DEAL_II_NOEXCEPT {}                            \
     virtual void print_info (std::ostream &out) const {                   \
-      out outsequence << std::endl;                                       \
+      out << "    " outsequence << std::endl;                             \
     }                                                                     \
   private:                                                                \
     const type1 arg1;                                                     \
@@ -431,7 +431,7 @@ namespace deal_II_exceptions
       arg1 (a1), arg2(a2) {}                                              \
     virtual ~Exception2 () DEAL_II_NOEXCEPT {}                            \
     virtual void print_info (std::ostream &out) const {                   \
-      out outsequence << std::endl;                                       \
+      out << "    " outsequence << std::endl;                             \
     }                                                                     \
   private:                                                                \
     const type1 arg1;                                                     \
@@ -452,7 +452,7 @@ namespace deal_II_exceptions
       arg1 (a1), arg2(a2), arg3(a3) {}                                    \
     virtual ~Exception3 () DEAL_II_NOEXCEPT {}                            \
     virtual void print_info (std::ostream &out) const {                   \
-      out outsequence << std::endl;                                       \
+      out << "    " outsequence << std::endl;                             \
     }                                                                     \
   private:                                                                \
     const type1 arg1;                                                     \
@@ -475,7 +475,7 @@ namespace deal_II_exceptions
       arg1 (a1), arg2(a2), arg3(a3), arg4(a4) {}                          \
     virtual ~Exception4 () DEAL_II_NOEXCEPT {}                            \
     virtual void print_info (std::ostream &out) const {                   \
-      out outsequence << std::endl;                                       \
+      out << "    " outsequence << std::endl;                             \
     }                                                                     \
   private:                                                                \
     const type1 arg1;                                                     \
@@ -499,7 +499,7 @@ namespace deal_II_exceptions
       arg1 (a1), arg2(a2), arg3(a3), arg4(a4), arg5(a5) {}                \
     virtual ~Exception5 () DEAL_II_NOEXCEPT {}                            \
     virtual void print_info (std::ostream &out) const {                   \
-      out outsequence << std::endl;                                       \
+      out << "    " outsequence << std::endl;                             \
     }                                                                     \
   private:                                                                \
     const type1 arg1;                                                     \
