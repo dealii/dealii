@@ -97,7 +97,7 @@ void check_grid()
 
   my_cylinder (triangulation, 0.5, 1.0);
 
-  typename Triangulation<dim>::active_cell_iterator
+  Triangulation<dim>::active_cell_iterator
   cell = triangulation.begin (),
   endc = triangulation.end();
   for (; cell!=endc; ++cell)
