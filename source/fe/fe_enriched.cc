@@ -12,6 +12,8 @@
 // the top level of the deal.II distribution.
 //
 // ---------------------------------------------------------------------
+
+
 #include <deal.II/fe/fe_enriched.h>
 
 #ifdef DEAL_II_WITH_CXX14
@@ -127,17 +129,19 @@ FE_Enriched<dim,spacedim>::FE_Enriched (const FiniteElement<dim,spacedim> &fe_ba
                                         const Function<spacedim>      *enrichment_function)
   :
   FE_Enriched<dim,spacedim>
-  (&fe_base, { &fe_enriched },
+  (&fe_base,
+   std::vector<const FiniteElement<dim,spacedim>*>(1, &fe_enriched),
+   std::vector<std::vector<std::function<const Function<spacedim> *(const typename Triangulation<dim, spacedim>::cell_iterator &) > > >
+   (1,
+    std::vector<std::function<const Function<spacedim> *(const typename Triangulation<dim, spacedim>::cell_iterator &) > >
+    (1,
+     [=] (const typename Triangulation<dim, spacedim>::cell_iterator &) -> const Function<spacedim> *
 {
-  {
-    [=] (const typename Triangulation<dim, spacedim>::cell_iterator &) -> const Function<spacedim> *
-    {
-      return enrichment_function;
-    }
-  }
+  return enrichment_function;
 })
-{
-}
+ )
+)
+{}
 
 
 template <int dim, int spacedim>
@@ -148,8 +152,7 @@ FE_Enriched<dim,spacedim>::FE_Enriched (const FiniteElement<dim,spacedim> *fe_ba
   FE_Enriched<dim,spacedim> (build_fes(fe_base,fe_enriched),
                              build_multiplicities(functions),
                              functions)
-{
-}
+{}
 
 
 template <int dim, int spacedim>
