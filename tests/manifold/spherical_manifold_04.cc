@@ -69,7 +69,6 @@ void test (const double R)
   MappingQ<dim> mapping(fe_degree);
 
   FEValues<dim> fe_values (mapping, fe, quadrature_formula,
-                           update_quadrature_points |
                            update_JxW_values);
 
   DoFHandler<dim>::active_cell_iterator

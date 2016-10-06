@@ -123,7 +123,6 @@ void test (MappingEnum::type mapping_name, unsigned int refinements=1)
     }
 
   FEValues<2,3> fe_values (*mapping, fe, cell_quadrature,
-                           update_values            |
                            update_JxW_values);
   const unsigned int n_q_points    = cell_quadrature.size();
 
