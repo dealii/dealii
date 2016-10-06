@@ -803,7 +803,9 @@ namespace DoFTools
                         continue; // (the neighbor is finer)
 
                       const unsigned int
-                      neighbor_face_n = cell->neighbor_face_no (face_n);
+                      neighbor_face_n = periodic_neighbor?
+                                        cell->periodic_neighbor_face_no (face_n):
+                                        cell->neighbor_face_no (face_n);
 
                       if (cell_face->has_children ())
                         {
