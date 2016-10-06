@@ -1,6 +1,6 @@
 
 //
-// Copyright (C) 2015 by the deal.II authors
+// Copyright (C) 2015, 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,11 +37,11 @@ void test()
   repetitions[1] = 2;
   repetitions[2] = 1;
   GridGenerator::subdivided_hyper_rectangle(tria,repetitions,a,b);
-  typename Triangulation<3>::active_cell_iterator cell = tria.begin_active();
+  Triangulation<3>::active_cell_iterator cell = tria.begin_active();
   cell->set_refine_flag();
   tria.execute_coarsening_and_refinement();
 
-  std::vector<std::set<typename Triangulation<3>::active_cell_iterator> >
+  std::vector<std::set<Triangulation<3>::active_cell_iterator> >
   vertex_to_cell = GridTools::vertex_to_cell_map(tria);
 
   AssertThrow(tria.n_vertices()==vertex_to_cell.size(),

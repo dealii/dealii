@@ -69,10 +69,9 @@ void test (const double R)
   MappingQ<dim> mapping(fe_degree);
 
   FEValues<dim> fe_values (mapping, fe, quadrature_formula,
-                           update_quadrature_points |
                            update_JxW_values);
 
-  typename DoFHandler<dim>::active_cell_iterator
+  DoFHandler<dim>::active_cell_iterator
   cell = dof_handler.begin_active (),
   endc = dof_handler.end ();
   const unsigned int n_q_points = quadrature_formula.size();

@@ -83,7 +83,7 @@ void test (MappingEnum::type mapping_name, unsigned int refinements=1)
   // static const RotatedSphericalManifold rotated_sphere;
   // triangulation.set_manifold (1, rotated_sphere);
 
-  for (typename Triangulation<2,3>::active_cell_iterator
+  for (Triangulation<2,3>::active_cell_iterator
        cell=triangulation.begin_active();
        cell!=triangulation.end(); ++cell)
     {
@@ -123,22 +123,17 @@ void test (MappingEnum::type mapping_name, unsigned int refinements=1)
     }
 
   FEValues<2,3> fe_values (*mapping, fe, cell_quadrature,
-                           update_values            |
-                           update_gradients         |
-                           update_quadrature_points |
                            update_JxW_values);
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = cell_quadrature.size();
 
   double surface_area = 0;
-  for (typename DoFHandler<2,3>::active_cell_iterator
+  for (DoFHandler<2,3>::active_cell_iterator
        cell = dof_handler.begin_active(),
        endc = dof_handler.end();
        cell!=endc; ++cell)
     {
       double patch_surface = 0;
       fe_values.reinit (cell);
-      const std::vector<Point<3> > &qp = fe_values.get_quadrature_points();
 
 
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
