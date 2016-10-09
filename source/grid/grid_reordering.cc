@@ -463,10 +463,11 @@ namespace internal
      */
     template <int dim>
     unsigned int
-    get_next_unoriented_quad(const std::vector<Cell<dim> > &cells,
-                             const std::vector<Edge<dim> > &edges)
+    get_next_unoriented_cell(const std::vector<Cell<dim> > &cells,
+                             const std::vector<Edge<dim> > &edges,
+                             const unsigned int             current_cell)
     {
-      for (unsigned int c=0; c<cells.size(); ++c)
+      for (unsigned int c=current_cell; c<cells.size(); ++c)
         for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
           if (edges[cells[c].edge_indices[l]].orientation_status == Edge<dim>::not_oriented)
             return c;
@@ -704,8 +705,10 @@ namespace internal
 
       // then loop over all cells and start orienting parallel edge sets
       // of cells that still have non-oriented edges
-      unsigned int next_cell_with_unoriented_edge;
-      while ((next_cell_with_unoriented_edge = get_next_unoriented_quad(cell_list, edge_list)) !=
+      unsigned int next_cell_with_unoriented_edge = 0;
+      while ((next_cell_with_unoriented_edge = get_next_unoriented_cell(cell_list,
+                                               edge_list,
+                                               next_cell_with_unoriented_edge)) !=
              numbers::invalid_unsigned_int)
         {
           // see which edge sets are still not oriented
