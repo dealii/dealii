@@ -131,7 +131,7 @@ line and on what happens when compiling programs, respectively.
 Note that deal.II is actively developed, and in the course of this
 development we occasionally rename or deprecate functions or classes
 that are still referenced in these video lectures.  For
-example, step-1 code shown in the video lecture 5 has a class
+example, the step-1 code shown in video lecture 5 uses a class
 HyperShellBoundary which was replaced with SphericalManifold class
 later on. However, in spite of such kind of details the content of the
 lectures is still very relevant.
