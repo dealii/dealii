@@ -77,7 +77,7 @@ void test ()
 
   // loop over cells, fill local matrix with
   // random values, insert both into sparse and
-  // full matrix. Make some random entries equal
+  // diagonal vector. Make some random entries equal
   // to zero
   typename DoFHandler<dim>::active_cell_iterator
   cell = dof.begin_active(), endc = dof.end();

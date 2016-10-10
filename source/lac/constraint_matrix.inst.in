@@ -22,6 +22,7 @@ for (S: REAL_SCALARS; T : DEAL_II_VEC_TEMPLATES)
     template void ConstraintMatrix::distribute_local_to_global<T<S> > (
         const Vector<S>&, const std::vector<types::global_dof_index> &, const std::vector<types::global_dof_index> &, T<S> &, const FullMatrix<S>&, bool) const;
     template void ConstraintMatrix::set_zero<T<S> >(T<S> &) const;
+    template void ConstraintMatrix::distribute_local_to_global<T<S> > (T<S>&, const FullMatrix<S>&, const std::vector<types::global_dof_index> &) const;
 }
 
 
