@@ -2379,6 +2379,57 @@ ConstraintMatrix::distribute_local_to_global (
 }
 
 
+template <typename VectorType>
+void
+ConstraintMatrix::distribute_local_to_global (
+  VectorType                   &global_vector_diagonals,
+  const FullMatrix<typename VectorType::value_type>  &local_matrix,
+  const std::vector<size_type> &indices) const
+{
+  typedef typename VectorType::value_type number;
+
+  AssertDimension (local_matrix.m(), indices.size());
+  AssertDimension (local_matrix.n(), indices.size());
+
+  const size_type n_local_dofs = indices.size();
+
+  typename internals::ConstraintMatrixData<number>::ScratchDataAccessor
+  scratch_data;
+  internals::GlobalRowsFromLocal &global_rows = scratch_data->global_rows;
+  global_rows.reinit(n_local_dofs);
+  internals::GlobalRowsFromLocal &global_cols = scratch_data->global_columns;
+  global_cols.reinit(n_local_dofs);
+  make_sorted_row_list (indices, global_rows);
+  make_sorted_row_list (indices, global_cols);
+
+  const size_type n_actual_dofs = global_rows.size();
+
+  // create arrays for the column data (indices and values) that will then be
+  // written into the matrix. Shortcut for deal.II sparse matrix
+  std::vector<size_type> &cols = scratch_data->columns;
+  std::vector<number>     &vals = scratch_data->values;
+  cols.resize(n_actual_dofs);
+  vals.resize(n_actual_dofs);
+
+  // now do the actual job.
+  for (size_type i=0; i<n_actual_dofs; ++i)
+    {
+      const size_type row = global_rows.global_row(i);
+
+      // calculate all the data that will be written into the matrix row.
+      size_type *col_ptr = &cols[0];
+      number    *val_ptr = &vals[0];
+      internals::resolve_matrix_row (global_rows, global_cols, i, 0,
+                                     n_actual_dofs,
+                                     local_matrix, col_ptr, val_ptr);
+      const size_type n_values = col_ptr - &cols[0];
+      for (unsigned int c = 0; c < n_values; c++)
+        if ( cols[c] == row)
+          global_vector_diagonals[row] += vals[c];
+    }
+}
+
+
 // similar function as above, but now specialized for block matrices. See the
 // other function for additional comments.
 template <typename MatrixType, typename VectorType>
