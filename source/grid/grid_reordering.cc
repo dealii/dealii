@@ -146,8 +146,111 @@ namespace internal
     };
 
 
-    template <int dim>
-    class Edge;
+    /**
+     * A structure that store the index of a cell and, crucially, how a
+     * given edge relates to this cell.
+     */
+    struct AdjacentCell
+    {
+      /**
+       * Default constructor. Initialize the fields with invalid values.
+       */
+      AdjacentCell ()
+        :
+        cell_index (numbers::invalid_unsigned_int),
+        edge_within_cell (numbers::invalid_unsigned_int)
+      {}
+
+      /**
+       * Constructor. Initialize the fields with the given values.
+       */
+      AdjacentCell (const unsigned int cell_index,
+                    const unsigned int edge_within_cell)
+        :
+        cell_index (cell_index),
+        edge_within_cell (edge_within_cell)
+      {}
+
+
+      unsigned int cell_index;
+      unsigned int edge_within_cell;
+    };
+
+
+
+    template <int dim> class AdjacentCells;
+
+    /**
+     * A class that represents all of the cells adjacent to a given edge.
+     * This class corresponds to the 2d case where each edge has at most
+     * two adjacent cells.
+     */
+    template <>
+    class AdjacentCells<2>
+    {
+    public:
+      typedef const AdjacentCell *const_iterator;
+
+      /**
+       * Add the given cell to the collection of cells adjacent to
+       * the edge this object corresponds to. Since we are covering
+       * the 2d case, the set of adjacent cells currently
+       * represented by this object must have either zero or
+       * one element already, since we can not add more than two
+       * adjacent cells for each edge.
+       */
+      void push_back (const AdjacentCell &adjacent_cell)
+      {
+        if (adjacent_cells[0].cell_index == numbers::invalid_unsigned_int)
+          adjacent_cells[0] = adjacent_cell;
+        else
+          {
+            Assert (adjacent_cells[1].cell_index == numbers::invalid_unsigned_int,
+                    ExcInternalError());
+            adjacent_cells[1] = adjacent_cell;
+          }
+      }
+
+
+      /**
+       * Return an iterator to the first valid cell stored as adjacent to the
+       * edge represented by the current object.
+       * @return
+       */
+      const_iterator begin () const
+      {
+        return &adjacent_cells[0];
+      }
+
+
+      /**
+       * Return an iterator to the element past the last valid cell stored
+       * as adjacent to the edge represented by the current object.
+       * @return
+       */
+      const_iterator end () const
+      {
+        // check whether the current object stores zero, one, or two
+        // adjacent cells, and use this to point to the element past the
+        // last valid one
+        if (adjacent_cells[0].cell_index == numbers::invalid_unsigned_int)
+          return &adjacent_cells[0];
+        else if (adjacent_cells[1].cell_index == numbers::invalid_unsigned_int)
+          return &adjacent_cells[1];
+        else
+          return &adjacent_cells[2];
+      }
+
+    private:
+      /**
+       * References to the (at most) two cells that are adjacent to
+       * the edge this object corresponds to. Unused elements are
+       * default-initialized and have invalid values; in particular,
+       * their cell_index field equals numbers::invalid_unsigned_int.
+       */
+      AdjacentCell adjacent_cells[2];
+    };
+
 
     /**
      * A class that describes all of the relevant properties of an
@@ -158,13 +261,10 @@ namespace internal
      * (global) direction of the edge: either from the first vertex to
      * the second, the other way around, or so far undetermined.
      */
-    template <>
-    class Edge<2>
+    template <int dim>
+    class Edge
     {
     public:
-
-      static const unsigned int dim = 2;
-
       /**
        * Default constructor. Creates an invalid edge.
        */
@@ -219,25 +319,6 @@ namespace internal
       }
 
       /**
-       * Store the given cell index as one of the cells as adjacent to
-       * the current edge. Also store that the current edge has index
-       * @p edge_within_cell within the given cell.
-       */
-      void add_adjacent_cell (const unsigned int cell_index,
-                              const unsigned int edge_within_cell)
-      {
-        const AdjacentCell adjacent_cell (cell_index, edge_within_cell);
-        if (adjacent_cells[0].cell_index == numbers::invalid_unsigned_int)
-          adjacent_cells[0] = adjacent_cell;
-        else
-          {
-            Assert (adjacent_cells[1].cell_index == numbers::invalid_unsigned_int,
-                    ExcInternalError());
-            adjacent_cells[1] = adjacent_cell;
-          }
-      }
-
-      /**
        * The global indices of the two vertices that bound this edge. These
        * will be ordered so that the first index is less than the second.
        */
@@ -257,36 +338,10 @@ namespace internal
       OrientationStatus orientation_status;
 
       /**
-       * A structure that stores how this edge relates to the at most
-       * two cells that are next to it.
+       * Store the set of cells adjacent to this edge (these cells then
+       * also store *where* in the cell the edge is located).
        */
-      struct AdjacentCell
-      {
-        /**
-         * Default constructor. Initialize the fields with invalid values.
-         */
-        AdjacentCell ()
-          :
-          cell_index (numbers::invalid_unsigned_int),
-          edge_within_cell (numbers::invalid_unsigned_int)
-        {}
-
-        /**
-         * Constructor. Initialize the fields with the given values.
-         */
-        AdjacentCell (const unsigned int cell_index,
-                      const unsigned int edge_within_cell)
-          :
-          cell_index (cell_index),
-          edge_within_cell (edge_within_cell)
-        {}
-
-
-        unsigned int cell_index;
-        unsigned int edge_within_cell;
-      };
-
-      AdjacentCell adjacent_cells[2];
+      AdjacentCells<dim> adjacent_cells;
     };
 
 
@@ -394,7 +449,7 @@ namespace internal
           // then also inform the edges that they are adjacent
           // to the current cell, and where within this cell
           for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
-            edges[cell_list.back().edge_indices[l]].add_adjacent_cell (i, l);
+            edges[cell_list.back().edge_indices[l]].adjacent_cells.push_back (AdjacentCell (i, l));
         }
       Assert (cell_list.size() == cells.size(), ExcInternalError());
 
@@ -408,10 +463,11 @@ namespace internal
      */
     template <int dim>
     unsigned int
-    get_next_unoriented_quad(const std::vector<Cell<dim> > &cells,
-                             const std::vector<Edge<dim> > &edges)
+    get_next_unoriented_cell(const std::vector<Cell<dim> > &cells,
+                             const std::vector<Edge<dim> > &edges,
+                             const unsigned int             current_cell)
     {
-      for (unsigned int c=0; c<cells.size(); ++c)
+      for (unsigned int c=current_cell; c<cells.size(); ++c)
         for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
           if (edges[cells[c].edge_indices[l]].orientation_status == Edge<dim>::not_oriented)
             return c;
@@ -499,70 +555,71 @@ namespace internal
                         ExcInternalError());
 
                 // now go through the cells adjacent to this edge
-                for (unsigned int K_element=0; K_element<2; ++K_element)
-                  if (edges[delta].adjacent_cells[K_element].cell_index != numbers::invalid_unsigned_int)
-                    {
-                      const unsigned int K = edges[delta].adjacent_cells[K_element].cell_index;
-                      const unsigned int delta_is_edge_in_K = edges[delta].adjacent_cells[K_element].edge_within_cell;
+                for (typename AdjacentCells<dim>::const_iterator
+                     adjacent_cell = edges[delta].adjacent_cells.begin();
+                     adjacent_cell != edges[delta].adjacent_cells.end(); ++adjacent_cell)
+                  {
+                    const unsigned int K = adjacent_cell->cell_index;
+                    const unsigned int delta_is_edge_in_K = adjacent_cell->edge_within_cell;
 
-                      // figure out the direction of delta with respect to the cell K
-                      // (in the orientation in which the user has given it to us)
-                      const unsigned int first_edge_vertex
-                        = (edges[delta].orientation_status == Edge<dim>::forward
-                           ?
-                           edges[delta].vertex_indices[0]
-                           :
-                           edges[delta].vertex_indices[1]);
-                      const unsigned int first_edge_vertex_in_K = cells[K].vertex_indices[GeometryInfo<dim>::face_to_cell_vertices(delta_is_edge_in_K, 0)];
-                      Assert (first_edge_vertex == first_edge_vertex_in_K
-                              ||
-                              first_edge_vertex == cells[K].vertex_indices[GeometryInfo<dim>::face_to_cell_vertices(delta_is_edge_in_K, 1)],
-                              ExcInternalError());
+                    // figure out the direction of delta with respect to the cell K
+                    // (in the orientation in which the user has given it to us)
+                    const unsigned int first_edge_vertex
+                      = (edges[delta].orientation_status == Edge<dim>::forward
+                         ?
+                         edges[delta].vertex_indices[0]
+                         :
+                         edges[delta].vertex_indices[1]);
+                    const unsigned int first_edge_vertex_in_K = cells[K].vertex_indices[GeometryInfo<dim>::face_to_cell_vertices(delta_is_edge_in_K, 0)];
+                    Assert (first_edge_vertex == first_edge_vertex_in_K
+                            ||
+                            first_edge_vertex == cells[K].vertex_indices[GeometryInfo<dim>::face_to_cell_vertices(delta_is_edge_in_K, 1)],
+                            ExcInternalError());
 
-                      // now figure out which direction the opposite edge needs to be into.
-                      const unsigned int opposite_edge
-                        = cells[K].edge_indices[ParallelEdges<2>::parallel_edges[delta_is_edge_in_K][0]];
-                      const unsigned int first_opposite_edge_vertex
-                        =  cells[K].vertex_indices[GeometryInfo<dim>::face_to_cell_vertices(
-                                                     ParallelEdges<dim>::parallel_edges[delta_is_edge_in_K][0],
-                                                     (first_edge_vertex == first_edge_vertex_in_K
-                                                      ?
-                                                      0
-                                                      :
-                                                      1))];
+                    // now figure out which direction the opposite edge needs to be into.
+                    const unsigned int opposite_edge
+                      = cells[K].edge_indices[ParallelEdges<2>::parallel_edges[delta_is_edge_in_K][0]];
+                    const unsigned int first_opposite_edge_vertex
+                      =  cells[K].vertex_indices[GeometryInfo<dim>::face_to_cell_vertices(
+                                                   ParallelEdges<dim>::parallel_edges[delta_is_edge_in_K][0],
+                                                   (first_edge_vertex == first_edge_vertex_in_K
+                                                    ?
+                                                    0
+                                                    :
+                                                    1))];
 
-                      const Edge<dim>::OrientationStatus opposite_edge_orientation
-                        = (edges[opposite_edge].vertex_indices[0]
-                           ==
-                           first_opposite_edge_vertex
-                           ?
-                           Edge<dim>::forward
-                           :
-                           Edge<dim>::backward);
+                    const Edge<dim>::OrientationStatus opposite_edge_orientation
+                      = (edges[opposite_edge].vertex_indices[0]
+                         ==
+                         first_opposite_edge_vertex
+                         ?
+                         Edge<dim>::forward
+                         :
+                         Edge<dim>::backward);
 
-                      // see if the opposite edge (there is only one in 2d) has already been
-                      // oriented.
-                      if (edges[opposite_edge].orientation_status == Edge<dim>::not_oriented)
-                        {
-                          // the opposite edge is not yet oriented. do orient it and add it to
-                          // Delta_k;
-                          edges[opposite_edge].orientation_status = opposite_edge_orientation;
-                          if (Delta_k[0] == numbers::invalid_unsigned_int)
-                            Delta_k[0] = opposite_edge;
-                          else
-                            {
-                              Assert (Delta_k[1] == numbers::invalid_unsigned_int, ExcInternalError());
-                              Delta_k[1] = opposite_edge;
-                            }
-                        }
-                      else
-                        {
-                          // the opposite edge has already been oriented. assert that it is
-                          // consistent with the current one
-                          Assert (edges[opposite_edge].orientation_status == opposite_edge_orientation,
-                                  ExcInternalError());
-                        }
-                    }
+                    // see if the opposite edge (there is only one in 2d) has already been
+                    // oriented.
+                    if (edges[opposite_edge].orientation_status == Edge<dim>::not_oriented)
+                      {
+                        // the opposite edge is not yet oriented. do orient it and add it to
+                        // Delta_k;
+                        edges[opposite_edge].orientation_status = opposite_edge_orientation;
+                        if (Delta_k[0] == numbers::invalid_unsigned_int)
+                          Delta_k[0] = opposite_edge;
+                        else
+                          {
+                            Assert (Delta_k[1] == numbers::invalid_unsigned_int, ExcInternalError());
+                            Delta_k[1] = opposite_edge;
+                          }
+                      }
+                    else
+                      {
+                        // the opposite edge has already been oriented. assert that it is
+                        // consistent with the current one
+                        Assert (edges[opposite_edge].orientation_status == opposite_edge_orientation,
+                                ExcInternalError());
+                      }
+                  }
               }
 
           // finally copy the new set to the previous one
@@ -648,8 +705,10 @@ namespace internal
 
       // then loop over all cells and start orienting parallel edge sets
       // of cells that still have non-oriented edges
-      unsigned int next_cell_with_unoriented_edge;
-      while ((next_cell_with_unoriented_edge = get_next_unoriented_quad(cell_list, edge_list)) !=
+      unsigned int next_cell_with_unoriented_edge = 0;
+      while ((next_cell_with_unoriented_edge = get_next_unoriented_cell(cell_list,
+                                               edge_list,
+                                               next_cell_with_unoriented_edge)) !=
              numbers::invalid_unsigned_int)
         {
           // see which edge sets are still not oriented
