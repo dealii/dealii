@@ -128,6 +128,13 @@ command line, you may be interested in watching lectures 2.9 and 2.91.
 (@dealiiVideoLectureSeeAlso{2.9,2.91}) These give overviews over the command
 line and on what happens when compiling programs, respectively.
 
+Note that deal.II is actively developed, and in the course of this
+development we occasionally rename or deprecate functions or classes
+that are still referenced in these video lectures.  For
+example, the step-1 code shown in video lecture 5 uses a class
+HyperShellBoundary which was replaced with SphericalManifold class
+later on. However, in spite of such kind of details the content of the
+lectures is still very relevant.
 
 <h3> What this program does </h3>
 
