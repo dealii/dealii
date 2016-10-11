@@ -501,7 +501,7 @@ namespace Step50
     // Our first job is to identify those degrees of freedom on each level
     // that are located on interfaces between adaptively refined levels, and
     // those that lie on the interface but also on the exterior boundary of
-    // the domain. The <code>MGConstraints</code> already computed the
+    // the domain. The <code>MGConstrainedDoFs</code> already computed the
     // information for us when we called initialize in
 
     // <code>setup_system()</code>.
@@ -511,7 +511,7 @@ namespace Step50
     // the assembled value has to be added into on each level.  On the
     // other hand, we also have to impose zero boundary conditions on
     // the external boundary of each level. But this the
-    // <code>MGConstraints</code> knows it. So we simply ask for them
+    // <code>MGConstrainedDoFs</code> knows it. So we simply ask for them
     // by calling <code>get_boundary_indices ()</code>.  The third
     // step is to construct constraints on all those degrees of
     // freedom: their value should be zero after each application of
@@ -695,11 +695,7 @@ namespace Step50
     // Create the object that deals with the transfer between
     // different refinement levels.
     MGTransferPrebuilt<vector_t> mg_transfer(mg_constrained_dofs);
-    // Now the prolongation matrix has to be built.  This matrix needs
-    // to take the boundary values on each level into account and
-    // needs to know about the indices at the refinement edges. The
-    // <code>MGConstraints</code> knows about that so pass it as an
-    // argument.
+    // Now the prolongation matrix has to be built.
     mg_transfer.build_matrices(mg_dof_handler);
 
     matrix_t &coarse_matrix = mg_matrices[0];
