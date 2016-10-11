@@ -307,7 +307,7 @@ protected:
   /**
    * For every row in the underlying SparsityPattern, this array contains a
    * pointer to the row's first afterdiagonal entry. Becomes available after
-   * invocation of decompose().
+   * invocation of prebuild_lower_bound().
    */
   std::vector<const size_type *> prebuilt_lower_bound;
 
