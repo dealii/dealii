@@ -17,7 +17,6 @@
 #include <deal.II/base/polynomials_piecewise.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/table.h>
-
 #include <deal.II/base/std_cxx11/array.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -313,6 +312,9 @@ compute (const Point<dim>            &p,
                     case 2:
                       index = polynomial*factor + f;
                       break;
+                    default:
+                      ExcNotImplemented();
+                      break;
                     }
 
                   const unsigned int i = index_map_inverse[index];
@@ -326,17 +328,27 @@ compute (const Point<dim>            &p,
 
   // Compute the values (and derivatives, if
   // necessary) of all polynomials at this
-  // evaluation point. To avoid expensive memory allocations,
-  // use alloca to allocate a (small) amount of memory
-  // on the stack and store the
-  // result in a vector of arrays (that has enough
+  // evaluation point. To avoid expensive memory allocation,
+  // we use a small amount of memory on the stack, and store the
+  // result in an array (that has enough
   // fields for any evaluation of values and
-  // derivatives, up to the 4th derivative).
-  std_cxx11::array<std_cxx11::array<double, 5>, dim> *v =
-    (std_cxx11::array<std_cxx11::array<double, 5>, dim> *)
-    alloca(sizeof(std_cxx11::array<std_cxx11::array<double, 5>, dim>) * polynomials.size());
+  // derivatives, up to the 4th derivative, for up to 20 polynomials).
+  // If someone uses a larger number of
+  // polynomials, we need to allocate more memory on the heap.
+  std_cxx11::array<std_cxx11::array<double,5>, dim> *v;
+  std_cxx11::array<std_cxx11::array<std_cxx11::array<double,5>, dim>, 20> small_array;
+  std::vector<std_cxx11::array<std_cxx11::array<double,5>, dim> > large_array;
 
-  for (unsigned int i=0; i<polynomials.size(); ++i)
+  const unsigned int n_polynomials = polynomials.size();
+  if (n_polynomials > 20)
+    {
+      large_array.resize(n_polynomials);
+      v = &large_array[0];
+    }
+  else
+    v = &small_array[0];
+
+  for (unsigned int i=0; i<n_polynomials; ++i)
     for (unsigned int d=0; d<dim; ++d)
       polynomials[i].value(p(d), n_values_and_derivatives, &v[i][d][0]);
 

@@ -98,10 +98,10 @@ namespace Polynomials
 
     /**
      * Return the values and the derivatives of the Polynomial at point
-     * <tt>x</tt>.  <tt>values[i], i=0,...,values_size-1</tt> includes the
+     * <tt>x</tt>.  <tt>values[i], i=0,...,n_derivatives</tt> includes the
      * <tt>i</tt>th derivative.The number of derivatives to be computed is
-     * determined by @p values_size and @p values has to provide sufficient
-     * space for @p values_size values.
+     * determined by @p n_derivatives and @p values has to provide sufficient
+     * space for @p n_derivatives + 1 values.
      *
      * Note that all the derivatives evaluate to zero at the border between
      * intervals (assuming exact arithmetics) in the interior of the unit
@@ -112,7 +112,7 @@ namespace Polynomials
      * make sense.
      */
     void value (const number         x,
-                const unsigned int values_size,
+                const unsigned int n_derivatives,
                 number *values) const;
 
     /**

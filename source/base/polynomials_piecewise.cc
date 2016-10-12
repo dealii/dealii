@@ -47,7 +47,7 @@ namespace Polynomials
   {
     Assert (values.size() > 0, ExcZero());
 
-    value(x,values.size(),&values[0]);
+    value(x,values.size()-1,&values[0]);
   }
 
 
@@ -55,10 +55,10 @@ namespace Polynomials
   template <typename number>
   void
   PiecewisePolynomial<number>::value (const number         x,
-                                      const unsigned int values_size,
+                                      const unsigned int n_derivatives,
                                       number *values) const
   {
-    Assert (values_size > 0, ExcZero());
+    Assert (n_derivatives >= 0, ExcZero());
 
     // shift polynomial if necessary
     number y = x;
@@ -72,7 +72,7 @@ namespace Polynomials
             const double offset = step * interval;
             if (x<offset || x>offset+step+step)
               {
-                for (unsigned int k=0; k<values_size; ++k)
+                for (unsigned int k=0; k<=n_derivatives; ++k)
                   values[k] = 0;
                 return;
               }
@@ -89,7 +89,7 @@ namespace Polynomials
             const double offset = step * interval;
             if (x<offset || x>offset+step)
               {
-                for (unsigned int k=0; k<values_size; ++k)
+                for (unsigned int k=0; k<=n_derivatives; ++k)
                   values[k] = 0;
                 return;
               }
@@ -106,16 +106,16 @@ namespace Polynomials
              (interval < n_intervals-1 || derivative_change_sign == -1.)))
           {
             values[0] = value(x);
-            for (unsigned int d=1; d<values_size; ++d)
+            for (unsigned int d=1; d<=n_derivatives; ++d)
               values[d] = 0;
             return;
           }
       }
 
-    polynomial.value(y, values_size, values);
+    polynomial.value(y, n_derivatives, values);
 
     // change sign if necessary
-    for (unsigned int j=1; j<values_size; j+=2)
+    for (unsigned int j=1; j<=n_derivatives; j+=2)
       values[j] *= derivative_change_sign;
   }
 
