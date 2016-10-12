@@ -452,7 +452,7 @@ protected:
  * @ref ConceptRelaxationType "relaxation concept".
  *
  * @code
- *     // Declare related objects
+ * // Declare related objects
  *
  * SparseMatrix<double> A;
  * Vector<double> x;
@@ -461,10 +461,10 @@ protected:
  *
  * //...initialize and build A
  *
- *     // Define and initialize preconditioner
+ * // Define and initialize preconditioner:
  *
  * PreconditionJacobi<SparseMatrix<double> > precondition;
- * precondition.initialize (A, .6);
+ * precondition.initialize (A, PreconditionJacobi<SparseMatrix<double> >::AdditionalData(.6));
  *
  * solver.solve (A, x, b, precondition);
  * @endcode
@@ -475,6 +475,11 @@ template <typename MatrixType = SparseMatrix<double> >
 class PreconditionJacobi : public PreconditionRelaxation<MatrixType>
 {
 public:
+  /**
+   * A typedef to the base class AdditionalData.
+   */
+  typedef typename PreconditionRelaxation<MatrixType>::AdditionalData AdditionalData;
+
   /**
    * Apply preconditioner.
    */
@@ -529,7 +534,7 @@ public:
  * @ref ConceptRelaxationType "relaxation concept".
  *
  * @code
- *     // Declare related objects
+ * // Declare related objects
  *
  * SparseMatrix<double> A;
  * Vector<double> x;
@@ -538,10 +543,10 @@ public:
  *
  * //...initialize and build A
  *
- *     // Define and initialize preconditioner
+ * // Define and initialize preconditioner
  *
  * PreconditionSOR<SparseMatrix<double> > precondition;
- * precondition.initialize (A, .6);
+ * precondition.initialize (A, PreconditionSOR<SparseMatrix<double> >::AdditionalData(.6));
  *
  * solver.solve (A, x, b, precondition);
  * @endcode
@@ -552,6 +557,11 @@ template <typename MatrixType = SparseMatrix<double> >
 class PreconditionSOR : public PreconditionRelaxation<MatrixType>
 {
 public:
+  /**
+   * A typedef to the base class AdditionalData.
+   */
+  typedef typename PreconditionRelaxation<MatrixType>::AdditionalData AdditionalData;
+
   /**
    * Apply preconditioner.
    */
@@ -596,10 +606,10 @@ public:
  *
  * //...initialize and build A
  *
- *     // Define and initialize preconditioner
+ * // Define and initialize preconditioner
  *
  * PreconditionSSOR<SparseMatrix<double> > precondition;
- * precondition.initialize (A, .6);
+ * precondition.initialize (A, PreconditionSSOR<SparseMatrix<double> >::AdditionalData(.6));
  *
  * solver.solve (A, x, b, precondition);
  * @endcode
@@ -610,6 +620,11 @@ template <typename MatrixType = SparseMatrix<double> >
 class PreconditionSSOR : public PreconditionRelaxation<MatrixType>
 {
 public:
+  /**
+   * A typedef to the base class AdditionalData.
+   */
+  typedef typename PreconditionRelaxation<MatrixType>::AdditionalData AdditionalData;
+
   /**
    * Declare type for container size.
    */
