@@ -25,7 +25,7 @@
  *
  * <ol>
  * <li> MGMatrixBase contains the level matrices with a fairly general
- * implementation in MGMatrix
+ * implementation in mg::Matrix
  * <li> MGCoarseGridBase is the solver on the coarsest level.
  * <li> MGSmootherBase performs smoothing on each level.
  * <li> MGTransferBase organizes the transfer between levels.

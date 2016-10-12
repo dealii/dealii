@@ -110,7 +110,7 @@ public:
 
   /**
    * Set the matrix object to be used. The matrix object must exist longer as
-   * the @p MGMatrix object, since only a pointer is stored.
+   * the @p MGMatrixSelect object, since only a pointer is stored.
    */
   void set_matrix (MGLevelObject<MatrixType> *M);
 
