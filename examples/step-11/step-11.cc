@@ -296,13 +296,13 @@ namespace Step11
     //
     // The second remark concerns the quadrature formula we use: we want to
     // integrate over bilinear shape functions, so we know that we have to use
-    // at least a Gauss2 quadrature formula. On the other hand, we want to
-    // have the quadrature rule to have at least the order of the boundary
-    // approximation. Since the order of Gauss-r is 2r, and the order of the
-    // boundary approximation using polynomials of degree p is p+1, we know
-    // that 2r@>=p+1. Since r has to be an integer and (as mentioned above)
-    // has to be at least 2, this makes up for the formula above computing
-    // <code>gauss_degree</code>.
+    // at least an order two Gauss quadrature formula. On the other hand, we
+    // want the quadrature rule to have at least the order of the boundary
+    // approximation. Since the order of Gauss rule with $r$ points is $2r -
+    // 1$, and the order of the boundary approximation using polynomials of
+    // degree $p$ is $p+1$, we know that $2r \geq p$. Since r has to be an
+    // integer and (as mentioned above) has to be at least $2$, this makes up
+    // for the formula above computing <code>gauss_degree</code>.
     //
     // Since the generation of the body force contributions to the right hand
     // side vector was so simple, we do that all over again for the boundary

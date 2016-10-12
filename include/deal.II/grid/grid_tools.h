@@ -1449,7 +1449,7 @@ namespace GridTools
 
 
   /**
-   * This compatibility version of collect_periodic_face_pairs() only works on
+   * This compatibility version of collect_periodic_faces() only works on
    * grids with cells in
    * @ref GlossFaceOrientation "standard orientation".
    *
@@ -1464,7 +1464,7 @@ namespace GridTools
    *
    * See above function for further details.
    *
-   * @note This version of collect_periodic_face_pairs() will not work on
+   * @note This version of collect_periodic_faces() will not work on
    * meshes with cells not in
    * @ref GlossFaceOrientation "standard orientation".
    *

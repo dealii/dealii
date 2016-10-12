@@ -110,9 +110,9 @@ namespace hp
  * times some factor) of each cell and take the square root.
  *
  * The integration is done using a quadrature formula on the face. For linear
- * trial functions (FEQ1), the QGauss2 or even the QMidpoint rule will
- * suffice. For higher order elements, it is necessary to utilize higher order
- * quadrature formulae as well.
+ * trial functions (FEQ1), QGauss (with two points) or even the QMidpoint rule
+ * will suffice. For higher order elements, it is necessary to utilize higher
+ * order quadrature formulae as well.
  *
  * We store the contribution of each face in a @p map, as provided by the C++
  * standard library, with the iterator pointing to that face being the key

@@ -688,7 +688,7 @@ public:
    * Code implementing this would then look like this:
    * @code
    * for (i=0; i<dofs_per_face; ++i)
-   *  if (fe.is_primitive(fe.face_to_equivalent_cell_index(i, some_face_no)))
+   *  if (fe.is_primitive(fe.face_to_cell_index(i, some_face_no)))
    *   ... do whatever
    * @endcode
    * The function takes additional arguments that account for the fact that
@@ -831,9 +831,8 @@ public:
    * meet at a common face, whether it is the other way around, whether
    * neither dominates, or if either could dominate.
    *
-   * For a definition of domination, see FiniteElementBase::Domination and in
-   * particular the
-   * @ref hp_paper "hp paper".
+   * For a definition of domination, see FiniteElementDomination::Domination
+   * and in particular the @ref hp_paper "hp paper".
    */
   virtual
   FiniteElementDomination::Domination

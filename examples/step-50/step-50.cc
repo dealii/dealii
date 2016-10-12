@@ -501,7 +501,7 @@ namespace Step50
     // Our first job is to identify those degrees of freedom on each level
     // that are located on interfaces between adaptively refined levels, and
     // those that lie on the interface but also on the exterior boundary of
-    // the domain. The <code>MGConstraints</code> already computed the
+    // the domain. The <code>MGConstrainedDoFs</code> already computed the
     // information for us when we called initialize in
 
     // <code>setup_system()</code>.
@@ -511,7 +511,7 @@ namespace Step50
     // the assembled value has to be added into on each level.  On the
     // other hand, we also have to impose zero boundary conditions on
     // the external boundary of each level. But this the
-    // <code>MGConstraints</code> knows it. So we simply ask for them
+    // <code>MGConstrainedDoFs</code> knows it. So we simply ask for them
     // by calling <code>get_boundary_indices ()</code>.  The third
     // step is to construct constraints on all those degrees of
     // freedom: their value should be zero after each application of
@@ -542,8 +542,8 @@ namespace Step50
     // need a right hand side, and more significantly (ii) we don't
     // just loop over all active cells, but in fact all cells, active
     // or not. Consequently, the correct iterator to use is
-    // MGDoFHandler::cell_iterator rather than
-    // MGDoFHandler::active_cell_iterator. Let's go about it:
+    // DoFHandler::cell_iterator rather than
+    // DoFHandler::active_cell_iterator. Let's go about it:
     typename DoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
                                             endc = mg_dof_handler.end();
 
@@ -679,7 +679,7 @@ namespace Step50
   // spaces involved and can often be computed in a generic way
   // independent of the problem under consideration. In that case, we
   // can use the MGTransferPrebuilt class that, given the constraints
-  // on the global level and an MGDoFHandler object computes the
+  // on the global level and an DoFHandler object computes the
   // matrices corresponding to these transfer operators.
   //
   // The second part of the following lines deals with the coarse grid
@@ -695,11 +695,7 @@ namespace Step50
     // Create the object that deals with the transfer between
     // different refinement levels.
     MGTransferPrebuilt<vector_t> mg_transfer(mg_constrained_dofs);
-    // Now the prolongation matrix has to be built.  This matrix needs
-    // to take the boundary values on each level into account and
-    // needs to know about the indices at the refinement edges. The
-    // <code>MGConstraints</code> knows about that so pass it as an
-    // argument.
+    // Now the prolongation matrix has to be built.
     mg_transfer.build_matrices(mg_dof_handler);
 
     matrix_t &coarse_matrix = mg_matrices[0];
@@ -820,22 +816,14 @@ namespace Step50
 
   // @sect4{Postprocessing}
 
-  // The following two functions postprocess a
-  // solution once it is computed. In
-  // particular, the first one refines the mesh
-  // at the beginning of each cycle while the
-  // second one outputs results at the end of
-  // each such cycle. The functions are almost
-  // unchanged from those in step-6, with the
-  // exception of two minor differences: The
-  // KellyErrorEstimator::estimate function
-  // wants an argument of type DoFHandler, not
-  // MGDoFHandler, and so we have to cast from
-  // derived to base class; and we generate
-  // output in VTK format, to use the more
-  // modern visualization programs available
-  // today compared to those that were
-  // available when step-6 was written.
+  // The following two functions postprocess a solution once it is
+  // computed. In particular, the first one refines the mesh at the beginning
+  // of each cycle while the second one outputs results at the end of each
+  // such cycle. The <code>refine_grid()</code> method is almost unchanged
+  // from step-6: the only substantial difference is that this method uses a
+  // distributed grid refinement function instead of a serial one. The
+  // <code>output_results()</code> method is quite different since each
+  // processor writes only part of the overall graphical output.
   template <int dim>
   void LaplaceProblem<dim>::refine_grid ()
   {

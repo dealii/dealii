@@ -38,8 +38,8 @@ DEAL_II_NAMESPACE_OPEN
  * multilevel algorithms. It has no relation to the actual matrix type and
  * takes the vector class as only template argument.
  *
- * Usually, the derived class MGMatrix, operating on an MGLevelObject of
- * matrices will be sufficient for applications.
+ * Usually, the derived class mg::Matrix, which operates on an MGLevelObject
+ * of matrices, will be sufficient for applications.
  *
  * @author Guido Kanschat, 2002
  */
