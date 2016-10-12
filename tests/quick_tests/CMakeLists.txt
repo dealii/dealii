@@ -111,6 +111,12 @@ IF (DEAL_II_WITH_PETSC AND DEAL_II_WITH_SLEPC)
   make_quicktest("step-slepc" ${_mybuild} "")
 ENDIF()
 
+# Test trilinos
+IF (DEAL_II_WITH_TRILINOS)
+  make_quicktest("step-trilinos" ${_mybuild} "")
+ENDIF()
+
+
 # A custom test target:
 ADD_CUSTOM_TARGET(test
   COMMAND ${CMAKE_COMMAND} -D ALL_TESTS="${ALL_TESTS}" -P ${CMAKE_CURRENT_SOURCE_DIR}/run.cmake
