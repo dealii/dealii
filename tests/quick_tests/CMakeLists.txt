@@ -131,6 +131,11 @@ IF (DEAL_II_WITH_UMFPACK)
   make_quicktest("umfpack" ${_mybuild} "")
 ENDIF()
 
+# Test GSL
+IF (DEAL_II_WITH_GSL)
+  make_quicktest("gsl" ${_mybuild} "")
+ENDIF()
+
 
 
 # A custom test target:
