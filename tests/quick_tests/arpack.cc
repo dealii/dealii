@@ -93,6 +93,30 @@ void test ()
                      eigenvalues,
                      eigenvectors,
                      eigenvalues.size());
+
+  {
+    const double precision = 1e-7;
+    Vector<double> Ax(eigenvectors[0]), Bx(eigenvectors[0]);
+    for (unsigned int i=0; i < eigenvectors.size(); ++i)
+      {
+        B.vmult(Bx,eigenvectors[i]);
+
+        for (unsigned int j=0; j < eigenvectors.size(); j++)
+          Assert( std::abs( eigenvectors[j] * Bx - (i==j))< precision,
+                  ExcMessage("Eigenvectors " +
+                             Utilities::int_to_string(i) +
+                             " and " +
+                             Utilities::int_to_string(j) +
+                             " are not orthonormal!"));
+
+        A.vmult(Ax,eigenvectors[i]);
+        Ax.add(-1.0*std::real(eigenvalues[i]),Bx);
+        Assert (Ax.l2_norm() < precision,
+                ExcMessage("Returned vector " +
+                           Utilities::int_to_string(i) +
+                           " is not an eigenvector!"));
+      }
+  }
 }
 
 

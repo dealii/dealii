@@ -155,8 +155,10 @@ void LaplaceProblem::solve ()
   PETScWrappers::PreconditionBlockJacobi preconditioner (A);
   cg_solver.solve (A, x, b, preconditioner);
 
-  // some output
-  // ?
+  PETScWrappers::Vector res(x);
+  A.residual(res,x,b);
+  AssertThrow(res.l2_norm()<1e-3,
+              ExcInternalError());
 }
 
 void LaplaceProblem::run ()

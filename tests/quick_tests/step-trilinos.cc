@@ -159,8 +159,10 @@ void LaplaceProblem::solve ()
   preconditioner.initialize (A);
   cg_solver.solve (A, x, b, preconditioner);
 
-  // some output
-  // ?
+  TrilinosWrappers::Vector res(x);
+  A.residual(res,x,b);
+  AssertThrow(res.l2_norm()<1e-3,
+              ExcInternalError());
 }
 
 void LaplaceProblem::run ()
