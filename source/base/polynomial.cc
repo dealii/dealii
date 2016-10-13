@@ -114,8 +114,6 @@ namespace Polynomials
                              const unsigned int n_derivatives,
                              number *values) const
   {
-    Assert(n_derivatives >= 0, ExcZero());
-
     // evaluate Lagrange polynomial and derivatives
     if (in_lagrange_product_form == true)
       {
