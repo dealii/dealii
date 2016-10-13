@@ -116,6 +116,12 @@ IF (DEAL_II_WITH_TRILINOS)
   make_quicktest("step-trilinos" ${_mybuild} "")
 ENDIF()
 
+# Test metis
+IF (DEAL_II_WITH_METIS AND DEAL_II_WITH_MPI)
+  make_quicktest("step-metis" ${_mybuild} 2)
+ENDIF()
+
+
 
 # A custom test target:
 ADD_CUSTOM_TARGET(test
