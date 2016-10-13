@@ -154,10 +154,36 @@ void LaplaceEigenspectrumProblem::assemble_system ()
 
 void LaplaceEigenspectrumProblem::solve ()
 {
-  SolverControl solver_control (1000, 1e-03);
+  SolverControl solver_control (1000, 1e-10);
   SLEPcWrappers::SolverArnoldi eigensolver (solver_control);
   eigensolver.set_which_eigenpairs (EPS_SMALLEST_REAL);
   eigensolver.solve (A, B, lambda, x, x.size());
+
+  {
+    const double precision = 1e-7;
+    PETScWrappers::Vector Ax(x[0]), Bx(x[0]);
+    for (unsigned int i=0; i < x.size(); ++i)
+      {
+        B.vmult(Bx,x[i]);
+
+        for (unsigned int j=0; j < x.size(); j++)
+          if (j!=i)
+            Assert( std::abs( x[j] * Bx )< precision,
+                    ExcMessage("Eigenvectors " +
+                               Utilities::int_to_string(i) +
+                               " and " +
+                               Utilities::int_to_string(j) +
+                               " are not orthogonal!"));
+
+        A.vmult(Ax,x[i]);
+        Ax.add(-1.0*lambda[i],Bx);
+        Assert (Ax.l2_norm() < precision,
+                ExcMessage("Returned vector " +
+                           Utilities::int_to_string(i) +
+                           " is not an eigenvector!"));
+      }
+  }
+
 
   // some output
   output_table.add_value ("lambda", lambda[0]);

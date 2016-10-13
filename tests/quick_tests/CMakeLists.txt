@@ -111,6 +111,38 @@ IF (DEAL_II_WITH_PETSC AND DEAL_II_WITH_SLEPC)
   make_quicktest("step-slepc" ${_mybuild} "")
 ENDIF()
 
+# Test trilinos
+IF (DEAL_II_WITH_TRILINOS)
+  make_quicktest("step-trilinos" ${_mybuild} "")
+ENDIF()
+
+# Test metis
+IF (DEAL_II_WITH_METIS AND DEAL_II_WITH_MPI)
+  make_quicktest("step-metis" ${_mybuild} 2)
+ENDIF()
+
+# Test LAPACK
+IF (DEAL_II_WITH_LAPACK)
+  make_quicktest("lapack" ${_mybuild} "")
+ENDIF()
+
+# Test Umfpack
+IF (DEAL_II_WITH_UMFPACK)
+  make_quicktest("umfpack" ${_mybuild} "")
+ENDIF()
+
+# Test GSL
+IF (DEAL_II_WITH_GSL)
+  make_quicktest("gsl" ${_mybuild} "")
+ENDIF()
+
+# Test Arpack
+IF (DEAL_II_WITH_ARPACK AND DEAL_II_WITH_UMFPACK)
+  make_quicktest("arpack" ${_mybuild} "")
+ENDIF()
+
+
+
 # A custom test target:
 ADD_CUSTOM_TARGET(test
   COMMAND ${CMAKE_COMMAND} -D ALL_TESTS="${ALL_TESTS}" -P ${CMAKE_CURRENT_SOURCE_DIR}/run.cmake

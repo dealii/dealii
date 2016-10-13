@@ -32,17 +32,18 @@
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/petsc_sparse_matrix.h>
-#include <deal.II/lac/petsc_vector.h>
-#include <deal.II/lac/petsc_solver.h>
-#include <deal.II/lac/petsc_precondition.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_solver.h>
+#include <deal.II/lac/trilinos_precondition.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <fstream>
 #include <iostream>
 
 using namespace dealii;
 
-// Test that deal.II is working with PETSc by solving the Laplace's
+// Test that deal.II is working with Trilinos by solving the Laplace's
 // problem in 2d.
 class LaplaceProblem
 {
@@ -59,8 +60,8 @@ private:
   FE_Q<2>          fe;
   DoFHandler<2>    dof_handler;
 
-  PETScWrappers::SparseMatrix A;
-  PETScWrappers::Vector       b, x;
+  TrilinosWrappers::SparseMatrix A;
+  TrilinosWrappers::Vector       b, x;
   ConstraintMatrix            constraints;
 
   TableHandler output_table;
@@ -80,8 +81,10 @@ void LaplaceProblem::setup_system ()
   DoFTools::make_zero_boundary_constraints (dof_handler, constraints);
   constraints.close ();
 
-  A.reinit (dof_handler.n_dofs(), dof_handler.n_dofs(),
-            dof_handler.max_couplings_between_dofs());
+  DynamicSparsityPattern dsp(dof_handler.n_dofs());
+  DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints, false);
+
+  A.reinit (dsp);
   b.reinit (dof_handler.n_dofs());
   x.reinit (dof_handler.n_dofs());
 
@@ -151,11 +154,12 @@ void LaplaceProblem::assemble_system ()
 void LaplaceProblem::solve ()
 {
   SolverControl solver_control (1e03, 1e-03);
-  PETScWrappers::SolverCG cg_solver (solver_control);
-  PETScWrappers::PreconditionBlockJacobi preconditioner (A);
+  TrilinosWrappers::SolverCG cg_solver (solver_control);
+  TrilinosWrappers::PreconditionBlockJacobi preconditioner;
+  preconditioner.initialize (A);
   cg_solver.solve (A, x, b, preconditioner);
 
-  PETScWrappers::Vector res(x);
+  TrilinosWrappers::Vector res(x);
   A.residual(res,x,b);
   AssertThrow(res.l2_norm()<1e-3,
               ExcInternalError());
