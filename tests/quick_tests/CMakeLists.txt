@@ -136,6 +136,11 @@ IF (DEAL_II_WITH_GSL)
   make_quicktest("gsl" ${_mybuild} "")
 ENDIF()
 
+# Test Arpack
+IF (DEAL_II_WITH_ARPACK AND DEAL_II_WITH_UMFPACK)
+  make_quicktest("arpack" ${_mybuild} "")
+ENDIF()
+
 
 
 # A custom test target:
