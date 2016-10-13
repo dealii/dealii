@@ -121,6 +121,11 @@ IF (DEAL_II_WITH_METIS AND DEAL_II_WITH_MPI)
   make_quicktest("step-metis" ${_mybuild} 2)
 ENDIF()
 
+# Test LAPACK
+IF (DEAL_II_WITH_LAPACK)
+  make_quicktest("lapack" ${_mybuild} "")
+ENDIF()
+
 
 
 # A custom test target:
