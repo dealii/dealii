@@ -126,6 +126,11 @@ IF (DEAL_II_WITH_LAPACK)
   make_quicktest("lapack" ${_mybuild} "")
 ENDIF()
 
+# Test Umfpack
+IF (DEAL_II_WITH_UMFPACK)
+  make_quicktest("umfpack" ${_mybuild} "")
+ENDIF()
+
 
 
 # A custom test target:
