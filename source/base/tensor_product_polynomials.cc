@@ -17,6 +17,7 @@
 #include <deal.II/base/polynomials_piecewise.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/table.h>
+#include <deal.II/base/std_cxx11/array.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -254,7 +255,7 @@ compute (const Point<dim>            &p,
   Assert (fourth_derivatives.size()==n_tensor_pols|| fourth_derivatives.size()==0,
           ExcDimensionMismatch2(fourth_derivatives.size(), n_tensor_pols, 0));
 
-  const bool update_values     = (values.size() == n_tensor_pols),
+  const bool update_values     = (values.size()==n_tensor_pols),
              update_grads      = (grads.size()==n_tensor_pols),
              update_grad_grads = (grad_grads.size()==n_tensor_pols),
              update_3rd_derivatives      = (third_derivatives.size()==n_tensor_pols),
@@ -275,26 +276,81 @@ compute (const Point<dim>            &p,
   if (update_4th_derivatives)
     n_values_and_derivatives = 5;
 
+  // Provide a shortcut if only values are requested. For this case usually the
+  // temporary memory allocation below does not pay off. Also we loop over all
+  // tensor polynomials in a peculiar way to avoid all dynamic memory allocation.
+  // We need to evaluate the polynomial value n_polynomials*dim times, and
+  // need to compute n_polynomials^dim tensor polynomials. Therefore we can split
+  // the loop over the tensor polynomials into one loop over n_polynomials,
+  // evaluate this polynomial for each dimension and multiply it with the
+  // associated n_polynomials^(dim-1) tensor polynomials before moving to the
+  // next polynomial.
+  if (n_values_and_derivatives == 1)
+    {
+      const unsigned int n_polynomials = polynomials.size();
+      const unsigned int factor = n_tensor_pols/n_polynomials;
 
-  // compute the values (and derivatives, if
-  // necessary) of all polynomials at this
-  // evaluation point. to avoid many
-  // reallocation, use one std::vector for
-  // polynomial evaluation and store the
-  // result as Tensor<1,5> (that has enough
-  // fields for any evaluation of values and
-  // derivatives, up to the 4th derivative)
-  Table<2,Tensor<1,5> > v(dim, polynomials.size());
-  {
-    std::vector<double> tmp (n_values_and_derivatives);
-    for (unsigned int d=0; d<dim; ++d)
-      for (unsigned int i=0; i<polynomials.size(); ++i)
+      std::fill(values.begin(),values.end(),1.0);
+
+      for (unsigned int polynomial=0; polynomial<n_polynomials; ++polynomial)
         {
-          polynomials[i].value(p(d), tmp);
-          for (unsigned int e=0; e<n_values_and_derivatives; ++e)
-            v(d,i)[e] = tmp[e];
-        };
-  }
+          for (unsigned int d=0; d<dim; ++d)
+            {
+              const double value = polynomials[polynomial].value(p(d));
+
+              for (unsigned int f=0; f<factor; ++f)
+                {
+                  unsigned int index = 0;
+                  switch (d)
+                    {
+                    case 0:
+                      index = polynomial+f*n_polynomials;
+                      break;
+                    case 1:
+                      index = polynomial*n_polynomials + (f/n_polynomials)*n_polynomials*n_polynomials + f%n_polynomials;
+                      break;
+                    case 2:
+                      index = polynomial*factor + f;
+                      break;
+                    default:
+                      ExcNotImplemented();
+                      break;
+                    }
+
+                  const unsigned int i = index_map_inverse[index];
+                  values[i] *= value;
+                }
+            }
+        }
+      return;
+    }
+
+
+  // Compute the values (and derivatives, if
+  // necessary) of all polynomials at this
+  // evaluation point. To avoid expensive memory allocation,
+  // we use a small amount of memory on the stack, and store the
+  // result in an array (that has enough
+  // fields for any evaluation of values and
+  // derivatives, up to the 4th derivative, for up to 20 polynomials).
+  // If someone uses a larger number of
+  // polynomials, we need to allocate more memory on the heap.
+  std_cxx11::array<std_cxx11::array<double,5>, dim> *v;
+  std_cxx11::array<std_cxx11::array<std_cxx11::array<double,5>, dim>, 20> small_array;
+  std::vector<std_cxx11::array<std_cxx11::array<double,5>, dim> > large_array;
+
+  const unsigned int n_polynomials = polynomials.size();
+  if (n_polynomials > 20)
+    {
+      large_array.resize(n_polynomials);
+      v = &large_array[0];
+    }
+  else
+    v = &small_array[0];
+
+  for (unsigned int i=0; i<n_polynomials; ++i)
+    for (unsigned int d=0; d<dim; ++d)
+      polynomials[i].value(p(d), n_values_and_derivatives, &v[i][d][0]);
 
   for (unsigned int i=0; i<n_tensor_pols; ++i)
     {
@@ -309,7 +365,7 @@ compute (const Point<dim>            &p,
         {
           values[i] = 1;
           for (unsigned int x=0; x<dim; ++x)
-            values[i] *= v(x,indices[x])[0];
+            values[i] *= v[indices[x]][x][0];
         }
 
       if (update_grads)
@@ -317,7 +373,7 @@ compute (const Point<dim>            &p,
           {
             grads[i][d] = 1.;
             for (unsigned int x=0; x<dim; ++x)
-              grads[i][d] *= v(x,indices[x])[d==x];
+              grads[i][d] *= v[indices[x]][x][d==x];
           }
 
       if (update_grad_grads)
@@ -332,7 +388,7 @@ compute (const Point<dim>            &p,
                   if (d2==x) ++derivative;
 
                   grad_grads[i][d1][d2]
-                  *= v(x,indices[x])[derivative];
+                  *= v[indices[x]][x][derivative];
                 }
             }
 
@@ -350,7 +406,7 @@ compute (const Point<dim>            &p,
                     if (d3==x) ++derivative;
 
                     third_derivatives[i][d1][d2][d3]
-                    *= v(x,indices[x])[derivative];
+                    *= v[indices[x]][x][derivative];
                   }
               }
 
@@ -370,7 +426,7 @@ compute (const Point<dim>            &p,
                       if (d4==x) ++derivative;
 
                       fourth_derivatives[i][d1][d2][d3][d4]
-                      *= v(x,indices[x])[derivative];
+                      *= v[indices[x]][x][derivative];
                     }
                 }
     }

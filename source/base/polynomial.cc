@@ -102,7 +102,19 @@ namespace Polynomials
                              std::vector<number> &values) const
   {
     Assert (values.size() > 0, ExcZero());
-    const unsigned int values_size=values.size();
+
+    value(x,values.size()-1,&values[0]);
+  }
+
+
+
+  template <typename number>
+  void
+  Polynomial<number>::value (const number         x,
+                             const unsigned int n_derivatives,
+                             number *values) const
+  {
+    Assert(n_derivatives >= 0, ExcZero());
 
     // evaluate Lagrange polynomial and derivatives
     if (in_lagrange_product_form == true)
@@ -111,11 +123,11 @@ namespace Polynomials
         // form (x-x_1)*(x-x_2)*...*(x-x_n), expand the derivatives like
         // automatic differentiation does.
         const unsigned int n_supp = lagrange_support_points.size();
-        switch (values_size)
+        switch (n_derivatives)
           {
           default:
             values[0] = 1;
-            for (unsigned int d=1; d<values_size; ++d)
+            for (unsigned int d=1; d<=n_derivatives; ++d)
               values[d] = 0;
             for (unsigned int i=0; i<n_supp; ++i)
               {
@@ -127,7 +139,7 @@ namespace Polynomials
                 // i.e., expand value v and derivative one). since we reuse a
                 // value from the next lower derivative from the steps before,
                 // need to start from the highest derivative
-                for (unsigned int k=values_size-1; k>0; --k)
+                for (unsigned int k=n_derivatives; k>0; --k)
                   values[k] = (values[k] * v + values[k-1]);
                 values[0] *= v;
               }
@@ -141,7 +153,7 @@ namespace Polynomials
             // p^(n)(x)/k! into the actual form of the derivative
             {
               number k_faculty = 1;
-              for (unsigned int k=0; k<values_size; ++k)
+              for (unsigned int k=0; k<=n_derivatives; ++k)
                 {
                   values[k] *= k_faculty * lagrange_weight;
                   k_faculty *= static_cast<number>(k+1);
@@ -149,10 +161,10 @@ namespace Polynomials
             }
             break;
 
-          // manually implement size 1 (values only), size 2 (value + first
-          // derivative), and size 3 (up to second derivative) since they
+          // manually implement case 0 (values only), case 1 (value + first
+          // derivative), and case 2 (up to second derivative) since they
           // might be called often. then, we can unroll the loop.
-          case 1:
+          case 0:
             values[0] = 1;
             for (unsigned int i=0; i<n_supp; ++i)
               {
@@ -162,7 +174,7 @@ namespace Polynomials
             values[0] *= lagrange_weight;
             break;
 
-          case 2:
+          case 1:
             values[0] = 1;
             values[1] = 0;
             for (unsigned int i=0; i<n_supp; ++i)
@@ -175,7 +187,7 @@ namespace Polynomials
             values[1] *= lagrange_weight;
             break;
 
-          case 3:
+          case 2:
             values[0] = 1;
             values[1] = 0;
             values[2] = 0;
@@ -199,7 +211,7 @@ namespace Polynomials
     // if we only need the value, then call the other function since that is
     // significantly faster (there is no need to allocate and free memory,
     // which is really expensive compared to all the other operations!)
-    if (values_size == 1)
+    if (n_derivatives == 0)
       {
         values[0] = value(x);
         return;
@@ -214,7 +226,7 @@ namespace Polynomials
     // loop over all requested derivatives. note that derivatives @p{j>m} are
     // necessarily zero, as they differentiate the polynomial more often than
     // the highest power is
-    const unsigned int min_valuessize_m=std::min(values_size, m);
+    const unsigned int min_valuessize_m=std::min(n_derivatives+1, m);
     for (unsigned int j=0; j<min_valuessize_m; ++j)
       {
         for (int k=m-2; k>=static_cast<int>(j); --k)
@@ -225,7 +237,7 @@ namespace Polynomials
       }
 
     // fill higher derivatives by zero
-    for (unsigned int j=min_valuessize_m; j<values_size; ++j)
+    for (unsigned int j=min_valuessize_m; j<=n_derivatives; ++j)
       values[j] = 0;
   }
 
