@@ -58,8 +58,6 @@ namespace Polynomials
                                       const unsigned int n_derivatives,
                                       number *values) const
   {
-    Assert (n_derivatives >= 0, ExcZero());
-
     // shift polynomial if necessary
     number y = x;
     double derivative_change_sign = 1.;
