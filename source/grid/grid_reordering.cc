@@ -215,7 +215,6 @@ namespace internal
       /**
        * Return an iterator to the first valid cell stored as adjacent to the
        * edge represented by the current object.
-       * @return
        */
       const_iterator begin () const
       {
@@ -236,9 +235,9 @@ namespace internal
         if (adjacent_cells[0].cell_index == numbers::invalid_unsigned_int)
           return &adjacent_cells[0];
         else if (adjacent_cells[1].cell_index == numbers::invalid_unsigned_int)
-          return &adjacent_cells[1];
+          return &adjacent_cells[0]+1;
         else
-          return &adjacent_cells[2];
+          return &adjacent_cells[0]+2;
       }
 
     private:
@@ -402,6 +401,112 @@ namespace internal
 
 
 
+    template <int dim> class EdgeDeltaSet;
+
+    /**
+     * A class that represents by how much the set of parallel edges
+     * grows in each step. In the graph orientation paper, this set is
+     * called $\Delta_k$, thus the name.
+     *
+     * In 2d, this set can only include zero, one, or two elements.
+     * Consequently, the appropriate data structure is one in which
+     * we store at most 2 elements in a fixed sized data structure.
+     */
+    template <>
+    class EdgeDeltaSet<2>
+    {
+    public:
+      /**
+       * Iterator type for the elements of the set.
+       */
+      typedef const unsigned int *const_iterator;
+
+      /**
+       * Default constructor. Initialize both slots as unused, corresponding
+       * to an empty set.
+       */
+      EdgeDeltaSet ()
+      {
+        edge_indices[0] = edge_indices[1] = numbers::invalid_unsigned_int;
+      }
+
+
+      /**
+       * Delete the elements of the set by marking both slots as unused.
+       */
+      void clear ()
+      {
+        edge_indices[0] = edge_indices[1] = numbers::invalid_unsigned_int;
+      }
+
+      /**
+       * Insert one element into the set. This will fail if the set already
+       * has two elements.
+       */
+      void insert (const unsigned int edge_index)
+      {
+        if (edge_indices[0] == numbers::invalid_unsigned_int)
+          edge_indices[0] = edge_index;
+        else
+          {
+            Assert (edge_indices[1] == numbers::invalid_unsigned_int,
+                    ExcInternalError());
+            edge_indices[1] = edge_index;
+          }
+      }
+
+
+      /**
+       * Return an iterator pointing to the first element of the set.
+       */
+      const_iterator begin () const
+      {
+        return &edge_indices[0];
+      }
+
+
+      /**
+       * Return an iterator pointing to the element past the last used one.
+       */
+      const_iterator end () const
+      {
+        // check whether the current object stores zero, one, or two
+        // indices, and use this to point to the element past the
+        // last valid one
+        if (edge_indices[0] == numbers::invalid_unsigned_int)
+          return &edge_indices[0];
+        else if (edge_indices[1] == numbers::invalid_unsigned_int)
+          return &edge_indices[0]+1;
+        else
+          return &edge_indices[0]+2;
+      }
+
+    private:
+      /**
+       * Storage space to store the indices of at most two edges.
+       */
+      unsigned int edge_indices[2];
+    };
+
+
+
+    /**
+     * A class that represents by how much the set of parallel edges
+     * grows in each step. In the graph orientation paper, this set is
+     * called $\Delta_k$, thus the name.
+     *
+     * In 3d, this set can have arbitrarily many elements, unlike the
+     * 2d case specialized above. Consequently, we simply represent
+     * the data structure with a std::set. Class derivation ensures
+     * that we simply inherit all of the member functions of the
+     * base class.
+     */
+    template <>
+    class EdgeDeltaSet<3> : std::set<unsigned int>
+    {};
+
+
+
 
     /**
      * From a list of cells, build a sorted vector that contains all of the edges
@@ -428,6 +533,8 @@ namespace internal
 
       return edge_list;
     }
+
+
 
     /**
      * Build the cell list. Update the edge array to let edges know
@@ -457,6 +564,7 @@ namespace internal
     }
 
 
+
     /**
      * Return the index within 'cells' of the first cell that has at least one
      * edge that is not yet oriented.
@@ -474,6 +582,7 @@ namespace internal
 
       return numbers::invalid_unsigned_int;
     }
+
 
 
     /**
@@ -532,101 +641,87 @@ namespace internal
       // this
       //
       // note that in 2d, each of the Deltas can at most
-      // contain two elements. we indicate non-used elements
-      // of these sets by invalid unsigned ints; if the set has
-      // only one element, then we use the first
-      unsigned int Delta_k[2] = { numbers::invalid_unsigned_int,
-                                  numbers::invalid_unsigned_int
-                                };
-      unsigned int Delta_k_minus_1[2] = { cells[cell].edge_indices[local_edge],
-                                          numbers::invalid_unsigned_int
-                                        };
-      while (Delta_k_minus_1[0] != numbers::invalid_unsigned_int)   // while set is not empty
+      // contain two elements, whereas in 3d it can be arbitrarily many
+      EdgeDeltaSet<dim> Delta_k;
+      EdgeDeltaSet<dim> Delta_k_minus_1;
+      Delta_k_minus_1.insert (cells[cell].edge_indices[local_edge]);
+
+      while (Delta_k_minus_1.begin() != Delta_k_minus_1.end())   // while set is not empty
         {
-          Delta_k[0] = Delta_k[1] = numbers::invalid_unsigned_int;
+          Delta_k.clear ();
 
-          for (unsigned int delta_element=0; delta_element<2; ++delta_element)
-            if (Delta_k_minus_1[delta_element] != numbers::invalid_unsigned_int)
-              {
-                // get the edge we are currently looking at. it must already
-                // have been oriented
-                const unsigned int delta = Delta_k_minus_1[delta_element];
-                Assert (edges[delta].orientation_status != Edge<dim>::not_oriented,
-                        ExcInternalError());
+          for (EdgeDeltaSet<dim>::const_iterator delta = Delta_k_minus_1.begin();
+               delta != Delta_k_minus_1.end(); ++delta)
+            {
+              Assert (edges[*delta].orientation_status != Edge<dim>::not_oriented,
+                      ExcInternalError());
 
-                // now go through the cells adjacent to this edge
-                for (typename AdjacentCells<dim>::const_iterator
-                     adjacent_cell = edges[delta].adjacent_cells.begin();
-                     adjacent_cell != edges[delta].adjacent_cells.end(); ++adjacent_cell)
-                  {
-                    const unsigned int K = adjacent_cell->cell_index;
-                    const unsigned int delta_is_edge_in_K = adjacent_cell->edge_within_cell;
+              // now go through the cells adjacent to this edge
+              for (typename AdjacentCells<dim>::const_iterator
+                   adjacent_cell = edges[*delta].adjacent_cells.begin();
+                   adjacent_cell != edges[*delta].adjacent_cells.end(); ++adjacent_cell)
+                {
+                  const unsigned int K = adjacent_cell->cell_index;
+                  const unsigned int delta_is_edge_in_K = adjacent_cell->edge_within_cell;
 
-                    // figure out the direction of delta with respect to the cell K
-                    // (in the orientation in which the user has given it to us)
-                    const unsigned int first_edge_vertex
-                      = (edges[delta].orientation_status == Edge<dim>::forward
-                         ?
-                         edges[delta].vertex_indices[0]
-                         :
-                         edges[delta].vertex_indices[1]);
-                    const unsigned int first_edge_vertex_in_K = cells[K].vertex_indices[GeometryInfo<dim>::face_to_cell_vertices(delta_is_edge_in_K, 0)];
-                    Assert (first_edge_vertex == first_edge_vertex_in_K
-                            ||
-                            first_edge_vertex == cells[K].vertex_indices[GeometryInfo<dim>::face_to_cell_vertices(delta_is_edge_in_K, 1)],
-                            ExcInternalError());
+                  // figure out the direction of delta with respect to the cell K
+                  // (in the orientation in which the user has given it to us)
+                  const unsigned int first_edge_vertex
+                    = (edges[*delta].orientation_status == Edge<dim>::forward
+                       ?
+                       edges[*delta].vertex_indices[0]
+                       :
+                       edges[*delta].vertex_indices[1]);
+                  const unsigned int first_edge_vertex_in_K = cells[K].vertex_indices[GeometryInfo<dim>::face_to_cell_vertices(delta_is_edge_in_K, 0)];
+                  Assert (first_edge_vertex == first_edge_vertex_in_K
+                          ||
+                          first_edge_vertex == cells[K].vertex_indices[GeometryInfo<dim>::face_to_cell_vertices(delta_is_edge_in_K, 1)],
+                          ExcInternalError());
 
-                    // now figure out which direction the opposite edge needs to be into.
-                    const unsigned int opposite_edge
-                      = cells[K].edge_indices[ParallelEdges<2>::parallel_edges[delta_is_edge_in_K][0]];
-                    const unsigned int first_opposite_edge_vertex
-                      =  cells[K].vertex_indices[GeometryInfo<dim>::face_to_cell_vertices(
-                                                   ParallelEdges<dim>::parallel_edges[delta_is_edge_in_K][0],
-                                                   (first_edge_vertex == first_edge_vertex_in_K
-                                                    ?
-                                                    0
-                                                    :
-                                                    1))];
+                  // now figure out which direction the opposite edge needs to be into.
+                  const unsigned int opposite_edge
+                    = cells[K].edge_indices[ParallelEdges<2>::parallel_edges[delta_is_edge_in_K][0]];
+                  const unsigned int first_opposite_edge_vertex
+                    =  cells[K].vertex_indices[GeometryInfo<dim>::face_to_cell_vertices(
+                                                 ParallelEdges<dim>::parallel_edges[delta_is_edge_in_K][0],
+                                                 (first_edge_vertex == first_edge_vertex_in_K
+                                                  ?
+                                                  0
+                                                  :
+                                                  1))];
 
-                    const Edge<dim>::OrientationStatus opposite_edge_orientation
-                      = (edges[opposite_edge].vertex_indices[0]
-                         ==
-                         first_opposite_edge_vertex
-                         ?
-                         Edge<dim>::forward
-                         :
-                         Edge<dim>::backward);
+                  const Edge<dim>::OrientationStatus opposite_edge_orientation
+                    = (edges[opposite_edge].vertex_indices[0]
+                       ==
+                       first_opposite_edge_vertex
+                       ?
+                       Edge<dim>::forward
+                       :
+                       Edge<dim>::backward);
 
-                    // see if the opposite edge (there is only one in 2d) has already been
-                    // oriented.
-                    if (edges[opposite_edge].orientation_status == Edge<dim>::not_oriented)
-                      {
-                        // the opposite edge is not yet oriented. do orient it and add it to
-                        // Delta_k;
-                        edges[opposite_edge].orientation_status = opposite_edge_orientation;
-                        if (Delta_k[0] == numbers::invalid_unsigned_int)
-                          Delta_k[0] = opposite_edge;
-                        else
-                          {
-                            Assert (Delta_k[1] == numbers::invalid_unsigned_int, ExcInternalError());
-                            Delta_k[1] = opposite_edge;
-                          }
-                      }
-                    else
-                      {
-                        // the opposite edge has already been oriented. assert that it is
-                        // consistent with the current one
-                        Assert (edges[opposite_edge].orientation_status == opposite_edge_orientation,
-                                ExcInternalError());
-                      }
-                  }
-              }
+                  // see if the opposite edge (there is only one in 2d) has already been
+                  // oriented.
+                  if (edges[opposite_edge].orientation_status == Edge<dim>::not_oriented)
+                    {
+                      // the opposite edge is not yet oriented. do orient it and add it to
+                      // Delta_k
+                      edges[opposite_edge].orientation_status = opposite_edge_orientation;
+                      Delta_k.insert (opposite_edge);
+                    }
+                  else
+                    {
+                      // the opposite edge has already been oriented. assert that it is
+                      // consistent with the current one
+                      Assert (edges[opposite_edge].orientation_status == opposite_edge_orientation,
+                              ExcInternalError());
+                    }
+                }
+            }
 
           // finally copy the new set to the previous one
           // (corresponding to increasing 'k' by one in the
           // algorithm)
-          Delta_k_minus_1[0] = Delta_k[0];
-          Delta_k_minus_1[1] = Delta_k[1];
+          Delta_k_minus_1 = Delta_k;
         }
     }
 
