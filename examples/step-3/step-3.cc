@@ -390,9 +390,8 @@ void Step3::assemble_system ()
   // Now for the loop over all cells. We have seen before how this works, so
   // the following code should be familiar including the conventional names
   // for these variables:
-  DoFHandler<2>::active_cell_iterator
-  cell = dof_handler.begin_active(),
-  endc = dof_handler.end();
+  DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active();
+  DoFHandler<2>::active_cell_iterator endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
       // @note As already mentioned in step-1, there is a more convenient way

@@ -146,7 +146,7 @@ void second_grid ()
       // Next, we need an iterator that points to a cell and which we will
       // move over all active cells one by one. In a sense, you can think of a
       // triangulation as a collection of cells. If it was an array, you would
-      // just get a pointer that you move from one to the next. In
+      // just get a pointer that you move from one array element to the next. In
       // triangulations, cells aren't stored as an array, so simple pointers
       // do not work, but one can generalize pointers to iterators (see <a
       // href="http://en.wikipedia.org/wiki/Iterator#C.2B.2B">this wikipedia
@@ -173,9 +173,8 @@ void second_grid ()
       // After declaring the iterator variable, the loop over all cells is
       // then rather trivial, and looks like any loop involving pointers
       // instead of iterators:
-      Triangulation<2>::active_cell_iterator
-      cell = triangulation.begin_active(),
-      endc = triangulation.end();
+      Triangulation<2>::active_cell_iterator cell = triangulation.begin_active();
+      Triangulation<2>::active_cell_iterator endc = triangulation.end();
       for (; cell!=endc; ++cell)
         {
           // @note Writing a loop like this requires a lot of typing, but it
