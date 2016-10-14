@@ -57,7 +57,7 @@ namespace FETools
                                  OutVector &/*u2*/)
       {
         Assert(false, ExcNotImplemented())
-      };
+      }
     };
 #else
     // Implementation of the @p extrapolate function
