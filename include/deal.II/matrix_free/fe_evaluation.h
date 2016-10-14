@@ -464,6 +464,12 @@ public:
    */
   value_type integrate_value () const;
 
+  /**
+   * Return the determinant of the Jacobian from the unit to the real cell
+   * times the quadrature weight.
+   */
+  VectorizedArray<Number> JxW(const unsigned int q_point) const;
+
   //@}
 
   /**
@@ -2022,7 +2028,7 @@ FEEvaluationBase<dim,n_components_,Number>
   jacobian_grad_upper(0),
   cell               (numbers::invalid_unsigned_int),
   cell_type          (internal::MatrixFreeFunctions::undefined),
-  cell_data_number   (0),
+  cell_data_number   (numbers::invalid_unsigned_int),
   first_selected_component (0)
 {
   for (unsigned int c=0; c<n_components_; ++c)
@@ -2086,7 +2092,7 @@ FEEvaluationBase<dim,n_components_,Number>
   jacobian_grad_upper(0),
   cell               (0),
   cell_type          (internal::MatrixFreeFunctions::general),
-  cell_data_number   (0),
+  cell_data_number   (numbers::invalid_unsigned_int),
   // keep the number of the selected component within the current base element
   // for reading dof values
   first_selected_component (fe.component_to_base_index(first_selected_component).second)
@@ -2137,16 +2143,20 @@ FEEvaluationBase<dim,n_components_,Number>
   mapping_info       (other.mapping_info),
   stored_shape_info  (other.stored_shape_info),
   data               (other.data),
-  cartesian_data     (other.cartesian_data),
-  jacobian           (other.jacobian),
-  J_value            (other.J_value),
-  quadrature_weights (other.quadrature_weights),
-  quadrature_points  (other.quadrature_points),
-  jacobian_grad      (other.jacobian_grad),
-  jacobian_grad_upper(other.jacobian_grad_upper),
-  cell               (other.cell),
-  cell_type          (other.cell_type),
-  cell_data_number   (other.cell_data_number),
+  cartesian_data     (0),
+  jacobian           (0),
+  J_value            (0),
+  quadrature_weights (mapping_info != 0 ?
+                      mapping_info->mapping_data_gen[quad_no].
+                      quadrature_weights[active_quad_index].begin()
+                      :
+                      0),
+  quadrature_points  (0),
+  jacobian_grad      (0),
+  jacobian_grad_upper(0),
+  cell               (numbers::invalid_unsigned_int),
+  cell_type          (internal::MatrixFreeFunctions::general),
+  cell_data_number   (numbers::invalid_unsigned_int),
   first_selected_component (other.first_selected_component)
 {
   for (unsigned int c=0; c<n_components_; ++c)
@@ -2170,6 +2180,7 @@ FEEvaluationBase<dim,n_components_,Number>
       jacobian = mapped_geometry->get_inverse_jacobians().begin();
       J_value = mapped_geometry->get_JxW_values().begin();
       quadrature_points = mapped_geometry->get_quadrature_points().begin();
+      cell = 0;
     }
 }
 
@@ -2336,7 +2347,7 @@ FEEvaluationBase<dim,n_components_,Number>
 ::fill_JxW_values(AlignedVector<VectorizedArray<Number> > &JxW_values) const
 {
   AssertDimension(JxW_values.size(), data->n_q_points);
-  Assert (this->J_value != 0, ExcNotImplemented());
+  Assert (this->J_value != 0, ExcNotInitialized());
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian ||
       this->cell_type == internal::MatrixFreeFunctions::affine)
     {
@@ -2348,6 +2359,24 @@ FEEvaluationBase<dim,n_components_,Number>
   else
     for (unsigned int q=0; q<data->n_q_points; ++q)
       JxW_values[q] = this->J_value[q];
+}
+
+
+
+template <int dim, int n_components_, typename Number>
+inline
+VectorizedArray<Number>
+FEEvaluationBase<dim,n_components_,Number>::JxW(const unsigned int q_point) const
+{
+  Assert (this->J_value != 0, ExcNotInitialized());
+  if (this->cell_type == internal::MatrixFreeFunctions::cartesian ||
+      this->cell_type == internal::MatrixFreeFunctions::affine)
+    {
+      Assert (this->mapping_info != 0, ExcInternalError());
+      return this->J_value[0] * this->quadrature_weights[q_point];
+    }
+  else
+    return this->J_value[q_point];
 }
 
 
@@ -6928,6 +6957,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 {
   Assert (this->mapping_info->quadrature_points_initialized == true,
           ExcNotInitialized());
+  Assert (this->quadrature_points != 0, ExcNotInitialized());
   AssertIndexRange (q, n_q_points);
 
   // Cartesian mesh: not all quadrature points are stored, only the
