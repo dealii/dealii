@@ -647,6 +647,16 @@ namespace Step40
   template <int dim>
   void LaplaceProblem<dim>::run ()
   {
+    pcout << "Running with "
+#ifdef USE_PETSC_LA
+          << "PETSc"
+#else
+          << "Trilinos"
+#endif
+          << " on "
+          << Utilities::MPI::n_mpi_processes(mpi_communicator)
+          << " MPI rank(s)..." << std::endl;
+
     const unsigned int n_cycles = 8;
     for (unsigned int cycle=0; cycle<n_cycles; ++cycle)
       {
