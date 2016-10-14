@@ -1918,14 +1918,12 @@ MappingQGeneric<dim,spacedim>::requires_update_flags (const UpdateFlags in) cons
                  | update_jacobian_pushed_forward_3rd_derivatives) )
         out |= update_covariant_transformation;
 
-      // The contravariant transformation
-      // used in the Piola transformation, which
-      // requires the determinant of the
-      // Jacobi matrix of the transformation.
-      // Because we have no way of knowing here whether the finite
-      // elements wants to use the contravariant of the Piola
-      // transforms, we add the JxW values to the list of flags to be
-      // updated for each cell.
+      // The contravariant transformation is used in the Piola
+      // transformation, which requires the determinant of the Jacobi
+      // matrix of the transformation.  Because we have no way of
+      // knowing here whether the finite element wants to use the
+      // contravariant or the Piola transforms, we add the JxW values
+      // to the list of flags to be updated for each cell.
       if (out & update_contravariant_transformation)
         out |= update_JxW_values;
 
