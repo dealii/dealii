@@ -93,9 +93,8 @@ void make_grid (Triangulation<2> &triangulation)
 
   for (unsigned int step=0; step<3; ++step)
     {
-      Triangulation<2>::active_cell_iterator
-      cell = triangulation.begin_active(),
-      endc = triangulation.end();
+      Triangulation<2>::active_cell_iterator cell = triangulation.begin_active();
+      Triangulation<2>::active_cell_iterator endc = triangulation.end();
 
       for (; cell!=endc; ++cell)
         for (unsigned int v=0;
