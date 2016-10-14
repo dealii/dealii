@@ -88,8 +88,8 @@ void make_grid (Triangulation<2> &triangulation)
                               5 );
 
   static const SphericalManifold<2> manifold_description(center);
-  triangulation.set_all_manifold_ids(0);
   triangulation.set_manifold (0, manifold_description);
+  triangulation.set_all_manifold_ids(0);
 
   for (unsigned int step=0; step<3; ++step)
     {
