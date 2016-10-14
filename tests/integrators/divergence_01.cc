@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2015 by the deal.II authors
+// Copyright (C) 2012 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -218,8 +218,8 @@ test_fe(Triangulation<dim> &tr, FiniteElement<dim> &fv, FiniteElement<dim> &fs)
 {
   deallog << fv.get_name() << " x " << fs.get_name() << std::endl << "cell matrix" << std::endl;
   QGauss<dim> quadrature(fv.tensor_degree()+1);
-  FEValues<dim> fev(fv, quadrature, update_values | update_gradients);
-  FEValues<dim> fes(fs, quadrature, update_values | update_gradients);
+  FEValues<dim> fev(fv, quadrature, update_values | update_gradients | update_JxW_values);
+  FEValues<dim> fes(fs, quadrature, update_values | update_gradients | update_JxW_values);
 
   typename Triangulation<dim>::cell_iterator cell1 = tr.begin(1);
   fev.reinit(cell1);
@@ -227,8 +227,8 @@ test_fe(Triangulation<dim> &tr, FiniteElement<dim> &fv, FiniteElement<dim> &fs)
   test_cell(fev, fes);
 
   QGauss<dim-1> face_quadrature(fv.tensor_degree()+1);
-  FEFaceValues<dim> fev1(fv, face_quadrature, update_values | update_gradients | update_normal_vectors);
-  FEFaceValues<dim> fes1(fs, face_quadrature, update_values | update_gradients | update_normal_vectors);
+  FEFaceValues<dim> fev1(fv, face_quadrature, update_values | update_gradients | update_normal_vectors | update_JxW_values);
+  FEFaceValues<dim> fes1(fs, face_quadrature, update_values | update_gradients | update_normal_vectors | update_JxW_values);
   for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
     {
       deallog << "boundary_matrix " << i << std::endl;
@@ -237,8 +237,8 @@ test_fe(Triangulation<dim> &tr, FiniteElement<dim> &fv, FiniteElement<dim> &fs)
       test_boundary(fev1, fes1);
     }
 
-  FEFaceValues<dim> fev2(fv, face_quadrature, update_values | update_gradients);
-  FEFaceValues<dim> fes2(fs, face_quadrature, update_values | update_gradients);
+  FEFaceValues<dim> fev2(fv, face_quadrature, update_values | update_gradients | update_JxW_values);
+  FEFaceValues<dim> fes2(fs, face_quadrature, update_values | update_gradients | update_JxW_values);
   typename Triangulation<dim>::cell_iterator cell2 = cell1->neighbor(1);
 
   deallog << "face_matrix " << 0 << std::endl;
