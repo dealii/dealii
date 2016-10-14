@@ -657,7 +657,7 @@ namespace internal
                       ExcInternalError());
 
               // now go through the cells adjacent to this edge
-              for (typename AdjacentCells<dim>::const_iterator
+              for (AdjacentCells<dim>::const_iterator
                    adjacent_cell = edges[*delta].adjacent_cells.begin();
                    adjacent_cell != edges[*delta].adjacent_cells.end(); ++adjacent_cell)
                 {
