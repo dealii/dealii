@@ -135,9 +135,9 @@ void second_grid ()
   // topic; if you're confused about what exactly is happening here,
   // you may want to look at the @ref GlossManifoldIndicator "glossary
   // entry on this topic".)
-  triangulation.set_all_manifold_ids(0);
   const SphericalManifold<2> manifold_description(center);
   triangulation.set_manifold (0, manifold_description);
+  triangulation.set_all_manifold_ids(0);
 
   // In order to demonstrate how to write a loop over all cells, we will
   // refine the grid in five steps towards the inner circle of the domain:
