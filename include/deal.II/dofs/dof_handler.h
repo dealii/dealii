@@ -68,8 +68,12 @@ namespace internal
 
 
 /**
- * Manage the distribution and numbering of the degrees of freedom for non-
- * multigrid algorithms. This class satisfies the
+ * Given a triangulation and a description of a finite element, this
+ * class enumerates degrees of freedom on all vertices, edges, faces,
+ * and cells of the triangulation. As a result, it also provides a
+ * <i>basis</i> for a discrete space $V_h$ whose elements are finite
+ * element functions defined on each cell by a FiniteElement object.
+ * This class satisfies the
  * @ref ConceptMeshType "MeshType concept"
  * requirements.
  *
