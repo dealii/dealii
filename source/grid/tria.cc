@@ -1312,8 +1312,6 @@ namespace internal
       {
         typedef
         typename Triangulation<dim,spacedim>::line_iterator line_iterator;
-        typedef
-        typename Triangulation<dim,spacedim>::active_line_iterator active_line_iterator;
 
         number_cache.n_levels = 0;
         if (level_objects > 0)
@@ -1413,8 +1411,6 @@ namespace internal
 
         typedef
         typename Triangulation<dim,spacedim>::quad_iterator quad_iterator;
-        typedef
-        typename Triangulation<dim,spacedim>::active_quad_iterator active_quad_iterator;
 
         ///////////////////////////////////
         // update the number of quads on the different levels in the
@@ -1519,8 +1515,6 @@ namespace internal
 
         typedef
         typename Triangulation<dim,spacedim>::hex_iterator hex_iterator;
-        typedef
-        typename Triangulation<dim,spacedim>::active_hex_iterator active_hex_iterator;
 
         ///////////////////////////////////
         // update the number of hexes on the different levels in the
@@ -11841,7 +11835,6 @@ Triangulation<dim, spacedim>::add_periodicity
 (const std::vector<GridTools::PeriodicFacePair<cell_iterator> > &
  periodicity_vector)
 {
-  typedef std::pair<cell_iterator, unsigned int> CellFace;
   periodic_face_pairs_level_0.insert(periodic_face_pairs_level_0.end(),
                                      periodicity_vector.begin(),
                                      periodicity_vector.end());
