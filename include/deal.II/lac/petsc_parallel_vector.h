@@ -601,7 +601,7 @@ namespace internal
       static
       void reinit_range_vector (const Matrix &matrix,
                                 PETScWrappers::MPI::Vector &v,
-                                bool omit_zeroing_entries)
+                                bool /*omit_zeroing_entries*/)
       {
         v.reinit(matrix.locally_owned_range_indices(), matrix.get_mpi_communicator());
       }
@@ -610,7 +610,7 @@ namespace internal
       static
       void reinit_domain_vector(const Matrix &matrix,
                                 PETScWrappers::MPI::Vector &v,
-                                bool omit_zeroing_entries)
+                                bool /*omit_zeroing_entries*/)
       {
         v.reinit(matrix.locally_owned_domain_indices(), matrix.get_mpi_communicator());
       }

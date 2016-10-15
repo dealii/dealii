@@ -265,11 +265,8 @@ namespace DoFRenumbering
 
       int delta = 0;
 
-      typedef double Type;
-
       // must be BGL directed graph now
       typedef adjacency_list<vecS, vecS, directedS>  Graph;
-      typedef graph_traits<Graph>::vertex_descriptor Vertex;
 
       int n = dof_handler.n_dofs();
 
