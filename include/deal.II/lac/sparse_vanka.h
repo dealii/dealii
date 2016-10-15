@@ -591,8 +591,8 @@ SparseVanka<number>::n () const
 template<typename number>
 template<typename number2>
 inline void
-SparseVanka<number>::Tvmult (Vector<number2>       &dst,
-                             const Vector<number2> &src) const
+SparseVanka<number>::Tvmult (Vector<number2>       &/*dst*/,
+                             const Vector<number2> &/*src*/) const
 {
   AssertThrow(false, ExcNotImplemented());
 }
