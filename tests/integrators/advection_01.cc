@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2015 by the deal.II authors
+// Copyright (C) 2012 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -242,14 +242,14 @@ test_fe(Triangulation<dim> &tr, FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl << "cell matrix" << std::endl;
   QGauss<dim> quadrature(fe.tensor_degree());
-  FEValues<dim> fev(fe, quadrature, update_values | update_gradients);
+  FEValues<dim> fev(fe, quadrature, update_values | update_gradients | update_JxW_values);
 
   typename Triangulation<dim>::cell_iterator cell1 = tr.begin(1);
   fev.reinit(cell1);
   test_cell(fev);
 
   QGauss<dim-1> face_quadrature(fe.tensor_degree()+1);
-  FEFaceValues<dim> fef1(fe, face_quadrature, update_values | update_gradients | update_normal_vectors);
+  FEFaceValues<dim> fef1(fe, face_quadrature, update_values | update_gradients | update_normal_vectors | update_JxW_values);
   for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
     {
       deallog << "boundary_matrix " << i << std::endl;
@@ -257,7 +257,7 @@ test_fe(Triangulation<dim> &tr, FiniteElement<dim> &fe)
       test_boundary(fef1);
     }
 
-  FEFaceValues<dim> fef2(fe, face_quadrature, update_values | update_gradients | update_normal_vectors);
+  FEFaceValues<dim> fef2(fe, face_quadrature, update_values | update_gradients | update_normal_vectors | update_JxW_values);
   typename Triangulation<dim>::cell_iterator cell2 = cell1->neighbor(1);
 
   deallog << "face_matrix " << 0 << std::endl;
