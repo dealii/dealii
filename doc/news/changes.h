@@ -392,6 +392,13 @@ inconvenience this causes.
 
 <ol>
 
+ <li> New: There is now a function FEEvaluation::JxW() to return the Jacobian
+ determinant times the quadrature weight in the matrix-free evaluation
+ routines similary to FEValues.
+ <br>
+ (Martin Kronbichler, 2016/10/14)
+ </li>
+
  <li> Fixed: GridGenerator::hyper_cube_slit() with colorized set to
  true is now working correctly.
  <br>
@@ -399,7 +406,7 @@ inconvenience this causes.
  </li>
 
  <li> Fixed: SphericalManifold now behaves correctly also when R>>1
- and the center is not the origin. 
+ and the center is not the origin.
  <br>
  (Luca Heltai, 2016/10/01)
  </li>
