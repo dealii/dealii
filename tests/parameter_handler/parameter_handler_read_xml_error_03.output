@@ -1,3 +1,7 @@
 
-DEAL::ExcInvalidXMLParameterFile ("There are " + Utilities::to_string(n_top_level_elements) + " top-level elements, but there " "should only be one.")
-There are 2 top-level elements, but there should only be one.
+DEAL::ExcInvalidXMLParameterFile (top_level_message.str())
+    The ParameterHandler input parser found 2 top level elements while reading
+    an XML format input file, but there should be exactly one top level element.
+    The top level elements are:
+        ParameterHandler
+        secondtopleveltag

@@ -1936,11 +1936,29 @@ void ParameterHandler::parse_input_from_xml (std::istream &in)
 
   const std::size_t n_top_level_elements = std::distance (single_node_tree.begin(),
                                                           single_node_tree.end());
-  AssertThrow (n_top_level_elements == 1,
-               ExcInvalidXMLParameterFile ("There are "
-                                           + Utilities::to_string(n_top_level_elements)
-                                           + " top-level elements, but there "
-                                           "should only be one."));
+  if (n_top_level_elements != 1)
+    {
+      std::ostringstream top_level_message;
+      top_level_message << "The ParameterHandler input parser found "
+                        << n_top_level_elements
+                        << " top level elements while reading\n "
+                        << "    an XML format input file, but there should be"
+                        << " exactly one top level element.\n"
+                        << "    The top level elements are:\n";
+
+      unsigned int entry_n = 0;
+      for (boost::property_tree::ptree::iterator it = single_node_tree.begin();
+           it != single_node_tree.end(); ++it, ++entry_n)
+        {
+          top_level_message << "        "
+                            << it->first
+                            << (entry_n != n_top_level_elements - 1 ? "\n" : "");
+        }
+
+      // repeat assertion condition to make the printed version easier to read
+      AssertThrow (n_top_level_elements == 1,
+                   ExcInvalidXMLParameterFile (top_level_message.str()));
+    }
 
   // read the child elements recursively
   const boost::property_tree::ptree
