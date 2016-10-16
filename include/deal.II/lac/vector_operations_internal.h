@@ -1146,7 +1146,9 @@ namespace internal
 
       if (n_chunks > threshold_array_allocate)
         {
-          large_array.resize(n_chunks);
+          // make sure we allocate an even number of elements,
+          // access to the new last element is needed in do_sum()
+          large_array.resize(2*((n_chunks+1)/2));
           array_ptr = &large_array[0];
         }
       else
