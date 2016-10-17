@@ -347,7 +347,7 @@ MARK_AS_ADVANCED(DEAL_II_DOXYGEN_USE_MATHJAX)
 
 OPTION(DEAL_II_DOXYGEN_USE_ONLINE_MATHJAX
   "If set to ON, doxygen documentation is generated using online (from CDN) mathjax copy"
-  OFF
+  ON
   )
 MARK_AS_ADVANCED(DEAL_II_DOXYGEN_USE_ONLINE_MATHJAX)
 
