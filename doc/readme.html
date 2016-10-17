@@ -344,9 +344,12 @@
       adding <code>-DDEAL_II_DOXYGEN_USE_MATHJAX=ON</code> to the
       CMake call above. These formulas are then rendered natively by
       the browser. CMake will try to find a local installation of
-      MathJax scripts, otherwise the online version of the scripts will be
-      used in the documentation.
-    </p>
+      MathJax scripts, otherwise the online version of the scripts
+      will be used in the documentation. If you are going to host a
+      public copy of deal.II documentation it is a good idea to force
+      using online version of MathJax scripts by
+      adding <code>-DDEAL_II_DOXYGEN_USE_ONLINE_MATHJAX=ON<code>.
+    </p
 
     <p>
       Upon calling <code>make</code> and <code>make install</code>, this will
