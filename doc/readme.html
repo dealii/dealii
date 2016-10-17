@@ -308,7 +308,7 @@
 
     <a name="documentation"></a>
     <h3>Configuring and building the documentation</h3>
-
+    
     <p>
       All the documentation about the version that you downloaded and that can
       be found at the <a href="http://www.dealii.org/" target="_top">
@@ -319,34 +319,34 @@
     <pre>
       cmake -DDEAL_II_COMPONENT_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/path/install/dir ../deal.II
     </pre>
-
-  <p>
-    For this to succeed, you will need <a href="http://www.perl.org/"
-					  target="_top">Perl 5.x</a>,
-    <a href="http://www.doxygen.org/" target="_top">doxygen</a>
-    and <code>dot</code> (which is part of
-    the <a href="http://www.graphviz.org" target="_top">GraphViz</a>
-    package) to be installed.
-  </p>
+    
+    <p>
+      For this to succeed, you will need <a href="http://www.perl.org/"
+					    target="_top">Perl 5.x</a>,
+      <a href="http://www.doxygen.org/" target="_top">doxygen</a>
+      and <code>dot</code> (which is part of
+      the <a href="http://www.graphviz.org" target="_top">GraphViz</a>
+      package) to be installed.
+    </p>
   
-  <p>
-    The documentation contains links to pictures (e.g., for the
-    tutorial programs) that are by default stored online at the
-    dealii.org domain. If you want to use the documentation completely
-    offline, you can run
-    the <code>contrib/utilities/makeofflinedoc.sh</code> script in an
-    installed documentation directory to download all images.
-  </p>
-
-  <p> Finally, the default for locally installed documentation is to
-    render formulas as images. You can force formulas to be displayed
-    via the MathJax system by
-    adding <code>-DDEAL_II_DOXYGEN_USE_MATHJAX=ON</code> to the CMake
-    call above. These formulas are then rendered natively by the
-    browser. CMake will try to find a local installation of MathJax
-    scripts. If it is not present CMake will insert MathJax an online
-    link into documentation files.
-</p>
+    <p>
+      The documentation contains links to pictures (e.g., for the
+      tutorial programs) that are by default stored online at the
+      dealii.org domain. If you want to use the documentation
+      completely offline, you can run
+      the <code>contrib/utilities/makeofflinedoc.sh</code> script in
+      an installed documentation directory to download all images.
+    </p>
+    
+    <p> Finally, the default for locally installed documentation is to
+      render formulas as images. You can force formulas to be
+      displayed via the MathJax system by
+      adding <code>-DDEAL_II_DOXYGEN_USE_MATHJAX=ON</code> to the
+      CMake call above. These formulas are then rendered natively by
+      the browser. CMake will try to find a local installation of
+      MathJax scripts. If it is not present CMake will insert MathJax
+      an online link into documentation files.
+    </p>
 
     <p>
       Upon calling <code>make</code> and <code>make install</code>, this will
