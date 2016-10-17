@@ -58,6 +58,19 @@ IF(DEAL_II_DOXYGEN_USE_MATHJAX)
 ELSE()
   SET(_use_mathjax NO)
 ENDIF()
+ 
+FIND_PACKAGE(MathJax)
+IF(MATHJAX_FOUND)
+  SET(_mathjax_relpath ${MATHJAX_PATH})
+  MESSAGE(STATUS "Using local MathJax: " ${MATHJAX_PATH})
+  SET(MATHJAX_RELPATH_CONFIG "MATHJAX_RELPATH = ${MATHJAX_PATH}")
+ELSE()
+  SET(_mathjax_relpath "https://cdn.mathjax.org/mathjax/latest")
+  MESSAGE(STATUS "Using web-based MathJax: " ${_mathjax_relpath})
+  SET(MATHJAX_RELPATH_CONFIG "")
+  MESSAGE(STATUS "Using default web-based MathJax")
+ENDIF()
+
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/options.dox.in
   ${CMAKE_CURRENT_BINARY_DIR}/options.dox
