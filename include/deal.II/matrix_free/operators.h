@@ -20,7 +20,11 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/vectorization.h>
+#include <deal.II/base/subscriptor.h>
 
+#include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/multigrid/mg_constrained_dofs.h>
+#include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
 
 
