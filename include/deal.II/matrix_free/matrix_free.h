@@ -103,7 +103,7 @@ DEAL_II_NAMESPACE_OPEN
  */
 
 template <int dim, typename Number=double>
-class MatrixFree
+class MatrixFree : public Subscriptor
 {
 public:
 

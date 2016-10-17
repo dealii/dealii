@@ -38,6 +38,7 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, typename Number>
 MatrixFree<dim, Number>::MatrixFree()
   :
+  Subscriptor(),
   indices_are_initialized (false),
   mapping_is_initialized  (false)
 {}
