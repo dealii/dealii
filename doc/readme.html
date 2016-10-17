@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+<!doctype html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -316,20 +316,36 @@
       so, invoke <code>cmake</code> in the build instructions above as follows:
     </p>
 
-<pre>
-  cmake -DDEAL_II_COMPONENT_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/path/install/dir ../deal.II
-</pre>
+    <pre>
+      cmake -DDEAL_II_COMPONENT_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/path/install/dir ../deal.II
+    </pre>
 
-<p>
-  For this to succeed, you will need <a href="http://www.perl.org/"
-					target="_top">Perl 5.x</a>,
-  <a href="http://www.doxygen.org/" target="_top">doxygen</a>
-  and <code>dot</code> (which is part of
-  the <a href="http://www.graphviz.org" target="_top">GraphViz</a>
-  package) to be installed. Run contrib/utilities/makeofflinedoc.sh inside
-  installed documentation to download all the images for the tutorial. Define
-  DEAL_II_DOXYGEN_USE_MATHJAX to use MathJax for a local copy (so the equations will be
-  rendered in the browser, instead of being precompiled images that do not scale well).
+  <p>
+    For this to succeed, you will need <a href="http://www.perl.org/"
+					  target="_top">Perl 5.x</a>,
+    <a href="http://www.doxygen.org/" target="_top">doxygen</a>
+    and <code>dot</code> (which is part of
+    the <a href="http://www.graphviz.org" target="_top">GraphViz</a>
+    package) to be installed.
+  </p>
+  
+  <p>
+    The documentation contains links to pictures (e.g., for the
+    tutorial programs) that are by default stored online at the
+    dealii.org domain. If you want to use the documentation completely
+    offline, you can run
+    the <code>contrib/utilities/makeofflinedoc.sh</code> script in an
+    installed documentation directory to download all images.
+  </p>
+
+  <p> Finally, the default for locally installed documentation is to
+    render formulas as images. You can force formulas to be displayed
+    via the MathJax system by
+    adding <code>-DDEAL_II_DOXYGEN_USE_MATHJAX=ON</code> to the CMake
+    call above. These formulas are then rendered natively by the
+    browser. CMake will try to find a local installation of MathJax
+    scripts. If it is not present CMake will insert MathJax an online
+    link into documentation files.
 </p>
 
     <p>

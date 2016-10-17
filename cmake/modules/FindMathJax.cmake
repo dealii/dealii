@@ -24,17 +24,6 @@
 # SET(MATHJAX_DIR "" CACHE PATH "An optional hint to a MATHJAX installation")
 # SET_IF_EMPTY(MATHJAX_DIR "$ENV{MATHJAX_DIR}")
 
-# DEAL_II_FIND_LIBRARY(MATHJAX_LIBRARY
-#   NAMES mathjax
-#   HINTS ${MATHJAX_DIR}
-#   )
-
-# DEAL_II_FIND_PATH(MATHJAX_DIR
-#   NAMES MathJax.js
-#   PATHS "$ENV{MATHJAX_DIR}" "/usr/share/javascript/mathjax/"
-#   DOC "Path to local MathJax.js"
-#   )
-
 DEAL_II_FIND_PATH(MATHJAX_PATH MathJax.js
   PATHS ${MATHJAX_ROOT}
   $ENV{MATHJAX_ROOT}
