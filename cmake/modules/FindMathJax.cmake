@@ -30,6 +30,7 @@ DEAL_II_FIND_PATH(MATHJAX_PATH MathJax.js
   "${CMAKE_PREFIX_PATH}/share/javascript/mathjax"
   "${CMAKE_INSTALL_DATADIR}/javascript/mathjax"
   "/usr/share/javascript/mathjax"
+  "/usr/share/yelp/mathjax"
   DOC "Root path of MathJax.js"
   )
 
