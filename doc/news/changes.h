@@ -392,6 +392,11 @@ inconvenience this causes.
 
 <ol>
 
+ <li> New: Add a base class for matrix-free operators MatrixFreeOperators::Base.
+ <br>
+ (Denis Davydov, 2016/10/16)
+ </li>
+
  <li> New: There is now a function FEEvaluation::JxW() to return the Jacobian
  determinant times the quadrature weight in the matrix-free evaluation
  routines similary to FEValues.
