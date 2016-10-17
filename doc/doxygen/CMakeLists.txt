@@ -65,6 +65,9 @@ IF(DEAL_II_DOXYGEN_USE_MATHJAX)
       "/usr/share/yelp/mathjax"
       DOC "Root path of MathJax.js"
       )
+    IF(MATHJAX MATCHES "-NOTFOUND")
+      MESSAGE(FATAL_ERROR "MathJax was not found.")
+    ENDIF()
   ENDIF()
   IF(MATHJAX_PATH AND NOT DEAL_II_DOXYGEN_USE_ONLINE_MATHJAX)
     SET(_mathjax_relpath ${MATHJAX_PATH})
