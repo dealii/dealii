@@ -311,7 +311,20 @@ AdditionalData (const unsigned int number_of_arnoldi_vectors,
   number_of_arnoldi_vectors(number_of_arnoldi_vectors),
   eigenvalue_of_interest(eigenvalue_of_interest),
   symmetric(symmetric)
-{}
+{
+  //Check for possible options for symmetric problems
+  if (symmetric)
+    {
+      Assert(eigenvalue_of_interest!=largest_real_part,
+             ExcMessage("'largest real part' can only be used for non-symmetric problems!"));
+      Assert(eigenvalue_of_interest!=smallest_real_part,
+             ExcMessage("'smallest real part' can only be used for non-symmetric problems!"));
+      Assert(eigenvalue_of_interest!=largest_imaginary_part,
+             ExcMessage("'largest imaginary part' can only be used for non-symmetric problems!"));
+      Assert(eigenvalue_of_interest!=smallest_imaginary_part,
+             ExcMessage("'smallest imaginary part' can only be used for non-symmetric problems!"));
+    }
+}
 
 
 inline
