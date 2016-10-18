@@ -990,35 +990,6 @@ namespace
 }
 
 
-template<>
-void
-GridReordering<1>::invert_all_cells_of_negative_grid(const std::vector<Point<1> > &,
-                                                     std::vector<CellData<1> > &)
-{
-  // nothing to be done in 1d
-}
-
-
-
-template<>
-void
-GridReordering<1,2>::invert_all_cells_of_negative_grid(const std::vector<Point<2> > &,
-                                                       std::vector<CellData<1> > &)
-{
-  // nothing to be done in 1d
-}
-
-
-
-template<>
-void
-GridReordering<1,3>::invert_all_cells_of_negative_grid(const std::vector<Point<3> > &,
-                                                       std::vector<CellData<1> > &)
-{
-  // nothing to be done in 1d
-}
-
-
 // anonymous namespace for internal helper functions
 namespace
 {
@@ -1091,6 +1062,74 @@ namespace
 
 
 
+template <int dim, int spacedim>
+void
+GridReordering<dim,spacedim>::reorder_cells (std::vector<CellData<dim> > &cells,
+                                             const bool use_new_style_ordering)
+{
+  Assert (cells.size() != 0,
+          ExcMessage("List of elements to orient must have at least one cell"));
+
+  // there is nothing for us to do in 1d
+  if (dim == 1)
+    return;
+
+  // if necessary, convert to new-style format
+  if (use_new_style_ordering == false)
+    reorder_old_to_new_style(cells);
+
+  // check if grids are already consistent. if so, do
+  // nothing. if not, then do the reordering
+  if (!is_consistent (cells))
+    try
+      {
+        reorient(cells);
+      }
+    catch (const ExcMeshNotOrientable &)
+      {
+        // the mesh is not orientable. this is acceptable if we are in 3d,
+        // as class Triangulation knows how to handle this, but it is
+        // not in 2d; in that case, re-throw the exception
+        if (dim < 3)
+          throw;
+      }
+
+  // and convert back if necessary
+  if (use_new_style_ordering == false)
+    reorder_new_to_old_style(cells);
+}
+
+
+
+template<>
+void
+GridReordering<1>::invert_all_cells_of_negative_grid(const std::vector<Point<1> > &,
+                                                     std::vector<CellData<1> > &)
+{
+  // nothing to be done in 1d
+}
+
+
+
+template<>
+void
+GridReordering<1,2>::invert_all_cells_of_negative_grid(const std::vector<Point<2> > &,
+                                                       std::vector<CellData<1> > &)
+{
+  // nothing to be done in 1d
+}
+
+
+
+template<>
+void
+GridReordering<1,3>::invert_all_cells_of_negative_grid(const std::vector<Point<3> > &,
+                                                       std::vector<CellData<1> > &)
+{
+  // nothing to be done in 1d
+}
+
+
 template<>
 void
 GridReordering<2>::invert_all_cells_of_negative_grid(const std::vector<Point<2> > &all_vertices,
@@ -1157,50 +1196,10 @@ GridReordering<2,3>::invert_all_cells_of_negative_grid(const std::vector<Point<3
 
 
 
-template <int dim, int spacedim>
-void
-GridReordering<dim,spacedim>::reorder_cells (std::vector<CellData<dim> > &cells,
-                                             const bool use_new_style_ordering)
-{
-  Assert (cells.size() != 0,
-          ExcMessage("List of elements to orient must have at least one cell"));
-
-  // there is nothing for us to do in 1d
-  if (dim == 1)
-    return;
-
-  // if necessary, convert to new-style format
-  if (use_new_style_ordering == false)
-    reorder_old_to_new_style(cells);
-
-  // check if grids are already consistent. if so, do
-  // nothing. if not, then do the reordering
-  if (!is_consistent (cells))
-    try
-      {
-        reorient(cells);
-      }
-    catch (const ExcMeshNotOrientable &)
-      {
-        // the mesh is not orientable. this is acceptable if we are in 3d,
-        // as class Triangulation knows how to handle this, but it is
-        // not in 2d; in that case, re-throw the exception
-        if (dim < 3)
-          throw;
-      }
-
-  // and convert back if necessary
-  if (use_new_style_ordering == false)
-    reorder_new_to_old_style(cells);
-}
-
-
-
 template<>
 void
-GridReordering<3>::invert_all_cells_of_negative_grid(
-  const std::vector<Point<3> > &all_vertices,
-  std::vector<CellData<3> > &cells)
+GridReordering<3>::invert_all_cells_of_negative_grid(const std::vector<Point<3> > &all_vertices,
+                                                     std::vector<CellData<3> > &cells)
 {
   unsigned int vertices_lex[GeometryInfo<3>::vertices_per_cell];
   unsigned int n_negative_cells=0;
