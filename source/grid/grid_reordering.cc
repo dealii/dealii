@@ -33,9 +33,6 @@ namespace internal
 {
   namespace GridReordering2d
   {
-    DeclExceptionMsg (ExcMeshNotOrientable,
-                      "The edges of the mesh are not consistently orientable.");
-
     /**
      * A simple data structure denoting an edge, i.e., the ordered pair
      * of its vertex indices. This is only used in the is_consistent()
@@ -1188,7 +1185,7 @@ GridReordering<dim,spacedim>::reorder_cells (std::vector<CellData<dim> > &cells,
       {
         internal::GridReordering2d::reorient(cells);
       }
-    catch (const internal::GridReordering2d::ExcMeshNotOrientable &)
+    catch (const ExcMeshNotOrientable &)
       {
         // the mesh is not orientable. this is acceptable if we are in 3d,
         // as class Triangulation knows how to handle this, but it is
