@@ -666,21 +666,6 @@ public:
 // declaration of explicit specializations
 template<>
 void
-GridReordering<2>::reorder_cells (std::vector<CellData<2> > &original_cells,
-                                  const bool);
-
-template<>
-void
-GridReordering<2,3>::reorder_cells (std::vector<CellData<2> > &original_cells,
-                                    const bool);
-
-template<>
-void
-GridReordering<3>::reorder_cells (std::vector<CellData<3> > &original_cells,
-                                  const bool);
-
-template<>
-void
 GridReordering<2>::invert_all_cells_of_negative_grid(const std::vector<Point<2> > &all_vertices,
                                                      std::vector<CellData<2> >    &cells);
 

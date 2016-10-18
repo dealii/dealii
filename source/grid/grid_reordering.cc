@@ -987,18 +987,15 @@ namespace internal
         rotate_cell (cell_list, edge_list, c, cells);
     }
 
+
+    // overload of the function above for 1d -- there is nothing
+    // to orient in that case
+    void reorient (std::vector<CellData<1> > &)
+    {}
+
   }
 }
 
-
-template<>
-void
-GridReordering<1>::reorder_cells (std::vector<CellData<1> > &,
-                                  const bool)
-{
-  // there should not be much to do
-  // in 1d...
-}
 
 
 template<>
@@ -1009,14 +1006,6 @@ GridReordering<1>::invert_all_cells_of_negative_grid(const std::vector<Point<1> 
   // nothing to be done in 1d
 }
 
-template<>
-void
-GridReordering<1,2>::reorder_cells (std::vector<CellData<1> > &,
-                                    const bool)
-{
-  // there should not be much to do
-  // in 1d...
-}
 
 
 template<>
@@ -1027,15 +1016,6 @@ GridReordering<1,2>::invert_all_cells_of_negative_grid(const std::vector<Point<2
   // nothing to be done in 1d
 }
 
-
-template<>
-void
-GridReordering<1,3>::reorder_cells (std::vector<CellData<1> > &,
-                                    const bool)
-{
-  // there should not be much to do
-  // in 1d...
-}
 
 
 template<>
@@ -1059,6 +1039,11 @@ namespace
    * do the reordering of their
    * arguments in-place.
    */
+  void
+  reorder_new_to_old_style (std::vector<CellData<1> > &)
+  {}
+
+
   void
   reorder_new_to_old_style (std::vector<CellData<2> > &cells)
   {
@@ -1085,6 +1070,11 @@ namespace
    * And now also in the opposite direction.
    */
   void
+  reorder_old_to_new_style (std::vector<CellData<1> > &)
+  {}
+
+
+  void
   reorder_old_to_new_style (std::vector<CellData<2> > &cells)
   {
     // just invert the permutation:
@@ -1105,52 +1095,6 @@ namespace
           cells[cell].vertices[GeometryInfo<3>::ucd_to_deal[i]] = tmp[i];
       }
   }
-}
-
-
-template<>
-void
-GridReordering<2>::reorder_cells (std::vector<CellData<2> > &cells,
-                                  const bool use_new_style_ordering)
-{
-  // if necessary, convert to old (compatibility) to new-style format
-  if (!use_new_style_ordering)
-    reorder_old_to_new_style(cells);
-
-  // check if grids are already
-  // consistent. if so, do
-  // nothing. if not, then do the
-  // reordering
-  if (!internal::GridReordering2d::is_consistent (cells))
-    internal::GridReordering2d::reorient(cells);
-
-
-  // and convert back if necessary
-  if (!use_new_style_ordering)
-    reorder_new_to_old_style(cells);
-}
-
-
-template<>
-void
-GridReordering<2,3>::reorder_cells (std::vector<CellData<2> > &cells,
-                                    const bool use_new_style_ordering)
-{
-  // if necessary, convert to old (compatibility) to new-style format
-  if (!use_new_style_ordering)
-    reorder_old_to_new_style(cells);
-
-  // check if grids are already
-  // consistent. if so, do
-  // nothing. if not, then do the
-  // reordering
-  if (!internal::GridReordering2d::is_consistent (cells))
-    internal::GridReordering2d::reorient(cells);
-
-
-  // and convert back if necessary
-  if (!use_new_style_ordering)
-    reorder_new_to_old_style(cells);
 }
 
 
@@ -1221,13 +1165,17 @@ GridReordering<2,3>::invert_all_cells_of_negative_grid(const std::vector<Point<3
 
 
 
-template<>
+template <int dim, int spacedim>
 void
-GridReordering<3>::reorder_cells (std::vector<CellData<3> > &cells,
-                                  const bool use_new_style_ordering)
+GridReordering<dim,spacedim>::reorder_cells (std::vector<CellData<dim> > &cells,
+                                             const bool use_new_style_ordering)
 {
   Assert (cells.size() != 0,
           ExcMessage("List of elements to orient must have at least one cell"));
+
+  // there is nothing for us to do in 1d
+  if (dim == 1)
+    return;
 
   // if necessary, convert to new-style format
   if (use_new_style_ordering == false)
@@ -1242,7 +1190,11 @@ GridReordering<3>::reorder_cells (std::vector<CellData<3> > &cells,
       }
     catch (const internal::GridReordering2d::ExcMeshNotOrientable &)
       {
-        // the mesh is not orientable
+        // the mesh is not orientable. this is acceptable if we are in 3d,
+        // as class Triangulation knows how to handle this, but it is
+        // not in 2d; in that case, re-throw the exception
+        if (dim < 3)
+          throw;
       }
 
   // and convert back if necessary
@@ -1316,6 +1268,15 @@ GridReordering<3>::invert_all_cells_of_negative_grid(
                          "the number of cells, the mesh density, etc."));
 }
 
+
+
+/* ------------------------ explicit instantiations ------------------- */
+template class GridReordering<1,1>;
+template class GridReordering<1,2>;
+template class GridReordering<1,3>;
+template class GridReordering<2,2>;
+template class GridReordering<2,3>;
+template class GridReordering<3,3>;
 
 DEAL_II_NAMESPACE_CLOSE
 
