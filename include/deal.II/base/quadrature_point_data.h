@@ -231,10 +231,10 @@ namespace parallel
      * automatic shipping of information between different processors.
      *
      * To that end, the constructor of the class is provided with three main objects:
-     * scalar FiniteElement @projection_fe, @p mass_quadrature and @p data_quadrature
+     * scalar FiniteElement @p projection_fe, @p mass_quadrature and @p data_quadrature
      * Quadrature rules.
      * First, the data located at @p data_quadrature of each cell is L2-projected
-     * to the continuous space defined by a single FiniteElement @projection_fe .
+     * to the continuous space defined by a single FiniteElement @p projection_fe .
      * This is achieved using FETools::compute_projection_from_quadrature_points_matrix().
      * In  doing so the mass matrix of this element is required, which will be calculated
      * with the @p mass_quadrature rule . Should the cell now belong to another processor,
