@@ -70,7 +70,7 @@ namespace DoFTools
       /**
         * Comparison operator.
         *
-        * Return true if @lhs is considered less than @rhs.
+        * Return true if @p lhs is considered less than @p rhs.
         */
       bool operator() (const Point<dim, Number> &lhs,
                        const Point<dim, Number> &rhs) const
