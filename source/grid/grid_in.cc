@@ -307,8 +307,27 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
       if (keyword == "CELL_DATA")
         {
-          int no_ids;
-          in>>no_ids;
+          unsigned int no_ids;
+          in >> no_ids;
+
+          AssertThrow (no_ids == no_cells + (dim == 3 ?
+                                             no_quads :
+                                             (dim == 2 ?
+                                              no_lines
+                                              :
+                                              0)),
+                       ExcMessage ("The VTK reader found a CELL_DATA statement "
+                                   "that lists a total of "
+                                   + Utilities::int_to_string (no_ids) +
+                                   " cell data objects, but this needs to "
+                                   "equal the number of cells (which is "
+                                   + Utilities::int_to_string (no_cells) +
+                                   ") plus the number of quads ("
+                                   + Utilities::int_to_string (no_quads) +
+                                   " in 3d or the number of lines ("
+                                   + Utilities::int_to_string (no_lines) +
+                                   ") in 2d."));
+
 
           std::string linenew;
           std::string textnew[2];
@@ -331,7 +350,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
           for (unsigned int i = 0; i < no_cells; i++) //assigning IDs to cells.
             {
-              int id;
+              double id;
               in>>id;
               cells[cell_indices[i]].material_id = id;
             }
@@ -340,8 +359,8 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
             {
               for (unsigned int i = 0; i < no_quads; i++) //assigning IDs to bounds.
                 {
-                  int id;
-                  in>>id;
+                  double id;
+                  in >> id;
                   subcelldata.boundary_quads[quad_indices[i]].material_id = id;
                 }
             }
@@ -349,8 +368,8 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
             {
               for (unsigned int i = 0; i < no_lines; i++) //assigning IDs to bounds.
                 {
-                  int id;
-                  in>>id;
+                  double id;
+                  in >> id;
                   subcelldata.boundary_lines[line_indices[i]].material_id = id;
                 }
             }
