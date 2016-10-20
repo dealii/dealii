@@ -38,6 +38,12 @@ inconvenience this causes.
 </p>
 
 <ol>
+ <li> Changed: Some typedefs (both names and definitions) within the
+ <tt>generic_linear_algebra.h</tt> header have been altered.
+ <br>
+ (Jean-Paul Pelteret, 2016/10/21)
+ </li>
+
  <li> Deprecated: ParameterHandler::read_input,
  ParameterHandler::read_input_from_xml, and
  ParameterHandler::read_input_from_string are now deprecated in favor of
@@ -221,6 +227,13 @@ inconvenience this causes.
  of that class.
  <br>
  (Wolfgang Bangerth, 2016/10/28)
+ </li>
+ 
+ <li> Changed: The <tt>generic_linear_algebra.h</tt> has been updated to
+ include more type definitions for vectors, sparse matrices, solvers and
+ preconditioners for native deal.II, PETSc and Trilinos data types.
+ <br>
+ (Jean-Paul Pelteret, 2016/10/21)
  </li>
 
  <li> Improved: deal.II now bundles a subset of BOOST 1.62 instead of a subset
