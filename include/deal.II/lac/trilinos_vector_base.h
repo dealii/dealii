@@ -53,6 +53,12 @@ template <typename number> class Vector;
  * @addtogroup TrilinosWrappers
  * @{
  */
+
+/**
+* A namespace in which wrapper classes for Trilinos objects reside.
+*
+* @ingroup TrilinosWrappers
+*/
 namespace TrilinosWrappers
 {
   // forward declaration

@@ -562,31 +562,38 @@ public:
   using BlockSparsityPatternBase<DynamicSparsityPattern>::reinit;
 };
 
+/*@}*/
+
 
 #ifdef DEAL_II_WITH_TRILINOS
 
 
-/**
- * This class extends the base class to implement an array of Trilinos
- * sparsity patterns that can be used to initialize Trilinos block sparse
- * matrices that can be distributed among different processors. It is used in
- * the same way as the BlockSparsityPattern except that it builds upon the
- * TrilinosWrappers::SparsityPattern instead of the dealii::SparsityPattern.
- * See the documentation of the BlockSparsityPattern for examples.
- *
- * This class is has properties of the "dynamic" type of
- * @ref Sparsity
- * (in the sense that it can extend the memory if too little elements were
- * allocated), but otherwise is more like the basic deal.II SparsityPattern
- * (in the sense that the method compress() needs to be called before the
- * pattern can be used).
- *
- * This class is used in step-32.
- *
- * @author Martin Kronbichler, 2008, 2009
- */
 namespace TrilinosWrappers
 {
+
+  /*! @addtogroup TrilinosWrappers
+   *@{
+   */
+
+  /**
+   * This class extends the base class to implement an array of Trilinos
+   * sparsity patterns that can be used to initialize Trilinos block sparse
+   * matrices that can be distributed among different processors. It is used in
+   * the same way as the dealii::BlockSparsityPattern except that it builds upon
+   * the TrilinosWrappers::SparsityPattern instead of the
+   * dealii::SparsityPattern.
+   *
+   * This class is has properties of the "dynamic" type of
+   * @ref Sparsity
+   * (in the sense that it can extend the memory if too little elements were
+   * allocated), but otherwise is more like the basic deal.II SparsityPattern
+   * (in the sense that the method compress() needs to be called before the
+   * pattern can be used).
+   *
+   * This class is used in step-32.
+   *
+   * @author Martin Kronbichler, 2008, 2009
+   */
   class BlockSparsityPattern :
     public dealii::BlockSparsityPatternBase<SparsityPattern>
   {
@@ -709,12 +716,13 @@ namespace TrilinosWrappers
      */
     using BlockSparsityPatternBase<SparsityPattern>::reinit;
   };
-}
+
+  /*@}*/
+
+} /* namespace TrilinosWrappers */
 
 #endif
 
-
-/*@}*/
 /*---------------------- Template functions -----------------------------------*/
 
 
