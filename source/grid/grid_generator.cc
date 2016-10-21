@@ -4134,7 +4134,14 @@ namespace GridGenerator
         s.boundary_quads.push_back(quad);
       }
 
-    // use all of this to finally create the extruded 3d triangulation
+    // use all of this to finally create the extruded 3d
+    // triangulation.  it is not necessary to call
+    // GridReordering<3,3>::reorder_cells because the cells we have
+    // constructed above are automatically correctly oriented. this is
+    // because the 2d base mesh is always correctly oriented, and
+    // extruding it automatically yields a correctly oriented 3d mesh,
+    // as discussed in the edge orientation paper mentioned in the
+    // introduction to the GridReordering class.
     result.create_triangulation (points,
                                  cells,
                                  s);
