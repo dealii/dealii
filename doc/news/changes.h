@@ -392,6 +392,13 @@ inconvenience this causes.
 
 <ol>
 
+ <li> Fixed: GridIn::read_vtk() accidentally only read material ids of
+ input cells correctly if the file listed them as integers. If they were
+ listed them as floating point numbers, then unpredictable numbers were used.
+ <br>
+ (Wolfgang Bangerth, 2016/10/20)
+ </li>
+
  <li> New: Add a base class for matrix-free operators MatrixFreeOperators::Base.
  <br>
  (Denis Davydov, 2016/10/16)
