@@ -102,6 +102,7 @@ namespace boost
             typename boost::enable_if<boost::is_void<typename Func::result_type> >::type * = 0
           ) const
         {
+          (void)args; // Silence a faulty -Wunused-but-set-parameter diagnostic emitted by gcc up to 4.8*
           func(BOOST_SIGNALS2_GET<indices>(args)...);
           return R();
         }
