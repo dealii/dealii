@@ -264,12 +264,11 @@ public:
   void set_initial_vector(const VectorType &vec);
 
   /**
-   * Set real @p sigmar and complex @p sigmai parts of the shift for
-   * shift-and-invert spectral transformation.
+   * Set shift @p sigma for shift-and-invert spectral transformation.
    *
    * If this function is not called, the shift is assumed to be zero.
    */
-  void set_shift(const double sigmar, const double sigmai = 0.);
+  void set_shift(const std::complex<double> sigma);
 
   /**
    * Solve the generalized eigensprectrum problem $A x=\lambda B x$ by calling
@@ -533,10 +532,10 @@ PArpackSolver<VectorType>::PArpackSolver (SolverControl        &control,
 {}
 
 template <typename VectorType>
-void PArpackSolver<VectorType>::set_shift(const double r, const double i )
+void PArpackSolver<VectorType>::set_shift(const std::complex<double> sigma)
 {
-  sigmar = r;
-  sigmai = i;
+  sigmar = sigma.real();
+  sigmai = sigma.imag();
 }
 
 template <typename VectorType>
