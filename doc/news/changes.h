@@ -392,6 +392,12 @@ inconvenience this causes.
 
 <ol>
 
+ <li> New: PreconditionChebyshev now offers a PreconditionChebyshev::step()
+ and PreconditionChebyshev::Tstep() methods for usage in relaxation smoothers.
+ <br>
+ (Martin Kronbichler, 2016/10/21)
+ </li>
+
  <li> Fixed: GridIn::read_vtk() accidentally only read material ids of
  input cells correctly if the file listed them as integers. If they were
  listed them as floating point numbers, then unpredictable numbers were used.
