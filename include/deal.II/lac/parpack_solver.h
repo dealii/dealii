@@ -264,10 +264,12 @@ public:
   void set_initial_vector(const VectorType &vec);
 
   /**
-   * Set desired shift value. If this function is not called, the
-   * shift is assumed to be zero.
+   * Set real @p sigmar and complex @p sigmai parts of the shift for
+   * shift-and-invert spectral transformation.
+   *
+   * If this function is not called, the shift is assumed to be zero.
    */
-  void set_shift(const double s );
+  void set_shift(const double sigmar, const double sigmai = 0.);
 
   /**
    * Solve the generalized eigensprectrum problem $A x=\lambda B x$ by calling
@@ -399,9 +401,14 @@ protected:
   std::vector< types::global_dof_index > local_indices;
 
   /**
-   * The shift value to be applied during solution
+   * Real part of the shift
    */
-  double shift_value;
+  double sigmar;
+
+  /**
+   * Imaginary part of the shift
+   */
+  double sigmai;
 
 private:
 
@@ -521,14 +528,15 @@ PArpackSolver<VectorType>::PArpackSolver (SolverControl        &control,
   mpi_communicator( mpi_communicator ),
   mpi_communicator_fortran ( MPI_Comm_c2f( mpi_communicator ) ),
   initial_vector_provided(false),
-  shift_value(0.0)
-
+  sigmar(0.0),
+  sigmai(0.0)
 {}
 
 template <typename VectorType>
-void PArpackSolver<VectorType>::set_shift(const double s )
+void PArpackSolver<VectorType>::set_shift(const double r, const double i )
 {
-  shift_value = s;
+  sigmar = r;
+  sigmai = i;
 }
 
 template <typename VectorType>
@@ -891,9 +899,6 @@ void PArpackSolver<VectorType>::solve
 
       // which eigenvectors
       char howmany[4] = "All";
-
-      double sigmar = shift_value; // real part of the shift
-      double sigmai = 0.0; // imaginary part of the shift
 
       std::vector<double> eigenvalues_real (n_eigenvalues+1, 0.);
       std::vector<double> eigenvalues_im (n_eigenvalues+1, 0.);
