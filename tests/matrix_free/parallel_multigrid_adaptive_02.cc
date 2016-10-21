@@ -15,8 +15,8 @@
 
 
 
-// same as parallel_multigird_adaptive, but derive from
-// MatrixFreeOperators::Base class.
+// same as parallel_multigird_adaptive_01, but based on MGTransferMatrixFree
+// and deriving from the MatrixFreeOperators::Base class.
 
 #include "../tests.h"
 
@@ -35,7 +35,7 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/multigrid/multigrid.h>
-#include <deal.II/multigrid/mg_transfer.h>
+#include <deal.II/multigrid/mg_transfer_matrix_free.h>
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_coarse.h>
 #include <deal.II/multigrid/mg_smoother.h>
@@ -54,6 +54,8 @@ template <int dim, int fe_degree, int n_q_points_1d = fe_degree+1, typename numb
 class LaplaceOperator : public MatrixFreeOperators::Base<dim, number>
 {
 public:
+  typedef number value_type;
+
   LaplaceOperator()
     :
     MatrixFreeOperators::Base<dim, number>()
@@ -176,14 +178,14 @@ private:
 
 
 
-template <typename LAPLACEOPERATOR>
-class MGTransferMF : public MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double> >
+template <int dim, typename LAPLACEOPERATOR>
+class MGTransferMF : public MGTransferMatrixFree<dim, typename LAPLACEOPERATOR::value_type>
 {
 public:
   MGTransferMF(const MGLevelObject<LAPLACEOPERATOR> &laplace,
                const MGConstrainedDoFs &mg_constrained_dofs)
     :
-    MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double> >(mg_constrained_dofs),
+    MGTransferMatrixFree<dim, typename LAPLACEOPERATOR::value_type>(mg_constrained_dofs),
     laplace_operator (laplace)
   {
   }
@@ -193,16 +195,16 @@ public:
    * with MatrixFree and bypass the crude vector initialization in
    * MGTransferPrebuilt
    */
-  template <int dim, class InVector, int spacedim>
+  template <class InVector, int spacedim>
   void
   copy_to_mg (const DoFHandler<dim,spacedim> &mg_dof_handler,
-              MGLevelObject<LinearAlgebra::distributed::Vector<double> > &dst,
+              MGLevelObject<LinearAlgebra::distributed::Vector<typename LAPLACEOPERATOR::value_type> > &dst,
               const InVector &src) const
   {
     for (unsigned int level=dst.min_level();
          level<=dst.max_level(); ++level)
       laplace_operator[level].initialize_dof_vector(dst[level]);
-    MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double> >::
+    MGTransferMatrixFree<dim, typename LAPLACEOPERATOR::value_type>::
     copy_to_mg(mg_dof_handler, dst, src);
   }
 
@@ -343,9 +345,9 @@ void do_test (const DoFHandler<dim>  &dof)
   for (unsigned int level=0; level<dof.get_triangulation().n_global_levels(); ++level)
     mg_interface_matrices[level].initialize(mg_matrices[level]);
 
-  MGTransferMF<LevelMatrixType> mg_transfer(mg_matrices,
-                                            mg_constrained_dofs);
-  mg_transfer.build_matrices(dof);
+  MGTransferMF<dim,LevelMatrixType> mg_transfer(mg_matrices,
+                                                mg_constrained_dofs);
+  mg_transfer.build(dof);
 
   MGCoarseIterative<LevelMatrixType,number> mg_coarse;
   mg_coarse.initialize(mg_matrices[0]);
@@ -379,7 +381,7 @@ void do_test (const DoFHandler<dim>  &dof)
                                                             mg_smoother);
   mg.set_edge_matrices(mg_interface, mg_interface);
   PreconditionMG<dim, LinearAlgebra::distributed::Vector<double>,
-                 MGTransferMF<LevelMatrixType> >
+                 MGTransferMF<dim,LevelMatrixType> >
                  preconditioner(dof, mg, mg_transfer);
 
   {
