@@ -392,6 +392,12 @@ inconvenience this causes.
 
 <ol>
 
+ <li> New: Add ArpackSolver::set_shift() to set the shift value in spectral
+ transformation.
+ <br>
+ (Denis Davydov, 2016/10/25)
+ </li>
+
  <li> New: PreconditionChebyshev now offers a PreconditionChebyshev::step()
  and PreconditionChebyshev::Tstep() methods for usage in relaxation smoothers.
  <br>
