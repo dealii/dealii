@@ -25,6 +25,12 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/mapping_collection.h>
+#include <deal.II/lac/sparsity_tools.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/solver_control.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_values.h>
+
 
 #include <map>
 #include <vector>
@@ -317,6 +323,100 @@ class ConstraintMatrix;
  */
 namespace VectorTools
 {
+  /**
+   * Do L2 projection from quadrature points to the FE space in parallel with
+   * consistent mass matrix.
+   *
+   * For more details, see description of the VectorTools namespace.
+   *
+   * @author Denis Davydov, 2016.
+   */
+  template <typename Vector, typename Matrix, typename Solver, typename Preconditioner>
+  class Projector
+  {
+  public:
+    /**
+     * Default constructor.
+     */
+    Projector();
+
+    /**
+     * Calculate mass matrix in DoFHandler @p dof using @p lhs_quadrature
+     * quadrature and @p constraints . The preconditioner will also be
+     * initialized.
+     */
+    template <int dim, int spacedim>
+    void initialize(const DoFHandler<dim, spacedim> &dof,
+                    const ConstraintMatrix          &constraints,
+                    const Quadrature<dim>           &lhs_quadrature,
+                    const MPI_Comm                   mpi_communicator);
+
+    /**
+     * Project the function @p func .
+     *
+     * Can be used with lambdas:
+     * @code
+     * projector.project<dim,dim>(dof_handler,
+     *                            constraints,
+     *                            quadrature_formula,
+     *                            mpi_communicator,
+     *                            [=] (const Point<dim> &p) -> double { return parameters.manager.some_method(p); },
+     *                            field);
+     * @endcode
+     */
+    template <int dim, int spacedim>
+    void project(const DoFHandler<dim, spacedim> &dof_handler,
+                 const ConstraintMatrix &constraints,
+                 const Quadrature<dim> &rhs_quadrature,
+                 const MPI_Comm  mpi_communicator,
+                 const std::function< double (const Point<spacedim> &)> func,
+                 Vector &projection);
+
+
+    /**
+     * Project values from quadrature points.
+     *
+     * Can be used with lambdas:
+     * @code
+     * projector.project<dim,dim>(dof_handler,
+     *                            constraints,
+     *                            quadrature_formula,
+     *                            mpi_communicator,
+     *                            [=] (const typename DoFHandler<dim>::active_cell_iterator & cell, const unsigned int q) -> double { return qp_manager.get_data(cell)[q]->density; },
+     *                            field);
+     * @endcode
+     */
+    template <int dim, int spacedim>
+    void project(const DoFHandler<dim, spacedim> &dof_handler,
+                 const ConstraintMatrix &constraints,
+                 const Quadrature<dim> &rhs_quadrature,
+                 const MPI_Comm  mpi_communicator,
+                 const std::function< double (const typename DoFHandler<dim, spacedim>::active_cell_iterator &, const unsigned int)> func,
+                 Vector &projection);
+
+  private:
+
+    /**
+     * Preconditioner
+     */
+    Preconditioner preconditioner;
+
+    /**
+     * Mass matrix.
+     */
+    Matrix mass_matrix;
+
+    /**
+     * Right-hand-side vector due to inhomogeneous constraints.
+     */
+    Vector rhs_constraints;
+
+    /**
+     * Total right-hand-side vector.
+     */
+    Vector rhs;
+  };
+
   /**
    * Denote which norm/integral is to be computed by the
    * integrate_difference() function on each cell and compute_global_error()
@@ -2851,6 +2951,199 @@ namespace VectorTools
                     "The given point is inside a cell of a "
                     "parallel::distributed::Triangulation that is not "
                     "locally owned by this processor.");
+
+
+  // ------------ templated functions -------------
+  template <typename Vector, typename Matrix, typename Solver, typename Preconditioner>
+  Projector<Vector,Matrix,Solver,Preconditioner>::Projector()
+  {
+  }
+
+
+  template <typename VectorType, typename Matrix, typename Solver, typename Preconditioner>
+  template <int dim, int spacedim>
+  void Projector<VectorType,Matrix,Solver,Preconditioner>::project(const DoFHandler<dim, spacedim> &dof_handler,
+      const ConstraintMatrix &constraints,
+      const Quadrature<dim> &rhs_quadrature,
+      const MPI_Comm  mpi_communicator,
+      const std::function< double (const Point<spacedim> &)> func,
+      VectorType &projection)
+  {
+    // First, assembly the RHS:
+    rhs = 0.;
+    FEValues<dim> fe_values (dof_handler.get_fe(), rhs_quadrature,
+                             update_values  | update_quadrature_points | update_JxW_values);
+
+    const unsigned int   dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+    const unsigned int   n_q_points    = rhs_quadrature.size();
+    Vector<double>       cell_rhs (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+    typename DoFHandler<dim, spacedim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+    for (; cell!=endc; ++cell)
+      if (cell->is_locally_owned())
+        {
+          cell_rhs = 0;
+          fe_values.reinit (cell);
+          for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+            {
+              const double val_q = func(fe_values.quadrature_point(q_point));
+              for (unsigned int i=0; i<dofs_per_cell; ++i)
+                cell_rhs(i) += (fe_values.shape_value(i,q_point) *
+                                val_q *
+                                fe_values.JxW(q_point));
+            }
+
+          cell->get_dof_indices (local_dof_indices);
+          constraints.distribute_local_to_global (cell_rhs,
+                                                  local_dof_indices,
+                                                  rhs);
+        }
+
+    rhs.compress (VectorOperation::add);
+
+    rhs+= rhs_constraints;
+
+    // now solve:
+    SolverControl solver_control (dof_handler.n_dofs(),
+                                  (rhs.l2_norm() > 0.0 ? 1e-4 * rhs.l2_norm() : 1e-4),
+                                  false, false);
+
+    Solver solver(solver_control);
+    solver.solve (mass_matrix, projection, rhs, preconditioner);
+    constraints.distribute (projection);
+  }
+
+
+  template <typename VectorType, typename Matrix, typename Solver, typename Preconditioner>
+  template <int dim, int spacedim>
+  void Projector<VectorType,Matrix,Solver,Preconditioner>::project(const DoFHandler<dim, spacedim> &dof_handler,
+      const ConstraintMatrix &constraints,
+      const Quadrature<dim> &rhs_quadrature,
+      const MPI_Comm  mpi_communicator,
+      const std::function< double (const typename DoFHandler<dim, spacedim>::active_cell_iterator &, const unsigned int)> func,
+      VectorType &projection)
+  {
+    // First, assembly the RHS:
+    rhs = 0.;
+    FEValues<dim> fe_values (dof_handler.get_fe(), rhs_quadrature,
+                             update_values  | update_JxW_values);
+
+    const unsigned int   dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+    const unsigned int   n_q_points    = rhs_quadrature.size();
+    Vector<double>       cell_rhs (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+    typename DoFHandler<dim, spacedim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+    for (; cell!=endc; ++cell)
+      if (cell->is_locally_owned())
+        {
+          cell_rhs = 0;
+          fe_values.reinit (cell);
+          for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+            {
+              const double val_q = func(cell, q_point);
+              for (unsigned int i=0; i<dofs_per_cell; ++i)
+                cell_rhs(i) += (fe_values.shape_value(i,q_point) *
+                                val_q *
+                                fe_values.JxW(q_point));
+            }
+
+          cell->get_dof_indices (local_dof_indices);
+          constraints.distribute_local_to_global (cell_rhs,
+                                                  local_dof_indices,
+                                                  rhs);
+        }
+
+    rhs.compress (VectorOperation::add);
+
+    rhs+= rhs_constraints;
+
+    // now solve:
+    SolverControl solver_control (dof_handler.n_dofs(),
+                                  (rhs.l2_norm() > 0.0 ? 1e-4 * rhs.l2_norm() : 1e-4),
+                                  false, false);
+
+    Solver solver(solver_control);
+    solver.solve (mass_matrix, projection, rhs, preconditioner);
+    constraints.distribute (projection);
+  }
+
+
+
+  template <typename VectorType, typename Matrix, typename Solver, typename Preconditioner>
+  template <int dim, int spacedim>
+  void Projector<VectorType,Matrix,Solver,Preconditioner>::initialize(
+    const DoFHandler<dim, spacedim>  &dof_handler,
+    const ConstraintMatrix           &constraints,
+    const Quadrature< dim >          &lhs_quadrature,
+    const MPI_Comm                    mpi_communicator)
+  {
+    const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs ();
+    IndexSet locally_relevant_dofs;
+    DoFTools::extract_locally_relevant_dofs (dof_handler,
+                                             locally_relevant_dofs);
+
+    rhs.reinit (locally_owned_dofs, mpi_communicator);
+    rhs_constraints.reinit (locally_owned_dofs, mpi_communicator);
+
+    DynamicSparsityPattern dsp (locally_relevant_dofs);
+    DoFTools::make_sparsity_pattern (dof_handler, dsp,
+                                     constraints, false);
+    SparsityTools::distribute_sparsity_pattern (dsp,
+                                                dof_handler.n_locally_owned_dofs_per_processor(),
+                                                mpi_communicator,
+                                                locally_relevant_dofs);
+    mass_matrix.reinit (locally_owned_dofs,
+                        locally_owned_dofs,
+                        dsp,
+                        mpi_communicator);
+
+    // Now assembly mass matrix:
+    FEValues<dim> fe_values (dof_handler.get_fe(), lhs_quadrature,
+                             update_values  | update_JxW_values);
+
+    const unsigned int   dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+    const unsigned int   n_q_points    = lhs_quadrature.size();
+    FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
+    Vector<double>       cell_rhs (dofs_per_cell);
+    cell_rhs = 0.;
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+    typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+    for (; cell!=endc; ++cell)
+      if (cell->is_locally_owned())
+        {
+          cell_matrix = 0;
+          fe_values.reinit (cell);
+          for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+            for (unsigned int i=0; i<dofs_per_cell; ++i)
+              for (unsigned int j=i; j<dofs_per_cell; ++j)
+                cell_matrix(i,j) += (fe_values.shape_value(i,q_point) *
+                                     fe_values.shape_value(j,q_point) *
+                                     fe_values.JxW(q_point));
+
+          // exploit symmetry:
+          for (unsigned int i=0; i<dofs_per_cell; ++i)
+            for (unsigned int j=i+1; j<dofs_per_cell; ++j)
+              cell_matrix(j,i) = cell_matrix(i,j);
+
+          cell->get_dof_indices (local_dof_indices);
+          constraints.distribute_local_to_global (cell_matrix,
+                                                  cell_rhs,
+                                                  local_dof_indices,
+                                                  mass_matrix,
+                                                  rhs_constraints);
+        }
+
+    mass_matrix.compress (VectorOperation::add);
+    rhs_constraints.compress (VectorOperation::add);
+
+    preconditioner.initialize(mass_matrix);
+  }
 }
 
 
