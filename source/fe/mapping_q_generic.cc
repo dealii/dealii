@@ -3719,12 +3719,6 @@ add_quad_support_points(const Triangulation<3,3>::cell_iterator &cell,
   static const StraightBoundary<3> straight_boundary;
   // used if face quad at boundary or entirely in the interior of the domain
   std::vector<Point<3> > quad_points ((polynomial_degree-1)*(polynomial_degree-1));
-  // used if only one line of face quad is at boundary
-  std::vector<Point<3> > b(4*polynomial_degree);
-
-  // Used by the new Manifold interface. This vector collects the
-  // vertices used to compute the intermediate points.
-  std::vector<Point<3> > vertices(4);
 
   // loop over all faces and collect points on them
   for (unsigned int face_no=0; face_no<faces_per_cell; ++face_no)
