@@ -67,6 +67,19 @@ public:
       s *= p[i];
     return s;
   }
+
+  VectorizedArray<double> value(const Point<dim, VectorizedArray<double>> &p_vec) const
+  {
+    VectorizedArray<double> res = make_vectorized_array (0.);
+    Point<dim> p;
+    for (unsigned int v = 0; v < VectorizedArray<double>::n_array_elements; ++v)
+      {
+        for (unsigned int d = 0; d < dim; d++)
+          p[d] = p_vec[d][v];
+        res[v] = value(p);
+      }
+    return res;
+  }
 };
 
 const unsigned int fe_degree = 1;
@@ -105,7 +118,7 @@ void test()
   // initialize a quadrature data
   {
     FEEvaluation<dim,fe_degree,n_q_points_1d,1,double> fe_eval(data);
-    const unsigned int n_cells = fine_level_data.n_macro_cells();
+    const unsigned int n_cells = data.n_macro_cells();
     const unsigned int n_q_points = fe_eval.n_q_points;
 
     qp_data.reinit(n_cells, n_q_points);
@@ -131,7 +144,7 @@ void test()
   projector.project<dim,fe_degree, n_q_points_1d>(data,
                                                   constraints,
                                                   [=] (const unsigned int cell, const unsigned int q) -> VectorizedArray<double> { return qp_data(cell,q); },
-                                                  VectorType &projection);
+                                                  field);
 
   IndexSet locally_relevant_dofs;
   DoFTools::extract_locally_relevant_dofs (dof_handler,
@@ -178,7 +191,8 @@ void test()
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv,
+                                                       numbers::invalid_unsigned_int);
 
   std::ofstream logfile("output");
   deallog.attach(logfile);

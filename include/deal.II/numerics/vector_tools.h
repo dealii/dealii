@@ -3121,8 +3121,16 @@ namespace VectorTools
       }
     rhs_mf.compress(VectorOperation::add);
 
-
-    rhs = rhs_mf;
+    // workaround for: rhs = rhs_mf;
+    {
+      const IndexSet mf_locally_owned = rhs_mf.locally_owned_elements();
+      for (unsigned int i = 0; i < mf_locally_owned.n_elements(); i++)
+        {
+          const unsigned int dof = mf_locally_owned.nth_index_in_set(i);
+          rhs(dof) = rhs_mf(dof);
+        }
+      rhs.compress(VectorOperation::insert);
+    }
     rhs+= rhs_constraints;
 
     // now solve:
