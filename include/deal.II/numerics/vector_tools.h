@@ -30,6 +30,9 @@
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/matrix_free/matrix_free.h>
+#include <deal.II/matrix_free/fe_evaluation.h>
+
 
 
 #include <map>
@@ -392,6 +395,24 @@ namespace VectorTools
                  const Quadrature<dim> &rhs_quadrature,
                  const MPI_Comm  mpi_communicator,
                  const std::function< double (const typename DoFHandler<dim, spacedim>::active_cell_iterator &, const unsigned int)> func,
+                 Vector &projection);
+
+    /**
+     * Project values from quadrature points in MatrixFree.
+     *
+     * Can be used with lambdas:
+     * @code
+     * projector.project<dim,fe_degree, n_q_points_1d>(
+     *     data,
+     *     constraints,
+     *     [=] (const unsigned int cell, const unsigned int q) -> VectorizedArray<double> { return qp_data(cell,q); },
+     *     VectorType &projection);
+     * @endcode
+     */
+    template <int dim, int fe_degree, int n_q_points_1d>
+    void project(const MatrixFree<dim,double> &data,
+                 const ConstraintMatrix &constraints,
+                 const std::function< VectorizedArray<double> (const unsigned int, const unsigned int)> func,
                  Vector &projection);
 
   private:
@@ -3063,6 +3084,49 @@ namespace VectorTools
 
     // now solve:
     SolverControl solver_control (dof_handler.n_dofs(),
+                                  (rhs.l2_norm() > 0.0 ? 1e-4 * rhs.l2_norm() : 1e-4),
+                                  false, false);
+
+    Solver solver(solver_control);
+    solver.solve (mass_matrix, projection, rhs, preconditioner);
+    constraints.distribute (projection);
+  }
+
+
+
+
+  template <typename VectorType, typename Matrix, typename Solver, typename Preconditioner>
+  template <int dim, int fe_degree, int n_q_points_1d>
+  void Projector<VectorType,Matrix,Solver,Preconditioner>::project(
+    const MatrixFree<dim,double> &data,
+    const ConstraintMatrix &constraints,
+    const std::function< VectorizedArray<double> (const unsigned int, const unsigned int)> func,
+    VectorType &projection)
+  {
+    // First, assembly the RHS:
+    LinearAlgebra::distributed::Vector<double> rhs_mf;
+    data.initialize_dof_vector(rhs_mf);
+    FEEvaluation<dim,fe_degree,n_q_points_1d,1,double> fe_eval(data);
+    const unsigned int n_cells = data.n_macro_cells();
+    const unsigned int n_q_points = fe_eval.n_q_points;
+
+    for (unsigned int cell=0; cell<n_cells; ++cell)
+      {
+        fe_eval.reinit(cell);
+        for (unsigned int q= 0; q < n_q_points; ++q)
+          fe_eval.submit_value(func(cell,q), q);
+
+        fe_eval.integrate (true,false);
+        fe_eval.distribute_local_to_global (rhs_mf);
+      }
+    rhs_mf.compress(VectorOperation::add);
+
+
+    rhs = rhs_mf;
+    rhs+= rhs_constraints;
+
+    // now solve:
+    SolverControl solver_control (rhs.size(),
                                   (rhs.l2_norm() > 0.0 ? 1e-4 * rhs.l2_norm() : 1e-4),
                                   false, false);
 
