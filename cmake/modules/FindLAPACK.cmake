@@ -37,9 +37,13 @@ SET_IF_EMPTY(BLAS_DIR "$ENV{BLAS_DIR}")
 SET_IF_EMPTY(LAPACK_DIR "$ENV{LAPACK_DIR}")
 
 SET(_cmake_prefix_path_backup "${CMAKE_PREFIX_PATH}")
+SET(_cmake_find_library_suffixes_backup ${CMAKE_FIND_LIBRARY_SUFFIXES})
 
 # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
 LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+
+# help out some machines that have just liblapack.so.3 (and not liblapack.so)
+SET(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} .so.3)
 
 SET(CMAKE_PREFIX_PATH ${BLAS_DIR} ${LAPACK_DIR} ${_cmake_prefix_path_backup})
 FIND_PACKAGE(BLAS)
@@ -48,6 +52,7 @@ SET(CMAKE_PREFIX_PATH ${LAPACK_DIR} ${_cmake_prefix_path_backup})
 FIND_PACKAGE(LAPACK)
 
 SET(CMAKE_PREFIX_PATH ${_cmake_prefix_path_backup})
+SET(CMAKE_FIND_LIBRARY_SUFFIXES ${_cmake_find_library_suffixes_backup})
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
 #
