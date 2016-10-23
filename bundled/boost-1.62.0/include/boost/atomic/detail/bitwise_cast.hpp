@@ -36,7 +36,7 @@ BOOST_FORCEINLINE To bitwise_cast(From const& from) BOOST_NOEXCEPT
     {
         To to;
     }
-    value = {};
+    value = {To()};
     BOOST_ATOMIC_DETAIL_MEMCPY
     (
         &reinterpret_cast< char& >(value.to),
