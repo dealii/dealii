@@ -495,7 +495,7 @@
     }
  * @endcode
  * Note how we use <a
- * href="http://www.boost.org/doc/libs/1_37_0/libs/bind/bind.html">std_cxx11::bind</a>
+ * href="http://www.boost.org/doc/libs/1_62_0/libs/bind/bind.html">std_cxx11::bind</a>
  * to <i>bind</i> certain arguments to the <code>vmult_one_row</code>
  * function, leaving one argument open and thus allowing the
  * parallel::transform function to consider the passed function argument as

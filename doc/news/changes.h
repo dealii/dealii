@@ -66,7 +66,7 @@ inconvenience this causes.
  previous minimal version of 1.54. This is because 1.54 does not support
  serializing objects of type std::unique_ptr if C++11 is used, but we now
  use such objects in a variety of places in classes that can be serialized.
- BOOST 1.56, on the other hand, supports this. deal.II bundles BOOST 1.56
+ BOOST 1.56, on the other hand, supports this. deal.II bundles BOOST 1.62
  for cases where no or no sufficiently new version of BOOST is found on
  a system.
  <br>
@@ -215,6 +215,12 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li> Improved: deal.II now bundles a subset of BOOST 1.62 instead of a subset
+ of BOOST 1.56.
+ <br>
+ (David Wells, 2016/10/20)
+ </li>
+
  <li> New: Add a new FiniteElement class, FE_P1NC, to implement the scalar
  version of the P1 nonconforming finite element which is a piecewise linear
  element on quadrilaterals in 2d.
