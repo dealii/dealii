@@ -14,8 +14,10 @@
 // ---------------------------------------------------------------------
 
 
-// same test as parallel_multigrid_adaptive but using but using adaptive
-// meshes with hanging nodes (doing local smoothing)
+// same test as parallel_multigrid_adaptive_01 but using
+// MGTransferMatrixFree rather the MGTransferPrebuilt (and manually
+// implementing the full LaplaceOperator class rather than using the
+// operator as in _02)
 
 #include "../tests.h"
 

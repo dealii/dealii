@@ -15,8 +15,8 @@
 
 
 
-// same as parallel_multigird_adaptive_01, but based on MGTransferMatrixFree
-// and deriving from the MatrixFreeOperators::Base class.
+// same as parallel_multigird_adaptive_02, but using mg::SmootherRelaxation
+// rather than MGSmootherPrecondition
 
 #include "../tests.h"
 
@@ -353,7 +353,7 @@ void do_test (const DoFHandler<dim>  &dof)
   mg_coarse.initialize(mg_matrices[0]);
 
   typedef PreconditionChebyshev<LevelMatrixType,LinearAlgebra::distributed::Vector<number> > SMOOTHER;
-  MGSmootherPrecondition<LevelMatrixType, SMOOTHER, LinearAlgebra::distributed::Vector<number> >
+  mg::SmootherRelaxation<SMOOTHER, LinearAlgebra::distributed::Vector<number> >
   mg_smoother;
 
   MGLevelObject<typename SMOOTHER::AdditionalData> smoother_data;
