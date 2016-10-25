@@ -22,6 +22,8 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/vectorization.h>
 
+#include <cstdio>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace internal
