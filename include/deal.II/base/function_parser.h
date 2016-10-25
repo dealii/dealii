@@ -155,7 +155,7 @@ template <typename> class Vector;
  * function by using a single string:
  * @code
  *    // Empty constants object
- *    std::map<std::string> constants;
+ *    std::map<std::string,double> constants;
  *
  *    // Variables that will be used inside the expressions
  *    std::string variables = "x,y";
