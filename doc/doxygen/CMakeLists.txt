@@ -55,9 +55,35 @@ ADD_SUBDIRECTORY(code-gallery)
 #
 IF(DEAL_II_DOXYGEN_USE_MATHJAX)
   SET(_use_mathjax YES)
+  IF(NOT DEAL_II_DOXYGEN_USE_ONLINE_MATHJAX)
+    DEAL_II_FIND_PATH(MATHJAX_PATH MathJax.js
+      PATHS ${MATHJAX_ROOT}
+      $ENV{MATHJAX_ROOT}
+      "${CMAKE_PREFIX_PATH}/share/javascript/mathjax"
+      "${CMAKE_INSTALL_DATADIR}/javascript/mathjax"
+      "/usr/share/javascript/mathjax"
+      "/usr/share/yelp/mathjax"
+      DOC "Root path of MathJax.js"
+      )
+    IF(MATHJAX MATCHES "-NOTFOUND")
+      MESSAGE(FATAL_ERROR "MathJax was not found.")
+    ENDIF()
+  ENDIF()
+  IF(MATHJAX_PATH AND NOT DEAL_II_DOXYGEN_USE_ONLINE_MATHJAX)
+    SET(_mathjax_relpath ${MATHJAX_PATH})
+    MESSAGE(STATUS "Using local MathJax: " ${MATHJAX_PATH})
+    SET(MATHJAX_RELPATH_CONFIG "MATHJAX_RELPATH = ${MATHJAX_PATH}")
+  ELSE()
+    SET(_mathjax_relpath "https://cdn.mathjax.org/mathjax/latest")
+    MESSAGE(STATUS "Using web-based MathJax: " ${_mathjax_relpath})
+    SET(MATHJAX_RELPATH_CONFIG "")
+    MESSAGE(STATUS "Using default web-based MathJax")
+  ENDIF()
 ELSE()
   SET(_use_mathjax NO)
 ENDIF()
+ 
+
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/options.dox.in
   ${CMAKE_CURRENT_BINARY_DIR}/options.dox
