@@ -162,6 +162,13 @@ public:
   void set_initial_vector(const VectorType &vec);
 
   /**
+   * Set shift @p sigma for shift-and-invert spectral transformation.
+   *
+   * If this function is not called, the shift is assumed to be zero.
+   */
+  void set_shift(const std::complex<double> sigma);
+
+  /**
    * Solve the generalized eigensprectrum problem $A x=\lambda B x$ by calling
    * the <code>dsaupd</code> and <code>dseupd</code> or
    * <code>dnaupd</code> and <code>dneupd</code> functions of ARPACK.
@@ -237,6 +244,17 @@ protected:
    */
   bool initial_vector_provided;
   std::vector<double> resid;
+
+  /**
+   * Real part of the shift
+   */
+  double sigmar;
+
+  /**
+   * Imaginary part of the shift
+   */
+  double sigmai;
+
 
 private:
 
@@ -333,8 +351,23 @@ ArpackSolver::ArpackSolver (SolverControl &control,
   :
   solver_control (control),
   additional_data (data),
-  initial_vector_provided(false)
+  initial_vector_provided(false),
+  sigmar(0.0),
+  sigmai(0.0)
 {}
+
+
+
+
+inline
+void
+ArpackSolver::set_shift(const std::complex<double> sigma)
+{
+  sigmar = sigma.real();
+  sigmai = sigma.imag();
+}
+
+
 
 template <typename VectorType>
 inline
@@ -600,9 +633,6 @@ void ArpackSolver::solve (const MatrixType1                  &/*system_matrix*/,
       std::vector<int> select (ncv, 1);
 
       int ldz = n;
-
-      double sigmar = 0.0; // real part of the shift
-      double sigmai = 0.0; // imaginary part of the shift
 
       std::vector<double> eigenvalues_real (nev+1, 0.);
       std::vector<double> eigenvalues_im (nev+1, 0.);
