@@ -1376,7 +1376,7 @@ namespace DoFTools
         // one, where we take "random" to be "once this way once that way"
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           if (subdomain_association[local_dof_indices[i]] ==
-              numbers::invalid_unsigned_int)
+              numbers::invalid_subdomain_id)
             subdomain_association[local_dof_indices[i]] = subdomain_id;
           else
             {

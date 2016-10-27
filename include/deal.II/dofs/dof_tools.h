@@ -623,7 +623,7 @@ namespace DoFTools
                               SparsityPatternType       &sparsity_pattern,
                               const ConstraintMatrix    &constraints,
                               const bool                 keep_constrained_dofs = true,
-                              const types::subdomain_id  subdomain_id          = numbers::invalid_unsigned_int);
+                              const types::subdomain_id  subdomain_id          = numbers::invalid_subdomain_id);
 
   /**
    * This function does essentially the same as the other
