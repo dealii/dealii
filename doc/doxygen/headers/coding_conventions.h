@@ -185,7 +185,7 @@ instantiate, and for them the <code>.templates.h</code> file will not be of any 
 It will also not slow down their compilations because nothing they see will
 #include the <code>.templates.h</code> file. But users who define their own
 (vector, matrix, ...) types can instantiate the template functions with their
-own user-defined types by #includeing the <code>.templates.h</code> files.
+own user-defined types by including the <code>.templates.h</code> files.
 
 <li> Finally, if we can not assume in advance which values template arguments
 will take (e.g., any class derived from Subscriptor can be used as an argument),
@@ -196,10 +196,12 @@ file with declarations. The definitions should be guarded with <code>#ifndef DOX
 </ol>
 
 <p> For the first two cases, instantiation instructions are defined in <code>.inst.in</code>
-files. These files are processed by custom CMake scripts to generate <code>.inst</code> files
-using lists of parameters (vector classes, dimensions, tensor ranks, etc)
-defined in <code>cmake/config/template-arguments.in</code>. It is those <code>.inst</code>
-files that are eventually included from the corresponding <code>.cc</code> files. </p>
+files. They are processed by a binary called expand_instantiations (built from
+<code>cmake/scripts/expand_instantiations.cc</code>) and the parameters are
+defined dynamically through cmake depending on your configuration (see
+<code>share/deal.II/template-arguments</code> in your build directory).
+It is those <code>.inst</code> files that are eventually included from the
+corresponding <code>.cc</code> files. </p>
 
 
 <h3>Defensive programming</h3>
