@@ -530,6 +530,9 @@ void do_test (const DoFHandler<dim>  &dof)
                  preconditioner(dof, mg, mg_transfer);
 
   {
+    // avoid output from inner (coarse-level) solver
+    deallog.depth_file(3);
+
     ReductionControl control(30, 1e-20, 1e-7);
     SolverCG<LinearAlgebra::distributed::Vector<double> > solver(control);
     solver.solve(fine_matrix, sol, in, preconditioner);

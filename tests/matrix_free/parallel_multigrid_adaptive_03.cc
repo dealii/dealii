@@ -507,9 +507,6 @@ void do_test (const DoFHandler<dim>  &dof, const bool threaded)
         mg_matrices[level].get_matrix_diagonal_inverse();
     }
 
-  // temporarily disable deallog for the setup of the preconditioner that
-  // involves a CG solver for eigenvalue estimation
-  deallog.depth_file(0);
   mg_smoother.initialize(mg_matrices, smoother_data);
 
   mg::Matrix<LinearAlgebra::distributed::Vector<number> >
@@ -531,6 +528,7 @@ void do_test (const DoFHandler<dim>  &dof, const bool threaded)
   {
     // avoid output from inner (coarse-level) solver
     deallog.depth_file(3);
+
     ReductionControl control(30, 1e-20, 1e-7);
     SolverCG<LinearAlgebra::distributed::Vector<double> > solver(control);
     solver.solve(fine_matrix, sol, in, preconditioner);

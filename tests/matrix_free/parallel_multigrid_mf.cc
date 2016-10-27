@@ -364,7 +364,6 @@ void do_test (const DoFHandler<dim>  &dof)
 
   // temporarily disable deallog for the setup of the preconditioner that
   // involves a CG solver for eigenvalue estimation
-  deallog.depth_file(0);
   mg_smoother.initialize(mg_matrices, smoother_data);
 
   mg::Matrix<LinearAlgebra::distributed::Vector<number> >

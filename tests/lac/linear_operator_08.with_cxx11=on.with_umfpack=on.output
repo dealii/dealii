@@ -1,8 +1,6 @@
 
 DEAL::Preconditioners
 DEAL:Preconditioners::PreconditionChebyshev
-DEAL:Preconditioners:cg::Starting value 0.9486832981
-DEAL:Preconditioners:cg::Convergence step 1 value 0.000000000
 DEAL:Preconditioners:Exact inverse:cg::Starting value 16.88194302
 DEAL:Preconditioners:Exact inverse:cg::Convergence step 1 value 2.601335705e-15
 DEAL:Preconditioners::PreconditionIdentity
