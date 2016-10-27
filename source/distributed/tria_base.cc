@@ -230,7 +230,7 @@ namespace parallel
   }
 
   template <int dim, int spacedim>
-  const std::set<unsigned int> &
+  const std::set<types::subdomain_id> &
   Triangulation<dim,spacedim>::
   ghost_owners () const
   {
@@ -238,7 +238,7 @@ namespace parallel
   }
 
   template <int dim, int spacedim>
-  const std::set<unsigned int> &
+  const std::set<types::subdomain_id> &
   Triangulation<dim,spacedim>::
   level_ghost_owners () const
   {

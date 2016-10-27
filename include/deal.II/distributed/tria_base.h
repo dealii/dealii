@@ -137,7 +137,8 @@ namespace parallel
      * @note: If @p i is contained in the list of processor @p j, then @p j
      * will also be contained in the list of processor @p i.
      */
-    const std::set<unsigned int> &ghost_owners () const;
+    const std::set<types::subdomain_id> &
+    ghost_owners () const;
 
     /**
      * Return a set of MPI ranks of the processors that have at least one
@@ -148,7 +149,8 @@ namespace parallel
      * @note: If @p i is contained in the list of processor @p j, then @p j
      * will also be contained in the list of processor @p i.
      */
-    const std::set<unsigned int> &level_ghost_owners () const;
+    const std::set<types::subdomain_id> &
+    level_ghost_owners () const;
 
   protected:
     /**
@@ -179,28 +181,28 @@ namespace parallel
        * This vector stores the number of locally owned active cells per MPI
        * rank.
        */
-      std::vector<unsigned int> n_locally_owned_active_cells;
+      std::vector<unsigned int>     n_locally_owned_active_cells;
       /**
        * The total number of active cells (sum of @p
        * n_locally_owned_active_cells).
        */
-      types::global_dof_index   n_global_active_cells;
+      types::global_dof_index       n_global_active_cells;
       /**
        * The global number of levels computed as the maximum number of levels
        * taken over all MPI ranks, so <tt>n_levels()<=n_global_levels =
        * max(n_levels() on proc i)</tt>.
        */
-      unsigned int              n_global_levels;
+      unsigned int                  n_global_levels;
       /**
        * A set containing the subdomain_id (MPI rank) of the owners of the
        * ghost cells on this processor.
        */
-      std::set<unsigned int> ghost_owners;
+      std::set<types::subdomain_id> ghost_owners;
       /**
        * A set containing the MPI ranks of the owners of the level ghost cells
        * on this processor (for all levels).
        */
-      std::set<unsigned int> level_ghost_owners;
+      std::set<types::subdomain_id> level_ghost_owners;
 
       NumberCache();
     };
@@ -211,8 +213,6 @@ namespace parallel
      * Update the number_cache variable after mesh creation or refinement.
      */
     virtual void update_number_cache ();
-
-
   };
 
 } // namespace parallel

@@ -516,10 +516,10 @@ namespace
 
   template <int dim, int spacedim>
   void
-  match_quadrant (const dealii::Triangulation<dim,spacedim> *tria,
-                  unsigned int dealii_index,
+  match_quadrant (const dealii::Triangulation<dim,spacedim>      *tria,
+                  unsigned int                                    dealii_index,
                   typename internal::p4est::types<dim>::quadrant &ghost_quadrant,
-                  unsigned int ghost_owner)
+                  types::subdomain_id                             ghost_owner)
   {
     int i, child_id;
     int l = ghost_quadrant.level;
@@ -937,7 +937,7 @@ namespace
 
     void build_lists (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                       const typename internal::p4est::types<dim>::quadrant &p4est_cell,
-                      const unsigned int myid);
+                      const types::subdomain_id myid);
   };
 
 
@@ -1935,21 +1935,27 @@ namespace parallel
             int dummy = 0;
             unsigned int req_counter = 0;
 
-            for (std::set<unsigned int>::iterator it = this->number_cache.level_ghost_owners.begin();
+            for (std::set<types::subdomain_id>::iterator it = this->number_cache.level_ghost_owners.begin();
                  it != this->number_cache.level_ghost_owners.end();
                  ++it, ++req_counter)
               {
-                MPI_Isend(&dummy, 1, MPI_INT,
+                Assert (typeid(types::subdomain_id)
+                        == typeid(unsigned int),
+                        ExcNotImplemented());
+                MPI_Isend(&dummy, 1, MPI_UNSIGNED,
                           *it, 9001, this->mpi_communicator,
                           &requests[req_counter]);
               }
 
-            for (std::set<unsigned int>::iterator it = this->number_cache.level_ghost_owners.begin();
+            for (std::set<types::subdomain_id>::iterator it = this->number_cache.level_ghost_owners.begin();
                  it != this->number_cache.level_ghost_owners.end();
                  ++it)
               {
-                int dummy;
-                MPI_Recv(&dummy, 1, MPI_INT,
+                Assert (typeid(types::subdomain_id)
+                        == typeid(unsigned int),
+                        ExcNotImplemented());
+                unsigned int dummy;
+                MPI_Recv(&dummy, 1, MPI_UNSIGNED,
                          *it, 9001, this->mpi_communicator,
                          MPI_STATUS_IGNORE);
               }
@@ -1961,7 +1967,8 @@ namespace parallel
           }
 #endif
 
-          Assert(this->number_cache.level_ghost_owners.size() < Utilities::MPI::n_mpi_processes(this->mpi_communicator), ExcInternalError());
+          Assert(this->number_cache.level_ghost_owners.size() < Utilities::MPI::n_mpi_processes(this->mpi_communicator),
+                 ExcInternalError());
         }
     }
 
@@ -2629,7 +2636,7 @@ namespace parallel
           // every ghostquadrant, find corresponding deal coarsecell and
           // recurse.
           typename dealii::internal::p4est::types<dim>::quadrant *quadr;
-          unsigned int ghost_owner=0;
+          types::subdomain_id ghost_owner=0;
           typename dealii::internal::p4est::types<dim>::topidx ghost_tree=0;
 
           for (unsigned int g_idx=0; g_idx<parallel_ghost->ghosts.elem_count; ++g_idx)
