@@ -780,27 +780,19 @@ namespace MatrixFreeOperators
     LinearAlgebra::distributed::Vector<number> ones;
     Base<dim, number>::initialize_dof_vector(Base<dim, number>::inverse_diagonal_entries);
     Base<dim, number>::initialize_dof_vector(ones);
-    Base<dim, number>::inverse_diagonal_entries = 1.;
     ones = 1.;
     ones.update_ghost_values();
     apply_add(Base<dim, number>::inverse_diagonal_entries, ones);
 
-    const IndexSet &locally_owned_elements
-      = Base<dim, number>::inverse_diagonal_entries.locally_owned_elements();
-    locally_owned_elements.print(std::cout);
-    const std::vector<unsigned int> constrained_dofs
+    const std::vector<unsigned int> &constrained_dofs
       = Base<dim, number>::data->get_constrained_dofs();
-    for (unsigned int i=0; i<constrained_dofs.size(); ++i)
-      if (locally_owned_elements.is_element(constrained_dofs[i]))
-        Base<dim, number>::inverse_diagonal_entries(constrained_dofs[i]) = 1.;
+    for (unsigned int i=0; i< constrained_dofs.size(); ++i)
+      Base<dim, number>::inverse_diagonal_entries.local_element(constrained_dofs[i]) = 1.;
 
     const unsigned int local_size = Base<dim, number>::inverse_diagonal_entries.local_size();
     for (unsigned int i=0; i<local_size; ++i)
-      {
-        const double tmp = Base<dim, number>::inverse_diagonal_entries.local_element(i);
-        Base<dim, number>::inverse_diagonal_entries.local_element(i)
-          =1./Base<dim, number>::inverse_diagonal_entries.local_element(i);
-      }
+      Base<dim, number>::inverse_diagonal_entries.local_element(i)
+        =1./Base<dim, number>::inverse_diagonal_entries.local_element(i);
 
     Base<dim, number>::inverse_diagonal_entries.compress(VectorOperation::insert);
     Base<dim, number>::inverse_diagonal_entries.update_ghost_values();
