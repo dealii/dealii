@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2015 by the deal.II authors
+// Copyright (C) 2009 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,8 +50,7 @@ void test()
       if (myid==0)
         {
 
-          std::vector< unsigned int > cell_subd;
-          cell_subd.resize(tr.n_active_cells());
+          std::vector<types::subdomain_id> cell_subd(tr.n_active_cells());
 
           GridTools::get_subdomain_association(tr, cell_subd);
           for (unsigned int i=0; i<tr.n_active_cells(); ++i)
