@@ -695,6 +695,15 @@ namespace LinearAlgebra
                 const ::dealii::Vector<OtherNumber> &values);
 
       /**
+       * Take an address where n_elements are stored contiguously and add them
+       * into the vector.
+       */
+      template <typename OtherNumber>
+      void add (const size_type n_elements,
+                const size_type *indices,
+                const OtherNumber *values);
+
+      /**
        * Scaling and simple vector addition, i.e.  <tt>*this =
        * s*(*this)+V</tt>.
        */
@@ -1386,6 +1395,24 @@ namespace LinearAlgebra
           Assert (numbers::is_finite(values[i]),
                   ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
           this->operator()(indices[i]) += values(i);
+        }
+    }
+
+
+
+    template <typename Number>
+    template <typename OtherNumber>
+    inline
+    void
+    Vector<Number>::add (const size_type n_elements,
+                         const size_type *indices,
+                         const OtherNumber *values)
+    {
+      for (size_type i=0; i<n_elements; ++i, ++indices, ++values)
+        {
+          Assert (numbers::is_finite(*values),
+                  ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+          this->operator()(*indices) += *values;
         }
     }
 
