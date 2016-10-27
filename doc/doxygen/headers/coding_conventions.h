@@ -195,7 +195,7 @@ file with declarations. The definitions should be guarded with <code>#ifndef DOX
 
 </ol>
 
-<p> For the first two cases, instantiation instructions are defined in .inst.in
+<p> For the first two cases, instantiation instructions are defined in <code>.inst.in</code>
 files. These files are processed by custom CMake scripts to generate <code>.inst</code> files
 using lists of parameters (vector classes, dimensions, tensor ranks, etc)
 defined in <code>cmake/config/template-arguments.in</code>. It is those <code>.inst</code>
