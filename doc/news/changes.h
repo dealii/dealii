@@ -391,6 +391,10 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> New: Add MatrixFreeOperators::MassOperator representing a mass matrix.
+ <br>
+ (Daniel Arndt, 2016/10/27)
+ <li>
 
  <li> Fixed: GridIn::read_vtk() accidentally only read material ids of
  input cells correctly if the file listed them as integers. If they were
