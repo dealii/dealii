@@ -6220,7 +6220,8 @@ write_pvd_record (std::ostream &out,
                   const std::vector<std::pair<double,std::string> >  &times_and_names) const
 {
   AssertThrow (out, ExcIO());
-
+   
+  out.precision(12);
   out << "<?xml version=\"1.0\"?>\n";
 
   out << "<!--\n";
