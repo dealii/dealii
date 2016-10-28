@@ -158,7 +158,7 @@ namespace MatrixFreeOperators
     virtual void compute_diagonal () = 0;
 
     /**
-     * Get read access to diagonal of this operator.
+     * Get read access to the inverse diagonal of this operator.
      */
     const LinearAlgebra::distributed::Vector<number> &get_matrix_diagonal_inverse() const;
 
@@ -284,6 +284,46 @@ namespace MatrixFreeOperators
      * A structure to hold inverse shape functions
      */
     AlignedVector<VectorizedArray<Number> > inverse_shape;
+  };
+
+
+
+  /**
+   * This class implements the operation of the action of a mass matrix.
+   *
+   * @author Daniel Arndt, 2016
+   */
+  template <int dim, int fe_degree, int n_components = 1, typename number = double>
+  class MassOperator : public Base<dim, number>
+  {
+  public:
+
+    /**
+     * Constructor. Initializes the MatrixFree object.
+     */
+    MassOperator ();
+
+    /**
+     * For preconditioning, we store a lumped mass matrix at the diagonal entries.
+     */
+    virtual void compute_diagonal ();
+
+  private:
+    /**
+     * Applies the mass matrix operation on an input vector. It is
+     * assumed that the passed input and output vector are correctly initialized
+     * using initialize_dof_vector().
+     */
+    virtual void apply_add (LinearAlgebra::distributed::Vector<number>       &dst,
+                            const LinearAlgebra::distributed::Vector<number> &src) const;
+
+    /**
+     * For this operator, there is just a cell contribution.
+     */
+    void local_apply_cell (const MatrixFree<dim,number>                     &data,
+                           LinearAlgebra::distributed::Vector<number>       &dst,
+                           const LinearAlgebra::distributed::Vector<number> &src,
+                           const std::pair<unsigned int,unsigned int>  &cell_range) const;
   };
 
 
@@ -715,6 +755,82 @@ namespace MatrixFreeOperators
     dst = src;
     dst.scale(inverse_diagonal_entries);
     dst*= omega;
+  }
+
+
+
+  //-----------------------------MassOperator----------------------------------
+
+  template <int dim, int fe_degree, int n_components, typename number>
+  MassOperator<dim, fe_degree, n_components, number>::
+  MassOperator ()
+    :
+    Base<dim, number>()
+  {}
+
+
+
+  template <int dim, int fe_degree, int n_components, typename number>
+  void
+  MassOperator<dim, fe_degree, n_components, number>::
+  compute_diagonal()
+  {
+    Assert((Base<dim, number>::data != NULL), ExcNotInitialized());
+
+    LinearAlgebra::distributed::Vector<number> ones;
+    Base<dim, number>::initialize_dof_vector(Base<dim, number>::inverse_diagonal_entries);
+    Base<dim, number>::initialize_dof_vector(ones);
+    ones = 1.;
+    ones.update_ghost_values();
+    apply_add(Base<dim, number>::inverse_diagonal_entries, ones);
+
+    const std::vector<unsigned int> &constrained_dofs
+      = Base<dim, number>::data->get_constrained_dofs();
+    for (unsigned int i=0; i< constrained_dofs.size(); ++i)
+      Base<dim, number>::inverse_diagonal_entries.local_element(constrained_dofs[i]) = 1.;
+
+    const unsigned int local_size = Base<dim, number>::inverse_diagonal_entries.local_size();
+    for (unsigned int i=0; i<local_size; ++i)
+      Base<dim, number>::inverse_diagonal_entries.local_element(i)
+        =1./Base<dim, number>::inverse_diagonal_entries.local_element(i);
+
+    Base<dim, number>::inverse_diagonal_entries.compress(VectorOperation::insert);
+    Base<dim, number>::inverse_diagonal_entries.update_ghost_values();
+  }
+
+
+
+  template <int dim, int fe_degree, int n_components, typename number>
+  void
+  MassOperator<dim, fe_degree, n_components, number>::
+  apply_add (LinearAlgebra::distributed::Vector<number>       &dst,
+             const LinearAlgebra::distributed::Vector<number> &src) const
+  {
+    Base<dim, number>::data->cell_loop (&MassOperator::local_apply_cell,
+                                        this, dst, src);
+  }
+
+
+
+  template <int dim, int fe_degree, int n_components, typename number>
+  void
+  MassOperator<dim, fe_degree, n_components, number>::
+  local_apply_cell (const MatrixFree<dim,number>                     &data,
+                    LinearAlgebra::distributed::Vector<number>       &dst,
+                    const LinearAlgebra::distributed::Vector<number> &src,
+                    const std::pair<unsigned int,unsigned int>  &cell_range) const
+  {
+    FEEvaluation<dim, fe_degree, fe_degree+1, n_components, number> phi(*Base<dim, number>::data);
+    for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
+      {
+        phi.reinit (cell);
+        phi.read_dof_values(src);
+        phi.evaluate (true,false,false);
+        for (unsigned int q=0; q<phi.n_q_points; ++q)
+          phi.submit_value (phi.get_value(q), q);
+        phi.integrate (true,false);
+        phi.distribute_local_to_global (dst);
+      }
   }
 
 } // end of namespace MatrixFreeOperators
