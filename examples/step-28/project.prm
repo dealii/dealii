@@ -1,0 +1,14 @@
+# Listing of Parameters
+# ---------------------
+# Polynomial degree of the finite element to be used
+set Finite element degree     = 2
+
+# The number of energy different groups considered
+set Number of energy groups   = 2
+
+# Inner power iterations are stopped when the change in k_eff falls below this
+# tolerance
+set Power iteration tolerance = 1e-12
+
+# Number of refinement cycles to be performed
+set Refinement cycles         = 5
