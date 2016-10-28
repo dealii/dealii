@@ -1479,7 +1479,7 @@
  *
  * deal.II implements serialization facilities by implementing the necessary
  * interfaces for the <a
- * href="http://www.boost.org/doc/libs/1_46_1/libs/serialization/doc/index.html"
+ * href="http://www.boost.org/doc/libs/1_62_0/libs/serialization/doc/index.html"
  * target="_top">BOOST serialization</a> library. See there for examples on
  * how to save and restore objects. </dd>
  *
