@@ -24,6 +24,12 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+/**
+ * An exception that is thrown whenever the edges of a mesh are not
+ * orientable.
+ */
+DeclExceptionMsg (ExcMeshNotOrientable,
+                  "The edges of the mesh are not consistently orientable.");
 
 
 /**
@@ -664,21 +670,6 @@ public:
 
 
 // declaration of explicit specializations
-template<>
-void
-GridReordering<2>::reorder_cells (std::vector<CellData<2> > &original_cells,
-                                  const bool);
-
-template<>
-void
-GridReordering<2,3>::reorder_cells (std::vector<CellData<2> > &original_cells,
-                                    const bool);
-
-template<>
-void
-GridReordering<3>::reorder_cells (std::vector<CellData<3> > &original_cells,
-                                  const bool);
-
 template<>
 void
 GridReordering<2>::invert_all_cells_of_negative_grid(const std::vector<Point<2> > &all_vertices,
