@@ -215,6 +215,14 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li> Improved: The code in class GridReordering has been rewritten from
+ scratch. It now follows the algorithm described in the paper by
+ Agelek, Anderson, Bangerth and Barth mentioned in the documentation
+ of that class.
+ <br>
+ (Wolfgang Bangerth, 2016/10/28)
+ </li>
+
  <li> Improved: deal.II now bundles a subset of BOOST 1.62 instead of a subset
  of BOOST 1.56.
  <br>
