@@ -39,8 +39,9 @@ namespace parallel
                                                 const bool allow_artificial_cells):
       dealii::parallel::Triangulation<dim,spacedim>(mpi_communicator,smooth_grid,false),
       allow_artificial_cells(allow_artificial_cells)
-    {
-    }
+    {}
+
+
 
     template <int dim, int spacedim>
     void Triangulation<dim,spacedim>::partition()
@@ -85,12 +86,16 @@ namespace parallel
         }
     }
 
+
+
     template <int dim, int spacedim>
     bool
     Triangulation<dim,spacedim>::with_artificial_cells() const
     {
       return allow_artificial_cells;
     }
+
+
 
     template <int dim, int spacedim>
     const std::vector<types::subdomain_id> &
@@ -99,11 +104,13 @@ namespace parallel
       return true_subdomain_ids_of_cells;
     }
 
+
+
     template <int dim, int spacedim>
     Triangulation<dim,spacedim>::~Triangulation ()
-    {
+    {}
 
-    }
+
 
     template <int dim, int spacedim>
     void
@@ -113,6 +120,8 @@ namespace parallel
       partition();
       this->update_number_cache ();
     }
+
+
 
     template <int dim, int spacedim>
     void
@@ -134,6 +143,8 @@ namespace parallel
       partition();
       this->update_number_cache ();
     }
+
+
 
     template <int dim, int spacedim>
     void
@@ -165,6 +176,8 @@ namespace parallel
       Assert (false, ExcNotImplemented());
     }
 
+
+
     template <int dim, int spacedim>
     bool
     Triangulation<dim,spacedim>::with_artificial_cells() const
@@ -172,6 +185,8 @@ namespace parallel
       Assert (false, ExcNotImplemented());
       return true;
     }
+
+
 
     template <int dim, int spacedim>
     const std::vector<unsigned int> &
