@@ -121,7 +121,7 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
      SP    &sparsity,
      const ConstraintMatrix &,
      const bool,
-     const unsigned int);
+     const types::subdomain_id);
 
     template void
     DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension>, SP>
@@ -129,7 +129,7 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
      SP    &sparsity,
      const ConstraintMatrix &,
      const bool,
-     const unsigned int);
+     const types::subdomain_id);
 
     template void
     DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension>, SP>
@@ -138,7 +138,7 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
      SP &,
      const ConstraintMatrix &,
      const bool,
-     const unsigned int);
+     const types::subdomain_id);
 
     template void
     DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension>, SP>
@@ -147,7 +147,7 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
      SP &,
      const ConstraintMatrix &,
      const bool,
-     const unsigned int);
+     const types::subdomain_id);
 
     template void
     DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension>, SP>
@@ -189,7 +189,7 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
      SP    &sparsity,
      const Table<2,Coupling>&,
      const Table<2,Coupling>&,
-     const unsigned int);
+     const types::subdomain_id);
 
     template void
     DoFTools::make_flux_sparsity_pattern<DoFHandler<deal_II_dimension>,SP>
@@ -199,21 +199,23 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
      const bool,
      const Table<2,Coupling>&,
      const Table<2,Coupling>&,
-     const unsigned int);
+     const types::subdomain_id);
 
     template void
     DoFTools::make_flux_sparsity_pattern<DoFHandler<deal_II_dimension>,SP>
     (const DoFHandler<deal_II_dimension> &dof,
      SP    &sparsity,
      const ConstraintMatrix &constraints,
-     const bool, const unsigned int);
+     const bool,
+     const types::subdomain_id);
 
     template void
     DoFTools::make_flux_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SP>
     (const hp::DoFHandler<deal_II_dimension> &dof,
      SP    &sparsity,
      const ConstraintMatrix &constraints,
-     const bool, const unsigned int);
+     const bool,
+     const types::subdomain_id);
 
 #if deal_II_dimension > 1
 
@@ -223,7 +225,7 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
      SP    &sparsity,
      const Table<2,Coupling>&,
      const Table<2,Coupling>&,
-     const unsigned int);
+     const types::subdomain_id);
 
     template void
     DoFTools::make_flux_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SP>
@@ -233,7 +235,7 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
      const bool,
      const Table<2,Coupling>&,
      const Table<2,Coupling>&,
-     const unsigned int);
+     const types::subdomain_id);
 
 #endif
 
@@ -245,7 +247,7 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
      SP    &sparsity,
      const ConstraintMatrix &,
      const bool,
-     const unsigned int);
+     const types::subdomain_id);
 
     template void
     DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>, SP>
@@ -253,7 +255,7 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
      SP    &sparsity,
      const ConstraintMatrix &,
      const bool,
-     const unsigned int);
+     const types::subdomain_id);
 
     template void
     DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>, SP>
@@ -262,7 +264,7 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
      SP &,
      const ConstraintMatrix &,
      const bool,
-     const unsigned int);
+     const types::subdomain_id);
 
     template void
     DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>, SP>
@@ -271,7 +273,7 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
      SP &,
      const ConstraintMatrix &,
      const bool,
-     const unsigned int);
+     const types::subdomain_id);
 
     template void
     DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>, SP>
@@ -308,7 +310,7 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
      SP    &sparsity,
      const ConstraintMatrix &,
      const bool,
-     const unsigned int);
+     const types::subdomain_id);
 
     template void
     DoFTools::make_sparsity_pattern<hp::DoFHandler<1,3>, SP>
@@ -316,7 +318,7 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
      SP    &sparsity,
      const ConstraintMatrix &,
      const bool,
-     const unsigned int);
+     const types::subdomain_id);
 
     template void
     DoFTools::make_sparsity_pattern<DoFHandler<1,3>, SP>
@@ -325,7 +327,7 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
      SP &,
      const ConstraintMatrix &,
      const bool,
-     const unsigned int);
+     const types::subdomain_id);
 
     template void
     DoFTools::make_sparsity_pattern<hp::DoFHandler<1,3>, SP>
@@ -334,7 +336,7 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
      SP &,
      const ConstraintMatrix &,
      const bool,
-     const unsigned int);
+     const types::subdomain_id);
 
     template void
     DoFTools::make_sparsity_pattern<DoFHandler<1,3>, SP>

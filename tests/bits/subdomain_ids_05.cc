@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2015 by the deal.II authors
+// Copyright (C) 2001 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -72,7 +72,7 @@ void test ()
   dof_handler.distribute_dofs (fe);
   deallog << dof_handler.n_dofs() << std::endl;
 
-  std::vector<unsigned int> subdomain_association (dof_handler.n_dofs());
+  std::vector<types::subdomain_id> subdomain_association (dof_handler.n_dofs());
   DoFTools::get_subdomain_association (dof_handler,
                                        subdomain_association);
   for (unsigned int subdomain=0; subdomain<(1<<dim); ++subdomain)

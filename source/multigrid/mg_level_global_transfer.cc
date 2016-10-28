@@ -172,13 +172,13 @@ namespace
         // inefficient. Please fix this, Timo.
         // The list of neighbors is symmetric (our neighbors have us as a neighbor),
         // so we can use it to send and to know how many messages we will get.
-        std::set<unsigned int> neighbors = tria->level_ghost_owners();
+        std::set<types::subdomain_id> neighbors = tria->level_ghost_owners();
         std::map<int, std::vector<DoFPair> > send_data;
 
         // * find owners of the level dofs and insert into send_data accordingly
         for (typename std::vector<DoFPair>::iterator dofpair=send_data_temp.begin(); dofpair != send_data_temp.end(); ++dofpair)
           {
-            std::set<unsigned int>::iterator it;
+            std::set<types::subdomain_id>::iterator it;
             for (it = neighbors.begin(); it != neighbors.end(); ++it)
               {
                 if (mg_dof.locally_owned_mg_dofs_per_processor(dofpair->level)[*it].is_element(dofpair->level_dof_index))
@@ -195,7 +195,7 @@ namespace
         // * send
         std::vector<MPI_Request> requests;
         {
-          for (std::set<unsigned int>::iterator it = neighbors.begin(); it != neighbors.end(); ++it)
+          for (std::set<types::subdomain_id>::iterator it = neighbors.begin(); it != neighbors.end(); ++it)
             {
               requests.push_back(MPI_Request());
               unsigned int dest = *it;

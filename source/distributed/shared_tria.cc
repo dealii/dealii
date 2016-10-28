@@ -93,7 +93,7 @@ namespace parallel
     }
 
     template <int dim, int spacedim>
-    const std::vector<unsigned int> &
+    const std::vector<types::subdomain_id> &
     Triangulation<dim,spacedim>::get_true_subdomain_ids_of_cells() const
     {
       return true_subdomain_ids_of_cells;

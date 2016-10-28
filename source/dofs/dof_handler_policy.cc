@@ -1599,10 +1599,10 @@ namespace internal
                                    const std::vector<dealii::types::global_dof_index> &p4est_tree_to_coarse_cell_permutation)
         {
           // build list of cells to request for each neighbor
-          std::set<unsigned int> level_ghost_owners = tria.level_ghost_owners();
+          std::set<dealii::types::subdomain_id> level_ghost_owners = tria.level_ghost_owners();
           typedef std::map<dealii::types::subdomain_id, typename types<dim>::cellinfo> cellmap_t;
           cellmap_t neighbor_cell_list;
-          for (std::set<unsigned int>::iterator it = level_ghost_owners.begin();
+          for (std::set<dealii::types::subdomain_id>::iterator it = level_ghost_owners.begin();
                it != level_ghost_owners.end();
                ++it)
             neighbor_cell_list.insert(std::make_pair(*it, typename types<dim>::cellinfo()));
