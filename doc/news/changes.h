@@ -405,10 +405,16 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
- <li> New: Add MatrixFreeOperators::MassOperator representing a mass matrix.
+
+ <li> Fixed: Increased precision of timesteps in DataOutInterface::write_pvd_record().
+ <br>
+ (Rajat Arora, 2016/10/29)
+ </li>
+ 
+<li> New: Add MatrixFreeOperators::MassOperator representing a mass matrix.
  <br>
  (Daniel Arndt, 2016/10/27)
- <li>
+ </li>
 
  <li> New: Add ArpackSolver::set_shift() to set the shift value in spectral
  transformation.
