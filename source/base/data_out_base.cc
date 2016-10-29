@@ -6232,6 +6232,9 @@ write_pvd_record (std::ostream &out,
   out << "<VTKFile type=\"Collection\" version=\"0.1\" ByteOrder=\"LittleEndian\">\n";
   out << "  <Collection>\n";
 
+  std::streamsize ss = out.precision();
+  out.precision(12);
+
   for (unsigned int i=0; i<times_and_names.size(); ++i)
     out << "    <DataSet timestep=\"" << times_and_names[i].first
         << "\" group=\"\" part=\"0\" file=\"" << times_and_names[i].second
@@ -6241,6 +6244,7 @@ write_pvd_record (std::ostream &out,
   out << "</VTKFile>\n";
 
   out.flush();
+  out.precision(ss);
 
   AssertThrow (out, ExcIO());
 }
