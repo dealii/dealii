@@ -361,7 +361,9 @@ void do_test (const DoFHandler<dim>  &dof)
       smoother_data[level].smoothing_range = 15.;
       smoother_data[level].degree = 5;
       smoother_data[level].eig_cg_n_iterations = 15;
-      smoother_data[level].matrix_diagonal_inverse =
+      smoother_data[level].preconditioner.
+      reset(new DiagonalMatrix<LinearAlgebra::distributed::Vector<number> >());
+      smoother_data[level].preconditioner->get_vector() =
         mg_matrices[level].get_matrix_diagonal_inverse();
     }
   mg_smoother.initialize(mg_matrices, smoother_data);
