@@ -887,6 +887,9 @@ public:
    */
   typedef types::global_dof_index size_type;
 
+  // avoid warning about use of deprecated variables
+  DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+
   /**
    * Standardized data struct to pipe additional parameters to the
    * preconditioner.
@@ -936,7 +939,7 @@ public:
      * @deprecated For non-zero starting, use the step() and Tstep()
      * interfaces, whereas vmult() provides the preconditioner interface.
      */
-    bool nonzero_starting;
+    bool nonzero_starting DEAL_II_DEPRECATED;
 
     /**
      * Maximum number of CG iterations performed for finding the maximum
@@ -963,13 +966,15 @@ public:
      *
      * @deprecated Set the variable @p preconditioner defined below instead.
      */
-    VectorType matrix_diagonal_inverse;
+    VectorType matrix_diagonal_inverse DEAL_II_DEPRECATED;
 
     /**
      * Stores the preconditioner object that the Chebyshev is wrapped around.
      */
     std_cxx11::shared_ptr<PreconditionerType> preconditioner;
   };
+
+  DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
   PreconditionChebyshev ();
 
@@ -1922,6 +1927,9 @@ namespace internal
 
 
 
+// avoid warning about deprecated variable nonzero_starting
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+
 template <typename MatrixType, class VectorType, typename PreconditionerType>
 inline
 PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::AdditionalData::
@@ -1940,6 +1948,7 @@ AdditionalData (const unsigned int degree,
   max_eigenvalue (max_eigenvalue)
 {}
 
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
 template <typename MatrixType, typename VectorType, typename PreconditionerType>
@@ -1956,6 +1965,8 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::PreconditionChe
 }
 
 
+// avoid warning about deprecated variable AdditionalData::matrix_diagonal_inverse
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 
 template <typename MatrixType, typename VectorType, typename PreconditionerType>
 inline
@@ -1971,6 +1982,24 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::initialize
                                                              data.matrix_diagonal_inverse);
   is_initialized = false;
 }
+
+
+
+template <typename MatrixType, typename VectorType, typename PreconditionerType>
+inline
+void
+PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::clear ()
+{
+  is_initialized = false;
+  matrix_ptr = 0;
+  data.matrix_diagonal_inverse.reinit(0);
+  data.preconditioner.reset();
+  update1.reinit(0);
+  update2.reinit(0);
+  update3.reinit(0);
+}
+
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
 
@@ -2200,27 +2229,13 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>
 
 template <typename MatrixType, typename VectorType, typename PreconditionerType>
 inline
-void
-PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::clear ()
-{
-  is_initialized = false;
-  matrix_ptr = 0;
-  data.matrix_diagonal_inverse.reinit(0);
-  data.preconditioner.reset();
-  update1.reinit(0);
-  update2.reinit(0);
-  update3.reinit(0);
-}
-
-
-template <typename MatrixType, typename VectorType, typename PreconditionerType>
-inline
 typename PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::size_type
 PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::m () const
 {
   Assert (matrix_ptr!=0, ExcNotInitialized());
   return matrix_ptr->m();
 }
+
 
 
 template <typename MatrixType, typename VectorType, typename PreconditionerType>
