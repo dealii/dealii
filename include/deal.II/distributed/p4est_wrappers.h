@@ -272,7 +272,7 @@ namespace internal
       static
       size_t (&connectivity_memory_used) (types<2>::connectivity *p4est);
 
-      static const unsigned max_level;
+      static const unsigned int max_level = P4EST_MAXLEVEL;
     };
 
 
@@ -454,7 +454,7 @@ namespace internal
       static
       size_t (&connectivity_memory_used) (types<3>::connectivity *p4est);
 
-      static const unsigned max_level;
+      static const unsigned int max_level = P8EST_MAXLEVEL;
     };
 
 

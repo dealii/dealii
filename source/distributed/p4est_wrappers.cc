@@ -191,7 +191,7 @@ namespace internal
     size_t (&functions<2>::connectivity_memory_used) (types<2>::connectivity *p4est)
       = p4est_connectivity_memory_used;
 
-    const unsigned int functions<2>::max_level = P4EST_MAXLEVEL;
+    const unsigned int functions<2>::max_level;
 
     int (&functions<3>::quadrant_compare) (const void *v1, const void *v2)
       = p8est_quadrant_compare;
@@ -379,7 +379,7 @@ namespace internal
     size_t (&functions<3>::connectivity_memory_used) (types<3>::connectivity *p4est)
       = p8est_connectivity_memory_used;
 
-    const unsigned int functions<3>::max_level = P8EST_MAXLEVEL;
+    const unsigned int functions<3>::max_level;
 
     template <int dim>
     void
