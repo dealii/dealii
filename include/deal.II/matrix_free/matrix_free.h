@@ -287,24 +287,6 @@ public:
    * or contain several copies of the same element. Mixing several different
    * elements into one FESystem is not allowed. In that case, use the
    * initialization function with several DoFHandler arguments.
-   *
-   * The @p IndexSet @p locally_owned_dofs is used to specify the parallel
-   * partitioning with MPI. Usually, this needs not be specified, and the
-   * other initialization function without and @p IndexSet description can be
-   * used, which gets the partitioning information builtin into the
-   * DoFHandler.
-   */
-  template <typename DoFHandlerType, typename QuadratureType>
-  void reinit (const Mapping<dim>     &mapping,
-               const DoFHandlerType   &dof_handler,
-               const ConstraintMatrix &constraint,
-               const IndexSet         &locally_owned_dofs,
-               const QuadratureType   &quad,
-               const AdditionalData    additional_data = AdditionalData());
-
-  /**
-   * Initializes the data structures. Same as above, but with index set stored
-   * in the DoFHandler for describing the locally owned degrees of freedom.
    */
   template <typename DoFHandlerType, typename QuadratureType>
   void reinit (const Mapping<dim>     &mapping,
@@ -322,6 +304,21 @@ public:
                const ConstraintMatrix &constraint,
                const QuadratureType   &quad,
                const AdditionalData    additional_data = AdditionalData());
+
+  /**
+   * Same as above.
+   *
+   * @deprecated Setting the index set specifically is not supported any
+   * more. Use the reinit function without index set argument to choose the
+   * one provided by DoFHandler::locally_owned_dofs().
+   */
+  template <typename DoFHandlerType, typename QuadratureType>
+  void reinit (const Mapping<dim>     &mapping,
+               const DoFHandlerType   &dof_handler,
+               const ConstraintMatrix &constraint,
+               const IndexSet         &locally_owned_dofs,
+               const QuadratureType   &quad,
+               const AdditionalData    additional_data = AdditionalData()) DEAL_II_DEPRECATED;
 
   /**
    * Extracts the information needed to perform loops over cells. The
@@ -342,25 +339,6 @@ public:
    * different degrees. However, the number of different quadrature formulas
    * can be sets independently from the number of DoFHandlers, when several
    * elements are always integrated with the same quadrature formula.
-   *
-   * The @p IndexSet @p locally_owned_dofs is used to specify the parallel
-   * partitioning with MPI. Usually, this needs not be specified, and the
-   * other initialization function without and @p IndexSet description can be
-   * used, which gets the partitioning information from the DoFHandler. This
-   * is the most general initialization function.
-   */
-  template <typename DoFHandlerType, typename QuadratureType>
-  void reinit (const Mapping<dim>                          &mapping,
-               const std::vector<const DoFHandlerType *>   &dof_handler,
-               const std::vector<const ConstraintMatrix *> &constraint,
-               const std::vector<IndexSet>                 &locally_owned_set,
-               const std::vector<QuadratureType>           &quad,
-               const AdditionalData                        additional_data = AdditionalData());
-
-  /**
-   * Initializes the data structures. Same as before, but now the index set
-   * description of the locally owned range of degrees of freedom is taken
-   * from the DoFHandler.
    */
   template <typename DoFHandlerType, typename QuadratureType>
   void reinit (const Mapping<dim>                          &mapping,
@@ -378,6 +356,21 @@ public:
                const std::vector<const ConstraintMatrix *> &constraint,
                const std::vector<QuadratureType>           &quad,
                const AdditionalData                        additional_data = AdditionalData());
+
+  /**
+   * Same as above.
+   *
+   * @deprecated Setting the index set specifically is not supported any
+   * more. Use the reinit function without index set argument to choose the
+   * one provided by DoFHandler::locally_owned_dofs().
+   */
+  template <typename DoFHandlerType, typename QuadratureType>
+  void reinit (const Mapping<dim>                          &mapping,
+               const std::vector<const DoFHandlerType *>   &dof_handler,
+               const std::vector<const ConstraintMatrix *> &constraint,
+               const std::vector<IndexSet>                 &locally_owned_set,
+               const std::vector<QuadratureType>           &quad,
+               const AdditionalData                        additional_data = AdditionalData()) DEAL_II_DEPRECATED;
 
   /**
    * Initializes the data structures. Same as before, but now the index set
