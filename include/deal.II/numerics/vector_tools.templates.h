@@ -1117,28 +1117,28 @@ namespace VectorTools
     switch (fe_degree)
       {
       case 1:
-        project_parallel<dim, VectorType,1,2> (matrix_free,constraints,func,vec_result);
+        project_parallel<dim, VectorType, dim, 2> (matrix_free,constraints,func,vec_result);
         break;
       case 2:
-        project_parallel<dim, VectorType,2,3> (matrix_free,constraints,func,vec_result);
+        project_parallel<dim, VectorType, dim, 3> (matrix_free, constraints, func, vec_result);
         break;
       case 3:
-        project_parallel<dim, VectorType,3,4> (matrix_free,constraints,func,vec_result);
+        project_parallel<dim, VectorType, dim, 4> (matrix_free, constraints, func, vec_result);
         break;
       case 4:
-        project_parallel<dim, VectorType,4,5> (matrix_free,constraints,func,vec_result);
+        project_parallel<dim, VectorType, dim, 5> (matrix_free, constraints, func, vec_result);
         break;
       case 5:
-        project_parallel<dim, VectorType,5,6> (matrix_free,constraints,func,vec_result);
+        project_parallel<dim, VectorType, dim, 6> (matrix_free, constraints, func, vec_result);
         break;
       case 6:
-        project_parallel<dim, VectorType,6,7> (matrix_free,constraints,func,vec_result);
+        project_parallel<dim, VectorType, dim, 7> (matrix_free, constraints, func, vec_result);
         break;
       case 7:
-        project_parallel<dim, VectorType,7,8> (matrix_free,constraints,func,vec_result);
+        project_parallel<dim, VectorType, dim, 8> (matrix_free, constraints, func, vec_result);
         break;
       case 8:
-        project_parallel<dim, VectorType,8,9> (matrix_free,constraints,func,vec_result);
+        project_parallel<dim, VectorType, dim, 9> (matrix_free, constraints, func, vec_result);
         break;
       default:
         Assert (false, ExcNotImplemented());
