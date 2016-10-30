@@ -53,6 +53,7 @@ namespace TrilinosWrappers
 {
   // forward declarations
   class SparsityPattern;
+  class SparseMatrix;
 
   namespace SparsityPatternIterators
   {
@@ -1164,7 +1165,7 @@ namespace TrilinosWrappers
      */
     std_cxx11::shared_ptr<Epetra_CrsGraph> nonlocal_graph;
 
-    friend class SparseMatrix;
+    friend class TrilinosWrappers::SparseMatrix;
     friend class SparsityPatternIterators::Accessor;
     friend class SparsityPatternIterators::Iterator;
   };
