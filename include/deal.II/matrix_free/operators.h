@@ -495,6 +495,7 @@ namespace MatrixFreeOperators
   Base<dim,Number>::el (const unsigned int row,
                         const unsigned int col) const
   {
+    (void) col;
     Assert (row == col, ExcNotImplemented());
     Assert (inverse_diagonal_entries.size() > 0, ExcNotInitialized());
     return 1.0/inverse_diagonal_entries(row);
@@ -820,7 +821,7 @@ namespace MatrixFreeOperators
                     const LinearAlgebra::distributed::Vector<Number> &src,
                     const std::pair<unsigned int,unsigned int>  &cell_range) const
   {
-    FEEvaluation<dim, fe_degree, fe_degree+1, n_components, Number> phi(*Base<dim, Number>::data);
+    FEEvaluation<dim, fe_degree, fe_degree+1, n_components, Number> phi(data);
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
         phi.reinit (cell);

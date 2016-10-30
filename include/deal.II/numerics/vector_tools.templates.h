@@ -988,13 +988,13 @@ namespace VectorTools
 
 
 
-    template <int dim, typename VectorType, int fe_degree, int n_q_points_1d>
+    template <int dim, typename VectorType, int spacedim, int fe_degree, int n_q_points_1d>
     void project_parallel (const MatrixFree<dim,typename VectorType::value_type> &matrix_free,
                            const ConstraintMatrix &constraints,
                            const std_cxx11::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
                            VectorType &vec_result)
     {
-      const DoFHandler<dim> &dof = matrix_free.get_dof_handler();
+      const DoFHandler<dim,spacedim> &dof = matrix_free.get_dof_handler();
 
       typedef typename VectorType::value_type Number;
       Assert (dof.get_fe().n_components() == 1,
@@ -1071,28 +1071,28 @@ namespace VectorTools
     switch (dof.get_fe().degree)
       {
       case 1:
-        project_parallel<dim, VectorType,spacedim,1> (mapping,dof,constraints,quadrature,func,vec_result);
+        project_parallel<dim,VectorType,spacedim,1> (mapping,dof,constraints,quadrature,func,vec_result);
         break;
       case 2:
-        project_parallel<dim, VectorType,spacedim,2> (mapping,dof,constraints,quadrature,func,vec_result);
+        project_parallel<dim,VectorType,spacedim,2> (mapping,dof,constraints,quadrature,func,vec_result);
         break;
       case 3:
-        project_parallel<dim, VectorType,spacedim,3> (mapping,dof,constraints,quadrature,func,vec_result);
+        project_parallel<dim,VectorType,spacedim,3> (mapping,dof,constraints,quadrature,func,vec_result);
         break;
       case 4:
-        project_parallel<dim, VectorType,spacedim,4> (mapping,dof,constraints,quadrature,func,vec_result);
+        project_parallel<dim,VectorType,spacedim,4> (mapping,dof,constraints,quadrature,func,vec_result);
         break;
       case 5:
-        project_parallel<dim, VectorType,spacedim,5> (mapping,dof,constraints,quadrature,func,vec_result);
+        project_parallel<dim,VectorType,spacedim,5> (mapping,dof,constraints,quadrature,func,vec_result);
         break;
       case 6:
-        project_parallel<dim, VectorType,spacedim,6> (mapping,dof,constraints,quadrature,func,vec_result);
+        project_parallel<dim,VectorType,spacedim,6> (mapping,dof,constraints,quadrature,func,vec_result);
         break;
       case 7:
-        project_parallel<dim, VectorType,spacedim,7> (mapping,dof,constraints,quadrature,func,vec_result);
+        project_parallel<dim,VectorType,spacedim,7> (mapping,dof,constraints,quadrature,func,vec_result);
         break;
       case 8:
-        project_parallel<dim, VectorType,spacedim,8> (mapping,dof,constraints,quadrature,func,vec_result);
+        project_parallel<dim,VectorType,spacedim,8> (mapping,dof,constraints,quadrature,func,vec_result);
         break;
       default:
         Assert (false, ExcNotImplemented());
@@ -1108,6 +1108,7 @@ namespace VectorTools
                 const std_cxx11::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
                 VectorType &vec_result)
   {
+    (void) n_q_points_1d;
     const unsigned int fe_degree = matrix_free.get_dof_handler().get_fe().degree;
 
     Assert (fe_degree+1 == n_q_points_1d,
@@ -1116,28 +1117,28 @@ namespace VectorTools
     switch (fe_degree)
       {
       case 1:
-        project_parallel<dim, VectorType,1,2> (matrix_free,constraints,func,vec_result);
+        project_parallel<dim,VectorType,dim,1,2> (matrix_free,constraints,func,vec_result);
         break;
       case 2:
-        project_parallel<dim, VectorType,2,3> (matrix_free,constraints,func,vec_result);
+        project_parallel<dim,VectorType,dim,2,3> (matrix_free,constraints,func,vec_result);
         break;
       case 3:
-        project_parallel<dim, VectorType,3,4> (matrix_free,constraints,func,vec_result);
+        project_parallel<dim,VectorType,dim,3,4> (matrix_free,constraints,func,vec_result);
         break;
       case 4:
-        project_parallel<dim, VectorType,4,5> (matrix_free,constraints,func,vec_result);
+        project_parallel<dim,VectorType,dim,4,5> (matrix_free,constraints,func,vec_result);
         break;
       case 5:
-        project_parallel<dim, VectorType,5,6> (matrix_free,constraints,func,vec_result);
+        project_parallel<dim,VectorType,dim,5,6> (matrix_free,constraints,func,vec_result);
         break;
       case 6:
-        project_parallel<dim, VectorType,6,7> (matrix_free,constraints,func,vec_result);
+        project_parallel<dim,VectorType,dim,6,7> (matrix_free,constraints,func,vec_result);
         break;
       case 7:
-        project_parallel<dim, VectorType,7,8> (matrix_free,constraints,func,vec_result);
+        project_parallel<dim,VectorType,dim,7,8> (matrix_free,constraints,func,vec_result);
         break;
       case 8:
-        project_parallel<dim, VectorType,8,9> (matrix_free,constraints,func,vec_result);
+        project_parallel<dim,VectorType,dim,8,9> (matrix_free,constraints,func,vec_result);
         break;
       default:
         Assert (false, ExcNotImplemented());
