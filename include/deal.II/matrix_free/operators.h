@@ -495,6 +495,7 @@ namespace MatrixFreeOperators
   Base<dim,Number>::el (const unsigned int row,
                         const unsigned int col) const
   {
+    (void)col;
     Assert (row == col, ExcNotImplemented());
     Assert (inverse_diagonal_entries.size() > 0, ExcNotInitialized());
     return 1.0/inverse_diagonal_entries(row);
@@ -815,7 +816,7 @@ namespace MatrixFreeOperators
   template <int dim, int fe_degree, int n_components, typename Number>
   void
   MassOperator<dim, fe_degree, n_components, Number>::
-  local_apply_cell (const MatrixFree<dim,Number>                     &data,
+  local_apply_cell (const MatrixFree<dim,Number>                     &/*data*/,
                     LinearAlgebra::distributed::Vector<Number>       &dst,
                     const LinearAlgebra::distributed::Vector<Number> &src,
                     const std::pair<unsigned int,unsigned int>  &cell_range) const

@@ -1110,6 +1110,7 @@ namespace VectorTools
   {
     const unsigned int fe_degree = matrix_free.get_dof_handler().get_fe().degree;
 
+    (void)n_q_points_1d;
     Assert (fe_degree+1 == n_q_points_1d,
             ExcNotImplemented());
 

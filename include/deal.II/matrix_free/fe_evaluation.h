@@ -2455,6 +2455,8 @@ namespace internal
   void check_vector_compatibility (const LinearAlgebra::distributed::Vector<Number> &vec,
                                    const internal::MatrixFreeFunctions::DoFInfo     &dof_info)
   {
+    (void)vec;
+    (void)dof_info;
     Assert (vec.partitioners_are_compatible(*dof_info.vector_partitioner),
             ExcMessage("The parallel layout of the given vector is not "
                        "compatible with the parallel partitioning in MatrixFree. "
