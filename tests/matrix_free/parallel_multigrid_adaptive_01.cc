@@ -508,7 +508,9 @@ void do_test (const DoFHandler<dim>  &dof)
       smoother_data[level].smoothing_range = 15.;
       smoother_data[level].degree = 5;
       smoother_data[level].eig_cg_n_iterations = 15;
-      smoother_data[level].matrix_diagonal_inverse =
+      smoother_data[level].preconditioner.
+      reset(new DiagonalMatrix<LinearAlgebra::distributed::Vector<number> >());
+      smoother_data[level].preconditioner->get_vector() =
         mg_matrices[level].get_matrix_diagonal_inverse();
     }
   mg_smoother.initialize(mg_matrices, smoother_data);
@@ -530,6 +532,9 @@ void do_test (const DoFHandler<dim>  &dof)
                  preconditioner(dof, mg, mg_transfer);
 
   {
+    // avoid output from inner (coarse-level) solver
+    deallog.depth_file(3);
+
     ReductionControl control(30, 1e-20, 1e-7);
     SolverCG<LinearAlgebra::distributed::Vector<double> > solver(control);
     solver.solve(fine_matrix, sol, in, preconditioner);

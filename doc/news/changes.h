@@ -416,6 +416,21 @@ inconvenience this causes.
  (Daniel Arndt, 2016/10/27)
  </li>
 
+ <li> New: There is a new class DiagonalMatrix which represents a diagonal
+ matrix via a vector. This is useful for representing Jacobi preconditioners
+ with matrix-free methods.
+ <br>
+ (Martin Kronbichler, 2016/10/27)
+ </li>
+
+ <li> New: The class PreconditionChebyshev now offers a third template
+ parameter PreconditionerType that is passed to the preconditioner setup via
+ AdditionalData::preconditioner. This allows using other preconditioners than
+ the default (and previous) selection of a point-Jacobi preconditioner.
+ <br>
+ (Martin Kronbichler, 2016/10/27)
+ </li>
+
  <li> New: Add ArpackSolver::set_shift() to set the shift value in spectral
  transformation.
  <br>

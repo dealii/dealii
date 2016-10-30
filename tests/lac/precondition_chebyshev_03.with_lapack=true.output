@@ -1,0 +1,13 @@
+
+DEAL::Size 4 Unknowns 9
+DEAL::Residual step i=0:   ilu=0.33, cheby=0.08
+DEAL::Residual step i=1:   ilu=0.36, cheby=0.08
+DEAL::Residual step i=2:   ilu=0.17, cheby=0.05
+DEAL::Size 8 Unknowns 49
+DEAL::Residual step i=0:   ilu=1.94, cheby=0.14
+DEAL::Residual step i=1:   ilu=2.15, cheby=0.15
+DEAL::Residual step i=2:   ilu=1.76, cheby=0.15
+DEAL::Size 16 Unknowns 225
+DEAL::Residual step i=0:   ilu=6.15, cheby=0.38
+DEAL::Residual step i=1:   ilu=6.25, cheby=0.40
+DEAL::Residual step i=2:   ilu=5.65, cheby=0.37
