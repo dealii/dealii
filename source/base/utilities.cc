@@ -132,7 +132,7 @@ namespace Utilities
   trim(const std::string &input)
   {
     std::string::size_type left = 0;
-    std::string::size_type right = input.size() - 1;
+    std::string::size_type right = input.size() > 0 ? input.size() - 1 : 0;
 
     for (; left < input.size(); ++left)
       {
