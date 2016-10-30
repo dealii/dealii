@@ -1833,7 +1833,7 @@ namespace internal
     inline
     void
     vector_updates (const ::dealii::Vector<Number> &src,
-                    const DiagonalMatrix<::dealii::Vector<Number> > &jacobi,
+                    const DiagonalMatrix< ::dealii::Vector<Number> > &jacobi,
                     const bool    start_zero,
                     const double  factor1,
                     const double  factor2,
