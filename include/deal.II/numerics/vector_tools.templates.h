@@ -21,6 +21,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/qprojector.h>
+#include <deal.II/distributed/tria_base.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/la_vector.h>
@@ -37,6 +38,9 @@
 #include <deal.II/lac/vector_memory.h>
 #include <deal.II/lac/filtered_matrix.h>
 #include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/matrix_free/matrix_free.h>
+#include <deal.II/matrix_free/operators.h>
+#include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_boundary.h>
@@ -881,7 +885,280 @@ namespace VectorTools
       for (unsigned int i=0; i<vec.size(); ++i)
         vec_result(i) = vec(i);
     }
+
+
+
+    template <int dim, typename VectorType, int spacedim, int fe_degree>
+    void project_parallel (const Mapping<dim, spacedim>   &mapping,
+                           const DoFHandler<dim,spacedim> &dof,
+                           const ConstraintMatrix         &constraints,
+                           const Quadrature<dim>          &quadrature,
+                           const std_cxx11::function< typename VectorType::value_type (const typename DoFHandler<dim, spacedim>::active_cell_iterator &, const unsigned int)> func,
+                           VectorType                     &vec_result)
+    {
+      const parallel::Triangulation<dim,spacedim> *parallel_tria =
+        dynamic_cast<const parallel::Triangulation<dim,spacedim>*>(&dof.get_tria());
+
+      typedef typename VectorType::value_type Number;
+      Assert (dof.get_fe().n_components() == 1,
+              ExcDimensionMismatch(dof.get_fe().n_components(),
+                                   1));
+      Assert (vec_result.size() == dof.n_dofs(),
+              ExcDimensionMismatch (vec_result.size(), dof.n_dofs()));
+      Assert (dof.get_fe().degree == fe_degree,
+              ExcDimensionMismatch(fe_degree, dof.get_fe().degree));
+
+      // set up mass matrix and right hand side
+      typename MatrixFree<dim,Number>::AdditionalData additional_data;
+      additional_data.tasks_parallel_scheme =
+        MatrixFree<dim,Number>::AdditionalData::partition_color;
+      if (parallel_tria !=0)
+        additional_data.mpi_communicator = parallel_tria->get_communicator();
+      additional_data.mapping_update_flags = (update_values | update_JxW_values);
+      MatrixFree<dim, Number> matrix_free;
+      matrix_free.reinit (mapping, dof, constraints,
+                          QGauss<1>(fe_degree+1), additional_data);
+      typedef MatrixFreeOperators::MassOperator<dim, fe_degree, 1, Number> MatrixType;
+      MatrixType mass_matrix;
+      mass_matrix.initialize(matrix_free);
+      mass_matrix.compute_diagonal();
+
+      typedef LinearAlgebra::distributed::Vector<Number> LocalVectorType;
+      LocalVectorType vec, rhs, inhomogeneities;
+      matrix_free.initialize_dof_vector(vec);
+      matrix_free.initialize_dof_vector(rhs);
+      matrix_free.initialize_dof_vector(inhomogeneities);
+      constraints.distribute(inhomogeneities);
+      inhomogeneities*=-1.;
+
+      // assemble right hand side:
+      {
+        FEValues<dim> fe_values (mapping, dof.get_fe(), quadrature,
+                                 update_values | update_JxW_values);
+
+        const unsigned int   dofs_per_cell = dof.get_fe().dofs_per_cell;
+        const unsigned int   n_q_points    = quadrature.size();
+        Vector<Number>       cell_rhs (dofs_per_cell);
+        std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+        typename DoFHandler<dim, spacedim>::active_cell_iterator
+        cell = dof.begin_active(),
+        endc = dof.end();
+        for (; cell!=endc; ++cell)
+          if (cell->is_locally_owned())
+            {
+              cell_rhs = 0;
+              fe_values.reinit (cell);
+              for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+                {
+                  const double val_q = func(cell, q_point);
+                  for (unsigned int i=0; i<dofs_per_cell; ++i)
+                    cell_rhs(i) += (fe_values.shape_value(i,q_point) *
+                                    val_q *
+                                    fe_values.JxW(q_point));
+                }
+
+              cell->get_dof_indices (local_dof_indices);
+              constraints.distribute_local_to_global (cell_rhs,
+                                                      local_dof_indices,
+                                                      rhs);
+            }
+        rhs.compress (VectorOperation::add);
+      }
+
+      mass_matrix.vmult_add(rhs, inhomogeneities);
+
+      //now invert the matrix
+      ReductionControl     control(rhs.size(), 0., 1e-12, false, false);
+      SolverCG<LinearAlgebra::distributed::Vector<Number> > cg(control);
+      typename PreconditionChebyshev<MatrixType, LocalVectorType>::AdditionalData data;
+      data.matrix_diagonal_inverse = mass_matrix.get_matrix_diagonal_inverse();
+      PreconditionChebyshev<MatrixType, LocalVectorType> preconditioner;
+      preconditioner.initialize(mass_matrix, data);
+      cg.solve (mass_matrix, vec, rhs, preconditioner);
+      vec+=inhomogeneities;
+
+      constraints.distribute (vec);
+
+      const IndexSet locally_owned_dofs = dof.locally_owned_dofs();
+      IndexSet::ElementIterator it = locally_owned_dofs.begin();
+      for (; it!=locally_owned_dofs.end(); ++it)
+        vec_result(*it) = vec(*it);
+      vec_result.compress(VectorOperation::insert);
+    }
+
+
+
+    template <int dim, typename VectorType, int fe_degree, int n_q_points_1d>
+    void project_parallel (const MatrixFree<dim,typename VectorType::value_type> &matrix_free,
+                           const ConstraintMatrix &constraints,
+                           const std_cxx11::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
+                           VectorType &vec_result)
+    {
+      const DoFHandler<dim> &dof = matrix_free.get_dof_handler();
+
+      typedef typename VectorType::value_type Number;
+      Assert (dof.get_fe().n_components() == 1,
+              ExcDimensionMismatch(dof.get_fe().n_components(),
+                                   1));
+      Assert (vec_result.size() == dof.n_dofs(),
+              ExcDimensionMismatch (vec_result.size(), dof.n_dofs()));
+      Assert (dof.get_fe().degree == fe_degree,
+              ExcDimensionMismatch(fe_degree, dof.get_fe().degree));
+
+      typedef MatrixFreeOperators::MassOperator<dim, fe_degree, 1, Number> MatrixType;
+      MatrixType mass_matrix;
+      mass_matrix.initialize(matrix_free);
+      mass_matrix.compute_diagonal();
+
+      typedef LinearAlgebra::distributed::Vector<Number> LocalVectorType;
+      LocalVectorType vec, rhs, inhomogeneities;
+      matrix_free.initialize_dof_vector(vec);
+      matrix_free.initialize_dof_vector(rhs);
+      matrix_free.initialize_dof_vector(inhomogeneities);
+      constraints.distribute(inhomogeneities);
+      inhomogeneities*=-1.;
+
+      // assemble right hand side:
+      {
+        FEEvaluation<dim,fe_degree,n_q_points_1d,1,Number> fe_eval(matrix_free);
+        const unsigned int n_cells = matrix_free.n_macro_cells();
+        const unsigned int n_q_points = fe_eval.n_q_points;
+
+        for (unsigned int cell=0; cell<n_cells; ++cell)
+          {
+            fe_eval.reinit(cell);
+            for (unsigned int q= 0; q < n_q_points; ++q)
+              fe_eval.submit_value(func(cell,q), q);
+
+            fe_eval.integrate (true,false);
+            fe_eval.distribute_local_to_global (rhs);
+          }
+        rhs.compress(VectorOperation::add);
+      }
+
+      mass_matrix.vmult_add(rhs, inhomogeneities);
+
+      //now invert the matrix
+      ReductionControl     control(rhs.size(), 0., 1e-12, false, false);
+      SolverCG<LinearAlgebra::distributed::Vector<Number> > cg(control);
+      typename PreconditionChebyshev<MatrixType, LocalVectorType>::AdditionalData data;
+      data.matrix_diagonal_inverse = mass_matrix.get_matrix_diagonal_inverse();
+      PreconditionChebyshev<MatrixType, LocalVectorType> preconditioner;
+      preconditioner.initialize(mass_matrix, data);
+      cg.solve (mass_matrix, vec, rhs, preconditioner);
+      vec+=inhomogeneities;
+
+      constraints.distribute (vec);
+
+      const IndexSet locally_owned_dofs = dof.locally_owned_dofs();
+      IndexSet::ElementIterator it = locally_owned_dofs.begin();
+      for (; it!=locally_owned_dofs.end(); ++it)
+        vec_result(*it) = vec(*it);
+      vec_result.compress(VectorOperation::insert);
+    }
   }
+
+
+
+  template <int dim, typename VectorType, int spacedim>
+  void project (const Mapping<dim, spacedim>   &mapping,
+                const DoFHandler<dim,spacedim> &dof,
+                const ConstraintMatrix         &constraints,
+                const Quadrature<dim>          &quadrature,
+                const std_cxx11::function< typename VectorType::value_type (const typename DoFHandler<dim, spacedim>::active_cell_iterator &, const unsigned int)> func,
+                VectorType                     &vec_result)
+  {
+    switch (dof.get_fe().degree)
+      {
+      case 1:
+        project_parallel<dim, VectorType,spacedim,1> (mapping,dof,constraints,quadrature,func,vec_result);
+        break;
+      case 2:
+        project_parallel<dim, VectorType,spacedim,2> (mapping,dof,constraints,quadrature,func,vec_result);
+        break;
+      case 3:
+        project_parallel<dim, VectorType,spacedim,3> (mapping,dof,constraints,quadrature,func,vec_result);
+        break;
+      case 4:
+        project_parallel<dim, VectorType,spacedim,4> (mapping,dof,constraints,quadrature,func,vec_result);
+        break;
+      case 5:
+        project_parallel<dim, VectorType,spacedim,5> (mapping,dof,constraints,quadrature,func,vec_result);
+        break;
+      case 6:
+        project_parallel<dim, VectorType,spacedim,6> (mapping,dof,constraints,quadrature,func,vec_result);
+        break;
+      case 7:
+        project_parallel<dim, VectorType,spacedim,7> (mapping,dof,constraints,quadrature,func,vec_result);
+        break;
+      case 8:
+        project_parallel<dim, VectorType,spacedim,8> (mapping,dof,constraints,quadrature,func,vec_result);
+        break;
+      default:
+        Assert (false, ExcNotImplemented());
+      }
+  }
+
+
+
+  template <int dim, typename VectorType>
+  void project (const MatrixFree<dim,typename VectorType::value_type> &matrix_free,
+                const ConstraintMatrix &constraints,
+                const unsigned int n_q_points_1d,
+                const std_cxx11::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
+                VectorType &vec_result)
+  {
+    const unsigned int fe_degree = matrix_free.get_dof_handler().get_fe().degree;
+
+    Assert (fe_degree+1 == n_q_points_1d,
+            ExcNotImplemented());
+
+    switch (fe_degree)
+      {
+      case 1:
+        project_parallel<dim, VectorType,1,2> (matrix_free,constraints,func,vec_result);
+        break;
+      case 2:
+        project_parallel<dim, VectorType,2,3> (matrix_free,constraints,func,vec_result);
+        break;
+      case 3:
+        project_parallel<dim, VectorType,3,4> (matrix_free,constraints,func,vec_result);
+        break;
+      case 4:
+        project_parallel<dim, VectorType,4,5> (matrix_free,constraints,func,vec_result);
+        break;
+      case 5:
+        project_parallel<dim, VectorType,5,6> (matrix_free,constraints,func,vec_result);
+        break;
+      case 6:
+        project_parallel<dim, VectorType,6,7> (matrix_free,constraints,func,vec_result);
+        break;
+      case 7:
+        project_parallel<dim, VectorType,7,8> (matrix_free,constraints,func,vec_result);
+        break;
+      case 8:
+        project_parallel<dim, VectorType,8,9> (matrix_free,constraints,func,vec_result);
+        break;
+      default:
+        Assert (false, ExcNotImplemented());
+      }
+  }
+
+
+
+  template <int dim, typename VectorType>
+  void project (const MatrixFree<dim,typename VectorType::value_type> &matrix_free,
+                const ConstraintMatrix &constraints,
+                const std_cxx11::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
+                VectorType &vec_result)
+  {
+    project (matrix_free,
+             constraints,
+             matrix_free.get_dof_handler().get_fe().degree+1,
+             func,
+             vec_result);
+  }
+
 
 
   template <int dim, typename VectorType, int spacedim>

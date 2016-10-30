@@ -21,6 +21,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/std_cxx11/function.h>
 #include <deal.II/dofs/function_map.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/hp/dof_handler.h>
@@ -35,6 +36,7 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, typename Number> class Function;
 template <int dim> class Quadrature;
 template <int dim> class QGauss;
+template <int dim, typename number> class MatrixFree;
 
 template <typename number> class Vector;
 template <typename number> class FullMatrix;
@@ -855,6 +857,71 @@ namespace VectorTools
                     QGauss<dim-1>(2) :
                     Quadrature<dim-1>(0)),
                 const bool                          project_to_boundary_first = false);
+
+  /**
+   * The same as above for projection of scalar-valued quadrature data.
+   * The user provided function should return a value at the quadrature point
+   * based on the cell iterator and quadrature number and of course should be
+   * consistent with the provided @p quadrature object, which will be used
+   * to assemble the right-hand-side.
+   *
+   * This function can be used with lambdas:
+   * @code
+   * VectorTools::project
+   * (mapping,
+   *  dof_handler,
+   *  constraints,
+   *  quadrature_formula,
+   *  [=] (const typename DoFHandler<dim>::active_cell_iterator & cell, const unsigned int q) -> double
+   *  { return qp_data.get_data(cell)[q]->density; },
+   *  field);
+   * @endcode
+   * where <code>qp_data</code> is a CellDataStorage object, which stores
+   * quadrature point data.
+   */
+  template <int dim, typename VectorType, int spacedim>
+  void project (const Mapping<dim, spacedim>   &mapping,
+                const DoFHandler<dim,spacedim> &dof,
+                const ConstraintMatrix         &constraints,
+                const Quadrature<dim>          &quadrature,
+                const std_cxx11::function< typename VectorType::value_type (const typename DoFHandler<dim, spacedim>::active_cell_iterator &, const unsigned int)> func,
+                VectorType                     &vec_result);
+
+  /**
+   * The same as above for projection of scalar-valued MatrixFree quadrature
+   * data.
+   * The user provided function @p func should return a VectorizedArray value
+   * at the quadrature point based on the cell number and quadrature number and
+   * should be consistent with the @p n_q_points_1d.
+   *
+   * This function can be used with lambdas:
+   * @code
+   * VectorTools::project
+   * (matrix_free_data,
+   *  constraints,
+   *  3,
+   *  [=] (const unsigned int cell, const unsigned int q) -> VectorizedArray<double>
+   *  { return qp_data(cell,q); },
+   *  field);
+   * @endcode
+   * where <code>qp_data</code> is a an object of type Table<2, VectorizedArray<double> >,
+   * which stores quadrature point data.
+   */
+  template <int dim, typename VectorType>
+  void project (const MatrixFree<dim,typename VectorType::value_type> &data,
+                const ConstraintMatrix &constraints,
+                const unsigned int n_q_points_1d,
+                const std_cxx11::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
+                VectorType &vec_result);
+
+  /**
+   * Same as above but for <code>n_q_points_1d = matrix_free.get_dof_handler().get_fe().degree+1</code>.
+   */
+  template <int dim, typename VectorType>
+  void project (const MatrixFree<dim,typename VectorType::value_type> &data,
+                const ConstraintMatrix &constraints,
+                const std_cxx11::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
+                VectorType &vec_result);
 
   /**
    * Compute Dirichlet boundary conditions.  This function makes up a map of
