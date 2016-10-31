@@ -220,14 +220,14 @@ public:
 
   /**
    * Return the dimension of the codomain (or range) space. It calls the
-   * inherited SparseMatrix::m() function. To remember: the matrix is of
+   * inherited SparseMatrix::m() function. Note that the matrix is of
    * dimension $m \times n$.
    */
   size_type m () const;
 
   /**
    * Return the dimension of the domain space. It calls the  inherited
-   * SparseMatrix::n() function. To remember: the matrix is of dimension $m
+   * SparseMatrix::n() function. Note that the matrix is of dimension $m
    * \times n$.
    */
   size_type n () const;

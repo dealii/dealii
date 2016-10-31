@@ -189,13 +189,13 @@ public:
                const BlockVector<double> &src) const;
 
   /**
-   * Return the dimension of the codomain (or range) space. To remember: the
+   * Return the dimension of the codomain (or range) space. Note that the
    * matrix is of dimension $m \times n$.
    */
   size_type m () const;
 
   /**
-   * Return the dimension of the domain space. To remember: the matrix is of
+   * Return the dimension of the domain space. Note that the matrix is of
    * dimension $m \times n$.
    */
   size_type n () const;
