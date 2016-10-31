@@ -143,7 +143,14 @@ public:
   virtual void Tvmult (VectorType &dst, const VectorType &src) const;
 
   /**
-   * Get the names of all implemented preconditionings.
+   * Get the names of all implemented preconditionings. The list of possible
+   * options includes:
+   * <ul>
+   * <li>  "none" </li>
+   * <li>  "jacobi" </li>
+   * <li>  "sor" </li>
+   * <li>  "ssor" </li>
+   * </ul>
    */
   static std::string get_precondition_names();
 
