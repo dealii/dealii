@@ -30,9 +30,30 @@ DataPostprocessor<dim>::~DataPostprocessor()
 template <int dim>
 void
 DataPostprocessor<dim>::
-compute_derived_quantities_scalar (const std::vector<double>         &/*uh*/,
-                                   const std::vector<Tensor<1,dim> > &/*duh*/,
-                                   const std::vector<Tensor<2,dim> > &/*dduh*/,
+compute_derived_quantities_scalar (const DataPostprocessorInputs::Scalar<dim> &inputs,
+                                   std::vector<Vector<double> >               &computed_quantities) const
+{
+  // for backward compatibility, call the old function.
+  // this also requires converting the accidental use
+  // of Point<dim> for normal vectors
+  std::vector<Point<dim> > normals (inputs.normals.begin(),
+                                    inputs.normals.end());
+  compute_derived_quantities_scalar(inputs.solution_values,
+                                    inputs.solution_gradients,
+                                    inputs.solution_hessians,
+                                    normals,
+                                    inputs.evaluation_points,
+                                    computed_quantities);
+}
+
+
+
+template <int dim>
+void
+DataPostprocessor<dim>::
+compute_derived_quantities_scalar (const std::vector<double>         &/*solution_values*/,
+                                   const std::vector<Tensor<1,dim> > &/*solution_gradients*/,
+                                   const std::vector<Tensor<2,dim> > &/*solution_hessians*/,
                                    const std::vector<Point<dim> >    &/*normals*/,
                                    const std::vector<Point<dim> >    &/*evaluation_points*/,
                                    std::vector<Vector<double> >      &computed_quantities) const
@@ -46,9 +67,30 @@ compute_derived_quantities_scalar (const std::vector<double>         &/*uh*/,
 template <int dim>
 void
 DataPostprocessor<dim>::
-compute_derived_quantities_vector (const std::vector<Vector<double> > &/*uh*/,
-                                   const std::vector<std::vector<Tensor<1,dim> > > &/*duh*/,
-                                   const std::vector<std::vector<Tensor<2,dim> > > &/*dduh*/,
+compute_derived_quantities_vector (const DataPostprocessorInputs::Vector<dim> &inputs,
+                                   std::vector<Vector<double> >               &computed_quantities) const
+{
+  // for backward compatibility, call the old function.
+  // this also requires converting the accidental use
+  // of Point<dim> for normal vectors
+  std::vector<Point<dim> > normals (inputs.normals.begin(),
+                                    inputs.normals.end());
+  compute_derived_quantities_vector(inputs.solution_values,
+                                    inputs.solution_gradients,
+                                    inputs.solution_hessians,
+                                    normals,
+                                    inputs.evaluation_points,
+                                    computed_quantities);
+}
+
+
+
+template <int dim>
+void
+DataPostprocessor<dim>::
+compute_derived_quantities_vector (const std::vector<Vector<double> > &/*solution_values*/,
+                                   const std::vector<std::vector<Tensor<1,dim> > > &/*solution_gradients*/,
+                                   const std::vector<std::vector<Tensor<2,dim> > > &/*solution_hessians*/,
                                    const std::vector<Point<dim> >                  &/*normals*/,
                                    const std::vector<Point<dim> >                  &/*evaluation_points*/,
                                    std::vector<Vector<double> >                    &computed_quantities) const

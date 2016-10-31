@@ -45,7 +45,6 @@ namespace internal
                     const std::vector<std_cxx11::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
                     const UpdateFlags update_flags);
 
-      std::vector<Point<dim> > patch_normals;
       std::vector<Point<spacedim> > patch_evaluation_points;
     };
   }
