@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2015 by the deal.II authors
+// Copyright (C) 2000 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -139,20 +139,16 @@ public:
 
   virtual
   void
-  compute_derived_quantities_vector (const std::vector<Vector<double> >              &solution_values,
-                                     const std::vector<std::vector<Tensor<1,dim> > > &,
-                                     const std::vector<std::vector<Tensor<2,dim> > > &,
-                                     const std::vector<Point<dim> > &,
-                                     const std::vector<Point<dim> > &,
+  compute_derived_quantities_vector (const DataPostprocessorInputs::Vector<dim> &input_data,
                                      std::vector<Vector<double> >                    &computed_quantities) const
   {
-    for (unsigned int q=0; q<solution_values.size(); ++q)
+    for (unsigned int q=0; q<input_data.solution_values.size(); ++q)
       {
         Assert (computed_quantities[q].size() == dim,
                 ExcInternalError());
 
         for (unsigned int d=0; d<dim; ++d)
-          computed_quantities[q](d) = solution_values[q](0)*solution_values[q](0) + solution_values[q](1)*solution_values[q](1);
+          computed_quantities[q](d) = input_data.solution_values[q](0)*input_data.solution_values[q](0) + input_data.solution_values[q](1)*input_data.solution_values[q](1);
         AssertThrow (std::fabs(computed_quantities[q](0)-1) < 1e-12,
                      ExcInternalError());
       }
