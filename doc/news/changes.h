@@ -215,6 +215,28 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li> Improved: The way DataPostprocessor receives its input has been updated.
+    <br>
+    In the past, the two functions we use to postprocess data got lists of arguments
+    for the solution, its derivatives, the evaluation points, and normal vectors.
+    This is not flexible enough: We can not easily add other information that
+    we have needed in the past or that users have requested, such as a pointer
+    to the cell we're currently on, or the material-id of the cell.
+    <br>
+    Rather than adding each possible argument anyone may want to use
+    individually to the list of the postprocessor function arguments, the
+    existing functions have been deprecated in favor of a new set of
+    functions that
+    take a reference to a structure that contains these individual pieces
+    of information. We can extend the members of these structures without
+    backward compatibility issues because the functions still get a
+    reference to the same structure, we just grow the structure
+    itself. Functions that never used the new members of the structure
+    will continue to work as they always did.
+ <br>
+ (Wolfgang Bangerth, 2016/10/31)
+ </li>
+
  <li> Improved: The code in class GridReordering has been rewritten from
  scratch. It now follows the algorithm described in the paper by
  Agelek, Anderson, Bangerth and Barth mentioned in the documentation
