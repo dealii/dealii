@@ -172,7 +172,16 @@ public:
                 ::AdditionalData &data);
 
   /**
-   * Get the names of all implemented solvers.
+   * Get the names of all implemented solvers. The list of possible
+   * options includes:
+   * <ul>
+   * <li>  "richardson" </li>
+   * <li>  "cg" </li>
+   * <li>  "bicgstab" </li>
+   * <li>  "gmres" </li>
+   * <li>  "fgmres" </li>
+   * <li>  "minres" </li>
+   * </ul>
    */
   static std::string get_solver_names ();
 
