@@ -853,8 +853,26 @@ private:
  * eigenvalues of the preconditioned matrix system and the degree (i.e.,
  * number of iterations) is high enough, this class can also be used as a
  * direct solver. For an error estimation of the Chebyshev iteration that can
- * be used to determine the number of iteration, see e.g. section 5.1 of
- * R. S. Varga, Matrix iterative analysis, 2nd ed., Springer, 2009.
+ * be used to determine the number of iteration, see Varga (2009).
+ *
+ * In order to use Chebyshev as a solver, set the degree to
+ * numbers::invalid_unsigned_int to force the automatic computation of the
+ * number of iterations needed to reach a given target tolerance. In this
+ * case, the target tolerance is read from the variable
+ * PreconditionChebyshev::AdditionalData::smoothing_range (it needs to be a
+ * number less than one to force any iterations obviously).
+ *
+ * For details on the algorithm, see section 5.1 of
+ * @code{.bib}
+ @Book{Varga2009,
+   Title       = {Matrix iterative analysis},
+   Author      = {Varga, R. S.},
+   Publisher   = {Springer},
+   Address     = {Berlin},
+   Edition     = {2nd},
+   Year        = {2009},
+ }
+ * @endcode
  *
  * <h4>Requirements on the templated classes</h4>
  *
@@ -870,8 +888,10 @@ private:
  * matrix must provide <tt>el(i,i)</tt> methods for accessing the matrix
  * diagonal in case the preconditioner type is a diagonal matrix. Even though
  * it is highly recommended to pass the inverse diagonal entries inside a
- * separate preconditioner object for implementing the Jacobi method (and the
- * only possibility when computing in %parallel with MPI), there is a backward
+ * separate preconditioner object for implementing the Jacobi method (which is
+ * the only possible way to operate this class when computing in %parallel
+ * with MPI because there is no knowledge about the locally stored range of
+ * entries that would be needed from the matrix alone), there is a backward
  * compatibility function that can extract the diagonal in case of a serial
  * computation.
  *
@@ -911,19 +931,24 @@ public:
      * the polynomial gives the number of matrix-vector products to be
      * performed for one application of the vmult() operation. Degree zero
      * corresponds to a damped Jacobi method.
+     *
+     * If the degree is set to numbers::invalid_unsigned_int, the algorithm
+     * will automatically determine the number of necessary iterations based
+     * on the usual Chebyshev error formula as mentioned in the discussion of
+     * the main class.
      */
     unsigned int degree;
 
     /**
      * This sets the range between the largest eigenvalue in the matrix and
-     * the smallest eigenvalue to be treated. If the parameter is zero, an
-     * estimate for the largest and for the smallest eigenvalue will be
-     * calculated internally. Otherwise, the Chebyshev polynomial will act in
-     * the interval $[\lambda_\mathrm{max}/ \tt{smoothing\_range},
-     * \lambda_\mathrm{max}]$, where $\lambda_\mathrm{max}$ is an estimate of
-     * the maximum eigenvalue of the matrix. A choice of
-     * <tt>smoothing_range</tt> between 5 and 20 is useful in case the
-     * preconditioner is used as a smoother in multigrid.
+     * the smallest eigenvalue to be treated. If the parameter is set to a
+     * number less than 1, an estimate for the largest and for the smallest
+     * eigenvalue will be calculated internally. For a smoothing range larger
+     * than one, the Chebyshev polynomial will act in the interval
+     * $[\lambda_\mathrm{max}/ \tt{smoothing\_range}, \lambda_\mathrm{max}]$,
+     * where $\lambda_\mathrm{max}$ is an estimate of the maximum eigenvalue
+     * of the matrix. A choice of <tt>smoothing_range</tt> between 5 and 20 is
+     * useful in case the preconditioner is used as a smoother in multigrid.
      */
     double smoothing_range;
 
@@ -2035,14 +2060,11 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::estimate_eigenv
                                                       &eigenvalue_tracker,
                                                       std_cxx11::_1));
 
-      // catch case the rhs vector is exactly zero (no eigenvalue estimate
-      // possible) by setting a different initial guess
-      if (update2 * update2 == typename VectorType::value_type())
-        {
-          update2 = 1.;
-          if (update2.locally_owned_elements().is_element(0))
-            update2(0) = 0.;
-        }
+      // set an initial guess which is close to the constant vector but where
+      // one entry is different to trigger high frequencies
+      update2 = 1.;
+      if (update2.locally_owned_elements().is_element(0))
+        update2(0) = 0.;
 
       try
         {
@@ -2059,8 +2081,8 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::estimate_eigenv
         {
           min_eigenvalue = eigenvalue_tracker.values.front();
 
-          // include a safety factor since the CG method will in general not be
-          // converged
+          // include a safety factor since the CG method will in general not
+          // be converged
           max_eigenvalue = 1.2*eigenvalue_tracker.values.back();
         }
     }
@@ -2073,6 +2095,21 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::estimate_eigenv
   const double alpha = (data.smoothing_range > 1. ?
                         max_eigenvalue / data.smoothing_range :
                         std::min(0.9*max_eigenvalue, min_eigenvalue));
+
+  // in case the user set the degree to invalid unsigned int, we have to
+  // determine the number of necessary iterations from the Chebyshev error
+  // estimate, given the target tolerance specified by smoothing_range. This
+  // estimate is based on the error formula given in section 5.1 of
+  // R. S. Varga, Matrix iterative analysis, 2nd ed., Springer, 2009
+  if (data.degree == numbers::invalid_unsigned_int)
+    {
+      const double actual_range = max_eigenvalue / alpha;
+      const double sigma = (1.-std::sqrt(1./actual_range))/(1.+std::sqrt(1./actual_range));
+      const double eps = data.smoothing_range;
+      const_cast<PreconditionChebyshev<MatrixType,VectorType,PreconditionerType> *>(this)->data.degree
+        = 1+std::log(1./eps+std::sqrt(1./eps/eps-1))/std::log(1./sigma);
+    }
+
   const_cast<PreconditionChebyshev<MatrixType,VectorType,PreconditionerType> *>(this)->delta = (max_eigenvalue-alpha)*0.5;
   const_cast<PreconditionChebyshev<MatrixType,VectorType,PreconditionerType> *>(this)->theta = (max_eigenvalue+alpha)*0.5;
 
