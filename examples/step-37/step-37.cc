@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2015 by the deal.II authors
+ * Copyright (C) 2009 - 2016 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -14,7 +14,8 @@
  * ---------------------------------------------------------------------
 
  *
- * Authors: Katharina Kormann, Martin Kronbichler, Uppsala University, 2009-2012
+ * Authors: Katharina Kormann, Martin Kronbichler, Uppsala University,
+ * 2009-2012, updated to MPI version with parallel vectors in 2016
  */
 
 
@@ -24,9 +25,9 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/timer.h>
 
-#include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/precondition.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -39,7 +40,7 @@
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/multigrid/multigrid.h>
-#include <deal.II/multigrid/mg_transfer.h>
+#include <deal.II/multigrid/mg_transfer_matrix_free.h>
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_coarse.h>
 #include <deal.II/multigrid/mg_smoother.h>
@@ -52,6 +53,7 @@
 // matrix-free methods or more generic finite element operators with the class
 // MatrixFree.
 #include <deal.II/matrix_free/matrix_free.h>
+#include <deal.II/matrix_free/operators.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
 
 #include <iostream>
@@ -113,14 +115,14 @@ namespace Step37
   // introduction that holds data from several cells. For example, we evaluate
   // the coefficient shown here not on a simple point as usually done, but we
   // hand it a Point<dim,VectorizedArray<double> > point, which is actually a
-  // collection of two points in the case of SSE2. Do not confuse the entries
-  // in VectorizedArray<double> with the different coordinates of the
-  // point. Indeed, the data is laid out such that <code>p[0]</code> returns a
-  // VectorizedArray<double>, which in turn contains the x-coordinate for the
-  // first point and the second point. You may access the coordinates
-  // individually using e.g. <code>p[0][j]</code>, j=0,1, but it is
-  // recommended to define operations on a VectorizedArray as much as possible
-  // in order to make use of vectorized operations.
+  // collection of four points in the case of AVX. Do not confuse the entries
+  // in VectorizedArray with the different coordinates of the point. Indeed,
+  // the data is laid out such that <code>p[0]</code> returns a
+  // VectorizedArray, which in turn contains the x-coordinate for the first
+  // point and the second point. You may access the coordinates individually
+  // using e.g. <code>p[0][j]</code>, j=0,1,2,3, but it is recommended to
+  // define operations on a VectorizedArray as much as possible in order to
+  // make use of vectorized operations.
   //
   // In the function implementation, we assume that the number type overloads
   // basic arithmetic operations, so we just write the code as usual. The
@@ -168,156 +170,109 @@ namespace Step37
   // The following class, called <code>LaplaceOperator</code>, implements the
   // differential operator. For all practical purposes, it is a matrix, i.e.,
   // you can ask it for its size (member functions <code>m(), n()</code>) and
-  // you can apply it to a vector (the various variants of the
-  // <code>vmult()</code> function). The difference to a real matrix of course
-  // lies in the fact that this class doesn't actually store the
-  // <i>elements</i> of the matrix, but only knows how to compute the action
-  // of the operator when applied to a vector.
-
-  // In this program, we want to make use of the data cache for finite element
-  // operator application that is integrated in deal.II. The main class that
-  // collects all data is called MatrixFree. It contains mapping information
-  // (Jacobians) and index relations between local and global degrees of
-  // freedom. It also contains constraints like the ones from Dirichlet
-  // boundary conditions (or hanging nodes, if we had any). Moreover, it can
-  // issue a loop over all cells in %parallel, where it makes sure that only
-  // cells are worked on that do not share any degree of freedom (this makes
-  // the loop thread-safe when writing into destination vectors). This is a
-  // more advanced strategy compared to the WorkStream class described in the
-  // @ref threads module that serializes operations that might not be
-  // thread-safe. Of course, to not destroy thread-safety, we have to be
-  // careful when writing into class-global structures.
+  // you can apply it to a vector (the <code>vmult()</code> function). The
+  // difference to a real matrix of course lies in the fact that this class
+  // does not actually store the <i>elements</i> of the matrix, but only knows
+  // how to compute the action of the operator when applied to a vector.
   //
-  // First comes the implementation of the matrix-free class. It provides some
-  // standard information we expect for matrices (like returning the
-  // dimensions of the matrix), it implements matrix-vector multiplications in
-  // several forms (transposed and untransposed), and it provides functions
-  // for initializing the structure with data. The class has three template
-  // arguments, one for the dimension (as many deal.II classes carry), one for
-  // the degree of the finite element (which we need to enable efficient
-  // computations through the FEEvaluation class), and one for the underlying
-  // scalar type. We want to use <code>double</code> numbers (i.e., double
-  // precision, 64-bit floating point) for the final matrix, but floats
-  // (single precision, 32-bit floating point numbers) for the multigrid level
-  // matrices (as that is only a preconditioner, and floats can be worked with
+  // The infrastructure describing the matrix size, the initialization from a
+  // MatrixFree object, and the various interfaces to matrix-vector products
+  // through vmult() and Tvmult() methods, is provided by the class
+  // MatrixFreeOperator::Base from which this class derives. The
+  // LaplaceOperator class defined here only has to provide a few interfaces,
+  // namely the actual action of the operator through the apply_add() method
+  // that gets used in the vmult() functions, and a method to compute the
+  // diagonal entries of the underlying matrix. We need the diagonal for the
+  // definition of the multigrid smoother. Since we consider a problem with
+  // variable coefficient, we further implement a method that can fill the
+  // coefficiient values.
+  //
+  // This program makes use of the data cache for finite element operator
+  // application that is integrated in deal.II. This data cache class is
+  // called MatrixFree. It contains mapping information (Jacobians) and index
+  // relations between local and global degrees of freedom. It also contains
+  // constraints like the ones from hanging nodes or Dirichlet boundary
+  // conditions. Moreover, it can issue a loop over all cells in %parallel,
+  // making sure that only cells are worked on that do not share any degree of
+  // freedom (this makes the loop thread-safe when writing into destination
+  // vectors). This is a more advanced strategy compared to the WorkStream
+  // class described in the @ref threads module. Of course, to not destroy
+  // thread-safety, we have to be careful when writing into class-global
+  // structures.
+  //
+  // The class implementing the Laplace operator has three template arguments,
+  // one for the dimension (as many deal.II classes carry), one for the degree
+  // of the finite element (which we need to enable efficient computations
+  // through the FEEvaluation class), and one for the underlying scalar
+  // type. We want to use <code>double</code> numbers (i.e., double precision,
+  // 64-bit floating point) for the final matrix, but floats (single
+  // precision, 32-bit floating point numbers) for the multigrid level
+  // matrices (as that is only a preconditioner, and floats can be processed
   // twice as fast).
-  //
-  // In this class, we store the actual MatrixFree object, the variable
-  // coefficient that is evaluated at all quadrature points (so that we don't
-  // have to recompute it during matrix-vector products), and a vector that
-  // contains the diagonal of the matrix that we need for the multigrid
-  // smoother. We choose to let the user provide the diagonal in this program,
-  // but we could also integrate a function in this class to evaluate the
-  // diagonal. Unfortunately, this forces us to define matrix entries at two
-  // places, once when we evaluate the product and once for the diagonal, but
-  // the work is still much less than when we compute sparse matrices.
   //
   // As a sidenote, if we implemented several different operations on the same
   // grid and degrees of freedom (like a mass matrix and a Laplace matrix), we
-  // would have to have two classes like the current one for each of the
-  // operators (maybe with a common base class). However, in that case, we
-  // would not store a MatrixFree object in this class to avoid doing the
-  // expensive work of precomputing everything MatrixFree stores
-  // twice. Rather, we would keep this object in the main class and simply
-  // store a reference.
+  // would define two classes like the current one for each of the operators
+  // (maybe with a common base class), and let both of them refer to the same
+  // MatrixFree data cache from the general problem class. The interface
+  // through MatrixFreeOperators::Base requires us to only provide a minimal
+  // set of functions. This concept allows for writing complex application
+  // codes with many matrix-free apply operations.
   //
-  // @note Note that storing values of type
-  // <code>VectorizedArray<number></code> requires care: Here, we use the
-  // deal.II table class which is prepared to hold the data with correct
-  // alignment. However, storing it in e.g.
+  // @note Storing values of type <code>VectorizedArray<number></code>
+  // requires care: Here, we use the deal.II table class which is prepared to
+  // hold the data with correct alignment. However, storing e.g. an
   // <code>std::vector<VectorizedArray<number> ></code> is not possible with
   // vectorization: A certain alignment of the data with the memory address
-  // boundaries is required (essentially, a VectorizedArray of 16 bytes length
-  // as in SSE needs to start at a memory address that is divisible by
-  // 16). The table class (as well as the AlignedVector class it is based on)
-  // makes sure that this alignment is respected, whereas std::vector can in
-  // general not, which may lead to segmentation faults at strange places for
-  // some systems or suboptimal performance for other systems.
+  // boundaries is required (essentially, a VectorizedArray that is 32 bytes
+  // long in case of AVX needs to start at a memory address that is divisible
+  // by 32). The table class (as well as the AlignedVector class it is based
+  // on) makes sure that this alignment is respected, whereas std::vector does
+  // not in general, which may lead to segmentation faults at strange places
+  // for some systems or suboptimal performance for other systems.
   template <int dim, int fe_degree, typename number>
-  class LaplaceOperator : public Subscriptor
+  class LaplaceOperator : public MatrixFreeOperators::Base<dim,number>
   {
   public:
+    typedef number value_type;
+
     LaplaceOperator ();
 
     void clear();
 
-    void reinit (const DoFHandler<dim>  &dof_handler,
-                 const ConstraintMatrix  &constraints,
-                 const unsigned int      level = numbers::invalid_unsigned_int);
+    void evaluate_coefficient(const Coefficient<dim> &coefficient_function);
 
-    unsigned int m () const;
-    unsigned int n () const;
-
-    void vmult (Vector<double> &dst,
-                const Vector<double> &src) const;
-    void Tvmult (Vector<double> &dst,
-                 const Vector<double> &src) const;
-    void vmult_add (Vector<double> &dst,
-                    const Vector<double> &src) const;
-    void Tvmult_add (Vector<double> &dst,
-                     const Vector<double> &src) const;
-
-    number el (const unsigned int row,
-               const unsigned int col) const;
-    void set_diagonal (const Vector<number> &diagonal);
-
-    std::size_t memory_consumption () const;
+    virtual void compute_diagonal();
 
   private:
-    void local_apply (const MatrixFree<dim,number>    &data,
-                      Vector<double>                      &dst,
-                      const Vector<double>                &src,
-                      const std::pair<unsigned int,unsigned int> &cell_range) const;
+    virtual void apply_add(LinearAlgebra::distributed::Vector<number> &dst,
+                           const LinearAlgebra::distributed::Vector<number> &src) const;
 
-    void evaluate_coefficient(const Coefficient<dim> &function);
+    void local_apply (const MatrixFree<dim,number>                     &data,
+                      LinearAlgebra::distributed::Vector<number>       &dst,
+                      const LinearAlgebra::distributed::Vector<number> &src,
+                      const std::pair<unsigned int,unsigned int>       &cell_range) const;
 
-    MatrixFree<dim,number>      data;
+    void local_compute_diagonal (const MatrixFree<dim,number>                     &data,
+                                 LinearAlgebra::distributed::Vector<number>       &dst,
+                                 const unsigned int                               &dummy,
+                                 const std::pair<unsigned int,unsigned int>       &cell_range) const;
+
     Table<2, VectorizedArray<number> > coefficient;
-
-    Vector<number>  diagonal_values;
-    bool            diagonal_is_available;
   };
 
 
 
   // This is the constructor of the @p LaplaceOperator class. All it does is
-  // to subscribe to the general deal.II @p Subscriptor scheme that makes sure
-  // that we do not delete an object of this class as long as it used
-  // somewhere else, e.g. in a preconditioner.
+  // to call the default constructor of the base class
+  // MatrixFreeOperators::Base, which in turn is based on the Subscriptor
+  // class that asserts that this class cannot go out of scope while still in
+  // use in e.g. a preconditioner.
   template <int dim, int fe_degree, typename number>
   LaplaceOperator<dim,fe_degree,number>::LaplaceOperator ()
     :
-    Subscriptor()
+    MatrixFreeOperators::Base<dim, number>()
   {}
-
-
-
-  // The next functions return the number of rows and columns of the global
-  // matrix (i.e. the dimensions of the operator this class represents, the
-  // point of this tutorial program was, after all, that we don't actually
-  // store the elements of the rows and columns of this operator). Since the
-  // matrix is square, the returned numbers are the same. We get the number
-  // from the vector partitioner stored in the data field (a partitioner
-  // distributes elements of a vector onto a number of different machines if
-  // programs are run in %parallel; since this program is written to run on
-  // only a single machine, the partitioner will simply say that all elements
-  // of the vector -- or, in the current case, all rows and columns of a
-  // matrix -- are stored on the current machine).
-  template <int dim, int fe_degree, typename number>
-  unsigned int
-  LaplaceOperator<dim,fe_degree,number>::m () const
-  {
-    return data.get_vector_partitioner()->size();
-  }
-
-
-
-  template <int dim, int fe_degree, typename number>
-  unsigned int
-  LaplaceOperator<dim,fe_degree,number>::n () const
-  {
-    return data.get_vector_partitioner()->size();
-  }
 
 
 
@@ -325,40 +280,14 @@ namespace Step37
   void
   LaplaceOperator<dim,fe_degree,number>::clear ()
   {
-    data.clear();
-    diagonal_is_available = false;
-    diagonal_values.reinit(0);
+    coefficient.reinit(0, 0);
+    MatrixFreeOperators::Base<dim,number>::clear();
   }
 
 
-  // @sect4{Initialization}
 
-  // Once we have created the multigrid dof_handler and the constraints, we
-  // can call the reinit function for each level of the multigrid routine
-  // (and the active cells). The main purpose of the reinit function is to
-  // setup the <code> MatrixFree </code> instance for the problem. Also, the
-  // coefficient is evaluated. For this, we need to activate the update flag
-  // in the AdditionalData field of MatrixFree that enables the storage of
-  // quadrature point coordinates in real space (by default, it only caches
-  // data for gradients (inverse transposed Jacobians) and JxW values). Note
-  // that if we call the reinit function without specifying the level (i.e.,
-  // giving <code>level = numbers::invalid_unsigned_int</code>), we have told
-  // the class to loop over the active cells.
-  //
-  // We also set one option regarding task parallelism. We choose to use the
-  // @p partition_color strategy, which is based on subdivision of cells into
-  // partitions where cells in partition $k$ (or, more precisely, the degrees
-  // of freedom on these cells) only interact with cells in partitions $k-1$,
-  // $k$, and $k+1$. Within each partition, cells are colored in such a way
-  // that cells with the same color do not share degrees of freedom and can,
-  // therefore, be worked on at the same time without interference. This
-  // determines a task dependency graph that is scheduled by the Intel
-  // Threading Building Blocks library. Another option would be the strategy
-  // @p partition_partition, which performs better when the grid is more
-  // unstructured. We could also manually set the size of chunks that form one
-  // task in the scheduling process by setting @p tasks_block_size, but the
-  // default strategy to let the function decide works well already.
-  //
+  // @sect4{Computation of coefficient}
+
   // To initialize the coefficient, we directly give it the Coefficient class
   // defined above and then select the method
   // <code>coefficient_function.value</code> with vectorized number (which the
@@ -366,30 +295,12 @@ namespace Step37
   // FEEvaluation class (and its template arguments) will be explained below.
   template <int dim, int fe_degree, typename number>
   void
-  LaplaceOperator<dim,fe_degree,number>::reinit (const DoFHandler<dim>  &dof_handler,
-                                                 const ConstraintMatrix  &constraints,
-                                                 const unsigned int      level)
-  {
-    typename MatrixFree<dim,number>::AdditionalData additional_data;
-    additional_data.tasks_parallel_scheme =
-      MatrixFree<dim,number>::AdditionalData::partition_color;
-    additional_data.level_mg_handler = level;
-    additional_data.mapping_update_flags = (update_gradients | update_JxW_values |
-                                            update_quadrature_points);
-    data.reinit (dof_handler, constraints, QGauss<1>(fe_degree+1),
-                 additional_data);
-    evaluate_coefficient(Coefficient<dim>());
-  }
-
-
-
-  template <int dim, int fe_degree, typename number>
-  void
   LaplaceOperator<dim,fe_degree,number>::
   evaluate_coefficient (const Coefficient<dim> &coefficient_function)
   {
-    const unsigned int n_cells = data.n_macro_cells();
-    FEEvaluation<dim,fe_degree,fe_degree+1,1,number> phi (data);
+    const unsigned int n_cells = this->data->n_macro_cells();
+    FEEvaluation<dim,fe_degree,fe_degree+1,1,number> phi (*this->data);
+
     coefficient.reinit (n_cells, phi.n_q_points);
     for (unsigned int cell=0; cell<n_cells; ++cell)
       {
@@ -412,17 +323,18 @@ namespace Step37
   // <code>cell_loop</code> in the MatrixFree class will internally call this
   // function with some range of cells that is obtained by checking which
   // cells are possible to work on simultaneously so that write operations do
-  // not cause any race condition. Note that the total range of cells as
-  // visible in this class is usually not equal to the number of (active)
-  // cells in the triangulation.  In fact, "cell" may be the wrong term to
-  // begin with, since it is rather a collection of quadrature points from
-  // several cells, and the MatrixFree class groups the quadrature points of
-  // several cells into one block to enable a higher degree of vectorization.
-  // The number of such "cells" is stored in MatrixFree and can be queried
-  // through MatrixFree::n_macro_cells(). Compared to the
-  // deal.II cell iterators, in this class all cells are laid out in a plain
-  // array with no direct knowledge of level or neighborship relations, which
-  // makes it possible to index the cells by unsigned integers.
+  // not cause any race condition. Note that the cell range used in the loop
+  // is not directly the number of (active) cells in the current mesh, but
+  // rather a collection of batches of cells.  In other word, "cell" may be
+  // the wrong term to begin with, since FEEvaluation groups data from several
+  // cells together. This means that in the loop over quadrature points we are
+  // actually seeing a group of quadrature points of several cells as one
+  // block. This is done to enable a higher degree of vectorization.  The
+  // number of such "cells" or "cell batches" is stored in MatrixFree and can
+  // be queried through MatrixFree::n_macro_cells(). Compared to the deal.II
+  // cell iterators, in this class all cells are laid out in a plain array
+  // with no direct knowledge of level or neighborship relations, which makes
+  // it possible to index the cells by unsigned integers.
   //
   // The implementation of the Laplace operator is quite simple: First, we
   // need to create an object FEEvaluation that contains the computational
@@ -431,7 +343,7 @@ namespace Step37
   // that temporary results do not use a lot of memory, and since we specify
   // template arguments with the element order, the data is stored on the
   // stack (without expensive memory allocation). Usually, one only needs to
-  // set two template arguments, the dimension as first argument and the
+  // set two template arguments, the dimension as a first argument and the
   // degree of the finite element as the second argument (this is equal to the
   // number of degrees of freedom per dimension minus one for FE_Q
   // elements). However, here we also want to be able to use float numbers for
@@ -455,7 +367,8 @@ namespace Step37
   // derivatives of order between zero and two. We only want gradients, no
   // values and no second derivatives, so we set the function arguments to
   // true in the gradient slot (second slot), and to false in the values slot
-  // (first slot) and Hessian slot (third slot). Note that the FEEvaluation
+  // (first slot). There is also a third slot for the Hessian whose setting
+  // defaults to false, so it needs not be given. Note that the FEEvaluation
   // class internally evaluates shape functions in an efficient way where one
   // dimension is worked on at a time (using the tensor product form of shape
   // functions and quadrature points as mentioned in the introduction). This
@@ -493,176 +406,319 @@ namespace Step37
   // degrees of freedom).  </ol>
   template <int dim, int fe_degree, typename number>
   void
-  LaplaceOperator<dim,fe_degree,number>::
-  local_apply (const MatrixFree<dim,number>         &data,
-               Vector<double>                       &dst,
-               const Vector<double>                 &src,
-               const std::pair<unsigned int,unsigned int> &cell_range) const
+  LaplaceOperator<dim,fe_degree,number>
+  ::local_apply (const MatrixFree<dim,number>                     &data,
+                 LinearAlgebra::distributed::Vector<number>       &dst,
+                 const LinearAlgebra::distributed::Vector<number> &src,
+                 const std::pair<unsigned int,unsigned int>       &cell_range) const
   {
     FEEvaluation<dim,fe_degree,fe_degree+1,1,number> phi (data);
 
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
+        AssertDimension(coefficient.size(0), data.n_macro_cells());
+        AssertDimension(coefficient.size(1), phi.n_q_points);
+
         phi.reinit (cell);
         phi.read_dof_values(src);
-        phi.evaluate (false,true,false);
+        phi.evaluate (false, true);
         for (unsigned int q=0; q<phi.n_q_points; ++q)
           phi.submit_gradient (coefficient(cell,q) *
                                phi.get_gradient(q), q);
-        phi.integrate (false,true);
+        phi.integrate (false, true);
         phi.distribute_local_to_global (dst);
       }
   }
 
 
 
-  // @sect4{vmult functions}
-
-  // Now to the @p vmult function that is called externally: In addition to
-  // what we do in a @p vmult_add function further down, we set the
-  // destination to zero first. The transposed matrix-vector is needed for
-  // well-defined multigrid preconditioner operations. Since we solve a
-  // Laplace problem, this is the same operation, and we just refer to the
-  // vmult operation.
-  template <int dim, int fe_degree, typename number>
-  void
-  LaplaceOperator<dim,fe_degree,number>::vmult (Vector<double>       &dst,
-                                                const Vector<double> &src) const
-  {
-    dst = 0;
-    vmult_add (dst, src);
-  }
-
-
-
-  template <int dim, int fe_degree, typename number>
-  void
-  LaplaceOperator<dim,fe_degree,number>::Tvmult (Vector<double>       &dst,
-                                                 const Vector<double> &src) const
-  {
-    dst = 0;
-    vmult_add (dst,src);
-  }
-
-
-
-  template <int dim, int fe_degree, typename number>
-  void
-  LaplaceOperator<dim,fe_degree,number>::Tvmult_add (Vector<double>       &dst,
-                                                     const Vector<double> &src) const
-  {
-    vmult_add (dst,src);
-  }
-
-
-
-  // This function implements the loop over all cells. This is done with the
-  // @p cell_loop of the MatrixFree class, which takes the operator() of this
-  // class with arguments MatrixFree, OutVector, InVector, cell_range. Note
-  // that we could also use a simple function as local operation in case we
-  // had constant coefficients (all we need then is the MatrixFree, the
-  // vectors and the cell range), but since the coefficient is stored in a
-  // variable of this class, we cannot use that variant here. The cell loop is
-  // automatically performed on several threads if multithreading is enabled
-  // (this class uses a quite elaborate algorithm to work on cells that do not
-  // share any degrees of freedom that could possibly give rise to race
-  // conditions, using the dynamic task scheduler of the Intel Threading
-  // Building Blocks).
+  // This function implements the loop over all cells for the
+  // Base::apply_add() interface. This is done with the @p cell_loop of the
+  // MatrixFree class, which takes the operator() of this class with arguments
+  // MatrixFree, OutVector, InVector, cell_range. When working with MPI
+  // parallelization (but no threading) as is done in this tutorial program,
+  // the cell loop corresponds to the following three lines of code:
   //
-  // After the cell loop, we need to touch the constrained degrees of freedom:
-  // Since the assembly loop automatically resolves constraints (just as the
+  // @code
+  // src.update_ghost_values();
+  // local_apply(*this->data, dst, src, std::make_pair(0U, data.n_macro_cells()));
+  // dst.compress(VectorOperation::add);
+  // @endcode
+  //
+  // Here, the two calls update_ghost_values() and compress() perform the data
+  // exchange on processor boundaries for MPI, once for the source vector
+  // where we need to read from entries owned by remote processors, and once
+  // for the destination vector where we have accumulated parts of the
+  // residuals that need to be added to the respective entry of the owner
+  // processor. However, MatrixFree::cell_loop does not only abstract away
+  // those two calls, but also performs some additional optimizations. On the
+  // one hand, it will split the update_ghost_values() and compress() calls in
+  // a way to allow for overlapping communication and computation. The
+  // local_apply function is then called with three cell ranges representing
+  // partitions of the cell range from 0 to MatrixFree::n_macro_cells(). On
+  // the other hand, cell_loop also supports thread parallelism in which case
+  // the cell ranges are split into smaller chunks and scheduled in an
+  // advanced way that avoids access to the same vector entry by several
+  // threads. That feature is explained in step-48.
+  //
+  // Note that after the cell loop, the constrained degrees of freedom need to
+  // be touched once more for sensible vmult() operators: Since the assembly
+  // loop automatically resolves constraints (just as the
   // ConstraintMatrix::distribute_local_to_global call does), it does not
-  // compute any contribution for constrained degrees of freedom. In other
-  // words, the entries for constrained DoFs remain zero after the first part
-  // of this function, as if the matrix had empty rows and columns for
-  // constrained degrees of freedom. On the other hand, iterative solvers like
-  // CG only work for non-singular matrices, so we have to modify the
-  // operation on constrained DoFs. The easiest way to do that is to pretend
-  // that the sub-block of the matrix that corresponds to constrained DoFs is
-  // the identity matrix, in which case application of the matrix would simply
-  // copy the elements of the right hand side vector into the left hand
-  // side. In general, however, one needs to make sure that the diagonal
-  // entries of this sub-block are of the same order of magnitude as the
-  // diagonal elements of the rest of the matrix.  Here, the domain extent is
-  // of unit size, so we can simply choose unit size. If we had domains that
-  // are far away from unit size, we would need to choose a number that is
-  // close to the size of other diagonal matrix entries, so that these
-  // artificial eigenvalues do not change the eigenvalue spectrum (and make
-  // convergence with CG more difficult).
+  // compute any contribution for constrained degrees of freedom, leaving the
+  // respective entries zero. This would represent a matrix that had empty
+  // rows and columns for constrained degrees of freedom. However, iterative
+  // solvers like CG only work for non-singular matrices. The easiest way to
+  // do that is to set the sub-block of the matrix that corresponds to
+  // constrained DoFs to an identity matrix, in which case application of the
+  // matrix would simply copy the elements of the right hand side vector into
+  // the left hand side. Fortunately, the vmult() implementations
+  // MatrixFreeOperators::Base do this automatically for us outside the
+  // apply_add() function, so we do not need to take further action here.
+  //
+  // When using the combination of MatrixFree and FEEvaluation in parallel
+  // with MPI, there is one aspect to be careful about. This is the indexing
+  // used for accessing the vector. For performance reasons, MatrixFree and
+  // FEEvaluation are designed to access vectors in MPI-local index space also
+  // when working with multiple processors. Working in local index space means
+  // that no index translation needs to be performed at the vector access,
+  // apart from the unavoidable indirect addressing. However, local index
+  // spaces are ambiguous: While it is standard convention to access the
+  // locally owned range of a vector with indices between 0 and the local
+  // size, the case is involved for the ghosted entries. For the matrix-vector
+  // product, only the indices appearing on locally owned cells (plus those
+  // referenced via hanging node constraints) are necessary. However, in
+  // deal.II we often set all degrees of freedom on ghosted elements as
+  // ghosted vector entries. In that case, the MPI-local index of a ghosted
+  // vector entry in general be different in the two possible ghost sets,
+  // despite referring to the same global index. To avoid problems,
+  // FEEvaluation checks that the partitioning of the vector used for the
+  // matrix-vector product does indeed match with the partitioning of the
+  // indices in MatrixFree by a check called
+  // LinearAlgebra::distributed::Vector::partitioners_are_compatible. To
+  // facilitate things, the MatrixFreeOperators::Base class includes a
+  // mechanism to fit the ghost set to the correct layout. This happens in the
+  // ghost region of the vector, so the ghost region might be different in
+  // both the destination and source vector after a call to a vmult()
+  // mehtod. This is legitimate because the ghost region of a distributed
+  // deal.II vector is mutable. Vectors used in matrix-vector products must
+  // not be ghosted upon entry of vmult() functions, so no information gets
+  // lost.
   template <int dim, int fe_degree, typename number>
   void
-  LaplaceOperator<dim,fe_degree,number>::vmult_add (Vector<double>       &dst,
-                                                    const Vector<double> &src) const
+  LaplaceOperator<dim,fe_degree,number>
+  ::apply_add (LinearAlgebra::distributed::Vector<number>       &dst,
+               const LinearAlgebra::distributed::Vector<number> &src) const
   {
-    data.cell_loop (&LaplaceOperator::local_apply, this, dst, src);
-
-    const std::vector<unsigned int> &
-    constrained_dofs = data.get_constrained_dofs();
-    for (unsigned int i=0; i<constrained_dofs.size(); ++i)
-      dst(constrained_dofs[i]) += src(constrained_dofs[i]);
+    this->data->cell_loop (&LaplaceOperator::local_apply, this, dst, src);
   }
 
 
 
-  // The next function is used to return entries of the matrix. Since this
-  // class is intended not to store the matrix entries, it would make no sense
-  // to provide access to all those elements. However, diagonal entries are
-  // explicitly needed for the implementation of the Chebyshev smoother that
-  // we intend to use in the multigrid preconditioner. This matrix is equipped
-  // with a vector that stores the diagonal.
-  template <int dim, int fe_degree, typename number>
-  number
-  LaplaceOperator<dim,fe_degree,number>::el (const unsigned int row,
-                                             const unsigned int col) const
-  {
-    Assert (row == col, ExcNotImplemented());
-    Assert (diagonal_is_available == true, ExcNotInitialized());
-    return diagonal_values(row);
-  }
-
-
-
-  // Regarding the calculation of the diagonal, we expect the user to provide
-  // a vector with the diagonal entries (and we will compute them in the code
-  // below). We only need it for the level matrices of multigrid, not the
-  // system matrix (since we only need these diagonals for the multigrid
-  // smoother). Since we fill only elements into unconstrained entries, we
-  // have to set constrained entries to one in order to avoid the same
-  // problems as discussed above.
+  // The following function implements the computation of the diagonal of the
+  // operator. Computing matrix entries of a matrix-free operator evaluation
+  // turns out to be more complicated than evaluating the
+  // operator. Fundamentally, we could obtain a matrix representation of the
+  // operator by applying the operator on <i>all</i> unit vectors. Of course,
+  // that would be very inefficient since we would need to perform <i>n</i>
+  // operator evaluations to retrieve the whole matrix. Furthermore, this
+  // approach would completely ignore the matrix sparsity. On an individual
+  // cell, however, this is the way to go and actually not that inefficient as
+  // there usually is a coupling between all degrees of freedom inside the
+  // cell.
+  //
+  // We first initialize the diagonal vector to the correct parallel
+  // layout. This vector is encapsulated in a member called
+  // inverse_diagonal_entries of type DiagonalMatrix in the base class
+  // MatrixFreeOperators::Base. This member is a shared pointer that we first
+  // need to initialize and then get the vector representing the diagonal
+  // entries in the matrix. As to the actual diagonal computation, we again
+  // use the cell_loop infrastructure of MatrixFree to invoke a local worker
+  // routine called local_compute_diagonal(). Since we will only write into a
+  // vector but not have any source vector, we put a dummy argument of type
+  // <tt>unsigned int</tt> in place of the source vector to confirm with the
+  // cell_loop interface. After the loop, we need to set the vector entries
+  // subject to Dirichlet boundary conditions to one (either those on the
+  // boundary described by the ConstraintMatrix object inside MatrixFree or
+  // the indices at the interface between different grid levels in adaptive
+  // multigrid). This is done through the function
+  // MatrixFreeOperators::Base::set_constrained_entries_to_one() and matches
+  // with the setting in the matrix-vector product provided by the Base
+  // operator. Finally, we need to invert the diagonal entries which is the
+  // form required by the Chebyshev smoother based on the Jacobi iteration. In
+  // the loop, we assert that all entries are non-zero, because they should
+  // either have obtained a positive contribution from integrals or be
+  // constrained and treated by @p set_constrained_entries_to_one() following
+  // cell_loop.
   template <int dim, int fe_degree, typename number>
   void
-  LaplaceOperator<dim,fe_degree,number>::set_diagonal(const Vector<number> &diagonal)
+  LaplaceOperator<dim,fe_degree,number>
+  ::compute_diagonal ()
   {
-    AssertDimension (m(), diagonal.size());
+    this->inverse_diagonal_entries.
+    reset(new DiagonalMatrix<LinearAlgebra::distributed::Vector<number> >());
+    LinearAlgebra::distributed::Vector<number> &inverse_diagonal =
+      this->inverse_diagonal_entries->get_vector();
+    this->data->initialize_dof_vector(inverse_diagonal);
+    unsigned int dummy;
+    this->data->cell_loop (&LaplaceOperator::local_compute_diagonal, this,
+                           inverse_diagonal, dummy);
 
-    diagonal_values = diagonal;
+    this->set_constrained_entries_to_one(inverse_diagonal);
 
-    const std::vector<unsigned int> &
-    constrained_dofs = data.get_constrained_dofs();
-    for (unsigned int i=0; i<constrained_dofs.size(); ++i)
-      diagonal_values(constrained_dofs[i]) = 1.0;
-
-    diagonal_is_available = true;
+    for (unsigned int i=0; i<inverse_diagonal.local_size(); ++i)
+      {
+        Assert(inverse_diagonal.local_element(i) != 0.,
+               ExcMessage("No diagonal entry in a positive definite operator "
+                          "should be zero"));
+        inverse_diagonal.local_element(i) =
+          1./inverse_diagonal.local_element(i);
+      }
   }
 
 
 
-  // Eventually, we provide a function that calculates how much memory this
-  // class uses. We just need to sum up the memory consumption in the
-  // MatrixFree object and the memory for storing the other member
-  // variables. As a remark: In 3D and for Cartesian meshes, most memory is
-  // consumed for storing the vector indices on the local cells (corresponding
-  // to local_dof_indices). For general (non-Cartesian) meshes, the cached
-  // Jacobian transformation consumes most memory.
+  // In the local compute loop, we compute the diagonal by a loop over all
+  // columns in the local matrix and putting the entry 1 in the <i>i</i>th
+  // slot and a zero entry in all other slots, i.e., we apply the cell-wise
+  // differential operator on one unit vector at a time. The inner part
+  // invoking FEEvaluation::evaluate, the loop over quadrature points, and
+  // FEEvalution::integrate, is exactly the same as in the local_apply
+  // function. Afterwards, we pick out the <i>i</i>th entry of the local
+  // result and put it to a temporary storage (as we overwrite all entries in
+  // the array behind FEEvaluation::get_dof_value() with the next loop
+  // iteration). Finally, the temporary storage is written to the destination
+  // vector. Note how we use FEEvaluation::get_dof_value() and
+  // FEEvaluation::submit_dof_value() to read and write to the data field that
+  // FEEvaluation uses for the integration on the one hand and writes into the
+  // global vector on the other hand.
+  //
+  // Given that we are only interested in the matrix diagonal, we simply throw
+  // away all other entries of the local matrix that have been computed along
+  // the way. While it might seem wasteful to compute the complete cell matrix
+  // and then throw away everything but the diagonal, the integration are so
+  // efficient that the computation does not take too much time. Note that the
+  // complexity of operator evaluation per element is $\mathcal
+  // O((p+1)^{d+1})$ for polynomial degree $k$, so computing the whole matrix
+  // costs us $\mathcal O((p+1)^{2d+1})$ operations, not too far away from
+  // $\mathcal O((p+1)^{2d})$ complexity for computing the diagonal with
+  // FEValues. Since FEEvaluation is also considerably faster due to
+  // vectorization and other optimizations, the diagonal computation with this
+  // function is actually the fastest (simple) variant. (It would be possible
+  // to compute the diagonal with sum factorization techniques in $\mathcal
+  // O((p+1)^{d+1})$ operations involving specifically adapted
+  // kernels&mdash;but since such kernels are only useful in that particular
+  // context and the diagonal computation is typically not on the critical
+  // path, they have not been implemented in deal.II.)
+  //
+  // Note that the code that calls distribute_local_to_global on the vector to
+  // accumulate the diagonal entries into the global matrix has some
+  // limitations. For operators with hanging node constraints that distribute
+  // an integral contribution of a constrained DoF to several other entries
+  // inside the distribute_local_to_global call, the vector interface used
+  // here does not exactly compute the diagonal entries, but lumps some
+  // contributions located on the diagonal of the local matrix but would end
+  // up on a off-diagonal position of the global matrix to the diagonal. The
+  // result is correct up to discretization accuracy as shown in <a
+  // href="http://dx.doi.org/10.4208/cicp.101214.021015a">Kormann (2016),
+  // section 5.3</a>, but not equal. In this tutorial program, no harm can
+  // happen because the diagonal is only used for the multigrid level matrices
+  // where no hanging node constraints appear.
   template <int dim, int fe_degree, typename number>
-  std::size_t
-  LaplaceOperator<dim,fe_degree,number>::memory_consumption () const
+  void
+  LaplaceOperator<dim,fe_degree,number>
+  ::local_compute_diagonal (const MatrixFree<dim,number>               &data,
+                            LinearAlgebra::distributed::Vector<number> &dst,
+                            const unsigned int &,
+                            const std::pair<unsigned int,unsigned int> &cell_range) const
   {
-    return (data.memory_consumption () +
-            coefficient.memory_consumption() +
-            diagonal_values.memory_consumption() +
-            MemoryConsumption::memory_consumption(diagonal_is_available));
+    FEEvaluation<dim,fe_degree,fe_degree+1,1,number> phi (data);
+
+    AlignedVector<VectorizedArray<number> > diagonal(phi.dofs_per_cell);
+
+    for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
+      {
+        AssertDimension(coefficient.size(0), data.n_macro_cells());
+        AssertDimension(coefficient.size(1), phi.n_q_points);
+
+        phi.reinit (cell);
+        for (unsigned int i=0; i<phi.dofs_per_cell; ++i)
+          {
+            for (unsigned int j=0; j<phi.dofs_per_cell; ++j)
+              phi.submit_dof_value(VectorizedArray<number>(), j);
+            phi.submit_dof_value(make_vectorized_array<number>(1.), i);
+
+            phi.evaluate (false, true);
+            for (unsigned int q=0; q<phi.n_q_points; ++q)
+              phi.submit_gradient (coefficient(cell,q) *
+                                   phi.get_gradient(q), q);
+            phi.integrate (false, true);
+            diagonal[i] = phi.get_dof_value(i);
+          }
+        for (unsigned int i=0; i<phi.dofs_per_cell; ++i)
+          phi.submit_dof_value(diagonal[i], i);
+        phi.distribute_local_to_global (dst);
+      }
   }
+
+
+
+  // @sect4{MGInterfaceMatrix class}
+
+  // The adaptive multigrid realization in deal.II implements an approach
+  // called local smoothing. This means that the smoothing on the finest level
+  // only covers the local part of the mesh defined by the fixed (finest) grid
+  // level and ignores parts of the computational domain where the terminal
+  // cells are coarser than this level. As the method progresses to coarser
+  // levels, more and more of the global mesh will be covered. At some coarser
+  // level, the whole mesh will be covered. Since all level matrices in the
+  // multigrid method cover a single level in the mesh, no hanging nodes
+  // appear on the level matrices. At the interface between multigrid levels,
+  // homogeneous Dirichlet boundary conditions are set while smoothing. When
+  // the residual is transferred to the next coarser level, however, the
+  // coupling over the multigrid interface needs to be taken into account.
+  // This is done by the so-called interface (or edge) matrices that compute
+  // the part of the residual that is missed by the level matrix with
+  // homogeneous Dirichlet conditions. We refer to the @ref mg_paper
+  // "Multigrid paper by Janssen and Kanschat" for more details.
+  //
+  // For the implementation of those interface matrices, most infrastructure
+  // is already in place and provided by MatrixFreeOperators::Base through the
+  // two multiplication routines vmult_interface_down() and
+  // vmult_interface_up(). The only thing we have to do in this tutorial
+  // program is to wrap those multiplication routines into a separate class
+  // where they are accessed via the @p vmult() and @p Tvmult interface as
+  // expected by the multigrid routines (that were originally written for
+  // matrices, hence expecting those names). Note that the
+  // vmult_interface_down is used during the restriction phase of the
+  // multigrid V-cycle, whereas vmult_interface_up is used during the
+  // prolongation phase.
+  template <typename OperatorType>
+  class MGInterfaceMatrix : public Subscriptor
+  {
+  public:
+    typedef typename OperatorType::value_type value_type;
+
+    void initialize (const OperatorType &operator_in)
+    {
+      this->mf_base_operator = &operator_in;
+    }
+
+    void vmult (LinearAlgebra::distributed::Vector<value_type> &dst,
+                const LinearAlgebra::distributed::Vector<value_type> &src) const
+    {
+      mf_base_operator->vmult_interface_down(dst, src);
+    }
+
+    void Tvmult (LinearAlgebra::distributed::Vector<value_type> &dst,
+                 const LinearAlgebra::distributed::Vector<value_type> &src) const
+    {
+      mf_base_operator->vmult_interface_up(dst, src);
+    }
+
+  private:
+    SmartPointer<const OperatorType> mf_base_operator;
+  };
 
 
 
@@ -675,12 +731,18 @@ namespace Step37
   // argument (the value is defined at the top of the file), and that we use
   // float numbers for the multigrid level matrices.
   //
-  // The class also has a member variable to keep track of all the time we
-  // spend on setting up the entire chain of data before we actually go about
-  // solving the problem. In addition, there is an output stream (that is
-  // disabled by default) that can be used to output details for the
+  // The class also has a member variable to keep track of all the detailed
+  // timings for setting up the entire chain of data before we actually go
+  // about solving the problem. In addition, there is an output stream (that
+  // is disabled by default) that can be used to output details for the
   // individual setup operations instead of the summary only that is printed
   // out by default.
+  //
+  // Since this program is designed to be used with MPI, we also provide the
+  // usual @p pcout output stream that only prints the information of the
+  // processor with MPI rank 0. The grid used for this programs can either be
+  // a distributed triangulation based on p4est (in case deal.II is configured
+  // to use p4est), otherwise it is a serial grid that only runs without MPI.
   template <int dim>
   class LaplaceProblem
   {
@@ -690,29 +752,37 @@ namespace Step37
 
   private:
     void setup_system ();
-    void assemble_system ();
-    void assemble_multigrid ();
+    void assemble_rhs ();
     void solve ();
     void output_results (const unsigned int cycle) const;
 
+#ifdef DEAL_II_WITH_P4EST
+    parallel::distributed::Triangulation<dim>  triangulation;
+#else
+    Triangulation<dim>                         triangulation;
+#endif
+
+    FE_Q<dim>                                  fe;
+    DoFHandler<dim>                            dof_handler;
+
+    ConstraintMatrix                           constraints;
+    MatrixFree<dim,double>                     system_mf_storage;
     typedef LaplaceOperator<dim,degree_finite_element,double> SystemMatrixType;
+    SystemMatrixType                           system_matrix;
+
+    MGConstrainedDoFs                          mg_constrained_dofs;
+    MGLevelObject<ConstraintMatrix>            mg_constraints;
+    MGLevelObject<MatrixFree<dim,float> >      mg_mf_storage;
     typedef LaplaceOperator<dim,degree_finite_element,float>  LevelMatrixType;
+    MGLevelObject<LevelMatrixType>             mg_matrices;
 
-    Triangulation<dim>               triangulation;
-    FE_Q<dim>                        fe;
-    DoFHandler<dim>                  dof_handler;
-    ConstraintMatrix                 constraints;
+    LinearAlgebra::distributed::Vector<double> solution;
+    LinearAlgebra::distributed::Vector<double> solution_update;
+    LinearAlgebra::distributed::Vector<double> system_rhs;
 
-    SystemMatrixType                 system_matrix;
-    MGLevelObject<LevelMatrixType>   mg_matrices;
-    FullMatrix<float>                coarse_matrix;
-    MGLevelObject<ConstraintMatrix>  mg_constraints;
-
-    Vector<double>                   solution;
-    Vector<double>                   system_rhs;
-
-    double                           setup_time;
-    ConditionalOStream               time_details;
+    double                                     setup_time;
+    ConditionalOStream                         pcout;
+    ConditionalOStream                         time_details;
   };
 
 
@@ -721,30 +791,53 @@ namespace Step37
   // degree specified at the top of the file as well (otherwise, an exception
   // will be thrown at some point, since the computational kernel defined in
   // the templated LaplaceOperator class and the information from the finite
-  // element read out by MatrixFree will not match).
+  // element read out by MatrixFree will not match). The constructor of the
+  // triangulation needs to set an additional flag that tells the grid to
+  // conform to the 2:1 cell balance over vertices, which is needed for the
+  // convergence of the geometric multigrid routines. For the distributed
+  // grid, we also need to specifically enable the multigrid hierarchy.
   template <int dim>
   LaplaceProblem<dim>::LaplaceProblem ()
     :
+#ifdef DEAL_II_WITH_P4EST
+    triangulation(MPI_COMM_WORLD,
+                  Triangulation<dim>::limit_level_difference_at_vertices,
+                  parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
+#else
     triangulation (Triangulation<dim>::limit_level_difference_at_vertices),
+#endif
     fe (degree_finite_element),
     dof_handler (triangulation),
-    time_details (std::cout, false)
+    pcout (std::cout, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0),
+    time_details (std::cout, false &&
+                  Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
   {}
 
 
 
   // @sect4{LaplaceProblem::setup_system}
 
-  // This is the function of step-16 with relevant changes due to the
-  // LaplaceOperator class. We do not use adaptive grids, so we do not have to
-  // compute edge matrices. Thus, all we do is to implement Dirichlet boundary
-  // conditions through the ConstraintMatrix, set up the (one-dimensional)
-  // quadrature that should be used by the matrix-free class, and call the
-  // initialization functions.
-  //
-  // In the process, we output data on both the run time of the program as
-  // well as on memory consumption, where we output memory data in megabytes
-  // (1 million bytes).
+  // The setup stage is in analogy to step-16 with relevant changes due to the
+  // LaplaceOperator class. The first thing to do is to set up the DoFHandler,
+  // including the degrees of freedom for the multigrid levels, and to
+  // initialize constraints from hanging nodes and homogeneous Dirichlet
+  // conditions. Since we intend to use this programs in %parallel with MPI,
+  // we need to make sure that the constraints get to know the locally
+  // relevant degrees of freedom, otherwise the storage would explode when
+  // using more than a few hundred millions of degrees of freedom, see
+  // step-40.
+
+  // Once we have created the multigrid dof_handler and the constraints, we
+  // can call the reinit function for each level of the multigrid routine (and
+  // the active cells). The main purpose of the reinit function is to setup
+  // the <code> MatrixFree </code> instance for the problem. Also, the
+  // coefficient is evaluated. For this, we need to activate the update flag
+  // in the AdditionalData field of MatrixFree that enables the storage of
+  // quadrature point coordinates in real space (by default, it only caches
+  // data for gradients (inverse transposed Jacobians) and JxW values). Note
+  // that if we call the reinit function without specifying the level (i.e.,
+  // giving <code>level = numbers::invalid_unsigned_int</code>), MatrixFree
+  // constructs a loop over the active cells.
   template <int dim>
   void LaplaceProblem<dim>::setup_system ()
   {
@@ -759,11 +852,18 @@ namespace Step37
     dof_handler.distribute_dofs (fe);
     dof_handler.distribute_mg_dofs (fe);
 
-    std::cout << "Number of degrees of freedom: "
-              << dof_handler.n_dofs()
-              << std::endl;
+    pcout << "Number of degrees of freedom: "
+          << dof_handler.n_dofs()
+          << std::endl;
+
+    IndexSet locally_relevant_dofs;
+    DoFTools::extract_locally_relevant_dofs (dof_handler,
+                                             locally_relevant_dofs);
 
     constraints.clear();
+    constraints.reinit(locally_relevant_dofs);
+    DoFTools::make_hanging_node_constraints(dof_handler,
+                                            constraints);
     VectorTools::interpolate_boundary_values (dof_handler,
                                               0,
                                               ZeroFunction<dim>(),
@@ -774,15 +874,22 @@ namespace Step37
                  << time() << "s/" << time.wall_time() << "s" << std::endl;
     time.restart();
 
-    system_matrix.reinit (dof_handler, constraints);
-    std::cout.precision(4);
-    std::cout << "System matrix memory consumption:     "
-              << system_matrix.memory_consumption()*1e-6
-              << " MB."
-              << std::endl;
+    {
+      typename MatrixFree<dim,double>::AdditionalData additional_data;
+      additional_data.tasks_parallel_scheme =
+        MatrixFree<dim,double>::AdditionalData::none;
+      additional_data.mapping_update_flags = (update_gradients | update_JxW_values |
+                                              update_quadrature_points);
+      additional_data.mpi_communicator = MPI_COMM_WORLD;
+      system_mf_storage.reinit (dof_handler, constraints, QGauss<1>(fe.degree+1),
+                                additional_data);
+    }
 
-    solution.reinit (dof_handler.n_dofs());
-    system_rhs.reinit (dof_handler.n_dofs());
+    system_matrix.initialize (system_mf_storage);
+    system_matrix.evaluate_coefficient(Coefficient<dim>());
+
+    system_matrix.initialize_dof_vector(solution);
+    system_matrix.initialize_dof_vector(system_rhs);
 
     setup_time += time.wall_time();
     time_details << "Setup matrix-free system   (CPU/wall) "
@@ -790,37 +897,47 @@ namespace Step37
     time.restart();
 
     // Next, initialize the matrices for the multigrid method on all the
-    // levels. The function MGTools::make_boundary_list returns for each
-    // multigrid level which degrees of freedom are located on a Dirichlet
-    // boundary; we force these DoFs to have value zero by adding to the
-    // ConstraintMatrix object a zero condition by using the command
-    // ConstraintMatrix::add_line. Once this is done, we close the
-    // ConstraintMatrix on each level so it can be used to read out indices
-    // internally in the MatrixFree.
-    const unsigned int nlevels = triangulation.n_levels();
+    // levels. The data structure MGConstrainedDoFs keeps information about
+    // the indices subject to boundary conditions as well as the indices on
+    // edges between different refinement levels as described in the step-16
+    // tutorial program. We then go through the levels of the mesh and
+    // construct the constraints and matrices on each level. These follow
+    // closely the construction of the system matrix on the original mesh,
+    // except the slight difference in naming when accessing information on
+    // the levels rather than the active cells.
+    const unsigned int nlevels = triangulation.n_global_levels();
     mg_matrices.resize(0, nlevels-1);
+    mg_mf_storage.resize(0, nlevels-1);
     mg_constraints.resize (0, nlevels-1);
 
-    typename FunctionMap<dim>::type dirichlet_boundary;
-    ZeroFunction<dim>               homogeneous_dirichlet_bc (1);
-    dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
-    std::vector<std::set<types::global_dof_index> > boundary_indices(triangulation.n_levels());
-    MGTools::make_boundary_list (dof_handler,
-                                 dirichlet_boundary,
-                                 boundary_indices);
+    std::set<types::boundary_id> dirichlet_boundary;
+    dirichlet_boundary.insert(0);
+    mg_constrained_dofs.initialize(dof_handler);
+    mg_constrained_dofs.make_zero_boundary_constraints(dof_handler, dirichlet_boundary);
+
     for (unsigned int level=0; level<nlevels; ++level)
       {
-        std::set<types::global_dof_index>::iterator bc_it = boundary_indices[level].begin();
-        for ( ; bc_it != boundary_indices[level].end(); ++bc_it)
-          mg_constraints[level].add_line(*bc_it);
-
+        IndexSet relevant_dofs;
+        DoFTools::extract_locally_relevant_level_dofs(dof_handler, level,
+                                                      relevant_dofs);
+        mg_constraints[level].reinit(relevant_dofs);
+        mg_constraints[level].add_lines(mg_constrained_dofs.get_boundary_indices(level));
         mg_constraints[level].close();
-        mg_matrices[level].reinit(dof_handler,
-                                  mg_constraints[level],
-                                  level);
+
+        typename MatrixFree<dim,float>::AdditionalData additional_data;
+        additional_data.tasks_parallel_scheme =
+          MatrixFree<dim,float>::AdditionalData::none;
+        additional_data.mapping_update_flags = (update_gradients | update_JxW_values |
+                                                update_quadrature_points);
+        additional_data.mpi_communicator = MPI_COMM_WORLD;
+        additional_data.level_mg_handler = level;
+
+        mg_mf_storage[level].reinit(dof_handler, mg_constraints[level],
+                                    QGauss<1>(fe.degree+1), additional_data);
+
+        mg_matrices[level].initialize(mg_mf_storage[level], mg_constrained_dofs, level);
+        mg_matrices[level].evaluate_coefficient(Coefficient<dim>());
       }
-    coarse_matrix.reinit (dof_handler.n_dofs(0),
-                          dof_handler.n_dofs(0));
     setup_time += time.wall_time();
     time_details << "Setup matrix-free levels   (CPU/wall) "
                  << time() << "s/" << time.wall_time() << "s" << std::endl;
@@ -828,128 +945,34 @@ namespace Step37
 
 
 
-  // @sect4{LaplaceProblem::assemble_system}
+  // @sect4{LaplaceProblem::assemble_rhs}
 
-  // The assemble function is significantly reduced compared to step-16. All
-  // we need to do is to assemble the right hand side. That is the same as in
-  // many other tutorial programs. In the end, we condense the constraints
-  // from Dirichlet boundary conditions away from the right hand side.
+  // The assemble function is very simple since all we have to do is to
+  // assemble the right hand side. Thanks to FEEvaluation and all the data
+  // cached in the MatrixFree class, this can be done in a few lines. Since
+  // this call is not wrapped into a MatrixFree::cell_loop (which would be an
+  // alternative), we must not forget to call compress() at the end of the
+  // assembly to send all the contributions of the right hand side to the
+  // owner of the respective degree of freedom.
   template <int dim>
-  void LaplaceProblem<dim>::assemble_system ()
+  void LaplaceProblem<dim>::assemble_rhs ()
   {
     Timer time;
-    QGauss<dim>  quadrature_formula(fe.degree+1);
-    FEValues<dim> fe_values (fe, quadrature_formula,
-                             update_values   | update_JxW_values);
 
-    const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int   n_q_points    = quadrature_formula.size();
-
-    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
-
-    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
+    system_rhs = 0;
+    FEEvaluation<dim,degree_finite_element> phi(system_mf_storage);
+    for (unsigned int cell=0; cell<system_mf_storage.n_macro_cells(); ++cell)
       {
-        cell->get_dof_indices (local_dof_indices);
-        fe_values.reinit (cell);
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
-          {
-            double rhs_val = 0;
-            for (unsigned int q=0; q<n_q_points; ++q)
-              rhs_val += (fe_values.shape_value(i,q) * 1.0 *
-                          fe_values.JxW(q));
-            system_rhs(local_dof_indices[i]) += rhs_val;
-          }
+        phi.reinit(cell);
+        for (unsigned int q=0; q<phi.n_q_points; ++q)
+          phi.submit_value(make_vectorized_array<double>(1.0), q);
+        phi.integrate(true, false);
+        phi.distribute_local_to_global(system_rhs);
       }
-    constraints.condense(system_rhs);
+    system_rhs.compress(VectorOperation::add);
+
     setup_time += time.wall_time();
     time_details << "Assemble right hand side   (CPU/wall) "
-                 << time() << "s/" << time.wall_time() << "s" << std::endl;
-  }
-
-
-  // @sect4{LaplaceProblem::assemble_multigrid}
-
-  // Here is another assemble function. Again, it is simpler than assembling
-  // matrices. We need to compute the diagonal of the Laplace matrices on the
-  // individual levels, send the final matrices to the LaplaceOperator class,
-  // and we need to compute the full matrix on the coarsest level (since that
-  // is inverted exactly in the deal.II multigrid implementation).
-  template <int dim>
-  void LaplaceProblem<dim>::assemble_multigrid ()
-  {
-    Timer time;
-    coarse_matrix = 0;
-    QGauss<dim>  quadrature_formula(fe.degree+1);
-    FEValues<dim> fe_values (fe, quadrature_formula,
-                             update_gradients  | update_inverse_jacobians |
-                             update_quadrature_points | update_JxW_values);
-
-    const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int   n_q_points    = quadrature_formula.size();
-
-    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
-    const Coefficient<dim>    coefficient;
-    std::vector<double>       coefficient_values (n_q_points);
-    FullMatrix<float>         local_matrix (dofs_per_cell, dofs_per_cell);
-    Vector<double>            local_diagonal (dofs_per_cell);
-
-    const unsigned int n_levels = triangulation.n_levels();
-    std::vector<Vector<float> > diagonals (n_levels);
-    for (unsigned int level=0; level<n_levels; ++level)
-      diagonals[level].reinit (dof_handler.n_dofs(level));
-
-    std::vector<unsigned int> cell_no(triangulation.n_levels());
-    typename DoFHandler<dim>::cell_iterator cell = dof_handler.begin(),
-                                            endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
-      {
-        const unsigned int level = cell->level();
-        cell->get_mg_dof_indices (local_dof_indices);
-        fe_values.reinit (cell);
-        coefficient.value_list (fe_values.get_quadrature_points(),
-                                coefficient_values);
-
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
-          {
-            double local_diag = 0;
-            for (unsigned int q=0; q<n_q_points; ++q)
-              local_diag += ((fe_values.shape_grad(i,q) *
-                              fe_values.shape_grad(i,q)) *
-                             coefficient_values[q] * fe_values.JxW(q));
-            local_diagonal(i) = local_diag;
-          }
-        mg_constraints[level].distribute_local_to_global(local_diagonal,
-                                                         local_dof_indices,
-                                                         diagonals[level]);
-
-        if (level == 0)
-          {
-            local_matrix = 0;
-
-            for (unsigned int i=0; i<dofs_per_cell; ++i)
-              for (unsigned int j=0; j<dofs_per_cell; ++j)
-                {
-                  double add_value = 0;
-                  for (unsigned int q=0; q<n_q_points; ++q)
-                    add_value += (fe_values.shape_grad(i,q) *
-                                  fe_values.shape_grad(j,q) *
-                                  coefficient_values[q] *
-                                  fe_values.JxW(q));
-                  local_matrix(i,j) = add_value;
-                }
-            mg_constraints[0].distribute_local_to_global (local_matrix,
-                                                          local_dof_indices,
-                                                          coarse_matrix);
-          }
-      }
-
-    for (unsigned int level=0; level<n_levels; ++level)
-      mg_matrices[level].set_diagonal (diagonals[level]);
-
-    setup_time += time.wall_time();
-    time_details << "Assemble MG diagonal       (CPU/wall) "
                  << time() << "s/" << time.wall_time() << "s" << std::endl;
   }
 
@@ -957,100 +980,141 @@ namespace Step37
 
   // @sect4{LaplaceProblem::solve}
 
-  // The solution process again looks like step-16. We now use a Chebyshev
-  // smoother instead of SOR (SOR would be very difficult to implement because
-  // we do not have the matrix elements available explicitly, and it is
-  // difficult to make it work efficiently in %parallel). The multigrid
-  // classes provide a simple interface for using the Chebyshev smoother which
-  // is defined in a preconditioner class: MGSmootherPrecondition.
+  // The solution process is similar as in step-16. We start with the setup of
+  // the transfer. For LinearAlgebra::distributed::Vector, there is a very
+  // fast transfer class called MGTransferMatrixFree that does the
+  // interpolation between the grid levels with the same fast sum
+  // factorization kernels that get also used in FEEvaluation.
   template <int dim>
   void LaplaceProblem<dim>::solve ()
   {
     Timer time;
-    MGTransferPrebuilt<Vector<double> > mg_transfer;
-    mg_transfer.build_matrices(dof_handler);
+    MGTransferMatrixFree<dim,float> mg_transfer(mg_constrained_dofs);
+    mg_transfer.build(dof_handler);
     setup_time += time.wall_time();
     time_details << "MG build transfer time     (CPU/wall) " << time()
                  << "s/" << time.wall_time() << "s\n";
     time.restart();
 
-    MGCoarseGridHouseholder<float, Vector<double> > mg_coarse;
-    mg_coarse.initialize(coarse_matrix);
-    setup_time += time.wall_time();
-    time_details << "MG coarse time             (CPU/wall) " << time()
-                 << "s/" << time.wall_time() << "s\n";
-    time.restart();
-
-    typedef PreconditionChebyshev<LevelMatrixType,Vector<double> > SMOOTHER;
-    MGSmootherPrecondition<LevelMatrixType, SMOOTHER, Vector<double> >
+    // As a smoother, this tutorial program uses a Chebyshev iteration instead
+    // of SOR in step-16. (SOR would be very difficult to implement because we
+    // do not have the matrix elements available explicitly, and it is
+    // difficult to make it work efficiently in %parallel.)  The smoother is
+    // initialized with our level matrices and the mandatory additional data
+    // for the Chebyshev smoother. We use a relatively high degree here (4),
+    // since matrix-vector products are comparably cheap. We choose to smooth
+    // out a range of $[1.2 \hat{\lambda}_{\max}/15,1.2 \hat{\lambda}_{\max}]$
+    // in the smoother where $\hat{\lambda}_{\max}$ is an estimate of the
+    // largest eigenvalue (the factor 1.2 is applied inside
+    // PreconditionChebyshev). In order to compute that eigenvalue, the
+    // Chebyshev initialization performs a few steps of a CG algorithm
+    // without preconditioner. Since the highest eigenvalue is usually the
+    // easiest one to find and a rough estimate is enough, we choose 10
+    // iterations. Finally, we also set the inner preconditioner type in the
+    // Chebyshev method which is a Jacobi iteration. This is represented by
+    // the DiagonalMatrix class that gets the inverse diagonal entry provided
+    // by our LaplaceOperator class.
+    //
+    // On level zero, we initialize the smoother differently because we want
+    // to use the Chebyshev iteration as a solver. PreconditionChebyshev
+    // allows the user to switch to solver mode where the number of iterations
+    // is internally chosen to the correct value. In the additional data
+    // object, this setting is activated by choosen the polynomial degree to
+    // @p numbers::invalid_unsigned_int. The algorithm will then attack all
+    // eigenvalues between the smallest and largest one in the coarse level
+    // matrix. The number of steps in the Chebyshev smoother are chosen such
+    // that the Chebyshev convergence estimates guarantee to reduce the
+    // residual by the number specified in the variable @p
+    // smoothing_range. Note that for solving, @p smoothing_range is a
+    // relative tolerance and chosen smaller than one, in this case, we select
+    // three orders of magnitude, whereas it is a number larger than 1 when
+    // only selected eigenvalues are smoothed.
+    //
+    // From a computational point of view, the Chebyshev iteration is a very
+    // attractive coarse grid solver as long as the coarse size is
+    // moderate. This is because the Chebyshev method performs only
+    // matrix-vector products and vector updates, which typically parallelize
+    // better to the largest cluster size with more than a few tens of
+    // thousands of cores than inner product involved in other iterative
+    // methods. The former involves only local communication between neighbors
+    // in the (coarse) mesh, whereas the latter requires global communication
+    // over all processors.
+    typedef PreconditionChebyshev<LevelMatrixType,LinearAlgebra::distributed::Vector<float> > SMOOTHER;
+    mg::SmootherRelaxation<SMOOTHER, LinearAlgebra::distributed::Vector<float> >
     mg_smoother;
-
-    // Then, we initialize the smoother with our level matrices and the
-    // mandatory additional data for the Chebyshev smoother. We use quite a
-    // high degree here (6), since matrix-vector products are comparably cheap
-    // and more parallel than the level-transfer operations. We choose to
-    // smooth out a range of $[1.2 \hat{\lambda}_{\max}/10,1.2
-    // \hat{\lambda}_{\max}]$ in the smoother where $\hat{\lambda}_{\max}$ is
-    // an estimate of the largest eigenvalue. In order to compute that
-    // eigenvalue, the Chebyshev initializations performs a few steps of a CG
-    // algorithm without preconditioner. Since the highest eigenvalue is
-    // usually the easiest one to find and a rough estimate is enough, we
-    // choose 10 iterations.
-    typename SMOOTHER::AdditionalData smoother_data;
-    smoother_data.smoothing_range = 10.;
-    smoother_data.degree = 6;
-    smoother_data.eig_cg_n_iterations = 10;
+    MGLevelObject<typename SMOOTHER::AdditionalData> smoother_data;
+    smoother_data.resize(0, triangulation.n_global_levels()-1);
+    for (unsigned int level = 0; level<triangulation.n_global_levels(); ++level)
+      {
+        if (level > 0)
+          {
+            smoother_data[level].smoothing_range = 15.;
+            smoother_data[level].degree = 4;
+            smoother_data[level].eig_cg_n_iterations = 10;
+          }
+        else
+          {
+            smoother_data[level].smoothing_range = 1e-3;
+            smoother_data[0].degree = numbers::invalid_unsigned_int;
+            smoother_data[0].eig_cg_n_iterations = mg_matrices[0].m();
+          }
+        mg_matrices[level].compute_diagonal();
+        smoother_data[level].preconditioner = mg_matrices[level].get_matrix_diagonal_inverse();
+      }
     mg_smoother.initialize(mg_matrices, smoother_data);
 
-    mg::Matrix<Vector<double> > mg_matrix(mg_matrices);
+    MGCoarseGridApplySmoother<LinearAlgebra::distributed::Vector<float> > mg_coarse;
+    mg_coarse.initialize(mg_smoother);
 
-    Multigrid<Vector<double> > mg(dof_handler,
-                                  mg_matrix,
-                                  mg_coarse,
-                                  mg_transfer,
-                                  mg_smoother,
-                                  mg_smoother);
-    PreconditionMG<dim, Vector<double>,
-                   MGTransferPrebuilt<Vector<double> > >
+    // Next, we set up the interface matrices that are needed for the case
+    // with hanging nodes. We have prepared the necessary class
+    // MGInterfaceMatrix above for accessing the infrastructure of
+    // MatrixFreeOperators::Base. All we have to do is to create a respective
+    // MGLevelObject. Once that is done, we set up the remaining Multigrid
+    // preconditioner infrastructure in complete analogy to step-16 to obtain
+    // a @p preconditioner object that can be applied to a matrix.
+    mg::Matrix<LinearAlgebra::distributed::Vector<float> > mg_matrix(mg_matrices);
+
+    MGLevelObject<MGInterfaceMatrix<LevelMatrixType> > mg_interface_matrices;
+    mg_interface_matrices.resize(0, triangulation.n_global_levels()-1);
+    for (unsigned int level=0; level<triangulation.n_global_levels(); ++level)
+      mg_interface_matrices[level].initialize(mg_matrices[level]);
+    mg::Matrix<LinearAlgebra::distributed::Vector<float> > mg_interface(mg_interface_matrices);
+
+    Multigrid<LinearAlgebra::distributed::Vector<float> > mg(mg_matrix,
+                                                             mg_coarse,
+                                                             mg_transfer,
+                                                             mg_smoother,
+                                                             mg_smoother);
+    PreconditionMG<dim, LinearAlgebra::distributed::Vector<float>,
+                   MGTransferMatrixFree<dim,float> >
                    preconditioner(dof_handler, mg, mg_transfer);
 
-    // Finally, write out the memory consumption of the Multigrid object (or
-    // rather, of its most significant components, since there is no built-in
-    // function for the total multigrid object), then create the solver object
-    // and solve the system. This is very easy, and we didn't even see any
-    // difference in the solve process compared to step-16. The magic is all
-    // hidden behind the implementation of the LaplaceOperator::vmult
+    // The setup of the multigrid routines was quite easy and one cannot see
+    // any difference in the solve process as compared to step-16. The magic
+    // is all hidden behind the implementation of the LaplaceOperator::vmult
     // operation. Note that we print out the solve time and the accumulated
     // setup time through standard out, i.e., in any case, whereas detailed
     // times for the setup operations are only printed in case the flag for
     // detail_times in the constructor is changed.
-    const std::size_t multigrid_memory
-      = (mg_matrices.memory_consumption() +
-         mg_transfer.memory_consumption() +
-         coarse_matrix.memory_consumption());
-    std::cout << "Multigrid objects memory consumption: "
-              << multigrid_memory * 1e-6
-              << " MB."
-              << std::endl;
 
-    SolverControl           solver_control (1000, 1e-12*system_rhs.l2_norm());
-    SolverCG<>              cg (solver_control);
+    SolverControl solver_control (100, 1e-12*system_rhs.l2_norm());
+    SolverCG<LinearAlgebra::distributed::Vector<double> > cg (solver_control);
     setup_time += time.wall_time();
     time_details << "MG build smoother time     (CPU/wall) " << time()
                  << "s/" << time.wall_time() << "s\n";
-    std::cout << "Total setup time               (wall) " << setup_time
-              << "s\n";
+    pcout << "Total setup time               (wall) " << setup_time
+          << "s\n";
 
     time.reset();
     time.start();
     cg.solve (system_matrix, solution, system_rhs,
               preconditioner);
 
-
-    std::cout << "Time solve ("
-              << solver_control.last_step()
-              << " iterations)  (CPU/wall) " << time() << "s/"
-              << time.wall_time() << "s\n";
+    pcout << "Time solve ("
+          << solver_control.last_step()
+          << " iterations)  (CPU/wall) " << time() << "s/"
+          << time.wall_time() << "s\n";
   }
 
 
@@ -1059,12 +1123,19 @@ namespace Step37
 
   // Here is the data output, which is a simplified version of step-5. We use
   // the standard VTU (= compressed VTK) output for each grid produced in the
-  // refinement process.
+  // refinement process. We disable the output when the mesh gets too
+  // large. Note that a variant of program has been run on hundreds of
+  // thousands MPI ranks with as many as 100 billion grid cells, which is not
+  // directly accessible to classical visualization tools.
   template <int dim>
   void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
   {
+    if (triangulation.n_global_active_cells() > 1000000)
+      return;
+
     DataOut<dim> data_out;
 
+    solution.update_ghost_values();
     data_out.attach_dof_handler (dof_handler);
     data_out.add_data_vector (solution, "solution");
     data_out.build_patches ();
@@ -1072,10 +1143,30 @@ namespace Step37
     std::ostringstream filename;
     filename << "solution-"
              << cycle
+             << "." << Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)
              << ".vtu";
 
     std::ofstream output (filename.str().c_str());
     data_out.write_vtu (output);
+
+    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+      {
+        std::vector<std::string> filenames;
+        for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
+          {
+            std::ostringstream filename;
+            filename << "solution-"
+                     << cycle
+                     << "."
+                     << i
+                     << ".vtu";
+
+            filenames.push_back(filename.str().c_str());
+          }
+        std::string master_name = "solution-" + Utilities::to_string(cycle) + ".pvtu";
+        std::ofstream master_output (master_name.c_str());
+        data_out.write_pvtu_record (master_output, filenames);
+      }
   }
 
 
@@ -1083,14 +1174,14 @@ namespace Step37
   // @sect4{LaplaceProblem::run}
 
   // The function that runs the program is very similar to the one in
-  // step-16. We make less refinement steps in 3D compared to 2D, but that's
+  // step-16. We do few refinement steps in 3D compared to 2D, but that's
   // it.
   template <int dim>
   void LaplaceProblem<dim>::run ()
   {
     for (unsigned int cycle=0; cycle<9-dim; ++cycle)
       {
-        std::cout << "Cycle " << cycle << std::endl;
+        pcout << "Cycle " << cycle << std::endl;
 
         if (cycle == 0)
           {
@@ -1099,11 +1190,10 @@ namespace Step37
           }
         triangulation.refine_global (1);
         setup_system ();
-        assemble_system ();
-        assemble_multigrid ();
+        assemble_rhs ();
         solve ();
         output_results (cycle);
-        std::cout << std::endl;
+        pcout << std::endl;
       };
   }
 }
@@ -1112,12 +1202,15 @@ namespace Step37
 
 // @sect3{The <code>main</code> function}
 
-// This is as in most other programs.
-int main ()
+// Apart from the fact that we set up the MPI framework according to step-40,
+// there are no surprises in the main function.
+int main (int argc, char *argv[])
 {
   try
     {
       using namespace Step37;
+
+      Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
 
       LaplaceProblem<dimension> laplace_problem;
       laplace_problem.run ();
