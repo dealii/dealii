@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2015 by the deal.II authors
+// Copyright (C) 2011 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -229,6 +229,12 @@ namespace MatrixFreeOperators
     void mult_add (LinearAlgebra::distributed::Vector<Number> &dst,
                    const LinearAlgebra::distributed::Vector<Number> &src,
                    const bool transpose) const;
+
+    /**
+     * Adjust the ghost range of the vectors to the storage requirements of
+     * the underlying MatrixFree class.
+     */
+    void adjust_ghost_range_if_necessary(const LinearAlgebra::distributed::Vector<Number> &vec) const;
   };
 
 
@@ -678,13 +684,18 @@ namespace MatrixFreeOperators
   void
   Base<dim,Number>::
   initialize (const MatrixFree<dim,Number> &data_,
-              const MGConstrainedDoFs &mg_constrained_dofs,
-              const unsigned int level)
+              const MGConstrainedDoFs      &mg_constrained_dofs,
+              const unsigned int            level)
   {
     AssertThrow (level != numbers::invalid_unsigned_int,
                  ExcMessage("level is not set"));
+    if (data_.n_macro_cells() > 0)
+      {
+        AssertDimension(static_cast<int>(level),
+                        data_.get_cell_iterator(0,0)->level());
+      }
 
-    data =  SmartPointer<const MatrixFree<dim,Number>, Base<dim,Number> >(&data_,typeid(*this).name());
+    data = SmartPointer<const MatrixFree<dim,Number>, Base<dim,Number> >(&data_,typeid(*this).name());
 
     // setup edge_constrained indices
     std::vector<types::global_dof_index> interface_indices;
@@ -749,12 +760,40 @@ namespace MatrixFreeOperators
 
   template <int dim, typename Number>
   void
+  Base<dim,Number>::adjust_ghost_range_if_necessary(const LinearAlgebra::distributed::Vector<Number> &src) const
+  {
+    // If both vectors use the same partitioner -> done
+    if (src.get_partitioner().get() ==
+        data->get_dof_info(0).vector_partitioner.get())
+      return;
+
+    // If not, assert that the local ranges are the same and reset to the
+    // current partitioner
+    Assert(src.get_partitioner()->local_size() ==
+           data->get_dof_info(0).vector_partitioner->local_size(),
+           ExcMessage("The vector passed to the vmult() function does not have "
+                      "the correct size for compatibility with MatrixFree."));
+
+    // copy the vector content to a temporary vector so that it does not get
+    // lost
+    VectorView<Number> view_src_in(src.local_size(), src.begin());
+    Vector<Number> copy_vec = view_src_in;
+    const_cast<LinearAlgebra::distributed::Vector<Number> &>(src).
+    reinit(data->get_dof_info(0).vector_partitioner);
+    VectorView<Number> view_src_out(src.local_size(), src.begin());
+    static_cast<Vector<Number>&>(view_src_out) = copy_vec;
+  }
+
+
+
+  template <int dim, typename Number>
+  void
   Base<dim,Number>::mult_add (LinearAlgebra::distributed::Vector<Number> &dst,
                               const LinearAlgebra::distributed::Vector<Number> &src,
                               const bool transpose) const
   {
-    Assert(src.partitioners_are_globally_compatible(*data->get_dof_info(0).vector_partitioner), ExcInternalError());
-    Assert(dst.partitioners_are_globally_compatible(*data->get_dof_info(0).vector_partitioner), ExcInternalError());
+    adjust_ghost_range_if_necessary(src);
+    adjust_ghost_range_if_necessary(dst);
 
     // set zero Dirichlet values on the input vector (and remember the src and
     // dst values because we need to reset them at the end)
@@ -793,8 +832,8 @@ namespace MatrixFreeOperators
   vmult_interface_down(LinearAlgebra::distributed::Vector<Number> &dst,
                        const LinearAlgebra::distributed::Vector<Number> &src) const
   {
-    Assert(src.partitioners_are_globally_compatible(*data->get_dof_info(0).vector_partitioner), ExcInternalError());
-    Assert(dst.partitioners_are_globally_compatible(*data->get_dof_info(0).vector_partitioner), ExcInternalError());
+    adjust_ghost_range_if_necessary(src);
+    adjust_ghost_range_if_necessary(dst);
 
     dst = 0;
 
@@ -835,8 +874,8 @@ namespace MatrixFreeOperators
   vmult_interface_up(LinearAlgebra::distributed::Vector<Number> &dst,
                      const LinearAlgebra::distributed::Vector<Number> &src) const
   {
-    Assert(src.partitioners_are_globally_compatible(*data->get_dof_info(0).vector_partitioner), ExcInternalError());
-    Assert(dst.partitioners_are_globally_compatible(*data->get_dof_info(0).vector_partitioner), ExcInternalError());
+    adjust_ghost_range_if_necessary(src);
+    adjust_ghost_range_if_necessary(dst);
 
     dst = 0;
 
