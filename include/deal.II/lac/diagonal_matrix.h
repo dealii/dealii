@@ -65,8 +65,8 @@ public:
   size_type m () const;
 
   /**
-   * Number of columns of this matrix. To remember: this matrix is an <i>n x
-   * n</i>-matrix.
+   * Number of columns of this matrix. This number corresponds to the size of
+   * the underlying vector.
    */
   size_type n () const;
 

@@ -240,7 +240,7 @@ public:
                const Vector<number2> &src) const;
 
   /**
-   * Return the dimension of the codomain (or range) space. To remember: the
+   * Return the dimension of the codomain (or range) space. Note that the
    * matrix is of dimension $m \times n$.
    *
    * @note This function should only be called if the preconditioner has been
@@ -249,7 +249,7 @@ public:
   size_type m () const;
 
   /**
-   * Return the dimension of the domain space. To remember: the matrix is of
+   * Return the dimension of the domain space. Note that the matrix is of
    * dimension $m \times n$.
    *
    * @note This function should only be called if the preconditioner has been
