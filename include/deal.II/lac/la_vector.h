@@ -179,7 +179,7 @@ namespace LinearAlgebra
     virtual void equ(const Number a, const VectorSpaceVector<Number> &V);
 
     /**
-     * Return the mean value of the element of this vector.
+     * Return the mean value of all the entries of this vector.
      */
     virtual typename VectorSpaceVector<Number>::value_type mean_value() const;
 
