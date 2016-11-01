@@ -11,116 +11,182 @@ solution through both isocontours and volume rendering:
 
 Of more interest is to evaluate some aspects of the multigrid solver.
 When we run this program in 2D for quadratic ($Q_2$) elements, we get the
-following output:
+following output (when run on one core in release mode):
 @code
 Cycle 0
 Number of degrees of freedom: 81
-System matrix memory consumption:     0.008982 MB.
-Multigrid objects memory consumption: 0.02617 MB.
-Total setup time               (wall) 0.001811s
-Time solve (5 iterations)  (CPU/wall) 0s/0.0002651s
+Total setup time               (wall) 0.00159788s
+Time solve (6 iterations)  (CPU/wall) 0.000951s/0.000951052s
 
 Cycle 1
 Number of degrees of freedom: 289
-System matrix memory consumption:     0.01817 MB.
-Multigrid objects memory consumption: 0.05779 MB.
-Total setup time               (wall) 0.001223s
-Time solve (5 iterations)  (CPU/wall) 0s/0.000926s
+Total setup time               (wall) 0.00114608s
+Time solve (6 iterations)  (CPU/wall) 0.000935s/0.000934839s
 
 Cycle 2
 Number of degrees of freedom: 1089
-System matrix memory consumption:     0.05286 MB.
-Multigrid objects memory consumption: 0.1581 MB.
-Total setup time               (wall) 0.003045s
-Time solve (6 iterations)  (CPU/wall) 0.012s/0.003393s
+Total setup time               (wall) 0.00244665s
+Time solve (6 iterations)  (CPU/wall) 0.00207s/0.002069s
 
 Cycle 3
 Number of degrees of freedom: 4225
-System matrix memory consumption:     0.1957 MB.
-Multigrid objects memory consumption: 0.5228 MB.
-Total setup time               (wall) 0.008561s
-Time solve (6 iterations)  (CPU/wall) 0.02s/0.01133s
+Total setup time               (wall) 0.00678205s
+Time solve (6 iterations)  (CPU/wall) 0.005616s/0.00561595s
 
 Cycle 4
 Number of degrees of freedom: 16641
-System matrix memory consumption:     0.7343 MB.
-Multigrid objects memory consumption: 1.925 MB.
-Total setup time               (wall) 0.02938s
-Time solve (6 iterations)  (CPU/wall) 0.068s/0.03312s
+Total setup time               (wall) 0.0241671s
+Time solve (6 iterations)  (CPU/wall) 0.019543s/0.0195441s
 
 Cycle 5
 Number of degrees of freedom: 66049
-System matrix memory consumption:     2.856 MB.
-Multigrid objects memory consumption: 7.435 MB.
-Total setup time               (wall) 0.1128s
-Time solve (6 iterations)  (CPU/wall) 0.228s/0.09577s
+Total setup time               (wall) 0.0967851s
+Time solve (6 iterations)  (CPU/wall) 0.07457s/0.0745709s
 
 Cycle 6
 Number of degrees of freedom: 263169
-System matrix memory consumption:     11.28 MB.
-Multigrid objects memory consumption: 29.3 MB.
-Total setup time               (wall) 0.4553s
-Time solve (6 iterations)  (CPU/wall) 1.272s/0.3955s
+Total setup time               (wall) 0.346374s
+Time solve (6 iterations)  (CPU/wall) 0.260042s/0.265033s
 @endcode
 
 As in step-16, we see that the number of CG iterations remains constant with
-increasing number of degrees of freedom. We can also see that the various
-objects we have to store for the multigrid method on the individual levels of
-our mesh together make up more than twice as much as the matrix on the finest
-level. For the present example, about half the memory consumption of the
-multigrid objects are the level transfer matrices, and the other half is
-consumed by the matrix-free objects (and there, mainly the indices and the
-variable coefficient).
+increasing number of degrees of freedom. The constant number of iterations
+(together with optimal computational properties) means that the computing time
+approximately quadruples as the problem size quadruples from one cycle to the
+next. A look at the memory consumption reveals that the code is also very
+efficient in terms of storage. Around 2-4 million degrees of freedom fit into
+1 GB of memory. An interesting fact is that solving one linear system is
+cheaper than the setup, despite not building a matrix (approximately half of
+which is spent in the DoFHandler::distribute_dofs() and
+DoFHandler::distributed_mg_dofs() calls). This shows the high efficiency of
+this approach, but also the fact that most benefit will be obtained when
+solving multiple systems on the same mesh and DoFHandler structure.
 
 Not much changes if we run the program in three spatial dimensions, with the
-exception that the multilevel objects now take up some more memory (because
-the level transfer matrices are denser) and the computing times are somewhat
-larger:
+exception that problem sizes grow by a factor eight when refining the mesh and
+the obvious increase in computing times:
 
 @code
 Cycle 0
 Number of degrees of freedom: 125
-System matrix memory consumption:     0.01093 MB.
-Multigrid objects memory consumption: 0.03094 MB.
-Total setup time               (wall) 0.002481s
-Time solve (5 iterations)  (CPU/wall) 0s/0.000334s
+Total setup time               (wall) 0.00231099s
+Time solve (6 iterations)  (CPU/wall) 0.000692s/0.000922918s
 
 Cycle 1
 Number of degrees of freedom: 729
-System matrix memory consumption:     0.04105 MB.
-Multigrid objects memory consumption: 0.1274 MB.
-Total setup time               (wall) 0.004471s
-Time solve (5 iterations)  (CPU/wall) 0.004s/0.001979s
+Total setup time               (wall) 0.00289083s
+Time solve (6 iterations)  (CPU/wall) 0.001534s/0.0024128s
 
 Cycle 2
 Number of degrees of freedom: 4913
-System matrix memory consumption:     0.2821 MB.
-Multigrid objects memory consumption: 0.8048 MB.
-Total setup time               (wall) 0.01651s
-Time solve (4 iterations)  (CPU/wall) 0.036s/0.01295s
+Total setup time               (wall) 0.0143182s
+Time solve (6 iterations)  (CPU/wall) 0.010785s/0.0107841s
 
 Cycle 3
 Number of degrees of freedom: 35937
-System matrix memory consumption:     1.948 MB.
-Multigrid objects memory consumption: 5.734 MB.
-Total setup time               (wall) 0.1072s
-Time solve (5 iterations)  (CPU/wall) 0.16s/0.0709s
+Total setup time               (wall) 0.087064s
+Time solve (6 iterations)  (CPU/wall) 0.063522s/0.06545s
 
 Cycle 4
 Number of degrees of freedom: 274625
-System matrix memory consumption:     14.49 MB.
-Multigrid objects memory consumption: 44.41 MB.
-Total setup time               (wall) 0.8173s
-Time solve (5 iterations)  (CPU/wall) 1.52s/0.5093s
+Total setup time               (wall) 0.596306s
+Time solve (6 iterations)  (CPU/wall) 0.427757s/0.431765s
 
 Cycle 5
 Number of degrees of freedom: 2146689
-System matrix memory consumption:     115.9 MB.
-Multigrid objects memory consumption: 342.6 MB.
-Total setup time               (wall) 6.387s
-Time solve (5 iterations)  (CPU/wall) 12.45s/3.767s
+Total setup time               (wall) 4.96491s
+Time solve (6 iterations)  (CPU/wall) 3.53126s/3.56142s
 @endcode
 
+Since it is so easy, we look at what happens if we increase the polynomial
+degree. When selecting the degree as four in 3D, i.e., on $\mathcal Q_4$
+elements, we get the following program output:
+
+@code
+Cycle 0
+Number of degrees of freedom: 729
+Total setup time               (wall) 0.00633097s
+Time solve (6 iterations)  (CPU/wall) 0.002829s/0.00379395s
+
+Cycle 1
+Number of degrees of freedom: 4913
+Total setup time               (wall) 0.0174279s
+Time solve (6 iterations)  (CPU/wall) 0.012255s/0.012254s
+
+Cycle 2
+Number of degrees of freedom: 35937
+Total setup time               (wall) 0.082655s
+Time solve (6 iterations)  (CPU/wall) 0.052362s/0.0523629s
+
+Cycle 3
+Number of degrees of freedom: 274625
+Total setup time               (wall) 0.507943s
+Time solve (6 iterations)  (CPU/wall) 0.341811s/0.345788s
+
+Cycle 4
+Number of degrees of freedom: 2146689
+Total setup time               (wall) 3.46251s
+Time solve (7 iterations)  (CPU/wall) 3.29638s/3.3265s
+
+Cycle 5
+Number of degrees of freedom: 16974593
+Total setup time               (wall) 27.8989s
+Time solve (7 iterations)  (CPU/wall) 26.3705s/27.1077s
+@endcode
+
+Since $\mathcal Q_4$ elements on a mesh correspond to $\mathcal Q_2$ elements
+on half the mesh size, we can start to compare the run time at cycle 4 with
+fourth degree polynomials with cycle 5 at quadratic polynomials, both at 2.1
+million degrees of freedom. The surprising effect is that the solver for
+$\mathcal Q_4$ element is actually slightly faster than for the quadratic
+case, despite using one more linear iteration. The effect that higher-degree
+polynomials are similarly fast or even faster than lower degree ones is one of
+the main strengths of matrix-free operator evaluation through sum
+factorization, see the <a
+href="http://dx.doi.org/10.1016/j.compfluid.2012.04.012">matrix-free
+paper</a>. This is fundamentally different to matrix-based methods that get
+more expensive as the degree increases and the coupling gets denser.
+
+The improved efficiency is also reflected in the initialization routines.
+
+Finally, let us look at the timings with degree 8, which corresponds to
+another round of mesh refinement in the lower order methods:
+
+@code
+Cycle 0
+Number of degrees of freedom: 4913
+Total setup time               (wall) 0.0842004s
+Time solve (8 iterations)  (CPU/wall) 0.019296s/0.0192959s
+
+Cycle 1
+Number of degrees of freedom: 35937
+Total setup time               (wall) 0.327048s
+Time solve (8 iterations)  (CPU/wall) 0.07517s/0.075999s
+
+Cycle 2
+Number of degrees of freedom: 274625
+Total setup time               (wall) 2.12335s
+Time solve (8 iterations)  (CPU/wall) 0.448739s/0.453698s
+
+Cycle 3
+Number of degrees of freedom: 2146689
+Total setup time               (wall) 16.1743s
+Time solve (8 iterations)  (CPU/wall) 3.95003s/3.97717s
+
+Cycle 4
+Number of degrees of freedom: 16974593
+Total setup time               (wall) 130.8s
+Time solve (8 iterations)  (CPU/wall) 31.0316s/31.767s
+@endcode
+
+Here, the initialization seems considerably slower than before, which is
+mainly due to the computation of the diagonal of the matrix, which actually
+computes a 729 x 729 matrix on each cell and throws away everything but the
+diagonal. The solver times, however, are again very close to the quartic case,
+showing that the linear increase with the polynomial degree that is
+theoretically expected is offset by better computational characteristics and
+the fact that higher order methods have a smaller share of degrees of freedom
+living on several cells that slow the method down.
 
 <h3>Comparison with a sparse matrix</h3>
 
@@ -194,22 +260,15 @@ example makes use of multithreading, so both cores are actually used.
   </tr>
 </table>
 
-The table clearly shows that the matrix-free implementation is twice as fast
-for the solver, and more than six times as fast when it comes to
+The table clearly shows that the matrix-free implementation is more than twice
+as fast for the solver, and more than six times as fast when it comes to
 initialization costs. As the problem size is made a factor 8 larger, we note
 that the times usually go up by a factor eight, too (as the solver iterations
-are constant at 5). There are two deviations. The first is in the sparse
-matrix between 5k and 36k degrees of freedom, where the time increases by a
-factor 12. This is the threshold when the cache in the processor can no longer
-hold all data necessary for the matrix-vector products and all matrix elements
-must be fetched from main memory. The second deviation is the times for the
-matrix-free solve which increase by less than a factor 8. This is because of
-more parallelism from more cells, exploited by the (involved) dynamic task
-scheduling approach taken in the cell loop of the MatrixFree class. Note
-that about 30% of the time in the
-matrix-free solver is spent on restriction and prolongation, which use sparse
-matrices. So the speedup could be even better if all parts were done
-efficiently.
+are constant at six). The main deviation is in the sparse matrix between 5k
+and 36k degrees of freedom, where the time increases by a factor 12. This is
+the threshold when the cache in the processor can no longer hold all data
+necessary for the matrix-vector products and all matrix elements must be
+fetched from main memory.
 
 Of course, this picture does not necessarily translate to all cases, as there
 are problems where knowledge of matrix entries enables much better solvers (as
@@ -227,13 +286,6 @@ elements increases (the matrix-free implementation has costs
 2<i>p<sup>d</sup></i> for the sparse matrix, so it will win anyway for order 4
 and higher in 3d).
 
-<h3>Possibilities for extensions</h3>
+<h3> Results for large-scale parallel computations</h3>
 
-Above, we have shown figures for second-order finite elements. Our
-implementation gains more compared to sparse matrices if higher order elements
-are used. However, FE_Q elements with equidistant nodes are badly conditioned
-if the order increases. In this case, the smoother and the multigrid solver
-break down. Node clustering close to the element boundaries resolves this
-problem (and the multigrid solver converges in 5 or 6 iterations also for very
-high order). Elements with this properties are the Gauss-Lobatto FE_Q
-elements, which are presented in step-48.
+<h3> Results with adaptivity</h3>
