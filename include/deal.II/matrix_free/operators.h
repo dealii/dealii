@@ -72,7 +72,7 @@ namespace MatrixFreeOperators
      * Release all memory and return to a state just like after having called
      * the default constructor.
      */
-    void clear();
+    virtual void clear();
 
     /**
      * Initialize operator on fine scale.
@@ -174,6 +174,12 @@ namespace MatrixFreeOperators
   protected:
 
     /**
+     * Set constrained entries (both from hanging nodes and edge constraints)
+     * of @p dst to one.
+     */
+    void set_constrained_entries_to_one (LinearAlgebra::distributed::Vector<Number> &dst) const;
+
+    /**
      * Apply operator to @p src and add result in @p dst.
      */
     virtual void apply_add(LinearAlgebra::distributed::Vector<Number> &dst,
@@ -197,12 +203,13 @@ namespace MatrixFreeOperators
      */
     LinearAlgebra::distributed::Vector<Number> inverse_diagonal_entries;
 
+  private:
+
     /**
      * Indices of DoFs on edge in case the operator is used in GMG context.
      */
     std::vector<unsigned int> edge_constrained_indices;
 
-  private:
     /**
      * Auxiliary vector.
      */
@@ -553,6 +560,20 @@ namespace MatrixFreeOperators
         edge_constrained_indices.push_back(locally_owned.index_within_set(interface_indices[i]));
     have_interface_matrices = Utilities::MPI::max((unsigned int)edge_constrained_indices.size(),
                                                   data_.get_vector_partitioner()->get_mpi_communicator()) > 0;
+  }
+
+
+
+  template <int dim, typename Number>
+  void
+  Base<dim,Number>::set_constrained_entries_to_one (LinearAlgebra::distributed::Vector<Number> &dst) const
+  {
+    const std::vector<unsigned int> &
+    constrained_dofs = data->get_constrained_dofs();
+    for (unsigned int i=0; i<constrained_dofs.size(); ++i)
+      dst.local_element(constrained_dofs[i]) = 1.;
+    for (unsigned int i=0; i<edge_constrained_indices.size(); ++i)
+      dst.local_element(edge_constrained_indices[i]) = 1.;
   }
 
 
