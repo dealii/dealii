@@ -145,7 +145,7 @@ void do_project (const parallel::distributed::Triangulation<dim> &triangulation,
 
       LinearAlgebra::distributed::Vector<double> field;
       data.initialize_dof_vector(field);
-      VectorTools::project
+      VectorTools::project<dim,LinearAlgebra::distributed::Vector<double> >
       (data,
        constraints,
        n_q_points_1d,
