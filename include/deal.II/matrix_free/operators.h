@@ -72,7 +72,7 @@ namespace MatrixFreeOperators
      * Release all memory and return to a state just like after having called
      * the default constructor.
      */
-    void clear();
+    virtual void clear();
 
     /**
      * Initialize operator on fine scale.
@@ -174,6 +174,12 @@ namespace MatrixFreeOperators
   protected:
 
     /**
+     * Set constrained entries (both from hanging nodes and edge constraints)
+     * of @p dst to one.
+     */
+    void set_constrained_entries_to_one (LinearAlgebra::distributed::Vector<Number> &dst) const;
+
+    /**
      * Apply operator to @p src and add result in @p dst.
      */
     virtual void apply_add(LinearAlgebra::distributed::Vector<Number> &dst,
@@ -197,12 +203,13 @@ namespace MatrixFreeOperators
      */
     LinearAlgebra::distributed::Vector<Number> inverse_diagonal_entries;
 
+  private:
+
     /**
      * Indices of DoFs on edge in case the operator is used in GMG context.
      */
     std::vector<unsigned int> edge_constrained_indices;
 
-  private:
     /**
      * Auxiliary vector.
      */
@@ -299,7 +306,7 @@ namespace MatrixFreeOperators
   public:
 
     /**
-     * Constructor. Initializes the MatrixFree object.
+     * Constructor.
      */
     MassOperator ();
 
@@ -324,6 +331,125 @@ namespace MatrixFreeOperators
                            LinearAlgebra::distributed::Vector<Number>       &dst,
                            const LinearAlgebra::distributed::Vector<Number> &src,
                            const std::pair<unsigned int,unsigned int>  &cell_range) const;
+  };
+
+
+
+  /**
+   * This class implements the operation of the action of a Laplace matrix,
+   * namely $ L_{ij} = \int_\Omega c(\mathbf x) \mathbf \nabla N_i(\mathbf x) \cdot \mathbf \nabla N_j(\mathbf x)\,d \mathbf x$,
+   * where $c(\mathbf x)$ is the scalar heterogeneity coefficient.
+   *
+   * @author Denis Davydov, 2016
+   */
+  template <int dim, int fe_degree, int n_q_points_1d = fe_degree+1, int n_components = 1, typename Number = double>
+  class LaplaceOperator : public Base<dim, Number>
+  {
+  public:
+
+    /**
+     * Constructor.
+     */
+    LaplaceOperator ();
+
+    /**
+     * The diagonal is approximated by computing a local diagonal matrix per element
+     * and distributing it to the global diagonal. This will lead to wrong results
+     * on element with hanging nodes but is still an acceptable approximation
+     * to be used in preconditioners.
+     */
+    virtual void compute_diagonal ();
+
+    /**
+     * Set the heterogeneous scalar coefficient @p scalar_coefficient to be used at
+     * the quadrature points. The Table should be of correct size, consistent
+     * with the total number of quadrature points in <code>dim</code>-dimensions,
+     * controlled by the @p n_q_points_1d template parameter. Here,
+     * <code>(*scalar_coefficient)(cell,q)</code> corresponds to the value of the
+     * coefficient, where <code>cell</code> is an index into a set of cell
+     * batches as administered by the MatrixFree framework (which does not work
+     * on individual cells, but instead of batches of cells at once), and
+     * <code>q</code> is the number of the quadrature point within this batch.
+     *
+     * Such tables can be initialized by
+     * @code
+     * std_cxx11::shared_ptr<Table<2, VectorizedArray<double> > > coefficient;
+     * coefficient = std_cxx11::make_shared<Table<2, VectorizedArray<double> > >();
+     * {
+     *   FEEvaluation<dim,fe_degree,n_q_points_1d,1,double> fe_eval(mf_data);
+     *   const unsigned int n_cells = mf_data.n_macro_cells();
+     *   const unsigned int n_q_points = fe_eval.n_q_points;
+     *   coefficient->reinit(n_cells, n_q_points);
+     *   for (unsigned int cell=0; cell<n_cells; ++cell)
+     *     {
+     *       fe_eval.reinit(cell);
+     *       for (unsigned int q=0; q<n_q_points; ++q)
+     *         (*coefficient)(cell,q) = function.value(fe_eval.quadrature_point(q));
+     *     }
+     * }
+     * @endcode
+     * where <code>mf_data</code> is a MatrixFree object and <code>function</code>
+     * is a function which provides the following method
+     * <code>VectorizedArray<double> value(const Point<dim, VectorizedArray<double> > &p_vec)</code>.
+     *
+     * If this function is not called, the coefficient is assumed to be unity.
+     *
+     * The argument to this function is a shared pointer to such a table. The
+     * class stores the shared pointer to this table, not a deep copy
+     * and uses it to form the Laplace matrix. Consequently, you can update the
+     * table and re-use the current object to obtain the action of a Laplace
+     * matrix with this updated coefficient. Alternatively, if the table values
+     * are only to be filled once, the original shared pointer can also go out
+     * of scope in user code and the clear() command or destructor of this class
+     * will delete the table.
+     */
+    void set_coefficient(const std_cxx11::shared_ptr<Table<2, VectorizedArray<Number> > > &scalar_coefficient );
+
+    virtual void clear();
+
+    /**
+     * Read/Write access to coefficients to be used in Laplace operator.
+     *
+     * The function will throw an error if coefficients are not previously set
+     * by set_coefficient() function.
+     */
+    std_cxx11::shared_ptr< Table<2, VectorizedArray<Number> > > get_coefficient();
+
+  private:
+    /**
+     * Applies the laplace matrix operation on an input vector. It is
+     * assumed that the passed input and output vector are correctly initialized
+     * using initialize_dof_vector().
+     */
+    virtual void apply_add (LinearAlgebra::distributed::Vector<Number>       &dst,
+                            const LinearAlgebra::distributed::Vector<Number> &src) const;
+
+    /**
+     * Applies the Laplace operator on a cell.
+     */
+    void local_apply_cell (const MatrixFree<dim,Number>                     &data,
+                           LinearAlgebra::distributed::Vector<Number>       &dst,
+                           const LinearAlgebra::distributed::Vector<Number> &src,
+                           const std::pair<unsigned int,unsigned int>  &cell_range) const;
+
+    /**
+     * Apply diagonal part of the Laplace operator on a cell.
+     */
+    void local_diagonal_cell (const MatrixFree<dim,Number>                &data,
+                              LinearAlgebra::distributed::Vector<Number>  &dst,
+                              const unsigned int &,
+                              const std::pair<unsigned int,unsigned int>  &cell_range) const;
+
+    /**
+     * Apply Laplace operator on a cell @p cell.
+     */
+    void do_operation_on_cell(FEEvaluation<dim,fe_degree,n_q_points_1d,n_components,Number> &phi,
+                              const unsigned int cell) const;
+
+    /**
+     * User-provided heterogeneity coefficient.
+     */
+    std_cxx11::shared_ptr< Table<2, VectorizedArray<Number> > > scalar_coefficient;
   };
 
 
@@ -553,6 +679,20 @@ namespace MatrixFreeOperators
         edge_constrained_indices.push_back(locally_owned.index_within_set(interface_indices[i]));
     have_interface_matrices = Utilities::MPI::max((unsigned int)edge_constrained_indices.size(),
                                                   data_.get_vector_partitioner()->get_mpi_communicator()) > 0;
+  }
+
+
+
+  template <int dim, typename Number>
+  void
+  Base<dim,Number>::set_constrained_entries_to_one (LinearAlgebra::distributed::Vector<Number> &dst) const
+  {
+    const std::vector<unsigned int> &
+    constrained_dofs = data->get_constrained_dofs();
+    for (unsigned int i=0; i<constrained_dofs.size(); ++i)
+      dst.local_element(constrained_dofs[i]) = 1.;
+    for (unsigned int i=0; i<edge_constrained_indices.size(); ++i)
+      dst.local_element(edge_constrained_indices[i]) = 1.;
   }
 
 
@@ -833,6 +973,182 @@ namespace MatrixFreeOperators
         phi.distribute_local_to_global (dst);
       }
   }
+
+
+  //-----------------------------LaplaceOperator----------------------------------
+
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
+  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
+  LaplaceOperator ()
+    :
+    Base<dim, Number>()
+  {
+  }
+
+
+
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
+  void
+  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
+  clear ()
+  {
+    Base<dim, Number>::clear();
+    scalar_coefficient = NULL;
+  }
+
+
+
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
+  void
+  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
+  set_coefficient(const std_cxx11::shared_ptr<Table<2, VectorizedArray<Number> > > &scalar_coefficient_ )
+  {
+    scalar_coefficient = scalar_coefficient_;
+  }
+
+
+
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
+  std_cxx11::shared_ptr< Table<2, VectorizedArray<Number> > >
+  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
+  get_coefficient()
+  {
+    Assert (scalar_coefficient.get(),
+            ExcNotInitialized());
+    return scalar_coefficient;
+  }
+
+
+
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
+  void
+  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
+  compute_diagonal()
+  {
+    Assert((Base<dim, Number>::data != NULL), ExcNotInitialized());
+
+    unsigned int dummy = 0;
+    LinearAlgebra::distributed::Vector<Number> &inverse_diagonal_entries = Base<dim,Number>::inverse_diagonal_entries;
+    this->initialize_dof_vector(inverse_diagonal_entries);
+    Base<dim,Number>::
+    data->cell_loop (&LaplaceOperator::local_diagonal_cell,
+                     this, inverse_diagonal_entries, dummy);
+
+    this->set_constrained_entries_to_one(inverse_diagonal_entries);
+
+    for (unsigned int i=0; i<inverse_diagonal_entries.local_size(); ++i)
+      if (std::abs(inverse_diagonal_entries.local_element(i)) > std::sqrt(std::numeric_limits<Number>::epsilon()))
+        inverse_diagonal_entries.local_element(i) = 1./inverse_diagonal_entries.local_element(i);
+      else
+        inverse_diagonal_entries.local_element(i) = 1.;
+
+    Base<dim, Number>::inverse_diagonal_entries.compress(VectorOperation::insert);
+    Base<dim, Number>::inverse_diagonal_entries.update_ghost_values();
+  }
+
+
+
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
+  void
+  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
+  apply_add (LinearAlgebra::distributed::Vector<Number>       &dst,
+             const LinearAlgebra::distributed::Vector<Number> &src) const
+  {
+    Base<dim, Number>::data->cell_loop (&LaplaceOperator::local_apply_cell,
+                                        this, dst, src);
+  }
+
+  namespace
+  {
+    template<typename Number>
+    bool
+    non_negative(const VectorizedArray<Number> &n)
+    {
+      for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+        if (n[v] < 0.)
+          return false;
+
+      return true;
+    }
+  }
+
+
+
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
+  void
+  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
+  do_operation_on_cell(FEEvaluation<dim,fe_degree,n_q_points_1d,n_components,Number> &phi,
+                       const unsigned int cell) const
+  {
+    phi.evaluate (false,true,false);
+    if (scalar_coefficient.get())
+      {
+        for (unsigned int q=0; q<phi.n_q_points; ++q)
+          {
+            Assert (non_negative((*scalar_coefficient)(cell,q)),
+                    ExcMessage("Coefficient must be non-negative"));
+            phi.submit_gradient ((*scalar_coefficient)(cell,q)*phi.get_gradient(q), q);
+          }
+      }
+    else
+      {
+        for (unsigned int q=0; q<phi.n_q_points; ++q)
+          {
+            phi.submit_gradient (phi.get_gradient(q), q);
+          }
+      }
+    phi.integrate (false,true);
+  }
+
+
+
+
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
+  void
+  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
+  local_apply_cell (const MatrixFree<dim,Number>                     &data,
+                    LinearAlgebra::distributed::Vector<Number>       &dst,
+                    const LinearAlgebra::distributed::Vector<Number> &src,
+                    const std::pair<unsigned int,unsigned int>  &cell_range) const
+  {
+    FEEvaluation<dim,fe_degree,n_q_points_1d,n_components,Number> phi (data);
+    for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
+      {
+        phi.reinit (cell);
+        phi.read_dof_values(src);
+        do_operation_on_cell(phi,cell);
+        phi.distribute_local_to_global (dst);
+      }
+  }
+
+
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
+  void
+  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
+  local_diagonal_cell (const MatrixFree<dim,Number>                     &data,
+                       LinearAlgebra::distributed::Vector<Number>       &dst,
+                       const unsigned int &,
+                       const std::pair<unsigned int,unsigned int>       &cell_range) const
+  {
+    FEEvaluation<dim,fe_degree,n_q_points_1d,n_components,Number> phi (data);
+    for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
+      {
+        phi.reinit (cell);
+        VectorizedArray<Number> local_diagonal_vector[phi.tensor_dofs_per_cell];
+        for (unsigned int i=0; i<phi.dofs_per_cell; ++i)
+          {
+            for (unsigned int j=0; j<phi.dofs_per_cell; ++j)
+              phi.begin_dof_values()[j] = VectorizedArray<Number>();
+            phi.begin_dof_values()[i] = 1.;
+            do_operation_on_cell(phi,cell);
+            local_diagonal_vector[i] = phi.begin_dof_values()[i];
+          }
+        for (unsigned int i=0; i<phi.tensor_dofs_per_cell; ++i)
+          phi.begin_dof_values()[i] = local_diagonal_vector[i];
+        phi.distribute_local_to_global (dst);
+      }
+  }
+
 
 } // end of namespace MatrixFreeOperators
 
