@@ -245,8 +245,11 @@ namespace internal
         }
         case 1:
         {
-          this->face_indices(0,0) = 0;
-          this->face_indices(1,0) = n_dofs_1d-1;
+          if (this->dofs_per_face>0)
+            {
+              this->face_indices(0,0) = 0;
+              this->face_indices(1,0) = n_dofs_1d-1;
+            }
           break;
         }
         default:
