@@ -93,6 +93,33 @@ namespace LinearAlgebra
       }
 
 
+
+      template <typename Number>
+      struct ElemSum
+      {
+        __device__ static Number reduction_op(const Number a, const Number b)
+        {
+          return (a + b);
+        }
+
+        __device__ static Number atomic_op(Number *dst, const Number a)
+        {
+          return atomicAdd_wrapper(dst, a);
+        }
+
+        __device__ static Number element_wise_op(const Number a)
+        {
+          return a;
+        }
+
+        __device__ static Number null_value()
+        {
+          return Number();
+        }
+      };
+
+
+
       template <typename Number>
       struct L1Norm
       {
@@ -116,6 +143,7 @@ namespace LinearAlgebra
           return Number();
         }
       };
+
 
 
       template <typename Number>
@@ -860,6 +888,34 @@ namespace LinearAlgebra
       AssertCuda(cudaGetLastError());
       // Check that there was no problem during the execution of the kernel
       AssertCuda(cudaDeviceSynchronize());
+    }
+
+
+
+    template <typename Number>
+    typename Vector<Number>::value_type Vector<Number>::mean_value() const
+    {
+      Number *result_device;
+      cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
+      AssertCuda(error_code);
+      error_code = cudaMemset(result_device, Number(), sizeof(Number));
+
+      const int n_blocks = 1 + (n_elements-1)/(CHUNK_SIZE*BLOCK_SIZE);
+      internal::reduction<Number, internal::ElemSum<Number>>
+                                                          <<<dim3(n_blocks,1),dim3(BLOCK_SIZE)>>> (
+                                                            result_device, val,
+                                                            n_elements);
+
+      // Copy the result back to the host
+      Number result;
+      error_code = cudaMemcpy(&result, result_device, sizeof(Number),
+                              cudaMemcpyDeviceToHost);
+      AssertCuda(error_code);
+      // Free the memory on the device
+      error_code = cudaFree(result_device);
+      AssertCuda(error_code);
+
+      return result/static_cast<typename Vector<Number>::value_type>(n_elements);
     }
 
 

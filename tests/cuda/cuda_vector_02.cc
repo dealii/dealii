@@ -84,6 +84,8 @@ void test()
     AssertThrow(2.*read_write_2[i]==read_write_3[i],
                 ExcMessage("Problem in equ."));
 
+  AssertThrow(b.mean_value()==54.50, ExcMessage("Problem in mean_value."));
+
   AssertThrow(b.l1_norm()==5450., ExcMessage("Problem in l1_norm."));
 
   const double eps=1e-3;

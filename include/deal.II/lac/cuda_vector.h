@@ -44,6 +44,7 @@ namespace LinearAlgebra
     class Vector: public VectorSpaceVector<Number>
     {
     public:
+      typedef typename VectorSpaceVector<Number>::value_type value_type;
       typedef typename VectorSpaceVector<Number>::size_type  size_type;
       typedef typename VectorSpaceVector<Number>::real_type  real_type;
 
@@ -154,6 +155,11 @@ namespace LinearAlgebra
        * Assignement <tt>*this = a*V</tt>.
        */
       virtual void equ(const Number a, const VectorSpaceVector<Number> &V) override;
+
+      /**
+       * Return the mean value of all the entries of this vector.
+       */
+      virtual value_type mean_value() const override;
 
       /**
        * Return the l<sub>1</sub> norm of the vector (i.e., the sum of the
