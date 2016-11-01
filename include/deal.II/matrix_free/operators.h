@@ -306,7 +306,7 @@ namespace MatrixFreeOperators
   public:
 
     /**
-     * Constructor. Initializes the MatrixFree object.
+     * Constructor.
      */
     MassOperator ();
 
