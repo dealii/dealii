@@ -405,6 +405,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> New: Add MatrixFreeOperators::LaplaceOperator representing a Laplace matrix.
+ <br>
+ (Denis Davydov, 2016/10/30)
+ </li>
+
  <li> New: Add VectorTools::project() to do L2 projection
  of scalar-valued quadrature point data in parallel.
  <br>
