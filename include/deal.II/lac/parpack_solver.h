@@ -245,7 +245,7 @@ public:
                 const AdditionalData &data = AdditionalData());
 
   /**
-   * Initialise internal variables.
+   * Initialize internal variables.
    */
   void reinit(const IndexSet &locally_owned_dofs );
 
@@ -257,6 +257,11 @@ public:
    */
   void reinit(const IndexSet &locally_owned_dofs,
               const std::vector<IndexSet> &partitioning);
+
+  /**
+   * Initialize internal variables from the input @p distributed_vector.
+   */
+  void reinit(const VectorType &distributed_vector);
 
   /**
    * Set initial vector for building Krylov space.
@@ -601,8 +606,19 @@ void PArpackSolver<VectorType>::reinit(const IndexSet &locally_owned_dofs)
   src.reinit (locally_owned_dofs,mpi_communicator);
   dst.reinit (locally_owned_dofs,mpi_communicator);
   tmp.reinit (locally_owned_dofs,mpi_communicator);
-
 }
+
+template <typename VectorType>
+void PArpackSolver<VectorType>::reinit(const VectorType &distributed_vector)
+{
+  internal_reinit(distributed_vector.locally_owned_elements());
+
+  // deal.II vectors:
+  src.reinit (distributed_vector);
+  dst.reinit (distributed_vector);
+  tmp.reinit (distributed_vector);
+}
+
 
 template <typename VectorType>
 void PArpackSolver<VectorType>::reinit(const IndexSet &locally_owned_dofs,
@@ -614,7 +630,6 @@ void PArpackSolver<VectorType>::reinit(const IndexSet &locally_owned_dofs,
   src.reinit (partitioning,mpi_communicator);
   dst.reinit (partitioning,mpi_communicator);
   tmp.reinit (partitioning,mpi_communicator);
-
 }
 
 template <typename VectorType>
