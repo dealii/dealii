@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2015 by the deal.II authors
+// Copyright (C) 2002 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,7 +41,9 @@ template <typename number>
 SparseMatrixEZ<number>::SparseMatrixEZ(const SparseMatrixEZ<number> &m)
   :
   Subscriptor (m),
-  n_columns (0)
+  n_columns (0),
+  increment (m.increment),
+  saved_default_row_length (m.saved_default_row_length)
 {
   Assert (m.m()==0 && m.n()==0,
           ExcMessage("This constructor can only be called if the provided argument "
