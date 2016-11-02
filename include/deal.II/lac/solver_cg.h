@@ -215,12 +215,6 @@ public:
 
 protected:
   /**
-   * Implementation of the computation of the norm of the residual. This can
-   * be replaced by a more problem oriented functional in a derived class.
-   */
-  virtual double criterion();
-
-  /**
    * Interface for derived class. This function gets the current iteration
    * vector, the residual and the update vector in each step. It can be used
    * for a graphical output of the convergence history.
@@ -253,14 +247,6 @@ protected:
   VectorType *Vr;
   VectorType *Vp;
   VectorType *Vz;
-
-  /**
-   * Within the iteration loop, the square of the residual vector is stored in
-   * this variable. The function @p criterion uses this variable to compute
-   * the convergence value, which in this class is the norm of the residual
-   * vector and thus the square root of the @p res2 value.
-   */
-  double res2;
 
   /**
    * Additional parameters.
@@ -359,15 +345,6 @@ SolverCG<VectorType>::SolverCG (SolverControl        &cn,
 template <typename VectorType>
 SolverCG<VectorType>::~SolverCG ()
 {}
-
-
-
-template <typename VectorType>
-double
-SolverCG<VectorType>::criterion()
-{
-  return std::sqrt(res2);
-}
 
 
 
