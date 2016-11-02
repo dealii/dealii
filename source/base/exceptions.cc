@@ -16,6 +16,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/logstream.h>
 #include <string>
+#include <cstring>
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
