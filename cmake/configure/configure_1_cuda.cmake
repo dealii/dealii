@@ -41,6 +41,8 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
 
   IF(CUDA_FOUND)
 
+    SET(${var} TRUE)
+
     IF("${CUDA_NVCC_FLAGS}" MATCHES "-arch")
 
       # Compute Capability specified explicitly.
@@ -51,31 +53,50 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
       ELSEIF("${CUDA_NVCC_FLAGS}" MATCHES "-arch=sm_([0-9]*)")
         SET(CUDA_COMPUTE_CAPABILITY "${CMAKE_MATCH_1}")
       ELSE()
-        MESSAGE( FATAL_ERROR "Missformed Compute Capability specified")
+        STRING(REGEX MATCH "(-arch[ ]*[^ ]*)" match "${CUDA_NVCC_FLAGS}")
+        MESSAGE(STATUS "Ill-formed Compute Capability specified.")
+        SET(CUDA_ADDITIONAL_ERROR_STRING
+          ${CUDA_ADDITIONAL_ERROR_STRING}
+          "An ill-formed Compute Capability was passed in CUDA_NVCC_FLAGS: ${match}\n"
+          "deal.II requires at least Compute Capability 3.5\n"
+          "which is used as default is nothing is specified."
+          )
+        SET(${var} FALSE)
       ENDIF()
+
 
       IF("${CUDA_COMPUTE_CAPABILITY}" LESS "35")
-        MESSAGE( FATAL_ERROR "Too low CUDA Compute Capability specified -- deal.II requires at least 3.5 ")
+        MESSAGE(STATUS "Too low CUDA Compute Capability specified -- deal.II requires at least 3.5 ")
+        SET(CUDA_ADDITIONAL_ERROR_STRING
+          ${CUDA_ADDITIONAL_ERROR_STRING}
+          "Too low CUDA Compute Capability specified: ${CUDA_COMPUTE_CAPABILITY}\n"
+          "deal.II requires at least Compute Capability 3.5\n"
+          "which is used as default is nothing is specified."
+          )
+        SET(${var} FALSE)
       ENDIF()
     ENDIF()
 
-    IF( NOT DEFINED CUDA_COMPUTE_CAPABILITY)
-      # Set to use compute capability 3.5 by default
-      SET(CUDA_COMPUTE_CAPABILITY "35")
-      SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -arch=sm_35)
+    # Configuration was successful
+    IF(${var})
+
+      IF( NOT DEFINED CUDA_COMPUTE_CAPABILITY)
+        # Set to use compute capability 3.5 by default
+        SET(CUDA_COMPUTE_CAPABILITY "35")
+        SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -arch=sm_35)
+      ENDIF()
+
+      # Export further definitions
+      STRING(SUBSTRING "${CUDA_COMPUTE_CAPABILITY}" 0 1 CUDA_COMPUTE_CAPABILITY_MAJOR)
+      STRING(SUBSTRING "${CUDA_COMPUTE_CAPABILITY}" 1 1 CUDA_COMPUTE_CAPABILITY_MINOR)
+      SET(CUDA_ATTACH_VS_BUILD_RULE_TO_CUDA_FILE FALSE)
+
+
+      SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -std=c++11)
+
+      # FIXME: CUDA compiler NVCC doesn't support C++14.
+
     ENDIF()
-
-    # Export further definitions
-    STRING(SUBSTRING "${CUDA_COMPUTE_CAPABILITY}" 0 1 CUDA_COMPUTE_CAPABILITY_MAJOR)
-    STRING(SUBSTRING "${CUDA_COMPUTE_CAPABILITY}" 1 1 CUDA_COMPUTE_CAPABILITY_MINOR)
-
-    SET(CUDA_ATTACH_VS_BUILD_RULE_TO_CUDA_FILE FALSE)
-
-    SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -std=c++11)
-
-    # FIXME: CUDA compiler NVCC doesn't support C++14.
-
-    SET(${var} TRUE)
   ENDIF()
 
 ENDMACRO()
