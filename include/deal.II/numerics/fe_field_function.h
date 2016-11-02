@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2015 by the deal.II authors
+// Copyright (C) 2007 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -446,11 +446,6 @@ namespace Functions
      * The latest cell hint.
      */
     mutable cell_hint_t cell_hint;
-
-    /**
-     * Store the number of components of this function.
-     */
-    const unsigned int n_components;
 
     /**
      * Given a cell, return the reference coordinates of the given point

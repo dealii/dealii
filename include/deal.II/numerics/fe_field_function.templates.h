@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2015 by the deal.II authors
+// Copyright (C) 2007 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,8 +41,7 @@ namespace Functions
     dh(&mydh, "FEFieldFunction"),
     data_vector(myv),
     mapping(mymapping),
-    cell_hint(dh->end()),
-    n_components(mydh.get_fe().n_components())
+    cell_hint(dh->end())
   {
   }
 
@@ -62,8 +61,8 @@ namespace Functions
   void FEFieldFunction<dim, DoFHandlerType, VectorType>::vector_value (const Point<dim> &p,
       Vector<typename VectorType::value_type>   &values) const
   {
-    Assert (values.size() == n_components,
-            ExcDimensionMismatch(values.size(), n_components));
+    Assert (values.size() == this->n_components,
+            ExcDimensionMismatch(values.size(), this->n_components));
     typename DoFHandlerType::active_cell_iterator cell = cell_hint.get();
     if (cell == dh->end())
       cell = dh->begin_active();
@@ -101,7 +100,7 @@ namespace Functions
   FEFieldFunction<dim, DoFHandlerType, VectorType>::value (const Point<dim>   &p,
                                                            const unsigned int comp) const
   {
-    Vector<typename VectorType::value_type> values(n_components);
+    Vector<typename VectorType::value_type> values(this->n_components);
     vector_value(p, values);
     return values(comp);
   }
@@ -115,8 +114,8 @@ namespace Functions
                    std::vector<Tensor<1,dim,typename VectorType::value_type> > &gradients) const
   {
     typedef typename VectorType::value_type number;
-    Assert (gradients.size() == n_components,
-            ExcDimensionMismatch(gradients.size(), n_components));
+    Assert (gradients.size() == this->n_components,
+            ExcDimensionMismatch(gradients.size(), this->n_components));
     typename DoFHandlerType::active_cell_iterator cell = cell_hint.get();
     if (cell == dh->end())
       cell = dh->begin_active();
@@ -142,7 +141,7 @@ namespace Functions
                        update_gradients);
     fe_v.reinit(cell);
 
-    if (n_components == 1)
+    if (this->n_components == 1)
       {
         // the size of the @p gradients coincidentally coincides
         // with the number of quadrature points we evaluate the function at.
@@ -156,7 +155,7 @@ namespace Functions
         // to the number of quadrature points (always one here), whereas the second
         // to the number of components.
         std::vector< std::vector<Tensor<1,dim,number> > > vgrads
-        (1,  std::vector<Tensor<1,dim,number> >(n_components) );
+        (1,  std::vector<Tensor<1,dim,number> >(this->n_components) );
         fe_v.get_function_gradients(data_vector, vgrads);
         gradients = vgrads[0];
       }
@@ -170,7 +169,7 @@ namespace Functions
   gradient (const Point<dim>   &p,
             const unsigned int comp) const
   {
-    std::vector<Tensor<1,dim,typename VectorType::value_type> > grads(n_components);
+    std::vector<Tensor<1,dim,typename VectorType::value_type> > grads(this->n_components);
     vector_gradient(p, grads);
     return grads[comp];
   }
@@ -183,8 +182,8 @@ namespace Functions
   vector_laplacian (const Point<dim> &p,
                     Vector<typename VectorType::value_type>   &values) const
   {
-    Assert (values.size() == n_components,
-            ExcDimensionMismatch(values.size(), n_components));
+    Assert (values.size() == this->n_components,
+            ExcDimensionMismatch(values.size(), this->n_components));
     typename DoFHandlerType::active_cell_iterator cell = cell_hint.get();
     if (cell == dh->end())
       cell = dh->begin_active();
@@ -222,7 +221,7 @@ namespace Functions
   (const Point<dim>   &p,
    const unsigned int  comp) const
   {
-    Vector<typename VectorType::value_type> lap(n_components);
+    Vector<typename VectorType::value_type> lap(this->n_components);
     vector_laplacian(p, lap);
     return lap[comp];
   }
@@ -266,7 +265,7 @@ namespace Functions
       {
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
-        std::vector< Vector<typename VectorType::value_type> > vvalues (nq, Vector<typename VectorType::value_type>(n_components));
+        std::vector< Vector<typename VectorType::value_type> > vvalues (nq, Vector<typename VectorType::value_type>(this->n_components));
         fe_v.get_present_fe_values ().get_function_values(data_vector, vvalues);
         for (unsigned int q=0; q<nq; ++q)
           values[maps[i][q]] = vvalues[q];
@@ -284,7 +283,7 @@ namespace Functions
   {
     Assert(points.size() == values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
-    std::vector< Vector<typename VectorType::value_type> > vvalues(points.size(), Vector<typename VectorType::value_type>(n_components));
+    std::vector< Vector<typename VectorType::value_type> > vvalues(points.size(), Vector<typename VectorType::value_type>(this->n_components));
     vector_value_list(points, vvalues);
     for (unsigned int q=0; q<points.size(); ++q)
       values[q] = vvalues[q](component);
@@ -328,7 +327,7 @@ namespace Functions
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
         std::vector< std::vector<Tensor<1,dim,typename VectorType::value_type> > >
-        vgrads (nq, std::vector<Tensor<1,dim,typename VectorType::value_type> >(n_components));
+        vgrads (nq, std::vector<Tensor<1,dim,typename VectorType::value_type> >(this->n_components));
         fe_v.get_present_fe_values ().get_function_gradients(data_vector, vgrads);
         for (unsigned int q=0; q<nq; ++q)
           {
@@ -350,7 +349,7 @@ namespace Functions
     Assert(points.size() == values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
     std::vector< std::vector<Tensor<1,dim, typename VectorType::value_type> > >
-    vvalues(points.size(), std::vector<Tensor<1,dim,typename VectorType::value_type> >(n_components));
+    vvalues(points.size(), std::vector<Tensor<1,dim,typename VectorType::value_type> >(this->n_components));
     vector_gradient_list(points, vvalues);
     for (unsigned int q=0; q<points.size(); ++q)
       values[q] = vvalues[q][component];
@@ -392,7 +391,7 @@ namespace Functions
       {
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
-        std::vector< Vector<typename VectorType::value_type> > vvalues (nq, Vector<typename VectorType::value_type>(n_components));
+        std::vector< Vector<typename VectorType::value_type> > vvalues (nq, Vector<typename VectorType::value_type>(this->n_components));
         fe_v.get_present_fe_values ().get_function_laplacians(data_vector, vvalues);
         for (unsigned int q=0; q<nq; ++q)
           values[maps[i][q]] = vvalues[q];
@@ -408,7 +407,7 @@ namespace Functions
   {
     Assert(points.size() == values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
-    std::vector< Vector<typename VectorType::value_type> > vvalues(points.size(), Vector<typename VectorType::value_type>(n_components));
+    std::vector< Vector<typename VectorType::value_type> > vvalues(points.size(), Vector<typename VectorType::value_type>(this->n_components));
     vector_laplacian_list(points, vvalues);
     for (unsigned int q=0; q<points.size(); ++q)
       values[q] = vvalues[q](component);
