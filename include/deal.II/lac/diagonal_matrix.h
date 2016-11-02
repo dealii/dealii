@@ -54,6 +54,11 @@ public:
   VectorType &get_vector();
 
   /**
+   * Clear content of this object and reset to the state of default constructor.
+   */
+  void clear();
+
+  /**
    * Returns a read-only reference to the underlying vector.
    */
   const VectorType &get_vector() const;
@@ -143,6 +148,11 @@ public:
   void Tvmult_add (VectorType       &dst,
                    const VectorType &src) const;
 
+  /**
+   * Return the memory consumption of this object.
+   */
+  std::size_t memory_consumption () const;
+
 private:
   /**
    * The stored vector.
@@ -159,6 +169,24 @@ DiagonalMatrix<VectorType>::DiagonalMatrix()
   :
   Subscriptor()
 {}
+
+
+
+template <typename VectorType>
+void
+DiagonalMatrix<VectorType>::clear()
+{
+  diagonal.reinit(0);
+}
+
+
+
+template <typename VectorType>
+std::size_t
+DiagonalMatrix<VectorType>::memory_consumption () const
+{
+  return diagonal.memory_consumption();
+}
 
 
 
