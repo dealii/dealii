@@ -27,6 +27,19 @@ DEAL_II_NAMESPACE_OPEN
  * VectorType::scale, so the template vector class needs to provide a
  * @p scale() method.
  *
+ * When using this class with ConstraintsMatrix::distribute_local_to_global(),
+ * the underlying vector needs to provide write access to all entries referenced
+ * by cells in an assembly process. This means that this class also needs access
+ * to ghost entries that are owned by other processors than the calling one.
+ * In practice this requires initialization of the vector as follows
+ * @code
+ * DiagonalMatrix<LinearAlgebra::distributed::Vector<double> > diagonal_matrix;
+ * LinearAlgebra::distributed::Vector<double> &diagonal_vector = diagonal_matrix.get_vector();
+ * diagonal_vector.reinit(locally_owned_dofs,
+ *                        locally_relevant_dofs,
+ *                        mpi_communicator);
+ * @code
+ *
  * @author Martin Kronbichler, 2016
  */
 template <typename VectorType=Vector<double> >
@@ -46,6 +59,13 @@ public:
    * @p vec.
    */
   void reinit (const VectorType &vec);
+
+  /**
+   * Compresses the data structures and allows the resulting matrix to be used
+   * in all other operations like matrix-vector products. This is a collective
+   * operation, i.e., it needs to be run on all processors when used in parallel.
+   */
+  void compress (VectorOperation::values operation);
 
   /**
    * Returns a reference to the underlying vector for manipulation of the
@@ -117,6 +137,16 @@ public:
             const number2   *values,
             const bool       elide_zero_values = true,
             const bool       col_indices_are_sorted = false);
+
+  /**
+   * Add value to the element (i,j).
+   *
+   * Due to the storage of this matrix, entries are only added to the diagonal
+   * of the matrix. All other entries are ignored and no exception is thrown.
+   */
+  void add (const size_type i,
+            const size_type j,
+            const value_type value);
 
   /**
    * Performs a matrix-vector multiplication with the given matrix.
@@ -200,6 +230,15 @@ DiagonalMatrix<VectorType>::reinit(const VectorType &vec)
 
 
 template <typename VectorType>
+void
+DiagonalMatrix<VectorType>::compress (VectorOperation::values operation)
+{
+  diagonal.compress(operation);
+}
+
+
+
+template <typename VectorType>
 VectorType &
 DiagonalMatrix<VectorType>::get_vector()
 {
@@ -270,6 +309,18 @@ DiagonalMatrix<VectorType>::add (const size_type  row,
   for (size_type i=0; i<n_cols; ++i)
     if (col_indices[i] == row)
       diagonal(row) += values[i];
+}
+
+
+
+template <typename VectorType>
+void
+DiagonalMatrix<VectorType>::add (const size_type i,
+                                 const size_type j,
+                                 const value_type value)
+{
+  if (i == j)
+    diagonal(i) += value;
 }
 
 

@@ -39,6 +39,7 @@
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_block_sparse_matrix.h>
 #include <deal.II/lac/matrix_block.h>
+#include <deal.II/lac/diagonal_matrix.h>
 
 #include <algorithm>
 #include <numeric>
