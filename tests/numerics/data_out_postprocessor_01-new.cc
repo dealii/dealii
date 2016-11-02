@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2015 by the deal.II authors
+// Copyright (C) 2000 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,9 +17,6 @@
 // tests DataPostprocessor: create a FE field that has two components of
 // the kind cos(something) and sin(something) and then have a postprocessor
 // that computes the sum of squares. should always be equal to one
-//
-// this test uses the shortcut class DataPostprocessorVector to make
-// writing postprocessors simpler
 
 
 #include "../tests.h"
@@ -129,30 +126,39 @@ void LaplaceProblem<dim>::solve ()
 
 
 template <int dim>
-class MyPostprocessor : public DataPostprocessorVector<dim>
+class MyPostprocessor : public DataPostprocessor<dim>
 {
 public:
-  MyPostprocessor ()
-    :
-    DataPostprocessorVector<dim> ("magnitude_times_d", update_values)
-  {}
+  virtual std::vector<std::string> get_names () const
+  {
+    return std::vector<std::string>(1,"magnitude");
+  }
+
+  virtual
+  std::vector<DataComponentInterpretation::DataComponentInterpretation>
+  get_data_component_interpretation () const
+  {
+    return
+      std::vector<DataComponentInterpretation::DataComponentInterpretation>
+      (1,DataComponentInterpretation::component_is_scalar);
+  }
+
+  virtual UpdateFlags get_needed_update_flags () const
+  {
+    return update_values;
+  }
 
   virtual
   void
-  compute_derived_quantities_vector (const std::vector<Vector<double> >              &solution_values,
-                                     const std::vector<std::vector<Tensor<1,dim> > > &,
-                                     const std::vector<std::vector<Tensor<2,dim> > > &,
-                                     const std::vector<Point<dim> > &,
-                                     const std::vector<Point<dim> > &,
+  compute_derived_quantities_vector (const DataPostprocessorInputs::Vector<dim> &input_data,
                                      std::vector<Vector<double> >                    &computed_quantities) const
   {
-    for (unsigned int q=0; q<solution_values.size(); ++q)
+    for (unsigned int q=0; q<input_data.solution_values.size(); ++q)
       {
-        Assert (computed_quantities[q].size() == dim,
-                ExcInternalError());
+        AssertThrow (computed_quantities[q].size() == 1,
+                     ExcInternalError());
 
-        for (unsigned int d=0; d<dim; ++d)
-          computed_quantities[q](d) = solution_values[q](0)*solution_values[q](0) + solution_values[q](1)*solution_values[q](1);
+        computed_quantities[q](0) = input_data.solution_values[q](0)*input_data.solution_values[q](0) + input_data.solution_values[q](1)*input_data.solution_values[q](1);
         AssertThrow (std::fabs(computed_quantities[q](0)-1) < 1e-12,
                      ExcInternalError());
       }

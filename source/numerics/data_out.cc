@@ -141,7 +141,8 @@ build_one_patch
           const unsigned int n_components =
             this_fe_patch_values.get_fe().n_components();
 
-          const DataPostprocessor<DoFHandlerType::space_dimension> *postprocessor=this->dof_data[dataset]->postprocessor;
+          const DataPostprocessor<DoFHandlerType::space_dimension> *postprocessor
+            = this->dof_data[dataset]->postprocessor;
 
           if (postprocessor != 0)
             {
@@ -154,25 +155,20 @@ build_one_patch
                   // gradient etc.
                   if (update_flags & update_values)
                     this->dof_data[dataset]->get_function_values (this_fe_patch_values,
-                                                                  scratch_data.patch_values);
+                                                                  scratch_data.patch_values_scalar.solution_values);
                   if (update_flags & update_gradients)
                     this->dof_data[dataset]->get_function_gradients (this_fe_patch_values,
-                                                                     scratch_data.patch_gradients);
+                                                                     scratch_data.patch_values_scalar.solution_gradients);
                   if (update_flags & update_hessians)
                     this->dof_data[dataset]->get_function_hessians (this_fe_patch_values,
-                                                                    scratch_data.patch_hessians);
+                                                                    scratch_data.patch_values_scalar.solution_hessians);
 
                   if (update_flags & update_quadrature_points)
-                    scratch_data.patch_evaluation_points = this_fe_patch_values.get_quadrature_points();
+                    scratch_data.patch_values_scalar.evaluation_points = this_fe_patch_values.get_quadrature_points();
 
 
-                  std::vector<Point<DoFHandlerType::space_dimension> > dummy_normals;
                   postprocessor->
-                  compute_derived_quantities_scalar(scratch_data.patch_values,
-                                                    scratch_data.patch_gradients,
-                                                    scratch_data.patch_hessians,
-                                                    dummy_normals,
-                                                    scratch_data.patch_evaluation_points,
+                  compute_derived_quantities_scalar(scratch_data.patch_values_scalar,
                                                     scratch_data.postprocessed_values[dataset]);
                 }
               else
@@ -183,25 +179,19 @@ build_one_patch
                   // derivative...
                   if (update_flags & update_values)
                     this->dof_data[dataset]->get_function_values (this_fe_patch_values,
-                                                                  scratch_data.patch_values_system);
+                                                                  scratch_data.patch_values_system.solution_values);
                   if (update_flags & update_gradients)
                     this->dof_data[dataset]->get_function_gradients (this_fe_patch_values,
-                                                                     scratch_data.patch_gradients_system);
+                                                                     scratch_data.patch_values_system.solution_gradients);
                   if (update_flags & update_hessians)
                     this->dof_data[dataset]->get_function_hessians (this_fe_patch_values,
-                                                                    scratch_data.patch_hessians_system);
+                                                                    scratch_data.patch_values_system.solution_hessians);
 
                   if (update_flags & update_quadrature_points)
-                    scratch_data.patch_evaluation_points = this_fe_patch_values.get_quadrature_points();
-
-                  std::vector<Point<DoFHandlerType::space_dimension> > dummy_normals;
+                    scratch_data.patch_values_system.evaluation_points = this_fe_patch_values.get_quadrature_points();
 
                   postprocessor->
                   compute_derived_quantities_vector(scratch_data.patch_values_system,
-                                                    scratch_data.patch_gradients_system,
-                                                    scratch_data.patch_hessians_system,
-                                                    dummy_normals,
-                                                    scratch_data.patch_evaluation_points,
                                                     scratch_data.postprocessed_values[dataset]);
                 }
 
@@ -219,20 +209,20 @@ build_one_patch
             if (n_components == 1)
               {
                 this->dof_data[dataset]->get_function_values (this_fe_patch_values,
-                                                              scratch_data.patch_values);
+                                                              scratch_data.patch_values_scalar.solution_values);
                 for (unsigned int q=0; q<n_q_points; ++q)
-                  patch.data(offset,q) = scratch_data.patch_values[q];
+                  patch.data(offset,q) = scratch_data.patch_values_scalar.solution_values[q];
               }
             else
               {
                 scratch_data.resize_system_vectors(n_components);
                 this->dof_data[dataset]->get_function_values (this_fe_patch_values,
-                                                              scratch_data.patch_values_system);
+                                                              scratch_data.patch_values_system.solution_values);
                 for (unsigned int component=0; component<n_components;
                      ++component)
                   for (unsigned int q=0; q<n_q_points; ++q)
                     patch.data(offset+component,q) =
-                      scratch_data.patch_values_system[q](component);
+                      scratch_data.patch_values_system.solution_values[q](component);
               }
           // increment the counter for the actual data record
           offset+=this->dof_data[dataset]->n_output_variables;

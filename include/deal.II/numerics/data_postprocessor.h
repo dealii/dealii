@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2015 by the deal.II authors
+// Copyright (C) 2007 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,6 +29,190 @@
 #include <string>
 
 DEAL_II_NAMESPACE_OPEN
+
+
+/**
+ * A namespace for data structures that are going to be passed from
+ * DataOut to the member functions of DataPostprocessor.
+ */
+namespace DataPostprocessorInputs
+{
+  /**
+   * A structure that is used to pass information to
+   * DataPostprocessor::compute_derived_quantities_scalar(). It contains
+   * the values and (if requested) derivatives of a scalar solution
+   * variable at the evaluation points on a cell or face. If appropriate,
+   * it also contains the normal vectors to the geometry on which output
+   * is generated, at these evaluation points.
+   */
+  template <int spacedim>
+  struct Scalar
+  {
+    /**
+     * An array of values of the (scalar) solution at each of the evaluation
+     * points used to create graphical output from one cell, face, or other
+     * object.
+     */
+    std::vector<double>               solution_values;
+
+    /**
+     * An array of gradients of the (scalar) solution at each of the evaluation
+     * points used to create graphical output from one cell, face, or other
+     * object.
+     *
+     * This array is only filled if a user-derived class overloads the
+     * DataPostprocessor::get_needed_update_flags(), and the function
+     * returns (possibly among other flags)
+     * UpdateFlags::update_gradients.  Alternatively, a class derived
+     * from DataPostprocessorScalar or DataPostprocessorVector may
+     * pass this flag to the constructor of DataPostprocessorScalar or
+     * DataPostprocessorVector.
+     */
+    std::vector<Tensor<1, spacedim> > solution_gradients;
+
+    /**
+     * An array of second derivatives of the (scalar) solution at each of the evaluation
+     * points used to create graphical output from one cell, face, or other
+     * object.
+     *
+     * This array is only filled if a user-derived class overloads the
+     * DataPostprocessor::get_needed_update_flags(), and the function
+     * returns (possibly among other flags)
+     * UpdateFlags::update_hessians.  Alternatively, a class derived
+     * from DataPostprocessorScalar or DataPostprocessorVector may
+     * pass this flag to the constructor of DataPostprocessorScalar or
+     * DataPostprocessorVector.
+     */
+    std::vector<Tensor<2, spacedim> > solution_hessians;
+
+    /**
+     * An array of vectors normal to the faces of cells, evaluated at the points
+     * at which we are generating graphical output. This array is only used by
+     * the DataOutFaces class, and is left empty by all other classes for
+     * which the DataPostprocessor framework can be used. In the case of
+     * DataOutFaces, the array contains the outward normal vectors to the
+     * face, seen from the interior of the cell.
+     *
+     * This array is only filled if a user-derived class overloads the
+     * DataPostprocessor::get_needed_update_flags(), and the function
+     * returns (possibly among other flags)
+     * UpdateFlags::update_normal_vectors.  Alternatively, a class
+     * derived from DataPostprocessorScalar or DataPostprocessorVector
+     * may pass this flag to the constructor of
+     * DataPostprocessorScalar or DataPostprocessorVector.
+     */
+    std::vector<Tensor<1, spacedim> > normals;
+
+    /**
+     * An array of coordinates corresponding to the locations at which
+     * we are generating graphical output on one cell.
+     *
+     * This array is only filled if a user-derived class overloads the
+     * DataPostprocessor::get_needed_update_flags(), and the function
+     * returns (possibly among other flags)
+     * UpdateFlags::update_quadrature_points.  Alternatively, a class
+     * derived from DataPostprocessorScalar or DataPostprocessorVector
+     * may pass this flag to the constructor of
+     * DataPostprocessorScalar or DataPostprocessorVector.
+     */
+    std::vector<Point<spacedim> >     evaluation_points;
+  };
+
+
+
+  /**
+   * A structure that is used to pass information to
+   * DataPostprocessor::compute_derived_quantities_vector(). It contains
+   * the values and (if requested) derivatives of a vector-valued solution
+   * variable at the evaluation points on a cell or face. If appropriate,
+   * it also contains the normal vectors to the geometry on which output
+   * is generated, at these evaluation points.
+   */
+  template <int spacedim>
+  struct Vector
+  {
+    /**
+     * An array of values of a vector-valued solution at each of the evaluation
+     * points used to create graphical output from one cell, face, or other
+     * object.
+     *
+     * The outer vector runs over the evaluation points, whereas the inner
+     * vector runs over the components of the finite element field for which
+     * output will be generated.
+     */
+    std::vector<dealii::Vector<double> >            solution_values;
+
+    /**
+     * An array of gradients of a vector-valued solution at each of the evaluation
+     * points used to create graphical output from one cell, face, or other
+     * object.
+     *
+     * The outer vector runs over the evaluation points, whereas the inner
+     * vector runs over the components of the finite element field for which
+     * output will be generated.
+     *
+     * This array is only filled if a user-derived class overloads the
+     * DataPostprocessor::get_needed_update_flags(), and the function
+     * returns (possibly among other flags)
+     * UpdateFlags::update_gradients.  Alternatively, a class derived
+     * from DataPostprocessorScalar or DataPostprocessorVector may
+     * pass this flag to the constructor of DataPostprocessorScalar or
+     * DataPostprocessorVector.
+     */
+    std::vector<std::vector<Tensor<1, spacedim> > > solution_gradients;
+
+    /**
+     * An array of second derivatives of a vector-valued solution at each of the evaluation
+     * points used to create graphical output from one cell, face, or other
+     * object.
+     *
+     * The outer vector runs over the evaluation points, whereas the inner
+     * vector runs over the components of the finite element field for which
+     * output will be generated.
+     *
+     * This array is only filled if a user-derived class overloads the
+     * DataPostprocessor::get_needed_update_flags(), and the function
+     * returns (possibly among other flags)
+     * UpdateFlags::update_hessians.  Alternatively, a class derived
+     * from DataPostprocessorScalar or DataPostprocessorVector may
+     * pass this flag to the constructor of DataPostprocessorScalar or
+     * DataPostprocessorVector.
+     */
+    std::vector<std::vector<Tensor<2, spacedim> > > solution_hessians;
+
+    /**
+     * An array of vectors normal to the faces of cells, evaluated at the points
+     * at which we are generating graphical output. This array is only used by
+     * the DataOutFaces class, and is left empty by all other classes for
+     * which the DataPostprocessor framework can be used. In the case of
+     * DataOutFaces, the array contains the outward normal vectors to the
+     * face, seen from the interior of the cell.
+     *
+     * This array is only filled if a user-derived class overloads the
+     * DataPostprocessor::get_needed_update_flags(), and the function
+     * returns (possibly among other flags)
+     * UpdateFlags::update_normal_vectors.  Alternatively, a class
+     * derived from DataPostprocessorScalar or DataPostprocessorVector
+     * may pass this flag to the constructor of
+     * DataPostprocessorScalar or DataPostprocessorVector.
+     */
+    std::vector<Tensor<1, spacedim> >               normals;
+
+    /**
+     * An array of coordinates corresponding to the locations at which
+     * we are generating graphical output on one cell.
+     *
+     * This array is only filled if a user-derived class overloads the
+     * DataPostprocessor::get_needed_update_flags(), and the function
+     * returns (possibly among other flags)
+     * UpdateFlags::update_quadrature_points.  Alternatively, a class
+     * derived from DataPostprocessorScalar or DataPostprocessorVector
+     * may pass this flag to the constructor of
+     * DataPostprocessorScalar or DataPostprocessorVector.
+     */
+    std::vector<Point<spacedim> >                   evaluation_points;
+  };
+}
 
 
 /**
@@ -108,12 +292,13 @@ DEAL_II_NAMESPACE_OPEN
  * actually computes the results.
  *
  * @ingroup output
- * @author Tobias Leicht, 2007
+ * @author Tobias Leicht, 2007, Wolfgang Bangerth, 2016
  */
 template <int dim>
 class DataPostprocessor: public Subscriptor
 {
 public:
+
   /**
    * Destructor. This function doesn't actually do anything but is marked as
    * virtual to ensure that data postprocessors can be destroyed through
@@ -123,26 +308,55 @@ public:
 
   /**
    * This is the main function which actually performs the postprocessing. The
-   * last argument is a reference to the postprocessed data which has correct
-   * size already and must be filled by this function. @p uh is a reference to
-   * a vector of data values at all points, @p duh the same for gradients, @p
-   * dduh for second derivatives and @p normals is a reference to the normal
-   * vectors. Note, that the last four references will only contain valid
-   * data, if the respective flags are returned by @p get_needed_update_flags,
-   * otherwise those vectors will be in an unspecified state. @p normals will
-   * always be an empty vector when working on cells, not on faces.
+   * second argument is a reference to the postprocessed data which already has
+   * correct size and must be filled by this function.
    *
-   * This function is called when the original data vector represents scalar
+   * The function takes the values, gradients, and higher derivatives of the
+   * solution at all evaluation points, as well as other data such as the
+   * cell, via the first argument. Not all of the member vectors of this
+   * argument will be filled with data -- in fact, derivatives and other
+   * quantities will only be contain valid data if the corresponding flags
+   * are returned by by an overloaded version of the get_needed_update_flags()
+   * function (implemented in a user's derived class).
+   * Otherwise those vectors will be in an unspecified state.
+   *
+   * This function is called when the finite element field that is being
+   * converted into graphical data by DataOut or similar classes represents scalar
    * data, i.e. the finite element in use has only a single vector component.
    */
   virtual
   void
-  compute_derived_quantities_scalar (const std::vector<double>         &uh,
-                                     const std::vector<Tensor<1,dim> > &duh,
-                                     const std::vector<Tensor<2,dim> > &dduh,
+  compute_derived_quantities_scalar (const DataPostprocessorInputs::Scalar<dim> &input_data,
+                                     std::vector<Vector<double> >               &computed_quantities) const;
+
+  /**
+   * @deprecated This function is deprecated. It has been superseded by
+   * function of same name above that receives a superset of the
+   * information provided to the current function through the members
+   * of the structure it receives as the first argument.
+   *
+   * If a user class derived from the current class (or from
+   * DataPostprocessorScalar) does not overload the function above,
+   * but instead overloads the current (legacy) form of the function,
+   * then the default implementation of the function above will simply
+   * call the current function. However, not all elements of the
+   * DataPostprocessorInputs::Scalar argument the function above
+   * receives have corresponding function arguments in the current
+   * function, and consequently not all information that function has
+   * available is passed on to the current one. In other words, there
+   * are pieces of information you may need in an implementation of a
+   * postprocess that are available if you overload the new form of this
+   * function above, but that are not available if you overload the old
+   * form of the function here.
+   */
+  virtual
+  void
+  compute_derived_quantities_scalar (const std::vector<double>         &solution_values,
+                                     const std::vector<Tensor<1,dim> > &solution_gradients,
+                                     const std::vector<Tensor<2,dim> > &solution_hessians,
                                      const std::vector<Point<dim> >    &normals,
                                      const std::vector<Point<dim> >    &evaluation_points,
-                                     std::vector<Vector<double> >      &computed_quantities) const;
+                                     std::vector<Vector<double> >      &computed_quantities) const DEAL_II_DEPRECATED;
 
   /**
    * Same as the compute_derived_quantities_scalar() function, but this
@@ -151,12 +365,37 @@ public:
    */
   virtual
   void
-  compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
-                                     const std::vector<std::vector<Tensor<1,dim> > > &duh,
-                                     const std::vector<std::vector<Tensor<2,dim> > > &dduh,
+  compute_derived_quantities_vector (const DataPostprocessorInputs::Vector<dim> &input_data,
+                                     std::vector<Vector<double> >               &computed_quantities) const;
+
+  /**
+   * @deprecated This function is deprecated. It has been superseded by
+   * function of same name above that receives a superset of the
+   * information provided to the current function through the members
+   * of the structure it receives as the first argument.
+   *
+   * If a user class derived from the current class (or from
+   * DataPostprocessorVector) does not overload the function above,
+   * but instead overloads the current (legacy) form of the function,
+   * then the default implementation of the function above will simply
+   * call the current function. However, not all elements of the
+   * DataPostprocessorInputs::Vector argument the function above
+   * receives have corresponding function arguments in the current
+   * function, and consequently not all information that function has
+   * available is passed on to the current one. In other words, there
+   * are pieces of information you may need in an implementation of a
+   * postprocess that are available if you overload the new form of this
+   * function above, but that are not available if you overload the old
+   * form of the function here.
+   */
+  virtual
+  void
+  compute_derived_quantities_vector (const std::vector<Vector<double> >              &solution_values,
+                                     const std::vector<std::vector<Tensor<1,dim> > > &solution_gradients,
+                                     const std::vector<std::vector<Tensor<2,dim> > > &solution_hessians,
                                      const std::vector<Point<dim> >                  &normals,
                                      const std::vector<Point<dim> >                  &evaluation_points,
-                                     std::vector<Vector<double> >                    &computed_quantities) const;
+                                     std::vector<Vector<double> >                    &computed_quantities) const DEAL_II_DEPRECATED;
 
   /**
    * Return the vector of strings describing the names of the computed

@@ -105,24 +105,24 @@ Postprocess<dim>::n_output_variables () const
 template <int dim>
 void
 Postprocess<dim>::compute_derived_quantities_scalar (
-  const std::vector< double >                  &uh,
-  const std::vector< Tensor< 1, dim > >   &duh,
-  const std::vector< Tensor< 2, dim > >   &dduh,
+  const std::vector< double >                  &solution_values,
+  const std::vector< Tensor< 1, dim > >   &solution_gradients,
+  const std::vector< Tensor< 2, dim > >   &solution_hessians,
   const std::vector< Point< dim > >                     & /* normals */,
   const std::vector< Point< dim > >                     & /* locations */,
   std::vector< Vector< double > >                        &computed_quantities
 ) const
 {
-  Assert(computed_quantities.size() == uh.size(),
-         ExcDimensionMismatch (computed_quantities.size(), uh.size()));
+  Assert(computed_quantities.size() == solution_values.size(),
+         ExcDimensionMismatch (computed_quantities.size(), solution_values.size()));
 
   for (unsigned int i=0; i<computed_quantities.size(); i++)
     {
       Assert(computed_quantities[i].size() == 2,
              ExcDimensionMismatch (computed_quantities[i].size(), 2));
 
-      computed_quantities[i](0) = duh[i][0]; // norm of x gradient
-      computed_quantities[i](1) = dduh[i][0].norm(); // norm of x hessian
+      computed_quantities[i](0) = solution_gradients[i][0]; // norm of x gradient
+      computed_quantities[i](1) = solution_hessians[i][0].norm(); // norm of x hessian
     }
 }
 
