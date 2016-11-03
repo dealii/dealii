@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2015 by the deal.II authors
+// Copyright (C) 2002 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -167,17 +167,20 @@ public:
    * Constructor with initialization.
    */
   template <typename MatrixType>
-  ScaledMatrix (const MatrixType &M, const double factor);
+  ScaledMatrix (const MatrixType &M,
+                const double factor);
 
   /**
    * Destructor
    */
   ~ScaledMatrix ();
+
   /**
    * Initialize for use with a new matrix and factor.
    */
   template <typename MatrixType>
-  void initialize (const MatrixType &M, const double factor);
+  void initialize (const MatrixType &M,
+                   const double factor);
 
   /**
    * Reset the object to its original state.
@@ -187,18 +190,21 @@ public:
   /**
    * Matrix-vector product.
    */
-  void vmult (VectorType &w, const VectorType &v) const;
+  void vmult (VectorType &w,
+              const VectorType &v) const;
 
   /**
    * Transposed matrix-vector product.
    */
-  void Tvmult (VectorType &w, const VectorType &v) const;
+  void Tvmult (VectorType &w,
+               const VectorType &v) const;
 
 private:
   /**
    * The matrix.
    */
   PointerMatrixBase<VectorType> *m;
+
   /**
    * The scaling factor;
    */
@@ -510,7 +516,8 @@ template<typename VectorType>
 inline
 ScaledMatrix<VectorType>::ScaledMatrix()
   :
-  m(0)
+  m(0),
+  factor (0)
 {}
 
 
