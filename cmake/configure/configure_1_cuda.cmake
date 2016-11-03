@@ -43,6 +43,11 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
 
     SET(${var} TRUE)
 
+    IF(DEFINED CUDA_DIR)
+      SET(CUDA_TOOLKIT_ROOT_DIR "${CUDA_DIR}")
+    ENDIF()
+    MESSAGE(STATUS "Configured to use CUDA installation at ${CUDA_TOOLKIT_ROOT_DIR}")
+
     IF("${CUDA_NVCC_FLAGS}" MATCHES "-arch")
 
       # Compute Capability specified explicitly.
