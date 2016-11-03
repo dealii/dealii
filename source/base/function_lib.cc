@@ -1049,12 +1049,12 @@ namespace Functions
         break;
       case 2:
         result[0] = std::exp(p(0)) * std::exp(p(1));
-        result[1] = std::exp(p(0)) * std::exp(p(1));
+        result[1] = result[0];
         break;
       case 3:
         result[0] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
-        result[1] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
-        result[2] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+        result[1] = result[0];
+        result[2] = result[0];
         break;
       default:
         Assert(false, ExcNotImplemented());
@@ -1081,12 +1081,12 @@ namespace Functions
             break;
           case 2:
             gradients[i][0] = std::exp(p(0)) * std::exp(p(1));
-            gradients[i][1] = std::exp(p(0)) * std::exp(p(1));
+            gradients[i][1] = gradients[i][0];
             break;
           case 3:
             gradients[i][0] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
-            gradients[i][1] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
-            gradients[i][2] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+            gradients[i][1] = gradients[i][0];
+            gradients[i][2] = gradients[i][0];
             break;
           default:
             Assert(false, ExcNotImplemented());
