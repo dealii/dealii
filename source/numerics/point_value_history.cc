@@ -653,9 +653,9 @@ void PointValueHistory<dim>
         {
           // Extract data for the
           // PostProcessor object
-          std::vector< typename VectorType::value_type > uh (n_quadrature_points, 0.0);
-          std::vector< Tensor< 1, dim, typename VectorType::value_type > > duh (n_quadrature_points, Tensor <1, dim, typename VectorType::value_type> ());
-          std::vector< Tensor< 2, dim, typename VectorType::value_type > > dduh (n_quadrature_points, Tensor <2, dim, typename VectorType::value_type> ());
+          std::vector< typename VectorType::value_type > solution_values (n_quadrature_points, 0.0);
+          std::vector< Tensor< 1, dim, typename VectorType::value_type > > solution_gradients (n_quadrature_points, Tensor <1, dim, typename VectorType::value_type> ());
+          std::vector< Tensor< 2, dim, typename VectorType::value_type > > solution_hessians (n_quadrature_points, Tensor <2, dim, typename VectorType::value_type> ());
           std::vector<Point<dim> > dummy_normals (1, Point<dim> ());
           std::vector<Point<dim> > evaluation_points;
           // at each point there is
@@ -663,13 +663,13 @@ void PointValueHistory<dim>
           // value, gradient etc.
           if (update_flags & update_values)
             fe_values.get_function_values (solution,
-                                           uh);
+                                           solution_values);
           if (update_flags & update_gradients)
             fe_values.get_function_gradients (solution,
-                                              duh);
+                                              solution_gradients);
           if (update_flags & update_hessians)
             fe_values.get_function_hessians (solution,
-                                             dduh);
+                                             solution_hessians);
 
           // find the closest quadrature point
           evaluation_points = fe_values.get_quadrature_points();
@@ -688,9 +688,9 @@ void PointValueHistory<dim>
           // or compute_derived_quantities_scalar
           // TODO this function should also operate with typename VectorType::value_type
           data_postprocessor.
-          compute_derived_quantities_scalar(std::vector< double > (1, uh[selected_point]),
-                                            std::vector< Tensor< 1, dim > > (1, Tensor< 1, dim >(duh[selected_point]) ),
-                                            std::vector< Tensor< 2, dim > > (1, Tensor< 2, dim >(dduh[selected_point]) ),
+          compute_derived_quantities_scalar(std::vector< double > (1, solution_values[selected_point]),
+                                            std::vector< Tensor< 1, dim > > (1, Tensor< 1, dim >(solution_gradients[selected_point]) ),
+                                            std::vector< Tensor< 2, dim > > (1, Tensor< 2, dim >(solution_hessians[selected_point]) ),
                                             dummy_normals,
                                             std::vector<Point<dim> > (1, evaluation_points[selected_point]),
                                             computed_quantities);
@@ -699,9 +699,9 @@ void PointValueHistory<dim>
       else     // The case of a vector FE
         {
           // Extract data for the PostProcessor object
-          std::vector< Vector< typename VectorType::value_type > > uh (n_quadrature_points, Vector <typename VectorType::value_type> (n_components));
-          std::vector< std::vector< Tensor< 1, dim, typename VectorType::value_type > > > duh (n_quadrature_points, std::vector< Tensor< 1, dim, typename VectorType::value_type > > (n_components,  Tensor< 1, dim, typename VectorType::value_type >()));
-          std::vector< std::vector< Tensor< 2, dim, typename VectorType::value_type > > > dduh (n_quadrature_points, std::vector< Tensor< 2, dim, typename VectorType::value_type > > (n_components,  Tensor< 2, dim, typename VectorType::value_type >()));
+          std::vector< Vector< typename VectorType::value_type > > solution_values (n_quadrature_points, Vector <typename VectorType::value_type> (n_components));
+          std::vector< std::vector< Tensor< 1, dim, typename VectorType::value_type > > > solution_gradients (n_quadrature_points, std::vector< Tensor< 1, dim, typename VectorType::value_type > > (n_components,  Tensor< 1, dim, typename VectorType::value_type >()));
+          std::vector< std::vector< Tensor< 2, dim, typename VectorType::value_type > > > solution_hessians (n_quadrature_points, std::vector< Tensor< 2, dim, typename VectorType::value_type > > (n_components,  Tensor< 2, dim, typename VectorType::value_type >()));
           std::vector<Point<dim> > dummy_normals  (1, Point<dim> ());
           std::vector<Point<dim> > evaluation_points;
           // at each point there is
@@ -710,13 +710,13 @@ void PointValueHistory<dim>
           // derivative...
           if (update_flags & update_values)
             fe_values.get_function_values (solution,
-                                           uh);
+                                           solution_values);
           if (update_flags & update_gradients)
             fe_values.get_function_gradients (solution,
-                                              duh);
+                                              solution_gradients);
           if (update_flags & update_hessians)
             fe_values.get_function_hessians (solution,
-                                             dduh);
+                                             solution_hessians);
 
           // find the closest quadrature point
           evaluation_points = fe_values.get_quadrature_points();
@@ -734,20 +734,20 @@ void PointValueHistory<dim>
           // FIXME: We need tmp vectors below because the data
           // postprocessors are not equipped to deal with anything but
           // doubles (scalars and tensors).
-          const Vector< typename VectorType::value_type >                        &uh_s   = uh[selected_point];
-          const std::vector< Tensor< 1, dim, typename VectorType::value_type > > &duh_s  = duh[selected_point];
-          const std::vector< Tensor< 2, dim, typename VectorType::value_type > > &dduh_s = dduh[selected_point];
-          std::vector< Tensor< 1, dim > > tmp_d (duh_s.size());
-          for (unsigned int i = 0; i < duh_s.size(); i++)
-            tmp_d[i] = duh_s[i];
+          const Vector< typename VectorType::value_type >                        &solution_values_s   = solution_values[selected_point];
+          const std::vector< Tensor< 1, dim, typename VectorType::value_type > > &solution_gradients_s  = solution_gradients[selected_point];
+          const std::vector< Tensor< 2, dim, typename VectorType::value_type > > &solution_hessians_s = solution_hessians[selected_point];
+          std::vector< Tensor< 1, dim > > tmp_d (solution_gradients_s.size());
+          for (unsigned int i = 0; i < solution_gradients_s.size(); i++)
+            tmp_d[i] = solution_gradients_s[i];
 
-          std::vector< Tensor< 2, dim > > tmp_dd (dduh_s.size());
-          for (unsigned int i = 0; i < dduh_s.size(); i++)
-            tmp_dd[i] = dduh_s[i];
+          std::vector< Tensor< 2, dim > > tmp_dd (solution_hessians_s.size());
+          for (unsigned int i = 0; i < solution_hessians_s.size(); i++)
+            tmp_dd[i] = solution_hessians_s[i];
 
-          Vector< double > tmp(uh_s.size());
-          for (unsigned int i = 0; i < uh_s.size(); i++)
-            tmp[i] = uh_s[i];
+          Vector< double > tmp(solution_values_s.size());
+          for (unsigned int i = 0; i < solution_values_s.size(); i++)
+            tmp[i] = solution_values_s[i];
           // Call compute_derived_quantities_vector
           // or compute_derived_quantities_scalar
           data_postprocessor.
