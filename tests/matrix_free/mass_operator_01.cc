@@ -107,7 +107,7 @@ void test ()
 
   MatrixFree<dim,number> mf_data;
   {
-    const QGauss<1> quad (fe_degree+1);
+    const QGauss<1> quad (fe_degree+2);
     typename MatrixFree<dim,number>::AdditionalData data;
     data.mpi_communicator = MPI_COMM_WORLD;
     data.tasks_parallel_scheme =
@@ -116,7 +116,7 @@ void test ()
     mf_data.reinit (dof, constraints, quad, data);
   }
 
-  MatrixFreeOperators::MassOperator<dim,fe_degree, 1, number> mf;
+  MatrixFreeOperators::MassOperator<dim,fe_degree, fe_degree+2, 1, number> mf;
   mf.initialize(mf_data);
   mf.compute_diagonal();
   LinearAlgebra::distributed::Vector<number> in, out, ref;
@@ -147,7 +147,7 @@ void test ()
     sparse_matrix.reinit (csp);
   }
   {
-    QGauss<dim>  quadrature_formula(fe_degree+1);
+    QGauss<dim>  quadrature_formula(fe_degree+2);
 
     FEValues<dim> fe_values (dof.get_fe(), quadrature_formula,
                              update_values    |  update_gradients |

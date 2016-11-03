@@ -917,8 +917,8 @@ namespace VectorTools
       additional_data.mapping_update_flags = (update_values | update_JxW_values);
       MatrixFree<dim, Number> matrix_free;
       matrix_free.reinit (mapping, dof, constraints,
-                          QGauss<1>(fe_degree+1), additional_data);
-      typedef MatrixFreeOperators::MassOperator<dim, fe_degree, 1, Number> MatrixType;
+                          QGauss<1>(fe_degree+2), additional_data);
+      typedef MatrixFreeOperators::MassOperator<dim, fe_degree, fe_degree+2, 1, Number> MatrixType;
       MatrixType mass_matrix;
       mass_matrix.initialize(matrix_free);
       mass_matrix.compute_diagonal();
@@ -1004,7 +1004,7 @@ namespace VectorTools
       Assert (dof.get_fe().degree == fe_degree,
               ExcDimensionMismatch(fe_degree, dof.get_fe().degree));
 
-      typedef MatrixFreeOperators::MassOperator<dim, fe_degree, 1, Number> MatrixType;
+      typedef MatrixFreeOperators::MassOperator<dim, fe_degree, n_q_points_1d, 1, Number> MatrixType;
       MatrixType mass_matrix;
       mass_matrix.initialize(matrix_free);
       mass_matrix.compute_diagonal();
