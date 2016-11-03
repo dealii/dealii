@@ -3830,6 +3830,7 @@ FEFaceValuesBase<dim,spacedim>::FEFaceValuesBase (const unsigned int n_q_points,
                               update_default,
                               mapping,
                               fe),
+  present_face_index (numbers::invalid_unsigned_int),
   quadrature(quadrature)
 {}
 
