@@ -301,7 +301,7 @@ namespace MatrixFreeOperators
    *
    * @author Daniel Arndt, 2016
    */
-  template <int dim, int fe_degree, int n_components = 1, typename Number = double>
+  template <int dim, int fe_degree, int n_q_points_1d = fe_degree+1, int n_components = 1, typename Number = double>
   class MassOperator : public Base<dim, Number>
   {
   public:
@@ -901,8 +901,8 @@ namespace MatrixFreeOperators
 
   //-----------------------------MassOperator----------------------------------
 
-  template <int dim, int fe_degree, int n_components, typename Number>
-  MassOperator<dim, fe_degree, n_components, Number>::
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
+  MassOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
   MassOperator ()
     :
     Base<dim, Number>()
@@ -910,9 +910,9 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, int fe_degree, int n_components, typename Number>
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
   void
-  MassOperator<dim, fe_degree, n_components, Number>::
+  MassOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
   compute_diagonal()
   {
     Assert((Base<dim, Number>::data != NULL), ExcNotInitialized());
@@ -938,9 +938,9 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, int fe_degree, int n_components, typename Number>
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
   void
-  MassOperator<dim, fe_degree, n_components, Number>::
+  MassOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
   apply_add (LinearAlgebra::distributed::Vector<Number>       &dst,
              const LinearAlgebra::distributed::Vector<Number> &src) const
   {
@@ -950,15 +950,15 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, int fe_degree, int n_components, typename Number>
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
   void
-  MassOperator<dim, fe_degree, n_components, Number>::
+  MassOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
   local_apply_cell (const MatrixFree<dim,Number>                     &data,
                     LinearAlgebra::distributed::Vector<Number>       &dst,
                     const LinearAlgebra::distributed::Vector<Number> &src,
                     const std::pair<unsigned int,unsigned int>  &cell_range) const
   {
-    FEEvaluation<dim, fe_degree, fe_degree+1, n_components, Number> phi(data);
+    FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number> phi(data);
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
         phi.reinit (cell);
