@@ -52,7 +52,7 @@ namespace MatrixFreeOperators
     /**
      * Number typedef.
      */
-    typedef Number number_type;
+    typedef Number value_type;
 
     /**
      * size_type needed for preconditioner classes.
@@ -305,6 +305,15 @@ namespace MatrixFreeOperators
   class MassOperator : public Base<dim, Number>
   {
   public:
+    /**
+     * Number typedef.
+     */
+    typedef typename Base<dim,Number>::value_type value_type;
+
+    /**
+     * size_type needed for preconditioner classes.
+     */
+    typedef typename Base<dim,Number>::size_type size_type;
 
     /**
      * Constructor.
@@ -347,6 +356,15 @@ namespace MatrixFreeOperators
   class LaplaceOperator : public Base<dim, Number>
   {
   public:
+    /**
+     * Number typedef.
+     */
+    typedef typename Base<dim,Number>::value_type value_type;
+
+    /**
+     * size_type needed for preconditioner classes.
+     */
+    typedef typename Base<dim,Number>::size_type size_type;
 
     /**
      * Constructor.

@@ -49,108 +49,6 @@ std::ofstream logfile("output");
 
 using namespace dealii::MatrixFreeOperators;
 
-
-template <int dim, int fe_degree, int n_q_points_1d = fe_degree+1, typename number=double>
-class LaplaceOperator : public MatrixFreeOperators::Base<dim, number>
-{
-public:
-  typedef number value_type;
-
-  LaplaceOperator()
-    :
-    MatrixFreeOperators::Base<dim, number>()
-  {};
-
-  void compute_diagonal ()
-  {
-    unsigned int dummy = 0;
-    LinearAlgebra::distributed::Vector<number> &inverse_diagonal_entries = Base<dim,number>::inverse_diagonal_entries;
-    this->initialize_dof_vector(inverse_diagonal_entries);
-    Base<dim,number>::
-    data->cell_loop (&LaplaceOperator::local_diagonal_cell,
-                     this, inverse_diagonal_entries, dummy);
-
-    const std::vector<unsigned int> &
-    constrained_dofs = Base<dim,number>::data->get_constrained_dofs();
-    for (unsigned int i=0; i<constrained_dofs.size(); ++i)
-      inverse_diagonal_entries.local_element(constrained_dofs[i]) = 0.;
-    for (unsigned int i=0; i<Base<dim,number>::edge_constrained_indices.size(); ++i)
-      inverse_diagonal_entries.local_element(Base<dim,number>::edge_constrained_indices[i]) = 0.;
-
-    for (unsigned int i=0; i<inverse_diagonal_entries.local_size(); ++i)
-      if (std::abs(inverse_diagonal_entries.local_element(i)) > 1e-10)
-        inverse_diagonal_entries.local_element(i) = 1./inverse_diagonal_entries.local_element(i);
-      else
-        inverse_diagonal_entries.local_element(i) = 1.;
-  }
-
-protected:
-
-
-  void apply_add (LinearAlgebra::distributed::Vector<number>       &dst,
-                  const LinearAlgebra::distributed::Vector<number> &src) const
-  {
-    Base<dim,number>::
-    data->cell_loop (&LaplaceOperator::local_apply, this, dst, src);
-  }
-
-
-private:
-
-  void
-  local_apply (const MatrixFree<dim,number>                &data,
-               LinearAlgebra::distributed::Vector<number>       &dst,
-               const LinearAlgebra::distributed::Vector<number> &src,
-               const std::pair<unsigned int,unsigned int>  &cell_range) const
-  {
-    FEEvaluation<dim,fe_degree,n_q_points_1d,1,number> phi (data);
-
-    for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
-      {
-        phi.reinit (cell);
-        phi.read_dof_values(src);
-        phi.evaluate (false,true,false);
-        for (unsigned int q=0; q<phi.n_q_points; ++q)
-          phi.submit_gradient (phi.get_gradient(q), q);
-        phi.integrate (false,true);
-        phi.distribute_local_to_global (dst);
-      }
-  }
-
-  void
-  local_diagonal_cell (const MatrixFree<dim,number>                &data,
-                       LinearAlgebra::distributed::Vector<number>       &dst,
-                       const unsigned int &,
-                       const std::pair<unsigned int,unsigned int>  &cell_range) const
-  {
-    FEEvaluation<dim,fe_degree,n_q_points_1d,1,number> phi (data);
-
-    for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
-      {
-        phi.reinit (cell);
-
-        VectorizedArray<number> local_diagonal_vector[phi.tensor_dofs_per_cell];
-        for (unsigned int i=0; i<phi.dofs_per_cell; ++i)
-          {
-            for (unsigned int j=0; j<phi.dofs_per_cell; ++j)
-              phi.begin_dof_values()[j] = VectorizedArray<number>();
-            phi.begin_dof_values()[i] = 1.;
-            phi.evaluate (false,true,false);
-            for (unsigned int q=0; q<phi.n_q_points; ++q)
-              phi.submit_gradient (phi.get_gradient(q), q);
-            phi.integrate (false,true);
-            local_diagonal_vector[i] = phi.begin_dof_values()[i];
-          }
-        for (unsigned int i=0; i<phi.tensor_dofs_per_cell; ++i)
-          phi.begin_dof_values()[i] = local_diagonal_vector[i];
-        phi.distribute_local_to_global (dst);
-      }
-  }
-
-};
-
-
-
 template <typename LAPLACEOPERATOR>
 class MGInterfaceMatrix : public Subscriptor
 {
@@ -279,7 +177,7 @@ void do_test (const DoFHandler<dim>  &dof)
 
   MappingQ<dim> mapping(fe_degree+1);
 
-  LaplaceOperator<dim,fe_degree,n_q_points_1d,number> fine_matrix;
+  LaplaceOperator<dim,fe_degree,n_q_points_1d,1,number> fine_matrix;
   MatrixFree<dim,number> fine_level_data;
 
   typename MatrixFree<dim,number>::AdditionalData fine_level_additional_data;
@@ -311,7 +209,7 @@ void do_test (const DoFHandler<dim>  &dof)
   }
 
   // set up multigrid in analogy to step-37
-  typedef LaplaceOperator<dim,fe_degree,n_q_points_1d,number> LevelMatrixType;
+  typedef LaplaceOperator<dim,fe_degree,n_q_points_1d,1,number> LevelMatrixType;
 
   MGLevelObject<LevelMatrixType> mg_matrices;
   MGLevelObject<MatrixFree<dim,number> > mg_level_data;
@@ -365,7 +263,7 @@ void do_test (const DoFHandler<dim>  &dof)
       smoother_data[level].eig_cg_n_iterations = 15;
       smoother_data[level].preconditioner.
       reset(new DiagonalMatrix<LinearAlgebra::distributed::Vector<number> >());
-      smoother_data[level].preconditioner->get_vector() =
+      *smoother_data[level].preconditioner =
         mg_matrices[level].get_matrix_diagonal_inverse();
     }
   mg_smoother.initialize(mg_matrices, smoother_data);
