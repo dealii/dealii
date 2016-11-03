@@ -1737,7 +1737,7 @@ namespace GridGenerator
     tria.create_triangulation (points, cells, t);
 
     // set boundary indicator
-    if (colorize && dim>1)
+    if (colorize)
       {
         double eps = 0.01 * delta;
         Triangulation<dim>::cell_iterator cell = tria.begin(),
