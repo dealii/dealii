@@ -3150,9 +3150,9 @@ namespace Step32
 
     virtual
     void
-    compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
-                                       const std::vector<std::vector<Tensor<1,dim> > > &duh,
-                                       const std::vector<std::vector<Tensor<2,dim> > > &dduh,
+    compute_derived_quantities_vector (const std::vector<Vector<double> >              &solution_values,
+                                       const std::vector<std::vector<Tensor<1,dim> > > &solution_gradients,
+                                       const std::vector<std::vector<Tensor<2,dim> > > &solution_hessians,
                                        const std::vector<Point<dim> >                  &normals,
                                        const std::vector<Point<dim> >                  &evaluation_points,
                                        std::vector<Vector<double> >                    &computed_quantities) const;
@@ -3242,33 +3242,33 @@ namespace Step32
   template <int dim>
   void
   BoussinesqFlowProblem<dim>::Postprocessor::
-  compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
-                                     const std::vector<std::vector<Tensor<1,dim> > > &duh,
-                                     const std::vector<std::vector<Tensor<2,dim> > > &/*dduh*/,
+  compute_derived_quantities_vector (const std::vector<Vector<double> >              &solution_values,
+                                     const std::vector<std::vector<Tensor<1,dim> > > &solution_gradients,
+                                     const std::vector<std::vector<Tensor<2,dim> > > &/*solution_hessians*/,
                                      const std::vector<Point<dim> >                  &/*normals*/,
                                      const std::vector<Point<dim> >                  &/*evaluation_points*/,
                                      std::vector<Vector<double> >                    &computed_quantities) const
   {
-    const unsigned int n_quadrature_points = uh.size();
-    Assert (duh.size() == n_quadrature_points,                  ExcInternalError());
+    const unsigned int n_quadrature_points = solution_values.size();
+    Assert (solution_gradients.size() == n_quadrature_points,                  ExcInternalError());
     Assert (computed_quantities.size() == n_quadrature_points,  ExcInternalError());
-    Assert (uh[0].size() == dim+2,                              ExcInternalError());
+    Assert (solution_values[0].size() == dim+2,                              ExcInternalError());
 
     for (unsigned int q=0; q<n_quadrature_points; ++q)
       {
         for (unsigned int d=0; d<dim; ++d)
           computed_quantities[q](d)
-            = (uh[q](d) *  EquationData::year_in_seconds * 100);
+            = (solution_values[q](d) *  EquationData::year_in_seconds * 100);
 
-        const double pressure = (uh[q](dim)-minimal_pressure);
+        const double pressure = (solution_values[q](dim)-minimal_pressure);
         computed_quantities[q](dim) = pressure;
 
-        const double temperature = uh[q](dim+1);
+        const double temperature = solution_values[q](dim+1);
         computed_quantities[q](dim+1) = temperature;
 
         Tensor<2,dim> grad_u;
         for (unsigned int d=0; d<dim; ++d)
-          grad_u[d] = duh[q][d];
+          grad_u[d] = solution_gradients[q][d];
         const SymmetricTensor<2,dim> strain_rate = symmetrize (grad_u);
         computed_quantities[q](dim+2) = 2 * EquationData::eta *
                                         strain_rate * strain_rate;
