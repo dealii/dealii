@@ -17,6 +17,7 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/qprojector.h>
+#include <deal.II/base/signaling_nan.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/grid/tria.h>
@@ -40,6 +41,8 @@ const unsigned int MappingCartesian<dim,spacedim>::invalid_face_number;
 template<int dim, int spacedim>
 MappingCartesian<dim, spacedim>::InternalData::InternalData (const Quadrature<dim> &q)
   :
+  cell_extents (numbers::signaling_nan<Tensor<1,dim> >()),
+  volume_element (numbers::signaling_nan<double>()),
   quadrature_points (q.get_points ())
 {}
 
