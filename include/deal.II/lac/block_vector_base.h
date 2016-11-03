@@ -2049,10 +2049,10 @@ template <class VectorType>
 std::size_t
 BlockVectorBase<VectorType>::memory_consumption () const
 {
-  std::size_t mem = sizeof(this->n_blocks());
+  std::size_t mem = MemoryConsumption::memory_consumption (this->block_indices);
   for (size_type i=0; i<this->components.size(); ++i)
     mem += MemoryConsumption::memory_consumption (this->components[i]);
-  mem += MemoryConsumption::memory_consumption (this->block_indices);
+
   return mem;
 }
 
