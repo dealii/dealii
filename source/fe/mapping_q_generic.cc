@@ -667,7 +667,10 @@ MappingQGeneric<dim,spacedim>::InternalData::InternalData (const unsigned int po
   polynomial_degree (polynomial_degree),
   n_shape_functions (Utilities::fixed_power<dim>(polynomial_degree+1)),
   line_support_points (polynomial_degree + 1)
-{}
+{
+  for (unsigned int i=0; i<unit_tangentials.size(); ++i)
+    unit_tangentials[i] = numbers::signaling_nan<Tensor<1,dim> >();
+}
 
 
 

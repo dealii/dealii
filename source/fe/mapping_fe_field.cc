@@ -63,7 +63,10 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData::InternalDa
   mask (mask),
   local_dof_indices(fe.dofs_per_cell),
   local_dof_values(fe.dofs_per_cell)
-{}
+{
+  for (unsigned int i=0; i<unit_tangentials.size(); ++i)
+    unit_tangentials[i] = numbers::signaling_nan<Tensor<1,dim> >();
+}
 
 
 
