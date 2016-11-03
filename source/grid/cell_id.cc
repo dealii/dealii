@@ -26,7 +26,14 @@ CellId::CellId()
   :
   coarse_cell_id(numbers::invalid_unsigned_int),
   n_child_indices(numbers::invalid_unsigned_int)
-{}
+{
+  // initialize the child indices to invalid values
+  // (the only allowed values are between zero and
+  // GeometryInfo<dim>::max_children_per_cell)
+  for (unsigned int i=0; i<child_indices.size(); ++i)
+    child_indices[i] = std::numeric_limits<char>::max();
+
+}
 
 
 
