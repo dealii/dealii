@@ -313,8 +313,7 @@ compute (const Point<dim>            &p,
                       index = polynomial*factor + f;
                       break;
                     default:
-                      ExcNotImplemented();
-                      break;
+                      AssertThrow(false, ExcNotImplemented());
                     }
 
                   const unsigned int i = index_map_inverse[index];
