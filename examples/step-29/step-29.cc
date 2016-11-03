@@ -300,9 +300,9 @@ namespace Step29
 
     virtual
     void
-    compute_derived_quantities_vector (const std::vector<Vector<double> >               &uh,
-                                       const std::vector<std::vector<Tensor<1, dim> > > &duh,
-                                       const std::vector<std::vector<Tensor<2, dim> > > &dduh,
+    compute_derived_quantities_vector (const std::vector<Vector<double> >               &solution_values,
+                                       const std::vector<std::vector<Tensor<1, dim> > > &solution_gradients,
+                                       const std::vector<std::vector<Tensor<2, dim> > > &solution_hessians,
                                        const std::vector<Point<dim> >                   &normals,
                                        const std::vector<Point<dim> >                   &evaluation_points,
                                        std::vector<Vector<double> >                     &computed_quantities) const;
@@ -347,16 +347,16 @@ namespace Step29
   template <int dim>
   void
   ComputeIntensity<dim>::compute_derived_quantities_vector (
-    const std::vector<Vector<double> >                 &uh,
-    const std::vector<std::vector<Tensor<1, dim> > >   & /*duh*/,
-    const std::vector<std::vector<Tensor<2, dim> > >   & /*dduh*/,
+    const std::vector<Vector<double> >                 &solution_values,
+    const std::vector<std::vector<Tensor<1, dim> > >   & /*solution_gradients*/,
+    const std::vector<std::vector<Tensor<2, dim> > >   & /*solution_hessians*/,
     const std::vector<Point<dim> >                     & /*normals*/,
     const std::vector<Point<dim> >                     & /*evaluation_points*/,
     std::vector<Vector<double> >                       &computed_quantities
   ) const
   {
-    Assert(computed_quantities.size() == uh.size(),
-           ExcDimensionMismatch (computed_quantities.size(), uh.size()));
+    Assert(computed_quantities.size() == solution_values.size(),
+           ExcDimensionMismatch (computed_quantities.size(), solution_values.size()));
 
     // The computation itself is straightforward: We iterate over each entry
     // in the output vector and compute $|u|$ from the corresponding values of
@@ -365,9 +365,9 @@ namespace Step29
       {
         Assert(computed_quantities[i].size() == 1,
                ExcDimensionMismatch (computed_quantities[i].size(), 1));
-        Assert(uh[i].size() == 2, ExcDimensionMismatch (uh[i].size(), 2));
+        Assert(solution_values[i].size() == 2, ExcDimensionMismatch (solution_values[i].size(), 2));
 
-        computed_quantities[i](0) = std::sqrt(uh[i](0)*uh[i](0) + uh[i](1)*uh[i](1));
+        computed_quantities[i](0) = std::sqrt(solution_values[i](0)*solution_values[i](0) + solution_values[i](1)*solution_values[i](1));
       }
   }
 
