@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2015 by the deal.II authors
+// Copyright (C) 2002 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,6 +31,7 @@ template<typename number>
 SparseLUDecomposition<number>::SparseLUDecomposition()
   :
   SparseMatrix<number>(),
+  strengthen_diagonal (0),
   own_sparsity(0)
 {}
 
