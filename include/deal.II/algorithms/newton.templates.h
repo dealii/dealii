@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2015 by the deal.II authors
+// Copyright (C) 2006 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -93,7 +93,8 @@ namespace Algorithms
 
   template <typename VectorType>
   void
-  Newton<VectorType>::operator() (AnyData &out, const AnyData &in)
+  Newton<VectorType>::operator() (AnyData &out,
+                                  const AnyData &in)
   {
     Assert (out.size() == 1, ExcNotImplemented());
     deallog.push ("Newton");
@@ -128,15 +129,15 @@ namespace Algorithms
 
     if (debug_vectors)
       {
-        AnyData out;
+        AnyData tmp;
         VectorType *p = &u;
-        out.add<const VectorType *>(p, "solution");
+        tmp.add<const VectorType *>(p, "solution");
         p = Du;
-        out.add<const VectorType *>(p, "update");
+        tmp.add<const VectorType *>(p, "update");
         p = res;
-        out.add<const VectorType *>(p, "residual");
+        tmp.add<const VectorType *>(p, "residual");
         *data_out << step;
-        *data_out << out;
+        *data_out << tmp;
       }
 
     while (control.check(step++, resnorm) == SolverControl::iterate)
@@ -159,15 +160,15 @@ namespace Algorithms
 
         if (debug_vectors)
           {
-            AnyData out;
+            AnyData tmp;
             VectorType *p = &u;
-            out.add<const VectorType *>(p, "solution");
+            tmp.add<const VectorType *>(p, "solution");
             p = Du;
-            out.add<const VectorType *>(p, "update");
+            tmp.add<const VectorType *>(p, "update");
             p = res;
-            out.add<const VectorType *>(p, "residual");
+            tmp.add<const VectorType *>(p, "residual");
             *data_out << step;
-            *data_out << out;
+            *data_out << tmp;
           }
 
         u.add(-1., *Du);
