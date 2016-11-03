@@ -1472,9 +1472,9 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
   // auxiliary variables for the bounding box and the range of cell levels
   double x_min = tria.begin()->vertex(0)[0];
-  double x_max = tria.begin()->vertex(0)[0];
+  double x_max = x_min;
   double y_min = tria.begin()->vertex(0)[1];
-  double y_max = tria.begin()->vertex(0)[1];
+  double y_max = y_min;
 
   double x_dimension, y_dimension;
 
