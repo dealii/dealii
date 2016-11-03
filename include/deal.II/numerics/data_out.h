@@ -334,8 +334,7 @@ private:
   (const std::pair<cell_iterator, unsigned int>                 *cell_and_index,
    internal::DataOut::ParallelData<DoFHandlerType::dimension, DoFHandlerType::space_dimension>  &scratch_data,
    const unsigned int                                            n_subdivisions,
-   const CurvedCellRegion                                        curved_cell_region,
-   std::vector<DataOutBase::Patch<DoFHandlerType::dimension, DoFHandlerType::space_dimension> > &patches);
+   const CurvedCellRegion                                        curved_cell_region);
 };
 
 
