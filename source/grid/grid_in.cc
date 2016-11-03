@@ -293,7 +293,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
         {
           in.ignore(256, '\n');
 
-          while (!in.eof())
+          while (!in.fail() && !in.eof())
             {
               in>>keyword;
               if (keyword != "12" && keyword != "9")
@@ -2988,7 +2988,7 @@ namespace
     std::string line;
     std::getline (input_stream, line);
 
-    while (!input_stream.eof())
+    while (!input_stream.fail() && !input_stream.eof())
       {
         std::transform(line.begin(), line.end(), line.begin(), ::toupper);
 
@@ -2997,7 +2997,7 @@ namespace
             line.compare (0, 5, "*PART") == 0)
           {
             // Skip header and comments
-            while (!input_stream.eof())
+            while (!input_stream.fail() && !input_stream.eof())
               {
                 std::getline (input_stream, line);
                 if (line[0] == '*')
@@ -3013,7 +3013,7 @@ namespace
 
             // Contains lines in the form:
             // Index, x, y, z
-            while (!input_stream.eof())
+            while (!input_stream.fail() && !input_stream.eof())
               {
                 std::getline (input_stream, line);
                 if (line[0] == '*')
@@ -3054,7 +3054,7 @@ namespace
 
             // Read ELEMENT definition
             std::getline (input_stream, line);
-            while (!input_stream.eof())
+            while (!input_stream.fail() && !input_stream.eof())
               {
                 if (line[0] == '*')
                   goto cont;
@@ -3102,7 +3102,7 @@ namespace
             // definition of each "set" of faces that comprise the surface
             // These are either marked by an "S" or "E" in 3d or 2d respectively.
             std::getline (input_stream, line);
-            while (!input_stream.eof())
+            while (!input_stream.fail() && !input_stream.eof())
               {
                 if (line[0] == '*')
                   goto cont;
@@ -3202,7 +3202,7 @@ namespace
               {
                 // Option (2)
                 std::getline (input_stream, line);
-                while (!input_stream.eof())
+                while (!input_stream.fail() && !input_stream.eof())
                   {
                     if (line[0] == '*')
                       break;
@@ -3227,7 +3227,7 @@ namespace
         else if (line.compare (0, 5, "*NSET") == 0)
           {
             // Skip nodesets; we have no use for them
-            while (!input_stream.eof())
+            while (!input_stream.fail() && !input_stream.eof())
               {
                 std::getline (input_stream, line);
                 if (line[0] == '*')
