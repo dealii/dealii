@@ -201,6 +201,10 @@ FOREACH(_feature ${_deal_ii_features_sorted})
     IF(_feature MATCHES "MPI" AND DEFINED OMPI_VERSION)
       _detailed("#            OMPI_VERSION = ${OMPI_VERSION}\n")
     ENDIF()
+    IF(_feature MATCHES "CUDA" AND DEFINED CUDA_COMPUTE_CAPABILITY)
+      _detailed("#            CUDA_COMPUTE_CAPABILITY = ${CUDA_COMPUTE_CAPABILITY_MAJOR}.${CUDA_COMPUTE_CAPABILITY_MINOR}\n")
+    ENDIF()
+
 
     #
     # Print out ${_feature}_DIR:
