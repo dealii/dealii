@@ -66,8 +66,7 @@ build_one_patch
 (const std::pair<cell_iterator, unsigned int>                                                *cell_and_index,
  internal::DataOut::ParallelData<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &scratch_data,
  const unsigned int                                                                           n_subdivisions,
- const CurvedCellRegion                                                                       curved_cell_region,
- std::vector<DataOutBase::Patch<DoFHandlerType::dimension, DoFHandlerType::space_dimension> > &patches)
+ const CurvedCellRegion                                                                       curved_cell_region)
 {
   // first create the output object that we will write into
   ::dealii::DataOutBase::Patch<DoFHandlerType::dimension, DoFHandlerType::space_dimension> patch;
@@ -290,13 +289,13 @@ build_one_patch
   const unsigned int patch_idx =
     (*scratch_data.cell_to_patch_index_map)[cell_and_index->first->level()][cell_and_index->first->index()];
   // did we mess up the indices?
-  Assert(patch_idx < patches.size(), ExcInternalError());
+  Assert(patch_idx < this->patches.size(), ExcInternalError());
   patch.patch_index = patch_idx;
 
   // Put the patch into the patches vector. instead of copying the data,
   // simply swap the contents to avoid the penalty of writing into another
   // processor's memory
-  patches[patch_idx].swap (patch);
+  this->patches[patch_idx].swap (patch);
 }
 
 
@@ -449,8 +448,7 @@ void DataOut<dim,DoFHandlerType>::build_patches
                                         copy data object -- it just writes everything right into the
                                         output array */
                                      n_subdivisions,
-                                     curved_cell_region,
-                                     std_cxx11::ref(this->patches)),
+                                     curved_cell_region),
                      // no copy-local-to-global function needed here
                      std_cxx11::function<void (const int &)>(),
                      thread_data,
