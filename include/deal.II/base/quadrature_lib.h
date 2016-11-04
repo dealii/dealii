@@ -224,19 +224,18 @@ public:
   QGaussLog(const unsigned int n,
             const bool revert=false);
 
-protected:
+private:
   /**
-   * Set the points of the quadrature formula.
+   * Compute the points of the quadrature formula.
    */
   std::vector<double>
-  set_quadrature_points(const unsigned int n) const;
+  get_quadrature_points(const unsigned int n) const;
 
   /**
-   * Set the weights of the quadrature formula.
+   * Compute the weights of the quadrature formula.
    */
   std::vector<double>
-  set_quadrature_weights(const unsigned int n) const;
-
+  get_quadrature_weights(const unsigned int n) const;
 };
 
 
@@ -659,8 +658,8 @@ template <>
 long double
 QGaussLobatto<1>::gamma(const unsigned int n) const;
 
-template <> std::vector<double> QGaussLog<1>::set_quadrature_points(const unsigned int) const;
-template <> std::vector<double> QGaussLog<1>::set_quadrature_weights(const unsigned int) const;
+template <> std::vector<double> QGaussLog<1>::get_quadrature_points(const unsigned int) const;
+template <> std::vector<double> QGaussLog<1>::get_quadrature_weights(const unsigned int) const;
 
 template <> QMidpoint<1>::QMidpoint ();
 template <> QTrapez<1>::QTrapez ();
