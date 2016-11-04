@@ -15,6 +15,7 @@
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/parameter_handler.h>
+#include <deal.II/base/signaling_nan.h>
 #include <deal.II/lac/solver_control.h>
 
 #include <cmath>
@@ -32,7 +33,9 @@ SolverControl::SolverControl (const unsigned int maxiter,
   :
   maxsteps(maxiter),
   tol(tolerance),
-  lvalue(1.e300),
+  lcheck(failure),
+  initial_val(numbers::signaling_nan<double>()),
+  lvalue(numbers::signaling_nan<double>()),
   lstep(0),
   check_failure(false),
   relative_failure_residual(0),
@@ -220,13 +223,16 @@ ReductionControl::ReductionControl(const unsigned int n,
                                    const bool m_log_result)
   :
   SolverControl (n, tol, m_log_history, m_log_result),
-  reduce(red)
+  reduce(red),
+  reduced_tol(numbers::signaling_nan<double>())
 {}
 
 
 ReductionControl::ReductionControl (const SolverControl &c)
   :
-  SolverControl(c)
+  SolverControl(c),
+  reduce(numbers::signaling_nan<double>()),
+  reduced_tol(numbers::signaling_nan<double>())
 {
   set_reduction(0.);
 }
@@ -256,7 +262,7 @@ ReductionControl::check (const unsigned int step,
     {
       initial_val = check_value;
       reduced_tol = check_value * reduce;
-    };
+    }
 
   // check whether desired reduction
   // has been achieved. also check
