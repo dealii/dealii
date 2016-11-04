@@ -502,7 +502,6 @@ FE_Q_Hierarchical<dim>::
 initialize_constraints (const std::vector<FullMatrix<double> > &dofs_subcell)
 {
   const unsigned int dofs_1d = 2*this->dofs_per_vertex + this->dofs_per_line;
-  const unsigned int degree=this->degree;
 
   this->interface_constraints
   .TableBase<2,double>::reinit (this->interface_constraints_size());
@@ -524,7 +523,7 @@ initialize_constraints (const std::vector<FullMatrix<double> > &dofs_subcell)
       for (unsigned int c=0; c<GeometryInfo<1>::max_children_per_cell; ++c)
         for (unsigned int i=0; i<dofs_1d; ++i)
           for (unsigned int j=2; j<dofs_1d; ++j)
-            this->interface_constraints(1 + c*(degree-1) + j - 2,i) =
+            this->interface_constraints(1 + c*(this->degree-1) + j - 2,i) =
               dofs_subcell[c](j,i);
       break;
     }
@@ -553,73 +552,73 @@ initialize_constraints (const std::vector<FullMatrix<double> > &dofs_subcell)
             dofs_subcell[1](1, (i - (i % dofs_1d)) / dofs_1d);
 
           // interior edges
-          for (unsigned int j=0; j<(degree-1); j++)
+          for (unsigned int j=0; j<(this->degree-1); j++)
             {
               this->interface_constraints(5 + j,face_renumber[i]) =
                 dofs_subcell[0](1, i % dofs_1d) *
                 dofs_subcell[0](2 + j, (i - (i % dofs_1d)) / dofs_1d);
-              this->interface_constraints(5 + (degree-1) + j,face_renumber[i]) =
+              this->interface_constraints(5 + (this->degree-1) + j,face_renumber[i]) =
                 dofs_subcell[0](1,i % dofs_1d) *
                 dofs_subcell[1](2 + j, (i - (i % dofs_1d)) / dofs_1d);
-              this->interface_constraints(5 + 2*(degree-1) + j,face_renumber[i]) =
+              this->interface_constraints(5 + 2*(this->degree-1) + j,face_renumber[i]) =
                 dofs_subcell[0](2 + j,i % dofs_1d) *
                 dofs_subcell[1](0, (i - (i % dofs_1d)) / dofs_1d);
-              this->interface_constraints(5 + 3*(degree-1) + j,face_renumber[i]) =
+              this->interface_constraints(5 + 3*(this->degree-1) + j,face_renumber[i]) =
                 dofs_subcell[1](2 + j, i % dofs_1d) *
                 dofs_subcell[0](1, (i - (i % dofs_1d)) / dofs_1d);
             }
 
           // boundary edges
-          for (unsigned int j=0; j<(degree-1); j++)
+          for (unsigned int j=0; j<(this->degree-1); j++)
             {
               // left edge
-              this->interface_constraints(5 + 4*(degree-1) + j,face_renumber[i]) =
+              this->interface_constraints(5 + 4*(this->degree-1) + j,face_renumber[i]) =
                 dofs_subcell[0](0,     i % dofs_1d) *
                 dofs_subcell[0](2 + j, (i - (i % dofs_1d)) / dofs_1d);
-              this->interface_constraints(5 + 4*(degree-1) + (degree-1) + j,face_renumber[i]) =
+              this->interface_constraints(5 + 4*(this->degree-1) + (this->degree-1) + j,face_renumber[i]) =
                 dofs_subcell[0](0,     i % dofs_1d) *
                 dofs_subcell[1](2 + j, (i - (i % dofs_1d)) / dofs_1d);
               // right edge
-              this->interface_constraints(5 + 4*(degree-1) + 2*(degree-1) + j,face_renumber[i]) =
+              this->interface_constraints(5 + 4*(this->degree-1) + 2*(this->degree-1) + j,face_renumber[i]) =
                 dofs_subcell[1](1,     i % dofs_1d) *
                 dofs_subcell[0](2 + j, (i - (i % dofs_1d)) / dofs_1d);
-              this->interface_constraints(5 + 4*(degree-1) + 3*(degree-1) + j,face_renumber[i]) =
+              this->interface_constraints(5 + 4*(this->degree-1) + 3*(this->degree-1) + j,face_renumber[i]) =
                 dofs_subcell[1](1,     i % dofs_1d) *
                 dofs_subcell[1](2 + j, (i - (i % dofs_1d)) / dofs_1d);
               // bottom edge
-              this->interface_constraints(5 + 4*(degree-1) + 4*(degree-1) + j,face_renumber[i]) =
+              this->interface_constraints(5 + 4*(this->degree-1) + 4*(this->degree-1) + j,face_renumber[i]) =
                 dofs_subcell[0](2 + j, i % dofs_1d) *
                 dofs_subcell[0](0,     (i - (i % dofs_1d)) / dofs_1d);
-              this->interface_constraints(5 + 4*(degree-1) + 5*(degree-1) + j,face_renumber[i]) =
+              this->interface_constraints(5 + 4*(this->degree-1) + 5*(this->degree-1) + j,face_renumber[i]) =
                 dofs_subcell[1](2 + j, i % dofs_1d) *
                 dofs_subcell[0](0,     (i - (i % dofs_1d)) / dofs_1d);
               // top edge
-              this->interface_constraints(5 + 4*(degree-1) + 6*(degree-1) + j,face_renumber[i]) =
+              this->interface_constraints(5 + 4*(this->degree-1) + 6*(this->degree-1) + j,face_renumber[i]) =
                 dofs_subcell[0](2 + j, i % dofs_1d) *
                 dofs_subcell[1](1,     (i - (i % dofs_1d)) / dofs_1d);
-              this->interface_constraints(5 + 4*(degree-1) + 7*(degree-1) + j,face_renumber[i]) =
+              this->interface_constraints(5 + 4*(this->degree-1) + 7*(this->degree-1) + j,face_renumber[i]) =
                 dofs_subcell[1](2 + j, i % dofs_1d) *
                 dofs_subcell[1](1,     (i - (i % dofs_1d)) / dofs_1d);
             }
 
           // interior faces
-          for (unsigned int j=0; j<(degree-1); j++)
-            for (unsigned int k=0; k<(degree-1); k++)
+          for (unsigned int j=0; j<(this->degree-1); j++)
+            for (unsigned int k=0; k<(this->degree-1); k++)
               {
                 // subcell 0
-                this->interface_constraints(5 + 12*(degree-1) + j + k*(degree-1),face_renumber[i]) =
+                this->interface_constraints(5 + 12*(this->degree-1) + j + k*(this->degree-1),face_renumber[i]) =
                   dofs_subcell[0](2 + j, i % dofs_1d) *
                   dofs_subcell[0](2 + k, (i - (i % dofs_1d)) / dofs_1d);
                 // subcell 1
-                this->interface_constraints(5 + 12*(degree-1) + j + k*(degree-1) + (degree-1)*(degree-1),face_renumber[i]) =
+                this->interface_constraints(5 + 12*(this->degree-1) + j + k*(this->degree-1) + (this->degree-1)*(this->degree-1),face_renumber[i]) =
                   dofs_subcell[1](2 + j, i % dofs_1d) *
                   dofs_subcell[0](2 + k, (i - (i % dofs_1d)) / dofs_1d);
                 // subcell 2
-                this->interface_constraints(5 + 12*(degree-1) + j + k*(degree-1) + 2*(degree-1)*(degree-1),face_renumber[i]) =
+                this->interface_constraints(5 + 12*(this->degree-1) + j + k*(this->degree-1) + 2*(this->degree-1)*(this->degree-1),face_renumber[i]) =
                   dofs_subcell[0](2 + j, i % dofs_1d) *
                   dofs_subcell[1](2 + k, (i - (i % dofs_1d)) / dofs_1d);
                 // subcell 3
-                this->interface_constraints(5 + 12*(degree-1) + j + k*(degree-1) + 3*(degree-1)*(degree-1),face_renumber[i]) =
+                this->interface_constraints(5 + 12*(this->degree-1) + j + k*(this->degree-1) + 3*(this->degree-1)*(this->degree-1),face_renumber[i]) =
                   dofs_subcell[1](2 + j, i % dofs_1d) *
                   dofs_subcell[1](2 + k, (i - (i % dofs_1d)) / dofs_1d);
               }
