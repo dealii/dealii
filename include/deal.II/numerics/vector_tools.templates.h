@@ -777,6 +777,8 @@ namespace VectorTools
       return true;
     }
 
+
+
     template <typename number>
     void invert_mass_matrix(const SparseMatrix<number> &mass_matrix,
                             const Vector<number>       &rhs,
@@ -802,6 +804,7 @@ namespace VectorTools
     {
       Assert(false, ExcNotImplemented());
     }
+
 
 
     /**
@@ -1178,6 +1181,7 @@ namespace VectorTools
   }
 
 
+
   template <int dim, typename VectorType, int spacedim>
   void project (const DoFHandler<dim,spacedim> &dof,
                 const ConstraintMatrix         &constraints,
@@ -1228,13 +1232,17 @@ namespace VectorTools
   }
 
 
-  template <int dim, int spacedim>
+
+  template <int dim, int spacedim, typename VectorType>
   void create_right_hand_side (const Mapping<dim, spacedim>   &mapping,
                                const DoFHandler<dim,spacedim> &dof_handler,
                                const Quadrature<dim>          &quadrature,
-                               const Function<spacedim>       &rhs_function,
-                               Vector<double>                 &rhs_vector)
+                               const Function<spacedim, typename VectorType::value_type> &rhs_function,
+                               VectorType                     &rhs_vector,
+                               const ConstraintMatrix         &constraints)
   {
+    typedef typename VectorType::value_type Number;
+
     const FiniteElement<dim,spacedim> &fe  = dof_handler.get_fe();
     Assert (fe.n_components() == rhs_function.n_components,
             ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
@@ -1252,7 +1260,7 @@ namespace VectorTools
                        n_components  = fe.n_components();
 
     std::vector<types::global_dof_index> dofs (dofs_per_cell);
-    Vector<double> cell_vector (dofs_per_cell);
+    Vector<Number> cell_vector (dofs_per_cell);
 
     typename DoFHandler<dim,spacedim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -1260,105 +1268,107 @@ namespace VectorTools
 
     if (n_components==1)
       {
-        std::vector<double> rhs_values(n_q_points);
+        std::vector<Number> rhs_values(n_q_points);
 
         for (; cell!=endc; ++cell)
-          {
-            fe_values.reinit(cell);
+          if (cell->is_locally_owned())
+            {
+              fe_values.reinit(cell);
 
-            const std::vector<double> &weights   = fe_values.get_JxW_values ();
-            rhs_function.value_list (fe_values.get_quadrature_points(),
-                                     rhs_values);
+              const std::vector<double> &weights   = fe_values.get_JxW_values ();
+              rhs_function.value_list (fe_values.get_quadrature_points(),
+                                       rhs_values);
 
-            cell_vector = 0;
-            for (unsigned int point=0; point<n_q_points; ++point)
-              for (unsigned int i=0; i<dofs_per_cell; ++i)
-                cell_vector(i) += rhs_values[point] *
-                                  fe_values.shape_value(i,point) *
-                                  weights[point];
+              cell_vector = 0;
+              for (unsigned int point=0; point<n_q_points; ++point)
+                for (unsigned int i=0; i<dofs_per_cell; ++i)
+                  cell_vector(i) += rhs_values[point] *
+                                    fe_values.shape_value(i,point) *
+                                    weights[point];
 
-            cell->get_dof_indices (dofs);
+              cell->get_dof_indices(dofs);
 
-            for (unsigned int i=0; i<dofs_per_cell; ++i)
-              rhs_vector(dofs[i]) += cell_vector(i);
-          }
-
+              constraints.distribute_local_to_global(cell_vector, dofs, rhs_vector);
+            }
       }
     else
       {
-        std::vector<Vector<double> > rhs_values(n_q_points,
-                                                Vector<double>(n_components));
+        std::vector<Vector<Number> > rhs_values(n_q_points,
+                                                Vector<Number>(n_components));
 
         for (; cell!=endc; ++cell)
-          {
-            fe_values.reinit(cell);
+          if (cell->is_locally_owned())
+            {
+              fe_values.reinit(cell);
 
-            const std::vector<double> &weights   = fe_values.get_JxW_values ();
-            rhs_function.vector_value_list (fe_values.get_quadrature_points(),
-                                            rhs_values);
+              const std::vector<double> &weights   = fe_values.get_JxW_values ();
+              rhs_function.vector_value_list (fe_values.get_quadrature_points(),
+                                              rhs_values);
 
-            cell_vector = 0;
-            // Use the faster code if the
-            // FiniteElement is primitive
-            if (fe.is_primitive ())
-              {
-                for (unsigned int point=0; point<n_q_points; ++point)
-                  for (unsigned int i=0; i<dofs_per_cell; ++i)
-                    {
-                      const unsigned int component
-                        = fe.system_to_component_index(i).first;
+              cell_vector = 0;
+              // Use the faster code if the
+              // FiniteElement is primitive
+              if (fe.is_primitive ())
+                {
+                  for (unsigned int point=0; point<n_q_points; ++point)
+                    for (unsigned int i=0; i<dofs_per_cell; ++i)
+                      {
+                        const unsigned int component
+                          = fe.system_to_component_index(i).first;
 
-                      cell_vector(i) += rhs_values[point](component) *
-                                        fe_values.shape_value(i,point) *
-                                        weights[point];
-                    }
-              }
-            else
-              {
-                // Otherwise do it the way
-                // proposed for vector valued
-                // elements
-                for (unsigned int point=0; point<n_q_points; ++point)
-                  for (unsigned int i=0; i<dofs_per_cell; ++i)
-                    for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
-                      if (fe.get_nonzero_components(i)[comp_i])
-                        {
-                          cell_vector(i) += rhs_values[point](comp_i) *
-                                            fe_values.shape_value_component(i,point,comp_i) *
-                                            weights[point];
-                        }
-              }
+                        cell_vector(i) += rhs_values[point](component) *
+                                          fe_values.shape_value(i,point) *
+                                          weights[point];
+                      }
+                }
+              else
+                {
+                  // Otherwise do it the way
+                  // proposed for vector valued
+                  // elements
+                  for (unsigned int point=0; point<n_q_points; ++point)
+                    for (unsigned int i=0; i<dofs_per_cell; ++i)
+                      for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
+                        if (fe.get_nonzero_components(i)[comp_i])
+                          {
+                            cell_vector(i) += rhs_values[point](comp_i) *
+                                              fe_values.shape_value_component(i,point,comp_i) *
+                                              weights[point];
+                          }
+                }
+              cell->get_dof_indices (dofs);
 
-            cell->get_dof_indices (dofs);
-
-            for (unsigned int i=0; i<dofs_per_cell; ++i)
-              rhs_vector(dofs[i]) += cell_vector(i);
-          }
+              constraints.distribute_local_to_global(cell_vector, dofs, rhs_vector);
+            }
       }
   }
 
 
 
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType>
   void create_right_hand_side (const DoFHandler<dim,spacedim> &dof_handler,
                                const Quadrature<dim>          &quadrature,
-                               const Function<spacedim>       &rhs_function,
-                               Vector<double>                 &rhs_vector)
+                               const Function<spacedim, typename VectorType::value_type> &rhs_function,
+                               VectorType                     &rhs_vector,
+                               const ConstraintMatrix         &constraints)
   {
     create_right_hand_side(StaticMappingQ1<dim,spacedim>::mapping, dof_handler, quadrature,
-                           rhs_function, rhs_vector);
+                           rhs_function, rhs_vector, constraints);
   }
 
 
 
 
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType>
   void create_right_hand_side (const hp::MappingCollection<dim,spacedim> &mapping,
                                const hp::DoFHandler<dim,spacedim>        &dof_handler,
                                const hp::QCollection<dim>                &quadrature,
-                               const Function<spacedim>                  &rhs_function,
-                               Vector<double>                            &rhs_vector)
+                               const Function<spacedim, typename VectorType::value_type> &rhs_function,
+                               VectorType                                &rhs_vector,
+                               const ConstraintMatrix                    &constraints)
   {
+    typedef typename VectorType::value_type Number;
+
     const hp::FECollection<dim,spacedim> &fe  = dof_handler.get_fe();
     Assert (fe.n_components() == rhs_function.n_components,
             ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
@@ -1374,7 +1384,7 @@ namespace VectorTools
     const unsigned int n_components  = fe.n_components();
 
     std::vector<types::global_dof_index> dofs (fe.max_dofs_per_cell());
-    Vector<double> cell_vector (fe.max_dofs_per_cell());
+    Vector<Number> cell_vector (fe.max_dofs_per_cell());
 
     typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -1382,112 +1392,112 @@ namespace VectorTools
 
     if (n_components==1)
       {
-        std::vector<double> rhs_values;
+        std::vector<Number> rhs_values;
 
         for (; cell!=endc; ++cell)
-          {
-            x_fe_values.reinit(cell);
+          if (cell->is_locally_owned())
+            {
+              x_fe_values.reinit(cell);
 
-            const FEValues<dim,spacedim> &fe_values = x_fe_values.get_present_fe_values();
+              const FEValues<dim,spacedim> &fe_values = x_fe_values.get_present_fe_values();
 
-            const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
-                               n_q_points    = fe_values.n_quadrature_points;
-            rhs_values.resize (n_q_points);
-            dofs.resize (dofs_per_cell);
-            cell_vector.reinit (dofs_per_cell);
+              const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
+                                 n_q_points    = fe_values.n_quadrature_points;
+              rhs_values.resize (n_q_points);
+              dofs.resize (dofs_per_cell);
+              cell_vector.reinit (dofs_per_cell);
 
-            const std::vector<double> &weights   = fe_values.get_JxW_values ();
-            rhs_function.value_list (fe_values.get_quadrature_points(),
-                                     rhs_values);
+              const std::vector<Number> &weights   = fe_values.get_JxW_values ();
+              rhs_function.value_list (fe_values.get_quadrature_points(),
+                                       rhs_values);
 
-            cell_vector = 0;
-            for (unsigned int point=0; point<n_q_points; ++point)
-              for (unsigned int i=0; i<dofs_per_cell; ++i)
-                cell_vector(i) += rhs_values[point] *
-                                  fe_values.shape_value(i,point) *
-                                  weights[point];
+              cell_vector = 0;
+              for (unsigned int point=0; point<n_q_points; ++point)
+                for (unsigned int i=0; i<dofs_per_cell; ++i)
+                  cell_vector(i) += rhs_values[point] *
+                                    fe_values.shape_value(i,point) *
+                                    weights[point];
 
-            cell->get_dof_indices (dofs);
+              cell->get_dof_indices (dofs);
 
-            for (unsigned int i=0; i<dofs_per_cell; ++i)
-              rhs_vector(dofs[i]) += cell_vector(i);
-          }
+              constraints.distribute_local_to_global(cell_vector, dofs, rhs_vector);
+            }
 
       }
     else
       {
-        std::vector<Vector<double> > rhs_values;
+        std::vector<Vector<Number> > rhs_values;
 
         for (; cell!=endc; ++cell)
-          {
-            x_fe_values.reinit(cell);
+          if (cell->is_locally_owned())
+            {
+              x_fe_values.reinit(cell);
 
-            const FEValues<dim,spacedim> &fe_values = x_fe_values.get_present_fe_values();
+              const FEValues<dim,spacedim> &fe_values = x_fe_values.get_present_fe_values();
 
-            const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
-                               n_q_points    = fe_values.n_quadrature_points;
-            rhs_values.resize (n_q_points,
-                               Vector<double>(n_components));
-            dofs.resize (dofs_per_cell);
-            cell_vector.reinit (dofs_per_cell);
+              const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
+                                 n_q_points    = fe_values.n_quadrature_points;
+              rhs_values.resize (n_q_points,
+                                 Vector<Number>(n_components));
+              dofs.resize (dofs_per_cell);
+              cell_vector.reinit (dofs_per_cell);
 
-            const std::vector<double> &weights   = fe_values.get_JxW_values ();
-            rhs_function.vector_value_list (fe_values.get_quadrature_points(),
-                                            rhs_values);
+              const std::vector<Number> &weights   = fe_values.get_JxW_values ();
+              rhs_function.vector_value_list (fe_values.get_quadrature_points(),
+                                              rhs_values);
 
-            cell_vector = 0;
+              cell_vector = 0;
 
-            // Use the faster code if the
-            // FiniteElement is primitive
-            if (cell->get_fe().is_primitive ())
-              {
-                for (unsigned int point=0; point<n_q_points; ++point)
-                  for (unsigned int i=0; i<dofs_per_cell; ++i)
-                    {
-                      const unsigned int component
-                        = cell->get_fe().system_to_component_index(i).first;
+              // Use the faster code if the
+              // FiniteElement is primitive
+              if (cell->get_fe().is_primitive ())
+                {
+                  for (unsigned int point=0; point<n_q_points; ++point)
+                    for (unsigned int i=0; i<dofs_per_cell; ++i)
+                      {
+                        const unsigned int component
+                          = cell->get_fe().system_to_component_index(i).first;
 
-                      cell_vector(i) += rhs_values[point](component) *
-                                        fe_values.shape_value(i,point) *
-                                        weights[point];
-                    }
-              }
-            else
-              {
-                // Otherwise do it the way proposed
-                // for vector valued elements
-                for (unsigned int point=0; point<n_q_points; ++point)
-                  for (unsigned int i=0; i<dofs_per_cell; ++i)
-                    for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
-                      if (cell->get_fe().get_nonzero_components(i)[comp_i])
-                        {
-                          cell_vector(i) += rhs_values[point](comp_i) *
-                                            fe_values.shape_value_component(i,point,comp_i) *
-                                            weights[point];
-                        }
-              }
+                        cell_vector(i) += rhs_values[point](component) *
+                                          fe_values.shape_value(i,point) *
+                                          weights[point];
+                      }
+                }
+              else
+                {
+                  // Otherwise do it the way proposed
+                  // for vector valued elements
+                  for (unsigned int point=0; point<n_q_points; ++point)
+                    for (unsigned int i=0; i<dofs_per_cell; ++i)
+                      for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
+                        if (cell->get_fe().get_nonzero_components(i)[comp_i])
+                          {
+                            cell_vector(i) += rhs_values[point](comp_i) *
+                                              fe_values.shape_value_component(i,point,comp_i) *
+                                              weights[point];
+                          }
+                }
 
-            cell->get_dof_indices (dofs);
+              cell->get_dof_indices (dofs);
 
-            for (unsigned int i=0; i<dofs_per_cell; ++i)
-              rhs_vector(dofs[i]) += cell_vector(i);
-          }
+              constraints.distribute_local_to_global(cell_vector, dofs, rhs_vector);
+            }
       }
   }
 
 
 
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType>
   void create_right_hand_side (const hp::DoFHandler<dim,spacedim> &dof_handler,
                                const hp::QCollection<dim>         &quadrature,
-                               const Function<spacedim>           &rhs_function,
-                               Vector<double>                     &rhs_vector)
+                               const Function<spacedim, typename VectorType::value_type> &rhs_function,
+                               VectorType                         &rhs_vector,
+                               const ConstraintMatrix             &constraints)
   {
     create_right_hand_side(hp::StaticMappingQ1<dim,spacedim>::mapping_collection,
                            dof_handler, quadrature,
-                           rhs_function, rhs_vector);
+                           rhs_function, rhs_vector, constraints);
   }
-
 
 
 
@@ -1678,13 +1688,13 @@ namespace VectorTools
 
 
 
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType>
   void
   create_boundary_right_hand_side (const Mapping<dim, spacedim>       &mapping,
                                    const DoFHandler<dim,spacedim>     &dof_handler,
                                    const Quadrature<dim-1>            &quadrature,
-                                   const Function<spacedim>           &rhs_function,
-                                   Vector<double>                     &rhs_vector,
+                                   const Function<spacedim,typename VectorType::value_type> &rhs_function,
+                                   VectorType                         &rhs_vector,
                                    const std::set<types::boundary_id> &boundary_ids)
   {
     const FiniteElement<dim> &fe  = dof_handler.get_fe();
@@ -1801,12 +1811,12 @@ namespace VectorTools
 
 
 
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType>
   void
   create_boundary_right_hand_side (const DoFHandler<dim,spacedim>     &dof_handler,
                                    const Quadrature<dim-1>            &quadrature,
-                                   const Function<spacedim>           &rhs_function,
-                                   Vector<double>                     &rhs_vector,
+                                   const Function<spacedim,typename VectorType::value_type> &rhs_function,
+                                   VectorType                         &rhs_vector,
                                    const std::set<types::boundary_id> &boundary_ids)
   {
     create_boundary_right_hand_side(StaticMappingQ1<dim>::mapping, dof_handler,
@@ -1817,13 +1827,13 @@ namespace VectorTools
 
 
 
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType>
   void
   create_boundary_right_hand_side (const hp::MappingCollection<dim,spacedim> &mapping,
                                    const hp::DoFHandler<dim,spacedim>        &dof_handler,
                                    const hp::QCollection<dim-1>              &quadrature,
-                                   const Function<spacedim>                  &rhs_function,
-                                   Vector<double>                            &rhs_vector,
+                                   const Function<spacedim,typename VectorType::value_type> &rhs_function,
+                                   VectorType                                &rhs_vector,
                                    const std::set<types::boundary_id>        &boundary_ids)
   {
     const hp::FECollection<dim> &fe  = dof_handler.get_fe();
@@ -1952,12 +1962,12 @@ namespace VectorTools
 
 
 
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType>
   void
   create_boundary_right_hand_side (const hp::DoFHandler<dim,spacedim> &dof_handler,
                                    const hp::QCollection<dim-1>       &quadrature,
-                                   const Function<spacedim>           &rhs_function,
-                                   Vector<double>                     &rhs_vector,
+                                   const Function<spacedim,typename VectorType::value_type> &rhs_function,
+                                   VectorType                         &rhs_vector,
                                    const std::set<types::boundary_id> &boundary_ids)
   {
     create_boundary_right_hand_side(hp::StaticMappingQ1<dim>::mapping_collection,
@@ -2495,7 +2505,7 @@ namespace VectorTools
       // Allow for a maximum of 5*n steps to reduce the residual by 10^-12. n
       // steps may not be sufficient, since roundoff errors may accumulate for
       // badly conditioned matrices
-      ReductionControl        control(5*rhs.size(), 0., 1.e-12, false, false);
+      ReductionControl        control(5.*rhs.size(), 0., 1.e-12, false, false);
       GrowingVectorMemory<Vector<number> > memory;
       SolverCG<Vector<number> >            cg(control,memory);
 

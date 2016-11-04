@@ -739,7 +739,6 @@ namespace VectorTools
                                  const ConstraintMatrix              &constraints,
                                  VectorType                          &u2);
 
-
   /**
    * The same function as above, but takes an InterGridMap object directly as
    * a parameter. Useful for interpolating several vectors at the same time.
@@ -1925,41 +1924,45 @@ namespace VectorTools
    *
    * See the general documentation of this namespace for further information.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType>
   void create_right_hand_side (const Mapping<dim, spacedim>    &mapping,
                                const DoFHandler<dim,spacedim>  &dof,
                                const Quadrature<dim>           &q,
-                               const Function<spacedim,double> &rhs,
-                               Vector<double>                  &rhs_vector);
+                               const Function<spacedim,typename VectorType::value_type> &rhs,
+                               VectorType                      &rhs_vector,
+                               const ConstraintMatrix          &constraints=ConstraintMatrix());
 
   /**
    * Call the create_right_hand_side() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType>
   void create_right_hand_side (const DoFHandler<dim,spacedim>  &dof,
                                const Quadrature<dim>           &q,
-                               const Function<spacedim,double> &rhs,
-                               Vector<double>                  &rhs_vector);
+                               const Function<spacedim,typename VectorType::value_type> &rhs,
+                               VectorType                      &rhs_vector,
+                               const ConstraintMatrix          &constraints=ConstraintMatrix());
 
   /**
    * Like the previous set of functions, but for hp objects.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType>
   void create_right_hand_side (const hp::MappingCollection<dim,spacedim> &mapping,
                                const hp::DoFHandler<dim,spacedim>        &dof,
                                const hp::QCollection<dim>                &q,
-                               const Function<spacedim,double>           &rhs,
-                               Vector<double>                            &rhs_vector);
+                               const Function<spacedim,typename VectorType::value_type> &rhs,
+                               VectorType                                &rhs_vector,
+                               const ConstraintMatrix                    &constraints=ConstraintMatrix());
 
   /**
    * Like the previous set of functions, but for hp objects.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType>
   void create_right_hand_side (const hp::DoFHandler<dim,spacedim> &dof,
                                const hp::QCollection<dim>         &q,
-                               const Function<spacedim,double>    &rhs,
-                               Vector<double>                     &rhs_vector);
+                               const Function<spacedim,typename VectorType::value_type> &rhs,
+                               VectorType                         &rhs_vector,
+                               const ConstraintMatrix             &constraints=ConstraintMatrix());
 
   /**
    * Create a right hand side vector for a point source at point @p p. In
@@ -2069,12 +2072,12 @@ namespace VectorTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  template <int dim, int spacedim>
-  void create_boundary_right_hand_side (const Mapping<dim,spacedim>      &mapping,
-                                        const DoFHandler<dim,spacedim>   &dof,
-                                        const Quadrature<dim-1> &q,
-                                        const Function<spacedim,double>     &rhs,
-                                        Vector<double>          &rhs_vector,
+  template <int dim, int spacedim, typename VectorType>
+  void create_boundary_right_hand_side (const Mapping<dim,spacedim>        &mapping,
+                                        const DoFHandler<dim,spacedim>     &dof,
+                                        const Quadrature<dim-1>            &q,
+                                        const Function<spacedim,typename VectorType::value_type> &rhs,
+                                        VectorType                         &rhs_vector,
                                         const std::set<types::boundary_id> &boundary_ids = std::set<types::boundary_id>());
 
   /**
@@ -2084,12 +2087,12 @@ namespace VectorTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType>
   void create_boundary_right_hand_side
   (const DoFHandler<dim,spacedim>     &dof,
    const Quadrature<dim-1>            &q,
-   const Function<spacedim,double>    &rhs,
-   Vector<double>                     &rhs_vector,
+   const Function<spacedim,typename VectorType::value_type> &rhs,
+   VectorType                         &rhs_vector,
    const std::set<types::boundary_id> &boundary_ids = std::set<types::boundary_id>());
 
   /**
@@ -2098,13 +2101,13 @@ namespace VectorTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType>
   void create_boundary_right_hand_side
   (const hp::MappingCollection<dim,spacedim> &mapping,
    const hp::DoFHandler<dim,spacedim>        &dof,
    const hp::QCollection<dim-1>              &q,
-   const Function<spacedim,double>           &rhs,
-   Vector<double>                            &rhs_vector,
+   const Function<spacedim,typename VectorType::value_type> &rhs,
+   VectorType                                &rhs_vector,
    const std::set<types::boundary_id>        &boundary_ids = std::set<types::boundary_id>());
 
   /**
@@ -2115,12 +2118,12 @@ namespace VectorTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType>
   void create_boundary_right_hand_side
   (const hp::DoFHandler<dim,spacedim> &dof,
    const hp::QCollection<dim-1>       &q,
-   const Function<spacedim,double>    &rhs,
-   Vector<double>                     &rhs_vector,
+   const Function<spacedim,typename VectorType::value_type> &rhs,
+   VectorType                         &rhs_vector,
    const std::set<types::boundary_id> &boundary_ids = std::set<types::boundary_id>());
 
   //@}
