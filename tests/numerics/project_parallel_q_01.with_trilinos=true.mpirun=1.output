@@ -1,0 +1,23 @@
+
+DEAL::n_dofs=162
+DEAL::FESystem<2>[FE_Q<2>(1)^2], P_0, rel. error=1.81989e-17
+DEAL::FESystem<2>[FE_Q<2>(1)^2], P_1, rel. error=2.48720e-17
+DEAL::FESystem<2>[FE_Q<2>(1)^2], P_2, rel. error=6.65062e-05
+DEAL::FESystem<2>[FE_Q<2>(1)^2], P_3, rel. error=0.000153713
+DEAL::n_dofs=289
+DEAL::FESystem<2>[FE_Q<2>(2)], P_0, rel. error=2.31928e-17
+DEAL::FESystem<2>[FE_Q<2>(2)], P_1, rel. error=2.70614e-17
+DEAL::FESystem<2>[FE_Q<2>(2)], P_2, rel. error=3.56528e-17
+DEAL::FESystem<2>[FE_Q<2>(2)], P_3, rel. error=2.41461e-06
+DEAL::FESystem<2>[FE_Q<2>(2)], P_4, rel. error=6.79248e-06
+DEAL::n_dofs=1458
+DEAL::FESystem<3>[FE_Q<3>(1)^2], P_0, rel. error=7.35909e-18
+DEAL::FESystem<3>[FE_Q<3>(1)^2], P_1, rel. error=1.08733e-17
+DEAL::FESystem<3>[FE_Q<3>(1)^2], P_2, rel. error=2.01238e-05
+DEAL::FESystem<3>[FE_Q<3>(1)^2], P_3, rel. error=4.66822e-05
+DEAL::n_dofs=4913
+DEAL::FESystem<3>[FE_Q<3>(2)], P_0, rel. error=5.92284e-18
+DEAL::FESystem<3>[FE_Q<3>(2)], P_1, rel. error=5.33425e-18
+DEAL::FESystem<3>[FE_Q<3>(2)], P_2, rel. error=1.45412e-17
+DEAL::FESystem<3>[FE_Q<3>(2)], P_3, rel. error=5.05504e-07
+DEAL::FESystem<3>[FE_Q<3>(2)], P_4, rel. error=1.43736e-06
