@@ -1357,7 +1357,7 @@ FE_Q_Base<PolynomialType,dim,spacedim>
           this->dofs_per_cell)
         return this->restriction[refinement_case-1][child];
 
-      FullMatrix<double> restriction(this->dofs_per_cell, this->dofs_per_cell);
+      FullMatrix<double> my_restriction(this->dofs_per_cell, this->dofs_per_cell);
       // distinguish q/q_dg0 case
       const unsigned int q_dofs_per_cell = Utilities::fixed_power<dim>(q_degree+1);
 
@@ -1386,7 +1386,7 @@ FE_Q_Base<PolynomialType,dim,spacedim>
       const unsigned int dofs1d = q_degree+1;
       std::vector<Tensor<1,dim> > evaluations1d (dofs1d);
 
-      restriction.reinit(this->dofs_per_cell, this->dofs_per_cell);
+      my_restriction.reinit(this->dofs_per_cell, this->dofs_per_cell);
 
       for (unsigned int i=0; i<q_dofs_per_cell; ++i)
         {
@@ -1434,9 +1434,9 @@ FE_Q_Base<PolynomialType,dim,spacedim>
                       const unsigned int child_dof =
                         index_map_inverse[j+jj];
                       if (std::fabs (val-1.) < eps)
-                        restriction(mother_dof,child_dof)=1.;
+                        my_restriction(mother_dof,child_dof)=1.;
                       else if (std::fabs(val) > eps)
-                        restriction(mother_dof,child_dof)=val;
+                        my_restriction(mother_dof,child_dof)=val;
                       sum_check += val;
                     }
                   FE_Q_Helper::increment_indices<dim> (j_indices, dofs1d);
@@ -1453,13 +1453,14 @@ FE_Q_Base<PolynomialType,dim,spacedim>
 
           // part for FE_Q_DG0
           if (q_dofs_per_cell < this->dofs_per_cell)
-            restriction(this->dofs_per_cell-1,this->dofs_per_cell-1) =
+            my_restriction(this->dofs_per_cell-1,this->dofs_per_cell-1) =
               1./GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case));
         }
 
-      // swap matrices
-      restriction.swap(const_cast<FullMatrix<double> &>
-                       (this->restriction[refinement_case-1][child]));
+      // swap the just computed restriction matrix into the
+      // element of the vector stored in the base class
+      my_restriction.swap(const_cast<FullMatrix<double> &>
+                          (this->restriction[refinement_case-1][child]));
     }
 
   return this->restriction[refinement_case-1][child];
