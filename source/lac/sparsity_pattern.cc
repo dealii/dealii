@@ -577,9 +577,7 @@ void SparsityPattern::copy_from (const FullMatrix<number> &matrix)
           ++entries_per_row[row];
       if ((matrix.m() == matrix.n())
           &&
-          (matrix(row,row) == 0)
-          &&
-          (matrix.m() == matrix.n()))
+          (matrix(row,row) == 0))
         ++entries_per_row[row];
     }
 
