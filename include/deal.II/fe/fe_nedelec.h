@@ -112,9 +112,12 @@ class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim>
 {
 public:
   /**
-   * Constructor for the N&eacute;d&eacute;lec element of degree @p p.
+   * Constructor for the N&eacute;d&eacute;lec element of given @p order.
+   * The maximal polynomial degree of the shape functions is
+   * <code>order+1</code> (in each variable; the total polynomial degree
+   * may be higher).
    */
-  FE_Nedelec (const unsigned int p);
+  FE_Nedelec (const unsigned int order);
 
   /**
    * Return a string that uniquely identifies a finite element. This class
@@ -290,7 +293,7 @@ private:
    * class and fill the tables with interpolation weights (#boundary_weights
    * and interior_weights). Called from the constructor.
    */
-  void initialize_support_points (const unsigned int degree);
+  void initialize_support_points (const unsigned int order);
 
   /**
    * Initialize the interpolation from functions on refined mesh cells onto
