@@ -341,6 +341,44 @@ IndexSet::subtract_set (const IndexSet &other)
 
 
 
+IndexSet::size_type
+IndexSet::pop_back ()
+{
+  Assert(ranges.size() != 0,
+         ExcMessage("pop_back() failed, because this IndexSet contains no entries."));
+
+  const size_type index = ranges.back().end-1;
+  --ranges.back().end;
+
+  if (ranges.back().begin == ranges.back().end)
+    ranges.pop_back();
+
+  return index;
+}
+
+
+
+IndexSet::size_type
+IndexSet::pop_front ()
+{
+  Assert(ranges.size() != 0,
+         ExcMessage("pop_front() failed, because this IndexSet contains no entries."));
+
+  const size_type index = ranges.front().begin;
+  ++ranges.front().begin;
+
+  if (ranges.front().begin == ranges.front().end)
+    ranges.erase(ranges.begin());
+
+  // We have to set this in any case, because nth_index_in_set is not longer
+  // up to date for all but the first range
+  is_compressed = false;
+
+  return index;
+}
+
+
+
 void
 IndexSet::add_indices(const IndexSet &other,
                       const unsigned int offset)

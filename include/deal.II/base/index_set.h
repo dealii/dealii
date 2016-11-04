@@ -218,6 +218,12 @@ public:
   bool is_contiguous () const;
 
   /**
+   * Return whether the index set stored by this object contains no elements.
+   * This is similar, but faster than checking <code>n_elements() == 0</code>.
+   */
+  bool is_empty () const;
+
+  /**
    * Return whether the IndexSets are ascending with respect to MPI process
    * number and 1:1, i.e., each index is contained in exactly one IndexSet
    * (among those stored on the different processes), each process stores
@@ -314,6 +320,18 @@ public:
    * \leftarrow x \backslash o$.
    */
   void subtract_set (const IndexSet &other);
+
+  /**
+   * Removes and returns the last element of the last range.
+   * Throws an exception if the IndexSet is empty.
+   */
+  size_type pop_back ();
+
+  /**
+   * Removes and returns the first element of the first range.
+   * Throws an exception if the IndexSet is empty.
+   */
+  size_type pop_front ();
 
   /**
    * Fills the given vector with all indices contained in this IndexSet.
@@ -1516,6 +1534,14 @@ IndexSet::is_contiguous () const
 {
   compress ();
   return (ranges.size() <= 1);
+}
+
+
+inline
+bool
+IndexSet::is_empty () const
+{
+  return ranges.empty();
 }
 
 
