@@ -389,9 +389,10 @@ namespace internal
                           if (update_flags & update_JxW_values)
                             current_data.JxW_values.reserve (reserve_size);
                           if (update_flags & update_jacobian_grads)
-                            current_data.jacobians_grad_diag.reserve (reserve_size);
-                          if (update_flags & update_jacobian_grads)
-                            current_data.jacobians_grad_upper.reserve (reserve_size);
+                            {
+                              current_data.jacobians_grad_diag.reserve (reserve_size);
+                              current_data.jacobians_grad_upper.reserve (reserve_size);
+                            }
                         }
                     }
 
