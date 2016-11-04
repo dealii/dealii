@@ -41,8 +41,13 @@ DEAL_II_NAMESPACE_OPEN
 // current process
 Timer::Timer()
   :
+  start_time (0.),
+  start_time_children (0.),
+  start_wall_time (0.),
   cumulative_time (0.),
-  cumulative_wall_time (0.)
+  cumulative_wall_time (0.),
+  last_lap_time (0.),
+  running (false)
 #ifdef DEAL_II_WITH_MPI
   , mpi_communicator (MPI_COMM_SELF)
   , sync_wall_time (false)
@@ -59,8 +64,13 @@ Timer::Timer()
 Timer::Timer(MPI_Comm mpi_communicator,
              bool sync_wall_time_)
   :
+  start_time (0.),
+  start_time_children (0.),
+  start_wall_time (0.),
   cumulative_time (0.),
   cumulative_wall_time (0.),
+  last_lap_time (0.),
+  running (false),
   mpi_communicator (mpi_communicator),
   sync_wall_time(sync_wall_time_)
 {
