@@ -57,6 +57,7 @@ LogStream::LogStream()
   double_threshold(0.),
   float_threshold(0.),
   offset(0),
+  print_thread_id(false),
   old_cerr(0),
   at_newline(true)
 {
