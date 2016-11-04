@@ -367,6 +367,8 @@ SparseDirectUMFPACK::solve (const Matrix        &matrix,
 
 SparseDirectUMFPACK::SparseDirectUMFPACK ()
   :
+  _m(0),
+  _n(0),
   symbolic_decomposition (0),
   numeric_decomposition (0),
   control (0)
