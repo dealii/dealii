@@ -93,9 +93,9 @@ namespace internal
 template <int dim, typename DoFHandlerType>
 void
 DataOutRotation<dim,DoFHandlerType>::
-build_one_patch (const cell_iterator *cell,
+build_one_patch (const cell_iterator                                                 *cell,
                  internal::DataOutRotation::ParallelData<dimension, space_dimension> &data,
-                 std::vector<DataOutBase::Patch<dimension+1,space_dimension+1> > &patches)
+                 std::vector<DataOutBase::Patch<dimension+1,space_dimension+1> >     &my_patches)
 {
   if (dim == 3)
     {
@@ -140,10 +140,10 @@ build_one_patch (const cell_iterator *cell,
           Assert (r1 >= 0, ExcRadialVariableHasNegativeValues(r1));
           Assert (r2 >= 0, ExcRadialVariableHasNegativeValues(r2));
 
-          patches[angle].vertices[0] = r1*angle_directions[angle];
-          patches[angle].vertices[1] = r2*angle_directions[angle];
-          patches[angle].vertices[2] = r1*angle_directions[angle+1];
-          patches[angle].vertices[3] = r2*angle_directions[angle+1];
+          my_patches[angle].vertices[0] = r1*angle_directions[angle];
+          my_patches[angle].vertices[1] = r2*angle_directions[angle];
+          my_patches[angle].vertices[2] = r1*angle_directions[angle+1];
+          my_patches[angle].vertices[3] = r2*angle_directions[angle+1];
 
           break;
         };
@@ -161,12 +161,12 @@ build_one_patch (const cell_iterator *cell,
               Assert (v(0) >= 0, ExcRadialVariableHasNegativeValues(v(0)));
 
               // now set the vertices of the patch
-              patches[angle].vertices[vertex] = v(0) * angle_directions[angle];
-              patches[angle].vertices[vertex][0] = v(1);
+              my_patches[angle].vertices[vertex] = v(0) * angle_directions[angle];
+              my_patches[angle].vertices[vertex][0] = v(1);
 
-              patches[angle].vertices[vertex+GeometryInfo<dimension>::vertices_per_cell]
+              my_patches[angle].vertices[vertex+GeometryInfo<dimension>::vertices_per_cell]
                 = v(0) * angle_directions[angle+1];
-              patches[angle].vertices[vertex+GeometryInfo<dimension>::vertices_per_cell][0]
+              my_patches[angle].vertices[vertex+GeometryInfo<dimension>::vertices_per_cell][0]
                 = v(1);
             };
 
@@ -254,8 +254,8 @@ build_one_patch (const cell_iterator *cell,
                         case 1:
                           for (unsigned int x=0; x<n_points; ++x)
                             for (unsigned int y=0; y<n_points; ++y)
-                              patches[angle].data(offset+component,
-                                                  x*n_points + y)
+                              my_patches[angle].data(offset+component,
+                                                     x*n_points + y)
                                 = data.postprocessed_values[dataset][x](component);
                           break;
 
@@ -263,10 +263,10 @@ build_one_patch (const cell_iterator *cell,
                           for (unsigned int x=0; x<n_points; ++x)
                             for (unsigned int y=0; y<n_points; ++y)
                               for (unsigned int z=0; z<n_points; ++z)
-                                patches[angle].data(offset+component,
-                                                    x*n_points*n_points +
-                                                    y*n_points +
-                                                    z)
+                                my_patches[angle].data(offset+component,
+                                                       x*n_points*n_points +
+                                                       y*n_points +
+                                                       z)
                                   = data.postprocessed_values[dataset][x*n_points+z](component);
                           break;
 
@@ -285,8 +285,8 @@ build_one_patch (const cell_iterator *cell,
                     case 1:
                       for (unsigned int x=0; x<n_points; ++x)
                         for (unsigned int y=0; y<n_points; ++y)
-                          patches[angle].data(offset,
-                                              x*n_points + y)
+                          my_patches[angle].data(offset,
+                                                 x*n_points + y)
                             = data.patch_values_scalar.solution_values[x];
                       break;
 
@@ -294,10 +294,10 @@ build_one_patch (const cell_iterator *cell,
                       for (unsigned int x=0; x<n_points; ++x)
                         for (unsigned int y=0; y<n_points; ++y)
                           for (unsigned int z=0; z<n_points; ++z)
-                            patches[angle].data(offset,
-                                                x*n_points*n_points +
-                                                y +
-                                                z*n_points)
+                            my_patches[angle].data(offset,
+                                                   x*n_points*n_points +
+                                                   y +
+                                                   z*n_points)
                               = data.patch_values_scalar.solution_values[x*n_points+z];
                       break;
 
@@ -320,8 +320,8 @@ build_one_patch (const cell_iterator *cell,
                         case 1:
                           for (unsigned int x=0; x<n_points; ++x)
                             for (unsigned int y=0; y<n_points; ++y)
-                              patches[angle].data(offset+component,
-                                                  x*n_points + y)
+                              my_patches[angle].data(offset+component,
+                                                     x*n_points + y)
                                 = data.patch_values_system.solution_values[x](component);
                           break;
 
@@ -329,10 +329,10 @@ build_one_patch (const cell_iterator *cell,
                           for (unsigned int x=0; x<n_points; ++x)
                             for (unsigned int y=0; y<n_points; ++y)
                               for (unsigned int z=0; z<n_points; ++z)
-                                patches[angle].data(offset+component,
-                                                    x*n_points*n_points +
-                                                    y*n_points +
-                                                    z)
+                                my_patches[angle].data(offset+component,
+                                                       x*n_points*n_points +
+                                                       y*n_points +
+                                                       z)
                                   = data.patch_values_system.solution_values[x*n_points+z](component);
                           break;
 
@@ -362,9 +362,9 @@ build_one_patch (const cell_iterator *cell,
                 case 1:
                   for (unsigned int x=0; x<n_points; ++x)
                     for (unsigned int y=0; y<n_points; ++y)
-                      patches[angle].data(dataset+offset,
-                                          x*n_points +
-                                          y)
+                      my_patches[angle].data(dataset+offset,
+                                             x*n_points +
+                                             y)
                         = value;
                   break;
 
@@ -372,10 +372,10 @@ build_one_patch (const cell_iterator *cell,
                   for (unsigned int x=0; x<n_points; ++x)
                     for (unsigned int y=0; y<n_points; ++y)
                       for (unsigned int z=0; z<n_points; ++z)
-                        patches[angle].data(dataset+offset,
-                                            x*n_points*n_points +
-                                            y*n_points +
-                                            z)
+                        my_patches[angle].data(dataset+offset,
+                                               x*n_points*n_points +
+                                               y*n_points +
+                                               z)
                           = value;
                   break;
 
