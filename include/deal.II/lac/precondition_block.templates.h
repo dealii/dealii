@@ -54,7 +54,8 @@ template <typename MatrixType, typename inverse_type>
 PreconditionBlock<MatrixType,inverse_type>::PreconditionBlock (bool store)
   : PreconditionBlockBase<inverse_type>(store),
     blocksize(0),
-    A(0, typeid(*this).name())
+    A(0, typeid(*this).name()),
+    relaxation(1.0)
 {}
 
 
