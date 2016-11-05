@@ -161,7 +161,8 @@ namespace MatrixFreeOperators
     /**
      * Get read access to the inverse diagonal of this operator.
      */
-    const DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> > &get_matrix_diagonal_inverse() const;
+    const std_cxx11::shared_ptr<DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> > > &
+    get_matrix_diagonal_inverse() const;
 
     /**
      * Apply the Jacobi preconditioner, which multiplies every element of the
@@ -200,9 +201,10 @@ namespace MatrixFreeOperators
     SmartPointer<const MatrixFree<dim,Number>, Base<dim,Number> > data;
 
     /**
-     * A vector to store inverse of diagonal elements.
+     * A shared pointer to a diagonal matrix that stores the inverse of
+     * diagonal elements as a vector.
      */
-    DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> > inverse_diagonal_entries;
+    std_cxx11::shared_ptr<DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> > > inverse_diagonal_entries;
 
   private:
 
@@ -232,7 +234,10 @@ namespace MatrixFreeOperators
 
     /**
      * Adjust the ghost range of the vectors to the storage requirements of
-     * the underlying MatrixFree class.
+     * the underlying MatrixFree class. This is used inside the mult_add() as
+     * well as vmult_interface_up() and vmult_interface_down() methods in
+     * order to ensure that the cell loops will be able to access the ghost
+     * indices with the correct local indices.
      */
     void adjust_ghost_range_if_necessary(const LinearAlgebra::distributed::Vector<Number> &vec) const;
   };
@@ -636,7 +641,7 @@ namespace MatrixFreeOperators
   Base<dim,Number>::clear ()
   {
     data = NULL;
-    inverse_diagonal_entries.clear();
+    inverse_diagonal_entries.reset();
   }
 
 
@@ -648,8 +653,9 @@ namespace MatrixFreeOperators
   {
     (void) col;
     Assert (row == col, ExcNotImplemented());
-    Assert (inverse_diagonal_entries.m() > 0, ExcNotInitialized());
-    return 1.0/inverse_diagonal_entries(row,row);
+    Assert (inverse_diagonal_entries.get() != NULL &&
+            inverse_diagonal_entries->m() > 0, ExcNotInitialized());
+    return 1.0/(*inverse_diagonal_entries)(row,row);
   }
 
 
@@ -918,16 +924,17 @@ namespace MatrixFreeOperators
   std::size_t
   Base<dim,Number>::memory_consumption () const
   {
-    return inverse_diagonal_entries.memory_consumption();
+    return inverse_diagonal_entries.get() != NULL ? inverse_diagonal_entries->memory_consumption() : sizeof(*this);
   }
 
 
 
   template <int dim, typename Number>
-  const DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> > &
+  const std_cxx11::shared_ptr<DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> > > &
   Base<dim,Number>::get_matrix_diagonal_inverse() const
   {
-    Assert(inverse_diagonal_entries.m() > 0, ExcNotInitialized());
+    Assert(inverse_diagonal_entries.get() != NULL &&
+           inverse_diagonal_entries->m() > 0, ExcNotInitialized());
     return inverse_diagonal_entries;
   }
 
@@ -949,9 +956,10 @@ namespace MatrixFreeOperators
                                         const LinearAlgebra::distributed::Vector<Number> &src,
                                         const Number omega) const
   {
-    Assert(inverse_diagonal_entries.m() > 0, ExcNotInitialized());
-    inverse_diagonal_entries.vmult(dst,src);
-    dst*= omega;
+    Assert(inverse_diagonal_entries.get() &&
+           inverse_diagonal_entries->m() > 0, ExcNotInitialized());
+    inverse_diagonal_entries->vmult(dst,src);
+    dst *= omega;
   }
 
 
@@ -974,23 +982,23 @@ namespace MatrixFreeOperators
   {
     Assert((Base<dim, Number>::data != NULL), ExcNotInitialized());
 
+    this->inverse_diagonal_entries.
+    reset(new DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> >());
+    LinearAlgebra::distributed::Vector<Number> &inverse_diagonal_vector = this->inverse_diagonal_entries->get_vector();
     LinearAlgebra::distributed::Vector<Number> ones;
-    LinearAlgebra::distributed::Vector<Number> &inverse_diagonal_entries = Base<dim, Number>::inverse_diagonal_entries.get_vector();
     this->initialize_dof_vector(ones);
-    this->initialize_dof_vector(inverse_diagonal_entries);
+    this->initialize_dof_vector(inverse_diagonal_vector);
     ones = 1.;
-    ones.update_ghost_values();
-    apply_add(inverse_diagonal_entries, ones);
+    apply_add(inverse_diagonal_vector, ones);
 
-    this->set_constrained_entries_to_one(inverse_diagonal_entries);
+    this->set_constrained_entries_to_one(inverse_diagonal_vector);
 
-    const unsigned int local_size = inverse_diagonal_entries.local_size();
+    const unsigned int local_size = inverse_diagonal_vector.local_size();
     for (unsigned int i=0; i<local_size; ++i)
-      inverse_diagonal_entries.local_element(i)
-        =1./inverse_diagonal_entries.local_element(i);
+      inverse_diagonal_vector.local_element(i)
+        =1./inverse_diagonal_vector.local_element(i);
 
-    inverse_diagonal_entries.compress(VectorOperation::insert);
-    inverse_diagonal_entries.update_ghost_values();
+    inverse_diagonal_vector.update_ghost_values();
   }
 
 
@@ -1082,22 +1090,22 @@ namespace MatrixFreeOperators
     Assert((Base<dim, Number>::data != NULL), ExcNotInitialized());
 
     unsigned int dummy = 0;
-    LinearAlgebra::distributed::Vector<Number> &inverse_diagonal_entries = Base<dim,Number>::inverse_diagonal_entries.get_vector();
-    this->initialize_dof_vector(inverse_diagonal_entries);
-    Base<dim,Number>::
-    data->cell_loop (&LaplaceOperator::local_diagonal_cell,
-                     this, inverse_diagonal_entries, dummy);
+    this->inverse_diagonal_entries.
+    reset(new DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> >());
+    LinearAlgebra::distributed::Vector<Number> &inverse_diagonal_vector = this->inverse_diagonal_entries->get_vector();
+    this->initialize_dof_vector(inverse_diagonal_vector);
 
-    this->set_constrained_entries_to_one(inverse_diagonal_entries);
+    this->data->cell_loop (&LaplaceOperator::local_diagonal_cell,
+                           this, inverse_diagonal_vector, dummy);
+    this->set_constrained_entries_to_one(inverse_diagonal_vector);
 
-    for (unsigned int i=0; i<inverse_diagonal_entries.local_size(); ++i)
-      if (std::abs(inverse_diagonal_entries.local_element(i)) > std::sqrt(std::numeric_limits<Number>::epsilon()))
-        inverse_diagonal_entries.local_element(i) = 1./inverse_diagonal_entries.local_element(i);
+    for (unsigned int i=0; i<inverse_diagonal_vector.local_size(); ++i)
+      if (std::abs(inverse_diagonal_vector.local_element(i)) > std::sqrt(std::numeric_limits<Number>::epsilon()))
+        inverse_diagonal_vector.local_element(i) = 1./inverse_diagonal_vector.local_element(i);
       else
-        inverse_diagonal_entries.local_element(i) = 1.;
+        inverse_diagonal_vector.local_element(i) = 1.;
 
-    inverse_diagonal_entries.compress(VectorOperation::insert);
-    inverse_diagonal_entries.update_ghost_values();
+    inverse_diagonal_vector.update_ghost_values();
   }
 
 
