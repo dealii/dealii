@@ -1008,7 +1008,7 @@ namespace MatrixFreeOperators
   clear ()
   {
     Base<dim, Number>::clear();
-    scalar_coefficient = NULL;
+    scalar_coefficient.reset();
   }
 
 
