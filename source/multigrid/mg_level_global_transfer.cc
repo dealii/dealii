@@ -55,10 +55,16 @@ namespace
             const types::global_dof_index global_dof_index,
             const types::global_dof_index level_dof_index)
       :
-      level(level), global_dof_index(global_dof_index), level_dof_index(level_dof_index)
+      level(level),
+      global_dof_index(global_dof_index),
+      level_dof_index(level_dof_index)
     {}
 
     DoFPair()
+      :
+      level (numbers::invalid_unsigned_int),
+      global_dof_index (numbers::invalid_dof_index),
+      level_dof_index (numbers::invalid_dof_index)
     {}
   };
 
@@ -390,14 +396,14 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::fill_and_com
 {
   // first go to the usual routine...
   std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > >
-  copy_indices;
+  my_copy_indices;
   std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > >
-  copy_indices_global_mine;
+  my_copy_indices_global_mine;
   std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > >
-  copy_indices_level_mine;
+  my_copy_indices_level_mine;
 
-  fill_copy_indices(mg_dof, mg_constrained_dofs, copy_indices,
-                    copy_indices_global_mine, copy_indices_level_mine);
+  fill_copy_indices(mg_dof, mg_constrained_dofs, my_copy_indices,
+                    my_copy_indices_global_mine, my_copy_indices_level_mine);
 
   // get all degrees of freedom that we need read access to in copy_to_mg
   // and copy_from_mg, respectively. We fill an IndexSet once on each level
@@ -419,11 +425,11 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::fill_and_com
   std::vector<IndexSet> level_index_set(mg_dof.get_triangulation().n_global_levels());
   for (unsigned int l=0; l<mg_dof.get_triangulation().n_global_levels(); ++l)
     {
-      for (unsigned int i=0; i<copy_indices_level_mine[l].size(); ++i)
-        accessed_indices.push_back(copy_indices_level_mine[l][i].first);
+      for (unsigned int i=0; i<my_copy_indices_level_mine[l].size(); ++i)
+        accessed_indices.push_back(my_copy_indices_level_mine[l][i].first);
       std::vector<types::global_dof_index> accessed_level_indices;
-      for (unsigned int i=0; i<copy_indices_global_mine[l].size(); ++i)
-        accessed_level_indices.push_back(copy_indices_global_mine[l][i].second);
+      for (unsigned int i=0; i<my_copy_indices_global_mine[l].size(); ++i)
+        accessed_level_indices.push_back(my_copy_indices_global_mine[l][i].second);
       std::sort(accessed_level_indices.begin(), accessed_level_indices.end());
       level_index_set[l].set_size(mg_dof.locally_owned_mg_dofs(l).size());
       level_index_set[l].add_indices(accessed_level_indices.begin(),
@@ -454,32 +460,32 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::fill_and_com
         *ghosted_level_vector[level].get_partitioner();
       // owned-owned case: the locally owned indices are going to control
       // the local index
-      this->copy_indices[level].resize(copy_indices[level].size());
-      for (unsigned int i=0; i<copy_indices[level].size(); ++i)
+      this->copy_indices[level].resize(my_copy_indices[level].size());
+      for (unsigned int i=0; i<my_copy_indices[level].size(); ++i)
         this->copy_indices[level][i] =
           std::pair<unsigned int,unsigned int>
-          (global_partitioner.global_to_local(copy_indices[level][i].first),
-           level_partitioner.global_to_local(copy_indices[level][i].second));
+          (global_partitioner.global_to_local(my_copy_indices[level][i].first),
+           level_partitioner.global_to_local(my_copy_indices[level][i].second));
 
       // remote-owned case: the locally owned indices for the level and the
       // ghost dofs for the global indices set the local index
       this->copy_indices_level_mine[level].
-      resize(copy_indices_level_mine[level].size());
-      for (unsigned int i=0; i<copy_indices_level_mine[level].size(); ++i)
+      resize(my_copy_indices_level_mine[level].size());
+      for (unsigned int i=0; i<my_copy_indices_level_mine[level].size(); ++i)
         this->copy_indices_level_mine[level][i] =
           std::pair<unsigned int,unsigned int>
-          (global_partitioner.global_to_local(copy_indices_level_mine[level][i].first),
-           level_partitioner.global_to_local(copy_indices_level_mine[level][i].second));
+          (global_partitioner.global_to_local(my_copy_indices_level_mine[level][i].first),
+           level_partitioner.global_to_local(my_copy_indices_level_mine[level][i].second));
 
       // owned-remote case: the locally owned indices for the global dofs
       // and the ghost dofs for the level indices set the local index
       this->copy_indices_global_mine[level].
-      resize(copy_indices_global_mine[level].size());
-      for (unsigned int i=0; i<copy_indices_global_mine[level].size(); ++i)
+      resize(my_copy_indices_global_mine[level].size());
+      for (unsigned int i=0; i<my_copy_indices_global_mine[level].size(); ++i)
         this->copy_indices_global_mine[level][i] =
           std::pair<unsigned int,unsigned int>
-          (global_partitioner.global_to_local(copy_indices_global_mine[level][i].first),
-           level_partitioner.global_to_local(copy_indices_global_mine[level][i].second));
+          (global_partitioner.global_to_local(my_copy_indices_global_mine[level][i].first),
+           level_partitioner.global_to_local(my_copy_indices_global_mine[level][i].second));
     }
 
   perform_plain_copy = this->copy_indices.back().size()
