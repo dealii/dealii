@@ -104,11 +104,11 @@ void PreconditionBlock<MatrixType,inverse_type>::initialize
 template <typename MatrixType, typename inverse_type>
 void PreconditionBlock<MatrixType,inverse_type>::initialize
 (const MatrixType             &M,
- const std::vector<size_type> &permutation,
- const std::vector<size_type> &inverse_permutation,
+ const std::vector<size_type> &new_permutation,
+ const std::vector<size_type> &new_inverse_permutation,
  const AdditionalData          parameters)
 {
-  set_permutation(permutation, inverse_permutation);
+  set_permutation(new_permutation, new_inverse_permutation);
   initialize(M, parameters);
 }
 
@@ -515,23 +515,19 @@ void PreconditionBlock<MatrixType,inverse_type>::invert_diagblocks()
 
 template <typename MatrixType, typename inverse_type>
 void PreconditionBlock<MatrixType,inverse_type>::set_permutation
-(const std::vector<size_type> &p,
- const std::vector<size_type> &i)
+(const std::vector<size_type> &new_permutation,
+ const std::vector<size_type> &new_inverse_permutation)
 {
-  Assert (p.size() == i.size(), ExcDimensionMismatch(p.size(), i.size()));
+  AssertDimension (new_permutation.size(),
+                   new_inverse_permutation.size());
 
   if (this->inverses_ready())
     {
-      AssertDimension(p.size(), this->size());
+      AssertDimension(new_permutation.size(), this->size());
     }
 
-  permutation.resize(p.size());
-  inverse_permutation.resize(p.size());
-  for (unsigned int k=0; k<p.size(); ++k)
-    {
-      permutation[k] = p[k];
-      inverse_permutation[k] = i[k];
-    }
+  permutation = new_permutation;
+  inverse_permutation = new_inverse_permutation;
 }
 
 
