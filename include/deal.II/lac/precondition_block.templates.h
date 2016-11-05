@@ -93,7 +93,7 @@ void PreconditionBlock<MatrixType,inverse_type>::initialize
   if (parameters.invert_diagonal)
     {
       if (permutation.size() == M.m())
-        invert_permuted_diagblocks(permutation, inverse_permutation);
+        invert_permuted_diagblocks();
       else
         invert_diagblocks();
     }
@@ -112,9 +112,7 @@ void PreconditionBlock<MatrixType,inverse_type>::initialize
 }
 
 template <typename MatrixType, typename inverse_type>
-void PreconditionBlock<MatrixType,inverse_type>::invert_permuted_diagblocks
-(const std::vector<size_type> &permutation,
- const std::vector<size_type> &inverse_permutation)
+void PreconditionBlock<MatrixType,inverse_type>::invert_permuted_diagblocks()
 {
   Assert (A!=0, ExcNotInitialized());
   Assert (blocksize!=0, ExcNotInitialized());
