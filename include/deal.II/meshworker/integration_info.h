@@ -556,7 +556,8 @@ namespace MeshWorker
     :
     fevalv(0),
     multigrid(false),
-    global_data(std_cxx11::shared_ptr<VectorDataBase<dim, sdim> >(new VectorDataBase<dim, sdim>))
+    global_data(std_cxx11::shared_ptr<VectorDataBase<dim, sdim> >(new VectorDataBase<dim, sdim>)),
+    n_components(numbers::invalid_unsigned_int)
   {}
 
 
