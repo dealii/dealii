@@ -925,7 +925,7 @@ namespace LinearAlgebra
        * respective reinit() call, for additional queries regarding the
        * parallel communication, or the compatibility of partitioners.
        */
-      std_cxx11::shared_ptr<const Utilities::MPI::Partitioner>
+      const std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> &
       get_partitioner () const;
 
       /**
@@ -1430,7 +1430,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     inline
-    std_cxx11::shared_ptr<const Utilities::MPI::Partitioner>
+    const std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> &
     Vector<Number>::get_partitioner () const
     {
       return partitioner;
