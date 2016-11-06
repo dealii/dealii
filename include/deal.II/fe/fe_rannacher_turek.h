@@ -55,13 +55,13 @@ class FE_RannacherTurek : public FE_Poly<PolynomialsRannacherTurek<dim>, dim>
 {
 public:
   /**
-   * Constructor for Rannacher-Turek element of degree @p degree, using @p
+   * Constructor for Rannacher-Turek element of given @p order, using @p
    * n_face_support_points quadrature points on each face for interpolation.
-   * Notice that the element of degree 0 contains polynomials of degree 2.
+   * Notice that the element of order 0 contains polynomials of degree 2.
    *
-   * Only implemented for degree 0 in 2D.
+   * The element is currently only implemented for order 0 in 2D.
    */
-  FE_RannacherTurek(const unsigned int degree = 0,
+  FE_RannacherTurek(const unsigned int order = 0,
                     const unsigned int n_face_support_points = 2);
 
   virtual std::string get_name() const;
@@ -79,14 +79,16 @@ public:
     const VectorSlice<const std::vector<std::vector<double> > > &values) const;
 private:
   /**
-   * Degree of this element.
+   * Order of this element.
    */
-  const unsigned int degree;
+  const unsigned int order;
+
   /**
    * The number of quadrature points used on each face to evaluate node
    * functionals during interpolation.
    */
   const unsigned int n_face_support_points;
+
   /**
    * The weights used on the faces to evaluate node functionals.
    */
