@@ -1980,6 +1980,8 @@ template <typename MatrixType, typename VectorType, typename PreconditionerType>
 inline
 PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::PreconditionChebyshev ()
   :
+  theta          (1.),
+  delta          (1.),
   is_initialized (false)
 {
 #ifdef DEAL_II_WITH_CXX11
@@ -2016,6 +2018,7 @@ void
 PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::clear ()
 {
   is_initialized = false;
+  theta = delta = 1.0;
   matrix_ptr = 0;
   data.matrix_diagonal_inverse.reinit(0);
   data.preconditioner.reset();
