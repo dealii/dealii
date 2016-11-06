@@ -143,6 +143,11 @@ protected:
 
 private:
   /**
+   * Copy operator. Made private since it is not used and not implemented.
+   */
+  ExceptionBase operator= (const ExceptionBase &exc);
+
+  /**
    * Internal function that generates the c_string. Called by what().
    */
   void generate_message() const;
