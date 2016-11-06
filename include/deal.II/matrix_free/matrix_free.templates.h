@@ -366,7 +366,8 @@ namespace internal
       for (unsigned int child=0; child<cell->n_children(); ++child)
         resolve_cell (cell->child(child), cell_its,
                       subdomain_id);
-    else if (cell->subdomain_id() == subdomain_id)
+    else if (subdomain_id == numbers::invalid_subdomain_id
+             || cell->subdomain_id() == subdomain_id)
       {
         Assert (cell->active(), ExcInternalError());
         cell_its.push_back (std::pair<unsigned int,unsigned int>
@@ -391,7 +392,7 @@ initialize_dof_handlers (const std::vector<const DoFHandler<dim>*> &dof_handler,
 
   dof_info.resize (dof_handlers.n_dof_handlers);
 
-  // go through cells on zeroth level and then successively step down into
+  // Go through cells on zeroth level and then successively step down into
   // children. This gives a z-ordering of the cells, which is beneficial when
   // setting up neighboring relations between cells for thread parallelization
   const unsigned int n_mpi_procs = size_info.n_procs;
@@ -404,8 +405,16 @@ initialize_dof_handlers (const std::vector<const DoFHandler<dim>*> &dof_handler,
         cell_level_index.reserve (tria.n_active_cells());
       typename Triangulation<dim>::cell_iterator cell = tria.begin(0),
                                                  end_cell = tria.end(0);
+      // For serial Triangulations always take all cells
+      const unsigned int subdomain_id
+        = (dynamic_cast<const parallel::Triangulation<dim> *>
+           (&dof_handler[0]->get_triangulation())!=0)
+          ? my_pid : numbers::invalid_subdomain_id;
       for ( ; cell != end_cell; ++cell)
-        internal::resolve_cell (cell, cell_level_index, my_pid);
+        internal::resolve_cell (cell, cell_level_index, subdomain_id);
+
+      Assert(n_mpi_procs>1 || cell_level_index.size()==tria.n_active_cells(),
+             ExcInternalError());
     }
   else
     {
@@ -454,9 +463,17 @@ initialize_dof_handlers (const std::vector<const hp::DoFHandler<dim>*> &dof_hand
     }
   typename hp::DoFHandler<dim>::cell_iterator cell = dof_handler[0]->begin(0),
                                               end_cell = dof_handler[0]->end(0);
+  // For serial Triangulations always take all cells
+  const unsigned int subdomain_id
+    = (dynamic_cast<const parallel::Triangulation<dim> *>
+       (&dof_handler[0]->get_triangulation())!=0)
+      ? my_pid : numbers::invalid_subdomain_id;
   for ( ; cell != end_cell; ++cell)
     internal::resolve_cell (cell, cell_level_index,
-                            my_pid);
+                            subdomain_id);
+
+  Assert(n_mpi_procs>1 || cell_level_index.size()==tria.n_active_cells(),
+         ExcInternalError());
 }
 
 
