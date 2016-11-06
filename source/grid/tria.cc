@@ -6258,15 +6258,6 @@ namespace internal
                         hex->face_rotation (5)
                       };
 
-                  // some commonly used fields which
-                  // have varying size
-                  const unsigned int *vertex_indices=0;
-                  const typename Triangulation<dim,spacedim>::raw_line_iterator
-                  *lines=0;
-                  const unsigned int *line_indices=0;
-                  const bool *line_orientation=0;
-                  const int *quad_indices=0;
-
                   // little helper table, indicating, whether the
                   // child with index 0 or with index 1 can be found
                   // at the standard origin of an anisotropically
@@ -6304,6 +6295,12 @@ namespace internal
                     {
                     case RefinementCase<dim>::cut_x:
                     {
+                      const typename Triangulation<dim,spacedim>::raw_line_iterator
+                      *lines = NULL;
+                      const unsigned int *line_indices     = NULL;
+                      const bool         *line_orientation = NULL;
+                      const int          *quad_indices     = NULL;
+
                       //////////////////////////////
                       //
                       //     RefinementCase<dim>::cut_x
@@ -6375,13 +6372,13 @@ namespace internal
                         ->line((hex->face(5)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3)         //3
                       };
 
-                      lines=&lines_x[0];
+                      lines = &lines_x[0];
 
                       unsigned int line_indices_x[4];
 
                       for (unsigned int i=0; i<4; ++i)
-                        line_indices_x[i]=lines[i]->index();
-                      line_indices=&line_indices_x[0];
+                        line_indices_x[i] = lines[i]->index();
+                      line_indices = &line_indices_x[0];
 
                       // the orientation of lines for the inner quads
                       // is quite tricky. as these lines are newly
@@ -6480,7 +6477,7 @@ namespace internal
                         hex->face(5)->child_index(1-child_at_origin[hex->face(5)->refinement_case()-1][f_fl[5]][f_ro[5]])
 
                       };
-                      quad_indices=&quad_indices_x[0];
+                      quad_indices = &quad_indices_x[0];
 
                       new_hexes[0]->set (internal::Triangulation
                                          ::TriaObject<3>(quad_indices[1],
@@ -6498,8 +6495,15 @@ namespace internal
                                                          quad_indices[10]));
                       break;
                     }
+
                     case RefinementCase<dim>::cut_y:
                     {
+                      const typename Triangulation<dim,spacedim>::raw_line_iterator
+                      *lines = NULL;
+                      const unsigned int *line_indices     = NULL;
+                      const bool         *line_orientation = NULL;
+                      const int          *quad_indices     = NULL;
+
                       //////////////////////////////
                       //
                       //     RefinementCase<dim>::cut_y
@@ -6698,8 +6702,15 @@ namespace internal
                                                          quad_indices[10]));
                       break;
                     }
+
                     case RefinementCase<dim>::cut_z:
                     {
+                      const typename Triangulation<dim,spacedim>::raw_line_iterator
+                      *lines = NULL;
+                      const unsigned int *line_indices     = NULL;
+                      const bool         *line_orientation = NULL;
+                      const int          *quad_indices     = NULL;
+
                       //////////////////////////////
                       //
                       //     RefinementCase<dim>::cut_z
@@ -6900,8 +6911,15 @@ namespace internal
                                                          quad_indices[10]));
                       break;
                     }
+
                     case RefinementCase<dim>::cut_xy:
                     {
+                      const typename Triangulation<dim,spacedim>::raw_line_iterator
+                      *lines = NULL;
+                      const unsigned int *line_indices     = NULL;
+                      const bool         *line_orientation = NULL;
+                      const int          *quad_indices     = NULL;
+
                       //////////////////////////////
                       //
                       //     RefinementCase<dim>::cut_xy
@@ -7242,8 +7260,15 @@ namespace internal
                                                          quad_indices[19]));
                       break;
                     }
+
                     case RefinementCase<dim>::cut_xz:
                     {
+                      const typename Triangulation<dim,spacedim>::raw_line_iterator
+                      *lines = NULL;
+                      const unsigned int *line_indices     = NULL;
+                      const bool         *line_orientation = NULL;
+                      const int          *quad_indices     = NULL;
+
                       //////////////////////////////
                       //
                       //     RefinementCase<dim>::cut_xz
@@ -7594,8 +7619,15 @@ namespace internal
                                                          quad_indices[19]));
                       break;
                     }
+
                     case RefinementCase<dim>::cut_yz:
                     {
+                      const typename Triangulation<dim,spacedim>::raw_line_iterator
+                      *lines = NULL;
+                      const unsigned int *line_indices     = NULL;
+                      const bool         *line_orientation = NULL;
+                      const int          *quad_indices     = NULL;
+
                       //////////////////////////////
                       //
                       //     RefinementCase<dim>::cut_yz
@@ -7933,8 +7965,16 @@ namespace internal
                                                          quad_indices[19]));
                       break;
                     }
+
                     case RefinementCase<dim>::cut_xyz:
                     {
+                      const typename Triangulation<dim,spacedim>::raw_line_iterator
+                      *lines = NULL;
+                      const unsigned int *vertex_indices   = NULL;
+                      const unsigned int *line_indices     = NULL;
+                      const bool         *line_orientation = NULL;
+                      const int          *quad_indices     = NULL;
+
                       //////////////////////////////
                       //
                       //     RefinementCase<dim>::cut_xyz
@@ -8939,6 +8979,8 @@ Triangulation (const Triangulation<dim, spacedim> &other)
 // is an error!
   :
   Subscriptor(),
+  signals (),
+  anisotropic_refinement(false),
   check_for_distorted_cells(other.check_for_distorted_cells)
 {
   Assert (false, ExcMessage ("You are not allowed to call this constructor "
