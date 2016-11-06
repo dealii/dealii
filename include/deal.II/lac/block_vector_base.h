@@ -277,9 +277,9 @@ namespace internal
 
 
       /**
-       * Copy constructor.
+       * Copy constructor from an iterator with the same constness.
        */
-      Iterator (const Iterator<BlockVectorType,Constness> &c);
+      Iterator (const Iterator &c);
 
     private:
       /**
