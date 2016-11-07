@@ -28,6 +28,7 @@ namespace Algorithms
   template <typename VectorType>
   OutputOperator<VectorType>::OutputOperator()
     :
+    step (numbers::invalid_unsigned_int),
     os(0)
   {}
 
