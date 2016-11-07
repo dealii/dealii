@@ -597,11 +597,6 @@ private:
   get_dpo_vector (const unsigned int degree);
 
   /**
-   * Degree of the polynomials.
-   */
-  const unsigned int degree;
-
-  /**
    * Pointer to an object representing the polynomial space used here.
    */
   const PolynomialSpace<dim> polynomial_space;

@@ -38,7 +38,6 @@ FE_DGPNonparametric<dim,spacedim>::FE_DGPNonparametric (const unsigned int degre
     std::vector<ComponentMask>(
       FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell,
       std::vector<bool>(1,true))),
-  degree(degree),
   polynomial_space (Polynomials::Legendre::generate_complete_basis(degree))
 {
   const unsigned int n_dofs = this->dofs_per_cell;
@@ -107,7 +106,7 @@ FE_DGPNonparametric<dim,spacedim>::get_name () const
   std::ostringstream namebuf;
   namebuf << "FE_DGPNonparametric<"
           << Utilities::dim_string(dim,spacedim)
-          << ">(" << degree << ")";
+          << ">(" << this->degree << ")";
 
   return namebuf.str();
 }
@@ -585,7 +584,7 @@ template <int dim, int spacedim>
 unsigned int
 FE_DGPNonparametric<dim,spacedim>::get_degree () const
 {
-  return degree;
+  return this->degree;
 }
 
 
