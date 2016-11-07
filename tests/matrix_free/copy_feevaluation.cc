@@ -75,23 +75,25 @@ public:
     (1, FEEvaluation<dim,degree_p+1,degree_p+2,dim,Number>(data, 0));
     AlignedVector<FEEvaluation<dim,degree_p,  degree_p+2,1,  Number> > pressure
     (1, FEEvaluation<dim,degree_p,  degree_p+2,1,  Number>(data, 1));
+    FEEvaluation<dim,degree_p,  degree_p+2,1,  Number> pressure2(data, 1);
+    pressure2 = pressure[0];
 
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
         velocity[0].reinit (cell);
         velocity[0].read_dof_values (src.block(0));
         velocity[0].evaluate (false,true,false);
-        pressure[0].reinit (cell);
-        pressure[0].read_dof_values (src.block(1));
-        pressure[0].evaluate (true,false,false);
+        pressure2.reinit (cell);
+        pressure2.read_dof_values (src.block(1));
+        pressure2.evaluate (true,false,false);
 
         for (unsigned int q=0; q<FEEvaluation<dim,degree_p,degree_p+2,1,Number>::n_q_points; ++q)
           {
             SymmetricTensor<2,dim,vector_t> sym_grad_u =
               velocity[0].get_symmetric_gradient (q);
-            vector_t pres = pressure[0].get_value(q);
+            vector_t pres = pressure2.get_value(q);
             vector_t div = -velocity[0].get_divergence(q);
-            pressure[0].submit_value   (div, q);
+            pressure2.submit_value   (div, q);
 
             // subtract p * I
             for (unsigned int d=0; d<dim; ++d)
@@ -102,8 +104,8 @@ public:
 
         velocity[0].integrate (false,true);
         velocity[0].distribute_local_to_global (dst.block(0));
-        pressure[0].integrate (true,false);
-        pressure[0].distribute_local_to_global (dst.block(1));
+        pressure2.integrate (true,false);
+        pressure2.distribute_local_to_global (dst.block(1));
       }
   }
 
