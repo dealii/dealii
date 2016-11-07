@@ -759,11 +759,9 @@ namespace LinearAlgebra
     std::size_t
     BlockVector<Number>::memory_consumption () const
     {
-      std::size_t mem = sizeof(this->n_blocks());
-      for (size_type i=0; i<this->components.size(); ++i)
-        mem += MemoryConsumption::memory_consumption (this->components[i]);
-      mem += MemoryConsumption::memory_consumption (this->block_indices);
-      return mem;
+      return (MemoryConsumption::memory_consumption (this->block_indices)
+              +
+              MemoryConsumption::memory_consumption (this->components));
     }
 
   } // end of namespace distributed
