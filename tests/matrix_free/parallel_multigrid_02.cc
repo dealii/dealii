@@ -35,9 +35,8 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/multigrid/multigrid.h>
-#include <deal.II/multigrid/mg_transfer.h>
+#include <deal.II/multigrid/mg_transfer_matrix_free.h>
 #include <deal.II/multigrid/mg_tools.h>
-#include <deal.II/multigrid/mg_coarse.h>
 #include <deal.II/multigrid/mg_smoother.h>
 #include <deal.II/multigrid/mg_matrix.h>
 
@@ -46,36 +45,6 @@
 #include <deal.II/matrix_free/operators.h>
 
 std::ofstream logfile("output");
-
-
-template <typename MatrixType>
-class MGTransferPrebuiltMF : public MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double> >
-{
-public:
-  MGTransferPrebuiltMF(const MGLevelObject<MatrixType> &laplace)
-    :
-    laplace_operator (laplace)
-  {};
-
-  /**
-   * Overload copy_to_mg from MGTransferPrebuilt to get the vectors compatible
-   * with MatrixFree and bypass the crude initialization in MGTransferPrebuilt
-   */
-  template <int dim, class InVector, int spacedim>
-  void
-  copy_to_mg (const DoFHandler<dim,spacedim> &mg_dof,
-              MGLevelObject<LinearAlgebra::distributed::Vector<double> > &dst,
-              const InVector &src) const
-  {
-    for (unsigned int level=dst.min_level();
-         level<=dst.max_level(); ++level)
-      laplace_operator[level].initialize_dof_vector(dst[level]);
-    MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double> >::copy_to_mg(mg_dof, dst, src);
-  }
-
-private:
-  const MGLevelObject<MatrixType> &laplace_operator;
-};
 
 
 
@@ -194,8 +163,8 @@ void do_test (const DoFHandler<dim>  &dof)
       mg_matrices[level].compute_diagonal();
     }
 
-  MGTransferPrebuiltMF<LevelMatrixType> mg_transfer(mg_matrices);
-  mg_transfer.build_matrices(dof);
+  MGTransferMatrixFree<dim,double> mg_transfer(mg_constrained_dofs);
+  mg_transfer.build(dof);
 
   MGCoarseIterative<LevelMatrixType,number> mg_coarse;
   mg_coarse.initialize(mg_matrices[0]);
@@ -211,10 +180,7 @@ void do_test (const DoFHandler<dim>  &dof)
       smoother_data[level].smoothing_range = 15.;
       smoother_data[level].degree = 5;
       smoother_data[level].eig_cg_n_iterations = 15;
-      smoother_data[level].preconditioner.
-      reset(new DiagonalMatrix<LinearAlgebra::distributed::Vector<number> >());
-      *smoother_data[level].preconditioner =
-        mg_matrices[level].get_matrix_diagonal_inverse();
+      smoother_data[level].preconditioner = mg_matrices[level].get_matrix_diagonal_inverse();
     }
   mg_smoother.initialize(mg_matrices, smoother_data);
 
@@ -228,7 +194,7 @@ void do_test (const DoFHandler<dim>  &dof)
                                                             mg_smoother,
                                                             mg_smoother);
   PreconditionMG<dim, LinearAlgebra::distributed::Vector<double>,
-                 MGTransferPrebuiltMF<LevelMatrixType> >
+                 MGTransferMatrixFree<dim,double> >
                  preconditioner(dof, mg, mg_transfer);
 
   {

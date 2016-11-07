@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2015 by the deal.II authors
+// Copyright (C) 2011 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -161,7 +161,8 @@ namespace MatrixFreeOperators
     /**
      * Get read access to the inverse diagonal of this operator.
      */
-    const DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> > &get_matrix_diagonal_inverse() const;
+    const std_cxx11::shared_ptr<DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> > > &
+    get_matrix_diagonal_inverse() const;
 
     /**
      * Apply the Jacobi preconditioner, which multiplies every element of the
@@ -200,9 +201,10 @@ namespace MatrixFreeOperators
     SmartPointer<const MatrixFree<dim,Number>, Base<dim,Number> > data;
 
     /**
-     * A vector to store inverse of diagonal elements.
+     * A shared pointer to a diagonal matrix that stores the inverse of
+     * diagonal elements as a vector.
      */
-    DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> > inverse_diagonal_entries;
+    std_cxx11::shared_ptr<DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> > > inverse_diagonal_entries;
 
   private:
 
@@ -229,6 +231,15 @@ namespace MatrixFreeOperators
     void mult_add (LinearAlgebra::distributed::Vector<Number> &dst,
                    const LinearAlgebra::distributed::Vector<Number> &src,
                    const bool transpose) const;
+
+    /**
+     * Adjust the ghost range of the vectors to the storage requirements of
+     * the underlying MatrixFree class. This is used inside the mult_add() as
+     * well as vmult_interface_up() and vmult_interface_down() methods in
+     * order to ensure that the cell loops will be able to access the ghost
+     * indices with the correct local indices.
+     */
+    void adjust_ghost_range_if_necessary(const LinearAlgebra::distributed::Vector<Number> &vec) const;
   };
 
 
@@ -630,7 +641,7 @@ namespace MatrixFreeOperators
   Base<dim,Number>::clear ()
   {
     data = NULL;
-    inverse_diagonal_entries.clear();
+    inverse_diagonal_entries.reset();
   }
 
 
@@ -642,8 +653,9 @@ namespace MatrixFreeOperators
   {
     (void) col;
     Assert (row == col, ExcNotImplemented());
-    Assert (inverse_diagonal_entries.m() > 0, ExcNotInitialized());
-    return 1.0/inverse_diagonal_entries(row,row);
+    Assert (inverse_diagonal_entries.get() != NULL &&
+            inverse_diagonal_entries->m() > 0, ExcNotInitialized());
+    return 1.0/(*inverse_diagonal_entries)(row,row);
   }
 
 
@@ -678,13 +690,18 @@ namespace MatrixFreeOperators
   void
   Base<dim,Number>::
   initialize (const MatrixFree<dim,Number> &data_,
-              const MGConstrainedDoFs &mg_constrained_dofs,
-              const unsigned int level)
+              const MGConstrainedDoFs      &mg_constrained_dofs,
+              const unsigned int            level)
   {
     AssertThrow (level != numbers::invalid_unsigned_int,
                  ExcMessage("level is not set"));
+    if (data_.n_macro_cells() > 0)
+      {
+        AssertDimension(static_cast<int>(level),
+                        data_.get_cell_iterator(0,0)->level());
+      }
 
-    data =  SmartPointer<const MatrixFree<dim,Number>, Base<dim,Number> >(&data_,typeid(*this).name());
+    data = SmartPointer<const MatrixFree<dim,Number>, Base<dim,Number> >(&data_,typeid(*this).name());
 
     // setup edge_constrained indices
     std::vector<types::global_dof_index> interface_indices;
@@ -749,12 +766,40 @@ namespace MatrixFreeOperators
 
   template <int dim, typename Number>
   void
+  Base<dim,Number>::adjust_ghost_range_if_necessary(const LinearAlgebra::distributed::Vector<Number> &src) const
+  {
+    // If both vectors use the same partitioner -> done
+    if (src.get_partitioner().get() ==
+        data->get_dof_info(0).vector_partitioner.get())
+      return;
+
+    // If not, assert that the local ranges are the same and reset to the
+    // current partitioner
+    Assert(src.get_partitioner()->local_size() ==
+           data->get_dof_info(0).vector_partitioner->local_size(),
+           ExcMessage("The vector passed to the vmult() function does not have "
+                      "the correct size for compatibility with MatrixFree."));
+
+    // copy the vector content to a temporary vector so that it does not get
+    // lost
+    VectorView<Number> view_src_in(src.local_size(), src.begin());
+    Vector<Number> copy_vec = view_src_in;
+    const_cast<LinearAlgebra::distributed::Vector<Number> &>(src).
+    reinit(data->get_dof_info(0).vector_partitioner);
+    VectorView<Number> view_src_out(src.local_size(), src.begin());
+    static_cast<Vector<Number>&>(view_src_out) = copy_vec;
+  }
+
+
+
+  template <int dim, typename Number>
+  void
   Base<dim,Number>::mult_add (LinearAlgebra::distributed::Vector<Number> &dst,
                               const LinearAlgebra::distributed::Vector<Number> &src,
                               const bool transpose) const
   {
-    Assert(src.partitioners_are_globally_compatible(*data->get_dof_info(0).vector_partitioner), ExcInternalError());
-    Assert(dst.partitioners_are_globally_compatible(*data->get_dof_info(0).vector_partitioner), ExcInternalError());
+    adjust_ghost_range_if_necessary(src);
+    adjust_ghost_range_if_necessary(dst);
 
     // set zero Dirichlet values on the input vector (and remember the src and
     // dst values because we need to reset them at the end)
@@ -793,8 +838,8 @@ namespace MatrixFreeOperators
   vmult_interface_down(LinearAlgebra::distributed::Vector<Number> &dst,
                        const LinearAlgebra::distributed::Vector<Number> &src) const
   {
-    Assert(src.partitioners_are_globally_compatible(*data->get_dof_info(0).vector_partitioner), ExcInternalError());
-    Assert(dst.partitioners_are_globally_compatible(*data->get_dof_info(0).vector_partitioner), ExcInternalError());
+    adjust_ghost_range_if_necessary(src);
+    adjust_ghost_range_if_necessary(dst);
 
     dst = 0;
 
@@ -835,8 +880,8 @@ namespace MatrixFreeOperators
   vmult_interface_up(LinearAlgebra::distributed::Vector<Number> &dst,
                      const LinearAlgebra::distributed::Vector<Number> &src) const
   {
-    Assert(src.partitioners_are_globally_compatible(*data->get_dof_info(0).vector_partitioner), ExcInternalError());
-    Assert(dst.partitioners_are_globally_compatible(*data->get_dof_info(0).vector_partitioner), ExcInternalError());
+    adjust_ghost_range_if_necessary(src);
+    adjust_ghost_range_if_necessary(dst);
 
     dst = 0;
 
@@ -879,16 +924,17 @@ namespace MatrixFreeOperators
   std::size_t
   Base<dim,Number>::memory_consumption () const
   {
-    return inverse_diagonal_entries.memory_consumption();
+    return inverse_diagonal_entries.get() != NULL ? inverse_diagonal_entries->memory_consumption() : sizeof(*this);
   }
 
 
 
   template <int dim, typename Number>
-  const DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> > &
+  const std_cxx11::shared_ptr<DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> > > &
   Base<dim,Number>::get_matrix_diagonal_inverse() const
   {
-    Assert(inverse_diagonal_entries.m() > 0, ExcNotInitialized());
+    Assert(inverse_diagonal_entries.get() != NULL &&
+           inverse_diagonal_entries->m() > 0, ExcNotInitialized());
     return inverse_diagonal_entries;
   }
 
@@ -910,9 +956,10 @@ namespace MatrixFreeOperators
                                         const LinearAlgebra::distributed::Vector<Number> &src,
                                         const Number omega) const
   {
-    Assert(inverse_diagonal_entries.m() > 0, ExcNotInitialized());
-    inverse_diagonal_entries.vmult(dst,src);
-    dst*= omega;
+    Assert(inverse_diagonal_entries.get() &&
+           inverse_diagonal_entries->m() > 0, ExcNotInitialized());
+    inverse_diagonal_entries->vmult(dst,src);
+    dst *= omega;
   }
 
 
@@ -935,23 +982,23 @@ namespace MatrixFreeOperators
   {
     Assert((Base<dim, Number>::data != NULL), ExcNotInitialized());
 
+    this->inverse_diagonal_entries.
+    reset(new DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> >());
+    LinearAlgebra::distributed::Vector<Number> &inverse_diagonal_vector = this->inverse_diagonal_entries->get_vector();
     LinearAlgebra::distributed::Vector<Number> ones;
-    LinearAlgebra::distributed::Vector<Number> &inverse_diagonal_entries = Base<dim, Number>::inverse_diagonal_entries.get_vector();
     this->initialize_dof_vector(ones);
-    this->initialize_dof_vector(inverse_diagonal_entries);
+    this->initialize_dof_vector(inverse_diagonal_vector);
     ones = 1.;
-    ones.update_ghost_values();
-    apply_add(inverse_diagonal_entries, ones);
+    apply_add(inverse_diagonal_vector, ones);
 
-    this->set_constrained_entries_to_one(inverse_diagonal_entries);
+    this->set_constrained_entries_to_one(inverse_diagonal_vector);
 
-    const unsigned int local_size = inverse_diagonal_entries.local_size();
+    const unsigned int local_size = inverse_diagonal_vector.local_size();
     for (unsigned int i=0; i<local_size; ++i)
-      inverse_diagonal_entries.local_element(i)
-        =1./inverse_diagonal_entries.local_element(i);
+      inverse_diagonal_vector.local_element(i)
+        =1./inverse_diagonal_vector.local_element(i);
 
-    inverse_diagonal_entries.compress(VectorOperation::insert);
-    inverse_diagonal_entries.update_ghost_values();
+    inverse_diagonal_vector.update_ghost_values();
   }
 
 
@@ -1043,22 +1090,22 @@ namespace MatrixFreeOperators
     Assert((Base<dim, Number>::data != NULL), ExcNotInitialized());
 
     unsigned int dummy = 0;
-    LinearAlgebra::distributed::Vector<Number> &inverse_diagonal_entries = Base<dim,Number>::inverse_diagonal_entries.get_vector();
-    this->initialize_dof_vector(inverse_diagonal_entries);
-    Base<dim,Number>::
-    data->cell_loop (&LaplaceOperator::local_diagonal_cell,
-                     this, inverse_diagonal_entries, dummy);
+    this->inverse_diagonal_entries.
+    reset(new DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> >());
+    LinearAlgebra::distributed::Vector<Number> &inverse_diagonal_vector = this->inverse_diagonal_entries->get_vector();
+    this->initialize_dof_vector(inverse_diagonal_vector);
 
-    this->set_constrained_entries_to_one(inverse_diagonal_entries);
+    this->data->cell_loop (&LaplaceOperator::local_diagonal_cell,
+                           this, inverse_diagonal_vector, dummy);
+    this->set_constrained_entries_to_one(inverse_diagonal_vector);
 
-    for (unsigned int i=0; i<inverse_diagonal_entries.local_size(); ++i)
-      if (std::abs(inverse_diagonal_entries.local_element(i)) > std::sqrt(std::numeric_limits<Number>::epsilon()))
-        inverse_diagonal_entries.local_element(i) = 1./inverse_diagonal_entries.local_element(i);
+    for (unsigned int i=0; i<inverse_diagonal_vector.local_size(); ++i)
+      if (std::abs(inverse_diagonal_vector.local_element(i)) > std::sqrt(std::numeric_limits<Number>::epsilon()))
+        inverse_diagonal_vector.local_element(i) = 1./inverse_diagonal_vector.local_element(i);
       else
-        inverse_diagonal_entries.local_element(i) = 1.;
+        inverse_diagonal_vector.local_element(i) = 1.;
 
-    inverse_diagonal_entries.compress(VectorOperation::insert);
-    inverse_diagonal_entries.update_ghost_values();
+    inverse_diagonal_vector.update_ghost_values();
   }
 
 

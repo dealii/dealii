@@ -340,6 +340,7 @@ MGCoarseGridApplySmoother<VectorType>::operator() (const unsigned int level,
 
 /* ------------------ Functions for MGCoarseGridLACIteration ------------ */
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 
 template<typename SolverType, class VectorType>
 MGCoarseGridLACIteration<SolverType, VectorType>
@@ -430,6 +431,9 @@ MGCoarseGridLACIteration<SolverType, VectorType>
     delete matrix;
   matrix = new PointerMatrix<MatrixType, VectorType>(&m);
 }
+
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
 
 /* ------------------ Functions for MGCoarseGridIterativeSolver ------------ */
 

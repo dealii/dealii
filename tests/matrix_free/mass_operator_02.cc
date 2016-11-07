@@ -84,7 +84,7 @@ void test ()
   mf.initialize(mf_data);
   mf.compute_diagonal();
   const LinearAlgebra::distributed::Vector<double> &diagonal
-    = mf.get_matrix_diagonal_inverse().get_vector();
+    = mf.get_matrix_diagonal_inverse()->get_vector();
 
   LinearAlgebra::distributed::Vector<number> in, out, ref;
   mf_data.initialize_dof_vector (in);
@@ -191,4 +191,3 @@ int main (int argc, char **argv)
   test<3,2>();
   deallog.pop();
 }
-
