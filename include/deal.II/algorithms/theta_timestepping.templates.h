@@ -17,6 +17,7 @@
 #include <deal.II/algorithms/theta_timestepping.h>
 
 #include <deal.II/base/parameter_handler.h>
+#include <deal.II/base/signaling_nan.h>
 #include <deal.II/lac/vector_memory.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -24,9 +25,20 @@ DEAL_II_NAMESPACE_OPEN
 namespace Algorithms
 {
   template <typename VectorType>
-  ThetaTimestepping<VectorType>::ThetaTimestepping (OperatorBase &e, OperatorBase &i)
-    : vtheta(0.5), adaptive(false), op_explicit(&e), op_implicit(&i)
-  {}
+  ThetaTimestepping<VectorType>::ThetaTimestepping (OperatorBase &e,
+                                                    OperatorBase &i)
+    :
+    vtheta(0.5),
+    adaptive(false),
+    op_explicit(&e),
+    op_implicit(&i)
+  {
+    d_explicit.step = numbers::signaling_nan<double>();
+    d_explicit.time = numbers::signaling_nan<double>();
+
+    d_implicit.step = numbers::signaling_nan<double>();
+    d_implicit.time = numbers::signaling_nan<double>();
+  }
 
 
   template <typename VectorType>
