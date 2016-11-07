@@ -489,7 +489,8 @@ void DataOutBase::DataOutFilter::fill_node_data(std::vector<double> &node_data) 
 
   for (it=existing_points.begin(); it!=existing_points.end(); ++it)
     {
-      for (int d=0; d<node_dim; ++d) node_data[node_dim*it->second+d] = it->first(d);
+      for (unsigned int d=0; d<node_dim; ++d)
+        node_data[node_dim*it->second+d] = it->first(d);
     }
 }
 
@@ -515,7 +516,7 @@ DataOutBase::DataOutFilter::write_cell(
   unsigned int d3)
 {
   unsigned int base_entry = index * GeometryInfo<dim>::vertices_per_cell;
-  n_cell_verts = GeometryInfo<dim>::vertices_per_cell;
+  vertices_per_cell = GeometryInfo<dim>::vertices_per_cell;
   internal_add_cell(base_entry+0, start);
   internal_add_cell(base_entry+1, start+d1);
   if (dim>=2)
