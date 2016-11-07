@@ -40,8 +40,11 @@ namespace internal
     ShapeInfo<Number>::ShapeInfo ()
       :
       element_type (tensor_general),
+      fe_degree (numbers::invalid_unsigned_int),
       n_q_points (0),
-      dofs_per_cell (0)
+      dofs_per_cell (0),
+      n_q_points_face (0),
+      dofs_per_face (0)
     {}
 
 
