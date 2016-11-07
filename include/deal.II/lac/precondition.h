@@ -1937,6 +1937,37 @@ namespace internal
         }
     }
 
+    template <typename VectorType>
+    void set_initial_guess(VectorType &vector)
+    {
+      vector = 1./std::sqrt(static_cast<double>(vector.size()));
+      if (vector.locally_owned_elements().is_element(0))
+        vector(0) = 0.;
+    }
+
+    template <typename Number>
+    void set_initial_guess(::dealii::Vector<Number> &vector)
+    {
+      // Choose a high-frequency mode consisting of numbers between 0 and 1
+      // that is cheap to compute (cheaper than random numbers) but avoids
+      // obviously re-occurring numbers in multi-component systems by choosing
+      // a period of 11
+      for (unsigned int i=0; i<vector.size(); ++i)
+        vector(i) = i%11;
+    }
+
+    template <typename Number>
+    void set_initial_guess(::dealii::LinearAlgebra::distributed::Vector<Number> &vector)
+    {
+      // Choose a high-frequency mode consisting of numbers between 0 and 1
+      // that is cheap to compute (cheaper than random numbers) but avoids
+      // obviously re-occurring numbers in multi-component systems by choosing
+      // a period of 11
+      const unsigned int size = vector.local_size();
+      for (unsigned int i=0; i<vector.local_size(); ++i)
+        vector.local_element(i) = i%11;
+    }
+
     struct EigenvalueTracker
     {
     public:
@@ -2041,7 +2072,7 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::estimate_eigenv
   Assert(data.preconditioner.get() != NULL, ExcNotInitialized());
 
   update1.reinit(src);
-  update2 = src;
+  update2.reinit(src, true);
 
   // calculate largest eigenvalue using a hand-tuned CG iteration on the
   // matrix weighted by its diagonal. we start with a vector that consists of
@@ -2065,9 +2096,7 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::estimate_eigenv
 
       // set an initial guess which is close to the constant vector but where
       // one entry is different to trigger high frequencies
-      update2 = 1.;
-      if (update2.locally_owned_elements().is_element(0))
-        update2(0) = 0.;
+      internal::PreconditionChebyshev::set_initial_guess(update2);
 
       try
         {
