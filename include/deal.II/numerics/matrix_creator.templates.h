@@ -185,6 +185,13 @@ namespace MatrixCreator
           update_flags (data.update_flags)
         {}
 
+        Scratch &operator = (const Scratch &)
+        {
+          Assert (false, ExcNotImplemented());
+          return *this;
+        }
+
+
         const ::dealii::hp::FECollection<dim,spacedim>      &fe_collection;
         const ::dealii::hp::QCollection<dim>                &quadrature_collection;
         const ::dealii::hp::MappingCollection<dim,spacedim> &mapping_collection;
@@ -621,7 +628,7 @@ namespace MatrixCreator
       template <typename DoFHandlerType, typename number>
       struct CopyData
       {
-        CopyData() {};
+        CopyData();
 
         CopyData(CopyData const &data);
 
@@ -633,8 +640,17 @@ namespace MatrixCreator
         std::vector<Vector<number> > cell_vector;
       };
 
+
       template <typename DoFHandlerType, typename number>
-      CopyData<DoFHandlerType,number>::CopyData(CopyData const &data) :
+      CopyData<DoFHandlerType,number>::CopyData()
+        :
+        dofs_per_cell(numbers::invalid_unsigned_int)
+      {}
+
+
+      template <typename DoFHandlerType, typename number>
+      CopyData<DoFHandlerType,number>::CopyData(CopyData const &data)
+        :
         dofs_per_cell(data.dofs_per_cell),
         dofs(data.dofs),
         dof_is_on_face(data.dof_is_on_face),
