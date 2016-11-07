@@ -850,7 +850,13 @@ private:
    */
   struct DoFHandlers
   {
-    DoFHandlers () : n_dof_handlers (0), level (numbers::invalid_unsigned_int) {};
+    DoFHandlers ()
+      :
+      active_dof_handler(usual),
+      n_dof_handlers (0),
+      level (numbers::invalid_unsigned_int)
+    {}
+
     std::vector<SmartPointer<const DoFHandler<dim> > >   dof_handler;
     std::vector<SmartPointer<const hp::DoFHandler<dim> > > hp_dof_handler;
     enum ActiveDoFHandler { usual, hp } active_dof_handler;
