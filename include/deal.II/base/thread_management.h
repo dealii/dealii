@@ -2860,6 +2860,13 @@ namespace Threads
       ~TaskDescriptor ();
 
       /**
+       * Copy operator. Throws an exception since we want to make sure that
+       * each TaskDescriptor object corresponds to exactly one task.
+       */
+      TaskDescriptor &
+      operator = (const TaskDescriptor &);
+
+      /**
        * Queue up the task to the scheduler. We need to do this in a separate
        * function since the new tasks needs to access objects from the current
        * object and that can only reliably happen if the current object is
@@ -2908,6 +2915,8 @@ namespace Threads
 
     template <typename RT>
     TaskDescriptor<RT>::TaskDescriptor ()
+      :
+      task_is_done (false)
     {
       Assert (false, ExcInternalError());
     }
@@ -2916,7 +2925,11 @@ namespace Threads
 
     template <typename RT>
     TaskDescriptor<RT>::TaskDescriptor (const TaskDescriptor &)
+      :
+      task_is_done (false)
     {
+      // we shouldn't be getting here -- task descriptors
+      // can't be copied
       Assert (false, ExcInternalError());
     }
 
@@ -2942,6 +2955,17 @@ namespace Threads
       Assert (task != 0, ExcInternalError());
       Assert (task->ref_count()==0, ExcInternalError());
       task->destroy (*task);
+    }
+
+
+    template <typename RT>
+    TaskDescriptor<RT> &
+    TaskDescriptor<RT>::operator = (const TaskDescriptor &)
+    {
+      // we shouldn't be getting here -- task descriptors
+      // can't be copied
+      Assert (false, ExcInternalError());
+      return *this;
     }
 
 
