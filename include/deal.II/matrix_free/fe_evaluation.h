@@ -650,6 +650,14 @@ protected:
   FEEvaluationBase (const FEEvaluationBase &other);
 
   /**
+   * Copy assignment operator. If FEEvaluationBase was constructed from a
+   * mapping, fe, quadrature, and update flags, the underlying geometry
+   * evaluation based on FEValues will be deep-copied in order to allow for
+   * using in parallel with threads.
+   */
+  FEEvaluationBase &operator = (const FEEvaluationBase &other);
+
+  /**
    * A unified function to read from and write into vectors based on the given
    * template operation. It can perform the operation for @p read_dof_values,
    * @p distribute_local_to_global, and @p set_dof_values. It performs the
@@ -950,6 +958,11 @@ protected:
    * Copy constructor
    */
   FEEvaluationAccess (const FEEvaluationAccess &other);
+
+  /**
+   * Copy assignment operator
+   */
+  FEEvaluationAccess &operator= (const FEEvaluationAccess &other);
 };
 
 
@@ -1089,6 +1102,11 @@ protected:
    * Copy constructor
    */
   FEEvaluationAccess (const FEEvaluationAccess &other);
+
+  /**
+   * Copy assignment operator
+   */
+  FEEvaluationAccess &operator= (const FEEvaluationAccess &other);
 };
 
 
@@ -1237,6 +1255,11 @@ protected:
    * Copy constructor
    */
   FEEvaluationAccess (const FEEvaluationAccess &other);
+
+  /**
+   * Copy assignment operator
+   */
+  FEEvaluationAccess &operator= (const FEEvaluationAccess &other);
 };
 
 
@@ -1375,6 +1398,11 @@ protected:
    * Copy constructor
    */
   FEEvaluationAccess (const FEEvaluationAccess &other);
+
+  /**
+   * Copy assignment operator
+   */
+  FEEvaluationAccess &operator= (const FEEvaluationAccess &other);
 };
 
 
@@ -1888,6 +1916,14 @@ public:
   FEEvaluation (const FEEvaluation &other);
 
   /**
+   * Copy assignment operator. If FEEvaluationBase was constructed from a
+   * mapping, fe, quadrature, and update flags, the underlying geometry
+   * evaluation based on FEValues will be deep-copied in order to allow for
+   * using in parallel with threads.
+   */
+  FEEvaluation &operator= (const FEEvaluation &other);
+
+  /**
    * Evaluates the function values, the gradients, and the Laplacians of the
    * FE function given at the DoF values in the input vector at the quadrature
    * points on the unit cell.  The function arguments specify which parts
@@ -2029,7 +2065,13 @@ FEEvaluationBase<dim,n_components_,Number>
   cell               (numbers::invalid_unsigned_int),
   cell_type          (internal::MatrixFreeFunctions::undefined),
   cell_data_number   (numbers::invalid_unsigned_int),
-  first_selected_component (0)
+  dof_values_initialized    (false),
+  values_quad_initialized   (false),
+  gradients_quad_initialized(false),
+  hessians_quad_initialized (false),
+  values_quad_submitted     (false),
+  gradients_quad_submitted  (false),
+  first_selected_component  (0)
 {
   for (unsigned int c=0; c<n_components_; ++c)
     {
@@ -2093,9 +2135,15 @@ FEEvaluationBase<dim,n_components_,Number>
   cell               (0),
   cell_type          (internal::MatrixFreeFunctions::general),
   cell_data_number   (numbers::invalid_unsigned_int),
+  dof_values_initialized    (false),
+  values_quad_initialized   (false),
+  gradients_quad_initialized(false),
+  hessians_quad_initialized (false),
+  values_quad_submitted     (false),
+  gradients_quad_submitted  (false),
   // keep the number of the selected component within the current base element
   // for reading dof values
-  first_selected_component (fe.component_to_base_index(first_selected_component).second)
+  first_selected_component  (fe.component_to_base_index(first_selected_component).second)
 {
   const unsigned int base_element_number =
     fe.component_to_base_index(first_selected_component).first;
@@ -2157,7 +2205,13 @@ FEEvaluationBase<dim,n_components_,Number>
   cell               (numbers::invalid_unsigned_int),
   cell_type          (internal::MatrixFreeFunctions::general),
   cell_data_number   (numbers::invalid_unsigned_int),
-  first_selected_component (other.first_selected_component)
+  dof_values_initialized    (false),
+  values_quad_initialized   (false),
+  gradients_quad_initialized(false),
+  hessians_quad_initialized (false),
+  values_quad_submitted     (false),
+  gradients_quad_submitted  (false),
+  first_selected_component  (other.first_selected_component)
 {
   for (unsigned int c=0; c<n_components_; ++c)
     {
@@ -2182,6 +2236,57 @@ FEEvaluationBase<dim,n_components_,Number>
       quadrature_points = mapped_geometry->get_quadrature_points().begin();
       cell = 0;
     }
+}
+
+
+
+template <int dim, int n_components_, typename Number>
+inline
+FEEvaluationBase<dim,n_components_,Number> &
+FEEvaluationBase<dim,n_components_,Number>
+::operator= (const FEEvaluationBase<dim,n_components_,Number> &other)
+{
+  AssertDimension(quad_no, other.quad_no);
+  AssertDimension(n_fe_components, other.n_fe_components);
+  AssertDimension(active_fe_index, other.active_fe_index);
+  AssertDimension(active_quad_index, other.active_quad_index);
+  AssertDimension(first_selected_component, other.first_selected_component);
+
+  matrix_info = other.matrix_info;
+  dof_info = other.dof_info;
+  mapping_info = other.mapping_info;
+  stored_shape_info = other.stored_shape_info;
+  data = other.data;
+  cartesian_data = 0;
+  jacobian = 0;
+  J_value = 0;
+  quadrature_weights = mapping_info != 0 ?
+                       mapping_info->mapping_data_gen[quad_no].
+                       quadrature_weights[active_quad_index].begin()
+                       :
+                       0;
+  quadrature_points = 0;
+  jacobian_grad = 0;
+  jacobian_grad_upper = 0;
+  cell = numbers::invalid_unsigned_int;
+  cell_type = internal::MatrixFreeFunctions::general;
+  cell_data_number = numbers::invalid_unsigned_int;
+
+  // Create deep copy of mapped geometry for use in parallel...
+  if (other.mapped_geometry.get() != 0)
+    {
+      mapped_geometry.reset
+      (new internal::MatrixFreeFunctions::
+       MappingDataOnTheFly<dim,Number>(other.mapped_geometry->get_fe_values().get_mapping(),
+                                       other.mapped_geometry->get_quadrature(),
+                                       other.mapped_geometry->get_fe_values().get_update_flags()));
+      jacobian = mapped_geometry->get_inverse_jacobians().begin();
+      J_value = mapped_geometry->get_JxW_values().begin();
+      quadrature_points = mapped_geometry->get_quadrature_points().begin();
+      cell = 0;
+    }
+
+  return *this;
 }
 
 
@@ -4026,6 +4131,17 @@ FEEvaluationAccess<dim,n_components_,Number>
 
 
 
+template <int dim, int n_components_, typename Number>
+inline
+FEEvaluationAccess<dim,n_components_,Number> &
+FEEvaluationAccess<dim,n_components_,Number>
+::operator= (const FEEvaluationAccess<dim,n_components_,Number> &other)
+{
+  this->FEEvaluationBase<dim,n_components_,Number>::operator=(other);
+  return *this;
+}
+
+
 
 /*-------------------- FEEvaluationAccess scalar ----------------------------*/
 
@@ -4069,6 +4185,18 @@ FEEvaluationAccess<dim,1,Number>
   :
   FEEvaluationBase <dim,1,Number>(other)
 {}
+
+
+
+template <int dim, typename Number>
+inline
+FEEvaluationAccess<dim,1,Number> &
+FEEvaluationAccess<dim,1,Number>
+::operator= (const FEEvaluationAccess<dim,1,Number> &other)
+{
+  this->FEEvaluationBase<dim,1,Number>::operator=(other);
+  return *this;
+}
 
 
 
@@ -4308,6 +4436,18 @@ FEEvaluationAccess<dim,dim,Number>
   :
   FEEvaluationBase <dim,dim,Number>(other)
 {}
+
+
+
+template <int dim, typename Number>
+inline
+FEEvaluationAccess<dim,dim,Number> &
+FEEvaluationAccess<dim,dim,Number>
+::operator= (const FEEvaluationAccess<dim,dim,Number> &other)
+{
+  this->FEEvaluationAccess<dim,dim,Number>::operator=(other);
+  return *this;
+}
 
 
 
@@ -4668,6 +4808,18 @@ FEEvaluationAccess<1,1,Number>
   :
   FEEvaluationBase <1,1,Number>(other)
 {}
+
+
+
+template <typename Number>
+inline
+FEEvaluationAccess<1,1,Number> &
+FEEvaluationAccess<1,1,Number>
+::operator= (const FEEvaluationAccess<1,1,Number> &other)
+{
+  this->FEEvaluationBase<1,1,Number>::operator=(other);
+  return *this;
+}
 
 
 
@@ -6724,6 +6876,20 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   dofs_per_cell (this->data->dofs_per_cell)
 {
   set_data_pointers();
+}
+
+
+
+template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
+          typename Number>
+inline
+FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number> &
+FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
+::operator= (const FEEvaluation &other)
+{
+  this->FEEvaluationAccess<dim,n_components_,Number>::operator=(other);
+  set_data_pointers();
+  return *this;
 }
 
 
