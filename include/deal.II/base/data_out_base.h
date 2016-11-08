@@ -1126,11 +1126,21 @@ namespace DataOutBase
     /// Flags used to specify filtering behavior
     DataOutBase::DataOutFilterFlags   flags;
 
-    /// Dimensionality of the nodes, used to properly output filtered data
-    int         node_dim;
+    /**
+     * The number of space dimensions in which the vertices represented
+     * by the current object live. This corresponds to the usual
+     * <dim> argument, but since this class is not templated on the
+     * dimension, we need to store it here.
+     */
+    unsigned int      node_dim;
 
-    /// Number of vertices per cell
-    int         n_cell_verts;
+    /**
+     * The number of vertices per cell. Equal to
+     * GeometryInfo<node_dim>::vertices_per_cell. We need to store
+     * it as a run-time variable here because the dimension
+     * node_dim is also a run-time variable.
+     */
+    unsigned int      vertices_per_cell;
 
     /// Map of points to an internal index
     Map3DPoint        existing_points;
@@ -1156,8 +1166,19 @@ namespace DataOutBase
     void internal_add_cell(const unsigned int &cell_index, const unsigned int &pt_index);
 
   public:
-    DataOutFilter() : flags(false, true) {};
-    DataOutFilter(const DataOutBase::DataOutFilterFlags &flags) : flags(flags) {};
+    DataOutFilter()
+      :
+      flags(false, true),
+      node_dim (numbers::invalid_unsigned_int),
+      vertices_per_cell (numbers::invalid_unsigned_int)
+    {}
+
+    DataOutFilter(const DataOutBase::DataOutFilterFlags &flags)
+      :
+      flags(flags),
+      node_dim (numbers::invalid_unsigned_int),
+      vertices_per_cell (numbers::invalid_unsigned_int)
+    {}
 
     /**
      * Write a point with the specified index into the filtered data set. If
@@ -1233,7 +1254,7 @@ namespace DataOutBase
      */
     unsigned int n_cells() const
     {
-      return filtered_cells.size()/n_cell_verts;
+      return filtered_cells.size()/vertices_per_cell;
     };
 
     /**
