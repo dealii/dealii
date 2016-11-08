@@ -724,6 +724,13 @@ namespace PETScWrappers
     SparseMatrix::
     reinit (const IndexSet &,
             const IndexSet &,
+            const SparsityPattern &,
+            const MPI_Comm &);
+
+    template void
+    SparseMatrix::
+    reinit (const IndexSet &,
+            const IndexSet &,
             const DynamicSparsityPattern &,
             const MPI_Comm &);
 
@@ -739,6 +746,12 @@ namespace PETScWrappers
                              const std::vector<size_type> &,
                              const unsigned int ,
                              const bool);
+
+    template void
+    SparseMatrix::
+    do_reinit (const IndexSet &,
+               const IndexSet &,
+               const SparsityPattern &);
 
     template void
     SparseMatrix::
