@@ -209,7 +209,9 @@ namespace SparsityTools
             ExcMessage("Only valid for sparsity patterns which store all rows."));
     for (SparsityPattern::size_type i=0; i<starting_indices.size(); ++i)
       Assert (starting_indices[i] < sparsity.n_rows(),
-              ExcMessage ("Invalid starting index"));
+              ExcMessage ("Invalid starting index: All starting indices need "
+                          "to be between zero and the number of rows in the "
+                          "sparsity pattern."));
 
     // store the indices of the dofs renumbered in the last round. Default to
     // starting points
@@ -219,18 +221,7 @@ namespace SparsityTools
     std::fill (new_indices.begin(), new_indices.end(),
                numbers::invalid_size_type);
 
-    // delete disallowed elements
-    for (DynamicSparsityPattern::size_type i=0; i<last_round_dofs.size(); ++i)
-      if ((last_round_dofs[i]==numbers::invalid_size_type) ||
-          (last_round_dofs[i]>=sparsity.n_rows()))
-        last_round_dofs[i] = numbers::invalid_size_type;
-
-    std::remove_if (last_round_dofs.begin(), last_round_dofs.end(),
-                    std_cxx11::bind(std::equal_to<DynamicSparsityPattern::size_type>(),
-                                    std_cxx11::_1,
-                                    numbers::invalid_size_type));
-
-    // now if no valid points remain: find dof with lowest coordination number
+    // if no starting indices were given: find dof with lowest coordination number
     if (last_round_dofs.empty())
       last_round_dofs
       .push_back (internal::find_unnumbered_starting_index (sparsity,
