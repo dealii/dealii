@@ -215,6 +215,16 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+ <li>
+ Fixed: We have run the PVS static analysis checker on the entire code base,
+ to see what possible problems it uncovers (see
+ https://github.com/dealii/dealii/issues/3342).  With the exception of
+ a few false positives, several dozen issues (mostly uninitialized
+ variables) were fixed.
+ <br>
+ (Konstantin Ladutenko and many others, 2016/11/08)
+ </li>
+
  <li> Improved: The way DataPostprocessor receives its input has been updated.
     <br>
     In the past, the two functions we use to postprocess data got lists of arguments
