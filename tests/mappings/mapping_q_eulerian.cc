@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2015 by the deal.II authors
+// Copyright (C) 2008 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -156,7 +156,7 @@ void MappingTest<dim>::run_test ()
   ConvergenceTable table;
 
   for (unsigned int ref_level = 0;
-       ref_level < 5;
+       ref_level < (degree<4 ? 5 : 3);
        ++ref_level, triangulation.refine_global(1))
     {
 
