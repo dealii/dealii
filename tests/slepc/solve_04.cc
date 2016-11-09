@@ -39,6 +39,7 @@
 template<typename SolverType, typename MatrixType, typename VectorType>
 void
 check_solve( SolverType &solver,
+             const unsigned int solver_number,
              const SolverControl &solver_control,
              const MatrixType &A,
              std::vector<VectorType> &u, std::vector<PetscScalar > &v)
@@ -63,8 +64,41 @@ check_solve( SolverType &solver,
       deallog << "Exception: " << e.get_exc_name() << std::endl;
     }
 
-  deallog << "Solver stopped after " << solver_control.last_step()
-          << " iterations" << std::endl;
+  switch (solver_number)
+    {
+    case 1:
+      check_solver_within_range ((void)true,
+                                 solver_control.last_step(),
+                                 5,5);
+      break;
+    case 2:
+      check_solver_within_range ((void)true,
+                                 solver_control.last_step(),
+                                 24,24);
+      break;
+    case 3:
+      check_solver_within_range ((void)true,
+                                 solver_control.last_step(),
+                                 21,21);
+      break;
+    case 4:
+      check_solver_within_range ((void)true,
+                                 solver_control.last_step(),
+                                 123,128);
+      break;
+    case 5:
+      check_solver_within_range ((void)true,
+                                 solver_control.last_step(),
+                                 137,138);
+      break;
+    case 6:
+      check_solver_within_range ((void)true,
+                                 solver_control.last_step(),
+                                 50,51);
+      break;
+    default:
+      Assert (false, ExcNotImplemented());
+    }
 
   deallog << "Eigenvalues:";
   for (unsigned int i = 0; i < v.size(); i++)
@@ -108,28 +142,28 @@ int main(int argc, char **argv)
 
     {
       SLEPcWrappers::SolverKrylovSchur solver(control);
-      check_solve (solver, control, A,u,v);
+      check_solve (solver, 1, control, A,u,v);
     }
 
     {
       SLEPcWrappers::SolverArnoldi solver(control);
-      check_solve (solver, control, A,u,v);
+      check_solve (solver, 2, control, A,u,v);
     }
 
     {
       SLEPcWrappers::SolverLanczos solver(control);
-      check_solve (solver, control, A,u,v);
+      check_solve (solver, 3, control, A,u,v);
     }
 
     {
       SLEPcWrappers::SolverGeneralizedDavidson solver(control);
-      check_solve (solver, control, A,u,v);
+      check_solve (solver, 4, control, A,u,v);
     }
 
     {
       SLEPcWrappers::SolverGeneralizedDavidson::AdditionalData data(true);
       SLEPcWrappers::SolverGeneralizedDavidson solver(control,PETSC_COMM_SELF,data);
-      check_solve (solver, control, A,u,v);
+      check_solve (solver, 5, control, A,u,v);
     }
 
     // set extra settings for JD; Otherwise, at least on OSX,
@@ -139,7 +173,7 @@ int main(int argc, char **argv)
     PETScWrappers::set_option_value("-st_ksp_max_it", "10");
     {
       SLEPcWrappers::SolverJacobiDavidson solver(control);
-      check_solve (solver, control, A,u,v);
+      check_solve (solver, 6, control, A,u,v);
     }
 
   }
