@@ -15,11 +15,18 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/base/mpi.h>
+
 #include <string>
 #include <cstring>
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
+
+#ifdef DEAL_II_WITH_MPI
+#  include <mpi.h>
+#endif
 
 #ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
 #  include <execinfo.h>
@@ -333,6 +340,58 @@ void ExceptionBase::generate_message () const
       what_str = "ExceptionBase::generate_message () failed";
     }
 }
+
+
+
+#ifdef DEAL_II_WITH_MPI
+namespace StandardExceptions
+{
+  ExcMPI::ExcMPI (const int error_code)
+    :
+    error_code (error_code)
+  {}
+
+  void ExcMPI::print_info (std::ostream &out) const
+  {
+    char error_name[MPI_MAX_ERROR_STRING];
+    error_name[0] = '\0';
+    int resulting_length = MPI_MAX_ERROR_STRING;
+
+    // get the string name of the error code by first converting it to an error
+    // class.
+    int error_class = 0;
+    int ierr = MPI_Error_class (error_code, &error_class);
+
+    // Check the output of the error printing functions. If either MPI function
+    // fails we should just print a less descriptive message.
+    bool error_name_known = ierr == MPI_SUCCESS;
+    if (error_name_known)
+      {
+        ierr = MPI_Error_string (error_class, error_name, &resulting_length);
+        error_name_known = error_name_known && (ierr == MPI_SUCCESS);
+      }
+
+    out << "deal.II encountered an error while calling an MPI function."
+        << std::endl;
+    if (error_name_known)
+      {
+        out << "The description of the error provided by MPI is \""
+            << error_name
+            << "\"."
+            << std::endl;
+      }
+    else
+      {
+        out << "This error code is not equal to any of the standard MPI error codes."
+            << std::endl;
+      }
+    out << "The numerical value of the original error code is "
+        << error_code
+        << "."
+        << std::endl;
+  }
+}
+#endif // DEAL_II_WITH_MPI
 
 
 

@@ -1,0 +1,61 @@
+
+DEAL::
+deal.II encountered an error while calling an MPI function.
+The description of the error provided by MPI is "Invalid buffer pointer".
+The numerical value of the original error code was 1.
+DEAL::
+deal.II encountered an error while calling an MPI function.
+The description of the error provided by MPI is "Invalid count".
+The numerical value of the original error code was 2.
+DEAL::
+deal.II encountered an error while calling an MPI function.
+The description of the error provided by MPI is "Invalid datatype".
+The numerical value of the original error code was 3.
+DEAL::
+deal.II encountered an error while calling an MPI function.
+The description of the error provided by MPI is "Invalid tag".
+The numerical value of the original error code was 4.
+DEAL::
+deal.II encountered an error while calling an MPI function.
+The description of the error provided by MPI is "Invalid communicator".
+The numerical value of the original error code was 5.
+DEAL::
+deal.II encountered an error while calling an MPI function.
+The description of the error provided by MPI is "Invalid rank".
+The numerical value of the original error code was 6.
+DEAL::
+deal.II encountered an error while calling an MPI function.
+The description of the error provided by MPI is "Invalid MPI_Request".
+The numerical value of the original error code was 19.
+DEAL::
+deal.II encountered an error while calling an MPI function.
+The description of the error provided by MPI is "Invalid root".
+The numerical value of the original error code was 7.
+DEAL::
+deal.II encountered an error while calling an MPI function.
+The description of the error provided by MPI is "Invalid group".
+The numerical value of the original error code was 8.
+DEAL::
+deal.II encountered an error while calling an MPI function.
+The description of the error provided by MPI is "Invalid MPI_Op".
+The numerical value of the original error code was 9.
+DEAL::
+deal.II encountered an error while calling an MPI function.
+The description of the error provided by MPI is "Invalid topology".
+The numerical value of the original error code was 10.
+DEAL::
+deal.II encountered an error while calling an MPI function.
+The description of the error provided by MPI is "Unknown error.  Please file a bug report.".
+The numerical value of the original error code was 13.
+DEAL::
+deal.II encountered an error while calling an MPI function.
+The description of the error provided by MPI is "Other MPI error".
+The numerical value of the original error code was 15.
+DEAL::
+deal.II encountered an error while calling an MPI function.
+The description of the error provided by MPI is "Internal MPI error!".
+The numerical value of the original error code was 16.
+DEAL::
+deal.II encountered an error while calling an MPI function.
+The description of the error provided by MPI is "Unknown error class".
+The numerical value of the original error code was 1073741823.
