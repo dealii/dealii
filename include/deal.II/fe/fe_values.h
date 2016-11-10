@@ -1603,7 +1603,7 @@ public:
                  const unsigned int point_no) const;
 
   /**
-   * Return one vector component of the gradient of a shape function at a
+   * Return one vector component of the hessian of a shape function at a
    * quadrature point. If the finite element is scalar, then only component
    * zero is allowed and the return value equals that of the shape_hessian()
    * function. If the finite element is vector valued but all shape functions
@@ -2026,8 +2026,6 @@ public:
    *
    * @post <code>laplacians[q]</code> will contain the Laplacian of the field
    * described by fe_function at the $q$th quadrature point.
-   * <code>gradients[q][i][j]</code> represents the $(i,j)$th component of the
-   * matrix of second derivatives at quadrature point $q$.
    *
    * @post For each component of the output vector, there holds
    * <code>laplacians[q]=trace(hessians[q])</code>, where <tt>hessians</tt>
