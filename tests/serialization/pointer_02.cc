@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2015 by the deal.II authors
+// Copyright (C) 2010 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -76,9 +76,11 @@ private:
 
 void test ()
 {
+  C *backup;
   {
     C *p1 = new C();
-    C *p2 = new C();
+    C *p2 = new C(); // this is the pointer that will be overwritten
+    backup = p2;     // but save a pointer to the original object
 
     verify (p1, p2);
 
@@ -93,6 +95,11 @@ void test ()
   // original object pointed to as a memory
   // leak. assert that this behavior persists
   AssertThrow (objects_destroyed == 2, ExcInternalError());
+
+  // we've checked what we wanted to check, so now delete
+  // the original object to ensure we don't get undue
+  // error messages from memory checkers about leaked memory
+  delete backup;
 }
 
 
