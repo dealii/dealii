@@ -1,7 +1,7 @@
 /* ---------------------------------------------------------------------
  * $Id$
  *
- * Copyright (C) 1999 - 2015 by the deal.II authors
+ * Copyright (C) 1999 - 2016 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -327,26 +327,38 @@ int main ()
     {
 //     {
 //       FiniteElement<2> *fe = new FE_Q<2>(degree);
-//       Step3<2> laplace_problem(fe, degree);
-//       laplace_problem.run();
+//       {
+//         Step3<2> laplace_problem(fe, degree);
+//         laplace_problem.run();
+//        }
+//        delete fe;
 //     }
 
       {
         FiniteElement<2> *fe = new FE_Q_Bubbles<2>(degree);
-        Step3<2> laplace_problem(fe, degree);
-        laplace_problem.run();
+        {
+          Step3<2> laplace_problem(fe, degree);
+          laplace_problem.run();
+        }
+        delete fe;
       }
 
 //     {
 //       FiniteElement<3> *fe = new FE_Q<3>(degree);
-//       Step3<3> laplace_problem(fe, degree);
-//       laplace_problem.run();
+//       {
+//         Step3<3> laplace_problem(fe, degree);
+//         laplace_problem.run();
+//        }
+//        delete fe;
 //     }
 
       {
         FiniteElement<3> *fe = new FE_Q_Bubbles<3>(degree);
-        Step3<3> laplace_problem(fe, degree);
-        laplace_problem.run();
+        {
+          Step3<3> laplace_problem(fe, degree);
+          laplace_problem.run();
+        }
+        delete fe;
       }
     }
   return 0;
