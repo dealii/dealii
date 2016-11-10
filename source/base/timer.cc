@@ -116,7 +116,10 @@ void Timer::start ()
 
 #ifdef DEAL_II_WITH_MPI
   if (sync_wall_time)
-    MPI_Barrier(mpi_communicator);
+    {
+      const int ierr = MPI_Barrier(mpi_communicator);
+      AssertThrowMPI(ierr);
+    }
 #endif
 
 #if defined(DEAL_II_HAVE_SYS_TIME_H) && defined(DEAL_II_HAVE_SYS_RESOURCE_H)

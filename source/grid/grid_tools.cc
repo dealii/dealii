@@ -1800,8 +1800,9 @@ next_cell:
     // processors and shifting the indices accordingly
     const unsigned int n_cpu = Utilities::MPI::n_mpi_processes(triangulation.get_communicator());
     std::vector<types::global_vertex_index> indices(n_cpu);
-    MPI_Allgather(&next_index, 1, DEAL_II_DOF_INDEX_MPI_TYPE, &indices[0],
-                  indices.size(), DEAL_II_DOF_INDEX_MPI_TYPE, triangulation.get_communicator());
+    int ierr = MPI_Allgather(&next_index, 1, DEAL_II_DOF_INDEX_MPI_TYPE, &indices[0],
+                             indices.size(), DEAL_II_DOF_INDEX_MPI_TYPE, triangulation.get_communicator());
+    AssertThrowMPI(ierr);
     const types::global_vertex_index shift = std::accumulate(&indices[0],
                                                              &indices[0]+triangulation.locally_owned_subdomain(),0);
 
@@ -1841,8 +1842,9 @@ next_cell:
           }
 
         // Send the message
-        MPI_Isend(&vertices_send_buffers[i][0],buffer_size,DEAL_II_VERTEX_INDEX_MPI_TYPE,
-                  destination, 0, triangulation.get_communicator(), &first_requests[i]);
+        ierr = MPI_Isend(&vertices_send_buffers[i][0],buffer_size,DEAL_II_VERTEX_INDEX_MPI_TYPE,
+                         destination, 0, triangulation.get_communicator(), &first_requests[i]);
+        AssertThrowMPI(ierr);
       }
 
     // Receive the first message
@@ -1859,8 +1861,9 @@ next_cell:
         vertices_recv_buffers[i].resize(buffer_size);
 
         // Receive the message
-        MPI_Recv(&vertices_recv_buffers[i][0],buffer_size,DEAL_II_VERTEX_INDEX_MPI_TYPE,
-                 source, 0, triangulation.get_communicator(), MPI_STATUS_IGNORE);
+        ierr = MPI_Recv(&vertices_recv_buffers[i][0],buffer_size,DEAL_II_VERTEX_INDEX_MPI_TYPE,
+                        source, 0, triangulation.get_communicator(), MPI_STATUS_IGNORE);
+        AssertThrowMPI(ierr);
       }
 
 
@@ -1893,8 +1896,9 @@ next_cell:
           }
 
         // Send the message
-        MPI_Isend(&cellids_send_buffers[i][0], buffer_size, MPI_CHAR,
-                  destination, 0, triangulation.get_communicator(), &second_requests[i]);
+        ierr = MPI_Isend(&cellids_send_buffers[i][0], buffer_size, MPI_CHAR,
+                         destination, 0, triangulation.get_communicator(), &second_requests[i]);
+        AssertThrowMPI(ierr);
       }
 
     // Receive the second message
@@ -1908,8 +1912,9 @@ next_cell:
         cellids_recv_buffers[i].resize(buffer_size);
 
         // Receive the message
-        MPI_Recv(&cellids_recv_buffers[i][0],buffer_size, MPI_CHAR,
-                 source, 0, triangulation.get_communicator(), MPI_STATUS_IGNORE);
+        ierr = MPI_Recv(&cellids_recv_buffers[i][0],buffer_size, MPI_CHAR,
+                        source, 0, triangulation.get_communicator(), MPI_STATUS_IGNORE);
+        AssertThrowMPI(ierr);
       }
 
 

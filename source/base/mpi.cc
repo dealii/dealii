@@ -81,7 +81,8 @@ namespace Utilities
     unsigned int n_mpi_processes (const MPI_Comm &mpi_communicator)
     {
       int n_jobs=1;
-      (void) MPI_Comm_size (mpi_communicator, &n_jobs);
+      const int ierr = MPI_Comm_size (mpi_communicator, &n_jobs);
+      AssertThrowMPI(ierr);
 
       return n_jobs;
     }
@@ -90,7 +91,8 @@ namespace Utilities
     unsigned int this_mpi_process (const MPI_Comm &mpi_communicator)
     {
       int rank=0;
-      (void) MPI_Comm_rank (mpi_communicator, &rank);
+      const int ierr = MPI_Comm_rank (mpi_communicator, &rank);
+      AssertThrowMPI(ierr);
 
       return rank;
     }
@@ -99,7 +101,8 @@ namespace Utilities
     MPI_Comm duplicate_communicator (const MPI_Comm &mpi_communicator)
     {
       MPI_Comm new_communicator;
-      MPI_Comm_dup (mpi_communicator, &new_communicator);
+      const int ierr = MPI_Comm_dup (mpi_communicator, &new_communicator);
+      AssertThrowMPI(ierr);
       return new_communicator;
     }
 
@@ -142,9 +145,10 @@ namespace Utilities
       // processors in this case, which is more expensive than the reduction
       // operation above in MPI_Allreduce)
       std::vector<unsigned int> all_destinations (max_n_destinations * n_procs);
-      MPI_Allgather (&my_destinations[0], max_n_destinations, MPI_UNSIGNED,
-                     &all_destinations[0], max_n_destinations, MPI_UNSIGNED,
-                     mpi_comm);
+      const int ierr = MPI_Allgather (&my_destinations[0], max_n_destinations, MPI_UNSIGNED,
+                                      &all_destinations[0], max_n_destinations, MPI_UNSIGNED,
+                                      mpi_comm);
+      AssertThrowMPI(ierr);
 
       // now we know who is going to communicate with whom. collect who is
       // going to communicate with us!
@@ -236,7 +240,7 @@ namespace Utilities
 
       MPI_Op op;
       int ierr = MPI_Op_create((MPI_User_function *)&max_reduce, true, &op);
-      AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
+      AssertThrowMPI(ierr);
 
       MinMaxAvg in;
       in.sum = in.min = in.max = my_value;
@@ -248,18 +252,18 @@ namespace Utilities
       MPI_Datatype types[]= {MPI_DOUBLE, MPI_INT};
 
       ierr = MPI_Type_struct(2, lengths, displacements, types, &type);
-      AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
+      AssertThrowMPI(ierr);
 
       ierr = MPI_Type_commit(&type);
-      AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
+      AssertThrowMPI(ierr);
       ierr = MPI_Allreduce (&in, &result, 1, type, op, mpi_communicator);
-      AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
+      AssertThrowMPI(ierr);
 
       ierr = MPI_Type_free (&type);
-      AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
+      AssertThrowMPI(ierr);
 
       ierr = MPI_Op_free(&op);
-      AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
+      AssertThrowMPI(ierr);
 
       result.avg = result.sum / numproc;
 
@@ -324,19 +328,19 @@ namespace Utilities
       // if we have PETSc, we will initialize it and let it handle MPI.
       // Otherwise, we will do it.
       int MPI_has_been_started = 0;
-      MPI_Initialized(&MPI_has_been_started);
+      int ierr = MPI_Initialized(&MPI_has_been_started);
+      AssertThrowMPI(ierr);
       AssertThrow (MPI_has_been_started == 0,
                    ExcMessage ("MPI error. You can only start MPI once!"));
 
-      int mpi_err, provided;
-      // this works like mpi_err = MPI_Init (&argc, &argv); but tells MPI that
+      int provided;
+      // this works like ierr = MPI_Init (&argc, &argv); but tells MPI that
       // we might use several threads but never call two MPI functions at the
       // same time. For an explanation see on why we do this see
       // http://www.open-mpi.org/community/lists/users/2010/03/12244.php
       int wanted = MPI_THREAD_SERIALIZED;
-      mpi_err = MPI_Init_thread(&argc, &argv, wanted, &provided);
-      AssertThrow (mpi_err == 0,
-                   ExcMessage ("MPI could not be initialized."));
+      ierr = MPI_Init_thread(&argc, &argv, wanted, &provided);
+      AssertThrowMPI(ierr);
 
       // disable for now because at least some implementations always return
       // MPI_THREAD_SINGLE.
@@ -397,9 +401,10 @@ namespace Utilities
 
           std::vector<char> all_hostnames(max_hostname_size *
                                           MPI::n_mpi_processes(MPI_COMM_WORLD));
-          MPI_Allgather (&hostname_array[0], max_hostname_size, MPI_CHAR,
-                         &all_hostnames[0], max_hostname_size, MPI_CHAR,
-                         MPI_COMM_WORLD);
+          const int ierr MPI_Allgather (&hostname_array[0], max_hostname_size, MPI_CHAR,
+                                        &all_hostnames[0], max_hostname_size, MPI_CHAR,
+                                        MPI_COMM_WORLD);
+          AssertThrowMPI(ierr);
 
           // search how often our own hostname appears and the how-manyth
           // instance the current process represents
@@ -517,9 +522,8 @@ namespace Utilities
             }
           else
             {
-              const int mpi_err = MPI_Finalize();
-              AssertThrow (mpi_err == 0,
-                           ExcMessage ("An error occurred while calling MPI_Finalize()"));
+              const int ierr = MPI_Finalize();
+              AssertThrowMPI(ierr);
             }
         }
 #endif
@@ -531,7 +535,8 @@ namespace Utilities
     {
 #ifdef DEAL_II_WITH_MPI
       int MPI_has_been_started = 0;
-      MPI_Initialized(&MPI_has_been_started);
+      const int ierr = MPI_Initialized(&MPI_has_been_started);
+      AssertThrowMPI(ierr);
 
       return (MPI_has_been_started > 0);
 #else

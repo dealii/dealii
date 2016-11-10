@@ -1927,8 +1927,8 @@ namespace parallel
           // Check that level_ghost_owners is symmetric by sending a message
           // to everyone
           {
-
-            MPI_Barrier(this->mpi_communicator);
+            int ierr = MPI_Barrier(this->mpi_communicator);
+            AssertThrowMPI(ierr);
 
             // important: preallocate to avoid (re)allocation:
             std::vector<MPI_Request> requests (this->number_cache.level_ghost_owners.size());
@@ -1942,9 +1942,10 @@ namespace parallel
                 Assert (typeid(types::subdomain_id)
                         == typeid(unsigned int),
                         ExcNotImplemented());
-                MPI_Isend(&dummy, 1, MPI_UNSIGNED,
-                          *it, 9001, this->mpi_communicator,
-                          &requests[req_counter]);
+                ierr = MPI_Isend(&dummy, 1, MPI_UNSIGNED,
+                                 *it, 9001, this->mpi_communicator,
+                                 &requests[req_counter]);
+                AssertThrowMPI(ierr);
               }
 
             for (std::set<types::subdomain_id>::iterator it = this->number_cache.level_ghost_owners.begin();
@@ -1955,15 +1956,20 @@ namespace parallel
                         == typeid(unsigned int),
                         ExcNotImplemented());
                 unsigned int dummy;
-                MPI_Recv(&dummy, 1, MPI_UNSIGNED,
-                         *it, 9001, this->mpi_communicator,
-                         MPI_STATUS_IGNORE);
+                ierr = MPI_Recv(&dummy, 1, MPI_UNSIGNED,
+                                *it, 9001, this->mpi_communicator,
+                                MPI_STATUS_IGNORE);
+                AssertThrowMPI(ierr);
               }
 
             if (requests.size() > 0)
-              MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+              {
+                ierr = MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+                AssertThrowMPI(ierr);
+              }
 
-            MPI_Barrier(this->mpi_communicator);
+            ierr = MPI_Barrier(this->mpi_communicator);
+            AssertThrowMPI(ierr);
           }
 #endif
 
@@ -3198,9 +3204,10 @@ namespace parallel
           // that the packet has been
           // received
           it->second.pack_data (*buffer);
-          MPI_Isend(&(*buffer)[0], buffer->size(),
-                    MPI_BYTE, it->first,
-                    123, this->get_communicator(), &requests[idx]);
+          const int ierr = MPI_Isend(&(*buffer)[0], buffer->size(),
+                                     MPI_BYTE, it->first,
+                                     123, this->get_communicator(), &requests[idx]);
+          AssertThrowMPI(ierr);
         }
 
       Assert(destinations.size()==needs_to_get_cells.size(), ExcInternalError());
@@ -3218,13 +3225,16 @@ namespace parallel
         {
           MPI_Status status;
           int len;
-          MPI_Probe(MPI_ANY_SOURCE, 123, this->get_communicator(), &status);
-          MPI_Get_count(&status, MPI_BYTE, &len);
+          int ierr = MPI_Probe(MPI_ANY_SOURCE, 123, this->get_communicator(), &status);
+          AssertThrowMPI(ierr);
+          ierr = MPI_Get_count(&status, MPI_BYTE, &len);
+          AssertThrowMPI(ierr);
           receive.resize(len);
 
           char *ptr = &receive[0];
-          MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
-                   this->get_communicator(), &status);
+          ierr = MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
+                          this->get_communicator(), &status);
+          AssertThrowMPI(ierr);
 
           cellinfo.unpack_data(receive);
           const unsigned int cells = cellinfo.tree_index.size();
@@ -3250,7 +3260,10 @@ namespace parallel
       // complete all sends, so that we can
       // safely destroy the buffers.
       if (requests.size() > 0)
-        MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+        {
+          const int ierr = MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+          AssertThrowMPI(ierr);
+        }
 
       //check all msgs got sent and received
       Assert(Utilities::MPI::sum(needs_to_get_cells.size(), this->get_communicator())

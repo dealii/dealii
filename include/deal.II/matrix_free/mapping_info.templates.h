@@ -866,8 +866,9 @@ namespace internal
       // disable the check here only if no processor has any such data
 #ifdef DEAL_II_WITH_MPI
       unsigned int general_size_glob = 0, general_size_loc = jacobians.size();
-      MPI_Allreduce (&general_size_loc, &general_size_glob, 1, MPI_UNSIGNED,
-                     MPI_MAX, size_info.communicator);
+      int ierr = MPI_Allreduce (&general_size_loc, &general_size_glob, 1,
+                                MPI_UNSIGNED, MPI_MAX, size_info.communicator);
+      AssertThrowMPI (ierr);
 #else
       unsigned int general_size_glob = jacobians.size();
 #endif
@@ -885,8 +886,9 @@ namespace internal
 
 #ifdef DEAL_II_WITH_MPI
       unsigned int quad_size_glob = 0, quad_size_loc = quadrature_points.size();
-      MPI_Allreduce (&quad_size_loc, &quad_size_glob, 1, MPI_UNSIGNED,
-                     MPI_MAX, size_info.communicator);
+      ierr = MPI_Allreduce (&quad_size_loc, &quad_size_glob, 1, MPI_UNSIGNED,
+                            MPI_MAX, size_info.communicator);
+      AssertThrowMPI (ierr);
 #else
       unsigned int quad_size_glob = quadrature_points.size();
 #endif

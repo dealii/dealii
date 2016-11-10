@@ -1086,12 +1086,13 @@ namespace FETools
           destinations.push_back (it->receiver);
 
           it->pack_data (*buffer);
-          MPI_Isend (&(*buffer)[0], buffer->size(),
-                     MPI_BYTE,
-                     it->receiver,
-                     round,
-                     communicator,
-                     &requests[idx]);
+          const int ierr = MPI_Isend (&(*buffer)[0], buffer->size(),
+                                      MPI_BYTE,
+                                      it->receiver,
+                                      round,
+                                      communicator,
+                                      &requests[idx]);
+          AssertThrowMPI(ierr);
         }
 
       Assert(destinations.size()==cells_to_send.size(), ExcInternalError());
@@ -1106,12 +1107,15 @@ namespace FETools
         {
           MPI_Status status;
           int len;
-          MPI_Probe(MPI_ANY_SOURCE, round, communicator, &status);
-          MPI_Get_count(&status, MPI_BYTE, &len);
+          int ierr = MPI_Probe(MPI_ANY_SOURCE, round, communicator, &status);
+          AssertThrowMPI(ierr);
+          ierr = MPI_Get_count(&status, MPI_BYTE, &len);
+          AssertThrowMPI(ierr);
           receive.resize (len);
 
           char *buf = &receive[0];
-          MPI_Recv (buf, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG, communicator, &status);
+          ierr = MPI_Recv (buf, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG, communicator, &status);
+          AssertThrowMPI(ierr);
 
           cell_data.unpack_data (receive);
 
@@ -1124,7 +1128,10 @@ namespace FETools
         }
 
       if (requests.size () > 0)
-        MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+        {
+          const int ierr = MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+          AssertThrowMPI(ierr);
+        }
 
       // finally sort the list of cells
       std::sort (received_cells.begin (), received_cells.end ());

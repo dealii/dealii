@@ -784,7 +784,8 @@ namespace Utilities
         {
           MPI_Comm comm = mpi_comm->GetMpiComm();
           *mpi_comm = Epetra_MpiComm(MPI_COMM_SELF);
-          MPI_Comm_free (&comm);
+          const int ierr = MPI_Comm_free (&comm);
+          AssertThrowMPI(ierr);
         }
 #endif
     }

@@ -95,21 +95,23 @@ namespace Utilities
 #ifdef DEAL_II_WITH_MPI
         if (job_supports_mpi())
           {
-            MPI_Allreduce (values != output
-                           ?
-                           // TODO This const_cast is only needed for older
-                           // (e.g., openMPI 1.6, released in 2012)
-                           // implementations of MPI-2. It is not needed as of
-                           // MPI-3 and we should remove it at some point in
-                           // the future.
-                           const_cast<void *>(static_cast<const void *>(values))
-                           :
-                           MPI_IN_PLACE,
-                           static_cast<void *>(output),
-                           static_cast<int>(size),
-                           internal::mpi_type_id(values),
-                           mpi_op,
-                           mpi_communicator);
+            const int ierr = MPI_Allreduce
+                             (values != output
+                              ?
+                              // TODO This const_cast is only needed for older
+                              // (e.g., openMPI 1.6, released in 2012)
+                              // implementations of MPI-2. It is not needed as
+                              // of MPI-3 and we should remove it at some
+                              // point in the future.
+                              const_cast<void *>(static_cast<const void *>(values))
+                              :
+                              MPI_IN_PLACE,
+                              static_cast<void *>(output),
+                              static_cast<int>(size),
+                              internal::mpi_type_id(values),
+                              mpi_op,
+                              mpi_communicator);
+            AssertThrowMPI(ierr);
           }
         else
 #endif
@@ -132,21 +134,23 @@ namespace Utilities
         if (job_supports_mpi())
           {
             T dummy_selector;
-            MPI_Allreduce (values != output
-                           ?
-                           // TODO This const_cast is only needed for older
-                           // (e.g., openMPI 1.6, released in 2012)
-                           // implementations of MPI-2. It is not needed as of
-                           // MPI-3 and we should remove it at some point in
-                           // the future.
-                           const_cast<void *>(static_cast<const void *>(values))
-                           :
-                           MPI_IN_PLACE,
-                           static_cast<void *>(output),
-                           static_cast<int>(size*2),
-                           internal::mpi_type_id(&dummy_selector),
-                           mpi_op,
-                           mpi_communicator);
+            const int ierr = MPI_Allreduce
+                             (values != output
+                              ?
+                              // TODO This const_cast is only needed for older
+                              // (e.g., openMPI 1.6, released in 2012)
+                              // implementations of MPI-2. It is not needed as
+                              // of MPI-3 and we should remove it at some
+                              // point in the future.
+                              const_cast<void *>(static_cast<const void *>(values))
+                              :
+                              MPI_IN_PLACE,
+                              static_cast<void *>(output),
+                              static_cast<int>(size*2),
+                              internal::mpi_type_id(&dummy_selector),
+                              mpi_op,
+                              mpi_communicator);
+            AssertThrowMPI(ierr);
           }
         else
 #endif

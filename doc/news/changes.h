@@ -215,6 +215,13 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+<li> Improved: the error codes for all MPI functions are now checked and, if the
+     MPI function failed for any reason, an exception with a helpful message is
+     thrown.
+     <br>
+     (David Wells, 2016/11/09)
+</li>
+
  <li>
  Fixed: We have run the PVS static analysis checker on the entire code base,
  to see what possible problems it uncovers (see
@@ -466,7 +473,7 @@ inconvenience this causes.
  <br>
  (Rajat Arora, 2016/10/29)
  </li>
- 
+
 <li> New: Add MatrixFreeOperators::MassOperator representing a mass matrix.
  <br>
  (Daniel Arndt, 2016/10/27)

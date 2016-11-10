@@ -210,9 +210,18 @@ namespace
               // the receiving end will be waitng. In that case we just send
               // an empty message.
               if (data.size())
-                MPI_Isend(&data[0], data.size()*sizeof(data[0]), MPI_BYTE, dest, 71, tria->get_communicator(), &*requests.rbegin());
+                {
+                  const int ierr = MPI_Isend(&data[0], data.size()*sizeof(data[0]),
+                                             MPI_BYTE, dest, 71, tria->get_communicator(),
+                                             &*requests.rbegin());
+                  AssertThrowMPI(ierr);
+                }
               else
-                MPI_Isend(NULL, 0, MPI_BYTE, dest, 71, tria->get_communicator(), &*requests.rbegin());
+                {
+                  const int ierr = MPI_Isend(NULL, 0, MPI_BYTE, dest, 71,
+                                             tria->get_communicator(), &*requests.rbegin());
+                  AssertThrowMPI(ierr);
+                }
             }
         }
 
@@ -224,14 +233,16 @@ namespace
             {
               MPI_Status status;
               int len;
-              MPI_Probe(MPI_ANY_SOURCE, 71, tria->get_communicator(), &status);
-              MPI_Get_count(&status, MPI_BYTE, &len);
+              int ierr = MPI_Probe(MPI_ANY_SOURCE, 71, tria->get_communicator(), &status);
+              AssertThrowMPI(ierr);
+              ierr = MPI_Get_count(&status, MPI_BYTE, &len);
+              AssertThrowMPI(ierr);
 
               if (len==0)
                 {
-                  int err = MPI_Recv(NULL, 0, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
-                                     tria->get_communicator(), &status);
-                  AssertThrow(err==MPI_SUCCESS, ExcInternalError());
+                  ierr = MPI_Recv(NULL, 0, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
+                                  tria->get_communicator(), &status);
+                  AssertThrowMPI(ierr);
                   continue;
                 }
 
@@ -240,9 +251,9 @@ namespace
               receive_buffer.resize(count);
 
               void *ptr = &receive_buffer[0];
-              int err = MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
-                                 tria->get_communicator(), &status);
-              AssertThrow(err==MPI_SUCCESS, ExcInternalError());
+              ierr = MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
+                              tria->get_communicator(), &status);
+              AssertThrowMPI(ierr);
 
               for (unsigned int i=0; i<receive_buffer.size(); ++i)
                 {
@@ -256,14 +267,16 @@ namespace
         // * wait for all MPI_Isend to complete
         if (requests.size() > 0)
           {
-            MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+            const int ierr = MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+            AssertThrowMPI(ierr);
             requests.clear();
           }
 #ifdef DEBUG
         // Make sure in debug mode, that everybody sent/received all packages
         // on this level. If a deadlock occurs here, the list of expected
         // senders is not computed correctly.
-        MPI_Barrier(tria->get_communicator());
+        const int ierr = MPI_Barrier(tria->get_communicator());
+        AssertThrowMPI(ierr);
 #endif
       }
 #endif

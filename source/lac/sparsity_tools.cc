@@ -595,13 +595,16 @@ namespace SparsityTools
     {
       unsigned int idx=0;
       for (map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it, ++idx)
-        MPI_Isend(&(it->second[0]),
-                  it->second.size(),
-                  DEAL_II_DOF_INDEX_MPI_TYPE,
-                  it->first,
-                  124,
-                  mpi_comm,
-                  &requests[idx]);
+        {
+          const int ierr = MPI_Isend(&(it->second[0]),
+                                     it->second.size(),
+                                     DEAL_II_DOF_INDEX_MPI_TYPE,
+                                     it->first,
+                                     124,
+                                     mpi_comm,
+                                     &requests[idx]);
+          AssertThrowMPI(ierr);
+        }
     }
 
     {
@@ -611,13 +614,16 @@ namespace SparsityTools
         {
           MPI_Status status;
           int len;
-          MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, mpi_comm, &status);
+          int ierr = MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, mpi_comm, &status);
+          AssertThrowMPI(ierr);
           Assert (status.MPI_TAG==124, ExcInternalError());
 
-          MPI_Get_count(&status, DEAL_II_DOF_INDEX_MPI_TYPE, &len);
+          ierr = MPI_Get_count(&status, DEAL_II_DOF_INDEX_MPI_TYPE, &len);
+          AssertThrowMPI(ierr);
           recv_buf.resize(len);
-          MPI_Recv(&recv_buf[0], len, DEAL_II_DOF_INDEX_MPI_TYPE, status.MPI_SOURCE,
-                   status.MPI_TAG, mpi_comm, &status);
+          ierr = MPI_Recv(&recv_buf[0], len, DEAL_II_DOF_INDEX_MPI_TYPE, status.MPI_SOURCE,
+                          status.MPI_TAG, mpi_comm, &status);
+          AssertThrowMPI(ierr);
 
           std::vector<DynamicSparsityPattern::size_type>::const_iterator ptr = recv_buf.begin();
           std::vector<DynamicSparsityPattern::size_type>::const_iterator end = recv_buf.end();
@@ -639,7 +645,10 @@ namespace SparsityTools
 
     // complete all sends, so that we can safely destroy the buffers.
     if (requests.size())
-      MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+      {
+        const int ierr = MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+        AssertThrowMPI(ierr);
+      }
 
   }
 
@@ -717,13 +726,16 @@ namespace SparsityTools
     {
       unsigned int idx=0;
       for (map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it, ++idx)
-        MPI_Isend(&(it->second[0]),
-                  it->second.size(),
-                  DEAL_II_DOF_INDEX_MPI_TYPE,
-                  it->first,
-                  124,
-                  mpi_comm,
-                  &requests[idx]);
+        {
+          const int ierr = MPI_Isend(&(it->second[0]),
+                                     it->second.size(),
+                                     DEAL_II_DOF_INDEX_MPI_TYPE,
+                                     it->first,
+                                     124,
+                                     mpi_comm,
+                                     &requests[idx]);
+          AssertThrowMPI(ierr);
+        }
     }
 
     {
@@ -733,13 +745,16 @@ namespace SparsityTools
         {
           MPI_Status status;
           int len;
-          MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, mpi_comm, &status);
+          int ierr = MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, mpi_comm, &status);
+          AssertThrowMPI(ierr);
           Assert (status.MPI_TAG==124, ExcInternalError());
 
-          MPI_Get_count(&status, DEAL_II_DOF_INDEX_MPI_TYPE, &len);
+          ierr = MPI_Get_count(&status, DEAL_II_DOF_INDEX_MPI_TYPE, &len);
+          AssertThrowMPI(ierr);
           recv_buf.resize(len);
-          MPI_Recv(&recv_buf[0], len, DEAL_II_DOF_INDEX_MPI_TYPE, status.MPI_SOURCE,
-                   status.MPI_TAG, mpi_comm, &status);
+          ierr = MPI_Recv(&recv_buf[0], len, DEAL_II_DOF_INDEX_MPI_TYPE, status.MPI_SOURCE,
+                          status.MPI_TAG, mpi_comm, &status);
+          AssertThrowMPI(ierr);
 
           std::vector<BlockDynamicSparsityPattern::size_type>::const_iterator ptr = recv_buf.begin();
           std::vector<BlockDynamicSparsityPattern::size_type>::const_iterator end = recv_buf.end();
@@ -761,7 +776,10 @@ namespace SparsityTools
 
     // complete all sends, so that we can safely destroy the buffers.
     if (requests.size())
-      MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+      {
+        const int ierr = MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+        AssertThrowMPI(ierr);
+      }
   }
 #endif
 }
