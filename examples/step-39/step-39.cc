@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2010 - 2015 by the deal.II authors
+ * Copyright (C) 2010 - 2016 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -859,16 +859,16 @@ namespace Step39
   }
 
 
-  // Some graphical output
+  // Create graphical output. We produce the filename by collating the
+  // name from its various components, including the refinement cycle
+  // that we output with two digits.
   template <int dim>
   void InteriorPenaltyProblem<dim>::output_results (const unsigned int cycle) const
   {
-    // Output of the solution in gnuplot format.
-    char *fn = new char[100];
-    sprintf(fn, "sol-%02d", cycle);
+    const std::string filename = "sol-" +
+                                 Utilities::int_to_string(cycle,2) +
+                                 ".gnuplot";
 
-    std::string filename(fn);
-    filename += ".gnuplot";
     deallog << "Writing solution to <" << filename << ">..."
             << std::endl << std::endl;
     std::ofstream gnuplot_output (filename.c_str());
