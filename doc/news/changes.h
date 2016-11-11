@@ -437,6 +437,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: There was a memory leak if a previously used SparsityPattern
+ object was re-used by reading from a serialization archive via
+ SparsityPattern::load(). This is now fixed.
+ <br>
+ (Wolfgang Bangerth, 2016/11/10)
+ </li>
+
  <li> New: Add PArpackSolver::reinit(const VectorType &distributed_vector) to
  initialize internal data structures based on a vector. This makes PArpack
  usable with MatrixFree operators.

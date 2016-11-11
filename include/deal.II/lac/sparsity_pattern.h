@@ -1430,8 +1430,13 @@ SparsityPattern::load (Archive &ar, const unsigned int)
 
   ar &max_dim &rows &cols &max_vec_len &max_row_length &compressed &store_diagonal_first_in_row;
 
-  rowstart = new std::size_t [max_dim + 1];
-  colnums = new size_type [max_vec_len];
+  if (rowstart != 0)
+    delete[] rowstart;
+  rowstart = new std::size_t[max_dim + 1];
+
+  if (colnums != 0)
+    delete[] colnums;
+  colnums = new size_type[max_vec_len];
 
   ar &boost::serialization::make_array(rowstart, max_dim + 1);
   ar &boost::serialization::make_array(colnums, max_vec_len);
