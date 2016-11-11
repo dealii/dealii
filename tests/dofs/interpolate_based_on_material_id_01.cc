@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2015 by the deal.II authors
+// Copyright (C) 2006 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -101,6 +101,12 @@ void test ()
             AssertThrow (values[i] == cell->index() % 128, ExcInternalError());
         }
     }
+
+  for (typename std::map<types::material_id, const Function<dim>*>::iterator
+       p = functions.begin();
+       p != functions.end(); ++p)
+    delete p->second;
+
   deallog << "OK" << std::endl;
 }
 

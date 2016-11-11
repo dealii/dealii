@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2015 by the deal.II authors
+// Copyright (C) 2008 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -73,4 +73,6 @@ int main()
 
   for (unsigned int i=0; i<sz; ++i)
     AssertThrow (p[i] == 0, ExcInternalError());
+
+  delete[] p;
 }
