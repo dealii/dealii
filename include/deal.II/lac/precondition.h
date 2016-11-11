@@ -1963,7 +1963,6 @@ namespace internal
       // that is cheap to compute (cheaper than random numbers) but avoids
       // obviously re-occurring numbers in multi-component systems by choosing
       // a period of 11
-      const unsigned int size = vector.local_size();
       for (unsigned int i=0; i<vector.local_size(); ++i)
         vector.local_element(i) = i%11;
     }
