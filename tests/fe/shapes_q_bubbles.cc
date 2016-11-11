@@ -22,7 +22,7 @@
 #include <fstream>
 #include <string>
 
-#define PRECISION 3
+#define PRECISION 7
 
 
 template<int dim>
