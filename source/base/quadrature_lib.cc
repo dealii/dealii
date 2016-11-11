@@ -434,124 +434,124 @@ template <>
 std::vector<double>
 QGaussLog<1>::get_quadrature_points(const unsigned int n) const
 {
-  std::vector<double> quadrature_points(n);
+  std::vector<double> q_points(n);
 
   switch (n)
     {
     case 1:
-      quadrature_points[0] = 0.3333333333333333;
+      q_points[0] = 0.3333333333333333;
       break;
 
     case 2:
-      quadrature_points[0] = 0.1120088061669761;
-      quadrature_points[1] = 0.6022769081187381;
+      q_points[0] = 0.1120088061669761;
+      q_points[1] = 0.6022769081187381;
       break;
 
     case 3:
-      quadrature_points[0] = 0.06389079308732544;
-      quadrature_points[1] = 0.3689970637156184;
-      quadrature_points[2] = 0.766880303938942;
+      q_points[0] = 0.06389079308732544;
+      q_points[1] = 0.3689970637156184;
+      q_points[2] = 0.766880303938942;
       break;
 
     case 4:
-      quadrature_points[0] = 0.04144848019938324;
-      quadrature_points[1] = 0.2452749143206022;
-      quadrature_points[2] = 0.5561654535602751;
-      quadrature_points[3] = 0.848982394532986;
+      q_points[0] = 0.04144848019938324;
+      q_points[1] = 0.2452749143206022;
+      q_points[2] = 0.5561654535602751;
+      q_points[3] = 0.848982394532986;
       break;
 
     case 5:
-      quadrature_points[0] = 0.02913447215197205;
-      quadrature_points[1] = 0.1739772133208974;
-      quadrature_points[2] =  0.4117025202849029;
-      quadrature_points[3] = 0.6773141745828183;
-      quadrature_points[4] = 0.89477136103101;
+      q_points[0] = 0.02913447215197205;
+      q_points[1] = 0.1739772133208974;
+      q_points[2] =  0.4117025202849029;
+      q_points[3] = 0.6773141745828183;
+      q_points[4] = 0.89477136103101;
       break;
 
     case 6:
-      quadrature_points[0] = 0.02163400584411693;
-      quadrature_points[1] = 0.1295833911549506;
-      quadrature_points[2] = 0.3140204499147661;
-      quadrature_points[3] = 0.5386572173517997;
-      quadrature_points[4] = 0.7569153373774084;
-      quadrature_points[5] = 0.922668851372116;
+      q_points[0] = 0.02163400584411693;
+      q_points[1] = 0.1295833911549506;
+      q_points[2] = 0.3140204499147661;
+      q_points[3] = 0.5386572173517997;
+      q_points[4] = 0.7569153373774084;
+      q_points[5] = 0.922668851372116;
       break;
 
 
     case 7:
-      quadrature_points[0] = 0.0167193554082585;
-      quadrature_points[1] = 0.100185677915675;
-      quadrature_points[2] = 0.2462942462079286;
-      quadrature_points[3] = 0.4334634932570557;
-      quadrature_points[4] = 0.6323509880476823;
-      quadrature_points[5] = 0.81111862674023;
-      quadrature_points[6] = 0.940848166743287;
+      q_points[0] = 0.0167193554082585;
+      q_points[1] = 0.100185677915675;
+      q_points[2] = 0.2462942462079286;
+      q_points[3] = 0.4334634932570557;
+      q_points[4] = 0.6323509880476823;
+      q_points[5] = 0.81111862674023;
+      q_points[6] = 0.940848166743287;
       break;
 
     case 8:
-      quadrature_points[0] = 0.01332024416089244;
-      quadrature_points[1] = 0.07975042901389491;
-      quadrature_points[2] = 0.1978710293261864;
-      quadrature_points[3] =   0.354153994351925;
-      quadrature_points[4] =   0.5294585752348643;
-      quadrature_points[5] = 0.7018145299391673;
-      quadrature_points[6] = 0.849379320441094;
-      quadrature_points[7] = 0.953326450056343;
+      q_points[0] = 0.01332024416089244;
+      q_points[1] = 0.07975042901389491;
+      q_points[2] = 0.1978710293261864;
+      q_points[3] =   0.354153994351925;
+      q_points[4] =   0.5294585752348643;
+      q_points[5] = 0.7018145299391673;
+      q_points[6] = 0.849379320441094;
+      q_points[7] = 0.953326450056343;
       break;
 
     case 9:
-      quadrature_points[0] = 0.01086933608417545;
-      quadrature_points[1] = 0.06498366633800794;
-      quadrature_points[2] = 0.1622293980238825;
-      quadrature_points[3] = 0.2937499039716641;
-      quadrature_points[4] = 0.4466318819056009;
-      quadrature_points[5] = 0.6054816627755208;
-      quadrature_points[6] = 0.7541101371585467;
-      quadrature_points[7] = 0.877265828834263;
-      quadrature_points[8] = 0.96225055941096;
+      q_points[0] = 0.01086933608417545;
+      q_points[1] = 0.06498366633800794;
+      q_points[2] = 0.1622293980238825;
+      q_points[3] = 0.2937499039716641;
+      q_points[4] = 0.4466318819056009;
+      q_points[5] = 0.6054816627755208;
+      q_points[6] = 0.7541101371585467;
+      q_points[7] = 0.877265828834263;
+      q_points[8] = 0.96225055941096;
       break;
 
     case 10:
-      quadrature_points[0] = 0.00904263096219963;
-      quadrature_points[1] = 0.05397126622250072;
-      quadrature_points[2] =  0.1353118246392511;
-      quadrature_points[3] = 0.2470524162871565;
-      quadrature_points[4] = 0.3802125396092744;
-      quadrature_points[5] = 0.5237923179723384;
-      quadrature_points[6] = 0.6657752055148032;
-      quadrature_points[7] = 0.7941904160147613;
-      quadrature_points[8] = 0.898161091216429;
-      quadrature_points[9] = 0.9688479887196;
+      q_points[0] = 0.00904263096219963;
+      q_points[1] = 0.05397126622250072;
+      q_points[2] =  0.1353118246392511;
+      q_points[3] = 0.2470524162871565;
+      q_points[4] = 0.3802125396092744;
+      q_points[5] = 0.5237923179723384;
+      q_points[6] = 0.6657752055148032;
+      q_points[7] = 0.7941904160147613;
+      q_points[8] = 0.898161091216429;
+      q_points[9] = 0.9688479887196;
       break;
 
 
     case 11:
-      quadrature_points[0] = 0.007643941174637681;
-      quadrature_points[1] = 0.04554182825657903;
-      quadrature_points[2] = 0.1145222974551244;
-      quadrature_points[3] = 0.2103785812270227;
-      quadrature_points[4] = 0.3266955532217897;
-      quadrature_points[5] = 0.4554532469286375;
-      quadrature_points[6] = 0.5876483563573721;
-      quadrature_points[7] = 0.7139638500230458;
-      quadrature_points[8] = 0.825453217777127;
-      quadrature_points[9] = 0.914193921640008;
-      quadrature_points[10] = 0.973860256264123;
+      q_points[0] = 0.007643941174637681;
+      q_points[1] = 0.04554182825657903;
+      q_points[2] = 0.1145222974551244;
+      q_points[3] = 0.2103785812270227;
+      q_points[4] = 0.3266955532217897;
+      q_points[5] = 0.4554532469286375;
+      q_points[6] = 0.5876483563573721;
+      q_points[7] = 0.7139638500230458;
+      q_points[8] = 0.825453217777127;
+      q_points[9] = 0.914193921640008;
+      q_points[10] = 0.973860256264123;
       break;
 
     case 12:
-      quadrature_points[0] = 0.006548722279080035;
-      quadrature_points[1] = 0.03894680956045022;
-      quadrature_points[2] = 0.0981502631060046;
-      quadrature_points[3] = 0.1811385815906331;
-      quadrature_points[4] = 0.2832200676673157;
-      quadrature_points[5] = 0.398434435164983;
-      quadrature_points[6] = 0.5199526267791299;
-      quadrature_points[7] = 0.6405109167754819;
-      quadrature_points[8] = 0.7528650118926111;
-      quadrature_points[9] = 0.850240024421055;
-      quadrature_points[10] = 0.926749682988251;
-      quadrature_points[11] = 0.977756129778486;
+      q_points[0] = 0.006548722279080035;
+      q_points[1] = 0.03894680956045022;
+      q_points[2] = 0.0981502631060046;
+      q_points[3] = 0.1811385815906331;
+      q_points[4] = 0.2832200676673157;
+      q_points[5] = 0.398434435164983;
+      q_points[6] = 0.5199526267791299;
+      q_points[7] = 0.6405109167754819;
+      q_points[8] = 0.7528650118926111;
+      q_points[9] = 0.850240024421055;
+      q_points[10] = 0.926749682988251;
+      q_points[11] = 0.977756129778486;
       break;
 
     default:
@@ -559,7 +559,7 @@ QGaussLog<1>::get_quadrature_points(const unsigned int n) const
       break;
     }
 
-  return quadrature_points;
+  return q_points;
 }
 
 
