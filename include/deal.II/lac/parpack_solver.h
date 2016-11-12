@@ -531,7 +531,13 @@ PArpackSolver<VectorType>::PArpackSolver (SolverControl        &control,
   additional_data (data),
   mpi_communicator( mpi_communicator ),
   mpi_communicator_fortran ( MPI_Comm_c2f( mpi_communicator ) ),
+  lworkl(0),
+  nloc(0),
+  ncv(0),
+  ldv(0),
   initial_vector_provided(false),
+  ldz(0),
+  lworkev(0),
   sigmar(0.0),
   sigmai(0.0)
 {}
