@@ -298,14 +298,13 @@ namespace Step29
   public:
     ComputeIntensity ();
 
+    using DataPostprocessorScalar<dim>::compute_derived_quantities_vector;
+
     virtual
     void
-    compute_derived_quantities_vector (const std::vector<Vector<double> >               &solution_values,
-                                       const std::vector<std::vector<Tensor<1, dim> > > &solution_gradients,
-                                       const std::vector<std::vector<Tensor<2, dim> > > &solution_hessians,
-                                       const std::vector<Point<dim> >                   &normals,
-                                       const std::vector<Point<dim> >                   &evaluation_points,
-                                       std::vector<Vector<double> >                     &computed_quantities) const;
+    compute_derived_quantities_vector
+    (const DataPostprocessorInputs::Vector<dim> &inputs,
+     std::vector<Vector<double> >               &computed_quantities) const;
   };
 
   // In the constructor, we need to call the constructor of the base class
@@ -330,33 +329,26 @@ namespace Step29
   {}
 
 
-  // The actual postprocessing happens in the following function.  Its inputs
-  // are a vector representing values of the function (which is here
-  // vector-valued) representing the data vector given to
-  // DataOut::add_data_vector, evaluated at all evaluation points where we
-  // generate output, and some tensor objects representing derivatives (that
-  // we don't use here since $|u|$ is computed from just $v$ and $w$, and for
-  // which we assign no name to the corresponding function argument).  The
-  // derived quantities are returned in the <code>computed_quantities</code>
-  // vector.  Remember that this function may only use data for which the
-  // respective update flag is specified by
+  // The actual postprocessing happens in the following function. Its input is
+  // an object that stores values of the function (which is here vector-valued)
+  // representing the data vector given to DataOut::add_data_vector, evaluated
+  // at all evaluation points where we generate output, and some tensor objects
+  // representing derivatives (that we don't use here since $|u|$ is computed
+  // from just $v$ and $w$). The derived quantities are returned in the
+  // <code>computed_quantities</code> vector. Remember that this function may
+  // only use data for which the respective update flag is specified by
   // <code>get_needed_update_flags</code>. For example, we may not use the
   // derivatives here, since our implementation of
   // <code>get_needed_update_flags</code> requests that only function values
   // are provided.
   template <int dim>
   void
-  ComputeIntensity<dim>::compute_derived_quantities_vector (
-    const std::vector<Vector<double> >                 &solution_values,
-    const std::vector<std::vector<Tensor<1, dim> > >   & /*solution_gradients*/,
-    const std::vector<std::vector<Tensor<2, dim> > >   & /*solution_hessians*/,
-    const std::vector<Point<dim> >                     & /*normals*/,
-    const std::vector<Point<dim> >                     & /*evaluation_points*/,
-    std::vector<Vector<double> >                       &computed_quantities
-  ) const
+  ComputeIntensity<dim>::compute_derived_quantities_vector
+  (const DataPostprocessorInputs::Vector<dim> &inputs,
+   std::vector<Vector<double> >               &computed_quantities) const
   {
-    Assert(computed_quantities.size() == solution_values.size(),
-           ExcDimensionMismatch (computed_quantities.size(), solution_values.size()));
+    Assert(computed_quantities.size() == inputs.solution_values.size(),
+           ExcDimensionMismatch (computed_quantities.size(), inputs.solution_values.size()));
 
     // The computation itself is straightforward: We iterate over each entry
     // in the output vector and compute $|u|$ from the corresponding values of
@@ -365,9 +357,12 @@ namespace Step29
       {
         Assert(computed_quantities[i].size() == 1,
                ExcDimensionMismatch (computed_quantities[i].size(), 1));
-        Assert(solution_values[i].size() == 2, ExcDimensionMismatch (solution_values[i].size(), 2));
+        Assert(inputs.solution_values[i].size() == 2,
+               ExcDimensionMismatch (inputs.solution_values[i].size(), 2));
 
-        computed_quantities[i](0) = std::sqrt(solution_values[i](0)*solution_values[i](0) + solution_values[i](1)*solution_values[i](1));
+        computed_quantities[i](0)
+          = std::sqrt(inputs.solution_values[i](0)*inputs.solution_values[i](0)
+                      + inputs.solution_values[i](1)*inputs.solution_values[i](1));
       }
   }
 

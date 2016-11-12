@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2015 by the deal.II authors
+ * Copyright (C) 2008 - 2016 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -3148,14 +3148,13 @@ namespace Step32
     Postprocessor (const unsigned int partition,
                    const double       minimal_pressure);
 
+    using DataPostprocessor<dim>::compute_derived_quantities_vector;
+
     virtual
     void
-    compute_derived_quantities_vector (const std::vector<Vector<double> >              &solution_values,
-                                       const std::vector<std::vector<Tensor<1,dim> > > &solution_gradients,
-                                       const std::vector<std::vector<Tensor<2,dim> > > &solution_hessians,
-                                       const std::vector<Point<dim> >                  &normals,
-                                       const std::vector<Point<dim> >                  &evaluation_points,
-                                       std::vector<Vector<double> >                    &computed_quantities) const;
+    compute_derived_quantities_vector
+    (const DataPostprocessorInputs::Vector<dim> &inputs,
+     std::vector<Vector<double> >               &computed_quantities) const;
 
     virtual std::vector<std::string> get_names () const;
 
@@ -3237,38 +3236,37 @@ namespace Step32
   //
   // The quantities we output here are more for illustration, rather than for
   // actual scientific value. We come back to this briefly in the results
-  // section of this program and explain what one may in fact be interested
-  // in.
+  // section of this program and explain what one may in fact be interested in.
   template <int dim>
   void
   BoussinesqFlowProblem<dim>::Postprocessor::
-  compute_derived_quantities_vector (const std::vector<Vector<double> >              &solution_values,
-                                     const std::vector<std::vector<Tensor<1,dim> > > &solution_gradients,
-                                     const std::vector<std::vector<Tensor<2,dim> > > &/*solution_hessians*/,
-                                     const std::vector<Point<dim> >                  &/*normals*/,
-                                     const std::vector<Point<dim> >                  &/*evaluation_points*/,
-                                     std::vector<Vector<double> >                    &computed_quantities) const
+  compute_derived_quantities_vector
+  (const DataPostprocessorInputs::Vector<dim> &inputs,
+   std::vector<Vector<double> >               &computed_quantities) const
   {
-    const unsigned int n_quadrature_points = solution_values.size();
-    Assert (solution_gradients.size() == n_quadrature_points,                  ExcInternalError());
-    Assert (computed_quantities.size() == n_quadrature_points,  ExcInternalError());
-    Assert (solution_values[0].size() == dim+2,                              ExcInternalError());
+    const unsigned int n_quadrature_points = inputs.solution_values.size();
+    Assert (inputs.solution_gradients.size() == n_quadrature_points,
+            ExcInternalError());
+    Assert (computed_quantities.size() == n_quadrature_points,
+            ExcInternalError());
+    Assert (inputs.solution_values[0].size() == dim+2,
+            ExcInternalError());
 
     for (unsigned int q=0; q<n_quadrature_points; ++q)
       {
         for (unsigned int d=0; d<dim; ++d)
           computed_quantities[q](d)
-            = (solution_values[q](d) *  EquationData::year_in_seconds * 100);
+            = (inputs.solution_values[q](d) *  EquationData::year_in_seconds * 100);
 
-        const double pressure = (solution_values[q](dim)-minimal_pressure);
+        const double pressure = (inputs.solution_values[q](dim)-minimal_pressure);
         computed_quantities[q](dim) = pressure;
 
-        const double temperature = solution_values[q](dim+1);
+        const double temperature = inputs.solution_values[q](dim+1);
         computed_quantities[q](dim+1) = temperature;
 
         Tensor<2,dim> grad_u;
         for (unsigned int d=0; d<dim; ++d)
-          grad_u[d] = solution_gradients[q][d];
+          grad_u[d] = inputs.solution_gradients[q][d];
         const SymmetricTensor<2,dim> strain_rate = symmetrize (grad_u);
         computed_quantities[q](dim+2) = 2 * EquationData::eta *
                                         strain_rate * strain_rate;
