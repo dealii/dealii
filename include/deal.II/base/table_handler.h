@@ -131,7 +131,7 @@ namespace internal
     value_type value;
 
     /**
-     * cache the current value as a string
+     * Cache the current value as a string.
      */
     mutable std::string cached_value;
 
