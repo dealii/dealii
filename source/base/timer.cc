@@ -17,6 +17,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/utilities.h>
+#include <deal.II/base/signaling_nan.h>
 #include <sstream>
 #include <iostream>
 #include <iomanip>
@@ -49,10 +50,16 @@ Timer::Timer()
   last_lap_time (0.),
   running (false)
 #ifdef DEAL_II_WITH_MPI
-  , mpi_communicator (MPI_COMM_SELF)
-  , sync_wall_time (false)
+  ,
+  mpi_communicator (MPI_COMM_SELF),
+  sync_wall_time (false)
 #endif
 {
+#ifdef DEAL_II_WITH_MPI
+  mpi_data.sum = mpi_data.min = mpi_data.max = mpi_data.avg = numbers::signaling_nan<double>();
+  mpi_data.min_index = mpi_data.max_index = numbers::invalid_unsigned_int;
+#endif
+
   start();
 }
 
@@ -62,7 +69,7 @@ Timer::Timer()
 // the communicator given from input
 #ifdef DEAL_II_WITH_MPI
 Timer::Timer(MPI_Comm mpi_communicator,
-             bool sync_wall_time_)
+             const bool sync_wall_time_)
   :
   start_time (0.),
   start_time_children (0.),
@@ -74,9 +81,16 @@ Timer::Timer(MPI_Comm mpi_communicator,
   mpi_communicator (mpi_communicator),
   sync_wall_time(sync_wall_time_)
 {
+#ifdef DEAL_II_WITH_MPI
+  mpi_data.sum = mpi_data.min = mpi_data.max = mpi_data.avg = numbers::signaling_nan<double>();
+  mpi_data.min_index = mpi_data.max_index = numbers::invalid_unsigned_int;
+#endif
+
   start();
 }
 #endif
+
+
 
 #ifdef DEAL_II_MSVC
 
