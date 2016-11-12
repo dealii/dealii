@@ -1,0 +1,32 @@
+
+DEAL::row: 0
+DEAL::column: 0
+DEAL::value: 1.00000
+DEAL::row: 0
+DEAL::column: 4
+DEAL::value: -1.00000
+DEAL::row: 1
+DEAL::column: 0
+DEAL::value: -1.00000
+DEAL::row: 1
+DEAL::column: 1
+DEAL::value: 1.00000
+DEAL::row: 2
+DEAL::column: 1
+DEAL::value: -1.00000
+DEAL::row: 2
+DEAL::column: 2
+DEAL::value: 1.00000
+DEAL::row: 3
+DEAL::column: 2
+DEAL::value: -1.00000
+DEAL::row: 3
+DEAL::column: 3
+DEAL::value: 1.00000
+DEAL::row: 4
+DEAL::column: 3
+DEAL::value: -1.00000
+DEAL::row: 4
+DEAL::column: 4
+DEAL::value: 1.00000
+DEAL::OK
