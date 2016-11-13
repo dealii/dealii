@@ -252,12 +252,13 @@ namespace Step33
     }
 
 
-    // @sect4{EulerEquations::compute_normal_flux}
+    // @sect4{EulerEquations::numerical_normal_flux}
 
-    // On the boundaries of the domain and across hanging nodes we use a
-    // numerical flux function to enforce boundary conditions.  This routine
-    // is the basic Lax-Friedrich's flux with a stabilization parameter
-    // $\alpha$. It's form has also been given already in the introduction:
+    // On the boundaries of the domain and across element faces we use a
+    // numerical flux function to enforce boundary conditions and solve 
+    // 1D-Riemann's problems on the faces. This routine is the basic 
+    // Lax-Friedrich's flux with a stabilization parameter $\alpha$.
+    // It's form has also been given already in the introduction:
     template <typename InputVector>
     static
     void numerical_normal_flux (const Tensor<1,dim>                &normal,
