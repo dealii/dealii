@@ -481,7 +481,8 @@ namespace PETScWrappers
       if (v.size()==0)
         {
           // this happens if v has not been initialized to something useful:
-          // Vector x,v;x=v;
+          //   Vector x,v;
+          //   x=v;
           // we skip the code below and create a simple serial vector of
           // length 0
 
