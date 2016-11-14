@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2015 by the deal.II authors
+// Copyright (C) 2004 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -76,6 +76,7 @@ namespace PETScWrappers
 
   MatrixBase::MatrixBase ()
     :
+    matrix (NULL),
     last_action (VectorOperation::unknown)
   {}
 

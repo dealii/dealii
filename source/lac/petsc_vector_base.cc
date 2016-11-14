@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2015 by the deal.II authors
+// Copyright (C) 2004 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -150,6 +150,7 @@ namespace PETScWrappers
 
   VectorBase::VectorBase ()
     :
+    vector (NULL),
     ghosted(false),
     last_action (::dealii::VectorOperation::unknown),
     attained_ownership(true)
