@@ -503,7 +503,7 @@ void MGTransferMatrixFree<dim,Number>::build
   //
   // get the valence of the individual components and compute the weights as
   // the inverse of the valence
-  weights_on_refined.resize(n_levels);
+  weights_on_refined.resize(n_levels-1);
   for (unsigned int level = 1; level<n_levels; ++level)
     {
       this->ghosted_level_vector[level] = 0;
@@ -522,7 +522,7 @@ void MGTransferMatrixFree<dim,Number>::build
 
       // we only store 3^dim weights because all dofs on a line have the same
       // valence, and all dofs on a quad have the same valence.
-      weights_on_refined[level].resize(((n_owned_level_cells[level-1]+vec_size-1)/vec_size)*Utilities::fixed_power<dim>(3));
+      weights_on_refined[level-1].resize(((n_owned_level_cells[level-1]+vec_size-1)/vec_size)*Utilities::fixed_power<dim>(3));
       for (unsigned int c=0; c<n_owned_level_cells[level-1]; ++c)
         {
           const unsigned int comp = c/vec_size;
@@ -533,7 +533,7 @@ void MGTransferMatrixFree<dim,Number>::build
               {
                 unsigned int shift = 9*degree_to_3[k] + 3*degree_to_3[j];
                 for (unsigned int i=0; i<n_child_dofs_1d; ++i, ++m)
-                  weights_on_refined[level][comp*Utilities::fixed_power<dim>(3)+shift+degree_to_3[i]][v] = Number(1.)/
+                  weights_on_refined[level-1][comp*Utilities::fixed_power<dim>(3)+shift+degree_to_3[i]][v] = Number(1.)/
                       this->ghosted_level_vector[level].local_element(level_dof_indices[level][n_child_cell_dofs*c+m]);
               }
         }
@@ -799,7 +799,7 @@ void MGTransferMatrixFree<dim,Number>
                                                            n_child_cell_dofs,
                                                            n_components,
                                                            evaluation_data);
-          weight_dofs_on_child<dim,degree,Number>(&weights_on_refined[to_level][(cell/vec_size)*three_to_dim],
+          weight_dofs_on_child<dim,degree,Number>(&weights_on_refined[to_level-1][(cell/vec_size)*three_to_dim],
                                                   n_components,
                                                   &evaluation_data[2*n_child_cell_dofs]);
         }
@@ -872,7 +872,7 @@ void MGTransferMatrixFree<dim,Number>
           Evaluator evaluator(shape_info.shape_val_evenodd,
                               shape_info.shape_val_evenodd,
                               shape_info.shape_val_evenodd);
-          weight_dofs_on_child<dim,degree,Number>(&weights_on_refined[from_level][(cell/vec_size)*three_to_dim],
+          weight_dofs_on_child<dim,degree,Number>(&weights_on_refined[from_level-1][(cell/vec_size)*three_to_dim],
                                                   n_components,
                                                   &evaluation_data[0]);
           perform_tensorized_op<dim,Evaluator,Number,false>(evaluator,
