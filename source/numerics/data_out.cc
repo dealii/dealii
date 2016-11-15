@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2015 by the deal.II authors
+// Copyright (C) 1999 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -72,8 +72,7 @@ build_one_patch
   ::dealii::DataOutBase::Patch<DoFHandlerType::dimension, DoFHandlerType::space_dimension> patch;
   patch.n_subdivisions = n_subdivisions;
 
-  // use ucd_to_deal map as patch vertices are in the old, unnatural
-  // ordering. if the mapping does not preserve locations
+  // set the vertices of the patch. if the mapping does not preserve locations
   // (e.g. MappingQEulerian), we need to compute the offset of the vertex for
   // the graphical output. Otherwise, we can just use the vertex info.
   for (unsigned int vertex=0; vertex<GeometryInfo<DoFHandlerType::dimension>::vertices_per_cell; ++vertex)
@@ -110,17 +109,20 @@ build_one_patch
             (DoFHandlerType::dimension != DoFHandlerType::space_dimension))))
         {
           Assert(patch.space_dim==DoFHandlerType::space_dimension, ExcInternalError());
-          const std::vector<Point<DoFHandlerType::space_dimension> > &q_points=fe_patch_values.get_quadrature_points();
-          // resize the patch.data member in order to have enough memory for
-          // the quadrature points as well
-          patch.data.reinit (scratch_data.n_datasets+DoFHandlerType::space_dimension, n_q_points);
+
           // set the flag indicating that for this cell the points are
           // explicitly given
-          patch.points_are_available=true;
-          // copy points to patch.data
+          patch.points_are_available = true;
+
+          // then resize the patch.data member in order to have enough memory for
+          // the quadrature points as well, and copy the quadrature points there
+          const std::vector<Point<DoFHandlerType::space_dimension> > &q_points
+            = fe_patch_values.get_quadrature_points();
+
+          patch.data.reinit (scratch_data.n_datasets+DoFHandlerType::space_dimension, n_q_points);
           for (unsigned int i=0; i<DoFHandlerType::space_dimension; ++i)
             for (unsigned int q=0; q<n_q_points; ++q)
-              patch.data(patch.data.size(0)-DoFHandlerType::space_dimension+i,q)=q_points[q][i];
+              patch.data(patch.data.size(0)-DoFHandlerType::space_dimension+i,q) = q_points[q][i];
         }
       else
         {

@@ -244,8 +244,14 @@ namespace DataOutBase
 
     /**
      * Corner points of a patch.  Inner points are computed by a multilinear
-     * transform of the unit cell to the cell specified by these corner
-     * points. The order of points is the same as for cells in the
+     * transformation of the unit cell to the cell specified by these corner
+     * points, if <code>points_are_available==false</code>.
+     *
+     * On the other hand, if <code>points_are_available==true</code>, then
+     * the coordinates of the points at which output is to be generated
+     * is attached in additional rows to the <code>data</code> table.
+     *
+     * The order of points is the same as for cells in the
      * triangulation.
      */
     Point<spacedim> vertices[GeometryInfo<dim>::vertices_per_cell];
@@ -277,10 +283,11 @@ namespace DataOutBase
 
     /**
      * Data vectors. The format is as follows: <tt>data(i,.)</tt> denotes the
-     * data belonging to the <tt>i</tt>th data vector. <tt>data.n()</tt>
+     * data belonging to the <tt>i</tt>th data vector. <tt>data.n_cols()</tt>
      * therefore equals the number of output points; this number is
-     * <tt>(subdivisions+1)^{dim</tt>}. <tt>data.m()</tt> equals the number of
-     * data vectors.
+     * <tt>(subdivisions+1)^{dim}</tt>. <tt>data.n_rows()</tt> equals the number of
+     * data vectors. For the current purpose, a data vector equals one scalar,
+     * even if multiple scalars may later be interpreted as vectors.
      *
      * Within each column, <tt>data(.,j)</tt> are the data values at the
      * output point <tt>j</tt>, where <tt>j</tt> denotes the usual
