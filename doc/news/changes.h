@@ -437,6 +437,21 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: Calling MappingQ::clone() did not copy the
+ <code>use_mapping_q_on_all_cells</code> flag that this
+ mapping class gets passed to its constructor. This leads
+ to wrong results if you wanted to use curved cells on
+ interior cells and if such an object was used inside an
+ hp::MappingCollection, for example. There are, in addition,
+ several places in the library where one would pass a mapping,
+ and the library would clone it into a member of such a collection,
+ and these would also yield wrong results. An example is the use
+ of DataOut::build_patches with a mapping that had this flag set
+ upon construction.
+ <br>
+ (Sebastian Gonzalez-Pintor, Wolfgang Bangerth, 2016/11/15)
+ </li>
+
  <li> Fixed: There was a memory leak if a previously used SparsityPattern
  object was re-used by reading from a serialization archive via
  SparsityPattern::load(). This is now fixed.
