@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2015 by the deal.II authors
+// Copyright (C) 2003 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -391,12 +391,16 @@ namespace internal
                                     const unsigned int dofs_per_cell) const
     {
       (void)dofs_per_cell;
-      Assert (obj_index < cell_cache_offsets.size(),
-              ExcInternalError());
-      Assert (cell_cache_offsets[obj_index]+dofs_per_cell
-              <=
-              cell_dof_indices_cache.size(),
-              ExcInternalError());
+      Assert ((obj_index < cell_cache_offsets.size())
+              &&
+              (cell_cache_offsets[obj_index]+dofs_per_cell
+               <=
+               cell_dof_indices_cache.size()),
+              ExcMessage("You are trying to access an element of the cache that stores "
+                         "the indices of all degrees of freedom that live on one cell. "
+                         "However, this element does not exist. Did you forget to call "
+                         "DoFHandler::distribute_dofs(), or did you forget to call it "
+                         "again after changing the active_fe_index of one of the cells?"));
 
       return &cell_dof_indices_cache[cell_cache_offsets[obj_index]];
     }
