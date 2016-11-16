@@ -197,13 +197,14 @@ namespace parallel
 
     unsigned int send_value
       = number_cache.n_locally_owned_active_cells[my_subdomain];
-    MPI_Allgather (&send_value,
-                   1,
-                   MPI_UNSIGNED,
-                   &number_cache.n_locally_owned_active_cells[0],
-                   1,
-                   MPI_UNSIGNED,
-                   this->mpi_communicator);
+    const int ierr = MPI_Allgather (&send_value,
+                                    1,
+                                    MPI_UNSIGNED,
+                                    &number_cache.n_locally_owned_active_cells[0],
+                                    1,
+                                    MPI_UNSIGNED,
+                                    this->mpi_communicator);
+    AssertThrowMPI(ierr);
 
     number_cache.n_global_active_cells
       = std::accumulate (number_cache.n_locally_owned_active_cells.begin(),

@@ -406,6 +406,8 @@ namespace PETScWrappers
   void
   VectorBase::compress (const VectorOperation::values operation)
   {
+    int ierr;
+    (void)ierr;
 #ifdef DEBUG
 #ifdef DEAL_II_WITH_MPI
     // Check that all processors agree that last_action is the same (or none!)
@@ -413,8 +415,9 @@ namespace PETScWrappers
     int my_int_last_action = last_action;
     int all_int_last_action;
 
-    MPI_Allreduce(&my_int_last_action, &all_int_last_action, 1, MPI_INT,
-                  MPI_BOR, get_mpi_communicator());
+    ierr = MPI_Allreduce(&my_int_last_action, &all_int_last_action, 1, MPI_INT,
+                         MPI_BOR, get_mpi_communicator());
+    AssertThrowMPI(ierr);
 
     AssertThrow(all_int_last_action != (::dealii::VectorOperation::add | ::dealii::VectorOperation::insert),
                 ExcMessage("Error: not all processors agree on the last VectorOperation before this compress() call."));
@@ -439,7 +442,6 @@ namespace PETScWrappers
     // we still need to call
     // VecAssemblyBegin/End on all
     // processors.
-    int ierr;
     ierr = VecAssemblyBegin(vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
     ierr = VecAssemblyEnd(vector);

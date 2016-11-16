@@ -121,8 +121,9 @@ namespace PETScWrappers
       // mismatch (may not be true for every proc)
 
       int k_global, k = ((size() != n) || (local_size() != local_sz));
-      MPI_Allreduce (&k, &k_global, 1,
-                     MPI_INT, MPI_LOR, communicator);
+      int ierr = MPI_Allreduce (&k, &k_global, 1,
+                                MPI_INT, MPI_LOR, communicator);
+      AssertThrowMPI(ierr);
 
       if (k_global || has_ghost_elements())
         {
@@ -134,7 +135,6 @@ namespace PETScWrappers
 //         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
           // so let's go the slow way:
-          int ierr;
 
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
           ierr = VecDestroy (vector);
@@ -413,7 +413,8 @@ namespace PETScWrappers
             i++)
         {
           // This is slow, but most likely only used to debug.
-          MPI_Barrier(communicator);
+          ierr = MPI_Barrier(communicator);
+          AssertThrowMPI(ierr);
           if (i == Utilities::MPI::this_mpi_process(communicator))
             {
               if (across)

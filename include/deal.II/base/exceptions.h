@@ -1082,6 +1082,40 @@ namespace StandardExceptions
                   << arg1);
 #endif
 //@}
+
+#ifdef DEAL_II_WITH_MPI
+  /**
+   * Exception for MPI errors. This exception is only defined if
+   * <code>deal.II</code> is compiled with MPI support. This exception should
+   * be used with <code>AssertThrow</code> to check error codes of MPI
+   * functions. For example:
+   * @code
+   * const int ierr = MPI_Isend(...);
+   * AssertThrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
+   * @endcode
+   * or, using the convenience macro <code>AssertThrowMPI</code>,
+   * @code
+   * const int ierr = MPI_Irecv(...);
+   * AssertThrowMPI(ierr);
+   * @endcode
+   *
+   * If the assertion fails then the error code will be used to print a helpful
+   * message to the screen by utilizing the <code>MPI_Error_string</code>
+   * function.
+   *
+   * @ingroup Exceptions
+   * @author David Wells, 2016
+   */
+  class ExcMPI : public dealii::ExceptionBase
+  {
+  public:
+    ExcMPI (const int error_code);
+
+    virtual void print_info (std::ostream &out) const;
+
+    const int error_code;
+  };
+#endif // DEAL_II_WITH_MPI
 } /*namespace StandardExceptions*/
 
 
@@ -1148,6 +1182,20 @@ namespace StandardExceptions
  */
 #define AssertIsFinite(number) Assert(dealii::numbers::is_finite(number), \
                                       dealii::ExcNumberNotFinite(std::complex<double>(number)))
+
+#ifdef DEAL_II_WITH_MPI
+/**
+ * An assertion that checks whether or not an error code returned by an MPI
+ * function is equal to <code>MPI_SUCCESS</code>. If the check fails then an
+ * exception of type ExcMPI is thrown with the given error code as an
+ * argument.
+ *
+ * @ingroup Exceptions
+ * @author David Wells, 2016
+ */
+#define AssertThrowMPI(error_code) AssertThrow(error_code == MPI_SUCCESS, \
+                                               dealii::ExcMPI(error_code))
+#endif // DEAL_II_WITH_MPI
 
 #ifdef DEAL_II_WITH_CUDA
 /**

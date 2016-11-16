@@ -6156,28 +6156,28 @@ void DataOutInterface<dim,spacedim>::write_vtu_in_parallel (const char *filename
   write_vtu (f);
 #else
 
-  int myrank, nproc, err;
-  MPI_Comm_rank(comm, &myrank);
-  MPI_Comm_size(comm, &nproc);
+  int myrank, nproc;
+  int ierr = MPI_Comm_rank(comm, &myrank);
+  AssertThrowMPI(ierr);
+  ierr = MPI_Comm_size(comm, &nproc);
+  AssertThrowMPI(ierr);
 
   MPI_Info info;
-  MPI_Info_create(&info);
+  ierr = MPI_Info_create(&info);
+  AssertThrowMPI(ierr);
   MPI_File fh;
-  err = MPI_File_open(comm, const_cast<char *>(filename),
-                      MPI_MODE_CREATE | MPI_MODE_WRONLY, info, &fh);
-  AssertThrow(err==0,
-              ExcMessage("Unable to open file <"
-                         + std::string(filename) +
-                         "> with MPI_File_open. The error code "
-                         "returned was "
-                         + Utilities::to_string(err) + "."));
+  ierr = MPI_File_open(comm, const_cast<char *>(filename),
+                       MPI_MODE_CREATE | MPI_MODE_WRONLY, info, &fh);
+  AssertThrowMPI(ierr);
 
-
-  MPI_File_set_size(fh, 0); // delete the file contents
+  ierr = MPI_File_set_size(fh, 0); // delete the file contents
+  AssertThrowMPI(ierr);
   // this barrier is necessary, because otherwise others might already
   // write while one core is still setting the size to zero.
-  MPI_Barrier(comm);
-  MPI_Info_free(&info);
+  ierr = MPI_Barrier(comm);
+  AssertThrowMPI(ierr);
+  ierr = MPI_Info_free(&info);
+  AssertThrowMPI(ierr);
 
   unsigned int header_size;
 
@@ -6187,18 +6187,24 @@ void DataOutInterface<dim,spacedim>::write_vtu_in_parallel (const char *filename
       std::stringstream ss;
       DataOutBase::write_vtu_header(ss, vtk_flags);
       header_size = ss.str().size();
-      MPI_File_write(fh, const_cast<char *>(ss.str().c_str()), header_size, MPI_CHAR, MPI_STATUS_IGNORE);
+      ierr = MPI_File_write(fh, const_cast<char *>(ss.str().c_str()), header_size,
+                            MPI_CHAR, MPI_STATUS_IGNORE);
+      AssertThrowMPI(ierr);
     }
 
-  MPI_Bcast(&header_size, 1, MPI_UNSIGNED, 0, comm);
+  ierr = MPI_Bcast(&header_size, 1, MPI_UNSIGNED, 0, comm);
+  AssertThrowMPI(ierr);
 
-  MPI_File_seek_shared( fh, header_size, MPI_SEEK_SET );
+  ierr = MPI_File_seek_shared( fh, header_size, MPI_SEEK_SET );
+  AssertThrowMPI(ierr);
   {
     std::stringstream ss;
     DataOutBase::write_vtu_main (get_patches(), get_dataset_names(),
                                  get_vector_data_ranges(),
                                  vtk_flags, ss);
-    MPI_File_write_ordered(fh, const_cast<char *>(ss.str().c_str()), ss.str().size(), MPI_CHAR, MPI_STATUS_IGNORE);
+    ierr = MPI_File_write_ordered(fh, const_cast<char *>(ss.str().c_str()),
+                                  ss.str().size(), MPI_CHAR, MPI_STATUS_IGNORE);
+    AssertThrowMPI(ierr);
   }
 
   //write footer
@@ -6207,9 +6213,12 @@ void DataOutInterface<dim,spacedim>::write_vtu_in_parallel (const char *filename
       std::stringstream ss;
       DataOutBase::write_vtu_footer(ss);
       unsigned int footer_size = ss.str().size();
-      MPI_File_write_shared(fh, const_cast<char *>(ss.str().c_str()), footer_size, MPI_CHAR, MPI_STATUS_IGNORE);
+      ierr = MPI_File_write_shared(fh, const_cast<char *>(ss.str().c_str()),
+                                   footer_size, MPI_CHAR, MPI_STATUS_IGNORE);
+      AssertThrowMPI(ierr);
     }
-  MPI_File_close( &fh );
+  ierr = MPI_File_close( &fh );
+  AssertThrowMPI(ierr);
 #endif
 }
 
@@ -6469,8 +6478,10 @@ create_xdmf_entry (const DataOutBase::DataOutFilter &data_filter,
 
   // And compute the global total
 #ifdef DEAL_II_WITH_MPI
-  MPI_Comm_rank(comm, &myrank);
-  MPI_Allreduce(local_node_cell_count, global_node_cell_count, 2, MPI_UNSIGNED, MPI_SUM, comm);
+  int ierr = MPI_Comm_rank(comm, &myrank);
+  AssertThrowMPI(ierr);
+  ierr = MPI_Allreduce(local_node_cell_count, global_node_cell_count, 2, MPI_UNSIGNED, MPI_SUM, comm);
+  AssertThrowMPI(ierr);
 #else
   myrank = 0;
   global_node_cell_count[0] = local_node_cell_count[0];
@@ -6507,7 +6518,8 @@ write_xdmf_file (const std::vector<XDMFEntry> &entries,
   int             myrank;
 
 #ifdef DEAL_II_WITH_MPI
-  MPI_Comm_rank(comm, &myrank);
+  const int ierr = MPI_Comm_rank(comm, &myrank);
+  AssertThrowMPI(ierr);
 #else
   (void)comm;
   myrank = 0;
@@ -6737,6 +6749,8 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
                                        const std::string &solution_filename,
                                        MPI_Comm comm)
 {
+  int ierr;
+  (void)ierr;
 #ifndef DEAL_II_WITH_HDF5
   // throw an exception, but first make
   // sure the compiler does not warn about
@@ -6778,7 +6792,8 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
 #ifndef H5_HAVE_PARALLEL
 #  ifdef DEAL_II_WITH_MPI
   int world_size;
-  MPI_Comm_size(comm, &world_size);
+  ierr = MPI_Comm_size(comm, &world_size);
+  AssertThrowMPI(ierr);
   AssertThrow (world_size <= 1,
                ExcMessage ("Serial HDF5 output on multiple processes is not yet supported."));
 #  endif
@@ -6802,8 +6817,10 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
   // Compute the global total number of nodes/cells
   // And determine the offset of the data for this process
 #ifdef DEAL_II_WITH_MPI
-  MPI_Allreduce(local_node_cell_count, global_node_cell_count, 2, MPI_UNSIGNED, MPI_SUM, comm);
-  MPI_Scan(local_node_cell_count, global_node_cell_offsets, 2, MPI_UNSIGNED, MPI_SUM, comm);
+  ierr = MPI_Allreduce(local_node_cell_count, global_node_cell_count, 2, MPI_UNSIGNED, MPI_SUM, comm);
+  AssertThrowMPI(ierr);
+  ierr = MPI_Scan(local_node_cell_count, global_node_cell_offsets, 2, MPI_UNSIGNED, MPI_SUM, comm);
+  AssertThrowMPI(ierr);
   global_node_cell_offsets[0] -= local_node_cell_count[0];
   global_node_cell_offsets[1] -= local_node_cell_count[1];
 #else

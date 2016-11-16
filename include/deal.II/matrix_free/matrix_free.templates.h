@@ -85,8 +85,9 @@ namespace internal
         if (Utilities::MPI::job_supports_mpi())
           {
             int communicators_same = 0;
-            MPI_Comm_compare (dist_tria->get_communicator(), comm_mf,
-                              &communicators_same);
+            const int ierr = MPI_Comm_compare (dist_tria->get_communicator(), comm_mf,
+                                               &communicators_same);
+            AssertThrowMPI (ierr);
             Assert (communicators_same == MPI_IDENT ||
                     communicators_same == MPI_CONGRUENT,
                     ExcMessage ("MPI communicator in parallel::distributed::Triangulation "

@@ -183,13 +183,15 @@ namespace Utilities
       // Allow non-zero start index for the vector. send this data to all
       // processors
       first_index[0] = local_range_data.first;
-      MPI_Bcast(&first_index[0], 1, DEAL_II_DOF_INDEX_MPI_TYPE,
-                0, communicator);
+      int ierr = MPI_Bcast(&first_index[0], 1, DEAL_II_DOF_INDEX_MPI_TYPE,
+                           0, communicator);
+      AssertThrowMPI(ierr);
 
       // Get the end-of-local_range for all processors
-      MPI_Allgather(&local_range_data.second, 1,
-                    DEAL_II_DOF_INDEX_MPI_TYPE, &first_index[1], 1,
-                    DEAL_II_DOF_INDEX_MPI_TYPE, communicator);
+      ierr = MPI_Allgather(&local_range_data.second, 1,
+                           DEAL_II_DOF_INDEX_MPI_TYPE, &first_index[1], 1,
+                           DEAL_II_DOF_INDEX_MPI_TYPE, communicator);
+      AssertThrowMPI(ierr);
       first_index[n_procs] = global_size;
 
       // fix case when there are some processors without any locally owned
@@ -261,8 +263,9 @@ namespace Utilities
         for (unsigned int i=0; i<n_ghost_targets; i++)
           send_buffer[ghost_targets_data[i].first] = ghost_targets_data[i].second;
 
-        MPI_Alltoall (&send_buffer[0], 1, MPI_INT, &receive_buffer[0], 1,
-                      MPI_INT, communicator);
+        const int ierr = MPI_Alltoall (&send_buffer[0], 1, MPI_INT, &receive_buffer[0], 1,
+                                       MPI_INT, communicator);
+        AssertThrowMPI(ierr);
 
         // allocate memory for import data
         std::vector<std::pair<unsigned int,unsigned int> > import_targets_temp;
@@ -285,11 +288,13 @@ namespace Utilities
         std::vector<MPI_Request> import_requests (import_targets_data.size());
         for (unsigned int i=0; i<import_targets_data.size(); i++)
           {
-            MPI_Irecv (&expanded_import_indices[current_index_start],
-                       import_targets_data[i].second,
-                       DEAL_II_DOF_INDEX_MPI_TYPE,
-                       import_targets_data[i].first, import_targets_data[i].first,
-                       communicator, &import_requests[i]);
+            const int ierr = MPI_Irecv (&expanded_import_indices[current_index_start],
+                                        import_targets_data[i].second,
+                                        DEAL_II_DOF_INDEX_MPI_TYPE,
+                                        import_targets_data[i].first,
+                                        import_targets_data[i].first,
+                                        communicator, &import_requests[i]);
+            AssertThrowMPI(ierr);
             current_index_start += import_targets_data[i].second;
           }
         AssertDimension (current_index_start, n_import_indices_data);
@@ -298,17 +303,22 @@ namespace Utilities
         current_index_start = 0;
         for (unsigned int i=0; i<n_ghost_targets; i++)
           {
-            MPI_Send (&expanded_ghost_indices[current_index_start],
-                      ghost_targets_data[i].second, DEAL_II_DOF_INDEX_MPI_TYPE,
-                      ghost_targets_data[i].first, my_pid,
-                      communicator);
+            const int ierr = MPI_Send (&expanded_ghost_indices[current_index_start],
+                                       ghost_targets_data[i].second, DEAL_II_DOF_INDEX_MPI_TYPE,
+                                       ghost_targets_data[i].first, my_pid,
+                                       communicator);
+            AssertThrowMPI(ierr);
             current_index_start += ghost_targets_data[i].second;
           }
         AssertDimension (current_index_start, n_ghost_indices_data);
 
         if (import_requests.size()>0)
-          MPI_Waitall (import_requests.size(), &import_requests[0],
-                       MPI_STATUSES_IGNORE);
+          {
+            const int ierr = MPI_Waitall (import_requests.size(),
+                                          &import_requests[0],
+                                          MPI_STATUSES_IGNORE);
+            AssertThrowMPI(ierr);
+          }
 
         // transform import indices to local index space and compress
         // contiguous indices in form of ranges
@@ -363,8 +373,9 @@ namespace Utilities
       if (Utilities::MPI::job_supports_mpi())
         {
           int communicators_same = 0;
-          MPI_Comm_compare (part.communicator, communicator,
-                            &communicators_same);
+          const int ierr = MPI_Comm_compare (part.communicator, communicator,
+                                             &communicators_same);
+          AssertThrowMPI(ierr);
           if (!(communicators_same == MPI_IDENT ||
                 communicators_same == MPI_CONGRUENT))
             return false;

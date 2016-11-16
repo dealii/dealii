@@ -578,9 +578,11 @@ IndexSet::is_ascending_and_one_to_one (const MPI_Comm &communicator) const
   const unsigned int gather_size = (my_rank==0)?n_ranks:1;
   std::vector<types::global_dof_index> global_dofs(gather_size);
 
-  MPI_Gather(&first_local_dof, 1, DEAL_II_DOF_INDEX_MPI_TYPE,
-             &(global_dofs[0]), 1, DEAL_II_DOF_INDEX_MPI_TYPE, 0,
-             communicator);
+  int ierr = MPI_Gather(&first_local_dof, 1, DEAL_II_DOF_INDEX_MPI_TYPE,
+                        &(global_dofs[0]), 1, DEAL_II_DOF_INDEX_MPI_TYPE, 0,
+                        communicator);
+  AssertThrowMPI(ierr);
+
   if (my_rank == 0)
     {
       // find out if the received std::vector is ascending
@@ -604,7 +606,8 @@ IndexSet::is_ascending_and_one_to_one (const MPI_Comm &communicator) const
 
   // now broadcast the result
   int is_ascending = is_globally_ascending ? 1 : 0;
-  MPI_Bcast(&is_ascending, 1, MPI_INT, 0, communicator);
+  ierr = MPI_Bcast(&is_ascending, 1, MPI_INT, 0, communicator);
+  AssertThrowMPI(ierr);
 
   return (is_ascending==1);
 #else

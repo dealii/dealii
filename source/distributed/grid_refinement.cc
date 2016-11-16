@@ -97,8 +97,9 @@ namespace
 
     // compute the minimum on
     // processor zero
-    MPI_Reduce (comp, result, 2, MPI_DOUBLE,
-                MPI_MIN, 0, mpi_communicator);
+    const int ierr = MPI_Reduce (comp, result, 2, MPI_DOUBLE,
+                                 MPI_MIN, 0, mpi_communicator);
+    AssertThrowMPI(ierr);
 
     // make sure only processor zero
     // got something
@@ -131,8 +132,9 @@ namespace
     double result = 0;
     // compute the minimum on
     // processor zero
-    MPI_Reduce (&my_sum, &result, 1, MPI_DOUBLE,
-                MPI_SUM, 0, mpi_communicator);
+    const int ierr = MPI_Reduce (&my_sum, &result, 1, MPI_DOUBLE,
+                                 MPI_SUM, 0, mpi_communicator);
+    AssertThrowMPI(ierr);
 
     // make sure only processor zero
     // got something
@@ -274,8 +276,9 @@ namespace
 
       do
         {
-          MPI_Bcast (&interesting_range[0], 2, MPI_DOUBLE,
-                     master_mpi_rank, mpi_communicator);
+          int ierr = MPI_Bcast (&interesting_range[0], 2, MPI_DOUBLE,
+                                master_mpi_rank, mpi_communicator);
+          AssertThrowMPI(ierr);
 
           if (interesting_range[0] == interesting_range[1])
             return interesting_range[0];
@@ -300,8 +303,9 @@ namespace
                                                      test_threshold));
 
           unsigned int total_count;
-          MPI_Reduce (&my_count, &total_count, 1, MPI_UNSIGNED,
-                      MPI_SUM, master_mpi_rank, mpi_communicator);
+          ierr = MPI_Reduce (&my_count, &total_count, 1, MPI_UNSIGNED,
+                             MPI_SUM, master_mpi_rank, mpi_communicator);
+          AssertThrowMPI(ierr);
 
           // now adjust the range. if
           // we have to many cells, we
@@ -369,8 +373,9 @@ namespace
 
       do
         {
-          MPI_Bcast (&interesting_range[0], 2, MPI_DOUBLE,
-                     master_mpi_rank, mpi_communicator);
+          int ierr = MPI_Bcast (&interesting_range[0], 2, MPI_DOUBLE,
+                                master_mpi_rank, mpi_communicator);
+          AssertThrowMPI(ierr);
 
           if (interesting_range[0] == interesting_range[1])
             {
@@ -384,8 +389,9 @@ namespace
               // actual largest value
               double final_threshold =  std::min (interesting_range[0],
                                                   global_min_and_max.second);
-              MPI_Bcast (&final_threshold, 1, MPI_DOUBLE,
-                         master_mpi_rank, mpi_communicator);
+              ierr = MPI_Bcast (&final_threshold, 1, MPI_DOUBLE,
+                                master_mpi_rank, mpi_communicator);
+              AssertThrowMPI(ierr);
 
               return final_threshold;
             }
@@ -406,8 +412,9 @@ namespace
               my_error += criteria(i);
 
           double total_error;
-          MPI_Reduce (&my_error, &total_error, 1, MPI_DOUBLE,
-                      MPI_SUM, master_mpi_rank, mpi_communicator);
+          ierr = MPI_Reduce (&my_error, &total_error, 1, MPI_DOUBLE,
+                             MPI_SUM, master_mpi_rank, mpi_communicator);
+          AssertThrowMPI(ierr);
 
           // now adjust the range. if we have to many cells, we take
           // the upper half of the previous range, otherwise the lower
