@@ -126,12 +126,11 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
   std::vector< Point<spacedim> > vertices;//vector of vertices
   std::vector< CellData<dim> > cells;//vector of cells
   SubCellData subcelldata;//subcell data that includes bounds and material IDs.
-  std::map<int, int> vertex_indices; // # vert in unv (key) ---> # vert in deal.II (value)
   std::map<int, int> cell_indices; // # cell in unv (key) ---> # cell in deal.II (value)
-  std::map<int, int> quad_indices; // # quad in unv (key) ---> # quad in deal.II (value)
-  std::map<int, int> line_indices; // # line in unv(key) ---> # line in deal.II (value)
 
-  unsigned int no_vertices, no_quads=0, no_lines=0;
+  unsigned int n_vertices;
+  unsigned int n_quads=0;
+  unsigned int n_lines=0;
 
   std::string keyword;
 
@@ -141,10 +140,10 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
   if (keyword == "POINTS")
     {
-      in>>no_vertices;// taking the no. of vertices
+      in >> n_vertices;
       in.ignore(256, '\n');//ignoring the number beside the total no. of points.
 
-      for (unsigned int count = 0; count < no_vertices; count++) //loop to read three values till the no . vertices is satisfied
+      for (unsigned int vertex = 0; vertex < n_vertices; ++vertex)
         {
           // VTK format always specifies vertex coordinates with 3 components
           Point<3> x;
@@ -153,8 +152,6 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
           vertices.push_back(Point<spacedim>());
           for (unsigned int d=0; d<spacedim; ++d)
             vertices.back()(d) = x(d);
-
-          vertex_indices[count] = count;
         }
     }
 
@@ -176,56 +173,45 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
   in >> keyword;
 
-  unsigned int total_cells, no_cells = 0, type;// declaring counters, refer to the order of declaring variables for an idea of what is what!
+  unsigned int n_cells = 0;
 
   ///////////////////Processing the CELLS section that contains cells(cells) and bound_quads(subcelldata)///////////////////////
 
   if (keyword == "CELLS")
     {
-      in>>total_cells;
+      unsigned int n_geometric_objects;
+      in >> n_geometric_objects;
       in.ignore(256,'\n');
 
       if (dim == 3)
         {
-          for (unsigned int count = 0; count < total_cells; count++)
+          for (unsigned int count = 0; count < n_geometric_objects; count++)
             {
-              in>>type;
+              unsigned int type;
+              in >> type;
 
               if (type == 8)
                 {
-
                   cells.push_back(CellData<dim>());
 
                   for (unsigned int j = 0; j < type; j++) //loop to feed data
                     in >> cells.back().vertices[j];
 
-
                   cells.back().material_id = 0;
 
-                  for (unsigned int j = 0; j < type; j++) //loop to feed the data of the vertices to the cell
-                    {
-                      cells.back().vertices[j] = vertex_indices[cells.back().vertices[j]];
-                    }
                   cell_indices[count] = count;
-                  no_cells++;
+                  ++n_cells;
                 }
 
               else if ( type == 4)
                 {
-
                   subcelldata.boundary_quads.push_back(CellData<2>());
 
                   for (unsigned int j = 0; j < type; j++) //loop to feed the data to the boundary
-                    {
-                      in >> subcelldata.boundary_quads.back().vertices[j];
-                    }
+                    in >> subcelldata.boundary_quads.back().vertices[j];
                   subcelldata.boundary_quads.back().material_id = 0;
-                  for (unsigned int j = 0; j < type; j++)
-                    {
-                      subcelldata.boundary_quads.back().vertices[j] = vertex_indices[subcelldata.boundary_quads.back().vertices[j]];
-                    }
-                  quad_indices[no_quads] = no_quads;
-                  no_quads++;
+
+                  ++n_quads;
                 }
 
               else
@@ -236,9 +222,10 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
       else if (dim == 2)
         {
-          for (unsigned int count = 0; count < total_cells; count++)
+          for (unsigned int count = 0; count < n_geometric_objects; count++)
             {
-              in>>type;
+              unsigned int type;
+              in >> type;
 
               if (type == 4)
                 {
@@ -249,12 +236,8 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
                   cells.back().material_id = 0;
 
-                  for (unsigned int j = 0; j < type; j++) //loop to feed the data of the vertices to the cell
-                    {
-                      cells.back().vertices[j] = vertex_indices[cells.back().vertices[j]];
-                    }
                   cell_indices[count] = count;
-                  no_cells++;
+                  ++n_cells;
                 }
 
               else if (type == 2)
@@ -267,13 +250,10 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                     {
                       in >> subcelldata.boundary_lines.back().vertices[j];
                     }
+
                   subcelldata.boundary_lines.back().material_id = 0;
-                  for (unsigned int j = 0; j < type; j++)
-                    {
-                      subcelldata.boundary_lines.back().vertices[j] = vertex_indices[subcelldata.boundary_lines.back().vertices[j]];
-                    }
-                  line_indices[no_lines] = no_lines;
-                  no_lines++;
+
+                  ++n_lines;
                 }
 
               else
@@ -310,22 +290,22 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
           unsigned int no_ids;
           in >> no_ids;
 
-          AssertThrow (no_ids == no_cells + (dim == 3 ?
-                                             no_quads :
-                                             (dim == 2 ?
-                                              no_lines
-                                              :
-                                              0)),
+          AssertThrow (no_ids == n_cells + (dim == 3 ?
+                                            n_quads :
+                                            (dim == 2 ?
+                                             n_lines
+                                             :
+                                             0)),
                        ExcMessage ("The VTK reader found a CELL_DATA statement "
                                    "that lists a total of "
                                    + Utilities::int_to_string (no_ids) +
                                    " cell data objects, but this needs to "
                                    "equal the number of cells (which is "
-                                   + Utilities::int_to_string (no_cells) +
+                                   + Utilities::int_to_string (n_cells) +
                                    ") plus the number of quads ("
-                                   + Utilities::int_to_string (no_quads) +
+                                   + Utilities::int_to_string (n_quads) +
                                    " in 3d or the number of lines ("
-                                   + Utilities::int_to_string (no_lines) +
+                                   + Utilities::int_to_string (n_lines) +
                                    ") in 2d."));
 
 
@@ -348,7 +328,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                                        textnew[i] + "> section"));
             }
 
-          for (unsigned int i = 0; i < no_cells; i++) //assigning IDs to cells.
+          for (unsigned int i = 0; i < n_cells; i++) //assigning IDs to cells.
             {
               double id;
               in>>id;
@@ -357,22 +337,20 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
           if (dim == 3)
             {
-              for (unsigned int i = 0; i < no_quads; i++) //assigning IDs to bounds.
+              for (unsigned int i = 0; i < n_quads; i++) //assigning IDs to bounds.
                 {
                   double id;
                   in >> id;
-                  Assert (quad_indices[i] < subcelldata.boundary_quads.size(), ExcInternalError());
-                  subcelldata.boundary_quads[quad_indices[i]].material_id = id;
+                  subcelldata.boundary_quads[i].material_id = id;
                 }
             }
           else if (dim == 2)
             {
-              for (unsigned int i = 0; i < no_lines; i++) //assigning IDs to bounds.
+              for (unsigned int i = 0; i < n_lines; i++) //assigning IDs to bounds.
                 {
                   double id;
                   in >> id;
-                  Assert (line_indices[i] < subcelldata.boundary_lines.size(), ExcInternalError());
-                  subcelldata.boundary_lines[line_indices[i]].material_id = id;
+                  subcelldata.boundary_lines[i].material_id = id;
                 }
             }
         }
