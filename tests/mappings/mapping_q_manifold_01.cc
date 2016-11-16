@@ -172,7 +172,7 @@ void test(const FiniteElement<dim> &fe)
 
       Vector<double> v(dof_handler.n_dofs());
       VectorTools::project(mapping, dof_handler, constraints,
-                           QGauss<dim>(fe.degree + 1), fe_function, v);
+                           QGauss<dim>(fe.degree + 2), fe_function, v);
 
       Vector<float> diff(triangulation.n_active_cells());
       VectorTools::integrate_difference(mapping, dof_handler, v, fe_function, diff,
