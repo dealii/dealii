@@ -109,7 +109,7 @@ void test (const Triangulation<dim> &tr,
 
   MappingQGeneric<dim> mapping(1);
 
-  const QGauss<dim> quadrature(2);
+  const QGauss<dim> quadrature(fe.degree+2);
   FEValues<dim> fe_values (mapping, fe, quadrature,
                            update_values | update_gradients | update_3rd_derivatives);
 
