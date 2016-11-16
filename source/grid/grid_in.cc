@@ -224,7 +224,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                     {
                       subcelldata.boundary_quads.back().vertices[j] = vertex_indices[subcelldata.boundary_quads.back().vertices[j]];
                     }
-                  quad_indices[no_quads] = no_quads + 1;
+                  quad_indices[no_quads] = no_quads;
                   no_quads++;
                 }
 
@@ -272,7 +272,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                     {
                       subcelldata.boundary_lines.back().vertices[j] = vertex_indices[subcelldata.boundary_lines.back().vertices[j]];
                     }
-                  line_indices[no_lines] = no_lines + 1;
+                  line_indices[no_lines] = no_lines;
                   no_lines++;
                 }
 
@@ -361,6 +361,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                 {
                   double id;
                   in >> id;
+                  Assert (quad_indices[i] < subcelldata.boundary_quads.size(), ExcInternalError());
                   subcelldata.boundary_quads[quad_indices[i]].material_id = id;
                 }
             }
@@ -370,6 +371,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                 {
                   double id;
                   in >> id;
+                  Assert (line_indices[i] < subcelldata.boundary_lines.size(), ExcInternalError());
                   subcelldata.boundary_lines[line_indices[i]].material_id = id;
                 }
             }
