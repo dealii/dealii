@@ -114,43 +114,35 @@ namespace TrilinosWrappers
     void
     Accessor::visit_present_row ()
     {
-      // if we are asked to visit the
-      // past-the-end line, then simply
-      // release all our caches and go on
-      // with life
+      // if we are asked to visit the past-the-end line, then simply
+      // release all our caches and go on with life
       if (this->a_row == sparsity_pattern->n_rows())
         {
           colnum_cache.reset ();
 
           return;
         }
-//TODO: Is this thread safe?
 
       // otherwise first flush Trilinos caches
       sparsity_pattern->compress ();
 
-      // get a representation of the present
-      // row
+      // get a representation of the present row
       int ncols;
-      // TODO: casting a size_type to an int, could be a problem
-      int colnums = sparsity_pattern->n_cols();
 
-      int ierr;
-      ierr = sparsity_pattern->graph->ExtractGlobalRowCopy((TrilinosWrappers::types::int_type)this->a_row,
-                                                           colnums,
-                                                           ncols,
-                                                           (TrilinosWrappers::types::int_type *)&(*colnum_cache)[0]);
-      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      colnum_cache.reset (new std::vector<size_type> (sparsity_pattern->row_length(this->a_row)));
 
-      // copy it into our caches if the
-      // line isn't empty. if it is, then
-      // we've done something wrong, since
-      // we shouldn't have initialized an
-      // iterator for an empty line (what
-      // would it point to?)
-      Assert (ncols != 0, ExcInternalError());
-      colnum_cache.reset (new std::vector<size_type> (colnums,
-                                                      colnums+ncols));
+
+      if (colnum_cache->size() > 0)
+        {
+          int ierr;
+          ierr = sparsity_pattern->graph->ExtractGlobalRowCopy((TrilinosWrappers::types::int_type)this->a_row,
+                                                               colnum_cache->size(),
+                                                               ncols,
+                                                               (TrilinosWrappers::types::int_type *)&(*colnum_cache)[0]);
+          AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+          AssertThrow (static_cast<std::vector<size_type>::size_type>(ncols) == colnum_cache->size(),
+                       ExcInternalError());
+        }
     }
   }
 

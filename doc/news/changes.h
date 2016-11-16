@@ -451,6 +451,12 @@ inconvenience this causes.
  <br>
  (Sebastian Gonzalez-Pintor, Wolfgang Bangerth, 2016/11/15)
  </li>
+ 
+ <li> Fixed: Objects of type TrilinosWrappers::SparsityPattern::const_iterator
+ were entirely unusable due to a bug. This is now fixed.
+ <br>
+ (Wolfgang Bangerth, 2016/11/15)
+ </li>
 
  <li> Fixed: There was a memory leak if a previously used SparsityPattern
  object was re-used by reading from a serialization archive via
