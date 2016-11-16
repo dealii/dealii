@@ -504,7 +504,8 @@ template<int dim, int spacedim>
 Mapping<dim,spacedim> *
 MappingQ<dim,spacedim>::clone () const
 {
-  return new MappingQ<dim,spacedim>(this->polynomial_degree);
+  return new MappingQ<dim,spacedim>(this->polynomial_degree,
+                                    this->use_mapping_q_on_all_cells);
 }
 
 
