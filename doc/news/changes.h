@@ -502,6 +502,14 @@ inconvenience this causes.
  (Martin Kronbichler, 2016/10/27)
  </li>
 
+ <li> Fixed: GridIn::read_vtk() had off-by-one errors in reading face
+ boundary indicators from VTK files. Consequently, not all boundary indicators
+ were correctly set.
+ <br>
+ (Mayank Sabharwal, Wolfgang Bangerth, 2016/10/25)
+ </li>
+
+
  <li> New: Add ArpackSolver::set_shift() to set the shift value in spectral
  transformation.
  <br>
