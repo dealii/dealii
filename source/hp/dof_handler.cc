@@ -1995,43 +1995,6 @@ namespace hp
 
 
   template<int dim, int spacedim>
-  template<typename number>
-  types::global_dof_index
-  DoFHandler<dim,spacedim>::n_boundary_dofs (const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_ids) const
-  {
-    Assert (finite_elements != 0, ExcNoFESelected());
-    Assert (boundary_ids.find(numbers::internal_face_boundary_id) == boundary_ids.end(),
-            ExcInvalidBoundaryIndicator());
-
-    // same as above, but with
-    // additional checks for set of
-    // boundary indicators
-    std::set<types::global_dof_index> boundary_dofs;
-    std::vector<types::global_dof_index> dofs_on_face;
-    dofs_on_face.reserve (this->get_fe ().max_dofs_per_face());
-
-    typename HpDoFHandler<dim,spacedim>::active_cell_iterator cell = this->begin_active (),
-                                                              endc = this->end();
-    for (; cell!=endc; ++cell)
-      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-        if (cell->at_boundary(f) &&
-            (boundary_ids.find(cell->face(f)->boundary_id()) !=
-             boundary_ids.end()))
-          {
-            const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
-            dofs_on_face.resize (dofs_per_face);
-
-            cell->face(f)->get_dof_indices (dofs_on_face,
-                                            cell->active_fe_index());
-            for (unsigned int i=0; i<dofs_per_face; ++i)
-              boundary_dofs.insert(dofs_on_face[i]);
-          }
-    return boundary_dofs.size();
-  }
-
-
-
-  template<int dim, int spacedim>
   types::global_dof_index
   DoFHandler<dim,spacedim>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_ids) const
   {
