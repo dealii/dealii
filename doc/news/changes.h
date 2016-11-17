@@ -38,6 +38,13 @@ inconvenience this causes.
 </p>
 
 <ol>
+ <li> Changed: VectorTools::create_right_hand_side and
+ VectorTools::create_boundary_right_hand_side now take an additional template
+ parameter VectorType.
+ <br>
+ (Daniel Arndt, 2016/10/25)
+ </li>
+
  <li> Deprecated: ParameterHandler::read_input,
  ParameterHandler::read_input_from_xml, and
  ParameterHandler::read_input_from_string are now deprecated in favor of
@@ -495,7 +502,7 @@ inconvenience this causes.
  (Rajat Arora, 2016/10/29)
  </li>
 
-<li> New: Add MatrixFreeOperators::MassOperator representing a mass matrix.
+ <li> New: Add MatrixFreeOperators::MassOperator representing a mass matrix.
  <br>
  (Daniel Arndt, 2016/10/27)
  </li>
@@ -513,6 +520,12 @@ inconvenience this causes.
  the default (and previous) selection of a point-Jacobi preconditioner.
  <br>
  (Martin Kronbichler, 2016/10/27)
+ </li>
+
+ <li> >New: VectorTools::create_right_hand_side can be used for parallel
+ Triangulations and homogeneous constraints using a ConstraintMatrix.
+ <br>
+ (Daniel Arndt, 2016/10/25)
  </li>
 
  <li> Fixed: GridIn::read_vtk() had off-by-one errors in reading face
