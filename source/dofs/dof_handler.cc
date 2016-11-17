@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2015 by the deal.II authors
+// Copyright (C) 1998 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1009,49 +1009,14 @@ types::global_dof_index DoFHandler<dim,spacedim>::n_boundary_dofs () const
 
 
 
-template<int dim, int spacedim>
-template<typename number>
-types::global_dof_index
-DoFHandler<dim,spacedim>::n_boundary_dofs (const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_ids) const
-{
-  Assert (boundary_ids.find(numbers::internal_face_boundary_id) == boundary_ids.end(),
-          ExcInvalidBoundaryIndicator());
-
-  std::set<types::global_dof_index> boundary_dofs;
-
-  const unsigned int dofs_per_face = get_fe().dofs_per_face;
-  std::vector<types::global_dof_index> dofs_on_face(dofs_per_face);
-
-  // same as in the previous
-  // function, but with an additional
-  // check for the boundary indicator
-  active_cell_iterator cell = begin_active (),
-                       endc = end();
-  for (; cell!=endc; ++cell)
-    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-      if (cell->at_boundary(f)
-          &&
-          (boundary_ids.find(cell->face(f)->boundary_id()) !=
-           boundary_ids.end()))
-        {
-          cell->face(f)->get_dof_indices (dofs_on_face);
-          for (unsigned int i=0; i<dofs_per_face; ++i)
-            boundary_dofs.insert(dofs_on_face[i]);
-        }
-
-  return boundary_dofs.size();
-}
-
-
-
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 types::global_dof_index
 DoFHandler<dim,spacedim>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_ids) const
 {
   Assert (boundary_ids.find (numbers::internal_face_boundary_id) == boundary_ids.end(),
           ExcInvalidBoundaryIndicator());
 
-  std::set<int> boundary_dofs;
+  std::set<types::global_dof_index> boundary_dofs;
 
   const unsigned int dofs_per_face = get_fe().dofs_per_face;
   std::vector<types::global_dof_index> dofs_on_face(dofs_per_face);
