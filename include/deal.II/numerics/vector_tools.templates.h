@@ -896,19 +896,19 @@ namespace VectorTools
 
 
     /*
-     * Generic implementation for project using a MatrixFree implementation
-     * with arbitrary number of components and degree of the FiniteElement.
+     * MatrixFree implementation of project() for an arbitrary number of
+     * components and arbitrary degree of the FiniteElement.
      */
     template <int components, int fe_degree, int dim, typename VectorType, int spacedim>
-    void project_generic (const Mapping<dim, spacedim>                              &mapping,
-                          const DoFHandler<dim, spacedim>                           &dof,
-                          const ConstraintMatrix                                    &constraints,
-                          const Quadrature<dim>                                     &quadrature,
-                          const Function<spacedim, typename VectorType::value_type> &function,
-                          VectorType                                                &vec_result,
-                          const bool                                                 enforce_zero_boundary,
-                          const Quadrature<dim-1>                                   &q_boundary,
-                          const bool                                                 project_to_boundary_first)
+    void project_matrix_free (const Mapping<dim, spacedim>                              &mapping,
+                              const DoFHandler<dim, spacedim>                           &dof,
+                              const ConstraintMatrix                                    &constraints,
+                              const Quadrature<dim>                                     &quadrature,
+                              const Function<spacedim, typename VectorType::value_type> &function,
+                              VectorType                                                &vec_result,
+                              const bool                                                 enforce_zero_boundary,
+                              const Quadrature<dim-1>                                   &q_boundary,
+                              const bool                                                 project_to_boundary_first)
     {
       Assert (project_to_boundary_first == false, ExcNotImplemented());
       Assert (enforce_zero_boundary == false, ExcNotImplemented());
@@ -981,72 +981,73 @@ namespace VectorTools
 
     /**
       * Helper interface. After figuring out the number of components
-      * in project_parallel, we determine the degree of the FiniteElement
-      * and call project_generic with the appropriate template arguments.
+      * in project_matrix_free_component, we determine the degree of the
+      * FiniteElement and call project_matrix_free with the appropriate
+      * template arguments.
       */
     template <int components, int dim, typename VectorType, int spacedim>
-    void project_parallel_helper (const Mapping<dim, spacedim>                              &mapping,
-                                  const DoFHandler<dim, spacedim>                           &dof,
-                                  const ConstraintMatrix                                    &constraints,
-                                  const Quadrature<dim>                                     &quadrature,
-                                  const Function<spacedim, typename VectorType::value_type> &function,
-                                  VectorType                                                &vec_result,
-                                  const bool                                                 enforce_zero_boundary,
-                                  const Quadrature<dim-1>                                   &q_boundary,
-                                  const bool                                                 project_to_boundary_first)
+    void project_matrix_free_degree (const Mapping<dim, spacedim>                              &mapping,
+                                     const DoFHandler<dim, spacedim>                           &dof,
+                                     const ConstraintMatrix                                    &constraints,
+                                     const Quadrature<dim>                                     &quadrature,
+                                     const Function<spacedim, typename VectorType::value_type> &function,
+                                     VectorType                                                &vec_result,
+                                     const bool                                                 enforce_zero_boundary,
+                                     const Quadrature<dim-1>                                   &q_boundary,
+                                     const bool                                                 project_to_boundary_first)
     {
       switch (dof.get_fe().degree)
         {
         case 1:
-          dealii::VectorTools::project_generic<components, 1>
+          VectorTools::project_matrix_free<components, 1>
           (mapping, dof, constraints, quadrature, function, vec_result,
            enforce_zero_boundary, q_boundary, project_to_boundary_first);
           break;
 
         case 2:
-          dealii::VectorTools::project_generic<components, 2>
+          VectorTools::project_matrix_free<components, 2>
           (mapping, dof, constraints, quadrature, function, vec_result,
            enforce_zero_boundary, q_boundary, project_to_boundary_first);
           break;
 
         case 3:
-          dealii::VectorTools::project_generic<components, 3>
+          VectorTools::project_matrix_free<components, 3>
           (mapping, dof, constraints, quadrature, function, vec_result,
            enforce_zero_boundary, q_boundary, project_to_boundary_first);
           break;
 
         case 4:
-          dealii::VectorTools::project_generic<components, 4>
+          project_matrix_free<components, 4>
           (mapping, dof, constraints, quadrature, function, vec_result,
            enforce_zero_boundary, q_boundary, project_to_boundary_first);
           break;
 
         case 5:
-          dealii::VectorTools::project_generic<components, 5>
+          project_matrix_free<components, 5>
           (mapping, dof, constraints, quadrature, function, vec_result,
            enforce_zero_boundary, q_boundary, project_to_boundary_first);
           break;
 
         case 6:
-          dealii::VectorTools::project_generic<components, 6>
+          project_matrix_free<components, 6>
           (mapping, dof, constraints, quadrature, function, vec_result,
            enforce_zero_boundary, q_boundary, project_to_boundary_first);
           break;
 
         case 7:
-          dealii::VectorTools::project_generic<components, 7>
+          project_matrix_free<components, 7>
           (mapping, dof, constraints, quadrature, function, vec_result,
            enforce_zero_boundary, q_boundary, project_to_boundary_first);
           break;
 
         case 8:
-          dealii::VectorTools::project_generic<components, 8>
+          project_matrix_free<components, 8>
           (mapping, dof, constraints, quadrature, function, vec_result,
            enforce_zero_boundary, q_boundary, project_to_boundary_first);
           break;
 
         default:
-          Assert(false, ExcNotImplemented());
+          Assert(false, ExcInternalError());
         }
     }
 
@@ -1055,59 +1056,64 @@ namespace VectorTools
     // Helper interface for the matrix-free implementation of project().
     // Used to determine the number of components.
     template <int dim, typename VectorType, int spacedim>
-    void project_parallel (const Mapping<dim, spacedim>           &mapping,
-                           const DoFHandler<dim,spacedim>         &dof,
-                           const ConstraintMatrix                 &constraints,
-                           const Quadrature<dim>                  &quadrature,
-                           const Function<spacedim, typename VectorType::value_type> &function,
-                           VectorType                             &vec_result,
-                           const bool                             enforce_zero_boundary,
-                           const Quadrature<dim-1>                &q_boundary,
-                           const bool                             project_to_boundary_first)
+    void project_matrix_free_component (const Mapping<dim, spacedim>           &mapping,
+                                        const DoFHandler<dim,spacedim>         &dof,
+                                        const ConstraintMatrix                 &constraints,
+                                        const Quadrature<dim>                  &quadrature,
+                                        const Function<spacedim, typename VectorType::value_type> &function,
+                                        VectorType                             &vec_result,
+                                        const bool                             enforce_zero_boundary,
+                                        const Quadrature<dim-1>                &q_boundary,
+                                        const bool                             project_to_boundary_first)
     {
       switch (dof.get_fe().n_components())
         {
         case 1:
-          project_parallel_helper<1>
+          project_matrix_free_degree<1>
           (mapping, dof, constraints, quadrature, function, vec_result,
            enforce_zero_boundary, q_boundary, project_to_boundary_first);
           break;
 
         case 2:
-          project_parallel_helper<2>
+          project_matrix_free_degree<2>
           (mapping, dof, constraints, quadrature, function, vec_result,
            enforce_zero_boundary, q_boundary, project_to_boundary_first);
           break;
 
         case 3:
-          project_parallel_helper<3>
+          project_matrix_free_degree<3>
           (mapping, dof, constraints, quadrature, function, vec_result,
            enforce_zero_boundary, q_boundary, project_to_boundary_first);
           break;
 
         case 4:
-          project_parallel_helper<4>
+          project_matrix_free_degree<4>
           (mapping, dof, constraints, quadrature, function, vec_result,
            enforce_zero_boundary, q_boundary, project_to_boundary_first);
           break;
 
         default:
-          Assert(false, ExcNotImplemented());
+          Assert(false, ExcInternalError());
         }
     }
 
 
 
-    template <int dim, typename VectorType>
-    void project_matrix_free (const Mapping<dim>            &mapping,
-                              const DoFHandler<dim>         &dof,
-                              const ConstraintMatrix        &constraints,
-                              const Quadrature<dim>         &quadrature,
-                              const Function<dim, typename VectorType::value_type> &function,
-                              VectorType                    &vec_result,
-                              const bool                    enforce_zero_boundary,
-                              const Quadrature<dim-1>       &q_boundary,
-                              const bool                    project_to_boundary_first)
+    /**
+     * Specialization of project() for the case dim==spacedim.
+     * Check if we can use the MatrixFree implementation or need
+     * to use the matrix based one.
+     */
+    template <typename VectorType, int dim>
+    void project (const Mapping<dim>            &mapping,
+                  const DoFHandler<dim>         &dof,
+                  const ConstraintMatrix        &constraints,
+                  const Quadrature<dim>         &quadrature,
+                  const Function<dim, typename VectorType::value_type> &function,
+                  VectorType                    &vec_result,
+                  const bool                    enforce_zero_boundary,
+                  const Quadrature<dim-1>       &q_boundary,
+                  const bool                    project_to_boundary_first)
     {
       // If we can, use the matrix-free implementation
       bool use_matrix_free = true;
@@ -1118,9 +1124,10 @@ namespace VectorTools
       else
         {
           // Find out if the FiniteElement is supported
-          // This is copied from matrix_free/shape_info.templates.h
+          // This is based on matrix_free/shape_info.templates.h
           // and matrix_free/matrix_free.templates.h
-          if (dof.get_fe().degree==0 || dof.get_fe().n_base_elements()!=1)
+          if (dof.get_fe().degree==0 || dof.get_fe().n_base_elements()!=1
+              || dof.get_fe().degree>8 || dof.get_fe().n_components()>4)
             use_matrix_free = false;
           else
             {
@@ -1139,10 +1146,10 @@ namespace VectorTools
         }
 
       if (use_matrix_free)
-        project_parallel (mapping, dof, constraints, quadrature,
-                          function, vec_result,
-                          enforce_zero_boundary, q_boundary,
-                          project_to_boundary_first);
+        project_matrix_free_component (mapping, dof, constraints, quadrature,
+                                       function, vec_result,
+                                       enforce_zero_boundary, q_boundary,
+                                       project_to_boundary_first);
       else
         {
           Assert((dynamic_cast<const parallel::Triangulation<dim>* > (&(dof.get_triangulation()))==0),
@@ -1453,7 +1460,7 @@ namespace VectorTools
           = dynamic_cast<const Function<dim, typename VectorType::value_type>*> (&function);
         Assert (mapping_ptr!=0, ExcInternalError());
         Assert (dof_ptr!=0, ExcInternalError());
-        project_matrix_free<dim, VectorType>
+        project<VectorType, dim>
         (*mapping_ptr, *dof_ptr, constraints, quadrature, *function_ptr, vec_result,
          enforce_zero_boundary, q_boundary, project_to_boundary_first);
       }
