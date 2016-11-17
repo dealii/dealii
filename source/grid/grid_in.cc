@@ -126,9 +126,6 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
   std::vector< Point<spacedim> > vertices;
   std::vector< CellData<dim> >   cells;
   SubCellData                    subcelldata;
-  std::map<int, int> cell_indices; // # cell in unv (key) ---> # cell in deal.II (value)
-
-  unsigned int n_vertices;
 
   std::string keyword;
 
@@ -138,7 +135,9 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
   if (keyword == "POINTS")
     {
+      unsigned int n_vertices;
       in >> n_vertices;
+
       in.ignore(256, '\n');//ignoring the number beside the total no. of points.
 
       for (unsigned int vertex = 0; vertex < n_vertices; ++vertex)
@@ -188,14 +187,19 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
               if (type == 8)
                 {
+                  // we assume that the file contains first all cells,
+                  // and only then any faces or lines
+                  AssertThrow (subcelldata.boundary_quads.size() == 0
+                               &&
+                               subcelldata.boundary_lines.size() == 0,
+                               ExcNotImplemented());
+
                   cells.push_back(CellData<dim>());
 
                   for (unsigned int j = 0; j < type; j++) //loop to feed data
                     in >> cells.back().vertices[j];
 
                   cells.back().material_id = 0;
-
-                  cell_indices[count] = count;
                 }
 
               else if ( type == 4)
@@ -223,14 +227,17 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
               if (type == 4)
                 {
+                  // we assume that the file contains first all cells,
+                  // and only then any faces
+                  AssertThrow (subcelldata.boundary_lines.size() == 0,
+                               ExcNotImplemented());
+
                   cells.push_back(CellData<dim>());
 
                   for (unsigned int j = 0; j < type; j++) //loop to feed data
                     in >> cells.back().vertices[j];
 
                   cells.back().material_id = 0;
-
-                  cell_indices[count] = count;
                 }
 
               else if (type == 2)
@@ -319,16 +326,20 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                                        textnew[i] + "> section"));
             }
 
-          for (unsigned int i = 0; i < cells.size(); i++) //assigning IDs to cells.
+          // read material ids first for all cells, then for all
+          // faces. the assumption that cells come before all faces
+          // has been verified above via an assertion, so the order
+          // used in the following blocks makes sense
+          for (unsigned int i = 0; i < cells.size(); i++)
             {
               double id;
               in >> id;
-              cells[cell_indices[i]].material_id = id;
+              cells[i].material_id = id;
             }
 
           if (dim == 3)
             {
-              for (unsigned int i = 0; i < subcelldata.boundary_quads.size(); i++) //assigning IDs to bounds.
+              for (unsigned int i = 0; i < subcelldata.boundary_quads.size(); i++)
                 {
                   double id;
                   in >> id;
@@ -337,7 +348,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
             }
           else if (dim == 2)
             {
-              for (unsigned int i = 0; i < subcelldata.boundary_lines.size(); i++) //assigning IDs to bounds.
+              for (unsigned int i = 0; i < subcelldata.boundary_lines.size(); i++)
                 {
                   double id;
                   in >> id;
