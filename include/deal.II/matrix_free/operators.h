@@ -246,6 +246,86 @@ namespace MatrixFreeOperators
 
 
   /**
+   * Auxiliary class to provide interface vmult/Tvmult methods required in
+   * adaptive geometric multgrids. @p OperatorType class should be derived
+   * from MatrixFreeOperators::Base class.
+   *
+   * The adaptive multigrid realization in deal.II implements an approach
+   * called local smoothing. This means that the smoothing on the finest level
+   * only covers the local part of the mesh defined by the fixed (finest) grid
+   * level and ignores parts of the computational domain where the terminal
+   * cells are coarser than this level. As the method progresses to coarser
+   * levels, more and more of the global mesh will be covered. At some coarser
+   * level, the whole mesh will be covered. Since all level matrices in the
+   * multigrid method cover a single level in the mesh, no hanging nodes
+   * appear on the level matrices. At the interface between multigrid levels,
+   * homogeneous Dirichlet boundary conditions are set while smoothing. When
+   * the residual is transferred to the next coarser level, however, the
+   * coupling over the multigrid interface needs to be taken into account.
+   * This is done by the so-called interface (or edge) matrices that compute
+   * the part of the residual that is missed by the level matrix with
+   * homogeneous Dirichlet conditions. We refer to the @ref mg_paper
+   * "Multigrid paper by Janssen and Kanschat" for more details.
+   *
+   * For the implementation of those interface matrices, most infrastructure
+   * is already in place and provided by MatrixFreeOperators::Base through the
+   * two multiplication routines vmult_interface_down() and
+   * vmult_interface_up(). The only thing MGInterfaceOperator does is
+   * wrapping those operations and make them accessible via
+   * @p vmult() and @p Tvmult interface as expected by the multigrid routines
+   * (that were originally written for matrices, hence expecting those names).
+   * Note that the vmult_interface_down is used during the restriction phase of
+   * the multigrid V-cycle, whereas vmult_interface_up is used during the
+   * prolongation phase.
+   *
+   * @author Martin Kronbichler, 2016
+   */
+  template <typename OperatorType>
+  class MGInterfaceOperator : public Subscriptor
+  {
+  public:
+    /**
+     * Number typedef.
+     */
+    typedef typename OperatorType::value_type value_type;
+
+    /**
+     * Default constructor.
+     */
+    MGInterfaceOperator();
+
+    /**
+     * Clear the pointer to the OperatorType object.
+     */
+    void clear();
+
+    /**
+     * Initialize this class with an operator @p operator_in.
+     */
+    void initialize (const OperatorType &operator_in);
+
+    /**
+     * vmult operator, see class description for more info.
+     */
+    void vmult (LinearAlgebra::distributed::Vector<value_type> &dst,
+                const LinearAlgebra::distributed::Vector<value_type> &src) const;
+
+    /**
+     * Tvmult operator, see class description for more info.
+     */
+    void Tvmult (LinearAlgebra::distributed::Vector<value_type> &dst,
+                 const LinearAlgebra::distributed::Vector<value_type> &src) const;
+
+  private:
+    /**
+     * Const pointer to the operator class.
+     */
+    SmartPointer<const OperatorType> mf_base_operator;
+  };
+
+
+
+  /**
    * This class implements the operation of the action of the inverse of a
    * mass matrix on an element for the special case of an evaluation object
    * with as many quadrature points as there are cell degrees of freedom. It
@@ -961,6 +1041,62 @@ namespace MatrixFreeOperators
            inverse_diagonal_entries->m() > 0, ExcNotInitialized());
     inverse_diagonal_entries->vmult(dst,src);
     dst *= omega;
+  }
+
+
+
+  //------------------------- MGInterfaceOperator ------------------------------
+
+  template <typename OperatorType>
+  MGInterfaceOperator<OperatorType>::MGInterfaceOperator ()
+    :
+    Subscriptor(),
+    mf_base_operator(NULL)
+  {
+  }
+
+
+
+  template <typename OperatorType>
+  void
+  MGInterfaceOperator<OperatorType>::clear ()
+  {
+    mf_base_operator = NULL;
+  }
+
+
+
+  template <typename OperatorType>
+  void
+  MGInterfaceOperator<OperatorType>::initialize (const OperatorType &operator_in)
+  {
+    mf_base_operator = &operator_in;
+  }
+
+
+
+  template <typename OperatorType>
+  void
+  MGInterfaceOperator<OperatorType>::vmult (LinearAlgebra::distributed::Vector<typename MGInterfaceOperator<OperatorType>::value_type> &dst,
+                                            const LinearAlgebra::distributed::Vector<typename MGInterfaceOperator<OperatorType>::value_type> &src) const
+  {
+    Assert(mf_base_operator != NULL,
+           ExcNotInitialized());
+
+    mf_base_operator->vmult_interface_down(dst, src);
+  }
+
+
+
+  template <typename OperatorType>
+  void
+  MGInterfaceOperator<OperatorType>::Tvmult (LinearAlgebra::distributed::Vector<typename MGInterfaceOperator<OperatorType>::value_type> &dst,
+                                             const LinearAlgebra::distributed::Vector<typename MGInterfaceOperator<OperatorType>::value_type> &src) const
+  {
+    Assert(mf_base_operator != NULL,
+           ExcNotInitialized());
+
+    mf_base_operator->vmult_interface_up(dst, src);
   }
 
 
