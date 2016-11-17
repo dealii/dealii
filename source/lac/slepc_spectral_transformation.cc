@@ -33,7 +33,7 @@ namespace SLEPcWrappers
 {
   TransformationBase::TransformationBase (const MPI_Comm &mpi_communicator)
   {
-    int ierr = STCreate(mpi_communicator, &st);
+    const int ierr = STCreate(mpi_communicator, &st);
     AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
   }
 
@@ -41,14 +41,14 @@ namespace SLEPcWrappers
   {
     if (st!=NULL)
       {
-        int ierr = STDestroy(&st);
+        const int ierr = STDestroy(&st);
         AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
       }
   }
 
   void TransformationBase::set_matrix_mode(const STMatMode mode)
   {
-    int ierr = STSetMatMode(st,mode);
+    const int ierr = STSetMatMode(st,mode);
     AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
   }
 

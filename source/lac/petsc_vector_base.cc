@@ -1178,9 +1178,8 @@ namespace PETScWrappers
 #endif
 
         const InsertMode mode = (add_values ? ADD_VALUES : INSERT_VALUES);
-        const int ierr
-          = VecSetValues (vector, n_elements, petsc_indices, values,
-                          mode);
+        const int ierr = VecSetValues (vector, n_elements, petsc_indices,
+                                       values, mode);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
       }
 

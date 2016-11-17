@@ -310,12 +310,10 @@ namespace PETScWrappers
     // completely pointless change in
     // spelling Chebyshev between PETSc 3.2
     // and 3.3...
-    int ierr;
-
 #if DEAL_II_PETSC_VERSION_LT(3,3,0)
-    ierr = KSPSetType (ksp, KSPCHEBYCHEV);
+    int ierr = KSPSetType (ksp, KSPCHEBYCHEV);
 #else
-    ierr = KSPSetType (ksp, KSPCHEBYSHEV);
+    int ierr = KSPSetType (ksp, KSPCHEBYSHEV);
 #endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -340,8 +338,7 @@ namespace PETScWrappers
   void
   SolverCG::set_solver_type (KSP &ksp) const
   {
-    int ierr;
-    ierr = KSPSetType (ksp, KSPCG);
+    int ierr = KSPSetType (ksp, KSPCG);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
@@ -365,8 +362,7 @@ namespace PETScWrappers
   void
   SolverBiCG::set_solver_type (KSP &ksp) const
   {
-    int ierr;
-    ierr = KSPSetType (ksp, KSPBICG);
+    int ierr = KSPSetType (ksp, KSPBICG);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
@@ -400,8 +396,7 @@ namespace PETScWrappers
   void
   SolverGMRES::set_solver_type (KSP &ksp) const
   {
-    int ierr;
-    ierr = KSPSetType (ksp, KSPGMRES);
+    int ierr = KSPSetType (ksp, KSPGMRES);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // set the restart parameter from the
@@ -467,8 +462,7 @@ namespace PETScWrappers
   void
   SolverBicgstab::set_solver_type (KSP &ksp) const
   {
-    int ierr;
-    ierr = KSPSetType (ksp, KSPBCGS);
+    int ierr = KSPSetType (ksp, KSPBCGS);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
@@ -492,8 +486,7 @@ namespace PETScWrappers
   void
   SolverCGS::set_solver_type (KSP &ksp) const
   {
-    int ierr;
-    ierr = KSPSetType (ksp, KSPCGS);
+    int ierr = KSPSetType (ksp, KSPCGS);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
@@ -542,8 +535,7 @@ namespace PETScWrappers
   void
   SolverTCQMR::set_solver_type (KSP &ksp) const
   {
-    int ierr;
-    ierr = KSPSetType (ksp, KSPTCQMR);
+    int ierr = KSPSetType (ksp, KSPTCQMR);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
@@ -592,8 +584,7 @@ namespace PETScWrappers
   void
   SolverLSQR::set_solver_type (KSP &ksp) const
   {
-    int ierr;
-    ierr = KSPSetType (ksp, KSPLSQR);
+    int ierr = KSPSetType (ksp, KSPLSQR);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
@@ -664,8 +655,7 @@ namespace PETScWrappers
     * preconditioner.  Its use is due to SparseDirectMUMPS being a direct
     * (rather than iterative) solver
     */
-    int ierr;
-    ierr = KSPSetType (ksp, KSPPREONLY);
+    int ierr = KSPSetType (ksp, KSPPREONLY);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     /**
