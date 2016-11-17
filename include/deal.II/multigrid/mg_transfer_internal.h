@@ -17,9 +17,11 @@
 #ifndef dealii__mg_transfer_internal_h
 #define dealii__mg_transfer_internal_h
 
+#include <deal.II/base/mg_level_object.h>
 #include <deal.II/dofs/dof_handler.h>
+#include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/multigrid/mg_constrained_dofs.h>
-
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -38,6 +40,76 @@ namespace internal
                            std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &copy_indices,
                            std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &copy_indices_global_mine,
                            std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &copy_indices_level_mine);
+
+
+
+    /**
+     * Given the collection of child cells in lexicographic ordering as seen
+     * from the parent, this function computes the first index of the given
+     * child
+     */
+    template <int dim>
+    unsigned int
+    compute_shift_within_children(const unsigned int child,
+                                  const unsigned int fe_shift_1d,
+                                  const unsigned int fe_degree);
+
+    /**
+     * Stores data related to the finite element contained in the
+     * DoFHandler. Used only for the initialization using
+     * <tt>setup_transfer</tt>.
+     */
+    template <typename Number>
+    struct ElementInfo
+    {
+
+      /**
+       * Stores the degree of the finite element. The selection of the
+       * computational kernel is based on this number.
+       */
+      unsigned int fe_degree;
+
+      /**
+       * Stores whether the element is continuous and there is a joint degree of
+       * freedom in the center of the 1D line.
+       */
+      bool element_is_continuous;
+
+      /**
+       * Stores the number of components in the finite element.
+       */
+      unsigned int n_components;
+
+      /**
+       * Stores the number of degrees of freedom on all child cells. It is
+       * <tt>2<sup>dim</sup>*fe.dofs_per_cell</tt> for DG elements and somewhat
+       * less for continuous elements.
+       */
+      unsigned int n_child_cell_dofs;
+
+      /**
+       * Holds the one-dimensional embedding (prolongation) matrix from mother
+       * element to the children.
+       */
+      internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
+
+    };
+
+    /**
+     * Sets up most of the internal data structures of MGTransferMatrixFree
+     */
+    template <int dim, typename Number>
+    void setup_transfer(const dealii::DoFHandler<dim>                                       &mg_dof,
+                        const MGConstrainedDoFs                                             *mg_constrained_dofs,
+                        ElementInfo<Number>                                                 &elem_info,
+                        std::vector<std::vector<unsigned int> >                             &level_dof_indices,
+                        std::vector<std::vector<std::pair<unsigned int,unsigned int> > >    &parent_child_connect,
+                        std::vector<unsigned int>                                           &n_owned_level_cells,
+                        std::vector<std::vector<std::vector<unsigned short> > >             &dirichlet_indices,
+                        std::vector<AlignedVector<VectorizedArray<Number> > >               &weights_on_refined,
+                        std::vector<std::vector<std::pair<unsigned int, unsigned int> > >   &copy_indices_global_mine,
+                        MGLevelObject<LinearAlgebra::distributed::Vector<Number> >          &ghosted_level_vector);
+
   }
 }
 
