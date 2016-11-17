@@ -561,11 +561,13 @@ namespace PETScWrappers
     assert_is_compressed ();
 
     // Set options
-    PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
-                          format);
+    int ierr = PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
+                                     format);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // Write to screen
-    MatView (matrix, PETSC_VIEWER_STDOUT_WORLD);
+    ierr = MatView (matrix, PETSC_VIEWER_STDOUT_WORLD);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
   void
@@ -603,7 +605,8 @@ namespace PETScWrappers
   MatrixBase::memory_consumption() const
   {
     MatInfo info;
-    MatGetInfo(matrix, MAT_LOCAL, &info);
+    const int ierr = MatGetInfo(matrix, MAT_LOCAL, &info);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return sizeof(*this) + static_cast<size_type>(info.memory);
   }

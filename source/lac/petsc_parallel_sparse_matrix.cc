@@ -660,10 +660,11 @@ namespace PETScWrappers
             for (size_type i=local_row_start; i<local_row_end; ++i)
               {
                 PetscInt petsc_i = i;
-                MatSetValues (matrix, 1, &petsc_i,
-                              sparsity_pattern.row_length(i),
-                              &colnums_in_window[rowstart_in_window[i-local_row_start]],
-                              &values[0], INSERT_VALUES);
+                ierr = MatSetValues (matrix, 1, &petsc_i,
+                                     sparsity_pattern.row_length(i),
+                                     &colnums_in_window[rowstart_in_window[i-local_row_start]],
+                                     &values[0], INSERT_VALUES);
+                AssertThrow (ierr == 0, ExcPETScError(ierr));
               }
           }
 

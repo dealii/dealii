@@ -1052,11 +1052,13 @@ namespace PETScWrappers
     //TODO[TH]:assert(is_compressed())
 
     // Set options
-    PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
-                          format);
+    int ierr = PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
+                                     format);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // Write to screen
-    VecView (vector, PETSC_VIEWER_STDOUT_WORLD);
+    ierr = VecView (vector, PETSC_VIEWER_STDOUT_WORLD);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
 

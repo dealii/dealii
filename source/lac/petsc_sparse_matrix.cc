@@ -129,7 +129,8 @@ namespace PETScWrappers
   SparseMatrix::get_mpi_communicator () const
   {
     static MPI_Comm comm;
-    PetscObjectGetComm((PetscObject)matrix, &comm);
+    const int ierr = PetscObjectGetComm((PetscObject)matrix, &comm);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
     return comm;
   }
 
@@ -229,9 +230,10 @@ namespace PETScWrappers
               row_entries[j] = sparsity_pattern.column_number (i,j);
 
             const PetscInt int_row = i;
-            MatSetValues (matrix, 1, &int_row,
-                          row_lengths[i], &row_entries[0],
-                          &row_values[0], INSERT_VALUES);
+            const int ierr = MatSetValues (matrix, 1, &int_row,
+                                           row_lengths[i], &row_entries[0],
+                                           &row_values[0], INSERT_VALUES);
+            AssertThrow (ierr == 0, ExcPETScError(ierr));
           }
         compress (VectorOperation::insert);
 
