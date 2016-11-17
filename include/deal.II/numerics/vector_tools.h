@@ -934,33 +934,6 @@ namespace VectorTools
                 VectorType &vec_result);
 
   /**
-   * Implementation for the project() function with finite elements
-   * are supported by the MatrixFree class for arbitrary number of
-   * components and degree of the FiniteElement.
-   *
-   * This function should be used if you have more than four components
-   * or the degree of your FiniteElement is higher than eight. For all the
-   * other cases project() is already instantiated.
-   *
-   * The first two template arguments have to be specified explicitly.
-   * @p vec_result is expected to not have any ghost entries.
-   * @p project_to_boundary_first and @p enforce_zero_boundary are not yet
-   * implemented.
-   */
-  template <int components, int fe_degree, int dim, typename VectorType, int spacedim>
-  void project_generic (const Mapping<dim, spacedim>                              &mapping,
-                        const DoFHandler<dim, spacedim>                           &dof,
-                        const ConstraintMatrix                                    &constraints,
-                        const Quadrature<dim>                                     &quadrature,
-                        const Function<spacedim, typename VectorType::value_type> &function,
-                        VectorType                                                &vec_result,
-                        const bool                                                 enforce_zero_boundary = false,
-                        const Quadrature<dim-1>                                   &q_boundary = (dim > 1 ?
-                            QGauss<dim-1>(2) :
-                            Quadrature<dim-1>(0)),
-                        const bool                      project_to_boundary_first = false);
-
-  /**
    * Compute Dirichlet boundary conditions.  This function makes up a map of
    * degrees of freedom subject to Dirichlet boundary conditions and the
    * corresponding values to be assigned to them, by interpolation around the

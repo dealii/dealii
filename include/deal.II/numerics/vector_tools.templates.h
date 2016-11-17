@@ -895,14 +895,98 @@ namespace VectorTools
 
 
 
-    /**
-     * Helper interface. After figuring out the number of components
-     * in project_parallel, we determine the degree of the FiniteElement
-     * and call project_generic with the appropriate template arguments.
+    /*
+     * Generic implementation for project using a MatrixFree implementation
+     * with arbitrary number of components and degree of the FiniteElement.
      */
+    template <int components, int fe_degree, int dim, typename VectorType, int spacedim>
+    void project_generic (const Mapping<dim, spacedim>                              &mapping,
+                          const DoFHandler<dim, spacedim>                           &dof,
+                          const ConstraintMatrix                                    &constraints,
+                          const Quadrature<dim>                                     &quadrature,
+                          const Function<spacedim, typename VectorType::value_type> &function,
+                          VectorType                                                &vec_result,
+                          const bool                                                 enforce_zero_boundary,
+                          const Quadrature<dim-1>                                   &q_boundary,
+                          const bool                                                 project_to_boundary_first)
+    {
+      Assert (project_to_boundary_first == false, ExcNotImplemented());
+      Assert (enforce_zero_boundary == false, ExcNotImplemented());
+      (void) enforce_zero_boundary;
+      (void) project_to_boundary_first;
+      (void) q_boundary;
+
+      const IndexSet locally_owned_dofs = dof.locally_owned_dofs();
+      IndexSet locally_relevant_dofs;
+      DoFTools::extract_locally_relevant_dofs(dof, locally_relevant_dofs);
+
+      typedef typename VectorType::value_type number;
+      Assert (dof.get_fe().n_components() == function.n_components,
+              ExcDimensionMismatch(dof.get_fe().n_components(),
+                                   function.n_components));
+      Assert (vec_result.size() == dof.n_dofs(),
+              ExcDimensionMismatch (vec_result.size(), dof.n_dofs()));
+      Assert (dof.get_fe().degree == fe_degree,
+              ExcDimensionMismatch(fe_degree, dof.get_fe().degree));
+      Assert (dof.get_fe().n_components() == components,
+              ExcDimensionMismatch(components, dof.get_fe().n_components()));
+
+      // set up mass matrix and right hand side
+      typename MatrixFree<dim,number>::AdditionalData additional_data;
+      additional_data.tasks_parallel_scheme =
+        MatrixFree<dim,number>::AdditionalData::partition_color;
+      if (const parallel::Triangulation<dim,spacedim> *parallel_tria =
+            dynamic_cast<const parallel::Triangulation<dim,spacedim>*>(&dof.get_tria()))
+        additional_data.mpi_communicator = parallel_tria->get_communicator();
+      additional_data.mapping_update_flags = (update_values | update_JxW_values);
+      MatrixFree<dim, number> matrix_free;
+      matrix_free.reinit (mapping, dof, constraints,
+                          QGauss<1>(fe_degree+2), additional_data);
+      typedef MatrixFreeOperators::MassOperator<dim, fe_degree, fe_degree+2, components, number> MatrixType;
+      MatrixType mass_matrix;
+      mass_matrix.initialize(matrix_free);
+      mass_matrix.compute_diagonal();
+
+      typedef LinearAlgebra::distributed::Vector<number> LocalVectorType;
+      LocalVectorType vec, rhs, inhomogeneities;
+      matrix_free.initialize_dof_vector(vec);
+      matrix_free.initialize_dof_vector(rhs);
+      matrix_free.initialize_dof_vector(inhomogeneities);
+      constraints.distribute(inhomogeneities);
+      inhomogeneities*=-1.;
+
+      create_right_hand_side (mapping, dof, quadrature, function, rhs, constraints);
+      mass_matrix.vmult_add(rhs, inhomogeneities);
+
+      // now invert the matrix
+      // Allow for a maximum of 5*n steps to reduce the residual by 10^-12. n
+      // steps may not be sufficient, since roundoff errors may accumulate for
+      // badly conditioned matrices. This behavior can be observed, e.g. for
+      // FE_Q_Hierarchical for degree higher than three.
+      ReductionControl     control(5.*rhs.size(), 0., 1e-12, false, false);
+      SolverCG<LinearAlgebra::distributed::Vector<number> > cg(control);
+      PreconditionJacobi<MatrixType> preconditioner;
+      preconditioner.initialize(mass_matrix, 1.);
+      cg.solve (mass_matrix, vec, rhs, preconditioner);
+      vec+=inhomogeneities;
+
+      constraints.distribute (vec);
+      IndexSet::ElementIterator it = locally_owned_dofs.begin();
+      for (; it!=locally_owned_dofs.end(); ++it)
+        vec_result(*it) = vec(*it);
+      vec_result.compress(VectorOperation::insert);
+    }
+
+
+
+    /**
+      * Helper interface. After figuring out the number of components
+      * in project_parallel, we determine the degree of the FiniteElement
+      * and call project_generic with the appropriate template arguments.
+      */
     template <int components, int dim, typename VectorType, int spacedim>
     void project_parallel_helper (const Mapping<dim, spacedim>                              &mapping,
-                                  const dealii::DoFHandler<dim, spacedim>                           &dof,
+                                  const DoFHandler<dim, spacedim>                           &dof,
                                   const ConstraintMatrix                                    &constraints,
                                   const Quadrature<dim>                                     &quadrature,
                                   const Function<spacedim, typename VectorType::value_type> &function,
@@ -962,9 +1046,7 @@ namespace VectorTools
           break;
 
         default:
-          Assert(false,
-                 ExcMessage("Call project_generic yourself specifying the "
-                            "appropriate template arguments!"));
+          Assert(false, ExcNotImplemented());
         }
     }
 
@@ -974,7 +1056,7 @@ namespace VectorTools
     // Used to determine the number of components.
     template <int dim, typename VectorType, int spacedim>
     void project_parallel (const Mapping<dim, spacedim>           &mapping,
-                           const dealii::DoFHandler<dim,spacedim> &dof,
+                           const DoFHandler<dim,spacedim>         &dof,
                            const ConstraintMatrix                 &constraints,
                            const Quadrature<dim>                  &quadrature,
                            const Function<spacedim, typename VectorType::value_type> &function,
@@ -1010,9 +1092,7 @@ namespace VectorTools
           break;
 
         default:
-          Assert(false,
-                 ExcMessage("Call project_generic yourself specifying the "
-                            "appropriate template arguments!"));
+          Assert(false, ExcNotImplemented());
         }
     }
 
@@ -1020,7 +1100,7 @@ namespace VectorTools
 
     template <int dim, typename VectorType>
     void project_matrix_free (const Mapping<dim>            &mapping,
-                              const dealii::DoFHandler<dim> &dof,
+                              const DoFHandler<dim>         &dof,
                               const ConstraintMatrix        &constraints,
                               const Quadrature<dim>         &quadrature,
                               const Function<dim, typename VectorType::value_type> &function,
@@ -1084,9 +1164,6 @@ namespace VectorTools
                            const std_cxx11::function< typename VectorType::value_type (const typename DoFHandler<dim, spacedim>::active_cell_iterator &, const unsigned int)> func,
                            VectorType                     &vec_result)
     {
-      const parallel::Triangulation<dim,spacedim> *parallel_tria =
-        dynamic_cast<const parallel::Triangulation<dim,spacedim>*>(&dof.get_tria());
-
       typedef typename VectorType::value_type Number;
       Assert (dof.get_fe().n_components() == 1,
               ExcDimensionMismatch(dof.get_fe().n_components(),
@@ -1100,7 +1177,8 @@ namespace VectorTools
       typename MatrixFree<dim,Number>::AdditionalData additional_data;
       additional_data.tasks_parallel_scheme =
         MatrixFree<dim,Number>::AdditionalData::partition_color;
-      if (parallel_tria !=0)
+      if (const parallel::Triangulation<dim,spacedim> *parallel_tria =
+            dynamic_cast<const parallel::Triangulation<dim,spacedim>*>(&dof.get_tria()))
         additional_data.mpi_communicator = parallel_tria->get_communicator();
       additional_data.mapping_update_flags = (update_values | update_JxW_values);
       MatrixFree<dim, Number> matrix_free;
@@ -1352,87 +1430,6 @@ namespace VectorTools
              matrix_free.get_dof_handler().get_fe().degree+1,
              func,
              vec_result);
-  }
-
-
-
-  template <int components, int fe_degree, int dim, typename VectorType, int spacedim>
-  void project_generic (const Mapping<dim, spacedim>                              &mapping,
-                        const DoFHandler<dim, spacedim>                           &dof,
-                        const ConstraintMatrix                                    &constraints,
-                        const Quadrature<dim>                                     &quadrature,
-                        const Function<spacedim, typename VectorType::value_type> &function,
-                        VectorType                                                &vec_result,
-                        const bool                                                 enforce_zero_boundary,
-                        const Quadrature<dim-1>                                   &q_boundary,
-                        const bool                                                 project_to_boundary_first)
-  {
-    const parallel::Triangulation<dim,spacedim> *parallel_tria =
-      dynamic_cast<const parallel::Triangulation<dim,spacedim>*>(&dof.get_tria());
-    Assert (project_to_boundary_first == false, ExcNotImplemented());
-    Assert (enforce_zero_boundary == false, ExcNotImplemented());
-    (void) enforce_zero_boundary;
-    (void) project_to_boundary_first;
-    (void) q_boundary;
-
-    const IndexSet locally_owned_dofs = dof.locally_owned_dofs();
-    IndexSet locally_relevant_dofs;
-    DoFTools::extract_locally_relevant_dofs(dof, locally_relevant_dofs);
-
-    typedef typename VectorType::value_type number;
-    Assert (dof.get_fe().n_components() == function.n_components,
-            ExcDimensionMismatch(dof.get_fe().n_components(),
-                                 function.n_components));
-    Assert (vec_result.size() == dof.n_dofs(),
-            ExcDimensionMismatch (vec_result.size(), dof.n_dofs()));
-    Assert (dof.get_fe().degree == fe_degree,
-            ExcDimensionMismatch(fe_degree, dof.get_fe().degree));
-    Assert (dof.get_fe().n_components() == components,
-            ExcDimensionMismatch(components, dof.get_fe().n_components()));
-
-    // set up mass matrix and right hand side
-    typename MatrixFree<dim,number>::AdditionalData additional_data;
-    additional_data.tasks_parallel_scheme =
-      MatrixFree<dim,number>::AdditionalData::partition_color;
-    if (parallel_tria)
-      additional_data.mpi_communicator = parallel_tria->get_communicator();
-    additional_data.mapping_update_flags = (update_values | update_JxW_values);
-    MatrixFree<dim, number> matrix_free;
-    matrix_free.reinit (mapping, dof, constraints,
-                        QGauss<1>(fe_degree+2), additional_data);
-    typedef MatrixFreeOperators::MassOperator<dim, fe_degree, fe_degree+2, components, number> MatrixType;
-    MatrixType mass_matrix;
-    mass_matrix.initialize(matrix_free);
-    mass_matrix.compute_diagonal();
-
-    typedef LinearAlgebra::distributed::Vector<number> LocalVectorType;
-    LocalVectorType vec, rhs, inhomogeneities;
-    matrix_free.initialize_dof_vector(vec);
-    matrix_free.initialize_dof_vector(rhs);
-    matrix_free.initialize_dof_vector(inhomogeneities);
-    constraints.distribute(inhomogeneities);
-    inhomogeneities*=-1.;
-
-    create_right_hand_side (mapping, dof, quadrature, function, rhs, constraints);
-    mass_matrix.vmult_add(rhs, inhomogeneities);
-
-    // now invert the matrix
-    // Allow for a maximum of 5*n steps to reduce the residual by 10^-12. n
-    // steps may not be sufficient, since roundoff errors may accumulate for
-    // badly conditioned matrices. This behavior can be observed, e.g. for
-    // FE_Q_Hierarchical for degree higher than three.
-    ReductionControl     control(5.*rhs.size(), 0., 1e-12, false, false);
-    SolverCG<LinearAlgebra::distributed::Vector<number> > cg(control);
-    PreconditionJacobi<MatrixType> preconditioner;
-    preconditioner.initialize(mass_matrix, 1.);
-    cg.solve (mass_matrix, vec, rhs, preconditioner);
-    vec+=inhomogeneities;
-
-    constraints.distribute (vec);
-    IndexSet::ElementIterator it = locally_owned_dofs.begin();
-    for (; it!=locally_owned_dofs.end(); ++it)
-      vec_result(*it) = vec(*it);
-    vec_result.compress(VectorOperation::insert);
   }
 
 
