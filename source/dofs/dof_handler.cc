@@ -1017,7 +1017,7 @@ DoFHandler<dim,spacedim>::n_boundary_dofs (const std::map<types::boundary_id, co
   Assert (boundary_ids.find(numbers::internal_face_boundary_id) == boundary_ids.end(),
           ExcInvalidBoundaryIndicator());
 
-  std::set<int> boundary_dofs;
+  std::set<types::global_dof_index> boundary_dofs;
 
   const unsigned int dofs_per_face = get_fe().dofs_per_face;
   std::vector<types::global_dof_index> dofs_on_face(dofs_per_face);
