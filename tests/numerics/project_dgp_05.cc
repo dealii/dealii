@@ -22,9 +22,6 @@
 // convergence, which we have to specify in the last argument to the
 // call below
 
-char logname[] = "output";
-
-
 #include "project_common.h"
 
 
