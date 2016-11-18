@@ -27,8 +27,10 @@ namespace internal
   namespace MGTransfer
   {
     /**
-     * Internal data structure that is used in the MPI communication in fill_and_communicate_copy_indices().
-     * It represents an entry in the copy_indices* map, that associates a level dof index with a global dof index.
+     * Internal data structure that is used in the MPI communication in
+     * fill_and_communicate_copy_indices().  It represents an entry in the
+     * copy_indices* map, that associates a level dof index with a global dof
+     * index.
      */
     struct DoFPair
     {
@@ -55,7 +57,8 @@ namespace internal
 
 
     /**
-     * Internal function for filling the copy indices from global to level indices
+     * Internal function for filling the copy indices from global to level
+     * indices
      */
     template <int dim, int spacedim>
     void fill_copy_indices(const dealii::DoFHandler<dim,spacedim> &mg_dof,
@@ -66,12 +69,12 @@ namespace internal
     {
       // Now we are filling the variables copy_indices*, which are essentially
       // maps from global to mgdof for each level stored as a std::vector of
-      // pairs. We need to split this map on each level depending on the ownership
-      // of the global and mgdof, so that we later not access non-local elements
-      // in copy_to/from_mg.
-      // We keep track in the bitfield dof_touched which global dof has
-      // been processed already (on the current level). This is the same as
-      // the multigrid running in serial.
+      // pairs. We need to split this map on each level depending on the
+      // ownership of the global and mgdof, so that we later not access
+      // non-local elements in copy_to/from_mg.
+      // We keep track in the bitfield dof_touched which global dof has been
+      // processed already (on the current level). This is the same as the
+      // multigrid running in serial.
 
       // map cpu_index -> vector of data
       // that will be copied into copy_indices_level_mine
@@ -108,8 +111,8 @@ namespace internal
                  )
                 continue;
 
-              // get the dof numbers of this cell for the global and the level-wise
-              // numbering
+              // get the dof numbers of this cell for the global and the
+              // level-wise numbering
               level_cell->get_dof_indices (global_dof_indices);
               level_cell->get_mg_dof_indices (level_dof_indices);
 
@@ -160,8 +163,9 @@ namespace internal
         {
           // TODO: Searching the owner for every single DoF becomes quite
           // inefficient. Please fix this, Timo.
-          // The list of neighbors is symmetric (our neighbors have us as a neighbor),
-          // so we can use it to send and to know how many messages we will get.
+          // The list of neighbors is symmetric (our neighbors have us as a
+          // neighbor), so we can use it to send and to know how many messages
+          // we will get.
           std::set<types::subdomain_id> neighbors = tria->level_ghost_owners();
           std::map<int, std::vector<DoFPair> > send_data;
 
@@ -177,8 +181,8 @@ namespace internal
                       break;
                     }
                 }
-              // Is this level dof not owned by any of our neighbors? That
-              // would certainly be a bug!
+              // Is this level dof not owned by any of our neighbors? That would
+              // certainly be a bug!
               Assert(it!=neighbors.end(), ExcMessage("could not find DoF owner."));
             }
 
@@ -190,9 +194,9 @@ namespace internal
                 requests.push_back(MPI_Request());
                 unsigned int dest = *it;
                 std::vector<DoFPair> &data = send_data[dest];
-                // If there is nothing to send, we still need to send a message, because
-                // the receiving end will be waitng. In that case we just send
-                // an empty message.
+                // If there is nothing to send, we still need to send a message,
+                // because the receiving end will be waitng. In that case we
+                // just send an empty message.
                 if (data.size())
                   {
                     const int ierr = MPI_Isend(&data[0], data.size()*sizeof(data[0]),
@@ -265,8 +269,9 @@ namespace internal
         }
 #endif
 
-      // Sort the indices. This will produce more reliable debug output for regression tests
-      // and likely won't hurt performance even in release mode.
+      // Sort the indices. This will produce more reliable debug output for
+      // regression tests and likely won't hurt performance even in release
+      // mode.
       std::less<std::pair<types::global_dof_index, types::global_dof_index> > compare;
       for (unsigned int level=0; level<copy_indices.size(); ++level)
         std::sort(copy_indices[level].begin(), copy_indices[level].end(), compare);
