@@ -43,13 +43,22 @@ namespace LACExceptions
   DeclException0 (ExcDifferentBlockIndices);
 
   /**
-   * An error of a PETSc function was encountered. Check the PETSc
-   * documentation for details.
+   * Exception thrown when a PETSc function reports an error. If possible,
+   * this exception uses the message provided by
+   * <code>PetscErrorMessage</code> to print a description of the error.
+   *
+   * @note For backwards compatibility this is defined whether or not deal.II
+   * is compiled with PETSc.
    */
-  DeclException1 (ExcPETScError,
-                  int,
-                  << "An error with error number " << arg1
-                  << " occurred while calling a PETSc function");
+  class ExcPETScError : public dealii::ExceptionBase
+  {
+  public:
+    ExcPETScError (const int error_code);
+
+    virtual void print_info (std::ostream &out) const;
+
+    const int error_code;
+  };
 
   /**
    * An error of a Trilinos function was encountered. Check the Trilinos

@@ -48,6 +48,7 @@
 #  ifdef DEAL_II_WITH_MPI
 #    include <slepcsys.h>
 #  endif
+#  include <deal.II/lac/slepc_solver.h>
 #endif
 
 #ifdef DEAL_II_WITH_P4EST
@@ -357,10 +358,12 @@ namespace Utilities
 #ifdef DEAL_II_WITH_PETSC
 #  ifdef DEAL_II_WITH_SLEPC
       // Initialize SLEPc (with PETSc):
-      SlepcInitialize(&argc, &argv, PETSC_NULL, PETSC_NULL);
+      ierr = SlepcInitialize(&argc, &argv, PETSC_NULL, PETSC_NULL);
+      AssertThrow (ierr == 0, SLEPcWrappers::SolverBase::ExcSLEPcError(ierr));
 #  else
       // or just initialize PETSc alone:
-      PetscInitialize(&argc, &argv, PETSC_NULL, PETSC_NULL);
+      ierr = PetscInitialize(&argc, &argv, PETSC_NULL, PETSC_NULL);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
 #  endif
 #endif
 

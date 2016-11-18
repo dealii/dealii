@@ -1052,11 +1052,13 @@ namespace PETScWrappers
     //TODO[TH]:assert(is_compressed())
 
     // Set options
-    PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
-                          format);
+    int ierr = PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
+                                     format);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // Write to screen
-    VecView (vector, PETSC_VIEWER_STDOUT_WORLD);
+    ierr = VecView (vector, PETSC_VIEWER_STDOUT_WORLD);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
 
@@ -1178,9 +1180,8 @@ namespace PETScWrappers
 #endif
 
         const InsertMode mode = (add_values ? ADD_VALUES : INSERT_VALUES);
-        const int ierr
-          = VecSetValues (vector, n_elements, petsc_indices, values,
-                          mode);
+        const int ierr = VecSetValues (vector, n_elements, petsc_indices,
+                                       values, mode);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
       }
 

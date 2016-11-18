@@ -163,12 +163,15 @@ namespace PETScWrappers
     void initialize(const PreconditionerBase &preconditioner);
 
     /**
-     * Exception
+     * Exception.
+     *
+     * @deprecated This function has been deprecated in favor of the more
+     * general LACExceptions::ExcPETScError exception class.
      */
     DeclException1 (ExcPETScError,
                     int,
                     << "An error with error number " << arg1
-                    << " occurred while calling a PETSc function");
+                    << " occurred while calling a PETSc function") DEAL_II_DEPRECATED;
 
   protected:
 

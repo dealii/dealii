@@ -132,7 +132,7 @@ namespace PETScWrappers
 
       this->communicator = other.communicator;
 
-      int ierr = MatCopy(other.matrix, matrix, SAME_NONZERO_PATTERN);
+      const int ierr = MatCopy(other.matrix, matrix, SAME_NONZERO_PATTERN);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
     }
 
@@ -239,23 +239,19 @@ namespace PETScWrappers
       int ierr;
 
 #if DEAL_II_PETSC_VERSION_LT(3,3,0)
-      ierr
-        = MatCreateMPIAIJ (communicator,
+      ierr = MatCreateMPIAIJ (communicator,
+                              local_rows, local_columns,
+                              m, n,
+                              n_nonzero_per_row, 0,
+                              n_offdiag_nonzero_per_row, 0,
+                              &matrix);
+#else
+      ierr = MatCreateAIJ (communicator,
                            local_rows, local_columns,
                            m, n,
                            n_nonzero_per_row, 0,
                            n_offdiag_nonzero_per_row, 0,
                            &matrix);
-#else
-      ierr
-        = MatCreateAIJ (communicator,
-                        local_rows, local_columns,
-                        m, n,
-                        n_nonzero_per_row, 0,
-                        n_offdiag_nonzero_per_row, 0,
-                        &matrix);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
-
       set_matrix_option (matrix, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
 #endif
       AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -311,22 +307,19 @@ namespace PETScWrappers
       int ierr;
 
 #if DEAL_II_PETSC_VERSION_LT(3,3,0)
-      ierr
-        = MatCreateMPIAIJ (communicator,
+      ierr = MatCreateMPIAIJ (communicator,
+                              local_rows, local_columns,
+                              m, n,
+                              0, &int_row_lengths[0],
+                              0, offdiag_row_lengths.size() ? &int_offdiag_row_lengths[0] : 0,
+                              &matrix);
+#else
+      ierr = MatCreateAIJ (communicator,
                            local_rows, local_columns,
                            m, n,
                            0, &int_row_lengths[0],
                            0, offdiag_row_lengths.size() ? &int_offdiag_row_lengths[0] : 0,
                            &matrix);
-#else
-      ierr
-        = MatCreateAIJ (communicator,
-                        local_rows, local_columns,
-                        m, n,
-                        0, &int_row_lengths[0],
-                        0, offdiag_row_lengths.size() ? &int_offdiag_row_lengths[0] : 0,
-                        &matrix);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
 
 //TODO: Sometimes the actual number of nonzero entries allocated is greater than the number of nonzero entries, which petsc will complain about unless explicitly disabled with MatSetOption. There is probably a way to prevent a different number nonzero elements being allocated in the first place. (See also previous TODO).
       set_matrix_option (matrix, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
@@ -456,20 +449,20 @@ namespace PETScWrappers
           // then call the petsc function
           // that summarily allocates these
           // entries:
-          MatMPIAIJSetPreallocationCSR (matrix,
-                                        &rowstart_in_window[0],
-                                        &colnums_in_window[0],
-                                        0);
+          ierr = MatMPIAIJSetPreallocationCSR (matrix,
+                                               &rowstart_in_window[0],
+                                               &colnums_in_window[0],
+                                               0);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
         }
       else
         {
           PetscInt i=0;
-          MatMPIAIJSetPreallocationCSR (matrix,
-                                        &i,
-                                        &i,
-                                        0);
-
-
+          ierr = MatMPIAIJSetPreallocationCSR (matrix,
+                                               &i,
+                                               &i,
+                                               0);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
         }
       compress (dealii::VectorOperation::insert);
 
@@ -548,24 +541,21 @@ namespace PETScWrappers
       // the first _local_ row, i.e. it
       // doesn't index into an array for
       // _all_ rows.
-      const int ierr
-        = MatCreateMPIAIJ(communicator,
-                          local_rows_per_process[this_process],
-                          local_columns_per_process[this_process],
-                          sparsity_pattern.n_rows(),
-                          sparsity_pattern.n_cols(),
-                          0, &row_lengths_in_window[0],
-                          0, &row_lengths_out_of_window[0],
-                          &matrix);
+      const int ierr = MatCreateMPIAIJ(communicator,
+                                       local_rows_per_process[this_process],
+                                       local_columns_per_process[this_process],
+                                       sparsity_pattern.n_rows(),
+                                       sparsity_pattern.n_cols(),
+                                       0, &row_lengths_in_window[0],
+                                       0, &row_lengths_out_of_window[0],
+                                       &matrix);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
 #else //PETSC_VERSION>=2.3.3
       // create the matrix. We
       // do not set row length but set the
       // correct SparsityPattern later.
-      int ierr;
-
-      ierr = MatCreate(communicator,&matrix);
+      int ierr = MatCreate(communicator,&matrix);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       ierr = MatSetSizes(matrix,
@@ -636,10 +626,11 @@ namespace PETScWrappers
           // then call the petsc function
           // that summarily allocates these
           // entries:
-          MatMPIAIJSetPreallocationCSR (matrix,
-                                        &rowstart_in_window[0],
-                                        &colnums_in_window[0],
-                                        0);
+          ierr = MatMPIAIJSetPreallocationCSR (matrix,
+                                               &rowstart_in_window[0],
+                                               &colnums_in_window[0],
+                                               0);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
 
 #if DEAL_II_PETSC_VERSION_LT(2,3,3)
           // this is only needed for old
@@ -669,10 +660,11 @@ namespace PETScWrappers
             for (size_type i=local_row_start; i<local_row_end; ++i)
               {
                 PetscInt petsc_i = i;
-                MatSetValues (matrix, 1, &petsc_i,
-                              sparsity_pattern.row_length(i),
-                              &colnums_in_window[rowstart_in_window[i-local_row_start]],
-                              &values[0], INSERT_VALUES);
+                ierr = MatSetValues (matrix, 1, &petsc_i,
+                                     sparsity_pattern.row_length(i),
+                                     &colnums_in_window[rowstart_in_window[i-local_row_start]],
+                                     &values[0], INSERT_VALUES);
+                AssertThrow (ierr == 0, ExcPETScError(ierr));
               }
           }
 

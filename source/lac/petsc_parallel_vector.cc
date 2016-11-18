@@ -141,7 +141,6 @@ namespace PETScWrappers
 #else
           ierr = VecDestroy (&vector);
 #endif
-
           AssertThrow (ierr == 0, ExcPETScError(ierr));
 
           create_vector (n, local_sz);
@@ -164,7 +163,7 @@ namespace PETScWrappers
           reinit (v.locally_owned_elements(), v.ghost_indices, v.communicator);
           if (!omit_zeroing_entries)
             {
-              int ierr = VecSet(vector, 0.0);
+              const int ierr = VecSet(vector, 0.0);
               AssertThrow (ierr == 0, ExcPETScError(ierr));
             }
         }
@@ -272,9 +271,8 @@ namespace PETScWrappers
       Assert (local_size <= n, ExcIndexRange (local_size, 0, n));
       ghosted = false;
 
-      const int ierr
-        = VecCreateMPI (communicator, local_size, PETSC_DETERMINE,
-                        &vector);
+      const int ierr = VecCreateMPI (communicator, local_size, PETSC_DETERMINE,
+                                     &vector);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       Assert (size() == n,
@@ -303,14 +301,12 @@ namespace PETScWrappers
            :
            0);
 
-      int ierr
-        = VecCreateGhost(communicator,
-                         local_size,
-                         PETSC_DETERMINE,
-                         ghostindices.size(),
-                         ptr,
-                         &vector);
-
+      int ierr = VecCreateGhost(communicator,
+                                local_size,
+                                PETSC_DETERMINE,
+                                ghostindices.size(),
+                                ptr,
+                                &vector);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       Assert (size() == n,
@@ -387,15 +383,12 @@ namespace PETScWrappers
       PetscInt    nlocal, istart, iend;
 
       int ierr = VecGetArray (vector, &val);
-
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       ierr = VecGetLocalSize (vector, &nlocal);
-
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       ierr = VecGetOwnershipRange (vector, &istart, &iend);
-
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       // save the state of out stream

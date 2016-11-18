@@ -878,8 +878,7 @@ namespace PETScWrappers
 
       const PetscInt petsc_i = index;
 
-      const int ierr
-        = VecSetValues (vector, 1, &petsc_i, &value, INSERT_VALUES);
+      const int ierr = VecSetValues (vector, 1, &petsc_i, &value, INSERT_VALUES);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       vector.last_action = VectorOperation::insert;
@@ -915,8 +914,7 @@ namespace PETScWrappers
 
       // use the PETSc function to add something
       const PetscInt petsc_i = index;
-      const int ierr
-        = VecSetValues (vector, 1, &petsc_i, &value, ADD_VALUES);
+      const int ierr = VecSetValues (vector, 1, &petsc_i, &value, ADD_VALUES);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
 
@@ -953,8 +951,7 @@ namespace PETScWrappers
       // add something
       const PetscInt petsc_i = index;
       const PetscScalar subtractand = -value;
-      const int ierr
-        = VecSetValues (vector, 1, &petsc_i, &subtractand, ADD_VALUES);
+      const int ierr = VecSetValues (vector, 1, &petsc_i, &subtractand, ADD_VALUES);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       return *this;
@@ -990,8 +987,7 @@ namespace PETScWrappers
       const PetscScalar new_value
         = static_cast<PetscScalar>(*this) * value;
 
-      const int ierr
-        = VecSetValues (vector, 1, &petsc_i, &new_value, INSERT_VALUES);
+      const int ierr = VecSetValues (vector, 1, &petsc_i, &new_value, INSERT_VALUES);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       return *this;
@@ -1027,8 +1023,7 @@ namespace PETScWrappers
       const PetscScalar new_value
         = static_cast<PetscScalar>(*this) / value;
 
-      const int ierr
-        = VecSetValues (vector, 1, &petsc_i, &new_value, INSERT_VALUES);
+      const int ierr = VecSetValues (vector, 1, &petsc_i, &new_value, INSERT_VALUES);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       return *this;

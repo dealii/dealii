@@ -158,11 +158,10 @@ namespace PETScWrappers
 #endif
 
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    const int ierr
-      = MatZeroRowsIS(matrix, index_set, new_diag_value);
+    const int ierr = MatZeroRowsIS(matrix, index_set, new_diag_value);
 #else
-    const int ierr
-      = MatZeroRowsIS(matrix, index_set, new_diag_value, PETSC_NULL, PETSC_NULL);
+    const int ierr = MatZeroRowsIS(matrix, index_set, new_diag_value, PETSC_NULL,
+                                   PETSC_NULL);
 #endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -183,9 +182,8 @@ namespace PETScWrappers
 
     PetscScalar value;
 
-    const int ierr
-      = MatGetValues (matrix, 1, &petsc_i, 1, &petsc_j,
-                      &value);
+    const int ierr = MatGetValues (matrix, 1, &petsc_i, 1, &petsc_j,
+                                   &value);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return value;
@@ -247,7 +245,7 @@ namespace PETScWrappers
   {
     PetscInt n_rows, n_cols;
 
-    int ierr = MatGetSize (matrix, &n_rows, &n_cols);
+    const int ierr = MatGetSize (matrix, &n_rows, &n_cols);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return n_rows;
@@ -260,7 +258,7 @@ namespace PETScWrappers
   {
     PetscInt n_rows, n_cols;
 
-    int ierr = MatGetSize (matrix, &n_rows, &n_cols);
+    const int ierr = MatGetSize (matrix, &n_rows, &n_cols);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return n_cols;
@@ -273,7 +271,7 @@ namespace PETScWrappers
   {
     PetscInt n_rows, n_cols;
 
-    int ierr = MatGetLocalSize (matrix, &n_rows, &n_cols);
+    const int ierr = MatGetLocalSize (matrix, &n_rows, &n_cols);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return n_rows;
@@ -299,8 +297,7 @@ namespace PETScWrappers
   MatrixBase::n_nonzero_elements () const
   {
     MatInfo mat_info;
-    const int ierr
-      = MatGetInfo (matrix, MAT_GLOBAL_SUM, &mat_info);
+    const int ierr = MatGetInfo (matrix, MAT_GLOBAL_SUM, &mat_info);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return static_cast<size_type>(mat_info.nz_used);
@@ -328,8 +325,7 @@ namespace PETScWrappers
 
 //TODO: this is probably horribly inefficient; we should lobby for a way to
 //query this information from PETSc
-    int ierr;
-    ierr = MatGetRow(*this, row, &ncols, &colnums, &values);
+    int ierr = MatGetRow(*this, row, &ncols, &colnums, &values);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // then restore the matrix and return the number of columns in this row as
@@ -350,8 +346,7 @@ namespace PETScWrappers
   {
     PetscReal result;
 
-    const int ierr
-      = MatNorm (matrix, NORM_1, &result);
+    const int ierr = MatNorm (matrix, NORM_1, &result);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return result;
@@ -364,8 +359,7 @@ namespace PETScWrappers
   {
     PetscReal result;
 
-    const int ierr
-      = MatNorm (matrix, NORM_INFINITY, &result);
+    const int ierr = MatNorm (matrix, NORM_INFINITY, &result);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return result;
@@ -378,8 +372,7 @@ namespace PETScWrappers
   {
     PetscReal result;
 
-    const int ierr
-      = MatNorm (matrix, NORM_FROBENIUS, &result);
+    const int ierr = MatNorm (matrix, NORM_FROBENIUS, &result);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return result;
@@ -411,8 +404,7 @@ namespace PETScWrappers
   {
     PetscScalar result;
 
-    const int ierr
-      = MatGetTrace (matrix, &result);
+    const int ierr = MatGetTrace (matrix, &result);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return result;
@@ -437,7 +429,6 @@ namespace PETScWrappers
   {
     const PetscScalar factor = 1./a;
     const int ierr = MatScale (matrix, factor);
-
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return *this;
@@ -450,9 +441,7 @@ namespace PETScWrappers
   {
     const int ierr = MatAXPY (matrix, factor,
                               other, DIFFERENT_NONZERO_PATTERN);
-    (void)ierr;
-
-    Assert (ierr == 0, ExcPETScError(ierr));
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return *this;
   }
@@ -474,7 +463,6 @@ namespace PETScWrappers
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
     const int ierr = MatMult (matrix, src, dst);
-    (void)ierr;
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -487,7 +475,6 @@ namespace PETScWrappers
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
     const int ierr = MatMultTranspose (matrix, src, dst);
-    (void)ierr;
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -513,7 +500,6 @@ namespace PETScWrappers
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
     const int ierr = MatMultTransposeAdd (matrix, src, dst, dst);
-    (void)ierr;
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -543,8 +529,7 @@ namespace PETScWrappers
   void
   MatrixBase::transpose ()
   {
-    int ierr = MatTranspose(matrix, MAT_REUSE_MATRIX, &matrix);
-    (void)ierr;
+    const int ierr = MatTranspose(matrix, MAT_REUSE_MATRIX, &matrix);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -553,8 +538,7 @@ namespace PETScWrappers
   {
     PetscBooleanType truth;
     assert_is_compressed ();
-    int ierr = MatIsSymmetric (matrix, tolerance, &truth);
-    (void)ierr;
+    const int ierr = MatIsSymmetric (matrix, tolerance, &truth);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
     return truth;
   }
@@ -565,8 +549,7 @@ namespace PETScWrappers
     PetscBooleanType truth;
 
     assert_is_compressed ();
-    int ierr = MatIsHermitian (matrix, tolerance, &truth);
-    (void)ierr;
+    const int ierr = MatIsHermitian (matrix, tolerance, &truth);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return truth;
@@ -578,11 +561,13 @@ namespace PETScWrappers
     assert_is_compressed ();
 
     // Set options
-    PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
-                          format);
+    int ierr = PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
+                                     format);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // Write to screen
-    MatView (matrix, PETSC_VIEWER_STDOUT_WORLD);
+    ierr = MatView (matrix, PETSC_VIEWER_STDOUT_WORLD);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
   void
@@ -600,7 +585,6 @@ namespace PETScWrappers
     for (row = loc_range.first; row < loc_range.second; ++row)
       {
         int ierr = MatGetRow(*this, row, &ncols, &colnums, &values);
-        (void)ierr;
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
         for (PetscInt col = 0; col < ncols; ++col)
@@ -621,7 +605,8 @@ namespace PETScWrappers
   MatrixBase::memory_consumption() const
   {
     MatInfo info;
-    MatGetInfo(matrix, MAT_LOCAL, &info);
+    const int ierr = MatGetInfo(matrix, MAT_LOCAL, &info);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return sizeof(*this) + static_cast<size_type>(info.memory);
   }

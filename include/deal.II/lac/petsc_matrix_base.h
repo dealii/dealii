@@ -1256,9 +1256,9 @@ namespace PETScWrappers
         col_value_ptr = &column_values[0];
       }
 
-    const int ierr
-      = MatSetValues (matrix, 1, &petsc_i, n_columns, col_index_ptr,
-                      col_value_ptr, INSERT_VALUES);
+    const int ierr = MatSetValues (matrix, 1, &petsc_i, n_columns,
+                                   col_index_ptr,
+                                   col_value_ptr, INSERT_VALUES);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -1398,9 +1398,8 @@ namespace PETScWrappers
         col_value_ptr = &column_values[0];
       }
 
-    const int ierr
-      = MatSetValues (matrix, 1, &petsc_i, n_columns, col_index_ptr,
-                      col_value_ptr, ADD_VALUES);
+    const int ierr = MatSetValues (matrix, 1, &petsc_i, n_columns,
+                                   col_index_ptr, col_value_ptr, ADD_VALUES);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 

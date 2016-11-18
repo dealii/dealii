@@ -239,7 +239,7 @@ namespace PETScWrappers
     // to the matrix-vector multiplication
     // of this MatrixFree object,
     void  *this_object;
-    int ierr = MatShellGetContext (A, &this_object);
+    const int ierr = MatShellGetContext (A, &this_object);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // call vmult of this object:

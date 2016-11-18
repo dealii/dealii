@@ -55,10 +55,8 @@ namespace PETScWrappers
   {
     // use the call sequence indicating only a maximal number of
     // elements per row for all rows globally
-    const int ierr
-      = MatCreateSeqDense (PETSC_COMM_SELF, m, n, PETSC_NULL,
-                           &matrix);
-
+    const int ierr = MatCreateSeqDense (PETSC_COMM_SELF, m, n, PETSC_NULL,
+                                        &matrix);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 

@@ -393,12 +393,11 @@ namespace PETScWrappers
 
     create_pc();
 
-    int ierr;
-    ierr = PCSetType (pc, const_cast<char *>(PCICC));
+    int ierr = PCSetType (pc, const_cast<char *>(PCICC));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // then set flags
-    PCFactorSetLevels (pc, additional_data.levels);
+    ierr = PCFactorSetLevels (pc, additional_data.levels);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     ierr = PCSetFromOptions (pc);
@@ -445,7 +444,7 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // then set flags
-    PCFactorSetLevels (pc, additional_data.levels);
+    ierr = PCFactorSetLevels (pc, additional_data.levels);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     ierr = PCSetFromOptions (pc);

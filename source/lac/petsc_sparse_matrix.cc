@@ -31,9 +31,8 @@ namespace PETScWrappers
   SparseMatrix::SparseMatrix ()
   {
     const int m=0, n=0, n_nonzero_per_row=0;
-    const int ierr
-      = MatCreateSeqAIJ(PETSC_COMM_SELF, m, n, n_nonzero_per_row,
-                        0, &matrix);
+    const int ierr = MatCreateSeqAIJ(PETSC_COMM_SELF, m, n, n_nonzero_per_row,
+                                     0, &matrix);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -130,7 +129,8 @@ namespace PETScWrappers
   SparseMatrix::get_mpi_communicator () const
   {
     static MPI_Comm comm;
-    PetscObjectGetComm((PetscObject)matrix, &comm);
+    const int ierr = PetscObjectGetComm((PetscObject)matrix, &comm);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
     return comm;
   }
 
@@ -145,9 +145,9 @@ namespace PETScWrappers
     // use the call sequence indicating only
     // a maximal number of elements per row
     // for all rows globally
-    const int ierr
-      = MatCreateSeqAIJ(PETSC_COMM_SELF, m, n, n_nonzero_per_row,
-                        0, &matrix);
+    const int ierr = MatCreateSeqAIJ(PETSC_COMM_SELF, m, n,
+                                     n_nonzero_per_row,
+                                     0, &matrix);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // set symmetric flag, if so requested
@@ -179,9 +179,8 @@ namespace PETScWrappers
     const std::vector<PetscInt>
     int_row_lengths (row_lengths.begin(), row_lengths.end());
 
-    const int ierr
-      = MatCreateSeqAIJ(PETSC_COMM_SELF, m, n, 0,
-                        &int_row_lengths[0], &matrix);
+    const int ierr = MatCreateSeqAIJ(PETSC_COMM_SELF, m, n, 0,
+                                     &int_row_lengths[0], &matrix);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // set symmetric flag, if so requested
@@ -231,9 +230,10 @@ namespace PETScWrappers
               row_entries[j] = sparsity_pattern.column_number (i,j);
 
             const PetscInt int_row = i;
-            MatSetValues (matrix, 1, &int_row,
-                          row_lengths[i], &row_entries[0],
-                          &row_values[0], INSERT_VALUES);
+            const int ierr = MatSetValues (matrix, 1, &int_row,
+                                           row_lengths[i], &row_entries[0],
+                                           &row_values[0], INSERT_VALUES);
+            AssertThrow (ierr == 0, ExcPETScError(ierr));
           }
         compress (VectorOperation::insert);
 
@@ -246,7 +246,7 @@ namespace PETScWrappers
   SparseMatrix::m () const
   {
     PetscInt m,n;
-    PetscErrorCode ierr = MatGetSize(matrix, &m, &n);
+    const PetscErrorCode ierr = MatGetSize(matrix, &m, &n);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return m;
@@ -256,7 +256,7 @@ namespace PETScWrappers
   SparseMatrix::n () const
   {
     PetscInt m,n;
-    PetscErrorCode ierr = MatGetSize(matrix, &m, &n);
+    const PetscErrorCode ierr = MatGetSize(matrix, &m, &n);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return n;
