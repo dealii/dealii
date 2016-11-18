@@ -495,7 +495,7 @@ inconvenience this causes.
  of scalar-valued quadrature point data in parallel.
  <br>
  (Denis Davydov, 2016/10/28)
- <li>
+ </li>
 
  <li> Fixed: Increased precision of timesteps in DataOutInterface::write_pvd_record().
  <br>
@@ -780,6 +780,7 @@ inconvenience this causes.
  <li> Fixed: (P)ARPACK interface for non-symmetric matrices.
  <br>
  (Joscha Gedicke, 2016/08/01)
+ </li>
 
  <li> Fixed: The TrilinosWrappers::SparsityPattern::print() and
  TrilinosWrappers::SparsityPattern::print_gnuplot() methods did not produce
