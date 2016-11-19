@@ -15,7 +15,7 @@
 ## ---------------------------------------------------------------------
 
 #
-# This script creates changes.h from the contributions in the subfolders
+# This script creates "changes.h.new" from the contributions in the subfolders
 # of ./doc/news.
 #
 # The script needs to be executed as 
@@ -29,61 +29,45 @@ if test ! -d incompatibilities -o ! -d general -o ! -d specific ; then
   exit 1
 fi
 
-echo INCOMPATIBILITIES
-cat header_incompatibilities > changes.h
-echo "<ol>" >> changes.h	
-ARRAY=($(ls incompatibilities | sort -r))
-if ! [ -z "$ARRAY" ]; then
-  echo -n " <li>" >> changes.h
-  sed 's/^/ /' incompatibilities/${ARRAY[0]} >> changes.h
-  echo " </li>" >> changes.h
-  unset ARRAY[0]
+OUTPUT="changes.h.new"
 
-  for f in ${ARRAY[@]}; do
-    echo "" >> changes.h
-    echo -n " <li>" >> changes.h
-    sed 's/^/ /' incompatibilities/$f >> changes.h
-    echo " </li>" >> changes.h
-  done
-fi
-echo "</ol>" >> changes.h
+function process_directory
+{
+  echo "<ol>" >> ${OUTPUT}
+  # process all entries in the right order
+  ARRAY=($(ls "$1" | sort -r))
+  if ! [ -z "${ARRAY[0]}" ]; then
+    # treat the first item special
+    # we don't want to insert a new line here
+    echo -n " <li>" >> ${OUTPUT}
+    # indent lines by one blank space
+    sed 's/^[ ]*/ /' "$1"/"${ARRAY[0]}" >> ${OUTPUT}
+    echo " </li>" >> ${OUTPUT}
+    unset "ARRAY[0]"
+
+    for f in "${ARRAY[@]}"; do
+      echo "" >> ${OUTPUT}
+      echo -n " <li>" >> ${OUTPUT}
+      # indent lines by one blank space
+      sed 's/^[ ]*/ /' "$1"/"$f" >> ${OUTPUT}
+      echo " </li>" >> ${OUTPUT}
+    done
+  fi
+  echo "</ol>" >> ${OUTPUT}
+}
+
+cat header > ${OUTPUT}
+
+echo INCOMPATIBILITIES
+cat header_incompatibilities >> ${OUTPUT}
+process_directory incompatibilities
 
 echo GENERAL
-cat header_general >> changes.h
-echo "<ol>" >> changes.h
-ARRAY=($(ls general | sort -r))
-if ! [ -z $ARRAY ]; then
-  echo -n " <li>" >> changes.h
-  sed 's/^/ /' general/${ARRAY[0]} >> changes.h
-  echo " </li>" >> changes.h
-  unset ARRAY[0]
-
-  for f in ${ARRAY[@]}; do
-    echo "" >> changes.h
-    echo -n " <li>" >> changes.h
-    sed 's/^/ /' general/$f >> changes.h
-    echo " </li>" >> changes.h
-  done
-fi
-echo "</ol>" >> changes.h
+cat header_general >> ${OUTPUT}
+process_directory general
 
 echo SPECIFIC
-cat header_specific >> changes.h
-echo "<ol>" >> changes.h
-ARRAY=($(ls specific | sort -r))
-if ! [ -z $ARRAY ]; then
-  echo -n " <li>" >> changes.h
-  sed 's/^/ /' specific/${ARRAY[0]} >> changes.h
-  echo " </li>" >> changes.h
-  unset ARRAY[0]
+cat header_specific >> ${OUTPUT}
+process_directory specific
 
-  for f in ${ARRAY[@]}; do
-    echo "" >> changes.h
-    echo -n " <li>" >> changes.h
-    sed 's/^/ /' specific/$f >> changes.h
-    echo " </li>" >> changes.h
-  done
-fi
-echo "</ol>" >> changes.h
-
-cat footer >> changes.h
+cat footer >> ${OUTPUT}

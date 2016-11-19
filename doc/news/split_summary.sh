@@ -31,26 +31,26 @@ fi
 
 
 rm summary
-for f in `ls xx*`; do
+for f in xx*; do
   #remove HTML list tags
-  sed -i'' 's/<li>\|<\/li>\|<ol>\|<\/ol>//g' $f
+  sed -i'' 's/<li>\|<\/li>\|<ol>\|<\/ol>//g' "$f"
   #remove trailing whitespace
-  sed -i'' 's/^[ \t]*//' $f
+  sed -i'' 's/^[ \t]*//' "$f"
   #remove empty lines
-  sed -i'' '/^\s*$/d' $f
+  sed -i'' '/^\s*$/d' "$f"
   #only consider non-empty files 
   if [[ -s $f ]] ; then
-    cat $f > tmp
-    DATE=`sed -n -r 's/^.*([0-9]{4})\/([0-1][0-9])\/([0-3][0-9]).*$/\1\2\3/p' $f`
-    TMP=`tail $f | sed -n -r 's/.*\(([A-Za-z0-9, ]*).*[0-9]{4}\/[0-1][0-9]\/([0-3][0-9])\).*/\1/p'`
-    NAME=`echo $TMP | sed -r 's/[ ,]+//g'`
-    OLDNAME=$NAME
+    cat "$f" > tmp
+    DATE=$(sed -n -r 's/^.*([0-9]{4})\/([0-1][0-9])\/([0-3][0-9]).*$/\1\2\3/p' "$f")
+    TMP=$(tail "$f" | sed -n -r 's/.*\(([A-Za-z0-9, ]*).*[0-9]{4}\/[0-1][0-9]\/([0-3][0-9])\).*/\1/p')
+    NAME=$(echo "${TMP}" | sed -r 's/[ ,]+//g')
+    OLDNAME=${NAME}
     COUNTER=0
     while [[ -s ${DATE}${NAME} ]] ; do
       COUNTER=$((COUNTER+1)) 
       NAME="${OLDNAME}_${COUNTER}"
     done
-    mv tmp ${DATE}${NAME}
+    mv tmp "${DATE}""${NAME}"
   fi
-  rm $f
+  rm "$f"
 done

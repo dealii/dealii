@@ -32,10 +32,9 @@ fi
 
 csplit --silent changes.h '/^<ol>\|<\/ol>$/' '{*}'
 
-for f in `ls xx*`; do
+for f in xx*; do
   #remove HTML list tags
-  #sed -i'' '/<ol>\|<\/ol>/!p' $f
-  sed -i'' '/<ol>\|<\/ol>/d' $f
+  sed -i'' '/<ol>\|<\/ol>/d' "$f"
 done
 
 mv xx00 header_incompatibilities
@@ -46,20 +45,24 @@ mv xx04 header_specific
 mv xx05 specific/summary
 mv xx06 footer
 
+csplit --silent header_incompatibilities '/^<!--.*$/' '{*}'
+mv xx00 header
+mv xx01 header_incompatibilities
+
 echo INCOMPATIBILITIES
-cd incompatibilities
+cd incompatibilities || exit
 csplit --silent summary '/^<li>\|<\/li>$/' '{*}'
 ../split_summary.sh
 cd ..
 
 echo GENERAL
-cd general
+cd general || exit
 csplit --silent summary '/^<li>\|<\/li>$/' '{*}'
 ../split_summary.sh
 cd ..
 
 echo SPECIFIC
-cd specific
+cd specific || exit
 csplit --silent summary '/^<li>\|<\/li>$/' '{*}'
 ../split_summary.sh
 cd ..

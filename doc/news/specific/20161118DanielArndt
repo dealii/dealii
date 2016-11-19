@@ -1,4 +1,4 @@
 New: Automatically recreate changes.h from files in 
-subfolders of./doc/news
+subfolders of ./doc/news
 <br>
 (Daniel Arndt, 2016/11/18)
