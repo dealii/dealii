@@ -27,7 +27,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -120,23 +119,20 @@ void do_project (const parallel::distributed::Triangulation<dim> &triangulation,
                                            constraints);
   constraints.close ();
 
-  TrilinosWrappers::MPI::Vector projection_tmp (locally_owned_dofs,
-                                                mpi_communicator);
-  TrilinosWrappers::MPI::Vector projection (locally_owned_dofs,
-                                            locally_relevant_dofs,
-                                            mpi_communicator);
+  LinearAlgebra::distributed::Vector projection (locally_owned_dofs,
+                                                 locally_relevant_dofs,
+                                                 mpi_communicator);
   Vector<float>  error (triangulation.n_active_cells());
   for (unsigned int q=0; q<=p+2-order_difference; ++q)
     {
       // project the function
       VectorTools::project
       (dof_handler, constraints, QGauss<dim>(p+2),
-       F<dim> (q, fe.n_components()), projection_tmp);
+       F<dim> (q, fe.n_components()), projection);
       // just to make sure it doesn't get
       // forgotten: handle hanging node
       // constraints
-      constraints.distribute (projection_tmp);
-      projection = projection_tmp;
+      constraints.distribute (projection);
 
       // then compute the interpolation error
       VectorTools::integrate_difference (dof_handler,
@@ -149,7 +145,7 @@ void do_project (const parallel::distributed::Triangulation<dim> &triangulation,
       const double L2_error
         = std::sqrt(Utilities::MPI::sum(L2_error_local * L2_error_local,
                                         mpi_communicator));
-      const double projection_l2_norm = projection_tmp.l2_norm();
+      const double projection_l2_norm = projection.l2_norm();
       deallog << fe.get_name() << ", P_" << q
               << ", rel. error=" << L2_error / projection_l2_norm
               << std::endl;
