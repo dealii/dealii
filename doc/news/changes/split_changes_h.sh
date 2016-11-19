@@ -15,22 +15,28 @@
 ## ---------------------------------------------------------------------
 
 #
-# This script splits the previously used into contributions in the folders:
-# incompatibilities/ general/ specific/
+# This script splits the previously used "changes.h" into contributions
+# in the folders "incompatibilities", "major" and "minor".
 # The resulting files can be used in ./create_changes_h.sh to create
 # changes.h anew.
 #
 # The script needs to be executed as 
 #   ./split_changes_h.sh
-# from ./doc_news.
+# from ./doc/news/changes.
 
-if test ! -d incompatibilities -o ! -d specific -o ! -d general ; then
-  echo "*** This script must be run from ./doc/news!"
+if test ! -d incompatibilities -o ! -d minor -o ! -d major ; then
+  echo "*** This script must be run from ./doc/news/changes!"
+  exit 1
+fi
+
+if test ! -f ../changes.h ; then
+  echo "*** The file '../changes.h' does not exist!"
   exit 1
 fi
 
 
-csplit --silent changes.h '/^<ol>\|<\/ol>$/' '{*}'
+
+csplit --silent ../changes.h '/^<ol>\|<\/ol>$/' '{*}'
 
 for f in xx*; do
   #remove HTML list tags
@@ -39,10 +45,10 @@ done
 
 mv xx00 header_incompatibilities
 mv xx01 incompatibilities/summary
-mv xx02 header_general
-mv xx03 general/summary
-mv xx04 header_specific
-mv xx05 specific/summary
+mv xx02 header_major
+mv xx03 major/summary
+mv xx04 header_minor
+mv xx05 minor/summary
 mv xx06 footer
 
 csplit --silent header_incompatibilities '/^<!--.*$/' '{*}'
@@ -56,13 +62,13 @@ csplit --silent summary '/^<li>\|<\/li>$/' '{*}'
 cd ..
 
 echo GENERAL
-cd general || exit
+cd major || exit
 csplit --silent summary '/^<li>\|<\/li>$/' '{*}'
 ../split_summary.sh
 cd ..
 
 echo SPECIFIC
-cd specific || exit
+cd minor || exit
 csplit --silent summary '/^<li>\|<\/li>$/' '{*}'
 ../split_summary.sh
 cd ..

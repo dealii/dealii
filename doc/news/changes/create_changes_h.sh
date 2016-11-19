@@ -16,20 +16,20 @@
 
 #
 # This script creates "changes.h.new" from the contributions in the subfolders
-# of ./doc/news.
+# of ./doc/news/changes.
 #
 # The script needs to be executed as 
 #   ./create_changes_h.sh
-# from ./doc_news.
+# from ./doc/news/changes.
 
 
 
-if test ! -d incompatibilities -o ! -d general -o ! -d specific ; then
-  echo "*** This script must be run from ./doc/news!"
+if test ! -d incompatibilities -o ! -d major -o ! -d minor ; then
+  echo "*** This script must be run from ./doc/news/changes!"
   exit 1
 fi
 
-OUTPUT="changes.h.new"
+OUTPUT="../changes.h.new"
 
 function process_directory
 {
@@ -63,11 +63,11 @@ cat header_incompatibilities >> ${OUTPUT}
 process_directory incompatibilities
 
 echo GENERAL
-cat header_general >> ${OUTPUT}
-process_directory general
+cat header_major >> ${OUTPUT}
+process_directory major
 
 echo SPECIFIC
-cat header_specific >> ${OUTPUT}
-process_directory specific
+cat header_minor >> ${OUTPUT}
+process_directory minor
 
 cat footer >> ${OUTPUT}
