@@ -18,6 +18,8 @@
 #define dealii__mg_transfer_internal_h
 
 #include <deal.II/dofs/dof_tools.h>
+#include <deal.II/distributed/tria.h>
+#include <deal.II/multigrid/mg_constrained_dofs.h>
 
 
 DEAL_II_NAMESPACE_OPEN
