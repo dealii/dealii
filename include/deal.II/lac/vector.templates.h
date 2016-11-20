@@ -113,7 +113,7 @@ Vector<Number>::Vector (const PETScWrappers::Vector &v)
       // get a representation of the vector
       // and copy it
       PetscScalar *start_ptr;
-      int ierr = VecGetArray (static_cast<const Vec &>(v), &start_ptr);
+      PetscErrorCode ierr = VecGetArray (static_cast<const Vec &>(v), &start_ptr);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       internal::copy (start_ptr, start_ptr+vec_size, begin());
@@ -876,7 +876,7 @@ Vector<Number>::operator= (const PETScWrappers::Vector &v)
       // get a representation of the vector
       // and copy it
       PetscScalar *start_ptr;
-      int ierr = VecGetArray (static_cast<const Vec &>(v), &start_ptr);
+      PetscErrorCode ierr = VecGetArray (static_cast<const Vec &>(v), &start_ptr);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       internal::copy (start_ptr, start_ptr+vec_size, begin());

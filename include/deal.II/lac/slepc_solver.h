@@ -789,7 +789,6 @@ namespace SLEPcWrappers
   void
   SolverBase::set_initial_space(const std::vector<Vector> &this_initial_space)
   {
-    int ierr;
     std::vector<Vec> vecs(this_initial_space.size());
 
     for (unsigned int i = 0; i < this_initial_space.size(); i++)
@@ -805,9 +804,9 @@ namespace SLEPcWrappers
     // by taking a linear combination of them. (TODO: make function virtual?)
 
 #if DEAL_II_PETSC_VERSION_LT(3,1,0)
-    ierr = EPSSetInitialVector (eps, &vecs[0]);
+    const PetscErrorCode ierr = EPSSetInitialVector (eps, &vecs[0]);
 #else
-    ierr = EPSSetInitialSpace (eps, vecs.size(), &vecs[0]);
+    const PetscErrorCode ierr = EPSSetInitialSpace (eps, vecs.size(), &vecs[0]);
 #endif
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }

@@ -55,8 +55,7 @@ namespace PETScWrappers
 #else
     const PetscErrorCode ierr = PetscOptionsSetValue (NULL, name.c_str (), value.c_str ());
 #endif
-    (void)ierr;
-    Assert (ierr == 0, ExcPETScError(ierr));
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
 
@@ -117,9 +116,9 @@ namespace PETScWrappers
                                  const PetscBooleanType option_value = PETSC_FALSE)
   {
 #if DEAL_II_PETSC_VERSION_LT(3,0,0)
-    const int ierr = MatSetOption (matrix, option_name);
+    const PetscErrorCode ierr = MatSetOption (matrix, option_name);
 #else
-    const int ierr = MatSetOption (matrix, option_name, option_value);
+    const PetscErrorCode ierr = MatSetOption (matrix, option_name, option_value);
 #endif
 
     AssertThrow (ierr == 0, ExcPETScError(ierr));
