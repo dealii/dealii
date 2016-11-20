@@ -451,6 +451,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Fixed: DataOut::build_patches() ignored a higher order
+ or Eulerian mapping if no data had previously been attached
+ via DataOut::add_data_vector(), i.e., if all that was to be output
+ is the mesh itself. This is now fixed.
+ <br>
+ (Wolfgang Bangerth, 2016/11/15)
+ </li>
+
  <li> Fixed: Calling MappingQ::clone() did not copy the
  <code>use_mapping_q_on_all_cells</code> flag that this
  mapping class gets passed to its constructor. This leads

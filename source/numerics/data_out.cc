@@ -83,54 +83,54 @@ build_one_patch
                                (cell_and_index->first,
                                 GeometryInfo<DoFHandlerType::dimension>::unit_cell_vertex (vertex));
 
+  // create DoFHandlerType::active_cell_iterator and initialize FEValues
+  scratch_data.reinit_all_fe_values(this->dof_data, cell_and_index->first);
+
+  const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values
+    = scratch_data.get_present_fe_values (0);
+
+  const unsigned int n_q_points = fe_patch_values.n_quadrature_points;
+
+  // depending on the requested output of curved cells, if necessary
+  // append the quadrature points to the last rows of the patch.data
+  // member. This is the case if we want to produce curved cells at the
+  // boundary and this cell actually is at the boundary, or else if we
+  // want to produce curved cells everywhere
+  //
+  // note: a cell is *always* at the boundary if dim<spacedim
+  if (curved_cell_region==curved_inner_cells
+      ||
+      (curved_cell_region==curved_boundary
+       &&
+       (cell_and_index->first->at_boundary()
+        ||
+        (DoFHandlerType::dimension != DoFHandlerType::space_dimension))))
+    {
+      Assert(patch.space_dim==DoFHandlerType::space_dimension, ExcInternalError());
+
+      // set the flag indicating that for this cell the points are
+      // explicitly given
+      patch.points_are_available = true;
+
+      // then resize the patch.data member in order to have enough memory for
+      // the quadrature points as well, and copy the quadrature points there
+      const std::vector<Point<DoFHandlerType::space_dimension> > &q_points
+        = fe_patch_values.get_quadrature_points();
+
+      patch.data.reinit (scratch_data.n_datasets+DoFHandlerType::space_dimension, n_q_points);
+      for (unsigned int i=0; i<DoFHandlerType::space_dimension; ++i)
+        for (unsigned int q=0; q<n_q_points; ++q)
+          patch.data(patch.data.size(0)-DoFHandlerType::space_dimension+i,q) = q_points[q][i];
+    }
+  else
+    {
+      patch.data.reinit(scratch_data.n_datasets, n_q_points);
+      patch.points_are_available = false;
+    }
+
+
   if (scratch_data.n_datasets > 0)
     {
-      // create DoFHandlerType::active_cell_iterator and initialize FEValues
-      scratch_data.reinit_all_fe_values(this->dof_data, cell_and_index->first);
-
-      const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values
-        = scratch_data.get_present_fe_values (0);
-
-      const unsigned int n_q_points = fe_patch_values.n_quadrature_points;
-
-      // depending on the requested output of curved cells, if necessary
-      // append the quadrature points to the last rows of the patch.data
-      // member. This is the case if we want to produce curved cells at the
-      // boundary and this cell actually is at the boundary, or else if we
-      // want to produce curved cells everywhere
-      //
-      // note: a cell is *always* at the boundary if dim<spacedim
-      if (curved_cell_region==curved_inner_cells
-          ||
-          (curved_cell_region==curved_boundary
-           &&
-           (cell_and_index->first->at_boundary()
-            ||
-            (DoFHandlerType::dimension != DoFHandlerType::space_dimension))))
-        {
-          Assert(patch.space_dim==DoFHandlerType::space_dimension, ExcInternalError());
-
-          // set the flag indicating that for this cell the points are
-          // explicitly given
-          patch.points_are_available = true;
-
-          // then resize the patch.data member in order to have enough memory for
-          // the quadrature points as well, and copy the quadrature points there
-          const std::vector<Point<DoFHandlerType::space_dimension> > &q_points
-            = fe_patch_values.get_quadrature_points();
-
-          patch.data.reinit (scratch_data.n_datasets+DoFHandlerType::space_dimension, n_q_points);
-          for (unsigned int i=0; i<DoFHandlerType::space_dimension; ++i)
-            for (unsigned int q=0; q<n_q_points; ++q)
-              patch.data(patch.data.size(0)-DoFHandlerType::space_dimension+i,q) = q_points[q][i];
-        }
-      else
-        {
-          patch.data.reinit(scratch_data.n_datasets, n_q_points);
-          patch.points_are_available = false;
-        }
-
-
       // counter for data records
       unsigned int offset=0;
 
