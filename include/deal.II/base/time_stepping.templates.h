@@ -52,6 +52,14 @@ namespace TimeStepping
   // ----------------------------------------------------------------------
 
   template <typename VectorType>
+  ExplicitRungeKutta<VectorType>::ExplicitRungeKutta()
+  {
+    status.method = INVALID_METHOD;
+  }
+
+
+
+  template <typename VectorType>
   ExplicitRungeKutta<VectorType>::ExplicitRungeKutta(runge_kutta_method method)
   {
     initialize(method);
@@ -199,6 +207,20 @@ namespace TimeStepping
   // ----------------------------------------------------------------------
   // ImplicitRungeKutta
   // ----------------------------------------------------------------------
+
+  template <typename VectorType>
+  ImplicitRungeKutta<VectorType>::ImplicitRungeKutta()
+    :
+    skip_linear_combi(false),
+    max_it(numbers::invalid_unsigned_int),
+    tolerance(-1.)
+  {
+    status.method = INVALID_METHOD;
+    status.n_iterations = numbers::invalid_unsigned_int;
+    status.norm_residual = -1.;
+  }
+
+
 
   template <typename VectorType>
   ImplicitRungeKutta<VectorType>::ImplicitRungeKutta(runge_kutta_method method,

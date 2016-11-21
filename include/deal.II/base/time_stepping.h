@@ -55,7 +55,7 @@ namespace TimeStepping
   enum runge_kutta_method { FORWARD_EULER, RK_THIRD_ORDER, RK_CLASSIC_FOURTH_ORDER,
                             BACKWARD_EULER, IMPLICIT_MIDPOINT, CRANK_NICOLSON,
                             SDIRK_TWO_STAGES, HEUN_EULER, BOGACKI_SHAMPINE, DOPRI,
-                            FEHLBERG, CASH_KARP
+                            FEHLBERG, CASH_KARP, INVALID_METHOD
                           };
 
 
@@ -206,7 +206,7 @@ namespace TimeStepping
      * Default constructor. initialize(runge_kutta_method) needs to be called
      * before the object can be used.
      */
-    ExplicitRungeKutta() {}
+    ExplicitRungeKutta();
 
     /**
      * Constructor. This function calls initialize(runge_kutta_method).
@@ -296,7 +296,7 @@ namespace TimeStepping
      * set_newton_solver_parameters(unsigned int,double) need to be called
      * before the object can be used.
      */
-    ImplicitRungeKutta() {}
+    ImplicitRungeKutta();
 
     /**
      * Constructor. This function calls initialize(runge_kutta_method) and
