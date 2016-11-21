@@ -36,23 +36,14 @@ function process_directory
   echo "<ol>" >> ${OUTPUT}
   # process all entries in the right order
   ARRAY=($(ls "$1" | sort -r))
-  if ! [ -z "${ARRAY[0]}" ]; then
-    # treat the first item special
-    # we don't want to insert a new line here
+  for f in "${ARRAY[@]}"; do
+    echo "" >> ${OUTPUT}
     echo -n " <li>" >> ${OUTPUT}
     # indent lines by one blank space
-    sed 's/^[ ]*/ /' "$1"/"${ARRAY[0]}" >> ${OUTPUT}
+    sed 's/^[ ]*/ /' "$1"/"$f" >> ${OUTPUT}
     echo " </li>" >> ${OUTPUT}
-    unset "ARRAY[0]"
-
-    for f in "${ARRAY[@]}"; do
-      echo "" >> ${OUTPUT}
-      echo -n " <li>" >> ${OUTPUT}
-      # indent lines by one blank space
-      sed 's/^[ ]*/ /' "$1"/"$f" >> ${OUTPUT}
-      echo " </li>" >> ${OUTPUT}
-    done
-  fi
+  done
+  echo "" >> ${OUTPUT}
   echo "</ol>" >> ${OUTPUT}
 }
 
