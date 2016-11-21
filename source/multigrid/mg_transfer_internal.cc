@@ -428,7 +428,8 @@ namespace internal
           points_refined[shift*c+j][0] =
             c*0.5 + 0.5 * basic_support_points[renumbering[j]][0];
 
-      unsigned int n_child_dofs_1d = points_refined.size();
+      const unsigned int n_child_dofs_1d = points_refined.size();
+
       elem_info.n_child_cell_dofs = elem_info.n_components*Utilities::fixed_power<dim>(n_child_dofs_1d);
 
       // step 1.4: evaluate the polynomials and store the data in ShapeInfo
@@ -483,7 +484,6 @@ namespace internal
 
       setup_element_info(elem_info,fe,mg_dof);
 
-      unsigned int n_child_dofs_1d = elem_info.shape_info.n_q_points;
 
       // -------------- 2. Extract and match dof indices between child and parent
       const unsigned int n_levels = tria.n_global_levels();
@@ -694,6 +694,8 @@ namespace internal
         }
 
       // ---------------------- 3. compute weights to make restriction additive
+
+      const unsigned int n_child_dofs_1d = fe.degree + 1 + fe.dofs_per_cell - fe.dofs_per_vertex;
 
       // get the valence of the individual components and compute the weights as
       // the inverse of the valence
