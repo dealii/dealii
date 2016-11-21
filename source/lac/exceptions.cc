@@ -40,7 +40,8 @@ namespace LACExceptions
     // PetscErrorMessage changes the value in a pointer to refer to a
     // statically allocated description of the current error message.
     const char *petsc_message;
-    const int ierr = PetscErrorMessage (error_code, &petsc_message, /*specific=*/NULL);
+    const PetscErrorCode ierr = PetscErrorMessage (error_code, &petsc_message,
+                                                   /*specific=*/NULL);
     if (ierr == 0 && petsc_message != NULL)
       {
         out << "The description of the error provided by PETSc is \""

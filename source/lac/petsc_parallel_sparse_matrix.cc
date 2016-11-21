@@ -36,7 +36,7 @@ namespace PETScWrappers
       // create an empty matrix, we can as
       // well make it sequential
       const int m=0, n=0, n_nonzero_per_row=0;
-      const int ierr
+      const PetscErrorCode ierr
         = MatCreateSeqAIJ(PETSC_COMM_SELF, m, n, n_nonzero_per_row,
                           0, &matrix);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -132,7 +132,8 @@ namespace PETScWrappers
 
       this->communicator = other.communicator;
 
-      const int ierr = MatCopy(other.matrix, matrix, SAME_NONZERO_PATTERN);
+      const PetscErrorCode ierr = MatCopy(other.matrix, matrix,
+                                          SAME_NONZERO_PATTERN);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
     }
 
@@ -236,22 +237,22 @@ namespace PETScWrappers
       // use the call sequence indicating only
       // a maximal number of elements per row
       // for all rows globally
-      int ierr;
-
 #if DEAL_II_PETSC_VERSION_LT(3,3,0)
-      ierr = MatCreateMPIAIJ (communicator,
-                              local_rows, local_columns,
-                              m, n,
-                              n_nonzero_per_row, 0,
-                              n_offdiag_nonzero_per_row, 0,
-                              &matrix);
+      const PetscErrorCode ierr = MatCreateMPIAIJ
+                                  (communicator,
+                                   local_rows, local_columns,
+                                   m, n,
+                                   n_nonzero_per_row, 0,
+                                   n_offdiag_nonzero_per_row, 0,
+                                   &matrix);
 #else
-      ierr = MatCreateAIJ (communicator,
-                           local_rows, local_columns,
-                           m, n,
-                           n_nonzero_per_row, 0,
-                           n_offdiag_nonzero_per_row, 0,
-                           &matrix);
+      const PetscErrorCode ierr = MatCreateAIJ
+                                  (communicator,
+                                   local_rows, local_columns,
+                                   m, n,
+                                   n_nonzero_per_row, 0,
+                                   n_offdiag_nonzero_per_row, 0,
+                                   &matrix);
       set_matrix_option (matrix, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
 #endif
       AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -303,23 +304,23 @@ namespace PETScWrappers
                                                            offdiag_row_lengths.end());
 
 //TODO: There must be a significantly better way to provide information about the off-diagonal blocks of the matrix. this way, petsc keeps allocating tiny chunks of memory, and gets completely hung up over this
-
-      int ierr;
-
 #if DEAL_II_PETSC_VERSION_LT(3,3,0)
-      ierr = MatCreateMPIAIJ (communicator,
-                              local_rows, local_columns,
-                              m, n,
-                              0, &int_row_lengths[0],
-                              0, offdiag_row_lengths.size() ? &int_offdiag_row_lengths[0] : 0,
-                              &matrix);
+      const PetscErrorCode ierr = MatCreateMPIAIJ
+                                  (communicator,
+                                   local_rows, local_columns,
+                                   m, n,
+                                   0, &int_row_lengths[0],
+                                   0, offdiag_row_lengths.size() ? &int_offdiag_row_lengths[0] : 0,
+                                   &matrix);
 #else
-      ierr = MatCreateAIJ (communicator,
-                           local_rows, local_columns,
-                           m, n,
-                           0, &int_row_lengths[0],
-                           0, offdiag_row_lengths.size() ? &int_offdiag_row_lengths[0] : 0,
-                           &matrix);
+      const PetscErrorCode ierr = MatCreateAIJ
+                                  (communicator,
+                                   local_rows, local_columns,
+                                   m, n,
+                                   0, &int_row_lengths[0],
+                                   0,
+                                   offdiag_row_lengths.size() ? &int_offdiag_row_lengths[0] : 0,
+                                   &matrix);
 
 //TODO: Sometimes the actual number of nonzero entries allocated is greater than the number of nonzero entries, which petsc will complain about unless explicitly disabled with MatSetOption. There is probably a way to prevent a different number nonzero elements being allocated in the first place. (See also previous TODO).
       set_matrix_option (matrix, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
@@ -372,9 +373,7 @@ namespace PETScWrappers
 
       // create the matrix. We do not set row length but set the
       // correct SparsityPattern later.
-      int ierr;
-
-      ierr = MatCreate(communicator,&matrix);
+      PetscErrorCode ierr = MatCreate(communicator,&matrix);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       ierr = MatSetSizes(matrix,
@@ -541,21 +540,21 @@ namespace PETScWrappers
       // the first _local_ row, i.e. it
       // doesn't index into an array for
       // _all_ rows.
-      const int ierr = MatCreateMPIAIJ(communicator,
-                                       local_rows_per_process[this_process],
-                                       local_columns_per_process[this_process],
-                                       sparsity_pattern.n_rows(),
-                                       sparsity_pattern.n_cols(),
-                                       0, &row_lengths_in_window[0],
-                                       0, &row_lengths_out_of_window[0],
-                                       &matrix);
+      const PetscErrorCode ierr = MatCreateMPIAIJ(communicator,
+                                                  local_rows_per_process[this_process],
+                                                  local_columns_per_process[this_process],
+                                                  sparsity_pattern.n_rows(),
+                                                  sparsity_pattern.n_cols(),
+                                                  0, &row_lengths_in_window[0],
+                                                  0, &row_lengths_out_of_window[0],
+                                                  &matrix);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
 #else //PETSC_VERSION>=2.3.3
       // create the matrix. We
       // do not set row length but set the
       // correct SparsityPattern later.
-      int ierr = MatCreate(communicator,&matrix);
+      PetscErrorCode ierr = MatCreate(communicator,&matrix);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       ierr = MatSetSizes(matrix,

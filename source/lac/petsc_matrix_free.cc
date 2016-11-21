@@ -191,7 +191,7 @@ namespace PETScWrappers
     // and reinit x and y with
     // dealii::PETScWrappers::*::Vector:
     const char  *vec_type;
-    int ierr = VecGetType (src, &vec_type);
+    PetscErrorCode ierr = VecGetType (src, &vec_type);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     PetscInt  local_size;
@@ -239,7 +239,7 @@ namespace PETScWrappers
     // to the matrix-vector multiplication
     // of this MatrixFree object,
     void  *this_object;
-    const int ierr = MatShellGetContext (A, &this_object);
+    const PetscErrorCode ierr = MatShellGetContext (A, &this_object);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // call vmult of this object:
@@ -258,11 +258,11 @@ namespace PETScWrappers
     Assert (local_rows <= m, ExcDimensionMismatch (local_rows, m));
     Assert (local_columns <= n, ExcDimensionMismatch (local_columns, n));
 
-    int ierr;
     // create a PETSc MatShell matrix-type
     // object of dimension m x n and local size
     // local_rows x local_columns
-    ierr = MatCreateShell(communicator, local_rows, local_columns, m, n, (void *)this, &matrix);
+    PetscErrorCode ierr = MatCreateShell(communicator, local_rows, local_columns,
+                                         m, n, (void *)this, &matrix);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
     // register the MatrixFree::matrix_free_mult function
     // as the matrix multiplication used by this matrix

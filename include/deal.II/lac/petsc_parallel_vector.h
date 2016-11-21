@@ -486,11 +486,10 @@ namespace PETScWrappers
           // we skip the code below and create a simple serial vector of
           // length 0
 
-          int ierr;
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
-          ierr = VecDestroy (vector);
+          PetscErrorCode ierr = VecDestroy (vector);
 #else
-          ierr = VecDestroy (&vector);
+          PetscErrorCode ierr = VecDestroy (&vector);
 #endif
           AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -512,13 +511,11 @@ namespace PETScWrappers
             reinit (v.communicator, v.size(), v.local_size(), true);
         }
 
-      const int ierr = VecCopy (v.vector, vector);
+      PetscErrorCode ierr = VecCopy (v.vector, vector);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       if (has_ghost_elements())
         {
-          int ierr;
-
           ierr = VecGhostUpdateBegin(vector, INSERT_VALUES, SCATTER_FORWARD);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
           ierr = VecGhostUpdateEnd(vector, INSERT_VALUES, SCATTER_FORWARD);

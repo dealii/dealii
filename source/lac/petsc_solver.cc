@@ -60,8 +60,6 @@ namespace PETScWrappers
                      const VectorBase         &b,
                      const PreconditionerBase &preconditioner)
   {
-    int ierr;
-
     /*
       TODO: PETSc duplicates communicators, so this does not work (you put MPI_COMM_SELF in, but get something other out when you ask PETSc for the communicator. This mainly fails due to the MatrixFree classes, that can not ask PETSc for a communicator. //Timo Heister
     Assert(A.get_mpi_communicator()==mpi_communicator, ExcMessage("PETSc Solver and Matrix need to use the same MPI_Comm."));
@@ -75,7 +73,7 @@ namespace PETScWrappers
       {
         solver_data.reset (new SolverData());
 
-        ierr = KSPCreate (mpi_communicator, &solver_data->ksp);
+        PetscErrorCode ierr = KSPCreate (mpi_communicator, &solver_data->ksp);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
         // let derived classes set the solver
@@ -117,7 +115,7 @@ namespace PETScWrappers
       }
 
     // set the command line option prefix name
-    ierr = KSPSetOptionsPrefix(solver_data->ksp, prefix_name.c_str());
+    PetscErrorCode ierr = KSPSetOptionsPrefix(solver_data->ksp, prefix_name.c_str());
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // set the command line options provided
@@ -207,7 +205,7 @@ namespace PETScWrappers
   void
   SolverBase::initialize(const PreconditionerBase &preconditioner)
   {
-    int ierr;
+    PetscErrorCode ierr;
 
     solver_data.reset (new SolverData());
 
@@ -263,8 +261,7 @@ namespace PETScWrappers
   void
   SolverRichardson::set_solver_type (KSP &ksp) const
   {
-    int ierr;
-    ierr = KSPSetType (ksp, KSPRICHARDSON);
+    PetscErrorCode ierr = KSPSetType (ksp, KSPRICHARDSON);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // set the damping factor from the data
@@ -315,9 +312,9 @@ namespace PETScWrappers
     // spelling Chebyshev between PETSc 3.2
     // and 3.3...
 #if DEAL_II_PETSC_VERSION_LT(3,3,0)
-    int ierr = KSPSetType (ksp, KSPCHEBYCHEV);
+    PetscErrorCode ierr = KSPSetType (ksp, KSPCHEBYCHEV);
 #else
-    int ierr = KSPSetType (ksp, KSPCHEBYSHEV);
+    PetscErrorCode ierr = KSPSetType (ksp, KSPCHEBYSHEV);
 #endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -343,7 +340,7 @@ namespace PETScWrappers
   void
   SolverCG::set_solver_type (KSP &ksp) const
   {
-    int ierr = KSPSetType (ksp, KSPCG);
+    PetscErrorCode ierr = KSPSetType (ksp, KSPCG);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
@@ -368,7 +365,7 @@ namespace PETScWrappers
   void
   SolverBiCG::set_solver_type (KSP &ksp) const
   {
-    int ierr = KSPSetType (ksp, KSPBICG);
+    PetscErrorCode ierr = KSPSetType (ksp, KSPBICG);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
@@ -403,7 +400,7 @@ namespace PETScWrappers
   void
   SolverGMRES::set_solver_type (KSP &ksp) const
   {
-    int ierr = KSPSetType (ksp, KSPGMRES);
+    PetscErrorCode ierr = KSPSetType (ksp, KSPGMRES);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // set the restart parameter from the
@@ -470,7 +467,7 @@ namespace PETScWrappers
   void
   SolverBicgstab::set_solver_type (KSP &ksp) const
   {
-    int ierr = KSPSetType (ksp, KSPBCGS);
+    PetscErrorCode ierr = KSPSetType (ksp, KSPBCGS);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
@@ -495,7 +492,7 @@ namespace PETScWrappers
   void
   SolverCGS::set_solver_type (KSP &ksp) const
   {
-    int ierr = KSPSetType (ksp, KSPCGS);
+    PetscErrorCode ierr = KSPSetType (ksp, KSPCGS);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
@@ -520,7 +517,7 @@ namespace PETScWrappers
   void
   SolverTFQMR::set_solver_type (KSP &ksp) const
   {
-    int ierr = KSPSetType (ksp, KSPTFQMR);
+    PetscErrorCode ierr = KSPSetType (ksp, KSPTFQMR);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
@@ -545,7 +542,7 @@ namespace PETScWrappers
   void
   SolverTCQMR::set_solver_type (KSP &ksp) const
   {
-    int ierr = KSPSetType (ksp, KSPTCQMR);
+    PetscErrorCode ierr = KSPSetType (ksp, KSPTCQMR);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
@@ -570,7 +567,7 @@ namespace PETScWrappers
   void
   SolverCR::set_solver_type (KSP &ksp) const
   {
-    int ierr = KSPSetType (ksp, KSPCR);
+    PetscErrorCode ierr = KSPSetType (ksp, KSPCR);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
@@ -595,7 +592,7 @@ namespace PETScWrappers
   void
   SolverLSQR::set_solver_type (KSP &ksp) const
   {
-    int ierr = KSPSetType (ksp, KSPLSQR);
+    PetscErrorCode ierr = KSPSetType (ksp, KSPLSQR);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
@@ -620,7 +617,7 @@ namespace PETScWrappers
   void
   SolverPreOnly::set_solver_type (KSP &ksp) const
   {
-    int ierr = KSPSetType (ksp, KSPPREONLY);
+    PetscErrorCode ierr = KSPSetType (ksp, KSPPREONLY);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // The KSPPREONLY solver of
@@ -667,7 +664,7 @@ namespace PETScWrappers
     * preconditioner.  Its use is due to SparseDirectMUMPS being a direct
     * (rather than iterative) solver
     */
-    int ierr = KSPSetType (ksp, KSPPREONLY);
+    PetscErrorCode ierr = KSPSetType (ksp, KSPPREONLY);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     /**
@@ -692,8 +689,6 @@ namespace PETScWrappers
                             const VectorBase &b)
   {
 #ifdef PETSC_HAVE_MUMPS
-    int ierr;
-
     /**
      * factorization matrix to be obtained from MUMPS
      */
@@ -725,7 +720,7 @@ namespace PETScWrappers
          * creates the default KSP context and puts it in the location
          * solver_data->ksp
          */
-        ierr = KSPCreate (mpi_communicator, &solver_data->ksp);
+        PetscErrorCode ierr = KSPCreate (mpi_communicator, &solver_data->ksp);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
         /**
@@ -820,7 +815,7 @@ namespace PETScWrappers
     /**
      * solve the linear system
      */
-    ierr = KSPSolve (solver_data->ksp, b, x);
+    PetscErrorCode ierr = KSPSolve (solver_data->ksp, b, x);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     /**
