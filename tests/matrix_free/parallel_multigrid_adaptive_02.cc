@@ -49,34 +49,6 @@ std::ofstream logfile("output");
 
 using namespace dealii::MatrixFreeOperators;
 
-
-template <typename LAPLACEOPERATOR>
-class MGInterfaceMatrix : public Subscriptor
-{
-public:
-  void initialize (const LAPLACEOPERATOR &laplace)
-  {
-    this->laplace = &laplace;
-  }
-
-  void vmult (LinearAlgebra::distributed::Vector<double> &dst,
-              const LinearAlgebra::distributed::Vector<double> &src) const
-  {
-    laplace->vmult_interface_down(dst, src);
-  }
-
-  void Tvmult (LinearAlgebra::distributed::Vector<double> &dst,
-               const LinearAlgebra::distributed::Vector<double> &src) const
-  {
-    laplace->vmult_interface_up(dst, src);
-  }
-
-private:
-  SmartPointer<const LAPLACEOPERATOR> laplace;
-};
-
-
-
 template <int dim, typename LAPLACEOPERATOR>
 class MGTransferMF : public MGTransferMatrixFree<dim, typename LAPLACEOPERATOR::value_type>
 {
@@ -239,7 +211,7 @@ void do_test (const DoFHandler<dim>  &dof)
                                     level);
       mg_matrices[level].compute_diagonal();
     }
-  MGLevelObject<MGInterfaceMatrix<LevelMatrixType> > mg_interface_matrices;
+  MGLevelObject<MGInterfaceOperator<LevelMatrixType> > mg_interface_matrices;
   mg_interface_matrices.resize(0, dof.get_triangulation().n_global_levels()-1);
   for (unsigned int level=0; level<dof.get_triangulation().n_global_levels(); ++level)
     mg_interface_matrices[level].initialize(mg_matrices[level]);
