@@ -97,7 +97,10 @@ void MGTransferMatrixFree<dim,Number>::build
 {
   this->fill_and_communicate_copy_indices(mg_dof);
 
+  std::vector<std::vector<Number> > weights_unvectorized;
+
   internal::MGTransfer::ElementInfo<Number> elem_info;
+
   internal::MGTransfer::setup_transfer<dim,Number>(mg_dof,
                                                    (const MGConstrainedDoFs *)this->mg_constrained_dofs,
                                                    elem_info,
@@ -105,7 +108,7 @@ void MGTransferMatrixFree<dim,Number>::build
                                                    parent_child_connect,
                                                    n_owned_level_cells,
                                                    dirichlet_indices,
-                                                   weights_on_refined,
+                                                   weights_unvectorized,
                                                    this->copy_indices_global_mine,
                                                    this->ghosted_level_vector);
   // unpack element info data
@@ -114,6 +117,29 @@ void MGTransferMatrixFree<dim,Number>::build
   n_components             = elem_info.n_components;
   n_child_cell_dofs        = elem_info.n_child_cell_dofs;
   shape_info               = elem_info.shape_info;
+
+
+  // reshuffle into aligned vector of vectorized arrays
+  const unsigned int vec_size = VectorizedArray<Number>::n_array_elements;
+  const unsigned int n_levels = mg_dof.get_triangulation().n_global_levels();
+
+  const unsigned int n_weights_per_cell = Utilities::fixed_power<dim>(3);
+  weights_on_refined.resize(n_levels-1);
+  for (unsigned int level = 1; level<n_levels; ++level)
+    {
+      weights_on_refined[level-1].resize(((n_owned_level_cells[level-1]+vec_size-1)/vec_size)*n_weights_per_cell);
+
+      for (unsigned int c=0; c<n_owned_level_cells[level-1]; ++c)
+        {
+          const unsigned int comp = c/vec_size;
+          const unsigned int v = c%vec_size;
+          for (unsigned int i = 0; i<n_weights_per_cell; ++i)
+            {
+
+              weights_on_refined[level-1][comp*n_weights_per_cell+i][v] = weights_unvectorized[level-1][c*n_weights_per_cell+i];
+            }
+        }
+    }
 
   evaluation_data.resize(3*n_child_cell_dofs);
 }

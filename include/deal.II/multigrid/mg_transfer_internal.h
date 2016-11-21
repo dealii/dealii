@@ -106,7 +106,7 @@ namespace internal
                         std::vector<std::vector<std::pair<unsigned int,unsigned int> > >    &parent_child_connect,
                         std::vector<unsigned int>                                           &n_owned_level_cells,
                         std::vector<std::vector<std::vector<unsigned short> > >             &dirichlet_indices,
-                        std::vector<AlignedVector<VectorizedArray<Number> > >               &weights_on_refined,
+                        std::vector<std::vector<Number> >                                   &weights_on_refined,
                         std::vector<std::vector<std::pair<unsigned int, unsigned int> > >   &copy_indices_global_mine,
                         MGLevelObject<LinearAlgebra::distributed::Vector<Number> >          &ghosted_level_vector);
 

@@ -456,7 +456,7 @@ namespace internal
                         std::vector<std::vector<std::pair<unsigned int,unsigned int> > >    &parent_child_connect,
                         std::vector<unsigned int>                                           &n_owned_level_cells,
                         std::vector<std::vector<std::vector<unsigned short> > >             &dirichlet_indices,
-                        std::vector<AlignedVector<VectorizedArray<Number> > >               &weights_on_refined,
+                        std::vector<std::vector<Number> >                                   &weights_on_refined,
                         std::vector<std::vector<std::pair<unsigned int, unsigned int> > >   &copy_indices_global_mine,
                         MGLevelObject<LinearAlgebra::distributed::Vector<Number> >          &ghosted_level_vector)
     {
@@ -709,7 +709,6 @@ namespace internal
           ghosted_level_vector[level].compress(VectorOperation::add);
           ghosted_level_vector[level].update_ghost_values();
 
-          const unsigned int vec_size = VectorizedArray<Number>::n_array_elements;
           std::vector<unsigned int> degree_to_3 (n_child_dofs_1d);
           degree_to_3[0] = 0;
           for (unsigned int i=1; i<n_child_dofs_1d-1; ++i)
@@ -718,21 +717,16 @@ namespace internal
 
           // we only store 3^dim weights because all dofs on a line have the
           // same valence, and all dofs on a quad have the same valence.
-          weights_on_refined[level-1].resize(((n_owned_level_cells[level-1]+vec_size-1)/vec_size)*Utilities::fixed_power<dim>(3));
+          weights_on_refined[level-1].resize(n_owned_level_cells[level-1]*Utilities::fixed_power<dim>(3));
           for (unsigned int c=0; c<n_owned_level_cells[level-1]; ++c)
-            {
-              const unsigned int comp = c/vec_size;
-              const unsigned int v = c%vec_size;
-
-              for (unsigned int k=0, m=0; k<(dim>2 ? n_child_dofs_1d : 1); ++k)
-                for (unsigned int j=0; j<(dim>1 ? n_child_dofs_1d : 1); ++j)
-                  {
-                    unsigned int shift = 9*degree_to_3[k] + 3*degree_to_3[j];
-                    for (unsigned int i=0; i<n_child_dofs_1d; ++i, ++m)
-                      weights_on_refined[level-1][comp*Utilities::fixed_power<dim>(3)+shift+degree_to_3[i]][v] = Number(1.)/
-                          ghosted_level_vector[level].local_element(level_dof_indices[level][elem_info.n_child_cell_dofs*c+m]);
-                  }
-            }
+            for (unsigned int k=0, m=0; k<(dim>2 ? n_child_dofs_1d : 1); ++k)
+              for (unsigned int j=0; j<(dim>1 ? n_child_dofs_1d : 1); ++j)
+                {
+                  unsigned int shift = 9*degree_to_3[k] + 3*degree_to_3[j];
+                  for (unsigned int i=0; i<n_child_dofs_1d; ++i, ++m)
+                    weights_on_refined[level-1][c*Utilities::fixed_power<dim>(3)+shift+degree_to_3[i]] = Number(1.)/
+                        ghosted_level_vector[level].local_element(level_dof_indices[level][elem_info.n_child_cell_dofs*c+m]);
+                }
         }
 
     }
