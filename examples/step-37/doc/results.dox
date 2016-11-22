@@ -291,6 +291,120 @@ elements increases (the matrix-free implementation has costs
 2<i>p<sup>d</sup></i> for the sparse matrix, so it will win anyway for order 4
 and higher in 3d).
 
-<h3> Results for large-scale parallel computations</h3>
+<h3> Results for large-scale parallel computations on SuperMUC</h3>
 
-<h3> Results with adaptivity</h3>
+As explained in the introduction and the in-code comments, this program can be
+run in parallel with MPI. It turns out that geometric multigrid schemes work
+really well and can scale to very large machines. To the authors' knowledge,
+the geometric multigrid results shown here are the largest computations done
+with deal.II as of late 2016, run on up to 147,456 cores of the <a
+href="https://www.lrz.de/services/compute/supermuc/systemdescription/">complete
+SuperMUC Phase 1</a>. The ingredients for scalability beyond 1000 cores are
+that no data structure that depends on the global problem size is held in its
+entirety on a single processor and that the communication is not too frequent
+in order not to run into latency issues of the network.  For PDEs solved with
+iterative solvers, the communication latency is often the limiting factor,
+rather than the throughput of the network. For the example of the SuperMUC
+system, the point-to-point latency between two processors is between 1e-6 and
+1e-5 seconds, depending on the proximity in the MPI network. The matrix-vector
+products with @p LaplaceOperator from this class involves several
+point-to-point communication steps, interleaved with computations on each
+core. The resulting latency of a matrix-vector product is around 1e-4
+seconds. Global communication, for example an @p MPI_Allreduce operation that
+accumulates the sum of a single number per rank over all ranks in the MPI
+network, has a latency of 1e-4 seconds. The multigrid V-cycle used in this
+program is also a form of global communication. Think about the coarse grid
+solve that happens on a single processor: It accumulates the contributions
+from all processors before it starts. When completed, the coarse grid solution
+is transfered to finer levels, where more and more processors help in
+smoothing until the fine grid. Essentially, this is a tree-like pattern over
+the processors in the network and controlled by the mesh. As opposed to the
+@p MPI_Allreduce operations where the tree in the reduction is optimized to the
+actual links in the MPI network, the multigrid V-cycle does this according to
+the partitioning of the mesh. Thus, we cannot expect the same
+optimality. Furthermore, the multigrid cycle is not simply a walk up and down
+the refinement tree, but also communication on each level when doing the
+smoothing. In other words, the global communication in multigrid is more
+challenging and related to the mesh that provides less optimization
+opportunities. The measured latency of the V-cycle is between 6e-3 and 2e-2
+seconds, i.e., the same as 60 to 200 MPI_Allreduce operations.
+
+The following figure shows a scaling experiments on $\mathcal Q_3$
+elements. Along the lines, the problem size is held constant as the number of
+cores is increasing. When doubling the number of cores, one expects a halving
+of the computational time, indicated by the dotted gray lines. The results
+show that the implementation shows almost ideal behavior until an absolute
+time of around 0.1 seconds is reached. The solver tolerances have been set
+such that the solver performs five iterations. This way of plotting data is
+the <b>strong scaling</b> of the algorithm. As we go to very large core
+counts, the curves flatten out a bit earlier, which is because of the
+communication network in SuperMUC where communication between processors
+farther away is slightly slower.
+
+<img src="https://www.dealii.org/images/steps/developer/step-37.scaling_strong.png" alt="">
+
+In addition, the plot also contains results for <b>weak scaling</b> that lists
+how the algorithm behaves as both the number of processor cores and elements
+is increased at the same pace. In this situation, we expect that the compute
+time remains constant. Algorithmically, the number of CG iterations is
+constant at 5, so we are good from that end. The lines in the plot are
+arranged such that the top left point in each data series represents the same
+size per processor, namely 131,072 elements (or approximately 3.5 million
+degrees of freedom per core). The gray lines indicating ideal strong scaling
+are by the same factor of 8 apart. The results show again that the scaling is
+almost ideal. The parallel efficiency when going from 288 cores to 147,456
+cores is at around 75% for a local problem size of 750,000 degrees of freedom
+per core which takes 1.0s on 288 cores, 1.03s on 2304 cores, 1.19s on 18k
+cores, and 1.35s on 147k cores. The algorithms also reach a very high
+utilization of the processor. The largest computation on 147k cores reaches
+around 1.7 PFLOPs/s on SuperMUC out of an arithmetic peak of 3.2 PFLOPs/s. For
+an iterative PDE solver, this is a very high number and significantly more is
+often only reached for dense linear algebra. Sparse linear algebra is limited
+to a tenth of this value.
+
+As mentioned in the introduction, the matrix-free method reduces the memory
+consumption of the data structures. Besides the higher performance due to less
+memory transfer, the algorithms also allow for very large problems to fit into
+memory. The figure below we show the computational time as we increase the
+problem size until an upper limit where the computation exhausts memory. We do
+this for 1k cores, 8k cores, and 65k cores and see that the problem size can
+be varied over almost two orders of magnitude with ideal scaling. The largest
+computation shown in this picture involves 292 billion ($2.92 \cdot 10^{11}$)
+degrees of freedom. On a DG computation of 147k DoFs, the above algorithms
+were also run on 532 billion DoFs.
+
+<img src="https://www.dealii.org/images/steps/developer/step-37.scaling_size.png" alt="">
+
+Finally, we note that while performing the tests on the large-scale system
+shown above lead to improvements of the multigrid algorithms in deal.II. The
+original version contained the sub-optimal code based on
+MGSmootherPrecondition where some inner products were done on each smoothing
+operation on each level, which only became apparent on 65k cores and
+more. However, the following picture shows that the improvement already pay
+off on a smaller scale, here shown on computations on up to 14,336 cores for
+$\mathcal Q_5$ elements:
+
+<img src="https://www.dealii.org/images/steps/developer/step-37.scaling_oldnew.png" alt="">
+
+
+<h3> Adaptivity</h3>
+
+As explained in the code, the algorithm presented here is prepared to run on
+adaptively refined meshes. If only part of the mesh is refined, the multigrid
+cycle will run with local smoothing and impose Dirichlet conditions along the
+interfaces which differ in refinement level for smoothing through the
+MatrixFreeOperators::Base class. Due to the way the degrees of freedom are
+distributed over levels, relating the owner of the level cells to the owner of
+the first descendant active cell, there can be an imbalance between different
+processors in MPI, which limits scalability by a factor of around two to five.
+
+<h3> Possibilities for extensions</h3>
+
+This program is parallelized with MPI only. As an alternative, the MatrixFree
+loop can also be issued in hybrid mode, for example by using MPI parallelizing
+over the nodes of a cluster and with threads through Intel TBB within the
+shared memory region of one node. To use this, one would need to both set the
+number of threads in the MPI_InitFinalize data structure in the main function,
+and set the MatrixFree::AdditionalData::tasks_parallel_scheme to
+partition_color to actually do the loop in parallel. This use case is
+discussed in step-48.
