@@ -67,7 +67,7 @@ In this formula, the matrix <i>P</i><sub>cell,loc-glob</sub> is a rectangular
 matrix that defines the index mapping from local degrees of freedom in the
 current cell to the global degrees of freedom. The information from which this
 operator can be built is usually encoded in the <code>local_dof_indices</code>
-variable is used in the assembly calls filling matrices in deal.II. Moreover,
+variable and is used in the assembly calls filling matrices in deal.II. Here,
 <i>A</i><sub>cell</sub> denotes the cell matrix associated with <i>A</i>.
 
 If we are to perform a matrix-vector product, we can hence use that
@@ -204,20 +204,23 @@ tutorial programs, there is nothing to be optimized since FEValues::reinit
 needs to be called on every cell. In this process, the transformation is
 applied while computing the local matrix elements.
 
-In a matrix-free implementation, however, we will compute those integrals much
-more often than once. For example, iterative solvers will apply the matrix
-many times, and so we can think about whether we may be able to cache
-something between different operator applications, i.e., integral
+In a matrix-free implementation, however, we will compute those integrals very
+often because iterative solvers will apply the matrix many times during the
+solution process. Therefore, we need to think about whether we may be able to
+cache some data that gets reused in the operator applications, i.e., integral
 computations. On the other hand, we realize that we must not cache too much
 data since otherwise we get back to the situation where memory access becomes
-the dominating factor.
+the dominating factor. Therefore, we will not store the transformed gradients
+in the matrix <i>B</i>, as they would in general be different on every element
+for curved meshes.
 
 The trick is to factor out the Jacobian transformation and first apply the
-gradient on the reference cell only. That transforms the vector of values on
-the local dofs to a vector of gradients on the quadrature points. There, we
-first apply the Jacobian that we factored out from the gradient, apply the
-weights of the quadrature, and finally apply the transposed Jacobian for
-preparing the third loop which again uses the gradients on the unit cell.
+gradient on the reference cell only. This operation interpolates the vector of
+values on the local dofs to a vector of (unit-coordinate) gradients on the
+quadrature points. There, we first apply the Jacobian that we factored out
+from the gradient, then apply the weights of the quadrature, and finally apply
+the transposed Jacobian for preparing the third loop which tests by the
+gradients on the unit cell and sums over quadrature points.
 
 Let us again write this in terms of matrices. Let the matrix
 <i>B</i><sub>cell</sub> denote the cell-related gradient matrix, with each row
@@ -326,45 +329,63 @@ Note how we create an additional FEValues object for the reference cell
 gradients and how we initialize it to the reference cell. The actual
 derivative data is then applied by the inverse, transposed Jacobians (deal.II
 calls the Jacobian matrix from real to unit cell inverse_jacobian, as the
-forward transformation is from unit to real cell). Note that the factor
+forward transformation is from unit to real cell). The factor
 $J_\mathrm{cell}^{-1} D_\mathrm{cell} J_\mathrm{cell}^{-\mathrm T}$ is
 block-diagonal over quadrature. In this form, one realizes that variable
 coefficients (possibly expressed through a tensor) and general grid topologies
-with Jacobian transformations have a similar effect on the coefficient that
-transforms the unit-cell derivatives.
+with Jacobian transformations have a similar effect on the coefficient
+transforming the unit-cell derivatives.
 
-Finally, we are using tensor product basis functions and now that we have
-separated out the gradient on the reference cell <i>B</i><sub>ref_cell</sub>,
-we can exploit the tensor-product structure to further reduce the
-complexity. We illustrate this in two space dimensions, but the same technique
-can be used in higher dimensions. On the reference cell, the basis functions
-are of the tensor product form $\phi(x,y,z) = \varphi_i(x) \varphi_j(y)$. The
-part of the matrix <i>B</i><sub>ref_cell</sub> that computes the first
-component has the form $B_\mathrm{sub\_cell}^x = B_\mathrm{grad,x} \otimes
-B_\mathrm{val,y}$, where <i>B</i><sub>grad,x</sub> and
-<i>B</i><sub>val,y</sub> contain the evaluation of all the 1D basis functions
-on all the 1D quadrature points. Forming a matrix <i>U</i> with <i>U(j,i)</i>
-containing the coefficient belonging to basis function $\varphi_i(x)
-\varphi_j(y)$, we get $(B_\mathrm{grad,x} \otimes
+At this point, one might wonder why we store the matrix
+$J_\mathrm{cell}^{-\mathrm T}$ and the coefficient separately, rather than
+only the complete factor $J_\mathrm{cell}^{-1} D_\mathrm{cell}
+J_\mathrm{cell}^{-\mathrm T}$. The latter would use less memory because the
+tensor is symmetric with six independent values in 3D, whereas for the former
+we would need nine entries for the inverse transposed Jacobian, one for the
+quadrature weight and Jacobian determinant, and one for the coefficient,
+totaling to 11 doubles. The reason is that the former approach allows for
+implementing generic differential operators through a common framework of
+cached data, whereas the latter specifically stores the coefficient for the
+Laplacian. In case applications demand for it, this specialization could pay
+off and would be worthwhile to consider. Note that the implementation in
+deal.II is smart enough to detenct Cartesian or affine geometries where the
+Jacobian is constant throughout the cell and needs not be stored for every
+cell (and indeed often is the same over different cells as well).
+
+The final optimization that is most crucial from an operation count point of
+view is to make use of the tensor product structure in the basis
+functions. This is possible because we have factored out the gradient from the
+reference cell operation described by <i>B</i><sub>ref_cell</sub>, i.e., an
+interpolation operation over the completely regular data fields of the
+reference cell. We illustrate the process of complexity reduction in two space
+dimensions, but the same technique can be used in higher dimensions. On the
+reference cell, the basis functions are of the tensor product form
+$\phi(x,y,z) = \varphi_i(x) \varphi_j(y)$. The part of the matrix
+<i>B</i><sub>ref_cell</sub> that computes the first component has the form
+$B_\mathrm{sub\_cell}^x = B_\mathrm{grad,x} \otimes B_\mathrm{val,y}$, where
+<i>B</i><sub>grad,x</sub> and <i>B</i><sub>val,y</sub> contain the evaluation
+of all the 1D basis functions on all the 1D quadrature points. Forming a
+matrix <i>U</i> with <i>U(j,i)</i> containing the coefficient belonging to
+basis function $\varphi_i(x) \varphi_j(y)$, we get $(B_\mathrm{grad,x} \otimes
 B_\mathrm{val,y})u_\mathrm{cell} = B_\mathrm{val,y} U B_\mathrm{grad,x}$. This
 reduces the complexity for computing this product from $p^4$ to $2 p^3$, where
 <i>p</i>-1 is the degree of the finite element (i.e., equivalently, <i>p</i>
 is the number of shape functions in each coordinate direction), or $p^{2d}$ to
-$d p^{d+1}$ in general. Note that the concentration on the polynomial degree
-in terms of complexity is relevant as the polynomial degree is increased
-rather than the grid resolution. Good algorithms for moderate degrees like the
-one used here are linear in the polynomial degree independent on the
-dimension, as opposed to matrix-based schemes or naive evaluation through
-FEValues. These techniques have been established in the spectral element
-community since the 1980s.
+$d p^{d+1}$ in general. The reason why we look at the complexity in terms of
+the polynomial degree is since we want to be able to go to high degrees and
+possibly increase the polynomial degree <i>p</i> instead of the grid
+resolution. Good algorithms for moderate degrees like the ones used here are
+linear in the polynomial degree independent on the dimension, as opposed to
+matrix-based schemes or naive evaluation through FEValues. The techniques used
+in the implementations of deal.II have been established in the spectral
+element community since the 1980s.
 
 Implementing a matrix-free and cell-based finite element operator requires a
-somewhat different design compared to the usual matrix assembly codes shown in
-previous tutorial programs. The data structures for doing this are the
-MatrixFree class that collects all data and issues a (parallel) loop over all
-cells and the FEEvaluation class that evaluates finite element basis functions
-by making use of the tensor product structure.
-
+somewhat different program design as compared to the usual matrix assembly
+codes shown in previous tutorial programs. The data structures for doing this
+are the MatrixFree class that collects all data and issues a (parallel) loop
+over all cells and the FEEvaluation class that evaluates finite element basis
+functions by making use of the tensor product structure.
 
 The implementation of the matrix-free matrix-vector product shown in this
 tutorial is slower than a matrix-vector product using a sparse matrix for
@@ -373,47 +394,52 @@ reduced complexity due to the tensor product structure and due to less memory
 transfer during computations. The impact of reduced memory transfer is
 particularly beneficial when working on a multicore processor where several
 processing units share access to memory. In that case, an algorithm which is
-computation bound will show almost perfect parallel speedup, whereas an
-algorithm that is bound by memory transfer might not achieve similar speedup
-(even when the work is perfectly parallel and one could expect perfect scaling
-like in sparse matrix-vector products). An additional gain with this
-implementation is that we do not have to build the sparse matrix itself, which
-can also be quite expensive depending on the underlying differential
-equation. Moreover, the above framework is simple to generalize to nonlinear
-operations, as we demonstrate in step-48.
+computation bound will show almost perfect parallel speedup (apart from
+possible changes of the processor's clock frequency through turbo modes
+depending on how many cores are active), whereas an algorithm that is bound by
+memory transfer might not achieve similar speedup (even when the work is
+perfectly parallel and one could expect perfect scaling like in sparse
+matrix-vector products). An additional gain with this implementation is that
+we do not have to build the sparse matrix itself, which can also be quite
+expensive depending on the underlying differential equation. Moreover, the
+above framework is simple to generalize to nonlinear operations, as we
+demonstrate in step-48.
 
 
 <h3>Combination with multigrid</h3>
 
 Above, we have gone to significant lengths to implement a matrix-vector
 product that does not actually store the matrix elements. In many user codes,
-however, one wants more than just performing some number of matrix-vector
-products &mdash; one wants to do as little of these operations as possible
-when solving linear equation systems. In theory, we could use the CG method
-without preconditioning; however, that would not be very efficient. Rather,
-one uses preconditioners for improving speed. Unfortunately, most of the more
-frequently used preconditioners such as SSOR, ILU or algebraic multigrid (AMG)
-cannot be used here because their implementation requires knowledge of the
-elements of the system matrix.
+however, one wants more than just doing a few matrix-vector products &mdash;
+one wants to do as few of these operations as possible when solving linear
+systems. In theory, we could use the CG method without preconditioning;
+however, that would not be very efficient for the Laplacian. Rather,
+preconditioners are used for increasing the speed of
+convergence. Unfortunately, most of the more frequently used preconditioners
+such as SSOR, ILU or algebraic multigrid (AMG) cannot be used here because
+their implementation requires knowledge of the elements of the system matrix.
 
 One solution is to use geometric multigrid methods as shown in step-16. They
-are known to be very fast, and they are suitable for our purpose since they
-can be designed based purely on matrix-vector products related to the a
-colletion of cells. All one needs to do is to find a smoother that works with
-matrix-vector products only (our choice requires knowledge of the diagonal
-entries of the matrix, though). One such candidate would be a damped Jacobi
-iteration, but that is often not sufficiently good in damping high-frequency
-errors. A Chebyshev iteration around the Jacobi method, eventually, is our
-choice in this tutorial program. It can be seen as an extension of the Jacobi
-method by using Chebyshev polynomials. With degree zero, the Jacobi method
-with optimal damping parameter is retrieved, whereas higher order corrections
-improve the smoothing properties if some parameters are suitably chosen. The
-effectiveness of Chebyshev smoothing in multigrid has been demonstrated, e.g.,
-in the article <a
-href="http://www.sciencedirect.com/science/article/pii/S0021999103001943">
+are known to be very fast, and they are suitable for our purpose since all
+ingredients, including the transfer between different grid levels, can be
+expressed in terms of matrix-vector products related to a colletion of
+cells. All one needs to do is to find a smoother that is based on
+matrix-vector products rather than all the matrix entries. One such candidate
+would be a damped Jacobi iteration that requires access to the matrix
+diagonal, but it is often not sufficiently good in damping all high-frequency
+errors. The properties of the Jacobi method can be improved by iterating it a
+few times with the so-called Chebyshev iteration. The Chebyshev iteration is
+described by a polynomial expression of the matrix-vector product where the
+coefficients can be chosen to achieve certain properties, in this case to
+smooth the high-frequency components of the error which are associated to the
+eigenvalues of the Jacobi-preconditioned matrix. At degree zero, the Jacobi
+method with optimal damping parameter is retrieved, whereas higher order
+corrections are used to improve the smoothing properties. The effectiveness of
+Chebyshev smoothing in multigrid has been demonstrated, e.g., in the article
+<a href="http://www.sciencedirect.com/science/article/pii/S0021999103001943">
 <i>M. Adams, M. Brezina, J. Hu, R. Tuminaro. Parallel multigrid smoothers:
 polynomial versus Gauss&ndash;Seidel, J. Comput. Phys. 188:593&ndash;610,
-2003</i> </a>. This publication also identifies one more advantage of
+2003</i></a>. This publication also identifies one more advantage of
 Chebyshev smoothers that we exploit here, namely that they are easy to
 parallelize, whereas SOR/Gauss&ndash;Seidel smoothing relies on substitutions,
 for which a naive parallelization works on diagonal sub-blocks of the matrix,
@@ -475,47 +501,52 @@ cells at once. In all what follows, you can think of a VectorizedArray to hold
 data from several cells. Remember that it is not related to the spatial
 dimension and the number of elements e.g. in a Tensor or Point.
 
-Note that vectorization depends on the CPU that is used for deal.II. In order
-to generate the fastest kernels of FEEvaluation for your computer, you should
-compile deal.II with the so-called <i>native</i> processor variant. When using
-the gcc compiler, it can be enabled by setting the variable
-<tt>CMAKE_CXX_FLAGS</tt> to <tt>"-march=native"</tt> in the cmake build
-settings (on the command line, specify
-<tt>-DCMAKE_CXX_FLAGS="-march=native"</tt>, see the deal.II README for more
-information). Similar options exist for other compilers.
+Note that vectorization depends on the CPU the code is running on and for
+which the code is compiled. In order to generate the fastest kernels of
+FEEvaluation for your computer, you should compile deal.II with the so-called
+<i>native</i> processor variant. When using the gcc compiler, it can be
+enabled by setting the variable <tt>CMAKE_CXX_FLAGS</tt> to
+<tt>"-march=native"</tt> in the cmake build settings (on the command line,
+specify <tt>-DCMAKE_CXX_FLAGS="-march=native"</tt>, see the deal.II README for
+more information). Similar options exist for other compilers.
 
 
 <h3>Running multigrid on large-scale parallel computers</h3>
 
 As mentioned above, all components in the matrix-free framework can easily be
-parallelized with MPI using domain decomposition. Thanks to the good support
-of large-scale parallel mesh framework provided by p4est (see step-40 for
-details) in deal.II, and the fact that cell-based loops with matrix-free
-evaluation <i>only</i> need a decomposition of the mesh into chunks of roughly
-equal size on each processor, there is relatively little to do for extending
-the program to MPI. While other tutorial programs using MPI have relied on
-either PETSc or Trilinos, this program uses deal.II's own parallel vector
-facilities.
+parallelized with MPI using domain decomposition. Thanks to the easy access to
+large-scale parallel meshes through p4est (see step-40 for details) in
+deal.II, and the fact that cell-based loops with matrix-free evaluation
+<i>only</i> need a decomposition of the mesh into chunks of roughly equal size
+on each processor, there is relatively little to do to write a parallel
+program working with distributed memory. While other tutorial programs using
+MPI have relied on either PETSc or Trilinos, this program uses deal.II's own
+parallel vector facilities.
 
 The deal.II parallel vector class, LinearAlgebra::distributed::Vector, holds
-the processor-local part of the solution as well as information on and data
-fields for the ghost DoFs, i.e. DoFs that are owned by a remote processor but
-needed on cells that are treated by the present processor. Moreover, it holds
-the MPI-send information for DoFs that are owned locally but needed by other
-processors. A benefit of the design of that vector class is the way ghosted
-entries are accessed. In the storage scheme of the vector, the array of data
-does extend beyond the processor-local part of the solution with further
-vector entries available for the ghost degrees of freedom by a continguous
-index range. (Note that the index range depends on the exact configuration of
-the mesh.) Moreover, it holds the MPI-send information for DoFs that are owned
-locally but needed by other processors. Since matrix-free operations can be
-thought of doing linear algebra that is performance critical, and
-performance-critical code cannot waste time on doing MPI-global to MPI-local
-index translations, the availability of such access functionality in index
-spaces local to one MPI rank is fundamental. The way things are accessed here
-is a direct array access. A user can use the query
-LinearAlgebra::distributed::Vector::local_element for that purpose, but it is
-actually rarely used because all of this happens internally in FEEvaluation.
+the processor-local part of the solution as well as data fields for ghosted
+DoFs, i.e. DoFs that are owned by a remote processor but accessed by cells
+that are owned by the present processor. In the @ref GlossLocallyActiveDof
+"glossary" these degrees of freedom are referred to as locally active degrees
+of freedom. The function MatrixFree::initialize_dof_vector() prodides a method
+that sets this design. Note that hanging nodes can relate to additional
+ghosted degrees of freedom that must be included in the distributed vector but
+are not part of the locally active DoFs in the sense of the @ref
+GlossLocallyActiveDof "glossary". Moreover, the distributed vector holds the
+some MPI metadata for DoFs that are owned locally but needed by other
+processors. A benefit of the design of this vector class is the way ghosted
+entries are accessed. In the storage scheme of the vector, the data array
+extends beyond the processor-local part of the solution with further vector
+entries available for the ghosted degrees of freedom. This gives a continguous
+index range for all locally active degrees of freedom. (Note that the index
+range depends on the exact configuration of the mesh.) Since matrix-free
+operations can be thought of doing linear algebra that is performance
+critical, and performance-critical code cannot waste time on doing MPI-global
+to MPI-local index translations, the availability of an index spaces local to
+one MPI rank is fundamental. The way things are accessed here is a direct
+array access. This is provided through
+LinearAlgebra::distributed::Vector::local_element(), but it is actually rarely
+needed because all of this happens internally in FEEvaluation.
 
 The design of LinearAlgebra::distributed::Vector is similar to the
 PETScWrappers::MPI::Vector and TrilinosWrappers::MPI::Vector data types we

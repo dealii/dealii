@@ -50,7 +50,7 @@ Time solve (6 iterations)  (CPU/wall) 0.260042s/0.265033s
 @endcode
 
 As in step-16, we see that the number of CG iterations remains constant with
-increasing number of degrees of freedom. The constant number of iterations
+increasing number of degrees of freedom. A constant number of iterations
 (together with optimal computational properties) means that the computing time
 approximately quadruples as the problem size quadruples from one cycle to the
 next. A look at the memory consumption reveals that the code is also very
@@ -59,8 +59,8 @@ efficient in terms of storage. Around 2-4 million degrees of freedom fit into
 cheaper than the setup, despite not building a matrix (approximately half of
 which is spent in the DoFHandler::distribute_dofs() and
 DoFHandler::distributed_mg_dofs() calls). This shows the high efficiency of
-this approach, but also the fact that most benefit will be obtained when
-solving multiple systems on the same mesh and DoFHandler structure.
+this approach, but also that the deal.II data structures are quite expensive
+to set up and the setup cost must be amortized over several system solves.
 
 Not much changes if we run the program in three spatial dimensions, with the
 exception that problem sizes grow by a factor eight when refining the mesh and
@@ -100,7 +100,9 @@ Time solve (6 iterations)  (CPU/wall) 3.53126s/3.56142s
 
 Since it is so easy, we look at what happens if we increase the polynomial
 degree. When selecting the degree as four in 3D, i.e., on $\mathcal Q_4$
-elements, we get the following program output:
+elements, by changing the line <code>const unsigned int
+degree_finite_element=4;</code> at the top of the program, we get the
+following program output:
 
 @code
 Cycle 0
@@ -134,10 +136,10 @@ Total setup time               (wall) 27.8989s
 Time solve (7 iterations)  (CPU/wall) 26.3705s/27.1077s
 @endcode
 
-Since $\mathcal Q_4$ elements on a mesh correspond to $\mathcal Q_2$ elements
-on half the mesh size, we can start to compare the run time at cycle 4 with
-fourth degree polynomials with cycle 5 at quadratic polynomials, both at 2.1
-million degrees of freedom. The surprising effect is that the solver for
+Since $\mathcal Q_4$ elements on a certain mesh correspond to $\mathcal Q_2$
+elements on half the mesh size, we can compare the run time at cycle 4 with
+fourth degree polynomials with cycle 5 using quadratic polynomials, both at
+2.1 million degrees of freedom. The surprising effect is that the solver for
 $\mathcal Q_4$ element is actually slightly faster than for the quadratic
 case, despite using one more linear iteration. The effect that higher-degree
 polynomials are similarly fast or even faster than lower degree ones is one of
@@ -145,9 +147,11 @@ the main strengths of matrix-free operator evaluation through sum
 factorization, see the <a
 href="http://dx.doi.org/10.1016/j.compfluid.2012.04.012">matrix-free
 paper</a>. This is fundamentally different to matrix-based methods that get
-more expensive as the degree increases and the coupling gets denser.
+more expensive per unknown as the polynomial degree increases and the coupling
+gets denser.
 
-The improved efficiency is also reflected in the initialization routines.
+In addition, also the setup gets a bit cheaper for higher order, which is
+because fewer elements need to be set up.
 
 Finally, let us look at the timings with degree 8, which corresponds to
 another round of mesh refinement in the lower order methods:
@@ -184,15 +188,16 @@ mainly due to the computation of the diagonal of the matrix, which actually
 computes a 729 x 729 matrix on each cell and throws away everything but the
 diagonal. The solver times, however, are again very close to the quartic case,
 showing that the linear increase with the polynomial degree that is
-theoretically expected is offset by better computational characteristics and
-the fact that higher order methods have a smaller share of degrees of freedom
-living on several cells that slow the method down.
+theoretically expected is almost completely offset by better computational
+characteristics and the fact that higher order methods have a smaller share of
+degrees of freedom living on several cells that add to the evaluation
+complexity.
 
 <h3>Comparison with a sparse matrix</h3>
 
 In order to understand the capabilities of the matrix-free implementation, we
-compare the performance on the 3d example above with a SparseMatrix
-implementation and we measure the computation times for both initialization of
+compare the performance of the 3d example above with a SparseMatrix
+implementation by measuring both the computation times for the initialization of
 the problem (distribute DoFs, setup and assemble matrices, setup multigrid
 structures) and the actual solution for the matrix-free variant and the
 variant based on sparse matrices. We base the preconditioner on float
@@ -220,43 +225,43 @@ example makes use of multithreading, so both cores are actually used.
     <td align="right">125</td>
     <td align="center">0.0048s</td>
     <td align="center">0.00075s</td>
-    <td align="center">0.0025s</td>
-    <td align="center">0.00033s</td>
+    <td align="center">0.0023s</td>
+    <td align="center">0.00092s</td>
   </tr>
   <tr>
     <td align="right">729</td>
     <td align="center">0.014s</td>
     <td align="center">0.0022s</td>
-    <td align="center">0.0026s</td>
-    <td align="center">0.0018s</td>
+    <td align="center">0.0029s</td>
+    <td align="center">0.0028s</td>
   </tr>
   <tr>
     <td align="right">4,913</td>
     <td align="center">0.10s</td>
     <td align="center">0.012s</td>
-    <td align="center">0.017s</td>
-    <td align="center">0.013s</td>
+    <td align="center">0.014s</td>
+    <td align="center">0.011s</td>
   </tr>
   <tr>
     <td align="right">35,937</td>
     <td align="center">0.80s</td>
     <td align="center">0.14s</td>
-    <td align="center">0.11s</td>
-    <td align="center">0.071s</td>
+    <td align="center">0.087s</td>
+    <td align="center">0.065s</td>
   </tr>
   <tr>
     <td align="right">274,625</td>
     <td align="center">5.93s</td>
     <td align="center">1.05s</td>
-    <td align="center">0.82s</td>
-    <td align="center">0.51s</td>
+    <td align="center">0.60s</td>
+    <td align="center">0.43s</td>
   </tr>
   <tr>
     <td align="right">2,146,689</td>
     <td align="center">46.7s</td>
     <td align="center">8.44s</td>
-    <td align="center">6.39s</td>
-    <td align="center">3.77s</td>
+    <td align="center">4.96s</td>
+    <td align="center">3.56s</td>
   </tr>
 </table>
 
@@ -266,8 +271,8 @@ initialization costs. As the problem size is made a factor 8 larger, we note
 that the times usually go up by a factor eight, too (as the solver iterations
 are constant at six). The main deviation is in the sparse matrix between 5k
 and 36k degrees of freedom, where the time increases by a factor 12. This is
-the threshold when the cache in the processor can no longer hold all data
-necessary for the matrix-vector products and all matrix elements must be
+the threshold where the (L3) cache in the processor can no longer hold all
+data necessary for the matrix-vector products and all matrix elements must be
 fetched from main memory.
 
 Of course, this picture does not necessarily translate to all cases, as there
