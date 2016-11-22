@@ -1093,6 +1093,13 @@ private:
 
   friend struct dealii::internal::DoFHandler::Implementation;
   friend struct dealii::internal::DoFHandler::Policy::Implementation;
+
+  // explicitly check for sensible template arguments
+#ifdef DEAL_II_WITH_CXX11
+  static_assert (dim<=spacedim,
+                 "The dimension <dim> of a DoFHandler must be less than or "
+                 "equal to the space dimension <spacedim> in which it lives.");
+#endif
 };
 
 
