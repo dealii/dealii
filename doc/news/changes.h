@@ -473,7 +473,7 @@ inconvenience this causes.
  <br>
  (Sebastian Gonzalez-Pintor, Wolfgang Bangerth, 2016/11/15)
  </li>
- 
+
  <li> Fixed: Objects of type TrilinosWrappers::SparsityPattern::const_iterator
  were entirely unusable due to a bug. This is now fixed.
  <br>
@@ -492,6 +492,12 @@ inconvenience this causes.
  usable with MatrixFree operators.
  <br>
  (Denis Davydov, 2016/10/31)
+ </li>
+
+ <li> New: VectorTools::project can be used for parallel Triangulations in
+ specific cases.
+ <br>
+ (Daniel Arndt, 2016/10/30)
  </li>
 
  <li> New: Add MatrixFreeOperators::LaplaceOperator representing a Laplace matrix.
@@ -542,7 +548,6 @@ inconvenience this causes.
  <br>
  (Mayank Sabharwal, Wolfgang Bangerth, 2016/10/25)
  </li>
-
 
  <li> New: Add ArpackSolver::set_shift() to set the shift value in spectral
  transformation.

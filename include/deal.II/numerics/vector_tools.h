@@ -763,20 +763,30 @@ namespace VectorTools
    * that you need not give a second quadrature formula if you don't want to
    * project to the boundary first, but that you must if you want to do so.
    *
-   * This function needs the mass matrix of the finite element space on the
-   * present grid. To this end, the mass matrix is assembled exactly using
-   * MatrixTools::create_mass_matrix. This function performs numerical
-   * quadrature using the given quadrature rule; you should therefore make
-   * sure that the given quadrature formula is also sufficient for the
-   * integration of the mass matrix.
+   * A MatrixFree implementation is used if the following conditions are met:
+   * - @p enforce_zero_boundary is false,
+   * - @p project_to_boundary_first is false,
+   * - the FiniteElement is supported by the MatrixFree class,
+   * - the FiniteElement has less than five components
+   * - the degree of the FiniteElement is less than nine.
+   * - dim==spacedim
+   *
+   * In this case, this function performs numerical quadrature using the given
+   * quadrature formula for integration of the provided function while a
+   * QGauss(fe_degree+2) object is used for the mass operator. You should
+   * therefore make sure that the given quadrature formula is sufficient for
+   * creating the right-hand side.
+   *
+   * Otherwise, only serial Triangulations are supported and the mass matrix
+   * is assembled exactly using MatrixTools::create_mass_matrix and the same
+   * quadrature rule as for the right-hand side.
+   * You should therefore make sure that the given quadrature formula is also
+   * sufficient for creating the mass matrix.
    *
    * See the general documentation of this namespace for further information.
    *
    * In 1d, the default value of the boundary quadrature formula is an invalid
    * object since integration on the boundary doesn't happen in 1d.
-   *
-   * @note This function is not implemented for MPI parallel computations,
-   * see step-32 for a way to do a projection in parallel.
    *
    * @param[in] mapping The mapping object to use.
    * @param[in] dof The DoFHandler the describes the finite element space to
@@ -787,7 +797,8 @@ namespace VectorTools
    * mass matrix.
    * @param[in] function The function to project into the finite element space.
    * @param[out] vec The output vector where the projected function will be
-   * stored in. This vector is required to be already initialized.
+   * stored in. This vector is required to be already initialized and must not
+   * have ghost elements.
    * @param[in] enforce_zero_boundary If true, @p vec will have zero boundary
    * conditions.
    * @param[in] q_boundary Quadrature rule to be used if @p project_to_boundary_first
