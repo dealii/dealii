@@ -1096,6 +1096,8 @@ namespace Step37
     cg.solve (system_matrix, solution, system_rhs,
               preconditioner);
 
+    constraints.distribute(solution);
+
     pcout << "Time solve ("
           << solver_control.last_step()
           << " iterations)  (CPU/wall) " << time() << "s/"
