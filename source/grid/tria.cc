@@ -13586,39 +13586,6 @@ Triangulation<dim, spacedim>::DistortedCellList::~DistortedCellList () DEAL_II_N
 }
 
 
-template <>
-const Manifold<2,1> &Triangulation<2, 1>::get_manifold(const types::manifold_id) const
-{
-  Assert(false, ExcImpossibleInDim(1));
-  // We cannot simply create a temporary Manifold<2,1> because it is not
-  // instantiated and would lead to unresolved symbols. Given the fact that
-  // this function should be unreachable anyaway, just dereference a
-  // nullptr:
-  return *static_cast<FlatManifold<2,1>*>(0);
-}
-
-template <>
-const Manifold<3,1> &Triangulation<3, 1>::get_manifold(const types::manifold_id) const
-{
-  Assert(false, ExcImpossibleInDim(1));
-  // We cannot simply create a temporary Manifold<2,1> because it is not
-  // instantiated and would lead to unresolved symbols. Given the fact that
-  // this function should be unreachable anyaway, just dereference a
-  // nullptr:
-  return *static_cast<FlatManifold<3,1>*>(0);
-}
-
-template <>
-const Manifold<3,2> &Triangulation<3, 2>::get_manifold(const types::manifold_id) const
-{
-  Assert(false, ExcImpossibleInDim(2));
-  // We cannot simply create a temporary Manifold<2,1> because it is not
-  // instantiated and would lead to unresolved symbols. Given the fact that
-  // this function should be unreachable anyaway, just dereference a
-  // nullptr:
-  return *static_cast<FlatManifold<3,2>*>(0);
-}
-
 // explicit instantiations
 #include "tria.inst"
 
