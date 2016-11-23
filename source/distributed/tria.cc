@@ -3610,8 +3610,48 @@ namespace parallel
 
         subids->elem_count = 0;
       }
-    }
 
+
+      /**
+       * This struct wraps the p4est_iterate / p8est_iterate in a templated
+       * fashion so that we can avoid the compiler complaining about invalid
+       * types being referred, which would be the case inside switch or if
+       * statements.
+       */
+      template <int dim, int spacedim>
+      struct pXest_iterate_wrapper
+      {
+        static void iterate(typename dealii::internal::p4est::types<dim>::forest *parallel_forest,
+                            typename dealii::internal::p4est::types<dim>::ghost *parallel_ghost,
+                            void *user_data);
+      };
+
+      template <int spacedim>
+      struct pXest_iterate_wrapper<2,spacedim>
+      {
+        static void iterate(dealii::internal::p4est::types<2>::forest *parallel_forest,
+                            dealii::internal::p4est::types<2>::ghost *parallel_ghost,
+                            void *user_data)
+        {
+          p4est_iterate (parallel_forest, parallel_ghost, user_data,
+                         NULL, find_ghosts_face<2,spacedim>,
+                         find_ghosts_corner<2,spacedim>);
+        }
+      };
+
+      template <int spacedim>
+      struct pXest_iterate_wrapper<3,spacedim>
+      {
+        static void iterate(dealii::internal::p4est::types<3>::forest *parallel_forest,
+                            dealii::internal::p4est::types<3>::ghost *parallel_ghost,
+                            void *user_data)
+        {
+          p8est_iterate (parallel_forest, parallel_ghost, user_data,
+                         NULL, find_ghosts_face<3,spacedim>, find_ghosts_edge<3,spacedim>,
+                         find_ghosts_corner<3,spacedim>);
+        }
+      };
+    }
 
 
     /**
@@ -3632,28 +3672,9 @@ namespace parallel
       fg.triangulation = this;
       fg.vertices_with_ghost_neighbors = &vertices_with_ghost_neighbors;
 
-      // switch between functions. to make the compiler happy, we need to cast
-      // the first two arguments to the type p[48]est_iterate wants to see. this
-      // cast is the identity cast in each of the two branches, so it is safe.
-      switch (dim)
-        {
-        case 2:
-          p4est_iterate (reinterpret_cast<dealii::internal::p4est::types<2>::forest *>(this->parallel_forest),
-                         reinterpret_cast<dealii::internal::p4est::types<2>::ghost *>(this->parallel_ghost),
-                         static_cast<void *>(&fg),
-                         NULL, find_ghosts_face<2,spacedim>, find_ghosts_corner<2,spacedim>);
-          break;
-
-        case 3:
-          p8est_iterate (reinterpret_cast<dealii::internal::p4est::types<3>::forest *>(this->parallel_forest),
-                         reinterpret_cast<dealii::internal::p4est::types<3>::ghost *>(this->parallel_ghost),
-                         static_cast<void *>(&fg),
-                         NULL, find_ghosts_face<3,spacedim>, find_ghosts_edge<3,spacedim>, find_ghosts_corner<3,spacedim>);
-          break;
-
-        default:
-          Assert (false, ExcNotImplemented());
-        }
+      pXest_iterate_wrapper<dim,spacedim>::iterate (this->parallel_forest,
+                                                    this->parallel_ghost,
+                                                    static_cast<void *>(&fg));
 
       sc_array_destroy (fg.subids);
     }
