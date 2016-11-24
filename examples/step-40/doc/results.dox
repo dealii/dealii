@@ -98,11 +98,15 @@ more interpretation can be found in the final version of the paper):
 </table>
 
 As can clearly be seen, the program scales nicely to very large
-numbers of processors. The curves, in particular the linear solver, become a
-bit wobble at the right end of the graphs since each processor has too little
+numbers of processors.
+(For a discussion of what we consider "scalable" programs, see
+@ref GlossParallelScaling "this glossary entry".)
+The curves, in particular the linear solver, become a
+bit wobbly at the right end of the graphs since each processor has too little
 to do to offset the cost of communication (the part of the whole problem each
 processor has to solve in the above two examples is only 13,000 and 90,000
-degrees of freedom when 4,096 processors are used).
+degrees of freedom when 4,096 processors are used; a good rule of thumb is that
+parallel programs work well if each processor has at least 100,000 unknowns).
 
 While the strong scaling graphs above show that we can solve a problem of
 fixed size faster and faster if we take more and more processors, the more
@@ -139,6 +143,11 @@ number, and one could expect that given more than the 4,096 machines
 shown above would also further reduce the compute time. That said, one
 can certainly expect that this limit will eventually be lifted by the
 hypre developers.
+
+On the other hand, this does not mean that deal.II cannot solve bigger
+problems. Indeed, step-37 shows how one can solve problems that are not
+just a little, but very substantially larger than anything we have shown
+here.
 
 
 
