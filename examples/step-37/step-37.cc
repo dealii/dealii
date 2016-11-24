@@ -185,7 +185,7 @@ namespace Step37
   // diagonal entries of the underlying matrix. We need the diagonal for the
   // definition of the multigrid smoother. Since we consider a problem with
   // variable coefficient, we further implement a method that can fill the
-  // coefficiient values.
+  // coefficient values.
   //
   // Note that the file <code>include/deal.II/matrix_free/operators.h</code>
   // already contains an implementation of the Laplacian through the class
@@ -492,7 +492,7 @@ namespace Step37
   // FEEvaluation are designed to access vectors in MPI-local index space also
   // when working with multiple processors. Working in local index space means
   // that no index translation needs to be performed at the place the vector
-  // access happns, apart from the unavoidable indirect addressing. However,
+  // access happens, apart from the unavoidable indirect addressing. However,
   // local index spaces are ambiguous: While it is standard convention to
   // access the locally owned range of a vector with indices between 0 and the
   // local size, the numbering is not so clear for the ghosted entries and
@@ -1053,7 +1053,7 @@ namespace Step37
     // is used during the restriction phase of the multigrid V-cycle, whereas
     // vmult_interface_up is used during the prolongation phase.
     //
-    // Once the interface matrix created, we set up the remaining Multigrid
+    // Once the interface matrix is created, we set up the remaining Multigrid
     // preconditioner infrastructure in complete analogy to step-16 to obtain
     // a @p preconditioner object that can be applied to a matrix.
     mg::Matrix<LinearAlgebra::distributed::Vector<float> > mg_matrix(mg_matrices);
@@ -1075,7 +1075,7 @@ namespace Step37
                    MGTransferMatrixFree<dim,float> >
                    preconditioner(dof_handler, mg, mg_transfer);
 
-    // The setup of the multigrid routines was quite easy and one cannot see
+    // The setup of the multigrid routines is quite easy and one cannot see
     // any difference in the solve process as compared to step-16. All the
     // magic is hidden behind the implementation of the LaplaceOperator::vmult
     // operation. Note that we print out the solve time and the accumulated

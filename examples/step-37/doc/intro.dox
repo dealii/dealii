@@ -17,11 +17,10 @@ International Conference on e-Science, 2011.  </i>
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
-This example shows how to implement a matrix-free method, that is, a
-method that does not explicitly store the matrix elements, for a
-second-order Poisson equation with variable coefficients on a
-hypercube. The linear system will be solved with a multigrid
-method.
+This example shows how to implement a matrix-free method, that is, a method
+that does not explicitly store the matrix elements, for a second-order Poisson
+equation with variable coefficients on a hypercube. The linear system will be
+solved with a multigrid method and uses large-scale parallelism with MPI.
 
 The major motivation for matrix-free methods is the fact that on today's
 processors access to main memory (i.e., for objects that do not fit in the
@@ -348,7 +347,7 @@ implementing generic differential operators through a common framework of
 cached data, whereas the latter specifically stores the coefficient for the
 Laplacian. In case applications demand for it, this specialization could pay
 off and would be worthwhile to consider. Note that the implementation in
-deal.II is smart enough to detenct Cartesian or affine geometries where the
+deal.II is smart enough to detect Cartesian or affine geometries where the
 Jacobian is constant throughout the cell and needs not be stored for every
 cell (and indeed often is the same over different cells as well).
 
@@ -528,12 +527,12 @@ the processor-local part of the solution as well as data fields for ghosted
 DoFs, i.e. DoFs that are owned by a remote processor but accessed by cells
 that are owned by the present processor. In the @ref GlossLocallyActiveDof
 "glossary" these degrees of freedom are referred to as locally active degrees
-of freedom. The function MatrixFree::initialize_dof_vector() prodides a method
+of freedom. The function MatrixFree::initialize_dof_vector() provides a method
 that sets this design. Note that hanging nodes can relate to additional
 ghosted degrees of freedom that must be included in the distributed vector but
 are not part of the locally active DoFs in the sense of the @ref
 GlossLocallyActiveDof "glossary". Moreover, the distributed vector holds the
-some MPI metadata for DoFs that are owned locally but needed by other
+MPI metadata for DoFs that are owned locally but needed by other
 processors. A benefit of the design of this vector class is the way ghosted
 entries are accessed. In the storage scheme of the vector, the data array
 extends beyond the processor-local part of the solution with further vector
@@ -552,7 +551,7 @@ The design of LinearAlgebra::distributed::Vector is similar to the
 PETScWrappers::MPI::Vector and TrilinosWrappers::MPI::Vector data types we
 have used in step-40 and step-32 before, but since we do not need any other
 parallel functionality of these libraries, we use the
-parallel::distributed::Vector class of deal.II instead of linking in another
+LinearAlgebra::distributed::Vector class of deal.II instead of linking in another
 large library in this tutorial program. Also note that the PETSc and Trilinos
 vectors do not provide the fine-grained control over ghost entries with direct
 array access because they abstract away the necessary implementation details.
