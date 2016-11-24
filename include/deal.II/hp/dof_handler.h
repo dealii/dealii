@@ -906,6 +906,25 @@ namespace hp
 
   /* ----------------------- Inline functions ---------------------------------- */
 
+
+  template <int dim, int spacedim>
+  template <typename number>
+  types::global_dof_index
+  DoFHandler<dim,spacedim>::n_boundary_dofs (const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_ids) const
+  {
+    // extract the set of boundary ids and forget about the function object pointers
+    std::set<types::boundary_id> boundary_ids_only;
+    for (typename std::map<types::boundary_id, const Function<spacedim,number>*>::const_iterator
+         p = boundary_ids.begin();
+         p != boundary_ids.end(); ++p)
+      boundary_ids_only.insert (p->first);
+
+    // then just hand everything over to the other function that does the work
+    return n_boundary_dofs(boundary_ids_only);
+  }
+
+
+
   template <int dim, int spacedim>
   template <class Archive>
   void DoFHandler<dim, spacedim>::save(Archive &ar, unsigned int) const

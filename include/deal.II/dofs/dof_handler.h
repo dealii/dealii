@@ -1243,6 +1243,24 @@ DoFHandler<dim,spacedim>::block_info () const
 }
 
 
+template <int dim, int spacedim>
+template <typename number>
+types::global_dof_index
+DoFHandler<dim,spacedim>::n_boundary_dofs (const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_ids) const
+{
+  // extract the set of boundary ids and forget about the function object pointers
+  std::set<types::boundary_id> boundary_ids_only;
+  for (typename std::map<types::boundary_id, const Function<spacedim,number>*>::const_iterator
+       p = boundary_ids.begin();
+       p != boundary_ids.end(); ++p)
+    boundary_ids_only.insert (p->first);
+
+  // then just hand everything over to the other function that does the work
+  return n_boundary_dofs(boundary_ids_only);
+}
+
+
+
 namespace internal
 {
   /**
@@ -1254,7 +1272,6 @@ namespace internal
    */
   template<int dim, int spacedim>
   std::string policy_to_string(const dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> &policy);
-
 }
 
 
