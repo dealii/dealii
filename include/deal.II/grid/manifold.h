@@ -298,6 +298,14 @@ class Manifold : public Subscriptor
 {
 public:
 
+  // explicitly check for sensible template arguments
+#ifdef DEAL_II_WITH_CXX11
+  static_assert (dim<=spacedim,
+                 "The dimension <dim> of a Manifold must be less than or "
+                 "equal to the space dimension <spacedim> in which it lives.");
+#endif
+
+
   /**
    * Type keeping information about the normals at the vertices of a face of a
    * cell. Thus, there are <tt>GeometryInfo<dim>::vertices_per_face</tt>
@@ -879,6 +887,13 @@ template <int dim, int spacedim=dim, int chartdim=dim>
 class ChartManifold : public Manifold<dim,spacedim>
 {
 public:
+  // explicitly check for sensible template arguments
+#ifdef DEAL_II_WITH_CXX11
+  static_assert (dim<=spacedim,
+                 "The dimension <dim> of a ChartManifold must be less than or "
+                 "equal to the space dimension <spacedim> in which it lives.");
+#endif
+
   /**
    * Constructor. The optional argument can be used to specify the periodicity
    * of the chartdim-dimensional manifold (one period per direction). A
