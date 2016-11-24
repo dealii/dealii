@@ -33,7 +33,20 @@
 #  include <p8est_communication.h>
 #  include <p8est_iterate.h>
 
+#include <map>
+#include <set>
+
+
 DEAL_II_NAMESPACE_OPEN
+
+namespace parallel
+{
+  namespace distributed
+  {
+    template <int dim, int spacedim> class Triangulation;
+  }
+}
+
 
 namespace internal
 {
@@ -272,6 +285,11 @@ namespace internal
       static
       size_t (&connectivity_memory_used) (types<2>::connectivity *p4est);
 
+      template <int spacedim>
+      static void iterate(dealii::internal::p4est::types<2>::forest *parallel_forest,
+                          dealii::internal::p4est::types<2>::ghost *parallel_ghost,
+                          void *user_data);
+
       static const unsigned int max_level = P4EST_MAXLEVEL;
     };
 
@@ -454,6 +472,11 @@ namespace internal
       static
       size_t (&connectivity_memory_used) (types<3>::connectivity *p4est);
 
+      template <int spacedim>
+      static void iterate(dealii::internal::p4est::types<3>::forest *parallel_forest,
+                          dealii::internal::p4est::types<3>::ghost *parallel_ghost,
+                          void *user_data);
+
       static const unsigned int max_level = P8EST_MAXLEVEL;
     };
 
@@ -539,6 +562,21 @@ namespace internal
     bool
     tree_exists_locally (const typename types<dim>::forest *parallel_forest,
                          const typename types<dim>::topidx coarse_grid_cell);
+
+
+    /**
+     * This is the callback data structure used to fill
+     * vertices_with_ghost_neighbors via the p4est_iterate tool
+     */
+    template <int dim, int spacedim>
+    struct FindGhosts
+    {
+      typename dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation;
+      sc_array_t                                                          *subids;
+      std::map<unsigned int, std::set<dealii::types::subdomain_id> >      *vertices_with_ghost_neighbors;
+    };
+
+
   }
 }
 
