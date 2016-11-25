@@ -389,52 +389,6 @@ ENDIF()
 
 
 #
-# Intel (at least 14, 15) has a bug where it incorrectly detects multiple
-# matching function candidates and dies during type resolution in a
-# perfectly valid SFINAE scenario. This seems to happen because the templated
-# variant is not discarded (where it should be):
-#
-# error: more than one instance of overloaded function
-#     "has_vmult_add<Range, T>::test [with Range=double, T=MyMatrix]"
-# matches the argument list:
-#     function template "void has_vmult_add<Range, T>::test<C>(decltype((<expression>))) [with Range=double, T=MyMatrix]"
-#     function template "void has_vmult_add<Range, T>::test<C>(decltype((&C::vmult_add<double>))) [with Range=double, T=MyMatrix]"
-# [...]
-#
-# - Matthias Maier, 2015
-#
-
-IF(DEAL_II_WITH_CXX11)
-  PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
-  CHECK_CXX_COMPILER_BUG(
-    "
-    template <typename Range, typename T> struct has_vmult_add
-    {
-      template <typename C>
-      static void test(decltype(&C::vmult_add));
-
-      template <typename C>
-      static void test(decltype(&C::template vmult_add<Range>));
-
-      typedef decltype(test<T>(0)) type;
-    };
-
-    struct MyMatrix
-    {
-      void vmult_add() const;
-    };
-
-    int main()
-    {
-      typedef has_vmult_add<double, MyMatrix>::type test;
-    }
-    "
-    DEAL_II_ICC_SFINAE_BUG
-    )
-  RESET_CMAKE_REQUIRED()
-ENDIF()
-
-#
 # Intel 16.0.1 produces wrong code that creates a race condition in
 # tests/fe/curl_curl_01.debug but 16.0.2 is known to work. Blacklist this
 # version. Also see github.com/dealii/dealii/issues/2203
