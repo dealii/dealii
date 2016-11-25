@@ -218,12 +218,6 @@ public:
   {
     deallog << "MyMatrix6::vmult_add" << std::endl;
   }
-
-  template<typename number, typename number2>
-  void Tvmult_add(Vector<number> &, const Vector<number2> &, bool = true) const
-  {
-    deallog << "MyMatrix6::Tvmult_add" << std::endl;
-  }
 };
 
 using namespace dealii;
@@ -253,8 +247,6 @@ int main()
   linear_operator(m2).vmult_add(v, u);
   linear_operator(m2).Tvmult_add(v, u);
 
-#ifndef DEAL_II_ICC_SFINAE_BUG
-
   linear_operator(m3).vmult(v, u);
   linear_operator(m3).Tvmult(v, u);
   linear_operator(m3).vmult_add(v, u);
@@ -274,28 +266,4 @@ int main()
   linear_operator(m6).Tvmult(v, u);
   linear_operator(m6).vmult_add(v, u);
   linear_operator(m6).Tvmult_add(v, u);
-
-#else
-
-  deallog << "MyMatrix3::vmult" << std::endl;
-  deallog << "MyMatrix3::Tvmult" << std::endl;
-  deallog << "MyMatrix3::vmult_add" << std::endl;
-  deallog << "MyMatrix3::Tvmult_add" << std::endl;
-
-  deallog << "MyMatrix4::vmult" << std::endl;
-  deallog << "MyMatrix4::Tvmult" << std::endl;
-  deallog << "MyMatrix4::vmult_add" << std::endl;
-  deallog << "MyMatrix4::Tvmult_add" << std::endl;
-
-  deallog << "MyMatrix5::vmult" << std::endl;
-  deallog << "MyMatrix5::Tvmult" << std::endl;
-  deallog << "MyMatrix5::vmult_add" << std::endl;
-  deallog << "MyMatrix5::Tvmult_add" << std::endl;
-
-  deallog << "MyMatrix6::vmult" << std::endl;
-  deallog << "MyMatrix6::Tvmult" << std::endl;
-  deallog << "MyMatrix6::vmult_add" << std::endl;
-  deallog << "MyMatrix6::Tvmult_add" << std::endl;
-
-#endif
 }

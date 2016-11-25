@@ -451,6 +451,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Improved: The trait class has_vmult_add in linear_operators.h
+ has been restricted to test if there is a vmult_add and a Tvmult_add
+ method that takes two arguments. This check now also works with
+ ICC 13 and ICC 14.
+ <br>
+ (Daniel Arndt, 2016/11/25)
+ </li>
+
  <li> Fixed: DataOut::build_patches() ignored a higher order
  or Eulerian mapping if no data had previously been attached
  via DataOut::add_data_vector(), i.e., if all that was to be output

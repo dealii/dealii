@@ -828,35 +828,24 @@ namespace internal
 namespace
 {
   // A trait class that determines whether type T provides public
-  // (templated or non-templated) vmult_add and Tvmult_add member functions
+  // (templated or non-templated) vmult_add member functions
   template <typename Range, typename Domain, typename T>
-  class has_vmult_add
+  class has_vmult_add_and_Tvmult_add
   {
     template <typename C>
     static std::false_type test(...);
 
     template <typename C>
-    static std::true_type test(decltype(&C::vmult_add),
-                               decltype(&C::Tvmult_add));
-
-    // Work around a bug with icc (up to version 15) that fails during type
-    // deduction in an SFINAE scenario
-#ifndef DEAL_II_ICC_SFINAE_BUG
-
-    template <typename C>
-    static std::true_type test(decltype(&C::template vmult_add<Range>),
-                               decltype(&C::template Tvmult_add<Range>));
-
-    template <typename C>
-    static std::true_type test(decltype(&C::template vmult_add<Range, Domain>),
-                               decltype(&C::template Tvmult_add<Domain, Range>));
-#endif
+    static auto test(Range *r, Domain *d)
+    -> decltype(std::declval<C>().vmult_add(*r,*d),
+                std::declval<C>().Tvmult_add(*d,*r),
+                std::true_type());
 
   public:
     // type is std::true_type if Matrix provides vmult_add and Tvmult_add,
     // otherwise it is std::false_type
 
-    typedef decltype(test<T>(0, 0)) type;
+    typedef decltype(test<T>(nullptr, nullptr)) type;
   };
 
 
@@ -1105,10 +1094,10 @@ linear_operator(const OperatorExemplar &operator_exemplar, const Matrix &matrix)
   };
 
   typename std::conditional<
-  has_vmult_add<Range, Domain, Matrix>::type::value,
-                MatrixInterfaceWithVmultAdd<Range, Domain>,
-                MatrixInterfaceWithoutVmultAdd<Range, Domain>>::type().
-                operator()(return_op, matrix);
+  has_vmult_add_and_Tvmult_add<Range, Domain, Matrix>::type::value,
+                               MatrixInterfaceWithVmultAdd<Range, Domain>,
+                               MatrixInterfaceWithoutVmultAdd<Range, Domain>>::type().
+                               operator()(return_op, matrix);
 
   return return_op;
 }
