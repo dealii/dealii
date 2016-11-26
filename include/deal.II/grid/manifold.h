@@ -1028,8 +1028,15 @@ private:
   /**
    * The sub_manifold object is used to compute the average of the points in
    * the chart coordinates system.
+   *
+   * In an ideal world, it would have type
+   * FlatManifold<dim,chartdim>. However, this would instantiate cases
+   * where dim>spacedim, which leads to invalid situations. We instead
+   * use <chartdim,chartdim>, which is (i) always valid, and (ii) does
+   * not matter at all since the first (dim) argument of manifolds is,
+   * in fact, ignored as far as manifold functionality is concerned.
    */
-  const FlatManifold<dim,chartdim> sub_manifold;
+  const FlatManifold<chartdim,chartdim> sub_manifold;
 };
 
 
