@@ -22,7 +22,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/lac/vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -119,13 +119,13 @@ void do_project (const parallel::distributed::Triangulation<dim> &triangulation,
                                            constraints);
   constraints.close ();
 
-  LinearAlgebra::distributed::Vector projection (locally_owned_dofs,
-                                                 locally_relevant_dofs,
-                                                 mpi_communicator);
+  LinearAlgebra::distributed::Vector<double> projection
+  (locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
   Vector<float>  error (triangulation.n_active_cells());
   for (unsigned int q=0; q<=p+2-order_difference; ++q)
     {
       // project the function
+      projection.zero_out_ghosts();
       VectorTools::project
       (dof_handler, constraints, QGauss<dim>(p+2),
        F<dim> (q, fe.n_components()), projection);
@@ -133,6 +133,7 @@ void do_project (const parallel::distributed::Triangulation<dim> &triangulation,
       // forgotten: handle hanging node
       // constraints
       constraints.distribute (projection);
+      projection.update_ghost_values();
 
       // then compute the interpolation error
       VectorTools::integrate_difference (dof_handler,
