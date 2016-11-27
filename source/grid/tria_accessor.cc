@@ -1773,7 +1773,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
     case 2:
     {
       const int this_face_index=face_index(neighbor);
-      const TriaIterator<CellAccessor<2,spacedim> > neighbor_cell = this->neighbor(neighbor);
+      const TriaIterator<CellAccessor<2, (spacedim<2 ? 2 : spacedim)> > neighbor_cell = this->neighbor(neighbor);
 
       // usually, on regular patches of
       // the grid, this cell is just on
@@ -1791,7 +1791,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
       const unsigned int face_no_guess
         = GeometryInfo<2>::opposite_face[neighbor];
 
-      const TriaIterator<TriaAccessor<1, 2, spacedim> > face_guess
+      const TriaIterator<TriaAccessor<1, 2, (spacedim<2 ? 2 : spacedim)> > face_guess
         =neighbor_cell->face(face_no_guess);
 
       if (face_guess->has_children())
@@ -1807,7 +1807,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
         {
           if (face_no!=face_no_guess)
             {
-              const TriaIterator<TriaAccessor<1, 2, spacedim> > face
+              const TriaIterator<TriaAccessor<1, 2, (spacedim<2 ? 2 : spacedim)> > face
                 =neighbor_cell->face(face_no);
               if (face->has_children())
                 for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
@@ -1827,7 +1827,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
     case 3:
     {
       const int this_face_index=face_index(neighbor);
-      const TriaIterator<CellAccessor<3, spacedim> >
+      const TriaIterator<CellAccessor<3, (spacedim<3 ? 3 : spacedim)> >
       neighbor_cell = this->neighbor(neighbor);
 
       // usually, on regular patches of the grid, this cell is just on the
@@ -1839,7 +1839,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
       const unsigned int face_no_guess
         = GeometryInfo<3>::opposite_face[neighbor];
 
-      const TriaIterator<TriaAccessor<3-1, 3, spacedim> > face_guess
+      const TriaIterator<TriaAccessor<3-1, 3, (spacedim<3 ? 3 : spacedim)> > face_guess
         =neighbor_cell->face(face_no_guess);
 
       if (face_guess->has_children())
@@ -1867,7 +1867,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
           if (face_no==face_no_guess)
             continue;
 
-          const TriaIterator<TriaAccessor<3-1, 3, spacedim> > face
+          const TriaIterator<TriaAccessor<3-1, 3, (spacedim<3 ? 3 : spacedim)> > face
             =neighbor_cell->face(face_no);
 
           if (!face->has_children())
@@ -2347,15 +2347,18 @@ neighbor_child_on_subface (const unsigned int face,
       // |   | 1 |      | 0 |   |      |   0   |      | 0 | 1 |
       // *---*---*      *---*---*      *-------*      *---*---*
 
-      const typename Triangulation<3,spacedim>::face_iterator
+      // in the following line, we know that if we got here that we
+      // have spacedim>=3. avoid instantiating invalid classes
+      // otherwise, even though we know that it is in dead code
+      const typename Triangulation<3,(spacedim<3 ? 3 : spacedim)>::face_iterator
       mother_face = this->face(face);
       const unsigned int total_children=mother_face->number_of_children();
       Assert (subface<total_children,ExcIndexRange(subface,0,total_children));
       Assert (total_children<=GeometryInfo<3>::max_children_per_face, ExcInternalError());
 
       unsigned int neighbor_neighbor;
-      TriaIterator<CellAccessor<3,spacedim> > neighbor_child;
-      const TriaIterator<CellAccessor<3,spacedim> > neighbor
+      TriaIterator<CellAccessor<3,(spacedim<3 ? 3 : spacedim)> > neighbor_child;
+      const TriaIterator<CellAccessor<3,(spacedim<3 ? 3 : spacedim)> > neighbor
         = this->neighbor(face);
 
 
@@ -2558,9 +2561,13 @@ neighbor_child_on_subface (const unsigned int face,
                                                      0));
 
 #ifdef DEBUG
-      // check, whether the face neighbor_child
-      // matches the requested subface
-      typename Triangulation<3,spacedim>::face_iterator requested;
+      // check, whether the face neighbor_child matches the requested
+      // subface.
+      //
+      // in the following line, we know that if we got here that we
+      // have spacedim>=3. avoid instantiating invalid classes
+      // otherwise, even though we know that it is in dead code
+      typename Triangulation<3,(spacedim<3 ? 3 : spacedim)>::face_iterator requested;
       switch (this->subface_case(face))
         {
         case internal::SubfaceCase<3>::case_x:
