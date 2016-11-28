@@ -1773,7 +1773,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
     case 2:
     {
       const int this_face_index=face_index(neighbor);
-      const TriaIterator<CellAccessor<2, (spacedim<2 ? 2 : spacedim)> > neighbor_cell = this->neighbor(neighbor);
+      const TriaIterator<CellAccessor<dim,spacedim> > neighbor_cell = this->neighbor(neighbor);
 
       // usually, on regular patches of
       // the grid, this cell is just on
@@ -1791,7 +1791,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
       const unsigned int face_no_guess
         = GeometryInfo<2>::opposite_face[neighbor];
 
-      const TriaIterator<TriaAccessor<1, 2, (spacedim<2 ? 2 : spacedim)> > face_guess
+      const TriaIterator<TriaAccessor<dim-1, dim, spacedim> > face_guess
         =neighbor_cell->face(face_no_guess);
 
       if (face_guess->has_children())
@@ -1807,7 +1807,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
         {
           if (face_no!=face_no_guess)
             {
-              const TriaIterator<TriaAccessor<1, 2, (spacedim<2 ? 2 : spacedim)> > face
+              const TriaIterator<TriaAccessor<dim-1, dim, spacedim> > face
                 =neighbor_cell->face(face_no);
               if (face->has_children())
                 for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
@@ -1827,7 +1827,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
     case 3:
     {
       const int this_face_index=face_index(neighbor);
-      const TriaIterator<CellAccessor<3, (spacedim<3 ? 3 : spacedim)> >
+      const TriaIterator<CellAccessor<dim,spacedim> >
       neighbor_cell = this->neighbor(neighbor);
 
       // usually, on regular patches of the grid, this cell is just on the
@@ -1839,7 +1839,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
       const unsigned int face_no_guess
         = GeometryInfo<3>::opposite_face[neighbor];
 
-      const TriaIterator<TriaAccessor<3-1, 3, (spacedim<3 ? 3 : spacedim)> > face_guess
+      const TriaIterator<TriaAccessor<dim-1, dim, spacedim> > face_guess
         =neighbor_cell->face(face_no_guess);
 
       if (face_guess->has_children())
@@ -1867,7 +1867,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
           if (face_no==face_no_guess)
             continue;
 
-          const TriaIterator<TriaAccessor<3-1, 3, (spacedim<3 ? 3 : spacedim)> > face
+          const TriaIterator<TriaAccessor<dim-1, dim, spacedim> > face
             =neighbor_cell->face(face_no);
 
           if (!face->has_children())
@@ -2347,24 +2347,21 @@ neighbor_child_on_subface (const unsigned int face,
       // |   | 1 |      | 0 |   |      |   0   |      | 0 | 1 |
       // *---*---*      *---*---*      *-------*      *---*---*
 
-      // in the following line, we know that if we got here that we
-      // have spacedim>=3. avoid instantiating invalid classes
-      // otherwise, even though we know that it is in dead code
-      const typename Triangulation<3,(spacedim<3 ? 3 : spacedim)>::face_iterator
+      const typename Triangulation<dim,spacedim>::face_iterator
       mother_face = this->face(face);
       const unsigned int total_children=mother_face->number_of_children();
       Assert (subface<total_children,ExcIndexRange(subface,0,total_children));
       Assert (total_children<=GeometryInfo<3>::max_children_per_face, ExcInternalError());
 
       unsigned int neighbor_neighbor;
-      TriaIterator<CellAccessor<3,(spacedim<3 ? 3 : spacedim)> > neighbor_child;
-      const TriaIterator<CellAccessor<3,(spacedim<3 ? 3 : spacedim)> > neighbor
+      TriaIterator<CellAccessor<dim,spacedim> > neighbor_child;
+      const TriaIterator<CellAccessor<dim,spacedim> > neighbor
         = this->neighbor(face);
 
 
-      const RefinementCase<2> mother_face_ref_case
+      const RefinementCase<dim-1> mother_face_ref_case
         = mother_face->refinement_case();
-      if (mother_face_ref_case==RefinementCase<2>::cut_xy) // total_children==4
+      if (mother_face_ref_case==static_cast<RefinementCase<dim-1> >(RefinementCase<2>::cut_xy)) // total_children==4
         {
           // this case is quite easy. we are sure,
           // that the neighbor is not coarser.
@@ -2377,11 +2374,11 @@ neighbor_child_on_subface (const unsigned int face,
           // now use the info provided by GeometryInfo
           // to extract the neighbors child number
           const unsigned int neighbor_child_index
-            = GeometryInfo<3>::child_cell_on_face(neighbor->refinement_case(),
-                                                  neighbor_neighbor, subface,
-                                                  neighbor->face_orientation(neighbor_neighbor),
-                                                  neighbor->face_flip(neighbor_neighbor),
-                                                  neighbor->face_rotation(neighbor_neighbor));
+            = GeometryInfo<dim>::child_cell_on_face(neighbor->refinement_case(),
+                                                    neighbor_neighbor, subface,
+                                                    neighbor->face_orientation(neighbor_neighbor),
+                                                    neighbor->face_flip(neighbor_neighbor),
+                                                    neighbor->face_rotation(neighbor_neighbor));
           neighbor_child = neighbor->child(neighbor_child_index);
 
           // make sure that the neighbor child cell we
@@ -2467,24 +2464,24 @@ neighbor_child_on_subface (const unsigned int face,
                   iso_subface=first_child_to_find + 2*indices.second;
                 }
               neighbor_child_index
-                = GeometryInfo<3>::child_cell_on_face(neighbor->refinement_case(),
-                                                      neighbor_neighbor,
-                                                      iso_subface,
-                                                      neighbor->face_orientation(neighbor_neighbor),
-                                                      neighbor->face_flip(neighbor_neighbor),
-                                                      neighbor->face_rotation(neighbor_neighbor));
+                = GeometryInfo<dim>::child_cell_on_face(neighbor->refinement_case(),
+                                                        neighbor_neighbor,
+                                                        iso_subface,
+                                                        neighbor->face_orientation(neighbor_neighbor),
+                                                        neighbor->face_flip(neighbor_neighbor),
+                                                        neighbor->face_rotation(neighbor_neighbor));
             }
           else //neighbor is not coarser
             {
               neighbor_neighbor=neighbor_of_neighbor(face);
               neighbor_child_index
-                = GeometryInfo<3>::child_cell_on_face(neighbor->refinement_case(),
-                                                      neighbor_neighbor,
-                                                      first_child_to_find,
-                                                      neighbor->face_orientation(neighbor_neighbor),
-                                                      neighbor->face_flip(neighbor_neighbor),
-                                                      neighbor->face_rotation(neighbor_neighbor),
-                                                      mother_face_ref_case);
+                = GeometryInfo<dim>::child_cell_on_face(neighbor->refinement_case(),
+                                                        neighbor_neighbor,
+                                                        first_child_to_find,
+                                                        neighbor->face_orientation(neighbor_neighbor),
+                                                        neighbor->face_flip(neighbor_neighbor),
+                                                        neighbor->face_rotation(neighbor_neighbor),
+                                                        mother_face_ref_case);
             }
 
           neighbor_child=neighbor->child(neighbor_child_index);
@@ -2493,11 +2490,11 @@ neighbor_child_on_subface (const unsigned int face,
           // along the given subface. go down that
           // list and deliver the last of those.
           while (neighbor_child->has_children() &&
-                 GeometryInfo<3>::face_refinement_case(neighbor_child->refinement_case(),
-                                                       neighbor_neighbor)
+                 GeometryInfo<dim>::face_refinement_case(neighbor_child->refinement_case(),
+                                                         neighbor_neighbor)
                  == RefinementCase<2>::no_refinement)
             neighbor_child =
-              neighbor_child->child(GeometryInfo<3>::
+              neighbor_child->child(GeometryInfo<dim>::
                                     child_cell_on_face(neighbor_child->refinement_case(),
                                                        neighbor_neighbor,
                                                        0));
@@ -2514,7 +2511,7 @@ neighbor_child_on_subface (const unsigned int face,
                 {
                   if (subface<2)
                     neighbor_child =
-                      neighbor_child->child(GeometryInfo<3>::
+                      neighbor_child->child(GeometryInfo<dim>::
                                             child_cell_on_face(neighbor_child->refinement_case(),
                                                                neighbor_neighbor,subface,
                                                                neighbor_child->face_orientation(neighbor_neighbor),
@@ -2527,7 +2524,7 @@ neighbor_child_on_subface (const unsigned int face,
                   Assert(mother_face->child(1)->has_children(), ExcInternalError());
                   if (subface>0)
                     neighbor_child =
-                      neighbor_child->child(GeometryInfo<3>::
+                      neighbor_child->child(GeometryInfo<dim>::
                                             child_cell_on_face(neighbor_child->refinement_case(),
                                                                neighbor_neighbor,subface-1,
                                                                neighbor_child->face_orientation(neighbor_neighbor),
@@ -2539,7 +2536,7 @@ neighbor_child_on_subface (const unsigned int face,
           else if (total_children==4)
             {
               neighbor_child =
-                neighbor_child->child(GeometryInfo<3>::
+                neighbor_child->child(GeometryInfo<dim>::
                                       child_cell_on_face(neighbor_child->refinement_case(),
                                                          neighbor_neighbor,subface%2,
                                                          neighbor_child->face_orientation(neighbor_neighbor),
@@ -2555,7 +2552,7 @@ neighbor_child_on_subface (const unsigned int face,
       // deliver the last of those.
       while (neighbor_child->has_children())
         neighbor_child
-          = neighbor_child->child(GeometryInfo<3>::
+          = neighbor_child->child(GeometryInfo<dim>::
                                   child_cell_on_face(neighbor_child->refinement_case(),
                                                      neighbor_neighbor,
                                                      0));
@@ -2563,11 +2560,7 @@ neighbor_child_on_subface (const unsigned int face,
 #ifdef DEBUG
       // check, whether the face neighbor_child matches the requested
       // subface.
-      //
-      // in the following line, we know that if we got here that we
-      // have spacedim>=3. avoid instantiating invalid classes
-      // otherwise, even though we know that it is in dead code
-      typename Triangulation<3,(spacedim<3 ? 3 : spacedim)>::face_iterator requested;
+      typename Triangulation<dim,spacedim>::face_iterator requested;
       switch (this->subface_case(face))
         {
         case internal::SubfaceCase<3>::case_x:
