@@ -3454,6 +3454,13 @@ private:
 
   template <typename>
   friend class dealii::internal::Triangulation::TriaObjects;
+
+  // explicitly check for sensible template arguments
+#ifdef DEAL_II_WITH_CXX11
+  static_assert (dim<=spacedim,
+                 "The dimension <dim> of a Triangulation must be less than or "
+                 "equal to the space dimension <spacedim> in which it lives.");
+#endif
 };
 
 
