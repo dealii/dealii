@@ -2721,6 +2721,14 @@ protected:
   friend class FEFaceValues<dim,spacedim>;
   friend class FESubfaceValues<dim,spacedim>;
   friend class FESystem<dim,spacedim>;
+
+  // explicitly check for sensible template arguments
+#ifdef DEAL_II_WITH_CXX11
+  static_assert (dim<=spacedim,
+                 "The dimension <dim> of a FiniteElement must be less than or "
+                 "equal to the space dimension <spacedim> in which it lives.");
+#endif
+
 };
 
 
