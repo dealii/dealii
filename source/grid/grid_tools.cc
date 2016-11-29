@@ -665,9 +665,9 @@ namespace GridTools
      * of the @p dim space dimensions. Factorized into a function of its own
      * in order to allow parallel execution.
      */
-    void laplace_solve (const SparseMatrix<double> &S,
-                        const std::map<unsigned int,double> &m,
-                        Vector<double> &u)
+    void laplace_solve (const SparseMatrix<double>                     &S,
+                        const std::map<types::global_dof_index,double> &fixed_dofs,
+                        Vector<double>                                 &u)
     {
       const unsigned int n_dofs=S.n();
       FilteredMatrix<Vector<double> > SF (S);
@@ -681,7 +681,7 @@ namespace GridTools
 
       Vector<double> f(n_dofs);
 
-      SF.add_constraints(m);
+      SF.add_constraints(fixed_dofs);
       SF.apply_constraints (f, true);
       solver.solve(SF, u, f, PF);
     }
@@ -728,41 +728,34 @@ namespace GridTools
 
     MatrixCreator::create_laplace_matrix(StaticMappingQ1<dim>::mapping, dof_handler, quadrature, S, coefficient);
 
-    // set up the boundary values for
-    // the laplace problem
-    std::vector<std::map<unsigned int,double> > m(dim);
+    // set up the boundary values for the laplace problem
+    std::map<types::global_dof_index,double> fixed_dofs[dim];
     typename std::map<unsigned int,Point<dim> >::const_iterator map_end=new_points.end();
 
-    // fill these maps using the data
-    // given by new_points
+    // fill these maps using the data given by new_points
     typename DoFHandler<dim>::cell_iterator cell=dof_handler.begin_active(),
                                             endc=dof_handler.end();
     for (; cell!=endc; ++cell)
       {
-        for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+        // loop over all vertices of the cell and see if it is listed in the map
+        // given as first argument of the function
+        for (unsigned int vertex_no=0;
+             vertex_no<GeometryInfo<dim>::vertices_per_cell; ++vertex_no)
           {
-            const typename DoFHandler<dim>::face_iterator face=cell->face(face_no);
+            const unsigned int vertex_index=cell->vertex_index(vertex_no);
 
-            // loop over all vertices of the cell and see if it is listed in the map
-            // given as first argument of the function
-            for (unsigned int vertex_no=0;
-                 vertex_no<GeometryInfo<dim>::vertices_per_face; ++vertex_no)
-              {
-                const unsigned int vertex_index=face->vertex_index(vertex_no);
+            const typename std::map<unsigned int,Point<dim> >::const_iterator map_iter
+              = new_points.find(vertex_index);
 
-                const typename std::map<unsigned int,Point<dim> >::const_iterator map_iter
-                  = new_points.find(vertex_index);
-
-                if (map_iter!=map_end)
-                  for (unsigned int i=0; i<dim; ++i)
-                    m[i].insert(std::pair<unsigned int,double> (
-                                  face->vertex_dof_index(vertex_no, 0), map_iter->second(i)));
-              }
+            if (map_iter!=map_end)
+              for (unsigned int i=0; i<dim; ++i)
+                fixed_dofs[i].insert(std::pair<types::global_dof_index,double>
+                                     (cell->vertex_dof_index(vertex_no, 0),
+                                      map_iter->second(i)));
           }
       }
 
-    // solve the dim problems with
-    // different right hand sides.
+    // solve the dim problems with different right hand sides.
     Vector<double> us[dim];
     for (unsigned int i=0; i<dim; ++i)
       us[i].reinit (dof_handler.n_dofs());
@@ -771,21 +764,25 @@ namespace GridTools
     Threads::TaskGroup<> tasks;
     for (unsigned int i=0; i<dim; ++i)
       tasks += Threads::new_task (&laplace_solve,
-                                  S, m[i], us[i]);
+                                  S, fixed_dofs[i], us[i]);
     tasks.join_all ();
 
-    // change the coordinates of the
-    // points of the triangulation
+    // change the coordinates of the points of the triangulation
     // according to the computed values
+    std::vector<bool> vertex_touched (triangulation.n_vertices(), false);
     for (cell=dof_handler.begin_active(); cell!=endc; ++cell)
       for (unsigned int vertex_no=0;
            vertex_no<GeometryInfo<dim>::vertices_per_cell; ++vertex_no)
-        {
-          Point<dim> &v=cell->vertex(vertex_no);
-          const unsigned int dof_index=cell->vertex_dof_index(vertex_no, 0);
-          for (unsigned int i=0; i<dim; ++i)
-            v(i)=us[i](dof_index);
-        }
+        if (vertex_touched[cell->vertex_index(vertex_no)] == false)
+          {
+            Point<dim> &v = cell->vertex(vertex_no);
+
+            const types::global_dof_index dof_index = cell->vertex_dof_index(vertex_no, 0);
+            for (unsigned int i=0; i<dim; ++i)
+              v(i) = us[i](dof_index);
+
+            vertex_touched[cell->vertex_index(vertex_no)] = true;
+          }
   }
 
   template <int dim, int spacedim>
