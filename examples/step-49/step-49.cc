@@ -58,12 +58,12 @@ using namespace dealii;
 // Finally, the function outputs the mesh in encapsulated postscript (EPS)
 // format that can easily be visualized in the same way as was done in step-1.
 template <int dim>
-void print_mesh_info(const Triangulation<dim> &tria,
+void print_mesh_info(const Triangulation<dim> &triangulation,
                      const std::string        &filename)
 {
   std::cout << "Mesh info:" << std::endl
             << " dimension: " << dim << std::endl
-            << " no. of cells: " << tria.n_active_cells() << std::endl;
+            << " no. of cells: " << triangulation.n_active_cells() << std::endl;
 
   // Next loop over all faces of all cells and find how often each
   // boundary indicator is used (recall that if you access an element
@@ -73,8 +73,8 @@ void print_mesh_info(const Triangulation<dim> &tria,
   {
     std::map<unsigned int, unsigned int> boundary_count;
     typename Triangulation<dim>::active_cell_iterator
-    cell = tria.begin_active(),
-    endc = tria.end();
+    cell = triangulation.begin_active(),
+    endc = triangulation.end();
     for (; cell!=endc; ++cell)
       {
         for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -98,7 +98,7 @@ void print_mesh_info(const Triangulation<dim> &tria,
   // file:
   std::ofstream out (filename.c_str());
   GridOut grid_out;
-  grid_out.write_eps (tria, out);
+  grid_out.write_eps (triangulation, out);
   std::cout << " written to " << filename
             << std::endl
             << std::endl;
@@ -121,7 +121,7 @@ void grid_1 ()
   std::ifstream f("untitled.msh");
   gridin.read_msh(f);
 
-  print_mesh_info(triangulation, "grid-1.eps");
+  print_mesh_info (triangulation, "grid-1.eps");
 }
 
 
@@ -146,7 +146,7 @@ void grid_2 ()
   Triangulation<2> triangulation;
   GridGenerator::merge_triangulations (tria1, tria2, triangulation);
 
-  print_mesh_info(triangulation, "grid-2.eps");
+  print_mesh_info (triangulation, "grid-2.eps");
 }
 
 
@@ -241,7 +241,7 @@ void grid_4()
   GridGenerator::hyper_cube_with_cylindrical_hole (triangulation, 0.25, 1.0);
 
   GridGenerator::extrude_triangulation (triangulation, 3, 2.0, out);
-  print_mesh_info(out, "grid-4.eps");
+  print_mesh_info (out, "grid-4.eps");
 }
 
 
@@ -267,16 +267,17 @@ Point<2> grid_5_transform (const Point<2> &in)
 
 void grid_5()
 {
-  Triangulation<2> tria;
+  Triangulation<2> triangulation;
   std::vector<unsigned int> repetitions(2);
   repetitions[0] = 14;
   repetitions[1] = 2;
-  GridGenerator::subdivided_hyper_rectangle (tria, repetitions,
+  GridGenerator::subdivided_hyper_rectangle (triangulation,
+                                             repetitions,
                                              Point<2>(0.0,0.0),
                                              Point<2>(10.0,1.0));
 
-  GridTools::transform(&grid_5_transform, tria);
-  print_mesh_info(tria, "grid-5.eps");
+  GridTools::transform (&grid_5_transform, triangulation);
+  print_mesh_info (triangulation, "grid-5.eps");
 }
 
 
@@ -308,15 +309,16 @@ struct Grid6Func
 
 void grid_6()
 {
-  Triangulation<2> tria;
+  Triangulation<2> triangulation;
   std::vector< unsigned int > repetitions(2);
   repetitions[0] = repetitions[1] = 40;
-  GridGenerator::subdivided_hyper_rectangle (tria, repetitions,
+  GridGenerator::subdivided_hyper_rectangle (triangulation,
+                                             repetitions,
                                              Point<2>(0.0,0.0),
                                              Point<2>(1.0,1.0));
 
-  GridTools::transform(Grid6Func(), tria);
-  print_mesh_info(tria, "grid-6.eps");
+  GridTools::transform(Grid6Func(), triangulation);
+  print_mesh_info (triangulation, "grid-6.eps");
 }
 
 
@@ -330,15 +332,15 @@ void grid_6()
 // super-convergence properties.
 void grid_7()
 {
-  Triangulation<2> tria;
+  Triangulation<2> triangulation;
   std::vector<unsigned int> repetitions(2);
   repetitions[0] = repetitions[1] = 16;
-  GridGenerator::subdivided_hyper_rectangle (tria, repetitions,
+  GridGenerator::subdivided_hyper_rectangle (triangulation, repetitions,
                                              Point<2>(0.0,0.0),
                                              Point<2>(1.0,1.0));
 
-  GridTools::distort_random (0.3, tria, true);
-  print_mesh_info(tria, "grid-7.eps");
+  GridTools::distort_random (0.3, triangulation, true);
+  print_mesh_info (triangulation, "grid-7.eps");
 }
 
 
