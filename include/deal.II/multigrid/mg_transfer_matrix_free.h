@@ -90,6 +90,9 @@ public:
    * <tt>to_level</tt> using the embedding matrices of the underlying finite
    * element. The previous content of <tt>dst</tt> is overwritten.
    *
+   * @param to_level The index of the level to prolongate to, which is the
+   * level of @p dst.
+   *
    * @param src is a vector with as many elements as there are degrees of
    * freedom on the coarser level involved.
    *
@@ -108,6 +111,9 @@ public:
    * some degrees of freedom in <tt>dst</tt> are active and will not be
    * altered. For the other degrees of freedom, the result of the restriction
    * is added.
+   *
+   * @param to_level The index of the level to restrict from, which is the
+   * level of @p src.
    *
    * @param src is a vector with as many elements as there are degrees of
    * freedom on the finer level involved.

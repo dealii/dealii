@@ -38,7 +38,7 @@ DEAL_II_NAMESPACE_OPEN
  * diagonal_vector.reinit(locally_owned_dofs,
  *                        locally_relevant_dofs,
  *                        mpi_communicator);
- * @code
+ * @endcode
  *
  * @author Martin Kronbichler, 2016
  */
