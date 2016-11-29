@@ -23,7 +23,7 @@ for (VEC : REAL_SERIAL_VECTORS; deal_II_dimension : DIMENSIONS; deal_II_space_di
     (const Mapping<deal_II_dimension,deal_II_space_dimension>          &,
      const DoFHandler<deal_II_dimension,deal_II_space_dimension>       &,
      const Quadrature<deal_II_dimension>                               &,
-     const Function<deal_II_space_dimension, typename VEC::value_type> &,
+     const Function<deal_II_space_dimension, VEC::value_type>          &,
      VEC                                                               &,
      const ConstraintMatrix                                            &);
 
@@ -31,7 +31,7 @@ for (VEC : REAL_SERIAL_VECTORS; deal_II_dimension : DIMENSIONS; deal_II_space_di
     void create_right_hand_side<deal_II_dimension,deal_II_space_dimension,VEC >
     (const DoFHandler<deal_II_dimension,deal_II_space_dimension>       &,
      const Quadrature<deal_II_dimension>                               &,
-     const Function<deal_II_space_dimension, typename VEC::value_type> &,
+     const Function<deal_II_space_dimension, VEC::value_type>          &,
      VEC                                                               &,
      const ConstraintMatrix                                            &);
     \}
@@ -50,7 +50,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     (const hp::MappingCollection<deal_II_dimension> &,
      const hp::DoFHandler<deal_II_dimension>        &,
      const hp::QCollection<deal_II_dimension>       &,
-     const Function<deal_II_space_dimension, typename Vector<double>::value_type> &,
+     const Function<deal_II_space_dimension, Vector<double>::value_type> &,
      Vector<double>                                 &,
      const ConstraintMatrix                         &);
 
@@ -58,7 +58,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     void create_right_hand_side<deal_II_dimension, deal_II_space_dimension, Vector<double> >
     (const hp::DoFHandler<deal_II_dimension>  &,
      const hp::QCollection<deal_II_dimension> &,
-     const Function<deal_II_space_dimension, typename Vector<double>::value_type> &,
+     const Function<deal_II_space_dimension, Vector<double>::value_type> &,
      Vector<double>                           &,
      const ConstraintMatrix                   &);
 
@@ -69,7 +69,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     (const Mapping<deal_II_dimension>      &,
      const DoFHandler<deal_II_dimension>   &,
      const Quadrature<deal_II_dimension-1> &,
-     const Function<deal_II_space_dimension, typename Vector<double>::value_type> &,
+     const Function<deal_II_space_dimension, Vector<double>::value_type> &,
      Vector<double>                        &,
      const std::set<types::boundary_id>    &);
 #endif
@@ -79,7 +79,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     create_boundary_right_hand_side<deal_II_dimension, deal_II_space_dimension, Vector<double> >
     (const DoFHandler<deal_II_dimension>   &,
      const Quadrature<deal_II_dimension-1> &,
-     const Function<deal_II_space_dimension, typename Vector<double>::value_type> &,
+     const Function<deal_II_space_dimension, Vector<double>::value_type> &,
      Vector<double>                        &,
      const std::set<types::boundary_id>    &);
 
@@ -90,7 +90,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     (const hp::MappingCollection<deal_II_dimension> &,
      const hp::DoFHandler<deal_II_dimension>        &,
      const hp::QCollection<deal_II_dimension-1>     &,
-     const Function<deal_II_space_dimension, typename Vector<double>::value_type> &,
+     const Function<deal_II_space_dimension, Vector<double>::value_type> &,
      Vector<double>                                 &,
      const std::set<types::boundary_id>             &);
 #endif
@@ -100,7 +100,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     create_boundary_right_hand_side<deal_II_dimension, deal_II_space_dimension, Vector<double> >
     (const hp::DoFHandler<deal_II_dimension>    &,
      const hp::QCollection<deal_II_dimension-1> &,
-     const Function<deal_II_space_dimension, typename Vector<double>::value_type> &,
+     const Function<deal_II_space_dimension, Vector<double>::value_type> &,
      Vector<double>                             &,
      const std::set<types::boundary_id>         &);
 
