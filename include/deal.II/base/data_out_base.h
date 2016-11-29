@@ -1136,7 +1136,7 @@ namespace DataOutBase
     /**
      * The number of space dimensions in which the vertices represented
      * by the current object live. This corresponds to the usual
-     * <dim> argument, but since this class is not templated on the
+     * @p dim argument, but since this class is not templated on the
      * dimension, we need to store it here.
      */
     unsigned int      node_dim;
