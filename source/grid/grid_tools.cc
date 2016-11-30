@@ -3742,6 +3742,11 @@ next_cell:
     Assert (pairs1.size() == pairs2.size(),
             ExcMessage ("Unmatched faces on periodic boundaries"));
 
+    Assert (pairs1.size() > 0,
+            ExcMessage("No new periodic face pairs have been found. "
+                       "Are you sure that you've selected the correct boundary "
+                       "id's and that the coarsest level mesh is colorized?"));
+
     // and call match_periodic_face_pairs that does the actual matching:
     match_periodic_face_pairs(pairs1, pairs2, direction, matched_pairs, offset,
                               matrix);
@@ -3799,6 +3804,10 @@ next_cell:
     Assert (pairs1.size() == pairs2.size(),
             ExcMessage ("Unmatched faces on periodic boundaries"));
 
+    Assert (pairs1.size() > 0,
+            ExcMessage("No new periodic face pairs have been found. "
+                       "Are you sure that you've selected the correct boundary "
+                       "id's and that the coarsest level mesh is colorized?"));
 
 #ifdef DEBUG
     const unsigned int size_old = matched_pairs.size();
