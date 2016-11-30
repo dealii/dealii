@@ -947,13 +947,28 @@ namespace DataOutBase
     bool print_date_and_time;
 
     /**
-     * A data type providing the different possible zlib compression levels.
+     * A data type providing the different possible zlib compression
+     * levels. These map directly to constants defined by zlib.
      */
     enum ZlibCompressionLevel
     {
+      /**
+       * Do not use any compression.
+       */
       no_compression,
+      /**
+       * Use the fastest available compression algorithm.
+       */
       best_speed,
+      /**
+       * Use the algorithm which results in the smallest compressed
+       * files. This is the default flag.
+       */
       best_compression,
+      /**
+       * Use the default compression algorithm. This is a compromise between
+       * speed and file size.
+       */
       default_compression
     };
 
