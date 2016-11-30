@@ -1434,6 +1434,12 @@ namespace GridTools
    * times with different boundary ids to generate a vector with all periodic
    * pairs.
    *
+   * @note Since the periodic face pairs are found on the coarsest mesh level,
+   * it is necessary to ensure that the coarsest level faces have the correct
+   * boundary indicators set. In general, this means that one must first set
+   * all boundary indicators on the coarse grid before performing any global
+   * or local grid refinement.
+   *
    * @author Daniel Arndt, Matthias Maier, 2013 - 2015
    */
   template <typename MeshType>
