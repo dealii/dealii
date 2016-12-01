@@ -51,6 +51,9 @@
 CHECK_CXX_SOURCE_COMPILES(
   "
   #include <emmintrin.h>
+#ifdef __AVX512F__
+  #include <immintrin.h>
+#endif
   int main()
   {
     __m128d a, b;
@@ -60,6 +63,16 @@ CHECK_CXX_SOURCE_COMPILES(
     __m128d d = b - c;
     __m128d e = c * a + d;
     __m128d f = e/a;
+#ifdef __AVX512F__
+    __m512d g, h;
+    g = _mm512_set1_pd (1.0);
+    h = _mm512_set1_pd (2.1);
+    __m512d i = g + h;
+    g = i - g;
+    h *= i;
+    i = h/i;
+    (void)i;
+#endif
     (void)f;
   }
   "
