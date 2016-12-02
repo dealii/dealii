@@ -389,10 +389,25 @@ namespace Utilities
      */
     struct MemoryStats
     {
-      unsigned long int VmPeak; /** peak virtual memory size in kB */
-      unsigned long int VmSize; /** current virtual memory size in kB */
-      unsigned long int VmHWM; /** peak resident memory size in kB */
-      unsigned long int VmRSS; /** current resident memory size in kB */
+      /**
+       * Peak virtual memory size in kB.
+       */
+      unsigned long int VmPeak;
+
+      /**
+       * Current virtual memory size in kB.
+       */
+      unsigned long int VmSize;
+
+      /**
+       * Peak resident memory size in kB. Also known as "high water mark" (HWM).
+       */
+      unsigned long int VmHWM;
+
+      /**
+       * Current resident memory size in kB. Also known as "resident set size" (RSS).
+       */
+      unsigned long int VmRSS;
     };
 
 
