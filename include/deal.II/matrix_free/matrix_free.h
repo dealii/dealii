@@ -505,6 +505,16 @@ public:
    * set accordingly. For vector-valued problems with several DoFHandlers
    * underlying this class, the parameter @p vector_component defines which
    * component is to be used.
+   *
+   * For the vectors used with MatrixFree and in FEEvaluation, a vector needs
+   * to hold all @ref GlossLocallyActiveDof "locally active DoFs" and also
+   * some of the @ref GlossLocallyRelevantDof "locally relevant DoFs". The
+   * selection of DoFs is such that one can read all degrees of freedom on all
+   * locally relevant elements (locally active) plus the degrees of freedom
+   * that contraints expand into from the locally owned cells. However, not
+   * all locally relevant DoFs are stored because most of them would never be
+   * accessed in matrix-vector products and result in too much data sent
+   * around which impacts the performance.
    */
   template <typename VectorType>
   void initialize_dof_vector(VectorType &vec,
@@ -517,6 +527,16 @@ public:
    * set accordingly. For vector-valued problems with several DoFHandlers
    * underlying this class, the parameter @p vector_component defines which
    * component is to be used.
+   *
+   * For the vectors used with MatrixFree and in FEEvaluation, a vector needs
+   * to hold all @ref GlossLocallyActiveDof "locally active DoFs" and also
+   * some of the @ref GlossLocallyRelevantDof "locally relevant DoFs". The
+   * selection of DoFs is such that one can read all degrees of freedom on all
+   * locally relevant elements (locally active) plus the degrees of freedom
+   * that contraints expand into from the locally owned cells. However, not
+   * all locally relevant DoFs are stored because most of them would never be
+   * accessed in matrix-vector products and result in too much data sent
+   * around which impacts the performance.
    */
   template <typename Number2>
   void initialize_dof_vector(LinearAlgebra::distributed::Vector<Number2> &vec,

@@ -222,6 +222,14 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+
+<li> Improved: The step-37 tutorial program now shows the matrix-free multigrid
+     solver based on MPI parallelization rather than only a serial version.
+     Moreover, support for adaptively refined meshes has been added.
+     <br>
+     (Martin Kronbichler, 2016/11/23)
+</li>
+
 <li> Improved: the error codes for all MPI functions are now checked and, if the
      MPI function failed for any reason, an exception with a helpful message is
      thrown.
