@@ -87,11 +87,6 @@ namespace LinearAlgebra
     Vector(const InputIterator first, const InputIterator last);
 
     /**
-     * Destructor, deallocates memory.
-     */
-    virtual ~Vector();
-
-    /**
      * Copies the data of the input vector @p in_vector.
      */
     Vector<Number> &operator= (const Vector<Number> &in_vector);
@@ -324,12 +319,6 @@ namespace LinearAlgebra
     this->reinit(complete_index_set(std::distance (first, last)), true);
     std::copy(first, last, this->begin());
   }
-
-
-
-  template <typename Number>
-  inline
-  Vector<Number>::~Vector() {}
 
 
 

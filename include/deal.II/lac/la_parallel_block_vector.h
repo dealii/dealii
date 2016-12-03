@@ -168,11 +168,6 @@ namespace LinearAlgebra
                    const MPI_Comm  communicator);
 
       /**
-       * Destructor. Clears memory.
-       */
-      ~BlockVector ();
-
-      /**
        * Copy operator: fill all components of the vector with the given
        * scalar value.
        */
