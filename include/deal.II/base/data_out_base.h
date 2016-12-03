@@ -1727,6 +1727,136 @@ namespace DataOutBase
                        std::ostream                            &out);
 
   /**
+   * In ParaView it is possible to visualize time-dependent data tagged with
+   * the current integration time of a time dependent simulation. To use this
+   * feature you need a <code>.pvd</code> file that describes which VTU or
+   * PVTU file belongs to which timestep. This function writes a file that
+   * provides this mapping, i.e., it takes a list of pairs each of which
+   * indicates a particular time instant and the corresponding file that
+   * contains the graphical data for this time instant.
+   *
+   * A typical use case, in program that computes a time dependent solution,
+   * would be the following (<code>time</code> and <code>time_step</code> are
+   * member variables of the class with types <code>double</code> and
+   * <code>unsigned int</code>, respectively; the variable
+   * <code>times_and_names</code> is of type
+   * <code>std::vector@<std::pair@<double,std::string@> @></code>):
+   *
+   * @code
+   *  template <int dim>
+   *  void MyEquation<dim>::output_results () const
+   *  {
+   *    DataOut<dim> data_out;
+   *
+   *    data_out.attach_dof_handler (dof_handler);
+   *    data_out.add_data_vector (solution, "U");
+   *    data_out.build_patches ();
+   *
+   *    const std::string filename = "solution-" +
+   *                                 Utilities::int_to_string (timestep_number, 3) +
+   *                                 ".vtu";
+   *    std::ofstream output (filename.c_str());
+   *    data_out.write_vtu (output);
+   *
+   *    times_and_names.push_back (std::pair<double,std::string> (time, filename));
+   *    std::ofstream pvd_output ("solution.pvd");
+   *    DataOutBase::write_pvd_record (pvd_output, times_and_names);
+   *  }
+   * @endcode
+   *
+   * @note See DataOutInterface::write_vtu or DataOutInterface::write_pvtu_record
+   * for writing solutions at each timestep.
+   *
+   * @note The second element of each pair, i.e., the file in which the
+   * graphical data for each time is stored, may itself be again a file that
+   * references other files. For example, it could be the name for a
+   * <code>.pvtu</code> file that references multiple parts of a parallel
+   * computation.
+   *
+   * @author Marco Engelhard, 2012
+   */
+  void write_pvd_record (std::ostream &out,
+                         const std::vector<std::pair<double,std::string> >  &times_and_names);
+
+  /**
+   * This function is the exact equivalent of the write_pvtu_record() function
+   * but for older versions of the VisIt visualization program and for one
+   * visualization graph (or one time step only). See there for the purpose of
+   * this function.
+   *
+   * This function is documented in the "Creating a master file for parallel"
+   * section (section 5.7) of the "Getting data into VisIt" report that can be
+   * found here:
+   * https://wci.llnl.gov/codes/visit/2.0.0/GettingDataIntoVisIt2.0.0.pdf
+   */
+  void write_visit_record (std::ostream &out,
+                           const std::vector<std::string> &piece_names);
+
+  /**
+   * This function is equivalent to the write_visit_record() above but for
+   * multiple time steps. Here is an example of how the function would be
+   * used:
+   * @code
+   *  const unsigned int number_of_time_steps = 3;
+   *  std::vector<std::vector<std::string > > piece_names(number_of_time_steps);
+   *
+   *  piece_names[0].push_back("subdomain_01.time_step_0.vtk");
+   *  piece_names[0].push_back("subdomain_02.time_step_0.vtk");
+   *
+   *  piece_names[1].push_back("subdomain_01.time_step_1.vtk");
+   *  piece_names[1].push_back("subdomain_02.time_step_1.vtk");
+   *
+   *  piece_names[2].push_back("subdomain_01.time_step_2.vtk");
+   *  piece_names[2].push_back("subdomain_02.time_step_2.vtk");
+   *
+   *  std::ofstream visit_output ("master_file.visit");
+   *
+   *  DataOutBase::write_visit_record(visit_output, piece_names);
+   * @endcode
+   *
+   * This function is documented in the "Creating a master file for parallel"
+   * section (section 5.7) of the "Getting data into VisIt" report that can be
+   * found here:
+   * https://wci.llnl.gov/codes/visit/2.0.0/GettingDataIntoVisIt2.0.0.pdf
+   */
+  void write_visit_record (std::ostream &out,
+                           const std::vector<std::vector<std::string> > &piece_names);
+
+  /**
+   * This function is equivalent to the write_visit_record() above but for
+   * multiple time steps and with additional information about the time for
+   * each timestep. Here is an example of how the function would be
+   * used:
+   * @code
+   *  const unsigned int number_of_time_steps = 3;
+   *  std::vector<std::pair<double,std::vector<std::string > > > times_and_piece_names(number_of_time_steps);
+   *
+   *  times_and_piece_names[0].first = 0.0;
+   *  times_and_piece_names[0].second.push_back("subdomain_01.time_step_0.vtk");
+   *  times_and_piece_names[0].second.push_back("subdomain_02.time_step_0.vtk");
+   *
+   *  times_and_piece_names[1].first = 0.5;
+   *  times_and_piece_names[1].second.push_back("subdomain_01.time_step_1.vtk");
+   *  times_and_piece_names[1].second.push_back("subdomain_02.time_step_1.vtk");
+   *
+   *  times_and_piece_names[2].first = 1.0;
+   *  times_and_piece_names[2].second.push_back("subdomain_01.time_step_2.vtk");
+   *  times_and_piece_names[2].second.push_back("subdomain_02.time_step_2.vtk");
+   *
+   *  std::ofstream visit_output ("master_file.visit");
+   *
+   *  DataOutBase::write_visit_record(visit_output, times_and_piece_names);
+   * @endcode
+   *
+   * This function is documented in the "Creating a master file for parallel"
+   * section (section 5.7) of the "Getting data into VisIt" report that can be
+   * found here:
+   * https://wci.llnl.gov/codes/visit/2.0.0/GettingDataIntoVisIt2.0.0.pdf
+   */
+  void write_visit_record (std::ostream &out,
+                           const std::vector<std::pair<double,std::vector<std::string> > > &times_and_piece_names);
+
+  /**
    * Write the given list of patches to the output stream in SVG format.
    *
    * SVG (Scalable Vector Graphics) is an XML-based vector image format
@@ -2177,138 +2307,34 @@ public:
                           const std::vector<std::string> &piece_names) const;
 
   /**
-   * In ParaView it is possible to visualize time-dependent data tagged with
-   * the current integration time of a time dependent simulation. To use this
-   * feature you need a <code>.pvd</code> file that describes which VTU or
-   * PVTU file belongs to which timestep. This function writes a file that
-   * provides this mapping, i.e., it takes a list of pairs each of which
-   * indicates a particular time instant and the corresponding file that
-   * contains the graphical data for this time instant.
-   *
-   * A typical use case, in program that computes a time dependent solution,
-   * would be the following (<code>time</code> and <code>time_step</code> are
-   * member variables of the class with types <code>double</code> and
-   * <code>unsigned int</code>, respectively; the variable
-   * <code>times_and_names</code> is of type
-   * <code>std::vector@<std::pair@<double,std::string@> @></code>):
-   *
-   * @code
-   *  template <int dim>
-   *  void MyEquation<dim>::output_results () const
-   *  {
-   *    DataOut<dim> data_out;
-   *
-   *    data_out.attach_dof_handler (dof_handler);
-   *    data_out.add_data_vector (solution, "U");
-   *    data_out.build_patches ();
-   *
-   *    const std::string filename = "solution-" +
-   *                                 Utilities::int_to_string (timestep_number, 3) +
-   *                                 ".vtu";
-   *    std::ofstream output (filename.c_str());
-   *    data_out.write_vtu (output);
-   *
-   *    times_and_names.push_back (std::pair<double,std::string> (time, filename));
-   *    std::ofstream pvd_output ("solution.pvd");
-   *    data_out.write_pvd_record (pvd_output, times_and_names);
-   *  }
-   * @endcode
-   *
-   * @note See DataOutBase::write_vtu or DataOutInterface::write_pvtu_record
-   * for writing solutions at each timestep.
-   *
-   * @note The second element of each pair, i.e., the file in which the
-   * graphical data for each time is stored, may itself be again a file that
-   * references other files. For example, it could be the name for a
-   * <code>.pvtu</code> file that references multiple parts of a parallel
-   * computation.
-   *
-   * @author Marco Engelhard, 2012
+   * @deprecated Use DataOutBase::write_pvd_record() instead
    */
-  void write_pvd_record (std::ostream &out,
-                         const std::vector<std::pair<double,std::string> >  &times_and_names) const;
+  static void write_pvd_record (std::ostream &out,
+                                const std::vector<std::pair<double,std::string> >  &times_and_names) DEAL_II_DEPRECATED;
 
   /**
-   * This function is the exact equivalent of the write_pvtu_record() function
-   * but for older versions of the VisIt visualization program and for one
-   * visualization graph (or one time step only). See there for the purpose of
-   * this function.
-   *
-   * This function is documented in the "Creating a master file for parallel"
-   * section (section 5.7) of the "Getting data into VisIt" report that can be
-   * found here:
-   * https://wci.llnl.gov/codes/visit/2.0.0/GettingDataIntoVisIt2.0.0.pdf
+   * @deprecated Use DataOutBase::write_visit_record() instead
    */
-  void write_visit_record (std::ostream &out,
-                           const std::vector<std::string> &piece_names) const;
+  static
+  void
+  write_visit_record (std::ostream &out,
+                      const std::vector<std::string> &piece_names) DEAL_II_DEPRECATED;
 
   /**
-   * This function is equivalent to the write_visit_record() above but for
-   * multiple time steps. Here is an example of how the function would be
-   * used:
-   * @code
-   *  DataOut<dim> data_out;
-   *
-   *  const unsigned int number_of_time_steps = 3;
-   *  std::vector<std::vector<std::string > > piece_names(number_of_time_steps);
-   *
-   *  piece_names[0].push_back("subdomain_01.time_step_0.vtk");
-   *  piece_names[0].push_back("subdomain_02.time_step_0.vtk");
-   *
-   *  piece_names[1].push_back("subdomain_01.time_step_1.vtk");
-   *  piece_names[1].push_back("subdomain_02.time_step_1.vtk");
-   *
-   *  piece_names[2].push_back("subdomain_01.time_step_2.vtk");
-   *  piece_names[2].push_back("subdomain_02.time_step_2.vtk");
-   *
-   *  std::ofstream visit_output ("master_file.visit");
-   *
-   *  data_out.write_visit_record(visit_output, piece_names);
-   * @endcode
-   *
-   * This function is documented in the "Creating a master file for parallel"
-   * section (section 5.7) of the "Getting data into VisIt" report that can be
-   * found here:
-   * https://wci.llnl.gov/codes/visit/2.0.0/GettingDataIntoVisIt2.0.0.pdf
+   * @deprecated Use DataOutBase::write_visit_record() instead
    */
-  void write_visit_record (std::ostream &out,
-                           const std::vector<std::vector<std::string> > &piece_names) const;
+  static
+  void
+  write_visit_record (std::ostream &out,
+                      const std::vector<std::vector<std::string> > &piece_names) DEAL_II_DEPRECATED;
 
   /**
-   * This function is equivalent to the write_visit_record() above but for
-   * multiple time steps and with additional information about the time for
-   * each timestep. Here is an example of how the function would be
-   * used:
-   * @code
-   *  DataOut<dim> data_out;
-   *
-   *  const unsigned int number_of_time_steps = 3;
-   *  std::vector<std::pair<double,std::vector<std::string > > > times_and_piece_names(number_of_time_steps);
-   *
-   *  times_and_piece_names[0].first = 0.0;
-   *  times_and_piece_names[0].second.push_back("subdomain_01.time_step_0.vtk");
-   *  times_and_piece_names[0].second.push_back("subdomain_02.time_step_0.vtk");
-   *
-   *  times_and_piece_names[1].first = 0.5;
-   *  times_and_piece_names[1].second.push_back("subdomain_01.time_step_1.vtk");
-   *  times_and_piece_names[1].second.push_back("subdomain_02.time_step_1.vtk");
-   *
-   *  times_and_piece_names[2].first = 1.0;
-   *  times_and_piece_names[2].second.push_back("subdomain_01.time_step_2.vtk");
-   *  times_and_piece_names[2].second.push_back("subdomain_02.time_step_2.vtk");
-   *
-   *  std::ofstream visit_output ("master_file.visit");
-   *
-   *  data_out.write_visit_record(visit_output, times_and_piece_names);
-   * @endcode
-   *
-   * This function is documented in the "Creating a master file for parallel"
-   * section (section 5.7) of the "Getting data into VisIt" report that can be
-   * found here:
-   * https://wci.llnl.gov/codes/visit/2.0.0/GettingDataIntoVisIt2.0.0.pdf
+   * @deprecated Use DataOutBase::write_visit_record() instead
    */
-  void write_visit_record (std::ostream &out,
-                           const std::vector<std::pair<double,std::vector<std::string> > > &times_and_piece_names) const;
+  static
+  void
+  write_visit_record (std::ostream &out,
+                      const std::vector<std::pair<double,std::vector<std::string> > > &times_and_piece_names) DEAL_II_DEPRECATED;
 
   /**
    * Obtain data through get_patches() and write it to <tt>out</tt> in SVG
