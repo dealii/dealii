@@ -275,13 +275,17 @@ SphericalManifold<dim,spacedim>::
 get_new_point (const std::vector<Point<spacedim> > &vertices,
                const std::vector<double> &weights) const
 {
+  const unsigned int n_points = vertices.size();
+
   double rho = 0.0;
   Tensor<1,spacedim> candidate;
-  for (unsigned int i = 0; i<vertices.size(); i++)
+  for (unsigned int i = 0; i<n_points; i++)
     {
-      rho += (vertices[i]-center).norm()*weights[i];
-      candidate += (vertices[i]-center)*weights[i];
+      const Tensor<1,spacedim> direction (vertices[i]-center);
+      rho += direction.norm()*weights[i];
+      candidate += direction*weights[i];
     }
+
   // Unit norm direction.
   candidate /= candidate.norm();
 
