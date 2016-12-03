@@ -147,12 +147,6 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    BlockVector<Number>::~BlockVector ()
-    {}
-
-
-
-    template <typename Number>
     BlockVector<Number> &
     BlockVector<Number>::operator = (const value_type s)
     {

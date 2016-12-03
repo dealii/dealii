@@ -207,8 +207,25 @@ namespace LinearAlgebra
      * Return the memory consumption of this class in bytes.
      */
     virtual std::size_t memory_consumption() const = 0;
+
+    /**
+     * Destructor. Declared as virtual so that inheriting classes (which may
+     * manage their own memory) are destroyed correctly.
+     */
+    virtual ~VectorSpaceVector();
   };
   /*@}*/
+
+
+
+#ifndef DOXYGEN
+  // TODO we can get rid of this when we require C++11 by using '=default'
+  // above
+  template <typename Number>
+  inline
+  VectorSpaceVector<Number>::~VectorSpaceVector()
+  {}
+#endif // DOXYGEN
 }
 
 DEAL_II_NAMESPACE_CLOSE
