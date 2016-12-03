@@ -533,9 +533,22 @@ TimerOutput::print_summary () const
           out_stream << std::setprecision(3);
           out_stream << i->second.total_cpu_time << "s |";
           out_stream << std::setw(10);
-          out_stream << std::setprecision(2);
           if (total_cpu_time != 0)
-            out_stream << i->second.total_cpu_time/total_cpu_time * 100 << "% |";
+            {
+              // if run time was less than 0.1%, just print a zero to avoid
+              // printing silly things such as "2.45e-6%". otherwise print
+              // the actual percentage
+              const double fraction = i->second.total_cpu_time/total_cpu_time;
+              if (fraction > 0.001)
+                {
+                  out_stream << std::setprecision(2);
+                  out_stream << fraction * 100;
+                }
+              else
+                out_stream << 0.0;
+
+              out_stream << "% |";
+            }
           else
             out_stream << 0.0 << "% |";
         }
@@ -591,11 +604,25 @@ TimerOutput::print_summary () const
           out_stream << std::setprecision(3);
           out_stream << i->second.total_wall_time << "s |";
           out_stream << std::setw(10);
-          out_stream << std::setprecision(2);
-          double value = i->second.total_wall_time/total_wall_time * 100;
-          if (!numbers::is_finite(value))
-            value = 0.0;
-          out_stream << value << "% |";
+
+          if (total_wall_time != 0)
+            {
+              // if run time was less than 0.1%, just print a zero to avoid
+              // printing silly things such as "2.45e-6%". otherwise print
+              // the actual percentage
+              const double fraction = i->second.total_wall_time/total_wall_time;
+              if (fraction > 0.001)
+                {
+                  out_stream << std::setprecision(2);
+                  out_stream << fraction * 100;
+                }
+              else
+                out_stream << 0.0;
+
+              out_stream << "% |";
+            }
+          else
+            out_stream << 0.0 << "% |";
         }
       out_stream << std::endl
                  << "+---------------------------------+-----------+"
