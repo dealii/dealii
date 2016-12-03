@@ -459,6 +459,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> Changed: To improve readability, TimerOutput::print_summary()
+ now simply outputs "0%" if a particular section's time requires
+ less than 0.1 per cent of the overall run time.
+ <br>
+ (Wolfgang Bangerth, 2016/12/03)
+ </li>
+
  <li> Improved: The trait class has_vmult_add in linear_operators.h
  has been restricted to test if there is a vmult_add and a Tvmult_add
  method that takes two arguments. This check now also works with
