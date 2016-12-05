@@ -72,6 +72,12 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 
+// Defined in these two headers are some operations that are pertinent to
+// finite strain elasticity. The first will help us compute some kinematic
+// quantities, and the second provides some stanard tensor definitions.
+#include <deal.II/physics/elasticity/kinematics.h>
+#include <deal.II/physics/elasticity/standard_tensors.h>
+
 #include <iostream>
 #include <fstream>
 
@@ -431,44 +437,6 @@ namespace Step44
     }
   }
 
-// @sect3{Some standard tensors}
-
-// Now we define some frequently used second and fourth-order tensors:
-  template <int dim>
-  class StandardTensors
-  {
-  public:
-
-    // $\mathbf{I}$
-    static const SymmetricTensor<2, dim> I;
-    // $\mathbf{I} \otimes \mathbf{I}$
-    static const SymmetricTensor<4, dim> IxI;
-    // $\mathcal{S}$, note that as we only use this fourth-order unit tensor
-    // to operate on symmetric second-order tensors.  To maintain notation
-    // consistent with Holzapfel (2001) we name the tensor $\mathcal{I}$
-    static const SymmetricTensor<4, dim> II;
-    // Fourth-order deviatoric tensor such that
-    // $\textrm{dev} \{ \bullet \} = \{ \bullet \} -
-    //  [1/\textrm{dim}][ \{ \bullet\} :\mathbf{I}]\mathbf{I}$
-    static const SymmetricTensor<4, dim> dev_P;
-  };
-
-  template <int dim>
-  const SymmetricTensor<2, dim>
-  StandardTensors<dim>::I = unit_symmetric_tensor<dim>();
-
-  template <int dim>
-  const SymmetricTensor<4, dim>
-  StandardTensors<dim>::IxI = outer_product(I, I);
-
-  template <int dim>
-  const SymmetricTensor<4, dim>
-  StandardTensors<dim>::II = identity_tensor<dim>();
-
-  template <int dim>
-  const SymmetricTensor<4, dim>
-  StandardTensors<dim>::dev_P = deviator_tensor<dim>();
-
 // @sect3{Time class}
 
 // A simple class to store time data. Its functioning is transparent so no
@@ -560,7 +528,7 @@ namespace Step44
       det_F(1.0),
       p_tilde(0.0),
       J_tilde(1.0),
-      b_bar(StandardTensors<dim>::I)
+      b_bar(Physics::Elasticity::StandardTensors<dim>::I)
     {
       Assert(kappa > 0, ExcInternalError());
     }
@@ -577,7 +545,8 @@ namespace Step44
                               const double J_tilde_in)
     {
       det_F = determinant(F);
-      b_bar = std::pow(det_F, -2.0 / dim) * symmetrize(F * transpose(F));
+      const Tensor<2, dim> F_bar = Physics::Elasticity::Kinematics::F_iso(F);
+      b_bar = Physics::Elasticity::Kinematics::b(F_bar);
       p_tilde = p_tilde_in;
       J_tilde = J_tilde_in;
 
@@ -653,7 +622,7 @@ namespace Step44
     // volumetric Kirchhoff stress $\boldsymbol{\tau}_{\textrm{vol}}$:
     SymmetricTensor<2, dim> get_tau_vol() const
     {
-      return p_tilde * det_F * StandardTensors<dim>::I;
+      return p_tilde * det_F * Physics::Elasticity::StandardTensors<dim>::I;
     }
 
     // Next, determine the isochoric Kirchhoff stress
@@ -661,7 +630,7 @@ namespace Step44
     // \mathcal{P}:\overline{\boldsymbol{\tau}}$:
     SymmetricTensor<2, dim> get_tau_iso() const
     {
-      return StandardTensors<dim>::dev_P * get_tau_bar();
+      return Physics::Elasticity::StandardTensors<dim>::dev_P * get_tau_bar();
     }
 
     // Then, determine the fictitious Kirchhoff stress
@@ -677,8 +646,8 @@ namespace Step44
     {
 
       return p_tilde * det_F
-             * ( StandardTensors<dim>::IxI
-                 - (2.0 * StandardTensors<dim>::II) );
+             * ( Physics::Elasticity::StandardTensors<dim>::IxI
+                 - (2.0 * Physics::Elasticity::StandardTensors<dim>::S) );
     }
 
     // Calculate the isochoric part of the tangent $J
@@ -689,17 +658,17 @@ namespace Step44
       const SymmetricTensor<2, dim> tau_iso = get_tau_iso();
       const SymmetricTensor<4, dim> tau_iso_x_I
         = outer_product(tau_iso,
-                        StandardTensors<dim>::I);
+                        Physics::Elasticity::StandardTensors<dim>::I);
       const SymmetricTensor<4, dim> I_x_tau_iso
-        = outer_product(StandardTensors<dim>::I,
+        = outer_product(Physics::Elasticity::StandardTensors<dim>::I,
                         tau_iso);
       const SymmetricTensor<4, dim> c_bar = get_c_bar();
 
       return (2.0 / dim) * trace(tau_bar)
-             * StandardTensors<dim>::dev_P
+             * Physics::Elasticity::StandardTensors<dim>::dev_P
              - (2.0 / dim) * (tau_iso_x_I + I_x_tau_iso)
-             + StandardTensors<dim>::dev_P * c_bar
-             * StandardTensors<dim>::dev_P;
+             + Physics::Elasticity::StandardTensors<dim>::dev_P * c_bar
+             * Physics::Elasticity::StandardTensors<dim>::dev_P;
     }
 
     // Calculate the fictitious elasticity tensor $\overline{\mathfrak{c}}$.
@@ -724,7 +693,7 @@ namespace Step44
   public:
     PointHistory()
       :
-      F_inv(StandardTensors<dim>::I),
+      F_inv(Physics::Elasticity::StandardTensors<dim>::I),
       tau(SymmetricTensor<2, dim>()),
       d2Psi_vol_dJ2(0.0),
       dPsi_vol_dJ(0.0),
@@ -764,9 +733,7 @@ namespace Step44
                         const double p_tilde,
                         const double J_tilde)
     {
-      const Tensor<2, dim> F
-        = (Tensor<2, dim>(StandardTensors<dim>::I) +
-           Grad_u_n);
+      const Tensor<2, dim> F = Physics::Elasticity::Kinematics::F(Grad_u_n);
       material->update_material_data(F, p_tilde, J_tilde);
 
       // The material has been updated so we now calculate the Kirchhoff
@@ -2275,7 +2242,7 @@ namespace Step44
                   {
                     data.cell_matrix(i, j) += N[i] * det_F
                                               * (symm_grad_Nx[j]
-                                                 * StandardTensors<dim>::I)
+                                                 * Physics::Elasticity::StandardTensors<dim>::I)
                                               * JxW;
                   }
                 // and lastly the $\mathsf{\mathbf{k}}_{ \widetilde{J} \widetilde{p}}$
