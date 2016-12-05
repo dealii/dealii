@@ -1926,7 +1926,7 @@ namespace Step44
     // exception object that identify the location (filename and line number)
     // where the exception was raised to make it simpler to identify where the
     // problem happened.
-    AssertThrow (newton_iteration <= parameters.max_iterations_NR,
+    AssertThrow (newton_iteration < parameters.max_iterations_NR,
                  ExcMessage("No convergence in nonlinear solver!"));
   }
 
