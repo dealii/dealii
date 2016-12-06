@@ -3435,7 +3435,7 @@ namespace Step32
                                  Utilities::int_to_string (out_index, 5) +
                                  ".visit");
         std::ofstream visit_master (visit_master_filename.c_str());
-        data_out.write_visit_record (visit_master, filenames);
+        DataOutBase::write_visit_record (visit_master, filenames);
       }
 
     computing_timer.exit_section ();

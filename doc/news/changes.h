@@ -38,6 +38,18 @@ inconvenience this causes.
 </p>
 
 <ol>
+ <li> Deprecated: The DataOutInterface::write_pvd_record() and
+ DataOutInterface::write_visit_record() functions were actually
+ independent of any kind of data being written. As a consequence,
+ they did not depend on the state of the DataOutInterface object
+ to which they belonged (or any object of a derived class). Such
+ functions typically reside in the DataOutBase namespace instead
+ where they have now been moved. The functions in DataOutInterface
+ are now deprecated.
+ <br>
+ (Wolfgang Bangerth, 2016/12/03)
+ </li>
+
  <li> Changed: VectorTools::create_right_hand_side and
  VectorTools::create_boundary_right_hand_side now take an additional template
  parameter VectorType.

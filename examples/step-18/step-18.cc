@@ -1395,7 +1395,7 @@ namespace Step18
                                  Utilities::int_to_string(timestep_no,4) +
                                  ".visit");
         std::ofstream visit_master (visit_master_filename.c_str());
-        data_out.write_visit_record (visit_master, filenames);
+        DataOutBase::write_visit_record (visit_master, filenames);
 
         // Similarly, we write the paraview .pvtu:
         const std::string
@@ -1411,7 +1411,7 @@ namespace Step18
         static std::vector<std::pair<double,std::string> > times_and_names;
         times_and_names.push_back (std::pair<double,std::string> (present_time, pvtu_master_filename));
         std::ofstream pvd_output ("solution.pvd");
-        data_out.write_pvd_record (pvd_output, times_and_names);
+        DataOutBase::write_pvd_record (pvd_output, times_and_names);
       }
 
   }

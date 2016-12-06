@@ -904,7 +904,7 @@ namespace Step50
                                  Utilities::int_to_string (cycle, 5) +
                                  ".visit");
         std::ofstream visit_master (visit_master_filename.c_str());
-        data_out.write_visit_record (visit_master, filenames);
+        DataOutBase::write_visit_record (visit_master, filenames);
 
         std::cout << "   wrote " << pvtu_master_filename << std::endl;
 
