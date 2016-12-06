@@ -1708,14 +1708,14 @@ namespace DataOutBase
                          const VtkFlags &flags);
 
   /**
-   * This writes the footer for the xml based vtu file format. This routine is
+   * This function writes the footer for the xml based vtu file format. This routine is
    * used internally together with DataOutInterface::write_vtu_header() and
    * DataOutInterface::write_vtu_main() by DataOutBase::write_vtu().
    */
   void write_vtu_footer (std::ostream &out);
 
   /**
-   * This writes the main part for the xml based vtu file format. This routine
+   * This function writes the main part for the xml based vtu file format. This routine
    * is used internally together with DataOutInterface::write_vtu_header() and
    * DataOutInterface::write_vtu_footer() by DataOutBase::write_vtu().
    */
@@ -1725,6 +1725,53 @@ namespace DataOutBase
                        const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                        const VtkFlags                          &flags,
                        std::ostream                            &out);
+
+  /**
+   * Some visualization programs, such as ParaView, can read several separate
+   * VTU files that all form part of the same simulation, in order to
+   * parallelize visualization. In that case, you need a
+   * <code>.pvtu</code> file that describes which VTU files (written, for
+   * example, through the DataOutInterface::write_vtu() function) form a group.
+   * The current function can generate such a master record.
+   *
+   * This function is typically not called by itself from user space, but
+   * you may want to call it through DataOutInterface::write_pvtu_record()
+   * since the DataOutInterface class has access to information that you
+   * would have to provide to the current function by hand.
+   *
+   * In any case, whether this function is called directly or via
+   * DataOutInterface::write_pvtu_record(), the master record file so
+   * written contains a list of (scalar or vector) fields that describes which
+   * fields can actually be found in the individual files that comprise the set of
+   * parallel VTU files along with the names of these files. This function
+   * gets the names and types of fields through the third and fourth
+   * argument; you can determine these by hand, but in practice, this function
+   * is most easily called by calling DataOutInterfaces::write_pvtu_record(),
+   * which determines the last two arguments by calling
+   * DataOutInterface::get_dataset_names() and
+   * DataOutInterface::get_vector_data_ranges() functions. The second argument
+   * to this function specifies the names of the files that form the parallel
+   * set.
+   *
+   * @note Use DataOutBase::write_vtu() and DataOutInterface::write_vtu()
+   * for writing each piece. Also note that
+   * only one parallel process needs to call the current function, listing the
+   * names of the files written by all parallel processes.
+   *
+   * @note In order to tell Paraview to group together multiple
+   * <code>pvtu</code> files that each describe one time step of a time
+   * dependent simulation, see the DataOutBase::write_pvd_record()
+   * function.
+   *
+   * @note Older versions of VisIt (before 2.5.1), can not read
+   * <code>pvtu</code> records. However, it can read visit records as written
+   * by the write_visit_record() function.
+   */
+  void
+  write_pvtu_record (std::ostream                                                                  &out,
+                     const std::vector<std::string>                                                &piece_names,
+                     const std::vector<std::string>                                                &data_names,
+                     const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges);
 
   /**
    * In ParaView it is possible to visualize time-dependent data tagged with
@@ -1764,7 +1811,8 @@ namespace DataOutBase
    *  }
    * @endcode
    *
-   * @note See DataOutInterface::write_vtu or DataOutInterface::write_pvtu_record
+   * @note See DataOutInterface::write_vtu, DataOutInterface::write_pvtu_record,
+   * and DataOutInterface::write_vtu_in_parallel
    * for writing solutions at each timestep.
    *
    * @note The second element of each pair, i.e., the file in which the
@@ -2271,24 +2319,28 @@ public:
    * performance on parallel filesystems. Also see
    * DataOutInterface::write_vtu().
    */
-  void write_vtu_in_parallel (const char *filename, MPI_Comm comm) const;
+  void write_vtu_in_parallel (const char *filename,
+                              MPI_Comm comm) const;
 
   /**
    * Some visualization programs, such as ParaView, can read several separate
-   * VTU files to parallelize visualization. In that case, you need a
+   * VTU files that all form part of the same simulation, in order to
+   * parallelize visualization. In that case, you need a
    * <code>.pvtu</code> file that describes which VTU files (written, for
-   * example, through the write_vtu() function) form a group. The current
-   * function can generate such a master record.
+   * example, through the DataOutInterface::write_vtu() function) form a group.
+   * The current function can generate such a master record.
    *
-   * The file so written contains a list of (scalar or vector) fields whose
-   * values are described by the individual files that comprise the set of
+   * The master record file generated by this function
+   * contains a list of (scalar or vector) fields that describes which
+   * fields can actually be found in the individual files that comprise the set of
    * parallel VTU files along with the names of these files. This function
-   * gets the names and types of fields through the get_patches() function of
-   * this class like all the other write_xxx() functions. The second argument
+   * gets the names and types of fields through the get_dataset_names() and
+   * get_vector_data_ranges() functions of this class. The second argument
    * to this function specifies the names of the files that form the parallel
    * set.
    *
-   * @note See DataOutBase::write_vtu for writing each piece. Also note that
+   * @note Use DataOutBase::write_vtu() and DataOutInterface::write_vtu()
+   * for writing each piece. Also note that
    * only one parallel process needs to call the current function, listing the
    * names of the files written by all parallel processes.
    *
@@ -2296,7 +2348,7 @@ public:
    *
    * @note In order to tell Paraview to group together multiple
    * <code>pvtu</code> files that each describe one time step of a time
-   * dependent simulation, see the DataOutInterface::write_pvd_record()
+   * dependent simulation, see the DataOutBase::write_pvd_record()
    * function.
    *
    * @note Older versions of VisIt (before 2.5.1), can not read
