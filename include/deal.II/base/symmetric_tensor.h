@@ -32,6 +32,8 @@ template <int dim, typename Number> SymmetricTensor<4,dim,Number>
 deviator_tensor ();
 template <int dim, typename Number> SymmetricTensor<4,dim,Number>
 identity_tensor ();
+template <int dim, typename Number> SymmetricTensor<2,dim,Number>
+invert (const SymmetricTensor<2,dim,Number> &);
 template <int dim, typename Number> SymmetricTensor<4,dim,Number>
 invert (const SymmetricTensor<4,dim,Number> &);
 template <int dim2, typename Number> Number
@@ -822,6 +824,9 @@ private:
 
   template <int dim2, typename Number2>
   friend SymmetricTensor<4,dim2,Number2> identity_tensor ();
+
+  template <int dim2, typename Number2>
+  friend SymmetricTensor<2,dim2,Number2> invert (const SymmetricTensor<2,dim2,Number2> &);
 
   template <int dim2, typename Number2>
   friend SymmetricTensor<4,dim2,Number2> invert (const SymmetricTensor<4,dim2,Number2> &);
@@ -2548,6 +2553,117 @@ identity_tensor ()
 {
   return identity_tensor<dim,double>();
 }
+
+
+
+/**
+ * Invert a symmetric rank-2 tensor.
+ *
+ * @note If a tensor is not invertible, then the result is unspecified, but will
+ * likely contain the results of a division by zero or a very small number at
+ * the very least.
+ *
+ * @relates SymmetricTensor
+ * @author Jean-Paul Pelteret, 2016
+ */
+template <int dim, typename Number>
+inline
+SymmetricTensor<2,dim,Number>
+invert (const SymmetricTensor<2,dim,Number> &t)
+{
+  // if desired, take over the
+  // inversion of a 4x4 tensor
+  // from the FullMatrix
+  AssertThrow (false, ExcNotImplemented());
+
+  return SymmetricTensor<2,dim,Number>();
+}
+
+
+
+#ifndef DOXYGEN
+
+template <typename Number>
+inline
+SymmetricTensor<2,1,Number>
+invert (const SymmetricTensor<2,1,Number> &t)
+{
+  SymmetricTensor<2,1,Number> tmp;
+
+  tmp[0][0] = 1.0/t[0][0];
+
+  return tmp;
+}
+
+
+
+template <typename Number>
+inline
+SymmetricTensor<2,2,Number>
+invert (const SymmetricTensor<2,2,Number> &t)
+{
+  SymmetricTensor<2,2,Number> tmp;
+
+  // Sympy result: ([
+  // [ t11/(t00*t11 - t01**2), -t01/(t00*t11 - t01**2)],
+  // [-t01/(t00*t11 - t01**2),  t00/(t00*t11 - t01**2)]  ])
+  const TableIndices<2> idx_00 (0,0);
+  const TableIndices<2> idx_01 (0,1);
+  const TableIndices<2> idx_11 (1,1);
+  const Number inv_det_t
+    = 1.0/(t[idx_00]*t[idx_11]
+           - t[idx_01]*t[idx_01]);
+  tmp[idx_00] = t[idx_11];
+  tmp[idx_01] = -t[idx_01];
+  tmp[idx_11] = t[idx_00];
+  tmp *= inv_det_t;
+
+  return tmp;
+}
+
+
+
+template <typename Number>
+inline
+SymmetricTensor<2,3,Number>
+invert (const SymmetricTensor<2,3,Number> &t)
+{
+  SymmetricTensor<2,3,Number> tmp;
+
+  // Sympy result: ([
+  // [  (t11*t22 - t12**2)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11),
+  //    (-t01*t22 + t02*t12)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11),
+  //    (t01*t12 - t02*t11)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11)],
+  // [  (-t01*t22 + t02*t12)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11),
+  //    (t00*t22 - t02**2)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11),
+  //    (t00*t12 - t01*t02)/(-t00*t11*t22 + t00*t12**2 + t01**2*t22 - 2*t01*t02*t12 + t02**2*t11)],
+  // [  (t01*t12 - t02*t11)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11),
+  //    (t00*t12 - t01*t02)/(-t00*t11*t22 + t00*t12**2 + t01**2*t22 - 2*t01*t02*t12 + t02**2*t11),
+  //    (-t00*t11 + t01**2)/(-t00*t11*t22 + t00*t12**2 + t01**2*t22 - 2*t01*t02*t12 + t02**2*t11)]  ])
+  const TableIndices<2> idx_00 (0,0);
+  const TableIndices<2> idx_01 (0,1);
+  const TableIndices<2> idx_02 (0,2);
+  const TableIndices<2> idx_11 (1,1);
+  const TableIndices<2> idx_12 (1,2);
+  const TableIndices<2> idx_22 (2,2);
+  const Number inv_det_t
+    = 1.0/(t[idx_00]*t[idx_11]*t[idx_22]
+           - t[idx_00]*t[idx_12]*t[idx_12]
+           - t[idx_01]*t[idx_01]*t[idx_22]
+           + 2.0*t[idx_01]*t[idx_02]*t[idx_12]
+           - t[idx_02]*t[idx_02]*t[idx_11]);
+  tmp[idx_00] = t[idx_11]*t[idx_22] - t[idx_12]*t[idx_12];
+  tmp[idx_01] = -t[idx_01]*t[idx_22] + t[idx_02]*t[idx_12];
+  tmp[idx_02] = t[idx_01]*t[idx_12] - t[idx_02]*t[idx_11];
+  tmp[idx_11] = t[idx_00]*t[idx_22] - t[idx_02]*t[idx_02];
+  tmp[idx_12] = -t[idx_00]*t[idx_12] + t[idx_01]*t[idx_02];
+  tmp[idx_22] = t[idx_00]*t[idx_11] - t[idx_01]*t[idx_01];
+  tmp *= inv_det_t;
+
+  return tmp;
+}
+
+#endif /* DOXYGEN */
 
 
 
