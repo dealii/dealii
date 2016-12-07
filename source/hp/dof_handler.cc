@@ -607,9 +607,10 @@ namespace internal
 
               types::global_dof_index next_free_dof = 0;
               types::global_dof_index cache_size = 0;
-              for (typename HpDoFHandler<dim,spacedim>::active_cell_iterator
-                   cell=dof_handler.begin_active(level);
-                   cell!=dof_handler.end_active(level); ++cell)
+              typename HpDoFHandler<dim,spacedim>::active_cell_iterator
+              cell=dof_handler.begin_active(level),
+              endc=dof_handler.end_active(level);
+              for (; cell!=endc; ++cell)
                 if (!cell->has_children())
                   {
                     dof_handler.levels[level]->dof_offsets[cell->index()] = next_free_dof;
@@ -638,9 +639,10 @@ namespace internal
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
               types::global_dof_index counter = 0;
-              for (typename HpDoFHandler<dim,spacedim>::cell_iterator
-                   cell=dof_handler.begin_active(level);
-                   cell!=dof_handler.end_active(level); ++cell)
+              typename HpDoFHandler<dim,spacedim>::active_cell_iterator
+              cell=dof_handler.begin_active(level),
+              endc=dof_handler.end_active(level);
+              for (; cell!=endc; ++cell)
                 if (!cell->has_children())
                   counter += cell->get_fe().dofs_per_line;
 
@@ -705,7 +707,6 @@ namespace internal
             dof_handler.faces = new internal::hp::DoFIndicesOnFaces<2>;
           }
 
-
           // QUAD (CELL) DOFs
 
           // count how much space we need
@@ -735,9 +736,10 @@ namespace internal
 
               types::global_dof_index next_free_dof = 0;
               types::global_dof_index cache_size = 0;
-              for (typename HpDoFHandler<dim, spacedim>::active_cell_iterator
-                   cell=dof_handler.begin_active(level);
-                   cell!=dof_handler.end_active(level); ++cell)
+              typename HpDoFHandler<dim,spacedim>::active_cell_iterator
+              cell=dof_handler.begin_active(level),
+              endc=dof_handler.end_active(level);
+              for (; cell!=endc; ++cell)
                 if (!cell->has_children())
                   {
                     dof_handler.levels[level]->dof_offsets[cell->index()] = next_free_dof;
@@ -766,9 +768,10 @@ namespace internal
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
               types::global_dof_index counter = 0;
-              for (typename HpDoFHandler<dim,spacedim>::cell_iterator
-                   cell=dof_handler.begin_active(level);
-                   cell!=dof_handler.end_active(level); ++cell)
+              typename HpDoFHandler<dim,spacedim>::active_cell_iterator
+              cell=dof_handler.begin_active(level),
+              endc=dof_handler.end_active(level);
+              for (; cell!=endc; ++cell)
                 if (!cell->has_children())
                   counter += cell->get_fe().dofs_per_quad;
 
@@ -1081,7 +1084,6 @@ namespace internal
             dof_handler.faces = new internal::hp::DoFIndicesOnFaces<3>;
           }
 
-
           // HEX (CELL) DOFs
 
           // count how much space we need
@@ -1111,9 +1113,10 @@ namespace internal
 
               types::global_dof_index next_free_dof = 0;
               types::global_dof_index cache_size = 0;
-              for (typename HpDoFHandler<dim,spacedim>::active_cell_iterator
-                   cell=dof_handler.begin_active(level);
-                   cell!=dof_handler.end_active(level); ++cell)
+              typename HpDoFHandler<dim,spacedim>::active_cell_iterator
+              cell=dof_handler.begin_active(level),
+              endc=dof_handler.end_active(level);
+              for (; cell!=endc; ++cell)
                 if (!cell->has_children())
                   {
                     dof_handler.levels[level]->dof_offsets[cell->index()] = next_free_dof;
@@ -1142,9 +1145,10 @@ namespace internal
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
               types::global_dof_index counter = 0;
-              for (typename HpDoFHandler<dim,spacedim>::cell_iterator
-                   cell=dof_handler.begin_active(level);
-                   cell!=dof_handler.end_active(level); ++cell)
+              typename HpDoFHandler<dim,spacedim>::active_cell_iterator
+              cell=dof_handler.begin_active(level),
+              endc=dof_handler.end_active(level);
+              for (; cell!=endc; ++cell)
                 if (!cell->has_children())
                   counter += cell->get_fe().dofs_per_hex;
 

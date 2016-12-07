@@ -235,6 +235,12 @@ inconvenience this causes.
 
 <ol>
 
+<li> Improved: The run time for the method hp::DoFHandler::distribute_dofs was
+     quadratic in the total number of dofs for some grids. This has been fixed.
+     <br>
+     (David Wells, 2016/12/07)
+</li>
+
 <li> New: The inverse of a rank-2 SymmetricTensor can now be directly computed
      with SymmetricTensor::invert() instead of having to use the
      Tensor::invert() function.
