@@ -1842,57 +1842,81 @@ Tensor<2,dim,Number>
 invert (const Tensor<2,dim,Number> &t)
 {
   Number return_tensor [dim][dim];
-  switch (dim)
-    {
-    case 1:
-      return_tensor[0][0] = 1.0/t[0][0];
-      break;
 
-    case 2:
-      // this is Maple output,
-      // thus a bit unstructured
-    {
-      const Number det = t[0][0]*t[1][1]-t[1][0]*t[0][1];
-      const Number t4 = 1.0/det;
-      return_tensor[0][0] = t[1][1]*t4;
-      return_tensor[0][1] = -t[0][1]*t4;
-      return_tensor[1][0] = -t[1][0]*t4;
-      return_tensor[1][1] = t[0][0]*t4;
-      break;
-    }
+  // if desired, take over the
+  // inversion of a 4x4 tensor
+  // from the FullMatrix
+  AssertThrow (false, ExcNotImplemented());
 
-    case 3:
-    {
-      const Number t4 = t[0][0]*t[1][1],
-                   t6 = t[0][0]*t[1][2],
-                   t8 = t[0][1]*t[1][0],
-                   t00 = t[0][2]*t[1][0],
-                   t01 = t[0][1]*t[2][0],
-                   t04 = t[0][2]*t[2][0],
-                   det = (t4*t[2][2]-t6*t[2][1]-t8*t[2][2]+
-                          t00*t[2][1]+t01*t[1][2]-t04*t[1][1]),
-                         t07 = 1.0/det;
-      return_tensor[0][0] = (t[1][1]*t[2][2]-t[1][2]*t[2][1])*t07;
-      return_tensor[0][1] = (t[0][2]*t[2][1]-t[0][1]*t[2][2])*t07;
-      return_tensor[0][2] = (t[0][1]*t[1][2]-t[0][2]*t[1][1])*t07;
-      return_tensor[1][0] = (t[1][2]*t[2][0]-t[1][0]*t[2][2])*t07;
-      return_tensor[1][1] = (t[0][0]*t[2][2]-t04)*t07;
-      return_tensor[1][2] = (t00-t6)*t07;
-      return_tensor[2][0] = (t[1][0]*t[2][1]-t[1][1]*t[2][0])*t07;
-      return_tensor[2][1] = (t01-t[0][0]*t[2][1])*t07;
-      return_tensor[2][2] = (t4-t8)*t07;
-
-      break;
-    }
-
-    // if desired, take over the
-    // inversion of a 4x4 tensor
-    // from the FullMatrix
-    default:
-      AssertThrow (false, ExcNotImplemented());
-    }
   return Tensor<2,dim,Number>(return_tensor);
 }
+
+
+#ifndef DOXYGEN
+
+template <typename Number>
+inline
+Tensor<2,1,Number>
+invert (const Tensor<2,1,Number> &t)
+{
+  Number return_tensor [1][1];
+
+  return_tensor[0][0] = 1.0/t[0][0];
+
+  return Tensor<2,1,Number>(return_tensor);
+}
+
+
+template <typename Number>
+inline
+Tensor<2,2,Number>
+invert (const Tensor<2,2,Number> &t)
+{
+  Tensor<2,2,Number> return_tensor;
+
+  // this is Maple output,
+  // thus a bit unstructured
+  const Number inv_det_t = 1.0/(t[0][0]*t[1][1]-t[1][0]*t[0][1]);
+  return_tensor[0][0] = t[1][1];
+  return_tensor[0][1] = -t[0][1];
+  return_tensor[1][0] = -t[1][0];
+  return_tensor[1][1] = t[0][0];
+  return_tensor *= inv_det_t;
+
+  return return_tensor;
+}
+
+
+template <typename Number>
+inline
+Tensor<2,3,Number>
+invert (const Tensor<2,3,Number> &t)
+{
+  Tensor<2,3,Number> return_tensor;
+
+  const Number t4 = t[0][0]*t[1][1],
+               t6 = t[0][0]*t[1][2],
+               t8 = t[0][1]*t[1][0],
+               t00 = t[0][2]*t[1][0],
+               t01 = t[0][1]*t[2][0],
+               t04 = t[0][2]*t[2][0],
+               inv_det_t = 1.0/(t4*t[2][2]-t6*t[2][1]-t8*t[2][2]+
+                                t00*t[2][1]+t01*t[1][2]-t04*t[1][1]);
+  return_tensor[0][0] = t[1][1]*t[2][2]-t[1][2]*t[2][1];
+  return_tensor[0][1] = t[0][2]*t[2][1]-t[0][1]*t[2][2];
+  return_tensor[0][2] = t[0][1]*t[1][2]-t[0][2]*t[1][1];
+  return_tensor[1][0] = t[1][2]*t[2][0]-t[1][0]*t[2][2];
+  return_tensor[1][1] = t[0][0]*t[2][2]-t04;
+  return_tensor[1][2] = t00-t6;
+  return_tensor[2][0] = t[1][0]*t[2][1]-t[1][1]*t[2][0];
+  return_tensor[2][1] = t01-t[0][0]*t[2][1];
+  return_tensor[2][2] = t4-t8;
+  return_tensor *= inv_det_t;
+
+  return return_tensor;
+}
+
+#endif /* DOXYGEN */
 
 
 /**
@@ -1981,4 +2005,3 @@ DEAL_II_NAMESPACE_CLOSE
 #include <deal.II/base/tensor_deprecated.h>
 
 #endif
-

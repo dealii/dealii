@@ -235,6 +235,13 @@ inconvenience this causes.
 
 <ol>
 
+<li> New: The inverse of a rank-2 SymmetricTensor can now be directly computed
+     with SymmetricTensor::invert() instead of having to use the
+     Tensor::invert() function.
+     <br>
+     (Jean-Paul Pelteret, 2016/12/07)
+</li>
+
 <li> Improved: The step-37 tutorial program now shows the matrix-free multigrid
      solver based on MPI parallelization rather than only a serial version.
      Moreover, support for adaptively refined meshes has been added.
