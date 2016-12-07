@@ -270,7 +270,8 @@ inconvenience this causes.
     Rather than adding each possible argument anyone may want to use
     individually to the list of the postprocessor function arguments, the
     existing functions have been deprecated in favor of a new set of
-    functions that
+    functions DataPostprocessor::evaluate_scalar_field() and
+    DataPostprocessor::evaluate_vector_field() that
     take a reference to a structure that contains these individual pieces
     of information. We can extend the members of these structures without
     backward compatibility issues because the functions still get a

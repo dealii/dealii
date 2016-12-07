@@ -170,8 +170,8 @@ build_one_patch (const FaceDescriptor *cell_and_face,
                     data.patch_values_scalar.normals = this_fe_patch_values.get_all_normal_vectors();
 
                   postprocessor->
-                  compute_derived_quantities_scalar(data.patch_values_scalar,
-                                                    data.postprocessed_values[dataset]);
+                  evaluate_scalar_field(data.patch_values_scalar,
+                                        data.postprocessed_values[dataset]);
                 }
               else
                 {
@@ -195,8 +195,8 @@ build_one_patch (const FaceDescriptor *cell_and_face,
                     data.patch_values_system.normals = this_fe_patch_values.get_all_normal_vectors();
 
                   postprocessor->
-                  compute_derived_quantities_vector(data.patch_values_system,
-                                                    data.postprocessed_values[dataset]);
+                  evaluate_vector_field(data.patch_values_system,
+                                        data.postprocessed_values[dataset]);
                 }
 
               for (unsigned int q=0; q<n_q_points; ++q)

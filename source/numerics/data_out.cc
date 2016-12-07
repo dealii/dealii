@@ -169,8 +169,8 @@ build_one_patch
 
 
                   postprocessor->
-                  compute_derived_quantities_scalar(scratch_data.patch_values_scalar,
-                                                    scratch_data.postprocessed_values[dataset]);
+                  evaluate_scalar_field(scratch_data.patch_values_scalar,
+                                        scratch_data.postprocessed_values[dataset]);
                 }
               else
                 {
@@ -192,8 +192,8 @@ build_one_patch
                     scratch_data.patch_values_system.evaluation_points = this_fe_patch_values.get_quadrature_points();
 
                   postprocessor->
-                  compute_derived_quantities_vector(scratch_data.patch_values_system,
-                                                    scratch_data.postprocessed_values[dataset]);
+                  evaluate_vector_field(scratch_data.patch_values_system,
+                                        scratch_data.postprocessed_values[dataset]);
                 }
 
               for (unsigned int q=0; q<n_q_points; ++q)
