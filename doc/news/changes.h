@@ -235,19 +235,6 @@ inconvenience this causes.
 
 <ol>
 
-<li> Improved: The run time for the method hp::DoFHandler::distribute_dofs was
-     quadratic in the total number of dofs for some grids. This has been fixed.
-     <br>
-     (David Wells, 2016/12/07)
-</li>
-
-<li> New: The inverse of a rank-2 SymmetricTensor can now be directly computed
-     with SymmetricTensor::invert() instead of having to use the
-     Tensor::invert() function.
-     <br>
-     (Jean-Paul Pelteret, 2016/12/07)
-</li>
-
 <li> Improved: The step-37 tutorial program now shows the matrix-free multigrid
      solver based on MPI parallelization rather than only a serial version.
      Moreover, support for adaptively refined meshes has been added.
@@ -484,7 +471,26 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
- <li> Changed: To improve readability, TimerOutput::print_summary()
+ <li> Fixed: ArrayView objects to empty views could not be copied.
+ This is now fixed.
+ <br>
+ (Wolfgang Bangerth, 2016/12/07)
+ </li>
+
+<li> Improved: The run time for the method hp::DoFHandler::distribute_dofs was
+     quadratic in the total number of dofs for some grids. This has been fixed.
+     <br>
+     (David Wells, 2016/12/07)
+</li>
+
+<li> New: The inverse of a rank-2 SymmetricTensor can now be directly computed
+     with SymmetricTensor::invert() instead of having to use the
+     Tensor::invert() function.
+     <br>
+     (Jean-Paul Pelteret, 2016/12/07)
+</li>
+
+<li> Changed: To improve readability, TimerOutput::print_summary()
  now simply outputs "0%" if a particular section's time requires
  less than 0.1 per cent of the overall run time.
  <br>
