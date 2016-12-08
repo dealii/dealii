@@ -138,6 +138,8 @@ private:
    * The length of the array this object represents.
    */
   const std::size_t  n_elements;
+
+  friend class ArrayView<const ElementType>;
 };
 
 
@@ -160,8 +162,8 @@ template <typename ElementType>
 inline
 ArrayView<ElementType>::ArrayView(const ArrayView<typename boost::remove_cv<value_type>::type> &view)
   :
-  starting_element (&view[0]),
-  n_elements(view.size())
+  starting_element (view.starting_element),
+  n_elements(view.n_elements)
 {}
 
 
