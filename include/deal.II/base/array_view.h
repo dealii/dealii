@@ -78,6 +78,12 @@ public:
   typedef ElementType value_type;
 
   /**
+   * Default constructor. Creates an invalid view that does not point to
+   * anything at all.
+   */
+  ArrayView ();
+
+  /**
    * Constructor.
    *
    * @param[in] starting_element A pointer to the first element of the array
@@ -145,6 +151,16 @@ private:
 
 
 //---------------------------------------------------------------------------
+
+
+template <typename ElementType>
+inline
+ArrayView<ElementType>::ArrayView()
+  :
+  starting_element (NULL),
+  n_elements(0)
+{}
+
 
 
 template <typename ElementType>

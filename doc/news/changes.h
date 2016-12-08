@@ -471,6 +471,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+ <li> New: The ArrayView class now has a default constructor that creates
+ an invalid object.
+ <br>
+ (Wolfgang Bangerth, 2016/12/08)
+ </li>
+
  <li> Fixed: ArrayView objects to empty views could not be copied.
  This is now fixed.
  <br>
