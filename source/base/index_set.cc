@@ -344,7 +344,7 @@ IndexSet::subtract_set (const IndexSet &other)
 IndexSet::size_type
 IndexSet::pop_back ()
 {
-  Assert(ranges.size() != 0,
+  Assert(is_empty() == false,
          ExcMessage("pop_back() failed, because this IndexSet contains no entries."));
 
   const size_type index = ranges.back().end-1;
@@ -361,7 +361,7 @@ IndexSet::pop_back ()
 IndexSet::size_type
 IndexSet::pop_front ()
 {
-  Assert(ranges.size() != 0,
+  Assert(is_empty() == false,
          ExcMessage("pop_front() failed, because this IndexSet contains no entries."));
 
   const size_type index = ranges.front().begin;
@@ -370,7 +370,7 @@ IndexSet::pop_front ()
   if (ranges.front().begin == ranges.front().end)
     ranges.erase(ranges.begin());
 
-  // We have to set this in any case, because nth_index_in_set is not longer
+  // We have to set this in any case, because nth_index_in_set is no longer
   // up to date for all but the first range
   is_compressed = false;
 
