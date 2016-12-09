@@ -212,9 +212,9 @@ namespace Physics
        * as constructed from the deformation gradient tensor @p F.
        * The result performs the following operation:
        * @f[
-       *  \texttt{Dev_P_T} \{ \bullet \} = J^{-2/\textrm{dim}} \left[ \{ \bullet \} -
-       *  \frac{1}{\textrm{dim}} \left[\mathbf{C}^{-1} : \{ \bullet \}\right] \mathbf{C} \right]
-       *  := \hat{\mathcal{P}}^{T} : \{ \bullet \}
+       *  \hat{\mathcal{P}}^{T} : \{ \bullet \}
+       *    = J^{-2/\textrm{dim}} \left[ \{ \bullet \} - \frac{1}{\textrm{dim}} \left[\mathbf{C}^{-1} : \{ \bullet \}\right] \mathbf{C} \right]
+       *    = \texttt{Dev_P_T} \{ \bullet \}
        * @f]
        */
       template <typename Number>

@@ -223,7 +223,7 @@ namespace Physics
        * gradient).
        * The result is expressed as
        * @f[
-       *  \mathbf{d} := \frac{1}{2} \left[ \mathbf{l} + \mathbf{l}^{T} \right] \, .
+       *  \mathbf{d} := \frac{1}{2} \left[ \mathbf{l} + \mathbf{l}^{T} \right]
        * @f]
        * where
        * @f[
@@ -246,7 +246,7 @@ namespace Physics
        * gradient).
        * The result is expressed as
        * @f[
-       *  \mathbf{w} := \frac{1}{2} \left[ \mathbf{l} - \mathbf{l}^{T} \right] \, .
+       *  \mathbf{w} := \frac{1}{2} \left[ \mathbf{l} - \mathbf{l}^{T} \right]
        * @f]
        * where
        * @f[
