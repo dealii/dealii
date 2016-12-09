@@ -1945,6 +1945,51 @@ transpose (const Tensor<2,dim,Number> &t)
 
 
 /**
+ * Return the adjugate of the given tensor of rank 2.
+ * The adjugate of a tensor $\left(\bullet\right)$ is defined as
+ * @f[
+ *  \textrm{adj}\left(\bullet\right)
+ *   := \textrm{det}\left(\bullet\right) \; \left(\bullet\right)^{-1} \; .
+ * @f]
+ *
+ * @note This requires that the tensor is invertible.
+ *
+ * @relates Tensor
+ * @author Jean-Paul Pelteret, 2016
+ */
+template <int dim, typename Number>
+inline
+Tensor<2,dim,Number>
+adjugate (const Tensor<2,dim,Number> &t)
+{
+  return determinant(t)*invert(t);
+}
+
+
+/**
+ * Return the cofactor of the given tensor of rank 2.
+ * The cofactor of a tensor $\left(\bullet\right)$ is defined as
+ * @f[
+ *  \textrm{cof}\left(\bullet\right)
+ *   := \textrm{det}\left(\bullet\right) \; \left(\bullet\right)^{-T}
+ *    = \left[ \textrm{adj}\left(\bullet\right) \right]^{T} \; .
+ * @f]
+ *
+ * @note This requires that the tensor is invertible.
+ *
+ * @relates Tensor
+ * @author Jean-Paul Pelteret, 2016
+ */
+template <int dim, typename Number>
+inline
+Tensor<2,dim,Number>
+cofactor (const Tensor<2,dim,Number> &t)
+{
+  return transpose(adjugate(t));
+}
+
+
+/**
  * Return the $l_1$ norm of the given rank-2 tensor, where $||t||_1 = \max_j
  * \sum_i |t_{ij}|$ (maximum of the sums over columns).
  *

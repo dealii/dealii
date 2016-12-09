@@ -235,6 +235,28 @@ inconvenience this causes.
 
 <ol>
 
+ <li> New: Implemented some standard tensor definitions for elasticity in
+ Physics::Elasticity::StandardTensors. Within the newly implemented
+ Physics::Elasticity::Kinematics namespace are some standard
+ definitions of kinematic quantities commonly used in elasticity.
+ <br>
+ (Jean-Paul Pelteret, Andrew McBride, 2016/12/05)
+ </li>
+
+ <li> New: The Physics::Transformations namespace defines a number of operations
+ that can be used to push forward and pull back quantities to and from different
+ body configurations.
+ <br>
+ (Jean-Paul Pelteret, Andrew McBride, 2016/12/05)
+ </li>
+
+ <li> New: The Physics namespace is dedicated to defining useful
+ functions and other quantities that are regularly used in the implementation
+ of classical (multi-)physics problems.
+ <br>
+ (Jean-Paul Pelteret, 2016/12/05)
+ </li>
+
 <li> Improved: The step-37 tutorial program now shows the matrix-free multigrid
      solver based on MPI parallelization rather than only a serial version.
      Moreover, support for adaptively refined meshes has been added.
@@ -307,6 +329,12 @@ inconvenience this causes.
  knowledge about solution.
  <br>
  (Denis Davydov, 2016/09/28)
+ </li>
+
+ <li> New: The Tensor class has two new functions implemented, namely those
+ that return its Tensor::adjoint() and Tensor::cofactor().
+ <br>
+ (Jean-Paul Pelteret, 2016/09/25)
  </li>
 
  <li> Improved: The doxygen documentation now contains nicely formatted

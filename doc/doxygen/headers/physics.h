@@ -1,0 +1,165 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2016 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
+/**
+ * @defgroup physics Physics
+ *
+ * @brief A module dedicated to the implementation of functions and
+ * classes that relate to continuum physics, physical fields and materials.
+ */
+
+/**
+ * A collection of namespaces and utilities to assist in the
+ * definition, construction and manipulation of data related to
+ * physical fields and materials.
+ */
+namespace Physics
+{
+
+  /**
+  * A collection of operations to assist in the transformation of tensor
+  * quantities from the reference to spatial configuration, and vice versa.
+  * These types of transformation are typically used to re-express quantities
+  * measured or computed in one configuration in terms of a second configuration.
+  *
+  * <h3>Notation</h3>
+  *
+  * We will use the same notation for the coordinates $\mathbf{X}, \mathbf{x}$,
+  * transformations $\varphi$, differential operator $\nabla_{0}$ and deformation
+  * gradient $\mathbf{F}$ as discussed for namespace Physics::Elasticity.
+  *
+  * As a further point on notation, we will follow Holzapfel (2007) and denote
+  * the push forward transformation as $\chi\left(\bullet\right)$ and
+  * the pull back transformation as $\chi^{-1}\left(\bullet\right)$.
+  * We will also use the annotation $\left(\bullet\right)^{\sharp}$ to indicate
+  * that a tensor $\left(\bullet\right)$ is a contravariant tensor,
+  * and $\left(\bullet\right)^{\flat}$ that it is covariant. In other
+  * words, these indices do not actually change the tensor, they just indicate
+  * the <i>kind</i> of object a particular tensor is.
+  *
+  * @note For these transformations, unless otherwise stated, we will strictly
+  * assume that all indices of the transformed tensors derive from one coordinate
+  * system; that is to say that they are not multi-point tensors (such as the
+  * Piola stress in elasticity).
+  *
+  * @ingroup physics
+  *
+  * @author Jean-Paul Pelteret, Andrew McBride, 2016
+  */
+  namespace Transformations
+  {
+  }
+
+  /**
+   * This namespace provides a collection of definitions that
+   * conform to standard notation used in (nonlinear) elasticity.
+   *
+   * <h3>Notation</h3>
+   *
+   * References for this notation include:
+   * @code{.bib}
+       @Book{Holzapfel2007a,
+          title =     {Nonlinear solid mechanics. A Continuum Approach for Engineering},
+          publisher = {John Wiley \& Sons Ltd.},
+          year =      {2007},
+          author =    {Holzapfel, G. A.},
+          address =   {West Sussex, England},
+          note =      {ISBN: 0-471-82304-X}
+        }
+        @Book{Wriggers2008a,
+          title =     {Nonlinear finite element methods},
+          publisher = {Springer Berlin Heidelberg},
+          year =      {2008},
+          author =    {Wriggers, P.},
+          volume =    {4},
+          address =   {Berlin, Germany},
+          note =      {ISBN: 978-3-540-71000-4},
+          doi =       {10.1007/978-3-540-71001-1}
+        }
+   * @endcode
+   *
+   * For convenience we will predefine some commonly referenced tensors and
+   * operations.
+   * Considering the position vector $\mathbf{X}$ in the referential (material)
+   * configuration, points $\mathbf{X}$ are transformed to points $\mathbf{x}$
+   * in the current (spatial) configuration through the nonlinear map
+   * @f[
+   *  \mathbf{x}
+   *   := \boldsymbol{\varphi} \left( \mathbf{X} \right)
+   *    = \mathbf{X} + \mathbf{u}(\mathbf{X}) \, ,
+   * @f]
+   * where the $\mathbf{u}(\mathbf{X})$ represents the displacement vector.
+   * From this we can compute the deformation gradient tensor as
+   * @f[
+   *  \mathbf{F} := \mathbf{I} + \nabla_{0}\mathbf{u} \, ,
+   * @f]
+   * wherein the differential operator $\nabla_{0}$ is defined as
+   * $\frac{\partial}{\partial \mathbf{X}}$ and $\mathbf{I}$ is the identity
+   * tensor.
+   *
+   * Finally, two common tensor operators are represented by $\cdot$ and $:$
+   * operators. These respectively represent a single and double contraction over
+   * the inner tensor indices.
+   * Vectors and second-order tensors are highlighted by bold font, while
+   * fourth-order tensors are denoted by calliagraphic font.
+   *
+   * One can think of fourth-order tensors as linear operators mapping second-order
+   * tensors (matrices) onto themselves in much the same way as matrices map
+   * vectors onto vectors.
+   * To provide some context to the implemented class members and functions,
+   * consider the following fundamental operations performed on tensors with special
+   * properties:
+   *
+   * If we represent a general second-order tensor as $\mathbf{A}$, then the general
+   * fourth-order unit tensors $\mathcal{I}$ and $\overline{\mathcal{I}}$ are
+   * defined by
+   * @f[
+   *  \mathbf{A} = \mathcal{I}:\mathbf{A}
+   *        \qquad \text{and} \qquad
+   *      \mathbf{A}^T = \overline{\mathcal{I}}:\mathbf{A} \, ,
+   * @f]
+   * or, in indicial notation,
+   * @f[
+   *   I_{ijkl} = \delta_{ik}\delta_{jl}
+   *        \qquad \text{and} \qquad
+   *     \overline I_{ijkl} = \delta_{il}\delta_{jk}
+   * @f]
+   * with the Kronecker deltas taking their common definition.
+   * Note that $\mathcal{I} \neq \overline{\mathcal{I}}^T$.
+   *
+   * We then define the symmetric and skew-symmetric fourth-order unit tensors by
+   * @f[
+   *      \mathcal{S} := \dfrac{1}{2}[\mathcal{I} + \overline{\mathcal{I}}]
+   *    \qquad \text{and} \qquad
+   *      \mathcal{W} := \dfrac{1}{2}[\mathcal{I} - \overline{\mathcal{I}}] \, ,
+   * @f]
+   * such that
+   * @f[
+   *      \mathcal{S}:\mathbf{A} = \dfrac{1}{2}[\mathbf{A} + \mathbf{A}^T]
+   *    \qquad \text{and} \qquad
+   *      \mathcal{W}:\mathbf{A} = \dfrac{1}{2}[\mathbf{A} - \mathbf{A}^T] \, .
+   * @f]
+   * The fourth-order symmetric tensor returned by identity_tensor() is
+   * $\mathcal{S}$.
+   *
+   * @author Jean-Paul Pelteret, Andrew McBride, 2016
+   *
+   * @ingroup physics
+   */
+  namespace Elasticity
+  {
+  }
+
+}
