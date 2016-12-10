@@ -273,8 +273,8 @@ namespace Step29
   // version of this function that in addition to the data vector has an
   // additional argument of type DataPostprocessor. What happens when this
   // function is used for output is that at each point where output data is to
-  // be generated, the DataPostprocessor::compute_derived_quantities_scalar or
-  // DataPostprocessor::compute_derived_quantities_vector function of the
+  // be generated, the DataPostprocessor::evaluate_scalar_field() or
+  // DataPostprocessor::evaluate_vector_field() function of the
   // specified DataPostprocessor object is invoked to compute the output
   // quantities from the values, the gradients and the second derivatives of
   // the finite element function represented by the data vector (in the case
@@ -298,11 +298,9 @@ namespace Step29
   public:
     ComputeIntensity ();
 
-    using DataPostprocessorScalar<dim>::compute_derived_quantities_vector;
-
     virtual
     void
-    compute_derived_quantities_vector
+    evaluate_vector_field
     (const DataPostprocessorInputs::Vector<dim> &inputs,
      std::vector<Vector<double> >               &computed_quantities) const;
   };
@@ -343,7 +341,7 @@ namespace Step29
   // are provided.
   template <int dim>
   void
-  ComputeIntensity<dim>::compute_derived_quantities_vector
+  ComputeIntensity<dim>::evaluate_vector_field
   (const DataPostprocessorInputs::Vector<dim> &inputs,
    std::vector<Vector<double> >               &computed_quantities) const
   {

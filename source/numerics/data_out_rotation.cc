@@ -217,8 +217,8 @@ build_one_patch (const cell_iterator                                            
                         data.patch_values_scalar.evaluation_points = fe_patch_values.get_quadrature_points();
 
                       postprocessor->
-                      compute_derived_quantities_scalar(data.patch_values_scalar,
-                                                        data.postprocessed_values[dataset]);
+                      evaluate_scalar_field(data.patch_values_scalar,
+                                            data.postprocessed_values[dataset]);
                     }
                   else
                     {
@@ -241,8 +241,8 @@ build_one_patch (const cell_iterator                                            
 
                       std::vector<Point<space_dimension> > dummy_normals;
                       postprocessor->
-                      compute_derived_quantities_vector(data.patch_values_system,
-                                                        data.postprocessed_values[dataset]);
+                      evaluate_vector_field(data.patch_values_system,
+                                            data.postprocessed_values[dataset]);
                     }
 
                   for (unsigned int component=0;

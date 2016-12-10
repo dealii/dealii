@@ -150,8 +150,8 @@ public:
 
   virtual
   void
-  compute_derived_quantities_vector (const DataPostprocessorInputs::Vector<dim> &input_data,
-                                     std::vector<Vector<double> >                    &computed_quantities) const
+  evaluate_vector_field (const DataPostprocessorInputs::Vector<dim> &input_data,
+                         std::vector<Vector<double> >                    &computed_quantities) const
   {
     for (unsigned int q=0; q<input_data.solution_values.size(); ++q)
       {

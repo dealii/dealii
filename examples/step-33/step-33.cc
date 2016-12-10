@@ -541,11 +541,9 @@ namespace Step33
     public:
       Postprocessor (const bool do_schlieren_plot);
 
-      using DataPostprocessor<dim>::compute_derived_quantities_vector;
-
       virtual
       void
-      compute_derived_quantities_vector
+      evaluate_vector_field
       (const DataPostprocessorInputs::Vector<dim> &inputs,
        std::vector<Vector<double> >               &computed_quantities) const;
 
@@ -588,7 +586,7 @@ namespace Step33
   template <int dim>
   void
   EulerEquations<dim>::Postprocessor::
-  compute_derived_quantities_vector
+  evaluate_vector_field
   (const DataPostprocessorInputs::Vector<dim> &inputs,
    std::vector<Vector<double> >               &computed_quantities) const
   {

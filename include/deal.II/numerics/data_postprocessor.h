@@ -39,7 +39,7 @@ namespace DataPostprocessorInputs
 {
   /**
    * A structure that is used to pass information to
-   * DataPostprocessor::compute_derived_quantities_scalar(). It contains
+   * DataPostprocessor::evaluate_scalar_field(). It contains
    * the values and (if requested) derivatives of a scalar solution
    * variable at the evaluation points on a cell or face. If appropriate,
    * it also contains the normal vectors to the geometry on which output
@@ -122,7 +122,7 @@ namespace DataPostprocessorInputs
 
   /**
    * A structure that is used to pass information to
-   * DataPostprocessor::compute_derived_quantities_vector(). It contains
+   * DataPostprocessor::evaluate_vector_field(). It contains
    * the values and (if requested) derivatives of a vector-valued solution
    * variable at the evaluation points on a cell or face. If appropriate,
    * it also contains the normal vectors to the geometry on which output
@@ -255,8 +255,8 @@ namespace DataPostprocessorInputs
  * function get_needed_update_flags(). It is your responsibility to use only
  * those values which were updated in the calculation of derived quantities.
  * The DataOut object will provide references to the requested data in the
- * call to compute_derived_quantities_scalar() or
- * compute_derived_quantities_vector() (DataOut decides which of the two
+ * call to evaluate_scalar_field() or
+ * evaluate_vector_field() (DataOut decides which of the two
  * functions to call depending on whether the finite element in use has only a
  * single, or multiple vector components; note that this is only determined by
  * the number of components in the finite element in use, and not by whether
@@ -279,8 +279,7 @@ namespace DataPostprocessorInputs
  * hand, in step-29 we implement a postprocessor that only computes the
  * magnitude of a complex number given by a two-component finite element. It
  * seems silly to have to implement four virtual functions for this
- * (compute_derived_quantities_scalar() or
- * compute_derived_quantities_vector(), get_names(), get_update_flags() and
+ * (evaluate_scalar_field() or evaluate_vector_field(), get_names(), get_update_flags() and
  * get_data_component_interpretation()).
  *
  * To this end there are two classes DataPostprocessorScalar and
@@ -326,12 +325,12 @@ public:
    */
   virtual
   void
-  compute_derived_quantities_scalar (const DataPostprocessorInputs::Scalar<dim> &input_data,
-                                     std::vector<Vector<double> >               &computed_quantities) const;
+  evaluate_scalar_field (const DataPostprocessorInputs::Scalar<dim> &input_data,
+                         std::vector<Vector<double> >               &computed_quantities) const;
 
   /**
    * @deprecated This function is deprecated. It has been superseded by
-   * function of same name above that receives a superset of the
+   * the evaluate_scalar_field() function that receives a superset of the
    * information provided to the current function through the members
    * of the structure it receives as the first argument.
    *
@@ -359,18 +358,18 @@ public:
                                      std::vector<Vector<double> >      &computed_quantities) const DEAL_II_DEPRECATED;
 
   /**
-   * Same as the compute_derived_quantities_scalar() function, but this
+   * Same as the evaluate_scalar_field() function, but this
    * function is called when the original data vector represents vector data,
    * i.e. the finite element in use has multiple vector components.
    */
   virtual
   void
-  compute_derived_quantities_vector (const DataPostprocessorInputs::Vector<dim> &input_data,
-                                     std::vector<Vector<double> >               &computed_quantities) const;
+  evaluate_vector_field (const DataPostprocessorInputs::Vector<dim> &input_data,
+                         std::vector<Vector<double> >               &computed_quantities) const;
 
   /**
    * @deprecated This function is deprecated. It has been superseded by
-   * function of same name above that receives a superset of the
+   * the evaluate_vector_field() function that receives a superset of the
    * information provided to the current function through the members
    * of the structure it receives as the first argument.
    *
@@ -452,8 +451,8 @@ public:
  * functions by hand.
  *
  * All derived classes have to do is implement a constructor and overload
- * either DataPostprocessor::compute_derived_quantities_scalar() or
- * DataPostprocessor::compute_derived_quantities_vector().
+ * either DataPostprocessor::evaluate_scalar_field() or
+ * DataPostprocessor::evaluate_vector_field().
  *
  * An example of how this class can be used can be found in step-29.
  *
@@ -526,8 +525,8 @@ private:
  * functions by hand.
  *
  * All derived classes have to do is implement a constructor and overload
- * either DataPostprocessor::compute_derived_quantities_scalar() or
- * DataPostprocessor::compute_derived_quantities_vector().
+ * either DataPostprocessor::evaluate_scalar_field() or
+ * DataPostprocessor::evaluate_vector_field().
  *
  * An example of how the closely related class DataPostprocessorScalar is used
  * can be found in step-29.

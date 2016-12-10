@@ -903,11 +903,9 @@ namespace Step47
   class Postprocessor : public DataPostprocessor<dim>
   {
   public:
-    using DataPostprocessor<dim>::compute_derived_quantities_vector;
-
     virtual
     void
-    compute_derived_quantities_vector
+    evaluate_vector_field
     (const dealii::DataPostprocessorInputs::Vector<dim> &inputs,
      std::vector<Vector<double> >                       &computed_quantities) const;
 
@@ -954,7 +952,7 @@ namespace Step47
   template <int dim>
   void
   Postprocessor<dim>::
-  compute_derived_quantities_vector
+  evaluate_vector_field
   (const dealii::DataPostprocessorInputs::Vector<dim> &inputs,
    std::vector<Vector<double> >                       &computed_quantities) const
   {

@@ -3136,8 +3136,8 @@ namespace Step32
   // inherits from the class DataPostprocessor, which can be attached to
   // DataOut. This allows us to output derived quantities from the solution,
   // like the friction heating included in this example. It overloads the
-  // virtual function DataPostprocessor::compute_derived_quantities_vector,
-  // which is then internally called from DataOut::build_patches. We have to
+  // virtual function DataPostprocessor::evaluate_vector_field(),
+  // which is then internally called from DataOut::build_patches(). We have to
   // give it values of the numerical solution, its derivatives, normals to the
   // cell, the actual evaluation points and any additional quantities. This
   // follows the same procedure as discussed in step-29 and other programs.
@@ -3148,11 +3148,9 @@ namespace Step32
     Postprocessor (const unsigned int partition,
                    const double       minimal_pressure);
 
-    using DataPostprocessor<dim>::compute_derived_quantities_vector;
-
     virtual
     void
-    compute_derived_quantities_vector
+    evaluate_vector_field
     (const DataPostprocessorInputs::Vector<dim> &inputs,
      std::vector<Vector<double> >               &computed_quantities) const;
 
@@ -3240,7 +3238,7 @@ namespace Step32
   template <int dim>
   void
   BoussinesqFlowProblem<dim>::Postprocessor::
-  compute_derived_quantities_vector
+  evaluate_vector_field
   (const DataPostprocessorInputs::Vector<dim> &inputs,
    std::vector<Vector<double> >               &computed_quantities) const
   {

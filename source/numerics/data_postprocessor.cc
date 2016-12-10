@@ -30,8 +30,8 @@ DataPostprocessor<dim>::~DataPostprocessor()
 template <int dim>
 void
 DataPostprocessor<dim>::
-compute_derived_quantities_scalar (const DataPostprocessorInputs::Scalar<dim> &inputs,
-                                   std::vector<Vector<double> >               &computed_quantities) const
+evaluate_scalar_field (const DataPostprocessorInputs::Scalar<dim> &inputs,
+                       std::vector<Vector<double> >               &computed_quantities) const
 {
   // for backward compatibility, call the old function.
   // this also requires converting the accidental use
@@ -67,8 +67,8 @@ compute_derived_quantities_scalar (const std::vector<double>         &/*solution
 template <int dim>
 void
 DataPostprocessor<dim>::
-compute_derived_quantities_vector (const DataPostprocessorInputs::Vector<dim> &inputs,
-                                   std::vector<Vector<double> >               &computed_quantities) const
+evaluate_vector_field (const DataPostprocessorInputs::Vector<dim> &inputs,
+                       std::vector<Vector<double> >               &computed_quantities) const
 {
   // for backward compatibility, call the old function.
   // this also requires converting the accidental use
