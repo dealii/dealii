@@ -667,8 +667,7 @@ namespace Physics
                      const Tensor<2,dim,Number> &F);
 
 //@}
-  };
-
+  }
 }
 
 
