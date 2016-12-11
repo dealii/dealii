@@ -359,7 +359,7 @@
  *   until we hit a certain fraction of the <i>norm of the initial
  *   residual</i>.
  * - In the second approach, we get the same problem if the starting vector
- *   in the iteration is zero, since then then the residual may be
+ *   in the iteration is zero, since then the residual may be
  *   dominated by constrained degrees of freedom having values that do not
  *   match the values we want for them at the solution. We can again
  *   circumvent this problem by setting the corresponding elements of the
@@ -451,7 +451,7 @@
  * <i>International Journal for Numerical Methods in Engineering</i>
  * 20(11):2107-2112, 1985).
  *
- * Here, $A$ is a given (unconstrained) system matrix for wich we only
+ * Here, $A$ is a given (unconstrained) system matrix for which we only
  * assume that we can apply it to a vector but can not necessarily access
  * individual matrix entries. $b$ is the corresponding right hand side of a
  * system of linear equations $A\,x=b$. The matrix $C$ describes the

@@ -62,7 +62,7 @@
  * quadrature points -- these quadrature points are then simply the vertices
  * of the cells (provided, for example, by QTrapez).
  *
- * FEValues's role is to provide a user the values of shape functions, their
+ * FEValues' role is to provide a user the values of shape functions, their
  * gradients, etc, at quadrature points. The same is true with some geometric
  * information, e.g., the normal vectors at the quadrature points. To this end,
  * it provides a large number of member functions in the FEValuesBase base

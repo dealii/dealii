@@ -163,7 +163,7 @@ source files.
 
 <h3>Instantiation of templated functions/classes</h3>
 
-<p> Majority of classes and functions in deal.II are templated. This brings a
+<p>The majority of classes and functions in deal.II are templated. This brings a
 question of how and where such objects are instantiated, if at all. Throughout
 deal.II we adopt the following convention:</p>
 

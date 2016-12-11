@@ -31,7 +31,7 @@
 /**
  * @defgroup febase Base classes
  *
- * The members of this sub-module describe the implementational mechanics of
+ * The members of this sub-module describe the implementation mechanics of
  * finite element classes, without actually implementing a concrete
  * element. For example, the FiniteElement base class declares the virtual
  * functions a derived class has to implement if it wants to describe a finite
