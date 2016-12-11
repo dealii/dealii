@@ -262,8 +262,7 @@ namespace Physics
          const Tensor<2, dim, Number> &dF_dt);
 
 //@}
-    };
-
+    }
   }
 }
 
