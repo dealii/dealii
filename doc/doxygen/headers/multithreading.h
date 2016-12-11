@@ -586,7 +586,7 @@
  * then take the square root of the result. This is what the
  * parallel::accumulate_from_subranges function does (note that you
  * have to specify the result type as a template argument and that, as
- * usual, the minimumum number of elements of the outer loop that can
+ * usual, the minimum number of elements of the outer loop that can
  * be scheduled on a single CPU core is given as the last argument):
  * @code
     double
