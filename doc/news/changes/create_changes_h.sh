@@ -20,7 +20,8 @@
 #
 # The script needs to be executed as 
 #   ./create_changes_h.sh
-# from ./doc/news/changes.
+# from ./doc/news/changes. It simply outputs its results to the console,
+# from where the text can be captured to a file.
 
 
 
@@ -29,36 +30,34 @@ if test ! -d incompatibilities -o ! -d major -o ! -d minor ; then
   exit 1
 fi
 
-OUTPUT="../changes.h.new"
 
 function process_directory
 {
-  echo "<ol>" >> ${OUTPUT}
+  echo "<ol>"
   # process all entries in the right order
   ARRAY=($(ls "$1" | sort -r))
   for f in "${ARRAY[@]}"; do
-    echo "" >> ${OUTPUT}
-    echo -n " <li>" >> ${OUTPUT}
+    echo ""
+    echo -n " <li>"
     # indent lines by one blank space
-    sed 's/^[ ]*/ /' "$1"/"$f" >> ${OUTPUT}
-    echo " </li>" >> ${OUTPUT}
+    sed 's/^[ ]*/ /' "$1"/"$f"
+    echo " </li>"
   done
-  echo "" >> ${OUTPUT}
-  echo "</ol>" >> ${OUTPUT}
+  echo ""
+  echo "</ol>"
 }
 
-cat header > ${OUTPUT}
 
-echo INCOMPATIBILITIES
-cat header_incompatibilities >> ${OUTPUT}
+
+cat header
+
+cat header_incompatibilities
 process_directory incompatibilities
 
-echo GENERAL
-cat header_major >> ${OUTPUT}
+cat header_major
 process_directory major
 
-echo SPECIFIC
-cat header_minor >> ${OUTPUT}
+cat header_minor
 process_directory minor
 
-cat footer >> ${OUTPUT}
+cat footer

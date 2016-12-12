@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II Authors
+## Copyright (C) 2012 - 2016 by the deal.II Authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -21,6 +21,7 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION)
   MESSAGE(STATUS "")
   MESSAGE(STATUS "Setting up documentation")
 
+  ADD_SUBDIRECTORY(news)
   ADD_SUBDIRECTORY(doxygen)
 
   #
