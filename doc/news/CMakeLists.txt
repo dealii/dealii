@@ -13,6 +13,7 @@
 ##
 ## ---------------------------------------------------------------------
 
+
 #
 # Set up all necessary bits for the changelog generation
 #
@@ -26,16 +27,18 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION)
   #
   ADD_CUSTOM_COMMAND(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/changes.h
-    COMMAND 
-      ${CMAKE_CURRENT_SOURCE_DIR}/changes/create_changes_h.sh
-        > ${CMAKE_CURRENT_BINARY_DIR}/changes.h
+    COMMAND ${CMAKE_COMMAND} -DOUTPUT_FILE=${CMAKE_CURRENT_BINARY_DIR}/changes.h
+                             -P ${CMAKE_CURRENT_SOURCE_DIR}/changes/create_changes_h.cmake
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/changes
     DEPENDS 
       ${CMAKE_CURRENT_SOURCE_DIR}/changes/header
       ${CMAKE_CURRENT_SOURCE_DIR}/changes/header_incompatibilities
       ${CMAKE_CURRENT_SOURCE_DIR}/changes/header_major
       ${CMAKE_CURRENT_SOURCE_DIR}/changes/header_minor
-      ${CMAKE_CURRENT_SOURCE_DIR}/changes/create_changes_h.sh
+      ${CMAKE_CURRENT_SOURCE_DIR}/changes/footer
+      ${CMAKE_CURRENT_SOURCE_DIR}/changes/major
+      ${CMAKE_CURRENT_SOURCE_DIR}/changes/minor
+      ${CMAKE_CURRENT_SOURCE_DIR}/changes/incompatibilities
   )
 
   ADD_CUSTOM_TARGET(changelog ALL
@@ -43,10 +46,6 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION)
   )
 
   ADD_DEPENDENCIES(documentation changelog)
-
-  #
-  # Install the static elements of the html documentation:
-  #
 
 ENDIF(DEAL_II_COMPONENT_DOCUMENTATION)
 
