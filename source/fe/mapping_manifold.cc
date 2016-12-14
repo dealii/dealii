@@ -43,7 +43,10 @@ DEAL_II_NAMESPACE_OPEN
 
 template<int dim, int spacedim>
 MappingManifold<dim,spacedim>::InternalData::InternalData ()
-{}
+{
+  for (unsigned int i=0; i<unit_tangentials.size(); ++i)
+    unit_tangentials[i] = numbers::signaling_nan<Tensor<1,dim> >();
+}
 
 
 template<int dim, int spacedim>
