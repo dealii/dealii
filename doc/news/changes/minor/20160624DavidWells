@@ -1,0 +1,4 @@
+New: GnuplotFlags now supports user specified space dimension labels
+through a member variable.
+<br>
+(David Wells, 2016/06/24)

@@ -1,0 +1,4 @@
+New: Rank-4 symmetric tensors of type SymmetricTensor can now
+be converted to rank-4 tensors of type Tensor.
+<br>
+(Wolfgang Bangerth, 2016/08/11)

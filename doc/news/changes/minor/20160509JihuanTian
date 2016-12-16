@@ -1,0 +1,6 @@
+Fixed: Corrected the sign of curl calculated in the functions:
+LocalIntegrators::curl_curl_matrix, LocalIntegrators::curl_matrix,
+LocalIntegrators::nitsche_curl_matrix and LocalIntegrators::ip_curl_matrix in
+integrators/maxwell.h.
+<br>
+(Jihuan Tian, 2016/05/09)

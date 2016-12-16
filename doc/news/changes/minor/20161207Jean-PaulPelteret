@@ -1,0 +1,5 @@
+New: The inverse of a rank-2 SymmetricTensor can now be directly computed
+with SymmetricTensor::invert() instead of having to use the
+Tensor::invert() function.
+<br>
+(Jean-Paul Pelteret, 2016/12/07)

@@ -1,0 +1,8 @@
+Changed: The deal.II distributed vector classes do now derive from
+LinearAlgebra::VectorSpaceVector and have been moved to the
+LinearAlgebra::distributed namespace. In the definition of the new
+interfaces, several old vector functions have been marked as deprecated. The
+methods <tt>operator==</tt>, <tt>operator!=</tt>, and
+<tt>is_non_negative</tt> have been removed from the new interface.
+<br>
+(Martin Kronbichler, 2016/06/15)

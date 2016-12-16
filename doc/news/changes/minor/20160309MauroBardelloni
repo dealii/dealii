@@ -1,0 +1,5 @@
+New: Add NURBSPatchManifold. This class is a child of ChartManifold and
+implements a manifold descriptor for the face of a CAD imported usign
+OpenCASCADE.
+<br>
+(Mauro Bardelloni, 2016/03/09)

@@ -1,0 +1,4 @@
+Fixed: GridGenerator::hyper_cube_slit() with colorized set to
+true is now working correctly.
+<br>
+(Timo Heister, 2016/10/04)

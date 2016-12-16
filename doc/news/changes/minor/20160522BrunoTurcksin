@@ -1,0 +1,4 @@
+Fixed: Fix a bug where the SparsityPattern could not have more than 4
+billions entries when using 32bit indices.
+<br>
+(Bruno Turcksin, 2016/05/22)

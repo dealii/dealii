@@ -1,0 +1,4 @@
+New: VectorTools::project can be used for parallel Triangulations in
+specific cases.
+<br>
+(Daniel Arndt, 2016/10/30)

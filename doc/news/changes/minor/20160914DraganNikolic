@@ -1,0 +1,5 @@
+Fixed: Instantiating class Vector with non-standard template
+arguments did not work because of duplicate function symbols. This
+is now fixed.
+<br>
+(Dragan Nikolic, 2016/09/14)

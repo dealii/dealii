@@ -1,0 +1,4 @@
+New: Add ArpackSolver::set_shift() to set the shift value in spectral
+transformation.
+<br>
+(Denis Davydov, 2016/10/25)

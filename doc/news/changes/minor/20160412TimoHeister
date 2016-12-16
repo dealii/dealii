@@ -1,0 +1,5 @@
+New: Added TensorProductManifold to create new manifolds from two
+ChartManifold objects. This can be used, for example, to combine a
+2d manifold with a flat manifold for an extruded mesh.
+<br>
+(Timo Heister, 2016/04/12)
