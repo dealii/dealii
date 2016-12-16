@@ -1,0 +1,5 @@
+New: DoFTools::write_gnuplot_dof_support_point_info outputs
+support point locations and dof indices to a format readable by
+gnuplot.
+<br>
+(Timo Heister, 2016/09/16)

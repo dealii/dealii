@@ -1,0 +1,5 @@
+Fixed: The multigrid transfer performed invalid data accesses on
+multigrid hierarchies that define the coarse level as a level larger than
+0. This has been fixed.
+<br>
+(Martin Kronbichler, 2016/04/03)

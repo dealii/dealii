@@ -1,0 +1,5 @@
+Fixed: FEFieldFunction now works correctly in distributed computations,
+where before exceptions of type ExcPointNotAvailableHere could occur for
+evaluation points on or close to a boundary to a ghost cell.
+<br>
+(Timo Heister, 2016/06/06)

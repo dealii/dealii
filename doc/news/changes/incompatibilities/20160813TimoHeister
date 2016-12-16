@@ -1,0 +1,5 @@
+Removed: Deprecated classes CompressedSparsityPattern,
+CompressedSimpleSparsityPattern, CompressedSetSparsityPattern, and their
+block variants got removed.
+<br>
+(Timo Heister, 2016/08/13)

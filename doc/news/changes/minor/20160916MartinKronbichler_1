@@ -1,0 +1,4 @@
+Fixed: The Multigrid W-cycle and F-cycle have been fixed (for uniform
+grids).
+<br>
+(Martin Kronbichler, 2016/09/16)

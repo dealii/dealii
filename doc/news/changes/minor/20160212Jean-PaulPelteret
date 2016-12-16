@@ -1,0 +1,4 @@
+Fixed: FE_Nedelec elements up to polynomial order 12 can now be
+constructed.
+<br>
+(Jean-Paul Pelteret, 2016/02/12)

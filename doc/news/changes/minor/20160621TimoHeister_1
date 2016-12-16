@@ -1,0 +1,5 @@
+Fixed: Performance of DynamicSparsityPattern::begin(r) and
+DynamicSparsityPattern::end(r) has been improved dramatically in parallel
+computations and if the pattern is empty.
+<br>
+(Timo Heister, 2016/06/21)

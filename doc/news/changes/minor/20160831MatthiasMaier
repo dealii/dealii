@@ -1,0 +1,3 @@
+Fixed: The build system now uses -fPIC instead of -fpic
+<br>
+(Matthias Maier, 2016/08/31)

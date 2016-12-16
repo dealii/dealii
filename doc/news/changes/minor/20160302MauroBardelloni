@@ -1,0 +1,5 @@
+Fixed: The OpenCASCADE::push_forward_and_differential_forms()
+function is now able to change the direction of the normal vector
+according to Orientation() method.
+<br>
+(Mauro Bardelloni, 2016/03/02)

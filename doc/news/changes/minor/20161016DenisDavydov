@@ -1,0 +1,3 @@
+New: Add a base class for matrix-free operators MatrixFreeOperators::Base.
+<br>
+(Denis Davydov, 2016/10/16)

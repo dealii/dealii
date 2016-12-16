@@ -1,0 +1,4 @@
+Fixed: The function IndexSet::make_trilinos_map() now works if some
+processors have a contiguous range of indices and others do not.
+<br>
+(Bruno Turcksin, 2016/02/17)

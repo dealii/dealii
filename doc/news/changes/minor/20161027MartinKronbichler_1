@@ -1,0 +1,6 @@
+New: The class PreconditionChebyshev now offers a third template
+parameter PreconditionerType that is passed to the preconditioner setup via
+AdditionalData::preconditioner. This allows using other preconditioners than
+the default (and previous) selection of a point-Jacobi preconditioner.
+<br>
+(Martin Kronbichler, 2016/10/27)

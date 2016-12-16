@@ -1,0 +1,4 @@
+New: When using C++11, the function filter_iterators() allows to filter a
+range of iterators using predicates (like the ones defined in IteratorFilter).
+<br>
+(Bruno Turcksin, 2016/03/04)

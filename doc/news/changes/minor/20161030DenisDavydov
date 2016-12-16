@@ -1,0 +1,3 @@
+New: Add MatrixFreeOperators::LaplaceOperator representing a Laplace matrix.
+<br>
+(Denis Davydov, 2016/10/30)

@@ -1,0 +1,5 @@
+Improved: The doxygen documentation now contains nicely formatted
+boxes containing the text message of each exception. Several messages
+haven been clarified and improved.
+<br>
+(Timo Heister, 2016/09/06)

@@ -1,0 +1,5 @@
+Fixed: TrilinosWrappers::MPI::Vector::locally_owned_elements()
+now returns the correct IndexSet also if initialized with two
+IndexSets.
+<br>
+(Daniel Arndt, 2016/09/16)

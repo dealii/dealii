@@ -1,0 +1,5 @@
+Changed: To improve readability, TimerOutput::print_summary()
+now simply outputs "0%" if a particular section's time requires
+less than 0.1 per cent of the overall run time.
+<br>
+(Wolfgang Bangerth, 2016/12/03)

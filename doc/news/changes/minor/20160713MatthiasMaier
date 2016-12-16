@@ -1,0 +1,5 @@
+Fixed: CMake now handles mixed compiler and linker setup via
+<code>DEAL_II_CXX_FLAGS*</code> / <code>DEAL_II_LINKER_FLAGS*</code> and
+<code>CMAKE_CXX_FLAGS*</code> properly.
+<br>
+(Matthias Maier, 2016/07/13)

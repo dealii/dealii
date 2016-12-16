@@ -1,0 +1,4 @@
+New: The class MGCoarseGridIterativeSolver is replacing
+MGCoarseGridLACIteration with a simpler interface.
+<br>
+(Timo Heister, 2016/09/14)

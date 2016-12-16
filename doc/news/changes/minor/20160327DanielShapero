@@ -1,0 +1,5 @@
+New: When using C++11, a move constructor and assignment operator has
+been added to SparseMatrix, so that these objects can be returned from
+functions and packed into pairs and tuples.
+<br>
+(Daniel Shapero, 2016/03/27)

@@ -1,0 +1,5 @@
+New: There are now additional functions in the FETools::Compositing namespace that build
+finite elements out of simpler finite elements, either by forming tensor
+products or by combining the set of shape functions.
+<br>
+(Denis Davydov, Wolfgang Bangerth, 2016/05/20)
