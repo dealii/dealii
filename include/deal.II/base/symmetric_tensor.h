@@ -986,7 +986,7 @@ inline
 SymmetricTensor<rank,dim,Number>::
 SymmetricTensor (const SymmetricTensor<rank,dim,OtherNumber> &initializer)
 {
-  for (unsigned int i=0; i<n_independent_components; ++i)
+  for (unsigned int i=0; i<base_tensor_type::dimension; ++i)
     data[i] = initializer.data[i];
 }
 
