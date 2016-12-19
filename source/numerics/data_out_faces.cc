@@ -287,11 +287,15 @@ void DataOutFaces<dim,DoFHandlerType>::build_patches (const Mapping<dimension> &
   for (unsigned int i=0; i<this->dof_data.size(); ++i)
     n_datasets += this->dof_data[i]->n_output_variables;
 
-  // first count the cells we want to create patches of and make sure there is
-  // enough memory for that
+  // first collect the cells we want to create patches of; we will
+  // then iterate over them. the end-condition of the loop needs to
+  // test that next_face() returns an end iterator, as well as for the
+  // case that first_face() returns an invalid FaceDescriptor object
   std::vector<FaceDescriptor> all_faces;
   for (FaceDescriptor face=first_face();
-       face.first != this->triangulation->end();
+       ((face.first != this->triangulation->end())
+        &&
+        (face != FaceDescriptor()));
        face = next_face(face))
     all_faces.push_back (face);
 
