@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -12,6 +12,10 @@
 // the top level of the deal.II distribution.
 //
 // ---------------------------------------------------------------------
+
+#ifndef dealii__dof_info_templates_h
+#define dealii__dof_info_templates_h
+
 
 #include <deal.II/meshworker/dof_info.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -60,3 +64,4 @@ namespace MeshWorker
 
 DEAL_II_NAMESPACE_CLOSE
 
+#endif

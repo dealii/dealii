@@ -13,6 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
+#ifndef dealii__newton_templates_h
+#define dealii__newton_templates_h
+
 
 #include <deal.II/algorithms/newton.h>
 
@@ -206,3 +209,5 @@ namespace Algorithms
 
 
 DEAL_II_NAMESPACE_CLOSE
+
+#endif

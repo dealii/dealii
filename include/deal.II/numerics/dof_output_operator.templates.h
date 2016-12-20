@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2015 by the deal.II authors
+// Copyright (C) 2006 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -12,6 +12,9 @@
 // the top level of the deal.II distribution.
 //
 // ---------------------------------------------------------------------
+
+#ifndef dealii__dof_output_operator_templates_h
+#define dealii__dof_output_operator_templates_h
 
 
 #include <deal.II/numerics/dof_output_operator.h>
@@ -67,3 +70,5 @@ namespace Algorithms
 }
 
 DEAL_II_NAMESPACE_CLOSE
+
+#endif
