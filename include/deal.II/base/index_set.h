@@ -1604,10 +1604,9 @@ inline
 IndexSet::size_type
 IndexSet::nth_index_in_set (const unsigned int n) const
 {
-  // to make this call thread-safe, compress() must not be called through this
-  // function
-  Assert (is_compressed == true, ExcMessage ("IndexSet must be compressed."));
   Assert (n < n_elements(), ExcIndexRangeType<size_type> (n, 0, n_elements()));
+
+  compress ();
 
   // first check whether the index is in the largest range
   Assert (largest_range < ranges.size(), ExcInternalError());
