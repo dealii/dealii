@@ -119,6 +119,13 @@ IndexSet::add_range (const size_type begin,
 void
 IndexSet::do_compress () const
 {
+  // we will, in the following, modify mutable variables. this can only
+  // work in multithreaded applications if we lock the data structures
+  // via a mutex, so that users can call 'const' functions from threads
+  // in parallel (and these 'const' functions can then call compress()
+  // which itself calls the current function)
+  Threads::Mutex::ScopedLock lock (compress_mutex);
+
   // see if any of the contiguous ranges can be merged. do not use
   // std::vector::erase in-place as it is quadratic in the number of
   // ranges. since the ranges are sorted by their first index, determining
@@ -660,7 +667,8 @@ IndexSet::memory_consumption () const
 {
   return (MemoryConsumption::memory_consumption (ranges) +
           MemoryConsumption::memory_consumption (is_compressed) +
-          MemoryConsumption::memory_consumption (index_space_size));
+          MemoryConsumption::memory_consumption (index_space_size) +
+          sizeof (compress_mutex));
 }
 
 

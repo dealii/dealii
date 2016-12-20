@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/thread_management.h>
 #include <boost/serialization/vector.hpp>
 #include <vector>
 #include <algorithm>
@@ -852,6 +853,12 @@ private:
    * (ghosts).
    */
   mutable size_type largest_range;
+
+  /**
+   * A mutex that is used to synchronize operations of the do_compress() function
+   * that is called from many 'const' functions via compress().
+   */
+  mutable Threads::Mutex compress_mutex;
 
   /**
    * Actually perform the compress() operation.
@@ -1751,7 +1758,7 @@ IndexSet::print (StreamType &out) const
       else
         out << "[" << p->begin << "," << p->end-1 << "]";
 
-      if (p !=--ranges.end())
+      if (p != --ranges.end())
         out << ", ";
     }
   out << "}" << std::endl;
