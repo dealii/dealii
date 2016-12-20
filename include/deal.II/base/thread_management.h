@@ -305,6 +305,16 @@ namespace Threads
 
 
     /**
+     * Copy operators. As discussed in this class's documentation, no state
+     * is copied from the object given as argument.
+     */
+    Mutex &operator = (const Mutex &)
+    {
+      return *this;
+    }
+
+
+    /**
      * Acquire a mutex.
      */
     inline void acquire ()
