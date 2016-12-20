@@ -32,7 +32,7 @@ code is written, without having to look up the exact definition of something.
 
 <h3>Notes on deal.II indentation</h3>
 
-<p>deal.II uses <code>astyle</code> to normalize indentation. A
+<p>deal.II uses <code>astyle</code> 2.04 to normalize indentation. A
 style file is provided at
 <code>
 <pre>
