@@ -21,6 +21,7 @@
 #include <deal.II/lac/constraint_matrix.h>
 
 #include <deal.II/base/table.h>
+#include <deal.II/base/thread_local_storage.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -33,6 +34,7 @@
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 
+#include <complex>
 #include <iomanip>
 
 DEAL_II_NAMESPACE_OPEN

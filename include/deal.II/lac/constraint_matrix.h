@@ -22,15 +22,12 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/template_constraints.h>
-#include <deal.II/base/thread_local_storage.h>
 
 #include <deal.II/lac/vector.h>
 
 #include <vector>
-#include <map>
 #include <set>
 #include <utility>
-#include <complex>
 
 
 DEAL_II_NAMESPACE_OPEN
