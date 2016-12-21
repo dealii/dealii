@@ -15,7 +15,7 @@
 
 
 // tests DataPostprocessor: access the cell we are currently working
-// on for a scalar finite element
+// on for a vector finite element field and DataOutFaces
 
 
 #include "../tests.h"
@@ -32,7 +32,7 @@
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/lac/vector.h>
 
-#include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/data_out_faces.h>
 #include <deal.II/numerics/data_postprocessor.h>
 #include <fstream>
 
@@ -43,34 +43,37 @@ std::ofstream logfile("output");
 
 
 template <int dim>
-class MyPostprocessor : public DataPostprocessorScalar<dim>
+class MyPostprocessor : public DataPostprocessorVector<dim>
 {
 public:
   MyPostprocessor ()
     :
-    DataPostprocessorScalar<dim> ("data", update_values)
+    DataPostprocessorVector<dim> ("data", update_values)
   {}
 
   virtual
   void
-  evaluate_scalar_field (const DataPostprocessorInputs::Scalar<dim> &input_data,
-                         std::vector<Vector<double> >               &computed_quantities) const
+  evaluate_vector_field (const DataPostprocessorInputs::Vector<dim> &input_data,
+                         std::vector<Vector<double> >                    &computed_quantities) const
   {
     for (unsigned int q=0; q<input_data.solution_values.size(); ++q)
       {
-        Assert (computed_quantities[q].size() == 1,
+        // we only have one scalar field to output
+        Assert (input_data.solution_values[q].size() == 2,
+                ExcInternalError());
+        Assert (computed_quantities[q].size() == dim,
                 ExcInternalError());
 
         // get the cell this all belongs to
         typename DoFHandler<dim>::cell_iterator
         cell = input_data.template get_cell<DoFHandler<dim> >();
 
-        Assert (input_data.solution_values[q]
+        Assert (input_data.solution_values[q](0)
                 ==
                 double(cell->active_cell_index()),
                 ExcInternalError());
 
-        computed_quantities[q][0] = input_data.solution_values[q];
+        computed_quantities[q][0] = input_data.solution_values[q](0);
       }
   }
 };
@@ -81,7 +84,7 @@ template <int dim>
 void test ()
 {
   Triangulation<dim>   triangulation;
-  FE_DGQ<dim>          fe(1);
+  FESystem<dim>        fe(FE_DGQ<dim>(0),2);
   DoFHandler<dim>      dof_handler(triangulation);
 
   GridGenerator::hyper_cube (triangulation, 0, 1);
@@ -105,7 +108,7 @@ void test ()
     }
 
   MyPostprocessor<dim> p;
-  DataOut<dim> data_out;
+  DataOutFaces<dim> data_out;
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution, p);
   data_out.build_patches ();
@@ -118,7 +121,6 @@ int main ()
   logfile << std::setprecision(2);
   deallog << std::setprecision(2);
 
-  test<1>();
   test<2>();
   test<3>();
 

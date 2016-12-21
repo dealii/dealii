@@ -169,6 +169,12 @@ build_one_patch (const FaceDescriptor *cell_and_face,
                   if (update_flags & update_normal_vectors)
                     data.patch_values_scalar.normals = this_fe_patch_values.get_all_normal_vectors();
 
+                  const typename DoFHandlerType::active_cell_iterator dh_cell(&cell_and_face->first->get_triangulation(),
+                                                                              cell_and_face->first->level(),
+                                                                              cell_and_face->first->index(),
+                                                                              this->dof_data[dataset]->dof_handler);
+                  data.patch_values_scalar.template set_cell<DoFHandlerType> (dh_cell);
+
                   postprocessor->
                   evaluate_scalar_field(data.patch_values_scalar,
                                         data.postprocessed_values[dataset]);
@@ -193,6 +199,12 @@ build_one_patch (const FaceDescriptor *cell_and_face,
 
                   if (update_flags & update_normal_vectors)
                     data.patch_values_system.normals = this_fe_patch_values.get_all_normal_vectors();
+
+                  const typename DoFHandlerType::active_cell_iterator dh_cell(&cell_and_face->first->get_triangulation(),
+                                                                              cell_and_face->first->level(),
+                                                                              cell_and_face->first->index(),
+                                                                              this->dof_data[dataset]->dof_handler);
+                  data.patch_values_system.template set_cell<DoFHandlerType> (dh_cell);
 
                   postprocessor->
                   evaluate_vector_field(data.patch_values_system,

@@ -15,7 +15,7 @@
 
 
 // tests DataPostprocessor: access the cell we are currently working
-// on for a scalar finite element
+// on for a scalar finite element field and DataOutFaces
 
 
 #include "../tests.h"
@@ -32,7 +32,7 @@
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/lac/vector.h>
 
-#include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/data_out_faces.h>
 #include <deal.II/numerics/data_postprocessor.h>
 #include <fstream>
 
@@ -105,7 +105,7 @@ void test ()
     }
 
   MyPostprocessor<dim> p;
-  DataOut<dim> data_out;
+  DataOutFaces<dim> data_out;
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution, p);
   data_out.build_patches ();
@@ -118,7 +118,6 @@ int main ()
   logfile << std::setprecision(2);
   deallog << std::setprecision(2);
 
-  test<1>();
   test<2>();
   test<3>();
 
