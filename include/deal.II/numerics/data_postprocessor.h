@@ -25,6 +25,8 @@
 #include <deal.II/fe/fe_update_flags.h>
 #include <deal.II/numerics/data_component_interpretation.h>
 
+#include <boost/any.hpp>
+
 #include <vector>
 #include <string>
 
@@ -38,15 +40,189 @@ DEAL_II_NAMESPACE_OPEN
 namespace DataPostprocessorInputs
 {
   /**
+   * A base class containing common elements for the Scalar and Vector classes
+   * that are passed as arguments to
+   * DataPostprocessor::evaluate_scalar_field() and
+   * DataPostprocessor::evaluate_vector_field(). This common base class
+   * provides access to the points at which the solution is being evaluated,
+   * and a few other fields, as described in the following.
+   *
+   * <h4>Normal vector access</h4>
+   *
+   * If appropriate, i.e., if the object that is currently being processed
+   * is a face of a cell and the DataPostprocessor object is called from
+   * DataOutFaces or a similar class, then the current object also
+   * stores the normal vectors to the geometry on which output
+   * is generated, at these evaluation points.
+   *
+   * On the other hand, if the solution is being evaluated on a cell,
+   * then the @p normal_vectors member variable does not contain anything
+   * useful.
+   *
+   * <h4>Cell access</h4>
+   *
+   * DataPostprocessor is typically called from classes such as DataOut
+   * or DataOutFaces that evaluate solution fields on a cell-by-cell
+   * basis. As a consequence, classes derived from DataPostprocessor
+   * (or DataPostprocessorScalar or DataPostprocessorVector) sometimes
+   * need to use which cell is currently under investigation. Consequently,
+   * DataOut and similar classes pass the cell they are currently working
+   * on to DataPostprocessor via the classes in this namespace (and
+   * specifically the current base class).
+   *
+   * However, the situation is not so simple. This is because the current
+   * class (and those derived from it) only knows the space dimension in
+   * which the output lives. But this can come from many sources. First,
+   * the cell may be a cell in a DoFHandler or hp::DoFHandler object.
+   * Second, if we are in 3d, this may be because we are working on a
+   * DoFHandler<3>, or a DoFHandler<2,3> (i.e., either a 3d mesh, or a
+   * 2d meshes of a 2d surface embedded in 3d space). Finally, if one
+   * considers classes such as DataOutRotation or DataOutStack, then
+   * @p spacedim being equal to 3 might mean that we are actually
+   * working on a DoFHandler<2> or hp::DoFHandler<2>.
+   *
+   * In other words, just because we know the value of the @p spacedim
+   * template argument of the current class does not mean that the
+   * data type of the cell iterator that is currently being worked on
+   * is obvious.
+   *
+   * To make the cell iterator accessible nevertheless, this class uses
+   * an object of type boost::any to store the cell iterator. You can
+   * think of this as being a void pointer that can point to anything.
+   * To use what is being used therefore requires the user to know the
+   * data type of the thing being pointed to.
+   *
+   * To make this work, the DataOut and related classes store in objects
+   * of the current type a representation of the cell. To get it back out,
+   * you would use the get_cell() function that requires you to say,
+   * as a template parameter, the DoFHandler type to which the cell that
+   * is currently being processed belongs. This is knowledge you typically
+   * have in an application: for example, if your application runs in
+   * @p dim space dimensions, uses a hp::DoFHandler, and you are currently
+   * using the DataOut class, then the cells that are worked on have data
+   * type <code>DataOut<dim>::cell_iterator</code>. Consequently, in a
+   * postprocessor, you can call
+   * <code>inputs.get_cell@<hp::DoFHandler@<dim@> @> </code>. For technical
+   * reasons, however, C++ will typically require you to write this as
+   * <code>inputs.template get_cell@<DoFHandler@<dim@> @> </code>
+   * because the member function we call here requires that we explicitly
+   * provide the template argument.
+   *
+   * Let us consider a complete example of a postprocessor that computes
+   * the fluid norm of the stress $\|\sigma\| = \|\eta \nabla u\|$ from the
+   * viscosity $\eta$ and the gradient of the fluid velocity, $\nabla u$,
+   * assuming that the viscosity is something that depends on the cell's material
+   * id. This can be done using a class we derive from DataPostprocessorScalar
+   * where we overload the DataPostprocessor::evaluate_vector_field() function
+   * that receives the values and gradients of the velocity (plus of
+   * other solution variables such as the pressure, but let's ignore those
+   * for the moment). Then we could use code such as this, assuming that we
+   * use a hp::DoFHandler:
+   * @code
+   *   template <int dim>
+   *   class ComputeStress : public DataPostprocessorScalar<dim>
+   *   {
+   *     public:
+   *       ... // overload other necessary member variables
+   *       virtual
+   *       void
+   *       evaluate_vector_field (const DataPostprocessorInputs::Vector<dim> &input_data,
+   *                              std::vector<Vector<double> >               &computed_quantities) const
+   *       {
+   *         const typename hp::DoFHandler<dim>::cell_iterator
+   *           current_cell = input_data.template get_cell<hp::DoFHandler<dim> >();
+   *         const viscosity = look_up_viscosity (current_cell->material_id());
+   *
+   *         for (unsigned int q=0; q<input_data.solution_gradients.size(); ++q)
+   *           computed_quantities[q][0] = (viscosity * input_data.solution_gradients[q]).norm();
+   *       }
+   *   };
+   * @endcode
+   *
+   * @author Wolfgang Bangerth, 2016
+   */
+  template <int spacedim>
+  struct CommonInputs
+  {
+    /**
+     * An array of vectors normal to the faces of cells, evaluated at the points
+     * at which we are generating graphical output. This array is only used by
+     * the DataOutFaces class, and is left empty by all other classes for
+     * which the DataPostprocessor framework can be used. In the case of
+     * DataOutFaces, the array contains the outward normal vectors to the
+     * face, seen from the interior of the cell.
+     *
+     * This array is only filled if a user-derived class overloads the
+     * DataPostprocessor::get_needed_update_flags(), and the function
+     * returns (possibly among other flags)
+     * UpdateFlags::update_normal_vectors.  Alternatively, a class
+     * derived from DataPostprocessorScalar or DataPostprocessorVector
+     * may pass this flag to the constructor of
+     * DataPostprocessorScalar or DataPostprocessorVector.
+     */
+    std::vector<Tensor<1, spacedim> > normals;
+
+    /**
+     * An array of coordinates corresponding to the locations at which
+     * we are generating graphical output on one cell.
+     *
+     * This array is only filled if a user-derived class overloads the
+     * DataPostprocessor::get_needed_update_flags(), and the function
+     * returns (possibly among other flags)
+     * UpdateFlags::update_quadrature_points.  Alternatively, a class
+     * derived from DataPostprocessorScalar or DataPostprocessorVector
+     * may pass this flag to the constructor of
+     * DataPostprocessorScalar or DataPostprocessorVector.
+     */
+    std::vector<Point<spacedim> >     evaluation_points;
+
+    /**
+     * Set the cell that is currently being used in evaluating the data
+     * for which the DataPostprocessor object is being called.
+     *
+     * This function is not usually called from user space, but is instead
+     * called by DataOut and similar classes when creating the object that
+     * is then passed to DataPostprocessor.
+     */
+    template <typename DoFHandlerType>
+    void
+    set_cell (const typename DoFHandlerType::cell_iterator &cell);
+
+    /**
+     * Query the cell on which we currently produce graphical output.
+     * See the documentation of the current class for an example on how
+     * to use this function.
+     */
+    template <typename DoFHandlerType>
+    typename DoFHandlerType::cell_iterator
+    get_cell () const;
+
+  private:
+    /**
+     * The place where set_cell() stores the cell. Since the actual data
+     * type of the cell iterator can be many different things, the
+     * interface uses boost::any here. This makes assignment in set_cell()
+     * simple, but requires knowing the data type of the stored object in
+     * get_cell().
+     */
+    boost::any cell;
+  };
+
+  /**
    * A structure that is used to pass information to
    * DataPostprocessor::evaluate_scalar_field(). It contains
    * the values and (if requested) derivatives of a scalar solution
-   * variable at the evaluation points on a cell or face. If appropriate,
-   * it also contains the normal vectors to the geometry on which output
-   * is generated, at these evaluation points.
+   * variable at the evaluation points on a cell or face.
+   *
+   * Through the fields in the CommonInputs base class, this class also
+   * makes available access to the locations of evaluations points,
+   * normal vectors (if appropriate), and which cell data is currently
+   * being evaluated on (also if appropriate).
+   *
+   * @author Wolfgang Bangerth, 2016
    */
   template <int spacedim>
-  struct Scalar
+  struct Scalar : public CommonInputs<spacedim>
   {
     /**
      * An array of values of the (scalar) solution at each of the evaluation
@@ -84,38 +260,6 @@ namespace DataPostprocessorInputs
      * DataPostprocessorVector.
      */
     std::vector<Tensor<2, spacedim> > solution_hessians;
-
-    /**
-     * An array of vectors normal to the faces of cells, evaluated at the points
-     * at which we are generating graphical output. This array is only used by
-     * the DataOutFaces class, and is left empty by all other classes for
-     * which the DataPostprocessor framework can be used. In the case of
-     * DataOutFaces, the array contains the outward normal vectors to the
-     * face, seen from the interior of the cell.
-     *
-     * This array is only filled if a user-derived class overloads the
-     * DataPostprocessor::get_needed_update_flags(), and the function
-     * returns (possibly among other flags)
-     * UpdateFlags::update_normal_vectors.  Alternatively, a class
-     * derived from DataPostprocessorScalar or DataPostprocessorVector
-     * may pass this flag to the constructor of
-     * DataPostprocessorScalar or DataPostprocessorVector.
-     */
-    std::vector<Tensor<1, spacedim> > normals;
-
-    /**
-     * An array of coordinates corresponding to the locations at which
-     * we are generating graphical output on one cell.
-     *
-     * This array is only filled if a user-derived class overloads the
-     * DataPostprocessor::get_needed_update_flags(), and the function
-     * returns (possibly among other flags)
-     * UpdateFlags::update_quadrature_points.  Alternatively, a class
-     * derived from DataPostprocessorScalar or DataPostprocessorVector
-     * may pass this flag to the constructor of
-     * DataPostprocessorScalar or DataPostprocessorVector.
-     */
-    std::vector<Point<spacedim> >     evaluation_points;
   };
 
 
@@ -124,12 +268,17 @@ namespace DataPostprocessorInputs
    * A structure that is used to pass information to
    * DataPostprocessor::evaluate_vector_field(). It contains
    * the values and (if requested) derivatives of a vector-valued solution
-   * variable at the evaluation points on a cell or face. If appropriate,
-   * it also contains the normal vectors to the geometry on which output
-   * is generated, at these evaluation points.
+   * variable at the evaluation points on a cell or face.
+   *
+   * Through the fields in the CommonInputs base class, this class also
+   * makes available access to the locations of evaluations points,
+   * normal vectors (if appropriate), and which cell data is currently
+   * being evaluated on (also if appropriate).
+   *
+   * @author Wolfgang Bangerth, 2016
    */
   template <int spacedim>
-  struct Vector
+  struct Vector : public CommonInputs<spacedim>
   {
     /**
      * An array of values of a vector-valued solution at each of the evaluation
@@ -179,39 +328,8 @@ namespace DataPostprocessorInputs
      * DataPostprocessorVector.
      */
     std::vector<std::vector<Tensor<2, spacedim> > > solution_hessians;
-
-    /**
-     * An array of vectors normal to the faces of cells, evaluated at the points
-     * at which we are generating graphical output. This array is only used by
-     * the DataOutFaces class, and is left empty by all other classes for
-     * which the DataPostprocessor framework can be used. In the case of
-     * DataOutFaces, the array contains the outward normal vectors to the
-     * face, seen from the interior of the cell.
-     *
-     * This array is only filled if a user-derived class overloads the
-     * DataPostprocessor::get_needed_update_flags(), and the function
-     * returns (possibly among other flags)
-     * UpdateFlags::update_normal_vectors.  Alternatively, a class
-     * derived from DataPostprocessorScalar or DataPostprocessorVector
-     * may pass this flag to the constructor of
-     * DataPostprocessorScalar or DataPostprocessorVector.
-     */
-    std::vector<Tensor<1, spacedim> >               normals;
-
-    /**
-     * An array of coordinates corresponding to the locations at which
-     * we are generating graphical output on one cell.
-     *
-     * This array is only filled if a user-derived class overloads the
-     * DataPostprocessor::get_needed_update_flags(), and the function
-     * returns (possibly among other flags)
-     * UpdateFlags::update_quadrature_points.  Alternatively, a class
-     * derived from DataPostprocessorScalar or DataPostprocessorVector
-     * may pass this flag to the constructor of
-     * DataPostprocessorScalar or DataPostprocessorVector.
-     */
-    std::vector<Point<spacedim> >                   evaluation_points;
   };
+
 }
 
 
@@ -586,6 +704,56 @@ private:
   const UpdateFlags update_flags;
 };
 
+
+
+#ifndef DOXYGEN
+// -------------------- template functions ----------------------
+
+namespace DataPostprocessorInputs
+{
+
+  template <int spacedim>
+  template <typename DoFHandlerType>
+  void
+  CommonInputs<spacedim>::set_cell (const typename DoFHandlerType::cell_iterator &new_cell)
+  {
+    // see if we had previously already stored a cell that has the same
+    // data type; if so, reuse the memory location and avoid calling 'new'
+    // inside boost::any
+    if (typename DoFHandlerType::cell_iterator * storage_location
+        = boost::any_cast<typename DoFHandlerType::cell_iterator>(&cell))
+      *storage_location = new_cell;
+    else
+      // if we had nothing stored before, or if we had stored a different
+      // data type, just let boost::any replace things
+      cell = new_cell;
+  }
+
+
+
+  template <int spacedim>
+  template <typename DoFHandlerType>
+  typename DoFHandlerType::cell_iterator
+  CommonInputs<spacedim>::get_cell () const
+  {
+    Assert(cell.empty() == false,
+           ExcMessage ("You are trying to access the cell associated with a "
+                       "DataPostprocessorInputs::Scalar object for which no cell has "
+                       "been set."));
+    Assert(boost::any_cast<typename DoFHandlerType::cell_iterator>(&cell) != 0,
+           ExcMessage ("You are trying to access the cell associated with a "
+                       "DataPostprocessorInputs::Scalar with a DoFHandler type that "
+                       "is different from the type with which it has been set. For "
+                       "example, if the cell for which output is currently being "
+                       "generated belongs to a hp::DoFHandler<2,3> object, then you can "
+                       "only call the current function with a template argument "
+                       "equal to hp::DoFHandler<2,3>, but not with any other class "
+                       "type or dimension template argument."));
+    return boost::any_cast<typename DoFHandlerType::cell_iterator>(cell);
+  }
+}
+
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 
