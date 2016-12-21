@@ -216,6 +216,12 @@ build_one_patch (const cell_iterator                                            
                       if (update_flags & update_quadrature_points)
                         data.patch_values_scalar.evaluation_points = fe_patch_values.get_quadrature_points();
 
+                      const typename DoFHandlerType::active_cell_iterator dh_cell(&(*cell)->get_triangulation(),
+                                                                                  (*cell)->level(),
+                                                                                  (*cell)->index(),
+                                                                                  this->dof_data[dataset]->dof_handler);
+                      data.patch_values_scalar.template set_cell<DoFHandlerType> (dh_cell);
+
                       postprocessor->
                       evaluate_scalar_field(data.patch_values_scalar,
                                             data.postprocessed_values[dataset]);
@@ -239,7 +245,12 @@ build_one_patch (const cell_iterator                                            
                       if (update_flags & update_quadrature_points)
                         data.patch_values_system.evaluation_points = fe_patch_values.get_quadrature_points();
 
-                      std::vector<Point<space_dimension> > dummy_normals;
+                      const typename DoFHandlerType::active_cell_iterator dh_cell(&(*cell)->get_triangulation(),
+                                                                                  (*cell)->level(),
+                                                                                  (*cell)->index(),
+                                                                                  this->dof_data[dataset]->dof_handler);
+                      data.patch_values_system.template set_cell<DoFHandlerType> (dh_cell);
+
                       postprocessor->
                       evaluate_vector_field(data.patch_values_system,
                                             data.postprocessed_values[dataset]);
