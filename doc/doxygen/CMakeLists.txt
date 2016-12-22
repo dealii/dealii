@@ -158,10 +158,12 @@ file(GLOB _doxygen_depend
 # are captured via a GLOB since they may not exist (and so not
 # be captured via the GLOB) at the time cmake runs
 LIST(APPEND _doxygen_depend
-  ${CMAKE_BINARY_DIR}/doc/news/changes.h
   ${CMAKE_BINARY_DIR}/include/deal.II/base/config.h
   ${CMAKE_CURRENT_BINARY_DIR}/tutorial/tutorial.h
   )
+
+# Add the changelog (a CMake custom target) as a dependency for doxygen too
+LIST(APPEND _doxygen_depend changelog)
 
 # find all tutorial programs so we can add dependencies as appropriate
 FILE(GLOB _deal_ii_steps
