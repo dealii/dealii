@@ -68,7 +68,6 @@ INSTALL(FILES
 
 FILE(GLOB _misc
   ${CMAKE_CURRENT_SOURCE_DIR}/doxygen/headers/*.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/news/changes.h
   )
 
 ADD_LIBRARY(doxygen_headers OBJECT ${_misc})
