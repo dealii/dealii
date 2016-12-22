@@ -13,6 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
+#ifndef dealii__fe_poly_templates_h
+#define dealii__fe_poly_templates_h
+
 
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/polynomial_space.h>
@@ -534,3 +537,5 @@ FE_Poly<PolynomialType,dim,spacedim>::get_poly_space_numbering_inverse () const
 
 
 DEAL_II_NAMESPACE_CLOSE
+
+#endif

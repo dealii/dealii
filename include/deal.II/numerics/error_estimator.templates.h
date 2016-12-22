@@ -13,6 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
+#ifndef dealii__error_estimator_templates_h
+#define dealii__error_estimator_templates_h
+
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/quadrature.h>
@@ -1308,3 +1311,5 @@ void KellyErrorEstimator<dim, spacedim>::estimate
 }
 
 DEAL_II_NAMESPACE_CLOSE
+
+#endif

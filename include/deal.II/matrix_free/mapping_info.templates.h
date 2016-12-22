@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2015 by the deal.II authors
+// Copyright (C) 2011 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,6 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
+#ifndef dealii__matrix_free_mapping_info_templates_h
+#define dealii__matrix_free_mapping_info_templates_h
 
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/memory_consumption.h>
@@ -925,5 +927,6 @@ namespace internal
   } // end of namespace MatrixFreeFunctions
 } // end of namespace internal
 
-
 DEAL_II_NAMESPACE_CLOSE
+
+#endif

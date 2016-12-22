@@ -13,6 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
+#ifndef dealii__fe_field_function_templates_h
+#define dealii__fe_field_function_templates_h
+
 
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/logstream.h>
@@ -604,3 +607,5 @@ namespace Functions
 }
 
 DEAL_II_NAMESPACE_CLOSE
+
+#endif
