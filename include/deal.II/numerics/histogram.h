@@ -74,7 +74,14 @@ public:
    */
   enum IntervalSpacing
   {
-    linear, logarithmic
+    /**
+     * Space intervals linearly.
+     */
+    linear,
+    /**
+     * Space intervals logarithmically.
+     */
+    logarithmic
   };
 
 

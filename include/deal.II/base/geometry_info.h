@@ -52,9 +52,21 @@ public:
    */
   enum Object
   {
+    /**
+     * A vertex.
+     */
     vertex = 0,
+    /**
+     * A line.
+     */
     line   = 1,
+    /**
+     * A quadrilateral.
+     */
     quad   = 2,
+    /**
+     * A hexahedron.
+     */
     hex    = 3
   };
 
@@ -139,8 +151,14 @@ struct RefinementPossibilities
    */
   enum Possibilities
   {
-    no_refinement= 0,
+    /**
+     * Do not perform refinement.
+     */
+    no_refinement = 0,
 
+    /**
+     * Perform isotropic refinement.
+     */
     isotropic_refinement = static_cast<unsigned char>(-1)
   };
 };
@@ -196,9 +214,17 @@ struct RefinementPossibilities<1>
    */
   enum Possibilities
   {
-    no_refinement= 0,
+    /**
+     * Do not refine.
+     */
+    no_refinement = 0,
+    /**
+     * Perform a cut in the x-direction.
+     */
     cut_x        = 1,
-
+    /**
+     * Perform isotropic refinement.
+     */
     isotropic_refinement = cut_x
   };
 };
@@ -255,11 +281,26 @@ struct RefinementPossibilities<2>
    */
   enum Possibilities
   {
-    no_refinement= 0,
-    cut_x        = 1,
-    cut_y        = 2,
-    cut_xy       = cut_x | cut_y,
+    /**
+     * Do not refine.
+     */
+    no_refinement = 0,
+    /**
+     * Perform a cut in the x-direction.
+     */
+    cut_x         = 1,
+    /**
+     * Perform a cut in the y-direction.
+     */
+    cut_y         = 2,
+    /**
+     * Perform cuts in the x- and y-directions.
+     */
+    cut_xy        = cut_x | cut_y,
 
+    /**
+     * Perform isotropic refinement.
+     */
     isotropic_refinement = cut_xy
   };
 };
@@ -316,15 +357,42 @@ struct RefinementPossibilities<3>
    */
   enum Possibilities
   {
-    no_refinement= 0,
-    cut_x        = 1,
-    cut_y        = 2,
-    cut_xy       = cut_x | cut_y,
-    cut_z        = 4,
-    cut_xz       = cut_x | cut_z,
-    cut_yz       = cut_y | cut_z,
-    cut_xyz      = cut_x | cut_y | cut_z,
+    /**
+     * Do not refine.
+     */
+    no_refinement = 0,
+    /**
+     * Perform a cut in the x-direction.
+     */
+    cut_x         = 1,
+    /**
+     * Perform a cut in the y-direction.
+     */
+    cut_y         = 2,
+    /**
+     * Perform a cut in the x and y-directions.
+     */
+    cut_xy        = cut_x | cut_y,
+    /**
+     * Perform a cut in the z-direction.
+     */
+    cut_z         = 4,
+    /**
+     * Perform a cuts in the x- and y-directions.
+     */
+    cut_xz        = cut_x | cut_z,
+    /**
+     * Perform a cuts in the x- and y-directions.
+     */
+    cut_yz        = cut_y | cut_z,
+    /**
+     * Perform a cuts in the x-, y-, and z-directions.
+     */
+    cut_xyz       = cut_x | cut_y | cut_z,
 
+    /**
+     * Perform isotropic refinement.
+     */
     isotropic_refinement = cut_xyz
   };
 };
@@ -470,8 +538,14 @@ namespace internal
      */
     enum Possibilities
     {
+      /**
+       * Do not refine.
+       */
       case_none = 0,
 
+      /**
+       * Refine isotropically.
+       */
       case_isotropic = static_cast<unsigned char>(-1)
     };
   };
@@ -496,8 +570,14 @@ namespace internal
      */
     enum Possibilities
     {
+      /**
+       * Do not refine.
+       */
       case_none = 0,
 
+      /**
+       * Refine isotropically.
+       */
       case_isotropic = case_none
     };
   };
@@ -524,8 +604,14 @@ namespace internal
      */
     enum Possibilities
     {
+      /**
+       * Do not refine.
+       */
       case_none = 0,
 
+      /**
+       * Refine isotropically.
+       */
       case_isotropic = case_none
     };
   };
@@ -554,9 +640,17 @@ namespace internal
      */
     enum Possibilities
     {
+      /**
+       * Do not refine.
+       */
       case_none = 0,
+      /**
+       * Cut in the x-direction.
+       */
       case_x    = 1,
-
+      /**
+       * Refine isotropically.
+       */
       case_isotropic = case_x
     };
   };

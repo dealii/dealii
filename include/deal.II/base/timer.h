@@ -431,9 +431,21 @@ public:
    */
   enum OutputFrequency
   {
+    /**
+     * Generate output after every call.
+     */
     every_call,
+    /**
+     * Generate output in summary at the end.
+     */
     summary,
+    /**
+     * Generate output both after every call and in summary at the end.
+     */
     every_call_and_summary,
+    /**
+     * Never generate any output.
+     */
     never
   };
 
@@ -443,8 +455,17 @@ public:
    */
   enum OutputType
   {
+    /**
+     * Output CPU times.
+     */
     cpu_times,
+    /**
+     * Output wall clock times.
+     */
     wall_times,
+    /**
+     * Output both CPU and wall clock times.
+     */
     cpu_and_wall_times
   };
 

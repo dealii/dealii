@@ -517,7 +517,14 @@ public:
    */
   enum BlockingStrategy
   {
-    index_intervals, adaptive
+    /**
+     * Block by index intervals.
+     */
+    index_intervals,
+    /**
+     * Block with an adaptive strategy.
+     */
+    adaptive
   };
 
   /**

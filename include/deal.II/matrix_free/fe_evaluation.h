@@ -5013,8 +5013,22 @@ namespace internal
    */
   enum EvaluatorVariant
   {
+    /**
+     * Do not use anything more than the tensor product structure of the
+     * finite element.
+     */
     evaluate_general,
+    /**
+     * Perform evaluation by exploiting symmetry in the finite element: i.e.,
+     * skip some computations by utilizing the symmetry in the shape functions
+     * and quadrature points.
+     */
     evaluate_symmetric,
+    /**
+     * Use symmetry to apply the operator to even and odd parts of the input
+     * vector separately: see the documentation of the EvaluatorTensorProduct
+     * specialization for more information.
+     */
     evaluate_evenodd
   };
 

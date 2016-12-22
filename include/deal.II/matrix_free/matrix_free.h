@@ -138,9 +138,30 @@ public:
   struct AdditionalData
   {
     /**
-     * Collects options for task parallelism.
+     * Collects options for task parallelism. See the documentation of the
+     * member variable MatrixFree::AdditionalData::tasks_parallel_scheme for a
+     * thorough description.
      */
-    enum TasksParallelScheme {none, partition_partition, partition_color, color};
+    enum TasksParallelScheme
+    {
+      /**
+       * Perform application in serial.
+       */
+      none,
+      /**
+       * Partition the cells into two levels and afterwards form chunks.
+       */
+      partition_partition,
+      /**
+       * Partition on the global level and color cells within the partitions.
+       */
+      partition_color,
+      /**
+       * Use the traditional coloring algorithm: this is like
+       * TasksParallelScheme::partition_color, but only uses one partition.
+       */
+      color
+    };
 
     /**
      * Constructor for AdditionalData.
@@ -879,7 +900,17 @@ private:
 
     std::vector<SmartPointer<const DoFHandler<dim> > >   dof_handler;
     std::vector<SmartPointer<const hp::DoFHandler<dim> > > hp_dof_handler;
-    enum ActiveDoFHandler { usual, hp } active_dof_handler;
+    enum ActiveDoFHandler
+    {
+      /**
+       * Use DoFHandler.
+       */
+      usual,
+      /**
+       * Use hp::DoFHandler.
+       */
+      hp
+    } active_dof_handler;
     unsigned int n_dof_handlers;
     unsigned int level;
   };

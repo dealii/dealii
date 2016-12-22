@@ -94,10 +94,25 @@ namespace FiniteElementDomination
    */
   enum Domination
   {
+    /**
+     * The current element dominates.
+     */
     this_element_dominates,
+    /**
+     * The other element dominates.
+     */
     other_element_dominates,
+    /**
+     * Neither element dominates.
+     */
     neither_element_dominates,
+    /**
+     * Either element may dominate.
+     */
     either_element_can_dominate,
+    /**
+     * There are no requirements.
+     */
     no_requirements
   };
 

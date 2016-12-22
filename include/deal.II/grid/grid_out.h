@@ -285,7 +285,14 @@ namespace GridOutFlags
      */
     enum SizeType
     {
-      width, height
+      /**
+       * Scale with the width.
+       */
+      width,
+      /**
+       * Scale with the height.
+       */
+      height
     };
 
     /**

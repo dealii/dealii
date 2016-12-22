@@ -791,7 +791,17 @@ namespace Patterns
      * Files can be used for input or output. This can be specified in the
      * constructor by choosing the flag <tt>type</tt>.
      */
-    enum FileType {input = 0, output = 1};
+    enum FileType
+    {
+      /**
+       * Open for input.
+       */
+      input = 0,
+      /**
+       * Open for output.
+       */
+      output = 1
+    };
 
     /**
      * Constructor.  The type of the file can be specified by choosing the
@@ -2548,7 +2558,14 @@ private:
      */
     enum MultipleEntryType
     {
-      variant, array
+      /**
+       * A variant entry.
+       */
+      variant,
+      /**
+       * An array entry.
+       */
+      array
     };
 
     /**
