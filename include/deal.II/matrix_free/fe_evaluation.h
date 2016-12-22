@@ -1481,7 +1481,7 @@ protected:
  *             Point<dim> p;
  *             for (unsigned int d=0; d<dim; ++d)
  *               p[d] = p_vect[d][v];
- *             f_value = function.value(p);
+ *             f_value[v] = function.value(p);
  *           }
  *         phi.submit_value(f_value, q);
  *       }
