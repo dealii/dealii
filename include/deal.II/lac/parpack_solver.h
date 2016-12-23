@@ -160,14 +160,44 @@ public:
    */
   enum WhichEigenvalues
   {
+    /**
+     * The algebraically largest eigenvalues.
+     */
     algebraically_largest,
+    /**
+     * The algebraically smallest eigenvalues.
+     */
     algebraically_smallest,
+    /**
+     * The eigenvalue with the largest magnitudes.
+     */
     largest_magnitude,
+    /**
+     * The eigenvalue with the smallest magnitudes.
+     */
     smallest_magnitude,
+    /**
+     * The eigenvalues with the largest real parts.
+     */
     largest_real_part,
+    /**
+     * The eigenvalues with the smallest real parts.
+     */
     smallest_real_part,
+    /**
+     * The eigenvalues with the largest imaginary parts.
+     */
     largest_imaginary_part,
+    /**
+     * The eigenvalues with the smallest imaginary parts.
+     */
     smallest_imaginary_part,
+    /**
+     * Compute half of the eigenvalues from the high end of the spectrum and
+     * the other half from the low end. If the number of requested
+     * eigenvectors is odd, then the extra eigenvector comes from the high end
+     * of the spectrum.
+     */
     both_ends
   };
 

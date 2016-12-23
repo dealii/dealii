@@ -1860,8 +1860,17 @@ public:
    */
   enum VertexKind
   {
+    /**
+     * Left vertex.
+     */
     left_vertex,
+    /**
+     * Interior vertex.
+     */
     interior_vertex,
+    /**
+     * Right vertex.
+     */
     right_vertex
   };
 

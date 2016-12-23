@@ -88,7 +88,21 @@ namespace parallel
  */
 struct VectorOperation
 {
-  enum values { unknown, insert, add };
+  enum values
+  {
+    /**
+     * The current operation is unknown.
+     */
+    unknown,
+    /**
+     * The current operation is an insertion.
+     */
+    insert,
+    /**
+     * The current operation is an addition.
+     */
+    add
+  };
 };
 
 

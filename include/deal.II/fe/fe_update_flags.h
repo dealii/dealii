@@ -355,9 +355,22 @@ namespace CellSimilarity
 {
   enum Similarity
   {
+    /**
+     * The cells differ by something besides a translation or inverted
+     * translations.
+     */
     none,
+    /**
+     * The cells differ by a translation.
+     */
     translation,
+    /**
+     * The cells differ by an inverted translation.
+     */
     inverted_translation,
+    /**
+     * The next cell is not valid.
+     */
     invalid_next_cell
   };
 }

@@ -224,26 +224,40 @@ namespace deal_II_exceptions
     /**
      * Conditionally abort the program.
      *
-     * Depending on whether disable_abort_on_exception was called, this
-     * function either aborts the program flow by printing the error message
-     * provided by @p exc and calling <tt>std::abort()</tt>, or throws @p exc
-     * instead (if @p nothrow is set to <tt>false</tt>).
+     * Depending on whether deal_II_exceptions::disable_abort_on_exception was
+     * called, this function either aborts the program flow by printing the
+     * error message provided by @p exc and calling <tt>std::abort()</tt>, or
+     * throws @p exc instead (if @p nothrow is set to <tt>false</tt>).
      *
-     * If the boolean @p nothrow is set to true and disable_abort_on_exception
-     * was called, the exception type is just printed to deallog and program
-     * flow continues. This is useful if throwing an exception is prohibited
+     * If the boolean @p nothrow is set to true and
+     * deal_II_exceptions::disable_abort_on_exception was called, the
+     * exception type is just printed to deallog and program flow
+     * continues. This is useful if throwing an exception is prohibited
      * (e.g. in a destructor with <tt>noexcept(true)</tt> or
      * <tt>throw()</tt>).
      */
     void abort (const ExceptionBase &exc, bool nothrow = false);
 
     /**
-     * An enum describing how to treat an exception in issue_error
+     * An enum describing how to treat an exception in issue_error.
      */
     enum ExceptionHandling
     {
+      /**
+       * Abort the program by calling <code>std::abort</code> unless
+       * deal_II_exceptions::disable_abort_on_exception has been called: in
+       * that case the program will throw an exception.
+       */
       abort_on_exception,
+      /**
+       * Throw the exception normally.
+       */
       throw_on_exception,
+      /**
+       * Call <code>std::abort</code> as long as
+       * deal_II_exceptions::disable_abort_on_exception has not been called:
+       * if it has, then just print a description of the exception to deallog.
+       */
       abort_nothrow_on_exception
     };
 

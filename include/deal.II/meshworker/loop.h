@@ -95,10 +95,24 @@ namespace MeshWorker
      */
     bool ghost_cells;
 
+    /**
+     * Enumeration describing when to do assembly on a face: see, e.g.,
+     * MeshWorker::LoopControl::faces_to_ghost for an example of how the value
+     * of this enumeration is interpreted in a particular circumstance.
+     */
     enum FaceOption
     {
+      /**
+       * Do not perform assembly on a face.
+       */
       never,
+      /**
+       * Perform assembly on one face.
+       */
       one,
+      /**
+       * Perform assembly on both faces.
+       */
       both
     };
 

@@ -135,7 +135,26 @@ namespace internal
     /**
      * Data type to identify cell type.
      */
-    enum CellType {cartesian=0, affine=1, general=2, undefined=3};
+    enum CellType
+    {
+      /**
+       * The cell is Cartesian.
+       */
+      cartesian = 0,
+      /**
+       * The cell may be described with an affine mapping.
+       */
+      affine    = 1,
+      /**
+       * There is no special information available for compressing the
+       * representation of the cell.
+       */
+      general   = 2,
+      /**
+       * The cell type is undefined.
+       */
+      undefined = 3
+    };
 
 
     /**

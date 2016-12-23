@@ -583,7 +583,17 @@ public:
   /* EndPoint is used to specify which of the two endpoints of the unit interval
    * is used also as quadrature point
    */
-  enum EndPoint { left,right };
+  enum EndPoint
+  {
+    /**
+     * Left end point.
+     */
+    left,
+    /**
+     * Right end point.
+     */
+    right
+  };
   /// Generate a formula with <tt>n</tt> quadrature points
   QGaussRadauChebyshev(const unsigned int n,
                        EndPoint ep=QGaussRadauChebyshev::left);

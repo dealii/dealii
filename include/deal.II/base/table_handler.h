@@ -322,9 +322,22 @@ public:
    */
   enum TextOutputFormat
   {
+    /**
+     * Print the table with headers.
+     */
     table_with_headers,
+    /**
+     * Print the table with separate lines for each column label.
+     */
     table_with_separate_column_description,
+    /**
+     * Like table_with_separate_column_description, but without aligning the
+     * column containing the column labels.
+     */
     simple_table_with_separate_column_description,
+    /**
+     * Print the table in org mode format.
+     */
     org_mode_table
   };
 

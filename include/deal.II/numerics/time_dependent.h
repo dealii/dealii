@@ -408,7 +408,14 @@ public:
    */
   enum Direction
   {
-    forward, backward
+    /**
+     * Go in the forward direction.
+     */
+    forward,
+    /**
+     * Go in the backward direction.
+     */
+    backward
   };
 
   /**
@@ -643,8 +650,17 @@ public:
    */
   enum SolutionState
   {
+    /**
+     * Solve the primal problem next.
+     */
     primal_problem = 0x0,
+    /**
+     * Solve the dual problem next.
+     */
     dual_problem   = 0x1,
+    /**
+     * Perform postprocessing next.
+     */
     postprocess    = 0x2
   };
 
@@ -1272,6 +1288,9 @@ public:
    */
   enum SolutionState
   {
+    /**
+     * Perform grid refinement next.
+     */
     grid_refinement = 0x1000
   };
 
