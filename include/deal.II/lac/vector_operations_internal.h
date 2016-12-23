@@ -885,9 +885,19 @@ namespace internal
   // innermost level, eight values are added consecutively in order to better
   // balance multiplications and additions.
 
+  // Loops are unrolled as follows: the range [first,last) is broken into
+  // @p n_chunks each of size 32 plus the @p remainder.
+  // accumulate_regular() does the work on 32*n_chunks elements employing SIMD
+  // if possible and stores the result of the operation for each chunk in @p outer_results.
+
   // The code returns the result as the last argument in order to make
   // spawning tasks simpler and use automatic template deduction.
 
+
+  /**
+   * The minimum number of chunks (each of size 32) to divide the range
+   * [first,last) into two (second part of the if branch in accumulate_recursive).
+   */
   const unsigned int vector_accumulation_recursion_threshold = 128;
 
   template <typename Operation, typename ResultType>
@@ -909,6 +919,10 @@ namespace internal
         // vec_size == 0
         outer_results[0] = ResultType();
 
+        // the variable serves two purposes: (i)  number of chunks (each 32 indices)
+        // for the given size; all results are stored in outer_results[0,n_chunks)
+        // (ii) in the SIMD case n_chunks is also a next free index in outer_results[]
+        // to which we can write after accumulate_regular() is executed.
         size_type n_chunks = vec_size / 32;
         const size_type remainder = vec_size % 32;
         Assert (remainder == 0 || n_chunks < vector_accumulation_recursion_threshold,
@@ -925,7 +939,12 @@ namespace internal
         // switch statement with fall-through to work on these values.
         if (remainder > 0)
           {
+            // if we got here, it means that (vec_size <= vector_accumulation_recursion_threshold * 32),
+            // which is to say that the domain can be split into n_chunks <= vector_accumulation_recursion_threshold:
             AssertIndexRange(n_chunks, vector_accumulation_recursion_threshold+1);
+            // split the remainder into chunks of 8, there could be up to 3
+            // such chunks since remainder < 32.
+            // Work on those chunks without any SIMD, that is we call op(index).
             const size_type inner_chunks = remainder / 8;
             Assert (inner_chunks <= 3, ExcInternalError());
             const size_type remainder_inner = remainder % 8;
@@ -964,9 +983,10 @@ namespace internal
                 break;
               }
           }
+        // make sure we worked through all indices
         AssertDimension(index, last);
 
-        // now sum the results from the chunks
+        // now sum the results from the chunks stored in outer_results[0,n_chunks)
         // recursively
         while (n_chunks > 1)
           {
@@ -986,6 +1006,8 @@ namespace internal
         const size_type new_size =
           (vec_size / (vector_accumulation_recursion_threshold * 32)) *
           vector_accumulation_recursion_threshold * 8;
+        Assert (first+3*new_size < last,
+                ExcInternalError());
         ResultType r0, r1, r2, r3;
         accumulate_recursive (op, first, first+new_size, r0);
         accumulate_recursive (op, first+new_size, first+2*new_size, r1);
@@ -1010,6 +1032,8 @@ namespace internal
                      ResultType (&outer_results)[vector_accumulation_recursion_threshold],
                      internal::bool2type<false>)
   {
+    // note that each chunk is chosen to have a width of 32, thereby the index
+    // is incremented by 4*8 for each @p i.
     for (size_type i=0; i<n_chunks; ++i)
       {
         ResultType r0 = op(index);
@@ -1045,6 +1069,12 @@ namespace internal
                      Number (&outer_results)[vector_accumulation_recursion_threshold],
                      internal::bool2type<true>)
   {
+    // we start from @p index and workout @p n_chunks each of size 32.
+    // in order employ SIMD and work on @p nvecs at a time, we split this
+    // loop yet again:
+    // First we work on (n_chunks/nvecs) chunks, where each chunk processes
+    // nvecs*(4*8) elements.
+
     const unsigned int nvecs = VectorizedArray<Number>::n_array_elements;
     const size_type regular_chunks = n_chunks/nvecs;
     for (size_type i=0; i<regular_chunks; ++i)
@@ -1069,8 +1099,13 @@ namespace internal
 
     // If we are treating a case where the vector length is not divisible by
     // the vectorization length, need a cleanup loop
+    // The remaining chunks are processed one by one starting from regular_chunks * nvecs;
+    // We do as much as possible with 2 SIMD operations within each chunk.
+    // Here we assume that nvecs < 32/2 = 16 as well as 16%nvecs==0.
     AssertIndexRange(VectorizedArray<Number>::n_array_elements,
                      17);
+    Assert (16 % nvecs == 0,
+            ExcInternalError());
     if (n_chunks % VectorizedArray<Number>::n_array_elements != 0)
       {
         VectorizedArray<Number> r0 = VectorizedArray<Number>(),
@@ -1084,6 +1119,8 @@ namespace internal
             }
         r0 += r1;
         r0.store(&outer_results[start_irreg]);
+        // update n_chunks to denote unused element in outer_results[] from
+        // which we can keep writing.
         n_chunks = start_irreg + VectorizedArray<Number>::n_array_elements;
       }
   }
@@ -1157,6 +1194,10 @@ namespace internal
         array_ptr = &small_array[0];
     };
 
+    /**
+     * An operator used by TBB to work on a given @p range of chunks
+     * [range.begin(), range.end()).
+     */
     void operator() (const tbb::blocked_range<size_type> &range) const
     {
       for (size_type i = range.begin(); i < range.end(); ++i)
