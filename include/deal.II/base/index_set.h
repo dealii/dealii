@@ -250,7 +250,7 @@ public:
   /**
    * Return the how-manyth element of this set (counted in ascending order) @p
    * global_index is. @p global_index needs to be less than the size(). This
-   * function throws an exception if the index @p global_index is not actually
+   * function returns numbers::invalid_dof_index if the index @p global_index is not actually
    * a member of this index set, i.e. if is_element(global_index) is false.
    */
   size_type index_within_set (const size_type global_index) const;
@@ -1648,7 +1648,6 @@ IndexSet::nth_index_in_set (const unsigned int n) const
 }
 
 
-
 inline
 IndexSet::size_type
 IndexSet::index_within_set (const size_type n) const
@@ -1656,7 +1655,6 @@ IndexSet::index_within_set (const size_type n) const
   // to make this call thread-safe, compress() must not be called through this
   // function
   Assert (is_compressed == true, ExcMessage ("IndexSet must be compressed."));
-  Assert (is_element(n) == true, ExcIndexNotPresent (n));
   Assert (n < size(), ExcIndexRangeType<size_type> (n, 0, size()));
 
   // check whether the index is in the largest range. use the result to
@@ -1682,6 +1680,10 @@ IndexSet::index_within_set (const size_type n) const
   std::vector<Range>::const_iterator
   p = Utilities::lower_bound(range_begin, range_end, r,
                              Range::end_compare);
+
+  // if n is not in this set
+  if (p==range_end || p->end == n || p->begin > n)
+    return numbers::invalid_dof_index;
 
   Assert(p!=ranges.end(), ExcInternalError());
   Assert(p->begin<=n, ExcInternalError());
