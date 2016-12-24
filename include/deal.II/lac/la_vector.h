@@ -176,7 +176,7 @@ namespace LinearAlgebra
     /**
      * Return the mean value of all the entries of this vector.
      */
-    virtual typename VectorSpaceVector<Number>::value_type mean_value() const;
+    virtual value_type mean_value() const;
 
     /**
      * Return the l<sub>1</sub> norm of the vector (i.e., the sum of the
