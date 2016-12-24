@@ -283,7 +283,7 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  typename VectorSpaceVector<Number>::value_type Vector<Number>::mean_value() const
+  typename Vector<Number>::value_type Vector<Number>::mean_value() const
   {
     Assert (this->size(), ExcEmptyObject());
 
