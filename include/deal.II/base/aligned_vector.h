@@ -356,7 +356,7 @@ namespace internal
       // never arrive here because they are non-trivial).
 
       if (std_cxx11::is_trivial<T>::value == true)
-        std::memcpy ((void *)(destination_+begin), source_+begin,
+        std::memcpy ((void *)(destination_+begin), (void *)(source_+begin),
                      (end-begin)*sizeof(T));
       else if (copy_source_ == false)
         for (std::size_t i=begin; i<end; ++i)
