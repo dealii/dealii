@@ -1419,7 +1419,7 @@ namespace DoFTools
     // If we have a distributed::Triangulation only allow locally_owned
     // subdomain.
     Assert (
-      (dof_handler.get_triangulation().locally_owned_subdomain() == numbers::invalid_subdomain_id)
+      (dof_handler.get_triangulation().locally_owned_subdomain() == 0)
       ||
       (subdomain == dof_handler.get_triangulation().locally_owned_subdomain()),
       ExcMessage ("For parallel::distributed::Triangulation objects and "

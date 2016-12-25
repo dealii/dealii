@@ -70,7 +70,7 @@ namespace DoFTools
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
     Assert (
-      (dof.get_triangulation().locally_owned_subdomain() == numbers::invalid_subdomain_id)
+      (dof.get_triangulation().locally_owned_subdomain() == 0)
       ||
       (subdomain_id == numbers::invalid_subdomain_id)
       ||
@@ -134,7 +134,7 @@ namespace DoFTools
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
     Assert (
-      (dof.get_triangulation().locally_owned_subdomain() == numbers::invalid_subdomain_id)
+      (dof.get_triangulation().locally_owned_subdomain() == 0)
       ||
       (subdomain_id == numbers::invalid_subdomain_id)
       ||
