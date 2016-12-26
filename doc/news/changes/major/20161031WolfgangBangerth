@@ -18,4 +18,9 @@ reference to the same structure, we just grow the structure
 itself. Functions that never used the new members of the structure
 will continue to work as they always did.
 <br>
-(Wolfgang Bangerth, 2016/10/31)
+As an example of what is possible, the
+DataPostprocessorInputs classes that are now handed to the evaluation
+functions contain a way to access the cell that is currently being
+evaluated.
+<br>
+(Wolfgang Bangerth, 2016/10/31-2016/12/21)

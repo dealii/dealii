@@ -167,6 +167,11 @@ build_one_patch
                   if (update_flags & update_quadrature_points)
                     scratch_data.patch_values_scalar.evaluation_points = this_fe_patch_values.get_quadrature_points();
 
+                  const typename DoFHandlerType::active_cell_iterator dh_cell(&cell_and_index->first->get_triangulation(),
+                                                                              cell_and_index->first->level(),
+                                                                              cell_and_index->first->index(),
+                                                                              this->dof_data[dataset]->dof_handler);
+                  scratch_data.patch_values_scalar.template set_cell<DoFHandlerType> (dh_cell);
 
                   postprocessor->
                   evaluate_scalar_field(scratch_data.patch_values_scalar,
@@ -190,6 +195,12 @@ build_one_patch
 
                   if (update_flags & update_quadrature_points)
                     scratch_data.patch_values_system.evaluation_points = this_fe_patch_values.get_quadrature_points();
+
+                  const typename DoFHandlerType::active_cell_iterator dh_cell(&cell_and_index->first->get_triangulation(),
+                                                                              cell_and_index->first->level(),
+                                                                              cell_and_index->first->index(),
+                                                                              this->dof_data[dataset]->dof_handler);
+                  scratch_data.patch_values_system.template set_cell<DoFHandlerType> (dh_cell);
 
                   postprocessor->
                   evaluate_vector_field(scratch_data.patch_values_system,
