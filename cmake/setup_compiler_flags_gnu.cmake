@@ -111,6 +111,12 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-c++11-extensions")
 
   #
+  # Disable a diagnostic that warns about potentially uninstantiated static
+  # members. This leads to a ton of false positives.
+  #
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-undefined-var-template")
+
+  #
   # Clang versions prior to 3.6 emit a lot of false positives wrt
   # "-Wunused-function". Also suppress warnings for Xcode older than 6.3
   # (which is equivalent to clang < 3.6).
