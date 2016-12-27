@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2015 by the deal.II authors
+// Copyright (C) 2010 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,12 +30,21 @@ int main()
   is1.add_range(0, 2);
   is1.add_range(5,8);
 
-  deallog << is1.n_elements() << ", " << is1.pop_back() << std::endl;
-  deallog << is1.n_elements() << ", " << is1.pop_back() << std::endl;
-  deallog << is1.n_elements() << ", " << is1.pop_back() << std::endl;
+  deallog << is1.n_elements() << ", ";
+  deallog << is1.pop_back() << std::endl;
+
+  deallog << is1.n_elements() << ", ";
+  deallog << is1.pop_back() << std::endl;
+
+  deallog << is1.n_elements() << ", ";
+  deallog << is1.pop_back() << std::endl;
+
 
   is1.add_index(9);
 
-  deallog << is1.n_elements() << ", " << is1.pop_back() << std::endl;
-  deallog << is1.n_elements() << ", " << is1.pop_back() << std::endl;
+  deallog << is1.n_elements() << ", ";
+  deallog << is1.pop_back() << std::endl;
+
+  deallog << is1.n_elements() << ", ";
+  deallog << is1.pop_back() << std::endl;
 }
