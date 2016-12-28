@@ -205,6 +205,41 @@ namespace DoFTools
   };
 
   /**
+   * Take a vector of values which live on cells (e.g. an error per cell) and
+   * distribute it to the dofs in such a way that a finite element field
+   * results, which can then be further processed, e.g. for output. You should
+   * note that the resulting field will not be continuous at hanging nodes.
+   * This can, however, easily be arranged by calling the appropriate @p
+   * distribute function of a ConstraintMatrix object created for this
+   * DoFHandler object, after the vector has been fully assembled.
+   *
+   * It is assumed that the number of elements in @p cell_data equals the
+   * number of active cells and that the number of elements in @p dof_data
+   * equals <tt>dof_handler.n_dofs()</tt>.
+   *
+   * Note that the input vector may be a vector of any data type as long as it
+   * is convertible to @p double.  The output vector, being a data vector on a
+   * DoF handler, always consists of elements of type @p double.
+   *
+   * In case the finite element used by this DoFHandler consists of more than
+   * one component, you need to specify which component in the output vector
+   * should be used to store the finite element field in; the default is zero
+   * (no other value is allowed if the finite element consists only of one
+   * component). All other components of the vector remain untouched, i.e.
+   * their contents are not changed.
+   *
+   * This function cannot be used if the finite element in use has shape
+   * functions that are non-zero in more than one vector component (in deal.II
+   * speak: they are non-primitive).
+   */
+  template <typename DoFHandlerType, typename Number>
+  void
+  distribute_cell_to_dof_vector (const DoFHandlerType  &dof_handler,
+                                 const Vector<Number>  &cell_data,
+                                 Vector<double>        &dof_data,
+                                 const unsigned int     component = 0);
+
+  /**
    * @name Functions to support code that generically uses both DoFHandler and hp::DoFHandler
    * @{
    */
@@ -1143,41 +1178,6 @@ namespace DoFTools
    const ComponentMask      &component_mask = ComponentMask());
 
   /**
-   * Take a vector of values which live on cells (e.g. an error per cell) and
-   * distribute it to the dofs in such a way that a finite element field
-   * results, which can then be further processed, e.g. for output. You should
-   * note that the resulting field will not be continuous at hanging nodes.
-   * This can, however, easily be arranged by calling the appropriate @p
-   * distribute function of a ConstraintMatrix object created for this
-   * DoFHandler object, after the vector has been fully assembled.
-   *
-   * It is assumed that the number of elements in @p cell_data equals the
-   * number of active cells and that the number of elements in @p dof_data
-   * equals <tt>dof_handler.n_dofs()</tt>.
-   *
-   * Note that the input vector may be a vector of any data type as long as it
-   * is convertible to @p double.  The output vector, being a data vector on a
-   * DoF handler, always consists of elements of type @p double.
-   *
-   * In case the finite element used by this DoFHandler consists of more than
-   * one component, you need to specify which component in the output vector
-   * should be used to store the finite element field in; the default is zero
-   * (no other value is allowed if the finite element consists only of one
-   * component). All other components of the vector remain untouched, i.e.
-   * their contents are not changed.
-   *
-   * This function cannot be used if the finite element in use has shape
-   * functions that are non-zero in more than one vector component (in deal.II
-   * speak: they are non-primitive).
-   */
-  template <typename DoFHandlerType, typename Number>
-  void
-  distribute_cell_to_dof_vector (const DoFHandlerType  &dof_handler,
-                                 const Vector<Number>  &cell_data,
-                                 Vector<double>        &dof_data,
-                                 const unsigned int     component = 0);
-
-  /**
    * @}
    */
 
@@ -1185,6 +1185,18 @@ namespace DoFTools
    * @name Identifying subsets of degrees of freedom with particular properties
    * @{
    */
+
+  /**
+   * Select all dofs that will be constrained by interface constraints, i.e.
+   * all hanging nodes.
+   *
+   * The size of @p selected_dofs shall equal <tt>dof_handler.n_dofs()</tt>.
+   * Previous contents of this array or overwritten.
+   */
+  template <int dim, int spacedim>
+  void
+  extract_hanging_node_dofs (const DoFHandler<dim,spacedim> &dof_handler,
+                             std::vector<bool>              &selected_dofs);
 
   /**
    * Extract the indices of the degrees of freedom belonging to certain vector
@@ -1436,26 +1448,6 @@ namespace DoFTools
   extract_constant_modes (const DoFHandlerType            &dof_handler,
                           const ComponentMask             &component_mask,
                           std::vector<std::vector<bool> > &constant_modes);
-
-  /**
-   * @}
-   */
-  /**
-   * @name Hanging nodes
-   * @{
-   */
-
-  /**
-   * Select all dofs that will be constrained by interface constraints, i.e.
-   * all hanging nodes.
-   *
-   * The size of @p selected_dofs shall equal <tt>dof_handler.n_dofs()</tt>.
-   * Previous contents of this array or overwritten.
-   */
-  template <int dim, int spacedim>
-  void
-  extract_hanging_node_dofs (const DoFHandler<dim,spacedim> &dof_handler,
-                             std::vector<bool>              &selected_dofs);
   //@}
 
   /**
@@ -1699,6 +1691,62 @@ namespace DoFTools
    * where the subdomains consist of small numbers of cells only.
    */
   //@{
+
+  /**
+   * Return the set of degrees of freedom that live on a set of cells (i.e., a
+   * patch) described by the argument.
+   *
+   * Patches are often used in defining error estimators that require the
+   * solution of a local problem on the patch surrounding each of the cells of
+   * the mesh. You can get a list of cells that form the patch around a given
+   * cell using GridTools::get_patch_around_cell(). While
+   * DoFTools::count_dofs_on_patch() can be used to determine the size of
+   * these local problems, so that one can assemble the local system and then
+   * solve it, it is still necessary to provide a mapping between the global
+   * indices of the degrees of freedom that live on the patch and a local
+   * enumeration. This function provides such a local enumeration by returning
+   * the set of degrees of freedom that live on the patch.
+   *
+   * Since this set is returned in the form of a std::vector, one can also
+   * think of it as a mapping
+   * @code
+   *   i -> global_dof_index
+   * @endcode
+   * where <code>i</code> is an index into the returned vector (i.e., a the
+   * <i>local</i> index of a degree of freedom on the patch) and
+   * <code>global_dof_index</code> is the global index of a degree of freedom
+   * located on the patch. The array returned has size equal to
+   * DoFTools::count_dofs_on_patch().
+   *
+   * @note The array returned is sorted by global DoF index. Consequently, if
+   * one considers the index into this array a local DoF index, then the local
+   * system that results retains the block structure of the global system.
+   *
+   * @tparam DoFHandlerType A type that is either DoFHandler or
+   * hp::DoFHandler. In C++, the compiler can not determine the type of
+   * <code>DoFHandlerType</code> from the function call. You need to specify
+   * it as an explicit template argument following the function name.
+   *
+   * @param patch A collection of cells within an object of type
+   * DoFHandlerType
+   *
+   * @return A list of those global degrees of freedom located on the patch,
+   * as defined above.
+   *
+   * @note In the context of a parallel distributed computation, it only makes
+   * sense to call this function on patches around locally owned cells. This
+   * is because the neighbors of locally owned cells are either locally owned
+   * themselves, or ghost cells. For both, we know that these are in fact the
+   * real cells of the complete, parallel triangulation. We can also query the
+   * degrees of freedom on these. In other words, this function can only work
+   * if all cells in the patch are either locally owned or ghost cells.
+   *
+   * @author Arezou Ghesmati, Wolfgang Bangerth, 2014
+   */
+  template <typename DoFHandlerType>
+  std::vector<types::global_dof_index>
+  get_dofs_on_patch (const std::vector<typename DoFHandlerType::active_cell_iterator> &patch);
+
   /**
    * Creates a sparsity pattern, which lists
    * the degrees of freedom associated to each cell on the given
@@ -2005,61 +2053,6 @@ namespace DoFTools
   template <typename DoFHandlerType>
   unsigned int
   count_dofs_on_patch (const std::vector<typename DoFHandlerType::active_cell_iterator> &patch);
-
-  /**
-   * Return the set of degrees of freedom that live on a set of cells (i.e., a
-   * patch) described by the argument.
-   *
-   * Patches are often used in defining error estimators that require the
-   * solution of a local problem on the patch surrounding each of the cells of
-   * the mesh. You can get a list of cells that form the patch around a given
-   * cell using GridTools::get_patch_around_cell(). While
-   * DoFTools::count_dofs_on_patch() can be used to determine the size of
-   * these local problems, so that one can assemble the local system and then
-   * solve it, it is still necessary to provide a mapping between the global
-   * indices of the degrees of freedom that live on the patch and a local
-   * enumeration. This function provides such a local enumeration by returning
-   * the set of degrees of freedom that live on the patch.
-   *
-   * Since this set is returned in the form of a std::vector, one can also
-   * think of it as a mapping
-   * @code
-   *   i -> global_dof_index
-   * @endcode
-   * where <code>i</code> is an index into the returned vector (i.e., a the
-   * <i>local</i> index of a degree of freedom on the patch) and
-   * <code>global_dof_index</code> is the global index of a degree of freedom
-   * located on the patch. The array returned has size equal to
-   * DoFTools::count_dofs_on_patch().
-   *
-   * @note The array returned is sorted by global DoF index. Consequently, if
-   * one considers the index into this array a local DoF index, then the local
-   * system that results retains the block structure of the global system.
-   *
-   * @tparam DoFHandlerType A type that is either DoFHandler or
-   * hp::DoFHandler. In C++, the compiler can not determine the type of
-   * <code>DoFHandlerType</code> from the function call. You need to specify
-   * it as an explicit template argument following the function name.
-   *
-   * @param patch A collection of cells within an object of type
-   * DoFHandlerType
-   *
-   * @return A list of those global degrees of freedom located on the patch,
-   * as defined above.
-   *
-   * @note In the context of a parallel distributed computation, it only makes
-   * sense to call this function on patches around locally owned cells. This
-   * is because the neighbors of locally owned cells are either locally owned
-   * themselves, or ghost cells. For both, we know that these are in fact the
-   * real cells of the complete, parallel triangulation. We can also query the
-   * degrees of freedom on these. In other words, this function can only work
-   * if all cells in the patch are either locally owned or ghost cells.
-   *
-   * @author Arezou Ghesmati, Wolfgang Bangerth, 2014
-   */
-  template <typename DoFHandlerType>
-  std::vector<types::global_dof_index>
-  get_dofs_on_patch (const std::vector<typename DoFHandlerType::active_cell_iterator> &patch);
 
   /**
    * @}
