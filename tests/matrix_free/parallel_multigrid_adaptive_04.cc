@@ -15,7 +15,7 @@
 
 
 
-// same as parallel_multigird_adaptive_02, but using mg::SmootherRelaxation
+// same as parallel_multigrid_adaptive_02, but using mg::SmootherRelaxation
 // rather than MGSmootherPrecondition
 
 #include "../tests.h"
