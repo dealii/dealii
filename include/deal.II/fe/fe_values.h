@@ -380,9 +380,9 @@ namespace FEValuesViews
 
   private:
     /**
-     * A reference to the FEValuesBase object we operate on.
+     * A pointer to the FEValuesBase object we operate on.
      */
-    const FEValuesBase<dim,spacedim> &fe_values;
+    const SmartPointer<const FEValuesBase<dim,spacedim> > fe_values;
 
     /**
      * The single scalar component this view represents of the FEValuesBase
@@ -854,9 +854,9 @@ namespace FEValuesViews
 
   private:
     /**
-     * A reference to the FEValuesBase object we operate on.
+     * A pointer to the FEValuesBase object we operate on.
      */
-    const FEValuesBase<dim,spacedim> &fe_values;
+    const SmartPointer<const FEValuesBase<dim,spacedim> > fe_values;
 
     /**
      * The first component of the vector this view represents of the
@@ -1070,9 +1070,9 @@ namespace FEValuesViews
 
   private:
     /**
-     * A reference to the FEValuesBase object we operate on.
+     * A pointer to the FEValuesBase object we operate on.
      */
-    const FEValuesBase<dim, spacedim> &fe_values;
+    const SmartPointer<const FEValuesBase<dim, spacedim> > fe_values;
 
     /**
      * The first component of the vector this view represents of the
@@ -1275,9 +1275,9 @@ namespace FEValuesViews
 
   private:
     /**
-     * A reference to the FEValuesBase object we operate on.
+     * A pointer to the FEValuesBase object we operate on.
      */
-    const FEValuesBase<dim, spacedim> &fe_values;
+    const SmartPointer<const FEValuesBase<dim, spacedim> > fe_values;
 
     /**
      * The first component of the vector this view represents of the
@@ -3204,18 +3204,18 @@ namespace FEValuesViews
                                const unsigned int q_point) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
-    Assert (shape_function < fe_values.fe->dofs_per_cell,
-            ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
-    Assert (fe_values.update_flags & update_values,
+    Assert (shape_function < fe_values->fe->dofs_per_cell,
+            ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
+    Assert (fe_values->update_flags & update_values,
             typename FVB::ExcAccessToUninitializedField("update_values"));
 
     // an adaptation of the FEValuesBase::shape_value_component function
     // except that here we know the component as fixed and we have
     // pre-computed and cached a bunch of information. See the comments there.
     if (shape_function_data[shape_function].is_nonzero_shape_function_component)
-      return fe_values.finite_element_output.shape_values(shape_function_data[shape_function]
-                                                          .row_index,
-                                                          q_point);
+      return fe_values->finite_element_output.shape_values(shape_function_data[shape_function]
+                                                           .row_index,
+                                                           q_point);
     else
       return 0;
   }
@@ -3230,9 +3230,9 @@ namespace FEValuesViews
                                   const unsigned int q_point) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
-    Assert (shape_function < fe_values.fe->dofs_per_cell,
-            ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
-    Assert (fe_values.update_flags & update_gradients,
+    Assert (shape_function < fe_values->fe->dofs_per_cell,
+            ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
+    Assert (fe_values->update_flags & update_gradients,
             typename FVB::ExcAccessToUninitializedField("update_gradients"));
 
     // an adaptation of the
@@ -3242,8 +3242,8 @@ namespace FEValuesViews
     // pre-computed and cached a bunch of
     // information. See the comments there.
     if (shape_function_data[shape_function].is_nonzero_shape_function_component)
-      return fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function]
-                                                             .row_index][q_point];
+      return fe_values->finite_element_output.shape_gradients[shape_function_data[shape_function]
+                                                              .row_index][q_point];
     else
       return gradient_type();
   }
@@ -3257,9 +3257,9 @@ namespace FEValuesViews
                                  const unsigned int q_point) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
-    Assert (shape_function < fe_values.fe->dofs_per_cell,
-            ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
-    Assert (fe_values.update_flags & update_hessians,
+    Assert (shape_function < fe_values->fe->dofs_per_cell,
+            ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
+    Assert (fe_values->update_flags & update_hessians,
             typename FVB::ExcAccessToUninitializedField("update_hessians"));
 
     // an adaptation of the
@@ -3269,7 +3269,7 @@ namespace FEValuesViews
     // pre-computed and cached a bunch of
     // information. See the comments there.
     if (shape_function_data[shape_function].is_nonzero_shape_function_component)
-      return fe_values.finite_element_output.shape_hessians[shape_function_data[shape_function].row_index][q_point];
+      return fe_values->finite_element_output.shape_hessians[shape_function_data[shape_function].row_index][q_point];
     else
       return hessian_type();
   }
@@ -3283,9 +3283,9 @@ namespace FEValuesViews
                                           const unsigned int q_point) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
-    Assert (shape_function < fe_values.fe->dofs_per_cell,
-            ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
-    Assert (fe_values.update_flags & update_3rd_derivatives,
+    Assert (shape_function < fe_values->fe->dofs_per_cell,
+            ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
+    Assert (fe_values->update_flags & update_3rd_derivatives,
             typename FVB::ExcAccessToUninitializedField("update_3rd_derivatives"));
 
     // an adaptation of the
@@ -3295,7 +3295,7 @@ namespace FEValuesViews
     // pre-computed and cached a bunch of
     // information. See the comments there.
     if (shape_function_data[shape_function].is_nonzero_shape_function_component)
-      return fe_values.finite_element_output.shape_3rd_derivatives[shape_function_data[shape_function].row_index][q_point];
+      return fe_values->finite_element_output.shape_3rd_derivatives[shape_function_data[shape_function].row_index][q_point];
     else
       return third_derivative_type();
   }
@@ -3309,9 +3309,9 @@ namespace FEValuesViews
                                const unsigned int q_point) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
-    Assert (shape_function < fe_values.fe->dofs_per_cell,
-            ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
-    Assert (fe_values.update_flags & update_values,
+    Assert (shape_function < fe_values->fe->dofs_per_cell,
+            ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
+    Assert (fe_values->update_flags & update_values,
             typename FVB::ExcAccessToUninitializedField("update_values"));
 
     // same as for the scalar case except
@@ -3323,7 +3323,7 @@ namespace FEValuesViews
       {
         value_type return_value;
         return_value[shape_function_data[shape_function].single_nonzero_component_index]
-          = fe_values.finite_element_output.shape_values(snc,q_point);
+          = fe_values->finite_element_output.shape_values(snc,q_point);
         return return_value;
       }
     else
@@ -3332,7 +3332,7 @@ namespace FEValuesViews
         for (unsigned int d=0; d<dim; ++d)
           if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
             return_value[d]
-              = fe_values.finite_element_output.shape_values(shape_function_data[shape_function].row_index[d],q_point);
+              = fe_values->finite_element_output.shape_values(shape_function_data[shape_function].row_index[d],q_point);
 
         return return_value;
       }
@@ -3347,9 +3347,9 @@ namespace FEValuesViews
                                   const unsigned int q_point) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
-    Assert (shape_function < fe_values.fe->dofs_per_cell,
-            ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
-    Assert (fe_values.update_flags & update_gradients,
+    Assert (shape_function < fe_values->fe->dofs_per_cell,
+            ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
+    Assert (fe_values->update_flags & update_gradients,
             typename FVB::ExcAccessToUninitializedField("update_gradients"));
 
     // same as for the scalar case except
@@ -3361,7 +3361,7 @@ namespace FEValuesViews
       {
         gradient_type return_value;
         return_value[shape_function_data[shape_function].single_nonzero_component_index]
-          = fe_values.finite_element_output.shape_gradients[snc][q_point];
+          = fe_values->finite_element_output.shape_gradients[snc][q_point];
         return return_value;
       }
     else
@@ -3370,7 +3370,7 @@ namespace FEValuesViews
         for (unsigned int d=0; d<dim; ++d)
           if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
             return_value[d]
-              = fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[d]][q_point];
+              = fe_values->finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[d]][q_point];
 
         return return_value;
       }
@@ -3387,9 +3387,9 @@ namespace FEValuesViews
     // this function works like in
     // the case above
     typedef FEValuesBase<dim,spacedim> FVB;
-    Assert (shape_function < fe_values.fe->dofs_per_cell,
-            ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
-    Assert (fe_values.update_flags & update_gradients,
+    Assert (shape_function < fe_values->fe->dofs_per_cell,
+            ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
+    Assert (fe_values->update_flags & update_gradients,
             typename FVB::ExcAccessToUninitializedField("update_gradients"));
 
     // same as for the scalar case except
@@ -3399,14 +3399,14 @@ namespace FEValuesViews
       return divergence_type();
     else if (snc != -1)
       return
-        fe_values.finite_element_output.shape_gradients[snc][q_point][shape_function_data[shape_function].single_nonzero_component_index];
+        fe_values->finite_element_output.shape_gradients[snc][q_point][shape_function_data[shape_function].single_nonzero_component_index];
     else
       {
         divergence_type return_value = 0;
         for (unsigned int d=0; d<dim; ++d)
           if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
             return_value
-            += fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[d]][q_point][d];
+            += fe_values->finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[d]][q_point][d];
 
         return return_value;
       }
@@ -3422,9 +3422,9 @@ namespace FEValuesViews
     // this function works like in the case above
     typedef FEValuesBase<dim,spacedim> FVB;
 
-    Assert (shape_function < fe_values.fe->dofs_per_cell,
-            ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
-    Assert (fe_values.update_flags & update_gradients,
+    Assert (shape_function < fe_values->fe->dofs_per_cell,
+            ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
+    Assert (fe_values->update_flags & update_gradients,
             typename FVB::ExcAccessToUninitializedField("update_gradients"));
     // same as for the scalar case except that we have one more index
     const int snc = shape_function_data[shape_function].single_nonzero_component;
@@ -3452,9 +3452,9 @@ namespace FEValuesViews
               // can only be zero
               // or one in 2d
               if (shape_function_data[shape_function].single_nonzero_component_index == 0)
-                return_value[0] = -1.0 * fe_values.finite_element_output.shape_gradients[snc][q_point][1];
+                return_value[0] = -1.0 * fe_values->finite_element_output.shape_gradients[snc][q_point][1];
               else
-                return_value[0] = fe_values.finite_element_output.shape_gradients[snc][q_point][0];
+                return_value[0] = fe_values->finite_element_output.shape_gradients[snc][q_point][0];
 
               return return_value;
             }
@@ -3467,11 +3467,11 @@ namespace FEValuesViews
 
               if (shape_function_data[shape_function].is_nonzero_shape_function_component[0])
                 return_value[0]
-                -= fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][1];
+                -= fe_values->finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][1];
 
               if (shape_function_data[shape_function].is_nonzero_shape_function_component[1])
                 return_value[0]
-                += fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][0];
+                += fe_values->finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][0];
 
               return return_value;
             }
@@ -3488,23 +3488,23 @@ namespace FEValuesViews
                 case 0:
                 {
                   return_value[0] = 0;
-                  return_value[1] = fe_values.finite_element_output.shape_gradients[snc][q_point][2];
-                  return_value[2] = -1.0 * fe_values.finite_element_output.shape_gradients[snc][q_point][1];
+                  return_value[1] = fe_values->finite_element_output.shape_gradients[snc][q_point][2];
+                  return_value[2] = -1.0 * fe_values->finite_element_output.shape_gradients[snc][q_point][1];
                   return return_value;
                 }
 
                 case 1:
                 {
-                  return_value[0] = -1.0 * fe_values.finite_element_output.shape_gradients[snc][q_point][2];
+                  return_value[0] = -1.0 * fe_values->finite_element_output.shape_gradients[snc][q_point][2];
                   return_value[1] = 0;
-                  return_value[2] = fe_values.finite_element_output.shape_gradients[snc][q_point][0];
+                  return_value[2] = fe_values->finite_element_output.shape_gradients[snc][q_point][0];
                   return return_value;
                 }
 
                 default:
                 {
-                  return_value[0] = fe_values.finite_element_output.shape_gradients[snc][q_point][1];
-                  return_value[1] = -1.0 * fe_values.finite_element_output.shape_gradients[snc][q_point][0];
+                  return_value[0] = fe_values->finite_element_output.shape_gradients[snc][q_point][1];
+                  return_value[1] = -1.0 * fe_values->finite_element_output.shape_gradients[snc][q_point][0];
                   return_value[2] = 0;
                   return return_value;
                 }
@@ -3521,25 +3521,25 @@ namespace FEValuesViews
               if (shape_function_data[shape_function].is_nonzero_shape_function_component[0])
                 {
                   return_value[1]
-                  += fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][2];
+                  += fe_values->finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][2];
                   return_value[2]
-                  -= fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][1];
+                  -= fe_values->finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[0]][q_point][1];
                 }
 
               if (shape_function_data[shape_function].is_nonzero_shape_function_component[1])
                 {
                   return_value[0]
-                  -= fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][2];
+                  -= fe_values->finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][2];
                   return_value[2]
-                  += fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][0];
+                  += fe_values->finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[1]][q_point][0];
                 }
 
               if (shape_function_data[shape_function].is_nonzero_shape_function_component[2])
                 {
                   return_value[0]
-                  += fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[2]][q_point][1];
+                  += fe_values->finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[2]][q_point][1];
                   return_value[1]
-                  -= fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[2]][q_point][0];
+                  -= fe_values->finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[2]][q_point][0];
                 }
 
               return return_value;
@@ -3560,9 +3560,9 @@ namespace FEValuesViews
     // this function works like in
     // the case above
     typedef FEValuesBase<dim,spacedim> FVB;
-    Assert (shape_function < fe_values.fe->dofs_per_cell,
-            ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
-    Assert (fe_values.update_flags & update_hessians,
+    Assert (shape_function < fe_values->fe->dofs_per_cell,
+            ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
+    Assert (fe_values->update_flags & update_hessians,
             typename FVB::ExcAccessToUninitializedField("update_hessians"));
 
     // same as for the scalar case except
@@ -3574,7 +3574,7 @@ namespace FEValuesViews
       {
         hessian_type return_value;
         return_value[shape_function_data[shape_function].single_nonzero_component_index]
-          = fe_values.finite_element_output.shape_hessians[snc][q_point];
+          = fe_values->finite_element_output.shape_hessians[snc][q_point];
         return return_value;
       }
     else
@@ -3583,7 +3583,7 @@ namespace FEValuesViews
         for (unsigned int d=0; d<dim; ++d)
           if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
             return_value[d]
-              = fe_values.finite_element_output.shape_hessians[shape_function_data[shape_function].row_index[d]][q_point];
+              = fe_values->finite_element_output.shape_hessians[shape_function_data[shape_function].row_index[d]][q_point];
 
         return return_value;
       }
@@ -3598,9 +3598,9 @@ namespace FEValuesViews
     // this function works like in
     // the case above
     typedef FEValuesBase<dim,spacedim> FVB;
-    Assert (shape_function < fe_values.fe->dofs_per_cell,
-            ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
-    Assert (fe_values.update_flags & update_3rd_derivatives,
+    Assert (shape_function < fe_values->fe->dofs_per_cell,
+            ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
+    Assert (fe_values->update_flags & update_3rd_derivatives,
             typename FVB::ExcAccessToUninitializedField("update_3rd_derivatives"));
 
     // same as for the scalar case except
@@ -3612,7 +3612,7 @@ namespace FEValuesViews
       {
         third_derivative_type return_value;
         return_value[shape_function_data[shape_function].single_nonzero_component_index]
-          = fe_values.finite_element_output.shape_3rd_derivatives[snc][q_point];
+          = fe_values->finite_element_output.shape_3rd_derivatives[snc][q_point];
         return return_value;
       }
     else
@@ -3621,7 +3621,7 @@ namespace FEValuesViews
         for (unsigned int d=0; d<dim; ++d)
           if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
             return_value[d]
-              = fe_values.finite_element_output.shape_3rd_derivatives[shape_function_data[shape_function].row_index[d]][q_point];
+              = fe_values->finite_element_output.shape_3rd_derivatives[shape_function_data[shape_function].row_index[d]][q_point];
 
         return return_value;
       }
@@ -3712,9 +3712,9 @@ namespace FEValuesViews
                                             const unsigned int q_point) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
-    Assert (shape_function < fe_values.fe->dofs_per_cell,
-            ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
-    Assert (fe_values.update_flags & update_gradients,
+    Assert (shape_function < fe_values->fe->dofs_per_cell,
+            ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
+    Assert (fe_values->update_flags & update_gradients,
             typename FVB::ExcAccessToUninitializedField("update_gradients"));
 
     // same as for the scalar case except
@@ -3724,14 +3724,14 @@ namespace FEValuesViews
       return symmetric_gradient_type();
     else if (snc != -1)
       return symmetrize_single_row (shape_function_data[shape_function].single_nonzero_component_index,
-                                    fe_values.finite_element_output.shape_gradients[snc][q_point]);
+                                    fe_values->finite_element_output.shape_gradients[snc][q_point]);
     else
       {
         gradient_type return_value;
         for (unsigned int d=0; d<dim; ++d)
           if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
             return_value[d]
-              = fe_values.finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[d]][q_point];
+              = fe_values->finite_element_output.shape_gradients[shape_function_data[shape_function].row_index[d]][q_point];
 
         return symmetrize(return_value);
       }
@@ -3746,9 +3746,9 @@ namespace FEValuesViews
                                             const unsigned int q_point) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
-    Assert (shape_function < fe_values.fe->dofs_per_cell,
-            ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
-    Assert (fe_values.update_flags & update_values,
+    Assert (shape_function < fe_values->fe->dofs_per_cell,
+            ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
+    Assert (fe_values->update_flags & update_values,
             typename FVB::ExcAccessToUninitializedField("update_values"));
 
     // similar to the vector case where we
@@ -3771,7 +3771,7 @@ namespace FEValuesViews
         const unsigned int comp =
           shape_function_data[shape_function].single_nonzero_component_index;
         return_value[value_type::unrolled_to_component_indices(comp)]
-          = fe_values.finite_element_output.shape_values(snc,q_point);
+          = fe_values->finite_element_output.shape_values(snc,q_point);
         return return_value;
       }
     else
@@ -3780,7 +3780,7 @@ namespace FEValuesViews
         for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
           if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
             return_value[value_type::unrolled_to_component_indices(d)]
-              = fe_values.finite_element_output.shape_values(shape_function_data[shape_function].row_index[d],q_point);
+              = fe_values->finite_element_output.shape_values(shape_function_data[shape_function].row_index[d],q_point);
         return return_value;
       }
   }
@@ -3793,9 +3793,9 @@ namespace FEValuesViews
                                                 const unsigned int q_point) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
-    Assert (shape_function < fe_values.fe->dofs_per_cell,
-            ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
-    Assert (fe_values.update_flags & update_gradients,
+    Assert (shape_function < fe_values->fe->dofs_per_cell,
+            ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
+    Assert (fe_values->update_flags & update_gradients,
             typename FVB::ExcAccessToUninitializedField("update_gradients"));
 
     const int snc = shape_function_data[shape_function].single_nonzero_component;
@@ -3857,7 +3857,7 @@ namespace FEValuesViews
         // b_jj := \dfrac{\partial phi_{ii,jj}}{\partial x_jj}.
         // again, all other entries of 'b' are
         // zero
-        const dealii::Tensor<1, spacedim> phi_grad = fe_values.finite_element_output.shape_gradients[snc][q_point];
+        const dealii::Tensor<1, spacedim> phi_grad = fe_values->finite_element_output.shape_gradients[snc][q_point];
 
         divergence_type return_value;
         return_value[ii] = phi_grad[jj];
@@ -3883,9 +3883,9 @@ namespace FEValuesViews
                                    const unsigned int q_point) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
-    Assert (shape_function < fe_values.fe->dofs_per_cell,
-            ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
-    Assert (fe_values.update_flags & update_values,
+    Assert (shape_function < fe_values->fe->dofs_per_cell,
+            ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
+    Assert (fe_values->update_flags & update_values,
             typename FVB::ExcAccessToUninitializedField("update_values"));
 
     // similar to the vector case where we
@@ -3908,7 +3908,7 @@ namespace FEValuesViews
         const unsigned int comp =
           shape_function_data[shape_function].single_nonzero_component_index;
         const TableIndices<2> indices = dealii::Tensor<2,spacedim>::unrolled_to_component_indices(comp);
-        return_value[indices] = fe_values.finite_element_output.shape_values(snc,q_point);
+        return_value[indices] = fe_values->finite_element_output.shape_values(snc,q_point);
         return return_value;
       }
     else
@@ -3919,7 +3919,7 @@ namespace FEValuesViews
             {
               const TableIndices<2> indices = dealii::Tensor<2,spacedim>::unrolled_to_component_indices(d);
               return_value[indices]
-                = fe_values.finite_element_output.shape_values(shape_function_data[shape_function].row_index[d],q_point);
+                = fe_values->finite_element_output.shape_values(shape_function_data[shape_function].row_index[d],q_point);
             }
         return return_value;
       }
@@ -3933,9 +3933,9 @@ namespace FEValuesViews
                                        const unsigned int q_point) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
-    Assert (shape_function < fe_values.fe->dofs_per_cell,
-            ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
-    Assert (fe_values.update_flags & update_gradients,
+    Assert (shape_function < fe_values->fe->dofs_per_cell,
+            ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
+    Assert (fe_values->update_flags & update_gradients,
             typename FVB::ExcAccessToUninitializedField("update_gradients"));
 
     const int snc = shape_function_data[shape_function].single_nonzero_component;
@@ -3970,7 +3970,7 @@ namespace FEValuesViews
         const unsigned int ii = indices[0];
         const unsigned int jj = indices[1];
 
-        const dealii::Tensor<1, spacedim> phi_grad = fe_values.finite_element_output.shape_gradients[snc][q_point];
+        const dealii::Tensor<1, spacedim> phi_grad = fe_values->finite_element_output.shape_gradients[snc][q_point];
 
         divergence_type return_value;
         return_value[jj] = phi_grad[ii];
