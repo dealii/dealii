@@ -585,6 +585,13 @@ namespace LinearAlgebra
                        const Number b, const VectorSpaceVector<Number> &W);
 
       /**
+       * A collective add operation: This function adds a whole set of values
+       * stored in @p values to the vector components specified by @p indices.
+       */
+      virtual void add (const std::vector<size_type> &indices,
+                        const std::vector<Number>    &values);
+
+      /**
        * Scaling and simple addition of a multiple of a vector, i.e. <tt>*this =
        * s*(*this)+a*V</tt>.
        */
