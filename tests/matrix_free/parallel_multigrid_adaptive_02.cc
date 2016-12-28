@@ -15,7 +15,7 @@
 
 
 
-// same as parallel_multigird_adaptive_01, but based on MGTransferMatrixFree
+// same as parallel_multigrid_adaptive_01, but based on MGTransferMatrixFree
 // and using MatrixFreeOperators::LaplaceOperator class.
 
 #include "../tests.h"
