@@ -1204,11 +1204,14 @@ namespace StandardExceptions
  * exception of type ExcMPI is thrown with the given error code as an
  * argument.
  *
+ * @note Active only if deal.II is compiled with MPI
  * @ingroup Exceptions
  * @author David Wells, 2016
  */
 #define AssertThrowMPI(error_code) AssertThrow(error_code == MPI_SUCCESS, \
                                                dealii::ExcMPI(error_code))
+#else
+#define AssertThrowMPI(error_code) {}
 #endif // DEAL_II_WITH_MPI
 
 #ifdef DEAL_II_WITH_CUDA
