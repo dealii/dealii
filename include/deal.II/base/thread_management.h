@@ -2918,7 +2918,7 @@ namespace Threads
       task->set_ref_count (2);
 
       tbb::task *worker = new (task->allocate_child()) TaskEntryPoint<RT>(*this);
-      task->spawn (*worker);
+      tbb::task::spawn (*worker);
     }
 
 
