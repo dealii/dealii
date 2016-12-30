@@ -819,7 +819,7 @@ namespace MatrixFreeOperators
   Base<dim,Number>::vmult (LinearAlgebra::distributed::Vector<Number>       &dst,
                            const LinearAlgebra::distributed::Vector<Number> &src) const
   {
-    dst = 0;
+    dst = Number(0.);
     vmult_add (dst, src);
   }
 
@@ -922,7 +922,7 @@ namespace MatrixFreeOperators
     adjust_ghost_range_if_necessary(src);
     adjust_ghost_range_if_necessary(dst);
 
-    dst = 0;
+    dst = Number(0.);
 
     if (!have_interface_matrices)
       return;
@@ -964,7 +964,7 @@ namespace MatrixFreeOperators
     adjust_ghost_range_if_necessary(src);
     adjust_ghost_range_if_necessary(dst);
 
-    dst = 0;
+    dst = Number(0.);
 
     if (!have_interface_matrices)
       return;
@@ -995,7 +995,7 @@ namespace MatrixFreeOperators
   Base<dim,Number>::Tvmult (LinearAlgebra::distributed::Vector<Number>       &dst,
                             const LinearAlgebra::distributed::Vector<Number> &src) const
   {
-    dst = 0;
+    dst = Number(0.);
     Tvmult_add (dst,src);
   }
 
@@ -1125,7 +1125,7 @@ namespace MatrixFreeOperators
     LinearAlgebra::distributed::Vector<Number> ones;
     this->initialize_dof_vector(ones);
     this->initialize_dof_vector(inverse_diagonal_vector);
-    ones = 1.;
+    ones = Number(1.);
     apply_add(inverse_diagonal_vector, ones);
 
     this->set_constrained_entries_to_one(inverse_diagonal_vector);

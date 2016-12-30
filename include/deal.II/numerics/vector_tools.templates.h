@@ -1546,7 +1546,7 @@ namespace VectorTools
             ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
     Assert (rhs_vector.size() == dof_handler.n_dofs(),
             ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
-    rhs_vector = 0;
+    rhs_vector = typename VectorType::value_type(0.);
 
     UpdateFlags update_flags = UpdateFlags(update_values   |
                                            update_quadrature_points |
