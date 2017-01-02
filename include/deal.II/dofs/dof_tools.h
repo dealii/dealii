@@ -2359,6 +2359,13 @@ namespace DoFTools
                                   const ComponentMask                &component_mask = ComponentMask());
 
   /**
+
+  /**
+   * @name Exceptions
+   * @{
+   */
+
+  /**
    * @todo Write description
    *
    * @ingroup Exceptions
@@ -2390,6 +2397,9 @@ namespace DoFTools
    * @ingroup Exceptions
    */
   DeclException0 (ExcInvalidBoundaryIndicator);
+  /**
+   * @}
+   */
 }
 
 
