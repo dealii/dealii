@@ -2120,6 +2120,11 @@ namespace DoFTools
    */
 
   /**
+   * @name Functions that return different DoF mappings
+   * @{
+   */
+
+  /**
    * Create a mapping from degree of freedom indices to the index of that
    * degree of freedom on the boundary. After this operation,
    * <tt>mapping[dof]</tt> gives the index of the degree of freedom with
@@ -2255,6 +2260,9 @@ namespace DoFTools
   (const Mapping<DoFHandlerType::dimension, DoFHandlerType::space_dimension>       &mapping,
    const DoFHandlerType                                                            &dof_handler,
    std::map<Point<DoFHandlerType::space_dimension>, types::global_dof_index, Comp> &point_to_index_map);
+  /**
+   * @}
+   */
 
   /**
    * Generate text output readable by gnuplot with point data based on the
