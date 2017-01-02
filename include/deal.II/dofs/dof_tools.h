@@ -266,41 +266,6 @@ namespace DoFTools
    */
 
   /**
-   * Take a vector of values which live on cells (e.g. an error per cell) and
-   * distribute it to the dofs in such a way that a finite element field
-   * results, which can then be further processed, e.g. for output. You should
-   * note that the resulting field will not be continuous at hanging nodes.
-   * This can, however, easily be arranged by calling the appropriate @p
-   * distribute function of a ConstraintMatrix object created for this
-   * DoFHandler object, after the vector has been fully assembled.
-   *
-   * It is assumed that the number of elements in @p cell_data equals the
-   * number of active cells and that the number of elements in @p dof_data
-   * equals <tt>dof_handler.n_dofs()</tt>.
-   *
-   * Note that the input vector may be a vector of any data type as long as it
-   * is convertible to @p double.  The output vector, being a data vector on a
-   * DoF handler, always consists of elements of type @p double.
-   *
-   * In case the finite element used by this DoFHandler consists of more than
-   * one component, you need to specify which component in the output vector
-   * should be used to store the finite element field in; the default is zero
-   * (no other value is allowed if the finite element consists only of one
-   * component). All other components of the vector remain untouched, i.e.
-   * their contents are not changed.
-   *
-   * This function cannot be used if the finite element in use has shape
-   * functions that are non-zero in more than one vector component (in deal.II
-   * speak: they are non-primitive).
-   */
-  template <typename DoFHandlerType, typename Number>
-  void
-  distribute_cell_to_dof_vector (const DoFHandlerType  &dof_handler,
-                                 const Vector<Number>  &cell_data,
-                                 Vector<double>        &dof_data,
-                                 const unsigned int     component = 0);
-
-  /**
    * @name Functions to support code that generically uses both DoFHandler and hp::DoFHandler
    * @{
    */
@@ -2265,6 +2230,47 @@ namespace DoFTools
    */
 
   /**
+   * @name Miscellaneous
+   * @{
+   */
+
+  /**
+   * Take a vector of values which live on cells (e.g. an error per cell) and
+   * distribute it to the dofs in such a way that a finite element field
+   * results, which can then be further processed, e.g. for output. You should
+   * note that the resulting field will not be continuous at hanging nodes.
+   * This can, however, easily be arranged by calling the appropriate @p
+   * distribute function of a ConstraintMatrix object created for this
+   * DoFHandler object, after the vector has been fully assembled.
+   *
+   * It is assumed that the number of elements in @p cell_data equals the
+   * number of active cells and that the number of elements in @p dof_data
+   * equals <tt>dof_handler.n_dofs()</tt>.
+   *
+   * Note that the input vector may be a vector of any data type as long as it
+   * is convertible to @p double.  The output vector, being a data vector on a
+   * DoF handler, always consists of elements of type @p double.
+   *
+   * In case the finite element used by this DoFHandler consists of more than
+   * one component, you need to specify which component in the output vector
+   * should be used to store the finite element field in; the default is zero
+   * (no other value is allowed if the finite element consists only of one
+   * component). All other components of the vector remain untouched, i.e.
+   * their contents are not changed.
+   *
+   * This function cannot be used if the finite element in use has shape
+   * functions that are non-zero in more than one vector component (in deal.II
+   * speak: they are non-primitive).
+   */
+  template <typename DoFHandlerType, typename Number>
+  void
+  distribute_cell_to_dof_vector (const DoFHandlerType  &dof_handler,
+                                 const Vector<Number>  &cell_data,
+                                 Vector<double>        &dof_data,
+                                 const unsigned int     component = 0);
+
+
+  /**
    * Generate text output readable by gnuplot with point data based on the
    * given map @p support_points.  For each support point location, a string
    * label containing a list of all DoFs from the map is generated.  The map
@@ -2359,6 +2365,8 @@ namespace DoFTools
                                   const ComponentMask                &component_mask = ComponentMask());
 
   /**
+   * @}
+   */
 
   /**
    * @name Exceptions
