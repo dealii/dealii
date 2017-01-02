@@ -175,6 +175,7 @@ namespace GridTools
  */
 namespace DoFTools
 {
+
   /**
    * The flags used in tables by certain <tt>make_*_pattern</tt> functions to
    * describe whether two components of the solution couple in the bilinear
@@ -203,6 +204,66 @@ namespace DoFTools
      */
     nonzero
   };
+
+  /**
+   * @name DoF couplings
+   * @{
+   */
+
+  /**
+   * Map a coupling table from the user friendly organization by components to
+   * the organization by blocks. Specializations of this function for
+   * DoFHandler and hp::DoFHandler are required due to the different results
+   * of their finite element access.
+   *
+   * The return vector will be initialized to the correct length inside this
+   * function.
+   */
+  template <int dim, int spacedim>
+  void
+  convert_couplings_to_blocks (const hp::DoFHandler<dim,spacedim> &dof_handler,
+                               const Table<2, Coupling> &table_by_component,
+                               std::vector<Table<2,Coupling> > &tables_by_block);
+
+  /**
+   * Map a coupling table from the user friendly organization by components to
+   * the organization by blocks. Specializations of this function for
+   * DoFHandler and hp::DoFHandler are required due to the different results
+   * of their finite element access.
+   *
+   * The return vector will be initialized to the correct length inside this
+   * function.
+   */
+  template <int dim, int spacedim>
+  void
+  convert_couplings_to_blocks (const DoFHandler<dim,spacedim> &dof_handler,
+                               const Table<2, Coupling> &table_by_component,
+                               std::vector<Table<2,Coupling> > &tables_by_block);
+
+  /**
+   * Given a finite element and a table how the vector components of it couple
+   * with each other, compute and return a table that describes how the
+   * individual shape functions couple with each other.
+   */
+  template <int dim, int spacedim>
+  Table<2,Coupling>
+  dof_couplings_from_component_couplings (const FiniteElement<dim,spacedim> &fe,
+                                          const Table<2,Coupling> &component_couplings);
+
+  /**
+   * Same function as above for a collection of finite elements, returning a
+   * collection of tables.
+   *
+   * The function currently treats DoFTools::Couplings::nonzero the same as
+   * DoFTools::Couplings::always .
+   */
+  template <int dim, int spacedim>
+  std::vector<Table<2,Coupling> >
+  dof_couplings_from_component_couplings (const hp::FECollection<dim,spacedim> &fe,
+                                          const Table<2,Coupling> &component_couplings);
+  /**
+   * @}
+   */
 
   /**
    * Take a vector of values which live on cells (e.g. an error per cell) and
@@ -2227,21 +2288,6 @@ namespace DoFTools
 
 
   /**
-   * Map a coupling table from the user friendly organization by components to
-   * the organization by blocks. Specializations of this function for
-   * DoFHandler and hp::DoFHandler are required due to the different results
-   * of their finite element access.
-   *
-   * The return vector will be initialized to the correct length inside this
-   * function.
-   */
-  template <int dim, int spacedim>
-  void
-  convert_couplings_to_blocks (const hp::DoFHandler<dim,spacedim> &dof_handler,
-                               const Table<2, Coupling> &table_by_component,
-                               std::vector<Table<2,Coupling> > &tables_by_block);
-
-  /**
    * Make a constraint matrix for the constraints that result from zero
    * boundary values on the given boundary indicator.
    *
@@ -2304,43 +2350,6 @@ namespace DoFTools
                                   ConstraintMatrix                   &zero_boundary_constraints,
                                   const ComponentMask                &component_mask = ComponentMask());
 
-
-  /**
-   * Map a coupling table from the user friendly organization by components to
-   * the organization by blocks. Specializations of this function for
-   * DoFHandler and hp::DoFHandler are required due to the different results
-   * of their finite element access.
-   *
-   * The return vector will be initialized to the correct length inside this
-   * function.
-   */
-  template <int dim, int spacedim>
-  void
-  convert_couplings_to_blocks (const DoFHandler<dim,spacedim> &dof_handler,
-                               const Table<2, Coupling> &table_by_component,
-                               std::vector<Table<2,Coupling> > &tables_by_block);
-
-  /**
-   * Given a finite element and a table how the vector components of it couple
-   * with each other, compute and return a table that describes how the
-   * individual shape functions couple with each other.
-   */
-  template <int dim, int spacedim>
-  Table<2,Coupling>
-  dof_couplings_from_component_couplings (const FiniteElement<dim,spacedim> &fe,
-                                          const Table<2,Coupling> &component_couplings);
-
-  /**
-   * Same function as above for a collection of finite elements, returning a
-   * collection of tables.
-   *
-   * The function currently treats DoFTools::Couplings::nonzero the same as
-   * DoFTools::Couplings::always .
-   */
-  template <int dim, int spacedim>
-  std::vector<Table<2,Coupling> >
-  dof_couplings_from_component_couplings (const hp::FECollection<dim,spacedim> &fe,
-                                          const Table<2,Coupling> &component_couplings);
   /**
    * @todo Write description
    *
