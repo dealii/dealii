@@ -158,6 +158,13 @@ IF (CMAKE_BUILD_TYPE MATCHES "Release")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-funroll-loops")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-funroll-all-loops")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-fstrict-aliasing")
+
+  #
+  # There are many places in the library where we create a new typedef and then
+  # immediately use it in an Assert. Hence, only ignore unused typedefs in Release
+  # mode.
+  #
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-Wno-unused-local-typedefs")
 ENDIF()
 
 
