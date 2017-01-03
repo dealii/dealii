@@ -833,12 +833,12 @@ SolverGMRES<VectorType>::solve (const MatrixType         &A,
 
   const bool do_eigenvalues=
     !condition_number_signal.empty()
-    |!all_condition_numbers_signal.empty()
-    |!eigenvalues_signal.empty()
-    |!all_eigenvalues_signal.empty()
-    |!hessenberg_signal.empty()
-    |!all_hessenberg_signal.empty()
-    |additional_data.compute_eigenvalues;
+    ||!all_condition_numbers_signal.empty()
+    ||!eigenvalues_signal.empty()
+    ||!all_eigenvalues_signal.empty()
+    ||!hessenberg_signal.empty()
+    ||!all_hessenberg_signal.empty()
+    ||additional_data.compute_eigenvalues;
   // for eigenvalue computation, need to collect the Hessenberg matrix (before
   // applying Givens rotations)
   FullMatrix<double> H_orig;

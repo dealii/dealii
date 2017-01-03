@@ -449,12 +449,12 @@ SolverCG<VectorType>::solve (const MatrixType         &A,
   // Should we build the matrix for
   // eigenvalue computations?
   const bool do_eigenvalues = !condition_number_signal.empty()
-                              |!all_condition_numbers_signal.empty()
-                              |!eigenvalues_signal.empty()
-                              |!all_eigenvalues_signal.empty()
-                              | additional_data.compute_condition_number
-                              | additional_data.compute_all_condition_numbers
-                              | additional_data.compute_eigenvalues;
+                              ||!all_condition_numbers_signal.empty()
+                              ||!eigenvalues_signal.empty()
+                              ||!all_eigenvalues_signal.empty()
+                              || additional_data.compute_condition_number
+                              || additional_data.compute_all_condition_numbers
+                              || additional_data.compute_eigenvalues;
 
   // vectors used for eigenvalue
   // computations
