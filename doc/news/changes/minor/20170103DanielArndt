@@ -1,0 +1,4 @@
+Fixed: ConstraintMatrix::shift also works if the object
+is initialized with an IndexSet object.
+<br>
+(Daniel Arndt, 2017/01/03)

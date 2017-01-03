@@ -365,7 +365,8 @@ public:
 
   /**
    * Shift all entries of this matrix down @p offset rows and over @p offset
-   * columns.
+   * columns. If this object is initialized with an IndexSet, local_lines are
+   * shifted as well.
    *
    * This function is useful if you are building block matrices, where all
    * blocks are built by the same DoFHandler object, i.e. the matrix size is
