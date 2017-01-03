@@ -293,9 +293,9 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
 
   const unsigned int n_q_points = mapping_data.quadrature_points.size();
 
-  std::vector<double> values(fe_internal.update_each & update_values ? this->dofs_per_cell : 0);
-  std::vector<Tensor<1,dim> > grads(fe_internal.update_each & update_gradients ? this->dofs_per_cell : 0);
-  std::vector<Tensor<2,dim> > grad_grads(fe_internal.update_each & update_hessians ? this->dofs_per_cell : 0);
+  std::vector<double> values((fe_internal.update_each & update_values) ? this->dofs_per_cell : 0);
+  std::vector<Tensor<1,dim> > grads((fe_internal.update_each & update_gradients) ? this->dofs_per_cell : 0);
+  std::vector<Tensor<2,dim> > grad_grads((fe_internal.update_each & update_hessians) ? this->dofs_per_cell : 0);
   std::vector<Tensor<3,dim> > empty_vector_of_3rd_order_tensors;
   std::vector<Tensor<4,dim> > empty_vector_of_4th_order_tensors;
 
@@ -339,9 +339,9 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
 
   const unsigned int n_q_points = mapping_data.quadrature_points.size();
 
-  std::vector<double> values(fe_internal.update_each & update_values ? this->dofs_per_cell : 0);
-  std::vector<Tensor<1,dim> > grads(fe_internal.update_each & update_gradients ? this->dofs_per_cell : 0);
-  std::vector<Tensor<2,dim> > grad_grads(fe_internal.update_each & update_hessians ? this->dofs_per_cell : 0);
+  std::vector<double> values((fe_internal.update_each & update_values) ? this->dofs_per_cell : 0);
+  std::vector<Tensor<1,dim> > grads((fe_internal.update_each & update_gradients) ? this->dofs_per_cell : 0);
+  std::vector<Tensor<2,dim> > grad_grads((fe_internal.update_each & update_hessians) ? this->dofs_per_cell : 0);
   std::vector<Tensor<3,dim> > empty_vector_of_3rd_order_tensors;
   std::vector<Tensor<4,dim> > empty_vector_of_4th_order_tensors;
 
@@ -386,9 +386,9 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 
   const unsigned int n_q_points = mapping_data.quadrature_points.size();
 
-  std::vector<double> values(fe_internal.update_each & update_values ? this->dofs_per_cell : 0);
-  std::vector<Tensor<1,dim> > grads(fe_internal.update_each & update_gradients ? this->dofs_per_cell : 0);
-  std::vector<Tensor<2,dim> > grad_grads(fe_internal.update_each & update_hessians ? this->dofs_per_cell : 0);
+  std::vector<double> values((fe_internal.update_each & update_values) ? this->dofs_per_cell : 0);
+  std::vector<Tensor<1,dim> > grads((fe_internal.update_each & update_gradients) ? this->dofs_per_cell : 0);
+  std::vector<Tensor<2,dim> > grad_grads((fe_internal.update_each & update_hessians) ? this->dofs_per_cell : 0);
   std::vector<Tensor<3,dim> > empty_vector_of_3rd_order_tensors;
   std::vector<Tensor<4,dim> > empty_vector_of_4th_order_tensors;
 
