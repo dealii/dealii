@@ -1270,7 +1270,7 @@ namespace Threads
      * an implicit pointer to an object that exists exactly once for each
      * thread, the check is simply to compare these pointers.
      */
-    bool operator == (const Thread &t)
+    bool operator == (const Thread &t) const
     {
       return thread_descriptor == t.thread_descriptor;
     }
@@ -3155,7 +3155,7 @@ namespace Threads
      * an implicit pointer to an object that exists exactly once for each
      * task, the check is simply to compare these pointers.
      */
-    bool operator == (const Task &t)
+    bool operator == (const Task &t) const
     {
       AssertThrow (joinable(), ExcNoTask());
       return task_descriptor == t.task_descriptor;
