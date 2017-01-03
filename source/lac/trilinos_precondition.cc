@@ -231,11 +231,11 @@ namespace TrilinosWrappers
   /* ----------------------- PreconditionBlockJacobi ---------------------- */
 
   PreconditionBlockJacobi::AdditionalData::
-  AdditionalData (const unsigned int block_size,
-                  const std::string  block_creation_type,
-                  const double omega,
-                  const double min_diagonal,
-                  const unsigned int n_sweeps)
+  AdditionalData (const unsigned int  block_size,
+                  const std::string  &block_creation_type,
+                  const double        omega,
+                  const double        min_diagonal,
+                  const unsigned int  n_sweeps)
     :
     block_size(block_size),
     block_creation_type(block_creation_type),
@@ -290,12 +290,12 @@ namespace TrilinosWrappers
   /* ----------------------- PreconditionBlockSSOR ------------------------ */
 
   PreconditionBlockSSOR::AdditionalData::
-  AdditionalData (const unsigned int block_size,
-                  const std::string  block_creation_type,
-                  const double       omega,
-                  const double       min_diagonal,
-                  const unsigned int overlap,
-                  const unsigned int n_sweeps)
+  AdditionalData (const unsigned int  block_size,
+                  const std::string  &block_creation_type,
+                  const double        omega,
+                  const double        min_diagonal,
+                  const unsigned int  overlap,
+                  const unsigned int  n_sweeps)
     :
     block_size(block_size),
     block_creation_type(block_creation_type),
@@ -351,12 +351,12 @@ namespace TrilinosWrappers
   /* ------------------------ PreconditionBlockSOR ------------------------ */
 
   PreconditionBlockSOR::AdditionalData::
-  AdditionalData (const unsigned int block_size,
-                  const std::string  block_creation_type,
-                  const double       omega,
-                  const double       min_diagonal,
-                  const unsigned int overlap,
-                  const unsigned int n_sweeps)
+  AdditionalData (const unsigned int  block_size,
+                  const std::string  &block_creation_type,
+                  const double        omega,
+                  const double        min_diagonal,
+                  const unsigned int  overlap,
+                  const unsigned int  n_sweeps)
     :
     block_size(block_size),
     block_creation_type(block_creation_type),

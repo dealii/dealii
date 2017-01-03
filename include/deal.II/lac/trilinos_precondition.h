@@ -507,11 +507,11 @@ namespace TrilinosWrappers
        * subdivision of the rows, set the damping parameter to one, and do not
        * modify the diagonal.
        */
-      AdditionalData (const unsigned int block_size = 1,
-                      const std::string  block_creation_type = "linear",
-                      const double       omega = 1,
-                      const double       min_diagonal = 0,
-                      const unsigned int n_sweeps = 1);
+      AdditionalData (const unsigned int  block_size          = 1,
+                      const std::string  &block_creation_type = "linear",
+                      const double        omega               = 1,
+                      const double        min_diagonal        = 0,
+                      const unsigned int  n_sweeps            = 1);
 
       /**
        * This specifies the size of blocks.
@@ -612,12 +612,12 @@ namespace TrilinosWrappers
        * run a BlockJacobi preconditioner, where each block is inverted
        * approximately by a block SOR).
        */
-      AdditionalData (const unsigned int block_size = 1,
-                      const std::string  block_creation_type = "linear",
-                      const double       omega = 1,
-                      const double       min_diagonal = 0,
-                      const unsigned int overlap = 0,
-                      const unsigned int n_sweeps = 1);
+      AdditionalData (const unsigned int  block_size          = 1,
+                      const std::string  &block_creation_type = "linear",
+                      const double        omega               = 1,
+                      const double        min_diagonal        = 0,
+                      const unsigned int  overlap             = 0,
+                      const unsigned int  n_sweeps            = 1);
 
       /**
        * This specifies the size of blocks.
@@ -725,12 +725,12 @@ namespace TrilinosWrappers
        * run a BlockJacobi preconditioner, where each block is inverted
        * approximately by a block SOR).
        */
-      AdditionalData (const unsigned int block_size = 1,
-                      const std::string  block_creation_type = "linear",
-                      const double       omega = 1,
-                      const double       min_diagonal = 0,
-                      const unsigned int overlap = 0,
-                      const unsigned int n_sweeps = 1);
+      AdditionalData (const unsigned int  block_size          = 1,
+                      const std::string  &block_creation_type = "linear",
+                      const double        omega               = 1,
+                      const double        min_diagonal        = 0,
+                      const unsigned int  overlap             = 0,
+                      const unsigned int  n_sweeps            = 1);
 
       /**
        * This specifies the size of blocks.
