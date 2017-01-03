@@ -321,7 +321,7 @@ long double QGaussLobatto<1>::JacobiP(const long double x,
 
 
 template <>
-long double QGaussLobatto<1>::gamma(const unsigned int n) const
+long double QGaussLobatto<1>::gamma(const unsigned int n)
 {
   long double result = n - 1;
   for (int i=n-2; i>1; --i)
@@ -432,7 +432,7 @@ QGaussLog<1>::QGaussLog(const unsigned int n,
 
 template <>
 std::vector<double>
-QGaussLog<1>::get_quadrature_points(const unsigned int n) const
+QGaussLog<1>::get_quadrature_points(const unsigned int n)
 {
   std::vector<double> q_points(n);
 
@@ -565,7 +565,7 @@ QGaussLog<1>::get_quadrature_points(const unsigned int n) const
 
 template <>
 std::vector<double>
-QGaussLog<1>::get_quadrature_weights(const unsigned int n) const
+QGaussLog<1>::get_quadrature_weights(const unsigned int n)
 {
   std::vector<double> quadrature_weights(n);
 
