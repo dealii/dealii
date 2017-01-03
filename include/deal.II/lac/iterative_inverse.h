@@ -129,10 +129,9 @@ inline
 void
 IterativeInverse<VectorType>::initialize(const MatrixType &m, const PreconditionerType &p)
 {
-  // dummy variable
-  VectorType *v = 0;
-  matrix = std_cxx11::shared_ptr<PointerMatrixBase<VectorType> > (new_pointer_matrix_base(m, *v));
-  preconditioner = std_cxx11::shared_ptr<PointerMatrixBase<VectorType> > (new_pointer_matrix_base(p, *v));
+  VectorType v;
+  matrix = std_cxx11::shared_ptr<PointerMatrixBase<VectorType> > (new_pointer_matrix_base(m, v));
+  preconditioner = std_cxx11::shared_ptr<PointerMatrixBase<VectorType> > (new_pointer_matrix_base(p, v));
 }
 
 
