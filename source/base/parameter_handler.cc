@@ -2918,8 +2918,8 @@ ParameterHandler::scan_line (std::string         line,
       return;
     }
   // enter subsection
-  else if ((line.find ("SUBSECTION ") == 0) ||
-           (line.find ("subsection ") == 0))
+  else if (Utilities::match_at_string_start(line, "SUBSECTION ") ||
+           Utilities::match_at_string_start(line, "subsection "))
     {
       // delete this prefix
       line.erase (0, std::string("subsection").length()+1);
@@ -2936,8 +2936,8 @@ ParameterHandler::scan_line (std::string         line,
       subsection_path.push_back (subsection);
     }
   // exit subsection
-  else if ((line.find ("END") == 0) ||
-           (line.find ("end") == 0))
+  else if (Utilities::match_at_string_start(line, "END") ||
+           Utilities::match_at_string_start(line, "end"))
     {
       line.erase (0, 3);
       while ((line.size() > 0) && (std::isspace(line[0])))
@@ -2954,8 +2954,8 @@ ParameterHandler::scan_line (std::string         line,
       leave_subsection ();
     }
   // regular entry
-  else if ((line.find ("SET ") == 0) ||
-           (line.find ("set ") == 0))
+  else if (Utilities::match_at_string_start(line, "SET ") ||
+           Utilities::match_at_string_start(line, "set "))
     {
       // erase "set" statement
       line.erase (0, 4);
@@ -3022,8 +3022,8 @@ ParameterHandler::scan_line (std::string         line,
         }
     }
   // an include statement?
-  else if ((line.find ("INCLUDE ") == 0) ||
-           (line.find ("include ") == 0))
+  else if (Utilities::match_at_string_start(line, "include ") ||
+           Utilities::match_at_string_start(line, "INCLUDE "))
     {
       // erase "include " statement and eliminate spaces
       line.erase (0, 7);

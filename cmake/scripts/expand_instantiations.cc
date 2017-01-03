@@ -44,6 +44,7 @@
 // Author: Wolfgang Bangerth, 2007
 
 
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -60,6 +61,16 @@ std::map<std::string, std::list<std::string> >  expansion_lists;
 
 
 /* ======================== auxiliary functions ================= */
+
+// Return whether or not one string starts with a given prefix
+bool
+has_prefix(const std::string &base, const std::string &prefix)
+{
+  if (prefix.size() > base.size())
+    return false;
+  else
+    return std::equal(prefix.begin(), prefix.end(), base.begin());
+}
 
 
 // replace all occurrences of 'pattern' by 'substitute' in 'in', and
@@ -297,14 +308,14 @@ void read_expansion_lists (const std::string &filename)
       name = get_substring_with_delim (whole_file, " :");
 
       skip_space (whole_file);
-      if (whole_file.find (":=") != 0)
+      if (!has_prefix(whole_file, ":="))
         {
           std::cerr << "Invalid entry <" << name << '>' << std::endl;
           std::exit (1);
         }
       whole_file.erase (0, 2);
       skip_space (whole_file);
-      if (whole_file.find ("{") != 0)
+      if (whole_file[0] != '{')
         {
           std::cerr << "Invalid entry <" << name << '>' << std::endl;
           std::exit (1);
@@ -315,7 +326,7 @@ void read_expansion_lists (const std::string &filename)
       std::string
       expansion = get_substring_with_delim (whole_file, "}");
 
-      if (whole_file.find ("}") != 0)
+      if (whole_file[0] != '}')
         {
           std::cerr << "Invalid entry <" << name << '>' << std::endl;
           std::exit (1);
@@ -416,14 +427,14 @@ void process_instantiations ()
   while (whole_file.size() != 0)
     {
       skip_space (whole_file);
-      if (whole_file.find ("for") != 0)
+      if (!has_prefix(whole_file, "for"))
         {
           std::cerr << "Invalid instantiation list: missing 'for'" << std::endl;
           std::exit (1);
         }
       whole_file.erase (0, 3);
       skip_space (whole_file);
-      if (whole_file.find ("(") != 0)
+      if (whole_file[0] != '(')
         {
           std::cerr << "Invalid instantiation list: missing '('" << std::endl;
           std::exit (1);
@@ -436,7 +447,7 @@ void process_instantiations ()
         = split_string_list (get_substring_with_delim (whole_file,
                                                        ")"),
                              ';');
-      if (whole_file.find (")") != 0)
+      if (whole_file[0] != ')')
         {
           std::cerr << "Invalid instantiation list: missing ')'" << std::endl;
           std::exit (1);
@@ -471,7 +482,7 @@ void process_instantiations ()
 
       // now read the part in {...}
       skip_space (whole_file);
-      if (whole_file.find ("{") != 0)
+      if (whole_file[0] != '{')
         {
           std::cerr << "Invalid substitution text" << std::endl;
           std::exit (1);
