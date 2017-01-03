@@ -454,9 +454,8 @@ namespace Patterns
 
 
   Selection::Selection (const std::string &seq)
+    : sequence(seq)
   {
-    sequence = seq;
-
     while (sequence.find(" |") != std::string::npos)
       sequence.replace (sequence.find(" |"), 2, "|");
     while (sequence.find("| ") != std::string::npos)
