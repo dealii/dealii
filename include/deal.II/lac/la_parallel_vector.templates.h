@@ -680,7 +680,7 @@ namespace LinearAlgebra
                    j++, read_position++)
                 Assert(*read_position == Number() ||
                        std::abs(local_element(j) - *read_position) <=
-                       std::abs(local_element(j)) * 1000. *
+                       std::abs(local_element(j)) * 10000. *
                        std::numeric_limits<real_type>::epsilon(),
                        ExcNonMatchingElements(*read_position, local_element(j),
                                               part.this_mpi_process()));
