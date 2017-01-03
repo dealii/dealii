@@ -19,14 +19,13 @@ namespace internal
        typename dealii::internal::p4est::types<dim>::quadrant &quad)
       {
         int i, l = quad.level;
-        int child_id;
         dealii::types::global_dof_index dealii_index =
           triangulation->get_p4est_tree_to_coarse_cell_permutation()[treeidx];
 
         for (i = 0; i < l; i++)
           {
             typename dealii::Triangulation<dim,spacedim>::cell_iterator cell (triangulation, i, dealii_index);
-            child_id = dealii::internal::p4est::functions<dim>::quadrant_ancestor_id (&quad, i + 1);
+            const int child_id = dealii::internal::p4est::functions<dim>::quadrant_ancestor_id (&quad, i + 1);
             Assert (cell->has_children (), ExcMessage ("p4est quadrant does not correspond to a cell!"));
             dealii_index = cell->child_index(child_id);
           }

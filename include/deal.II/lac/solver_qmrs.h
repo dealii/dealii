@@ -346,7 +346,7 @@ SolverQMRS<VectorType>::iterate(const MatrixType         &A,
 
   int  it=0;
 
-  double tau, rho, theta=0, sigma, alpha, psi, theta_old, rho_old, beta;
+  double tau, rho, theta=0;
   double res;
 
   d.reinit(x);
@@ -375,19 +375,19 @@ SolverQMRS<VectorType>::iterate(const MatrixType         &A,
       // Step 1
       A.vmult(t,q);
       // Step 2
-      sigma = q*t;
+      const double sigma = q*t;
 
 //TODO:[?] Find a really good breakdown criterion. The absolute one detects breakdown instead of convergence
       if (std::fabs(sigma/rho) < additional_data.breakdown)
         return IterationResult(SolverControl::iterate, std::fabs(sigma/rho));
       // Step 3
-      alpha = rho/sigma;
+      const double alpha = rho/sigma;
 
       v.add(-alpha,t);
       // Step 4
-      theta_old = theta;
+      const double theta_old = theta;
       theta = v*v/tau;
-      psi = 1./(1.+theta);
+      const double psi = 1./(1.+theta);
       tau *= theta*psi;
 
       d.sadd(psi*theta_old, psi*alpha, p);
@@ -411,11 +411,11 @@ SolverQMRS<VectorType>::iterate(const MatrixType         &A,
       if (std::fabs(rho) < additional_data.breakdown)
         return IterationResult(SolverControl::iterate, std::fabs(rho));
       // Step 7
-      rho_old = rho;
+      const double rho_old = rho;
       precondition.vmult(q,v);
       rho = q*v;
 
-      beta = rho/rho_old;
+      const double beta = rho/rho_old;
       p.sadd(beta,v);
       precondition.vmult(q,p);
     }

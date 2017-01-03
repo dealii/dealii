@@ -338,7 +338,6 @@ no_constraint:
       const unsigned int n_owned  = (vector_partitioner->local_range().second-
                                      vector_partitioner->local_range().first);
       const std::size_t n_ghosts = ghost_dofs.size();
-      unsigned int      n_unique_ghosts= 0;
 #ifdef DEBUG
       for (std::vector<unsigned int>::iterator dof = dof_indices.begin();
            dof!=dof_indices.end(); ++dof)
@@ -349,6 +348,7 @@ no_constraint:
       IndexSet ghost_indices (vector_partitioner->size());
       if (n_ghosts > 0)
         {
+          unsigned int n_unique_ghosts = 0;
           // since we need to go back to the local_to_global indices and
           // replace the temporary numbering of ghosts by the real number in
           // the index set, we need to store these values

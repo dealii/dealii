@@ -409,11 +409,10 @@ namespace OpenCASCADE
     Assert(Inters.IsDone(), ExcMessage("Could not project point."));
 
     double minDistance = 1e7;
-    double distance;
     Point<3> result;
     for (int i=0; i<Inters.NbPnt(); ++i)
       {
-        distance = point(origin).Distance(Inters.Pnt(i+1));
+        const double distance = point(origin).Distance(Inters.Pnt(i+1));
         //cout<<"Point "<<i<<": "<<point(Inters.Pnt(i+1))<<"  distance: "<<distance<<endl;
         if (distance < minDistance)
           {

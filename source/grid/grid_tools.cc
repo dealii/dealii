@@ -3019,11 +3019,10 @@ next_cell:
     typename std::vector<typename Container::cell_iterator>::const_iterator uniform_cell;
     for (uniform_cell=uniform_cells.begin(); uniform_cell!=uniform_cells.end(); ++uniform_cell)
       {
-        bool repeat_vertex;
         for (unsigned int v=0; v<GeometryInfo<Container::dimension>::vertices_per_cell; ++v)
           {
             Point<Container::space_dimension> position=(*uniform_cell)->vertex (v);
-            repeat_vertex=false;
+            bool repeat_vertex=false;
 
             for (unsigned int m=0; m<i; ++m)
               {

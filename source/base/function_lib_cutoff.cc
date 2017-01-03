@@ -273,11 +273,10 @@ namespace Functions
       {
         const double d = this->center.distance(points[k]);
         const double r = this->radius;
-        double e = 0.;
         double val = 0.;
         if (d<this->radius)
           {
-            e = -r*r/(r*r-d*d);
+            const double e = -r*r/(r*r-d*d);
             if (e>-50)
               val = numbers::E * exp(e);
           }

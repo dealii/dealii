@@ -133,17 +133,17 @@ QGauss<1>::QGauss (const unsigned int n)
       long double z = std::cos(numbers::PI * (i-.25)/(n+.5));
 
       long double pp;
-      long double p1, p2, p3;
+      long double p1;
 
       // Newton iteration
       do
         {
           // compute L_n (z)
           p1 = 1.;
-          p2 = 0.;
+          long double p2 = 0.;
           for (unsigned int j=0; j<n; ++j)
             {
-              p3 = p2;
+              const long double p3 = p2;
               p2 = p1;
               p1 = ((2.*j+1.)*z*p2-j*p3)/(j+1);
             }
@@ -228,11 +228,11 @@ compute_quadrature_points(const unsigned int q,
   for (unsigned int i=0; i<m; ++i)
     x[i] = - std::cos( (long double) (2*i+1)/(2*m) * numbers::PI );
 
-  long double r, s, J_x, f, delta;
+  long double s, J_x, f, delta;
 
   for (unsigned int k=0; k<m; ++k)
     {
-      r = x[k];
+      long double r = x[k];
       if (k>0)
         r = (r + x[k-1])/2;
 
@@ -297,7 +297,6 @@ long double QGaussLobatto<1>::JacobiP(const long double x,
   // the Jacobi polynomial is evaluated
   // using a recursion formula.
   std::vector<long double> p(n+1);
-  int v, a1, a2, a3, a4;
 
   // initial values P_0(x), P_1(x):
   p[0] = 1.0L;
@@ -307,11 +306,11 @@ long double QGaussLobatto<1>::JacobiP(const long double x,
 
   for (unsigned int i=1; i<=(n-1); ++i)
     {
-      v  = 2*i + alpha + beta;
-      a1 = 2*(i+1)*(i + alpha + beta + 1)*v;
-      a2 = (v + 1)*(alpha*alpha - beta*beta);
-      a3 = v*(v + 1)*(v + 2);
-      a4 = 2*(i+alpha)*(i+beta)*(v + 2);
+      const int v  = 2*i + alpha + beta;
+      const int a1 = 2*(i+1)*(i + alpha + beta + 1)*v;
+      const int a2 = (v + 1)*(alpha*alpha - beta*beta);
+      const int a3 = v*(v + 1)*(v + 2);
+      const int a4 = 2*(i+alpha)*(i+beta)*(v + 2);
 
       p[i+1] = static_cast<long double>( (a2 + a3*x)*p[i] - a4*p[i-1])/a1;
     } // for
@@ -816,14 +815,13 @@ QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
 
   double eps = 1e-8;
   unsigned int q_id = 0; // Current quad point index.
-  double area = 0;
   Tensor<1,2> dist;
 
   for (unsigned int box=0; box<4; ++box)
     {
       dist = (singularity-GeometryInfo<2>::unit_cell_vertex(box));
       dist = Point<2>(std::abs(dist[0]), std::abs(dist[1]));
-      area = dist[0]*dist[1];
+      double area = dist[0]*dist[1];
       if (area > eps)
         for (unsigned int q=0; q<quads[box].size(); ++q, ++q_id)
           {

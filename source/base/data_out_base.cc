@@ -7002,13 +7002,13 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
   // all vector data, then handle the
   // scalar data sets that have been
   // left over
-  unsigned int    i, pt_data_vector_dim;
+  unsigned int    i;
   std::string     vector_name;
   for (i=0; i<data_filter.n_data_sets(); ++i)
     {
       // Allocate space for the point data
       // Must be either 1D or 3D
-      pt_data_vector_dim = data_filter.get_data_set_dim(i);
+      const unsigned int pt_data_vector_dim = data_filter.get_data_set_dim(i);
       vector_name = data_filter.get_data_set_name(i);
 
       // Create the dataspace for the point data
