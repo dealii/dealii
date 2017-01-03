@@ -49,12 +49,6 @@ class TensorProductPolynomialsBubbles : public TensorProductPolynomials<dim>
 {
 public:
   /**
-   * Access to the dimension of this object, for checking and automatic
-   * setting of dimension in other classes.
-   */
-  static const unsigned int dimension = dim;
-
-  /**
    * Constructor. <tt>pols</tt> is a vector of objects that should be derived
    * or otherwise convertible to one-dimensional polynomial objects. It will
    * be copied element by element into a private variable.
