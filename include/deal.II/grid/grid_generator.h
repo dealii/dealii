@@ -810,13 +810,17 @@ namespace GridGenerator
 
   /**
    * Produce a domain that is the space between two cylinders in 3d, with
-   * given length, inner and outer radius and a given number of elements for
-   * this initial triangulation. If @p n_radial_cells is zero (as is the
+   * given length, inner and outer radius and a given number of elements. The
+   * cylinder shell is built around the $z$-axis with the two faces located
+   * at $z = 0$ and $z = $ @p length.
+   *
+   * If @p n_radial_cells is zero (as is the
    * default), then it is computed adaptively such that the resulting elements
    * have the least aspect ratio. The same holds for @p n_axial_cells.
    *
    * @note Although this function is declared as a template, it does not make
-   * sense in 1D and 2D.
+   * sense in 1D and 2D. Also keep in mind that this object is rotated
+   * and positioned differently than the one created by cylinder().
    *
    * @note The triangulation needs to be void upon calling this function.
    */
