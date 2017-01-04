@@ -42,7 +42,7 @@ void test ()
 
   index_set.add_index (9);
 
-  for (unsigned int i=0; i<index_set.n_elements(); ++i)
+  for (IndexSet::size_type i=0; i<index_set.n_elements(); ++i)
     {
       deallog << index_set.nth_index_in_set(i)
               << std::endl;
@@ -52,9 +52,9 @@ void test ()
     }
   deallog << "OK" << std::endl;
 
-  for (unsigned int i=0; i<index_set.size(); ++i)
+  for (IndexSet::size_type i=0; i<index_set.size(); ++i)
     {
-      const unsigned int i_out = index_set.index_within_set(i);
+      const IndexSet::size_type i_out = index_set.index_within_set(i);
       const bool within = (i_out != numbers::invalid_dof_index);
       AssertThrow (within == index_set.is_element(i),
                    ExcInternalError());
