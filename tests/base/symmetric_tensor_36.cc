@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 by the deal.II authors
+// Copyright (C) 2016 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,7 +27,6 @@
 #include <complex>
 #include <fstream>
 #include <iomanip>
-#include <typeinfo>
 
 // Some number types cannot be converted to floats/doubles;
 // for example, complex numbers cannot be converted to primitive numbers
@@ -38,7 +37,7 @@ template<int rank, int dim,
          typename NumberType1,
          typename NumberType2>
 typename boost::disable_if<boost::is_constructible<NumberType1,NumberType2>,void>::type
-test_tensor_constructor ()
+test_tensor_constructor (const std::string &, const std::string &)
 {}
 
 template<int rank, int dim,
@@ -46,13 +45,13 @@ template<int rank, int dim,
          typename NumberType1,
          typename NumberType2>
 typename boost::enable_if<boost::is_constructible<NumberType1,NumberType2>,void>::type
-test_tensor_constructor ()
+test_tensor_constructor (const std::string &type1, const std::string &type2)
 {
   deallog
       << "Rank " << rank << ", "
       << "Dim " << dim << ":"
-      << "  From " << typeid(NumberType2).name()
-      << "  To " << typeid(NumberType1).name()
+      << "  From " << type2
+      << " To " << type1
       << " ... "
       << std::flush;
   TensorType<rank,dim,NumberType2> tmp2;
@@ -64,12 +63,12 @@ template<int rank, int dim,
          template<int,int,typename> class TensorType,
          typename NumberType1>
 void
-test_fixed_NT_2()
+test_fixed_NT_2(const std::string &type1)
 {
-  test_tensor_constructor<rank,dim,TensorType,NumberType1,float>();
-  test_tensor_constructor<rank,dim,TensorType,NumberType1,double>();
-  test_tensor_constructor<rank,dim,TensorType,NumberType1,std::complex<float> >();
-  test_tensor_constructor<rank,dim,TensorType,NumberType1,std::complex<double> >();
+  test_tensor_constructor<rank,dim,TensorType,NumberType1,float>(type1, "float");
+  test_tensor_constructor<rank,dim,TensorType,NumberType1,double>(type1, "double");
+  test_tensor_constructor<rank,dim,TensorType,NumberType1,std::complex<float> >(type1, "std::complex<float>");
+  test_tensor_constructor<rank,dim,TensorType,NumberType1,std::complex<double> >(type1, "std::complex<double>");
 }
 
 template<int rank, int dim,
@@ -77,10 +76,10 @@ template<int rank, int dim,
 void
 test_fixed_NT_1()
 {
-  test_fixed_NT_2<rank,dim,TensorType,float>();
-  test_fixed_NT_2<rank,dim,TensorType,double>();
-  test_fixed_NT_2<rank,dim,TensorType,std::complex<float> >();
-  test_fixed_NT_2<rank,dim,TensorType,std::complex<double> >();
+  test_fixed_NT_2<rank,dim,TensorType,float>("float");
+  test_fixed_NT_2<rank,dim,TensorType,double>("double");
+  test_fixed_NT_2<rank,dim,TensorType,std::complex<float> >("std::complex<float>");
+  test_fixed_NT_2<rank,dim,TensorType,std::complex<double> >("std::complex<double>");
 }
 
 template<int rank, int dim>
