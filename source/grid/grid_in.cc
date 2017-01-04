@@ -3095,7 +3095,6 @@ namespace
                 // Surface can be created from ELSET, or directly from cells
                 // If elsets_list contains a key with specific name - refers to that ELSET, otherwise refers to cell
                 std::istringstream iss (line);
-                char comma;
                 int el_idx;
                 int face_number;
                 char temp;
@@ -3122,6 +3121,7 @@ namespace
                 else
                   {
                     // Surface refers directly to elements
+                    char comma;
                     iss >> el_idx >> comma >> temp >> face_number;
                     quad_node_list = get_global_node_numbers (el_idx, face_number);
                     quad_node_list.insert (quad_node_list.begin(), b_indicator);

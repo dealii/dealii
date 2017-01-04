@@ -121,7 +121,7 @@ protected:
    * Evaluate the Gamma function $ \Gamma(n) = (n-1)! $.
    * @param n  point of evaluation (integer).
    */
-  long double gamma(const unsigned int n) const;
+  static long double gamma(const unsigned int n);
 };
 
 
@@ -228,14 +228,16 @@ private:
   /**
    * Compute the points of the quadrature formula.
    */
+  static
   std::vector<double>
-  get_quadrature_points(const unsigned int n) const;
+  get_quadrature_points(const unsigned int n);
 
   /**
    * Compute the weights of the quadrature formula.
    */
+  static
   std::vector<double>
-  get_quadrature_weights(const unsigned int n) const;
+  get_quadrature_weights(const unsigned int n);
 };
 
 
@@ -666,10 +668,10 @@ long double QGaussLobatto<1>::
 JacobiP(const long double, const int, const int, const unsigned int) const;
 template <>
 long double
-QGaussLobatto<1>::gamma(const unsigned int n) const;
+QGaussLobatto<1>::gamma(const unsigned int n);
 
-template <> std::vector<double> QGaussLog<1>::get_quadrature_points(const unsigned int) const;
-template <> std::vector<double> QGaussLog<1>::get_quadrature_weights(const unsigned int) const;
+template <> std::vector<double> QGaussLog<1>::get_quadrature_points(const unsigned int);
+template <> std::vector<double> QGaussLog<1>::get_quadrature_weights(const unsigned int);
 
 template <> QMidpoint<1>::QMidpoint ();
 template <> QTrapez<1>::QTrapez ();

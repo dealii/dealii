@@ -2382,7 +2382,7 @@ MatrixFree<dim, Number>::cell_loop
               std::vector<internal::color::PartitionWork<Worker>*> worker(n_workers);
               std::vector<internal::color::PartitionWork<Worker>*> blocked_worker(n_blocked_workers);
               unsigned int worker_index = 0, slice_index = 0;
-              unsigned int spawn_index =  0, spawn_index_new = 0;
+              unsigned int spawn_index =  0;
               int spawn_index_child = -2;
               internal::MPIComCompress<OutVector> *worker_compr = new(root->allocate_child())
               internal::MPIComCompress<OutVector>(dst);
@@ -2390,7 +2390,7 @@ MatrixFree<dim, Number>::cell_loop
               for (unsigned int part=0;
                    part<task_info.partition_color_blocks_row_index.size()-1; part++)
                 {
-                  spawn_index_new = worker_index;
+                  const unsigned int spawn_index_new = worker_index;
                   if (part == 0)
                     worker[worker_index] = new(worker_compr->allocate_child())
                     internal::color::PartitionWork<Worker>(func,slice_index,task_info,false);

@@ -915,13 +915,12 @@ FullMatrix<number>::matrix_norm_square (const Vector<number2> &v) const
   number2 sum = 0.;
   const size_type n_rows = m();
   const number *val_ptr = &this->values[0];
-  const number2 *v_ptr;
 
   for (size_type row=0; row<n_rows; ++row)
     {
       number s = 0.;
       const number *const val_end_of_row = val_ptr+n_rows;
-      v_ptr = v.begin();
+      const number2 *v_ptr = v.begin();
       while (val_ptr != val_end_of_row)
         s += number(*val_ptr++) * number(*v_ptr++);
 
@@ -947,13 +946,12 @@ FullMatrix<number>::matrix_scalar_product (const Vector<number2> &u,
   const size_type n_rows = m();
   const size_type n_cols = n();
   const number *val_ptr = &this->values[0];
-  const number2 *v_ptr;
 
   for (size_type row=0; row<n_rows; ++row)
     {
       number s = 0.;
       const number *const val_end_of_row = val_ptr+n_cols;
-      v_ptr = v.begin();
+      const number2 *v_ptr = v.begin();
       while (val_ptr != val_end_of_row)
         s += number(*val_ptr++) * number(*v_ptr++);
 
@@ -1466,13 +1464,12 @@ FullMatrix<number>::cholesky (const FullMatrix<number2> &A)
       /* reinit *this to 0 */
       this->reinit(A.m(), A.n());
 
-      double SLik2 = 0.0, SLikLjk = 0.0;
       for (size_type i=0; i< this->n_cols(); i++)
         {
-          SLik2 = 0.0;
+          double SLik2 = 0.0;
           for (size_type j = 0; j < i; j++)
             {
-              SLikLjk = 0.0;
+              double SLikLjk = 0.0;
               for (size_type k =0; k<j; k++)
                 {
                   SLikLjk += (*this)(i,k)*(*this)(j,k);

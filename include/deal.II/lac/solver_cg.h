@@ -337,6 +337,9 @@ SolverCG<VectorType>::SolverCG (SolverControl        &cn,
                                 const AdditionalData &data)
   :
   Solver<VectorType>(cn),
+  Vr(NULL),
+  Vp(NULL),
+  Vz(NULL),
   additional_data(data)
 {}
 
@@ -452,7 +455,6 @@ SolverCG<VectorType>::solve (const MatrixType         &A,
                               | additional_data.compute_condition_number
                               | additional_data.compute_all_condition_numbers
                               | additional_data.compute_eigenvalues;
-  double eigen_beta_alpha = 0;
 
   // vectors used for eigenvalue
   // computations
@@ -464,6 +466,8 @@ SolverCG<VectorType>::solve (const MatrixType         &A,
 
   try
     {
+      double eigen_beta_alpha = 0;
+
       // define some aliases for simpler access
       VectorType &g = *Vr;
       VectorType &d = *Vz;
@@ -475,7 +479,7 @@ SolverCG<VectorType>::solve (const MatrixType         &A,
       d.reinit(x, true);
       h.reinit(x, true);
 
-      double gh,alpha,beta;
+      double gh,beta;
 
       // compute residual. if vector is
       // zero, then short-circuit the
@@ -515,7 +519,7 @@ SolverCG<VectorType>::solve (const MatrixType         &A,
           it++;
           A.vmult(h,d);
 
-          alpha = d*h;
+          double alpha = d*h;
           Assert(alpha != 0., ExcDivideByZero());
           alpha = gh/alpha;
 

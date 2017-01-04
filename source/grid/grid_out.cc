@@ -2104,14 +2104,13 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 // draw the legend
   if (svg_flags.draw_legend) out << '\n' << " <!-- legend -->" << '\n';
 
-  unsigned int line_offset = 0;
-
   additional_width = 0;
   if (!svg_flags.margin) additional_width = static_cast<unsigned int>(.5 + (height/100.) * 2.5);
 
   // explanation of the cell labeling
   if (svg_flags.draw_legend && (svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id || svg_flags.label_level_subdomain_id ))
     {
+      unsigned int line_offset = 0;
       out << " <rect x=\"" << width + additional_width << "\" y=\"" << static_cast<unsigned int>(.5 + (height/100.) * margin_in_percent)
           << "\" width=\"" << static_cast<unsigned int>(.5 + (height/100.) * (40. - margin_in_percent)) << "\" height=\"" << static_cast<unsigned int>(.5 + height * .165) << "\"/>" << '\n';
 

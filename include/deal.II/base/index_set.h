@@ -804,7 +804,7 @@ private:
               (range_1.end == range_2.end));
     }
 
-    std::size_t memory_consumption () const
+    static std::size_t memory_consumption ()
     {
       return sizeof(Range);
     }

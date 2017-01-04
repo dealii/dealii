@@ -2616,11 +2616,10 @@ namespace Functions
     (void)component;
     Assert (component==0, ExcIndexRange(component,0,1));
 
-    double prod;
     double sum = 0;
     for (unsigned int monom = 0; monom < exponents.n_rows(); ++monom)
       {
-        prod = 1;
+        double prod = 1;
         for (unsigned int s=0; s< dim; ++s)
           {
             if (p[s] < 0)

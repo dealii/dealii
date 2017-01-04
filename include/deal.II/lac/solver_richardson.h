@@ -193,6 +193,8 @@ SolverRichardson<VectorType>::SolverRichardson(SolverControl            &cn,
                                                const AdditionalData     &data)
   :
   Solver<VectorType> (cn,mem),
+  Vr(NULL),
+  Vd(NULL),
   additional_data(data)
 {}
 
@@ -203,6 +205,8 @@ SolverRichardson<VectorType>::SolverRichardson(SolverControl        &cn,
                                                const AdditionalData &data)
   :
   Solver<VectorType> (cn),
+  Vr(NULL),
+  Vd(NULL),
   additional_data(data)
 {}
 

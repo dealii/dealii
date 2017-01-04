@@ -126,19 +126,18 @@ namespace TrilinosWrappers
       // otherwise first flush Trilinos caches
       sparsity_pattern->compress ();
 
-      // get a representation of the present row
-      int ncols;
-
       colnum_cache.reset (new std::vector<size_type> (sparsity_pattern->row_length(this->a_row)));
 
 
       if (colnum_cache->size() > 0)
         {
-          int ierr;
-          ierr = sparsity_pattern->graph->ExtractGlobalRowCopy((TrilinosWrappers::types::int_type)this->a_row,
-                                                               colnum_cache->size(),
-                                                               ncols,
-                                                               (TrilinosWrappers::types::int_type *)&(*colnum_cache)[0]);
+          // get a representation of the present row
+          int ncols;
+          const int ierr = sparsity_pattern->graph->ExtractGlobalRowCopy
+                           ((TrilinosWrappers::types::int_type)this->a_row,
+                            colnum_cache->size(),
+                            ncols,
+                            (TrilinosWrappers::types::int_type *)&(*colnum_cache)[0]);
           AssertThrow (ierr == 0, ExcTrilinosError(ierr));
           AssertThrow (static_cast<std::vector<size_type>::size_type>(ncols) == colnum_cache->size(),
                        ExcInternalError());
