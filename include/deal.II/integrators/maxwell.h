@@ -225,11 +225,12 @@ namespace LocalIntegrators
       const FEValuesBase<dim> &fetest,
       double factor = 1.)
     {
-      unsigned int t_comp = (dim==3) ? dim : 1;
       const unsigned int n_dofs = fe.dofs_per_cell;
       const unsigned int t_dofs = fetest.dofs_per_cell;
       AssertDimension(fe.get_fe().n_components(), dim);
-      AssertDimension(fetest.get_fe().n_components(), t_comp);
+      // There should be the right number of components (3 in 3D, otherwise 1)
+      // for the curl.
+      AssertDimension(fetest.get_fe().n_components(), (dim == 3) ? dim : 1);
       AssertDimension(M.m(), t_dofs);
       AssertDimension(M.n(), n_dofs);
 

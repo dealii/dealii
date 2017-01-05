@@ -312,11 +312,6 @@ namespace internal
                 const TableIndices<rank> &previous_indices);
 
       /**
-       * Default constructor. Not needed, and invisible, so private.
-       */
-      Accessor ();
-
-      /**
        * Copy constructor. Not needed, and invisible, so private.
        */
       Accessor (const Accessor &a);
@@ -844,17 +839,6 @@ namespace internal
   {
     template <int rank, int dim, bool constness, int P, typename Number>
     Accessor<rank,dim,constness,P,Number>::
-    Accessor ()
-      :
-      tensor (*static_cast<tensor_type *>(0)),
-      previous_indices ()
-    {
-      Assert (false, ExcMessage ("You can't call the default constructor of this class."));
-    }
-
-
-    template <int rank, int dim, bool constness, int P, typename Number>
-    Accessor<rank,dim,constness,P,Number>::
     Accessor (tensor_type              &tensor,
               const TableIndices<rank> &previous_indices)
       :
@@ -879,18 +863,6 @@ namespace internal
     {
       return Accessor<rank,dim,constness,P-1,Number> (tensor,
                                                       merge (previous_indices, i, rank-P));
-    }
-
-
-
-    template <int rank, int dim, bool constness, typename Number>
-    Accessor<rank,dim,constness,1,Number>::
-    Accessor ()
-      :
-      tensor (*static_cast<tensor_type *>(0)),
-      previous_indices ()
-    {
-      Assert (false, ExcMessage ("You can't call the default constructor of this class."));
     }
 
 
@@ -922,8 +894,6 @@ namespace internal
     {
       return tensor(merge (previous_indices, i, rank-1));
     }
-
-
   }
 }
 

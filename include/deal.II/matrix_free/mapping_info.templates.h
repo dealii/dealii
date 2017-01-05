@@ -245,9 +245,9 @@ namespace internal
           std::vector<std_cxx11::shared_ptr<dealii::FEValues<dim> > >
           fe_values (current_data.quadrature.size());
           UpdateFlags update_flags_feval =
-            (update_flags & update_inverse_jacobians ? update_jacobians : update_default) |
-            (update_flags & update_jacobian_grads ? update_jacobian_grads : update_default) |
-            (update_flags & update_quadrature_points ? update_quadrature_points : update_default);
+            ((update_flags & update_inverse_jacobians) ? update_jacobians : update_default) |
+            ((update_flags & update_jacobian_grads) ? update_jacobian_grads : update_default) |
+            ((update_flags & update_quadrature_points) ? update_quadrature_points : update_default);
 
           // resize the fields that have fixed size or for which we know
           // something from an earlier loop
