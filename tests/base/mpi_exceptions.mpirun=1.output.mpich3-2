@@ -25,7 +25,7 @@ The description of the error provided by MPI is "Invalid rank".
 The numerical value of the original error code is 6.
 DEAL::
 deal.II encountered an error while calling an MPI function.
-The description of the error provided by MPI is "Invalid MPI_Request".
+The description of the error provided by MPI is "Request pending due to failure".
 The numerical value of the original error code is 19.
 DEAL::
 deal.II encountered an error while calling an MPI function.
