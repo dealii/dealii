@@ -57,5 +57,5 @@ The description of the error provided by MPI is "MPI_ERR_INTERN: internal error"
 The numerical value of the original error code is 17.
 DEAL::
 deal.II encountered an error while calling an MPI function.
-The description of the error provided by MPI is "MPI_ERR_UNKNOWN: unknown error".
+This error code is not equal to any of the standard MPI error codes.
 The numerical value of the original error code is 92.

@@ -357,18 +357,24 @@ namespace StandardExceptions
     error_name[0] = '\0';
     int resulting_length = MPI_MAX_ERROR_STRING;
 
-    // get the string name of the error code by first converting it to an error
-    // class.
-    int error_class = 0;
-    int ierr = MPI_Error_class (error_code, &error_class);
-
-    // Check the output of the error printing functions. If either MPI function
-    // fails we should just print a less descriptive message.
-    bool error_name_known = ierr == MPI_SUCCESS;
-    if (error_name_known)
+    bool error_name_known = false;
+    // workaround for Open MPI 1.6.5 not accepting
+    // MPI_ERR_LASTCODE in MPI_Error_class
+    if (error_code < MPI_ERR_LASTCODE)
       {
-        ierr = MPI_Error_string (error_class, error_name, &resulting_length);
-        error_name_known = error_name_known && (ierr == MPI_SUCCESS);
+        // get the string name of the error code by first converting it to an
+        // error class.
+        int error_class = 0;
+        int ierr = MPI_Error_class (error_code, &error_class);
+        error_name_known = (ierr == MPI_SUCCESS);
+
+        // Check the output of the error printing functions. If either MPI
+        // function fails we should just print a less descriptive message.
+        if (error_name_known)
+          {
+            ierr = MPI_Error_string (error_class, error_name, &resulting_length);
+            error_name_known = error_name_known && (ierr == MPI_SUCCESS);
+          }
       }
 
     out << "deal.II encountered an error while calling an MPI function."
