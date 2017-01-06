@@ -227,7 +227,7 @@ void test(const FiniteElement<dim> &fe, unsigned n_cycles, bool global, const Po
 int main ()
 {
   std::ofstream logfile ("output");
-  deallog << std::setprecision(6);
+  deallog << std::setprecision(7);
   deallog << std::fixed;
   deallog.attach(logfile);
   deallog.threshold_double (1e-8);
