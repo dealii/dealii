@@ -1,0 +1,4 @@
+New: hp::DoFHandler now uses a compressed data structure for its
+internal representation of DoF indices. This saves memory.
+<br>
+(Wolfgang Bangerth, 2017/01/06)

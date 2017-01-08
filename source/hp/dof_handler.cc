@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2016 by the deal.II authors
+// Copyright (C) 2003 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -3175,6 +3175,14 @@ namespace hp
                     tria->n_raw_cells(level),
                     ExcInternalError ());
           }
+
+        // it may be that the previous table was compressed; in that
+        // case, restore the correct active_fe_index. the fact that
+        // this no longer matches the indices in the table is of no
+        // importance because the current function is called at a
+        // point where we have to recreate the dof_indices tables in
+        // the levels anyway
+        levels[level]->normalize_active_fe_indices ();
       }
   }
 

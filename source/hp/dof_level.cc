@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2015 by the deal.II authors
+// Copyright (C) 2003 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,7 +29,6 @@ namespace internal
     DoFLevel::compress_data (const dealii::hp::FECollection<dim,spacedim> &fe_collection)
     {
       (void)fe_collection;
-      return;
 
       if (dof_offsets.size() == 0 || dof_indices.size()==0)
         return;
@@ -81,6 +80,7 @@ namespace internal
       // now allocate the new array and copy into it whatever we need
       std::vector<types::global_dof_index> new_dof_indices;
       new_dof_indices.reserve(new_size);
+      std::vector<offset_type> new_dof_offsets (dof_offsets.size(), (offset_type)(-1));
       for (unsigned int cell=0; cell<dof_offsets.size(); )
         // see if this cell is active on the current level
         if (dof_offsets[cell] != (offset_type)(-1))
@@ -97,6 +97,8 @@ namespace internal
 
             Assert (next_offset-dof_offsets[cell] == fe_collection[active_fe_indices[cell]].template n_dofs_per_object<dim>(),
                     ExcInternalError());
+
+            new_dof_offsets[cell] = new_dof_indices.size();
 
             // see if the range of dofs for this cell can be compressed and if so
             // how many slots we have to store for them
@@ -118,10 +120,11 @@ namespace internal
 
                     // make sure that the current active_fe_index indicates
                     // that this entry hasn't been compressed yet
-                    Assert ((signed_active_fe_index_type)active_fe_indices[cell] >= 0, ExcInternalError());
+                    Assert (is_compressed_entry(active_fe_indices[cell]) == false,
+                            ExcInternalError());
 
                     // then mark the compression
-                    active_fe_indices[cell] = (active_fe_index_type)~(signed_active_fe_index_type)active_fe_indices[cell];
+                    active_fe_indices[cell] = get_toggled_compression_state(active_fe_indices[cell]);
                   }
                 else
                   for (unsigned int i=dof_offsets[cell]; i<next_offset; ++i)
@@ -137,6 +140,7 @@ namespace internal
       // finally swap old and new content
       Assert (new_dof_indices.size() == new_size, ExcInternalError());
       dof_indices.swap (new_dof_indices);
+      dof_offsets.swap (new_dof_offsets);
     }
 
 
@@ -145,8 +149,6 @@ namespace internal
     void
     DoFLevel::uncompress_data(const dealii::hp::FECollection<dim,spacedim> &fe_collection)
     {
-      return;
-
       if (dof_offsets.size() == 0 || dof_indices.size()==0)
         return;
 
@@ -183,7 +185,7 @@ namespace internal
             new_dof_offsets[cell] = new_dof_indices.size();
 
             // see if we need to uncompress this set of dofs
-            if ((signed_active_fe_index_type)active_fe_indices[cell]>=0)
+            if (is_compressed_entry(active_fe_indices[cell]) == false)
               {
                 // apparently not. simply copy them
                 Assert (next_offset-dof_offsets[cell] == fe_collection[active_fe_indices[cell]].template n_dofs_per_object<dim>(),
@@ -196,8 +198,14 @@ namespace internal
                 // apparently so. uncompress
                 Assert (next_offset-dof_offsets[cell] == 1,
                         ExcInternalError());
-                for (unsigned int i=0; i<fe_collection[active_fe_indices[cell]].template n_dofs_per_object<dim>(); ++i)
+                const unsigned int dofs_per_object
+                  = fe_collection[get_toggled_compression_state(active_fe_indices[cell])]
+                    .template n_dofs_per_object<dim>();
+                for (unsigned int i=0; i<dofs_per_object; ++i)
                   new_dof_indices.push_back (dof_indices[dof_offsets[cell]]+i);
+
+                // then mark the uncompression
+                active_fe_indices[cell] = get_toggled_compression_state(active_fe_indices[cell]);
               }
 
             // then move on to the next cell
@@ -213,6 +221,7 @@ namespace internal
     }
 
 
+
     std::size_t
     DoFLevel::memory_consumption () const
     {
@@ -222,6 +231,17 @@ namespace internal
               MemoryConsumption::memory_consumption (cell_cache_offsets) +
               MemoryConsumption::memory_consumption(cell_dof_indices_cache));
     }
+
+
+
+    void DoFLevel::normalize_active_fe_indices ()
+    {
+      for (unsigned int i=0; i<active_fe_indices.size(); ++i)
+        if (is_compressed_entry(active_fe_indices[i]))
+          active_fe_indices[i]
+            = get_toggled_compression_state(active_fe_indices[i]);
+    }
+
 
 
     // explicit instantiations
