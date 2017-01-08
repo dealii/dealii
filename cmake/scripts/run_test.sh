@@ -27,10 +27,11 @@ set -u
 
 STAGE="$1"
 TEST_FULL="$2"
-RUN_COMMAND="$3"
-NUMDIFF_EXECUTABLE="$4"
-DIFF_EXECUTABLE="$5"
-COMPARISON_FILE="$6"
+NUMDIFF_EXECUTABLE="$3"
+DIFF_EXECUTABLE="$4"
+COMPARISON_FILE="$5"
+shift 5
+RUN_COMMAND=( "$@" )
 
 # Ensure uniform sorting for pathname expansion
 export LC_ALL=C
@@ -44,7 +45,7 @@ run(){
   rm -f output
   rm -f stdout
 
-  "${RUN_COMMAND}" > stdout 2>&1
+  "${RUN_COMMAND[@]}" > stdout 2>&1
   RETURN_VALUE=$?
 
   [ -f output ] || mv stdout output

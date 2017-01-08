@@ -169,7 +169,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
       IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.cc")
 
         SET(_target ${_test_name}.${_build_lowercase}) # target name
-        SET(_run_command "$<TARGET_FILE:${_target}>") # the command to issue
+        SET(_run_args "$<TARGET_FILE:${_target}>") # the command to issue
 
       ELSEIF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.prm")
 
@@ -184,7 +184,10 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
             "\" is defined.\n\n"
             )
         ENDIF()
-        SET(_run_command "$<TARGET_FILE:${_target}> ${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.prm")
+        SET(_run_args
+          "$<TARGET_FILE:${_target}>"
+          "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.prm"
+          )
 
       ELSE()
         MESSAGE(FATAL_ERROR
@@ -210,7 +213,13 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         SET(_diff_target ${_test_name}.mpirun${_n_cpu}.${_build_lowercase}.diff) # diff target name
         SET(_test_full ${_category}/${_test_name}.mpirun=${_n_cpu}.${_build_lowercase}) # full test name
         SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}/mpirun=${_n_cpu}) # directory to run the test in
-        SET(_run_command "${DEAL_II_MPIEXEC} ${DEAL_II_MPIEXEC_NUMPROC_FLAG} ${_n_cpu} ${DEAL_II_MPIEXEC_PREFLAGS} ${_run_command} ${DEAL_II_MPIEXEC_POSTFLAGS}")
+        SET(_run_args
+          "${DEAL_II_MPIEXEC}"
+          ${DEAL_II_MPIEXEC_NUMPROC_FLAG} ${_n_cpu}
+          ${DEAL_II_MPIEXEC_PREFLAGS}
+          ${_run_args}
+          "${DEAL_II_MPIEXEC_POSTFLAGS}"
+          )
       ENDIF()
 
       FILE(MAKE_DIRECTORY ${_test_directory})
@@ -257,8 +266,8 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
 
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/output
         COMMAND sh ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
-          run "${_test_full}" "${_run_command}" "${_test_diff}"
-          "${DIFF_EXECUTABLE}" "${_comparison_file}"
+          run "${_test_full}" "${_test_diff}"
+          "${DIFF_EXECUTABLE}" "${_comparison_file}" ${_run_args}
         COMMAND ${PERL_EXECUTABLE}
           -pi ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/normalize.pl
           ${_test_directory}/output
@@ -274,8 +283,8 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
 
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/diff
         COMMAND sh ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
-          diff "${_test_full}" "${_run_command}" "${_test_diff}"
-          "${DIFF_EXECUTABLE}" "${_comparison_file}"
+          diff "${_test_full}" "${_test_diff}"
+          "${DIFF_EXECUTABLE}" "${_comparison_file}" ${_run_args}
         WORKING_DIRECTORY
           ${_test_directory}
         DEPENDS
