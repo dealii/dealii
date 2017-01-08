@@ -2589,10 +2589,17 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   data.mapping_support_points = this->compute_mapping_support_points(cell);
   data.cell_of_current_support_points = cell;
 
+  // if the order of the mapping is greater than 1, then do not reuse any cell
+  // similarity information. This is necessary because the cell similarity
+  // value is computed with just cell vertices and does not take into account
+  // cell curvature.
+  const CellSimilarity::Similarity computed_cell_similarity =
+    (polynomial_degree == 1 ? cell_similarity : CellSimilarity::none);
+
   internal::maybe_compute_q_points<dim,spacedim> (QProjector<dim>::DataSetDescriptor::cell (),
                                                   data,
                                                   output_data.quadrature_points);
-  internal::maybe_update_Jacobians<dim,spacedim> (cell_similarity,
+  internal::maybe_update_Jacobians<dim,spacedim> (computed_cell_similarity,
                                                   QProjector<dim>::DataSetDescriptor::cell (),
                                                   data);
 
@@ -2612,7 +2619,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
               ExcDimensionMismatch(output_data.normal_vectors.size(), n_q_points));
 
 
-      if (cell_similarity != CellSimilarity::translation)
+      if (computed_cell_similarity != CellSimilarity::translation)
         for (unsigned int point=0; point<n_q_points; ++point)
           {
 
@@ -2649,7 +2656,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                 output_data.JxW_values[point]
                   = sqrt(determinant(G)) * weights[point];
 
-                if (cell_similarity == CellSimilarity::inverted_translation)
+                if (computed_cell_similarity == CellSimilarity::inverted_translation)
                   {
                     // we only need to flip the normal
                     if (update_flags & update_normal_vectors)
@@ -2693,7 +2700,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   if (update_flags & update_jacobians)
     {
       AssertDimension (output_data.jacobians.size(), n_q_points);
-      if (cell_similarity != CellSimilarity::translation)
+      if (computed_cell_similarity != CellSimilarity::translation)
         for (unsigned int point=0; point<n_q_points; ++point)
           output_data.jacobians[point] = data.contravariant[point];
     }
@@ -2702,42 +2709,42 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   if (update_flags & update_inverse_jacobians)
     {
       AssertDimension (output_data.inverse_jacobians.size(), n_q_points);
-      if (cell_similarity != CellSimilarity::translation)
+      if (computed_cell_similarity != CellSimilarity::translation)
         for (unsigned int point=0; point<n_q_points; ++point)
           output_data.inverse_jacobians[point] = data.covariant[point].transpose();
     }
 
-  internal::maybe_update_jacobian_grads<dim,spacedim> (cell_similarity,
+  internal::maybe_update_jacobian_grads<dim,spacedim> (computed_cell_similarity,
                                                        QProjector<dim>::DataSetDescriptor::cell (),
                                                        data,
                                                        output_data.jacobian_grads);
 
-  internal::maybe_update_jacobian_pushed_forward_grads<dim,spacedim> (cell_similarity,
+  internal::maybe_update_jacobian_pushed_forward_grads<dim,spacedim> (computed_cell_similarity,
       QProjector<dim>::DataSetDescriptor::cell (),
       data,
       output_data.jacobian_pushed_forward_grads);
 
-  internal::maybe_update_jacobian_2nd_derivatives<dim,spacedim> (cell_similarity,
+  internal::maybe_update_jacobian_2nd_derivatives<dim,spacedim> (computed_cell_similarity,
       QProjector<dim>::DataSetDescriptor::cell (),
       data,
       output_data.jacobian_2nd_derivatives);
 
-  internal::maybe_update_jacobian_pushed_forward_2nd_derivatives<dim,spacedim> (cell_similarity,
+  internal::maybe_update_jacobian_pushed_forward_2nd_derivatives<dim,spacedim> (computed_cell_similarity,
       QProjector<dim>::DataSetDescriptor::cell (),
       data,
       output_data.jacobian_pushed_forward_2nd_derivatives);
 
-  internal::maybe_update_jacobian_3rd_derivatives<dim,spacedim> (cell_similarity,
+  internal::maybe_update_jacobian_3rd_derivatives<dim,spacedim> (computed_cell_similarity,
       QProjector<dim>::DataSetDescriptor::cell (),
       data,
       output_data.jacobian_3rd_derivatives);
 
-  internal::maybe_update_jacobian_pushed_forward_3rd_derivatives<dim,spacedim> (cell_similarity,
+  internal::maybe_update_jacobian_pushed_forward_3rd_derivatives<dim,spacedim> (computed_cell_similarity,
       QProjector<dim>::DataSetDescriptor::cell (),
       data,
       output_data.jacobian_pushed_forward_3rd_derivatives);
 
-  return cell_similarity;
+  return computed_cell_similarity;
 }
 
 
