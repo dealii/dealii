@@ -44,7 +44,7 @@ run(){
   rm -f output
   rm -f stdout
 
-  ${RUN_COMMAND} > stdout 2>&1
+  "${RUN_COMMAND}" > stdout 2>&1
   RETURN_VALUE=$?
 
   [ -f output ] || mv stdout output
@@ -79,16 +79,16 @@ diff() {
   #
   for file in "${COMPARISON_FILE}"*; do
     # determine variant name (empty string for main comparison file):
-    variant=${file#*.output}
+    variant="${file#*.output}"
 
     #
     # Run diff or numdiff (if available) to determine whether files are the
     # same. Create a diff file "diff${variant}" for each variant file that
     # is found (including the main comparison file).
     #
-    case ${NUMDIFF_EXECUTABLE} in
+    case "${NUMDIFF_EXECUTABLE}" in
       *numdiff*)
-        ${NUMDIFF_EXECUTABLE} -a 1e-6 -r 1e-8 -s ' \t\n:<>=,;' \
+        "${NUMDIFF_EXECUTABLE}" -a 1e-6 -r 1e-8 -s ' \t\n:<>=,;' \
                               "${file}" output > diff${variant}
         ;;
       *)
