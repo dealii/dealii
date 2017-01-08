@@ -1,0 +1,76 @@
+
+DEAL::FE degree: 1
+DEAL::mapping order: 1
+DEAL::current slope: 2.0935
+DEAL::current slope: 2.0244
+DEAL::Last number of DoFs: 4913
+DEAL::Last L2 error: 0.0099885
+DEAL::regression slope: 2.0589
+DEAL::mapping order: 2
+DEAL::current slope: 2.0933
+DEAL::current slope: 2.0244
+DEAL::Last number of DoFs: 4913
+DEAL::Last L2 error: 0.0099885
+DEAL::regression slope: 2.0588
+DEAL::mapping order: 3
+DEAL::current slope: 2.0933
+DEAL::current slope: 2.0244
+DEAL::Last number of DoFs: 4913
+DEAL::Last L2 error: 0.0099885
+DEAL::regression slope: 2.0588
+DEAL::FE degree: 2
+DEAL::mapping order: 1
+DEAL::current slope: 2.8710
+DEAL::current slope: 2.9558
+DEAL::Last number of DoFs: 35937
+DEAL::Last L2 error: 0.00031701
+DEAL::regression slope: 2.9134
+DEAL::mapping order: 2
+DEAL::current slope: 2.8700
+DEAL::current slope: 2.9556
+DEAL::Last number of DoFs: 35937
+DEAL::Last L2 error: 0.00031699
+DEAL::regression slope: 2.9128
+DEAL::mapping order: 3
+DEAL::current slope: 2.8700
+DEAL::current slope: 2.9556
+DEAL::Last number of DoFs: 35937
+DEAL::Last L2 error: 0.00031699
+DEAL::regression slope: 2.9128
+DEAL::mapping order: 4
+DEAL::current slope: 2.8700
+DEAL::current slope: 2.9556
+DEAL::Last number of DoFs: 35937
+DEAL::Last L2 error: 0.00031699
+DEAL::regression slope: 2.9128
+DEAL::FE degree: 3
+DEAL::mapping order: 1
+DEAL::current slope: 4.0630
+DEAL::current slope: 4.0165
+DEAL::Last number of DoFs: 117649
+DEAL::Last L2 error: 3.3894e-06
+DEAL::regression slope: 4.0398
+DEAL::mapping order: 2
+DEAL::current slope: 4.0627
+DEAL::current slope: 4.0164
+DEAL::Last number of DoFs: 117649
+DEAL::Last L2 error: 3.3894e-06
+DEAL::regression slope: 4.0396
+DEAL::mapping order: 3
+DEAL::current slope: 4.0627
+DEAL::current slope: 4.0164
+DEAL::Last number of DoFs: 117649
+DEAL::Last L2 error: 3.3894e-06
+DEAL::regression slope: 4.0396
+DEAL::mapping order: 4
+DEAL::current slope: 4.0627
+DEAL::current slope: 4.0164
+DEAL::Last number of DoFs: 117649
+DEAL::Last L2 error: 3.3894e-06
+DEAL::regression slope: 4.0396
+DEAL::mapping order: 5
+DEAL::current slope: 4.0627
+DEAL::current slope: 4.0164
+DEAL::Last number of DoFs: 117649
+DEAL::Last L2 error: 3.3894e-06
+DEAL::regression slope: 4.0396
