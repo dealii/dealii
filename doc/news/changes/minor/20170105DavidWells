@@ -1,0 +1,3 @@
+Fixed: MappingQGeneric, when computing values on a given cell, sometimes reused information computed on a different cell whose faces were curved in a different way. MappingQGeneric now recomputes all values when its order is greater than one (that is, when it can represent curved cells).
+<br>
+(David Wells, 2017/01/05)
