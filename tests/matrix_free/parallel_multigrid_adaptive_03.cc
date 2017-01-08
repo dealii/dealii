@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2016 by the deal.II authors
+// Copyright (C) 2014 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -70,7 +70,6 @@ public:
       addit_data.tasks_parallel_scheme = MatrixFree<dim,number>::AdditionalData::none;
     addit_data.tasks_block_size = 3;
     addit_data.level_mg_handler = level;
-    addit_data.mpi_communicator = MPI_COMM_WORLD;
     ConstraintMatrix constraints;
     if (level == numbers::invalid_unsigned_int)
       {

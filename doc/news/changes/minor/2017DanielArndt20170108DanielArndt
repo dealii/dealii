@@ -1,0 +1,4 @@
+Improved: The MPI_Comm used in MatrixFree is not configurable via 
+AdditionalData anymore but set to the MPI_Comm of the Triangulation.
+<br>
+(Daniel Arndt, 2017/01/08)

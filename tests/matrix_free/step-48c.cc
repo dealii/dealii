@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2015 by the deal.II authors
+// Copyright (C) 2012 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -266,7 +266,6 @@ namespace Step48
 
     QGaussLobatto<1> quadrature (fe_degree+1);
     typename MatrixFree<dim>::AdditionalData additional_data;
-    additional_data.mpi_communicator = MPI_COMM_WORLD;
     additional_data.tasks_parallel_scheme =
       MatrixFree<dim>::AdditionalData::partition_partition;
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 by the deal.II authors
+// Copyright (C) 2016 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -118,7 +118,6 @@ void do_project (const parallel::distributed::Triangulation<dim> &triangulation,
 
   typename MatrixFree<dim,double>::AdditionalData additional_data;
   additional_data.tasks_parallel_scheme = MatrixFree<dim,double>::AdditionalData::partition_color;
-  additional_data.mpi_communicator = MPI_COMM_WORLD;
   additional_data.mapping_update_flags = update_values | update_JxW_values | update_quadrature_points;
   MatrixFree<dim,double>  data;
   data.reinit (dof_handler, constraints, quadrature_formula_1d, additional_data);
