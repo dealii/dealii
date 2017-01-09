@@ -61,7 +61,8 @@ namespace TrilinosWrappers
    * ParameterList) and is similar to the deal.II class SolverSelector.
    *
    * @ingroup TrilinosWrappers
-   * @author Martin Kronbichler, 2008, 2009
+   * @author Martin Kronbichler, 2008, 2009; extension for full compatibility
+   * with LinearOperator class: Jean-Paul Pelteret, 2015
    */
   class SolverBase
   {
@@ -164,10 +165,58 @@ namespace TrilinosWrappers
      * Trilinos is chosen.
      */
     void
-    solve (Epetra_Operator        &A,
+    solve (const Epetra_Operator  &A,
            VectorBase             &x,
            const VectorBase       &b,
            const PreconditionBase &preconditioner);
+
+    /**
+     * Solve the linear system <tt>Ax=b</tt> where both <tt>A</tt> and its
+     * @p precondtioner are an operator.
+     * This function can be used when both <tt>A</tt> and the @p preconditioner
+     * are LinearOperators derived from a TrilinosPayload.
+     * Depending on the information provided by derived classes and the object
+     * passed as a preconditioner, one of the linear solvers and preconditioners
+     * of Trilinos is chosen.
+     */
+    void
+    solve (const Epetra_Operator  &A,
+           VectorBase             &x,
+           const VectorBase       &b,
+           const Epetra_Operator  &preconditioner);
+
+    /**
+     * Solve the linear system <tt>Ax=b</tt> where <tt>A</tt> is an operator,
+     * and the vectors @p x and @p b are native Trilinos vector types.
+     * This function can be used when <tt>A</tt> is a LinearOperators derived
+     * from a TrilinosPayload.
+     * Depending on the information provided by derived classes and the object
+     * passed as a preconditioner, one of the linear solvers and preconditioners
+     * of Trilinos is chosen.
+     */
+    void
+    solve (const Epetra_Operator    &A,
+           Epetra_MultiVector       &x,
+           const Epetra_MultiVector &b,
+           const PreconditionBase   &preconditioner);
+
+    /**
+     * Solve the linear system <tt>Ax=b</tt> where both <tt>A</tt> and its
+     * @p precondtioner are an operator, and the vectors @p x and @p b are
+     * native Trilinos vector types.
+     * This function can be used when both <tt>A</tt> and the @p preconditioner
+     * are LinearOperators derived from a TrilinosPayload.
+     * Depending on the information provided by derived classes and the object
+     * passed as a preconditioner, one of the linear solvers and preconditioners
+     * of Trilinos is chosen.
+     */
+    void
+    solve (const Epetra_Operator    &A,
+           Epetra_MultiVector       &x,
+           const Epetra_MultiVector &b,
+           const Epetra_Operator    &preconditioner);
+
+
 
     /**
      * Solve the linear system <tt>Ax=b</tt>. Depending on the information
@@ -257,7 +306,15 @@ namespace TrilinosWrappers
      * The solve function is used to set properly the Epetra_LinearProblem,
      * once it is done this function solves the linear problem.
      */
-    void do_solve(const PreconditionBase &preconditioner);
+    template<typename Preconditioner>
+    void do_solve(const Preconditioner &preconditioner);
+
+    /**
+    * A function that sets the preconditioner that the solver will apply
+    */
+    template<typename Preconditioner>
+    void set_preconditioner (AztecOO              &solver,
+                             const Preconditioner &preconditioner);
 
     /**
      * A structure that collects the Trilinos sparse matrix, the right hand
