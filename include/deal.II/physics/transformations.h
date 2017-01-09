@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 by the deal.II authors
+// Copyright (C) 2016 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,7 @@
 #ifndef dealii__transformations_h
 #define dealii__transformations_h
 
+#include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/symmetric_tensor.h>
 
@@ -27,6 +28,75 @@ namespace Physics
 
   namespace Transformations
   {
+
+    /**
+     * Transformation functions and tensors that are defined in terms of
+     * rotation angles and axes of rotation.
+     *
+     * @author Jean-Paul Pelteret, 2017
+    */
+    namespace Rotations
+    {
+      /**
+       * @name Rotation matrices
+       */
+//@{
+
+      /**
+      * Returns the rotation matrix for 2-d Euclidean space, namely
+      * @f[
+      *  \mathbf{R} := \left[ \begin{array}{cc}
+      *  cos(\theta) & sin(\theta) \\
+      *  -sin(\theta) & cos(\theta)
+      * \end{array}\right]
+      * @f]
+      * where $\theta$ is the rotation angle given in radians.
+      * In particular, this describes the counter-clockwise rotation of a vector
+      * relative to a
+      * <a href="http://mathworld.wolfram.com/RotationMatrix.html">fixed set of right-handed axes</a>.
+      *
+      * @param[in] angle The rotation angle (about the z-axis) in radians
+      */
+      template<typename Number>
+      Tensor<2,2,Number>
+      rotation_matrix_2d (const Number &angle);
+
+
+      /**
+      * Returns the rotation matrix for 3-d Euclidean space.
+      * Most concisely stated using the Rodrigues' rotation formula, this
+      * function returns the equivalent of
+      * @f[
+      *  \mathbf{R} := cos(\theta)\mathbf{I} + sin(\theta)\mathbf{W}
+      *              + (1-cos(\theta))\mathbf{u}\otimes\mathbf{u}
+      * @f]
+      * where $\mathbf{u}$ is the axial vector (an axial vector) and $\theta$
+      * is the rotation angle given in radians, $\mathbf{I}$ is the identity
+      * tensor and $\mathbf{W}$ is the skew symmetric tensor of $\mathbf{u}$.
+      *
+      * @dealiiWriggersA{374,9.194}
+      * This presents Rodrigues' rotation formula, but the implementation used
+      * in this function is described in this
+      * <a href="https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle">wikipedia link</a>.
+      * In particular, this describes the counter-clockwise rotation of a vector
+      * <a href="http://mathworld.wolfram.com/RotationMatrix.html">in a plane with its normal</a>.
+      * defined by the @p axis of rotation.
+      * An alternative implementation is discussed at
+      * <a href="https://www.gamedev.net/resources/_/technical/math-and-physics/do-we-really-need-quaternions-r1199">this link</a>,
+      * but is inconsistent (sign-wise) with the Rodrigues' rotation formula as
+      * it describes the rotation of a coordinate system.
+      *
+      * @param[in] axis  A unit vector that defines the axis of rotation
+      * @param[in] angle The rotation angle in radians
+      */
+      template<typename Number>
+      Tensor<2,3,Number>
+      rotation_matrix_3d (const Point<3,Number> &axis,
+                          const Number          &angle);
+
+//@}
+
+    }
 
     /**
      * Transformation of tensors that are defined in terms of a set of
@@ -785,6 +855,55 @@ namespace internal
       }
     }
   }
+}
+
+
+
+template<typename Number>
+Tensor<2,2,Number>
+Physics::Transformations::Rotations::rotation_matrix_2d (const Number &angle)
+{
+  const double rotation[2][2]
+  = {{
+      std::cos(angle) , -std::sin(angle)
+    },
+    {
+      std::sin(angle) , std::cos(angle)
+    }
+  };
+  return Tensor<2,2> (rotation);
+}
+
+
+
+template<typename Number>
+Tensor<2,3,Number>
+Physics::Transformations::Rotations::rotation_matrix_3d (const Point<3,Number> &axis,
+                                                         const Number          &angle)
+{
+  Assert(std::abs(axis.norm() - 1.0) < 1e-9,
+         ExcMessage("The supplied axial vector is not a unit vector."));
+  const Number c = std::cos(angle);
+  const Number s = std::sin(angle);
+  const Number t = 1.-c;
+  const double rotation[3][3]
+  = {{
+      t *axis[0] *axis[0] + c,
+      t *axis[0] *axis[1] - s *axis[2],
+      t *axis[0] *axis[2] + s *axis[1]
+    },
+    {
+      t *axis[0] *axis[1] + s *axis[2],
+      t *axis[1] *axis[1] + c,
+      t *axis[1] *axis[2] - s *axis[0]
+    },
+    {
+      t *axis[0] *axis[2] - s *axis[1],
+      t *axis[1] *axis[2] + s *axis[0],
+      t *axis[2] *axis[2] + c
+    }
+  };
+  return Tensor<2,3,Number>(rotation);
 }
 
 
