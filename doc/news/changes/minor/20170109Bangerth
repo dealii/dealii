@@ -1,0 +1,3 @@
+Fixed: PolynomialsABF::compute_n_pols() returned the wrong value in 3d.
+<br>
+(Wolfgang Bangerth, 2017/01/09)
