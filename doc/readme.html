@@ -288,6 +288,17 @@
 	  are usually found almost instantaneously, displaying the file
 	  name and line number of where the problem occurred.
 	</p>
+	<p>
+	  With GCC Debug mode, by default, uses the <code>-Og</code> flag. It promises most of the
+	  debugging experience of <code>-O0</code> but at a better performance.
+	  This is a reasonable choice for unit tests and enables numerous asserts
+	  within the library. Sometimes, however, one needs Debug mode to use
+	  <code>-O0</code>, where all compiler optimizations are avoided and code and variables
+	  are exactly as indicated in the C++ program (e.g. with <code>-Og</code> GCC 6.2.0
+	  optimizes out local variables).
+	  This can be achieved by configuring <acronym>deal.II</acronym> with
+	  <code>-DDEAL_II_HAVE_FLAG_Og=false</code>.
+	</p>
 	</li>
 
 	<li> <i>Optimized mode</i>: You will want to link with this version of
