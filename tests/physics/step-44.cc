@@ -710,7 +710,7 @@ namespace Step44
     parameters(input_file),
     triangulation(Triangulation<dim>::maximum_smoothing),
     time(parameters.end_time, parameters.delta_t),
-    timer(deallog.get_file_stream(),
+    timer(std::cout,
           TimerOutput::never,
           TimerOutput::wall_times),
     degree(parameters.poly_degree),
@@ -727,7 +727,7 @@ namespace Step44
     qf_face(parameters.quad_order),
     n_q_points (qf_cell.size()),
     n_q_points_f (qf_face.size()),
-    pcout(deallog.get_file_stream())
+    pcout(std::cout)
   {
     Assert(dim==2 || dim==3, ExcMessage("This problem only works in 2 or 3 space dimensions."));
     determine_component_extractors();
@@ -753,7 +753,7 @@ namespace Step44
                             J_mask,
                             solution_n);
     }
-    output_results();
+    // output_results();
     time.increment();
     BlockVector<double> solution_delta(dofs_per_block);
     while (time.current() < time.end())
@@ -761,7 +761,24 @@ namespace Step44
         solution_delta = 0.0;
         solve_nonlinear_timestep(solution_delta);
         solution_n += solution_delta;
-        output_results();
+        // output_results();
+        // Output displacement at centre of traction surface
+        {
+          const Point<dim> soln_pt (dim==3 ? Point<dim>(0.0, 1.0, 0.0)*parameters.scale : Point<dim>(0.0, 1.0)*parameters.scale);
+          typename DoFHandler<dim>::active_cell_iterator cell =
+            dof_handler_ref.begin_active(), endc = dof_handler_ref.end();
+          for (; cell != endc; ++cell)
+            for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+              if (cell->vertex(v).distance(soln_pt) < 1e-6*parameters.scale)
+                {
+                  Tensor<1,dim> soln;
+                  for (unsigned int d=0; d<dim; ++d)
+                    soln[d] = solution_n(cell->vertex_dof_index(v,u_dof+d));
+                  deallog
+                      << "Timestep " << time.get_timestep()
+                      << ": " << soln << std::endl;
+                }
+        }
         time.increment();
       }
   }
@@ -1798,7 +1815,7 @@ namespace Step44
                                      * parameters.max_iterations_lin;
               const double tol_sol = parameters.tol_lin
                                      * system_rhs.block(u_dof).l2_norm();
-              SolverControl solver_control(solver_its, tol_sol);
+              SolverControl solver_control(solver_its, tol_sol, false, false);
               GrowingVectorMemory<Vector<double> > GVM;
               SolverCG<Vector<double> > solver_CG(solver_control, GVM);
               PreconditionSelector<SparseMatrix<double>, Vector<double> >
@@ -1948,8 +1965,8 @@ namespace Step44
 int main (int argc,char **argv)
 {
   std::ofstream logfile("output");
+  deallog << std::setprecision(3);
   deallog.attach(logfile);
-  deallog.depth_file(0);
   deallog.threshold_double(1.e-10);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
