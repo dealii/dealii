@@ -99,7 +99,6 @@ void test ()
   {
     const QGauss<1> quad (fe_degree+1);
     typename MatrixFree<dim,number>::AdditionalData data;
-    data.mpi_communicator = MPI_COMM_WORLD;
     data.tasks_parallel_scheme =
       MatrixFree<dim,number>::AdditionalData::none;
     data.tasks_block_size = 7;

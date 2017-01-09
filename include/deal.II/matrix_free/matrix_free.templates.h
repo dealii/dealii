@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2016 by the deal.II authors
+// Copyright (C) 2011 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -74,38 +74,6 @@ copy_from (const MatrixFree<dim,Number> &v)
 
 
 
-namespace internal
-{
-  template <int dim>
-  void assert_communicator_equality (const dealii::Triangulation<dim> &tria,
-                                     const MPI_Comm                  &comm_mf)
-  {
-#ifdef DEAL_II_WITH_MPI
-    const parallel::distributed::Triangulation<dim> *dist_tria =
-      dynamic_cast<const parallel::distributed::Triangulation<dim>*>(&tria);
-    if (dist_tria != 0)
-      {
-        if (Utilities::MPI::job_supports_mpi())
-          {
-            int communicators_same = 0;
-            const int ierr = MPI_Comm_compare (dist_tria->get_communicator(), comm_mf,
-                                               &communicators_same);
-            AssertThrowMPI (ierr);
-            Assert (communicators_same == MPI_IDENT ||
-                    communicators_same == MPI_CONGRUENT,
-                    ExcMessage ("MPI communicator in parallel::distributed::Triangulation "
-                                "and matrix free class must be the same!"));
-          }
-      }
-#else
-    (void)tria;
-    (void)comm_mf;
-#endif
-  }
-}
-
-
-
 template <int dim, typename Number>
 void MatrixFree<dim,Number>::
 internal_reinit(const Mapping<dim>                          &mapping,
@@ -138,11 +106,14 @@ internal_reinit(const Mapping<dim>                          &mapping,
       AssertDimension (dof_handler.size(), locally_owned_set.size());
 
       // set variables that are independent of FE
-      internal::assert_communicator_equality (dof_handler[0]->get_triangulation(),
-                                              additional_data.mpi_communicator);
-      size_info.communicator = additional_data.mpi_communicator;
       if (Utilities::MPI::job_supports_mpi() == true)
         {
+          const parallel::Triangulation<dim> *dist_tria =
+            dynamic_cast<const parallel::Triangulation<dim>*>
+            (&(dof_handler[0]->get_triangulation()));
+          size_info.communicator = dist_tria != 0 ?
+                                   dist_tria->get_communicator() :
+                                   MPI_COMM_SELF;
           size_info.my_pid  =
             Utilities::MPI::this_mpi_process(size_info.communicator);
           size_info.n_procs =
@@ -150,6 +121,7 @@ internal_reinit(const Mapping<dim>                          &mapping,
         }
       else
         {
+          size_info.communicator = MPI_COMM_SELF;
           size_info.my_pid = 0;
           size_info.n_procs = 1;
         }
@@ -268,11 +240,14 @@ internal_reinit(const Mapping<dim>                            &mapping,
       AssertDimension (dof_handler.size(), locally_owned_set.size());
 
       // set variables that are independent of FE
-      internal::assert_communicator_equality (dof_handler[0]->get_triangulation(),
-                                              additional_data.mpi_communicator);
-      size_info.communicator = additional_data.mpi_communicator;
       if (Utilities::MPI::job_supports_mpi() == true)
         {
+          const parallel::Triangulation<dim> *dist_tria =
+            dynamic_cast<const parallel::Triangulation<dim>*>
+            (&(dof_handler[0]->get_triangulation()));
+          size_info.communicator = dist_tria != 0 ?
+                                   dist_tria->get_communicator() :
+                                   MPI_COMM_SELF;
           size_info.my_pid  =
             Utilities::MPI::this_mpi_process(size_info.communicator);
           size_info.n_procs =
@@ -280,6 +255,7 @@ internal_reinit(const Mapping<dim>                            &mapping,
         }
       else
         {
+          size_info.communicator = MPI_COMM_SELF;
           size_info.my_pid = 0;
           size_info.n_procs = 1;
         }

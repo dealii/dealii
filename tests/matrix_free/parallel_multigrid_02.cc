@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 by the deal.II authors
+// Copyright (C) 2016 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -118,7 +118,6 @@ void do_test (const DoFHandler<dim>  &dof)
 
   typename MatrixFree<dim,number>::AdditionalData fine_level_additional_data;
   fine_level_additional_data.tasks_parallel_scheme = MatrixFree<dim,number>::AdditionalData::none;
-  fine_level_additional_data.mpi_communicator = MPI_COMM_WORLD;
   fine_level_data.reinit (mapping, dof, constraints, QGauss<1>(n_q_points_1d),
                           fine_level_additional_data);
 
@@ -144,7 +143,6 @@ void do_test (const DoFHandler<dim>  &dof)
     {
       typename MatrixFree<dim,number>::AdditionalData mg_additional_data;
       mg_additional_data.tasks_parallel_scheme = MatrixFree<dim,number>::AdditionalData::none;
-      mg_additional_data.mpi_communicator = MPI_COMM_WORLD;
       mg_additional_data.level_mg_handler = level;
 
       ConstraintMatrix level_constraints;

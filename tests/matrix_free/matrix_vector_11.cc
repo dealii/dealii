@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2015 by the deal.II authors
+// Copyright (C) 2013 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -102,7 +102,6 @@ void test ()
   {
     const QGauss<1> quad (fe_degree+1);
     typename MatrixFree<dim,number>::AdditionalData data;
-    data.mpi_communicator = MPI_COMM_WORLD;
     data.tasks_parallel_scheme =
       MatrixFree<dim,number>::AdditionalData::none;
     data.tasks_block_size = 7;
@@ -130,7 +129,6 @@ void test ()
     {
       const QGauss<1> quad (fe_degree+1);
       typename MatrixFree<dim,number>::AdditionalData data;
-      data.mpi_communicator = MPI_COMM_WORLD;
       if (parallel_option == 0)
         {
           data.tasks_parallel_scheme =

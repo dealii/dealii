@@ -95,7 +95,6 @@ void test ()
   {
     const QGauss<1> quad (fe_degree+1);
     typename MatrixFree<dim,double>::AdditionalData data;
-    data.mpi_communicator = mpi_communicator;
     data.tasks_parallel_scheme =
       MatrixFree<dim,double>::AdditionalData::partition_color;
     data.mapping_update_flags = update_values | update_gradients | update_JxW_values;

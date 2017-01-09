@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2016 by the deal.II authors
+// Copyright (C) 2005 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -935,9 +935,6 @@ namespace VectorTools
       typename MatrixFree<dim,number>::AdditionalData additional_data;
       additional_data.tasks_parallel_scheme =
         MatrixFree<dim,number>::AdditionalData::partition_color;
-      if (const parallel::Triangulation<dim,spacedim> *parallel_tria =
-            dynamic_cast<const parallel::Triangulation<dim,spacedim>*>(&dof.get_tria()))
-        additional_data.mpi_communicator = parallel_tria->get_communicator();
       additional_data.mapping_update_flags = (update_values | update_JxW_values);
       MatrixFree<dim, number> matrix_free;
       matrix_free.reinit (mapping, dof, constraints,
@@ -1184,9 +1181,6 @@ namespace VectorTools
       typename MatrixFree<dim,Number>::AdditionalData additional_data;
       additional_data.tasks_parallel_scheme =
         MatrixFree<dim,Number>::AdditionalData::partition_color;
-      if (const parallel::Triangulation<dim,spacedim> *parallel_tria =
-            dynamic_cast<const parallel::Triangulation<dim,spacedim>*>(&dof.get_tria()))
-        additional_data.mpi_communicator = parallel_tria->get_communicator();
       additional_data.mapping_update_flags = (update_values | update_JxW_values);
       MatrixFree<dim, Number> matrix_free;
       matrix_free.reinit (mapping, dof, constraints,
