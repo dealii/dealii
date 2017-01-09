@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2015 by the deal.II authors
+// Copyright (C) 2004 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,6 +27,7 @@
 #include <deal.II/base/table.h>
 #include <deal.II/base/thread_management.h>
 
+#include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -62,11 +63,6 @@ public:
    * contained.
    */
   PolynomialsABF (const unsigned int k);
-
-  /**
-   * Destructor deleting the polynomials.
-   */
-  ~PolynomialsABF ();
 
   /**
    * Compute the value and the first and second derivatives of each Raviart-
@@ -118,9 +114,10 @@ private:
 
   /**
    * An object representing the polynomial space for a single component. We
-   * can re-use it by rotating the coordinates of the evaluation point.
+   * can re-use it for the other vector components by rotating the
+   * coordinates of the evaluation point.
    */
-  AnisotropicPolynomials<dim> *polynomial_space;
+  const AnisotropicPolynomials<dim> polynomial_space;
 
   /**
    * Number of Raviart-Thomas polynomials.
