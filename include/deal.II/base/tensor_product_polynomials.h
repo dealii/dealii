@@ -353,7 +353,7 @@ private:
    * Number of tensor product polynomials. This is <tt>Nx*Ny*Nz</tt>, or with
    * terms dropped if the number of space dimensions is less than 3.
    */
-  unsigned int n_tensor_pols;
+  const unsigned int n_tensor_pols;
 
   /**
    * Each tensor product polynomial @þ{i} is a product of one-dimensional
