@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2015 by the deal.II authors
+// Copyright (C) 2010 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -181,6 +181,65 @@ namespace LocalIntegrators
                           (2. * fe.shape_value_component(i,k,d) * penalty * fe.shape_value_component(j,k,d)
                            - (n * fe.shape_grad_component(i,k,d)) * fe.shape_value_component(j,k,d)
                            - (n * fe.shape_grad_component(j,k,d)) * fe.shape_value_component(i,k,d));
+        }
+    }
+
+    /**
+     * Weak boundary condition of Nitsche type for the Laplacian applied to the
+     * tangential component only, namely on
+     * the face <i>F</i> the matrix
+     * @f[
+     * \int_F \Bigl(\gamma u_\tau v_\tau - \partial_n u_\tau v_\tau - u_\tau \partial_n v_\tau\Bigr)\;ds.
+     * @f]
+     *
+     * Here, $\gamma$ is the <tt>penalty</tt> parameter suitably computed with
+     * compute_penalty().
+     *
+     * @author Guido Kanschat
+     * @date 2017
+     */
+    template <int dim>
+    void nitsche_tangential_matrix (
+      FullMatrix<double> &M,
+      const FEValuesBase<dim> &fe,
+      double penalty,
+      double factor = 1.)
+    {
+      const unsigned int n_dofs = fe.dofs_per_cell;
+      AssertDimension(fe.get_fe().n_components(), dim);
+      Assert (M.m() == n_dofs, ExcDimensionMismatch(M.m(), n_dofs));
+      Assert (M.n() == n_dofs, ExcDimensionMismatch(M.n(), n_dofs));
+
+      for (unsigned int k=0; k<fe.n_quadrature_points; ++k)
+        {
+          const double dx = fe.JxW(k) * factor;
+          const Tensor<1,dim> n = fe.normal_vector(k);
+          for (unsigned int i=0; i<n_dofs; ++i)
+            for (unsigned int j=0; j<n_dofs; ++j)
+              {
+                double udotn = 0.;
+                double vdotn = 0.;
+                double ngradun = 0.;
+                double ngradvn = 0.;
+
+                for (unsigned int d=0; d<dim; ++d)
+                  {
+                    udotn += n[d]*fe.shape_value_component(j,k,d);
+                    vdotn += n[d]*fe.shape_value_component(i,k,d);
+                    ngradun += n*fe.shape_grad_component(j,k,d)*n[d];
+                    ngradvn += n*fe.shape_grad_component(i,k,d)*n[d];
+                  }
+
+                for (unsigned int d=0; d<dim; ++d)
+                  {
+                    const double v_t = fe.shape_value_component(i,k,d)-vdotn*n[d];
+                    const double dnv_t = n * fe.shape_grad_component(i,k,d)-ngradvn*n[d];
+                    const double u_t = fe.shape_value_component(j,k,d)-udotn*n[d];
+                    const double dnu_t = n * fe.shape_grad_component(j,k,d)-ngradun*n[d];
+
+                    M(i,j) += dx *(2.*penalty*u_t*v_t-dnu_t*v_t-dnv_t*u_t);
+                  }
+              }
         }
     }
 
@@ -367,7 +426,7 @@ namespace LocalIntegrators
      * @warning This function is still under development!
      *
      * @author Bärbel Janssen, Guido Kanschat
-     * @date 2013
+     * @date 2013, 2017
      */
     template <int dim>
     void ip_tangential_matrix (
@@ -403,6 +462,9 @@ namespace LocalIntegrators
           const Tensor<1,dim> n = fe1.normal_vector(k);
           for (unsigned int i=0; i<n_dofs; ++i)
             {
+              // We compute the tangential component by subtracting
+              // the normal component from the total. Thus, compute
+              // the normal component first
               for (unsigned int j=0; j<n_dofs; ++j)
                 {
                   double u1dotn = 0.;
@@ -428,7 +490,10 @@ namespace LocalIntegrators
                       ngradv2n += n*fe2.shape_grad_component(i,k,d)*n[d];
                     }
 
-                  for (unsigned int d=0; d<fe1.get_fe().n_components(); ++d)
+                  // The following code is equal to ip_matrix() with
+                  // the only exception that all variables introduced
+                  // below denote tangential components.
+                  for (unsigned int d=0; d<dim; ++d)
                     {
                       const double vi = fe1.shape_value_component(i,k,d)-v1dotn*n[d];
                       const double dnvi = n * fe1.shape_grad_component(i,k,d)-ngradv1n*n[d];
