@@ -498,6 +498,18 @@ namespace LinearAlgebra
 
 
     template <typename Number>
+    void
+    BlockVector<Number>::add (const std::vector<size_type> &indices,
+                              const std::vector<Number>    &values)
+    {
+      for (size_type i=0; i<indices.size(); ++i)
+        (*this)(indices[i]) += values[i];
+    }
+
+
+
+
+    template <typename Number>
     bool
     BlockVector<Number>::all_zero () const
     {

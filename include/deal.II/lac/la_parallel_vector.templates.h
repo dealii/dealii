@@ -1047,6 +1047,20 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
+    Vector<Number>::add (const std::vector<size_type> &indices,
+                         const std::vector<Number>    &values)
+    {
+      for (std::size_t i=0; i<indices.size(); ++i)
+        {
+          this->operator()(indices[i]) += values[i];
+        }
+    }
+
+
+
+
+    template <typename Number>
+    void
     Vector<Number>::sadd (const Number x,
                           const Vector<Number> &v)
     {

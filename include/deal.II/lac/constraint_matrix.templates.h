@@ -1443,6 +1443,11 @@ namespace internals
       std::vector<size_type> vector_indices;
 
       /**
+       * Temporary array for vector values
+       */
+      std::vector<Number> vector_values;
+
+      /**
        * Data array for reorder row/column indices. Use a shared ptr to
        * global_rows to avoid defining in the .h file
        */
@@ -2271,8 +2276,13 @@ ConstraintMatrix::distribute_local_to_global (
   // an array in any case since we cannot know about the actual data type in
   // the ConstraintMatrix class (unless we do cast). This involves a little
   // bit of logic to determine the type of the matrix value.
-  std::vector<size_type> &cols = scratch_data->columns;
-  std::vector<number>     &vals = scratch_data->values;
+  std::vector<size_type> &cols           = scratch_data->columns;
+  std::vector<number>    &vals           = scratch_data->values;
+  // create arrays for writing into the vector as well
+  std::vector<size_type> &vector_indices = scratch_data->vector_indices;
+  std::vector<number>    &vector_values  = scratch_data->vector_values;
+  vector_indices.resize(n_actual_dofs);
+  vector_values.resize(n_actual_dofs);
   SparseMatrix<number> *sparse_matrix
     = dynamic_cast<SparseMatrix<number> *>(&global_matrix);
   if (use_dealii_matrix == false)
@@ -2285,6 +2295,7 @@ ConstraintMatrix::distribute_local_to_global (
 
   // now do the actual job. go through all the global rows that we will touch
   // and call resolve_matrix_row for each of those.
+  size_type local_row_n = 0;
   for (size_type i=0; i<n_actual_dofs; ++i)
     {
       const size_type row = global_rows.global_row(i);
@@ -2321,7 +2332,35 @@ ConstraintMatrix::distribute_local_to_global (
                                                    local_matrix);
 
           if (val != number ())
-            global_vector(row) += static_cast<typename VectorType::value_type>(val);
+            {
+              vector_indices[local_row_n] = row;
+              vector_values[local_row_n] = val;
+              ++local_row_n;
+            }
+        }
+    }
+  // Drop the elements of vector_indices and vector_values that we do not use (we may
+  // always elide writing zero values to vectors)
+  const size_type n_local_rows = local_row_n;
+  vector_indices.resize(n_local_rows);
+  vector_values.resize(n_local_rows);
+
+  // While the standard case is that these types are equal, they need not be, so
+  // only do a bulk update if they are. Note that the types in the arguments to
+  // add must be equal if we have a Trilinos or PETSc vector but do not have to
+  // be if we have a deal.II native vector: one could further optimize this for
+  // Vector, LinearAlgebra::distributed::vector, etc.
+  if (types_are_equal<typename VectorType::value_type, number>::value)
+    {
+      global_vector.add(vector_indices,
+                        *reinterpret_cast<std::vector<number> *>(&vector_values));
+    }
+  else
+    {
+      for (size_type row_n=0; row_n<n_local_rows; ++row_n)
+        {
+          global_vector(vector_indices[row_n]) +=
+            static_cast<typename VectorType::value_type>(vector_values[row_n]);
         }
     }
 
