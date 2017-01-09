@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2015 by the deal.II authors
+// Copyright (C) 2010 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -232,12 +232,12 @@ namespace LocalIntegrators
 
                 for (unsigned int d=0; d<dim; ++d)
                   {
-                    const double v = fe.shape_value_component(i,k,d)-vdotn*n[d];
-                    const double dnv = n * fe.shape_grad_component(i,k,d)-ngradvn*n[d];
-                    const double u = fe.shape_value_component(j,k,d)-udotn*n[d];
-                    const double dnu = n * fe.shape_grad_component(j,k,d)-ngradun*n[d];
+                    const double v_t = fe.shape_value_component(i,k,d)-vdotn*n[d];
+                    const double dnv_t = n * fe.shape_grad_component(i,k,d)-ngradvn*n[d];
+                    const double u_t = fe.shape_value_component(j,k,d)-udotn*n[d];
+                    const double dnu_t = n * fe.shape_grad_component(j,k,d)-ngradun*n[d];
 
-                    M(i,j) += dx *(2.*penalty*u*v-dnu*v-dnv*u);
+                    M(i,j) += dx *(2.*penalty*u_t*v_t-dnu_t*v_t-dnv_t*u_t);
                   }
               }
         }
@@ -426,7 +426,7 @@ namespace LocalIntegrators
      * @warning This function is still under development!
      *
      * @author Bärbel Janssen, Guido Kanschat
-     * @date 2013
+     * @date 2013, 2017
      */
     template <int dim>
     void ip_tangential_matrix (
@@ -462,6 +462,9 @@ namespace LocalIntegrators
           const Tensor<1,dim> n = fe1.normal_vector(k);
           for (unsigned int i=0; i<n_dofs; ++i)
             {
+              // We compute the tangential component by subtracting
+              // the normal component from the total. Thus, compute
+              // the normal component first
               for (unsigned int j=0; j<n_dofs; ++j)
                 {
                   double u1dotn = 0.;
@@ -487,6 +490,9 @@ namespace LocalIntegrators
                       ngradv2n += n*fe2.shape_grad_component(i,k,d)*n[d];
                     }
 
+                  // The following code is equal to ip_matrix() with
+                  // the only exception that all variables introduced
+                  // below denote tangential components.
                   for (unsigned int d=0; d<dim; ++d)
                     {
                       const double vi = fe1.shape_value_component(i,k,d)-v1dotn*n[d];
