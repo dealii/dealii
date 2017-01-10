@@ -918,7 +918,7 @@ namespace VectorTools
    * which stores quadrature point data.
    */
   template <int dim, typename VectorType>
-  void project (const MatrixFree<dim,typename VectorType::value_type> &data,
+  void project (std_cxx11::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > data,
                 const ConstraintMatrix &constraints,
                 const unsigned int n_q_points_1d,
                 const std_cxx11::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
@@ -928,7 +928,7 @@ namespace VectorTools
    * Same as above but for <code>n_q_points_1d = matrix_free.get_dof_handler().get_fe().degree+1</code>.
    */
   template <int dim, typename VectorType>
-  void project (const MatrixFree<dim,typename VectorType::value_type> &data,
+  void project (std_cxx11::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > data,
                 const ConstraintMatrix &constraints,
                 const std_cxx11::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
                 VectorType &vec_result);

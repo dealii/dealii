@@ -105,21 +105,21 @@ void test ()
   //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
   //std::cout << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
-  MatrixFree<dim,number> mf_data;
+  std_cxx11::shared_ptr<MatrixFree<dim,number> > mf_data(new MatrixFree<dim,number> ());
   {
     const QGauss<1> quad (fe_degree+2);
     typename MatrixFree<dim,number>::AdditionalData data;
     data.tasks_parallel_scheme =
       MatrixFree<dim,number>::AdditionalData::none;
     data.tasks_block_size = 7;
-    mf_data.reinit (dof, constraints, quad, data);
+    mf_data->reinit (dof, constraints, quad, data);
   }
 
   MatrixFreeOperators::MassOperator<dim,fe_degree, fe_degree+2, 1, number> mf;
   mf.initialize(mf_data);
   mf.compute_diagonal();
   LinearAlgebra::distributed::Vector<number> in, out, ref;
-  mf_data.initialize_dof_vector (in);
+  mf_data->initialize_dof_vector (in);
   out.reinit (in);
   ref.reinit (in);
 

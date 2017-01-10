@@ -79,12 +79,12 @@ namespace MatrixFreeOperators
     /**
      * Initialize operator on fine scale.
      */
-    void initialize (const MatrixFree<dim,Number> &data);
+    void initialize (std_cxx11::shared_ptr<const MatrixFree<dim,Number> > data);
 
     /**
      * Initialize operator on a level @p level.
      */
-    void initialize (const MatrixFree<dim,Number> &data,
+    void initialize (std_cxx11::shared_ptr<const MatrixFree<dim,Number> > data,
                      const MGConstrainedDoFs &mg_constrained_dofs,
                      const unsigned int level);
 
@@ -199,7 +199,7 @@ namespace MatrixFreeOperators
     /**
      * MatrixFree object to be used with this operator.
      */
-    SmartPointer<const MatrixFree<dim,Number>, Base<dim,Number> > data;
+    std_cxx11::shared_ptr<const MatrixFree<dim,Number> > data;
 
     /**
      * A shared pointer to a diagonal matrix that stores the inverse of
@@ -758,9 +758,9 @@ namespace MatrixFreeOperators
   template <int dim, typename Number>
   void
   Base<dim,Number>::
-  initialize (const MatrixFree<dim,Number> &data_)
+  initialize (std_cxx11::shared_ptr<const MatrixFree<dim,Number> > data_)
   {
-    data =  SmartPointer<const MatrixFree<dim,Number>, Base<dim,Number> >(&data_,typeid(*this).name());
+    data = data_;
     edge_constrained_indices.clear();
     have_interface_matrices = false;
   }
@@ -770,19 +770,19 @@ namespace MatrixFreeOperators
   template <int dim, typename Number>
   void
   Base<dim,Number>::
-  initialize (const MatrixFree<dim,Number> &data_,
+  initialize (std_cxx11::shared_ptr<const MatrixFree<dim,Number> > data_,
               const MGConstrainedDoFs      &mg_constrained_dofs,
               const unsigned int            level)
   {
     AssertThrow (level != numbers::invalid_unsigned_int,
                  ExcMessage("level is not set"));
-    if (data_.n_macro_cells() > 0)
+    if (data_->n_macro_cells() > 0)
       {
         AssertDimension(static_cast<int>(level),
-                        data_.get_cell_iterator(0,0)->level());
+                        data_->get_cell_iterator(0,0)->level());
       }
 
-    data = SmartPointer<const MatrixFree<dim,Number>, Base<dim,Number> >(&data_,typeid(*this).name());
+    data = data_;
 
     // setup edge_constrained indices
     std::vector<types::global_dof_index> interface_indices;
@@ -795,7 +795,7 @@ namespace MatrixFreeOperators
       if (locally_owned.is_element(interface_indices[i]))
         edge_constrained_indices.push_back(locally_owned.index_within_set(interface_indices[i]));
     have_interface_matrices = Utilities::MPI::max((unsigned int)edge_constrained_indices.size(),
-                                                  data_.get_vector_partitioner()->get_mpi_communicator()) > 0;
+                                                  data->get_vector_partitioner()->get_mpi_communicator()) > 0;
   }
 
 

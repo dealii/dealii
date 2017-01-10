@@ -936,9 +936,10 @@ namespace VectorTools
       additional_data.tasks_parallel_scheme =
         MatrixFree<dim,number>::AdditionalData::partition_color;
       additional_data.mapping_update_flags = (update_values | update_JxW_values);
-      MatrixFree<dim, number> matrix_free;
-      matrix_free.reinit (mapping, dof, constraints,
-                          QGauss<1>(fe_degree+2), additional_data);
+      std_cxx11::shared_ptr<MatrixFree<dim, number> > matrix_free(
+        new MatrixFree<dim, number> ());
+      matrix_free->reinit (mapping, dof, constraints,
+                           QGauss<1>(fe_degree+2), additional_data);
       typedef MatrixFreeOperators::MassOperator<dim, fe_degree, fe_degree+2, components, number> MatrixType;
       MatrixType mass_matrix;
       mass_matrix.initialize(matrix_free);
@@ -946,9 +947,9 @@ namespace VectorTools
 
       typedef LinearAlgebra::distributed::Vector<number> LocalVectorType;
       LocalVectorType vec, rhs, inhomogeneities;
-      matrix_free.initialize_dof_vector(vec);
-      matrix_free.initialize_dof_vector(rhs);
-      matrix_free.initialize_dof_vector(inhomogeneities);
+      matrix_free->initialize_dof_vector(vec);
+      matrix_free->initialize_dof_vector(rhs);
+      matrix_free->initialize_dof_vector(inhomogeneities);
       constraints.distribute(inhomogeneities);
       inhomogeneities*=-1.;
 
@@ -1163,9 +1164,10 @@ namespace VectorTools
       additional_data.tasks_parallel_scheme =
         MatrixFree<dim,Number>::AdditionalData::partition_color;
       additional_data.mapping_update_flags = (update_values | update_JxW_values);
-      MatrixFree<dim, Number> matrix_free;
-      matrix_free.reinit (mapping, dof, constraints,
-                          QGauss<1>(fe_degree+2), additional_data);
+      std_cxx11::shared_ptr<MatrixFree<dim, Number> > matrix_free(
+        new MatrixFree<dim, Number>());
+      matrix_free->reinit (mapping, dof, constraints,
+                           QGauss<1>(fe_degree+2), additional_data);
       typedef MatrixFreeOperators::MassOperator<dim, fe_degree, fe_degree+2, 1, Number> MatrixType;
       MatrixType mass_matrix;
       mass_matrix.initialize(matrix_free);
@@ -1173,9 +1175,9 @@ namespace VectorTools
 
       typedef LinearAlgebra::distributed::Vector<Number> LocalVectorType;
       LocalVectorType vec, rhs, inhomogeneities;
-      matrix_free.initialize_dof_vector(vec);
-      matrix_free.initialize_dof_vector(rhs);
-      matrix_free.initialize_dof_vector(inhomogeneities);
+      matrix_free->initialize_dof_vector(vec);
+      matrix_free->initialize_dof_vector(rhs);
+      matrix_free->initialize_dof_vector(inhomogeneities);
       constraints.distribute(inhomogeneities);
       inhomogeneities*=-1.;
 
@@ -1240,12 +1242,12 @@ namespace VectorTools
 
 
     template <int dim, typename VectorType, int spacedim, int fe_degree, int n_q_points_1d>
-    void project_parallel (const MatrixFree<dim,typename VectorType::value_type> &matrix_free,
+    void project_parallel (std_cxx11::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > matrix_free,
                            const ConstraintMatrix &constraints,
                            const std_cxx11::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
                            VectorType &vec_result)
     {
-      const DoFHandler<dim,spacedim> &dof = matrix_free.get_dof_handler();
+      const DoFHandler<dim,spacedim> &dof = matrix_free->get_dof_handler();
 
       typedef typename VectorType::value_type Number;
       Assert (dof.get_fe().n_components() == 1,
@@ -1263,16 +1265,16 @@ namespace VectorTools
 
       typedef LinearAlgebra::distributed::Vector<Number> LocalVectorType;
       LocalVectorType vec, rhs, inhomogeneities;
-      matrix_free.initialize_dof_vector(vec);
-      matrix_free.initialize_dof_vector(rhs);
-      matrix_free.initialize_dof_vector(inhomogeneities);
+      matrix_free->initialize_dof_vector(vec);
+      matrix_free->initialize_dof_vector(rhs);
+      matrix_free->initialize_dof_vector(inhomogeneities);
       constraints.distribute(inhomogeneities);
       inhomogeneities*=-1.;
 
       // assemble right hand side:
       {
-        FEEvaluation<dim,fe_degree,n_q_points_1d,1,Number> fe_eval(matrix_free);
-        const unsigned int n_cells = matrix_free.n_macro_cells();
+        FEEvaluation<dim,fe_degree,n_q_points_1d,1,Number> fe_eval(*matrix_free);
+        const unsigned int n_cells = matrix_free->n_macro_cells();
         const unsigned int n_q_points = fe_eval.n_q_points;
 
         for (unsigned int cell=0; cell<n_cells; ++cell)
@@ -1356,14 +1358,14 @@ namespace VectorTools
 
 
   template <int dim, typename VectorType>
-  void project (const MatrixFree<dim,typename VectorType::value_type> &matrix_free,
+  void project (std_cxx11::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > matrix_free,
                 const ConstraintMatrix &constraints,
                 const unsigned int n_q_points_1d,
                 const std_cxx11::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
                 VectorType &vec_result)
   {
     (void) n_q_points_1d;
-    const unsigned int fe_degree = matrix_free.get_dof_handler().get_fe().degree;
+    const unsigned int fe_degree = matrix_free->get_dof_handler().get_fe().degree;
 
     Assert (fe_degree+1 == n_q_points_1d,
             ExcNotImplemented());
@@ -1402,14 +1404,14 @@ namespace VectorTools
 
 
   template <int dim, typename VectorType>
-  void project (const MatrixFree<dim,typename VectorType::value_type> &matrix_free,
+  void project (std_cxx11::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > matrix_free,
                 const ConstraintMatrix &constraints,
                 const std_cxx11::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
                 VectorType &vec_result)
   {
     project (matrix_free,
              constraints,
-             matrix_free.get_dof_handler().get_fe().degree+1,
+             matrix_free->get_dof_handler().get_fe().degree+1,
              func,
              vec_result);
   }

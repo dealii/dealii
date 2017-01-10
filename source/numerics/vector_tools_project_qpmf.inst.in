@@ -21,14 +21,14 @@ for (VEC: REAL_NONBLOCK_VECTORS; deal_II_dimension : DIMENSIONS)
 
     template
     void project<deal_II_dimension, VEC>(
-        const MatrixFree<deal_II_dimension,VEC::value_type> &matrix_free,
+        std_cxx11::shared_ptr<const MatrixFree<deal_II_dimension,VEC::value_type> > matrix_free,
         const ConstraintMatrix &constraints,
         const std_cxx11::function< VectorizedArray<VEC::value_type> (const unsigned int, const unsigned int)>,
         VEC &);
 
     template
     void project<deal_II_dimension, VEC>(
-        const MatrixFree<deal_II_dimension,VEC::value_type> &matrix_free,
+        std_cxx11::shared_ptr<const MatrixFree<deal_II_dimension,VEC::value_type> > matrix_free,
         const ConstraintMatrix &constraints,
         const unsigned int,
         const std_cxx11::function< VectorizedArray<VEC::value_type> (const unsigned int, const unsigned int)>,
