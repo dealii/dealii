@@ -718,7 +718,14 @@ namespace TrilinosWrappers
                                             )));
         }
 
-      reinit (vector_partitioner(), v);
+      const Epetra_Map &map = vector_partitioner();
+      const int size = map.NumMyElements();
+
+      // Need to copy out values, since the deal.II might not use doubles, so
+      // that a direct access is not possible.
+      for (int i=0; i<size; ++i)
+        (*vector)[0][i] = v(gid(map,i));
+
       return *this;
     }
 
