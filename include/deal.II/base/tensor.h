@@ -1658,15 +1658,21 @@ scalar_product (const Tensor<rank, dim, Number> &left,
  *   \text{right}_{j_1,..,j_{r2}}
  * @f]
  *
+ * @note Each of the three input tensors can be either a Tensor or
+ * SymmetricTensor.
+ *
  * @relates Tensor
- * @author Matthias Maier, 2015
+ * @author Matthias Maier, 2015, Jean-Paul Pelteret 2017
  */
-template <int rank_1, int rank_2, int dim,
+template <template<int, int, typename> class TensorT1,
+          template<int, int, typename> class TensorT2,
+          template<int, int, typename> class TensorT3,
+          int rank_1, int rank_2, int dim,
           typename T1, typename T2, typename T3>
 typename ProductType<T1, typename ProductType<T2, T3>::type>::type
-contract3 (const Tensor<rank_1, dim, T1> &left,
-           const Tensor<rank_1 + rank_2, dim, T2> &middle,
-           const Tensor<rank_2, dim, T3> &right)
+contract3 (const TensorT1<rank_1, dim, T1>          &left,
+           const TensorT2<rank_1 + rank_2, dim, T2> &middle,
+           const TensorT3<rank_2, dim, T3>          &right)
 {
   typedef typename ProductType<T1, typename ProductType<T2, T3>::type>::type
   return_type;
