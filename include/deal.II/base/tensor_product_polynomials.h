@@ -347,7 +347,7 @@ private:
   /**
    * Copy of the vector <tt>pols</tt> of polynomials given to the constructor.
    */
-  std::vector<std::vector<Polynomials::Polynomial<double> > > polynomials;
+  const std::vector<std::vector<Polynomials::Polynomial<double> > > polynomials;
 
   /**
    * Number of tensor product polynomials. This is <tt>Nx*Ny*Nz</tt>, or with
