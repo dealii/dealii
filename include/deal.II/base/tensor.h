@@ -1445,10 +1445,10 @@ operator- (const Tensor<rank,dim,Number> &p, const Tensor<rank,dim,OtherNumber> 
  * index of a tensor @p src1 of rank @p rank_1 with the first index of a
  * tensor @p src2 of rank @p rank_2:
  * @f[
- *   \text{result}_{i_1,..,i_{r1},j_1,..,j_{r2}}
+ *   \text{result}_{i_1,\ldots,i_{r1},j_1,\ldots,j_{r2}}
  *   = \sum_{k}
- *     \text{left}_{i_1,..,i_{r1}, k}
- *     \text{right}_{k, j_1,..,j_{r2}}
+ *     \text{left}_{i_1,\ldots,i_{r1}, k}
+ *     \text{right}_{k, j_1,\ldots,j_{r2}}
  * @f]
  *
  * @note For the Tensor class, the multiplication operator only performs a
@@ -1485,10 +1485,10 @@ operator * (const Tensor<rank_1, dim, Number> &src1,
  * contraction of index @p index_1 of a tensor @p src1 of rank @p rank_1 with
  * the index @p index_2 of a tensor @p src2 of rank @p rank_2:
  * @f[
- *   \text{result}_{i_1,..,i_{r1},j_1,..,j_{r2}}
+ *   \text{result}_{i_1,\ldots,i_{r1},j_1,\ldots,j_{r2}}
  *   = \sum_{k}
- *     \text{left}_{i_1,..,k,..,i_{r1}}
- *     \text{right}_{j_1,..,k,..,j_{r2}}
+ *     \text{left}_{i_1,\ldots,k,\ldots,i_{r1}}
+ *     \text{right}_{j_1,\ldots,k,\ldots,j_{r2}}
  * @f]
  *
  * If for example the first index (<code>index_1==0</code>) of a tensor
@@ -1546,10 +1546,10 @@ contract (const Tensor<rank_1, dim, Number> &src1,
  * index_3 with index @p index_4 of a tensor @p src1 of rank @p rank_1 and a
  * tensor @p src2 of rank @p rank_2:
  * @f[
- *   \text{result}_{i_1,..,i_{r1},j_1,..,j_{r2}}
+ *   \text{result}_{i_1,\ldots,i_{r1},j_1,\ldots,j_{r2}}
  *   = \sum_{k, l}
- *     \text{left}_{i_1,..,k,..,l,..,i_{r1}}
- *     \text{right}_{j_1,..,k,..,l..,j_{r2}}
+ *     \text{left}_{i_1,\ldots,k,\ldots,l,\ldots,i_{r1}}
+ *     \text{right}_{j_1,\ldots,k,\ldots,l\ldots,j_{r2}}
  * @f]
  *
  * If for example the first index (<code>index_1==0</code>) shall be
@@ -1626,9 +1626,9 @@ double_contract (const Tensor<rank_1, dim, Number> &src1,
  * of equal rank: Return a scalar number that is the result of a full
  * contraction of a tensor @p left and @p right:
  * @f[
- *   \sum_{i_1,..,i_r}
- *   \text{left}_{i_1,..,i_r}
- *   \text{right}_{i_1,..,i_r}
+ *   \sum_{i_1,\ldots,i_r}
+ *   \text{left}_{i_1,\ldots,i_r}
+ *   \text{right}_{i_1,\ldots,i_r}
  * @f]
  *
  * @relates Tensor
@@ -1652,10 +1652,10 @@ scalar_product (const Tensor<rank, dim, Number> &left,
  * tensor @p middle of rank $(\text{rank}_1+\text{rank}_2)$ and a tensor @p
  * right of rank @p rank_2:
  * @f[
- *   \sum_{i_1,..,i_{r1},j_1,..,j_{r2}}
- *   \text{left}_{i_1,..,i_{r1}}
- *   \text{middle}_{i_1,..,i_{r1},j_1,..,j_{r2}}
- *   \text{right}_{j_1,..,j_{r2}}
+ *   \sum_{i_1,\ldots,i_{r1},j_1,\ldots,j_{r2}}
+ *   \text{left}_{i_1,\ldots,i_{r1}}
+ *   \text{middle}_{i_1,\ldots,i_{r1},j_1,\ldots,j_{r2}}
+ *   \text{right}_{j_1,\ldots,j_{r2}}
  * @f]
  *
  * @note Each of the three input tensors can be either a Tensor or
@@ -1685,8 +1685,8 @@ contract3 (const TensorT1<rank_1, dim, T1>          &left,
  * The outer product of two tensors of @p rank_1 and @p rank_2: Returns a
  * tensor of rank $(\text{rank}_1 + \text{rank}_2)$:
  * @f[
- *   \text{result}_{i_1,..,i_{r1},j_1,..,j_{r2}}
- *   = \text{left}_{i_1,..,i_{r1}}\,\text{right}_{j_1,..,j_{r2}.}
+ *   \text{result}_{i_1,\ldots,i_{r1},j_1,\ldots,j_{r2}}
+ *   = \text{left}_{i_1,\ldots,i_{r1}}\,\text{right}_{j_1,\ldots,j_{r2}.}
  * @f]
  *
  * @relates Tensor
