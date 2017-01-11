@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2015 by the deal.II authors
+// Copyright (C) 2000 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,8 @@
 #include <deal.II/base/tensor_product_polynomials_bubbles.h>
 #include <deal.II/base/polynomials_piecewise.h>
 #include <deal.II/fe/fe_q_base.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -875,6 +877,14 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
           // a context where we don't require any continuity along the interface
           return FiniteElementDomination::no_requirements;
         }
+    }
+  else if ((dynamic_cast<const FE_DGQ<dim,spacedim>*>(&fe_other) != 0)
+           ||
+           (dynamic_cast<const FE_DGP<dim,spacedim>*>(&fe_other) != 0))
+    {
+      // there are no requirements between continuous and
+      // discontinuous elements
+      return FiniteElementDomination::no_requirements;
     }
 
   Assert (false, ExcNotImplemented());
