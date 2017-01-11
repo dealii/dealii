@@ -105,7 +105,7 @@ int main()
   deallog.pop();
   deallog.push("float");
   test<float,1> ();
-  test<float,9> ();
+  test<float,17> ();
   test<float,32> ();
   deallog.pop();
 
