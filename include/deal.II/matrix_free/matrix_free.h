@@ -640,6 +640,13 @@ public:
    */
   //@{
   /**
+   * Returns whether a given FiniteElement @p fe is supported by this class.
+   */
+  template <int spacedim>
+  static
+  bool is_supported (const FiniteElement<dim, spacedim> &fe);
+
+  /**
    * Return the number of different DoFHandlers specified at initialization.
    */
   unsigned int n_components () const;

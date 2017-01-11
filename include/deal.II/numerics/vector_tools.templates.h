@@ -1113,34 +1113,15 @@ namespace VectorTools
                   const bool                    project_to_boundary_first)
     {
       // If we can, use the matrix-free implementation
-      bool use_matrix_free = true;
+      bool use_matrix_free = MatrixFree<dim, typename VectorType::value_type>::is_supported(dof.get_fe());
+
       // enforce_zero_boundary and project_to_boundary_first
-      // are not yet supported
-      if (enforce_zero_boundary || project_to_boundary_first)
+      // are not yet supported.
+      // We have explicit instantiations only if
+      // the number of components and the degree is not too high.
+      if (enforce_zero_boundary || project_to_boundary_first
+          || dof.get_fe().degree>8 || dof.get_fe().n_components()>4)
         use_matrix_free = false;
-      else
-        {
-          // Find out if the FiniteElement is supported
-          // This is based on matrix_free/shape_info.templates.h
-          // and matrix_free/matrix_free.templates.h
-          if (dof.get_fe().degree==0 || dof.get_fe().n_base_elements()!=1
-              || dof.get_fe().degree>8 || dof.get_fe().n_components()>4)
-            use_matrix_free = false;
-          else
-            {
-              const FiniteElement<dim> *fe_ptr = &dof.get_fe().base_element(0);
-              if (fe_ptr->n_components() != 1)
-                use_matrix_free = false;
-              else if ((dynamic_cast<const FE_Poly<TensorProductPolynomials<dim>,dim,dim>*>(fe_ptr)==0)
-                       && (dynamic_cast<const FE_Poly<TensorProductPolynomials<dim,
-                           Polynomials::PiecewisePolynomial<double> >,dim,dim>*>(fe_ptr)==0)
-                       &&(dynamic_cast<const FE_DGP<dim>*>(fe_ptr)==0)
-                       &&(dynamic_cast<const FE_Q_DG0<dim>*>(fe_ptr)==0)
-                       &&(dynamic_cast<const FE_Q<dim>*>(fe_ptr)==0)
-                       &&(dynamic_cast<const FE_DGQ<dim>*>(fe_ptr)==0))
-                use_matrix_free = false;
-            }
-        }
 
       if (use_matrix_free)
         project_matrix_free_component (mapping, dof, constraints, quadrature,
