@@ -1,0 +1,6 @@
+Fixed: A bug in the rotation matrix used in step-18 has now been corrected.
+This tutorial now uses the function
+Physics::Transformations::Rotations::rotation_matrix_3d to compute the 3d 
+rotation matrix.
+<br>
+(Jean-Paul Pelteret, Paul Kuberry, 2017/01/09)
