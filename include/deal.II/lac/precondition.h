@@ -1903,7 +1903,6 @@ namespace internal
       (void)matrix;
       (void)preconditioner;
       AssertThrow(preconditioner.get() != NULL, ExcNotInitialized());
-      AssertDimension(preconditioner->m(), matrix.m());
     }
 
     template <typename MatrixType, typename VectorType>
@@ -1925,7 +1924,10 @@ namespace internal
           // Check if we can initialize from vector that then gets set to zero
           // as the matrix will own the memory
           preconditioner->reinit(diagonal_inverse);
-          diagonal_inverse.reinit(0);
+          {
+            VectorType empty_vector;
+            diagonal_inverse.reinit(empty_vector);
+          }
 
           // This part only works in serial
           if (preconditioner->m() != matrix.m())
@@ -2050,11 +2052,14 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::clear ()
   is_initialized = false;
   theta = delta = 1.0;
   matrix_ptr = 0;
-  data.matrix_diagonal_inverse.reinit(0);
+  {
+    VectorType empty_vector;
+    data.matrix_diagonal_inverse.reinit(empty_vector);
+    update1.reinit(empty_vector);
+    update2.reinit(empty_vector);
+    update3.reinit(empty_vector);
+  }
   data.preconditioner.reset();
-  update1.reinit(0);
-  update2.reinit(0);
-  update3.reinit(0);
 }
 
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
