@@ -553,71 +553,71 @@ namespace LinearAlgebra
       const unsigned int n_import_targets = part.import_targets().size();
       const unsigned int n_ghost_targets  = part.ghost_targets().size();
 
+      Assert(compress_requests.size() == 0,
+             ExcMessage("Another compress operation seems to still be running. "
+                        "Call compress_finish() first."));
+
       // Need to send and receive the data. Use non-blocking communication,
       // where it is generally less overhead to first initiate the receive and
       // then actually send the data
-      if (compress_requests.size() == 0)
+
+      // set channels in different range from update_ghost_values channels
+      const unsigned int channel = counter + 400;
+      unsigned int current_index_start = 0;
+      compress_requests.resize (n_import_targets + n_ghost_targets);
+
+      // allocate import_data in case it is not set up yet
+      if (import_data == 0)
+        import_data = new Number[part.n_import_indices()];
+
+      // initiate the receive operations
+      for (unsigned int i=0; i<n_import_targets; i++)
         {
-          // set channels in different range from update_ghost_values channels
-          const unsigned int channel = counter + 400;
-          unsigned int current_index_start = 0;
-          compress_requests.resize (n_import_targets + n_ghost_targets);
-
-          // allocate import_data in case it is not set up yet
-          if (import_data == 0)
-            import_data = new Number[part.n_import_indices()];
-          for (unsigned int i=0; i<n_import_targets; i++)
-            {
-              AssertThrow (static_cast<size_type>(part.import_targets()[i].second)*
-                           sizeof(Number) <
-                           static_cast<size_type>(std::numeric_limits<int>::max()),
-                           ExcMessage("Index overflow: Maximum message size in MPI is 2GB. "
-                                      "The number of ghost entries times the size of 'Number' "
-                                      "exceeds this value. This is not supported."));
-              const int ierr = MPI_Recv_init (&import_data[current_index_start],
-                                              part.import_targets()[i].second*sizeof(Number),
-                                              MPI_BYTE,
-                                              part.import_targets()[i].first,
-                                              part.import_targets()[i].first +
-                                              part.n_mpi_processes()*channel,
-                                              part.get_communicator(),
-                                              &compress_requests[i]);
-              AssertThrowMPI (ierr);
-              current_index_start += part.import_targets()[i].second;
-            }
-          AssertDimension(current_index_start, part.n_import_indices());
-
-          current_index_start = part.local_size();
-          for (unsigned int i=0; i<n_ghost_targets; i++)
-            {
-              AssertThrow (static_cast<size_type>(part.ghost_targets()[i].second)*
-                           sizeof(Number) <
-                           static_cast<size_type>(std::numeric_limits<int>::max()),
-                           ExcMessage("Index overflow: Maximum message size in MPI is 2GB. "
-                                      "The number of ghost entries times the size of 'Number' "
-                                      "exceeds this value. This is not supported."));
-              const int ierr = MPI_Send_init (&this->val[current_index_start],
-                                              part.ghost_targets()[i].second*sizeof(Number),
-                                              MPI_BYTE,
-                                              part.ghost_targets()[i].first,
-                                              part.this_mpi_process() +
-                                              part.n_mpi_processes()*channel,
-                                              part.get_communicator(),
-                                              &compress_requests[n_import_targets+i]);
-              AssertThrowMPI (ierr);
-              current_index_start += part.ghost_targets()[i].second;
-            }
-          AssertDimension (current_index_start,
-                           part.local_size()+part.n_ghost_indices());
+          AssertThrow (static_cast<size_type>(part.import_targets()[i].second)*
+                       sizeof(Number) <
+                       static_cast<size_type>(std::numeric_limits<int>::max()),
+                       ExcMessage("Index overflow: Maximum message size in MPI is 2GB. "
+                                  "The number of ghost entries times the size of 'Number' "
+                                  "exceeds this value. This is not supported."));
+          const int ierr = MPI_Irecv (&import_data[current_index_start],
+                                      part.import_targets()[i].second*sizeof(Number),
+                                      MPI_BYTE,
+                                      part.import_targets()[i].first,
+                                      part.import_targets()[i].first +
+                                      part.n_mpi_processes()*channel,
+                                      part.get_communicator(),
+                                      &compress_requests[i]);
+          AssertThrowMPI (ierr);
+          current_index_start += part.import_targets()[i].second;
         }
+      AssertDimension(current_index_start, part.n_import_indices());
+
+      // initiate the send operations
+      current_index_start = part.local_size();
+      for (unsigned int i=0; i<n_ghost_targets; i++)
+        {
+          AssertThrow (static_cast<size_type>(part.ghost_targets()[i].second)*
+                       sizeof(Number) <
+                       static_cast<size_type>(std::numeric_limits<int>::max()),
+                       ExcMessage("Index overflow: Maximum message size in MPI is 2GB. "
+                                  "The number of ghost entries times the size of 'Number' "
+                                  "exceeds this value. This is not supported."));
+          const int ierr = MPI_Isend (&this->val[current_index_start],
+                                      part.ghost_targets()[i].second*sizeof(Number),
+                                      MPI_BYTE,
+                                      part.ghost_targets()[i].first,
+                                      part.this_mpi_process() +
+                                      part.n_mpi_processes()*channel,
+                                      part.get_communicator(),
+                                      &compress_requests[n_import_targets+i]);
+          AssertThrowMPI (ierr);
+          current_index_start += part.ghost_targets()[i].second;
+        }
+      AssertDimension (current_index_start,
+                       part.local_size()+part.n_ghost_indices());
 
       AssertDimension(n_import_targets + n_ghost_targets,
                       compress_requests.size());
-      if (compress_requests.size() > 0)
-        {
-          const int ierr = MPI_Startall(compress_requests.size(),&compress_requests[0]);
-          AssertThrowMPI(ierr);
-        }
 #endif
     }
 
@@ -687,6 +687,7 @@ namespace LinearAlgebra
           AssertDimension(read_position-import_data,part.n_import_indices());
         }
 
+      // wait for the send operations to complete
       if (compress_requests.size() > 0 && n_ghost_targets > 0)
         {
           const int ierr = MPI_Waitall (n_ghost_targets,
@@ -696,6 +697,9 @@ namespace LinearAlgebra
         }
       else
         AssertDimension (part.n_ghost_indices(), 0);
+
+      // clear the compress requests
+      compress_requests.resize(0);
 
       zero_out_ghosts ();
 #else
@@ -722,51 +726,38 @@ namespace LinearAlgebra
       const unsigned int n_import_targets = part.import_targets().size();
       const unsigned int n_ghost_targets = part.ghost_targets().size();
 
+      Assert(update_ghost_values_requests.size() == 0,
+             ExcMessage("Another compress operation seems to still be running. "
+                        "Call compress_finish() first."));
+
       // Need to send and receive the data. Use non-blocking communication,
       // where it is generally less overhead to first initiate the receive and
       // then actually send the data
-      if (update_ghost_values_requests.size() == 0)
+      size_type current_index_start = part.local_size();
+      update_ghost_values_requests.resize (n_import_targets+n_ghost_targets);
+      for (unsigned int i=0; i<n_ghost_targets; i++)
         {
-          size_type current_index_start = part.local_size();
-          update_ghost_values_requests.resize (n_import_targets+n_ghost_targets);
-          for (unsigned int i=0; i<n_ghost_targets; i++)
-            {
-              // allow writing into ghost indices even though we are in a
-              // const function
-              const int ierr = MPI_Recv_init (const_cast<Number *>(&val[current_index_start]),
-                                              part.ghost_targets()[i].second*sizeof(Number),
-                                              MPI_BYTE,
-                                              part.ghost_targets()[i].first,
-                                              part.ghost_targets()[i].first +
-                                              counter*part.n_mpi_processes(),
-                                              part.get_communicator(),
-                                              &update_ghost_values_requests[i]);
-              AssertThrowMPI (ierr);
-              current_index_start += part.ghost_targets()[i].second;
-            }
-          AssertDimension (current_index_start,
-                           part.local_size()+part.n_ghost_indices());
-
-          // allocate import_data in case it is not set up yet
-          if (import_data == 0 && part.n_import_indices() > 0)
-            import_data = new Number[part.n_import_indices()];
-          current_index_start = 0;
-          for (unsigned int i=0; i<n_import_targets; i++)
-            {
-              const int ierr = MPI_Send_init (&import_data[current_index_start],
-                                              part.import_targets()[i].second*sizeof(Number),
-                                              MPI_BYTE, part.import_targets()[i].first,
-                                              part.this_mpi_process() +
-                                              part.n_mpi_processes()*counter,
-                                              part.get_communicator(),
-                                              &update_ghost_values_requests[n_ghost_targets+i]);
-              AssertThrowMPI (ierr);
-              current_index_start += part.import_targets()[i].second;
-            }
-          AssertDimension (current_index_start, part.n_import_indices());
+          // allow writing into ghost indices even though we are in a
+          // const function
+          const int ierr = MPI_Irecv (const_cast<Number *>(&val[current_index_start]),
+                                      part.ghost_targets()[i].second*sizeof(Number),
+                                      MPI_BYTE,
+                                      part.ghost_targets()[i].first,
+                                      part.ghost_targets()[i].first +
+                                      counter*part.n_mpi_processes(),
+                                      part.get_communicator(),
+                                      &update_ghost_values_requests[i]);
+          AssertThrowMPI (ierr);
+          current_index_start += part.ghost_targets()[i].second;
         }
+      AssertDimension (current_index_start,
+                       part.local_size()+part.n_ghost_indices());
 
-      // copy the data that is actually to be send to the import_data field
+      // allocate import_data in case it is not set up yet
+      if (import_data == 0 && part.n_import_indices() > 0)
+        import_data = new Number[part.n_import_indices()];
+
+      // copy the data to be sent to the import_data field
       if (part.n_import_indices() > 0)
         {
           Assert (import_data != 0, ExcInternalError());
@@ -778,14 +769,24 @@ namespace LinearAlgebra
               *write_position++ = local_element(j);
         }
 
+      // start the send operations
+      current_index_start = 0;
+      for (unsigned int i=0; i<n_import_targets; i++)
+        {
+          const int ierr = MPI_Isend (&import_data[current_index_start],
+                                      part.import_targets()[i].second*sizeof(Number),
+                                      MPI_BYTE, part.import_targets()[i].first,
+                                      part.this_mpi_process() +
+                                      part.n_mpi_processes()*counter,
+                                      part.get_communicator(),
+                                      &update_ghost_values_requests[n_ghost_targets+i]);
+          AssertThrowMPI (ierr);
+          current_index_start += part.import_targets()[i].second;
+        }
+      AssertDimension (current_index_start, part.n_import_indices());
+
       AssertDimension (n_import_targets+n_ghost_targets,
                        update_ghost_values_requests.size());
-      if (update_ghost_values_requests.size() > 0)
-        {
-          const int ierr = MPI_Startall(update_ghost_values_requests.size(),
-                                        &update_ghost_values_requests[0]);
-          AssertThrowMPI(ierr);
-        }
 #else
       (void)counter;
 #endif
@@ -813,6 +814,7 @@ namespace LinearAlgebra
                                         MPI_STATUSES_IGNORE);
           AssertThrowMPI (ierr);
         }
+      update_ghost_values_requests.resize(0);
 #endif
       vector_is_ghosted = true;
     }
