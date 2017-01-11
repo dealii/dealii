@@ -236,6 +236,24 @@ DEAL::FE_DGQ<2,3>(1)
 DEAL::Read FE_DGQ(1)
 DEAL::Generated :
 DEAL::FE_DGQ<3>(1)
+DEAL::Read FE_DGQLegendre(1)
+DEAL::Generated :
+DEAL::FE_DGQLegendre<1>(1)
+DEAL::Read FE_DGQLegendre(1)
+DEAL::Generated :
+DEAL::FE_DGQLegendre<1,2>(1)
+DEAL::Read FE_DGQLegendre(1)
+DEAL::Generated :
+DEAL::FE_DGQLegendre<2>(1)
+DEAL::Read FE_DGQLegendre(1)
+DEAL::Generated :
+DEAL::FE_DGQLegendre<1,3>(1)
+DEAL::Read FE_DGQLegendre(1)
+DEAL::Generated :
+DEAL::FE_DGQLegendre<2,3>(1)
+DEAL::Read FE_DGQLegendre(1)
+DEAL::Generated :
+DEAL::FE_DGQLegendre<3>(1)
 DEAL::Read FE_Nothing()
 DEAL::Generated :
 DEAL::FE_Nothing<1>()
@@ -506,6 +524,24 @@ DEAL::FE_Bernstein<2>(2)
 DEAL::Read FE_Bernstein(2)
 DEAL::Generated :
 DEAL::FE_Bernstein<3>(2)
+DEAL::Read FE_DGQHermite(3)
+DEAL::Generated :
+DEAL::FE_DGQHermite<1>(3)
+DEAL::Read FE_DGQHermite(3)
+DEAL::Generated :
+DEAL::FE_DGQHermite<1,2>(3)
+DEAL::Read FE_DGQHermite(3)
+DEAL::Generated :
+DEAL::FE_DGQHermite<2>(3)
+DEAL::Read FE_DGQHermite(3)
+DEAL::Generated :
+DEAL::FE_DGQHermite<1,3>(3)
+DEAL::Read FE_DGQHermite(3)
+DEAL::Generated :
+DEAL::FE_DGQHermite<2,3>(3)
+DEAL::Read FE_DGQHermite(3)
+DEAL::Generated :
+DEAL::FE_DGQHermite<3>(3)
 DEAL::Read FESystem[FE_Q_Hierarchical(1)^2-FE_Q_Hierarchical(1)]
 DEAL::Generated :
 DEAL::FESystem<1>[FE_Q_Hierarchical<1>(1)^2-FE_Q_Hierarchical<1>(1)]

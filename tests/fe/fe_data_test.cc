@@ -121,6 +121,12 @@ void test_fe_datas()
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_DGQArbitraryNodes<dim> (QGauss<1>(3)));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  fe_datas.push_back(new FE_DGQLegendre<dim> (1));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  fe_datas.push_back(new FE_DGQLegendre<dim> (2));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  fe_datas.push_back(new FE_DGQHermite<dim> (3));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_DGP<dim> (1));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_DGP<dim> (2));

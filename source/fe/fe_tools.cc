@@ -1095,6 +1095,10 @@ namespace
       = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim> >);
     result["FE_DGQArbitraryNodes"]
       = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim> >);
+    result["FE_DGQLegendre"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGQLegendre<dim> >);
+    result["FE_DGQHermite"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGQHermite<dim> >);
     result["FE_FaceQ"]
       = FEFactoryPointer(new FETools::FEFactory<FE_FaceQ<dim> >);
     result["FE_FaceP"]
@@ -1134,6 +1138,10 @@ namespace
       = FEFactoryPointer(new FETools::FEFactory<FE_Nothing<dim,spacedim> >);
     result["FE_DGQArbitraryNodes"]
       = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim,spacedim> >);
+    result["FE_DGQLegendre"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGQLegendre<dim,spacedim> >);
+    result["FE_DGQHermite"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGQHermite<dim,spacedim> >);
     result["FE_Q_Bubbles"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Q_Bubbles<dim,spacedim> >);
     result["FE_Q_DG0"]
