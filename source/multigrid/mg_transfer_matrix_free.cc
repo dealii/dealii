@@ -27,7 +27,6 @@
 #include <deal.II/multigrid/mg_transfer_matrix_free.h>
 #include <deal.II/multigrid/mg_transfer_internal.h>
 
-#include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
 
 #include <algorithm>
@@ -85,7 +84,7 @@ void MGTransferMatrixFree<dim,Number>::clear ()
   level_dof_indices.clear();
   parent_child_connect.clear();
   n_owned_level_cells.clear();
-  shape_info = internal::MatrixFreeFunctions::ShapeInfo<Number>();
+  prolongation_matrix_1d.clear();
   evaluation_data.clear();
   weights_on_refined.clear();
 }
@@ -116,7 +115,7 @@ void MGTransferMatrixFree<dim,Number>::build
   element_is_continuous    = elem_info.element_is_continuous;
   n_components             = elem_info.n_components;
   n_child_cell_dofs        = elem_info.n_child_cell_dofs;
-  shape_info               = elem_info.shape_info;
+  prolongation_matrix_1d   = elem_info.prolongation_matrix_1d;
 
 
   // reshuffle into aligned vector of vectorized arrays
@@ -387,16 +386,14 @@ void MGTransferMatrixFree<dim,Number>
         }
 
       // perform tensorized operation
-      Assert(shape_info.element_type ==
-             internal::MatrixFreeFunctions::tensor_symmetric, ExcNotImplemented());
       if (element_is_continuous)
         {
-          AssertDimension(shape_info.shape_val_evenodd.size(),
-                          (degree+1)*(degree+1));
-          typedef internal::EvaluatorTensorProduct<internal::evaluate_evenodd,dim,degree,2*degree+1,VectorizedArray<Number> > Evaluator;
-          Evaluator evaluator(shape_info.shape_val_evenodd,
-                              shape_info.shape_val_evenodd,
-                              shape_info.shape_val_evenodd);
+          AssertDimension(prolongation_matrix_1d.size(),
+                          (2*degree+1)*(degree+1));
+          typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,2*degree+1,VectorizedArray<Number> > Evaluator;
+          Evaluator evaluator(prolongation_matrix_1d,
+                              prolongation_matrix_1d,
+                              prolongation_matrix_1d);
           perform_tensorized_op<dim,Evaluator,Number,true>(evaluator,
                                                            n_child_cell_dofs,
                                                            n_components,
@@ -407,12 +404,12 @@ void MGTransferMatrixFree<dim,Number>
         }
       else
         {
-          AssertDimension(shape_info.shape_val_evenodd.size(),
-                          (degree+1)*(degree+1));
-          typedef internal::EvaluatorTensorProduct<internal::evaluate_evenodd,dim,degree,2*degree+2,VectorizedArray<Number> > Evaluator;
-          Evaluator evaluator(shape_info.shape_val_evenodd,
-                              shape_info.shape_val_evenodd,
-                              shape_info.shape_val_evenodd);
+          AssertDimension(prolongation_matrix_1d.size(),
+                          2*(degree+1)*(degree+1));
+          typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,2*(degree+1),VectorizedArray<Number> > Evaluator;
+          Evaluator evaluator(prolongation_matrix_1d,
+                              prolongation_matrix_1d,
+                              prolongation_matrix_1d);
           perform_tensorized_op<dim,Evaluator,Number,true>(evaluator,
                                                            n_child_cell_dofs,
                                                            n_components,
@@ -464,16 +461,14 @@ void MGTransferMatrixFree<dim,Number>
       }
 
       // perform tensorized operation
-      Assert(shape_info.element_type ==
-             internal::MatrixFreeFunctions::tensor_symmetric, ExcNotImplemented());
       if (element_is_continuous)
         {
-          AssertDimension(shape_info.shape_val_evenodd.size(),
-                          (degree+1)*(degree+1));
-          typedef internal::EvaluatorTensorProduct<internal::evaluate_evenodd,dim,degree,2*degree+1,VectorizedArray<Number> > Evaluator;
-          Evaluator evaluator(shape_info.shape_val_evenodd,
-                              shape_info.shape_val_evenodd,
-                              shape_info.shape_val_evenodd);
+          AssertDimension(prolongation_matrix_1d.size(),
+                          (2*degree+1)*(degree+1));
+          typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,2*degree+1,VectorizedArray<Number> > Evaluator;
+          Evaluator evaluator(prolongation_matrix_1d,
+                              prolongation_matrix_1d,
+                              prolongation_matrix_1d);
           weight_dofs_on_child<dim,degree,Number>(&weights_on_refined[from_level-1][(cell/vec_size)*three_to_dim],
                                                   n_components,
                                                   &evaluation_data[0]);
@@ -484,12 +479,12 @@ void MGTransferMatrixFree<dim,Number>
         }
       else
         {
-          AssertDimension(shape_info.shape_val_evenodd.size(),
-                          (degree+1)*(degree+1));
-          typedef internal::EvaluatorTensorProduct<internal::evaluate_evenodd,dim,degree,2*degree+2,VectorizedArray<Number> > Evaluator;
-          Evaluator evaluator(shape_info.shape_val_evenodd,
-                              shape_info.shape_val_evenodd,
-                              shape_info.shape_val_evenodd);
+          AssertDimension(prolongation_matrix_1d.size(),
+                          2*(degree+1)*(degree+1));
+          typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,2*(degree+1),VectorizedArray<Number> > Evaluator;
+          Evaluator evaluator(prolongation_matrix_1d,
+                              prolongation_matrix_1d,
+                              prolongation_matrix_1d);
           perform_tensorized_op<dim,Evaluator,Number,false>(evaluator,
                                                             n_child_cell_dofs,
                                                             n_components,
@@ -534,7 +529,7 @@ MGTransferMatrixFree<dim,Number>::memory_consumption() const
   memory += MemoryConsumption::memory_consumption(level_dof_indices);
   memory += MemoryConsumption::memory_consumption(parent_child_connect);
   memory += MemoryConsumption::memory_consumption(n_owned_level_cells);
-  memory += shape_info.memory_consumption();
+  memory += MemoryConsumption::memory_consumption(prolongation_matrix_1d);
   memory += MemoryConsumption::memory_consumption(evaluation_data);
   memory += MemoryConsumption::memory_consumption(weights_on_refined);
   memory += MemoryConsumption::memory_consumption(dirichlet_indices);
