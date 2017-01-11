@@ -1,0 +1,7 @@
+Fixed: LinearAlgebra::distributed::Vector used persistent MPI communicators
+for data exchange, which are not as well-tuned as the usual MPI_Isend and
+MPI_Irecv calls on some implementations, including memory leaks on IBM MPI if
+the communicators are alive over a longer time. Therefore, the communication
+has been changed to non-blocking MPI_Isend and MPI_Irecv calls.
+<br>
+(Martin Kronbichler, 2017/01/11)
