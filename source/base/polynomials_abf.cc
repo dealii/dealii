@@ -23,37 +23,41 @@
 DEAL_II_NAMESPACE_OPEN
 
 
+
+namespace
+{
+  template <int dim>
+  std::vector<std::vector< Polynomials::Polynomial< double > > >
+  get_abf_polynomials (const unsigned int k)
+  {
+    std::vector<std::vector< Polynomials::Polynomial< double > > > pols(dim);
+    pols[0] = Polynomials::LagrangeEquidistant::generate_complete_basis(k+2);
+
+    if (k == 0)
+      for (unsigned int d=1; d<dim; ++d)
+        pols[d] = Polynomials::Legendre::generate_complete_basis(0);
+    else
+      for (unsigned int d=1; d<dim; ++d)
+        pols[d] = Polynomials::LagrangeEquidistant::generate_complete_basis(k);
+
+    return pols;
+  }
+}
+
 template <int dim>
 PolynomialsABF<dim>::PolynomialsABF (const unsigned int k)
   :
   my_degree(k),
+  polynomial_space(get_abf_polynomials<dim>(k)),
   n_pols(compute_n_pols(k))
 {
-  std::vector<std::vector< Polynomials::Polynomial< double > > > pols(dim);
-  pols[0] = Polynomials::LagrangeEquidistant::generate_complete_basis(k+2);
-
-  if (k == 0)
-    for (unsigned int d=1; d<dim; ++d)
-      pols[d] = Polynomials::Legendre::generate_complete_basis(0);
-  else
-    for (unsigned int d=1; d<dim; ++d)
-      pols[d] = Polynomials::LagrangeEquidistant::generate_complete_basis(k);
-
-  polynomial_space = new AnisotropicPolynomials<dim>(pols);
-
   // check that the dimensions match. we only store one of the 'dim'
   // anisotropic polynomials that make up the vector-valued space, so
   // multiply by 'dim'
-  Assert (dim * polynomial_space->n() == compute_n_pols(k),
+  Assert (dim * polynomial_space.n() == compute_n_pols(k),
           ExcInternalError());
 }
 
-
-template <int dim>
-PolynomialsABF<dim>::~PolynomialsABF ()
-{
-  delete polynomial_space;
-}
 
 
 template <int dim>
@@ -76,7 +80,7 @@ PolynomialsABF<dim>::compute (const Point<dim>            &unit_point,
   Assert(fourth_derivatives.size()==n_pols|| fourth_derivatives.size()==0,
          ExcDimensionMismatch(fourth_derivatives.size(), n_pols));
 
-  const unsigned int n_sub = polynomial_space->n();
+  const unsigned int n_sub = polynomial_space.n();
   // guard access to the scratch
   // arrays in the following block
   // using a mutex to make sure they
@@ -107,8 +111,8 @@ PolynomialsABF<dim>::compute (const Point<dim>            &unit_point,
       for (unsigned int c=0; c<dim; ++c)
         p(c) = unit_point((c+d)%dim);
 
-      polynomial_space->compute (p, p_values, p_grads, p_grad_grads,
-                                 p_third_derivatives, p_fourth_derivatives);
+      polynomial_space.compute (p, p_values, p_grads, p_grad_grads,
+                                p_third_derivatives, p_fourth_derivatives);
 
       for (unsigned int i=0; i<p_values.size(); ++i)
         values[i+d*n_sub][d] = p_values[i];
