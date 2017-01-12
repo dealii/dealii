@@ -428,10 +428,7 @@ namespace internal
     fe_index_is_active (const unsigned int                obj_index,
                         const unsigned int                fe_index) const
     {
-      if (is_compressed_entry(active_fe_indices[obj_index]) == false)
-        return (fe_index == active_fe_index(obj_index));
-      else
-        return (fe_index == get_toggled_compression_state(active_fe_index(obj_index)));
+      return (fe_index == active_fe_index(obj_index));
     }
 
 
