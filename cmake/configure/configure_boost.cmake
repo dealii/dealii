@@ -22,6 +22,31 @@ SET(DEAL_II_WITH_BOOST ON # Always true. We need it :-]
   )
 
 
+MACRO(FEATURE_BOOST_CONFIGURE_COMMON)
+  #
+  # Boost version 1.62 - 1.63 checks for the availability of "emplace_hint"
+  # incorrectly: It tests for the preprocessor define
+  # BOOST_NO_CXX11_HDR_UNORDERED_MAP in .../boost/serialization/map.h
+  # thinking that that this define is characteristic for the presence of
+  # std::(multi)map::emplace_hint. This is generally correct, except for
+  # GCC before 4.8, for which the preprocessor variable is defined, but the
+  # function does not exist [1].
+  #
+  # Thus, simply define a BOOST_NO_CXX11_HDR_UNORDERED_MAP if the gcc
+  # compiler version is less than 4.8.
+  #
+  # [1] https://svn.boost.org/trac/boost/ticket/12755
+  #
+  IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
+      CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.8" )
+    LIST(APPEND BOOST_DEFINITIONS "BOOST_NO_CXX11_HDR_UNORDERED_MAP")
+    LIST(APPEND BOOST_USER_DEFINITIONS "BOOST_NO_CXX11_HDR_UNORDERED_MAP")
+  ENDIF()
+
+  ENABLE_IF_SUPPORTED(BOOST_CXX_FLAGS "-Wno-unused-local-typedefs")
+ENDMACRO()
+
+
 MACRO(FEATURE_BOOST_CONFIGURE_BUNDLED)
   #
   # Add rt to the link interface as well, boost/chrono needs it.
@@ -34,7 +59,7 @@ MACRO(FEATURE_BOOST_CONFIGURE_BUNDLED)
     ENDIF()
   ENDIF()
 
-  ENABLE_IF_SUPPORTED(BOOST_CXX_FLAGS "-Wno-unused-local-typedefs")
+  FEATURE_BOOST_CONFIGURE_COMMON()
 
   SET(BOOST_BUNDLED_INCLUDE_DIRS ${BOOST_FOLDER}/include)
 
@@ -66,8 +91,9 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
   ENDIF()
 ENDMACRO()
 
+
 MACRO(FEATURE_BOOST_CONFIGURE_EXTERNAL)
-  ENABLE_IF_SUPPORTED(BOOST_CXX_FLAGS "-Wno-unused-local-typedefs")
+  FEATURE_BOOST_CONFIGURE_COMMON()
 ENDMACRO()
 
 
