@@ -33,7 +33,7 @@ MACRO(DEAL_II_ADD_LIBRARY _library)
   FOREACH(_build ${DEAL_II_BUILD_TYPES})
     STRING(TOLOWER ${_build} _build_lowercase)
 
-    ADD_LIBRARY(${_library}.${_build_lowercase}
+    ADD_LIBRARY(${_library}_${_build_lowercase}
       ${ARGN}
       )
 
@@ -47,7 +47,7 @@ MACRO(DEAL_II_ADD_LIBRARY _library)
       ${DEAL_II_DEFINITIONS_${_build}}
       )
 
-    SET_TARGET_PROPERTIES(${_library}.${_build_lowercase} PROPERTIES
+    SET_TARGET_PROPERTIES(${_library}_${_build_lowercase} PROPERTIES
       LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
       COMPILE_DEFINITIONS "${_definitions}"
       COMPILE_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
@@ -55,23 +55,23 @@ MACRO(DEAL_II_ADD_LIBRARY _library)
       )
 
     SET_PROPERTY(GLOBAL APPEND PROPERTY DEAL_II_OBJECTS_${_build}
-      "$<TARGET_OBJECTS:${_library}.${_build_lowercase}>"
+      "$<TARGET_OBJECTS:${_library}_${_build_lowercase}>"
       )
 
     #
     # Cuda specific target setup:
     #
     IF(DEAL_II_WITH_CUDA)
-      CUDA_WRAP_SRCS(${_library}.${_build_lowercase}
+      CUDA_WRAP_SRCS(${_library}_${_build_lowercase}
         OBJ _generated_cuda_files ${ARGN} SHARED
         )
 
-      ADD_CUSTOM_TARGET(${_library}.${_build_lowercase}_cuda
+      ADD_CUSTOM_TARGET(${_library}_${_build_lowercase}_cuda
         DEPENDS
         ${_generated_cuda_files}
         )
-      ADD_DEPENDENCIES(${_library}.${_build_lowercase}
-        ${_library}.${_build_lowercase}_cuda
+      ADD_DEPENDENCIES(${_library}_${_build_lowercase}
+        ${_library}_${_build_lowercase}_cuda
         )
 
       SET_PROPERTY(GLOBAL APPEND PROPERTY DEAL_II_OBJECTS_${_build}
