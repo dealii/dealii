@@ -2545,8 +2545,8 @@ namespace internal
   // MatrixFree
   template <typename VectorType>
   inline
-  void check_vector_compatibility (const VectorType                             &vec,
-                                   const internal::MatrixFreeFunctions::DoFInfo &dof_info)
+  void check_vector_compatibility (const VectorType                             &NDEBUG_UNUSED_PARAMETER(vec),
+                                   const internal::MatrixFreeFunctions::DoFInfo &NDEBUG_UNUSED_PARAMETER(dof_info))
   {
     (void) vec;
     (void) dof_info;
@@ -7005,7 +7005,7 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
 inline
 void
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::check_template_arguments(const unsigned int fe_no)
+::check_template_arguments(const unsigned int NDEBUG_UNUSED_PARAMETER(fe_no))
 {
   (void)fe_no;
 #ifdef DEBUG
