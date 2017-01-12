@@ -700,8 +700,8 @@ namespace PETScWrappers
      * Prints the PETSc vector object values using PETSc internal vector
      * viewer function <tt>VecView</tt>. The default format prints the
      * vector's contents, including indices of vector elements. For other
-     * valid view formats, consult http://www.mcs.anl.gov/petsc/petsc-
-     * current/docs/manualpages/Vec/VecView.html
+     * valid view formats, consult
+     * http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/Vec/VecView.html
      */
     void write_ascii (const PetscViewerFormat format = PETSC_VIEWER_DEFAULT) ;
 

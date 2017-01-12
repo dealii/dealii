@@ -852,8 +852,7 @@ namespace PETScWrappers
      * Print the PETSc matrix object values using PETSc internal matrix viewer
      * function <tt>MatView</tt>. The default format prints the non- zero
      * matrix elements. For other valid view formats, consult
-     * http://www.mcs.anl.gov/petsc/petsc-
-     * current/docs/manualpages/Mat/MatView.html
+     * http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/Mat/MatView.html
      */
     void write_ascii (const PetscViewerFormat format = PETSC_VIEWER_DEFAULT);
 
