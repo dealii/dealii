@@ -1,4 +1,4 @@
-JobId up.math.colostate.edu Wed Jan 11 13:08:56 2017
+
 DEAL::-0.750000 -0.750000	0
 DEAL::-0.250000 -0.750000	0
 DEAL::-0.750000 -0.250000	0
@@ -15,3 +15,6 @@ DEAL::0.250000 0.250000	1
 DEAL::0.750000 0.250000	0
 DEAL::0.250000 0.750000	0
 DEAL::0.750000 0.750000	0
+DEAL::   Number of active cells:       16
+DEAL::   Number of degrees of freedom: 80
+DEAL::   Number of vertices: 25
