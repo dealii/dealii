@@ -37,9 +37,19 @@ MACRO(DEAL_II_ADD_LIBRARY _library)
       ${ARGN}
       )
 
+
+    #
+    # Work around a problem in CUDA_WARP_SRCS that doesn't take empty list
+    # elements lightly...
+    #
+    SET(_definitions
+      ${DEAL_II_DEFINITIONS}
+      ${DEAL_II_DEFINITIONS_${_build}}
+      )
+
     SET_TARGET_PROPERTIES(${_library}.${_build_lowercase} PROPERTIES
       LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
-      COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${_build}}"
+      COMPILE_DEFINITIONS "${_definitions}"
       COMPILE_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
       LINKER_LANGUAGE "CXX"
       )
