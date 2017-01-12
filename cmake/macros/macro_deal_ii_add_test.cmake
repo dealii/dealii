@@ -266,8 +266,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
 
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/output
         COMMAND sh ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
-          run "${_test_full}" "${_test_diff}"
-          "${DIFF_EXECUTABLE}" "${_comparison_file}" ${_run_args}
+          run "${_test_full}" ${_run_args}
         COMMAND ${PERL_EXECUTABLE}
           -pi ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/normalize.pl
           ${_test_directory}/output
