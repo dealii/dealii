@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2016 by the deal.II authors
+// Copyright (C) 1999 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,7 @@
 #include <deal.II/lac/block_indices.h>
 #include <deal.II/lac/block_vector_base.h>
 #include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/vector_type_traits.h>
 
 
 #include <cstdio>
@@ -578,7 +579,8 @@ namespace LinearAlgebra
 
   } // end of namespace distributed
 
-} // end of namespace parallel
+} // end of namespace LinearAlgebra
+
 
 /**
  * Global function which overloads the default implementation of the C++
@@ -595,6 +597,18 @@ void swap (LinearAlgebra::distributed::BlockVector<Number> &u,
 {
   u.swap (v);
 }
+
+
+/**
+ * Declare dealii::LinearAlgebra::BlockVector< Number > as distributed vector.
+ *
+ * @author Uwe Koecher, 2017
+ */
+template <typename Number>
+struct is_serial_vector< LinearAlgebra::distributed::BlockVector< Number > > : std_cxx11::false_type
+{
+};
+
 
 DEAL_II_NAMESPACE_CLOSE
 

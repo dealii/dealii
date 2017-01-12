@@ -7782,12 +7782,7 @@ namespace VectorTools
     else
       {
         // This function is not implemented for distributed vectors.
-        Assert(typeid(v) == typeid(Vector<double>) ||
-               typeid(v) == typeid(Vector<float>) ||
-               typeid(v) == typeid(BlockVector<double>) ||
-               typeid(v) == typeid(BlockVector<float>) ||
-               typeid(v) == typeid(LinearAlgebra::Vector<double>) ||
-               typeid(v) == typeid(LinearAlgebra::Vector<float>),
+        Assert((dealii::is_serial_vector< VectorType >::value == true),
                ExcNotImplemented());
 
         const unsigned int n = v.size();

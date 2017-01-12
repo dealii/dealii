@@ -33,6 +33,8 @@ namespace std_cxx11
   using std::is_standard_layout;
   using std::is_trivial;
   using std::enable_if;
+  using std::true_type;
+  using std::false_type;
 }
 DEAL_II_NAMESPACE_CLOSE
 
@@ -77,6 +79,9 @@ namespace std_cxx11
                               boost::has_trivial_constructor<T>::value &&
                               boost::has_trivial_destructor<T>::value;
   };
+
+  using boost::true_type;
+  using boost::false_type;
 }
 DEAL_II_NAMESPACE_CLOSE
 

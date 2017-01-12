@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2016 by the deal.II authors
+// Copyright (C) 2004 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,6 +26,7 @@
 #  include <deal.II/lac/petsc_vector_base.h>
 #  include <deal.II/lac/petsc_parallel_vector.h>
 #  include <deal.II/lac/vector.h>
+#  include <deal.II/lac/vector_type_traits.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -428,6 +429,18 @@ namespace internal
 
   } /* namespace LinearOperator */
 } /* namespace internal */
+
+
+/**
+ * Declare dealii::PETScWrappers::Vector as serial vector.
+ *
+ * @author Uwe Koecher, 2017
+ */
+template <>
+struct is_serial_vector< PETScWrappers::Vector > : std_cxx11::true_type
+{
+};
+
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -30,7 +30,6 @@ void Vector<int>::reinit<double>(const Vector<double> &, const bool);
 template class Vector<long double>;
 template long double Vector<long double>::operator *<long double>(const Vector<long double> &) const;
 
-
 // do a few functions that currently don't fit the scheme because they have
 // two template arguments that need to be different (the case of same
 // arguments is covered by the default copy constructor and copy operator that
