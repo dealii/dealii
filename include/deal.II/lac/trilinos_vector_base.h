@@ -855,10 +855,10 @@ namespace TrilinosWrappers
      * does not need to allocate temporary storage and move data around. Note
      * that the vectors need to be of the same size and base on the same map.
      *
-     * This function is analog to the the @p swap function of all C standard
-     * containers. Also, there is a global function <tt>swap(u,v)</tt> that
-     * simply calls <tt>u.swap(v)</tt>, again in analogy to standard
-     * functions.
+     * This function is analogous to the the @p swap function of all C++
+     * standard containers. Also, there is a global function
+     * <tt>swap(u,v)</tt> that simply calls <tt>u.swap(v)</tt>, again in
+     * analogy to standard functions.
      */
     void swap (VectorBase &v);
 

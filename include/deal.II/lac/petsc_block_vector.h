@@ -222,9 +222,10 @@ namespace PETScWrappers
      * same number of blocks. If needed, the numbers of blocks should be
      * exchanged, too.
      *
-     * This function is analog to the the swap() function of all C++ standard
-     * containers. Also, there is a global function swap(u,v) that simply
-     * calls <tt>u.swap(v)</tt>, again in analogy to standard functions.
+     * This function is analogous to the the swap() function of all C++
+     * standard containers. Also, there is a global function swap(u,v) that
+     * simply calls <tt>u.swap(v)</tt>, again in analogy to standard
+     * functions.
      */
     void swap (BlockVector &v);
 
