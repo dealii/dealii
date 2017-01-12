@@ -862,7 +862,8 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
       else
         return FiniteElementDomination::other_element_dominates;
     }
-  else if (const FE_Nothing<dim> *fe_nothing = dynamic_cast<const FE_Nothing<dim>*>(&fe_other))
+  else if (const FE_Nothing<dim,spacedim> *fe_nothing
+           = dynamic_cast<const FE_Nothing<dim,spacedim>*>(&fe_other))
     {
       if (fe_nothing->is_dominating())
         {
