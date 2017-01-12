@@ -18,12 +18,16 @@
 #
 
 #
+# cuda support is experimental. Therefore, disable the feature per default:
+#
+SET(DEAL_II_WITH_CUDA FALSE CACHE BOOL "")
+
+#
 # FindCUDA needs a compiler set up with C++11 support. Thus, only configure
 # if deal.II was configured with C++11 support.
 #
 SET(FEATURE_CUDA_DEPENDS CXX11)
 
-SET(DEAL_II_WITH_CUDA FALSE CACHE BOOL "")
 
 MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
 

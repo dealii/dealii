@@ -67,7 +67,9 @@ MACRO(DEAL_II_ADD_LIBRARY _library)
       # CUDA_WRAP_SRCS does not automatically pick up host compiler flags
       # from the target, so we have to feed relevant flags ourselves
       #
-      SET(CMAKE_CXX_FLAGS
+      # Furthermore, C++14 is not yet supported, so filter the flag:
+      #
+      STRING(REPLACE "-std=c++14" "-std=c++11" CMAKE_CXX_FLAGS
         "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
         )
 
