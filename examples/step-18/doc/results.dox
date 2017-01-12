@@ -8,8 +8,6 @@ after recompiling with the command <tt>make release</tt> on the same machine, a
 much more reasonable time.
 
 
-
-
 If run, the program prints the following output, explaining what it is
 doing during all that time:
 @verbatim
@@ -20,68 +18,68 @@ Timestep 1 at time 1
   Cycle 0:
     Number of active cells:       3712 (by partition: 3712)
     Number of degrees of freedom: 17226 (by partition: 17226)
-    Assembling system... norm of rhs is 2.35077e+10
+    Assembling system... norm of rhs is 1.88062e+10
     Solver converged in 103 iterations.
     Updating quadrature point data...
   Cycle 1:
     Number of active cells:       12812 (by partition: 12812)
     Number of degrees of freedom: 51738 (by partition: 51738)
-    Assembling system... norm of rhs is 2.32681e+10
+    Assembling system... norm of rhs is 1.86145e+10
     Solver converged in 121 iterations.
     Updating quadrature point data...
     Moving mesh...
 
 Timestep 2 at time 2
-    Assembling system... norm of rhs is 2.29614e+10
+    Assembling system... norm of rhs is 1.84169e+10
     Solver converged in 122 iterations.
     Updating quadrature point data...
     Moving mesh...
 
 Timestep 3 at time 3
-    Assembling system... norm of rhs is 2.26871e+10
-    Solver converged in 129 iterations.
+    Assembling system... norm of rhs is 1.82355e+10
+    Solver converged in 122 iterations.
     Updating quadrature point data...
     Moving mesh...
 
 Timestep 4 at time 4
-    Assembling system... norm of rhs is 2.24515e+10
-    Solver converged in 116 iterations.
+    Assembling system... norm of rhs is 1.80728e+10
+    Solver converged in 117 iterations.
     Updating quadrature point data...
     Moving mesh...
 
 Timestep 5 at time 5
-    Assembling system... norm of rhs is 2.22637e+10
-    Solver converged in 114 iterations.
+    Assembling system... norm of rhs is 1.79318e+10
+    Solver converged in 116 iterations.
     Updating quadrature point data...
     Moving mesh...
 
 Timestep 6 at time 6
-    Assembling system... norm of rhs is 2.21401e+10
-    Solver converged in 112 iterations.
+    Assembling system... norm of rhs is 1.78171e+10
+    Solver converged in 115 iterations.
     Updating quadrature point data...
     Moving mesh...
 
 Timestep 7 at time 7
-    Assembling system... norm of rhs is 2.2123e+10
+    Assembling system... norm of rhs is 1.7737e+10
     Solver converged in 112 iterations.
     Updating quadrature point data...
     Moving mesh...
 
 Timestep 8 at time 8
-    Assembling system... norm of rhs is 2.23793e+10
-    Solver converged in 136 iterations.
+    Assembling system... norm of rhs is 1.77127e+10
+    Solver converged in 111 iterations.
     Updating quadrature point data...
     Moving mesh...
 
 Timestep 9 at time 9
-    Assembling system... norm of rhs is 2.35671e+10
-    Solver converged in 140 iterations.
+    Assembling system... norm of rhs is 1.78207e+10
+    Solver converged in 113 iterations.
     Updating quadrature point data...
     Moving mesh...
 
 Timestep 10 at time 10
-    Assembling system... norm of rhs is 2.59722e+10
-    Solver converged in 163 iterations.
+    Assembling system... norm of rhs is 1.83544e+10
+    Solver converged in 115 iterations.
     Updating quadrature point data...
     Moving mesh...
 
@@ -170,67 +168,56 @@ images encode the norm of the stress in the material):
 
 
 As is clearly visible, as we keep compressing the cylinder, it starts
-to buckle and ultimately collapses. Towards the end of the simulation,
-the deflection pattern becomes nonsymmetric (the cylinder top slides
-to the right). The model clearly does not provide for this (all our
-forces and boundary deflections are symmetric) but the effect is
-probably physically correct anyway: in reality, small inhomogeneities
-in the body's material properties would lead it to buckle to one side
-to evade the forcing; in numerical simulations, small perturbations
-such as numerical round-off or an inexact solution of a linear system
-by an iterative solver could have the same effect. Another typical source for
-asymmetries in adaptive computations is that only a certain fraction of cells
-is refined in each step, which may lead to asymmetric meshes even if the
-original coarse mesh was symmetric.
+to bow out near the fully constrained bottom surface and, after about eight
+time units, buckle in an azimuthally symmetric manner.
 
 
-
-
-Whether the computation is fully converged is a different matter. In order to
-see whether it is, we ran the program again with one more global refinement at
-the beginning and with the time step halved. This would have taken a very long
-time on a single machine, so we used a proper workstation and ran it on 16
-processors in parallel. The beginning of the output
-now looks like this:
+Although the result appears plausible for the symmetric geometry and loading,
+it is yet to be established whether or not the computation is fully converged.
+In order to see whether it is, we ran the program again with one more global
+refinement at the beginning and with the time step halved. This would have
+taken a very long time on a single machine, so we used a proper workstation and
+ran it on 16 processors in parallel. The beginning of the output now looks like
+this:
 @verbatim
 Timestep 1 at time 0.5
   Cycle 0:
-    Number of active cells:       29696 (by partition: 1906+1844+1827+1850+1875+1877+1818+1838+1867+1859+1900+1878+1862+1809+1825+1861)
-    Number of degrees of freedom: 113100 (by partition: 7354+6831+7193+6912+7035+7154+6894+7116+7007+7189+7346+6952+6944+7133+6889+7151)
-    Assembling system... norm of rhs is 1.04416e+10
-    Solver converged in 243 iterations.
+    Number of active cells:       29696 (by partition: 1808+1802+1894+1881+1870+1840+1884+1810+1876+1818+1870+1884+1854+1903+1816+1886)
+    Number of degrees of freedom: 113100 (by partition: 6936+6930+7305+7116+7326+6869+7331+6786+7193+6829+7093+7162+6920+7280+6843+7181)
+    Assembling system... norm of rhs is 1.10765e+10
+    Solver converged in 209 iterations.
     Updating quadrature point data...
   Cycle 1:
-    Number of active cells:       102076 (by partition: 6513+6193+6241+6305+6448+6503+6275+6557+6532+6383+6356+6235+6402+6525+6214+6394)
-    Number of degrees of freedom: 359484 (by partition: 22401+21521+21649+21928+24768+24759+21610+23987+22678+22167+22021+21667+22034+22831+21256+22207)
-    Assembling system... norm of rhs is 3.04821e+10
-    Solver converged in 257 iterations.
+    Number of active cells:       102034 (by partition: 6387+6202+6421+6341+6408+6201+6428+6428+6385+6294+6506+6244+6417+6527+6299+6546)
+    Number of degrees of freedom: 359337 (by partition: 23255+21308+24774+24019+22304+21415+22430+22184+22298+21796+22396+21592+22325+22553+21977+22711)
+    Assembling system... norm of rhs is 1.35759e+10
+    Solver converged in 268 iterations.
     Updating quadrature point data...
     Moving mesh...
 
 Timestep 2 at time 1
-    Assembling system... norm of rhs is 3.02616e+10
-    Solver converged in 256 iterations.
+    Assembling system... norm of rhs is 1.34674e+10
+    Solver converged in 267 iterations.
     Updating quadrature point data...
     Moving mesh...
 
 Timestep 3 at time 1.5
-    Assembling system... norm of rhs is 3.00497e+10
-    Solver converged in 254 iterations.
+    Assembling system... norm of rhs is 1.33607e+10
+    Solver converged in 265 iterations.
     Updating quadrature point data...
     Moving mesh...
 
 Timestep 4 at time 2
-    Assembling system... norm of rhs is 2.98467e+10
-    Solver converged in 252 iterations.
+    Assembling system... norm of rhs is 1.32558e+10
+    Solver converged in 263 iterations.
     Updating quadrature point data...
     Moving mesh...
 
 [...]
 
 Timestep 20 at time 10
-    Assembling system... norm of rhs is 3.01912e+10
-    Solver converged in 479 iterations.
+    Assembling system... norm of rhs is 1.47755e+10
+    Solver converged in 425 iterations.
     Updating quadrature point data...
     Moving mesh...
 @endverbatim
@@ -257,6 +244,7 @@ this program are 16 files for each time step:
 -rw-r--r-- 1 wellsd2 user   1421 Feb 13 21:09 solution-0001.pvtu
 -rw-r--r-- 1 wellsd2 user    364 Feb 13 21:09 solution-0001.visit
 @endverbatim
+
 
 Here are first the mesh on which we compute as well as the partitioning
 for the 16 processors:
@@ -316,16 +304,32 @@ sequential case:
 </table>
 
 
-If one compares this with the previous run, the results are qualitatively
-similar, but quantitatively definitely different. The previous computation was
+As before, we observe that at high axial compression the cylinder begins
+to buckle, but this time ultimately collapses on itself. In contrast to our
+first run, towards the end of the simulation the deflection pattern becomes
+nonsymmetric (the central bulge deflects laterally). The model clearly does not
+provide for this (all our forces and boundary deflections are symmetric) but the
+effect is probably physically correct anyway: in reality, small inhomogeneities
+in the body's material properties would lead it to buckle to one side
+to evade the forcing; in numerical simulations, small perturbations
+such as numerical round-off or an inexact solution of a linear system
+by an iterative solver could have the same effect. Another typical source for
+asymmetries in adaptive computations is that only a certain fraction of cells
+is refined in each step, which may lead to asymmetric meshes even if the
+original coarse mesh was symmetric.
+
+
+If one compares this with the previous run, the results both qualitatively
+and quantitatively different. The previous computation was
 therefore certainly not converged, though we can't say for sure anything about
 the present one. One would need an even finer computation to find out. However,
 the point may be moot: looking at the last picture in detail, it is pretty
-obvious that not only is the linear small
-deformation model we chose completely inadequate, but for a realistic
-simulation we would also need to make sure that the body does not intersect
-itself during deformation. Without such a formulation we cannot expect anything
-to make physical sense, even if it produces nice pictures!
+obvious that not only is the linear small deformation model we chose completely
+inadequate, but for a realistic simulation we would also need to make sure that
+the body does not intersect itself during deformation (if we continued
+compressing the cylinder we would observe some self-intersection).
+Without such a formulation we cannot expect anything to make physical sense,
+even if it produces nice pictures!
 
 
 <h3>Possible directions for extensions</h3>

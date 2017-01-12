@@ -674,7 +674,7 @@ namespace Step18
                              const double present_timestep)
     :
     Function<dim> (dim),
-    velocity (.1),
+    velocity (.08),
     present_time (present_time),
     present_timestep (present_timestep)
   {}
