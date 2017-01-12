@@ -47,6 +47,19 @@ MACRO(FEATURE_BOOST_CONFIGURE_BUNDLED)
     LIST(APPEND BOOST_DEFINITIONS "BOOST_ALL_NO_LIB")
     LIST(APPEND BOOST_USER_DEFINITIONS "BOOST_ALL_NO_LIB")
   ENDIF()
+
+  #
+  # Our bundled boost version 1.62 checks for the availability of
+  # "emplace_hint" incorrectly. Thus, simply define
+  # BOOST_NO_CXX11_HDR_UNORDERED_MAP if the gcc compiler version is less
+  # than 4.8.
+  #
+  IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
+      CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.8" )
+    LIST(APPEND BOOST_DEFINITIONS "BOOST_NO_CXX11_HDR_UNORDERED_MAP")
+    LIST(APPEND BOOST_USER_DEFINITIONS "BOOST_NO_CXX11_HDR_UNORDERED_MAP")
+  ENDIF()
+
 ENDMACRO()
 
 MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
@@ -62,6 +75,17 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
     IF("${BOOST_VERSION_MAJOR}" STREQUAL "1" AND "${BOOST_VERSION_MINOR}" STREQUAL "58")
       MESSAGE(STATUS "Boost version 1.58 is not compatible with deal.II!")
       SET(${var} FALSE)
+    ENDIF()
+
+    #
+    # Newer boost versions check for the availability of "emplace_hint"
+    # incorrectly. Thus, simply define BOOST_NO_CXX11_HDR_UNORDERED_MAP if
+    # the gcc compiler version is less than 4.8.
+    #
+    IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
+        CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.8" )
+      LIST(APPEND BOOST_DEFINITIONS "BOOST_NO_CXX11_HDR_UNORDERED_MAP")
+      LIST(APPEND BOOST_USER_DEFINITIONS "BOOST_NO_CXX11_HDR_UNORDERED_MAP")
     ENDIF()
   ENDIF()
 ENDMACRO()
