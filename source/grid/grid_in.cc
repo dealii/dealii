@@ -397,7 +397,9 @@ void GridIn<dim, spacedim>::read_unv(std::istream &in)
   AssertThrow(in, ExcIO());
   in >> tmp;
 
-  AssertThrow(tmp == 2411, ExcUnknownSectionType(tmp)); // section 2411 describes vertices http://www.sdrl.uc.edu/universal-file-formats-for-modal-analysis-testing-1/file-format-storehouse/unv_2411.htm/
+  // section 2411 describes vertices: see
+  // http://www.sdrl.uc.edu/sdrl/referenceinfo/universalfileformats/file-format-storehouse/universal-dataset-number-2411
+  AssertThrow(tmp == 2411, ExcUnknownSectionType(tmp));
 
   std::vector< Point<spacedim> > vertices; // vector of vertex coordinates
   std::map<int, int> vertex_indices; // # vert in unv (key) ---> # vert in deal.II (value)
@@ -437,7 +439,9 @@ void GridIn<dim, spacedim>::read_unv(std::istream &in)
   AssertThrow(in, ExcIO());
   in >> tmp;
 
-  AssertThrow(tmp == 2412, ExcUnknownSectionType(tmp)); // section 2412 describes elements http://www.sdrl.uc.edu/universal-file-formats-for-modal-analysis-testing-1/file-format-storehouse/unv_2412.htm/
+  // section 2412 describes elements: see
+  // http://www.sdrl.uc.edu/sdrl/referenceinfo/universalfileformats/file-format-storehouse/universal-dataset-number-2412
+  AssertThrow(tmp == 2412, ExcUnknownSectionType(tmp));
 
   std::vector< CellData<dim> > cells; // vector of cells
   SubCellData subcelldata;
@@ -540,8 +544,11 @@ void GridIn<dim, spacedim>::read_unv(std::istream &in)
       AssertThrow(in, ExcIO());
       in >> tmp;
 
-      AssertThrow((tmp == 2467)||(tmp == 2477), ExcUnknownSectionType(tmp)); // section 2467 (2477) describes (materials - first and bcs - second) or (bcs - first and materials - second) - sequence depends on which group is created first
-      // http://www.sdrl.uc.edu/universal-file-formats-for-modal-analysis-testing-1/file-format-storehouse/unv_2467.htm/
+      // section 2467 (2477) describes (materials - first and bcs - second) or
+      // (bcs - first and materials - second) - sequence depends on which
+      // group is created first: see
+      // http://www.sdrl.uc.edu/sdrl/referenceinfo/universalfileformats/file-format-storehouse/universal-dataset-number-2467
+      AssertThrow((tmp == 2467)||(tmp == 2477), ExcUnknownSectionType(tmp));
 
       while (tmp != -1) // we do until reach end of 2467 or 2477
         {

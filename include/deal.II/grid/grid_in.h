@@ -155,15 +155,15 @@ template <int dim> struct CellData;
  * generator, see http://www.salome-platform.org/ . The sections of the format
  * that the GridIn::read_unv function supports are documented here:
  * <ul>
- * <li> section 2411: http://www.sdrl.uc.edu/universal-file-formats-for-modal-
- * analysis-testing-1/file-format-storehouse/unv_2411.htm
- * <li> section 2412: http://www.sdrl.uc.edu/universal-file-formats-for-modal-
- * analysis-testing-1/file-format-storehouse/unv_2412.htm
- * <li> section 2467: http://www.sdrl.uc.edu/universal-file-formats-for-modal-
- * analysis-testing-1/file-format-storehouse/unv_2467.htm
+ * <li> section 2411:
+ * http://www.sdrl.uc.edu/sdrl/referenceinfo/universalfileformats/file-format-storehouse/universal-dataset-number-2411
+ * <li> section 2412:
+ * http://www.sdrl.uc.edu/sdrl/referenceinfo/universalfileformats/file-format-storehouse/universal-dataset-number-2412
+ * <li> section 2467:
+ * http://www.sdrl.uc.edu/sdrl/referenceinfo/universalfileformats/file-format-storehouse/universal-dataset-number-2467
  * <li> all sections of this format, even if they may not be supported in our
- * reader, can be found here: http://www.sdrl.uc.edu/universal-file-formats-
- * for-modal-analysis-testing-1/file-format-storehouse/file-formats
+ * reader, can be found here:
+ * http://www.sdrl.uc.edu/sdrl/referenceinfo/universalfileformats/file-format-storehouse
  * </ul>
  * Note that Salome, let's say in 2D, can only make a quad mesh on an object
  * that has exactly 4 edges (or 4 pieces of the boundary). That means, that if

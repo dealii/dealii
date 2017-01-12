@@ -27,7 +27,12 @@
 from __future__ import print_function
 import textwrap
 import sys, re
-wrapper = textwrap.TextWrapper()
+
+# As of python 2.6 we can tell the text wrapper to not break on hyphens. This is
+# usually what we want to do: we don't want to split URLs with hyphens and
+# doxygen will format 'non-primitive' as 'non- primitive' if it is
+# (inadvertantly) split across two lines.
+wrapper = textwrap.TextWrapper(break_on_hyphens=False)
 
 # take an array of lines and wrap them to 78 columns and let each line start
 # with @p startwith
