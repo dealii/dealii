@@ -20,7 +20,6 @@
 #include <deal.II/base/mg_level_object.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/lac/la_parallel_vector.h>
-#include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -88,10 +87,17 @@ namespace internal
       unsigned int n_child_cell_dofs;
 
       /**
-       * Holds the one-dimensional embedding (prolongation) matrix from mother
-       * element to the children.
+       * Holds the numbering between the numbering of degrees of freedom in
+       * the finite element and the lexicographic numbering needed for the
+       * tensor product application.
        */
-      internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
+      std::vector<unsigned int> lexicographic_numbering;
+
+      /**
+       * Holds the one-dimensional embedding (prolongation) matrix from mother
+       * element to all the children.
+       */
+      AlignedVector<VectorizedArray<Number> > prolongation_matrix_1d;
 
     };
 

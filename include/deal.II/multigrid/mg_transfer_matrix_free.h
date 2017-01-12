@@ -23,7 +23,6 @@
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/base/mg_level_object.h>
 #include <deal.II/multigrid/mg_transfer.h>
-#include <deal.II/matrix_free/shape_info.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -188,9 +187,9 @@ private:
 
   /**
    * Holds the one-dimensional embedding (prolongation) matrix from mother
-   * element to the children.
+   * element to all the children.
    */
-  internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
+  AlignedVector<VectorizedArray<Number> > prolongation_matrix_1d;
 
   /**
    * Holds the temporary values for the tensor evaluation

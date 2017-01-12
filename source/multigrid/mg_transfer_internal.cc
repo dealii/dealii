@@ -17,6 +17,7 @@
 #include <deal.II/distributed/tria.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_tools.h>
+#include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/multigrid/mg_transfer_internal.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -414,35 +415,30 @@ namespace internal
           renumbering[fe.dofs_per_cell-fe.dofs_per_vertex] = fe.dofs_per_vertex;
       }
 
-      // step 1.3: create a 1D quadrature formula from the finite element that
-      // collects the support points of the basis functions on the two children.
+      // step 1.3: create a dummy 1D quadrature formula to extract the
+      // lexicographic numbering for the elements
       std::vector<Point<1> > basic_support_points = fe.get_unit_support_points();
       Assert(fe.dofs_per_vertex == 0 || fe.dofs_per_vertex == 1,
              ExcNotImplemented());
-      std::vector<Point<1> > points_refined(fe.dofs_per_vertex > 0 ?
+      const unsigned int shift = fe.dofs_per_cell - fe.dofs_per_vertex;
+      const unsigned int n_child_dofs_1d = (fe.dofs_per_vertex > 0 ?
                                             (2 * fe.dofs_per_cell - 1) :
                                             (2 * fe.dofs_per_cell));
-      const unsigned int shift = fe.dofs_per_cell - fe.dofs_per_vertex;
-      for (unsigned int c=0; c<GeometryInfo<1>::max_children_per_cell; ++c)
-        for (unsigned int j=0; j<basic_support_points.size(); ++j)
-          points_refined[shift*c+j][0] =
-            c*0.5 + 0.5 * basic_support_points[renumbering[j]][0];
-
-      const unsigned int n_child_dofs_1d = points_refined.size();
 
       elem_info.n_child_cell_dofs = elem_info.n_components*Utilities::fixed_power<dim>(n_child_dofs_1d);
+      const Quadrature<1> dummy_quadrature(std::vector<Point<1> >(1, Point<1>()));
+      internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
+      shape_info.reinit(dummy_quadrature, mg_dof.get_fe(), 0);
+      elem_info.lexicographic_numbering = shape_info.lexicographic_numbering;
 
-      // step 1.4: evaluate the polynomials and store the data in ShapeInfo
-      const Quadrature<1> quadrature(points_refined);
-      elem_info.shape_info.reinit(quadrature, mg_dof.get_fe(), 0);
+      // step 1.4: get the 1d prolongation matrix and combine from both children
+      elem_info.prolongation_matrix_1d.resize(fe.dofs_per_cell*n_child_dofs_1d);
 
       for (unsigned int c=0; c<GeometryInfo<1>::max_children_per_cell; ++c)
         for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
           for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
-            Assert(std::abs(elem_info.shape_info.shape_values[i*n_child_dofs_1d+j+c*shift][0] -
-                            fe.get_prolongation_matrix(c)(renumbering[j],renumbering[i]))
-                   < std::max(2.*(double)std::numeric_limits<Number>::epsilon(),1e-12),
-                   ExcInternalError());
+            elem_info.prolongation_matrix_1d[i*n_child_dofs_1d+j+c*shift] =
+              fe.get_prolongation_matrix(c)(renumbering[j],renumbering[i]);
     }
 
 
@@ -567,7 +563,7 @@ namespace internal
                       ghosted_level_dofs.push_back(local_dof_indices[i]);
 
                   add_child_indices<dim>(c, fe.dofs_per_cell - fe.dofs_per_vertex,
-                                         fe.degree, elem_info.shape_info.lexicographic_numbering,
+                                         fe.degree, elem_info.lexicographic_numbering,
                                          local_dof_indices,
                                          &next_indices[start_index]);
 
@@ -598,7 +594,7 @@ namespace internal
                       if (mg_constrained_dofs != 0)
                         for (unsigned int i=0; i<mg_dof.get_fe().dofs_per_cell; ++i)
                           if (mg_constrained_dofs->is_boundary_index(level,
-                                                                     local_dof_indices[elem_info.shape_info.lexicographic_numbering[i]]))
+                                                                     local_dof_indices[elem_info.lexicographic_numbering[i]]))
                             dirichlet_indices[level][child_index].push_back(i);
                     }
                 }
@@ -626,14 +622,14 @@ namespace internal
                   global_level_dof_indices_l0.resize(start_index+elem_info.n_child_cell_dofs,
                                                      numbers::invalid_dof_index);
                   add_child_indices<dim>(0, fe.dofs_per_cell - fe.dofs_per_vertex,
-                                         fe.degree, elem_info.shape_info.lexicographic_numbering,
+                                         fe.degree, elem_info.lexicographic_numbering,
                                          local_dof_indices,
                                          &global_level_dof_indices_l0[start_index]);
 
                   dirichlet_indices[0].push_back(std::vector<unsigned short>());
                   if (mg_constrained_dofs != 0)
                     for (unsigned int i=0; i<mg_dof.get_fe().dofs_per_cell; ++i)
-                      if (mg_constrained_dofs->is_boundary_index(0, local_dof_indices[elem_info.shape_info.lexicographic_numbering[i]]))
+                      if (mg_constrained_dofs->is_boundary_index(0, local_dof_indices[elem_info.lexicographic_numbering[i]]))
                         dirichlet_indices[0].back().push_back(i);
                 }
             }
