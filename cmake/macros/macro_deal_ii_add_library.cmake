@@ -62,9 +62,19 @@ MACRO(DEAL_II_ADD_LIBRARY _library)
     # Cuda specific target setup:
     #
     IF(DEAL_II_WITH_CUDA)
+
+      #
+      # CUDA_WRAP_SRCS does not automatically pick up host compiler flags
+      # from the target, so we have to feed relevant flags ourselves
+      #
+      SET(CMAKE_CXX_FLAGS
+        "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
+        )
+
       CUDA_WRAP_SRCS(${_library}_${_build_lowercase}
         OBJ _generated_cuda_files ${ARGN} SHARED
         )
+      SET(CMAKE_CXX_FLAGS "")
 
       ADD_CUSTOM_TARGET(${_library}_${_build_lowercase}_cuda
         DEPENDS
