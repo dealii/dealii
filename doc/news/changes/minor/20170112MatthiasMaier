@@ -1,0 +1,5 @@
+Fixed: Various issues with the CMake configuration of the cuda
+configuration have been addressed, including correct handling of compiler
+flags and preprocessor definitions.
+<br>
+(Matthias Maier, 2017/01/12)

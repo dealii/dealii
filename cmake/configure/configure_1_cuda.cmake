@@ -18,12 +18,16 @@
 #
 
 #
+# cuda support is experimental. Therefore, disable the feature per default:
+#
+SET(DEAL_II_WITH_CUDA FALSE CACHE BOOL "")
+
+#
 # FindCUDA needs a compiler set up with C++11 support. Thus, only configure
 # if deal.II was configured with C++11 support.
 #
 SET(FEATURE_CUDA_DEPENDS CXX11)
 
-SET(DEAL_II_WITH_CUDA FALSE CACHE BOOL "")
 
 MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
 
@@ -95,11 +99,6 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
       STRING(SUBSTRING "${CUDA_COMPUTE_CAPABILITY}" 0 1 CUDA_COMPUTE_CAPABILITY_MAJOR)
       STRING(SUBSTRING "${CUDA_COMPUTE_CAPABILITY}" 1 1 CUDA_COMPUTE_CAPABILITY_MINOR)
       SET(CUDA_ATTACH_VS_BUILD_RULE_TO_CUDA_FILE FALSE)
-
-
-      SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -std=c++11)
-
-      # FIXME: CUDA compiler NVCC doesn't support C++14.
 
     ENDIF()
   ENDIF()

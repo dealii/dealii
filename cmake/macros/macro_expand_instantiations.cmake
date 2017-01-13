@@ -23,7 +23,7 @@
 #
 # target
 #
-#    where target.${build_type} (and if present) target.${build_type}_cuda
+#    where target_${build_type} (and if present) target_${build_type}_cuda
 #    will depend on the generation of all .inst files, to ensure that all
 #    .inst files are generated prior to compiling.
 #
@@ -70,7 +70,7 @@ MACRO(EXPAND_INSTANTIATIONS _target _inst_in_files)
   # Define a custom target that depends on the generation of all inst.in
   # files.
   #
-  ADD_CUSTOM_TARGET(${_target}.inst ALL DEPENDS ${_inst_targets})
+  ADD_CUSTOM_TARGET(${_target}_inst ALL DEPENDS ${_inst_targets})
 
   #
   # Add a dependency to all target.${build_type} so that target.inst is
@@ -79,11 +79,12 @@ MACRO(EXPAND_INSTANTIATIONS _target _inst_in_files)
   FOREACH(_build ${DEAL_II_BUILD_TYPES})
     STRING(TOLOWER ${_build} _build_lowercase)
 
-    ADD_DEPENDENCIES(${_target}.${_build_lowercase} ${_target}.inst)
+    ADD_DEPENDENCIES(${_target}_${_build_lowercase} ${_target}_inst)
 
-    IF(TARGET ${_target}.${_build_lowercase}_cuda)
-      ADD_DEPENDENCIES(${_target}.${_build_lowercase}_cuda ${_target}.inst)
+    IF(TARGET ${_target}_${_build_lowercase}_cuda)
+      ADD_DEPENDENCIES(${_target}_${_build_lowercase}_cuda ${_target}_inst)
     ENDIF()
+
   ENDFOREACH()
 
 ENDMACRO()
