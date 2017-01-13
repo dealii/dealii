@@ -323,6 +323,11 @@ namespace internal
        */
       Accessor<rank,dim,constness,P-1,Number> operator [] (const unsigned int i);
 
+      /**
+       * Index operator.
+       */
+      Accessor<rank,dim,constness,P-1,Number> operator [] (const unsigned int i) const;
+
     private:
       /**
        * Store the data given to the constructor.
@@ -405,6 +410,11 @@ namespace internal
        * Index operator.
        */
       reference operator [] (const unsigned int);
+
+      /**
+       * Index operator.
+       */
+      reference operator [] (const unsigned int) const;
 
     private:
       /**
@@ -867,6 +877,16 @@ namespace internal
 
 
 
+    template <int rank, int dim, bool constness, int P, typename Number>
+    Accessor<rank,dim,constness,P-1,Number>
+    Accessor<rank,dim,constness,P,Number>::operator[] (const unsigned int i) const
+    {
+      return Accessor<rank,dim,constness,P-1,Number> (tensor,
+                                                      merge (previous_indices, i, rank-P));
+    }
+
+
+
     template <int rank, int dim, bool constness, typename Number>
     Accessor<rank,dim,constness,1,Number>::
     Accessor (tensor_type              &tensor,
@@ -891,6 +911,14 @@ namespace internal
     template <int rank, int dim, bool constness, typename Number>
     typename Accessor<rank,dim,constness,1,Number>::reference
     Accessor<rank,dim,constness,1,Number>::operator[] (const unsigned int i)
+    {
+      return tensor(merge (previous_indices, i, rank-1));
+    }
+
+
+    template <int rank, int dim, bool constness, typename Number>
+    typename Accessor<rank,dim,constness,1,Number>::reference
+    Accessor<rank,dim,constness,1,Number>::operator[] (const unsigned int i) const
     {
       return tensor(merge (previous_indices, i, rank-1));
     }

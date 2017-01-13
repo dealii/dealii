@@ -1,0 +1,4 @@
+Improved: The contract3() function has been extended accommodate both Tensor
+and SymmetricTensors arguments.
+<br>
+(Jean-Paul Pelteret, Matthias Maier, 2017/01/10)
