@@ -141,7 +141,7 @@ void test ()
   //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
   //std::cout << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
-  MatrixFree<dim,number> mf_data;
+  std_cxx11::shared_ptr<MatrixFree<dim,number> > mf_data(new MatrixFree<dim,number> ());
   {
     const QGauss<1> quad (fe_degree+1);
     typename MatrixFree<dim,number>::AdditionalData data;
@@ -149,15 +149,15 @@ void test ()
       MatrixFree<dim,number>::AdditionalData::none;
     data.tasks_block_size = 7;
     data.mapping_update_flags = update_quadrature_points | update_gradients | update_JxW_values;
-    mf_data.reinit (dof, constraints, quad, data);
+    mf_data->reinit (dof, constraints, quad, data);
   }
 
   std_cxx11::shared_ptr<Table<2, VectorizedArray<number> > > coefficient;
   coefficient = std_cxx11::make_shared<Table<2, VectorizedArray<number> > >();
   {
-    FEEvaluation<dim,fe_degree,fe_degree+1,1,number> fe_eval(mf_data);
+    FEEvaluation<dim,fe_degree,fe_degree+1,1,number> fe_eval(*mf_data);
 
-    const unsigned int n_cells = mf_data.n_macro_cells();
+    const unsigned int n_cells = mf_data->n_macro_cells();
     const unsigned int n_q_points = fe_eval.n_q_points;
 
     coefficient->reinit(n_cells, n_q_points);
@@ -174,7 +174,7 @@ void test ()
   mf.set_coefficient(coefficient);
   mf.compute_diagonal();
   LinearAlgebra::distributed::Vector<number> in, out, ref;
-  mf_data.initialize_dof_vector (in);
+  mf_data->initialize_dof_vector (in);
   out.reinit (in);
   ref.reinit (in);
 

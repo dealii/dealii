@@ -719,7 +719,7 @@ namespace Step37
     DoFHandler<dim>                            dof_handler;
 
     ConstraintMatrix                           constraints;
-    MatrixFree<dim,double>                     system_mf_storage;
+    std_cxx11::shared_ptr<MatrixFree<dim,double> > system_mf_storage;
     typedef LaplaceOperator<dim,degree_finite_element,double> SystemMatrixType;
     SystemMatrixType                           system_matrix;
 
@@ -760,6 +760,7 @@ namespace Step37
 #endif
     fe (degree_finite_element),
     dof_handler (triangulation),
+    system_mf_storage(new MatrixFree<dim,double>()),
     pcout (std::cout, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0),
     // The LaplaceProblem class holds an additional output stream that
     // collects detailed timings about the setup phase. This stream, called
@@ -840,8 +841,8 @@ namespace Step37
         MatrixFree<dim,double>::AdditionalData::none;
       additional_data.mapping_update_flags = (update_gradients | update_JxW_values |
                                               update_quadrature_points);
-      system_mf_storage.reinit (dof_handler, constraints, QGauss<1>(fe.degree+1),
-                                additional_data);
+      system_mf_storage->reinit (dof_handler, constraints, QGauss<1>(fe.degree+1),
+                                 additional_data);
     }
 
     system_matrix.initialize (system_mf_storage);
@@ -893,7 +894,9 @@ namespace Step37
         mg_mf_storage[level].reinit(dof_handler, level_constraints,
                                     QGauss<1>(fe.degree+1), additional_data);
 
-        mg_matrices[level].initialize(mg_mf_storage[level], mg_constrained_dofs, level);
+        mg_matrices[level].initialize(
+          std_cxx11::make_shared<MatrixFree<dim,float>>(mg_mf_storage[level]),
+          mg_constrained_dofs, level);
         mg_matrices[level].evaluate_coefficient(Coefficient<dim>());
       }
     setup_time += time.wall_time();
@@ -918,8 +921,8 @@ namespace Step37
     Timer time;
 
     system_rhs = 0;
-    FEEvaluation<dim,degree_finite_element> phi(system_mf_storage);
-    for (unsigned int cell=0; cell<system_mf_storage.n_macro_cells(); ++cell)
+    FEEvaluation<dim,degree_finite_element> phi(*system_mf_storage);
+    for (unsigned int cell=0; cell<system_mf_storage->n_macro_cells(); ++cell)
       {
         phi.reinit(cell);
         for (unsigned int q=0; q<phi.n_q_points; ++q)
