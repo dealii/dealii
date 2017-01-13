@@ -1119,21 +1119,26 @@ namespace internal
  * with which they interface; for example, triangulations store pointers to
  * objects describing boundaries and manifolds, and they have signals that
  * store pointers to other objects so they can be notified of changes in the
- * triangulation (see the section on signals in this introduction). As objects
- * that are re-loaded at a later time do not usually end up at the same
- * location in memory as they were when they were saved, dealing with pointers
- * to other objects is difficult.
+ * triangulation (see the section on signals in this introduction). Since these
+ * objects are owned by the user space (for example the user can create a custom
+ * manifold object), they may not be serializable. So in cases like this,
+ * boost::serialize can store a reference to an object instead of the pointer,
+ * but the reference will never be satisfied at write time because the object
+ * pointed to is not serialized. Clearly, at load time, boost::serialize will
+ * not know where to let the pointer point to because it never gets to re-create
+ * the object originally pointed to.
  *
  * For these reasons, saving a triangulation to an archive does not store all
  * information, but only certain parts. More specifically, the information
  * that is stored is everything that defines the mesh such as vertex
  * locations, vertex indices, how vertices are connected to cells, boundary
  * indicators, subdomain ids, material ids, etc. On the other hand, the
- * following information is not stored: - signals - pointers to boundary
- * objects previously set using Triangulation::set_boundary On the other hand,
- * since these are objects that are usually set in user code, they can
- * typically easily be set again in that part of your code in which you re-
- * load triangulations.
+ * following information is not stored:
+ *   - signals
+ *   - pointers to boundary objects previously set using Triangulation::set_boundary
+ * On the other hand, since these are objects that are usually set in user code,
+ * they can typically easily be set again in that part of your code in which you
+ * re-load triangulations.
  *
  * In a sense, this approach to serialization means that re-loading a
  * triangulation is more akin to calling the
