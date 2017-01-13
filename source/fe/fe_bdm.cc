@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2016 by the deal.II authors
+// Copyright (C) 2003 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -263,9 +263,9 @@ FE_BDM<dim>::get_ria_vector (const unsigned int deg)
     }
 
   const unsigned int dofs_per_cell = PolynomialsBDM<dim>::compute_n_pols(deg);
-  const unsigned int dofs_per_face = PolynomialSpace<dim-1>::compute_n_pols(deg);
+  const unsigned int dofs_per_face = PolynomialSpace<dim-1>::compute_n_pols(deg+1);
 
-  Assert(GeometryInfo<dim>::faces_per_cell*dofs_per_face < dofs_per_cell,
+  Assert(GeometryInfo<dim>::faces_per_cell*dofs_per_face <= dofs_per_cell,
          ExcInternalError());
 
   // all dofs need to be
