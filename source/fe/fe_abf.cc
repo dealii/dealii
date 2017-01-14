@@ -45,7 +45,9 @@ FE_ABF<dim>::FE_ABF (const unsigned int deg)
   FE_PolyTensor<PolynomialsABF<dim>, dim> (
     deg,
     FiniteElementData<dim>(get_dpo_vector(deg),
-                           dim, deg+1, FiniteElementData<dim>::Hdiv),
+                           dim,
+                           deg+2,
+                           FiniteElementData<dim>::Hdiv),
     std::vector<bool>(PolynomialsABF<dim>::compute_n_pols(deg), true),
     std::vector<ComponentMask>(PolynomialsABF<dim>::compute_n_pols(deg),
                                std::vector<bool>(dim,true))),
