@@ -2020,13 +2020,12 @@ vectorized_transpose_and_store(const bool                    add_into,
           _mm_storeu_ps(out+4*i+offsets[7], res7);
         }
     }
-  const unsigned int shift = n_chunks * 4;
   if (add_into)
-    for (unsigned int i=shift; i<n_entries; ++i)
+    for (unsigned int i=4*n_chunks; i<n_entries; ++i)
       for (unsigned int v=0; v<8; ++v)
         out[offsets[v]+i] += in[i][v];
   else
-    for (unsigned int i=shift; i<n_entries; ++i)
+    for (unsigned int i=4*n_chunks; i<n_entries; ++i)
       for (unsigned int v=0; v<8; ++v)
         out[offsets[v]+i] = in[i][v];
 }
@@ -2640,10 +2639,9 @@ void vectorized_load_and_transpose(const unsigned int      n_entries,
       out[4*i+2].data = _mm_shuffle_ps (v1, v3, 0x88);
       out[4*i+3].data = _mm_shuffle_ps (v1, v3, 0xdd);
     }
-  if (n_entries % 4 > 0)
-    for (unsigned int i=4*n_chunks; i<n_entries; ++i)
-      for (unsigned int v=0; v<4; ++v)
-        out[i][v] = in[offsets[v]+i];
+  for (unsigned int i=4*n_chunks; i<n_entries; ++i)
+    for (unsigned int v=0; v<4; ++v)
+      out[i][v] = in[offsets[v]+i];
 }
 
 
@@ -2698,13 +2696,12 @@ vectorized_transpose_and_store(const bool                    add_into,
           _mm_storeu_ps(out+4*i+offsets[3], u3);
         }
     }
-  const unsigned int shift = n_chunks * 4;
   if (add_into)
-    for (unsigned int i=shift; i<n_entries; ++i)
+    for (unsigned int i=4*n_chunks; i<n_entries; ++i)
       for (unsigned int v=0; v<4; ++v)
         out[offsets[v]+i] += in[i][v];
   else
-    for (unsigned int i=shift; i<n_entries; ++i)
+    for (unsigned int i=4*n_chunks; i<n_entries; ++i)
       for (unsigned int v=0; v<4; ++v)
         out[offsets[v]+i] = in[i][v];
 }
