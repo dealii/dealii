@@ -17,10 +17,13 @@
 #define dealii__fe_poly_tensor_h
 
 
+#include <deal.II/base/config.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/quadrature.h>
+#include <deal.II/base/thread_management.h>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -407,6 +410,11 @@ protected:
    * empty, the basis in #poly_space is used.
    */
   FullMatrix<double> inverse_node_matrix;
+
+  /**
+   * A mutex to be used to guard access to the variables below.
+   */
+  mutable Threads::Mutex cache_mutex;
 
   /**
    * If a shape function is computed at a single point, we must compute all of
