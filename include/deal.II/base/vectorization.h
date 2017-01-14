@@ -2640,7 +2640,7 @@ void vectorized_load_and_transpose(const unsigned int      n_entries,
       out[4*i+2].data = _mm_shuffle_ps (v1, v3, 0x88);
       out[4*i+3].data = _mm_shuffle_ps (v1, v3, 0xdd);
     }
-  if (remainder > 0)
+  if (n_entries % 4 > 0)
     for (unsigned int i=4*n_chunks; i<n_entries; ++i)
       for (unsigned int v=0; v<4; ++v)
         out[i][v] = in[offsets[v]+i];
