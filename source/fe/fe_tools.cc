@@ -1621,6 +1621,7 @@ namespace FETools
     Assert (fe.has_generalized_support_points(), ExcNotInitialized());
     Assert (N.n()==n_dofs, ExcDimensionMismatch(N.n(), n_dofs));
     Assert (N.m()==n_dofs, ExcDimensionMismatch(N.m(), n_dofs));
+    Assert (fe.n_components() == dim, ExcNotImplemented());
 
     const std::vector<Point<dim> > &points = fe.get_generalized_support_points();
 
@@ -1642,14 +1643,24 @@ namespace FETools
     // yield identity.
     for (unsigned int i=0; i<n_dofs; ++i)
       {
-        for (unsigned int k=0; k<values[0].size(); ++k)
+        // get the values of the current set of shape functions
+        // at the generalized support points
+        for (unsigned int k=0; k<points.size(); ++k)
           for (unsigned int d=0; d<dim; ++d)
-            values[d][k] = fe.shape_value_component(i,points[k],d);
+            {
+              values[d][k] = fe.shape_value_component(i,points[k],d);
+              Assert (numbers::is_finite(values[d][k]), ExcInternalError());
+            }
+
         fe.interpolate(local_dofs, values);
+
         // Enter the interpolated dofs
         // into the matrix
         for (unsigned int j=0; j<n_dofs; ++j)
-          N(j,i) = local_dofs[j];
+          {
+            N(j,i) = local_dofs[j];
+            Assert (numbers::is_finite(local_dofs[j]), ExcInternalError());
+          }
       }
   }
 
