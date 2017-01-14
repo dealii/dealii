@@ -231,21 +231,21 @@ template <int dim>
 std::vector<unsigned int>
 FE_BDM<dim>::get_dpo_vector (const unsigned int deg)
 {
+  // compute the number of unknowns per cell interior/face/edge
+  //
+  // for the number of interior dofs, this is the number of
+  // polynomials up to degree deg-2 in dim dimensions.
+  //
   // the element is face-based and we have as many degrees of freedom
   // on the faces as there are polynomials of degree up to
   // deg. Observe the odd convention of
   // PolynomialSpace::compute_n_pols()!
-  unsigned int dofs_per_face = PolynomialSpace<dim-1>::compute_n_pols(deg+1);
 
-  // and then there are interior dofs, namely the number of
-  // polynomials up to degree deg-2 in dim dimensions.
-  unsigned int interior_dofs = 0;
-  if (deg>1)
-    interior_dofs = dim * PolynomialSpace<dim>::compute_n_pols(deg-1);
-
-  std::vector<unsigned int> dpo(dim+1);
-  dpo[dim-1] = dofs_per_face;
-  dpo[dim]   = interior_dofs;
+  std::vector<unsigned int> dpo(dim+1, 0u);
+  dpo[dim]   = (deg > 1 ?
+                dim * PolynomialSpace<dim>::compute_n_pols(deg-1) :
+                0u);
+  dpo[dim-1] = PolynomialSpace<dim-1>::compute_n_pols(deg+1);
 
   return dpo;
 }
