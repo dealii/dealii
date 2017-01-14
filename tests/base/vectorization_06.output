@@ -1,0 +1,16 @@
+
+DEAL:double::gather contiguous #errors:      0
+DEAL:double::gather contiguous #errors:      0
+DEAL:double::gather non-contiguous #errors:  0
+DEAL:double::gather non-contiguous #errors:  0
+DEAL:double::scatter non-contiguous #errors: 0
+DEAL:float::gather contiguous #errors:      0
+DEAL:float::gather contiguous #errors:      0
+DEAL:float::gather non-contiguous #errors:  0
+DEAL:float::gather non-contiguous #errors:  0
+DEAL:float::scatter non-contiguous #errors: 0
+DEAL:long double::gather contiguous #errors:      0
+DEAL:long double::gather contiguous #errors:      0
+DEAL:long double::gather non-contiguous #errors:  0
+DEAL:long double::gather non-contiguous #errors:  0
+DEAL:long double::scatter non-contiguous #errors: 0
