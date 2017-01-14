@@ -1120,9 +1120,9 @@ FiniteElement<dim,spacedim>::interpolate(
 template <int dim, int spacedim>
 void
 FiniteElement<dim,spacedim>::interpolate(
-  std::vector<double>    &local_dofs,
+  std::vector<double>                &local_dofs,
   const std::vector<Vector<double> > &values,
-  unsigned int offset) const
+  const unsigned int                  offset) const
 {
   Assert (has_support_points(), ExcFEHasNoSupportPoints());
   Assert (values.size() == unit_support_points.size(),
