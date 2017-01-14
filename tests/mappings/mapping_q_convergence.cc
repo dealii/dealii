@@ -176,8 +176,6 @@ void create_tria(Triangulation<dim> &triangulation, const Geometry<dim> &geometr
   for (Triangulation<3>::active_cell_iterator cell=triangulation.begin_active();
        cell!=triangulation.end(); ++cell)
     cell->set_all_manifold_ids(0);
-
-  triangulation.refine_global(1);
 }
 
 
@@ -191,7 +189,7 @@ void test(const FiniteElement<dim> &fe)
   constraints.close();
 
   deallog << "FE degree: " << fe.degree << std::endl;
-  for (unsigned mapping_p = 1; mapping_p < fe.degree + 3; ++mapping_p)
+  for (unsigned mapping_p = 2; mapping_p < fe.degree + 3; ++mapping_p)
     {
       deallog << "mapping order: " << mapping_p << std::endl;
       Triangulation<dim> triangulation;
