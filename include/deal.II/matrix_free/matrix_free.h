@@ -163,6 +163,9 @@ public:
       color
     };
 
+    // avoid warning about use of deprecated variables
+    DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+
     /**
      * Constructor for AdditionalData.
      */
@@ -309,6 +312,8 @@ public:
      */
     bool                initialize_mapping;
   };
+
+  DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
   /**
    * @name 1: Construction and initialization

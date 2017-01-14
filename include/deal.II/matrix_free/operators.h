@@ -160,6 +160,12 @@ namespace MatrixFreeOperators
     virtual void compute_diagonal () = 0;
 
     /**
+     * Get read access to the MatrixFree object stored with this operator.
+     */
+    std_cxx11::shared_ptr<const MatrixFree<dim,Number> >
+    get_matrix_free () const;
+
+    /**
      * Get read access to the inverse diagonal of this operator.
      */
     const std_cxx11::shared_ptr<DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> > > &
@@ -690,7 +696,6 @@ namespace MatrixFreeOperators
   Base<dim,Number>::Base ()
     :
     Subscriptor(),
-    data(NULL),
     have_interface_matrices(false)
   {
   }
@@ -701,7 +706,7 @@ namespace MatrixFreeOperators
   typename Base<dim,Number>::size_type
   Base<dim,Number>::m () const
   {
-    Assert(data != NULL,
+    Assert(data.get() != NULL,
            ExcNotInitialized());
     return data->get_vector_partitioner()->size();
   }
@@ -721,7 +726,7 @@ namespace MatrixFreeOperators
   void
   Base<dim,Number>::clear ()
   {
-    data = NULL;
+    data.reset();
     inverse_diagonal_entries.reset();
   }
 
@@ -745,7 +750,7 @@ namespace MatrixFreeOperators
   void
   Base<dim,Number>::initialize_dof_vector (LinearAlgebra::distributed::Vector<Number> &vec) const
   {
-    Assert(data != NULL,
+    Assert(data.get() != NULL,
            ExcNotInitialized());
     if (!vec.partitioners_are_compatible(*data->get_dof_info(0).vector_partitioner))
       data->initialize_dof_vector(vec);
@@ -1011,6 +1016,15 @@ namespace MatrixFreeOperators
 
 
   template <int dim, typename Number>
+  std_cxx11::shared_ptr<const MatrixFree<dim,Number> >
+  Base<dim,Number>::get_matrix_free() const
+  {
+    return data;
+  }
+
+
+
+  template <int dim, typename Number>
   const std_cxx11::shared_ptr<DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> > > &
   Base<dim,Number>::get_matrix_diagonal_inverse() const
   {
@@ -1117,7 +1131,7 @@ namespace MatrixFreeOperators
   MassOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
   compute_diagonal()
   {
-    Assert((Base<dim, Number>::data != NULL), ExcNotInitialized());
+    Assert((Base<dim, Number>::data.get() != NULL), ExcNotInitialized());
 
     this->inverse_diagonal_entries.
     reset(new DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> >());
@@ -1224,7 +1238,7 @@ namespace MatrixFreeOperators
   LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
   compute_diagonal()
   {
-    Assert((Base<dim, Number>::data != NULL), ExcNotInitialized());
+    Assert((Base<dim, Number>::data.get() != NULL), ExcNotInitialized());
 
     unsigned int dummy = 0;
     this->inverse_diagonal_entries.

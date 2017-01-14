@@ -719,12 +719,10 @@ namespace Step37
     DoFHandler<dim>                            dof_handler;
 
     ConstraintMatrix                           constraints;
-    std_cxx11::shared_ptr<MatrixFree<dim,double> > system_mf_storage;
     typedef LaplaceOperator<dim,degree_finite_element,double> SystemMatrixType;
     SystemMatrixType                           system_matrix;
 
     MGConstrainedDoFs                          mg_constrained_dofs;
-    MGLevelObject<MatrixFree<dim,float> >      mg_mf_storage;
     typedef LaplaceOperator<dim,degree_finite_element,float>  LevelMatrixType;
     MGLevelObject<LevelMatrixType>             mg_matrices;
 
@@ -760,7 +758,6 @@ namespace Step37
 #endif
     fe (degree_finite_element),
     dof_handler (triangulation),
-    system_mf_storage(new MatrixFree<dim,double>()),
     pcout (std::cout, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0),
     // The LaplaceProblem class holds an additional output stream that
     // collects detailed timings about the setup phase. This stream, called
@@ -788,16 +785,19 @@ namespace Step37
   // Once we have created the multigrid dof_handler and the constraints, we
   // can call the reinit function for the global matrix operator as well as
   // each level of the multigrid scheme. The main action is to set up the
-  // <code> MatrixFree </code> instance for the problem. For this, we need to
-  // activate the update flag in the AdditionalData field of MatrixFree that
-  // enables the storage of quadrature point coordinates in real space (by
-  // default, it only caches data for gradients (inverse transposed Jacobians)
-  // and JxW values). Note that if we call the reinit function without
-  // specifying the level (i.e., giving <code>level =
-  // numbers::invalid_unsigned_int</code>), MatrixFree constructs a loop over
-  // the active cells. In this tutorial, we do not use threads in addition to
-  // MPI, which is why we explicitly disable it by setting the
-  // MatrixFree::AdditionalData::tasks_parallel_scheme to
+  // <code> MatrixFree </code> instance for the problem. The base class of the
+  // <code>LaplaceOperator</code> class, MatrixFreeOperators::Base, is
+  // initialized with a shared pointer to MatrixFree object. This way, we can
+  // simply create it here and then pass it on to the system matrix and level
+  // matrices, respectively. For setting up MatrixFree, we need to activate
+  // the update flag in the AdditionalData field of MatrixFree that enables
+  // the storage of quadrature point coordinates in real space (by default, it
+  // only caches data for gradients (inverse transposed Jacobians) and JxW
+  // values). Note that if we call the reinit function without specifying the
+  // level (i.e., giving <code>level = numbers::invalid_unsigned_int</code>),
+  // MatrixFree constructs a loop over the active cells. In this tutorial, we
+  // do not use threads in addition to MPI, which is why we explicitly disable
+  // it by setting the MatrixFree::AdditionalData::tasks_parallel_scheme to
   // MatrixFree::AdditionalData::none. Finally, the coefficient is evaluated
   // and vectors are initialized as explained above.
   template <int dim>
@@ -841,11 +841,13 @@ namespace Step37
         MatrixFree<dim,double>::AdditionalData::none;
       additional_data.mapping_update_flags = (update_gradients | update_JxW_values |
                                               update_quadrature_points);
+      std_cxx11::shared_ptr<MatrixFree<dim,double> >
+      system_mf_storage(new MatrixFree<dim,double>());
       system_mf_storage->reinit (dof_handler, constraints, QGauss<1>(fe.degree+1),
                                  additional_data);
+      system_matrix.initialize (system_mf_storage);
     }
 
-    system_matrix.initialize (system_mf_storage);
     system_matrix.evaluate_coefficient(Coefficient<dim>());
 
     system_matrix.initialize_dof_vector(solution);
@@ -867,7 +869,6 @@ namespace Step37
     // the levels rather than the active cells.
     const unsigned int nlevels = triangulation.n_global_levels();
     mg_matrices.resize(0, nlevels-1);
-    mg_mf_storage.resize(0, nlevels-1);
 
     std::set<types::boundary_id> dirichlet_boundary;
     dirichlet_boundary.insert(0);
@@ -890,13 +891,13 @@ namespace Step37
         additional_data.mapping_update_flags = (update_gradients | update_JxW_values |
                                                 update_quadrature_points);
         additional_data.level_mg_handler = level;
-
-        mg_mf_storage[level].reinit(dof_handler, level_constraints,
+        std_cxx11::shared_ptr<MatrixFree<dim,float> >
+        mg_mf_storage_level(new MatrixFree<dim,float>());
+        mg_mf_storage_level->reinit(dof_handler, level_constraints,
                                     QGauss<1>(fe.degree+1), additional_data);
 
-        mg_matrices[level].initialize(
-          std_cxx11::make_shared<MatrixFree<dim,float>>(mg_mf_storage[level]),
-          mg_constrained_dofs, level);
+        mg_matrices[level].initialize(mg_mf_storage_level, mg_constrained_dofs,
+                                      level);
         mg_matrices[level].evaluate_coefficient(Coefficient<dim>());
       }
     setup_time += time.wall_time();
@@ -910,8 +911,9 @@ namespace Step37
 
   // The assemble function is very simple since all we have to do is to
   // assemble the right hand side. Thanks to FEEvaluation and all the data
-  // cached in the MatrixFree class, this can be done in a few lines. Since
-  // this call is not wrapped into a MatrixFree::cell_loop (which would be an
+  // cached in the MatrixFree class, which we query from
+  // MatrixFreeOperators::Base, this can be done in a few lines. Since this
+  // call is not wrapped into a MatrixFree::cell_loop (which would be an
   // alternative), we must not forget to call compress() at the end of the
   // assembly to send all the contributions of the right hand side to the
   // owner of the respective degree of freedom.
@@ -921,8 +923,8 @@ namespace Step37
     Timer time;
 
     system_rhs = 0;
-    FEEvaluation<dim,degree_finite_element> phi(*system_mf_storage);
-    for (unsigned int cell=0; cell<system_mf_storage->n_macro_cells(); ++cell)
+    FEEvaluation<dim,degree_finite_element> phi(*system_matrix.get_matrix_free());
+    for (unsigned int cell=0; cell<system_matrix.get_matrix_free()->n_macro_cells(); ++cell)
       {
         phi.reinit(cell);
         for (unsigned int q=0; q<phi.n_q_points; ++q)
