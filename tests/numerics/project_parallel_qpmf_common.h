@@ -119,8 +119,8 @@ void do_project (const parallel::distributed::Triangulation<dim> &triangulation,
   typename MatrixFree<dim,double>::AdditionalData additional_data;
   additional_data.tasks_parallel_scheme = MatrixFree<dim,double>::AdditionalData::partition_color;
   additional_data.mapping_update_flags = update_values | update_JxW_values | update_quadrature_points;
-  MatrixFree<dim,double>  data;
-  data.reinit (dof_handler, constraints, quadrature_formula_1d, additional_data);
+  std_cxx11::shared_ptr<MatrixFree<dim,double> >  data(new MatrixFree<dim,double> ());
+  data->reinit (dof_handler, constraints, quadrature_formula_1d, additional_data);
 
   for (unsigned int q=0; q<=p; ++q)
     {
@@ -129,8 +129,8 @@ void do_project (const parallel::distributed::Triangulation<dim> &triangulation,
 
       // initialize a quadrature data
       {
-        FEEvaluation<dim,fe_degree,n_q_points_1d,1,double> fe_eval(data);
-        const unsigned int n_cells = data.n_macro_cells();
+        FEEvaluation<dim,fe_degree,n_q_points_1d,1,double> fe_eval(*data);
+        const unsigned int n_cells = data->n_macro_cells();
         const unsigned int n_q_points = fe_eval.n_q_points;
 
         qp_data.reinit(n_cells, n_q_points);
@@ -143,7 +143,7 @@ void do_project (const parallel::distributed::Triangulation<dim> &triangulation,
       }
 
       LinearAlgebra::distributed::Vector<double> field;
-      data.initialize_dof_vector(field);
+      data->initialize_dof_vector(field);
       VectorTools::project<dim,LinearAlgebra::distributed::Vector<double> >
       (data,
        constraints,
