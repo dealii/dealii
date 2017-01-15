@@ -241,7 +241,7 @@ namespace GridGenerator
                               const std::vector<std::vector<double> > &step_sizes,
                               const Point<dim>                        &p_1,
                               const Point<dim>                        &p_2,
-                              const bool                              colorize);
+                              const bool                              colorize=false);
 
   /**
    * Like the previous function, but with the following twist: the @p
