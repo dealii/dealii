@@ -133,11 +133,6 @@ public:
   Tensor ();
 
   /**
-   * Copy constructor.
-   */
-  Tensor (const Tensor<0,dim,Number> &initializer);
-
-  /**
    * Constructor from tensors with different underlying scalar type. This
    * obviously requires that the @p OtherNumber type is convertible to @p
    * Number.
@@ -167,11 +162,6 @@ public:
    * This is the const conversion operator that returns a read-only reference.
    */
   operator const Number &() const;
-
-  /**
-   * Copy assignment operator.
-   */
-  Tensor<0,dim,Number> &operator = (const Tensor<0,dim,Number> &rhs);
 
   /**
    * Assignment from tensors with different underlying scalar type. This
@@ -372,11 +362,6 @@ public:
   Tensor ();
 
   /**
-   * Copy constructor.
-   */
-  Tensor (const Tensor<rank_,dim,Number> &initializer);
-
-  /**
    * Constructor, where the data is copied from a C-style array.
    */
   Tensor (const array_type &initializer);
@@ -420,11 +405,6 @@ public:
    * Read and write access using TableIndices <tt>indices</tt>
    */
   Number &operator [] (const TableIndices<rank_> &indices);
-
-  /**
-   * Copy assignment operator.
-   */
-  Tensor &operator = (const Tensor<rank_,dim,Number> &rhs);
 
   /**
    * Assignment operator from tensors with different underlying scalar type.
@@ -596,14 +576,6 @@ Tensor<0,dim,Number>::Tensor ()
 
 
 template <int dim, typename Number>
-inline
-Tensor<0,dim,Number>::Tensor (const Tensor<0,dim,Number> &p)
-{
-  value = p.value;
-}
-
-
-template <int dim, typename Number>
 template <typename OtherNumber>
 inline
 Tensor<0,dim,Number>::Tensor (const OtherNumber initializer)
@@ -636,15 +608,6 @@ Tensor<0,dim,Number>::operator const Number &() const
 {
   Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
   return value;
-}
-
-
-template <int dim, typename Number>
-inline
-Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const Tensor<0,dim,Number> &p)
-{
-  value = p.value;
-  return *this;
 }
 
 
@@ -788,15 +751,6 @@ Tensor<rank_,dim,Number>::Tensor ()
 
 template <int rank_, int dim, typename Number>
 inline
-Tensor<rank_,dim,Number>::Tensor (const Tensor<rank_,dim,Number> &initializer)
-{
-  if (dim > 0)
-    std::copy (&initializer[0], &initializer[0]+dim, &values[0]);
-}
-
-
-template <int rank_, int dim, typename Number>
-inline
 Tensor<rank_,dim,Number>::Tensor (const array_type &initializer)
 {
   for (unsigned int i=0; i<dim; ++i)
@@ -903,17 +857,6 @@ Tensor<rank_,dim,Number>::operator[] (const TableIndices<rank_> &indices)
   Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
 
   return TensorAccessors::extract<rank_>(*this, indices);
-}
-
-
-template <int rank_, int dim, typename Number>
-inline
-Tensor<rank_,dim,Number> &
-Tensor<rank_,dim,Number>::operator = (const Tensor<rank_,dim,Number> &t)
-{
-  if (dim > 0)
-    std::copy (&t.values[0], &t.values[0]+dim, &values[0]);
-  return *this;
 }
 
 
