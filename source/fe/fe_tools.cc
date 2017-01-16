@@ -1612,15 +1612,14 @@ namespace FETools
 
 
   template<int dim, int spacedim>
-  void
-  compute_node_matrix(
-    FullMatrix<double> &N,
-    const FiniteElement<dim,spacedim> &fe)
+  FullMatrix<double>
+  compute_node_matrix(const FiniteElement<dim,spacedim> &fe)
   {
     const unsigned int n_dofs = fe.dofs_per_cell;
+
+    FullMatrix<double> N (n_dofs, n_dofs);
+
     Assert (fe.has_generalized_support_points(), ExcNotInitialized());
-    Assert (N.n()==n_dofs, ExcDimensionMismatch(N.n(), n_dofs));
-    Assert (N.m()==n_dofs, ExcDimensionMismatch(N.m(), n_dofs));
     Assert (fe.n_components() == dim, ExcNotImplemented());
 
     const std::vector<Point<dim> > &points = fe.get_generalized_support_points();
@@ -1662,6 +1661,8 @@ namespace FETools
             Assert (numbers::is_finite(local_dofs[j]), ExcInternalError());
           }
       }
+
+    return N;
   }
 
 
