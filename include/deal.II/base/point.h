@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/tensor_classes_fwd.h>
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
@@ -85,7 +86,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup geomprimitives
  * @author Wolfgang Bangerth, 1997
  */
-template <int dim, typename Number = double>
+template <int dim, typename Number>
 class Point : public Tensor<1,dim,Number>
 {
 public:

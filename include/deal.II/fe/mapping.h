@@ -18,7 +18,7 @@
 
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/derivative_form.h>
+#include <deal.II/base/tensor_classes_fwd.h>
 #include <deal.II/base/std_cxx11/array.h>
 #include <deal.II/base/array_view.h>
 #include <deal.II/grid/tria.h>

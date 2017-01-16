@@ -20,6 +20,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/table_indices.h>
 #include <deal.II/base/tensor_accessors.h>
+#include <deal.II/base/tensor_classes_fwd.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/utilities.h>
 
@@ -29,10 +30,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-// Forward declarations:
-
-template <int dim, typename Number> class Point;
-template <int rank_, int dim, typename Number = double> class Tensor;
+// Forward declaration:
 template <typename Number> class Vector;
 
 #ifndef DOXYGEN

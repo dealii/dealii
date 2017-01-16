@@ -17,6 +17,7 @@
 #define dealii__derivative_form_h
 
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/tensor_classes_fwd.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -52,7 +53,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Sebastian Pauletti, 2011, Luca Heltai, 2015
  */
-template <int order, int dim, int spacedim, typename Number=double>
+template <int order, int dim, int spacedim, typename Number>
 class DerivativeForm
 {
 public:

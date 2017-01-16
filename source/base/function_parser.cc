@@ -15,6 +15,7 @@
 
 
 #include <deal.II/base/function_parser.h>
+#include <deal.II/base/point.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/lac/vector.h>
