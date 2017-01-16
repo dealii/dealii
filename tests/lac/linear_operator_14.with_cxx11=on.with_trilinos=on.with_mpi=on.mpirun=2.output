@@ -1,0 +1,151 @@
+
+DEAL:0:Square:System info::Matrix frobenius norm
+DEAL:0:Square:System info::block(0,0): 0.4444444444
+DEAL:0:Square:System info::block(0,1): 0.4444444444
+DEAL:0:Square:System info::block(1,0): 0.4444444444
+DEAL:0:Square:System info::block(1,1): 0.4444444444
+DEAL:0:Square:System info::Vector L1 norm
+DEAL:0:Square:System info::block(0): 4.000000000
+DEAL:0:Square:System info::block(1): 4.000000000
+DEAL:0:Square:System info::Vector L2 norm
+DEAL:0:Square:System info::block(0): 0.8750000000
+DEAL:0:Square:System info::block(1): 0.8750000000
+DEAL:0:Square:System info::Vector Linfty norm
+DEAL:0:Square:System info::block(0): 0.2500000000
+DEAL:0:Square:System info::block(1): 0.2500000000
+DEAL:0:Square:System info::
+DEAL:0:Square:Matrix TW::Vector:vmult::System size:   A.m(): 25  A.n(): 25  b.size(): 25  r.size(): 25
+DEAL:0:Square:Matrix TW::Vector:vmult::Reference result norm squared: 0.03291452667
+DEAL:0:Square:Matrix TW::Vector:vmult::LinearOperator result norm squared: 0.03291452667
+DEAL:0:Square:Matrix TW::Vector:vmult::LinearOperator status:  UseTranspose: 0
+DEAL:0:Square:Matrix TW::Vector:vmult::LinearOperator payload result norm squared: 0.03291452667
+DEAL:0:Square:Matrix TW::Vector:Tvmult::System size:   A.m(): 25  A.n(): 25  b.size(): 25  r.size(): 25
+DEAL:0:Square:Matrix TW::Vector:Tvmult::Reference result norm squared: 0.03291452667
+DEAL:0:Square:Matrix TW::Vector:Tvmult::LinearOperator result norm squared: 0.03291452667
+DEAL:0:Square:Matrix TW::Vector:Tvmult::LinearOperator status:  UseTranspose: 1
+DEAL:0:Square:Matrix TW::Vector:Tvmult::LinearOperator payload result norm squared: 0.03291452667
+DEAL:0:Square:Matrix TW::Vector:Composite vmult::System size:   A.m(): 25  A.n(): 25  b.size(): 25  r.size(): 25
+DEAL:0:Square:Matrix TW::Vector:Composite vmult::Reference result norm squared: 0.001493556346
+DEAL:0:Square:Matrix TW::Vector:Composite vmult::LinearOperator result norm squared: 0.001493556346
+DEAL:0:Square:Matrix TW::Vector:Composite vmult::LinearOperator status:  UseTranspose: 0
+DEAL:0:Square:Matrix TW::Vector:Composite vmult::LinearOperator payload result norm squared: 0.001493556346
+DEAL:0:Square:Matrix TW::Vector:Composite mult Tvmult::System size:   A.m(): 25  A.n(): 25  b.size(): 25  r.size(): 25
+DEAL:0:Square:Matrix TW::Vector:Composite mult Tvmult::Reference result norm squared: 0.001493556346
+DEAL:0:Square:Matrix TW::Vector:Composite mult Tvmult::LinearOperator result norm squared: 0.001493556346
+DEAL:0:Square:Matrix TW::Vector:Composite mult Tvmult::LinearOperator status:  UseTranspose: 1
+DEAL:0:Square:Matrix TW::Vector:Composite mult Tvmult::LinearOperator payload result norm squared: 0.001493556346
+DEAL:0:Square::Matrix TW::Vector OK
+DEAL:0::
+DEAL:0::
+DEAL:0:Non-square:System info::Matrix frobenius norm
+DEAL:0:Non-square:System info::block(0,0): 0.2962962963
+DEAL:0:Non-square:System info::block(0,1): 0.3194444444
+DEAL:0:Non-square:System info::block(1,0): 0.3194444444
+DEAL:0:Non-square:System info::block(1,1): 0.4444444444
+DEAL:0:Non-square:System info::Vector L1 norm
+DEAL:0:Non-square:System info::block(0): 4.000000000
+DEAL:0:Non-square:System info::block(1): 4.000000000
+DEAL:0:Non-square:System info::Vector L2 norm
+DEAL:0:Non-square:System info::block(0): 0.5416666667
+DEAL:0:Non-square:System info::block(1): 0.8750000000
+DEAL:0:Non-square:System info::Vector Linfty norm
+DEAL:0:Non-square:System info::block(0): 0.1111111111
+DEAL:0:Non-square:System info::block(1): 0.2500000000
+DEAL:0:Non-square:System info::
+DEAL:0:Non-square:Matrix TW::Vector:vmult::System size:   A.m(): 25  A.n(): 81  b.size(): 81  r.size(): 25
+DEAL:0:Non-square:Matrix TW::Vector:vmult::Reference result norm squared: 0.004314239460
+DEAL:0:Non-square:Matrix TW::Vector:vmult::LinearOperator result norm squared: 0.004314239460
+DEAL:0:Non-square:Matrix TW::Vector:vmult::LinearOperator status:  UseTranspose: 0
+DEAL:0:Non-square:Matrix TW::Vector:vmult::LinearOperator payload result norm squared: 0.004314239460
+DEAL:0:Non-square:Matrix TW::Vector:Tvmult::System size:   A.m(): 25  A.n(): 81  b.size(): 25  r.size(): 81
+DEAL:0:Non-square:Matrix TW::Vector:Tvmult::Reference result norm squared: 0.01177375699
+DEAL:0:Non-square:Matrix TW::Vector:Tvmult::LinearOperator result norm squared: 0.01177375699
+DEAL:0:Non-square:Matrix TW::Vector:Tvmult::LinearOperator status:  UseTranspose: 1
+DEAL:0:Non-square:Matrix TW::Vector:Tvmult::LinearOperator payload result norm squared: 0.01177375699
+DEAL:0:Non-square:Matrix TW::Vector:Composite vmult::System size:   A.m(): 25  A.n(): 81  b.size(): 81  r.size(): 81
+DEAL:0:Non-square:Matrix TW::Vector:Composite vmult::Reference result norm squared: 6.726708649e-05
+DEAL:0:Non-square:Matrix TW::Vector:Composite vmult::LinearOperator result norm squared: 6.726708649e-05
+DEAL:0:Non-square:Matrix TW::Vector:Composite vmult::LinearOperator status:  UseTranspose: 0
+DEAL:0:Non-square:Matrix TW::Vector:Composite vmult::LinearOperator payload result norm squared: 6.726708649e-05
+DEAL:0:Non-square:Matrix TW::Vector:Composite mult Tvmult::System size:   A.m(): 25  A.n(): 81  b.size(): 25  r.size(): 25
+DEAL:0:Non-square:Matrix TW::Vector:Composite mult Tvmult::Reference result norm squared: 0.0001864259953
+DEAL:0:Non-square:Matrix TW::Vector:Composite mult Tvmult::LinearOperator result norm squared: 0.0001864259953
+DEAL:0:Non-square:Matrix TW::Vector:Composite mult Tvmult::LinearOperator status:  UseTranspose: 1
+DEAL:0:Non-square:Matrix TW::Vector:Composite mult Tvmult::LinearOperator payload result norm squared: 0.0001864259953
+DEAL:0:Non-square::Matrix TW::Vector OK
+
+DEAL:1:Square:System info::Matrix frobenius norm
+DEAL:1:Square:System info::block(0,0): 0.4444444444
+DEAL:1:Square:System info::block(0,1): 0.4444444444
+DEAL:1:Square:System info::block(1,0): 0.4444444444
+DEAL:1:Square:System info::block(1,1): 0.4444444444
+DEAL:1:Square:System info::Vector L1 norm
+DEAL:1:Square:System info::block(0): 4.000000000
+DEAL:1:Square:System info::block(1): 4.000000000
+DEAL:1:Square:System info::Vector L2 norm
+DEAL:1:Square:System info::block(0): 0.8750000000
+DEAL:1:Square:System info::block(1): 0.8750000000
+DEAL:1:Square:System info::Vector Linfty norm
+DEAL:1:Square:System info::block(0): 0.2500000000
+DEAL:1:Square:System info::block(1): 0.2500000000
+DEAL:1:Square:System info::
+DEAL:1:Square:Matrix TW::Vector:vmult::System size:   A.m(): 25  A.n(): 25  b.size(): 25  r.size(): 25
+DEAL:1:Square:Matrix TW::Vector:vmult::Reference result norm squared: 0.03291452667
+DEAL:1:Square:Matrix TW::Vector:vmult::LinearOperator result norm squared: 0.03291452667
+DEAL:1:Square:Matrix TW::Vector:vmult::LinearOperator status:  UseTranspose: 0
+DEAL:1:Square:Matrix TW::Vector:vmult::LinearOperator payload result norm squared: 0.03291452667
+DEAL:1:Square:Matrix TW::Vector:Tvmult::System size:   A.m(): 25  A.n(): 25  b.size(): 25  r.size(): 25
+DEAL:1:Square:Matrix TW::Vector:Tvmult::Reference result norm squared: 0.03291452667
+DEAL:1:Square:Matrix TW::Vector:Tvmult::LinearOperator result norm squared: 0.03291452667
+DEAL:1:Square:Matrix TW::Vector:Tvmult::LinearOperator status:  UseTranspose: 1
+DEAL:1:Square:Matrix TW::Vector:Tvmult::LinearOperator payload result norm squared: 0.03291452667
+DEAL:1:Square:Matrix TW::Vector:Composite vmult::System size:   A.m(): 25  A.n(): 25  b.size(): 25  r.size(): 25
+DEAL:1:Square:Matrix TW::Vector:Composite vmult::Reference result norm squared: 0.001493556346
+DEAL:1:Square:Matrix TW::Vector:Composite vmult::LinearOperator result norm squared: 0.001493556346
+DEAL:1:Square:Matrix TW::Vector:Composite vmult::LinearOperator status:  UseTranspose: 0
+DEAL:1:Square:Matrix TW::Vector:Composite vmult::LinearOperator payload result norm squared: 0.001493556346
+DEAL:1:Square:Matrix TW::Vector:Composite mult Tvmult::System size:   A.m(): 25  A.n(): 25  b.size(): 25  r.size(): 25
+DEAL:1:Square:Matrix TW::Vector:Composite mult Tvmult::Reference result norm squared: 0.001493556346
+DEAL:1:Square:Matrix TW::Vector:Composite mult Tvmult::LinearOperator result norm squared: 0.001493556346
+DEAL:1:Square:Matrix TW::Vector:Composite mult Tvmult::LinearOperator status:  UseTranspose: 1
+DEAL:1:Square:Matrix TW::Vector:Composite mult Tvmult::LinearOperator payload result norm squared: 0.001493556346
+DEAL:1:Square::Matrix TW::Vector OK
+DEAL:1::
+DEAL:1::
+DEAL:1:Non-square:System info::Matrix frobenius norm
+DEAL:1:Non-square:System info::block(0,0): 0.2962962963
+DEAL:1:Non-square:System info::block(0,1): 0.3194444444
+DEAL:1:Non-square:System info::block(1,0): 0.3194444444
+DEAL:1:Non-square:System info::block(1,1): 0.4444444444
+DEAL:1:Non-square:System info::Vector L1 norm
+DEAL:1:Non-square:System info::block(0): 4.000000000
+DEAL:1:Non-square:System info::block(1): 4.000000000
+DEAL:1:Non-square:System info::Vector L2 norm
+DEAL:1:Non-square:System info::block(0): 0.5416666667
+DEAL:1:Non-square:System info::block(1): 0.8750000000
+DEAL:1:Non-square:System info::Vector Linfty norm
+DEAL:1:Non-square:System info::block(0): 0.1111111111
+DEAL:1:Non-square:System info::block(1): 0.2500000000
+DEAL:1:Non-square:System info::
+DEAL:1:Non-square:Matrix TW::Vector:vmult::System size:   A.m(): 25  A.n(): 81  b.size(): 81  r.size(): 25
+DEAL:1:Non-square:Matrix TW::Vector:vmult::Reference result norm squared: 0.004314239460
+DEAL:1:Non-square:Matrix TW::Vector:vmult::LinearOperator result norm squared: 0.004314239460
+DEAL:1:Non-square:Matrix TW::Vector:vmult::LinearOperator status:  UseTranspose: 0
+DEAL:1:Non-square:Matrix TW::Vector:vmult::LinearOperator payload result norm squared: 0.004314239460
+DEAL:1:Non-square:Matrix TW::Vector:Tvmult::System size:   A.m(): 25  A.n(): 81  b.size(): 25  r.size(): 81
+DEAL:1:Non-square:Matrix TW::Vector:Tvmult::Reference result norm squared: 0.01177375699
+DEAL:1:Non-square:Matrix TW::Vector:Tvmult::LinearOperator result norm squared: 0.01177375699
+DEAL:1:Non-square:Matrix TW::Vector:Tvmult::LinearOperator status:  UseTranspose: 1
+DEAL:1:Non-square:Matrix TW::Vector:Tvmult::LinearOperator payload result norm squared: 0.01177375699
+DEAL:1:Non-square:Matrix TW::Vector:Composite vmult::System size:   A.m(): 25  A.n(): 81  b.size(): 81  r.size(): 81
+DEAL:1:Non-square:Matrix TW::Vector:Composite vmult::Reference result norm squared: 6.726708649e-05
+DEAL:1:Non-square:Matrix TW::Vector:Composite vmult::LinearOperator result norm squared: 6.726708649e-05
+DEAL:1:Non-square:Matrix TW::Vector:Composite vmult::LinearOperator status:  UseTranspose: 0
+DEAL:1:Non-square:Matrix TW::Vector:Composite vmult::LinearOperator payload result norm squared: 6.726708649e-05
+DEAL:1:Non-square:Matrix TW::Vector:Composite mult Tvmult::System size:   A.m(): 25  A.n(): 81  b.size(): 25  r.size(): 25
+DEAL:1:Non-square:Matrix TW::Vector:Composite mult Tvmult::Reference result norm squared: 0.0001864259953
+DEAL:1:Non-square:Matrix TW::Vector:Composite mult Tvmult::LinearOperator result norm squared: 0.0001864259953
+DEAL:1:Non-square:Matrix TW::Vector:Composite mult Tvmult::LinearOperator status:  UseTranspose: 1
+DEAL:1:Non-square:Matrix TW::Vector:Composite mult Tvmult::LinearOperator payload result norm squared: 0.0001864259953
+DEAL:1:Non-square::Matrix TW::Vector OK
+

@@ -1,0 +1,7 @@
+
+DEAL:DirectKLU::Starting value 0
+DEAL:DirectKLU::Convergence step 0 value 0
+DEAL:Trilinos_CG_SSOR::Convergence step 86 value 0
+DEAL:Trilinos_CG_SSOR::Norm of error in standard solve: 0
+DEAL:LinearOperator_Trilinos_CG_SSOR::Convergence step 86 value 0
+DEAL:LinearOperator_Trilinos_CG_SSOR::Norm of error in LinearOperator solve: 0
