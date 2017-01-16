@@ -570,11 +570,6 @@ public:
   SymmetricTensor (const SymmetricTensor<rank,dim,OtherNumber> &initializer);
 
   /**
-   * Assignment operator.
-   */
-  SymmetricTensor &operator = (const SymmetricTensor &);
-
-  /**
    * This operator assigns a scalar to a tensor. To avoid confusion with what
    * exactly it means to assign a scalar value to a tensor, zero is the only
    * value allowed for <tt>d</tt>, allowing the intuitive notation
@@ -1001,17 +996,6 @@ SymmetricTensor<rank,dim,Number>::SymmetricTensor (const Number (&array) [n_inde
   Assert (sizeof(typename base_tensor_type::array_type)
           == sizeof(array),
           ExcInternalError());
-}
-
-
-
-template <int rank, int dim, typename Number>
-inline
-SymmetricTensor<rank,dim,Number> &
-SymmetricTensor<rank,dim,Number>::operator = (const SymmetricTensor<rank,dim,Number> &t)
-{
-  data = t.data;
-  return *this;
 }
 
 

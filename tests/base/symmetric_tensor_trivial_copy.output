@@ -1,0 +1,29 @@
+
+DEAL::testing float
+DEAL::SymmetricTensor<2, 1> is trivially copyable: true
+DEAL::SymmetricTensor<2, 2> is trivially copyable: true
+DEAL::SymmetricTensor<2, 3> is trivially copyable: true
+DEAL::SymmetricTensor<4, 1> is trivially copyable: true
+DEAL::SymmetricTensor<4, 2> is trivially copyable: true
+DEAL::SymmetricTensor<4, 3> is trivially copyable: true
+DEAL::testing double
+DEAL::SymmetricTensor<2, 1> is trivially copyable: true
+DEAL::SymmetricTensor<2, 2> is trivially copyable: true
+DEAL::SymmetricTensor<2, 3> is trivially copyable: true
+DEAL::SymmetricTensor<4, 1> is trivially copyable: true
+DEAL::SymmetricTensor<4, 2> is trivially copyable: true
+DEAL::SymmetricTensor<4, 3> is trivially copyable: true
+DEAL::testing std::complex<float>
+DEAL::SymmetricTensor<2, 1> is trivially copyable: true
+DEAL::SymmetricTensor<2, 2> is trivially copyable: true
+DEAL::SymmetricTensor<2, 3> is trivially copyable: true
+DEAL::SymmetricTensor<4, 1> is trivially copyable: true
+DEAL::SymmetricTensor<4, 2> is trivially copyable: true
+DEAL::SymmetricTensor<4, 3> is trivially copyable: true
+DEAL::testing std::complex<double>
+DEAL::SymmetricTensor<2, 1> is trivially copyable: true
+DEAL::SymmetricTensor<2, 2> is trivially copyable: true
+DEAL::SymmetricTensor<2, 3> is trivially copyable: true
+DEAL::SymmetricTensor<4, 1> is trivially copyable: true
+DEAL::SymmetricTensor<4, 2> is trivially copyable: true
+DEAL::SymmetricTensor<4, 3> is trivially copyable: true
