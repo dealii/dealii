@@ -1666,6 +1666,17 @@ namespace FETools
   }
 
 
+
+  template<int dim, int spacedim>
+  void
+  compute_node_matrix(FullMatrix<double> &M,
+                      const FiniteElement<dim,spacedim> &fe)
+  {
+    M = compute_node_matrix (fe);
+  }
+
+
+
   /*
     template<>
     void
