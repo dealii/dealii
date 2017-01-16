@@ -148,7 +148,9 @@ DEAL_II_NAMESPACE_OPEN
  @Article{Davydov2016,
    Title                    = {On the h-adaptive PUM and hp-adaptive FEM approaches applied to PDEs in quantum mechanics.},
    Author                   = {Davydov, D and Gerasimov, T and Pelteret, J.-P. and Steinmann, P.},
-   Journal                  = {Journal of Computational Physics. Submitted},
+   eprinttype               = {arXiv},
+   eprint                   = {1612.02305},
+   eprintclass              = {physics.comp-ph},
    Year                     = {2016},
  }
  * @endcode
@@ -614,4 +616,3 @@ DEAL_II_NAMESPACE_CLOSE
 #endif // CXX14
 
 #endif // dealii__fe_enriched_h
-
