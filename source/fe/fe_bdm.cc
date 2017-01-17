@@ -57,27 +57,16 @@ FE_BDM<dim>::FE_BDM (const unsigned int deg)
   // Set up the generalized support
   // points
   initialize_support_points (deg);
-  //Now compute the inverse node
-  //matrix, generating the correct
-  //basis functions from the raw
-  //ones.
 
-  // We use an auxiliary matrix in
-  // this function. Therefore,
-  // inverse_node_matrix is still
-  // empty and shape_value_component
-  // returns the 'raw' shape values.
-  FullMatrix<double> M(n_dofs, n_dofs);
-  FETools::compute_node_matrix(M, *this);
-
-//   std::cout << std::endl;
-//   M.print_formatted(std::cout, 2, true);
-
+  // Now compute the inverse node matrix, generating the correct
+  // basis functions from the raw ones. For a discussion of what
+  // exactly happens here, see FETools::compute_node_matrix.
+  const FullMatrix<double> M = FETools::compute_node_matrix(*this);
   this->inverse_node_matrix.reinit(n_dofs, n_dofs);
   this->inverse_node_matrix.invert(M);
-  // From now on, the shape functions
-  // will be the correct ones, not
-  // the raw shape functions anymore.
+  // From now on, the shape functions provided by FiniteElement::shape_value
+  // and similar functions will be the correct ones, not
+  // the raw shape functions from the polynomial space anymore.
 
   // Embedding errors become pretty large, so we just replace the
   // regular threshold in both "computing_..." functions by 1.

@@ -291,10 +291,25 @@ namespace FETools
    * - That the finite element has exactly @p dim vector components.
    * - That the function $f_j$ is given by whatever the element implements
    *   through the FiniteElement::interpolate() function.
+   *
+   * @param fe The finite element for which the operations above are to be
+   *        performed.
+   * @return The matrix $X$ as discussed above.
    */
   template <int dim, int spacedim>
-  void compute_node_matrix(FullMatrix<double> &M,
-                           const FiniteElement<dim,spacedim> &fe);
+  FullMatrix<double>
+  compute_node_matrix(const FiniteElement<dim,spacedim> &fe);
+
+  /**
+   * Same as the function above, but return the matrix by reference through
+   * the first argument, rather than as the function's return value.
+   *
+   * @deprecated
+   */
+  template <int dim, int spacedim>
+  void
+  compute_node_matrix(FullMatrix<double> &M,
+                      const FiniteElement<dim,spacedim> &fe) DEAL_II_DEPRECATED;
 
   /**
    * For all possible (isotropic and anisotropic) refinement cases compute the

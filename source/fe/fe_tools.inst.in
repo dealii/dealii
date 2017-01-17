@@ -143,9 +143,13 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     get_fe_from_name<deal_II_dimension> (const std::string &);
 
     template
-    void compute_node_matrix(
-        FullMatrix<double> &,
-        const FiniteElement<deal_II_dimension> &);
+    FullMatrix<double>
+    compute_node_matrix(const FiniteElement<deal_II_dimension> &);
+
+    template
+    void
+    compute_node_matrix(FullMatrix<double> &,
+                        const FiniteElement<deal_II_dimension> &);
 
     template
     void compute_component_wise(

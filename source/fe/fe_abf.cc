@@ -62,18 +62,16 @@ FE_ABF<dim>::FE_ABF (const unsigned int deg)
   // quadrature weights, since they
   // are required for interpolation.
   initialize_support_points(deg);
-  // Now compute the inverse node
-  //matrix, generating the correct
-  //basis functions from the raw
-  //ones.
-  FullMatrix<double> M(n_dofs, n_dofs);
-  FETools::compute_node_matrix(M, *this);
 
+  // Now compute the inverse node matrix, generating the correct
+  // basis functions from the raw ones. For a discussion of what
+  // exactly happens here, see FETools::compute_node_matrix.
+  const FullMatrix<double> M = FETools::compute_node_matrix(*this);
   this->inverse_node_matrix.reinit(n_dofs, n_dofs);
   this->inverse_node_matrix.invert(M);
-  // From now on, the shape functions
-  // will be the correct ones, not
-  // the raw shape functions anymore.
+  // From now on, the shape functions provided by FiniteElement::shape_value
+  // and similar functions will be the correct ones, not
+  // the raw shape functions from the polynomial space anymore.
 
   // Reinit the vectors of
   // restriction and prolongation
