@@ -125,9 +125,11 @@ Now, Newton's iteration can be used to solve for the update terms:
   <li> Initialization: Initial guess $u_0$ and $p_0$, tolerance $\tau$;
   <li> Linear solve to compute update term $\delta\textbf{u}^{k}$ and $\delta p^k$;
   <li> Update the approximation: $\textbf{u}^{k+1} = \textbf{u}^{k} + \delta\textbf{u}^{k}$ and $p^{k+1} = p^{k} + \delta p^{k}$;
-  <li> Check residual norm: $E^{k+1} = \|F(\mathbf{u}^{k+1}, p^{k+1})\|$. 
-       If $E^{k+1} \leq \tau$, STOP. 
-       If $E^{k+1} > \tau$, back to step 2. 
+  <li> Check residual norm: $E^{k+1} = \|F(\mathbf{u}^{k+1}, p^{k+1})\|$:
+       <ul>
+       <li>If $E^{k+1} \leq \tau$, STOP. 
+       <li>If $E^{k+1} > \tau$, back to step 2. 
+       </ul>
 </ol>
 
 <h3> Finding an Initial Guess </h3>
@@ -236,7 +238,7 @@ Instead of solving the above system, we can solve the equivalent system
     \right)
 @f}
 with a parameter $\gamma$ and an invertible matrix W. Here 
-$\gamma B^TW^{-1}B & B^{T}$ is the Augmented Lagrangian term and
+$\gamma B^TW^{-1}B$ is the Augmented Lagrangian term and
  see [1] for details.
 
 Denoting the system matrix of the new system by $G$ and the right-hand

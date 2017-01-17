@@ -20,7 +20,7 @@ every mesh is shown. The data in the table shows that Newton's iteration converg
     <th colspan="2">Mesh4</th>
   </tr>
   <tr>
-    <th>Newton's iter </th>
+    <th>Newton iter   </th>
     <th>Residual      </th>
     <th>FGMRES        </th>
     <th>Residual      </th>
@@ -33,112 +33,112 @@ every mesh is shown. The data in the table shows that Newton's iteration converg
     <th>FGMRES        </th>
   </tr>
   <tr>
-    <th>1         </th>
-    <th>7.40396e-3</th>
-    <th>3         </th>
-    <th>1.05562e-3  </th>
-    <th>3         </th>
-    <th>4.94796e-4  </th>
-    <th>3         </th>
-    <th>2.5624e-4 </th>
-    <th>2         </th>
-    <th>1.26733e-4  </th>
-    <th>2         </th>
+    <td>1         </td>
+    <td>7.40396e-3</td>
+    <td>3         </td>
+    <td>1.05562e-3  </td>
+    <td>3         </td>
+    <td>4.94796e-4  </td>
+    <td>3         </td>
+    <td>2.5624e-4 </td>
+    <td>2         </td>
+    <td>1.26733e-4  </td>
+    <td>2         </td>
   </tr>
   <tr>
-    <th>2         </th>
-    <th>3.86766e-3  </th>
-    <th>4         </th>
-    <th>1.3549e-5  </th>
-    <th>3         </th>
-    <th>1.41981e-6  </th>
-    <th>3        </th>
-    <th>1.29108e-6  </th>
-    <th>4         </th>
-    <th>6.14794e-7  </th>
-    <th>4         </th>
+    <td>2         </td>
+    <td>3.86766e-3  </td>
+    <td>4         </td>
+    <td>1.3549e-5  </td>
+    <td>3         </td>
+    <td>1.41981e-6  </td>
+    <td>3        </td>
+    <td>1.29108e-6  </td>
+    <td>4         </td>
+    <td>6.14794e-7  </td>
+    <td>4         </td>
   </tr>
   <tr>
-    <th>3         </th>
-    <th>1.60421e-3</th>
-    <th>4         </th>
-    <th>1.24836e-9  </th>
-    <th>3         </th>
-    <th>9.11557e-11  </th>
-    <th>3         </th>
-    <th>3.35933e-11 </th>
-    <th>3         </th>
-    <th>5.86734e-11 </th>
-    <th>2         </th>
+    <td>3         </td>
+    <td>1.60421e-3</td>
+    <td>4         </td>
+    <td>1.24836e-9  </td>
+    <td>3         </td>
+    <td>9.11557e-11  </td>
+    <td>3         </td>
+    <td>3.35933e-11 </td>
+    <td>3         </td>
+    <td>5.86734e-11 </td>
+    <td>2         </td>
   </tr>
   <tr>
-    <th>4         </th>
-    <th>9.26748e-4  </th>
-    <th>4         </th>
-    <th>2.75537e-14  </th>
-    <th>4         </th>
-    <th>1.39986e-14 </th>
-    <th>5         </th>
-    <th>2.18864e-14 </th>
-    <th>5         </th>
-    <th>3.38787e-14 </th>
-    <th>5         </th>
+    <td>4         </td>
+    <td>9.26748e-4  </td>
+    <td>4         </td>
+    <td>2.75537e-14  </td>
+    <td>4         </td>
+    <td>1.39986e-14 </td>
+    <td>5         </td>
+    <td>2.18864e-14 </td>
+    <td>5         </td>
+    <td>3.38787e-14 </td>
+    <td>5         </td>
   </tr>
   <tr>
-    <th>5          </th>
-    <th>1.34601e-5</th>
-    <th>4          </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
+    <td>5          </td>
+    <td>1.34601e-5</td>
+    <td>4          </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
   </tr>
   <tr>
-    <th>6         </th>
-    <th>2.5235e-8    </th>
-    <th>5    </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
+    <td>6         </td>
+    <td>2.5235e-8    </td>
+    <td>5    </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
   </tr>
   <tr>
-    <th>7         </th>
-    <th>1.38899e-12    </th>
-    <th>4    </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
+    <td>7         </td>
+    <td>1.38899e-12    </td>
+    <td>4    </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
   </tr>
   <tr>
-    <th>8           </th>
-    <th>4.68224e-15 </th>
-    <th>4           </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;      </th>
-    <th>&nbsp;      </th>
-    <th>&nbsp;      </th>
-    <th>&nbsp;      </th>
-    <th>&nbsp;      </th>
-    <th>&nbsp;      </th>
+    <td>8           </td>
+    <td>4.68224e-15 </td>
+    <td>4           </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;      </td>
+    <td>&nbsp;      </td>
+    <td>&nbsp;      </td>
+    <td>&nbsp;      </td>
+    <td>&nbsp;      </td>
+    <td>&nbsp;      </td>
   </tr>
 </table>
 
-The following figures show the sequence of the generated grids. For the case
+The following figures show the sequence of generated grids. For the case
 of Re=400, the initial guess is obtained by solving Stokes on an $8 \times 8$
 mesh, and the mesh is refined adaptively. Between meshes, the solution from
 the coarse mesh is interpolated to the fine mesh to be used as an initial guess.
@@ -193,11 +193,10 @@ iterations are executed for solving this test case.
 
 <img src="https://www.dealii.org/images/steps/developer/step-57.Re7500_get_convergence.svg" style="width:50%" alt="">
 
-Also we show the residual from each step of Newton's iteration on every
-mesh. The quadratic convergence is shown clearly in the table.
+We also show the residual from each step of Newton's iteration on every
+mesh. The quadratic convergence is clearly visible in the table.
 
 <table align="center" border="1">
-  
   <tr>
     <th>&nbsp;</th>
     <th colspan="2">Mesh0</th>
@@ -206,9 +205,8 @@ mesh. The quadratic convergence is shown clearly in the table.
     <th colspan="2">Mesh3</th>
     <th colspan="2">Mesh4</th>
   </tr>
-
   <tr>
-    <th>Newton's iter </th>
+    <th>Newton iter   </th>
     <th>Residual      </th>
     <th>FGMRES        </th>
     <th>Residual      </th>
@@ -220,103 +218,96 @@ mesh. The quadratic convergence is shown clearly in the table.
     <th>Residual      </th>
     <th>FGMRES        </th>
   </tr>
-
   <tr>
-    <th>1          </th>
-    <th>1.89223e-6  </th>
-    <th>6          </th>
-    <th>4.2506e-3  </th>
-    <th>3          </th>
-    <th>1.42993e-3  </th>
-    <th>3          </th>
-    <th>4.87932e-4  </th>
-    <th>2          </th>
-    <th>1.89981e-04  </th>
-    <th>2         </th>
+    <td>1          </td>
+    <td>1.89223e-6  </td>
+    <td>6          </td>
+    <td>4.2506e-3  </td>
+    <td>3          </td>
+    <td>1.42993e-3  </td>
+    <td>3          </td>
+    <td>4.87932e-4  </td>
+    <td>2          </td>
+    <td>1.89981e-04  </td>
+    <td>2         </td>
   </tr>
-
   <tr>
-    <th>2         </th>
-    <th>3.16439e-9</th>
-    <th>8         </th>
-    <th>1.3732e-3 </th>
-    <th>7         </th>
-    <th>4.15062e-4 </th>
-    <th>7         </th>
-    <th>9.11191e-5 </th>
-    <th>8         </th>
-    <th>1.35553e-5</th>
-    <th>8         </th>
+    <td>2         </td>
+    <td>3.16439e-9</td>
+    <td>8         </td>
+    <td>1.3732e-3 </td>
+    <td>7         </td>
+    <td>4.15062e-4 </td>
+    <td>7         </td>
+    <td>9.11191e-5 </td>
+    <td>8         </td>
+    <td>1.35553e-5</td>
+    <td>8         </td>
   </tr>
-
   <tr>
-    <th>3         </th>
-    <th>1.7628e-14</th>
-    <th>9         </th>
-    <th>2.19455e-4 </th>
-    <th>6         </th>
-    <th>1.78805e-5 </th>
-    <th>6         </th>
-    <th>5.26782e-7 </th>
-    <th>7         </th>
-    <th>9.37391e-9 </th>
-    <th>7         </th>
+    <td>3         </td>
+    <td>1.7628e-14</td>
+    <td>9         </td>
+    <td>2.19455e-4 </td>
+    <td>6         </td>
+    <td>1.78805e-5 </td>
+    <td>6         </td>
+    <td>5.26782e-7 </td>
+    <td>7         </td>
+    <td>9.37391e-9 </td>
+    <td>7         </td>
   </tr>
-
   <tr>
-    <th>4         </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
-    <th>8.82693e-6 </th>
-    <th>6         </th>
-    <th>6.82096e-9 </th>
-    <th>7         </th>
-    <th>2.27696e-11 </th>
-    <th>8         </th>
-    <th>1.25899e-13</th>
-    <th>9        </th>
+    <td>4         </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
+    <td>8.82693e-6 </td>
+    <td>6         </td>
+    <td>6.82096e-9 </td>
+    <td>7         </td>
+    <td>2.27696e-11 </td>
+    <td>8         </td>
+    <td>1.25899e-13</td>
+    <td>9        </td>
   </tr>
-
   <tr>
-    <th>5         </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
-    <th>1.29739e-7</th>
-    <th>7         </th>
-    <th>1.25167e-13 </th>
-    <th>9        </th>
-    <th>1.76128e-14 </th>
-    <th>10         </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
+    <td>5         </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
+    <td>1.29739e-7</td>
+    <td>7         </td>
+    <td>1.25167e-13 </td>
+    <td>9        </td>
+    <td>1.76128e-14 </td>
+    <td>10         </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
   </tr>
-
   <tr>
-    <th>6         </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
-    <th>4.43518e-11</th>
-    <th>7         </th>
-    <th>&nbsp; </th>
-    <th>&nbsp;        </th>
-    <th>&nbsp; </th>
-    <th>&nbsp;        </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
+    <td>6         </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
+    <td>4.43518e-11</td>
+    <td>7         </td>
+    <td>&nbsp; </td>
+    <td>&nbsp;        </td>
+    <td>&nbsp; </td>
+    <td>&nbsp;        </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
   </tr>
-
   <tr>
-    <th>7         </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
-    <th>6.42323e-15 </th>
-    <th>9         </th>
-    <th>&nbsp;</th>
-    <th>&nbsp;         </th>
-    <th>&nbsp; </th>
-    <th>&nbsp;         </th>
-    <th>&nbsp;    </th>
-    <th>&nbsp;    </th>
+    <td>7         </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
+    <td>6.42323e-15 </td>
+    <td>9         </td>
+    <td>&nbsp;</td>
+    <td>&nbsp;         </td>
+    <td>&nbsp; </td>
+    <td>&nbsp;         </td>
+    <td>&nbsp;    </td>
+    <td>&nbsp;    </td>
   </tr>
 </table>
 The sequence of generated grids looks like this:
@@ -377,40 +368,35 @@ consumes less memory. This will be even more pronounced in 3d.
 
 <table align="center" border="1">
 <tr>
-  <td>Ref</td>
-  <td>DoFs</td>
-  <td>Iterative: Total/s (Setup/s)</td>
-  <td>Direct: Total/s (Setup/s)</td>
+  <th>Ref</th>
+  <th>DoFs</th>
+  <th>Iterative: Total/s (Setup/s)</th>
+  <th>Direct: Total/s (Setup/s)</th>
 </tr>
-
 <tr>
   <td>5</td>
   <td>9539</td>
   <td>0.10 (0.06)</td>
   <td>0.13 (0.12)</td>
 </tr>
-
 <tr>
   <td>6</td>
   <td>37507</td>
   <td>0.58 (0.37)</td>
   <td>1.03 (0.97)</td>
 </tr>
-
 <tr>
   <td>7</td>
   <td>148739</td>
   <td>3.59 (2.73)</td>
   <td>7.78 (7.53)</td>
 </tr>
-
 <tr>
   <td>8</td>
   <td>592387</td>
   <td>29.17 (24.94)</td>
   <td>(>4GB RAM)</td>
 </tr>
-
 </table>
 
 

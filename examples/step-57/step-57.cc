@@ -189,7 +189,7 @@ namespace Step57
   // Schur complement preconditioner is defined in this part. As discussed in
   // the introduction, the preconditioner in Krylov iterative methods is
   // implemented as a matrix-vector product operator. In practice, the Schur
-  // complement preconditioner is decomposed as a product of three matrices(as
+  // complement preconditioner is decomposed as a product of three matrices (as
   // presented in the first section).  The $\tilde{A}^{-1}$ in the first factor
   // involves a solve for the linear system $\tilde{A}x=b$. Here we solve
   // this system via a direct solver for simplicity. The computation involved
@@ -516,6 +516,13 @@ namespace Step57
       {
         pressure_mass_matrix.reinit(sparsity_pattern.block(1,1));
         pressure_mass_matrix.copy_from(system_matrix.block(1,1));
+
+        // Note that settings this pressure block to zero is not identical to
+        // not assembling anything in this block, because this operation here
+        // will (incorrectly) delete diagonal entries that come in from
+        // hanging node constraints for pressure DoFs. This means that our
+        // whole system matrix will have rows that are completely
+        // zero. Luckily, FGMRES handles these rows without any problem.
         system_matrix.block(1,1) = 0;
       }
   }
@@ -545,7 +552,7 @@ namespace Step57
   {
     const ConstraintMatrix &constraints_used = initial_step ? nonzero_constraints : zero_constraints;
 
-    SolverControl solver_control (system_matrix.m(),1e-4*system_rhs.l2_norm(), true);
+    SolverControl solver_control (system_matrix.m(), 1e-4*system_rhs.l2_norm(), true);
     SolverFGMRES<BlockVector<double> > gmres(solver_control);
 
     SparseILU<double> pmass_preconditioner;
