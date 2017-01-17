@@ -1990,6 +1990,10 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::update_internal_dofs
 }
 
 // explicit instantiations
+#define SPLIT_INSTANTIATIONS_COUNT 2
+#ifndef SPLIT_INSTANTIATIONS_INDEX
+#define SPLIT_INSTANTIATIONS_INDEX 0
+#endif
 #include "mapping_fe_field.inst"
 
 
