@@ -66,13 +66,6 @@ FullMatrix<number>::FullMatrix (const size_type m,
 }
 
 
-template <typename number>
-FullMatrix<number>::FullMatrix (const FullMatrix &m)
-  :
-  Table<2,number> (m)
-{}
-
-
 
 template <typename number>
 FullMatrix<number>::FullMatrix (const IdentityMatrix &id)
@@ -83,14 +76,6 @@ FullMatrix<number>::FullMatrix (const IdentityMatrix &id)
     (*this)(i,i) = 1;
 }
 
-
-template <typename number>
-FullMatrix<number> &
-FullMatrix<number>::operator = (const FullMatrix<number> &M)
-{
-  Table<2,number>::operator=(M);
-  return *this;
-}
 
 
 template <typename number>
