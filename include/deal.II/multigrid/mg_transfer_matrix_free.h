@@ -111,7 +111,7 @@ public:
    * altered. For the other degrees of freedom, the result of the restriction
    * is added.
    *
-   * @param to_level The index of the level to restrict from, which is the
+   * @param from_level The index of the level to restrict from, which is the
    * level of @p src.
    *
    * @param src is a vector with as many elements as there are degrees of
