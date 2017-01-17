@@ -359,6 +359,13 @@ public:
    * second. If this is nevertheless the case, an exception is thrown.
    * However, this behavior can be changed by providing a different value for
    * the second argument.
+   *
+   * If both this object and the object given as argument are initialized with
+   * an IndexSet object, local_lines is set to the union of these IndexSet
+   * objects.
+   *
+   * Merging a ConstraintMatrix that is initialized with an IndexSet
+   * and one that is not initialized with an IndexSet is not yet implemented.
    */
   void merge (const ConstraintMatrix &other_constraints,
               const MergeConflictBehavior merge_conflict_behavior = no_conflicts_allowed);
