@@ -419,6 +419,12 @@
  *       <td>step-56</td>
  *       <td> Geometric Multigrid for Stokes.
  *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-57</td>
+ *       <td> Incompressible, stationary Navier Stokes equations.
+ *       </td></tr>
+ *
  * </table>
  *
  * <a name="topic"></a>
@@ -503,7 +509,8 @@
  *       step-43,
  *       step-44,
  *       step-55,
- *       step-56
+ *       step-56,
+ *       step-57
  *     </td>
  *   </tr>
  *
@@ -602,7 +609,8 @@
  *       step-32,
  *       step-33,
  *       step-42,
- *       step-43
+ *       step-43,
+ *       step-57
  *     </td>
  *   </tr>
  *
@@ -740,7 +748,8 @@
  *       step-32,
  *       step-43,
  *       step-55,
- *       step-56
+ *       step-56,
+ *       step-57
  *     </td>
  *   </tr>
  *
@@ -757,7 +766,8 @@
  *       step-33,
  *       step-41,
  *       step-42,
- *       step-44
+ *       step-44,
+ *       step-57
  *     </td>
  *   </tr>
  *
@@ -859,7 +869,8 @@
  *       step-35,
  *       step-46,
  *       step-55,
- *       step-56
+ *       step-56,
+ *       step-57
  *     </td>
  *   </tr>
  *
@@ -942,7 +953,8 @@
  *         step-32,
  *         step-35,
  *         step-55,
- *         step-56
+ *         step-56,
+ *         step-57
  *    </td>
  *   </tr>
  *
