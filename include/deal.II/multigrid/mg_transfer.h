@@ -99,6 +99,23 @@ namespace internal
     {
     }
   };
+#else
+  // ! DEAL_II_WITH_TRILINOS
+  template <typename Number>
+  struct MatrixSelector<LinearAlgebra::distributed::Vector<Number> >
+  {
+    typedef ::dealii::SparsityPattern Sparsity;
+    typedef ::dealii::SparseMatrix<Number> Matrix;
+
+    template <typename SparsityPatternType, typename DoFHandlerType>
+    static void reinit(Matrix &, Sparsity &, int, const SparsityPatternType &, const DoFHandlerType &)
+    {
+      AssertThrow(false, ExcNotImplemented(
+                    "ERROR: MGTransferPrebuilt with LinearAlgebra::distributed::Vector currently "
+                    "needs deal.II to be configured with Trilinos."));
+    }
+  };
+
 #endif
 }
 
