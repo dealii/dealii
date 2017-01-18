@@ -16,10 +16,10 @@
 #ifndef dealii__function_derivative_h
 #define dealii__function_derivative_h
 
-#include <deal.II/base/config.h>
-#include <deal.II/base/exceptions.h>
-#include <deal.II/base/function.h>
 #include <deal.II/base/auto_derivative_function.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/tensor_classes_fwd.h>
 
 DEAL_II_NAMESPACE_OPEN
 

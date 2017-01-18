@@ -312,7 +312,14 @@ private:
  * @ingroup geomprimitives
  * @author Wolfgang Bangerth, 1998-2005, Matthias Maier, 2015
  */
+#ifdef DOXYGEN
+// Repeat the forward declaration's default template argument for Doxygen
+// (recall that repeating a default template argument from a forward
+// declaration is not allowed).
+template <int rank_, int dim, typename Number = double>
+#else
 template <int rank_, int dim, typename Number>
+#endif // DOXYGEN
 class Tensor
 {
 public:

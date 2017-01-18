@@ -20,7 +20,7 @@
 
 #ifdef DEAL_II_WITH_GSL
 #include <deal.II/base/function.h>
-#include <deal.II/base/point.h>
+#include <deal.II/base/tensor_classes_fwd.h>
 #include <gsl/gsl_spline.h>
 
 DEAL_II_NAMESPACE_OPEN

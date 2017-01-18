@@ -24,6 +24,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/function_time.h>
+#include <deal.II/base/tensor.h>
 
 #include <vector>
 

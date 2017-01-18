@@ -19,8 +19,9 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/point.h>
 #include <deal.II/base/table.h>
+#include <deal.II/base/table_indices.h>
+#include <deal.II/base/tensor_classes_fwd.h>
 
 #include <deal.II/base/std_cxx11/array.h>
 

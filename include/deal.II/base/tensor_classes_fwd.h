@@ -20,7 +20,7 @@
 #include <deal.II/base/config.h>
 
 // C++ does not permit repeated forward declarations of template classes with
-// default template arguments. Hence, collect the three most common
+// default template arguments. Hence, collect the four most common
 // Tensor-like classes here so that we can just include this file (with the
 // <code>#ifndef</code> guards) to avoid this problem.
 DEAL_II_NAMESPACE_OPEN

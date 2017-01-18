@@ -86,7 +86,14 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup geomprimitives
  * @author Wolfgang Bangerth, 1997
  */
+#ifdef DOXYGEN
+// Repeat the forward declaration's default template argument for Doxygen
+// (recall that repeating a default template argument from a forward
+// declaration is not allowed).
+template <int dim, typename Number = double>
+#else
 template <int dim, typename Number>
+#endif // ifdef DOXYGEN
 class Point : public Tensor<1,dim,Number>
 {
 public:
