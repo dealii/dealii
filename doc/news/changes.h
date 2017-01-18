@@ -1007,6 +1007,11 @@ inconvenience this causes.
  <br>
  (Spencer Patty, 2016/02/11)
  </li>
+
+ <li> New: Added print_matrix_market member function to SparseMatrix class.
+ This allows one to output matrices in a format suitable for importing into
+ other programs and libraries.
+ <\li>
 </ol>
 
 */

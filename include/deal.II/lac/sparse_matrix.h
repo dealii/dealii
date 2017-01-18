@@ -1469,6 +1469,7 @@ public:
 
   /**
    * Print the matrix to the given stream in the "Matrix Market" format.
+   * Each entry with an absolute value less than threshold is ignored.
    */
   template <class StreamType>
   void print_matrix_market(StreamType &out,
@@ -2382,44 +2383,6 @@ SparseMatrix<number>::end (const size_type r)
 
   return iterator(this, cols->rowstart[r+1]);
 }
-
-template<>
-template<class StreamType>
-void SparseMatrix<std::complex<double>>::print_matrix_market(StreamType &out,
-							     const double threshold) const
-{
-  AssertThrow(false, ExcNotImplemented() );
-}
-
-template <typename number>
-template <class StreamType>
-void SparseMatrix<number>::print_matrix_market(StreamType &out,
-                                               const double threshold) const
-{
-  Assert(cols != 0, ExcNotInitialized());
-  Assert(val != 0, ExcNotInitialized());
-  Assert(threshold >= 0, ExcMessage("Negative threshold!") );
-
-  //Print the header
-  out << "%%MatrixMarket matrix coordinate real general\n";
-  const size_type nnz = n_actually_nonzero_elements(threshold);
-  out << m() << ' ' << n() << ' ' << nnz << '\n';
-
-  //Print the body
-  for (unsigned int i = 0; i < m(); ++i)
-    for (const_iterator it = begin(i); it != end(i); ++it)
-      {
-        const number value = it->value();
-        if (std::fabs<number>(value) > threshold)
-          {
-            const unsigned int j = it->column();
-            //the following " + 1"s are to convert to ones
-            //based indexing.
-            out << i + 1 << ' ' << j + 1 << ' ' << value << '\n';
-          }
-      }
-}
-
 
 template <typename number>
 template <class StreamType>

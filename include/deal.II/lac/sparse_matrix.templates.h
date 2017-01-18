@@ -1902,53 +1902,54 @@ namespace internal
 {
   namespace SparseMatrix
   {
-    template <class StreamType, typename realType>
-    inline
-    void print_value(StreamType &out, const realType&val)
+    template<typename number>
+    struct PrintMatrixMarketUtilities
     {
-      out << val;
-    }
+      template <typename StreamType>
+      static void print_header(StreamType &out)
+      {
+        out << "%%MatrixMarket matrix coordinate real general\n";
+      }
 
-    template<class StreamType, typename realType>
-    inline
-    void print_value(StreamType &out, const std::complex<realType> &val)
-    {
-      // the following format is what is required by the matrix market format.
-      out << val.real << ' ' << val.imag;
-    }
+      template <typename StreamType>
+      static inline void print_value(StreamType &out,const number &val)
+      {
+        out << val;
+      }
+    };
 
-    template<class StreamType, class numberType>
-    void
-    print_header(StreamType &out,const numberType & dummy)
+    template<typename number>
+    struct PrintMatrixMarketUtilities<std::complex<number> >
+      //implementation for complex scalar type
     {
-      out << "%%MatrixMarket matrix coordinate real general\n";
-    }
+      template <typename StreamType>
+      static void print_header(StreamType &out)
+      {
+        out << "%%MatrixMarket matrix coordinate complex general\n";
+      }
 
-    //template<typename realType>
-    template<class StreamType, class realType>
-    void
-    print_header(StreamType &out, const std::complex<realType> & dummy )
-    {
-      out << "%%MatrixMarket matrix coordinate complex general\n";
-    }  
+      template <typename StreamType>
+      static inline void print_value(StreamType &out, const std::complex<number> &val)
+      {
+        // the following format is what is required by the matrix market format.
+        out << val.real << ' ' << val.imag;
+      }
+    };
+
   } // namespace SparseMatrix
 } // namespace internal
 
 template <typename number>
 template <class StreamType>
 void SparseMatrix<number>::print_matrix_market(StreamType &out,
-					       const double threshold) const
+                                               const double threshold) const
 {
   Assert(cols != 0, ExcNotInitialized());
   Assert(val != 0, ExcNotInitialized());
-  Assert(threshold >= 0, ExcMessage("Negative threshold!") );  
+  Assert(threshold >= 0, ExcMessage("Negative threshold!") );
 
   //Print the header.
-  {
-    const number dummy = (number) 1.0; 
-    print_header(out,dummy);
-  }
-  
+  internal::SparseMatrix::PrintMatrixMarketUtilities<number>::print_header(out);
   const size_type nnz = n_actually_nonzero_elements(threshold);
   out << m() << ' ' << n() << ' ' << nnz << '\n';
 
@@ -1956,22 +1957,17 @@ void SparseMatrix<number>::print_matrix_market(StreamType &out,
   for (unsigned int i = 0; i < m(); ++i)
     for (const_iterator it = begin(i); it != end(i); ++it)
       {
-	const number value = it->value();
-	if (std::fabs<number>(value) > threshold)
-	  {
-	    const unsigned int j = it->column();
-	    //the following " + 1"s are to convert to ones base indexing
-	    out << i + 1 << ' ' << j + 1 << ' ';
-	    print_value(out, value);
-	    out << value << '\n';
-	  }
+        const number value = it->value();
+        if (std::abs(value) > threshold)
+          {
+            const unsigned int j = it->column();
+            //the following " + 1"s are to convert to ones base indexing
+            out << i + 1 << ' ' << j + 1 << ' ';
+            internal::SparseMatrix::PrintMatrixMarketUtilities<number>::print_value(out, value);
+            out << '\n';
+          }
       }
 }
-
-  
-
-
-    
 
 template <typename number>
 void SparseMatrix<number>::print_formatted (std::ostream &out,
