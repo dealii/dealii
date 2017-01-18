@@ -103,7 +103,7 @@ void merge_check ()
 
       // now merge the two and print the
       // results
-      c1.merge (c2);
+      c1.merge (c2, ConstraintMatrix::no_conflicts_allowed, true);
       c1.print(deallog.get_file_stream());
     };
 }
