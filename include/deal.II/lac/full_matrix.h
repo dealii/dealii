@@ -225,17 +225,6 @@ public:
               const size_type cols);
 
   /**
-   * Copy constructor. This constructor does a deep copy of the matrix.
-   * Therefore, it poses a possible efficiency problem, if for example,
-   * function arguments are passed by value rather than by reference.
-   * Unfortunately, we can't mark this copy constructor <tt>explicit</tt>,
-   * since that prevents the use of this class in containers, such as
-   * <tt>std::vector</tt>. The responsibility to check performance of programs
-   * must therefore remain with the user of this class.
-   */
-  FullMatrix (const FullMatrix &);
-
-  /**
    * Constructor initializing from an array of numbers. The array is arranged
    * line by line. No range checking is performed.
    */
@@ -262,14 +251,6 @@ public:
   /**
    * @{
    */
-
-  /**
-   * Assignment operator.
-   *
-   * @dealiiOperationIsMultithreaded
-   */
-  FullMatrix<number> &
-  operator = (const FullMatrix<number> &);
 
   /**
    * Variable assignment operator.
