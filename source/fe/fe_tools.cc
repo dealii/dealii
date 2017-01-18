@@ -1624,9 +1624,9 @@ namespace FETools
 
     const std::vector<Point<dim> > &points = fe.get_generalized_support_points();
 
-    // We need the values of the
-    // polynomials in all generalized
-    // support points.
+    // We need the values of the polynomials in all generalized support points.
+    // This function specifically works for the case where shape functions
+    // have 'dim' vector components, so allocate that much space
     std::vector<std::vector<double> >
     values (dim, std::vector<double>(points.size()));
 
@@ -1634,12 +1634,10 @@ namespace FETools
     // result of the interpolation
     std::vector<double> local_dofs(n_dofs);
 
-    // One row per shape
-    // function. Remember that these
-    // are the 'raw' shape functions
-    // where the inverse node matrix is
-    // empty. Otherwise, this would
-    // yield identity.
+    // Get the values of each shape function in turn. Remember that these
+    // are the 'raw' shape functions (i.e., where the element has not yet
+    // computed the expansion coefficients with regard to the basis
+    // provided by the polynomial space).
     for (unsigned int i=0; i<n_dofs; ++i)
       {
         // get the values of the current set of shape functions
@@ -1647,14 +1645,13 @@ namespace FETools
         for (unsigned int k=0; k<points.size(); ++k)
           for (unsigned int d=0; d<dim; ++d)
             {
-              values[d][k] = fe.shape_value_component(i,points[k],d);
+              values[d][k] = fe.shape_value_component(i, points[k], d);
               Assert (numbers::is_finite(values[d][k]), ExcInternalError());
             }
 
         fe.interpolate(local_dofs, values);
 
-        // Enter the interpolated dofs
-        // into the matrix
+        // Enter the interpolated dofs into the matrix
         for (unsigned int j=0; j<n_dofs; ++j)
           {
             N(j,i) = local_dofs[j];
