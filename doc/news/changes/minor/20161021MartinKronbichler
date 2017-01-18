@@ -1,0 +1,4 @@
+New: PreconditionChebyshev now offers a PreconditionChebyshev::step()
+and PreconditionChebyshev::Tstep() methods for usage in relaxation smoothers.
+<br>
+(Martin Kronbichler, 2016/10/21)

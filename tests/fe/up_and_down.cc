@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2015 by the deal.II authors
+// Copyright (C) 2013 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -236,6 +236,11 @@ void test ()
         deallog << dim << "d, uniform grid, fe #" << i;
         check_element (tr, *fe_list[i]);
       }
+
+
+  for (unsigned int i=0; i<sizeof(fe_list)/sizeof(fe_list[0]); ++i)
+    if (fe_list[i] != 0)
+      delete fe_list[i];
 }
 
 

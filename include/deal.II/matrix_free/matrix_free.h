@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2016 by the deal.II authors
+// Copyright (C) 2011 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -97,11 +97,13 @@ DEAL_II_NAMESPACE_OPEN
  * operations for several cells with one CPU instruction and is one of the
  * main features of this framework.
  *
+ * For details on usage of this class, see the description of FEEvaluation.
+ *
  * @author Katharina Kormann, Martin Kronbichler, 2010, 2011
  */
 
 template <int dim, typename Number=double>
-class MatrixFree
+class MatrixFree : public Subscriptor
 {
 public:
 
@@ -136,14 +138,61 @@ public:
   struct AdditionalData
   {
     /**
-     * Collects options for task parallelism.
+     * Collects options for task parallelism. See the documentation of the
+     * member variable MatrixFree::AdditionalData::tasks_parallel_scheme for a
+     * thorough description.
      */
-    enum TasksParallelScheme {none, partition_partition, partition_color, color};
+    enum TasksParallelScheme
+    {
+      /**
+       * Perform application in serial.
+       */
+      none,
+      /**
+       * Partition the cells into two levels and afterwards form chunks.
+       */
+      partition_partition,
+      /**
+       * Partition on the global level and color cells within the partitions.
+       */
+      partition_color,
+      /**
+       * Use the traditional coloring algorithm: this is like
+       * TasksParallelScheme::partition_color, but only uses one partition.
+       */
+      color
+    };
+
+    // avoid warning about use of deprecated variables
+    DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 
     /**
      * Constructor for AdditionalData.
      */
-    AdditionalData (const MPI_Comm            mpi_communicator   = MPI_COMM_SELF,
+    AdditionalData (const TasksParallelScheme tasks_parallel_scheme = partition_partition,
+                    const unsigned int        tasks_block_size   = 0,
+                    const UpdateFlags         mapping_update_flags  = update_gradients | update_JxW_values,
+                    const unsigned int level_mg_handler = numbers::invalid_unsigned_int,
+                    const bool                store_plain_indices = true,
+                    const bool                initialize_indices = true,
+                    const bool                initialize_mapping = true)
+      :
+      tasks_parallel_scheme (tasks_parallel_scheme),
+      tasks_block_size      (tasks_block_size),
+      mapping_update_flags  (mapping_update_flags),
+      level_mg_handler      (level_mg_handler),
+      store_plain_indices   (store_plain_indices),
+      initialize_indices    (initialize_indices),
+      initialize_mapping    (initialize_mapping)
+    {};
+
+    /**
+     * Constructor for AdditionalData.
+     *
+     * @deprecated @p mpi_communicator should not be specified here
+     * since it is not used in the MatrixFree class.
+     */
+    AdditionalData (const MPI_Comm            mpi_communicator,
                     const TasksParallelScheme tasks_parallel_scheme = partition_partition,
                     const unsigned int        tasks_block_size   = 0,
                     const UpdateFlags         mapping_update_flags  = update_gradients | update_JxW_values,
@@ -160,15 +209,18 @@ public:
       store_plain_indices   (store_plain_indices),
       initialize_indices    (initialize_indices),
       initialize_mapping    (initialize_mapping)
-    {};
+    {} DEAL_II_DEPRECATED
 
     /**
      * Set the MPI communicator that the parallel layout of the operator
      * should be based upon. Defaults to MPI_COMM_SELF, but should be set to a
      * communicator similar to the one used for a distributed triangulation in
      * order to inform this class over all cells that are present.
+     *
+     * @deprecated This variable is not used anymore. The @p mpi_communicator
+     * is automatically set to the one used by the triangulation.
      */
-    MPI_Comm            mpi_communicator;
+    MPI_Comm            mpi_communicator DEAL_II_DEPRECATED;
 
     /**
      * Set the scheme for task parallelism. There are four options available.
@@ -261,6 +313,8 @@ public:
     bool                initialize_mapping;
   };
 
+  DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
   /**
    * @name 1: Construction and initialization
    */
@@ -285,24 +339,6 @@ public:
    * or contain several copies of the same element. Mixing several different
    * elements into one FESystem is not allowed. In that case, use the
    * initialization function with several DoFHandler arguments.
-   *
-   * The @p IndexSet @p locally_owned_dofs is used to specify the parallel
-   * partitioning with MPI. Usually, this needs not be specified, and the
-   * other initialization function without and @p IndexSet description can be
-   * used, which gets the partitioning information builtin into the
-   * DoFHandler.
-   */
-  template <typename DoFHandlerType, typename QuadratureType>
-  void reinit (const Mapping<dim>     &mapping,
-               const DoFHandlerType   &dof_handler,
-               const ConstraintMatrix &constraint,
-               const IndexSet         &locally_owned_dofs,
-               const QuadratureType   &quad,
-               const AdditionalData    additional_data = AdditionalData());
-
-  /**
-   * Initializes the data structures. Same as above, but with index set stored
-   * in the DoFHandler for describing the locally owned degrees of freedom.
    */
   template <typename DoFHandlerType, typename QuadratureType>
   void reinit (const Mapping<dim>     &mapping,
@@ -320,6 +356,21 @@ public:
                const ConstraintMatrix &constraint,
                const QuadratureType   &quad,
                const AdditionalData    additional_data = AdditionalData());
+
+  /**
+   * Same as above.
+   *
+   * @deprecated Setting the index set specifically is not supported any
+   * more. Use the reinit function without index set argument to choose the
+   * one provided by DoFHandler::locally_owned_dofs().
+   */
+  template <typename DoFHandlerType, typename QuadratureType>
+  void reinit (const Mapping<dim>     &mapping,
+               const DoFHandlerType   &dof_handler,
+               const ConstraintMatrix &constraint,
+               const IndexSet         &locally_owned_dofs,
+               const QuadratureType   &quad,
+               const AdditionalData    additional_data = AdditionalData()) DEAL_II_DEPRECATED;
 
   /**
    * Extracts the information needed to perform loops over cells. The
@@ -340,25 +391,6 @@ public:
    * different degrees. However, the number of different quadrature formulas
    * can be sets independently from the number of DoFHandlers, when several
    * elements are always integrated with the same quadrature formula.
-   *
-   * The @p IndexSet @p locally_owned_dofs is used to specify the parallel
-   * partitioning with MPI. Usually, this needs not be specified, and the
-   * other initialization function without and @p IndexSet description can be
-   * used, which gets the partitioning information from the DoFHandler. This
-   * is the most general initialization function.
-   */
-  template <typename DoFHandlerType, typename QuadratureType>
-  void reinit (const Mapping<dim>                          &mapping,
-               const std::vector<const DoFHandlerType *>   &dof_handler,
-               const std::vector<const ConstraintMatrix *> &constraint,
-               const std::vector<IndexSet>                 &locally_owned_set,
-               const std::vector<QuadratureType>           &quad,
-               const AdditionalData                        additional_data = AdditionalData());
-
-  /**
-   * Initializes the data structures. Same as before, but now the index set
-   * description of the locally owned range of degrees of freedom is taken
-   * from the DoFHandler.
    */
   template <typename DoFHandlerType, typename QuadratureType>
   void reinit (const Mapping<dim>                          &mapping,
@@ -376,6 +408,21 @@ public:
                const std::vector<const ConstraintMatrix *> &constraint,
                const std::vector<QuadratureType>           &quad,
                const AdditionalData                        additional_data = AdditionalData());
+
+  /**
+   * Same as above.
+   *
+   * @deprecated Setting the index set specifically is not supported any
+   * more. Use the reinit function without index set argument to choose the
+   * one provided by DoFHandler::locally_owned_dofs().
+   */
+  template <typename DoFHandlerType, typename QuadratureType>
+  void reinit (const Mapping<dim>                          &mapping,
+               const std::vector<const DoFHandlerType *>   &dof_handler,
+               const std::vector<const ConstraintMatrix *> &constraint,
+               const std::vector<IndexSet>                 &locally_owned_set,
+               const std::vector<QuadratureType>           &quad,
+               const AdditionalData                        additional_data = AdditionalData()) DEAL_II_DEPRECATED;
 
   /**
    * Initializes the data structures. Same as before, but now the index set
@@ -510,6 +557,16 @@ public:
    * set accordingly. For vector-valued problems with several DoFHandlers
    * underlying this class, the parameter @p vector_component defines which
    * component is to be used.
+   *
+   * For the vectors used with MatrixFree and in FEEvaluation, a vector needs
+   * to hold all @ref GlossLocallyActiveDof "locally active DoFs" and also
+   * some of the @ref GlossLocallyRelevantDof "locally relevant DoFs". The
+   * selection of DoFs is such that one can read all degrees of freedom on all
+   * locally relevant elements (locally active) plus the degrees of freedom
+   * that contraints expand into from the locally owned cells. However, not
+   * all locally relevant DoFs are stored because most of them would never be
+   * accessed in matrix-vector products and result in too much data sent
+   * around which impacts the performance.
    */
   template <typename VectorType>
   void initialize_dof_vector(VectorType &vec,
@@ -522,6 +579,16 @@ public:
    * set accordingly. For vector-valued problems with several DoFHandlers
    * underlying this class, the parameter @p vector_component defines which
    * component is to be used.
+   *
+   * For the vectors used with MatrixFree and in FEEvaluation, a vector needs
+   * to hold all @ref GlossLocallyActiveDof "locally active DoFs" and also
+   * some of the @ref GlossLocallyRelevantDof "locally relevant DoFs". The
+   * selection of DoFs is such that one can read all degrees of freedom on all
+   * locally relevant elements (locally active) plus the degrees of freedom
+   * that contraints expand into from the locally owned cells. However, not
+   * all locally relevant DoFs are stored because most of them would never be
+   * accessed in matrix-vector products and result in too much data sent
+   * around which impacts the performance.
    */
   template <typename Number2>
   void initialize_dof_vector(LinearAlgebra::distributed::Vector<Number2> &vec,
@@ -577,6 +644,13 @@ public:
    * @name 4: General information
    */
   //@{
+  /**
+   * Returns whether a given FiniteElement @p fe is supported by this class.
+   */
+  template <int spacedim>
+  static
+  bool is_supported (const FiniteElement<dim, spacedim> &fe);
+
   /**
    * Return the number of different DoFHandlers specified at initialization.
    */
@@ -855,10 +929,26 @@ private:
    */
   struct DoFHandlers
   {
-    DoFHandlers () : n_dof_handlers (0), level (numbers::invalid_unsigned_int) {};
+    DoFHandlers ()
+      :
+      active_dof_handler(usual),
+      n_dof_handlers (0),
+      level (numbers::invalid_unsigned_int)
+    {}
+
     std::vector<SmartPointer<const DoFHandler<dim> > >   dof_handler;
     std::vector<SmartPointer<const hp::DoFHandler<dim> > > hp_dof_handler;
-    enum ActiveDoFHandler { usual, hp } active_dof_handler;
+    enum ActiveDoFHandler
+    {
+      /**
+       * Use DoFHandler.
+       */
+      usual,
+      /**
+       * Use hp::DoFHandler.
+       */
+      hp
+    } active_dof_handler;
     unsigned int n_dof_handlers;
     unsigned int level;
   };
@@ -1483,8 +1573,12 @@ reinit(const DoFHandlerType                                  &dof_handler,
   std::vector<IndexSet> locally_owned_sets =
     internal::MatrixFree::extract_locally_owned_index_sets
     (dof_handlers, additional_data.level_mg_handler);
-  reinit(StaticMappingQ1<dim>::mapping, dof_handlers,constraints, locally_owned_sets, quads,
-         additional_data);
+
+  std::vector<hp::QCollection<1> > quad_hp;
+  quad_hp.push_back (hp::QCollection<1>(quad));
+
+  internal_reinit(StaticMappingQ1<dim>::mapping, dof_handlers,constraints,
+                  locally_owned_sets, quad_hp, additional_data);
 }
 
 
@@ -1500,17 +1594,19 @@ reinit(const Mapping<dim>                                    &mapping,
 {
   std::vector<const DoFHandlerType *>   dof_handlers;
   std::vector<const ConstraintMatrix *> constraints;
-  std::vector<QuadratureType>           quads;
 
   dof_handlers.push_back(&dof_handler);
   constraints.push_back (&constraints_in);
-  quads.push_back (quad);
 
   std::vector<IndexSet> locally_owned_sets =
     internal::MatrixFree::extract_locally_owned_index_sets
     (dof_handlers, additional_data.level_mg_handler);
-  reinit(mapping, dof_handlers,constraints,locally_owned_sets, quads,
-         additional_data);
+
+  std::vector<hp::QCollection<1> > quad_hp;
+  quad_hp.push_back (hp::QCollection<1>(quad));
+
+  internal_reinit(mapping, dof_handlers,constraints,locally_owned_sets,
+                  quad_hp,  additional_data);
 }
 
 
@@ -1526,9 +1622,11 @@ reinit(const std::vector<const DoFHandlerType *>   &dof_handler,
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFree::extract_locally_owned_index_sets
     (dof_handler, additional_data.level_mg_handler);
-  reinit(StaticMappingQ1<dim>::mapping, dof_handler,constraint,locally_owned_set,
-         static_cast<const std::vector<Quadrature<1> >&>(quad),
-         additional_data);
+  std::vector<hp::QCollection<1> > quad_hp;
+  for (unsigned int q=0; q<quad.size(); ++q)
+    quad_hp.push_back (hp::QCollection<1>(quad[q]));
+  internal_reinit(StaticMappingQ1<dim>::mapping, dof_handler,constraint,
+                  locally_owned_set, quad_hp, additional_data);
 }
 
 
@@ -1541,13 +1639,13 @@ reinit(const std::vector<const DoFHandlerType *>             &dof_handler,
        const QuadratureType                                  &quad,
        const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
-  std::vector<QuadratureType> quads;
-  quads.push_back(quad);
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFree::extract_locally_owned_index_sets
     (dof_handler, additional_data.level_mg_handler);
-  reinit(StaticMappingQ1<dim>::mapping, dof_handler,constraint,locally_owned_set, quads,
-         additional_data);
+  std::vector<hp::QCollection<1> > quad_hp;
+  quad_hp.push_back (hp::QCollection<1>(quad));
+  internal_reinit(StaticMappingQ1<dim>::mapping, dof_handler,constraint,
+                  locally_owned_set, quad_hp, additional_data);
 }
 
 
@@ -1561,13 +1659,13 @@ reinit(const Mapping<dim>                                    &mapping,
        const QuadratureType                                  &quad,
        const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
-  std::vector<QuadratureType> quads;
-  quads.push_back(quad);
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFree::extract_locally_owned_index_sets
     (dof_handler, additional_data.level_mg_handler);
-  reinit(mapping, dof_handler,constraint,locally_owned_set, quads,
-         additional_data);
+  std::vector<hp::QCollection<1> > quad_hp;
+  quad_hp.push_back (hp::QCollection<1>(quad));
+  internal_reinit(mapping, dof_handler,constraint,
+                  locally_owned_set, quad_hp, additional_data);
 }
 
 
@@ -1584,8 +1682,11 @@ reinit(const Mapping<dim>                                   &mapping,
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFree::extract_locally_owned_index_sets
     (dof_handler, additional_data.level_mg_handler);
-  reinit(mapping, dof_handler,constraint,locally_owned_set,
-         quad, additional_data);
+  std::vector<hp::QCollection<1> > quad_hp;
+  for (unsigned int q=0; q<quad.size(); ++q)
+    quad_hp.push_back (hp::QCollection<1>(quad[q]));
+  internal_reinit(mapping, dof_handler,constraint,locally_owned_set,
+                  quad_hp, additional_data);
 }
 
 
@@ -2319,7 +2420,7 @@ MatrixFree<dim, Number>::cell_loop
               std::vector<internal::color::PartitionWork<Worker>*> worker(n_workers);
               std::vector<internal::color::PartitionWork<Worker>*> blocked_worker(n_blocked_workers);
               unsigned int worker_index = 0, slice_index = 0;
-              unsigned int spawn_index =  0, spawn_index_new = 0;
+              unsigned int spawn_index =  0;
               int spawn_index_child = -2;
               internal::MPIComCompress<OutVector> *worker_compr = new(root->allocate_child())
               internal::MPIComCompress<OutVector>(dst);
@@ -2327,7 +2428,7 @@ MatrixFree<dim, Number>::cell_loop
               for (unsigned int part=0;
                    part<task_info.partition_color_blocks_row_index.size()-1; part++)
                 {
-                  spawn_index_new = worker_index;
+                  const unsigned int spawn_index_new = worker_index;
                   if (part == 0)
                     worker[worker_index] = new(worker_compr->allocate_child())
                     internal::color::PartitionWork<Worker>(func,slice_index,task_info,false);

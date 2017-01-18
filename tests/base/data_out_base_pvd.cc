@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2014, 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,27 +30,6 @@
 #include "patches.h"
 
 
-
-std::vector<DataOutBase::Patch<2,2> > patches;
-
-class DataOutX : public DataOutInterface<2,2>
-{
-  virtual
-  const std::vector< ::DataOutBase::Patch<2,2> > &
-  get_patches () const
-  {
-    return patches;
-  }
-
-  virtual
-  std::vector<std::string>
-  get_dataset_names () const
-  {
-    return std::vector<std::string>();
-  }
-};
-
-
 template <int dim, int spacedim>
 void check(std::ostream &out)
 {
@@ -61,8 +40,7 @@ void check(std::ostream &out)
   names[3] = std::make_pair(3.141,"d");
   names[4] = std::make_pair(42e19,"i");
 
-  DataOutX x;
-  x.write_pvd_record (out, names);
+  DataOutBase::write_pvd_record (out, names);
 }
 
 

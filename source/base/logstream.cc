@@ -57,6 +57,7 @@ LogStream::LogStream()
   double_threshold(0.),
   float_threshold(0.),
   offset(0),
+  print_thread_id(false),
   old_cerr(0),
   at_newline(true)
 {
@@ -260,7 +261,9 @@ LogStream::get_console()
 std::ostream &
 LogStream::get_file_stream()
 {
-  Assert(file, ExcNoFileStreamGiven());
+  Assert(file,
+         ExcMessage("You can't ask for the std::ostream object for the output "
+                    "file if none had been set before."));
   return *file;
 }
 

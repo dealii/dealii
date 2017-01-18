@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2012 - 2015 by the deal.II authors
+ * Copyright (C) 2012 - 2016 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -2059,7 +2059,7 @@ namespace Step42
         data_out.write_pvtu_record(pvtu_master_output, filenames);
 
         std::ofstream visit_master_output((output_dir + filename_base + ".visit").c_str());
-        data_out.write_visit_record(visit_master_output, filenames);
+        DataOutBase::write_visit_record(visit_master_output, filenames);
       }
 
     TrilinosWrappers::MPI::Vector tmp(solution);
@@ -2211,7 +2211,7 @@ int main (int argc, char *argv[])
           return 1;
         }
 
-      prm.read_input(argv[1]);
+      prm.parse_input(argv[1]);
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv,
                                                            numbers::invalid_unsigned_int);
       {

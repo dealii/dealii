@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2007 - 2015 by the deal.II authors
+ * Copyright (C) 2007 - 2016 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -543,12 +543,9 @@ namespace Step33
 
       virtual
       void
-      compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
-                                         const std::vector<std::vector<Tensor<1,dim> > > &duh,
-                                         const std::vector<std::vector<Tensor<2,dim> > > &dduh,
-                                         const std::vector<Point<dim> >                  &normals,
-                                         const std::vector<Point<dim> >                  &evaluation_points,
-                                         std::vector<Vector<double> >                    &computed_quantities) const;
+      evaluate_vector_field
+      (const DataPostprocessorInputs::Vector<dim> &inputs,
+       std::vector<Vector<double> >               &computed_quantities) const;
 
       virtual std::vector<std::string> get_names () const;
 
@@ -579,41 +576,38 @@ namespace Step33
 
   // This is the only function worth commenting on. When generating graphical
   // output, the DataOut and related classes will call this function on each
-  // cell, with values, gradients, Hessians, and normal vectors (in case we're
-  // working on faces) at each quadrature point. Note that the data at each
-  // quadrature point is itself vector-valued, namely the conserved
+  // cell, with access to values, gradients, Hessians, and normal vectors (in
+  // case we're working on faces) at each quadrature point. Note that the data
+  // at each quadrature point is itself vector-valued, namely the conserved
   // variables. What we're going to do here is to compute the quantities we're
   // interested in at each quadrature point. Note that for this we can ignore
-  // the Hessians ("dduh") and normal vectors; to avoid compiler warnings
-  // about unused variables, we comment out their names.
+  // the Hessians ("inputs.solution_hessians") and normal vectors
+  // ("inputs.normals").
   template <int dim>
   void
   EulerEquations<dim>::Postprocessor::
-  compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
-                                     const std::vector<std::vector<Tensor<1,dim> > > &duh,
-                                     const std::vector<std::vector<Tensor<2,dim> > > &/*dduh*/,
-                                     const std::vector<Point<dim> >                  &/*normals*/,
-                                     const std::vector<Point<dim> >                  &/*evaluation_points*/,
-                                     std::vector<Vector<double> >                    &computed_quantities) const
+  evaluate_vector_field
+  (const DataPostprocessorInputs::Vector<dim> &inputs,
+   std::vector<Vector<double> >               &computed_quantities) const
   {
     // At the beginning of the function, let us make sure that all variables
     // have the correct sizes, so that we can access individual vector
     // elements without having to wonder whether we might read or write
-    // invalid elements; we also check that the <code>duh</code> vector only
+    // invalid elements; we also check that the <code>solution_gradients</code> vector only
     // contains data if we really need it (the system knows about this because
     // we say so in the <code>get_needed_update_flags()</code> function
     // below). For the inner vectors, we check that at least the first element
     // of the outer vector has the correct inner size:
-    const unsigned int n_quadrature_points = uh.size();
+    const unsigned int n_quadrature_points = inputs.solution_values.size();
 
     if (do_schlieren_plot == true)
-      Assert (duh.size() == n_quadrature_points,
+      Assert (inputs.solution_gradients.size() == n_quadrature_points,
               ExcInternalError());
 
     Assert (computed_quantities.size() == n_quadrature_points,
             ExcInternalError());
 
-    Assert (uh[0].size() == n_components,
+    Assert (inputs.solution_values[0].size() == n_components,
             ExcInternalError());
 
     if (do_schlieren_plot == true)
@@ -630,17 +624,17 @@ namespace Step33
     // <code>density_component</code> information:
     for (unsigned int q=0; q<n_quadrature_points; ++q)
       {
-        const double density = uh[q](density_component);
+        const double density = inputs.solution_values[q](density_component);
 
         for (unsigned int d=0; d<dim; ++d)
           computed_quantities[q](d)
-            = uh[q](first_momentum_component+d) / density;
+            = inputs.solution_values[q](first_momentum_component+d) / density;
 
-        computed_quantities[q](dim) = compute_pressure (uh[q]);
+        computed_quantities[q](dim) = compute_pressure (inputs.solution_values[q]);
 
         if (do_schlieren_plot == true)
-          computed_quantities[q](dim+1) = duh[q][density_component] *
-                                          duh[q][density_component];
+          computed_quantities[q](dim+1) = inputs.solution_gradients[q][density_component] *
+                                          inputs.solution_gradients[q][density_component];
       }
   }
 
@@ -1378,7 +1372,7 @@ namespace Step33
     ParameterHandler prm;
     Parameters::AllParameters<dim>::declare_parameters (prm);
 
-    prm.read_input (input_filename);
+    prm.parse_input (input_filename);
     parameters.parse_parameters (prm);
 
     verbose_cout.set_condition (parameters.output == Parameters::Solver::verbose);

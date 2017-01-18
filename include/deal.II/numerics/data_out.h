@@ -260,8 +260,9 @@ public:
    * of a curved boundary by using more subdivisions. Some mappings like
    * MappingQEulerian result in curved cells in the interior of the domain.
    * The same is true if you have attached a manifold description to
-   * the cells of a triangulation (see @ref "Manifolds" manifold for more
-   * information). However, there is no easy way to query the mapping
+   * the cells of a triangulation (see
+   * @ref manifold "Manifolds"
+   * for more information). However, there is no easy way to query the mapping
    * or manifold whether it really does lead to curved cells.
    * Thus the last argument @p curved_region takes one of three values
    * resulting in no curved cells at all, curved cells at the boundary
@@ -334,8 +335,7 @@ private:
   (const std::pair<cell_iterator, unsigned int>                 *cell_and_index,
    internal::DataOut::ParallelData<DoFHandlerType::dimension, DoFHandlerType::space_dimension>  &scratch_data,
    const unsigned int                                            n_subdivisions,
-   const CurvedCellRegion                                        curved_cell_region,
-   std::vector<DataOutBase::Patch<DoFHandlerType::dimension, DoFHandlerType::space_dimension> > &patches);
+   const CurvedCellRegion                                        curved_cell_region);
 };
 
 

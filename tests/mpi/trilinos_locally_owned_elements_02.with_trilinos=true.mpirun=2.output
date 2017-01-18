@@ -1,0 +1,17 @@
+
+DEAL:0::locally_owned_elements_distributed: {[0,9]}
+DEAL:0::locally_owned_elements_ghosted: {[0,9]}
+DEAL:0::local_range_begin_ghosted: 0
+DEAL:0::local_range_end_ghosted: 20
+DEAL:0::local_range_begin_distributed: 0
+DEAL:0::local_range_end_distributed: 10
+DEAL:0::OK
+
+DEAL:1::locally_owned_elements_distributed: {[10,19]}
+DEAL:1::locally_owned_elements_ghosted: {[10,19]}
+DEAL:1::local_range_begin_ghosted: 5
+DEAL:1::local_range_end_ghosted: 20
+DEAL:1::local_range_begin_distributed: 10
+DEAL:1::local_range_end_distributed: 20
+DEAL:1::OK
+

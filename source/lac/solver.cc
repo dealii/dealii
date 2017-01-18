@@ -18,6 +18,7 @@
 #include <deal.II/lac/vector_memory.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/petsc_block_vector.h>
 #include <deal.II/lac/trilinos_vector.h>

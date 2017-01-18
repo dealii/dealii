@@ -18,17 +18,26 @@ International Conference on e-Science, 2011.  </i>
 This program demonstrates how to use the cell-based implementation of finite
 element operators with the MatrixFree class, first introduced in step-37, to
 solve nonlinear partial differential equations. Moreover, we demonstrate how
-the MatrixFree class handles constraints and how it can be parallelized over
-distributed nodes. Finally, we will use an explicit time-stepping method to
-solve the problem and introduce Gauss-Lobatto finite elements that are very
-convenient in this case since they have a diagonal, and thus trivially
-invertible, mass matrix. Moreover, this type of elements clusters the nodes
-towards the element boundaries which is why they have good properties for
-high-order discretization methods. Indeed, the condition number of an FE_Q
-elements with equidistant nodes grows exponentially with the degree, which
-destroys any benefit for orders of about five and higher. For this reason,
-Gauss-Lobatto points are actually the default for FE_Q (but at degrees one and
-two, those are equivalent to the equidistant points).
+the MatrixFree class handles constraints, an issue shortly mentioned in the
+results section of step-37. Finally, we will use an explicit time-stepping
+method to solve the problem and introduce Gauss-Lobatto finite elements that
+are very convenient in this case since their mass matrix can be accurately
+approximated by a diagonal, and thus trivially invertible, matrix. The two
+ingredients to this property are firstly a distribution of the nodal points of
+Lagrange polynomials according to the point distribution of the Gauss-Lobatto
+quadrature rule. Secondly, the quadrature is done with the same Gauss-Lobatto
+quadrature rule. In this formula, the integrals $\int_K \varphi_i \varphi_j
+dx\approx \sum_q \varphi_i \varphi_j \mathrm{det}(J) \big |_{x_q}$ are
+approximated to zero whenever $i\neq j$, because on the points defining the
+Lagrange polynomials exactly one function $\varphi_j$ is one and all others
+zero. Moreover, the Gauss-Lobatto distribution of nodes of Lagrange
+polynomials clusters the nodes towards the element boundaries. This results in
+a well-conditioned polynomial basis for high-order discretization
+methods. Indeed, the condition number of an FE_Q elements with equidistant
+nodes grows exponentially with the degree, which destroys any benefit for
+orders of about five and higher. For this reason, Gauss-Lobatto points are the
+default distribution for FE_Q (but at degrees one and two, those are
+equivalent to the equidistant points).
 
 <h3> Problem statement and discretization </h3>
 
@@ -67,8 +76,8 @@ Using this quadrature rule, for a <i>p</i>th order finite element, we
 use a <i>(2p-1)</i>th order accurate formula to evaluate the
 integrals. Since the product of two <i>p</i>th order basis functions
 when computing a mass matrix gives a function with polynomial degree
-<i>2p</i> in each direction, the integrals are not exactly
-evaluated. However, considering the fact that the interpolation order
+<i>2p</i> in each direction, the integrals are not computed exactly.
+However, considering the fact that the interpolation order
 of finite elements of degree <i>p</i> is <i>p+1</i>, the overall
 convergence properties are not disturbed by the quadrature error, in
 particular not when we use high orders.
@@ -139,23 +148,19 @@ scheduled by the Threading Building Blocks library, and finally with a
 vectorization by clustering of two (or more) cells into a SIMD data type for
 the operator application. As we have already discussed in step-37, you will
 get best performance by using an instruction set specific to your system,
-e.g. with the cmake variable
-<tt>-DCMAKE_CXX_FLAGS="-march=native"</tt>. Shared memory (thread)
-parallelization was also exploited in step-37. Here, we demonstrate MPI
-parallelization.
-
-To facilitate parallelism with distributed memory (MPI), we use a special
-vector type parallel::distributed::Vector that holds the
-processor-local part of the solution as well as information on and data
-fields for the ghost DoFs, i.e. DoFs that are owned by a remote
-processor but needed on cells that are treated by the present
-processor. Moreover, it holds the MPI-send information for DoFs that
-are owned locally but needed by other processors. This is similar to
-the PETScWrappers::MPI::Vector and TrilinosWrappers::MPI::Vector data
-types we have used in step-40 and step-32 before, but since we do not
-need any other parallel functionality of these libraries, we use the
-parallel::distributed::Vector class of deal.II instead of linking in
-another large library.
+e.g. with the cmake variable <tt>-DCMAKE_CXX_FLAGS="-march=native"</tt>. The
+MPI parallelization was already exploited in step-37. Here, we additionally
+consider thread parallelization with TBB. This is fairly simple, as all we
+need to do is to tell the initialization of the MatrixFree object about the
+fact that we want to use a thread parallel scheme through the variable
+MatrixFree::AdditionalData::thread_parallel_scheme. During setup, a dependency
+graph similar to the one described in the @ref workstream_paper , which allows
+the code to schedule the work of the @p local_apply function on chunks of cell
+without several threads accessing the same vector indices. As opposed to the
+WorkStream loops, some additional clever tricks to avoid global
+synchronizations as described in <a
+href="https://dx.doi.org/10.1109/eScience.2011.53">Kormann and Kronbichler
+(2011)</a> are also applied.
 
 Note that this program is designed to be run with a distributed triangulation
 (parallel::distributed::Triangulation), which requires deal.II to be

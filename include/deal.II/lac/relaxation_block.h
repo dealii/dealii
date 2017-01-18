@@ -249,6 +249,12 @@ protected:
    * Control information.
    */
   SmartPointer<const AdditionalData, RelaxationBlock<MatrixType, InverseNumberType, VectorType> > additional_data;
+
+private:
+  /**
+   * Computes (the inverse of) a range of blocks.
+   */
+  void block_kernel(const size_type block_begin, const size_type block_end);
 };
 
 

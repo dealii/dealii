@@ -135,7 +135,7 @@ namespace Step36
                               Patterns::Anything(),
                               "A functional description of the potential.");
 
-    parameters.read_input (prm_file);
+    parameters.parse_input (prm_file);
   }
 
 

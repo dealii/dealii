@@ -84,16 +84,16 @@ namespace PETScWrappers
         // but somehow it leads to odd errors
         // somewhere down the line in some of
         // the tests:
-//         const int ierr = VecSetSizes (vector, n, n);
+//         const PetscErrorCode ierr = VecSetSizes (vector, n, n);
 //         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
         // so let's go the slow way:
         if (attained_ownership)
           {
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
-            int ierr = VecDestroy (vector);
+            PetscErrorCode ierr = VecDestroy (vector);
 #else
-            int ierr = VecDestroy (&vector);
+            PetscErrorCode ierr = VecDestroy (&vector);
 #endif
             AssertThrow (ierr == 0, ExcPETScError(ierr));
           }
@@ -121,7 +121,7 @@ namespace PETScWrappers
   void
   Vector::create_vector (const size_type n)
   {
-    const int ierr
+    const PetscErrorCode ierr
       = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
     attained_ownership = true;

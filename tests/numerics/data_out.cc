@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2015 by the deal.II authors
+// Copyright (C) 2000 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -142,8 +142,8 @@ void LaplaceProblem<2>::output_results () const
       piece_names[1].push_back("subdomain-02.time_step_1.vtk");
       piece_names[2].push_back("subdomain-01.time_step_2.vtk");
       piece_names[2].push_back("subdomain-02.time_step_2.vtk");
-      data_out.write_visit_record(logfile, piece_names);
-      data_out.write_visit_record(logfile, piece_names[01]);
+      DataOutBase::write_visit_record(logfile, piece_names);
+      DataOutBase::write_visit_record(logfile, piece_names[01]);
     };
 
   // test DataOutRotation in 2d

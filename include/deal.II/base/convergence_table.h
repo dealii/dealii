@@ -208,11 +208,6 @@ public:
   /**
    * Exception
    */
-  DeclException0 (ExcWrongValueType);
-
-  /**
-   * Exception
-   */
   DeclException1 (ExcRateColumnAlreadyExists,
                   std::string,
                   << "Rate column <" << arg1 << "> does already exist.");

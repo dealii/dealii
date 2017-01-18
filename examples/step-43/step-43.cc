@@ -1743,6 +1743,10 @@ namespace Step43
       old_saturation_solution = tmp_saturation[1];
       saturation_matching_last_computed_darcy_solution = tmp_saturation[2];
 
+      saturation_constraints.distribute(saturation_solution);
+      saturation_constraints.distribute(old_saturation_solution);
+      saturation_constraints.distribute(saturation_matching_last_computed_darcy_solution);
+
       std::vector<TrilinosWrappers::MPI::BlockVector> tmp_darcy (2);
       tmp_darcy[0].reinit (darcy_solution);
       tmp_darcy[1].reinit (darcy_solution);
@@ -1750,6 +1754,9 @@ namespace Step43
 
       last_computed_darcy_solution        = tmp_darcy[0];
       second_last_computed_darcy_solution = tmp_darcy[1];
+
+      darcy_constraints.distribute(last_computed_darcy_solution);
+      darcy_constraints.distribute(second_last_computed_darcy_solution);
 
       rebuild_saturation_matrix    = true;
     }

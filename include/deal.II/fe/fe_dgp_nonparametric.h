@@ -468,9 +468,8 @@ public:
    * meet at a common face, whether it is the other way around, whether
    * neither dominates, or if either could dominate.
    *
-   * For a definition of domination, see FiniteElementBase::Domination and in
-   * particular the
-   * @ref hp_paper "hp paper".
+   * For a definition of domination, see FiniteElementDomination::Domination
+   * and in particular the @ref hp_paper "hp paper".
    */
   virtual
   FiniteElementDomination::Domination
@@ -596,11 +595,6 @@ private:
   static
   std::vector<unsigned int>
   get_dpo_vector (const unsigned int degree);
-
-  /**
-   * Degree of the polynomials.
-   */
-  const unsigned int degree;
 
   /**
    * Pointer to an object representing the polynomial space used here.

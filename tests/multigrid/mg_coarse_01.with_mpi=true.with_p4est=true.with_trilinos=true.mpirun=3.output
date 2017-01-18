@@ -1,0 +1,69 @@
+Cycle 0:
+   Number of active cells:       144
+   Number of degrees of freedom: 1369 (by level: 361, 1369)
+CG(ID):
+check residual:0.0231622
+check residual:0.0192417
+check residual:0.0172953
+coarse iterations: 31
+CG(ILU):
+check residual:0.0231622
+check residual:0.0192417
+check residual:0.0172953
+coarse iterations: 30
+CG(AMG):
+check residual:0.0231622
+check residual:0.0192417
+check residual:0.0172953
+coarse iterations: 1
+AMG:
+check residual:0.0231622
+check residual:0.0192417
+check residual:0.0172953
+applications: 3
+Cycle 1:
+   Number of active cells:       484
+   Number of degrees of freedom: 4489 (by level: 1156, 4489)
+CG(ID):
+check residual:0.012677
+check residual:0.0105349
+check residual:0.00947063
+coarse iterations: 56
+CG(ILU):
+check residual:0.012677
+check residual:0.0105349
+check residual:0.00947063
+coarse iterations: 50
+CG(AMG):
+check residual:0.012677
+check residual:0.0105349
+check residual:0.00947063
+coarse iterations: 1
+AMG:
+check residual:0.012677
+check residual:0.0105349
+check residual:0.00947063
+applications: 3
+Cycle 2:
+   Number of active cells:       1024
+   Number of degrees of freedom: 9409 (by level: 2401, 9409)
+CG(ID):
+check residual:0.00872685
+check residual:0.00725329
+check residual:0.00652099
+coarse iterations: 80
+CG(ILU):
+check residual:0.00872685
+check residual:0.00725329
+check residual:0.00652099
+coarse iterations: 67
+CG(AMG):
+check residual:0.00872685
+check residual:0.00725329
+check residual:0.00652099
+coarse iterations: 20
+AMG:
+check residual:0.0115343
+check residual:0.0130869
+check residual:0.0139613
+applications: 3

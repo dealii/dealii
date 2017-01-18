@@ -1,0 +1,4 @@
+New: RelaxationBlock classes for geometric multigrid now support parallel
+computations using Trilinos.
+<br>
+(Timo Heister, Guido Kanschat, 2016/08/08)

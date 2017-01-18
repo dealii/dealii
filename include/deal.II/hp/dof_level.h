@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2015 by the deal.II authors
+// Copyright (C) 2003 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -118,6 +118,25 @@ namespace internal
        * index. We use this in computing binary complements.
        */
       typedef signed short int signed_active_fe_index_type;
+
+      /**
+       * Given an active_fe_index, return whether the corresponding
+       * set of DoF indices are compressed. See the general documentation
+       * of this class for a description of when this is the case.
+       */
+      static
+      bool
+      is_compressed_entry (const active_fe_index_type active_fe_index);
+
+      /**
+       * Given an active_fe_index (either corresponding to an uncompressed
+       * or compressed state), return the active_fe_index that corresponds
+       * to the respectively other state. See the general documentation
+       * of this class for a description of how compression is indicated.
+       */
+      static
+      active_fe_index_type
+      get_toggled_compression_state (const active_fe_index_type active_fe_index);
 
       /**
        * Indices specifying the finite element of hp::FECollection to use for
@@ -273,6 +292,27 @@ namespace internal
       template <int dim, int spacedim>
       void uncompress_data (const dealii::hp::FECollection<dim,spacedim> &fe_collection);
 
+
+      /**
+       * Restore the active fe indices stored by the current object to
+       * an uncompressed state. At the same time, do not touch any of
+       * the other data structures. This leaves the active_fe_indices
+       * array out-of-synch from the other member variables, and the
+       * function can consequently only be used when the remaining
+       * data structures are going to be rebuilt next. This is
+       * specifically the case in hp::DoFHandler::distribute_dofs()
+       * where we throw away all data in the DoFLevels objects *except
+       * for the active_fe_indices* array. This function therefore
+       * simply makes sure that that one array is in uncompressed
+       * format so that we can use the information about active
+       * fe_indices for all cells that were used in the previous mesh
+       * refinement cycle (or the previous time distribute_dofs() was
+       * called) without having to care about any of the other data
+       * fields.
+       */
+      void normalize_active_fe_indices ();
+
+
       /**
        * Make hp::DoFHandler and its auxiliary class a friend since it is the
        * class that needs to create these data structures.
@@ -285,6 +325,26 @@ namespace internal
 
     // -------------------- template functions --------------------------------
 
+
+    inline
+    bool DoFLevel::is_compressed_entry (const active_fe_index_type active_fe_index)
+    {
+      return ((signed_active_fe_index_type)active_fe_index < 0);
+    }
+
+
+
+    inline
+    DoFLevel::active_fe_index_type
+    DoFLevel::get_toggled_compression_state (const active_fe_index_type active_fe_index)
+    {
+      // convert the active_fe_index into a signed type, flip all
+      // bits, and get the unsigned representation back
+      return (active_fe_index_type)~(signed_active_fe_index_type)active_fe_index;
+    }
+
+
+
     inline
     types::global_dof_index
     DoFLevel::
@@ -296,20 +356,21 @@ namespace internal
       Assert (obj_index < dof_offsets.size(),
               ExcIndexRange (obj_index, 0, dof_offsets.size()));
 
-      // make sure we are on an
-      // object for which DoFs have
-      // been allocated at all
+      // make sure we are on an object for which DoFs have been
+      // allocated at all
       Assert (dof_offsets[obj_index] != (offset_type)(-1),
               ExcMessage ("You are trying to access degree of freedom "
                           "information for an object on which no such "
                           "information is available"));
 
-      Assert (fe_index == active_fe_indices[obj_index],
+      Assert (fe_index == (is_compressed_entry(active_fe_indices[obj_index]) == false ?
+                           active_fe_indices[obj_index] :
+                           get_toggled_compression_state(active_fe_indices[obj_index])),
               ExcMessage ("FE index does not match that of the present cell"));
 
       // see if the dof_indices array has been compressed for this
       // particular cell
-      if ((signed_active_fe_index_type)active_fe_indices[obj_index]>=0)
+      if (is_compressed_entry(active_fe_indices[obj_index]) == false)
         return dof_indices[dof_offsets[obj_index]+local_index];
       else
         return dof_indices[dof_offsets[obj_index]]+local_index;
@@ -336,7 +397,7 @@ namespace internal
               ExcMessage ("You are trying to access degree of freedom "
                           "information for an object on which no such "
                           "information is available"));
-      Assert ((signed_active_fe_index_type)active_fe_indices[obj_index]>=0,
+      Assert (is_compressed_entry(active_fe_indices[obj_index]) == false,
               ExcMessage ("This function can no longer be called after compressing the dof_indices array"));
       Assert (fe_index == active_fe_indices[obj_index],
               ExcMessage ("FE index does not match that of the present cell"));
@@ -353,10 +414,10 @@ namespace internal
       Assert (obj_index < active_fe_indices.size(),
               ExcIndexRange (obj_index, 0, active_fe_indices.size()));
 
-      if (((signed_active_fe_index_type)active_fe_indices[obj_index]) >= 0)
+      if (is_compressed_entry(active_fe_indices[obj_index]) == false)
         return active_fe_indices[obj_index];
       else
-        return (active_fe_index_type)~(signed_active_fe_index_type)active_fe_indices[obj_index];
+        return get_toggled_compression_state(active_fe_indices[obj_index]);
     }
 
 
@@ -371,6 +432,7 @@ namespace internal
     }
 
 
+
     inline
     void
     DoFLevel::
@@ -379,6 +441,16 @@ namespace internal
     {
       Assert (obj_index < active_fe_indices.size(),
               ExcIndexRange (obj_index, 0, active_fe_indices.size()));
+
+      // check whether the given fe_index is within the range of
+      // values that we interpret as "not compressed". if not, then
+      // the index is so large that we cannot accept it. (but this
+      // will not likely happen because it requires someone using an
+      // FECollection that has more than 32k entries.)
+      Assert (is_compressed_entry (fe_index) == false,
+              ExcMessage ("You are using an active_fe_index that is larger than an "
+                          "internal limitation for these objects. Try to work with "
+                          "hp::FECollection objects that have a more modest size."));
 
       active_fe_indices[obj_index] = fe_index;
     }
@@ -391,15 +463,21 @@ namespace internal
                                     const unsigned int dofs_per_cell) const
     {
       (void)dofs_per_cell;
-      Assert (obj_index < cell_cache_offsets.size(),
-              ExcInternalError());
-      Assert (cell_cache_offsets[obj_index]+dofs_per_cell
-              <=
-              cell_dof_indices_cache.size(),
-              ExcInternalError());
+      Assert ((obj_index < cell_cache_offsets.size())
+              &&
+              (cell_cache_offsets[obj_index]+dofs_per_cell
+               <=
+               cell_dof_indices_cache.size()),
+              ExcMessage("You are trying to access an element of the cache that stores "
+                         "the indices of all degrees of freedom that live on one cell. "
+                         "However, this element does not exist. Did you forget to call "
+                         "DoFHandler::distribute_dofs(), or did you forget to call it "
+                         "again after changing the active_fe_index of one of the cells?"));
 
       return &cell_dof_indices_cache[cell_cache_offsets[obj_index]];
     }
+
+
 
     template <class Archive>
     inline

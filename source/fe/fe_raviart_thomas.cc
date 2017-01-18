@@ -59,23 +59,16 @@ FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int deg)
   // quadrature weights, since they
   // are required for interpolation.
   initialize_support_points(deg);
-  // Now compute the inverse node
-  //matrix, generating the correct
-  //basis functions from the raw
-  //ones.
 
-  // We use an auxiliary matrix in
-  // this function. Therefore,
-  // inverse_node_matrix is still
-  // empty and shape_value_component
-  // returns the 'raw' shape values.
-  FullMatrix<double> M(n_dofs, n_dofs);
-  FETools::compute_node_matrix(M, *this);
+  // Now compute the inverse node matrix, generating the correct
+  // basis functions from the raw ones. For a discussion of what
+  // exactly happens here, see FETools::compute_node_matrix.
+  const FullMatrix<double> M = FETools::compute_node_matrix(*this);
   this->inverse_node_matrix.reinit(n_dofs, n_dofs);
   this->inverse_node_matrix.invert(M);
-  // From now on, the shape functions
-  // will be the correct ones, not
-  // the raw shape functions anymore.
+  // From now on, the shape functions provided by FiniteElement::shape_value
+  // and similar functions will be the correct ones, not
+  // the raw shape functions from the polynomial space anymore.
 
   // Reinit the vectors of
   // restriction and prolongation
@@ -276,10 +269,10 @@ FE_RaviartThomas<dim>::initialize_restriction()
       // Store shape values, since the
       // evaluation suffers if not
       // ordered by point
-      Table<2,double> cached_values(this->dofs_per_cell, q_face.size());
+      Table<2,double> cached_values_on_face(this->dofs_per_cell, q_face.size());
       for (unsigned int k=0; k<q_face.size(); ++k)
         for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
-          cached_values(i,k)
+          cached_values_on_face(i,k)
             = this->shape_value_component(i, q_face.point(k),
                                           GeometryInfo<dim>::unit_normal_direction[face]);
 
@@ -319,7 +312,7 @@ FE_RaviartThomas<dim>::initialize_restriction()
                   this->restriction[iso][child](face*this->dofs_per_face+i_face,
                                                 i_child)
                   += Utilities::fixed_power<dim-1>(.5) * q_sub.weight(k)
-                     * cached_values(i_child, k)
+                     * cached_values_on_face(i_child, k)
                      * this->shape_value_component(face*this->dofs_per_face+i_face,
                                                    q_sub.point(k),
                                                    GeometryInfo<dim>::unit_normal_direction[face]);
@@ -350,11 +343,11 @@ FE_RaviartThomas<dim>::initialize_restriction()
   // Store shape values, since the
   // evaluation suffers if not
   // ordered by point
-  Table<3,double> cached_values(this->dofs_per_cell, q_cell.size(), dim);
+  Table<3,double> cached_values_on_cell(this->dofs_per_cell, q_cell.size(), dim);
   for (unsigned int k=0; k<q_cell.size(); ++k)
     for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
       for (unsigned int d=0; d<dim; ++d)
-        cached_values(i,k,d) = this->shape_value_component(i, q_cell.point(k), d);
+        cached_values_on_cell(i,k,d) = this->shape_value_component(i, q_cell.point(k), d);
 
   for (unsigned int child=0; child<GeometryInfo<dim>::max_children_per_cell; ++child)
     {
@@ -368,7 +361,7 @@ FE_RaviartThomas<dim>::initialize_restriction()
                 this->restriction[iso][child](start_cell_dofs+i_weight*dim+d,
                                               i_child)
                 += q_sub.weight(k)
-                   * cached_values(i_child, k, d)
+                   * cached_values_on_cell(i_child, k, d)
                    * polynomials[d]->compute_value(i_weight, q_sub.point(k));
               }
     }

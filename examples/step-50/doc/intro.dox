@@ -30,7 +30,7 @@ most of what needs to be done is provided by deal.II itself. These are
 <li>The solver on the coarsest level; here, we use MGCoarseGridHouseholder.
 <li>The smoother on all other levels, which in our case will be the
     MGSmootherRelaxation class using SOR as the underlying method
-<li>And MGMatrix, a class having a special level multiplication, i.e. we
+<li>And mg::Matrix, a class having a special level multiplication, i.e. we
     basically store one matrix per grid level and allow multiplication
     with it.
 </ul>

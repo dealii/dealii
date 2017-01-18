@@ -1,0 +1,6 @@
+New: There are 6 new video lectures that explain the
+basics of Linux and the command line, how mesh refinement works, and some
+more complicated time stepping schemes.
+(@dealiiVideoLectureSeeAlso{2.9,2.91,17.25,17.5,17.75,30.25})
+<br>
+(Wolfgang Bangerth, 2016/08/19)

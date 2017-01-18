@@ -113,7 +113,17 @@ public:
    * Data type declaring the two types of vectors which are used in this
    * class.
    */
-  enum VectorType { cell_vector, dof_vector };
+  enum VectorType
+  {
+    /**
+     * The data describes one value for each cell.
+     */
+    cell_vector,
+    /**
+     * The data describes one value for each DoF.
+     */
+    dof_vector
+  };
 
   /**
    * Destructor. Only declared to make it @p virtual.

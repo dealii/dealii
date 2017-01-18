@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2015 by the deal.II authors
+// Copyright (C) 2006 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -12,6 +12,9 @@
 // the top level of the deal.II distribution.
 //
 // ---------------------------------------------------------------------
+
+#ifndef dealii__operator_templates_h
+#define dealii__operator_templates_h
 
 
 #include <deal.II/algorithms/operator.h>
@@ -28,6 +31,7 @@ namespace Algorithms
   template <typename VectorType>
   OutputOperator<VectorType>::OutputOperator()
     :
+    step (numbers::invalid_unsigned_int),
     os(0)
   {}
 
@@ -72,3 +76,5 @@ namespace Algorithms
 }
 
 DEAL_II_NAMESPACE_CLOSE
+
+#endif

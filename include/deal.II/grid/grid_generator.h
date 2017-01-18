@@ -52,11 +52,12 @@ namespace GridGenerator
    * in 2D, etc) consisting of exactly one cell. The hypercube volume is the
    * tensor product interval $[left,right]^{\text{dim}}$ in the present number
    * of dimensions, where the limits are given as arguments. They default to
-   * zero and unity, then producing the unit hypercube. If the argument @p
-   * colorize is false, all boundary indicators are set to zero ("not
-   * colorized") for 2d and 3d. If it is true, the boundary is colorized as in
-   * hyper_rectangle(). In 1d the indicators are always colorized, see
-   * hyper_rectangle().
+   * zero and unity, then producing the unit hypercube.
+   *
+   * If the argument @p colorize is false, all boundary indicators are set to
+   * zero ("not colorized") for 2d and 3d. If it is true, the boundary is
+   * colorized as in hyper_rectangle(). In 1d the indicators are always
+   * colorized, see hyper_rectangle().
    *
    * @image html hyper_cubes.png
    *
@@ -240,7 +241,7 @@ namespace GridGenerator
                               const std::vector<std::vector<double> > &step_sizes,
                               const Point<dim>                        &p_1,
                               const Point<dim>                        &p_2,
-                              const bool                              colorize);
+                              const bool                              colorize=false);
 
   /**
    * Like the previous function, but with the following twist: the @p
@@ -290,6 +291,26 @@ namespace GridGenerator
   void
   cheese (Triangulation<dim, spacedim> &tria,
           const std::vector<unsigned int> &holes);
+
+  /**
+   * A general quadrilateral in 2d or a general hexahedron in 3d. It is the
+   * responsibility of the user to provide the vertices in the right order (see
+   * the documentation of the GeometryInfo class) because the vertices are stored
+   * in the same order as they are given. It is also important to make sure that
+   * the volume of the cell is positive.
+   *
+   * If the argument @p colorize is false, all boundary indicators are set to
+   * zero ("not colorized") for 2d and 3d. If it is true, the boundary is
+   * colorized as in hyper_rectangle(). In 1d the indicators are always
+   * colorized, see hyper_rectangle().
+   *
+   * @author Bruno Turcksin
+   */
+  template <int dim>
+  void
+  general_cell(Triangulation<dim> &tria,
+               const std::vector<Point<dim> > &vertices,
+               const bool colorize = false);
 
   /**
    * A parallelogram. The first corner point is the origin. The @p dim
@@ -598,18 +619,32 @@ namespace GridGenerator
 
   /**
    * Initialize the given triangulation with a hyper-L (in 2d or 3d)
-   * consisting of exactly <tt>2^dim-1</tt> cells. It produces the hypercube
-   * with the interval [<i>left,right</i>] without the hypercube made out of
-   * the interval [<i>(left+right)/2,right</i>] for each coordinate. If the
-   * @p colorize flag is set, the @p boundary_ids of the surfaces are
-   * assigned, such that the left boundary is 0, and the others are set with
-   * growing number accordingly to the counterclockwise. Colorize option works
-   * only with 2-dimensional problem. This function will create the classical
-   * L-shape in 2d and it will look like the following in 3d:
+   * consisting of exactly <tt>2^dim-1</tt> cells. It produces the
+   * hypercube with the interval [<i>left,right</i>] without the
+   * hypercube made out of the interval [<i>(left+right)/2,right</i>]
+   * for each coordinate. Because the domain is about the simplest one
+   * with a reentrant (i.e., non-convex) corner, solutions of many
+   * partial differential equation have singularities at this
+   * corner. That is, at the corner, the gradient or a higher
+   * derivative (depending on the boundary conditions chosen) does not
+   * remain bounded. As a consequence, this domain is often used to
+   * test convergence of schemes when the solution lacks regularity.
+   *
+   * If the @p colorize flag is set, the @p boundary_ids of the
+   * surfaces are assigned, such that the left boundary is 0, and the
+   * others are set with growing number accordingly to the
+   * counterclockwise. Colorize option works only with 2-dimensional
+   * problem. This function will create the classical L-shape in 2d
+   * and it will look like the following in 3d:
    *
    * @image html hyper_l.png
    *
-   * This function is declared to exist for triangulations of all space
+   * @note The 3d domain is also often referred to as the "Fichera corner",
+   * named after Gaetano Fichera (1922-1996) who first computed an
+   * approximation of the corner singularity exponent of the lowest
+   * eigenfunction of the domain.
+   *
+   * This function exists for triangulations of all space
    * dimensions, but throws an error if called in 1d.
    *
    * @note The triangulation needs to be void upon calling this function.
@@ -631,6 +666,9 @@ namespace GridGenerator
    * that a plane cuts the lower half of a rectangle in two.  This function is
    * declared to exist for triangulations of all space dimensions, but throws
    * an error if called in 1d.
+   *
+   * If @p colorize is set to @p true, the faces forming the slit are marked
+   * with boundary id 1 and 2, respectively.
    *
    * @note The triangulation needs to be void upon calling this function.
    */
@@ -772,13 +810,17 @@ namespace GridGenerator
 
   /**
    * Produce a domain that is the space between two cylinders in 3d, with
-   * given length, inner and outer radius and a given number of elements for
-   * this initial triangulation. If @p n_radial_cells is zero (as is the
+   * given length, inner and outer radius and a given number of elements. The
+   * cylinder shell is built around the $z$-axis with the two faces located
+   * at $z = 0$ and $z = $ @p length.
+   *
+   * If @p n_radial_cells is zero (as is the
    * default), then it is computed adaptively such that the resulting elements
    * have the least aspect ratio. The same holds for @p n_axial_cells.
    *
    * @note Although this function is declared as a template, it does not make
-   * sense in 1D and 2D.
+   * sense in 1D and 2D. Also keep in mind that this object is rotated
+   * and positioned differently than the one created by cylinder().
    *
    * @note The triangulation needs to be void upon calling this function.
    */
@@ -861,7 +903,7 @@ namespace GridGenerator
    * before gluing the loop together.
    * @param R           The radius of the circle, which forms the middle line
    * of the torus containing the loop of cells. Must be greater than @p r.
-   * @param r           The radius of the cylinder bend together as loop.
+   * @param r           The radius of the cylinder bent together as a loop.
    */
   void moebius (Triangulation<3,3> &tria,
                 const unsigned int  n_cells,

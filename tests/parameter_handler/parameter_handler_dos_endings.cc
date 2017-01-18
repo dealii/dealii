@@ -45,8 +45,7 @@ void test ()
   file_contents << "end\r\n";
 
   std::istringstream input_stream(file_contents.str());
-  bool okay = foo.read_input(input_stream);
-  AssertThrow(okay, ExcMessage("read_input failed"));
+  foo.parse_input(input_stream);
 
   foo.enter_subsection("bar");
   deallog << foo.get ("val") << std::endl;

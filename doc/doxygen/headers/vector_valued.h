@@ -532,7 +532,7 @@
  *        would represent the gradient of the scalar pressure component, which
  *        is of type <code>Tensor@<1,dim@></code>, whereas the gradient of the
  *        velocities components, <code>fe_values[velocities].gradient(i,q)</code>
- *        is a <code>Tensor@<2,dim@></code>, i.e. a matrix $G_{ij}$ that consits
+ *        is a <code>Tensor@<2,dim@></code>, i.e. a matrix $G_{ij}$ that consists
  *        of entries $G_{ij}=\frac{\partial\phi_i}{\partial x_j}$. Finally,
  *        both scalar and vector views can be asked for the second derivatives
  *        ("Hessians") and vector views can be asked for the symmetric gradient,

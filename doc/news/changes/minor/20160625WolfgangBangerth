@@ -1,0 +1,6 @@
+Changed: Similar to MappingQEulerian, MappingQ1Eulerian has gained
+a second constructor that reverses the order of the arguments to indicate
+which DoFHandler a vector is based on. The old constructor is now
+deprecated and will be removed in a future version.
+<br>
+(Wolfgang Bangerth, 2016/06/25)

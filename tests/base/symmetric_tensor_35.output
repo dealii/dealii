@@ -1,0 +1,8 @@
+
+DEAL::Symmetric Tensor dim 1
+DEAL::0.50000
+DEAL::Symmetric Tensor dim 2
+DEAL::0.75000 -0.50000 -0.50000 1.0000
+DEAL::Symmetric Tensor dim 3
+DEAL::-7.2500 3.5000 8.0000 3.5000 -1.0000 -4.0000 8.0000 -4.0000 -8.0000
+DEAL::OK

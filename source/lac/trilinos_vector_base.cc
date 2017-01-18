@@ -100,7 +100,8 @@ namespace TrilinosWrappers
     last_action (Zero),
     compressed (true),
     has_ghosts  (v.has_ghosts),
-    vector(new Epetra_FEVector(*v.vector))
+    vector(new Epetra_FEVector(*v.vector)),
+    owned_elements(complete_index_set(v.size()))
   {}
 
 
@@ -139,6 +140,7 @@ namespace TrilinosWrappers
         last_action = Zero;
         vector.reset (new Epetra_FEVector(*v.vector));
         has_ghosts = v.has_ghosts;
+        owned_elements = v.owned_elements;
       }
     else
       {

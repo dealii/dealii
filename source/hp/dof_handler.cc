@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2016 by the deal.II authors
+// Copyright (C) 2003 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -607,9 +607,10 @@ namespace internal
 
               types::global_dof_index next_free_dof = 0;
               types::global_dof_index cache_size = 0;
-              for (typename HpDoFHandler<dim,spacedim>::active_cell_iterator
-                   cell=dof_handler.begin_active(level);
-                   cell!=dof_handler.end_active(level); ++cell)
+              typename HpDoFHandler<dim,spacedim>::active_cell_iterator
+              cell=dof_handler.begin_active(level),
+              endc=dof_handler.end_active(level);
+              for (; cell!=endc; ++cell)
                 if (!cell->has_children())
                   {
                     dof_handler.levels[level]->dof_offsets[cell->index()] = next_free_dof;
@@ -638,9 +639,10 @@ namespace internal
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
               types::global_dof_index counter = 0;
-              for (typename HpDoFHandler<dim,spacedim>::cell_iterator
-                   cell=dof_handler.begin_active(level);
-                   cell!=dof_handler.end_active(level); ++cell)
+              typename HpDoFHandler<dim,spacedim>::active_cell_iterator
+              cell=dof_handler.begin_active(level),
+              endc=dof_handler.end_active(level);
+              for (; cell!=endc; ++cell)
                 if (!cell->has_children())
                   counter += cell->get_fe().dofs_per_line;
 
@@ -705,7 +707,6 @@ namespace internal
             dof_handler.faces = new internal::hp::DoFIndicesOnFaces<2>;
           }
 
-
           // QUAD (CELL) DOFs
 
           // count how much space we need
@@ -735,9 +736,10 @@ namespace internal
 
               types::global_dof_index next_free_dof = 0;
               types::global_dof_index cache_size = 0;
-              for (typename HpDoFHandler<dim, spacedim>::active_cell_iterator
-                   cell=dof_handler.begin_active(level);
-                   cell!=dof_handler.end_active(level); ++cell)
+              typename HpDoFHandler<dim,spacedim>::active_cell_iterator
+              cell=dof_handler.begin_active(level),
+              endc=dof_handler.end_active(level);
+              for (; cell!=endc; ++cell)
                 if (!cell->has_children())
                   {
                     dof_handler.levels[level]->dof_offsets[cell->index()] = next_free_dof;
@@ -766,9 +768,10 @@ namespace internal
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
               types::global_dof_index counter = 0;
-              for (typename HpDoFHandler<dim,spacedim>::cell_iterator
-                   cell=dof_handler.begin_active(level);
-                   cell!=dof_handler.end_active(level); ++cell)
+              typename HpDoFHandler<dim,spacedim>::active_cell_iterator
+              cell=dof_handler.begin_active(level),
+              endc=dof_handler.end_active(level);
+              for (; cell!=endc; ++cell)
                 if (!cell->has_children())
                   counter += cell->get_fe().dofs_per_quad;
 
@@ -1081,7 +1084,6 @@ namespace internal
             dof_handler.faces = new internal::hp::DoFIndicesOnFaces<3>;
           }
 
-
           // HEX (CELL) DOFs
 
           // count how much space we need
@@ -1111,9 +1113,10 @@ namespace internal
 
               types::global_dof_index next_free_dof = 0;
               types::global_dof_index cache_size = 0;
-              for (typename HpDoFHandler<dim,spacedim>::active_cell_iterator
-                   cell=dof_handler.begin_active(level);
-                   cell!=dof_handler.end_active(level); ++cell)
+              typename HpDoFHandler<dim,spacedim>::active_cell_iterator
+              cell=dof_handler.begin_active(level),
+              endc=dof_handler.end_active(level);
+              for (; cell!=endc; ++cell)
                 if (!cell->has_children())
                   {
                     dof_handler.levels[level]->dof_offsets[cell->index()] = next_free_dof;
@@ -1142,9 +1145,10 @@ namespace internal
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
               types::global_dof_index counter = 0;
-              for (typename HpDoFHandler<dim,spacedim>::cell_iterator
-                   cell=dof_handler.begin_active(level);
-                   cell!=dof_handler.end_active(level); ++cell)
+              typename HpDoFHandler<dim,spacedim>::active_cell_iterator
+              cell=dof_handler.begin_active(level),
+              endc=dof_handler.end_active(level);
+              for (; cell!=endc; ++cell)
                 if (!cell->has_children())
                   counter += cell->get_fe().dofs_per_hex;
 
@@ -1989,43 +1993,6 @@ namespace hp
             for (unsigned int i=0; i<dofs_per_face; ++i)
               boundary_dofs.insert(dofs_on_face[i]);
           };
-    return boundary_dofs.size();
-  }
-
-
-
-  template<int dim, int spacedim>
-  template<typename number>
-  types::global_dof_index
-  DoFHandler<dim,spacedim>::n_boundary_dofs (const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_ids) const
-  {
-    Assert (finite_elements != 0, ExcNoFESelected());
-    Assert (boundary_ids.find(numbers::internal_face_boundary_id) == boundary_ids.end(),
-            ExcInvalidBoundaryIndicator());
-
-    // same as above, but with
-    // additional checks for set of
-    // boundary indicators
-    std::set<types::global_dof_index> boundary_dofs;
-    std::vector<types::global_dof_index> dofs_on_face;
-    dofs_on_face.reserve (this->get_fe ().max_dofs_per_face());
-
-    typename HpDoFHandler<dim,spacedim>::active_cell_iterator cell = this->begin_active (),
-                                                              endc = this->end();
-    for (; cell!=endc; ++cell)
-      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-        if (cell->at_boundary(f) &&
-            (boundary_ids.find(cell->face(f)->boundary_id()) !=
-             boundary_ids.end()))
-          {
-            const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
-            dofs_on_face.resize (dofs_per_face);
-
-            cell->face(f)->get_dof_indices (dofs_on_face,
-                                            cell->active_fe_index());
-            for (unsigned int i=0; i<dofs_per_face; ++i)
-              boundary_dofs.insert(dofs_on_face[i]);
-          }
     return boundary_dofs.size();
   }
 
@@ -3208,6 +3175,14 @@ namespace hp
                     tria->n_raw_cells(level),
                     ExcInternalError ());
           }
+
+        // it may be that the previous table was compressed; in that
+        // case, restore the correct active_fe_index. the fact that
+        // this no longer matches the indices in the table is of no
+        // importance because the current function is called at a
+        // point where we have to recreate the dof_indices tables in
+        // the levels anyway
+        levels[level]->normalize_active_fe_indices ();
       }
   }
 

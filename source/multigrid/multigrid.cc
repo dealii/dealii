@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,7 @@
 
 
 #include <deal.II/lac/vector.h>
+#include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/petsc_vector.h>
@@ -35,13 +36,24 @@ DEAL_II_NAMESPACE_OPEN
 
 
 MGTransferBlockBase::MGTransferBlockBase ()
+  :
+  n_mg_blocks (0)
 {}
 
 
-MGTransferBlockBase::MGTransferBlockBase (
-  const ConstraintMatrix &c, const MGConstrainedDoFs &mg_c)
+
+MGTransferBlockBase::MGTransferBlockBase (const MGConstrainedDoFs &mg_c)
   :
-  constraints(&c),
+  n_mg_blocks (0),
+  mg_constrained_dofs(&mg_c)
+{}
+
+
+
+MGTransferBlockBase::MGTransferBlockBase (const ConstraintMatrix &/*c*/,
+                                          const MGConstrainedDoFs &mg_c)
+  :
+  n_mg_blocks (0),
   mg_constrained_dofs(&mg_c)
 {}
 
@@ -188,12 +200,17 @@ MGTransferBlockBase::memory_consumption () const
 
 template<typename number>
 MGTransferSelect<number>::MGTransferSelect ()
+  :
+  selected_component (0),
+  mg_selected_component (0)
 {}
 
 
 template<typename number>
 MGTransferSelect<number>::MGTransferSelect (const ConstraintMatrix &c)
   :
+  selected_component (0),
+  mg_selected_component (0),
   constraints(&c)
 {}
 
@@ -217,6 +234,7 @@ void MGTransferSelect<number>::prolongate (
 }
 
 
+
 template <typename number>
 void MGTransferSelect<number>::restrict_and_add (
   const unsigned int   from_level,
@@ -236,25 +254,42 @@ void MGTransferSelect<number>::restrict_and_add (
 
 template <typename number>
 MGTransferBlockSelect<number>::MGTransferBlockSelect ()
+  :
+  selected_block (0)
 {}
+
 
 
 template <typename number>
-MGTransferBlockSelect<number>::MGTransferBlockSelect (
-  const ConstraintMatrix &c, const MGConstrainedDoFs &mg_c)
-  : MGTransferBlockBase(c, mg_c)
+MGTransferBlockSelect<number>::MGTransferBlockSelect (const MGConstrainedDoFs &mg_c)
+  :
+  MGTransferBlockBase(mg_c),
+  selected_block (0)
 {}
+
+
+
+template <typename number>
+MGTransferBlockSelect<number>::MGTransferBlockSelect (const ConstraintMatrix &/*c*/,
+                                                      const MGConstrainedDoFs &mg_c)
+  :
+  MGTransferBlockBase(mg_c),
+  selected_block (0)
+{}
+
+
 
 template <typename number>
 MGTransferBlockSelect<number>::~MGTransferBlockSelect ()
 {}
 
 
+
 template <typename number>
-void MGTransferBlockSelect<number>::prolongate (
-  const unsigned int   to_level,
-  Vector<number>       &dst,
-  const Vector<number> &src) const
+void
+MGTransferBlockSelect<number>::prolongate (const unsigned int   to_level,
+                                           Vector<number>       &dst,
+                                           const Vector<number> &src) const
 {
   Assert ((to_level >= 1) && (to_level<=prolongation_matrices.size()),
           ExcIndexRange (to_level, 1, prolongation_matrices.size()+1));
@@ -266,10 +301,10 @@ void MGTransferBlockSelect<number>::prolongate (
 
 
 template <typename number>
-void MGTransferBlockSelect<number>::restrict_and_add (
-  const unsigned int   from_level,
-  Vector<number>       &dst,
-  const Vector<number> &src) const
+void
+MGTransferBlockSelect<number>::restrict_and_add (const unsigned int   from_level,
+                                                 Vector<number>       &dst,
+                                                 const Vector<number> &src) const
 {
   Assert ((from_level >= 1) && (from_level<=prolongation_matrices.size()),
           ExcIndexRange (from_level, 1, prolongation_matrices.size()+1));

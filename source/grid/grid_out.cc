@@ -1472,9 +1472,9 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
   // auxiliary variables for the bounding box and the range of cell levels
   double x_min = tria.begin()->vertex(0)[0];
-  double x_max = tria.begin()->vertex(0)[0];
+  double x_max = x_min;
   double y_min = tria.begin()->vertex(0)[1];
-  double y_max = tria.begin()->vertex(0)[1];
+  double y_max = y_min;
 
   double x_dimension, y_dimension;
 
@@ -2104,14 +2104,13 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 // draw the legend
   if (svg_flags.draw_legend) out << '\n' << " <!-- legend -->" << '\n';
 
-  unsigned int line_offset = 0;
-
   additional_width = 0;
   if (!svg_flags.margin) additional_width = static_cast<unsigned int>(.5 + (height/100.) * 2.5);
 
   // explanation of the cell labeling
   if (svg_flags.draw_legend && (svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id || svg_flags.label_level_subdomain_id ))
     {
+      unsigned int line_offset = 0;
       out << " <rect x=\"" << width + additional_width << "\" y=\"" << static_cast<unsigned int>(.5 + (height/100.) * margin_in_percent)
           << "\" width=\"" << static_cast<unsigned int>(.5 + (height/100.) * (40. - margin_in_percent)) << "\" height=\"" << static_cast<unsigned int>(.5 + height * .165) << "\"/>" << '\n';
 
@@ -2659,7 +2658,7 @@ unsigned int GridOut::n_boundary_lines (const Triangulation<1,3> &) const
   return 0;
 }
 
-unsigned int GridOut::n_boundary_lines (const Triangulation<2> &) const
+unsigned int GridOut::n_boundary_lines (const Triangulation<2,2> &) const
 {
   return 0;
 }
@@ -2729,7 +2728,7 @@ unsigned int GridOut::n_boundary_lines (const Triangulation<dim, spacedim> &tria
 
 
 unsigned int
-GridOut::write_msh_faces (const Triangulation<1> &,
+GridOut::write_msh_faces (const Triangulation<1,1> &,
                           const unsigned int next_element_index,
                           std::ostream &) const
 {
@@ -2755,7 +2754,7 @@ GridOut::write_msh_faces (const Triangulation<1,3> &,
 
 
 unsigned int
-GridOut::write_msh_lines (const Triangulation<1> &,
+GridOut::write_msh_lines (const Triangulation<1,1> &,
                           const unsigned int next_element_index,
                           std::ostream &) const
 {
@@ -2899,7 +2898,7 @@ GridOut::write_msh_lines (const Triangulation<dim,spacedim> &tria,
 
 
 unsigned int
-GridOut::write_ucd_faces (const Triangulation<1> &,
+GridOut::write_ucd_faces (const Triangulation<1,1> &,
                           const unsigned int next_element_index,
                           std::ostream &) const
 {
@@ -2923,7 +2922,7 @@ GridOut::write_ucd_faces (const Triangulation<1,3> &,
 }
 
 unsigned int
-GridOut::write_ucd_lines (const Triangulation<1> &,
+GridOut::write_ucd_lines (const Triangulation<1,1> &,
                           const unsigned int next_element_index,
                           std::ostream &) const
 {

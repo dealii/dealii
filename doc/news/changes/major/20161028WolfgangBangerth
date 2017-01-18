@@ -1,0 +1,6 @@
+Improved: The code in class GridReordering has been rewritten from
+scratch. It now follows the algorithm described in the paper by
+Agelek, Anderson, Bangerth and Barth mentioned in the documentation
+of that class.
+<br>
+(Wolfgang Bangerth, 2016/10/28)

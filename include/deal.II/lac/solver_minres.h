@@ -236,12 +236,10 @@ SolverMinRes<VectorType>::solve (const MatrixType         &A,
 
   double r_l2 = 0;
   double r0   = 0;
-  double tau = 0;
+  double tau  = 0;
   double c    = 0;
-  double gamma = 0;
-  double s = 0;
-  double d_ = 0;
-  double d = 0;
+  double s    = 0;
+  double d_   = 0;
 
   // The iteration step.
   unsigned int j = 1;
@@ -283,7 +281,7 @@ SolverMinRes<VectorType>::solve (const MatrixType         &A,
       A.vmult(*u[2],v);
       u[2]->add (-std::sqrt(delta[1]/delta[0]), *u[0]);
 
-      gamma = *u[2] * v;
+      const double gamma = *u[2] * v;
       u[2]->add (-gamma / std::sqrt(delta[1]), *u[1]);
       *m[0] = v;
 
@@ -309,7 +307,7 @@ SolverMinRes<VectorType>::solve (const MatrixType         &A,
           e[1] = -c * std::sqrt(delta[2]);
         }
 
-      d = std::sqrt (d_*d_ + delta[2]);
+      const double d = std::sqrt (d_*d_ + delta[2]);
 
       if (j>1)
         tau *= s / c;

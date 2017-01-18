@@ -345,12 +345,8 @@ namespace internal
       const unsigned int n_datasets;
       const unsigned int n_subdivisions;
 
-      std::vector<double>                                patch_values;
-      std::vector<dealii::Vector<double> >               patch_values_system;
-      std::vector<Tensor<1,spacedim> >                   patch_gradients;
-      std::vector<std::vector<Tensor<1,spacedim> > >     patch_gradients_system;
-      std::vector<Tensor<2,spacedim> >                   patch_hessians;
-      std::vector<std::vector<Tensor<2,spacedim> > >     patch_hessians_system;
+      DataPostprocessorInputs::Scalar<spacedim>          patch_values_scalar;
+      DataPostprocessorInputs::Vector<spacedim>          patch_values_system;
       std::vector<std::vector<dealii::Vector<double> > > postprocessed_values;
 
       const dealii::hp::MappingCollection<dim,spacedim> mapping_collection;

@@ -103,15 +103,18 @@ namespace hp
    * hp::DoFHandler::distribute_dofs(), and then assemble a linear system and
    * solve a problem on this finite element space. However, one can skip
    * assigning active FE indices upon mesh refinement in certain
-   * circumstances. In particular, the following rules apply: - Upon mesh
-   * refinement, child cells inherit the active FE index of the parent. - On
-   * the other hand, when coarsening cells, the (now active) parent cell will
-   * not have an active FE index set and you will have to set it explicitly
-   * before calling hp::DoFHandler::distribute_dofs(). In particular, to avoid
-   * stale information to be used by accident, this class deletes the active
-   * FE index of cells that are refined after inheriting this index to the
-   * children; this implies that if the children are coarsened away, the old
-   * value is no longer available on the parent cell.
+   * circumstances. In particular, the following rules apply:
+   * - Upon mesh refinement, child cells inherit the active FE index of
+   *   the parent.
+   * - On the other hand, when coarsening cells, the (now active)
+   *   parent cell will not have an active FE index set and you will
+   *   have to set it explicitly before calling
+   *   hp::DoFHandler::distribute_dofs(). In particular, to avoid
+   *   stale information to be used by accident, this class deletes
+   *   the active FE index of cells that are refined after inheriting
+   *   this index to the children; this implies that if the children
+   *   are coarsened away, the old value is no longer available on the
+   *   parent cell.
    *
    * @ingroup dofs
    * @ingroup hp
@@ -902,6 +905,25 @@ namespace hp
 
 
   /* ----------------------- Inline functions ---------------------------------- */
+
+
+  template <int dim, int spacedim>
+  template <typename number>
+  types::global_dof_index
+  DoFHandler<dim,spacedim>::n_boundary_dofs (const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_ids) const
+  {
+    // extract the set of boundary ids and forget about the function object pointers
+    std::set<types::boundary_id> boundary_ids_only;
+    for (typename std::map<types::boundary_id, const Function<spacedim,number>*>::const_iterator
+         p = boundary_ids.begin();
+         p != boundary_ids.end(); ++p)
+      boundary_ids_only.insert (p->first);
+
+    // then just hand everything over to the other function that does the work
+    return n_boundary_dofs(boundary_ids_only);
+  }
+
+
 
   template <int dim, int spacedim>
   template <class Archive>

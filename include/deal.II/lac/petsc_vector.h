@@ -249,7 +249,7 @@ namespace PETScWrappers
     if (size() != v.size())
       reinit (v.size(), true);
 
-    const int ierr = VecCopy (v.vector, vector);
+    const PetscErrorCode ierr = VecCopy (v.vector, vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return *this;
@@ -261,7 +261,7 @@ namespace PETScWrappers
   Vector &
   Vector::operator = (const MPI::Vector &v)
   {
-    int ierr;
+    PetscErrorCode ierr;
     if (attained_ownership)
       {
         // the petsc function we call wants to

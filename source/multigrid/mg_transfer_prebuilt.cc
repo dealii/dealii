@@ -48,9 +48,15 @@ MGTransferPrebuilt<VectorType>::MGTransferPrebuilt ()
 
 
 template<typename VectorType>
-MGTransferPrebuilt<VectorType>::MGTransferPrebuilt (const ConstraintMatrix &c, const MGConstrainedDoFs &mg_c)
-  :
-  constraints(&c)
+MGTransferPrebuilt<VectorType>::MGTransferPrebuilt (const MGConstrainedDoFs &mg_c)
+{
+  this->mg_constrained_dofs = &mg_c;
+}
+
+
+
+template<typename VectorType>
+MGTransferPrebuilt<VectorType>::MGTransferPrebuilt (const ConstraintMatrix &/*c*/, const MGConstrainedDoFs &mg_c)
 {
   this->mg_constrained_dofs = &mg_c;
 }
@@ -65,10 +71,18 @@ MGTransferPrebuilt<VectorType>::~MGTransferPrebuilt ()
 
 template <typename VectorType>
 void MGTransferPrebuilt<VectorType>::initialize_constraints
-(const ConstraintMatrix &c, const MGConstrainedDoFs &mg_c)
+(const MGConstrainedDoFs &mg_c)
 {
-  constraints = &c;
   this->mg_constrained_dofs = &mg_c;
+}
+
+
+
+template <typename VectorType>
+void MGTransferPrebuilt<VectorType>::initialize_constraints
+(const ConstraintMatrix &/*c*/, const MGConstrainedDoFs &mg_c)
+{
+  initialize_constraints(mg_c);
 }
 
 
@@ -80,7 +94,6 @@ void MGTransferPrebuilt<VectorType>::clear ()
   prolongation_matrices.resize(0);
   prolongation_sparsities.resize(0);
   interface_dofs.resize(0);
-  constraints = 0;
 }
 
 

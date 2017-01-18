@@ -1049,12 +1049,12 @@ namespace Functions
         break;
       case 2:
         result[0] = std::exp(p(0)) * std::exp(p(1));
-        result[1] = std::exp(p(0)) * std::exp(p(1));
+        result[1] = result[0];
         break;
       case 3:
         result[0] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
-        result[1] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
-        result[2] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+        result[1] = result[0];
+        result[2] = result[0];
         break;
       default:
         Assert(false, ExcNotImplemented());
@@ -1081,12 +1081,12 @@ namespace Functions
             break;
           case 2:
             gradients[i][0] = std::exp(p(0)) * std::exp(p(1));
-            gradients[i][1] = std::exp(p(0)) * std::exp(p(1));
+            gradients[i][1] = gradients[i][0];
             break;
           case 3:
             gradients[i][0] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
-            gradients[i][1] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
-            gradients[i][2] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+            gradients[i][1] = gradients[i][0];
+            gradients[i][2] = gradients[i][0];
             break;
           default:
             Assert(false, ExcNotImplemented());
@@ -2616,11 +2616,10 @@ namespace Functions
     (void)component;
     Assert (component==0, ExcIndexRange(component,0,1));
 
-    double prod;
     double sum = 0;
     for (unsigned int monom = 0; monom < exponents.n_rows(); ++monom)
       {
-        prod = 1;
+        double prod = 1;
         for (unsigned int s=0; s< dim; ++s)
           {
             if (p[s] < 0)

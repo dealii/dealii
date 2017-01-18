@@ -37,15 +37,6 @@
 
 MACRO(DEAL_II_INVOKE_AUTOPILOT)
 
-  # Set CMAKE_BUILD_TYPE=Debug if both 
-  # Debug and Release mode are given
-  IF("${CMAKE_BUILD_TYPE}" STREQUAL "DebugRelease")
-    SET(CMAKE_BUILD_TYPE "Debug" CACHE STRING
-      "Choose the type of build, options are: Debug, Release"
-      FORCE)
-  ENDIF()
-
-
   # Generator specific values:
   IF(CMAKE_GENERATOR MATCHES "Ninja")
     SET(_make_command "$ ninja")

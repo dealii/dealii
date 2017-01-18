@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2015 by the deal.II authors
+// Copyright (C) 2010 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,7 +37,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
             const ComponentMask &,
             const Function<deal_II_space_dimension>     *,
             const unsigned int       ,
-            const unsigned int       ,
+            const types::subdomain_id,
             const types::material_id,
             const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);
 
@@ -53,7 +53,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
         const ComponentMask &,
         const Function<deal_II_space_dimension>     *,
         const unsigned int       ,
-        const unsigned int       ,
+        const types::subdomain_id,
         const types::material_id,
         const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);
 
@@ -69,7 +69,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
             const ComponentMask &,
             const Function<deal_II_space_dimension>     *,
             const unsigned int       ,
-            const unsigned int       ,
+            const types::subdomain_id,
             const types::material_id,
             const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);
 
@@ -85,7 +85,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
         const ComponentMask &,
         const Function<deal_II_space_dimension>     *,
         const unsigned int       ,
-        const unsigned int       ,
+        const types::subdomain_id,
         const types::material_id,
         const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);
 
@@ -101,7 +101,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
             const ComponentMask &,
             const Function<deal_II_space_dimension>     *,
             const unsigned int       ,
-            const unsigned int       ,
+            const types::subdomain_id,
             const types::material_id,
             const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);
 
@@ -117,7 +117,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
         const ComponentMask &,
         const Function<deal_II_space_dimension>     *,
         const unsigned int       ,
-        const unsigned int       ,
+        const types::subdomain_id,
         const types::material_id,
         const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);
 
@@ -133,7 +133,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
             const ComponentMask &,
             const Function<deal_II_space_dimension>     *,
             const unsigned int       ,
-            const unsigned int       ,
+            const types::subdomain_id,
             const types::material_id,
             const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);
 
@@ -149,7 +149,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
         const ComponentMask &,
         const Function<deal_II_space_dimension>     *,
         const unsigned int       ,
-        const unsigned int       ,
+        const types::subdomain_id,
         const types::material_id,
         const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);
 

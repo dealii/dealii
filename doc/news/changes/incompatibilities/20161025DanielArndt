@@ -1,0 +1,5 @@
+Changed: VectorTools::create_right_hand_side and
+VectorTools::create_boundary_right_hand_side now take an additional template
+parameter VectorType.
+<br>
+(Daniel Arndt, 2016/10/25)

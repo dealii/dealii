@@ -112,4 +112,5 @@
  * - The LinearOperator class and all associated functions such as
  *   linear_operator(), null_operator(), and everything else that is part of
  *   the LAOperators documentation module.
+ * - The FE_Enriched class.
  */

@@ -18,6 +18,7 @@
 
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/signaling_nan.h>
 #include <deal.II/base/std_cxx11/function.h>
 
 #include <vector>
@@ -47,15 +48,16 @@ namespace TimeStepping
    * - Embedded explicit methods (see EmbeddedExplicitRungeKutta::initialize):
    *   - HEUN_EULER (second order)
    *   - BOGACKI_SHAMPINE (third order)
-   *   - DOPRI: Dormand-Prince (fifth order, method used by ode45 in
-   * MATLAB)
+   *   - DOPRI: Dormand-Prince (fifth order; this is the method used by ode45
+   *     in MATLAB)
    *   - FEHLBERG (fifth order)
    *   - CASH_KARP (firth order)
    */
   enum runge_kutta_method { FORWARD_EULER, RK_THIRD_ORDER, RK_CLASSIC_FOURTH_ORDER,
                             BACKWARD_EULER, IMPLICIT_MIDPOINT, CRANK_NICOLSON,
                             SDIRK_TWO_STAGES, HEUN_EULER, BOGACKI_SHAMPINE, DOPRI,
-                            FEHLBERG, CASH_KARP
+                            FEHLBERG, CASH_KARP,
+                            invalid
                           };
 
 
@@ -132,6 +134,7 @@ namespace TimeStepping
      * Purely virtual method used to initialize the Runge-Kutta method.
      */
     virtual void initialize(runge_kutta_method method) = 0;
+
     /**
      * This function is used to advance from time @p t to t+ @p delta_t. @p F
      * is a vector of functions $ f(t,y) $ that should be integrated, the
@@ -203,8 +206,9 @@ namespace TimeStepping
     using RungeKutta<VectorType>::evolve_one_time_step;
 
     /**
-     * Default constructor. initialize(runge_kutta_method) needs to be called
-     * before the object can be used.
+     * Default constructor. This constructor creates an object for which
+     * you will want to call <code>initialize(runge_kutta_method)</code>
+     * before it can be used.
      */
     ExplicitRungeKutta() {}
 
@@ -254,6 +258,11 @@ namespace TimeStepping
      */
     struct Status : public TimeStepping<VectorType>::Status
     {
+      Status ()
+        :
+        method (invalid)
+      {}
+
       runge_kutta_method method;
     };
 
@@ -303,12 +312,14 @@ namespace TimeStepping
      * initialize the maximum number of iterations and the tolerance of the
      * Newton solver.
      */
-    ImplicitRungeKutta(runge_kutta_method method, unsigned int max_it=100, double tolerance=1e-6);
+    ImplicitRungeKutta(const runge_kutta_method method,
+                       const unsigned int       max_it    = 100,
+                       const double             tolerance = 1e-6);
 
     /**
      * Initialize the implicit Runge-Kutta method.
      */
-    void initialize(runge_kutta_method method);
+    void initialize(const runge_kutta_method method);
 
     /**
      * This function is used to advance from time @p t to t+ @p delta_t. @p f
@@ -332,7 +343,8 @@ namespace TimeStepping
      * Set the maximum number of iterations and the tolerance used by the
      * Newton solver.
      */
-    void set_newton_solver_parameters(unsigned int max_it, double tolerance);
+    void set_newton_solver_parameters(const unsigned int max_it,
+                                      const double       tolerance);
 
     /**
      * Structure that stores the name of the method, the number of Newton
@@ -340,6 +352,13 @@ namespace TimeStepping
      */
     struct Status : public TimeStepping<VectorType>::Status
     {
+      Status ()
+        :
+        method (invalid),
+        n_iterations (numbers::invalid_unsigned_int),
+        norm_residual (numbers::signaling_nan<double>())
+      {}
+
       runge_kutta_method method;
       unsigned int       n_iterations;
       double             norm_residual;
@@ -426,13 +445,13 @@ namespace TimeStepping
      * Constructor. This function calls initialize(runge_kutta_method) and
      * initialize the parameters needed for time adaptation.
      */
-    EmbeddedExplicitRungeKutta(runge_kutta_method method,
-                               double coarsen_param = 1.2,
-                               double refine_param = 0.8,
-                               double min_delta = 1e-14,
-                               double max_delta = 1e100,
-                               double refine_tol = 1e-8,
-                               double coarsen_tol = 1e-12);
+    EmbeddedExplicitRungeKutta(const runge_kutta_method method,
+                               const double coarsen_param = 1.2,
+                               const double refine_param = 0.8,
+                               const double min_delta = 1e-14,
+                               const double max_delta = 1e100,
+                               const double refine_tol = 1e-8,
+                               const double coarsen_tol = 1e-12);
 
     /**
      * Destructor.
@@ -486,12 +505,12 @@ namespace TimeStepping
     /**
      * Set the parameters necessary for the time adaptation.
      */
-    void set_time_adaptation_parameters(double coarsen_param,
-                                        double refine_param,
-                                        double min_delta,
-                                        double max_delta,
-                                        double refine_tol,
-                                        double coarsen_tol);
+    void set_time_adaptation_parameters(const double coarsen_param,
+                                        const double refine_param,
+                                        const double min_delta,
+                                        const double max_delta,
+                                        const double refine_tol,
+                                        const double coarsen_tol);
 
     /**
      * Structure that stores the name of the method, the reason to exit

@@ -133,11 +133,6 @@ public:
   Tensor ();
 
   /**
-   * Copy constructor.
-   */
-  Tensor (const Tensor<0,dim,Number> &initializer);
-
-  /**
    * Constructor from tensors with different underlying scalar type. This
    * obviously requires that the @p OtherNumber type is convertible to @p
    * Number.
@@ -167,11 +162,6 @@ public:
    * This is the const conversion operator that returns a read-only reference.
    */
   operator const Number &() const;
-
-  /**
-   * Copy assignment operator.
-   */
-  Tensor<0,dim,Number> &operator = (const Tensor<0,dim,Number> &rhs);
 
   /**
    * Assignment from tensors with different underlying scalar type. This
@@ -372,11 +362,6 @@ public:
   Tensor ();
 
   /**
-   * Copy constructor.
-   */
-  Tensor (const Tensor<rank_,dim,Number> &initializer);
-
-  /**
    * Constructor, where the data is copied from a C-style array.
    */
   Tensor (const array_type &initializer);
@@ -420,11 +405,6 @@ public:
    * Read and write access using TableIndices <tt>indices</tt>
    */
   Number &operator [] (const TableIndices<rank_> &indices);
-
-  /**
-   * Copy assignment operator.
-   */
-  Tensor &operator = (const Tensor<rank_,dim,Number> &rhs);
 
   /**
    * Assignment operator from tensors with different underlying scalar type.
@@ -596,14 +576,6 @@ Tensor<0,dim,Number>::Tensor ()
 
 
 template <int dim, typename Number>
-inline
-Tensor<0,dim,Number>::Tensor (const Tensor<0,dim,Number> &p)
-{
-  value = p.value;
-}
-
-
-template <int dim, typename Number>
 template <typename OtherNumber>
 inline
 Tensor<0,dim,Number>::Tensor (const OtherNumber initializer)
@@ -636,15 +608,6 @@ Tensor<0,dim,Number>::operator const Number &() const
 {
   Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
   return value;
-}
-
-
-template <int dim, typename Number>
-inline
-Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const Tensor<0,dim,Number> &p)
-{
-  value = p.value;
-  return *this;
 }
 
 
@@ -788,15 +751,6 @@ Tensor<rank_,dim,Number>::Tensor ()
 
 template <int rank_, int dim, typename Number>
 inline
-Tensor<rank_,dim,Number>::Tensor (const Tensor<rank_,dim,Number> &initializer)
-{
-  if (dim > 0)
-    std::copy (&initializer[0], &initializer[0]+dim, &values[0]);
-}
-
-
-template <int rank_, int dim, typename Number>
-inline
 Tensor<rank_,dim,Number>::Tensor (const array_type &initializer)
 {
   for (unsigned int i=0; i<dim; ++i)
@@ -903,17 +857,6 @@ Tensor<rank_,dim,Number>::operator[] (const TableIndices<rank_> &indices)
   Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
 
   return TensorAccessors::extract<rank_>(*this, indices);
-}
-
-
-template <int rank_, int dim, typename Number>
-inline
-Tensor<rank_,dim,Number> &
-Tensor<rank_,dim,Number>::operator = (const Tensor<rank_,dim,Number> &t)
-{
-  if (dim > 0)
-    std::copy (&t.values[0], &t.values[0]+dim, &values[0]);
-  return *this;
 }
 
 
@@ -1445,10 +1388,10 @@ operator- (const Tensor<rank,dim,Number> &p, const Tensor<rank,dim,OtherNumber> 
  * index of a tensor @p src1 of rank @p rank_1 with the first index of a
  * tensor @p src2 of rank @p rank_2:
  * @f[
- *   \text{result}_{i_1,..,i_{r1},j_1,..,j_{r2}}
+ *   \text{result}_{i_1,\ldots,i_{r1},j_1,\ldots,j_{r2}}
  *   = \sum_{k}
- *     \text{left}_{i_1,..,i_{r1}, k}
- *     \text{right}_{k, j_1,..,j_{r2}}
+ *     \text{left}_{i_1,\ldots,i_{r1}, k}
+ *     \text{right}_{k, j_1,\ldots,j_{r2}}
  * @f]
  *
  * @note For the Tensor class, the multiplication operator only performs a
@@ -1485,10 +1428,10 @@ operator * (const Tensor<rank_1, dim, Number> &src1,
  * contraction of index @p index_1 of a tensor @p src1 of rank @p rank_1 with
  * the index @p index_2 of a tensor @p src2 of rank @p rank_2:
  * @f[
- *   \text{result}_{i_1,..,i_{r1},j_1,..,j_{r2}}
+ *   \text{result}_{i_1,\ldots,i_{r1},j_1,\ldots,j_{r2}}
  *   = \sum_{k}
- *     \text{left}_{i_1,..,k,..,i_{r1}}
- *     \text{right}_{j_1,..,k,..,j_{r2}}
+ *     \text{left}_{i_1,\ldots,k,\ldots,i_{r1}}
+ *     \text{right}_{j_1,\ldots,k,\ldots,j_{r2}}
  * @f]
  *
  * If for example the first index (<code>index_1==0</code>) of a tensor
@@ -1546,10 +1489,10 @@ contract (const Tensor<rank_1, dim, Number> &src1,
  * index_3 with index @p index_4 of a tensor @p src1 of rank @p rank_1 and a
  * tensor @p src2 of rank @p rank_2:
  * @f[
- *   \text{result}_{i_1,..,i_{r1},j_1,..,j_{r2}}
+ *   \text{result}_{i_1,\ldots,i_{r1},j_1,\ldots,j_{r2}}
  *   = \sum_{k, l}
- *     \text{left}_{i_1,..,k,..,l,..,i_{r1}}
- *     \text{right}_{j_1,..,k,..,l..,j_{r2}}
+ *     \text{left}_{i_1,\ldots,k,\ldots,l,\ldots,i_{r1}}
+ *     \text{right}_{j_1,\ldots,k,\ldots,l\ldots,j_{r2}}
  * @f]
  *
  * If for example the first index (<code>index_1==0</code>) shall be
@@ -1626,9 +1569,9 @@ double_contract (const Tensor<rank_1, dim, Number> &src1,
  * of equal rank: Return a scalar number that is the result of a full
  * contraction of a tensor @p left and @p right:
  * @f[
- *   \sum_{i_1,..,i_r}
- *   \text{left}_{i_1,..,i_r}
- *   \text{right}_{i_1,..,i_r}
+ *   \sum_{i_1,\ldots,i_r}
+ *   \text{left}_{i_1,\ldots,i_r}
+ *   \text{right}_{i_1,\ldots,i_r}
  * @f]
  *
  * @relates Tensor
@@ -1652,21 +1595,27 @@ scalar_product (const Tensor<rank, dim, Number> &left,
  * tensor @p middle of rank $(\text{rank}_1+\text{rank}_2)$ and a tensor @p
  * right of rank @p rank_2:
  * @f[
- *   \sum_{i_1,..,i_{r1},j_1,..,j_{r2}}
- *   \text{left}_{i_1,..,i_{r1}}
- *   \text{middle}_{i_1,..,i_{r1},j_1,..,j_{r2}}
- *   \text{right}_{j_1,..,j_{r2}}
+ *   \sum_{i_1,\ldots,i_{r1},j_1,\ldots,j_{r2}}
+ *   \text{left}_{i_1,\ldots,i_{r1}}
+ *   \text{middle}_{i_1,\ldots,i_{r1},j_1,\ldots,j_{r2}}
+ *   \text{right}_{j_1,\ldots,j_{r2}}
  * @f]
  *
+ * @note Each of the three input tensors can be either a Tensor or
+ * SymmetricTensor.
+ *
  * @relates Tensor
- * @author Matthias Maier, 2015
+ * @author Matthias Maier, 2015, Jean-Paul Pelteret 2017
  */
-template <int rank_1, int rank_2, int dim,
+template <template<int, int, typename> class TensorT1,
+          template<int, int, typename> class TensorT2,
+          template<int, int, typename> class TensorT3,
+          int rank_1, int rank_2, int dim,
           typename T1, typename T2, typename T3>
 typename ProductType<T1, typename ProductType<T2, T3>::type>::type
-contract3 (const Tensor<rank_1, dim, T1> &left,
-           const Tensor<rank_1 + rank_2, dim, T2> &middle,
-           const Tensor<rank_2, dim, T3> &right)
+contract3 (const TensorT1<rank_1, dim, T1>          &left,
+           const TensorT2<rank_1 + rank_2, dim, T2> &middle,
+           const TensorT3<rank_2, dim, T3>          &right)
 {
   typedef typename ProductType<T1, typename ProductType<T2, T3>::type>::type
   return_type;
@@ -1679,8 +1628,8 @@ contract3 (const Tensor<rank_1, dim, T1> &left,
  * The outer product of two tensors of @p rank_1 and @p rank_2: Returns a
  * tensor of rank $(\text{rank}_1 + \text{rank}_2)$:
  * @f[
- *   \text{result}_{i_1,..,i_{r1},j_1,..,j_{r2}}
- *   = \text{left}_{i_1,..,i_{r1}}\,\text{right}_{j_1,..,j_{r2}.}
+ *   \text{result}_{i_1,\ldots,i_{r1},j_1,\ldots,j_{r2}}
+ *   = \text{left}_{i_1,\ldots,i_{r1}}\,\text{right}_{j_1,\ldots,j_{r2}.}
  * @f]
  *
  * @relates Tensor
@@ -1842,57 +1791,81 @@ Tensor<2,dim,Number>
 invert (const Tensor<2,dim,Number> &t)
 {
   Number return_tensor [dim][dim];
-  switch (dim)
-    {
-    case 1:
-      return_tensor[0][0] = 1.0/t[0][0];
-      break;
 
-    case 2:
-      // this is Maple output,
-      // thus a bit unstructured
-    {
-      const Number det = t[0][0]*t[1][1]-t[1][0]*t[0][1];
-      const Number t4 = 1.0/det;
-      return_tensor[0][0] = t[1][1]*t4;
-      return_tensor[0][1] = -t[0][1]*t4;
-      return_tensor[1][0] = -t[1][0]*t4;
-      return_tensor[1][1] = t[0][0]*t4;
-      break;
-    }
+  // if desired, take over the
+  // inversion of a 4x4 tensor
+  // from the FullMatrix
+  AssertThrow (false, ExcNotImplemented());
 
-    case 3:
-    {
-      const Number t4 = t[0][0]*t[1][1],
-                   t6 = t[0][0]*t[1][2],
-                   t8 = t[0][1]*t[1][0],
-                   t00 = t[0][2]*t[1][0],
-                   t01 = t[0][1]*t[2][0],
-                   t04 = t[0][2]*t[2][0],
-                   det = (t4*t[2][2]-t6*t[2][1]-t8*t[2][2]+
-                          t00*t[2][1]+t01*t[1][2]-t04*t[1][1]),
-                         t07 = 1.0/det;
-      return_tensor[0][0] = (t[1][1]*t[2][2]-t[1][2]*t[2][1])*t07;
-      return_tensor[0][1] = (t[0][2]*t[2][1]-t[0][1]*t[2][2])*t07;
-      return_tensor[0][2] = (t[0][1]*t[1][2]-t[0][2]*t[1][1])*t07;
-      return_tensor[1][0] = (t[1][2]*t[2][0]-t[1][0]*t[2][2])*t07;
-      return_tensor[1][1] = (t[0][0]*t[2][2]-t04)*t07;
-      return_tensor[1][2] = (t00-t6)*t07;
-      return_tensor[2][0] = (t[1][0]*t[2][1]-t[1][1]*t[2][0])*t07;
-      return_tensor[2][1] = (t01-t[0][0]*t[2][1])*t07;
-      return_tensor[2][2] = (t4-t8)*t07;
-
-      break;
-    }
-
-    // if desired, take over the
-    // inversion of a 4x4 tensor
-    // from the FullMatrix
-    default:
-      AssertThrow (false, ExcNotImplemented());
-    }
   return Tensor<2,dim,Number>(return_tensor);
 }
+
+
+#ifndef DOXYGEN
+
+template <typename Number>
+inline
+Tensor<2,1,Number>
+invert (const Tensor<2,1,Number> &t)
+{
+  Number return_tensor [1][1];
+
+  return_tensor[0][0] = 1.0/t[0][0];
+
+  return Tensor<2,1,Number>(return_tensor);
+}
+
+
+template <typename Number>
+inline
+Tensor<2,2,Number>
+invert (const Tensor<2,2,Number> &t)
+{
+  Tensor<2,2,Number> return_tensor;
+
+  // this is Maple output,
+  // thus a bit unstructured
+  const Number inv_det_t = 1.0/(t[0][0]*t[1][1]-t[1][0]*t[0][1]);
+  return_tensor[0][0] = t[1][1];
+  return_tensor[0][1] = -t[0][1];
+  return_tensor[1][0] = -t[1][0];
+  return_tensor[1][1] = t[0][0];
+  return_tensor *= inv_det_t;
+
+  return return_tensor;
+}
+
+
+template <typename Number>
+inline
+Tensor<2,3,Number>
+invert (const Tensor<2,3,Number> &t)
+{
+  Tensor<2,3,Number> return_tensor;
+
+  const Number t4 = t[0][0]*t[1][1],
+               t6 = t[0][0]*t[1][2],
+               t8 = t[0][1]*t[1][0],
+               t00 = t[0][2]*t[1][0],
+               t01 = t[0][1]*t[2][0],
+               t04 = t[0][2]*t[2][0],
+               inv_det_t = 1.0/(t4*t[2][2]-t6*t[2][1]-t8*t[2][2]+
+                                t00*t[2][1]+t01*t[1][2]-t04*t[1][1]);
+  return_tensor[0][0] = t[1][1]*t[2][2]-t[1][2]*t[2][1];
+  return_tensor[0][1] = t[0][2]*t[2][1]-t[0][1]*t[2][2];
+  return_tensor[0][2] = t[0][1]*t[1][2]-t[0][2]*t[1][1];
+  return_tensor[1][0] = t[1][2]*t[2][0]-t[1][0]*t[2][2];
+  return_tensor[1][1] = t[0][0]*t[2][2]-t04;
+  return_tensor[1][2] = t00-t6;
+  return_tensor[2][0] = t[1][0]*t[2][1]-t[1][1]*t[2][0];
+  return_tensor[2][1] = t01-t[0][0]*t[2][1];
+  return_tensor[2][2] = t4-t8;
+  return_tensor *= inv_det_t;
+
+  return return_tensor;
+}
+
+#endif /* DOXYGEN */
 
 
 /**
@@ -1917,6 +1890,51 @@ transpose (const Tensor<2,dim,Number> &t)
         };
     }
   return tt;
+}
+
+
+/**
+ * Return the adjugate of the given tensor of rank 2.
+ * The adjugate of a tensor $\left(\bullet\right)$ is defined as
+ * @f[
+ *  \textrm{adj}\left(\bullet\right)
+ *   := \textrm{det}\left(\bullet\right) \; \left(\bullet\right)^{-1} \; .
+ * @f]
+ *
+ * @note This requires that the tensor is invertible.
+ *
+ * @relates Tensor
+ * @author Jean-Paul Pelteret, 2016
+ */
+template <int dim, typename Number>
+inline
+Tensor<2,dim,Number>
+adjugate (const Tensor<2,dim,Number> &t)
+{
+  return determinant(t)*invert(t);
+}
+
+
+/**
+ * Return the cofactor of the given tensor of rank 2.
+ * The cofactor of a tensor $\left(\bullet\right)$ is defined as
+ * @f[
+ *  \textrm{cof}\left(\bullet\right)
+ *   := \textrm{det}\left(\bullet\right) \; \left(\bullet\right)^{-T}
+ *    = \left[ \textrm{adj}\left(\bullet\right) \right]^{T} \; .
+ * @f]
+ *
+ * @note This requires that the tensor is invertible.
+ *
+ * @relates Tensor
+ * @author Jean-Paul Pelteret, 2016
+ */
+template <int dim, typename Number>
+inline
+Tensor<2,dim,Number>
+cofactor (const Tensor<2,dim,Number> &t)
+{
+  return transpose(adjugate(t));
 }
 
 
@@ -1981,4 +1999,3 @@ DEAL_II_NAMESPACE_CLOSE
 #include <deal.II/base/tensor_deprecated.h>
 
 #endif
-

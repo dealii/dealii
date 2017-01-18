@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2015 by the deal.II authors
+// Copyright (C) 2005 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -2124,6 +2124,11 @@ int main ()
       deallog.threshold_double(1.e-10);
 
       const unsigned int dim = 2;
+
+      Data::SetUp<Data::Exercise_2_3<dim>,dim> setup;
+      const Point<dim> evaluation_point (0.75, 0.75);
+      DualFunctional::PointValueEvaluation<dim> eval(evaluation_point);
+
       Framework<dim>::ProblemDescription descriptor;
 
       descriptor.refinement_criterion
@@ -2132,11 +2137,8 @@ int main ()
       descriptor.primal_fe_degree = 1;
       descriptor.dual_fe_degree   = 2;
 
-      descriptor.data = new Data::SetUp<Data::Exercise_2_3<dim>,dim> ();
-
-      const Point<dim> evaluation_point (0.75, 0.75);
-      descriptor.dual_functional
-        = new DualFunctional::PointValueEvaluation<dim> (evaluation_point);
+      descriptor.data = &setup;
+      descriptor.dual_functional = &eval;
 
       Evaluation::PointValueEvaluation<dim>
       postprocessor1 (evaluation_point);

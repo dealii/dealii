@@ -1,0 +1,29 @@
+
+DEAL::FE_ABF<2>(0) supported by MatrixFree: false
+DEAL::FE_BDM<2>(1) supported by MatrixFree: false
+DEAL::FE_Bernstein<2>(1) supported by MatrixFree: true
+DEAL::FE_DGBDM<2>(1) supported by MatrixFree: false
+DEAL::FE_DGNedelec<2>(1) supported by MatrixFree: false
+DEAL::FE_DGP<1,2>(1) supported by MatrixFree: false
+DEAL::FE_DGP<2>(1) supported by MatrixFree: true
+DEAL::FE_DGPMonomial<2>(1) supported by MatrixFree: false
+DEAL::FE_DGPNonparametric<2>(1) supported by MatrixFree: false
+DEAL::FE_DGRaviartThomas<2>(1) supported by MatrixFree: false
+DEAL::FE_DGQ<1,2>(1) supported by MatrixFree: false
+DEAL::FE_DGQ<2>(1) supported by MatrixFree: true
+DEAL::FE_DGQArbitraryNodes<2>(QGauss(2)) supported by MatrixFree: true
+DEAL::FE_FaceP<2>(1) supported by MatrixFree: false
+DEAL::FE_FaceQ<2>(1) supported by MatrixFree: false
+DEAL::FE_P1NC supported by MatrixFree: false
+DEAL::FE_Nedelec<2>(1) supported by MatrixFree: false
+DEAL::FE_Nothing<2>() supported by MatrixFree: false
+DEAL::FE_Q<1,2>(1) supported by MatrixFree: false
+DEAL::FE_Q<2>(1) supported by MatrixFree: true
+DEAL::FE_Q_Bubbles<2>(1) supported by MatrixFree: false
+DEAL::FE_Q_DG0<2>(1) supported by MatrixFree: true
+DEAL::FE_Q_Hierarchical<2>(1) supported by MatrixFree: true
+DEAL::FE_Q_iso_Q1<2>(1) supported by MatrixFree: true
+DEAL::FE_RannacherTurek<2>(0, 2) supported by MatrixFree: false
+DEAL::FE_RaviartThomas<2>(1) supported by MatrixFree: false
+DEAL::FE_RaviartThomasNodal<2>(1) supported by MatrixFree: false
+DEAL::FE_TraceQ<2>(1) supported by MatrixFree: false

@@ -196,7 +196,7 @@ namespace internal
                            4*new_size-children.size(),
                            -1);
 
-          // for the following two fields, we know exactly how many elements
+          // for the following fields, we know exactly how many elements
           // we need, so first reserve then resize (resize itself, at least
           // with some compiler libraries, appears to round up the size it
           // actually reserves)

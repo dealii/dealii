@@ -1,0 +1,25 @@
+
+DEAL:2d::Testing FE_Q<2>(1)
+DEAL:2d::Number of degrees of freedom: 507
+DEAL:2d::Testing FE_Q<2>(1)
+DEAL:2d::Number of degrees of freedom: 881
+DEAL:2d::Testing FE_Q<2>(1)
+DEAL:2d::Number of degrees of freedom: 2147
+DEAL:2d::Testing FE_Q<2>(1)
+DEAL:2d::Number of degrees of freedom: 6517
+DEAL:2d::Testing FE_Q<2>(3)
+DEAL:2d::Number of degrees of freedom: 4259
+DEAL:2d::Testing FE_Q<2>(3)
+DEAL:2d::Number of degrees of freedom: 7457
+DEAL:2d::Testing FE_Q<2>(3)
+DEAL:2d::Number of degrees of freedom: 18535
+DEAL:3d::Testing FE_Q<3>(1)
+DEAL:3d::Number of degrees of freedom: 1103
+DEAL:3d::Testing FE_Q<3>(1)
+DEAL:3d::Number of degrees of freedom: 3694
+DEAL:3d::Testing FE_Q<3>(1)
+DEAL:3d::Number of degrees of freedom: 9566
+DEAL:3d::Testing FE_Q<3>(2)
+DEAL:3d::Number of degrees of freedom: 7494
+DEAL:3d::Testing FE_Q<3>(2)
+DEAL:3d::Number of degrees of freedom: 26548

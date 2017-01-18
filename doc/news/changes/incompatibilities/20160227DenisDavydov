@@ -1,0 +1,4 @@
+Changed: Many functions in VectorTools and MatrixTools now require
+matching data types between vectors, matrices, and Function arguments.
+<br>
+(Denis Davydov, 2016/02/27)

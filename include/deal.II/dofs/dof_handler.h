@@ -68,8 +68,12 @@ namespace internal
 
 
 /**
- * Manage the distribution and numbering of the degrees of freedom for non-
- * multigrid algorithms. This class satisfies the
+ * Given a triangulation and a description of a finite element, this
+ * class enumerates degrees of freedom on all vertices, edges, faces,
+ * and cells of the triangulation. As a result, it also provides a
+ * <i>basis</i> for a discrete space $V_h$ whose elements are finite
+ * element functions defined on each cell by a FiniteElement object.
+ * This class satisfies the
  * @ref ConceptMeshType "MeshType concept"
  * requirements.
  *
@@ -1089,6 +1093,13 @@ private:
 
   friend struct dealii::internal::DoFHandler::Implementation;
   friend struct dealii::internal::DoFHandler::Policy::Implementation;
+
+  // explicitly check for sensible template arguments
+#ifdef DEAL_II_WITH_CXX11
+  static_assert (dim<=spacedim,
+                 "The dimension <dim> of a DoFHandler must be less than or "
+                 "equal to the space dimension <spacedim> in which it lives.");
+#endif
 };
 
 
@@ -1232,6 +1243,24 @@ DoFHandler<dim,spacedim>::block_info () const
 }
 
 
+template <int dim, int spacedim>
+template <typename number>
+types::global_dof_index
+DoFHandler<dim,spacedim>::n_boundary_dofs (const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_ids) const
+{
+  // extract the set of boundary ids and forget about the function object pointers
+  std::set<types::boundary_id> boundary_ids_only;
+  for (typename std::map<types::boundary_id, const Function<spacedim,number>*>::const_iterator
+       p = boundary_ids.begin();
+       p != boundary_ids.end(); ++p)
+    boundary_ids_only.insert (p->first);
+
+  // then just hand everything over to the other function that does the work
+  return n_boundary_dofs(boundary_ids_only);
+}
+
+
+
 namespace internal
 {
   /**
@@ -1243,7 +1272,6 @@ namespace internal
    */
   template<int dim, int spacedim>
   std::string policy_to_string(const dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> &policy);
-
 }
 
 

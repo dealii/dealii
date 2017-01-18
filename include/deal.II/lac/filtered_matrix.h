@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2015 by the deal.II authors
+// Copyright (C) 2001 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -341,7 +341,7 @@ public:
    */
   template <typename MatrixType>
   FilteredMatrix (const MatrixType &matrix,
-                  bool              expect_constrained_source = false);
+                  const bool        expect_constrained_source = false);
 
   /**
    * Copy operator. Take over matrix and constraints from the other object.
@@ -359,7 +359,7 @@ public:
    */
   template <typename MatrixType>
   void initialize (const MatrixType &m,
-                   bool              expect_constrained_source = false);
+                   const bool        expect_constrained_source = false);
 
   /**
    * Delete all constraints and the matrix pointer.
@@ -713,6 +713,8 @@ FilteredMatrix<VectorType>::initialize (const MatrixType &m, bool ecs)
 template <typename VectorType>
 inline
 FilteredMatrix<VectorType>::FilteredMatrix ()
+  :
+  expect_constrained_source (false)
 {}
 
 
@@ -733,7 +735,10 @@ template <typename VectorType>
 template <typename MatrixType>
 inline
 FilteredMatrix<VectorType>::
-FilteredMatrix (const MatrixType &m, bool ecs)
+FilteredMatrix (const MatrixType &m,
+                const bool ecs)
+  :
+  expect_constrained_source (false)
 {
   initialize (m, ecs);
 }

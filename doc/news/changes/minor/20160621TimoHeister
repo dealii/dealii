@@ -1,0 +1,4 @@
+New: IndexSet::at(idx) returns an iterator pointing to the given index
+or the next larger element in the set if idx is not contained.
+<br>
+(Timo Heister, 2016/06/21)

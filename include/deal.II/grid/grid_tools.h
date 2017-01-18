@@ -1434,6 +1434,12 @@ namespace GridTools
    * times with different boundary ids to generate a vector with all periodic
    * pairs.
    *
+   * @note Since the periodic face pairs are found on the coarsest mesh level,
+   * it is necessary to ensure that the coarsest level faces have the correct
+   * boundary indicators set. In general, this means that one must first set
+   * all boundary indicators on the coarse grid before performing any global
+   * or local grid refinement.
+   *
    * @author Daniel Arndt, Matthias Maier, 2013 - 2015
    */
   template <typename MeshType>
@@ -1449,7 +1455,7 @@ namespace GridTools
 
 
   /**
-   * This compatibility version of collect_periodic_face_pairs() only works on
+   * This compatibility version of collect_periodic_faces() only works on
    * grids with cells in
    * @ref GlossFaceOrientation "standard orientation".
    *
@@ -1464,7 +1470,7 @@ namespace GridTools
    *
    * See above function for further details.
    *
-   * @note This version of collect_periodic_face_pairs() will not work on
+   * @note This version of collect_periodic_faces() will not work on
    * meshes with cells not in
    * @ref GlossFaceOrientation "standard orientation".
    *

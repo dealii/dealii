@@ -1,0 +1,3 @@
+Improved: Some parts of mesh refinement are now parallelized.
+<br>
+(Wolfgang Bangerth, 2016/09/27)

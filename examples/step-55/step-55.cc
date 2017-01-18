@@ -79,7 +79,7 @@ namespace LA
 #include <fstream>
 #include <iostream>
 
-namespace Step56
+namespace Step55
 {
   using namespace dealii;
 
@@ -838,7 +838,7 @@ int main(int argc, char *argv[])
   try
     {
       using namespace dealii;
-      using namespace Step56;
+      using namespace Step55;
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 

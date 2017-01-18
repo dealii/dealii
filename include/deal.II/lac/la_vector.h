@@ -54,6 +54,7 @@ namespace LinearAlgebra
   {
   public:
     typedef types::global_dof_index size_type;
+    typedef typename ReadWriteVector<Number>::value_type value_type;
 
     /**
      * Constructor. Create a vector of dimension zero.
@@ -84,11 +85,6 @@ namespace LinearAlgebra
      */
     template <typename InputIterator>
     Vector(const InputIterator first, const InputIterator last);
-
-    /**
-     * Destructor, deallocates memory.
-     */
-    virtual ~Vector();
 
     /**
      * Copies the data of the input vector @p in_vector.
@@ -176,6 +172,11 @@ namespace LinearAlgebra
      * Assignment <tt>*this = a*V</tt>.
      */
     virtual void equ(const Number a, const VectorSpaceVector<Number> &V);
+
+    /**
+     * Return the mean value of all the entries of this vector.
+     */
+    virtual value_type mean_value() const;
 
     /**
      * Return the l<sub>1</sub> norm of the vector (i.e., the sum of the
@@ -318,12 +319,6 @@ namespace LinearAlgebra
     this->reinit(complete_index_set(std::distance (first, last)), true);
     std::copy(first, last, this->begin());
   }
-
-
-
-  template <typename Number>
-  inline
-  Vector<Number>::~Vector() {}
 
 
 

@@ -244,8 +244,14 @@ namespace DataOutBase
 
     /**
      * Corner points of a patch.  Inner points are computed by a multilinear
-     * transform of the unit cell to the cell specified by these corner
-     * points. The order of points is the same as for cells in the
+     * transformation of the unit cell to the cell specified by these corner
+     * points, if <code>points_are_available==false</code>.
+     *
+     * On the other hand, if <code>points_are_available==true</code>, then
+     * the coordinates of the points at which output is to be generated
+     * is attached in additional rows to the <code>data</code> table.
+     *
+     * The order of points is the same as for cells in the
      * triangulation.
      */
     Point<spacedim> vertices[GeometryInfo<dim>::vertices_per_cell];
@@ -277,10 +283,11 @@ namespace DataOutBase
 
     /**
      * Data vectors. The format is as follows: <tt>data(i,.)</tt> denotes the
-     * data belonging to the <tt>i</tt>th data vector. <tt>data.n()</tt>
+     * data belonging to the <tt>i</tt>th data vector. <tt>data.n_cols()</tt>
      * therefore equals the number of output points; this number is
-     * <tt>(subdivisions+1)^{dim</tt>}. <tt>data.m()</tt> equals the number of
-     * data vectors.
+     * <tt>(subdivisions+1)^{dim}</tt>. <tt>data.n_rows()</tt> equals the number of
+     * data vectors. For the current purpose, a data vector equals one scalar,
+     * even if multiple scalars may later be interpreted as vectors.
      *
      * Within each column, <tt>data(.,j)</tt> are the data values at the
      * output point <tt>j</tt>, where <tt>j</tt> denotes the usual
@@ -940,13 +947,28 @@ namespace DataOutBase
     bool print_date_and_time;
 
     /**
-     * A data type providing the different possible zlib compression levels.
+     * A data type providing the different possible zlib compression
+     * levels. These map directly to constants defined by zlib.
      */
     enum ZlibCompressionLevel
     {
+      /**
+       * Do not use any compression.
+       */
       no_compression,
+      /**
+       * Use the fastest available compression algorithm.
+       */
       best_speed,
+      /**
+       * Use the algorithm which results in the smallest compressed
+       * files. This is the default flag.
+       */
       best_compression,
+      /**
+       * Use the default compression algorithm. This is a compromise between
+       * speed and file size.
+       */
       default_compression
     };
 
@@ -1126,11 +1148,21 @@ namespace DataOutBase
     /// Flags used to specify filtering behavior
     DataOutBase::DataOutFilterFlags   flags;
 
-    /// Dimensionality of the nodes, used to properly output filtered data
-    int         node_dim;
+    /**
+     * The number of space dimensions in which the vertices represented
+     * by the current object live. This corresponds to the usual
+     * @p dim argument, but since this class is not templated on the
+     * dimension, we need to store it here.
+     */
+    unsigned int      node_dim;
 
-    /// Number of vertices per cell
-    int         n_cell_verts;
+    /**
+     * The number of vertices per cell. Equal to
+     * GeometryInfo<node_dim>::vertices_per_cell. We need to store
+     * it as a run-time variable here because the dimension
+     * node_dim is also a run-time variable.
+     */
+    unsigned int      vertices_per_cell;
 
     /// Map of points to an internal index
     Map3DPoint        existing_points;
@@ -1156,8 +1188,19 @@ namespace DataOutBase
     void internal_add_cell(const unsigned int &cell_index, const unsigned int &pt_index);
 
   public:
-    DataOutFilter() : flags(false, true) {};
-    DataOutFilter(const DataOutBase::DataOutFilterFlags &flags) : flags(flags) {};
+    DataOutFilter()
+      :
+      flags(false, true),
+      node_dim (numbers::invalid_unsigned_int),
+      vertices_per_cell (numbers::invalid_unsigned_int)
+    {}
+
+    DataOutFilter(const DataOutBase::DataOutFilterFlags &flags)
+      :
+      flags(flags),
+      node_dim (numbers::invalid_unsigned_int),
+      vertices_per_cell (numbers::invalid_unsigned_int)
+    {}
 
     /**
      * Write a point with the specified index into the filtered data set. If
@@ -1233,7 +1276,7 @@ namespace DataOutBase
      */
     unsigned int n_cells() const
     {
-      return filtered_cells.size()/n_cell_verts;
+      return filtered_cells.size()/vertices_per_cell;
     };
 
     /**
@@ -1665,14 +1708,14 @@ namespace DataOutBase
                          const VtkFlags &flags);
 
   /**
-   * This writes the footer for the xml based vtu file format. This routine is
+   * This function writes the footer for the xml based vtu file format. This routine is
    * used internally together with DataOutInterface::write_vtu_header() and
    * DataOutInterface::write_vtu_main() by DataOutBase::write_vtu().
    */
   void write_vtu_footer (std::ostream &out);
 
   /**
-   * This writes the main part for the xml based vtu file format. This routine
+   * This function writes the main part for the xml based vtu file format. This routine
    * is used internally together with DataOutInterface::write_vtu_header() and
    * DataOutInterface::write_vtu_footer() by DataOutBase::write_vtu().
    */
@@ -1682,6 +1725,184 @@ namespace DataOutBase
                        const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                        const VtkFlags                          &flags,
                        std::ostream                            &out);
+
+  /**
+   * Some visualization programs, such as ParaView, can read several separate
+   * VTU files that all form part of the same simulation, in order to
+   * parallelize visualization. In that case, you need a
+   * <code>.pvtu</code> file that describes which VTU files (written, for
+   * example, through the DataOutInterface::write_vtu() function) form a group.
+   * The current function can generate such a master record.
+   *
+   * This function is typically not called by itself from user space, but
+   * you may want to call it through DataOutInterface::write_pvtu_record()
+   * since the DataOutInterface class has access to information that you
+   * would have to provide to the current function by hand.
+   *
+   * In any case, whether this function is called directly or via
+   * DataOutInterface::write_pvtu_record(), the master record file so
+   * written contains a list of (scalar or vector) fields that describes which
+   * fields can actually be found in the individual files that comprise the set of
+   * parallel VTU files along with the names of these files. This function
+   * gets the names and types of fields through the third and fourth
+   * argument; you can determine these by hand, but in practice, this function
+   * is most easily called by calling DataOutInterfaces::write_pvtu_record(),
+   * which determines the last two arguments by calling
+   * DataOutInterface::get_dataset_names() and
+   * DataOutInterface::get_vector_data_ranges() functions. The second argument
+   * to this function specifies the names of the files that form the parallel
+   * set.
+   *
+   * @note Use DataOutBase::write_vtu() and DataOutInterface::write_vtu()
+   * for writing each piece. Also note that
+   * only one parallel process needs to call the current function, listing the
+   * names of the files written by all parallel processes.
+   *
+   * @note In order to tell Paraview to group together multiple
+   * <code>pvtu</code> files that each describe one time step of a time
+   * dependent simulation, see the DataOutBase::write_pvd_record()
+   * function.
+   *
+   * @note Older versions of VisIt (before 2.5.1), can not read
+   * <code>pvtu</code> records. However, it can read visit records as written
+   * by the write_visit_record() function.
+   */
+  void
+  write_pvtu_record (std::ostream                                                                  &out,
+                     const std::vector<std::string>                                                &piece_names,
+                     const std::vector<std::string>                                                &data_names,
+                     const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges);
+
+  /**
+   * In ParaView it is possible to visualize time-dependent data tagged with
+   * the current integration time of a time dependent simulation. To use this
+   * feature you need a <code>.pvd</code> file that describes which VTU or
+   * PVTU file belongs to which timestep. This function writes a file that
+   * provides this mapping, i.e., it takes a list of pairs each of which
+   * indicates a particular time instant and the corresponding file that
+   * contains the graphical data for this time instant.
+   *
+   * A typical use case, in program that computes a time dependent solution,
+   * would be the following (<code>time</code> and <code>time_step</code> are
+   * member variables of the class with types <code>double</code> and
+   * <code>unsigned int</code>, respectively; the variable
+   * <code>times_and_names</code> is of type
+   * <code>std::vector@<std::pair@<double,std::string@> @></code>):
+   *
+   * @code
+   *  template <int dim>
+   *  void MyEquation<dim>::output_results () const
+   *  {
+   *    DataOut<dim> data_out;
+   *
+   *    data_out.attach_dof_handler (dof_handler);
+   *    data_out.add_data_vector (solution, "U");
+   *    data_out.build_patches ();
+   *
+   *    const std::string filename = "solution-" +
+   *                                 Utilities::int_to_string (timestep_number, 3) +
+   *                                 ".vtu";
+   *    std::ofstream output (filename.c_str());
+   *    data_out.write_vtu (output);
+   *
+   *    times_and_names.push_back (std::pair<double,std::string> (time, filename));
+   *    std::ofstream pvd_output ("solution.pvd");
+   *    DataOutBase::write_pvd_record (pvd_output, times_and_names);
+   *  }
+   * @endcode
+   *
+   * @note See DataOutInterface::write_vtu, DataOutInterface::write_pvtu_record,
+   * and DataOutInterface::write_vtu_in_parallel
+   * for writing solutions at each timestep.
+   *
+   * @note The second element of each pair, i.e., the file in which the
+   * graphical data for each time is stored, may itself be again a file that
+   * references other files. For example, it could be the name for a
+   * <code>.pvtu</code> file that references multiple parts of a parallel
+   * computation.
+   *
+   * @author Marco Engelhard, 2012
+   */
+  void write_pvd_record (std::ostream &out,
+                         const std::vector<std::pair<double,std::string> >  &times_and_names);
+
+  /**
+   * This function is the exact equivalent of the write_pvtu_record() function
+   * but for older versions of the VisIt visualization program and for one
+   * visualization graph (or one time step only). See there for the purpose of
+   * this function.
+   *
+   * This function is documented in the "Creating a master file for parallel"
+   * section (section 5.7) of the "Getting data into VisIt" report that can be
+   * found here:
+   * https://wci.llnl.gov/codes/visit/2.0.0/GettingDataIntoVisIt2.0.0.pdf
+   */
+  void write_visit_record (std::ostream &out,
+                           const std::vector<std::string> &piece_names);
+
+  /**
+   * This function is equivalent to the write_visit_record() above but for
+   * multiple time steps. Here is an example of how the function would be
+   * used:
+   * @code
+   *  const unsigned int number_of_time_steps = 3;
+   *  std::vector<std::vector<std::string > > piece_names(number_of_time_steps);
+   *
+   *  piece_names[0].push_back("subdomain_01.time_step_0.vtk");
+   *  piece_names[0].push_back("subdomain_02.time_step_0.vtk");
+   *
+   *  piece_names[1].push_back("subdomain_01.time_step_1.vtk");
+   *  piece_names[1].push_back("subdomain_02.time_step_1.vtk");
+   *
+   *  piece_names[2].push_back("subdomain_01.time_step_2.vtk");
+   *  piece_names[2].push_back("subdomain_02.time_step_2.vtk");
+   *
+   *  std::ofstream visit_output ("master_file.visit");
+   *
+   *  DataOutBase::write_visit_record(visit_output, piece_names);
+   * @endcode
+   *
+   * This function is documented in the "Creating a master file for parallel"
+   * section (section 5.7) of the "Getting data into VisIt" report that can be
+   * found here:
+   * https://wci.llnl.gov/codes/visit/2.0.0/GettingDataIntoVisIt2.0.0.pdf
+   */
+  void write_visit_record (std::ostream &out,
+                           const std::vector<std::vector<std::string> > &piece_names);
+
+  /**
+   * This function is equivalent to the write_visit_record() above but for
+   * multiple time steps and with additional information about the time for
+   * each timestep. Here is an example of how the function would be
+   * used:
+   * @code
+   *  const unsigned int number_of_time_steps = 3;
+   *  std::vector<std::pair<double,std::vector<std::string > > > times_and_piece_names(number_of_time_steps);
+   *
+   *  times_and_piece_names[0].first = 0.0;
+   *  times_and_piece_names[0].second.push_back("subdomain_01.time_step_0.vtk");
+   *  times_and_piece_names[0].second.push_back("subdomain_02.time_step_0.vtk");
+   *
+   *  times_and_piece_names[1].first = 0.5;
+   *  times_and_piece_names[1].second.push_back("subdomain_01.time_step_1.vtk");
+   *  times_and_piece_names[1].second.push_back("subdomain_02.time_step_1.vtk");
+   *
+   *  times_and_piece_names[2].first = 1.0;
+   *  times_and_piece_names[2].second.push_back("subdomain_01.time_step_2.vtk");
+   *  times_and_piece_names[2].second.push_back("subdomain_02.time_step_2.vtk");
+   *
+   *  std::ofstream visit_output ("master_file.visit");
+   *
+   *  DataOutBase::write_visit_record(visit_output, times_and_piece_names);
+   * @endcode
+   *
+   * This function is documented in the "Creating a master file for parallel"
+   * section (section 5.7) of the "Getting data into VisIt" report that can be
+   * found here:
+   * https://wci.llnl.gov/codes/visit/2.0.0/GettingDataIntoVisIt2.0.0.pdf
+   */
+  void write_visit_record (std::ostream &out,
+                           const std::vector<std::pair<double,std::vector<std::string> > > &times_and_piece_names);
 
   /**
    * Write the given list of patches to the output stream in SVG format.
@@ -2098,24 +2319,28 @@ public:
    * performance on parallel filesystems. Also see
    * DataOutInterface::write_vtu().
    */
-  void write_vtu_in_parallel (const char *filename, MPI_Comm comm) const;
+  void write_vtu_in_parallel (const char *filename,
+                              MPI_Comm comm) const;
 
   /**
    * Some visualization programs, such as ParaView, can read several separate
-   * VTU files to parallelize visualization. In that case, you need a
+   * VTU files that all form part of the same simulation, in order to
+   * parallelize visualization. In that case, you need a
    * <code>.pvtu</code> file that describes which VTU files (written, for
-   * example, through the write_vtu() function) form a group. The current
-   * function can generate such a master record.
+   * example, through the DataOutInterface::write_vtu() function) form a group.
+   * The current function can generate such a master record.
    *
-   * The file so written contains a list of (scalar or vector) fields whose
-   * values are described by the individual files that comprise the set of
+   * The master record file generated by this function
+   * contains a list of (scalar or vector) fields that describes which
+   * fields can actually be found in the individual files that comprise the set of
    * parallel VTU files along with the names of these files. This function
-   * gets the names and types of fields through the get_patches() function of
-   * this class like all the other write_xxx() functions. The second argument
+   * gets the names and types of fields through the get_dataset_names() and
+   * get_vector_data_ranges() functions of this class. The second argument
    * to this function specifies the names of the files that form the parallel
    * set.
    *
-   * @note See DataOutBase::write_vtu for writing each piece. Also note that
+   * @note Use DataOutBase::write_vtu() and DataOutInterface::write_vtu()
+   * for writing each piece. Also note that
    * only one parallel process needs to call the current function, listing the
    * names of the files written by all parallel processes.
    *
@@ -2123,7 +2348,7 @@ public:
    *
    * @note In order to tell Paraview to group together multiple
    * <code>pvtu</code> files that each describe one time step of a time
-   * dependent simulation, see the DataOutInterface::write_pvd_record()
+   * dependent simulation, see the DataOutBase::write_pvd_record()
    * function.
    *
    * @note Older versions of VisIt (before 2.5.1), can not read
@@ -2134,138 +2359,34 @@ public:
                           const std::vector<std::string> &piece_names) const;
 
   /**
-   * In ParaView it is possible to visualize time-dependent data tagged with
-   * the current integration time of a time dependent simulation. To use this
-   * feature you need a <code>.pvd</code> file that describes which VTU or
-   * PVTU file belongs to which timestep. This function writes a file that
-   * provides this mapping, i.e., it takes a list of pairs each of which
-   * indicates a particular time instant and the corresponding file that
-   * contains the graphical data for this time instant.
-   *
-   * A typical use case, in program that computes a time dependent solution,
-   * would be the following (<code>time</code> and <code>time_step</code> are
-   * member variables of the class with types <code>double</code> and
-   * <code>unsigned int</code>, respectively; the variable
-   * <code>times_and_names</code> is of type
-   * <code>std::vector@<std::pair@<double,std::string@> @></code>):
-   *
-   * @code
-   *  template <int dim>
-   *  void MyEquation<dim>::output_results () const
-   *  {
-   *    DataOut<dim> data_out;
-   *
-   *    data_out.attach_dof_handler (dof_handler);
-   *    data_out.add_data_vector (solution, "U");
-   *    data_out.build_patches ();
-   *
-   *    const std::string filename = "solution-" +
-   *                                 Utilities::int_to_string (timestep_number, 3) +
-   *                                 ".vtu";
-   *    std::ofstream output (filename.c_str());
-   *    data_out.write_vtu (output);
-   *
-   *    times_and_names.push_back (std::pair<double,std::string> (time, filename));
-   *    std::ofstream pvd_output ("solution.pvd");
-   *    data_out.write_pvd_record (pvd_output, times_and_names);
-   *  }
-   * @endcode
-   *
-   * @note See DataOutBase::write_vtu or DataOutInterface::write_pvtu_record
-   * for writing solutions at each timestep.
-   *
-   * @note The second element of each pair, i.e., the file in which the
-   * graphical data for each time is stored, may itself be again a file that
-   * references other files. For example, it could be the name for a
-   * <code>.pvtu</code> file that references multiple parts of a parallel
-   * computation.
-   *
-   * @author Marco Engelhard, 2012
+   * @deprecated Use DataOutBase::write_pvd_record() instead
    */
-  void write_pvd_record (std::ostream &out,
-                         const std::vector<std::pair<double,std::string> >  &times_and_names) const;
+  static void write_pvd_record (std::ostream &out,
+                                const std::vector<std::pair<double,std::string> >  &times_and_names) DEAL_II_DEPRECATED;
 
   /**
-   * This function is the exact equivalent of the write_pvtu_record() function
-   * but for older versions of the VisIt visualization program and for one
-   * visualization graph (or one time step only). See there for the purpose of
-   * this function.
-   *
-   * This function is documented in the "Creating a master file for parallel"
-   * section (section 5.7) of the "Getting data into VisIt" report that can be
-   * found here:
-   * https://wci.llnl.gov/codes/visit/2.0.0/GettingDataIntoVisIt2.0.0.pdf
+   * @deprecated Use DataOutBase::write_visit_record() instead
    */
-  void write_visit_record (std::ostream &out,
-                           const std::vector<std::string> &piece_names) const;
+  static
+  void
+  write_visit_record (std::ostream &out,
+                      const std::vector<std::string> &piece_names) DEAL_II_DEPRECATED;
 
   /**
-   * This function is equivalent to the write_visit_record() above but for
-   * multiple time steps. Here is an example of how the function would be
-   * used:
-   * @code
-   *  DataOut<dim> data_out;
-   *
-   *  const unsigned int number_of_time_steps = 3;
-   *  std::vector<std::vector<std::string > > piece_names(number_of_time_steps);
-   *
-   *  piece_names[0].push_back("subdomain_01.time_step_0.vtk");
-   *  piece_names[0].push_back("subdomain_02.time_step_0.vtk");
-   *
-   *  piece_names[1].push_back("subdomain_01.time_step_1.vtk");
-   *  piece_names[1].push_back("subdomain_02.time_step_1.vtk");
-   *
-   *  piece_names[2].push_back("subdomain_01.time_step_2.vtk");
-   *  piece_names[2].push_back("subdomain_02.time_step_2.vtk");
-   *
-   *  std::ofstream visit_output ("master_file.visit");
-   *
-   *  data_out.write_visit_record(visit_output, piece_names);
-   * @endcode
-   *
-   * This function is documented in the "Creating a master file for parallel"
-   * section (section 5.7) of the "Getting data into VisIt" report that can be
-   * found here:
-   * https://wci.llnl.gov/codes/visit/2.0.0/GettingDataIntoVisIt2.0.0.pdf
+   * @deprecated Use DataOutBase::write_visit_record() instead
    */
-  void write_visit_record (std::ostream &out,
-                           const std::vector<std::vector<std::string> > &piece_names) const;
+  static
+  void
+  write_visit_record (std::ostream &out,
+                      const std::vector<std::vector<std::string> > &piece_names) DEAL_II_DEPRECATED;
 
   /**
-   * This function is equivalent to the write_visit_record() above but for
-   * multiple time steps and with additional information about the time for
-   * each timestep. Here is an example of how the function would be
-   * used:
-   * @code
-   *  DataOut<dim> data_out;
-   *
-   *  const unsigned int number_of_time_steps = 3;
-   *  std::vector<std::pair<double,std::vector<std::string > > > times_and_piece_names(number_of_time_steps);
-   *
-   *  times_and_piece_names[0].first = 0.0;
-   *  times_and_piece_names[0].second.push_back("subdomain_01.time_step_0.vtk");
-   *  times_and_piece_names[0].second.push_back("subdomain_02.time_step_0.vtk");
-   *
-   *  times_and_piece_names[1].first = 0.5;
-   *  times_and_piece_names[1].second.push_back("subdomain_01.time_step_1.vtk");
-   *  times_and_piece_names[1].second.push_back("subdomain_02.time_step_1.vtk");
-   *
-   *  times_and_piece_names[2].first = 1.0;
-   *  times_and_piece_names[2].second.push_back("subdomain_01.time_step_2.vtk");
-   *  times_and_piece_names[2].second.push_back("subdomain_02.time_step_2.vtk");
-   *
-   *  std::ofstream visit_output ("master_file.visit");
-   *
-   *  data_out.write_visit_record(visit_output, times_and_piece_names);
-   * @endcode
-   *
-   * This function is documented in the "Creating a master file for parallel"
-   * section (section 5.7) of the "Getting data into VisIt" report that can be
-   * found here:
-   * https://wci.llnl.gov/codes/visit/2.0.0/GettingDataIntoVisIt2.0.0.pdf
+   * @deprecated Use DataOutBase::write_visit_record() instead
    */
-  void write_visit_record (std::ostream &out,
-                           const std::vector<std::pair<double,std::vector<std::string> > > &times_and_piece_names) const;
+  static
+  void
+  write_visit_record (std::ostream &out,
+                      const std::vector<std::pair<double,std::vector<std::string> > > &times_and_piece_names) DEAL_II_DEPRECATED;
 
   /**
    * Obtain data through get_patches() and write it to <tt>out</tt> in SVG
@@ -2653,11 +2774,16 @@ public:
   /**
    * Exception
    */
-  DeclException0 (ExcIncompatibleDatasetNames);
+  DeclExceptionMsg (ExcIncompatibleDatasetNames,
+                    "You are trying to merge two sets of patches for which the "
+                    "declared names of the variables do not match.");
   /**
    * Exception
    */
-  DeclException0 (ExcIncompatiblePatchLists);
+  DeclExceptionMsg (ExcIncompatiblePatchLists,
+                    "You are trying to merge two sets of patches for which the "
+                    "number of subdivisions or the number of vector components "
+                    "do not match.");
   /**
    * Exception
    */

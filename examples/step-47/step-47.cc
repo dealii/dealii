@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2011 - 2015 by the deal.II authors
+ * Copyright (C) 2011 - 2016 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -905,12 +905,9 @@ namespace Step47
   public:
     virtual
     void
-    compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
-                                       const std::vector<std::vector<Tensor<1,dim> > > &duh,
-                                       const std::vector<std::vector<Tensor<2,dim> > > &dduh,
-                                       const std::vector<Point<dim> >                  &normals,
-                                       const std::vector<Point<dim> >                  &evaluation_points,
-                                       std::vector<Vector<double> >                    &computed_quantities) const;
+    evaluate_vector_field
+    (const dealii::DataPostprocessorInputs::Vector<dim> &inputs,
+     std::vector<Vector<double> >                       &computed_quantities) const;
 
     virtual std::vector<std::string> get_names () const;
 
@@ -955,28 +952,27 @@ namespace Step47
   template <int dim>
   void
   Postprocessor<dim>::
-  compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
-                                     const std::vector<std::vector<Tensor<1,dim> > > &/*duh*/,
-                                     const std::vector<std::vector<Tensor<2,dim> > > &/*dduh*/,
-                                     const std::vector<Point<dim> >                  &/*normals*/,
-                                     const std::vector<Point<dim> >                  &evaluation_points,
-                                     std::vector<Vector<double> >                    &computed_quantities) const
+  evaluate_vector_field
+  (const dealii::DataPostprocessorInputs::Vector<dim> &inputs,
+   std::vector<Vector<double> >                       &computed_quantities) const
   {
-    const unsigned int n_quadrature_points = uh.size();
-    Assert (computed_quantities.size() == n_quadrature_points,  ExcInternalError());
-    Assert (uh[0].size() == 2,                                  ExcInternalError());
+    const unsigned int n_quadrature_points = inputs.solution_values.size();
+    Assert (computed_quantities.size() == n_quadrature_points,
+            ExcInternalError());
+    Assert (inputs.solution_values[0].size() == 2,
+            ExcInternalError());
 
     for (unsigned int q=0; q<n_quadrature_points; ++q)
       {
         computed_quantities[q](0)
-          = (uh[q](0)
+          = (inputs.solution_values[q](0)
              +
 //TODO: shift in weight function is missing!
-             uh[q](1) * std::fabs(level_set(evaluation_points[q])));
+             inputs.solution_values[q](1) * std::fabs(level_set(inputs.evaluation_points[q])));
         computed_quantities[q](1)
           = (computed_quantities[q](0)
              -
-             exact_solution (evaluation_points[q]));
+             exact_solution (inputs.evaluation_points[q]));
       }
   }
 

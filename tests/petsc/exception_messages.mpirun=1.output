@@ -1,0 +1,21 @@
+
+DEAL::
+deal.II encountered an error while calling a PETSc function.
+PETSc was not able to determine a description for this particular error code.
+The numerical value of the original error code is 54.
+DEAL::
+deal.II encountered an error while calling a PETSc function.
+The description of the error provided by PETSc is "Out of memory".
+The numerical value of the original error code is 55.
+DEAL::
+deal.II encountered an error while calling a PETSc function.
+The description of the error provided by PETSc is "Error in external library".
+The numerical value of the original error code is 76.
+DEAL::
+deal.II encountered an error while calling a PETSc function.
+The description of the error provided by PETSc is "Object is in wrong state".
+The numerical value of the original error code is 73.
+DEAL::
+deal.II encountered an error while calling a PETSc function.
+The description of the error provided by PETSc is "Arguments must have same type".
+The numerical value of the original error code is 69.

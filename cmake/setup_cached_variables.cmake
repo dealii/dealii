@@ -345,6 +345,12 @@ OPTION(DEAL_II_DOXYGEN_USE_MATHJAX
   )
 MARK_AS_ADVANCED(DEAL_II_DOXYGEN_USE_MATHJAX)
 
+OPTION(DEAL_II_DOXYGEN_USE_ONLINE_MATHJAX
+  "If set to ON, doxygen documentation is generated using online (from CDN) mathjax copy"
+  ON
+  )
+MARK_AS_ADVANCED(DEAL_II_DOXYGEN_USE_ONLINE_MATHJAX)
+
 SET(DEAL_II_CPACK_EXTERNAL_LIBS "opt" CACHE STRING
     "A relative path to tree of external libraries that will be installed in bundle package. The path is relative to the /Applications/${DEAL_II_CPACK_BUNDLE_NAME}.app/Contents/Resources directory. It defaults to opt, but you may want to use a different value, for example if you want to distribute a brew based package."
   )

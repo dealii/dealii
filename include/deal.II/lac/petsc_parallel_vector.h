@@ -481,15 +481,15 @@ namespace PETScWrappers
       if (v.size()==0)
         {
           // this happens if v has not been initialized to something useful:
-          // Vector x,v;x=v;
+          //   Vector x,v;
+          //   x=v;
           // we skip the code below and create a simple serial vector of
           // length 0
 
-          int ierr;
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
-          ierr = VecDestroy (vector);
+          PetscErrorCode ierr = VecDestroy (vector);
 #else
-          ierr = VecDestroy (&vector);
+          PetscErrorCode ierr = VecDestroy (&vector);
 #endif
           AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -511,13 +511,11 @@ namespace PETScWrappers
             reinit (v.communicator, v.size(), v.local_size(), true);
         }
 
-      const int ierr = VecCopy (v.vector, vector);
+      PetscErrorCode ierr = VecCopy (v.vector, vector);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       if (has_ghost_elements())
         {
-          int ierr;
-
           ierr = VecGhostUpdateBegin(vector, INSERT_VALUES, SCATTER_FORWARD);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
           ierr = VecGhostUpdateEnd(vector, INSERT_VALUES, SCATTER_FORWARD);
@@ -601,7 +599,7 @@ namespace internal
       static
       void reinit_range_vector (const Matrix &matrix,
                                 PETScWrappers::MPI::Vector &v,
-                                bool omit_zeroing_entries)
+                                bool /*omit_zeroing_entries*/)
       {
         v.reinit(matrix.locally_owned_range_indices(), matrix.get_mpi_communicator());
       }
@@ -610,7 +608,7 @@ namespace internal
       static
       void reinit_domain_vector(const Matrix &matrix,
                                 PETScWrappers::MPI::Vector &v,
-                                bool omit_zeroing_entries)
+                                bool /*omit_zeroing_entries*/)
       {
         v.reinit(matrix.locally_owned_domain_indices(), matrix.get_mpi_communicator());
       }

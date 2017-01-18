@@ -1,0 +1,78 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2016 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
+
+for (deal_II_dimension : DIMENSIONS; number : REAL_SCALARS)
+{
+
+    namespace Physics
+    \{
+    namespace Elasticity
+    \{
+    namespace Kinematics
+    \{
+    template
+    Tensor<2,deal_II_dimension,number>
+    F<deal_II_dimension,number>(const Tensor<2,deal_II_dimension,number>&);
+
+    template
+    Tensor<2,deal_II_dimension,number>
+    F_iso<deal_II_dimension,number>(const Tensor<2,deal_II_dimension,number>&);
+
+    template
+    SymmetricTensor<2,deal_II_dimension,number>
+    F_vol<deal_II_dimension,number>(const Tensor<2,deal_II_dimension,number>&);
+
+    template
+    SymmetricTensor<2,deal_II_dimension,number>
+    C<deal_II_dimension,number>(const Tensor<2,deal_II_dimension,number>&);
+
+    template
+    SymmetricTensor<2,deal_II_dimension,number>
+    b<deal_II_dimension,number>(const Tensor<2,deal_II_dimension,number>&);
+
+    template
+    SymmetricTensor<2,deal_II_dimension,number>
+    E<deal_II_dimension,number>(const Tensor<2,deal_II_dimension,number>&);
+
+    template
+    SymmetricTensor<2,deal_II_dimension,number>
+    epsilon<deal_II_dimension,number>(const Tensor<2,deal_II_dimension,number>&);
+
+    template
+    SymmetricTensor<2,deal_II_dimension,number>
+    e<deal_II_dimension,number>(const Tensor<2,deal_II_dimension,number>&);
+
+    template
+    Tensor<2,deal_II_dimension,number>
+    l<deal_II_dimension,number>(
+        const Tensor<2,deal_II_dimension,number>&,
+        const Tensor<2,deal_II_dimension,number>&);
+
+    template
+    SymmetricTensor<2,deal_II_dimension,number>
+    d<deal_II_dimension,number>(
+        const Tensor<2,deal_II_dimension,number>&,
+        const Tensor<2,deal_II_dimension,number>&);
+
+    template
+    Tensor<2,deal_II_dimension,number>
+    w<deal_II_dimension,number>(
+        const Tensor<2,deal_II_dimension,number>&,
+        const Tensor<2,deal_II_dimension,number>&);
+    \}
+    \}
+    \}
+}

@@ -46,7 +46,8 @@ namespace parallel
     template<int dim, typename VectorType, typename DoFHandlerType>
     SolutionTransfer<dim, VectorType, DoFHandlerType>::SolutionTransfer (const DoFHandlerType &dof)
       :
-      dof_handler(&dof, typeid(*this).name())
+      dof_handler(&dof, typeid(*this).name()),
+      offset (numbers::invalid_unsigned_int)
     {
       Assert (dynamic_cast<const parallel::distributed::Triangulation<dim>*>
               (&dof_handler->get_triangulation()) != 0,

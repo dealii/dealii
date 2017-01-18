@@ -34,8 +34,7 @@ void test ()
   foo.declare_entry("val", "1.0", dealii::Patterns::Double(), "");
   foo.leave_subsection();
 
-  bool okay = foo.read_input(SOURCE_DIR "/parameter_handler_18.prm");
-  Assert(okay, ExcMessage("read_input failed"));
+  foo.parse_input(SOURCE_DIR "/parameter_handler_18.prm");
 
   foo.enter_subsection("bar");
   deallog << foo.get ("val") << std::endl;

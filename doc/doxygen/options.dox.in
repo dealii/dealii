@@ -85,6 +85,10 @@ ALIASES += dealiiOperationIsMultithreaded="@note If deal.II is configured with t
 
 ALIASES += dealiiExceptionMessage{1}="@note The message that will be printed by this exception reads: <div class='doxygen-generated-exception-message'> \1 </div> "
 
+ALIASES += dealiiWriggersA{2}="@note For a discussion of the background of this function, see P. Wriggers: \"Nonlinear finite element methods\" (2008), and in particular formula (\2) on p. \1 (or thereabouts). "
+
+ALIASES += dealiiHolzapfelA{2}="@note For a discussion of the background of this function, see G. A. Holzapfel: \"Nonlinear solid mechanics. A Continuum Approach for Engineering\" (2007), and in particular formula (\2) on p. \1 (or thereabouts). "
+
 #---------------------------------------------------------------------------
 # configuration options related to source browsing
 #---------------------------------------------------------------------------
@@ -112,7 +116,7 @@ HTML_FILE_EXTENSION    = .html
 HTML_HEADER            = header.html
 HTML_FOOTER            = footer.html
 USE_MATHJAX            = @_use_mathjax@
-MATHJAX_RELPATH        = https://cdn.mathjax.org/mathjax/latest
+MATHJAX_RELPATH        = @_mathjax_relpath@
 MATHJAX_EXTENSIONS     = TeX/AMSmath TeX/AMSsymbols
 HTML_COLORSTYLE_HUE    = 220
 HTML_COLORSTYLE_SAT    = 200

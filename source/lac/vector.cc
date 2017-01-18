@@ -66,4 +66,27 @@ TEMPL_OP_EQ(std::complex<float>,std::complex<double>);
 
 #undef TEMPL_OP_EQ
 
+#ifdef DEAL_II_BOOST_BIND_COMPILER_BUG
+template <>
+Vector<std::complex<float> > &
+Vector<std::complex<float> >::operator= (const std::complex<float> s)
+{
+  AssertIsFinite(s);
+  if (s != std::complex<float>())
+    Assert (vec_size!=0, ExcEmptyObject());
+  if (vec_size!=0)
+    std::fill (begin(), end(), s);
+
+  return *this;
+}
+#endif
+
+template <>
+Vector<int>::real_type
+Vector<int>::lp_norm (const real_type) const
+{
+  Assert(false, ExcMessage("No lp norm for integer vectors"));
+  return -1;
+}
+
 DEAL_II_NAMESPACE_CLOSE

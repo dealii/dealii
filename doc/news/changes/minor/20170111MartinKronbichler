@@ -1,0 +1,7 @@
+New: The class VectorizedArray has gained two new access functions, gather and
+scatter, that map to more efficient hardware versions on new architectures
+(AVX2 or AVX-512). Furthermore, support for AVX-512 has been improved by
+providing optimized vectorized_load_and_transpose() and
+vectorized_transpose_and_store().
+<br>
+(Martin Kronbichler, 2017/01/11)

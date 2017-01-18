@@ -2065,11 +2065,10 @@ namespace Step31
     // another copy of temporary vectors for temperature (now corresponding to
     // the new grid), and let the interpolate function do the job. Then, the
     // resulting array of vectors is written into the respective vector member
-    // variables. For the Stokes vector, everything is just the same &ndash;
-    // except that we do not need another temporary vector since we just
-    // interpolate a single vector. In the end, we have to tell the program
-    // that the matrices and preconditioners need to be regenerated, since the
-    // mesh has changed.
+    // variables.
+    //
+    // Remember that the set of constraints will be updated for the new
+    // triangulation in the setup_dofs() call.
     triangulation.execute_coarsening_and_refinement ();
     setup_dofs ();
 
@@ -2081,7 +2080,18 @@ namespace Step31
     temperature_solution = tmp[0];
     old_temperature_solution = tmp[1];
 
+    // After the solution has been transfered we then enforce the constraints
+    // on the transfered solution.
+    temperature_constraints.distribute(temperature_solution);
+    temperature_constraints.distribute(old_temperature_solution);
+
+    // For the Stokes vector, everything is just the same &ndash; except that
+    // we do not need another temporary vector since we just interpolate a
+    // single vector. In the end, we have to tell the program that the matrices
+    // and preconditioners need to be regenerated, since the mesh has changed.
     stokes_trans.interpolate (x_stokes, stokes_solution);
+
+    stokes_constraints.distribute(stokes_solution);
 
     rebuild_stokes_matrix         = true;
     rebuild_temperature_matrices  = true;

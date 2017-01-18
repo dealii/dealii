@@ -118,14 +118,44 @@ public:
    */
   enum WhichEigenvalues
   {
+    /**
+     * The algebraically largest eigenvalues.
+     */
     algebraically_largest,
+    /**
+     * The algebraically smallest eigenvalues.
+     */
     algebraically_smallest,
+    /**
+     * The eigenvalue with the largest magnitudes.
+     */
     largest_magnitude,
+    /**
+     * The eigenvalue with the smallest magnitudes.
+     */
     smallest_magnitude,
+    /**
+     * The eigenvalues with the largest real parts.
+     */
     largest_real_part,
+    /**
+     * The eigenvalues with the smallest real parts.
+     */
     smallest_real_part,
+    /**
+     * The eigenvalues with the largest imaginary parts.
+     */
     largest_imaginary_part,
+    /**
+     * The eigenvalues with the smallest imaginary parts.
+     */
     smallest_imaginary_part,
+    /**
+     * Compute half of the eigenvalues from the high end of the spectrum and
+     * the other half from the low end. If the number of requested
+     * eigenvectors is odd, then the extra eigenvector comes from the high end
+     * of the spectrum.
+     */
     both_ends
   };
 
@@ -160,6 +190,13 @@ public:
    */
   template <typename VectorType>
   void set_initial_vector(const VectorType &vec);
+
+  /**
+   * Set shift @p sigma for shift-and-invert spectral transformation.
+   *
+   * If this function is not called, the shift is assumed to be zero.
+   */
+  void set_shift(const std::complex<double> sigma);
 
   /**
    * Solve the generalized eigensprectrum problem $A x=\lambda B x$ by calling
@@ -238,6 +275,17 @@ protected:
   bool initial_vector_provided;
   std::vector<double> resid;
 
+  /**
+   * Real part of the shift
+   */
+  double sigmar;
+
+  /**
+   * Imaginary part of the shift
+   */
+  double sigmai;
+
+
 private:
 
   /**
@@ -311,7 +359,20 @@ AdditionalData (const unsigned int number_of_arnoldi_vectors,
   number_of_arnoldi_vectors(number_of_arnoldi_vectors),
   eigenvalue_of_interest(eigenvalue_of_interest),
   symmetric(symmetric)
-{}
+{
+  //Check for possible options for symmetric problems
+  if (symmetric)
+    {
+      Assert(eigenvalue_of_interest!=largest_real_part,
+             ExcMessage("'largest real part' can only be used for non-symmetric problems!"));
+      Assert(eigenvalue_of_interest!=smallest_real_part,
+             ExcMessage("'smallest real part' can only be used for non-symmetric problems!"));
+      Assert(eigenvalue_of_interest!=largest_imaginary_part,
+             ExcMessage("'largest imaginary part' can only be used for non-symmetric problems!"));
+      Assert(eigenvalue_of_interest!=smallest_imaginary_part,
+             ExcMessage("'smallest imaginary part' can only be used for non-symmetric problems!"));
+    }
+}
 
 
 inline
@@ -320,8 +381,23 @@ ArpackSolver::ArpackSolver (SolverControl &control,
   :
   solver_control (control),
   additional_data (data),
-  initial_vector_provided(false)
+  initial_vector_provided(false),
+  sigmar(0.0),
+  sigmai(0.0)
 {}
+
+
+
+
+inline
+void
+ArpackSolver::set_shift(const std::complex<double> sigma)
+{
+  sigmar = sigma.real();
+  sigmai = sigma.imag();
+}
+
+
 
 template <typename VectorType>
 inline
@@ -587,9 +663,6 @@ void ArpackSolver::solve (const MatrixType1                  &/*system_matrix*/,
       std::vector<int> select (ncv, 1);
 
       int ldz = n;
-
-      double sigmar = 0.0; // real part of the shift
-      double sigmai = 0.0; // imaginary part of the shift
 
       std::vector<double> eigenvalues_real (nev+1, 0.);
       std::vector<double> eigenvalues_im (nev+1, 0.);

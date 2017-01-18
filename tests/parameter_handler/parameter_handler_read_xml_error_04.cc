@@ -15,7 +15,7 @@
 
 
 
-// check ParameterHandler::read_input_from_xml. try to read a file with a
+// check ParameterHandler::parse_input_from_xml. try to read a file with a
 // parameter that does not satisfy its pattern
 
 #include "../tests.h"
@@ -76,10 +76,15 @@ int main ()
 
   // read from XML
   std::ifstream in (SOURCE_DIR "/prm/parameter_handler_read_xml_error_04.prm");
-  bool result = prm.read_input_from_xml (in);
-  AssertThrow (result == false, ExcInternalError());
-
-  deallog << "OK" << std::endl;
+  try
+    {
+      prm.parse_input_from_xml (in);
+    }
+  catch (const ParameterHandler::ExcInvalidEntryForPatternXML &exc)
+    {
+      deallog << exc.get_exc_name() << std::endl;
+      exc.print_info(deallog.get_file_stream());
+    }
 
   return 0;
 }

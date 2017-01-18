@@ -59,14 +59,15 @@ namespace internal
 
 
 template <int dim>
-FE_Nedelec<dim>::FE_Nedelec (const unsigned int p) :
+FE_Nedelec<dim>::FE_Nedelec (const unsigned int order)
+  :
   FE_PolyTensor<PolynomialsNedelec<dim>, dim>
-  (p,
-   FiniteElementData<dim> (get_dpo_vector (p), dim, p + 1,
+  (order,
+   FiniteElementData<dim> (get_dpo_vector (order), dim, order + 1,
                            FiniteElementData<dim>::Hcurl),
-   std::vector<bool> (PolynomialsNedelec<dim>::compute_n_pols (p), true),
+   std::vector<bool> (PolynomialsNedelec<dim>::compute_n_pols (order), true),
    std::vector<ComponentMask>
-   (PolynomialsNedelec<dim>::compute_n_pols (p),
+   (PolynomialsNedelec<dim>::compute_n_pols (order),
     std::vector<bool> (dim, true)))
 {
 #ifdef DEBUG_NEDELEC
@@ -82,7 +83,7 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int p) :
   // generalized support points and
   // quadrature weights, since they
   // are required for interpolation.
-  initialize_support_points (p);
+  initialize_support_points (order);
   this->inverse_node_matrix.reinit (n_dofs, n_dofs);
   this->inverse_node_matrix.fill
   (FullMatrix<double> (IdentityMatrix (n_dofs)));
@@ -104,7 +105,7 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int p) :
 
   FETools::compute_face_embedding_matrices<dim,double>
   (*this, face_embeddings, 0, 0,
-   internal::get_embedding_computation_tolerance(p));
+   internal::get_embedding_computation_tolerance(order));
 
   switch (dim)
     {
@@ -235,22 +236,22 @@ FE_Nedelec<1>::initialize_support_points (const unsigned int)
 
 template <>
 void
-FE_Nedelec<2>::initialize_support_points (const unsigned int degree)
+FE_Nedelec<2>::initialize_support_points (const unsigned int order)
 {
   const int dim = 2;
 
   // Create polynomial basis.
   const std::vector<Polynomials::Polynomial<double> > &lobatto_polynomials
-    = Polynomials::Lobatto::generate_complete_basis (degree + 1);
+    = Polynomials::Lobatto::generate_complete_basis (order + 1);
   std::vector<Polynomials::Polynomial<double> >
-  lobatto_polynomials_grad (degree + 1);
+  lobatto_polynomials_grad (order + 1);
 
   for (unsigned int i = 0; i < lobatto_polynomials_grad.size (); ++i)
     lobatto_polynomials_grad[i] = lobatto_polynomials[i + 1].derivative ();
 
   // Initialize quadratures to obtain
   // quadrature points later on.
-  const QGauss<dim - 1> reference_edge_quadrature (degree + 1);
+  const QGauss<dim - 1> reference_edge_quadrature (order + 1);
   const unsigned int n_edge_points = reference_edge_quadrature.size ();
   const unsigned int n_boundary_points
     = GeometryInfo<dim>::lines_per_cell * n_edge_points;
@@ -264,17 +265,17 @@ FE_Nedelec<2>::initialize_support_points (const unsigned int degree)
     this->generalized_face_support_points[q_point]
       = reference_edge_quadrature.point (q_point);
 
-  if (degree > 0)
+  if (order > 0)
     {
       // If the polynomial degree is positive
       // we have support points on the faces
       // and in the interior of a cell.
-      const QGauss<dim> quadrature (degree + 1);
+      const QGauss<dim> quadrature (order + 1);
       const unsigned int &n_interior_points = quadrature.size ();
 
       this->generalized_support_points.resize
       (n_boundary_points + n_interior_points);
-      boundary_weights.reinit (n_edge_points, degree);
+      boundary_weights.reinit (n_edge_points, order);
 
       for (unsigned int q_point = 0; q_point < n_edge_points;
            ++q_point)
@@ -287,7 +288,7 @@ FE_Nedelec<2>::initialize_support_points (const unsigned int degree)
                 (QProjector<dim>::DataSetDescriptor::face
                  (line, true, false, false, n_edge_points) + q_point);
 
-          for (unsigned int i = 0; i < degree; ++i)
+          for (unsigned int i = 0; i < order; ++i)
             boundary_weights (q_point, i)
               = reference_edge_quadrature.weight (q_point)
                 * lobatto_polynomials_grad[i + 1].value
@@ -322,43 +323,43 @@ FE_Nedelec<2>::initialize_support_points (const unsigned int degree)
 
 template <>
 void
-FE_Nedelec<3>::initialize_support_points (const unsigned int degree)
+FE_Nedelec<3>::initialize_support_points (const unsigned int order)
 {
   const int dim = 3;
 
   // Create polynomial basis.
   const std::vector<Polynomials::Polynomial<double> > &lobatto_polynomials
-    = Polynomials::Lobatto::generate_complete_basis (degree + 1);
+    = Polynomials::Lobatto::generate_complete_basis (order + 1);
   std::vector<Polynomials::Polynomial<double> >
-  lobatto_polynomials_grad (degree + 1);
+  lobatto_polynomials_grad (order + 1);
 
   for (unsigned int i = 0; i < lobatto_polynomials_grad.size (); ++i)
     lobatto_polynomials_grad[i] = lobatto_polynomials[i + 1].derivative ();
 
   // Initialize quadratures to obtain
   // quadrature points later on.
-  const QGauss<1> reference_edge_quadrature (degree + 1);
+  const QGauss<1> reference_edge_quadrature (order + 1);
   const unsigned int &n_edge_points = reference_edge_quadrature.size ();
   const Quadrature<dim - 1>& edge_quadrature
     = QProjector<dim - 1>::project_to_all_faces
       (reference_edge_quadrature);
 
-  if (degree > 0)
+  if (order > 0)
     {
-      // If the polynomial degree is positive
+      // If the polynomial order is positive
       // we have support points on the edges,
       // faces and in the interior of a cell.
-      const QGauss<dim - 1> reference_face_quadrature (degree + 1);
+      const QGauss<dim - 1> reference_face_quadrature (order + 1);
       const unsigned int &n_face_points
         = reference_face_quadrature.size ();
       const unsigned int n_boundary_points
         = GeometryInfo<dim>::lines_per_cell * n_edge_points
           + GeometryInfo<dim>::faces_per_cell * n_face_points;
-      const QGauss<dim> quadrature (degree + 1);
+      const QGauss<dim> quadrature (order + 1);
       const unsigned int &n_interior_points = quadrature.size ();
 
       boundary_weights.reinit (n_edge_points + n_face_points,
-                               2 * (degree + 1) * degree);
+                               2 * (order + 1) * order);
       this->generalized_face_support_points.resize
       (4 * n_edge_points + n_face_points);
       this->generalized_support_points.resize
@@ -395,7 +396,7 @@ FE_Nedelec<3>::initialize_support_points (const unsigned int degree)
                      reference_edge_quadrature.point (q_point) (0));
               }
 
-          for (unsigned int i = 0; i < degree; ++i)
+          for (unsigned int i = 0; i < order; ++i)
             boundary_weights (q_point, i)
               = reference_edge_quadrature.weight (q_point)
                 * lobatto_polynomials_grad[i + 1].value
@@ -410,11 +411,11 @@ FE_Nedelec<3>::initialize_support_points (const unsigned int degree)
                                                 + 4 * n_edge_points]
             = reference_face_quadrature.point (q_point);
 
-          for (unsigned int i = 0; i <= degree; ++i)
-            for (unsigned int j = 0; j < degree; ++j)
+          for (unsigned int i = 0; i <= order; ++i)
+            for (unsigned int j = 0; j < order; ++j)
               {
                 boundary_weights (q_point + n_edge_points,
-                                  2 * (i * degree + j))
+                                  2 * (i * order + j))
                   = reference_face_quadrature.weight (q_point)
                     * lobatto_polynomials_grad[i].value
                     (this->generalized_face_support_points
@@ -423,7 +424,7 @@ FE_Nedelec<3>::initialize_support_points (const unsigned int degree)
                     (this->generalized_face_support_points
                      [q_point + 4 * n_edge_points] (1));
                 boundary_weights (q_point + n_edge_points,
-                                  2 * (i * degree + j) + 1)
+                                  2 * (i * order + j) + 1)
                   = reference_face_quadrature.weight (q_point)
                     * lobatto_polynomials_grad[i].value
                     (this->generalized_face_support_points

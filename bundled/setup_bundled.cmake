@@ -28,7 +28,7 @@ OPTION(DEAL_II_FORCE_BUNDLED_BOOST
   "Always use the bundled boost library instead of an external one."
   OFF)
 
-SET(BOOST_FOLDER "${CMAKE_SOURCE_DIR}/bundled/boost-1.56.0")
+SET(BOOST_FOLDER "${CMAKE_SOURCE_DIR}/bundled/boost-1.62.0")
 
 
 #

@@ -1,0 +1,6 @@
+New: Implemented some standard tensor definitions for elasticity in
+Physics::Elasticity::StandardTensors. Within the newly implemented
+Physics::Elasticity::Kinematics namespace are some standard
+definitions of kinematic quantities commonly used in elasticity.
+<br>
+(Jean-Paul Pelteret, Andrew McBride, 2016/12/05)

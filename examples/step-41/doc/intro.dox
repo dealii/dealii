@@ -239,10 +239,10 @@ pp. 865-888.
 
 The algorithm for the primal-dual active set method works as follows (NOTE: $B = B^T$):
 
-- [(0)] Initialize $\mathcal{A}_k$ and $\mathcal{F}_k$, such that
+1. Initialize $\mathcal{A}_k$ and $\mathcal{F}_k$, such that
  $\mathcal{S}=\mathcal{A}_k\cup\mathcal{F}_k$ and
  $\mathcal{A}_k\cap\mathcal{F}_k=\emptyset$ and set $k=1$.
-- [(1)] Find the primal-dual pair $(U^k,\Lambda^k)$ that satisfies
+2. Find the primal-dual pair $(U^k,\Lambda^k)$ that satisfies
  @f{align*}
   AU^k + B\Lambda^k &= F,\\
   [BU^k]_i &= G_i\quad&&\forall i\in\mathcal{A}_k,\\
@@ -251,16 +251,16 @@ The algorithm for the primal-dual active set method works as follows (NOTE: $B =
  Note that the second and third conditions imply that exactly $|S|$ unknowns
  are fixed, with the first condition yielding the remaining $|S|$ equations
  necessary to determine both $U$ and $\Lambda$.
-- [(2)] Define the new active and inactive sets by
+3. Define the new active and inactive sets by
  @f{equation*}
  \begin{split}
   \mathcal{A}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i + c([BU^k]_i - G_i)< 0\rbrace,\\
   \mathcal{F}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i + c([BU^k]_i - G_i)\geq 0\rbrace.
  \end{split}
  @f}
-- [(3)] If $\mathcal{A}_{k+1}=\mathcal{A}_k$ (and then, obviously, also
+4. If $\mathcal{A}_{k+1}=\mathcal{A}_k$ (and then, obviously, also
  $\mathcal{F}_{k+1}=\mathcal{F}_k$) then stop, else set $k=k+1$ and go to step
- (1).
+ (2).
 
 The method is called "primal-dual" because it uses both primal (the
 displacement $U$) as well as dual variables (the Lagrange multiplier
@@ -270,10 +270,10 @@ At the end of this section, let us add two observations. First,
 for any primal-dual pair $(U^k,\Lambda^k)$ that satisfies these
 condition, we can distinguish the following cases:
 
-- [1.] $\Lambda^k_i + c([BU^k]_i - G_i) < 0$ (i active):
+1. $\Lambda^k_i + c([BU^k]_i - G_i) < 0$ (i active):
   <br>
   Then either $[BU^k]_i<G_i$ and $\Lambda^k_i=0$ (penetration) or $\Lambda^k_i<0$ and $[BU^k]_i=G_i$ (pressing load).
-- [2.] $\Lambda^k_i + c([BU^k]_i - G_i)\geq 0$ (i inactive):
+2. $\Lambda^k_i + c([BU^k]_i - G_i)\geq 0$ (i inactive):
   <br>
   Then either $[BU^k]_i\geq G_i$ and $\Lambda^k_i=0$ (no contact) or $\Lambda^k_i\geq0$ and $[BU^k]_i=G_i$ (unpressing load).
 
@@ -416,3 +416,5 @@ follows step-4 with minor differences:
 - We change the preconditioner for the solver.
 
 
+You may want to read up on step-4 if you want to understand the
+current program.

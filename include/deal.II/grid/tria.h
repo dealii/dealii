@@ -94,20 +94,37 @@ namespace hp
 /*------------------------------------------------------------------------*/
 
 /**
- * A structure to describe individual cells and passed as argument to
- * Triangulation::create_triangulation(). It contains all data needed to
- * construct a cell, namely the indices of the vertices, the material or
- * boundary indicator (depending on whether it represents a cell or a face),
- * and a manifold id to describe the manifold this object belongs to.
+ * The CellData class (and the related SubCellData class) is used to
+ * provide a comprehensive, but minimal, description of the cells when
+ * creating a triangulation via Triangulation::create_triangulation().
+ * Specifically, each CellData object -- describing one cell in a
+ * triangulation -- has member variables for indices of the $2^d$ vertices
+ * (the actual coordinates of the vertices are described in a separate
+ * vector passed to Triangulation::create_triangulation(), so the CellData
+ * object only needs to store indices into that vector), the material
+ * id of the cell that can be used in applications to describe which
+ * part of the domain a cell belongs to (see
+ * @ref GlossMaterialId "the glossary entry on material ids"),
+ * and a manifold id that is used to describe the geometry object
+ * that is responsible for this cell (see
+ * @ref GlossManifoldIndicator "the glossary entry on manifold ids")
+ * to describe the manifold this object belongs to.
  *
- * This structure is also used to represent data for faces and edge as part of
- * the SubCellData class. In that case the #vertices array needs to represent
- * the vertices of a face or edge of a cell listed in the argument to
- * Triangulation::create_triangulation() that denotes the faces. It can be
- * used to attach boundary indicators to faces.
+ * This structure is also used to represent data for faces and edges when used
+ * as a member of the the SubCellData class. In this case, the template argument
+ * @p structdim of an object will be less than the dimension @p dim of the
+ * triangulation. If this is so, then #vertices array represents the indices of
+ * the vertices of one face or edge of one of the cells passed to
+ * Triangulation::create_triangulation(). Furthermore, for faces the
+ * material id has no meaning, and the @p material_id field is reused
+ * to store a @p boundary_id instead to designate which part of the boundary
+ * the face or edge belongs to (see
+ * @ref GlossBoundaryId "the glossary entry on boundary ids").
  *
  * An example showing how this class can be used is in the
- * <code>create_coarse_grid()</code> function of step-14.
+ * <code>create_coarse_grid()</code> function of step-14. There are also
+ * many more use cases in the implementation of the functions of the
+ * GridGenerator namespace.
  *
  * @ingroup grid
  */
@@ -115,28 +132,50 @@ template <int structdim>
 struct CellData
 {
   /**
-   * Indices of the vertices of this cell.
+   * Indices of the vertices of this cell. These indices correspond
+   * to entries in the vector of vertex locations passed to
+   * Triangulation::create_triangulation().
    */
   unsigned int vertices[GeometryInfo<structdim>::vertices_per_cell];
 
   /**
-   * Material or boundary indicator of this cell. The material_id may be used
-   * to denote different coefficients, etc.
-   *
-   * Note that if this object is part of a SubCellData object, then it
-   * represents a face or edge of a cell. In this case one should use the
-   * field boundary_id instead of material_id.
+   * Material or boundary indicator of this cell.
+   * This field is a union that stores <i>either</i> a boundary or
+   * a material id, depending on whether the current object is used
+   * to describe a cell (in a vector of CellData objects) or a
+   * face or edge (as part of a SubCellData object).
    */
   union
   {
-    types::boundary_id boundary_id;
+    /**
+     * The material id of the cell being described. See the documentation
+     * of the CellData class for examples of how to use this field.
+     *
+     * This variable can only be used if the current object is used to
+     * describe a cell, i.e., if @p structdim equals the dimension
+     * @p dim of a triangulation.
+     */
     types::material_id material_id;
+
+    /**
+     * The boundary id of a face or edge being described. See the documentation
+     * of the CellData class for examples of how to use this field.
+     *
+     * This variable can only be used if the current object is used to
+     * describe a face or edge, i.e., if @p structdim is less than the dimension
+     * @p dim of a triangulation. In this case, the CellData object this
+     * variable belongs to will be part of a SubCellData object.
+     */
+    types::boundary_id boundary_id;
   };
 
   /**
    * Manifold identifier of this object. This identifier should be used to
    * identify the manifold to which this object belongs, and from which this
    * object will collect information on how to add points upon refinement.
+   *
+   * See the documentation of the CellData class for examples of how to use
+   * this field.
    */
   types::manifold_id manifold_id;
 
@@ -153,56 +192,83 @@ struct CellData
 
 
 /**
- * Structure to be passed to Triangulation::create_triangulation function to
- * describe boundary information.
+ * The SubCellData class is used to describe information about faces and
+ * edges at the boundary of a mesh when creating a triangulation via
+ * Triangulation::create_triangulation(). It contains member variables
+ * that describe boundary edges and boundary quads.
  *
- * This structure is the same for all dimensions, since we use an input
- * function which is the same for all dimensions. The content of objects of
- * this structure varies with the dimensions, however.
+ * The class has no template argument and is used both in the description
+ * of boundary edges in 2d (in which case the contents of the
+ * @p boundary_quads member variable are ignored), as well as in the
+ * description of boundary edges and faces in 3d (in which case both the
+ * @p boundary_lines and @p boundary_quads members may be used). It is also
+ * used as the argument to Triangulation::create_triangulation() in 1d,
+ * where the contents of objects of the current type are simply ignored.
  *
- * Since in one dimension, there is no boundary information apart from the two
- * end points of the interval, this structure does not contain anything and
- * exists only for consistency, to allow a common interface for all space
- * dimensions. All fields should always be empty.
+ * By default, Triangulation::create_triangulation() simply assigns
+ * default boundary indicators and manifold indicators to edges and
+ * quads at the boundary of the mesh. (See the glossary entries on
+ * @ref GlossBoundaryId "boundary ids"
+ * and
+ * @ref GlossManifoldIndicator "manifold ids"
+ * for more information on what they represent.) As a consequence,
+ * it is not <i>necessary</i> to explicitly describe the properties
+ * of boundary objects. In all cases, these properties can also be
+ * set at a later time, once the triangulation has already been
+ * created. On the other hand, it is sometimes convenient to describe
+ * boundary indicators or manifold ids at the time of creation. In
+ * these cases, the current class can be used by filling the
+ * @p boundary_lines and @p boundary_quads vectors with
+ * CellData<1> and CellData<2> objects that correspond to boundary
+ * edges and quads for which properties other than the default
+ * values should be used.
  *
- * Boundary data in 2D consists of a list of lines which belong to a given
- * boundary component. A boundary component is a list of lines which are given
- * a common number describing the boundary condition to hold on this part of
- * the boundary. The triangulation creation function gives lines not in this
- * list either the boundary indicator zero (if on the boundary) or
- * numbers::internal_face_boundary_id (if in the interior).
+ * Each entry in the @p boundary_lines and @p boundary_quads vectors
+ * then needs to correspond to an edge or quad of the cells that
+ * are described by the vector of CellData objects passed to
+ * Triangulation::create_triangulation(). I.e., the vertex indices
+ * stored in each entry need to correspond to an edge or face
+ * of the triangulation that has the same set of vertex indices,
+ * and in the same order. For these boundary edges or quads, one can
+ * then set either or both the CellData::boundary_id and
+ * CellData::manifold_id.
  *
- * You will get an error if you try to set the boundary indicator of an
- * interior edge or face, i.e., an edge or face that is not at the boundary of
- * the mesh. However, one may sometimes want to set the manifold indicator to
- * an interior object. In this case, set its boundary indicator to
- * numbers::internal_face_boundary_id, to indicate that you understand that it
- * is an interior object, but set its manifold id to the value you want.
+ * There are also use cases where one may want to set the manifold id
+ * of an <i>interior</i> edge or face. Such faces, identified by
+ * their vertex indices, may also appear in the
+ * @p boundary_lines and @p boundary_quads vectors (despite the names of
+ * these member variables). However, it is then obviously not allowed
+ * to set a boundary id (because the object is not actually part of
+ * the boundary). As a consequence, to be valid, the CellData::boundary_id
+ * of interior edges or faces needs to equal
+ * numbers::internal_face_boundary_id.
  *
  * @ingroup grid
  */
 struct SubCellData
 {
   /**
-   * Each record of this vector describes a line on the boundary and its
-   * boundary indicator.
+   * A vector of CellData<1> objects that describe boundary and manifold
+   * information for edges of 2d or 3d triangulations.
+   *
+   * This vector may not be used in the creation of 1d triangulations.
    */
   std::vector<CellData<1> > boundary_lines;
 
   /**
-   * Each record of this vector describes a quad on the boundary and its
-   * boundary indicator.
+   * A vector of CellData<2> objects that describe boundary and manifold
+   * information for quads of 3d triangulations.
+   *
+   * This vector may not be used in the creation of 1d or 2d triangulations.
    */
   std::vector<CellData<2> > boundary_quads;
 
   /**
-   * This function checks whether the vectors which may not be used in a given
-   * dimension are really empty. I.e., whether the <tt>boundary_*</tt> arrays
-   * are empty when in one space dimension and whether the @p boundary_quads
-   * array is empty when in two dimensions.
-   *
-   * Since this structure is the same for all dimensions, the actual dimension
-   * has to be given as a parameter.
+   * Determine whether the member variables above which may not be used in a given
+   * dimension are really empty. In other words, this function returns whether
+   * both @p boundary_lines and @p boundary_quads are empty vectors
+   * when @p dim equals one, and whether the @p boundary_quads
+   * vector is empty when @p dim equals two.
    */
   bool check_consistency (const unsigned int dim) const;
 };
@@ -1053,21 +1119,26 @@ namespace internal
  * with which they interface; for example, triangulations store pointers to
  * objects describing boundaries and manifolds, and they have signals that
  * store pointers to other objects so they can be notified of changes in the
- * triangulation (see the section on signals in this introduction). As objects
- * that are re-loaded at a later time do not usually end up at the same
- * location in memory as they were when they were saved, dealing with pointers
- * to other objects is difficult.
+ * triangulation (see the section on signals in this introduction). Since these
+ * objects are owned by the user space (for example the user can create a custom
+ * manifold object), they may not be serializable. So in cases like this,
+ * boost::serialize can store a reference to an object instead of the pointer,
+ * but the reference will never be satisfied at write time because the object
+ * pointed to is not serialized. Clearly, at load time, boost::serialize will
+ * not know where to let the pointer point to because it never gets to re-create
+ * the object originally pointed to.
  *
  * For these reasons, saving a triangulation to an archive does not store all
  * information, but only certain parts. More specifically, the information
  * that is stored is everything that defines the mesh such as vertex
  * locations, vertex indices, how vertices are connected to cells, boundary
  * indicators, subdomain ids, material ids, etc. On the other hand, the
- * following information is not stored: - signals - pointers to boundary
- * objects previously set using Triangulation::set_boundary On the other hand,
- * since these are objects that are usually set in user code, they can
- * typically easily be set again in that part of your code in which you re-
- * load triangulations.
+ * following information is not stored:
+ *   - signals
+ *   - pointers to boundary objects previously set using Triangulation::set_boundary
+ * On the other hand, since these are objects that are usually set in user code,
+ * they can typically easily be set again in that part of your code in which you
+ * re-load triangulations.
  *
  * In a sense, this approach to serialization means that re-loading a
  * triangulation is more akin to calling the
@@ -1530,6 +1601,11 @@ public:
    * triangulation.
    */
   Triangulation (Triangulation<dim, spacedim> &&tria);
+
+  /**
+   * Move assignment operator.
+   */
+  Triangulation &operator = (Triangulation<dim, spacedim> &&tria);
 #endif
 
   /**
@@ -3449,6 +3525,14 @@ private:
 
   template <typename>
   friend class dealii::internal::Triangulation::TriaObjects;
+
+  // explicitly check for sensible template arguments
+#ifdef DEAL_II_WITH_CXX11
+  static_assert (dim<=spacedim,
+                 "The dimension <dim> of a Triangulation must be less than or "
+                 "equal to the space dimension <spacedim> in which it lives.");
+#endif
+
 };
 
 
@@ -3674,16 +3758,6 @@ template <> unsigned int Triangulation<1,3>::n_raw_hexs (const unsigned int leve
 template <> unsigned int Triangulation<1,3>::n_active_quads (const unsigned int level) const;
 template <> unsigned int Triangulation<1,3>::n_active_quads () const;
 template <> unsigned int Triangulation<1,3>::max_adjacent_cells () const;
-
-
-// -------------------------------------------------------------------
-// Explicit invalid things...
-template <>
-const Manifold<2,1> &Triangulation<2, 1>::get_manifold(const types::manifold_id) const;
-template <>
-const Manifold<3,1> &Triangulation<3, 1>::get_manifold(const types::manifold_id) const;
-template <>
-const Manifold<3,2> &Triangulation<3, 2>::get_manifold(const types::manifold_id) const;
 
 
 #endif // DOXYGEN

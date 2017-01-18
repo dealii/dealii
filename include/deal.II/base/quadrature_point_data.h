@@ -231,10 +231,10 @@ namespace parallel
      * automatic shipping of information between different processors.
      *
      * To that end, the constructor of the class is provided with three main objects:
-     * scalar FiniteElement @projection_fe, @p mass_quadrature and @p data_quadrature
+     * scalar FiniteElement @p projection_fe, @p mass_quadrature and @p data_quadrature
      * Quadrature rules.
      * First, the data located at @p data_quadrature of each cell is L2-projected
-     * to the continuous space defined by a single FiniteElement @projection_fe .
+     * to the continuous space defined by a single FiniteElement @p projection_fe .
      * This is achieved using FETools::compute_projection_from_quadrature_points_matrix().
      * In  doing so the mass matrix of this element is required, which will be calculated
      * with the @p mass_quadrature rule . Should the cell now belong to another processor,
@@ -639,12 +639,11 @@ void pack_cell_data
 
   const std::vector<std::shared_ptr<const DataType> > qpd = data_storage->get_data(cell);
 
-  const unsigned int m = matrix_data.m();
   const unsigned int n = matrix_data.n();
 
   std::vector<double> single_qp_data(n);
-  Assert (qpd.size() == m,
-          ExcDimensionMismatch(qpd.size(),m));
+  Assert (qpd.size() == matrix_data.m(),
+          ExcDimensionMismatch(qpd.size(), matrix_data.m()));
   for (unsigned int q = 0; q < qpd.size(); q++)
     {
       qpd[q]->pack_values(single_qp_data);
@@ -673,12 +672,11 @@ void unpack_to_cell_data
 
   std::vector<std::shared_ptr<DataType> > qpd = data_storage->get_data(cell);
 
-  const unsigned int m = values_at_qp.m();
   const unsigned int n = values_at_qp.n();
 
   std::vector<double> single_qp_data(n);
-  Assert(qpd.size() == m,
-         ExcDimensionMismatch(qpd.size(),m));
+  Assert(qpd.size() == values_at_qp.m(),
+         ExcDimensionMismatch(qpd.size(), values_at_qp.m()));
 
   for (unsigned int q = 0; q < qpd.size(); q++)
     {

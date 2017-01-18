@@ -126,7 +126,7 @@ void check_smoother(const MGLevelObject<MatrixType> &m,
                     const MGLevelObject<RELAX> &r)
 {
   GrowingVectorMemory<BlockVector<double> > mem;
-  MGSmootherBlock<MatrixType, RELAX, double> smoother(mem);
+  MGSmootherBlock<MatrixType, RELAX, double> smoother;
 
   smoother.initialize(m, r);
 

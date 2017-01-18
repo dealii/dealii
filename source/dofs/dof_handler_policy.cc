@@ -1092,7 +1092,7 @@ namespace internal
                           std::vector<NumberCache> &number_caches) const
       {
         // first, call the sequential function to distribute dofs
-        Sequential<dim,spacedim>:: distribute_mg_dofs (dof_handler, number_caches);
+        Sequential<dim,spacedim>::distribute_mg_dofs (dof_handler, number_caches);
         // now we need to update the number cache.
         // This part is not yet implemented.
         AssertThrow(false,ExcNotImplemented());
@@ -1160,9 +1160,10 @@ namespace internal
               types::global_dof_index shift = 0;
               //set rcounts based on new_numbers:
               int cur_count = new_numbers_copy.size ();
-              MPI_Allgather (&cur_count,  1, MPI_INT,
-                             &rcounts[0], 1, MPI_INT,
-                             tr->get_communicator ());
+              int ierr = MPI_Allgather (&cur_count,  1, MPI_INT,
+                                        &rcounts[0], 1, MPI_INT,
+                                        tr->get_communicator ());
+              AssertThrowMPI(ierr);
 
               for (unsigned int i = 0; i < n_cpu; i++)
                 {
@@ -1172,12 +1173,13 @@ namespace internal
               Assert(((int)new_numbers_copy.size()) ==
                      rcounts[Utilities::MPI::this_mpi_process (tr->get_communicator ())],
                      ExcInternalError());
-              MPI_Allgatherv (&new_numbers_copy[0],     new_numbers_copy.size (),
-                              DEAL_II_DOF_INDEX_MPI_TYPE,
-                              &gathered_new_numbers[0], &rcounts[0],
-                              &displs[0],
-                              DEAL_II_DOF_INDEX_MPI_TYPE,
-                              tr->get_communicator ());
+              ierr = MPI_Allgatherv (&new_numbers_copy[0],     new_numbers_copy.size (),
+                                     DEAL_II_DOF_INDEX_MPI_TYPE,
+                                     &gathered_new_numbers[0], &rcounts[0],
+                                     &displs[0],
+                                     DEAL_II_DOF_INDEX_MPI_TYPE,
+                                     tr->get_communicator ());
+              AssertThrowMPI(ierr);
             }
 
             // put new numbers according to the current locally_owned_dofs_per_processor IndexSets
@@ -1599,10 +1601,10 @@ namespace internal
                                    const std::vector<dealii::types::global_dof_index> &p4est_tree_to_coarse_cell_permutation)
         {
           // build list of cells to request for each neighbor
-          std::set<unsigned int> level_ghost_owners = tria.level_ghost_owners();
+          std::set<dealii::types::subdomain_id> level_ghost_owners = tria.level_ghost_owners();
           typedef std::map<dealii::types::subdomain_id, typename types<dim>::cellinfo> cellmap_t;
           cellmap_t neighbor_cell_list;
-          for (std::set<unsigned int>::iterator it = level_ghost_owners.begin();
+          for (std::set<dealii::types::subdomain_id>::iterator it = level_ghost_owners.begin();
                it != level_ghost_owners.end();
                ++it)
             neighbor_cell_list.insert(std::make_pair(*it, typename types<dim>::cellinfo()));
@@ -1641,9 +1643,10 @@ namespace internal
               // that the packet has been
               // received
               it->second.pack_data (sendbuffers[idx]);
-              MPI_Isend(sendbuffers[idx].data(), sendbuffers[idx].size(),
-                        MPI_BYTE, it->first,
-                        1100101, tria.get_communicator(), &requests[idx]);
+              const int ierr = MPI_Isend(sendbuffers[idx].data(), sendbuffers[idx].size(),
+                                         MPI_BYTE, it->first,
+                                         1100101, tria.get_communicator(), &requests[idx]);
+              AssertThrowMPI(ierr);
             }
 
           //* receive requests and reply
@@ -1657,13 +1660,16 @@ namespace internal
 
               MPI_Status status;
               int len;
-              MPI_Probe(MPI_ANY_SOURCE, 1100101, tria.get_communicator(), &status);
-              MPI_Get_count(&status, MPI_BYTE, &len);
+              int ierr = MPI_Probe(MPI_ANY_SOURCE, 1100101, tria.get_communicator(), &status);
+              AssertThrowMPI(ierr);
+              ierr = MPI_Get_count(&status, MPI_BYTE, &len);
+              AssertThrowMPI(ierr);
               receive.resize(len);
 
               char *ptr = &receive[0];
-              MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
-                       tria.get_communicator(), &status);
+              ierr = MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
+                              tria.get_communicator(), &status);
+              AssertThrowMPI(ierr);
 
               cellinfo.unpack_data(receive);
 
@@ -1688,9 +1694,10 @@ namespace internal
 
               //send reply
               cellinfo.pack_data(reply_buffers[idx]);
-              MPI_Isend(&(reply_buffers[idx])[0], reply_buffers[idx].size(),
-                        MPI_BYTE, status.MPI_SOURCE,
-                        1100102, tria.get_communicator(), &reply_requests[idx]);
+              ierr = MPI_Isend(&(reply_buffers[idx])[0], reply_buffers[idx].size(),
+                               MPI_BYTE, status.MPI_SOURCE,
+                               1100102, tria.get_communicator(), &reply_requests[idx]);
+              AssertThrowMPI(ierr);
             }
 
           // * finally receive the replies
@@ -1701,13 +1708,16 @@ namespace internal
 
               MPI_Status status;
               int len;
-              MPI_Probe(MPI_ANY_SOURCE, 1100102, tria.get_communicator(), &status);
-              MPI_Get_count(&status, MPI_BYTE, &len);
+              int ierr = MPI_Probe(MPI_ANY_SOURCE, 1100102, tria.get_communicator(), &status);
+              AssertThrowMPI(ierr);
+              ierr = MPI_Get_count(&status, MPI_BYTE, &len);
+              AssertThrowMPI(ierr);
               receive.resize(len);
 
               char *ptr = &receive[0];
-              MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
-                       tria.get_communicator(), &status);
+              ierr = MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
+                              tria.get_communicator(), &status);
+              AssertThrowMPI(ierr);
 
               cellinfo.unpack_data(receive);
               if (cellinfo.tree_index.size()==0)
@@ -1739,9 +1749,15 @@ namespace internal
           // complete all sends, so that we can
           // safely destroy the buffers.
           if (requests.size() > 0)
-            MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+            {
+              const int ierr = MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+              AssertThrowMPI(ierr);
+            }
           if (reply_requests.size() > 0)
-            MPI_Waitall(reply_requests.size(), &reply_requests[0], MPI_STATUSES_IGNORE);
+            {
+              const int ierr = MPI_Waitall(reply_requests.size(), &reply_requests[0], MPI_STATUSES_IGNORE);
+              AssertThrowMPI(ierr);
+            }
 
         }
 
@@ -1909,9 +1925,10 @@ namespace internal
               // that the packet has been
               // received
               it->second.pack_data (*buffer);
-              MPI_Isend(&(*buffer)[0], buffer->size(),
-                        MPI_BYTE, it->first,
-                        123, tr->get_communicator(), &requests[idx]);
+              const int ierr = MPI_Isend(&(*buffer)[0], buffer->size(),
+                                         MPI_BYTE, it->first,
+                                         123, tr->get_communicator(), &requests[idx]);
+              AssertThrowMPI(ierr);
             }
 
 
@@ -1955,13 +1972,16 @@ namespace internal
             {
               MPI_Status status;
               int len;
-              MPI_Probe(MPI_ANY_SOURCE, 123, tr->get_communicator(), &status);
-              MPI_Get_count(&status, MPI_BYTE, &len);
+              int ierr = MPI_Probe(MPI_ANY_SOURCE, 123, tr->get_communicator(), &status);
+              AssertThrowMPI(ierr);
+              ierr = MPI_Get_count(&status, MPI_BYTE, &len);
+              AssertThrowMPI(ierr);
               receive.resize(len);
 
               char *ptr = &receive[0];
-              MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
-                       tr->get_communicator(), &status);
+              ierr = MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
+                              tr->get_communicator(), &status);
+              AssertThrowMPI(ierr);
 
               typename types<dim>::cellinfo cellinfo;
               cellinfo.unpack_data(receive);
@@ -1994,7 +2014,10 @@ namespace internal
           // complete all sends, so that we can
           // safely destroy the buffers.
           if (requests.size() > 0)
-            MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+            {
+              const int ierr = MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+              AssertThrowMPI(ierr);
+            }
 
 
 #ifdef DEBUG
@@ -2005,8 +2028,10 @@ namespace internal
             unsigned int sent=needs_to_get_cells.size();
             unsigned int recv=senders.size();
 
-            MPI_Allreduce(&sent, &sum_send, 1, MPI_UNSIGNED, MPI_SUM, tr->get_communicator());
-            MPI_Allreduce(&recv, &sum_recv, 1, MPI_UNSIGNED, MPI_SUM, tr->get_communicator());
+            int ierr = MPI_Allreduce(&sent, &sum_send, 1, MPI_UNSIGNED, MPI_SUM, tr->get_communicator());
+            AssertThrowMPI(ierr);
+            ierr = MPI_Allreduce(&recv, &sum_recv, 1, MPI_UNSIGNED, MPI_SUM, tr->get_communicator());
+            AssertThrowMPI(ierr);
             Assert(sum_send==sum_recv, ExcInternalError());
           }
 #endif
@@ -2037,7 +2062,8 @@ namespace internal
           // processors from which we expect
           // messages, and by using different
           // tags for phase 1 and 2
-          MPI_Barrier(tr->get_communicator());
+          const int ierr = MPI_Barrier(tr->get_communicator());
+          AssertThrowMPI(ierr);
 #endif
         }
 
@@ -2132,11 +2158,12 @@ namespace internal
         //shift ids to make them unique
         number_cache.n_locally_owned_dofs_per_processor.resize(n_cpus);
 
-        MPI_Allgather ( &number_cache.n_locally_owned_dofs,
-                        1, DEAL_II_DOF_INDEX_MPI_TYPE,
-                        &number_cache.n_locally_owned_dofs_per_processor[0],
-                        1, DEAL_II_DOF_INDEX_MPI_TYPE,
-                        tr->get_communicator());
+        const int ierr = MPI_Allgather ( &number_cache.n_locally_owned_dofs,
+                                         1, DEAL_II_DOF_INDEX_MPI_TYPE,
+                                         &number_cache.n_locally_owned_dofs_per_processor[0],
+                                         1, DEAL_II_DOF_INDEX_MPI_TYPE,
+                                         tr->get_communicator());
+        AssertThrowMPI(ierr);
 
         const dealii::types::global_dof_index
         shift = std::accumulate (number_cache
@@ -2365,11 +2392,12 @@ namespace internal
             //shift ids to make them unique
             number_cache.n_locally_owned_dofs_per_processor.resize(n_cpus);
 
-            MPI_Allgather ( &number_cache.n_locally_owned_dofs,
-                            1, DEAL_II_DOF_INDEX_MPI_TYPE,
-                            &number_cache.n_locally_owned_dofs_per_processor[0],
-                            1, DEAL_II_DOF_INDEX_MPI_TYPE,
-                            tr->get_communicator());
+            int ierr = MPI_Allgather ( &number_cache.n_locally_owned_dofs,
+                                       1, DEAL_II_DOF_INDEX_MPI_TYPE,
+                                       &number_cache.n_locally_owned_dofs_per_processor[0],
+                                       1, DEAL_II_DOF_INDEX_MPI_TYPE,
+                                       tr->get_communicator());
+            AssertThrowMPI(ierr);
 
             const dealii::types::global_dof_index
             shift = std::accumulate (number_cache
@@ -2466,7 +2494,8 @@ namespace internal
 
           // This barrier is crucial so that messages between phase 1&2 don't
           // mix.
-          MPI_Barrier(tr->get_communicator());
+          const int ierr = MPI_Barrier(tr->get_communicator());
+          AssertThrowMPI(ierr);
 
           // Phase 2, only request the cells that were not completed in Phase
           // 1.
@@ -2724,9 +2753,10 @@ namespace internal
           my_data.resize(max_size);
 
           std::vector<char> buffer(max_size*n_cpus);
-          MPI_Allgather(&my_data[0], max_size, MPI_BYTE,
-                        &buffer[0], max_size, MPI_BYTE,
-                        tr->get_communicator());
+          const int ierr = MPI_Allgather(&my_data[0], max_size, MPI_BYTE,
+                                         &buffer[0], max_size, MPI_BYTE,
+                                         tr->get_communicator());
+          AssertThrowMPI(ierr);
 
           number_cache.locally_owned_dofs_per_processor.resize (n_cpus);
           number_cache.n_locally_owned_dofs_per_processor.resize (n_cpus);

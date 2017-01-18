@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 by the deal.II authors
+// Copyright (C) 2014-2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,6 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
+#ifndef dealii__std_cxx1x_bind_h
+#define dealii__std_cxx1x_bind_h
+
 // this file is deprecated. simply include the one we use now
 #include "../std_cxx11/bind.h"
 
@@ -20,3 +23,5 @@
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx1x = std_cxx11;
 DEAL_II_NAMESPACE_CLOSE
+
+#endif

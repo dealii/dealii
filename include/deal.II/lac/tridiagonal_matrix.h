@@ -78,14 +78,14 @@ public:
 //@{
 
   /**
-   * Number of rows of this matrix. To remember: this matrix is an <i>m x
-   * m</i>-matrix.
+   * Number of rows of this matrix. Note that the matrix is an <i>m x
+   * m</i> matrix.
    */
   size_type m () const;
 
   /**
-   * Number of columns of this matrix. To remember: this matrix is an <i>n x
-   * n</i>-matrix.
+   * Number of columns of this matrix. Note that the matrix is an <i>n x
+   * n</i> matrix.
    */
   size_type n () const;
 
@@ -398,4 +398,3 @@ TridiagonalMatrix<number>::print (
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-

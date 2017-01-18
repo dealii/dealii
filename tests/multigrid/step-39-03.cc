@@ -675,6 +675,8 @@ namespace Step39
     data_out.build_patches ();
 
     data_out.write_gnuplot(gnuplot_output);
+
+    delete[] fn;
   }
 
   template <int dim>

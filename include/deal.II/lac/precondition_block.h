@@ -212,8 +212,7 @@ protected:
   /**
    * Replacement of invert_diagblocks() for permuted preconditioning.
    */
-  void invert_permuted_diagblocks(const std::vector<size_type> &permutation,
-                                  const std::vector<size_type> &inverse_permutation);
+  void invert_permuted_diagblocks();
 public:
   /**
    * Deletes the inverse diagonal block matrices if existent, sets the

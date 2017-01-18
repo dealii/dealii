@@ -36,7 +36,8 @@ TimestepControl::TimestepControl (double start,
     min_step_val(0),
     current_step_val(start_step),
     step_val(start_step),
-    print_step(print_step)
+    print_step(print_step),
+    next_print_val(print_step > 0. ? start_val + print_step : start_val - 1.)
 {
   now_val = start_val;
   strcpy(format, "T.%06.3f");

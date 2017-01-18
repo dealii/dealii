@@ -277,9 +277,9 @@ namespace internal
 
 
       /**
-       * Copy constructor.
+       * Copy constructor from an iterator with the same constness.
        */
-      Iterator (const Iterator<BlockVectorType,Constness> &c);
+      Iterator (const Iterator &c);
 
     private:
       /**
@@ -2049,11 +2049,9 @@ template <class VectorType>
 std::size_t
 BlockVectorBase<VectorType>::memory_consumption () const
 {
-  std::size_t mem = sizeof(this->n_blocks());
-  for (size_type i=0; i<this->components.size(); ++i)
-    mem += MemoryConsumption::memory_consumption (this->components[i]);
-  mem += MemoryConsumption::memory_consumption (this->block_indices);
-  return mem;
+  return (MemoryConsumption::memory_consumption (this->block_indices)
+          +
+          MemoryConsumption::memory_consumption (this->components));
 }
 
 

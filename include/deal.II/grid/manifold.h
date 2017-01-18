@@ -298,6 +298,14 @@ class Manifold : public Subscriptor
 {
 public:
 
+  // explicitly check for sensible template arguments
+#ifdef DEAL_II_WITH_CXX11
+  static_assert (dim<=spacedim,
+                 "The dimension <dim> of a Manifold must be less than or "
+                 "equal to the space dimension <spacedim> in which it lives.");
+#endif
+
+
   /**
    * Type keeping information about the normals at the vertices of a face of a
    * cell. Thus, there are <tt>GeometryInfo<dim>::vertices_per_face</tt>
@@ -548,6 +556,24 @@ public:
    * mapped surface, however, will not usually coincide with the
    * actual surface.)
    *
+   * This function only makes sense if dim==spacedim because
+   * otherwise there is no unique normal vector but in fact a
+   * (spacedim-dim+1)-dimensional tangent space of vectors that
+   * are all both normal to the face and normal to the dim-dimensional
+   * surface that lives in spacedim-dimensional space. For example,
+   * think of a two-dimensional mesh that covers a two-dimensional
+   * surface in three-dimensional space. In that case, each
+   * face (edge) is one-dimensional, and there are two linearly independent
+   * vectors that are both normal to the edge: one is normal to the
+   * edge and tangent to the surface (intuitively, that would be the
+   * one that points from the current cell to the neighboring one,
+   * if the surface was locally flat), and the other one is rooted
+   * in the edge but points perpendicular to the surface (which is
+   * also perpendicular to the edge that lives within the surface).
+   * Thus, because there are no obviously correct semantics for this function
+   * if spacedim is greater than dim, the function will simply throw
+   * an error in that situation.
+   *
    * The face iterator gives an indication which face this function is
    * supposed to compute the normal vector for.  This is useful if the
    * boundary of the domain is composed of different nondifferential
@@ -556,10 +582,22 @@ public:
    * mesh, with piecewise (bi-)linear components between the vertices,
    * but where the boundary may have a kink at the vertices itself).
    *
-   * @note The default implementation of this function computes the
-   * normal vector by taking the cross product between the tangent
-   * vectors from p to the most orthogonal and further non consecutive
-   * vertices of the face.
+   * @note In 2d, the default implementation of this function computes the
+   * normal vector by taking the tangent direction from p to
+   * the further one of the two vertices that make up an edge, and then
+   * rotates it outward (with respect to the coordinate system of the edge)
+   * by 90 degrees. In 3d, the default implementation is more
+   * complicated, aiming at avoiding problems with numerical round-off
+   * for points close to one of the vertices. If the point p is closer
+   * to the center of the face than to any of the vertices, the
+   * normal vector is computed by the cross product of the tangent
+   * vectors from p to either vertex zero and one of the face (if
+   * the closest vertex is either vertex two or three), or of the tangent
+   * vectors from p to vertices two and three (if the closest vertex is
+   * either vertex zero or one). On the other hand, if the point p
+   * is closer to one of the vertices than to the center of the face,
+   * then we take the cross product of the tangent vectors from p
+   * to the two vertices that are adjacent to the closest one.
    */
   virtual
   Tensor<1,spacedim>
@@ -849,6 +887,13 @@ template <int dim, int spacedim=dim, int chartdim=dim>
 class ChartManifold : public Manifold<dim,spacedim>
 {
 public:
+  // explicitly check for sensible template arguments
+#ifdef DEAL_II_WITH_CXX11
+  static_assert (dim<=spacedim,
+                 "The dimension <dim> of a ChartManifold must be less than or "
+                 "equal to the space dimension <spacedim> in which it lives.");
+#endif
+
   /**
    * Constructor. The optional argument can be used to specify the periodicity
    * of the chartdim-dimensional manifold (one period per direction). A
@@ -998,8 +1043,15 @@ private:
   /**
    * The sub_manifold object is used to compute the average of the points in
    * the chart coordinates system.
+   *
+   * In an ideal world, it would have type
+   * FlatManifold<dim,chartdim>. However, this would instantiate cases
+   * where dim>spacedim, which leads to invalid situations. We instead
+   * use <chartdim,chartdim>, which is (i) always valid, and (ii) does
+   * not matter at all since the first (dim) argument of manifolds is,
+   * in fact, ignored as far as manifold functionality is concerned.
    */
-  const FlatManifold<dim,chartdim> sub_manifold;
+  const FlatManifold<chartdim,chartdim> sub_manifold;
 };
 
 

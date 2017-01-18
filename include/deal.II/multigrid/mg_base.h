@@ -38,8 +38,8 @@ DEAL_II_NAMESPACE_OPEN
  * multilevel algorithms. It has no relation to the actual matrix type and
  * takes the vector class as only template argument.
  *
- * Usually, the derived class MGMatrix, operating on an MGLevelObject of
- * matrices will be sufficient for applications.
+ * Usually, the derived class mg::Matrix, which operates on an MGLevelObject
+ * of matrices, will be sufficient for applications.
  *
  * @author Guido Kanschat, 2002
  */
@@ -79,6 +79,16 @@ public:
   virtual void Tvmult_add (const unsigned int level,
                            VectorType         &dst,
                            const VectorType   &src) const = 0;
+
+  /**
+   * Return the minimal level for which matrices are stored.
+   */
+  virtual unsigned int get_minlevel() const = 0;
+
+  /**
+   * Return the minimal level for which matrices are stored.
+   */
+  virtual unsigned int get_maxlevel() const = 0;
 };
 
 

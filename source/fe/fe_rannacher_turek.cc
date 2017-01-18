@@ -26,7 +26,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
-FE_RannacherTurek<dim>::FE_RannacherTurek(const unsigned int degree,
+FE_RannacherTurek<dim>::FE_RannacherTurek(const unsigned int order,
                                           const unsigned int n_face_support_points) :
   FE_Poly<PolynomialsRannacherTurek<dim>, dim>(
     PolynomialsRannacherTurek<dim>(),
@@ -36,11 +36,11 @@ FE_RannacherTurek<dim>::FE_RannacherTurek(const unsigned int degree,
                            FiniteElementData<dim>::L2),
     std::vector<bool>(4, false), // restriction not implemented
     std::vector<ComponentMask>(4, std::vector<bool>(1, true))),
-  degree(degree),
+  order(order),
   n_face_support_points(n_face_support_points)
 {
   Assert(dim == 2, ExcNotImplemented());
-  Assert(degree == 0, ExcNotImplemented());
+  Assert(order == 0, ExcNotImplemented());
   this->initialize_support_points();
 }
 
@@ -63,7 +63,7 @@ std::string FE_RannacherTurek<dim>::get_name() const
   std::ostringstream namebuf;
   namebuf << "FE_RannacherTurek"
           << "<" << dim << ">"
-          << "(" << this->degree << ", " << this->n_face_support_points << ")";
+          << "(" << this->order << ", " << this->n_face_support_points << ")";
   return namebuf.str();
 }
 
@@ -72,7 +72,7 @@ std::string FE_RannacherTurek<dim>::get_name() const
 template <int dim>
 FiniteElement<dim> *FE_RannacherTurek<dim>::clone() const
 {
-  return new FE_RannacherTurek<dim>(this->degree, this->n_face_support_points);
+  return new FE_RannacherTurek<dim>(this->order, this->n_face_support_points);
 }
 
 

@@ -38,7 +38,6 @@ FE_DGPNonparametric<dim,spacedim>::FE_DGPNonparametric (const unsigned int degre
     std::vector<ComponentMask>(
       FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell,
       std::vector<bool>(1,true))),
-  degree(degree),
   polynomial_space (Polynomials::Legendre::generate_complete_basis(degree))
 {
   const unsigned int n_dofs = this->dofs_per_cell;
@@ -107,7 +106,7 @@ FE_DGPNonparametric<dim,spacedim>::get_name () const
   std::ostringstream namebuf;
   namebuf << "FE_DGPNonparametric<"
           << Utilities::dim_string(dim,spacedim)
-          << ">(" << degree << ")";
+          << ">(" << this->degree << ")";
 
   return namebuf.str();
 }
@@ -294,9 +293,9 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
 
   const unsigned int n_q_points = mapping_data.quadrature_points.size();
 
-  std::vector<double> values(fe_internal.update_each & update_values ? this->dofs_per_cell : 0);
-  std::vector<Tensor<1,dim> > grads(fe_internal.update_each & update_gradients ? this->dofs_per_cell : 0);
-  std::vector<Tensor<2,dim> > grad_grads(fe_internal.update_each & update_hessians ? this->dofs_per_cell : 0);
+  std::vector<double> values((fe_internal.update_each & update_values) ? this->dofs_per_cell : 0);
+  std::vector<Tensor<1,dim> > grads((fe_internal.update_each & update_gradients) ? this->dofs_per_cell : 0);
+  std::vector<Tensor<2,dim> > grad_grads((fe_internal.update_each & update_hessians) ? this->dofs_per_cell : 0);
   std::vector<Tensor<3,dim> > empty_vector_of_3rd_order_tensors;
   std::vector<Tensor<4,dim> > empty_vector_of_4th_order_tensors;
 
@@ -340,9 +339,9 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
 
   const unsigned int n_q_points = mapping_data.quadrature_points.size();
 
-  std::vector<double> values(fe_internal.update_each & update_values ? this->dofs_per_cell : 0);
-  std::vector<Tensor<1,dim> > grads(fe_internal.update_each & update_gradients ? this->dofs_per_cell : 0);
-  std::vector<Tensor<2,dim> > grad_grads(fe_internal.update_each & update_hessians ? this->dofs_per_cell : 0);
+  std::vector<double> values((fe_internal.update_each & update_values) ? this->dofs_per_cell : 0);
+  std::vector<Tensor<1,dim> > grads((fe_internal.update_each & update_gradients) ? this->dofs_per_cell : 0);
+  std::vector<Tensor<2,dim> > grad_grads((fe_internal.update_each & update_hessians) ? this->dofs_per_cell : 0);
   std::vector<Tensor<3,dim> > empty_vector_of_3rd_order_tensors;
   std::vector<Tensor<4,dim> > empty_vector_of_4th_order_tensors;
 
@@ -387,9 +386,9 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 
   const unsigned int n_q_points = mapping_data.quadrature_points.size();
 
-  std::vector<double> values(fe_internal.update_each & update_values ? this->dofs_per_cell : 0);
-  std::vector<Tensor<1,dim> > grads(fe_internal.update_each & update_gradients ? this->dofs_per_cell : 0);
-  std::vector<Tensor<2,dim> > grad_grads(fe_internal.update_each & update_hessians ? this->dofs_per_cell : 0);
+  std::vector<double> values((fe_internal.update_each & update_values) ? this->dofs_per_cell : 0);
+  std::vector<Tensor<1,dim> > grads((fe_internal.update_each & update_gradients) ? this->dofs_per_cell : 0);
+  std::vector<Tensor<2,dim> > grad_grads((fe_internal.update_each & update_hessians) ? this->dofs_per_cell : 0);
   std::vector<Tensor<3,dim> > empty_vector_of_3rd_order_tensors;
   std::vector<Tensor<4,dim> > empty_vector_of_4th_order_tensors;
 
@@ -585,7 +584,7 @@ template <int dim, int spacedim>
 unsigned int
 FE_DGPNonparametric<dim,spacedim>::get_degree () const
 {
-  return degree;
+  return this->degree;
 }
 
 

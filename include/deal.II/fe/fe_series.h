@@ -56,12 +56,12 @@ namespace FESeries
    * A class to calculate expansion of a scalar FE field into Fourier series
    * on a reference element. The exponential form of the Fourier series is
    * based on completeness and Hermitian orthogonality of the set of exponential
-   * functions \f$ \phi_{\bf k}({\bf x}) = \exp(2 \pi i\, {\bf k} \cdot {\bf x})\f$.
+   * functions $ \phi_{\bf k}({\bf x}) = \exp(2 \pi i\, {\bf k} \cdot {\bf x})$.
    * For example in 1D the L2-orthogonality condition reads
    * @f[
    *   \int_0^1 \phi_k(x) \phi_l^\ast(x) dx=\delta_{kl}.
    * @f]
-   * Note that \f$ \phi_{\bf k} = \phi_{-\bf k}^\ast \f$.
+   * Note that $ \phi_{\bf k} = \phi_{-\bf k}^\ast $.
    *
    * The arbitrary scalar FE field on the reference element can be expanded in
    * the complete orthogonal exponential basis as
@@ -75,11 +75,11 @@ namespace FESeries
    *    \int_{[0,1]^d} u({\bf x}) \phi_{\bf k}^\ast ({\bf x}) d{\bf x}\,.
    * @f]
    * It is this complex-valued expansion coefficients, that are calculated by
-   * this class. Note that \f$ u({\bf x}) = \sum_i u_i N_i({\bf x})\f$,
-   * where \f$ N_i({\bf x}) \f$ are real-valued FiniteElement shape functions.
-   * Consequently \f$ c_{\bf k} \equiv c_{-\bf k}^\ast \f$ and
-   * we only need to compute \f$ c_{\bf k} \f$ for positive indices
-   * \f$ \bf k \f$ .
+   * this class. Note that $ u({\bf x}) = \sum_i u_i N_i({\bf x})$,
+   * where $ N_i({\bf x}) $ are real-valued FiniteElement shape functions.
+   * Consequently $ c_{\bf k} \equiv c_{-\bf k}^\ast $ and
+   * we only need to compute $ c_{\bf k} $ for positive indices
+   * $ \bf k $ .
    *
    * @author Denis Davydov, 2016.
    */
@@ -125,7 +125,7 @@ namespace FESeries
     void ensure_existence(const unsigned int fe_index);
 
     /**
-     * Angular frequencies \f$ 2 \pi {\bf k} \f$ .
+     * Angular frequencies $ 2 \pi {\bf k} $ .
      */
     Table<dim, Tensor<1,dim> > k_vectors;
 
@@ -154,20 +154,20 @@ namespace FESeries
    * @f[
    *    P_n(x) = \frac{1}{2^n n!} \frac{d^n}{dx^n}[x^2-1]^n.
    * @f]
-   * These polynomials are orthogonal with respect to the \f$ L^2 \f$ inner
-   * product on the interval \f$ [-1;1] \f$
+   * These polynomials are orthogonal with respect to the $ L^2 $ inner
+   * product on the interval $ [-1;1] $
    * @f[
    *    \int_{-1}^1 P_m(x) P_n(x) = \frac{2}{2n + 1} \delta_{mn}
    * @f]
    * and are complete.
-   * A family of \f$ L^2 \f$-orthogonal polynomials on \f$ [0;1] \f$ can be
+   * A family of $ L^2 $-orthogonal polynomials on $ [0;1] $ can be
    * constructed via
    * @f[
    *    \widetilde P_m = \sqrt{2} P_m(2x-1).
    * @f]
    *
    *
-   * An arbitrary scalar FE field on the reference element \f$ [0;1] \f$ can be
+   * An arbitrary scalar FE field on the reference element $ [0;1] $ can be
    * expanded in the complete orthogonal basis as
    * @f[
    *    u(x)
@@ -178,9 +178,9 @@ namespace FESeries
    *    c_m = \frac{2m+1}{2}
    *    \int_0^1 u(x) \widetilde P_m(x) dx .
    * @f]
-   * This class calculates coefficients \f$ c_{\bf k} \f$ using
-   * \f$ dim \f$-dimensional Legendre polynomials constructed from
-   * \f$ \widetilde P_m(x) \f$ using tensor product rule.
+   * This class calculates coefficients $ c_{\bf k} $ using
+   * $ dim $-dimensional Legendre polynomials constructed from
+   * $ \widetilde P_m(x) $ using tensor product rule.
    *
    * @author Denis Davydov, 2016.
    */

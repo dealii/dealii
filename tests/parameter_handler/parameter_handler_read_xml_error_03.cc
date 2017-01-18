@@ -76,10 +76,15 @@ int main ()
 
   // read from XML
   std::ifstream in (SOURCE_DIR "/prm/parameter_handler_read_xml_error_03.prm");
-  bool result = prm.read_input_from_xml (in);
-  AssertThrow (result == false, ExcInternalError());
-
-  deallog << "OK" << std::endl;
+  try
+    {
+      prm.parse_input_from_xml (in);
+    }
+  catch (const ParameterHandler::ExcInvalidXMLParameterFile &exc)
+    {
+      deallog << exc.get_exc_name() << std::endl;
+      exc.print_info(deallog.get_file_stream());
+    }
 
   return 0;
 }

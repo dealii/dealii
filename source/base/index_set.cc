@@ -16,7 +16,8 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/index_set.h>
-#include <list>
+
+#include <vector>
 
 #ifdef DEAL_II_WITH_TRILINOS
 #  ifdef DEAL_II_WITH_MPI
@@ -118,6 +119,13 @@ IndexSet::add_range (const size_type begin,
 void
 IndexSet::do_compress () const
 {
+  // we will, in the following, modify mutable variables. this can only
+  // work in multithreaded applications if we lock the data structures
+  // via a mutex, so that users can call 'const' functions from threads
+  // in parallel (and these 'const' functions can then call compress()
+  // which itself calls the current function)
+  Threads::Mutex::ScopedLock lock (compress_mutex);
+
   // see if any of the contiguous ranges can be merged. do not use
   // std::vector::erase in-place as it is quadratic in the number of
   // ranges. since the ranges are sorted by their first index, determining
@@ -274,10 +282,9 @@ IndexSet::subtract_set (const IndexSet &other)
   is_compressed = false;
 
 
-  // we save new ranges to be added to our IndexSet in an temporary list and
-  // add all of them in one go at the end. This is necessary because a growing
-  // ranges vector invalidates iterators.
-  std::list<Range> temp_list;
+  // we save new ranges to be added to our IndexSet in an temporary vector and
+  // add all of them in one go at the end.
+  std::vector<Range> new_ranges;
 
   std::vector<Range>::iterator own_it = ranges.begin();
   std::vector<Range>::iterator other_it = other.ranges.begin();
@@ -303,7 +310,7 @@ IndexSet::subtract_set (const IndexSet &other)
         {
           Range r(own_it->begin, other_it->begin);
           r.nth_index_in_set = 0; //fix warning of unused variable
-          temp_list.push_back(r);
+          new_ranges.push_back(r);
         }
       // change own_it to the sub range behind other_it. Do not delete own_it
       // in any case. As removal would invalidate iterators, we just shrink
@@ -331,12 +338,50 @@ IndexSet::subtract_set (const IndexSet &other)
     }
 
   // done, now add the temporary ranges
-  for (std::list<Range>::iterator it = temp_list.begin();
-       it != temp_list.end();
-       ++it)
+  const std::vector<Range>::iterator end = new_ranges.end();
+  for (std::vector<Range>::iterator it = new_ranges.begin();
+       it != end; ++it)
     add_range(it->begin, it->end);
 
   compress();
+}
+
+
+
+IndexSet::size_type
+IndexSet::pop_back ()
+{
+  Assert(is_empty() == false,
+         ExcMessage("pop_back() failed, because this IndexSet contains no entries."));
+
+  const size_type index = ranges.back().end-1;
+  --ranges.back().end;
+
+  if (ranges.back().begin == ranges.back().end)
+    ranges.pop_back();
+
+  return index;
+}
+
+
+
+IndexSet::size_type
+IndexSet::pop_front ()
+{
+  Assert(is_empty() == false,
+         ExcMessage("pop_front() failed, because this IndexSet contains no entries."));
+
+  const size_type index = ranges.front().begin;
+  ++ranges.front().begin;
+
+  if (ranges.front().begin == ranges.front().end)
+    ranges.erase(ranges.begin());
+
+  // We have to set this in any case, because nth_index_in_set is no longer
+  // up to date for all but the first range
+  is_compressed = false;
+
+  return index;
 }
 
 
@@ -347,6 +392,11 @@ IndexSet::add_indices(const IndexSet &other,
 {
   if ((this == &other) && (offset == 0))
     return;
+
+  Assert (other.ranges.size() == 0
+          || other.ranges.back().end-1 < index_space_size,
+          ExcIndexRangeType<size_type> (other.ranges.back().end-1,
+                                        0, index_space_size));
 
   compress();
   other.compress();
@@ -578,9 +628,11 @@ IndexSet::is_ascending_and_one_to_one (const MPI_Comm &communicator) const
   const unsigned int gather_size = (my_rank==0)?n_ranks:1;
   std::vector<types::global_dof_index> global_dofs(gather_size);
 
-  MPI_Gather(&first_local_dof, 1, DEAL_II_DOF_INDEX_MPI_TYPE,
-             &(global_dofs[0]), 1, DEAL_II_DOF_INDEX_MPI_TYPE, 0,
-             communicator);
+  int ierr = MPI_Gather(&first_local_dof, 1, DEAL_II_DOF_INDEX_MPI_TYPE,
+                        &(global_dofs[0]), 1, DEAL_II_DOF_INDEX_MPI_TYPE, 0,
+                        communicator);
+  AssertThrowMPI(ierr);
+
   if (my_rank == 0)
     {
       // find out if the received std::vector is ascending
@@ -604,7 +656,8 @@ IndexSet::is_ascending_and_one_to_one (const MPI_Comm &communicator) const
 
   // now broadcast the result
   int is_ascending = is_globally_ascending ? 1 : 0;
-  MPI_Bcast(&is_ascending, 1, MPI_INT, 0, communicator);
+  ierr = MPI_Bcast(&is_ascending, 1, MPI_INT, 0, communicator);
+  AssertThrowMPI(ierr);
 
   return (is_ascending==1);
 #else
@@ -619,7 +672,8 @@ IndexSet::memory_consumption () const
 {
   return (MemoryConsumption::memory_consumption (ranges) +
           MemoryConsumption::memory_consumption (is_compressed) +
-          MemoryConsumption::memory_consumption (index_space_size));
+          MemoryConsumption::memory_consumption (index_space_size) +
+          sizeof (compress_mutex));
 }
 
 

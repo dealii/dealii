@@ -123,15 +123,9 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
   ///////////////////Declaring storage and mappings//////////////////
 
-  std::vector< Point<spacedim> > vertices;//vector of vertices
-  std::vector< CellData<dim> > cells;//vector of cells
-  SubCellData subcelldata;//subcell data that includes bounds and material IDs.
-  std::map<int, int> vertex_indices; // # vert in unv (key) ---> # vert in deal.II (value)
-  std::map<int, int> cell_indices; // # cell in unv (key) ---> # cell in deal.II (value)
-  std::map<int, int> quad_indices; // # quad in unv (key) ---> # quad in deal.II (value)
-  std::map<int, int> line_indices; // # line in unv(key) ---> # line in deal.II (value)
-
-  unsigned int no_vertices, no_quads=0, no_lines=0;
+  std::vector< Point<spacedim> > vertices;
+  std::vector< CellData<dim> >   cells;
+  SubCellData                    subcelldata;
 
   std::string keyword;
 
@@ -141,10 +135,12 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
   if (keyword == "POINTS")
     {
-      in>>no_vertices;// taking the no. of vertices
+      unsigned int n_vertices;
+      in >> n_vertices;
+
       in.ignore(256, '\n');//ignoring the number beside the total no. of points.
 
-      for (unsigned int count = 0; count < no_vertices; count++) //loop to read three values till the no . vertices is satisfied
+      for (unsigned int vertex = 0; vertex < n_vertices; ++vertex)
         {
           // VTK format always specifies vertex coordinates with 3 components
           Point<3> x;
@@ -153,8 +149,6 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
           vertices.push_back(Point<spacedim>());
           for (unsigned int d=0; d<spacedim; ++d)
             vertices.back()(d) = x(d);
-
-          vertex_indices[count] = count;
         }
     }
 
@@ -176,56 +170,46 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
   in >> keyword;
 
-  unsigned int total_cells, no_cells = 0, type;// declaring counters, refer to the order of declaring variables for an idea of what is what!
-
   ///////////////////Processing the CELLS section that contains cells(cells) and bound_quads(subcelldata)///////////////////////
 
   if (keyword == "CELLS")
     {
-      in>>total_cells;
+      unsigned int n_geometric_objects;
+      in >> n_geometric_objects;
       in.ignore(256,'\n');
 
       if (dim == 3)
         {
-          for (unsigned int count = 0; count < total_cells; count++)
+          for (unsigned int count = 0; count < n_geometric_objects; count++)
             {
-              in>>type;
+              unsigned int type;
+              in >> type;
 
               if (type == 8)
                 {
+                  // we assume that the file contains first all cells,
+                  // and only then any faces or lines
+                  AssertThrow (subcelldata.boundary_quads.size() == 0
+                               &&
+                               subcelldata.boundary_lines.size() == 0,
+                               ExcNotImplemented());
 
                   cells.push_back(CellData<dim>());
 
                   for (unsigned int j = 0; j < type; j++) //loop to feed data
                     in >> cells.back().vertices[j];
 
-
                   cells.back().material_id = 0;
-
-                  for (unsigned int j = 0; j < type; j++) //loop to feed the data of the vertices to the cell
-                    {
-                      cells.back().vertices[j] = vertex_indices[cells.back().vertices[j]];
-                    }
-                  cell_indices[count] = count;
-                  no_cells++;
                 }
 
               else if ( type == 4)
                 {
-
                   subcelldata.boundary_quads.push_back(CellData<2>());
 
                   for (unsigned int j = 0; j < type; j++) //loop to feed the data to the boundary
-                    {
-                      in >> subcelldata.boundary_quads.back().vertices[j];
-                    }
+                    in >> subcelldata.boundary_quads.back().vertices[j];
+
                   subcelldata.boundary_quads.back().material_id = 0;
-                  for (unsigned int j = 0; j < type; j++)
-                    {
-                      subcelldata.boundary_quads.back().vertices[j] = vertex_indices[subcelldata.boundary_quads.back().vertices[j]];
-                    }
-                  quad_indices[no_quads] = no_quads + 1;
-                  no_quads++;
                 }
 
               else
@@ -236,25 +220,24 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
       else if (dim == 2)
         {
-          for (unsigned int count = 0; count < total_cells; count++)
+          for (unsigned int count = 0; count < n_geometric_objects; count++)
             {
-              in>>type;
+              unsigned int type;
+              in >> type;
 
               if (type == 4)
                 {
+                  // we assume that the file contains first all cells,
+                  // and only then any faces
+                  AssertThrow (subcelldata.boundary_lines.size() == 0,
+                               ExcNotImplemented());
+
                   cells.push_back(CellData<dim>());
 
                   for (unsigned int j = 0; j < type; j++) //loop to feed data
                     in >> cells.back().vertices[j];
 
                   cells.back().material_id = 0;
-
-                  for (unsigned int j = 0; j < type; j++) //loop to feed the data of the vertices to the cell
-                    {
-                      cells.back().vertices[j] = vertex_indices[cells.back().vertices[j]];
-                    }
-                  cell_indices[count] = count;
-                  no_cells++;
                 }
 
               else if (type == 2)
@@ -267,13 +250,8 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                     {
                       in >> subcelldata.boundary_lines.back().vertices[j];
                     }
+
                   subcelldata.boundary_lines.back().material_id = 0;
-                  for (unsigned int j = 0; j < type; j++)
-                    {
-                      subcelldata.boundary_lines.back().vertices[j] = vertex_indices[subcelldata.boundary_lines.back().vertices[j]];
-                    }
-                  line_indices[no_lines] = no_lines + 1;
-                  no_lines++;
                 }
 
               else
@@ -293,7 +271,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
         {
           in.ignore(256, '\n');
 
-          while (!in.eof())
+          while (!in.fail() && !in.eof())
             {
               in>>keyword;
               if (keyword != "12" && keyword != "9")
@@ -307,8 +285,27 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
       if (keyword == "CELL_DATA")
         {
-          int no_ids;
-          in>>no_ids;
+          unsigned int n_ids;
+          in >> n_ids;
+
+          AssertThrow (n_ids == cells.size() + (dim == 3 ?
+                                                subcelldata.boundary_quads.size() :
+                                                (dim == 2 ?
+                                                 subcelldata.boundary_lines.size()
+                                                 :
+                                                 0)),
+                       ExcMessage ("The VTK reader found a CELL_DATA statement "
+                                   "that lists a total of "
+                                   + Utilities::int_to_string (n_ids) +
+                                   " cell data objects, but this needs to "
+                                   "equal the number of cells (which is "
+                                   + Utilities::int_to_string (cells.size()) +
+                                   ") plus the number of quads ("
+                                   + Utilities::int_to_string (subcelldata.boundary_quads.size()) +
+                                   " in 3d or the number of lines ("
+                                   + Utilities::int_to_string (subcelldata.boundary_lines.size()) +
+                                   ") in 2d."));
+
 
           std::string linenew;
           std::string textnew[2];
@@ -329,29 +326,33 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                                        textnew[i] + "> section"));
             }
 
-          for (unsigned int i = 0; i < no_cells; i++) //assigning IDs to cells.
+          // read material ids first for all cells, then for all
+          // faces. the assumption that cells come before all faces
+          // has been verified above via an assertion, so the order
+          // used in the following blocks makes sense
+          for (unsigned int i = 0; i < cells.size(); i++)
             {
-              int id;
-              in>>id;
-              cells[cell_indices[i]].material_id = id;
+              double id;
+              in >> id;
+              cells[i].material_id = id;
             }
 
           if (dim == 3)
             {
-              for (unsigned int i = 0; i < no_quads; i++) //assigning IDs to bounds.
+              for (unsigned int i = 0; i < subcelldata.boundary_quads.size(); i++)
                 {
-                  int id;
-                  in>>id;
-                  subcelldata.boundary_quads[quad_indices[i]].material_id = id;
+                  double id;
+                  in >> id;
+                  subcelldata.boundary_quads[i].material_id = id;
                 }
             }
           else if (dim == 2)
             {
-              for (unsigned int i = 0; i < no_lines; i++) //assigning IDs to bounds.
+              for (unsigned int i = 0; i < subcelldata.boundary_lines.size(); i++)
                 {
-                  int id;
-                  in>>id;
-                  subcelldata.boundary_lines[line_indices[i]].material_id = id;
+                  double id;
+                  in >> id;
+                  subcelldata.boundary_lines[i].material_id = id;
                 }
             }
         }
@@ -396,7 +397,9 @@ void GridIn<dim, spacedim>::read_unv(std::istream &in)
   AssertThrow(in, ExcIO());
   in >> tmp;
 
-  AssertThrow(tmp == 2411, ExcUnknownSectionType(tmp)); // section 2411 describes vertices http://www.sdrl.uc.edu/universal-file-formats-for-modal-analysis-testing-1/file-format-storehouse/unv_2411.htm/
+  // section 2411 describes vertices: see
+  // http://www.sdrl.uc.edu/sdrl/referenceinfo/universalfileformats/file-format-storehouse/universal-dataset-number-2411
+  AssertThrow(tmp == 2411, ExcUnknownSectionType(tmp));
 
   std::vector< Point<spacedim> > vertices; // vector of vertex coordinates
   std::map<int, int> vertex_indices; // # vert in unv (key) ---> # vert in deal.II (value)
@@ -436,7 +439,9 @@ void GridIn<dim, spacedim>::read_unv(std::istream &in)
   AssertThrow(in, ExcIO());
   in >> tmp;
 
-  AssertThrow(tmp == 2412, ExcUnknownSectionType(tmp)); // section 2412 describes elements http://www.sdrl.uc.edu/universal-file-formats-for-modal-analysis-testing-1/file-format-storehouse/unv_2412.htm/
+  // section 2412 describes elements: see
+  // http://www.sdrl.uc.edu/sdrl/referenceinfo/universalfileformats/file-format-storehouse/universal-dataset-number-2412
+  AssertThrow(tmp == 2412, ExcUnknownSectionType(tmp));
 
   std::vector< CellData<dim> > cells; // vector of cells
   SubCellData subcelldata;
@@ -539,8 +544,11 @@ void GridIn<dim, spacedim>::read_unv(std::istream &in)
       AssertThrow(in, ExcIO());
       in >> tmp;
 
-      AssertThrow((tmp == 2467)||(tmp == 2477), ExcUnknownSectionType(tmp)); // section 2467 (2477) describes (materials - first and bcs - second) or (bcs - first and materials - second) - sequence depends on which group is created first
-      // http://www.sdrl.uc.edu/universal-file-formats-for-modal-analysis-testing-1/file-format-storehouse/unv_2467.htm/
+      // section 2467 (2477) describes (materials - first and bcs - second) or
+      // (bcs - first and materials - second) - sequence depends on which
+      // group is created first: see
+      // http://www.sdrl.uc.edu/sdrl/referenceinfo/universalfileformats/file-format-storehouse/universal-dataset-number-2467
+      AssertThrow((tmp == 2467)||(tmp == 2477), ExcUnknownSectionType(tmp));
 
       while (tmp != -1) // we do until reach end of 2467 or 2477
         {
@@ -2969,7 +2977,7 @@ namespace
     std::string line;
     std::getline (input_stream, line);
 
-    while (!input_stream.eof())
+    while (!input_stream.fail() && !input_stream.eof())
       {
         std::transform(line.begin(), line.end(), line.begin(), ::toupper);
 
@@ -2978,7 +2986,7 @@ namespace
             line.compare (0, 5, "*PART") == 0)
           {
             // Skip header and comments
-            while (!input_stream.eof())
+            while (!input_stream.fail() && !input_stream.eof())
               {
                 std::getline (input_stream, line);
                 if (line[0] == '*')
@@ -2994,7 +3002,7 @@ namespace
 
             // Contains lines in the form:
             // Index, x, y, z
-            while (!input_stream.eof())
+            while (!input_stream.fail() && !input_stream.eof())
               {
                 std::getline (input_stream, line);
                 if (line[0] == '*')
@@ -3035,7 +3043,7 @@ namespace
 
             // Read ELEMENT definition
             std::getline (input_stream, line);
-            while (!input_stream.eof())
+            while (!input_stream.fail() && !input_stream.eof())
               {
                 if (line[0] == '*')
                   goto cont;
@@ -3083,7 +3091,7 @@ namespace
             // definition of each "set" of faces that comprise the surface
             // These are either marked by an "S" or "E" in 3d or 2d respectively.
             std::getline (input_stream, line);
-            while (!input_stream.eof())
+            while (!input_stream.fail() && !input_stream.eof())
               {
                 if (line[0] == '*')
                   goto cont;
@@ -3094,7 +3102,6 @@ namespace
                 // Surface can be created from ELSET, or directly from cells
                 // If elsets_list contains a key with specific name - refers to that ELSET, otherwise refers to cell
                 std::istringstream iss (line);
-                char comma;
                 int el_idx;
                 int face_number;
                 char temp;
@@ -3121,6 +3128,7 @@ namespace
                 else
                   {
                     // Surface refers directly to elements
+                    char comma;
                     iss >> el_idx >> comma >> temp >> face_number;
                     quad_node_list = get_global_node_numbers (el_idx, face_number);
                     quad_node_list.insert (quad_node_list.begin(), b_indicator);
@@ -3183,7 +3191,7 @@ namespace
               {
                 // Option (2)
                 std::getline (input_stream, line);
-                while (!input_stream.eof())
+                while (!input_stream.fail() && !input_stream.eof())
                   {
                     if (line[0] == '*')
                       break;
@@ -3208,7 +3216,7 @@ namespace
         else if (line.compare (0, 5, "*NSET") == 0)
           {
             // Skip nodesets; we have no use for them
-            while (!input_stream.eof())
+            while (!input_stream.fail() && !input_stream.eof())
               {
                 std::getline (input_stream, line);
                 if (line[0] == '*')

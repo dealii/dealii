@@ -49,13 +49,21 @@ void check ()
 
 
 
-  deallog << std::endl << "* read_input with missing 'end':" << std::endl;
+  deallog << std::endl << "* parse_input with missing 'end':" << std::endl;
 
-  std::string s = "set dim=2\nsubsection test\n\n"; // note: missing "end"
-  bool success = prm.read_input_from_string (s.c_str());
-  deallog << "success? " << success << " (should fail)" << std::endl;
+  try
+    {
+      std::string s = "set dim=2\nsubsection test\n\n"; // note: missing "end"
+      prm.parse_input_from_string (s.c_str());
+    }
+  catch (const ParameterHandler::ExcUnbalancedSubsections &exc)
+    {
+      deallog << exc.get_exc_name() << std::endl;
+      exc.print_info(deallog.get_file_stream());
+    }
+  deallog << std::endl;
 
-  // make sure read_input resets the current path:
+  // make sure parse_input resets the current path:
   try
     {
       prm.leave_subsection();
@@ -68,29 +76,31 @@ void check ()
 
 
 
-  deallog << std::endl << "* Check non empty path before read_input()" << std::endl;
+  deallog << std::endl << "* Check non empty path before parse_input()" << std::endl;
 
   {
     prm.enter_subsection("test");
     std::string s = "set x=5\n";
-    bool success = prm.read_input_from_string (s.c_str());
-    deallog << "success? "
-            << success
-            << " (should work), x correct? "
-            << (prm.get_integer("x")==5) << std::endl;
+    prm.parse_input_from_string (s.c_str());
     prm.leave_subsection();
   }
 
 
-  deallog << std::endl << "* Check read_input() catches messing with path:" << std::endl;
+  deallog << std::endl << "* Check parse_input() catches messing with path:" << std::endl;
   {
     prm.enter_subsection("test");
-    std::string s = "end\nsubsection test2\nset y=7\n";
-    bool success = prm.read_input_from_string (s.c_str());
-    deallog << "success = " << success << " -- (should fail)" << std::endl;
+    try
+      {
+        std::string s = "end\nsubsection test2\nset y=7\n";
+        prm.parse_input_from_string (s.c_str());
+      }
+    catch (const ParameterHandler::ExcUnbalancedSubsections &exc)
+      {
+        deallog << exc.get_exc_name() << std::endl;
+        exc.print_info(deallog.get_file_stream());
+      }
     prm.leave_subsection();
   }
-
 }
 
 

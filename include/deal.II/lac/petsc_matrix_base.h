@@ -83,11 +83,6 @@ namespace PETScWrappers
                   const size_type   index);
 
         /**
-         * Copy constructor.
-         */
-        Accessor (const Accessor &a);
-
-        /**
          * Row number of the element represented by this object.
          */
         size_type row() const;
@@ -857,8 +852,7 @@ namespace PETScWrappers
      * Print the PETSc matrix object values using PETSc internal matrix viewer
      * function <tt>MatView</tt>. The default format prints the non- zero
      * matrix elements. For other valid view formats, consult
-     * http://www.mcs.anl.gov/petsc/petsc-
-     * current/docs/manualpages/Mat/MatView.html
+     * http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/Mat/MatView.html
      */
     void write_ascii (const PetscViewerFormat format = PETSC_VIEWER_DEFAULT);
 
@@ -999,17 +993,6 @@ namespace PETScWrappers
       visit_present_row ();
     }
 
-
-    inline
-    const_iterator::Accessor::
-    Accessor (const Accessor &a)
-      :
-      matrix(a.matrix),
-      a_row(a.a_row),
-      a_index(a.a_index),
-      colnum_cache (a.colnum_cache),
-      value_cache (a.value_cache)
-    {}
 
 
     inline
@@ -1272,9 +1255,9 @@ namespace PETScWrappers
         col_value_ptr = &column_values[0];
       }
 
-    const int ierr
-      = MatSetValues (matrix, 1, &petsc_i, n_columns, col_index_ptr,
-                      col_value_ptr, INSERT_VALUES);
+    const PetscErrorCode ierr = MatSetValues (matrix, 1, &petsc_i, n_columns,
+                                              col_index_ptr,
+                                              col_value_ptr, INSERT_VALUES);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -1414,9 +1397,9 @@ namespace PETScWrappers
         col_value_ptr = &column_values[0];
       }
 
-    const int ierr
-      = MatSetValues (matrix, 1, &petsc_i, n_columns, col_index_ptr,
-                      col_value_ptr, ADD_VALUES);
+    const PetscErrorCode ierr = MatSetValues (matrix, 1, &petsc_i, n_columns,
+                                              col_index_ptr, col_value_ptr,
+                                              ADD_VALUES);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -1489,8 +1472,8 @@ namespace PETScWrappers
   {
     PetscInt begin, end;
 
-    const int ierr = MatGetOwnershipRange (static_cast<const Mat &>(matrix),
-                                           &begin, &end);
+    const PetscErrorCode ierr = MatGetOwnershipRange (static_cast<const Mat &>(matrix),
+                                                      &begin, &end);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return ((index >= static_cast<size_type>(begin)) &&

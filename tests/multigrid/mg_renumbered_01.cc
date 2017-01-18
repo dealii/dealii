@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2015 by the deal.II authors
+// Copyright (C) 2010 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -340,12 +340,9 @@ void LaplaceProblem<dim>::test ()
   MGConstrainedDoFs mg_constrained_dofs_renumbered;
   mg_constrained_dofs_renumbered.initialize(mg_dof_handler_renumbered, dirichlet_boundary);
 
-  ConstraintMatrix constraints;
-  constraints.close();
-
-  MGTransferPrebuilt<Vector<double> > mg_transfer (constraints, mg_constrained_dofs);
+  MGTransferPrebuilt<Vector<double> > mg_transfer (mg_constrained_dofs);
   mg_transfer.build_matrices(mg_dof_handler);
-  MGTransferPrebuilt<Vector<double> > mg_transfer_renumbered (constraints, mg_constrained_dofs_renumbered);
+  MGTransferPrebuilt<Vector<double> > mg_transfer_renumbered (mg_constrained_dofs_renumbered);
   mg_transfer_renumbered.build_matrices(mg_dof_handler_renumbered);
 
   FullMatrix<double> coarse_matrix;

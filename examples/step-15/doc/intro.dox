@@ -121,7 +121,7 @@ Using the basis functions as test functions and defining $a_{n}:=\frac{1}
 @f[
   \sum_{j=0}^{N-1}\left[ \left( \nabla \varphi_{i} , a_{n} \nabla \varphi_{j} \right) -
   \left(\nabla u^{n}\cdot \nabla \varphi_{i} , a_{n}^{3} \nabla u^{n} \cdot \nabla
-  \varphi_{j} \right) \right] \cdot \delta U_{j}=\left( \nabla \varphi_{i} , a_{n}
+  \varphi_{j} \right) \right] \cdot \delta U_{j}=-\left( \nabla \varphi_{i} , a_{n}
   \nabla u^{n}\right) \qquad \forall i=0,\dots ,N-1,
 @f]
 
@@ -143,7 +143,7 @@ where the entries of the matrix $A^{n}$ are given by:
 and the right hand side $b^{n}$ is given by:
 
 @f[
-  b^{n}_{i}:=\left( \nabla \varphi_{i} , a_{n} \nabla u^{n}\right).
+  b^{n}_{i}:=-\left( \nabla \varphi_{i} , a_{n} \nabla u^{n}\right).
 @f]
 
 

@@ -1,0 +1,4 @@
+Improved: FEValues no longer generates the mapping's internal database if
+the mapping will not be required for the set of update flags specified.
+<br>
+(Jonathan Robey, 2016/09/14)

@@ -33,35 +33,57 @@ MACRO(DEAL_II_ADD_LIBRARY _library)
   FOREACH(_build ${DEAL_II_BUILD_TYPES})
     STRING(TOLOWER ${_build} _build_lowercase)
 
-    ADD_LIBRARY(${_library}.${_build_lowercase}
+    ADD_LIBRARY(${_library}_${_build_lowercase}
       ${ARGN}
       )
 
-    SET_TARGET_PROPERTIES(${_library}.${_build_lowercase} PROPERTIES
+
+    #
+    # Work around a problem in CUDA_WARP_SRCS that doesn't take empty list
+    # elements lightly...
+    #
+    SET(_definitions
+      ${DEAL_II_DEFINITIONS}
+      ${DEAL_II_DEFINITIONS_${_build}}
+      )
+
+    SET_TARGET_PROPERTIES(${_library}_${_build_lowercase} PROPERTIES
       LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
-      COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${_build}}"
+      COMPILE_DEFINITIONS "${_definitions}"
       COMPILE_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
       LINKER_LANGUAGE "CXX"
       )
 
     SET_PROPERTY(GLOBAL APPEND PROPERTY DEAL_II_OBJECTS_${_build}
-      "$<TARGET_OBJECTS:${_library}.${_build_lowercase}>"
+      "$<TARGET_OBJECTS:${_library}_${_build_lowercase}>"
       )
 
     #
     # Cuda specific target setup:
     #
     IF(DEAL_II_WITH_CUDA)
+
+      #
+      # CUDA_WRAP_SRCS does not automatically pick up host compiler flags
+      # from the target, so we have to feed relevant flags ourselves
+      #
+      # Furthermore, C++14 is not yet supported, so filter the flag:
+      #
+      STRING(REPLACE "-std=c++14" "-std=c++11" CMAKE_CXX_FLAGS
+        "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
+        )
+
       CUDA_WRAP_SRCS(${_library}_${_build_lowercase}
         OBJ _generated_cuda_files ${ARGN} SHARED
         )
+      SET(CMAKE_CXX_FLAGS "")
 
-      ADD_CUSTOM_TARGET(${_library}.${_build_lowercase}_cuda
+      ADD_CUSTOM_TARGET(${_library}_${_build_lowercase}_cuda
         DEPENDS
         ${_generated_cuda_files}
         )
-      ADD_DEPENDENCIES(${_library}.${_build_lowercase}
-        ${_library}.${_build_lowercase}_cuda
+      ADD_DEPENDENCIES(${_library}_${_build_lowercase}
+        ${_library}_${_build_lowercase}_cuda
         )
 
       SET_PROPERTY(GLOBAL APPEND PROPERTY DEAL_II_OBJECTS_${_build}

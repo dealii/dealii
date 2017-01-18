@@ -1,0 +1,7 @@
+Fixed: We have run the PVS static analysis checker on the entire code base,
+to see what possible problems it uncovers (see
+https://github.com/dealii/dealii/issues/3342).  With the exception of
+a few false positives, several dozen issues (mostly uninitialized
+variables) were fixed.
+<br>
+(Konstantin Ladutenko and many others, 2016/11/08)

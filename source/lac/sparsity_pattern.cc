@@ -62,7 +62,7 @@ SparsityPattern::SparsityPattern (const SparsityPattern &s)
   store_diagonal_first_in_row(false)
 {
   (void)s;
-  Assert (s.rows==0 && s.cols==0 && s.rowstart==0 && s.colnums==0,
+  Assert (s.empty(),
           ExcMessage("This constructor can only be called if the provided argument "
                      "is the sparsity pattern for an empty matrix. This constructor can "
                      "not be used to copy-construct a non-empty sparsity pattern."));
@@ -226,12 +226,12 @@ SparsityPattern &
 SparsityPattern::operator = (const SparsityPattern &s)
 {
   (void)s;
-  Assert (s.rows==0 && s.cols==0 && s.rowstart==0 && s.colnums==0,
+  Assert (s.empty(),
           ExcMessage("This operator can only be called if the provided argument "
                      "is the sparsity pattern for an empty matrix. This operator can "
                      "not be used to copy a non-empty sparsity pattern."));
 
-  Assert (rows==0 && cols==0 && rowstart==0 && cols==0,
+  Assert (this->empty(),
           ExcMessage("This operator can only be called if the current object is "
                      "empty."));
 
@@ -577,9 +577,7 @@ void SparsityPattern::copy_from (const FullMatrix<number> &matrix)
           ++entries_per_row[row];
       if ((matrix.m() == matrix.n())
           &&
-          (matrix(row,row) == 0)
-          &&
-          (matrix.m() == matrix.n()))
+          (matrix(row,row) == 0))
         ++entries_per_row[row];
     }
 

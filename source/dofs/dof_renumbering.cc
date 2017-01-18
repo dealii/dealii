@@ -265,11 +265,8 @@ namespace DoFRenumbering
 
       int delta = 0;
 
-      typedef double Type;
-
       // must be BGL directed graph now
       typedef adjacency_list<vecS, vecS, directedS>  Graph;
-      typedef graph_traits<Graph>::vertex_descriptor Vertex;
 
       int n = dof_handler.n_dofs();
 
@@ -773,11 +770,12 @@ namespace DoFRenumbering
         all_dof_counts(fe_collection.n_components() *
                        Utilities::MPI::n_mpi_processes (tria->get_communicator()));
 
-        MPI_Allgather ( &local_dof_count[0],
-                        n_buckets, DEAL_II_DOF_INDEX_MPI_TYPE,
-                        &all_dof_counts[0],
-                        n_buckets, DEAL_II_DOF_INDEX_MPI_TYPE,
-                        tria->get_communicator());
+        const int ierr = MPI_Allgather ( &local_dof_count[0],
+                                         n_buckets, DEAL_II_DOF_INDEX_MPI_TYPE,
+                                         &all_dof_counts[0],
+                                         n_buckets, DEAL_II_DOF_INDEX_MPI_TYPE,
+                                         tria->get_communicator());
+        AssertThrowMPI(ierr);
 
         for (unsigned int i=0; i<n_buckets; ++i)
           Assert (all_dof_counts[n_buckets*tria->locally_owned_subdomain()+i]
@@ -1060,11 +1058,12 @@ namespace DoFRenumbering
         all_dof_counts(fe_collection.n_components() *
                        Utilities::MPI::n_mpi_processes (tria->get_communicator()));
 
-        MPI_Allgather ( &local_dof_count[0],
-                        n_buckets, DEAL_II_DOF_INDEX_MPI_TYPE,
-                        &all_dof_counts[0],
-                        n_buckets, DEAL_II_DOF_INDEX_MPI_TYPE,
-                        tria->get_communicator());
+        const int ierr = MPI_Allgather ( &local_dof_count[0],
+                                         n_buckets, DEAL_II_DOF_INDEX_MPI_TYPE,
+                                         &all_dof_counts[0],
+                                         n_buckets, DEAL_II_DOF_INDEX_MPI_TYPE,
+                                         tria->get_communicator());
+        AssertThrowMPI(ierr);
 
         for (unsigned int i=0; i<n_buckets; ++i)
           Assert (all_dof_counts[n_buckets*tria->locally_owned_subdomain()+i]

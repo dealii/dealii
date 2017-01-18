@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2015 by the deal.II authors
+// Copyright (C) 2013 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -200,6 +200,12 @@ void loop ()
         check (1, *maps[m], *elements[e], gauss);
 //      check (2, *maps[m], *elements[e], gauss);
       }
+
+  for (unsigned int m=0; m<maps.size(); ++m)
+    delete maps[m];
+
+  for (unsigned int e=0; e<elements.size(); ++e)
+    delete elements[e];
 }
 
 

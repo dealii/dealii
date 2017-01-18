@@ -24,7 +24,11 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/symmetric_tensor.h>
+#include <deal.II/distributed/tria.h>
 #include <deal.II/fe/component_mask.h>
+#include <deal.II/lac/parallel_vector.h>
+
+
 
 #include <vector>
 #include <string>
@@ -228,35 +232,84 @@ namespace FETools
                              FullMatrix<number> &matrix);
 
   /**
-   * Compute the matrix of nodal values of a finite element applied to all its
-   * shape functions.
+   * This is a rather specialized function used during the construction of
+   * finite element objects. It is used to build the basis of shape functions
+   * for an element given a set of polynomials and interpolation points. The
+   * function is only implemented for finite elements with exactly @p dim
+   * vector components. In particular, this applies to classes derived from
+   * the FE_PolyTensor class.
    *
-   * This function is supposed to help building finite elements from
-   * polynomial spaces and should be called inside the constructor of an
-   * element. Applied to a completely initialized finite element, the result
-   * should be the unit matrix by definition of the node values.
+   * Specifically, the purpose of this function is as follows: FE_PolyTensor
+   * receives, from its derived classes, an argument that describes a polynomial
+   * space. This space may be parameterized in terms of monomials, or in some
+   * other way, but is in general not in the form that we use for finite
+   * elements where we typically want to use a basis that is derived from
+   * some kind of node functional (e.g., the interpolation at specific points).
+   * Concretely, assume that the basis used by the polynomial space is
+   * $\{\tilde\varphi_j(\mathbf x)\}_{j=1}^N$, and that the node functionals
+   * of the finite element are $\{\Psi_i\}_{i=1}^N$. We then want to compute a
+   * basis $\{\varphi_j(\mathbf x)\}_{j=1}^N$ for the finite element space so
+   * that $\Psi_i[\varphi_j] = \delta_{ij}$. To do this, we can set
+   * $\varphi_j(\mathbf x) = \sum_{k=1}^N c_{jk} \tilde\varphi_k(\mathbf x)$
+   * where we need to determine the expansion coefficients $c_{jk}$. We do this
+   * by applying $\Psi_i$ to both sides of the equation, to obtain
+   * @f{align*}
+   *   \Psi_i [\varphi_j] = \sum_{k=1}^N c_{jk} \Psi_i[\tilde\varphi_k],
+   * @f}
+   * and we know that the left hand side equals $\delta_{ij}$.
+   * If you think of this as a system of $N\times N$ equations for the
+   * elements of a matrix on the left and on the right, then this can be
+   * written as
+   * @f{align*}
+   *   I = C X^T
+   * @f}
+   * where $C$ is the matrix of coefficients $c_{jk}$ and
+   * $X_{ik} = \Psi_i[\tilde\varphi_k]$. Consequently, in order to compute
+   * the expansion coefficients $C=X^{-T}$, we need to apply the node
+   * functionals to all functions of the "raw" basis of the polynomial space.
    *
-   * Using this matrix allows the construction of the basis of shape functions
-   * in two steps.
+   * Until the finite element receives this matrix $X$ back, it describes its
+   * shape functions (e.g., in FiniteElement::shape_value()) in the form
+   * $\tilde\varphi_j$. After it calls this function, it has the expansion
+   * coefficients and can describe its shape functions as $\varphi_j$.
    *
-   * <ol>
+   * This function therefore computes this matrix $X$, for the following
+   * specific circumstances:
+   * - That the node functionals $\Psi_i$ are point evaluations at points
+   *   $\mathbf x_i$ that the finite element in question describes via its
+   *   "generalized" support points (through
+   *   FiniteElement::get_generalized_support_points()). These point
+   *   evaluations need to necessarily evaluate the <i>value</i> of a shape
+   *   function at that point (the shape function may be vector-valued, and
+   *   so the functional may be a linear combination of the individual
+   *   components of the values); but, in particular, the nodal functions may
+   *   not be <i>integrals</i> over entire edges or faces,
+   *   or other non-local functionals. In other words, we assume that
+   *   $\Psi_i[\tilde\varphi_j] = f_j(\tilde\varphi_j(\mathbf x_i))$
+   *   where $f_j$ is a function of the (possibly vector-valued) argument
+   *   that returns a scalar.
+   * - That the finite element has exactly @p dim vector components.
+   * - That the function $f_j$ is given by whatever the element implements
+   *   through the FiniteElement::interpolate() function.
    *
-   * <li>Define the space of shape functions using an arbitrary basis
-   * <i>w<sub>j</sub></i> and compute the matrix <i>M</i> of node functionals
-   * <i>N<sub>i</sub></i> applied to these basis functions.
-   *
-   * <li>Compute the basis <i>v<sub>j</sub></i> of the finite element shape
-   * function space by applying <i>M<sup>-1</sup></i> to the basis
-   * <i>w<sub>j</sub></i>.
-   *
-   * </ol>
-   *
-   * @note The FiniteElement must provide generalized support points and and
-   * interpolation functions.
+   * @param fe The finite element for which the operations above are to be
+   *        performed.
+   * @return The matrix $X$ as discussed above.
    */
   template <int dim, int spacedim>
-  void compute_node_matrix(FullMatrix<double> &M,
-                           const FiniteElement<dim,spacedim> &fe);
+  FullMatrix<double>
+  compute_node_matrix(const FiniteElement<dim,spacedim> &fe);
+
+  /**
+   * Same as the function above, but return the matrix by reference through
+   * the first argument, rather than as the function's return value.
+   *
+   * @deprecated
+   */
+  template <int dim, int spacedim>
+  void
+  compute_node_matrix(FullMatrix<double> &M,
+                      const FiniteElement<dim,spacedim> &fe) DEAL_II_DEPRECATED;
 
   /**
    * For all possible (isotropic and anisotropic) refinement cases compute the
@@ -710,28 +763,29 @@ namespace FETools
    * corresponding cell of `dof2` using the interpolation matrix of the finite
    * element spaces used on these cells and provided by the finite element
    * objects involved. This step is done using the FETools::interpolate()
-   * function. - It then performs a loop over all non-active cells of `dof2`.
+   * function.
+   * - It then performs a loop over all non-active cells of `dof2`.
    * If such a non-active cell has at least one active child, then we call the
    * children of this cell a "patch". We then interpolate from the children of
    * this patch to the patch, using the finite element space associated with
    * `dof2` and immediately interpolate back to the children. In essence, this
    * information throws away all information in the solution vector that lives
-   * on a scale smaller than the patch cell. - Since we traverse non-active
-   * cells from the coarsest to the finest levels, we may find patches that
-   * correspond to child cells of previously treated patches if the mesh had
-   * been refined adaptively (this cannot happen if the mesh has been refined
-   * globally because there the children of a patch are all active). We also
-   * perform the operation described above on these patches, but it is easy to
-   * see that on patches that are children of previously treated patches, the
-   * operation is now the identity operation (since it interpolates from the
-   * children of the current patch a function that had previously been
-   * interpolated to these children from an even coarser patch). Consequently,
-   * this does not alter the solution vector any more.
+   * on a scale smaller than the patch cell.
+   * - Since we traverse non-active cells from the coarsest to the finest
+   * levels, we may find patches that correspond to child cells of previously
+   * treated patches if the mesh had been refined adaptively (this cannot
+   * happen if the  mesh has been refined globally because there the children
+   * of a patch are all active). We also perform the operation described above
+   * on these patches, but it is easy to see that on patches that are children
+   * of previously treated patches, the operation is now the identity operation
+   * (since it interpolates from the children of the current patch a function
+   * that had previously been interpolated to these children from an even coarser
+   * patch). Consequently, this does not alter the solution vector any more.
    *
    * The name of the function originates from the fact that it can be used to
    * construct a representation of a function of higher polynomial degree on a
    * once coarser mesh. For example, if you imagine that you start with a
-   * $Q_1$ function on globally refined mesh, and that @p dof2 is associated
+   * $Q_1$ function on a globally refined mesh, and that @p dof2 is associated
    * with a $Q_2$ element, then this function computes the equivalent of the
    * operator $I_{2h}^{(2)}$ interpolating the original piecewise linear
    * function onto a quadratic function on a once coarser mesh with mesh size
@@ -777,6 +831,7 @@ namespace FETools
                     const DoFHandler<dim,spacedim> &dof2,
                     const ConstraintMatrix         &constraints,
                     OutVector                      &z2);
+
   //@}
   /**
    * The numbering of the degrees of freedom in continuous finite elements is

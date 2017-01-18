@@ -700,8 +700,8 @@ namespace PETScWrappers
      * Prints the PETSc vector object values using PETSc internal vector
      * viewer function <tt>VecView</tt>. The default format prints the
      * vector's contents, including indices of vector elements. For other
-     * valid view formats, consult http://www.mcs.anl.gov/petsc/petsc-
-     * current/docs/manualpages/Vec/VecView.html
+     * valid view formats, consult
+     * http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/Vec/VecView.html
      */
     void write_ascii (const PetscViewerFormat format = PETSC_VIEWER_DEFAULT) ;
 
@@ -724,10 +724,10 @@ namespace PETScWrappers
      * only swaps the pointers to the data of the two vectors and therefore
      * does not need to allocate temporary storage and move data around.
      *
-     * This function is analog to the the @p swap function of all C++ standard
-     * containers. Also, there is a global function <tt>swap(u,v)</tt> that
-     * simply calls <tt>u.swap(v)</tt>, again in analogy to standard
-     * functions.
+     * This function is analogous to the the @p swap function of all C++
+     * standard containers. Also, there is a global function
+     * <tt>swap(u,v)</tt> that simply calls <tt>u.swap(v)</tt>, again in
+     * analogy to standard functions.
      */
     void swap (VectorBase &v);
 
@@ -878,8 +878,8 @@ namespace PETScWrappers
 
       const PetscInt petsc_i = index;
 
-      const int ierr
-        = VecSetValues (vector, 1, &petsc_i, &value, INSERT_VALUES);
+      const PetscErrorCode ierr = VecSetValues (vector, 1, &petsc_i, &value,
+                                                INSERT_VALUES);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       vector.last_action = VectorOperation::insert;
@@ -915,8 +915,8 @@ namespace PETScWrappers
 
       // use the PETSc function to add something
       const PetscInt petsc_i = index;
-      const int ierr
-        = VecSetValues (vector, 1, &petsc_i, &value, ADD_VALUES);
+      const PetscErrorCode ierr = VecSetValues (vector, 1, &petsc_i, &value,
+                                                ADD_VALUES);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
 
@@ -953,8 +953,8 @@ namespace PETScWrappers
       // add something
       const PetscInt petsc_i = index;
       const PetscScalar subtractand = -value;
-      const int ierr
-        = VecSetValues (vector, 1, &petsc_i, &subtractand, ADD_VALUES);
+      const PetscErrorCode ierr = VecSetValues (vector, 1, &petsc_i, &subtractand,
+                                                ADD_VALUES);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       return *this;
@@ -990,8 +990,8 @@ namespace PETScWrappers
       const PetscScalar new_value
         = static_cast<PetscScalar>(*this) * value;
 
-      const int ierr
-        = VecSetValues (vector, 1, &petsc_i, &new_value, INSERT_VALUES);
+      const PetscErrorCode ierr = VecSetValues (vector, 1, &petsc_i, &new_value,
+                                                INSERT_VALUES);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       return *this;
@@ -1027,8 +1027,8 @@ namespace PETScWrappers
       const PetscScalar new_value
         = static_cast<PetscScalar>(*this) / value;
 
-      const int ierr
-        = VecSetValues (vector, 1, &petsc_i, &new_value, INSERT_VALUES);
+      const PetscErrorCode ierr = VecSetValues (vector, 1, &petsc_i, &new_value,
+                                                INSERT_VALUES);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       return *this;
@@ -1067,8 +1067,8 @@ namespace PETScWrappers
   VectorBase::in_local_range (const size_type index) const
   {
     PetscInt begin, end;
-    const int ierr = VecGetOwnershipRange (static_cast<const Vec &>(vector),
-                                           &begin, &end);
+    const PetscErrorCode ierr = VecGetOwnershipRange (static_cast<const Vec &>(vector),
+                                                      &begin, &end);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return ((index >= static_cast<size_type>(begin)) &&
@@ -1163,9 +1163,6 @@ namespace PETScWrappers
     // with a parallel vector
     if (ghosted )
       {
-
-        int ierr;
-
         // there is the possibility
         // that the vector has
         // ghost elements. in that
@@ -1184,7 +1181,7 @@ namespace PETScWrappers
         // position we can get from
         // an index set
         PetscInt begin, end;
-        ierr = VecGetOwnershipRange (vector, &begin, &end);
+        PetscErrorCode ierr = VecGetOwnershipRange (vector, &begin, &end);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
         Vec locally_stored_elements = PETSC_NULL;
@@ -1231,10 +1228,8 @@ namespace PETScWrappers
     // element we are interested in
     else
       {
-        int ierr;
-
         PetscInt begin, end;
-        ierr = VecGetOwnershipRange (vector, &begin, &end);
+        PetscErrorCode ierr = VecGetOwnershipRange (vector, &begin, &end);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
         PetscScalar *ptr;

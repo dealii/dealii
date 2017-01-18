@@ -54,6 +54,40 @@ namespace DoFTools
 {
   namespace internal
   {
+    /**
+     * Comparison functor struct to compare two Points and return if one is
+     * "less" than the other one. This can be used to use Point<dim> as a key in
+     * std::map.
+     *
+     * Comparison is done by comparing values in each dimension in ascending
+     * order (first x, then y, etc.). Note that comparisons are done without an
+     * epsilon, so points need to have identical floating point components to be
+     * considered equal.
+     */
+    template <int dim,typename Number=double>
+    struct ComparisonHelper
+    {
+      /**
+        * Comparison operator.
+        *
+        * Return true if @p lhs is considered less than @p rhs.
+        */
+      bool operator() (const Point<dim, Number> &lhs,
+                       const Point<dim, Number> &rhs) const
+      {
+        for (unsigned int d=0; d<dim; ++d)
+          {
+            if (lhs[d] == rhs[d])
+              continue;
+            return lhs[d]<rhs[d];
+          }
+        return false;
+      }
+
+    };
+
+
+
     // return an array that for each dof on the reference cell
     // lists the corresponding vector component.
     //
@@ -1342,7 +1376,7 @@ namespace DoFTools
         // one, where we take "random" to be "once this way once that way"
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           if (subdomain_association[local_dof_indices[i]] ==
-              numbers::invalid_unsigned_int)
+              numbers::invalid_subdomain_id)
             subdomain_association[local_dof_indices[i]] = subdomain_id;
           else
             {
@@ -1670,9 +1704,10 @@ namespace DoFTools
       {
         std::vector<types::global_dof_index> local_dof_count = dofs_per_component;
 
-        MPI_Allreduce ( &local_dof_count[0], &dofs_per_component[0], n_target_components,
-                        DEAL_II_DOF_INDEX_MPI_TYPE,
-                        MPI_SUM, tria->get_communicator());
+        const int ierr = MPI_Allreduce (&local_dof_count[0], &dofs_per_component[0], n_target_components,
+                                        DEAL_II_DOF_INDEX_MPI_TYPE,
+                                        MPI_SUM, tria->get_communicator());
+        AssertThrowMPI (ierr);
       }
 #endif
   }
@@ -1747,10 +1782,11 @@ namespace DoFTools
                (&dof_handler.get_triangulation())))
           {
             std::vector<types::global_dof_index> local_dof_count = dofs_per_block;
-            MPI_Allreduce ( &local_dof_count[0], &dofs_per_block[0],
-                            n_target_blocks,
-                            DEAL_II_DOF_INDEX_MPI_TYPE,
-                            MPI_SUM, tria->get_communicator());
+            const int ierr = MPI_Allreduce (&local_dof_count[0], &dofs_per_block[0],
+                                            n_target_blocks,
+                                            DEAL_II_DOF_INDEX_MPI_TYPE,
+                                            MPI_SUM, tria->get_communicator());
+            AssertThrowMPI (ierr);
           }
 #endif
       }
@@ -1996,6 +2032,50 @@ namespace DoFTools
     internal::map_dofs_to_support_points (mapping,
                                           dof_handler,
                                           support_points);
+  }
+
+  template <int spacedim>
+  void
+  write_gnuplot_dof_support_point_info(std::ostream &out,
+                                       const std::map<types::global_dof_index, Point<spacedim> > &support_points)
+  {
+    AssertThrow (out, ExcIO());
+
+    typedef std::map< types::global_dof_index, Point<spacedim> >
+    dof_map_t;
+
+    typedef std::map<Point<spacedim>, std::vector<types::global_dof_index>, typename internal::ComparisonHelper<spacedim> >
+    point_map_t;
+
+    point_map_t point_map;
+
+    // convert to map point -> list of DoFs
+    for (typename dof_map_t::const_iterator it = support_points.begin();
+         it!=support_points.end();
+         ++it)
+      {
+        std::vector<types::global_dof_index> &v = point_map[it->second];
+        v.push_back(it->first);
+      }
+
+    // print the newly created map:
+    for (typename point_map_t::iterator it = point_map.begin();
+         it!=point_map.end();
+         ++it)
+      {
+        out << it->first << " \"";
+        const std::vector<types::global_dof_index> &v = it->second;
+        for (unsigned int i=0; i < v.size(); ++i)
+          {
+            if (i>0)
+              out << ", ";
+            out << v[i];
+          }
+
+        out << "\"\n";
+      }
+
+    out << std::flush;
   }
 
 

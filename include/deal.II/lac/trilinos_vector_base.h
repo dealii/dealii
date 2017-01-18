@@ -53,6 +53,12 @@ template <typename number> class Vector;
  * @addtogroup TrilinosWrappers
  * @{
  */
+
+/**
+* A namespace in which wrapper classes for Trilinos objects reside.
+*
+* @ingroup TrilinosWrappers
+*/
 namespace TrilinosWrappers
 {
   // forward declaration
@@ -849,10 +855,10 @@ namespace TrilinosWrappers
      * does not need to allocate temporary storage and move data around. Note
      * that the vectors need to be of the same size and base on the same map.
      *
-     * This function is analog to the the @p swap function of all C standard
-     * containers. Also, there is a global function <tt>swap(u,v)</tt> that
-     * simply calls <tt>u.swap(v)</tt>, again in analogy to standard
-     * functions.
+     * This function is analogous to the the @p swap function of all C++
+     * standard containers. Also, there is a global function
+     * <tt>swap(u,v)</tt> that simply calls <tt>u.swap(v)</tt>, again in
+     * analogy to standard functions.
      */
     void swap (VectorBase &v);
 
@@ -936,6 +942,11 @@ namespace TrilinosWrappers
      * describing ghost elements.
      */
     std_cxx11::shared_ptr<Epetra_MultiVector> nonlocal_vector;
+
+    /**
+     * An IndexSet storing the indices this vector owns exclusively.
+     */
+    IndexSet owned_elements;
 
     /**
      * Make the reference class a friend.
@@ -1082,27 +1093,11 @@ namespace TrilinosWrappers
   IndexSet
   VectorBase::locally_owned_elements() const
   {
-    IndexSet is (size());
-
-    // easy case: local range is contiguous
-    if (vector->Map().LinearMap())
-      {
-        const std::pair<size_type, size_type> x = local_range();
-        is.add_range (x.first, x.second);
-      }
-    else if (vector->Map().NumMyElements() > 0)
-      {
-        const size_type n_indices = vector->Map().NumMyElements();
-#ifndef DEAL_II_WITH_64BIT_INDICES
-        unsigned int *vector_indices = (unsigned int *)vector->Map().MyGlobalElements();
-#else
-        size_type *vector_indices = (size_type *)vector->Map().MyGlobalElements64();
-#endif
-        is.add_indices(vector_indices, vector_indices+n_indices);
-        is.compress();
-      }
-
-    return is;
+    Assert(owned_elements.size()==size(),
+           ExcMessage("The locally owned elements have not been properly initialized!"
+                      " This happens for example if this object has been initialized"
+                      " with exactly one overlapping IndexSet."));
+    return owned_elements;
   }
 
 
@@ -1218,6 +1213,8 @@ namespace TrilinosWrappers
 
     if (v.nonlocal_vector.get() != 0)
       nonlocal_vector.reset(new Epetra_MultiVector(v.nonlocal_vector->Map(), 1));
+
+    owned_elements = v.owned_elements;
   }
 
 

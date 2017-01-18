@@ -37,19 +37,30 @@ MACRO(DEAL_II_INITIALIZE_CACHED_VARIABLES)
   ENDIF()
 
   #
-  # Set build type according to build type of deal.II
+  # Set build type according to available libraries
   #
-  SET(CMAKE_BUILD_TYPE ${DEAL_II_BUILD_TYPE} CACHE STRING
-    "Choose the type of build, options are: Debug, Release, DebugRelease")
+  IF(DEAL_II_BUILD_TYPE MATCHES "Debug")
+    SET(CMAKE_BUILD_TYPE "Debug" CACHE STRING
+      "Choose the type of build, options are: Debug, Release"
+      )
+  ELSE()
+    SET(CMAKE_BUILD_TYPE "Release" CACHE STRING
+      "Choose the type of build, options are: Debug, Release"
+      )
+  ENDIF()
 
   #
-  # Reset build type if unsupported, i.e. if it is not (case insensitively
-  # equal to Debug or Release or unsupported by the current build type:
+  # Reset build type if unsupported, i.e. if it is not Debug, Release, or
+  # DebugRelease, or if the library doesn't support it
   #
-  STRING(TOLOWER "${CMAKE_BUILD_TYPE}" _cmake_build_type)
+  IF( NOT "${CMAKE_BUILD_TYPE}" MATCHES "^(Debug|Release|DebugRelease)$"
+      OR NOT "${DEAL_II_BUILD_TYPE}" MATCHES "${CMAKE_BUILD_TYPE}" )
 
-  IF(NOT "${_cmake_build_type}" MATCHES "^(debug|release|debugrelease)$")
-
+    IF("${DEAL_II_BUILD_TYPE}" STREQUAL "DebugRelease")
+      SET(_new_build_type "Debug")
+    ELSE()
+      SET(_new_build_type "${DEAL_II_BUILD_TYPE}")
+    ENDIF()
 
     MESSAGE(
 "###
@@ -57,14 +68,14 @@ MACRO(DEAL_II_INITIALIZE_CACHED_VARIABLES)
 #  WARNING:
 #
 #  CMAKE_BUILD_TYPE \"${CMAKE_BUILD_TYPE}\" unsupported by current installation!
-#  deal.II was built with CMAKE_BUILD_TYPE \"${DEAL_II_BUILD_TYPE}\".
+#  deal.II was configured with \"${DEAL_II_BUILD_TYPE}\".
 #
-#  CMAKE_BUILD_TYPE is forced to \"${DEAL_II_BUILD_TYPE}\".
+#  CMAKE_BUILD_TYPE was forced to \"${_new_build_type}\".
 #
 ###"
       )
-    SET(CMAKE_BUILD_TYPE ${DEAL_II_BUILD_TYPE} CACHE STRING
-      "Choose the type of build, options are: Debug, Release, DebugRelease"
+    SET(CMAKE_BUILD_TYPE "${_new_build_type}" CACHE STRING
+      "Choose the type of build, options are: Debug, Release"
       FORCE
       )
 

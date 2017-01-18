@@ -131,7 +131,7 @@ namespace internal
     value_type value;
 
     /**
-     * cache the current value as a string
+     * Cache the current value as a string.
      */
     mutable std::string cached_value;
 
@@ -322,9 +322,22 @@ public:
    */
   enum TextOutputFormat
   {
+    /**
+     * Print the table with headers.
+     */
     table_with_headers,
+    /**
+     * Print the table with separate lines for each column label.
+     */
     table_with_separate_column_description,
+    /**
+     * Like table_with_separate_column_description, but without aligning the
+     * column containing the column labels.
+     */
     simple_table_with_separate_column_description,
+    /**
+     * Print the table in org mode format.
+     */
     org_mode_table
   };
 
@@ -447,10 +460,11 @@ public:
                    const TextOutputFormat format = table_with_headers) const;
 
   /**
-   * Write table as a tex file. If with_header is set to false (it is true by
-   * default), then no "\documentclass{...}", "\begin{document}" and
-   * "\end{document}" are used. In this way the file can be included into an
-   * existing tex file using a command like "\input{table_file}".
+   * Write table as a tex file. If @p with_header is set to false, then no
+   * <code>\\documentclass{...}</code>, <code>\\begin{document}</code> and
+   * <code>\\end{document}</code> are used. In this way the file can be
+   * included into an existing tex file using a command like
+   * <code>\\input{table_file}</code>.
    */
   void write_tex (std::ostream &file, const bool with_header=true) const;
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2016 by the deal.II authors
+// Copyright (C) 2000 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,11 +43,20 @@ namespace Polynomials
   /**
    * Base class for all 1D polynomials. A polynomial is represented in this
    * class by its coefficients, which are set through the constructor or by
-   * derived classes. Evaluation of a polynomial happens through the Horner
-   * scheme which provides both numerical stability and a minimal number of
-   * numerical operations.
+   * derived classes.
    *
-   * @author Ralf Hartmann, Guido Kanschat, 2000, 2006
+   * There are two paths for evaluation of polynomials. One is based on the
+   * coefficients which are evaluated through the Horner scheme which is a
+   * robust general-purpose scheme. An alternative and more stable evaluation
+   * of high-degree polynomials with roots in the unit interval is provided by
+   * a product in terms of the roots. This form is available for special
+   * polynomials such as Lagrange polynomials or Legendre polynomials and used
+   * with the respective constructor. To obtain this more stable evaluation
+   * form, the constructor with the roots in form of a Lagrange polynomial
+   * must be used. In case a manipulation is done that changes the roots, the
+   * representation is switched to the coefficient form.
+   *
+   * @author Ralf Hartmann, Guido Kanschat, 2000, 2006, Martin Kronbichler, 2011, 2017
    */
   template <typename number>
   class Polynomial : public Subscriptor
@@ -69,7 +78,7 @@ namespace Polynomials
     Polynomial (const unsigned int n);
 
     /**
-     * Constructor for Lagrange polynomial and its point of evaluation. The
+     * Constructor for a Lagrange polynomial and its point of evaluation. The
      * idea is to construct $\prod_{i\neq j} \frac{x-x_i}{x_j-x_i}$, where j
      * is the evaluation point specified as argument and the support points
      * contain all points (including x_j, which will internally not be
@@ -87,7 +96,8 @@ namespace Polynomials
      * Return the value of this polynomial at the given point.
      *
      * This function uses the Horner scheme for numerical stability of the
-     * evaluation.
+     * evaluation for polynomials in the coefficient form or the product of
+     * terms involving the roots if that representation is used.
      */
     number value (const number x) const;
 
@@ -98,10 +108,26 @@ namespace Polynomials
      * thus determined by the size of the array passed.
      *
      * This function uses the Horner scheme for numerical stability of the
-     * evaluation.
+     * evaluation for polynomials in the coefficient form or the product of
+     * terms involving the roots if that representation is used.
      */
     void value (const number         x,
                 std::vector<number> &values) const;
+
+    /**
+     * Return the values and the derivatives of the Polynomial at point
+     * <tt>x</tt>.  <tt>values[i], i=0,...,n_derivatives</tt> includes the
+     * <tt>i</tt>th derivative. The number of derivatives to be computed is
+     * determined by @p n_derivatives and @p values has to provide sufficient
+     * space for @p n_derivatives + 1 values.
+     *
+     * This function uses the Horner scheme for numerical stability of the
+     * evaluation for polynomials in the coefficient form or the product of
+     * terms involving the roots if that representation is used.
+     */
+    void value (const number         x,
+                const unsigned int n_derivatives,
+                number *values) const;
 
     /**
      * Degree of the polynomial. This is the degree reflected by the number of
@@ -347,8 +373,9 @@ namespace Polynomials
 
   /**
    * Legendre polynomials of arbitrary degree. Constructing a Legendre
-   * polynomial of degree <tt>p</tt>, the coefficients will be computed by the
-   * three-term recursion formula.
+   * polynomial of degree <tt>p</tt>, the roots will be computed by the Gauss
+   * formula of the respective number of points and a representation of the
+   * polynomial by its roots.
    *
    * @note The polynomials defined by this class differ in two aspects by what
    * is usually referred to as Legendre polynomials: (i) This classes defines
@@ -376,38 +403,6 @@ namespace Polynomials
     static
     std::vector<Polynomial<double> >
     generate_complete_basis (const unsigned int degree);
-
-  private:
-    /**
-     * Coefficients for the interval $[0,1]$.
-     */
-    static std::vector<std_cxx11::shared_ptr<const std::vector<double> > > shifted_coefficients;
-
-    /**
-     * Vector with already computed coefficients. For each degree of the
-     * polynomial, we keep one pointer to the list of coefficients; we do so
-     * rather than keeping a vector of vectors in order to simplify
-     * programming multithread-safe. In order to avoid memory leak, we use a
-     * shared_ptr in order to correctly free the memory of the vectors when
-     * the global destructor is called.
-     */
-    static std::vector<std_cxx11::shared_ptr<const std::vector<double> > > recursive_coefficients;
-
-    /**
-     * Compute coefficients recursively. The coefficients are stored in a
-     * static data vector to be available when needed next time. Since the
-     * recursion is performed for the interval $[-1,1]$, the polynomials are
-     * shifted to $[0,1]$ by the <tt>scale</tt> and <tt>shift</tt> functions
-     * of <tt>Polynomial</tt>, afterwards.
-     */
-    static void compute_coefficients (const unsigned int p);
-
-    /**
-     * Get coefficients for constructor.  This way, it can use the non-
-     * standard constructor of Polynomial.
-     */
-    static const std::vector<double> &
-    get_coefficients (const unsigned int k);
   };
 
   /**
@@ -562,7 +557,7 @@ namespace Polynomials
    * Legendre polynomials of increasing order. The implementation is
    * @f{align*}{
    * p_0(x) &= 2x^3-3x^2+1 \\
-   * p_1(x) &= -2x^2+3x^2 \\
+   * p_1(x) &= -2x^3+3x^2 \\
    * p_2(x) &= x^3-2x^2+x  \\
    * p_3(x) &= x^3-x^2 \\
    * p_4(x) &= 16x^2(x-1)^2 \\

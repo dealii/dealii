@@ -24,6 +24,12 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+/**
+ * An exception that is thrown whenever the edges of a mesh are not
+ * orientable.
+ */
+DeclExceptionMsg (ExcMeshNotOrientable,
+                  "The edges of the mesh are not consistently orientable.");
 
 
 /**
@@ -473,15 +479,16 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Both algorithms are described in the paper "On orienting edges of
  * unstructured two- and three-dimensional meshes", R. Agelek, M. Anderson, W.
- * Bangerth, W. L. Barth (submitted, 2015). A preprint is available as <a
+ * Bangerth, W. L. Barth (submitted, 2016). A preprint is available as <a
  * href="http://arxiv.org/abs/1512.02137">arxiv
  * 1512.02137</a>.
  *
  *
  * <h3>For the curious</h3>
  *
- * Prior to the implementation of the algorithms developed by Michael Anderson
- * and described above, we used a branch-and-cut algorithm initially
+ * Prior to the implementation of the algorithms described above (originally
+ * implemented by Michael Anderson in 2002, and re-implemented by Wolfgang
+ * Bangerth in 2016), we used a branch-and-cut algorithm initially
  * implemented in 2000 by Wolfgang Bangerth. Although it is no longer used,
  * here is how it works, and why it doesn't always work for large meshes since
  * its run-time can be exponential in bad cases.
@@ -618,7 +625,7 @@ DEAL_II_NAMESPACE_OPEN
  * Triangulation::create_triangulation() function.
  *
  * @ingroup grid
- * @author Wolfgang Bangerth, 2000, Michael Anderson 2003, Ralf Hartmann 2005
+ * @author Wolfgang Bangerth, 2000, 2016, Michael Anderson 2003
  */
 template <int dim, int spacedim=dim>
 class GridReordering
@@ -664,21 +671,6 @@ public:
 
 
 // declaration of explicit specializations
-template<>
-void
-GridReordering<2>::reorder_cells (std::vector<CellData<2> > &original_cells,
-                                  const bool);
-
-template<>
-void
-GridReordering<2,3>::reorder_cells (std::vector<CellData<2> > &original_cells,
-                                    const bool);
-
-template<>
-void
-GridReordering<3>::reorder_cells (std::vector<CellData<3> > &original_cells,
-                                  const bool);
-
 template<>
 void
 GridReordering<2>::invert_all_cells_of_negative_grid(const std::vector<Point<2> > &all_vertices,

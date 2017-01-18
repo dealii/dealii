@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2016 by the deal.II authors
+// Copyright (C) 2010 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,5 +39,16 @@ for (deal_II_dimension : DIMENSIONS)
     template void internal::MatrixFreeFunctions::ShapeInfo<float>::reinit
     <deal_II_dimension>(const Quadrature<1> &, const FiniteElement
                         <deal_II_dimension,deal_II_dimension> &, const unsigned int);
+#endif
+}
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
+{
+#if deal_II_dimension <= deal_II_space_dimension
+    template bool MatrixFree<deal_II_dimension, double>::
+    is_supported(const FiniteElement<deal_II_dimension, deal_II_space_dimension> &);
+
+    template bool MatrixFree<deal_II_dimension, float>::
+    is_supported(const FiniteElement<deal_II_dimension, deal_II_space_dimension> &);
 #endif
 }

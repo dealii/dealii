@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,15 +43,18 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     void interpolate<deal_II_dimension>
     (const hp::DoFHandler<deal_II_dimension> &, const Vector<double> &,
      const hp::DoFHandler<deal_II_dimension> &, Vector<double> &);
+
     template
     void interpolate<deal_II_dimension>
     (const hp::DoFHandler<deal_II_dimension> &, const Vector<double> &,
      const hp::DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
      Vector<double> &);
+
     template
     void interpolate<deal_II_dimension>
     (const hp::DoFHandler<deal_II_dimension> &, const Vector<float> &,
      const hp::DoFHandler<deal_II_dimension> &, Vector<float> &);
+
     template
     void interpolate<deal_II_dimension>
     (const hp::DoFHandler<deal_II_dimension> &, const Vector<float> &,
@@ -60,8 +63,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 #endif
     \}
 }
-
-
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS; VEC : SERIAL_VECTORS)
 {
@@ -72,35 +73,30 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     void back_interpolate<deal_II_dimension>
     (const DoFHandler<deal_II_dimension> &, const VEC &,
      const FiniteElement<deal_II_dimension> &, VEC &);
+
     template
     void back_interpolate<deal_II_dimension>
     (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
      const VEC &,
      const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
      VEC &);
+
     template
     void interpolation_difference<deal_II_dimension>
     (const DoFHandler<deal_II_dimension> &, const VEC &,
      const FiniteElement<deal_II_dimension> &, VEC &);
+
     template
     void interpolation_difference<deal_II_dimension>
     (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
      const VEC &,
      const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
      VEC &);
+
     template
     void project_dg<deal_II_dimension>
     (const DoFHandler<deal_II_dimension> &, const VEC &,
      const DoFHandler<deal_II_dimension> &, VEC &);
-    template
-    void extrapolate<deal_II_dimension>
-    (const DoFHandler<deal_II_dimension> &, const VEC &,
-     const DoFHandler<deal_II_dimension> &, VEC &);
-    template
-    void extrapolate<deal_II_dimension>
-    (const DoFHandler<deal_II_dimension> &, const VEC &,
-     const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-     VEC &);
 #endif
     \}
 }

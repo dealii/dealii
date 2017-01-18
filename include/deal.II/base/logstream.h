@@ -398,12 +398,6 @@ public:
    */
   std::size_t memory_consumption () const;
 
-
-  /**
-   * Exception.
-   */
-  DeclException0(ExcNoFileStreamGiven);
-
 private:
 
 

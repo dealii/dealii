@@ -263,15 +263,33 @@ get_tangent_vector (const Point<spacedim> &p1,
 
 template <int dim, int spacedim>
 Point<spacedim>
-SphericalManifold<dim,spacedim>::
-project_to_manifold (const std::vector<Point<spacedim> > &vertices,
-                     const Point<spacedim> &candidate) const
+SphericalManifold<dim, spacedim>::
+get_new_point (const Quadrature<spacedim> &quad) const
 {
+  return get_new_point(quad.get_points(),quad.get_weights());
+}
+
+template <int dim, int spacedim>
+Point<spacedim>
+SphericalManifold<dim,spacedim>::
+get_new_point (const std::vector<Point<spacedim> > &vertices,
+               const std::vector<double> &weights) const
+{
+  const unsigned int n_points = vertices.size();
+
   double rho = 0.0;
-  for (unsigned int i = 0; i<vertices.size(); i++)
-    rho += (vertices[i]-center).norm();
-  rho /= (1.0*vertices.size());
-  return center+(rho/(candidate-center).norm())*(candidate-center);
+  Tensor<1,spacedim> candidate;
+  for (unsigned int i = 0; i<n_points; i++)
+    {
+      const Tensor<1,spacedim> direction (vertices[i]-center);
+      rho += direction.norm()*weights[i];
+      candidate += direction*weights[i];
+    }
+
+  // Unit norm direction.
+  candidate /= candidate.norm();
+
+  return center+rho*candidate;
 }
 
 // ============================================================
@@ -469,7 +487,7 @@ TorusManifold<dim>::pull_back(const Point<3> &p) const
   double y = p(2);
   double phi = atan2(y, x);
   double theta = atan2(z, std::sqrt(x*x+y*y)-R);
-  double w = std::sqrt((pow(y-sin(phi)*R, 2.0)+pow(x-cos(phi)*R, 2.0)+z*z))/r;
+  double w = std::sqrt(pow(y-sin(phi)*R, 2.0)+pow(x-cos(phi)*R, 2.0)+z*z)/r;
   return Point<3>(phi, theta, w);
 }
 

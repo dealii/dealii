@@ -132,7 +132,7 @@ namespace Utilities
   trim(const std::string &input)
   {
     std::string::size_type left = 0;
-    std::string::size_type right = input.size() - 1;
+    std::string::size_type right = input.size() > 0 ? input.size() - 1 : 0;
 
     for (; left < input.size(); ++left)
       {
@@ -784,7 +784,8 @@ namespace Utilities
         {
           MPI_Comm comm = mpi_comm->GetMpiComm();
           *mpi_comm = Epetra_MpiComm(MPI_COMM_SELF);
-          MPI_Comm_free (&comm);
+          const int ierr = MPI_Comm_free (&comm);
+          AssertThrowMPI(ierr);
         }
 #endif
     }

@@ -117,7 +117,7 @@ namespace internal
 
       /**
        * We use this union to store boundary and material data. Because only
-       * one one out of these two is actually needed here, we use an union.
+       * one out of these two is actually needed here, we use an union.
        */
       struct BoundaryOrMaterialId
       {

@@ -1,0 +1,5 @@
+New: Add VectorTools::compute_global_error that computes global
+errors from cellwise errors obtained by VectorTools::integrate_difference()
+and do MPI collectives if necessary.
+<br>
+(Timo Heister, 2016/05/15)

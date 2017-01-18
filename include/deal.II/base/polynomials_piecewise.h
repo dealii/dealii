@@ -83,7 +83,7 @@ namespace Polynomials
      * Return the values and the derivatives of the Polynomial at point
      * <tt>x</tt>.  <tt>values[i], i=0,...,values.size()-1</tt> includes the
      * <tt>i</tt>th derivative. The number of derivatives to be computed is
-     * thus determined by the size of the array passed.
+     * thus determined by the size of the vector passed.
      *
      * Note that all the derivatives evaluate to zero at the border between
      * intervals (assuming exact arithmetics) in the interior of the unit
@@ -95,6 +95,25 @@ namespace Polynomials
      */
     void value (const number         x,
                 std::vector<number> &values) const;
+
+    /**
+     * Return the values and the derivatives of the Polynomial at point
+     * <tt>x</tt>.  <tt>values[i], i=0,...,n_derivatives</tt> includes the
+     * <tt>i</tt>th derivative.The number of derivatives to be computed is
+     * determined by @p n_derivatives and @p values has to provide sufficient
+     * space for @p n_derivatives + 1 values.
+     *
+     * Note that all the derivatives evaluate to zero at the border between
+     * intervals (assuming exact arithmetics) in the interior of the unit
+     * interval, as there is no unique gradient value in that case for a
+     * piecewise polynomial. This is not always desired (e.g., when evaluating
+     * jumps of gradients on the element boundary), but it is the user's
+     * responsibility to avoid evaluation at these points when it does not
+     * make sense.
+     */
+    void value (const number         x,
+                const unsigned int n_derivatives,
+                number *values) const;
 
     /**
      * Degree of the polynomial. This is the degree of the underlying base

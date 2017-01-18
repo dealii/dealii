@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2015 by the deal.II authors
+ * Copyright (C) 2008 - 2016 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -1054,9 +1054,7 @@ namespace Step32
         AssertThrow (false, ExcMessage (message.str().c_str()));
       }
 
-    const bool success = prm.read_input (parameter_file);
-    AssertThrow (success, ExcMessage ("Invalid input parameter file."));
-
+    prm.parse_input (parameter_file);
     parse_parameters (prm);
   }
 
@@ -3138,8 +3136,8 @@ namespace Step32
   // inherits from the class DataPostprocessor, which can be attached to
   // DataOut. This allows us to output derived quantities from the solution,
   // like the friction heating included in this example. It overloads the
-  // virtual function DataPostprocessor::compute_derived_quantities_vector,
-  // which is then internally called from DataOut::build_patches. We have to
+  // virtual function DataPostprocessor::evaluate_vector_field(),
+  // which is then internally called from DataOut::build_patches(). We have to
   // give it values of the numerical solution, its derivatives, normals to the
   // cell, the actual evaluation points and any additional quantities. This
   // follows the same procedure as discussed in step-29 and other programs.
@@ -3152,12 +3150,9 @@ namespace Step32
 
     virtual
     void
-    compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
-                                       const std::vector<std::vector<Tensor<1,dim> > > &duh,
-                                       const std::vector<std::vector<Tensor<2,dim> > > &dduh,
-                                       const std::vector<Point<dim> >                  &normals,
-                                       const std::vector<Point<dim> >                  &evaluation_points,
-                                       std::vector<Vector<double> >                    &computed_quantities) const;
+    evaluate_vector_field
+    (const DataPostprocessorInputs::Vector<dim> &inputs,
+     std::vector<Vector<double> >               &computed_quantities) const;
 
     virtual std::vector<std::string> get_names () const;
 
@@ -3239,38 +3234,37 @@ namespace Step32
   //
   // The quantities we output here are more for illustration, rather than for
   // actual scientific value. We come back to this briefly in the results
-  // section of this program and explain what one may in fact be interested
-  // in.
+  // section of this program and explain what one may in fact be interested in.
   template <int dim>
   void
   BoussinesqFlowProblem<dim>::Postprocessor::
-  compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
-                                     const std::vector<std::vector<Tensor<1,dim> > > &duh,
-                                     const std::vector<std::vector<Tensor<2,dim> > > &/*dduh*/,
-                                     const std::vector<Point<dim> >                  &/*normals*/,
-                                     const std::vector<Point<dim> >                  &/*evaluation_points*/,
-                                     std::vector<Vector<double> >                    &computed_quantities) const
+  evaluate_vector_field
+  (const DataPostprocessorInputs::Vector<dim> &inputs,
+   std::vector<Vector<double> >               &computed_quantities) const
   {
-    const unsigned int n_quadrature_points = uh.size();
-    Assert (duh.size() == n_quadrature_points,                  ExcInternalError());
-    Assert (computed_quantities.size() == n_quadrature_points,  ExcInternalError());
-    Assert (uh[0].size() == dim+2,                              ExcInternalError());
+    const unsigned int n_quadrature_points = inputs.solution_values.size();
+    Assert (inputs.solution_gradients.size() == n_quadrature_points,
+            ExcInternalError());
+    Assert (computed_quantities.size() == n_quadrature_points,
+            ExcInternalError());
+    Assert (inputs.solution_values[0].size() == dim+2,
+            ExcInternalError());
 
     for (unsigned int q=0; q<n_quadrature_points; ++q)
       {
         for (unsigned int d=0; d<dim; ++d)
           computed_quantities[q](d)
-            = (uh[q](d) *  EquationData::year_in_seconds * 100);
+            = (inputs.solution_values[q](d) *  EquationData::year_in_seconds * 100);
 
-        const double pressure = (uh[q](dim)-minimal_pressure);
+        const double pressure = (inputs.solution_values[q](dim)-minimal_pressure);
         computed_quantities[q](dim) = pressure;
 
-        const double temperature = uh[q](dim+1);
+        const double temperature = inputs.solution_values[q](dim+1);
         computed_quantities[q](dim+1) = temperature;
 
         Tensor<2,dim> grad_u;
         for (unsigned int d=0; d<dim; ++d)
-          grad_u[d] = duh[q][d];
+          grad_u[d] = inputs.solution_gradients[q][d];
         const SymmetricTensor<2,dim> strain_rate = symmetrize (grad_u);
         computed_quantities[q](dim+2) = 2 * EquationData::eta *
                                         strain_rate * strain_rate;
@@ -3439,7 +3433,7 @@ namespace Step32
                                  Utilities::int_to_string (out_index, 5) +
                                  ".visit");
         std::ofstream visit_master (visit_master_filename.c_str());
-        data_out.write_visit_record (visit_master, filenames);
+        DataOutBase::write_visit_record (visit_master, filenames);
       }
 
     computing_timer.exit_section ();

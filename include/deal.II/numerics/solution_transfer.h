@@ -433,7 +433,18 @@ private:
    */
   enum PreparationState
   {
-    none, pure_refinement, coarsening_and_refinement
+    /**
+     * The SolutionTransfer is not yet prepared.
+     */
+    none,
+    /**
+     * The SolutionTransfer is prepared for purely refinement.
+     */
+    pure_refinement,
+    /**
+     * The SolutionTransfer is prepared for coarsening and refinement.
+     */
+    coarsening_and_refinement
   };
 
   /**

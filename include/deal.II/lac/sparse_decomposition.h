@@ -220,14 +220,14 @@ public:
 
   /**
    * Return the dimension of the codomain (or range) space. It calls the
-   * inherited SparseMatrix::m() function. To remember: the matrix is of
+   * inherited SparseMatrix::m() function. Note that the matrix is of
    * dimension $m \times n$.
    */
   size_type m () const;
 
   /**
    * Return the dimension of the domain space. It calls the  inherited
-   * SparseMatrix::n() function. To remember: the matrix is of dimension $m
+   * SparseMatrix::n() function. Note that the matrix is of dimension $m
    * \times n$.
    */
   size_type n () const;
@@ -295,7 +295,8 @@ protected:
    * elements <code>rowsum</code>.
    *
    * @note The default implementation in SparseLUDecomposition returns
-   * <code>strengthen_diagonal</code>'s value.
+   * <code>strengthen_diagonal</code>'s value. This variable is set to
+   * a nonzero value in several of the derived classes.
    */
   virtual number get_strengthen_diagonal(const number rowsum, const size_type row) const;
 
@@ -307,7 +308,7 @@ protected:
   /**
    * For every row in the underlying SparsityPattern, this array contains a
    * pointer to the row's first afterdiagonal entry. Becomes available after
-   * invocation of decompose().
+   * invocation of prebuild_lower_bound().
    */
   std::vector<const size_type *> prebuilt_lower_bound;
 
@@ -405,11 +406,12 @@ SparseLUDecomposition<number>::Tvmult_add (OutVector &dst,
 
 
 template <typename number>
-SparseLUDecomposition<number>::AdditionalData::AdditionalData (
-  const double strengthen_diag,
-  const unsigned int extra_off_diag,
-  const bool use_prev_sparsity,
-  const SparsityPattern *use_this_spars):
+SparseLUDecomposition<number>::
+AdditionalData::AdditionalData (const double strengthen_diag,
+                                const unsigned int extra_off_diag,
+                                const bool use_prev_sparsity,
+                                const SparsityPattern *use_this_spars)
+  :
   strengthen_diagonal(strengthen_diag),
   extra_off_diagonals(extra_off_diag),
   use_previous_sparsity(use_prev_sparsity),

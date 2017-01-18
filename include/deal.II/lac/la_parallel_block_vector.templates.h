@@ -147,12 +147,6 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    BlockVector<Number>::~BlockVector ()
-    {}
-
-
-
-    template <typename Number>
     BlockVector<Number> &
     BlockVector<Number>::operator = (const value_type s)
     {
@@ -504,6 +498,18 @@ namespace LinearAlgebra
 
 
     template <typename Number>
+    void
+    BlockVector<Number>::add (const std::vector<size_type> &indices,
+                              const std::vector<Number>    &values)
+    {
+      for (size_type i=0; i<indices.size(); ++i)
+        (*this)(indices[i]) += values[i];
+    }
+
+
+
+
+    template <typename Number>
     bool
     BlockVector<Number>::all_zero () const
     {
@@ -759,11 +765,9 @@ namespace LinearAlgebra
     std::size_t
     BlockVector<Number>::memory_consumption () const
     {
-      std::size_t mem = sizeof(this->n_blocks());
-      for (size_type i=0; i<this->components.size(); ++i)
-        mem += MemoryConsumption::memory_consumption (this->components[i]);
-      mem += MemoryConsumption::memory_consumption (this->block_indices);
-      return mem;
+      return (MemoryConsumption::memory_consumption (this->block_indices)
+              +
+              MemoryConsumption::memory_consumption (this->components));
     }
 
   } // end of namespace distributed

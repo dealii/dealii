@@ -82,13 +82,19 @@ public:
   typedef const VectorType const_vector_type;
 
   /**
-   * Constructor. The DoFHandler is used to determine the highest possible
-   * level. <tt>transfer</tt> is an object performing prolongation and
+   * Constructor. The DoFHandler is used to check whether the provided
+   * minlevel and maxlevel are in the range of valid levels.
+   * If maxlevel is set to the default value, the highest valid
+   * level is used.
+   * <tt>transfer</tt> is an object performing prolongation and
    * restriction.
    *
    * This function already initializes the vectors which will be used later in
    * the course of the computations. You should therefore create objects of
    * this type as late as possible.
+   *
+   * @deprecated Use the other constructor instead.
+   * The DoFHandler is actually not needed.
    */
   template <int dim>
   Multigrid(const DoFHandler<dim>              &mg_dof_handler,
@@ -97,20 +103,26 @@ public:
             const MGTransferBase<VectorType>   &transfer,
             const MGSmootherBase<VectorType>   &pre_smooth,
             const MGSmootherBase<VectorType>   &post_smooth,
-            Cycle                              cycle = v_cycle);
+            const unsigned int                 minlevel = 0,
+            const unsigned int                 maxlevel = numbers::invalid_unsigned_int,
+            Cycle                              cycle = v_cycle) DEAL_II_DEPRECATED;
 
   /**
-   * Experimental constructor for cases in which no DoFHandler is available.
+   * Constructor. <tt>transfer</tt> is an object performing prolongation and
+   * restriction. For levels in [minlevel, maxlevel] matrix has to contain
+   * valid matrices. By default the maxlevel is set to the maximal valid level.
    *
-   * @warning Not intended for general use.
+   * This function already initializes the vectors which will be used later in
+   * the course of the computations. You should therefore create objects of
+   * this type as late as possible.
    */
-  Multigrid(const unsigned int                 minlevel,
-            const unsigned int                 maxlevel,
-            const MGMatrixBase<VectorType>     &matrix,
+  Multigrid(const MGMatrixBase<VectorType>     &matrix,
             const MGCoarseGridBase<VectorType> &coarse,
             const MGTransferBase<VectorType>   &transfer,
             const MGSmootherBase<VectorType>   &pre_smooth,
             const MGSmootherBase<VectorType>   &post_smooth,
+            const unsigned int                 minlevel = 0,
+            const unsigned int                 maxlevel = numbers::invalid_unsigned_int,
             Cycle                              cycle = v_cycle);
 
   /**
@@ -179,9 +191,8 @@ public:
 
   /**
    * Set the highest level for which the multilevel method is performed. By
-   * default, this is the finest level of the Triangulation; therefore, this
-   * function will only accept arguments smaller than the current #maxlevel
-   * and not smaller than the current #minlevel.
+   * default, this is the finest level of the Triangulation. Accepted are
+   * values not smaller than the current #minlevel.
    */
   void set_maxlevel (const unsigned int);
 
@@ -440,21 +451,18 @@ private:
 
 template <typename VectorType>
 template <int dim>
-Multigrid<VectorType>::Multigrid (const DoFHandler<dim>          &mg_dof_handler,
+Multigrid<VectorType>::Multigrid (const DoFHandler<dim>              &mg_dof_handler,
                                   const MGMatrixBase<VectorType>     &matrix,
                                   const MGCoarseGridBase<VectorType> &coarse,
                                   const MGTransferBase<VectorType>   &transfer,
                                   const MGSmootherBase<VectorType>   &pre_smooth,
                                   const MGSmootherBase<VectorType>   &post_smooth,
+                                  const unsigned int                 min_level,
+                                  const unsigned int                 max_level,
                                   Cycle                              cycle)
   :
   cycle_type(cycle),
-  minlevel(0),
-  maxlevel(mg_dof_handler.get_triangulation().n_global_levels()-1),
-  defect(minlevel,maxlevel),
-  solution(minlevel,maxlevel),
-  t(minlevel,maxlevel),
-  defect2(minlevel,maxlevel),
+  minlevel(min_level),
   matrix(&matrix, typeid(*this).name()),
   coarse(&coarse, typeid(*this).name()),
   transfer(&transfer, typeid(*this).name()),
@@ -463,7 +471,47 @@ Multigrid<VectorType>::Multigrid (const DoFHandler<dim>          &mg_dof_handler
   edge_down(0, typeid(*this).name()),
   edge_up(0, typeid(*this).name()),
   debug(0)
-{}
+{
+  const unsigned int dof_handler_max_level
+    = mg_dof_handler.get_triangulation().n_global_levels()-1;
+  if (max_level == numbers::invalid_unsigned_int)
+    maxlevel = dof_handler_max_level;
+  else
+    maxlevel = max_level;
+
+  reinit(minlevel, maxlevel);
+}
+
+
+
+template <typename VectorType>
+Multigrid<VectorType>::Multigrid (const MGMatrixBase<VectorType>        &matrix,
+                                  const MGCoarseGridBase<VectorType>    &coarse,
+                                  const MGTransferBase<VectorType>      &transfer,
+                                  const MGSmootherBase<VectorType>      &pre_smooth,
+                                  const MGSmootherBase<VectorType>      &post_smooth,
+                                  const unsigned int                    min_level,
+                                  const unsigned int                    max_level,
+                                  Cycle                                 cycle)
+  :
+  cycle_type(cycle),
+  matrix(&matrix, typeid(*this).name()),
+  coarse(&coarse, typeid(*this).name()),
+  transfer(&transfer, typeid(*this).name()),
+  pre_smooth(&pre_smooth, typeid(*this).name()),
+  post_smooth(&post_smooth, typeid(*this).name()),
+  edge_out(0, typeid(*this).name()),
+  edge_in(0, typeid(*this).name()),
+  edge_down(0, typeid(*this).name()),
+  edge_up(0, typeid(*this).name()),
+  debug(0)
+{
+  if (max_level == numbers::invalid_unsigned_int)
+    maxlevel = matrix.get_maxlevel();
+  else
+    maxlevel = max_level;
+  reinit(min_level, maxlevel);
+}
 
 
 

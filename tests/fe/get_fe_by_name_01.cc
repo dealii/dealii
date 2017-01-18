@@ -119,6 +119,7 @@ int main ()
   gen.generate_all_codim("FE_Bernstein(1)");
   gen.generate_all_codim("FE_DGP(1)");
   gen.generate_all_codim("FE_DGQ(1)");
+  gen.generate_all_codim("FE_DGQLegendre(1)");
   gen.generate_all_codim("FE_Nothing()");
   gen.generate_all_codim("FE_DGQArbitraryNodes(QGauss(2))");
   gen.generate_all_codim("FE_Q_Bubbles(1)");
@@ -134,6 +135,7 @@ int main ()
   gen.generate_all_codim("FE_Q_iso_Q1(2)");
   gen.generate_all_codim("FE_Q(2)");
   gen.generate_all_codim("FE_Bernstein(2)");
+  gen.generate_all_codim("FE_DGQHermite(3)");
 
   //systems
   gen.generate_all_dim("FESystem[FE_Q_Hierarchical(1)^2-FE_Q_Hierarchical(1)]");

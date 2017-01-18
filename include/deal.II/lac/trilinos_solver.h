@@ -74,7 +74,29 @@ namespace TrilinosWrappers
      * one of the specialized derived classes when the solver should be set at
      * runtime. Currently enabled options are:
      */
-    enum SolverName {cg, cgs, gmres, bicgstab, tfqmr} solver_name;
+    enum SolverName
+    {
+      /**
+       * Use the conjugate gradient (CG) algorithm.
+       */
+      cg,
+      /**
+       * Use the conjugate gradient squared (CGS) algorithm.
+       */
+      cgs,
+      /**
+       * Use the generalized minimum residual (GMRES) algorithm.
+       */
+      gmres,
+      /**
+       * Use the biconjugate gradient stabilized (BICGStab) algorithm.
+       */
+      bicgstab,
+      /**
+       * Use the transpose-free quasi-minimal residual (TFQMR) method.
+       */
+      tfqmr
+    } solver_name;
 
     /**
      * Standardized data struct to pipe additional data to the solver.

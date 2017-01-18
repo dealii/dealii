@@ -18,6 +18,7 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/petsc_vector.h>
@@ -115,12 +116,12 @@ namespace internal
             }
         }
 
-      patch_values.resize (n_q_points);
-      patch_values_system.resize (n_q_points);
-      patch_gradients.resize (n_q_points);
-      patch_gradients_system.resize (n_q_points);
-      patch_hessians.resize (n_q_points);
-      patch_hessians_system.resize (n_q_points);
+      patch_values_scalar.solution_values.resize (n_q_points);
+      patch_values_scalar.solution_gradients.resize (n_q_points);
+      patch_values_scalar.solution_hessians.resize (n_q_points);
+      patch_values_system.solution_values.resize (n_q_points);
+      patch_values_system.solution_gradients.resize (n_q_points);
+      patch_values_system.solution_hessians.resize (n_q_points);
 
       for (unsigned int dataset=0; dataset<n_postprocessor_outputs.size(); ++dataset)
         if (n_postprocessor_outputs[dataset] != 0)
@@ -141,12 +142,8 @@ namespace internal
       :
       n_datasets (data.n_datasets),
       n_subdivisions (data.n_subdivisions),
-      patch_values (data.patch_values),
+      patch_values_scalar (data.patch_values_scalar),
       patch_values_system (data.patch_values_system),
-      patch_gradients (data.patch_gradients),
-      patch_gradients_system (data.patch_gradients_system),
-      patch_hessians (data.patch_hessians),
-      patch_hessians_system (data.patch_hessians_system),
       postprocessed_values (data.postprocessed_values),
       mapping_collection (data.mapping_collection),
       finite_elements (data.finite_elements),
@@ -269,18 +266,18 @@ namespace internal
     ParallelDataBase<dim,spacedim>::
     resize_system_vectors(const unsigned int n_components)
     {
-      Assert(patch_values_system.size() > 0, ExcInternalError());
-      AssertDimension(patch_values_system.size(),
-                      patch_gradients_system.size());
-      AssertDimension(patch_values_system.size(),
-                      patch_hessians_system.size());
-      if (patch_values_system[0].size() == n_components)
+      Assert(patch_values_system.solution_values.size() > 0, ExcInternalError());
+      AssertDimension(patch_values_system.solution_values.size(),
+                      patch_values_system.solution_gradients.size());
+      AssertDimension(patch_values_system.solution_values.size(),
+                      patch_values_system.solution_hessians.size());
+      if (patch_values_system.solution_values[0].size() == n_components)
         return;
-      for (unsigned int k=0; k<patch_values_system.size(); ++k)
+      for (unsigned int k=0; k<patch_values_system.solution_values.size(); ++k)
         {
-          patch_values_system[k].reinit(n_components);
-          patch_gradients_system[k].resize(n_components);
-          patch_hessians_system[k].resize(n_components);
+          patch_values_system.solution_values[k].reinit(n_components);
+          patch_values_system.solution_gradients[k].resize(n_components);
+          patch_values_system.solution_hessians[k].resize(n_components);
         }
     }
 

@@ -1,2 +1,7 @@
 
-DEAL::OK
+DEAL::ExcInvalidXMLParameterFile (top_level_message.str())
+    The ParameterHandler input parser found 2 top level elements while reading
+    an XML format input file, but there should be exactly one top level element.
+    The top level elements are:
+        ParameterHandler
+        secondtopleveltag

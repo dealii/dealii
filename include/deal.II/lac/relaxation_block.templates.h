@@ -94,66 +94,74 @@ inline
 void
 RelaxationBlock<MatrixType, InverseNumberType, VectorType>::invert_diagblocks ()
 {
-  const MatrixType &M=*A;
-  FullMatrix<InverseNumberType> M_cell;
-
   if (this->same_diagonal())
     {
       Assert(false, ExcNotImplemented());
     }
   else
     {
-      for (size_type block=0; block<additional_data->block_list.n_rows(); ++block)
-        {
-          const size_type bs = additional_data->block_list.row_length(block);
-          M_cell.reinit(bs, bs);
-
-          // Copy rows for this block
-          // into the matrix for the
-          // diagonal block
-          SparsityPattern::iterator row
-            = additional_data->block_list.begin(block);
-          for (size_type row_cell=0; row_cell<bs; ++row_cell, ++row)
-            {
-//TODO:[GK] Optimize here
-              for (typename MatrixType::const_iterator entry = M.begin(row->column());
-                   entry != M.end(row->column()); ++entry)
-                {
-                  const size_type column = entry->column();
-                  const size_type col_cell = additional_data->block_list.row_position(block, column);
-                  if (col_cell != numbers::invalid_size_type)
-                    M_cell(row_cell, col_cell) = entry->value();
-                }
-            }
-          // Now M_cell contains the
-          // diagonal block. Now
-          // store it and its
-          // inverse, if so requested.
-          if (this->store_diagonals())
-            {
-              this->diagonal(block).reinit(bs, bs);
-              this->diagonal(block) = M_cell;
-            }
-          switch (this->inversion)
-            {
-            case PreconditionBlockBase<InverseNumberType>::gauss_jordan:
-              this->inverse(block).reinit(bs, bs);
-              this->inverse(block).invert(M_cell);
-              break;
-            case PreconditionBlockBase<InverseNumberType>::householder:
-              this->inverse_householder(block).initialize(M_cell);
-              break;
-            case PreconditionBlockBase<InverseNumberType>::svd:
-              this->inverse_svd(block).reinit(bs, bs);
-              this->inverse_svd(block) = M_cell;
-              this->inverse_svd(block).compute_inverse_svd(additional_data->threshold);
-              break;
-            default:
-              Assert(false, ExcNotImplemented());
-            }
-        }
+      // compute blocks in parallel
+      parallel::apply_to_subranges(0, this->additional_data->block_list.n_rows(),
+                                   std_cxx11::bind(&RelaxationBlock<MatrixType, InverseNumberType, VectorType>::block_kernel, this,
+                                                   std_cxx11::_1, std_cxx11::_2),
+                                   16);
     }
   this->inverses_computed(true);
+}
+
+
+template <typename MatrixType, typename InverseNumberType, typename VectorType>
+inline
+void
+RelaxationBlock<MatrixType, InverseNumberType, VectorType>::block_kernel (const size_type block_begin, const size_type block_end)
+{
+  const MatrixType &M=*(this->A);
+  FullMatrix<InverseNumberType> M_cell;
+
+  for (size_type block = block_begin; block < block_end; ++block)
+    {
+      const size_type bs = this->additional_data->block_list.row_length(block);
+      M_cell.reinit(bs, bs);
+
+      // Copy rows for this block into the matrix for the diagonal block
+      SparsityPattern::iterator row
+        = this->additional_data->block_list.begin(block);
+      for (size_type row_cell=0; row_cell<bs; ++row_cell, ++row)
+        {
+          for (typename MatrixType::const_iterator entry = M.begin(row->column());
+               entry != M.end(row->column()); ++entry)
+            {
+              const size_type column = entry->column();
+              const size_type col_cell = this->additional_data->block_list.row_position(block, column);
+              if (col_cell != numbers::invalid_size_type)
+                M_cell(row_cell, col_cell) = entry->value();
+            }
+        }
+      // Now M_cell contains the diagonal block. Now store it and its
+      // inverse, if so requested.
+      if (this->store_diagonals())
+        {
+          this->diagonal(block).reinit(bs, bs);
+          this->diagonal(block) = M_cell;
+        }
+      switch (this->inversion)
+        {
+        case PreconditionBlockBase<InverseNumberType>::gauss_jordan:
+          this->inverse(block).reinit(bs, bs);
+          this->inverse(block).invert(M_cell);
+          break;
+        case PreconditionBlockBase<InverseNumberType>::householder:
+          this->inverse_householder(block).initialize(M_cell);
+          break;
+        case PreconditionBlockBase<InverseNumberType>::svd:
+          this->inverse_svd(block).reinit(bs, bs);
+          this->inverse_svd(block) = M_cell;
+          this->inverse_svd(block).compute_inverse_svd(this->additional_data->threshold);
+          break;
+        default:
+          Assert(false, ExcNotImplemented());
+        }
+    }
 }
 
 namespace internal

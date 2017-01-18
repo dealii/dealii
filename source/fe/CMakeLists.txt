@@ -33,6 +33,7 @@ SET(_src
   fe_nothing.cc
   fe_poly.cc
   fe_poly_tensor.cc
+  fe_p1nc.cc
   fe_q_base.cc
   fe_q.cc
   fe_q_bubbles.cc
@@ -44,8 +45,10 @@ SET(_src
   fe_raviart_thomas_nodal.cc
   fe_series.cc
   fe_system.cc
+  fe_enriched.cc
   fe_tools.cc
   fe_tools_interpolate.cc
+  fe_tools_extrapolate.cc
   fe_trace.cc
   fe_values.cc
   fe_values_inst2.cc
@@ -86,8 +89,10 @@ SET(_inst
   fe_raviart_thomas.inst.in
   fe_raviart_thomas_nodal.inst.in
   fe_system.inst.in
+  fe_enriched.inst.in
   fe_tools.inst.in
   fe_tools_interpolate.inst.in
+  fe_tools_extrapolate.inst.in
   fe_trace.inst.in
   fe_values.decl.1.inst.in
   fe_values.decl.2.inst.in

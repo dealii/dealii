@@ -663,17 +663,17 @@ QProjector<3>::project_to_subface (const Quadrature<2>    &quadrature,
     {
     case RefinementCase<dim-1>::cut_x:
       xi_scale=0.5;
-      xi_translation=subface_no%2 * 0.5;
+      xi_translation = subface_no%2 * 0.5;
       break;
     case RefinementCase<dim-1>::cut_y:
       eta_scale=0.5;
-      eta_translation=subface_no%2 * 0.5;
+      eta_translation = subface_no%2 * 0.5;
       break;
     case RefinementCase<dim-1>::cut_xy:
       xi_scale= 0.5;
       eta_scale=0.5;
-      xi_translation =subface_no%2 * 0.5;
-      eta_translation=subface_no/2 * 0.5;
+      xi_translation  = int(subface_no%2) * 0.5;
+      eta_translation = int(subface_no/2) * 0.5;
       break;
     default:
       Assert(false,ExcInternalError());

@@ -665,9 +665,9 @@ namespace GridTools
      * of the @p dim space dimensions. Factorized into a function of its own
      * in order to allow parallel execution.
      */
-    void laplace_solve (const SparseMatrix<double> &S,
-                        const std::map<unsigned int,double> &m,
-                        Vector<double> &u)
+    void laplace_solve (const SparseMatrix<double>                     &S,
+                        const std::map<types::global_dof_index,double> &fixed_dofs,
+                        Vector<double>                                 &u)
     {
       const unsigned int n_dofs=S.n();
       FilteredMatrix<Vector<double> > SF (S);
@@ -681,7 +681,7 @@ namespace GridTools
 
       Vector<double> f(n_dofs);
 
-      SF.add_constraints(m);
+      SF.add_constraints(fixed_dofs);
       SF.apply_constraints (f, true);
       solver.solve(SF, u, f, PF);
     }
@@ -728,41 +728,34 @@ namespace GridTools
 
     MatrixCreator::create_laplace_matrix(StaticMappingQ1<dim>::mapping, dof_handler, quadrature, S, coefficient);
 
-    // set up the boundary values for
-    // the laplace problem
-    std::vector<std::map<unsigned int,double> > m(dim);
+    // set up the boundary values for the laplace problem
+    std::map<types::global_dof_index,double> fixed_dofs[dim];
     typename std::map<unsigned int,Point<dim> >::const_iterator map_end=new_points.end();
 
-    // fill these maps using the data
-    // given by new_points
+    // fill these maps using the data given by new_points
     typename DoFHandler<dim>::cell_iterator cell=dof_handler.begin_active(),
                                             endc=dof_handler.end();
     for (; cell!=endc; ++cell)
       {
-        for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+        // loop over all vertices of the cell and see if it is listed in the map
+        // given as first argument of the function
+        for (unsigned int vertex_no=0;
+             vertex_no<GeometryInfo<dim>::vertices_per_cell; ++vertex_no)
           {
-            const typename DoFHandler<dim>::face_iterator face=cell->face(face_no);
+            const unsigned int vertex_index=cell->vertex_index(vertex_no);
 
-            // loop over all vertices of the cell and see if it is listed in the map
-            // given as first argument of the function
-            for (unsigned int vertex_no=0;
-                 vertex_no<GeometryInfo<dim>::vertices_per_face; ++vertex_no)
-              {
-                const unsigned int vertex_index=face->vertex_index(vertex_no);
+            const typename std::map<unsigned int,Point<dim> >::const_iterator map_iter
+              = new_points.find(vertex_index);
 
-                const typename std::map<unsigned int,Point<dim> >::const_iterator map_iter
-                  = new_points.find(vertex_index);
-
-                if (map_iter!=map_end)
-                  for (unsigned int i=0; i<dim; ++i)
-                    m[i].insert(std::pair<unsigned int,double> (
-                                  face->vertex_dof_index(vertex_no, 0), map_iter->second(i)));
-              }
+            if (map_iter!=map_end)
+              for (unsigned int i=0; i<dim; ++i)
+                fixed_dofs[i].insert(std::pair<types::global_dof_index,double>
+                                     (cell->vertex_dof_index(vertex_no, 0),
+                                      map_iter->second(i)));
           }
       }
 
-    // solve the dim problems with
-    // different right hand sides.
+    // solve the dim problems with different right hand sides.
     Vector<double> us[dim];
     for (unsigned int i=0; i<dim; ++i)
       us[i].reinit (dof_handler.n_dofs());
@@ -771,21 +764,25 @@ namespace GridTools
     Threads::TaskGroup<> tasks;
     for (unsigned int i=0; i<dim; ++i)
       tasks += Threads::new_task (&laplace_solve,
-                                  S, m[i], us[i]);
+                                  S, fixed_dofs[i], us[i]);
     tasks.join_all ();
 
-    // change the coordinates of the
-    // points of the triangulation
+    // change the coordinates of the points of the triangulation
     // according to the computed values
+    std::vector<bool> vertex_touched (triangulation.n_vertices(), false);
     for (cell=dof_handler.begin_active(); cell!=endc; ++cell)
       for (unsigned int vertex_no=0;
            vertex_no<GeometryInfo<dim>::vertices_per_cell; ++vertex_no)
-        {
-          Point<dim> &v=cell->vertex(vertex_no);
-          const unsigned int dof_index=cell->vertex_dof_index(vertex_no, 0);
-          for (unsigned int i=0; i<dim; ++i)
-            v(i)=us[i](dof_index);
-        }
+        if (vertex_touched[cell->vertex_index(vertex_no)] == false)
+          {
+            Point<dim> &v = cell->vertex(vertex_no);
+
+            const types::global_dof_index dof_index = cell->vertex_dof_index(vertex_no, 0);
+            for (unsigned int i=0; i<dim; ++i)
+              v(i) = us[i](dof_index);
+
+            vertex_touched[cell->vertex_index(vertex_no)] = true;
+          }
   }
 
   template <int dim, int spacedim>
@@ -1800,8 +1797,9 @@ next_cell:
     // processors and shifting the indices accordingly
     const unsigned int n_cpu = Utilities::MPI::n_mpi_processes(triangulation.get_communicator());
     std::vector<types::global_vertex_index> indices(n_cpu);
-    MPI_Allgather(&next_index, 1, DEAL_II_DOF_INDEX_MPI_TYPE, &indices[0],
-                  indices.size(), DEAL_II_DOF_INDEX_MPI_TYPE, triangulation.get_communicator());
+    int ierr = MPI_Allgather(&next_index, 1, DEAL_II_DOF_INDEX_MPI_TYPE, &indices[0],
+                             indices.size(), DEAL_II_DOF_INDEX_MPI_TYPE, triangulation.get_communicator());
+    AssertThrowMPI(ierr);
     const types::global_vertex_index shift = std::accumulate(&indices[0],
                                                              &indices[0]+triangulation.locally_owned_subdomain(),0);
 
@@ -1841,8 +1839,9 @@ next_cell:
           }
 
         // Send the message
-        MPI_Isend(&vertices_send_buffers[i][0],buffer_size,DEAL_II_VERTEX_INDEX_MPI_TYPE,
-                  destination, 0, triangulation.get_communicator(), &first_requests[i]);
+        ierr = MPI_Isend(&vertices_send_buffers[i][0],buffer_size,DEAL_II_VERTEX_INDEX_MPI_TYPE,
+                         destination, 0, triangulation.get_communicator(), &first_requests[i]);
+        AssertThrowMPI(ierr);
       }
 
     // Receive the first message
@@ -1859,8 +1858,9 @@ next_cell:
         vertices_recv_buffers[i].resize(buffer_size);
 
         // Receive the message
-        MPI_Recv(&vertices_recv_buffers[i][0],buffer_size,DEAL_II_VERTEX_INDEX_MPI_TYPE,
-                 source, 0, triangulation.get_communicator(), MPI_STATUS_IGNORE);
+        ierr = MPI_Recv(&vertices_recv_buffers[i][0],buffer_size,DEAL_II_VERTEX_INDEX_MPI_TYPE,
+                        source, 0, triangulation.get_communicator(), MPI_STATUS_IGNORE);
+        AssertThrowMPI(ierr);
       }
 
 
@@ -1893,8 +1893,9 @@ next_cell:
           }
 
         // Send the message
-        MPI_Isend(&cellids_send_buffers[i][0], buffer_size, MPI_CHAR,
-                  destination, 0, triangulation.get_communicator(), &second_requests[i]);
+        ierr = MPI_Isend(&cellids_send_buffers[i][0], buffer_size, MPI_CHAR,
+                         destination, 0, triangulation.get_communicator(), &second_requests[i]);
+        AssertThrowMPI(ierr);
       }
 
     // Receive the second message
@@ -1908,8 +1909,9 @@ next_cell:
         cellids_recv_buffers[i].resize(buffer_size);
 
         // Receive the message
-        MPI_Recv(&cellids_recv_buffers[i][0],buffer_size, MPI_CHAR,
-                 source, 0, triangulation.get_communicator(), MPI_STATUS_IGNORE);
+        ierr = MPI_Recv(&cellids_recv_buffers[i][0],buffer_size, MPI_CHAR,
+                        source, 0, triangulation.get_communicator(), MPI_STATUS_IGNORE);
+        AssertThrowMPI(ierr);
       }
 
 
@@ -3017,11 +3019,10 @@ next_cell:
     typename std::vector<typename Container::cell_iterator>::const_iterator uniform_cell;
     for (uniform_cell=uniform_cells.begin(); uniform_cell!=uniform_cells.end(); ++uniform_cell)
       {
-        bool repeat_vertex;
         for (unsigned int v=0; v<GeometryInfo<Container::dimension>::vertices_per_cell; ++v)
           {
             Point<Container::space_dimension> position=(*uniform_cell)->vertex (v);
-            repeat_vertex=false;
+            bool repeat_vertex=false;
 
             for (unsigned int m=0; m<i; ++m)
               {
@@ -3740,6 +3741,11 @@ next_cell:
     Assert (pairs1.size() == pairs2.size(),
             ExcMessage ("Unmatched faces on periodic boundaries"));
 
+    Assert (pairs1.size() > 0,
+            ExcMessage("No new periodic face pairs have been found. "
+                       "Are you sure that you've selected the correct boundary "
+                       "id's and that the coarsest level mesh is colorized?"));
+
     // and call match_periodic_face_pairs that does the actual matching:
     match_periodic_face_pairs(pairs1, pairs2, direction, matched_pairs, offset,
                               matrix);
@@ -3797,6 +3803,10 @@ next_cell:
     Assert (pairs1.size() == pairs2.size(),
             ExcMessage ("Unmatched faces on periodic boundaries"));
 
+    Assert (pairs1.size() > 0,
+            ExcMessage("No new periodic face pairs have been found. "
+                       "Are you sure that you've selected the correct boundary "
+                       "id's and that the coarsest level mesh is colorized?"));
 
 #ifdef DEBUG
     const unsigned int size_old = matched_pairs.size();

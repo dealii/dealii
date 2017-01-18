@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2015 by the deal.II authors
+// Copyright (C) 2011 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -12,6 +12,9 @@
 // the top level of the deal.II distribution.
 //
 // ---------------------------------------------------------------------
+
+#ifndef dealii__matrix_free_templates_h
+#define dealii__matrix_free_templates_h
 
 
 #include <deal.II/base/utilities.h>
@@ -38,6 +41,7 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, typename Number>
 MatrixFree<dim, Number>::MatrixFree()
   :
+  Subscriptor(),
   indices_are_initialized (false),
   mapping_is_initialized  (false)
 {}
@@ -66,37 +70,6 @@ copy_from (const MatrixFree<dim,Number> &v)
   size_info = v.size_info;
   indices_are_initialized = v.indices_are_initialized;
   mapping_is_initialized  = v.mapping_is_initialized;
-}
-
-
-
-namespace internal
-{
-  template <int dim>
-  void assert_communicator_equality (const dealii::Triangulation<dim> &tria,
-                                     const MPI_Comm                  &comm_mf)
-  {
-#ifdef DEAL_II_WITH_MPI
-    const parallel::distributed::Triangulation<dim> *dist_tria =
-      dynamic_cast<const parallel::distributed::Triangulation<dim>*>(&tria);
-    if (dist_tria != 0)
-      {
-        if (Utilities::MPI::job_supports_mpi())
-          {
-            int communicators_same = 0;
-            MPI_Comm_compare (dist_tria->get_communicator(), comm_mf,
-                              &communicators_same);
-            Assert (communicators_same == MPI_IDENT ||
-                    communicators_same == MPI_CONGRUENT,
-                    ExcMessage ("MPI communicator in parallel::distributed::Triangulation "
-                                "and matrix free class must be the same!"));
-          }
-      }
-#else
-    (void)tria;
-    (void)comm_mf;
-#endif
-  }
 }
 
 
@@ -133,11 +106,14 @@ internal_reinit(const Mapping<dim>                          &mapping,
       AssertDimension (dof_handler.size(), locally_owned_set.size());
 
       // set variables that are independent of FE
-      internal::assert_communicator_equality (dof_handler[0]->get_triangulation(),
-                                              additional_data.mpi_communicator);
-      size_info.communicator = additional_data.mpi_communicator;
       if (Utilities::MPI::job_supports_mpi() == true)
         {
+          const parallel::Triangulation<dim> *dist_tria =
+            dynamic_cast<const parallel::Triangulation<dim>*>
+            (&(dof_handler[0]->get_triangulation()));
+          size_info.communicator = dist_tria != 0 ?
+                                   dist_tria->get_communicator() :
+                                   MPI_COMM_SELF;
           size_info.my_pid  =
             Utilities::MPI::this_mpi_process(size_info.communicator);
           size_info.n_procs =
@@ -145,6 +121,7 @@ internal_reinit(const Mapping<dim>                          &mapping,
         }
       else
         {
+          size_info.communicator = MPI_COMM_SELF;
           size_info.my_pid = 0;
           size_info.n_procs = 1;
         }
@@ -263,11 +240,14 @@ internal_reinit(const Mapping<dim>                            &mapping,
       AssertDimension (dof_handler.size(), locally_owned_set.size());
 
       // set variables that are independent of FE
-      internal::assert_communicator_equality (dof_handler[0]->get_triangulation(),
-                                              additional_data.mpi_communicator);
-      size_info.communicator = additional_data.mpi_communicator;
       if (Utilities::MPI::job_supports_mpi() == true)
         {
+          const parallel::Triangulation<dim> *dist_tria =
+            dynamic_cast<const parallel::Triangulation<dim>*>
+            (&(dof_handler[0]->get_triangulation()));
+          size_info.communicator = dist_tria != 0 ?
+                                   dist_tria->get_communicator() :
+                                   MPI_COMM_SELF;
           size_info.my_pid  =
             Utilities::MPI::this_mpi_process(size_info.communicator);
           size_info.n_procs =
@@ -275,6 +255,7 @@ internal_reinit(const Mapping<dim>                            &mapping,
         }
       else
         {
+          size_info.communicator = MPI_COMM_SELF;
           size_info.my_pid = 0;
           size_info.n_procs = 1;
         }
@@ -350,6 +331,38 @@ internal_reinit(const Mapping<dim>                            &mapping,
 }
 
 
+template <int dim, typename Number>
+template <int spacedim>
+bool
+MatrixFree<dim, Number>::is_supported(const FiniteElement<dim, spacedim> &fe)
+{
+  if (dim != spacedim)
+    return false;
+
+  // first check for degree, number of base_elemnt and number of its components
+  if (fe.degree==0 || fe.n_base_elements()!=1)
+    return false;
+
+  const FiniteElement<dim, spacedim> *fe_ptr = &(fe.base_element(0));
+  if (fe_ptr->n_components() != 1)
+    return false;
+
+  // then check of the base element is supported
+  if (dynamic_cast<const FE_Poly<TensorProductPolynomials<dim>,dim,spacedim>*>(fe_ptr)!=0)
+    return true;
+  if (dynamic_cast<const FE_Poly<TensorProductPolynomials<dim,
+      Polynomials::PiecewisePolynomial<double> >,dim,spacedim>*>(fe_ptr)!=0)
+    return true;
+  if (dynamic_cast<const FE_DGP<dim, spacedim>*>(fe_ptr)!=0)
+    return true;
+  if (dynamic_cast<const FE_Q_DG0<dim, spacedim>*>(fe_ptr)!=0)
+    return true;
+
+  // if the base element is not in the above list it is not supported
+  return false;
+}
+
+
 
 namespace internal
 {
@@ -365,7 +378,8 @@ namespace internal
       for (unsigned int child=0; child<cell->n_children(); ++child)
         resolve_cell (cell->child(child), cell_its,
                       subdomain_id);
-    else if (cell->subdomain_id() == subdomain_id)
+    else if (subdomain_id == numbers::invalid_subdomain_id
+             || cell->subdomain_id() == subdomain_id)
       {
         Assert (cell->active(), ExcInternalError());
         cell_its.push_back (std::pair<unsigned int,unsigned int>
@@ -390,7 +404,7 @@ initialize_dof_handlers (const std::vector<const DoFHandler<dim>*> &dof_handler,
 
   dof_info.resize (dof_handlers.n_dof_handlers);
 
-  // go through cells on zeroth level and then successively step down into
+  // Go through cells on zeroth level and then successively step down into
   // children. This gives a z-ordering of the cells, which is beneficial when
   // setting up neighboring relations between cells for thread parallelization
   const unsigned int n_mpi_procs = size_info.n_procs;
@@ -403,8 +417,16 @@ initialize_dof_handlers (const std::vector<const DoFHandler<dim>*> &dof_handler,
         cell_level_index.reserve (tria.n_active_cells());
       typename Triangulation<dim>::cell_iterator cell = tria.begin(0),
                                                  end_cell = tria.end(0);
+      // For serial Triangulations always take all cells
+      const unsigned int subdomain_id
+        = (dynamic_cast<const parallel::Triangulation<dim> *>
+           (&dof_handler[0]->get_triangulation())!=0)
+          ? my_pid : numbers::invalid_subdomain_id;
       for ( ; cell != end_cell; ++cell)
-        internal::resolve_cell (cell, cell_level_index, my_pid);
+        internal::resolve_cell (cell, cell_level_index, subdomain_id);
+
+      Assert(n_mpi_procs>1 || cell_level_index.size()==tria.n_active_cells(),
+             ExcInternalError());
     }
   else
     {
@@ -453,9 +475,17 @@ initialize_dof_handlers (const std::vector<const hp::DoFHandler<dim>*> &dof_hand
     }
   typename hp::DoFHandler<dim>::cell_iterator cell = dof_handler[0]->begin(0),
                                               end_cell = dof_handler[0]->end(0);
+  // For serial Triangulations always take all cells
+  const unsigned int subdomain_id
+    = (dynamic_cast<const parallel::Triangulation<dim> *>
+       (&dof_handler[0]->get_triangulation())!=0)
+      ? my_pid : numbers::invalid_subdomain_id;
   for ( ; cell != end_cell; ++cell)
     internal::resolve_cell (cell, cell_level_index,
-                            my_pid);
+                            subdomain_id);
+
+  Assert(n_mpi_procs>1 || cell_level_index.size()==tria.n_active_cells(),
+         ExcInternalError());
 }
 
 
@@ -1074,3 +1104,5 @@ namespace internal
 
 
 DEAL_II_NAMESPACE_CLOSE
+
+#endif

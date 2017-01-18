@@ -53,6 +53,7 @@ namespace TrilinosWrappers
 {
   // forward declarations
   class SparsityPattern;
+  class SparseMatrix;
 
   namespace SparsityPatternIterators
   {
@@ -86,11 +87,6 @@ namespace TrilinosWrappers
       Accessor (const SparsityPattern *sparsity_pattern,
                 const size_type        row,
                 const size_type        index);
-
-      /**
-       * Copy constructor.
-       */
-      Accessor (const Accessor &a);
 
       /**
        * Row number of the element represented by this object.
@@ -1164,7 +1160,7 @@ namespace TrilinosWrappers
      */
     std_cxx11::shared_ptr<Epetra_CrsGraph> nonlocal_graph;
 
-    friend class SparseMatrix;
+    friend class TrilinosWrappers::SparseMatrix;
     friend class SparsityPatternIterators::Accessor;
     friend class SparsityPatternIterators::Iterator;
   };
@@ -1191,15 +1187,6 @@ namespace TrilinosWrappers
       visit_present_row ();
     }
 
-
-    inline
-    Accessor::Accessor (const Accessor &a)
-      :
-      sparsity_pattern(a.sparsity_pattern),
-      a_row(a.a_row),
-      a_index(a.a_index),
-      colnum_cache (a.colnum_cache)
-    {}
 
 
     inline

@@ -41,25 +41,36 @@ int main ()
                          Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")));
       prm.leave_subsection ();
 
-      // test both relevant read_input functions
-      if (i == 0)
+      // We need a local path for the file to get consistent output messages.
+      const int chdir_return_code = chdir (SOURCE_DIR);
+      AssertThrow (chdir_return_code == 0, ExcInternalError());
+      // test both relevant parse_input functions. They should fail with a
+      // specific exception.
+      try
         {
-          prm.read_input(SOURCE_DIR "/prm/parameter_handler_backslash_04.prm");
+          if (i == 0)
+            {
+              prm.parse_input("prm/parameter_handler_backslash_04.prm");
+            }
+          else
+            {
+              std::ifstream input_stream
+              ("prm/parameter_handler_backslash_04.prm");
+              prm.parse_input(input_stream);
+            }
+
+          std::string list;
+          prm.enter_subsection ("Testing");
+          list = prm.get ("Function");
+          prm.leave_subsection ();
+
+          deallog << list << std::endl;
         }
-      else
+      catch (ParameterHandler::ExcInvalidEntryForPattern &exc)
         {
-          std::ifstream input_stream
-          (SOURCE_DIR "/prm/parameter_handler_backslash_04.prm");
-          prm.read_input(input_stream);
+          deallog << exc.get_exc_name() << std::endl;
+          exc.print_info(deallog.get_file_stream());
         }
-
-
-      std::string list;
-      prm.enter_subsection ("Testing");
-      list = prm.get ("Function");
-      prm.leave_subsection ();
-
-      deallog << list << std::endl;
     }
 
   return 0;

@@ -48,9 +48,9 @@ namespace PETScWrappers
     if (pc!=NULL)
       {
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
-        int ierr = PCDestroy(pc);
+        PetscErrorCode ierr = PCDestroy(pc);
 #else
-        int ierr = PCDestroy(&pc);
+        PetscErrorCode ierr = PCDestroy(&pc);
 #endif
         pc = NULL;
         AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -64,8 +64,7 @@ namespace PETScWrappers
   {
     AssertThrow (pc != NULL, StandardExceptions::ExcInvalidState ());
 
-    int ierr;
-    ierr = PCApply(pc, src, dst);
+    const PetscErrorCode ierr = PCApply(pc, src, dst);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -78,11 +77,11 @@ namespace PETScWrappers
     AssertThrow (pc == NULL, StandardExceptions::ExcInvalidState ());
 
     MPI_Comm comm;
-    int ierr;
     // this ugly cast is necessary because the
     // type Mat and PETScObject are
     // unrelated.
-    ierr = PetscObjectGetComm(reinterpret_cast<PetscObject>(matrix), &comm);
+    PetscErrorCode ierr = PetscObjectGetComm(reinterpret_cast<PetscObject>(matrix),
+                                             &comm);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     ierr = PCCreate(comm, &pc);
@@ -116,7 +115,7 @@ namespace PETScWrappers
   {
     additional_data = additional_data_;
 
-    int ierr = PCCreate(comm, &pc);
+    PetscErrorCode ierr = PCCreate(comm, &pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     initialize();
@@ -138,8 +137,7 @@ namespace PETScWrappers
   {
     AssertThrow (pc != NULL, StandardExceptions::ExcInvalidState ());
 
-    int ierr;
-    ierr = PCSetType (pc, const_cast<char *>(PCJACOBI));
+    PetscErrorCode ierr = PCSetType (pc, const_cast<char *>(PCJACOBI));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     ierr = PCSetFromOptions (pc);
@@ -158,7 +156,7 @@ namespace PETScWrappers
     create_pc();
     initialize();
 
-    int ierr = PCSetUp (pc);
+    PetscErrorCode ierr = PCSetUp (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -169,7 +167,7 @@ namespace PETScWrappers
   {
     additional_data = additional_data_;
 
-    int ierr = PCCreate(comm, &pc);
+    PetscErrorCode ierr = PCCreate(comm, &pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     initialize();
@@ -190,8 +188,7 @@ namespace PETScWrappers
   void
   PreconditionBlockJacobi::initialize()
   {
-    int ierr;
-    ierr = PCSetType (pc, const_cast<char *>(PCBJACOBI));
+    PetscErrorCode ierr = PCSetType (pc, const_cast<char *>(PCBJACOBI));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     ierr = PCSetFromOptions (pc);
@@ -211,7 +208,7 @@ namespace PETScWrappers
     create_pc();
     initialize();
 
-    int ierr = PCSetUp (pc);
+    PetscErrorCode ierr = PCSetUp (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -247,8 +244,7 @@ namespace PETScWrappers
 
     create_pc();
 
-    int ierr;
-    ierr = PCSetType (pc, const_cast<char *>(PCSOR));
+    PetscErrorCode ierr = PCSetType (pc, const_cast<char *>(PCSOR));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // then set flags as given
@@ -294,8 +290,7 @@ namespace PETScWrappers
 
     create_pc();
 
-    int ierr;
-    ierr = PCSetType (pc, const_cast<char *>(PCSOR));
+    PetscErrorCode ierr = PCSetType (pc, const_cast<char *>(PCSOR));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // then set flags as given
@@ -345,8 +340,7 @@ namespace PETScWrappers
 
     create_pc();
 
-    int ierr;
-    ierr = PCSetType (pc, const_cast<char *>(PCEISENSTAT));
+    PetscErrorCode ierr = PCSetType (pc, const_cast<char *>(PCEISENSTAT));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // then set flags as given
@@ -393,12 +387,11 @@ namespace PETScWrappers
 
     create_pc();
 
-    int ierr;
-    ierr = PCSetType (pc, const_cast<char *>(PCICC));
+    PetscErrorCode ierr = PCSetType (pc, const_cast<char *>(PCICC));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // then set flags
-    PCFactorSetLevels (pc, additional_data.levels);
+    ierr = PCFactorSetLevels (pc, additional_data.levels);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     ierr = PCSetFromOptions (pc);
@@ -440,12 +433,11 @@ namespace PETScWrappers
 
     create_pc();
 
-    int ierr;
-    ierr = PCSetType (pc, const_cast<char *>(PCILU));
+    PetscErrorCode ierr = PCSetType (pc, const_cast<char *>(PCILU));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // then set flags
-    PCFactorSetLevels (pc, additional_data.levels);
+    ierr = PCFactorSetLevels (pc, additional_data.levels);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     ierr = PCSetFromOptions (pc);
@@ -482,7 +474,7 @@ namespace PETScWrappers
   {
     additional_data = additional_data_;
 
-    int ierr = PCCreate(comm, &pc);
+    PetscErrorCode ierr = PCCreate(comm, &pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
 #ifdef PETSC_HAVE_HYPRE
@@ -506,8 +498,7 @@ namespace PETScWrappers
   PreconditionBoomerAMG::initialize ()
   {
 #ifdef PETSC_HAVE_HYPRE
-    int ierr;
-    ierr = PCSetType (pc, const_cast<char *>(PCHYPRE));
+    PetscErrorCode ierr = PCSetType (pc, const_cast<char *>(PCHYPRE));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     ierr = PCHYPRESetType(pc, "boomeramg");
@@ -564,7 +555,7 @@ namespace PETScWrappers
     create_pc();
     initialize ();
 
-    int ierr = PCSetUp (pc);
+    PetscErrorCode ierr = PCSetUp (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
 #else // PETSC_HAVE_HYPRE
@@ -617,8 +608,7 @@ namespace PETScWrappers
 #ifdef PETSC_HAVE_HYPRE
     create_pc();
 
-    int ierr;
-    ierr = PCSetType (pc, const_cast<char *>(PCHYPRE));
+    PetscErrorCode ierr = PCSetType (pc, const_cast<char *>(PCHYPRE));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     ierr = PCHYPRESetType(pc, "parasails");
@@ -713,8 +703,7 @@ namespace PETScWrappers
 
     create_pc();
 
-    int ierr;
-    ierr = PCSetType (pc, const_cast<char *>(PCNONE));
+    PetscErrorCode ierr = PCSetType (pc, const_cast<char *>(PCNONE));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     ierr = PCSetFromOptions (pc);
@@ -760,8 +749,7 @@ namespace PETScWrappers
 
     create_pc();
 
-    int ierr;
-    ierr = PCSetType (pc, const_cast<char *>(PCLU));
+    PetscErrorCode ierr = PCSetType (pc, const_cast<char *>(PCLU));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // set flags as given

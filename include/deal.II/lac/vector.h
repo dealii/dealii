@@ -88,7 +88,21 @@ namespace parallel
  */
 struct VectorOperation
 {
-  enum values { unknown, insert, add };
+  enum values
+  {
+    /**
+     * The current operation is unknown.
+     */
+    unknown,
+    /**
+     * The current operation is an insertion.
+     */
+    insert,
+    /**
+     * The current operation is an addition.
+     */
+    add
+  };
 };
 
 
@@ -319,9 +333,10 @@ public:
    * swaps the pointers to the data of the two vectors and therefore does not
    * need to allocate temporary storage and move data around.
    *
-   * This function is analog to the the @p swap function of all C++ standard
-   * containers. Also, there is a global function <tt>swap(u,v)</tt> that
-   * simply calls <tt>u.swap(v)</tt>, again in analogy to standard functions.
+   * This function is analogous to the the @p swap function of all C++
+   * standard containers. Also, there is a global function <tt>swap(u,v)</tt>
+   * that simply calls <tt>u.swap(v)</tt>, again in analogy to standard
+   * functions.
    *
    * This function is virtual in order to allow for derived classes to handle
    * memory separately.
@@ -1030,6 +1045,22 @@ private:
 
 #ifndef DOXYGEN
 
+
+//------------------------ declarations for explicit specializations
+
+#ifdef DEAL_II_BOOST_BIND_COMPILER_BUG
+template <>
+Vector<std::complex<float> > &
+Vector<std::complex<float> >::operator= (const std::complex<float> s);
+#endif
+
+
+template <>
+Vector<int>::real_type
+Vector<int>::lp_norm (const real_type) const;
+
+
+//------------------------ inline functions
 
 template <typename Number>
 inline

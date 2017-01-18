@@ -29,9 +29,6 @@
 //
 // the problem was fixed by fixing the code
 
-char logname[] = "output";
-
-
 #include "../tests.h"
 
 
@@ -235,7 +232,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile(logname);
+  std::ofstream logfile("output");
   logfile.precision (3);
 
   deallog.attach(logfile);

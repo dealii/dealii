@@ -40,10 +40,16 @@ namespace LinearAlgebra
     {
 #ifdef DEAL_II_WITH_MPI
       for (size_type j=0; j<compress_requests.size(); j++)
-        MPI_Request_free(&compress_requests[j]);
+        {
+          const int ierr = MPI_Request_free(&compress_requests[j]);
+          AssertThrowMPI(ierr);
+        }
       compress_requests.clear();
       for (size_type j=0; j<update_ghost_values_requests.size(); j++)
-        MPI_Request_free(&update_ghost_values_requests[j]);
+        {
+          const int ierr = MPI_Request_free(&update_ghost_values_requests[j]);
+          AssertThrowMPI(ierr);
+        }
       update_ghost_values_requests.clear();
 #endif
     }
@@ -231,9 +237,9 @@ namespace LinearAlgebra
       reinit (v, true);
 
       thread_loop_partitioner = v.thread_loop_partitioner;
-      dealii::internal::Vector_copy<Number,Number> copier(v.val, val);
-      internal::parallel_for(copier, partitioner->local_size(),
-                             thread_loop_partitioner);
+      dealii::internal::VectorOperations::Vector_copy<Number,Number> copier(v.val, val);
+      internal::VectorOperations::parallel_for(copier, partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       zero_out_ghosts();
     }
@@ -374,9 +380,9 @@ namespace LinearAlgebra
         must_update_ghost_values |= vector_is_ghosted;
 
       thread_loop_partitioner = c.thread_loop_partitioner;
-      dealii::internal::Vector_copy<Number,Number2> copier(c.val, val);
-      internal::parallel_for(copier, partitioner->local_size(),
-                             thread_loop_partitioner);
+      dealii::internal::VectorOperations::Vector_copy<Number,Number2> copier(c.val, val);
+      internal::VectorOperations::parallel_for(copier, partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       if (must_update_ghost_values)
         update_ghost_values();
@@ -430,7 +436,8 @@ namespace LinearAlgebra
 
       // get a representation of the vector and copy it
       PetscScalar *start_ptr;
-      int ierr = VecGetArray (static_cast<const Vec &>(petsc_vec), &start_ptr);
+      PetscErrorCode ierr = VecGetArray (static_cast<const Vec &>(petsc_vec),
+                                         &start_ptr);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       const size_type vec_size = local_size();
@@ -546,70 +553,71 @@ namespace LinearAlgebra
       const unsigned int n_import_targets = part.import_targets().size();
       const unsigned int n_ghost_targets  = part.ghost_targets().size();
 
+      Assert(compress_requests.size() == 0,
+             ExcMessage("Another compress operation seems to still be running. "
+                        "Call compress_finish() first."));
+
       // Need to send and receive the data. Use non-blocking communication,
       // where it is generally less overhead to first initiate the receive and
       // then actually send the data
-      if (compress_requests.size() == 0)
+
+      // set channels in different range from update_ghost_values channels
+      const unsigned int channel = counter + 400;
+      unsigned int current_index_start = 0;
+      compress_requests.resize (n_import_targets + n_ghost_targets);
+
+      // allocate import_data in case it is not set up yet
+      if (import_data == 0)
+        import_data = new Number[part.n_import_indices()];
+
+      // initiate the receive operations
+      for (unsigned int i=0; i<n_import_targets; i++)
         {
-          // set channels in different range from update_ghost_values channels
-          const unsigned int channel = counter + 400;
-          unsigned int current_index_start = 0;
-          compress_requests.resize (n_import_targets + n_ghost_targets);
-
-          // allocate import_data in case it is not set up yet
-          if (import_data == 0)
-            import_data = new Number[part.n_import_indices()];
-          for (unsigned int i=0; i<n_import_targets; i++)
-            {
-              AssertThrow (static_cast<size_type>(part.import_targets()[i].second)*
-                           sizeof(Number) <
-                           static_cast<size_type>(std::numeric_limits<int>::max()),
-                           ExcMessage("Index overflow: Maximum message size in MPI is 2GB. "
-                                      "The number of ghost entries times the size of 'Number' "
-                                      "exceeds this value. This is not supported."));
-              MPI_Recv_init (&import_data[current_index_start],
-                             part.import_targets()[i].second*sizeof(Number),
-                             MPI_BYTE,
-                             part.import_targets()[i].first,
-                             part.import_targets()[i].first +
-                             part.n_mpi_processes()*channel,
-                             part.get_communicator(),
-                             &compress_requests[i]);
-              current_index_start += part.import_targets()[i].second;
-            }
-          AssertDimension(current_index_start, part.n_import_indices());
-
-          current_index_start = part.local_size();
-          for (unsigned int i=0; i<n_ghost_targets; i++)
-            {
-              AssertThrow (static_cast<size_type>(part.ghost_targets()[i].second)*
-                           sizeof(Number) <
-                           static_cast<size_type>(std::numeric_limits<int>::max()),
-                           ExcMessage("Index overflow: Maximum message size in MPI is 2GB. "
-                                      "The number of ghost entries times the size of 'Number' "
-                                      "exceeds this value. This is not supported."));
-              MPI_Send_init (&this->val[current_index_start],
-                             part.ghost_targets()[i].second*sizeof(Number),
-                             MPI_BYTE,
-                             part.ghost_targets()[i].first,
-                             part.this_mpi_process() +
-                             part.n_mpi_processes()*channel,
-                             part.get_communicator(),
-                             &compress_requests[n_import_targets+i]);
-              current_index_start += part.ghost_targets()[i].second;
-            }
-          AssertDimension (current_index_start,
-                           part.local_size()+part.n_ghost_indices());
+          AssertThrow (static_cast<size_type>(part.import_targets()[i].second)*
+                       sizeof(Number) <
+                       static_cast<size_type>(std::numeric_limits<int>::max()),
+                       ExcMessage("Index overflow: Maximum message size in MPI is 2GB. "
+                                  "The number of ghost entries times the size of 'Number' "
+                                  "exceeds this value. This is not supported."));
+          const int ierr = MPI_Irecv (&import_data[current_index_start],
+                                      part.import_targets()[i].second*sizeof(Number),
+                                      MPI_BYTE,
+                                      part.import_targets()[i].first,
+                                      part.import_targets()[i].first +
+                                      part.n_mpi_processes()*channel,
+                                      part.get_communicator(),
+                                      &compress_requests[i]);
+          AssertThrowMPI (ierr);
+          current_index_start += part.import_targets()[i].second;
         }
+      AssertDimension(current_index_start, part.n_import_indices());
+
+      // initiate the send operations
+      current_index_start = part.local_size();
+      for (unsigned int i=0; i<n_ghost_targets; i++)
+        {
+          AssertThrow (static_cast<size_type>(part.ghost_targets()[i].second)*
+                       sizeof(Number) <
+                       static_cast<size_type>(std::numeric_limits<int>::max()),
+                       ExcMessage("Index overflow: Maximum message size in MPI is 2GB. "
+                                  "The number of ghost entries times the size of 'Number' "
+                                  "exceeds this value. This is not supported."));
+          const int ierr = MPI_Isend (&this->val[current_index_start],
+                                      part.ghost_targets()[i].second*sizeof(Number),
+                                      MPI_BYTE,
+                                      part.ghost_targets()[i].first,
+                                      part.this_mpi_process() +
+                                      part.n_mpi_processes()*channel,
+                                      part.get_communicator(),
+                                      &compress_requests[n_import_targets+i]);
+          AssertThrowMPI (ierr);
+          current_index_start += part.ghost_targets()[i].second;
+        }
+      AssertDimension (current_index_start,
+                       part.local_size()+part.n_ghost_indices());
 
       AssertDimension(n_import_targets + n_ghost_targets,
                       compress_requests.size());
-      if (compress_requests.size() > 0)
-        {
-          int ierr = MPI_Startall(compress_requests.size(),&compress_requests[0]);
-          (void)ierr;
-          Assert (ierr == MPI_SUCCESS, ExcInternalError());
-        }
 #endif
     }
 
@@ -650,10 +658,9 @@ namespace LinearAlgebra
       // first wait for the receive to complete
       if (compress_requests.size() > 0 && n_import_targets > 0)
         {
-          int ierr = MPI_Waitall (n_import_targets, &compress_requests[0],
-                                  MPI_STATUSES_IGNORE);
-          (void)ierr;
-          Assert (ierr == MPI_SUCCESS, ExcInternalError());
+          const int ierr = MPI_Waitall (n_import_targets, &compress_requests[0],
+                                        MPI_STATUSES_IGNORE);
+          AssertThrowMPI(ierr);
 
           Number *read_position = import_data;
           std::vector<std::pair<unsigned int, unsigned int> >::const_iterator
@@ -673,23 +680,26 @@ namespace LinearAlgebra
                    j++, read_position++)
                 Assert(*read_position == Number() ||
                        std::abs(local_element(j) - *read_position) <=
-                       std::abs(local_element(j)) * 1000. *
+                       std::abs(local_element(j)) * 10000. *
                        std::numeric_limits<real_type>::epsilon(),
                        ExcNonMatchingElements(*read_position, local_element(j),
                                               part.this_mpi_process()));
           AssertDimension(read_position-import_data,part.n_import_indices());
         }
 
+      // wait for the send operations to complete
       if (compress_requests.size() > 0 && n_ghost_targets > 0)
         {
-          int ierr = MPI_Waitall (n_ghost_targets,
-                                  &compress_requests[n_import_targets],
-                                  MPI_STATUSES_IGNORE);
-          (void)ierr;
-          Assert (ierr == MPI_SUCCESS, ExcInternalError());
+          const int ierr = MPI_Waitall (n_ghost_targets,
+                                        &compress_requests[n_import_targets],
+                                        MPI_STATUSES_IGNORE);
+          AssertThrowMPI(ierr);
         }
       else
         AssertDimension (part.n_ghost_indices(), 0);
+
+      // clear the compress requests
+      compress_requests.resize(0);
 
       zero_out_ghosts ();
 #else
@@ -716,49 +726,38 @@ namespace LinearAlgebra
       const unsigned int n_import_targets = part.import_targets().size();
       const unsigned int n_ghost_targets = part.ghost_targets().size();
 
+      Assert(update_ghost_values_requests.size() == 0,
+             ExcMessage("Another compress operation seems to still be running. "
+                        "Call compress_finish() first."));
+
       // Need to send and receive the data. Use non-blocking communication,
       // where it is generally less overhead to first initiate the receive and
       // then actually send the data
-      if (update_ghost_values_requests.size() == 0)
+      size_type current_index_start = part.local_size();
+      update_ghost_values_requests.resize (n_import_targets+n_ghost_targets);
+      for (unsigned int i=0; i<n_ghost_targets; i++)
         {
-          size_type current_index_start = part.local_size();
-          update_ghost_values_requests.resize (n_import_targets+n_ghost_targets);
-          for (unsigned int i=0; i<n_ghost_targets; i++)
-            {
-              // allow writing into ghost indices even though we are in a
-              // const function
-              MPI_Recv_init (const_cast<Number *>(&val[current_index_start]),
-                             part.ghost_targets()[i].second*sizeof(Number),
-                             MPI_BYTE,
-                             part.ghost_targets()[i].first,
-                             part.ghost_targets()[i].first +
-                             counter*part.n_mpi_processes(),
-                             part.get_communicator(),
-                             &update_ghost_values_requests[i]);
-              current_index_start += part.ghost_targets()[i].second;
-            }
-          AssertDimension (current_index_start,
-                           part.local_size()+part.n_ghost_indices());
-
-          // allocate import_data in case it is not set up yet
-          if (import_data == 0 && part.n_import_indices() > 0)
-            import_data = new Number[part.n_import_indices()];
-          current_index_start = 0;
-          for (unsigned int i=0; i<n_import_targets; i++)
-            {
-              MPI_Send_init (&import_data[current_index_start],
-                             part.import_targets()[i].second*sizeof(Number),
-                             MPI_BYTE, part.import_targets()[i].first,
-                             part.this_mpi_process() +
-                             part.n_mpi_processes()*counter,
-                             part.get_communicator(),
-                             &update_ghost_values_requests[n_ghost_targets+i]);
-              current_index_start += part.import_targets()[i].second;
-            }
-          AssertDimension (current_index_start, part.n_import_indices());
+          // allow writing into ghost indices even though we are in a
+          // const function
+          const int ierr = MPI_Irecv (const_cast<Number *>(&val[current_index_start]),
+                                      part.ghost_targets()[i].second*sizeof(Number),
+                                      MPI_BYTE,
+                                      part.ghost_targets()[i].first,
+                                      part.ghost_targets()[i].first +
+                                      counter*part.n_mpi_processes(),
+                                      part.get_communicator(),
+                                      &update_ghost_values_requests[i]);
+          AssertThrowMPI (ierr);
+          current_index_start += part.ghost_targets()[i].second;
         }
+      AssertDimension (current_index_start,
+                       part.local_size()+part.n_ghost_indices());
 
-      // copy the data that is actually to be send to the import_data field
+      // allocate import_data in case it is not set up yet
+      if (import_data == 0 && part.n_import_indices() > 0)
+        import_data = new Number[part.n_import_indices()];
+
+      // copy the data to be sent to the import_data field
       if (part.n_import_indices() > 0)
         {
           Assert (import_data != 0, ExcInternalError());
@@ -770,15 +769,24 @@ namespace LinearAlgebra
               *write_position++ = local_element(j);
         }
 
+      // start the send operations
+      current_index_start = 0;
+      for (unsigned int i=0; i<n_import_targets; i++)
+        {
+          const int ierr = MPI_Isend (&import_data[current_index_start],
+                                      part.import_targets()[i].second*sizeof(Number),
+                                      MPI_BYTE, part.import_targets()[i].first,
+                                      part.this_mpi_process() +
+                                      part.n_mpi_processes()*counter,
+                                      part.get_communicator(),
+                                      &update_ghost_values_requests[n_ghost_targets+i]);
+          AssertThrowMPI (ierr);
+          current_index_start += part.import_targets()[i].second;
+        }
+      AssertDimension (current_index_start, part.n_import_indices());
+
       AssertDimension (n_import_targets+n_ghost_targets,
                        update_ghost_values_requests.size());
-      if (update_ghost_values_requests.size() > 0)
-        {
-          int ierr = MPI_Startall(update_ghost_values_requests.size(),
-                                  &update_ghost_values_requests[0]);
-          (void)ierr;
-          Assert (ierr == MPI_SUCCESS, ExcInternalError());
-        }
 #else
       (void)counter;
 #endif
@@ -801,12 +809,12 @@ namespace LinearAlgebra
           // make this function thread safe
           Threads::Mutex::ScopedLock lock (mutex);
 
-          int ierr = MPI_Waitall (update_ghost_values_requests.size(),
-                                  &update_ghost_values_requests[0],
-                                  MPI_STATUSES_IGNORE);
-          (void)ierr;
-          Assert (ierr == MPI_SUCCESS, ExcInternalError());
+          const int ierr = MPI_Waitall (update_ghost_values_requests.size(),
+                                        &update_ghost_values_requests[0],
+                                        MPI_STATUSES_IGNORE);
+          AssertThrowMPI (ierr);
         }
+      update_ghost_values_requests.resize(0);
 #endif
       vector_is_ghosted = true;
     }
@@ -848,9 +856,9 @@ namespace LinearAlgebra
 
       tmp_vector.compress(operation);
 
-      dealii::internal::Vector_copy<Number,Number> copier(tmp_vector.val, val);
-      internal::parallel_for(copier, partitioner->local_size(),
-                             thread_loop_partitioner);
+      dealii::internal::VectorOperations::Vector_copy<Number,Number> copier(tmp_vector.val, val);
+      internal::VectorOperations::parallel_for(copier, partitioner->local_size(),
+                                               thread_loop_partitioner);
     }
 
 
@@ -869,19 +877,19 @@ namespace LinearAlgebra
           int flag = 1;
           if (update_ghost_values_requests.size()>0)
             {
-              int ierr = MPI_Testall (update_ghost_values_requests.size(),
-                                      &update_ghost_values_requests[0],
-                                      &flag, MPI_STATUSES_IGNORE);
-              Assert (ierr == MPI_SUCCESS, ExcInternalError());
+              const int ierr = MPI_Testall (update_ghost_values_requests.size(),
+                                            &update_ghost_values_requests[0],
+                                            &flag, MPI_STATUSES_IGNORE);
+              AssertThrowMPI (ierr);
               Assert (flag == 1,
                       ExcMessage("MPI found unfinished update_ghost_values() requests"
                                  "when calling swap, which is not allowed"));
             }
           if (compress_requests.size()>0)
             {
-              int ierr = MPI_Testall (compress_requests.size(), &compress_requests[0],
-                                      &flag, MPI_STATUSES_IGNORE);
-              Assert (ierr == MPI_SUCCESS, ExcInternalError());
+              const int ierr = MPI_Testall (compress_requests.size(), &compress_requests[0],
+                                            &flag, MPI_STATUSES_IGNORE);
+              AssertThrowMPI (ierr);
               Assert (flag == 1,
                       ExcMessage("MPI found unfinished compress() requests "
                                  "when calling swap, which is not allowed"));
@@ -907,10 +915,10 @@ namespace LinearAlgebra
     Vector<Number> &
     Vector<Number>::operator = (const Number s)
     {
-      internal::Vector_set<Number> setter(s, val);
+      internal::VectorOperations::Vector_set<Number> setter(s, val);
 
-      internal::parallel_for(setter, partitioner->local_size(),
-                             thread_loop_partitioner);
+      internal::VectorOperations::parallel_for(setter, partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       // if we call Vector::operator=0, we want to zero out all the entries
       // plus ghosts.
@@ -933,9 +941,9 @@ namespace LinearAlgebra
 
       AssertDimension (local_size(), v.local_size());
 
-      internal::Vectorization_add_v<Number> vector_add(val, v.val);
-      internal::parallel_for(vector_add, partitioner->local_size(),
-                             thread_loop_partitioner);
+      internal::VectorOperations::Vectorization_add_v<Number> vector_add(val, v.val);
+      internal::VectorOperations::parallel_for(vector_add, partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -956,9 +964,9 @@ namespace LinearAlgebra
 
       AssertDimension (local_size(), v.local_size());
 
-      internal::Vectorization_subtract_v<Number> vector_subtract(val, v.val);
-      internal::parallel_for(vector_subtract, partitioner->local_size(),
-                             thread_loop_partitioner);
+      internal::VectorOperations::Vectorization_subtract_v<Number> vector_subtract(val, v.val);
+      internal::VectorOperations::parallel_for(vector_subtract, partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -974,9 +982,9 @@ namespace LinearAlgebra
     {
       AssertIsFinite(a);
 
-      internal::Vectorization_add_factor<Number> vector_add(val, a);
-      internal::parallel_for(vector_add, partitioner->local_size(),
-                             thread_loop_partitioner);
+      internal::VectorOperations::Vectorization_add_factor<Number> vector_add(val, a);
+      internal::VectorOperations::parallel_for(vector_add, partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -997,9 +1005,9 @@ namespace LinearAlgebra
       AssertIsFinite(a);
       AssertDimension (local_size(), v.local_size());
 
-      internal::Vectorization_add_av<Number> vector_add(val, v.val, a);
-      internal::parallel_for(vector_add, partitioner->local_size(),
-                             thread_loop_partitioner);
+      internal::VectorOperations::Vectorization_add_av<Number> vector_add(val, v.val, a);
+      internal::VectorOperations::parallel_for(vector_add, partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1028,13 +1036,28 @@ namespace LinearAlgebra
       AssertDimension (local_size(), v.local_size());
       AssertDimension (local_size(), w.local_size());
 
-      internal::Vectorization_add_avpbw<Number> vector_add(val, v.val, w.val, a, b);
-      internal::parallel_for(vector_add, partitioner->local_size(),
-                             thread_loop_partitioner);
+      internal::VectorOperations::Vectorization_add_avpbw<Number> vector_add(val, v.val,
+          w.val, a, b);
+      internal::VectorOperations::parallel_for(vector_add, partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
     }
+
+
+
+    template <typename Number>
+    void
+    Vector<Number>::add (const std::vector<size_type> &indices,
+                         const std::vector<Number>    &values)
+    {
+      for (std::size_t i=0; i<indices.size(); ++i)
+        {
+          this->operator()(indices[i]) += values[i];
+        }
+    }
+
 
 
 
@@ -1046,9 +1069,9 @@ namespace LinearAlgebra
       AssertIsFinite(x);
       AssertDimension (local_size(), v.local_size());
 
-      internal::Vectorization_sadd_xv<Number> vector_sadd(val, v.val, x);
-      internal::parallel_for(vector_sadd, partitioner->local_size(),
-                             thread_loop_partitioner);
+      internal::VectorOperations::Vectorization_sadd_xv<Number> vector_sadd(val, v.val, x);
+      internal::VectorOperations::parallel_for(vector_sadd, partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1071,9 +1094,9 @@ namespace LinearAlgebra
       AssertIsFinite(a);
       AssertDimension (local_size(), v.local_size());
 
-      internal::Vectorization_sadd_xav<Number> vector_sadd(val, v.val, a, x);
-      internal::parallel_for(vector_sadd, partitioner->local_size(),
-                             thread_loop_partitioner);
+      internal::VectorOperations::Vectorization_sadd_xav<Number> vector_sadd(val, v.val, a, x);
+      internal::VectorOperations::parallel_for(vector_sadd, partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1096,10 +1119,10 @@ namespace LinearAlgebra
       AssertDimension (local_size(), v.local_size());
       AssertDimension (local_size(), w.local_size());
 
-      internal::Vectorization_sadd_xavbw<Number> vector_sadd(val, v.val, w.val,
-                                                             x, a, b);
-      internal::parallel_for(vector_sadd, partitioner->local_size(),
-                             thread_loop_partitioner);
+      internal::VectorOperations::Vectorization_sadd_xavbw<Number> vector_sadd(val, v.val, w.val,
+          x, a, b);
+      internal::VectorOperations::parallel_for(vector_sadd, partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1112,10 +1135,11 @@ namespace LinearAlgebra
     Vector<Number>::operator *= (const Number factor)
     {
       AssertIsFinite(factor);
-      internal::Vectorization_multiply_factor<Number> vector_multiply(val, factor);
+      internal::VectorOperations::Vectorization_multiply_factor<Number> vector_multiply(val,
+          factor);
 
-      internal::parallel_for(vector_multiply, partitioner->local_size(),
-                             thread_loop_partitioner);
+      internal::VectorOperations::parallel_for(vector_multiply, partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1146,9 +1170,9 @@ namespace LinearAlgebra
 
       AssertDimension (local_size(), v.local_size());
 
-      internal::Vectorization_scale<Number> vector_scale(val, v.val);
-      internal::parallel_for(vector_scale, partitioner->local_size(),
-                             thread_loop_partitioner);
+      internal::VectorOperations::Vectorization_scale<Number> vector_scale(val, v.val);
+      internal::VectorOperations::parallel_for(vector_scale, partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1169,9 +1193,9 @@ namespace LinearAlgebra
       AssertIsFinite(a);
       AssertDimension (local_size(), v.local_size());
 
-      internal::Vectorization_equ_au<Number> vector_equ(val, v.val, a);
-      internal::parallel_for(vector_equ, partitioner->local_size(),
-                             thread_loop_partitioner);
+      internal::VectorOperations::Vectorization_equ_au<Number> vector_equ(val, v.val, a);
+      internal::VectorOperations::parallel_for(vector_equ, partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1192,9 +1216,10 @@ namespace LinearAlgebra
       AssertDimension (local_size(), v.local_size());
       AssertDimension (local_size(), w.local_size());
 
-      internal::Vectorization_equ_aubv<Number> vector_equ(val, v.val, w.val, a, b);
-      internal::parallel_for(vector_equ, partitioner->local_size(),
-                             thread_loop_partitioner);
+      internal::VectorOperations::Vectorization_equ_aubv<Number> vector_equ(val, v.val,
+          w.val, a, b);
+      internal::VectorOperations::parallel_for(vector_equ, partitioner->local_size(),
+                                               thread_loop_partitioner);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1245,9 +1270,9 @@ namespace LinearAlgebra
       AssertDimension (partitioner->local_size(), v.partitioner->local_size());
 
       Number sum;
-      internal::Dot<Number,Number2> dot(val, v.val);
-      internal::parallel_reduce (dot, partitioner->local_size(), sum,
-                                 thread_loop_partitioner);
+      internal::VectorOperations::Dot<Number,Number2> dot(val, v.val);
+      internal::VectorOperations::parallel_reduce (dot, partitioner->local_size(), sum,
+                                                   thread_loop_partitioner);
       AssertIsFinite(sum);
 
       return sum;
@@ -1279,9 +1304,9 @@ namespace LinearAlgebra
     Vector<Number>::norm_sqr_local () const
     {
       real_type sum;
-      internal::Norm2<Number,real_type> norm2(val);
-      internal::parallel_reduce (norm2, partitioner->local_size(), sum,
-                                 thread_loop_partitioner);
+      internal::VectorOperations::Norm2<Number,real_type> norm2(val);
+      internal::VectorOperations::parallel_reduce (norm2, partitioner->local_size(), sum,
+                                                   thread_loop_partitioner);
       AssertIsFinite(sum);
 
       return sum;
@@ -1299,9 +1324,9 @@ namespace LinearAlgebra
         return Number();
 
       Number sum;
-      internal::MeanValue<Number> mean(val);
-      internal::parallel_reduce (mean, partitioner->local_size(), sum,
-                                 thread_loop_partitioner);
+      internal::VectorOperations::MeanValue<Number> mean(val);
+      internal::VectorOperations::parallel_reduce (mean, partitioner->local_size(), sum,
+                                                   thread_loop_partitioner);
 
       return sum / real_type(partitioner->local_size());
     }
@@ -1329,9 +1354,9 @@ namespace LinearAlgebra
     Vector<Number>::l1_norm_local () const
     {
       real_type sum;
-      internal::Norm1<Number, real_type> norm1(val);
-      internal::parallel_reduce (norm1, partitioner->local_size(), sum,
-                                 thread_loop_partitioner);
+      internal::VectorOperations::Norm1<Number, real_type> norm1(val);
+      internal::VectorOperations::parallel_reduce (norm1, partitioner->local_size(), sum,
+                                                   thread_loop_partitioner);
 
       return sum;
     }
@@ -1371,9 +1396,9 @@ namespace LinearAlgebra
     Vector<Number>::lp_norm_local (const real_type p) const
     {
       real_type sum;
-      internal::NormP<Number, real_type> normp(val, p);
-      internal::parallel_reduce (normp, partitioner->local_size(), sum,
-                                 thread_loop_partitioner);
+      internal::VectorOperations::NormP<Number, real_type> normp(val, p);
+      internal::VectorOperations::parallel_reduce (normp, partitioner->local_size(), sum,
+                                                   thread_loop_partitioner);
       return std::pow(sum, 1./p);
     }
 
@@ -1435,8 +1460,8 @@ namespace LinearAlgebra
       AssertDimension (vec_size, w.local_size());
 
       Number sum;
-      internal::AddAndDot<Number> adder(this->val, v.val, w.val, a);
-      internal::parallel_reduce (adder, vec_size, sum, thread_loop_partitioner);
+      internal::VectorOperations::AddAndDot<Number> adder(this->val, v.val, w.val, a);
+      internal::VectorOperations::parallel_reduce (adder, vec_size, sum, thread_loop_partitioner);
       AssertIsFinite(sum);
       return sum;
     }
@@ -1533,7 +1558,10 @@ namespace LinearAlgebra
 #ifdef DEAL_II_WITH_MPI
       if (partitioner->n_mpi_processes() > 1)
         for (unsigned int i=0; i<partitioner->this_mpi_process(); i++)
-          MPI_Barrier (partitioner->get_communicator());
+          {
+            const int ierr = MPI_Barrier (partitioner->get_communicator());
+            AssertThrowMPI (ierr);
+          }
 #endif
 
       out << "Process #" << partitioner->this_mpi_process() << std::endl
@@ -1568,11 +1596,15 @@ namespace LinearAlgebra
 #ifdef DEAL_II_WITH_MPI
       if (partitioner->n_mpi_processes() > 1)
         {
-          MPI_Barrier (partitioner->get_communicator());
+          int ierr = MPI_Barrier (partitioner->get_communicator());
+          AssertThrowMPI (ierr);
 
           for (unsigned int i=partitioner->this_mpi_process()+1;
                i<partitioner->n_mpi_processes(); i++)
-            MPI_Barrier (partitioner->get_communicator());
+            {
+              ierr = MPI_Barrier (partitioner->get_communicator());
+              AssertThrowMPI (ierr);
+            }
         }
 #endif
 

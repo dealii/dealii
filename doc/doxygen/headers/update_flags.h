@@ -243,7 +243,7 @@
  * <li>FEValues::reinit() calls Mapping::fill_fe_values(), then FiniteElement::fill_fe_values()
  * <li>FEFaceValues::reinit() calls Mapping::fill_fe_face_values(), then FiniteElement::fill_fe_face_values()
  * <li>FESubfaceValues::reinit() calls Mapping::fill_fe_subface_values(),
- * thenFiniteElement::fill_fe_subface_values()
+ * then FiniteElement::fill_fe_subface_values()
  * </ul>
  * 
  * This is where the actual data fields for FEValues, stored in

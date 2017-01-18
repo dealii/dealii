@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2011 - 2015 by the deal.II authors
+ * Copyright (C) 2011 - 2017 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -415,7 +415,6 @@ namespace Step48
 
     QGaussLobatto<1> quadrature (fe_degree+1);
     typename MatrixFree<dim>::AdditionalData additional_data;
-    additional_data.mpi_communicator = MPI_COMM_WORLD;
     additional_data.tasks_parallel_scheme =
       MatrixFree<dim>::AdditionalData::partition_partition;
 
@@ -433,25 +432,25 @@ namespace Step48
 
   // This function prints the norm of the solution and writes the solution
   // vector to a file. The norm is standard (except for the fact that we need
-  // to be sure to only count norms on locally owned cells), and the second is
-  // similar to what we did in step-40. Note that we can use the same vector
-  // for output as we used for computation: The vectors in the matrix-free
-  // framework always provide full information on all locally owned cells
-  // (this is what is needed in the local evaluations, too), including ghost
-  // vector entries on these cells. This is the only data that is needed in
-  // the integrate_difference function as well as in DataOut. We only need to
-  // make sure that we tell the vector to update its ghost values before we
-  // read them. This is a feature present only in the
-  // LinearAlgebra::distributed::Vector class. Distributed vectors with PETSc and
-  // Trilinos, on the other hand, need to be copied to special vectors
-  // including ghost values (see the relevant section in step-40). If we
-  // wanted to access all degrees of freedom on ghost cells, too (e.g. when
-  // computing error estimators that use the jump of solution over cell
-  // boundaries), we would need more information and create a vector
-  // initialized with locally relevant dofs just as in step-40. Observe also
-  // that we need to distribute constraints for output - they are not filled
-  // during computations (rather, they are distributed on the fly in the
-  // matrix-free method read_dof_values).
+  // to accumulate the norms over all processors for the parallel grid), and
+  // the second is similar to what we did in step-40 or step-37. Note that we
+  // can use the same vector for output as the one used during computations:
+  // The vectors in the matrix-free framework always provide full information
+  // on all locally owned cells (this is what is needed in the local
+  // evaluations, too), including ghost vector entries on these cells. This is
+  // the only data that is needed in the integrate_difference function as well
+  // as in DataOut. The only action to take at this point is then to make sure
+  // that the vector updates its ghost values before we read from them. This
+  // is a feature present only in the LinearAlgebra::distributed::Vector
+  // class. Distributed vectors with PETSc and Trilinos, on the other hand,
+  // need to be copied to special vectors including ghost values (see the
+  // relevant section in step-40). If we also wanted to access all degrees of
+  // freedom on ghost cells (e.g. when computing error estimators that use the
+  // jump of solution over cell boundaries), we would need more information
+  // and create a vector initialized with locally relevant dofs just as in
+  // step-40. Observe also that we need to distribute constraints for output -
+  // they are not filled during computations (rather, they are interpolated on
+  // the fly in the matrix-free method read_dof_values).
   template <int dim>
   void
   SineGordonProblem<dim>::output_results (const unsigned int timestep_number)

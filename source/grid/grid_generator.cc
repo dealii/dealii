@@ -749,6 +749,33 @@ namespace GridGenerator
     tria.set_all_manifold_ids_on_boundary(0);
   }
 
+
+
+  template <int dim>
+  void
+  general_cell (Triangulation<dim> &tria,
+                const std::vector<Point<dim> > &vertices,
+                const bool colorize)
+  {
+    Assert (vertices.size() == dealii::GeometryInfo<dim>::vertices_per_cell,
+            ExcMessage("Wrong number of vertices."));
+
+    // First create a hyper_rectangle and then deform it.
+    hyper_cube(tria, 0, 1, colorize);
+
+    typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
+    for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+      cell->vertex(i) = vertices[i];
+
+    // Check that the order of the vertices makes sense, i.e., the volume of the
+    // cell is positive.
+    Assert(GridTools::volume(tria) > 0.,
+           ExcMessage("The volume of the cell is not greater than zero. "
+                      "This could be due to the wrong ordering of the vertices."));
+  }
+
+
+
   template<>
   void
   parallelogram (Triangulation<3> &,
@@ -1710,7 +1737,7 @@ namespace GridGenerator
     tria.create_triangulation (points, cells, t);
 
     // set boundary indicator
-    if (colorize && dim>1)
+    if (colorize)
       {
         double eps = 0.01 * delta;
         Triangulation<dim>::cell_iterator cell = tria.begin(),
@@ -2139,7 +2166,7 @@ namespace GridGenerator
         Triangulation<2>::cell_iterator cell = tria.begin();
         cell->face(1)->set_boundary_id(1);
         ++cell;
-        cell->face(3)->set_boundary_id(2);
+        cell->face(0)->set_boundary_id(2);
       }
   }
 
@@ -2738,11 +2765,10 @@ namespace GridGenerator
 
     if (colorize)
       {
-        Assert(false, ExcNotImplemented());
         Triangulation<3>::cell_iterator cell = tria.begin();
         cell->face(1)->set_boundary_id(1);
         ++cell;
-        cell->face(3)->set_boundary_id(2);
+        cell->face(0)->set_boundary_id(2);
       }
   }
 
@@ -4108,7 +4134,14 @@ namespace GridGenerator
         s.boundary_quads.push_back(quad);
       }
 
-    // use all of this to finally create the extruded 3d triangulation
+    // use all of this to finally create the extruded 3d
+    // triangulation.  it is not necessary to call
+    // GridReordering<3,3>::reorder_cells because the cells we have
+    // constructed above are automatically correctly oriented. this is
+    // because the 2d base mesh is always correctly oriented, and
+    // extruding it automatically yields a correctly oriented 3d mesh,
+    // as discussed in the edge orientation paper mentioned in the
+    // introduction to the GridReordering class.
     result.create_triangulation (points,
                                  cells,
                                  s);

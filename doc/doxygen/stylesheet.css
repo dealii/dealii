@@ -26,3 +26,11 @@ div.doxygen-generated-exception-message {
     padding: 5px;
     font-size: 95%;
 }
+
+div.image img[src="fe_enriched_1d.png"] {
+    width:500px;
+}
+
+div.image img[src="fe_enriched_h-refinement.png"] {
+    width:500px;
+}

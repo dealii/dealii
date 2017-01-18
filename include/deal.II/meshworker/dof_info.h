@@ -274,6 +274,8 @@ namespace MeshWorker
   template <int dim, int spacedim, typename number>
   DoFInfo<dim,spacedim,number>::DoFInfo(const DoFHandler<dim,spacedim> &dof_handler)
     :
+    face_number (numbers::invalid_unsigned_int),
+    sub_number (numbers::invalid_unsigned_int),
     level_cell (false)
   {
     std::vector<types::global_dof_index> aux(1);

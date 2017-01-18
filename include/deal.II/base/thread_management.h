@@ -305,6 +305,16 @@ namespace Threads
 
 
     /**
+     * Copy operators. As discussed in this class's documentation, no state
+     * is copied from the object given as argument.
+     */
+    Mutex &operator = (const Mutex &)
+    {
+      return *this;
+    }
+
+
+    /**
      * Acquire a mutex.
      */
     inline void acquire ()
@@ -1260,7 +1270,7 @@ namespace Threads
      * an implicit pointer to an object that exists exactly once for each
      * thread, the check is simply to compare these pointers.
      */
-    bool operator == (const Thread &t)
+    bool operator == (const Thread &t) const
     {
       return thread_descriptor == t.thread_descriptor;
     }
@@ -2860,6 +2870,13 @@ namespace Threads
       ~TaskDescriptor ();
 
       /**
+       * Copy operator. Throws an exception since we want to make sure that
+       * each TaskDescriptor object corresponds to exactly one task.
+       */
+      TaskDescriptor &
+      operator = (const TaskDescriptor &);
+
+      /**
        * Queue up the task to the scheduler. We need to do this in a separate
        * function since the new tasks needs to access objects from the current
        * object and that can only reliably happen if the current object is
@@ -2901,13 +2918,15 @@ namespace Threads
       task->set_ref_count (2);
 
       tbb::task *worker = new (task->allocate_child()) TaskEntryPoint<RT>(*this);
-      task->spawn (*worker);
+      tbb::task::spawn (*worker);
     }
 
 
 
     template <typename RT>
     TaskDescriptor<RT>::TaskDescriptor ()
+      :
+      task_is_done (false)
     {
       Assert (false, ExcInternalError());
     }
@@ -2916,7 +2935,11 @@ namespace Threads
 
     template <typename RT>
     TaskDescriptor<RT>::TaskDescriptor (const TaskDescriptor &)
+      :
+      task_is_done (false)
     {
+      // we shouldn't be getting here -- task descriptors
+      // can't be copied
       Assert (false, ExcInternalError());
     }
 
@@ -2942,6 +2965,17 @@ namespace Threads
       Assert (task != 0, ExcInternalError());
       Assert (task->ref_count()==0, ExcInternalError());
       task->destroy (*task);
+    }
+
+
+    template <typename RT>
+    TaskDescriptor<RT> &
+    TaskDescriptor<RT>::operator = (const TaskDescriptor &)
+    {
+      // we shouldn't be getting here -- task descriptors
+      // can't be copied
+      Assert (false, ExcInternalError());
+      return *this;
     }
 
 
@@ -3121,7 +3155,7 @@ namespace Threads
      * an implicit pointer to an object that exists exactly once for each
      * task, the check is simply to compare these pointers.
      */
-    bool operator == (const Task &t)
+    bool operator == (const Task &t) const
     {
       AssertThrow (joinable(), ExcNoTask());
       return task_descriptor == t.task_descriptor;

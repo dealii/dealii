@@ -1230,9 +1230,8 @@ public:
    * meet at a common face, whether it is the other way around, whether
    * neither dominates, or if either could dominate.
    *
-   * For a definition of domination, see FiniteElementBase::Domination and in
-   * particular the
-   * @ref hp_paper "hp paper".
+   * For a definition of domination, see FiniteElementDomination::Domination
+   * and in particular the @ref hp_paper "hp paper".
    */
   virtual
   FiniteElementDomination::Domination
@@ -1337,7 +1336,7 @@ public:
    * Code implementing this would then look like this:
    * @code
    * for (i=0; i<dofs_per_face; ++i)
-   *  if (fe.is_primitive(fe.face_to_equivalent_cell_index(i, some_face_no)))
+   *  if (fe.is_primitive(fe.face_to_cell_index(i, some_face_no)))
    *   ... do whatever
    * @endcode
    * The function takes additional arguments that account for the fact that
@@ -1960,7 +1959,7 @@ public:
   void
   interpolate(std::vector<double>                &local_dofs,
               const std::vector<Vector<double> > &values,
-              unsigned int offset = 0) const;
+              const unsigned int                  offset = 0) const;
 
   /**
    * Interpolate a set of vector values, computed in the generalized support
@@ -1968,7 +1967,7 @@ public:
    */
   virtual
   void
-  interpolate(std::vector<double> &local_dofs,
+  interpolate(std::vector<double>                                         &local_dofs,
               const VectorSlice<const std::vector<std::vector<double> > > &values) const;
 
   //@}
@@ -2722,6 +2721,14 @@ protected:
   friend class FEFaceValues<dim,spacedim>;
   friend class FESubfaceValues<dim,spacedim>;
   friend class FESystem<dim,spacedim>;
+
+  // explicitly check for sensible template arguments
+#ifdef DEAL_II_WITH_CXX11
+  static_assert (dim<=spacedim,
+                 "The dimension <dim> of a FiniteElement must be less than or "
+                 "equal to the space dimension <spacedim> in which it lives.");
+#endif
+
 };
 
 

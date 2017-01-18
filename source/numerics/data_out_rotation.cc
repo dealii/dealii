@@ -93,9 +93,9 @@ namespace internal
 template <int dim, typename DoFHandlerType>
 void
 DataOutRotation<dim,DoFHandlerType>::
-build_one_patch (const cell_iterator *cell,
+build_one_patch (const cell_iterator                                                 *cell,
                  internal::DataOutRotation::ParallelData<dimension, space_dimension> &data,
-                 std::vector<DataOutBase::Patch<dimension+1,space_dimension+1> > &patches)
+                 std::vector<DataOutBase::Patch<dimension+1,space_dimension+1> >     &my_patches)
 {
   if (dim == 3)
     {
@@ -140,10 +140,10 @@ build_one_patch (const cell_iterator *cell,
           Assert (r1 >= 0, ExcRadialVariableHasNegativeValues(r1));
           Assert (r2 >= 0, ExcRadialVariableHasNegativeValues(r2));
 
-          patches[angle].vertices[0] = r1*angle_directions[angle];
-          patches[angle].vertices[1] = r2*angle_directions[angle];
-          patches[angle].vertices[2] = r1*angle_directions[angle+1];
-          patches[angle].vertices[3] = r2*angle_directions[angle+1];
+          my_patches[angle].vertices[0] = r1*angle_directions[angle];
+          my_patches[angle].vertices[1] = r2*angle_directions[angle];
+          my_patches[angle].vertices[2] = r1*angle_directions[angle+1];
+          my_patches[angle].vertices[3] = r2*angle_directions[angle+1];
 
           break;
         };
@@ -161,12 +161,12 @@ build_one_patch (const cell_iterator *cell,
               Assert (v(0) >= 0, ExcRadialVariableHasNegativeValues(v(0)));
 
               // now set the vertices of the patch
-              patches[angle].vertices[vertex] = v(0) * angle_directions[angle];
-              patches[angle].vertices[vertex][0] = v(1);
+              my_patches[angle].vertices[vertex] = v(0) * angle_directions[angle];
+              my_patches[angle].vertices[vertex][0] = v(1);
 
-              patches[angle].vertices[vertex+GeometryInfo<dimension>::vertices_per_cell]
+              my_patches[angle].vertices[vertex+GeometryInfo<dimension>::vertices_per_cell]
                 = v(0) * angle_directions[angle+1];
-              patches[angle].vertices[vertex+GeometryInfo<dimension>::vertices_per_cell][0]
+              my_patches[angle].vertices[vertex+GeometryInfo<dimension>::vertices_per_cell][0]
                 = v(1);
             };
 
@@ -205,25 +205,26 @@ build_one_patch (const cell_iterator *cell,
                       // value, gradient etc.
                       if (update_flags & update_values)
                         this->dof_data[dataset]->get_function_values (fe_patch_values,
-                                                                      data.patch_values);
+                                                                      data.patch_values_scalar.solution_values);
                       if (update_flags & update_gradients)
                         this->dof_data[dataset]->get_function_gradients (fe_patch_values,
-                                                                         data.patch_gradients);
+                                                                         data.patch_values_scalar.solution_gradients);
                       if (update_flags & update_hessians)
                         this->dof_data[dataset]->get_function_hessians (fe_patch_values,
-                                                                        data.patch_hessians);
+                                                                        data.patch_values_scalar.solution_hessians);
 
                       if (update_flags & update_quadrature_points)
-                        data.patch_evaluation_points = fe_patch_values.get_quadrature_points();
+                        data.patch_values_scalar.evaluation_points = fe_patch_values.get_quadrature_points();
 
-                      std::vector<Point<space_dimension> > dummy_normals;
+                      const typename DoFHandlerType::active_cell_iterator dh_cell(&(*cell)->get_triangulation(),
+                                                                                  (*cell)->level(),
+                                                                                  (*cell)->index(),
+                                                                                  this->dof_data[dataset]->dof_handler);
+                      data.patch_values_scalar.template set_cell<DoFHandlerType> (dh_cell);
+
                       postprocessor->
-                      compute_derived_quantities_scalar(data.patch_values,
-                                                        data.patch_gradients,
-                                                        data.patch_hessians,
-                                                        dummy_normals,
-                                                        data.patch_evaluation_points,
-                                                        data.postprocessed_values[dataset]);
+                      evaluate_scalar_field(data.patch_values_scalar,
+                                            data.postprocessed_values[dataset]);
                     }
                   else
                     {
@@ -233,25 +234,26 @@ build_one_patch (const cell_iterator *cell,
                       // its derivative...
                       if (update_flags & update_values)
                         this->dof_data[dataset]->get_function_values (fe_patch_values,
-                                                                      data.patch_values_system);
+                                                                      data.patch_values_system.solution_values);
                       if (update_flags & update_gradients)
                         this->dof_data[dataset]->get_function_gradients (fe_patch_values,
-                                                                         data.patch_gradients_system);
+                                                                         data.patch_values_system.solution_gradients);
                       if (update_flags & update_hessians)
                         this->dof_data[dataset]->get_function_hessians (fe_patch_values,
-                                                                        data.patch_hessians_system);
+                                                                        data.patch_values_system.solution_hessians);
 
                       if (update_flags & update_quadrature_points)
-                        data.patch_evaluation_points = fe_patch_values.get_quadrature_points();
+                        data.patch_values_system.evaluation_points = fe_patch_values.get_quadrature_points();
 
-                      std::vector<Point<space_dimension> > dummy_normals;
+                      const typename DoFHandlerType::active_cell_iterator dh_cell(&(*cell)->get_triangulation(),
+                                                                                  (*cell)->level(),
+                                                                                  (*cell)->index(),
+                                                                                  this->dof_data[dataset]->dof_handler);
+                      data.patch_values_system.template set_cell<DoFHandlerType> (dh_cell);
+
                       postprocessor->
-                      compute_derived_quantities_vector(data.patch_values_system,
-                                                        data.patch_gradients_system,
-                                                        data.patch_hessians_system,
-                                                        dummy_normals,
-                                                        data.patch_evaluation_points,
-                                                        data.postprocessed_values[dataset]);
+                      evaluate_vector_field(data.patch_values_system,
+                                            data.postprocessed_values[dataset]);
                     }
 
                   for (unsigned int component=0;
@@ -263,8 +265,8 @@ build_one_patch (const cell_iterator *cell,
                         case 1:
                           for (unsigned int x=0; x<n_points; ++x)
                             for (unsigned int y=0; y<n_points; ++y)
-                              patches[angle].data(offset+component,
-                                                  x*n_points + y)
+                              my_patches[angle].data(offset+component,
+                                                     x*n_points + y)
                                 = data.postprocessed_values[dataset][x](component);
                           break;
 
@@ -272,10 +274,10 @@ build_one_patch (const cell_iterator *cell,
                           for (unsigned int x=0; x<n_points; ++x)
                             for (unsigned int y=0; y<n_points; ++y)
                               for (unsigned int z=0; z<n_points; ++z)
-                                patches[angle].data(offset+component,
-                                                    x*n_points*n_points +
-                                                    y*n_points +
-                                                    z)
+                                my_patches[angle].data(offset+component,
+                                                       x*n_points*n_points +
+                                                       y*n_points +
+                                                       z)
                                   = data.postprocessed_values[dataset][x*n_points+z](component);
                           break;
 
@@ -287,27 +289,27 @@ build_one_patch (const cell_iterator *cell,
               else if (n_components == 1)
                 {
                   this->dof_data[dataset]->get_function_values (fe_patch_values,
-                                                                data.patch_values);
+                                                                data.patch_values_scalar.solution_values);
 
                   switch (dimension)
                     {
                     case 1:
                       for (unsigned int x=0; x<n_points; ++x)
                         for (unsigned int y=0; y<n_points; ++y)
-                          patches[angle].data(offset,
-                                              x*n_points + y)
-                            = data.patch_values[x];
+                          my_patches[angle].data(offset,
+                                                 x*n_points + y)
+                            = data.patch_values_scalar.solution_values[x];
                       break;
 
                     case 2:
                       for (unsigned int x=0; x<n_points; ++x)
                         for (unsigned int y=0; y<n_points; ++y)
                           for (unsigned int z=0; z<n_points; ++z)
-                            patches[angle].data(offset,
-                                                x*n_points*n_points +
-                                                y +
-                                                z*n_points)
-                              = data.patch_values[x*n_points+z];
+                            my_patches[angle].data(offset,
+                                                   x*n_points*n_points +
+                                                   y +
+                                                   z*n_points)
+                              = data.patch_values_scalar.solution_values[x*n_points+z];
                       break;
 
                     default:
@@ -319,7 +321,7 @@ build_one_patch (const cell_iterator *cell,
                 {
                   data.resize_system_vectors(n_components);
                   this->dof_data[dataset]->get_function_values (fe_patch_values,
-                                                                data.patch_values_system);
+                                                                data.patch_values_system.solution_values);
 
                   for (unsigned int component=0; component<n_components;
                        ++component)
@@ -329,20 +331,20 @@ build_one_patch (const cell_iterator *cell,
                         case 1:
                           for (unsigned int x=0; x<n_points; ++x)
                             for (unsigned int y=0; y<n_points; ++y)
-                              patches[angle].data(offset+component,
-                                                  x*n_points + y)
-                                = data.patch_values_system[x](component);
+                              my_patches[angle].data(offset+component,
+                                                     x*n_points + y)
+                                = data.patch_values_system.solution_values[x](component);
                           break;
 
                         case 2:
                           for (unsigned int x=0; x<n_points; ++x)
                             for (unsigned int y=0; y<n_points; ++y)
                               for (unsigned int z=0; z<n_points; ++z)
-                                patches[angle].data(offset+component,
-                                                    x*n_points*n_points +
-                                                    y*n_points +
-                                                    z)
-                                  = data.patch_values_system[x*n_points+z](component);
+                                my_patches[angle].data(offset+component,
+                                                       x*n_points*n_points +
+                                                       y*n_points +
+                                                       z)
+                                  = data.patch_values_system.solution_values[x*n_points+z](component);
                           break;
 
                         default:
@@ -371,9 +373,9 @@ build_one_patch (const cell_iterator *cell,
                 case 1:
                   for (unsigned int x=0; x<n_points; ++x)
                     for (unsigned int y=0; y<n_points; ++y)
-                      patches[angle].data(dataset+offset,
-                                          x*n_points +
-                                          y)
+                      my_patches[angle].data(dataset+offset,
+                                             x*n_points +
+                                             y)
                         = value;
                   break;
 
@@ -381,10 +383,10 @@ build_one_patch (const cell_iterator *cell,
                   for (unsigned int x=0; x<n_points; ++x)
                     for (unsigned int y=0; y<n_points; ++y)
                       for (unsigned int z=0; z<n_points; ++z)
-                        patches[angle].data(dataset+offset,
-                                            x*n_points*n_points +
-                                            y*n_points +
-                                            z)
+                        my_patches[angle].data(dataset+offset,
+                                               x*n_points*n_points +
+                                               y*n_points +
+                                               z)
                           = value;
                   break;
 

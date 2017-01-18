@@ -163,12 +163,15 @@ namespace PETScWrappers
     void initialize(const PreconditionerBase &preconditioner);
 
     /**
-     * Exception
+     * Exception.
+     *
+     * @deprecated This function has been deprecated in favor of the more
+     * general LACExceptions::ExcPETScError exception class.
      */
     DeclException1 (ExcPETScError,
                     int,
                     << "An error with error number " << arg1
-                    << " occurred while calling a PETSc function");
+                    << " occurred while calling a PETSc function") DEAL_II_DEPRECATED;
 
   protected:
 
@@ -919,8 +922,7 @@ namespace PETScWrappers
    *
    * @note The class internally calls KSPSetFromOptions thus you are able to
    * use all the PETSc parameters for MATSOLVERMUMPS package. See
-   * http://www.mcs.anl.gov/petsc/petsc-
-   * current/docs/manualpages/Mat/MATSOLVERMUMPS.html
+   * http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/Mat/MATSOLVERMUMPS.html
    *
    * @ingroup PETScWrappers
    * @author Daniel Brauss, Alexander Grayver, 2012

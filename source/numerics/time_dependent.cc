@@ -250,7 +250,8 @@ TimeStepBase::TimeStepBase (const double time) :
   next_timestep (0),
   sweep_no (numbers::invalid_unsigned_int),
   timestep_no (numbers::invalid_unsigned_int),
-  time (time)
+  time (time),
+  next_action(numbers::invalid_unsigned_int)
 {}
 
 
@@ -863,7 +864,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
           if (cell->refine_flag_set())
             previous_cells += (GeometryInfo<dim>::max_children_per_cell-1);
           else if (cell->coarsen_flag_set())
-            previous_cells -= (GeometryInfo<dim>::max_children_per_cell-1) /
+            previous_cells -= (double)(GeometryInfo<dim>::max_children_per_cell-1) /
                               GeometryInfo<dim>::max_children_per_cell;
 
         // @p{previous_cells} now gives the
@@ -889,7 +890,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
           if (cell->refine_flag_set())
             estimated_cells += (GeometryInfo<dim>::max_children_per_cell-1);
           else if (cell->coarsen_flag_set())
-            estimated_cells -= (GeometryInfo<dim>::max_children_per_cell-1) /
+            estimated_cells -= (double)(GeometryInfo<dim>::max_children_per_cell-1) /
                                GeometryInfo<dim>::max_children_per_cell;
 
         // calculate the allowed delta in

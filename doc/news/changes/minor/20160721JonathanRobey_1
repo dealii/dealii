@@ -1,0 +1,4 @@
+Improved: Split out pattern descriptions for LaTeX and Description
+ParameterHandler OutputStyles, and add better description text.
+<br>
+(Jonathan Robey, 2016/07/21)

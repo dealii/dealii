@@ -14,6 +14,19 @@
 ##
 ## ---------------------------------------------------------------------
 
+#
+# This script indents all source files of deal.II according to our
+# usual code formatting standards. It is used to ensure that our
+# code base looks uniform, as uniformity helps make code easier to
+# read.
+#
+# The script needs to be executed as 
+#   ./contrib/utilities/indent
+# from the top-level directory of the source tree, or via
+#   make indent
+# from a build directory.
+#
+
 if test ! -d source -o ! -d include -o ! -d examples ; then
   echo "*** This script must be run from the top-level directory of deal.II."
   exit 1

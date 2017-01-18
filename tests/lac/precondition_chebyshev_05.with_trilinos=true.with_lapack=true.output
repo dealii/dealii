@@ -1,0 +1,13 @@
+
+DEAL::Size 4 Unknowns 9
+DEAL::Residual step i=0:   jacobi=1.2946, cheby=0.0432
+DEAL::Residual step i=1:   jacobi=1.3005, cheby=0.0339
+DEAL::Residual step i=2:   jacobi=0.7640, cheby=0.0260
+DEAL::Size 8 Unknowns 49
+DEAL::Residual step i=0:   jacobi=3.3132, cheby=0.1465
+DEAL::Residual step i=1:   jacobi=3.5095, cheby=0.1507
+DEAL::Residual step i=2:   jacobi=2.9701, cheby=0.1604
+DEAL::Size 16 Unknowns 225
+DEAL::Residual step i=0:   jacobi=7.5744, cheby=3.4216
+DEAL::Residual step i=1:   jacobi=7.6760, cheby=3.4354
+DEAL::Residual step i=2:   jacobi=7.0389, cheby=3.1193

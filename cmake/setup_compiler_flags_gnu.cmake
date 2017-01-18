@@ -111,6 +111,12 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-c++11-extensions")
 
   #
+  # Disable a diagnostic that warns about potentially uninstantiated static
+  # members. This leads to a ton of false positives.
+  #
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-undefined-var-template")
+
+  #
   # Clang versions prior to 3.6 emit a lot of false positives wrt
   # "-Wunused-function". Also suppress warnings for Xcode older than 6.3
   # (which is equivalent to clang < 3.6).
@@ -152,6 +158,13 @@ IF (CMAKE_BUILD_TYPE MATCHES "Release")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-funroll-loops")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-funroll-all-loops")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-fstrict-aliasing")
+
+  #
+  # There are many places in the library where we create a new typedef and then
+  # immediately use it in an Assert. Hence, only ignore unused typedefs in Release
+  # mode.
+  #
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-Wno-unused-local-typedefs")
 ENDIF()
 
 

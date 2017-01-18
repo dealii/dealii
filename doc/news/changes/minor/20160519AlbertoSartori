@@ -1,0 +1,3 @@
+New: Added PArpackSolver::reinit() when dealing with BlockVectors.
+<br>
+(Alberto Sartori, 2016/05/19)

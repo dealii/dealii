@@ -17,6 +17,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/utilities.h>
+#include <deal.II/base/signaling_nan.h>
 #include <sstream>
 #include <iostream>
 #include <iomanip>
@@ -41,13 +42,24 @@ DEAL_II_NAMESPACE_OPEN
 // current process
 Timer::Timer()
   :
+  start_time (0.),
+  start_time_children (0.),
+  start_wall_time (0.),
   cumulative_time (0.),
-  cumulative_wall_time (0.)
+  cumulative_wall_time (0.),
+  last_lap_time (0.),
+  running (false)
 #ifdef DEAL_II_WITH_MPI
-  , mpi_communicator (MPI_COMM_SELF)
-  , sync_wall_time (false)
+  ,
+  mpi_communicator (MPI_COMM_SELF),
+  sync_wall_time (false)
 #endif
 {
+#ifdef DEAL_II_WITH_MPI
+  mpi_data.sum = mpi_data.min = mpi_data.max = mpi_data.avg = numbers::signaling_nan<double>();
+  mpi_data.min_index = mpi_data.max_index = numbers::invalid_unsigned_int;
+#endif
+
   start();
 }
 
@@ -57,16 +69,28 @@ Timer::Timer()
 // the communicator given from input
 #ifdef DEAL_II_WITH_MPI
 Timer::Timer(MPI_Comm mpi_communicator,
-             bool sync_wall_time_)
+             const bool sync_wall_time_)
   :
+  start_time (0.),
+  start_time_children (0.),
+  start_wall_time (0.),
   cumulative_time (0.),
   cumulative_wall_time (0.),
+  last_lap_time (0.),
+  running (false),
   mpi_communicator (mpi_communicator),
   sync_wall_time(sync_wall_time_)
 {
+#ifdef DEAL_II_WITH_MPI
+  mpi_data.sum = mpi_data.min = mpi_data.max = mpi_data.avg = numbers::signaling_nan<double>();
+  mpi_data.min_index = mpi_data.max_index = numbers::invalid_unsigned_int;
+#endif
+
   start();
 }
 #endif
+
+
 
 #ifdef DEAL_II_MSVC
 
@@ -106,7 +130,10 @@ void Timer::start ()
 
 #ifdef DEAL_II_WITH_MPI
   if (sync_wall_time)
-    MPI_Barrier(mpi_communicator);
+    {
+      const int ierr = MPI_Barrier(mpi_communicator);
+      AssertThrowMPI(ierr);
+    }
 #endif
 
 #if defined(DEAL_II_HAVE_SYS_TIME_H) && defined(DEAL_II_HAVE_SYS_RESOURCE_H)
@@ -506,9 +533,22 @@ TimerOutput::print_summary () const
           out_stream << std::setprecision(3);
           out_stream << i->second.total_cpu_time << "s |";
           out_stream << std::setw(10);
-          out_stream << std::setprecision(2);
           if (total_cpu_time != 0)
-            out_stream << i->second.total_cpu_time/total_cpu_time * 100 << "% |";
+            {
+              // if run time was less than 0.1%, just print a zero to avoid
+              // printing silly things such as "2.45e-6%". otherwise print
+              // the actual percentage
+              const double fraction = i->second.total_cpu_time/total_cpu_time;
+              if (fraction > 0.001)
+                {
+                  out_stream << std::setprecision(2);
+                  out_stream << fraction * 100;
+                }
+              else
+                out_stream << 0.0;
+
+              out_stream << "% |";
+            }
           else
             out_stream << 0.0 << "% |";
         }
@@ -564,11 +604,25 @@ TimerOutput::print_summary () const
           out_stream << std::setprecision(3);
           out_stream << i->second.total_wall_time << "s |";
           out_stream << std::setw(10);
-          out_stream << std::setprecision(2);
-          double value = i->second.total_wall_time/total_wall_time * 100;
-          if (!numbers::is_finite(value))
-            value = 0.0;
-          out_stream << value << "% |";
+
+          if (total_wall_time != 0)
+            {
+              // if run time was less than 0.1%, just print a zero to avoid
+              // printing silly things such as "2.45e-6%". otherwise print
+              // the actual percentage
+              const double fraction = i->second.total_wall_time/total_wall_time;
+              if (fraction > 0.001)
+                {
+                  out_stream << std::setprecision(2);
+                  out_stream << fraction * 100;
+                }
+              else
+                out_stream << 0.0;
+
+              out_stream << "% |";
+            }
+          else
+            out_stream << 0.0 << "% |";
         }
       out_stream << std::endl
                  << "+---------------------------------+-----------+"

@@ -21,5 +21,5 @@ DEAL::MyMatrix5::vmult_add
 DEAL::MyMatrix5::Tvmult_add
 DEAL::MyMatrix6::vmult
 DEAL::MyMatrix6::Tvmult
-DEAL::MyMatrix6::vmult_add
-DEAL::MyMatrix6::Tvmult_add
+DEAL::MyMatrix6::vmult
+DEAL::MyMatrix6::Tvmult

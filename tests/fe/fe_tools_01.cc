@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2015 by the deal.II authors
+// Copyright (C) 2006 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,6 +39,8 @@ void test_fe(const char *name)
           << '\t' << fe->dofs_per_quad
           << '\t' << fe->dofs_per_hex
           << std::endl;
+
+  delete fe;
 }
 
 

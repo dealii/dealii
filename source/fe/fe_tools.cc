@@ -1095,6 +1095,10 @@ namespace
       = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim> >);
     result["FE_DGQArbitraryNodes"]
       = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim> >);
+    result["FE_DGQLegendre"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGQLegendre<dim> >);
+    result["FE_DGQHermite"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGQHermite<dim> >);
     result["FE_FaceQ"]
       = FEFactoryPointer(new FETools::FEFactory<FE_FaceQ<dim> >);
     result["FE_FaceP"]
@@ -1134,6 +1138,10 @@ namespace
       = FEFactoryPointer(new FETools::FEFactory<FE_Nothing<dim,spacedim> >);
     result["FE_DGQArbitraryNodes"]
       = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim,spacedim> >);
+    result["FE_DGQLegendre"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGQLegendre<dim,spacedim> >);
+    result["FE_DGQHermite"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGQHermite<dim,spacedim> >);
     result["FE_Q_Bubbles"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Q_Bubbles<dim,spacedim> >);
     result["FE_Q_DG0"]
@@ -1604,15 +1612,15 @@ namespace FETools
 
 
   template<int dim, int spacedim>
-  void
-  compute_node_matrix(
-    FullMatrix<double> &N,
-    const FiniteElement<dim,spacedim> &fe)
+  FullMatrix<double>
+  compute_node_matrix(const FiniteElement<dim,spacedim> &fe)
   {
     const unsigned int n_dofs = fe.dofs_per_cell;
+
+    FullMatrix<double> N (n_dofs, n_dofs);
+
     Assert (fe.has_generalized_support_points(), ExcNotInitialized());
-    Assert (N.n()==n_dofs, ExcDimensionMismatch(N.n(), n_dofs));
-    Assert (N.m()==n_dofs, ExcDimensionMismatch(N.m(), n_dofs));
+    Assert (fe.n_components() == dim, ExcNotImplemented());
 
     const std::vector<Point<dim> > &points = fe.get_generalized_support_points();
 
@@ -1634,16 +1642,39 @@ namespace FETools
     // yield identity.
     for (unsigned int i=0; i<n_dofs; ++i)
       {
-        for (unsigned int k=0; k<values[0].size(); ++k)
+        // get the values of the current set of shape functions
+        // at the generalized support points
+        for (unsigned int k=0; k<points.size(); ++k)
           for (unsigned int d=0; d<dim; ++d)
-            values[d][k] = fe.shape_value_component(i,points[k],d);
+            {
+              values[d][k] = fe.shape_value_component(i,points[k],d);
+              Assert (numbers::is_finite(values[d][k]), ExcInternalError());
+            }
+
         fe.interpolate(local_dofs, values);
+
         // Enter the interpolated dofs
         // into the matrix
         for (unsigned int j=0; j<n_dofs; ++j)
-          N(j,i) = local_dofs[j];
+          {
+            N(j,i) = local_dofs[j];
+            Assert (numbers::is_finite(local_dofs[j]), ExcInternalError());
+          }
       }
+
+    return N;
   }
+
+
+
+  template<int dim, int spacedim>
+  void
+  compute_node_matrix(FullMatrix<double> &M,
+                      const FiniteElement<dim,spacedim> &fe)
+  {
+    M = compute_node_matrix (fe);
+  }
+
 
 
   /*

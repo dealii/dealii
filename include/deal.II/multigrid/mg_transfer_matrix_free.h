@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2016 by the deal.II authors
+// Copyright (C) 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,7 +23,6 @@
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/base/mg_level_object.h>
 #include <deal.II/multigrid/mg_transfer.h>
-#include <deal.II/matrix_free/shape_info.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -90,6 +89,9 @@ public:
    * <tt>to_level</tt> using the embedding matrices of the underlying finite
    * element. The previous content of <tt>dst</tt> is overwritten.
    *
+   * @param to_level The index of the level to prolongate to, which is the
+   * level of @p dst.
+   *
    * @param src is a vector with as many elements as there are degrees of
    * freedom on the coarser level involved.
    *
@@ -108,6 +110,9 @@ public:
    * some degrees of freedom in <tt>dst</tt> are active and will not be
    * altered. For the other degrees of freedom, the result of the restriction
    * is added.
+   *
+   * @param from_level The index of the level to restrict from, which is the
+   * level of @p src.
    *
    * @param src is a vector with as many elements as there are degrees of
    * freedom on the finer level involved.
@@ -182,9 +187,9 @@ private:
 
   /**
    * Holds the one-dimensional embedding (prolongation) matrix from mother
-   * element to the children.
+   * element to all the children.
    */
-  internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
+  AlignedVector<VectorizedArray<Number> > prolongation_matrix_1d;
 
   /**
    * Holds the temporary values for the tensor evaluation

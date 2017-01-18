@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II Authors
+## Copyright (C) 2012 - 2016 by the deal.II Authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -21,6 +21,7 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION)
   MESSAGE(STATUS "")
   MESSAGE(STATUS "Setting up documentation")
 
+  ADD_SUBDIRECTORY(news)
   ADD_SUBDIRECTORY(doxygen)
 
   #
@@ -32,6 +33,7 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION)
     PATTERN "CMakeLists.txt" EXCLUDE
     PATTERN "doxygen" EXCLUDE
     PATTERN "*.in" EXCLUDE
+    PATTERN "news" EXCLUDE
     )
 
   CONFIGURE_FILE(
@@ -66,7 +68,6 @@ INSTALL(FILES
 
 FILE(GLOB _misc
   ${CMAKE_CURRENT_SOURCE_DIR}/doxygen/headers/*.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/news/changes.h
   )
 
 ADD_LIBRARY(doxygen_headers OBJECT ${_misc})

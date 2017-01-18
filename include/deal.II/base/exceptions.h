@@ -143,6 +143,11 @@ protected:
 
 private:
   /**
+   * Copy operator. Made private since it is not used and not implemented.
+   */
+  ExceptionBase operator= (const ExceptionBase &exc);
+
+  /**
    * Internal function that generates the c_string. Called by what().
    */
   void generate_message() const;
@@ -219,26 +224,40 @@ namespace deal_II_exceptions
     /**
      * Conditionally abort the program.
      *
-     * Depending on whether disable_abort_on_exception was called, this
-     * function either aborts the program flow by printing the error message
-     * provided by @p exc and calling <tt>std::abort()</tt>, or throws @p exc
-     * instead (if @p nothrow is set to <tt>false</tt>).
+     * Depending on whether deal_II_exceptions::disable_abort_on_exception was
+     * called, this function either aborts the program flow by printing the
+     * error message provided by @p exc and calling <tt>std::abort()</tt>, or
+     * throws @p exc instead (if @p nothrow is set to <tt>false</tt>).
      *
-     * If the boolean @p nothrow is set to true and disable_abort_on_exception
-     * was called, the exception type is just printed to deallog and program
-     * flow continues. This is useful if throwing an exception is prohibited
+     * If the boolean @p nothrow is set to true and
+     * deal_II_exceptions::disable_abort_on_exception was called, the
+     * exception type is just printed to deallog and program flow
+     * continues. This is useful if throwing an exception is prohibited
      * (e.g. in a destructor with <tt>noexcept(true)</tt> or
      * <tt>throw()</tt>).
      */
     void abort (const ExceptionBase &exc, bool nothrow = false);
 
     /**
-     * An enum describing how to treat an exception in issue_error
+     * An enum describing how to treat an exception in issue_error.
      */
     enum ExceptionHandling
     {
+      /**
+       * Abort the program by calling <code>std::abort</code> unless
+       * deal_II_exceptions::disable_abort_on_exception has been called: in
+       * that case the program will throw an exception.
+       */
       abort_on_exception,
+      /**
+       * Throw the exception normally.
+       */
       throw_on_exception,
+      /**
+       * Call <code>std::abort</code> as long as
+       * deal_II_exceptions::disable_abort_on_exception has not been called:
+       * if it has, then just print a description of the exception to deallog.
+       */
       abort_nothrow_on_exception
     };
 
@@ -393,7 +412,7 @@ namespace deal_II_exceptions
     Exception (const std::string &msg = defaulttext) : arg (msg) {}       \
     virtual ~Exception () DEAL_II_NOEXCEPT {}                             \
     virtual void print_info (std::ostream &out) const {                   \
-      out << arg << std::endl;                                            \
+      out << "    " << arg << std::endl;                                  \
     }                                                                     \
   private:                                                                \
     const std::string arg;                                                \
@@ -411,7 +430,7 @@ namespace deal_II_exceptions
     Exception1 (const type1 a1) : arg1 (a1) {}                            \
     virtual ~Exception1 () DEAL_II_NOEXCEPT {}                            \
     virtual void print_info (std::ostream &out) const {                   \
-      out outsequence << std::endl;                                       \
+      out << "    " outsequence << std::endl;                             \
     }                                                                     \
   private:                                                                \
     const type1 arg1;                                                     \
@@ -431,7 +450,7 @@ namespace deal_II_exceptions
       arg1 (a1), arg2(a2) {}                                              \
     virtual ~Exception2 () DEAL_II_NOEXCEPT {}                            \
     virtual void print_info (std::ostream &out) const {                   \
-      out outsequence << std::endl;                                       \
+      out << "    " outsequence << std::endl;                             \
     }                                                                     \
   private:                                                                \
     const type1 arg1;                                                     \
@@ -452,7 +471,7 @@ namespace deal_II_exceptions
       arg1 (a1), arg2(a2), arg3(a3) {}                                    \
     virtual ~Exception3 () DEAL_II_NOEXCEPT {}                            \
     virtual void print_info (std::ostream &out) const {                   \
-      out outsequence << std::endl;                                       \
+      out << "    " outsequence << std::endl;                             \
     }                                                                     \
   private:                                                                \
     const type1 arg1;                                                     \
@@ -475,7 +494,7 @@ namespace deal_II_exceptions
       arg1 (a1), arg2(a2), arg3(a3), arg4(a4) {}                          \
     virtual ~Exception4 () DEAL_II_NOEXCEPT {}                            \
     virtual void print_info (std::ostream &out) const {                   \
-      out outsequence << std::endl;                                       \
+      out << "    " outsequence << std::endl;                             \
     }                                                                     \
   private:                                                                \
     const type1 arg1;                                                     \
@@ -499,7 +518,7 @@ namespace deal_II_exceptions
       arg1 (a1), arg2(a2), arg3(a3), arg4(a4), arg5(a5) {}                \
     virtual ~Exception5 () DEAL_II_NOEXCEPT {}                            \
     virtual void print_info (std::ostream &out) const {                   \
-      out outsequence << std::endl;                                       \
+      out << "    " outsequence << std::endl;                             \
     }                                                                     \
   private:                                                                \
     const type1 arg1;                                                     \
@@ -768,7 +787,7 @@ namespace StandardExceptions
                     "example would be that the first part of an algorithm "
                     "sorts elements of an array in ascending order, and "
                     "a second part of the algorithm later encounters an "
-                    "an element that is not larger than the previous one."
+                    "element that is not larger than the previous one."
                     "\n\n"
                     "There is usually not very much you can do if you "
                     "encounter such an exception since it indicates an error "
@@ -1077,6 +1096,40 @@ namespace StandardExceptions
                   << arg1);
 #endif
 //@}
+
+#ifdef DEAL_II_WITH_MPI
+  /**
+   * Exception for MPI errors. This exception is only defined if
+   * <code>deal.II</code> is compiled with MPI support. This exception should
+   * be used with <code>AssertThrow</code> to check error codes of MPI
+   * functions. For example:
+   * @code
+   * const int ierr = MPI_Isend(...);
+   * AssertThrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
+   * @endcode
+   * or, using the convenience macro <code>AssertThrowMPI</code>,
+   * @code
+   * const int ierr = MPI_Irecv(...);
+   * AssertThrowMPI(ierr);
+   * @endcode
+   *
+   * If the assertion fails then the error code will be used to print a helpful
+   * message to the screen by utilizing the <code>MPI_Error_string</code>
+   * function.
+   *
+   * @ingroup Exceptions
+   * @author David Wells, 2016
+   */
+  class ExcMPI : public dealii::ExceptionBase
+  {
+  public:
+    ExcMPI (const int error_code);
+
+    virtual void print_info (std::ostream &out) const;
+
+    const int error_code;
+  };
+#endif // DEAL_II_WITH_MPI
 } /*namespace StandardExceptions*/
 
 
@@ -1143,6 +1196,23 @@ namespace StandardExceptions
  */
 #define AssertIsFinite(number) Assert(dealii::numbers::is_finite(number), \
                                       dealii::ExcNumberNotFinite(std::complex<double>(number)))
+
+#ifdef DEAL_II_WITH_MPI
+/**
+ * An assertion that checks whether or not an error code returned by an MPI
+ * function is equal to <code>MPI_SUCCESS</code>. If the check fails then an
+ * exception of type ExcMPI is thrown with the given error code as an
+ * argument.
+ *
+ * @note Active only if deal.II is compiled with MPI
+ * @ingroup Exceptions
+ * @author David Wells, 2016
+ */
+#define AssertThrowMPI(error_code) AssertThrow(error_code == MPI_SUCCESS, \
+                                               dealii::ExcMPI(error_code))
+#else
+#define AssertThrowMPI(error_code) {}
+#endif // DEAL_II_WITH_MPI
 
 #ifdef DEAL_II_WITH_CUDA
 /**

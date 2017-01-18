@@ -23,8 +23,9 @@ SET(_src
   block_vector.cc
   chunk_sparse_matrix.cc
   chunk_sparsity_pattern.cc
-  dynamic_sparsity_pattern.cc
   constraint_matrix.cc
+  dynamic_sparsity_pattern.cc
+  exceptions.cc
   full_matrix.cc
   lapack_full_matrix.cc
   la_vector.cc

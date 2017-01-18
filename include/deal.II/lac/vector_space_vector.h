@@ -129,6 +129,11 @@ namespace LinearAlgebra
     virtual void equ(const Number a, const VectorSpaceVector<Number> &V) = 0;
 
     /**
+     * Return the mean value of all the entries of this vector.
+     */
+    virtual value_type mean_value() const = 0;
+
+    /**
      * Return the l<sub>1</sub> norm of the vector (i.e., the sum of the
      * absolute values of all entries among all processors).
      */
@@ -167,6 +172,11 @@ namespace LinearAlgebra
                                const VectorSpaceVector<Number> &W) = 0;
 
     /**
+     * This function does nothing and only exists for backward compatibility.
+     */
+    virtual void compress(VectorOperation::values) {}
+
+    /**
      * Return the global size of the vector, equal to the sum of the number of
      * locally owned indices among all processors.
      */
@@ -197,8 +207,25 @@ namespace LinearAlgebra
      * Return the memory consumption of this class in bytes.
      */
     virtual std::size_t memory_consumption() const = 0;
+
+    /**
+     * Destructor. Declared as virtual so that inheriting classes (which may
+     * manage their own memory) are destroyed correctly.
+     */
+    virtual ~VectorSpaceVector();
   };
   /*@}*/
+
+
+
+#ifndef DOXYGEN
+  // TODO we can get rid of this when we require C++11 by using '=default'
+  // above
+  template <typename Number>
+  inline
+  VectorSpaceVector<Number>::~VectorSpaceVector()
+  {}
+#endif // DOXYGEN
 }
 
 DEAL_II_NAMESPACE_CLOSE

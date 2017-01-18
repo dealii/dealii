@@ -121,7 +121,7 @@ protected:
    * Evaluate the Gamma function $ \Gamma(n) = (n-1)! $.
    * @param n  point of evaluation (integer).
    */
-  long double gamma(const unsigned int n) const;
+  static long double gamma(const unsigned int n);
 };
 
 
@@ -224,19 +224,20 @@ public:
   QGaussLog(const unsigned int n,
             const bool revert=false);
 
-protected:
+private:
   /**
-   * Set the points of the quadrature formula.
+   * Compute the points of the quadrature formula.
    */
+  static
   std::vector<double>
-  set_quadrature_points(const unsigned int n) const;
+  get_quadrature_points(const unsigned int n);
 
   /**
-   * Set the weights of the quadrature formula.
+   * Compute the weights of the quadrature formula.
    */
+  static
   std::vector<double>
-  set_quadrature_weights(const unsigned int n) const;
-
+  get_quadrature_weights(const unsigned int n);
 };
 
 
@@ -584,7 +585,17 @@ public:
   /* EndPoint is used to specify which of the two endpoints of the unit interval
    * is used also as quadrature point
    */
-  enum EndPoint { left,right };
+  enum EndPoint
+  {
+    /**
+     * Left end point.
+     */
+    left,
+    /**
+     * Right end point.
+     */
+    right
+  };
   /// Generate a formula with <tt>n</tt> quadrature points
   QGaussRadauChebyshev(const unsigned int n,
                        EndPoint ep=QGaussRadauChebyshev::left);
@@ -657,10 +668,10 @@ long double QGaussLobatto<1>::
 JacobiP(const long double, const int, const int, const unsigned int) const;
 template <>
 long double
-QGaussLobatto<1>::gamma(const unsigned int n) const;
+QGaussLobatto<1>::gamma(const unsigned int n);
 
-template <> std::vector<double> QGaussLog<1>::set_quadrature_points(const unsigned int) const;
-template <> std::vector<double> QGaussLog<1>::set_quadrature_weights(const unsigned int) const;
+template <> std::vector<double> QGaussLog<1>::get_quadrature_points(const unsigned int);
+template <> std::vector<double> QGaussLog<1>::get_quadrature_weights(const unsigned int);
 
 template <> QMidpoint<1>::QMidpoint ();
 template <> QTrapez<1>::QTrapez ();

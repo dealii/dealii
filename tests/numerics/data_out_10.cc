@@ -37,8 +37,6 @@
 
 void test()
 {
-  DataOut<2> data_out;
-
   const unsigned int number_of_time_steps = 3;
   std::vector<std::pair<double,std::vector<std::string > > > times_and_piece_names(number_of_time_steps);
 
@@ -53,7 +51,7 @@ void test()
   times_and_piece_names[2].first = 1.0;
   times_and_piece_names[2].second.push_back("subdomain-01.time_step_2.vtk");
   times_and_piece_names[2].second.push_back("subdomain-02.time_step_2.vtk");
-  data_out.write_visit_record(deallog.get_file_stream(), times_and_piece_names);
+  DataOutBase::write_visit_record(deallog.get_file_stream(), times_and_piece_names);
 
   deallog << "OK" << std::endl;
 

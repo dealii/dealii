@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2016 by the deal.II authors
+// Copyright (C) 2003 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -57,27 +57,16 @@ FE_BDM<dim>::FE_BDM (const unsigned int deg)
   // Set up the generalized support
   // points
   initialize_support_points (deg);
-  //Now compute the inverse node
-  //matrix, generating the correct
-  //basis functions from the raw
-  //ones.
 
-  // We use an auxiliary matrix in
-  // this function. Therefore,
-  // inverse_node_matrix is still
-  // empty and shape_value_component
-  // returns the 'raw' shape values.
-  FullMatrix<double> M(n_dofs, n_dofs);
-  FETools::compute_node_matrix(M, *this);
-
-//   std::cout << std::endl;
-//   M.print_formatted(std::cout, 2, true);
-
+  // Now compute the inverse node matrix, generating the correct
+  // basis functions from the raw ones. For a discussion of what
+  // exactly happens here, see FETools::compute_node_matrix.
+  const FullMatrix<double> M = FETools::compute_node_matrix(*this);
   this->inverse_node_matrix.reinit(n_dofs, n_dofs);
   this->inverse_node_matrix.invert(M);
-  // From now on, the shape functions
-  // will be the correct ones, not
-  // the raw shape functions anymore.
+  // From now on, the shape functions provided by FiniteElement::shape_value
+  // and similar functions will be the correct ones, not
+  // the raw shape functions from the polynomial space anymore.
 
   // Embedding errors become pretty large, so we just replace the
   // regular threshold in both "computing_..." functions by 1.
@@ -231,21 +220,21 @@ template <int dim>
 std::vector<unsigned int>
 FE_BDM<dim>::get_dpo_vector (const unsigned int deg)
 {
+  // compute the number of unknowns per cell interior/face/edge
+  //
+  // for the number of interior dofs, this is the number of
+  // polynomials up to degree deg-2 in dim dimensions.
+  //
   // the element is face-based and we have as many degrees of freedom
   // on the faces as there are polynomials of degree up to
   // deg. Observe the odd convention of
   // PolynomialSpace::compute_n_pols()!
-  unsigned int dofs_per_face = PolynomialSpace<dim-1>::compute_n_pols(deg+1);
 
-  // and then there are interior dofs, namely the number of
-  // polynomials up to degree deg-2 in dim dimensions.
-  unsigned int interior_dofs = 0;
-  if (deg>1)
-    interior_dofs = dim * PolynomialSpace<dim>::compute_n_pols(deg-1);
-
-  std::vector<unsigned int> dpo(dim+1);
-  dpo[dim-1] = dofs_per_face;
-  dpo[dim]   = interior_dofs;
+  std::vector<unsigned int> dpo(dim+1, 0u);
+  dpo[dim]   = (deg > 1 ?
+                dim * PolynomialSpace<dim>::compute_n_pols(deg-1) :
+                0u);
+  dpo[dim-1] = PolynomialSpace<dim-1>::compute_n_pols(deg+1);
 
   return dpo;
 }
@@ -263,9 +252,9 @@ FE_BDM<dim>::get_ria_vector (const unsigned int deg)
     }
 
   const unsigned int dofs_per_cell = PolynomialsBDM<dim>::compute_n_pols(deg);
-  const unsigned int dofs_per_face = PolynomialSpace<dim-1>::compute_n_pols(deg);
+  const unsigned int dofs_per_face = PolynomialSpace<dim-1>::compute_n_pols(deg+1);
 
-  Assert(GeometryInfo<dim>::faces_per_cell*dofs_per_face < dofs_per_cell,
+  Assert(GeometryInfo<dim>::faces_per_cell*dofs_per_face <= dofs_per_cell,
          ExcInternalError());
 
   // all dofs need to be

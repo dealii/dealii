@@ -1,0 +1,3 @@
+Fixed: Increased precision of timesteps in DataOutInterface::write_pvd_record().
+<br>
+(Rajat Arora, 2016/10/29)

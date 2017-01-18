@@ -119,13 +119,13 @@ public:
   void use_matrix(const MatrixType &M);
 
   /**
-   * Return the dimension of the codomain (or range) space. To remember: the
+   * Return the dimension of the codomain (or range) space. Note that the
    * matrix is of dimension $m \times n$.
    */
   size_type m () const;
 
   /**
-   * Return the dimension of the domain space. To remember: the matrix is of
+   * Return the dimension of the domain space. Note that the matrix is of
    * dimension $m \times n$.
    */
   size_type n () const;
@@ -143,7 +143,14 @@ public:
   virtual void Tvmult (VectorType &dst, const VectorType &src) const;
 
   /**
-   * Get the names of all implemented preconditionings.
+   * Get the names of all implemented preconditionings. The list of possible
+   * options includes:
+   * <ul>
+   * <li>  "none" </li>
+   * <li>  "jacobi" </li>
+   * <li>  "sor" </li>
+   * <li>  "ssor" </li>
+   * </ul>
    */
   static std::string get_precondition_names();
 

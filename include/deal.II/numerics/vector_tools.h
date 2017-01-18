@@ -21,6 +21,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/std_cxx11/function.h>
 #include <deal.II/dofs/function_map.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/hp/dof_handler.h>
@@ -35,6 +36,7 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, typename Number> class Function;
 template <int dim> class Quadrature;
 template <int dim> class QGauss;
+template <int dim, typename number> class MatrixFree;
 
 template <typename number> class Vector;
 template <typename number> class FullMatrix;
@@ -737,7 +739,6 @@ namespace VectorTools
                                  const ConstraintMatrix              &constraints,
                                  VectorType                          &u2);
 
-
   /**
    * The same function as above, but takes an InterGridMap object directly as
    * a parameter. Useful for interpolating several vectors at the same time.
@@ -762,20 +763,30 @@ namespace VectorTools
    * that you need not give a second quadrature formula if you don't want to
    * project to the boundary first, but that you must if you want to do so.
    *
-   * This function needs the mass matrix of the finite element space on the
-   * present grid. To this end, the mass matrix is assembled exactly using
-   * MatrixTools::create_mass_matrix. This function performs numerical
-   * quadrature using the given quadrature rule; you should therefore make
-   * sure that the given quadrature formula is also sufficient for the
-   * integration of the mass matrix.
+   * A MatrixFree implementation is used if the following conditions are met:
+   * - @p enforce_zero_boundary is false,
+   * - @p project_to_boundary_first is false,
+   * - the FiniteElement is supported by the MatrixFree class,
+   * - the FiniteElement has less than five components
+   * - the degree of the FiniteElement is less than nine.
+   * - dim==spacedim
+   *
+   * In this case, this function performs numerical quadrature using the given
+   * quadrature formula for integration of the provided function while a
+   * QGauss(fe_degree+2) object is used for the mass operator. You should
+   * therefore make sure that the given quadrature formula is sufficient for
+   * creating the right-hand side.
+   *
+   * Otherwise, only serial Triangulations are supported and the mass matrix
+   * is assembled exactly using MatrixTools::create_mass_matrix and the same
+   * quadrature rule as for the right-hand side.
+   * You should therefore make sure that the given quadrature formula is also
+   * sufficient for creating the mass matrix.
    *
    * See the general documentation of this namespace for further information.
    *
    * In 1d, the default value of the boundary quadrature formula is an invalid
    * object since integration on the boundary doesn't happen in 1d.
-   *
-   * @note This function is not implemented for MPI parallel computations,
-   * see step-32 for a way to do a projection in parallel.
    *
    * @param[in] mapping The mapping object to use.
    * @param[in] dof The DoFHandler the describes the finite element space to
@@ -786,7 +797,8 @@ namespace VectorTools
    * mass matrix.
    * @param[in] function The function to project into the finite element space.
    * @param[out] vec The output vector where the projected function will be
-   * stored in. This vector is required to be already initialized.
+   * stored in. This vector is required to be already initialized and must not
+   * have ghost elements.
    * @param[in] enforce_zero_boundary If true, @p vec will have zero boundary
    * conditions.
    * @param[in] q_boundary Quadrature rule to be used if @p project_to_boundary_first
@@ -855,6 +867,71 @@ namespace VectorTools
                     QGauss<dim-1>(2) :
                     Quadrature<dim-1>(0)),
                 const bool                          project_to_boundary_first = false);
+
+  /**
+   * The same as above for projection of scalar-valued quadrature data.
+   * The user provided function should return a value at the quadrature point
+   * based on the cell iterator and quadrature number and of course should be
+   * consistent with the provided @p quadrature object, which will be used
+   * to assemble the right-hand-side.
+   *
+   * This function can be used with lambdas:
+   * @code
+   * VectorTools::project
+   * (mapping,
+   *  dof_handler,
+   *  constraints,
+   *  quadrature_formula,
+   *  [=] (const typename DoFHandler<dim>::active_cell_iterator & cell, const unsigned int q) -> double
+   *  { return qp_data.get_data(cell)[q]->density; },
+   *  field);
+   * @endcode
+   * where <code>qp_data</code> is a CellDataStorage object, which stores
+   * quadrature point data.
+   */
+  template <int dim, typename VectorType, int spacedim>
+  void project (const Mapping<dim, spacedim>   &mapping,
+                const DoFHandler<dim,spacedim> &dof,
+                const ConstraintMatrix         &constraints,
+                const Quadrature<dim>          &quadrature,
+                const std_cxx11::function< typename VectorType::value_type (const typename DoFHandler<dim, spacedim>::active_cell_iterator &, const unsigned int)> func,
+                VectorType                     &vec_result);
+
+  /**
+   * The same as above for projection of scalar-valued MatrixFree quadrature
+   * data.
+   * The user provided function @p func should return a VectorizedArray value
+   * at the quadrature point based on the cell number and quadrature number and
+   * should be consistent with the @p n_q_points_1d.
+   *
+   * This function can be used with lambdas:
+   * @code
+   * VectorTools::project
+   * (matrix_free_data,
+   *  constraints,
+   *  3,
+   *  [=] (const unsigned int cell, const unsigned int q) -> VectorizedArray<double>
+   *  { return qp_data(cell,q); },
+   *  field);
+   * @endcode
+   * where <code>qp_data</code> is a an object of type Table<2, VectorizedArray<double> >,
+   * which stores quadrature point data.
+   */
+  template <int dim, typename VectorType>
+  void project (std_cxx11::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > data,
+                const ConstraintMatrix &constraints,
+                const unsigned int n_q_points_1d,
+                const std_cxx11::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
+                VectorType &vec_result);
+
+  /**
+   * Same as above but for <code>n_q_points_1d = matrix_free.get_dof_handler().get_fe().degree+1</code>.
+   */
+  template <int dim, typename VectorType>
+  void project (std_cxx11::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > data,
+                const ConstraintMatrix &constraints,
+                const std_cxx11::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
+                VectorType &vec_result);
 
   /**
    * Compute Dirichlet boundary conditions.  This function makes up a map of
@@ -1609,8 +1686,11 @@ namespace VectorTools
    * function multiple times with only one boundary indicator, or whether we
    * call the function once with the whole set of boundary indicators at once.
    *
-   * The fourth parameter describes the boundary function that is used for
-   * computing these constraints.
+   * Argument four (@p function_map) describes the boundary function $\vec u_\Gamma$
+   * for each boundary id. The function <code>function_map[id]</code>
+   * is used on boundary with id @p id taken from the set @p boundary_ids.
+   * Each function in @p function_map is expected to have @p dim
+   * components, which are used independent of @p first_vector_component.
    *
    * The mapping argument is used to compute the boundary points at which the
    * function needs to request the normal vector $\vec n$ from the boundary
@@ -1858,41 +1938,45 @@ namespace VectorTools
    *
    * See the general documentation of this namespace for further information.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType>
   void create_right_hand_side (const Mapping<dim, spacedim>    &mapping,
                                const DoFHandler<dim,spacedim>  &dof,
                                const Quadrature<dim>           &q,
-                               const Function<spacedim,double> &rhs,
-                               Vector<double>                  &rhs_vector);
+                               const Function<spacedim,typename VectorType::value_type> &rhs,
+                               VectorType                      &rhs_vector,
+                               const ConstraintMatrix          &constraints=ConstraintMatrix());
 
   /**
    * Call the create_right_hand_side() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType>
   void create_right_hand_side (const DoFHandler<dim,spacedim>  &dof,
                                const Quadrature<dim>           &q,
-                               const Function<spacedim,double> &rhs,
-                               Vector<double>                  &rhs_vector);
+                               const Function<spacedim,typename VectorType::value_type> &rhs,
+                               VectorType                      &rhs_vector,
+                               const ConstraintMatrix          &constraints=ConstraintMatrix());
 
   /**
    * Like the previous set of functions, but for hp objects.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType>
   void create_right_hand_side (const hp::MappingCollection<dim,spacedim> &mapping,
                                const hp::DoFHandler<dim,spacedim>        &dof,
                                const hp::QCollection<dim>                &q,
-                               const Function<spacedim,double>           &rhs,
-                               Vector<double>                            &rhs_vector);
+                               const Function<spacedim,typename VectorType::value_type> &rhs,
+                               VectorType                                &rhs_vector,
+                               const ConstraintMatrix                    &constraints=ConstraintMatrix());
 
   /**
    * Like the previous set of functions, but for hp objects.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType>
   void create_right_hand_side (const hp::DoFHandler<dim,spacedim> &dof,
                                const hp::QCollection<dim>         &q,
-                               const Function<spacedim,double>    &rhs,
-                               Vector<double>                     &rhs_vector);
+                               const Function<spacedim,typename VectorType::value_type> &rhs,
+                               VectorType                         &rhs_vector,
+                               const ConstraintMatrix             &constraints=ConstraintMatrix());
 
   /**
    * Create a right hand side vector for a point source at point @p p. In
@@ -2002,12 +2086,12 @@ namespace VectorTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  template <int dim, int spacedim>
-  void create_boundary_right_hand_side (const Mapping<dim,spacedim>      &mapping,
-                                        const DoFHandler<dim,spacedim>   &dof,
-                                        const Quadrature<dim-1> &q,
-                                        const Function<spacedim,double>     &rhs,
-                                        Vector<double>          &rhs_vector,
+  template <int dim, int spacedim, typename VectorType>
+  void create_boundary_right_hand_side (const Mapping<dim,spacedim>        &mapping,
+                                        const DoFHandler<dim,spacedim>     &dof,
+                                        const Quadrature<dim-1>            &q,
+                                        const Function<spacedim,typename VectorType::value_type> &rhs,
+                                        VectorType                         &rhs_vector,
                                         const std::set<types::boundary_id> &boundary_ids = std::set<types::boundary_id>());
 
   /**
@@ -2017,12 +2101,12 @@ namespace VectorTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType>
   void create_boundary_right_hand_side
   (const DoFHandler<dim,spacedim>     &dof,
    const Quadrature<dim-1>            &q,
-   const Function<spacedim,double>    &rhs,
-   Vector<double>                     &rhs_vector,
+   const Function<spacedim,typename VectorType::value_type> &rhs,
+   VectorType                         &rhs_vector,
    const std::set<types::boundary_id> &boundary_ids = std::set<types::boundary_id>());
 
   /**
@@ -2031,13 +2115,13 @@ namespace VectorTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType>
   void create_boundary_right_hand_side
   (const hp::MappingCollection<dim,spacedim> &mapping,
    const hp::DoFHandler<dim,spacedim>        &dof,
    const hp::QCollection<dim-1>              &q,
-   const Function<spacedim,double>           &rhs,
-   Vector<double>                            &rhs_vector,
+   const Function<spacedim,typename VectorType::value_type> &rhs,
+   VectorType                                &rhs_vector,
    const std::set<types::boundary_id>        &boundary_ids = std::set<types::boundary_id>());
 
   /**
@@ -2048,12 +2132,12 @@ namespace VectorTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename VectorType>
   void create_boundary_right_hand_side
   (const hp::DoFHandler<dim,spacedim> &dof,
    const hp::QCollection<dim-1>       &q,
-   const Function<spacedim,double>    &rhs,
-   Vector<double>                     &rhs_vector,
+   const Function<spacedim,typename VectorType::value_type> &rhs,
+   VectorType                         &rhs_vector,
    const std::set<types::boundary_id> &boundary_ids = std::set<types::boundary_id>());
 
   //@}

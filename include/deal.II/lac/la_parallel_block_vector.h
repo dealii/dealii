@@ -168,11 +168,6 @@ namespace LinearAlgebra
                    const MPI_Comm  communicator);
 
       /**
-       * Destructor. Clears memory.
-       */
-      ~BlockVector ();
-
-      /**
        * Copy operator: fill all components of the vector with the given
        * scalar value.
        */
@@ -396,7 +391,7 @@ namespace LinearAlgebra
        * the same number of blocks. If needed, the numbers of blocks should be
        * exchanged, too.
        *
-       * This function is analog to the the swap() function of all C++
+       * This function is analogous to the the swap() function of all C++
        * standard containers. Also, there is a global function swap(u,v) that
        * simply calls <tt>u.swap(v)</tt>, again in analogy to standard
        * functions.
@@ -462,6 +457,13 @@ namespace LinearAlgebra
        */
       virtual void add(const Number a, const VectorSpaceVector<Number> &V,
                        const Number b, const VectorSpaceVector<Number> &W);
+
+      /**
+       * A collective add operation: This function adds a whole set of values
+       * stored in @p values to the vector components specified by @p indices.
+       */
+      virtual void add (const std::vector<size_type> &indices,
+                        const std::vector<Number>    &values);
 
       /**
        * Scaling and simple addition of a multiple of a vector, i.e. <tt>*this =

@@ -319,7 +319,7 @@ namespace LinearAlgebra
        * only swaps the pointers to the data of the two vectors and therefore
        * does not need to allocate temporary storage and move data around.
        *
-       * This function is analog to the the @p swap function of all C++
+       * This function is analogous to the the @p swap function of all C++
        * standard containers. Also, there is a global function
        * <tt>swap(u,v)</tt> that simply calls <tt>u.swap(v)</tt>, again in
        * analogy to standard functions.
@@ -585,6 +585,13 @@ namespace LinearAlgebra
                        const Number b, const VectorSpaceVector<Number> &W);
 
       /**
+       * A collective add operation: This function adds a whole set of values
+       * stored in @p values to the vector components specified by @p indices.
+       */
+      virtual void add (const std::vector<size_type> &indices,
+                        const std::vector<Number>    &values);
+
+      /**
        * Scaling and simple addition of a multiple of a vector, i.e. <tt>*this =
        * s*(*this)+a*V</tt>.
        */
@@ -693,6 +700,15 @@ namespace LinearAlgebra
       template <typename OtherNumber>
       void add (const std::vector<size_type>        &indices,
                 const ::dealii::Vector<OtherNumber> &values);
+
+      /**
+       * Take an address where n_elements are stored contiguously and add them
+       * into the vector.
+       */
+      template <typename OtherNumber>
+      void add (const size_type n_elements,
+                const size_type *indices,
+                const OtherNumber *values);
 
       /**
        * Scaling and simple vector addition, i.e.  <tt>*this =
@@ -890,7 +906,7 @@ namespace LinearAlgebra
       /**
        * Compute the mean value of all the entries in the vector.
        */
-      Number mean_value () const;
+      virtual Number mean_value () const;
 
       /**
        * $l_p$-norm of the vector. The pth root of the sum of the pth powers
@@ -916,7 +932,7 @@ namespace LinearAlgebra
        * respective reinit() call, for additional queries regarding the
        * parallel communication, or the compatibility of partitioners.
        */
-      std_cxx11::shared_ptr<const Utilities::MPI::Partitioner>
+      const std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> &
       get_partitioner () const;
 
       /**
@@ -1392,6 +1408,24 @@ namespace LinearAlgebra
 
 
     template <typename Number>
+    template <typename OtherNumber>
+    inline
+    void
+    Vector<Number>::add (const size_type n_elements,
+                         const size_type *indices,
+                         const OtherNumber *values)
+    {
+      for (size_type i=0; i<n_elements; ++i, ++indices, ++values)
+        {
+          Assert (numbers::is_finite(*values),
+                  ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+          this->operator()(*indices) += *values;
+        }
+    }
+
+
+
+    template <typename Number>
     inline
     const MPI_Comm &
     Vector<Number>::get_mpi_communicator() const
@@ -1403,7 +1437,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     inline
-    std_cxx11::shared_ptr<const Utilities::MPI::Partitioner>
+    const std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> &
     Vector<Number>::get_partitioner () const
     {
       return partitioner;

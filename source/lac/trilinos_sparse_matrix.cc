@@ -398,7 +398,6 @@ namespace TrilinosWrappers
         const std::pair<size_type, size_type>
         local_range = rhs.local_range();
 
-        int ierr;
         // Try to copy all the rows of the matrix one by one. In case of error
         // (i.e., the column indices are different), we need to abort and blow
         // away the matrix.
@@ -410,8 +409,8 @@ namespace TrilinosWrappers
             int n_entries, rhs_n_entries;
             TrilinosScalar *value_ptr, *rhs_value_ptr;
             int *index_ptr, *rhs_index_ptr;
-            ierr = rhs.matrix->ExtractMyRowView (row_local, rhs_n_entries,
-                                                 rhs_value_ptr, rhs_index_ptr);
+            int ierr = rhs.matrix->ExtractMyRowView (row_local, rhs_n_entries,
+                                                     rhs_value_ptr, rhs_index_ptr);
             (void)ierr;
             Assert (ierr == 0, ExcTrilinosError(ierr));
 
@@ -1774,7 +1773,6 @@ namespace TrilinosWrappers
     local_range = rhs.local_range();
     const bool same_col_map = matrix->ColMap().SameAs(rhs.matrix->ColMap());
 
-    int ierr;
     for (size_type row=local_range.first; row < local_range.second; ++row)
       {
         const int row_local =
@@ -1787,8 +1785,8 @@ namespace TrilinosWrappers
         int n_entries, rhs_n_entries;
         TrilinosScalar *value_ptr, *rhs_value_ptr;
         int *index_ptr, *rhs_index_ptr;
-        ierr = rhs.matrix->ExtractMyRowView (row_local, rhs_n_entries,
-                                             rhs_value_ptr, rhs_index_ptr);
+        int ierr = rhs.matrix->ExtractMyRowView (row_local, rhs_n_entries,
+                                                 rhs_value_ptr, rhs_index_ptr);
         (void)ierr;
         Assert (ierr == 0, ExcTrilinosError(ierr));
 

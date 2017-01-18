@@ -13,6 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
+#ifndef dealii__matrix_free_shape_info_templates_h
+#define dealii__matrix_free_shape_info_templates_h
+
 
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/memory_consumption.h>
@@ -40,8 +43,11 @@ namespace internal
     ShapeInfo<Number>::ShapeInfo ()
       :
       element_type (tensor_general),
+      fe_degree (numbers::invalid_unsigned_int),
       n_q_points (0),
-      dofs_per_cell (0)
+      dofs_per_cell (0),
+      n_q_points_face (0),
+      dofs_per_face (0)
     {}
 
 
@@ -245,8 +251,11 @@ namespace internal
         }
         case 1:
         {
-          this->face_indices(0,0) = 0;
-          this->face_indices(1,0) = n_dofs_1d-1;
+          if (this->dofs_per_face>0)
+            {
+              this->face_indices(0,0) = 0;
+              this->face_indices(1,0) = n_dofs_1d-1;
+            }
           break;
         }
         default:
@@ -416,3 +425,5 @@ namespace internal
 
 
 DEAL_II_NAMESPACE_CLOSE
+
+#endif

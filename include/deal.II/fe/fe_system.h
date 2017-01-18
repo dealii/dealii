@@ -28,6 +28,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+template <int dim, int spacedim> class FE_Enriched;
+
 
 /**
  * This class provides an interface to group several elements together into
@@ -686,7 +688,7 @@ public:
    * Code implementing this would then look like this:
    * @code
    * for (i=0; i<dofs_per_face; ++i)
-   *  if (fe.is_primitive(fe.face_to_equivalent_cell_index(i, some_face_no)))
+   *  if (fe.is_primitive(fe.face_to_cell_index(i, some_face_no)))
    *   ... do whatever
    * @endcode
    * The function takes additional arguments that account for the fact that
@@ -829,9 +831,8 @@ public:
    * meet at a common face, whether it is the other way around, whether
    * neither dominates, or if either could dominate.
    *
-   * For a definition of domination, see FiniteElementBase::Domination and in
-   * particular the
-   * @ref hp_paper "hp paper".
+   * For a definition of domination, see FiniteElementDomination::Domination
+   * and in particular the @ref hp_paper "hp paper".
    */
   virtual
   FiniteElementDomination::Domination
@@ -959,7 +960,6 @@ private:
       unsigned int> >
       base_elements;
 
-
   /**
    * Initialize the @p unit_support_points field of the FiniteElement class.
    * Called from the constructor.
@@ -1071,6 +1071,8 @@ private:
    * Mutex for protecting initialization of restriction and embedding matrix.
    */
   mutable Threads::Mutex mutex;
+
+  friend class FE_Enriched<dim,spacedim>;
 };
 
 

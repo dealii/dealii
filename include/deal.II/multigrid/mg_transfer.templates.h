@@ -201,10 +201,10 @@ MGLevelGlobalTransfer<VectorType>::copy_to_mg
   AssertIndexRange(dst.max_level(), mg_dof_handler.get_triangulation().n_global_levels());
   AssertIndexRange(dst.min_level(), dst.max_level()+1);
   reinit_vector(mg_dof_handler, component_to_block_map, dst);
-  bool first = true;
 #ifdef DEBUG_OUTPUT
   std::cout << "copy_to_mg src " << src.l2_norm() << std::endl;
-  MPI_Barrier(MPI_COMM_WORLD);
+  int ierr = MPI_Barrier(MPI_COMM_WORLD);
+  AssertThrowMPI(ierr);
 #endif
 
   if (perform_plain_copy)
@@ -214,13 +214,6 @@ MGLevelGlobalTransfer<VectorType>::copy_to_mg
       // the global DoFs are the same, we can do a plain copy
       AssertDimension(dst[dst.max_level()].size(), src.size());
       internal::copy_vector(copy_indices[dst.max_level()], src, dst[dst.max_level()]);
-
-      // do the initial restriction
-      for (unsigned int level=dst.max_level(); level != dst.min_level(); )
-        {
-          --level;
-          this->restrict_and_add (level+1, dst[level], dst[level+1]);
-        }
       return;
     }
 
@@ -228,7 +221,8 @@ MGLevelGlobalTransfer<VectorType>::copy_to_mg
     {
       --level;
 #ifdef DEBUG_OUTPUT
-      MPI_Barrier(MPI_COMM_WORLD);
+      ierr = MPI_Barrier(MPI_COMM_WORLD);
+      AssertThrowMPI(ierr);
 #endif
 
       typedef std::vector<std::pair<types::global_dof_index, types::global_dof_index> >::const_iterator dof_pair_iterator;
@@ -248,19 +242,10 @@ MGLevelGlobalTransfer<VectorType>::copy_to_mg
       dst_level.compress(VectorOperation::insert);
 
 #ifdef DEBUG_OUTPUT
-      MPI_Barrier(MPI_COMM_WORLD);
+      ierr = MPI_Barrier(MPI_COMM_WORLD);
+      AssertThrowMPI(ierr);
       std::cout << "copy_to_mg dst " << level << " " << dst_level.l2_norm() << std::endl;
 #endif
-
-      if (!first)
-        {
-          this->restrict_and_add (level+1, dst[level], dst[level+1]);
-#ifdef DEBUG_OUTPUT
-          std::cout << "copy_to_mg restr&add " << level << " " << dst_level.l2_norm() << std::endl;
-#endif
-        }
-
-      first = false;
     }
 }
 
@@ -291,9 +276,11 @@ MGLevelGlobalTransfer<VectorType>::copy_from_mg
   for (unsigned int level=src.min_level(); level<=src.max_level(); ++level)
     {
 #ifdef DEBUG_OUTPUT
-      MPI_Barrier(MPI_COMM_WORLD);
+      int ierr = MPI_Barrier(MPI_COMM_WORLD);
+      AssertThrowMPI(ierr);
       std::cout << "copy_from_mg src " << level << " " << src[level].l2_norm() << std::endl;
-      MPI_Barrier(MPI_COMM_WORLD);
+      ierr = MPI_Barrier(MPI_COMM_WORLD);
+      AssertThrowMPI(ierr);
 #endif
 
       typedef std::vector<std::pair<types::global_dof_index, types::global_dof_index> >::const_iterator dof_pair_iterator;
@@ -313,14 +300,16 @@ MGLevelGlobalTransfer<VectorType>::copy_from_mg
 #ifdef DEBUG_OUTPUT
       {
         dst.compress(VectorOperation::insert);
-        MPI_Barrier(MPI_COMM_WORLD);
+        ierr = MPI_Barrier(MPI_COMM_WORLD);
+        AssertThrowMPI(ierr);
         std::cout << "copy_from_mg level=" << level << " " << dst.l2_norm() << std::endl;
       }
 #endif
     }
   dst.compress(VectorOperation::insert);
 #ifdef DEBUG_OUTPUT
-  MPI_Barrier(MPI_COMM_WORLD);
+  const int ierr = MPI_Barrier(MPI_COMM_WORLD);
+  AssertThrowMPI(ierr);
   std::cout << "copy_from_mg " << dst.l2_norm() << std::endl;
 #endif
 }
@@ -382,7 +371,6 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::copy_to_mg
   AssertIndexRange(dst.max_level(), mg_dof_handler.get_triangulation().n_global_levels());
   AssertIndexRange(dst.min_level(), dst.max_level()+1);
   reinit_vector(mg_dof_handler, component_to_block_map, dst);
-  bool first = true;
 
   if (perform_plain_copy)
     {
@@ -392,13 +380,6 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::copy_to_mg
       VectorView<Number>  dst_view (src.local_size(), dst[dst.max_level()].begin());
       VectorView<Number2> src_view (src.local_size(), src.begin());
       static_cast<Vector<Number> &>(dst_view) = static_cast<Vector<Number2> &>(src_view);
-
-      // do the initial restriction
-      for (unsigned int level=dst.max_level(); level != dst.min_level(); )
-        {
-          --level;
-          this->restrict_and_add (level+1, dst[level], dst[level+1]);
-        }
       return;
     }
 
@@ -430,13 +411,6 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::copy_to_mg
         dst_level.local_element(i->second) = ghosted_global_vector.local_element(i->first);
 
       dst_level.compress(VectorOperation::insert);
-
-      if (!first)
-        {
-          this->restrict_and_add (level+1, dst_level, dst[level+1]);
-        }
-
-      first = false;
     }
 }
 

@@ -791,7 +791,17 @@ namespace Patterns
      * Files can be used for input or output. This can be specified in the
      * constructor by choosing the flag <tt>type</tt>.
      */
-    enum FileType {input = 0, output = 1};
+    enum FileType
+    {
+      /**
+       * Open for input.
+       */
+      input = 0,
+      /**
+       * Open for output.
+       */
+      output = 1
+    };
 
     /**
      * Constructor.  The type of the file can be specified by choosing the
@@ -1061,7 +1071,7 @@ namespace Patterns
  *   @endcode
  * The file so referenced is searched for relative to the current directory
  * (not relative to the directory in which the including parameter file is
- * located, since this is not known to all three versions of the read_input()
+ * located, since this is not known to all three versions of the parse_input()
  * function).
  *
  *
@@ -1076,12 +1086,12 @@ namespace Patterns
  *     ...
  *     // declaration of entries
  *     ...
- *     prm.read_input (cin);         // read input from standard in,
+ *     prm.parse_input (std::cin); // read input from standard in,
  *     // or
- *     prm.read_input ("simulation.in");
+ *     prm.parse_input ("simulation.prm");
  *     // or
  *     char *in = "set Time step size = 0.3 \n ...";
- *     prm.read_input_from_string (in);
+ *     prm.parse_input_from_string (in);
  *     ...
  *   @endcode
  * You can use several sources of input successively. Entries which are
@@ -1089,7 +1099,7 @@ namespace Patterns
  *
  * You should not try to declare entries using declare_entry() and
  * enter_subsection() with as yet unknown subsection names after using
- * read_input(). The results in this case are unspecified.
+ * parse_input(). The results in this case are unspecified.
  *
  * If an error occurs upon reading the input, error messages are written to
  * <tt>std::cerr</tt> and the reader function returns with a return value of
@@ -1328,7 +1338,7 @@ namespace Patterns
  *     p.declare_parameters (prm);
  *     // read input from "prmtest.prm"; giving argv[1] would also be a
  *     // good idea
- *     prm.read_input ("prmtest.prm");
+ *     prm.parse_input ("prmtest.prm");
  *     // print parameters to std::cout as ASCII text
  *     std::cout << "\n\n";
  *     prm.print_parameters (std::cout, ParameterHandler::Text);
@@ -1628,17 +1638,32 @@ public:
    * will stop parsing lines after encountering @p last_line .
    * This is handy when adding extra data that shall be parsed manually.
    *
-   * Return whether the read was successful.
+   * @deprecated This function has been deprecated in favor of the replacement
+   * ParameterHandler::parse_input, which raises exceptions to indicate errors
+   * instead of returning an error code.
    */
   virtual bool read_input (std::istream &input,
                            const std::string &filename = "input file",
-                           const std::string &last_line = "");
+                           const std::string &last_line = "") DEAL_II_DEPRECATED;
+
+  /**
+   * Parse each line from a stream until the stream returns the <tt>eof</tt>
+   * condition or error to provide values for known parameter fields. The second
+   * argument can be used to denote the name of the file (if that's what the
+   * input stream represents) we are reading from; this is only used when
+   * creating output for exceptions.
+   *
+   * If non-empty @p last_line is provided, the ParameterHandler object
+   * will stop parsing lines after encountering @p last_line .
+   * This is handy when adding extra data that shall be parsed manually.
+   */
+  virtual void parse_input (std::istream &input,
+                            const std::string &filename = "input file",
+                            const std::string &last_line = "");
 
   /**
    * Read input from a file the name of which is given. The PathSearch class
    * "PARAMETERS" is used to find the file.
-   *
-   * Return whether the read was successful.
    *
    * Unless <tt>optional</tt> is <tt>true</tt>, this function will
    * automatically generate the requested file with default values if the file
@@ -1648,11 +1673,30 @@ public:
    * If non-empty @p last_line is provided, the ParameterHandler object
    * will stop parsing lines after encountering @p last_line .
    * This is handy when adding extra data that shall be parsed manually.
+   *
+   * @deprecated This function has been deprecated in favor of the replacement
+   * ParameterHandler::parse_input, which raises exceptions to indicate errors
+   * instead of returning an error code. ParameterHandler::parse_input does
+   * not have the capability to write default values to a file on failure: if
+   * you wish to duplicate that old behavior then you should catch the
+   * PathSearch::ExcFileNotFound exception and then call
+   * ParameterHandler::print_parameters.
    */
   virtual bool read_input (const std::string &filename,
                            const bool optional = false,
                            const bool write_stripped_file = false,
-                           const std::string &last_line = "");
+                           const std::string &last_line = "") DEAL_II_DEPRECATED;
+
+  /**
+   * Parse the given file to provide values for known parameter fields. The
+   * PathSearch class "PARAMETERS" is used to find the file.
+   *
+   * If non-empty @p last_line is provided, the ParameterHandler object
+   * will stop parsing lines after encountering @p last_line .
+   * This is handy when adding extra data that shall be parsed manually.
+   */
+  virtual void parse_input (const std::string &filename,
+                            const std::string &last_line = "");
 
   /**
    * Read input from a string in memory. The lines in memory have to be
@@ -1662,10 +1706,23 @@ public:
    * will stop parsing lines after encountering @p last_line .
    * This is handy when adding extra data that shall be parsed manually.
    *
-   * Return whether the read was successful.
+   * @deprecated This function has been deprecated in favor of the replacement
+   * ParameterHandler::parse_input_from_string, which raises exceptions to
+   * indicate errors instead of returning an error code.
    */
   virtual bool read_input_from_string (const char *s,
                                        const std::string &last_line = "");
+
+  /**
+   * Parse input from a string to populate known parameter fields. The lines
+   * in the string must be separated by <tt>@\n</tt> characters.
+   *
+   * If non-empty @p last_line is provided, the ParameterHandler object
+   * will stop parsing lines after encountering @p last_line .
+   * This is handy when adding extra data that shall be parsed manually.
+   */
+  virtual void parse_input_from_string (const char *s,
+                                        const std::string &last_line = "");
 
   /**
    * Read a parameter file in XML format. This could be from a file originally
@@ -1674,9 +1731,20 @@ public:
    * method and then modified by the graphical parameter GUI (see the general
    * documentation of this class).
    *
-   * Return whether the read was successful.
+   * @deprecated This function has been deprecated in favor of the replacement
+   * ParameterHandler::parse_input_from_xml, which raises exceptions to indicate
+   * errors instead of returning an error code.
    */
-  virtual bool read_input_from_xml (std::istream &input);
+  virtual bool read_input_from_xml (std::istream &input) DEAL_II_DEPRECATED;
+
+  /**
+   * Parse input from an XML stream to populate known parameter fields. This
+   * could be from a file originally written by the print_parameters() function
+   * using the XML output style and then modified by hand as necessary, or from
+   * a file written using this method and then modified by the graphical
+   * parameter GUI (see the general documentation of this class).
+   */
+  virtual void parse_input_from_xml (std::istream &input);
 
   /**
    * Clear all contents.
@@ -1997,6 +2065,83 @@ public:
   DeclException1 (ExcEntryUndeclared,
                   std::string,
                   << "You can't ask for entry <" << arg1 << "> you have not yet declared.");
+
+  /**
+   * Exception for when there are an unequal number of 'subsection' and 'end'
+   * statements. The first argument is the name of the file and the second
+   * argument is a formatted list of the subsection path before and after
+   * entering the parser.
+   */
+  DeclException2 (ExcUnbalancedSubsections,
+                  std::string, std::string,
+                  << "There are unequal numbers of 'subsection' and 'end' "
+                  "statements in the parameter file <" << arg1 << ">."
+                  << (arg2.size() > 0 ? "\n" + arg2 : ""));
+
+  /**
+   * Exception for when, during parsing of a parameter file, the parser
+   * encounters a subsection in the file that was not previously declared.
+   */
+  DeclException3 (ExcNoSubsection,
+                  int, std::string, std::string,
+                  << "Line <" << arg1 << "> of file <" << arg2 << ": There is "
+                  "no such subsection to be entered: " << arg3);
+
+  /**
+   * General exception for a line that could not be parsed, taking, as
+   * arguments, the line number, file name, and a brief description of why the
+   * line cannot be parsed.
+   */
+  DeclException3 (ExcCannotParseLine,
+                  int, std::string, std::string, << "Line <" << arg1 <<
+                  "> of file <" << arg2 << ">: " << arg3);
+
+  /**
+   * Exception for an an entry in a parameter file that does not match the
+   * provided pattern. The arguments are, in order, the line number, file
+   * name, entry value, entry name, and a description of the pattern.
+   */
+  DeclException5 (ExcInvalidEntryForPattern,
+                  int, std::string, std::string, std::string, std::string,
+                  << "Line <" << arg1 << "> of file <" << arg2 << ">:\n"
+                  "    The entry value \n" << "        " << arg3 << '\n' <<
+                  "    for the entry named\n" << "        " << arg4 << '\n' <<
+                  "    does not match the given pattern:\n" << "        " <<
+                  arg5);
+
+  /**
+   * Exception for when an XML file cannot be read at all. This happens when
+   * there is no top-level XML element called "ParameterHandler" or when there
+   * are multiple top level elements.
+   */
+  DeclExceptionMsg (ExcInvalidXMLParameterFile,
+                    "The provided file could not be parsed as a "
+                    "ParameterHandler description.");
+
+  /**
+   * Exception for when an entry in an XML parameter file does not match the
+   * provided pattern. The arguments are, in order, the entry value, entry
+   * name, and a description of the pattern.
+   */
+  DeclException3 (ExcInvalidEntryForPatternXML,
+                  std::string, std::string, std::string,
+                  << "    The entry value \n" << "        " << arg1 << '\n' <<
+                  "    for the entry named\n" << "        " << arg2 << '\n' <<
+                  "    does not match the given pattern:\n" << "        " <<
+                  arg3);
+
+  /**
+   * Exception for when the file given in an include statement cannot be
+   * open. The arguments are, in order, the line number of the include
+   * statement, current parameter file name, and the name of the file intended
+   * for inclusion.
+   */
+  DeclException3 (ExcCannotOpenIncludeStatementFile,
+                  int, std::string, std::string,
+                  << "Line <" << arg1 << "> of file <" << arg2 << ">: This line "
+                  "contains an 'include' or 'INCLUDE' statement, but the given "
+                  "file to include <" << arg3 << "> cannot be opened.");
+
   //@}
 private:
   /**
@@ -2052,18 +2197,17 @@ private:
 
   /**
    * Scan one line of input. <tt>input_filename</tt> and
-   * <tt>current_line_n</tt> are the name of the input file and the current
-   * number of the line presently scanned (for the logs if there are
-   * messages). Return <tt>false</tt> if line contained stuff that could not
-   * be understood, the uppermost subsection was to be left by an <tt>END</tt>
-   * or <tt>end</tt> statement, a value for a non-declared entry was given or
-   * the entry value did not match the regular expression. <tt>true</tt>
-   * otherwise.
+   * <tt>current_line_n</tt> are the name of the input file and the number of
+   * the line presently scanned (these are used in exception messages to show
+   * where parse errors occurred). This function will raise an exception if
+   * the line contains an undeclared subsection or entry, if the line's entry
+   * does not match its given pattern, or if the line could not be understood
+   * as a valid parameter file expression.
    *
    * The function modifies its argument, but also takes it by value, so the
    * caller's variable is not changed.
    */
-  bool scan_line (std::string         line,
+  void scan_line (std::string         line,
                   const std::string  &input_filename,
                   const unsigned int  current_line_n);
 
@@ -2170,7 +2314,7 @@ private:
  *       class MultipleParameterLoop prm;
  *       HelperClass h;
  *       HelperClass::declare_parameters (prm);
- *       prm.read_input ("prmtest.prm");
+ *       prm.parse_input ("prmtest.prm");
  *       prm.loop (h);
  *       return 0;
  *     }
@@ -2340,20 +2484,51 @@ public:
    * This is handy when adding extra data that shall be parsed manually.
    *
    * @note Of the three <tt>read_input</tt> functions implemented by
-   * ParameterHandler, this is the only one overridden with new behavior by
-   * this class. This is because the other two <tt>read_input</tt> functions
-   * just reformat their inputs and then call this version.
+   * ParameterHandler, this method and its replacement
+   * (MultipleParameterLoop::parse_input) are the only ones overridden with
+   * new behavior by this class. This is because the other two
+   * <tt>read_input</tt> functions just reformat their inputs and then call
+   * this version.
+   *
+   * @deprecated This function has been deprecated in favor of the replacement
+   * MultipleParameterLoop::parse_input, which raises exceptions to indicate
+   * errors instead of returning an error code.
    */
   virtual bool read_input (std::istream &input,
                            const std::string &filename = "input file",
-                           const std::string &last_line = "");
+                           const std::string &last_line = "") DEAL_II_DEPRECATED;
+
+  /**
+   * Read input from a stream until the stream returns the <tt>eof</tt>
+   * condition or error. The second argument can be used to denote the name of
+   * the file (if that's what the input stream represents) we are reading
+   * from; this is only used when creating output for error messages.
+   *
+   * If non-empty @p last_line is provided, the ParameterHandler object
+   * will stop parsing lines after encountering @p last_line .
+   * This is handy when adding extra data that shall be parsed manually.
+   *
+   * @note Of the three <tt>parse_input</tt> functions implemented by
+   * ParameterHandler, this method and the deprecated method
+   * MultipleParameterLoop::read_input are the only ones overridden with new
+   * behavior by this class. This is because the other two <tt>parse_input</tt>
+   * functions just reformat their inputs and then call this version.
+   */
+  virtual void parse_input (std::istream &input,
+                            const std::string &filename = "input file",
+                            const std::string &last_line = "");
 
   /**
    * Overriding virtual functions which are overloaded (like
-   * ParameterHandler::read_input, which has two different sets of input
+   * ParameterHandler::parse_input, which has two different sets of input
    * argument types) causes the non-overridden functions to be hidden. Get
    * around this by explicitly using both variants of
-   * ParameterHandler::read_input and then overriding the one we care about.
+   * ParameterHandler::parse_input and then overriding the one we care about.
+   */
+  using ParameterHandler::parse_input;
+
+  /**
+   * For backwards compatibility also include the deprecated read functions.
    */
   using ParameterHandler::read_input;
 
@@ -2383,7 +2558,14 @@ private:
      */
     enum MultipleEntryType
     {
-      variant, array
+      /**
+       * A variant entry.
+       */
+      variant,
+      /**
+       * An array entry.
+       */
+      array
     };
 
     /**

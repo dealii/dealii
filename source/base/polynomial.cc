@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,6 +17,7 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/thread_management.h>
+#include <deal.II/base/quadrature_lib.h>
 
 #include <cmath>
 #include <algorithm>
@@ -102,8 +103,18 @@ namespace Polynomials
                              std::vector<number> &values) const
   {
     Assert (values.size() > 0, ExcZero());
-    const unsigned int values_size=values.size();
 
+    value(x,values.size()-1,&values[0]);
+  }
+
+
+
+  template <typename number>
+  void
+  Polynomial<number>::value (const number         x,
+                             const unsigned int n_derivatives,
+                             number *values) const
+  {
     // evaluate Lagrange polynomial and derivatives
     if (in_lagrange_product_form == true)
       {
@@ -111,11 +122,11 @@ namespace Polynomials
         // form (x-x_1)*(x-x_2)*...*(x-x_n), expand the derivatives like
         // automatic differentiation does.
         const unsigned int n_supp = lagrange_support_points.size();
-        switch (values_size)
+        switch (n_derivatives)
           {
           default:
             values[0] = 1;
-            for (unsigned int d=1; d<values_size; ++d)
+            for (unsigned int d=1; d<=n_derivatives; ++d)
               values[d] = 0;
             for (unsigned int i=0; i<n_supp; ++i)
               {
@@ -127,7 +138,7 @@ namespace Polynomials
                 // i.e., expand value v and derivative one). since we reuse a
                 // value from the next lower derivative from the steps before,
                 // need to start from the highest derivative
-                for (unsigned int k=values_size-1; k>0; --k)
+                for (unsigned int k=n_derivatives; k>0; --k)
                   values[k] = (values[k] * v + values[k-1]);
                 values[0] *= v;
               }
@@ -141,7 +152,7 @@ namespace Polynomials
             // p^(n)(x)/k! into the actual form of the derivative
             {
               number k_faculty = 1;
-              for (unsigned int k=0; k<values_size; ++k)
+              for (unsigned int k=0; k<=n_derivatives; ++k)
                 {
                   values[k] *= k_faculty * lagrange_weight;
                   k_faculty *= static_cast<number>(k+1);
@@ -149,10 +160,10 @@ namespace Polynomials
             }
             break;
 
-          // manually implement size 1 (values only), size 2 (value + first
-          // derivative), and size 3 (up to second derivative) since they
+          // manually implement case 0 (values only), case 1 (value + first
+          // derivative), and case 2 (up to second derivative) since they
           // might be called often. then, we can unroll the loop.
-          case 1:
+          case 0:
             values[0] = 1;
             for (unsigned int i=0; i<n_supp; ++i)
               {
@@ -162,7 +173,7 @@ namespace Polynomials
             values[0] *= lagrange_weight;
             break;
 
-          case 2:
+          case 1:
             values[0] = 1;
             values[1] = 0;
             for (unsigned int i=0; i<n_supp; ++i)
@@ -175,7 +186,7 @@ namespace Polynomials
             values[1] *= lagrange_weight;
             break;
 
-          case 3:
+          case 2:
             values[0] = 1;
             values[1] = 0;
             values[2] = 0;
@@ -199,7 +210,7 @@ namespace Polynomials
     // if we only need the value, then call the other function since that is
     // significantly faster (there is no need to allocate and free memory,
     // which is really expensive compared to all the other operations!)
-    if (values_size == 1)
+    if (n_derivatives == 0)
       {
         values[0] = value(x);
         return;
@@ -214,7 +225,7 @@ namespace Polynomials
     // loop over all requested derivatives. note that derivatives @p{j>m} are
     // necessarily zero, as they differentiate the polynomial more often than
     // the highest power is
-    const unsigned int min_valuessize_m=std::min(values_size, m);
+    const unsigned int min_valuessize_m=std::min(n_derivatives+1, m);
     for (unsigned int j=0; j<min_valuessize_m; ++j)
       {
         for (int k=m-2; k>=static_cast<int>(j); --k)
@@ -225,7 +236,7 @@ namespace Polynomials
       }
 
     // fill higher derivatives by zero
-    for (unsigned int j=min_valuessize_m; j<values_size; ++j)
+    for (unsigned int j=min_valuessize_m; j<=n_derivatives; ++j)
       values[j] = 0;
   }
 
@@ -830,177 +841,30 @@ namespace Polynomials
 // ------------------ class Legendre --------------- //
 
 
-// Reserve space for polynomials up to degree 19. Should be sufficient
-// for the start.
-  std::vector<std_cxx11::shared_ptr<const std::vector<double> > >
-  Legendre::recursive_coefficients(20);
-  std::vector<std_cxx11::shared_ptr<const std::vector<double> > >
-  Legendre::shifted_coefficients(20);
-
 
   Legendre::Legendre (const unsigned int k)
     :
-    Polynomial<double> (get_coefficients(k))
-  {}
-
-
-
-  void
-  Legendre::compute_coefficients (const unsigned int k_)
+    Polynomial<double> (0)
   {
-    // make sure we call the
-    // Polynomial::shift function
-    // only with an argument with
-    // which it will not crash the
-    // compiler
-#ifdef DEAL_II_LONG_DOUBLE_LOOP_BUG
-    typedef double SHIFT_TYPE;
-#else
-    typedef long double SHIFT_TYPE;
-#endif
+    this->coefficients.clear();
+    this->in_lagrange_product_form = true;
+    this->lagrange_support_points.resize(k);
 
-    unsigned int k = k_;
-
-    // first make sure that no other
-    // thread intercepts the
-    // operation of this function;
-    // for this, acquire the lock
-    // until we quit this function
-    Threads::Mutex::ScopedLock lock(coefficients_lock);
-
-    // The first 2 coefficients are hard-coded
-    if (k==0)
-      k=1;
-    // check: does the information
-    // already exist?
-    if ((recursive_coefficients.size() < k+1) ||
-        ((recursive_coefficients.size() >= k+1) &&
-         (recursive_coefficients[k] ==
-          std_cxx11::shared_ptr<const std::vector<double> >())))
-      // no, then generate the
-      // respective coefficients
+    // the roots of a Legendre polynomial are exactly the points in the
+    // Gauss-Legendre quadrature formula
+    if (k > 0)
       {
-        // make sure that there is enough
-        // space in the array for the
-        // coefficients, so we have to resize
-        // it to size k+1
+        QGauss<1> gauss(k);
+        for (unsigned int i=0; i<k; ++i)
+          this->lagrange_support_points[i] = gauss.get_points()[i][0];
+      }
 
-        // but it's more complicated than
-        // that: we call this function
-        // recursively, so if we simply
-        // resize it to k+1 here, then
-        // compute the coefficients for
-        // degree k-1 by calling this
-        // function recursively, then it will
-        // reset the size to k -- not enough
-        // for what we want to do below. the
-        // solution therefore is to only
-        // resize the size if we are going to
-        // *increase* it
-        if (recursive_coefficients.size() < k+1)
-          recursive_coefficients.resize (k+1);
-
-        if (k<=1)
-          {
-            // create coefficients
-            // vectors for k=0 and k=1
-            //
-            // allocate the respective
-            // amount of memory and
-            // later assign it to the
-            // coefficients array to
-            // make it const
-            std::vector<double> *c0 = new std::vector<double>(1);
-            (*c0)[0] = 1.;
-
-            std::vector<double> *c1 = new std::vector<double>(2);
-            (*c1)[0] = 0.;
-            (*c1)[1] = 1.;
-
-            // now make these arrays
-            // const. use shared_ptr for
-            // recursive_coefficients because
-            // that avoids a memory leak that
-            // would appear if we used plain
-            // pointers.
-            recursive_coefficients[0] =
-              std_cxx11::shared_ptr<const std::vector<double> >(c0);
-            recursive_coefficients[1] =
-              std_cxx11::shared_ptr<const std::vector<double> >(c1);
-
-            // Compute polynomials
-            // orthogonal on [0,1]
-            c0 = new std::vector<double>(*c0);
-            c1 = new std::vector<double>(*c1);
-
-            Polynomial<double>::shift<SHIFT_TYPE> (*c0, -1.);
-            Polynomial<double>::scale(*c0, 2.);
-            Polynomial<double>::shift<SHIFT_TYPE> (*c1, -1.);
-            Polynomial<double>::scale(*c1, 2.);
-            Polynomial<double>::multiply(*c1, std::sqrt(3.));
-            shifted_coefficients[0]=std_cxx11::shared_ptr<const std::vector<double> >(c0);
-            shifted_coefficients[1]=std_cxx11::shared_ptr<const std::vector<double> >(c1);
-          }
-        else
-          {
-            // for larger numbers,
-            // compute the coefficients
-            // recursively. to do so,
-            // we have to release the
-            // lock temporarily to
-            // allow the called
-            // function to acquire it
-            // itself
-            coefficients_lock.release ();
-            compute_coefficients(k-1);
-            coefficients_lock.acquire ();
-
-            std::vector<double> *ck = new std::vector<double>(k+1);
-
-            const double a = 1./(k);
-            const double b = a*(2*k-1);
-            const double c = a*(k-1);
-
-            (*ck)[k]   = b*(*recursive_coefficients[k-1])[k-1];
-            (*ck)[k-1] = b*(*recursive_coefficients[k-1])[k-2];
-            for (unsigned int i=1 ; i<= k-2 ; ++i)
-              (*ck)[i] = b*(*recursive_coefficients[k-1])[i-1]
-                         -c*(*recursive_coefficients[k-2])[i];
-
-            (*ck)[0]   = -c*(*recursive_coefficients[k-2])[0];
-
-            // finally assign the newly
-            // created vector to the
-            // const pointer in the
-            // coefficients array
-            recursive_coefficients[k] =
-              std_cxx11::shared_ptr<const std::vector<double> >(ck);
-            // and compute the
-            // coefficients for [0,1]
-            ck = new std::vector<double>(*ck);
-            Polynomial<double>::shift<SHIFT_TYPE> (*ck, -1.);
-            Polynomial<double>::scale(*ck, 2.);
-            Polynomial<double>::multiply(*ck, std::sqrt(2.*k+1.));
-            shifted_coefficients[k] =
-              std_cxx11::shared_ptr<const std::vector<double> >(ck);
-          };
-      };
-  }
-
-
-
-  const std::vector<double> &
-  Legendre::get_coefficients (const unsigned int k)
-  {
-    // first make sure the coefficients
-    // get computed if so necessary
-    compute_coefficients (k);
-
-    // then get a pointer to the array
-    // of coefficients. do that in a MT
-    // safe way
-    Threads::Mutex::ScopedLock lock (coefficients_lock);
-    return *shifted_coefficients[k];
+    // compute the abscissa in zero of the product of monomials. The exact
+    // value should be sqrt(2*k+1), so set the weight to that value.
+    double prod = 1.;
+    for (unsigned int i=0; i<k; ++i)
+      prod *= this->lagrange_support_points[i];
+    this->lagrange_weight = std::sqrt(double(2*k+1)) / prod;
   }
 
 
@@ -1297,39 +1161,52 @@ namespace Polynomials
       }
   }
 
+
+
 // ------------------ HermiteInterpolation --------------- //
 
   HermiteInterpolation::HermiteInterpolation (const unsigned int p)
     :
-    Polynomial<double>((p<4) ? 3 : p+1)
+    Polynomial<double>(0)
   {
+    this->coefficients.clear();
+    this->in_lagrange_product_form = true;
+
+    this->lagrange_support_points.resize(3);
     if (p==0)
       {
-        this->coefficients[0] = 1.;
-        this->coefficients[2] = -3.;
-        this->coefficients[3] = 2.;
+        this->lagrange_support_points[0] = -0.5;
+        this->lagrange_support_points[1] = 1.;
+        this->lagrange_support_points[2] = 1.;
+        this->lagrange_weight = 2.;
       }
     else if (p==1)
       {
-        this->coefficients[2] = 3.;
-        this->coefficients[3] = -2.;
+        this->lagrange_support_points[0] = 0.;
+        this->lagrange_support_points[1] = 0.;
+        this->lagrange_support_points[2] = 1.5;
+        this->lagrange_weight = -2.;
       }
     else if (p==2)
       {
-        this->coefficients[1] = 1.;
-        this->coefficients[2] = -2.;
-        this->coefficients[3] = 1.;
+        this->lagrange_support_points[0] = 0.;
+        this->lagrange_support_points[1] = 1.;
+        this->lagrange_support_points[2] = 1.;
       }
     else if (p==3)
       {
-        this->coefficients[2] = -1.;
-        this->coefficients[3] = 1.;
+        this->lagrange_support_points[0] = 0.;
+        this->lagrange_support_points[1] = 0.;
+        this->lagrange_support_points[2] = 1.;
       }
     else
       {
-        this->coefficients[4] = 16.;
-        this->coefficients[3] = -32.;
-        this->coefficients[2] = 16.;
+        this->lagrange_support_points.resize(4);
+        this->lagrange_support_points[0] = 0.;
+        this->lagrange_support_points[1] = 0.;
+        this->lagrange_support_points[2] = 1.;
+        this->lagrange_support_points[3] = 1.;
+        this->lagrange_weight = 16.;
 
         if (p>4)
           {
@@ -1350,6 +1227,7 @@ namespace Polynomials
 
     return basis;
   }
+
 }
 
 // ------------------ explicit instantiations --------------- //

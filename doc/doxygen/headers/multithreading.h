@@ -495,7 +495,7 @@
     }
  * @endcode
  * Note how we use <a
- * href="http://www.boost.org/doc/libs/1_37_0/libs/bind/bind.html">std_cxx11::bind</a>
+ * href="http://www.boost.org/doc/libs/1_62_0/libs/bind/bind.html">std_cxx11::bind</a>
  * to <i>bind</i> certain arguments to the <code>vmult_one_row</code>
  * function, leaving one argument open and thus allowing the
  * parallel::transform function to consider the passed function argument as
@@ -586,7 +586,7 @@
  * then take the square root of the result. This is what the
  * parallel::accumulate_from_subranges function does (note that you
  * have to specify the result type as a template argument and that, as
- * usual, the minimumum number of elements of the outer loop that can
+ * usual, the minimum number of elements of the outer loop that can
  * be scheduled on a single CPU core is given as the last argument):
  * @code
     double

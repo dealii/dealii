@@ -27,6 +27,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -46,13 +47,10 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 
-// These are the new files we need. The first one provides an alternative to
-// the usual SparsityPattern class and the DynamicSparsityPattern class
-// already discussed in step-11 and step-18. The second and third provide <i>hp</i>
+// These are the new files we need. The first and second provide <i>hp</i>
 // versions of the DoFHandler and FEValues classes as described in the
 // introduction of this program. The last one provides Fourier transformation
 // class on the unit cell.
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/fe/fe_series.h>

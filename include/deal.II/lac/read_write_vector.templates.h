@@ -140,7 +140,7 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::apply(const Functor &func)
   {
     FunctorTemplate<Functor> functor(*this, func);
-    internal::parallel_for(functor, n_elements(), thread_loop_partitioner);
+    internal::VectorOperations::parallel_for(functor, n_elements(), thread_loop_partitioner);
   }
 #endif
 
@@ -157,8 +157,8 @@ namespace LinearAlgebra
     if (n_elements() != in_vector.n_elements())
       reinit(in_vector, true);
 
-    dealii::internal::Vector_copy<Number,Number> copier(in_vector.val, val);
-    internal::parallel_for(copier, n_elements(), thread_loop_partitioner);
+    dealii::internal::VectorOperations::Vector_copy<Number,Number> copier(in_vector.val, val);
+    internal::VectorOperations::parallel_for(copier, n_elements(), thread_loop_partitioner);
 
     return *this;
   }
@@ -174,8 +174,8 @@ namespace LinearAlgebra
     if (n_elements() != in_vector.n_elements())
       reinit(in_vector, true);
 
-    dealii::internal::Vector_copy<Number,Number2> copier(in_vector.val, val);
-    internal::parallel_for(copier, n_elements(), thread_loop_partitioner);
+    dealii::internal::VectorOperations::Vector_copy<Number,Number2> copier(in_vector.val, val);
+    internal::VectorOperations::parallel_for(copier, n_elements(), thread_loop_partitioner);
 
     return *this;
   }
@@ -189,8 +189,8 @@ namespace LinearAlgebra
     Assert(s==static_cast<Number>(0), ExcMessage("Only 0 can be assigned to a vector."));
     (void)s;
 
-    internal::Vector_set<Number> setter(Number(), val);
-    internal::parallel_for(setter, n_elements(), thread_loop_partitioner);
+    internal::VectorOperations::Vector_set<Number> setter(Number(), val);
+    internal::VectorOperations::parallel_for(setter, n_elements(), thread_loop_partitioner);
 
     return *this;
   }
@@ -278,7 +278,7 @@ namespace LinearAlgebra
 
     // get a representation of the vector and copy it
     PetscScalar *start_ptr;
-    int ierr = VecGetArray (static_cast<const Vec &>(petsc_vec), &start_ptr);
+    PetscErrorCode ierr = VecGetArray (static_cast<const Vec &>(petsc_vec), &start_ptr);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     const size_type vec_size = petsc_vec.local_size();

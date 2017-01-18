@@ -1479,7 +1479,7 @@
  *
  * deal.II implements serialization facilities by implementing the necessary
  * interfaces for the <a
- * href="http://www.boost.org/doc/libs/1_46_1/libs/serialization/doc/index.html"
+ * href="http://www.boost.org/doc/libs/1_62_0/libs/serialization/doc/index.html"
  * target="_top">BOOST serialization</a> library. See there for examples on
  * how to save and restore objects. </dd>
  *
@@ -1547,8 +1547,8 @@
  * points.
  *
  * Lagrangian elements fill the vector accessed by
- * FiniteElementBase::get_unit_support_points(), such that the
- * function FiniteElementBase::has_support_points() returns
+ * FiniteElement::get_unit_support_points(), such that the
+ * function FiniteElement::has_support_points() returns
  * <tt>true</tt>. Naturally, these support points are on the
  * @ref GlossReferenceCell "reference cell".  Then, FEValues can be used
  * (in conjunction with a Mapping) to access support points on the
@@ -1574,7 +1574,7 @@
  *
  * <dt class="glossary">@anchor GlossUnitSupport <b>Unit support points</b></dt>
  * <dd>These are the @ref GlossSupport "support points" on the reference cell, defined in
- * FiniteElementBase. For example, the usual Q1 element in 1d has support
+ * FiniteElement. For example, the usual Q1 element in 1d has support
  * points  at <tt>x=0</tt> and <tt>x=1</tt> (and similarly, in higher
  * dimensions at the vertices of the unit square or cube). On the other
  * hand, higher order Lagrangian elements have unit support points also

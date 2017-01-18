@@ -281,12 +281,6 @@ namespace SparseMatrixIterators
      */
     template <typename, bool>
     friend class Iterator;
-
-    /**
-     * Make the SparseMatrix class a friend so that it, in turn, can declare
-     * the Reference class a friend.
-     */
-    template <typename> friend class dealii::SparseMatrix;
   };
 
 
@@ -664,13 +658,13 @@ public:
   bool empty () const;
 
   /**
-   * Return the dimension of the codomain (or range) space. To remember: the
+   * Return the dimension of the codomain (or range) space. Note that the
    * matrix is of dimension $m \times n$.
    */
   size_type m () const;
 
   /**
-   * Return the dimension of the domain space. To remember: the matrix is of
+   * Return the dimension of the domain space. Note that the matrix is of
    * dimension $m \times n$.
    */
   size_type n () const;
@@ -1645,13 +1639,6 @@ private:
    */
   template <typename,bool> friend class SparseMatrixIterators::Iterator;
   template <typename,bool> friend class SparseMatrixIterators::Accessor;
-
-#ifndef DEAL_II_MSVC
-  // Visual studio is choking on the following friend declaration, probably
-  // because Reference is only defined in a specialization. It looks like
-  // the library is compiling without this line, though.
-  template <typename number2> friend class SparseMatrixIterators::Accessor<number2, false>::Reference;
-#endif
 };
 
 #ifndef DOXYGEN

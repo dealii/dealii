@@ -27,6 +27,7 @@
 #include <deal.II/base/std_cxx11/tuple.h>
 
 #include <deal.II/distributed/tria_base.h>
+#include <deal.II/distributed/p4est_wrappers.h>
 
 #include <set>
 #include <vector>
@@ -63,93 +64,11 @@ namespace internal
   }
 }
 
-
-namespace internal
+namespace FETools
 {
-  namespace p4est
+  namespace internal
   {
-    /**
-     * A structure whose explicit specializations contain typedefs to the
-     * relevant p4est_* and p8est_* types. Using this structure, for example
-     * by saying <tt>types<dim>::connectivity</tt> we can write code in a
-     * dimension independent way, either referring to p4est_connectivity_t or
-     * p8est_connectivity_t, depending on template argument.
-     */
-    template <int> struct types;
-
-    template <>
-    struct types<2>
-    {
-      typedef p4est_connectivity_t connectivity;
-      typedef p4est_t              forest;
-      typedef p4est_tree_t         tree;
-      typedef p4est_quadrant_t     quadrant;
-      typedef p4est_topidx_t       topidx;
-      typedef p4est_locidx_t       locidx;
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
-      typedef p4est_connect_type_t balance_type;
-#else
-      typedef p4est_balance_type_t balance_type;
-#endif
-      typedef p4est_ghost_t        ghost;
-    };
-
-    template <>
-    struct types<3>
-    {
-      typedef p8est_connectivity_t connectivity;
-      typedef p8est_t              forest;
-      typedef p8est_tree_t         tree;
-      typedef p8est_quadrant_t     quadrant;
-      typedef p4est_topidx_t       topidx;
-      typedef p4est_locidx_t       locidx;
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
-      typedef p8est_connect_type_t balance_type;
-#else
-      typedef p8est_balance_type_t balance_type;
-#endif
-      typedef p8est_ghost_t        ghost;
-    };
-
-
-    /**
-     * Initialize the GeometryInfo<dim>::max_children_per_cell children of the
-     * cell p4est_cell.
-     */
-    template <int dim>
-    void
-    init_quadrant_children
-    (const typename types<dim>::quadrant &p4est_cell,
-     typename types<dim>::quadrant (&p4est_children)[GeometryInfo<dim>::max_children_per_cell]);
-
-
-    /**
-     * Initialize quadrant to represent a coarse cell.
-     */
-    template <int dim>
-    void
-    init_coarse_quadrant(typename types<dim>::quadrant &quad);
-
-
-
-    /**
-     * Return whether q1 and q2 are equal
-     */
-    template <int dim>
-    bool
-    quadrant_is_equal (const typename types<dim>::quadrant &q1,
-                       const typename types<dim>::quadrant &q2);
-
-    //TODO: remove these functions from
-    //public interface somehow? [TH]
-
-    /**
-     * returns whether q1 is an ancestor of q2
-     */
-    template <int dim>
-    bool
-    quadrant_is_ancestor (const typename types<dim>::quadrant &q1,
-                          const typename types<dim>::quadrant &q2);
+    template <int, int, class> class ExtrapolateImplementation;
   }
 }
 
@@ -454,6 +373,12 @@ namespace parallel
 
       /**
        * Implementation of the same function as in the base class.
+       *
+       * @note This function cannot copy a triangulation that has been refined.
+       *
+       * @note This function can be used to copy a serial Triangulation to a
+       * parallel::distributed::Triangulation but only if the serial
+       * Triangulation has never been refined.
        */
       virtual void copy_triangulation (const dealii::Triangulation<dim, spacedim> &other_tria);
 
@@ -967,6 +892,8 @@ namespace parallel
       mark_locally_active_vertices_on_level(const int level) const;
 
       template <int, int> friend class dealii::internal::DoFHandler::Policy::ParallelDistributed;
+
+      template <int,int,class> friend class dealii::FETools::internal::ExtrapolateImplementation;
     };
 
 

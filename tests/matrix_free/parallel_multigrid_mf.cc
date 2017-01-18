@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2016 by the deal.II authors
+// Copyright (C) 2014 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,7 +61,6 @@ public:
     typename MatrixFree<dim,number>::AdditionalData addit_data;
     addit_data.tasks_parallel_scheme = MatrixFree<dim,number>::AdditionalData::none;
     addit_data.level_mg_handler = level;
-    addit_data.mpi_communicator = MPI_COMM_WORLD;
 
     // extract the constraints due to Dirichlet boundary conditions
     ConstraintMatrix constraints;
@@ -364,7 +363,6 @@ void do_test (const DoFHandler<dim>  &dof)
 
   // temporarily disable deallog for the setup of the preconditioner that
   // involves a CG solver for eigenvalue estimation
-  deallog.depth_file(0);
   mg_smoother.initialize(mg_matrices, smoother_data);
 
   mg::Matrix<LinearAlgebra::distributed::Vector<number> >

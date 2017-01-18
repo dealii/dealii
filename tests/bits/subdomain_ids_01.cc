@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2015 by the deal.II authors
+// Copyright (C) 2001 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -73,7 +73,7 @@ void test ()
   deallog << dof_handler.n_dofs() << std::endl;
 
   std::vector<bool> selected_dofs (dof_handler.n_dofs());
-  for (unsigned int subdomain=0; subdomain<(1<<dim); ++subdomain)
+  for (types::subdomain_id subdomain=0; subdomain<(1<<dim); ++subdomain)
     {
       // count number on dofs on
       // subdomain. note that they add up to
