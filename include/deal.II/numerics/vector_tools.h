@@ -20,10 +20,12 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/point.h>
 #include <deal.II/base/std_cxx11/function.h>
+#include <deal.II/base/tensor_fwd.h>
+
 #include <deal.II/dofs/function_map.h>
 #include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/mapping_collection.h>
 

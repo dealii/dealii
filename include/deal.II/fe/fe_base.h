@@ -19,8 +19,6 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
-#include <deal.II/base/point.h>
-#include <deal.II/base/tensor.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/vector_slice.h>
 #include <deal.II/base/geometry_info.h>

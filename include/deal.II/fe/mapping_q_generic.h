@@ -19,9 +19,13 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/derivative_form.h>
+#include <deal.II/base/point.h>
 #include <deal.II/base/table.h>
+#include <deal.II/base/tensor.h>
 #include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/grid/tria_iterator.h>
+
 #include <deal.II/fe/mapping.h>
 #include <deal.II/fe/fe_q.h>
 

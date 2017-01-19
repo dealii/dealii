@@ -22,6 +22,7 @@
 #include <deal.II/base/polynomials_nedelec.h>
 #include <deal.II/base/polynomials_bdm.h>
 #include <deal.II/base/polynomial.h>
+#include <deal.II/base/tensor.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/fe/fe.h>
