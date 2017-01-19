@@ -1,0 +1,4 @@
+New: numbers::signaling_nan() can now also be called with Point@<dim@>
+as argument.
+<br>
+(Wolfgang Bangerth, 2017/01/18)
