@@ -56,6 +56,7 @@ SET(_src
   mapping_cartesian.cc
   mapping.cc
   mapping_fe_field.cc
+  mapping_fe_field_inst2.cc
   mapping_q_generic.cc
   mapping_q1.cc
   mapping_q1_eulerian.cc

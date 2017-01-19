@@ -48,6 +48,8 @@ SET(_src
   vector_tools_point_value.cc
   vector_tools_point_gradient.cc
   vector_tools_project.cc
+  vector_tools_project_inst2.cc
+  vector_tools_project_inst3.cc
   vector_tools_project_qp.cc
   vector_tools_project_qpmf.cc
   vector_tools_rhs.cc
