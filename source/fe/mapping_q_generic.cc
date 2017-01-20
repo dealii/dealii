@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2016 by the deal.II authors
+// Copyright (C) 2000 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -848,7 +848,11 @@ initialize_face (const UpdateFlags      update_flags,
 
   if (dim > 1)
     {
-      if (this->update_each & update_boundary_forms)
+      if (this->update_each & (update_boundary_forms |
+                               update_normal_vectors |
+                               update_jacobians      |
+                               update_JxW_values      |
+                               update_inverse_jacobians))
         {
           aux.resize (dim-1, std::vector<Tensor<1,spacedim> > (n_original_q_points));
 
@@ -1961,10 +1965,12 @@ MappingQGeneric<dim,spacedim>::requires_update_flags (const UpdateFlags in) cons
       // contravariant or the Piola transforms, we add the JxW values
       // to the list of flags to be updated for each cell.
       if (out & update_contravariant_transformation)
-        out |= update_JxW_values;
+        out |= update_volume_elements;
 
+      // the same is true when computing normal vectors: they require
+      // the determinant of the Jacobian
       if (out & update_normal_vectors)
-        out |= update_JxW_values;
+        out |= update_volume_elements;
     }
 
   return out;
@@ -2778,13 +2784,23 @@ namespace internal
     {
       const UpdateFlags update_flags = data.update_each;
 
-      if (update_flags & update_boundary_forms)
+      if (update_flags & (update_boundary_forms |
+                          update_normal_vectors |
+                          update_jacobians      |
+                          update_JxW_values      |
+                          update_inverse_jacobians))
         {
-          AssertDimension (output_data.boundary_forms.size(), n_q_points);
+          if (update_flags & update_boundary_forms)
+            AssertDimension (output_data.boundary_forms.size(), n_q_points);
           if (update_flags & update_normal_vectors)
             AssertDimension (output_data.normal_vectors.size(), n_q_points);
           if (update_flags & update_JxW_values)
             AssertDimension (output_data.JxW_values.size(), n_q_points);
+
+          Assert (data.aux.size() >= dim-1, ExcInternalError());
+
+          // first compute some common data that is used for evaluating
+          // all of the flags below
 
           // map the unit tangentials to the real cell. checking for d!=dim-1
           // eliminates compiler warnings regarding unsigned int expressions <
@@ -2804,90 +2820,90 @@ namespace internal
                                  make_array_view(data.aux[d]));
             }
 
-          // if dim==spacedim, we can use the unit tangentials to compute the
-          // boundary form by simply taking the cross product
-          if (dim == spacedim)
+          if (update_flags & update_boundary_forms)
             {
-              for (unsigned int i=0; i<n_q_points; ++i)
-                switch (dim)
-                  {
-                  case 1:
-                    // in 1d, we don't have access to any of the data.aux
-                    // fields (because it has only dim-1 components), but we
-                    // can still compute the boundary form by simply
-                    // looking at the number of the face
-                    output_data.boundary_forms[i][0] = (face_no == 0 ?
-                                                        -1 : +1);
-                    break;
-                  case 2:
-                    output_data.boundary_forms[i] =
-                      cross_product_2d(data.aux[0][i]);
-                    break;
-                  case 3:
-                    output_data.boundary_forms[i] =
-                      cross_product_3d(data.aux[0][i], data.aux[1][i]);
-                    break;
-                  default:
-                    Assert(false, ExcNotImplemented());
-                  }
-            }
-          else //(dim < spacedim)
-            {
-              // in the codim-one case, the boundary form results from the
-              // cross product of all the face tangential vectors and the cell
-              // normal vector
-              //
-              // to compute the cell normal, use the same method used in
-              // fill_fe_values for cells above
-              AssertDimension (data.contravariant.size(), n_q_points);
-
-              for (unsigned int point=0; point<n_q_points; ++point)
+              // if dim==spacedim, we can use the unit tangentials to compute the
+              // boundary form by simply taking the cross product
+              if (dim == spacedim)
                 {
-                  if (dim==1)
+                  for (unsigned int i=0; i<n_q_points; ++i)
+                    switch (dim)
+                      {
+                      case 1:
+                        // in 1d, we don't have access to any of the data.aux
+                        // fields (because it has only dim-1 components), but we
+                        // can still compute the boundary form by simply
+                        // looking at the number of the face
+                        output_data.boundary_forms[i][0] = (face_no == 0 ?
+                                                            -1 : +1);
+                        break;
+                      case 2:
+                        output_data.boundary_forms[i] =
+                          cross_product_2d(data.aux[0][i]);
+                        break;
+                      case 3:
+                        output_data.boundary_forms[i] =
+                          cross_product_3d(data.aux[0][i], data.aux[1][i]);
+                        break;
+                      default:
+                        Assert(false, ExcNotImplemented());
+                      }
+                }
+              else //(dim < spacedim)
+                {
+                  // in the codim-one case, the boundary form results from the
+                  // cross product of all the face tangential vectors and the cell
+                  // normal vector
+                  //
+                  // to compute the cell normal, use the same method used in
+                  // fill_fe_values for cells above
+                  AssertDimension (data.contravariant.size(), n_q_points);
+
+                  for (unsigned int point=0; point<n_q_points; ++point)
                     {
-                      // J is a tangent vector
-                      output_data.boundary_forms[point] = data.contravariant[point].transpose()[0];
-                      output_data.boundary_forms[point] /=
-                        (face_no == 0 ? -1. : +1.) * output_data.boundary_forms[point].norm();
-                    }
+                      if (dim==1)
+                        {
+                          // J is a tangent vector
+                          output_data.boundary_forms[point] = data.contravariant[point].transpose()[0];
+                          output_data.boundary_forms[point] /=
+                            (face_no == 0 ? -1. : +1.) * output_data.boundary_forms[point].norm();
+                        }
 
-                  if (dim==2)
-                    {
-                      const DerivativeForm<1,spacedim,dim> DX_t =
-                        data.contravariant[point].transpose();
+                      if (dim==2)
+                        {
+                          const DerivativeForm<1,spacedim,dim> DX_t =
+                            data.contravariant[point].transpose();
 
-                      Tensor<1, spacedim> cell_normal =
-                        cross_product_3d(DX_t[0], DX_t[1]);
-                      cell_normal /= cell_normal.norm();
+                          Tensor<1, spacedim> cell_normal =
+                            cross_product_3d(DX_t[0], DX_t[1]);
+                          cell_normal /= cell_normal.norm();
 
-                      // then compute the face normal from the face tangent
-                      // and the cell normal:
-                      output_data.boundary_forms[point] =
-                        cross_product_3d(data.aux[0][point], cell_normal);
+                          // then compute the face normal from the face tangent
+                          // and the cell normal:
+                          output_data.boundary_forms[point] =
+                            cross_product_3d(data.aux[0][point], cell_normal);
+                        }
                     }
                 }
             }
 
-          if (update_flags & (update_normal_vectors
-                              | update_JxW_values))
+          if (update_flags & update_JxW_values)
             for (unsigned int i=0; i<output_data.boundary_forms.size(); ++i)
               {
-                if (update_flags & update_JxW_values)
+                output_data.JxW_values[i] = output_data.boundary_forms[i].norm() * weights[i];
+
+                if (subface_no != numbers::invalid_unsigned_int)
                   {
-                    output_data.JxW_values[i] = output_data.boundary_forms[i].norm() * weights[i];
-
-                    if (subface_no!=numbers::invalid_unsigned_int)
-                      {
-                        const double area_ratio=GeometryInfo<dim>::subface_ratio(
-                                                  cell->subface_case(face_no), subface_no);
-                        output_data.JxW_values[i] *= area_ratio;
-                      }
+                    const double area_ratio = GeometryInfo<dim>::subface_ratio(cell->subface_case(face_no),
+                                                                               subface_no);
+                    output_data.JxW_values[i] *= area_ratio;
                   }
-
-                if (update_flags & update_normal_vectors)
-                  output_data.normal_vectors[i] = Point<spacedim>(output_data.boundary_forms[i] /
-                                                                  output_data.boundary_forms[i].norm());
               }
+
+          if (update_flags & update_normal_vectors)
+            for (unsigned int i=0; i<output_data.normal_vectors.size(); ++i)
+              output_data.normal_vectors[i] = Point<spacedim>(output_data.boundary_forms[i] /
+                                                              output_data.boundary_forms[i].norm());
 
           if (update_flags & update_jacobians)
             for (unsigned int point=0; point<n_q_points; ++point)

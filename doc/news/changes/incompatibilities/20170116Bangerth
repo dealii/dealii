@@ -1,0 +1,12 @@
+Fixed: The MappingQGeneric class (which is a base class of MappingQ)
+sometimes set the update_JxW_values flag internally, even though this
+was not necessary. This resulted in doing more work than was actually
+necessary, and this has been rectified. On the other hand, this change
+means that in some circumstances, codes may not have <i>explicitly</i>
+told an FEValues or FEFaceValues object that they actually need the
+JxW values, but could access them anyway without getting an
+error. This will now yield an error that is easily fixed by
+explicitly listing update_JxW_values as a required flag where you
+create the FEValues object.
+<br>
+(Wolfgang Bangerth, 2017/01/16)
