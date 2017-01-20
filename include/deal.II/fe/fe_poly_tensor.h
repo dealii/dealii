@@ -32,9 +32,11 @@ DEAL_II_NAMESPACE_OPEN
  * FiniteElement classes based on Tensor valued polynomial spaces like
  * PolynomialsBDM and PolynomialsRaviartThomas.
  *
- * Every class that implements following function can be used as template
- * parameter PolynomialType.
- *
+ * In essence, what this class requires is that a derived class describes
+ * to it a (vector-valued) polynomial space in which every polynomial
+ * has exactly @p dim vector components. The polynomial space is described
+ * through the @p PolynomialType template argument, which needs to provide
+ * a function of the following signature:
  * @code
  * void compute (const Point<dim>            &unit_point,
  *               std::vector<Tensor<1,dim> > &values,
@@ -42,63 +44,78 @@ DEAL_II_NAMESPACE_OPEN
  *               std::vector<Tensor<3,dim> > &grad_grads) const;
  * @endcode
  *
- * In many cases, the node functionals depend on the shape of the mesh cell,
- * since they evaluate normal or tangential components on the faces. In order
- * to allow for a set of transformations, the variable #mapping_type has been
- * introduced. It should also be set in the constructor of a derived class.
+ * For more information on the template parameter <tt>spacedim</tt>, see the
+ * documentation for the class Triangulation.
+ *
+ *
+ * <h3>Deriving classes</h3>
  *
  * This class is not a fully implemented FiniteElement class, but implements
  * some common features of vector valued elements based on vector valued
  * polynomial classes. What's missing here in particular is information on the
- * topological location of the node values.
+ * topological location of the node values, and derived classes need to provide
+ * this information.
  *
- * For more information on the template parameter <tt>spacedim</tt>, see the
- * documentation for the class Triangulation.
- *
- * <h3>Deriving classes</h3>
+ * Similarly, in many cases, node functionals depend on the shape of the mesh cell,
+ * since they evaluate normal or tangential components on the faces. In order
+ * to allow for a set of transformations, the variable #mapping_type has been
+ * introduced. It should needs be set in the constructor of a derived class.
  *
  * Any derived class must decide on the polynomial space to use.  This
  * polynomial space should be implemented simply as a set of vector valued
  * polynomials like PolynomialsBDM and PolynomialsRaviartThomas.  In order to
- * facilitate this implementation, the basis of this space may be arbitrary.
+ * facilitate this implementation, which basis the polynomial space chooses
+ * is not of importance to the current class -- as described next, this class
+ * handles the transformation from the basis chosen by the polynomial space
+ * template argument to the basis we want to use for finite element
+ * computations internally.
+ *
  *
  * <h4>Determining the correct basis</h4>
  *
- * In most cases, the set of desired node values $N_i$ and the basis functions
- * $v_j$ will not fulfill the interpolation condition $N_i(v_j) =
- * \delta_{ij}$.
- *
- * The use of the member data #inverse_node_matrix allows to compute the basis
- * $v_j$ automatically, after the node values for each original basis function
- * of the polynomial space have been computed.
- *
- * Therefore, the constructor of a derived class should have a structure like
- * this (example for interpolation in support points):
- *
+ * In most cases, the basis used by the class that describes the polynomial
+ * space, $\{\tilde\varphi_j(\hat{\mathbf x})\}$, does not match the one we
+ * want to use for the finite element description,
+ * $\{\varphi_j(\hat{\mathbf x})\}$. Rather, we need to express the finite
+ * element shape functions as a linear combination of the basis provided
+ * by the polynomial space:
+ * @f{align*}
+ *   \varphi_j = \sum_k c_{jk} \tilde\varphi_j.
+ * @f}
+ * These expansion coefficients $c_{jk}$ are typically computed in the
+ * constructors of derived classes. To facilitate this, this class
+ * at first (unless told otherwise, see below), assumes that the shape
+ * functions should be exactly the ones provided by the polynomial
+ * space. In the constructor of the derived class, one then typically has
+ * code of the form
  * @code
- *  fill_support_points();
- *
- *  const unsigned int n_dofs = this->dofs_per_cell;
- *  FullMatrix<double> N(n_dofs, n_dofs);
- *
- *  for (unsigned int i=0;i<n_dofs;++i)
- *    {
- *      const Point<dim>& p = this->unit_support_point[i];
- *
- *      for (unsigned int j=0;j<n_dofs;++j)
- *        for (unsigned int d=0;d<dim;++d)
- *          N(i,j) += node_vector[i][d]
- *                  * this->shape_value_component(j, p, d);
- *    }
- *
- *  this->inverse_node_matrix.reinit(n_dofs, n_dofs);
- *  this->inverse_node_matrix.invert(N);
+ *   // Now compute the inverse node matrix, generating the correct
+ *   // basis functions from the raw ones. For a discussion of what
+ *   // exactly happens here, see FETools::compute_node_matrix.
+ *   const FullMatrix<double> M = FETools::compute_node_matrix(*this);
+ *   this->inverse_node_matrix.reinit(n_dofs, n_dofs);
+ *   this->inverse_node_matrix.invert(M);
+ *   // From now on, the shape functions provided by FiniteElement::shape_value
+ *   // and similar functions will be the correct ones, not
+ *   // the raw shape functions from the polynomial space anymore.
  * @endcode
+ * The FETools::compute_node_matrix() function explains in more
+ * detail what exactly it computes, and how; in any case, the result
+ * is that @p inverse_node_matrix now contains the expansion coefficients
+ * $c_{jk}$, and the fact that this block of code now sets the
+ * matrix to a non-zero size indicates to the functions of the current
+ * class that it should from then on use the expanded basis,
+ * $\{\varphi_j(\hat{\mathbf x})\}$, and no longer the original, "raw"
+ * basis $\{\tilde\varphi_j(\hat{\mathbf x})\}$ when asked for values
+ * or derivatives of shape functions.
  *
- * @note The matrix #inverse_node_matrix should have dimensions zero before
- * this piece of code is executed. Only then, shape_value_component() will
- * return the raw polynomial <i>j</i> as defined in the polynomial space
- * PolynomialType.
+ * In order for this scheme to work, it is important to ensure that
+ * the size of the @p inverse_node_matrix be zero at the time when
+ * FETools::compute_node_matrix() is called; thus, the call to this
+ * function cannot be inlined into the last line -- the result of
+ * the call really does need to be stored in the temporary object
+ * @p M.
+ *
  *
  * <h4>Setting the transformation</h4>
  *
@@ -107,8 +124,11 @@ DEAL_II_NAMESPACE_OPEN
  * transformations can be selected from the set MappingType and stored in
  * #mapping_type. Therefore, each constructor should contain a line like:
  * @code
- * this->mapping_type = this->mapping_none;
+ * this->mapping_type = mapping_none;
  * @endcode
+ * (in case no mapping is required) or using whatever value among
+ * the ones defined in MappingType is appropriate for the element you
+ * are implementing.
  *
  * @see PolynomialsBDM, PolynomialsRaviartThomas
  * @ingroup febase
