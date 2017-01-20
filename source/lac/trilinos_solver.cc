@@ -88,8 +88,10 @@ namespace TrilinosWrappers
 
 
 
+  // Note: "A" is set as a constant reference so that all patterns for ::solve
+  //       can be used by the inverse_operator of LinearOperator
   void
-  SolverBase::solve (Epetra_Operator        &A,
+  SolverBase::solve (const Epetra_Operator  &A,
                      VectorBase             &x,
                      const VectorBase       &b,
                      const PreconditionBase &preconditioner)
@@ -99,9 +101,75 @@ namespace TrilinosWrappers
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
     linear_problem.reset
-    (new Epetra_LinearProblem(&A,
+    (new Epetra_LinearProblem(const_cast<Epetra_Operator *>(&A),
                               &x.trilinos_vector(),
                               const_cast<Epetra_MultiVector *>(&b.trilinos_vector())));
+
+    do_solve(preconditioner);
+  }
+
+
+
+  // Note: "A" is set as a constant reference so that all patterns for ::solve
+  //       can be used by the inverse_operator of LinearOperator
+  void
+  SolverBase::solve (const Epetra_Operator  &A,
+                     VectorBase             &x,
+                     const VectorBase       &b,
+                     const Epetra_Operator  &preconditioner)
+  {
+    linear_problem.reset();
+
+    // We need an Epetra_LinearProblem object to let the AztecOO solver know
+    // about the matrix and vectors.
+    linear_problem.reset
+    (new Epetra_LinearProblem(const_cast<Epetra_Operator *>(&A),
+                              &x.trilinos_vector(),
+                              const_cast<Epetra_MultiVector *>(&b.trilinos_vector())));
+
+    do_solve(preconditioner);
+  }
+
+
+
+  // Note: "A" is set as a constant reference so that all patterns for ::solve
+  //       can be used by the inverse_operator of LinearOperator
+  void
+  SolverBase::solve (const Epetra_Operator    &A,
+                     Epetra_MultiVector       &x,
+                     const Epetra_MultiVector &b,
+                     const PreconditionBase   &preconditioner)
+  {
+    linear_problem.reset();
+
+    // We need an Epetra_LinearProblem object to let the AztecOO solver know
+    // about the matrix and vectors.
+    linear_problem.reset
+    (new Epetra_LinearProblem(const_cast<Epetra_Operator *>(&A),
+                              &x,
+                              const_cast<Epetra_MultiVector *>(&b)));
+
+    do_solve(preconditioner);
+  }
+
+
+
+  // Note: "A" is set as a constant reference so that all patterns for ::solve
+  //       can be used by the inverse_operator of LinearOperator
+  void
+  SolverBase::solve (const Epetra_Operator    &A,
+                     Epetra_MultiVector       &x,
+                     const Epetra_MultiVector &b,
+                     const Epetra_Operator    &preconditioner)
+  {
+    linear_problem.reset();
+
+    // We need an Epetra_LinearProblem object to let the AztecOO solver know
+    // about the matrix and vectors.
+    linear_problem.reset
+    (new Epetra_LinearProblem(const_cast<Epetra_Operator *>(&A),
+                              &x,
+                              const_cast<Epetra_MultiVector *>(&b)));
 
     do_solve(preconditioner);
   }
@@ -214,9 +282,9 @@ namespace TrilinosWrappers
   }
 
 
-
+  template<typename Preconditioner>
   void
-  SolverBase::do_solve(const PreconditionBase &preconditioner)
+  SolverBase::do_solve(const Preconditioner &preconditioner)
   {
     int ierr;
 
@@ -246,16 +314,8 @@ namespace TrilinosWrappers
         Assert (false, ExcNotImplemented());
       }
 
-    // Introduce the preconditioner, if the identity preconditioner is used,
-    // the precondioner is set to none, ...
-    if (preconditioner.preconditioner.use_count()!=0)
-      {
-        ierr = solver.SetPrecOperator (const_cast<Epetra_Operator *>
-                                       (preconditioner.preconditioner.get()));
-        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-      }
-    else
-      solver.SetAztecOption(AZ_precond,AZ_none);
+    // Set the preconditioner
+    set_preconditioner(solver, preconditioner);
 
     // ... set some options, ...
     solver.SetAztecOption (AZ_output, additional_data.output_solver_details ?
@@ -299,6 +359,32 @@ namespace TrilinosWrappers
 
 
 
+  template<>
+  void
+  SolverBase::set_preconditioner(AztecOO                &solver,
+                                 const PreconditionBase &preconditioner)
+  {
+    // Introduce the preconditioner, if the identity preconditioner is used,
+    // the precondioner is set to none, ...
+    if (preconditioner.preconditioner.use_count()!=0)
+      {
+        const int ierr = solver.SetPrecOperator (const_cast<Epetra_Operator *>
+                                                 (preconditioner.preconditioner.get()));
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      }
+    else
+      solver.SetAztecOption(AZ_precond,AZ_none);
+  }
+
+
+  template<>
+  void
+  SolverBase::set_preconditioner(AztecOO               &solver,
+                                 const Epetra_Operator &preconditioner)
+  {
+    const int ierr = solver.SetPrecOperator (const_cast<Epetra_Operator *>(&preconditioner));
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+  }
 
 
   /* ---------------------- SolverCG ------------------------ */
@@ -635,6 +721,26 @@ namespace TrilinosWrappers
     do_solve();
   }
 
+}
+
+
+// explicit instantiations
+// TODO: put these instantiations into generic file
+namespace TrilinosWrappers
+{
+  template void
+  SolverBase::do_solve(const PreconditionBase &preconditioner);
+
+  template void
+  SolverBase::do_solve(const Epetra_Operator &preconditioner);
+
+  template void
+  SolverBase::set_preconditioner(AztecOO                &solver,
+                                 const PreconditionBase &preconditioner);
+
+  template void
+  SolverBase::set_preconditioner(AztecOO               &solver,
+                                 const Epetra_Operator &preconditioner);
 }
 
 DEAL_II_NAMESPACE_CLOSE

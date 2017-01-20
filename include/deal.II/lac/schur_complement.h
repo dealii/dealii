@@ -224,14 +224,15 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup LAOperators
  */
 template <typename Range_1, typename Domain_1,
-          typename Range_2, typename Domain_2>
-LinearOperator<Range_2, Domain_2>
-schur_complement(const LinearOperator<Domain_1, Range_1> &A_inv,
-                 const LinearOperator<Range_1, Domain_2> &B,
-                 const LinearOperator<Range_2, Domain_1> &C,
-                 const LinearOperator<Range_2, Domain_2> &D)
+          typename Range_2, typename Domain_2,
+          typename Payload>
+LinearOperator<Range_2, Domain_2, Payload>
+schur_complement(const LinearOperator<Domain_1, Range_1, Payload> &A_inv,
+                 const LinearOperator<Range_1, Domain_2, Payload> &B,
+                 const LinearOperator<Range_2, Domain_1, Payload> &C,
+                 const LinearOperator<Range_2, Domain_2, Payload> &D)
 {
-  LinearOperator<Range_2, Domain_2> return_op;
+  LinearOperator<Range_2, Domain_2, Payload> return_op ((Payload(D)));
 
   return_op.reinit_range_vector = D.reinit_range_vector;
   return_op.reinit_domain_vector = D.reinit_domain_vector;
@@ -361,12 +362,12 @@ schur_complement(const LinearOperator<Domain_1, Range_1> &A_inv,
  * @ingroup LAOperators
  */
 template <typename Range_1, typename Domain_1,
-          typename Range_2>
+          typename Range_2, typename Payload>
 PackagedOperation<Range_2>
-condense_schur_rhs (const LinearOperator<Range_1, Domain_1> &A_inv,
-                    const LinearOperator<Range_2, Domain_1> &C,
-                    const Range_1                           &f,
-                    const Range_2                           &g)
+condense_schur_rhs (const LinearOperator<Range_1, Domain_1, Payload> &A_inv,
+                    const LinearOperator<Range_2, Domain_1, Payload> &C,
+                    const Range_1                                    &f,
+                    const Range_2                                    &g)
 {
   PackagedOperation<Range_2> return_comp;
 
@@ -442,12 +443,12 @@ condense_schur_rhs (const LinearOperator<Range_1, Domain_1> &A_inv,
  * @ingroup LAOperators
  */
 template <typename Range_1, typename Domain_1,
-          typename Domain_2>
+          typename Domain_2, typename Payload>
 PackagedOperation<Domain_1>
-postprocess_schur_solution (const LinearOperator<Range_1, Domain_1> &A_inv,
-                            const LinearOperator<Range_1, Domain_2> &B,
-                            const Domain_2                          &y,
-                            const Range_1                           &f)
+postprocess_schur_solution (const LinearOperator<Range_1, Domain_1, Payload> &A_inv,
+                            const LinearOperator<Range_1, Domain_2, Payload> &B,
+                            const Domain_2                                   &y,
+                            const Range_1                                    &f)
 {
   PackagedOperation<Domain_1> return_comp;
 

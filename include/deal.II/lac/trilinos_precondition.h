@@ -72,7 +72,8 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2008
+   * @author Martin Kronbichler, 2008; extension for full compatibility with
+   * LinearOperator class: Jean-Paul Pelteret, 2015
    */
   class PreconditionBase : public Subscriptor
   {
@@ -111,6 +112,22 @@ namespace TrilinosWrappers
      * called the constructor.
      */
     void clear ();
+
+    /**
+     * Return the MPI communicator object in use with this matrix.
+     */
+    MPI_Comm get_mpi_communicator () const;
+
+    /**
+     * Sets an internal flag so that all operations performed by the matrix,
+     * i.e., multiplications, are done in transposed order. However, this does
+     * not reshape the matrix to transposed form directly, so care should be
+     * taken when using this flag.
+     *
+     * @note Calling this function any even number of times in succession will
+     * return the object to its original state.
+     */
+    void transpose ();
 
     /**
      * Apply the preconditioner.
@@ -153,14 +170,42 @@ namespace TrilinosWrappers
                          const dealii::LinearAlgebra::distributed::Vector<double> &src) const;
 
     /**
-     * Return a reference to the underlaying Trilinos Epetra_Operator. So you
-     * can use the preconditioner with unwrapped Trilinos solver.
+     * @name Access to underlying Trilinos data
+     */
+//@{
+    /**
      *
      * Calling this function from an uninitialized object will cause an
      * exception.
      */
-    Epetra_Operator &trilinos_operator() const;
+    Epetra_Operator &trilinos_operator () const;
+    //@}
 
+    /**
+     * @name Partitioners
+     */
+//@{
+
+    /**
+     * Return the partitioning of the domain space of this matrix, i.e., the
+     * partitioning of the vectors this matrix has to be multiplied with.
+     */
+    IndexSet locally_owned_domain_indices() const;
+
+    /**
+     * Return the partitioning of the range space of this matrix, i.e., the
+     * partitioning of the vectors that are result from matrix-vector
+     * products.
+     */
+    IndexSet locally_owned_range_indices() const;
+
+//@}
+
+    /**
+     * @addtogroup Exceptions
+     *
+     */
+//@{
     /**
      * Exception.
      */
@@ -170,6 +215,7 @@ namespace TrilinosWrappers
                     << "uses a map that is not compatible to the one in vector "
                     << arg1
                     << ". Check preconditioner and matrix setup.");
+//@}
 
     friend class SolverBase;
 
@@ -1798,11 +1844,33 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Bruno Turcksin, 2013
+   * @author Bruno Turcksin, 2013; extension for full compatibility with
+   * LinearOperator class: Jean-Paul Pelteret, 2016
    */
   class PreconditionIdentity : public PreconditionBase
   {
   public:
+
+    /**
+     * This function is only present to provide the interface of a
+     * preconditioner to be handed to a smoother.  This does nothing.
+     */
+    struct AdditionalData
+    {
+      /**
+       * Constructor.
+       */
+      AdditionalData () {}
+    };
+
+    /**
+     * The matrix argument is ignored and here just for compatibility with more
+     * complex preconditioners.
+     * @note This function must be called when this preconditioner is to be
+     * wrapped in a LinearOperator without an exemplar materix.
+     */
+    void initialize (const SparseMatrix   &matrix,
+                     const AdditionalData &additional_data = AdditionalData());
 
     /**
      * Apply the preconditioner, i.e., dst = src.
@@ -1852,6 +1920,31 @@ namespace TrilinosWrappers
 
 
 #ifndef DOXYGEN
+
+
+  inline
+  void
+  PreconditionBase::transpose ()
+  {
+    // This only flips a flag that tells
+    // Trilinos that any vmult operation
+    // should be done with the
+    // transpose. However, the matrix
+    // structure is not reset.
+    int ierr;
+
+    if (!preconditioner->UseTranspose())
+      {
+        ierr = preconditioner->SetUseTranspose (true);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      }
+    else
+      {
+        ierr = preconditioner->SetUseTranspose (false);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      }
+  }
+
 
   inline
   void
@@ -1970,14 +2063,6 @@ namespace TrilinosWrappers
     const int ierr = preconditioner->ApplyInverse (tril_src, tril_dst);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
     preconditioner->SetUseTranspose(false);
-  }
-
-  inline
-  Epetra_Operator &
-  PreconditionBase::trilinos_operator () const
-  {
-    AssertThrow (preconditioner, ExcMessage("Trying to dereference a null pointer."));
-    return (*preconditioner);
   }
 
 #endif

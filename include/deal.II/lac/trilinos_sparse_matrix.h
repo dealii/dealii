@@ -29,6 +29,10 @@
 #  include <deal.II/lac/trilinos_vector.h>
 #  include <deal.II/lac/vector_view.h>
 
+#ifdef DEAL_II_WITH_CXX11
+#include <deal.II/lac/vector_memory.h>
+#endif // DEAL_II_WITH_CXX11
+
 #  include <vector>
 #  include <cmath>
 #  include <memory>
@@ -38,11 +42,13 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Map.h>
 #  include <Epetra_CrsGraph.h>
 #  include <Epetra_MultiVector.h>
+#  include <Epetra_Operator.h>
+#  include <Epetra_Comm.h>
 #  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
 #    include "mpi.h"
 #  else
-#    include "Epetra_SerialComm.h"
+#    include <Epetra_SerialComm.h>
 #  endif
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
@@ -56,6 +62,7 @@ template <typename MatrixType> class BlockMatrixBase;
 template <typename number> class SparseMatrix;
 class SparsityPattern;
 class DynamicSparsityPattern;
+
 
 
 namespace TrilinosWrappers
@@ -1407,6 +1414,9 @@ namespace TrilinosWrappers
      * i.e., multiplications, are done in transposed order. However, this does
      * not reshape the matrix to transposed form directly, so care should be
      * taken when using this flag.
+     *
+     * @note Calling this function any even number of times in succession will
+     * return the object to its original state.
      */
     void transpose ();
 
@@ -2036,9 +2046,450 @@ namespace TrilinosWrappers
   };
 
 
+#ifdef DEAL_II_WITH_CXX11
+
+  // forwards declarations
+  class PreconditionBase;
+
+  namespace internal
+  {
+    namespace
+    {
+      inline
+      void check_vector_map_equality(const Epetra_CrsMatrix   &mtrx,
+                                     const Epetra_MultiVector &src,
+                                     const Epetra_MultiVector &dst,
+                                     const bool                transpose)
+      {
+        if (transpose == false)
+          {
+            Assert (src.Map().SameAs(mtrx.DomainMap()) == true,
+                    ExcMessage ("Column map of matrix does not fit with vector map!"));
+            Assert (dst.Map().SameAs(mtrx.RangeMap()) == true,
+                    ExcMessage ("Row map of matrix does not fit with vector map!"));
+          }
+        else
+          {
+            Assert (src.Map().SameAs(mtrx.RangeMap()) == true,
+                    ExcMessage ("Column map of matrix does not fit with vector map!"));
+            Assert (dst.Map().SameAs(mtrx.DomainMap()) == true,
+                    ExcMessage ("Row map of matrix does not fit with vector map!"));
+          }
+        (void)mtrx; // removes -Wunused-variable in optimized mode
+        (void)src;
+        (void)dst;
+      }
+
+      inline
+      void check_vector_map_equality(const Epetra_Operator    &op,
+                                     const Epetra_MultiVector &src,
+                                     const Epetra_MultiVector &dst,
+                                     const bool                transpose)
+      {
+        if (transpose == false)
+          {
+            Assert (src.Map().SameAs(op.OperatorDomainMap()) == true,
+                    ExcMessage ("Column map of operator does not fit with vector map!"));
+            Assert (dst.Map().SameAs(op.OperatorRangeMap()) == true,
+                    ExcMessage ("Row map of operator does not fit with vector map!"));
+          }
+        else
+          {
+            Assert (src.Map().SameAs(op.OperatorRangeMap()) == true,
+                    ExcMessage ("Column map of operator does not fit with vector map!"));
+            Assert (dst.Map().SameAs(op.OperatorDomainMap()) == true,
+                    ExcMessage ("Row map of operator does not fit with vector map!"));
+          }
+        (void)op; // removes -Wunused-variable in optimized mode
+        (void)src;
+        (void)dst;
+      }
+    }
+
+    namespace LinearOperator
+    {
+
+      /**
+      * This is a extension class to LinearOperators for Trilinos sparse matrix
+      * and preconditioner types. It provides the interface to performing basic
+      * operations (<tt>vmult</tt> and <tt>Tvmult</tt>)  on Trilinos vector types.
+      * It fulfills the requirements necessary for wrapping a Trilinos solver,
+      * which calls Epetra_Operator functions, as a LinearOperator.
+      *
+      * @note The TrilinosWrappers::SparseMatrix or
+      * TrilinosWrappers::PreconditionBase that this payload wraps is passed by
+      * reference to the <tt>vmult</tt> and <tt>Tvmult</tt> functions. This
+      * object is not thread-safe when the transpose flag is set on it or the
+      * Trilinos object to which it refers. See the docuemtation for the
+      * TrilinosWrappers::internal::LinearOperator::TrilinosPayload::SetUseTranspose()
+      * function for further details.
+      *
+      * @author Jean-Paul Pelteret, 2016
+      *
+      * @ingroup TrilinosWrappers
+      */
+      class TrilinosPayload
+        : public Epetra_Operator
+      {
+      public:
+
+        /**
+        * Definition for the internally supported vector type.
+        */
+        typedef Epetra_MultiVector VectorType;
+
+        /**
+        * Definition for the vector type for the domain space of the operator.
+        */
+        typedef VectorType Range;
+
+        /**
+        * Definition for the vector type for the range space of the operator.
+        */
+        typedef VectorType Domain;
+
+        /**
+        * @name Constructors / destructor
+        */
+//@{
+
+        /**
+        * Default constructor
+        *
+        * @note By design, the resulting object is inoperable since there is
+        * insufficient information with which to construct the domain and
+        * range maps.
+        */
+        TrilinosPayload ();
+
+        /**
+        * Constructor for a sparse matrix based on an exemplary matrix
+        */
+        TrilinosPayload (const TrilinosWrappers::SparseMatrix &matrix_exemplar,
+                         const TrilinosWrappers::SparseMatrix &matrix);
+
+        /**
+        * Constructor for a preconditioner based on an exemplary matrix
+        */
+        TrilinosPayload (const TrilinosWrappers::SparseMatrix     &matrix_exemplar,
+                         const TrilinosWrappers::PreconditionBase &preconditioner);
+
+        /**
+        * Constructor for a preconditioner based on an exemplary preconditioner
+        */
+        TrilinosPayload (const TrilinosWrappers::PreconditionBase &preconditioner_exemplar,
+                         const TrilinosWrappers::PreconditionBase &preconditioner);
+
+        /**
+        * Default copy constructor
+        */
+        TrilinosPayload (const TrilinosPayload &payload);
+
+        /**
+        * Composite copy constructor
+        *
+        * This is required for PackagedOperations as it sets up the domain and
+        * range maps, and composite <tt>vmult</tt> and <tt>Tvmult</tt> operations
+        * based on the combined operation of both operations
+        */
+        TrilinosPayload (const TrilinosPayload &first_op,
+                         const TrilinosPayload &second_op);
+
+        /**
+        * Destructor
+        */
+        virtual ~TrilinosPayload() {}
+
+        /**
+        * Default copy assignment operator.
+        */
+        TrilinosPayload &
+        operator=(const TrilinosPayload &) = default;
+
+
+        /**
+        * Returns a payload configured for transpose operations
+        */
+        TrilinosPayload transpose_payload () const;
+
+
+        /**
+        * Returns a payload configured for inverse operations
+        *
+        * Invoking this constructor will configure two additional functions,
+        * namely <tt>inv_vmult</tt> and <tt>inv_Tvmult</tt>, both of which wrap
+        * inverse operations.
+        * The <tt>vmult</tt> and <tt>Tvmult</tt> operations retain the standard
+        * definitions inherited from @p op.
+        */
+        template <typename Solver, typename Preconditioner>
+        TrilinosPayload inverse_payload (Solver &, const Preconditioner &) const;
+
+
+//@}
+
+        /**
+        * @name LinearOperator functionality
+        */
+//@{
+
+        /**
+         * Returns an IndexSet that defines the partitioning of the domain space
+         * of this matrix, i.e., the partitioning of the vectors this matrix has
+         * to be multiplied with / operate on.
+         */
+        IndexSet
+        locally_owned_domain_indices () const;
+
+        /**
+         * Returns an IndexSet that defines the partitioning of the range space
+         * of this matrix, i.e., the partitioning of the vectors that result
+         * from matrix-vector products.
+         */
+        IndexSet
+        locally_owned_range_indices () const;
+
+        /**
+         * Return the MPI communicator object in use with this Payload.
+         */
+        MPI_Comm
+        get_mpi_communicator () const;
+
+        /**
+         * Sets an internal flag so that all operations performed by the matrix,
+         * i.e., multiplications, are done in transposed order.
+         * @note This does not reshape the matrix to transposed form directly,
+         * so care should be taken when using this flag.
+         */
+        void
+        transpose ();
+
+        /**
+         * The standard matrix-vector operation to be performed by the payload
+         * when Apply is called.
+         *
+         * @note This is not called by a LinearOperator, but rather by Trilinos
+         * functions that expect this to mimic the action of the LinearOperator.
+         */
+        std::function<void(VectorType &, const VectorType &)> vmult;
+
+        /**
+         * The standard transpose matrix-vector operation to be performed by
+         * the payload when Apply is called.
+         *
+         * @note This is not called by a LinearOperator, but rather by Trilinos
+         * functions that expect this to mimic the action of the LinearOperator.
+         */
+        std::function<void(VectorType &, const VectorType &)> Tvmult;
+
+        /**
+         * The inverse matrix-vector operation to be performed by the payload
+         * when ApplyInverse is called.
+         *
+         * @note This is not called by a LinearOperator, but rather by Trilinos
+         * functions that expect this to mimic the action of the InverseOperator.
+         */
+        std::function<void(VectorType &, const VectorType &)> inv_vmult;
+
+        /**
+         * The inverse transpose matrix-vector operation to be performed by
+         * the payload when ApplyInverse is called.
+         *
+         * @note This is not called by a LinearOperator, but rather by Trilinos
+         * functions that expect this to mimic the action of the InverseOperator.
+         */
+        std::function<void(VectorType &, const VectorType &)> inv_Tvmult;
+
+//@}
+
+        /**
+        * @name Core Epetra_Operator functionality
+        */
+//@{
+
+        /**
+         * Return the status of the transpose flag for this operator
+         *
+         * This overloads the same function from the Trilinos class
+         * Epetra_Operator.
+         */
+        virtual bool
+        UseTranspose () const override;
+
+        /**
+         * Sets an internal flag so that all operations performed by the matrix,
+         * i.e., multiplications, are done in transposed order.
+         *
+         * This overloads the same function from the Trilinos class
+         * Epetra_Operator.
+         *
+         * @note This does not reshape the matrix to transposed form directly,
+         * so care should be taken when using this flag. When the flag is set to
+         * true (either here or directly on the underlying Trilinos object
+         * itself), this object is no longer thread-safe. In essense, it is not
+         * possible ensure that the transposed state of the LinearOperator and
+         * the underlying Trilinos object remain synchronized throughout all
+         * operations that may occur on different threads simultaneously.
+         */
+        virtual int
+        SetUseTranspose (bool UseTranspose) override;
+
+        /**
+         * Apply the vmult operation on a vector @p X (of internally defined
+         * type VectorType) and store the result in the vector @p Y.
+         *
+         * This overloads the same function from the Trilinos class
+         * Epetra_Operator.
+         *
+         * @note The intended operation depends on the status of the internal
+         * transpose flag. If this flag is set to true, the result will be
+         * the equivalent of performing a Tvmult operation.
+         */
+        virtual int
+        Apply(const VectorType &X,
+              VectorType       &Y) const override;
+
+        /**
+         * Apply the vmult inverse operation on a vector @p X (of internally
+         * defined type VectorType) and store the result in the vector @p Y.
+         *
+         * In practise, this function is only called from a Trilinos solver if
+         * the wrapped object is to act as a preconditioner.
+         *
+         * This overloads the same function from the Trilinos class
+         * Epetra_Operator.
+         *
+         * @note This function will only be operable if the payload has been
+         * initalised with an InverseOperator, or is a wrapper to a preconditioner.
+         * If not, then using this function will lead to an error being thrown.
+         * @note The intended operation depends on the status of the internal
+         * transpose flag. If this flag is set to true, the result will be
+         * the equivalent of performing a Tvmult operation.
+         */
+        virtual int
+        ApplyInverse(const VectorType &Y,
+                     VectorType       &X) const override;
+//@}
+
+        /**
+        * @name Additional Epetra_Operator functionality
+        */
+//@{
+
+        /**
+         * Returns a label to describe this class.
+         *
+         * This overloads the same function from the Trilinos class
+         * Epetra_Operator.
+         */
+        virtual const char *
+        Label () const override;
+
+        /**
+         * Returns a reference to the underlying MPI communicator for
+         * this object.
+         *
+         * This overloads the same function from the Trilinos class
+         * Epetra_Operator.
+         */
+        virtual const Epetra_Comm &
+        Comm () const override;
+
+        /**
+         * Return the partitioning of the domain space of this matrix, i.e., the
+         * partitioning of the vectors this matrix has to be multiplied with.
+         *
+         * This overloads the same function from the Trilinos class
+         * Epetra_Operator.
+         */
+        virtual const Epetra_Map &
+        OperatorDomainMap () const override;
+
+        /**
+         * Return the partitioning of the range space of this matrix, i.e., the
+         * partitioning of the vectors that are result from matrix-vector
+         * products.
+         *
+         * This overloads the same function from the Trilinos class
+         * Epetra_Operator.
+         */
+        virtual const Epetra_Map &
+        OperatorRangeMap () const override;
+//@}
+
+      private:
+
+        /**
+         * A flag recording whether the operator is to perform standard
+         * matrix-vector multiplication, or the transpose operation.
+         */
+        bool use_transpose;
+
+        /**
+         * Internal communication pattern in case the matrix needs to be copied
+         * from deal.II format.
+         */
+#ifdef DEAL_II_WITH_MPI
+        Epetra_MpiComm     communicator;
+#else
+        Epetra_SerialComm  communicator;
+#endif
+
+        /**
+        * Epetra_Map that sets the partitioning of the domain space of
+        * this operator.
+        */
+        Epetra_Map domain_map;
+
+        /**
+        * Epetra_Map that sets the partitioning of the range space of
+        * this operator.
+        */
+        Epetra_Map range_map;
+
+        /**
+         * Returns a flag that describes whether this operator can return the
+         * computation of the infinity norm. Since in general this is not the
+         * case, this always returns a negetive result.
+         *
+         * This overloads the same function from the Trilinos class
+         * Epetra_Operator.
+         */
+        virtual bool
+        HasNormInf () const override;
+
+        /**
+         * Returns the infinity norm of this operator.
+         * Throws an error since, in general, we cannot compute this value.
+         *
+         * This overloads the same function from the Trilinos class
+         * Epetra_Operator.
+         */
+        virtual double
+        NormInf () const override;
+      };
+
+      /**
+      * Returns an operator that returns a payload configured to support the
+      * addition of two LinearOperators
+      */
+      TrilinosPayload operator+(const TrilinosPayload &first_op,
+                                const TrilinosPayload &second_op);
+
+      /**
+      * Returns an operator that returns a payload configured to support the
+      * multiplication of two LinearOperators
+      */
+      TrilinosPayload operator*(const TrilinosPayload &first_op,
+                                const TrilinosPayload &second_op);
+
+    } /* namespace LinearOperator */
+  } /* namespace internal */
+
+#endif // DEAL_II_WITH_CXX11
+
 
 // -------------------------- inline and template functions ----------------------
-
 
 #ifndef DOXYGEN
 
@@ -2685,10 +3136,67 @@ namespace TrilinosWrappers
   }
 
 
+#ifdef DEAL_II_WITH_CXX11
+  namespace internal
+  {
+    namespace LinearOperator
+    {
+      template <typename Solver, typename Preconditioner>
+      TrilinosPayload
+      TrilinosPayload::inverse_payload (
+        Solver                &solver,
+        const Preconditioner  &preconditioner) const
+      {
+        const auto &payload = *this;
+
+        TrilinosPayload return_op(payload);
+
+        // Capture by copy so the payloads are always valid
+
+        return_op.inv_vmult = [payload,&solver,&preconditioner](
+                                TrilinosPayload::Domain &tril_dst, const TrilinosPayload::Range &tril_src
+                              )
+        {
+          // Duplicated from TrilinosWrappers::PreconditionBase::vmult
+          // as well as from TrilinosWrappers::SparseMatrix::Tvmult
+          Assert (&tril_src != &tril_dst, TrilinosWrappers::SparseMatrix::ExcSourceEqualsDestination());
+          internal::check_vector_map_equality(payload,
+                                              tril_src, tril_dst,
+                                              !payload.UseTranspose());
+          solver.solve(payload, tril_dst, tril_src, preconditioner);
+        };
+
+        return_op.inv_Tvmult = [payload,&solver,&preconditioner](
+                                 TrilinosPayload::Range &tril_dst, const TrilinosPayload::Domain &tril_src
+                               )
+        {
+          // Duplicated from TrilinosWrappers::PreconditionBase::vmult
+          // as well as from TrilinosWrappers::SparseMatrix::Tvmult
+          Assert (&tril_src != &tril_dst, TrilinosWrappers::SparseMatrix::ExcSourceEqualsDestination());
+          internal::check_vector_map_equality(payload,
+                                              tril_src, tril_dst,
+                                              payload.UseTranspose());
+
+          const_cast<TrilinosPayload &>(payload).transpose();
+          solver.solve(payload, tril_dst, tril_src, preconditioner);
+          const_cast<TrilinosPayload &>(payload).transpose();
+        };
+
+        // If the input operator is already setup for transpose operations, then
+        // we must do similar with its inverse.
+        if (return_op.UseTranspose() == true)
+          std::swap(return_op.inv_vmult,
+                    return_op.inv_Tvmult);
+
+        return return_op;
+      }
+    } // namespace LinearOperator
+  } // namespace internal
+#endif // DEAL_II_WITH_CXX11
 
 #endif // DOXYGEN
 
-}
+} /* namespace TrilinosWrappers */
 
 
 DEAL_II_NAMESPACE_CLOSE

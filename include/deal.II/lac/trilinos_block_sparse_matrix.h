@@ -563,7 +563,63 @@ namespace TrilinosWrappers
       BaseClass::vmult_nonblock_nonblock (dst, src);
   }
 
-}
+
+#ifdef DEAL_II_WITH_CXX11
+
+
+  namespace internal
+  {
+    namespace BlockLinearOperator
+    {
+
+      /**
+      * This is an extension class to BlockLinearOperators for Trilinos
+      * block sparse matrices.
+      *
+      * @note This class does very little at the moment other than to check
+      * that the correct Payload type for each subblock has been chosen
+      * correctly. Further extensions to the class may be necessary in the
+      * future in order to add further functionality to BlockLinearOperators
+      * while retaining compatability with the Trilinos sparse matrix and
+      * preconditioner classes.
+      *
+      * @author Jean-Paul Pelteret, 2016
+      *
+      * @ingroup TrilinosWrappers
+      */
+      template<typename PayloadBlockType>
+      class TrilinosBlockPayload
+      {
+      public:
+        /**
+        * Type of payload held by each subblock
+        */
+        typedef PayloadBlockType BlockType;
+
+        /**
+        * Default constructor
+        *
+        * This simply checks that the payload for each block has been chosen
+        * correctly (i.e. is of type TrilinosPayload). Apart from this, this
+        * class does not do anything in particular and needs no special
+        * configuration, we have only one generic constructor that can be
+        * called under any conditions.
+        */
+        template <typename... Args>
+        TrilinosBlockPayload (const Args &...)
+        {
+          static_assert(typeid(PayloadBlockType)==typeid(internal::LinearOperator::TrilinosPayload),
+                        "TrilinosBlockPayload can only accept a payload of type TrilinosPayload.");
+        }
+      };
+
+    } /*namespace BlockLinearOperator*/
+  } /* namespace internal */
+
+}/* namespace TrilinosWrappers */
+
+
+#endif // DEAL_II_WITH_CXX11
 
 DEAL_II_NAMESPACE_CLOSE
 

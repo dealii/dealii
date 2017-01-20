@@ -28,7 +28,7 @@ DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations:
 template <typename Number> class Vector;
-template <typename Range, typename Domain> class LinearOperator;
+template <typename Range, typename Domain, typename Payload> class LinearOperator;
 template <typename Range = Vector<double> > class PackagedOperation;
 
 
@@ -660,9 +660,9 @@ PackagedOperation<Range> operator*(typename Range::value_type number,
  *
  * @ingroup LAOperators
  */
-template <typename Range, typename Domain>
+template <typename Range, typename Domain, typename Payload>
 PackagedOperation<Range>
-operator*(const LinearOperator<Range, Domain> &op,
+operator*(const LinearOperator<Range, Domain, Payload> &op,
           const Domain &u)
 {
   PackagedOperation<Range> return_comp;
@@ -702,10 +702,10 @@ operator*(const LinearOperator<Range, Domain> &op,
  *
  * @ingroup LAOperators
  */
-template <typename Range, typename Domain>
+template <typename Range, typename Domain, typename Payload>
 PackagedOperation<Domain>
 operator*(const Range &u,
-          const LinearOperator<Range, Domain> &op)
+          const LinearOperator<Range, Domain, Payload> &op)
 {
   PackagedOperation<Range> return_comp;
 
@@ -736,9 +736,9 @@ operator*(const Range &u,
  *
  * @ingroup LAOperators
  */
-template <typename Range, typename Domain>
+template <typename Range, typename Domain, typename Payload>
 PackagedOperation<Range>
-operator*(const LinearOperator<Range, Domain> &op,
+operator*(const LinearOperator<Range, Domain, Payload> &op,
           const PackagedOperation<Domain> &comp)
 {
   PackagedOperation<Range> return_comp;
@@ -786,10 +786,10 @@ operator*(const LinearOperator<Range, Domain> &op,
  *
  * @ingroup LAOperators
  */
-template <typename Range, typename Domain>
+template <typename Range, typename Domain, typename Payload>
 PackagedOperation<Domain>
 operator*(const PackagedOperation<Range> &comp,
-          const LinearOperator<Range, Domain> &op)
+          const LinearOperator<Range, Domain, Payload> &op)
 {
   PackagedOperation<Range> return_comp;
 

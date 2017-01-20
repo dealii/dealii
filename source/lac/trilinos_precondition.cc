@@ -70,6 +70,33 @@ namespace TrilinosWrappers
   }
 
 
+  MPI_Comm
+  PreconditionBase::get_mpi_communicator () const
+  {
+    return communicator.GetMpiComm();
+  }
+
+
+  Epetra_Operator &
+  PreconditionBase::trilinos_operator () const
+  {
+    AssertThrow (preconditioner, ExcMessage("Trying to dereference a null pointer."));
+    return (*preconditioner);
+  }
+
+
+  IndexSet
+  PreconditionBase::locally_owned_domain_indices() const
+  {
+    return IndexSet(preconditioner->OperatorDomainMap());
+  }
+
+
+  IndexSet
+  PreconditionBase::locally_owned_range_indices() const
+  {
+    return IndexSet(preconditioner->OperatorRangeMap());
+  }
 
   /* -------------------------- PreconditionJacobi -------------------------- */
 
@@ -673,6 +700,49 @@ namespace TrilinosWrappers
 
 
   /* -------------------------- PreconditionIdentity --------------------- */
+
+  void
+  PreconditionIdentity::initialize (const SparseMatrix   &matrix,
+                                    const AdditionalData &)
+  {
+    // What follows just configures a dummy preconditioner that
+    // sets up the domain and range maps, as well as the communicator.
+    // It is never used as the vmult, Tvmult operations are
+    // given a custom defintion.
+    // Note: This is only required in order to wrap this
+    // preconditioner in a LinearOperator without an exemplar
+    // matrix.
+
+    // From PreconditionJacobi:
+    // release memory before reallocation
+    preconditioner.reset ();
+    preconditioner.reset (Ifpack().Create
+                          ("point relaxation",
+                           const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
+                           0));
+
+    Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
+                                    (preconditioner.get());
+    Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
+                                     "preconditioner"));
+
+    int ierr;
+
+    Teuchos::ParameterList parameter_list;
+    parameter_list.set ("relaxation: sweeps", 1);
+    parameter_list.set ("relaxation: type", "Jacobi");
+    parameter_list.set ("relaxation: damping factor", 1.0);
+    parameter_list.set ("relaxation: min diagonal value", 0.0);
+
+    ierr = ifpack->SetParameters(parameter_list);
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    ierr = ifpack->Initialize();
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    ierr = ifpack->Compute();
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+  }
 
   void
   PreconditionIdentity::vmult(VectorBase       &dst,
