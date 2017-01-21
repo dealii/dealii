@@ -119,7 +119,7 @@ namespace TrilinosWrappers
       /**
        * Same as above but for non-const reference objects.
        */
-      const VectorReference &
+      VectorReference &
       operator = (const VectorReference &r);
 
       /**
@@ -1005,7 +1005,7 @@ namespace TrilinosWrappers
 
 
     inline
-    const VectorReference &
+    VectorReference &
     VectorReference::operator = (const VectorReference &r)
     {
       // as above
