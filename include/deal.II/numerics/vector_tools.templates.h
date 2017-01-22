@@ -916,10 +916,6 @@ namespace VectorTools
       (void) project_to_boundary_first;
       (void) q_boundary;
 
-      const IndexSet locally_owned_dofs = dof.locally_owned_dofs();
-      IndexSet locally_relevant_dofs;
-      DoFTools::extract_locally_relevant_dofs(dof, locally_relevant_dofs);
-
       typedef typename VectorType::value_type number;
       Assert (dof.get_fe().n_components() == function.n_components,
               ExcDimensionMismatch(dof.get_fe().n_components(),
