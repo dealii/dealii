@@ -40,56 +40,23 @@ void test ()
   TrilinosWrappers::internal::VectorReference c (v(2));
 
   // copy VectorReference objects. note that operator= for these
-  // objects does not copy the*content* of the reference object, but
+  // objects does not copy the *content* of the reference object, but
   // assigns the value of the vector element referenced on the right
   // to the vector element referenced on the left
   (c = a) = b;
   b = a;
 
-  deallog << static_cast<TrilinosScalar>(a) << std::endl; // should point to v(0)
-  deallog << static_cast<TrilinosScalar>(b) << std::endl; // should point to v(0)
-  deallog << static_cast<TrilinosScalar>(c) << std::endl; // should point to v(0)
+  deallog << static_cast<TrilinosScalar>(a) << std::endl;
+  deallog << static_cast<TrilinosScalar>(b) << std::endl;
+  deallog << static_cast<TrilinosScalar>(c) << std::endl;
 }
 
 
 
 int main (int argc,char **argv)
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
-
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
-
-
-  try
-    {
-      {
-        test ();
-      }
-    }
-  catch (std::exception &exc)
-    {
-      std::cerr << std::endl << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      std::cerr << "Exception on processing: " << std::endl
-                << exc.what() << std::endl
-                << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-
-      return 1;
-    }
-  catch (...)
-    {
-      std::cerr << std::endl << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      std::cerr << "Unknown exception!" << std::endl
-                << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      return 1;
-    };
+  MPILogInitAll log;
+  
+  test ();
 }
