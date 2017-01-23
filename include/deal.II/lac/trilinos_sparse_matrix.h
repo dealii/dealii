@@ -2201,13 +2201,6 @@ namespace TrilinosWrappers
         virtual ~TrilinosPayload() {}
 
         /**
-        * Default copy assignment operator.
-        */
-        TrilinosPayload &
-        operator=(const TrilinosPayload &) = default;
-
-
-        /**
         * Returns a payload configured for transpose operations
         */
         TrilinosPayload transpose_payload () const;
@@ -2314,7 +2307,7 @@ namespace TrilinosWrappers
          * Epetra_Operator.
          */
         virtual bool
-        UseTranspose () const override;
+        UseTranspose () const;
 
         /**
          * Sets an internal flag so that all operations performed by the matrix,
@@ -2332,7 +2325,7 @@ namespace TrilinosWrappers
          * operations that may occur on different threads simultaneously.
          */
         virtual int
-        SetUseTranspose (bool UseTranspose) override;
+        SetUseTranspose (bool UseTranspose);
 
         /**
          * Apply the vmult operation on a vector @p X (of internally defined
@@ -2347,7 +2340,7 @@ namespace TrilinosWrappers
          */
         virtual int
         Apply(const VectorType &X,
-              VectorType       &Y) const override;
+              VectorType       &Y) const;
 
         /**
          * Apply the vmult inverse operation on a vector @p X (of internally
@@ -2368,7 +2361,7 @@ namespace TrilinosWrappers
          */
         virtual int
         ApplyInverse(const VectorType &Y,
-                     VectorType       &X) const override;
+                     VectorType       &X) const;
 //@}
 
         /**
@@ -2383,7 +2376,7 @@ namespace TrilinosWrappers
          * Epetra_Operator.
          */
         virtual const char *
-        Label () const override;
+        Label () const;
 
         /**
          * Returns a reference to the underlying MPI communicator for
@@ -2393,7 +2386,7 @@ namespace TrilinosWrappers
          * Epetra_Operator.
          */
         virtual const Epetra_Comm &
-        Comm () const override;
+        Comm () const;
 
         /**
          * Return the partitioning of the domain space of this matrix, i.e., the
@@ -2403,7 +2396,7 @@ namespace TrilinosWrappers
          * Epetra_Operator.
          */
         virtual const Epetra_Map &
-        OperatorDomainMap () const override;
+        OperatorDomainMap () const;
 
         /**
          * Return the partitioning of the range space of this matrix, i.e., the
@@ -2414,7 +2407,7 @@ namespace TrilinosWrappers
          * Epetra_Operator.
          */
         virtual const Epetra_Map &
-        OperatorRangeMap () const override;
+        OperatorRangeMap () const;
 //@}
 
       private:
@@ -2456,7 +2449,7 @@ namespace TrilinosWrappers
          * Epetra_Operator.
          */
         virtual bool
-        HasNormInf () const override;
+        HasNormInf () const;
 
         /**
          * Returns the infinity norm of this operator.
@@ -2466,7 +2459,7 @@ namespace TrilinosWrappers
          * Epetra_Operator.
          */
         virtual double
-        NormInf () const override;
+        NormInf () const;
       };
 
       /**
