@@ -294,8 +294,9 @@
 #endif
 
 //
-// last known and checked version is 19.00.23026 (VC++ 2015 RTM):
-#if (_MSC_VER > 1900)
+// tjhei: taken from boost git repo
+// last known and checked version is 19.10.24629 (VC++ 2017 RC):
+#if (_MSC_VER > 1910)
 #  if defined(BOOST_ASSERT_CONFIG)
 #     error "Unknown compiler version - please run the configure tests and report the results"
 #  else
