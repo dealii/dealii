@@ -365,7 +365,7 @@ namespace LinearAlgebra
               c.partitioner->local_range().second == c.partitioner->local_range().first));
           if ((c.partitioner->n_mpi_processes() > 1 &&
                Utilities::MPI::min(local_ranges_are_identical,
-                                   c.partitioner->get_communicator()) == 0)
+                                   c.partitioner->get_mpi_communicator()) == 0)
               ||
               !local_ranges_are_identical)
             reinit (c, true);
@@ -585,7 +585,7 @@ namespace LinearAlgebra
                                       part.import_targets()[i].first,
                                       part.import_targets()[i].first +
                                       part.n_mpi_processes()*channel,
-                                      part.get_communicator(),
+                                      part.get_mpi_communicator(),
                                       &compress_requests[i]);
           AssertThrowMPI (ierr);
           current_index_start += part.import_targets()[i].second;
@@ -608,7 +608,7 @@ namespace LinearAlgebra
                                       part.ghost_targets()[i].first,
                                       part.this_mpi_process() +
                                       part.n_mpi_processes()*channel,
-                                      part.get_communicator(),
+                                      part.get_mpi_communicator(),
                                       &compress_requests[n_import_targets+i]);
           AssertThrowMPI (ierr);
           current_index_start += part.ghost_targets()[i].second;
@@ -745,7 +745,7 @@ namespace LinearAlgebra
                                       part.ghost_targets()[i].first,
                                       part.ghost_targets()[i].first +
                                       counter*part.n_mpi_processes(),
-                                      part.get_communicator(),
+                                      part.get_mpi_communicator(),
                                       &update_ghost_values_requests[i]);
           AssertThrowMPI (ierr);
           current_index_start += part.ghost_targets()[i].second;
@@ -778,7 +778,7 @@ namespace LinearAlgebra
                                       MPI_BYTE, part.import_targets()[i].first,
                                       part.this_mpi_process() +
                                       part.n_mpi_processes()*counter,
-                                      part.get_communicator(),
+                                      part.get_mpi_communicator(),
                                       &update_ghost_values_requests[n_ghost_targets+i]);
           AssertThrowMPI (ierr);
           current_index_start += part.import_targets()[i].second;
@@ -1252,7 +1252,7 @@ namespace LinearAlgebra
       int local_result = -static_cast<int>(all_zero_local());
       if (partitioner->n_mpi_processes() > 1)
         return -Utilities::MPI::max(local_result,
-                                    partitioner->get_communicator());
+                                    partitioner->get_mpi_communicator());
       else
         return -local_result;
     }
@@ -1292,7 +1292,7 @@ namespace LinearAlgebra
       Number local_result = inner_product_local(v);
       if (partitioner->n_mpi_processes() > 1)
         return Utilities::MPI::sum (local_result,
-                                    partitioner->get_communicator());
+                                    partitioner->get_mpi_communicator());
       else
         return local_result;
     }
@@ -1341,7 +1341,7 @@ namespace LinearAlgebra
       if (partitioner->n_mpi_processes() > 1)
         return Utilities::MPI::sum (local_result *
                                     (real_type)partitioner->local_size(),
-                                    partitioner->get_communicator())
+                                    partitioner->get_mpi_communicator())
                /(real_type)partitioner->size();
       else
         return local_result;
@@ -1370,7 +1370,7 @@ namespace LinearAlgebra
       real_type local_result = l1_norm_local();
       if (partitioner->n_mpi_processes() > 1)
         return Utilities::MPI::sum(local_result,
-                                   partitioner->get_communicator());
+                                   partitioner->get_mpi_communicator());
       else
         return local_result;
     }
@@ -1384,7 +1384,7 @@ namespace LinearAlgebra
       real_type local_result = norm_sqr_local();
       if (partitioner->n_mpi_processes() > 1)
         return std::sqrt(Utilities::MPI::sum(local_result,
-                                             partitioner->get_communicator()));
+                                             partitioner->get_mpi_communicator()));
       else
         return std::sqrt(local_result);
     }
@@ -1411,7 +1411,7 @@ namespace LinearAlgebra
       const real_type local_result = lp_norm_local(p);
       if (partitioner->n_mpi_processes() > 1)
         return std::pow (Utilities::MPI::sum(std::pow(local_result,p),
-                                             partitioner->get_communicator()),
+                                             partitioner->get_mpi_communicator()),
                          static_cast<real_type>(1.0/p));
       else
         return local_result;
@@ -1442,7 +1442,7 @@ namespace LinearAlgebra
       const real_type local_result = linfty_norm_local();
       if (partitioner->n_mpi_processes() > 1)
         return Utilities::MPI::max (local_result,
-                                    partitioner->get_communicator());
+                                    partitioner->get_mpi_communicator());
       else
         return local_result;
     }
@@ -1485,7 +1485,7 @@ namespace LinearAlgebra
       Number local_result = add_and_dot_local(a, v, w);
       if (partitioner->n_mpi_processes() > 1)
         return Utilities::MPI::sum (local_result,
-                                    partitioner->get_communicator());
+                                    partitioner->get_mpi_communicator());
       else
         return local_result;
     }
@@ -1559,7 +1559,7 @@ namespace LinearAlgebra
       if (partitioner->n_mpi_processes() > 1)
         for (unsigned int i=0; i<partitioner->this_mpi_process(); i++)
           {
-            const int ierr = MPI_Barrier (partitioner->get_communicator());
+            const int ierr = MPI_Barrier (partitioner->get_mpi_communicator());
             AssertThrowMPI (ierr);
           }
 #endif
@@ -1596,13 +1596,13 @@ namespace LinearAlgebra
 #ifdef DEAL_II_WITH_MPI
       if (partitioner->n_mpi_processes() > 1)
         {
-          int ierr = MPI_Barrier (partitioner->get_communicator());
+          int ierr = MPI_Barrier (partitioner->get_mpi_communicator());
           AssertThrowMPI (ierr);
 
           for (unsigned int i=partitioner->this_mpi_process()+1;
                i<partitioner->n_mpi_processes(); i++)
             {
-              ierr = MPI_Barrier (partitioner->get_communicator());
+              ierr = MPI_Barrier (partitioner->get_mpi_communicator());
               AssertThrowMPI (ierr);
             }
         }
