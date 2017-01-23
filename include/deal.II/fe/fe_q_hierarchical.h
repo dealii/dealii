@@ -701,7 +701,7 @@ public:
   void
   interpolate(std::vector<double>                &local_dofs,
               const std::vector<Vector<double> > &values,
-              unsigned int offset = 0) const;
+              const unsigned int offset = 0) const;
 
   /**
    * This function is not implemented and throws an exception if called.

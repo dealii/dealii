@@ -3105,7 +3105,7 @@ template <int dim>
 void
 FE_Nedelec<dim>::interpolate (std::vector<double> &local_dofs,
                               const std::vector<Vector<double> > &values,
-                              unsigned int offset) const
+                              const unsigned int offset) const
 {
   const unsigned int deg = this->degree-1;
 

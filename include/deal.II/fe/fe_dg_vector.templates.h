@@ -105,7 +105,7 @@ void
 FE_DGVector<PolynomialType,dim,spacedim>::interpolate
 (std::vector<double> & /*local_dofs*/,
  const std::vector<Vector<double> > & /*values*/,
- unsigned int /*offset*/) const
+ const unsigned int /*offset*/) const
 {
   Assert(false, ExcNotImplemented());
 }

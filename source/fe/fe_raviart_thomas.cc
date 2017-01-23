@@ -477,7 +477,7 @@ void
 FE_RaviartThomas<dim>::interpolate(
   std::vector<double>    &local_dofs,
   const std::vector<Vector<double> > &values,
-  unsigned int offset) const
+  const unsigned int offset) const
 {
   Assert (values.size() == this->generalized_support_points.size(),
           ExcDimensionMismatch(values.size(), this->generalized_support_points.size()));
