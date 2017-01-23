@@ -199,7 +199,7 @@ template <int dim, int spacedim>
 void
 FE_Q_DG0<dim,spacedim>::interpolate(std::vector<double>    &local_dofs,
                                     const std::vector<Vector<double> > &values,
-                                    unsigned int offset) const
+                                    const unsigned int offset) const
 {
   Assert (values.size() == this->unit_support_points.size(),
           ExcDimensionMismatch(values.size(),

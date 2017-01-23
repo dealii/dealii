@@ -276,7 +276,7 @@ public:
    */
   virtual void interpolate(std::vector<double>                &local_dofs,
                            const std::vector<Vector<double> > &values,
-                           unsigned int offset = 0) const;
+                           const unsigned int                  offset = 0) const;
 
   /**
    * Interpolate a set of vector values, computed in the generalized support

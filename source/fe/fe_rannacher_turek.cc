@@ -133,7 +133,7 @@ template <int dim>
 void FE_RannacherTurek<dim>::interpolate(
   std::vector<double> &local_dofs,
   const std::vector<Vector<double> > &values,
-  unsigned int offset) const
+  const unsigned int offset) const
 {
   AssertDimension(values.size(), this->generalized_support_points.size());
   AssertDimension(local_dofs.size(), this->dofs_per_cell);
