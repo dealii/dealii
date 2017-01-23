@@ -73,7 +73,11 @@ namespace TrilinosWrappers
   MPI_Comm
   PreconditionBase::get_mpi_communicator () const
   {
-    return communicator.GetMpiComm();
+#ifdef DEAL_II_WITH_MPI
+    return communicator.Comm();
+#else
+    return MPI_COMM_SELF;
+#endif
   }
 
 
