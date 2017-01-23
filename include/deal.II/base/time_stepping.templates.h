@@ -52,7 +52,7 @@ namespace TimeStepping
   // ----------------------------------------------------------------------
 
   template <typename VectorType>
-  ExplicitRungeKutta<VectorType>::ExplicitRungeKutta(runge_kutta_method method)
+  ExplicitRungeKutta<VectorType>::ExplicitRungeKutta(const runge_kutta_method method)
   {
     initialize(method);
   }
@@ -60,7 +60,7 @@ namespace TimeStepping
 
 
   template <typename VectorType>
-  void ExplicitRungeKutta<VectorType>::initialize(runge_kutta_method method)
+  void ExplicitRungeKutta<VectorType>::initialize(const runge_kutta_method method)
   {
     status.method = method;
 
@@ -201,9 +201,9 @@ namespace TimeStepping
   // ----------------------------------------------------------------------
 
   template <typename VectorType>
-  ImplicitRungeKutta<VectorType>::ImplicitRungeKutta(runge_kutta_method method,
-                                                     unsigned int max_it,
-                                                     double tolerance)
+  ImplicitRungeKutta<VectorType>::ImplicitRungeKutta(const runge_kutta_method method,
+                                                     const unsigned int max_it,
+                                                     const double tolerance)
     :
     RungeKutta<VectorType> (),
     skip_linear_combi(false),
@@ -216,7 +216,7 @@ namespace TimeStepping
 
 
   template <typename VectorType>
-  void ImplicitRungeKutta<VectorType>::initialize(runge_kutta_method method)
+  void ImplicitRungeKutta<VectorType>::initialize(const runge_kutta_method method)
   {
     status.method = method;
 
@@ -399,13 +399,13 @@ namespace TimeStepping
 
   template <typename VectorType>
   EmbeddedExplicitRungeKutta<VectorType>::EmbeddedExplicitRungeKutta
-  (runge_kutta_method method,
-   double             coarsen_param,
-   double             refine_param,
-   double             min_delta,
-   double             max_delta,
-   double             refine_tol,
-   double             coarsen_tol)
+  (const runge_kutta_method method,
+   const double             coarsen_param,
+   const double             refine_param,
+   const double             min_delta,
+   const double             max_delta,
+   const double             refine_tol,
+   const double             coarsen_tol)
     :
     coarsen_param(coarsen_param),
     refine_param(refine_param),
@@ -422,7 +422,7 @@ namespace TimeStepping
 
 
   template <typename VectorType>
-  void EmbeddedExplicitRungeKutta<VectorType>::initialize(runge_kutta_method method)
+  void EmbeddedExplicitRungeKutta<VectorType>::initialize(const runge_kutta_method method)
   {
     status.method = method;
 
@@ -776,12 +776,13 @@ namespace TimeStepping
 
 
   template <typename VectorType>
-  void EmbeddedExplicitRungeKutta<VectorType>::set_time_adaptation_parameters(double coarsen_param_,
-      double refine_param_,
-      double min_delta_,
-      double max_delta_,
-      double refine_tol_,
-      double coarsen_tol_)
+  void EmbeddedExplicitRungeKutta<VectorType>::set_time_adaptation_parameters(
+    const double coarsen_param_,
+    const double refine_param_,
+    const double min_delta_,
+    const double max_delta_,
+    const double refine_tol_,
+    const double coarsen_tol_)
   {
     coarsen_param = coarsen_param_;
     refine_param = refine_param_;
