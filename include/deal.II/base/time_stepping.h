@@ -133,7 +133,7 @@ namespace TimeStepping
     /**
      * Purely virtual method used to initialize the Runge-Kutta method.
      */
-    virtual void initialize(runge_kutta_method method) = 0;
+    virtual void initialize(const runge_kutta_method method) = 0;
 
     /**
      * This function is used to advance from time @p t to t+ @p delta_t. @p F
@@ -215,12 +215,12 @@ namespace TimeStepping
     /**
      * Constructor. This function calls initialize(runge_kutta_method).
      */
-    ExplicitRungeKutta(runge_kutta_method method);
+    ExplicitRungeKutta(const runge_kutta_method method);
 
     /**
      * Initialize the explicit Runge-Kutta method.
      */
-    void initialize(runge_kutta_method method);
+    void initialize(const runge_kutta_method method);
 
     /**
      * This function is used to advance from time @p t to t+ @p delta_t. @p f
@@ -469,7 +469,7 @@ namespace TimeStepping
     /**
      * Initialize the embedded explicit Runge-Kutta method.
      */
-    void initialize(runge_kutta_method method);
+    void initialize(const runge_kutta_method method);
 
     /**
      * This function is used to advance from time @p t to t+ @p delta_t. @p f
