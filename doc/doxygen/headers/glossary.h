@@ -1255,7 +1255,7 @@
  *
  * <table><tr>
  *   <th>Element</th>
- *   <th>Function space</th>
+ *   <th>%Function space</th>
  *   <th>Node values</th></tr>
  *   <tr><th>FE_Q, FE_DGQ</th>
  *     <td><i>Q<sub>k</sub></i></td>
