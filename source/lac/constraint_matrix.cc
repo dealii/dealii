@@ -475,18 +475,18 @@ void ConstraintMatrix::close ()
 
 void
 ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
-                         const MergeConflictBehavior merge_conflict_behavior)
+                         const MergeConflictBehavior merge_conflict_behavior,
+                         const bool allow_different_local_lines)
 {
-  AssertThrow(local_lines == other_constraints.local_lines,
-              ExcNotImplemented());
+  (void) allow_different_local_lines;
+  Assert(allow_different_local_lines ||
+         local_lines == other_constraints.local_lines,
+         ExcMessage("local_lines for this and the other objects are not the same "
+                    "although allow_different_local_lines is false."));
 
   // store the previous state with respect to sorting
   const bool object_was_sorted = sorted;
   sorted = false;
-
-  if (other_constraints.lines_cache.size() > lines_cache.size())
-    lines_cache.resize(other_constraints.lines_cache.size(),
-                       numbers::invalid_size_type);
 
   // first action is to fold into the present object possible constraints
   // in the second object. we don't strictly need to do this any more since
@@ -503,15 +503,16 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
       tmp.clear ();
       for (size_type i=0; i<line->entries.size(); ++i)
         {
-          // if the present dof is not constrained, or if we won't take the
+          // if the present dof is not stored, or not constrained, or if we won't take the
           // constraint from the other object, then simply copy it over
-          if (other_constraints.is_constrained(line->entries[i].first) == false
+          if ((other_constraints.local_lines.size() != 0
+               && other_constraints.local_lines.is_element(line->entries[i].first) == false)
+              ||
+              other_constraints.is_constrained(line->entries[i].first) == false
               ||
               ((merge_conflict_behavior != right_object_wins)
-               &&
-               other_constraints.is_constrained(line->entries[i].first)
-               &&
-               this->is_constrained(line->entries[i].first)))
+               && other_constraints.is_constrained(line->entries[i].first)
+               && this->is_constrained(line->entries[i].first)))
             tmp.push_back(line->entries[i]);
           else
             // otherwise resolve further constraints by replacing the old
@@ -530,56 +531,85 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
                 tmp.push_back (std::pair<size_type,double>(j->first,
                                                            j->second*weight));
 
-              line->inhomogeneity += other_constraints.get_inhomogeneity(line->entries[i].first) *
-                                     weight;
+              line->inhomogeneity
+              += other_constraints.get_inhomogeneity(line->entries[i].first) *
+                 weight;
             }
         }
       // finally exchange old and newly resolved line
       line->entries.swap (tmp);
     }
 
-
-
-  // next action: append those lines at the end that we want to add
-  for (std::vector<ConstraintLine>::const_iterator
-       line=other_constraints.lines.begin();
-       line!=other_constraints.lines.end(); ++line)
-    if (is_constrained(line->line) == false)
-      lines.push_back (*line);
+  {
+    size_type new_size;
+    if (local_lines.size() != 0)
+      {
+        Assert (other_constraints.local_lines.size() !=0, ExcNotImplemented());
+        // The last stored index determines the new size of lines_cache
+        const size_type last_stored_index
+          = std::max(local_lines.nth_index_in_set(lines_cache.size()-1),
+                     other_constraints.local_lines.nth_index_in_set(other_constraints.lines_cache.size()-1));
+        // we don't need the old local_lines anymore, so update it
+        local_lines.add_indices(other_constraints.local_lines);
+        new_size = local_lines.index_within_set (last_stored_index)+1;
+      }
     else
       {
-        // the constrained dof we want to copy from the other object is
-        // also constrained here. let's see what we should do with that
-        switch (merge_conflict_behavior)
+        Assert (other_constraints.local_lines.size() == 0, ExcNotImplemented());
+        new_size = std::max(lines_cache.size(), other_constraints.lines_cache.size());
+      }
+    // we don't need the old lines_cache anymore
+    lines_cache.assign(new_size, numbers::invalid_size_type);
+  }
+
+  {
+    size_type index = 0;
+    // reset lines_cache for our own constraints
+    for (std::vector<ConstraintLine>::const_iterator line = lines.begin();
+         line != lines.end(); ++line)
+      lines_cache[calculate_line_index(line->line)] = index++;
+
+    // Then consider other_constraints
+    for (std::vector<ConstraintLine>::const_iterator line = other_constraints.lines.begin();
+         line != other_constraints.lines.end(); ++line)
+      {
+        const size_type local_line_no = calculate_line_index(line->line);
+        if (lines_cache[local_line_no] == numbers::invalid_size_type)
           {
-          case no_conflicts_allowed:
-            AssertThrow (false,
-                         ExcDoFIsConstrainedFromBothObjects (line->line));
-            break;
+            // there are no constraints for that line yet
+            lines.push_back(*line);
+            lines_cache[local_line_no] = index++;
+          }
+        else
+          {
+            // we already store that line
+            switch (merge_conflict_behavior)
+              {
+              case no_conflicts_allowed:
+                AssertThrow (false,
+                             ExcDoFIsConstrainedFromBothObjects (line->line));
+                break;
 
-          case left_object_wins:
-            // ignore this constraint
-            break;
+              case left_object_wins:
+                // ignore this constraint
+                break;
 
-          case right_object_wins:
-            // we need to replace the existing constraint by the one from
-            // the other object
-            lines[lines_cache[calculate_line_index(line->line)]].entries
-              = line->entries;
-            lines[lines_cache[calculate_line_index(line->line)]].inhomogeneity
-              = line->inhomogeneity;
-            break;
+              case right_object_wins:
+                lines[lines_cache[local_line_no]] = *line;
+                break;
 
-          default:
-            Assert (false, ExcNotImplemented());
+              default:
+                Assert (false, ExcNotImplemented());
+              }
           }
       }
 
-  // update the lines cache
-  size_type counter = 0;
-  for (std::vector<ConstraintLine>::const_iterator line=lines.begin();
-       line!=lines.end(); ++line, ++counter)
-    lines_cache[calculate_line_index(line->line)] = counter;
+    // check that we set the pointers correctly
+    for (size_type i=0; i<lines_cache.size(); ++i)
+      if (lines_cache[i] != numbers::invalid_size_type)
+        Assert (i == calculate_line_index(lines[lines_cache[i]].line),
+                ExcInternalError());
+  }
 
   // if the object was sorted before, then make sure it is so afterward as
   // well. otherwise leave everything in the unsorted state

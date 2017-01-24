@@ -1,0 +1,4 @@
+New: Two ConstraintMatrix objects can be merged even if their
+local_lines are not the same.
+<br>
+(Daniel Arndt, 2017/01/13)

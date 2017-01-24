@@ -359,9 +359,18 @@ public:
    * second. If this is nevertheless the case, an exception is thrown.
    * However, this behavior can be changed by providing a different value for
    * the second argument.
+   *
+   * By default, merging two ConstraintMatrix objects that are initialized
+   * with different IndexSet objects is not allowed.
+   * This behavior can be altered by setting @p allow_different_local_lines
+   * appropriately.
+   *
+   * Merging a ConstraintMatrix that is initialized with an IndexSet
+   * and one that is not initialized with an IndexSet is not yet implemented.
    */
   void merge (const ConstraintMatrix &other_constraints,
-              const MergeConflictBehavior merge_conflict_behavior = no_conflicts_allowed);
+              const MergeConflictBehavior merge_conflict_behavior = no_conflicts_allowed,
+              const bool allow_different_local_lines = false);
 
   /**
    * Shift all entries of this matrix down @p offset rows and over @p offset
