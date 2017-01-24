@@ -16,7 +16,7 @@
 
 // Deadlock reported by Kronbichler (github
 // https://github.com/dealii/dealii/issues/2051) with 3 processes
-// in MgTransferPrebuilt
+// in MGTransferPrebuilt
 
 
 #include "../tests.h"
@@ -27,6 +27,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/multigrid/mg_transfer.h>
+#include <deal.II/multigrid/mg_transfer_matrix_free.h>
 #include <deal.II/grid/grid_out.h>
 
 
@@ -76,10 +77,23 @@ void check()
 
           grid_out.write_svg (tr, grid_output);
         }
+#ifdef DEAL_II_WITH_TRILINOS
+      {
+        // MGTransferPrebuilt internally uses Trilinos matrices, so only
+        // create this if we have Trilinos
+        MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double> >
+        transfer_ref(mg_constrained_dofs);
+        transfer_ref.build_matrices(mgdof);
+      }
+#endif
+      {
+        // but the matrix free transfer will work without Trilinos
+        MGTransferMatrixFree<dim, double>
+        transfer_ref(mg_constrained_dofs);
+        transfer_ref.build(mgdof);
+      }
 
-      MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double> >
-      transfer_ref(mg_constrained_dofs);
-      transfer_ref.build_matrices(mgdof);
+
     }
 }
 
