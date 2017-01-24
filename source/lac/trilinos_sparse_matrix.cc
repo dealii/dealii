@@ -2449,6 +2449,20 @@ namespace TrilinosWrappers
 {
   namespace internal
   {
+    namespace
+    {
+#ifndef DEAL_II_WITH_MPI
+      Epetra_Map
+      make_serial_Epetra_map (const IndexSet &serial_partitioning)
+      {
+        // See IndexSet::make_trilinos_map
+        return Epetra_Map(TrilinosWrappers::types::int_type(serial_partitioning.size()),
+                          TrilinosWrappers::types::int_type(serial_partitioning.n_elements()),
+                          0, Epetra_SerialComm());
+      }
+#endif
+    }
+
     namespace LinearOperator
     {
 
@@ -2456,9 +2470,12 @@ namespace TrilinosWrappers
         : use_transpose (false),
 #ifdef DEAL_II_WITH_MPI
           communicator (MPI_COMM_SELF),
-#endif
           domain_map (IndexSet().make_trilinos_map(communicator.Comm())),
           range_map (IndexSet().make_trilinos_map(communicator.Comm()))
+#else
+          domain_map (internal::make_serial_Epetra_map(IndexSet())),
+          range_map (internal::make_serial_Epetra_map(IndexSet()))
+#endif
       {
         vmult = [](Range &, const Domain &)
         {
@@ -2494,9 +2511,14 @@ namespace TrilinosWrappers
       TrilinosPayload::TrilinosPayload (const TrilinosWrappers::SparseMatrix &matrix_exemplar,
                                         const TrilinosWrappers::SparseMatrix &matrix)
         : use_transpose (matrix_exemplar.trilinos_matrix().UseTranspose()),
+#ifdef DEAL_II_WITH_MPI
           communicator (matrix_exemplar.get_mpi_communicator()),
           domain_map (matrix_exemplar.locally_owned_domain_indices().make_trilinos_map(communicator.Comm())),
           range_map (matrix_exemplar.locally_owned_range_indices().make_trilinos_map(communicator.Comm()))
+#else
+          domain_map (internal::make_serial_Epetra_map(matrix_exemplar.locally_owned_domain_indices())),
+          range_map (internal::make_serial_Epetra_map(matrix_exemplar.locally_owned_range_indices()))
+#endif
       {
         vmult = [&matrix_exemplar,&matrix](Range &tril_dst, const Domain &tril_src)
         {
@@ -2553,9 +2575,14 @@ namespace TrilinosWrappers
       TrilinosPayload::TrilinosPayload (const TrilinosWrappers::SparseMatrix     &matrix_exemplar,
                                         const TrilinosWrappers::PreconditionBase &preconditioner)
         : use_transpose (matrix_exemplar.trilinos_matrix().UseTranspose()),
+#ifdef DEAL_II_WITH_MPI
           communicator (matrix_exemplar.get_mpi_communicator()),
           domain_map (matrix_exemplar.locally_owned_domain_indices().make_trilinos_map(communicator.Comm())),
           range_map (matrix_exemplar.locally_owned_range_indices().make_trilinos_map(communicator.Comm()))
+#else
+          domain_map (internal::make_serial_Epetra_map(matrix_exemplar.locally_owned_domain_indices())),
+          range_map (internal::make_serial_Epetra_map(matrix_exemplar.locally_owned_range_indices()))
+#endif
       {
         vmult = [&matrix_exemplar,&preconditioner](Range &tril_dst, const Domain &tril_src)
         {
@@ -2631,9 +2658,14 @@ namespace TrilinosWrappers
       TrilinosPayload::TrilinosPayload (const TrilinosWrappers::PreconditionBase &preconditioner_exemplar,
                                         const TrilinosWrappers::PreconditionBase &preconditioner)
         : use_transpose (preconditioner_exemplar.trilinos_operator().UseTranspose()),
+#ifdef DEAL_II_WITH_MPI
           communicator (preconditioner_exemplar.get_mpi_communicator()),
           domain_map (preconditioner_exemplar.locally_owned_domain_indices().make_trilinos_map(communicator.Comm())),
           range_map (preconditioner_exemplar.locally_owned_range_indices().make_trilinos_map(communicator.Comm()))
+#else
+          domain_map (internal::make_serial_Epetra_map(preconditioner_exemplar.locally_owned_domain_indices())),
+          range_map (internal::make_serial_Epetra_map(preconditioner_exemplar.locally_owned_range_indices()))
+#endif
       {
         vmult = [&preconditioner_exemplar,&preconditioner](Range &tril_dst, const Domain &tril_src)
         {
@@ -2760,7 +2792,11 @@ namespace TrilinosWrappers
       MPI_Comm
       TrilinosPayload::get_mpi_communicator () const
       {
+#ifdef DEAL_II_WITH_MPI
         return communicator.Comm();
+#else
+        return MPI_COMM_SELF;
+#endif
       }
 
 
