@@ -278,7 +278,8 @@ namespace FETools
    * - That the node functionals $\Psi_i$ are point evaluations at points
    *   $\mathbf x_i$ that the finite element in question describes via its
    *   "generalized" support points (through
-   *   FiniteElement::get_generalized_support_points()). These point
+   *   FiniteElement::get_generalized_support_points(), see also
+   *   @ref GlossGeneralizedSupport "this glossary entry"). These point
    *   evaluations need to necessarily evaluate the <i>value</i> of a shape
    *   function at that point (the shape function may be vector-valued, and
    *   so the functional may be a linear combination of the individual
