@@ -49,7 +49,7 @@ void test_boundary(const FiniteElement<dim> &fe, bool diff=false)
 
   FullMatrix<double> M(fe.dofs_per_cell);
   FullMatrix<double> Mglobal(dof.n_dofs());
-  std::vector<unsigned int> indices(fe.dofs_per_cell);
+  std::vector<types::global_dof_index> indices(fe.dofs_per_cell);
 
   typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
   cell->get_dof_indices(indices);
@@ -87,8 +87,8 @@ void test_face(const FiniteElement<dim> &fe, bool diff=false)
   FullMatrix<double> M21(fe.dofs_per_cell);
   FullMatrix<double> M22(fe.dofs_per_cell);
   FullMatrix<double> Mglobal(dof.n_dofs());
-  std::vector<unsigned int> indices1(fe.dofs_per_cell);
-  std::vector<unsigned int> indices2(fe.dofs_per_cell);
+  std::vector<types::global_dof_index> indices1(fe.dofs_per_cell);
+  std::vector<types::global_dof_index> indices2(fe.dofs_per_cell);
 
   typename DoFHandler<dim>::active_cell_iterator cell1 = dof.begin_active();
   typename DoFHandler<dim>::active_cell_iterator cell2 = ++dof.begin_active();
