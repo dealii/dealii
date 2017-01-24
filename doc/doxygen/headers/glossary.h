@@ -855,21 +855,59 @@
  *
  *
  * <dt class="glossary">@anchor GlossGeneralizedSupport <b>Generalized support points</b></dt>
- * <dd>While @ref GlossSupport "support points" allow very simple interpolation
- * into the finite element space, their concept is restricted to
- * @ref GlossLagrange "Lagrange elements". For other elements, more general
- * interpolation operators can be defined, often relying on integral values
- * or moments. Since these integral values are again computed using a
- * quadrature rule, we consider them a generalization of support
- * points.
+ * <dd>"Generalized support points" are, as the name suggests, a
+ * generalization of @ref GlossSupport "support points". The latter
+ * are used to describe that a finite element simply <i>interpolates</i>
+ * values at individual points (the "support points"). If we call these
+ * points $\hat\mathbf x_i$ (where the hat indicates that these points
+ * are defined on the reference cell $\hat K$), then one typically defines
+ * shape functions $\varphi_j(\mathbf x)$ in such a way that the
+ * <i>nodal functionals</i> $\Psi_i[\cdot]$ simply evaluate the function
+ * at the support point, i.e., that $\Psi_i[\varphi]=\varphi(\hat\mathbf x_i)$,
+ * and the basis is chosen so that $\Psi_i[\varphi_j]=\delta_{ij}$ where
+ * $\delta_{ij}$ is the Kronecker delta function. This leads to the common
+ * @ref GlossLagrange "Lagrange elements".
  *
- * Note that there is no simple relation between
- * @ref GlossShape "shape functions" and generalized support points, unlike for
- * regular @ref GlossSupport "support points". Instead, FiniteElement defines
- * a couple of interpolation functions doing the actual interpolation.
+ * (In the vector valued case, the only other piece of information
+ * besides the support points $\hat\mathbf x_i$ that one needs to provide
+ * is the <i>vector component</i> $c(i)$ the $i$th node functional
+ * corresponds, so that $\Psi_i[\varphi]=\varphi(\hat\mathbf x_i)_{c(i)}$.)
  *
- * If a finite element is Lagrangian, generalized support points
- * and support points coincide.
+ * On the other hand, there are other kinds of elements that are not
+ * defined this way. For example, for the lowest order Raviart-Thomas element
+ * (see the FE_RaviartThomas class), the node functional evaluates not
+ * individual components of a vector-valued finite element function with @p dim
+ * components, but the <i>normal component</i> of this vector:
+ * $\Psi_i[\varphi]
+ *  =
+ *  \varphi(\hat\mathbf x_i) \cdot \mathbf n_i
+ * $, where the $\mathbf n_i$ are the normal vectors to the face of the cell
+ * on which $\hat\mathbf x_i$ is located. In other words, the node functional
+ * is a <i>linear combination</i> of the components of $\varphi$ when
+ * evaluated at $\hat\mathbf x_i$. Similar things happen for the BDM,
+ * ABF, and Nedelec elements (see the FE_BDM, FE_ABF, FE_Nedelec classes).
+ *
+ * In these cases, the element does not have <i>support points</i> because
+ * it is not purely interpolatory; however, some kind of interpolation
+ * is still involved when defining shape functions as the node functionals
+ * still require point evaluations at special points $\hat\mathbf x_i$.
+ * In these cases, we call the points <i>generalized support points</i>.
+ *
+ * Finally, there are elements that still do not fit into this
+ * scheme. For example, some hierarchical basis functions
+ * (see, for example the FE_Q_Hierarchical element) are defined so
+ * that the node functionals are <i>moments</i> of finite element
+ * functions,
+ * $\Psi_i[\varphi]
+ *  =
+ *  \int_{\hat K} \varphi(\hat\mathbf x)
+ *  {\hat x_1}^{p_1(i)}
+ *  {\hat x_2}^{p_2(i)}
+ * $ in 2d, and similarly for 3d, where the $p_d(i)$ are the order
+ * of the moment described by shape function $i$. Some other elements
+ * use moments over edges or faces. In all of these cases, node functionals
+ * are not defined through interpolation at all, and these elements then
+ * have neither support points, nor generalized support points.
  * </dd>
  *
  *
