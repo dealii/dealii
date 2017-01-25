@@ -1850,10 +1850,10 @@ public:
   unit_face_support_point (const unsigned int index) const;
 
   /**
-   * Return a support point vector for generalized interpolation.
+   * Return a vector of generalized support points.
    *
    * See the
-   * @ref GlossGeneralizedSupport "glossary entry on generalized points"
+   * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
    * for more information.
    */
   const std::vector<Point<dim> > &
@@ -1870,7 +1870,8 @@ public:
   bool has_generalized_support_points () const;
 
   /**
-   *
+   * Return the equivalent to get_generalized_support_points(), except
+   * for faces.
    */
   const std::vector<Point<dim-1> > &
   get_generalized_face_support_points () const;
@@ -1878,7 +1879,7 @@ public:
   /**
    * Return whether a finite element has defined generalized support points on
    * faces. If the result is true, then a call to the
-   * get_generalized_face_support_points yields a non-empty array.
+   * get_generalized_face_support_points() function yields a non-empty array.
    *
    * For more information, see the documentation for the has_support_points()
    * function.
