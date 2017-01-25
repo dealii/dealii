@@ -546,12 +546,28 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
       {
         Assert (other_constraints.local_lines.size() !=0, ExcNotImplemented());
         // The last stored index determines the new size of lines_cache
-        const size_type last_stored_index
-          = std::max(local_lines.nth_index_in_set(lines_cache.size()-1),
-                     other_constraints.local_lines.nth_index_in_set(other_constraints.lines_cache.size()-1));
-        // we don't need the old local_lines anymore, so update it
-        local_lines.add_indices(other_constraints.local_lines);
-        new_size = local_lines.index_within_set (last_stored_index)+1;
+        if (lines_cache.size()>0 || other_constraints.lines_cache.size()>0)
+          {
+            // there exist constraints
+            const size_type last_stored_index_own
+              = (lines_cache.size()>0)?
+                local_lines.nth_index_in_set(lines_cache.size()-1):
+                0;
+            const size_type last_stored_index_other
+              = (other_constraints.lines_cache.size()>0)?
+                other_constraints.local_lines.nth_index_in_set(other_constraints.lines_cache.size()-1):
+                0;
+            const size_type last_stored_index = std::max(last_stored_index_own,
+                                                         last_stored_index_other);
+            // we don't need the old local_lines anymore, so update it
+            local_lines.add_indices(other_constraints.local_lines);
+            new_size = local_lines.index_within_set (last_stored_index)+1;
+          }
+        else
+          {
+            // there don't exist constraints
+            new_size = 0;
+          }
       }
     else
       {
