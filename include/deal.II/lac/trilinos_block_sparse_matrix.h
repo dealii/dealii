@@ -616,10 +616,10 @@ namespace TrilinosWrappers
     } /*namespace BlockLinearOperator*/
   } /* namespace internal */
 
+#endif // DEAL_II_WITH_CXX11
+
 }/* namespace TrilinosWrappers */
 
-
-#endif // DEAL_II_WITH_CXX11
 
 DEAL_II_NAMESPACE_CLOSE
 
