@@ -313,14 +313,16 @@ namespace MatrixFreeOperators
     /**
      * vmult operator, see class description for more info.
      */
-    void vmult (LinearAlgebra::distributed::Vector<value_type> &dst,
-                const LinearAlgebra::distributed::Vector<value_type> &src) const;
+    template <typename VectorType>
+    void vmult (VectorType &dst,
+                const VectorType &src) const;
 
     /**
      * Tvmult operator, see class description for more info.
      */
-    void Tvmult (LinearAlgebra::distributed::Vector<value_type> &dst,
-                 const LinearAlgebra::distributed::Vector<value_type> &src) const;
+    template <typename VectorType>
+    void Tvmult (VectorType &dst,
+                 const VectorType &src) const;
 
   private:
     /**
@@ -1090,10 +1092,19 @@ namespace MatrixFreeOperators
 
 
   template <typename OperatorType>
+  template <typename VectorType>
   void
-  MGInterfaceOperator<OperatorType>::vmult (LinearAlgebra::distributed::Vector<typename MGInterfaceOperator<OperatorType>::value_type> &dst,
-                                            const LinearAlgebra::distributed::Vector<typename MGInterfaceOperator<OperatorType>::value_type> &src) const
+  MGInterfaceOperator<OperatorType>::vmult (VectorType &dst,
+                                            const VectorType &src) const
   {
+#ifdef DEAL_II_WITH_CXX11
+#ifndef DEAL_II_MSVC
+    static_assert (std::is_same<typename VectorType::value_type,value_type>::value,
+                   "The vector type must be based on the same value type as this"
+                   "operator");
+#endif
+#endif
+
     Assert(mf_base_operator != NULL,
            ExcNotInitialized());
 
@@ -1103,10 +1114,19 @@ namespace MatrixFreeOperators
 
 
   template <typename OperatorType>
+  template <typename VectorType>
   void
-  MGInterfaceOperator<OperatorType>::Tvmult (LinearAlgebra::distributed::Vector<typename MGInterfaceOperator<OperatorType>::value_type> &dst,
-                                             const LinearAlgebra::distributed::Vector<typename MGInterfaceOperator<OperatorType>::value_type> &src) const
+  MGInterfaceOperator<OperatorType>::Tvmult (VectorType &dst,
+                                             const VectorType &src) const
   {
+#ifdef DEAL_II_WITH_CXX11
+#ifndef DEAL_II_MSVC
+    static_assert (std::is_same<typename VectorType::value_type,value_type>::value,
+                   "The vector type must be based on the same value type as this"
+                   "operator");
+#endif
+#endif
+
     Assert(mf_base_operator != NULL,
            ExcNotInitialized());
 
