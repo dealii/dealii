@@ -44,7 +44,7 @@ test (const unsigned int degree)
           << std::endl;
 
   for (unsigned int i=0; i<fe_bdm.dofs_per_cell; ++i)
-    std::cout << fe_bdm.restriction_is_additive(i) << " ";
+    deallog << fe_bdm.restriction_is_additive(i) << " ";
 
   deallog << std::endl;
 }
