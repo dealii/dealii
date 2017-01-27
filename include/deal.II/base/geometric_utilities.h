@@ -45,6 +45,13 @@ namespace GeometricUtilities
      * Return spherical coordinates of a Cartesian point @p point.
      * The returned array is filled with radius, azimuth angle $\in [0,2 \pi)$
      * and polar/inclination angle $ \in [0,\pi]$ (ommited in 2D).
+     *
+     * In 3D the transformation is given by
+     * @f{align*}
+     *  r &= \sqrt{x^2+y^2+z^2} \\
+     *  \theta &= {\rm atan}(y/x) \\
+     *  \phi &= {\rm acos} (z/r)
+     * @f}
      */
     template <int dim>
     std_cxx11::array<double,dim>
@@ -52,9 +59,16 @@ namespace GeometricUtilities
 
     /**
      * Return the Cartesian coordinates of a spherical point defined by @p scoord
-     * which is filled with radius $\in [0,\infty)$, azimuth angle
-     * $\in [0,2 \pi)$ and polar/inclination angle $\in [0,\pi]$
+     * which is filled with radius $r \in [0,\infty)$, azimuth angle
+     * $\theta \in [0,2 \pi)$ and polar/inclination angle $\phi \in [0,\pi]$
      * (ommited in 2D).
+     *
+     * In 3D the transformation is given by
+     * @f{align*}
+     *  x &= r\, \cos(\theta) \, \sin(\phi) \\
+     *  y &= r\, \sin(\theta) \, \sin(\phi) \\
+     *  z &= r\, \cos(\phi)
+     * @f}
      */
     template <std::size_t dim>
     Point<dim>

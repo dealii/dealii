@@ -47,13 +47,13 @@ namespace GeometricUtilities
 
       // radius
       scoord[0] = position.norm();
-      // azimuth angle
+      // azimuth angle \theta:
       scoord[1] = std::atan2(position(1),position(0));
       // correct to [0,2*pi)
       if (scoord[1] < 0.0)
         scoord[1] += 2.0*numbers::PI;
 
-      // polar angle
+      // polar angle \phi:
       if (dim==3)
         {
           // acos returns the angle in the range [0,\pi]
