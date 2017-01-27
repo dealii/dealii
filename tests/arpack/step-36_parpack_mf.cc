@@ -91,14 +91,14 @@ void test ()
                                             constraints);
   constraints.close ();
 
-  MatrixFree<dim,double> mf_data;
+  std_cxx11::shared_ptr<MatrixFree<dim,double> > mf_data(new MatrixFree<dim,double> ());
   {
     const QGauss<1> quad (fe_degree+1);
     typename MatrixFree<dim,double>::AdditionalData data;
     data.tasks_parallel_scheme =
       MatrixFree<dim,double>::AdditionalData::partition_color;
     data.mapping_update_flags = update_values | update_gradients | update_JxW_values;
-    mf_data.reinit (dof_handler, constraints, quad, data);
+    mf_data->reinit (dof_handler, constraints, quad, data);
   }
 
 
@@ -112,7 +112,7 @@ void test ()
   eigenfunctions.resize (number_of_eigenvalues);
   eigenvalues.resize (number_of_eigenvalues);
   for (unsigned int i=0; i<eigenfunctions.size (); ++i)
-    mf_data.initialize_dof_vector (eigenfunctions[i]);
+    mf_data->initialize_dof_vector (eigenfunctions[i]);
 
   // test PArpack with matrix-free
   {
@@ -144,7 +144,7 @@ void test ()
     // make sure initial vector is orthogonal to the space due to constraints
     {
       LinearAlgebra::distributed::Vector<double> init_vector;
-      mf_data.initialize_dof_vector(init_vector);
+      mf_data->initialize_dof_vector(init_vector);
       init_vector = 1.;
       constraints.set_zero(init_vector);
       eigensolver.set_initial_vector(init_vector);
