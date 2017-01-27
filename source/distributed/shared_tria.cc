@@ -36,9 +36,11 @@ namespace parallel
     template <int dim, int spacedim>
     Triangulation<dim,spacedim>::Triangulation (MPI_Comm mpi_communicator,
                                                 const typename dealii::Triangulation<dim,spacedim>::MeshSmoothing smooth_grid,
-                                                const bool allow_artificial_cells):
+                                                const bool allow_artificial_cells,
+                                                const Settings settings):
       dealii::parallel::Triangulation<dim,spacedim>(mpi_communicator,smooth_grid,false),
-      allow_artificial_cells(allow_artificial_cells)
+      allow_artificial_cells(allow_artificial_cells),
+      settings (settings)
     {}
 
 
@@ -46,7 +48,22 @@ namespace parallel
     template <int dim, int spacedim>
     void Triangulation<dim,spacedim>::partition()
     {
-      dealii::GridTools::partition_triangulation (this->n_subdomains, *this);
+      if (settings & partition_metis)
+        {
+          dealii::GridTools::partition_triangulation (this->n_subdomains, *this);
+          if (settings & construct_multigrid_hierarchy)
+            dealii::GridTools::partition_multigrid_levels(...);
+        }
+      else if (settings & partition_zorder)
+        {
+          dealii::GridTools::partition_triangulation_zorder (this->n_subdomains, *this);
+          if (settings & construct_multigrid_hierarchy)
+            dealii::GridTools::partition_multigrid_levels(...);
+        }
+      else
+        {
+          // signal thing
+        }
 
       true_subdomain_ids_of_cells.resize(this->n_active_cells());
 

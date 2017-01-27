@@ -72,6 +72,37 @@ namespace parallel
       typedef typename dealii::Triangulation<dim,spacedim>::cell_iterator        cell_iterator;
 
       /**
+       * Configuration flags for distributed Triangulations to be set in the
+       * constructor. Settings can be combined using bitwise OR.
+       */
+      enum Settings
+      {
+        /**
+         * Default settings, other options are disabled.
+         */
+        partition_metis = 0x0,
+
+        /**
+         *
+         */
+        partition_zorder = 0x1,
+
+        /**
+         *
+         */
+        partition_custom_signal = 0x2,
+
+        /**
+         * This flags needs to be set to use the geometric multigrid
+         * functionality. This option requires additional computation and
+         * communication. Note: geometric multigrid is still a work in
+         * progress.
+         */
+        construct_multigrid_hierarchy = 0x8,
+      };
+
+
+      /**
        * Constructor.
        *
        * If @p allow_aritifical_cells is true, this class will behave similar
@@ -83,7 +114,8 @@ namespace parallel
       Triangulation (MPI_Comm mpi_communicator,
                      const typename dealii::Triangulation<dim,spacedim>::MeshSmoothing =
                        (dealii::Triangulation<dim,spacedim>::none),
-                     const bool allow_artificial_cells = false);
+                     const bool allow_artificial_cells = false,
+                     const Settings settings = partition_metis);
 
       /**
        * Destructor.
@@ -150,6 +182,12 @@ namespace parallel
       bool with_artificial_cells() const;
 
     private:
+
+      /**
+       * Settings
+       */
+      Settings settings;
+
       /**
        * A flag to decide whether or not artificial cells are allowed.
        */
