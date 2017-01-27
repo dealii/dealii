@@ -827,13 +827,20 @@ namespace LinearAlgebra
                            VectorOperation::values                         operation,
                            std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern)
     {
+      IndexSet locally_owned_elem = locally_owned_elements();
       // If no communication pattern is given, create one. Otherwise, use the
       // given one.
       std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> comm_pattern;
       if (communication_pattern.get() == NULL)
         {
-          comm_pattern.reset(new Utilities::MPI::Partitioner(locally_owned_elements(),
-                                                             V.get_stored_elements(),
+          // Split the IndexSet of V in locally owned elements and ghost indices
+          // then create the communication pattern
+          IndexSet ghost_indices(V.get_stored_elements());
+          ghost_indices.subtract_set(locally_owned_elem);
+          IndexSet local_indices(V.get_stored_elements());
+          local_indices.subtract_set(ghost_indices);
+          comm_pattern.reset(new Utilities::MPI::Partitioner(local_indices,
+                                                             ghost_indices,
                                                              get_mpi_communicator()));
         }
       else
@@ -856,9 +863,13 @@ namespace LinearAlgebra
 
       tmp_vector.compress(operation);
 
-      dealii::internal::VectorOperations::Vector_copy<Number,Number> copier(tmp_vector.val, val);
-      internal::VectorOperations::parallel_for(copier, partitioner->local_size(),
-                                               thread_loop_partitioner);
+      // Copy the local elements of tmp_vector to the right place in val
+      IndexSet tmp_index_set = tmp_vector.locally_owned_elements();
+      for (size_type i=0; i<tmp_index_set.n_elements(); ++i)
+        {
+          val[locally_owned_elem.index_within_set(tmp_index_set.nth_index_in_set(i))] =
+            tmp_vector.local_element(i);
+        }
     }
 
 

@@ -126,7 +126,7 @@ namespace LinearAlgebra
     if (omit_zeroing_entries == false)
       this->operator= (Number());
 
-    // reset the communication patter
+    // reset the communication pattern
     source_stored_elements.clear();
     comm_pattern.reset();
   }
