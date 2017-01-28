@@ -1,7 +1,19 @@
+// input file that will be processed into build/share/deal.II/template-arguments
+// and used by expand_instantiations to process .inst.in files.
+
+
+// booleans
 BOOL            := { true; false }
+
+// real scalar floating point types
 REAL_SCALARS    := { double; float }
+
+// complex scalar types
 COMPLEX_SCALARS := { std::complex<double>;
                      std::complex<float> }
+
+// scalar types that have a corresponding MPI datatype and that we can
+// therefore use in calls like MPI_Allreduce
 MPI_SCALARS     := { int;
                      long int;
                      unsigned int;
@@ -11,12 +23,12 @@ MPI_SCALARS     := { int;
                      double;
                      long double }
 
-DERIVATIVE_TENSORS := { double;
-                        Tensor<1,deal_II_dimension>;
-                        Tensor<2,deal_II_dimension> }
-
+// template names for serial vectors that we can instantiate as T<S> where
+// S=REAL_SCALARS for example
 DEAL_II_VEC_TEMPLATES := { Vector; BlockVector }
 
+// Serial vector types
+// TODO: why are parallel vectors in here?
 SERIAL_VECTORS := { Vector<double>;
                     Vector<float> ;
 
@@ -43,6 +55,7 @@ SERIAL_VECTORS := { Vector<double>;
                     @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR@;
                   }
 
+// TODO: why is this the same as SERIAL_VECTORS?
 REAL_SERIAL_VECTORS := { Vector<double>;
                     Vector<float> ;
 
@@ -69,6 +82,7 @@ REAL_SERIAL_VECTORS := { Vector<double>;
                     @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR_REAL@;
                   }
 
+// real vector types excluding block vectors
 REAL_NONBLOCK_VECTORS := { Vector<double>;
                     Vector<float> ;
 
@@ -84,18 +98,24 @@ REAL_NONBLOCK_VECTORS := { Vector<double>;
                     @DEAL_II_EXPAND_PETSC_MPI_VECTOR_REAL@;
                   }
 
+// wrappers for non-MPI vectors (PETSc/Trilinos) 
 EXTERNAL_SEQUENTIAL_VECTORS := { @DEAL_II_EXPAND_TRILINOS_VECTOR@;
                                  @DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR@;
                                  @DEAL_II_EXPAND_PETSC_VECTOR@;
                                  @DEAL_II_EXPAND_PETSC_BLOCKVECTOR@
                                }
 
+// wrappers for MPI vectors (PETSc/Trilinos) 
 EXTERNAL_PARALLEL_VECTORS := { @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
                                @DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR@;
                                @DEAL_II_EXPAND_PETSC_MPI_VECTOR@;
                                @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR@
                              }
 
+// TODO: I don't understand this one. LA::distributed::Vector does not have a
+// native matrix type, especially if we don't compile with Trilinos. Currently
+// only used: mg_transfer_prebuilt.inst.in and
+// mg_level_global_transfer.inst.in
 VECTORS_WITH_MATRIX := { Vector<double>;
                     Vector<float> ;
 
@@ -108,32 +128,32 @@ VECTORS_WITH_MATRIX := { Vector<double>;
                     @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
                   }
 
-DOFHANDLERS := { DoFHandler<deal_II_dimension>;
-                 hp::DoFHandler<deal_II_dimension> }
-
+// DoFHandler and hp::DoFHandler templates
 DOFHANDLER_TEMPLATES := { DoFHandler;
                           hp::DoFHandler }
 
+// Triangulation and DoFHandler templates
 TRIANGULATION_AND_DOFHANDLER_TEMPLATES := { Triangulation;
                                             parallel::shared::Triangulation;
                                             parallel::distributed::Triangulation;
                                             DoFHandler;
                                             hp::DoFHandler }
 
+// concrete sequential Triangulation and DoFHandler types with hard-coded
+// <deal_II_dimension, deal_II_space_dimension>
 SEQUENTIAL_TRIANGULATION_AND_DOFHANDLERS := { Triangulation<deal_II_dimension, deal_II_space_dimension>;
                                               DoFHandler<deal_II_dimension, deal_II_space_dimension>;
                                               hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> }
 
+// concrete Triangulation and DoFHandler types (all types you can iterate over cells from)
+// with hard-coded <deal_II_dimension, deal_II_space_dimension>
 TRIANGULATION_AND_DOFHANDLERS := { Triangulation<deal_II_dimension, deal_II_space_dimension>;
                                    parallel::shared::Triangulation<deal_II_dimension, deal_II_space_dimension>;
                                    parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>;
                                    DoFHandler<deal_II_dimension, deal_II_space_dimension>;
                                    hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> }
 
-
-FEVALUES_BASES := { FEValuesBase<deal_II_dimension>;
-                    FEFaceValuesBase<deal_II_dimension> }
-
+// serial and parallel sparsity pattern types
 SPARSITY_PATTERNS := { SparsityPattern;
                        DynamicSparsityPattern;
                        @DEAL_II_EXPAND_TRILINOS_SPARSITY_PATTERN@;
@@ -142,12 +162,16 @@ SPARSITY_PATTERNS := { SparsityPattern;
                        BlockDynamicSparsityPattern;
                        @DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN@; }
 
+// all supported logical dimensions
 DIMENSIONS := { 1; 2; 3 }
 
+// all supported spacial dimensions
 SPACE_DIMENSIONS := { 1; 2; 3 }
 
+// all ranks used for instantiating tensors
 RANKS := { 1; 2; 3; 4 }
 
+// Flags that are allowed in DataOutInterface::set_flags
 OUTPUT_FLAG_TYPES := { DXFlags; UcdFlags; GnuplotFlags; PovrayFlags; EpsFlags;
                        GmvFlags; TecplotFlags; VtkFlags; SvgFlags;
                        Deal_II_IntermediateFlags }
