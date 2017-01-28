@@ -14,20 +14,25 @@
 // ---------------------------------------------------------------------
 
 
-
-
-for (DH : DOFHANDLERS; deal_II_dimension : DIMENSIONS)
+for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
 {
+#if deal_II_dimension <= deal_II_space_dimension
     template
     void
-    DoFTools::make_hanging_node_constraints (const DH &dof_handler,
-            ConstraintMatrix &constraints);
+    DoFTools::make_hanging_node_constraints (
+	const DH<deal_II_dimension, deal_II_space_dimension>	 &,
+            ConstraintMatrix &);	
+#endif
+}
 
+
+for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
+{
 #if deal_II_dimension != 1
     template
     void
-    DoFTools::make_periodicity_constraints (const DH::face_iterator &,
-                                            const DH::face_iterator &,
+    DoFTools::make_periodicity_constraints (const DH<deal_II_dimension>::face_iterator &,
+                                            const DH<deal_II_dimension>::face_iterator &,
                                             dealii::ConstraintMatrix &,
                                             const ComponentMask &,
                                             bool, bool, bool,
@@ -36,8 +41,8 @@ for (DH : DOFHANDLERS; deal_II_dimension : DIMENSIONS)
 
     template
     void
-    DoFTools::make_periodicity_constraints<DH>
-    (const std::vector<GridTools::PeriodicFacePair<DH::cell_iterator> > &,
+    DoFTools::make_periodicity_constraints<DH<deal_II_dimension> >
+    (const std::vector<GridTools::PeriodicFacePair<DH<deal_II_dimension>::cell_iterator> > &,
      dealii::ConstraintMatrix &,
      const ComponentMask &,
      const std::vector<unsigned int> &);
@@ -45,7 +50,7 @@ for (DH : DOFHANDLERS; deal_II_dimension : DIMENSIONS)
 
     template
     void
-    DoFTools::make_periodicity_constraints(const DH &,
+    DoFTools::make_periodicity_constraints(const DH<deal_II_dimension> &,
                                            const types::boundary_id,
                                            const types::boundary_id,
                                            const int,
@@ -54,7 +59,7 @@ for (DH : DOFHANDLERS; deal_II_dimension : DIMENSIONS)
 
     template
     void
-    DoFTools::make_periodicity_constraints(const DH &,
+    DoFTools::make_periodicity_constraints(const DH<deal_II_dimension> &,
                                            const types::boundary_id,
                                            const int,
                                            dealii::ConstraintMatrix &,
@@ -64,23 +69,6 @@ for (DH : DOFHANDLERS; deal_II_dimension : DIMENSIONS)
 
 for (deal_II_dimension : DIMENSIONS)
 {
-#if deal_II_dimension < 3
-
-    template
-    void
-    DoFTools::
-    make_hanging_node_constraints (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_handler,
-                                   ConstraintMatrix &constraints);
-#endif
-
-#if deal_II_dimension == 3
-    template
-    void
-    DoFTools::
-    make_hanging_node_constraints (const DoFHandler<1,3> &dof_handler,
-                                   ConstraintMatrix &constraints);
-#endif
-
     template
     void
     DoFTools::make_zero_boundary_constraints
