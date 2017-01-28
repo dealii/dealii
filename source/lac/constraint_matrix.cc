@@ -637,11 +637,16 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
 
 void ConstraintMatrix::shift (const size_type offset)
 {
-  //TODO: this doesn't work with IndexSets yet. [TH]
-  AssertThrow(local_lines.size()==0, ExcNotImplemented());
-
-  lines_cache.insert (lines_cache.begin(), offset,
-                      numbers::invalid_size_type);
+  if (local_lines.size() == 0)
+    lines_cache.insert (lines_cache.begin(), offset,
+                        numbers::invalid_size_type);
+  else
+    {
+      // shift local_lines
+      IndexSet new_local_lines(local_lines.size());
+      new_local_lines.add_indices(local_lines, offset);
+      std::swap(local_lines, new_local_lines);
+    }
 
   for (std::vector<ConstraintLine>::iterator i = lines.begin();
        i != lines.end(); ++i)
@@ -652,6 +657,15 @@ void ConstraintMatrix::shift (const size_type offset)
            j != i->entries.end(); ++j)
         j->first += offset;
     }
+
+#ifdef DEBUG
+  // make sure that lines, lines_cache and local_lines
+  // are still linked correctly
+  for (size_type i=0; i<lines_cache.size(); ++i)
+    Assert(lines_cache[i] == numbers::invalid_size_type ||
+           calculate_line_index(lines[lines_cache[i]].line) == i,
+           ExcInternalError());
+#endif
 }
 
 
