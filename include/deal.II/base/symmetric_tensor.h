@@ -2916,7 +2916,9 @@ operator * (const SymmetricTensor<rank,dim,Number> &t,
   // (as well as with switched arguments and double<->float).
   typedef typename ProductType<Number,OtherNumber>::type product_type;
   SymmetricTensor<rank,dim,product_type> tt(t);
-  tt *= product_type(factor);
+  product_type new_factor;
+  new_factor = factor;
+  tt *= new_factor;
   return tt;
 }
 
