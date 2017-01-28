@@ -1,0 +1,4 @@
+Fixed: Trilinos solvers now respect the convergence criterion specified by
+ReductionControl.
+<br>
+(Jean-Paul Pelteret, 2017/01/28)
