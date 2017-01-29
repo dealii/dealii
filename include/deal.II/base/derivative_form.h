@@ -79,11 +79,6 @@ public:
   /**
    * Assignment operator.
    */
-  DerivativeForm   &operator = (const DerivativeForm <order, dim, spacedim, Number> &);
-
-  /**
-   * Assignment operator.
-   */
   DerivativeForm   &operator = (const Tensor<order+1,dim, Number> &);
 
   /**
@@ -189,18 +184,6 @@ DerivativeForm<order, dim, spacedim, Number>::DerivativeForm(const Tensor<order+
       (*this)[j] = T[j];
 }
 
-
-
-template <int order, int dim, int spacedim, typename Number>
-inline
-DerivativeForm<order, dim, spacedim, Number> &
-DerivativeForm<order, dim, spacedim, Number>::
-operator = (const DerivativeForm<order, dim, spacedim, Number> &ta)
-{
-  for (unsigned int j=0; j<spacedim; ++j)
-    (*this)[j] = ta[j];
-  return *this;
-}
 
 
 
