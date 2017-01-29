@@ -29,13 +29,13 @@ div.doxygen-generated-exception-message {
 
 /*
  * Fix the default table settings to be readable: this overrides the first row
- * and column background to grey (instead of dark blue, upon which links are
- * impossible to read) and the text color to black (instead of white, which
- * would no longer be visable).
+ * and column background to light blue (instead of dark blue, upon which links
+ * are impossible to read) and the text color to black (instead of white, which
+ * would no longer be visible).
  */
 table.doxtable th {
-	background-color: #d6d6d6;
-	color: #000000;
+    background-color: #D6E2FA;
+    color: #000000;
 }
 
 div.image img[src="fe_enriched_1d.png"] {
