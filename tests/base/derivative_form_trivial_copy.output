@@ -1,0 +1,21 @@
+
+DEAL::testing float
+DEAL::DerivativeForm<1, 2, 2> is trivially copyable: true
+DEAL::DerivativeForm<2, 2, 2> is trivially copyable: true
+DEAL::DerivativeForm<2, 2, 3> is trivially copyable: true
+DEAL::DerivativeForm<2, 3, 3> is trivially copyable: true
+DEAL::testing double
+DEAL::DerivativeForm<1, 2, 2> is trivially copyable: true
+DEAL::DerivativeForm<2, 2, 2> is trivially copyable: true
+DEAL::DerivativeForm<2, 2, 3> is trivially copyable: true
+DEAL::DerivativeForm<2, 3, 3> is trivially copyable: true
+DEAL::testing std::complex<float>
+DEAL::DerivativeForm<1, 2, 2> is trivially copyable: true
+DEAL::DerivativeForm<2, 2, 2> is trivially copyable: true
+DEAL::DerivativeForm<2, 2, 3> is trivially copyable: true
+DEAL::DerivativeForm<2, 3, 3> is trivially copyable: true
+DEAL::testing std::complex<double>
+DEAL::DerivativeForm<1, 2, 2> is trivially copyable: true
+DEAL::DerivativeForm<2, 2, 2> is trivially copyable: true
+DEAL::DerivativeForm<2, 2, 3> is trivially copyable: true
+DEAL::DerivativeForm<2, 3, 3> is trivially copyable: true
