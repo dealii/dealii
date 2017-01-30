@@ -115,8 +115,11 @@ void MGTransferMatrixFree<dim,Number>::build
   element_is_continuous    = elem_info.element_is_continuous;
   n_components             = elem_info.n_components;
   n_child_cell_dofs        = elem_info.n_child_cell_dofs;
-  prolongation_matrix_1d   = elem_info.prolongation_matrix_1d;
 
+  // duplicate and put into vectorized array
+  prolongation_matrix_1d.resize(elem_info.prolongation_matrix_1d.size());
+  for (unsigned int i=0; i<elem_info.prolongation_matrix_1d.size(); i++)
+    prolongation_matrix_1d[i] = elem_info.prolongation_matrix_1d[i];
 
   // reshuffle into aligned vector of vectorized arrays
   const unsigned int vec_size = VectorizedArray<Number>::n_array_elements;

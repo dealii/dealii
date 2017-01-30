@@ -97,7 +97,7 @@ namespace internal
        * Holds the one-dimensional embedding (prolongation) matrix from mother
        * element to all the children.
        */
-      AlignedVector<VectorizedArray<Number> > prolongation_matrix_1d;
+      std::vector<Number> prolongation_matrix_1d;
 
     };
 
