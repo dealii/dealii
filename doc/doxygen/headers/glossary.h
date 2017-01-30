@@ -589,7 +589,7 @@
  * used in the finite element community to indicate two slightly different,
  * but related things. The first is that we'd like to represent the finite
  * element solution as a linear combination of shape functions, in the form
- * $u_h(\mathbf x) = \sum_{j=0}^{N-1} U_j \varphi_j(\mathbf x)$. Here, $U_j$
+ * $u_h(\mathbf{x}) = \sum_{j=0}^{N-1} U_j \varphi_j(\mathbf{x})$. Here, $U_j$
  * is a vector of expansion coefficients. Because we don't know their values
  * yet (we will compute them as the solution of a linear or nonlinear system),
  * they are called "unknowns" or "degrees of freedom". The second meaning of
@@ -600,7 +600,7 @@
  * V_h$). In other words, all we say here that the solution needs to lie in
  * some space $V_h$. However, to actually solve this problem on a computer we
  * need to choose a basis of this space; this is the set of shape functions
- * $\varphi_j(\mathbf x)$ we have used above in the expansion of $u_h(\mathbf
+ * $\varphi_j(\mathbf{x})$ we have used above in the expansion of $u_h(\mathbf
  * x)$ with coefficients $U_j$. There are of course many bases of the space
  * $V_h$, but we will specifically choose the one that is described by the
  * finite element functions that are traditionally defined locally on the
@@ -859,19 +859,19 @@
  * generalization of @ref GlossSupport "support points". The latter
  * are used to describe that a finite element simply <i>interpolates</i>
  * values at individual points (the "support points"). If we call these
- * points $\hat\mathbf x_i$ (where the hat indicates that these points
- * are defined on the reference cell $\hat K$), then one typically defines
- * shape functions $\varphi_j(\mathbf x)$ in such a way that the
+ * points $\hat{\mathbf{x}}_i$ (where the hat indicates that these points
+ * are defined on the reference cell $\hat{K}$), then one typically defines
+ * shape functions $\varphi_j(\mathbf{x})$ in such a way that the
  * <i>nodal functionals</i> $\Psi_i[\cdot]$ simply evaluate the function
- * at the support point, i.e., that $\Psi_i[\varphi]=\varphi(\hat\mathbf x_i)$,
+ * at the support point, i.e., that $\Psi_i[\varphi]=\varphi(\hat{\mathbf{x}}_i)$,
  * and the basis is chosen so that $\Psi_i[\varphi_j]=\delta_{ij}$ where
  * $\delta_{ij}$ is the Kronecker delta function. This leads to the common
  * @ref GlossLagrange "Lagrange elements".
  *
  * (In the vector valued case, the only other piece of information
- * besides the support points $\hat\mathbf x_i$ that one needs to provide
+ * besides the support points $\hat{\mathbf{x}}_i$ that one needs to provide
  * is the <i>vector component</i> $c(i)$ the $i$th node functional
- * corresponds, so that $\Psi_i[\varphi]=\varphi(\hat\mathbf x_i)_{c(i)}$.)
+ * corresponds, so that $\Psi_i[\varphi]=\varphi(\hat{\mathbf{x}}_i)_{c(i)}$.)
  *
  * On the other hand, there are other kinds of elements that are not
  * defined this way. For example, for the lowest order Raviart-Thomas element
@@ -880,17 +880,17 @@
  * components, but the <i>normal component</i> of this vector:
  * $\Psi_i[\varphi]
  *  =
- *  \varphi(\hat\mathbf x_i) \cdot \mathbf n_i
- * $, where the $\mathbf n_i$ are the normal vectors to the face of the cell
- * on which $\hat\mathbf x_i$ is located. In other words, the node functional
+ *  \varphi(\hat{\mathbf{x}}_i) \cdot \mathbf{n}_i
+ * $, where the $\mathbf{n}_i$ are the normal vectors to the face of the cell
+ * on which $\hat{\mathbf{x}}_i$ is located. In other words, the node functional
  * is a <i>linear combination</i> of the components of $\varphi$ when
- * evaluated at $\hat\mathbf x_i$. Similar things happen for the BDM,
+ * evaluated at $\hat{\mathbf{x}}_i$. Similar things happen for the BDM,
  * ABF, and Nedelec elements (see the FE_BDM, FE_ABF, FE_Nedelec classes).
  *
  * In these cases, the element does not have <i>support points</i> because
  * it is not purely interpolatory; however, some kind of interpolation
  * is still involved when defining shape functions as the node functionals
- * still require point evaluations at special points $\hat\mathbf x_i$.
+ * still require point evaluations at special points $\hat{\mathbf{x}}_i$.
  * In these cases, we call the points <i>generalized support points</i>.
  *
  * Finally, there are elements that still do not fit into this
@@ -900,9 +900,9 @@
  * functions,
  * $\Psi_i[\varphi]
  *  =
- *  \int_{\hat K} \varphi(\hat\mathbf x)
- *  {\hat x_1}^{p_1(i)}
- *  {\hat x_2}^{p_2(i)}
+ *  \int_{\hat{K}} \varphi(\hat{\mathbf{x}})
+ *  {\hat{x}_1}^{p_1(i)}
+ *  {\hat{x}_2}^{p_2(i)}
  * $ in 2d, and similarly for 3d, where the $p_d(i)$ are the order
  * of the moment described by shape function $i$. Some other elements
  * use moments over edges or faces. In all of these cases, node functionals
