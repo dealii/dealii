@@ -727,7 +727,6 @@ namespace Step37
     MGLevelObject<LevelMatrixType>             mg_matrices;
 
     LinearAlgebra::distributed::Vector<double> solution;
-    LinearAlgebra::distributed::Vector<double> solution_update;
     LinearAlgebra::distributed::Vector<double> system_rhs;
 
     double                                     setup_time;
