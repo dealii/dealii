@@ -20,10 +20,12 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/template_constraints.h>
-#include <deal.II/base/symmetric_tensor.h>
-#include <deal.II/base/vectorization.h>
+#include <deal.II/base/point.h>
 #include <deal.II/base/smartpointer.h>
+#include <deal.II/base/symmetric_tensor.h>
+#include <deal.II/base/template_constraints.h>
+#include <deal.II/base/vectorization.h>
+
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/mapping_data_on_the_fly.h>

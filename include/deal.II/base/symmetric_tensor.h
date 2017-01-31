@@ -18,13 +18,12 @@
 
 
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/tensor_classes_fwd.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/table_indices.h>
 #include <deal.II/base/template_constraints.h>
 
 DEAL_II_NAMESPACE_OPEN
-
-template <int rank, int dim, typename Number=double> class SymmetricTensor;
 
 template <int dim, typename Number> SymmetricTensor<2,dim,Number>
 unit_symmetric_tensor ();
@@ -503,7 +502,14 @@ namespace internal
  * @ingroup geomprimitives
  * @author Wolfgang Bangerth, 2005
  */
+#ifdef DOXYGEN
+// Repeat the forward declaration's default template argument for Doxygen
+// (recall that repeating a default template argument from a forward
+// declaration is not allowed).
+template <int rank, int dim, typename Number = double>
+#else
 template <int rank, int dim, typename Number>
+#endif // DOXYGEN
 class SymmetricTensor
 {
 public:

@@ -21,7 +21,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
-#include <deal.II/base/point.h>
+#include <deal.II/base/tensor_classes_fwd.h>
 #include <deal.II/base/std_cxx11/shared_ptr.h>
 
 #include <vector>

@@ -19,10 +19,9 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/tensor.h>
-#include <deal.II/base/point.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomial_space.h>
+#include <deal.II/base/tensor_classes_fwd.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/thread_management.h>

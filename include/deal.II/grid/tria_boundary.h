@@ -20,10 +20,12 @@
 /*----------------------------   boundary-function.h     ---------------------------*/
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/subscriptor.h>
-#include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/thread_management.h>
+
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/manifold.h>
 

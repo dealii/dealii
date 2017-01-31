@@ -19,9 +19,11 @@
 
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/function.h>
+#include <deal.II/base/point.h>
 #include <deal.II/base/polynomials_piecewise.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/qprojector.h>
+#include <deal.II/base/tensor.h>
 #include <deal.II/distributed/tria_base.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>

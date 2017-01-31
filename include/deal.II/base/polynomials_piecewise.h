@@ -22,7 +22,6 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/polynomial.h>
-#include <deal.II/base/point.h>
 
 #include <vector>
 

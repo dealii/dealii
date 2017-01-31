@@ -20,9 +20,10 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/std_cxx11/array.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/function.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/table.h>
-#include <deal.II/base/function.h>
+#include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>
 #include <map>
 

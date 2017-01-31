@@ -18,6 +18,8 @@
 
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/point.h>
+
 #include <deal.II/grid/tria.h>
 
 #include <vector>

@@ -23,6 +23,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/tensor_classes_fwd.h>
 #include <deal.II/base/thread_local_storage.h>
 
 #include <deal.II/lac/vector.h>

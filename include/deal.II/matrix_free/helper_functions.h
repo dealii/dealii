@@ -22,7 +22,7 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
-#include <deal.II/base/tensor.h>
+#include <deal.II/base/tensor_classes_fwd.h>
 #include <deal.II/base/vectorization.h>
 
 DEAL_II_NAMESPACE_OPEN

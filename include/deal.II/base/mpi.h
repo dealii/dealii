@@ -17,6 +17,7 @@
 #define dealii__mpi_h
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/tensor_classes_fwd.h>
 
 #include <vector>
 
@@ -36,10 +37,6 @@ static const int MPI_SUM = 0;
 
 DEAL_II_NAMESPACE_OPEN
 
-
-//Forward type declarations to allow MPI sums over tensorial types
-template <int rank, int dim, typename Number> class Tensor;
-template <int rank, int dim, typename Number> class SymmetricTensor;
 
 //Forward type declaration to allow MPI sums over Vector<number> type
 template <typename Number> class Vector;
