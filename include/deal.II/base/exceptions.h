@@ -1228,6 +1228,18 @@ namespace StandardExceptions
                                            dealii::ExcCudaError(cudaGetErrorString(error_code)))
 #endif
 
+// A static assert which checks a compile-time condition. This is nothing more
+// than a wrapper around the C++11 <code>static_assert</code> declaration, which
+// we need to disable for non-C++11.
+
+// Just like <code>static_assert</code>, it takes two arguments, a
+// <code>constexpr</code> condition and an error message.
+#if defined(DEAL_II_WITH_CXX11)
+#define DEAL_II_STATIC_ASSERT(...) static_assert(__VA_ARGS__)
+#else
+#define DEAL_II_STATIC_ASSERT(...) /* do nothing */
+#endif
+
 using namespace StandardExceptions;
 
 DEAL_II_NAMESPACE_CLOSE

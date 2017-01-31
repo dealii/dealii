@@ -1044,9 +1044,9 @@ namespace internal
       // true). As mentioned above, try to check this at compile time if C++11
       // support is available.
 #ifdef DEAL_II_WITH_CXX11
-      static_assert(Constness == true,
-                    "Constructing a non-const iterator from a const iterator "
-                    "does not make sense.");
+      DEAL_II_STATIC_ASSERT(Constness == true,
+                            "Constructing a non-const iterator from a const iterator "
+                            "does not make sense.");
 #else
       Assert(Constness == true, ExcCastingAwayConstness());
 #endif
