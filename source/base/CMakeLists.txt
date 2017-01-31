@@ -30,6 +30,7 @@ SET(_src
   function_lib.cc
   function_lib_cutoff.cc
   function_parser.cc
+  function_spherical.cc
   function_time.cc
   geometry_info.cc
   geometric_utilities.cc
