@@ -67,6 +67,11 @@ namespace Functions
   CSpline<dim>::value (const Point<dim>   &p,
                        const unsigned int) const
   {
+    // GSL functions may modify gsl_interp_accel *acc object (last argument).
+    // This can only work in multithreaded applications if we lock the data
+    // structures via a mutex.
+    Threads::Mutex::ScopedLock lock (acc_mutex);
+
     const double &x = p[0];
     Assert (x >= interpolation_points.front() && x <= interpolation_points.back(),
             ExcCSplineRange(x,interpolation_points.front(),interpolation_points.back()));
@@ -81,6 +86,11 @@ namespace Functions
   CSpline<dim>::gradient (const Point<dim>   &p,
                           const unsigned int) const
   {
+    // GSL functions may modify gsl_interp_accel *acc object (last argument).
+    // This can only work in multithreaded applications if we lock the data
+    // structures via a mutex.
+    Threads::Mutex::ScopedLock lock (acc_mutex);
+
     const double &x = p[0];
     Assert (x >= interpolation_points.front() && x <= interpolation_points.back(),
             ExcCSplineRange(x,interpolation_points.front(),interpolation_points.back()));
@@ -98,6 +108,11 @@ namespace Functions
   CSpline<dim>::laplacian (const Point<dim>   &p,
                            const unsigned int) const
   {
+    // GSL functions may modify gsl_interp_accel *acc object (last argument).
+    // This can only work in multithreaded applications if we lock the data
+    // structures via a mutex.
+    Threads::Mutex::ScopedLock lock (acc_mutex);
+
     const double &x = p[0];
     Assert (x >= interpolation_points.front() && x <= interpolation_points.back(),
             ExcCSplineRange(x,interpolation_points.front(),interpolation_points.back()));
