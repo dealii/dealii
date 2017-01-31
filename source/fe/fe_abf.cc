@@ -80,7 +80,7 @@ FE_ABF<dim>::FE_ABF (const unsigned int deg)
   // refinement
   this->reinit_restriction_and_prolongation_matrices(true);
   // Fill prolongation matrices with embedding operators
-  FETools::compute_embedding_matrices (*this, this->prolongation);
+  FETools::compute_embedding_matrices (*this, this->prolongation, false, 2.e-12);
 
   initialize_restriction ();
 
