@@ -549,7 +549,7 @@ namespace MeshWorker
     (const DOFINFO &info)
     {
       for (unsigned int i=0; i<residuals.size(); ++i)
-        assemble(*residuals(i), info.vector(i), info.indices);
+        assemble(*(residuals.entry<VectorType>(i)), info.vector(i), info.indices);
     }
 
 
@@ -562,8 +562,8 @@ namespace MeshWorker
     {
       for (unsigned int i=0; i<residuals.size(); ++i)
         {
-          assemble(*residuals(i), info1.vector(i), info1.indices);
-          assemble(*residuals(i), info2.vector(i), info2.indices);
+          assemble(*(residuals.entry<VectorType>(i)), info1.vector(i), info1.indices);
+          assemble(*(residuals.entry<VectorType>(i)), info2.vector(i), info2.indices);
         }
     }
 
