@@ -5,6 +5,6 @@ several old vector functions have been marked as deprecated. The methods
 <tt>operator==</tt>, <tt>operator!=</tt>, <tt>is_non_negative</tt>, and
 <tt>norm_sqr</tt> have been removed from the new interface. For the latter,
 there exists a simple workaround as it simply corresponds to the square of
-<tt>l2_norm<tt>.
+<tt>l2_norm</tt>.
 <br>
 (Martin Kronbichler, 2016/06/15)
