@@ -244,6 +244,18 @@ public:
    * Otherwise one would have to use different instance of this class for each
    * disjoint enriched domain.
    *
+   * If you don't plan to use this feature, you can utilize C++11 lambdas to
+   * define dummy functions. Below is an example which uses two functions with
+   * the first element to be enriched and a single function with the second one.
+   * @code
+   * FE_Enriched<dim> fe
+   * (&fe_base,
+   * {&fe_1, &fe_2},
+   * {{[=] (const typename Triangulation<dim>::cell_iterator &) -> const Function<dim> * {return &fe_1_function1;},
+   *   [=] (const typename Triangulation<dim>::cell_iterator &) -> const Function<dim> * {return &fe_1_function2;}},
+   *  {[=] (const typename Triangulation<dim>::cell_iterator &) -> const Function<dim> * {return &fe_2_function;}}});
+   * @endcode
+   *
    * @note When using the same finite element for enrichment with N
    * different functions, it is advised to have the second argument of size 1
    * and the last argument of size 1 x N. The same can be achieved by providing
