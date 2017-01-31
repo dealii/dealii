@@ -87,6 +87,12 @@ namespace Functions
     virtual Tensor<1,dim> gradient (const Point<dim>   &p,
                                     const unsigned int  component = 0) const;
 
+    virtual SymmetricTensor<2,dim> hessian (const Point<dim>   &p,
+                                            const unsigned int  component = 0) const;
+
+    virtual double laplacian(const Point< dim > &p,
+                             const unsigned int component = 0) const;
+
     std::size_t memory_consumption () const;
 
   private:

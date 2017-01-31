@@ -49,6 +49,8 @@ namespace Functions
     gsl_spline_init (cspline, &interpolation_points[0], &interpolation_values[0], n);
   }
 
+
+
   template <int dim>
   CSpline<dim>::~CSpline()
   {
@@ -57,6 +59,7 @@ namespace Functions
     acc = NULL;
     cspline = NULL;
   }
+
 
 
   template <int dim>
@@ -70,6 +73,7 @@ namespace Functions
 
     return gsl_spline_eval (cspline, x, acc);
   }
+
 
 
   template <int dim>
@@ -86,6 +90,33 @@ namespace Functions
     res[0] = deriv;
     return res;
   }
+
+
+
+  template <int dim>
+  double
+  CSpline<dim>::laplacian (const Point<dim>   &p,
+                           const unsigned int) const
+  {
+    const double &x = p[0];
+    Assert (x >= interpolation_points.front() && x <= interpolation_points.back(),
+            ExcCSplineRange(x,interpolation_points.front(),interpolation_points.back()));
+
+    return gsl_spline_eval_deriv2 (cspline, x, acc);
+  }
+
+
+
+  template <int dim>
+  SymmetricTensor<2,dim>
+  CSpline<dim>::hessian (const Point<dim>   &p,
+                         const unsigned int) const
+  {
+    Tensor<2,dim> res;
+    res[0][0] = laplacian(p);
+    return res;
+  }
+
 
 
   template <int dim>
