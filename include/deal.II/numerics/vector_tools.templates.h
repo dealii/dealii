@@ -1370,12 +1370,6 @@ namespace VectorTools
       case 6:
         project_parallel<dim,VectorType,spacedim,6> (mapping,dof,constraints,quadrature,func,vec_result);
         break;
-      case 7:
-        project_parallel<dim,VectorType,spacedim,7> (mapping,dof,constraints,quadrature,func,vec_result);
-        break;
-      case 8:
-        project_parallel<dim,VectorType,spacedim,8> (mapping,dof,constraints,quadrature,func,vec_result);
-        break;
       default:
         Assert (false, ExcNotImplemented());
       }
@@ -1415,12 +1409,6 @@ namespace VectorTools
         break;
       case 6:
         project_parallel<dim,VectorType,dim,6,7> (matrix_free,constraints,func,vec_result);
-        break;
-      case 7:
-        project_parallel<dim,VectorType,dim,7,8> (matrix_free,constraints,func,vec_result);
-        break;
-      case 8:
-        project_parallel<dim,VectorType,dim,8,9> (matrix_free,constraints,func,vec_result);
         break;
       default:
         Assert (false, ExcNotImplemented());
