@@ -124,13 +124,15 @@ public:
                                     const unsigned int face_index) const;
 
   virtual void interpolate(std::vector<double>                &local_dofs,
-                           const std::vector<double>          &values) const;
+                           const std::vector<double>          &values) const DEAL_II_DEPRECATED;
+
   virtual void interpolate(std::vector<double>                &local_dofs,
                            const std::vector<Vector<double> > &values,
-                           const unsigned int                  offset = 0) const;
-  virtual void interpolate(
-    std::vector<double> &local_dofs,
-    const VectorSlice<const std::vector<std::vector<double> > > &values) const;
+                           const unsigned int                  offset = 0) const DEAL_II_DEPRECATED;
+
+  virtual void interpolate(std::vector<double> &local_dofs,
+                           const VectorSlice<const std::vector<std::vector<double> > > &values) const DEAL_II_DEPRECATED;
+
   virtual std::size_t memory_consumption () const;
   virtual FiniteElement<dim> *clone() const;
 

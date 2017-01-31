@@ -256,14 +256,14 @@ public:
                            const RefinementCase<dim> &refinement_case=RefinementCase<dim>::isotropic_refinement) const;
 
   virtual void interpolate (std::vector<double> &local_dofs,
-                            const std::vector<double> &values) const;
+                            const std::vector<double> &values) const DEAL_II_DEPRECATED;
 
   virtual void interpolate (std::vector<double> &local_dofs,
                             const std::vector<Vector<double> > &values,
-                            const unsigned int offset = 0) const;
+                            const unsigned int offset = 0) const DEAL_II_DEPRECATED;
+
   virtual void interpolate (std::vector<double> &local_dofs,
-                            const VectorSlice<const std::vector<std::vector<double> > > &values)
-  const;
+                            const VectorSlice<const std::vector<std::vector<double> > > &values) const DEAL_II_DEPRECATED;
 
   /**
    * Return a list of constant modes of the element.

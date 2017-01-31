@@ -1941,11 +1941,13 @@ public:
    * element has support points. In this case, the resulting coefficients are
    * just the values in the support points. All other elements must
    * reimplement it.
+   *
+   * @deprecated Use convert_support_point_values_to_nodal_values() instead.
    */
   virtual
   void
   interpolate(std::vector<double>       &local_dofs,
-              const std::vector<double> &values) const;
+              const std::vector<double> &values) const DEAL_II_DEPRECATED;
 
   /**
    * Interpolate a set of vector values, computed in the generalized support
@@ -1955,21 +1957,25 @@ public:
    * <tt>offset</tt> is used to determine the first component of the vector to
    * be interpolated. Maybe consider changing your data structures to use the
    * next function.
+   *
+   * @deprecated Use convert_support_point_values_to_nodal_values() instead.
    */
   virtual
   void
   interpolate(std::vector<double>                &local_dofs,
               const std::vector<Vector<double> > &values,
-              const unsigned int                  offset = 0) const;
+              const unsigned int                  offset = 0) const DEAL_II_DEPRECATED;
 
   /**
    * Interpolate a set of vector values, computed in the generalized support
    * points.
+   *
+   * @deprecated Use convert_support_point_values_to_nodal_values() instead.
    */
   virtual
   void
   interpolate(std::vector<double>                                         &local_dofs,
-              const VectorSlice<const std::vector<std::vector<double> > > &values) const;
+              const VectorSlice<const std::vector<std::vector<double> > > &values) const DEAL_II_DEPRECATED;
 
   //@}
 
