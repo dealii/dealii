@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2016 by the deal.II authors
+// Copyright (C) 2011 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,6 +23,7 @@
 #include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/lac/vector_space_vector.h>
+#include <deal.II/lac/vector_type_traits.h>
 
 #include <iomanip>
 
@@ -1449,7 +1450,6 @@ namespace LinearAlgebra
 }
 
 
-
 /**
  * Global function @p swap which overloads the default implementation of the
  * C++ standard library which uses a temporary object. The function simply
@@ -1465,6 +1465,18 @@ void swap (LinearAlgebra::distributed::Vector<Number> &u,
 {
   u.swap (v);
 }
+
+
+/**
+ * Declare dealii::LinearAlgebra::Vector< Number > as distributed vector.
+ *
+ * @author Uwe Koecher, 2017
+ */
+template <typename Number>
+struct is_serial_vector< LinearAlgebra::distributed::Vector< Number > > : std_cxx11::false_type
+{
+};
+
 
 DEAL_II_NAMESPACE_CLOSE
 

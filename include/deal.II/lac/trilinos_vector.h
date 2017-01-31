@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2016 by the deal.II authors
+// Copyright (C) 2008 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,6 +28,7 @@
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/vector.h>
 #  include <deal.II/lac/trilinos_vector_base.h>
+#  include <deal.II/lac/vector_type_traits.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include "Epetra_Map.h"
@@ -928,7 +929,6 @@ namespace TrilinosWrappers
   };
 
 
-
 // ------------------- inline and template functions --------------
 
 
@@ -1080,6 +1080,28 @@ namespace internal
 
   } /* namespace LinearOperator */
 } /* namespace internal */
+
+
+/**
+ * Declare dealii::TrilinosWrappers::Vector as serial vector.
+ *
+ * @author Uwe Koecher, 2017
+ */
+template <>
+struct is_serial_vector< TrilinosWrappers::Vector > : std_cxx11::true_type
+{
+};
+
+
+/**
+ * Declare dealii::TrilinosWrappers::MPI::Vector as distributed vector.
+ *
+ * @author Uwe Koecher, 2017
+ */
+template <>
+struct is_serial_vector< TrilinosWrappers::MPI::Vector > : std_cxx11::false_type
+{
+};
 
 
 DEAL_II_NAMESPACE_CLOSE

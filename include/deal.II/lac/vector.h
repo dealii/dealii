@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2016 by the deal.II authors
+// Copyright (C) 1999 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/index_set.h>
+#include <deal.II/lac/vector_type_traits.h>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/split_member.hpp>
 
@@ -1426,8 +1427,19 @@ operator << (LogStream &os, const Vector<number> &v)
   return os;
 }
 
-
 /*@}*/
+
+
+/**
+ * Declare dealii::Vector< Number > as serial vector.
+ *
+ * @author Uwe Koecher, 2017
+ */
+template <typename Number>
+struct is_serial_vector< Vector<Number> > : std_cxx11::true_type
+{
+};
+
 
 DEAL_II_NAMESPACE_CLOSE
 

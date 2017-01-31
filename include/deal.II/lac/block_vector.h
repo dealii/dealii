@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2016 by the deal.II authors
+// Copyright (C) 1999 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,6 +21,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/lac/block_indices.h>
 #include <deal.II/lac/block_vector_base.h>
+#include <deal.II/lac/vector_type_traits.h>
 
 #include <cstdio>
 #include <vector>
@@ -516,6 +517,17 @@ namespace internal
 
   } /* namespace LinearOperator */
 } /* namespace internal */
+
+
+/**
+ * Declare dealii::BlockVector< Number > as serial vector.
+ *
+ * @author Uwe Koecher, 2017
+ */
+template <typename Number>
+struct is_serial_vector< BlockVector< Number > > : std_cxx11::true_type
+{
+};
 
 DEAL_II_NAMESPACE_CLOSE
 

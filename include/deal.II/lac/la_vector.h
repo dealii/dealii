@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C)  2015 by the deal.II authors
+// Copyright (C) 2015 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,6 +23,7 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/vector_space_vector.h>
+#include <deal.II/lac/vector_type_traits.h>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/split_member.hpp>
 
@@ -375,6 +376,18 @@ namespace LinearAlgebra
     return ReadWriteVector<Number>::memory_consumption();
   }
 } // end of namespace LinearAlgebra
+
+
+/**
+ * Declare dealii::LinearAlgebra::Vector< Number > as serial vector.
+ *
+ * @author Uwe Koecher, 2017
+ */
+template <typename Number>
+struct is_serial_vector< LinearAlgebra::Vector< Number > > : std_cxx11::true_type
+{
+};
+
 
 DEAL_II_NAMESPACE_CLOSE
 
