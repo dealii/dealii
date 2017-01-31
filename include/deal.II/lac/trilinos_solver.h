@@ -324,6 +324,12 @@ namespace TrilinosWrappers
     std_cxx11::shared_ptr<Epetra_LinearProblem> linear_problem;
 
     /**
+     * A structure that contains a Trilinos object that can query the linear
+     * solver and determine whether the convergence criterion have been met.
+     */
+    std_cxx11::shared_ptr<AztecOO_StatusTest> status_test;
+
+    /**
      * A structure that contains the Trilinos solver and preconditioner
      * objects.
      */

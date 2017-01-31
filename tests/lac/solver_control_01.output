@@ -1,0 +1,8 @@
+
+DEAL::Size 32 Unknowns 961
+DEAL:Abs tol:cg::Starting value 31.0000
+DEAL:Abs tol:cg::Convergence step 43 value 0.000818932
+DEAL:Abs tol::Success. Solver stopped after 43 iterations
+DEAL:Iterations:cg::Starting value 31.0000
+DEAL:Iterations:cg::Failure step 20 value 6.00198
+DEAL:Iterations::Failure. Solver stopped after 20 iterations
