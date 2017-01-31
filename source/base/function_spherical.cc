@@ -225,7 +225,7 @@ namespace Functions
   template <int dim>
   SymmetricTensor<2,dim>
   Spherical<dim>::hessian (const Point<dim> &p_,
-                           const unsigned int component) const
+                           const unsigned int /* component */) const
   {
     const Point<dim> p = p_ - coordinate_system_offset;
     const std_cxx11::array<double, dim> sp = GeometricUtilities::Coordinates::to_spherical(p);
@@ -309,7 +309,7 @@ namespace Functions
 
   template <int dim>
   double
-  Spherical<dim>::svalue(const std_cxx11::array<double, dim> &sp) const
+  Spherical<dim>::svalue(const std_cxx11::array<double, dim> & /* sp */) const
   {
     AssertThrow(false,
                 ExcNotImplemented());
@@ -320,7 +320,7 @@ namespace Functions
 
   template <int dim>
   std_cxx11::array<double, dim>
-  Spherical<dim>::sgradient(const std_cxx11::array<double, dim> &sp) const
+  Spherical<dim>::sgradient(const std_cxx11::array<double, dim> & /* sp */) const
   {
     AssertThrow(false,
                 ExcNotImplemented());
@@ -331,7 +331,7 @@ namespace Functions
 
   template <int dim>
   std_cxx11::array<double, 6>
-  Spherical<dim>::shessian (const std_cxx11::array<double, dim> &sp) const
+  Spherical<dim>::shessian (const std_cxx11::array<double, dim> & /* sp */) const
   {
     AssertThrow(false,
                 ExcNotImplemented());
