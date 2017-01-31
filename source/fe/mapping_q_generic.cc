@@ -3775,9 +3775,9 @@ add_quad_support_points(const Triangulation<3,3>::cell_iterator &cell,
 {
   const unsigned int faces_per_cell    = GeometryInfo<3>::faces_per_cell;
 
-  static const StraightBoundary<3> straight_boundary;
   // used if face quad at boundary or entirely in the interior of the domain
   std::vector<Point<3> > quad_points ((polynomial_degree-1)*(polynomial_degree-1));
+  std::vector<Point<3> > tmp_points;
 
   // loop over all faces and collect points on them
   for (unsigned int face_no=0; face_no<faces_per_cell; ++face_no)
@@ -3810,19 +3810,45 @@ add_quad_support_points(const Triangulation<3,3>::cell_iterator &cell,
                ExcInternalError());
 #endif
 
-      // ask the boundary/manifold object to return intermediate points on it
-      get_intermediate_points_on_object(face->get_manifold(), line_support_points,
-                                        face, quad_points);
+      // On a quad, we have to check whether the manifold should determine the
+      // point distribution or rather a weighted sum should be created. This
+      // is the same logic as in the compute_mapping_support_points
+      // function below.
+      if (dynamic_cast<const Boundary<3,3> *>(&face->get_manifold()) == NULL)
+        {
+          // ask the boundary/manifold object to return intermediate points on it
+          get_intermediate_points_on_object(face->get_manifold(), line_support_points,
+                                            face, quad_points);
 
-      // in 3D, the orientation, flip and rotation of the face might not
-      // match what we expect here, namely the standard orientation. thus
-      // reorder points accordingly. since a Mapping uses the same shape
-      // function as an FE_Q, we can ask a FE_Q to do the reordering for us.
-      for (unsigned int i=0; i<quad_points.size(); ++i)
-        a.push_back(quad_points[fe_q->adjust_quad_dof_index_for_face_orientation(i,
-                                face_orientation,
-                                face_flip,
-                                face_rotation)]);
+          // in 3D, the orientation, flip and rotation of the face might not
+          // match what we expect here, namely the standard orientation. thus
+          // reorder points accordingly. since a Mapping uses the same shape
+          // function as an FE_Q, we can ask a FE_Q to do the reordering for us.
+          for (unsigned int i=0; i<quad_points.size(); ++i)
+            a.push_back(quad_points[fe_q->adjust_quad_dof_index_for_face_orientation(i,
+                                    face_orientation,
+                                    face_flip,
+                                    face_rotation)]);
+        }
+      else
+        {
+          // need to extract the points surrounding a quad from the points
+          // already computed. First get the 4 vertices and then the points on
+          // the four lines
+          tmp_points.resize(4 + 4*(polynomial_degree-1));
+          for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
+            tmp_points[v] = a[GeometryInfo<3>::face_to_cell_vertices(face_no,v)];
+          if (polynomial_degree > 1)
+            for (unsigned int line=0; line<GeometryInfo<2>::lines_per_cell; ++line)
+              for (unsigned int i=0; i<polynomial_degree-1; ++i)
+                tmp_points[4+line*(polynomial_degree-1)+i] =
+                  a[GeometryInfo<3>::vertices_per_cell +
+                    (polynomial_degree-1)*
+                    GeometryInfo<3>::face_to_cell_lines(face_no,line) + i];
+          add_weighted_interior_points (support_point_weights_on_quad, tmp_points);
+          a.insert(a.end(), tmp_points.begin()+4+4*(polynomial_degree-1),
+                   tmp_points.end());
+        }
     }
 }
 

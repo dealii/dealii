@@ -1,0 +1,13 @@
+
+DEAL::Volume 2D mapping degree 1: 0.156929 error: 0.00501399
+DEAL::Volume 2D mapping degree 2: 0.156152 error: 3.91474e-05
+DEAL::Volume 2D mapping degree 3: 0.156147 error: 6.04868e-06
+DEAL::Volume 2D mapping degree 4: 0.156146 error: 5.88206e-08
+DEAL::Volume 2D mapping degree 5: 0.156146 error: 8.80543e-09
+DEAL::Volume 2D mapping degree 6: 0.156146 error: 8.99033e-11
+DEAL::Volume 3D mapping degree 1: 0.0643409 error: 0.00501399
+DEAL::Volume 3D mapping degree 2: 0.0640224 error: 3.91474e-05
+DEAL::Volume 3D mapping degree 3: 0.0640203 error: 6.04868e-06
+DEAL::Volume 3D mapping degree 4: 0.0640199 error: 5.88206e-08
+DEAL::Volume 3D mapping degree 5: 0.0640199 error: 8.80543e-09
+DEAL::Volume 3D mapping degree 6: 0.0640199 error: 8.99045e-11
