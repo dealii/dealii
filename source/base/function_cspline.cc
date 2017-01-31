@@ -49,6 +49,8 @@ namespace Functions
     gsl_spline_init (cspline, &interpolation_points[0], &interpolation_values[0], n);
   }
 
+
+
   template <int dim>
   CSpline<dim>::~CSpline()
   {
@@ -59,11 +61,17 @@ namespace Functions
   }
 
 
+
   template <int dim>
   double
   CSpline<dim>::value (const Point<dim>   &p,
                        const unsigned int) const
   {
+    // GSL functions may modify gsl_interp_accel *acc object (last argument).
+    // This can only work in multithreaded applications if we lock the data
+    // structures via a mutex.
+    Threads::Mutex::ScopedLock lock (acc_mutex);
+
     const double &x = p[0];
     Assert (x >= interpolation_points.front() && x <= interpolation_points.back(),
             ExcCSplineRange(x,interpolation_points.front(),interpolation_points.back()));
@@ -72,11 +80,17 @@ namespace Functions
   }
 
 
+
   template <int dim>
   Tensor<1,dim>
   CSpline<dim>::gradient (const Point<dim>   &p,
                           const unsigned int) const
   {
+    // GSL functions may modify gsl_interp_accel *acc object (last argument).
+    // This can only work in multithreaded applications if we lock the data
+    // structures via a mutex.
+    Threads::Mutex::ScopedLock lock (acc_mutex);
+
     const double &x = p[0];
     Assert (x >= interpolation_points.front() && x <= interpolation_points.back(),
             ExcCSplineRange(x,interpolation_points.front(),interpolation_points.back()));
@@ -86,6 +100,38 @@ namespace Functions
     res[0] = deriv;
     return res;
   }
+
+
+
+  template <int dim>
+  double
+  CSpline<dim>::laplacian (const Point<dim>   &p,
+                           const unsigned int) const
+  {
+    // GSL functions may modify gsl_interp_accel *acc object (last argument).
+    // This can only work in multithreaded applications if we lock the data
+    // structures via a mutex.
+    Threads::Mutex::ScopedLock lock (acc_mutex);
+
+    const double &x = p[0];
+    Assert (x >= interpolation_points.front() && x <= interpolation_points.back(),
+            ExcCSplineRange(x,interpolation_points.front(),interpolation_points.back()));
+
+    return gsl_spline_eval_deriv2 (cspline, x, acc);
+  }
+
+
+
+  template <int dim>
+  SymmetricTensor<2,dim>
+  CSpline<dim>::hessian (const Point<dim>   &p,
+                         const unsigned int) const
+  {
+    Tensor<2,dim> res;
+    res[0][0] = laplacian(p);
+    return res;
+  }
+
 
 
   template <int dim>

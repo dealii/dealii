@@ -21,6 +21,7 @@
 #ifdef DEAL_II_WITH_GSL
 #include <deal.II/base/function.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/thread_management.h>
 #include <gsl/gsl_spline.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -87,6 +88,12 @@ namespace Functions
     virtual Tensor<1,dim> gradient (const Point<dim>   &p,
                                     const unsigned int  component = 0) const;
 
+    virtual SymmetricTensor<2,dim> hessian (const Point<dim>   &p,
+                                            const unsigned int  component = 0) const;
+
+    virtual double laplacian(const Point< dim > &p,
+                             const unsigned int component = 0) const;
+
     std::size_t memory_consumption () const;
 
   private:
@@ -109,6 +116,11 @@ namespace Functions
      * GSL cubic spline interpolator
      */
     gsl_spline *cspline;
+
+    /**
+     * A mutex for accelerator object.
+     */
+    mutable Threads::Mutex acc_mutex;
   };
 }
 
