@@ -2805,27 +2805,37 @@ namespace TrilinosWrappers
         return_op.vmult = [](Range &tril_dst,
                              const Domain &)
         {
-          tril_dst.Scale(0);
+          const int ierr = tril_dst.PutScalar(0.0);
+
+          AssertThrow (ierr == 0, ExcTrilinosError(ierr));
         };
 
         return_op.Tvmult = [](Domain &tril_dst,
                               const Range &)
         {
-          tril_dst.Scale(0);
+          const int ierr = tril_dst.PutScalar(0.0);
+
+          AssertThrow (ierr == 0, ExcTrilinosError(ierr));
         };
 
         return_op.inv_vmult = [](Domain &tril_dst,
                                  const Range &)
         {
           AssertThrow(false, ExcMessage("Cannot compute inverse of null operator"));
-          tril_dst.Scale(0);
+
+          const int ierr = tril_dst.PutScalar(0.0);
+
+          AssertThrow (ierr == 0, ExcTrilinosError(ierr));
         };
 
         return_op.inv_Tvmult = [](Range &tril_dst,
                                   const Domain &)
         {
           AssertThrow(false, ExcMessage("Cannot compute inverse of null operator"));
-          tril_dst.Scale(0);
+
+          const int ierr = tril_dst.PutScalar(0.0);
+
+          AssertThrow (ierr == 0, ExcTrilinosError(ierr));
         };
 
         return return_op;
