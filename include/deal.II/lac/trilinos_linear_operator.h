@@ -57,28 +57,6 @@ namespace TrilinosWrappers
   /**
    * @relates LinearOperator
    *
-   * Return a LinearOperator that is the identity of the vector space @p Range.
-   *
-   * This function is the equivalent of the dealii::identity_operator, but
-   * ensures full compatibility with Trilinos operations by preselecting the
-   * appropriate template parameters.
-   *
-   * @author Jean-Paul Pelteret, 2016
-   *
-   * @ingroup TrilinosWrappers
-   */
-  template <typename Range>
-  inline LinearOperator<Range, Range, TrilinosWrappers::internal::LinearOperator::TrilinosPayload>
-  identity_operator(const std::function<void(Range &, bool)> &reinit_vector)
-  {
-    typedef TrilinosWrappers::internal::LinearOperator::TrilinosPayload Payload;
-    return dealii::identity_operator<Range, Payload>(reinit_vector);
-  }
-
-
-  /**
-   * @relates LinearOperator
-   *
    * A function that encapsulates generic @p matrix objects, based on an
    * @p operator_exemplar, that act on a compatible Vector type into a
    * LinearOperator.
