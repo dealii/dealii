@@ -840,6 +840,9 @@ null_operator(const LinearOperator<Range, Domain, Payload> &op)
 
   return_op.is_null_operator = true;
 
+  return_op.reinit_range_vector = op.reinit_range_vector;
+  return_op.reinit_domain_vector = op.reinit_domain_vector;
+
   return_op.vmult = [](Range &v, const Domain &)
   {
     v = 0.;
