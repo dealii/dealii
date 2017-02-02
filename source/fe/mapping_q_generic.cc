@@ -2797,7 +2797,7 @@ namespace internal
           if (update_flags & update_JxW_values)
             AssertDimension (output_data.JxW_values.size(), n_q_points);
 
-          Assert (data.aux.size() >= dim-1, ExcInternalError());
+          Assert (data.aux.size()+1 >= dim, ExcInternalError());
 
           // first compute some common data that is used for evaluating
           // all of the flags below
