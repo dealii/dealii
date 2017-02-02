@@ -540,60 +540,41 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
       line->entries.swap (tmp);
     }
 
-  {
-    size_type new_size;
-    if (local_lines.size() != 0)
-      {
-        Assert (other_constraints.local_lines.size() !=0, ExcNotImplemented());
-        // The last stored index determines the new size of lines_cache
-        if (lines_cache.size()>0 || other_constraints.lines_cache.size()>0)
-          {
-            // there exist constraints
-            const size_type last_stored_index_own
-              = (lines_cache.size()>0)?
-                local_lines.nth_index_in_set(lines_cache.size()-1):
-                0;
-            const size_type last_stored_index_other
-              = (other_constraints.lines_cache.size()>0)?
-                other_constraints.local_lines.nth_index_in_set(other_constraints.lines_cache.size()-1):
-                0;
-            const size_type last_stored_index = std::max(last_stored_index_own,
-                                                         last_stored_index_other);
-            // we don't need the old local_lines anymore, so update it
-            local_lines.add_indices(other_constraints.local_lines);
-            new_size = local_lines.index_within_set (last_stored_index)+1;
-          }
-        else
-          {
-            // there don't exist constraints
-            new_size = 0;
-          }
-      }
-    else
-      {
-        Assert (other_constraints.local_lines.size() == 0, ExcNotImplemented());
-        new_size = std::max(lines_cache.size(), other_constraints.lines_cache.size());
-      }
-    // we don't need the old lines_cache anymore
-    lines_cache.assign(new_size, numbers::invalid_size_type);
-  }
+  if (local_lines.size() != 0)
+    local_lines.add_indices(other_constraints.local_lines);
 
   {
-    size_type index = 0;
+    // do not bother to resize the lines cache exactly since it is pretty
+    // cheap to adjust it along the way.
+    std::fill(lines_cache.begin(), lines_cache.end(), numbers::invalid_size_type);
+
     // reset lines_cache for our own constraints
+    size_type index = 0;
     for (std::vector<ConstraintLine>::const_iterator line = lines.begin();
          line != lines.end(); ++line)
-      lines_cache[calculate_line_index(line->line)] = index++;
+      {
+        size_type local_line_no = calculate_line_index(line->line);
+        if (local_line_no >= lines_cache.size())
+          lines_cache.resize(local_line_no+1, numbers::invalid_size_type);
+        lines_cache[local_line_no] = index++;
+      }
 
-    // Then consider other_constraints
+    // Add other_constraints to lines cache and our list of constraints
     for (std::vector<ConstraintLine>::const_iterator line = other_constraints.lines.begin();
          line != other_constraints.lines.end(); ++line)
       {
         const size_type local_line_no = calculate_line_index(line->line);
-        if (lines_cache[local_line_no] == numbers::invalid_size_type)
+        if (local_line_no >= lines_cache.size())
+          {
+            lines_cache.resize(local_line_no+1, numbers::invalid_size_type);
+            lines.push_back(*line);
+            lines_cache[local_line_no] = index++;
+          }
+        else if (lines_cache[local_line_no] == numbers::invalid_size_type)
           {
             // there are no constraints for that line yet
             lines.push_back(*line);
+            AssertIndexRange(local_line_no, lines_cache.size());
             lines_cache[local_line_no] = index++;
           }
         else
@@ -611,6 +592,7 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
                 break;
 
               case right_object_wins:
+                AssertIndexRange(local_line_no, lines_cache.size());
                 lines[lines_cache[local_line_no]] = *line;
                 break;
 
