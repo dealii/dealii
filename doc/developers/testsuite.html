@@ -130,9 +130,9 @@ name.
       the testsuite and run cmake pointing to the <code>tests</code>
       subdirectory, e.g.,
 <pre>
-$ mkdir tests/build
-$ cd tests/build
-$ cmake ..
+$ mkdir tests_for_installed_dealii
+$ cd tests_for_installed_dealii
+$ cmake -DDEAL_II_DIR=/path/to/installed/dealii /path/to/dealii_source/tests
 </pre>
       After that the same configuration targets as described <a
       href="setupbuild">above</a> are available.
