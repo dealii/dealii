@@ -298,7 +298,7 @@ namespace parallel
         default_setting = 0x0,
         /**
          * If set, the deal.II mesh will be reconstructed from the coarse mesh
-         * every time a repartioning in p4est happens. This can be a bit more
+         * every time a repartitioning in p4est happens. This can be a bit more
          * expensive, but guarantees the same memory layout and therefore cell
          * ordering in the deal.II mesh. As assembly is done in the deal.II
          * cell ordering, this flag is required to get reproducible behaviour
@@ -313,7 +313,7 @@ namespace parallel
          */
         construct_multigrid_hierarchy = 0x2,
         /**
-         * Setting this flag will disable automatic repartioning of the cells
+         * Setting this flag will disable automatic repartitioning of the cells
          * after a refinement cycle. It can be executed manually by calling
          * repartition().
          */
