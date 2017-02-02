@@ -30,7 +30,6 @@
 // back to the quadrature points is an identity operation
 
 
-std::string output_file_name = "output";
 
 
 template <int dim>

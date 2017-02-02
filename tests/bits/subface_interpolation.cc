@@ -21,7 +21,6 @@
 //   FE::subface_interpolation
 
 
-std::string output_file_name = "output";
 
 
 

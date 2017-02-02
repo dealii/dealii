@@ -28,7 +28,6 @@
 // elements, when computing some sort of edge directions. This is the
 // case left over from dof_tools_19
 
-std::string output_file_name = "output";
 
 
 template <int dim>

@@ -21,7 +21,6 @@
 //   DoFTools::count_dofs_per_component
 
 
-std::string output_file_name = "output";
 
 
 template <int dim>

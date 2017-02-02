@@ -24,7 +24,6 @@
 //                           SparsityPattern       &);
 
 
-std::string output_file_name = "output";
 
 // set up masks. choose X-shaped
 // masks with full first row and

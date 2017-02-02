@@ -22,7 +22,6 @@
 //   FE_FaceQ/FaceP/TraceQ::subface_interpolation
 
 
-std::string output_file_name = "output";
 
 
 void
@@ -176,7 +175,7 @@ main()
 {
   try
     {
-      std::ofstream logfile(output_file_name.c_str());
+      std::ofstream logfile("output");
       deallog << std::setprecision (6);
       deallog.attach(logfile);
       deallog.threshold_double(1.e-10);

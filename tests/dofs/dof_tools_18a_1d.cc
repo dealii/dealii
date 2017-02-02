@@ -51,7 +51,6 @@
 // DoF 4. this was previously missing
 
 
-std::string output_file_name = "output";
 
 
 template <int dim>
@@ -119,7 +118,7 @@ main()
 {
   try
     {
-      std::ofstream logfile(output_file_name.c_str());
+      std::ofstream logfile("output");
       logfile << std::setprecision (2);
       deallog << std::setprecision (2);
       deallog.attach(logfile);

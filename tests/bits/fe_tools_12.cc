@@ -21,7 +21,6 @@
 //   FETools::get_projection_matrix
 
 
-std::string output_file_name = "output";
 
 
 

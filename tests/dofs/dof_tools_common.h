@@ -43,8 +43,6 @@ template <int dim>
 void
 check_this (const DoFHandler<dim> &dof_handler);
 
-// forward declaration of a variable with the name of the output file
-extern std::string output_file_name;
 
 
 void
@@ -137,7 +135,7 @@ main()
 {
   try
     {
-      std::ofstream logfile(output_file_name.c_str());
+      std::ofstream logfile("output");
       logfile << std::setprecision (8);
       deallog << std::setprecision (8);
       deallog.attach(logfile);

@@ -39,7 +39,6 @@
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/fe/fe_dgq.h>
 
-std::string output_file_name = "output";
 
 template<int dim>
 class FilteredDataOut : public DataOut<dim>
@@ -123,7 +122,7 @@ check ()
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile(output_file_name.c_str());
+  std::ofstream logfile("output");
   deallog << std::setprecision (2);
   logfile << std::setprecision (2);
   deallog.attach(logfile);

@@ -38,7 +38,6 @@
 // because VectorTools::project wasn't implemented at all in 1d. It
 // required fixing both bugs to get to the actual point of this test.
 
-std::string output_file_name = "output";
 
 
 template <int dim>

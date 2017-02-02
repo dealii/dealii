@@ -24,7 +24,6 @@
 #include <deal.II/numerics/data_out_rotation.h>
 
 
-std::string output_file_name = "output";
 
 
 // have a class that makes sure we can get at the patches and data set

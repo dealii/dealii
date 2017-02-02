@@ -23,7 +23,6 @@
 #include <deal.II/numerics/data_out.h>
 
 
-std::string output_file_name = "output";
 
 
 template <int dim>

@@ -23,7 +23,6 @@
 //   make_flux_sparsity_pattern (const DoFHandler<dim>     &,
 //                           DynamicSparsityPattern &);
 
-std::string output_file_name = "output";
 
 
 template <int dim>

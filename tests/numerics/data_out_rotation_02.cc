@@ -23,7 +23,6 @@
 #include <deal.II/numerics/data_out_rotation.h>
 
 
-std::string output_file_name = "output";
 
 
 

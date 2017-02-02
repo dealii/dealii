@@ -46,8 +46,6 @@ check_this (const DoFHandler<dim> &dof_handler,
             const Vector<double>  &v_node,
             const Vector<double>  &v_cell);
 
-// forward declaration of a variable with the name of the output file
-extern std::string output_file_name;
 
 
 // take a vector, and make a block vector out of it
@@ -117,7 +115,7 @@ main()
 {
   try
     {
-      std::ofstream logfile(output_file_name.c_str());
+      std::ofstream logfile("output");
       deallog << std::setprecision (2);
       logfile << std::setprecision (2);
       deallog.attach(logfile);
