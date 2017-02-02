@@ -1239,7 +1239,8 @@ namespace StandardExceptions
 #define DEAL_II_STATIC_ASSERT(...) static_assert(__VA_ARGS__)
 #else
 #define DEAL_II_STATIC_ASSERT_DUMMY(L) typedef char __static_assert__##L
-#define DEAL_II_STATIC_ASSERT(...) DEAL_II_STATIC_ASSERT_DUMMY(__LINE__)
+#define DEAL_II_STATIC_ASSERT_DUMMY2(L) DEAL_II_STATIC_ASSERT_DUMMY(L)
+#define DEAL_II_STATIC_ASSERT(...) DEAL_II_STATIC_ASSERT_DUMMY2(__LINE__)
 #endif
 
 using namespace StandardExceptions;
