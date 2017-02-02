@@ -656,27 +656,19 @@ namespace FETools
    * nodes. For that case use the @p back_interpolate function, below, that
    * takes an additional @p ConstraintMatrix object.
    *
+   * @p dof1 might be a DoFHandler or a hp::DoFHandler onject.
+   *
    * Furthermore note, that for the specific case when the finite element
    * space corresponding to @p fe1 is a subset of the finite element space
    * corresponding to @p fe2, this function is simply an identity mapping.
    */
-  template <int dim, class InVector, class OutVector, int spacedim>
-  void back_interpolate (const DoFHandler<dim,spacedim>    &dof1,
-                         const InVector                    &u1,
-                         const FiniteElement<dim,spacedim> &fe2,
-                         OutVector                         &u1_interpolated);
-
-  /**
-   * Same as last function, except that the dof handler objects might be of
-   * type @p hp::DoFHandler.
-   */
   template <int dim,
-            template <int> class DoFHandlerType,
+            template <int,int> class DoFHandlerType,
             class InVector, class OutVector, int spacedim>
-  void back_interpolate (const DoFHandlerType<dim>         &dof1,
-                         const InVector                    &u1,
-                         const FiniteElement<dim,spacedim> &fe2,
-                         OutVector                         &u1_interpolated);
+  void back_interpolate (const DoFHandlerType<dim,spacedim> &dof1,
+                         const InVector                     &u1,
+                         const FiniteElement<dim,spacedim>  &fe2,
+                         OutVector                          &u1_interpolated);
 
   /**
    * Gives the interpolation of the @p dof1-function @p u1 to a @p

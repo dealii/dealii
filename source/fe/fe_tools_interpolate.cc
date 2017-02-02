@@ -237,85 +237,17 @@ namespace FETools
 
 
 
-  template <int dim, class InVector, class OutVector, int spacedim>
+  template <int dim,
+            template <int, int> class DoFHandlerType,
+            class InVector, class OutVector, int spacedim>
   void
-  back_interpolate(const DoFHandler<dim,spacedim>    &dof1,
-                   const InVector           &u1,
-                   const FiniteElement<dim,spacedim> &fe2,
-                   OutVector                &u1_interpolated)
+  back_interpolate(const DoFHandlerType<dim, spacedim> &dof1,
+                   const InVector                      &u1,
+                   const FiniteElement<dim,spacedim>   &fe2,
+                   OutVector                           &u1_interpolated)
   {
     Assert(dof1.get_fe().n_components() == fe2.n_components(),
            ExcDimensionMismatch(dof1.get_fe().n_components(), fe2.n_components()));
-    Assert(u1.size()==dof1.n_dofs(), ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
-    Assert(u1_interpolated.size()==dof1.n_dofs(),
-           ExcDimensionMismatch(u1_interpolated.size(), dof1.n_dofs()));
-
-#ifdef DEBUG
-    const IndexSet &dof1_local_dofs = dof1.locally_owned_dofs();
-    const IndexSet u1_elements = u1.locally_owned_elements();
-    const IndexSet u1_interpolated_elements = u1_interpolated.locally_owned_elements();
-    Assert(u1_elements == dof1_local_dofs,
-           ExcMessage("The provided vector and DoF handler should have the same"
-                      " index sets."));
-    Assert(u1_interpolated_elements == dof1_local_dofs,
-           ExcMessage("The provided vector and DoF handler should have the same"
-                      " index sets."));
-#endif
-
-    // For continuous elements on grids
-    // with hanging nodes we need
-    // hanging node
-    // constraints. Consequently, when
-    // the elements are continuous no
-    // hanging node constraints are
-    // allowed.
-    const bool hanging_nodes_not_allowed=
-      (dof1.get_fe().dofs_per_vertex != 0) || (fe2.dofs_per_vertex != 0);
-
-    const unsigned int dofs_per_cell1=dof1.get_fe().dofs_per_cell;
-
-    Vector<typename OutVector::value_type> u1_local(dofs_per_cell1);
-    Vector<typename OutVector::value_type> u1_int_local(dofs_per_cell1);
-
-    const types::subdomain_id subdomain_id =
-      dof1.get_triangulation().locally_owned_subdomain();
-
-    typename DoFHandler<dim,spacedim>::active_cell_iterator cell = dof1.begin_active(),
-                                                            endc = dof1.end();
-
-    FullMatrix<double> interpolation_matrix(dofs_per_cell1, dofs_per_cell1);
-    get_back_interpolation_matrix(dof1.get_fe(), fe2,
-                                  interpolation_matrix);
-    for (; cell!=endc; ++cell)
-      if ((cell->subdomain_id() == subdomain_id)
-          ||
-          (subdomain_id == numbers::invalid_subdomain_id))
-        {
-          if (hanging_nodes_not_allowed)
-            for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-              Assert (cell->at_boundary(face) ||
-                      cell->neighbor(face)->level() == cell->level(),
-                      ExcHangingNodesNotAllowed(0));
-
-          cell->get_dof_values(u1, u1_local);
-          interpolation_matrix.vmult(u1_int_local, u1_local);
-          cell->set_dof_values(u1_int_local, u1_interpolated);
-        }
-
-    u1_interpolated.compress(VectorOperation::insert);
-  }
-
-
-
-  template <int dim,
-            template <int> class DoFHandlerType,
-            class InVector, class OutVector, int spacedim>
-  void
-  back_interpolate(const DoFHandlerType<dim>         &dof1,
-                   const InVector                    &u1,
-                   const FiniteElement<dim,spacedim> &fe2,
-                   OutVector                         &u1_interpolated)
-  {
     Assert(u1.size() == dof1.n_dofs(),
            ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
     Assert(u1_interpolated.size() == dof1.n_dofs(),
@@ -339,8 +271,8 @@ namespace FETools
     const types::subdomain_id subdomain_id =
       dof1.get_triangulation().locally_owned_subdomain();
 
-    typename DoFHandlerType<dim>::active_cell_iterator cell = dof1.begin_active(),
-                                                       endc = dof1.end();
+    typename DoFHandlerType<dim, spacedim>::active_cell_iterator cell = dof1.begin_active(),
+                                                                 endc = dof1.end();
 
     // map from possible fe objects in
     // dof1 to the back_interpolation
@@ -353,10 +285,6 @@ namespace FETools
           ||
           (subdomain_id == numbers::invalid_subdomain_id))
         {
-          Assert(cell->get_fe().n_components() == fe2.n_components(),
-                 ExcDimensionMismatch(cell->get_fe().n_components(),
-                                      fe2.n_components()));
-
           // For continuous elements on
           // grids with hanging nodes we
           // need hanging node
@@ -377,12 +305,12 @@ namespace FETools
 
           // make sure back_interpolation
           // matrix is available
-          if (interpolation_matrices[&cell->get_fe()] != 0)
+          if (interpolation_matrices[&cell->get_fe()] == 0)
             {
               interpolation_matrices[&cell->get_fe()] =
                 std_cxx11::shared_ptr<FullMatrix<double> >
                 (new FullMatrix<double>(dofs_per_cell1, dofs_per_cell1));
-              get_back_interpolation_matrix(dof1.get_fe(), fe2,
+              get_back_interpolation_matrix(cell->get_fe(), fe2,
                                             *interpolation_matrices[&cell->get_fe()]);
             }
 
@@ -394,8 +322,7 @@ namespace FETools
           cell->set_dof_values(u1_int_local, u1_interpolated);
         };
 
-    // if we work on a parallel PETSc vector
-    // we have to finish the work
+    // if we work on a parallel vector, we have to finish the work
     u1_interpolated.compress(VectorOperation::insert);
   }
 

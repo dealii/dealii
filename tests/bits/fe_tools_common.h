@@ -47,9 +47,6 @@ void
 check_this (const FiniteElement<dim> &fe1,
             const FiniteElement<dim> &fe2);
 
-// forward declaration of a variable with the name of the output file
-extern std::string output_file_name;
-
 
 
 // output some indicators for a given matrix. we don't write out the
@@ -122,6 +119,17 @@ DoFHandler<dim> *make_dof_handler (const Triangulation<dim> &tria,
 
 
 template <int dim>
+hp::DoFHandler<dim> *make_hp_dof_handler (const Triangulation<dim> &tria,
+                                          const hp::FECollection<dim> &fe)
+{
+  hp::DoFHandler<dim> *dof_handler = new hp::DoFHandler<dim>(tria);
+  dof_handler->distribute_dofs (fe);
+  return dof_handler;
+}
+
+
+
+template <int dim>
 void
 check (const FiniteElement<dim> &fe1,
        const FiniteElement<dim> &fe2,
@@ -175,7 +183,7 @@ main()
 {
   try
     {
-      std::ofstream logfile(output_file_name.c_str());
+      std::ofstream logfile("output");
       deallog << std::setprecision (8);
       deallog.attach(logfile);
       deallog.depth_console(0);
