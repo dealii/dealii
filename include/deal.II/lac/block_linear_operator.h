@@ -502,8 +502,8 @@ template <size_t m, size_t n, typename Range, typename Domain, typename BlockPay
 BlockLinearOperator<Range, Domain, BlockPayload>
 block_operator(const std::array<std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType, typename BlockPayload::BlockType>, n>, m> &ops)
 {
-  DEAL_II_STATIC_ASSERT(m > 0 && n > 0,
-                        "a blocked LinearOperator must consist of at least one block");
+  static_assert(m > 0 && n > 0,
+                "a blocked LinearOperator must consist of at least one block");
 
   typedef typename BlockLinearOperator<Range, Domain, BlockPayload>::BlockType BlockType;
 
@@ -611,8 +611,8 @@ template <size_t m, typename Range, typename Domain, typename BlockPayload>
 BlockLinearOperator<Range, Domain, BlockPayload>
 block_diagonal_operator(const std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType, typename BlockPayload::BlockType>, m> &ops)
 {
-  DEAL_II_STATIC_ASSERT(m > 0,
-                        "a blockdiagonal LinearOperator must consist of at least one block");
+  static_assert(m > 0,
+                "a blockdiagonal LinearOperator must consist of at least one block");
 
   typedef typename BlockLinearOperator<Range, Domain, BlockPayload>::BlockType BlockType;
 
@@ -655,9 +655,9 @@ template <size_t m, typename Range, typename Domain, typename BlockPayload>
 BlockLinearOperator<Range, Domain, BlockPayload>
 block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename Domain::BlockType, typename BlockPayload::BlockType> &op)
 {
-  DEAL_II_STATIC_ASSERT(m > 0,
-                        "a blockdiagonal LinearOperator must consist of at least "
-                        "one block");
+  static_assert(m > 0,
+                "a blockdiagonal LinearOperator must consist of at least "
+                "one block");
 
   typedef typename BlockLinearOperator<Range, Domain, BlockPayload>::BlockType BlockType;
   std::array<BlockType, m> new_ops;

@@ -17,7 +17,6 @@
 #define dealii__tensor_accessors_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/exceptions.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/table_indices.h>
 
@@ -186,8 +185,10 @@ namespace TensorAccessors
   internal::ReorderedIndexView<index, rank, T>
   reordered_index_view(T &t)
   {
-    DEAL_II_STATIC_ASSERT(0 <= index && index < rank,
-                          "The specified index must lie within the range [0,rank)");
+#ifdef DEAL_II_WITH_CXX11
+    static_assert(0 <= index && index < rank,
+                  "The specified index must lie within the range [0,rank)");
+#endif
 
     return internal::ReorderedIndexView<index, rank, T>(t);
   }
@@ -265,12 +266,14 @@ namespace TensorAccessors
   inline DEAL_II_ALWAYS_INLINE
   void contract(T1 &result, const T2 &left, const T3 &right)
   {
-    DEAL_II_STATIC_ASSERT(rank_1 >= no_contr, "The rank of the left tensor must be "
-                          "equal or greater than the number of "
-                          "contractions");
-    DEAL_II_STATIC_ASSERT(rank_2 >= no_contr, "The rank of the right tensor must be "
-                          "equal or greater than the number of "
-                          "contractions");
+#ifdef DEAL_II_WITH_CXX11
+    static_assert(rank_1 >= no_contr, "The rank of the left tensor must be "
+                  "equal or greater than the number of "
+                  "contractions");
+    static_assert(rank_2 >= no_contr, "The rank of the right tensor must be "
+                  "equal or greater than the number of "
+                  "contractions");
+#endif
 
     internal::Contract<no_contr, rank_1, rank_2, dim>::template contract<T1, T2, T3>
     (result, left, right);

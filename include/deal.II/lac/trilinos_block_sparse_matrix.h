@@ -608,8 +608,8 @@ namespace TrilinosWrappers
         template <typename... Args>
         TrilinosBlockPayload (const Args &...)
         {
-          DEAL_II_STATIC_ASSERT(typeid(PayloadBlockType)==typeid(internal::LinearOperator::TrilinosPayload),
-                                "TrilinosBlockPayload can only accept a payload of type TrilinosPayload.");
+          static_assert(typeid(PayloadBlockType)==typeid(internal::LinearOperator::TrilinosPayload),
+                        "TrilinosBlockPayload can only accept a payload of type TrilinosPayload.");
         }
       };
 
