@@ -86,12 +86,14 @@ public:
   {}
 
 private:
-  virtual double svalue(const std_cxx11::array<double, dim> &sp) const
+  virtual double svalue(const std_cxx11::array<double, dim> &sp,
+                        const unsigned int) const
   {
     return std::exp(-Z*sp[0]);
   }
 
-  virtual std_cxx11::array<double, dim> sgradient(const std_cxx11::array<double, dim> &sp) const
+  virtual std_cxx11::array<double, dim> sgradient(const std_cxx11::array<double, dim> &sp,
+                                                  const unsigned int) const
   {
     std_cxx11::array<double, dim> res;
     res[0] = -Z*std::exp(-Z*sp[0]);
@@ -100,7 +102,8 @@ private:
     return res;
   }
 
-  virtual std_cxx11::array<double, 6> shessian (const std_cxx11::array<double, dim> &sp) const
+  virtual std_cxx11::array<double, 6> shessian (const std_cxx11::array<double, dim> &sp,
+                                                const unsigned int) const
   {
     std_cxx11::array<double, 6> res;
     res[0] = Z*Z*std::exp(-Z*sp[0]);

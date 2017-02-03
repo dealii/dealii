@@ -48,8 +48,13 @@ namespace Functions
     /**
      * Constructor which should be provided with @p center defining the origin
      * of the coordinate system.
+     *
+     * Note that components of this function are treated as entirely separate
+     * quantities -- not as the components of a vector that will be
+     * re-interpreted in a different coordinate system.
      */
-    Spherical(const Point<dim> &center = Point<dim>());
+    Spherical(const Point<dim> &center = Point<dim>(),
+              const unsigned int n_components=1);
 
     /**
      * Return the value of the function at the given point.
@@ -87,7 +92,8 @@ namespace Functions
      * Return the value at point @p sp. Here, @p sp is provided in spherical
      * coordinates.
      */
-    virtual double svalue(const std_cxx11::array<double, dim> &sp) const;
+    virtual double svalue(const std_cxx11::array<double, dim> &sp,
+                          const unsigned int component) const;
 
     /**
      * Return the gradient in spherical coordinates.
@@ -95,7 +101,8 @@ namespace Functions
      * The returned object should contain derivatives in the following order:
      * $\{ f_{,r},\, f_{,\theta},\, f_{,\phi}\}$.
      */
-    virtual std_cxx11::array<double, dim> sgradient(const std_cxx11::array<double, dim> &sp) const;
+    virtual std_cxx11::array<double, dim> sgradient(const std_cxx11::array<double, dim> &sp,
+                                                    const unsigned int component) const;
 
     /**
      * Return the Hessian in spherical coordinates.
@@ -103,7 +110,8 @@ namespace Functions
      * The returned object should contain derivatives in the following order:
      * $\{ f_{,rr},\, f_{,\theta\theta},\, f_{,\phi\phi},\, f_{,r\theta},\, f_{,r\phi},\, f_{,\theta\phi}\}$.
      */
-    virtual std_cxx11::array<double, 6> shessian (const std_cxx11::array<double, dim> &sp) const;
+    virtual std_cxx11::array<double, 6> shessian (const std_cxx11::array<double, dim> &sp,
+                                                  const unsigned int component) const;
 
     /**
      * A vector from the origin to the center of spherical coordinate system.
