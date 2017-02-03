@@ -204,7 +204,8 @@ split_string_list (const std::string &s,
 
       skip_space (name);
 
-      while ((name.size() != 0) && (name[name.length()-1] == ' '))
+      while ((name.size() != 0) && (name[name.length()-1] == ' '
+                                    || name[name.length()-1] == '\n'))
         name.erase (name.length()-1, 1);
 
       split_list.push_back (name);
@@ -301,6 +302,8 @@ void read_expansion_lists (const std::string &filename)
   // end-of-line characters by spaces
   std::string whole_file = read_whole_file (in);
 
+  skip_space (whole_file);
+
   // now process entries of the form
   //   NAME := { class1; class2; ...}.
   while (whole_file.size() != 0)
@@ -363,6 +366,13 @@ void substitute (const std::string &text,
       const std::string name    = substitutions.front().first,
                         pattern = substitutions.front().second;
 
+      if (expansion_lists.find(pattern)==expansion_lists.end())
+        {
+          std::cerr << "could not find pattern '" << pattern << "'" << std::endl;
+          std::exit (1);
+        }
+
+
       const std::list<std::pair<std::string, std::string> >
       rest_of_substitutions (++substitutions.begin(),
                              substitutions.end());
@@ -383,6 +393,12 @@ void substitute (const std::string &text,
       // do the substitutions
       const std::string name    = substitutions.front().first,
                         pattern = substitutions.front().second;
+
+      if (expansion_lists.find(pattern)==expansion_lists.end())
+        {
+          std::cerr << "could not find pattern '" << pattern << "'"<< std::endl;
+          std::exit (1);
+        }
 
       for (std::list<std::string>::const_iterator
            expansion = expansion_lists[pattern].begin();
