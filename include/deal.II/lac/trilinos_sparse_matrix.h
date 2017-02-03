@@ -2201,10 +2201,19 @@ namespace TrilinosWrappers
         virtual ~TrilinosPayload() {}
 
         /**
+        * Returns a payload configured for identity operations
+        */
+        TrilinosPayload identity_payload () const;
+
+        /**
+        * Returns a payload configured for null operations
+        */
+        TrilinosPayload null_payload () const;
+
+        /**
         * Returns a payload configured for transpose operations
         */
         TrilinosPayload transpose_payload () const;
-
 
         /**
         * Returns a payload configured for inverse operations

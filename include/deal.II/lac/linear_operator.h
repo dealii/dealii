@@ -791,6 +791,39 @@ identity_operator(const std::function<void(Range &, bool)> &reinit_vector)
 /**
  * @relates LinearOperator
  *
+ * Return a LinearOperator that is the identity of the vector space @p Range.
+ *
+ * The function takes a LinearOperator @p op and uses its range initializer
+ * to create an identiy operator. In contrast to the function above, this
+ * function also ensures that the underlying Payload matches that of the
+ * input @p op.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range, typename Domain, typename Payload>
+LinearOperator<Range, Domain, Payload>
+identity_operator(const LinearOperator<Range, Domain, Payload> &op)
+{
+  const LinearOperator<Range, Domain, Payload> id_op
+    = identity_operator<Range,Payload>(op.reinit_range_vector);
+  LinearOperator<Range, Domain, Payload> return_op (
+    op.identity_payload()
+  );
+
+  return_op.reinit_range_vector = id_op.reinit_range_vector;
+  return_op.reinit_domain_vector = id_op.reinit_domain_vector;
+  return_op.vmult = id_op.vmult;
+  return_op.vmult_add = id_op.vmult_add;
+  return_op.Tvmult = id_op.Tvmult;
+  return_op.Tvmult_add = id_op.Tvmult_add;
+
+  return return_op;
+}
+
+
+/**
+ * @relates LinearOperator
+ *
  * Return a nulled variant of the LinearOperator @p op, i.e. with optimized
  * LinearOperator::vmult, LinearOperator::vmult_add, etc. functions and with
  * LinearOperator::is_null_operator set to true.
@@ -801,9 +834,14 @@ template <typename Range, typename Domain, typename Payload>
 LinearOperator<Range, Domain, Payload>
 null_operator(const LinearOperator<Range, Domain, Payload> &op)
 {
-  auto return_op = op;
+  LinearOperator<Range, Domain, Payload> return_op (
+    op.null_payload()
+  );
 
   return_op.is_null_operator = true;
+
+  return_op.reinit_range_vector = op.reinit_range_vector;
+  return_op.reinit_domain_vector = op.reinit_domain_vector;
 
   return_op.vmult = [](Range &v, const Domain &)
   {
@@ -908,6 +946,26 @@ namespace internal
       template <typename... Args>
       EmptyPayload (const Args &...)
       { }
+
+
+      /**
+      * Returns a payload configured for identity operations
+      */
+      EmptyPayload
+      identity_payload () const
+      {
+        return *this;
+      }
+
+
+      /**
+      * Returns a payload configured for null operations
+      */
+      EmptyPayload
+      null_payload () const
+      {
+        return *this;
+      }
 
 
       /**

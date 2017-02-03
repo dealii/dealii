@@ -2764,6 +2764,86 @@ namespace TrilinosWrappers
 
 
       TrilinosPayload
+      TrilinosPayload::identity_payload () const
+      {
+        TrilinosPayload return_op (*this);
+
+        return_op.vmult = [](Range &tril_dst,
+                             const Range &tril_src)
+        {
+          tril_dst = tril_src;
+        };
+
+        return_op.Tvmult = [](Range &tril_dst,
+                              const Range &tril_src)
+        {
+          tril_dst = tril_src;
+        };
+
+        return_op.inv_vmult = [](Range &tril_dst,
+                                 const Range &tril_src)
+        {
+          tril_dst = tril_src;
+        };
+
+        return_op.inv_Tvmult = [](Range &tril_dst,
+                                  const Range &tril_src)
+        {
+          tril_dst = tril_src;
+        };
+
+        return return_op;
+      }
+
+
+
+      TrilinosPayload
+      TrilinosPayload::null_payload () const
+      {
+        TrilinosPayload return_op (*this);
+
+        return_op.vmult = [](Range &tril_dst,
+                             const Domain &)
+        {
+          const int ierr = tril_dst.PutScalar(0.0);
+
+          AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+        };
+
+        return_op.Tvmult = [](Domain &tril_dst,
+                              const Range &)
+        {
+          const int ierr = tril_dst.PutScalar(0.0);
+
+          AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+        };
+
+        return_op.inv_vmult = [](Domain &tril_dst,
+                                 const Range &)
+        {
+          AssertThrow(false, ExcMessage("Cannot compute inverse of null operator"));
+
+          const int ierr = tril_dst.PutScalar(0.0);
+
+          AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+        };
+
+        return_op.inv_Tvmult = [](Range &tril_dst,
+                                  const Domain &)
+        {
+          AssertThrow(false, ExcMessage("Cannot compute inverse of null operator"));
+
+          const int ierr = tril_dst.PutScalar(0.0);
+
+          AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+        };
+
+        return return_op;
+      }
+
+
+
+      TrilinosPayload
       TrilinosPayload::transpose_payload () const
       {
         TrilinosPayload return_op (*this);
