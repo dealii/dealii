@@ -39,7 +39,7 @@ void test()
   read_write_vector.local_element(0) = 1.;
   read_write_vector.local_element(1) = 2.;
 
-  v.import(read_write_vector, VectorOperation::values::insert);
+  v.import(read_write_vector, VectorOperation::insert);
 
   AssertThrow(v.local_element(0) == 1., ExcInternalError());
   AssertThrow(v.local_element(1) == 2., ExcInternalError());
@@ -51,7 +51,7 @@ void test()
   read_write_vector.local_element(0) = 1.;
   read_write_vector.local_element(1) = 2.;
 
-  v.import(read_write_vector, VectorOperation::values::insert);
+  v.import(read_write_vector, VectorOperation::insert);
 
   AssertThrow(v.local_element(0) == my_id+1, ExcInternalError());
   AssertThrow(v.local_element(1) == my_id+1, ExcInternalError());
