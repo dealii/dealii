@@ -15,13 +15,11 @@
 
 // Verify that hp::DoFHandler::distribute_dofs runs in linear time for a mesh
 // which (prior to commit 23ab0eb0c0) it previously ran in quadratic time. This
-// test checks this in three ways:
+// test checks this in two ways:
 // 1. The amount of time needed to create the grid and the amount of time
 //    needed to distribute dofs should be nearly equal for bilinears. The test
 //    below checks that they are within 50% of each-other.
-// 2. The linear interpolant of the timing data should be fairly accurate. The test
-//    below checks that the least squares error is not too large.
-// 3. Finally, this test should time out if the old quadratic time algorithm is
+// 2. This test should time out if the old quadratic time algorithm is
 //    used (that numbering algorithm takes roughly 1000 seconds on 2016
 //    hardware, but the linear time algorithm takes about 6 seconds)
 
@@ -227,7 +225,7 @@ int main(int argc, char **argv)
   Vector<double> n_dofs(n_cycles);
   Vector<double> distribute_dofs_run_times(n_cycles);
   Vector<double> create_grid_run_times(n_cycles);
-  FullMatrix<double> least_squares_data(n_cycles, 1);
+
   for (unsigned int i = 0; i < n_cycles; ++i)
     {
       n_global_refines += 1;
@@ -246,16 +244,7 @@ int main(int argc, char **argv)
                                  "distributing dofs should be within 50% for "
                                  "sufficiently large grids."));
         }
-      least_squares_data(i, 0) = n_dofs[i];
     }
-
-  // finally, check that the run time is linear:
-  Householder<double> householder(least_squares_data);
-  Vector<double> slope(1);
-  const double error = householder.least_squares(slope, distribute_dofs_run_times);
-  // on my machine the error is about 0.1 so this is a substantial margin for
-  // error
-  AssertThrow(error < 0.3, ExcMessage("The run time should be close to linear."));
 
   deallog << "OK" << std::endl;
 }
