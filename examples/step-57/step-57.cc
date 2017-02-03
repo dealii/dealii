@@ -98,10 +98,9 @@ namespace Step57
   private:
     void setup_dofs();
     void initialize_system();
-    void assemble_system(const bool initial_step,
-                         const bool assemble_matrix,
-                         const bool assemble_rhs);
-    void assemble_matrix(const bool initial_step);
+    void assemble(const bool initial_step,
+                  const bool assemble_matrix);
+    void assemble_system(const bool initial_step);
     void assemble_rhs(const bool initial_step);
     void solve(const bool initial_step);
     void refine_mesh();
@@ -373,24 +372,23 @@ namespace Step57
     system_rhs.reinit (dofs_per_block);
   }
 
-  // @sect4{StationaryNavierStokes::assemble_system}
+  // @sect4{StationaryNavierStokes::assemble}
 
   // This function builds the system matrix and right hand side that we
-  // actually work on. "initial_step" is given for applying different
-  // constraints (nonzero for the initial step and zero for the others). The
-  // other two flags are to determine whether to assemble the system matrix
-  // or the right hand side vector, respectively.
+  // currently work on. The @p initial_step argument is used to determine
+  // which set of constraints we apply (nonzero for the initial step and zero
+  // for the others). The @p assemble_matrix flag determines whether to
+  // assemble the whole system or only the right hand side vector,
+  // respectively.
 
   template <int dim>
-  void StationaryNavierStokes<dim>::assemble_system(const bool initial_step,
-                                                    const bool assemble_matrix,
-                                                    const bool assemble_rhs)
+  void StationaryNavierStokes<dim>::assemble(const bool initial_step,
+                                             const bool assemble_matrix)
   {
     if (assemble_matrix)
       system_matrix    = 0;
 
-    if (assemble_rhs)
-      system_rhs       = 0;
+    system_rhs       = 0;
 
     QGauss<dim>   quadrature_formula(degree+2);
 
@@ -445,12 +443,13 @@ namespace Step57
         fe_values[pressure].get_function_values(evaluation_point,
                                                 present_pressure_values);
 
-        // The assembly is similar to step-22. An additional term with gamma as a coefficient
-        // is the Augmented Lagrangian (AL), which is assembled via grad-div stabilization.
-        // As we discussed in the introduction, the bottom right block of the system matrix should be
-        // zero. Since the pressure mass matrix is used while creating the preconditioner,
-        // we assemble it here and then move it into a separate SparseMatrix at the end (same as in step-22).
-
+        // The assembly is similar to step-22. An additional term with gamma
+        // as a coefficient is the Augmented Lagrangian (AL), which is
+        // assembled via grad-div stabilization.  As we discussed in the
+        // introduction, the bottom right block of the system matrix should be
+        // zero. Since the pressure mass matrix is used while creating the
+        // preconditioner, we assemble it here and then move it into a
+        // separate SparseMatrix at the end (same as in step-22).
         for (unsigned int q=0; q<n_q_points; ++q)
           {
             for (unsigned int k=0; k<dofs_per_cell; ++k)
@@ -478,32 +477,29 @@ namespace Step57
                       }
                   }
 
-                if (assemble_rhs)
-                  {
-                    double present_velocity_divergence =  trace(present_velocity_gradients[q]);
-                    local_rhs(i) += ( - viscosity*scalar_product(present_velocity_gradients[q],grad_phi_u[i])
-                                      - present_velocity_gradients[q]*present_velocity_values[q]*phi_u[i]
-                                      + present_pressure_values[q]*div_phi_u[i]
-                                      + present_velocity_divergence*phi_p[i]
-                                      - gamma*present_velocity_divergence*div_phi_u[i])
-                                    * fe_values.JxW(q);
-                  }
+                double present_velocity_divergence =  trace(present_velocity_gradients[q]);
+                local_rhs(i) += ( - viscosity*scalar_product(present_velocity_gradients[q],grad_phi_u[i])
+                                  - present_velocity_gradients[q]*present_velocity_values[q]*phi_u[i]
+                                  + present_pressure_values[q]*div_phi_u[i]
+                                  + present_velocity_divergence*phi_p[i]
+                                  - gamma*present_velocity_divergence*div_phi_u[i])
+                                * fe_values.JxW(q);
               }
           }
 
         cell->get_dof_indices (local_dof_indices);
 
         const ConstraintMatrix &constraints_used = initial_step ? nonzero_constraints : zero_constraints;
-        // Finally we move pressure mass matrix into a separate matrix:
 
         if (assemble_matrix)
           {
             constraints_used.distribute_local_to_global(local_matrix,
+                                                        local_rhs,
                                                         local_dof_indices,
-                                                        system_matrix);
+                                                        system_matrix,
+                                                        system_rhs);
           }
-
-        if (assemble_rhs)
+        else
           {
             constraints_used.distribute_local_to_global(local_rhs,
                                                         local_dof_indices,
@@ -514,6 +510,8 @@ namespace Step57
 
     if (assemble_matrix)
       {
+        // Finally we move pressure mass matrix into a separate matrix:
+
         pressure_mass_matrix.reinit(sparsity_pattern.block(1,1));
         pressure_mass_matrix.copy_from(system_matrix.block(1,1));
 
@@ -528,16 +526,17 @@ namespace Step57
   }
 
   template <int dim>
-  void StationaryNavierStokes<dim>::assemble_matrix(const bool initial_step)
+  void StationaryNavierStokes<dim>::assemble_system(const bool initial_step)
   {
-    assemble_system(initial_step, true, false);
+    assemble(initial_step, true);
   }
 
   template <int dim>
   void StationaryNavierStokes<dim>::assemble_rhs(const bool initial_step)
   {
-    assemble_system(initial_step, false, true);
+    assemble(initial_step, false);
   }
+
   // @sect4{StationaryNavierStokes::solve}
   // In this function, we use FGMRES together with the block preconditioner,
   // which is defined at the beginning of the program, to solve the linear
@@ -660,8 +659,7 @@ namespace Step57
                 setup_dofs();
                 initialize_system();
                 evaluation_point = present_solution;
-                assemble_matrix(first_step);
-                assemble_rhs(first_step);
+                assemble_system(first_step);
                 solve(first_step);
                 present_solution = newton_update;
                 nonzero_constraints.distribute(present_solution);
@@ -678,9 +676,7 @@ namespace Step57
             else
               {
                 evaluation_point = present_solution;
-                assemble_matrix(first_step);
-                if (outer_iteration == 0)
-                  assemble_rhs(first_step);
+                assemble_system(first_step);
                 solve(first_step);
 
                 // To make sure our solution is getting close to the exact solution, we
