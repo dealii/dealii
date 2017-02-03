@@ -2763,6 +2763,12 @@ namespace TrilinosWrappers
 
 
 
+      // Destructor
+      TrilinosPayload::~TrilinosPayload ()
+      { }
+
+
+
       TrilinosPayload
       TrilinosPayload::identity_payload () const
       {
