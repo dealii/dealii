@@ -21,7 +21,6 @@
 
 #ifdef DEAL_II_WITH_CXX11
 
-#include <deal.II/base/exceptions.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/grid/tria.h>
@@ -327,8 +326,8 @@ namespace parallel
     class ContinuousQuadratureDataTransfer
     {
     public:
-      DEAL_II_STATIC_ASSERT(std::is_base_of<TransferableQuadraturePointData, DataType>::value,
-                            "User's DataType class should be derived from QPData");
+      static_assert(std::is_base_of<TransferableQuadraturePointData, DataType>::value,
+                    "User's DataType class should be derived from QPData");
 
       /**
        * A typedef for a cell.
@@ -506,8 +505,8 @@ template<typename T>
 void CellDataStorage<CellIteratorType,DataType>::initialize(const CellIteratorType &cell,
                                                             const unsigned int n_q_points)
 {
-  DEAL_II_STATIC_ASSERT(std::is_base_of<DataType, T>::value,
-                        "User's T class should be derived from user's DataType class");
+  static_assert(std::is_base_of<DataType, T>::value,
+                "User's T class should be derived from user's DataType class");
 
   if (map.find(cell) == map.end())
     {
@@ -578,8 +577,8 @@ template <typename T>
 std::vector<std::shared_ptr<T> >
 CellDataStorage<CellIteratorType,DataType>::get_data(const CellIteratorType &cell)
 {
-  DEAL_II_STATIC_ASSERT(std::is_base_of<DataType, T>::value,
-                        "User's T class should be derived from user's DataType class");
+  static_assert(std::is_base_of<DataType, T>::value,
+                "User's T class should be derived from user's DataType class");
 
   auto it = map.find(cell);
   Assert(it != map.end(), ExcMessage("Could not find data for the cell"));
@@ -602,8 +601,8 @@ template <typename T>
 std::vector<std::shared_ptr<const T> >
 CellDataStorage<CellIteratorType,DataType>::get_data(const CellIteratorType &cell) const
 {
-  DEAL_II_STATIC_ASSERT(std::is_base_of<DataType, T>::value,
-                        "User's T class should be derived from user's DataType class");
+  static_assert(std::is_base_of<DataType, T>::value,
+                "User's T class should be derived from user's DataType class");
 
   auto it = map.find(cell);
   Assert(it != map.end(), ExcMessage("Could not find QP data for the cell"));
@@ -635,8 +634,8 @@ void pack_cell_data
  const CellDataStorage<CellIteratorType,DataType> *data_storage,
  FullMatrix<double> &matrix_data)
 {
-  DEAL_II_STATIC_ASSERT(std::is_base_of<TransferableQuadraturePointData, DataType>::value,
-                        "User's DataType class should be derived from QPData");
+  static_assert(std::is_base_of<TransferableQuadraturePointData, DataType>::value,
+                "User's DataType class should be derived from QPData");
 
   const std::vector<std::shared_ptr<const DataType> > qpd = data_storage->get_data(cell);
 
@@ -668,8 +667,8 @@ void unpack_to_cell_data
  const FullMatrix<double> &values_at_qp,
  CellDataStorage<CellIteratorType,DataType> *data_storage)
 {
-  DEAL_II_STATIC_ASSERT(std::is_base_of<TransferableQuadraturePointData, DataType>::value,
-                        "User's DataType class should be derived from QPData");
+  static_assert(std::is_base_of<TransferableQuadraturePointData, DataType>::value,
+                "User's DataType class should be derived from QPData");
 
   std::vector<std::shared_ptr<DataType> > qpd = data_storage->get_data(cell);
 

@@ -1097,9 +1097,13 @@ namespace MatrixFreeOperators
   MGInterfaceOperator<OperatorType>::vmult (VectorType &dst,
                                             const VectorType &src) const
   {
-    DEAL_II_STATIC_ASSERT (std::is_same<typename VectorType::value_type,value_type>::value,
-                           "The vector type must be based on the same value type as this"
-                           "operator");
+#ifdef DEAL_II_WITH_CXX11
+#ifndef DEAL_II_MSVC
+    static_assert (std::is_same<typename VectorType::value_type,value_type>::value,
+                   "The vector type must be based on the same value type as this"
+                   "operator");
+#endif
+#endif
 
     Assert(mf_base_operator != NULL,
            ExcNotInitialized());
@@ -1115,9 +1119,13 @@ namespace MatrixFreeOperators
   MGInterfaceOperator<OperatorType>::Tvmult (VectorType &dst,
                                              const VectorType &src) const
   {
-    DEAL_II_STATIC_ASSERT (std::is_same<typename VectorType::value_type,value_type>::value,
-                           "The vector type must be based on the same value type as this"
-                           "operator");
+#ifdef DEAL_II_WITH_CXX11
+#ifndef DEAL_II_MSVC
+    static_assert (std::is_same<typename VectorType::value_type,value_type>::value,
+                   "The vector type must be based on the same value type as this"
+                   "operator");
+#endif
+#endif
 
     Assert(mf_base_operator != NULL,
            ExcNotInitialized());

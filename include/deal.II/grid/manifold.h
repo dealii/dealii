@@ -299,9 +299,11 @@ class Manifold : public Subscriptor
 public:
 
   // explicitly check for sensible template arguments
-  DEAL_II_STATIC_ASSERT (dim<=spacedim,
-                         "The dimension <dim> of a Manifold must be less than or "
-                         "equal to the space dimension <spacedim> in which it lives.");
+#ifdef DEAL_II_WITH_CXX11
+  static_assert (dim<=spacedim,
+                 "The dimension <dim> of a Manifold must be less than or "
+                 "equal to the space dimension <spacedim> in which it lives.");
+#endif
 
 
   /**
@@ -886,9 +888,11 @@ class ChartManifold : public Manifold<dim,spacedim>
 {
 public:
   // explicitly check for sensible template arguments
-  DEAL_II_STATIC_ASSERT (dim<=spacedim,
-                         "The dimension <dim> of a ChartManifold must be less than or "
-                         "equal to the space dimension <spacedim> in which it lives.");
+#ifdef DEAL_II_WITH_CXX11
+  static_assert (dim<=spacedim,
+                 "The dimension <dim> of a ChartManifold must be less than or "
+                 "equal to the space dimension <spacedim> in which it lives.");
+#endif
 
   /**
    * Constructor. The optional argument can be used to specify the periodicity

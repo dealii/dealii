@@ -3528,10 +3528,12 @@ private:
 
   // explicitly check for sensible template arguments, but not on windows
   // because MSVC creates bogus warnings during normal compilation
+#ifdef DEAL_II_WITH_CXX11
 #ifndef DEAL_II_MSVC
-  DEAL_II_STATIC_ASSERT (dim<=spacedim,
-                         "The dimension <dim> of a Triangulation must be less than or "
-                         "equal to the space dimension <spacedim> in which it lives.");
+  static_assert (dim<=spacedim,
+                 "The dimension <dim> of a Triangulation must be less than or "
+                 "equal to the space dimension <spacedim> in which it lives.");
+#endif
 #endif
 
 };
