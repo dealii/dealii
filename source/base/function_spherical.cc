@@ -153,9 +153,10 @@ namespace Functions
 
 
   template <int dim>
-  Spherical<dim>::Spherical(const Point<dim> &p)
+  Spherical<dim>::Spherical(const Point<dim> &p,
+                            const unsigned int n_components)
     :
-    Function<dim>(1),
+    Function<dim>(n_components),
     coordinate_system_offset(p)
   {
     AssertThrow(dim==3,
@@ -167,11 +168,11 @@ namespace Functions
   template <int dim>
   double
   Spherical<dim>::value (const Point<dim>   &p_,
-                         const unsigned int) const
+                         const unsigned int component) const
   {
     const Point<dim> p = p_ - coordinate_system_offset;
     const std_cxx11::array<double, dim> sp = GeometricUtilities::Coordinates::to_spherical(p);
-    return svalue(sp);
+    return svalue(sp, component);
   }
 
 
@@ -179,11 +180,11 @@ namespace Functions
   template <int dim>
   Tensor<1,dim>
   Spherical<dim>::gradient (const Point<dim>   &p_,
-                            const unsigned int) const
+                            const unsigned int component) const
   {
     const Point<dim> p = p_ - coordinate_system_offset;
     const std_cxx11::array<double, dim> sp = GeometricUtilities::Coordinates::to_spherical(p);
-    const std_cxx11::array<double, dim> sg = sgradient(sp);
+    const std_cxx11::array<double, dim> sg = sgradient(sp, component);
 
     // somewhat backwards, but we need cos/sin's for unit vectors
     const double cos_theta = std::cos(sp[1]);
@@ -225,12 +226,12 @@ namespace Functions
   template <int dim>
   SymmetricTensor<2,dim>
   Spherical<dim>::hessian (const Point<dim> &p_,
-                           const unsigned int /* component */) const
+                           const unsigned int component) const
   {
     const Point<dim> p = p_ - coordinate_system_offset;
     const std_cxx11::array<double, dim> sp = GeometricUtilities::Coordinates::to_spherical(p);
-    const std_cxx11::array<double, dim> sg = sgradient(sp);
-    const std_cxx11::array<double, 6>   sh = shessian(sp);
+    const std_cxx11::array<double, dim> sg = sgradient(sp, component);
+    const std_cxx11::array<double, 6>   sh = shessian(sp, component);
 
     // somewhat backwards, but we need cos/sin's for unit vectors
     const double cos_theta = std::cos(sp[1]);
@@ -309,7 +310,8 @@ namespace Functions
 
   template <int dim>
   double
-  Spherical<dim>::svalue(const std_cxx11::array<double, dim> & /* sp */) const
+  Spherical<dim>::svalue(const std_cxx11::array<double, dim> & /* sp */,
+                         const unsigned int /*component*/) const
   {
     AssertThrow(false,
                 ExcNotImplemented());
@@ -320,7 +322,8 @@ namespace Functions
 
   template <int dim>
   std_cxx11::array<double, dim>
-  Spherical<dim>::sgradient(const std_cxx11::array<double, dim> & /* sp */) const
+  Spherical<dim>::sgradient(const std_cxx11::array<double, dim> & /* sp */,
+                            const unsigned int /*component*/) const
   {
     AssertThrow(false,
                 ExcNotImplemented());
@@ -331,7 +334,8 @@ namespace Functions
 
   template <int dim>
   std_cxx11::array<double, 6>
-  Spherical<dim>::shessian (const std_cxx11::array<double, dim> & /* sp */) const
+  Spherical<dim>::shessian (const std_cxx11::array<double, dim> & /* sp */,
+                            const unsigned int /*component*/) const
   {
     AssertThrow(false,
                 ExcNotImplemented());

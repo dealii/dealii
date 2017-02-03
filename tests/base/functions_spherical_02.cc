@@ -128,12 +128,14 @@ public:
   {}
 
 private:
-  virtual double svalue(const std_cxx11::array<double, dim> &sp) const
+  virtual double svalue(const std_cxx11::array<double, dim> &sp,
+                        const unsigned int) const
   {
     return sp[0]*sp[0]*std::cos(sp[1])*std::sin(sp[2]);
   }
 
-  virtual std_cxx11::array<double, dim> sgradient(const std_cxx11::array<double, dim> &sp) const
+  virtual std_cxx11::array<double, dim> sgradient(const std_cxx11::array<double, dim> &sp,
+                                                  const unsigned int) const
   {
     std_cxx11::array<double, dim> res;
     const double r     = sp[0];
@@ -145,7 +147,8 @@ private:
     return res;
   }
 
-  virtual std_cxx11::array<double, 6> shessian (const std_cxx11::array<double, dim> &sp) const
+  virtual std_cxx11::array<double, 6> shessian (const std_cxx11::array<double, dim> &sp,
+                                                const unsigned int) const
   {
     std_cxx11::array<double, 6> res;
     const double r = sp[0];
