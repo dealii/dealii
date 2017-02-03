@@ -25,7 +25,6 @@
 // the concrete dimension (see the documentation)
 
 
-std::string output_file_name = "output";
 
 template <int dim>
 std::string modify_name (const std::string &name)

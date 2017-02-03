@@ -21,7 +21,6 @@
 #include "full_matrix_common.h"
 
 
-std::string output_file_name = "output";
 
 const double entries2[4] =  { 0.814723686393179 ,  0.516389376684563,
                               0.516389376684563,   0.913375856139019

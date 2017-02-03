@@ -23,7 +23,6 @@
 // set of elements
 
 
-std::string output_file_name = "output";
 
 
 

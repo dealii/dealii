@@ -24,7 +24,6 @@
 //                          std::vector<std::vector<bool> > &,
 //                      BlockDynamicSparsityPattern  &);
 
-std::string output_file_name = "output";
 
 
 template <int dim>

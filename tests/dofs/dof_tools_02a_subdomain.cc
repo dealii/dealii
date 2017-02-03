@@ -27,7 +27,6 @@
 // with the subdomain argument
 
 
-std::string output_file_name = "output";
 
 
 template <int dim>

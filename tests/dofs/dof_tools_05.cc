@@ -21,7 +21,6 @@
 //   DoFTools::extract_boundary_dofs
 
 
-std::string output_file_name = "output";
 
 
 template <int dim>

@@ -22,7 +22,6 @@
 //                                         std::vector<unsigned int> &)
 
 
-std::string output_file_name = "output";
 
 
 template <int dim>

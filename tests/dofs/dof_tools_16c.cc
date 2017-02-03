@@ -25,7 +25,6 @@
 //                                   const std::vector<unsigned int> &
 //                               BlockSparsityPattern  &);
 
-std::string output_file_name = "output";
 
 
 template <int dim>

@@ -34,9 +34,6 @@ template <typename number>
 void
 check ();
 
-// forward declaration of a variable with the name of the output file
-extern std::string output_file_name;
-
 
 
 template <typename number>
@@ -155,7 +152,7 @@ main()
 {
   try
     {
-      std::ofstream logfile(output_file_name.c_str());
+      std::ofstream logfile("output");
       deallog << std::setprecision (2);
       deallog.attach(logfile);
       deallog.depth_console(0);

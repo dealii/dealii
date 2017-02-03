@@ -39,7 +39,6 @@
 #include <string>
 
 
-std::string output_file_name = "output";
 
 
 
@@ -133,7 +132,7 @@ check ()
 
 int main()
 {
-  std::ofstream logfile(output_file_name.c_str());
+  std::ofstream logfile("output");
   logfile << std::setprecision (2);
   deallog << std::setprecision (2);
   deallog.attach(logfile);

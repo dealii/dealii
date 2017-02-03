@@ -24,7 +24,6 @@
 //                   std::vector<Point<dim> > &)
 
 
-std::string output_file_name = "output";
 
 
 template <int dim>

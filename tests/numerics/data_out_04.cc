@@ -27,7 +27,6 @@
 #include <deal.II/numerics/data_out.h>
 
 
-std::string output_file_name = "output";
 
 
 // have a class that makes sure we can get at the patches and data set

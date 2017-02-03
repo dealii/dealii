@@ -24,7 +24,6 @@
 #include "full_matrix_common.h"
 
 
-std::string output_file_name = "output";
 
 
 template <typename number>

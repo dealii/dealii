@@ -26,7 +26,6 @@
 #include <deal.II/numerics/data_out.h>
 
 
-std::string output_file_name = "output";
 
 
 template <int dim>
@@ -73,7 +72,7 @@ main()
 {
   try
     {
-      std::ofstream logfile(output_file_name.c_str());
+      std::ofstream logfile("output");
       deallog << std::setprecision (2);
       logfile << std::setprecision (2);
       deallog.attach(logfile);
