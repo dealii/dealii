@@ -268,8 +268,11 @@ namespace TrilinosWrappers
        *
        * For the current class, the variable equals true, since it does
        * support parallel data storage.
+       *
+       * @deprecated instead of using this variable, please use the type trait
+       * value <code>is_serial_vector< VectorType >::value</code>
        */
-      static const bool supports_distributed_data = true;
+      static const bool supports_distributed_data DEAL_II_DEPRECATED = true;
 
       /**
        * @name Basic constructors and initialization.
@@ -767,8 +770,11 @@ namespace TrilinosWrappers
      * For the current class, the variable equals false, since it does not
      * support parallel data storage.  If you do need parallel data storage,
      * use TrilinosWrappers::MPI::Vector.
+     *
+     * @deprecated instead of using this variable, please use the type trait
+     * value <code>is_serial_vector< VectorType >::value</code>
      */
-    static const bool supports_distributed_data = false;
+    static const bool supports_distributed_data DEAL_II_DEPRECATED = false;
 
     /**
      * Default constructor that generates an empty (zero size) vector. The
