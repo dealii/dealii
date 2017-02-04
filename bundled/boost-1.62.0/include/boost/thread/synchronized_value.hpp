@@ -971,22 +971,22 @@ namespace boost
   template <typename T, typename L>
   bool operator<(T const& lhs, synchronized_value<T,L> const&rhs)
   {
-    return rhs>=lhs;
+    return rhs>lhs;
   }
   template <typename T, typename L>
   bool operator<=(T const& lhs, synchronized_value<T,L> const&rhs)
   {
-    return rhs>lhs;
+    return rhs>=lhs;
   }
   template <typename T, typename L>
   bool operator>(T const& lhs, synchronized_value<T,L> const&rhs)
   {
-    return rhs<=lhs;
+    return rhs<lhs;
   }
   template <typename T, typename L>
   bool operator>=(T const& lhs, synchronized_value<T,L> const&rhs)
   {
-    return rhs<lhs;
+    return rhs<=lhs;
   }
 
   /**
