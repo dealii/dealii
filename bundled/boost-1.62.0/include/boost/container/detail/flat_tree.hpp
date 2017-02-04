@@ -409,7 +409,6 @@ class flat_tree
    iterator insert_unique(const_iterator hint, const value_type& val)
    {
       BOOST_ASSERT(this->priv_in_range_or_end(hint));
-      std::pair<iterator,bool> ret;
       insert_commit_data data;
       return this->priv_insert_unique_prepare(hint, KeyOfValue()(val), data)
             ? this->priv_insert_commit(data, val)
@@ -419,7 +418,6 @@ class flat_tree
    iterator insert_unique(const_iterator hint, BOOST_RV_REF(value_type) val)
    {
       BOOST_ASSERT(this->priv_in_range_or_end(hint));
-      std::pair<iterator,bool> ret;
       insert_commit_data data;
       return this->priv_insert_unique_prepare(hint, KeyOfValue()(val), data)
          ? this->priv_insert_commit(data, boost::move(val))
