@@ -809,6 +809,7 @@ class iterator_from_iiterator
    typedef typename types_t::value_type          value_type;
 
    BOOST_CONTAINER_FORCEINLINE iterator_from_iiterator()
+      : m_iit()
    {}
 
    BOOST_CONTAINER_FORCEINLINE explicit iterator_from_iiterator(IIterator iit) BOOST_NOEXCEPT_OR_NOTHROW
