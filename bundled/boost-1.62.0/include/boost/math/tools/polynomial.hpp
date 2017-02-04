@@ -337,7 +337,7 @@ public:
    }
    T evaluate(T z)const
    {
-      return boost::math::tools::evaluate_polynomial(&m_data[0], z, m_data.size());;
+      return m_data.size() > 0 ? boost::math::tools::evaluate_polynomial(&m_data[0], z, m_data.size()) : 0;
    }
    std::vector<T> chebyshev()const
    {
