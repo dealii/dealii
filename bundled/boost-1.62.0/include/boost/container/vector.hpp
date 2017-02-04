@@ -3120,7 +3120,7 @@ class vector
             }
             else{ //If trivial destructor, we can uninitialized copy + copy in a single uninitialized copy
                ::boost::container::uninitialized_move_alloc_n
-                  (this->m_holder.alloc(), pos, old_finish - pos, new_start + before_plus_new);
+                  (this->m_holder.alloc(), pos, static_cast<size_type>(old_finish - pos), new_start + before_plus_new);
                this->m_holder.m_size = new_size;
                old_values_destroyer.release();
             }
