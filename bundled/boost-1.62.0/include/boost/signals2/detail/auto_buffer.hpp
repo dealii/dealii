@@ -1116,7 +1116,7 @@ namespace detail
     inline bool operator<=( const auto_buffer<T,SBP,GP,A>& l,
                             const auto_buffer<T,SBP,GP,A>& r )
     {
-        return !(r > l);
+        return !(r < l);
     }
 
     template< class T, class SBP, class GP, class A >
