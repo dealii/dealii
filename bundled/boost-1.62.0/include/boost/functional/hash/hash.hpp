@@ -456,7 +456,7 @@ namespace boost
     BOOST_HASH_SPECIALIZE(long double)
 
     BOOST_HASH_SPECIALIZE_REF(std::string)
-#if !defined(BOOST_NO_STD_WSTRING)
+#if !defined(BOOST_NO_STD_WSTRING) && !defined(BOOST_NO_INTRINSIC_WCHAR_T)
     BOOST_HASH_SPECIALIZE_REF(std::wstring)
 #endif
 
