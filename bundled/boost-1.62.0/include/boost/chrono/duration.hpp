@@ -438,7 +438,7 @@ namespace chrono {
         BOOST_FORCEINLINE BOOST_CONSTEXPR
         duration() : rep_(duration_values<rep>::zero()) { }
 #else
-        BOOST_CONSTEXPR duration() BOOST_NOEXCEPT : rep_() {};
+        BOOST_CONSTEXPR duration() BOOST_NOEXCEPT : rep_() {}
 #endif
         template <class Rep2>
         BOOST_SYMBOL_VISIBLE BOOST_FORCEINLINE BOOST_CONSTEXPR
