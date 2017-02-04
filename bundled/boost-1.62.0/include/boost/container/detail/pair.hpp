@@ -417,35 +417,6 @@ inline void swap(pair<T1, T2>& x, pair<T1, T2>& y)
 }  //namespace container {
 
 
-//Without this specialization recursive flat_(multi)map instantiation fails
-//because is_enum needs to instantiate the recursive pair, leading to a compilation error).
-//This breaks the cycle clearly stating that pair is not an enum avoiding any instantiation.
-template<class T>
-struct is_enum;
-
-template<class T, class U>
-struct is_enum< ::boost::container::container_detail::pair<T, U> >
-{
-   static const bool value = false;
-};
-
-template<class T, class U>
-struct is_enum< ::std::pair<T, U> >
-{
-   static const bool value = false;
-};
-
-template <class T>
-struct is_class;
-
-//This specialization is needed to avoid instantiation of pair in
-//is_class, and allow recursive maps.
-template <class T1, class T2>
-struct is_class< ::boost::container::container_detail::pair<T1, T2> >
-{
-   static const bool value = true;
-};
-
 #ifdef BOOST_NO_CXX11_RVALUE_REFERENCES
 
 template<class T1, class T2>
