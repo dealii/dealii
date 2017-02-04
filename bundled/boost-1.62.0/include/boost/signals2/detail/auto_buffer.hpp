@@ -971,7 +971,7 @@ namespace detail
 
         pointer uninitialized_grow( size_type n ) // strong
         {
-            if( size_ + n <= members_.capacity_ )
+            if( size_ + n > members_.capacity_ )
                 reserve( size_ + n );
 
             pointer res = end();
