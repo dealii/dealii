@@ -960,10 +960,8 @@ FilteredIterator<BaseIterator> &
 FilteredIterator<BaseIterator>::
 operator = (const FilteredIterator &fi)
 {
-  Assert ((fi.state() != IteratorState::valid) || (*predicate)(fi),
-          ExcInvalidElement(fi));
-  BaseIterator::operator = (fi);
-  return *this;
+  const BaseIterator &bi = fi;
+  return operator = (bi);
 }
 
 
