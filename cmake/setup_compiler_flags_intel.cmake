@@ -58,6 +58,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-w2")
 #
 # Disable some warnings that lead to a lot of false positives:
 #
+#   -w21    type qualifiers are meaningless in this declaration
 #   -w68    integer conversion resulted in a change of sign
 #           (triggers a lot in functionparser)
 #   -w175   subscript out of range
@@ -97,10 +98,12 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-w2")
 #   -w1572  floating-point equality and inequality comparisons are unreliable
 #   -w2259  non-pointer conversion from "double" to "float" may
 #           lose significant bits
-#   -w21    type qualifiers are meaningless in this declaration
 #   -w2536  type qualifiers are meaningless here
+#   -w3415  the "always_inline" attribute is ignored on non-inline functions
+#           incorrectly triggered by inline functions in tensor.h
 #   -w15531 A portion of SIMD loop is serialized
 #
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd21")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd68")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd135")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd175")
@@ -115,8 +118,8 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd1418")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd1478")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd1572")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd2259")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd21")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd2536")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd3415")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd15531")
 
 
