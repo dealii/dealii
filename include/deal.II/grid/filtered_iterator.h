@@ -960,6 +960,11 @@ FilteredIterator<BaseIterator> &
 FilteredIterator<BaseIterator>::
 operator = (const FilteredIterator &fi)
 {
+  // Using equivalent code to the one for 'operator=(const BaseIterator &bi)'
+  // below, some compiler would not cast fi to the base class of type
+  // BaseIterator but try to go through constructing a new Accessor from fi
+  // which fails. Hence, we just use an explicit upcast and call the above-
+  // mentioned method.
   const BaseIterator &bi = fi;
   return operator = (bi);
 }
