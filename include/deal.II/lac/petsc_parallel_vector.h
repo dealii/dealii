@@ -172,8 +172,11 @@ namespace PETScWrappers
        *
        * For the current class, the variable equals true, since it does
        * support parallel data storage.
+       *
+       * @deprecated instead of using this variable, please use the type trait
+       * value <code>is_serial_vector< VectorType >::value</code>
        */
-      static const bool supports_distributed_data = true;
+      static const bool supports_distributed_data DEAL_II_DEPRECATED = true;
 
       /**
        * Default constructor. Initialize the vector as empty.
