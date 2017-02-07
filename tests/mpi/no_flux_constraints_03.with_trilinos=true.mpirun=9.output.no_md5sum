@@ -1,0 +1,14 @@
+
+DEAL:0:3d::#cells = 568
+DEAL:0:3d::#dofs = 2481
+DEAL:0:3d::
+DEAL:0:3d::#constraints on 0: 198
+DEAL:0:3d::#constraints on 1: 221
+DEAL:0:3d::#constraints on 2: 266
+DEAL:0:3d::#constraints on 3: 233
+DEAL:0:3d::#constraints on 4: 300
+DEAL:0:3d::#constraints on 5: 233
+DEAL:0:3d::#constraints on 6: 266
+DEAL:0:3d::#constraints on 7: 221
+DEAL:0:3d::#constraints on 8: 198
+DEAL:0:3d::OK
