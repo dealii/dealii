@@ -1612,7 +1612,7 @@ bool ParameterHandler::read_input (std::istream &input,
       parse_input(input, filename, last_line);
       return true;
     }
-  catch (const ExcIO &exc)
+  catch (const ExcIO &)
     {
       throw;
     }
@@ -1785,7 +1785,7 @@ ParameterHandler::read_input_from_string (const char *s,
       parse_input_from_string (s, last_line);
       return true;
     }
-  catch (const ExcIO &exc)
+  catch (const ExcIO &)
     {
       throw;
     }
@@ -1902,7 +1902,7 @@ bool ParameterHandler::read_input_from_xml(std::istream &in)
       parse_input_from_xml (in);
       return true;
     }
-  catch (const ExcIO &exc)
+  catch (const ExcIO &)
     {
       throw;
     }
@@ -3125,7 +3125,7 @@ MultipleParameterLoop::read_input (std::istream &input,
       MultipleParameterLoop::parse_input(input, filename, last_line);
       return true;
     }
-  catch (const ExcIO &exc)
+  catch (const ExcIO &)
     {
       throw;
     }
