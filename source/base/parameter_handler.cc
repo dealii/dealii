@@ -469,7 +469,7 @@ namespace Patterns
     std::string tmp(sequence);
     // remove whitespace at beginning
     while ((tmp.length() != 0) && (std::isspace (tmp[0])))
-     tmp.erase (0,1);
+      tmp.erase (0,1);
 
     // check the different possibilities
     while (tmp.find('|') != std::string::npos)
