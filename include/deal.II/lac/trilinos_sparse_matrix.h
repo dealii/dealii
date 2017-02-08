@@ -2112,109 +2112,109 @@ namespace TrilinosWrappers
     {
 
       /**
-      * This is a extension class to LinearOperators for Trilinos sparse matrix
-      * and preconditioner types. It provides the interface to performing basic
-      * operations (<tt>vmult</tt> and <tt>Tvmult</tt>)  on Trilinos vector types.
-      * It fulfills the requirements necessary for wrapping a Trilinos solver,
-      * which calls Epetra_Operator functions, as a LinearOperator.
-      *
-      * @note The TrilinosWrappers::SparseMatrix or
-      * TrilinosWrappers::PreconditionBase that this payload wraps is passed by
-      * reference to the <tt>vmult</tt> and <tt>Tvmult</tt> functions. This
-      * object is not thread-safe when the transpose flag is set on it or the
-      * Trilinos object to which it refers. See the docuemtation for the
-      * TrilinosWrappers::internal::LinearOperator::TrilinosPayload::SetUseTranspose()
-      * function for further details.
-      *
-      * @author Jean-Paul Pelteret, 2016
-      *
-      * @ingroup TrilinosWrappers
-      */
+       * This is an extension class to LinearOperators for Trilinos sparse matrix
+       * and preconditioner types. It provides the interface to performing basic
+       * operations (<tt>vmult</tt> and <tt>Tvmult</tt>)  on Trilinos vector types.
+       * It fulfills the requirements necessary for wrapping a Trilinos solver,
+       * which calls Epetra_Operator functions, as a LinearOperator.
+       *
+       * @note The TrilinosWrappers::SparseMatrix or
+       * TrilinosWrappers::PreconditionBase that this payload wraps is passed by
+       * reference to the <tt>vmult</tt> and <tt>Tvmult</tt> functions. This
+       * object is not thread-safe when the transpose flag is set on it or the
+       * Trilinos object to which it refers. See the docuemtation for the
+       * TrilinosWrappers::internal::LinearOperator::TrilinosPayload::SetUseTranspose()
+       * function for further details.
+       *
+       * @author Jean-Paul Pelteret, 2016
+       *
+       * @ingroup TrilinosWrappers
+       */
       class TrilinosPayload
         : public Epetra_Operator
       {
       public:
 
         /**
-        * Definition for the internally supported vector type.
-        */
+         * Definition for the internally supported vector type.
+         */
         typedef Epetra_MultiVector VectorType;
 
         /**
-        * Definition for the vector type for the domain space of the operator.
-        */
+         * Definition for the vector type for the domain space of the operator.
+         */
         typedef VectorType Range;
 
         /**
-        * Definition for the vector type for the range space of the operator.
-        */
+         * Definition for the vector type for the range space of the operator.
+         */
         typedef VectorType Domain;
 
         /**
-        * @name Constructors / destructor
-        */
+         * @name Constructors / destructor
+         */
 //@{
 
         /**
-        * Default constructor
-        *
-        * @note By design, the resulting object is inoperable since there is
-        * insufficient information with which to construct the domain and
-        * range maps.
-        */
+         * Default constructor
+         *
+         * @note By design, the resulting object is inoperable since there is
+         * insufficient information with which to construct the domain and
+         * range maps.
+         */
         TrilinosPayload ();
 
         /**
-        * Constructor for a sparse matrix based on an exemplary matrix
-        */
+         * Constructor for a sparse matrix based on an exemplary matrix
+         */
         TrilinosPayload (const TrilinosWrappers::SparseMatrix &matrix_exemplar,
                          const TrilinosWrappers::SparseMatrix &matrix);
 
         /**
-        * Constructor for a preconditioner based on an exemplary matrix
-        */
+         * Constructor for a preconditioner based on an exemplary matrix
+         */
         TrilinosPayload (const TrilinosWrappers::SparseMatrix     &matrix_exemplar,
                          const TrilinosWrappers::PreconditionBase &preconditioner);
 
         /**
-        * Constructor for a preconditioner based on an exemplary preconditioner
-        */
+         * Constructor for a preconditioner based on an exemplary preconditioner
+         */
         TrilinosPayload (const TrilinosWrappers::PreconditionBase &preconditioner_exemplar,
                          const TrilinosWrappers::PreconditionBase &preconditioner);
 
         /**
-        * Default copy constructor
-        */
+         * Default copy constructor
+         */
         TrilinosPayload (const TrilinosPayload &payload);
 
         /**
-        * Composite copy constructor
-        *
-        * This is required for PackagedOperations as it sets up the domain and
-        * range maps, and composite <tt>vmult</tt> and <tt>Tvmult</tt> operations
-        * based on the combined operation of both operations
-        */
+         * Composite copy constructor
+         *
+         * This is required for PackagedOperations as it sets up the domain and
+         * range maps, and composite <tt>vmult</tt> and <tt>Tvmult</tt> operations
+         * based on the combined operation of both operations
+         */
         TrilinosPayload (const TrilinosPayload &first_op,
                          const TrilinosPayload &second_op);
 
         /**
-        * Destructor
-        */
+         * Destructor
+         */
         virtual ~TrilinosPayload();
 
         /**
-        * Returns a payload configured for identity operations
-        */
+         * Returns a payload configured for identity operations
+         */
         TrilinosPayload identity_payload () const;
 
         /**
-        * Returns a payload configured for null operations
-        */
+         * Returns a payload configured for null operations
+         */
         TrilinosPayload null_payload () const;
 
         /**
-        * Returns a payload configured for transpose operations
-        */
+         * Returns a payload configured for transpose operations
+         */
         TrilinosPayload transpose_payload () const;
 
         /**
@@ -2266,8 +2266,8 @@ namespace TrilinosWrappers
 //@}
 
         /**
-        * @name LinearOperator functionality
-        */
+         * @name LinearOperator functionality
+         */
 //@{
 
         /**
@@ -2340,8 +2340,8 @@ namespace TrilinosWrappers
 //@}
 
         /**
-        * @name Core Epetra_Operator functionality
-        */
+         * @name Core Epetra_Operator functionality
+         */
 //@{
 
         /**
@@ -2409,8 +2409,8 @@ namespace TrilinosWrappers
 //@}
 
         /**
-        * @name Additional Epetra_Operator functionality
-        */
+         * @name Additional Epetra_Operator functionality
+         */
 //@{
 
         /**
@@ -2473,15 +2473,15 @@ namespace TrilinosWrappers
 #endif
 
         /**
-        * Epetra_Map that sets the partitioning of the domain space of
-        * this operator.
-        */
+         * Epetra_Map that sets the partitioning of the domain space of
+         * this operator.
+         */
         Epetra_Map domain_map;
 
         /**
-        * Epetra_Map that sets the partitioning of the range space of
-        * this operator.
-        */
+         * Epetra_Map that sets the partitioning of the range space of
+         * this operator.
+         */
         Epetra_Map range_map;
 
         /**
@@ -2507,16 +2507,16 @@ namespace TrilinosWrappers
       };
 
       /**
-      * Returns an operator that returns a payload configured to support the
-      * addition of two LinearOperators
-      */
+       * Returns an operator that returns a payload configured to support the
+       * addition of two LinearOperators
+       */
       TrilinosPayload operator+(const TrilinosPayload &first_op,
                                 const TrilinosPayload &second_op);
 
       /**
-      * Returns an operator that returns a payload configured to support the
-      * multiplication of two LinearOperators
-      */
+       * Returns an operator that returns a payload configured to support the
+       * multiplication of two LinearOperators
+       */
       TrilinosPayload operator*(const TrilinosPayload &first_op,
                                 const TrilinosPayload &second_op);
 
