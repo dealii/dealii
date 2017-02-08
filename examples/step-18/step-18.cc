@@ -474,7 +474,7 @@ namespace Step18
     // it when necessary. Instead, we opted to obtain the complete copy once
     // and for all, and instead get rid of the distributed copy
     // immediately. Thus, note that the declaration of
-    // <code>inremental_displacement</code> does not denote a distribute
+    // <code>incremental_displacement</code> does not denote a distribute
     // vector as would be indicated by the middle namespace <code>MPI</code>:
     PETScWrappers::MPI::SparseMatrix system_matrix;
 
