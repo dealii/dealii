@@ -39,7 +39,7 @@ DEAL_II_NAMESPACE_OPEN
 // distinguish between dealii::DoFHandler and dealii::hp::DoFHandler.
 // Plus it makes code in dof_handler.cc easier to read.
 // Requires C++11 support which is in Visual Studio 2013 and newer.
-#if _MSC_VER >= 1800
+#if defined(_MSC_VER) && (_MSC_VER >= 1800)
 template <int dim, int spacedim> using HpDoFHandler = ::dealii::hp::DoFHandler<dim, spacedim>;
 #else
 // When using older Visual Studio or a different compiler just fall back.
