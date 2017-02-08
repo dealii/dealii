@@ -108,12 +108,11 @@ void test()
   sleep(1);
   if (myid==0)
     {
-      //sort and merge the constraint matrices on proc 0, generate a checksum
+      //sort and merge the constraint matrices on proc 0
       //and output that into the deallog
       system((std::string("cat ") + base + "cm_*.dot | sort -n | uniq > " + base + "cm").c_str());
-      system((std::string("md5sum ") + base + "cm > " + base + "cm.check").c_str());
       {
-        std::ifstream file((base+"cm.check").c_str());
+        std::ifstream file((base+"cm").c_str());
         std::string str;
         while (!file.eof())
           {
@@ -125,7 +124,6 @@ void test()
       // delete the files created
       // by processor 0
       std::remove ((base + "cm").c_str());
-      std::remove ((base + "cm.check").c_str());
     }
 
   // remove tmp files again. wait
