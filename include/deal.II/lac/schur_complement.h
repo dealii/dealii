@@ -219,7 +219,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
- * @author Jean-Paul Pelteret, Matthias Maier, Martin Kronbichler, 2015
+ * @author Jean-Paul Pelteret, Matthias Maier, Martin Kronbichler, 2015, 2017
  *
  * @ingroup LAOperators
  */
@@ -232,103 +232,15 @@ schur_complement(const LinearOperator<Domain_1, Range_1, Payload> &A_inv,
                  const LinearOperator<Range_2, Domain_1, Payload> &C,
                  const LinearOperator<Range_2, Domain_2, Payload> &D)
 {
-  LinearOperator<Range_2, Domain_2, Payload> return_op ((Payload(D)));
-
-  return_op.reinit_range_vector = D.reinit_range_vector;
-  return_op.reinit_domain_vector = D.reinit_domain_vector;
-
-  // ensure to have valid computation objects by catching
-  // A_inv,B,C,D by value
-
-  return_op.vmult_add = [A_inv,B,C,D](Range_2 &dst_g, const Domain_2 &src_y)
-  {
-    static GrowingVectorMemory<Range_1>  vector_memory_f;
-    static GrowingVectorMemory<Range_2>  vector_memory_g;
-    static GrowingVectorMemory<Domain_1> vector_memory_x;
-
-    Range_1  &tmp_f = *(vector_memory_f.alloc());
-    Range_2  &tmp_g = *(vector_memory_g.alloc());
-    Domain_1 &tmp_x = *(vector_memory_x.alloc());
-
-    // Reinitialise in context of how they'll be used
-    B.reinit_range_vector(tmp_f, /*bool omit_zeroing_entries =*/ true);
-    A_inv.reinit_range_vector(tmp_x, /*bool omit_zeroing_entries =*/ true);
-    C.reinit_range_vector(tmp_g, /*bool omit_zeroing_entries =*/ true);
-
-    // Need to form dst_g such that dst_g = S*src_y = (D - C*A_inv*B) src_y
-    if (D.is_null_operator == false)
-      D.vmult_add (dst_g, src_y); // dst_g += D*src_y (length y)
-
-    B.vmult (tmp_f, src_y); // tmp_f = B*src_y (length x)
-    try
-      {
-        A_inv.vmult (tmp_x, tmp_f); // tmp_x = A_inv*B*src_y (length x)
-      }
-    catch (...)
-      {
-        AssertThrow(false,
-                    ExcMessage("No convergence in A_inv vmult operation"));
-      }
-    C.vmult (tmp_g, tmp_x); // tmp_g = C*A_inv*B*src_y (length y)
-    dst_g -= tmp_g; // dst_g += D*src_y - C*A_inv*B*src_y
-
-    vector_memory_x.free(&tmp_x);
-    vector_memory_g.free(&tmp_g);
-    vector_memory_f.free(&tmp_f);
-  };
-
-  const auto vmult_add = return_op.vmult_add;
-  return_op.vmult = [vmult_add](Range_2 &dst_g, const Domain_2 &src_y)
-  {
-    dst_g = 0.;
-    vmult_add(dst_g, src_y);
-  };
-
-  return_op.Tvmult_add = [A_inv,B,C,D](Domain_2 &dst_g, const Range_2 &src_y)
-  {
-    static GrowingVectorMemory<Domain_1> vector_memory_f;
-    static GrowingVectorMemory<Domain_2> vector_memory_g;
-    static GrowingVectorMemory<Range_1>  vector_memory_x;
-
-    Domain_1 &tmp_f = *(vector_memory_f.alloc());
-    Domain_2 &tmp_g = *(vector_memory_g.alloc());
-    Range_1  &tmp_x = *(vector_memory_x.alloc());
-
-    // Reinitialise in context of how they'll be used
-    C.reinit_domain_vector(tmp_f, /*bool omit_zeroing_entries =*/ true);
-    A_inv.reinit_domain_vector(tmp_x, /*bool omit_zeroing_entries =*/ true);
-    B.reinit_domain_vector(tmp_g, /*bool omit_zeroing_entries =*/ true);
-
-    // Need to form y such that dst such that dst_g = S*src_y = (D^T - B^T*A_inv^T*C^T) src_y
-    if (D.is_null_operator == false)
-      D.Tvmult_add (dst_g, src_y); // dst_g += D^T*src_y (length y)
-
-    C.Tvmult (tmp_f, src_y); // tmp_f = C^T*src_y (length x)
-    try
-      {
-        A_inv.Tvmult (tmp_x, tmp_f); // tmp_x = A_inv^T*C^T*src_y (length x)
-      }
-    catch (...)
-      {
-        AssertThrow(false,
-                    ExcMessage("No convergence in A_inv Tvmult operation"));
-      }
-    B.Tvmult (tmp_g, tmp_x); // tmp_g = B^T*A_inv^T*C^T*src_y (length y)
-    dst_g -= tmp_g; // dst_g += D^T*src_y - B^T*A_inv^T*C^T*src_y
-
-    vector_memory_x.free(&tmp_x);
-    vector_memory_g.free(&tmp_g);
-    vector_memory_f.free(&tmp_f);
-  };
-
-  const auto Tvmult_add = return_op.Tvmult_add;
-  return_op.Tvmult = [Tvmult_add](Domain_2 &dst_g, const Range_2 &src_y)
-  {
-    dst_g = 0.;
-    Tvmult_add(dst_g, src_y);
-  };
-
-  return return_op;
+  // We return the result of the compound LinearOperator
+  // directly, so as to ensure that the underlying Payload
+  // definition aligns with the operations expressed here.
+  // All of the memory allocations etc. are taken care of
+  // internally.
+  if (D.is_null_operator == false)
+    return D - C*A_inv*B;
+  else
+    return -1.0*C*A_inv*B;
 }
 
 //@}
@@ -357,7 +269,7 @@ schur_complement(const LinearOperator<Domain_1, Range_1, Payload> &A_inv,
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
- * @author Jean-Paul Pelteret, Matthias Maier, 2015
+ * @author Jean-Paul Pelteret, Matthias Maier, 2015, 2017
  *
  * @ingroup LAOperators
  */
@@ -369,56 +281,12 @@ condense_schur_rhs (const LinearOperator<Range_1, Domain_1, Payload> &A_inv,
                     const Range_1                                    &f,
                     const Range_2                                    &g)
 {
-  PackagedOperation<Range_2> return_comp;
-
-  return_comp.reinit_vector = C.reinit_range_vector;
-
-  // ensure to have valid computation objects by catching
-  // A_inv,C,f,g by value
-
-  return_comp.apply_add = [A_inv,C,f,g](Range_2 &g_star)
-  {
-
-    static GrowingVectorMemory<Range_1> vector_memory_f;
-    static GrowingVectorMemory<Range_2> vector_memory_g;
-
-    Range_1 &tmp_f1 = *(vector_memory_f.alloc());
-    Range_2 &tmp_g1 = *(vector_memory_g.alloc());
-    Range_2 &tmp_g2 = *(vector_memory_g.alloc());
-
-    // Reinitialise in context of how they'll be used
-    A_inv.reinit_range_vector(tmp_f1, /*bool omit_zeroing_entries =*/ true);
-    C.reinit_range_vector(tmp_g1, /*bool omit_zeroing_entries =*/ true);
-
-    // Condensation on RHS of one field
-    // Need to form g* such that g* = g - C*A_inv*f
-    try
-      {
-        A_inv.vmult(tmp_f1, f); // tmp_f1 = A_inv * f
-      }
-    catch (...)
-      {
-        AssertThrow(false,
-                    ExcMessage("No convergence in A_inv vmult operation"));
-      }
-    C.vmult(tmp_g1, tmp_f1); // tmp2 = C * A_inv * f
-
-    g_star += g;
-    g_star -= tmp_g1; // tmp_g2 = g - C * A_inv * f
-
-    vector_memory_g.free(&tmp_g2);
-    vector_memory_g.free(&tmp_g1);
-    vector_memory_f.free(&tmp_f1);
-  };
-
-  const auto apply_add = return_comp.apply_add;
-  return_comp.apply = [apply_add](Range_2 &g_star)
-  {
-    g_star = 0.;
-    apply_add(g_star);
-  };
-
-  return return_comp;
+  // We return the result of the compound PackagedOperation
+  // directly, so as to ensure that the underlying Payload
+  // definition aligns with the operations expressed here.
+  // All of the memory allocations etc. are taken care of
+  // internally.
+  return g - C*A_inv*f;
 }
 
 /**
@@ -438,7 +306,7 @@ condense_schur_rhs (const LinearOperator<Range_1, Domain_1, Payload> &A_inv,
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
- * @author Jean-Paul Pelteret, Matthias Maier, 2015
+ * @author Jean-Paul Pelteret, Matthias Maier, 2015, 2017
  *
  * @ingroup LAOperators
  */
@@ -450,50 +318,12 @@ postprocess_schur_solution (const LinearOperator<Range_1, Domain_1, Payload> &A_
                             const Domain_2                                   &y,
                             const Range_1                                    &f)
 {
-  PackagedOperation<Domain_1> return_comp;
-
-  return_comp.reinit_vector = A_inv.reinit_domain_vector;
-
-  // ensure to have valid computation objects by catching
-  // A_inv,B,y,f by value
-
-  return_comp.apply_add = [A_inv,B,y,f](Domain_1 &x)
-  {
-    static GrowingVectorMemory<Range_1> vector_memory_f;
-
-    Range_1 &tmp_f1 = *(vector_memory_f.alloc());
-    Range_1 &tmp_f2 = *(vector_memory_f.alloc());
-
-    // Reinitialise in context of how they'll be used
-    B.reinit_range_vector(tmp_f1, /*bool omit_zeroing_entries =*/ true);
-
-    // Solve for second field
-    // Need to form x such that x = A_inv*(f - B*y)
-    B.vmult(tmp_f1, y); // tmp_f1 = B*y
-    tmp_f2 = f;
-    tmp_f2 -= tmp_f1; // tmp_f2 = f - B*y
-    try
-      {
-        A_inv.vmult_add(x, tmp_f2); // x = A_inv*(f-B*y)
-      }
-    catch (...)
-      {
-        AssertThrow(false,
-                    ExcMessage("No convergence in A_inv vmult operation"));
-      }
-
-    vector_memory_f.free(&tmp_f2);
-    vector_memory_f.free(&tmp_f1);
-  };
-
-  const auto apply_add = return_comp.apply_add;
-  return_comp.apply = [apply_add](Domain_1 &x)
-  {
-    x = 0.;
-    apply_add(x);
-  };
-
-  return return_comp;
+  // We return the result of the compound PackagedOperation
+  // directly, so as to ensure that the underlying Payload
+  // definition aligns with the operations expressed here.
+  // All of the memory allocations etc. are taken care of
+  // internally.
+  return A_inv*(f - B*y);
 }
 
 //@}

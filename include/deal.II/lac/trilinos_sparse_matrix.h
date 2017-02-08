@@ -2198,7 +2198,7 @@ namespace TrilinosWrappers
         /**
         * Destructor
         */
-        virtual ~TrilinosPayload() {}
+        virtual ~TrilinosPayload();
 
         /**
         * Returns a payload configured for identity operations

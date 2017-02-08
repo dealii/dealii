@@ -536,10 +536,9 @@ namespace Step22
         TrilinosWrappers::PreconditionAMG preconditioner;
         preconditioner.initialize (system_matrix.block(1,1));
 
-        cg.solve (schur_complement,
-                  tmp.block(1),
-                  schur_rhs,
-                  preconditioner);
+        check_solver_within_range(
+          cg.solve (schur_complement, tmp.block(1), schur_rhs, preconditioner),
+          solver_control.last_step(), 10, 12);
 
         constraints.distribute (tmp);
         solution_reference.block(1)=tmp.block(1);
@@ -618,7 +617,6 @@ namespace Step22
                                          1e-9, 1e-6);
       SolverType solver_S (solver_control_S);
       const auto S_inv = inverse_operator(S,solver_S,preconditioner_M);
-      // const auto S_inv = inverse_operator(S,solver_S,S_inv_approx);
 
       TrilinosWrappers::MPI::BlockVector solution_tmp;
       solution_tmp.reinit (owned_partitioning,
@@ -628,16 +626,17 @@ namespace Step22
 
       const VectorType &f = system_rhs.block(0);
       const VectorType &g = system_rhs.block(1);
-      deallog.push("Pre");
-      // auto rhs = condense_schur_rhs (A_inv,C,f,g); // Delays computation
-      const VectorType rhs = condense_schur_rhs (A_inv,C,f,g);
-      deallog.pop();
-      deallog.push("Main");
-      y = S_inv * rhs;
-      deallog.pop();
-      deallog.push("Post");
-      x = postprocess_schur_solution (A_inv,B,y,f);
-      deallog.pop();
+
+      {
+        const unsigned int previous_depth = deallog.depth_file(0);
+
+        const VectorType rhs = condense_schur_rhs (A_inv,C,f,g);
+        y = S_inv * rhs;
+        x = postprocess_schur_solution (A_inv,B,y,f);
+
+        deallog.depth_file(previous_depth);
+      }
+
 
       constraints.distribute (solution_tmp);
       solution = solution_tmp;
@@ -671,13 +670,23 @@ namespace Step22
     const double global_error = std::sqrt(Utilities::MPI::sum(
                                             local_error * local_error,
                                             mpi_communicator));
-    deallog
-        << "Rel. norm of error in SchurOperator solve: " << global_error/ref_global_norm
-        << std::endl;
 
-    // Check solution
-    AssertThrow(global_error/ref_global_norm < 1e-3,
-                ExcMessage("Solution does not match reference result"));
+    if (global_error/ref_global_norm < 1.e-3)
+      {
+        deallog << "Relative difference of results less than 1.e-3"
+                << std::endl;
+
+      }
+    else
+      {
+        deallog
+            << "Relative difference of results too large: "
+            << global_error/ref_global_norm
+            << std::endl;
+
+        AssertThrow(false,
+                    ExcMessage("Solution does not match reference result"));
+      }
   }
 
   template <int dim>
