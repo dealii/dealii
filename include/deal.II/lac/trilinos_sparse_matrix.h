@@ -31,6 +31,7 @@
 
 #ifdef DEAL_II_WITH_CXX11
 #include <deal.II/lac/vector_memory.h>
+#include <type_traits>
 #endif // DEAL_II_WITH_CXX11
 
 #  include <vector>
@@ -2049,6 +2050,7 @@ namespace TrilinosWrappers
 #ifdef DEAL_II_WITH_CXX11
 
   // forwards declarations
+  class SolverBase;
   class PreconditionBase;
 
   namespace internal
@@ -2216,17 +2218,50 @@ namespace TrilinosWrappers
         TrilinosPayload transpose_payload () const;
 
         /**
-        * Returns a payload configured for inverse operations
-        *
-        * Invoking this constructor will configure two additional functions,
-        * namely <tt>inv_vmult</tt> and <tt>inv_Tvmult</tt>, both of which wrap
-        * inverse operations.
-        * The <tt>vmult</tt> and <tt>Tvmult</tt> operations retain the standard
-        * definitions inherited from @p op.
-        */
+         * Returns a payload configured for inverse operations
+         *
+         * Invoking this factory function will configure two additional functions,
+         * namely <tt>inv_vmult</tt> and <tt>inv_Tvmult</tt>, both of which wrap
+         * inverse operations.
+         * The <tt>vmult</tt> and <tt>Tvmult</tt> operations retain the standard
+         * definitions inherited from @p op.
+         *
+         * @note This function is enabled only if the solver and preconditioner
+         * derive from the respective TrilinosWrappers base classes.
+         * The C++ compiler will therefore only consider this function if the
+         * following criterion are satisfied:
+         * 1. the @p Solver derives from TrilinosWrappers::SolverBase, and
+         * 2. the @p Preconditioner derives from TrilinosWrappers::PreconditionBase.
+         */
         template <typename Solver, typename Preconditioner>
-        TrilinosPayload inverse_payload (Solver &, const Preconditioner &) const;
+        typename std::enable_if<
+        std::is_base_of<TrilinosWrappers::SolverBase,Solver>::value &&
+        std::is_base_of<TrilinosWrappers::PreconditionBase,Preconditioner>::value,
+            TrilinosPayload>::type
+            inverse_payload (Solver &, const Preconditioner &) const;
 
+        /**
+         * Returns a payload configured for inverse operations
+         *
+         * Invoking this factory function will configure two additional functions,
+         * namely <tt>inv_vmult</tt> and <tt>inv_Tvmult</tt>, both of which
+         * are disabled because the @p Solver or @p Preconditioner are not
+         * compatible with Epetra_MultiVector.
+         * The <tt>vmult</tt> and <tt>Tvmult</tt> operations retain the standard
+         * definitions inherited from @p op.
+         *
+         * @note The C++ compiler will only consider this function if the
+         * following criterion are satisfied:
+         * 1. the @p Solver does not derive from TrilinosWrappers::SolverBase, and
+         * 2. the @p Preconditioner does not derive from
+         * TrilinosWrappers::PreconditionBase.
+         */
+        template <typename Solver, typename Preconditioner>
+        typename std::enable_if<
+        !(std::is_base_of<TrilinosWrappers::SolverBase,Solver>::value &&
+          std::is_base_of<TrilinosWrappers::PreconditionBase,Preconditioner>::value),
+              TrilinosPayload>::type
+              inverse_payload (Solver &, const Preconditioner &) const;
 
 //@}
 
@@ -3144,10 +3179,13 @@ namespace TrilinosWrappers
     namespace LinearOperator
     {
       template <typename Solver, typename Preconditioner>
-      TrilinosPayload
-      TrilinosPayload::inverse_payload (
-        Solver                &solver,
-        const Preconditioner  &preconditioner) const
+      typename std::enable_if<
+      std::is_base_of<TrilinosWrappers::SolverBase,Solver>::value &&
+      std::is_base_of<TrilinosWrappers::PreconditionBase,Preconditioner>::value,
+          TrilinosPayload>::type
+          TrilinosPayload::inverse_payload (
+            Solver                &solver,
+            const Preconditioner  &preconditioner) const
       {
         const auto &payload = *this;
 
@@ -3189,6 +3227,36 @@ namespace TrilinosWrappers
         if (return_op.UseTranspose() == true)
           std::swap(return_op.inv_vmult,
                     return_op.inv_Tvmult);
+
+        return return_op;
+      }
+
+      template <typename Solver, typename Preconditioner>
+      typename std::enable_if<
+      !(std::is_base_of<TrilinosWrappers::SolverBase,Solver>::value &&
+        std::is_base_of<TrilinosWrappers::PreconditionBase,Preconditioner>::value),
+            TrilinosPayload>::type
+            TrilinosPayload::inverse_payload (
+              Solver                &solver,
+              const Preconditioner  &preconditioner) const
+      {
+        TrilinosPayload return_op(*this);
+
+        return_op.inv_vmult = [](TrilinosPayload::Domain &,
+                                 const TrilinosPayload::Range &)
+        {
+          AssertThrow(false,
+                      ExcMessage("Payload inv_vmult disabled because of "
+                                 "incompatible solver/preconditioner choice."));
+        };
+
+        return_op.inv_Tvmult = [](TrilinosPayload::Range &,
+                                  const TrilinosPayload::Domain &)
+        {
+          AssertThrow(false,
+                      ExcMessage("Payload inv_vmult disabled because of "
+                                 "incompatible solver/preconditioner choice."));
+        };
 
         return return_op;
       }
