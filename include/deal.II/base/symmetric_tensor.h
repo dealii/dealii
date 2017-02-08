@@ -2551,7 +2551,7 @@ identity_tensor ()
 template <int dim, typename Number>
 inline
 SymmetricTensor<2,dim,Number>
-invert (const SymmetricTensor<2,dim,Number> &t)
+invert (const SymmetricTensor<2,dim,Number> &)
 {
   // if desired, take over the
   // inversion of a 4x4 tensor

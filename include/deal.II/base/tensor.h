@@ -1788,7 +1788,7 @@ Number trace (const Tensor<2,dim,Number> &d)
 template <int dim, typename Number>
 inline
 Tensor<2,dim,Number>
-invert (const Tensor<2,dim,Number> &t)
+invert (const Tensor<2,dim,Number> &)
 {
   Number return_tensor [dim][dim];
 
