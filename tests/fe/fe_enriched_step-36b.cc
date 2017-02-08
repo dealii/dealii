@@ -870,7 +870,7 @@ int main (int argc,char **argv)
         dealii::PETScWrappers::set_option_value("-eps_target","-1.0");
         dealii::PETScWrappers::set_option_value("-st_type","sinvert");
         dealii::PETScWrappers::set_option_value("-st_ksp_type","cg");
-        dealii::PETScWrappers::set_option_value("-st_pc_type", "gamg");
+        dealii::PETScWrappers::set_option_value("-st_pc_type", "jacobi");
         dealii::PETScWrappers::set_option_value("-st_ksp_tol", "1e-11");
         step36.run();
       }
