@@ -140,9 +140,10 @@ void EvaluateDerivative (DoFHandler<3> &dof_handler,
         }
     }
 
-  deallog << "L2-Err=" << pow (err_l2, 0.5)
-          << ", Hdiv-Err=" << pow (err_hdiv, 0.5)
-          << std::endl;
+  AssertThrow(err_l2 < 1.e-20, ExcInternalError());
+  AssertThrow(err_hdiv < 1.e-20, ExcInternalError());
+
+  deallog << "OK" << std::endl;
 }
 
 
@@ -489,7 +490,7 @@ void project (const Mapping<dim>       &mapping,
                                         mass_matrix, vec, tmp,
                                         true);
 
-  SolverControl           control(1000,1e-16);
+  SolverControl           control(1000,1e-16, false, false);
   PrimitiveVectorMemory<> memory;
   SolverCG<>              cg(control,memory);
 
@@ -504,10 +505,9 @@ void project (const Mapping<dim>       &mapping,
 
 
 
-int main (int /*argc*/, char **/*argv*/)
+int main ()
 {
   initlog();
-
 
   Triangulation<3> tria_test;
   GridGenerator::hyper_cube(tria_test);
@@ -546,12 +546,4 @@ int main (int /*argc*/, char **/*argv*/)
            solution);
 
   EvaluateDerivative (dof_handler, solution);
-  solution.print (deallog);
-
-  DataOut<3> data_out;
-  data_out.attach_dof_handler (dof_handler);
-  data_out.add_data_vector (solution, "solution");
-  data_out.build_patches (2);
-
-  data_out.write_gnuplot (deallog.get_file_stream());
 }
