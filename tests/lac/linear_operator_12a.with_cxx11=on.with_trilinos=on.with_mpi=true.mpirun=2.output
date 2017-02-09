@@ -1,0 +1,9 @@
+
+DEAL:DirectKLU::Starting value 0
+DEAL:DirectKLU::Convergence step 0 value 0
+DEAL:deal_II_CG_SSOR:cg::Starting value 21.8027
+DEAL:deal_II_CG_SSOR:cg::Convergence step 105 value 0
+DEAL:deal_II_CG_SSOR::Norm of error in standard solve: 0
+DEAL:LinearOperator_deal_II_CG_SSOR:cg::Starting value 21.8027
+DEAL:LinearOperator_deal_II_CG_SSOR:cg::Convergence step 105 value 0
+DEAL:LinearOperator_deal_II_CG_SSOR::Norm of error in LinearOperator solve: 0
