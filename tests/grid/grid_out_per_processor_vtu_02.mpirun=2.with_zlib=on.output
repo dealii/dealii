@@ -1,0 +1,100 @@
+
+DEAL:0:2d::hyper_cube
+<?xml version="1.0"?>
+<!--
+#This file was generated 
+-->
+<VTKFile type="PUnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <PUnstructuredGrid GhostLevel="0">
+    <PPointData Scalars="scalars">
+    <PDataArray type="Float64" Name="subdomain" format="ascii"/>
+    <PDataArray type="Float64" Name="proc_writing" format="ascii"/>
+    </PPointData>
+    <PPoints>
+      <PDataArray type="Float64" NumberOfComponents="3"/>
+    </PPoints>
+    <Piece Source="file1.proc0000.vtu"/>
+    <Piece Source="file1.proc0001.vtu"/>
+  </PUnstructuredGrid>
+</VTKFile>
+
+<?xml version="1.0" ?> 
+<!-- 
+# vtk DataFile Version 3.0
+#This file was generated 
+-->
+<VTKFile type="UnstructuredGrid" version="0.1" compressor="vtkZLibDataCompressor" byte_order="LittleEndian">
+<UnstructuredGrid>
+<Piece NumberOfPoints="16" NumberOfCells="4" >
+  <Points>
+    <DataArray type="Float64" NumberOfComponents="3" format="binary">
+AQAAAIABAACAAQAALQAAAA==eNpjYMAHPtgzkCQP4xPSBwMP7EmTh/FxiRPrflzmfLAnzV5C6gmHDwBXYxlL
+    </DataArray>
+  </Points>
+
+  <Cells>
+    <DataArray type="Int32" Name="connectivity" format="binary">
+AQAAAEAAAABAAAAAKAAAAA==eNoNwwkSwBAQALB1VIvi/7+VzCQiIlnMVh9fm5/d6fB3edxeCvAAeQ==
+    </DataArray>
+    <DataArray type="Int32" Name="offsets" format="binary">
+AQAAABAAAAAQAAAAEwAAAA==eNpjYWBg4ABiHiAWAGIAAVAAKQ==
+    </DataArray>
+    <DataArray type="UInt8" Name="types" format="binary">
+AQAAAAQAAAAEAAAADAAAAA==eNrj5OTkBAAAXgAl
+    </DataArray>
+  </Cells>
+  <PointData Scalars="scalars">
+    <DataArray type="Float64" Name="level" format="binary">
+AQAAAIAAAACAAAAAEAAAAA==eNpjYCAGfLCnFQ0AiwIONQ==    </DataArray>
+    <DataArray type="Float64" Name="subdomain" format="binary">
+AQAAAIAAAACAAAAAGgAAAA==eNpjYACBD/sZ8NKEwAd7/DTDAVw0AOJFDnk=    </DataArray>
+    <DataArray type="Float64" Name="level_subdomain" format="binary">
+AQAAAIAAAACAAAAAFAAAAA==eNpjYCAKHCBAEwAf7HHRACjbB70=    </DataArray>
+    <DataArray type="Float64" Name="proc_writing" format="binary">
+AQAAAIAAAACAAAAADAAAAA==eNpjYBhYAAAAgAAB    </DataArray>
+  </PointData>
+ </Piece>
+ </UnstructuredGrid>
+</VTKFile>
+
+
+<?xml version="1.0" ?> 
+<!-- 
+# vtk DataFile Version 3.0
+#This file was generated 
+-->
+<VTKFile type="UnstructuredGrid" version="0.1" compressor="vtkZLibDataCompressor" byte_order="LittleEndian">
+<UnstructuredGrid>
+<Piece NumberOfPoints="16" NumberOfCells="4" >
+  <Points>
+    <DataArray type="Float64" NumberOfComponents="3" format="binary">
+AQAAAIABAACAAQAALQAAAA==eNpjYMAHPtgzkCQP4xPSBwMP7EmTh/FxiRPrflzmfLAnzV5C6gmHDwBXYxlL
+    </DataArray>
+  </Points>
+
+  <Cells>
+    <DataArray type="Int32" Name="connectivity" format="binary">
+AQAAAEAAAABAAAAAKAAAAA==eNoNwwkSwBAQALB1VIvi/7+VzCQiIlnMVh9fm5/d6fB3edxeCvAAeQ==
+    </DataArray>
+    <DataArray type="Int32" Name="offsets" format="binary">
+AQAAABAAAAAQAAAAEwAAAA==eNpjYWBg4ABiHiAWAGIAAVAAKQ==
+    </DataArray>
+    <DataArray type="UInt8" Name="types" format="binary">
+AQAAAAQAAAAEAAAADAAAAA==eNrj5OTkBAAAXgAl
+    </DataArray>
+  </Cells>
+  <PointData Scalars="scalars">
+    <DataArray type="Float64" Name="level" format="binary">
+AQAAAIAAAACAAAAAEAAAAA==eNpjYCAGfLCnFQ0AiwIONQ==    </DataArray>
+    <DataArray type="Float64" Name="subdomain" format="binary">
+AQAAAIAAAACAAAAAGgAAAA==eNpjYACBD/sZ8NKEwAd7/DTDAVw0AOJFDnk=    </DataArray>
+    <DataArray type="Float64" Name="level_subdomain" format="binary">
+AQAAAIAAAACAAAAAFAAAAA==eNpjYCAKHCBAEwAf7HHRACjbB70=    </DataArray>
+    <DataArray type="Float64" Name="proc_writing" format="binary">
+AQAAAIAAAACAAAAAEQAAAA==eNpjYACBD/YMA0QDAJLsEvE=    </DataArray>
+  </PointData>
+ </Piece>
+ </UnstructuredGrid>
+</VTKFile>
+
+

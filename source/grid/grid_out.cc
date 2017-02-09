@@ -2548,11 +2548,24 @@ void GridOut::write_mesh_per_processor_as_vtu (const Triangulation<dim,spacedim>
   for (cell=tria.begin(), endc=tria.end();
        cell != endc; ++cell)
     {
-      if (!include_artificial && cell->level_subdomain_id() ==
-          numbers::artificial_subdomain_id)
-        continue;
-      if (!view_levels && cell->has_children())
-        continue;
+      if (!view_levels)
+        {
+          if (cell->has_children())
+            continue;
+          if (!include_artificial &&
+              cell->subdomain_id() == numbers::artificial_subdomain_id)
+            continue;
+        }
+      else if (!include_artificial)
+        {
+          if (cell->has_children() &&
+              cell->level_subdomain_id() == numbers::artificial_subdomain_id)
+            continue;
+          else if (!cell->has_children() &&
+                   cell->level_subdomain_id() == numbers::artificial_subdomain_id &&
+                   cell->subdomain_id() == numbers::artificial_subdomain_id)
+            continue;
+        }
 
       DataOutBase::Patch<dim,spacedim> patch;
       patch.data.reinit(n_datasets, n_q_points);
