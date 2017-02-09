@@ -20,6 +20,7 @@
 // of the number of CPUs
 
 #include "../tests.h"
+#include "../md5/md5.h"
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/distributed/tria.h>
@@ -108,21 +109,14 @@ void test()
   sleep(1);
   if (myid==0)
     {
-      //sort and merge the constraint matrices on proc 0
+      //sort and merge the constraint matrices on proc 0, generate a checksum
       //and output that into the deallog
       system((std::string("cat ") + base + "cm_*.dot | sort -n | uniq > " + base + "cm").c_str());
-      {
-        std::ifstream file((base+"cm").c_str());
-        std::string str;
-        while (!file.eof())
-          {
-            std::getline(file, str);
-            deallog << str << std::endl;
-          }
-      }
-
-      // delete the files created
-      // by processor 0
+      std::ifstream in(base+"cm", std::ios::in | std::ios::binary);
+      std::ostringstream contents;
+      contents << in.rdbuf();
+      in.close();
+      deallog << md5(contents.str()) << std::endl;
       std::remove ((base + "cm").c_str());
     }
 
