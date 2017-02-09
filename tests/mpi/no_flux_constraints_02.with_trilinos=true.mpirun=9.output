@@ -2,8 +2,7 @@
 DEAL:0:3d::# flagged cells = 224
 DEAL:0:3d::#cells = 7712
 DEAL:0:3d::#dofs = 27018
-DEAL:0:3d::9f3296fa8b319b40f49d8cc9de4efa48  cm
-DEAL:0:3d::
+DEAL:0:3d::checksum: 1517649227
 DEAL:0:3d::#constraints on 0: 237
 DEAL:0:3d::#constraints on 1: 786
 DEAL:0:3d::#constraints on 2: 909

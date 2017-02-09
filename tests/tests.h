@@ -182,6 +182,30 @@ void sort_file_contents (const std::string &filename)
 }
 
 
+/*
+ * simple ADLER32 checksum for a range of chars
+ */
+template <class IT>
+unsigned int checksum(const IT &begin, const IT &end)
+{
+  AssertThrow(sizeof(unsigned int)==4, ExcInternalError());
+  AssertThrow(sizeof(*begin)==1, ExcInternalError());
+
+  unsigned int a = 1;
+  unsigned int b = 0;
+
+  IT it = begin;
+
+  while (it != end)
+    {
+      a = (a + (unsigned char)*it) % 65521;
+      b = (a + b) % 65521;
+      ++it;
+    }
+
+  return (b << 16) | a;
+}
+
 
 
 /*
