@@ -1,0 +1,129 @@
+
+<svg width="3400" height="1000" xmlns="http://www.w3.org/2000/svg" version="1.1">
+
+
+<!-- internal style sheet -->
+<style type="text/css"><![CDATA[
+ rect.background{fill:white}
+ rect{fill:none; stroke:rgb(25,25,25); stroke-width:2}
+ text{font-family:Helvetica; text-anchor:middle; fill:rgb(25,25,25)}
+ line{stroke:rgb(25,25,25); stroke-width:4}
+ path{fill:none; stroke:rgb(25,25,25); stroke-width:2}
+
+ path.p0{fill:rgb(0,102,255); stroke:rgb(25,25,25); stroke-width:2}
+ path.ps0{fill:rgb(0,77,191); stroke:rgb(20,20,20); stroke-width:2}
+ rect.r0{fill:rgb(0,102,255); stroke:rgb(25,25,25); stroke-width:2}
+ path.p1{fill:rgb(255,0,0); stroke:rgb(25,25,25); stroke-width:2}
+ path.ps1{fill:rgb(191,0,0); stroke:rgb(20,20,20); stroke-width:2}
+ rect.r1{fill:rgb(255,0,0); stroke:rgb(25,25,25); stroke-width:2}
+]]></style>
+
+ <rect class="background" width="3000" height="1000"/>
+  <!-- cells -->
+  <path class="p0" d="M 1920 920 L 2760 920 L 2760 80 L 1920 80 L 1920 920"/>
+  <text x="2340" y="603" style="font-size:205px">1,0,0</text>
+  <line x1="2760" y1="920" x2="2760" y2="80"/>
+  <line x1="1920" y1="920" x2="2760" y2="920"/>
+  <line x1="1920" y1="80" x2="2760" y2="80"/>
+  <path class="p1" d="M 240 920 L 660 920 L 660 500 L 240 500 L 240 920"/>
+  <text x="450" y="760" style="font-size:100px">2,1,1</text>
+  <line x1="240" y1="920" x2="240" y2="500"/>
+  <line x1="240" y1="920" x2="660" y2="920"/>
+  <path class="p1" d="M 660 920 L 1080 920 L 1080 500 L 660 500 L 660 920"/>
+  <text x="870" y="762" style="font-size:104px">3,0,0</text>
+  <line x1="660" y1="920" x2="1080" y2="920"/>
+  <path class="p1" d="M 240 500 L 660 500 L 660 80 L 240 80 L 240 500"/>
+  <text x="450" y="340" style="font-size:100px">0,1,1</text>
+  <line x1="240" y1="500" x2="240" y2="80"/>
+  <line x1="240" y1="80" x2="660" y2="80"/>
+  <path class="p1" d="M 660 500 L 1080 500 L 1080 80 L 660 80 L 660 500"/>
+  <text x="870" y="342" style="font-size:104px">0,0,0</text>
+  <line x1="660" y1="80" x2="1080" y2="80"/>
+  <path class="p1" d="M 1080 920 L 1500 920 L 1500 500 L 1080 500 L 1080 920"/>
+  <text x="1290" y="763" style="font-size:106px">0,1,1</text>
+  <line x1="1080" y1="920" x2="1500" y2="920"/>
+  <path class="p1" d="M 1500 920 L 1920 920 L 1920 500 L 1500 500 L 1500 920"/>
+  <text x="1710" y="763" style="font-size:106px">0,0,0</text>
+  <line x1="1500" y1="920" x2="1920" y2="920"/>
+  <path class="p1" d="M 1080 500 L 1500 500 L 1500 80 L 1080 80 L 1080 500"/>
+  <text x="1290" y="343" style="font-size:106px">0,1,1</text>
+  <line x1="1080" y1="80" x2="1500" y2="80"/>
+  <path class="p1" d="M 1500 500 L 1920 500 L 1920 80 L 1500 80 L 1500 500"/>
+  <text x="1710" y="343" style="font-size:106px">0,0,0</text>
+  <line x1="1500" y1="80" x2="1920" y2="80"/>
+
+ <!-- legend -->
+ <rect x="3000" y="80" width="320" height="165"/>
+ <text x="3013" y="107" style="text-anchor:start; font-weight:bold; font-size:18px">cell label</text>
+  <text x="3020" y="134" style="text-anchor:start; font-style:oblique; font-size:18px">material_id,</text>
+  <text x= "3020" y="161" style="text-anchor:start; font-style:oblique; font-size:18px">subdomain_id,</text>
+  <text x= "3020" y="188" style="text-anchor:start; font-style:oblique; font-size:18px">level_subdomain_id</text>
+  <text x="3000" y="274" style="text-anchor:start; font-size:18px">azimuth: 0°, polar: 0°</text>
+
+ <!-- colorbar -->
+ <text x="3000" y="356" style="text-anchor:start; font-weight:bold; font-size:18px">level_number</text>
+  <rect class="r0" x="3000" y="645" width="25" height="275"/>
+  <text x="3037.50" y="788.500" style="text-anchor:start; font-size:18px; font-weight:bold">0 min</text>
+  <rect class="r1" x="3000" y="370" width="25" height="275"/>
+  <text x="3037.50" y="513.500" style="text-anchor:start; font-size:18px; font-weight:bold">1 max</text>
+
+</svg><svg width="3400" height="1000" xmlns="http://www.w3.org/2000/svg" version="1.1">
+
+
+<!-- internal style sheet -->
+<style type="text/css"><![CDATA[
+ rect.background{fill:white}
+ rect{fill:none; stroke:rgb(25,25,25); stroke-width:2}
+ text{font-family:Helvetica; text-anchor:middle; fill:rgb(25,25,25)}
+ line{stroke:rgb(25,25,25); stroke-width:4}
+ path{fill:none; stroke:rgb(25,25,25); stroke-width:2}
+
+ path.p0{fill:rgb(0,102,255); stroke:rgb(25,25,25); stroke-width:2}
+ path.ps0{fill:rgb(0,77,191); stroke:rgb(20,20,20); stroke-width:2}
+ rect.r0{fill:rgb(0,102,255); stroke:rgb(25,25,25); stroke-width:2}
+ path.p1{fill:rgb(255,0,0); stroke:rgb(25,25,25); stroke-width:2}
+ path.ps1{fill:rgb(191,0,0); stroke:rgb(20,20,20); stroke-width:2}
+ rect.r1{fill:rgb(255,0,0); stroke:rgb(25,25,25); stroke-width:2}
+]]></style>
+
+ <rect class="background" width="3000" height="1000"/>
+  <!-- cells -->
+  <path class="p0" d="M 1920 920 L 2760 920 L 2760 80 L 1920 80 L 1920 920"/>
+  <text x="2340" y="603" style="font-size:205px">1,0,0</text>
+  <line x1="1920" y1="920" x2="1920" y2="80"/>
+  <line x1="2760" y1="920" x2="2760" y2="80"/>
+  <line x1="1920" y1="920" x2="2760" y2="920"/>
+  <line x1="1920" y1="80" x2="2760" y2="80"/>
+  <path class="p1" d="M 240 920 L 660 920 L 660 500 L 240 500 L 240 920"/>
+  <text x="450" y="760" style="font-size:100px">2,1,1</text>
+  <line x1="240" y1="920" x2="240" y2="500"/>
+  <line x1="240" y1="920" x2="660" y2="920"/>
+  <path class="p1" d="M 660 920 L 1080 920 L 1080 500 L 660 500 L 660 920"/>
+  <text x="870" y="762" style="font-size:104px">3,0,0</text>
+  <line x1="1080" y1="920" x2="1080" y2="500"/>
+  <line x1="660" y1="920" x2="1080" y2="920"/>
+  <path class="p1" d="M 240 500 L 660 500 L 660 80 L 240 80 L 240 500"/>
+  <text x="450" y="340" style="font-size:100px">3,0,0</text>
+  <line x1="240" y1="500" x2="240" y2="80"/>
+  <line x1="240" y1="80" x2="660" y2="80"/>
+  <path class="p1" d="M 660 500 L 1080 500 L 1080 80 L 660 80 L 660 500"/>
+  <text x="870" y="342" style="font-size:104px">3,0,0</text>
+  <line x1="1080" y1="500" x2="1080" y2="80"/>
+  <line x1="660" y1="80" x2="1080" y2="80"/>
+
+ <!-- legend -->
+ <rect x="3000" y="80" width="320" height="165"/>
+ <text x="3013" y="107" style="text-anchor:start; font-weight:bold; font-size:18px">cell label</text>
+  <text x="3020" y="134" style="text-anchor:start; font-style:oblique; font-size:18px">material_id,</text>
+  <text x= "3020" y="161" style="text-anchor:start; font-style:oblique; font-size:18px">subdomain_id,</text>
+  <text x= "3020" y="188" style="text-anchor:start; font-style:oblique; font-size:18px">level_subdomain_id</text>
+  <text x="3000" y="274" style="text-anchor:start; font-size:18px">azimuth: 0°, polar: 0°</text>
+
+ <!-- colorbar -->
+ <text x="3000" y="356" style="text-anchor:start; font-weight:bold; font-size:18px">level_number</text>
+  <rect class="r0" x="3000" y="645" width="25" height="275"/>
+  <text x="3037.50" y="788.500" style="text-anchor:start; font-size:18px; font-weight:bold">0 min</text>
+  <rect class="r1" x="3000" y="370" width="25" height="275"/>
+  <text x="3037.50" y="513.500" style="text-anchor:start; font-size:18px; font-weight:bold">1 max</text>
+
+</svg>DEAL::225

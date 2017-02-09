@@ -919,6 +919,17 @@ namespace GridGenerator
   ///@{
 
   /**
+    * Create a new Triangulation (in @p dest) that contains all cells from
+    * @p other_tria that have a user flag set or that are a parent or sibling
+    * of a cell that is flagged.
+    */
+  template <int dim, int spacedim>
+  void create_mesh_from_marked_cells (Triangulation<dim, spacedim> &dest,
+                                      Triangulation<dim, spacedim> &other_tria);
+
+
+
+  /**
    * Given the two triangulations specified as the first two arguments, create
    * the triangulation that contains the cells of both triangulation and store
    * it in the third parameter. Previous content of @p result will be deleted.

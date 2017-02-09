@@ -3863,6 +3863,233 @@ namespace GridGenerator
   }
 
 
+  namespace
+  {
+    template <int dim, int spacedim>
+    bool recurse_for_marked_cells(const typename Triangulation<dim, spacedim>::cell_iterator &it_dst,
+                                  const typename Triangulation<dim, spacedim>::cell_iterator &it_src)
+    {
+      if (it_src->n_children() == 0)
+        {
+          it_dst->set_material_id(it_src->material_id());
+          it_dst->set_manifold_id(it_src->manifold_id());
+          it_dst->set_subdomain_id(it_src->subdomain_id());
+          it_dst->set_level_subdomain_id(it_src->level_subdomain_id());
+
+          // copy vertex positions
+          for (unsigned int v=0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+            it_dst->vertex(v) = it_src->vertex(v);
+
+          // copy boundary ids
+          for (unsigned int f=0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+            {
+              if (!it_dst->at_boundary(f))
+                continue;
+
+              if (it_src->at_boundary(f))
+                it_dst->face(f)->set_boundary_id(it_src->face(f)->boundary_id());
+              else
+                it_dst->face(f)->set_boundary_id(-2); // now a boundary
+            }
+        }
+
+      if (!it_src->user_flag_set())
+        return false;
+
+      if (it_src->n_children()>0 && it_dst->n_children()==0)
+        {
+          // TODO: get type of refinement from it_src for anisoptropic refinement
+          bool need_to_refine = false;
+          for (unsigned int i=0; i<it_src->n_children(); ++i)
+            if (it_src->child(i)->user_flag_set())
+              {
+                need_to_refine = true;
+                break;
+              }
+          if (need_to_refine)
+            it_dst->set_refine_flag();
+          return true;
+        }
+
+      bool change = false;
+      for (unsigned int i=0; i<it_src->n_children(); ++i)
+        if (it_src->child(i)->user_flag_set())
+          change |= recurse_for_marked_cells<dim,spacedim>(it_dst->child(i), it_src->child(i));
+
+      return change;
+    }
+  }
+
+  template <int dim, int spacedim>
+  void
+  create_mesh_from_marked_cells (Triangulation<dim, spacedim> &dest,
+                                 Triangulation<dim, spacedim> &other_tria)
+  {
+
+    Assert (other_tria.n_cells() > 0,
+            ExcMessage("When calling GridGenerator::create_mesh_from_marked_cells(), "
+                       "the source triangulation must be non-empty."));
+
+    unsigned int n_levels = 0;
+    unsigned int n_total = 0;
+
+    // mark parents and find out max level
+    for (unsigned int level=0; level<other_tria.n_levels(); ++level)
+      {
+        typename Triangulation<dim, spacedim>::cell_iterator it = other_tria.begin(level),
+                                                             endc = other_tria.end(level);
+
+        for (; it != endc; ++it)
+          {
+            bool want = it->user_flag_set();
+
+            for (unsigned int c=0; c<it->n_children(); ++c)
+              if (it->child(c)->user_flag_set())
+                {
+                  want = true;
+                  break;
+                }
+
+            if (want)
+              {
+                if (n_levels==0)
+                  n_levels = level;
+
+                it->set_user_flag();
+                n_total += 1;
+              }
+          }
+
+      }
+
+    std::cout << "copy_marked_cells: "
+              << " levels=" << n_levels
+              << " cells=" << n_total << std::endl;
+
+
+
+    // create coarse mesh
+    std::vector<unsigned int> map_new_to_old_coarse_cell;
+    std::vector<unsigned int> map_old_to_new_vertex(other_tria.n_vertices(),
+                                                    numbers::invalid_unsigned_int);
+    {
+
+
+      std::vector<Point<spacedim> > vertices;
+      std::vector<CellData<dim> > cells;
+      SubCellData subcelldata;
+
+
+      typename Triangulation<dim, spacedim>::cell_iterator it = other_tria.begin(0),
+                                                           endc = other_tria.end(0);
+      for (; it != endc; ++it)
+        if (it->user_flag_set())
+          {
+            CellData<dim> data;
+            data.material_id = it->material_id();
+            data.manifold_id = it->manifold_id();
+
+            for (unsigned int vidx=0; vidx<GeometryInfo<dim>::vertices_per_cell; ++vidx)
+              {
+                const unsigned int old_idx = it->vertex_index(vidx);
+                unsigned int new_idx = map_old_to_new_vertex[old_idx];
+                if (new_idx==numbers::invalid_unsigned_int)
+                  {
+                    new_idx = vertices.size();
+                    vertices.push_back(it->vertex(vidx));
+                    map_old_to_new_vertex[old_idx] = new_idx;
+
+                  }
+                data.vertices[vidx] = new_idx;
+              }
+            cells.push_back(data);
+            map_new_to_old_coarse_cell.push_back(it->index());
+
+          }
+
+      // TODO subcelldata
+
+      //std::vector<CellData<1> > boundary_lines;
+      //std::vector<CellData<2> > boundary_quads;
+
+
+
+
+      dest.create_triangulation (vertices, cells, subcelldata);
+    }
+
+
+    // now refine:
+    {
+      bool change = true;
+
+      while (change)
+        {
+          change = false;
+
+          typename Triangulation<dim, spacedim>::cell_iterator it = dest.begin(0),
+                                                               endc = dest.end(0);
+          for (; it != endc; ++it)
+            {
+              typename Triangulation<dim, spacedim>::cell_iterator it_other
+              (&other_tria, 0, map_new_to_old_coarse_cell[it->index()]);
+
+              change |= recurse_for_marked_cells<dim,spacedim>(it, it_other);
+            }
+
+          if (change)
+            dest.execute_coarsening_and_refinement();
+        }
+
+    }
+
+
+    /*
+
+
+        // copy normal elements
+        vertices               = other_tria.vertices;
+        vertices_used          = other_tria.vertices_used;
+        anisotropic_refinement = other_tria.anisotropic_refinement;
+        smooth_grid            = other_tria.smooth_grid;
+
+        if (dim > 1)
+          faces.reset (new internal::Triangulation::TriaFaces<dim>(*other_tria.faces));
+
+        typename std::map<types::manifold_id,
+                 SmartPointer<const Manifold<dim,spacedim> , Triangulation<dim, spacedim> > >::const_iterator
+                 bdry_iterator = other_tria.manifold.begin();
+        for (; bdry_iterator != other_tria.manifold.end() ; ++bdry_iterator)
+          manifold[bdry_iterator->first] = bdry_iterator->second;
+
+
+        levels.reserve (other_tria.levels.size());
+        for (unsigned int level=0; level<other_tria.levels.size(); ++level)
+          levels.push_back (new
+                            internal::Triangulation::
+                            TriaLevel<dim>(*other_tria.levels[level]));
+
+        number_cache = other_tria.number_cache;
+
+        if (dim == 1)
+          {
+            vertex_to_boundary_id_map_1d
+            .reset(new std::map<unsigned int, types::boundary_id>
+                   (*other_tria.vertex_to_boundary_id_map_1d));
+
+            vertex_to_manifold_id_map_1d
+            .reset(new std::map<unsigned int, types::manifold_id>
+                   (*other_tria.vertex_to_manifold_id_map_1d));
+          }
+
+        // inform those who are listening on other_tria of the copy operation
+        other_tria.signals.copy (*this);
+        // also inform all listeners of the current triangulation that the
+        // triangulation has been created
+        signals.create();
+    */
+  }
+
 
   template <int dim, int spacedim>
   void
