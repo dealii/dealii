@@ -1208,11 +1208,11 @@ public:
                           const unsigned int q_point);
 
   /**
-   * Write a contribution that is tested by the gradient to the field
+   * Write a contribution that is tested by the symmetric gradient to the field
    * containing the values on quadrature points with component @p q_point.
-   * Access to the same field as through @p get_gradient. If applied before
+   * Access to the same field as through @p get_symmetric_gradient. If applied before
    * the function @p integrate(...,true) is called, this specifies the
-   * gradient which is tested by all basis function gradients on the current
+   * symmetric gradient which is tested by all basis function symmetric gradients on the current
    * cell and integrated over.
    */
   void submit_symmetric_gradient(const SymmetricTensor<2,dim,VectorizedArray<Number> > grad_in,
