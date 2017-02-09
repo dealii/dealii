@@ -3873,6 +3873,7 @@ namespace GridGenerator
         {
           it_dst->set_material_id(it_src->material_id());
           it_dst->set_manifold_id(it_src->manifold_id());
+
           it_dst->set_subdomain_id(it_src->subdomain_id());
           it_dst->set_level_subdomain_id(it_src->level_subdomain_id());
 
@@ -3894,7 +3895,10 @@ namespace GridGenerator
         }
 
       if (!it_src->user_flag_set())
-        return false;
+        {
+          it_dst->set_subdomain_id(numbers::artificial_subdomain_id);
+          return false;
+        }
 
       if (it_src->n_children()>0 && it_dst->n_children()==0)
         {
@@ -3913,8 +3917,7 @@ namespace GridGenerator
 
       bool change = false;
       for (unsigned int i=0; i<it_src->n_children(); ++i)
-        if (it_src->child(i)->user_flag_set())
-          change |= recurse_for_marked_cells<dim,spacedim>(it_dst->child(i), it_src->child(i));
+        change |= recurse_for_marked_cells<dim,spacedim>(it_dst->child(i), it_src->child(i));
 
       return change;
     }

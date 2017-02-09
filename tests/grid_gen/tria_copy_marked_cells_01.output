@@ -103,11 +103,11 @@
   <line x1="1080" y1="920" x2="1080" y2="500"/>
   <line x1="660" y1="920" x2="1080" y2="920"/>
   <path class="p1" d="M 240 500 L 660 500 L 660 80 L 240 80 L 240 500"/>
-  <text x="450" y="340" style="font-size:100px">3,0,0</text>
+  <text x="450" y="340" style="font-size:100px">0,-2,1</text>
   <line x1="240" y1="500" x2="240" y2="80"/>
   <line x1="240" y1="80" x2="660" y2="80"/>
   <path class="p1" d="M 660 500 L 1080 500 L 1080 80 L 660 80 L 660 500"/>
-  <text x="870" y="342" style="font-size:104px">3,0,0</text>
+  <text x="870" y="342" style="font-size:104px">0,-2,0</text>
   <line x1="1080" y1="500" x2="1080" y2="80"/>
   <line x1="660" y1="80" x2="1080" y2="80"/>
 
