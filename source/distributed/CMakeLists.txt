@@ -21,6 +21,7 @@ SET(_src
   tria.cc
   tria_base.cc
   shared_tria.cc
+  split_tria.cc
   p4est_wrappers.cc
   )
 
@@ -29,6 +30,7 @@ SET(_inst
   solution_transfer.inst.in
   tria.inst.in
   shared_tria.inst.in
+  split_tria.inst.in
   tria_base.inst.in
   p4est_wrappers.inst.in
   )
