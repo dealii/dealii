@@ -231,7 +231,7 @@ namespace LinearAdvectionTest
                 if (neighbor_index != -1) // interior face
                   {
                     typename DoFHandler<dim>::active_cell_iterator neighbor_cell =
-                      neighbor_cell = current_cell->neighbor(face_n);
+                      current_cell->neighbor(face_n);
 
                     bool do_face_integration = false;
                     bool neighbor_is_level_lower = false;
