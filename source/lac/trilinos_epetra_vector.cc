@@ -23,6 +23,7 @@
 
 #include <boost/io/ios_state.hpp>
 
+#include <deal.II/lac/read_write_vector.h>
 #include "Epetra_Import.h"
 #include "Epetra_Map.h"
 #include "Epetra_MpiComm.h"
@@ -43,6 +44,7 @@ namespace LinearAlgebra
 
     Vector::Vector(const Vector &V)
       :
+      Subscriptor(),
       vector(new Epetra_FEVector(V.trilinos_vector()))
     {}
 
@@ -73,6 +75,21 @@ namespace LinearAlgebra
 
 
 
+    void Vector::reinit(const VectorSpaceVector<double> &V,
+                        const bool omit_zeroing_entries)
+    {
+      // Check that casting will work.
+      Assert(dynamic_cast<const Vector *>(&V)!=NULL, ExcVectorTypeNotCompatible());
+
+      // Downcast V. If fails, throws an exception.
+      const Vector &down_V = dynamic_cast<const Vector &>(V);
+
+      reinit(down_V.locally_owned_elements(), down_V.get_mpi_communicator(),
+             omit_zeroing_entries);
+    }
+
+
+
     Vector &Vector::operator= (const Vector &V)
     {
       // Distinguish three cases:
@@ -94,6 +111,16 @@ namespace LinearAlgebra
           else
             vector.reset(new Epetra_FEVector(V.trilinos_vector()));
         }
+
+      return *this;
+    }
+
+
+
+    Vector &Vector::operator= (const double s)
+    {
+      Assert(s==0., ExcMessage("Only 0 can be assigned to a vector."));
+      vector->PutScalar(s);
 
       return *this;
     }

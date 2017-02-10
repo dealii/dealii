@@ -55,6 +55,18 @@ namespace LinearAlgebra
     typedef types::global_dof_index                           size_type;
     typedef typename numbers::NumberTraits<Number>::real_type real_type;
 
+    /**
+     * Change the dimension to that of the vector V. The elements of V are not
+     * copied.
+     */
+    virtual void reinit(const VectorSpaceVector<Number> &V,
+                        const bool omit_zeroing_entries = false) = 0;
+
+    /**
+     * Sets all elements of the vector to the scalar @p s. This operation is
+     * only allowed if @p s is equal to zero.
+     */
+    virtual VectorSpaceVector<Number> &operator= (const Number s) = 0;
 
     /**
      * Multiply the entire vector by a fixed factor.

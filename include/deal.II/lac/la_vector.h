@@ -88,6 +88,49 @@ namespace LinearAlgebra
     Vector(const InputIterator first, const InputIterator last);
 
     /**
+     * Set the global size of the vector to @p size. The stored elements have
+     * their index in [0,size).
+     *
+     * If the flag @p omit_zeroing_entries is set to false, the memory will be
+     * initialized with zero, otherwise the memory will be untouched (and the
+     * user must make sure to fill it with reasonable data before using it).
+     */
+    virtual void reinit(const size_type size,
+                        const bool      omit_zeroing_entries = false);
+
+    /**
+     * Uses the same IndexSet as the one of the input vector @p in_vector and
+     * allocates memory for this vector.
+     *
+     * If the flag @p omit_zeroing_entries is set to false, the memory will be
+     * initialized with zero, otherwise the memory will be untouched (and the
+     * user must make sure to fill it with reasonable data before using it).
+     */
+    template <typename Number2>
+    void reinit(const ReadWriteVector<Number2> &in_vector,
+                const bool                      omit_zeroing_entries = false);
+
+    /**
+     * Initializes the vector. The indices are specified by @p
+     * locally_stored_indices.
+     *
+     * If the flag @p omit_zeroing_entries is set to false, the memory will be
+     * initialized with zero, otherwise the memory will be untouched (and the
+     * user must make sure to fill it with reasonable data before using it).
+     * locally_stored_indices.
+     */
+    virtual void reinit(const IndexSet &locally_stored_indices,
+                        const bool      omit_zeroing_entries = false);
+
+
+    /**
+     * Change the dimension to that of the vector V. The elements of V are not
+     * copied.
+     */
+    virtual void reinit(const VectorSpaceVector<Number> &V,
+                        const bool omit_zeroing_entries = false);
+
+    /**
      * Copies the data of the input vector @p in_vector.
      */
     Vector<Number> &operator= (const Vector<Number> &in_vector);

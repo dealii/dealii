@@ -29,10 +29,13 @@ void test()
   LinearAlgebra::CUDAWrappers::Vector<double> a;
   LinearAlgebra::CUDAWrappers::Vector<double> b(size);
   LinearAlgebra::CUDAWrappers::Vector<double> c(b);
+  LinearAlgebra::CUDAWrappers::Vector<double> d;
+  d.reinit(c);
 
   AssertThrow(a.size()==0, ExcMessage("Vector has the wrong size."));
   AssertThrow(b.size()==size, ExcMessage("Vector has the wrong size."));
   AssertThrow(c.size()==size, ExcMessage("Vector has the wrong size."));
+  AssertThrow(d.size()==size, ExcMessage("Vector has the wrong size."));
 
   a.reinit(size);
   AssertThrow(a.size()==size, ExcMessage("Vector has the wrong size."));
@@ -95,6 +98,11 @@ void test()
   c.import(read_write_1, VectorOperation::insert);
   const double val = b*c;
   AssertThrow(val==328350., ExcMessage("Problem in operator *."));
+
+  b = 0.;
+  read_write_3.import(b, VectorOperation::insert);
+  for (unsigned int i=0; i<size; ++i)
+    AssertThrow(read_write_3[i] == 0.,ExcMessage("Problem in operator =."));
 }
 
 int main(int argc, char **argv)

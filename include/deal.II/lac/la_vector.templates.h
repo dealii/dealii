@@ -26,6 +26,51 @@ DEAL_II_NAMESPACE_OPEN
 namespace LinearAlgebra
 {
   template <typename Number>
+  void Vector<Number>::reinit(const size_type size,
+                              const bool omit_zeroing_entries)
+  {
+    ReadWriteVector<Number>::reinit(size, omit_zeroing_entries);
+  }
+
+
+
+  template <typename Number>
+  template <typename Number2>
+  void Vector<Number>::reinit(const ReadWriteVector<Number2> &in_vector,
+                              const bool                      omit_zeroing_entries)
+  {
+    ReadWriteVector<Number>::reinit(in_vector, omit_zeroing_entries);
+  }
+
+
+
+  template <typename Number>
+  void Vector<Number>::reinit(const IndexSet &locally_stored_indices,
+                              const bool      omit_zeroing_entries)
+  {
+    ReadWriteVector<Number>::reinit(locally_stored_indices, omit_zeroing_entries);
+  }
+
+
+
+  template <typename Number>
+  void Vector<Number>::reinit(const VectorSpaceVector<Number> &V,
+                              const bool omit_zeroing_entries)
+  {
+    // Check that casting will work.
+    Assert(dynamic_cast<const Vector<Number>*>(&V)!=NULL, ExcVectorTypeNotCompatible());
+
+    // Downcast V. If fails, throws an exception.
+    const Vector<Number> &down_V = dynamic_cast<const Vector<Number>&>(V);
+    Assert(down_V.size()==this->size(),
+           ExcMessage("Cannot add two vectors with different numbers of elements"));
+
+    ReadWriteVector<Number>::reinit(down_V, omit_zeroing_entries);
+  }
+
+
+
+  template <typename Number>
   Vector<Number> &Vector<Number>::operator= (const Vector<Number> &in_vector)
   {
     if (PointerComparison::equal(this, &in_vector))
@@ -49,7 +94,7 @@ namespace LinearAlgebra
   {
     this->thread_loop_partitioner = in_vector.thread_loop_partitioner;
     if (this->size() != in_vector.size())
-      this->reinit(in_vector, true);
+      ReadWriteVector<Number>::reinit(in_vector, true);
 
     dealii::internal::VectorOperations::Vector_copy<Number, Number2> copier(in_vector.val, this->val);
     internal::VectorOperations::parallel_for(copier, 0, this->size(), this->thread_loop_partitioner);
@@ -446,7 +491,7 @@ namespace LinearAlgebra
 
     in.getline(buf,16,'\n');
     sz = std::atoi(buf);
-    this->reinit(sz,true);
+    ReadWriteVector<Number>::reinit(sz,true);
 
     char c;
     // in >> c;

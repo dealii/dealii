@@ -84,6 +84,13 @@ namespace LinearAlgebra
                   const bool      omit_zeroing_entries = false);
 
       /**
+       * Change the dimension to that of the vector V. The elements of V are not
+       * copied.
+       */
+      virtual void reinit(const VectorSpaceVector<Number> &V,
+                          const bool omit_zeroing_entries = false) override;
+
+      /**
        * Import all the element from the input vector @p V.
        * VectorOperation::values @p operation is used to decide if the
        * elements int @p V should be added to the current vector or replace
@@ -95,6 +102,12 @@ namespace LinearAlgebra
                           VectorOperation::values operation,
                           std::shared_ptr<const CommunicationPatternBase> communication_pattern =
                             std::shared_ptr<const CommunicationPatternBase> ()) override;
+
+      /**
+       * Sets all elements of the vector to the scalar @p s. This operation is
+       * only allowed if @p s is equal to zero.
+       */
+      virtual Vector<Number> &operator= (const Number s) override;
 
       /**
        * Multiply the entive vector by a fixed factor.

@@ -565,6 +565,15 @@ namespace LinearAlgebra
 
 
     template <typename Number>
+    void Vector<Number>::reinit(const VectorSpaceVector<Number> &V,
+                                const bool omit_zeroing_entries)
+    {
+      reinit(V.size(), omit_zeroing_entries);
+    }
+
+
+
+    template <typename Number>
     void Vector<Number>::import(const ReadWriteVector<Number> &V,
                                 VectorOperation::values operation,
                                 std::shared_ptr<const CommunicationPatternBase> )
@@ -602,6 +611,20 @@ namespace LinearAlgebra
           error_code = cudaFree(tmp);
           AssertCuda(error_code);
         }
+    }
+
+
+
+    template <typename Number>
+    Vector<Number> &Vector<Number>::operator= (const Number s)
+    {
+      Assert(s == Number(), ExcMessage("Onlyt 0 can be assigned to a vector."));
+      (void)s;
+
+      cudaError_t error_code = cudaMemset(val, 0, n_elements*sizeof(Number));
+      AssertCuda(error_code);
+
+      return *this;
     }
 
 
@@ -1029,7 +1052,7 @@ namespace LinearAlgebra
     void Vector<Number>::print(std::ostream       &out,
                                const unsigned int  precision,
                                const bool          scientific,
-                               const bool          across) const
+                               const bool          ) const
     {
       AssertThrow(out, ExcIO());
       std::ios::fmtflags old_flags = out.flags();

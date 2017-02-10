@@ -291,6 +291,18 @@ namespace LinearAlgebra
 
 
     template <typename Number>
+    void
+    BlockVector<Number>::reinit(const VectorSpaceVector<Number> &V,
+                                const bool omit_zeroing_entries)
+    {
+      Assert(dynamic_cast<const BlockVector<Number> *>(&V)!=NULL,
+             ExcVectorTypeNotCompatible());
+      const BlockVector<Number> &down_V = dynamic_cast<const BlockVector<Number> &>(V);
+      reinit(down_V, omit_zeroing_entries);
+    }
+
+
+    template <typename Number>
     BlockVector<Number> &
     BlockVector<Number>::operator *= (const Number factor)
     {
