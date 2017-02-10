@@ -227,7 +227,7 @@ namespace LinearAlgebra
                                  const VectorSpaceVector<double> &W);
       /**
        * This function always returns false and is present only for backward
-       * compatibily.
+       * compatibility.
        */
       bool has_ghost_elements() const;
 
@@ -342,7 +342,7 @@ namespace LinearAlgebra
  * Declare dealii::LinearAlgebra::EpetraWrappers::Vector as distributed vector.
  */
 template <>
-struct is_serial_vector<LinearAlgebra::EpetraWrappers::Vector> : std_cxx11::false_type
+struct is_serial_vector<LinearAlgebra::EpetraWrappers::Vector> : std::false_type
 {
 };
 

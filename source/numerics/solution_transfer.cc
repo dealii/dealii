@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2016 by the deal.II authors
+// Copyright (C) 1999 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,6 +21,7 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/fe/fe.h>
+#include <deal.II/lac/vector_element_access.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
@@ -33,8 +34,6 @@
 #include <deal.II/numerics/solution_transfer.h>
 
 DEAL_II_NAMESPACE_OPEN
-
-
 
 template<int dim, typename VectorType, typename DoFHandlerType>
 SolutionTransfer<dim, VectorType, DoFHandlerType>::
@@ -158,7 +157,8 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::refine_interpolate
           Assert(dofs_per_cell==(*pointerstruct->second.indices_ptr).size(),
                  ExcInternalError());
           for (unsigned int i=0; i<dofs_per_cell; ++i)
-            local_values(i)=in((*pointerstruct->second.indices_ptr)[i]);
+            local_values(i)=internal::ElementAccess<VectorType>::get(
+                              in,(*pointerstruct->second.indices_ptr)[i]);
           cell->set_dof_values_by_interpolation(local_values, out,
                                                 this_fe_index);
         }
@@ -467,7 +467,8 @@ interpolate (const std::vector<VectorType> &all_in,
                 {
                   tmp.reinit (in_size, true);
                   for (unsigned int i=0; i<in_size; ++i)
-                    tmp(i) = all_in[j]((*indexptr)[i]);
+                    tmp(i) = internal::ElementAccess<VectorType>::get(all_in[j],
+                                                                      (*indexptr)[i]);
 
                   cell->set_dof_values_by_interpolation (tmp, all_out[j],
                                                          old_fe_index);
@@ -520,7 +521,8 @@ interpolate (const std::vector<VectorType> &all_in,
 
 
                   for (unsigned int i=0; i<dofs_per_cell; ++i)
-                    all_out[j](dofs[i])=(*data)(i);
+                    internal::ElementAccess<VectorType>::set((*data)(i), dofs[i],
+                                                             all_out[j]);
                 }
             }
           // undefined status

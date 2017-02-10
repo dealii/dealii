@@ -19,6 +19,7 @@
 
 #include <deal.II/algorithms/operator.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/lac/vector_element_access.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -54,7 +55,8 @@ namespace Algorithms
             if (v == nullptr) continue;
             deallog << vectors.name(i);
             for (unsigned int j=0; j<v->size(); ++j)
-              deallog << ' ' << (*v)(j);
+              deallog << ' ' << ::dealii::internal::ElementAccess<VectorType>::get(
+                        *v, j);
             deallog << std::endl;
           }
         deallog << std::endl;
@@ -67,7 +69,8 @@ namespace Algorithms
             const VectorType *v = vectors.try_read_ptr<VectorType>(i);
             if (v == nullptr) continue;
             for (unsigned int j=0; j<v->size(); ++j)
-              (*os) << ' ' << (*v)(j);
+              (*os) << ' ' << ::dealii::internal::ElementAccess<VectorType>::get(
+                      *v, j);
           }
         (*os) << std::endl;
       }

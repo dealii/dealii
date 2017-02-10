@@ -23,6 +23,7 @@
 #include <deal.II/lac/petsc_block_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/vector_element_access.h>
 
 #include <deal.II/numerics/vector_tools.h>
 
@@ -589,7 +590,8 @@ void PointValueHistory<dim>
           if (mask->second[comp])
             {
               unsigned int solution_index = point->solution_indices[comp];
-              data_store_field->second[data_store_index * n_stored + store_index].push_back (solution (solution_index));
+              data_store_field->second[data_store_index * n_stored + store_index].push_back (
+                internal::ElementAccess<VectorType>::get(solution,solution_index));
               store_index++;
             }
         }

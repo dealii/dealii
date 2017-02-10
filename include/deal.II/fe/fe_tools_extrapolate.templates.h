@@ -684,7 +684,8 @@ namespace FETools
                   const bool on_refined_neighbor
                     = (dofs_on_refined_neighbors.find(indices[j])!=dofs_on_refined_neighbors.end());
                   if (!(on_refined_neighbor && dofs_on_refined_neighbors[indices[j]]>dealii_cell->level()))
-                    u(indices[j]) = local_values(j);
+                    ::dealii::internal::ElementAccess<OutVector>::set(
+                      local_values(j), indices[j], u);
                 }
             }
         }
@@ -1446,6 +1447,20 @@ namespace FETools
         const parallel::distributed::Triangulation<dim,spacedim> *parallel_tria =
           dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_tria());
         Assert (parallel_tria != nullptr, ExcNotImplemented());
+
+        const IndexSet locally_owned_dofs = dh.locally_owned_dofs();
+        vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
+      }
+
+
+
+      template <int dim, int spacedim>
+      void reinit_distributed(const DoFHandler<dim, spacedim> &dh,
+                              LinearAlgebra::EpetraWrappers::Vector &vector)
+      {
+        const parallel::distributed::Triangulation<dim,spacedim> *parallel_tria =
+          dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_tria());
+        Assert (parallel_tria !=0, ExcNotImplemented());
 
         const IndexSet locally_owned_dofs = dh.locally_owned_dofs();
         vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());

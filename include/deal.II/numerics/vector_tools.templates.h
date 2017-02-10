@@ -30,6 +30,7 @@
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/trilinos_epetra_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_block_vector.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -264,8 +265,9 @@ namespace VectorTools
                       if (component_mask[component] == true)
                         {
                           const unsigned int rep_dof=dof_to_rep_index_table[fe_index][i];
-                          vec(dofs_on_cell[i])
-                            = function_values_system[fe_index][rep_dof](component);
+                          ::dealii::internal::ElementAccess<VectorType>::set(
+                            function_values_system[fe_index][rep_dof](component),
+                            dofs_on_cell[i], vec);
                         }
                     }
                 }
@@ -282,8 +284,9 @@ namespace VectorTools
                   // values to the global
                   // vector
                   for (unsigned int i=0; i<fe[fe_index].dofs_per_cell; ++i)
-                    vec(dofs_on_cell[i])
-                      = function_values_scalar[fe_index][dof_to_rep_index_table[fe_index][i]];
+                    ::dealii::internal::ElementAccess<VectorType>::set(
+                      function_values_scalar[fe_index][dof_to_rep_index_table[fe_index][i]],
+                      dofs_on_cell[i], vec);
                 }
             }
         }
@@ -337,7 +340,8 @@ namespace VectorTools
         // distribute cell vector
         for (unsigned int j=0; j<dof_2.get_fe().dofs_per_cell; ++j)
           {
-            data_2(local_dof_indices[j]) += cell_data_2(j);
+            ::dealii::internal::ElementAccess<OutVector>::add(cell_data_2(j),
+                                                              local_dof_indices[j], data_2);
 
             // count, how often we have
             // added to this dof
@@ -355,7 +359,11 @@ namespace VectorTools
         Assert (touch_count[i] != 0,
                 ExcInternalError());
 
-        data_2(i) /= touch_count[i];
+        const double val = ::dealii::internal::ElementAccess<OutVector>::get(
+                             data_2, i);
+
+        ::dealii::internal::ElementAccess<OutVector>::set(
+          val/touch_count[i], i, data_2);
       }
   }
 
@@ -495,7 +503,9 @@ namespace VectorTools
                     if ( component_mask[component] )
                       {
                         const unsigned int rep_dof = dof_to_rep_index_table[fe_index][i];
-                        dst(dofs_on_cell[i])       = function_values_system[fe_index][rep_dof](component);
+                        ::dealii::internal::ElementAccess<VectorType>::set(
+                          function_values_system[fe_index][rep_dof](component),
+                          dofs_on_cell[i], dst);
                       }
                   }
               }
@@ -509,8 +519,9 @@ namespace VectorTools
                  0);
 
                 for (unsigned int i = 0; i < fe[fe_index].dofs_per_cell; ++i)
-                  dst(dofs_on_cell[i]) = function_values_scalar[fe_index]
-                                         [dof_to_rep_index_table[fe_index][i]];
+                  ::dealii::internal::ElementAccess<VectorType>::set(
+                    function_values_scalar[fe_index][dof_to_rep_index_table[fe_index][i]],
+                    dofs_on_cell[i], dst);
               }
           }
 
@@ -890,7 +901,8 @@ namespace VectorTools
       // it may be of another type than Vector<double> and that wouldn't
       // necessarily go together with the matrix and other functions
       for (unsigned int i=0; i<vec.size(); ++i)
-        vec_result(i) = vec(i);
+        ::dealii::internal::ElementAccess<VectorType>::set(vec(i), i,
+                                                           vec_result);
     }
 
 
@@ -1090,7 +1102,8 @@ namespace VectorTools
       const IndexSet locally_owned_dofs = dof.locally_owned_dofs();
       IndexSet::ElementIterator it = locally_owned_dofs.begin();
       for (; it!=locally_owned_dofs.end(); ++it)
-        vec_result(*it) = work_result(*it);
+        ::dealii::internal::ElementAccess<VectorType>::set(work_result(*it),
+                                                           *it, vec_result);
       vec_result.compress(VectorOperation::insert);
     }
 
@@ -1235,7 +1248,7 @@ namespace VectorTools
       const IndexSet locally_owned_dofs = dof.locally_owned_dofs();
       IndexSet::ElementIterator it = locally_owned_dofs.begin();
       for (; it!=locally_owned_dofs.end(); ++it)
-        vec_result(*it) = vec(*it);
+        ::dealii::internal::ElementAccess<VectorType>::set(vec(*it), *it, vec_result);
       vec_result.compress(VectorOperation::insert);
     }
 
@@ -1310,7 +1323,7 @@ namespace VectorTools
       const IndexSet locally_owned_dofs = dof.locally_owned_dofs();
       IndexSet::ElementIterator it = locally_owned_dofs.begin();
       for (; it!=locally_owned_dofs.end(); ++it)
-        vec_result(*it) = vec(*it);
+        ::dealii::internal::ElementAccess<VectorType>::set(vec(*it), *it, vec_result);
       vec_result.compress(VectorOperation::insert);
     }
   }
@@ -7933,7 +7946,8 @@ namespace VectorTools
               {
                 unsigned int comp = fe.system_to_component_index(q).first;
                 if (fe_mask[comp])
-                  vector(dofs[q]) = points[q][fe_to_real[comp]];
+                  ::dealii::internal::ElementAccess<VectorType>::set(
+                    points[q][fe_to_real[comp]], dofs[q], vector);
               }
           }
       }

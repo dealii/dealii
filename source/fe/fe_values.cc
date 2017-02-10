@@ -22,6 +22,7 @@
 #include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
+#include <deal.II/lac/vector_element_access.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/petsc_block_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
@@ -47,7 +48,7 @@ namespace
   get_vector_element (const VectorType &vector,
                       const types::global_dof_index cell_number)
   {
-    return vector[cell_number];
+    return internal::ElementAccess<VectorType>::get(vector,cell_number);
   }
 
 

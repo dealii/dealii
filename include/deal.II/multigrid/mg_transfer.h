@@ -72,8 +72,25 @@ namespace internal
     }
 
   };
+
   template <>
   struct MatrixSelector<dealii::TrilinosWrappers::MPI::Vector>
+  {
+    typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
+    typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
+
+    template <typename SparsityPatternType, typename DoFHandlerType>
+    static void reinit(Matrix &matrix, Sparsity &, int level, const SparsityPatternType &sp, DoFHandlerType &dh)
+    {
+      matrix.reinit(dh.locally_owned_mg_dofs(level+1),
+                    dh.locally_owned_mg_dofs(level),
+                    sp, MPI_COMM_WORLD, true);
+    }
+
+  };
+
+  template <>
+  struct MatrixSelector<dealii::LinearAlgebra::EpetraWrappers::Vector>
   {
     typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
