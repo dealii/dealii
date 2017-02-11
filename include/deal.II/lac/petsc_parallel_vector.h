@@ -227,10 +227,13 @@ namespace PETScWrappers
        *
        * @arg communicator denotes the MPI communicator over which the
        * different parts of the vector shall communicate
+       *
+       * @deprecated The use of objects that are explicitly of type VectorBase
+       * is deprecated: use PETScWrappers::MPI::Vector instead.
        */
       explicit Vector (const MPI_Comm     &communicator,
                        const VectorBase   &v,
-                       const size_type     local_size);
+                       const size_type     local_size) DEAL_II_DEPRECATED;
 
       /**
        * Construct a new parallel ghosted PETSc vector from an IndexSet.
