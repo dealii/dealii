@@ -3237,8 +3237,8 @@ namespace TrilinosWrappers
         std::is_base_of<TrilinosWrappers::PreconditionBase,Preconditioner>::value),
             TrilinosPayload>::type
             TrilinosPayload::inverse_payload (
-              Solver                &solver,
-              const Preconditioner  &preconditioner) const
+              Solver &,
+              const Preconditioner &) const
       {
         TrilinosPayload return_op(*this);
 
