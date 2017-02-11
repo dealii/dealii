@@ -116,17 +116,16 @@ namespace PETScWrappers
      * @code
      *   PETScWrappers::MPI::Vector vector;
      *   ...
-     *                   // do some write operations on the vector
+     *   // do some write operations on the vector
      *   for (unsigned int i=0; i<vector.size(); ++i)
      *     vector(i) = i;
      *
-     *                   // do some additions to vector elements, but
-     *                   // only for some elements
+     *   // do some additions to vector elements, but only for some elements
      *   for (unsigned int i=0; i<vector.size(); ++i)
      *     if (some_condition(i) == true)
      *       vector(i) += 1;
      *
-     *                   // do another collective operation
+     *   // do another collective operation
      *   const double norm = vector.l2_norm();
      * @endcode
      *
