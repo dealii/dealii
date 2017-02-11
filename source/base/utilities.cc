@@ -47,6 +47,7 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #ifdef DEAL_II_WITH_TRILINOS
 #  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
@@ -57,6 +58,7 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #  include "Teuchos_RCP.hpp"
 #  include "Epetra_SerialComm.h"
 #endif
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
 

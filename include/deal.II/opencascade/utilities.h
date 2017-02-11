@@ -27,6 +27,7 @@
 #include <string>
 
 // opencascade needs "HAVE_CONFIG_H" to be exported...
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #define HAVE_CONFIG_H
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Face.hxx>
@@ -40,6 +41,7 @@
 #include <IFSelect_ReturnStatus.hxx>
 #include <gp_Pnt.hxx>
 #undef HAVE_CONFIG_H
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
 
