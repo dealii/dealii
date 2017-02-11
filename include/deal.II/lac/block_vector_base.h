@@ -343,47 +343,47 @@ namespace internal
        * Compare for equality of iterators. This operator checks whether the
        * vectors pointed to are the same, and if not it throws an exception.
        */
-      template <bool _Constness>
-      bool operator == (const Iterator<BlockVectorType, _Constness> &i) const;
+      template <bool OtherConstness>
+      bool operator == (const Iterator<BlockVectorType, OtherConstness> &i) const;
 
       /**
        * Compare for inequality of iterators. This operator checks whether the
        * vectors pointed to are the same, and if not it throws an exception.
        */
-      template <bool _Constness>
-      bool operator != (const Iterator<BlockVectorType, _Constness> &i) const;
+      template <bool OtherConstness>
+      bool operator != (const Iterator<BlockVectorType, OtherConstness> &i) const;
 
       /**
        * Check whether this iterators points to an element previous to the one
        * pointed to by the given argument. This operator checks whether the
        * vectors pointed to are the same, and if not it throws an exception.
        */
-      template <bool _Constness>
-      bool operator < (const Iterator<BlockVectorType, _Constness> &i) const;
+      template <bool OtherConstness>
+      bool operator < (const Iterator<BlockVectorType, OtherConstness> &i) const;
 
       /**
        * Comparison operator alike to the one above.
        */
-      template <bool _Constness>
-      bool operator <= (const Iterator<BlockVectorType, _Constness> &i) const;
+      template <bool OtherConstness>
+      bool operator <= (const Iterator<BlockVectorType, OtherConstness> &i) const;
 
       /**
        * Comparison operator alike to the one above.
        */
-      template <bool _Constness>
-      bool operator > (const Iterator<BlockVectorType, _Constness> &i) const;
+      template <bool OtherConstness>
+      bool operator > (const Iterator<BlockVectorType, OtherConstness> &i) const;
 
       /**
        * Comparison operator alike to the one above.
        */
-      template <bool _Constness>
-      bool operator >= (const Iterator<BlockVectorType, _Constness> &i) const;
+      template <bool OtherConstness>
+      bool operator >= (const Iterator<BlockVectorType, OtherConstness> &i) const;
 
       /**
        * Return the distance between the two iterators, in elements.
        */
-      template <bool _Constness>
-      difference_type operator - (const Iterator<BlockVectorType, _Constness> &i) const;
+      template <bool OtherConstness>
+      difference_type operator - (const Iterator<BlockVectorType, OtherConstness> &i) const;
 
       /**
        * Return an iterator which is the given number of elements in front of
@@ -1179,11 +1179,11 @@ namespace internal
 
 
     template <class BlockVectorType, bool Constness>
-    template <bool _Constness>
+    template <bool OtherConstness>
     inline
     bool
     Iterator<BlockVectorType,Constness>::
-    operator == (const Iterator<BlockVectorType, _Constness> &i) const
+    operator == (const Iterator<BlockVectorType, OtherConstness> &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1193,11 +1193,11 @@ namespace internal
 
 
     template <class BlockVectorType, bool Constness>
-    template <bool _Constness>
+    template <bool OtherConstness>
     inline
     bool
     Iterator<BlockVectorType,Constness>::
-    operator != (const Iterator<BlockVectorType, _Constness> &i) const
+    operator != (const Iterator<BlockVectorType, OtherConstness> &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1207,11 +1207,11 @@ namespace internal
 
 
     template <class BlockVectorType, bool Constness>
-    template <bool _Constness>
+    template <bool OtherConstness>
     inline
     bool
     Iterator<BlockVectorType,Constness>::
-    operator < (const Iterator<BlockVectorType, _Constness> &i) const
+    operator < (const Iterator<BlockVectorType, OtherConstness> &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1221,11 +1221,11 @@ namespace internal
 
 
     template <class BlockVectorType, bool Constness>
-    template <bool _Constness>
+    template <bool OtherConstness>
     inline
     bool
     Iterator<BlockVectorType,Constness>::
-    operator <= (const Iterator<BlockVectorType, _Constness> &i) const
+    operator <= (const Iterator<BlockVectorType, OtherConstness> &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1235,11 +1235,11 @@ namespace internal
 
 
     template <class BlockVectorType, bool Constness>
-    template <bool _Constness>
+    template <bool OtherConstness>
     inline
     bool
     Iterator<BlockVectorType,Constness>::
-    operator > (const Iterator<BlockVectorType, _Constness> &i) const
+    operator > (const Iterator<BlockVectorType, OtherConstness> &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1249,11 +1249,11 @@ namespace internal
 
 
     template <class BlockVectorType, bool Constness>
-    template <bool _Constness>
+    template <bool OtherConstness>
     inline
     bool
     Iterator<BlockVectorType,Constness>::
-    operator >= (const Iterator<BlockVectorType, _Constness> &i) const
+    operator >= (const Iterator<BlockVectorType, OtherConstness> &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
@@ -1263,11 +1263,11 @@ namespace internal
 
 
     template <class BlockVectorType, bool Constness>
-    template <bool _Constness>
+    template <bool OtherConstness>
     inline
     typename Iterator<BlockVectorType,Constness>::difference_type
     Iterator<BlockVectorType,Constness>::
-    operator - (const Iterator<BlockVectorType, _Constness> &i) const
+    operator - (const Iterator<BlockVectorType, OtherConstness> &i) const
     {
       Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
