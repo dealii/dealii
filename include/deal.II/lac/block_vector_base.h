@@ -573,7 +573,7 @@ public:
    * @deprecated instead of using this variable, please use the type trait value
    * <code>is_serial_vector< VectorType >::value</code>
    */
-  static const bool supports_distributed_data DEAL_II_DEPRECATED = BlockType::supports_distributed_data;
+  static const bool supports_distributed_data DEAL_II_DEPRECATED = !is_serial_vector<BlockType>::value;
 
   /**
    * Default constructor.
