@@ -7,7 +7,8 @@ subsection Testing
   set int         = 3         # default: 1
 
   # docs 1
-  set string list = a, b, c   # default: a
+  set string list1 = a, b, c   # default: a
+  set string list2 = h, b, c   # default: h
 end
 
 

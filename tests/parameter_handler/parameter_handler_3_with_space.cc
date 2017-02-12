@@ -34,10 +34,14 @@ int main ()
 
       ParameterHandler prm;
       prm.enter_subsection ("Testing");
-      prm.declare_entry ("string list",
+      prm.declare_entry ("string list1",
                          "a",
                          Patterns::List(Patterns::Selection(" a|b|c|d|e|f|g|h")),
                          "docs 1");
+      prm.declare_entry ("string list2",
+                         "h",
+                         Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h ")),
+                         "docs 2");
       prm.declare_entry ("int",
                          "1",
                          Patterns::Integer());
@@ -48,7 +52,7 @@ int main ()
       prm.leave_subsection ();
 
       // read and then write parameters
-      prm.read_input(SOURCE_DIR "/prm/parameter_handler_3.prm");
+      prm.read_input(SOURCE_DIR "/prm/parameter_handler_3_with_space.prm");
       prm.print_parameters (logfile, ParameterHandler::Text);
     }
   catch (std::exception &exc)
