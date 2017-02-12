@@ -1,4 +1,4 @@
-Fixed: Patterns::Selection now ignore spaces at the beginning and the end 
+Fixed: Patterns::Selection now ignores spaces at the beginning and the end 
 of the sequence string.
 <br>
 (Rajat Arora, 2017/02/09)
