@@ -801,7 +801,13 @@ namespace PETScWrappers
                                const PetscScalar  *values,
                                const bool         add_values);
 
-
+  private:
+    /**
+     * Assignment operator. This is currently not implemented, so it is
+     * deliberately left as private (and undefined) to prevent accidental
+     * usage.
+     */
+    VectorBase &operator=(const VectorBase &);
   };
 
 

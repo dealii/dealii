@@ -116,17 +116,16 @@ namespace PETScWrappers
      * @code
      *   PETScWrappers::MPI::Vector vector;
      *   ...
-     *                   // do some write operations on the vector
+     *   // do some write operations on the vector
      *   for (unsigned int i=0; i<vector.size(); ++i)
      *     vector(i) = i;
      *
-     *                   // do some additions to vector elements, but
-     *                   // only for some elements
+     *   // do some additions to vector elements, but only for some elements
      *   for (unsigned int i=0; i<vector.size(); ++i)
      *     if (some_condition(i) == true)
      *       vector(i) += 1;
      *
-     *                   // do another collective operation
+     *   // do another collective operation
      *   const double norm = vector.l2_norm();
      * @endcode
      *
@@ -228,10 +227,13 @@ namespace PETScWrappers
        *
        * @arg communicator denotes the MPI communicator over which the
        * different parts of the vector shall communicate
+       *
+       * @deprecated The use of objects that are explicitly of type VectorBase
+       * is deprecated: use PETScWrappers::MPI::Vector instead.
        */
       explicit Vector (const MPI_Comm     &communicator,
                        const VectorBase   &v,
-                       const size_type     local_size);
+                       const size_type     local_size) DEAL_II_DEPRECATED;
 
       /**
        * Construct a new parallel ghosted PETSc vector from an IndexSet.
