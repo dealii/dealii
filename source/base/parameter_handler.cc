@@ -468,10 +468,11 @@ namespace Patterns
   {
     std::string tmp(sequence);
 
-// remove whitespace at beginning
+    // remove whitespace at beginning
     while ((tmp.length() != 0) && (std::isspace (tmp[0])))
-      tmp.erase (0,1); // check the different possibilities
+      tmp.erase (0,1);
 
+    // check the different possibilities
     while (tmp.find('|') != std::string::npos)
       {
         if (test_string == std::string(tmp, 0, tmp.find('|')))
@@ -480,11 +481,11 @@ namespace Patterns
         tmp.erase (0, tmp.find('|')+1);
       };
 
-//remove whitespace at the end
+    //remove whitespace at the end
     while ((tmp.length() != 0) && (std::isspace (*(tmp.end()-1))))
       tmp.erase (tmp.end()-1);
 
-// check last choice, not finished by |
+    // check last choice, not finished by |
     if (test_string == tmp)
       return true;
 
