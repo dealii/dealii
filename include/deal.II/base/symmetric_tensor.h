@@ -21,6 +21,7 @@
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/table_indices.h>
 #include <deal.II/base/template_constraints.h>
+#include <deal.II/base/vectorization.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1217,14 +1218,14 @@ namespace internal
       case 2:
         return (data[0] * sdata[0] +
                 data[1] * sdata[1] +
-                Number(2.) * data[2] * sdata[2]);
+                NumberType<Number>::value(2.0) * data[2] * sdata[2]);
       default:
         // Start with the non-diagonal part to avoid some multiplications by
         // 2.
         Number sum = data[dim] * sdata[dim];
         for (unsigned int d=dim+1; d<(dim*(dim+1)/2); ++d)
           sum += data[d] * sdata[d];
-        sum *= 2.;
+        sum *= NumberType<Number>::value(2.0);
         for (unsigned int d=0; d<dim; ++d)
           sum += data[d] * sdata[d];
         return sum;
@@ -2165,7 +2166,7 @@ Number determinant (const SymmetricTensor<2,dim,Number> &t)
                -t.data[0]*t.data[5]*t.data[5]
                -t.data[1]*t.data[4]*t.data[4]
                -t.data[2]*t.data[3]*t.data[3]
-               +Number(2.) * t.data[3]*t.data[4]*t.data[5] );
+               +internal::NumberType<Number>::value(2.0) * t.data[3]*t.data[4]*t.data[5] );
     default:
       Assert (false, ExcNotImplemented());
       return 0;
