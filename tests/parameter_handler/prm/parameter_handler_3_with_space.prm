@@ -1,0 +1,5 @@
+subsection Testing
+  set string list1 = a, b, c
+  set string list2 = h, b, c
+  set int          = 3
+end
