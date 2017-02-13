@@ -1923,6 +1923,43 @@ public:
    */
   FEEvaluation &operator= (const FEEvaluation &other);
 
+#ifdef DOXYGEN
+  // doxygen does not anyhow mentions functions coming from partial template
+  // specialization of the base class, in this case FEEvaluationAccess<dim,dim>.
+  // For now, hack-in those functions manually only to fix documentation:
+
+  /** @copydoc FEEvaluationAccess<dim,dim,Number>::get_divergence()
+   * @note: only available for n_components_==dim.
+   */
+  VectorizedArray<Number> get_divergence (const unsigned int q_point) const;
+
+  /** @copydoc FEEvaluationAccess<dim,dim,Number>::get_symmetric_gradient()
+   * @note: only available for n_components_==dim.
+   */
+  SymmetricTensor<2, dim, VectorizedArray<Number> > get_symmetric_gradient (const unsigned int q_point) const;
+
+  /** @copydoc FEEvaluationAccess<dim,dim,Number>::get_curl()
+   * @note: only available for n_components_==dim.
+   */
+  Tensor<1,(dim==2?1:dim), VectorizedArray<Number> > get_curl (const unsigned int q_point) const;
+
+  /** @copydoc FEEvaluationAccess<dim,dim,Number>::submit_divergence()
+   * @note: only available for n_components_==dim.
+   */
+  void submit_divergence (const VectorizedArray<Number> div_in, const unsigned int q_point);
+
+  /** @copydoc FEEvaluationAccess<dim,dim,Number>::submit_symmetric_gradient()
+   * @note: only available for n_components_==dim.
+   */
+  void submit_symmetric_gradient (const SymmetricTensor<2, dim, VectorizedArray<Number> > grad_in, const unsigned int q_point);
+
+  /** @copydoc FEEvaluationAccess<dim,dim,Number>::submit_curl()
+   * @note: only available for n_components_==dim.
+   */
+  void submit_curl (const Tensor<1, dim==2?1:dim, VectorizedArray<Number> > curl_in, const unsigned int q_point);
+
+#endif
+
   /**
    * Evaluates the function values, the gradients, and the Laplacians of the
    * FE function given at the DoF values in the input vector at the quadrature
