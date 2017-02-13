@@ -316,6 +316,32 @@ public:
   virtual double shape_value(const unsigned int      i,
                              const Point< dim >     &p) const;
 
+  /**
+   * @name Transfer matrices
+   * @{
+   */
+
+  /**
+   * Projection from a fine grid space onto a coarse grid space.
+   *
+   * This function only makes sense when all child elements are also enriched
+   * using the same function(s) as the parent element.
+   */
+  virtual const FullMatrix<double> &
+  get_restriction_matrix (const unsigned int child,
+                          const RefinementCase<dim> &refinement_case=RefinementCase<dim>::isotropic_refinement) const;
+
+  /**
+   * Embedding matrix between grids.
+   *
+   * This function only makes sense when all child elements are also enriched
+   * using the same function(s) as the parent element.
+   */
+  virtual const FullMatrix<double> &
+  get_prolongation_matrix (const unsigned int child,
+                           const RefinementCase<dim> &refinement_case=RefinementCase<dim>::isotropic_refinement) const;
+
+  //@}
 
   /**
    * @name Functions to support hp
