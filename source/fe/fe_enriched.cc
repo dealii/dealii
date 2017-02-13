@@ -892,6 +892,24 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
     }
 }
 
+template <int dim, int spacedim>
+const FullMatrix<double> &
+FE_Enriched<dim,spacedim>::get_prolongation_matrix (const unsigned int child,
+                                                    const RefinementCase<dim> &refinement_case) const
+{
+  return fe_system.get_prolongation_matrix(child, refinement_case);
+}
+
+
+template <int dim, int spacedim>
+const FullMatrix<double> &
+FE_Enriched<dim,spacedim>::get_restriction_matrix (const unsigned int child,
+                                                   const RefinementCase<dim> &refinement_case) const
+{
+  return fe_system.get_restriction_matrix(child, refinement_case);
+}
+
+
 /* ----------------------- FESystem::InternalData ------------------- */
 
 
