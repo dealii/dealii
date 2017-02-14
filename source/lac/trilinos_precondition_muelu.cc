@@ -100,6 +100,16 @@ namespace TrilinosWrappers
   {}
 
 
+
+  PreconditionAMGMueLu::PreconditionAMGMueLu()
+  {
+#ifdef DEAL_II_WITH_64BIT_INDICES
+    AssertThrow (false, ExcMessage("PreconditionAMGMueLu does not support 64bit-indices!"));
+#endif
+  }
+
+
+
   PreconditionAMGMueLu::~PreconditionAMGMueLu()
   {
     preconditioner.reset();
