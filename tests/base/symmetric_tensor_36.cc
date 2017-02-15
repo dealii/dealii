@@ -21,8 +21,7 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/logstream.h>
 
-// These boost functions are bundled with deal.II
-#include <boost/type_traits.hpp>
+#include <type_traits>
 
 #include <complex>
 #include <fstream>
@@ -36,7 +35,7 @@ template<int rank, int dim,
          template<int,int,typename> class TensorType,
          typename NumberType1,
          typename NumberType2>
-typename boost::disable_if<boost::is_constructible<NumberType1,NumberType2>,void>::type
+typename std::enable_if<!std::is_constructible<NumberType1,NumberType2>::value,void>::type
 test_tensor_constructor (const std::string &, const std::string &)
 {}
 
@@ -44,7 +43,7 @@ template<int rank, int dim,
          template<int,int,typename> class TensorType,
          typename NumberType1,
          typename NumberType2>
-typename boost::enable_if<boost::is_constructible<NumberType1,NumberType2>,void>::type
+typename std::enable_if<std::is_constructible<NumberType1,NumberType2>::value,void>::type
 test_tensor_constructor (const std::string &type1, const std::string &type2)
 {
   deallog
