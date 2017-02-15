@@ -367,7 +367,7 @@ namespace Step36
   void
   EigenvalueProblem<dim>::constrain_pou_dofs()
   {
-    std::vector<unsigned int> local_face_dof_indices(fe_collection[pou_fe_index].dofs_per_face);
+    std::vector<types::global_dof_index> local_face_dof_indices(fe_collection[pou_fe_index].dofs_per_face);
     for (typename hp::DoFHandler<dim>::active_cell_iterator
          cell = dof_handler.begin_active();
          cell != dof_handler.end(); ++cell)
