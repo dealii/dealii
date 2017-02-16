@@ -1702,18 +1702,18 @@ protected:
  * short 1D loops of length equal to the polynomial degree plus one. If the
  * loop bounds are known at compile time, the compiler can unroll loops as
  * deemed most efficient by its heuristics. At least the innermost loop is
- * almost always completely unrolled and thus completely eliminates the loop
- * overhead.
+ * almost always completely unrolled, avoiding the loop overhead.
  *
  * However, carrying the polynomial degree (and the number of quadrature
  * points) as a template parameter makes things more complicated in codes
  * where different polynomial degrees should be considered, e.g. in
  * application codes where the polynomial degree is given through an input
  * file. The recommended approach for good performance is to create different
- * cell functions, possibly through different operator classes derived from a
- * common base class with virtual functions to the functions called from the
- * outside. The kernels are distinguished by a template on the polynomial
- * degree of the respective class initialized from the detected polynomial
+ * cell functions, possibly through different operator classes that are
+ * derived from a common base class with virtual functions to access the
+ * operator evaluation. The program then keeps only a pointer to the common
+ * base class after initializing templated derived classes with fixed
+ * polynomial degree that are selected from the detected polynomial
  * degree. This approach requires a-priori knowledge of the range of valid
  * degrees and can lead to rather long compile times in programs with many
  * apply functions.
@@ -1721,7 +1721,7 @@ protected:
  * A flexible choice of the polynomial degree based on the information in the
  * element passed to the initialization is also supported by FEEvaluation,
  * even though it runs two to three times more slowly. For this, set the
- * template parameter of the polynomial degree to -1 (and choose an arbitrary
+ * template parameter for the polynomial degree to -1 (and choose an arbitrary
  * number for the number of quadrature points), which switches to the other
  * code path. Internally, an evaluator object with template specialization for
  * -1 is invoked that runs according to run-time bounds, whereas the default
@@ -5242,7 +5242,7 @@ namespace internal
   struct EvaluatorTensorProduct<evaluate_general,dim,fe_degree,n_q_points_1d,Number>
   {
     static const unsigned int dofs_per_cell = Utilities::fixed_int_power<fe_degree+1,dim>::value;
-    static const unsigned int n_q_points = Utilities::fixed_int_power<n_q_points_1d,dim>::value;
+    static const unsigned int n_q_points = n_q_points_1d == 0 ? 1 : Utilities::fixed_int_power<n_q_points_1d,dim>::value;
 
     /**
      * Empty constructor. Does nothing. Be careful when using 'values' and
@@ -5634,7 +5634,7 @@ namespace internal
   struct EvaluatorTensorProduct<evaluate_symmetric,dim,fe_degree,n_q_points_1d,Number>
   {
     static const unsigned int dofs_per_cell = Utilities::fixed_int_power<fe_degree+1,dim>::value;
-    static const unsigned int n_q_points = Utilities::fixed_int_power<n_q_points_1d,dim>::value;
+    static const unsigned int n_q_points = n_q_points_1d == 0 ? 1 : Utilities::fixed_int_power<n_q_points_1d,dim>::value;
 
     /**
      * Constructor, taking the data from ShapeInfo
@@ -6210,7 +6210,7 @@ namespace internal
   struct EvaluatorTensorProduct<evaluate_evenodd,dim,fe_degree,n_q_points_1d,Number>
   {
     static const unsigned int dofs_per_cell = Utilities::fixed_int_power<fe_degree+1,dim>::value;
-    static const unsigned int n_q_points = Utilities::fixed_int_power<n_q_points_1d,dim>::value;
+    static const unsigned int n_q_points = n_q_points_1d == 0 ? 1 : Utilities::fixed_int_power<n_q_points_1d,dim>::value;
 
     /**
      * Empty constructor. Does nothing. Be careful when using 'values' and
