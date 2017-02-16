@@ -1,0 +1,7 @@
+Fixed: Double contraction of two SymmetricTensor<..,VectorizedArray<T>> now
+works. Introduced internal::NumberType<T> with static member 
+internal::Numbertype::value to be called instead of the constructor Number()
+in symmetric_tensor.h.
+<br>
+(Mathias Mentler, 2016/02/14)
+
