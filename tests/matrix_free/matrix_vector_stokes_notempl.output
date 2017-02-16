@@ -1,0 +1,12 @@
+
+DEAL::
+DEAL::Test with doubles
+DEAL::
+DEAL:2d::Verification fe degree 1: 0
+DEAL:2d::
+DEAL:2d::Verification fe degree 2: 0
+DEAL:2d::
+DEAL:2d::Verification fe degree 3: 0
+DEAL:2d::
+DEAL:3d::Verification fe degree 1: 0
+DEAL:3d::

@@ -7404,9 +7404,9 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 #ifdef DEBUG
   // print error message when the dimensions do not match. Propose a possible
   // fix
-  if (fe_degree != -1 && static_cast<unsigned int>(fe_degree) != this->data->fe_degree
+  if ((fe_degree != -1 && static_cast<unsigned int>(fe_degree) != this->data->fe_degree)
       ||
-      n_q_points != this->data->n_q_points)
+      (fe_degree != -1 && static_n_q_points != this->data->n_q_points))
     {
       std::string message =
         "-------------------------------------------------------\n";
@@ -7439,13 +7439,13 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
                   proposed_dof_comp = no;
                   break;
                 }
-          if (n_q_points ==
+          if (static_n_q_points ==
               this->mapping_info->mapping_data_gen[this->quad_no].n_q_points[this->active_quad_index])
             proposed_quad_comp = this->quad_no;
           else
             for (unsigned int no=0; no<this->mapping_info->mapping_data_gen.size(); ++no)
               if (this->mapping_info->mapping_data_gen[no].n_q_points[this->active_quad_index]
-                  == n_q_points)
+                  == static_n_q_points)
                 {
                   proposed_quad_comp = no;
                   break;
@@ -7507,7 +7507,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
       message += "                                 " + correct_pos;
 
       Assert (static_cast<unsigned int>(fe_degree) == this->data->fe_degree &&
-              n_q_points == this->data->n_q_points,
+              static_n_q_points == this->data->n_q_points,
               ExcMessage(message));
     }
   if (fe_no != numbers::invalid_unsigned_int)
