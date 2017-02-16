@@ -1,0 +1,7 @@
+Changed: The template arguments to the
+DerivativeApproximation::approximate_derivative_tensor() function have
+been modified. It is no longer necessary to explicitly specify the
+<tt>dim<\tt>  and <tt>spacedim<\tt> arguments as they are determined from
+the input DoFHandler.
+<br>
+(Jean-Paul Pelteret, 2017/02/16)

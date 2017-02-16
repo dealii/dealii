@@ -238,24 +238,24 @@ namespace DerivativeApproximation
    * In a parallel computation the @p solution vector needs to contain the
    * locally relevant unknowns.
    */
-  template <typename DoFHandlerType, int dim, int spacedim, class InputVector, int order>
+  template <typename DoFHandlerType, class InputVector, int order>
   void
   approximate_derivative_tensor
-  (const Mapping<dim, spacedim>                        &mapping,
-   const DoFHandlerType                                &dof,
-   const InputVector                                   &solution,
+  (const Mapping<DoFHandlerType::dimension, DoFHandlerType::space_dimension>  &mapping,
+   const DoFHandlerType                                                       &dof,
+   const InputVector                                                          &solution,
 #ifndef _MSC_VER
-   const typename DoFHandlerType::active_cell_iterator &cell,
+   const typename DoFHandlerType::active_cell_iterator                        &cell,
 #else
    const TriaActiveIterator <dealii::DoFCellAccessor<DoFHandlerType, false> > &cell,
 #endif
-   Tensor<order, dim>                                  &derivative,
-   const unsigned int                                   component = 0);
+   Tensor<order, DoFHandlerType::dimension>                                   &derivative,
+   const unsigned int                                                         component = 0);
 
   /**
    * Same as above, with <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
-  template <typename DoFHandlerType, int dim, int spacedim, class InputVector, int order>
+  template <typename DoFHandlerType, class InputVector, int order>
   void
   approximate_derivative_tensor
   (const DoFHandlerType                                &dof,
@@ -265,7 +265,7 @@ namespace DerivativeApproximation
 #else
    const TriaActiveIterator<dealii::DoFCellAccessor<DoFHandlerType, false> > &cell,
 #endif
-   Tensor<order, dim>                                  &derivative,
+   Tensor<order, DoFHandlerType::dimension>            &derivative,
    const unsigned int                                   component = 0);
 
   /**
