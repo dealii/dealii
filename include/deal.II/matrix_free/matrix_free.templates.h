@@ -49,6 +49,16 @@ MatrixFree<dim, Number>::MatrixFree()
 
 
 template <int dim, typename Number>
+MatrixFree<dim, Number>::MatrixFree(const MatrixFree<dim,Number> &other)
+  :
+  Subscriptor()
+{
+  copy_from(other);
+}
+
+
+
+template <int dim, typename Number>
 MatrixFree<dim,Number>::~MatrixFree()
 {}
 
