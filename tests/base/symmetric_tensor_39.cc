@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2015 by the deal.II authors
+// Copyright (C) 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,8 +20,7 @@
 
 int main()
 {
-  std::string logname = "output";
-  std::ofstream logfile(logname);
+  initlog();
 
   const unsigned int dim = 3;
 
@@ -54,8 +53,7 @@ int main()
     for (unsigned int j = 0; j < dim; ++j)
       for (unsigned int v = 0; v < VectorizedArray<double>::n_array_elements; ++v)
         if (B[i][j][v] != 0.0)
-          logfile << "Not OK" << std::endl;
+          deallog<< "Not OK" << std::endl;
 
-  logfile << "OK" << std::endl;
-  logfile.close();
+  deallog << "OK" << std::endl;
 }
