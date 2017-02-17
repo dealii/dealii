@@ -163,6 +163,19 @@ IF(DEAL_II_HAVE_TESTS_DIRECTORY)
 ENDIF()
 
 #
+# Include all subdirectories starting with module-
+#
+
+FILE(GLOB _module_directories "module-*")
+FOREACH(_module ${_module_directories})
+  IF(EXISTS "${_module}/CMakeLists.txt")
+    MESSAGE(STATUS "Setting up module directory ${_module}")
+    ADD_SUBDIRECTORY(${_module})
+    MESSAGE(STATUS "Setting up module directory ${_module} - Done")
+  ENDIF()
+ENDFOREACH()
+
+#
 # And finally, print the configuration:
 #
 FILE(READ ${CMAKE_BINARY_DIR}/summary.log DEAL_II_LOG_SUMMARY)
