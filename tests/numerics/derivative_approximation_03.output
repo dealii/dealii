@@ -1,0 +1,1030 @@
+
+DEAL::------------ 2D ------------
+DEAL::
+DEAL::cell 3.0
+DEAL::approx. gradient: 3.30563 -0.712054 , norm: 3.38145
+DEAL::  exact gradient: 3.68794 -0.380308 , norm: 3.70750
+DEAL::approx. second derivative (hessian): -7.14849 -8.14611 -8.14611 -4.85472 , norm: 14.2281
+DEAL::  exact second derivative (hessian): -3.76675 -5.95762 -5.95762 -5.88554 , norm: 10.8772
+DEAL::approx. third derivative: -52.6152 11.3518 11.3518 -77.4973 11.3518 -77.4973 -77.4973 17.6570 , norm: 146.575
+DEAL::  exact third derivative: -59.0071 6.08492 6.08492 -92.1986 6.08492 -92.1986 -92.1986 9.50769 , norm: 170.836
+DEAL::
+DEAL::cell 3.1
+DEAL::approx. gradient: 2.67041 -1.96183 , norm: 3.31358
+DEAL::  exact gradient: 2.78501 -1.04781 , norm: 2.97560
+DEAL::approx. second derivative (hessian): -9.84763 -6.29001 -6.29001 -13.3756 , norm: 18.1443
+DEAL::  exact second derivative (hessian): -10.3780 -4.49899 -4.49899 -16.2156 , norm: 18.6597
+DEAL::approx. third derivative: -42.5044 20.8424 20.8424 -59.9624 20.8424 -59.9624 -59.9624 48.6478 , norm: 127.526
+DEAL::  exact third derivative: -44.5601 16.7650 16.7650 -69.6252 16.7650 -69.6252 -69.6252 26.1953 , norm: 134.380
+DEAL::
+DEAL::cell 3.2
+DEAL::approx. gradient: 2.05586 -0.933477 , norm: 2.25786
+DEAL::  exact gradient: 2.29363 -0.997138 , norm: 2.50100
+DEAL::approx. second derivative (hessian): -4.44583 -14.1228 -14.1228 -3.37118 , norm: 18.0416
+DEAL::  exact second derivative (hessian): -2.34264 -15.6204 -15.6204 -3.66037 , norm: 18.6358
+DEAL::approx. third derivative: -32.7228 24.8109 24.8109 -51.8345 24.8109 -51.8345 -51.8345 23.1476 , norm: 107.302
+DEAL::  exact third derivative: -36.6981 15.9542 15.9542 -57.3407 15.9542 -57.3407 -57.3407 24.9285 , norm: 112.230
+DEAL::
+DEAL::cell 3.3
+DEAL::approx. gradient: 1.66080 -2.57188 , norm: 3.06151
+DEAL::  exact gradient: 1.73207 -2.74728 , norm: 3.24771
+DEAL::approx. second derivative (hessian): -6.12450 -11.0278 -11.0278 -9.28815 , norm: 18.8470
+DEAL::  exact second derivative (hessian): -6.45436 -11.7960 -11.7960 -10.0849 , norm: 20.2045
+DEAL::approx. third derivative: -26.4346 41.0017 41.0017 -40.0387 41.0017 -40.0387 -40.0387 63.7755 , norm: 120.908
+DEAL::  exact third derivative: -27.7131 43.9565 43.9565 -43.3017 43.9565 -43.3017 -43.3017 68.6820 , norm: 130.026
+DEAL::
+DEAL::cell 3.4
+DEAL::approx. gradient: 1.15082 -2.73128 , norm: 2.96382
+DEAL::  exact gradient: 1.20020 -1.45877 , norm: 1.88905
+DEAL::approx. second derivative (hessian): -13.7100 -2.71069 -2.71069 -18.6216 , norm: 19.8235
+DEAL::  exact second derivative (hessian): -14.4484 -1.93884 -1.93884 -22.5756 , norm: 23.0144
+DEAL::approx. third derivative: -18.3173 29.0170 29.0170 -25.8409 29.0170 -25.8409 -25.8409 67.7280 , norm: 97.2205
+DEAL::  exact third derivative: -19.2032 23.3404 23.3404 -30.0051 23.3404 -30.0051 -30.0051 36.4693 , norm: 77.6788
+DEAL::
+DEAL::cell 3.5
+DEAL::approx. gradient: -0.650535 -2.83201 , norm: 2.90577
+DEAL::  exact gradient: -0.678453 -1.51258 , norm: 1.65776
+DEAL::approx. second derivative (hessian): -14.2156 1.53230 1.53230 -19.3084 , norm: 19.7339
+DEAL::  exact second derivative (hessian): -14.9813 1.09599 1.09599 -23.4082 , norm: 23.5484
+DEAL::approx. third derivative: 10.3545 30.0872 30.0872 14.6074 30.0872 14.6074 14.6074 70.2260 , norm: 91.6229
+DEAL::  exact third derivative: 10.8552 24.2012 24.2012 16.9613 24.2012 16.9613 16.9613 37.8144 , norm: 64.5594
+DEAL::
+DEAL::cell 3.6
+DEAL::approx. gradient: 0.715722 -3.58060 , norm: 3.65143
+DEAL::  exact gradient: 0.746437 -3.82479 , norm: 3.89695
+DEAL::approx. second derivative (hessian): -8.52660 -4.75246 -4.75246 -12.9311 , norm: 15.9667
+DEAL::  exact second derivative (hessian): -8.98582 -5.08351 -5.08351 -14.0403 , norm: 17.1902
+DEAL::approx. third derivative: -11.3920 57.0831 57.0831 -17.2547 57.0831 -17.2547 -17.2547 88.7889 , norm: 136.682
+DEAL::  exact third derivative: -11.9430 61.1967 61.1967 -18.6609 61.1967 -18.6609 -18.6609 95.6198 , norm: 146.852
+DEAL::
+DEAL::cell 3.7
+DEAL::approx. gradient: -0.404585 -3.71266 , norm: 3.73464
+DEAL::  exact gradient: -0.421948 -3.96586 , norm: 3.98825
+DEAL::approx. second derivative (hessian): -8.84108 2.68648 2.68648 -13.4080 , norm: 14.6504
+DEAL::  exact second derivative (hessian): -9.31725 2.87362 2.87362 -14.5582 , norm: 15.8268
+DEAL::approx. third derivative: 6.43971 59.1884 59.1884 9.75378 59.1884 9.75378 9.75378 92.0637 , norm: 138.969
+DEAL::  exact third derivative: 6.75116 63.4538 63.4538 10.5487 63.4538 10.5487 10.5487 99.1466 , norm: 149.294
+DEAL::
+DEAL::cell 3.8
+DEAL::approx. gradient: 0.0288201 -1.15800 , norm: 1.15836
+DEAL::  exact gradient: 0.0321533 -1.23698 , norm: 1.23740
+DEAL::approx. second derivative (hessian): -0.0623240 -17.5198 -17.5198 -0.0472589 , norm: 17.5746
+DEAL::  exact second derivative (hessian): -0.0328403 -19.3776 -19.3776 -0.0513130 , norm: 19.4197
+DEAL::approx. third derivative: -0.458725 30.7786 30.7786 -0.726643 30.7786 -0.726643 -0.726643 28.7152 , norm: 60.5667
+DEAL::  exact third derivative: -0.514453 19.7916 19.7916 -0.803832 19.7916 -0.803832 -0.803832 30.9244 , norm: 46.1914
+DEAL::
+DEAL::cell 3.9
+DEAL::approx. gradient: 0.0232819 -3.19049 , norm: 3.19057
+DEAL::  exact gradient: 0.0242810 -3.40808 , norm: 3.40816
+DEAL::approx. second derivative (hessian): -0.0858564 -13.6803 -13.6803 -0.130206 , norm: 13.7884
+DEAL::  exact second derivative (hessian): -0.0904805 -14.6333 -14.6333 -0.141376 , norm: 14.7492
+DEAL::approx. third derivative: -0.370574 50.8638 50.8638 -0.561283 50.8638 -0.561283 -0.561283 79.1153 , norm: 118.413
+DEAL::  exact third derivative: -0.388497 54.5292 54.5292 -0.607026 54.5292 -0.607026 -0.607026 85.2019 , norm: 127.204
+DEAL::
+DEAL::cell 3.10
+DEAL::approx. gradient: -2.00911 -0.944719 , norm: 2.22014
+DEAL::  exact gradient: -2.24148 -1.00915 , norm: 2.45817
+DEAL::approx. second derivative (hessian): 4.34475 -14.2929 -14.2929 3.29453 , norm: 18.1222
+DEAL::  exact second derivative (hessian): 2.28937 -15.8086 -15.8086 3.57715 , norm: 18.7549
+DEAL::approx. third derivative: 31.9788 25.1097 25.1097 50.6560 25.1097 50.6560 50.6560 23.4264 , norm: 105.646
+DEAL::  exact third derivative: 35.8637 16.1464 16.1464 56.0370 16.1464 56.0370 56.0370 25.2287 , norm: 110.115
+DEAL::
+DEAL::cell 3.11
+DEAL::approx. gradient: -1.62303 -2.60286 , norm: 3.06743
+DEAL::  exact gradient: -1.69269 -2.78037 , norm: 3.25509
+DEAL::approx. second derivative (hessian): 5.98525 -11.1606 -11.1606 9.07697 , norm: 18.7983
+DEAL::  exact second derivative (hessian): 6.30760 -11.9381 -11.9381 9.85563 , norm: 20.1508
+DEAL::approx. third derivative: 25.8336 41.4956 41.4956 39.1283 41.4956 39.1283 39.1283 64.5436 , norm: 120.797
+DEAL::  exact third derivative: 27.0830 44.4859 44.4859 42.3172 44.4859 42.3172 42.3172 69.5092 , norm: 129.901
+DEAL::
+DEAL::cell 3.12
+DEAL::approx. gradient: 0.0100334 -4.44183 , norm: 4.44184
+DEAL::  exact gradient: 0.0104639 -4.74476 , norm: 4.74477
+DEAL::approx. second derivative (hessian): -0.119530 -5.89555 -5.89555 -0.181274 , norm: 6.04604
+DEAL::  exact second derivative (hessian): -0.125968 -6.30623 -6.30623 -0.196825 , norm: 6.46773
+DEAL::approx. third derivative: -0.159700 70.8131 70.8131 -0.241886 70.8131 -0.241886 -0.241886 110.145 , norm: 164.850
+DEAL::  exact third derivative: -0.167423 75.9162 75.9162 -0.261599 75.9162 -0.261599 -0.261599 118.619 , norm: 177.089
+DEAL::
+DEAL::cell 3.13
+DEAL::approx. gradient: -0.00567168 -4.60566 , norm: 4.60566
+DEAL::  exact gradient: -0.00591508 -4.91976 , norm: 4.91976
+DEAL::approx. second derivative (hessian): -0.123939 3.33265 3.33265 -0.187960 , norm: 3.48875
+DEAL::  exact second derivative (hessian): -0.130614 3.56480 3.56480 -0.204084 , norm: 3.73234
+DEAL::approx. third derivative: 0.0902753 73.4249 73.4249 0.136734 73.4249 0.136734 0.136734 114.208 , norm: 170.930
+DEAL::  exact third derivative: 0.0946413 78.7162 78.7162 0.147877 78.7162 0.147877 0.147877 122.994 , norm: 183.620
+DEAL::
+DEAL::cell 3.14
+DEAL::approx. gradient: -0.699449 -3.62373 , norm: 3.69061
+DEAL::  exact gradient: -0.729466 -3.87086 , norm: 3.93899
+DEAL::approx. second derivative (hessian): 8.33273 -4.80970 -4.80970 12.6370 , norm: 15.7541
+DEAL::  exact second derivative (hessian): 8.78151 -5.14473 -5.14473 13.7211 , norm: 16.9582
+DEAL::approx. third derivative: 11.1330 57.7705 57.7705 16.8624 57.7705 16.8624 16.8624 89.8583 , norm: 138.072
+DEAL::  exact third derivative: 11.6715 61.9337 61.9337 18.2366 61.9337 18.2366 18.2366 96.7714 , norm: 148.344
+DEAL::
+DEAL::cell 3.15
+DEAL::approx. gradient: 0.395386 -3.75738 , norm: 3.77812
+DEAL::  exact gradient: 0.412354 -4.01363 , norm: 4.03475
+DEAL::approx. second derivative (hessian): 8.64006 2.71883 2.71883 13.1031 , norm: 14.3890
+DEAL::  exact second derivative (hessian): 9.10540 2.90822 2.90822 14.2272 , norm: 15.5413
+DEAL::approx. third derivative: -6.29329 59.9013 59.9013 -9.53201 59.9013 -9.53201 -9.53201 93.1725 , norm: 140.562
+DEAL::  exact third derivative: -6.59766 64.2180 64.2180 -10.3088 64.2180 -10.3088 -10.3088 100.341 , norm: 151.005
+DEAL::
+DEAL::cell 3.16
+DEAL::approx. gradient: -2.29261 -2.23937 , norm: 3.20482
+DEAL::  exact gradient: -2.39100 -1.19605 , norm: 2.67346
+DEAL::approx. second derivative (hessian): -11.2408 5.40013 5.40013 -15.2679 , norm: 19.0176
+DEAL::  exact second derivative (hessian): -11.8462 3.86250 3.86250 -18.5097 , norm: 20.2789
+DEAL::approx. third derivative: 36.4911 23.7910 23.7910 51.4793 23.7910 51.4793 51.4793 55.5302 , norm: 118.590
+DEAL::  exact third derivative: 38.2560 19.1368 19.1368 59.7750 19.1368 59.7750 59.7750 29.9012 , norm: 119.060
+DEAL::
+DEAL::cell 3.17
+DEAL::approx. gradient: -3.37338 -1.09846 , norm: 3.54772
+DEAL::  exact gradient: -3.51815 -0.586686 , norm: 3.56673
+DEAL::approx. second derivative (hessian): -5.51386 7.94582 7.94582 -7.48920 , norm: 14.5085
+DEAL::  exact second derivative (hessian): -5.81082 5.68332 5.68332 -9.07941 , norm: 13.3588
+DEAL::approx. third derivative: 53.6935 11.6700 11.6700 75.7472 11.6700 75.7472 75.7472 27.2387 , norm: 145.762
+DEAL::  exact third derivative: 56.2903 9.38698 9.38698 87.9537 9.38698 87.9537 87.9537 14.6672 , norm: 163.877
+DEAL::
+DEAL::cell 3.18
+DEAL::approx. gradient: -1.42584 -2.93574 , norm: 3.26367
+DEAL::  exact gradient: -1.48703 -3.13595 , norm: 3.47065
+DEAL::approx. second derivative (hessian): -6.99096 9.46767 9.46767 -10.6022 , norm: 18.4349
+DEAL::  exact second derivative (hessian): -7.36748 10.1272 10.1272 -11.5117 , norm: 19.7766
+DEAL::approx. third derivative: 22.6948 46.8024 46.8024 34.3742 46.8024 34.3742 34.3742 72.7981 , norm: 126.217
+DEAL::  exact third derivative: 23.7924 50.1752 50.1752 37.1756 50.1752 37.1756 37.1756 78.3988 , norm: 135.688
+DEAL::
+DEAL::cell 3.19
+DEAL::approx. gradient: -2.09799 -1.44004 , norm: 2.54466
+DEAL::  exact gradient: -2.18803 -1.53825 , norm: 2.67464
+DEAL::approx. second derivative (hessian): -3.42921 13.9308 13.9308 -5.20059 , norm: 18.2739
+DEAL::  exact second derivative (hessian): -3.61390 14.9013 14.9013 -5.64672 , norm: 19.5662
+DEAL::approx. third derivative: 33.3934 22.9576 22.9576 50.5787 22.9576 50.5787 50.5787 35.7090 , norm: 107.917
+DEAL::  exact third derivative: 35.0084 24.6120 24.6120 54.7007 24.6120 54.7007 54.7007 38.4562 , norm: 116.182
+DEAL::
+DEAL::cell 3.20
+DEAL::approx. gradient: -3.62822 0.311397 , norm: 3.64156
+DEAL::  exact gradient: -3.78393 0.166317 , norm: 3.78758
+DEAL::approx. second derivative (hessian): 1.56309 8.54610 8.54610 2.12308 , norm: 10.3938
+DEAL::  exact second derivative (hessian): 1.64728 6.11268 6.11268 2.57388 , norm: 8.24079
+DEAL::approx. third derivative: 57.7498 -3.30827 -3.30827 81.4696 -3.30827 81.4696 81.4696 -7.72177 , norm: 152.772
+DEAL::  exact third derivative: 60.5428 -2.66107 -2.66107 94.5982 -2.66107 94.5982 94.5982 -4.15792 , norm: 174.787
+DEAL::
+DEAL::cell 3.21
+DEAL::approx. gradient: -3.52740 1.64501 , norm: 3.89212
+DEAL::  exact gradient: -3.12327 0.878600 , norm: 3.24450
+DEAL::approx. second derivative (hessian): 5.23036 7.47725 7.47725 11.2155 , norm: 16.2768
+DEAL::  exact second derivative (hessian): 8.70207 5.04543 5.04543 13.5970 , norm: 16.7572
+DEAL::approx. third derivative: 56.1450 -14.2694 -14.2694 71.6481 -14.2694 71.6481 71.6481 -40.7917 , norm: 144.317
+DEAL::  exact third derivative: 49.9724 -14.0576 -14.0576 78.0818 -14.0576 78.0818 78.0818 -21.9650 , norm: 147.861
+DEAL::
+DEAL::cell 3.22
+DEAL::approx. gradient: -2.25649 0.408230 , norm: 2.29312
+DEAL::  exact gradient: -2.35332 0.436070 , norm: 2.39338
+DEAL::approx. second derivative (hessian): 0.972130 14.9833 14.9833 1.47429 , norm: 16.2086
+DEAL::  exact second derivative (hessian): 1.02449 16.0270 16.0270 1.60076 , norm: 17.3422
+DEAL::approx. third derivative: 35.9161 -6.50812 -6.50812 54.3997 -6.50812 54.3997 54.3997 -10.1230 , norm: 101.968
+DEAL::  exact third derivative: 37.6532 -6.97712 -6.97712 58.8331 -6.97712 58.8331 58.8331 -10.9018 , norm: 109.848
+DEAL::
+DEAL::cell 3.23
+DEAL::approx. gradient: -2.19378 2.15655 , norm: 3.07626
+DEAL::  exact gradient: -1.94244 2.30362 , norm: 3.01327
+DEAL::approx. second derivative (hessian): 3.25290 13.4770 13.4770 7.78821 , norm: 19.1870
+DEAL::  exact second derivative (hessian): 5.41205 13.2287 13.2287 8.45632 , norm: 20.2502
+DEAL::approx. third derivative: 34.9180 -25.9716 -25.9716 47.6399 -25.9716 47.6399 47.6399 -53.4764 , norm: 113.628
+DEAL::  exact third derivative: 31.0791 -36.8580 -36.8580 48.5611 -36.8580 48.5611 48.5611 -57.5906 , norm: 124.228
+DEAL::
+DEAL::cell 3.24
+DEAL::approx. gradient: -0.0199881 -3.64186 , norm: 3.64192
+DEAL::  exact gradient: -0.0208459 -3.89023 , norm: 3.89029
+DEAL::approx. second derivative (hessian): -0.0980029 11.7449 11.7449 -0.148627 , norm: 11.8682
+DEAL::  exact second derivative (hessian): -0.103281 12.5630 12.5630 -0.161377 , norm: 12.6954
+DEAL::approx. third derivative: 0.318148 58.0597 58.0597 0.481876 58.0597 0.481876 0.481876 90.3080 , norm: 135.163
+DEAL::  exact third derivative: 0.333534 62.2437 62.2437 0.521147 62.2437 0.521147 0.521147 97.2558 , norm: 145.198
+DEAL::
+DEAL::cell 3.25
+DEAL::approx. gradient: -0.0294107 -1.78641 , norm: 1.78665
+DEAL::  exact gradient: -0.0306729 -1.90824 , norm: 1.90849
+DEAL::approx. second derivative (hessian): -0.0480725 17.2816 17.2816 -0.0729046 , norm: 17.3421
+DEAL::  exact second derivative (hessian): -0.0506616 18.4854 18.4854 -0.0791587 , norm: 18.5503
+DEAL::approx. third derivative: 0.468126 28.4795 28.4795 0.709038 28.4795 0.709038 0.709038 44.2980 , norm: 66.3120
+DEAL::  exact third derivative: 0.490767 30.5318 30.5318 0.766823 30.5318 0.766823 0.766823 47.7060 , norm: 71.2351
+DEAL::
+DEAL::cell 3.26
+DEAL::approx. gradient: 1.39342 -2.97109 , norm: 3.28162
+DEAL::  exact gradient: 1.45321 -3.17372 , norm: 3.49061
+DEAL::approx. second derivative (hessian): 6.83201 9.58170 9.58170 10.3611 , norm: 18.3394
+DEAL::  exact second derivative (hessian): 7.19997 10.2491 10.2491 11.2500 , norm: 19.6722
+DEAL::approx. third derivative: -22.1788 47.3661 47.3661 -33.5927 47.3661 -33.5927 -33.5927 73.6749 , norm: 126.633
+DEAL::  exact third derivative: -23.2514 50.7795 50.7795 -36.3304 50.7795 -36.3304 -36.3304 79.3430 , norm: 136.130
+DEAL::
+DEAL::cell 3.27
+DEAL::approx. gradient: 2.05029 -1.45738 , norm: 2.51548
+DEAL::  exact gradient: 2.13828 -1.55677 , norm: 2.64495
+DEAL::approx. second derivative (hessian): 3.35124 14.0986 14.0986 5.08235 , norm: 18.3420
+DEAL::  exact second derivative (hessian): 3.53173 15.0807 15.0807 5.51833 , norm: 19.6384
+DEAL::approx. third derivative: -32.6341 23.2341 23.2341 -49.4286 23.2341 -49.4286 -49.4286 36.1390 , norm: 106.396
+DEAL::  exact third derivative: -34.2125 24.9084 24.9084 -53.4570 24.9084 -53.4570 -53.4570 38.9194 , norm: 114.540
+DEAL::
+DEAL::cell 3.28
+DEAL::approx. gradient: -0.0316326 0.506420 , norm: 0.507407
+DEAL::  exact gradient: -0.0329901 0.540957 , norm: 0.541962
+DEAL::approx. second derivative (hessian): 0.0136278 18.5872 18.5872 0.0206674 , norm: 18.6043
+DEAL::  exact second derivative (hessian): 0.0143618 19.8819 19.8819 0.0224403 , norm: 19.9003
+DEAL::approx. third derivative: 0.503491 -8.07350 -8.07350 0.762603 -8.07350 0.762603 0.762603 -12.5578 , norm: 18.8478
+DEAL::  exact third derivative: 0.527842 -8.65531 -8.65531 0.824753 -8.65531 0.824753 0.824753 -13.5239 , norm: 20.2474
+DEAL::
+DEAL::cell 3.29
+DEAL::approx. gradient: -0.0307535 2.67526 , norm: 2.67544
+DEAL::  exact gradient: -0.0272302 2.85771 , norm: 2.85784
+DEAL::approx. second derivative (hessian): 0.0456009 16.7186 16.7186 0.109179 , norm: 16.7960
+DEAL::  exact second derivative (hessian): 0.0758689 16.4106 16.4106 0.118545 , norm: 16.5078
+DEAL::approx. third derivative: 0.489499 -32.2184 -32.2184 0.667841 -32.2184 0.667841 0.667841 -66.3390 , norm: 86.6979
+DEAL::  exact third derivative: 0.435683 -45.7233 -45.7233 0.680755 -45.7233 0.680755 0.680755 -71.4427 , norm: 106.665
+DEAL::
+DEAL::cell 3.30
+DEAL::approx. gradient: 2.20518 0.413146 , norm: 2.24355
+DEAL::  exact gradient: 2.29982 0.441322 , norm: 2.34178
+DEAL::approx. second derivative (hessian): -0.950026 15.1637 15.1637 -1.44077 , norm: 16.3611
+DEAL::  exact second derivative (hessian): -1.00119 16.2200 16.2200 -1.56436 , norm: 17.5052
+DEAL::approx. third derivative: -35.0995 -6.58650 -6.58650 -53.1628 -6.58650 -53.1628 -53.1628 -10.2449 , norm: 99.7293
+DEAL::  exact third derivative: -36.7971 -7.06115 -7.06115 -57.4954 -7.06115 -57.4954 -57.4954 -11.0331 , norm: 107.436
+DEAL::
+DEAL::cell 3.31
+DEAL::approx. gradient: 2.14390 2.18252 , norm: 3.05936
+DEAL::  exact gradient: 1.89828 2.33137 , norm: 3.00645
+DEAL::approx. second derivative (hessian): -3.17894 13.6393 13.6393 -7.61113 , norm: 19.2132
+DEAL::  exact second derivative (hessian): -5.28899 13.3881 13.3881 -8.26405 , norm: 20.2470
+DEAL::approx. third derivative: -34.1241 -26.2844 -26.2844 -46.5567 -26.2844 -46.5567 -46.5567 -54.1205 , norm: 112.555
+DEAL::  exact third derivative: -30.3725 -37.3019 -37.3019 -47.4570 -37.3019 -47.4570 -47.4570 -58.2842 , norm: 123.492
+DEAL::
+DEAL::cell 3.32
+DEAL::approx. gradient: -3.28746 -0.374262 , norm: 3.30869
+DEAL::  exact gradient: -3.66767 -0.399786 , norm: 3.68939
+DEAL::approx. second derivative (hessian): 7.10918 -5.66231 -5.66231 5.39074 , norm: 11.9771
+DEAL::  exact second derivative (hessian): 3.74604 -6.26275 -6.26275 5.85318 , norm: 11.1504
+DEAL::approx. third derivative: 52.3259 9.94750 9.94750 82.8869 9.94750 82.8869 82.8869 9.28064 , norm: 154.051
+DEAL::  exact third derivative: 58.6827 6.39657 6.39657 91.6917 6.39657 91.6917 91.6917 9.99464 , norm: 169.966
+DEAL::
+DEAL::cell 3.33
+DEAL::approx. gradient: -2.65572 -1.03115 , norm: 2.84888
+DEAL::  exact gradient: -2.76969 -1.10148 , norm: 2.98068
+DEAL::approx. second derivative (hessian): 9.79349 -4.42142 -4.42142 14.8524 , norm: 17.4168
+DEAL::  exact second derivative (hessian): 10.3209 -4.72941 -4.72941 16.1265 , norm: 18.7729
+DEAL::approx. third derivative: 42.2707 16.4390 16.4390 64.0245 16.4390 64.0245 64.0245 25.5697 , norm: 124.695
+DEAL::  exact third derivative: 44.3151 17.6236 17.6236 69.2423 17.6236 69.2423 69.2423 27.5369 , norm: 134.303
+DEAL::
+DEAL::cell 3.34
+DEAL::approx. gradient: -3.32290 0.337694 , norm: 3.34001
+DEAL::  exact gradient: -3.70721 0.360725 , norm: 3.72471
+DEAL::approx. second derivative (hessian): 7.18582 5.10908 5.10908 5.44885 , norm: 11.4997
+DEAL::  exact second derivative (hessian): 3.78642 5.65085 5.65085 5.91628 , norm: 10.6017
+DEAL::approx. third derivative: 52.8900 -8.97558 -8.97558 83.7805 -8.97558 83.7805 83.7805 -8.37388 , norm: 155.456
+DEAL::  exact third derivative: 59.3153 -5.77160 -5.77160 92.6801 -5.77160 92.6801 92.6801 -9.01812 , norm: 171.664
+DEAL::
+DEAL::cell 3.35
+DEAL::approx. gradient: -2.68435 0.930404 , norm: 2.84102
+DEAL::  exact gradient: -2.79955 0.993856 , norm: 2.97073
+DEAL::approx. second derivative (hessian): 9.89907 3.98943 3.98943 15.0125 , norm: 17.1942
+DEAL::  exact second derivative (hessian): 10.4322 4.26732 4.26732 16.3003 , norm: 18.5450
+DEAL::approx. third derivative: 42.7264 -14.8328 -14.8328 64.7147 -14.8328 64.7147 64.7147 -23.0714 , norm: 124.827
+DEAL::  exact third derivative: 44.7928 -15.9017 -15.9017 69.9888 -15.9017 69.9888 69.9888 -24.8464 , norm: 134.453
+DEAL::
+DEAL::cell 3.36
+DEAL::approx. gradient: -1.14449 -1.43558 , norm: 1.83596
+DEAL::  exact gradient: -1.19360 -1.53349 , norm: 1.94326
+DEAL::approx. second derivative (hessian): 13.6346 -1.90542 -1.90542 20.6776 , norm: 21.1601
+DEAL::  exact second derivative (hessian): 14.3689 -2.03815 -2.03815 22.4515 , norm: 22.9363
+DEAL::approx. third derivative: 18.2166 22.8865 22.8865 27.5915 22.8865 27.5915 27.5915 35.5984 , norm: 73.8534
+DEAL::  exact third derivative: 19.0977 24.5358 24.5358 29.8401 24.5358 29.8401 29.8401 38.3371 , norm: 79.4466
+DEAL::
+DEAL::cell 3.37
+DEAL::approx. gradient: 0.646959 -1.48853 , norm: 1.62305
+DEAL::  exact gradient: 0.674723 -1.59005 , norm: 1.72728
+DEAL::approx. second derivative (hessian): 14.1375 1.07710 1.07710 21.4403 , norm: 21.5958
+DEAL::  exact second derivative (hessian): 14.8989 1.15213 1.15213 23.2795 , norm: 23.4350
+DEAL::approx. third derivative: -10.2975 23.7306 23.7306 -15.5970 23.7306 -15.5970 -15.5970 36.9114 , norm: 62.3515
+DEAL::  exact third derivative: -10.7956 25.4407 25.4407 -16.8681 25.4407 -16.8681 -16.8681 39.7511 , norm: 67.0222
+DEAL::
+DEAL::cell 3.38
+DEAL::approx. gradient: -1.15683 1.29532 , norm: 1.73669
+DEAL::  exact gradient: -1.20647 1.38366 , norm: 1.83578
+DEAL::approx. second derivative (hessian): 13.7816 1.71925 1.71925 20.9005 , norm: 21.2940
+DEAL::  exact second derivative (hessian): 14.5238 1.83901 1.83901 22.6935 , norm: 23.0884
+DEAL::approx. third derivative: 18.4130 -20.6504 -20.6504 27.8889 -20.6504 27.8889 27.8889 -32.1203 , norm: 70.5935
+DEAL::  exact third derivative: 19.3035 -22.1385 -22.1385 30.1618 -22.1385 30.1618 30.1618 -34.5914 , norm: 75.9522
+DEAL::
+DEAL::cell 3.39
+DEAL::approx. gradient: 0.653933 1.34309 , norm: 1.49383
+DEAL::  exact gradient: 0.681996 1.43469 , norm: 1.58854
+DEAL::approx. second derivative (hessian): 14.2899 -0.971861 -0.971861 21.6714 , norm: 21.7972
+DEAL::  exact second derivative (hessian): 15.0595 -1.03956 -1.03956 23.5305 , norm: 23.6562
+DEAL::approx. third derivative: -10.4085 -21.4120 -21.4120 -15.7651 -21.4120 -15.7651 -15.7651 -33.3050 , norm: 57.7806
+DEAL::  exact third derivative: -10.9119 -22.9550 -22.9550 -17.0499 -22.9550 -17.0499 -17.0499 -35.8673 , norm: 62.1163
+DEAL::
+DEAL::cell 3.40
+DEAL::approx. gradient: -2.10204 0.921977 , norm: 2.29534
+DEAL::  exact gradient: -2.34515 0.984855 , norm: 2.54355
+DEAL::approx. second derivative (hessian): 4.54569 13.9489 13.9489 3.44690 , norm: 17.9560
+DEAL::  exact second derivative (hessian): 2.39526 15.4280 15.4280 3.74259 , norm: 18.5116
+DEAL::approx. third derivative: 33.4578 -24.5052 -24.5052 52.9988 -24.5052 52.9988 52.9988 -22.8625 , norm: 108.951
+DEAL::  exact third derivative: 37.5224 -15.7577 -15.7577 58.6287 -15.7577 58.6287 58.6287 -24.6214 , norm: 114.329
+DEAL::
+DEAL::cell 3.41
+DEAL::approx. gradient: -1.69810 2.54020 , norm: 3.05551
+DEAL::  exact gradient: -1.77097 2.71344 , norm: 3.24023
+DEAL::approx. second derivative (hessian): 6.26207 10.8920 10.8920 9.49678 , norm: 18.8908
+DEAL::  exact second derivative (hessian): 6.59933 11.6507 11.6507 10.3115 , norm: 20.2530
+DEAL::approx. third derivative: 27.0284 -40.4966 -40.4966 40.9380 -40.4966 40.9380 40.9380 -62.9899 , norm: 121.020
+DEAL::  exact third derivative: 28.3356 -43.4150 -43.4150 44.2743 -43.4150 44.2743 44.2743 -67.8359 , norm: 130.153
+DEAL::
+DEAL::cell 3.42
+DEAL::approx. gradient: -0.0864524 1.14837 , norm: 1.15162
+DEAL::  exact gradient: -0.0964510 1.23664 , norm: 1.24039
+DEAL::approx. second derivative (hessian): 0.186955 17.4428 17.4428 1.98163 , norm: 18.5501
+DEAL::  exact second derivative (hessian): 0.0985119 19.3722 19.3722 0.153925 , norm: 19.4985
+DEAL::approx. third derivative: 1.37605 -30.7207 -30.7207 21.1949 -30.7207 21.1949 21.1949 -28.4765 , norm: 70.6524
+DEAL::  exact third derivative: 1.54322 -19.7862 -19.7862 2.41128 -19.7862 2.41128 2.41128 -30.9159 , norm: 46.3691
+DEAL::
+DEAL::cell 3.43
+DEAL::approx. gradient: -0.0698393 3.16396 , norm: 3.16473
+DEAL::  exact gradient: -0.0728364 3.40714 , norm: 3.40792
+DEAL::approx. second derivative (hessian): 0.257546 13.6221 13.6221 5.45973 , norm: 16.7268
+DEAL::  exact second derivative (hessian): 0.271417 14.6292 14.6292 0.424089 , norm: 14.9772
+DEAL::approx. third derivative: 1.11162 -50.7137 -50.7137 16.0433 -50.7137 16.0433 16.0433 -78.4573 , norm: 121.015
+DEAL::  exact third derivative: 1.16538 -54.5142 -54.5142 1.82091 -54.5142 1.82091 1.82091 -85.1785 , norm: 127.209
+DEAL::
+DEAL::cell 3.44
+DEAL::approx. gradient: -0.731799 3.53649 , norm: 3.61141
+DEAL::  exact gradient: -0.763204 3.77768 , norm: 3.85400
+DEAL::approx. second derivative (hessian): 8.71812 4.69391 4.69391 13.2215 , norm: 16.1759
+DEAL::  exact second derivative (hessian): 9.18766 5.02088 5.02088 14.3557 , norm: 17.4185
+DEAL::approx. third derivative: 11.6479 -56.3798 -56.3798 17.6423 -56.3798 17.6423 17.6423 -87.6951 , norm: 135.262
+DEAL::  exact third derivative: 12.2113 -60.4428 -60.4428 19.0801 -60.4428 19.0801 19.0801 -94.4419 , norm: 145.329
+DEAL::
+DEAL::cell 3.45
+DEAL::approx. gradient: 0.413673 3.66693 , norm: 3.69019
+DEAL::  exact gradient: 0.431425 3.91701 , norm: 3.94069
+DEAL::approx. second derivative (hessian): 9.03967 -2.65338 -2.65338 13.7092 , norm: 14.9087
+DEAL::  exact second derivative (hessian): 9.52653 -2.83822 -2.83822 14.8852 , norm: 16.1090
+DEAL::approx. third derivative: -6.58436 -58.4593 -58.4593 -9.97287 -58.4593 -9.97287 -9.97287 -90.9296 , norm: 137.340
+DEAL::  exact third derivative: -6.90281 -62.6721 -62.6721 -10.7856 -62.6721 -10.7856 -10.7856 -97.9252 , norm: 147.544
+DEAL::
+DEAL::cell 3.46
+DEAL::approx. gradient: -0.0300973 4.40490 , norm: 4.40500
+DEAL::  exact gradient: -0.0313890 4.74345 , norm: 4.74356
+DEAL::approx. second derivative (hessian): 0.358558 5.87044 5.87044 7.60109 , norm: 10.8773
+DEAL::  exact second derivative (hessian): 0.377869 6.30449 6.30449 0.590421 , norm: 6.78953
+DEAL::approx. third derivative: 0.479055 -70.6041 -70.6041 6.91388 -70.6041 6.91388 6.91388 -109.229 , norm: 164.406
+DEAL::  exact third derivative: 0.502223 -75.8953 -75.8953 0.784724 -75.8953 0.784724 0.784724 -118.586 , norm: 177.045
+DEAL::
+DEAL::cell 3.47
+DEAL::approx. gradient: 0.0170135 4.56736 , norm: 4.56739
+DEAL::  exact gradient: 0.0177436 4.91841 , norm: 4.91844
+DEAL::approx. second derivative (hessian): 0.371782 -3.31846 -3.31846 7.88144 , norm: 9.13769
+DEAL::  exact second derivative (hessian): 0.391806 -3.56382 -3.56382 0.612197 , norm: 4.06752
+DEAL::approx. third derivative: -0.270801 -73.2082 -73.2082 -3.90829 -73.2082 -3.90829 -3.90829 -113.258 , norm: 170.152
+DEAL::  exact third derivative: -0.283898 -78.6945 -78.6945 -0.443590 -78.6945 -0.443590 -0.443590 -122.960 , norm: 183.571
+DEAL::
+DEAL::cell 3.48
+DEAL::approx. gradient: 2.28001 -1.17703 , norm: 2.56590
+DEAL::  exact gradient: 2.37785 -1.25731 , norm: 2.68980
+DEAL::approx. second derivative (hessian): 11.1790 3.79590 3.79590 16.9536 , norm: 18.8355
+DEAL::  exact second derivative (hessian): 11.7811 4.06032 4.06032 18.4080 , norm: 20.3352
+DEAL::approx. third derivative: -36.2905 18.7646 18.7646 -54.9667 18.7646 -54.9667 -54.9667 29.1872 , norm: 110.857
+DEAL::  exact third derivative: -38.0457 20.1169 20.1169 -59.4463 20.1169 -59.4463 -59.4463 31.4327 , norm: 119.378
+DEAL::
+DEAL::cell 3.49
+DEAL::approx. gradient: 3.35483 -0.577360 , norm: 3.40415
+DEAL::  exact gradient: 3.49880 -0.616735 , norm: 3.55274
+DEAL::approx. second derivative (hessian): 5.48354 5.58534 5.58534 8.31609 , norm: 12.6619
+DEAL::  exact second derivative (hessian): 5.77887 5.97440 5.97440 9.02949 , norm: 13.5957
+DEAL::approx. third derivative: -53.3983 9.20444 9.20444 -80.8787 9.20444 -80.8787 -80.8787 14.3169 , norm: 151.442
+DEAL::  exact third derivative: -55.9808 9.86775 9.86775 -87.4701 9.86775 -87.4701 -87.4701 15.4184 , norm: 163.146
+DEAL::
+DEAL::cell 3.50
+DEAL::approx. gradient: 2.30459 1.06203 , norm: 2.53752
+DEAL::  exact gradient: 2.40349 1.13446 , norm: 2.65777
+DEAL::approx. second derivative (hessian): 11.2995 -3.42502 -3.42502 17.1364 , norm: 18.7177
+DEAL::  exact second derivative (hessian): 11.9081 -3.66361 -3.66361 18.6064 , norm: 20.2210
+DEAL::approx. third derivative: -36.6817 -16.9312 -16.9312 -55.5593 -16.9312 -55.5593 -55.5593 -26.3354 , norm: 110.271
+DEAL::  exact third derivative: -38.4558 -18.1514 -18.1514 -60.0872 -18.1514 -60.0872 -60.0872 -28.3615 , norm: 118.756
+DEAL::
+DEAL::cell 3.51
+DEAL::approx. gradient: 3.39100 0.520949 , norm: 3.43078
+DEAL::  exact gradient: 3.53652 0.556477 , norm: 3.58003
+DEAL::approx. second derivative (hessian): 5.54265 -5.03962 -5.03962 8.40575 , norm: 12.2132
+DEAL::  exact second derivative (hessian): 5.84117 -5.39068 -5.39068 9.12683 , norm: 13.1195
+DEAL::approx. third derivative: -53.9740 -8.30513 -8.30513 -81.7506 -8.30513 -81.7506 -81.7506 -12.9181 , norm: 152.763
+DEAL::  exact third derivative: -56.5843 -8.90363 -8.90363 -88.4130 -8.90363 -88.4130 -88.4130 -13.9119 , norm: 164.571
+DEAL::
+DEAL::cell 3.52
+DEAL::approx. gradient: 3.60827 0.163673 , norm: 3.61198
+DEAL::  exact gradient: 3.76312 0.174835 , norm: 3.76718
+DEAL::approx. second derivative (hessian): -1.55450 6.00729 6.00729 -2.35749 , norm: 7.97668
+DEAL::  exact second derivative (hessian): -1.63822 6.42575 6.42575 -2.55972 , norm: 8.54122
+DEAL::approx. third derivative: -57.4323 -2.60932 -2.60932 -86.9887 -2.60932 -86.9887 -86.9887 -4.05863 , norm: 161.358
+DEAL::  exact third derivative: -60.2100 -2.79736 -2.79736 -94.0781 -2.79736 -94.0781 -94.0781 -4.37087 , norm: 173.839
+DEAL::
+DEAL::cell 3.53
+DEAL::approx. gradient: 3.50800 0.864632 , norm: 3.61298
+DEAL::  exact gradient: 3.10610 0.923599 , norm: 3.24051
+DEAL::approx. second derivative (hessian): -5.20161 5.40338 5.40338 -12.4539 , norm: 15.3351
+DEAL::  exact second derivative (hessian): -8.65422 5.30384 5.30384 -13.5222 , norm: 16.9239
+DEAL::approx. third derivative: -55.8363 -10.4129 -10.4129 -76.1794 -10.4129 -76.1794 -76.1794 -21.4405 , norm: 145.988
+DEAL::  exact third derivative: -49.6976 -14.7776 -14.7776 -77.6525 -14.7776 -77.6525 -77.6525 -23.0900 , norm: 147.472
+DEAL::
+DEAL::cell 3.54
+DEAL::approx. gradient: 3.64717 -0.147681 , norm: 3.65016
+DEAL::  exact gradient: 3.80369 -0.157753 , norm: 3.80696
+DEAL::approx. second derivative (hessian): -1.57126 -5.42035 -5.42035 -2.38290 , norm: 7.41260
+DEAL::  exact second derivative (hessian): -1.65588 -5.79792 -5.79792 -2.58732 , norm: 7.93820
+DEAL::approx. third derivative: -58.0515 2.35438 2.35438 -87.9265 2.35438 -87.9265 -87.9265 3.66208 , norm: 163.074
+DEAL::  exact third derivative: -60.8591 2.52404 2.52404 -95.0923 2.52404 -95.0923 -95.0923 3.94382 , norm: 175.688
+DEAL::
+DEAL::cell 3.55
+DEAL::approx. gradient: 3.54582 -0.780154 , norm: 3.63063
+DEAL::  exact gradient: 3.13958 -0.833359 , norm: 3.24830
+DEAL::approx. second derivative (hessian): -5.25768 -4.87544 -4.87544 -12.5881 , norm: 15.0224
+DEAL::  exact second derivative (hessian): -8.74752 -4.78563 -4.78563 -13.6680 , norm: 16.5888
+DEAL::approx. third derivative: -56.4382 9.39547 9.39547 -77.0006 9.39547 -77.0006 -77.0006 19.3456 , norm: 147.009
+DEAL::  exact third derivative: -50.2334 13.3337 13.3337 -78.4896 13.3337 -78.4896 -78.4896 20.8340 , norm: 148.232
+DEAL::
+DEAL::cell 3.56
+DEAL::approx. gradient: 1.45786 2.89957 , norm: 3.24544
+DEAL::  exact gradient: 1.52043 3.09732 , norm: 3.45037
+DEAL::approx. second derivative (hessian): 7.14799 -9.35104 -9.35104 10.8403 , norm: 18.5257
+DEAL::  exact second derivative (hessian): 7.53297 -10.0024 -10.0024 11.7703 , norm: 19.8760
+DEAL::approx. third derivative: -23.2046 -46.2259 -46.2259 -35.1463 -46.2259 -35.1463 -35.1463 -71.9013 , norm: 125.796
+DEAL::  exact third derivative: -24.3268 -49.5571 -49.5571 -38.0107 -49.5571 -38.0107 -38.0107 -77.4330 , norm: 135.240
+DEAL::
+DEAL::cell 3.57
+DEAL::approx. gradient: 2.14512 1.42230 , norm: 2.57380
+DEAL::  exact gradient: 2.23717 1.51930 , norm: 2.70430
+DEAL::approx. second derivative (hessian): 3.50624 -13.7592 -13.7592 5.31741 , norm: 18.2008
+DEAL::  exact second derivative (hessian): 3.69508 -14.7177 -14.7177 5.77356 , norm: 19.4886
+DEAL::approx. third derivative: -34.1435 -22.6747 -22.6747 -51.7147 -22.6747 -51.7147 -51.7147 -35.2691 , norm: 109.432
+DEAL::  exact third derivative: -35.7948 -24.3088 -24.3088 -55.9294 -24.3088 -55.9294 -55.9294 -37.9825 , norm: 117.818
+DEAL::
+DEAL::cell 3.58
+DEAL::approx. gradient: 0.0599588 3.61158 , norm: 3.61207
+DEAL::  exact gradient: 0.0625319 3.88916 , norm: 3.88966
+DEAL::approx. second derivative (hessian): 0.293982 -11.6949 -11.6949 6.23214 , norm: 15.3289
+DEAL::  exact second derivative (hessian): 0.309815 -12.5596 -12.5596 0.484086 , norm: 12.9568
+DEAL::approx. third derivative: -0.954355 -57.8883 -57.8883 -13.7736 -57.8883 -13.7736 -13.7736 -89.5570 , norm: 136.542
+DEAL::  exact third derivative: -1.00051 -62.2266 -62.2266 -1.56330 -62.2266 -1.56330 -1.56330 -97.2290 , norm: 145.184
+DEAL::
+DEAL::cell 3.59
+DEAL::approx. gradient: 0.0882242 1.77155 , norm: 1.77375
+DEAL::  exact gradient: 0.0920103 1.90771 , norm: 1.90993
+DEAL::approx. second derivative (hessian): 0.144204 -17.2080 -17.2080 3.05699 , norm: 18.8701
+DEAL::  exact second derivative (hessian): 0.151971 -18.4803 -18.4803 0.237454 , norm: 18.6751
+DEAL::approx. third derivative: -1.40425 -28.3954 -28.3954 -20.2666 -28.3954 -20.2666 -20.2666 -43.9296 , norm: 74.7187
+DEAL::  exact third derivative: -1.47216 -30.5234 -30.5234 -2.30026 -30.5234 -2.30026 -2.30026 -47.6928 , norm: 71.3280
+DEAL::
+DEAL::cell 3.60
+DEAL::approx. gradient: 2.30717 -0.403201 , norm: 2.34214
+DEAL::  exact gradient: 2.40618 -0.430698 , norm: 2.44443
+DEAL::approx. second derivative (hessian): -0.993965 -14.7987 -14.7987 -1.50740 , norm: 16.0516
+DEAL::  exact second derivative (hessian): -1.04750 -15.8295 -15.8295 -1.63672 , norm: 17.1744
+DEAL::approx. third derivative: -36.7229 6.42795 6.42795 -55.6216 6.42795 -55.6216 -55.6216 9.99825 , norm: 104.181
+DEAL::  exact third derivative: -38.4989 6.89117 6.89117 -60.1546 6.89117 -60.1546 -60.1546 10.7675 , norm: 112.233
+DEAL::
+DEAL::cell 3.61
+DEAL::approx. gradient: 2.24306 -2.12998 , norm: 3.09324
+DEAL::  exact gradient: 1.98608 -2.27525 , norm: 3.02014
+DEAL::approx. second derivative (hessian): -3.32597 -13.3110 -13.3110 -7.96315 , norm: 19.1560
+DEAL::  exact second derivative (hessian): -5.53361 -13.0658 -13.0658 -8.64627 , norm: 20.2481
+DEAL::approx. third derivative: -35.7024 25.6516 25.6516 -48.7100 25.6516 -48.7100 -48.7100 52.8177 , norm: 114.701
+DEAL::  exact third derivative: -31.7772 36.4039 36.4039 -49.6519 36.4039 -49.6519 -49.6519 56.8811 , norm: 124.968
+DEAL::
+DEAL::cell 3.62
+DEAL::approx. gradient: 0.0948891 -0.502209 , norm: 0.511094
+DEAL::  exact gradient: 0.0989613 -0.540808 , norm: 0.549788
+DEAL::approx. second derivative (hessian): -0.0408797 -18.5080 -18.5080 -0.866611 , norm: 18.9663
+DEAL::  exact second derivative (hessian): -0.0430814 -19.8764 -19.8764 -0.0673147 , norm: 19.9316
+DEAL::approx. third derivative: -1.51034 8.04968 8.04968 -21.7977 8.04968 -21.7977 -21.7977 12.4534 , norm: 42.1565
+DEAL::  exact third derivative: -1.58338 8.65293 8.65293 -2.47403 8.65293 -2.47403 -2.47403 13.5202 , norm: 20.6950
+DEAL::
+DEAL::cell 3.63
+DEAL::approx. gradient: 0.0922522 -2.65301 , norm: 2.65462
+DEAL::  exact gradient: 0.0816831 -2.85692 , norm: 2.85809
+DEAL::approx. second derivative (hessian): -0.136790 -16.6529 -16.6529 -4.57804 , norm: 19.1577
+DEAL::  exact second derivative (hessian): -0.227586 -16.4061 -16.4061 -0.355603 , norm: 16.6978
+DEAL::approx. third derivative: -1.46836 32.0954 32.0954 -18.1070 32.0954 -18.1070 -18.1070 65.7873 , norm: 91.6737
+DEAL::  exact third derivative: -1.30693 45.7107 45.7107 -2.04208 45.7107 -2.04208 -2.04208 71.4230 , norm: 106.695
+DEAL::
+DEAL::
+DEAL::------------ 3D ------------
+DEAL::
+DEAL::cell 2.0
+DEAL::approx. gradient: 1.68054 -2.12960 0.00000 , norm: 2.71283
+DEAL::  exact gradient: 2.84675 -1.40255 0.00000 , norm: 3.17350
+DEAL::approx. second derivative (hessian): -10.0384 -10.3133 0.00000 -10.3133 -3.31217 2.22045e-16 0.00000 2.22045e-16 0.00000 , norm: 17.5230
+DEAL::  exact second derivative (hessian): -6.22074 -10.2694 0.00000 -10.2694 -9.71991 0.00000 0.00000 0.00000 0.00000 , norm: 18.3877
+DEAL::approx. third derivative: -26.3331 33.7236 -1.00945e-09 33.7236 -29.0569 -1.02148e-09 -1.00945e-09 -1.02148e-09 1.38239e-14 33.7236 -29.0569 -1.02148e-09 -29.0569 51.5294 -9.10732e-11 -1.02148e-09 -9.10732e-11 -3.46920e-15 -1.00945e-09 -1.02148e-09 1.38239e-14 -1.02148e-09 -9.10732e-11 -3.46920e-15 1.38239e-14 -3.46920e-15 0.00000 , norm: 96.4027
+DEAL::  exact third derivative: -45.5480 22.4408 0.00000 22.4408 -71.1687 0.00000 0.00000 0.00000 0.00000 22.4408 -71.1687 0.00000 -71.1687 35.0638 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 141.456
+DEAL::
+DEAL::cell 2.1
+DEAL::approx. gradient: 0.193085 -4.43086 0.00000 , norm: 4.43506
+DEAL::  exact gradient: 0.229461 -2.91816 0.00000 , norm: 2.92717
+DEAL::approx. second derivative (hessian): -10.4429 -0.928602 2.22045e-16 -0.928602 -6.89131 4.44089e-16 2.22045e-16 4.44089e-16 0.00000 , norm: 10.6711
+DEAL::  exact second derivative (hessian): -12.9429 -0.827763 0.00000 -0.827763 -20.2233 0.00000 0.00000 0.00000 0.00000 , norm: 20.3162
+DEAL::approx. third derivative: -3.02553 46.6543 -2.30673e-09 46.6543 -2.80690 -1.26564e-09 -2.30673e-09 -1.26564e-09 -1.66238e-14 46.6543 -2.80690 -1.26564e-09 -2.80690 107.212 -1.03269e-09 -1.26564e-09 -1.03269e-09 -6.83620e-15 -2.30673e-09 -1.26564e-09 -1.66238e-14 -1.26564e-09 -1.03269e-09 -6.83620e-15 -1.66238e-14 -6.83620e-15 0.00000 , norm: 134.377
+DEAL::  exact third derivative: -3.67138 46.6905 0.00000 46.6905 -5.73653 0.00000 0.00000 0.00000 0.00000 46.6905 -5.73653 0.00000 -5.73653 72.9539 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 109.428
+DEAL::
+DEAL::cell 2.2
+DEAL::approx. gradient: -0.620717 -1.73631 0.00000 , norm: 1.84393
+DEAL::  exact gradient: -1.05146 -2.28707 0.00000 , norm: 2.51719
+DEAL::approx. second derivative (hessian): 3.70772 -10.7223 0.00000 -10.7223 2.55155 0.00000 0.00000 0.00000 0.00000 , norm: 13.8675
+DEAL::  exact second derivative (hessian): 2.29766 -16.7458 0.00000 -16.7458 3.59010 0.00000 0.00000 0.00000 0.00000 , norm: 19.7021
+DEAL::approx. third derivative: 9.72628 45.9222 4.11639e-10 45.9222 16.9488 -8.82233e-10 4.11639e-10 -8.82233e-10 0.00000 45.9222 16.9488 -8.82233e-10 16.9488 42.0131 3.19990e-10 -8.82233e-10 3.19990e-10 -2.36848e-15 4.11639e-10 -8.82233e-10 0.00000 -8.82233e-10 3.19990e-10 -2.36848e-15 0.00000 -2.36848e-15 0.00000 , norm: 95.1212
+DEAL::  exact third derivative: 16.8234 36.5930 0.00000 36.5930 26.2865 0.00000 0.00000 0.00000 0.00000 36.5930 26.2865 0.00000 26.2865 57.1766 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 98.1952
+DEAL::
+DEAL::cell 2.3
+DEAL::approx. gradient: -0.0713169 -3.61258 0.00000 , norm: 3.61328
+DEAL::  exact gradient: -0.0847526 -4.75848 0.00000 , norm: 4.75923
+DEAL::approx. second derivative (hessian): 3.85715 -1.02293 0.00000 -1.02293 5.30876 0.00000 0.00000 0.00000 0.00000 , norm: 5.83722
+DEAL::  exact second derivative (hessian): 4.78053 -1.34979 0.00000 -1.34979 7.46958 0.00000 0.00000 0.00000 0.00000 , norm: 8.03022
+DEAL::approx. third derivative: 1.11750 57.2075 7.77759e-10 57.2075 1.53782 3.77879e-10 7.77759e-10 3.77879e-10 -1.65793e-14 57.2075 1.53782 3.77879e-10 1.53782 87.4126 1.15707e-09 3.77879e-10 1.15707e-09 -9.47390e-15 7.77759e-10 3.77879e-10 -1.65793e-14 3.77879e-10 1.15707e-09 -9.47390e-15 -1.65793e-14 -9.47390e-15 0.00000 , norm: 132.164
+DEAL::  exact third derivative: 1.35604 76.1357 0.00000 76.1357 2.11882 0.00000 0.00000 0.00000 0.00000 76.1357 2.11882 0.00000 2.11882 118.962 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 177.643
+DEAL::
+DEAL::cell 2.4
+DEAL::approx. gradient: 1.68054 -2.12960 0.00000 , norm: 2.71283
+DEAL::  exact gradient: 2.84675 -1.40255 0.00000 , norm: 3.17350
+DEAL::approx. second derivative (hessian): -10.0384 -10.3133 0.00000 -10.3133 -3.31217 0.00000 0.00000 0.00000 0.00000 , norm: 17.5230
+DEAL::  exact second derivative (hessian): -6.22074 -10.2694 0.00000 -10.2694 -9.71991 0.00000 0.00000 0.00000 0.00000 , norm: 18.3877
+DEAL::approx. third derivative: -26.3331 33.7236 -1.00947e-09 33.7236 -29.0569 -1.12650e-09 -1.00947e-09 -1.12650e-09 4.73695e-15 33.7236 -29.0569 -1.12650e-09 -29.0569 51.5294 -2.13648e-10 -1.12650e-09 -2.13648e-10 -4.73695e-15 -1.00947e-09 -1.12650e-09 4.73695e-15 -1.12650e-09 -2.13648e-10 -4.73695e-15 4.73695e-15 -4.73695e-15 0.00000 , norm: 96.4027
+DEAL::  exact third derivative: -45.5480 22.4408 0.00000 22.4408 -71.1687 0.00000 0.00000 0.00000 0.00000 22.4408 -71.1687 0.00000 -71.1687 35.0638 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 141.456
+DEAL::
+DEAL::cell 2.5
+DEAL::approx. gradient: 0.193085 -4.43086 0.00000 , norm: 4.43506
+DEAL::  exact gradient: 0.229461 -2.91816 0.00000 , norm: 2.92717
+DEAL::approx. second derivative (hessian): -10.4429 -0.928602 2.22045e-16 -0.928602 -6.89131 4.44089e-16 2.22045e-16 4.44089e-16 0.00000 , norm: 10.6711
+DEAL::  exact second derivative (hessian): -12.9429 -0.827763 0.00000 -0.827763 -20.2233 0.00000 0.00000 0.00000 0.00000 , norm: 20.3162
+DEAL::approx. third derivative: -3.02553 46.6543 -2.30673e-09 46.6543 -2.80690 -1.27771e-09 -2.30673e-09 -1.27771e-09 -4.44540e-17 46.6543 -2.80690 -1.27771e-09 -2.80690 107.212 -1.28772e-09 -1.27771e-09 -1.28772e-09 -6.83620e-15 -2.30673e-09 -1.27771e-09 -4.44540e-17 -1.27771e-09 -1.28772e-09 -6.83620e-15 -4.44540e-17 -6.83620e-15 0.00000 , norm: 134.377
+DEAL::  exact third derivative: -3.67138 46.6905 0.00000 46.6905 -5.73653 0.00000 0.00000 0.00000 0.00000 46.6905 -5.73653 0.00000 -5.73653 72.9539 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 109.428
+DEAL::
+DEAL::cell 2.6
+DEAL::approx. gradient: -0.620717 -1.73631 0.00000 , norm: 1.84393
+DEAL::  exact gradient: -1.05146 -2.28707 0.00000 , norm: 2.51719
+DEAL::approx. second derivative (hessian): 3.70772 -10.7223 0.00000 -10.7223 2.55155 0.00000 0.00000 0.00000 0.00000 , norm: 13.8675
+DEAL::  exact second derivative (hessian): 2.29766 -16.7458 0.00000 -16.7458 3.59010 0.00000 0.00000 0.00000 0.00000 , norm: 19.7021
+DEAL::approx. third derivative: 9.72628 45.9222 7.54106e-10 45.9222 16.9488 -1.27193e-09 7.54106e-10 -1.27193e-09 0.00000 45.9222 16.9488 -1.27193e-09 16.9488 42.0131 5.08842e-10 -1.27193e-09 5.08842e-10 -2.36848e-15 7.54106e-10 -1.27193e-09 0.00000 -1.27193e-09 5.08842e-10 -2.36848e-15 0.00000 -2.36848e-15 0.00000 , norm: 95.1212
+DEAL::  exact third derivative: 16.8234 36.5930 0.00000 36.5930 26.2865 0.00000 0.00000 0.00000 0.00000 36.5930 26.2865 0.00000 26.2865 57.1766 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 98.1952
+DEAL::
+DEAL::cell 2.7
+DEAL::approx. gradient: -0.0713169 -3.61258 0.00000 , norm: 3.61328
+DEAL::  exact gradient: -0.0847526 -4.75848 0.00000 , norm: 4.75923
+DEAL::approx. second derivative (hessian): 3.85715 -1.02293 -8.88178e-16 -1.02293 5.30876 -4.44089e-16 -8.88178e-16 -4.44089e-16 0.00000 , norm: 5.83722
+DEAL::  exact second derivative (hessian): 4.78053 -1.34979 0.00000 -1.34979 7.46958 0.00000 0.00000 0.00000 0.00000 , norm: 8.03022
+DEAL::approx. third derivative: 1.11750 57.2075 7.77754e-10 57.2075 1.53782 4.17231e-10 7.77754e-10 4.17231e-10 8.51555e-15 57.2075 1.53782 4.17231e-10 1.53782 87.4126 7.64140e-10 4.17231e-10 7.64140e-10 -6.79033e-15 7.77754e-10 4.17231e-10 8.51555e-15 4.17231e-10 7.64140e-10 -6.79033e-15 8.51555e-15 -6.79033e-15 0.00000 , norm: 132.164
+DEAL::  exact third derivative: 1.35604 76.1357 0.00000 76.1357 2.11882 0.00000 0.00000 0.00000 0.00000 76.1357 2.11882 0.00000 2.11882 118.962 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 177.643
+DEAL::
+DEAL::cell 2.8
+DEAL::approx. gradient: -2.18681 -2.65841 0.00000 , norm: 3.44227
+DEAL::  exact gradient: -2.59879 -1.75082 0.00000 , norm: 3.13354
+DEAL::approx. second derivative (hessian): -6.26549 10.5170 0.00000 10.5170 -4.13461 -2.22045e-16 0.00000 -2.22045e-16 0.00000 , norm: 15.7709
+DEAL::  exact second derivative (hessian): -7.76542 9.37494 0.00000 9.37494 -12.1335 0.00000 0.00000 0.00000 0.00000 , norm: 19.5754
+DEAL::approx. third derivative: 34.2660 27.9914 -1.29600e-09 27.9914 31.7900 1.24725e-09 -1.29600e-09 1.24725e-09 1.09559e-15 27.9914 31.7900 1.24725e-09 31.7900 64.3247 1.56142e-09 1.24725e-09 1.56142e-09 1.58255e-15 -1.29600e-09 1.24725e-09 1.09559e-15 1.24725e-09 1.56142e-09 1.58255e-15 1.09559e-15 1.58255e-15 0.00000 , norm: 103.413
+DEAL::  exact third derivative: 41.5807 28.0132 0.00000 28.0132 64.9698 0.00000 0.00000 0.00000 0.00000 28.0132 64.9698 0.00000 64.9698 43.7706 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 136.610
+DEAL::
+DEAL::cell 2.9
+DEAL::approx. gradient: -3.07924 1.55817 0.00000 , norm: 3.45104
+DEAL::  exact gradient: -3.03773 1.02621 0.00000 , norm: 3.20638
+DEAL::approx. second derivative (hessian): -1.68350 13.1766 -4.44089e-16 13.1766 2.42343 -1.11022e-16 -4.44089e-16 -1.11022e-16 0.00000 , norm: 13.7056
+DEAL::  exact second derivative (hessian): 4.55156 10.9584 0.00000 10.9584 7.11181 0.00000 0.00000 0.00000 0.00000 , norm: 16.8646
+DEAL::approx. third derivative: 48.2500 -4.34834 -1.30125e-10 -4.34834 41.3783 2.59623e-10 -1.30125e-10 2.59623e-10 7.08936e-16 -4.34834 41.3783 2.59623e-10 41.3783 -37.7027 2.69057e-10 2.59623e-10 2.69057e-10 -9.27584e-16 -1.30125e-10 2.59623e-10 7.08936e-16 2.59623e-10 2.69057e-10 -9.27584e-16 7.08936e-16 -9.27584e-16 0.00000 , norm: 94.5662
+DEAL::  exact third derivative: 48.6036 -16.4194 0.00000 -16.4194 75.9432 0.00000 0.00000 0.00000 0.00000 -16.4194 75.9432 0.00000 75.9432 -25.6553 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 145.366
+DEAL::
+DEAL::cell 2.10
+DEAL::approx. gradient: 0.807709 -2.16746 0.00000 , norm: 2.31306
+DEAL::  exact gradient: 0.959877 -2.85497 0.00000 , norm: 3.01201
+DEAL::approx. second derivative (hessian): 2.31419 11.5854 0.00000 11.5854 3.18513 0.00000 0.00000 0.00000 0.00000 , norm: 14.3432
+DEAL::  exact second derivative (hessian): 2.86820 15.2872 0.00000 15.2872 4.48156 0.00000 0.00000 0.00000 0.00000 , norm: 18.9833
+DEAL::approx. third derivative: -12.6563 34.3231 4.28212e-10 34.3231 -17.4168 1.42369e-09 4.28212e-10 1.42369e-09 1.59872e-14 34.3231 -17.4168 1.42369e-09 -17.4168 52.4454 1.76520e-09 1.42369e-09 1.76520e-09 4.73695e-15 4.28212e-10 1.42369e-09 1.59872e-14 1.42369e-09 1.76520e-09 4.73695e-15 1.59872e-14 4.73695e-15 0.00000 , norm: 85.7611
+DEAL::  exact third derivative: -15.3580 45.6795 0.00000 45.6795 -23.9969 0.00000 0.00000 0.00000 0.00000 45.6795 -23.9969 0.00000 -23.9969 71.3742 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 115.402
+DEAL::
+DEAL::cell 2.11
+DEAL::approx. gradient: 1.13734 1.27041 0.00000 , norm: 1.70513
+DEAL::  exact gradient: 1.12200 1.67339 0.00000 , norm: 2.01472
+DEAL::approx. second derivative (hessian): 0.621808 14.9824 0.00000 14.9824 -1.86690 0.00000 0.00000 0.00000 0.00000 , norm: 15.6565
+DEAL::  exact second derivative (hessian): -1.68114 17.8692 0.00000 17.8692 -2.62678 0.00000 0.00000 0.00000 0.00000 , norm: 20.0294
+DEAL::approx. third derivative: -17.8214 -0.455036 1.23206e-09 -0.455036 -21.9168 1.88659e-09 1.23206e-09 1.88659e-09 -1.18424e-15 -0.455036 -21.9168 1.88659e-09 -21.9168 -30.7399 -4.83623e-10 1.88659e-09 -4.83623e-10 0.00000 1.23206e-09 1.88659e-09 -1.18424e-15 1.88659e-09 -4.83623e-10 0.00000 -1.18424e-15 0.00000 0.00000 , norm: 52.0019
+DEAL::  exact third derivative: -17.9520 -26.7742 0.00000 -26.7742 -28.0500 0.00000 0.00000 0.00000 0.00000 -26.7742 -28.0500 0.00000 -28.0500 -41.8347 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 81.1381
+DEAL::
+DEAL::cell 2.12
+DEAL::approx. gradient: -2.18681 -2.65841 0.00000 , norm: 3.44227
+DEAL::  exact gradient: -2.59879 -1.75082 0.00000 , norm: 3.13354
+DEAL::approx. second derivative (hessian): -6.26549 10.5170 0.00000 10.5170 -4.13461 -2.22045e-16 0.00000 -2.22045e-16 0.00000 , norm: 15.7709
+DEAL::  exact second derivative (hessian): -7.76542 9.37494 0.00000 9.37494 -12.1335 0.00000 0.00000 0.00000 0.00000 , norm: 19.5754
+DEAL::approx. third derivative: 34.2660 27.9914 -1.29600e-09 27.9914 31.7900 8.37303e-10 -1.29600e-09 8.37303e-10 -6.60196e-15 27.9914 31.7900 8.37303e-10 31.7900 64.3247 2.02044e-09 8.37303e-10 2.02044e-09 1.58255e-15 -1.29600e-09 8.37303e-10 -6.60196e-15 8.37303e-10 2.02044e-09 1.58255e-15 -6.60196e-15 1.58255e-15 0.00000 , norm: 103.413
+DEAL::  exact third derivative: 41.5807 28.0132 0.00000 28.0132 64.9698 0.00000 0.00000 0.00000 0.00000 28.0132 64.9698 0.00000 64.9698 43.7706 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 136.610
+DEAL::
+DEAL::cell 2.13
+DEAL::approx. gradient: -3.07924 1.55817 0.00000 , norm: 3.45104
+DEAL::  exact gradient: -3.03773 1.02621 0.00000 , norm: 3.20638
+DEAL::approx. second derivative (hessian): -1.68350 13.1766 0.00000 13.1766 2.42343 0.00000 0.00000 0.00000 0.00000 , norm: 13.7056
+DEAL::  exact second derivative (hessian): 4.55156 10.9584 0.00000 10.9584 7.11181 0.00000 0.00000 0.00000 0.00000 , norm: 16.8646
+DEAL::approx. third derivative: 48.2500 -4.34834 -1.30128e-10 -4.34834 41.3783 4.52042e-10 -1.30128e-10 4.52042e-10 0.00000 -4.34834 41.3783 4.52042e-10 41.3783 -37.7027 3.58740e-10 4.52042e-10 3.58740e-10 -1.18424e-15 -1.30128e-10 4.52042e-10 0.00000 4.52042e-10 3.58740e-10 -1.18424e-15 0.00000 -1.18424e-15 0.00000 , norm: 94.5662
+DEAL::  exact third derivative: 48.6036 -16.4194 0.00000 -16.4194 75.9432 0.00000 0.00000 0.00000 0.00000 -16.4194 75.9432 0.00000 75.9432 -25.6553 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 145.366
+DEAL::
+DEAL::cell 2.14
+DEAL::approx. gradient: 0.807709 -2.16746 0.00000 , norm: 2.31306
+DEAL::  exact gradient: 0.959877 -2.85497 0.00000 , norm: 3.01201
+DEAL::approx. second derivative (hessian): 2.31419 11.5854 5.55112e-17 11.5854 3.18513 -2.22045e-16 5.55112e-17 -2.22045e-16 0.00000 , norm: 14.3432
+DEAL::  exact second derivative (hessian): 2.86820 15.2872 0.00000 15.2872 4.48156 0.00000 0.00000 0.00000 0.00000 , norm: 18.9833
+DEAL::approx. third derivative: -12.6563 34.3231 4.28208e-10 34.3231 -17.4168 2.76067e-09 4.28208e-10 2.76067e-09 -8.47953e-15 34.3231 -17.4168 2.76067e-09 -17.4168 52.4454 2.47243e-09 2.76067e-09 2.47243e-09 6.34703e-15 4.28208e-10 2.76067e-09 -8.47953e-15 2.76067e-09 2.47243e-09 6.34703e-15 -8.47953e-15 6.34703e-15 0.00000 , norm: 85.7611
+DEAL::  exact third derivative: -15.3580 45.6795 0.00000 45.6795 -23.9969 0.00000 0.00000 0.00000 0.00000 45.6795 -23.9969 0.00000 -23.9969 71.3742 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 115.402
+DEAL::
+DEAL::cell 2.15
+DEAL::approx. gradient: 1.13734 1.27041 0.00000 , norm: 1.70513
+DEAL::  exact gradient: 1.12200 1.67339 0.00000 , norm: 2.01472
+DEAL::approx. second derivative (hessian): 0.621808 14.9824 0.00000 14.9824 -1.86690 0.00000 0.00000 0.00000 0.00000 , norm: 15.6565
+DEAL::  exact second derivative (hessian): -1.68114 17.8692 0.00000 17.8692 -2.62678 0.00000 0.00000 0.00000 0.00000 , norm: 20.0294
+DEAL::approx. third derivative: -17.8214 -0.455036 1.85958e-09 -0.455036 -21.9168 5.96971e-10 1.85958e-09 5.96971e-10 -1.18424e-15 -0.455036 -21.9168 5.96971e-10 -21.9168 -30.7399 -2.07267e-10 5.96971e-10 -2.07267e-10 0.00000 1.85958e-09 5.96971e-10 -1.18424e-15 5.96971e-10 -2.07267e-10 0.00000 -1.18424e-15 0.00000 0.00000 , norm: 52.0019
+DEAL::  exact third derivative: -17.9520 -26.7742 0.00000 -26.7742 -28.0500 0.00000 0.00000 0.00000 0.00000 -26.7742 -28.0500 0.00000 -28.0500 -41.8347 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 81.1381
+DEAL::
+DEAL::cell 2.16
+DEAL::approx. gradient: -2.07199 -0.0301951 0.00000 , norm: 2.07221
+DEAL::  exact gradient: -3.50985 -0.0397729 0.00000 , norm: 3.51007
+DEAL::approx. second derivative (hessian): 12.3766 -0.186464 0.00000 -0.186464 8.51723 0.00000 0.00000 0.00000 0.00000 , norm: 12.3856
+DEAL::  exact second derivative (hessian): 7.66975 -0.291215 0.00000 -0.291215 11.9840 0.00000 0.00000 0.00000 0.00000 , norm: 12.0036
+DEAL::approx. third derivative: 32.4669 0.798604 1.38599e-09 0.798604 56.5762 -4.62318e-10 1.38599e-09 -4.62318e-10 -9.47390e-15 0.798604 56.5762 -4.62318e-10 56.5762 0.730622 2.21033e-09 -4.62318e-10 2.21033e-09 1.18424e-15 1.38599e-09 -4.62318e-10 -9.47390e-15 -4.62318e-10 2.21033e-09 1.18424e-15 -9.47390e-15 1.18424e-15 0.00000 , norm: 103.243
+DEAL::  exact third derivative: 56.1576 0.636366 0.00000 0.636366 87.7462 0.00000 0.00000 0.00000 0.00000 0.636366 87.7462 0.00000 87.7462 0.994322 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 162.031
+DEAL::
+DEAL::cell 2.17
+DEAL::approx. gradient: -0.238060 -0.0628240 0.00000 , norm: 0.246211
+DEAL::  exact gradient: -0.282910 -0.0827516 0.00000 , norm: 0.294764
+DEAL::approx. second derivative (hessian): 12.8754 -0.0177892 0.00000 -0.0177892 17.7210 0.00000 0.00000 0.00000 0.00000 , norm: 17.7211
+DEAL::  exact second derivative (hessian): 15.9577 -0.0234733 0.00000 -0.0234733 24.9339 0.00000 0.00000 0.00000 0.00000 , norm: 24.9340
+DEAL::approx. third derivative: 3.73027 0.994859 2.86029e-09 0.994859 5.13335 7.69358e-10 2.86029e-09 7.69358e-10 4.73695e-15 0.994859 5.13335 7.69358e-10 5.13335 1.52014 4.58687e-09 7.69358e-10 4.58687e-09 0.00000 2.86029e-09 7.69358e-10 4.73695e-15 7.69358e-10 4.58687e-09 0.00000 4.73695e-15 0.00000 0.00000 , norm: 9.91205
+DEAL::  exact third derivative: 4.52656 1.32403 0.00000 1.32403 7.07275 0.00000 0.00000 0.00000 0.00000 1.32403 7.07275 0.00000 7.07275 2.06879 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 13.4201
+DEAL::
+DEAL::cell 2.18
+DEAL::approx. gradient: -0.685975 1.28263 0.00000 , norm: 1.45455
+DEAL::  exact gradient: -1.16200 2.26198 0.00000 , norm: 2.54299
+DEAL::approx. second derivative (hessian): 4.09752 9.07897 0.00000 9.07897 8.61921 0.00000 0.00000 0.00000 0.00000 , norm: 15.7146
+DEAL::  exact second derivative (hessian): 2.53922 16.5621 0.00000 16.5621 3.96754 0.00000 0.00000 0.00000 0.00000 , norm: 19.8309
+DEAL::approx. third derivative: 10.7488 -43.1484 -1.57746e-09 -43.1484 45.8745 -2.01924e-09 -1.57746e-09 -2.01924e-09 -2.36848e-15 -43.1484 45.8745 -2.01924e-09 45.8745 -31.0355 -3.03740e-09 -2.01924e-09 -3.03740e-09 2.36848e-15 -1.57746e-09 -2.01924e-09 -2.36848e-15 -2.01924e-09 -3.03740e-09 2.36848e-15 -2.36848e-15 2.36848e-15 0.00000 , norm: 113.919
+DEAL::  exact third derivative: 18.5921 -36.1917 0.00000 -36.1917 29.0501 0.00000 0.00000 0.00000 0.00000 -36.1917 29.0501 0.00000 29.0501 -56.5496 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 100.024
+DEAL::
+DEAL::cell 2.19
+DEAL::approx. gradient: -0.0788147 2.66865 0.00000 , norm: 2.66981
+DEAL::  exact gradient: -0.0936630 4.70629 0.00000 , norm: 4.70722
+DEAL::approx. second derivative (hessian): 4.26266 0.888734 0.00000 0.888734 17.9332 0.00000 0.00000 0.00000 0.00000 , norm: 17.9907
+DEAL::  exact second derivative (hessian): 5.28312 1.33498 0.00000 1.33498 8.25488 0.00000 0.00000 0.00000 0.00000 , norm: 8.76650
+DEAL::approx. third derivative: 1.23498 -51.8568 7.12995e-10 -51.8568 3.88741 -1.61228e-09 7.12995e-10 -1.61228e-09 0.00000 -51.8568 3.88741 -1.61228e-09 3.88741 -64.5726 -5.81177e-09 -1.61228e-09 -5.81177e-09 9.47390e-15 7.12995e-10 -1.61228e-09 0.00000 -1.61228e-09 -5.81177e-09 9.47390e-15 0.00000 9.47390e-15 0.00000 , norm: 110.833
+DEAL::  exact third derivative: 1.49861 -75.3007 0.00000 -75.3007 2.34157 0.00000 0.00000 0.00000 0.00000 -75.3007 2.34157 0.00000 2.34157 -117.657 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 175.706
+DEAL::
+DEAL::cell 2.20
+DEAL::approx. gradient: -2.07199 -0.0301951 0.00000 , norm: 2.07221
+DEAL::  exact gradient: -3.50985 -0.0397729 0.00000 , norm: 3.51007
+DEAL::approx. second derivative (hessian): 12.3766 -0.186464 0.00000 -0.186464 8.51723 0.00000 0.00000 0.00000 0.00000 , norm: 12.3856
+DEAL::  exact second derivative (hessian): 7.66975 -0.291215 0.00000 -0.291215 11.9840 0.00000 0.00000 0.00000 0.00000 , norm: 12.0036
+DEAL::approx. third derivative: 32.4669 0.798604 1.38599e-09 0.798604 56.5762 -4.62318e-10 1.38599e-09 -4.62318e-10 -9.47390e-15 0.798604 56.5762 -4.62318e-10 56.5762 0.730622 2.21033e-09 -4.62318e-10 2.21033e-09 1.18424e-15 1.38599e-09 -4.62318e-10 -9.47390e-15 -4.62318e-10 2.21033e-09 1.18424e-15 -9.47390e-15 1.18424e-15 0.00000 , norm: 103.243
+DEAL::  exact third derivative: 56.1576 0.636366 0.00000 0.636366 87.7462 0.00000 0.00000 0.00000 0.00000 0.636366 87.7462 0.00000 87.7462 0.994322 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 162.031
+DEAL::
+DEAL::cell 2.21
+DEAL::approx. gradient: -0.238060 -0.0628240 0.00000 , norm: 0.246211
+DEAL::  exact gradient: -0.282910 -0.0827516 0.00000 , norm: 0.294764
+DEAL::approx. second derivative (hessian): 12.8754 -0.0177892 0.00000 -0.0177892 17.7210 0.00000 0.00000 0.00000 0.00000 , norm: 17.7211
+DEAL::  exact second derivative (hessian): 15.9577 -0.0234733 0.00000 -0.0234733 24.9339 0.00000 0.00000 0.00000 0.00000 , norm: 24.9340
+DEAL::approx. third derivative: 3.73027 0.994859 2.86029e-09 0.994859 5.13335 7.69363e-10 2.86029e-09 7.69363e-10 4.73695e-15 0.994859 5.13335 7.69363e-10 5.13335 1.52014 4.58687e-09 7.69363e-10 4.58687e-09 0.00000 2.86029e-09 7.69363e-10 4.73695e-15 7.69363e-10 4.58687e-09 0.00000 4.73695e-15 0.00000 0.00000 , norm: 9.91205
+DEAL::  exact third derivative: 4.52656 1.32403 0.00000 1.32403 7.07275 0.00000 0.00000 0.00000 0.00000 1.32403 7.07275 0.00000 7.07275 2.06879 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 13.4201
+DEAL::
+DEAL::cell 2.22
+DEAL::approx. gradient: -0.685975 1.28263 0.00000 , norm: 1.45455
+DEAL::  exact gradient: -1.16200 2.26198 0.00000 , norm: 2.54299
+DEAL::approx. second derivative (hessian): 4.09752 9.07897 0.00000 9.07897 8.61921 0.00000 0.00000 0.00000 0.00000 , norm: 15.7146
+DEAL::  exact second derivative (hessian): 2.53922 16.5621 0.00000 16.5621 3.96754 0.00000 0.00000 0.00000 0.00000 , norm: 19.8309
+DEAL::approx. third derivative: 10.7488 -43.1484 -1.57746e-09 -43.1484 45.8745 -2.01924e-09 -1.57746e-09 -2.01924e-09 -2.36848e-15 -43.1484 45.8745 -2.01924e-09 45.8745 -31.0355 -3.03740e-09 -2.01924e-09 -3.03740e-09 2.36848e-15 -1.57746e-09 -2.01924e-09 -2.36848e-15 -2.01924e-09 -3.03740e-09 2.36848e-15 -2.36848e-15 2.36848e-15 0.00000 , norm: 113.919
+DEAL::  exact third derivative: 18.5921 -36.1917 0.00000 -36.1917 29.0501 0.00000 0.00000 0.00000 0.00000 -36.1917 29.0501 0.00000 29.0501 -56.5496 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 100.024
+DEAL::
+DEAL::cell 2.23
+DEAL::approx. gradient: -0.0788147 2.66865 0.00000 , norm: 2.66981
+DEAL::  exact gradient: -0.0936630 4.70629 0.00000 , norm: 4.70722
+DEAL::approx. second derivative (hessian): 4.26266 0.888734 0.00000 0.888734 17.9332 0.00000 0.00000 0.00000 0.00000 , norm: 17.9907
+DEAL::  exact second derivative (hessian): 5.28312 1.33498 0.00000 1.33498 8.25488 0.00000 0.00000 0.00000 0.00000 , norm: 8.76650
+DEAL::approx. third derivative: 1.23498 -51.8568 7.12995e-10 -51.8568 3.88741 -1.61228e-09 7.12995e-10 -1.61228e-09 0.00000 -51.8568 3.88741 -1.61228e-09 3.88741 -64.5726 -5.81178e-09 -1.61228e-09 -5.81178e-09 9.47390e-15 7.12995e-10 -1.61228e-09 0.00000 -1.61228e-09 -5.81178e-09 9.47390e-15 0.00000 9.47390e-15 0.00000 , norm: 110.833
+DEAL::  exact third derivative: 1.49861 -75.3007 0.00000 -75.3007 2.34157 0.00000 0.00000 0.00000 0.00000 -75.3007 2.34157 0.00000 2.34157 -117.657 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 175.706
+DEAL::
+DEAL::cell 2.24
+DEAL::approx. gradient: 2.69619 -0.0376929 0.00000 , norm: 2.69645
+DEAL::  exact gradient: 3.20413 -0.0496489 0.00000 , norm: 3.20452
+DEAL::approx. second derivative (hessian): 7.72493 0.201474 0.00000 0.201474 10.6322 0.00000 0.00000 0.00000 0.00000 , norm: 10.6461
+DEAL::  exact second derivative (hessian): 9.57424 0.265850 0.00000 0.265850 14.9597 0.00000 0.00000 0.00000 0.00000 , norm: 14.9728
+DEAL::approx. third derivative: -42.2477 0.596891 1.41390e-09 0.596891 -58.1384 2.23319e-10 1.41390e-09 2.23319e-10 4.73695e-15 0.596891 -58.1384 2.23319e-10 -58.1384 0.912043 2.78293e-09 2.23319e-10 2.78293e-09 1.18424e-15 1.41390e-09 2.23319e-10 4.73695e-15 2.23319e-10 2.78293e-09 1.18424e-15 4.73695e-15 1.18424e-15 0.00000 , norm: 109.211
+DEAL::  exact third derivative: -51.2661 0.794383 0.00000 0.794383 -80.1033 0.00000 0.00000 0.00000 0.00000 0.794383 -80.1033 0.00000 -80.1033 1.24122 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 147.923
+DEAL::
+DEAL::cell 2.25
+DEAL::approx. gradient: 3.79650 0.0220930 0.00000 , norm: 3.79656
+DEAL::  exact gradient: 3.74531 0.0291008 0.00000 , norm: 3.74542
+DEAL::approx. second derivative (hessian): 2.07564 0.260550 0.00000 0.260550 -6.23184 0.00000 0.00000 0.00000 0.00000 , norm: 6.24000
+DEAL::  exact second derivative (hessian): -5.61176 0.310752 0.00000 0.310752 -8.76837 0.00000 0.00000 0.00000 0.00000 , norm: 8.79867
+DEAL::approx. third derivative: -59.4890 -0.00791324 -9.86381e-11 -0.00791324 -73.1597 2.64632e-10 -9.86381e-11 2.64632e-10 -9.47390e-15 -0.00791324 -73.1597 2.64632e-10 -73.1597 -0.534577 -1.61437e-09 2.64632e-10 -1.61437e-09 5.92119e-16 -9.86381e-11 2.64632e-10 -9.47390e-15 2.64632e-10 -1.61437e-09 5.92119e-16 -9.47390e-15 5.92119e-16 0.00000 , norm: 139.987
+DEAL::  exact third derivative: -59.9250 -0.465613 0.00000 -0.465613 -93.6328 0.00000 0.00000 0.00000 0.00000 -0.465613 -93.6328 0.00000 -93.6328 -0.727520 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 172.897
+DEAL::
+DEAL::cell 2.26
+DEAL::approx. gradient: 0.892626 1.60112 0.00000 , norm: 1.83313
+DEAL::  exact gradient: 1.06079 2.82366 0.00000 , norm: 3.01634
+DEAL::approx. second derivative (hessian): 2.55749 -10.0655 0.00000 -10.0655 10.7594 0.00000 0.00000 0.00000 0.00000 , norm: 17.5273
+DEAL::  exact second derivative (hessian): 3.16974 -15.1195 0.00000 -15.1195 4.95272 0.00000 0.00000 0.00000 0.00000 , norm: 19.2070
+DEAL::approx. third derivative: -13.9869 -31.1128 3.11787e-09 -31.1128 -44.0274 2.17671e-10 3.11787e-09 2.17671e-10 0.00000 -31.1128 -44.0274 2.17671e-10 -44.0274 -38.7419 -4.80051e-09 2.17671e-10 -4.80051e-09 -7.10543e-15 3.11787e-09 2.17671e-10 0.00000 2.17671e-10 -4.80051e-09 -7.10543e-15 0.00000 -7.10543e-15 0.00000 , norm: 102.058
+DEAL::  exact third derivative: -16.9727 -45.1785 0.00000 -45.1785 -26.5198 0.00000 0.00000 0.00000 0.00000 -45.1785 -26.5198 0.00000 -26.5198 -70.5914 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 116.209
+DEAL::
+DEAL::cell 2.27
+DEAL::approx. gradient: 1.25691 -0.938469 0.00000 , norm: 1.56861
+DEAL::  exact gradient: 1.23996 -1.65503 0.00000 , norm: 2.06800
+DEAL::approx. second derivative (hessian): 0.687181 -13.1900 0.00000 -13.1900 -6.30645 0.00000 0.00000 0.00000 0.00000 , norm: 16.4553
+DEAL::  exact second derivative (hessian): -1.85788 -17.6732 0.00000 -17.6732 -2.90295 0.00000 0.00000 0.00000 0.00000 , norm: 20.0614
+DEAL::approx. third derivative: -19.6950 -1.21098 3.69848e-09 -1.21098 -53.1857 3.67090e-09 3.69848e-09 3.67090e-09 -2.36848e-15 -1.21098 -53.1857 3.67090e-09 -53.1857 22.7079 2.10047e-09 3.67090e-09 2.10047e-09 0.00000 3.69848e-09 3.67090e-09 -2.36848e-15 3.67090e-09 2.10047e-09 0.00000 -2.36848e-15 0.00000 0.00000 , norm: 96.9232
+DEAL::  exact third derivative: -19.8394 26.4805 0.00000 26.4805 -30.9990 0.00000 0.00000 0.00000 0.00000 26.4805 -30.9990 0.00000 -30.9990 41.3759 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 84.2142
+DEAL::
+DEAL::cell 2.28
+DEAL::approx. gradient: 2.69619 -0.0376929 0.00000 , norm: 2.69645
+DEAL::  exact gradient: 3.20413 -0.0496489 0.00000 , norm: 3.20452
+DEAL::approx. second derivative (hessian): 7.72493 0.201474 0.00000 0.201474 10.6322 0.00000 0.00000 0.00000 0.00000 , norm: 10.6461
+DEAL::  exact second derivative (hessian): 9.57424 0.265850 0.00000 0.265850 14.9597 0.00000 0.00000 0.00000 0.00000 , norm: 14.9728
+DEAL::approx. third derivative: -42.2477 0.596891 1.44490e-09 0.596891 -58.1384 1.04125e-09 1.44490e-09 1.04125e-09 4.73695e-15 0.596891 -58.1384 1.04125e-09 -58.1384 0.912043 5.93068e-09 1.04125e-09 5.93068e-09 1.18424e-15 1.44490e-09 1.04125e-09 4.73695e-15 1.04125e-09 5.93068e-09 1.18424e-15 4.73695e-15 1.18424e-15 0.00000 , norm: 109.211
+DEAL::  exact third derivative: -51.2661 0.794383 0.00000 0.794383 -80.1033 0.00000 0.00000 0.00000 0.00000 0.794383 -80.1033 0.00000 -80.1033 1.24122 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 147.923
+DEAL::
+DEAL::cell 2.29
+DEAL::approx. gradient: 3.79650 0.0220930 0.00000 , norm: 3.79656
+DEAL::  exact gradient: 3.74531 0.0291008 0.00000 , norm: 3.74542
+DEAL::approx. second derivative (hessian): 2.07564 0.260550 0.00000 0.260550 -6.23184 0.00000 0.00000 0.00000 0.00000 , norm: 6.24000
+DEAL::  exact second derivative (hessian): -5.61176 0.310752 0.00000 0.310752 -8.76837 0.00000 0.00000 0.00000 0.00000 , norm: 8.79867
+DEAL::approx. third derivative: -59.4890 -0.00791324 -9.86405e-11 -0.00791324 -73.1597 2.64632e-10 -9.86405e-11 2.64632e-10 -9.47390e-15 -0.00791324 -73.1597 2.64632e-10 -73.1597 -0.534577 -1.61437e-09 2.64632e-10 -1.61437e-09 5.92119e-16 -9.86405e-11 2.64632e-10 -9.47390e-15 2.64632e-10 -1.61437e-09 5.92119e-16 -9.47390e-15 5.92119e-16 0.00000 , norm: 139.987
+DEAL::  exact third derivative: -59.9250 -0.465613 0.00000 -0.465613 -93.6328 0.00000 0.00000 0.00000 0.00000 -0.465613 -93.6328 0.00000 -93.6328 -0.727520 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 172.897
+DEAL::
+DEAL::cell 2.30
+DEAL::approx. gradient: 0.892626 1.60112 0.00000 , norm: 1.83313
+DEAL::  exact gradient: 1.06079 2.82366 0.00000 , norm: 3.01634
+DEAL::approx. second derivative (hessian): 2.55749 -10.0655 0.00000 -10.0655 10.7594 0.00000 0.00000 0.00000 0.00000 , norm: 17.5273
+DEAL::  exact second derivative (hessian): 3.16974 -15.1195 0.00000 -15.1195 4.95272 0.00000 0.00000 0.00000 0.00000 , norm: 19.2070
+DEAL::approx. third derivative: -13.9869 -31.1128 3.11787e-09 -31.1128 -44.0274 2.17673e-10 3.11787e-09 2.17673e-10 0.00000 -31.1128 -44.0274 2.17673e-10 -44.0274 -38.7419 -4.80050e-09 2.17673e-10 -4.80050e-09 -7.10543e-15 3.11787e-09 2.17673e-10 0.00000 2.17673e-10 -4.80050e-09 -7.10543e-15 0.00000 -7.10543e-15 0.00000 , norm: 102.058
+DEAL::  exact third derivative: -16.9727 -45.1785 0.00000 -45.1785 -26.5198 0.00000 0.00000 0.00000 0.00000 -45.1785 -26.5198 0.00000 -26.5198 -70.5914 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 116.209
+DEAL::
+DEAL::cell 2.31
+DEAL::approx. gradient: 1.25691 -0.938469 0.00000 , norm: 1.56861
+DEAL::  exact gradient: 1.23996 -1.65503 0.00000 , norm: 2.06800
+DEAL::approx. second derivative (hessian): 0.687181 -13.1900 0.00000 -13.1900 -6.30645 0.00000 0.00000 0.00000 0.00000 , norm: 16.4553
+DEAL::  exact second derivative (hessian): -1.85788 -17.6732 0.00000 -17.6732 -2.90295 0.00000 0.00000 0.00000 0.00000 , norm: 20.0614
+DEAL::approx. third derivative: -19.6950 -1.21098 3.69848e-09 -1.21098 -53.1857 3.67090e-09 3.69848e-09 3.67090e-09 -2.36848e-15 -1.21098 -53.1857 3.67090e-09 -53.1857 22.7079 2.10047e-09 3.67090e-09 2.10047e-09 0.00000 3.69848e-09 3.67090e-09 -2.36848e-15 3.67090e-09 2.10047e-09 0.00000 -2.36848e-15 0.00000 0.00000 , norm: 96.9232
+DEAL::  exact third derivative: -19.8394 26.4805 0.00000 26.4805 -30.9990 0.00000 0.00000 0.00000 0.00000 26.4805 -30.9990 0.00000 -30.9990 41.3759 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 84.2142
+DEAL::
+DEAL::cell 2.32
+DEAL::approx. gradient: 1.68054 -2.12960 0.00000 , norm: 2.71283
+DEAL::  exact gradient: 2.84675 -1.40255 0.00000 , norm: 3.17350
+DEAL::approx. second derivative (hessian): -10.0384 -10.3133 0.00000 -10.3133 -3.31217 2.22045e-16 0.00000 2.22045e-16 0.00000 , norm: 17.5230
+DEAL::  exact second derivative (hessian): -6.22074 -10.2694 0.00000 -10.2694 -9.71991 0.00000 0.00000 0.00000 0.00000 , norm: 18.3877
+DEAL::approx. third derivative: -26.3331 33.7236 -1.00944e-09 33.7236 -29.0569 -1.02148e-09 -1.00944e-09 -1.02148e-09 4.35004e-15 33.7236 -29.0569 -1.02148e-09 -29.0569 51.5294 -9.10762e-11 -1.02148e-09 -9.10762e-11 -3.46920e-15 -1.00944e-09 -1.02148e-09 4.35004e-15 -1.02148e-09 -9.10762e-11 -3.46920e-15 4.35004e-15 -3.46920e-15 0.00000 , norm: 96.4027
+DEAL::  exact third derivative: -45.5480 22.4408 0.00000 22.4408 -71.1687 0.00000 0.00000 0.00000 0.00000 22.4408 -71.1687 0.00000 -71.1687 35.0638 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 141.456
+DEAL::
+DEAL::cell 2.33
+DEAL::approx. gradient: 0.193085 -4.43086 0.00000 , norm: 4.43506
+DEAL::  exact gradient: 0.229461 -2.91816 0.00000 , norm: 2.92717
+DEAL::approx. second derivative (hessian): -10.4429 -0.928602 2.22045e-16 -0.928602 -6.89131 4.44089e-16 2.22045e-16 4.44089e-16 0.00000 , norm: 10.6711
+DEAL::  exact second derivative (hessian): -12.9429 -0.827763 0.00000 -0.827763 -20.2233 0.00000 0.00000 0.00000 0.00000 , norm: 20.3162
+DEAL::approx. third derivative: -3.02553 46.6543 -2.30673e-09 46.6543 -2.80690 -1.22944e-09 -2.30673e-09 -1.22944e-09 -4.44540e-17 46.6543 -2.80690 -1.22944e-09 -2.80690 107.212 -2.67601e-10 -1.22944e-09 -2.67601e-10 -6.83620e-15 -2.30673e-09 -1.22944e-09 -4.44540e-17 -1.22944e-09 -2.67601e-10 -6.83620e-15 -4.44540e-17 -6.83620e-15 0.00000 , norm: 134.377
+DEAL::  exact third derivative: -3.67138 46.6905 0.00000 46.6905 -5.73653 0.00000 0.00000 0.00000 0.00000 46.6905 -5.73653 0.00000 -5.73653 72.9539 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 109.428
+DEAL::
+DEAL::cell 2.34
+DEAL::approx. gradient: -0.620717 -1.73631 0.00000 , norm: 1.84393
+DEAL::  exact gradient: -1.05146 -2.28707 0.00000 , norm: 2.51719
+DEAL::approx. second derivative (hessian): 3.70772 -10.7223 0.00000 -10.7223 2.55155 0.00000 0.00000 0.00000 0.00000 , norm: 13.8675
+DEAL::  exact second derivative (hessian): 2.29766 -16.7458 0.00000 -16.7458 3.59010 0.00000 0.00000 0.00000 0.00000 , norm: 19.7021
+DEAL::approx. third derivative: 9.72628 45.9222 4.11657e-10 45.9222 16.9488 -8.82230e-10 4.11657e-10 -8.82230e-10 0.00000 45.9222 16.9488 -8.82230e-10 16.9488 42.0131 3.19990e-10 -8.82230e-10 3.19990e-10 -2.36848e-15 4.11657e-10 -8.82230e-10 0.00000 -8.82230e-10 3.19990e-10 -2.36848e-15 0.00000 -2.36848e-15 0.00000 , norm: 95.1212
+DEAL::  exact third derivative: 16.8234 36.5930 0.00000 36.5930 26.2865 0.00000 0.00000 0.00000 0.00000 36.5930 26.2865 0.00000 26.2865 57.1766 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 98.1952
+DEAL::
+DEAL::cell 2.35
+DEAL::approx. gradient: -0.0713169 -3.61258 0.00000 , norm: 3.61328
+DEAL::  exact gradient: -0.0847526 -4.75848 0.00000 , norm: 4.75923
+DEAL::approx. second derivative (hessian): 3.85715 -1.02293 0.00000 -1.02293 5.30876 0.00000 0.00000 0.00000 0.00000 , norm: 5.83722
+DEAL::  exact second derivative (hessian): 4.78053 -1.34979 0.00000 -1.34979 7.46958 0.00000 0.00000 0.00000 0.00000 , norm: 8.03022
+DEAL::approx. third derivative: 1.11750 57.2075 8.56452e-10 57.2075 1.53782 1.81414e-10 8.56452e-10 1.81414e-10 8.28967e-15 57.2075 1.53782 1.81414e-10 1.53782 87.4126 1.15707e-09 1.81414e-10 1.15707e-09 -9.47390e-15 8.56452e-10 1.81414e-10 8.28967e-15 1.81414e-10 1.15707e-09 -9.47390e-15 8.28967e-15 -9.47390e-15 0.00000 , norm: 132.164
+DEAL::  exact third derivative: 1.35604 76.1357 0.00000 76.1357 2.11882 0.00000 0.00000 0.00000 0.00000 76.1357 2.11882 0.00000 2.11882 118.962 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 177.643
+DEAL::
+DEAL::cell 2.36
+DEAL::approx. gradient: 1.68054 -2.12960 0.00000 , norm: 2.71283
+DEAL::  exact gradient: 2.84675 -1.40255 0.00000 , norm: 3.17350
+DEAL::approx. second derivative (hessian): -10.0384 -10.3133 0.00000 -10.3133 -3.31217 0.00000 0.00000 0.00000 0.00000 , norm: 17.5230
+DEAL::  exact second derivative (hessian): -6.22074 -10.2694 0.00000 -10.2694 -9.71991 0.00000 0.00000 0.00000 0.00000 , norm: 18.3877
+DEAL::approx. third derivative: -26.3331 33.7236 -1.00947e-09 33.7236 -29.0569 -1.12651e-09 -1.00947e-09 -1.12651e-09 1.42109e-14 33.7236 -29.0569 -1.12651e-09 -29.0569 51.5294 -2.13645e-10 -1.12651e-09 -2.13645e-10 -4.73695e-15 -1.00947e-09 -1.12651e-09 1.42109e-14 -1.12651e-09 -2.13645e-10 -4.73695e-15 1.42109e-14 -4.73695e-15 0.00000 , norm: 96.4027
+DEAL::  exact third derivative: -45.5480 22.4408 0.00000 22.4408 -71.1687 0.00000 0.00000 0.00000 0.00000 22.4408 -71.1687 0.00000 -71.1687 35.0638 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 141.456
+DEAL::
+DEAL::cell 2.37
+DEAL::approx. gradient: 0.193085 -4.43086 0.00000 , norm: 4.43506
+DEAL::  exact gradient: 0.229461 -2.91816 0.00000 , norm: 2.92717
+DEAL::approx. second derivative (hessian): -10.4429 -0.928602 0.00000 -0.928602 -6.89131 0.00000 0.00000 0.00000 0.00000 , norm: 10.6711
+DEAL::  exact second derivative (hessian): -12.9429 -0.827763 0.00000 -0.827763 -20.2233 0.00000 0.00000 0.00000 0.00000 , norm: 20.3162
+DEAL::approx. third derivative: -3.02553 46.6543 -2.30673e-09 46.6543 -2.80690 -1.27770e-09 -2.30673e-09 -1.27770e-09 -1.65793e-14 46.6543 -2.80690 -1.27770e-09 -2.80690 107.212 -1.28772e-09 -1.27770e-09 -1.28772e-09 -9.47390e-15 -2.30673e-09 -1.27770e-09 -1.65793e-14 -1.27770e-09 -1.28772e-09 -9.47390e-15 -1.65793e-14 -9.47390e-15 0.00000 , norm: 134.377
+DEAL::  exact third derivative: -3.67138 46.6905 0.00000 46.6905 -5.73653 0.00000 0.00000 0.00000 0.00000 46.6905 -5.73653 0.00000 -5.73653 72.9539 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 109.428
+DEAL::
+DEAL::cell 2.38
+DEAL::approx. gradient: -0.620717 -1.73631 0.00000 , norm: 1.84393
+DEAL::  exact gradient: -1.05146 -2.28707 0.00000 , norm: 2.51719
+DEAL::approx. second derivative (hessian): 3.70772 -10.7223 0.00000 -10.7223 2.55155 0.00000 0.00000 0.00000 0.00000 , norm: 13.8675
+DEAL::  exact second derivative (hessian): 2.29766 -16.7458 0.00000 -16.7458 3.59010 0.00000 0.00000 0.00000 0.00000 , norm: 19.7021
+DEAL::approx. third derivative: 9.72628 45.9222 7.54122e-10 45.9222 16.9488 -1.27193e-09 7.54122e-10 -1.27193e-09 0.00000 45.9222 16.9488 -1.27193e-09 16.9488 42.0131 5.08843e-10 -1.27193e-09 5.08843e-10 -2.36848e-15 7.54122e-10 -1.27193e-09 0.00000 -1.27193e-09 5.08843e-10 -2.36848e-15 0.00000 -2.36848e-15 0.00000 , norm: 95.1212
+DEAL::  exact third derivative: 16.8234 36.5930 0.00000 36.5930 26.2865 0.00000 0.00000 0.00000 0.00000 36.5930 26.2865 0.00000 26.2865 57.1766 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 98.1952
+DEAL::
+DEAL::cell 2.39
+DEAL::approx. gradient: -0.0713169 -3.61258 0.00000 , norm: 3.61328
+DEAL::  exact gradient: -0.0847526 -4.75848 0.00000 , norm: 4.75923
+DEAL::approx. second derivative (hessian): 3.85715 -1.02293 1.77636e-15 -1.02293 5.30876 0.00000 1.77636e-15 0.00000 0.00000 , norm: 5.83722
+DEAL::  exact second derivative (hessian): 4.78053 -1.34979 0.00000 -1.34979 7.46958 0.00000 0.00000 0.00000 0.00000 , norm: 8.03022
+DEAL::approx. third derivative: 1.11750 57.2075 7.38430e-10 57.2075 1.53782 5.54814e-10 7.38430e-10 5.54814e-10 -1.65793e-14 57.2075 1.53782 5.54814e-10 1.53782 87.4126 3.71221e-10 5.54814e-10 3.71221e-10 -9.47390e-15 7.38430e-10 5.54814e-10 -1.65793e-14 5.54814e-10 3.71221e-10 -9.47390e-15 -1.65793e-14 -9.47390e-15 0.00000 , norm: 132.164
+DEAL::  exact third derivative: 1.35604 76.1357 0.00000 76.1357 2.11882 0.00000 0.00000 0.00000 0.00000 76.1357 2.11882 0.00000 2.11882 118.962 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 177.643
+DEAL::
+DEAL::cell 2.40
+DEAL::approx. gradient: -2.18681 -2.65841 0.00000 , norm: 3.44227
+DEAL::  exact gradient: -2.59879 -1.75082 0.00000 , norm: 3.13354
+DEAL::approx. second derivative (hessian): -6.26549 10.5170 0.00000 10.5170 -4.13461 -2.22045e-16 0.00000 -2.22045e-16 0.00000 , norm: 15.7709
+DEAL::  exact second derivative (hessian): -7.76542 9.37494 0.00000 9.37494 -12.1335 0.00000 0.00000 0.00000 0.00000 , norm: 19.5754
+DEAL::approx. third derivative: 34.2660 27.9914 -1.29601e-09 27.9914 31.7900 1.38390e-09 -1.29601e-09 1.38390e-09 -6.60196e-15 27.9914 31.7900 1.38390e-09 31.7900 64.3247 1.40840e-09 1.38390e-09 1.40840e-09 1.58255e-15 -1.29601e-09 1.38390e-09 -6.60196e-15 1.38390e-09 1.40840e-09 1.58255e-15 -6.60196e-15 1.58255e-15 0.00000 , norm: 103.413
+DEAL::  exact third derivative: 41.5807 28.0132 0.00000 28.0132 64.9698 0.00000 0.00000 0.00000 0.00000 28.0132 64.9698 0.00000 64.9698 43.7706 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 136.610
+DEAL::
+DEAL::cell 2.41
+DEAL::approx. gradient: -3.07924 1.55817 0.00000 , norm: 3.45104
+DEAL::  exact gradient: -3.03773 1.02621 0.00000 , norm: 3.20638
+DEAL::approx. second derivative (hessian): -1.68350 13.1766 -4.44089e-16 13.1766 2.42343 -1.11022e-16 -4.44089e-16 -1.11022e-16 0.00000 , norm: 13.7056
+DEAL::  exact second derivative (hessian): 4.55156 10.9584 0.00000 10.9584 7.11181 0.00000 0.00000 0.00000 0.00000 , norm: 16.8646
+DEAL::approx. third derivative: 48.2500 -4.34834 -1.30118e-10 -4.34834 41.3783 2.59623e-10 -1.30118e-10 2.59623e-10 7.08936e-16 -4.34834 41.3783 2.59623e-10 41.3783 -37.7027 2.69057e-10 2.59623e-10 2.69057e-10 -9.27584e-16 -1.30118e-10 2.59623e-10 7.08936e-16 2.59623e-10 2.69057e-10 -9.27584e-16 7.08936e-16 -9.27584e-16 0.00000 , norm: 94.5662
+DEAL::  exact third derivative: 48.6036 -16.4194 0.00000 -16.4194 75.9432 0.00000 0.00000 0.00000 0.00000 -16.4194 75.9432 0.00000 75.9432 -25.6553 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 145.366
+DEAL::
+DEAL::cell 2.42
+DEAL::approx. gradient: 0.807709 -2.16746 0.00000 , norm: 2.31306
+DEAL::  exact gradient: 0.959877 -2.85497 0.00000 , norm: 3.01201
+DEAL::approx. second derivative (hessian): 2.31419 11.5854 0.00000 11.5854 3.18513 0.00000 0.00000 0.00000 0.00000 , norm: 14.3432
+DEAL::  exact second derivative (hessian): 2.86820 15.2872 0.00000 15.2872 4.48156 0.00000 0.00000 0.00000 0.00000 , norm: 18.9833
+DEAL::approx. third derivative: -12.6563 34.3231 -2.24576e-09 34.3231 -17.4168 1.96139e-09 -2.24576e-09 1.96139e-09 -8.88178e-15 34.3231 -17.4168 1.96139e-09 -17.4168 52.4454 2.23669e-09 1.96139e-09 2.23669e-09 4.73695e-15 -2.24576e-09 1.96139e-09 -8.88178e-15 1.96139e-09 2.23669e-09 4.73695e-15 -8.88178e-15 4.73695e-15 0.00000 , norm: 85.7611
+DEAL::  exact third derivative: -15.3580 45.6795 0.00000 45.6795 -23.9969 0.00000 0.00000 0.00000 0.00000 45.6795 -23.9969 0.00000 -23.9969 71.3742 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 115.402
+DEAL::
+DEAL::cell 2.43
+DEAL::approx. gradient: 1.13734 1.27041 0.00000 , norm: 1.70513
+DEAL::  exact gradient: 1.12200 1.67339 0.00000 , norm: 2.01472
+DEAL::approx. second derivative (hessian): 0.621808 14.9824 0.00000 14.9824 -1.86690 0.00000 0.00000 0.00000 0.00000 , norm: 15.6565
+DEAL::  exact second derivative (hessian): -1.68114 17.8692 0.00000 17.8692 -2.62678 0.00000 0.00000 0.00000 0.00000 , norm: 20.0294
+DEAL::approx. third derivative: -17.8214 -0.455036 1.23208e-09 -0.455036 -21.9168 1.88659e-09 1.23208e-09 1.88659e-09 -1.18424e-15 -0.455036 -21.9168 1.88659e-09 -21.9168 -30.7399 -4.83623e-10 1.88659e-09 -4.83623e-10 0.00000 1.23208e-09 1.88659e-09 -1.18424e-15 1.88659e-09 -4.83623e-10 0.00000 -1.18424e-15 0.00000 0.00000 , norm: 52.0019
+DEAL::  exact third derivative: -17.9520 -26.7742 0.00000 -26.7742 -28.0500 0.00000 0.00000 0.00000 0.00000 -26.7742 -28.0500 0.00000 -28.0500 -41.8347 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 81.1381
+DEAL::
+DEAL::cell 2.44
+DEAL::approx. gradient: -2.18681 -2.65841 0.00000 , norm: 3.44227
+DEAL::  exact gradient: -2.59879 -1.75082 0.00000 , norm: 3.13354
+DEAL::approx. second derivative (hessian): -6.26549 10.5170 0.00000 10.5170 -4.13461 0.00000 0.00000 0.00000 0.00000 , norm: 15.7709
+DEAL::  exact second derivative (hessian): -7.76542 9.37494 0.00000 9.37494 -12.1335 0.00000 0.00000 0.00000 0.00000 , norm: 19.5754
+DEAL::approx. third derivative: 34.2660 27.9914 -1.29600e-09 27.9914 31.7900 1.38390e-09 -1.29600e-09 1.38390e-09 2.96059e-15 27.9914 31.7900 1.38390e-09 31.7900 64.3247 1.40840e-09 1.38390e-09 1.40840e-09 0.00000 -1.29600e-09 1.38390e-09 2.96059e-15 1.38390e-09 1.40840e-09 0.00000 2.96059e-15 0.00000 0.00000 , norm: 103.413
+DEAL::  exact third derivative: 41.5807 28.0132 0.00000 28.0132 64.9698 0.00000 0.00000 0.00000 0.00000 28.0132 64.9698 0.00000 64.9698 43.7706 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 136.610
+DEAL::
+DEAL::cell 2.45
+DEAL::approx. gradient: -3.07924 1.55817 0.00000 , norm: 3.45104
+DEAL::  exact gradient: -3.03773 1.02621 0.00000 , norm: 3.20638
+DEAL::approx. second derivative (hessian): -1.68350 13.1766 0.00000 13.1766 2.42343 0.00000 0.00000 0.00000 0.00000 , norm: 13.7056
+DEAL::  exact second derivative (hessian): 4.55156 10.9584 0.00000 10.9584 7.11181 0.00000 0.00000 0.00000 0.00000 , norm: 16.8646
+DEAL::approx. third derivative: 48.2500 -4.34834 -1.30127e-10 -4.34834 41.3783 4.52044e-10 -1.30127e-10 4.52044e-10 -2.36848e-15 -4.34834 41.3783 4.52044e-10 41.3783 -37.7027 3.58740e-10 4.52044e-10 3.58740e-10 -1.18424e-15 -1.30127e-10 4.52044e-10 -2.36848e-15 4.52044e-10 3.58740e-10 -1.18424e-15 -2.36848e-15 -1.18424e-15 0.00000 , norm: 94.5662
+DEAL::  exact third derivative: 48.6036 -16.4194 0.00000 -16.4194 75.9432 0.00000 0.00000 0.00000 0.00000 -16.4194 75.9432 0.00000 75.9432 -25.6553 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 145.366
+DEAL::
+DEAL::cell 2.46
+DEAL::approx. gradient: 0.807709 -2.16746 0.00000 , norm: 2.31306
+DEAL::  exact gradient: 0.959877 -2.85497 0.00000 , norm: 3.01201
+DEAL::approx. second derivative (hessian): 2.31419 11.5854 -1.77636e-15 11.5854 3.18513 0.00000 -1.77636e-15 0.00000 0.00000 , norm: 14.3432
+DEAL::  exact second derivative (hessian): 2.86820 15.2872 0.00000 15.2872 4.48156 0.00000 0.00000 0.00000 0.00000 , norm: 18.9833
+DEAL::approx. third derivative: -12.6563 34.3231 -1.74294e-11 34.3231 -17.4168 1.81042e-09 -1.74294e-11 1.81042e-09 1.59872e-14 34.3231 -17.4168 1.81042e-09 -17.4168 52.4454 2.00094e-09 1.81042e-09 2.00094e-09 4.73695e-15 -1.74294e-11 1.81042e-09 1.59872e-14 1.81042e-09 2.00094e-09 4.73695e-15 1.59872e-14 4.73695e-15 0.00000 , norm: 85.7611
+DEAL::  exact third derivative: -15.3580 45.6795 0.00000 45.6795 -23.9969 0.00000 0.00000 0.00000 0.00000 45.6795 -23.9969 0.00000 -23.9969 71.3742 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 115.402
+DEAL::
+DEAL::cell 2.47
+DEAL::approx. gradient: 1.13734 1.27041 0.00000 , norm: 1.70513
+DEAL::  exact gradient: 1.12200 1.67339 0.00000 , norm: 2.01472
+DEAL::approx. second derivative (hessian): 0.621808 14.9824 0.00000 14.9824 -1.86690 0.00000 0.00000 0.00000 0.00000 , norm: 15.6565
+DEAL::  exact second derivative (hessian): -1.68114 17.8692 0.00000 17.8692 -2.62678 0.00000 0.00000 0.00000 0.00000 , norm: 20.0294
+DEAL::approx. third derivative: -17.8214 -0.455036 1.85960e-09 -0.455036 -21.9168 5.96973e-10 1.85960e-09 5.96973e-10 -1.18424e-15 -0.455036 -21.9168 5.96973e-10 -21.9168 -30.7399 -2.07267e-10 5.96973e-10 -2.07267e-10 0.00000 1.85960e-09 5.96973e-10 -1.18424e-15 5.96973e-10 -2.07267e-10 0.00000 -1.18424e-15 0.00000 0.00000 , norm: 52.0019
+DEAL::  exact third derivative: -17.9520 -26.7742 0.00000 -26.7742 -28.0500 0.00000 0.00000 0.00000 0.00000 -26.7742 -28.0500 0.00000 -28.0500 -41.8347 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 81.1381
+DEAL::
+DEAL::cell 2.48
+DEAL::approx. gradient: -2.07199 -0.0301951 0.00000 , norm: 2.07221
+DEAL::  exact gradient: -3.50985 -0.0397729 0.00000 , norm: 3.51007
+DEAL::approx. second derivative (hessian): 12.3766 -0.186464 0.00000 -0.186464 8.51723 0.00000 0.00000 0.00000 0.00000 , norm: 12.3856
+DEAL::  exact second derivative (hessian): 7.66975 -0.291215 0.00000 -0.291215 11.9840 0.00000 0.00000 0.00000 0.00000 , norm: 12.0036
+DEAL::approx. third derivative: 32.4669 0.798604 1.38599e-09 0.798604 56.5762 -4.62318e-10 1.38599e-09 -4.62318e-10 -9.47390e-15 0.798604 56.5762 -4.62318e-10 56.5762 0.730622 2.21033e-09 -4.62318e-10 2.21033e-09 1.18424e-15 1.38599e-09 -4.62318e-10 -9.47390e-15 -4.62318e-10 2.21033e-09 1.18424e-15 -9.47390e-15 1.18424e-15 0.00000 , norm: 103.243
+DEAL::  exact third derivative: 56.1576 0.636366 0.00000 0.636366 87.7462 0.00000 0.00000 0.00000 0.00000 0.636366 87.7462 0.00000 87.7462 0.994322 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 162.031
+DEAL::
+DEAL::cell 2.49
+DEAL::approx. gradient: -0.238060 -0.0628240 0.00000 , norm: 0.246211
+DEAL::  exact gradient: -0.282910 -0.0827516 0.00000 , norm: 0.294764
+DEAL::approx. second derivative (hessian): 12.8754 -0.0177892 0.00000 -0.0177892 17.7210 0.00000 0.00000 0.00000 0.00000 , norm: 17.7211
+DEAL::  exact second derivative (hessian): 15.9577 -0.0234733 0.00000 -0.0234733 24.9339 0.00000 0.00000 0.00000 0.00000 , norm: 24.9340
+DEAL::approx. third derivative: 3.73027 0.994859 2.86029e-09 0.994859 5.13335 7.67986e-10 2.86029e-09 7.67986e-10 4.73695e-15 0.994859 5.13335 7.67986e-10 5.13335 1.52014 7.21011e-09 7.67986e-10 7.21011e-09 0.00000 2.86029e-09 7.67986e-10 4.73695e-15 7.67986e-10 7.21011e-09 0.00000 4.73695e-15 0.00000 0.00000 , norm: 9.91205
+DEAL::  exact third derivative: 4.52656 1.32403 0.00000 1.32403 7.07275 0.00000 0.00000 0.00000 0.00000 1.32403 7.07275 0.00000 7.07275 2.06879 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 13.4201
+DEAL::
+DEAL::cell 2.50
+DEAL::approx. gradient: -0.685975 1.28263 0.00000 , norm: 1.45455
+DEAL::  exact gradient: -1.16200 2.26198 0.00000 , norm: 2.54299
+DEAL::approx. second derivative (hessian): 4.09752 9.07897 0.00000 9.07897 8.61921 0.00000 0.00000 0.00000 0.00000 , norm: 15.7146
+DEAL::  exact second derivative (hessian): 2.53922 16.5621 0.00000 16.5621 3.96754 0.00000 0.00000 0.00000 0.00000 , norm: 19.8309
+DEAL::approx. third derivative: 10.7488 -43.1484 -1.57746e-09 -43.1484 45.8745 -2.01924e-09 -1.57746e-09 -2.01924e-09 -2.36848e-15 -43.1484 45.8745 -2.01924e-09 45.8745 -31.0355 -3.03740e-09 -2.01924e-09 -3.03740e-09 2.36848e-15 -1.57746e-09 -2.01924e-09 -2.36848e-15 -2.01924e-09 -3.03740e-09 2.36848e-15 -2.36848e-15 2.36848e-15 0.00000 , norm: 113.919
+DEAL::  exact third derivative: 18.5921 -36.1917 0.00000 -36.1917 29.0501 0.00000 0.00000 0.00000 0.00000 -36.1917 29.0501 0.00000 29.0501 -56.5496 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 100.024
+DEAL::
+DEAL::cell 2.51
+DEAL::approx. gradient: -0.0788147 2.66865 0.00000 , norm: 2.66981
+DEAL::  exact gradient: -0.0936630 4.70629 0.00000 , norm: 4.70722
+DEAL::approx. second derivative (hessian): 4.26266 0.888734 0.00000 0.888734 17.9332 0.00000 0.00000 0.00000 0.00000 , norm: 17.9907
+DEAL::  exact second derivative (hessian): 5.28312 1.33498 0.00000 1.33498 8.25488 0.00000 0.00000 0.00000 0.00000 , norm: 8.76650
+DEAL::approx. third derivative: 1.23498 -51.8568 7.12995e-10 -51.8568 3.88741 -1.61228e-09 7.12995e-10 -1.61228e-09 0.00000 -51.8568 3.88741 -1.61228e-09 3.88741 -64.5726 -5.81178e-09 -1.61228e-09 -5.81178e-09 9.47390e-15 7.12995e-10 -1.61228e-09 0.00000 -1.61228e-09 -5.81178e-09 9.47390e-15 0.00000 9.47390e-15 0.00000 , norm: 110.833
+DEAL::  exact third derivative: 1.49861 -75.3007 0.00000 -75.3007 2.34157 0.00000 0.00000 0.00000 0.00000 -75.3007 2.34157 0.00000 2.34157 -117.657 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 175.706
+DEAL::
+DEAL::cell 2.52
+DEAL::approx. gradient: -2.07199 -0.0301951 0.00000 , norm: 2.07221
+DEAL::  exact gradient: -3.50985 -0.0397729 0.00000 , norm: 3.51007
+DEAL::approx. second derivative (hessian): 12.3766 -0.186464 0.00000 -0.186464 8.51723 0.00000 0.00000 0.00000 0.00000 , norm: 12.3856
+DEAL::  exact second derivative (hessian): 7.66975 -0.291215 0.00000 -0.291215 11.9840 0.00000 0.00000 0.00000 0.00000 , norm: 12.0036
+DEAL::approx. third derivative: 32.4669 0.798604 1.38599e-09 0.798604 56.5762 -4.62318e-10 1.38599e-09 -4.62318e-10 -9.47390e-15 0.798604 56.5762 -4.62318e-10 56.5762 0.730622 2.21033e-09 -4.62318e-10 2.21033e-09 1.18424e-15 1.38599e-09 -4.62318e-10 -9.47390e-15 -4.62318e-10 2.21033e-09 1.18424e-15 -9.47390e-15 1.18424e-15 0.00000 , norm: 103.243
+DEAL::  exact third derivative: 56.1576 0.636366 0.00000 0.636366 87.7462 0.00000 0.00000 0.00000 0.00000 0.636366 87.7462 0.00000 87.7462 0.994322 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 162.031
+DEAL::
+DEAL::cell 2.53
+DEAL::approx. gradient: -0.238060 -0.0628240 0.00000 , norm: 0.246211
+DEAL::  exact gradient: -0.282910 -0.0827516 0.00000 , norm: 0.294764
+DEAL::approx. second derivative (hessian): 12.8754 -0.0177892 0.00000 -0.0177892 17.7210 0.00000 0.00000 0.00000 0.00000 , norm: 17.7211
+DEAL::  exact second derivative (hessian): 15.9577 -0.0234733 0.00000 -0.0234733 24.9339 0.00000 0.00000 0.00000 0.00000 , norm: 24.9340
+DEAL::approx. third derivative: 3.73027 0.994859 2.86029e-09 0.994859 5.13335 7.69357e-10 2.86029e-09 7.69357e-10 4.73695e-15 0.994859 5.13335 7.69357e-10 5.13335 1.52014 4.58688e-09 7.69357e-10 4.58688e-09 0.00000 2.86029e-09 7.69357e-10 4.73695e-15 7.69357e-10 4.58688e-09 0.00000 4.73695e-15 0.00000 0.00000 , norm: 9.91205
+DEAL::  exact third derivative: 4.52656 1.32403 0.00000 1.32403 7.07275 0.00000 0.00000 0.00000 0.00000 1.32403 7.07275 0.00000 7.07275 2.06879 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 13.4201
+DEAL::
+DEAL::cell 2.54
+DEAL::approx. gradient: -0.685975 1.28263 0.00000 , norm: 1.45455
+DEAL::  exact gradient: -1.16200 2.26198 0.00000 , norm: 2.54299
+DEAL::approx. second derivative (hessian): 4.09752 9.07897 0.00000 9.07897 8.61921 0.00000 0.00000 0.00000 0.00000 , norm: 15.7146
+DEAL::  exact second derivative (hessian): 2.53922 16.5621 0.00000 16.5621 3.96754 0.00000 0.00000 0.00000 0.00000 , norm: 19.8309
+DEAL::approx. third derivative: 10.7488 -43.1484 -1.57746e-09 -43.1484 45.8745 -2.01924e-09 -1.57746e-09 -2.01924e-09 -2.36848e-15 -43.1484 45.8745 -2.01924e-09 45.8745 -31.0355 -3.03740e-09 -2.01924e-09 -3.03740e-09 2.36848e-15 -1.57746e-09 -2.01924e-09 -2.36848e-15 -2.01924e-09 -3.03740e-09 2.36848e-15 -2.36848e-15 2.36848e-15 0.00000 , norm: 113.919
+DEAL::  exact third derivative: 18.5921 -36.1917 0.00000 -36.1917 29.0501 0.00000 0.00000 0.00000 0.00000 -36.1917 29.0501 0.00000 29.0501 -56.5496 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 100.024
+DEAL::
+DEAL::cell 2.55
+DEAL::approx. gradient: -0.0788147 2.66865 0.00000 , norm: 2.66981
+DEAL::  exact gradient: -0.0936630 4.70629 0.00000 , norm: 4.70722
+DEAL::approx. second derivative (hessian): 4.26266 0.888734 0.00000 0.888734 17.9332 0.00000 0.00000 0.00000 0.00000 , norm: 17.9907
+DEAL::  exact second derivative (hessian): 5.28312 1.33498 0.00000 1.33498 8.25488 0.00000 0.00000 0.00000 0.00000 , norm: 8.76650
+DEAL::approx. third derivative: 1.23498 -51.8568 7.12995e-10 -51.8568 3.88741 -1.61228e-09 7.12995e-10 -1.61228e-09 0.00000 -51.8568 3.88741 -1.61228e-09 3.88741 -64.5726 -5.81178e-09 -1.61228e-09 -5.81178e-09 9.47390e-15 7.12995e-10 -1.61228e-09 0.00000 -1.61228e-09 -5.81178e-09 9.47390e-15 0.00000 9.47390e-15 0.00000 , norm: 110.833
+DEAL::  exact third derivative: 1.49861 -75.3007 0.00000 -75.3007 2.34157 0.00000 0.00000 0.00000 0.00000 -75.3007 2.34157 0.00000 2.34157 -117.657 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 175.706
+DEAL::
+DEAL::cell 2.56
+DEAL::approx. gradient: 2.69619 -0.0376929 0.00000 , norm: 2.69645
+DEAL::  exact gradient: 3.20413 -0.0496489 0.00000 , norm: 3.20452
+DEAL::approx. second derivative (hessian): 7.72493 0.201474 0.00000 0.201474 10.6322 0.00000 0.00000 0.00000 0.00000 , norm: 10.6461
+DEAL::  exact second derivative (hessian): 9.57424 0.265850 0.00000 0.265850 14.9597 0.00000 0.00000 0.00000 0.00000 , norm: 14.9728
+DEAL::approx. third derivative: -42.2477 0.596891 1.41390e-09 0.596891 -58.1384 2.38822e-10 1.41390e-09 2.38822e-10 4.73695e-15 0.596891 -58.1384 2.38822e-10 -58.1384 0.912043 4.35681e-09 2.38822e-10 4.35681e-09 1.18424e-15 1.41390e-09 2.38822e-10 4.73695e-15 2.38822e-10 4.35681e-09 1.18424e-15 4.73695e-15 1.18424e-15 0.00000 , norm: 109.211
+DEAL::  exact third derivative: -51.2661 0.794383 0.00000 0.794383 -80.1033 0.00000 0.00000 0.00000 0.00000 0.794383 -80.1033 0.00000 -80.1033 1.24122 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 147.923
+DEAL::
+DEAL::cell 2.57
+DEAL::approx. gradient: 3.79650 0.0220930 0.00000 , norm: 3.79656
+DEAL::  exact gradient: 3.74531 0.0291008 0.00000 , norm: 3.74542
+DEAL::approx. second derivative (hessian): 2.07564 0.260550 0.00000 0.260550 -6.23184 0.00000 0.00000 0.00000 0.00000 , norm: 6.24000
+DEAL::  exact second derivative (hessian): -5.61176 0.310752 0.00000 0.310752 -8.76837 0.00000 0.00000 0.00000 0.00000 , norm: 8.79867
+DEAL::approx. third derivative: -59.4890 -0.00791324 -9.86358e-11 -0.00791324 -73.1597 2.64631e-10 -9.86358e-11 2.64631e-10 -9.47390e-15 -0.00791324 -73.1597 2.64631e-10 -73.1597 -0.534577 -1.61437e-09 2.64631e-10 -1.61437e-09 5.92119e-16 -9.86358e-11 2.64631e-10 -9.47390e-15 2.64631e-10 -1.61437e-09 5.92119e-16 -9.47390e-15 5.92119e-16 0.00000 , norm: 139.987
+DEAL::  exact third derivative: -59.9250 -0.465613 0.00000 -0.465613 -93.6328 0.00000 0.00000 0.00000 0.00000 -0.465613 -93.6328 0.00000 -93.6328 -0.727520 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 172.897
+DEAL::
+DEAL::cell 2.58
+DEAL::approx. gradient: 0.892626 1.60112 0.00000 , norm: 1.83313
+DEAL::  exact gradient: 1.06079 2.82366 0.00000 , norm: 3.01634
+DEAL::approx. second derivative (hessian): 2.55749 -10.0655 0.00000 -10.0655 10.7594 0.00000 0.00000 0.00000 0.00000 , norm: 17.5273
+DEAL::  exact second derivative (hessian): 3.16974 -15.1195 0.00000 -15.1195 4.95272 0.00000 0.00000 0.00000 0.00000 , norm: 19.2070
+DEAL::approx. third derivative: -13.9869 -31.1128 3.11787e-09 -31.1128 -44.0274 2.17672e-10 3.11787e-09 2.17672e-10 0.00000 -31.1128 -44.0274 2.17672e-10 -44.0274 -38.7419 -4.80051e-09 2.17672e-10 -4.80051e-09 -7.10543e-15 3.11787e-09 2.17672e-10 0.00000 2.17672e-10 -4.80051e-09 -7.10543e-15 0.00000 -7.10543e-15 0.00000 , norm: 102.058
+DEAL::  exact third derivative: -16.9727 -45.1785 0.00000 -45.1785 -26.5198 0.00000 0.00000 0.00000 0.00000 -45.1785 -26.5198 0.00000 -26.5198 -70.5914 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 116.209
+DEAL::
+DEAL::cell 2.59
+DEAL::approx. gradient: 1.25691 -0.938469 0.00000 , norm: 1.56861
+DEAL::  exact gradient: 1.23996 -1.65503 0.00000 , norm: 2.06800
+DEAL::approx. second derivative (hessian): 0.687181 -13.1900 0.00000 -13.1900 -6.30645 0.00000 0.00000 0.00000 0.00000 , norm: 16.4553
+DEAL::  exact second derivative (hessian): -1.85788 -17.6732 0.00000 -17.6732 -2.90295 0.00000 0.00000 0.00000 0.00000 , norm: 20.0614
+DEAL::approx. third derivative: -19.6950 -1.21098 3.69848e-09 -1.21098 -53.1857 3.67090e-09 3.69848e-09 3.67090e-09 -2.36848e-15 -1.21098 -53.1857 3.67090e-09 -53.1857 22.7079 2.10047e-09 3.67090e-09 2.10047e-09 0.00000 3.69848e-09 3.67090e-09 -2.36848e-15 3.67090e-09 2.10047e-09 0.00000 -2.36848e-15 0.00000 0.00000 , norm: 96.9232
+DEAL::  exact third derivative: -19.8394 26.4805 0.00000 26.4805 -30.9990 0.00000 0.00000 0.00000 0.00000 26.4805 -30.9990 0.00000 -30.9990 41.3759 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 84.2142
+DEAL::
+DEAL::cell 2.60
+DEAL::approx. gradient: 2.69619 -0.0376929 0.00000 , norm: 2.69645
+DEAL::  exact gradient: 3.20413 -0.0496489 0.00000 , norm: 3.20452
+DEAL::approx. second derivative (hessian): 7.72493 0.201474 0.00000 0.201474 10.6322 0.00000 0.00000 0.00000 0.00000 , norm: 10.6461
+DEAL::  exact second derivative (hessian): 9.57424 0.265850 0.00000 0.265850 14.9597 0.00000 0.00000 0.00000 0.00000 , norm: 14.9728
+DEAL::approx. third derivative: -42.2477 0.596891 1.41390e-09 0.596891 -58.1384 2.23319e-10 1.41390e-09 2.23319e-10 4.73695e-15 0.596891 -58.1384 2.23319e-10 -58.1384 0.912043 2.78293e-09 2.23319e-10 2.78293e-09 1.18424e-15 1.41390e-09 2.23319e-10 4.73695e-15 2.23319e-10 2.78293e-09 1.18424e-15 4.73695e-15 1.18424e-15 0.00000 , norm: 109.211
+DEAL::  exact third derivative: -51.2661 0.794383 0.00000 0.794383 -80.1033 0.00000 0.00000 0.00000 0.00000 0.794383 -80.1033 0.00000 -80.1033 1.24122 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 147.923
+DEAL::
+DEAL::cell 2.61
+DEAL::approx. gradient: 3.79650 0.0220930 0.00000 , norm: 3.79656
+DEAL::  exact gradient: 3.74531 0.0291008 0.00000 , norm: 3.74542
+DEAL::approx. second derivative (hessian): 2.07564 0.260550 0.00000 0.260550 -6.23184 0.00000 0.00000 0.00000 0.00000 , norm: 6.24000
+DEAL::  exact second derivative (hessian): -5.61176 0.310752 0.00000 0.310752 -8.76837 0.00000 0.00000 0.00000 0.00000 , norm: 8.79867
+DEAL::approx. third derivative: -59.4890 -0.00791324 -9.86387e-11 -0.00791324 -73.1597 2.64631e-10 -9.86387e-11 2.64631e-10 -9.47390e-15 -0.00791324 -73.1597 2.64631e-10 -73.1597 -0.534577 -1.61437e-09 2.64631e-10 -1.61437e-09 5.92119e-16 -9.86387e-11 2.64631e-10 -9.47390e-15 2.64631e-10 -1.61437e-09 5.92119e-16 -9.47390e-15 5.92119e-16 0.00000 , norm: 139.987
+DEAL::  exact third derivative: -59.9250 -0.465613 0.00000 -0.465613 -93.6328 0.00000 0.00000 0.00000 0.00000 -0.465613 -93.6328 0.00000 -93.6328 -0.727520 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 172.897
+DEAL::
+DEAL::cell 2.62
+DEAL::approx. gradient: 0.892626 1.60112 0.00000 , norm: 1.83313
+DEAL::  exact gradient: 1.06079 2.82366 0.00000 , norm: 3.01634
+DEAL::approx. second derivative (hessian): 2.55749 -10.0655 0.00000 -10.0655 10.7594 0.00000 0.00000 0.00000 0.00000 , norm: 17.5273
+DEAL::  exact second derivative (hessian): 3.16974 -15.1195 0.00000 -15.1195 4.95272 0.00000 0.00000 0.00000 0.00000 , norm: 19.2070
+DEAL::approx. third derivative: -13.9869 -31.1128 3.11787e-09 -31.1128 -44.0274 2.17672e-10 3.11787e-09 2.17672e-10 0.00000 -31.1128 -44.0274 2.17672e-10 -44.0274 -38.7419 -4.80050e-09 2.17672e-10 -4.80050e-09 -7.10543e-15 3.11787e-09 2.17672e-10 0.00000 2.17672e-10 -4.80050e-09 -7.10543e-15 0.00000 -7.10543e-15 0.00000 , norm: 102.058
+DEAL::  exact third derivative: -16.9727 -45.1785 0.00000 -45.1785 -26.5198 0.00000 0.00000 0.00000 0.00000 -45.1785 -26.5198 0.00000 -26.5198 -70.5914 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 116.209
+DEAL::
+DEAL::cell 2.63
+DEAL::approx. gradient: 1.25691 -0.938469 0.00000 , norm: 1.56861
+DEAL::  exact gradient: 1.23996 -1.65503 0.00000 , norm: 2.06800
+DEAL::approx. second derivative (hessian): 0.687181 -13.1900 0.00000 -13.1900 -6.30645 0.00000 0.00000 0.00000 0.00000 , norm: 16.4553
+DEAL::  exact second derivative (hessian): -1.85788 -17.6732 0.00000 -17.6732 -2.90295 0.00000 0.00000 0.00000 0.00000 , norm: 20.0614
+DEAL::approx. third derivative: -19.6950 -1.21098 3.69848e-09 -1.21098 -53.1857 3.67090e-09 3.69848e-09 3.67090e-09 -2.36848e-15 -1.21098 -53.1857 3.67090e-09 -53.1857 22.7079 2.10047e-09 3.67090e-09 2.10047e-09 0.00000 3.69848e-09 3.67090e-09 -2.36848e-15 3.67090e-09 2.10047e-09 0.00000 -2.36848e-15 0.00000 0.00000 , norm: 96.9232
+DEAL::  exact third derivative: -19.8394 26.4805 0.00000 26.4805 -30.9990 0.00000 0.00000 0.00000 0.00000 26.4805 -30.9990 0.00000 -30.9990 41.3759 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 , norm: 84.2142
+DEAL::
