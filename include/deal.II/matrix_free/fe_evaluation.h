@@ -1728,6 +1728,23 @@ protected:
  * case with compile-time bounds given through fe_degree selects another
  * template class without compromising efficiency.
  *
+ * An overview of the performance of FEEvaluation is given in the following
+ * figure. It considers the time spent per degree of freedom for evaluating
+ * the Laplacian with continuous finite elements using a code similar to the
+ * step-37 tutorial program. The time is based on an experiment on a single
+ * core of an Intel Xeon E5-2687W v4, running at 3.4 GHz and measured at
+ * problem sizes around 10 million. The plot lists the computational time
+ * (around 0.1 seconds) divided by the number of degrees freedom.
+ *
+ * @image html fe_evaluation_laplacian_time_per_dof.png
+ *
+ * The figure shows that the templated version is between 2.5 and 3 times
+ * faster. The fastest turnaround on this setup is for polynomial degree 5 at
+ * 7.4e-9 seconds per degree of freedom or 134 million degrees of freedom per
+ * second - on a single core. The non-templated version is also fastest at
+ * polynomial degree 5 with 2.1e-9 seconds per degree of freedom or 48 million
+ * degrees of freedom per second.
+ *
  * <h3>Handling multi-component systems</h3>
  *
  * FEEvaluation also allows for treating vector-valued problems through a
