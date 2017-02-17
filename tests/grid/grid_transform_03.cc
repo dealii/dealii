@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2015 by the deal.II authors
+// Copyright (C) 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,13 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// Verify that GridTools::laplace_transform can deal with interior
-// nodes being pinned to a new location as well. The test itself
-// doesn't make much sense since it leads to a few inverted cells, but
-// it allows for easy visual inspection that the desired result
-// happens.
-//
-// (Testcase adapted from one by Denis Davydov.)
+// Similar to grid_transform_02.cc but use coefficient function and solve
+// for displacement field.
 
 
 #include "../tests.h"
@@ -36,6 +31,37 @@
 #include <fstream>
 #include <iomanip>
 
+template <int dim>
+class L2_inverse : public Function<dim>
+{
+public:
+  L2_inverse (const std::vector<Point<dim> > &distance_source)
+    :
+    Function<dim> (),
+    distance_source (distance_source)
+  {
+    Assert (distance_source.size()>0,
+            ExcNotImplemented());
+  }
+
+  virtual double value (const dealii::Point<dim> &p,
+                        const unsigned int component = 0) const
+  {
+    double l2_inverse = std::numeric_limits<double>::max();
+
+    for (unsigned int d = 0; d<distance_source.size(); d++)
+      l2_inverse = std::min ((p - distance_source[d]).norm_square (),
+                             l2_inverse);
+
+    l2_inverse = std::max (l2_inverse, 1.e-5);
+
+    return 1.0/l2_inverse;
+  }
+
+private:
+  const std::vector<Point<dim> > distance_source;
+};
+
 
 int main ()
 {
@@ -50,7 +76,7 @@ int main ()
   Triangulation<dim>::active_cell_iterator
   cell = GridTools::find_active_cell_around_point (tria,Point<dim>());
 
-  unsigned int best_vertex   = cell->vertex_index(0);//vertex number on local triangulation
+  unsigned int best_vertex   = cell->vertex_index(0); //vertex number on local triangulation
   Point<dim>   best_pos      = cell->vertex(0);
   double       best_dist     = Point<dim>().distance(best_pos);
 
@@ -68,6 +94,10 @@ int main ()
   new_points[best_vertex] = Point<dim>();
   new_points[best_vertex][0] += 1.;
 
+  // store the current location to be used in coefficient function
+  std::vector<Point<dim> > metric;
+  metric.push_back(best_pos);
+
   // now pin all of the points on the boundary
   cell = tria.begin_active();
   Triangulation<dim>::active_cell_iterator endc = tria.end();
@@ -83,7 +113,8 @@ int main ()
             }
 
   // then compute new point locations and output the result
-  GridTools::laplace_transform<dim>  (new_points,tria, NULL, true);
+  L2_inverse<dim> coefficient(metric);
+  GridTools::laplace_transform  (new_points,tria, &coefficient);
   std::ofstream out ("output");
   GridOut grid_out;
   grid_out.write_eps (tria, out);

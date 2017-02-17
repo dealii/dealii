@@ -1,0 +1,6 @@
+Fixed: Fixed a bug in GridTools::laplace_transform() which was previously solving
+for the final position field instead of displacement. The two formulations are
+not equivalent when a non-constant coefficient is provided, which is commonly
+used with displacement formulation.
+<br>
+(Denis Davydov, 2017/02/17)
