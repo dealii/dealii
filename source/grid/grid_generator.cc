@@ -3936,8 +3936,8 @@ namespace GridGenerator
     unsigned int n_levels = 0;
     unsigned int n_total = 0;
 
-    // mark parents and find out max level
-    for (unsigned int level=0; level<other_tria.n_levels(); ++level)
+    // mark parents of all cells recursively and find out max level
+    for (int level=other_tria.n_levels()-1; level>=0; --level)
       {
         typename Triangulation<dim, spacedim>::cell_iterator it = other_tria.begin(level),
                                                              endc = other_tria.end(level);
@@ -4017,6 +4017,8 @@ namespace GridGenerator
 
 
 
+      if (cells.size()==0)
+        return; // mesh is empty, but that is okay
 
       dest.create_triangulation (vertices, cells, subcelldata);
     }

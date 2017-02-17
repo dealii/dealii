@@ -2,18 +2,18 @@
 DEAL:0:2d:: locally_owned_subdomain(): 0
  n_active_cells: 15
  n_levels: 3
- n_global_levels: 0
- n_locally_owned_active_cells: 0
- n_global_active_cells: 0
+ n_global_levels: 3
+ n_locally_owned_active_cells: 5
+ n_global_active_cells: 15
 
 DEAL:0:2d::subdomains: 0 0 0 0 0 1 1 1 1 4294967294 4294967294 4294967294 2 2 2 
 
 DEAL:1:2d:: locally_owned_subdomain(): 1
  n_active_cells: 12
  n_levels: 2
- n_global_levels: 0
- n_locally_owned_active_cells: 0
- n_global_active_cells: 0
+ n_global_levels: 3
+ n_locally_owned_active_cells: 5
+ n_global_active_cells: 15
 
 DEAL:1:2d::subdomains: 4294967294 0 0 0 0 0 1 1 1 1 1 2 
 
@@ -21,9 +21,9 @@ DEAL:1:2d::subdomains: 4294967294 0 0 0 0 0 1 1 1 1 1 2
 DEAL:2:2d:: locally_owned_subdomain(): 2
  n_active_cells: 11
  n_levels: 3
- n_global_levels: 0
- n_locally_owned_active_cells: 0
- n_global_active_cells: 0
+ n_global_levels: 3
+ n_locally_owned_active_cells: 5
+ n_global_active_cells: 15
 
 DEAL:2:2d::subdomains: 0 0 0 1 1 1 2 2 2 2 2 
 

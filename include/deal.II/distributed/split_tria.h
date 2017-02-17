@@ -101,6 +101,10 @@ namespace parallel
 //                                         const std::vector< CellData< dim > > &cells,
 //                                         const SubCellData &subcelldata);
 
+      virtual void
+      update_number_cache ();
+
+
       /**
        * Copy @p other_tria to this triangulation.
        *

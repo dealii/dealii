@@ -49,28 +49,30 @@ namespace parallel
 
       true_subdomain_ids_of_cells.resize(this->n_active_cells());
 
-      // mark artificial cells
-      typename parallel::Triangulation<dim,spacedim>::active_cell_iterator
-      cell = this->begin_active(),
-      endc = this->end();
-      {
-        // get halo layer of (ghost) cells
-        // parallel::shared::Triangulation<dim>::
-        std_cxx11::function<bool (const typename Triangulation<dim,spacedim>::active_cell_iterator &)> predicate
-          = IteratorFilters::SubdomainEqualTo(this->my_subdomain);
+      if (this->n_active_cells()>0)
+        {
+          // mark artificial cells
 
-        const std::vector<typename dealii::Triangulation<dim,spacedim>::active_cell_iterator>
-        active_halo_layer_vector = GridTools::compute_active_cell_halo_layer<dealii::Triangulation<dim,spacedim> > (*this, predicate);
-        std::set<typename Triangulation<dim,spacedim>::active_cell_iterator>
-        active_halo_layer(active_halo_layer_vector.begin(), active_halo_layer_vector.end());
+          // get halo layer of (ghost) cells
+          // parallel::shared::Triangulation<dim>::
+          std_cxx11::function<bool (const typename Triangulation<dim,spacedim>::active_cell_iterator &)> predicate
+            = IteratorFilters::SubdomainEqualTo(this->my_subdomain);
 
-        for (unsigned int index=0; cell != endc; cell++, index++)
-          {
-            if (cell->is_locally_owned() == false &&
-                active_halo_layer.find(cell) == active_halo_layer.end())
-              cell->set_subdomain_id(numbers::artificial_subdomain_id);
-          }
-      }
+          const std::vector<typename dealii::Triangulation<dim,spacedim>::active_cell_iterator>
+          active_halo_layer_vector = GridTools::compute_active_cell_halo_layer<dealii::Triangulation<dim,spacedim> > (*this, predicate);
+          std::set<typename Triangulation<dim,spacedim>::active_cell_iterator>
+          active_halo_layer(active_halo_layer_vector.begin(), active_halo_layer_vector.end());
+
+          typename parallel::Triangulation<dim,spacedim>::active_cell_iterator
+          cell = this->begin_active(),
+          endc = this->end();
+          for (unsigned int index=0; cell != endc; cell++, index++)
+            {
+              if (cell->is_locally_owned() == false &&
+                  active_halo_layer.find(cell) == active_halo_layer.end())
+                cell->set_subdomain_id(numbers::artificial_subdomain_id);
+            }
+        }
 
 
 #ifdef DEBUG
@@ -112,7 +114,61 @@ namespace parallel
     }
 
 
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim,spacedim>::update_number_cache ()
+    {
+      Assert (this->number_cache.n_locally_owned_active_cells.size()
+              ==
+              Utilities::MPI::n_mpi_processes (this->mpi_communicator),
+              ExcInternalError());
 
+      std::fill (this->number_cache.n_locally_owned_active_cells.begin(),
+                 this->number_cache.n_locally_owned_active_cells.end(),
+                 0);
+
+      this->number_cache.ghost_owners.clear ();
+      this->number_cache.level_ghost_owners.clear ();
+
+      if (this->n_levels() > 0)
+        {
+          // find ghost owners
+          for (typename Triangulation<dim,spacedim>::active_cell_iterator
+               cell = this->begin_active();
+               cell != this->end();
+               ++cell)
+            if (cell->is_ghost())
+              this->number_cache.ghost_owners.insert(cell->subdomain_id());
+
+          Assert(this->number_cache.ghost_owners.size() < Utilities::MPI::n_mpi_processes(this->mpi_communicator),
+                 ExcInternalError());
+        }
+
+      if (this->n_levels() > 0)
+        for (typename Triangulation<dim,spacedim>::active_cell_iterator
+             cell = this->begin_active();
+             cell != this->end(); ++cell)
+          if (cell->subdomain_id() == this->my_subdomain)
+            ++this->number_cache.n_locally_owned_active_cells[this->my_subdomain];
+
+      unsigned int send_value
+        = this->number_cache.n_locally_owned_active_cells[this->my_subdomain];
+      const int ierr = MPI_Allgather (&send_value,
+                                      1,
+                                      MPI_UNSIGNED,
+                                      &this->number_cache.n_locally_owned_active_cells[0],
+                                      1,
+                                      MPI_UNSIGNED,
+                                      this->mpi_communicator);
+      AssertThrowMPI(ierr);
+
+      this->number_cache.n_global_active_cells
+        = std::accumulate (this->number_cache.n_locally_owned_active_cells.begin(),
+                           this->number_cache.n_locally_owned_active_cells.end(),
+                           /* ensure sum is computed with correct data type:*/
+                           static_cast<types::global_dof_index>(0));
+      this->number_cache.n_global_levels = Utilities::MPI::max(this->n_levels(), this->mpi_communicator);
+    }
 
 
     template <int dim, int spacedim>
@@ -157,7 +213,7 @@ namespace parallel
       other_not_const.load_user_flags(user_flags);
 
       partition();
-      //this->update_number_cache ();
+      this->update_number_cache ();
     }
 
   }

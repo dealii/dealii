@@ -1,0 +1,29 @@
+
+DEAL:0:2d:: locally_owned_subdomain(): 0
+ n_active_cells: 48
+ n_levels: 3
+ n_global_levels: 3
+ n_locally_owned_active_cells: 40
+ n_global_active_cells: 48
+
+DEAL:0:2d::subdomains: 4294967294 4294967294 1 1 4294967294 2 2 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+
+DEAL:1:2d:: locally_owned_subdomain(): 1
+ n_active_cells: 16
+ n_levels: 3
+ n_global_levels: 3
+ n_locally_owned_active_cells: 4
+ n_global_active_cells: 48
+
+DEAL:1:2d::subdomains: 1 1 1 1 2 4294967294 2 4294967294 0 0 4294967294 4294967294 0 4294967294 4294967294 4294967294 
+
+
+DEAL:2:2d:: locally_owned_subdomain(): 2
+ n_active_cells: 26
+ n_levels: 3
+ n_global_levels: 3
+ n_locally_owned_active_cells: 4
+ n_global_active_cells: 48
+
+DEAL:2:2d::subdomains: 4294967294 4294967294 4294967294 1 4294967294 1 2 2 2 2 4294967294 0 4294967294 4294967294 0 0 4294967294 4294967294 0 4294967294 0 4294967294 0 4294967294 4294967294 4294967294 
+

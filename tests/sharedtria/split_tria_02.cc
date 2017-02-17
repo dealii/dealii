@@ -61,20 +61,20 @@ void test()
 
   Triangulation<dim> basetria;
   GridGenerator::hyper_L(basetria);
-  basetria.refine_global();
-
-  typename Triangulation<dim>::active_cell_iterator it = basetria.begin_active();
-  it->set_refine_flag();
-  //  ++it;
-  it->set_refine_flag();
-  basetria.execute_coarsening_and_refinement ();
+  basetria.refine_global(2);
 
   typename Triangulation<dim>::active_cell_iterator
   cell = basetria.begin_active();
 
   for (unsigned int i=0; i < basetria.n_active_cells(); ++i)
     {
-      cell->set_subdomain_id((i*3/basetria.n_active_cells()) % nproc);
+      unsigned int j=0;
+      if (i<4)
+        j=1;
+      else if (i<8)
+        j=2;
+
+      cell->set_subdomain_id(j % nproc);
       ++cell;
     }
 
@@ -98,15 +98,16 @@ void test()
     deallog << v[i] << " ";
     deallog << std::endl;*/
 
-  {
-    deallog << "subdomains: ";
-    typename  Triangulation<dim>::active_cell_iterator it=tr.begin_active();
-    for (unsigned int index=0; it!=tr.end(); ++it,++index)
-      {
-        deallog << it->subdomain_id() << " ";
-      }
-    deallog << std::endl;
-  }
+  if (tr.n_active_cells()>0)
+    {
+      deallog << "subdomains: ";
+      typename  Triangulation<dim>::active_cell_iterator it=tr.begin_active();
+      for (unsigned int index=0; it!=tr.end(); ++it,++index)
+        {
+          deallog << it->subdomain_id() << " ";
+        }
+      deallog << std::endl;
+    }
 
   GridOut go;
   go.write_mesh_per_processor_as_vtu (tr, "mesh", false, true);
