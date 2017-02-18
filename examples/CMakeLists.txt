@@ -46,17 +46,63 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
     PATTERN "DTMB-5415_bulbous_bow.iges"  # step-54
     )
 
+  IF(DEAL_II_COMPILE_EXAMPLES)
+    #
+    # Set up all executables:
+    #
+    FILE(GLOB _steps ${CMAKE_CURRENT_SOURCE_DIR}/step-*/*.cc)
+    FOREACH(_step ${_steps})
+      GET_FILENAME_COMPONENT(_name ${_step} NAME_WE)
+      GET_FILENAME_COMPONENT(_directory ${_step} DIRECTORY)
+
+      #
+      # Extract dependency information from CMakeLists.txt file.
+      #
+      SET(_dependency_string TRUE)
+      IF(EXISTS "${_directory}/CMakeLists.txt")
+        FILE(STRINGS "${_directory}/CMakeLists.txt" _dependency_string
+          REGEX "^IF.*DEAL_II.* # keep in one line$"
+          )
+        STRING(REPLACE "IF(" "" _dependency_string "${_dependency_string}")
+        STRING(REPLACE ") # keep in one line" "" _dependency_string "${_dependency_string}")
+        IF("${_dependency_string}" STREQUAL "")
+          SET(_dependency_string "TRUE")
+        ELSE()
+          SET(_dependency_string "NOT (${_dependency_string})")
+        ENDIF()
+      ENDIF()
+
+      #
+      # Now evaluate the _dependency_string and store the result in _setup.
+      # We have to be careful - ${_dependency_string} evaluating to true
+      # means that not all dependencies are fulfilled.
+      #
+      SET(_setup FALSE)
+      EVALUATE_EXPRESSION("
+        IF(${_dependency_string})
+          SET(_setup TRUE)
+        ENDIF()")
+
+      IF(_setup)
+        FOREACH(_build ${DEAL_II_BUILD_TYPES})
+          STRING(TOLOWER ${_build} _build_lowercase)
+          ADD_EXECUTABLE(${_name}.${_build_lowercase} ${_step})
+          DEAL_II_INSOURCE_SETUP_TARGET(${_name}.${_build_lowercase} ${_build})
+          SET_TARGET_PROPERTIES(${_name}.${_build_lowercase}
+            PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
+            )
+          ADD_DEPENDENCIES(examples ${_name}.${_build_lowercase})
+        ENDFOREACH()
+
+      ELSE()
+
+        MESSAGE(STATUS "  ${_name} - dependencies not satisfied")
+      ENDIF()
+
+    ENDFOREACH()
+  ENDIF()
+
   MESSAGE(STATUS "Setting up examples - Done")
+
 ENDIF()
-
-#
-# Add a dummy target to make files known to IDEs like qtcreator
-#
-
-FILE(GLOB _misc
-  ${CMAKE_CURRENT_SOURCE_DIR}/step-*/*.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/step-*/*.h
-)
-ADD_CUSTOM_TARGET(dummy_examples_files
-  SOURCES ${_misc}
-  )
