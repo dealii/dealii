@@ -184,29 +184,17 @@ public:
    * MatrixFree object and lead to a structure that does not effectively use
    * vectorization in the evaluate routines based on these values (instead,
    * VectorizedArray::n_array_elements same copies are worked on).
+   *
+   * If the given vector template class is a block vector (determined through
+   * the template function 'IsBlockVector<VectorType>::value', which checks
+   * for vectors derived from dealii::BlockVectorBase) or an
+   * std::vector<VectorType> or std::vector<VectorType *>, this function reads
+   * @p n_components blocks from the block vector starting at the index
+   * @p first_index. For non-block vectors, @p first_index is ignored.
    */
   template <typename VectorType>
-  void read_dof_values (const VectorType &src);
-
-  /**
-   * For a collection of several vector @p src, read out the values on the
-   * degrees of freedom of the current cell for @p n_components (template
-   * argument), starting at @p first_index, and store them internally. Similar
-   * functionality as the function ConstraintMatrix::read_dof_values.  Note
-   * that if vectorization is enabled, the DoF values for several cells are
-   * set.
-   */
-  template <typename VectorType>
-  void read_dof_values (const std::vector<VectorType> &src,
-                        const unsigned int             first_index=0);
-
-  /**
-   * Reads data from several vectors. Same as other function with std::vector,
-   * but accepts a vector of pointers to vectors.
-   */
-  template <typename VectorType>
-  void read_dof_values (const std::vector<VectorType *> &src,
-                        const unsigned int              first_index=0);
+  void read_dof_values (const VectorType  &src,
+                        const unsigned int first_index = 0);
 
   /**
    * For the vector @p src, read out the values on the degrees of freedom of
@@ -228,29 +216,17 @@ public:
    * MatrixFree object and lead to a structure that does not effectively use
    * vectorization in the evaluate routines based on these values (instead,
    * VectorizedArray::n_array_elements same copies are worked on).
+   *
+   * If the given vector template class is a block vector (determined through
+   * the template function 'IsBlockVector<VectorType>::value', which checks
+   * for vectors derived from dealii::BlockVectorBase) or an
+   * std::vector<VectorType> or std::vector<VectorType *>, this function reads
+   * @p n_components blocks from the block vector starting at the index
+   * @p first_index. For non-block vectors, @p first_index is ignored.
    */
   template <typename VectorType>
-  void read_dof_values_plain (const VectorType &src);
-
-  /**
-   * For a collection of several vector @p src, read out the values on the
-   * degrees of freedom of the current cell for @p n_components (template
-   * argument), starting at @p first_index, and store them internally. Similar
-   * functionality as the function DoFAccessor::read_dof_values.  Note that if
-   * vectorization is enabled, the DoF values for several cells are set.
-   */
-  template <typename VectorType>
-  void read_dof_values_plain (const std::vector<VectorType> &src,
-                              const unsigned int             first_index=0);
-
-  /**
-   * Reads data from several vectors without resolving constraints. Same as
-   * other function with std::vector, but accepts a vector of pointers to
-   * vectors.
-   */
-  template <typename VectorType>
-  void read_dof_values_plain (const std::vector<VectorType *> &src,
-                              const unsigned int              first_index=0);
+  void read_dof_values_plain (const VectorType  &src,
+                              const unsigned int first_index = 0);
 
   /**
    * Takes the values stored internally on dof values of the current cell and
@@ -267,37 +243,27 @@ public:
    * MatrixFree object and lead to a structure that does not effectively use
    * vectorization in the evaluate routines based on these values (instead,
    * VectorizedArray::n_array_elements same copies are worked on).
+   *
+   * If the given vector template class is a block vector (determined through
+   * the template function 'IsBlockVector<VectorType>::value', which checks
+   * for vectors derived from dealii::BlockVectorBase) or an
+   * std::vector<VectorType> or std::vector<VectorType *>, this function
+   * writes to @p n_components blocks of the block vector starting at the
+   * index @p first_index. For non-block vectors, @p first_index is ignored.
    */
   template<typename VectorType>
-  void distribute_local_to_global (VectorType &dst) const;
-
-  /**
-   * Takes the values stored internally on dof values of the current cell for
-   * a vector-valued problem consisting of @p n_components (template argument)
-   * and sums them into the collection of vectors vector @p dst, starting at
-   * index @p first_index. The function also applies constraints during the
-   * write operation. The functionality is hence similar to the function
-   * ConstraintMatrix::distribute_local_to_global. If vectorization is
-   * enabled, the DoF values for several cells are used.
-   */
-  template<typename VectorType>
-  void distribute_local_to_global (std::vector<VectorType> &dst,
-                                   const unsigned int       first_index=0) const;
-
-  /**
-   * Write data to several vectors. Same as other function with std::vector,
-   * but accepts a vector of pointers to vectors.
-   */
-  template<typename VectorType>
-  void distribute_local_to_global (std::vector<VectorType *> &dst,
-                                   const unsigned int       first_index=0) const;
+  void distribute_local_to_global (VectorType        &dst,
+                                   const unsigned int first_index = 0) const;
 
   /**
    * Takes the values stored internally on dof values of the current cell and
-   * sums them into the vector @p dst. The function also applies constraints
-   * during the write operation. The functionality is hence similar to the
-   * function ConstraintMatrix::distribute_local_to_global.  Note that if
-   * vectorization is enabled, the DoF values for several cells are used.
+   * writes them into the vector @p dst. The function skips the degrees of
+   * freedom which are constrained. As opposed to the
+   * distribute_local_to_global method, the old values at the position given
+   * by the current cell are overwritten. Thus, if a degree of freedom is
+   * associated to more than one cell (as usual in continuous finite
+   * elements), the values will be overwritten and only the value written last
+   * is retained.
    *
    * If this class was constructed without a MatrixFree object and the
    * information is acquired on the fly through a
@@ -307,30 +273,17 @@ public:
    * MatrixFree object and lead to a structure that does not effectively use
    * vectorization in the evaluate routines based on these values (instead,
    * VectorizedArray::n_array_elements same copies are worked on).
+   *
+   * If the given vector template class is a block vector (determined through
+   * the template function 'IsBlockVector<VectorType>::value', which checks
+   * for vectors derived from dealii::BlockVectorBase) or an
+   * std::vector<VectorType> or std::vector<VectorType *>, this function
+   * writes to @p n_components blocks of the block vector starting at the
+   * index @p first_index. For non-block vectors, @p first_index is ignored.
    */
   template<typename VectorType>
-  void set_dof_values (VectorType &dst) const;
-
-  /**
-   * Takes the values stored internally on dof values of the current cell for
-   * a vector-valued problem consisting of @p n_components (template argument)
-   * and sums them into the collection of vectors vector @p dst, starting at
-   * index @p first_index. The function also applies constraints during the
-   * write operation. The functionality is hence similar to the function
-   * ConstraintMatrix::distribute_local_to_global.  Note that if vectorization
-   * is enabled, the DoF values for several cells are used.
-   */
-  template<typename VectorType>
-  void set_dof_values (std::vector<VectorType> &dst,
-                       const unsigned int       first_index=0) const;
-
-  /**
-   * Write data to several vectors. Same as other function with std::vector,
-   * but accepts a vector of pointers to vectors.
-   */
-  template<typename VectorType>
-  void set_dof_values (std::vector<VectorType *> &dst,
-                       const unsigned int        first_index=0) const;
+  void set_dof_values (VectorType        &dst,
+                       const unsigned int first_index = 0) const;
 
   //@}
 
@@ -2772,6 +2725,32 @@ namespace internal
       return &vec;
     }
   };
+
+  template <typename VectorType>
+  struct BlockVectorSelector<std::vector<VectorType>,false>
+  {
+    typedef VectorType BaseVectorType;
+
+    static BaseVectorType *get_vector_component (std::vector<VectorType> &vec,
+                                                 const unsigned int component)
+    {
+      AssertIndexRange (component, vec.size());
+      return &vec[component];
+    }
+  };
+
+  template <typename VectorType>
+  struct BlockVectorSelector<std::vector<VectorType *>,false>
+  {
+    typedef VectorType BaseVectorType;
+
+    static BaseVectorType *get_vector_component (std::vector<VectorType *> &vec,
+                                                 const unsigned int component)
+    {
+      AssertIndexRange (component, vec.size());
+      return vec[component];
+    }
+  };
 }
 
 
@@ -3125,14 +3104,15 @@ template<typename VectorType>
 inline
 void
 FEEvaluationBase<dim,n_components_,Number>
-::read_dof_values (const VectorType &src)
+::read_dof_values (const VectorType  &src,
+                   const unsigned int first_index)
 {
   // select between block vectors and non-block vectors. Note that the number
   // of components is checked in the internal data
   typename internal::BlockVectorSelector<VectorType,
            IsBlockVector<VectorType>::value>::BaseVectorType *src_data[n_components];
   for (unsigned int d=0; d<n_components; ++d)
-    src_data[d] = internal::BlockVectorSelector<VectorType, IsBlockVector<VectorType>::value>::get_vector_component(const_cast<VectorType &>(src), d);
+    src_data[d] = internal::BlockVectorSelector<VectorType, IsBlockVector<VectorType>::value>::get_vector_component(const_cast<VectorType &>(src), d+first_index);
 
   internal::VectorReader<Number> reader;
   read_write_operation (reader, src_data);
@@ -3149,70 +3129,15 @@ template<typename VectorType>
 inline
 void
 FEEvaluationBase<dim,n_components_,Number>
-::read_dof_values (const std::vector<VectorType> &src,
-                   const unsigned int             first_index)
-{
-  AssertIndexRange (first_index, src.size());
-  Assert (n_fe_components == 1, ExcNotImplemented());
-  Assert ((n_fe_components == 1 ?
-           (first_index+n_components <= src.size()) : true),
-          ExcIndexRange (first_index + n_components_, 0, src.size()));
-
-  VectorType *src_data [n_components];
-  for (unsigned int comp=0; comp<n_components; ++comp)
-    src_data[comp] = const_cast<VectorType *>(&src[comp+first_index]);
-
-  internal::VectorReader<Number> reader;
-  read_write_operation (reader, src_data);
-
-#ifdef DEBUG
-  dof_values_initialized = true;
-#endif
-}
-
-
-
-template <int dim, int n_components_, typename Number>
-template<typename VectorType>
-inline
-void
-FEEvaluationBase<dim,n_components_,Number>
-::read_dof_values (const std::vector<VectorType *> &src,
-                   const unsigned int              first_index)
-{
-  AssertIndexRange (first_index, src.size());
-  Assert (n_fe_components == 1, ExcNotImplemented());
-  Assert ((n_fe_components == 1 ?
-           (first_index+n_components <= src.size()) : true),
-          ExcIndexRange (first_index + n_components_, 0, src.size()));
-
-  const VectorType *src_data [n_components];
-  for (unsigned int comp=0; comp<n_components; ++comp)
-    src_data[comp] = const_cast<VectorType *>(src[comp+first_index]);
-
-  internal::VectorReader<Number> reader;
-  read_write_operation (reader, src_data);
-
-#ifdef DEBUG
-  dof_values_initialized = true;
-#endif
-}
-
-
-
-template <int dim, int n_components_, typename Number>
-template<typename VectorType>
-inline
-void
-FEEvaluationBase<dim,n_components_,Number>
-::read_dof_values_plain (const VectorType &src)
+::read_dof_values_plain (const VectorType  &src,
+                         const unsigned int first_index)
 {
   // select between block vectors and non-block vectors. Note that the number
   // of components is checked in the internal data
   const typename internal::BlockVectorSelector<VectorType,
         IsBlockVector<VectorType>::value>::BaseVectorType *src_data[n_components];
   for (unsigned int d=0; d<n_components; ++d)
-    src_data[d] = internal::BlockVectorSelector<VectorType, IsBlockVector<VectorType>::value>::get_vector_component(const_cast<VectorType &>(src), d);
+    src_data[d] = internal::BlockVectorSelector<VectorType, IsBlockVector<VectorType>::value>::get_vector_component(const_cast<VectorType &>(src), d+first_index);
 
   read_dof_values_plain (src_data);
 }
@@ -3224,49 +3149,8 @@ template<typename VectorType>
 inline
 void
 FEEvaluationBase<dim,n_components_,Number>
-::read_dof_values_plain (const std::vector<VectorType> &src,
-                         const unsigned int             first_index)
-{
-  AssertIndexRange (first_index, src.size());
-  Assert (n_fe_components == 1, ExcNotImplemented());
-  Assert ((n_fe_components == 1 ?
-           (first_index+n_components <= src.size()) : true),
-          ExcIndexRange (first_index + n_components_, 0, src.size()));
-  const VectorType *src_data [n_components];
-  for (unsigned int comp=0; comp<n_components; ++comp)
-    src_data[comp] = &src[comp+first_index];
-  read_dof_values_plain (src_data);
-}
-
-
-
-template <int dim, int n_components_, typename Number>
-template<typename VectorType>
-inline
-void
-FEEvaluationBase<dim,n_components_,Number>
-::read_dof_values_plain (const std::vector<VectorType *> &src,
-                         const unsigned int              first_index)
-{
-  AssertIndexRange (first_index, src.size());
-  Assert (n_fe_components == 1, ExcNotImplemented());
-  Assert ((n_fe_components == 1 ?
-           (first_index+n_components <= src.size()) : true),
-          ExcIndexRange (first_index + n_components_, 0, src.size()));
-  const VectorType *src_data [n_components];
-  for (unsigned int comp=0; comp<n_components; ++comp)
-    src_data[comp] = src[comp+first_index];
-  read_dof_values_plain (src_data);
-}
-
-
-
-template <int dim, int n_components_, typename Number>
-template<typename VectorType>
-inline
-void
-FEEvaluationBase<dim,n_components_,Number>
-::distribute_local_to_global (VectorType &dst) const
+::distribute_local_to_global (VectorType        &dst,
+                              const unsigned int first_index) const
 {
   Assert (dof_values_initialized==true,
           internal::ExcAccessToUninitializedField());
@@ -3276,7 +3160,7 @@ FEEvaluationBase<dim,n_components_,Number>
   typename internal::BlockVectorSelector<VectorType,
            IsBlockVector<VectorType>::value>::BaseVectorType *dst_data[n_components];
   for (unsigned int d=0; d<n_components; ++d)
-    dst_data[d] = internal::BlockVectorSelector<VectorType, IsBlockVector<VectorType>::value>::get_vector_component(dst, d);
+    dst_data[d] = internal::BlockVectorSelector<VectorType, IsBlockVector<VectorType>::value>::get_vector_component(dst, d+first_index);
 
   internal::VectorDistributorLocalToGlobal<Number> distributor;
   read_write_operation (distributor, dst_data);
@@ -3289,59 +3173,8 @@ template<typename VectorType>
 inline
 void
 FEEvaluationBase<dim,n_components_,Number>
-::distribute_local_to_global (std::vector<VectorType>  &dst,
-                              const unsigned int        first_index) const
-{
-  AssertIndexRange (first_index, dst.size());
-  Assert (n_fe_components == 1, ExcNotImplemented());
-  Assert ((n_fe_components == 1 ?
-           (first_index+n_components <= dst.size()) : true),
-          ExcIndexRange (first_index + n_components_, 0, dst.size()));
-  Assert (dof_values_initialized==true,
-          internal::ExcAccessToUninitializedField());
-
-  VectorType *dst_data [n_components];
-  for (unsigned int comp=0; comp<n_components; ++comp)
-    dst_data[comp] = &dst[comp+first_index];
-
-  internal::VectorDistributorLocalToGlobal<Number> distributor;
-  read_write_operation (distributor, dst_data);
-}
-
-
-
-template <int dim, int n_components_, typename Number>
-template<typename VectorType>
-inline
-void
-FEEvaluationBase<dim,n_components_,Number>
-::distribute_local_to_global (std::vector<VectorType *>  &dst,
-                              const unsigned int         first_index) const
-{
-  AssertIndexRange (first_index, dst.size());
-  Assert (n_fe_components == 1, ExcNotImplemented());
-  Assert ((n_fe_components == 1 ?
-           (first_index+n_components <= dst.size()) : true),
-          ExcIndexRange (first_index + n_components_, 0, dst.size()));
-  Assert (dof_values_initialized==true,
-          internal::ExcAccessToUninitializedField());
-
-  VectorType *dst_data [n_components];
-  for (unsigned int comp=0; comp<n_components; ++comp)
-    dst_data[comp] = dst[comp+first_index];
-
-  internal::VectorDistributorLocalToGlobal<Number> distributor;
-  read_write_operation (distributor, dst_data);
-}
-
-
-
-template <int dim, int n_components_, typename Number>
-template<typename VectorType>
-inline
-void
-FEEvaluationBase<dim,n_components_,Number>
-::set_dof_values (VectorType &dst) const
+::set_dof_values (VectorType        &dst,
+                  const unsigned int first_index) const
 {
   Assert (dof_values_initialized==true,
           internal::ExcAccessToUninitializedField());
@@ -3351,61 +3184,7 @@ FEEvaluationBase<dim,n_components_,Number>
   typename internal::BlockVectorSelector<VectorType,
            IsBlockVector<VectorType>::value>::BaseVectorType *dst_data[n_components];
   for (unsigned int d=0; d<n_components; ++d)
-    dst_data[d] = internal::BlockVectorSelector<VectorType, IsBlockVector<VectorType>::value>::get_vector_component(dst, d);
-
-  internal::VectorSetter<Number> setter;
-  read_write_operation (setter, dst_data);
-}
-
-
-
-template <int dim, int n_components_, typename Number>
-template<typename VectorType>
-inline
-void
-FEEvaluationBase<dim,n_components_,Number>
-::set_dof_values (std::vector<VectorType>  &dst,
-                  const unsigned int        first_index) const
-{
-  AssertIndexRange (first_index, dst.size());
-  Assert (n_fe_components == 1, ExcNotImplemented());
-  Assert ((n_fe_components == 1 ?
-           (first_index+n_components <= dst.size()) : true),
-          ExcIndexRange (first_index + n_components_, 0, dst.size()));
-
-  Assert (dof_values_initialized==true,
-          internal::ExcAccessToUninitializedField());
-
-  VectorType *dst_data [n_components];
-  for (unsigned int comp=0; comp<n_components; ++comp)
-    dst_data[comp] = &dst[comp+first_index];
-
-  internal::VectorSetter<Number> setter;
-  read_write_operation (setter, dst_data);
-}
-
-
-
-template <int dim, int n_components_, typename Number>
-template<typename VectorType>
-inline
-void
-FEEvaluationBase<dim,n_components_,Number>
-::set_dof_values (std::vector<VectorType *>  &dst,
-                  const unsigned int         first_index) const
-{
-  AssertIndexRange (first_index, dst.size());
-  Assert (n_fe_components == 1, ExcNotImplemented());
-  Assert ((n_fe_components == 1 ?
-           (first_index+n_components <= dst.size()) : true),
-          ExcIndexRange (first_index + n_components_, 0, dst.size()));
-
-  Assert (dof_values_initialized==true,
-          internal::ExcAccessToUninitializedField());
-
-  VectorType *dst_data [n_components];
-  for (unsigned int comp=0; comp<n_components; ++comp)
-    dst_data[comp] = dst[comp+first_index];
+    dst_data[d] = internal::BlockVectorSelector<VectorType, IsBlockVector<VectorType>::value>::get_vector_component(dst, d+first_index);
 
   internal::VectorSetter<Number> setter;
   read_write_operation (setter, dst_data);
