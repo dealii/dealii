@@ -377,8 +377,8 @@ were also run involving up to 549 billion (2^39) DoFs.
 <img src="https://www.dealii.org/images/steps/developer/step-37.scaling_size.png" alt="">
 
 Finally, we note that while performing the tests on the large-scale system
-shown above lead to improvements of the multigrid algorithms in deal.II. The
-original version contained the sub-optimal code based on
+shown above, improvements of the multigrid algorithms in deal.II have been
+developed. The original version contained the sub-optimal code based on
 MGSmootherPrecondition where some inner products were done on each smoothing
 operation on each level, which only became apparent on 65k cores and
 more. However, the following picture shows that the improvement already pay
