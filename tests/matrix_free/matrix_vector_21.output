@@ -1,0 +1,7 @@
+
+DEAL:2d::Testing FE_Q<2>(1)
+DEAL:2d::Norm of difference (component 1/2): 0 0 
+DEAL:2d::
+DEAL:3d::Testing FE_Q<3>(1)
+DEAL:3d::Norm of difference (component 1/2): 0 0 
+DEAL:3d::
