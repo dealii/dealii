@@ -2378,6 +2378,16 @@ DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::copy_from
 
 
 template <template <int, int> class DoFHandlerType, int spacedim, bool level_dof_access>
+inline
+TriaIterator<DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access > >
+DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::child (const unsigned int /*i*/) const
+{
+  return TriaIterator<DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access > >();
+}
+
+
+
+template <template <int, int> class DoFHandlerType, int spacedim, bool level_dof_access>
 template <int dim2, class DoFHandlerType2, bool level_dof_access2>
 inline
 bool
@@ -2402,18 +2412,6 @@ DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::operator !=
   Assert (this->dof_handler == a.dof_handler, ExcCantCompareIterators());
   return (BaseClass::operator != (a));
 }
-
-
-
-template <template <int, int> class DoFHandlerType, int spacedim, bool level_dof_access>
-inline
-TriaIterator<DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access > >
-DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::child (const unsigned int /*i*/) const
-{
-  return TriaIterator<DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access > >();
-}
-
-
 
 
 
