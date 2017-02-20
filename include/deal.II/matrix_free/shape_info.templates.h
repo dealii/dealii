@@ -44,6 +44,7 @@ namespace internal
       :
       element_type (tensor_general),
       fe_degree (numbers::invalid_unsigned_int),
+      n_q_points_1d(0),
       n_q_points (0),
       dofs_per_cell (0),
       n_q_points_face (0),
@@ -65,6 +66,7 @@ namespace internal
               ExcMessage("FEEvaluation only works for scalar finite elements."));
 
       fe_degree = fe->degree;
+      n_q_points_1d = quad.size();
 
       const unsigned int n_dofs_1d = fe_degree+1,
                          n_q_points_1d = quad.size();

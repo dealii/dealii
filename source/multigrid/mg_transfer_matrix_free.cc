@@ -203,7 +203,8 @@ void MGTransferMatrixFree<dim,Number>
     do_prolongate_add<10>(to_level, this->ghosted_level_vector[to_level],
                           this->ghosted_level_vector[to_level-1]);
   else
-    AssertThrow(false, ExcNotImplemented("Only degrees 0 up to 10 implemented."));
+    do_prolongate_add<-1>(to_level, this->ghosted_level_vector[to_level],
+                          this->ghosted_level_vector[to_level-1]);
 
   this->ghosted_level_vector[to_level].compress(VectorOperation::add);
   dst = this->ghosted_level_vector[to_level];
@@ -263,7 +264,9 @@ void MGTransferMatrixFree<dim,Number>
     do_restrict_add<10>(from_level, this->ghosted_level_vector[from_level-1],
                         this->ghosted_level_vector[from_level]);
   else
-    AssertThrow(false, ExcNotImplemented("Only degrees 0 up to 10 implemented."));
+    // go to the non-templated version of the evaluator
+    do_restrict_add<-1>(from_level, this->ghosted_level_vector[from_level-1],
+                        this->ghosted_level_vector[from_level]);
 
   this->ghosted_level_vector[from_level-1].compress(VectorOperation::add);
   dst += this->ghosted_level_vector[from_level-1];
@@ -280,7 +283,8 @@ namespace
                         const unsigned int n_components,
                         AlignedVector<VectorizedArray<Number> > &evaluation_data)
   {
-    AssertDimension(n_components * Eval::n_q_points, n_child_cell_dofs);
+    if (Eval::n_q_points != numbers::invalid_unsigned_int)
+      AssertDimension(n_components * Eval::n_q_points, n_child_cell_dofs);
     VectorizedArray<Number> *t0 = &evaluation_data[0];
     VectorizedArray<Number> *t1 = &evaluation_data[n_child_cell_dofs];
     VectorizedArray<Number> *t2 = &evaluation_data[2*n_child_cell_dofs];
@@ -320,11 +324,13 @@ namespace
   template <int dim, int degree, typename Number>
   void weight_dofs_on_child (const VectorizedArray<Number> *weights,
                              const unsigned int n_components,
+                             const unsigned int fe_degree,
                              VectorizedArray<Number> *data)
   {
-    Assert(degree > 0, ExcNotImplemented());
-    const int loop_length = 2*degree+1;
-    unsigned int degree_to_3 [loop_length];
+    Assert(fe_degree > 0, ExcNotImplemented());
+    Assert(fe_degree < 100, ExcNotImplemented());
+    const int loop_length = degree != -1 ? 2*degree+1 : 2*fe_degree+1;
+    unsigned int degree_to_3 [100];
     degree_to_3[0] = 0;
     for (int i=1; i<loop_length-1; ++i)
       degree_to_3[i] = 1;
@@ -355,7 +361,8 @@ void MGTransferMatrixFree<dim,Number>
                      const LinearAlgebra::distributed::Vector<Number> &src) const
 {
   const unsigned int vec_size = VectorizedArray<Number>::n_array_elements;
-  const unsigned int n_child_dofs_1d = 2*(fe_degree+1) - element_is_continuous;
+  const unsigned int degree_size = (degree > -1 ? degree : fe_degree) + 1;
+  const unsigned int n_child_dofs_1d = 2*degree_size - element_is_continuous;
   const unsigned int n_scalar_cell_dofs = Utilities::fixed_power<dim>(n_child_dofs_1d);
   const unsigned int three_to_dim = Utilities::fixed_int_power<3,dim>::value;
 
@@ -370,13 +377,13 @@ void MGTransferMatrixFree<dim,Number>
         {
           const unsigned int shift = internal::MGTransfer::compute_shift_within_children<dim>
                                      (parent_child_connect[to_level-1][cell+v].second,
-                                      degree+1-element_is_continuous, degree);
+                                      fe_degree+1-element_is_continuous, fe_degree);
           const unsigned int *indices = &level_dof_indices[to_level-1][parent_child_connect[to_level-1][cell+v].first*n_child_cell_dofs+shift];
           for (unsigned int c=0, m=0; c<n_components; ++c)
             {
-              for (unsigned int k=0; k<(dim>2 ? (degree+1) : 1); ++k)
-                for (unsigned int j=0; j<(dim>1 ? (degree+1) : 1); ++j)
-                  for (unsigned int i=0; i<(degree+1); ++i, ++m)
+              for (unsigned int k=0; k<(dim>2 ? degree_size : 1); ++k)
+                for (unsigned int j=0; j<(dim>1 ? degree_size : 1); ++j)
+                  for (unsigned int i=0; i<degree_size; ++i, ++m)
                     evaluation_data[m][v] =
                       src.local_element(indices[c*n_scalar_cell_dofs +
                                                 k*n_child_dofs_1d*n_child_dofs_1d+
@@ -388,31 +395,33 @@ void MGTransferMatrixFree<dim,Number>
             }
         }
 
+      AssertDimension(prolongation_matrix_1d.size(),
+                      degree_size * n_child_dofs_1d);
       // perform tensorized operation
       if (element_is_continuous)
         {
-          AssertDimension(prolongation_matrix_1d.size(),
-                          (2*degree+1)*(degree+1));
-          typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,2*degree+1,VectorizedArray<Number> > Evaluator;
+          typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,degree!=-1 ? 2*degree+1 : 0,VectorizedArray<Number> > Evaluator;
           Evaluator evaluator(prolongation_matrix_1d,
                               prolongation_matrix_1d,
-                              prolongation_matrix_1d);
+                              prolongation_matrix_1d,
+                              fe_degree,
+                              2*fe_degree+1);
           perform_tensorized_op<dim,Evaluator,Number,true>(evaluator,
                                                            n_child_cell_dofs,
                                                            n_components,
                                                            evaluation_data);
           weight_dofs_on_child<dim,degree,Number>(&weights_on_refined[to_level-1][(cell/vec_size)*three_to_dim],
-                                                  n_components,
+                                                  n_components, fe_degree,
                                                   &evaluation_data[2*n_child_cell_dofs]);
         }
       else
         {
-          AssertDimension(prolongation_matrix_1d.size(),
-                          2*(degree+1)*(degree+1));
           typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,2*(degree+1),VectorizedArray<Number> > Evaluator;
           Evaluator evaluator(prolongation_matrix_1d,
                               prolongation_matrix_1d,
-                              prolongation_matrix_1d);
+                              prolongation_matrix_1d,
+                              fe_degree,
+                              2*(fe_degree+1));
           perform_tensorized_op<dim,Evaluator,Number,true>(evaluator,
                                                            n_child_cell_dofs,
                                                            n_components,
@@ -441,7 +450,8 @@ void MGTransferMatrixFree<dim,Number>
                    const LinearAlgebra::distributed::Vector<Number> &src) const
 {
   const unsigned int vec_size = VectorizedArray<Number>::n_array_elements;
-  const unsigned int n_child_dofs_1d = 2*(fe_degree+1) - element_is_continuous;
+  const unsigned int degree_size = (degree > -1 ? degree : fe_degree) + 1;
+  const unsigned int n_child_dofs_1d = 2*degree_size - element_is_continuous;
   const unsigned int n_scalar_cell_dofs = Utilities::fixed_power<dim>(n_child_dofs_1d);
   const unsigned int three_to_dim = Utilities::fixed_int_power<3,dim>::value;
 
@@ -463,17 +473,19 @@ void MGTransferMatrixFree<dim,Number>
           }
       }
 
+      AssertDimension(prolongation_matrix_1d.size(),
+                      degree_size * n_child_dofs_1d);
       // perform tensorized operation
       if (element_is_continuous)
         {
-          AssertDimension(prolongation_matrix_1d.size(),
-                          (2*degree+1)*(degree+1));
-          typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,2*degree+1,VectorizedArray<Number> > Evaluator;
+          typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,degree!=-1 ? 2*degree+1 : 0,VectorizedArray<Number> > Evaluator;
           Evaluator evaluator(prolongation_matrix_1d,
                               prolongation_matrix_1d,
-                              prolongation_matrix_1d);
+                              prolongation_matrix_1d,
+                              fe_degree,
+                              2*fe_degree+1);
           weight_dofs_on_child<dim,degree,Number>(&weights_on_refined[from_level-1][(cell/vec_size)*three_to_dim],
-                                                  n_components,
+                                                  n_components, fe_degree,
                                                   &evaluation_data[0]);
           perform_tensorized_op<dim,Evaluator,Number,false>(evaluator,
                                                             n_child_cell_dofs,
@@ -482,12 +494,12 @@ void MGTransferMatrixFree<dim,Number>
         }
       else
         {
-          AssertDimension(prolongation_matrix_1d.size(),
-                          2*(degree+1)*(degree+1));
           typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,2*(degree+1),VectorizedArray<Number> > Evaluator;
           Evaluator evaluator(prolongation_matrix_1d,
                               prolongation_matrix_1d,
-                              prolongation_matrix_1d);
+                              prolongation_matrix_1d,
+                              fe_degree,
+                              2*(fe_degree+1));
           perform_tensorized_op<dim,Evaluator,Number,false>(evaluator,
                                                             n_child_cell_dofs,
                                                             n_components,
@@ -499,7 +511,7 @@ void MGTransferMatrixFree<dim,Number>
         {
           const unsigned int shift = internal::MGTransfer::compute_shift_within_children<dim>
                                      (parent_child_connect[from_level-1][cell+v].second,
-                                      degree+1-element_is_continuous, degree);
+                                      fe_degree+1-element_is_continuous, fe_degree);
           AssertIndexRange(parent_child_connect[from_level-1][cell+v].first*
                            n_child_cell_dofs+n_child_cell_dofs-1,
                            level_dof_indices[from_level-1].size());
@@ -510,9 +522,9 @@ void MGTransferMatrixFree<dim,Number>
               for (std::vector<unsigned short>::const_iterator i=dirichlet_indices[from_level-1][cell+v].begin(); i!=dirichlet_indices[from_level-1][cell+v].end(); ++i)
                 evaluation_data[2*n_child_cell_dofs+(*i)][v] = 0.;
 
-              for (unsigned int k=0; k<(dim>2 ? (degree+1) : 1); ++k)
-                for (unsigned int j=0; j<(dim>1 ? (degree+1) : 1); ++j)
-                  for (unsigned int i=0; i<(degree+1); ++i, ++m)
+              for (unsigned int k=0; k<(dim>2 ? degree_size : 1); ++k)
+                for (unsigned int j=0; j<(dim>1 ? degree_size : 1); ++j)
+                  for (unsigned int i=0; i<degree_size; ++i, ++m)
                     dst.local_element(indices[c*n_scalar_cell_dofs +
                                               k*n_child_dofs_1d*n_child_dofs_1d+
                                               j*n_child_dofs_1d+i])

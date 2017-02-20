@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2016 by the deal.II authors
+// Copyright (C) 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,9 +15,8 @@
 
 
 
-// same test as matrix_vector_stokes_noflux, but allocating FEEvaluation on
-// the heap (using AlignedVector) instead of allocating it on the stack. Tests
-// also copy constructors of FEEvaluation.
+// same as matrix_vector_stokes_noflux but no template parameter on the
+// polynomial degree
 
 #include "../tests.h"
 
@@ -28,7 +27,6 @@ std::ofstream logfile("output");
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
-#include <deal.II/base/aligned_vector.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -52,7 +50,7 @@ std::ofstream logfile("output");
 
 
 
-template <int dim, int degree_p, typename VectorType>
+template <int dim, typename VectorType>
 class MatrixFreeTest
 {
 public:
@@ -70,42 +68,37 @@ public:
                const std::pair<unsigned int,unsigned int> &cell_range) const
   {
     typedef VectorizedArray<Number> vector_t;
-    // allocate FEEvaluation. This test will test proper alignment
-    AlignedVector<FEEvaluation<dim,degree_p+1,degree_p+2,dim,Number> > velocity
-    (1, FEEvaluation<dim,degree_p+1,degree_p+2,dim,Number>(data, 0));
-    AlignedVector<FEEvaluation<dim,degree_p,  degree_p+2,1,  Number> > pressure
-    (1, FEEvaluation<dim,degree_p,  degree_p+2,1,  Number>(data, 1));
-    FEEvaluation<dim,degree_p,  degree_p+2,1,  Number> pressure2(data, 1);
-    pressure2 = pressure[0];
+    FEEvaluation<dim,-1,0,dim,Number> velocity (data, 0);
+    FEEvaluation<dim,-1,0,1,  Number> pressure (data, 1);
 
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
-        velocity[0].reinit (cell);
-        velocity[0].read_dof_values (src.block(0));
-        velocity[0].evaluate (false,true,false);
-        pressure2.reinit (cell);
-        pressure2.read_dof_values (src.block(1));
-        pressure2.evaluate (true,false,false);
+        velocity.reinit (cell);
+        velocity.read_dof_values (src.block(0));
+        velocity.evaluate (false,true,false);
+        pressure.reinit (cell);
+        pressure.read_dof_values (src.block(1));
+        pressure.evaluate (true,false,false);
 
-        for (unsigned int q=0; q<velocity[0].n_q_points; ++q)
+        for (unsigned int q=0; q<velocity.n_q_points; ++q)
           {
             SymmetricTensor<2,dim,vector_t> sym_grad_u =
-              velocity[0].get_symmetric_gradient (q);
-            vector_t pres = pressure2.get_value(q);
-            vector_t div = -velocity[0].get_divergence(q);
-            pressure2.submit_value   (div, q);
+              velocity.get_symmetric_gradient (q);
+            vector_t pres = pressure.get_value(q);
+            vector_t div = -trace(sym_grad_u);
+            pressure.submit_value   (div, q);
 
             // subtract p * I
             for (unsigned int d=0; d<dim; ++d)
               sym_grad_u[d][d] -= pres;
 
-            velocity[0].submit_symmetric_gradient(sym_grad_u, q);
+            velocity.submit_symmetric_gradient(sym_grad_u, q);
           }
 
-        velocity[0].integrate (false,true);
-        velocity[0].distribute_local_to_global (dst.block(0));
-        pressure2.integrate (true,false);
-        pressure2.distribute_local_to_global (dst.block(1));
+        velocity.integrate (false,true);
+        velocity.distribute_local_to_global (dst.block(0));
+        pressure.integrate (true,false);
+        pressure.distribute_local_to_global (dst.block(1));
       }
   }
 
@@ -114,7 +107,7 @@ public:
               const VectorType &src) const
   {
     dst = 0;
-    data.cell_loop (&MatrixFreeTest<dim,degree_p,VectorType>::local_apply,
+    data.cell_loop (&MatrixFreeTest<dim,VectorType>::local_apply,
                     this, dst, src);
   };
 
@@ -124,8 +117,8 @@ private:
 
 
 
-template <int dim, int fe_degree>
-void test ()
+template <int dim>
+void test (const unsigned int fe_degree)
 {
   SphericalManifold<dim> manifold;
   HyperShellBoundary<dim> boundary;
@@ -172,6 +165,7 @@ void test ()
   DoFRenumbering::component_wise (dof_handler, stokes_sub_blocks);
 
   std::set<types::boundary_id> no_normal_flux_boundaries;
+  no_normal_flux_boundaries.insert (0);
   no_normal_flux_boundaries.insert (1);
   DoFTools::make_hanging_node_constraints (dof_handler,
                                            constraints);
@@ -319,7 +313,7 @@ void test ()
 
   system_matrix.vmult (solution, system_rhs);
 
-  MatrixFreeTest<dim,fe_degree,BlockVector<double> > mf (mf_data);
+  MatrixFreeTest<dim,BlockVector<double> > mf (mf_data);
   mf.vmult (mf_solution, system_rhs);
 
   // Verification
@@ -342,12 +336,12 @@ int main ()
     deallog << std::endl << "Test with doubles" << std::endl << std::endl;
     deallog.threshold_double(1.e-12);
     deallog.push("2d");
-    test<2,1>();
-    test<2,2>();
-    test<2,3>();
+    test<2>(1);
+    test<2>(2);
+    test<2>(3);
     deallog.pop();
     deallog.push("3d");
-    test<3,1>();
+    test<3>(1);
     deallog.pop();
   }
 }

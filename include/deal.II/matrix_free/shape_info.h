@@ -195,6 +195,11 @@ namespace internal
       unsigned int fe_degree;
 
       /**
+       * Stores the number of quadrature points per dimension.
+       */
+      unsigned int n_q_points_1d;
+
+      /**
        * Stores the number of quadrature points in @p dim dimensions for a
        * cell.
        */
@@ -241,8 +246,11 @@ namespace internal
                                   const unsigned int base_element_number)
       :
       fe_degree (0),
+      n_q_points_1d (0),
       n_q_points (0),
-      dofs_per_cell (0)
+      dofs_per_cell (0),
+      n_q_points_face (0),
+      dofs_per_face (0)
     {
       reinit (quad, fe_in, base_element_number);
     }

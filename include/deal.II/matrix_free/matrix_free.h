@@ -17,10 +17,12 @@
 #ifndef dealii__matrix_free_h
 #define dealii__matrix_free_h
 
+#include <deal.II/base/aligned_vector.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/vectorization.h>
+#include <deal.II/base/thread_local_storage.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/mapping.h>
@@ -47,6 +49,7 @@
 #include <stdlib.h>
 #include <memory>
 #include <limits>
+#include <list>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -323,6 +326,11 @@ public:
    * Default empty constructor. Does nothing.
    */
   MatrixFree ();
+
+  /**
+   * Copy constructor, calls copy_from
+   */
+  MatrixFree (const MatrixFree<dim,Number> &other);
 
   /**
    * Destructor.
@@ -875,6 +883,25 @@ public:
                   const unsigned int hp_active_fe_index = 0,
                   const unsigned int hp_active_quad_index = 0) const;
 
+  /**
+   * Obtains a scratch data object for internal use. Make sure to release it
+   * afterwards by passing the pointer you obtain from this object to the
+   * release_scratch_data() function. This interface is used by FEEvaluation
+   * objects for storing their data structures.
+   *
+   * The organization of the internal data structure is a thread-local storage
+   * of a list of vectors. Multiple threads will each get a separate storage
+   * field and separate vectors, ensuring thread safety. The mechanism to
+   * acquire and release objects is similar to the mechanisms used for the
+   * local contributions of WorkStream, see @ref workstream_paper.
+   */
+  AlignedVector<VectorizedArray<Number> > *acquire_scratch_data() const;
+
+  /**
+   * Makes the object of the scratchpad available again.
+   */
+  void release_scratch_data(const AlignedVector<VectorizedArray<Number> > *memory) const;
+
   //@}
 
 private:
@@ -1017,6 +1044,15 @@ private:
    * Stores whether indices have been initialized.
    */
   bool                               mapping_is_initialized;
+
+  /**
+   * Scratchpad memory for use in evaluation. We allow more than one
+   * evaluation object to attach to this field (this, the outer
+   * std::vector), so we need to keep tracked of whether a certain data
+   * field is already used (first part of pair) and keep a list of
+   * objects.
+   */
+  mutable Threads::ThreadLocalStorage<std::list<std::pair<bool, AlignedVector<VectorizedArray<Number> > > > > scratch_pad;
 };
 
 
@@ -1508,6 +1544,42 @@ bool
 MatrixFree<dim,Number>::mapping_initialized () const
 {
   return mapping_is_initialized;
+}
+
+
+
+template <int dim,typename Number>
+AlignedVector<VectorizedArray<Number> > *
+MatrixFree<dim,Number>::acquire_scratch_data() const
+{
+  typedef std::list<std::pair<bool, AlignedVector<VectorizedArray<Number> > > > list_type;
+  list_type &data = scratch_pad.get();
+  for (typename list_type::iterator it=data.begin(); it!=data.end(); ++it)
+    if (it->first == false)
+      {
+        it->first = true;
+        return &it->second;
+      }
+  data.push_front(std::make_pair(true,AlignedVector<VectorizedArray<Number> >()));
+  return &data.front().second;
+}
+
+
+
+template <int dim, typename Number>
+void
+MatrixFree<dim,Number>::release_scratch_data(const AlignedVector<VectorizedArray<Number> > *scratch) const
+{
+  typedef std::list<std::pair<bool, AlignedVector<VectorizedArray<Number> > > > list_type;
+  list_type &data = scratch_pad.get();
+  for (typename list_type::iterator it=data.begin(); it!=data.end(); ++it)
+    if (&it->second == scratch)
+      {
+        Assert(it->first == true, ExcInternalError());
+        it->first = false;
+        return;
+      }
+  AssertThrow(false, ExcMessage("Tried to release invalid scratch pad"));
 }
 
 

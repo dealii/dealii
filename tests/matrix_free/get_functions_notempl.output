@@ -1,0 +1,147 @@
+
+DEAL:2d::Testing FE_Q<2>(1)
+DEAL:2d::Test with fe_degree 1, n_q_points_1d: 1
+DEAL:2d::Error function values: 0
+DEAL:2d::Error function gradients: 0
+DEAL:2d::Error function Laplacians: 0
+DEAL:2d::Error function diagonal of Hessian: 0
+DEAL:2d::Error function Hessians: 0
+DEAL:2d::
+DEAL:2d::Test with fe_degree 1, n_q_points_1d: 3
+DEAL:2d::Error function values: 0
+DEAL:2d::Error function gradients: 0
+DEAL:2d::Error function Laplacians: 0
+DEAL:2d::Error function diagonal of Hessian: 0
+DEAL:2d::Error function Hessians: 0
+DEAL:2d::
+DEAL:2d::Test with fe_degree 1, n_q_points_1d: 4
+DEAL:2d::Error function values: 0
+DEAL:2d::Error function gradients: 0
+DEAL:2d::Error function Laplacians: 0
+DEAL:2d::Error function diagonal of Hessian: 0
+DEAL:2d::Error function Hessians: 0
+DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(2)
+DEAL:2d::Test with fe_degree 2, n_q_points_1d: 1
+DEAL:2d::Error function values: 0
+DEAL:2d::Error function gradients: 0
+DEAL:2d::Error function Laplacians: 0
+DEAL:2d::Error function diagonal of Hessian: 0
+DEAL:2d::Error function Hessians: 0
+DEAL:2d::
+DEAL:2d::Test with fe_degree 2, n_q_points_1d: 2
+DEAL:2d::Error function values: 0
+DEAL:2d::Error function gradients: 0
+DEAL:2d::Error function Laplacians: 0
+DEAL:2d::Error function diagonal of Hessian: 0
+DEAL:2d::Error function Hessians: 0
+DEAL:2d::
+DEAL:2d::Test with fe_degree 2, n_q_points_1d: 4
+DEAL:2d::Error function values: 0
+DEAL:2d::Error function gradients: 0
+DEAL:2d::Error function Laplacians: 0
+DEAL:2d::Error function diagonal of Hessian: 0
+DEAL:2d::Error function Hessians: 0
+DEAL:2d::
+DEAL:2d::Test with fe_degree 2, n_q_points_1d: 5
+DEAL:2d::Error function values: 0
+DEAL:2d::Error function gradients: 0
+DEAL:2d::Error function Laplacians: 0
+DEAL:2d::Error function diagonal of Hessian: 0
+DEAL:2d::Error function Hessians: 0
+DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(3)
+DEAL:2d::Test with fe_degree 3, n_q_points_1d: 2
+DEAL:2d::Error function values: 0
+DEAL:2d::Error function gradients: 0
+DEAL:2d::Error function Laplacians: 0
+DEAL:2d::Error function diagonal of Hessian: 0
+DEAL:2d::Error function Hessians: 0
+DEAL:2d::
+DEAL:2d::Test with fe_degree 3, n_q_points_1d: 3
+DEAL:2d::Error function values: 0
+DEAL:2d::Error function gradients: 0
+DEAL:2d::Error function Laplacians: 0
+DEAL:2d::Error function diagonal of Hessian: 0
+DEAL:2d::Error function Hessians: 0
+DEAL:2d::
+DEAL:2d::Test with fe_degree 3, n_q_points_1d: 5
+DEAL:2d::Error function values: 0
+DEAL:2d::Error function gradients: 0
+DEAL:2d::Error function Laplacians: 0
+DEAL:2d::Error function diagonal of Hessian: 0
+DEAL:2d::Error function Hessians: 0
+DEAL:2d::
+DEAL:2d::Test with fe_degree 3, n_q_points_1d: 6
+DEAL:2d::Error function values: 0
+DEAL:2d::Error function gradients: 0
+DEAL:2d::Error function Laplacians: 0
+DEAL:2d::Error function diagonal of Hessian: 0
+DEAL:2d::Error function Hessians: 0
+DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(4)
+DEAL:2d::Test with fe_degree 4, n_q_points_1d: 3
+DEAL:2d::Error function values: 0
+DEAL:2d::Error function gradients: 0
+DEAL:2d::Error function Laplacians: 0
+DEAL:2d::Error function diagonal of Hessian: 0
+DEAL:2d::Error function Hessians: 0
+DEAL:2d::
+DEAL:2d::Test with fe_degree 4, n_q_points_1d: 4
+DEAL:2d::Error function values: 0
+DEAL:2d::Error function gradients: 0
+DEAL:2d::Error function Laplacians: 0
+DEAL:2d::Error function diagonal of Hessian: 0
+DEAL:2d::Error function Hessians: 0
+DEAL:2d::
+DEAL:2d::Test with fe_degree 4, n_q_points_1d: 6
+DEAL:2d::Error function values: 0
+DEAL:2d::Error function gradients: 0
+DEAL:2d::Error function Laplacians: 0
+DEAL:2d::Error function diagonal of Hessian: 0
+DEAL:2d::Error function Hessians: 0
+DEAL:2d::
+DEAL:2d::Test with fe_degree 4, n_q_points_1d: 7
+DEAL:2d::Error function values: 0
+DEAL:2d::Error function gradients: 0
+DEAL:2d::Error function Laplacians: 0
+DEAL:2d::Error function diagonal of Hessian: 0
+DEAL:2d::Error function Hessians: 0
+DEAL:2d::
+DEAL:3d::Testing FE_Q<3>(1)
+DEAL:3d::Test with fe_degree 1, n_q_points_1d: 1
+DEAL:3d::Error function values: 0
+DEAL:3d::Error function gradients: 0
+DEAL:3d::Error function Laplacians: 0
+DEAL:3d::Error function diagonal of Hessian: 0
+DEAL:3d::Error function Hessians: 0
+DEAL:3d::
+DEAL:3d::Test with fe_degree 1, n_q_points_1d: 3
+DEAL:3d::Error function values: 0
+DEAL:3d::Error function gradients: 0
+DEAL:3d::Error function Laplacians: 0
+DEAL:3d::Error function diagonal of Hessian: 0
+DEAL:3d::Error function Hessians: 0
+DEAL:3d::
+DEAL:3d::Testing FE_Q<3>(2)
+DEAL:3d::Test with fe_degree 2, n_q_points_1d: 1
+DEAL:3d::Error function values: 0
+DEAL:3d::Error function gradients: 0
+DEAL:3d::Error function Laplacians: 0
+DEAL:3d::Error function diagonal of Hessian: 0
+DEAL:3d::Error function Hessians: 0
+DEAL:3d::
+DEAL:3d::Test with fe_degree 2, n_q_points_1d: 2
+DEAL:3d::Error function values: 0
+DEAL:3d::Error function gradients: 0
+DEAL:3d::Error function Laplacians: 0
+DEAL:3d::Error function diagonal of Hessian: 0
+DEAL:3d::Error function Hessians: 0
+DEAL:3d::
+DEAL:3d::Test with fe_degree 2, n_q_points_1d: 4
+DEAL:3d::Error function values: 0
+DEAL:3d::Error function gradients: 0
+DEAL:3d::Error function Laplacians: 0
+DEAL:3d::Error function diagonal of Hessian: 0
+DEAL:3d::Error function Hessians: 0
+DEAL:3d::

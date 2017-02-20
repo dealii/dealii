@@ -920,7 +920,8 @@ namespace VectorTools
       Assert (dof.get_fe().n_components() == function.n_components,
               ExcDimensionMismatch(dof.get_fe().n_components(),
                                    function.n_components));
-      Assert (dof.get_fe().degree == fe_degree,
+      Assert (fe_degree == -1 ||
+              dof.get_fe().degree == static_cast<unsigned int>(fe_degree),
               ExcDimensionMismatch(fe_degree, dof.get_fe().degree));
       Assert (dof.get_fe().n_components() == components,
               ExcDimensionMismatch(components, dof.get_fe().n_components()));
@@ -933,7 +934,7 @@ namespace VectorTools
       std_cxx11::shared_ptr<MatrixFree<dim, Number> > matrix_free(
         new MatrixFree<dim, Number> ());
       matrix_free->reinit (mapping, dof, constraints,
-                           QGauss<1>(fe_degree+2), additional_data);
+                           QGauss<1>(dof.get_fe().degree+2), additional_data);
       typedef MatrixFreeOperators::MassOperator<dim, fe_degree, fe_degree+2, components, Number> MatrixType;
       MatrixType mass_matrix;
       mass_matrix.initialize(matrix_free);
@@ -1004,38 +1005,10 @@ namespace VectorTools
            enforce_zero_boundary, q_boundary, project_to_boundary_first);
           break;
 
-        case 4:
-          project_matrix_free<components, 4>
-          (mapping, dof, constraints, quadrature, function, work_result,
-           enforce_zero_boundary, q_boundary, project_to_boundary_first);
-          break;
-
-        case 5:
-          project_matrix_free<components, 5>
-          (mapping, dof, constraints, quadrature, function, work_result,
-           enforce_zero_boundary, q_boundary, project_to_boundary_first);
-          break;
-
-        case 6:
-          project_matrix_free<components, 6>
-          (mapping, dof, constraints, quadrature, function, work_result,
-           enforce_zero_boundary, q_boundary, project_to_boundary_first);
-          break;
-
-        case 7:
-          project_matrix_free<components, 7>
-          (mapping, dof, constraints, quadrature, function, work_result,
-           enforce_zero_boundary, q_boundary, project_to_boundary_first);
-          break;
-
-        case 8:
-          project_matrix_free<components, 8>
-          (mapping, dof, constraints, quadrature, function, work_result,
-           enforce_zero_boundary, q_boundary, project_to_boundary_first);
-          break;
-
         default:
-          Assert(false, ExcInternalError());
+          project_matrix_free<components, -1>
+          (mapping, dof, constraints, quadrature, function, work_result,
+           enforce_zero_boundary, q_boundary, project_to_boundary_first);
         }
     }
 
@@ -1145,9 +1118,9 @@ namespace VectorTools
       // enforce_zero_boundary and project_to_boundary_first
       // are not yet supported.
       // We have explicit instantiations only if
-      // the number of components and the degree is not too high.
+      // the number of components is not too high.
       if (enforce_zero_boundary || project_to_boundary_first
-          || dof.get_fe().degree>8 || dof.get_fe().n_components()>4)
+          || dof.get_fe().n_components()>4)
         use_matrix_free = false;
 
       if (use_matrix_free)
@@ -1182,7 +1155,8 @@ namespace VectorTools
                                    1));
       Assert (vec_result.size() == dof.n_dofs(),
               ExcDimensionMismatch (vec_result.size(), dof.n_dofs()));
-      Assert (dof.get_fe().degree == fe_degree,
+      Assert (fe_degree == -1 ||
+              dof.get_fe().degree == static_cast<unsigned int>(fe_degree),
               ExcDimensionMismatch(fe_degree, dof.get_fe().degree));
 
       // set up mass matrix and right hand side
@@ -1193,7 +1167,7 @@ namespace VectorTools
       std_cxx11::shared_ptr<MatrixFree<dim, Number> > matrix_free(
         new MatrixFree<dim, Number>());
       matrix_free->reinit (mapping, dof, constraints,
-                           QGauss<1>(fe_degree+2), additional_data);
+                           QGauss<1>(dof.get_fe().degree+2), additional_data);
       typedef MatrixFreeOperators::MassOperator<dim, fe_degree, fe_degree+2, 1, Number> MatrixType;
       MatrixType mass_matrix;
       mass_matrix.initialize(matrix_free);
@@ -1281,7 +1255,8 @@ namespace VectorTools
                                    1));
       Assert (vec_result.size() == dof.n_dofs(),
               ExcDimensionMismatch (vec_result.size(), dof.n_dofs()));
-      Assert (dof.get_fe().degree == fe_degree,
+      Assert (fe_degree == -1 ||
+              dof.get_fe().degree == static_cast<unsigned int>(fe_degree),
               ExcDimensionMismatch(fe_degree, dof.get_fe().degree));
 
       typedef MatrixFreeOperators::MassOperator<dim, fe_degree, n_q_points_1d, 1, Number> MatrixType;
@@ -1361,23 +1336,8 @@ namespace VectorTools
       case 3:
         project_parallel<dim,VectorType,spacedim,3> (mapping,dof,constraints,quadrature,func,vec_result);
         break;
-      case 4:
-        project_parallel<dim,VectorType,spacedim,4> (mapping,dof,constraints,quadrature,func,vec_result);
-        break;
-      case 5:
-        project_parallel<dim,VectorType,spacedim,5> (mapping,dof,constraints,quadrature,func,vec_result);
-        break;
-      case 6:
-        project_parallel<dim,VectorType,spacedim,6> (mapping,dof,constraints,quadrature,func,vec_result);
-        break;
-      case 7:
-        project_parallel<dim,VectorType,spacedim,7> (mapping,dof,constraints,quadrature,func,vec_result);
-        break;
-      case 8:
-        project_parallel<dim,VectorType,spacedim,8> (mapping,dof,constraints,quadrature,func,vec_result);
-        break;
       default:
-        Assert (false, ExcNotImplemented());
+        project_parallel<dim,VectorType,spacedim,-1> (mapping,dof,constraints,quadrature,func,vec_result);
       }
   }
 
@@ -1407,23 +1367,8 @@ namespace VectorTools
       case 3:
         project_parallel<dim,VectorType,dim,3,4> (matrix_free,constraints,func,vec_result);
         break;
-      case 4:
-        project_parallel<dim,VectorType,dim,4,5> (matrix_free,constraints,func,vec_result);
-        break;
-      case 5:
-        project_parallel<dim,VectorType,dim,5,6> (matrix_free,constraints,func,vec_result);
-        break;
-      case 6:
-        project_parallel<dim,VectorType,dim,6,7> (matrix_free,constraints,func,vec_result);
-        break;
-      case 7:
-        project_parallel<dim,VectorType,dim,7,8> (matrix_free,constraints,func,vec_result);
-        break;
-      case 8:
-        project_parallel<dim,VectorType,dim,8,9> (matrix_free,constraints,func,vec_result);
-        break;
       default:
-        Assert (false, ExcNotImplemented());
+        project_parallel<dim,VectorType,dim,-1,0> (matrix_free,constraints,func,vec_result);
       }
   }
 
