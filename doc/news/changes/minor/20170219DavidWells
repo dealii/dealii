@@ -1,0 +1,5 @@
+Fixed: The DoFAccessor specialization for <code>structdim == 0</code> and
+<code>dimension == 1</code> was missing several definitions, which were
+required for use of hp::DoFHandler in 1D. These have now been added.
+<br>
+(David Wells, 2017/02/19)

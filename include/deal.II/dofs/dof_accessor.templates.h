@@ -2287,6 +2287,33 @@ DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::set_dof_handler
 
 template <template <int, int> class DoFHandlerType, int spacedim, bool level_dof_access>
 inline
+void
+DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::set_dof_index
+(const unsigned int /*i*/,
+ const types::global_dof_index /*index*/,
+ const unsigned int /*fe_index*/) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+
+
+template <template <int, int> class DoFHandlerType, int spacedim, bool level_dof_access>
+inline
+void
+DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::set_vertex_dof_index
+(const unsigned int /*vertex*/,
+ const unsigned int /*i*/,
+ const types::global_dof_index /*index*/,
+ const unsigned int /*fe_index*/) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+
+
+template <template <int, int> class DoFHandlerType, int spacedim, bool level_dof_access>
+inline
 const DoFHandlerType<1,spacedim> &
 DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::get_dof_handler () const
 {
@@ -2354,6 +2381,70 @@ vertex_dof_index (const unsigned int vertex,
 
 template <template <int, int> class DoFHandlerType, int spacedim, bool level_dof_access>
 inline
+types::global_dof_index
+DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::
+dof_index (const unsigned int i,
+           const unsigned int fe_index) const
+{
+  return dealii::internal::DoFAccessor::Implementation::get_vertex_dof_index
+         (*this->dof_handler,
+          this->vertex_index(0),
+          fe_index,
+          i);
+}
+
+
+
+template <template <int, int> class DoFHandlerType, int spacedim, bool level_dof_access>
+inline
+unsigned int
+DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::
+n_active_fe_indices() const
+{
+  Assert(false, ExcNotImplemented());
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+template <template <int, int> class DoFHandlerType, int spacedim, bool level_dof_access>
+inline
+unsigned int
+DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::
+nth_active_fe_index(const unsigned int /*n*/) const
+{
+  Assert(false, ExcNotImplemented());
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+template <template <int, int> class DoFHandlerType, int spacedim, bool level_dof_access>
+inline
+bool
+DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::
+fe_index_is_active (const unsigned int fe_index) const
+{
+  Assert(false, ExcNotImplemented());
+  return false;
+}
+
+
+
+template <template <int, int> class DoFHandlerType, int spacedim, bool level_dof_access>
+inline
+const FiniteElement<DoFHandlerType<1,spacedim>::dimension,DoFHandlerType<1,spacedim>::space_dimension> &
+DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::
+get_fe (const unsigned int fe_index) const
+{
+  Assert (this->dof_handler != 0, ExcInvalidObject());
+  return dof_handler->get_fe()[fe_index];
+}
+
+
+
+template <template <int, int> class DoFHandlerType, int spacedim, bool level_dof_access>
+inline
 void
 DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::copy_from
 (const TriaAccessorBase<0,1,spacedim> &da)
@@ -2383,6 +2474,32 @@ TriaIterator<DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access > >
 DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::child (const unsigned int /*i*/) const
 {
   return TriaIterator<DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access > >();
+}
+
+
+
+template <template <int, int> class DoFHandlerType, int spacedim, bool level_dof_access>
+inline
+typename dealii::internal::DoFHandler::Iterators<DoFHandlerType<1,spacedim>, level_dof_access>::line_iterator
+DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::line
+(const unsigned int /*c*/) const
+{
+  Assert(false, ExcNotImplemented());
+  return typename dealii::internal::
+         DoFHandler::Iterators<DoFHandlerType<1,spacedim>, level_dof_access>::line_iterator();
+}
+
+
+
+template <template <int, int> class DoFHandlerType, int spacedim, bool level_dof_access>
+inline
+typename dealii::internal::DoFHandler::Iterators<DoFHandlerType<1,spacedim>, level_dof_access>::quad_iterator
+DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::quad
+(const unsigned int /*c*/) const
+{
+  Assert(false, ExcNotImplemented());
+  return typename dealii::internal::
+         DoFHandler::Iterators<DoFHandlerType<1,spacedim>, level_dof_access>::quad_iterator();
 }
 
 

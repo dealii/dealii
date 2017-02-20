@@ -1,0 +1,40 @@
+
+DEAL::===================================
+DEAL::cell center: 0.125000
+DEAL::cell dofs: 0, 4, 1, 2, 3
+DEAL::dof index (current cell, current index): 4 (neighbor cell, current index): 4
+DEAL::dof index (current cell, neighbor index): 4 (neighbor cell, neighbor index): 4
+DEAL::cell uses fe index 0: false
+DEAL::cell uses fe index 1: true
+DEAL::vertex dof index: 0
+DEAL::vertex dof index: 4
+DEAL::cell uses fe index 2: false
+DEAL::===================================
+DEAL::cell center: 0.375000
+DEAL::cell dofs: 4, 5, 6
+DEAL::dof index (current cell, current index): 5 (neighbor cell, current index): 5
+DEAL::dof index (current cell, neighbor index): 5 (neighbor cell, neighbor index): 5
+DEAL::cell uses fe index 0: true
+DEAL::vertex dof index: 4
+DEAL::vertex dof index: 5
+DEAL::cell uses fe index 1: false
+DEAL::cell uses fe index 2: false
+DEAL::===================================
+DEAL::cell center: 0.625000
+DEAL::cell dofs: 5, 7, 8
+DEAL::dof index (current cell, current index): 7 (neighbor cell, current index): 7
+DEAL::dof index (current cell, neighbor index): 7 (neighbor cell, neighbor index): 7
+DEAL::cell uses fe index 0: true
+DEAL::vertex dof index: 5
+DEAL::vertex dof index: 7
+DEAL::cell uses fe index 1: false
+DEAL::cell uses fe index 2: false
+DEAL::===================================
+DEAL::cell center: 0.875000
+DEAL::cell dofs: 7, 9, 10, 11, 12, 13, 14
+DEAL::cell uses fe index 0: false
+DEAL::cell uses fe index 1: false
+DEAL::cell uses fe index 2: true
+DEAL::vertex dof index: 7
+DEAL::vertex dof index: 9
+DEAL::OK
