@@ -196,7 +196,6 @@ namespace PETScWrappers
       this->communicator = communicator;
 
       // get rid of old matrix and generate a new one
-      destroy_matrix (matrix);
       const PetscErrorCode ierr = destroy_matrix (matrix);
       AssertThrow (ierr == 0, ExcPETScError (ierr));
 
