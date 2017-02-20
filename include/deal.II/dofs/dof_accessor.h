@@ -844,17 +844,19 @@ public:
   child (const unsigned int c) const;
 
   /**
-   * Pointer to the @p ith line bounding this object. If the current object is
-   * a line itself, then the only valid index is @p i equals to zero, and the
-   * function returns an iterator to itself.
+   * Pointer to the @p ith line bounding this object.
+   *
+   * Since meshes with dimension 1 do not have quads this method just throws
+   * an exception.
    */
   typename dealii::internal::DoFHandler::Iterators<DoFHandlerType<1,spacedim>, level_dof_access>::line_iterator
   line (const unsigned int i) const;
 
   /**
-   * Pointer to the @p ith quad bounding this object. If the current object is
-   * a quad itself, then the only valid index is @p i equals to zero, and the
-   * function returns an iterator to itself.
+   * Pointer to the @p ith quad bounding this object.
+   *
+   * Since meshes with dimension 1 do not have quads this method just throws
+   * an exception.
    */
   typename dealii::internal::DoFHandler::Iterators<DoFHandlerType<1,spacedim>, level_dof_access>::quad_iterator
   quad (const unsigned int i) const;
@@ -872,14 +874,12 @@ public:
 
   /**
    * Return the <i>global</i> indices of the degrees of freedom located on
-   * this object in the standard ordering defined by the finite element (i.e.,
-   * dofs on vertex 0, dofs on vertex 1, etc, dofs on line 0, dofs on line 1,
-   * etc, dofs on quad 0, etc.) This function is only available on
-   * <i>active</i> objects (see
-   * @ref GlossActive "this glossary entry").
+   * this object in the standard ordering defined by the finite element. This
+   * function is only available on <i>active</i> objects (see @ref GlossActive
+   * "this glossary entry").
    *
-   * The cells needs to be an active cell (and not artificial in a parallel
-   * distributed computation).
+   * The present vertex must belong to an active cell (and not artificial in a
+   * parallel distributed computation).
    *
    * The vector has to have the right size before being passed to this
    * function.
@@ -905,7 +905,6 @@ public:
    */
   void get_dof_indices (std::vector<types::global_dof_index> &dof_indices,
                         const unsigned int fe_index = AccessorData::default_fe_index) const;
-
 
   /**
    * Return the global multilevel indices of the degrees of freedom that live
@@ -950,20 +949,7 @@ public:
    * cells, as well as vertices, there may therefore be two sets of degrees of
    * freedom, one for each of the finite elements used on the adjacent cells.
    * In order to specify which set of degrees of freedom to work on, the last
-   * argument is used to disambiguate. Finally, if this function is called for
-   * a cell object, there can only be a single set of degrees of freedom, and
-   * fe_index has to match the result of active_fe_index().
-   *
-   * @note While the get_dof_indices() function returns an array that contains
-   * the indices of all degrees of freedom that somehow live on this object
-   * (i.e. on the vertices, edges or interior of this object), the current
-   * dof_index() function only considers the DoFs that really belong to this
-   * particular object's interior. In other words, as an example, if the
-   * current object refers to a quad (a cell in 2d, a face in 3d) and the
-   * finite element associated with it is a bilinear one, then the
-   * get_dof_indices() will return an array of size 4 while dof_index() will
-   * produce an exception because no degrees are defined in the interior of
-   * the face.
+   * argument is used to disambiguate.
    */
   types::global_dof_index dof_index (const unsigned int i,
                                      const unsigned int fe_index = AccessorData::default_fe_index) const;
@@ -982,33 +968,30 @@ public:
   /**
    * Return the number of finite elements that are active on a given object.
    *
-   * For non-hp DoFHandler objects, the answer is of course always one.
-   * However, for hp::DoFHandler objects, this isn't the case: If this is a
-   * cell, the answer is of course one. If it is a face, the answer may be one
-   * or two, depending on whether the two adjacent cells use the same finite
-   * element or not. If it is an edge in 3d, the possible return value may be
-   * one or any other value larger than that.
+   * Since vertices do not store the information necessary for this to be
+   * calculated, this method just raises an exception and only exists to
+   * enable dimension-independent programming.
    */
   unsigned int
   n_active_fe_indices () const;
 
   /**
-   * Return the @p n-th active fe index on this object. For cells and all non-
-   * hp objects, there is only a single active fe index, so the argument must
-   * be equal to zero. For lower-dimensional hp objects, there are
-   * n_active_fe_indices() active finite elements, and this function can be
-   * queried for their indices.
+   * Return the @p n-th active fe index on this object.
+   *
+   * Since vertices do not store the information necessary for this to be
+   * calculated, this method just raises an exception and only exists to
+   * enable dimension-independent programming.
    */
   unsigned int
   nth_active_fe_index (const unsigned int n) const;
 
   /**
    * Return true if the finite element with given index is active on the
-   * present object. For non-hp DoF accessors, this is of course the case only
-   * if @p fe_index equals zero. For cells, it is the case if @p fe_index
-   * equals active_fe_index() of this cell. For faces and other lower-
-   * dimensional objects, there may be more than one @p fe_index that are
-   * active on any given object (see n_active_fe_indices()).
+   * present object.
+   *
+   * Since vertices do not store the information necessary for this to be
+   * calculated, this method just raises an exception and only exists to
+   * enable dimension-independent programming.
    */
   bool
   fe_index_is_active (const unsigned int fe_index) const;
@@ -1302,8 +1285,8 @@ public:
   /**
    * Return an iterator to the @p ith face of this cell.
    *
-   * This function is not implemented in 1D, and returns DoFAccessor::line in
-   * 2D and DoFAccessor::quad in 3d.
+   * This function returns a DoFAccessor with <code>structdim == 0</code> in
+   * 1D, a DoFAccessor::line in 2D, and a DoFAccessor::quad in 3d.
    */
   face_iterator
   face (const unsigned int i) const;
