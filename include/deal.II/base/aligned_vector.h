@@ -699,8 +699,9 @@ AlignedVector<T>::push_back (const T in_data)
   if (_end_data == _end_allocated)
     reserve (std::max(2*capacity(),static_cast<size_type>(16)));
   if (std_cxx11::is_trivial<T>::value == false)
-    new (_end_data) T;
-  *_end_data++ = in_data;
+    new (_end_data++) T(in_data);
+  else
+    *_end_data++ = in_data;
 }
 
 
