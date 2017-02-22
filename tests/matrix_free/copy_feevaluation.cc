@@ -71,8 +71,8 @@ public:
   {
     typedef VectorizedArray<Number> vector_t;
     // allocate FEEvaluation. This test will test proper alignment
-    AlignedVector<FEEvaluation<dim,degree_p+1,degree_p+2,dim,Number> > velocity
-    (1, FEEvaluation<dim,degree_p+1,degree_p+2,dim,Number>(data, 0));
+    AlignedVector<FEEvaluation<dim,degree_p+1,degree_p+2,dim,Number> > velocity;
+    velocity.push_back(FEEvaluation<dim,degree_p+1,degree_p+2,dim,Number>(data, 0));
     AlignedVector<FEEvaluation<dim,degree_p,  degree_p+2,1,  Number> > pressure
     (1, FEEvaluation<dim,degree_p,  degree_p+2,1,  Number>(data, 1));
     FEEvaluation<dim,degree_p,  degree_p+2,1,  Number> pressure2(data, 1);
