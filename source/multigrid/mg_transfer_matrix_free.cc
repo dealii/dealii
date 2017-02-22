@@ -83,6 +83,7 @@ void MGTransferMatrixFree<dim,Number>::clear ()
   n_child_cell_dofs = 0;
   level_dof_indices.clear();
   parent_child_connect.clear();
+  dirichlet_indices.clear();
   n_owned_level_cells.clear();
   prolongation_matrix_1d.clear();
   evaluation_data.clear();
@@ -101,7 +102,7 @@ void MGTransferMatrixFree<dim,Number>::build
   internal::MGTransfer::ElementInfo<Number> elem_info;
 
   internal::MGTransfer::setup_transfer<dim,Number>(mg_dof,
-                                                   (const MGConstrainedDoFs *)this->mg_constrained_dofs,
+                                                   this->mg_constrained_dofs,
                                                    elem_info,
                                                    level_dof_indices,
                                                    parent_child_connect,
