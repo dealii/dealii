@@ -693,7 +693,8 @@ namespace GridTools
   template <>
   void laplace_transform (const std::map<unsigned int,Point<1> > &,
                           Triangulation<1> &,
-                          const Function<1> *)
+                          const Function<1> *,
+                          const bool )
   {
     Assert(false, ExcNotImplemented());
   }
@@ -704,7 +705,8 @@ namespace GridTools
   void
   laplace_transform (const std::map<unsigned int,Point<dim> > &new_points,
                      Triangulation<dim> &triangulation,
-                     const Function<dim> *coefficient)
+                     const Function<dim> *coefficient,
+                     const bool solve_for_absolute_positions)
   {
     // first provide everything that is needed for solving a Laplace
     // equation.
@@ -743,6 +745,7 @@ namespace GridTools
              vertex_no<GeometryInfo<dim>::vertices_per_cell; ++vertex_no)
           {
             const unsigned int vertex_index=cell->vertex_index(vertex_no);
+            const Point<dim> &vertex_point=cell->vertex(vertex_no);
 
             const typename std::map<unsigned int,Point<dim> >::const_iterator map_iter
               = new_points.find(vertex_index);
@@ -751,7 +754,10 @@ namespace GridTools
               for (unsigned int i=0; i<dim; ++i)
                 fixed_dofs[i].insert(std::pair<types::global_dof_index,double>
                                      (cell->vertex_dof_index(vertex_no, 0),
-                                      map_iter->second(i)));
+                                      (solve_for_absolute_positions ?
+                                       map_iter->second(i) :
+                                       map_iter->second(i) - vertex_point[i])
+                                     ));
           }
       }
 
@@ -779,7 +785,10 @@ namespace GridTools
 
             const types::global_dof_index dof_index = cell->vertex_dof_index(vertex_no, 0);
             for (unsigned int i=0; i<dim; ++i)
-              v(i) = us[i](dof_index);
+              if (solve_for_absolute_positions)
+                v(i) = us[i](dof_index);
+              else
+                v(i) += us[i](dof_index);
 
             vertex_touched[cell->vertex_index(vertex_no)] = true;
           }

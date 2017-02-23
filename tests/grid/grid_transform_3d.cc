@@ -87,7 +87,7 @@ int main ()
             }
       }
 
-  GridTools::laplace_transform (new_points, tria);
+  GridTools::laplace_transform<dim> (new_points, tria, NULL, true);
 
 
   GridOut grid_out;

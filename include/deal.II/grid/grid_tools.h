@@ -295,12 +295,27 @@ namespace GridTools
    * typically, each of the vertices at the boundary of the triangulation is
    * mapped to the corresponding points in the @p new_points map.
    *
-   * The way this function works is that it solves a Laplace equation for each
+   * The unknown displacement field $u_d(\mathbf x)$ in direction $d$ is obtained from
+   * the minimization problem
+   * \f[
+   *   \min\, \int
+   *   \frac{1}{2}
+   *   c(\mathbf x)
+   *   \mathbf \nabla u_d(\mathbf x) \cdot
+   *   \mathbf \nabla u_d(\mathbf x)
+   *   \,\rm d x
+   * \f]
+   * subject to prescribed constraints. The minimizer is obtained by solving the Laplace equation
    * of the dim components of a displacement field that maps the current
-   * domain into one described by @p new_points . The @p new_points array
-   * therefore represents the boundary values of this displacement field. The
-   * function then evaluates this displacement field at each vertex in the
-   * interior and uses it to place the mapped vertex where the displacement
+   * domain into one described by @p new_points . Linear finite elements with
+   * four Gaussian quadrature points in each direction are used. The difference
+   * between the vertex positions specified in @p new_points and their current
+   * value in @p tria therefore represents the prescribed values of this
+   * displacement field at the boundary of the domain, or more precisely at all
+   * of those locations for which @p new_points provides values (which may be
+   * at part of the boundary, or even in the interior of the domain). The
+   * function then evaluates this displacement field at each unconstrained
+   * vertex and uses it to place the mapped vertex where the displacement
    * field locates it. Because the solution of the Laplace equation is smooth,
    * this guarantees a smooth mapping from the old domain to the new one.
    *
@@ -323,12 +338,21 @@ namespace GridTools
    * Should this function be provided, sensible results can only be expected
    * if all coefficients are positive.
    *
+   * @param[in] solve_for_absolute_positions If set to <code>true</code>, the
+   * minimization problem is formulated with respect to the final vertex positions
+   * as opposed to their displacement. The two formulations are equivalent for
+   * the homogeneous problem (default value of @p coefficient), but they
+   * result in very different mesh motion otherwise. Since in most cases one will
+   * be using a non-constant coefficient in displacement formulation, the default
+   * value of this parameter is <code>false</code>.
+   *
    * @note This function is not currently implemented for the 1d case.
    */
   template <int dim>
   void laplace_transform (const std::map<unsigned int,Point<dim> > &new_points,
                           Triangulation<dim> &tria,
-                          const Function<dim,double> *coefficient = 0);
+                          const Function<dim,double> *coefficient = 0,
+                          const bool solve_for_absolute_positions = false);
 
   /**
    * Return a std::map with all vertices of faces located in the boundary
