@@ -107,7 +107,7 @@ void test ()
     mf_data->reinit (dof, constraints, quad, data);
   }
 
-  MatrixFreeOperators::LaplaceOperator<dim,fe_degree,fe_degree+1, 1, number> mf;
+  MatrixFreeOperators::LaplaceOperator<dim,fe_degree,fe_degree+1, 1, LinearAlgebra::distributed::Vector<number> > mf;
   mf.initialize(mf_data);
   mf.compute_diagonal();
   LinearAlgebra::distributed::Vector<number> in, out, ref;

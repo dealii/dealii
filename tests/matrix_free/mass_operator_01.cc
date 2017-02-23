@@ -115,7 +115,7 @@ void test ()
     mf_data->reinit (dof, constraints, quad, data);
   }
 
-  MatrixFreeOperators::MassOperator<dim,fe_degree, fe_degree+2, 1, number> mf;
+  MatrixFreeOperators::MassOperator<dim,fe_degree, fe_degree+2, 1, LinearAlgebra::distributed::Vector<number> > mf;
   mf.initialize(mf_data);
   mf.compute_diagonal();
   LinearAlgebra::distributed::Vector<number> in, out, ref;

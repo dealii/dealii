@@ -104,8 +104,8 @@ void test ()
 
   std::vector<LinearAlgebra::distributed::Vector<double> > eigenfunctions;
   std::vector<double>                                      eigenvalues;
-  MatrixFreeOperators::MassOperator<dim,fe_degree, fe_degree+1, 1, double> mass;
-  MatrixFreeOperators::LaplaceOperator<dim,fe_degree, fe_degree+1, 1, double> laplace;
+  MatrixFreeOperators::MassOperator<dim,fe_degree, fe_degree+1, 1> mass;
+  MatrixFreeOperators::LaplaceOperator<dim,fe_degree, fe_degree+1, 1> laplace;
   mass.initialize(mf_data);
   laplace.initialize(mf_data);
 

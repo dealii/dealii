@@ -935,7 +935,7 @@ namespace VectorTools
         new MatrixFree<dim, Number> ());
       matrix_free->reinit (mapping, dof, constraints,
                            QGauss<1>(dof.get_fe().degree+2), additional_data);
-      typedef MatrixFreeOperators::MassOperator<dim, fe_degree, fe_degree+2, components, Number> MatrixType;
+      typedef MatrixFreeOperators::MassOperator<dim, fe_degree, fe_degree+2, components, LinearAlgebra::distributed::Vector<Number> > MatrixType;
       MatrixType mass_matrix;
       mass_matrix.initialize(matrix_free);
       mass_matrix.compute_diagonal();
@@ -1168,7 +1168,7 @@ namespace VectorTools
         new MatrixFree<dim, Number>());
       matrix_free->reinit (mapping, dof, constraints,
                            QGauss<1>(dof.get_fe().degree+2), additional_data);
-      typedef MatrixFreeOperators::MassOperator<dim, fe_degree, fe_degree+2, 1, Number> MatrixType;
+      typedef MatrixFreeOperators::MassOperator<dim, fe_degree, fe_degree+2, 1, LinearAlgebra::distributed::Vector<Number> > MatrixType;
       MatrixType mass_matrix;
       mass_matrix.initialize(matrix_free);
       mass_matrix.compute_diagonal();
@@ -1259,7 +1259,7 @@ namespace VectorTools
               dof.get_fe().degree == static_cast<unsigned int>(fe_degree),
               ExcDimensionMismatch(fe_degree, dof.get_fe().degree));
 
-      typedef MatrixFreeOperators::MassOperator<dim, fe_degree, n_q_points_1d, 1, Number> MatrixType;
+      typedef MatrixFreeOperators::MassOperator<dim, fe_degree, n_q_points_1d, 1, LinearAlgebra::distributed::Vector<Number> > MatrixType;
       MatrixType mass_matrix;
       mass_matrix.initialize(matrix_free);
       mass_matrix.compute_diagonal();

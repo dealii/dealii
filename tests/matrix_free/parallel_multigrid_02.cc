@@ -113,7 +113,7 @@ void do_test (const DoFHandler<dim>  &dof)
 
   MappingQ<dim> mapping(fe_degree+1);
 
-  LaplaceOperator<dim,fe_degree,n_q_points_1d,1,number> fine_matrix;
+  LaplaceOperator<dim,fe_degree,n_q_points_1d,1,LinearAlgebra::distributed::Vector<number> > fine_matrix;
   std_cxx11::shared_ptr<MatrixFree<dim,number> > fine_level_data(new MatrixFree<dim,number> ());
 
   typename MatrixFree<dim,number>::AdditionalData fine_level_additional_data;
@@ -133,7 +133,7 @@ void do_test (const DoFHandler<dim>  &dof)
   in = 1.;
 
   // set up multigrid in analogy to step-37
-  typedef LaplaceOperator<dim,fe_degree,n_q_points_1d,1,number> LevelMatrixType;
+  typedef LaplaceOperator<dim,fe_degree,n_q_points_1d,1,LinearAlgebra::distributed::Vector<number> > LevelMatrixType;
 
   MGLevelObject<LevelMatrixType> mg_matrices;
   MGLevelObject<MatrixFree<dim,number> > mg_level_data;
