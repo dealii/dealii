@@ -53,9 +53,9 @@ using namespace dealii;
 template<class PRECONDITIONER, typename MatrixType, typename VectorType,
          class ADDITIONAL_DATA = typename PRECONDITIONER::AdditionalData>
 void
-test_preconditioner (const MatrixType &A,
-                     const VectorType &b,
-                     const ADDITIONAL_DATA &data = ADDITIONAL_DATA())
+test_preconditioner_block (const MatrixType &A,
+                           const VectorType &b,
+                           const ADDITIONAL_DATA &data = ADDITIONAL_DATA())
 {
   const auto lo_A = linear_operator<VectorType>(A);
 
@@ -447,7 +447,7 @@ int main()
     {
       deallog << "PreconditionBlockIdentity" << std::endl;
       typedef PreconditionBlockIdentity< SparseMatrix<double> > PREC;
-      test_preconditioner<PREC>(A, b);
+      test_preconditioner_block<PREC>(A, b);
     }
 
     deallog << "BlockSparseMatrix OK" << std::endl;
