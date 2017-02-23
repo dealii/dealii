@@ -321,7 +321,8 @@
  *   <tr valign="top">
  *       <td>step-37</td>
  *       <td> Solving a Poisson problem with a multilevel preconditioner without
- *       explicitly storing the matrix (a matrix-free method).
+ *       explicitly storing the matrix (a matrix-free method) in a massively
+ *       parallel context.
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -396,7 +397,7 @@
  *
  *   <tr valign="top">
  *       <td>step-52</td>
- *       <td> Solving the time dependent neutron diffusion equation using 
+ *       <td> Solving the time dependent neutron diffusion equation using
  *       Runge-Kutta methods.
  *       </td></tr>
  *
@@ -668,7 +669,7 @@
  *   </tr>
  *
  *   <tr valign="top">
- *     <td> Matrix-free methods
+ *     <td> Matrix-free methods with sum factorization
  *     </td>
  *     <td>
  *       step-37,
@@ -731,6 +732,7 @@
  *       step-17,
  *       step-18,
  *       step-32,
+ *       step-37,
  *       step-40,
  *       step-42,
  *       step-55
