@@ -934,14 +934,6 @@ namespace TrilinosWrappers
 
   template void
   SolverBase::do_solve(const Epetra_Operator &preconditioner);
-
-  template void
-  SolverBase::set_preconditioner(AztecOO                &solver,
-                                 const PreconditionBase &preconditioner);
-
-  template void
-  SolverBase::set_preconditioner(AztecOO               &solver,
-                                 const Epetra_Operator &preconditioner);
 }
 
 DEAL_II_NAMESPACE_CLOSE
