@@ -40,12 +40,12 @@ class array_wrapper :
 {
 private:
     array_wrapper & operator=(const array_wrapper & rhs);
-public:
+    // taken from commit 6b33d1c in the boostorg/serialization repo
     // note: I would like to make the copy constructor private but this breaks
-    // make_array.  So I try to make make_array a friend - but that doesn't
-    // build.  Need a C++ guru to explain this!
-    template<class S>
-    friend const boost::serialization::array_wrapper<T> make_array( T* t, S s);
+    // make_array.  So I try to make make_array a friend
+    template<class Tx, class S>
+    friend const boost::serialization::array_wrapper<Tx> make_array(Tx * t, S s);
+public:
 
     array_wrapper(const array_wrapper & rhs) :
         m_t(rhs.m_t),
