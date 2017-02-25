@@ -44,7 +44,7 @@
 
 #ifdef DEAL_II_WITH_SLEPC
 #    include <slepcsys.h>
-#  include <deal.II/lac/slepc_solver.h>
+#    include <deal.II/lac/slepc_solver.h>
 #endif
 
 #ifdef DEAL_II_WITH_P4EST
