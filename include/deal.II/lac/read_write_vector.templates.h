@@ -63,7 +63,7 @@ namespace LinearAlgebra
           free(val);
 
         Utilities::System::posix_memalign ((void **)&val, 64, sizeof(Number)*new_alloc_size);
-        if (new_alloc_size >= 4*internal::Vector::minimum_parallel_grain_size)
+        if (new_alloc_size >= 4*dealii::internal::Vector::minimum_parallel_grain_size)
           thread_loop_partitioner.reset(new parallel::internal::TBBPartitioner());
       }
   }
@@ -158,7 +158,7 @@ namespace LinearAlgebra
       reinit(in_vector, true);
 
     dealii::internal::VectorOperations::Vector_copy<Number,Number> copier(in_vector.val, val);
-    internal::VectorOperations::parallel_for(copier, n_elements(), thread_loop_partitioner);
+    dealii::internal::VectorOperations::parallel_for(copier, n_elements(), thread_loop_partitioner);
 
     return *this;
   }
@@ -175,7 +175,7 @@ namespace LinearAlgebra
       reinit(in_vector, true);
 
     dealii::internal::VectorOperations::Vector_copy<Number,Number2> copier(in_vector.val, val);
-    internal::VectorOperations::parallel_for(copier, n_elements(), thread_loop_partitioner);
+    dealii::internal::VectorOperations::parallel_for(copier, n_elements(), thread_loop_partitioner);
 
     return *this;
   }
@@ -189,8 +189,8 @@ namespace LinearAlgebra
     Assert(s==static_cast<Number>(0), ExcMessage("Only 0 can be assigned to a vector."));
     (void)s;
 
-    internal::VectorOperations::Vector_set<Number> setter(Number(), val);
-    internal::VectorOperations::parallel_for(setter, n_elements(), thread_loop_partitioner);
+    dealii::internal::VectorOperations::Vector_set<Number> setter(Number(), val);
+    dealii::internal::VectorOperations::parallel_for(setter, n_elements(), thread_loop_partitioner);
 
     return *this;
   }
