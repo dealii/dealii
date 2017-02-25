@@ -339,8 +339,19 @@ namespace TrilinosWrappers
      * Store a copy of the flags for this particular solver.
      */
     const AdditionalData additional_data;
-
   };
+
+
+  // provide a declaration for two explicit specializations
+  template <>
+  void
+  SolverBase::set_preconditioner(AztecOO                &solver,
+                                 const PreconditionBase &preconditioner);
+
+  template <>
+  void
+  SolverBase::set_preconditioner(AztecOO               &solver,
+                                 const Epetra_Operator &preconditioner);
 
 
 
