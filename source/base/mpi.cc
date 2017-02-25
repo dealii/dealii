@@ -43,9 +43,7 @@
 #endif
 
 #ifdef DEAL_II_WITH_SLEPC
-#  ifdef DEAL_II_WITH_MPI
 #    include <slepcsys.h>
-#  endif
 #  include <deal.II/lac/slepc_solver.h>
 #endif
 
