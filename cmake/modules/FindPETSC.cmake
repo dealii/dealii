@@ -38,12 +38,11 @@ SET_IF_EMPTY(PETSC_DIR "$ENV{PETSC_DIR}")
 SET_IF_EMPTY(PETSC_ARCH "$ENV{PETSC_ARCH}")
 
 DEAL_II_FIND_LIBRARY(PETSC_LIBRARY
-  NAMES libpetsc
+  NAMES petsc libpetsc
   HINTS ${PETSC_DIR} ${PETSC_DIR}/${PETSC_ARCH}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
-MESSAGE(STATUS "LIB_SUFFIX=\"${LIB_SUFFIX}\"")
 #
 # Search for the first part of the includes:
 #
