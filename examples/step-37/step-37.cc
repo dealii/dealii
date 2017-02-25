@@ -241,7 +241,7 @@ namespace Step37
   // not in general, which may lead to segmentation faults at strange places
   // for some systems or suboptimal performance for other systems.
   template <int dim, int fe_degree, typename number>
-  class LaplaceOperator : public MatrixFreeOperators::Base<dim,number>
+  class LaplaceOperator : public MatrixFreeOperators::Base<dim,LinearAlgebra::distributed::Vector<number> >
   {
   public:
     typedef number value_type;
@@ -281,7 +281,7 @@ namespace Step37
   template <int dim, int fe_degree, typename number>
   LaplaceOperator<dim,fe_degree,number>::LaplaceOperator ()
     :
-    MatrixFreeOperators::Base<dim, number>()
+    MatrixFreeOperators::Base<dim, LinearAlgebra::distributed::Vector<number> >()
   {}
 
 
@@ -291,7 +291,7 @@ namespace Step37
   LaplaceOperator<dim,fe_degree,number>::clear ()
   {
     coefficient.reinit(0, 0);
-    MatrixFreeOperators::Base<dim,number>::clear();
+    MatrixFreeOperators::Base<dim,LinearAlgebra::distributed::Vector<number> >::clear();
   }
 
 
