@@ -11854,6 +11854,37 @@ Triangulation<dim,spacedim>::locally_owned_subdomain () const
 
 
 template <int dim, int spacedim>
+types::global_dof_index
+Triangulation<dim,spacedim>::
+coarse_cell_index_to_global_index (const int index) const
+{
+  Assert(index>=0 && index<n_cells(0),
+         dealii::ExcIndexRange(index,0,n_cells(0)));
+  return index;
+}
+
+
+template <int dim, int spacedim>
+int
+Triangulation<dim,spacedim>::
+global_coarse_index_to_cell_index (const types::global_dof_index index) const
+{
+  Assert(index>=0 && index<n_global_coarse_cells(),
+         dealii::ExcIndexRange(index,0,n_global_coarse_cells()));
+  return index;
+}
+
+
+template <int dim, int spacedim>
+types::global_dof_index
+Triangulation<dim,spacedim>::
+n_global_coarse_cells () const
+{
+  return n_cells(0);
+}
+
+
+template <int dim, int spacedim>
 Triangulation<dim,spacedim> &
 Triangulation<dim,spacedim>::get_triangulation ()
 {

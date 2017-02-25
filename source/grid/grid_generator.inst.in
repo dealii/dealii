@@ -64,7 +64,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     template
     void
     create_mesh_from_marked_cells (Triangulation<deal_II_dimension, deal_II_space_dimension> &,
-                                   Triangulation<deal_II_dimension, deal_II_space_dimension> &);
+                                   Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+                                   IndexSet &);
     template
     void
     merge_triangulations

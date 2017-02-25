@@ -47,8 +47,6 @@ namespace parallel
     {
       //dealii::GridTools::partition_triangulation (this->n_subdomains, *this);
 
-      true_subdomain_ids_of_cells.resize(this->n_active_cells());
-
       if (this->n_active_cells()>0)
         {
           // mark artificial cells
@@ -208,12 +206,51 @@ namespace parallel
            it = active_halo_layer_vector.begin(); it != active_halo_layer_vector.end(); ++it)
         (*it)->set_user_flag();
 
-      GridGenerator::create_mesh_from_marked_cells(*this, other_not_const);
+      GridGenerator::create_mesh_from_marked_cells(*this, other_not_const, available_coarse_cells);
 
       other_not_const.load_user_flags(user_flags);
 
       partition();
       this->update_number_cache ();
+    }
+
+
+
+    template <int dim, int spacedim>
+    types::global_dof_index
+    Triangulation<dim,spacedim>::
+    coarse_cell_index_to_global_index (const int index) const
+    {
+      Assert(index>=0 && index<this->n_cells(0),
+             dealii::ExcIndexRange(index,0,this->n_cells(0)));
+      Assert(index < local_to_global_coarse_cell_index.size(), ExcInternalError());
+
+      return local_to_global_coarse_cell_index[index];
+    }
+
+
+    template <int dim, int spacedim>
+    int
+    Triangulation<dim,spacedim>::
+    global_coarse_index_to_cell_index (const types::global_dof_index index) const
+    {
+      Assert(index>=0 && index<n_global_coarse_cells(),
+             dealii::ExcIndexRange(index,0,n_global_coarse_cells()));
+      Assert(available_coarse_cells.is_element(index),
+             ExcMessage("Error: the coarse cell with the given index is not available here."));
+      return available_coarse_cells.index_within_set(index);
+    }
+
+
+    template <int dim, int spacedim>
+    types::global_dof_index
+    Triangulation<dim,spacedim>::
+    n_global_coarse_cells () const
+    {
+      // TODO: can not check n_cells() if mesh is empty
+//      Assert(available_coarse_cells.size()>=this->n_cells(0),
+//             ExcInternalError());
+      return available_coarse_cells.size();
     }
 
   }

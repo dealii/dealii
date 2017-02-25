@@ -13,6 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/index_set.h>
+
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_reordering.h>
 #include <deal.II/grid/grid_tools.h>
@@ -3926,7 +3929,8 @@ namespace GridGenerator
   template <int dim, int spacedim>
   void
   create_mesh_from_marked_cells (Triangulation<dim, spacedim> &dest,
-                                 Triangulation<dim, spacedim> &other_tria)
+                                 Triangulation<dim, spacedim> &other_tria,
+                                 IndexSet &coarse_cell_indices)
   {
 
     Assert (other_tria.n_cells() > 0,
@@ -3972,6 +3976,8 @@ namespace GridGenerator
 
 
     // create coarse mesh
+    coarse_cell_indices.clear();
+    coarse_cell_indices.set_size(other_tria.n_cells(0));
     std::vector<unsigned int> map_new_to_old_coarse_cell;
     std::vector<unsigned int> map_old_to_new_vertex(other_tria.n_vertices(),
                                                     numbers::invalid_unsigned_int);
@@ -4006,8 +4012,8 @@ namespace GridGenerator
                 data.vertices[vidx] = new_idx;
               }
             cells.push_back(data);
+            coarse_cell_indices.add_index(map_new_to_old_coarse_cell.size());
             map_new_to_old_coarse_cell.push_back(it->index());
-
           }
 
       // TODO subcelldata
@@ -4022,6 +4028,7 @@ namespace GridGenerator
 
       dest.create_triangulation (vertices, cells, subcelldata);
     }
+    coarse_cell_indices.compress();
 
 
     // now refine:

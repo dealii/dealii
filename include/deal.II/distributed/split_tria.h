@@ -41,6 +41,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+class IndexSet;
+
 namespace parallel
 {
 
@@ -129,6 +131,17 @@ namespace parallel
       void load (Archive &ar, const unsigned int version);
 
 
+      /**
+        */
+      virtual types::global_dof_index coarse_cell_index_to_global_index (const int index) const;
+
+      /**
+        */
+      virtual int global_coarse_index_to_cell_index (const types::global_dof_index index) const;
+
+      /**
+        */
+      virtual types::global_dof_index n_global_coarse_cells () const;
 
     private:
       /**
@@ -138,17 +151,16 @@ namespace parallel
       void partition();
 
       /**
-       * A vector containing subdomain IDs of cells obtained by partitioning
-       * using METIS. In case allow_artificial_cells is false, this vector is
-       * consistent with IDs stored in cell->subdomain_id() of the
-       * triangulation class. When allow_artificial_cells is true, cells which
-       * are artificial will have cell->subdomain_id() == numbers::artificial;
-       *
-       * The original parition information is stored to allow using sequential
-       * DoF distribution and partitioning functions with semi-artificial
-       * cells.
+       * map local cell->index() on level 0 to globally consistent cell
+       * index
        */
-      std::vector<types::subdomain_id> true_subdomain_ids_of_cells;
+      std::vector<types::global_dof_index> local_to_global_coarse_cell_index;
+
+      /**
+        * This IndexSet has the size n_global_coarse_cells() and contains
+        * all cell indices that are available locally;
+        */
+      IndexSet available_coarse_cells;
     };
 
     template <int dim, int spacedim>

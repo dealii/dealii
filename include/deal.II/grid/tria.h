@@ -2908,6 +2908,19 @@ public:
   virtual types::subdomain_id locally_owned_subdomain () const;
 
   /**
+    */
+  virtual types::global_dof_index coarse_cell_index_to_global_index (const int index) const;
+
+  /**
+    */
+  virtual int global_coarse_index_to_cell_index (const types::global_dof_index index) const;
+
+  /**
+    */
+  virtual types::global_dof_index n_global_coarse_cells () const;
+
+
+  /**
    * Return a reference to the current object.
    *
    * This doesn't seem to be very useful but allows to write code that can

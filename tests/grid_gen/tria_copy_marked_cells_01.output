@@ -126,4 +126,6 @@
   <rect class="r1" x="3000" y="370" width="25" height="275"/>
   <text x="3037.50" y="513.500" style="text-anchor:start; font-size:18px; font-weight:bold">1 max</text>
 
-</svg>DEAL::225
+</svg>DEAL::2 n_levels: 2 n_active_cells: 5
+DEAL::coarse_cell_indices size=3:
+DEAL::{[0,1]}

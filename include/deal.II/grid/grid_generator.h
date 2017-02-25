@@ -28,6 +28,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+
+class IndexSet;
+
+
 /**
  * This namespace provides a collection of functions for generating
  * triangulations for some basic geometries.
@@ -925,7 +929,8 @@ namespace GridGenerator
     */
   template <int dim, int spacedim>
   void create_mesh_from_marked_cells (Triangulation<dim, spacedim> &dest,
-                                      Triangulation<dim, spacedim> &other_tria);
+                                      Triangulation<dim, spacedim> &other_tria,
+                                      IndexSet &coarse_cell_indices);
 
 
 

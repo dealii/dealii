@@ -92,7 +92,8 @@ void test ()
   }
 
   Triangulation<dim, spacedim> tria2;
-  GridGenerator::create_mesh_from_marked_cells(tria2, tria);
+  IndexSet coarse_cell_indices;
+  GridGenerator::create_mesh_from_marked_cells(tria2, tria, coarse_cell_indices);
 
   {
     std::ofstream f("out.svg");
@@ -102,9 +103,12 @@ void test ()
 
 
   deallog << dim
-          << tria2.n_levels()
-          << tria2.n_active_cells()
+          << " n_levels: " << tria2.n_levels()
+          << " n_active_cells: " << tria2.n_active_cells()
           << std::endl;
+  deallog << "coarse_cell_indices size=" << coarse_cell_indices.size() << ":" << std::endl;
+  coarse_cell_indices.print(deallog);
+
 }
 
 
