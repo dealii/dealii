@@ -114,6 +114,26 @@ MACRO(DEAL_II_PICKUP_TESTS)
   ENDIF()
 
   #
+  # Check that the diff programs can run and terminate successfully:
+  #
+  FOREACH(_diff_program ${NUMDIFF_EXECUTABLE} ${DIFF_EXECUTABLE})
+    EXECUTE_PROCESS(COMMAND ${_diff_program} "-v"
+      TIMEOUT 4 # seconds
+      OUTPUT_QUIET
+      ERROR_QUIET
+      RESULT_VARIABLE _diff_program_status
+      )
+
+    IF(NOT "${_diff_program_status}" STREQUAL "0")
+      MESSAGE(FATAL_ERROR
+        "\nThe command \"${_diff_program} -v\" did not run correctly: it either "
+        "failed to exit after a few seconds or returned a nonzero exit code. "
+        "The test suite cannot be set up without this program, so please "
+        "reinstall it and then run the test suite setup command again.\n")
+    ENDIF()
+  ENDFOREACH()
+
+  #
   # Set time limit:
   #
 
