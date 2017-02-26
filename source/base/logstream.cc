@@ -110,14 +110,17 @@ LogStream::~LogStream()
 
 
 void
-LogStream::test_mode(bool on)
+LogStream::test_mode(const bool on,
+                     const double double_threshold_,
+                     const float float_threshold_,
+                     const double offset_)
 {
   Threads::Mutex::ScopedLock lock(log_lock);
   if (on)
     {
-      double_threshold = 1.e-10;
-      float_threshold = 1.e-7f;
-      offset = 1.e-7;
+      double_threshold = double_threshold_;
+      float_threshold = float_threshold_;
+      offset = offset_;
     }
   else
     {

@@ -190,13 +190,16 @@ public:
    * Setup the logstream for regression test mode.
    *
    * This sets the parameters #double_threshold, #float_threshold, and #offset
-   * to nonzero values. The exact values being used have been determined
-   * experimentally and can be found in the source code.
+   * to nonzero values. The default values being used have been determined
+   * experimentally.
    *
    * Called with an argument <tt>false</tt>, switches off test mode and sets
    * all involved parameters to zero.
    */
-  void test_mode (bool on=true);
+  void test_mode (const bool on = true,
+                  const double double_threshold = 1.e-10,
+                  const float float_threshold = 1.e-7f,
+                  const double offset = 1.e-7);
 
 
   /**

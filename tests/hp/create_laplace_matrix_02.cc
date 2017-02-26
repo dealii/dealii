@@ -144,6 +144,7 @@ int main ()
   deallog << std::setprecision (2);
   deallog << std::fixed;
   deallog.attach(logfile);
+  deallog.test_mode(true, 0., 0.);
 
   deallog.push ("1d");
   check<1> ();
