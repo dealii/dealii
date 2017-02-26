@@ -6408,19 +6408,19 @@ namespace internal
                                                             shape_info.n_q_points)) +
                                    c*Utilities::fixed_power<dim>(shape_info.fe_degree+1);
         unsigned int count_p = 0, count_q = 0;
-        for (unsigned int i=0; i<(dim>2?fe_degree+1:1); ++i)
+        for (int i=0; i<(dim>2?fe_degree+1:1); ++i)
           {
-            for (unsigned int j=0; j<(dim>1?fe_degree+1-i:1); ++j)
+            for (int j=0; j<(dim>1?fe_degree+1-i:1); ++j)
               {
-                for (unsigned int k=0; k<fe_degree+1-j-i; ++k, ++count_p, ++count_q)
+                for (int k=0; k<fe_degree+1-j-i; ++k, ++count_p, ++count_q)
                   for (unsigned int c=0; c<n_components; ++c)
                     expanded_dof_values[c][count_q] = values_dofs_actual[c][count_p];
-                for (unsigned int k=fe_degree+1-j-i; k<fe_degree+1; ++k, ++count_q)
+                for (int k=fe_degree+1-j-i; k<fe_degree+1; ++k, ++count_q)
                   for (unsigned int c=0; c<n_components; ++c)
                     expanded_dof_values[c][count_q] = VectorizedArray<Number>();
               }
-            for (unsigned int j=fe_degree+1-i; j<fe_degree+1; ++j)
-              for (unsigned int k=0; k<fe_degree+1; ++k, ++count_q)
+            for (int j=fe_degree+1-i; j<fe_degree+1; ++j)
+              for (int k=0; k<fe_degree+1; ++k, ++count_q)
                 for (unsigned int c=0; c<n_components; ++c)
                   expanded_dof_values[c][count_q] = VectorizedArray<Number>();
           }
@@ -6733,11 +6733,11 @@ namespace internal
     if (type == MatrixFreeFunctions::truncated_tensor)
       {
         unsigned int count_p = 0, count_q = 0;
-        for (unsigned int i=0; i<(dim>2?fe_degree+1:1); ++i)
+        for (int i=0; i<(dim>2?fe_degree+1:1); ++i)
           {
-            for (unsigned int j=0; j<(dim>1?fe_degree+1-i:1); ++j)
+            for (int j=0; j<(dim>1?fe_degree+1-i:1); ++j)
               {
-                for (unsigned int k=0; k<fe_degree+1-j-i; ++k, ++count_p, ++count_q)
+                for (int k=0; k<fe_degree+1-j-i; ++k, ++count_p, ++count_q)
                   {
                     for (unsigned int c=0; c<n_components; ++c)
                       values_dofs_actual[c][count_p] = expanded_dof_values[c][count_q];
