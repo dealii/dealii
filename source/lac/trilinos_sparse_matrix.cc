@@ -2386,7 +2386,7 @@ namespace TrilinosWrappers
   SparseMatrix::size_type
   SparseMatrix::memory_consumption () const
   {
-    size_type static_memory = sizeof(this) + sizeof (*matrix)
+    size_type static_memory = sizeof(*this) + sizeof (*matrix)
                               + sizeof(*matrix->Graph().DataPtr());
     return ((sizeof(TrilinosScalar)+sizeof(TrilinosWrappers::types::int_type))*
             matrix->NumMyNonzeros() + sizeof(int)*local_size() + static_memory);
@@ -2433,6 +2433,7 @@ namespace TrilinosWrappers
 
     const Epetra_MpiComm *mpi_comm
       = dynamic_cast<const Epetra_MpiComm *>(&matrix->RangeMap().Comm());
+    Assert(mpi_comm != 0, ExcInternalError());
     return mpi_comm->Comm();
 #else
 

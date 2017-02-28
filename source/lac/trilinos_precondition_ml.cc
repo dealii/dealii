@@ -313,7 +313,7 @@ namespace TrilinosWrappers
   PreconditionAMG::size_type
   PreconditionAMG::memory_consumption() const
   {
-    unsigned int memory = sizeof(this);
+    unsigned int memory = sizeof(*this);
 
     // todo: find a way to read out ML's data
     // sizes

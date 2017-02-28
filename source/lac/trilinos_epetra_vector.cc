@@ -170,7 +170,11 @@ namespace LinearAlgebra
       const Vector &down_V = dynamic_cast<const Vector &>(V);
       // If the maps are the same we can Update right away.
       if (vector->Map().SameAs(down_V.trilinos_vector().Map()))
-        vector->Update(1., down_V.trilinos_vector(), 1.);
+        {
+          const int ierr = vector->Update(1., down_V.trilinos_vector(), 1.);
+          Assert(ierr==0, ExcTrilinosError(ierr));
+          (void) ierr;
+        }
       else
         {
           Assert(this->size()==down_V.size(),
@@ -178,7 +182,8 @@ namespace LinearAlgebra
 
 #if DEAL_II_TRILINOS_VERSION_GTE(11,11,0)
           Epetra_Import data_exchange (vector->Map(), down_V.trilinos_vector().Map());
-          int ierr = vector->Import(down_V.trilinos_vector(), data_exchange, Epetra_AddLocalAlso);
+          const int ierr = vector->Import(down_V.trilinos_vector(),
+                                          data_exchange, Epetra_AddLocalAlso);
           Assert(ierr==0, ExcTrilinosError(ierr));
           (void) ierr;
 #else
@@ -190,7 +195,6 @@ namespace LinearAlgebra
 
           int ierr = dummy.Import(down_V.trilinos_vector(), data_exchange, Insert);
           Assert(ierr==0, ExcTrilinosError(ierr));
-          (void) ierr;
 
           ierr = vector->Update(1.0, dummy, 1.0);
           Assert(ierr==0, ExcTrilinosError(ierr));
@@ -427,6 +431,7 @@ namespace LinearAlgebra
     {
       const Epetra_MpiComm *epetra_comm
         = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()));
+      Assert (epetra_comm != 0, ExcInternalError());
       return epetra_comm->GetMpiComm();
     }
 

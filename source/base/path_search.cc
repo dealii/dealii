@@ -187,7 +187,7 @@ PathSearch::find (const std::string &filename,
         {
           return find(filename, *suffix, open_mode);
         }
-      catch (ExcFileNotFound)
+      catch (ExcFileNotFound &)
         {
           continue;
         }

@@ -313,7 +313,7 @@ namespace TrilinosWrappers
   PreconditionAMGMueLu::size_type
   PreconditionAMGMueLu::memory_consumption() const
   {
-    unsigned int memory = sizeof(this);
+    unsigned int memory = sizeof(*this);
 
     // todo: find a way to read out ML's data
     // sizes

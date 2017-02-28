@@ -1051,6 +1051,7 @@ namespace TrilinosWrappers
 
     const Epetra_MpiComm *mpi_comm
       = dynamic_cast<const Epetra_MpiComm *>(&graph->RangeMap().Comm());
+    Assert (mpi_comm != 0, ExcInternalError());
     return mpi_comm->Comm();
 #else
 

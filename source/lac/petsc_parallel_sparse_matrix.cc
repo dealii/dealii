@@ -31,6 +31,7 @@ namespace PETScWrappers
   namespace MPI
   {
     SparseMatrix::SparseMatrix ()
+      : communicator(MPI_COMM_SELF)
     {
       // just like for vectors: since we
       // create an empty matrix, we can as
