@@ -1657,6 +1657,10 @@ IndexSet::index_within_set (const size_type n) const
   Assert (is_compressed == true, ExcMessage ("IndexSet must be compressed."));
   Assert (n < size(), ExcIndexRangeType<size_type> (n, 0, size()));
 
+  // return immediately if the index set is empty
+  if (is_empty())
+    return numbers::invalid_dof_index;
+
   // check whether the index is in the largest range. use the result to
   // perform a one-sided binary search afterward
   Assert (largest_range < ranges.size(), ExcInternalError());
