@@ -1206,9 +1206,11 @@ namespace
 
 
 template<int dim, int spacedim>
-MappingQGeneric<dim,spacedim>::MappingQGeneric (const unsigned int p)
+MappingQGeneric<dim,spacedim>::MappingQGeneric (const unsigned int p,
+                                                const bool smooth_support_points_on_flat_manifold)
   :
   polynomial_degree(p),
+  smooth_support_points_on_flat_manifold(smooth_support_points_on_flat_manifold),
   line_support_points(this->polynomial_degree+1),
   fe_q(dim == 3 ? new FE_Q<dim>(this->polynomial_degree) : 0),
   support_point_weights_on_quad (compute_support_point_weights_on_quad<dim>(this->polynomial_degree)),
@@ -1224,6 +1226,7 @@ template<int dim, int spacedim>
 MappingQGeneric<dim,spacedim>::MappingQGeneric (const MappingQGeneric<dim,spacedim> &mapping)
   :
   polynomial_degree(mapping.polynomial_degree),
+  smooth_support_points_on_flat_manifold(mapping.smooth_support_points_on_flat_manifold),
   line_support_points(mapping.line_support_points),
   fe_q(dim == 3 ? new FE_Q<dim>(*mapping.fe_q) : 0),
   support_point_weights_on_quad (mapping.support_point_weights_on_quad),
@@ -3812,9 +3815,13 @@ add_quad_support_points(const Triangulation<3,3>::cell_iterator &cell,
 
       // On a quad, we have to check whether the manifold should determine the
       // point distribution or rather a weighted sum should be created. This
-      // is the same logic as in the compute_mapping_support_points
-      // function below.
-      if (dynamic_cast<const Boundary<3,3> *>(&face->get_manifold()) == NULL)
+      // is the same logic as in the compute_mapping_support_points function
+      // below: if we have a StraightBoundary but no "real" boundary
+      // description doing something else, we should go for the smoothing of
+      // the support points through add_weighted_interior_points
+      if (smooth_support_points_on_flat_manifold == false ||
+          std::string(typeid(face->get_manifold()).name()).find("StraightBoundary") ==
+          std::string::npos)
         {
           // ask the boundary/manifold object to return intermediate points on it
           get_intermediate_points_on_object(face->get_manifold(), line_support_points,
@@ -3901,13 +3908,17 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
         // (outer) points
         add_line_support_points(cell, a);
 
-        // then get the support points on the quad if we are on a
-        // manifold, otherwise compute them from the points around it
+        // then get the support points on the quad. if we have a
+        // StraightBoundary but no "real" boundary description doing something
+        // else, we should go for the smoothing of the support points through
+        // add_weighted_interior_points. we need to go through typeid because
+        // curved boundaries are derived from StraightBoundary and thus a
+        // plain dynamic_cast will not suffice.
         if (dim != spacedim)
           add_quad_support_points(cell, a);
-        // TODO: use get_intermediate_points_on_object for the else case
-        // unconditionally as soon as the interface of Boundary is fixed
-        else if (dynamic_cast<const Boundary<dim,spacedim> *>(&cell->get_manifold()) == NULL)
+        else if (smooth_support_points_on_flat_manifold == false ||
+                 std::string(typeid(cell->get_manifold()).name()).find("StraightBoundary") ==
+                 std::string::npos)
           {
             std::vector<Point<spacedim> > quad_points (Utilities::fixed_power<dim>(polynomial_degree-1));
             get_intermediate_points_on_object(cell->get_manifold(), line_support_points, cell, quad_points);
@@ -3924,9 +3935,15 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
         add_line_support_points (cell, a);
         add_quad_support_points (cell, a);
 
-        // then compute the interior points
-        // TODO: remove else case as soon as boundary is fixed
-        if (dynamic_cast<const Boundary<dim,spacedim> *>(&cell->get_manifold()) == NULL)
+        // then compute the interior points. if we have a StraightBoundary but
+        // no "real" boundary description doing something else, we should go
+        // for the smoothing of the support points through
+        // add_weighted_interior_points. we need to go through typeid because
+        // curved boundaries are derived from StraightBoundary and thus a
+        // plain dynamic_cast will not suffice.
+        if (smooth_support_points_on_flat_manifold == false ||
+            std::string(typeid(cell->get_manifold()).name()).find("StraightBoundary") ==
+            std::string::npos)
           {
             std::vector<Point<spacedim> > hex_points (Utilities::fixed_power<dim>(polynomial_degree-1));
             get_intermediate_points_on_object(cell->get_manifold(), line_support_points, cell, hex_points);
