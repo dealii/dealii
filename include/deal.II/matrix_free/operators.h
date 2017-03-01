@@ -44,21 +44,23 @@ namespace MatrixFreeOperators
    * In case of a non-symmetric operator, Tapply_add() should be additionally
    * implemented.
    *
+   * Currently, the only supported vector is LinearAlgebra::distributed::Vector.
+   *
    * @author Denis Davydov, 2016
    */
-  template <int dim, typename Number = double>
+  template <int dim, typename VectorType = LinearAlgebra::distributed::Vector<double> >
   class Base : public Subscriptor
   {
   public:
     /**
      * Number typedef.
      */
-    typedef Number value_type;
+    typedef typename VectorType::value_type value_type;
 
     /**
      * size_type needed for preconditioner classes.
      */
-    typedef typename LinearAlgebra::distributed::Vector<Number>::size_type size_type;
+    typedef typename VectorType::size_type size_type;
 
     /**
      * Default constructor.
@@ -79,12 +81,12 @@ namespace MatrixFreeOperators
     /**
      * Initialize operator on fine scale.
      */
-    void initialize (std_cxx11::shared_ptr<const MatrixFree<dim,Number> > data);
+    void initialize (std_cxx11::shared_ptr<const MatrixFree<dim,value_type> > data);
 
     /**
      * Initialize operator on a level @p level.
      */
-    void initialize (std_cxx11::shared_ptr<const MatrixFree<dim,Number> > data,
+    void initialize (std_cxx11::shared_ptr<const MatrixFree<dim,value_type> > data,
                      const MGConstrainedDoFs &mg_constrained_dofs,
                      const unsigned int level);
 
@@ -101,45 +103,45 @@ namespace MatrixFreeOperators
     /**
      * vmult operator for interface.
      */
-    void vmult_interface_down(LinearAlgebra::distributed::Vector<Number> &dst,
-                              const LinearAlgebra::distributed::Vector<Number> &src) const;
+    void vmult_interface_down(VectorType &dst,
+                              const VectorType &src) const;
 
     /**
      * vmult operator for interface.
      */
-    void vmult_interface_up(LinearAlgebra::distributed::Vector<Number> &dst,
-                            const LinearAlgebra::distributed::Vector<Number> &src) const;
+    void vmult_interface_up(VectorType &dst,
+                            const VectorType &src) const;
 
     /**
      * Matrix-vector multiplication.
      */
-    void vmult (LinearAlgebra::distributed::Vector<Number> &dst,
-                const LinearAlgebra::distributed::Vector<Number> &src) const;
+    void vmult (VectorType &dst,
+                const VectorType &src) const;
 
     /**
      * Transpose matrix-vector multiplication.
      */
-    void Tvmult (LinearAlgebra::distributed::Vector<Number> &dst,
-                 const LinearAlgebra::distributed::Vector<Number> &src) const;
+    void Tvmult (VectorType &dst,
+                 const VectorType &src) const;
 
     /**
      * Adding Matrix-vector multiplication.
      */
-    void vmult_add (LinearAlgebra::distributed::Vector<Number> &dst,
-                    const LinearAlgebra::distributed::Vector<Number> &src) const;
+    void vmult_add (VectorType &dst,
+                    const VectorType &src) const;
 
     /**
      * Adding transpose matrix-vector multiplication.
      */
-    void Tvmult_add (LinearAlgebra::distributed::Vector<Number> &dst,
-                     const LinearAlgebra::distributed::Vector<Number> &src) const;
+    void Tvmult_add (VectorType &dst,
+                     const VectorType &src) const;
 
     /**
      * Returns the value of the matrix entry (row,col). In matrix-free context
      * this function is valid only for row==col when diagonal is initialized.
      */
-    Number el (const unsigned int row,
-               const unsigned int col) const;
+    value_type el (const unsigned int row,
+                   const unsigned int col) const;
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this object.
@@ -149,7 +151,7 @@ namespace MatrixFreeOperators
     /**
      * A wrapper for initialize_dof_vector() of MatrixFree object.
      */
-    void initialize_dof_vector (LinearAlgebra::distributed::Vector<Number> &vec) const;
+    void initialize_dof_vector (VectorType &vec) const;
 
     /**
      * Compute diagonal of this operator.
@@ -162,13 +164,13 @@ namespace MatrixFreeOperators
     /**
      * Get read access to the MatrixFree object stored with this operator.
      */
-    std_cxx11::shared_ptr<const MatrixFree<dim,Number> >
+    std_cxx11::shared_ptr<const MatrixFree<dim,value_type> >
     get_matrix_free () const;
 
     /**
      * Get read access to the inverse diagonal of this operator.
      */
-    const std_cxx11::shared_ptr<DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> > > &
+    const std_cxx11::shared_ptr<DiagonalMatrix<VectorType> > &
     get_matrix_diagonal_inverse() const;
 
     /**
@@ -176,9 +178,9 @@ namespace MatrixFreeOperators
      * <tt>src</tt> vector by the inverse of the respective diagonal element and
      * multiplies the result with the relaxation factor <tt>omega</tt>.
      */
-    void precondition_Jacobi(LinearAlgebra::distributed::Vector<Number> &dst,
-                             const LinearAlgebra::distributed::Vector<Number> &src,
-                             const Number omega) const;
+    void precondition_Jacobi(VectorType &dst,
+                             const VectorType &src,
+                             const value_type omega) const;
 
   protected:
 
@@ -186,32 +188,32 @@ namespace MatrixFreeOperators
      * Set constrained entries (both from hanging nodes and edge constraints)
      * of @p dst to one.
      */
-    void set_constrained_entries_to_one (LinearAlgebra::distributed::Vector<Number> &dst) const;
+    void set_constrained_entries_to_one (VectorType &dst) const;
 
     /**
      * Apply operator to @p src and add result in @p dst.
      */
-    virtual void apply_add(LinearAlgebra::distributed::Vector<Number> &dst,
-                           const LinearAlgebra::distributed::Vector<Number> &src) const = 0;
+    virtual void apply_add(VectorType &dst,
+                           const VectorType &src) const = 0;
 
     /**
      * Apply transpose operator to @p src and add result in @p dst.
      *
      * Default implementation is to call apply_add().
      */
-    virtual void Tapply_add(LinearAlgebra::distributed::Vector<Number> &dst,
-                            const LinearAlgebra::distributed::Vector<Number> &src) const;
+    virtual void Tapply_add(VectorType &dst,
+                            const VectorType &src) const;
 
     /**
      * MatrixFree object to be used with this operator.
      */
-    std_cxx11::shared_ptr<const MatrixFree<dim,Number> > data;
+    std_cxx11::shared_ptr<const MatrixFree<dim,value_type> > data;
 
     /**
      * A shared pointer to a diagonal matrix that stores the inverse of
      * diagonal elements as a vector.
      */
-    std_cxx11::shared_ptr<DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> > > inverse_diagonal_entries;
+    std_cxx11::shared_ptr<DiagonalMatrix<VectorType > > inverse_diagonal_entries;
 
   private:
 
@@ -223,7 +225,7 @@ namespace MatrixFreeOperators
     /**
      * Auxiliary vector.
      */
-    mutable std::vector<std::pair<Number,Number> > edge_constrained_values;
+    mutable std::vector<std::pair<value_type,value_type> > edge_constrained_values;
 
     /**
      * A flag which determines whether or not this operator has interface
@@ -235,8 +237,8 @@ namespace MatrixFreeOperators
      * Function which implements vmult_add (@p transpose = false) and
      * Tvmult_add (@p transpose = true).
      */
-    void mult_add (LinearAlgebra::distributed::Vector<Number> &dst,
-                   const LinearAlgebra::distributed::Vector<Number> &src,
+    void mult_add (VectorType &dst,
+                   const VectorType &src,
                    const bool transpose) const;
 
     /**
@@ -246,7 +248,7 @@ namespace MatrixFreeOperators
      * order to ensure that the cell loops will be able to access the ghost
      * indices with the correct local indices.
      */
-    void adjust_ghost_range_if_necessary(const LinearAlgebra::distributed::Vector<Number> &vec) const;
+    void adjust_ghost_range_if_necessary(const VectorType &vec) const;
   };
 
 
@@ -401,19 +403,19 @@ namespace MatrixFreeOperators
    *
    * @author Daniel Arndt, 2016
    */
-  template <int dim, int fe_degree, int n_q_points_1d = fe_degree+1, int n_components = 1, typename Number = double>
-  class MassOperator : public Base<dim, Number>
+  template <int dim, int fe_degree, int n_q_points_1d = fe_degree+1, int n_components = 1, typename VectorType = LinearAlgebra::distributed::Vector<double> >
+  class MassOperator : public Base<dim, VectorType>
   {
   public:
     /**
      * Number typedef.
      */
-    typedef typename Base<dim,Number>::value_type value_type;
+    typedef typename Base<dim,VectorType>::value_type value_type;
 
     /**
      * size_type needed for preconditioner classes.
      */
-    typedef typename Base<dim,Number>::size_type size_type;
+    typedef typename Base<dim,VectorType>::size_type size_type;
 
     /**
      * Constructor.
@@ -431,15 +433,15 @@ namespace MatrixFreeOperators
      * assumed that the passed input and output vector are correctly initialized
      * using initialize_dof_vector().
      */
-    virtual void apply_add (LinearAlgebra::distributed::Vector<Number>       &dst,
-                            const LinearAlgebra::distributed::Vector<Number> &src) const;
+    virtual void apply_add (VectorType       &dst,
+                            const VectorType &src) const;
 
     /**
      * For this operator, there is just a cell contribution.
      */
-    void local_apply_cell (const MatrixFree<dim,Number>                     &data,
-                           LinearAlgebra::distributed::Vector<Number>       &dst,
-                           const LinearAlgebra::distributed::Vector<Number> &src,
+    void local_apply_cell (const MatrixFree<dim,value_type>            &data,
+                           VectorType                                  &dst,
+                           const VectorType                            &src,
                            const std::pair<unsigned int,unsigned int>  &cell_range) const;
   };
 
@@ -452,19 +454,19 @@ namespace MatrixFreeOperators
    *
    * @author Denis Davydov, 2016
    */
-  template <int dim, int fe_degree, int n_q_points_1d = fe_degree+1, int n_components = 1, typename Number = double>
-  class LaplaceOperator : public Base<dim, Number>
+  template <int dim, int fe_degree, int n_q_points_1d = fe_degree+1, int n_components = 1, typename VectorType = LinearAlgebra::distributed::Vector<double> >
+  class LaplaceOperator : public Base<dim, VectorType>
   {
   public:
     /**
      * Number typedef.
      */
-    typedef typename Base<dim,Number>::value_type value_type;
+    typedef typename Base<dim,VectorType>::value_type value_type;
 
     /**
      * size_type needed for preconditioner classes.
      */
-    typedef typename Base<dim,Number>::size_type size_type;
+    typedef typename Base<dim,VectorType>::size_type size_type;
 
     /**
      * Constructor.
@@ -522,7 +524,7 @@ namespace MatrixFreeOperators
      * of scope in user code and the clear() command or destructor of this class
      * will delete the table.
      */
-    void set_coefficient(const std_cxx11::shared_ptr<Table<2, VectorizedArray<Number> > > &scalar_coefficient );
+    void set_coefficient(const std_cxx11::shared_ptr<Table<2, VectorizedArray<value_type> > > &scalar_coefficient );
 
     virtual void clear();
 
@@ -532,7 +534,7 @@ namespace MatrixFreeOperators
      * The function will throw an error if coefficients are not previously set
      * by set_coefficient() function.
      */
-    std_cxx11::shared_ptr< Table<2, VectorizedArray<Number> > > get_coefficient();
+    std_cxx11::shared_ptr< Table<2, VectorizedArray<value_type> > > get_coefficient();
 
   private:
     /**
@@ -540,35 +542,35 @@ namespace MatrixFreeOperators
      * assumed that the passed input and output vector are correctly initialized
      * using initialize_dof_vector().
      */
-    virtual void apply_add (LinearAlgebra::distributed::Vector<Number>       &dst,
-                            const LinearAlgebra::distributed::Vector<Number> &src) const;
+    virtual void apply_add (VectorType       &dst,
+                            const VectorType &src) const;
 
     /**
      * Applies the Laplace operator on a cell.
      */
-    void local_apply_cell (const MatrixFree<dim,Number>                     &data,
-                           LinearAlgebra::distributed::Vector<Number>       &dst,
-                           const LinearAlgebra::distributed::Vector<Number> &src,
+    void local_apply_cell (const MatrixFree<dim,value_type>            &data,
+                           VectorType                                  &dst,
+                           const VectorType                            &src,
                            const std::pair<unsigned int,unsigned int>  &cell_range) const;
 
     /**
      * Apply diagonal part of the Laplace operator on a cell.
      */
-    void local_diagonal_cell (const MatrixFree<dim,Number>                &data,
-                              LinearAlgebra::distributed::Vector<Number>  &dst,
+    void local_diagonal_cell (const MatrixFree<dim,value_type>            &data,
+                              VectorType                                  &dst,
                               const unsigned int &,
                               const std::pair<unsigned int,unsigned int>  &cell_range) const;
 
     /**
      * Apply Laplace operator on a cell @p cell.
      */
-    void do_operation_on_cell(FEEvaluation<dim,fe_degree,n_q_points_1d,n_components,Number> &phi,
+    void do_operation_on_cell(FEEvaluation<dim,fe_degree,n_q_points_1d,n_components,value_type> &phi,
                               const unsigned int cell) const;
 
     /**
      * User-provided heterogeneity coefficient.
      */
-    std_cxx11::shared_ptr< Table<2, VectorizedArray<Number> > > scalar_coefficient;
+    std_cxx11::shared_ptr< Table<2, VectorizedArray<value_type> > > scalar_coefficient;
   };
 
 
@@ -687,15 +689,15 @@ namespace MatrixFreeOperators
   }
 
   //----------------- Base operator -----------------------------
-  template <int dim, typename Number>
-  Base<dim,Number>::~Base ()
+  template <int dim, typename VectorType>
+  Base<dim,VectorType>::~Base ()
   {
   }
 
 
 
-  template <int dim, typename Number>
-  Base<dim,Number>::Base ()
+  template <int dim, typename VectorType>
+  Base<dim,VectorType>::Base ()
     :
     Subscriptor(),
     have_interface_matrices(false)
@@ -704,9 +706,9 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename Number>
-  typename Base<dim,Number>::size_type
-  Base<dim,Number>::m () const
+  template <int dim, typename VectorType>
+  typename Base<dim,VectorType>::size_type
+  Base<dim,VectorType>::m () const
   {
     Assert(data.get() != NULL,
            ExcNotInitialized());
@@ -715,18 +717,18 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename Number>
-  typename Base<dim,Number>::size_type
-  Base<dim,Number>::n () const
+  template <int dim, typename VectorType>
+  typename Base<dim,VectorType>::size_type
+  Base<dim,VectorType>::n () const
   {
     return m();
   }
 
 
 
-  template <int dim, typename Number>
+  template <int dim, typename VectorType>
   void
-  Base<dim,Number>::clear ()
+  Base<dim,VectorType>::clear ()
   {
     data.reset();
     inverse_diagonal_entries.reset();
@@ -734,10 +736,10 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename Number>
-  Number
-  Base<dim,Number>::el (const unsigned int row,
-                        const unsigned int col) const
+  template <int dim, typename VectorType>
+  typename Base<dim,VectorType>::value_type
+  Base<dim,VectorType>::el (const unsigned int row,
+                            const unsigned int col) const
   {
     (void) col;
     Assert (row == col, ExcNotImplemented());
@@ -748,9 +750,9 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename Number>
+  template <int dim, typename VectorType>
   void
-  Base<dim,Number>::initialize_dof_vector (LinearAlgebra::distributed::Vector<Number> &vec) const
+  Base<dim,VectorType>::initialize_dof_vector (VectorType &vec) const
   {
     Assert(data.get() != NULL,
            ExcNotInitialized());
@@ -762,10 +764,10 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename Number>
+  template <int dim, typename VectorType>
   void
-  Base<dim,Number>::
-  initialize (std_cxx11::shared_ptr<const MatrixFree<dim,Number> > data_)
+  Base<dim,VectorType>::
+  initialize (std_cxx11::shared_ptr<const MatrixFree<dim,Base<dim,VectorType>::value_type> > data_)
   {
     data = data_;
     edge_constrained_indices.clear();
@@ -774,10 +776,10 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename Number>
+  template <int dim, typename VectorType>
   void
-  Base<dim,Number>::
-  initialize (std_cxx11::shared_ptr<const MatrixFree<dim,Number> > data_,
+  Base<dim,VectorType>::
+  initialize (std_cxx11::shared_ptr<const MatrixFree<dim,Base<dim,VectorType>::value_type> > data_,
               const MGConstrainedDoFs      &mg_constrained_dofs,
               const unsigned int            level)
   {
@@ -807,9 +809,9 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename Number>
+  template <int dim, typename VectorType>
   void
-  Base<dim,Number>::set_constrained_entries_to_one (LinearAlgebra::distributed::Vector<Number> &dst) const
+  Base<dim,VectorType>::set_constrained_entries_to_one (VectorType &dst) const
   {
     const std::vector<unsigned int> &
     constrained_dofs = data->get_constrained_dofs();
@@ -821,41 +823,43 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename Number>
+  template <int dim, typename VectorType>
   void
-  Base<dim,Number>::vmult (LinearAlgebra::distributed::Vector<Number>       &dst,
-                           const LinearAlgebra::distributed::Vector<Number> &src) const
+  Base<dim,VectorType>::vmult (VectorType       &dst,
+                               const VectorType &src) const
   {
+    typedef typename Base<dim,VectorType>::value_type Number;
     dst = Number(0.);
     vmult_add (dst, src);
   }
 
 
 
-  template <int dim, typename Number>
+  template <int dim, typename VectorType>
   void
-  Base<dim,Number>::vmult_add (LinearAlgebra::distributed::Vector<Number> &dst,
-                               const LinearAlgebra::distributed::Vector<Number> &src) const
+  Base<dim,VectorType>::vmult_add (VectorType &dst,
+                                   const VectorType &src) const
   {
     mult_add (dst, src, false);
   }
 
 
 
-  template <int dim, typename Number>
+  template <int dim, typename VectorType>
   void
-  Base<dim,Number>::Tvmult_add (LinearAlgebra::distributed::Vector<Number> &dst,
-                                const LinearAlgebra::distributed::Vector<Number> &src) const
+  Base<dim,VectorType>::Tvmult_add (VectorType &dst,
+                                    const VectorType &src) const
   {
     mult_add (dst, src, true);
   }
 
 
 
-  template <int dim, typename Number>
+  template <int dim, typename VectorType>
   void
-  Base<dim,Number>::adjust_ghost_range_if_necessary(const LinearAlgebra::distributed::Vector<Number> &src) const
+  Base<dim,VectorType>::adjust_ghost_range_if_necessary(const VectorType &src) const
   {
+    typedef typename Base<dim,VectorType>::value_type Number;
     // If both vectors use the same partitioner -> done
     if (src.get_partitioner().get() ==
         data->get_dof_info(0).vector_partitioner.get())
@@ -872,7 +876,7 @@ namespace MatrixFreeOperators
     // lost
     VectorView<Number> view_src_in(src.local_size(), src.begin());
     Vector<Number> copy_vec = view_src_in;
-    const_cast<LinearAlgebra::distributed::Vector<Number> &>(src).
+    const_cast<VectorType &>(src).
     reinit(data->get_dof_info(0).vector_partitioner);
     VectorView<Number> view_src_out(src.local_size(), src.begin());
     static_cast<Vector<Number>&>(view_src_out) = copy_vec;
@@ -880,12 +884,13 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename Number>
+  template <int dim, typename VectorType>
   void
-  Base<dim,Number>::mult_add (LinearAlgebra::distributed::Vector<Number> &dst,
-                              const LinearAlgebra::distributed::Vector<Number> &src,
-                              const bool transpose) const
+  Base<dim,VectorType>::mult_add (VectorType &dst,
+                                  const VectorType &src,
+                                  const bool transpose) const
   {
+    typedef typename Base<dim,VectorType>::value_type Number;
     adjust_ghost_range_if_necessary(src);
     adjust_ghost_range_if_necessary(dst);
 
@@ -896,7 +901,7 @@ namespace MatrixFreeOperators
         edge_constrained_values[i] =
           std::pair<Number,Number>(src.local_element(edge_constrained_indices[i]),
                                    dst.local_element(edge_constrained_indices[i]));
-        const_cast<LinearAlgebra::distributed::Vector<Number>&>(src).local_element(edge_constrained_indices[i]) = 0.;
+        const_cast<VectorType &>(src).local_element(edge_constrained_indices[i]) = 0.;
       }
 
     if (transpose)
@@ -913,19 +918,20 @@ namespace MatrixFreeOperators
     // destination
     for (unsigned int i=0; i<edge_constrained_indices.size(); ++i)
       {
-        const_cast<LinearAlgebra::distributed::Vector<Number>&>(src).local_element(edge_constrained_indices[i]) = edge_constrained_values[i].first;
+        const_cast<VectorType &>(src).local_element(edge_constrained_indices[i]) = edge_constrained_values[i].first;
         dst.local_element(edge_constrained_indices[i]) = edge_constrained_values[i].second + edge_constrained_values[i].first;
       }
   }
 
 
 
-  template <int dim, typename Number>
+  template <int dim, typename VectorType>
   void
-  Base<dim,Number>::
-  vmult_interface_down(LinearAlgebra::distributed::Vector<Number> &dst,
-                       const LinearAlgebra::distributed::Vector<Number> &src) const
+  Base<dim,VectorType>::
+  vmult_interface_down(VectorType &dst,
+                       const VectorType &src) const
   {
+    typedef typename Base<dim,VectorType>::value_type Number;
     adjust_ghost_range_if_necessary(src);
     adjust_ghost_range_if_necessary(dst);
 
@@ -941,7 +947,7 @@ namespace MatrixFreeOperators
         edge_constrained_values[i] =
           std::pair<Number,Number>(src.local_element(edge_constrained_indices[i]),
                                    dst.local_element(edge_constrained_indices[i]));
-        const_cast<LinearAlgebra::distributed::Vector<Number>&>(src).local_element(edge_constrained_indices[i]) = 0.;
+        const_cast<VectorType &>(src).local_element(edge_constrained_indices[i]) = 0.;
       }
 
     apply_add(dst,src);
@@ -954,7 +960,7 @@ namespace MatrixFreeOperators
         ++c;
 
         // reset the src values
-        const_cast<LinearAlgebra::distributed::Vector<Number>&>(src).local_element(edge_constrained_indices[i]) = edge_constrained_values[i].first;
+        const_cast<VectorType &>(src).local_element(edge_constrained_indices[i]) = edge_constrained_values[i].first;
       }
     for ( ; c<dst.local_size(); ++c)
       dst.local_element(c) = 0.;
@@ -962,12 +968,13 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename Number>
+  template <int dim, typename VectorType>
   void
-  Base<dim,Number>::
-  vmult_interface_up(LinearAlgebra::distributed::Vector<Number> &dst,
-                     const LinearAlgebra::distributed::Vector<Number> &src) const
+  Base<dim,VectorType>::
+  vmult_interface_up(VectorType &dst,
+                     const VectorType &src) const
   {
+    typedef typename Base<dim,VectorType>::value_type Number;
     adjust_ghost_range_if_necessary(src);
     adjust_ghost_range_if_necessary(dst);
 
@@ -976,7 +983,7 @@ namespace MatrixFreeOperators
     if (!have_interface_matrices)
       return;
 
-    LinearAlgebra::distributed::Vector<Number> src_cpy (src);
+    VectorType src_cpy (src);
     unsigned int c=0;
     for (unsigned int i=0; i<edge_constrained_indices.size(); ++i)
       {
@@ -997,38 +1004,39 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename Number>
+  template <int dim, typename VectorType>
   void
-  Base<dim,Number>::Tvmult (LinearAlgebra::distributed::Vector<Number>       &dst,
-                            const LinearAlgebra::distributed::Vector<Number> &src) const
+  Base<dim,VectorType>::Tvmult (VectorType       &dst,
+                                const VectorType &src) const
   {
+    typedef typename Base<dim,VectorType>::value_type Number;
     dst = Number(0.);
     Tvmult_add (dst,src);
   }
 
 
 
-  template <int dim, typename Number>
+  template <int dim, typename VectorType>
   std::size_t
-  Base<dim,Number>::memory_consumption () const
+  Base<dim,VectorType>::memory_consumption () const
   {
     return inverse_diagonal_entries.get() != NULL ? inverse_diagonal_entries->memory_consumption() : sizeof(*this);
   }
 
 
 
-  template <int dim, typename Number>
-  std_cxx11::shared_ptr<const MatrixFree<dim,Number> >
-  Base<dim,Number>::get_matrix_free() const
+  template <int dim, typename VectorType>
+  std_cxx11::shared_ptr<const MatrixFree<dim,typename Base<dim,VectorType>::value_type> >
+  Base<dim,VectorType>::get_matrix_free() const
   {
     return data;
   }
 
 
 
-  template <int dim, typename Number>
-  const std_cxx11::shared_ptr<DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> > > &
-  Base<dim,Number>::get_matrix_diagonal_inverse() const
+  template <int dim, typename VectorType>
+  const std_cxx11::shared_ptr<DiagonalMatrix<VectorType> > &
+  Base<dim,VectorType>::get_matrix_diagonal_inverse() const
   {
     Assert(inverse_diagonal_entries.get() != NULL &&
            inverse_diagonal_entries->m() > 0, ExcNotInitialized());
@@ -1037,21 +1045,21 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename Number>
+  template <int dim, typename VectorType>
   void
-  Base<dim,Number>::Tapply_add(LinearAlgebra::distributed::Vector<Number> &dst,
-                               const LinearAlgebra::distributed::Vector<Number> &src) const
+  Base<dim,VectorType>::Tapply_add(VectorType &dst,
+                                   const VectorType &src) const
   {
     apply_add(dst,src);
   }
 
 
 
-  template <int dim, typename Number>
+  template <int dim, typename VectorType>
   void
-  Base<dim,Number>::precondition_Jacobi(LinearAlgebra::distributed::Vector<Number> &dst,
-                                        const LinearAlgebra::distributed::Vector<Number> &src,
-                                        const Number omega) const
+  Base<dim,VectorType>::precondition_Jacobi(VectorType &dst,
+                                            const VectorType &src,
+                                            const typename Base<dim,VectorType>::value_type omega) const
   {
     Assert(inverse_diagonal_entries.get() &&
            inverse_diagonal_entries->m() > 0, ExcNotInitialized());
@@ -1137,26 +1145,27 @@ namespace MatrixFreeOperators
 
   //-----------------------------MassOperator----------------------------------
 
-  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
-  MassOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename VectorType>
+  MassOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
   MassOperator ()
     :
-    Base<dim, Number>()
+    Base<dim, VectorType>()
   {}
 
 
 
-  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename VectorType>
   void
-  MassOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
+  MassOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
   compute_diagonal()
   {
-    Assert((Base<dim, Number>::data.get() != NULL), ExcNotInitialized());
+    typedef typename Base<dim,VectorType>::value_type Number;
+    Assert((Base<dim, VectorType>::data.get() != NULL), ExcNotInitialized());
 
     this->inverse_diagonal_entries.
-    reset(new DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> >());
-    LinearAlgebra::distributed::Vector<Number> &inverse_diagonal_vector = this->inverse_diagonal_entries->get_vector();
-    LinearAlgebra::distributed::Vector<Number> ones;
+    reset(new DiagonalMatrix<VectorType>());
+    VectorType &inverse_diagonal_vector = this->inverse_diagonal_entries->get_vector();
+    VectorType ones;
     this->initialize_dof_vector(ones);
     this->initialize_dof_vector(inverse_diagonal_vector);
     ones = Number(1.);
@@ -1174,26 +1183,27 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename VectorType>
   void
-  MassOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
-  apply_add (LinearAlgebra::distributed::Vector<Number>       &dst,
-             const LinearAlgebra::distributed::Vector<Number> &src) const
+  MassOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
+  apply_add (VectorType       &dst,
+             const VectorType &src) const
   {
-    Base<dim, Number>::data->cell_loop (&MassOperator::local_apply_cell,
-                                        this, dst, src);
+    Base<dim, VectorType>::data->cell_loop (&MassOperator::local_apply_cell,
+                                            this, dst, src);
   }
 
 
 
-  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename VectorType>
   void
-  MassOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
-  local_apply_cell (const MatrixFree<dim,Number>                     &data,
-                    LinearAlgebra::distributed::Vector<Number>       &dst,
-                    const LinearAlgebra::distributed::Vector<Number> &src,
+  MassOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
+  local_apply_cell (const MatrixFree<dim,typename Base<dim,VectorType>::value_type> &data,
+                    VectorType                                  &dst,
+                    const VectorType                            &src,
                     const std::pair<unsigned int,unsigned int>  &cell_range) const
   {
+    typedef typename Base<dim,VectorType>::value_type Number;
     FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number> phi(data);
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
@@ -1210,40 +1220,40 @@ namespace MatrixFreeOperators
 
   //-----------------------------LaplaceOperator----------------------------------
 
-  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
-  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename VectorType>
+  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
   LaplaceOperator ()
     :
-    Base<dim, Number>()
+    Base<dim, VectorType>()
   {
   }
 
 
 
-  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename VectorType>
   void
-  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
+  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
   clear ()
   {
-    Base<dim, Number>::clear();
+    Base<dim, VectorType>::clear();
     scalar_coefficient.reset();
   }
 
 
 
-  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename VectorType>
   void
-  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
-  set_coefficient(const std_cxx11::shared_ptr<Table<2, VectorizedArray<Number> > > &scalar_coefficient_ )
+  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
+  set_coefficient(const std_cxx11::shared_ptr<Table<2, VectorizedArray<typename Base<dim,VectorType>::value_type> > > &scalar_coefficient_ )
   {
     scalar_coefficient = scalar_coefficient_;
   }
 
 
 
-  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
-  std_cxx11::shared_ptr< Table<2, VectorizedArray<Number> > >
-  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename VectorType>
+  std_cxx11::shared_ptr< Table<2, VectorizedArray<typename Base<dim,VectorType>::value_type> > >
+  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
   get_coefficient()
   {
     Assert (scalar_coefficient.get(),
@@ -1253,17 +1263,18 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename VectorType>
   void
-  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
+  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
   compute_diagonal()
   {
-    Assert((Base<dim, Number>::data.get() != NULL), ExcNotInitialized());
+    typedef typename Base<dim,VectorType>::value_type Number;
+    Assert((Base<dim, VectorType>::data.get() != NULL), ExcNotInitialized());
 
     unsigned int dummy = 0;
     this->inverse_diagonal_entries.
-    reset(new DiagonalMatrix<LinearAlgebra::distributed::Vector<Number> >());
-    LinearAlgebra::distributed::Vector<Number> &inverse_diagonal_vector = this->inverse_diagonal_entries->get_vector();
+    reset(new DiagonalMatrix<VectorType>());
+    VectorType &inverse_diagonal_vector = this->inverse_diagonal_entries->get_vector();
     this->initialize_dof_vector(inverse_diagonal_vector);
 
     this->data->cell_loop (&LaplaceOperator::local_diagonal_cell,
@@ -1281,14 +1292,14 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename VectorType>
   void
-  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
-  apply_add (LinearAlgebra::distributed::Vector<Number>       &dst,
-             const LinearAlgebra::distributed::Vector<Number> &src) const
+  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
+  apply_add (VectorType       &dst,
+             const VectorType &src) const
   {
-    Base<dim, Number>::data->cell_loop (&LaplaceOperator::local_apply_cell,
-                                        this, dst, src);
+    Base<dim, VectorType>::data->cell_loop (&LaplaceOperator::local_apply_cell,
+                                            this, dst, src);
   }
 
   namespace
@@ -1307,10 +1318,10 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename VectorType>
   void
-  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
-  do_operation_on_cell(FEEvaluation<dim,fe_degree,n_q_points_1d,n_components,Number> &phi,
+  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
+  do_operation_on_cell(FEEvaluation<dim,fe_degree,n_q_points_1d,n_components,typename Base<dim,VectorType>::value_type> &phi,
                        const unsigned int cell) const
   {
     phi.evaluate (false,true,false);
@@ -1336,14 +1347,15 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename VectorType>
   void
-  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
-  local_apply_cell (const MatrixFree<dim,Number>                     &data,
-                    LinearAlgebra::distributed::Vector<Number>       &dst,
-                    const LinearAlgebra::distributed::Vector<Number> &src,
+  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
+  local_apply_cell (const MatrixFree<dim,typename Base<dim,VectorType>::value_type> &data,
+                    VectorType       &dst,
+                    const VectorType &src,
                     const std::pair<unsigned int,unsigned int>  &cell_range) const
   {
+    typedef typename Base<dim,VectorType>::value_type Number;
     FEEvaluation<dim,fe_degree,n_q_points_1d,n_components,Number> phi (data);
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
@@ -1355,14 +1367,15 @@ namespace MatrixFreeOperators
   }
 
 
-  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename VectorType>
   void
-  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, Number>::
-  local_diagonal_cell (const MatrixFree<dim,Number>                     &data,
-                       LinearAlgebra::distributed::Vector<Number>       &dst,
+  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
+  local_diagonal_cell (const MatrixFree<dim,typename Base<dim,VectorType>::value_type> &data,
+                       VectorType                                       &dst,
                        const unsigned int &,
                        const std::pair<unsigned int,unsigned int>       &cell_range) const
   {
+    typedef typename Base<dim,VectorType>::value_type Number;
     FEEvaluation<dim,fe_degree,n_q_points_1d,n_components,Number> phi (data);
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {

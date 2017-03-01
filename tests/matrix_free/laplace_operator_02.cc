@@ -169,7 +169,7 @@ void test ()
       }
   }
 
-  MatrixFreeOperators::LaplaceOperator<dim,fe_degree,fe_degree+1, 1, number> mf;
+  MatrixFreeOperators::LaplaceOperator<dim,fe_degree,fe_degree+1, 1, LinearAlgebra::distributed::Vector<number> > mf;
   mf.initialize(mf_data);
   mf.set_coefficient(coefficient);
   mf.compute_diagonal();
