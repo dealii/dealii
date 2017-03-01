@@ -100,7 +100,7 @@ int main(int argc, char **argv)
 {
   // no threading in this test...
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
-  mpi_initlog();
+  initlog();
 
   check<2,double>(FE_DGQ<2>(3));
   check<2,double>(FE_DGQ<2>(8));
