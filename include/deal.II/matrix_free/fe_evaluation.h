@@ -5038,7 +5038,7 @@ namespace internal
   struct EvaluatorTensorProduct<evaluate_general,dim,fe_degree,n_q_points_1d,Number>
   {
     static const unsigned int dofs_per_cell = Utilities::fixed_int_power<fe_degree+1,dim>::value;
-    static const unsigned int n_q_points = n_q_points_1d == 0 ? 1 : Utilities::fixed_int_power<n_q_points_1d,dim>::value;
+    static const unsigned int n_q_points = Utilities::fixed_int_power<n_q_points_1d,dim>::value;
 
     /**
      * Empty constructor. Does nothing. Be careful when using 'values' and
@@ -5430,7 +5430,7 @@ namespace internal
   struct EvaluatorTensorProduct<evaluate_symmetric,dim,fe_degree,n_q_points_1d,Number>
   {
     static const unsigned int dofs_per_cell = Utilities::fixed_int_power<fe_degree+1,dim>::value;
-    static const unsigned int n_q_points = n_q_points_1d == 0 ? 1 : Utilities::fixed_int_power<n_q_points_1d,dim>::value;
+    static const unsigned int n_q_points = Utilities::fixed_int_power<n_q_points_1d,dim>::value;
 
     /**
      * Constructor, taking the data from ShapeInfo
@@ -6006,7 +6006,7 @@ namespace internal
   struct EvaluatorTensorProduct<evaluate_evenodd,dim,fe_degree,n_q_points_1d,Number>
   {
     static const unsigned int dofs_per_cell = Utilities::fixed_int_power<fe_degree+1,dim>::value;
-    static const unsigned int n_q_points = n_q_points_1d == 0 ? 1 : Utilities::fixed_int_power<n_q_points_1d,dim>::value;
+    static const unsigned int n_q_points = Utilities::fixed_int_power<n_q_points_1d,dim>::value;
 
     /**
      * Empty constructor. Does nothing. Be careful when using 'values' and
@@ -6291,7 +6291,7 @@ namespace internal
   template <>
   struct EvaluatorSelector<MatrixFreeFunctions::tensor_symmetric_plus_dg0,false>
   {
-    static const EvaluatorVariant variant = evaluate_symmetric;
+    static const EvaluatorVariant variant = evaluate_general;
   };
 
   template <>
@@ -6376,26 +6376,27 @@ namespace internal
                shape_info.fe_degree,
                shape_info.n_q_points_1d);
 
-    const unsigned int temp_size = Eval::dofs_per_cell > Eval::n_q_points ?
-                                   Eval::dofs_per_cell : Eval::n_q_points;
-#ifdef DEAL_II_WITH_CXX11
-    static_assert(temp_size > 0, "temp_size should not be zero");
-#endif
-
-    VectorizedArray<Number>  temp_data[temp_size < 100 ? 2*temp_size : 1];
+    const unsigned int temp_size = Eval::dofs_per_cell == numbers::invalid_unsigned_int ? 0
+                                   : (Eval::dofs_per_cell > Eval::n_q_points ?
+                                      Eval::dofs_per_cell : Eval::n_q_points);
+    VectorizedArray<Number>  temp_data[(temp_size > 0 && temp_size < 100) ? 2*temp_size : 1];
     VectorizedArray<Number> *temp1;
     VectorizedArray<Number> *temp2;
-    if (temp_size < 100)
+    if (temp_size == 0)
       {
-        temp1 = &temp_data[0];
+        temp1 = scratch_data;
+        temp2 = temp1 + std::max(Utilities::fixed_power<dim>(shape_info.fe_degree+1),
+                                 Utilities::fixed_power<dim>(shape_info.n_q_points_1d));
+      }
+    else if (temp_size > 100)
+      {
+        temp1 = scratch_data;
         temp2 = temp1 + temp_size;
       }
     else
       {
-        temp1 = scratch_data;
-        temp2 = scratch_data + (temp_size < numbers::invalid_unsigned_int ? temp_size :
-                                std::max(Utilities::fixed_power<dim>(shape_info.fe_degree+1),
-                                         Utilities::fixed_power<dim>(shape_info.n_q_points_1d)));
+        temp1 = &temp_data[0];
+        temp2 = temp1 + temp_size;
       }
 
     VectorizedArray<Number> **values_dofs = values_dofs_actual;
@@ -6407,20 +6408,21 @@ namespace internal
           expanded_dof_values[c] = scratch_data+2*(std::max(shape_info.dofs_per_cell,
                                                             shape_info.n_q_points)) +
                                    c*Utilities::fixed_power<dim>(shape_info.fe_degree+1);
+        const int degree = fe_degree != -1 ? fe_degree : shape_info.fe_degree;
         unsigned int count_p = 0, count_q = 0;
-        for (int i=0; i<(dim>2?fe_degree+1:1); ++i)
+        for (int i=0; i<(dim>2?degree+1:1); ++i)
           {
-            for (int j=0; j<(dim>1?fe_degree+1-i:1); ++j)
+            for (int j=0; j<(dim>1?degree+1-i:1); ++j)
               {
-                for (int k=0; k<fe_degree+1-j-i; ++k, ++count_p, ++count_q)
+                for (int k=0; k<degree+1-j-i; ++k, ++count_p, ++count_q)
                   for (unsigned int c=0; c<n_components; ++c)
                     expanded_dof_values[c][count_q] = values_dofs_actual[c][count_p];
-                for (int k=fe_degree+1-j-i; k<fe_degree+1; ++k, ++count_q)
+                for (int k=degree+1-j-i; k<degree+1; ++k, ++count_q)
                   for (unsigned int c=0; c<n_components; ++c)
                     expanded_dof_values[c][count_q] = VectorizedArray<Number>();
               }
-            for (int j=fe_degree+1-i; j<fe_degree+1; ++j)
-              for (int k=0; k<fe_degree+1; ++k, ++count_q)
+            for (int j=degree+1-i; j<degree+1; ++j)
+              for (int k=0; k<degree+1; ++k, ++count_q)
                 for (unsigned int c=0; c<n_components; ++c)
                   expanded_dof_values[c][count_q] = VectorizedArray<Number>();
           }
@@ -6561,8 +6563,8 @@ namespace internal
     // derivatives evaluate to zero
     if (type == MatrixFreeFunctions::tensor_symmetric_plus_dg0 && evaluate_val)
       for (unsigned int c=0; c<n_components; ++c)
-        for (unsigned int q=0; q<Eval::n_q_points; ++q)
-          values_quad[c][q] += values_dofs[c][Eval::dofs_per_cell];
+        for (unsigned int q=0; q<shape_info.n_q_points; ++q)
+          values_quad[c][q] += values_dofs[c][shape_info.dofs_per_cell-1];
   }
 
 
@@ -6593,22 +6595,27 @@ namespace internal
                shape_info.fe_degree,
                shape_info.n_q_points_1d);
 
-    const unsigned int temp_size = Eval::dofs_per_cell > Eval::n_q_points ?
-                                   Eval::dofs_per_cell : Eval::n_q_points;
-    VectorizedArray<Number>  temp_data[temp_size < 100 ? 2*temp_size : 1];
+    const unsigned int temp_size = Eval::dofs_per_cell == numbers::invalid_unsigned_int ? 0
+                                   : (Eval::dofs_per_cell > Eval::n_q_points ?
+                                      Eval::dofs_per_cell : Eval::n_q_points);
+    VectorizedArray<Number>  temp_data[(temp_size > 0 && temp_size < 100) ? 2*temp_size : 1];
     VectorizedArray<Number> *temp1;
     VectorizedArray<Number> *temp2;
-    if (temp_size < 100)
+    if (temp_size == 0)
       {
-        temp1 = &temp_data[0];
+        temp1 = scratch_data;
+        temp2 = temp1 + std::max(Utilities::fixed_power<dim>(shape_info.fe_degree+1),
+                                 Utilities::fixed_power<dim>(shape_info.n_q_points_1d));
+      }
+    else if (temp_size > 100)
+      {
+        temp1 = scratch_data;
         temp2 = temp1 + temp_size;
       }
     else
       {
-        temp1 = scratch_data;
-        temp2 = scratch_data + (temp_size < numbers::invalid_unsigned_int ? temp_size :
-                                std::max(Utilities::fixed_power<dim>(shape_info.fe_degree+1),
-                                         Utilities::fixed_power<dim>(shape_info.n_q_points_1d)));
+        temp1 = &temp_data[0];
+        temp2 = temp1 + temp_size;
       }
 
     // expand dof_values to tensor product for truncated tensor products
@@ -6721,32 +6728,33 @@ namespace internal
         if (integrate_val)
           for (unsigned int c=0; c<n_components; ++c)
             {
-              values_dofs[c][Eval::dofs_per_cell] = values_quad[c][0];
-              for (unsigned int q=1; q<Eval::n_q_points; ++q)
-                values_dofs[c][Eval::dofs_per_cell] += values_quad[c][q];
+              values_dofs[c][shape_info.dofs_per_cell-1] = values_quad[c][0];
+              for (unsigned int q=1; q<shape_info.n_q_points; ++q)
+                values_dofs[c][shape_info.dofs_per_cell-1] += values_quad[c][q];
             }
         else
           for (unsigned int c=0; c<n_components; ++c)
-            values_dofs[c][Eval::dofs_per_cell] = VectorizedArray<Number>();
+            values_dofs[c][shape_info.dofs_per_cell-1] = VectorizedArray<Number>();
       }
 
     if (type == MatrixFreeFunctions::truncated_tensor)
       {
         unsigned int count_p = 0, count_q = 0;
-        for (int i=0; i<(dim>2?fe_degree+1:1); ++i)
+        const int degree = fe_degree != -1 ? fe_degree : shape_info.fe_degree;
+        for (int i=0; i<(dim>2?degree+1:1); ++i)
           {
-            for (int j=0; j<(dim>1?fe_degree+1-i:1); ++j)
+            for (int j=0; j<(dim>1?degree+1-i:1); ++j)
               {
-                for (int k=0; k<fe_degree+1-j-i; ++k, ++count_p, ++count_q)
+                for (int k=0; k<degree+1-j-i; ++k, ++count_p, ++count_q)
                   {
                     for (unsigned int c=0; c<n_components; ++c)
                       values_dofs_actual[c][count_p] = expanded_dof_values[c][count_q];
                   }
                 count_q += j+i;
               }
-            count_q += i*(fe_degree+1);
+            count_q += i*(degree+1);
           }
-        AssertDimension(count_q, Eval::dofs_per_cell);
+        AssertDimension(count_q, Utilities::fixed_power<dim>(shape_info.fe_degree+1));
       }
   }
 
@@ -7125,12 +7133,31 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::check_template_arguments(const unsigned int fe_no,
                            const unsigned int first_selected_component)
 {
+  const unsigned int fe_degree_templ = fe_degree != -1 ? fe_degree : 0;
+  const unsigned int n_q_points_1d_templ = n_q_points_1d > 0 ? n_q_points_1d : 1;
   if (fe_degree == -1)
     {
-      evaluate_funct = internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
-      dim, -1, 0, n_components_, Number>::evaluate;
-      integrate_funct = internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
-      dim, -1, 0, n_components_, Number>::integrate;
+      if (this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0)
+        {
+          evaluate_funct = internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0,
+          dim, -1, 0, n_components_, Number>::evaluate;
+          integrate_funct = internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0,
+          dim, -1, 0, n_components_, Number>::integrate;
+        }
+      else if (this->data->element_type == internal::MatrixFreeFunctions::truncated_tensor)
+        {
+          evaluate_funct = internal::FEEvaluationImpl<internal::MatrixFreeFunctions::truncated_tensor,
+          dim, -1, 0, n_components_, Number>::evaluate;
+          integrate_funct = internal::FEEvaluationImpl<internal::MatrixFreeFunctions::truncated_tensor,
+          dim, -1, 0, n_components_, Number>::integrate;
+        }
+      else
+        {
+          evaluate_funct = internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
+          dim, -1, 0, n_components_, Number>::evaluate;
+          integrate_funct = internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
+          dim, -1, 0, n_components_, Number>::integrate;
+        }
     }
   else
     switch (this->data->element_type)
@@ -7138,55 +7165,55 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
       case internal::MatrixFreeFunctions::tensor_symmetric:
         evaluate_funct =
           internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric,
-          dim, fe_degree, n_q_points_1d, n_components_,
+          dim, fe_degree_templ, n_q_points_1d_templ, n_components_,
           Number>::evaluate;
         integrate_funct =
           internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric,
-          dim, fe_degree, n_q_points_1d, n_components_,
+          dim, fe_degree_templ, n_q_points_1d_templ, n_components_,
           Number>::integrate;
         break;
 
       case internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0:
         evaluate_funct =
           internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0,
-          dim, fe_degree, n_q_points_1d, n_components_,
+          dim, fe_degree_templ, n_q_points_1d_templ, n_components_,
           Number>::evaluate;
         integrate_funct =
           internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0,
-          dim, fe_degree, n_q_points_1d, n_components_,
+          dim, fe_degree_templ, n_q_points_1d_templ, n_components_,
           Number>::integrate;
         break;
 
       case internal::MatrixFreeFunctions::tensor_general:
         evaluate_funct =
           internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
-          dim, fe_degree, n_q_points_1d, n_components_,
+          dim, fe_degree_templ, n_q_points_1d_templ, n_components_,
           Number>::evaluate;
         integrate_funct =
           internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
-          dim, fe_degree, n_q_points_1d, n_components_,
+          dim, fe_degree_templ, n_q_points_1d_templ, n_components_,
           Number>::integrate;
         break;
 
       case internal::MatrixFreeFunctions::tensor_gausslobatto:
         evaluate_funct =
           internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_gausslobatto,
-          dim, fe_degree, n_q_points_1d, n_components_,
+          dim, fe_degree_templ, n_q_points_1d_templ, n_components_,
           Number>::evaluate;
         integrate_funct =
           internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_gausslobatto,
-          dim, fe_degree, n_q_points_1d, n_components_,
+          dim, fe_degree_templ, n_q_points_1d_templ, n_components_,
           Number>::integrate;
         break;
 
       case internal::MatrixFreeFunctions::truncated_tensor:
         evaluate_funct =
           internal::FEEvaluationImpl<internal::MatrixFreeFunctions::truncated_tensor,
-          dim, fe_degree, n_q_points_1d, n_components_,
+          dim, fe_degree_templ, n_q_points_1d_templ, n_components_,
           Number>::evaluate;
         integrate_funct =
           internal::FEEvaluationImpl<internal::MatrixFreeFunctions::truncated_tensor,
-          dim, fe_degree, n_q_points_1d, n_components_,
+          dim, fe_degree_templ, n_q_points_1d_templ, n_components_,
           Number>::integrate;
         break;
 
