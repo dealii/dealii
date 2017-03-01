@@ -114,6 +114,65 @@ MACRO(DEAL_II_PICKUP_TESTS)
   ENDIF()
 
   #
+  # Check that the diff programs can run and terminate successfully:
+  #
+  FOREACH(_diff_program ${NUMDIFF_EXECUTABLE} ${DIFF_EXECUTABLE})
+    EXECUTE_PROCESS(COMMAND ${_diff_program} "-v"
+      TIMEOUT 4 # seconds
+      OUTPUT_QUIET
+      ERROR_QUIET
+      RESULT_VARIABLE _diff_program_status
+      )
+
+    IF(NOT "${_diff_program_status}" STREQUAL "0")
+      MESSAGE(FATAL_ERROR
+        "\nThe command \"${_diff_program} -v\" did not run correctly: it either "
+        "failed to exit after a few seconds or returned a nonzero exit code. "
+        "The test suite cannot be set up without this program, so please "
+        "reinstall it and then run the test suite setup command again.\n")
+    ENDIF()
+  ENDFOREACH()
+
+  #
+  # Also check that numdiff is not a symlink to diff by running a relative
+  # tolerance test. Note that we set NUMDIFF_EXECUTABLE to diff in case we were
+  # not able to find it above, but here we check that the executable is really
+  # named 'numdiff'.
+  #
+  STRING(FIND "${NUMDIFF_EXECUTABLE}" "numdiff" _found_numdiff_binary)
+  IF(NOT "${_found_numdiff_binary}" STREQUAL "-1")
+    SET(_first_test_file_name
+      "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/numdiff-test-1.txt")
+    SET(_second_test_file_name
+      "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/numdiff-test-2.txt")
+    FILE(WRITE "${_first_test_file_name}" "0.99999999998\n2.0\n1.0\n")
+    FILE(WRITE "${_second_test_file_name}" "1.00000000001\n2.0\n1.0\n")
+
+    EXECUTE_PROCESS(COMMAND ${NUMDIFF_EXECUTABLE}
+      "-r" "1.0e-8" "--" "${_first_test_file_name}" "${_second_test_file_name}"
+      TIMEOUT 4 # seconds
+      OUTPUT_QUIET
+      ERROR_QUIET
+      RESULT_VARIABLE _numdiff_tolerance_test_status
+      )
+
+    #
+    # Tidy up:
+    #
+    FILE(REMOVE ${_first_test_file_name})
+    FILE(REMOVE ${_second_test_file_name})
+
+    IF(NOT "${_numdiff_tolerance_test_status}" STREQUAL "0")
+      MESSAGE(FATAL_ERROR
+        "\nThe detected numdiff executable was not able to pass a simple "
+        "relative tolerance test. This usually means that either numdiff "
+        "was misconfigured or that it is a symbolic link to diff. "
+        "The test suite needs numdiff to work correctly: please reinstall "
+        "numdiff and run the test suite configuration again.\n")
+    ENDIF()
+  ENDIF()
+
+  #
   # Set time limit:
   #
 
