@@ -25,6 +25,8 @@
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Import.h>
 #  include <Epetra_Export.h>
+
+#  include <boost/io/ios_state.hpp>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
@@ -487,6 +489,7 @@ namespace TrilinosWrappers
                      const bool         across) const
   {
     AssertThrow (out, ExcIO());
+    boost::io::ios_flags_saver restore_flags(out);
 
     // get a representation of the
     // vector and loop over all
