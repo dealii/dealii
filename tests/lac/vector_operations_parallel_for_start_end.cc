@@ -1,0 +1,80 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2012 - 2015 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
+
+// check that internal::VectorOperations::parallel_for works for start-end
+
+#include "../tests.h"
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/index_set.h>
+#include <deal.II/lac/vector_operations_internal.h>
+#include <cmath>
+#include <fstream>
+#include <iomanip>
+
+
+
+
+template <typename Number>
+void check ()
+{
+  for (unsigned int test=0; test<5; ++test)
+    {
+      const unsigned int size = 17 + test*1101;
+
+      std_cxx11::shared_ptr< ::dealii::parallel::internal::TBBPartitioner> thread_loop_partitioner;
+      thread_loop_partitioner.reset(new ::dealii::parallel::internal::TBBPartitioner());
+
+      Number *val;
+      Utilities::System::posix_memalign ((void **)&val, 64, sizeof(Number)*size);
+
+      const Number s = 3.1415;
+      internal::VectorOperations::Vector_set<Number> setter(s, val);
+
+      // now break the size in chunks
+      const unsigned int n_chunks = 3;
+      const unsigned int chunk_size = size / n_chunks;
+      for (unsigned int i = 0; i <= n_chunks; ++i)
+        {
+          const unsigned int begin = i*chunk_size;
+          const unsigned int end   = std::min((i+1)*chunk_size, size);
+          internal::VectorOperations::parallel_for(setter, end,
+                                                   thread_loop_partitioner,
+                                                   begin);
+        }
+
+      // check values:
+      for (unsigned int i = 0; i < size; ++i)
+        AssertThrow(val[i] == s,
+                    ExcInternalError());
+
+      free(val);
+    }
+}
+
+
+int main()
+{
+  std::ofstream logfile("output");
+  deallog << std::fixed;
+  deallog << std::setprecision(2);
+  deallog.attach(logfile);
+  deallog.threshold_double(1.e-10);
+
+  check<float>();
+  check<double>();
+  check<long double>();
+  deallog << "OK" << std::endl;
+}

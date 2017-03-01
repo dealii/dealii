@@ -116,11 +116,14 @@ namespace internal
     struct TBBForFunctor
     {
       TBBForFunctor(Functor &functor,
-                    const size_type vec_size)
+                    const size_type start,
+                    const size_type end)
         :
         functor(functor),
-        vec_size(vec_size)
+        start(start),
+        end(end)
       {
+        const size_type vec_size = end-start;
         // set chunk size for sub-tasks
         const unsigned int gs = internal::Vector::minimum_parallel_grain_size;
         n_chunks = std::min(static_cast<size_type>(4*MultithreadInfo::n_threads()),
@@ -140,13 +143,14 @@ namespace internal
 
       void operator() (const tbb::blocked_range<size_type> &range) const
       {
-        const size_type begin = range.begin()*chunk_size;
-        const size_type end = std::min(range.end()*chunk_size, vec_size);
-        functor(begin, end);
+        const size_type r_begin = start + range.begin()*chunk_size;
+        const size_type r_end = std::min(start + range.end()*chunk_size, end);
+        functor(r_begin, r_end);
       }
 
       Functor &functor;
-      const size_type vec_size;
+      const size_type start;
+      const size_type end;
       unsigned int n_chunks;
       size_type chunk_size;
     };
@@ -154,9 +158,11 @@ namespace internal
 
     template <typename Functor>
     void parallel_for(Functor &functor,
-                      size_type vec_size,
-                      std_cxx11::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
+                      size_type end,
+                      std_cxx11::shared_ptr<parallel::internal::TBBPartitioner> &partitioner,
+                      size_type start = 0)
     {
+      size_type vec_size = end-start;
 #ifdef DEAL_II_WITH_THREADS
       // only go to the parallel function in case there are at least 4 parallel
       // items, otherwise the overhead is too large
@@ -169,7 +175,7 @@ namespace internal
           std_cxx11::shared_ptr<tbb::affinity_partitioner> tbb_partitioner =
             partitioner->acquire_one_partitioner();
 
-          TBBForFunctor<Functor> generic_functor(functor, vec_size);
+          TBBForFunctor<Functor> generic_functor(functor, start, end);
           tbb::parallel_for (tbb::blocked_range<size_type> (0,
                                                             generic_functor.n_chunks,
                                                             1),
@@ -178,9 +184,9 @@ namespace internal
           partitioner->release_one_partitioner(tbb_partitioner);
         }
       else if (vec_size > 0)
-        functor(0,vec_size);
+        functor(start,end);
 #else
-      functor(0,vec_size);
+      functor(start,end);
       (void)partitioner;
 #endif
     }
