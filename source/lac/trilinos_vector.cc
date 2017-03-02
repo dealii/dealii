@@ -238,10 +238,11 @@ namespace TrilinosWrappers
             }
         }
 #if defined(DEBUG) && defined(DEAL_II_WITH_MPI)
-      const MPI_Comm mpi_communicator
-        = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()))->Comm();
+      const Epetra_MpiComm *comm_ptr
+        = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()));
+      Assert (comm_ptr != 0, ExcInternalError());
       const size_type n_elements_global
-        = Utilities::MPI::sum (owned_elements.n_elements(), mpi_communicator);
+        = Utilities::MPI::sum (owned_elements.n_elements(), comm_ptr->Comm());
 
       Assert (has_ghosts || n_elements_global == size(), ExcInternalError());
 #endif
@@ -358,10 +359,11 @@ namespace TrilinosWrappers
           last_action = Insert;
         }
 #if defined(DEBUG) && defined(DEAL_II_WITH_MPI)
-      const MPI_Comm mpi_communicator
-        = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()))->Comm();
+      const Epetra_MpiComm *comm_ptr
+        = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()));
+      Assert (comm_ptr != 0, ExcInternalError());
       const size_type n_elements_global
-        = Utilities::MPI::sum (owned_elements.n_elements(), mpi_communicator);
+        = Utilities::MPI::sum (owned_elements.n_elements(), comm_ptr->Comm());
 
       Assert (has_ghosts || n_elements_global == size(), ExcInternalError());
 #endif
@@ -436,10 +438,11 @@ namespace TrilinosWrappers
           last_action = Insert;
         }
 #if defined(DEBUG) && defined(DEAL_II_WITH_MPI)
-      const MPI_Comm mpi_communicator
-        = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()))->Comm();
+      const Epetra_MpiComm *comm_ptr
+        = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()));
+      Assert (comm_ptr != 0, ExcInternalError());
       const size_type n_elements_global
-        = Utilities::MPI::sum (owned_elements.n_elements(), mpi_communicator);
+        = Utilities::MPI::sum (owned_elements.n_elements(), comm_ptr->Comm());
 
       Assert (has_ghosts || n_elements_global == size(), ExcInternalError());
 #endif

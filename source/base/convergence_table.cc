@@ -60,8 +60,7 @@ void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column
 
   switch (rate_mode)
     {
-    case none:
-      break;
+    // case none: already considered above
     case reduction_rate:
       rate_key += "red.rate";
       no_rate_entries = columns[rate_key].entries.size();

@@ -1225,12 +1225,14 @@ namespace TrilinosWrappers
   {
     AssertIsFinite(s);
 
-    const int ierr = vector->PutScalar(s);
-
+    int ierr = vector->PutScalar(s);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
     if (nonlocal_vector.get() != 0)
-      nonlocal_vector->PutScalar(0.);
+      {
+        ierr = nonlocal_vector->PutScalar(0.);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      }
 
     return *this;
   }
@@ -1282,7 +1284,10 @@ namespace TrilinosWrappers
     Assert (!has_ghost_elements(), ExcGhostsPresent());
 
     if (last_action == Add)
-      vector->GlobalAssemble(Add);
+      {
+        const int ierr = vector->GlobalAssemble(Add);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      }
 
     if (last_action != Insert)
       last_action = Insert;

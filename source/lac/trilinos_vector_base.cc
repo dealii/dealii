@@ -210,10 +210,11 @@ namespace TrilinosWrappers
     // otherwise result in undefined behaviour in the call to
     // GlobalAssemble().
     double double_mode = mode;
+    const Epetra_MpiComm *comm_ptr
+      = dynamic_cast<const Epetra_MpiComm *>(&(vector_partitioner().Comm()));
+    Assert (comm_ptr != 0, ExcInternalError());
     Utilities::MPI::MinMaxAvg result
-      = Utilities::MPI::min_max_avg (double_mode,
-                                     dynamic_cast<const Epetra_MpiComm *>
-                                     (&vector_partitioner().Comm())->GetMpiComm());
+      = Utilities::MPI::min_max_avg (double_mode, comm_ptr->GetMpiComm());
     Assert(result.max-result.min<1e-5,
            ExcMessage ("Not all processors agree whether the last operation on "
                        "this vector was an addition or a set operation. This will "
@@ -230,7 +231,8 @@ namespace TrilinosWrappers
       {
         Epetra_Export exporter(nonlocal_vector->Map(), vector->Map());
         ierr = vector->Export(*nonlocal_vector, exporter, mode);
-        nonlocal_vector->PutScalar(0.);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+        ierr = nonlocal_vector->PutScalar(0.);
       }
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
     last_action = Zero;
@@ -368,6 +370,7 @@ namespace TrilinosWrappers
     // is zero on _all_ processors.
     const Epetra_MpiComm *mpi_comm
       = dynamic_cast<const Epetra_MpiComm *>(&vector->Map().Comm());
+    Assert(mpi_comm != 0, ExcInternalError());
     unsigned int num_nonzero = Utilities::MPI::sum(flag, mpi_comm->Comm());
     return num_nonzero == 0;
 #else

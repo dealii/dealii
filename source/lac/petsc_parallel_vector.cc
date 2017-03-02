@@ -30,6 +30,7 @@ namespace PETScWrappers
   {
 
     Vector::Vector ()
+      : communicator (MPI_COMM_SELF)
     {
       // this is an invalid empty vector, so we can just as well create a
       // sequential one to avoid all the overhead incurred by parallelism
