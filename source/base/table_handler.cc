@@ -16,6 +16,8 @@
 #include <deal.II/base/table_handler.h>
 #include <deal.II/base/table.h>
 
+#include <boost/io/ios_state.hpp>
+
 #include <sstream>
 #include <iostream>
 #include <iomanip>
@@ -322,6 +324,7 @@ void TableHandler::write_text(std::ostream &out,
                               const TextOutputFormat format) const
 {
   AssertThrow (out, ExcIO());
+  boost::io::ios_flags_saver restore_flags(out);
 
   // first pad the table from below if necessary
   if (auto_fill_mode == true)

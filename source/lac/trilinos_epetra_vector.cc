@@ -20,6 +20,9 @@
 #ifdef DEAL_II_WITH_MPI
 
 #include <deal.II/base/index_set.h>
+
+#include <boost/io/ios_state.hpp>
+
 #include "Epetra_Import.h"
 #include "Epetra_Map.h"
 #include "Epetra_MpiComm.h"
@@ -487,6 +490,7 @@ namespace LinearAlgebra
                        const bool across) const
     {
       AssertThrow(out, ExcIO());
+      boost::io::ios_flags_saver restore_flags(out);
 
       // Get a representation of the vector and loop over all
       // the elements
