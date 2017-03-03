@@ -300,7 +300,7 @@ inline
 SymmetricTensor<2, dim, Number>
 Physics::Elasticity::Kinematics::F_vol (const Tensor<2, dim, Number> &F)
 {
-  return NumberType<Number>::value(std::pow(determinant(F),1.0/dim))*static_cast< SymmetricTensor<2,dim,Number> >(unit_symmetric_tensor<dim>());
+  return internal::NumberType<Number>::value(std::pow(determinant(F),1.0/dim))*static_cast< SymmetricTensor<2,dim,Number> >(unit_symmetric_tensor<dim>());
 }
 
 
@@ -330,7 +330,7 @@ inline
 SymmetricTensor<2, dim, Number>
 Physics::Elasticity::Kinematics::E (const Tensor<2, dim, Number> &F)
 {
-  return NumberType<Number>::value(0.5)*(C(F) - static_cast<SymmetricTensor<2,dim,Number> >(StandardTensors<dim>::I));
+  return internal::NumberType<Number>::value(0.5)*(C(F) - static_cast<SymmetricTensor<2,dim,Number> >(StandardTensors<dim>::I));
 }
 
 
@@ -352,7 +352,7 @@ SymmetricTensor<2, dim, Number>
 Physics::Elasticity::Kinematics::e (const Tensor<2, dim, Number> &F)
 {
   const Tensor<2, dim, Number> F_inv = invert(F);
-  return NumberType<Number>::value(0.5)*symmetrize(static_cast<SymmetricTensor<2,dim,Number> >(StandardTensors<dim>::I) - transpose(F_inv)*F_inv);
+  return internal::NumberType<Number>::value(0.5)*symmetrize(static_cast<SymmetricTensor<2,dim,Number> >(StandardTensors<dim>::I) - transpose(F_inv)*F_inv);
 }
 
 
@@ -391,7 +391,7 @@ Physics::Elasticity::Kinematics::w (
   // This could be implemented as w = l-d, but that would mean computing "l"
   // a second time.
   const Tensor<2,dim> grad_v = l(F,dF_dt);
-  return NumberType<Number>::value*(grad_v - transpose(grad_v)) ;
+  return internal::NumberType<Number>::value(0.5)*(grad_v - transpose(grad_v));
 }
 
 #endif // DOXYGEN
