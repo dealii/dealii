@@ -1,4 +1,4 @@
 New: Reworked Physics::Elasticity::Kinematics
-that it is usable with vectorization
+so that it is usable with vectorization
 <br>
 (Mathias Mentler, 2017/03/01)
