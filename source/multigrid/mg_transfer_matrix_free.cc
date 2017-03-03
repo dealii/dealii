@@ -27,7 +27,7 @@
 #include <deal.II/multigrid/mg_transfer_matrix_free.h>
 #include <deal.II/multigrid/mg_transfer_internal.h>
 
-#include <deal.II/matrix_free/fe_evaluation.h>
+#include <deal.II/matrix_free/tensor_product_kernels.h>
 
 #include <algorithm>
 
