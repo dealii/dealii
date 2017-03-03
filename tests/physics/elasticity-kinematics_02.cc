@@ -53,7 +53,7 @@ int main()
   grad_u[2][1] = -1.0;
   grad_u[2][2] = 2.0;
 
-  // Scale the gradients along the vectorization-index so that each grad_u is unique.
+  // Scale the gradients along the vectorization-index so that each grad_u[v] is unique.
   for (unsigned int v = 0; v < VectorizedArray<double>::n_array_elements; v++)
     for (unsigned int i = 0; i < dim; i++)
       for (unsigned int j = 0; j < dim; j++)
