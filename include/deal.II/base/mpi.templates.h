@@ -37,49 +37,49 @@ namespace Utilities
       /**
        * Return the corresponding MPI data type id for the argument given.
        */
-      MPI_Datatype mpi_type_id (const int *)
+      inline MPI_Datatype mpi_type_id (const int *)
       {
         return MPI_INT;
       }
 
 
-      MPI_Datatype mpi_type_id (const long int *)
+      inline MPI_Datatype mpi_type_id (const long int *)
       {
         return MPI_LONG;
       }
 
 
-      MPI_Datatype mpi_type_id (const unsigned int *)
+      inline MPI_Datatype mpi_type_id (const unsigned int *)
       {
         return MPI_UNSIGNED;
       }
 
 
-      MPI_Datatype mpi_type_id (const unsigned long int *)
+      inline MPI_Datatype mpi_type_id (const unsigned long int *)
       {
         return MPI_UNSIGNED_LONG;
       }
 
 
-      MPI_Datatype mpi_type_id (const unsigned long long int *)
+      inline MPI_Datatype mpi_type_id (const unsigned long long int *)
       {
         return MPI_UNSIGNED_LONG_LONG;
       }
 
 
-      MPI_Datatype mpi_type_id (const float *)
+      inline MPI_Datatype mpi_type_id (const float *)
       {
         return MPI_FLOAT;
       }
 
 
-      MPI_Datatype mpi_type_id (const double *)
+      inline MPI_Datatype mpi_type_id (const double *)
       {
         return MPI_DOUBLE;
       }
 
 
-      MPI_Datatype mpi_type_id (const long double *)
+      inline MPI_Datatype mpi_type_id (const long double *)
       {
         return MPI_LONG_DOUBLE;
       }
