@@ -53,24 +53,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
-namespace
-{
-  template <typename CellIterator>
-  inline
-  void advance_by_n (CellIterator &cell,
-                     const unsigned int n)
-  {
-    // store a pointer to the end iterator, since we can't get at it any more
-    // once cell is already the end iterator (in that case dereferencing
-    // cell-> triggers an assertion)
-    const CellIterator endc = cell->get_dof_handler().end();
-    for (unsigned int t=0; ((t<n) && (cell!=endc)); ++t, ++cell)
-      ;
-  }
-}
-
-
 namespace internal
 {
   namespace
