@@ -767,7 +767,7 @@ namespace MatrixFreeOperators
   template <int dim, typename VectorType>
   void
   Base<dim,VectorType>::
-  initialize (std_cxx11::shared_ptr<const MatrixFree<dim,Base<dim,VectorType>::value_type> > data_)
+  initialize (std_cxx11::shared_ptr<const MatrixFree<dim,typename Base<dim,VectorType>::value_type> > data_)
   {
     data = data_;
     edge_constrained_indices.clear();
@@ -779,7 +779,7 @@ namespace MatrixFreeOperators
   template <int dim, typename VectorType>
   void
   Base<dim,VectorType>::
-  initialize (std_cxx11::shared_ptr<const MatrixFree<dim,Base<dim,VectorType>::value_type> > data_,
+  initialize (std_cxx11::shared_ptr<const MatrixFree<dim,typename Base<dim,VectorType>::value_type> > data_,
               const MGConstrainedDoFs      &mg_constrained_dofs,
               const unsigned int            level)
   {
@@ -1252,7 +1252,7 @@ namespace MatrixFreeOperators
 
 
   template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename VectorType>
-  std_cxx11::shared_ptr< Table<2, VectorizedArray<typename Base<dim,VectorType>::value_type> > >
+  std_cxx11::shared_ptr< Table<2, VectorizedArray< typename LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::value_type> > >
   LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
   get_coefficient()
   {
