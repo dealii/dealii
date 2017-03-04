@@ -200,7 +200,7 @@ namespace Threads
      * Wait for all threads to reach this point. Since there may only be one
      * thread, return immediately, i.e. this function is a no-op.
      */
-    int wait () const
+    inline int wait () const
     {
       return 0;
     }
@@ -208,7 +208,7 @@ namespace Threads
     /**
      * Dump the state of this object. Here: do nothing.
      */
-    void dump () const {}
+    inline void dump () const {}
 
     /**
      * @addtogroup Exceptions
