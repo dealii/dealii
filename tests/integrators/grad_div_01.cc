@@ -27,7 +27,6 @@
 #include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
 
-#include "tbb/task_scheduler_init.h"
 #include <deal.II/integrators/grad_div.h>
 
 using namespace LocalIntegrators::GradDiv;
