@@ -440,7 +440,7 @@ namespace internal
       void
       compute_shape_function_values_hardcode (const unsigned int            n_shape_functions,
                                               const std::vector<Point<1> > &unit_points,
-                                              typename dealii::MappingQGeneric<1,1>::InternalData &data)
+                                              dealii::MappingQGeneric<1,1>::InternalData &data)
       {
         (void)n_shape_functions;
         const unsigned int n_points=unit_points.size();
@@ -494,7 +494,7 @@ namespace internal
       void
       compute_shape_function_values_hardcode (const unsigned int            n_shape_functions,
                                               const std::vector<Point<2> > &unit_points,
-                                              typename dealii::MappingQGeneric<2,2>::InternalData &data)
+                                              dealii::MappingQGeneric<2,2>::InternalData &data)
       {
 
         (void)n_shape_functions;
@@ -572,7 +572,7 @@ namespace internal
       void
       compute_shape_function_values_hardcode (const unsigned int            n_shape_functions,
                                               const std::vector<Point<3> > &unit_points,
-                                              typename dealii::MappingQGeneric<3,3>::InternalData &data)
+                                              dealii::MappingQGeneric<3,3>::InternalData &data)
       {
         (void)n_shape_functions;
         const unsigned int n_points=unit_points.size();
