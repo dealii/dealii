@@ -334,11 +334,11 @@ namespace FETools
       // add new cell_data to
       // the ordered list new_needs
       // uses cell_data_insert
-      void add_new_need (const typename dealii::internal::p4est::types<dim>::forest    &forest,
-                         const typename dealii::internal::p4est::types<dim>::locidx    &tree_index,
-                         const typename DoFHandler<dim,spacedim>::cell_iterator        &dealii_cell,
-                         const typename dealii::internal::p4est::types<dim>::quadrant  &p4est_cell,
-                         std::vector<CellData>                                         &new_needs) const;
+      static void add_new_need (const typename dealii::internal::p4est::types<dim>::forest    &forest,
+                                const typename dealii::internal::p4est::types<dim>::locidx    &tree_index,
+                                const typename DoFHandler<dim,spacedim>::cell_iterator        &dealii_cell,
+                                const typename dealii::internal::p4est::types<dim>::quadrant  &p4est_cell,
+                                std::vector<CellData>                                         &new_needs);
 
       // binary search in cells_list
       // assume that cells_list
@@ -1128,7 +1128,7 @@ namespace FETools
                   const typename dealii::internal::p4est::types<dim>::locidx    &tree_index,
                   const typename DoFHandler<dim,spacedim>::cell_iterator        &dealii_cell,
                   const typename dealii::internal::p4est::types<dim>::quadrant  &p4est_cell,
-                  std::vector<CellData>                                         &new_needs) const
+                  std::vector<CellData>                                         &new_needs)
     {
       const FiniteElement<dim,spacedim> &fe            = dealii_cell->get_dof_handler().get_fe();
       const unsigned int                 dofs_per_cell = fe.dofs_per_cell;
