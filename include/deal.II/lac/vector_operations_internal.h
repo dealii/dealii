@@ -22,6 +22,7 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/vectorization.h>
 
+#include <cstring>
 #include <cstdio>
 
 DEAL_II_NAMESPACE_OPEN
