@@ -28,8 +28,6 @@
 #include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
 
-#include "tbb/task_scheduler_init.h"
-
 using namespace LocalIntegrators::Elasticity;
 
 template <int dim>
