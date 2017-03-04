@@ -69,8 +69,6 @@ namespace FETools
 
       ExtrapolateImplementation ();
 
-      ~ExtrapolateImplementation ();
-
       template <class InVector>
       void extrapolate_parallel (const InVector &u2_relevant,
                                  const DoFHandler<dim,spacedim> &dof2,
@@ -379,9 +377,6 @@ namespace FETools
         AssertThrow(false, ExcNotImplemented())
       }
 
-      ~ExtrapolateImplementation ()
-      {}
-
       template <class InVector>
       void extrapolate_parallel (const InVector &/*u2_relevant*/,
                                  const DoFHandler<1,1> &/*dof2*/,
@@ -398,9 +393,6 @@ namespace FETools
       {
         AssertThrow(false, ExcNotImplemented())
       }
-
-      ~ExtrapolateImplementation ()
-      {}
 
       template <class InVector>
       void extrapolate_parallel (const InVector &/*u2_relevant*/,
@@ -419,9 +411,6 @@ namespace FETools
         AssertThrow(false, ExcNotImplemented())
       }
 
-      ~ExtrapolateImplementation ()
-      {}
-
       template <class InVector>
       void extrapolate_parallel (const InVector &/*u2_relevant*/,
                                  const DoFHandler<1,3> &/*dof2*/,
@@ -435,13 +424,6 @@ namespace FETools
     ExtrapolateImplementation<dim,spacedim,OutVector>::
     ExtrapolateImplementation ()
       : round(0)
-    {}
-
-
-
-    template <int dim,int spacedim,class OutVector>
-    ExtrapolateImplementation<dim,spacedim,OutVector>::
-    ~ExtrapolateImplementation ()
     {}
 
 
