@@ -177,11 +177,11 @@ build_one_patch (const cell_iterator                                            
           Assert (false, ExcNotImplemented());
         };
 
-      unsigned int offset=0;
-
       // then fill in data
       if (data.n_datasets > 0)
         {
+          unsigned int offset=0;
+
           data.reinit_all_fe_values(this->dof_data, *cell);
           // first fill dof_data
           for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
