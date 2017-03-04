@@ -162,8 +162,8 @@ namespace internal
                       std_cxx11::shared_ptr<parallel::internal::TBBPartitioner> &partitioner,
                       size_type start = 0)
     {
-      size_type vec_size = end-start;
 #ifdef DEAL_II_WITH_THREADS
+      size_type vec_size = end-start;
       // only go to the parallel function in case there are at least 4 parallel
       // items, otherwise the overhead is too large
       if (vec_size >= 4*internal::Vector::minimum_parallel_grain_size &&
