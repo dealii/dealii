@@ -1495,7 +1495,12 @@ template <typename MatrixType>
 inline
 BlockMatrixBase<MatrixType>::~BlockMatrixBase ()
 {
-  clear ();
+  try
+    {
+      clear ();
+    }
+  catch (...)
+    {}
 }
 
 

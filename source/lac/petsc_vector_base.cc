@@ -206,7 +206,8 @@ namespace PETScWrappers
 #else
         const PetscErrorCode ierr = VecDestroy (&vector);
 #endif
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
+        AssertNothrow (ierr == 0, ExcPETScError(ierr));
+        (void) ierr;
       }
   }
 

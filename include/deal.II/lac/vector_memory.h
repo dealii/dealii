@@ -368,7 +368,12 @@ template <typename VectorType>
 inline
 VectorMemory<VectorType>::Pointer::~Pointer()
 {
-  pool->free(v);
+  try
+    {
+      pool->free(v);
+    }
+  catch (...)
+    {}
 }
 
 

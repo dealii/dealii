@@ -353,8 +353,13 @@ TimerOutput::TimerOutput (MPI_Comm      mpi_communicator,
 
 TimerOutput::~TimerOutput()
 {
-  while (active_sections.size() > 0)
-    leave_subsection();
+  try
+    {
+      while (active_sections.size() > 0)
+        leave_subsection();
+    }
+  catch (...)
+    {}
 
   if ( (output_frequency == summary || output_frequency == every_call_and_summary)
        && output_is_enabled == true)

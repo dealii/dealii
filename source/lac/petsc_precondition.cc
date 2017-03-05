@@ -37,7 +37,12 @@ namespace PETScWrappers
 
   PreconditionerBase::~PreconditionerBase ()
   {
-    clear();
+    try
+      {
+        clear();
+      }
+    catch (...)
+      {}
   }
 
   void
