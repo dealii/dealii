@@ -430,7 +430,7 @@ int main(int argc, char *argv[])
   const int dim = 2;
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  MPILogInitAll all;
+  initlog();
 
   deallog.depth_console(0);
   deallog << std::setprecision(10);
