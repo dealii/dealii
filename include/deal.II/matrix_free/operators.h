@@ -51,7 +51,7 @@ namespace MatrixFreeOperators
     template <typename VectorType>
     typename std_cxx11::enable_if<!IsBlockVector<VectorType>::value,
              unsigned int>::type
-             n_blocks(const VectorType &vector)
+             n_blocks(const VectorType &)
     {
       return 1;
     }
@@ -76,7 +76,7 @@ namespace MatrixFreeOperators
     template <typename VectorType>
     typename std_cxx11::enable_if<!IsBlockVector<VectorType>::value,
              VectorType &>::type
-             subblock(VectorType &vector, unsigned int block_no)
+             subblock(VectorType &vector, unsigned int)
     {
       return vector;
     }
@@ -84,7 +84,7 @@ namespace MatrixFreeOperators
     template <typename VectorType>
     typename std_cxx11::enable_if<!IsBlockVector<VectorType>::value,
              const VectorType &>::type
-             subblock(const VectorType &vector, unsigned int block_no)
+             subblock(const VectorType &vector, unsigned int)
     {
       return vector;
     }
@@ -100,7 +100,7 @@ namespace MatrixFreeOperators
     template <typename VectorType>
     typename std_cxx11::enable_if<!IsBlockVector<VectorType>::value,
              void>::type
-             collect_sizes(const VectorType &vector)
+             collect_sizes(const VectorType &)
     {}
   }
 
