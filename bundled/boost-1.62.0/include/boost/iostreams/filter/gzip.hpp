@@ -285,7 +285,7 @@ private:
         boost::iostreams::put(next, static_cast<char>(0xFF & (n >> 24)));
     }
     template<typename Sink>
-    static void write_long(long n, Sink& next, boost::mpl::false_)
+    static void write_long(long /*n*/, Sink& /*next*/, boost::mpl::false_)
     {
     }
     template<typename Sink>

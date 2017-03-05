@@ -2423,7 +2423,7 @@ template <template <int, int> class DoFHandlerType, int spacedim, bool level_dof
 inline
 bool
 DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::
-fe_index_is_active (const unsigned int fe_index) const
+fe_index_is_active (const unsigned int /*fe_index*/) const
 {
   Assert(false, ExcNotImplemented());
   return false;
