@@ -119,7 +119,7 @@ test()
   dof_u.distribute_dofs(fe_u);
   dof_p.distribute_dofs(fe_p);
 
-  std::shared_ptr<MatrixFree<dim, double> > mf_data;
+  std_cxx11::shared_ptr<MatrixFree<dim, double> > mf_data;
 
   dof.distribute_dofs(fe);
   ConstraintMatrix constraints, constraints_u, constraints_p;
@@ -179,7 +179,7 @@ test()
     const FEValuesExtractors::Vector velocities(0);
     const FEValuesExtractors::Scalar pressure(dim);
 
-    std::vector<SymmetricTensor<2, dim>> phi_grads_u(dofs_per_cell);
+    std::vector<SymmetricTensor<2, dim> > phi_grads_u(dofs_per_cell);
     std::vector<double> div_phi_u(dofs_per_cell);
     std::vector<double> phi_p(dofs_per_cell);
 
@@ -242,7 +242,7 @@ test()
         mf_system_rhs.block(1)(j) = val;
       }
 
-  mf_data = std::shared_ptr<MatrixFree<dim, double> >(new MatrixFree<dim, double>());
+  mf_data = std_cxx11::shared_ptr<MatrixFree<dim, double> >(new MatrixFree<dim, double>());
   // setup matrix-free structure
   {
     std::vector<const DoFHandler<dim>*> dofs;
