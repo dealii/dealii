@@ -2253,6 +2253,7 @@ FEEvaluationBase<dim,n_components_,Number>
          fe.element_multiplicity(base_element_number)-first_selected_component >= n_components_,
          ExcMessage("The underlying element must at least contain as many "
                     "components as requested by this class"));
+  (void) base_element_number;
 }
 
 
