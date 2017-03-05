@@ -461,26 +461,6 @@ namespace WorkStream
          * happens, whereas a small number is better for load balancing.
          */
         const unsigned int           chunk_size;
-
-        /**
-         * Initialize the pointers and vector elements in the specified entry
-         * of the item_buffer.
-         */
-        void init_buffer_elements (const unsigned int element,
-                                   const CopyData    &sample_copy_data)
-        {
-          Assert (item_buffer[element].n_items == 0,
-                  ExcInternalError());
-
-          item_buffer[element].work_items
-          .resize (chunk_size, remaining_iterator_range.second);
-          item_buffer[element].scratch_data
-            = &thread_local_scratch;
-          item_buffer[element].sample_scratch_data
-            = &sample_scratch_data;
-          item_buffer[element].copy_datas
-          .resize (chunk_size, sample_copy_data);
-        }
       };
 
 

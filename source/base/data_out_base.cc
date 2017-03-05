@@ -121,7 +121,6 @@ namespace
       const char *const plaintextend = plaintext_in + length_in;
       char *codechar = code_out;
       char result;
-      char fragment;
 
       result = state_in->result;
 
@@ -130,40 +129,46 @@ namespace
           while (1)
             {
             case step_A:
+            {
               if (plainchar == plaintextend)
                 {
                   state_in->result = result;
                   state_in->step = step_A;
                   return codechar - code_out;
                 }
-              fragment = *plainchar++;
+              const char fragment = *plainchar++;
               result = (fragment & 0x0fc) >> 2;
               *codechar++ = base64_encode_value(result);
               result = (fragment & 0x003) << 4;
+            }
             case step_B:
+            {
               if (plainchar == plaintextend)
                 {
                   state_in->result = result;
                   state_in->step = step_B;
                   return codechar - code_out;
                 }
-              fragment = *plainchar++;
+              const char fragment = *plainchar++;
               result |= (fragment & 0x0f0) >> 4;
               *codechar++ = base64_encode_value(result);
               result = (fragment & 0x00f) << 2;
+            }
             case step_C:
+            {
               if (plainchar == plaintextend)
                 {
                   state_in->result = result;
                   state_in->step = step_C;
                   return codechar - code_out;
                 }
-              fragment = *plainchar++;
+              const char fragment = *plainchar++;
               result |= (fragment & 0x0c0) >> 6;
               *codechar++ = base64_encode_value(result);
               result  = (fragment & 0x03f) >> 0;
               *codechar++ = base64_encode_value(result);
             }
+          }
         }
       /* control should not reach here */
       return codechar - code_out;

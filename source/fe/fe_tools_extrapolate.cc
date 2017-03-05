@@ -69,8 +69,6 @@ namespace FETools
 
       ExtrapolateImplementation ();
 
-      ~ExtrapolateImplementation ();
-
       template <class InVector>
       void extrapolate_parallel (const InVector &u2_relevant,
                                  const DoFHandler<dim,spacedim> &dof2,
@@ -336,11 +334,11 @@ namespace FETools
       // add new cell_data to
       // the ordered list new_needs
       // uses cell_data_insert
-      void add_new_need (const typename dealii::internal::p4est::types<dim>::forest    &forest,
-                         const typename dealii::internal::p4est::types<dim>::locidx    &tree_index,
-                         const typename DoFHandler<dim,spacedim>::cell_iterator        &dealii_cell,
-                         const typename dealii::internal::p4est::types<dim>::quadrant  &p4est_cell,
-                         std::vector<CellData>                                         &new_needs) const;
+      static void add_new_need (const typename dealii::internal::p4est::types<dim>::forest    &forest,
+                                const typename dealii::internal::p4est::types<dim>::locidx    &tree_index,
+                                const typename DoFHandler<dim,spacedim>::cell_iterator        &dealii_cell,
+                                const typename dealii::internal::p4est::types<dim>::quadrant  &p4est_cell,
+                                std::vector<CellData>                                         &new_needs);
 
       // binary search in cells_list
       // assume that cells_list
@@ -379,9 +377,6 @@ namespace FETools
         AssertThrow(false, ExcNotImplemented())
       }
 
-      ~ExtrapolateImplementation ()
-      {}
-
       template <class InVector>
       void extrapolate_parallel (const InVector &/*u2_relevant*/,
                                  const DoFHandler<1,1> &/*dof2*/,
@@ -398,9 +393,6 @@ namespace FETools
       {
         AssertThrow(false, ExcNotImplemented())
       }
-
-      ~ExtrapolateImplementation ()
-      {}
 
       template <class InVector>
       void extrapolate_parallel (const InVector &/*u2_relevant*/,
@@ -419,9 +411,6 @@ namespace FETools
         AssertThrow(false, ExcNotImplemented())
       }
 
-      ~ExtrapolateImplementation ()
-      {}
-
       template <class InVector>
       void extrapolate_parallel (const InVector &/*u2_relevant*/,
                                  const DoFHandler<1,3> &/*dof2*/,
@@ -435,13 +424,6 @@ namespace FETools
     ExtrapolateImplementation<dim,spacedim,OutVector>::
     ExtrapolateImplementation ()
       : round(0)
-    {}
-
-
-
-    template <int dim,int spacedim,class OutVector>
-    ExtrapolateImplementation<dim,spacedim,OutVector>::
-    ~ExtrapolateImplementation ()
     {}
 
 
@@ -1146,7 +1128,7 @@ namespace FETools
                   const typename dealii::internal::p4est::types<dim>::locidx    &tree_index,
                   const typename DoFHandler<dim,spacedim>::cell_iterator        &dealii_cell,
                   const typename dealii::internal::p4est::types<dim>::quadrant  &p4est_cell,
-                  std::vector<CellData>                                         &new_needs) const
+                  std::vector<CellData>                                         &new_needs)
     {
       const FiniteElement<dim,spacedim> &fe            = dealii_cell->get_dof_handler().get_fe();
       const unsigned int                 dofs_per_cell = fe.dofs_per_cell;
