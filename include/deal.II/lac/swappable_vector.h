@@ -50,6 +50,8 @@ DEAL_II_NAMESPACE_OPEN
  * @ref Instantiations
  * in the manual).
  *
+ * @deprecated The usage of this class is deprecated.
+ *
  * @author Wolfgang Bangerth, 1999, 2000
  */
 template <typename number>
@@ -207,7 +209,7 @@ private:
    * to signal success itself if this is required.
    */
   void reload_vector (const bool set_flag);
-};
+} DEAL_II_DEPRECATED;
 
 /*@}*/
 /*----------------------------   swappable_vector.h     ---------------------------*/
