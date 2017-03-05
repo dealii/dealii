@@ -100,8 +100,6 @@ namespace Step50
     void refine_grid ();
     void output_results (const unsigned int cycle) const;
 
-    ConditionalOStream                        pcout;
-
     parallel::distributed::Triangulation<dim>   triangulation;
     FE_Q<dim>            fe;
     DoFHandler<dim>    mg_dof_handler;
@@ -181,9 +179,6 @@ namespace Step50
   template <int dim>
   LaplaceProblem<dim>::LaplaceProblem (const unsigned int degree)
     :
-    pcout (std::cout,
-           (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)
-            == 0)),
     triangulation (MPI_COMM_WORLD,Triangulation<dim>::
                    limit_level_difference_at_vertices,
                    parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
@@ -481,7 +476,7 @@ namespace Step50
         preconditioner.vmult(check2, tmp);
         check3.sadd(0.75, 0.25, check2);
         double residual = system_matrix.residual(tmp, check3, system_rhs);
-        pcout << "check residual:" << residual << std::endl;
+        deallog << "check residual: " << residual << std::endl;
       }
   }
 
@@ -496,7 +491,7 @@ namespace Step50
     SolverCG<vector_t> coarse_solver(coarse_solver_control);
 
     {
-      pcout << "CG(ID):" << std::endl;
+      deallog << "CG(ID):" << std::endl;
 
       PreconditionIdentity id;
 
@@ -508,11 +503,11 @@ namespace Step50
                                       id);
 
       vcycle(coarse_grid_solver);
-      pcout << "coarse iterations: " << coarse_solver_control.last_step() << std::endl;
+      deallog << "coarse iterations: " << coarse_solver_control.last_step() << std::endl;
     }
 
     {
-      pcout << "CG(ILU):" << std::endl;
+      deallog << "CG(ILU):" << std::endl;
 
       LA::MPI::PreconditionILU prec;
       prec.initialize(coarse_matrix);
@@ -525,11 +520,11 @@ namespace Step50
                                       prec);
 
       vcycle(coarse_grid_solver);
-      pcout << "coarse iterations: " << coarse_solver_control.last_step() << std::endl;
+      deallog << "coarse iterations: " << coarse_solver_control.last_step() << std::endl;
     }
 
     {
-      pcout << "CG(AMG):" << std::endl;
+      deallog << "CG(AMG):" << std::endl;
 
       LA::MPI::PreconditionAMG prec;
       prec.initialize(coarse_matrix);
@@ -542,11 +537,11 @@ namespace Step50
                                       prec);
 
       vcycle(coarse_grid_solver);
-      pcout << "coarse iterations: " << coarse_solver_control.last_step() << std::endl;
+      deallog << "coarse iterations: " << coarse_solver_control.last_step() << std::endl;
     }
 
     {
-      pcout << "AMG:" << std::endl;
+      deallog << "AMG:" << std::endl;
       LA::MPI::PreconditionAMG::AdditionalData Amg_data;
       Amg_data.elliptic = true;
       Amg_data.higher_order_elements = true;
@@ -555,7 +550,7 @@ namespace Step50
       MGCoarseAMG<LA::MPI::Vector> coarse_grid_solver(coarse_matrix, Amg_data);
 
       vcycle(coarse_grid_solver);
-      pcout << "applications: " << coarse_grid_solver.count << std::endl;
+      deallog << "applications: " << coarse_grid_solver.count << std::endl;
     }
 
   }
@@ -596,7 +591,7 @@ namespace Step50
   {
     for (unsigned int cycle=0; cycle<3; ++cycle)
       {
-        pcout << "Cycle " << cycle << ':' << std::endl;
+        deallog << "Cycle " << cycle << ':' << std::endl;
 
         {
           unsigned int n_subdiv = 6+5*cycle;
@@ -605,20 +600,20 @@ namespace Step50
           triangulation.refine_global(1);
         }
 
-        pcout << "   Number of active cells:       "
-              << triangulation.n_global_active_cells()
-              << std::endl;
+        deallog << "   Number of active cells:       "
+                << triangulation.n_global_active_cells()
+                << std::endl;
 
         setup_system ();
 
-        pcout << "   Number of degrees of freedom: "
-              << mg_dof_handler.n_dofs()
-              << " (by level: ";
+        deallog << "   Number of degrees of freedom: "
+                << mg_dof_handler.n_dofs()
+                << " (by level: ";
         for (unsigned int level=0; level<triangulation.n_global_levels(); ++level)
-          pcout << mg_dof_handler.n_dofs(level)
-                << (level == triangulation.n_global_levels()-1
-                    ? ")" : ", ");
-        pcout << std::endl;
+          deallog << mg_dof_handler.n_dofs(level)
+                  << (level == triangulation.n_global_levels()-1
+                      ? ")" : ", ");
+        deallog << std::endl;
 
         assemble_system ();
         assemble_multigrid ();
@@ -632,6 +627,7 @@ namespace Step50
 int main (int argc, char *argv[])
 {
   dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  mpi_initlog(true);
 
   try
     {
