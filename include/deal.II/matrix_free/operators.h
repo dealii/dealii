@@ -779,7 +779,6 @@ namespace MatrixFreeOperators
   Base<dim,VectorType>::Base ()
     :
     Subscriptor(),
-    data(NULL),
     have_interface_matrices(false)
   {
   }
