@@ -96,8 +96,6 @@ namespace Step50
     void refine_grid ();
     void output_results (const unsigned int cycle) const;
 
-    ConditionalOStream                        pcout;
-
     parallel::distributed::Triangulation<dim>   triangulation;
     FE_Q<dim>            fe;
     DoFHandler<dim>    mg_dof_handler;
@@ -179,9 +177,6 @@ namespace Step50
   template <int dim>
   LaplaceProblem<dim>::LaplaceProblem (const unsigned int degree)
     :
-    pcout (std::cout,
-           (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)
-            == 0)),
     triangulation (MPI_COMM_WORLD,Triangulation<dim>::
                    limit_level_difference_at_vertices,
                    parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
@@ -407,9 +402,9 @@ namespace Step50
     for (unsigned int i=0; i<triangulation.n_global_levels(); ++i)
       {
         mg_matrices[i].compress(VectorOperation::add);
-        pcout << "mg_mat" << i << " " << mg_matrices[i].frobenius_norm() << std::endl;
+        deallog << "mg_mat" << i << " " << mg_matrices[i].frobenius_norm() << std::endl;
         mg_interface_matrices[i].compress(VectorOperation::add);
-        pcout << "mg_interface_mat" << i << " " << mg_interface_matrices[i].frobenius_norm() << std::endl;
+        deallog << "mg_interface_mat" << i << " " << mg_interface_matrices[i].frobenius_norm() << std::endl;
 
       }
   }
@@ -473,17 +468,16 @@ namespace Step50
             check3 += check2;
           }
 
-        pcout << "check3 iteration: " << check3.linfty_norm() << std::endl;
+        deallog << "check3 iteration: " << check3.linfty_norm() << std::endl;
       }
 
 
     solver.solve (system_matrix, solution, system_rhs,
                   preconditioner);
-    pcout << "   CG converged in " << solver_control.last_step() << " iterations." << std::endl;
 
     constraints.distribute (solution);
 
-    pcout << " sol: " << solution.min() << " - " << solution.max() << std::endl;
+    deallog << " sol: " << solution.min() << " - " << solution.max() << std::endl;
   }
 
   template <int dim>
@@ -522,7 +516,7 @@ namespace Step50
   {
     for (unsigned int cycle=0; cycle<2; ++cycle)
       {
-        pcout << "Cycle " << cycle << ':' << std::endl;
+        deallog << "Cycle " << cycle << ':' << std::endl;
 
         if (cycle == 0)
           {
@@ -554,20 +548,20 @@ namespace Step50
         else
           triangulation.refine_global ();
 
-        pcout << "   Number of active cells:       "
-              << triangulation.n_global_active_cells()
-              << std::endl;
+        deallog << "   Number of active cells:       "
+                << triangulation.n_global_active_cells()
+                << std::endl;
 
         setup_system ();
 
-        pcout << "   Number of degrees of freedom: "
-              << mg_dof_handler.n_dofs()
-              << " (by level: ";
+        deallog << "   Number of degrees of freedom: "
+                << mg_dof_handler.n_dofs()
+                << " (by level: ";
         for (unsigned int level=0; level<triangulation.n_global_levels(); ++level)
-          pcout << mg_dof_handler.n_dofs(level)
-                << (level == triangulation.n_global_levels()-1
-                    ? ")" : ", ");
-        pcout << std::endl;
+          deallog << mg_dof_handler.n_dofs(level)
+                  << (level == triangulation.n_global_levels()-1
+                      ? ")" : ", ");
+        deallog << std::endl;
 
         assemble_system ();
         assemble_multigrid ();
@@ -581,6 +575,7 @@ namespace Step50
 int main (int argc, char *argv[])
 {
   dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  mpi_initlog(true);
 
   try
     {
