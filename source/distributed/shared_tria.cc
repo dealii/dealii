@@ -138,7 +138,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          AssertThrow (false, ExcInternalError());
+          Assert (false, ExcInternalError());
         }
       partition();
       this->update_number_cache ();

@@ -1689,7 +1689,7 @@ namespace internal
               default:
                 // in 1d, a node must have one or two adjacent lines
                 if (spacedim==1)
-                  AssertThrow (false, ExcInternalError())
+                  Assert (false, ExcInternalError())
                   else
                     AssertThrow (false,
                                  ExcMessage ("You have a vertex in your triangulation "

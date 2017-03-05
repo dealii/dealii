@@ -74,7 +74,7 @@ namespace FE_Q_Bubbles_Helper
           q_fine.reset(new QGauss<dim> (degree+1));
           break;
         default:
-          AssertThrow(false, ExcInternalError());
+          Assert(false, ExcInternalError());
         }
 
       Assert(q_fine.get() != NULL, ExcInternalError());

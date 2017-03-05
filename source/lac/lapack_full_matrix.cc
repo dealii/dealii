@@ -468,7 +468,7 @@ LAPACKFullMatrix<number>::compute_lu_factorization()
   int info = 0;
   getrf(&mm, &nn, values, &mm, &ipiv[0], &info);
 
-  AssertThrow(info >= 0, ExcInternalError());
+  Assert(info >= 0, ExcInternalError());
   AssertThrow(info == 0, LACExceptions::ExcSingular());
 
   state = lu;
@@ -559,14 +559,14 @@ LAPACKFullMatrix<number>::invert()
     {
       getrf(&mm, &nn, values, &mm, &ipiv[0], &info);
 
-      AssertThrow(info >= 0, ExcInternalError());
+      Assert(info >= 0, ExcInternalError());
       AssertThrow(info == 0, LACExceptions::ExcSingular());
     }
 
   inv_work.resize (mm);
   getri(&mm, values, &mm, &ipiv[0], &inv_work[0], &mm, &info);
 
-  AssertThrow(info >= 0, ExcInternalError());
+  Assert(info >= 0, ExcInternalError());
   AssertThrow(info == 0, LACExceptions::ExcSingular());
 
   state = inverse_matrix;
@@ -591,7 +591,7 @@ LAPACKFullMatrix<number>::apply_lu_factorization(Vector<number> &v,
   getrs(trans, &nn, &one, values, &nn, &ipiv[0],
         v.begin(), &nn, &info);
 
-  AssertThrow(info == 0, ExcInternalError());
+  Assert(info == 0, ExcInternalError());
 }
 
 
@@ -613,7 +613,7 @@ LAPACKFullMatrix<number>::apply_lu_factorization(LAPACKFullMatrix<number> &B,
 
   getrs(trans, &nn, &kk, values, &nn, &ipiv[0], &B.values[0], &nn, &info);
 
-  AssertThrow(info == 0, ExcInternalError());
+  Assert(info == 0, ExcInternalError());
 }
 
 

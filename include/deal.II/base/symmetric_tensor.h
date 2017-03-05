@@ -1909,7 +1909,7 @@ namespace internal
                   return dim+c;
 
             // should never get here:
-            AssertThrow(false, ExcInternalError());
+            Assert(false, ExcInternalError());
             return 0;
           }
           }
@@ -2011,7 +2011,7 @@ namespace internal
                   return TableIndices<2>(d,e);
 
             // should never get here:
-            AssertThrow(false, ExcInternalError());
+            Assert(false, ExcInternalError());
             return TableIndices<2>(0, 0);
           }
       }
