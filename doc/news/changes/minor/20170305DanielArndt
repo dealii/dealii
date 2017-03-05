@@ -1,0 +1,4 @@
+Improved: MatrixFreeOperators::Base also supports block vectors.
+Derived operators may act on multiple blocks.
+<br>
+(Daniel Arndt, 2017/03/05)
