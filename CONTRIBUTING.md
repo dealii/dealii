@@ -9,7 +9,7 @@ participating available
 ## Getting started with git and GitHub
 If you are new to using git or the GitHub platform you may find it helpful
 to review
-[lecture 32.8](http://www.math.tamu.edu/~bangerth/videos.676.32.8.html),
+[lecture 32.8](http://www.math.colostate.edu/~bangerth/videos.676.32.8.html),
 which should be enough to help you get started with using GitHub or
 possibly contributing to the library itself.
 
@@ -35,7 +35,7 @@ your code. While this seems very formal, keeping all of the code review in
 one place makes it easier to coordinate changes to the library (and there
 are usually several people making changes to the library at once). This
 process is described at length in
-[lecture 32.8](http://www.math.tamu.edu/~bangerth/videos.676.32.8.html).
+[lecture 32.8](http://www.math.colostate.edu/~bangerth/videos.676.32.8.html).
 Please do not hesitate to ask questions about the workflow on the mailing
 list if you are not sure what to do.
 
