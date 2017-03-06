@@ -1621,6 +1621,30 @@ protected:
  * dof numbering applied by fe_eval because FEEvaluation internally uses a
  * lexicographic numbering of degrees of freedom as explained above.
  *
+ * <h4>Internal data organization</h4>
+ *
+ * The temporary data for holding the solution values on the local degrees of
+ * freedom as well as the interpolated values, gradients, and Hessians on
+ * quadrature points is a scratch array provided by
+ * MatrixFree::acquire_scratch_data() that is re-used between different calls
+ * to FEEvaluation. Therefore, constructing an FEEvaluation object is
+ * typically cheap and does not involve any expensive operation. Only a few
+ * dozen pointers to the actual data fields are set during
+ * construction. Therefore, no negative performance impact arises when
+ * creating an FEEvaluation several times per loop, such as at the top of a @p
+ * local_cell_operation operation that is split in small chunks for a parallel
+ * for loop, obviating a separate scratch data field for parallel loops as
+ * necessary in the loop of @p WorkStream.
+ *
+ * When using the FEEvaluation class in multithreaded mode, the thread local
+ * storage of the scratch data in MatrixFree automatically makes sure that
+ * each thread gets it private data array. Note, however, that deal.II must be
+ * compiled with thread support also when all the thread parallelization is
+ * provided externally and not done via deal.II's routines, such as
+ * OpenMP. This is because deal.II needs to know the notation of thread local
+ * storage. The FEEvaluation kernels have been verified to work within OpenMP
+ * loops.
+ *
  * <h3>Description of evaluation routines</h3>
  *
  * This class contains specialized evaluation routines for elements based on
@@ -1794,7 +1818,7 @@ protected:
  * Stokes operator described above is found at
  * https://github.com/dealii/dealii/blob/master/tests/matrix_free/matrix_vector_stokes_noflux.cc
  *
- * <h3>Handling several integration tasks and data storage</h3>
+ * <h3>Handling several integration tasks and data storage in quadrature points</h3>
  *
  * The design of FEEvaluation and MatrixFree separates the geometry from the
  * basis functions. Therefore, several DoFHandler objects (or the same
