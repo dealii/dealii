@@ -360,7 +360,7 @@ namespace TrilinosWrappers
         }
 #if defined(DEBUG) && defined(DEAL_II_WITH_MPI)
       const Epetra_MpiComm *comm_ptr
-        = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()));
+        = dynamic_cast<const Epetra_MpiComm *>(&(v.vector->Comm()));
       Assert (comm_ptr != 0, ExcInternalError());
       const size_type n_elements_global
         = Utilities::MPI::sum (owned_elements.n_elements(), comm_ptr->Comm());
@@ -494,6 +494,7 @@ namespace TrilinosWrappers
     }
 
 
+
     Vector &
     Vector::operator = (const Vector &v)
     {
@@ -504,6 +505,25 @@ namespace TrilinosWrappers
       const Epetra_MpiComm *v_comm = dynamic_cast<const Epetra_MpiComm *>(&v.vector->Comm());
       const bool same_communicators = my_comm != NULL && v_comm != NULL &&
                                       my_comm->DataPtr() == v_comm->DataPtr();
+      // Need to ask MPI whether the communicators are the same. We would like
+      // to use the following checks but currently we cannot make sure the
+      // memory of my_comm is not stale from some MPI_Comm_free
+      // somewhere. This can happen when a vector lives in GrowingVectorMemory
+      // data structures. Thus, the following code is commented out.
+      //
+      //if (my_comm != NULL && v_comm != NULL && my_comm->DataPtr() != v_comm->DataPtr())
+      //  {
+      //    int communicators_same = 0;
+      //    const int ierr = MPI_Comm_compare (my_comm->GetMpiComm(),
+      //                                       v_comm->GetMpiComm(),
+      //                                       &communicators_same);
+      //    AssertThrowMPI(ierr);
+      //    if (!(communicators_same == MPI_IDENT ||
+      //          communicators_same == MPI_CONGRUENT))
+      //      same_communicators = false;
+      //    else
+      //      same_communicators = true;
+      //  }
 #else
       const bool same_communicators = true;
 #endif
@@ -512,7 +532,7 @@ namespace TrilinosWrappers
       // layout (just need to copy the local data, not reset the memory and
       // the underlying Epetra_Map). The third case means that we have to
       // rebuild the calling vector.
-      if (same_communicators && vector->Map().SameAs(v.vector->Map()))
+      if (same_communicators && v.vector->Map().SameAs(vector->Map()))
         {
           *vector = *v.vector;
           if (v.nonlocal_vector.get() != 0)
