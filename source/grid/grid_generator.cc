@@ -329,7 +329,7 @@ namespace GridGenerator
                       cell->face(f)->line(j)->set_boundary_id(1);
               }
             else
-              AssertThrow (false, ExcInternalError());
+              Assert (false, ExcInternalError());
           }
     }
 

@@ -1039,7 +1039,7 @@ namespace DoFTools
       const dealii::hp::FECollection<dim,spacedim> *
       get_fe_collection (const dealii::DoFHandler<dim,spacedim> &)
       {
-        AssertThrow(false, ExcInternalError());
+        Assert(false, ExcInternalError());
         return NULL;
       }
     }

@@ -882,7 +882,7 @@ namespace
             break;
           }
           default:
-            AssertThrow (false, ExcInternalError());
+            Assert (false, ExcInternalError());
           }
       }
   }
@@ -1335,7 +1335,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          AssertThrow (false, ExcInternalError());
+          Assert (false, ExcInternalError());
         }
 
       // note that now we have some content in the p4est objects and call the
@@ -1355,7 +1355,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          AssertThrow (false, ExcInternalError());
+          Assert (false, ExcInternalError());
         }
 
       this->update_number_cache ();
@@ -1884,7 +1884,7 @@ namespace parallel
           // triangulation should not
           // be checking for
           // distorted cells
-          AssertThrow (false, ExcInternalError());
+          Assert (false, ExcInternalError());
         }
 
       this->update_number_cache ();
@@ -2568,7 +2568,7 @@ namespace parallel
               {
                 // the underlying triangulation should not be checking for
                 // distorted cells
-                AssertThrow (false, ExcInternalError());
+                Assert (false, ExcInternalError());
               }
 
             refinement_in_progress = saved_refinement_in_progress;
@@ -2689,7 +2689,7 @@ namespace parallel
             {
               // the underlying triangulation should not be checking for
               // distorted cells
-              AssertThrow (false, ExcInternalError());
+              Assert (false, ExcInternalError());
             }
 
           refinement_in_progress = saved_refinement_in_progress;
@@ -2986,7 +2986,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          AssertThrow (false, ExcInternalError());
+          Assert (false, ExcInternalError());
         }
 
 #ifdef DEBUG
@@ -3102,7 +3102,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          AssertThrow (false, ExcInternalError());
+          Assert (false, ExcInternalError());
         }
 
       refinement_in_progress = false;
@@ -3657,7 +3657,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          AssertThrow (false, ExcInternalError());
+          Assert (false, ExcInternalError());
         }
 
       //finally call the base class for storing the periodicity information
@@ -3714,7 +3714,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          AssertThrow (false, ExcInternalError());
+          Assert (false, ExcInternalError());
         }
 
       // note that now we have some content in the p4est objects and call the
@@ -3755,7 +3755,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          AssertThrow (false, ExcInternalError());
+          Assert (false, ExcInternalError());
         }
 
       this->update_number_cache ();
