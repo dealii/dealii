@@ -779,9 +779,11 @@ namespace MatrixFreeOperators
   Base<dim,VectorType>::Base ()
     :
     Subscriptor(),
-    data(NULL),
     have_interface_matrices(false)
   {
+    // boost-1.62.0 doesn't allow initializing a shared_ptr
+    // with NULL. Make sure the default constructor does that.
+    Assert(data.get() == NULL, ExcInternalError());
   }
 
 
