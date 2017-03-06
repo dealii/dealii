@@ -14,20 +14,15 @@
 // ---------------------------------------------------------------------
 
 // Verify that hp::DoFHandler::distribute_dofs runs in linear time for a mesh
-// which (prior to commit 23ab0eb0c0) it previously ran in quadratic time. This
-// test checks this in two ways:
-// 1. The amount of time needed to create the grid and the amount of time
-//    needed to distribute dofs should be nearly equal for bilinears. The test
-//    below checks that they are within 50% of each-other.
-// 2. This test should time out if the old quadratic time algorithm is
-//    used (that numbering algorithm takes roughly 1000 seconds on 2016
-//    hardware, but the linear time algorithm takes about 6 seconds)
+// which (prior to commit 23ab0eb0c0) it previously ran in quadratic
+// time. This test should time out if the old quadratic time algorithm is
+// used: that numbering algorithm takes roughly 1000 seconds on 2016 hardware
+// but the linear time algorithm takes about 6 seconds.
 
 #include "../tests.h"
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/timer.h>
 
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/fe_q.h>
@@ -139,9 +134,6 @@ public:
 
   void run();
 
-  Timer create_grid_timer;
-  Timer distribute_dofs_timer;
-
   const unsigned int n_global_refines;
 
   std_cxx11::shared_ptr<Manifold<dim> > boundary_manifold;
@@ -159,8 +151,6 @@ QuadraticTimeCircle<dim>::QuadraticTimeCircle(const unsigned int n_global_refine
   n_global_refines (n_global_refines),
   dof_handler(triangulation)
 {
-  create_grid_timer.start();
-
   boundary_manifold = ladutenko_circle(triangulation);
   typename Triangulation<dim>::active_cell_iterator
   cell = triangulation.begin_active(),
@@ -177,7 +167,6 @@ QuadraticTimeCircle<dim>::QuadraticTimeCircle(const unsigned int n_global_refine
 
   finite_elements.push_back(FE_Q<dim>(1));
   finite_elements.push_back(FE_Q<dim>(1));
-  create_grid_timer.stop();
 }
 
 
@@ -195,9 +184,7 @@ void QuadraticTimeCircle<dim>::setup_dofs()
   }
 
   {
-    distribute_dofs_timer.start();
-    dof_handler.distribute_dofs(finite_elements); // <-- test this!
-    distribute_dofs_timer.stop();
+    dof_handler.distribute_dofs(finite_elements); // <-- this is what we test.
   }
   deallog << "Number of DoFs: " << dof_handler.n_dofs() << std::endl;
 }
@@ -222,28 +209,11 @@ int main(int argc, char **argv)
 
   unsigned int n_global_refines = 2;
 
-  Vector<double> n_dofs(n_cycles);
-  Vector<double> distribute_dofs_run_times(n_cycles);
-  Vector<double> create_grid_run_times(n_cycles);
-
   for (unsigned int i = 0; i < n_cycles; ++i)
     {
       n_global_refines += 1;
       QuadraticTimeCircle<dim> quadratic_time_circle(n_global_refines);
       quadratic_time_circle.run();
-      n_dofs[i] = quadratic_time_circle.dof_handler.n_dofs();
-      create_grid_run_times[i] = quadratic_time_circle.create_grid_timer.wall_time();
-      distribute_dofs_run_times[i] = quadratic_time_circle.distribute_dofs_timer.wall_time();
-
-      // if the times are sufficiently large they should be nearly equal
-      if (create_grid_run_times[i] > 0.1)
-        {
-          AssertThrow(std::abs(create_grid_run_times[i] - distribute_dofs_run_times[i])
-                      /create_grid_run_times[i] < 0.5,
-                      ExcMessage("The run times for creating the grid and "
-                                 "distributing dofs should be within 50% for "
-                                 "sufficiently large grids."));
-        }
     }
 
   deallog << "OK" << std::endl;
