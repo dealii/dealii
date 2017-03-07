@@ -1206,61 +1206,62 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
         //TODO: Introduce the needed table and loop only over base element shape functions. This here is not efficient at all AND very bad style
         const UpdateFlags base_flags = base_fe_data.update_each;
 
-        // if the current cell is just a translation of the previous one,
-        // the underlying data has not changed, and we don't even need to
-        // enter this section
-        if (cell_similarity != CellSimilarity::translation)
-          for (unsigned int system_index=0; system_index<this->dofs_per_cell;
-               ++system_index)
-            if (this->system_to_base_table[system_index].first.first == base_no)
-              {
-                const unsigned int
-                base_index = this->system_to_base_table[system_index].second;
-                Assert (base_index<base_fe.dofs_per_cell, ExcInternalError());
+        // some base element might involve values that depend on the shape
+        // of the geometry, so we always need to copy the shape values around
+        // also in case we detected a cell similarity (but no heavy work will
+        // be done inside the individual elements in case we have a
+        // translation and simple elements).
+        for (unsigned int system_index=0; system_index<this->dofs_per_cell;
+             ++system_index)
+          if (this->system_to_base_table[system_index].first.first == base_no)
+            {
+              const unsigned int
+              base_index = this->system_to_base_table[system_index].second;
+              Assert (base_index<base_fe.dofs_per_cell, ExcInternalError());
 
-                // now copy. if the shape function is primitive, then there
-                // is only one value to be copied, but for non-primitive
-                // elements, there might be more values to be copied
-                //
-                // so, find out from which index to take this one value, and
-                // to which index to put
-                unsigned int out_index = 0;
-                for (unsigned int i=0; i<system_index; ++i)
-                  out_index += this->n_nonzero_components(i);
-                unsigned int in_index = 0;
-                for (unsigned int i=0; i<base_index; ++i)
-                  in_index += base_fe.n_nonzero_components(i);
+              // now copy. if the shape function is primitive, then there
+              // is only one value to be copied, but for non-primitive
+              // elements, there might be more values to be copied
+              //
+              // so, find out from which index to take this one value, and
+              // to which index to put
+              unsigned int out_index = 0;
+              for (unsigned int i=0; i<system_index; ++i)
+                out_index += this->n_nonzero_components(i);
+              unsigned int in_index = 0;
+              for (unsigned int i=0; i<base_index; ++i)
+                in_index += base_fe.n_nonzero_components(i);
 
-                // then loop over the number of components to be copied
-                Assert (this->n_nonzero_components(system_index) ==
-                        base_fe.n_nonzero_components(base_index),
-                        ExcInternalError());
+              // then loop over the number of components to be copied
+              Assert (this->n_nonzero_components(system_index) ==
+                      base_fe.n_nonzero_components(base_index),
+                      ExcInternalError());
 
-                if (base_flags & update_values)
-                  for (unsigned int s=0; s<this->n_nonzero_components(system_index); ++s)
-                    for (unsigned int q=0; q<n_q_points; ++q)
-                      output_data.shape_values[out_index+s][q] =
-                        base_data.shape_values(in_index+s,q);
+              if (base_flags & update_values)
+                for (unsigned int s=0; s<this->n_nonzero_components(system_index); ++s)
+                  for (unsigned int q=0; q<n_q_points; ++q)
+                    output_data.shape_values[out_index+s][q] =
+                      base_data.shape_values(in_index+s,q);
 
-                if (base_flags & update_gradients)
-                  for (unsigned int s=0; s<this->n_nonzero_components(system_index); ++s)
-                    for (unsigned int q=0; q<n_q_points; ++q)
-                      output_data.shape_gradients[out_index+s][q] =
-                        base_data.shape_gradients[in_index+s][q];
+              if (base_flags & update_gradients)
+                for (unsigned int s=0; s<this->n_nonzero_components(system_index); ++s)
+                  for (unsigned int q=0; q<n_q_points; ++q)
+                    output_data.shape_gradients[out_index+s][q] =
+                      base_data.shape_gradients[in_index+s][q];
 
-                if (base_flags & update_hessians)
-                  for (unsigned int s=0; s<this->n_nonzero_components(system_index); ++s)
-                    for (unsigned int q=0; q<n_q_points; ++q)
-                      output_data.shape_hessians[out_index+s][q] =
-                        base_data.shape_hessians[in_index+s][q];
+              if (base_flags & update_hessians)
+                for (unsigned int s=0; s<this->n_nonzero_components(system_index); ++s)
+                  for (unsigned int q=0; q<n_q_points; ++q)
+                    output_data.shape_hessians[out_index+s][q] =
+                      base_data.shape_hessians[in_index+s][q];
 
-                if (base_flags & update_3rd_derivatives)
-                  for (unsigned int s=0; s<this->n_nonzero_components(system_index); ++s)
-                    for (unsigned int q=0; q<n_q_points; ++q)
-                      output_data.shape_3rd_derivatives[out_index+s][q] =
-                        base_data.shape_3rd_derivatives[in_index+s][q];
+              if (base_flags & update_3rd_derivatives)
+                for (unsigned int s=0; s<this->n_nonzero_components(system_index); ++s)
+                  for (unsigned int q=0; q<n_q_points; ++q)
+                    output_data.shape_3rd_derivatives[out_index+s][q] =
+                      base_data.shape_3rd_derivatives[in_index+s][q];
 
-              }
+            }
       }
 }
 
