@@ -82,7 +82,7 @@ IF(DEAL_II_DOXYGEN_USE_MATHJAX)
 ELSE()
   SET(_use_mathjax NO)
 ENDIF()
- 
+
 
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/options.dox.in
@@ -233,6 +233,7 @@ ADD_CUSTOM_COMMAND(
   COMMAND ${DOXYGEN_EXECUTABLE}
     ${CMAKE_CURRENT_BINARY_DIR}/options.dox
     > ${CMAKE_BINARY_DIR}/doxygen.log 2>&1 # *pssst*
+    || ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/doxygen.log ${CMAKE_BINARY_DIR}/doxygen.err
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS
     tutorial
@@ -269,4 +270,3 @@ INSTALL(DIRECTORY
   DESTINATION ${DEAL_II_DOCHTML_RELDIR}/doxygen
   COMPONENT documentation
   )
-
