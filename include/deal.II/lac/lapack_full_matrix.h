@@ -122,6 +122,18 @@ public:
   operator = (const double d);
 
   /**
+   * This operator multiplies all entries by a fixed factor.
+   */
+  LAPACKFullMatrix<number> &
+  operator*= (const number factor);
+
+  /**
+   * This operator divides all entries by a fixed factor.
+   */
+  LAPACKFullMatrix<number> &
+  operator/= (const number factor);
+
+  /**
    * Assignment from different matrix classes, performing the usual conversion
    * to the transposed format expected by LAPACK. This assignment operator
    * uses iterators of the typename MatrixType. Therefore, sparse matrices are
