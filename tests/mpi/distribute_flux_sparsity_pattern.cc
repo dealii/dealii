@@ -114,8 +114,8 @@ namespace LinearAdvectionTest
       {
         for (unsigned int j = 0; j < fe.n_components(); ++j)
           {
-            cell_integral_mask(i, j) = DoFTools::Coupling::always;
-            flux_integral_mask(i, j) = DoFTools::Coupling::nonzero;
+            cell_integral_mask(i, j) = DoFTools::always;
+            flux_integral_mask(i, j) = DoFTools::nonzero;
           }
       }
 
