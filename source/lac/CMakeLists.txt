@@ -74,6 +74,7 @@ SET(_inst
   sparse_matrix.inst.in
   vector.inst.in
   vector_memory.inst.in
+  vector_memory_release.inst.in
   vector_view.inst.in
   )
 
