@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Test high order MappingQ on a ChartManifold.
+// Test cell similarity over GridTools::transform (here: scale)
 
 #include "../tests.h"
 
@@ -33,6 +33,12 @@ using namespace dealii;
 int main()
 {
   initlog ();
+
+  // there used to be a bug in the cell similarity detection beyond the
+  // GridTools::transform method , but cell similarity is only enabled without
+  // threads. to make sure this test is effective, manually set the thread
+  // limit to 1.
+  MultithreadInfo::set_thread_limit(1);
 
   Triangulation<2> triangulation;
   FE_DGQ<2> fe(0);
