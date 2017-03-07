@@ -157,8 +157,8 @@ namespace LinearAdvectionTest
     DynamicSparsityPattern dynamic_sparsity_pattern(locally_relevant_dofs);
     Table<2, DoFTools::Coupling> cell_integral_mask(1, 1);
     Table<2, DoFTools::Coupling> flux_integral_mask(1, 1);
-    cell_integral_mask(0, 0) = DoFTools::Coupling::always;
-    flux_integral_mask(0, 0) = DoFTools::Coupling::nonzero;
+    cell_integral_mask(0, 0) = DoFTools::always;
+    flux_integral_mask(0, 0) = DoFTools::nonzero;
 
     DoFTools::make_flux_sparsity_pattern(dof_handler, dynamic_sparsity_pattern,
                                          cell_integral_mask, flux_integral_mask);
