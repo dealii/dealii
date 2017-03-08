@@ -1777,7 +1777,7 @@ void GridIn<2>::read_netcdf (const std::string &filename)
   vertex_indices_var->get(&*vertex_indices.begin(), n_bquads, vertices_per_quad);
 
   for (unsigned int i=0; i<vertex_indices.size(); ++i)
-    Assert(vertex_indices[i]>=0, ExcInternalError());
+    AssertThrow(vertex_indices[i]>=0, ExcIO());
 
   if (output)
     {
@@ -1948,7 +1948,7 @@ void GridIn<3>::read_netcdf (const std::string &filename)
   vertex_indices_var->get(&*vertex_indices.begin(), n_cells, vertices_per_hex);
 
   for (unsigned int i=0; i<vertex_indices.size(); ++i)
-    Assert(vertex_indices[i]>=0, ExcInternalError());
+    AssertThrow(vertex_indices[i]>=0, ExcIO());
 
   if (output)
     {

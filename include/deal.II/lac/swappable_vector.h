@@ -128,11 +128,14 @@ public:
   /**
    * Remove the file to which the data has been stored the last time. After
    * this, the object does not own any file any more, so of course you can't
-   * call @p reload no more.
+   * call @p reload again.
    *
    * If this object does not own a file, for example since @p swap_out was not
    * called, or because @p kill_file has been called previously, then this
    * function does nothing.
+   *
+   * This throws a ExcIO exception if, for any reason, deleting the file
+   * failed.
    */
   void kill_file ();
 
