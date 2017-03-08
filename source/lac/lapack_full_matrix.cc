@@ -131,6 +131,41 @@ LAPACKFullMatrix<number>::operator = (const double d)
 
 
 template <typename number>
+LAPACKFullMatrix<number> &
+LAPACKFullMatrix<number>::operator*= (const number factor)
+{
+  Assert(state == LAPACKSupport::matrix ||
+         state == LAPACKSupport::inverse_matrix,
+         ExcState(state));
+
+  for (unsigned int column = 0; column<this->n(); ++column)
+    for (unsigned int row = 0; row<this->m(); ++row)
+      (*this)(row,column) *= factor;
+
+  return *this;
+}
+
+
+template <typename number>
+LAPACKFullMatrix<number> &
+LAPACKFullMatrix<number>::operator/= (const number factor)
+{
+  Assert(state == LAPACKSupport::matrix ||
+         state == LAPACKSupport::inverse_matrix,
+         ExcState(state));
+
+  AssertIsFinite(factor);
+  Assert (factor != number(0.), ExcZero() );
+
+  for (unsigned int column = 0; column<this->n(); ++column)
+    for (unsigned int row = 0; row<this->m(); ++row)
+      (*this)(row,column) /= factor;
+
+  return *this;
+}
+
+
+template <typename number>
 void
 LAPACKFullMatrix<number>::vmult (
   Vector<number>       &w,
