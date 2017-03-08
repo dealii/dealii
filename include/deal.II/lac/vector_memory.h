@@ -348,6 +348,16 @@ private:
   static Threads::Mutex mutex;
 };
 
+
+
+namespace internal
+{
+  namespace GrowingVectorMemory
+  {
+    void release_all_unused_memory();
+  }
+}
+
 /*@}*/
 
 #ifndef DOXYGEN

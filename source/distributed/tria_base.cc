@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2016 by the deal.II authors
+// Copyright (C) 2015 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,7 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/vector_memory.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -43,10 +44,9 @@ namespace parallel
                                               const bool check_for_distorted_cells)
     :
     dealii::Triangulation<dim,spacedim>(smooth_grid,check_for_distorted_cells),
-    mpi_communicator (Utilities::MPI::
-                      duplicate_communicator(mpi_communicator)),
+    mpi_communicator (mpi_communicator),
     my_subdomain (Utilities::MPI::this_mpi_process (this->mpi_communicator)),
-    n_subdomains(Utilities::MPI::n_mpi_processes(mpi_communicator))
+    n_subdomains(Utilities::MPI::n_mpi_processes (this->mpi_communicator))
   {
 #ifndef DEAL_II_WITH_MPI
     Assert(false, ExcMessage("You compiled deal.II without MPI support, for "
@@ -72,8 +72,11 @@ namespace parallel
     if (const dealii::parallel::Triangulation<dim,spacedim> *
         other_tria_x = dynamic_cast<const dealii::parallel::Triangulation<dim,spacedim> *>(&other_tria))
       {
-        MPI_Comm_free (&this->mpi_communicator);
-        mpi_communicator = Utilities::MPI::duplicate_communicator (other_tria_x->get_communicator ());
+        mpi_communicator = other_tria_x->get_communicator();
+
+        // release unused vector memory because we will have very different
+        // vectors now
+        ::dealii::internal::GrowingVectorMemory::release_all_unused_memory();
       }
 #endif
   }
@@ -98,10 +101,9 @@ namespace parallel
   template <int dim, int spacedim>
   Triangulation<dim,spacedim>::~Triangulation ()
   {
-#ifdef DEAL_II_WITH_MPI
-    // get rid of the unique communicator used here again
-    MPI_Comm_free (&this->mpi_communicator);
-#endif
+    // release unused vector memory because the vector layout is going to look
+    // very different now
+    ::dealii::internal::GrowingVectorMemory::release_all_unused_memory();
   }
 
   template <int dim, int spacedim>

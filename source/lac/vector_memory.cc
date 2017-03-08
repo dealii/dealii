@@ -32,4 +32,15 @@ DEAL_II_NAMESPACE_OPEN
 
 #include "vector_memory.inst"
 
+namespace internal
+{
+  namespace GrowingVectorMemory
+  {
+    void release_all_unused_memory()
+    {
+#include "vector_memory_release.inst"
+    }
+  }
+}
+
 DEAL_II_NAMESPACE_CLOSE
