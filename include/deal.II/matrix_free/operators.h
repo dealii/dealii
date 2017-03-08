@@ -116,7 +116,49 @@ namespace MatrixFreeOperators
    * Currently, the only supported vectors are LinearAlgebra::distributed::Vector
    * and LinearAlgebra::distributed::BlockVector.
    *
-   * @author Denis Davydov, Daniel Arndt, 2016, 2017
+   * <h4>Selective use of blocks in MatrixFree</h4>
+   *
+   * MatrixFree allows to use several DoFHandler/ConstraintMatrix combinations
+   * by passing an std::vector with pointers to the respective objects into
+   * the MatrixFree::reinit function. This class supports to select only some
+   * of the blocks in the underlying MatrixFree object by optional integer
+   * lists that specify the chosen blocks.
+   *
+   * One application of selection is in problems with a Newton-type iteration
+   * or problems with inhomogeneous boundary conditions. In such a case, one
+   * has to deal with two different sets of constraints: One set of
+   * constraints applies to the solution vector which might include hanging
+   * node constraints or periodicity constraints but no constraints on
+   * inhomogeneous Dirichlet boundaries. Before the nonlinear iteration, the
+   * boundary values are set to the expected value in the vector representing
+   * the initial guess. In each iteration of the Newton method, a linear
+   * system subject to zero Dirichlet boundary conditions is solved that is
+   * then added to the initial guess. This setup can be realized by using a
+   * vector of two pointers pointing to the same DoFHandler object and a
+   * vector of two pointers to the two ConstraintMatrix objects. If the first
+   * constraint matrix is the one including the zero Dirichlet constraints,
+   * one would give an std::vector<unsigned int>(1, 0) to the initialize()
+   * function, i.e., a vector of length 1 that selects exactly the first
+   * constraint matrix with index 0.
+   *
+   * A second application of using selectively constructing a matrix-free
+   * operator would be the setting of the step-32 tutorial program: This
+   * problem has three <i>blocks</i>, one for the velocity, one for the
+   * pressure, and one for temperature. The time lag scheme used for temporal
+   * evolution splits the temperature equation away from the Stokes system in
+   * velocity and pressure. However, there are cross terms like the velocity
+   * that enters the temperature advection-diffusion equation or the
+   * temperature that enters the right hand side of the velocity. In order to
+   * be sure that MatrixFree uses the same integer indexing to the different
+   * blocks, one needs to put all three blocks into the same MatrixFree
+   * object. However, when solving a linear system the operators involved
+   * either address the first two in the Stokes solver, or the last one for
+   * the temperature solver. In the former case, a BlockVector of two
+   * components would be selected with a vector selecting the blocks {0, 1} in
+   * MatrixFree, whereas in the latter, a non-block vector selecting the block
+   * {2} would be used.
+   *
+   * @author Denis Davydov, Daniel Arndt, Martin Kronbichler, 2016, 2017
    */
   template <int dim, typename VectorType = LinearAlgebra::distributed::Vector<double> >
   class Base : public Subscriptor
@@ -150,23 +192,61 @@ namespace MatrixFreeOperators
 
     /**
      * Initialize operator on fine scale.
+     *
+     * The optional selection vector allows to choose only some components
+     * from the underlying MatrixFree object, e.g. just a single one. The
+     * entry @p selected_row_blocks[i] in the vector chooses the DoFHandler
+     * and ConstraintMatrix object that was given as the
+     * @p selected_row_blocks[i]-th argument to the MatrixFree::reinit() call.
+     * Different arguments for rows and columns also make it possible to
+     * select non-diagonal blocks or rectangular blocks. If the row vector is
+     * empty, all components are selected, otherwise its size must be smaller
+     * or equal to MatrixFree::n_components() and all indices need to be
+     * unique and within the range of 0 and MatrixFree::n_components(). If the
+     * column selection vector is empty, it is taken the same as the row
+     * selection, defining a diagonal block.
      */
-    void initialize (std_cxx11::shared_ptr<const MatrixFree<dim,value_type> > data);
+    void initialize (std_cxx11::shared_ptr<const MatrixFree<dim,value_type> > data,
+                     const std::vector<unsigned int> &selected_row_blocks = std::vector<unsigned int>(),
+                     const std::vector<unsigned int> &selected_column_blocks = std::vector<unsigned int>());
 
     /**
      * Initialize operator on a level @p level for a single FiniteElement.
+     *
+     * The optional selection vector allows to choose only some components
+     * from the underlying MatrixFree object, e.g. just a single one. The
+     * entry @p selected_row_blocks[i] in the vector chooses the DoFHandler
+     * and ConstraintMatrix object that was given as the
+     * @p selected_row_blocks[i]-th argument to the MatrixFree::reinit() call.
+     * Since a multigrid operator is always associated to inverting a matrix
+     * and thus represents a diagonal block, the same vector for rows and
+     * columns is used as opposed to the non-level initialization function. If
+     * empty, all components are selected.
      */
     void initialize (std_cxx11::shared_ptr<const MatrixFree<dim,value_type> > data,
                      const MGConstrainedDoFs &mg_constrained_dofs,
-                     const unsigned int level);
+                     const unsigned int level,
+                     const std::vector<unsigned int> &selected_row_blocks = std::vector<unsigned int>());
 
     /**
-     * Initialize operator on a level @p level for multiple FiniteElement objects.
+     * Initialize operator on a level @p level for multiple FiniteElement
+     * objects.
+     *
+     * The optional selection vector allows to choose only some components
+     * from the underlying MatrixFree object, e.g. just a single one. The
+     * entry @p selected_row_blocks[i] in the vector chooses the DoFHandler
+     * and ConstraintMatrix object that was given as the
+     * @p selected_row_blocks[i]-th argument to the MatrixFree::reinit() call.
+     * Since a multigrid operator is always associated to inverting a matrix
+     * and thus represents a diagonal block, the same vector for rows and
+     * columns is used as opposed to the non-level initialization function. If
+     * empty, all components are selected.
      */
     void
     initialize(std_cxx11::shared_ptr<const MatrixFree<dim, value_type> > data_,
                const std::vector<MGConstrainedDoFs> &mg_constrained_dofs,
-               const unsigned int level);
+               const unsigned int level,
+               const std::vector<unsigned int> &selected_row_blocks = std::vector<unsigned int>());
 
     /**
      * Return the dimension of the codomain (or range) space.
@@ -293,6 +373,18 @@ namespace MatrixFreeOperators
      */
     std_cxx11::shared_ptr<DiagonalMatrix<VectorType > > inverse_diagonal_entries;
 
+    /**
+     * A vector which defines the selection of sub-components of MatrixFree
+     * for the rows of the matrix representation.
+     */
+    std::vector<unsigned int> selected_rows;
+
+    /**
+     * A vector which defines the selection of sub-components of MatrixFree
+     * for the columns of the matrix representation.
+     */
+    std::vector<unsigned int> selected_columns;
+
   private:
 
     /**
@@ -327,7 +419,8 @@ namespace MatrixFreeOperators
      * order to ensure that the cell loops will be able to access the ghost
      * indices with the correct local indices.
      */
-    void adjust_ghost_range_if_necessary(const VectorType &vec) const;
+    void adjust_ghost_range_if_necessary(const VectorType &vec,
+                                         const bool        is_row) const;
   };
 
 
@@ -480,6 +573,10 @@ namespace MatrixFreeOperators
   /**
    * This class implements the operation of the action of a mass matrix.
    *
+   * Note that this class only supports the non-blocked vector variant of the
+   * Base operator because only a single FEEvaluation object is used in the
+   * apply function.
+   *
    * @author Daniel Arndt, 2016
    */
   template <int dim, int fe_degree, int n_q_points_1d = fe_degree+1, int n_components = 1, typename VectorType = LinearAlgebra::distributed::Vector<double> >
@@ -530,6 +627,10 @@ namespace MatrixFreeOperators
    * This class implements the operation of the action of a Laplace matrix,
    * namely $ L_{ij} = \int_\Omega c(\mathbf x) \mathbf \nabla N_i(\mathbf x) \cdot \mathbf \nabla N_j(\mathbf x)\,d \mathbf x$,
    * where $c(\mathbf x)$ is the scalar heterogeneity coefficient.
+   *
+   * Note that this class only supports the non-blocked vector variant of the
+   * Base operator because only a single FEEvaluation object is used in the
+   * apply function.
    *
    * @author Denis Davydov, 2016
    */
@@ -795,8 +896,8 @@ namespace MatrixFreeOperators
     Assert(data.get() != NULL,
            ExcNotInitialized());
     typename Base<dim, VectorType>::size_type total_size = 0;
-    for (unsigned int i=0; i<data->n_components(); ++i)
-      total_size += data->get_vector_partitioner(i)->size();
+    for (unsigned int i=0; i<selected_rows.size(); ++i)
+      total_size += data->get_vector_partitioner(selected_rows[i])->size();
     return total_size;
   }
 
@@ -806,7 +907,12 @@ namespace MatrixFreeOperators
   typename Base<dim,VectorType>::size_type
   Base<dim,VectorType>::n () const
   {
-    return m();
+    Assert(data.get() != NULL,
+           ExcNotInitialized());
+    typename Base<dim, VectorType>::size_type total_size = 0;
+    for (unsigned int i=0; i<selected_columns.size(); ++i)
+      total_size += data->get_vector_partitioner(selected_columns[i])->size();
+    return total_size;
   }
 
 
@@ -841,13 +947,15 @@ namespace MatrixFreeOperators
   {
     Assert(data.get() != NULL,
            ExcNotInitialized());
+    AssertDimension(n_blocks(vec), selected_rows.size());
     for (unsigned int i = 0; i < n_blocks(vec); ++i)
       {
-        if (!subblock(vec,i).partitioners_are_compatible
-            (*data->get_dof_info(i).vector_partitioner))
-          data->initialize_dof_vector(subblock(vec,i));
-        Assert(subblock(vec,i).partitioners_are_globally_compatible
-               (*data->get_dof_info(i).vector_partitioner),
+        const unsigned int index = selected_rows[i];
+        if (!subblock(vec,index).partitioners_are_compatible
+            (*data->get_dof_info(index).vector_partitioner))
+          data->initialize_dof_vector(subblock(vec,index));
+        Assert(subblock(vec,index).partitioners_are_globally_compatible
+               (*data->get_dof_info(index).vector_partitioner),
                ExcInternalError());
       }
     collect_sizes(vec);
@@ -858,13 +966,50 @@ namespace MatrixFreeOperators
   template <int dim, typename VectorType>
   void
   Base<dim,VectorType>::
-  initialize (std_cxx11::shared_ptr<const MatrixFree<dim,typename Base<dim,VectorType>::value_type> > data_)
+  initialize (std_cxx11::shared_ptr<const MatrixFree<dim,typename Base<dim,VectorType>::value_type> > data_,
+              const std::vector<unsigned int> &given_row_selection,
+              const std::vector<unsigned int> &given_column_selection)
   {
     data = data_;
+
+    selected_rows.clear();
+    selected_columns.clear();
+    if (given_row_selection.empty())
+      for (unsigned int i=0; i<data_->n_components(); ++i)
+        selected_rows.push_back(i);
+    else
+      {
+        for (unsigned int i=0; i<given_row_selection.size(); ++i)
+          {
+            AssertIndexRange(given_row_selection[i], data_->n_components());
+            for (unsigned int j=0; j<given_row_selection.size(); ++j)
+              if (j!=i)
+                Assert(given_row_selection[j] != given_row_selection[i],
+                       ExcMessage("Given row indices must be unique"));
+
+            selected_rows.push_back(given_row_selection[i]);
+          }
+      }
+    if (given_column_selection.size() == 0)
+      selected_columns = selected_rows;
+    else
+      {
+        for (unsigned int i=0; i<given_column_selection.size(); ++i)
+          {
+            AssertIndexRange(given_column_selection[i], data_->n_components());
+            for (unsigned int j=0; j<given_row_selection.size(); ++j)
+              if (j!=i)
+                Assert(given_column_selection[j] != given_column_selection[i],
+                       ExcMessage("Given column indices must be unique"));
+
+            selected_columns.push_back(given_column_selection[i]);
+          }
+      }
+
     edge_constrained_indices.clear();
-    edge_constrained_indices.resize(data->n_components());
+    edge_constrained_indices.resize(selected_rows.size());
     edge_constrained_values.clear();
-    edge_constrained_values.resize(data->n_components());
+    edge_constrained_values.resize(selected_rows.size());
     have_interface_matrices = false;
   }
 
@@ -874,11 +1019,12 @@ namespace MatrixFreeOperators
   void
   Base<dim,VectorType>::
   initialize (std_cxx11::shared_ptr<const MatrixFree<dim,typename Base<dim,VectorType>::value_type> > data_,
-              const MGConstrainedDoFs      &mg_constrained_dofs,
-              const unsigned int            level)
+              const MGConstrainedDoFs         &mg_constrained_dofs,
+              const unsigned int               level,
+              const std::vector<unsigned int> &given_row_selection)
   {
     std::vector<MGConstrainedDoFs> mg_constrained_dofs_vector(1, mg_constrained_dofs);
-    initialize(data_, mg_constrained_dofs_vector, level);
+    initialize(data_, mg_constrained_dofs_vector, level, given_row_selection);
   }
 
 
@@ -888,19 +1034,41 @@ namespace MatrixFreeOperators
   Base<dim, VectorType>::
   initialize (std_cxx11::shared_ptr<const MatrixFree<dim, value_type> > data_,
               const std::vector<MGConstrainedDoFs> &mg_constrained_dofs,
-              const unsigned int level)
+              const unsigned int                    level,
+              const std::vector<unsigned int>      &given_row_selection)
   {
     AssertThrow (level != numbers::invalid_unsigned_int,
                  ExcMessage("level is not set"));
-    AssertDimension(mg_constrained_dofs.size(), data_->n_components());
+
+    selected_rows.clear();
+    selected_columns.clear();
+    if (given_row_selection.empty())
+      for (unsigned int i=0; i<data_->n_components(); ++i)
+        selected_rows.push_back(i);
+    else
+      {
+        for (unsigned int i=0; i<given_row_selection.size(); ++i)
+          {
+            AssertIndexRange(given_row_selection[i], data_->n_components());
+            for (unsigned int j=0; j<given_row_selection.size(); ++j)
+              if (j!=i)
+                Assert(given_row_selection[j] != given_row_selection[i],
+                       ExcMessage("Given row indices must be unique"));
+
+            selected_rows.push_back(given_row_selection[i]);
+          }
+      }
+    selected_columns = selected_rows;
+
+    AssertDimension(mg_constrained_dofs.size(), selected_rows.size());
     edge_constrained_indices.clear();
-    edge_constrained_indices.resize(data_->n_components());
+    edge_constrained_indices.resize(selected_rows.size());
     edge_constrained_values.clear();
-    edge_constrained_values.resize(data_->n_components());
+    edge_constrained_values.resize(selected_rows.size());
 
     data = data_;
 
-    for (unsigned int j = 0; j < data->n_components(); ++j)
+    for (unsigned int j = 0; j < selected_rows.size(); ++j)
       {
         if (data_->n_macro_cells() > 0)
           {
@@ -915,7 +1083,7 @@ namespace MatrixFreeOperators
         edge_constrained_indices[j].clear();
         edge_constrained_indices[j].reserve(interface_indices.size());
         edge_constrained_values[j].resize(interface_indices.size());
-        const IndexSet &locally_owned = data->get_dof_handler(j).locally_owned_mg_dofs(level);
+        const IndexSet &locally_owned = data->get_dof_handler(selected_rows[j]).locally_owned_mg_dofs(level);
         for (unsigned int i=0; i<interface_indices.size(); ++i)
           if (locally_owned.is_element(interface_indices[i]))
             edge_constrained_indices[j].push_back
@@ -935,7 +1103,7 @@ namespace MatrixFreeOperators
     for (unsigned int j=0; j<n_blocks(dst); ++j)
       {
         const std::vector<unsigned int> &
-        constrained_dofs = data->get_constrained_dofs(j);
+        constrained_dofs = data->get_constrained_dofs(selected_rows[j]);
         for (unsigned int i=0; i<constrained_dofs.size(); ++i)
           subblock(dst,j).local_element(constrained_dofs[i]) = 1.;
         for (unsigned int i=0; i<edge_constrained_indices[j].size(); ++i)
@@ -979,20 +1147,22 @@ namespace MatrixFreeOperators
 
   template <int dim, typename VectorType>
   void
-  Base<dim,VectorType>::adjust_ghost_range_if_necessary(const VectorType &src) const
+  Base<dim,VectorType>::adjust_ghost_range_if_necessary(const VectorType &src,
+                                                        const bool is_row) const
   {
     typedef typename Base<dim,VectorType>::value_type Number;
     for (unsigned int i=0; i<n_blocks(src); ++i)
       {
+        const unsigned int mf_component = is_row ? selected_rows[i] : selected_columns[i];
         // If both vectors use the same partitioner -> done
         if (subblock(src,i).get_partitioner().get() ==
-            data->get_dof_info(i).vector_partitioner.get())
+            data->get_dof_info(mf_component).vector_partitioner.get())
           continue;
 
         // If not, assert that the local ranges are the same and reset to the
         // current partitioner
         Assert(subblock(src,i).get_partitioner()->local_size() ==
-               data->get_dof_info(i).vector_partitioner->local_size(),
+               data->get_dof_info(mf_component).vector_partitioner->local_size(),
                ExcMessage("The vector passed to the vmult() function does not have "
                           "the correct size for compatibility with MatrixFree."));
 
@@ -1002,7 +1172,7 @@ namespace MatrixFreeOperators
                                        subblock(src,i).begin());
         const Vector<Number> copy_vec = view_src_in;
         subblock(const_cast<VectorType &>(src),i).
-        reinit(data->get_dof_info(i).vector_partitioner);
+        reinit(data->get_dof_info(mf_component).vector_partitioner);
         VectorView<Number> view_src_out(subblock(src,i).local_size(),
                                         subblock(src,i).begin());
         static_cast<Vector<Number>&>(view_src_out) = copy_vec;
@@ -1019,9 +1189,10 @@ namespace MatrixFreeOperators
   {
     AssertDimension(dst.size(), src.size());
     AssertDimension(n_blocks(dst), n_blocks(src));
+    AssertDimension(n_blocks(dst), selected_rows.size());
     typedef typename Base<dim,VectorType>::value_type Number;
-    adjust_ghost_range_if_necessary(src);
-    adjust_ghost_range_if_necessary(dst);
+    adjust_ghost_range_if_necessary(src, false);
+    adjust_ghost_range_if_necessary(dst, true);
 
     // set zero Dirichlet values on the input vector (and remember the src and
     // dst values because we need to reset them at the end)
@@ -1045,7 +1216,7 @@ namespace MatrixFreeOperators
     for (unsigned int j=0; j<n_blocks(dst); ++j)
       {
         const std::vector<unsigned int> &
-        constrained_dofs = data->get_constrained_dofs(j);
+        constrained_dofs = data->get_constrained_dofs(selected_rows[j]);
         for (unsigned int i=0; i<constrained_dofs.size(); ++i)
           subblock(dst,j).local_element(constrained_dofs[i]) +=
             subblock(src,j).local_element(constrained_dofs[i]);
@@ -1077,8 +1248,8 @@ namespace MatrixFreeOperators
   {
     typedef typename Base<dim,VectorType>::value_type Number;
     AssertDimension(dst.size(), src.size());
-    adjust_ghost_range_if_necessary(src);
-    adjust_ghost_range_if_necessary(dst);
+    adjust_ghost_range_if_necessary(src, false);
+    adjust_ghost_range_if_necessary(dst, true);
 
     dst = Number(0.);
 
@@ -1129,8 +1300,8 @@ namespace MatrixFreeOperators
   {
     typedef typename Base<dim,VectorType>::value_type Number;
     AssertDimension(dst.size(), src.size());
-    adjust_ghost_range_if_necessary(src);
-    adjust_ghost_range_if_necessary(dst);
+    adjust_ghost_range_if_necessary(src, false);
+    adjust_ghost_range_if_necessary(dst, true);
 
     dst = Number(0.);
 
@@ -1360,7 +1531,7 @@ namespace MatrixFreeOperators
                     const std::pair<unsigned int,unsigned int>  &cell_range) const
   {
     typedef typename Base<dim,VectorType>::value_type Number;
-    FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number> phi(data);
+    FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number> phi(data, this->selected_rows[0]);
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
         phi.reinit (cell);
@@ -1512,7 +1683,7 @@ namespace MatrixFreeOperators
                     const std::pair<unsigned int,unsigned int>  &cell_range) const
   {
     typedef typename Base<dim,VectorType>::value_type Number;
-    FEEvaluation<dim,fe_degree,n_q_points_1d,n_components,Number> phi (data);
+    FEEvaluation<dim,fe_degree,n_q_points_1d,n_components,Number> phi (data, this->selected_rows[0]);
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
         phi.reinit (cell);
@@ -1532,7 +1703,7 @@ namespace MatrixFreeOperators
                        const std::pair<unsigned int,unsigned int>       &cell_range) const
   {
     typedef typename Base<dim,VectorType>::value_type Number;
-    FEEvaluation<dim,fe_degree,n_q_points_1d,n_components,Number> phi (data);
+    FEEvaluation<dim,fe_degree,n_q_points_1d,n_components,Number> phi (data, this->selected_rows[0]);
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
         phi.reinit (cell);
