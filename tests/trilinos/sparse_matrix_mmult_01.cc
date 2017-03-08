@@ -36,7 +36,7 @@ void out_matrix_size(const MATRIX &M,
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi(argc, argv);
+  Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
 
   initlog();
 
