@@ -224,7 +224,7 @@ void SwappableVector<number>::kill_file ()
     {
       int status = std::remove (filename.c_str());
       (void)status;
-      Assert (status == 0, ExcInternalError());
+      AssertThrow (status == 0, ExcIO());
 
       filename = "";
     };
