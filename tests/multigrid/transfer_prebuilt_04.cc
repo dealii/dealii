@@ -99,7 +99,7 @@ void check()
 
 int main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi(argc, argv);
+  Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
   mpi_initlog();
 
   check<2>();

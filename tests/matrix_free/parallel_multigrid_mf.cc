@@ -413,7 +413,7 @@ void test ()
 
 int main (int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv);
+  Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
 
   mpi_initlog();
   deallog.threshold_double(1e-9);
