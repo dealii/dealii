@@ -51,8 +51,13 @@ TimeDependent::TimeDependent (const TimeSteppingData &data_primal,
 
 TimeDependent::~TimeDependent ()
 {
-  while (timesteps.size() != 0)
-    delete_timestep (0);
+  try
+    {
+      while (timesteps.size() != 0)
+        delete_timestep (0);
+    }
+  catch (...)
+    {}
 }
 
 

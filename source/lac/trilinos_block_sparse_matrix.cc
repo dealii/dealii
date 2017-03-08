@@ -33,7 +33,12 @@ namespace TrilinosWrappers
   {
     // delete previous content of
     // the subobjects array
-    clear ();
+    try
+      {
+        clear ();
+      }
+    catch (...)
+      {}
   }
 
 

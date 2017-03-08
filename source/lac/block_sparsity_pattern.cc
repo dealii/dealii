@@ -64,7 +64,12 @@ template <class SparsityPatternBase>
 BlockSparsityPatternBase<SparsityPatternBase>::~BlockSparsityPatternBase ()
 {
   // clear all memory
-  reinit (0,0);
+  try
+    {
+      reinit (0,0);
+    }
+  catch (...)
+    {}
 }
 
 
