@@ -2275,7 +2275,8 @@ FEValuesBase<dim,spacedim>::FEValuesBase (const unsigned int n_q_points,
 template <int dim, int spacedim>
 FEValuesBase<dim,spacedim>::~FEValuesBase ()
 {
-  tria_listener.disconnect ();
+  tria_listener_refinement.disconnect ();
+  tria_listener_mesh_transform.disconnect ();
 }
 
 
@@ -3458,7 +3459,8 @@ FEValuesBase< dim, spacedim >::invalidate_present_cell ()
   // so delete the present cell and
   // disconnect from the signal we have with
   // it
-  tria_listener.disconnect ();
+  tria_listener_refinement.disconnect ();
+  tria_listener_mesh_transform.disconnect ();
   present_cell.reset ();
 }
 
@@ -3479,10 +3481,13 @@ maybe_invalidate_previous_present_cell (const typename Triangulation<dim,spacedi
           // connect to the current one; also invalidate the previous
           // cell because we shouldn't be comparing cells from different
           // triangulations
-          tria_listener.disconnect ();
           invalidate_present_cell();
-          tria_listener =
+          tria_listener_refinement =
             cell->get_triangulation().signals.any_change.connect
+            (std_cxx11::bind (&FEValuesBase<dim,spacedim>::invalidate_present_cell,
+                              std_cxx11::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));
+          tria_listener_mesh_transform =
+            cell->get_triangulation().signals.mesh_movement.connect
             (std_cxx11::bind (&FEValuesBase<dim,spacedim>::invalidate_present_cell,
                               std_cxx11::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));
         }
@@ -3492,12 +3497,12 @@ maybe_invalidate_previous_present_cell (const typename Triangulation<dim,spacedi
       // if this FEValues has never been set to any cell at all, then
       // at least subscribe to the triangulation to get notified of
       // changes
-      tria_listener =
-        cell->get_triangulation().signals.mesh_movement.connect
+      tria_listener_refinement =
+        cell->get_triangulation().signals.post_refinement.connect
         (std_cxx11::bind (&FEValuesBase<dim,spacedim>::invalidate_present_cell,
                           std_cxx11::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));
-      tria_listener =
-        cell->get_triangulation().signals.post_refinement.connect
+      tria_listener_mesh_transform =
+        cell->get_triangulation().signals.mesh_movement.connect
         (std_cxx11::bind (&FEValuesBase<dim,spacedim>::invalidate_present_cell,
                           std_cxx11::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));
     }
