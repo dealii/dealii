@@ -2091,6 +2091,15 @@ public:
     boost::signals2::signal<void ()> post_refinement;
 
     /**
+     * This signal is triggered when a function in deal.II moves the grid
+     * points of a mesh, e.g. GridTools::transform. Unfortunately,
+     * modification of a vertex in user code through
+     * <code>cell_iterator->vertex(v) = xxxx</code> cannot be detected by this
+     * method.
+     */
+    boost::signals2::signal<void ()> mesh_movement;
+
+    /**
      * This signal is triggered for each cell that is going to be coarsened.
      *
      * @note This signal is triggered with the immediate parent cell of a set

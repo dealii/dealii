@@ -1,0 +1,6 @@
+Fixed: The CellSimilarity detection was broken on two corner cases involving
+complicated elements such as FE_RaviartThomas inside an FESystem and when
+preserving an FEValues object using GridTools::transform. These have been
+fixed.
+<br>
+(Martin Kronbichler, 2017/03/07)

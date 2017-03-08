@@ -1727,6 +1727,9 @@ namespace GridTools
                      + cell->face(face)->vertex(2) + cell->face(face)->vertex(3)) / 4.0;
               }
       }
+
+    // Make sure FEValues notices that the mesh has changed
+    triangulation.signals.mesh_movement();
   }
 
 

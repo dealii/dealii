@@ -3493,6 +3493,10 @@ maybe_invalidate_previous_present_cell (const typename Triangulation<dim,spacedi
       // at least subscribe to the triangulation to get notified of
       // changes
       tria_listener =
+        cell->get_triangulation().signals.mesh_movement.connect
+        (std_cxx11::bind (&FEValuesBase<dim,spacedim>::invalidate_present_cell,
+                          std_cxx11::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));
+      tria_listener =
         cell->get_triangulation().signals.post_refinement.connect
         (std_cxx11::bind (&FEValuesBase<dim,spacedim>::invalidate_present_cell,
                           std_cxx11::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));

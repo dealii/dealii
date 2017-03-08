@@ -122,6 +122,12 @@ int main ()
   deallog << std::fixed;
   deallog.attach(logfile);
 
+  // there used to be a bug in the cell similarity detection for the above
+  // test pattern of an FE_RaviartThomas inside and FESystem, but cell
+  // similarity is only enabled without threads. to make sure this test is
+  // effective, manually set the thread limit 1.
+  MultithreadInfo::set_thread_limit(1);
+
   deallog.push ("2d");
   check<2> ();
   deallog.pop ();
