@@ -8968,6 +8968,7 @@ Triangulation (const MeshSmoothing smooth_grid,
   signals.create.connect (signals.any_change);
   signals.post_refinement.connect (signals.any_change);
   signals.clear.connect (signals.any_change);
+  signals.mesh_movement.connect (signals.any_change);
 }
 
 

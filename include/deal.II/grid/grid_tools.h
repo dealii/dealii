@@ -1729,7 +1729,7 @@ namespace GridTools
       }
 
     // Make sure FEValues notices that the mesh has changed
-    triangulation.signals.post_refinement();
+    triangulation.signals.mesh_movement();
   }
 
 
