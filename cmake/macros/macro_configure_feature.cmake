@@ -67,15 +67,6 @@
 #                                                                      #
 ########################################################################
 
-#
-# Some black magic to have substitution in command names:
-#
-MACRO(RUN_COMMAND _the_command)
-  FILE(WRITE "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/macro_configure_feature.tmp"
-    "${_the_command}")
-  INCLUDE("${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/macro_configure_feature.tmp")
-ENDMACRO()
-
 
 #
 # A small macro to set the DEAL_II_WITH_${_feature} variables:
@@ -226,7 +217,7 @@ MACRO(CONFIGURE_FEATURE _feature)
         PURGE_FEATURE(${_feature})
 
         IF(FEATURE_${_feature}_HAVE_BUNDLED)
-          RUN_COMMAND("FEATURE_${_feature}_CONFIGURE_BUNDLED()")
+          EVALUATE_EXPRESSION("FEATURE_${_feature}_CONFIGURE_BUNDLED()")
           MESSAGE(STATUS "DEAL_II_WITH_${_feature} successfully set up with bundled packages.")
           SET(FEATURE_${_feature}_BUNDLED_CONFIGURED TRUE)
           SET_CACHED_OPTION(${_feature} ON)
@@ -242,14 +233,14 @@ MACRO(CONFIGURE_FEATURE _feature)
         # Second case: We are allowed to search for an external library
         #
         IF(COMMAND FEATURE_${_feature}_FIND_EXTERNAL)
-          RUN_COMMAND("FEATURE_${_feature}_FIND_EXTERNAL(FEATURE_${_feature}_EXTERNAL_FOUND)")
+          EVALUATE_EXPRESSION("FEATURE_${_feature}_FIND_EXTERNAL(FEATURE_${_feature}_EXTERNAL_FOUND)")
         ELSE()
           FEATURE_FIND_EXTERNAL(${_feature} FEATURE_${_feature}_EXTERNAL_FOUND)
         ENDIF()
 
         IF(FEATURE_${_feature}_EXTERNAL_FOUND)
           IF(COMMAND FEATURE_${_feature}_CONFIGURE_EXTERNAL)
-            RUN_COMMAND("FEATURE_${_feature}_CONFIGURE_EXTERNAL()")
+            EVALUATE_EXPRESSION("FEATURE_${_feature}_CONFIGURE_EXTERNAL()")
           ENDIF()
 
           MESSAGE(STATUS "DEAL_II_WITH_${_feature} successfully set up with external dependencies.")
@@ -263,7 +254,7 @@ MACRO(CONFIGURE_FEATURE _feature)
           MESSAGE(STATUS "DEAL_II_WITH_${_feature} has unmet external dependencies.")
 
           IF(FEATURE_${_feature}_HAVE_BUNDLED AND DEAL_II_ALLOW_BUNDLED)
-            RUN_COMMAND("FEATURE_${_feature}_CONFIGURE_BUNDLED()")
+            EVALUATE_EXPRESSION("FEATURE_${_feature}_CONFIGURE_BUNDLED()")
 
             MESSAGE(STATUS "DEAL_II_WITH_${_feature} successfully set up with bundled packages.")
             SET(FEATURE_${_feature}_BUNDLED_CONFIGURED TRUE)
@@ -272,7 +263,7 @@ MACRO(CONFIGURE_FEATURE _feature)
           ELSE()
             IF(DEAL_II_WITH_${_feature})
               IF(COMMAND FEATURE_${_feature}_ERROR_MESSAGE)
-                RUN_COMMAND("FEATURE_${_feature}_ERROR_MESSAGE()")
+                 EVALUATE_EXPRESSION("FEATURE_${_feature}_ERROR_MESSAGE()")
               ELSE()
                 FEATURE_ERROR_MESSAGE(${_feature})
               ENDIF()
