@@ -37,7 +37,7 @@ ENDIF()
 #
 # Are all dependencies fulfilled?
 #
-IF(NOT DEAL_II_WITH_LAPACK)
+IF(NOT DEAL_II_WITH_LAPACK) # keep in one line
   MESSAGE(FATAL_ERROR "
 Error! The deal.II library found at ${DEAL_II_PATH} was not configured with
     DEAL_II_WITH_LAPACK = ON
