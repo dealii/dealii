@@ -496,6 +496,8 @@ void
 LAPACKFullMatrix<number>::compute_lu_factorization()
 {
   Assert(state == matrix, ExcState(state));
+  state = LAPACKSupport::unusable;
+
   const int mm = this->n_rows();
   const int nn = this->n_cols();
   number *values = const_cast<number *> (&this->values[0]);
