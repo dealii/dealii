@@ -504,9 +504,11 @@ LAPACKFullMatrix<number>::compute_lu_factorization()
   getrf(&mm, &nn, values, &mm, &ipiv[0], &info);
 
   Assert(info >= 0, ExcInternalError());
-  AssertThrow(info == 0, LACExceptions::ExcSingular());
-
+  
+  // if info >= 0, the factorization has been completed
   state = lu;
+    
+  AssertThrow(info == 0, LACExceptions::ExcSingular());
 }
 
 
