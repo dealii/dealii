@@ -496,6 +496,8 @@ void
 LAPACKFullMatrix<number>::compute_lu_factorization()
 {
   Assert(state == matrix, ExcState(state));
+  state = LAPACKSupport::unusable;
+
   const int mm = this->n_rows();
   const int nn = this->n_cols();
   number *values = const_cast<number *> (&this->values[0]);
@@ -504,9 +506,11 @@ LAPACKFullMatrix<number>::compute_lu_factorization()
   getrf(&mm, &nn, values, &mm, &ipiv[0], &info);
 
   Assert(info >= 0, ExcInternalError());
-  AssertThrow(info == 0, LACExceptions::ExcSingular());
 
+  // if info >= 0, the factorization has been completed
   state = lu;
+
+  AssertThrow(info == 0, LACExceptions::ExcSingular());
 }
 
 
