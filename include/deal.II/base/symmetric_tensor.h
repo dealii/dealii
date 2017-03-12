@@ -1215,17 +1215,15 @@ namespace internal
       {
       case 1:
         return data[0] * sdata[0];
-      case 2:
-        return (data[0] * sdata[0] +
-                data[1] * sdata[1] +
-                NumberType<Number>::value(2.0) * data[2] * sdata[2]);
       default:
         // Start with the non-diagonal part to avoid some multiplications by
         // 2.
         Number sum = data[dim] * sdata[dim];
         for (unsigned int d=dim+1; d<(dim*(dim+1)/2); ++d)
           sum += data[d] * sdata[d];
-        sum *= NumberType<Number>::value(2.0);
+        sum += sum; // sum = sum * 2.;
+
+        // Now add the contributions from the diagonal
         for (unsigned int d=0; d<dim; ++d)
           sum += data[d] * sdata[d];
         return sum;
@@ -1259,10 +1257,16 @@ namespace internal
     typename SymmetricTensorAccessors::StorageType<2,dim,Number>::base_tensor_type tmp;
     for (unsigned int i=0; i<tmp.dimension; ++i)
       {
+        // Start with the non-diagonal part
+        Number sum = data[dim] * sdata[dim][i];
+        for (unsigned int d=dim+1; d<(dim*(dim+1)/2); ++d)
+          sum += data[d] * sdata[d][i];
+        sum += sum; // sum = sum * 2.;
+
+        // Now add the contributions from the diagonal
         for (unsigned int d=0; d<dim; ++d)
-          tmp[i] += data[d] * sdata[d][i];
-        for (unsigned int d=dim; d<(dim*(dim+1)/2); ++d)
-          tmp[i] += 2. * data[d] * sdata[d][i];
+          sum += data[d] * sdata[d][i];
+        tmp[i] = sum;
       }
     return tmp;
   }
@@ -1281,10 +1285,14 @@ namespace internal
     for (unsigned int i=0; i<data_dim; ++i)
       for (unsigned int j=0; j<data_dim; ++j)
         {
+          // Start with the non-diagonal part
+          for (unsigned int d=dim; d<(dim*(dim+1)/2); ++d)
+            tmp[i][j] += data[i][d] * sdata[d][j];
+          tmp[i][j] += tmp[i][j]; // tmp[i][j] = tmp[i][j] * 2;
+
+          // Now add the contributions from the diagonal
           for (unsigned int d=0; d<dim; ++d)
             tmp[i][j] += data[i][d] * sdata[d][j];
-          for (unsigned int d=dim; d<(dim*(dim+1)/2); ++d)
-            tmp[i][j] += 2. * data[i][d] * sdata[d][j];
         }
     return tmp;
   }
@@ -2159,14 +2167,17 @@ Number determinant (const SymmetricTensor<2,dim,Number> &t)
     case 2:
       return (t.data[0] * t.data[1] - t.data[2]*t.data[2]);
     case 3:
+    {
       // in analogy to general tensors, but
       // there's something to be simplified for
       // the present case
-      return ( t.data[0]*t.data[1]*t.data[2]
+      const Number tmp = t.data[3]*t.data[4]*t.data[5];
+      return ( tmp + tmp
+               +t.data[0]*t.data[1]*t.data[2]
                -t.data[0]*t.data[5]*t.data[5]
                -t.data[1]*t.data[4]*t.data[4]
-               -t.data[2]*t.data[3]*t.data[3]
-               +internal::NumberType<Number>::value(2.0) * t.data[3]*t.data[4]*t.data[5] );
+               -t.data[2]*t.data[3]*t.data[3]);
+    }
     default:
       Assert (false, ExcNotImplemented());
       return 0;
