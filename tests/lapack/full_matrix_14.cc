@@ -44,6 +44,11 @@ void test(const bool is_singular)
   catch (std::exception &exc)
     {
       deallog << "matrix is singular" << std::endl;
+      // Some implementations of LAPACK do not detect that the vector we pass
+      // down to the compute_factorization call is compatible with a singular
+      // matrix and divide by zero that triggers a floating point exception,
+      // so we add a small number to the diagonal of the matrix.
+      A(n-1,n-1) += 1e-50;
     }
 
   Vector<double> v(n);
