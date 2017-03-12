@@ -1,0 +1,6 @@
+Fixed: By moving a forward declaration of VectorizedArray to a more central
+place, it is now possible to use the norm() methods of Tensor, Point or
+SymmetricTensor objects of VectorizedArray classes without particular order of
+include files.
+<br>
+(Martin Kronbichler, 2017/03/12)
