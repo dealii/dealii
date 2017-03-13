@@ -124,6 +124,77 @@ FE_BDM<dim>::clone() const
 
 template <int dim>
 void
+FE_BDM<dim>::
+convert_generalized_support_point_values_to_nodal_values (const std::vector<Vector<double> > &support_point_values,
+                                                          std::vector<double> &nodal_values) const
+{
+  Assert (support_point_values.size() == this->generalized_support_points.size(),
+          ExcDimensionMismatch(support_point_values.size(), this->generalized_support_points.size()));
+  AssertDimension (support_point_values[0].size(), dim);
+  Assert (nodal_values.size() == this->dofs_per_cell,
+          ExcDimensionMismatch(nodal_values.size(),this->dofs_per_cell));
+
+  // First do interpolation on faces. There, the component evaluated
+  // depends on the face direction and orientation.
+
+  // The index of the first dof on this face or the cell
+  unsigned int dbase = 0;
+  // The index of the first generalized support point on this face or the cell
+  unsigned int pbase = 0;
+  for (unsigned int f = 0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+    {
+      // Old version with no moments in 2D. See comment below in
+      // initialize_support_points()
+      if (test_values_face.size() == 0)
+        {
+          for (unsigned int i=0; i<this->dofs_per_face; ++i)
+            nodal_values[dbase+i] = support_point_values[pbase+i][GeometryInfo<dim>::unit_normal_direction[f]];
+          pbase += this->dofs_per_face;
+        }
+      else
+        {
+          for (unsigned int i=0; i<this->dofs_per_face; ++i)
+            {
+              double s = 0.;
+              for (unsigned int k=0; k<test_values_face.size(); ++k)
+                s += support_point_values[pbase+k][GeometryInfo<dim>::unit_normal_direction[f]] * test_values_face[k][i];
+              nodal_values[dbase+i] = s;
+            }
+          pbase += test_values_face.size();
+        }
+      dbase += this->dofs_per_face;
+    }
+
+  AssertDimension (dbase, this->dofs_per_face * GeometryInfo<dim>::faces_per_cell);
+  AssertDimension (pbase, this->generalized_support_points.size() - test_values_cell.size());
+
+  // Done for BDM1
+  if (dbase == this->dofs_per_cell) return;
+
+  // What's missing are the interior
+  // degrees of freedom. In each
+  // point, we take all components of
+  // the solution.
+  Assert ((this->dofs_per_cell - dbase) % dim == 0, ExcInternalError());
+
+  for (unsigned int d=0; d<dim; ++d, dbase += test_values_cell[0].size())
+    {
+      for (unsigned int i=0; i<test_values_cell[0].size(); ++i)
+        {
+          double s = 0.;
+          for (unsigned int k=0; k<test_values_cell.size(); ++k)
+            s += support_point_values[pbase+k][d] * test_values_cell[k][i];
+          nodal_values[dbase+i] = s;
+        }
+    }
+
+  Assert (dbase == this->dofs_per_cell, ExcInternalError());
+}
+
+
+
+template <int dim>
+void
 FE_BDM<dim>::interpolate(
   std::vector<double> &,
   const std::vector<double> &) const

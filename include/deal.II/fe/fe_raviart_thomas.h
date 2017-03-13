@@ -128,6 +128,12 @@ public:
   virtual bool has_support_on_face (const unsigned int shape_index,
                                     const unsigned int face_index) const;
 
+  // documentation inherited from the base class
+  virtual
+  void
+  convert_generalized_support_point_values_to_nodal_values (const std::vector<Vector<double> > &support_point_values,
+                                                            std::vector<double>                &nodal_values) const;
+
   virtual void interpolate(std::vector<double>                &local_dofs,
                            const std::vector<double>          &values) const DEAL_II_DEPRECATED;
 
@@ -260,6 +266,11 @@ public:
 
   virtual FiniteElement<dim> *clone () const;
 
+  // documentation inherited from the base class
+  virtual
+  void
+  convert_generalized_support_point_values_to_nodal_values (const std::vector<Vector<double> > &support_point_values,
+                                                            std::vector<double>                &nodal_values) const;
   virtual void interpolate(std::vector<double>                &local_dofs,
                            const std::vector<double> &values) const DEAL_II_DEPRECATED;
 

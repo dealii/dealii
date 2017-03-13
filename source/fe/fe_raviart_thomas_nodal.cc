@@ -280,6 +280,55 @@ FE_RaviartThomasNodal<dim>::has_support_on_face (
 }
 
 
+
+template <int dim>
+void
+FE_RaviartThomasNodal<dim>::
+convert_generalized_support_point_values_to_nodal_values(const std::vector<Vector<double> > &support_point_values,
+                                                         std::vector<double>    &nodal_values) const
+{
+  Assert (support_point_values.size() == this->generalized_support_points.size(),
+          ExcDimensionMismatch(support_point_values.size(), this->generalized_support_points.size()));
+  Assert (nodal_values.size() == this->dofs_per_cell,
+          ExcDimensionMismatch(nodal_values.size(),this->dofs_per_cell));
+  Assert (support_point_values[0].size() == this->n_components(),
+          ExcDimensionMismatch(support_point_values[0].size(),this->n_components()));
+
+  // First do interpolation on
+  // faces. There, the component
+  // evaluated depends on the face
+  // direction and orientation.
+  unsigned int fbase = 0;
+  unsigned int f=0;
+  for (; f<GeometryInfo<dim>::faces_per_cell;
+       ++f, fbase+=this->dofs_per_face)
+    {
+      for (unsigned int i=0; i<this->dofs_per_face; ++i)
+        {
+          nodal_values[fbase+i] = support_point_values[fbase+i](GeometryInfo<dim>::unit_normal_direction[f]);
+        }
+    }
+
+  // The remaining points form dim
+  // chunks, one for each component.
+  const unsigned int istep = (this->dofs_per_cell - fbase) / dim;
+  Assert ((this->dofs_per_cell - fbase) % dim == 0, ExcInternalError());
+
+  f = 0;
+  while (fbase < this->dofs_per_cell)
+    {
+      for (unsigned int i=0; i<istep; ++i)
+        {
+          nodal_values[fbase+i] = support_point_values[fbase+i](f);
+        }
+      fbase+=istep;
+      ++f;
+    }
+  Assert (fbase == this->dofs_per_cell, ExcInternalError());
+}
+
+
+
 template <int dim>
 void
 FE_RaviartThomasNodal<dim>::interpolate(

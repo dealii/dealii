@@ -460,6 +460,42 @@ FE_RaviartThomas<dim>::has_support_on_face (
 }
 
 
+
+template <int dim>
+void
+FE_RaviartThomas<dim>::
+convert_generalized_support_point_values_to_nodal_values(const std::vector<Vector<double> > &support_point_values,
+                                                         std::vector<double>    &nodal_values) const
+{
+  Assert (support_point_values.size() == this->generalized_support_points.size(),
+          ExcDimensionMismatch(support_point_values.size(), this->generalized_support_points.size()));
+  Assert (nodal_values.size() == this->dofs_per_cell,
+          ExcDimensionMismatch(nodal_values.size(),this->dofs_per_cell));
+  Assert (support_point_values[0].size() == this->n_components(),
+          ExcDimensionMismatch(support_point_values[0].size(),this->n_components()));
+
+  std::fill(nodal_values.begin(), nodal_values.end(), 0.);
+
+  const unsigned int n_face_points = boundary_weights.size(0);
+  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+    for (unsigned int k=0; k<n_face_points; ++k)
+      for (unsigned int i=0; i<boundary_weights.size(1); ++i)
+        {
+          nodal_values[i+face*this->dofs_per_face] += boundary_weights(k,i)
+                                                      * support_point_values[face*n_face_points+k](GeometryInfo<dim>::unit_normal_direction[face]);
+        }
+
+  const unsigned int start_cell_dofs = GeometryInfo<dim>::faces_per_cell*this->dofs_per_face;
+  const unsigned int start_cell_points = GeometryInfo<dim>::faces_per_cell*n_face_points;
+
+  for (unsigned int k=0; k<interior_weights.size(0); ++k)
+    for (unsigned int i=0; i<interior_weights.size(1); ++i)
+      for (unsigned int d=0; d<dim; ++d)
+        nodal_values[start_cell_dofs+i*dim+d] += interior_weights(k,i,d) * support_point_values[k+start_cell_points](d);
+}
+
+
+
 // Since this is a vector valued element, we cannot interpolate a
 // scalar function
 template <int dim>

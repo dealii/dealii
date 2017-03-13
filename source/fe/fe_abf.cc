@@ -510,6 +510,68 @@ FE_ABF<dim>::has_support_on_face (const unsigned int shape_index,
 
 template <int dim>
 void
+FE_ABF<dim>::
+convert_generalized_support_point_values_to_nodal_values (const std::vector<Vector<double> > &support_point_values,
+                                                          std::vector<double>                &nodal_values) const
+{
+  Assert (support_point_values.size() == this->generalized_support_points.size(),
+          ExcDimensionMismatch(support_point_values.size(), this->generalized_support_points.size()));
+  Assert (support_point_values[0].size() == this->n_components(),
+          ExcDimensionMismatch(support_point_values[0].size(), this->n_components()));
+  Assert (nodal_values.size() == this->dofs_per_cell,
+          ExcDimensionMismatch(nodal_values.size(),this->dofs_per_cell));
+
+  std::fill(nodal_values.begin(), nodal_values.end(), 0.);
+
+  const unsigned int n_face_points = boundary_weights.size(0);
+  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+    for (unsigned int k=0; k<n_face_points; ++k)
+      for (unsigned int i=0; i<boundary_weights.size(1); ++i)
+        {
+          nodal_values[i+face*this->dofs_per_face] += boundary_weights(k,i)
+                                                      * support_point_values[face*n_face_points+k][GeometryInfo<dim>::unit_normal_direction[face]];
+        }
+
+  const unsigned int start_cell_dofs = GeometryInfo<dim>::faces_per_cell*this->dofs_per_face;
+  const unsigned int start_cell_points = GeometryInfo<dim>::faces_per_cell*n_face_points;
+
+  for (unsigned int k=0; k<interior_weights.size(0); ++k)
+    for (unsigned int i=0; i<interior_weights.size(1); ++i)
+      for (unsigned int d=0; d<dim; ++d)
+        nodal_values[start_cell_dofs+i*dim+d] += interior_weights(k,i,d) * support_point_values[k+start_cell_points][d];
+
+  const unsigned int start_abf_dofs = start_cell_dofs + interior_weights.size(1) * dim;
+
+  // Cell integral of ABF terms
+  for (unsigned int k=0; k<interior_weights_abf.size(0); ++k)
+    for (unsigned int i=0; i<interior_weights_abf.size(1); ++i)
+      for (unsigned int d=0; d<dim; ++d)
+        nodal_values[start_abf_dofs+i] += interior_weights_abf(k,i,d) * support_point_values[k+start_cell_points][d];
+
+  // Face integral of ABF terms
+  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+    {
+      double n_orient = (double) GeometryInfo<dim>::unit_normal_orientation[face];
+      for (unsigned int fp=0; fp < n_face_points; ++fp)
+        {
+          // TODO: Check what the face_orientation, face_flip and face_rotation have to be in 3D
+          unsigned int k = QProjector<dim>::DataSetDescriptor::face (face, false, false, false, n_face_points);
+          for (unsigned int i=0; i<boundary_weights_abf.size(1); ++i)
+            nodal_values[start_abf_dofs+i] += n_orient * boundary_weights_abf(k + fp, i)
+                                              * support_point_values[k + fp][GeometryInfo<dim>::unit_normal_direction[face]];
+        }
+    }
+
+  // TODO: Check if this "correction" can be removed.
+  for (unsigned int i=0; i<boundary_weights_abf.size(1); ++i)
+    if (std::fabs (nodal_values[start_abf_dofs+i]) < 1.0e-16)
+      nodal_values[start_abf_dofs+i] = 0.0;
+}
+
+
+
+template <int dim>
+void
 FE_ABF<dim>::interpolate(
   std::vector<double> &,
   const std::vector<double> &) const
@@ -580,6 +642,8 @@ FE_ABF<dim>::interpolate(
       local_dofs[start_abf_dofs+i] = 0.0;
 }
 
+
+
 template <int dim>
 void
 FE_ABF<dim>::interpolate(
@@ -639,6 +703,7 @@ FE_ABF<dim>::interpolate(
     if (std::fabs (local_dofs[start_abf_dofs+i]) < 1.0e-16)
       local_dofs[start_abf_dofs+i] = 0.0;
 }
+
 
 
 template <int dim>
