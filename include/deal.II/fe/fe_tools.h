@@ -234,7 +234,7 @@ namespace FETools
   /**
    * This is a rather specialized function used during the construction of
    * finite element objects. It is used to build the basis of shape functions
-   * for an element given a set of polynomials and interpolation points. The
+   * for an element, given a set of polynomials and interpolation points. The
    * function is only implemented for finite elements with exactly @p dim
    * vector components. In particular, this applies to classes derived from
    * the FE_PolyTensor class.
@@ -291,7 +291,8 @@ namespace FETools
    *   that returns a scalar.
    * - That the finite element has exactly @p dim vector components.
    * - That the function $f_j$ is given by whatever the element implements
-   *   through the FiniteElement::interpolate() function.
+   *   through the FiniteElement::convert_generalized_support_point_values_to_nodal_values()
+   *   function.
    *
    * @param fe The finite element for which the operations above are to be
    *        performed.

@@ -1627,8 +1627,8 @@ namespace FETools
     // We need the values of the polynomials in all generalized support points.
     // This function specifically works for the case where shape functions
     // have 'dim' vector components, so allocate that much space
-    std::vector<std::vector<double> >
-    values (dim, std::vector<double>(points.size()));
+    std::vector<Vector<double> >
+    values (points.size(), Vector<double>(dim));
 
     // In this vector, we store the
     // result of the interpolation
@@ -1645,11 +1645,12 @@ namespace FETools
         for (unsigned int k=0; k<points.size(); ++k)
           for (unsigned int d=0; d<dim; ++d)
             {
-              values[d][k] = fe.shape_value_component(i, points[k], d);
-              Assert (numbers::is_finite(values[d][k]), ExcInternalError());
+              values[k][d] = fe.shape_value_component(i, points[k], d);
+              Assert (numbers::is_finite(values[k][d]), ExcInternalError());
             }
 
-        fe.interpolate(local_dofs, values);
+        fe.convert_generalized_support_point_values_to_nodal_values(values,
+                                                                    local_dofs);
 
         // Enter the interpolated dofs into the matrix
         for (unsigned int j=0; j<n_dofs; ++j)
