@@ -123,7 +123,7 @@ void check_quadrature(double *exact_monomials)
           err = std::fabs(quadrature_int-exact_monomials[i]);
           deallog << "Quadrature order " << n << ", polynomial of degree " << i << ": ";
 
-          if (err < 1.e-15)
+          if (err < 1.e-14)
             deallog << "exact." << std::endl;
           else
             deallog << "error " << err << std::endl;

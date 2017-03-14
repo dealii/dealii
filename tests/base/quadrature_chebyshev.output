@@ -410,7 +410,7 @@ DEAL::Quadrature order 13, polynomial of degree 22: exact.
 DEAL::Quadrature order 13, polynomial of degree 23: exact.
 DEAL::Quadrature order 13, polynomial of degree 24: exact.
 DEAL::Quadrature order 13, polynomial of degree 25: exact.
-DEAL::Quadrature order 13, polynomial of degree 26: error 0
+DEAL::Quadrature order 13, polynomial of degree 26: exact.
 DEAL::Quadrature order 13, polynomial of degree 27: error 0
 DEAL::Quadrature order 13, polynomial of degree 28: error 0
 DEAL::Quadrature order 13, polynomial of degree 29: error 0
@@ -445,8 +445,8 @@ DEAL::Quadrature order 14, polynomial of degree 25: exact.
 DEAL::Quadrature order 14, polynomial of degree 26: exact.
 DEAL::Quadrature order 14, polynomial of degree 27: exact.
 DEAL::Quadrature order 14, polynomial of degree 28: exact.
-DEAL::Quadrature order 14, polynomial of degree 29: error 0
-DEAL::Quadrature order 14, polynomial of degree 30: error 0
+DEAL::Quadrature order 14, polynomial of degree 29: exact.
+DEAL::Quadrature order 14, polynomial of degree 30: exact.
 DEAL::Quadrature order 14, polynomial of degree 31: error 0
 DEAL::Quadrature order 15, polynomial of degree 0: exact.
 DEAL::Quadrature order 15, polynomial of degree 1: exact.
@@ -954,7 +954,7 @@ DEAL::Quadrature order 13, polynomial of degree 21: exact.
 DEAL::Quadrature order 13, polynomial of degree 22: exact.
 DEAL::Quadrature order 13, polynomial of degree 23: exact.
 DEAL::Quadrature order 13, polynomial of degree 24: exact.
-DEAL::Quadrature order 13, polynomial of degree 25: error 0
+DEAL::Quadrature order 13, polynomial of degree 25: exact.
 DEAL::Quadrature order 13, polynomial of degree 26: error 0
 DEAL::Quadrature order 13, polynomial of degree 27: error 0
 DEAL::Quadrature order 13, polynomial of degree 28: error 0
@@ -989,7 +989,7 @@ DEAL::Quadrature order 14, polynomial of degree 24: exact.
 DEAL::Quadrature order 14, polynomial of degree 25: exact.
 DEAL::Quadrature order 14, polynomial of degree 26: exact.
 DEAL::Quadrature order 14, polynomial of degree 27: exact.
-DEAL::Quadrature order 14, polynomial of degree 28: error 0
+DEAL::Quadrature order 14, polynomial of degree 28: exact.
 DEAL::Quadrature order 14, polynomial of degree 29: error 0
 DEAL::Quadrature order 14, polynomial of degree 30: error 0
 DEAL::Quadrature order 14, polynomial of degree 31: error 0
@@ -1024,7 +1024,7 @@ DEAL::Quadrature order 15, polynomial of degree 27: exact.
 DEAL::Quadrature order 15, polynomial of degree 28: exact.
 DEAL::Quadrature order 15, polynomial of degree 29: exact.
 DEAL::Quadrature order 15, polynomial of degree 30: exact.
-DEAL::Quadrature order 15, polynomial of degree 31: error 0
+DEAL::Quadrature order 15, polynomial of degree 31: exact.
 DEAL::Quadrature order 16, polynomial of degree 0: exact.
 DEAL::Quadrature order 16, polynomial of degree 1: exact.
 DEAL::Quadrature order 16, polynomial of degree 2: exact.
@@ -1700,7 +1700,7 @@ DEAL::Quadrature order 3, polynomial of degree 29: error 0.45767732
 DEAL::Quadrature order 3, polynomial of degree 30: error 0.46313933
 DEAL::Quadrature order 3, polynomial of degree 31: error 0.46833705
 DEAL::Quadrature order 4, polynomial of degree 0: exact.
-DEAL::Quadrature order 4, polynomial of degree 1: error 0
+DEAL::Quadrature order 4, polynomial of degree 1: exact.
 DEAL::Quadrature order 4, polynomial of degree 2: exact.
 DEAL::Quadrature order 4, polynomial of degree 3: exact.
 DEAL::Quadrature order 4, polynomial of degree 4: exact.
@@ -2045,7 +2045,7 @@ DEAL::Quadrature order 14, polynomial of degree 22: exact.
 DEAL::Quadrature order 14, polynomial of degree 23: exact.
 DEAL::Quadrature order 14, polynomial of degree 24: exact.
 DEAL::Quadrature order 14, polynomial of degree 25: exact.
-DEAL::Quadrature order 14, polynomial of degree 26: error 0
+DEAL::Quadrature order 14, polynomial of degree 26: exact.
 DEAL::Quadrature order 14, polynomial of degree 27: error 0
 DEAL::Quadrature order 14, polynomial of degree 28: error 0
 DEAL::Quadrature order 14, polynomial of degree 29: error 0
@@ -2081,7 +2081,7 @@ DEAL::Quadrature order 15, polynomial of degree 26: exact.
 DEAL::Quadrature order 15, polynomial of degree 27: exact.
 DEAL::Quadrature order 15, polynomial of degree 28: exact.
 DEAL::Quadrature order 15, polynomial of degree 29: exact.
-DEAL::Quadrature order 15, polynomial of degree 30: error 0
+DEAL::Quadrature order 15, polynomial of degree 30: exact.
 DEAL::Quadrature order 15, polynomial of degree 31: error 0
 DEAL::Quadrature order 16, polynomial of degree 0: exact.
 DEAL::Quadrature order 16, polynomial of degree 1: exact.
