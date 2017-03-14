@@ -1606,6 +1606,45 @@ next_cell:
   }
 
 
+  template <class MeshType>
+  std::vector<typename MeshType::cell_iterator>
+  compute_cell_halo_layer_on_level
+  (const MeshType     &mesh,
+   const unsigned int my_level_subdomain_id,
+   const unsigned int level)
+  {
+    std::vector<typename MeshType::cell_iterator> level_halo_layer;
+    std::vector<bool> locally_active_vertices_on_level_subdomain (mesh.get_triangulation().n_vertices(),
+        false);
+
+    // Find the cells which are locally owned.
+    // These are the cells around which we wish to construct
+    // the halo layer
+    for (typename MeshType::cell_iterator
+         cell = mesh.begin(level);
+         cell != mesh.end(level); ++cell)
+      if (cell->level_subdomain_id() == my_level_subdomain_id)
+        for (unsigned int v=0; v<GeometryInfo<MeshType::dimension>::vertices_per_cell; ++v)
+          locally_active_vertices_on_level_subdomain[cell->vertex_index(v)] = true;
+
+    // Find the cells which are not locally owned
+    // but share a vertex with the selected level subdomain
+    // These comprise the halo layer
+    for (typename MeshType::cell_iterator
+         cell = mesh.begin(level);
+         cell != mesh.end(level); ++cell)
+      if (cell->level_subdomain_id() != my_level_subdomain_id) //False -> possible halo layer cell
+        for (unsigned int v=0; v<GeometryInfo<MeshType::dimension>::vertices_per_cell; ++v)
+          if (locally_active_vertices_on_level_subdomain[cell->vertex_index(v)] == true)
+            {
+              level_halo_layer.push_back(cell);
+              break;
+            }
+
+    return level_halo_layer;
+  }
+
+
 
   template <class MeshType>
   std::vector<typename MeshType::active_cell_iterator>
@@ -1626,6 +1665,7 @@ next_cell:
 
     return active_halo_layer;
   }
+
 
 
 
@@ -2041,6 +2081,32 @@ next_cell:
   }
 
 
+  template <int dim, int spacedim>
+  void
+  get_vertex_connectivity_of_cells_on_level (const Triangulation<dim,spacedim> &triangulation,
+                                             const unsigned int                level,
+                                             DynamicSparsityPattern            &cell_connectivity)
+  {
+    std::vector<std::vector<unsigned int> > vertex_to_cell(triangulation.n_vertices());
+    for (typename Triangulation<dim,spacedim>::cell_iterator cell=
+           triangulation.begin(level); cell != triangulation.end(level); ++cell)
+      {
+        for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+          vertex_to_cell[cell->vertex_index(v)].push_back(cell->index());
+      }
+
+    cell_connectivity.reinit (triangulation.n_cells(level),
+                              triangulation.n_cells(level));
+    for (typename Triangulation<dim,spacedim>::cell_iterator cell=
+           triangulation.begin(level); cell != triangulation.end(level); ++cell)
+      {
+        for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+          for (unsigned int n=0; n<vertex_to_cell[cell->vertex_index(v)].size(); ++n)
+            cell_connectivity.add(cell->index(), vertex_to_cell[cell->vertex_index(v)][n]);
+      }
+  }
+
+
 
   template <int dim, int spacedim>
   void
@@ -2124,6 +2190,155 @@ next_cell:
       cell->set_subdomain_id (partition_indices[cell->active_cell_index()]);
   }
 
+
+  namespace
+  {
+    /**
+     * recursive helper function for partition_triangulation_zorder
+     */
+    template <class IT>
+    void set_subdomain_id_in_zorder_recursively(IT cell,
+                                                unsigned int &current_proc_idx,
+                                                unsigned int &current_cell_idx,
+                                                const unsigned int n_active_cellls,
+                                                const unsigned int n_partitions)
+    {
+      if (cell->active())
+        {
+          while (current_cell_idx >= floor((long)n_active_cellls*(current_proc_idx+1)/n_partitions))
+            ++current_proc_idx;
+          cell->set_subdomain_id(current_proc_idx);
+          ++current_cell_idx;
+        }
+      else
+        {
+          for (unsigned int n=0; n<cell->n_children(); ++n)
+            set_subdomain_id_in_zorder_recursively(cell->child(n),
+                                                   current_proc_idx,
+                                                   current_cell_idx,
+                                                   n_active_cellls,
+                                                   n_partitions);
+        }
+    }
+  }
+
+  template <int dim, int spacedim>
+  void
+  partition_triangulation_zorder (const unsigned int          n_partitions,
+                                  Triangulation<dim,spacedim> &triangulation)
+  {
+    Assert ((dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
+             (&triangulation)
+             == 0),
+            ExcMessage ("Objects of type parallel::distributed::Triangulation "
+                        "are already partitioned implicitly and can not be "
+                        "partitioned again explicitly."));
+    Assert (n_partitions > 0, ExcInvalidNumberOfPartitions(n_partitions));
+
+    // check for an easy return
+    if (n_partitions == 1)
+      {
+        for (typename dealii::internal::ActiveCellIterator<dim, spacedim, Triangulation<dim, spacedim> >::type
+             cell = triangulation.begin_active();
+             cell != triangulation.end(); ++cell)
+          cell->set_subdomain_id (0);
+        return;
+      }
+
+    typedef typename Triangulation<dim,spacedim>::active_cell_iterator ac_it;
+    typedef typename Triangulation<dim,spacedim>::cell_iterator lvl_it;
+
+    unsigned int current_proc_idx=0;
+    unsigned int current_cell_idx=0;
+    const unsigned int n_active_cellls = triangulation.n_active_cells();
+
+    // create coarse cell reordering
+    std::vector<unsigned int> coarse_cell_to_p4est_tree_permutation;
+    std::vector<unsigned int> p4est_tree_to_coarse_cell_permutation;
+
+    DynamicSparsityPattern cell_connectivity;
+    GridTools::get_vertex_connectivity_of_cells_on_level (triangulation, 0, cell_connectivity);
+    coarse_cell_to_p4est_tree_permutation.resize (triangulation.n_cells(0));
+    SparsityTools::reorder_hierarchical (cell_connectivity,
+                                         coarse_cell_to_p4est_tree_permutation);
+
+    p4est_tree_to_coarse_cell_permutation
+      = Utilities::invert_permutation (coarse_cell_to_p4est_tree_permutation);
+
+    // set subdomain id for active cell descendants
+    // of each coarse cell in permuted order
+    for (unsigned int idx=0; idx<triangulation.n_cells(0); ++idx)
+      {
+        const unsigned int coarse_cell_idx = p4est_tree_to_coarse_cell_permutation[idx];
+        lvl_it coarse_cell (&triangulation, 0, coarse_cell_idx);
+        set_subdomain_id_in_zorder_recursively(coarse_cell,
+                                               current_proc_idx,
+                                               current_cell_idx,
+                                               n_active_cellls,
+                                               n_partitions);
+      }
+
+    // ensure terminal siblings are on the same
+    // processor as in p4est
+    {
+      typename Triangulation<dim,spacedim>::cell_iterator
+      cell = triangulation.begin(),
+      endc = triangulation.end();
+      for (; cell!=endc; ++cell)
+        {
+          if (cell->active())
+            continue;
+          bool all_children_active = true;
+          std::map<unsigned int, unsigned int> map_cpu_n_cells;
+          for (unsigned int n=0; n<cell->n_children(); ++n)
+            if (!cell->child(n)->active())
+              {
+                all_children_active = false;
+                break;
+              }
+            else
+              ++map_cpu_n_cells[cell->child(n)->subdomain_id()];
+
+          if (!all_children_active)
+            continue;
+
+          unsigned int new_owner = cell->child(0)->subdomain_id();
+          for (std::map<unsigned int, unsigned int>::iterator it = map_cpu_n_cells.begin();
+               it != map_cpu_n_cells.end();
+               ++it)
+            if (it->second > map_cpu_n_cells[new_owner])
+              new_owner = it->first;
+
+          for (unsigned int n=0; n<cell->n_children(); ++n)
+            cell->child(n)->set_subdomain_id(new_owner);
+        }
+    }
+  }
+
+
+  template <int dim, int spacedim>
+  void
+  partition_multigrid_levels (Triangulation<dim,spacedim> &triangulation)
+  {
+    unsigned int n_levels = triangulation.n_levels();
+    for (int lvl=n_levels-1; lvl>=0; --lvl)
+      {
+        typename Triangulation<dim,spacedim>::cell_iterator
+        cell = triangulation.begin(lvl),
+        endc=triangulation.end(lvl);
+        for (; cell!=endc; ++cell)
+          {
+            if (!cell->has_children())
+              cell->set_level_subdomain_id(cell->subdomain_id());
+            else
+              {
+                Assert(cell->child(0)->level_subdomain_id()
+                       != numbers::artificial_subdomain_id, ExcInternalError());
+                cell->set_level_subdomain_id(cell->child(0)->level_subdomain_id());
+              }
+          }
+      }
+  }
 
 
   template <int dim, int spacedim>

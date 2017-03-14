@@ -713,6 +713,20 @@ namespace GridTools
   (const MeshType                                                                    &mesh,
    const std_cxx11::function<bool (const typename MeshType::active_cell_iterator &)> &predicate);
 
+
+  /**
+   * Extract and return the layer of cells around a subdomain on a given level
+   * in the @p mesh (i.e. those that share a common set of
+   * vertices with the level subdomain but are not a part of it).
+   */
+  template <class MeshType>
+  std::vector<typename MeshType::cell_iterator>
+  compute_cell_halo_layer_on_level
+  (const MeshType     &mesh,
+   const unsigned int my_level_subdomain_id,
+   const unsigned int level);
+
+
   /**
    * Extract and return ghost cells which are the active cell layer around all
    * locally owned cells. This is most relevant for
@@ -821,6 +835,20 @@ namespace GridTools
                                     DynamicSparsityPattern             &connectivity);
 
   /**
+   * Produce a sparsity pattern for a given level mesh in which nonzero entries
+   * indicate that two cells are connected via a common vertex. The diagonal
+   * entries of the sparsity pattern are also set.
+   *
+   * The rows and columns refer to the cells as they are traversed in their
+   * natural order using cell iterators.
+   */
+  template <int dim, int spacedim>
+  void
+  get_vertex_connectivity_of_cells_on_level (const Triangulation<dim, spacedim> &triangulation,
+                                             const unsigned int                 level,
+                                             DynamicSparsityPattern             &connectivity);
+
+  /**
    * Use the METIS partitioner to generate a partitioning of the active cells
    * making up the entire domain. After calling this function, the subdomain
    * ids of all active cells will have values between zero and @p
@@ -884,6 +912,31 @@ namespace GridTools
   partition_triangulation (const unsigned int     n_partitions,
                            const SparsityPattern &cell_connection_graph,
                            Triangulation<dim,spacedim>    &triangulation);
+
+  /**
+   * Generates a partitioning of the active cells making up the entire domain
+   * using the same partitioning scheme as in the p4est library. After calling
+   * this function, the subdomain ids of all active cells will have values
+   * between zero and @p n_partitions-1. You can access the subdomain id of a
+   * cell by using <tt>cell-@>subdomain_id()</tt>.
+   */
+  template <int dim, int spacedim>
+  void
+  partition_triangulation_zorder (const unsigned int          n_partitions,
+                                  Triangulation<dim,spacedim> &triangulation);
+
+  /**
+   * Partitions the cells of a multigrid heirarchy by assigning level subdomain ids
+   * using the "youngest child" rule, that is, each cell in the heirarchy is owned by
+   * the processor who owns its left most child in the forrest, and active cells
+   * have the same subdomain id and level subdomain id. You can access the level subdomain
+   * id of a cell by using <tt>cell-@>level_subdomain_id()</tt>.
+   *
+   * Note: This function assumes that the active cells have already been partitioned.
+   */
+  template <int dim, int spacedim>
+  void
+  partition_multigrid_levels (Triangulation<dim,spacedim> &triangulation);
 
   /**
    * For each active cell, return in the output array to which subdomain (as

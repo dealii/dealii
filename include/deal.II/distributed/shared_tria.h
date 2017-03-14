@@ -78,25 +78,46 @@ namespace parallel
       enum Settings
       {
         /**
-         * Default settings, other options are disabled.
+         * Use METIS partitioner to partition active cells. This is the
+         * default partioning method.
          */
-        partition_metis = 0x0,
+        partition_metis = 0x1,
 
         /**
-         *
+         * Partition active cells with the same scheme used in the
+         * p4est library.
          */
-        partition_zorder = 0x1,
+        partition_zorder = 0x2,
 
         /**
+         * Partition cells using a custom, user defined function. This is
+         * accomplished by connecting the post_refinement signal to the
+         * triangulation whenever it is first created and passing the user
+         * defined function through the signal using <code>std_cxx11::bind</code>.
+         * Here is an example:
          *
+         *  @code
+         *     template <int dim>
+         *     void mypartition(parallel::shared::Triangulation<dim> &tria)
+         *     {
+         *       // user defined partitioning scheme
+         *     }
+         *
+         *     int main ()
+         *     {
+         *       parallel::shared::Triangulation<dim> tria(...,
+         *                                                 parallel::shared::Triangulation<dim>::Settings::partition_custom_signal);
+         *       shared_tria.signals.post_refinement.connect (std::bind(&mypartition<dim>, std::ref(shared_tria)));
+         *     }
+         *  @endcode
          */
-        partition_custom_signal = 0x2,
+        partition_custom_signal = 0x4,
 
         /**
          * This flags needs to be set to use the geometric multigrid
          * functionality. This option requires additional computation and
          * communication. Note: geometric multigrid is still a work in
-         * progress.
+         * progress and not yet functional for shared triangulation.
          */
         construct_multigrid_hierarchy = 0x8,
       };
