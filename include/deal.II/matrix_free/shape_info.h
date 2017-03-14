@@ -145,6 +145,18 @@ namespace internal
       AlignedVector<VectorizedArray<Number> > shape_hes_evenodd;
 
       /**
+       * Stores the shape gradients of the spectral element space
+       * FE_DGQ<1>(Quadrature<1>) for faster evaluation in even-odd format.
+       */
+      AlignedVector<VectorizedArray<Number> > shape_grad_spectral_eo;
+
+      /**
+       * Stores the shape gradients of the spectral element space
+       * FE_DGQ<1>(Quadrature<1>) for faster evaluation in standard format.
+       */
+      AlignedVector<VectorizedArray<Number> > shape_grad_spectral;
+
+      /**
        * Stores the indices from cell DoFs to face DoFs. The rows go through
        * the <tt>2*dim</tt> faces, and the columns the DoFs on the faces.
        */

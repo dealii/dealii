@@ -198,7 +198,7 @@ namespace internal
         AssertDimension(count_q, Utilities::fixed_power<dim>(shape_info.fe_degree+1));
       }
 
-    // These avoid compiler errors; they are only used in sensible context but
+    // These avoid compiler warnings; they are only used in sensible context but
     // compilers typically cannot detect when we access something like
     // gradients_quad[2] only for dim==3.
     const unsigned int d1 = dim>1?1:0;
@@ -206,6 +206,46 @@ namespace internal
     const unsigned int d3 = dim>2?3:0;
     const unsigned int d4 = dim>2?4:0;
     const unsigned int d5 = dim>2?5:0;
+
+    // check if we can go through the spectral evaluation option which is
+    // faster than the standard one
+    if (fe_degree+1 == n_q_points_1d &&
+        (type == MatrixFreeFunctions::tensor_symmetric ||
+         type == MatrixFreeFunctions::tensor_general) &&
+        evaluate_lapl == false)
+      {
+        Eval eval_grad(shape_info.shape_values,
+                       variant == evaluate_evenodd ? shape_info.shape_grad_spectral_eo :
+                       shape_info.shape_grad_spectral,
+                       shape_info.shape_hessians,
+                       shape_info.fe_degree,
+                       shape_info.n_q_points_1d);
+        for (unsigned int c=0; c<n_components; c++)
+          {
+            if (dim == 1)
+              eval.template values<0,true,false>(values_dofs[c], values_quad[c]);
+            else if (dim == 2)
+              {
+                eval.template values<0,true,false>(values_dofs[c], gradients_quad[c][0]);
+                eval.template values<1,true,false>(gradients_quad[c][0], values_quad[c]);
+              }
+            else if (dim == 3)
+              {
+                eval.template values<0,true,false>(values_dofs[c], values_quad[c]);
+                eval.template values<1,true,false>(values_quad[c], gradients_quad[c][0]);
+                eval.template values<2,true,false>(gradients_quad[c][0], values_quad[c]);
+              }
+            if (evaluate_grad == true)
+              {
+                eval_grad.template gradients<0,true,false>(values_quad[c], gradients_quad[c][0]);
+                if (dim >= 2)
+                  eval_grad.template gradients<1,true,false>(values_quad[c], gradients_quad[c][d1]);
+                if (dim >= 3)
+                  eval_grad.template gradients<2,true,false>(values_quad[c], gradients_quad[c][d2]);
+              }
+          }
+        return;
+      }
 
     switch (dim)
       {
@@ -399,11 +439,53 @@ namespace internal
                                    c*Utilities::fixed_power<dim>(shape_info.fe_degree+1);
       }
 
-    // These avoid compiler errors; they are only used in sensible context but
+    // These avoid compiler warnings; they are only used in sensible context but
     // compilers typically cannot detect when we access something like
     // gradients_quad[2] only for dim==3.
     const unsigned int d1 = dim>1?1:0;
     const unsigned int d2 = dim>2?2:0;
+
+    // check if we can go through the spectral evaluation option which is
+    // faster than the standard one
+    if (fe_degree+1 == n_q_points_1d &&
+        (type == MatrixFreeFunctions::tensor_symmetric ||
+         type == MatrixFreeFunctions::tensor_general))
+      {
+        Eval eval_grad(shape_info.shape_values,
+                       variant == evaluate_evenodd ? shape_info.shape_grad_spectral_eo :
+                       shape_info.shape_grad_spectral,
+                       shape_info.shape_hessians,
+                       shape_info.fe_degree,
+                       shape_info.n_q_points_1d);
+        for (unsigned int c=0; c<n_components; c++)
+          {
+            if (integrate_grad == true)
+              {
+                if (integrate_val)
+                  eval_grad.template gradients<0,false,true>(gradients_quad[c][0], values_quad[c]);
+                else
+                  eval_grad.template gradients<0,false,false>(gradients_quad[c][0], values_quad[c]);
+                if (dim >= 2)
+                  eval_grad.template gradients<1,false,true>(gradients_quad[c][d1], values_quad[c]);
+                if (dim >= 3)
+                  eval_grad.template gradients<2,false,true>(gradients_quad[c][d2], values_quad[c]);
+              }
+            if (dim == 1)
+              eval.template values<0,false,false>(values_quad[c], values_dofs[c]);
+            else if (dim == 2)
+              {
+                eval.template values<0,false,false>(values_quad[c], gradients_quad[c][0]);
+                eval.template values<1,false,false>(gradients_quad[c][0], values_dofs[c]);
+              }
+            else if (dim == 3)
+              {
+                eval.template values<0,false,false>(values_quad[c], gradients_quad[c][0]);
+                eval.template values<1,false,false>(gradients_quad[c][0], values_quad[c]);
+                eval.template values<2,false,false>(values_quad[c], values_dofs[c]);
+              }
+          }
+        return;
+      }
 
     switch (dim)
       {
@@ -527,8 +609,9 @@ namespace internal
       }
   }
 
-  // This a specialization for Gauss-Lobatto elements where the 'values'
-  // operation is identity, which allows us to write shorter code.
+  // This a specialization for "spectral" elements like Gauss-Lobatto elements
+  // where the 'values' operation is identity, which allows us to write
+  // shorter code.
   template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
   struct FEEvaluationImpl<MatrixFreeFunctions::tensor_gausslobatto, dim,
     fe_degree, n_q_points_1d, n_components, Number>
