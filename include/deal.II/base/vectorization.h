@@ -46,26 +46,6 @@
 #endif
 
 
-// forward declarations
-DEAL_II_NAMESPACE_OPEN
-template <typename Number> class VectorizedArray;
-template <typename T> struct EnableIfScalar;
-DEAL_II_NAMESPACE_CLOSE
-
-
-namespace std
-{
-  template <typename Number> DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number>
-  sqrt(const ::dealii::VectorizedArray<Number> &);
-  template <typename Number> DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number>
-  abs(const ::dealii::VectorizedArray<Number> &);
-  template <typename Number> DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number>
-  max(const ::dealii::VectorizedArray<Number> &, const ::dealii::VectorizedArray<Number> &);
-  template <typename Number> DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number>
-  min (const ::dealii::VectorizedArray<Number> &, const ::dealii::VectorizedArray<Number> &);
-}
-
-
 DEAL_II_NAMESPACE_OPEN
 
 
