@@ -2766,6 +2766,25 @@ namespace internal
     }
 
     template <typename VectorType>
+    void process_dof_gather (const unsigned int      *indices,
+                             VectorType              &vec,
+                             VectorizedArray<Number> &res,
+                             internal::bool2type<true>) const
+    {
+      res.gather(vec.begin(), indices);
+    }
+
+    template <typename VectorType>
+    void process_dof_gather (const unsigned int      *indices,
+                             VectorType              &vec,
+                             VectorizedArray<Number> &res,
+                             internal::bool2type<false>) const
+    {
+      for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+        res[v] = vector_access(const_cast<const VectorType &>(vec), indices[v]);
+    }
+
+    template <typename VectorType>
     void process_dof_global (const types::global_dof_index index,
                              VectorType         &vec,
                              Number             &res) const
@@ -2813,6 +2832,34 @@ namespace internal
     }
 
     template <typename VectorType>
+    void process_dof_gather (const unsigned int      *indices,
+                             VectorType              &vec,
+                             VectorizedArray<Number> &res,
+                             internal::bool2type<true>) const
+    {
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL < 3
+      for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+        vector_access(vec, indices[v]) += res[v];
+#else
+      // only use gather in case there is also scatter
+      VectorizedArray<Number> tmp;
+      tmp.gather(vec.begin(), indices);
+      tmp += res;
+      tmp.scatter(indices, vec.begin());
+#endif
+    }
+
+    template <typename VectorType>
+    void process_dof_gather (const unsigned int      *indices,
+                             VectorType              &vec,
+                             VectorizedArray<Number> &res,
+                             internal::bool2type<false>) const
+    {
+      for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+        vector_access(vec, indices[v]) += res[v];
+    }
+
+    template <typename VectorType>
     void process_dof_global (const types::global_dof_index index,
                              VectorType         &vec,
                              Number             &res) const
@@ -2856,6 +2903,25 @@ namespace internal
                       Number             &res) const
     {
       vector_access (vec, index) = res;
+    }
+
+    template <typename VectorType>
+    void process_dof_gather (const unsigned int      *indices,
+                             VectorType              &vec,
+                             VectorizedArray<Number> &res,
+                             internal::bool2type<true>) const
+    {
+      res.scatter(indices, vec.begin());
+    }
+
+    template <typename VectorType>
+    void process_dof_gather (const unsigned int      *indices,
+                             VectorType              &vec,
+                             VectorizedArray<Number> &res,
+                             internal::bool2type<false>) const
+    {
+      for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+        vector_access(vec, indices[v]) = res[v];
     }
 
     template <typename VectorType>
@@ -3071,11 +3137,11 @@ FEEvaluationBase<dim,n_components_,Number>
               // vectorization loop
               AssertDimension (dof_info->end_indices(cell)-dof_indices,
                                static_cast<int>(n_local_dofs));
-              for (unsigned int j=0; j<n_local_dofs; j+=VectorizedArray<Number>::n_array_elements)
-                for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
-                  for (unsigned int comp=0; comp<n_components; ++comp)
-                    operation.process_dof (dof_indices[j+v], *src[comp],
-                                           local_data[comp][j+v]);
+              for (unsigned int j=0, ind=0; j<dofs_per_cell; ++j, ind += VectorizedArray<Number>::n_array_elements)
+                for (unsigned int comp=0; comp<n_components; ++comp)
+                  operation.process_dof_gather(dof_indices+ind,
+                                               *src[comp], values_dofs[comp][j],
+                                               dealii::internal::bool2type<types_are_equal<typename VectorType::value_type,Number>::value>());
             }
         }
 
@@ -3214,10 +3280,11 @@ FEEvaluationBase<dim,n_components_,Number>
               // vectorization loop
               AssertDimension (dof_info->end_indices(cell)-dof_indices,
                                static_cast<int>(n_local_dofs));
-              for (unsigned int j=0; j<n_local_dofs; j+=VectorizedArray<Number>::n_array_elements)
-                for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
-                  operation.process_dof (dof_indices[j+v], *src[0],
-                                         local_data[j+v]);
+              for (unsigned int comp=0, ind=0; comp<n_components; ++comp)
+                for (unsigned int j=0; j<dofs_per_cell; ++j, ind += VectorizedArray<Number>::n_array_elements)
+                  operation.process_dof_gather(dof_indices+ind,
+                                               *src[0], values_dofs[comp][j],
+                                               dealii::internal::bool2type<types_are_equal<typename VectorType::value_type,Number>::value>());
             }
         }
 
