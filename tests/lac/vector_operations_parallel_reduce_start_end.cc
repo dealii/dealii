@@ -47,7 +47,7 @@ void check ()
       internal::VectorOperations::MeanValue<Number> mean(val);
 
       Number sum_direct = 0.;
-      internal::VectorOperations::parallel_reduce (mean, size, sum_direct,
+      internal::VectorOperations::parallel_reduce (mean, 0, size, sum_direct,
                                                    thread_loop_partitioner);
 
       Number sum = 0.;
@@ -60,9 +60,8 @@ void check ()
           const unsigned int end   = std::min((i+1)*chunk_size, size);
 
           Number sum_i = 0.;
-          internal::VectorOperations::parallel_reduce (mean, end, sum_i,
-                                                       thread_loop_partitioner,
-                                                       begin);
+          internal::VectorOperations::parallel_reduce (mean, begin, end, sum_i,
+                                                       thread_loop_partitioner);
           sum+= sum_i;
         }
 

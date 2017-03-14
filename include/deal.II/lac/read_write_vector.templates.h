@@ -140,7 +140,7 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::apply(const Functor &func)
   {
     FunctorTemplate<Functor> functor(*this, func);
-    internal::VectorOperations::parallel_for(functor, n_elements(), thread_loop_partitioner);
+    internal::VectorOperations::parallel_for(functor, 0, n_elements(), thread_loop_partitioner);
   }
 #endif
 
@@ -158,7 +158,7 @@ namespace LinearAlgebra
       reinit(in_vector, true);
 
     dealii::internal::VectorOperations::Vector_copy<Number,Number> copier(in_vector.val, val);
-    dealii::internal::VectorOperations::parallel_for(copier, n_elements(), thread_loop_partitioner);
+    dealii::internal::VectorOperations::parallel_for(copier, 0, n_elements(), thread_loop_partitioner);
 
     return *this;
   }
@@ -175,7 +175,7 @@ namespace LinearAlgebra
       reinit(in_vector, true);
 
     dealii::internal::VectorOperations::Vector_copy<Number,Number2> copier(in_vector.val, val);
-    dealii::internal::VectorOperations::parallel_for(copier, n_elements(), thread_loop_partitioner);
+    dealii::internal::VectorOperations::parallel_for(copier, 0, n_elements(), thread_loop_partitioner);
 
     return *this;
   }
@@ -190,7 +190,7 @@ namespace LinearAlgebra
     (void)s;
 
     dealii::internal::VectorOperations::Vector_set<Number> setter(Number(), val);
-    dealii::internal::VectorOperations::parallel_for(setter, n_elements(), thread_loop_partitioner);
+    dealii::internal::VectorOperations::parallel_for(setter, 0, n_elements(), thread_loop_partitioner);
 
     return *this;
   }

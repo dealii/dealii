@@ -50,9 +50,8 @@ void check ()
         {
           const unsigned int begin = i*chunk_size;
           const unsigned int end   = std::min((i+1)*chunk_size, size);
-          internal::VectorOperations::parallel_for(setter, end,
-                                                   thread_loop_partitioner,
-                                                   begin);
+          internal::VectorOperations::parallel_for(setter, begin, end,
+                                                   thread_loop_partitioner);
         }
 
       // check values:

@@ -159,9 +159,9 @@ namespace internal
 
     template <typename Functor>
     void parallel_for(Functor &functor,
+                      size_type start,
                       size_type end,
-                      std_cxx11::shared_ptr<parallel::internal::TBBPartitioner> &partitioner,
-                      size_type start = 0)
+                      std_cxx11::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
     {
 #ifdef DEAL_II_WITH_THREADS
       size_type vec_size = end-start;
@@ -1252,10 +1252,10 @@ namespace internal
      */
     template <typename Operation, typename ResultType>
     void parallel_reduce (const Operation   &op,
+                          const size_type    start,
                           const size_type    end,
                           ResultType        &result,
-                          std_cxx11::shared_ptr<parallel::internal::TBBPartitioner> &partitioner,
-                          const size_type start = 0)
+                          std_cxx11::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
     {
 #ifdef DEAL_II_WITH_THREADS
       size_type vec_size = end-start;

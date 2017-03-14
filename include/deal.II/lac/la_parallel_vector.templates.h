@@ -238,7 +238,7 @@ namespace LinearAlgebra
 
       thread_loop_partitioner = v.thread_loop_partitioner;
       dealii::internal::VectorOperations::Vector_copy<Number,Number> copier(v.val, val);
-      internal::VectorOperations::parallel_for(copier, partitioner->local_size(),
+      internal::VectorOperations::parallel_for(copier, 0, partitioner->local_size(),
                                                thread_loop_partitioner);
 
       zero_out_ghosts();
@@ -381,7 +381,7 @@ namespace LinearAlgebra
 
       thread_loop_partitioner = c.thread_loop_partitioner;
       dealii::internal::VectorOperations::Vector_copy<Number,Number2> copier(c.val, val);
-      internal::VectorOperations::parallel_for(copier, partitioner->local_size(),
+      internal::VectorOperations::parallel_for(copier, 0, partitioner->local_size(),
                                                thread_loop_partitioner);
 
       if (must_update_ghost_values)
@@ -928,7 +928,7 @@ namespace LinearAlgebra
     {
       internal::VectorOperations::Vector_set<Number> setter(s, val);
 
-      internal::VectorOperations::parallel_for(setter, partitioner->local_size(),
+      internal::VectorOperations::parallel_for(setter, 0, partitioner->local_size(),
                                                thread_loop_partitioner);
 
       // if we call Vector::operator=0, we want to zero out all the entries
@@ -953,7 +953,7 @@ namespace LinearAlgebra
       AssertDimension (local_size(), v.local_size());
 
       internal::VectorOperations::Vectorization_add_v<Number> vector_add(val, v.val);
-      internal::VectorOperations::parallel_for(vector_add, partitioner->local_size(),
+      internal::VectorOperations::parallel_for(vector_add, 0, partitioner->local_size(),
                                                thread_loop_partitioner);
 
       if (vector_is_ghosted)
@@ -976,7 +976,7 @@ namespace LinearAlgebra
       AssertDimension (local_size(), v.local_size());
 
       internal::VectorOperations::Vectorization_subtract_v<Number> vector_subtract(val, v.val);
-      internal::VectorOperations::parallel_for(vector_subtract, partitioner->local_size(),
+      internal::VectorOperations::parallel_for(vector_subtract, 0, partitioner->local_size(),
                                                thread_loop_partitioner);
 
       if (vector_is_ghosted)
@@ -994,7 +994,7 @@ namespace LinearAlgebra
       AssertIsFinite(a);
 
       internal::VectorOperations::Vectorization_add_factor<Number> vector_add(val, a);
-      internal::VectorOperations::parallel_for(vector_add, partitioner->local_size(),
+      internal::VectorOperations::parallel_for(vector_add, 0, partitioner->local_size(),
                                                thread_loop_partitioner);
 
       if (vector_is_ghosted)
@@ -1017,7 +1017,7 @@ namespace LinearAlgebra
       AssertDimension (local_size(), v.local_size());
 
       internal::VectorOperations::Vectorization_add_av<Number> vector_add(val, v.val, a);
-      internal::VectorOperations::parallel_for(vector_add, partitioner->local_size(),
+      internal::VectorOperations::parallel_for(vector_add, 0, partitioner->local_size(),
                                                thread_loop_partitioner);
 
       if (vector_is_ghosted)
@@ -1049,7 +1049,7 @@ namespace LinearAlgebra
 
       internal::VectorOperations::Vectorization_add_avpbw<Number> vector_add(val, v.val,
           w.val, a, b);
-      internal::VectorOperations::parallel_for(vector_add, partitioner->local_size(),
+      internal::VectorOperations::parallel_for(vector_add, 0, partitioner->local_size(),
                                                thread_loop_partitioner);
 
       if (vector_is_ghosted)
@@ -1081,7 +1081,7 @@ namespace LinearAlgebra
       AssertDimension (local_size(), v.local_size());
 
       internal::VectorOperations::Vectorization_sadd_xv<Number> vector_sadd(val, v.val, x);
-      internal::VectorOperations::parallel_for(vector_sadd, partitioner->local_size(),
+      internal::VectorOperations::parallel_for(vector_sadd, 0, partitioner->local_size(),
                                                thread_loop_partitioner);
 
       if (vector_is_ghosted)
@@ -1106,7 +1106,7 @@ namespace LinearAlgebra
       AssertDimension (local_size(), v.local_size());
 
       internal::VectorOperations::Vectorization_sadd_xav<Number> vector_sadd(val, v.val, a, x);
-      internal::VectorOperations::parallel_for(vector_sadd, partitioner->local_size(),
+      internal::VectorOperations::parallel_for(vector_sadd, 0, partitioner->local_size(),
                                                thread_loop_partitioner);
 
       if (vector_is_ghosted)
@@ -1132,7 +1132,7 @@ namespace LinearAlgebra
 
       internal::VectorOperations::Vectorization_sadd_xavbw<Number> vector_sadd(val, v.val, w.val,
           x, a, b);
-      internal::VectorOperations::parallel_for(vector_sadd, partitioner->local_size(),
+      internal::VectorOperations::parallel_for(vector_sadd, 0, partitioner->local_size(),
                                                thread_loop_partitioner);
 
       if (vector_is_ghosted)
@@ -1149,7 +1149,7 @@ namespace LinearAlgebra
       internal::VectorOperations::Vectorization_multiply_factor<Number> vector_multiply(val,
           factor);
 
-      internal::VectorOperations::parallel_for(vector_multiply, partitioner->local_size(),
+      internal::VectorOperations::parallel_for(vector_multiply, 0, partitioner->local_size(),
                                                thread_loop_partitioner);
 
       if (vector_is_ghosted)
@@ -1182,7 +1182,7 @@ namespace LinearAlgebra
       AssertDimension (local_size(), v.local_size());
 
       internal::VectorOperations::Vectorization_scale<Number> vector_scale(val, v.val);
-      internal::VectorOperations::parallel_for(vector_scale, partitioner->local_size(),
+      internal::VectorOperations::parallel_for(vector_scale, 0, partitioner->local_size(),
                                                thread_loop_partitioner);
 
       if (vector_is_ghosted)
@@ -1205,7 +1205,7 @@ namespace LinearAlgebra
       AssertDimension (local_size(), v.local_size());
 
       internal::VectorOperations::Vectorization_equ_au<Number> vector_equ(val, v.val, a);
-      internal::VectorOperations::parallel_for(vector_equ, partitioner->local_size(),
+      internal::VectorOperations::parallel_for(vector_equ, 0, partitioner->local_size(),
                                                thread_loop_partitioner);
 
       if (vector_is_ghosted)
@@ -1229,7 +1229,7 @@ namespace LinearAlgebra
 
       internal::VectorOperations::Vectorization_equ_aubv<Number> vector_equ(val, v.val,
           w.val, a, b);
-      internal::VectorOperations::parallel_for(vector_equ, partitioner->local_size(),
+      internal::VectorOperations::parallel_for(vector_equ, 0, partitioner->local_size(),
                                                thread_loop_partitioner);
 
       if (vector_is_ghosted)
@@ -1282,7 +1282,7 @@ namespace LinearAlgebra
 
       Number sum;
       internal::VectorOperations::Dot<Number,Number2> dot(val, v.val);
-      internal::VectorOperations::parallel_reduce (dot, partitioner->local_size(), sum,
+      internal::VectorOperations::parallel_reduce (dot, 0, partitioner->local_size(), sum,
                                                    thread_loop_partitioner);
       AssertIsFinite(sum);
 
@@ -1316,7 +1316,7 @@ namespace LinearAlgebra
     {
       real_type sum;
       internal::VectorOperations::Norm2<Number,real_type> norm2(val);
-      internal::VectorOperations::parallel_reduce (norm2, partitioner->local_size(), sum,
+      internal::VectorOperations::parallel_reduce (norm2, 0, partitioner->local_size(), sum,
                                                    thread_loop_partitioner);
       AssertIsFinite(sum);
 
@@ -1336,7 +1336,7 @@ namespace LinearAlgebra
 
       Number sum;
       internal::VectorOperations::MeanValue<Number> mean(val);
-      internal::VectorOperations::parallel_reduce (mean, partitioner->local_size(), sum,
+      internal::VectorOperations::parallel_reduce (mean, 0, partitioner->local_size(), sum,
                                                    thread_loop_partitioner);
 
       return sum / real_type(partitioner->local_size());
@@ -1366,7 +1366,7 @@ namespace LinearAlgebra
     {
       real_type sum;
       internal::VectorOperations::Norm1<Number, real_type> norm1(val);
-      internal::VectorOperations::parallel_reduce (norm1, partitioner->local_size(), sum,
+      internal::VectorOperations::parallel_reduce (norm1, 0, partitioner->local_size(), sum,
                                                    thread_loop_partitioner);
 
       return sum;
@@ -1408,7 +1408,7 @@ namespace LinearAlgebra
     {
       real_type sum;
       internal::VectorOperations::NormP<Number, real_type> normp(val, p);
-      internal::VectorOperations::parallel_reduce (normp, partitioner->local_size(), sum,
+      internal::VectorOperations::parallel_reduce (normp, 0, partitioner->local_size(), sum,
                                                    thread_loop_partitioner);
       return std::pow(sum, 1./p);
     }
@@ -1472,7 +1472,7 @@ namespace LinearAlgebra
 
       Number sum;
       internal::VectorOperations::AddAndDot<Number> adder(this->val, v.val, w.val, a);
-      internal::VectorOperations::parallel_reduce (adder, vec_size, sum, thread_loop_partitioner);
+      internal::VectorOperations::parallel_reduce (adder, 0, vec_size, sum, thread_loop_partitioner);
       AssertIsFinite(sum);
       return sum;
     }
