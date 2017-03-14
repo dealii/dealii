@@ -37,7 +37,8 @@ MACRO(DEAL_II_INSOURCE_SETUP_TARGET _target _build)
     INCLUDE_DIRECTORIES
       "${CMAKE_BINARY_DIR}/include"
       "${CMAKE_SOURCE_DIR}/include"
-      "${CMAKE_SOURCE_DIR}/include/deal.II/"
+      ${DEAL_II_BUNDLED_INCLUDE_DIRS}
+      ${DEAL_II_INCLUDE_DIRS}
     )
 
 GET_PROPERTY(_type TARGET ${_target} PROPERTY TYPE)

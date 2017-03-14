@@ -49,6 +49,7 @@
 #
 #     DEAL_II_WITH_64BIT_INDICES
 #     DEAL_II_DOXYGEN_USE_MATHJAX
+#     DEAL_II_COMPILE_EXAMPLES
 #     DEAL_II_CPACK_BUNDLE_NAME
 #     DEAL_II_CPACK_EXTERNAL_LIBS
 #
@@ -344,6 +345,12 @@ OPTION(DEAL_II_DOXYGEN_USE_MATHJAX
   OFF
   )
 MARK_AS_ADVANCED(DEAL_II_DOXYGEN_USE_MATHJAX)
+
+OPTION(DEAL_II_COMPILE_EXAMPLES
+  "If set to ON, all configurable example executables will be built and installed as well. If set to OFF, the examples component only installs the source code of example steps."
+  ON
+  )
+MARK_AS_ADVANCED(DEAL_II_COMPILE_EXAMPLES)
 
 OPTION(DEAL_II_DOXYGEN_USE_ONLINE_MATHJAX
   "If set to ON, doxygen documentation is generated using online (from CDN) mathjax copy"

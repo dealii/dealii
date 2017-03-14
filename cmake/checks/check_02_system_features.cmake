@@ -141,6 +141,9 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
       "BUILD_SHARED_LIBS forced to OFF\n\n"
       )
     SET(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+
+    # And disable compilation of examples:
+    SET(DEAL_II_COMPILE_EXAMPLES OFF CACHE BOOL "" FORCE)
   ENDIF()
 
 ENDIF()
