@@ -1171,11 +1171,14 @@ namespace internal
       static const unsigned int threshold_array_allocate = 512;
 
       TBBReduceFunctor(const Operation   &op,
-                       const size_type    vec_size)
+                       const size_type    start,
+                       const size_type    end)
         :
         op(op),
-        vec_size(vec_size)
+        start(start),
+        end(end)
       {
+        const size_type vec_size = end-start;
         // set chunk size for sub-tasks
         const unsigned int gs = internal::Vector::minimum_parallel_grain_size;
         n_chunks = std::min(static_cast<size_type>(4*MultithreadInfo::n_threads()),
@@ -1210,7 +1213,7 @@ namespace internal
       void operator() (const tbb::blocked_range<size_type> &range) const
       {
         for (size_type i = range.begin(); i < range.end(); ++i)
-          accumulate_recursive(op, i*chunk_size, std::min((i+1)*chunk_size, vec_size),
+          accumulate_recursive(op, start+i*chunk_size, std::min(start+(i+1)*chunk_size, end),
                                array_ptr[i]);
       }
 
@@ -1228,7 +1231,8 @@ namespace internal
       }
 
       const Operation &op;
-      const size_type vec_size;
+      const size_type start;
+      const size_type end;
 
       mutable unsigned int n_chunks;
       unsigned int chunk_size;
@@ -1248,11 +1252,13 @@ namespace internal
      */
     template <typename Operation, typename ResultType>
     void parallel_reduce (const Operation   &op,
-                          const size_type    vec_size,
+                          const size_type    end,
                           ResultType        &result,
-                          std_cxx11::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
+                          std_cxx11::shared_ptr<parallel::internal::TBBPartitioner> &partitioner,
+                          const size_type start = 0)
     {
 #ifdef DEAL_II_WITH_THREADS
+      size_type vec_size = end-start;
       // only go to the parallel function in case there are at least 4 parallel
       // items, otherwise the overhead is too large
       if (vec_size >= 4*internal::Vector::minimum_parallel_grain_size &&
@@ -1264,7 +1270,7 @@ namespace internal
           std_cxx11::shared_ptr<tbb::affinity_partitioner> tbb_partitioner =
             partitioner->acquire_one_partitioner();
 
-          TBBReduceFunctor<Operation,ResultType> generic_functor(op, vec_size);
+          TBBReduceFunctor<Operation,ResultType> generic_functor(op, start, end);
           tbb::parallel_for (tbb::blocked_range<size_type> (0,
                                                             generic_functor.n_chunks,
                                                             1),
@@ -1274,9 +1280,9 @@ namespace internal
           result = generic_functor.do_sum();
         }
       else
-        accumulate_recursive(op,0,vec_size,result);
+        accumulate_recursive(op,start,end,result);
 #else
-      accumulate_recursive(op,0,vec_size,result);
+      accumulate_recursive(op,start,end,result);
       (void)partitioner;
 #endif
     }

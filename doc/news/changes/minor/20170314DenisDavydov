@@ -1,0 +1,4 @@
+New: extend internal::VectorOperations::parallel_for() and
+internal::VectorOperations::parallel_reduce() to [start,end).
+<br>
+(Denis Davydov, 2017/03/14)
