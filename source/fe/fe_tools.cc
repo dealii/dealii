@@ -1628,11 +1628,11 @@ namespace FETools
     // This function specifically works for the case where shape functions
     // have 'dim' vector components, so allocate that much space
     std::vector<Vector<double> >
-    values (points.size(), Vector<double>(dim));
+    support_point_values (points.size(), Vector<double>(dim));
 
     // In this vector, we store the
     // result of the interpolation
-    std::vector<double> local_dofs(n_dofs);
+    std::vector<double> nodal_values(n_dofs);
 
     // Get the values of each shape function in turn. Remember that these
     // are the 'raw' shape functions (i.e., where the element has not yet
@@ -1645,18 +1645,18 @@ namespace FETools
         for (unsigned int k=0; k<points.size(); ++k)
           for (unsigned int d=0; d<dim; ++d)
             {
-              values[k][d] = fe.shape_value_component(i, points[k], d);
-              Assert (numbers::is_finite(values[k][d]), ExcInternalError());
+              support_point_values[k][d] = fe.shape_value_component(i, points[k], d);
+              Assert (numbers::is_finite(support_point_values[k][d]), ExcInternalError());
             }
 
-        fe.convert_generalized_support_point_values_to_nodal_values(values,
-                                                                    local_dofs);
+        fe.convert_generalized_support_point_values_to_nodal_values(support_point_values,
+                                                                    nodal_values);
 
         // Enter the interpolated dofs into the matrix
         for (unsigned int j=0; j<n_dofs; ++j)
           {
-            N(j,i) = local_dofs[j];
-            Assert (numbers::is_finite(local_dofs[j]), ExcInternalError());
+            N(j,i) = nodal_values[j];
+            Assert (numbers::is_finite(nodal_values[j]), ExcInternalError());
           }
       }
 
