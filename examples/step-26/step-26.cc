@@ -145,8 +145,8 @@ namespace Step26
   double RightHandSide<dim>::value (const Point<dim> &p,
                                     const unsigned int component) const
   {
-    (void)component;
-    Assert (component == 0, ExcInternalError());
+    (void) component;
+    Assert (component == 0, ExcIndexRange(component, 0, 1));
     Assert (dim == 2, ExcNotImplemented());
 
     const double time = this->get_time();
@@ -186,8 +186,8 @@ namespace Step26
   double BoundaryValues<dim>::value (const Point<dim> &/*p*/,
                                      const unsigned int component) const
   {
-    (void)component;
-    Assert(component == 0, ExcInternalError());
+    (void) component;
+    Assert (component == 0, ExcIndexRange(component, 0, 1));
     return 0;
   }
 
