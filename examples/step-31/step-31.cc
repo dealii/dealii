@@ -178,6 +178,7 @@ namespace Step31
     TemperatureRightHandSide<dim>::value (const Point<dim>  &p,
                                           const unsigned int component) const
     {
+      (void) component;
       Assert (component == 0,
               ExcMessage ("Invalid operation for a scalar function."));
 
