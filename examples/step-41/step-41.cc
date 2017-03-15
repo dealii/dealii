@@ -130,7 +130,8 @@ namespace Step41
   double RightHandSide<dim>::value (const Point<dim> &,
                                     const unsigned int component) const
   {
-    Assert (component == 0, ExcNotImplemented());
+    (void) component;
+    Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     return -10;
   }
@@ -151,7 +152,8 @@ namespace Step41
   double BoundaryValues<dim>::value (const Point<dim> &,
                                      const unsigned int component) const
   {
-    Assert (component == 0, ExcNotImplemented());
+    (void) component;
+    Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     return 0;
   }
@@ -174,7 +176,8 @@ namespace Step41
   double Obstacle<dim>::value (const Point<dim> &p,
                                const unsigned int component) const
   {
-    Assert (component == 0, ExcNotImplemented());
+    (void) component;
+    Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     if (p (0) < -0.5)
       return -0.2;
