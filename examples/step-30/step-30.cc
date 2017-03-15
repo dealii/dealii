@@ -91,6 +91,7 @@ namespace Step30
                             std::vector<double> &values,
                             const unsigned int) const
   {
+    (void) points;
     Assert(values.size()==points.size(),
            ExcDimensionMismatch(values.size(),points.size()));
 
