@@ -190,16 +190,6 @@ STRING(REGEX REPLACE
 REMOVE_DUPLICATES(Trilinos_TPL_INCLUDE_DIRS)
 
 #
-# workaround: Do not pull in scotch include directory. It clashes with
-# our use of the metis headers...
-#
-FOREACH(_item ${Trilinos_TPL_INCLUDE_DIRS})
-  IF("${_item}" MATCHES "scotch$")
-    LIST(REMOVE_ITEM Trilinos_TPL_INCLUDE_DIRS ${_item})
-  ENDIF()
-ENDFOREACH()
-
-#
 # We'd like to have the full library names but the Trilinos package only
 # exports a list with short names...
 # So we check again for every lib and store the full path:
