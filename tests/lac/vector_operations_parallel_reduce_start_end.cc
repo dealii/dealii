@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// check that internal::VectorOperations::parallel_for works for start-end
+// check that internal::VectorOperations::parallel_reduce works for start-end
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -40,9 +40,17 @@ void check ()
       Number *val;
       Utilities::System::posix_memalign ((void **)&val, 64, sizeof(Number)*size);
 
-      const Number s = 3.1415;
-      internal::VectorOperations::Vector_set<Number> setter(s, val);
+      for (unsigned int i = 0; i < size; ++i)
+        val[i] = (double)rand()/RAND_MAX;
 
+
+      internal::VectorOperations::MeanValue<Number> mean(val);
+
+      Number sum_direct = 0.;
+      internal::VectorOperations::parallel_reduce (mean, 0, size, sum_direct,
+                                                   thread_loop_partitioner);
+
+      Number sum = 0.;
       // now break the size in chunks
       const unsigned int n_chunks = 3;
       const unsigned int chunk_size = size / n_chunks;
@@ -50,14 +58,16 @@ void check ()
         {
           const unsigned int begin = i*chunk_size;
           const unsigned int end   = std::min((i+1)*chunk_size, size);
-          internal::VectorOperations::parallel_for(setter, begin, end,
-                                                   thread_loop_partitioner);
+
+          Number sum_i = 0.;
+          internal::VectorOperations::parallel_reduce (mean, begin, end, sum_i,
+                                                       thread_loop_partitioner);
+          sum+= sum_i;
         }
 
       // check values:
-      for (unsigned int i = 0; i < size; ++i)
-        AssertThrow(val[i] == s,
-                    ExcInternalError());
+      AssertThrow(std::fabs(sum-sum_direct) < 1e-6*sum_direct,
+                  ExcInternalError());
 
       free(val);
     }

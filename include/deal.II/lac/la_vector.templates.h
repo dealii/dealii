@@ -36,7 +36,7 @@ namespace LinearAlgebra
       this->reinit(in_vector, true);
 
     dealii::internal::VectorOperations::Vector_copy<Number, Number> copier(in_vector.val, this->val);
-    internal::VectorOperations::parallel_for(copier, this->size(), this->thread_loop_partitioner);
+    internal::VectorOperations::parallel_for(copier, 0, this->size(), this->thread_loop_partitioner);
 
     return *this;
   }
@@ -52,7 +52,7 @@ namespace LinearAlgebra
       this->reinit(in_vector, true);
 
     dealii::internal::VectorOperations::Vector_copy<Number, Number2> copier(in_vector.val, this->val);
-    internal::VectorOperations::parallel_for(copier, this->size(), this->thread_loop_partitioner);
+    internal::VectorOperations::parallel_for(copier, 0, this->size(), this->thread_loop_partitioner);
 
     return *this;
   }
@@ -66,7 +66,7 @@ namespace LinearAlgebra
     (void) s;
 
     internal::VectorOperations::Vector_set<Number> setter(Number(), this->val);
-    internal::VectorOperations::parallel_for(setter, this->size(), this->thread_loop_partitioner);
+    internal::VectorOperations::parallel_for(setter, 0, this->size(), this->thread_loop_partitioner);
 
     return *this;
   }
@@ -79,7 +79,7 @@ namespace LinearAlgebra
     AssertIsFinite(factor);
 
     internal::VectorOperations::Vectorization_multiply_factor<Number> vector_multiply(this->val, factor);
-    internal::VectorOperations::parallel_for(vector_multiply, this->size(), this->thread_loop_partitioner);
+    internal::VectorOperations::parallel_for(vector_multiply, 0, this->size(), this->thread_loop_partitioner);
 
     return *this;
   }
@@ -110,7 +110,7 @@ namespace LinearAlgebra
            ExcMessage("Cannot add two vectors with different numbers of elements"));
 
     internal::VectorOperations::Vectorization_add_v<Number> vector_add(this->val, down_V.val);
-    internal::VectorOperations::parallel_for(vector_add, this->size(), this->thread_loop_partitioner);
+    internal::VectorOperations::parallel_for(vector_add, 0, this->size(), this->thread_loop_partitioner);
 
     return *this;
   }
@@ -128,7 +128,7 @@ namespace LinearAlgebra
     Assert(down_V.size()==this->size(),
            ExcMessage("Cannot subtract two vectors with different numbers of elements"));
     internal::VectorOperations::Vectorization_subtract_v<Number> vector_subtract(this->val, down_V.val);
-    internal::VectorOperations::parallel_for(vector_subtract, this->size(), this->thread_loop_partitioner);
+    internal::VectorOperations::parallel_for(vector_subtract, 0, this->size(), this->thread_loop_partitioner);
 
     return *this;
   }
@@ -149,7 +149,7 @@ namespace LinearAlgebra
                       "of two vectors with different numbers of elements"));
     Number sum;
     internal::VectorOperations::Dot<Number, Number> dot(this->val, down_V.val);
-    internal::VectorOperations::parallel_reduce(dot, this->size(), sum, this->thread_loop_partitioner);
+    internal::VectorOperations::parallel_reduce(dot, 0, this->size(), sum, this->thread_loop_partitioner);
 
     return sum;
   }
@@ -173,7 +173,7 @@ namespace LinearAlgebra
     AssertIsFinite(a);
 
     internal::VectorOperations::Vectorization_add_factor<Number> vector_add(this->val, a);
-    internal::VectorOperations::parallel_for(vector_add, this->size(), this->thread_loop_partitioner);
+    internal::VectorOperations::parallel_for(vector_add, 0, this->size(), this->thread_loop_partitioner);
   }
 
 
@@ -192,7 +192,7 @@ namespace LinearAlgebra
            ExcMessage("Cannot add two vectors with different numbers of elements"));
 
     internal::VectorOperations::Vectorization_add_av<Number> vector_add_av(this->val, down_V.val, a);
-    internal::VectorOperations::parallel_for(vector_add_av, this->size(), this->thread_loop_partitioner);
+    internal::VectorOperations::parallel_for(vector_add_av, 0, this->size(), this->thread_loop_partitioner);
   }
 
 
@@ -221,7 +221,7 @@ namespace LinearAlgebra
 
     internal::VectorOperations::Vectorization_add_avpbw<Number> vector_add(this->val, down_V.val,
         down_W.val, a, b);
-    internal::VectorOperations::parallel_for(vector_add, this->size(), this->thread_loop_partitioner);
+    internal::VectorOperations::parallel_for(vector_add, 0, this->size(), this->thread_loop_partitioner);
   }
 
 
@@ -241,7 +241,7 @@ namespace LinearAlgebra
     const Vector<Number> &down_V = dynamic_cast<const Vector<Number>&>(V);
     internal::VectorOperations::Vectorization_sadd_xav<Number> vector_sadd_xav(this->val, down_V.val,
         a, s);
-    internal::VectorOperations::parallel_for(vector_sadd_xav, this->size(), this->thread_loop_partitioner);
+    internal::VectorOperations::parallel_for(vector_sadd_xav, 0, this->size(), this->thread_loop_partitioner);
   }
 
 
@@ -260,7 +260,7 @@ namespace LinearAlgebra
            ExcMessage("Cannot add two vectors with different numbers of elements"));
 
     internal::VectorOperations::Vectorization_scale<Number> vector_scale(this->val, down_scaling_factors.val);
-    internal::VectorOperations::parallel_for(vector_scale, this->size(), this->thread_loop_partitioner);
+    internal::VectorOperations::parallel_for(vector_scale, 0, this->size(), this->thread_loop_partitioner);
   }
 
 
@@ -277,7 +277,7 @@ namespace LinearAlgebra
     // Downcast V. If fails, throws an exception.
     const Vector<Number> &down_V = dynamic_cast<const Vector<Number>&>(V);
     internal::VectorOperations::Vectorization_equ_au<Number> vector_equ(this->val, down_V.val, a);
-    internal::VectorOperations::parallel_for(vector_equ, this->size(), this->thread_loop_partitioner);
+    internal::VectorOperations::parallel_for(vector_equ, 0, this->size(), this->thread_loop_partitioner);
   }
 
 
@@ -290,7 +290,7 @@ namespace LinearAlgebra
     typedef typename VectorSpaceVector<Number>::real_type real_type;
     value_type sum;
     internal::VectorOperations::MeanValue<Number> mean_value(this->val);
-    internal::VectorOperations::parallel_reduce(mean_value, this->size(), sum, this->thread_loop_partitioner);
+    internal::VectorOperations::parallel_reduce(mean_value, 0, this->size(), sum, this->thread_loop_partitioner);
 
     return sum/static_cast<real_type>(this->size());
   }
@@ -305,7 +305,7 @@ namespace LinearAlgebra
     typedef typename VectorSpaceVector<Number>::real_type real_type;
     real_type sum;
     internal::VectorOperations::Norm1<Number, real_type> norm1(this->val);
-    internal::VectorOperations::parallel_reduce(norm1, this->size(), sum, this->thread_loop_partitioner);
+    internal::VectorOperations::parallel_reduce(norm1, 0, this->size(), sum, this->thread_loop_partitioner);
 
     return sum;
   }
@@ -326,7 +326,7 @@ namespace LinearAlgebra
     typedef typename VectorSpaceVector<Number>::real_type real_type;
     real_type norm_square;
     internal::VectorOperations::Norm2<Number, real_type> norm2(this->val);
-    internal::VectorOperations::parallel_reduce(norm2, this->size(), norm_square,
+    internal::VectorOperations::parallel_reduce(norm2, 0, this->size(), norm_square,
                                                 this->thread_loop_partitioner);
     if (numbers::is_finite(norm_square) &&
         norm_square>=std::numeric_limits<real_type>::min())
@@ -395,7 +395,7 @@ namespace LinearAlgebra
 
     Number sum;
     internal::VectorOperations::AddAndDot<Number> adder(this->val, down_V.val, down_W.val, a);
-    internal::VectorOperations::parallel_reduce(adder, this->size(), sum, this->thread_loop_partitioner);
+    internal::VectorOperations::parallel_reduce(adder, 0, this->size(), sum, this->thread_loop_partitioner);
     AssertIsFinite(sum);
 
     return sum;
