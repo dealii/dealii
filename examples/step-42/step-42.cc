@@ -876,7 +876,8 @@ namespace Step42
     output_dir = prm.get("output directory");
     if (output_dir != "" && *(output_dir.rbegin()) != '/')
       output_dir += "/";
-    mkdir(output_dir.c_str(), 0777);
+    const int ierr = mkdir(output_dir.c_str(), 0777);
+    AssertThrow(ierr == 0, ExcIO());
 
     pcout << "    Using output directory '" << output_dir << "'" << std::endl;
     pcout << "    FE degree " << fe_degree << std::endl;
