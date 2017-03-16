@@ -15,7 +15,9 @@
 // ---------------------------------------------------------------------
 
 
-// create a shared tria mesh and distribute multigrid
+// create a shared tria mesh and partition
+// active mesh in z-order as well as multigrid
+// compare partition against p4est
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>

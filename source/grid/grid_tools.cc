@@ -1606,45 +1606,6 @@ next_cell:
   }
 
 
-  template <class MeshType>
-  std::vector<typename MeshType::cell_iterator>
-  compute_cell_halo_layer_on_level
-  (const MeshType     &mesh,
-   const unsigned int my_level_subdomain_id,
-   const unsigned int level)
-  {
-    std::vector<typename MeshType::cell_iterator> level_halo_layer;
-    std::vector<bool> locally_active_vertices_on_level_subdomain (mesh.get_triangulation().n_vertices(),
-        false);
-
-    // Find the cells which are locally owned.
-    // These are the cells around which we wish to construct
-    // the halo layer
-    for (typename MeshType::cell_iterator
-         cell = mesh.begin(level);
-         cell != mesh.end(level); ++cell)
-      if (cell->level_subdomain_id() == my_level_subdomain_id)
-        for (unsigned int v=0; v<GeometryInfo<MeshType::dimension>::vertices_per_cell; ++v)
-          locally_active_vertices_on_level_subdomain[cell->vertex_index(v)] = true;
-
-    // Find the cells which are not locally owned
-    // but share a vertex with the selected level subdomain
-    // These comprise the halo layer
-    for (typename MeshType::cell_iterator
-         cell = mesh.begin(level);
-         cell != mesh.end(level); ++cell)
-      if (cell->level_subdomain_id() != my_level_subdomain_id) //False -> possible halo layer cell
-        for (unsigned int v=0; v<GeometryInfo<MeshType::dimension>::vertices_per_cell; ++v)
-          if (locally_active_vertices_on_level_subdomain[cell->vertex_index(v)] == true)
-            {
-              level_halo_layer.push_back(cell);
-              break;
-            }
-
-    return level_halo_layer;
-  }
-
-
 
   template <class MeshType>
   std::vector<typename MeshType::active_cell_iterator>
@@ -1665,7 +1626,6 @@ next_cell:
 
     return active_halo_layer;
   }
-
 
 
 
@@ -2197,15 +2157,15 @@ next_cell:
      * recursive helper function for partition_triangulation_zorder
      */
     template <class IT>
-    void set_subdomain_id_in_zorder_recursively(IT cell,
-                                                unsigned int &current_proc_idx,
-                                                unsigned int &current_cell_idx,
-                                                const unsigned int n_active_cellls,
+    void set_subdomain_id_in_zorder_recursively(IT                 cell,
+                                                unsigned int       &current_proc_idx,
+                                                unsigned int       &current_cell_idx,
+                                                const unsigned int n_active_cells,
                                                 const unsigned int n_partitions)
     {
       if (cell->active())
         {
-          while (current_cell_idx >= floor((long)n_active_cellls*(current_proc_idx+1)/n_partitions))
+          while (current_cell_idx >= floor((long)n_active_cells*(current_proc_idx+1)/n_partitions))
             ++current_proc_idx;
           cell->set_subdomain_id(current_proc_idx);
           ++current_cell_idx;
@@ -2216,7 +2176,7 @@ next_cell:
             set_subdomain_id_in_zorder_recursively(cell->child(n),
                                                    current_proc_idx,
                                                    current_cell_idx,
-                                                   n_active_cellls,
+                                                   n_active_cells,
                                                    n_partitions);
         }
     }
@@ -2245,14 +2205,8 @@ next_cell:
         return;
       }
 
-    typedef typename Triangulation<dim,spacedim>::active_cell_iterator ac_it;
-    typedef typename Triangulation<dim,spacedim>::cell_iterator lvl_it;
-
-    unsigned int current_proc_idx=0;
-    unsigned int current_cell_idx=0;
-    const unsigned int n_active_cellls = triangulation.n_active_cells();
-
-    // create coarse cell reordering
+    // Duplicate the coarse cell reordoring
+    // as done in p4est
     std::vector<unsigned int> coarse_cell_to_p4est_tree_permutation;
     std::vector<unsigned int> p4est_tree_to_coarse_cell_permutation;
 
@@ -2265,21 +2219,32 @@ next_cell:
     p4est_tree_to_coarse_cell_permutation
       = Utilities::invert_permutation (coarse_cell_to_p4est_tree_permutation);
 
+    unsigned int current_proc_idx=0;
+    unsigned int current_cell_idx=0;
+    const unsigned int n_active_cells = triangulation.n_active_cells();
+
     // set subdomain id for active cell descendants
     // of each coarse cell in permuted order
     for (unsigned int idx=0; idx<triangulation.n_cells(0); ++idx)
       {
         const unsigned int coarse_cell_idx = p4est_tree_to_coarse_cell_permutation[idx];
-        lvl_it coarse_cell (&triangulation, 0, coarse_cell_idx);
+        typename Triangulation<dim,spacedim>::cell_iterator
+        coarse_cell (&triangulation, 0, coarse_cell_idx);
+
         set_subdomain_id_in_zorder_recursively(coarse_cell,
                                                current_proc_idx,
                                                current_cell_idx,
-                                               n_active_cellls,
+                                               n_active_cells,
                                                n_partitions);
       }
 
-    // ensure terminal siblings are on the same
-    // processor as in p4est
+    // if all children of a cell are active (e.g. we
+    // have a cell that is refined once and no part
+    // is refined further), p4est places all of them
+    // on the same processor. The new owner will be
+    // the processor with the largest number of children
+    // (ties are broken by picking the lower rank).
+    // Duplicate this logic here.
     {
       typename Triangulation<dim,spacedim>::cell_iterator
       cell = triangulation.begin(),
@@ -2321,11 +2286,11 @@ next_cell:
   partition_multigrid_levels (Triangulation<dim,spacedim> &triangulation)
   {
     unsigned int n_levels = triangulation.n_levels();
-    for (int lvl=n_levels-1; lvl>=0; --lvl)
+    for (int lvl = n_levels-1; lvl>=0; --lvl)
       {
         typename Triangulation<dim,spacedim>::cell_iterator
         cell = triangulation.begin(lvl),
-        endc=triangulation.end(lvl);
+        endc = triangulation.end(lvl);
         for (; cell!=endc; ++cell)
           {
             if (!cell->has_children())

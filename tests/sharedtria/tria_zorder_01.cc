@@ -16,6 +16,7 @@
 
 
 // create a shared tria mesh and distribute with zorder scheme
+// compare against p4est
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>

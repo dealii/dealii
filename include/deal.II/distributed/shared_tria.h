@@ -107,17 +107,21 @@ namespace parallel
          *     {
          *       parallel::shared::Triangulation<dim> tria(...,
          *                                                 parallel::shared::Triangulation<dim>::Settings::partition_custom_signal);
-         *       shared_tria.signals.post_refinement.connect (std::bind(&mypartition<dim>, std::ref(shared_tria)));
+         *       tria.signals.post_refinement.connect (std::bind(&mypartition<dim>, std::ref(shared_tria)));
          *     }
          *  @endcode
+         *
+         * Note: If you plan to use a custom partition with geometric multigrid,
+         * you must manualy partition the level cells in addition to the active cells.
          */
         partition_custom_signal = 0x4,
 
         /**
-         * This flags needs to be set to use the geometric multigrid
-         * functionality. This option requires additional computation and
-         * communication. Note: geometric multigrid is still a work in
-         * progress and not yet functional for shared triangulation.
+         * This flag needs to be set to use the geometric multigrid
+         * functionality. This option requires additional computation and communication.
+         *
+         * Note: This flag should always be set alongside a flag for an
+         * active cell partitioning method.
          */
         construct_multigrid_hierarchy = 0x8,
       };

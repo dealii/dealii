@@ -45,10 +45,54 @@ namespace parallel
       Assert((settings & (partition_metis | partition_zorder | partition_custom_signal)) == partition_metis ||
              (settings & (partition_metis | partition_zorder | partition_custom_signal)) == partition_zorder ||
              (settings & (partition_metis | partition_zorder | partition_custom_signal)) == partition_custom_signal,
-             ExcMessage ("Settings must contain only one type of active cell partitioning scheme."))
+             ExcMessage ("Settings must contain exactly one type of active cell partitioning scheme."))
     }
 
 
+
+    namespace
+    {
+      /**
+       *  Helper function for partition() which determines halo
+       * layer cells for a given level
+       */
+      template <int dim, int spacedim>
+      std::vector<typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator>
+      compute_cell_halo_layer_on_level
+      (parallel::shared::Triangulation<dim,spacedim>                                                                   &tria,
+       const std_cxx11::function<bool (const typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator &)> &predicate,
+       const unsigned int                                                                                              level)
+      {
+        std::vector<typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator> level_halo_layer;
+        std::vector<bool> locally_active_vertices_on_level_subdomain (tria.n_vertices(), false);
+
+        // Find the cells for which the predicate is true
+        // These are the cells around which we wish to construct
+        // the halo layer
+        for (typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator
+             cell = tria.begin(level);
+             cell != tria.end(level); ++cell)
+          if (predicate(cell)) // True predicate -> part of subdomain
+            for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+              locally_active_vertices_on_level_subdomain[cell->vertex_index(v)] = true;
+
+        // Find the cells that do not conform to the predicate
+        // but share a vertex with the selected level subdomain
+        // These comprise the halo layer
+        for (typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator
+             cell = tria.begin(level);
+             cell != tria.end(level); ++cell)
+          if (!predicate(cell)) // False predicate -> possible halo layer cell
+            for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+              if (locally_active_vertices_on_level_subdomain[cell->vertex_index(v)] == true)
+                {
+                  level_halo_layer.push_back(cell);
+                  break;
+                }
+
+        return level_halo_layer;
+      }
+    }
 
     template <int dim, int spacedim>
     void Triangulation<dim,spacedim>::partition()
@@ -56,19 +100,23 @@ namespace parallel
       if (settings & partition_metis)
         {
           dealii::GridTools::partition_triangulation (this->n_subdomains, *this);
-          if (settings & construct_multigrid_hierarchy)
-            dealii::GridTools::partition_multigrid_levels(*this);
         }
       else if (settings & partition_zorder)
         {
           dealii::GridTools::partition_triangulation_zorder (this->n_subdomains, *this);
-          if (settings & construct_multigrid_hierarchy)
-            dealii::GridTools::partition_multigrid_levels(*this);
         }
-      else
+      else if (settings & partition_custom_signal)
         {
           // User partitions mesh manually
         }
+      else
+        {
+          AssertThrow(false, ExcInternalError())
+        }
+
+      // custom partition require manual partitioning of level cells
+      if ((settings & construct_multigrid_hierarchy) && !(settings & partition_custom_signal))
+        dealii::GridTools::partition_multigrid_levels(*this);
 
       true_subdomain_ids_of_cells.resize(this->n_active_cells());
 
@@ -98,40 +146,42 @@ namespace parallel
                   active_halo_layer.find(cell) == active_halo_layer.end())
                 cell->set_subdomain_id(numbers::artificial_subdomain_id);
             }
+
+          // loop over all cells in multigrid hierarchy and mark artificial:
+          if (settings & construct_multigrid_hierarchy)
+            {
+              std_cxx11::function<bool (const typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator &)> predicate
+                = IteratorFilters::LocallyOwnedLevelCell();
+              for (unsigned int lvl=0; lvl<this->n_levels(); ++lvl)
+                {
+                  const std::vector<typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator>
+                  level_halo_layer_vector = compute_cell_halo_layer_on_level (*this, predicate, lvl);
+                  std::set<typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator>
+                  level_halo_layer(level_halo_layer_vector.begin(), level_halo_layer_vector.end());
+
+                  typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator
+                  cell = this->begin(lvl),
+                  endc = this->end(lvl);
+                  for (; cell != endc; cell++)
+                    {
+                      // for active cells we must keep level subdomain id of all neighbors,
+                      // not just neighbors that exist on the same level.
+                      // if the cells subdomain id was not set to artitficial above, we will
+                      // also keep its level subdomain id.
+                      if (!cell->has_children() && cell->subdomain_id() != numbers::artificial_subdomain_id)
+                        continue;
+                      if (!cell->is_locally_owned_on_level() &&
+                          level_halo_layer.find(cell) == level_halo_layer.end())
+                        cell->set_level_subdomain_id(numbers::artificial_subdomain_id);
+                    }
+                }
+            }
         }
       else
         {
           // just store true subdomain ids
           for (unsigned int index=0; cell != endc; cell++, index++)
             true_subdomain_ids_of_cells[index] = cell->subdomain_id();
-        }
-
-      // loop over all cells in multigrid hierarchy and mark artificial:
-      if (allow_artificial_cells && (settings & construct_multigrid_hierarchy))
-        {
-          for (unsigned int lvl=0; lvl<this->n_levels(); ++lvl)
-            {
-              const std::vector<typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator>
-              level_halo_layer_vector = GridTools::compute_cell_halo_layer_on_level (*this, this->my_subdomain,lvl);
-              std::set<typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator>
-              level_halo_layer(level_halo_layer_vector.begin(), level_halo_layer_vector.end());
-
-              typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator
-              cell = this->begin(lvl),
-              endc = this->end(lvl);
-              for (; cell != endc; cell++)
-                {
-                  // for active cells we must keep level subdomain id of all neighbors,
-                  // not just neighbors that exist on the same level.
-                  // if the cells subdomain id was not set to artitficial above, we will
-                  // also keep its level subdomain id.
-                  if (!cell->has_children() && cell->subdomain_id() != numbers::artificial_subdomain_id)
-                    continue;
-                  if (cell->level_subdomain_id() != this->my_subdomain &&
-                      level_halo_layer.find(cell) == level_halo_layer.end())
-                    cell->set_level_subdomain_id(numbers::artificial_subdomain_id);
-                }
-            }
         }
 
 #ifdef DEBUG
@@ -153,30 +203,27 @@ namespace parallel
         Assert(total_cells == this->n_active_cells(),
                ExcMessage("Not all cells are assigned to a processor."))
       }
-#endif
 
+      // If running with multigrid, assert that each level
+      // cell is owned by a processor
       if (settings & construct_multigrid_hierarchy)
         {
-#ifdef DEBUG
-          {
-            // Assert that each level cell is owned by a processor if running with multigrid
-            unsigned int n_my_cells = 0;
-            typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator
-            cell = this->begin(),
-            endc = this->end();
-            for (; cell!=endc; ++cell)
-              if (cell->is_locally_owned_on_level())
-                n_my_cells += 1;
+          unsigned int n_my_cells = 0;
+          typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator
+          cell = this->begin(),
+          endc = this->end();
+          for (; cell!=endc; ++cell)
+            if (cell->is_locally_owned_on_level())
+              n_my_cells += 1;
 
-            unsigned int total_cells;
-            int ierr = MPI_Allreduce (&n_my_cells, &total_cells, 1, MPI_UNSIGNED, MPI_SUM, this->get_communicator());
-            AssertThrowMPI(ierr);
+          unsigned int total_cells;
+          int ierr = MPI_Allreduce (&n_my_cells, &total_cells, 1, MPI_UNSIGNED, MPI_SUM, this->get_communicator());
+          AssertThrowMPI(ierr);
 
-            Assert(total_cells == this->n_cells(),
-            ExcMessage("Not all cells are assigned to a processor."))
-          }
-#endif
+          Assert(total_cells == this->n_cells(),
+                 ExcMessage("Not all cells are assigned to a processor."))
         }
+#endif
     }
 
 

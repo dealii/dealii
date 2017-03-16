@@ -72,7 +72,7 @@ void test()
   cell = shared_tria.begin_active(),
   endc = shared_tria.end();
   for (; cell!=endc; ++cell)
-    if (cell->is_locally_owned())
+    if (cell->subdomain_id() != numbers::artificial_subdomain_id)
       deallog << "(" << cell->id().to_string() << "," << cell->subdomain_id() << ")" << std::endl;
 }
 
