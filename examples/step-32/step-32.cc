@@ -3010,7 +3010,7 @@ namespace Step32
           n_iterations = solver_control.last_step();
         }
 
-      catch (SolverControl::NoConvergence)
+      catch (SolverControl::NoConvergence &)
         {
           const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
                 TrilinosWrappers::PreconditionJacobi>
