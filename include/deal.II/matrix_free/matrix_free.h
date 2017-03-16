@@ -180,6 +180,7 @@ public:
                     const bool                initialize_indices = true,
                     const bool                initialize_mapping = true)
       :
+      mpi_communicator      (MPI_COMM_SELF),
       tasks_parallel_scheme (tasks_parallel_scheme),
       tasks_block_size      (tasks_block_size),
       mapping_update_flags  (mapping_update_flags),
@@ -2134,6 +2135,7 @@ namespace internal
                 const internal::MatrixFreeFunctions::TaskInfo &task_info_in,
                 const bool is_blocked_in)
         :
+        dummy (NULL),
         worker (worker_in),
         partition (partition_in),
         task_info (task_info_in),
@@ -2170,6 +2172,7 @@ namespace internal
                      const internal::MatrixFreeFunctions::TaskInfo &task_info_in,
                      const bool    is_blocked_in = false)
         :
+        dummy (NULL),
         function (function_in),
         partition (partition_in),
         task_info (task_info_in),
@@ -2297,6 +2300,7 @@ namespace internal
                      const internal::MatrixFreeFunctions::TaskInfo &task_info_in,
                      const bool    is_blocked_in)
         :
+        dummy (NULL),
         worker (worker_in),
         partition (partition_in),
         task_info (task_info_in),
