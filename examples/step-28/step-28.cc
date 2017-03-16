@@ -1308,7 +1308,8 @@ namespace Step28
     :
     parameters (parameters),
     material_data (parameters.n_groups),
-    fe (parameters.fe_degree)
+    fe (parameters.fe_degree),
+    k_eff (std::numeric_limits<double>::quiet_NaN())
   {}
 
 

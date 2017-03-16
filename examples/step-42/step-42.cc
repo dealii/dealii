@@ -861,7 +861,9 @@ namespace Step42
               (new EquationData::SphereObstacle<dim>(base_mesh == "box" ? 1.0 : 0.5))),
 
     transfer_solution (prm.get_bool("transfer solution")),
-    n_refinement_cycles (prm.get_integer("number of cycles"))
+    n_refinement_cycles (prm.get_integer("number of cycles")),
+    current_refinement_cycle (0)
+
   {
     std::string strat = prm.get("refinement strategy");
     if (strat == "global")
@@ -2151,8 +2153,7 @@ namespace Step42
   PlasticityContactProblem<dim>::run ()
   {
     computing_timer.reset();
-    for (current_refinement_cycle = 0;
-         current_refinement_cycle < n_refinement_cycles;
+    for (; current_refinement_cycle < n_refinement_cycles;
          ++current_refinement_cycle)
       {
         {

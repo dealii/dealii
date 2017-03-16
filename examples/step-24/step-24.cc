@@ -95,7 +95,7 @@ namespace Step24
     Vector<double>       old_solution_p, old_solution_v;
     Vector<double>       system_rhs_p, system_rhs_v;
 
-    double time, time_step;
+    double time_step, time;
     unsigned int timestep_number;
     const double theta;
 
@@ -192,12 +192,15 @@ namespace Step24
   // imaging) since this is where many of the experiments we want to compare
   // the output with are made in. The Crank-Nicolson scheme is used again,
   // i.e. theta is set to 0.5. The time step is later selected to satisfy $k =
-  // \frac hc$
+  // \frac hc$: here we initialize it to an invalid number.
   template <int dim>
   TATForwardProblem<dim>::TATForwardProblem ()
     :
     fe (1),
     dof_handler (triangulation),
+    time_step (std::numeric_limits<double>::quiet_NaN()),
+    time (time_step),
+    timestep_number (1),
     theta (0.5),
     wave_speed (1.437)
   {
@@ -498,9 +501,7 @@ namespace Step24
     Vector<double> G2 (solution_v.size());
 
     const double end_time = 0.7;
-    for (timestep_number=1, time=time_step;
-         time<=end_time;
-         time+=time_step, ++timestep_number)
+    for (time=time_step; time<=end_time; time+=time_step, ++timestep_number)
       {
         std::cout << std::endl;
         std::cout<< "time_step " << timestep_number << " @ t=" << time << std::endl;

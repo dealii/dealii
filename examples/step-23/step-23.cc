@@ -140,7 +140,7 @@ namespace Step23
     Vector<double>       old_solution_u, old_solution_v;
     Vector<double>       system_rhs;
 
-    double time, time_step;
+    double time_step, time;
     unsigned int timestep_number;
     const double theta;
   };
@@ -311,6 +311,8 @@ namespace Step23
     fe (1),
     dof_handler (triangulation),
     time_step (1./64),
+    time (time_step),
+    timestep_number (1),
     theta (0.5)
   {}
 
@@ -511,9 +513,7 @@ namespace Step23
     Vector<double> tmp (solution_u.size());
     Vector<double> forcing_terms (solution_u.size());
 
-    for (timestep_number=1, time=time_step;
-         time<=5;
-         time+=time_step, ++timestep_number)
+    for (; time<=5; time+=time_step, ++timestep_number)
       {
         std::cout << "Time step " << timestep_number
                   << " at t=" << time
