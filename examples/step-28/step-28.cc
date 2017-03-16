@@ -74,6 +74,10 @@
 // file:
 #include <deal.II/grid/grid_tools.h>
 
+// We use a little utility class from boost to save the state of an output
+// stream (see the <code>run</code> function below):
+#include <boost/io/ios_state.hpp>
+
 // Here are two more C++ standard headers that we use to define list data
 // types as well as to fine-tune the output we generate:
 #include <list>
@@ -1624,6 +1628,14 @@ namespace Step28
   template <int dim>
   void NeutronDiffusionProblem<dim>::run ()
   {
+    // We would like to change the output precision for just this function and
+    // restore the state of <code>std::cout</code> when this function returns.
+    // Hence, we need a way to undo the output format change. Boost provides a
+    // convenient way to save the state of an output stream and restore it at
+    // the end of the current block (when the destructor of
+    // <code>restore_flags</code> is called) with the
+    // <code>ios_flags_saver</code> class, which we use here.
+    boost::io::ios_flags_saver restore_flags(std::cout);
     std::cout << std::setprecision (12) << std::fixed;
 
     double k_eff_old = k_eff;
