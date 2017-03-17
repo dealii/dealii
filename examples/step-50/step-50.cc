@@ -188,6 +188,7 @@ namespace Step50
                                      std::vector<double>            &values,
                                      const unsigned int              component) const
   {
+    (void)component;
     const unsigned int n_points = points.size();
 
     Assert (values.size() == n_points,
