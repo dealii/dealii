@@ -1361,7 +1361,10 @@ namespace TrilinosWrappers
     if (last_action != Add)
       {
         if (last_action == Insert)
-          vector->GlobalAssemble(Insert);
+          {
+            const int ierr = vector->GlobalAssemble(Insert);
+            AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+          }
         last_action = Add;
       }
 
