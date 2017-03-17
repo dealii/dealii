@@ -715,16 +715,18 @@ namespace GridTools
 
 
   /**
-   * Extract and return the layer of cells around a subdomain on a given level
-   * in the @p mesh (i.e. those that share a common set of
-   * vertices with the level subdomain but are not a part of it).
+   * Extract and return the cell layer around a subdomain (set of
+   * cells) on a specified level of the @p mesh (i.e. those cells on
+   * that level that share a common set of vertices with the subdomain
+   * but are not a part of it). Here, the "subdomain" consists of exactly
+   * all of those cells for which the @p predicate returns @p true.
    */
   template <class MeshType>
   std::vector<typename MeshType::cell_iterator>
   compute_cell_halo_layer_on_level
-  (const MeshType     &mesh,
-   const unsigned int my_level_subdomain_id,
-   const unsigned int level);
+  (const MeshType                                                             &mesh,
+   const std_cxx11::function<bool (const typename MeshType::cell_iterator &)> &predicate,
+   const unsigned int                                                         level);
 
 
   /**

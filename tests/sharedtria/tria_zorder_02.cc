@@ -52,10 +52,13 @@ void test()
     if (cell->center().norm() > 0.3 && cell->center().norm() < 0.42)
       cell->set_refine_flag();
   shared_tria.execute_coarsening_and_refinement();
-  for (typename Triangulation<dim>::active_cell_iterator cell=shared_tria.begin_active(); cell != shared_tria.end(); ++cell)
-    if (cell->at_boundary() && (cell->center()[0] < 0 || cell->center()[1] < 0))
-      cell->set_refine_flag();
-  shared_tria.execute_coarsening_and_refinement();
+  if (dim != 1)
+    {
+      for (typename Triangulation<dim>::active_cell_iterator cell=shared_tria.begin_active(); cell != shared_tria.end(); ++cell)
+        if (cell->at_boundary() && (cell->center()[0] < 0 || cell->center()[1] < 0))
+          cell->set_refine_flag();
+      shared_tria.execute_coarsening_and_refinement();
+    }
 
   deallog << "(CellId,subdomain_id) for each active cell:" << std::endl;
   typename Triangulation<dim>::active_cell_iterator
@@ -71,6 +74,9 @@ int main(int argc, char *argv[])
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll all;
 
+  deallog.push("1d");
+  test<1>();
+  deallog.pop();
   deallog.push("2d");
   test<2>();
   deallog.pop();

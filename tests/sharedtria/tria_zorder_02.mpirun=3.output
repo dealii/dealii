@@ -1,4 +1,10 @@
 
+DEAL:0:1d::(CellId,subdomain_id) for each active cell:
+DEAL:0:1d::(0_2:00,0)
+DEAL:0:1d::(0_2:01,0)
+DEAL:0:1d::(0_3:100,0)
+DEAL:0:1d::(0_4:1010,0)
+DEAL:0:1d::(0_4:1011,0)
 DEAL:0:2d::(CellId,subdomain_id) for each active cell:
 DEAL:0:2d::(0_2:03,0)
 DEAL:0:2d::(0_2:12,0)
@@ -1161,6 +1167,11 @@ DEAL:0:3d::(1_4:6766,0)
 DEAL:0:3d::(1_4:6767,0)
 DEAL:0::OK
 
+DEAL:1:1d::(CellId,subdomain_id) for each active cell:
+DEAL:1:1d::(0_3:110,1)
+DEAL:1:1d::(0_3:111,1)
+DEAL:1:1d::(1_3:000,1)
+DEAL:1:1d::(1_3:001,1)
 DEAL:1:2d::(CellId,subdomain_id) for each active cell:
 DEAL:1:2d::(1_2:12,1)
 DEAL:1:2d::(1_2:30,1)
@@ -2318,6 +2329,12 @@ DEAL:1:3d::(4_4:3737,1)
 DEAL:1::OK
 
 
+DEAL:2:1d::(CellId,subdomain_id) for each active cell:
+DEAL:2:1d::(1_2:10,2)
+DEAL:2:1d::(1_2:11,2)
+DEAL:2:1d::(1_3:011,2)
+DEAL:2:1d::(1_4:0100,2)
+DEAL:2:1d::(1_4:0101,2)
 DEAL:2:2d::(CellId,subdomain_id) for each active cell:
 DEAL:2:2d::(2_2:21,2)
 DEAL:2:2d::(2_2:30,2)

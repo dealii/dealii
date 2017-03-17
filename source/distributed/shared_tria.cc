@@ -50,50 +50,6 @@ namespace parallel
 
 
 
-    namespace
-    {
-      /**
-       *  Helper function for partition() which determines halo
-       * layer cells for a given level
-       */
-      template <int dim, int spacedim>
-      std::vector<typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator>
-      compute_cell_halo_layer_on_level
-      (parallel::shared::Triangulation<dim,spacedim>                                                                   &tria,
-       const std_cxx11::function<bool (const typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator &)> &predicate,
-       const unsigned int                                                                                              level)
-      {
-        std::vector<typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator> level_halo_layer;
-        std::vector<bool> locally_active_vertices_on_level_subdomain (tria.n_vertices(), false);
-
-        // Find the cells for which the predicate is true
-        // These are the cells around which we wish to construct
-        // the halo layer
-        for (typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator
-             cell = tria.begin(level);
-             cell != tria.end(level); ++cell)
-          if (predicate(cell)) // True predicate -> part of subdomain
-            for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-              locally_active_vertices_on_level_subdomain[cell->vertex_index(v)] = true;
-
-        // Find the cells that do not conform to the predicate
-        // but share a vertex with the selected level subdomain
-        // These comprise the halo layer
-        for (typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator
-             cell = tria.begin(level);
-             cell != tria.end(level); ++cell)
-          if (!predicate(cell)) // False predicate -> possible halo layer cell
-            for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-              if (locally_active_vertices_on_level_subdomain[cell->vertex_index(v)] == true)
-                {
-                  level_halo_layer.push_back(cell);
-                  break;
-                }
-
-        return level_halo_layer;
-      }
-    }
-
     template <int dim, int spacedim>
     void Triangulation<dim,spacedim>::partition()
     {
@@ -114,7 +70,8 @@ namespace parallel
           AssertThrow(false, ExcInternalError())
         }
 
-      // custom partition require manual partitioning of level cells
+      // do not partition multigrid levels if user is
+      // defining a custom partition
       if ((settings & construct_multigrid_hierarchy) && !(settings & partition_custom_signal))
         dealii::GridTools::partition_multigrid_levels(*this);
 
@@ -155,7 +112,7 @@ namespace parallel
               for (unsigned int lvl=0; lvl<this->n_levels(); ++lvl)
                 {
                   const std::vector<typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator>
-                  level_halo_layer_vector = compute_cell_halo_layer_on_level (*this, predicate, lvl);
+                  level_halo_layer_vector = GridTools::compute_cell_halo_layer_on_level (*this, predicate, lvl);
                   std::set<typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator>
                   level_halo_layer(level_halo_layer_vector.begin(), level_halo_layer_vector.end());
 
@@ -164,10 +121,11 @@ namespace parallel
                   endc = this->end(lvl);
                   for (; cell != endc; cell++)
                     {
-                      // for active cells we must keep level subdomain id of all neighbors,
-                      // not just neighbors that exist on the same level.
+                      // for active cells we must keep level subdomain id of all neighbors
+                      // to our subdomain, not just cells that share a vertex on the same level.
                       // if the cells subdomain id was not set to artitficial above, we will
-                      // also keep its level subdomain id.
+                      // also keep its level subdomain id since it is either owned by this processor
+                      // or in the ghost layer of the active mesh.
                       if (!cell->has_children() && cell->subdomain_id() != numbers::artificial_subdomain_id)
                         continue;
                       if (!cell->is_locally_owned_on_level() &&

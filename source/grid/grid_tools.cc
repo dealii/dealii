@@ -1608,6 +1608,46 @@ next_cell:
 
 
   template <class MeshType>
+  std::vector<typename MeshType::cell_iterator>
+  compute_cell_halo_layer_on_level
+  (const MeshType                                                             &mesh,
+   const std_cxx11::function<bool (const typename MeshType::cell_iterator &)> &predicate,
+   const unsigned int                                                         level)
+  {
+    std::vector<typename MeshType::cell_iterator> level_halo_layer;
+    std::vector<bool> locally_active_vertices_on_level_subdomain (mesh.get_triangulation().n_vertices(),
+        false);
+
+    // Find the cells for which the predicate is true
+    // These are the cells around which we wish to construct
+    // the halo layer
+    for (typename MeshType::cell_iterator
+         cell = mesh.begin(level);
+         cell != mesh.end(level); ++cell)
+      if (predicate(cell)) // True predicate --> Part of subdomain
+        for (unsigned int v=0; v<GeometryInfo<MeshType::dimension>::vertices_per_cell; ++v)
+          locally_active_vertices_on_level_subdomain[cell->vertex_index(v)] = true;
+
+    // Find the cells that do not conform to the predicate
+    // but share a vertex with the selected subdomain on that level
+    // These comprise the halo layer
+    for (typename MeshType::cell_iterator
+         cell = mesh.begin(level);
+         cell != mesh.end(level); ++cell)
+      if (!predicate(cell)) // False predicate --> Potential halo cell
+        for (unsigned int v=0; v<GeometryInfo<MeshType::dimension>::vertices_per_cell; ++v)
+          if (locally_active_vertices_on_level_subdomain[cell->vertex_index(v)] == true)
+            {
+              level_halo_layer.push_back(cell);
+              break;
+            }
+
+    return level_halo_layer;
+  }
+
+
+
+  template <class MeshType>
   std::vector<typename MeshType::active_cell_iterator>
   compute_ghost_cell_halo_layer (const MeshType &mesh)
   {

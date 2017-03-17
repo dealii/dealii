@@ -1,4 +1,19 @@
 
+DEAL:0:1d::(CellId,level_subdomain_id) for each active cell:
+DEAL:0:1d::(0_0:,0)
+DEAL:0:1d::(1_0:,1)
+DEAL:0:1d::(0_1:0,0)
+DEAL:0:1d::(0_1:1,0)
+DEAL:0:1d::(1_1:0,1)
+DEAL:0:1d::(0_2:00,0)
+DEAL:0:1d::(0_2:01,0)
+DEAL:0:1d::(0_2:10,0)
+DEAL:0:1d::(0_2:11,1)
+DEAL:0:1d::(0_3:100,0)
+DEAL:0:1d::(0_3:101,0)
+DEAL:0:1d::(0_3:110,1)
+DEAL:0:1d::(0_4:1010,0)
+DEAL:0:1d::(0_4:1011,0)
 DEAL:0:2d::(CellId,level_subdomain_id) for each active cell:
 DEAL:0:2d::(0_0:,0)
 DEAL:0:2d::(1_0:,0)
@@ -1756,6 +1771,24 @@ DEAL:0:3d::(7_4:0100,2)
 DEAL:0:3d::(7_4:0101,2)
 DEAL:0::OK
 
+DEAL:1:1d::(CellId,level_subdomain_id) for each active cell:
+DEAL:1:1d::(0_0:,0)
+DEAL:1:1d::(1_0:,1)
+DEAL:1:1d::(0_1:1,0)
+DEAL:1:1d::(1_1:0,1)
+DEAL:1:1d::(1_1:1,2)
+DEAL:1:1d::(0_2:10,0)
+DEAL:1:1d::(0_2:11,1)
+DEAL:1:1d::(1_2:00,1)
+DEAL:1:1d::(1_2:01,2)
+DEAL:1:1d::(0_3:101,0)
+DEAL:1:1d::(0_3:110,1)
+DEAL:1:1d::(0_3:111,1)
+DEAL:1:1d::(1_3:000,1)
+DEAL:1:1d::(1_3:001,1)
+DEAL:1:1d::(1_3:010,2)
+DEAL:1:1d::(0_4:1011,0)
+DEAL:1:1d::(1_4:0100,2)
 DEAL:1:2d::(CellId,level_subdomain_id) for each active cell:
 DEAL:1:2d::(0_0:,0)
 DEAL:1:2d::(1_0:,0)
@@ -3829,6 +3862,18 @@ DEAL:1:3d::(7_4:0404,2)
 DEAL:1::OK
 
 
+DEAL:2:1d::(CellId,level_subdomain_id) for each active cell:
+DEAL:2:1d::(1_1:0,1)
+DEAL:2:1d::(1_1:1,2)
+DEAL:2:1d::(1_2:00,1)
+DEAL:2:1d::(1_2:01,2)
+DEAL:2:1d::(1_2:10,2)
+DEAL:2:1d::(1_2:11,2)
+DEAL:2:1d::(1_3:001,1)
+DEAL:2:1d::(1_3:010,2)
+DEAL:2:1d::(1_3:011,2)
+DEAL:2:1d::(1_4:0100,2)
+DEAL:2:1d::(1_4:0101,2)
 DEAL:2:2d::(CellId,level_subdomain_id) for each active cell:
 DEAL:2:2d::(0_0:,0)
 DEAL:2:2d::(1_0:,0)
