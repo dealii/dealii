@@ -23,6 +23,7 @@
 #include <deal.II/lac/solver_control.h>
 #include <cmath>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/signaling_nan.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -295,6 +296,22 @@ SolverBicgstab<VectorType>::SolverBicgstab (SolverControl        &cn,
                                             const AdditionalData &data)
   :
   Solver<VectorType>(cn),
+  Vx(NULL),
+  Vr(NULL),
+  Vrbar(NULL),
+  Vp(NULL),
+  Vy(NULL),
+  Vz(NULL),
+  Vt(NULL),
+  Vv(NULL),
+  Vb(NULL),
+  alpha(0.),
+  beta(0.),
+  omega(0.),
+  rho(0.),
+  rhobar(0.),
+  step(numbers::invalid_unsigned_int),
+  res(numbers::signaling_nan<double>()),
   additional_data(data)
 {}
 

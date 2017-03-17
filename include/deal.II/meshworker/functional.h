@@ -95,6 +95,11 @@ namespace MeshWorker
     {
     public:
       /**
+       * Constructor. Initialize the member variables.
+       */
+      CellsAndFaces();
+
+      /**
        * The initialization function, specifying the @p results vectors and
        * whether face data should be collected separately.
        *
@@ -197,6 +202,14 @@ namespace MeshWorker
     }
 
 //----------------------------------------------------------------------//
+
+    template <typename number>
+    inline
+    CellsAndFaces<number>::CellsAndFaces()
+      : separate_faces(true)
+    {}
+
+
 
     template <typename number>
     inline void
