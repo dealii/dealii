@@ -989,7 +989,6 @@ int main (int argc, char *argv[])
                 << "Aborting!" << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
-      throw;
     }
   catch (...)
     {
