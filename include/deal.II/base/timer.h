@@ -752,7 +752,12 @@ TimerOutput::Scope::Scope(dealii::TimerOutput &timer_, const std::string &sectio
 inline
 TimerOutput::Scope::~Scope()
 {
-  stop();
+  try
+    {
+      stop();
+    }
+  catch (...)
+    {}
 }
 
 inline

@@ -2419,7 +2419,12 @@ FEEvaluationBase<dim,n_components_,Number>::~FEEvaluationBase ()
 {
   if (matrix_info != 0)
     {
-      matrix_info->release_scratch_data(scratch_data_array);
+      try
+        {
+          matrix_info->release_scratch_data(scratch_data_array);
+        }
+      catch (...)
+        {}
     }
   else
     {

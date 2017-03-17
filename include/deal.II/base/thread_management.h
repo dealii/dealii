@@ -2973,8 +2973,8 @@ namespace Threads
       // of the arena". rather, let's explicitly destroy the empty
       // task object. before that, make sure that the task has been
       // shut down, expressed by a zero reference count
-      Assert (task != 0, ExcInternalError());
-      Assert (task->ref_count()==0, ExcInternalError());
+      AssertNothrow (task != 0, ExcInternalError());
+      AssertNothrow (task->ref_count()==0, ExcInternalError());
       task->destroy (*task);
     }
 
