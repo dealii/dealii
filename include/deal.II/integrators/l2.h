@@ -221,6 +221,7 @@ namespace LocalIntegrators
       const unsigned int n_components = fe1.get_fe().n_components();
 
       Assert(n1_dofs == n2_dofs, ExcNotImplemented());
+      (void) n2_dofs;
       AssertDimension(n_components, fe2.get_fe().n_components());
       AssertDimension(M11.m(), n1_dofs);
       AssertDimension(M12.m(), n1_dofs);

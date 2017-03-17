@@ -2904,6 +2904,7 @@ namespace Threads
     TaskDescriptor<RT>::TaskDescriptor (const std_cxx11::function<RT ()> &function)
       :
       function (function),
+      task(NULL),
       task_is_done (false)
     {}
 

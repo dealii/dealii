@@ -23,6 +23,7 @@
 #include <deal.II/base/logstream.h>
 #include <cmath>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/signaling_nan.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -167,7 +168,15 @@ template<class VectorType>
 SolverMinRes<VectorType>::SolverMinRes (SolverControl        &cn,
                                         const AdditionalData &)
   :
-  Solver<VectorType>(cn)
+  Solver<VectorType>(cn),
+  Vu0(NULL),
+  Vu1(NULL),
+  Vu2(NULL),
+  Vm0(NULL),
+  Vm1(NULL),
+  Vm2(NULL),
+  Vv(NULL),
+  res2(numbers::signaling_nan<double>())
 {}
 
 

@@ -792,7 +792,7 @@ namespace parallel
     template<int dim, typename DataType>
     void ContinuousQuadratureDataTransfer<dim,DataType>::pack_function
     (const typename parallel::distributed::Triangulation<dim,dim>::cell_iterator &cell,
-     const typename parallel::distributed::Triangulation<dim,dim>::CellStatus status,
+     const typename parallel::distributed::Triangulation<dim,dim>::CellStatus /*status*/,
      void *data)
     {
       double *data_store = reinterpret_cast<double *>(data);
@@ -815,6 +815,7 @@ namespace parallel
     {
       Assert ((status!=parallel::distributed::Triangulation<dim,dim>::CELL_COARSEN),
               ExcNotImplemented());
+      (void) status;
 
       const double *data_store = reinterpret_cast<const double *>(data);
 

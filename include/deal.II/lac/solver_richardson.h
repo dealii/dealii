@@ -22,6 +22,7 @@
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/signaling_nan.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -207,7 +208,8 @@ SolverRichardson<VectorType>::SolverRichardson(SolverControl        &cn,
   Solver<VectorType> (cn),
   Vr(NULL),
   Vd(NULL),
-  additional_data(data)
+  additional_data(data),
+  res(numbers::signaling_nan<double>())
 {}
 
 
