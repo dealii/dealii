@@ -997,7 +997,7 @@ namespace MatrixFreeOperators
         for (unsigned int i=0; i<given_column_selection.size(); ++i)
           {
             AssertIndexRange(given_column_selection[i], data_->n_components());
-            for (unsigned int j=0; j<given_row_selection.size(); ++j)
+            for (unsigned int j=0; j<given_column_selection.size(); ++j)
               if (j!=i)
                 Assert(given_column_selection[j] != given_column_selection[i],
                        ExcMessage("Given column indices must be unique"));
