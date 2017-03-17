@@ -1078,6 +1078,7 @@ namespace Step44
   Solid<dim>::Solid(const std::string &input_file)
     :
     parameters(input_file),
+    vol_reference(0.),
     triangulation(Triangulation<dim>::maximum_smoothing),
     time(parameters.end_time, parameters.delta_t),
     timer(std::cout,

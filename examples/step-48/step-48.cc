@@ -338,6 +338,7 @@ namespace Step48
     dof_handler (triangulation),
     n_global_refinements (10-2*dim),
     time (-10),
+    time_step(10.),
     final_time (10),
     cfl_number (.1/fe_degree),
     output_timestep_skip (200)

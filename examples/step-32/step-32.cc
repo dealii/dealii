@@ -1210,6 +1210,8 @@ namespace Step32
                    (Triangulation<dim>::smoothing_on_refinement |
                     Triangulation<dim>::smoothing_on_coarsening)),
 
+    global_Omega_diameter(0.),
+
     mapping (4),
 
     stokes_fe (FE_Q<dim>(parameters.stokes_velocity_degree),

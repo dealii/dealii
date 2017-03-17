@@ -321,7 +321,12 @@ namespace Step34
     fe(fe_degree),
     dh(tria),
     mapping(mapping_degree, true),
-    wind(dim)
+    wind(dim),
+    singular_quadrature_order(5),
+    n_cycles(4),
+    external_refinement(5),
+    run_in_this_dimension(true),
+    extend_solution(true)
   {}
 
 

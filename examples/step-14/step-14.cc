@@ -2673,6 +2673,7 @@ namespace Step14
               ExcInternalError());
       Assert (neighbor->has_children(),
               ExcInternalError());
+      (void) neighbor;
 
       // Then find out which neighbor the present cell is of the adjacent
       // cell. Note that we will operate on the children of this adjacent
