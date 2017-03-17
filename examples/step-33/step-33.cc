@@ -1090,12 +1090,20 @@ namespace Step33
     AllParameters<dim>::BoundaryConditions::BoundaryConditions ()
       :
       values (EulerEquations<dim>::n_components)
-    {}
+    {
+      for (unsigned int c=0; c<EulerEquations<dim>::n_components; ++c)
+        kind[c] = EulerEquations<dim>::no_penetration_boundary;
+    }
 
 
     template <int dim>
     AllParameters<dim>::AllParameters ()
       :
+      diffusion_power(0.),
+      time_step(1.),
+      final_time(1.),
+      theta(.5),
+      is_stationary(true),
       initial_conditions (EulerEquations<dim>::n_components)
     {}
 

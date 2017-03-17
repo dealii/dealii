@@ -168,7 +168,7 @@ namespace Step28
     sigma_s (n_materials, n_groups, n_groups),
     chi (n_materials, n_groups)
   {
-    switch (n_groups)
+    switch (this->n_groups)
       {
       case 2:
       {

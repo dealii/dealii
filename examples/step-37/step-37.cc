@@ -757,6 +757,7 @@ namespace Step37
 #endif
     fe (degree_finite_element),
     dof_handler (triangulation),
+    setup_time(0.),
     pcout (std::cout, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0),
     // The LaplaceProblem class holds an additional output stream that
     // collects detailed timings about the setup phase. This stream, called
