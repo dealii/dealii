@@ -84,13 +84,14 @@ template <int,int> class MappingQ;
  * <h4>Behavior along curved boundaries and with different manifolds</h4>
  *
  * As described above, one often only knows a manifold description of a
- * surface but not the interior of the computational domain. Thus, a
+ * surface but not the interior of the computational domain. In such a case, a
  * StraightBoundary object will be assigned to the interior entities that
- * describes a usual planar coordinate system where the additional points of
- * this class are placed exactly according to a bi-/trilinear mapping. When
- * combined with a non-flat manifold on the boundary, for example a circle,
- * the two manifold descriptions are in general incompatible. For example, a
- * StraightBoundary would put an interior point located at some small distance
+ * describes a usual planar coordinate system where the additional points for
+ * the higher order mapping are placed exactly according to a bi-/trilinear
+ * mapping. When combined with a non-flat manifold on the boundary, for
+ * example a circle, the two manifold descriptions are in general
+ * incompatible. For example, a StraightBoundary defined solely through the
+ * cell's vertices would put an interior point located at some small distance
  * epsilon away from the boundary along a flat line and thus in general
  * outside the concave part of a circle. If the polynomial degree of
  * MappingQGeneric is sufficiently high, the transformation from the reference
@@ -98,33 +99,36 @@ template <int,int> class MappingQ;
  * boundary.
  *
  * In order to avoid this situation, this class applies a smoothing on cells
- * adjacent to the boundary by using so-called Laplace smoothing. In the
- * algorithm computing new points, all the entities of the cells are passed
- * through hierarchically, starting from the lines to the quads and finally
- * hexes. The elements higher up in the hierarchy that sit on a
- * StraightBoundary will then get their points interpolated from all the
- * surrounding points and not just the corner points. If only a line is
- * associated to a curved boundary but the adjacent quad is on a flat
- * manifold, the points inside the quad will be computed according to the
- * deformed line and thus always result in a well-defined transformation. If
- * this smoothing is undesired, the optional argument @p
- * smooth_support_points_on_flat_manifold can be used to disable the
- * smoothing, placing the additional points strictly according to the
- * manifold.
+ * adjacent to the boundary by using so-called Laplace smoothing by
+ * default. In the algorithm that computing additional points, the
+ * compute_mapping_support_points() method, all the entities of the cells are
+ * passed through hierarchically, starting from the lines to the quads and
+ * finally hexes. The elements higher up in the hierarchy that sit on the
+ * boundary will then get their points interpolated from all the surrounding
+ * points and not just the corner points. If only a line is assigned a curved
+ * boundary but the adjacent quad is on a flat manifold, the points inside the
+ * quad will be computed according to the deformed line and thus always result
+ * in a well-defined transformation. This smoothing can be disabled by setting
+ * the optional argument @p smooth_support_points to false, placing the
+ * additional points strictly according to the manifold. This is usually the
+ * most efficient choice in case different manifolds are present that are
+ * compatible with each other.
  *
- * While this smoothing approach works well for low and medium convergence
- * orders up to approximately three to four, this mechanism has an inherent
- * shortcoming because it switches from a curved manifold to a flat manifold
- * within one layer of elements. This will cause the Jacobian transformation
- * to have jumps between the first and second element layer that can reduce
- * the order of convergence. For example, the convergence rates for solving
- * the Laplacian on a circle where only the boundary is deformed and the above
- * mesh smoothing algorithm is applied will typically not exceed 3.5, even for
+ * While the smoothing approach works well for filling holes or avoiding
+ * inversions with low and medium convergence orders up to approximately three
+ * to four, there is nonetheless an inherent shortcoming because of a
+ * discontinuous mapping that switches from a curved manifold to a flat
+ * manifold within one layer of elements. This will cause the Jacobian
+ * transformation to have jumps between the first and second element layer
+ * that can reduce the order of convergence. For example, the convergence
+ * rates for solving the Laplacian on a circle where only the boundary is
+ * deformed and the above mesh smoothing algorithm is applied will typically
+ * not exceed 3.5 (or 3 in the elements adjacent to the boundary), even for
  * fourth or fifth degree polynomials. In such a case, the curved manifold
  * needs to be switched to a flat manifold in a smooth way that does not
  * depend on the mesh size and eventuell covers a whole layer of cells.
  *
- * @author Wolfgang Bangerth, 2015
+ * @author Wolfgang Bangerth, 2015, Martin Kronbichler, 2017
  */
 template <int dim, int spacedim=dim>
 class MappingQGeneric : public Mapping<dim,spacedim>
@@ -135,12 +139,12 @@ public:
    * polynomials that are used to map cells from the reference to the real
    * cell.
    *
-   * The optional parameter @p smooth_support_points_on_flat_manifold controls
-   * whether smoothing adjancent to StraightBoundary objects according to the
-   * general class description should be enabled (default) or not.
+   * The optional parameter @p smooth_support_points controls whether
+   * smoothing according to the general class description should be enabled
+   * (default) or not.
    */
   MappingQGeneric (const unsigned int polynomial_degree,
-                   const bool         smooth_support_points_on_flat_manifold = true);
+                   const bool         smooth_support_points = true);
 
   /**
    * Copy constructor.
@@ -437,16 +441,6 @@ public:
      */
     const unsigned int n_shape_functions;
 
-    /*
-     * The default line support points. Is used in when the shape function
-     * values are computed.
-     *
-     * The number of quadrature points depends on the degree of this
-     * class, and it matches the number of degrees of freedom of an
-     * FE_Q<1>(this->degree).
-     */
-    QGaussLobatto<1> line_support_points;
-
     /**
      * Tensors of covariant transformation at each of the quadrature points.
      * The matrix stored is the Jacobian * G^{-1}, where G = Jacobian^{t} *
@@ -556,7 +550,7 @@ protected:
    * Stores whether we want to smooth the placement of interior points on flat
    * manifolds.
    */
-  const bool smooth_support_points_on_flat_manifold;
+  const bool smooth_support_points;
 
   /*
    * The default line support points. These are used when computing
@@ -577,29 +571,62 @@ protected:
   const std_cxx11::unique_ptr<FE_Q<dim> > fe_q;
 
   /**
-   * A table of weights by which we multiply the locations of the support
-   * points on the perimeter of a quad to get the location of interior support
-   * points.
+   * A vector of tables of weights by which we multiply the locations of the
+   * support points on the perimeter of an object (line, quad, hex) to get the
+   * location of interior support points.
    *
-   * Sizes: support_point_weights_on_quad.size()= number of inner
-   * unit_support_points support_point_weights_on_quad[i].size()= number of
-   * outer unit_support_points, i.e.  unit_support_points on the boundary of
-   * the quad
+   * Access into this table is by @p [structdim-1], i.e., use 0 to access the
+   * support point weights on a line (i.e., the interior points of the
+   * GaussLobatto quadrature), use 1 to access the support point weights from
+   * to perimeter to the interior of a quad, and use 2 to access the support
+   * point weights from the perimeter to the interior of a hex.
    *
-   * For the definition of this vector see equation (8) of the `mapping'
+   * The table itself contains as many columns as there are surrounding points
+   * to a particular object (2 for a vertex, <code>4 + 4*(degree-1)</code> for
+   * a quad, <code>8 + 12*(degree-1) + 6*(degree-1)*(degree-1)</code> for a
+   * hex) and as many rows as there are strictly interior points.
+   *
+   * For the definition of this table see equation (8) of the `mapping'
    * report.
    */
-  Table<2,double> support_point_weights_on_quad;
+  std::vector<Table<2,double> > support_point_weights_perimeter_to_interior;
 
   /**
-   * A table of weights by which we multiply the locations of the support
-   * points on the perimeter of a hex to get the location of interior support
-   * points.
+   * A vector of tables of weights by which we multiply the locations of the
+   * vertex points of an object (line, quad, hex) to get the location of
+   * interior support points.
    *
-   * For the definition of this vector see equation (8) of the `mapping'
-   * report.
+   * As opposed to @p support_point_weights_perimeter_to_interior, this table
+   * takes only the vertex points into account and not intermediate points
+   * inside the objects. Thus, the content of this table simply corresponds to
+   * the evaluation of the linear shape functions in the dimension of the
+   * object.
+   *
+   * Access into the vector of tables is by @p [structdim-1], i.e., use 0 to
+   * access the support point weights on a line (i.e., the interior points of
+   * the GaussLobatto quadrature), use 1 to access the support point weights
+   * from to perimeter to the interior of a quad, and use 2 to access the
+   * support point weights from the perimeter to the interior of a hex.
+   *
+   * The table itself contains as many columns as there are vertices on a
+   * particular object (2 for a vertex, 4 for a quad, 8 for a hex) and as many
+   * rows as there are strictly interior points.
    */
-  Table<2,double> support_point_weights_on_hex;
+  std::vector<Table<2,double> > support_point_weights_interior;
+
+  /**
+   * A table of weights by which we multiply the locations of the vertex
+   * points of the cell to get the location of all additional support points,
+   * both on lines, quads, and hexes (as appropriate). This data structure is
+   * used when we fill all support points at once, which is the case if the
+   * same manifold is attached to all sub-entities of a cell. This way, we can
+   * avoid some of the overhead in transforming data for mappings.
+   *
+   * The table has as many rows as there are vertices to the cell (2 in 1D, 4
+   * in 2D, 8 in 3D), and as many rows as there are additional support points
+   * in the mapping, i.e., <code>(degree+1)^dim - 2^dim</code>.
+   */
+  Table<2,double> support_point_weights_cell;
 
   /**
    * Return the locations of support points for the mapping. For example, for

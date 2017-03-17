@@ -353,8 +353,9 @@ namespace internal
 
         // Construct the tensor product polynomials used as shape functions for the
         // Qp mapping of cells at the boundary.
+        QGaussLobatto<1> line_support_points(data.polynomial_degree+1);
         const TensorProductPolynomials<dim>
-        tensor_pols (Polynomials::generate_complete_Lagrange_basis(data.line_support_points.get_points()));
+        tensor_pols (Polynomials::generate_complete_Lagrange_basis(line_support_points.get_points()));
         Assert (n_shape_functions==tensor_pols.n(),
                 ExcInternalError());
 
@@ -752,8 +753,7 @@ template<int dim, int spacedim>
 MappingQGeneric<dim,spacedim>::InternalData::InternalData (const unsigned int polynomial_degree)
   :
   polynomial_degree (polynomial_degree),
-  n_shape_functions (Utilities::fixed_power<dim>(polynomial_degree+1)),
-  line_support_points (polynomial_degree + 1)
+  n_shape_functions (Utilities::fixed_power<dim>(polynomial_degree+1))
 {}
 
 
@@ -1086,15 +1086,10 @@ namespace
    * For the definition of the @p support_point_weights_on_quad please refer to
    * equation (8) of the `mapping' report.
    */
-  template<int dim>
   Table<2,double>
   compute_support_point_weights_on_quad(const unsigned int polynomial_degree)
   {
     Table<2,double> loqvs;
-
-    // in 1d, there are no quads, so return an empty object
-    if (dim == 1)
-      return loqvs;
 
     // we are asked to compute weights for interior support points, but
     // there are no interior points if degree==1
@@ -1150,22 +1145,17 @@ namespace
    * For the definition of the @p support_point_weights_on_hex please refer to
    * equation (8) of the `mapping' report.
    */
-  template <int dim>
   Table<2,double>
   compute_support_point_weights_on_hex(const unsigned int polynomial_degree)
   {
     Table<2,double> lohvs;
-
-    // in 1d and 2d, there are no hexes, so return an empty object
-    if (dim < 3)
-      return lohvs;
 
     // we are asked to compute weights for interior support points, but
     // there are no interior points if degree==1
     if (polynomial_degree == 1)
       return lohvs;
 
-    const unsigned int n_inner = Utilities::fixed_power<dim>(polynomial_degree-1);
+    const unsigned int n_inner = Utilities::fixed_power<3>(polynomial_degree-1);
     const unsigned int n_outer = 8+12*(polynomial_degree-1)+6*(polynomial_degree-1)*(polynomial_degree-1);
 
     // first check whether we have precomputed the values for some polynomial
@@ -1188,7 +1178,7 @@ namespace
     else
       {
         // not precomputed, then do so now
-        lohvs = compute_laplace_vector<dim>(polynomial_degree);
+        lohvs = compute_laplace_vector<3>(polynomial_degree);
       }
 
     // the sum of weights of the points at the outer rim should be one. check
@@ -1200,6 +1190,115 @@ namespace
 
     return lohvs;
   }
+
+  /**
+   * This function collects the output of
+   * compute_support_point_weights_on_{quad,hex} in a single data structure.
+   */
+  std::vector<Table<2,double> >
+  compute_support_point_weights_perimeter_to_interior(const unsigned int polynomial_degree,
+                                                      const unsigned int dim)
+  {
+    Assert(dim > 0 && dim <= 3, ExcImpossibleInDim(dim));
+    std::vector<Table<2,double> > output(dim);
+    if (polynomial_degree <= 1)
+      return output;
+
+    // fill the 1D interior weights
+    QGaussLobatto<1> quadrature(polynomial_degree+1);
+    output[0].reinit(polynomial_degree-1, GeometryInfo<1>::vertices_per_cell);
+    for (unsigned int q=0; q<polynomial_degree-1; ++q)
+      for (unsigned int i=0; i<GeometryInfo<1>::vertices_per_cell; ++i)
+        output[0](q,i) = GeometryInfo<1>::d_linear_shape_function(quadrature.point(q+1),
+                                                                  i);
+
+    if (dim > 1)
+      output[1] = compute_support_point_weights_on_quad(polynomial_degree);
+
+    if (dim > 2)
+      output[2] = compute_support_point_weights_on_hex(polynomial_degree);
+
+    return output;
+  }
+
+  /**
+   * Collects all interior points for the various dimensions.
+   */
+  std::vector<Table<2,double> >
+  compute_support_point_weights_interior(const unsigned int polynomial_degree,
+                                         const unsigned int dim)
+  {
+    Assert(dim > 0 && dim <= 3, ExcImpossibleInDim(dim));
+    std::vector<Table<2,double> > output(dim);
+    if (polynomial_degree <= 1)
+      return output;
+
+    // fill the 1D interior weights
+    QGaussLobatto<1> quadrature(polynomial_degree+1);
+    output[0].reinit(polynomial_degree-1, GeometryInfo<1>::vertices_per_cell);
+    for (unsigned int q=0; q<polynomial_degree-1; ++q)
+      for (unsigned int i=0; i<GeometryInfo<1>::vertices_per_cell; ++i)
+        output[0](q,i) = GeometryInfo<1>::d_linear_shape_function(quadrature.point(q+1),
+                                                                  i);
+
+    // fill the 2D interior points
+    if (dim > 1)
+      {
+        output[1].reinit(Utilities::fixed_power<2>(polynomial_degree-1),
+                         GeometryInfo<2>::vertices_per_cell);
+        for (unsigned int q=0, q2=0; q2<polynomial_degree-1; ++q2)
+          for (unsigned int q1=0; q1<polynomial_degree-1; ++q1, ++q)
+            {
+              Point<2> point(quadrature.point(q1+1)[0],
+                             quadrature.point(q2+1)[0]);
+              for (unsigned int i=0; i<GeometryInfo<2>::vertices_per_cell; ++i)
+                output[1](q,i) = GeometryInfo<2>::d_linear_shape_function(point, i);
+            }
+      }
+
+    // fill the 3D interior points
+    if (dim > 2)
+      {
+        output[2].reinit(Utilities::fixed_power<3>(polynomial_degree-1),
+                         GeometryInfo<3>::vertices_per_cell);
+        for (unsigned int q=0, q3=0; q3<polynomial_degree-1; ++q3)
+          for (unsigned int q2=0; q2<polynomial_degree-1; ++q2)
+            for (unsigned int q1=0; q1<polynomial_degree-1; ++q1, ++q)
+              {
+                Point<3> point(quadrature.point(q1+1)[0],
+                               quadrature.point(q2+1)[0],
+                               quadrature.point(q3+1)[0]);
+                for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
+                  output[2](q,i) = GeometryInfo<3>::d_linear_shape_function(point, i);
+              }
+      }
+
+    return output;
+  }
+
+  /**
+   * Collects all interior points for the various dimensions.
+   */
+  template <int dim>
+  Table<2,double>
+  compute_support_point_weights_cell(const unsigned int polynomial_degree)
+  {
+    Assert(dim > 0 && dim <= 3, ExcImpossibleInDim(dim));
+    if (polynomial_degree <= 1)
+      return Table<2,double>();
+
+    FE_Q<dim> fe(polynomial_degree);
+    std::vector<Point<dim> > unit_support_points = fe.get_unit_support_points();
+
+    Table<2,double> output(fe.dofs_per_cell - GeometryInfo<dim>::vertices_per_cell,
+                           GeometryInfo<dim>::vertices_per_cell);
+    for (unsigned int q=0; q<output.size(0); ++q)
+      for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+        output(q,i) = GeometryInfo<dim>::d_linear_shape_function(unit_support_points[q+GeometryInfo<dim>::vertices_per_cell],
+                                                                 i);
+
+    return output;
+  }
 }
 
 
@@ -1207,14 +1306,15 @@ namespace
 
 template<int dim, int spacedim>
 MappingQGeneric<dim,spacedim>::MappingQGeneric (const unsigned int p,
-                                                const bool smooth_support_points_on_flat_manifold)
+                                                const bool smooth_support_points)
   :
   polynomial_degree(p),
-  smooth_support_points_on_flat_manifold(smooth_support_points_on_flat_manifold),
+  smooth_support_points(smooth_support_points),
   line_support_points(this->polynomial_degree+1),
   fe_q(dim == 3 ? new FE_Q<dim>(this->polynomial_degree) : 0),
-  support_point_weights_on_quad (compute_support_point_weights_on_quad<dim>(this->polynomial_degree)),
-  support_point_weights_on_hex (compute_support_point_weights_on_hex<dim>(this->polynomial_degree))
+  support_point_weights_perimeter_to_interior (compute_support_point_weights_perimeter_to_interior(this->polynomial_degree, dim)),
+  support_point_weights_interior (compute_support_point_weights_interior(this->polynomial_degree, dim)),
+  support_point_weights_cell (compute_support_point_weights_cell<dim>(this->polynomial_degree))
 {
   Assert (p >= 1, ExcMessage ("It only makes sense to create polynomial mappings "
                               "with a polynomial degree greater or equal to one."));
@@ -1226,11 +1326,12 @@ template<int dim, int spacedim>
 MappingQGeneric<dim,spacedim>::MappingQGeneric (const MappingQGeneric<dim,spacedim> &mapping)
   :
   polynomial_degree(mapping.polynomial_degree),
-  smooth_support_points_on_flat_manifold(mapping.smooth_support_points_on_flat_manifold),
+  smooth_support_points(mapping.smooth_support_points),
   line_support_points(mapping.line_support_points),
   fe_q(dim == 3 ? new FE_Q<dim>(*mapping.fe_q) : 0),
-  support_point_weights_on_quad (mapping.support_point_weights_on_quad),
-  support_point_weights_on_hex (mapping.support_point_weights_on_hex)
+  support_point_weights_perimeter_to_interior (mapping.support_point_weights_perimeter_to_interior),
+  support_point_weights_interior (mapping.support_point_weights_interior),
+  support_point_weights_cell (mapping.support_point_weights_cell)
 {}
 
 
@@ -3514,108 +3615,6 @@ transform (const ArrayView<const  Tensor<3,dim> >                  &input,
 namespace
 {
   /**
-   * Ask the manifold descriptor to return intermediate points on lines or
-   * faces. The function needs to return one or multiple points (depending on
-   * the number of elements in the output vector @p points that lie inside a
-   * line, quad or hex). Whether it is a line, quad or hex doesn't really
-   * matter to this function but it can be inferred from the number of input
-   * points in the @p surrounding_points vector.
-   */
-  template<int dim, int spacedim>
-  void
-  get_intermediate_points (const Manifold<dim, spacedim> &manifold,
-                           const QGaussLobatto<1>        &line_support_points,
-                           const std::vector<Point<spacedim> > &surrounding_points,
-                           std::vector<Point<spacedim> > &points)
-  {
-    Assert(surrounding_points.size() >= 2, ExcMessage("At least 2 surrounding points are required"));
-    const unsigned int n=points.size();
-    Assert(n>0, ExcMessage("You can't ask for 0 intermediate points."));
-    std::vector<double> w(surrounding_points.size());
-
-    switch (surrounding_points.size())
-      {
-      case 2:
-      {
-        // If two points are passed, these are the two vertices, so
-        // we can only compute degree-1 intermediate points.
-        for (unsigned int i=0; i<n; ++i)
-          {
-            const double x = line_support_points.point(i+1)[0];
-            w[1] = x;
-            w[0] = (1-x);
-            points[i] = manifold.get_new_point(surrounding_points, w);
-          }
-        break;
-      }
-
-      case 4:
-      {
-        Assert(spacedim >= 2, ExcImpossibleInDim(spacedim));
-        const unsigned m=
-          static_cast<unsigned int>(std::sqrt(static_cast<double>(n)));
-        // is n a square number
-        Assert(m*m==n, ExcInternalError());
-
-        // If m points are passed, two of them are the outer vertices, and we
-        // can only compute (degree-1)*(degree-1) intermediate points.
-        Point<2> p;
-        for (unsigned int i=0, c=0; i<m; ++i)
-          {
-            p[1] = line_support_points.point(1+i)[0];
-            for (unsigned int j=0; j<m; ++j, ++c)
-              {
-                p[0] = line_support_points.point(1+j)[0];
-
-                for (unsigned int l=0; l<4; ++l)
-                  w[l] = GeometryInfo<2>::d_linear_shape_function(p, l);
-
-                points[c]=manifold.get_new_point(surrounding_points, w);
-              }
-          }
-        break;
-      }
-
-      case 8:
-      {
-        Assert(spacedim >= 3, ExcImpossibleInDim(spacedim));
-        unsigned int m=1;
-        for ( ; m < n; ++m)
-          if (m*m*m == n)
-            break;
-        // is n a cube number
-        Assert(m*m*m==n, ExcInternalError());
-
-        Point<3> p;
-        for (unsigned int k=0, c=0; k<m; ++k)
-          {
-            p[2] = line_support_points.point(1+k)[0];
-            for (unsigned int i=0; i<m; ++i)
-              {
-                p[1] = line_support_points.point(1+i)[0];
-                for (unsigned int j=0; j<m; ++j, ++c)
-                  {
-                    p[0] = line_support_points.point(1+j)[0];
-
-                    for (unsigned int l=0; l<8; ++l)
-                      w[l] = GeometryInfo<3>::d_linear_shape_function(p, l);
-
-                    points[c]=manifold.get_new_point(surrounding_points, w);
-                  }
-              }
-          }
-        break;
-      }
-      default:
-        Assert(false, ExcInternalError());
-        break;
-      }
-  }
-
-
-
-
-  /**
    * Ask the manifold descriptor to return intermediate points on the object
    * pointed to by the TriaIterator @p iter. This function tries to be
    * backward compatible with respect to the differences between
@@ -3624,80 +3623,68 @@ namespace
    * Boundary<dim,spacedim>.
    */
   template <int dim, int spacedim, class TriaIterator>
-  void get_intermediate_points_on_object(const Manifold<dim, spacedim> &manifold,
-                                         const QGaussLobatto<1>        &line_support_points,
-                                         const TriaIterator &iter,
-                                         std::vector<Point<spacedim> > &points)
+  void add_intermediate_points(const Manifold<dim, spacedim> &manifold,
+                               const Table<2,double>         &weight_table,
+                               const TriaIterator            &iter,
+                               std::vector<Point<spacedim> > &points)
   {
     const unsigned int structdim = TriaIterator::AccessorType::structure_dimension;
 
     // Try backward compatibility option.
-    if (const Boundary<dim,spacedim> *boundary
-        = dynamic_cast<const Boundary<dim,spacedim> *>(&manifold))
+    const Boundary<dim,spacedim> *boundary
+      = dynamic_cast<const Boundary<dim,spacedim> *>(&manifold);
+    if (structdim < spacedim && boundary != NULL)
       // This is actually a boundary. Call old methods.
       {
+        std::vector<Point<spacedim> > new_points(weight_table.size(0));
         switch (structdim)
           {
           case 1:
           {
             const typename Triangulation<dim,spacedim>::line_iterator line = iter;
-            boundary->get_intermediate_points_on_line(line, points);
-            return;
+            boundary->get_intermediate_points_on_line(line, new_points);
+            break;
           }
           case 2:
           {
             const typename Triangulation<dim,spacedim>::quad_iterator quad = iter;
-            boundary->get_intermediate_points_on_quad(quad, points);
-            return;
+            boundary->get_intermediate_points_on_quad(quad, new_points);
+            break;
           }
           default:
             Assert(false, ExcInternalError());
-            return;
+            break;
           }
+        for (unsigned int i=0; i<new_points.size(); ++i)
+          points.push_back(new_points[i]);
       }
     else
       {
         std::vector<Point<spacedim> > sp(GeometryInfo<structdim>::vertices_per_cell);
         for (unsigned int i=0; i<sp.size(); ++i)
           sp[i] = iter->vertex(i);
-        get_intermediate_points(manifold, line_support_points, sp, points);
+        manifold.add_new_points(sp, weight_table, points);
       }
   }
 
 
-  /**
-   * Take a <tt>support_point_weights_on_hex(quad)</tt> and apply it to the vector
-   * @p a to compute the inner support points as a linear combination of the
-   * exterior points.
-   *
-   * The vector @p a initially contains the locations of the @p n_outer
-   * points, the @p n_inner computed inner points are appended.
-   *
-   * See equation (7) of the `mapping' report.
-   */
-  template <int spacedim>
-  void add_weighted_interior_points(const Table<2,double>   &lvs,
-                                    std::vector<Point<spacedim> > &a)
+
+  template <typename Iterator>
+  bool check_identical_manifolds_of_quads(const Iterator &)
   {
-    const unsigned int n_inner_apply=lvs.n_rows();
-    const unsigned int n_outer_apply=lvs.n_cols();
-    Assert(a.size()==n_outer_apply,
-           ExcDimensionMismatch(a.size(), n_outer_apply));
+    Assert(false, ExcNotImplemented());
+    return true;
+  }
 
-    // compute each inner point as linear combination of the outer points. the
-    // weights are given by the lvs entries, the outer points are the first
-    // (existing) elements of a
-    for (unsigned int unit_point=0; unit_point<n_inner_apply; ++unit_point)
-      {
-        Assert(lvs.n_cols()==n_outer_apply, ExcInternalError());
-        Point<spacedim> p;
-        for (unsigned int k=0; k<n_outer_apply; ++k)
-          p+=lvs[unit_point][k]*a[k];
-
-        a.push_back(p);
-      }
+  bool check_identical_manifolds_of_quads(const Triangulation<3,3>::cell_iterator &cell)
+  {
+    for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
+      if (&cell->face(f)->get_manifold() != &cell->get_manifold())
+        return false;
+    return true;
   }
 }
+
 
 
 template <int dim, int spacedim>
@@ -3749,7 +3736,9 @@ add_line_support_points (const typename Triangulation<dim,spacedim>::cell_iterat
               cell->get_manifold() :
               line->get_manifold() );
 
-          get_intermediate_points_on_object (manifold, line_support_points, line, line_points);
+          line_points.resize(0);
+          add_intermediate_points (manifold, support_point_weights_interior[0],
+                                   line, line_points);
 
           if (dim==3)
             {
@@ -3774,12 +3763,12 @@ template <>
 void
 MappingQGeneric<3,3>::
 add_quad_support_points(const Triangulation<3,3>::cell_iterator &cell,
-                        std::vector<Point<3> >                &a) const
+                        std::vector<Point<3> >                  &a) const
 {
   const unsigned int faces_per_cell    = GeometryInfo<3>::faces_per_cell;
 
   // used if face quad at boundary or entirely in the interior of the domain
-  std::vector<Point<3> > quad_points ((polynomial_degree-1)*(polynomial_degree-1));
+  std::vector<Point<3> > quad_points;
   std::vector<Point<3> > tmp_points;
 
   // loop over all faces and collect points on them
@@ -3816,16 +3805,20 @@ add_quad_support_points(const Triangulation<3,3>::cell_iterator &cell,
       // On a quad, we have to check whether the manifold should determine the
       // point distribution or rather a weighted sum should be created. This
       // is the same logic as in the compute_mapping_support_points function
-      // below: if we have a StraightBoundary but no "real" boundary
-      // description doing something else, we should go for the smoothing of
-      // the support points through add_weighted_interior_points
-      if (smooth_support_points_on_flat_manifold == false ||
-          std::string(typeid(face->get_manifold()).name()).find("StraightBoundary") ==
-          std::string::npos)
+      // below
+      bool all_manifold_ids_are_equal = true;
+      for (unsigned int l=0; l<GeometryInfo<3>::lines_per_face; ++l)
+        if (&face->line(l)->get_manifold() != &face->get_manifold())
+          all_manifold_ids_are_equal = false;
+      if (smooth_support_points == false || all_manifold_ids_are_equal ||
+          (dynamic_cast<const Boundary<3,3> *>(&face->get_manifold()) &&
+           std::string(typeid(face->get_manifold()).name()).find("StraightBoundary") ==
+           std::string::npos))
         {
           // ask the boundary/manifold object to return intermediate points on it
-          get_intermediate_points_on_object(face->get_manifold(), line_support_points,
-                                            face, quad_points);
+          quad_points.resize(0);
+          add_intermediate_points(face->get_manifold(), support_point_weights_interior[1],
+                                  face, quad_points);
 
           // in 3D, the orientation, flip and rotation of the face might not
           // match what we expect here, namely the standard orientation. thus
@@ -3852,9 +3845,9 @@ add_quad_support_points(const Triangulation<3,3>::cell_iterator &cell,
                   a[GeometryInfo<3>::vertices_per_cell +
                     (polynomial_degree-1)*
                     GeometryInfo<3>::face_to_cell_lines(face_no,line) + i];
-          add_weighted_interior_points (support_point_weights_on_quad, tmp_points);
-          a.insert(a.end(), tmp_points.begin()+4+4*(polynomial_degree-1),
-                   tmp_points.end());
+          face->get_manifold().add_new_points (tmp_points,
+                                               support_point_weights_perimeter_to_interior[1],
+                                               a);
         }
     }
 }
@@ -3865,13 +3858,10 @@ template <>
 void
 MappingQGeneric<2,3>::
 add_quad_support_points(const Triangulation<2,3>::cell_iterator &cell,
-                        std::vector<Point<3> >                &a) const
+                        std::vector<Point<3> >                  &a) const
 {
-  std::vector<Point<3> > quad_points ((polynomial_degree-1)*(polynomial_degree-1));
-  get_intermediate_points_on_object (cell->get_manifold(), line_support_points,
-                                     cell, quad_points);
-  for (unsigned int i=0; i<quad_points.size(); ++i)
-    a.push_back(quad_points[i]);
+  add_intermediate_points (cell->get_manifold(), support_point_weights_interior[1],
+                           cell, a);
 }
 
 
@@ -3893,72 +3883,83 @@ MappingQGeneric<dim,spacedim>::
 compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
 {
   // get the vertices first
-  std::vector<Point<spacedim> > a(GeometryInfo<dim>::vertices_per_cell);
+  std::vector<Point<spacedim> > a;
+  a.reserve(Utilities::fixed_power<dim>(polynomial_degree+1));
   for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-    a[i] = cell->vertex(i);
+    a.push_back(cell->vertex(i));
 
-  if (this->polynomial_degree>1)
-    switch (dim)
-      {
-      case 1:
-        add_line_support_points(cell, a);
-        break;
-      case 2:
-        // in 2d, add the points on the four bounding lines to the exterior
-        // (outer) points
-        add_line_support_points(cell, a);
+  if (this->polynomial_degree > 1)
+    {
+      // check if all entities have the same manifold id which is when we can
+      // simply ask the manifold for all points
+      Assert(dim<=3, ExcImpossibleInDim(dim));
+      bool all_manifold_ids_are_equal = (dim == spacedim);
+      if (dim > 1)
+        for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+          if (&cell->line(l)->get_manifold() != &cell->get_manifold())
+            all_manifold_ids_are_equal = false;
+      if (dim == 3)
+        if (check_identical_manifolds_of_quads(cell) == false)
+          all_manifold_ids_are_equal = false;
+      if (all_manifold_ids_are_equal)
+        {
+          std::vector<Point<spacedim> > vertices(a);
+          cell->get_manifold().add_new_points(vertices, support_point_weights_cell, a);
+          return a;
+        }
 
-        // then get the support points on the quad. if we have a
-        // StraightBoundary but no "real" boundary description doing something
-        // else, we should go for the smoothing of the support points through
-        // add_weighted_interior_points. we need to go through typeid because
-        // curved boundaries are derived from StraightBoundary and thus a
-        // plain dynamic_cast will not suffice.
-        if (dim != spacedim)
-          add_quad_support_points(cell, a);
-        else if (smooth_support_points_on_flat_manifold == false ||
-                 std::string(typeid(cell->get_manifold()).name()).find("StraightBoundary") ==
-                 std::string::npos)
-          {
-            std::vector<Point<spacedim> > quad_points (Utilities::fixed_power<dim>(polynomial_degree-1));
-            get_intermediate_points_on_object(cell->get_manifold(), line_support_points, cell, quad_points);
-            for (unsigned int i=0; i<quad_points.size(); ++i)
-              a.push_back(quad_points[i]);
-          }
-        else
-          add_weighted_interior_points (support_point_weights_on_quad, a);
-        break;
+      switch (dim)
+        {
+        case 1:
+          add_line_support_points(cell, a);
+          break;
+        case 2:
+          // in 2d, add the points on the four bounding lines to the exterior
+          // (outer) points
+          add_line_support_points(cell, a);
 
-      case 3:
-      {
-        // in 3d also add the points located on the boundary faces
-        add_line_support_points (cell, a);
-        add_quad_support_points (cell, a);
+          // then get the support points on the quad. decide whether to choose
+          // the smoothed variant that include all points and goes directly
+          // through the manifold or only the vertex points.
+          if (dim != spacedim)
+            add_quad_support_points(cell, a);
+          else if (smooth_support_points == false)
+            add_intermediate_points(cell->get_manifold(), support_point_weights_interior[1],
+                                    cell, a);
+          else
+            {
+              std::vector<Point<spacedim> > tmp_points(a);
+              cell->get_manifold().add_new_points(tmp_points,
+                                                  support_point_weights_perimeter_to_interior[1],
+                                                  a);
+            }
+          break;
 
-        // then compute the interior points. if we have a StraightBoundary but
-        // no "real" boundary description doing something else, we should go
-        // for the smoothing of the support points through
-        // add_weighted_interior_points. we need to go through typeid because
-        // curved boundaries are derived from StraightBoundary and thus a
-        // plain dynamic_cast will not suffice.
-        if (smooth_support_points_on_flat_manifold == false ||
-            std::string(typeid(cell->get_manifold()).name()).find("StraightBoundary") ==
-            std::string::npos)
-          {
-            std::vector<Point<spacedim> > hex_points (Utilities::fixed_power<dim>(polynomial_degree-1));
-            get_intermediate_points_on_object(cell->get_manifold(), line_support_points, cell, hex_points);
-            for (unsigned int i=0; i<hex_points.size(); ++i)
-              a.push_back(hex_points[i]);
-          }
-        else
-          add_weighted_interior_points (support_point_weights_on_hex, a);
-        break;
-      }
+        case 3:
+          // in 3d also add the points located on the boundary faces
+          add_line_support_points (cell, a);
+          add_quad_support_points (cell, a);
 
-      default:
-        Assert(false, ExcNotImplemented());
-        break;
-      }
+          // then compute the interior points. decide whether to choose
+          // the smoothed variant that include all points and goes directly
+          // through the manifold or only the vertex points.
+          if (smooth_support_points == false)
+            add_intermediate_points(cell->get_manifold(), support_point_weights_interior[2],
+                                    cell, a);
+          else
+            {
+              std::vector<Point<spacedim> > tmp_points(a);
+              cell->get_manifold().add_new_points(tmp_points,
+                                                  support_point_weights_perimeter_to_interior[2],
+                                                  a);
+            }
+          break;
+
+        default:
+          Assert(false, ExcNotImplemented());
+          break;
+        }
+    }
 
   return a;
 }

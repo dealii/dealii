@@ -55,7 +55,7 @@ MappingQ<dim,spacedim>::InternalData::memory_consumption () const
 template<int dim, int spacedim>
 MappingQ<dim,spacedim>::MappingQ (const unsigned int degree,
                                   const bool use_mapping_q_on_all_cells,
-                                  const bool smooth_support_points_on_flat_manifold)
+                                  const bool smooth_support_points)
   :
   polynomial_degree (degree),
 
@@ -77,7 +77,7 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int degree,
   // created via the shared_ptr objects
   qp_mapping (this->polynomial_degree>1
               ?
-              std_cxx11::shared_ptr<const MappingQGeneric<dim,spacedim> >(new MappingQGeneric<dim,spacedim>(degree, smooth_support_points_on_flat_manifold))
+              std_cxx11::shared_ptr<const MappingQGeneric<dim,spacedim> >(new MappingQGeneric<dim,spacedim>(degree, smooth_support_points))
               :
               q1_mapping)
 {}
