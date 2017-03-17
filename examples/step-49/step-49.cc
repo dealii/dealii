@@ -350,11 +350,38 @@ void grid_7()
 // subfunctions.
 int main ()
 {
-  grid_1 ();
-  grid_2 ();
-  grid_3 ();
-  grid_4 ();
-  grid_5 ();
-  grid_6 ();
-  grid_7 ();
+  try
+    {
+      grid_1 ();
+      grid_2 ();
+      grid_3 ();
+      grid_4 ();
+      grid_5 ();
+      grid_6 ();
+      grid_7 ();
+    }
+  catch (std::exception &exc)
+    {
+      std::cerr << std::endl << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      std::cerr << "Exception on processing: " << std::endl
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
+      return 1;
+    }
+  catch (...)
+    {
+      std::cerr << std::endl << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      std::cerr << "Unknown exception!" << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      return 1;
+    }
 }
