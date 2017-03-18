@@ -414,8 +414,8 @@ namespace GridTools
    * (default value) refine the cell in the direction that removes hanging node.
    *
    * @param[in] max_iterations At each step only closest cells to hanging nodes
-   * are refined. The code may require a lot of iterations to to remove all
    * hangind nodes. @p max_iterations is the maximum number of iteration
+   * are refined. The code may require a lot of iterations to remove all
    * allowed. If @p max_iterations == numbers::invalid_unsigned_int this
    * function continues refining until there are no hanging nodes.
    *

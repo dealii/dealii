@@ -384,8 +384,8 @@ namespace Utilities
        * evaluates the environment variable DEAL_II_NUM_THREADS. Finally, the
        * worker threads can only be created on cores to which the current MPI
        * process has access to; some MPI implementations limit the number of
-       * cores each process has access to to one or a subset of cores in order
-       * to ensure better cache behavior. Consequently, the number of threads
+       * cores each process may access to one or a subset of cores in order to
+       * ensure better cache behavior. Consequently, the number of threads
        * that will really be created will be the minimum of the argument
        * passed here, the environment variable (if set), and the number of
        * cores accessible to the thread.
