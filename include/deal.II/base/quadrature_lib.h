@@ -245,7 +245,7 @@ private:
 
 /**
  * A class for Gauss quadrature with arbitrary logarithmic weighting function.
- * This formula is used to to integrate $\ln(|x-x_0|/\alpha)\;f(x)$ on the
+ * This formula is used to integrate $\ln(|x-x_0|/\alpha)\;f(x)$ on the
  * interval $[0,1]$, where $f$ is a smooth function without singularities, and
  * $x_0$ and $\alpha$ are given at construction time, and are the location of
  * the singularity $x_0$ and an arbitrary scaling factor in the singularity.
@@ -314,10 +314,10 @@ protected:
 
 /**
  * A class for Gauss quadrature with $1/R$ weighting function. This formula
- * can be used to to integrate $1/R \ f(x)$ on the reference element
- * $[0,1]^2$, where $f$ is a smooth function without singularities, and $R$ is
- * the distance from the point $x$ to the vertex $\xi$, given at construction
- * time by specifying its index. Notice that this distance is evaluated in the
+ * can be used to integrate $1/R \ f(x)$ on the reference element $[0,1]^2$,
+ * where $f$ is a smooth function without singularities, and $R$ is the
+ * distance from the point $x$ to the vertex $\xi$, given at construction time
+ * by specifying its index. Notice that this distance is evaluated in the
  * reference element.
  *
  * This quadrature formula is obtained from two QGauss quadrature formulas,

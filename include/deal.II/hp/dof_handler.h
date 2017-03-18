@@ -140,7 +140,7 @@ namespace hp
     typedef typename ActiveSelector::active_hex_iterator  active_hex_iterator;
 
     /**
-     * A typedef that is used to to identify
+     * A typedef that is used to identify
      * @ref GlossActive "active cell iterators".
      * The concept of iterators is discussed at length in the
      * @ref Iterators "iterators documentation module".
@@ -168,7 +168,7 @@ namespace hp
     typedef typename LevelSelector::cell_iterator         level_cell_iterator;
 
     /**
-     * A typedef that is used to to identify cell iterators. The concept of
+     * A typedef that is used to identify cell iterators. The concept of
      * iterators is discussed at length in the
      * @ref Iterators "iterators documentation module".
      *

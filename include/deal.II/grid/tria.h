@@ -1464,7 +1464,7 @@ public:
   };
 
   /**
-   * A typedef that is used to to identify cell iterators. The concept of
+   * A typedef that is used to identify cell iterators. The concept of
    * iterators is discussed at length in the
    * @ref Iterators "iterators documentation module".
    *
@@ -1481,7 +1481,7 @@ public:
   typedef TriaIterator      <CellAccessor<dim,spacedim>         > cell_iterator;
 
   /**
-   * A typedef that is used to to identify
+   * A typedef that is used to identify
    * @ref GlossActive "active cell iterators".
    * The concept of iterators is discussed at length in the
    * @ref Iterators "iterators documentation module".
