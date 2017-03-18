@@ -85,6 +85,10 @@ namespace Functions
 
     cell_hint.get() = cell;
 
+    // check that the current cell is available:
+    AssertThrow (!cell->is_artificial(),
+                 VectorTools::ExcPointNotAvailableHere());
+
     // Now we can find out about the point
     Quadrature<dim> quad(qp.get());
     FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
@@ -135,6 +139,10 @@ namespace Functions
         cell = my_pair.first;
         qp = my_pair.second;
       }
+
+    // check that the current cell is available:
+    AssertThrow (!cell->is_artificial(),
+                 VectorTools::ExcPointNotAvailableHere());
 
     cell_hint.get() = cell;
 
@@ -203,6 +211,10 @@ namespace Functions
         cell = my_pair.first;
         qp = my_pair.second;
       }
+
+    // check that the current cell is available:
+    AssertThrow (!cell->is_artificial(),
+                 VectorTools::ExcPointNotAvailableHere());
 
     cell_hint.get() = cell;
 
@@ -479,6 +491,10 @@ namespace Functions
           qp = my_pair.second;
           point_flags[0] = true;
         }
+
+      // check that the cell is available:
+      AssertThrow (!cell->is_artificial(),
+                   VectorTools::ExcPointNotAvailableHere());
 
       // Put in the first point.
       cells.push_back(cell);
