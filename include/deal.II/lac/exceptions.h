@@ -30,7 +30,8 @@ namespace LACExceptions
   /**
    * This function only works for quadratic matrices.
    */
-  DeclException0 (ExcNotQuadratic);
+  DeclExceptionMsg (ExcNotQuadratic,
+                    "This function only works for quadratic objects!");
 
   /**
    * The operation cannot be finished since the matrix is singular.
