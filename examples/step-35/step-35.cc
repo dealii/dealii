@@ -98,7 +98,7 @@ namespace Step35
     {
     public:
       Data_Storage();
-      ~Data_Storage();
+
       void read_data (const char *filename);
       MethodFormulation form;
       double initial_time,
@@ -211,11 +211,6 @@ namespace Step35
                          " This indicates between how many time steps we print "
                          "the solution. ");
     }
-
-
-
-    Data_Storage::~Data_Storage()
-    {}
 
 
 
