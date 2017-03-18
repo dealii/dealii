@@ -26,9 +26,12 @@ DEAL_II_NAMESPACE_OPEN
 namespace LAPACKSupport
 {
   /**
-   * Most LAPACK functions change the contents of the matrix applied to to
-   * something which is not a matrix anymore. Therefore, LAPACK matrix classes
-   * in <tt>deal.II</tt> have a state flag indicating what happened to them.
+   * Most of the LAPACK functions one can apply to a matrix (e.g., by calling
+   * the member functions of this class) change its content in some ways. For
+   * example, they may invert the matrix, or may replace it by a matrix whose
+   * columns represent the eigenvectors of the original content of the matrix.
+   * The elements of this enumeration are therefore used to track what is
+   * currently being stored by this object.
    *
    * @author Guido Kanschat, 2005
    */

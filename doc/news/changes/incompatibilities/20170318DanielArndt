@@ -1,0 +1,4 @@
+Changed: LAPACKFullMatrix::print_formatted is only allowed
+if the state is 'matrix' or 'inverse_matrix'.
+<br>
+(Daniel Arndt, 2017/03/18)
