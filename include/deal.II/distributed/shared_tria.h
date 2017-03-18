@@ -211,7 +211,7 @@ namespace parallel
       /**
        * Settings
        */
-      Settings settings;
+      const Settings settings;
 
       /**
        * A flag to decide whether or not artificial cells are allowed.
