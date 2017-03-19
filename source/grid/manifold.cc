@@ -33,16 +33,16 @@ struct CompareWeights
 public:
   CompareWeights(const std::vector<double> &weights)
     :
-    compare_weights(&weights)
+    compare_weights(weights)
   {}
 
   bool operator() (unsigned int a, unsigned int b) const
   {
-    return (*compare_weights)[a] < (*compare_weights)[b];
+    return compare_weights[a] < compare_weights[b];
   }
 
 private:
-  const std::vector<double> *compare_weights;
+  const std::vector<double> &compare_weights;
 };
 
 /* -------------------------- Manifold --------------------- */
@@ -111,12 +111,22 @@ get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
   // First sort points in the order of their weights. This is done to
   // produce unique points even if get_intermediate_points is not
   // associative (as for the SphericalManifold).
-  std::vector<unsigned int> permutation(n_points);
+  unsigned int permutation_short[30];
+  std::vector<unsigned int> permutation_long;
+  unsigned int *permutation;
+  if (n_points > 30)
+    {
+      permutation_long.resize(n_points);
+      permutation = &permutation_long[0];
+    }
+  else
+    permutation = &permutation_short[0];
+
   for (unsigned int i=0; i<n_points; ++i)
     permutation[i] = i;
 
-  std::sort(permutation.begin(),
-            permutation.end(),
+  std::sort(permutation,
+            permutation + n_points,
             CompareWeights(weights));
 
   // Now loop over points in the order of their associated weight
@@ -131,7 +141,8 @@ get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
       else
         weight =  w/(weights[permutation[i]] + w);
 
-      p = get_intermediate_point(p, surrounding_points[permutation[i]],1.0 - weight );
+      if (std::abs(weight) > 1e-14)
+        p = get_intermediate_point(p, surrounding_points[permutation[i]],1.0 - weight );
       w += weights[permutation[i]];
     }
 
@@ -152,11 +163,12 @@ add_new_points (const std::vector<Point<spacedim> > &surrounding_points,
          ExcMessage("surrounding_points and new_points cannot be the same "
                     "array"));
 
-  std::vector<double> local_weights(surrounding_points.size());
+  const unsigned int n_points = surrounding_points.size();
+  std::vector<double> local_weights(n_points);
   for (unsigned int row=0; row<weights.size(0); ++row)
     {
-      for (unsigned int p=0; p<surrounding_points.size(); ++p)
-        local_weights[p] = weights[row][p];
+      for (unsigned int i=0; i<n_points; ++i)
+        local_weights[i] = weights(row,i);
       new_points.push_back(get_new_point(surrounding_points, local_weights));
     }
 }
@@ -774,19 +786,15 @@ add_new_points (const std::vector<Point<spacedim> > &surrounding_points,
   const unsigned int n_points = surrounding_points.size();
 
   std::vector<Point<chartdim> > chart_points(n_points);
-  std::vector<double> local_weights(n_points);
-
   for (unsigned int i=0; i<n_points; ++i)
     chart_points[i] = pull_back(surrounding_points[i]);
 
+  std::vector<Point<chartdim> > new_points_on_chart;
+  new_points_on_chart.reserve(weights.size(0));
+  sub_manifold.add_new_points(chart_points, weights, new_points_on_chart);
+
   for (unsigned int row=0; row<weights.size(0); ++row)
-    {
-      for (unsigned int p=0; p<n_points; ++p)
-        local_weights[p] = weights[row][p];
-      const Point<chartdim> p_chart = sub_manifold.get_new_point(chart_points,
-                                                                 local_weights);
-      new_points.push_back(push_forward(p_chart));
-    }
+    new_points.push_back(push_forward(new_points_on_chart[row]));
 }
 
 
