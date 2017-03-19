@@ -1,0 +1,80 @@
+
+DEAL:0::vector_value:
+DEAL:0::  OK: 2.10000
+DEAL:0::value:
+DEAL:0::  OK: 2.10000
+DEAL:0::value_list:
+DEAL:0::  OK: 2.10000
+DEAL:0::vector_value_list:
+DEAL:0::  OK: 2.10000
+DEAL:0::vector_gradient:
+DEAL:0::  OK: 1.00000 -3.55271e-15
+DEAL:0::gradient:
+DEAL:0::  OK: 1.00000
+DEAL:0::vector_gradient_list:
+DEAL:0::  OK: 1.00000 -3.55271e-15
+DEAL:0::gradient_list:
+DEAL:0::  OK: 1.00000 -3.55271e-15
+DEAL:0::laplacian:
+DEAL:0::  OK: 0.00000
+DEAL:0::vector_laplacian:
+DEAL:0::  OK: 0.00000
+DEAL:0::laplacian_list:
+DEAL:0::  OK: 0.00000
+DEAL:0::vector_laplacian_list:
+DEAL:0::  OK: 0.00000
+DEAL:0::OK
+
+DEAL:1::vector_value:
+DEAL:1::  ExcPointNotAvailableHere
+DEAL:1::value:
+DEAL:1::  ExcPointNotAvailableHere
+DEAL:1::value_list:
+DEAL:1::  ExcPointNotAvailableHere
+DEAL:1::vector_value_list:
+DEAL:1::  ExcPointNotAvailableHere
+DEAL:1::vector_gradient:
+DEAL:1::  ExcPointNotAvailableHere
+DEAL:1::gradient:
+DEAL:1::  ExcPointNotAvailableHere
+DEAL:1::vector_gradient_list:
+DEAL:1::  ExcPointNotAvailableHere
+DEAL:1::gradient_list:
+DEAL:1::  ExcPointNotAvailableHere
+DEAL:1::laplacian:
+DEAL:1::  ExcPointNotAvailableHere
+DEAL:1::vector_laplacian:
+DEAL:1::  ExcPointNotAvailableHere
+DEAL:1::laplacian_list:
+DEAL:1::  ExcPointNotAvailableHere
+DEAL:1::vector_laplacian_list:
+DEAL:1::  ExcPointNotAvailableHere
+DEAL:1::OK
+
+
+DEAL:2::vector_value:
+DEAL:2::  ExcPointNotAvailableHere
+DEAL:2::value:
+DEAL:2::  ExcPointNotAvailableHere
+DEAL:2::value_list:
+DEAL:2::  ExcPointNotAvailableHere
+DEAL:2::vector_value_list:
+DEAL:2::  ExcPointNotAvailableHere
+DEAL:2::vector_gradient:
+DEAL:2::  ExcPointNotAvailableHere
+DEAL:2::gradient:
+DEAL:2::  ExcPointNotAvailableHere
+DEAL:2::vector_gradient_list:
+DEAL:2::  ExcPointNotAvailableHere
+DEAL:2::gradient_list:
+DEAL:2::  ExcPointNotAvailableHere
+DEAL:2::laplacian:
+DEAL:2::  ExcPointNotAvailableHere
+DEAL:2::vector_laplacian:
+DEAL:2::  ExcPointNotAvailableHere
+DEAL:2::laplacian_list:
+DEAL:2::  ExcPointNotAvailableHere
+DEAL:2::vector_laplacian_list:
+DEAL:2::  ExcPointNotAvailableHere
+DEAL:2::OK
+

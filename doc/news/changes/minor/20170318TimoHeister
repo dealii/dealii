@@ -1,0 +1,3 @@
+Fixed: FEFieldFunction now correctly throws ExcPointNotAvailableHere if used in parallel with points not available locally.
+<br>
+(Timo Heister, 2017/03/18)
