@@ -330,7 +330,10 @@ public:
    * entire space (i.e. it is a cell, not a part of the boundary), and the
    * returned point equals the given input point.
    *
-   * @deprecated Use Manifold::project_to_manifold() instead.
+   * The default implementation of this function calls internally the
+   * project_to_manifold() function.
+   *
+   * @deprecated Use directly Manifold::project_to_manifold() instead.
    */
   virtual
   Point<spacedim>
@@ -348,7 +351,10 @@ public:
    * entire space (i.e. it is a cell, not a part of the boundary), and the
    * returned point equals the given input point.
    *
-   * @deprecated Use Manifold::project_to_manifold() instead.
+   * The default implementation of this function calls internally the
+   * project_to_manifold() function.
+   *
+   * @deprecated Use directly Manifold::project_to_manifold() instead.
    */
   virtual
   Point<spacedim>
@@ -367,7 +373,10 @@ public:
    * entire space (i.e. it is a cell, not a part of the boundary), and the
    * returned point equals the given input point.
    *
-   * @deprecated Use Manifold::project_to_manifold() instead.
+   * The default implementation of this function calls internally the
+   * project_to_manifold() function.
+   *
+   * @deprecated Use directly Manifold::project_to_manifold() instead.
    */
   virtual
   Point<spacedim>
@@ -375,7 +384,14 @@ public:
                       const Point<spacedim> &candidate) const  DEAL_II_DEPRECATED;
 
   /**
-   * Same function as above for arbitrary surrounding points.
+   * Given a candidate point and a collection of surrounding points on the,
+   * Manifold, return a point that lies on the Manifold described by this object.
+   * This function is used in some mesh smoothing algorithms that try to move
+   * around points in order to improve the mesh quality but need to ensure
+   * that points that were on a Manifold remain on the Manifold.
+   *
+   * The point returned is the projection of the candidate point onto the
+   * Manifold.
    */
   virtual
   Point<spacedim>

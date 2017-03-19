@@ -131,7 +131,7 @@ get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
       else
         weight =  w/(weights[permutation[i]] + w);
 
-      if (std::abs(weight) > 1e-14)
+      if (weight > 0)
         p = get_intermediate_point(p, surrounding_points[permutation[i]],1.0 - weight );
       w += weights[permutation[i]];
     }
@@ -157,8 +157,8 @@ add_new_points (const std::vector<Point<spacedim> > &surrounding_points,
   std::vector<double> local_weights(n_points);
   for (unsigned int row=0; row<weights.size(0); ++row)
     {
-      for (unsigned int i=0; i<n_points; ++i)
-        local_weights[i] = weights(row,i);
+      std::memcpy(&local_weights[0], &weights(row,0),
+                  surrounding_points.size() * sizeof(double));
       new_points.push_back(get_new_point(surrounding_points, local_weights));
     }
 }
