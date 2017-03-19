@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2016 by the deal.II authors
+// Copyright (C) 2006 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -436,7 +436,7 @@ namespace internal
        * we have this convention. We also know that it is always possible to
        * have opposite faces have parallel normal vectors. (For both things,
        * see the Agelek, Anderson, Bangerth, Barth paper mentioned in the
-       * publications list.)
+       * documentation of the GridReordering class.)
        *
        * The problem is that we originally had another condition, namely that
        * faces 0, 2 and 6 have normals that point into the cell, while the

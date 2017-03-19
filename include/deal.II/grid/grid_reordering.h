@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2016 by the deal.II authors
+// Copyright (C) 2000 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -479,7 +479,8 @@ DeclExceptionMsg (ExcMeshNotOrientable,
  *
  * Both algorithms are described in the paper "On orienting edges of
  * unstructured two- and three-dimensional meshes", R. Agelek, M. Anderson, W.
- * Bangerth, W. L. Barth (submitted, 2016). A preprint is available as <a
+ * Bangerth, W. L. Barth, accepted for publication in the ACM Transactions
+ * on Mathematical Software. A preprint is available as <a
  * href="http://arxiv.org/abs/1512.02137">arxiv
  * 1512.02137</a>.
  *
