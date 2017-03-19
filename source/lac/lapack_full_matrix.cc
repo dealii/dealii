@@ -985,6 +985,9 @@ LAPACKFullMatrix<number>::print_formatted (
 
   Assert ((!this->empty()) || (this->n_cols()+this->n_rows()==0),
           ExcInternalError());
+  Assert (state == LAPACKSupport::matrix ||
+          state == LAPACKSupport::inverse_matrix,
+          ExcState(state));
 
   // set output format, but store old
   // state

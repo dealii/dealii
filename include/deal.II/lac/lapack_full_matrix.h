@@ -592,6 +592,10 @@ public:
    *
    * @arg <tt>threshold</tt>: all entries with absolute value smaller than
    * this are considered zero.
+   *
+   * @note The entries stored resemble a matrix only if the state is either
+   * LAPACKSupport::matrix or LAPACK::inverse_matrix. Otherwise, calling this
+   * function is not allowed.
    */
   void print_formatted (std::ostream       &out,
                         const unsigned int  precision   = 3,
