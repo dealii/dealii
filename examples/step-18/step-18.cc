@@ -740,10 +740,15 @@ namespace Step18
     fe (FE_Q<dim>(1), dim),
     dof_handler (triangulation),
     quadrature_formula (2),
+    present_time (0.0),
+    present_timestep (1.0),
+    end_time (10.0),
+    timestep_no (0),
     mpi_communicator (MPI_COMM_WORLD),
     n_mpi_processes (Utilities::MPI::n_mpi_processes(mpi_communicator)),
     this_mpi_process (Utilities::MPI::this_mpi_process(mpi_communicator)),
-    pcout (std::cout, this_mpi_process == 0)
+    pcout (std::cout, this_mpi_process == 0),
+    n_local_cells (numbers::invalid_unsigned_int)
   {}
 
 
@@ -765,11 +770,6 @@ namespace Step18
   template <int dim>
   void TopLevel<dim>::run ()
   {
-    present_time = 0;
-    present_timestep = 1;
-    end_time = 10;
-    timestep_no = 0;
-
     do_initial_timestep ();
 
     while (present_time < end_time)

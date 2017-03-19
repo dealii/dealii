@@ -206,7 +206,9 @@ namespace Step26
     :
     fe(1),
     dof_handler(triangulation),
+    time (0.0),
     time_step(1. / 500),
+    timestep_number (0),
     theta(0.5)
   {}
 
@@ -464,9 +466,6 @@ start_time_iteration:
                              ZeroFunction<dim>(),
                              old_solution);
     solution = old_solution;
-
-    timestep_number = 0;
-    time            = 0;
 
     output_results();
 

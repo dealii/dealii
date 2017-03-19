@@ -397,7 +397,8 @@ namespace Step14
     template <int dim>
     Base<dim>::Base (Triangulation<dim> &coarse_grid)
       :
-      triangulation (&coarse_grid)
+      triangulation (&coarse_grid),
+      refinement_cycle (numbers::invalid_unsigned_int)
     {}
 
 

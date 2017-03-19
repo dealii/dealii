@@ -596,6 +596,7 @@ namespace Step21
     dof_handler (triangulation),
     n_refinement_steps (5),
     time_step (0),
+    timestep_number (1),
     viscosity (0.2)
   {}
 
@@ -1244,7 +1245,6 @@ namespace Step21
                             old_solution);
     }
 
-    timestep_number = 1;
     double time = 0;
 
     do

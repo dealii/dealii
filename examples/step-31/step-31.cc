@@ -568,7 +568,7 @@ namespace Step31
   BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
     :
     triangulation (Triangulation<dim>::maximum_smoothing),
-
+    global_Omega_diameter (std::numeric_limits<double>::quiet_NaN()),
     stokes_degree (1),
     stokes_fe (FE_Q<dim>(stokes_degree+1), dim,
                FE_Q<dim>(stokes_degree), 1),

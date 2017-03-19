@@ -98,7 +98,7 @@ namespace Step35
     {
     public:
       Data_Storage();
-      ~Data_Storage();
+
       void read_data (const char *filename);
       MethodFormulation form;
       double initial_time,
@@ -122,7 +122,22 @@ namespace Step35
     // In the constructor of this class we declare all the parameters. The
     // details of how this works have been discussed elsewhere, for example in
     // step-19 and step-29.
-    Data_Storage::Data_Storage()
+    Data_Storage::Data_Storage() :
+      form (METHOD_ROTATIONAL),
+      initial_time (0.),
+      final_time (1.),
+      Reynolds (1.),
+      dt (5e-4),
+      n_global_refines (0),
+      pressure_degree (1),
+      vel_max_iterations (1000),
+      vel_Krylov_size (30),
+      vel_off_diagonals (60),
+      vel_update_prec (15),
+      vel_eps (1e-12),
+      vel_diag_strength (0.01),
+      verbose (true),
+      output_interval (15)
     {
       prm.declare_entry ("Method_Form", "rotational",
                          Patterns::Selection ("rotational|standard"),
@@ -196,11 +211,6 @@ namespace Step35
                          " This indicates between how many time steps we print "
                          "the solution. ");
     }
-
-
-
-    Data_Storage::~Data_Storage()
-    {}
 
 
 

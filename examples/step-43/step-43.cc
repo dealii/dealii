@@ -624,7 +624,7 @@ namespace Step43
   TwoPhaseFlowProblem<dim>::TwoPhaseFlowProblem (const unsigned int degree)
     :
     triangulation (Triangulation<dim>::maximum_smoothing),
-
+    global_Omega_diameter (std::numeric_limits<double>::quiet_NaN()),
     degree (degree),
     darcy_degree (degree),
     darcy_fe (FE_Q<dim>(darcy_degree+1), dim,
@@ -645,6 +645,7 @@ namespace Step43
 
     time_step (0),
     old_time_step (0),
+    timestep_number (0),
     viscosity (0.2),
     porosity (1.0),
     AOS_threshold (3.0),
@@ -2197,7 +2198,6 @@ start_time_iteration:
                           SaturationInitialValues<dim>(),
                           old_saturation_solution);
 
-    timestep_number = 0;
     time_step = old_time_step = 0;
     current_macro_time_step = old_macro_time_step = 0;
 
