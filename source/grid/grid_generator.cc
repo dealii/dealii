@@ -3969,12 +3969,6 @@ namespace GridGenerator
 
       }
 
-    std::cout << "copy_marked_cells: "
-              << " levels=" << n_levels
-              << " cells=" << n_total << std::endl;
-
-
-
     // create coarse mesh
     coarse_cell_indices.clear();
     coarse_cell_indices.set_size(other_tria.n_cells(0));
