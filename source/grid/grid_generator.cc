@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2016 by the deal.II authors
+// Copyright (C) 1999 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1310,7 +1310,10 @@ namespace GridGenerator
         for (unsigned int j=0; j<step_sizes.at(i).size(); j++)
           x += step_sizes[i][j];
         Assert(std::fabs(x - (p2(i)-p1(i))) <= 1e-12*std::fabs(x),
-               ExcInvalidRepetitions (i) );
+               ExcMessage ("The sequence of step sizes in coordinate direction " +
+                           Utilities::int_to_string(i) +
+                           " must be equal to the distance of the two given "
+                           "points in this coordinate direction."));
       }
 
 

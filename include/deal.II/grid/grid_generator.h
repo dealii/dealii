@@ -1207,7 +1207,7 @@ namespace GridGenerator
   DeclException1 (ExcInvalidRepetitionsDimension,
                   int,
                   << "The vector of repetitions  must have "
-                  << arg1 <<" elements.");
+                  << arg1 << " elements.");
 
   /**
    * Exception for input that is not properly oriented.
