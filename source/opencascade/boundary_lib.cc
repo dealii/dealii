@@ -31,8 +31,11 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <BRepTools.hxx>
 #include <ShapeAnalysis_Surface.hxx>
 #include <TopoDS.hxx>
-#include <Adaptor3d_HCurve.hxx>
-#include <Handle_Adaptor3d_HCurve.hxx>
+
+#include <Standard_Version.hxx>
+#if (OCC_VERSION_MAJOR < 7)
+#  include <Handle_Adaptor3d_HCurve.hxx>
+#endif
 
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
