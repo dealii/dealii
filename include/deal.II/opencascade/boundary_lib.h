@@ -27,8 +27,9 @@
 
 // opencascade needs "HAVE_CONFIG_H" to be exported...
 #define HAVE_CONFIG_H
-#include <BRepAdaptor_Curve.hxx>
 #include <Adaptor3d_Curve.hxx>
+#include <Adaptor3d_HCurve.hxx>
+#include <BRepAdaptor_Curve.hxx>
 #undef HAVE_CONFIG_H
 
 DEAL_II_NAMESPACE_OPEN
