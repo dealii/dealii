@@ -45,9 +45,9 @@ int main ()
   gp_Ax2 axis(center, z_axis);
   Standard_Real radius(1.);
 
-  Handle(Geom_Curve) circle = GC_MakeCircle(axis, radius);
+  GC_MakeCircle make_circle(axis, radius);
+  Handle(Geom_Curve) circle = make_circle.Value();
   TopoDS_Edge edge = BRepBuilderAPI_MakeEdge(circle);
-
 
   // Now get a few points and project
   // them on the circle
