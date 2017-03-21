@@ -38,7 +38,7 @@ SET_IF_EMPTY(OPENCASCADE_DIR "$ENV{CASROOT}")
 
 DEAL_II_FIND_PATH(OPENCASCADE_INCLUDE_DIR Standard_Version.hxx
   HINTS ${OPENCASCADE_DIR}
-  PATH_SUFFIXES include include/oce inc
+  PATH_SUFFIXES include include/oce include/opencascade inc
   )
 
 IF(EXISTS ${OPENCASCADE_INCLUDE_DIR}/Standard_Version.hxx)
