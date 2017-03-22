@@ -437,8 +437,11 @@ SparsityPattern::compress ()
       // some internal checks: either the matrix is not quadratic, or if it
       // is, then the first element of this row must be the diagonal element
       // (i.e. with column index==line number)
+      // this test only makes sense if we have written to the index
+      // rowstart_line in new_colnums which is the case if row_length is not 0,
+      // so check this first
       Assert ((!store_diagonal_first_in_row) ||
-              (new_colnums[rowstart[line]] == line),
+              (row_length != 0 && new_colnums[rowstart[line]] == line),
               ExcInternalError());
       // assert that the first entry does not show up in the remaining ones
       // and that the remaining ones are unique among themselves (this handles
