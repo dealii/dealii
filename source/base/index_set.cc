@@ -636,20 +636,23 @@ IndexSet::is_ascending_and_one_to_one (const MPI_Comm &communicator) const
   if (my_rank == 0)
     {
       // find out if the received std::vector is ascending
-      types::global_dof_index old_dof = global_dofs[0], new_dof = 0;
+      types::global_dof_index old_dof = global_dofs[0];
       types::global_dof_index index = 0;
       while (global_dofs[index] == numbers::invalid_dof_index)
         ++index;
       old_dof = global_dofs[index++];
       for (; index<global_dofs.size(); ++index)
         {
-          new_dof = global_dofs[index];
-          if (new_dof == numbers::invalid_dof_index)
-            new_dof = old_dof;
-          else if (new_dof<=old_dof)
+          const types::global_dof_index new_dof = global_dofs[index];
+          if (new_dof !=  numbers::invalid_dof_index)
             {
-              is_globally_ascending = false;
-              break;
+              if  (new_dof <= old_dof)
+                {
+                  is_globally_ascending = false;
+                  break;
+                }
+              else
+                old_dof = new_dof;
             }
         }
     }
