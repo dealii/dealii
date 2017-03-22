@@ -31,8 +31,11 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <BRepTools.hxx>
 #include <ShapeAnalysis_Surface.hxx>
 #include <TopoDS.hxx>
-#include <Adaptor3d_HCurve.hxx>
-#include <Handle_Adaptor3d_HCurve.hxx>
+
+#include <Standard_Version.hxx>
+#if (OCC_VERSION_MAJOR < 7)
+#  include <Handle_Adaptor3d_HCurve.hxx>
+#endif
 
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
@@ -56,12 +59,12 @@ namespace OpenCASCADE
               (shape.ShapeType() == TopAbs_EDGE),
               ExcUnsupportedShape());
       if (shape.ShapeType() == TopAbs_WIRE)
-        return (Handle(BRepAdaptor_HCompCurve(new BRepAdaptor_HCompCurve(TopoDS::Wire(shape)))));
+        return Handle(BRepAdaptor_HCompCurve)(new BRepAdaptor_HCompCurve(TopoDS::Wire(shape)));
       else if (shape.ShapeType() == TopAbs_EDGE)
-        return (Handle(BRepAdaptor_HCurve(new BRepAdaptor_HCurve(TopoDS::Edge(shape)))));
+        return Handle(BRepAdaptor_HCurve)(new BRepAdaptor_HCurve(TopoDS::Edge(shape)));
 
       Assert(false, ExcInternalError());
-      return Handle(BRepAdaptor_HCurve(new BRepAdaptor_HCurve()));
+      return Handle(BRepAdaptor_HCurve)(new BRepAdaptor_HCurve());
     }
 
 

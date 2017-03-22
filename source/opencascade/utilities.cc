@@ -43,7 +43,12 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <TopoDS_Edge.hxx>
 #include <TopExp_Explorer.hxx>
 
-#include <Handle_Standard_Transient.hxx>
+#include <Standard_Version.hxx>
+#if (OCC_VERSION_MAJOR < 7)
+#  include <Handle_Standard_Transient.hxx>
+#else
+#  include <Standard_Transient.hxx>
+#endif
 
 #include <TColStd_SequenceOfTransient.hxx>
 #include <TColStd_HSequenceOfTransient.hxx>

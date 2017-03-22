@@ -50,9 +50,9 @@ int main ()
   gp_Ax2 axis(center, z_axis);
   Standard_Real radius(std::sqrt(2.)/2.);
 
-  Handle(Geom_Curve) circle = GC_MakeCircle(axis, radius);
+  GC_MakeCircle make_circle(axis, radius);
+  Handle(Geom_Circle) circle = make_circle.Value();
   TopoDS_Edge edge = BRepBuilderAPI_MakeEdge(circle);
-
 
   // Create a boundary projector.
   NormalProjectionBoundary<2,3> boundary_line(edge);
