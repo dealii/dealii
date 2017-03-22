@@ -55,7 +55,7 @@ ENDIF()
 SET(_opencascade_libraries
   TKBO TKBool TKBRep TKernel TKFeat TKFillet TKG2d TKG3d TKGeomAlgo
   TKGeomBase TKHLR TKIGES TKMath TKMesh TKOffset TKPrim TKShHealing TKSTEP
-  TKSTEPAttr TKSTEPBase TKSTL TKTopAlgo TKXSBase
+  TKSTEPAttr TKSTEPBase TKSTEP209 TKSTL TKTopAlgo TKXSBase
   )
 
 SET(_libraries "")
