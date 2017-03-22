@@ -2,7 +2,7 @@ New: The Manifold class and derived classes now provide a function
 Manifold::add_new_points that allows to compute multiple new points according
 to a matrix of weights that are appended to the last argument of the
 function. This function is used in MappingQGeneric and can be much more
-efficient for ChartManifold where ChartManifold::pull_back is an expensive
-operation.
+efficient for ChartManifold because ChartManifold::pull_back() calls are
+reused for several interpolation operations.
 <br>
 (Martin Kronbichler, 2017/03/17)

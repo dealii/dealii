@@ -5,8 +5,6 @@ implementation, a smoothing algorithm is invoked that interpolates from the
 whole perimeter of a cell's (or a face's) interior in case two or more
 manifolds are adjacent to the cell, like a Boundary object and the
 StraightBoundary in the interior. If only one manifold is present, the new
-points are interpolated from the surrounding vertices only. In case the
-smoothing is undesired, it can be disabled by an argument
-@p smooth_support_points passed to the constructor of MappingQGeneric.
+points are interpolated from the surrounding vertices only.
 <br>
 (Martin Kronbichler, 2017/03/17)

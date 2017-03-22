@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2016 by the deal.II authors
+// Copyright (C) 2001 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -71,50 +71,9 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <h4>Behavior along curved boundaries and with different manifolds</h4>
  *
- * As described above, one often only knows a manifold description of a
- * surface but not the interior of the computational domain. In such a case, a
- * StraightBoundary object will be assigned to the interior entities that
- * describes a usual planar coordinate system where the additional points for
- * the higher order mapping are placed exactly according to a bi-/trilinear
- * mapping. When combined with a non-flat manifold on the boundary, for
- * example a circle, the two manifold descriptions are in general
- * incompatible. For example, a StraightBoundary defined solely through the
- * cell's vertices would put an interior point located at some small distance
- * epsilon away from the boundary along a flat line and thus in general
- * outside the concave part of a circle. If the polynomial degree of
- * MappingQGeneric is sufficiently high, the transformation from the reference
- * cell to such a cell would in general contain inverted regions close to the
- * boundary.
- *
- * In order to avoid this situation, this class applies a smoothing on cells
- * adjacent to the boundary by using so-called Laplace smoothing by
- * default. In the algorithm that computing additional points, the
- * compute_mapping_support_points() method, all the entities of the cells are
- * passed through hierarchically, starting from the lines to the quads and
- * finally hexes. The elements higher up in the hierarchy that sit on the
- * boundary will then get their points interpolated from all the surrounding
- * points and not just the corner points. If only a line is assigned a curved
- * boundary but the adjacent quad is on a flat manifold, the points inside the
- * quad will be computed according to the deformed line and thus always result
- * in a well-defined transformation. This smoothing can be disabled by setting
- * the optional argument @p smooth_support_points to false, placing the
- * additional points strictly according to the manifold. This is usually the
- * most efficient choice in case different manifolds are present that are
- * compatible with each other.
- *
- * While the smoothing approach works well for filling holes or avoiding
- * inversions with low and medium convergence orders up to approximately three
- * to four, there is nonetheless an inherent shortcoming because of a
- * discontinuous mapping that switches from a curved manifold to a flat
- * manifold within one layer of elements. This will cause the Jacobian
- * transformation to have jumps between the first and second element layer
- * that can reduce the order of convergence. For example, the convergence
- * rates for solving the Laplacian on a circle where only the boundary is
- * deformed and the above mesh smoothing algorithm is applied will typically
- * not exceed 3.5 (or 3 in the elements adjacent to the boundary), even for
- * fourth or fifth degree polynomials. In such a case, the curved manifold
- * needs to be switched to a flat manifold in a smooth way that does not
- * depend on the mesh size and eventuell covers a whole layer of cells.
+ * For the behavior of the mapping and convergence rates in case of mixing
+ * different manifolds, please consult the respective section of
+ * MappingQGeneric.
  *
  * @author Ralf Hartmann, 2000, 2001, 2005; Guido Kanschat 2000, 2001,
  * Wolfgang Bangerth, 2015
@@ -139,14 +98,9 @@ public:
    * The value of @p use_mapping_q_on_all_cells is ignored if @p dim is not
    * equal to @p spacedim, i.e., if we are considering meshes on surfaces
    * embedded into higher dimensional spaces.
-   *
-   * The optional parameter @p smooth_support_points controls whether
-   * smoothing on objects where different manifolds meet according to the
-   * general class description should be enabled (default) or not.
    */
   MappingQ (const unsigned int polynomial_degree,
-            const bool use_mapping_q_on_all_cells = false,
-            const bool smooth_support_points = true);
+            const bool use_mapping_q_on_all_cells = false);
 
   /**
    * Copy constructor.
