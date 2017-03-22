@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/table.h>
 #include <deal.II/grid/manifold.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -32,16 +33,16 @@ struct CompareWeights
 public:
   CompareWeights(const std::vector<double> &weights)
     :
-    compare_weights(&weights)
+    compare_weights(weights)
   {}
 
   bool operator() (unsigned int a, unsigned int b) const
   {
-    return (*compare_weights)[a] < (*compare_weights)[b];
+    return compare_weights[a] < compare_weights[b];
   }
 
 private:
-  const std::vector<double> *compare_weights;
+  const std::vector<double> &compare_weights;
 };
 
 /* -------------------------- Manifold --------------------- */
@@ -49,6 +50,8 @@ private:
 template <int dim, int spacedim>
 Manifold<dim, spacedim>::~Manifold ()
 {}
+
+
 
 template <int dim, int spacedim>
 Point<spacedim>
@@ -59,6 +62,8 @@ project_to_manifold (const std::vector<Point<spacedim> > &,
   Assert (false, ExcPureFunctionCalled());
   return Point<spacedim>();
 }
+
+
 
 template <int dim, int spacedim>
 Point<spacedim>
@@ -73,6 +78,8 @@ get_intermediate_point (const Point<spacedim> &p1,
   return project_to_manifold(vertices, w * p2 + (1-w)*p1 );
 }
 
+
+
 template <int dim, int spacedim>
 Point<spacedim>
 Manifold<dim, spacedim>::
@@ -80,6 +87,8 @@ get_new_point (const Quadrature<spacedim> &quad) const
 {
   return get_new_point(quad.get_points(),quad.get_weights());
 }
+
+
 
 template <int dim, int spacedim>
 Point<spacedim>
@@ -102,12 +111,22 @@ get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
   // First sort points in the order of their weights. This is done to
   // produce unique points even if get_intermediate_points is not
   // associative (as for the SphericalManifold).
-  std::vector<unsigned int> permutation(n_points);
+  unsigned int permutation_short[30];
+  std::vector<unsigned int> permutation_long;
+  unsigned int *permutation;
+  if (n_points > 30)
+    {
+      permutation_long.resize(n_points);
+      permutation = &permutation_long[0];
+    }
+  else
+    permutation = &permutation_short[0];
+
   for (unsigned int i=0; i<n_points; ++i)
     permutation[i] = i;
 
-  std::sort(permutation.begin(),
-            permutation.end(),
+  std::sort(permutation,
+            permutation + n_points,
             CompareWeights(weights));
 
   // Now loop over points in the order of their associated weight
@@ -122,11 +141,36 @@ get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
       else
         weight =  w/(weights[permutation[i]] + w);
 
-      p = get_intermediate_point(p, surrounding_points[permutation[i]],1.0 - weight );
+      if (std::abs(weight) > 1e-14)
+        p = get_intermediate_point(p, surrounding_points[permutation[i]],1.0 - weight );
       w += weights[permutation[i]];
     }
 
   return p;
+}
+
+
+
+template <int dim, int spacedim>
+void
+Manifold<dim, spacedim>::
+add_new_points (const std::vector<Point<spacedim> > &surrounding_points,
+                const Table<2,double>               &weights,
+                std::vector<Point<spacedim> >       &new_points) const
+{
+  AssertDimension(surrounding_points.size(), weights.size(1));
+  Assert(&surrounding_points != &new_points,
+         ExcMessage("surrounding_points and new_points cannot be the same "
+                    "array"));
+
+  const unsigned int n_points = surrounding_points.size();
+  std::vector<double> local_weights(n_points);
+  for (unsigned int row=0; row<weights.size(0); ++row)
+    {
+      for (unsigned int i=0; i<n_points; ++i)
+        local_weights[i] = weights(row,i);
+      new_points.push_back(get_new_point(surrounding_points, local_weights));
+    }
 }
 
 
@@ -244,6 +288,7 @@ normal_vector (const Triangulation<3, 3>::face_iterator &face,
 }
 
 
+
 template <int dim, int spacedim>
 Tensor<1,spacedim>
 Manifold<dim, spacedim>::
@@ -273,6 +318,7 @@ get_normals_at_vertices (const Triangulation<2, 2>::face_iterator &face,
       n[i] /= n[i].norm();
     }
 }
+
 
 
 template <>
@@ -307,6 +353,7 @@ get_normals_at_vertices (const Triangulation<3, 3>::face_iterator &face,
 }
 
 
+
 template <int dim, int spacedim>
 void
 Manifold<dim, spacedim>::
@@ -319,7 +366,6 @@ get_normals_at_vertices (const typename Triangulation<dim, spacedim>::face_itera
       n[v] /= n[v].norm();
     }
 }
-
 
 
 
@@ -342,6 +388,7 @@ get_new_point_on_quad (const typename Triangulation<dim, spacedim>::quad_iterato
   const std::pair<std::vector<Point<spacedim> >, std::vector<double> > points_weights(get_default_points_and_weights(quad));
   return get_new_point (points_weights.first,points_weights.second);
 }
+
 
 
 template <int dim, int spacedim>
@@ -383,6 +430,7 @@ get_new_point_on_cell (const typename Triangulation<dim,spacedim>::cell_iterator
 }
 
 
+
 template <>
 Point<1>
 Manifold<1,1>::
@@ -391,6 +439,7 @@ get_new_point_on_face (const Triangulation<1,1>::face_iterator &) const
   Assert (false, ExcImpossibleInDim(1));
   return Point<1>();
 }
+
 
 
 template <>
@@ -412,6 +461,7 @@ get_new_point_on_face (const Triangulation<1,3>::face_iterator &) const
   Assert (false, ExcImpossibleInDim(1));
   return Point<3>();
 }
+
 
 
 template <>
@@ -499,6 +549,8 @@ FlatManifold<dim,spacedim>::FlatManifold (const Tensor<1,spacedim> &periodicity,
   tolerance(tolerance)
 {}
 
+
+
 template <int dim, int spacedim>
 Point<spacedim>
 FlatManifold<dim, spacedim>::
@@ -518,11 +570,69 @@ get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
   Assert(std::abs(std::accumulate(weights.begin(), weights.end(), 0.0)-1.0) < 1e-10,
          ExcMessage("The weights for the individual points should sum to 1!"));
 
-  Tensor<1,spacedim> minP = periodicity;
+  Point<spacedim> p;
 
+  // if there is no periodicity, use a shortcut
+  if (periodicity == Tensor<1,spacedim>())
+    {
+      for (unsigned int i=0; i<surrounding_points.size(); ++i)
+        p += surrounding_points[i] * weights[i];
+    }
+  else
+    {
+      Tensor<1,spacedim> minP = periodicity;
+
+      for (unsigned int d=0; d<spacedim; ++d)
+        if (periodicity[d] > 0)
+          for (unsigned int i=0; i<surrounding_points.size(); ++i)
+            {
+              minP[d] = std::min(minP[d], surrounding_points[i][d]);
+              Assert( (surrounding_points[i][d] < periodicity[d]+tolerance*periodicity[d]) ||
+                      (surrounding_points[i][d] >= -tolerance*periodicity[d]),
+                      ExcPeriodicBox(d, surrounding_points[i], periodicity[i]));
+            }
+
+      // compute the weighted average point, possibly taking into account periodicity
+      for (unsigned int i=0; i<surrounding_points.size(); ++i)
+        {
+          Point<spacedim> dp;
+          for (unsigned int d=0; d<spacedim; ++d)
+            if (periodicity[d] > 0)
+              dp[d] = ( (surrounding_points[i][d]-minP[d]) > periodicity[d]/2.0 ?
+                        -periodicity[d] : 0.0 );
+
+          p += (surrounding_points[i]+dp)*weights[i];
+        }
+
+      // if necessary, also adjust the weighted point by the periodicity
+      for (unsigned int d=0; d<spacedim; ++d)
+        if (periodicity[d] > 0)
+          if (p[d] < 0)
+            p[d] += periodicity[d];
+    }
+
+  return project_to_manifold(surrounding_points, p);
+}
+
+
+
+template <int dim, int spacedim>
+void
+FlatManifold<dim, spacedim>::
+add_new_points (const std::vector<Point<spacedim> > &surrounding_points,
+                const Table<2,double>               &weights,
+                std::vector<Point<spacedim> >       &new_points) const
+{
+  AssertDimension(surrounding_points.size(), weights.size(1));
+  if (weights.size(0) == 0)
+    return;
+
+  const unsigned int n_points = surrounding_points.size();
+
+  Tensor<1,spacedim> minP = periodicity;
   for (unsigned int d=0; d<spacedim; ++d)
     if (periodicity[d] > 0)
-      for (unsigned int i=0; i<surrounding_points.size(); ++i)
+      for (unsigned int i=0; i<n_points; ++i)
         {
           minP[d] = std::min(minP[d], surrounding_points[i][d]);
           Assert( (surrounding_points[i][d] < periodicity[d]+tolerance*periodicity[d]) ||
@@ -530,26 +640,47 @@ get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
                   ExcPeriodicBox(d, surrounding_points[i], periodicity[i]));
         }
 
-  // compute the weighted average point, possibly taking into account periodicity
-  Point<spacedim> p;
-  for (unsigned int i=0; i<surrounding_points.size(); ++i)
-    {
-      Point<spacedim> dp;
-      for (unsigned int d=0; d<spacedim; ++d)
-        if (periodicity[d] > 0)
-          dp[d] = ( (surrounding_points[i][d]-minP[d]) > periodicity[d]/2.0 ?
-                    -periodicity[d] : 0.0 );
-
-      p += (surrounding_points[i]+dp)*weights[i];
-    }
-
-  // if necessary, also adjust the weighted point by the periodicity
+  // check whether periodicity shifts some of the points. Only do this if
+  // necessary to avoid memory allocation
+  const Point<spacedim> *surrounding_points_start = &surrounding_points[0];
+  std::vector<Point<spacedim> > modified_points;
+  bool adjust_periodicity = false;
   for (unsigned int d=0; d<spacedim; ++d)
     if (periodicity[d] > 0)
-      if (p[d] < 0)
-        p[d] += periodicity[d];
+      for (unsigned int i=0; i<n_points; ++i)
+        if ((surrounding_points[i][d]-minP[d]) > periodicity[d]/2.0)
+          {
+            adjust_periodicity = true;
+            break;
+          }
+  if (adjust_periodicity == true)
+    {
+      modified_points = surrounding_points;
+      for (unsigned int d=0; d<spacedim; ++d)
+        if (periodicity[d] > 0)
+          for (unsigned int i=0; i<n_points; ++i)
+            if ((surrounding_points[i][d]-minP[d]) > periodicity[d]/2.0)
+              modified_points[i][d] -= periodicity[d];
+      surrounding_points_start = &modified_points[0];
+    }
 
-  return project_to_manifold(surrounding_points, p);
+  // Now perform the interpolation
+  for (unsigned int row=0; row<weights.size(0); ++row)
+    {
+      Assert(std::abs(std::accumulate(&weights(row,0), &weights(row,0)+n_points, 0.0)-1.0) < 1e-10,
+             ExcMessage("The weights for the individual points should sum to 1!"));
+      Point<spacedim> new_point;
+      for (unsigned int p=0; p<n_points; ++p)
+        new_point += surrounding_points_start[p] * weights(row,p);
+
+      // if necessary, also adjust the weighted point by the periodicity
+      for (unsigned int d=0; d<spacedim; ++d)
+        if (periodicity[d] > 0)
+          if (new_point[d] < 0)
+            new_point[d] += periodicity[d];
+
+      new_points.push_back(project_to_manifold(surrounding_points, new_point));
+    }
 }
 
 
@@ -643,6 +774,32 @@ get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
 
 
 template <int dim, int spacedim, int chartdim>
+void
+ChartManifold<dim,spacedim,chartdim>::
+add_new_points (const std::vector<Point<spacedim> > &surrounding_points,
+                const Table<2,double>               &weights,
+                std::vector<Point<spacedim> >       &new_points) const
+{
+  Assert(weights.size(0) > 0, ExcEmptyObject());
+  AssertDimension(surrounding_points.size(), weights.size(1));
+
+  const unsigned int n_points = surrounding_points.size();
+
+  std::vector<Point<chartdim> > chart_points(n_points);
+  for (unsigned int i=0; i<n_points; ++i)
+    chart_points[i] = pull_back(surrounding_points[i]);
+
+  std::vector<Point<chartdim> > new_points_on_chart;
+  new_points_on_chart.reserve(weights.size(0));
+  sub_manifold.add_new_points(chart_points, weights, new_points_on_chart);
+
+  for (unsigned int row=0; row<weights.size(0); ++row)
+    new_points.push_back(push_forward(new_points_on_chart[row]));
+}
+
+
+
+template <int dim, int spacedim, int chartdim>
 DerivativeForm<1,chartdim,spacedim>
 ChartManifold<dim,spacedim,chartdim>::
 push_forward_gradient(const Point<chartdim> &) const
@@ -695,4 +852,3 @@ ChartManifold<dim, spacedim, chartdim>::get_periodicity() const
 #include "manifold.inst"
 
 DEAL_II_NAMESPACE_CLOSE
-

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2016 by the deal.II authors
+// Copyright (C) 2001 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -68,6 +68,12 @@ DEAL_II_NAMESPACE_OPEN
  * of the domain and consequently a higher order mapping is used for all
  * cells; again this class is then equivalent to using MappingQGeneric right
  * away.
+ *
+ * <h4>Behavior along curved boundaries and with different manifolds</h4>
+ *
+ * For the behavior of the mapping and convergence rates in case of mixing
+ * different manifolds, please consult the respective section of
+ * MappingQGeneric.
  *
  * @author Ralf Hartmann, 2000, 2001, 2005; Guido Kanschat 2000, 2001,
  * Wolfgang Bangerth, 2015

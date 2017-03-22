@@ -29,6 +29,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// forward declaration
+template <int, typename> class Table;
+
 /**
  * We collect here some helper functions used in the Manifold<dim,spacedim>
  * classes.
@@ -397,6 +400,35 @@ public:
                  const std::vector<double>           &weights) const;
 
   /**
+   * Compute a new set of points that interpolate between the given points
+   * @p surrounding_points. @p weights is a table with as many columns as
+   * @p surrounding_points.size(). The number of rows in @p weights determines
+   * how many new points will be computed and appended to the last input
+   * argument @p new_points. After exit of this function, the size of
+   * @p new_points equals the size at entry plus the number of rows in
+   * @p weights.
+   *
+   * In its default implementation, this function simply calls get_new_point()
+   * on each row of @weights and appends those points to the output vector
+   * @p new_points. However, this function is more efficient if multiple new
+   * points need to be generated like in MappingQGeneric and the manifold does
+   * expensive transformations between a chart space and the physical space,
+   * such as ChartManifold. For this function, the surrounding points need to
+   * be transformed back to the chart sparse only once, rather than for every
+   * call to get_new_point(). If efficiency is not important, you may get away
+   * by implementing only the get_new_point() function.
+   *
+   * The implementation does not allow for @p surrounding_points and
+   * @p new_points to point to the same vector, so make sure to pass different
+   * objects into the function.
+   */
+  virtual
+  void
+  add_new_points (const std::vector<Point<spacedim> > &surrounding_points,
+                  const Table<2,double>               &weights,
+                  std::vector<Point<spacedim> >       &new_points) const;
+
+  /**
    * Given a point which lies close to the given manifold, it modifies it and
    * projects it to manifold itself.
    *
@@ -723,6 +755,24 @@ public:
   get_new_point(const std::vector<Point<spacedim> > &surrounding_points,
                 const std::vector<double>           &weights) const;
 
+  /**
+   * Compute a new set of points that interpolate between the given points
+   * @p surrounding_points. @p weights is a table with as many columns as
+   * @p surrounding_points.size(). The number of rows in @p weights determines
+   * how many new points will be computed and appended to the last input
+   * argument @p new_points. After exit of this function, the size of
+   * @p new_points equals the size at entry plus the number of rows in
+   * @p weights.
+   *
+   * For this particular implementation, the interpolation of the
+   * @p surrounding_points according to the @p weights is simply performed in
+   * Cartesian space.
+   */
+  virtual
+  void
+  add_new_points (const std::vector<Point<spacedim> > &surrounding_points,
+                  const Table<2,double>               &weights,
+                  std::vector<Point<spacedim> >       &new_points) const;
 
   /**
    * Project to FlatManifold. This is the identity function for flat,
@@ -933,6 +983,36 @@ public:
   Point<spacedim>
   get_new_point(const std::vector<Point<spacedim> > &surrounding_points,
                 const std::vector<double>           &weights) const;
+
+  /**
+   * Compute a new set of points that interpolate between the given points
+   * @p surrounding_points. @p weights is a table with as many columns as
+   * @p surrounding_points.size(). The number of rows in @p weights determines
+   * how many new points will be computed and appended to the last input
+   * argument @p new_points. After exit of this function, the size of
+   * @p new_points equals the size at entry plus the number of rows in
+   * @p weights.
+   *
+   * The implementation of this function first transforms the
+   * @p surrounding_points to the chart space by calling pull_back(). Then, new
+   * points are computed on the chart by usual interpolation according to the
+   * given @p weights, which are finally transformed to the image space by
+   * push_forward().
+   *
+   * This implementation can be much more efficient for computing multiple new
+   * points from the same surrounding points than separate calls to
+   * get_new_point() in case the pull_back() operation is expensive. This is
+   * because pull_back() is only called once for the surrounding points and
+   * the interpolation is done for all given weights using this set of
+   * points. Often, pull_back() is also more expensive than push_forward()
+   * because the former might involve some kind of Newton iteration in
+   * non-trivial manifolds.
+   */
+  virtual
+  void
+  add_new_points (const std::vector<Point<spacedim> > &surrounding_points,
+                  const Table<2,double>               &weights,
+                  std::vector<Point<spacedim> >       &new_points) const;
 
   /**
    * Pull back the given point in spacedim to the Euclidean chartdim

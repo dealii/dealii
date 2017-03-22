@@ -81,8 +81,57 @@ template <int,int> class MappingQ;
  * a manifold object to all cells that can then also be used by the mapping
  * classes for higher order mappings.
  *
+ * <h4>Behavior along curved boundaries and with different manifolds</h4>
  *
- * @author Wolfgang Bangerth, 2015
+ * As described above, one often only knows a manifold description of a
+ * surface but not the interior of the computational domain. In such a case, a
+ * StraightBoundary object will be assigned to the interior entities that
+ * describes a usual planar coordinate system where the additional points for
+ * the higher order mapping are placed exactly according to a bi-/trilinear
+ * mapping. When combined with a non-flat manifold on the boundary, for
+ * example a circle bulging into the interior of a square cell, the two
+ * manifold descriptions are in general incompatible. For example, a
+ * FlatManifold defined solely through the cell's vertices would put an
+ * interior point located at some small distance epsilon away from the
+ * boundary along a straight line and thus in general outside the concave part
+ * of a circle. If the polynomial degree of MappingQ is sufficiently high, the
+ * transformation from the reference cell to such a cell would in general
+ * contain inverted regions close to the boundary.
+ *
+ * In order to avoid this situation, this class applies a smoothing on cells
+ * adjacent to the boundary by using so-called Laplace smoothing by
+ * default. In the algorithm that computes additional points, the
+ * compute_mapping_support_points() method, all the entities of the cells are
+ * passed through hierarchically, starting from the lines to the quads and
+ * finally hexes. Points on objects higher up in the hierarchy are obtained
+ * from the manifold associated with that object, taking into account all the
+ * points previously computed by the manifolds associated with the
+ * lower-dimensional objects, not just the vertices. If only a line is
+ * assigned a curved boundary but the adjacent quad is on a flat manifold, the
+ * flat manifold on the quad will take the points on the deformed line into
+ * account when interpolating the position of the additional points inside the
+ * quad and thus always result in a well-defined transformation.
+ *
+ * While the smoothing approach works well for filling holes or avoiding
+ * inversions with low and medium convergence orders up to approximately three
+ * to four, there is nonetheless an inherent shortcoming when switching from a
+ * curved manifold to a flat manifold over a face (and the associated
+ * smoothing). The finite element theory (see e.g. Strang and Fix, 1973,
+ * Sections 2.2 and 3.3 and in particular Theorem 3.6) requires the
+ * transformation to be globally C^0 continuous also over several elements and
+ * to be uniform as the mesh is refined. Even though the Laplace smoothing
+ * fixes the discontinuity within one layer of cells, it cannot provide
+ * uniformity as the change is always within one layer of elements only. For
+ * example, the convergence rates for solving the Laplacian on a circle where
+ * only the boundary is deformed and the above mesh smoothing algorithm is
+ * applied will typically not exceed 3.5 (or 3 in the elements adjacent to the
+ * boundary), even for fourth or fifth degree polynomials. In such a case, the
+ * curved manifold needs to be switched to a flat manifold in a smooth way
+ * that does not depend on the mesh size and eventually covers a region of
+ * cells instead of only those that are immediately adjacent to the circular
+ * boundary.
+ *
+ * @author Wolfgang Bangerth, 2015, Martin Kronbichler, 2017
  */
 template <int dim, int spacedim=dim>
 class MappingQGeneric : public Mapping<dim,spacedim>
@@ -524,29 +573,39 @@ protected:
   const std_cxx11::unique_ptr<FE_Q<dim> > fe_q;
 
   /**
-   * A table of weights by which we multiply the locations of the support
-   * points on the perimeter of a quad to get the location of interior support
-   * points.
+   * A vector of tables of weights by which we multiply the locations of the
+   * support points on the perimeter of an object (line, quad, hex) to get the
+   * location of interior support points.
    *
-   * Sizes: support_point_weights_on_quad.size()= number of inner
-   * unit_support_points support_point_weights_on_quad[i].size()= number of
-   * outer unit_support_points, i.e.  unit_support_points on the boundary of
-   * the quad
+   * Access into this table is by @p [structdim-1], i.e., use 0 to access the
+   * support point weights on a line (i.e., the interior points of the
+   * GaussLobatto quadrature), use 1 to access the support point weights from
+   * to perimeter to the interior of a quad, and use 2 to access the support
+   * point weights from the perimeter to the interior of a hex.
    *
-   * For the definition of this vector see equation (8) of the `mapping'
+   * The table itself contains as many columns as there are surrounding points
+   * to a particular object (2 for a line, <code>4 + 4*(degree-1)</code> for
+   * a quad, <code>8 + 12*(degree-1) + 6*(degree-1)*(degree-1)</code> for a
+   * hex) and as many rows as there are strictly interior points.
+   *
+   * For the definition of this table see equation (8) of the `mapping'
    * report.
    */
-  Table<2,double> support_point_weights_on_quad;
+  std::vector<Table<2,double> > support_point_weights_perimeter_to_interior;
 
   /**
-   * A table of weights by which we multiply the locations of the support
-   * points on the perimeter of a hex to get the location of interior support
-   * points.
+   * A table of weights by which we multiply the locations of the vertex
+   * points of the cell to get the location of all additional support points,
+   * both on lines, quads, and hexes (as appropriate). This data structure is
+   * used when we fill all support points at once, which is the case if the
+   * same manifold is attached to all sub-entities of a cell. This way, we can
+   * avoid some of the overhead in transforming data for mappings.
    *
-   * For the definition of this vector see equation (8) of the `mapping'
-   * report.
+   * The table has as many rows as there are vertices to the cell (2 in 1D, 4
+   * in 2D, 8 in 3D), and as many rows as there are additional support points
+   * in the mapping, i.e., <code>(degree+1)^dim - 2^dim</code>.
    */
-  Table<2,double> support_point_weights_on_hex;
+  Table<2,double> support_point_weights_cell;
 
   /**
    * Return the locations of support points for the mapping. For example, for
