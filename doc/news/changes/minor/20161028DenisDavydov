@@ -1,4 +1,0 @@
-New: Add VectorTools::project() to do L2 projection
-of scalar-valued quadrature point data in parallel.
-<br>
-(Denis Davydov, 2016/10/28)

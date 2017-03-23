@@ -1,6 +1,0 @@
-Improved: The distribution of degrees of freedom on multigrid levels,
-DoFHandler::distribute_mg_dofs(), contained a few steps that scaled
-quadratically in the number of local cells for certain configurations. These
-steps have been replaced by linear complexity calls.
-<br>
-(Martin Kronbichler, 2016/03/18)

@@ -1,6 +1,0 @@
-Improved: The testsuite now supports fine grained feature constraints
-of the form <code>test.with_[feature]_with_[...]=true</code> corresponding
-to variables <code>DEAL_II_<FEATURE>_WITH_[...]</code> exported to
-<code>deal.IIConfig.cmake</code>.
-<br>
-(Matthias Maier, 2016/07/11)

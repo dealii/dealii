@@ -1,4 +1,0 @@
-New: Functions to compute the 2d and 3d rotation matrix have been implemented
-and can be found in the Physics::Transformations::Rotations namespace.
-<br>
-(Jean-Paul Pelteret, 2017/01/09)

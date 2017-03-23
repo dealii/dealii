@@ -1,4 +1,0 @@
-New: Modify IndexSet::index_within_set() to return numbers::invalid_dof_index
-if the global index is not a member of this index set.
-<br>
-(Denis Davydov, 2016/12/23)

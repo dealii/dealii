@@ -1,4 +1,0 @@
-New: The Tensor class has two new functions implemented, namely those
-that return its Tensor::adjugate() and Tensor::cofactor().
-<br>
-(Jean-Paul Pelteret, 2016/09/25)

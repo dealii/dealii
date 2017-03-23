@@ -1,6 +1,0 @@
-Fixed: The FE_ABF class reported the maximal polynomial degree (via
-FiniteElement::degree) for elements of order $r$ as $r+1$, but this is
-wrong. It should be $r+2$ (see Section 5 of the original paper of
-Arnold, Boffi, and Falk). This is now fixed.
-<br>
-(Wolfgang Bangerth, 2017/01/13)

@@ -1,4 +1,0 @@
-Fixed: SphericalManifold now behaves correctly also when R>>1
-and the center is not the origin.
-<br>
-(Luca Heltai, 2016/10/01)

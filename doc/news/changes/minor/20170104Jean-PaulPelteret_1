@@ -1,4 +1,0 @@
-New: The Trilinos preconditioner classes have been extended to be compatible
-with LinearOperators.
-<br>
-(Jean-Paul Pelteret, 2017/01/04)

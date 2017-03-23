@@ -1,4 +1,0 @@
-New: Introduce operators for residuals and interior penalty terms for
-the Grad-Div operator in LocalIntegrators::GradDiv.
-<br>
-(Timo Heister, Guido Kanschat, 2016/08/02)

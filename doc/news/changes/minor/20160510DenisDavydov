@@ -1,5 +1,0 @@
-New: Add functions to transform Cartesian coordinates to spherical and back:
-GeometricUtilities::Coordinates::to_spherical and
-GeometricUtilities::Coordinates::from_spherical.
-<br>
-(Denis Davydov, 2016/05/10)

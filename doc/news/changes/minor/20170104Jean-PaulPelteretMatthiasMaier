@@ -1,5 +1,0 @@
-New: LinearOperator now derive from an arbitrary Payload class. This allows
-their functionality to be extended to support matrix and vector classes
-such as the wrappers to PETSc or Trilinos.
-<br>
-(Jean-Paul Pelteret, Matthias Maier, 2017/01/04)

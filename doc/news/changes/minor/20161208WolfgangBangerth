@@ -1,4 +1,0 @@
-New: The ArrayView class now has a default constructor that creates
-an invalid object.
-<br>
-(Wolfgang Bangerth, 2016/12/08)

@@ -1,5 +1,0 @@
-Fixed: The class MGTransferMatrixFree::clear() did not reset all member
-variables, sometimes treating Dirichlet boundary conditions incorrectly if a
-transfer object was reused. This is now fixed.
-<br>
-(Martin Kronbichler, 2017/02/22)

@@ -1,4 +1,0 @@
-Fixed: The FE_PolyTensor class (and all of its descendants) was not
-thread-safe. This is now fixed.
-<br>
-(Wolfgang Bangerth, 2017/01/09)

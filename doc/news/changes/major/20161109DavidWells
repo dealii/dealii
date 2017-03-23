@@ -1,5 +1,0 @@
-Improved: the error codes for all MPI functions are now checked and, if the
-MPI function failed for any reason, an exception with a helpful message is
-thrown.
-<br>
-(David Wells, 2016/11/09)

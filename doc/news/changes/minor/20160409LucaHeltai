@@ -1,5 +1,0 @@
-New: Added CompositionManifold to create new manifolds from two
-ChartManifold objects. This can be used, for example, to rotate a
-cylindrical Manifold, or to make a cylinders with parabolic sides.
-<br>
-(Luca Heltai, 2016/04/09)

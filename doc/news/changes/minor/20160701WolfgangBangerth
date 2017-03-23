@@ -1,5 +1,0 @@
-Fixed: The function DoFTools::dof_couplings_from_component_couplings
-for hp::FECollection arguments was compiled but not exported from the
-object file. This is now fixed.
-<br>
-(Wolfgang Bangerth, 2016/07/01)

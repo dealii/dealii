@@ -1,8 +1,0 @@
-New: There is now a new DoFTools::make_flux_sparsity_pattern()
-which takes a constraint matrix and flux and internal dof masks, in
-parallel. This is useful in the case where some components of a
-finite element are continuous and some discontinuous, allowing
-constraints to be imposed on the continuous part while also building
-building the flux terms needed for the discontinuous part.
-<br>
-(Sam Cox, 2016/07/25)

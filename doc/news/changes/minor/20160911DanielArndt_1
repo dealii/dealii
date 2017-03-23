@@ -1,5 +1,0 @@
-New: IndexSet::is_ascending_and_one_to_one allows to find out
-whether the nth range of indices is stored on the nth process in case
-the IndexSets are contiguous.
-<br>
-(Daniel Arndt, 2016/09/11)
