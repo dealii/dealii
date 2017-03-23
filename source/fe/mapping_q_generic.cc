@@ -3693,13 +3693,14 @@ add_quad_support_points(const Triangulation<3,3>::cell_iterator &cell,
       // points. The second check is to find out whether the Boundary object
       // is actually a StraightBoundary (the default flat manifold assigned to
       // the triangulation if no manifold is assigned).
-      if ((dynamic_cast<const Boundary<3,3> *>(&face->get_manifold()) &&
-           std::string(typeid(face->get_manifold()).name()).find("StraightBoundary") ==
-           std::string::npos))
+      const Boundary<3,3> *boundary =
+        dynamic_cast<const Boundary<3,3> *>(&face->get_manifold());
+      if (boundary != NULL &&
+          std::string(typeid(*boundary).name()).find("StraightBoundary") ==
+          std::string::npos)
         {
           // ask the boundary/manifold object to return intermediate points on it
           tmp_points.resize((polynomial_degree-1)*(polynomial_degree-1));
-          const Boundary<3,3> *boundary = dynamic_cast<const Boundary<3,3> *>(&face->get_manifold());
           boundary->get_intermediate_points_on_quad(face, tmp_points);
           for (unsigned int i=0; i<tmp_points.size(); ++i)
             a.push_back(tmp_points[fe_q->adjust_quad_dof_index_for_face_orientation(i,
