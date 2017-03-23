@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id: tria.cc 32807 2014-04-22 15:01:57Z heister $
 //
-// Copyright (C) 2015 - 2016 by the deal.II authors
+// Copyright (C) 2015 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
