@@ -1231,7 +1231,8 @@ public:
    * neither dominates, or if either could dominate.
    *
    * For a definition of domination, see FiniteElementDomination::Domination
-   * and in particular the @ref hp_paper "hp paper".
+   * and in particular the
+   * @ref hp_paper "hp paper".
    */
   virtual
   FiniteElementDomination::Domination
@@ -1947,7 +1948,9 @@ public:
    * FETools::compute_node_matrix() function.
    *
    * In more detail, let us assume that the generalized support points
-   * (see @ref GlossGeneralizedSupport "this glossary entry") of the current
+   * (see
+   * @ref GlossGeneralizedSupport "this glossary entry"
+   * ) of the current
    * element are $\hat{\mathbf x}_i$ and that the node functionals associated
    * with the current element are $\Psi_i[\cdot]$. Then, the fact that the
    * element is based on generalized support points, implies that if we

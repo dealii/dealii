@@ -541,9 +541,9 @@ namespace DataOutBase
      * surrounded by angle brackets: For example, if the space dimension is 2
      * and the labels are <tt>"x"</tt> and <tt>"t"</tt>, then the relevant
      * line will start with
-     @verbatim
-     # <x> <t>
-     @endverbatim
+     * @verbatim
+     * # <x> <t>
+     * @endverbatim
      * Any extra labels will be ignored.
      *
      * If you specify these labels yourself then there should be at least

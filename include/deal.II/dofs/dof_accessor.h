@@ -180,7 +180,8 @@ namespace internal
  *   edges have @p structdim equal to one, etc.
  * @tparam DoFHandlerType The type of the DoF handler into which accessor
  *   of this type point. This is either the DoFHandler or hp::DoFHandler
- *   class. See also the @ref ConceptDoFHandlerType "DoFHandlerType concept".
+ *   class. See also the
+ *   @ref ConceptDoFHandlerType "DoFHandlerType concept".
  * @tparam level_dof_access If @p false, then the accessor simply represents
  *   a cell, face, or edge in a DoFHandler for which degrees of freedom only
  *   exist on the finest level. Some operations are not allowed in this case,
@@ -875,8 +876,8 @@ public:
   /**
    * Return the <i>global</i> indices of the degrees of freedom located on
    * this object in the standard ordering defined by the finite element. This
-   * function is only available on <i>active</i> objects (see @ref GlossActive
-   * "this glossary entry").
+   * function is only available on <i>active</i> objects (see
+   * @ref GlossActive "this glossary entry").
    *
    * The present vertex must belong to an active cell (and not artificial in a
    * parallel distributed computation).

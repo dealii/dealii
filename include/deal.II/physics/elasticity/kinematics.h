@@ -42,7 +42,7 @@ namespace Physics
      * 0 case, where the metric tensor is the identity tensor.
      *
      * @author Jean-Paul Pelteret, Andrew McBride, 2016
-    */
+     */
     namespace Kinematics
     {
 

@@ -97,7 +97,7 @@ DEAL_II_NAMESPACE_OPEN
  * Note that evaluation of gradients (hessians) of the enriched shape functions
  * or the finite element field requires evaluation of gradients (gradients and hessians)
  * of the enrichment functions:
- * @f{align*}
+ * @f{align*}{
  *   U(\mathbf x)
  *     &= \sum_i N_i(\mathbf x) U_i
  *     + \sum_{j,k} N_j(\mathbf x) F_k(\mathbf x) U_{jk} \\
@@ -145,35 +145,35 @@ DEAL_II_NAMESPACE_OPEN
  *
  * When using this class, please cite
  * @code{.bib}
- @Article{Davydov2016,
-   Title                    = {On the h-adaptive PUM and hp-adaptive FEM approaches applied to PDEs in quantum mechanics.},
-   Author                   = {Davydov, D and Gerasimov, T and Pelteret, J.-P. and Steinmann, P.},
-   eprinttype               = {arXiv},
-   eprint                   = {1612.02305},
-   eprintclass              = {physics.comp-ph},
-   Year                     = {2016},
- }
+ * @Article{Davydov2016,
+ *   Title                    = {On the h-adaptive PUM and hp-adaptive FEM approaches applied to PDEs in quantum mechanics.},
+ *   Author                   = {Davydov, D and Gerasimov, T and Pelteret, J.-P. and Steinmann, P.},
+ *   eprinttype               = {arXiv},
+ *   eprint                   = {1612.02305},
+ *   eprintclass              = {physics.comp-ph},
+ *   Year                     = {2016},
+ * }
  * @endcode
  * The PUM was introduced in
  * @code{.bib}
- @Article{Melenk1996,
-  Title                    = {The partition of unity finite element method: Basic theory and applications },
-  Author                   = {Melenk, J.M. and Babu\v{s}ka, I.},
-  Journal                  = {Computer Methods in Applied Mechanics and Engineering},
-  Year                     = {1996},
-  Number                   = {1--4},
-  Pages                    = {289 -- 314},
-  Volume                   = {139},
-}
-@Article{Babuska1997,
-  Title                    = {The partition of unity method},
-  Author                   = {Babu\v{s}ka, I. and Melenk, J. M.},
-  Journal                  = {International Journal for Numerical Methods in Engineering},
-  Year                     = {1997},
-  Number                   = {4},
-  Pages                    = {727--758},
-  Volume                   = {40},
-}
+ * @Article{Melenk1996,
+ *   Title                    = {The partition of unity finite element method: Basic theory and applications },
+ *   Author                   = {Melenk, J.M. and Babu\v{s}ka, I.},
+ *   Journal                  = {Computer Methods in Applied Mechanics and Engineering},
+ *   Year                     = {1996},
+ *   Number                   = {1--4},
+ *   Pages                    = {289 -- 314},
+ *   Volume                   = {139},
+ * }
+ * @Article{Babuska1997,
+ *   Title                    = {The partition of unity method},
+ *   Author                   = {Babu\v{s}ka, I. and Melenk, J. M.},
+ *   Journal                  = {International Journal for Numerical Methods in Engineering},
+ *   Year                     = {1997},
+ *   Number                   = {4},
+ *   Pages                    = {727--758},
+ *   Volume                   = {40},
+ * }
  * @endcode
  *
  * <h3>Implementation</h3>

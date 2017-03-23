@@ -3081,27 +3081,27 @@ public:
 
 
   /**
-    * Declare the (coarse) face pairs given in the argument of this function
-    * as periodic. This way it it possible to obtain neighbors across periodic
-    * boundaries.
-    *
-    * The vector can be filled by the function
-    * GridTools::collect_periodic_faces.
-    *
-    * For more information on periodic boundary conditions see
-    * GridTools::collect_periodic_faces,
-    * DoFTools::make_periodicity_constraints and step-45.
-    *
-    * @note Before this function can be used the Triangulation has to be
-    * initialized and must not be refined.
-    */
+   * Declare the (coarse) face pairs given in the argument of this function as
+   * periodic. This way it it possible to obtain neighbors across periodic
+   * boundaries.
+   *
+   * The vector can be filled by the function
+   * GridTools::collect_periodic_faces.
+   *
+   * For more information on periodic boundary conditions see
+   * GridTools::collect_periodic_faces, DoFTools::make_periodicity_constraints
+   * and step-45.
+   *
+   * @note Before this function can be used the Triangulation has to be
+   * initialized and must not be refined.
+   */
   virtual void
   add_periodicity
   (const std::vector<GridTools::PeriodicFacePair<cell_iterator> > &);
 
   /**
-    * Return the periodic_face_map.
-    */
+   * Return the periodic_face_map.
+   */
   const std::map<std::pair<cell_iterator, unsigned int>,std::pair<std::pair<cell_iterator, unsigned int>, std::bitset<3> > > &
   get_periodic_face_map() const;
 
@@ -3219,11 +3219,11 @@ protected:
 
 private:
   /**
-    * If add_periodicity() is called, this variable stores the given
-    * periodic face pairs on level 0 for later access during the
-    * identification of ghost cells for the multigrid hierarchy and for
-    * setting up the periodic_face_map.
-    */
+   * If add_periodicity() is called, this variable stores the given periodic
+   * face pairs on level 0 for later access during the identification of ghost
+   * cells for the multigrid hierarchy and for setting up the
+   * periodic_face_map.
+   */
   std::vector<GridTools::PeriodicFacePair<cell_iterator> > periodic_face_pairs_level_0;
 
   /**

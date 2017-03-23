@@ -19,7 +19,8 @@
  *
  * All classes related to shape functions and to access to shape
  * functions.  This concerns the actual values of finite elements. For
- * the numbering of degrees of freedom refer to the module on @ref dofs.
+ * the numbering of degrees of freedom refer to the module on
+ * @ref dofs.
  *
  * The classes and functions of this module fall into several sub-groups that
  * are discussed in their respective sub-modules listed above. In addition,
@@ -86,7 +87,8 @@
  * of its face with the neighboring cell. If vector-valued elements are used,
  * the FEValues and related classes allow access to all vector components; if
  * one wants to pick individual components, there are extractor classes that
- * make this task simpler, as described in the @ref vector_valued module.
+ * make this task simpler, as described in the
+ * @ref vector_valued module.
  *
  * The last member of this group, the UpdateFlags enumeration, is used as an
  * optimization: instead of letting the FEValues class compute every possible
@@ -95,13 +97,14 @@
  * UpdateFlags enumeration is used to offer symbolic names denoting what you
  * want the FEValues class to compute.
  * 
- * All these classes are used in all @ref Tutorial "tutorial programs" from
- * step-3 onward, and are described there in significant detail.
+ * All these classes are used in all
+ * @ref Tutorial "tutorial programs"
+ * from step-3 onward, and are described there in significant detail.
  *
  * The actual workings of the FEValues class and friends is
  * complicated because it has to be general yet efficient. The page on
- * @ref UpdateFlags attempts to give an overview of how this
- * works.
+ * @ref UpdateFlags
+ * attempts to give an overview of how this works.
  *
  * @ingroup feall
  */
@@ -120,8 +123,11 @@
  * point on the unit cell. To be useful in integrating matrix and right hand
  * side entries, one has to have the ability to map these shape functions and
  * gradients to the real cell. This is done using classes derived from the
- * Mapping base class (see the @ref mapping module) in conjunction with the
- * FEValues class (see the @ref feaccess module).
+ * Mapping base class (see
+ * @ref mapping)
+ * in conjunction with the
+ * FEValues class (see
+ * @ref feaccess).
  *
  * <h3>Vector-valued finite elements</h3>
  *

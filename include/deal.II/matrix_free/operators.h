@@ -444,8 +444,9 @@ namespace MatrixFreeOperators
    * coupling over the multigrid interface needs to be taken into account.
    * This is done by the so-called interface (or edge) matrices that compute
    * the part of the residual that is missed by the level matrix with
-   * homogeneous Dirichlet conditions. We refer to the @ref mg_paper
-   * "Multigrid paper by Janssen and Kanschat" for more details.
+   * homogeneous Dirichlet conditions. We refer to the
+   * @ref mg_paper "Multigrid paper by Janssen and Kanschat"
+   * for more details.
    *
    * For the implementation of those interface matrices, most infrastructure
    * is already in place and provided by MatrixFreeOperators::Base through the

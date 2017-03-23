@@ -310,8 +310,8 @@ namespace TrilinosWrappers
     void do_solve(const Preconditioner &preconditioner);
 
     /**
-    * A function that sets the preconditioner that the solver will apply
-    */
+     * A function that sets the preconditioner that the solver will apply
+     */
     template<typename Preconditioner>
     void set_preconditioner (AztecOO              &solver,
                              const Preconditioner &preconditioner);

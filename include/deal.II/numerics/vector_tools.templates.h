@@ -968,11 +968,11 @@ namespace VectorTools
 
 
     /**
-      * Helper interface. After figuring out the number of components
-      * in project_matrix_free_component, we determine the degree of the
-      * FiniteElement and call project_matrix_free with the appropriate
-      * template arguments.
-      */
+     * Helper interface. After figuring out the number of components in
+     * project_matrix_free_component, we determine the degree of the
+     * FiniteElement and call project_matrix_free with the appropriate
+     * template arguments.
+     */
     template <int components, int dim, typename Number, int spacedim>
     void project_matrix_free_degree
     (const Mapping<dim, spacedim>               &mapping,
