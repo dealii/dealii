@@ -1,0 +1,4 @@
+New: DoFTools::extract_dofs_with_support_on() returns a set of degrees of
+freedom that have support on a subset of locally owned cells.
+<br>
+(Denis Davydov, 2017/03/24)
