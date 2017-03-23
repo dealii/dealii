@@ -38,7 +38,6 @@
 #cmakedefine DEAL_II_WITH_ARPACK
 #cmakedefine DEAL_II_WITH_BZIP2
 #cmakedefine DEAL_II_WITH_CUDA
-#cmakedefine DEAL_II_WITH_CXX11
 #cmakedefine DEAL_II_WITH_CXX14
 #cmakedefine DEAL_II_WITH_GSL
 #cmakedefine DEAL_II_WITH_HDF5
@@ -56,6 +55,8 @@
 #cmakedefine DEAL_II_WITH_UMFPACK
 #cmakedefine DEAL_II_WITH_ZLIB
 
+// defined for backwards compatibility
+#define DEAL_II_WITH_CXX11
 
 /***********************************************************************
  * Compiler bugs:

@@ -162,7 +162,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     # with the -std=c++0x flag of GCC, see deal.II FAQ.
     # Test whether that is indeed the case
     #
-    IF(DEAL_II_WITH_CXX11 AND NOT TRILINOS_SUPPORTS_CPP11)
+    IF(NOT TRILINOS_SUPPORTS_CPP11)
 
       IF(TRILINOS_HAS_C99_TR1_WORKAROUND)
         LIST(APPEND TRILINOS_DEFINITIONS "HAS_C99_TR1_CMATH")
@@ -180,26 +180,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
           )
         SET(${var} FALSE)
       ENDIF()
-    ENDIF()
-
-    #
-    # Newer Trilinos versions (12.0.1 or newer) require a matching C++11
-    # support. I.e., if Trilinos is configured with C++11 support, deal.II
-    # also has to be configured with C++11 support:
-    #
-    IF(TRILINOS_WITH_MANDATORY_CXX11 AND NOT DEAL_II_WITH_CXX11)
-      MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
-        "Trilinos was compiled with C++11 support, but C++11 support is "
-        "disabled (DEAL_II_WITH_CXX11=off)."
-        )
-      SET(TRILINOS_ADDITIONAL_ERROR_STRING
-        ${TRILINOS_ADDITIONAL_ERROR_STRING}
-        "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
-        "requires C++11 support, but C++11 support is disabled:\n"
-        "  DEAL_II_WITH_CXX11 = ${DEAL_II_WITH_CXX11}\n"
-        )
-      SET(${var} FALSE)
-
     ENDIF()
 
     CHECK_MPI_INTERFACE(TRILINOS ${var})

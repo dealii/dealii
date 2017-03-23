@@ -1,0 +1,3 @@
+Changed: deal.II now requires a compiler supporting (very nearly) the entire C++11 standard. The minimal version of GCC supported is now 4.8.
+<br>
+(David Wells, 2017/03/23)

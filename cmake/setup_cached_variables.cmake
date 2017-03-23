@@ -393,14 +393,6 @@ without the need to install it, if this is what you tried to do.)
 ENDIF()
 
 #
-# Compatibility renaming:
-#
-
-IF(DEFINED DEAL_II_HAVE_CXX11_FLAG AND NOT DEAL_II_HAVE_CXX11_FLAG)
-  SET(DEAL_II_WITH_CXX11 FALSE CACHE BOOL "" FORCE)
-ENDIF()
-
-#
 # Miscellaneous renaming:
 #
 

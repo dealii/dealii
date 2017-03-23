@@ -34,10 +34,6 @@ IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
   ELSE()
     MESSAGE(STATUS "BOOST::Iostreams will not be available because zlib or its header files could not be found")
   ENDIF()
-
-  IF(DEAL_II_WITH_THREADS AND NOT DEAL_II_WITH_CXX11)
-    ADD_SUBDIRECTORY(${BOOST_FOLDER}/libs/thread/src)
-  ENDIF()
 ENDIF()
 
 
