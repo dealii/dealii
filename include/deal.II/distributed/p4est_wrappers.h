@@ -53,12 +53,12 @@ namespace internal
   namespace p4est
   {
     /**
-    * A structure whose explicit specializations contain typedefs to the
-    * relevant p4est_* and p8est_* types. Using this structure, for example
-    * by saying <tt>types<dim>::connectivity</tt> we can write code in a
-    * dimension independent way, either referring to p4est_connectivity_t or
-    * p8est_connectivity_t, depending on template argument.
-    */
+     * A structure whose explicit specializations contain typedefs to the
+     * relevant p4est_* and p8est_* types. Using this structure, for example
+     * by saying <tt>types<dim>::connectivity</tt> we can write code in a
+     * dimension independent way, either referring to p4est_connectivity_t or
+     * p8est_connectivity_t, depending on template argument.
+     */
     template <int> struct types;
 
     template <>
@@ -486,7 +486,8 @@ namespace internal
      * This struct templatizes the p4est iterate structs and function
      * prototypes, which are used to execute callback functions for faces,
      * edges, and corners that require local neighborhood information, i.e.
-     * the neighboring cells */
+     * the neighboring cells
+     */
     template <int dim> struct iter;
 
     template <> struct iter<2>
@@ -515,9 +516,9 @@ namespace internal
 
 
     /**
-    * Initialize the GeometryInfo<dim>::max_children_per_cell children of the
-    * cell p4est_cell.
-    */
+     * Initialize the GeometryInfo<dim>::max_children_per_cell children of the
+     * cell p4est_cell.
+     */
     template <int dim>
     void
     init_quadrant_children

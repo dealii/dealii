@@ -54,7 +54,9 @@ template <typename number> class LAPACKFullMatrix;
  * @note Instantiations for this template are provided for <tt>@<float@>,
  * @<double@>, @<std::complex@<float@>@>,
  * @<std::complex@<double@>@></tt>. Others can be generated in application
- * programs (see the section on @ref Instantiations in the manual).
+ * programs, see
+ * @ref Instantiations
+ * for details.
  *
  * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth, 1993-2004
  */

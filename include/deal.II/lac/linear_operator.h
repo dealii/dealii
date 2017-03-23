@@ -921,36 +921,36 @@ namespace internal
 
 
     /**
-    * A dummy class for LinearOperators that do not require any extensions
-    * to facilitate the operations of the matrix.
-    *
-    * This is the Payload class typically associated with deal.II's native
-    * SparseMatrix. To use Trilinos and PETSc SparseMatrices it is necessary
-    * to initialize a LinearOperator with their associated Payload.
-    *
-    * @author Jean-Paul Pelteret, Matthias Maier, 2016
-    *
-    * @ingroup LAOperators
-    */
+     * A dummy class for LinearOperators that do not require any extensions to
+     * facilitate the operations of the matrix.
+     *
+     * This is the Payload class typically associated with deal.II's native
+     * SparseMatrix. To use Trilinos and PETSc SparseMatrices it is necessary
+     * to initialize a LinearOperator with their associated Payload.
+     *
+     * @author Jean-Paul Pelteret, Matthias Maier, 2016
+     *
+     * @ingroup LAOperators
+     */
     class EmptyPayload
     {
     public:
 
       /**
-      * Default constructor
-      *
-      * Since this class does not do anything in particular and needs no special
-      * configuration, we have only one generic constructor that can be called
-      * under any conditions.
-      */
+       * Default constructor
+       *
+       * Since this class does not do anything in particular and needs no
+       * special configuration, we have only one generic constructor that can
+       * be called under any conditions.
+       */
       template <typename... Args>
       EmptyPayload (const Args &...)
       { }
 
 
       /**
-      * Returns a payload configured for identity operations
-      */
+       * Returns a payload configured for identity operations
+       */
       EmptyPayload
       identity_payload () const
       {
@@ -959,8 +959,8 @@ namespace internal
 
 
       /**
-      * Returns a payload configured for null operations
-      */
+       * Returns a payload configured for null operations
+       */
       EmptyPayload
       null_payload () const
       {
@@ -969,8 +969,8 @@ namespace internal
 
 
       /**
-      * Returns a payload configured for transpose operations
-      */
+       * Returns a payload configured for transpose operations
+       */
       EmptyPayload
       transpose_payload () const
       {
@@ -979,8 +979,8 @@ namespace internal
 
 
       /**
-      * Returns a payload configured for inverse operations
-      */
+       * Returns a payload configured for inverse operations
+       */
       template <typename Solver, typename Preconditioner>
       EmptyPayload
       inverse_payload (Solver &, const Preconditioner &) const
@@ -990,9 +990,9 @@ namespace internal
     };
 
     /**
-    * Operator that returns a payload configured to support the
-    * addition of two LinearOperators
-    */
+     * Operator that returns a payload configured to support the addition of
+     * two LinearOperators
+     */
     inline
     EmptyPayload operator+(const EmptyPayload &,
                            const EmptyPayload &)
@@ -1001,9 +1001,9 @@ namespace internal
     }
 
     /**
-    * Operator that returns a payload configured to support the
-    * multiplication of two LinearOperators
-    */
+     * Operator that returns a payload configured to support the
+     * multiplication of two LinearOperators
+     */
     inline
     EmptyPayload operator*(const EmptyPayload &,
                            const EmptyPayload &)

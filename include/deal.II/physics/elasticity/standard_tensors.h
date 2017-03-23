@@ -41,7 +41,7 @@ namespace Physics
      * @relates Tensor
      * @relates SymmetricTensor
      * @author Jean-Paul Pelteret, Andrew McBride, 2016
-    */
+     */
     template <int dim>
     class StandardTensors
     {

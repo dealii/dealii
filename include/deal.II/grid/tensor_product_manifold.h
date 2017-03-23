@@ -26,38 +26,37 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
-  * @brief Tensor product manifold of two ChartManifolds.
-  *
-  * This manifold will combine the ChartManifolds @p A and @p B given in the
-  * constructor to form a new ChartManifold by building the tensor product
-  * $A\cross B$. The first @p spacedim_A
-  * dimensions in the real space and the first @p chartdim_A dimensions
-  * of the chart will be given by manifold @p A, while the remaining
-  * coordinates are given by @p B. The manifold is to be used by a
-  * <tt>Triangulation@<dim, space_dim_A+space_dim_B@></tt>.
-  *
-  * An example usage would be the combination of a SphericalManifold with
-  * space dimension 2 and a FlatManifold with space dimension 1 to form
-  * a cylindrical manifold.
-  *
-  * pull_back(), push_forward(), and push_forward_gradient() are implemented
-  * by splitting the input argument into inputs for @p A and @p B according
-  * to the given dimensions and applying the corresponding operations before
-  * concatenating the result.
-  *
-  * @note The dimension arguments @p dim_A and @p dim_B are not used.
-  *
-  * @tparam dim Dimension of cells (needs to match first template argument of
-  * the Triangulation to be attached to.
-  * @tparam dim_A Dimension of ChartManifold A.
-  * @tparam spacedim_A Spacial dimension of ChartManifold A.
-  * @tparam chartdim_A Chart dimension of ChartManifold A.
-  * @tparam dim_B Dimension of ChartManifold B.
-  * @tparam spacedim_B Spacial dimension of ChartManifold B.
-  * @tparam chartdim_B Chart dimension of ChartManifold B.
-  *
-  * @author Luca Heltai, Timo Heister, 2016
-  */
+ * @brief Tensor product manifold of two ChartManifolds.
+ *
+ * This manifold will combine the ChartManifolds @p A and @p B given in the
+ * constructor to form a new ChartManifold by building the tensor product
+ * $A\cross B$. The first @p spacedim_A dimensions in the real space and the
+ * first @p chartdim_A dimensions of the chart will be given by manifold @p A,
+ * while the remaining coordinates are given by @p B. The manifold is to be
+ * used by a <tt>Triangulation@<dim, space_dim_A+space_dim_B@></tt>.
+ *
+ * An example usage would be the combination of a SphericalManifold with space
+ * dimension 2 and a FlatManifold with space dimension 1 to form a cylindrical
+ * manifold.
+ *
+ * pull_back(), push_forward(), and push_forward_gradient() are implemented by
+ * splitting the input argument into inputs for @p A and @p B according to the
+ * given dimensions and applying the corresponding operations before
+ * concatenating the result.
+ *
+ * @note The dimension arguments @p dim_A and @p dim_B are not used.
+ *
+ * @tparam dim Dimension of cells (needs to match first template argument of
+ * the Triangulation to be attached to.
+ * @tparam dim_A Dimension of ChartManifold A.
+ * @tparam spacedim_A Spacial dimension of ChartManifold A.
+ * @tparam chartdim_A Chart dimension of ChartManifold A.
+ * @tparam dim_B Dimension of ChartManifold B.
+ * @tparam spacedim_B Spacial dimension of ChartManifold B.
+ * @tparam chartdim_B Chart dimension of ChartManifold B.
+ *
+ * @author Luca Heltai, Timo Heister, 2016
+ */
 template <int dim,
           int dim_A, int spacedim_A, int chartdim_A,
           int dim_B, int spacedim_B, int chartdim_B>

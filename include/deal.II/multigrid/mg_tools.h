@@ -204,13 +204,12 @@ namespace MGTools
                       const ComponentMask               &component_mask = ComponentMask());
 
   /**
-  * The same function as above, but return an IndexSet rather than a
-  * std::set<unsigned int> on each level and use a std::set of
-  * boundary_ids as input.
-  *
-  * Previous content in @p boundary_indices is not overwritten,
-  * but added to.
-  */
+   * The same function as above, but return an IndexSet rather than a
+   * std::set<unsigned int> on each level and use a std::set of boundary_ids
+   * as input.
+   *
+   * Previous content in @p boundary_indices is not overwritten, but added to.
+   */
   template <int dim, int spacedim>
   void
   make_boundary_list (const DoFHandler<dim,spacedim>      &mg_dof,

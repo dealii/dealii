@@ -568,9 +568,11 @@ public:
    * component is to be used.
    *
    * For the vectors used with MatrixFree and in FEEvaluation, a vector needs
-   * to hold all @ref GlossLocallyActiveDof "locally active DoFs" and also
-   * some of the @ref GlossLocallyRelevantDof "locally relevant DoFs". The
-   * selection of DoFs is such that one can read all degrees of freedom on all
+   * to hold all
+   * @ref GlossLocallyActiveDof "locally active DoFs"
+   * and also some of the
+   * @ref GlossLocallyRelevantDof "locally relevant DoFs".
+   * The selection of DoFs is such that one can read all degrees of freedom on all
    * locally relevant elements (locally active) plus the degrees of freedom
    * that contraints expand into from the locally owned cells. However, not
    * all locally relevant DoFs are stored because most of them would never be
@@ -590,9 +592,11 @@ public:
    * component is to be used.
    *
    * For the vectors used with MatrixFree and in FEEvaluation, a vector needs
-   * to hold all @ref GlossLocallyActiveDof "locally active DoFs" and also
-   * some of the @ref GlossLocallyRelevantDof "locally relevant DoFs". The
-   * selection of DoFs is such that one can read all degrees of freedom on all
+   * to hold all
+   * @ref GlossLocallyActiveDof "locally active DoFs"
+   * and also some of the
+   * @ref GlossLocallyRelevantDof "locally relevant DoFs".
+   * The selection of DoFs is such that one can read all degrees of freedom on all
    * locally relevant elements (locally active) plus the degrees of freedom
    * that contraints expand into from the locally owned cells. However, not
    * all locally relevant DoFs are stored because most of them would never be
@@ -894,7 +898,9 @@ public:
    * of a list of vectors. Multiple threads will each get a separate storage
    * field and separate vectors, ensuring thread safety. The mechanism to
    * acquire and release objects is similar to the mechanisms used for the
-   * local contributions of WorkStream, see @ref workstream_paper.
+   * local contributions of WorkStream, see
+   * @ref workstream_paper "the WorkStream paper"
+   * .
    */
   AlignedVector<VectorizedArray<Number> > *acquire_scratch_data() const;
 

@@ -378,34 +378,35 @@ namespace internal
 
 
     /**
-    * A dummy class for BlockLinearOperators that do not require any extensions
-    * to facilitate the operations of the block matrix or its subblocks.
-    *
-    * This is the Payload class typically associated with deal.II's native
-    * BlockSparseMatrix. To use Trilinos and PETSc BlockSparseMatrices it is
-    * necessary to initialize a BlockLinearOperator with their associated
-    * BlockPayload.
-    *
-    * @author Jean-Paul Pelteret, Matthias Maier, 2016
-    *
-    * @ingroup LAOperators
-    */
+     * A dummy class for BlockLinearOperators that do not require any
+     * extensions to facilitate the operations of the block matrix or its
+     * subblocks.
+     *
+     * This is the Payload class typically associated with deal.II's native
+     * BlockSparseMatrix. To use Trilinos and PETSc BlockSparseMatrices it is
+     * necessary to initialize a BlockLinearOperator with their associated
+     * BlockPayload.
+     *
+     * @author Jean-Paul Pelteret, Matthias Maier, 2016
+     *
+     * @ingroup LAOperators
+     */
     template<typename PayloadBlockType>
     class EmptyBlockPayload
     {
     public:
       /**
-      * Type of payload held by each subblock
-      */
+       * Type of payload held by each subblock
+       */
       typedef PayloadBlockType BlockType;
 
       /**
-      * Default constructor
-      *
-      * Since this class does not do anything in particular and needs no special
-      * configuration, we have only one generic constructor that can be called
-      * under any conditions.
-      */
+       * Default constructor
+       *
+       * Since this class does not do anything in particular and needs no
+       * special configuration, we have only one generic constructor that can
+       * be called under any conditions.
+       */
       template <typename... Args>
       EmptyBlockPayload (const Args &...)
       { }

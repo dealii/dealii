@@ -211,10 +211,10 @@ namespace MeshWorker
       std::vector<SmartPointer<MatrixType,MatrixSimple<MatrixType> > > matrix;
 
       /**
-        * The smallest positive number that will be entered into the global
-        * matrix. All smaller absolute values will be treated as zero and will
-        * not be assembled.
-        */
+       * The smallest positive number that will be entered into the global
+       * matrix. All smaller absolute values will be treated as zero and will
+       * not be assembled.
+       */
       const double threshold;
 
     private:
@@ -462,9 +462,9 @@ namespace MeshWorker
 
     private:
       /**
-        * Assemble a single matrix <code>M</code> into the element at
-        * <code>index</code> in the vector #matrix.
-        */
+       * Assemble a single matrix <code>M</code> into the element at
+       * <code>index</code> in the vector #matrix.
+       */
       void assemble(const FullMatrix<double> &M,
                     const Vector<double> &vector,
                     const unsigned int index,

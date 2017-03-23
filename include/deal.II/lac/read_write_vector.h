@@ -213,12 +213,12 @@ namespace LinearAlgebra
     /**
      * Apply the functor @p func to each element of the vector. The functor
      * should look like
-     * <code>
+     * @code
      * struct Functor
      * {
      *    void operator() (Number &value);
      * };
-     * </code>
+     * @endcode
      *
      * @note This function requires C++11 and read_write_vector.templates.h
      * needs to be included.

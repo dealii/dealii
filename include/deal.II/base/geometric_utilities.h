@@ -47,7 +47,7 @@ namespace GeometricUtilities
      * and polar/inclination angle $ \in [0,\pi]$ (ommited in 2D).
      *
      * In 3D the transformation is given by
-     * @f{align*}
+     * @f{align*}{
      *  r &= \sqrt{x^2+y^2+z^2} \\
      *  \theta &= {\rm atan}(y/x) \\
      *  \phi &= {\rm acos} (z/r)
@@ -64,7 +64,7 @@ namespace GeometricUtilities
      * (ommited in 2D).
      *
      * In 3D the transformation is given by
-     * @f{align*}
+     * @f{align*}{
      *  x &= r\, \cos(\theta) \, \sin(\phi) \\
      *  y &= r\, \sin(\theta) \, \sin(\phi) \\
      *  z &= r\, \cos(\phi)

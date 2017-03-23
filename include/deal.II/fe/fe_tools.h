@@ -253,14 +253,14 @@ namespace FETools
    * $\varphi_j(\mathbf x) = \sum_{k=1}^N c_{jk} \tilde\varphi_k(\mathbf x)$
    * where we need to determine the expansion coefficients $c_{jk}$. We do this
    * by applying $\Psi_i$ to both sides of the equation, to obtain
-   * @f{align*}
+   * @f{align*}{
    *   \Psi_i [\varphi_j] = \sum_{k=1}^N c_{jk} \Psi_i[\tilde\varphi_k],
    * @f}
    * and we know that the left hand side equals $\delta_{ij}$.
    * If you think of this as a system of $N\times N$ equations for the
    * elements of a matrix on the left and on the right, then this can be
    * written as
-   * @f{align*}
+   * @f{align*}{
    *   I = C X^T
    * @f}
    * where $C$ is the matrix of coefficients $c_{jk}$ and
@@ -912,7 +912,7 @@ namespace FETools
    * two vector components, where the first should have linear shape
    * functions and the second quadratic shape functions. In 1d, the
    * shape functions (on the reference cell) of the base elements are then
-   * @f{align*}
+   * @f{align*}{
    *   Q_1 &= \{ 1-x, x \},
    *   \\  Q_2 &= \{ 2(\frac 12 - x)(1-x), 2(x - \frac 12)x, 4x(1-x) \},
    * @f}
@@ -920,7 +920,7 @@ namespace FETools
    * first vertex, then on the second vertex, then in the interior of
    * the cell). The tensor product construction will create an element with
    * the following shape functions:
-   * @f{align*}
+   * @f{align*}{
    *   Q_1 \times Q_2 &=
    *   \left\{
    *     \begin{pmatrix} 1-x \\ 0 \end{pmatrix},
@@ -942,7 +942,7 @@ namespace FETools
    * previous strategy, combining shape functions simply takes
    * <i>all</i> of the shape functions together. In the case above,
    * this would yield the following element:
-   * @f{align*}
+   * @f{align*}{
    *   Q_1 + Q_2 &= \{ 1-x, 2(\frac 12 - x)(1-x),
    *                   x, 2(x - \frac 12)x, 4x(1-x) \}.
    * @f}

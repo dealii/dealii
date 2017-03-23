@@ -34,7 +34,7 @@ namespace Physics
      * rotation angles and axes of rotation.
      *
      * @author Jean-Paul Pelteret, 2017
-    */
+     */
     namespace Rotations
     {
       /**
@@ -43,52 +43,53 @@ namespace Physics
 //@{
 
       /**
-      * Returns the rotation matrix for 2-d Euclidean space, namely
-      * @f[
-      *  \mathbf{R} := \left[ \begin{array}{cc}
-      *  cos(\theta) & sin(\theta) \\
-      *  -sin(\theta) & cos(\theta)
-      * \end{array}\right]
-      * @f]
-      * where $\theta$ is the rotation angle given in radians.
-      * In particular, this describes the counter-clockwise rotation of a vector
-      * relative to a
-      * <a href="http://mathworld.wolfram.com/RotationMatrix.html">fixed set of right-handed axes</a>.
-      *
-      * @param[in] angle The rotation angle (about the z-axis) in radians
-      */
+       * Returns the rotation matrix for 2-d Euclidean space, namely
+       * @f[
+       *  \mathbf{R} := \left[ \begin{array}{cc}
+       *  cos(\theta) & sin(\theta) \\
+       *  -sin(\theta) & cos(\theta)
+       * \end{array}\right]
+       * @f]
+       * where $\theta$ is the rotation angle given in radians. In particular,
+       * this describes the counter-clockwise rotation of a vector relative to
+       * a <a href="http://mathworld.wolfram.com/RotationMatrix.html">fixed
+       * set of right-handed axes</a>.
+       *
+       * @param[in] angle The rotation angle (about the z-axis) in radians
+       */
       template<typename Number>
       Tensor<2,2,Number>
       rotation_matrix_2d (const Number &angle);
 
 
       /**
-      * Returns the rotation matrix for 3-d Euclidean space.
-      * Most concisely stated using the Rodrigues' rotation formula, this
-      * function returns the equivalent of
-      * @f[
-      *  \mathbf{R} := cos(\theta)\mathbf{I} + sin(\theta)\mathbf{W}
-      *              + (1-cos(\theta))\mathbf{u}\otimes\mathbf{u}
-      * @f]
-      * where $\mathbf{u}$ is the axial vector (an axial vector) and $\theta$
-      * is the rotation angle given in radians, $\mathbf{I}$ is the identity
-      * tensor and $\mathbf{W}$ is the skew symmetric tensor of $\mathbf{u}$.
-      *
-      * @dealiiWriggersA{374,9.194}
-      * This presents Rodrigues' rotation formula, but the implementation used
-      * in this function is described in this
-      * <a href="https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle">wikipedia link</a>.
-      * In particular, this describes the counter-clockwise rotation of a vector
-      * <a href="http://mathworld.wolfram.com/RotationMatrix.html">in a plane with its normal</a>.
-      * defined by the @p axis of rotation.
-      * An alternative implementation is discussed at
-      * <a href="https://www.gamedev.net/resources/_/technical/math-and-physics/do-we-really-need-quaternions-r1199">this link</a>,
-      * but is inconsistent (sign-wise) with the Rodrigues' rotation formula as
-      * it describes the rotation of a coordinate system.
-      *
-      * @param[in] axis  A unit vector that defines the axis of rotation
-      * @param[in] angle The rotation angle in radians
-      */
+       * Returns the rotation matrix for 3-d Euclidean space. Most concisely
+       * stated using the Rodrigues' rotation formula, this function returns
+       * the equivalent of
+       * @f[
+       *  \mathbf{R} := cos(\theta)\mathbf{I} + sin(\theta)\mathbf{W}
+       *              + (1-cos(\theta))\mathbf{u}\otimes\mathbf{u}
+       * @f]
+       * where $\mathbf{u}$ is the axial vector (an axial vector) and $\theta$
+       * is the rotation angle given in radians, $\mathbf{I}$ is the identity
+       * tensor and $\mathbf{W}$ is the skew symmetric tensor of $\mathbf{u}$.
+       *
+       * @dealiiWriggersA{374,9.194} This presents Rodrigues' rotation
+       * formula, but the implementation used in this function is described in
+       * this <a
+       * href="https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle">wikipedia
+       * link</a>. In particular, this describes the counter-clockwise
+       * rotation of a vector <a
+       * href="http://mathworld.wolfram.com/RotationMatrix.html">in a plane
+       * with its normal</a>. defined by the @p axis of rotation. An
+       * alternative implementation is discussed at <a
+       * href="https://www.gamedev.net/resources/_/technical/math-and-physics/do-we-really-need-quaternions-r1199">this
+       * link</a>, but is inconsistent (sign-wise) with the Rodrigues'
+       * rotation formula as it describes the rotation of a coordinate system.
+       *
+       * @param[in] axis  A unit vector that defines the axis of rotation
+       * @param[in] angle The rotation angle in radians
+       */
       template<typename Number>
       Tensor<2,3,Number>
       rotation_matrix_3d (const Point<3,Number> &axis,
@@ -101,8 +102,8 @@ namespace Physics
     /**
      * Transformation of tensors that are defined in terms of a set of
      * contravariant bases. Rank-1 and rank-2 contravariant tensors
-     * $\left(\bullet\right)^{\sharp} = \mathbf{T}$ (and its spatial counterpart
-     * $\mathbf{t}$) typically satisfy the relation
+     * $\left(\bullet\right)^{\sharp} = \mathbf{T}$ (and its spatial
+     * counterpart $\mathbf{t}$) typically satisfy the relation
      * @f[
      *    \int_{V_{0}} \nabla_{0} \cdot \mathbf{T} \; dV
      *      = \int_{\partial V_{0}} \mathbf{T} \cdot \mathbf{N} \; dA
@@ -110,12 +111,12 @@ namespace Physics
      *      = \int_{V_{t}} \nabla \cdot \mathbf{t} \; dv
      * @f]
      * where $V_{0}$ and $V_{t}$ are respectively control volumes in the
-     * reference and spatial configurations, and their surfaces $\partial V_{0}$
-     * and $\partial V_{t}$ have the outwards facing normals $\mathbf{N}$ and
-     * $\mathbf{n}$.
+     * reference and spatial configurations, and their surfaces $\partial
+     * V_{0}$ and $\partial V_{t}$ have the outwards facing normals
+     * $\mathbf{N}$ and $\mathbf{n}$.
      *
      * @author Jean-Paul Pelteret, Andrew McBride, 2016
-    */
+     */
     namespace Contravariant
     {
 
@@ -125,85 +126,92 @@ namespace Physics
 //@{
 
       /**
-      * Returns the result of the push forward transformation on a
-      * contravariant vector, i.e.
-      * @f[
-      *  \chi\left(\bullet\right)^{\sharp}
-      *    := \mathbf{F} \cdot \left(\bullet\right)^{\sharp}
-      * @f]
-      *
-      * @param[in] V The (referential) vector to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\chi\left( \mathbf{V} \right)$
-      */
+       * Returns the result of the push forward transformation on a
+       * contravariant vector, i.e.
+       * @f[
+       *  \chi\left(\bullet\right)^{\sharp}
+       *    := \mathbf{F} \cdot \left(\bullet\right)^{\sharp}
+       * @f]
+       *
+       * @param[in] V The (referential) vector to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\chi\left( \mathbf{V} \right)$
+       */
       template <int dim, typename Number>
       Tensor<1,dim,Number>
       push_forward (const Tensor<1,dim,Number> &V,
                     const Tensor<2,dim,Number> &F);
 
       /**
-      * Returns the result of the push forward transformation on a rank-2
-      * contravariant tensor, i.e.
-      * @f[
-      *  \chi\left(\bullet\right)^{\sharp}
-      *    := \mathbf{F} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{T}
-      * @f]
-      *
-      * @param[in] T The (referential) rank-2 tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\chi\left( \mathbf{T} \right)$
-      */
+       * Returns the result of the push forward transformation on a rank-2
+       * contravariant tensor, i.e.
+       * @f[
+       *  \chi\left(\bullet\right)^{\sharp}
+       *    := \mathbf{F} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{T}
+       * @f]
+       *
+       * @param[in] T The (referential) rank-2 tensor to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\chi\left( \mathbf{T} \right)$
+       */
       template <int dim, typename Number>
       Tensor<2,dim,Number>
       push_forward (const Tensor<2,dim,Number> &T,
                     const Tensor<2,dim,Number> &F);
 
       /**
-      * Returns the result of the push forward transformation on a rank-2
-      * contravariant symmetric tensor, i.e.
-      * @f[
-      *  \chi\left(\bullet\right)^{\sharp}
-      *    := \mathbf{F} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{T}
-      * @f]
-      *
-      * @param[in] T The (referential) rank-2 symmetric tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\chi\left( \mathbf{T} \right)$
-      */
+       * Returns the result of the push forward transformation on a rank-2
+       * contravariant symmetric tensor, i.e.
+       * @f[
+       *  \chi\left(\bullet\right)^{\sharp}
+       *    := \mathbf{F} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{T}
+       * @f]
+       *
+       * @param[in] T The (referential) rank-2 symmetric tensor to be operated
+       * on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\chi\left( \mathbf{T} \right)$
+       */
       template <int dim, typename Number>
       SymmetricTensor<2,dim,Number>
       push_forward (const SymmetricTensor<2,dim,Number> &T,
                     const Tensor<2,dim,Number>          &F);
 
       /**
-      * Returns the result of the push forward transformation on a rank-4
-      * contravariant tensor, i.e. (in index notation)
-      * @f[
-      *  \left[ \chi\left(\bullet\right)^{\sharp} \right]_{ijkl}
-      *    := F_{iI} F_{jJ} \left(\bullet\right)^{\sharp}_{IJKL} F_{kK} F_{lL}
-      * @f]
-      *
-      * @param[in] H The (referential) rank-4 tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\chi\left( \mathbf{H} \right)$
-      */
+       * Returns the result of the push forward transformation on a rank-4
+       * contravariant tensor, i.e. (in index notation)
+       * @f[
+       *  \left[ \chi\left(\bullet\right)^{\sharp} \right]_{ijkl}
+       *    := F_{iI} F_{jJ} \left(\bullet\right)^{\sharp}_{IJKL} F_{kK} F_{lL}
+       * @f]
+       *
+       * @param[in] H The (referential) rank-4 tensor to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\chi\left( \mathbf{H} \right)$
+       */
       template <int dim, typename Number>
       Tensor<4,dim,Number>
       push_forward (const Tensor<4,dim,Number> &H,
                     const Tensor<2,dim,Number> &F);
 
       /**
-      * Returns the result of the push forward transformation on a rank-4
-      * contravariant symmetric tensor, i.e. (in index notation)
-      * @f[
-      *  \left[ \chi\left(\bullet\right)^{\sharp} \right]_{ijkl}
-      *    := F_{iI} F_{jJ} \left(\bullet\right)^{\sharp}_{IJKL} F_{kK} F_{lL}
-      * @f]
-      *
-      * @param[in] H The (referential) rank-4 symmetric tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\chi\left( \mathbf{H} \right)$
-      */
+       * Returns the result of the push forward transformation on a rank-4
+       * contravariant symmetric tensor, i.e. (in index notation)
+       * @f[
+       *  \left[ \chi\left(\bullet\right)^{\sharp} \right]_{ijkl}
+       *    := F_{iI} F_{jJ} \left(\bullet\right)^{\sharp}_{IJKL} F_{kK} F_{lL}
+       * @f]
+       *
+       * @param[in] H The (referential) rank-4 symmetric tensor to be operated
+       * on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\chi\left( \mathbf{H} \right)$
+       */
       template <int dim, typename Number>
       SymmetricTensor<4,dim,Number>
       push_forward (const SymmetricTensor<4,dim,Number> &H,
@@ -217,85 +225,90 @@ namespace Physics
 //@{
 
       /**
-      * Returns the result of the pull back transformation on a
-      * contravariant vector, i.e.
-      * @f[
-      *  \chi^{-1}\left(\bullet\right)^{\sharp}
-      *    := \mathbf{F}^{-1} \cdot \left(\bullet\right)^{\sharp}
-      * @f]
-      *
-      * @param[in] v The (spatial) vector to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\chi^{-1}\left( \mathbf{v} \right)$
-      */
+       * Returns the result of the pull back transformation on a contravariant
+       * vector, i.e.
+       * @f[
+       *  \chi^{-1}\left(\bullet\right)^{\sharp}
+       *    := \mathbf{F}^{-1} \cdot \left(\bullet\right)^{\sharp}
+       * @f]
+       *
+       * @param[in] v The (spatial) vector to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\chi^{-1}\left( \mathbf{v} \right)$
+       */
       template <int dim, typename Number>
       Tensor<1,dim,Number>
       pull_back (const Tensor<1,dim,Number> &v,
                  const Tensor<2,dim,Number> &F);
 
       /**
-      * Returns the result of the pull back transformation on a rank-2
-      * contravariant tensor, i.e.
-      * @f[
-      *  \chi^{-1}\left(\bullet\right)^{\sharp}
-      *    := \mathbf{F}^{-1} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{-T}
-      * @f]
-      *
-      * @param[in] t The (spatial) tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\chi^{-1}\left( \mathbf{t} \right)$
-      */
+       * Returns the result of the pull back transformation on a rank-2
+       * contravariant tensor, i.e.
+       * @f[
+       *  \chi^{-1}\left(\bullet\right)^{\sharp}
+       *    := \mathbf{F}^{-1} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{-T}
+       * @f]
+       *
+       * @param[in] t The (spatial) tensor to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\chi^{-1}\left( \mathbf{t} \right)$
+       */
       template <int dim, typename Number>
       Tensor<2,dim,Number>
       pull_back (const Tensor<2,dim,Number> &t,
                  const Tensor<2,dim,Number> &F);
 
       /**
-      * Returns the result of the pull back transformation on a rank-2
-      * contravariant symmetric tensor, i.e.
-      * @f[
-      *  \chi^{-1}\left(\bullet\right)^{\sharp}
-      *    := \mathbf{F}^{-1} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{-T}
-      * @f]
-      *
-      * @param[in] t The (spatial) symmetric tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\chi^{-1}\left( \mathbf{t} \right)$
-      */
+       * Returns the result of the pull back transformation on a rank-2
+       * contravariant symmetric tensor, i.e.
+       * @f[
+       *  \chi^{-1}\left(\bullet\right)^{\sharp}
+       *    := \mathbf{F}^{-1} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{-T}
+       * @f]
+       *
+       * @param[in] t The (spatial) symmetric tensor to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\chi^{-1}\left( \mathbf{t} \right)$
+       */
       template <int dim, typename Number>
       SymmetricTensor<2,dim,Number>
       pull_back (const SymmetricTensor<2,dim,Number> &t,
                  const Tensor<2,dim,Number>          &F);
 
       /**
-      * Returns the result of the pull back transformation on a rank-4
-      * contravariant tensor, i.e. (in index notation)
-      * @f[
-      *  \left[ \chi^{-1}\left(\bullet\right)^{\sharp} \right]_{IJKL}
-      *    := F^{-1}_{Ii} F^{-1}_{Jj} \left(\bullet\right)^{\sharp}_{ijkl} F^{-1}_{Kk} F^{-1}_{Ll}
-      * @f]
-      *
-      * @param[in] h The (spatial) tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\chi^{-1}\left( \mathbf{h} \right)$
-      */
+       * Returns the result of the pull back transformation on a rank-4
+       * contravariant tensor, i.e. (in index notation)
+       * @f[
+       *  \left[ \chi^{-1}\left(\bullet\right)^{\sharp} \right]_{IJKL}
+       *    := F^{-1}_{Ii} F^{-1}_{Jj} \left(\bullet\right)^{\sharp}_{ijkl} F^{-1}_{Kk} F^{-1}_{Ll}
+       * @f]
+       *
+       * @param[in] h The (spatial) tensor to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\chi^{-1}\left( \mathbf{h} \right)$
+       */
       template <int dim, typename Number>
       Tensor<4,dim,Number>
       pull_back (const Tensor<4,dim,Number> &h,
                  const Tensor<2,dim,Number> &F);
 
       /**
-      * Returns the result of the pull back transformation on a rank-4
-      * contravariant symmetric tensor, i.e. (in index notation)
-      * @f[
-      *  \left[ \chi^{-1}\left(\bullet\right)^{\sharp} \right]_{IJKL}
-      *    := F^{-1}_{Ii} F^{-1}_{Jj} \left(\bullet\right)^{\sharp}_{ijkl} F^{-1}_{Kk} F^{-1}_{Ll}
-      * @f]
-      *
-      * @param[in] h The (spatial) symmetric tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\chi^{-1}\left( \mathbf{h} \right)$
-      */
+       * Returns the result of the pull back transformation on a rank-4
+       * contravariant symmetric tensor, i.e. (in index notation)
+       * @f[
+       *  \left[ \chi^{-1}\left(\bullet\right)^{\sharp} \right]_{IJKL}
+       *    := F^{-1}_{Ii} F^{-1}_{Jj} \left(\bullet\right)^{\sharp}_{ijkl} F^{-1}_{Kk} F^{-1}_{Ll}
+       * @f]
+       *
+       * @param[in] h The (spatial) symmetric tensor to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\chi^{-1}\left( \mathbf{h} \right)$
+       */
       template <int dim, typename Number>
       SymmetricTensor<4,dim,Number>
       pull_back (const SymmetricTensor<4,dim,Number> &h,
@@ -307,8 +320,8 @@ namespace Physics
     /**
      * Transformation of tensors that are defined in terms of a set of
      * covariant basis vectors. Rank-1 and rank-2 covariant tensors
-     * $\left(\bullet\right)^{\flat} = \mathbf{T}$ (and its spatial counterpart
-     * $\mathbf{t}$) typically satisfy the relation
+     * $\left(\bullet\right)^{\flat} = \mathbf{T}$ (and its spatial
+     * counterpart $\mathbf{t}$) typically satisfy the relation
      * @f[
      *    \int_{\partial V_{0}} \left[ \nabla_{0} \times \mathbf{T} \right] \cdot \mathbf{N} \; dA
      *      = \oint_{\partial A_{0}} \mathbf{T} \cdot \mathbf{L} \; dL
@@ -316,12 +329,13 @@ namespace Physics
      *      = \int_{\partial V_{t}} \left[ \nabla \times \mathbf{t} \right] \cdot \mathbf{n} \; da
      * @f]
      * where the control surfaces $\partial V_{0}$ and $\partial V_{t}$ with
-     * outwards facing normals $\mathbf{N}$ and $\mathbf{n}$ are bounded by the
-     * curves $\partial A_{0}$ and $\partial A_{0}$ that are, respectively,
-     * associated with the line directors $\mathbf{L}$ and $\mathbf{l}$.
+     * outwards facing normals $\mathbf{N}$ and $\mathbf{n}$ are bounded by
+     * the curves $\partial A_{0}$ and $\partial A_{t}$ that are,
+     * respectively, associated with the line directors $\mathbf{L}$ and
+     * $\mathbf{l}$.
      *
      * @author Jean-Paul Pelteret, Andrew McBride, 2016
-    */
+     */
     namespace Covariant
     {
 
@@ -331,85 +345,92 @@ namespace Physics
 //@{
 
       /**
-      * Returns the result of the push forward transformation on a covariant
-      * vector, i.e.
-      * @f[
-      *  \chi\left(\bullet\right)^{\flat}
-      *    := \mathbf{F}^{-T} \cdot \left(\bullet\right)^{\flat}
-      * @f]
-      *
-      * @param[in] V The (referential) vector to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\chi\left( \mathbf{V} \right)$
-      */
+       * Returns the result of the push forward transformation on a covariant
+       * vector, i.e.
+       * @f[
+       *  \chi\left(\bullet\right)^{\flat}
+       *    := \mathbf{F}^{-T} \cdot \left(\bullet\right)^{\flat}
+       * @f]
+       *
+       * @param[in] V The (referential) vector to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\chi\left( \mathbf{V} \right)$
+       */
       template <int dim, typename Number>
       Tensor<1,dim,Number>
       push_forward (const Tensor<1,dim,Number> &V,
                     const Tensor<2,dim,Number> &F);
 
       /**
-      * Returns the result of the push forward transformation on a rank-2
-      * covariant tensor, i.e.
-      * @f[
-      *  \chi\left(\bullet\right)^{\flat}
-      *    := \mathbf{F}^{-T} \cdot \left(\bullet\right)^{\flat} \cdot \mathbf{F}^{-1}
-      * @f]
-      *
-      * @param[in] T The (referential) rank-2 tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\chi\left( \mathbf{T} \right)$
-      */
+       * Returns the result of the push forward transformation on a rank-2
+       * covariant tensor, i.e.
+       * @f[
+       *  \chi\left(\bullet\right)^{\flat}
+       *    := \mathbf{F}^{-T} \cdot \left(\bullet\right)^{\flat} \cdot \mathbf{F}^{-1}
+       * @f]
+       *
+       * @param[in] T The (referential) rank-2 tensor to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\chi\left( \mathbf{T} \right)$
+       */
       template <int dim, typename Number>
       Tensor<2,dim,Number>
       push_forward (const Tensor<2,dim,Number> &T,
                     const Tensor<2,dim,Number> &F);
 
       /**
-      * Returns the result of the push forward transformation on a rank-2
-      * covariant symmetric tensor, i.e.
-      * @f[
-      *  \chi\left(\bullet\right)^{\flat}
-      *    := \mathbf{F}^{-T} \cdot \left(\bullet\right)^{\flat} \cdot \mathbf{F}^{-1}
-      * @f]
-      *
-      * @param[in] T The (referential) rank-2 symmetric tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\chi\left( \mathbf{T} \right)$
-      */
+       * Returns the result of the push forward transformation on a rank-2
+       * covariant symmetric tensor, i.e.
+       * @f[
+       *  \chi\left(\bullet\right)^{\flat}
+       *    := \mathbf{F}^{-T} \cdot \left(\bullet\right)^{\flat} \cdot \mathbf{F}^{-1}
+       * @f]
+       *
+       * @param[in] T The (referential) rank-2 symmetric tensor to be operated
+       * on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\chi\left( \mathbf{T} \right)$
+       */
       template <int dim, typename Number>
       SymmetricTensor<2,dim,Number>
       push_forward (const SymmetricTensor<2,dim,Number> &T,
                     const Tensor<2,dim,Number>          &F);
 
       /**
-      * Returns the result of the push forward transformation on a rank-4
-      * covariant tensor, i.e. (in index notation)
-      * @f[
-      *  \left[ \chi\left(\bullet\right)^{\flat} \right]_{ijkl}
-      *    := F^{-T}_{iI} F^{-T}_{jJ} \left(\bullet\right)^{\flat}_{IJKL} F^{-T}_{kK} F^{-T}_{lL}
-      * @f]
-      *
-      * @param[in] H The (referential) rank-4 tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\chi\left( \mathbf{H} \right)$
-      */
+       * Returns the result of the push forward transformation on a rank-4
+       * covariant tensor, i.e. (in index notation)
+       * @f[
+       *  \left[ \chi\left(\bullet\right)^{\flat} \right]_{ijkl}
+       *    := F^{-T}_{iI} F^{-T}_{jJ} \left(\bullet\right)^{\flat}_{IJKL} F^{-T}_{kK} F^{-T}_{lL}
+       * @f]
+       *
+       * @param[in] H The (referential) rank-4 tensor to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\chi\left( \mathbf{H} \right)$
+       */
       template <int dim, typename Number>
       Tensor<4,dim,Number>
       push_forward (const Tensor<4,dim,Number> &H,
                     const Tensor<2,dim,Number> &F);
 
       /**
-      * Returns the result of the push forward transformation on a rank-4
-      * covariant symmetric tensor, i.e. (in index notation)
-      * @f[
-      *  \left[ \chi\left(\bullet\right)^{\flat} \right]_{ijkl}
-      *    := F^{-T}_{iI} F^{-T}_{jJ} \left(\bullet\right)^{\flat}_{IJKL} F^{-T}_{kK} F^{-T}_{lL}
-      * @f]
-      *
-      * @param[in] H The (referential) rank-4 symmetric tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\chi\left( \mathbf{H} \right)$
-      */
+       * Returns the result of the push forward transformation on a rank-4
+       * covariant symmetric tensor, i.e. (in index notation)
+       * @f[
+       *  \left[ \chi\left(\bullet\right)^{\flat} \right]_{ijkl}
+       *    := F^{-T}_{iI} F^{-T}_{jJ} \left(\bullet\right)^{\flat}_{IJKL} F^{-T}_{kK} F^{-T}_{lL}
+       * @f]
+       *
+       * @param[in] H The (referential) rank-4 symmetric tensor to be operated
+       * on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\chi\left( \mathbf{H} \right)$
+       */
       template <int dim, typename Number>
       SymmetricTensor<4,dim,Number>
       push_forward (const SymmetricTensor<4,dim,Number> &H,
@@ -423,85 +444,90 @@ namespace Physics
 //@{
 
       /**
-      * Returns the result of the pull back transformation on a
-      * covariant vector, i.e.
-      * @f[
-      *  \chi^{-1}\left(\bullet\right)^{\flat}
-      *    := \mathbf{F}^{T} \cdot \left(\bullet\right)^{\flat}
-      * @f]
-      *
-      * @param[in] v The (spatial) vector to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\chi^{-1}\left( \mathbf{v} \right)$
-      */
+       * Returns the result of the pull back transformation on a covariant
+       * vector, i.e.
+       * @f[
+       *  \chi^{-1}\left(\bullet\right)^{\flat}
+       *    := \mathbf{F}^{T} \cdot \left(\bullet\right)^{\flat}
+       * @f]
+       *
+       * @param[in] v The (spatial) vector to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\chi^{-1}\left( \mathbf{v} \right)$
+       */
       template <int dim, typename Number>
       Tensor<1,dim,Number>
       pull_back (const Tensor<1,dim,Number> &v,
                  const Tensor<2,dim,Number> &F);
 
       /**
-      * Returns the result of the pull back transformation on a rank-2
-      * covariant tensor, i.e.
-      * @f[
-      *  \chi^{-1}\left(\bullet\right)^{\flat}
-      *    := \mathbf{F}^{T} \cdot \left(\bullet\right)^{\flat} \cdot \mathbf{F}
-      * @f]
-      *
-      * @param[in] t The (spatial) tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\chi^{-1}\left( \mathbf{t} \right)$
-      */
+       * Returns the result of the pull back transformation on a rank-2
+       * covariant tensor, i.e.
+       * @f[
+       *  \chi^{-1}\left(\bullet\right)^{\flat}
+       *    := \mathbf{F}^{T} \cdot \left(\bullet\right)^{\flat} \cdot \mathbf{F}
+       * @f]
+       *
+       * @param[in] t The (spatial) tensor to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\chi^{-1}\left( \mathbf{t} \right)$
+       */
       template <int dim, typename Number>
       Tensor<2,dim,Number>
       pull_back (const Tensor<2,dim,Number> &t,
                  const Tensor<2,dim,Number> &F);
 
       /**
-      * Returns the result of the pull back transformation on a rank-2
-      * covariant symmetric tensor, i.e.
-      * @f[
-      *  \chi^{-1}\left(\bullet\right)^{\flat}
-      *    := \mathbf{F}^{T} \cdot \left(\bullet\right)^{\flat} \cdot \mathbf{F}
-      * @f]
-      *
-      * @param[in] t The (spatial) symmetric tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\chi^{-1}\left( \mathbf{t} \right)$
-      */
+       * Returns the result of the pull back transformation on a rank-2
+       * covariant symmetric tensor, i.e.
+       * @f[
+       *  \chi^{-1}\left(\bullet\right)^{\flat}
+       *    := \mathbf{F}^{T} \cdot \left(\bullet\right)^{\flat} \cdot \mathbf{F}
+       * @f]
+       *
+       * @param[in] t The (spatial) symmetric tensor to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\chi^{-1}\left( \mathbf{t} \right)$
+       */
       template <int dim, typename Number>
       SymmetricTensor<2,dim,Number>
       pull_back (const SymmetricTensor<2,dim,Number> &t,
                  const Tensor<2,dim,Number>          &F);
 
       /**
-      * Returns the result of the pull back transformation on a rank-4
-      * contravariant tensor, i.e. (in index notation)
-      * @f[
-      *  \left[ \chi^{-1}\left(\bullet\right)^{\flat} \right]_{IJKL}
-      *    := F^{T}_{Ii} F^{T}_{Jj} \left(\bullet\right)^{\flat}_{ijkl} F^{T}_{Kk} F^{T}_{Ll}
-      * @f]
-      *
-      * @param[in] h The (spatial) tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\chi^{-1}\left( \mathbf{h} \right)$
-      */
+       * Returns the result of the pull back transformation on a rank-4
+       * contravariant tensor, i.e. (in index notation)
+       * @f[
+       *  \left[ \chi^{-1}\left(\bullet\right)^{\flat} \right]_{IJKL}
+       *    := F^{T}_{Ii} F^{T}_{Jj} \left(\bullet\right)^{\flat}_{ijkl} F^{T}_{Kk} F^{T}_{Ll}
+       * @f]
+       *
+       * @param[in] h The (spatial) tensor to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\chi^{-1}\left( \mathbf{h} \right)$
+       */
       template <int dim, typename Number>
       Tensor<4,dim,Number>
       pull_back (const Tensor<4,dim,Number> &h,
                  const Tensor<2,dim,Number> &F);
 
       /**
-      * Returns the result of the pull back transformation on a rank-4
-      * contravariant symmetric tensor, i.e. (in index notation)
-      * @f[
-      *  \left[ \chi^{-1}\left(\bullet\right)^{\flat} \right]_{IJKL}
-      *    := F^{T}_{Ii} F^{T}_{Jj} \left(\bullet\right)^{\flat}_{ijkl} F^{T}_{Kk} F^{T}_{Ll}
-      * @f]
-      *
-      * @param[in] h The (spatial) symmetric tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\chi^{-1}\left( \mathbf{h} \right)$
-      */
+       * Returns the result of the pull back transformation on a rank-4
+       * contravariant symmetric tensor, i.e. (in index notation)
+       * @f[
+       *  \left[ \chi^{-1}\left(\bullet\right)^{\flat} \right]_{IJKL}
+       *    := F^{T}_{Ii} F^{T}_{Jj} \left(\bullet\right)^{\flat}_{ijkl} F^{T}_{Kk} F^{T}_{Ll}
+       * @f]
+       *
+       * @param[in] h The (spatial) symmetric tensor to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\chi^{-1}\left( \mathbf{h} \right)$
+       */
       template <int dim, typename Number>
       SymmetricTensor<4,dim,Number>
       pull_back (const SymmetricTensor<4,dim,Number> &h,
@@ -516,7 +542,7 @@ namespace Physics
      * change associated with the mapping.
      *
      * @author Jean-Paul Pelteret, Andrew McBride, 2016
-    */
+     */
     namespace Piola
     {
 
@@ -526,85 +552,97 @@ namespace Physics
 //@{
 
       /**
-      * Returns the result of the push forward transformation on a
-      * contravariant vector, i.e.
-      * @f[
-      *  \textrm{det} \mathbf{F}^{-1} \; \chi\left(\bullet\right)^{\sharp}
-      *    := \frac{1}{\textrm{det} \mathbf{F}} \; \mathbf{F} \cdot \left(\bullet\right)^{\sharp}
-      * @f]
-      *
-      * @param[in] V The (referential) vector to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\frac{1}{\textrm{det} \mathbf{F}} \; \chi\left( \mathbf{V} \right)$
-      */
+       * Returns the result of the push forward transformation on a
+       * contravariant vector, i.e.
+       * @f[
+       *  \textrm{det} \mathbf{F}^{-1} \; \chi\left(\bullet\right)^{\sharp}
+       *    := \frac{1}{\textrm{det} \mathbf{F}} \; \mathbf{F} \cdot \left(\bullet\right)^{\sharp}
+       * @f]
+       *
+       * @param[in] V The (referential) vector to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\frac{1}{\textrm{det} \mathbf{F}} \; \chi\left(
+       * \mathbf{V} \right)$
+       */
       template <int dim, typename Number>
       Tensor<1,dim,Number>
       push_forward (const Tensor<1,dim,Number> &V,
                     const Tensor<2,dim,Number> &F);
 
       /**
-      * Returns the result of the push forward transformation on a rank-2
-      * contravariant tensor, i.e.
-      * @f[
-      *  \textrm{det} \mathbf{F}^{-1} \; \chi\left(\bullet\right)^{\sharp}
-      *    := \frac{1}{\textrm{det} \mathbf{F}} \; \mathbf{F} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{T}
-      * @f]
-      *
-      * @param[in] T The (referential) rank-2 tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\frac{1}{\textrm{det} \mathbf{F}} \; \chi\left( \mathbf{T} \right)$
-      */
+       * Returns the result of the push forward transformation on a rank-2
+       * contravariant tensor, i.e.
+       * @f[
+       *  \textrm{det} \mathbf{F}^{-1} \; \chi\left(\bullet\right)^{\sharp}
+       *    := \frac{1}{\textrm{det} \mathbf{F}} \; \mathbf{F} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{T}
+       * @f]
+       *
+       * @param[in] T The (referential) rank-2 tensor to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\frac{1}{\textrm{det} \mathbf{F}} \; \chi\left(
+       * \mathbf{T} \right)$
+       */
       template <int dim, typename Number>
       Tensor<2,dim,Number>
       push_forward (const Tensor<2,dim,Number> &T,
                     const Tensor<2,dim,Number> &F);
 
       /**
-      * Returns the result of the push forward transformation on a rank-2
-      * contravariant symmetric tensor, i.e.
-      * @f[
-      *  \textrm{det} \mathbf{F}^{-1} \; \chi\left(\bullet\right)^{\sharp}
-      *    := \frac{1}{\textrm{det} \mathbf{F}} \; \mathbf{F} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{T}
-      * @f]
-      *
-      * @param[in] T The (referential) rank-2 symmetric tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\frac{1}{\textrm{det} \mathbf{F}} \; \chi\left( \mathbf{T} \right)$
-      */
+       * Returns the result of the push forward transformation on a rank-2
+       * contravariant symmetric tensor, i.e.
+       * @f[
+       *  \textrm{det} \mathbf{F}^{-1} \; \chi\left(\bullet\right)^{\sharp}
+       *    := \frac{1}{\textrm{det} \mathbf{F}} \; \mathbf{F} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{T}
+       * @f]
+       *
+       * @param[in] T The (referential) rank-2 symmetric tensor to be operated
+       * on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\frac{1}{\textrm{det} \mathbf{F}} \; \chi\left(
+       * \mathbf{T} \right)$
+       */
       template <int dim, typename Number>
       SymmetricTensor<2,dim,Number>
       push_forward (const SymmetricTensor<2,dim,Number> &T,
                     const Tensor<2,dim,Number>          &F);
 
       /**
-      * Returns the result of the push forward transformation on a rank-4
-      * contravariant tensor, i.e. (in index notation)
-      * @f[
-      *  \textrm{det} \mathbf{F}^{-1} \; \left[ \chi\left(\bullet\right)^{\sharp} \right]_{ijkl}
-      *    := \frac{1}{\textrm{det} \mathbf{F}} \; F_{iI} F_{jJ} \left(\bullet\right)^{\sharp}_{IJKL} F_{kK} F_{lL}
-      * @f]
-      *
-      * @param[in] H The (referential) rank-4 tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\frac{1}{\textrm{det} \mathbf{F}} \; \chi\left( \mathbf{H} \right)$
-      */
+       * Returns the result of the push forward transformation on a rank-4
+       * contravariant tensor, i.e. (in index notation)
+       * @f[
+       *  \textrm{det} \mathbf{F}^{-1} \; \left[ \chi\left(\bullet\right)^{\sharp} \right]_{ijkl}
+       *    := \frac{1}{\textrm{det} \mathbf{F}} \; F_{iI} F_{jJ} \left(\bullet\right)^{\sharp}_{IJKL} F_{kK} F_{lL}
+       * @f]
+       *
+       * @param[in] H The (referential) rank-4 tensor to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\frac{1}{\textrm{det} \mathbf{F}} \; \chi\left(
+       * \mathbf{H} \right)$
+       */
       template <int dim, typename Number>
       Tensor<4,dim,Number>
       push_forward (const Tensor<4,dim,Number> &H,
                     const Tensor<2,dim,Number> &F);
 
       /**
-      * Returns the result of the push forward transformation on a rank-4
-      * contravariant symmetric tensor, i.e. (in index notation)
-      * @f[
-      *  \textrm{det} \mathbf{F}^{-1} \; \left[ \chi\left(\bullet\right)^{\sharp} \right]_{ijkl}
-      *    := \frac{1}{\textrm{det} \mathbf{F}} \; F_{iI} F_{jJ} \left(\bullet\right)^{\sharp}_{IJKL} F_{kK} F_{lL}
-      * @f]
-      *
-      * @param[in] H The (referential) rank-4 symmetric tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\frac{1}{\textrm{det} \mathbf{F}} \; \chi\left( \mathbf{H} \right)$
-      */
+       * Returns the result of the push forward transformation on a rank-4
+       * contravariant symmetric tensor, i.e. (in index notation)
+       * @f[
+       *  \textrm{det} \mathbf{F}^{-1} \; \left[ \chi\left(\bullet\right)^{\sharp} \right]_{ijkl}
+       *    := \frac{1}{\textrm{det} \mathbf{F}} \; F_{iI} F_{jJ} \left(\bullet\right)^{\sharp}_{IJKL} F_{kK} F_{lL}
+       * @f]
+       *
+       * @param[in] H The (referential) rank-4 symmetric tensor to be operated
+       * on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\frac{1}{\textrm{det} \mathbf{F}} \; \chi\left(
+       * \mathbf{H} \right)$
+       */
       template <int dim, typename Number>
       SymmetricTensor<4,dim,Number>
       push_forward (const SymmetricTensor<4,dim,Number> &H,
@@ -618,85 +656,95 @@ namespace Physics
 //@{
 
       /**
-      * Returns the result of the pull back transformation on a
-      * contravariant vector, i.e.
-      * @f[
-      *  \textrm{det} \mathbf{F} \; \chi^{-1}\left(\bullet\right)^{\sharp}
-      *    := \textrm{det} \mathbf{F} \; \mathbf{F}^{-1} \cdot \left(\bullet\right)^{\sharp}
-      * @f]
-      *
-      * @param[in] v The (spatial) vector to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\textrm{det} \mathbf{F} \; \chi^{-1}\left( \mathbf{v} \right)$
-      */
+       * Returns the result of the pull back transformation on a contravariant
+       * vector, i.e.
+       * @f[
+       *  \textrm{det} \mathbf{F} \; \chi^{-1}\left(\bullet\right)^{\sharp}
+       *    := \textrm{det} \mathbf{F} \; \mathbf{F}^{-1} \cdot \left(\bullet\right)^{\sharp}
+       * @f]
+       *
+       * @param[in] v The (spatial) vector to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\textrm{det} \mathbf{F} \; \chi^{-1}\left( \mathbf{v}
+       * \right)$
+       */
       template <int dim, typename Number>
       Tensor<1,dim,Number>
       pull_back (const Tensor<1,dim,Number> &v,
                  const Tensor<2,dim,Number> &F);
 
       /**
-      * Returns the result of the pull back transformation on a rank-2
-      * contravariant tensor, i.e.
-      * @f[
-      *  \textrm{det} \mathbf{F} \; \chi^{-1}\left(\bullet\right)^{\sharp}
-      *    := \textrm{det} \mathbf{F} \; \mathbf{F}^{-1} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{-T}
-      * @f]
-      *
-      * @param[in] t The (spatial) tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\textrm{det} \mathbf{F} \; \chi^{-1}\left( \mathbf{t} \right)$
-      */
+       * Returns the result of the pull back transformation on a rank-2
+       * contravariant tensor, i.e.
+       * @f[
+       *  \textrm{det} \mathbf{F} \; \chi^{-1}\left(\bullet\right)^{\sharp}
+       *    := \textrm{det} \mathbf{F} \; \mathbf{F}^{-1} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{-T}
+       * @f]
+       *
+       * @param[in] t The (spatial) tensor to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\textrm{det} \mathbf{F} \; \chi^{-1}\left( \mathbf{t}
+       * \right)$
+       */
       template <int dim, typename Number>
       Tensor<2,dim,Number>
       pull_back (const Tensor<2,dim,Number> &t,
                  const Tensor<2,dim,Number> &F);
 
       /**
-      * Returns the result of the pull back transformation on a rank-2
-      * contravariant symmetric tensor, i.e.
-      * @f[
-      *  \textrm{det} \mathbf{F} \; \chi^{-1}\left(\bullet\right)^{\sharp}
-      *    := \textrm{det} \mathbf{F} \; \mathbf{F}^{-1} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{-T}
-      * @f]
-      *
-      * @param[in] t The (spatial) symmetric tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\textrm{det} \mathbf{F} \; \chi^{-1}\left( \mathbf{t} \right)$
-      */
+       * Returns the result of the pull back transformation on a rank-2
+       * contravariant symmetric tensor, i.e.
+       * @f[
+       *  \textrm{det} \mathbf{F} \; \chi^{-1}\left(\bullet\right)^{\sharp}
+       *    := \textrm{det} \mathbf{F} \; \mathbf{F}^{-1} \cdot \left(\bullet\right)^{\sharp} \cdot \mathbf{F}^{-T}
+       * @f]
+       *
+       * @param[in] t The (spatial) symmetric tensor to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\textrm{det} \mathbf{F} \; \chi^{-1}\left( \mathbf{t}
+       * \right)$
+       */
       template <int dim, typename Number>
       SymmetricTensor<2,dim,Number>
       pull_back (const SymmetricTensor<2,dim,Number> &t,
                  const Tensor<2,dim,Number>          &F);
 
       /**
-      * Returns the result of the pull back transformation on a rank-4
-      * contravariant tensor, i.e. (in index notation)
-      * @f[
-      *  \textrm{det} \mathbf{F} \; \left[ \chi^{-1}\left(\bullet\right)^{\sharp} \right]_{IJKL}
-      *    := \textrm{det} \mathbf{F} \; F^{-1}_{Ii} F^{-1}_{Jj} \left(\bullet\right)^{\sharp}_{ijkl} F^{-1}_{Kk} F^{-1}_{Ll}
-      * @f]
-      *
-      * @param[in] h The (spatial) tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\textrm{det} \mathbf{F} \; \chi^{-1}\left( \mathbf{h} \right)$
-      */
+       * Returns the result of the pull back transformation on a rank-4
+       * contravariant tensor, i.e. (in index notation)
+       * @f[
+       *  \textrm{det} \mathbf{F} \; \left[ \chi^{-1}\left(\bullet\right)^{\sharp} \right]_{IJKL}
+       *    := \textrm{det} \mathbf{F} \; F^{-1}_{Ii} F^{-1}_{Jj} \left(\bullet\right)^{\sharp}_{ijkl} F^{-1}_{Kk} F^{-1}_{Ll}
+       * @f]
+       *
+       * @param[in] h The (spatial) tensor to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\textrm{det} \mathbf{F} \; \chi^{-1}\left( \mathbf{h}
+       * \right)$
+       */
       template <int dim, typename Number>
       Tensor<4,dim,Number>
       pull_back (const Tensor<4,dim,Number> &h,
                  const Tensor<2,dim,Number> &F);
 
       /**
-      * Returns the result of the pull back transformation on a rank-4
-      * contravariant symmetric tensor, i.e. (in index notation)
-      * @f[
-      *  \textrm{det} \mathbf{F} \; \left[ \chi^{-1}\left(\bullet\right)^{\sharp} \right]_{IJKL}
-      *    := \textrm{det} \mathbf{F} \; F^{-1}_{Ii} F^{-1}_{Jj} \left(\bullet\right)^{\sharp}_{ijkl} F^{-1}_{Kk} F^{-1}_{Ll}
-      * @f]
-      *
-      * @param[in] h The (spatial) symmetric tensor to be operated on
-      * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-      * @return      $\textrm{det} \mathbf{F} \; \chi^{-1}\left( \mathbf{h} \right)$
-      */
+       * Returns the result of the pull back transformation on a rank-4
+       * contravariant symmetric tensor, i.e. (in index notation)
+       * @f[
+       *  \textrm{det} \mathbf{F} \; \left[ \chi^{-1}\left(\bullet\right)^{\sharp} \right]_{IJKL}
+       *    := \textrm{det} \mathbf{F} \; F^{-1}_{Ii} F^{-1}_{Jj} \left(\bullet\right)^{\sharp}_{ijkl} F^{-1}_{Kk} F^{-1}_{Ll}
+       * @f]
+       *
+       * @param[in] h The (spatial) symmetric tensor to be operated on
+       * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+       * \mathbf{X} \right)$
+       * @return      $\textrm{det} \mathbf{F} \; \chi^{-1}\left( \mathbf{h}
+       * \right)$
+       */
       template <int dim, typename Number>
       SymmetricTensor<4,dim,Number>
       pull_back (const SymmetricTensor<4,dim,Number> &h,
@@ -711,26 +759,27 @@ namespace Physics
 //@{
 
     /**
-    * Returns the result of applying Nanson's formula for the transformation of
-    * the material surface area element $d\mathbf{A}$ to the current surfaces
-    * area element $d\mathbf{a}$ under the nonlinear transformation map
-    * $\mathbf{x} = \boldsymbol{\varphi} \left( \mathbf{X} \right)$.
-    *
-    * The returned result is the spatial normal scaled by the ratio of areas
-    * between the reference and spatial surface elements, i.e.
-    * @f[
-    *  \mathbf{n} \frac{da}{dA}
-    *    := \textrm{det} \mathbf{F} \, \mathbf{F}^{-T} \cdot \mathbf{N}
-    *     = \textrm{cof} \mathbf{F} \cdot \mathbf{N} \, .
-    * @f]
-    *
-    * @param[in] N The referential normal unit vector $\mathbf{N}$
-    * @param[in] F The deformation gradient tensor $\mathbf{F} \left( \mathbf{X} \right)$
-    * @return      The scaled spatial normal vector $\mathbf{n} \frac{da}{dA}$
-    *
-    * @dealiiHolzapfelA{75,2.55}
-    * @dealiiWriggersA{23,3.11}
-    */
+     * Returns the result of applying Nanson's formula for the transformation
+     * of the material surface area element $d\mathbf{A}$ to the current
+     * surfaces area element $d\mathbf{a}$ under the nonlinear transformation
+     * map $\mathbf{x} = \boldsymbol{\varphi} \left( \mathbf{X} \right)$.
+     *
+     * The returned result is the spatial normal scaled by the ratio of areas
+     * between the reference and spatial surface elements, i.e.
+     * @f[
+     *  \mathbf{n} \frac{da}{dA}
+     *    := \textrm{det} \mathbf{F} \, \mathbf{F}^{-T} \cdot \mathbf{N}
+     *     = \textrm{cof} \mathbf{F} \cdot \mathbf{N} \, .
+     * @f]
+     *
+     * @param[in] N The referential normal unit vector $\mathbf{N}$
+     * @param[in] F The deformation gradient tensor $\mathbf{F} \left(
+     * \mathbf{X} \right)$
+     * @return      The scaled spatial normal vector $\mathbf{n}
+     * \frac{da}{dA}$
+     *
+     * @dealiiHolzapfelA{75,2.55} @dealiiWriggersA{23,3.11}
+     */
     template<int dim, typename Number>
     Tensor<1,dim,Number>
     nansons_formula (const Tensor<1,dim,Number> &N,

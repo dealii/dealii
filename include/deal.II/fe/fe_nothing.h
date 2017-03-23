@@ -185,7 +185,8 @@ public:
    * neither dominates, or if either could dominate.
    *
    * For a definition of domination, see FiniteElementDomination::Domination
-   * and in particular the @ref hp_paper "hp paper".
+   * and in particular the
+   * @ref hp_paper "hp paper".
    *
    * In the current case, this element is assumed to dominate if the second
    * argument in the constructor @p dominate is true. When this argument is

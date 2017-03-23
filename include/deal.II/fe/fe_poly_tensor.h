@@ -79,7 +79,7 @@ DEAL_II_NAMESPACE_OPEN
  * $\{\varphi_j(\hat{\mathbf x})\}$. Rather, we need to express the finite
  * element shape functions as a linear combination of the basis provided
  * by the polynomial space:
- * @f{align*}
+ * @f{align*}{
  *   \varphi_j = \sum_k c_{jk} \tilde\varphi_j.
  * @f}
  * These expansion coefficients $c_{jk}$ are typically computed in the

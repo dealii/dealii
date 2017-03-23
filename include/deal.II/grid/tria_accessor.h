@@ -2524,7 +2524,8 @@ public:
 
   /**
    * For a cell with its @c ith face at a periodic boundary,
-   * (see @ref GlossPeriodicConstraints "the entry for periodic boundaries")
+   * see
+   * @ref GlossPeriodicConstraints "the entry for periodic boundaries",
    * this function returns an iterator to the cell on the other side
    * of the periodic boundary. If there is no periodic boundary at the @c ith
    * face, an exception will be thrown.
