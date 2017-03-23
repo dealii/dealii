@@ -685,6 +685,13 @@ public:
    * In either case, included in the returned number are those DoFs which are
    * constrained by hanging nodes, see
    * @ref constraints.
+   *
+   * Mathematically speaking, the number returned by this function equals the
+   * dimension of the finite element space (without taking into account
+   * constraints) that corresponds to (i) the mesh on which it is defined,
+   * and (ii) the finite element that is used by the current object. It
+   * also, of course, equals the number of shape functions that span this
+   * space.
    */
   types::global_dof_index n_dofs () const;
 
