@@ -330,7 +330,7 @@ namespace Physics
      * @f]
      * where the control surfaces $\partial V_{0}$ and $\partial V_{t}$ with
      * outwards facing normals $\mathbf{N}$ and $\mathbf{n}$ are bounded by
-     * the curves $\partial A_{0}$ and $\partial A_{0}$ that are,
+     * the curves $\partial A_{0}$ and $\partial A_{t}$ that are,
      * respectively, associated with the line directors $\mathbf{L}$ and
      * $\mathbf{l}$.
      *
