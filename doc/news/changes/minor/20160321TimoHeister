@@ -1,5 +1,0 @@
-New: Added GridGenerator::torus() to generate the volume mesh of a
-torus in three dimensions and a manifold description TorusManifold to
-go with it.
-<br>
-(Timo Heister, 2016/03/21)

@@ -1,5 +1,0 @@
-New: There are two new finite elements FE_DGQLegendre and FE_DGQHermite which
-are similar to FE_DGQ but use the class Polynomials::Legendre and
-Polynomials::HermiteInterpolation as shape functions.
-<br>
-(Martin Kronbichler, 2017/01/11)

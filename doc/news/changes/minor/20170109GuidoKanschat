@@ -1,6 +1,0 @@
-New: LocalIntegrators::Laplace::ip_tangential_matrix() and
-LocalIntegrators::Laplace::nitsche_tangential_matrix() implement
-interior penalty and Nitsche boundary conditions for vector valued
-Poisson problems.
-<br>
-(Guido Kanschat, 2017/01/09)

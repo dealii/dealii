@@ -1,6 +1,0 @@
-New: The product of a rank-1 tensor (a vector) and a rank-2
-symmetric tensor (a symmetric matrix) is now defined and yields
-a rank-1 tensor (a vector). The opposite product was previously
-already defined.
-<br>
-(Wolfgang Bangerth, 2016/03/25)

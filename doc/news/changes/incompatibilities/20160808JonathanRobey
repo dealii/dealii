@@ -1,5 +1,0 @@
-Deprecated: MGLevelObject::clear() deprecated in favor of
-MGLevelObject::clear_elements() due to clear() being inconsistent with
-behavior of other container objects.
-<br>
-(Jonathan Robey, 2016/08/08)

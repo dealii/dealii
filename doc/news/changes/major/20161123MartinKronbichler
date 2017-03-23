@@ -1,5 +1,0 @@
-Improved: The step-37 tutorial program now shows the matrix-free multigrid
-solver based on MPI parallelization rather than only a serial version.
-Moreover, support for adaptively refined meshes has been added.
-<br>
-(Martin Kronbichler, 2016/11/23)

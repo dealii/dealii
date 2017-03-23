@@ -1,4 +1,0 @@
-New: added ReinitHelper for PETSc. This is required by LinearOperator
-class to reinit vectors.
-<br>
-(Mauro Bardelloni, 2016/04/13)

@@ -1,6 +1,0 @@
-Improved: The class FEEvaluation can now also be used without compile-time
-knowledge of the polynomial degree. If the template parameter @p fe_degree is
-set to -1, the degree will be deduced from the underlying finite element. Note
-that performance is 2-3 times slower, though.
-<br>
-(Martin Kronbichler, 2017/02/16)

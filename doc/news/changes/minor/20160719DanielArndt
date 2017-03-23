@@ -1,5 +1,0 @@
-New: Added GridGenerator::quarter_hyper_ball() to generate the
-intersection of a hyper ball with the positive orthant relative
-to its center.
-<br>
-(Daniel Arndt, 2016/07/19)

@@ -1,6 +1,0 @@
-Fixed: The SymmetricTensor copy constructor that accepted another
-SymmetricTensor of a different number type had an error in its internal data
-initialization loop range. This bug was only triggered when copying rank-4
-tensors.
-<br>
-(Jean-Paul Pelteret, 2016/12/16)

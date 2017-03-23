@@ -1,4 +1,0 @@
-Fixed: Meshworker::Assembler::ResidualSimple now also works for
-multiple blocks if no constraints are given.
-<br>
-(Daniel Arndt, 2016/04/08)

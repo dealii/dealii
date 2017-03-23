@@ -1,3 +1,0 @@
-Fixed: The GridOut::write_mesh_per_processor_as_vtu() function now works for a mesh whose multilevel hierarchy is not distributed, as well as a mesh whose level_subdomain_ids do not necessarily match its subdomain_ids for every active cell.  
-<br>
-(Conrad Clevenger, 2017/02/09)

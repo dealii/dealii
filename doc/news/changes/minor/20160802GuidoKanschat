@@ -1,4 +1,0 @@
-Improved: DoFTools::make_cell_patches() can create block lists
-only extending over local cells of distributed triangulations.
-<br>
-(Guido Kanschat, 2016/08/02)

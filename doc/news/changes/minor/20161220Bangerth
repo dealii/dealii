@@ -1,5 +1,0 @@
- Changed: IndexSet::compress() and, by extension, all of the
- "const" member functions of the IndexSet class, are now thread-safe.
- <br>
- (Wolfgang Bangerth, 2016/12/20)
-

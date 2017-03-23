@@ -1,5 +1,0 @@
-Changed: The function FETools::compute_node_matrix() used to return
-its result by reference through its first argument (a reference to a
-FullMatrix object). It now returns this matrix as an object.
-<br>
-(Wolfgang Bangerth, 2017/01/16)

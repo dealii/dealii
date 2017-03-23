@@ -1,5 +1,0 @@
-Fixed: The TrilinosWrappers::SparsityPattern::print() and
-TrilinosWrappers::SparsityPattern::print_gnuplot() methods did not produce
-correct output on distributed computations. This is now fixed.
-<br>
-(Martin Kronbichler, 2016/07/30)

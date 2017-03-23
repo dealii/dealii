@@ -1,5 +1,0 @@
-Fixed: CMake now tries to pick up the full link interface for gsl.
-This works around an underlinkage issue with libgsl.so not correctly
-stating all shared object dependencies.
-<br>
-(Matthias Maier, 2016/07/28)

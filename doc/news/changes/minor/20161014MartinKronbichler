@@ -1,5 +1,0 @@
-New: There is now a function FEEvaluation::JxW() to return the Jacobian
-determinant times the quadrature weight in the matrix-free evaluation
-routines similary to FEValues.
-<br>
-(Martin Kronbichler, 2016/10/14)

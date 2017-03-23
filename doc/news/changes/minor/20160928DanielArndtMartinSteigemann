@@ -1,4 +1,0 @@
-New: FETools::extrapolate allows for using the
-extrapolate algorithm on parallel::distributed::Triangulations.
-<br>
-(Daniel Arndt, Martin Steigemann, 2016/09/28)

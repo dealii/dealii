@@ -1,4 +1,0 @@
-Deprecated: MGCoarseGridLACIteration got deprecated in favor of
-MGCoarseGridIterativeSolver.
-<br>
-(Timo Heister, 2016/09/14)

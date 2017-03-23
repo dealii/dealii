@@ -1,5 +1,0 @@
-Improved: ContraintMatrix::distribute_local_to_global now does a bulk write of
-all vector values at once. This improves performance with
-PETScWrappers::MPI::Vector by about 10%.
-<br>
-(David Wells, 2016/12/21)

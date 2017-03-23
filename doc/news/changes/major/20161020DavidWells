@@ -1,4 +1,0 @@
-Improved: deal.II now bundles a subset of BOOST 1.62 instead of a subset
-of BOOST 1.56.
-<br>
-(David Wells, 2016/10/20)

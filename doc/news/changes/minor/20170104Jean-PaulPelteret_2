@@ -1,5 +1,0 @@
-New: Additional solve() functions have been added to the Trilinos solver
-classes, which provide the necessary extension for them to be compatible
-with LinearOperators.
-<br>
-(Jean-Paul Pelteret, 2017/01/04)

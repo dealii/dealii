@@ -1,8 +1,0 @@
-Fixed: FEValues::reinit() would sometimes try to be overly
-clever and not re-compute information when called with the same
-cell twice in a row, even if the underlying triangulation had
-been moved, translated, stretched, or otherwise had its vertex
-locations changed between the two calls to FEValues::reinit().
-This is now fixed.
-<br>
-(Wolfgang Bangerth, Jean-Paul Pelteret, Rajat Arora, 2016/07/11)

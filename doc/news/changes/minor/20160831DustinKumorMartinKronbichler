@@ -1,6 +1,0 @@
-Improved: SparsityPattern::copy_from() copying from a
-DynamicSparsityPattern argument had quadratic complexity in the number of
-rows for sparsity patterns where most of the rows are of length zero. The bad
-algorithm has been replaced by a linear complexity one.
-<br>
-(Dustin Kumor, Martin Kronbichler, 2016/08/31)

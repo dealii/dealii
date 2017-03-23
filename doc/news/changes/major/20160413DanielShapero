@@ -1,5 +1,0 @@
-New: Added move operations to BlockIndices, BlockVectorBase and
-BlockVector; Vector move operations nullify old object instead of
-using swap.
-<br>
-(Daniel Shapero, 2016/04/13)

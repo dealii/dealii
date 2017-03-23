@@ -1,4 +1,0 @@
-Fixed: Copying objects of type PolynomialsABF would lead to memory
-corruption once one of the two copies is destroyed. This is now fixed.
-<br>
-(Wolfgang Bangerth, 2017/01/09)

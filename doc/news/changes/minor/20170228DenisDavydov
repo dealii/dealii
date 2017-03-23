@@ -1,4 +1,0 @@
-Fixed: Fixed a bug in IndexSet::index_within_set() for the case when an index
-set is empty.
-<br>
-(Denis Davydov, 2017/02/28)

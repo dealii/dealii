@@ -1,5 +1,0 @@
-Changed: Several operators from LocalIntegrators::Divergence got moved
-to LocalIntegrators::GradDiv and the never used/tested
-LocalIntegrators::Divergence::grad_div() function was removed.
-<br>
-(Timo Heister, Guido Kanschat, 2016/08/02)

@@ -1,6 +1,0 @@
-Improved: The representation of the two polynomial classes
-Polynomials::Legendre and Polynomials::HermiteInterpolation has been changed
-to the root form, which ensures stable evaluation at high degrees as opposed
-to the coefficient form previously used.
-<br>
-(Martin Kronbichler, 2017/01/03)

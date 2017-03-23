@@ -1,5 +1,0 @@
- Changed: IndexSet::nth_index_in_set() can now be called without
- calling IndexSet::compress() first.
- <br>
- (Wolfgang Bangerth, 2016/12/19)
-

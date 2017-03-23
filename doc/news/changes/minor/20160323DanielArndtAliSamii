@@ -1,4 +1,0 @@
-New: Triangulation::add_periodicity allows for accessing neighbors across
-periodic boundaries via new functions in TriaAccessor.
-<br>
-(Daniel Arndt, Ali Samii, 2016/03/23)

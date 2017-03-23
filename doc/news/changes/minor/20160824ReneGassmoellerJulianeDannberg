@@ -1,5 +1,0 @@
-New: There is now the possibility to store information about the
-time of an output time step within the .visit file created by
-the DataOutInterface<dim,spacedim>::write_visit_record function.
-<br>
-(Rene Gassmoeller, Juliane Dannberg, 2016/08/24)

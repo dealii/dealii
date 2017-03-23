@@ -1,7 +1,0 @@
-Fixed: The Tensor class was not explicitly instantiated. This did
-not matter in almost all contexts because its members are all defined
-as @p inline in the header file. The only cases where it matters if one
-(or the compiler) were to take the address of one of the static member
-variables.
-<br>
-(Wolfgang Bangerth, 2016/06/03)

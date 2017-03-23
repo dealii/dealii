@@ -1,4 +1,0 @@
-New: Implement MGCoarseGridApplySmoother class to do a few steps of a
-smoother at the coarsest level.
-<br>
-(Denis Davydov, 2016/08/09)

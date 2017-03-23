@@ -1,5 +1,0 @@
-New: There is a new class DiagonalMatrix which represents a diagonal
-matrix via a vector. This is useful for representing Jacobi preconditioners
-with matrix-free methods.
-<br>
-(Martin Kronbichler, 2016/10/27)

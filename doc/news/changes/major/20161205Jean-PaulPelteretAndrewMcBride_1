@@ -1,5 +1,0 @@
-New: The Physics::Transformations namespace defines a number of operations
-that can be used to push forward and pull back quantities to and from different
-body configurations.
-<br>
-(Jean-Paul Pelteret, Andrew McBride, 2016/12/05)

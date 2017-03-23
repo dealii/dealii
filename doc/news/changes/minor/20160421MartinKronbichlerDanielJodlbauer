@@ -1,5 +1,0 @@
-Fixed: The methods TrilinosWrappers::SparseMatrix::(T)mmult previously
-produced invalid matrix sizes if the final matrix was non-square. This has
-been fixed.
-<br>
-(Martin Kronbichler, Daniel Jodlbauer, 2016/04/21)

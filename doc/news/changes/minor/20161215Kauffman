@@ -1,5 +1,0 @@
- Fixed: The DataOutFaces class did not work with parallel triangulations
- if a process had no faces to deal with.
- <br>
- (Justin Kauffman, Wolfgang Bangerth, 2016/12/15)
-

@@ -1,5 +1,0 @@
-Fixed and improved: Fix algorithm for incomplete assignment of level
-subdomain ids for parallel geometric multigrid. Also optimize algorithms
-used for assignment and DoF communication.
-<br>
-(Timo Heister, Martin Kronbichler, 2016/04/12)

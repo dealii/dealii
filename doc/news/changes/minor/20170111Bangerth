@@ -1,5 +1,0 @@
-Fixed: FE_Q::compare_for_face_domination() did not know how to deal
-with situations where the neighboring cell was an FE_DGQ, even though
-the reverse situation worked just fine. This is now fixed.
-<br>
-(Wolfgang Bangerth, 2017/01/11)

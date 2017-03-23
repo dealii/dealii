@@ -1,7 +1,0 @@
-Improved: The multigrid V-cycle has been rewritten for performance on
-large-scale machines. Rather than transferring parts of the defect
-immediately to all coarser levels with a complexity of O(n_levels) global
-communication steps per V-cycle, we now transfer the full defect once to the
-next coarser level only, resulting in crossing all processors only once.
-<br>
-(Martin Kronbichler, 2016/09/16)

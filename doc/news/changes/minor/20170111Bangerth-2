@@ -1,4 +1,0 @@
-Fixed: FE_Q::compare_for_face_domination() could not deal with
-FE_Nothing if <code>dim != spacedim</code>.
-<br>
-(Wolfgang Bangerth, 2017/01/11)

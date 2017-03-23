@@ -1,5 +1,0 @@
-Fixed: Reimplement copy_triangulation and load in
-dealii::parallel::shared::Triangulation, this avoids the loss of
-partition information which causes parallel::shared::Triangulation to be in an invalid state.
-<br>
-(Ce Qin, 2016/09/05)

@@ -1,6 +1,0 @@
-New: A LinearOperator Payload class supporting Trilinos sparse matrices and
-preconditioners has been developed. LinearOperator's, and their associated
-functionality, have thus been extended so that they can now be used with
-Trilinos algebra types.
-<br>
-(Jean-Paul Pelteret, Matthias Maier, 2017/01/04)

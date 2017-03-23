@@ -1,7 +1,0 @@
-Improved: DoFRenumbering::compute_Cuthill_McKee when used with
-distributed triangulations contained parts that scaled as the global problem
-size, rather than the processor-local size. This prevented its use with more
-than a few hundred cores when hanging node constraints were activated. This
-has been fixed.
-<br>
-(Martin Kronbichler, 2016/04/11)

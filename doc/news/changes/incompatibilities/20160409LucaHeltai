@@ -1,5 +1,0 @@
-Changed: FlatManifold takes as argument a periodicity option. This
-used to be a Point<dim>, but it should have been a Tensor<1,dim>. This
-is now changed.
-<br>
-(Luca Heltai, 2016/04/09)
