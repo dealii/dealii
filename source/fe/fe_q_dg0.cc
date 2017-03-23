@@ -176,6 +176,33 @@ FE_Q_DG0<dim,spacedim>::clone() const
 
 template <int dim, int spacedim>
 void
+FE_Q_DG0<dim,spacedim>::
+convert_generalized_support_point_values_to_nodal_values(const std::vector<Vector<double> > &support_point_values,
+                                                         std::vector<double>    &nodal_dofs) const
+{
+  Assert (support_point_values.size() == this->unit_support_points.size(),
+          ExcDimensionMismatch(support_point_values.size(),
+                               this->unit_support_points.size()));
+  Assert (nodal_dofs.size() == this->dofs_per_cell,
+          ExcDimensionMismatch(nodal_dofs.size(),this->dofs_per_cell));
+  Assert (support_point_values[0].size() == this->n_components(),
+          ExcDimensionMismatch(support_point_values[0].size(),this->n_components()));
+
+  for (unsigned int i=0; i<this->dofs_per_cell-1; ++i)
+    {
+      const std::pair<unsigned int, unsigned int> index
+        = this->system_to_component_index(i);
+      nodal_dofs[i] = support_point_values[i](index.first);
+    }
+
+  // We don't need the discontinuous function for local interpolation
+  nodal_dofs[nodal_dofs.size()-1] = 0.;
+}
+
+
+
+template <int dim, int spacedim>
+void
 FE_Q_DG0<dim,spacedim>::interpolate(std::vector<double>       &local_dofs,
                                     const std::vector<double> &values) const
 {

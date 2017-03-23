@@ -692,7 +692,7 @@ public:
    */
   virtual
   void interpolate(std::vector<double>       &local_dofs,
-                   const std::vector<double> &values) const;
+                   const std::vector<double> &values) const DEAL_II_DEPRECATED;
 
   /**
    * This function is not implemented and throws an exception if called.
@@ -701,7 +701,7 @@ public:
   void
   interpolate(std::vector<double>                &local_dofs,
               const std::vector<Vector<double> > &values,
-              const unsigned int offset = 0) const;
+              const unsigned int offset = 0) const DEAL_II_DEPRECATED;
 
   /**
    * This function is not implemented and throws an exception if called.
@@ -709,7 +709,7 @@ public:
   virtual
   void
   interpolate(std::vector<double> &local_dofs,
-              const VectorSlice<const std::vector<std::vector<double> > > &values) const;
+              const VectorSlice<const std::vector<std::vector<double> > > &values) const DEAL_II_DEPRECATED;
 
 
 protected:

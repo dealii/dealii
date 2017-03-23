@@ -258,33 +258,21 @@ public:
    */
   virtual std::string get_name () const;
 
-  /**
-   * Interpolate a set of scalar values, computed in the generalized support
-   * points.
-   */
-  virtual void interpolate(std::vector<double>       &local_dofs,
-                           const std::vector<double> &values) const;
+  // documentation inherited from the base class
+  virtual
+  void
+  convert_generalized_support_point_values_to_nodal_values (const std::vector<Vector<double> > &support_point_values,
+                                                            std::vector<double>                &nodal_values) const;
 
-  /**
-   * Interpolate a set of vector values, computed in the generalized support
-   * points.
-   *
-   * Since a finite element often only interpolates part of a vector,
-   * <tt>offset</tt> is used to determine the first component of the vector to
-   * be interpolated. Maybe consider changing your data structures to use the
-   * next function.
-   */
+  virtual void interpolate(std::vector<double>       &local_dofs,
+                           const std::vector<double> &values) const DEAL_II_DEPRECATED;
+
   virtual void interpolate(std::vector<double>                &local_dofs,
                            const std::vector<Vector<double> > &values,
-                           const unsigned int                  offset = 0) const;
+                           const unsigned int                  offset = 0) const DEAL_II_DEPRECATED;
 
-  /**
-   * Interpolate a set of vector values, computed in the generalized support
-   * points.
-   */
-  virtual void interpolate(
-    std::vector<double>          &local_dofs,
-    const VectorSlice<const std::vector<std::vector<double> > > &values) const;
+  virtual void interpolate(std::vector<double>          &local_dofs,
+                           const VectorSlice<const std::vector<std::vector<double> > > &values) const DEAL_II_DEPRECATED;
 
   /**
    * Return the matrix interpolating from the given finite element to the

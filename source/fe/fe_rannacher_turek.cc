@@ -102,6 +102,26 @@ void FE_RannacherTurek<dim>::initialize_support_points()
 
 
 template <int dim>
+void
+FE_RannacherTurek<dim>::
+convert_generalized_support_point_values_to_nodal_values(const std::vector<Vector<double> > &support_point_values,
+                                                         std::vector<double> &nodal_dofs) const
+{
+  AssertDimension(support_point_values.size(), this->generalized_support_points.size());
+  AssertDimension(nodal_dofs.size(), this->dofs_per_cell);
+
+  // extract component and call scalar version of this function
+  std::vector<double> scalar_values(support_point_values.size());
+  for (unsigned int q = 0; q < support_point_values.size(); ++q)
+    {
+      scalar_values[q] = support_point_values[q][0];
+    }
+  this->interpolate(nodal_dofs, scalar_values);
+}
+
+
+
+template <int dim>
 void FE_RannacherTurek<dim>::interpolate(
   std::vector<double> &local_dofs,
   const std::vector<double> &values) const

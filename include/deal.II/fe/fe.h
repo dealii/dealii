@@ -1933,6 +1933,78 @@ public:
   GeometryPrimitive
   get_associated_geometry_primitive (const unsigned int cell_dof_index) const;
 
+
+  /**
+   * Given the values of a function $f(\mathbf x)$ at the (generalized) support
+   * points, this function then computes what the nodal values of the element
+   * are, i.e., $\Psi_i[f]$, where $\Psi_i$ are the node functionals of
+   * the element. The values $\Psi_i[f]$ are then the expansion coefficients
+   * for the shape functions of the finite element function that
+   * <i>interpolates</i> the given function $f(x)$, i.e.,
+   * $ f_h(\mathbf x) = \sum_i \Psi_i[f] \varphi_i(\mathbf x)
+   * $ is the finite element interpolant of $f$ with the current element.
+   * The operation described here is used, for example, in the
+   * FETools::compute_node_matrix() function.
+   *
+   * In more detail, let us assume that the generalized support points
+   * (see @ref GlossGeneralizedSupport "this glossary entry") of the current
+   * element are $\hat{\mathbf x}_i$ and that the node functionals associated
+   * with the current element are $\Psi_i[\cdot]$. Then, the fact that the
+   * element is based on generalized support points, implies that if we
+   * apply $\Psi_i$ to a (possibly vector-valued) finite element function
+   * $\varphi$, the result must have the form
+   * $\Psi_i[\varphi] = f_i(\varphi(\hat{\mathbf x}_i))$ -- in other words,
+   * the value of the node functional $\Psi_i$ applied to $\varphi$ <i>only</i>
+   * depends on the <i>values of $\varphi$ at $\hat{\mathbf x}_i$</i> and not
+   * on values anywhere else, or integrals of $\varphi$, or any other kind
+   * of information.
+   *
+   * The exact form of $f_i$ depends on the element. For example, for scalar
+   * @ref GlossLagrange "Lagrange elements", we have that in fact
+   * $\Psi_i[\varphi] = \varphi(\hat{\mathbf x}_i)$. If you combine multiple
+   * scalar Lagrange elements via an FESystem object, then
+   * $\Psi_i[\varphi] = \varphi(\hat{\mathbf x}_i)_{c(i)}$ where $c(i)$
+   * is the result of the FiniteElement::system_to_component_index()
+   * function's return value's first component. In these two cases,
+   * $f_i$ is therefore simply the identity (in the scalar case) or a
+   * function that selects a particular vector component of its argument.
+   * On the other hand, for Raviart-Thomas elements, one would have that
+   * $f_i(\mathbf y) = \mathbf y \cdot \mathbf n_i$ where $\mathbf n_i$
+   * is the normal vector of the face at which the shape function is
+   * defined.
+   *
+   * Given all of this, what this function does is the following: If you
+   * input a list of values of a function $\varphi$ at all generalized
+   * support points (where each value is in fact a vector of values with
+   * as many components as the element has), then this function returns
+   * a vector of values obtained by applying the node functionals to
+   * these values. In other words, if you pass in
+   * $\{\varphi(\hat{\mathbf x}_i)\}_{i=0}^{N-1}$ then you
+   * will get out a vector
+   * $\{\Psi[\varphi]\}_{i=0}^{N-1}$ where $N$ equals @p dofs_per_cell.
+   *
+   * @param[in] support_point_values An array of size @p dofs_per_cell
+   *   (which equals the number of points the get_generalized_support_points()
+   *   function will return) where each element is a vector with as many entries
+   *   as the element has vector components. This array should contain
+   *   the values of a function at the generalized support points of the
+   *   current element.
+   * @param[out] nodal_values An array of size @p dofs_per_cell that contains
+   *   the node functionals of the element applied to the given function.
+   *
+   * @note Given what the function is supposed to do, the function clearly
+   * can only work for elements that actually implement (generalized) support
+   * points. Elements that do not have generalized support points -- e.g.,
+   * elements whose nodal functionals evaluate integrals or moments of
+   * functions (such as FE_Q_Hierarchical) -- can in general not make
+   * sense of the operation that is required for this function. They
+   * consequently may not implement it.
+   */
+  virtual
+  void
+  convert_generalized_support_point_values_to_nodal_values (const std::vector<Vector<double> > &support_point_values,
+                                                            std::vector<double>                &nodal_values) const;
+
   /**
    * Interpolate a set of scalar values, computed in the generalized support
    * points.
@@ -1941,11 +2013,13 @@ public:
    * element has support points. In this case, the resulting coefficients are
    * just the values in the support points. All other elements must
    * reimplement it.
+   *
+   * @deprecated Use convert_generalized_support_point_values_to_nodal_values() instead.
    */
   virtual
   void
   interpolate(std::vector<double>       &local_dofs,
-              const std::vector<double> &values) const;
+              const std::vector<double> &values) const DEAL_II_DEPRECATED;
 
   /**
    * Interpolate a set of vector values, computed in the generalized support
@@ -1955,21 +2029,25 @@ public:
    * <tt>offset</tt> is used to determine the first component of the vector to
    * be interpolated. Maybe consider changing your data structures to use the
    * next function.
+   *
+   * @deprecated Use convert_generalized_support_point_values_to_nodal_values() instead.
    */
   virtual
   void
   interpolate(std::vector<double>                &local_dofs,
               const std::vector<Vector<double> > &values,
-              const unsigned int                  offset = 0) const;
+              const unsigned int                  offset = 0) const DEAL_II_DEPRECATED;
 
   /**
    * Interpolate a set of vector values, computed in the generalized support
    * points.
+   *
+   * @deprecated Use convert_generalized_support_point_values_to_nodal_values() instead.
    */
   virtual
   void
   interpolate(std::vector<double>                                         &local_dofs,
-              const VectorSlice<const std::vector<std::vector<double> > > &values) const;
+              const VectorSlice<const std::vector<std::vector<double> > > &values) const DEAL_II_DEPRECATED;
 
   //@}
 

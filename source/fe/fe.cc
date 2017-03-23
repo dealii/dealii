@@ -1099,6 +1099,22 @@ FiniteElement<dim,spacedim>::get_constant_modes () const
 
 template <int dim, int spacedim>
 void
+FiniteElement<dim,spacedim>::
+convert_generalized_support_point_values_to_nodal_values (const std::vector<Vector<double> > &,
+                                                          std::vector<double> &) const
+{
+  Assert (has_generalized_support_points(),
+          ExcMessage ("The element for which you are calling the current "
+                      "function does not have generalized support points (see "
+                      "the glossary for a definition of generalized support "
+                      "points). Consequently, the current function can not "
+                      "be defined and is not implemented by the element."));
+  Assert (false, ExcNotImplemented());
+}
+
+
+template <int dim, int spacedim>
+void
 FiniteElement<dim,spacedim>::interpolate(
   std::vector<double>       &local_dofs,
   const std::vector<double> &values) const

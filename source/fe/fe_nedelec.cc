@@ -3086,6 +3086,934 @@ FE_Nedelec<dim>
   return this->restriction[refinement_case-1][child];
 }
 
+
+// Interpolate a function, which is given by
+// its values at the generalized support
+// points in the finite element space on the
+// reference cell.
+// This is done as usual by projection-based
+// interpolation.
+template <int dim>
+void
+FE_Nedelec<dim>::
+convert_generalized_support_point_values_to_nodal_values (const std::vector<Vector<double> > &support_point_values,
+                                                          std::vector<double> &nodal_values) const
+{
+  const unsigned int deg = this->degree-1;
+  Assert (support_point_values.size () == this->generalized_support_points.size (),
+          ExcDimensionMismatch (support_point_values.size (),
+                                this->generalized_support_points.size ()));
+  Assert (support_point_values[0].size () == this->n_components (),
+          ExcDimensionMismatch (support_point_values[0].size (), this->n_components ()));
+  Assert (nodal_values.size () == this->dofs_per_cell,
+          ExcDimensionMismatch (nodal_values.size (), this->dofs_per_cell));
+  std::fill (nodal_values.begin (), nodal_values.end (), 0.0);
+
+  switch (dim)
+    {
+    case 2:
+    {
+      // Let us begin with the
+      // interpolation part.
+      const QGauss<dim - 1> reference_edge_quadrature (this->degree);
+      const unsigned int &
+      n_edge_points = reference_edge_quadrature.size ();
+
+      for (unsigned int i = 0; i < 2; ++i)
+        for (unsigned int j = 0; j < 2; ++j)
+          {
+            for (unsigned int q_point = 0; q_point < n_edge_points;
+                 ++q_point)
+              nodal_values[(i + 2 * j) * this->degree]
+              += reference_edge_quadrature.weight (q_point)
+                 * support_point_values[q_point + (i + 2 * j) * n_edge_points][1 - j];
+
+            // Add the computed support_point_values to the resulting vector
+            // only, if they are not
+            // too small.
+            if (std::abs (nodal_values[(i + 2 * j) * this->degree]) < 1e-14)
+              nodal_values[(i + 2 * j) * this->degree] = 0.0;
+          }
+
+      // If the degree is greater
+      // than 0, then we have still
+      // some higher order edge
+      // shape functions to
+      // consider.
+      // Here the projection part
+      // starts. The dof support_point_values
+      // are obtained by solving
+      // a linear system of
+      // equations.
+      if (this->degree-1 > 1)
+        {
+          // We start with projection
+          // on the higher order edge
+          // shape function.
+          const std::vector<Polynomials::Polynomial<double> > &
+          lobatto_polynomials
+            = Polynomials::Lobatto::generate_complete_basis
+              (this->degree);
+          FullMatrix<double> system_matrix (this->degree-1, this->degree-1);
+          std::vector<Polynomials::Polynomial<double> >
+          lobatto_polynomials_grad (this->degree);
+
+          for (unsigned int i = 0; i < lobatto_polynomials_grad.size ();
+               ++i)
+            lobatto_polynomials_grad[i]
+              = lobatto_polynomials[i + 1].derivative ();
+
+          // Set up the system matrix.
+          // This can be used for all
+          // edges.
+          for (unsigned int i = 0; i < system_matrix.m (); ++i)
+            for (unsigned int j = 0; j < system_matrix.n (); ++j)
+              for (unsigned int q_point = 0; q_point < n_edge_points;
+                   ++q_point)
+                system_matrix (i, j)
+                += boundary_weights (q_point, j)
+                   * lobatto_polynomials_grad[i + 1].value
+                   (this->generalized_face_support_points[q_point]
+                    (1));
+
+          FullMatrix<double> system_matrix_inv (this->degree-1, this->degree-1);
+
+          system_matrix_inv.invert (system_matrix);
+
+          const unsigned int
+          line_coordinate[GeometryInfo<2>::lines_per_cell]
+            = {1, 1, 0, 0};
+          Vector<double> system_rhs (system_matrix.m ());
+          Vector<double> solution (system_rhs.size ());
+
+          for (unsigned int line = 0;
+               line < GeometryInfo<dim>::lines_per_cell; ++line)
+            {
+              // Set up the right hand side.
+              system_rhs = 0;
+
+              for (unsigned int q_point = 0; q_point < n_edge_points;
+                   ++q_point)
+                {
+                  const double tmp
+                    = support_point_values[line * n_edge_points + q_point][line_coordinate[line]]
+                      - nodal_values[line * this->degree]
+                      * this->shape_value_component
+                      (line * this->degree,
+                       this->generalized_support_points[line
+                                                        * n_edge_points
+                                                        + q_point],
+                       line_coordinate[line]);
+
+                  for (unsigned int i = 0; i < system_rhs.size (); ++i)
+                    system_rhs (i) += boundary_weights (q_point, i) * tmp;
+                }
+
+              system_matrix_inv.vmult (solution, system_rhs);
+
+              // Add the computed support_point_values
+              // to the resulting vector
+              // only, if they are not
+              // too small.
+              for (unsigned int i = 0; i < solution.size (); ++i)
+                if (std::abs (solution (i)) > 1e-14)
+                  nodal_values[line * this->degree + i + 1] = solution (i);
+            }
+
+          // Then we go on to the
+          // interior shape
+          // functions. Again we
+          // set up the system
+          // matrix and use it
+          // for both, the
+          // horizontal and the
+          // vertical, interior
+          // shape functions.
+          const QGauss<dim> reference_quadrature (this->degree);
+          const unsigned int &
+          n_interior_points = reference_quadrature.size ();
+          const std::vector<Polynomials::Polynomial<double> > &
+          legendre_polynomials
+            = Polynomials::Legendre::generate_complete_basis (this->degree-1);
+
+          system_matrix.reinit ((this->degree-1) * this->degree,
+                                (this->degree-1) * this->degree);
+          system_matrix = 0;
+
+          for (unsigned int i = 0; i < this->degree; ++i)
+            for (unsigned int j = 0; j < this->degree-1; ++j)
+              for (unsigned int k = 0; k < this->degree; ++k)
+                for (unsigned int l = 0; l < this->degree-1; ++l)
+                  for (unsigned int q_point = 0;
+                       q_point < n_interior_points; ++q_point)
+                    system_matrix (i * (this->degree-1) + j, k * (this->degree-1) + l)
+                    += reference_quadrature.weight (q_point)
+                       * legendre_polynomials[i].value
+                       (this->generalized_support_points[q_point
+                                                         + GeometryInfo<dim>::lines_per_cell
+                                                         * n_edge_points]
+                        (0))
+                       * lobatto_polynomials[j + 2].value
+                       (this->generalized_support_points[q_point
+                                                         + GeometryInfo<dim>::lines_per_cell
+                                                         * n_edge_points]
+                        (1))
+                       * lobatto_polynomials_grad[k].value
+                       (this->generalized_support_points[q_point
+                                                         + GeometryInfo<dim>::lines_per_cell
+                                                         * n_edge_points]
+                        (0))
+                       * lobatto_polynomials[l + 2].value
+                       (this->generalized_support_points[q_point
+                                                         + GeometryInfo<dim>::lines_per_cell
+                                                         * n_edge_points]
+                        (1));
+
+          system_matrix_inv.reinit (system_matrix.m (),
+                                    system_matrix.m ());
+          system_matrix_inv.invert (system_matrix);
+          // Set up the right hand side
+          // for the horizontal shape
+          // functions.
+          system_rhs.reinit (system_matrix_inv.m ());
+          system_rhs = 0;
+
+          for (unsigned int q_point = 0; q_point < n_interior_points;
+               ++q_point)
+            {
+              double tmp
+                = support_point_values[q_point + GeometryInfo<dim>::lines_per_cell
+                                       * n_edge_points][0];
+
+              for (unsigned int i = 0; i < 2; ++i)
+                for (unsigned int j = 0; j <= deg; ++j)
+                  tmp -= nodal_values[(i + 2) * this->degree + j]
+                         * this->shape_value_component
+                         ((i + 2) * this->degree + j,
+                          this->generalized_support_points[q_point
+                                                           + GeometryInfo<dim>::lines_per_cell
+                                                           * n_edge_points],
+                          0);
+
+              for (unsigned int i = 0; i <= deg; ++i)
+                for (unsigned int j = 0; j < deg; ++j)
+                  system_rhs (i * deg + j)
+                  += reference_quadrature.weight (q_point) * tmp
+                     * lobatto_polynomials_grad[i].value
+                     (this->generalized_support_points[q_point
+                                                       + GeometryInfo<dim>::lines_per_cell
+                                                       * n_edge_points]
+                      (0))
+                     * lobatto_polynomials[j + 2].value
+                     (this->generalized_support_points[q_point
+                                                       + GeometryInfo<dim>::lines_per_cell
+                                                       * n_edge_points]
+                      (1));
+            }
+
+          solution.reinit (system_matrix.m ());
+          system_matrix_inv.vmult (solution, system_rhs);
+
+          // Add the computed support_point_values
+          // to the resulting vector
+          // only, if they are not
+          // too small.
+          for (unsigned int i = 0; i <= deg; ++i)
+            for (unsigned int j = 0; j < deg; ++j)
+              if (std::abs (solution (i * deg + j)) > 1e-14)
+                nodal_values[(i + GeometryInfo<dim>::lines_per_cell) * deg
+                             + j + GeometryInfo<dim>::lines_per_cell]
+                  = solution (i * deg + j);
+
+          system_rhs = 0;
+          // Set up the right hand side
+          // for the vertical shape
+          // functions.
+
+          for (unsigned int q_point = 0; q_point < n_interior_points;
+               ++q_point)
+            {
+              double tmp
+                = support_point_values[q_point + GeometryInfo<dim>::lines_per_cell
+                                       * n_edge_points][1];
+
+              for (unsigned int i = 0; i < 2; ++i)
+                for (unsigned int j = 0; j <= deg; ++j)
+                  tmp -= nodal_values[i * this->degree + j]
+                         * this->shape_value_component
+                         (i * this->degree + j,
+                          this->generalized_support_points[q_point
+                                                           + GeometryInfo<dim>::lines_per_cell
+                                                           * n_edge_points],
+                          1);
+
+              for (unsigned int i = 0; i <= deg; ++i)
+                for (unsigned int j = 0; j < deg; ++j)
+                  system_rhs (i * deg + j)
+                  += reference_quadrature.weight (q_point) * tmp
+                     * lobatto_polynomials_grad[i].value
+                     (this->generalized_support_points[q_point
+                                                       + GeometryInfo<dim>::lines_per_cell
+                                                       * n_edge_points]
+                      (1))
+                     * lobatto_polynomials[j + 2].value
+                     (this->generalized_support_points[q_point
+                                                       + GeometryInfo<dim>::lines_per_cell
+                                                       * n_edge_points]
+                      (0));
+            }
+
+          system_matrix_inv.vmult (solution, system_rhs);
+
+          // Add the computed support_point_values
+          // to the resulting vector
+          // only, if they are not
+          // too small.
+          for (unsigned int i = 0; i <= deg; ++i)
+            for (unsigned int j = 0; j < deg; ++j)
+              if (std::abs (solution (i * deg + j)) > 1e-14)
+                nodal_values[i + (j + GeometryInfo<dim>::lines_per_cell
+                                  + deg) * this->degree]
+                  = solution (i * deg + j);
+        }
+
+      break;
+    }
+
+    case 3:
+    {
+      // Let us begin with the
+      // interpolation part.
+      const QGauss<1> reference_edge_quadrature (this->degree);
+      const unsigned int &
+      n_edge_points = reference_edge_quadrature.size ();
+
+      for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point)
+        {
+          for (unsigned int i = 0; i < 4; ++i)
+            nodal_values[(i + 8) * this->degree]
+            += reference_edge_quadrature.weight (q_point)
+               * support_point_values[q_point + (i + 8) * n_edge_points][2];
+
+          for (unsigned int i = 0; i < 2; ++i)
+            for (unsigned int j = 0; j < 2; ++j)
+              for (unsigned int k = 0; k < 2; ++k)
+                nodal_values[(i + 2 * (2 * j + k)) * this->degree]
+                += reference_edge_quadrature.weight (q_point)
+                   * support_point_values[q_point + (i + 2 * (2 * j + k))
+                                          * n_edge_points][1 - k];
+        }
+
+      // Add the computed support_point_values
+      // to the resulting vector
+      // only, if they are not
+      // too small.
+      for (unsigned int i = 0; i < 4; ++i)
+        if (std::abs (nodal_values[(i + 8) * this->degree]) < 1e-14)
+          nodal_values[(i + 8) * this->degree] = 0.0;
+
+      for (unsigned int i = 0; i < 2; ++i)
+        for (unsigned int j = 0; j < 2; ++j)
+          for (unsigned int k = 0; k < 2; ++k)
+            if (std::abs (nodal_values[(i + 2 * (2 * j + k)) * this->degree])
+                < 1e-14)
+              nodal_values[(i + 2 * (2 * j + k)) * this->degree] = 0.0;
+
+      // If the degree is greater
+      // than 0, then we have still
+      // some higher order shape
+      // functions to consider.
+      // Here the projection part
+      // starts. The dof support_point_values
+      // are obtained by solving
+      // a linear system of
+      // equations.
+      if (this->degree > 1)
+        {
+          // We start with projection
+          // on the higher order edge
+          // shape function.
+          const std::vector<Polynomials::Polynomial<double> > &
+          lobatto_polynomials
+            = Polynomials::Lobatto::generate_complete_basis
+              (this->degree);
+          FullMatrix<double> system_matrix (this->degree-1, this->degree-1);
+          std::vector<Polynomials::Polynomial<double> >
+          lobatto_polynomials_grad (this->degree);
+
+          for (unsigned int i = 0; i < lobatto_polynomials_grad.size ();
+               ++i)
+            lobatto_polynomials_grad[i]
+              = lobatto_polynomials[i + 1].derivative ();
+
+          // Set up the system matrix.
+          // This can be used for all
+          // edges.
+          for (unsigned int i = 0; i < system_matrix.m (); ++i)
+            for (unsigned int j = 0; j < system_matrix.n (); ++j)
+              for (unsigned int q_point = 0; q_point < n_edge_points;
+                   ++q_point)
+                system_matrix (i, j)
+                += boundary_weights (q_point, j)
+                   * lobatto_polynomials_grad[i + 1].value
+                   (this->generalized_face_support_points[q_point]
+                    (1));
+
+          FullMatrix<double> system_matrix_inv (this->degree-1, this->degree-1);
+
+          system_matrix_inv.invert (system_matrix);
+
+          const unsigned int
+          line_coordinate[GeometryInfo<3>::lines_per_cell]
+            = {1, 1, 0, 0, 1, 1, 0, 0, 2, 2, 2, 2};
+          Vector<double> system_rhs (system_matrix.m ());
+          Vector<double> solution (system_rhs.size ());
+
+          for (unsigned int line = 0;
+               line < GeometryInfo<dim>::lines_per_cell; ++line)
+            {
+              // Set up the right hand side.
+              system_rhs = 0;
+
+              for (unsigned int q_point = 0; q_point < this->degree; ++q_point)
+                {
+                  const double tmp
+                    = support_point_values[line * this->degree
+                                           + q_point][line_coordinate[line]]
+                      - nodal_values[line * this->degree]
+                      * this->shape_value_component
+                      (line * this->degree,
+                       this->generalized_support_points[line
+                                                        * this->degree
+                                                        + q_point],
+                       line_coordinate[line]);
+
+                  for (unsigned int i = 0; i < system_rhs.size (); ++i)
+                    system_rhs (i) += boundary_weights (q_point, i)
+                                      * tmp;
+                }
+
+              system_matrix_inv.vmult (solution, system_rhs);
+
+              // Add the computed values
+              // to the resulting vector
+              // only, if they are not
+              // too small.
+              for (unsigned int i = 0; i < solution.size (); ++i)
+                if (std::abs (solution (i)) > 1e-14)
+                  nodal_values[line * this->degree + i + 1] = solution (i);
+            }
+
+          // Then we go on to the
+          // face shape functions.
+          // Again we set up the
+          // system matrix and
+          // use it for both, the
+          // horizontal and the
+          // vertical, shape
+          // functions.
+          const std::vector<Polynomials::Polynomial<double> > &
+          legendre_polynomials
+            = Polynomials::Legendre::generate_complete_basis (this->degree-1);
+          const unsigned int n_face_points = n_edge_points * n_edge_points;
+
+          system_matrix.reinit ((this->degree-1) * this->degree,
+                                (this->degree-1) * this->degree);
+          system_matrix = 0;
+
+          for (unsigned int i = 0; i < this->degree; ++i)
+            for (unsigned int j = 0; j < this->degree-1; ++j)
+              for (unsigned int k = 0; k < this->degree; ++k)
+                for (unsigned int l = 0; l < this->degree-1; ++l)
+                  for (unsigned int q_point = 0; q_point < n_face_points;
+                       ++q_point)
+                    system_matrix (i * (this->degree-1) + j, k * (this->degree-1) + l)
+                    += boundary_weights (q_point + n_edge_points,
+                                         2 * (k * (this->degree-1) + l))
+                       * legendre_polynomials[i].value
+                       (this->generalized_face_support_points[q_point
+                                                              + 4
+                                                              * n_edge_points]
+                        (0))
+                       * lobatto_polynomials[j + 2].value
+                       (this->generalized_face_support_points[q_point
+                                                              + 4
+                                                              * n_edge_points]
+                        (1));
+
+          system_matrix_inv.reinit (system_matrix.m (),
+                                    system_matrix.m ());
+          system_matrix_inv.invert (system_matrix);
+          solution.reinit (system_matrix.m ());
+          system_rhs.reinit (system_matrix.m ());
+
+          const unsigned int
+          face_coordinates[GeometryInfo<3>::faces_per_cell][2]
+          = {{1, 2}, {1, 2}, {2, 0}, {2, 0}, {0, 1}, {0, 1}};
+          const unsigned int
+          edge_indices[GeometryInfo<3>::faces_per_cell][GeometryInfo<3>::lines_per_face]
+          = {{0, 4, 8, 10}, {1, 5, 9, 11}, {8, 9, 2, 6},
+            {10, 11, 3, 7}, {2, 3, 0, 1}, {6, 7, 4, 5}
+          };
+
+          for (unsigned int face = 0;
+               face < GeometryInfo<dim>::faces_per_cell; ++face)
+            {
+              // Set up the right hand side
+              // for the horizontal shape
+              // functions.
+              system_rhs = 0;
+
+              for (unsigned int q_point = 0; q_point < n_face_points;
+                   ++q_point)
+                {
+                  double tmp
+                    = support_point_values[q_point
+                                           + GeometryInfo<dim>::lines_per_cell
+                                           * n_edge_points][face_coordinates[face][0]];
+
+                  for (unsigned int i = 0; i < 2; ++i)
+                    for (unsigned int j = 0; j <= deg; ++j)
+                      tmp -= nodal_values[edge_indices[face][i]
+                                          * this->degree + j]
+                             * this->shape_value_component
+                             (edge_indices[face][i] * this->degree + j,
+                              this->generalized_support_points[q_point
+                                                               + GeometryInfo<dim>::lines_per_cell
+                                                               * n_edge_points],
+                              face_coordinates[face][0]);
+
+                  for (unsigned int i = 0; i <= deg; ++i)
+                    for (unsigned int j = 0; j < deg; ++j)
+                      system_rhs (i * deg + j)
+                      += boundary_weights (q_point + n_edge_points,
+                                           2 * (i * deg + j)) * tmp;
+                }
+
+              system_matrix_inv.vmult (solution, system_rhs);
+
+              // Add the computed support_point_values
+              // to the resulting vector
+              // only, if they are not
+              // too small.
+              for (unsigned int i = 0; i <= deg; ++i)
+                for (unsigned int j = 0; j < deg; ++j)
+                  if (std::abs (solution (i * deg + j)) > 1e-14)
+                    nodal_values[(2 * face * this->degree + i
+                                  + GeometryInfo<dim>::lines_per_cell) * deg
+                                 + j + GeometryInfo<dim>::lines_per_cell]
+                      = solution (i * deg + j);
+
+              // Set up the right hand side
+              // for the vertical shape
+              // functions.
+              system_rhs = 0;
+
+              for (unsigned int q_point = 0; q_point < n_face_points;
+                   ++q_point)
+                {
+                  double tmp
+                    = support_point_values[q_point
+                                           + GeometryInfo<dim>::lines_per_cell
+                                           * n_edge_points][face_coordinates[face][1]];
+
+                  for (int i = 2; i < (int) GeometryInfo<dim>::lines_per_face; ++i)
+                    for (unsigned int j = 0; j <= deg; ++j)
+                      tmp -= nodal_values[edge_indices[face][i]
+                                          * this->degree + j]
+                             * this->shape_value_component
+                             (edge_indices[face][i] * this->degree + j,
+                              this->generalized_support_points[q_point
+                                                               + GeometryInfo<dim>::lines_per_cell
+                                                               * n_edge_points],
+                              face_coordinates[face][1]);
+
+                  for (unsigned int i = 0; i <= deg; ++i)
+                    for (unsigned int j = 0; j < deg; ++j)
+                      system_rhs (i * deg + j)
+                      += boundary_weights (q_point + n_edge_points,
+                                           2 * (i * deg + j) + 1)
+                         * tmp;
+                }
+
+              system_matrix_inv.vmult (solution, system_rhs);
+
+              // Add the computed support_point_values
+              // to the resulting vector
+              // only, if they are not
+              // too small.
+              for (unsigned int i = 0; i <= deg; ++i)
+                for (unsigned int j = 0; j < deg; ++j)
+                  if (std::abs (solution (i * deg + j)) > 1e-14)
+                    nodal_values[((2 * face + 1) * deg + j + GeometryInfo<dim>::lines_per_cell)
+                                 * this->degree + i]
+                      = solution (i * deg + j);
+            }
+
+          // Finally we project
+          // the remaining parts
+          // of the function on
+          // the interior shape
+          // functions.
+          const QGauss<dim> reference_quadrature (this->degree);
+          const unsigned int
+          n_interior_points = reference_quadrature.size ();
+
+          // We create the
+          // system matrix.
+          system_matrix.reinit (this->degree * deg * deg,
+                                this->degree * deg * deg);
+          system_matrix = 0;
+
+          for (unsigned int i = 0; i <= deg; ++i)
+            for (unsigned int j = 0; j < deg; ++j)
+              for (unsigned int k = 0; k < deg; ++k)
+                for (unsigned int l = 0; l <= deg; ++l)
+                  for (unsigned int m = 0; m < deg; ++m)
+                    for (unsigned int n = 0; n < deg; ++n)
+                      for (unsigned int q_point = 0;
+                           q_point < n_interior_points; ++q_point)
+                        system_matrix ((i * deg + j) * deg + k,
+                                       (l * deg + m) * deg + n)
+                        += reference_quadrature.weight (q_point)
+                           * legendre_polynomials[i].value
+                           (this->generalized_support_points[q_point
+                                                             + GeometryInfo<dim>::lines_per_cell
+                                                             * n_edge_points
+                                                             + GeometryInfo<dim>::faces_per_cell
+                                                             * n_face_points]
+                            (0))
+                           * lobatto_polynomials[j + 2].value
+                           (this->generalized_support_points[q_point
+                                                             + GeometryInfo<dim>::lines_per_cell
+                                                             * n_edge_points
+                                                             + GeometryInfo<dim>::faces_per_cell
+                                                             * n_face_points]
+                            (1))
+                           * lobatto_polynomials[k + 2].value
+                           (this->generalized_support_points[q_point
+                                                             + GeometryInfo<dim>::lines_per_cell
+                                                             * n_edge_points
+                                                             + GeometryInfo<dim>::faces_per_cell
+                                                             * n_face_points]
+                            (2))
+                           * lobatto_polynomials_grad[l].value
+                           (this->generalized_support_points[q_point
+                                                             + GeometryInfo<dim>::lines_per_cell
+                                                             * n_edge_points
+                                                             + GeometryInfo<dim>::faces_per_cell
+                                                             * n_face_points]
+                            (0))
+                           * lobatto_polynomials[m + 2].value
+                           (this->generalized_support_points[q_point
+                                                             + GeometryInfo<dim>::lines_per_cell
+                                                             * n_edge_points
+                                                             + GeometryInfo<dim>::faces_per_cell
+                                                             * n_face_points]
+                            (1))
+                           * lobatto_polynomials[n + 2].value
+                           (this->generalized_support_points[q_point
+                                                             + GeometryInfo<dim>::lines_per_cell
+                                                             * n_edge_points
+                                                             + GeometryInfo<dim>::faces_per_cell
+                                                             * n_face_points]
+                            (2));
+
+          system_matrix_inv.reinit (system_matrix.m (),
+                                    system_matrix.m ());
+          system_matrix_inv.invert (system_matrix);
+          // Set up the right hand side.
+          system_rhs.reinit (system_matrix.m ());
+          system_rhs = 0;
+
+          for (unsigned int q_point = 0; q_point < n_interior_points;
+               ++q_point)
+            {
+              double tmp
+                = support_point_values[q_point + GeometryInfo<dim>::lines_per_cell
+                                       * n_edge_points
+                                       + GeometryInfo<dim>::faces_per_cell
+                                       * n_face_points][0];
+
+              for (unsigned int i = 0; i <= deg; ++i)
+                {
+                  for (unsigned int j = 0; j < 2; ++j)
+                    for (unsigned int k = 0; k < 2; ++k)
+                      tmp -= nodal_values[i + (j + 4 * k + 2) * this->degree]
+                             * this->shape_value_component
+                             (i + (j + 4 * k + 2) * this->degree,
+                              this->generalized_support_points[q_point
+                                                               + GeometryInfo<dim>::lines_per_cell
+                                                               * n_edge_points
+                                                               + GeometryInfo<dim>::faces_per_cell
+                                                               * n_face_points],
+                              0);
+
+                  for (unsigned int j = 0; j < deg; ++j)
+                    for (unsigned int k = 0; k < 4; ++k)
+                      tmp -= nodal_values[(i + 2 * (k + 2) * this->degree
+                                           + GeometryInfo<dim>::lines_per_cell)
+                                          * deg + j
+                                          + GeometryInfo<dim>::lines_per_cell]
+                             * this->shape_value_component
+                             ((i + 2 * (k + 2) * this->degree
+                               + GeometryInfo<dim>::lines_per_cell)
+                              * deg + j
+                              + GeometryInfo<dim>::lines_per_cell,
+                              this->generalized_support_points[q_point
+                                                               + GeometryInfo<dim>::lines_per_cell
+                                                               * n_edge_points
+                                                               + GeometryInfo<dim>::faces_per_cell
+                                                               * n_face_points],
+                              0);
+                }
+
+              for (unsigned int i = 0; i <= deg; ++i)
+                for (unsigned int j = 0; j < deg; ++j)
+                  for (unsigned int k = 0; k < deg; ++k)
+                    system_rhs ((i * deg + j) * deg + k)
+                    += reference_quadrature.weight (q_point) * tmp
+                       * lobatto_polynomials_grad[i].value
+                       (this->generalized_support_points[q_point
+                                                         + GeometryInfo<dim>::lines_per_cell
+                                                         * n_edge_points
+                                                         + GeometryInfo<dim>::faces_per_cell
+                                                         * n_face_points]
+                        (0))
+                       * lobatto_polynomials[j + 2].value
+                       (this->generalized_support_points[q_point
+                                                         + GeometryInfo<dim>::lines_per_cell
+                                                         * n_edge_points
+                                                         + GeometryInfo<dim>::faces_per_cell
+                                                         * n_face_points]
+                        (1))
+                       * lobatto_polynomials[k + 2].value
+                       (this->generalized_support_points[q_point
+                                                         + GeometryInfo<dim>::lines_per_cell
+                                                         * n_edge_points
+                                                         + GeometryInfo<dim>::faces_per_cell
+                                                         * n_face_points]
+                        (2));
+            }
+
+          solution.reinit (system_rhs.size ());
+          system_matrix_inv.vmult (solution, system_rhs);
+
+          // Add the computed values
+          // to the resulting vector
+          // only, if they are not
+          // too small.
+          for (unsigned int i = 0; i <= deg; ++i)
+            for (unsigned int j = 0; j < deg; ++j)
+              for (unsigned int k = 0; k < deg; ++k)
+                if (std::abs (solution ((i * deg + j) * deg + k)) > 1e-14)
+                  nodal_values[((i + 2 * GeometryInfo<dim>::faces_per_cell)
+                                * deg + j + GeometryInfo<dim>::lines_per_cell
+                                + 2 * GeometryInfo<dim>::faces_per_cell)
+                               * deg + k + GeometryInfo<dim>::lines_per_cell]
+                    = solution ((i * deg + j) * deg + k);
+
+          // Set up the right hand side.
+          system_rhs = 0;
+
+          for (unsigned int q_point = 0; q_point < n_interior_points;
+               ++q_point)
+            {
+              double tmp
+                = support_point_values[q_point + GeometryInfo<dim>::lines_per_cell
+                                       * n_edge_points
+                                       + GeometryInfo<dim>::faces_per_cell
+                                       * n_face_points][1];
+
+              for (unsigned int i = 0; i <= deg; ++i)
+                for (unsigned int j = 0; j < 2; ++j)
+                  {
+                    for (unsigned int k = 0; k < 2; ++k)
+                      tmp -= nodal_values[i + (4 * j + k) * this->degree]
+                             * this->shape_value_component
+                             (i + (4 * j + k) * this->degree,
+                              this->generalized_support_points[q_point
+                                                               + GeometryInfo<dim>::lines_per_cell
+                                                               * n_edge_points
+                                                               + GeometryInfo<dim>::faces_per_cell
+                                                               * n_face_points],
+                              1);
+
+                    for (unsigned int k = 0; k < deg; ++k)
+                      tmp -= nodal_values[(i + 2 * j * this->degree
+                                           + GeometryInfo<dim>::lines_per_cell)
+                                          * deg + k
+                                          + GeometryInfo<dim>::lines_per_cell]
+                             * this->shape_value_component
+                             ((i + 2 * j * this->degree
+                               + GeometryInfo<dim>::lines_per_cell)
+                              * deg + k
+                              + GeometryInfo<dim>::lines_per_cell,
+                              this->generalized_support_points[q_point
+                                                               + GeometryInfo<dim>::lines_per_cell
+                                                               * n_edge_points
+                                                               + GeometryInfo<dim>::faces_per_cell
+                                                               * n_face_points],
+                              1)
+                             + nodal_values[i + ((2 * j + 9) * deg + k
+                                                 + GeometryInfo<dim>::lines_per_cell)
+                                            * this->degree]
+                             * this->shape_value_component
+                             (i + ((2 * j + 9) * deg + k
+                                   + GeometryInfo<dim>::lines_per_cell)
+                              * this->degree,
+                              this->generalized_support_points[q_point
+                                                               + GeometryInfo<dim>::lines_per_cell
+                                                               * n_edge_points
+                                                               + GeometryInfo<dim>::faces_per_cell
+                                                               * n_face_points],
+                              1);
+                  }
+
+              for (unsigned int i = 0; i <= deg; ++i)
+                for (unsigned int j = 0; j < deg; ++j)
+                  for (unsigned int k = 0; k < deg; ++k)
+                    system_rhs ((i * deg + j) * deg + k)
+                    += reference_quadrature.weight (q_point) * tmp
+                       * lobatto_polynomials_grad[i].value
+                       (this->generalized_support_points[q_point
+                                                         + GeometryInfo<dim>::lines_per_cell
+                                                         * n_edge_points
+                                                         + GeometryInfo<dim>::faces_per_cell
+                                                         * n_face_points]
+                        (1))
+                       * lobatto_polynomials[j + 2].value
+                       (this->generalized_support_points[q_point
+                                                         + GeometryInfo<dim>::lines_per_cell
+                                                         * n_edge_points
+                                                         + GeometryInfo<dim>::faces_per_cell
+                                                         * n_face_points]
+                        (0))
+                       * lobatto_polynomials[k + 2].value
+                       (this->generalized_support_points[q_point
+                                                         + GeometryInfo<dim>::lines_per_cell
+                                                         * n_edge_points
+                                                         + GeometryInfo<dim>::faces_per_cell
+                                                         * n_face_points]
+                        (2));
+            }
+
+          system_matrix_inv.vmult (solution, system_rhs);
+
+          // Add the computed support_point_values
+          // to the resulting vector
+          // only, if they are not
+          // too small.
+          for (unsigned int i = 0; i <= deg; ++i)
+            for (unsigned int j = 0; j < deg; ++j)
+              for (unsigned int k = 0; k < deg; ++k)
+                if (std::abs (solution ((i * deg + j) * deg + k)) > 1e-14)
+                  nodal_values[((i + this->degree + 2
+                                 * GeometryInfo<dim>::faces_per_cell) * deg
+                                + j + GeometryInfo<dim>::lines_per_cell + 2
+                                * GeometryInfo<dim>::faces_per_cell) * deg
+                               + k + GeometryInfo<dim>::lines_per_cell]
+                    = solution ((i * deg + j) * deg + k);
+
+          // Set up the right hand side.
+          system_rhs = 0;
+
+          for (unsigned int q_point = 0; q_point < n_interior_points;
+               ++q_point)
+            {
+              double tmp
+                = support_point_values[q_point + GeometryInfo<dim>::lines_per_cell
+                                       * n_edge_points
+                                       + GeometryInfo<dim>::faces_per_cell
+                                       * n_face_points][2];
+
+              for (unsigned int i = 0; i <= deg; ++i)
+                for (unsigned int j = 0; j < 4; ++j)
+                  {
+                    tmp -= nodal_values[i + (j + 8) * this->degree]
+                           * this->shape_value_component
+                           (i + (j + 8) * this->degree,
+                            this->generalized_support_points[q_point
+                                                             + GeometryInfo<dim>::lines_per_cell
+                                                             * n_edge_points
+                                                             + GeometryInfo<dim>::faces_per_cell
+                                                             * n_face_points],
+                            2);
+
+                    for (unsigned int k = 0; k < deg; ++k)
+                      tmp -= nodal_values[i + ((2 * j + 1) * deg + k
+                                               + GeometryInfo<dim>::lines_per_cell)
+                                          * this->degree]
+                             * this->shape_value_component
+                             (i + ((2 * j + 1) * deg + k
+                                   + GeometryInfo<dim>::lines_per_cell)
+                              * this->degree,
+                              this->generalized_support_points[q_point
+                                                               + GeometryInfo<dim>::lines_per_cell
+                                                               * n_edge_points
+                                                               + GeometryInfo<dim>::faces_per_cell
+                                                               * n_face_points],
+                              2);
+                  }
+
+              for (unsigned int i = 0; i <= deg; ++i)
+                for (unsigned int j = 0; j < deg; ++j)
+                  for (unsigned int k = 0; k < deg; ++k)
+                    system_rhs ((i * deg + j) * deg + k)
+                    += reference_quadrature.weight (q_point) * tmp
+                       * lobatto_polynomials_grad[i].value
+                       (this->generalized_support_points[q_point
+                                                         + GeometryInfo<dim>::lines_per_cell
+                                                         * n_edge_points
+                                                         + GeometryInfo<dim>::faces_per_cell
+                                                         * n_face_points]
+                        (2))
+                       * lobatto_polynomials[j + 2].value
+                       (this->generalized_support_points[q_point
+                                                         + GeometryInfo<dim>::lines_per_cell
+                                                         * n_edge_points
+                                                         + GeometryInfo<dim>::faces_per_cell
+                                                         * n_face_points]
+                        (0))
+                       * lobatto_polynomials[k + 2].value
+                       (this->generalized_support_points[q_point
+                                                         + GeometryInfo<dim>::lines_per_cell
+                                                         * n_edge_points
+                                                         + GeometryInfo<dim>::faces_per_cell
+                                                         * n_face_points]
+                        (1));
+            }
+
+          system_matrix_inv.vmult (solution, system_rhs);
+
+          // Add the computed support_point_values
+          // to the resulting vector
+          // only, if they are not
+          // too small.
+          for (unsigned int i = 0; i <= deg; ++i)
+            for (unsigned int j = 0; j < deg; ++j)
+              for (unsigned int k = 0; k < deg; ++k)
+                if (std::abs (solution ((i * deg + j) * deg + k)) > 1e-14)
+                  nodal_values[i + ((j + 2 * (deg
+                                              + GeometryInfo<dim>::faces_per_cell))
+                                    * deg + k
+                                    + GeometryInfo<dim>::lines_per_cell)
+                               * this->degree]
+                    = solution ((i * deg + j) * deg + k);
+        }
+
+      break;
+    }
+
+    default:
+      Assert (false, ExcNotImplemented ());
+    }
+}
+
+
+
+
+
 // Since this is a vector valued element,
 // we cannot interpolate a scalar function.
 template <int dim>
