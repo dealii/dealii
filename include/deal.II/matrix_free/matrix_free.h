@@ -2529,9 +2529,11 @@ MatrixFree<dim, Number>::cell_loop
                       if (spawn_index_child == -1)
                         worker[spawn_index]->spawn(*blocked_worker[(part-1)/2]);
                       else
-                        worker[spawn_index]->spawn(*worker[spawn_index_child]);
+                        {
+                          Assert(spawn_index_child>=0, ExcInternalError());
+                          worker[spawn_index]->spawn(*worker[spawn_index_child]);
+                        }
                       spawn_index = spawn_index_new;
-                      spawn_index_child = -2;
                     }
                   else
                     {
@@ -2587,7 +2589,10 @@ MatrixFree<dim, Number>::cell_loop
                     }
                 }
               if (evens==odds)
-                worker[spawn_index]->spawn(*worker[spawn_index_child]);
+                {
+                  Assert(spawn_index_child>=0, ExcInternalError());
+                  worker[spawn_index]->spawn(*worker[spawn_index_child]);
+                }
               root->wait_for_all();
               root->destroy(*root);
             }
