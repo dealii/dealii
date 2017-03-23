@@ -36,11 +36,6 @@
 ########################################################################
 
 #
-# backwards compatibility with the old DEAL_II_CXX11_FLAG option
-#
-SET_IF_EMPTY(DEAL_II_CXX_VERSION_FLAG "${DEAL_II_CXX11_FLAG}")
-
-#
 # Check the user supplied DEAL_II_CXX_VERSION_FLAG
 #
 
