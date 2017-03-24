@@ -1,0 +1,6 @@
+New: The FEEvaluation::read_dof_values and
+FEEvaluation::distribute_local_to_global now use dedicate gather (AVX2,
+AVX-512) and scatter (AVX-512) instructions for faster vector access if those
+are available.
+<br>
+(Martin Kronbichler, 2017/03/24)

@@ -1,0 +1,6 @@
+New: The tensor product kernels used by FEEvaluation have gained a faster
+variant for evaluating gradients derived from spectral identities. This
+improves performance of the Laplace operator evaluation by 10-20% in the
+computation-bound case.
+<br>
+(Martin Kronbichler, 2017/03/24)
