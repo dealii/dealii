@@ -105,7 +105,7 @@ ExceptionBase::ExceptionBase (const ExceptionBase &exc)
 
 
 
-ExceptionBase::~ExceptionBase () DEAL_II_NOEXCEPT
+ExceptionBase::~ExceptionBase () noexcept
 {
   free (stacktrace); // free(NULL) is allowed
   stacktrace = NULL;
@@ -135,7 +135,7 @@ void ExceptionBase::set_fields (const char *f,
 #endif
 }
 
-const char *ExceptionBase::what() const DEAL_II_NOEXCEPT
+const char *ExceptionBase::what() const noexcept
 {
   // If no error c_string was generated so far, do it now:
   if (what_str == "")
