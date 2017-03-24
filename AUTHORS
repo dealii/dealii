@@ -1,0 +1,186 @@
+deal.II Authors
+===============
+
+   deal.II is a global project. It is administered by a group of principal
+   developers. Technical decisions are made by the principal developers
+   and a group of developers consisting of long-term contributors with a
+   global overview of the library. A large number of contributors have
+   provided substantial patches over the years. These three groups are
+   listed below.
+
+Principal developers
+--------------------
+
+     * Wolfgang Bangerth, Colorado State University, CO, USA
+     * Timo Heister, Clemson University, SC, USA
+     * Guido Kanschat, Universität Heidelberg, Germany
+     * Matthias Maier, University of Minnesota, Minneapolis, MN, USA
+
+Developers
+----------
+
+     * Daniel Arndt, University of Heidelberg, Germany
+     * Denis Davydov, University of Erlangen-Nuremberg, Germany
+     * Luca Heltai, SISSA, Trieste, Italy
+     * Martin Kronbichler, Technical University of Munich, Germany
+     * Jean-Paul Pelteret, University of Erlangen-Nuremberg, Germany
+     * Bruno Turcksin, Oak Ridge National Laboratory, USA
+     * David Wells, Rensselaer Polytechnic Institute, NY, USA
+     * Toby D. Young, Polish Academy of Sciences, Poland
+
+Contributors
+------------
+
+   Many people have contributed to deal.II over the years, some of them
+   very substantial parts of the library. Their work is greatly
+   appreciated: no open source project can survice without a community.
+   The following people contributed major parts of the library (in
+   alphabetical order), with many more that have sent in fixes and small
+   enhancements:
+
+     * Abner Salgado-Gonzalez
+     * Adam Kosik
+     * Adam Powell IV
+     * Alberto Sartori
+     * Alexander Grayver
+     * Alex Kokomov
+     * Ali Samii
+     * Alistair Bentley
+     * Andrea Bonito
+     * Andrea Mola
+     * Andreas Putz
+     * Andre Massing
+     * Andrew Baker
+     * Andrew McBride
+     * Angela Klewinghaus
+     * Angel Rodriguez
+     * Anna Schneebeli
+     * Anton Evgrafov
+     * Arezou Ghesmati
+     * Armin Ghajar Jazi
+     * Aslan Kosakian
+     * Bärbel Janssen
+     * Benjamin Brands
+     * Benjamin Shelton Kirk
+     * Ben Thompson
+     * Brian Carnes
+     * Cataldo Manigrasso
+     * Ce Qin
+     * Chih-Che Chueh
+     * Christian Goll
+     * Christian Wülker
+     * Christophe Trophime
+     * Christoph Heiniger
+     * Claire Bruna-Rosso
+     * Conrad Clevenger
+     * Craig Michoski
+     * Dakshina Ilangovan
+     * Damien Lebrun-Grandie
+     * Daniel Castanon Quiroz
+     * Daniel Jodlbauer
+     * Daniel Shapero
+     * Daniel Weygand
+     * David Neckels
+     * Dragan Nikolic
+     * Dustin Kumor
+     * Eldar Khattatov
+     * Eric Heien
+     * Fahad Alrashed
+     * Felix Gruber
+     * Fernando Posada
+     * Florian Prill
+     * Florian Sonner
+     * Franz-Theo Suttmeier
+     * Gennadiy Rishin
+     * Giorgos Kourakos
+     * Giuseppe Pitton
+     * Habib Talavatifard
+     * Heikki Virtanen
+     * Helmut Müller
+     * Ian Rose
+     * Ivan Christov
+     * Jaeryun Yim
+     * Jan Schrage
+     * Jan Stebel
+     * Jason Sheldon
+     * Jihuan Tian
+     * John Burnell
+     * Jonathan Perry-Houts
+     * Jonathan Pitt
+     * Jonathan Robey
+     * Jordan Cazamias
+     * Jörg Frohne
+     * Joscha Gedicke
+     * Jose Javier Munoz Criollo
+     * Joshua White
+     * Juan Carlos Araujo Cabarcas
+     * Juliane Dannberg
+     * Justin Kauffman
+     * Kainan Wang
+     * Karl Ljungkvist
+     * Katharina Kormann
+     * Kevin Drzycimski
+     * Kevin Dugan
+     * Konstantin Ladutenko
+     * Krysztof Bzowski
+     * Lei Qiao
+     * Liang Zhao
+     * Lukas Korous
+     * Maien Hamed
+     * Manuel Quezada de Luna
+     * Marco Borelli
+     * Marco Engelhard
+     * Marco Tezzele
+     * Markus Bürg
+     * Martin Genet
+     * Martin Steigemann
+     * Mathias Mentler
+     * Mauro Bardelloni
+     * Mayank Sabharwal
+     * Menno Fraters
+     * Michael Anderson
+     * Michael F. Herbst
+     * Michael Harmon
+     * Michael Rapson
+     * Michael Stadler
+     * Michal Wichrowski
+     * Mihai Alexe
+     * Minh Do-Quang
+     * Moritz Allmaras
+     * M. Sebastian Pauletti
+     * Nicola Cavallini
+     * Nicola Demo
+     * Nicola Giuliani
+     * Niklas Fehn
+     * Oleh Krehel
+     * Oliver Kayser-Herold
+     * Patrick Esser
+     * Paul Kuberry
+     * Praveen C
+     * Rajat Arora
+     * Ralf B. Schulz
+     * Ralf Hartmann
+     * Rene Gassmoeller
+     * Ross Kynch
+     * Ryan Grove
+     * Sam Cox
+     * Scott Miller
+     * Sebastian Gonzalez-Pintor
+     * Seungil Kim
+     * Shiva Rudraraju
+     * Simon Sticko
+     * Spencer Patty
+     * Stefan Nauber
+     * Sven Wetterauer
+     * Thomas Geenen
+     * Thomas Richter
+     * Tobias Leicht
+     * Uwe Köcher
+     * Vaibhav Palkar
+     * Valentin Zingan
+     * Vijay Mahadevan
+     * Xing Jin
+     * Yan Li
+     * Yaqi Wang
+     * Yuhan Zhou
+     * Zhen Tao
