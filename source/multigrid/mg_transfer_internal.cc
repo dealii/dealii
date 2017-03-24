@@ -456,6 +456,11 @@ namespace internal
                         std::vector<std::vector<std::pair<unsigned int, unsigned int> > >   &copy_indices_global_mine,
                         MGLevelObject<LinearAlgebra::distributed::Vector<Number> >          &ghosted_level_vector)
     {
+      level_dof_indices.clear();
+      parent_child_connect.clear();
+      n_owned_level_cells.clear();
+      dirichlet_indices.clear();
+      weights_on_refined.clear();
 
       // we collect all child DoFs of a mother cell together. For faster
       // tensorized operations, we align the degrees of freedom
