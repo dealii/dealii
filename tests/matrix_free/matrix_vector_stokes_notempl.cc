@@ -307,8 +307,7 @@ void test (const unsigned int fe_degree)
     // no parallelism
     mf_data.reinit (mapping, dofs, constraints, quad,
                     typename MatrixFree<dim>::AdditionalData
-                    (MPI_COMM_WORLD,
-                     MatrixFree<dim>::AdditionalData::none));
+                    (MatrixFree<dim>::AdditionalData::none));
   }
 
   system_matrix.vmult (solution, system_rhs);

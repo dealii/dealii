@@ -307,7 +307,7 @@ void test ()
     for (unsigned int no=0; no<2; ++no)
       quad.push_back(QGauss<1>(fe_degree+1+no));
     mf_data.reinit (dof, constraints, quad,
-                    typename MatrixFree<dim,number>::AdditionalData(MPI_COMM_SELF,MatrixFree<dim,number>::AdditionalData::none));
+                    typename MatrixFree<dim,number>::AdditionalData(MatrixFree<dim,number>::AdditionalData::none));
   }
 
   MatrixFreeTest<dim,fe_degree,number> mf (mf_data);
