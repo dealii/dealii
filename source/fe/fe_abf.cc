@@ -558,7 +558,7 @@ convert_generalized_support_point_values_to_nodal_values (const std::vector<Vect
           unsigned int k = QProjector<dim>::DataSetDescriptor::face (face, false, false, false, n_face_points);
           for (unsigned int i=0; i<boundary_weights_abf.size(1); ++i)
             nodal_values[start_abf_dofs+i] += n_orient * boundary_weights_abf(k + fp, i)
-                                              * support_point_values[k + fp][GeometryInfo<dim>::unit_normal_direction[face]];
+                                              * support_point_values[face*n_face_points+fp][GeometryInfo<dim>::unit_normal_direction[face]];
         }
     }
 
@@ -632,7 +632,7 @@ FE_ABF<dim>::interpolate(
           unsigned int k = QProjector<dim>::DataSetDescriptor::face (face, false, false, false, n_face_points);
           for (unsigned int i=0; i<boundary_weights_abf.size(1); ++i)
             local_dofs[start_abf_dofs+i] += n_orient * boundary_weights_abf(k + fp, i)
-                                            * values[k + fp](GeometryInfo<dim>::unit_normal_direction[face]+offset);
+                                            * values[face*n_face_points+fp](GeometryInfo<dim>::unit_normal_direction[face]+offset);
         }
     }
 
@@ -694,7 +694,7 @@ FE_ABF<dim>::interpolate(
           unsigned int k = QProjector<dim>::DataSetDescriptor::face (face, false, false, false, n_face_points);
           for (unsigned int i=0; i<boundary_weights_abf.size(1); ++i)
             local_dofs[start_abf_dofs+i] += n_orient * boundary_weights_abf(k + fp, i)
-                                            * values[GeometryInfo<dim>::unit_normal_direction[face]][k + fp];
+                                            * values[GeometryInfo<dim>::unit_normal_direction[face]][face*n_face_points+fp];
         }
     }
 
