@@ -20,8 +20,6 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/memory_consumption.h>
-#include <deal.II/base/std_cxx11/array.h>
-#include <deal.II/base/std_cxx11/unique_ptr.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -33,6 +31,8 @@
 
 #include <cmath>
 #include <algorithm>
+#include <array>
+#include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN

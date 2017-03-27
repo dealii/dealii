@@ -21,7 +21,6 @@
 #include <deal.II/meshworker/assembler.h>
 #include <deal.II/meshworker/loop.h>
 
-#include <deal.II/base/std_cxx11/function.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -29,6 +28,7 @@
 #include <deal.II/lac/block_vector.h>
 
 #include <fstream>
+#include <functional>
 #include <iomanip>
 
 using namespace dealii;
@@ -117,9 +117,9 @@ test_mesh(DoFHandler<dim> &mgdofs)
   MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, EmptyInfoBox>
   (dofs.begin_active(), dofs.end(),
    dof_info, info_box,
-   std_cxx11::bind (&Local<dim>::cell, local, std_cxx11::_1, std_cxx11::_2),
-   std_cxx11::bind (&Local<dim>::bdry, local, std_cxx11::_1, std_cxx11::_2),
-   std_cxx11::bind (&Local<dim>::face, local, std_cxx11::_1, std_cxx11::_2, std_cxx11::_3, std_cxx11::_4),
+   std::bind (&Local<dim>::cell, local, std::placeholders::_1, std::placeholders::_2),
+   std::bind (&Local<dim>::bdry, local, std::placeholders::_1, std::placeholders::_2),
+   std::bind (&Local<dim>::face, local, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4),
    assembler, lctrl);
 
   deallog << "  Results cells";
@@ -139,9 +139,9 @@ test_mesh(DoFHandler<dim> &mgdofs)
   MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, EmptyInfoBox>
   (mgdofs.begin_mg(), mgdofs.end_mg(),
    mg_dof_info, info_box,
-   std_cxx11::bind (&Local<dim>::cell, local, std_cxx11::_1, std_cxx11::_2),
-   std_cxx11::bind (&Local<dim>::bdry, local, std_cxx11::_1, std_cxx11::_2),
-   std_cxx11::bind (&Local<dim>::face, local, std_cxx11::_1, std_cxx11::_2, std_cxx11::_3, std_cxx11::_4),
+   std::bind (&Local<dim>::cell, local, std::placeholders::_1, std::placeholders::_2),
+   std::bind (&Local<dim>::bdry, local, std::placeholders::_1, std::placeholders::_2),
+   std::bind (&Local<dim>::face, local, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4),
    assembler, lctrl);
 
   deallog << "MGResults cells";

@@ -20,7 +20,9 @@
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/std_cxx11/array.h>
+
+
+#include <array>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -92,7 +94,7 @@ namespace Functions
      * Return the value at point @p sp. Here, @p sp is provided in spherical
      * coordinates.
      */
-    virtual double svalue(const std_cxx11::array<double, dim> &sp,
+    virtual double svalue(const std::array<double, dim> &sp,
                           const unsigned int component) const;
 
     /**
@@ -101,8 +103,8 @@ namespace Functions
      * The returned object should contain derivatives in the following order:
      * $\{ f_{,r},\, f_{,\theta},\, f_{,\phi}\}$.
      */
-    virtual std_cxx11::array<double, dim> sgradient(const std_cxx11::array<double, dim> &sp,
-                                                    const unsigned int component) const;
+    virtual std::array<double, dim> sgradient(const std::array<double, dim> &sp,
+                                              const unsigned int component) const;
 
     /**
      * Return the Hessian in spherical coordinates.
@@ -110,8 +112,8 @@ namespace Functions
      * The returned object should contain derivatives in the following order:
      * $\{ f_{,rr},\, f_{,\theta\theta},\, f_{,\phi\phi},\, f_{,r\theta},\, f_{,r\phi},\, f_{,\theta\phi}\}$.
      */
-    virtual std_cxx11::array<double, 6> shessian (const std_cxx11::array<double, dim> &sp,
-                                                  const unsigned int component) const;
+    virtual std::array<double, 6> shessian (const std::array<double, dim> &sp,
+                                            const unsigned int component) const;
 
     /**
      * A vector from the origin to the center of spherical coordinate system.

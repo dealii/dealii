@@ -114,8 +114,8 @@ int main ()
   std::string fluid_fe_name = "FESystem[FE_Nothing()^2-FE_Nothing()^2-FE_Q(2)^2-FE_Q(1)-FE_Q(2)^2]";
 
   hp::FECollection<dim> fe_collection;
-  std_cxx11::unique_ptr<FiniteElement<dim> > solid_fe (FETools::get_fe_by_name<dim, dim>(solid_fe_name));
-  std_cxx11::unique_ptr<FiniteElement<dim> > fluid_fe (FETools::get_fe_by_name<dim, dim>(fluid_fe_name));
+  std::unique_ptr<FiniteElement<dim> > solid_fe (FETools::get_fe_by_name<dim, dim>(solid_fe_name));
+  std::unique_ptr<FiniteElement<dim> > fluid_fe (FETools::get_fe_by_name<dim, dim>(fluid_fe_name));
 
   deallog << "Solid FE Space: " << solid_fe->get_name() << std::endl;
   deallog << "Fluid/Mesh FE Space: " << fluid_fe->get_name() << std::endl;

@@ -32,7 +32,7 @@
 
 #include <deal.II/dofs/dof_handler.h>
 
-#include <deal.II/base/std_cxx11/shared_ptr.h>
+#include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -140,7 +140,7 @@ protected:
   DeclException0(ExcMatricesNotBuilt);
 
 private:
-  std::vector<std_cxx11::shared_ptr<BlockSparsityPattern> >   prolongation_sparsities;
+  std::vector<std::shared_ptr<BlockSparsityPattern> >   prolongation_sparsities;
 
 protected:
 
@@ -149,7 +149,7 @@ protected:
    * of the mother cell, i.e. the coarse level. while row indices belong to
    * the child cell, i.e. the fine level.
    */
-  std::vector<std_cxx11::shared_ptr<BlockSparseMatrix<double> > > prolongation_matrices;
+  std::vector<std::shared_ptr<BlockSparseMatrix<double> > > prolongation_matrices;
 
   /**
    * Mapping for the <tt>copy_to/from_mg</tt>-functions. The indices into this

@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/std_cxx11/array.h>
 #include <deal.II/fe/mapping_q1_eulerian.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
@@ -29,6 +28,9 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/fe/fe.h>
+
+
+#include <array>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -57,12 +59,12 @@ MappingQ1Eulerian (const VectorType               &euler_transform_vectors,
 
 
 template <int dim, class VectorType, int spacedim>
-std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
 MappingQ1Eulerian<dim, VectorType, spacedim>::
 get_vertices
 (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
 {
-  std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertices;
+  std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertices;
   // The assertions can not be in the constructor, since this would
   // require to call dof_handler.distribute_dofs(fe) *before* the mapping
   // object is constructed, which is not necessarily what we want.
@@ -110,7 +112,7 @@ std::vector<Point<spacedim> >
 MappingQ1Eulerian<dim,VectorType,spacedim>::
 compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
 {
-  const std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+  const std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
   vertices = this->get_vertices(cell);
 
   std::vector<Point<spacedim> > a(GeometryInfo<dim>::vertices_per_cell);

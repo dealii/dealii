@@ -40,12 +40,12 @@
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/distributed/tria.h>
 
-#include <deal.II/base/std_cxx11/bind.h>
 
 #include <numeric>
 #include <algorithm>
 #include <cmath>
 #include <vector>
+#include <functional>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -16,7 +16,9 @@
 #ifndef dealii__vector_type_traits_h
 #define dealii__vector_type_traits_h
 
-#include <deal.II/base/std_cxx11/type_traits.h>
+#include <deal.II/base/config.h>
+
+#include <type_traits>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -29,12 +31,12 @@ DEAL_II_NAMESPACE_OPEN
  * The specialization
  * @code
  *   template <>
- *   struct is_serial_vector< VectorType > : std_cxx11::true_type {};
+ *   struct is_serial_vector< VectorType > : std::true_type {};
  * @endcode
  * for a serial vector type, respectively,
  * @code
  *   template <>
- *   struct is_serial_vector< VectorType > : std_cxx11::false_type {};
+ *   struct is_serial_vector< VectorType > : std::false_type {};
  * @endcode
  * for a vector type with support of distributed storage,
  * must be done in a header file of a vector declaration.

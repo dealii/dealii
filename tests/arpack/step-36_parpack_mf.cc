@@ -91,7 +91,7 @@ void test ()
                                             constraints);
   constraints.close ();
 
-  std_cxx11::shared_ptr<MatrixFree<dim,double> > mf_data(new MatrixFree<dim,double> ());
+  std::shared_ptr<MatrixFree<dim,double> > mf_data(new MatrixFree<dim,double> ());
   {
     const QGauss<1> quad (fe_degree+1);
     typename MatrixFree<dim,double>::AdditionalData data;

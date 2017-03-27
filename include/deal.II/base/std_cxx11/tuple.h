@@ -19,8 +19,6 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_CXX11
-
 #  include <tuple>
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx11
@@ -32,37 +30,6 @@ namespace std_cxx11
   using std::tuple_element;
 }
 DEAL_II_NAMESPACE_CLOSE
-
-#else
-
-#include <boost/tuple/tuple.hpp>
-DEAL_II_NAMESPACE_OPEN
-namespace std_cxx11
-{
-  using boost::tuple;
-  using boost::make_tuple;
-  using boost::get;
-
-  // boost::tuples::length has been renamed
-  // by the standard to std::tuple_size
-  template <typename T>
-  struct tuple_size
-  {
-    static const std::size_t value = boost::tuples::length<T>::value;
-  };
-
-  // similarly, boost::tuples::element has
-  // been renamed by the standard to
-  // std::tuple_element
-  template <int N, typename T>
-  struct tuple_element
-  {
-    typedef typename boost::tuples::element<N,T>::type type;
-  };
-}
-DEAL_II_NAMESPACE_CLOSE
-
-#endif
 
 // then allow using the old namespace name instead of the new one
 DEAL_II_NAMESPACE_OPEN

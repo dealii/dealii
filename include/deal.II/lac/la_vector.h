@@ -134,9 +134,9 @@ namespace LinearAlgebra
      */
     virtual void import(const ReadWriteVector<Number> &V,
                         VectorOperation::values operation,
-                        std_cxx11::shared_ptr<const CommunicationPatternBase>
+                        std::shared_ptr<const CommunicationPatternBase>
                         communication_pattern =
-                          std_cxx11::shared_ptr<const CommunicationPatternBase>());
+                          std::shared_ptr<const CommunicationPatternBase>());
 
     /**
      * Add @p a to all components. Note that @p a is a scalar not a vector.
@@ -384,7 +384,7 @@ namespace LinearAlgebra
  * @author Uwe Koecher, 2017
  */
 template <typename Number>
-struct is_serial_vector< LinearAlgebra::Vector< Number > > : std_cxx11::true_type
+struct is_serial_vector< LinearAlgebra::Vector< Number > > : std::true_type
 {
 };
 

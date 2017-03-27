@@ -17,7 +17,6 @@
 #include <deal.II/grid/grid_reordering.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/base/utilities.h>
-#include <deal.II/base/std_cxx11/bind.h>
 #include <deal.II/base/timer.h>
 
 #include <algorithm>

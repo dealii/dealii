@@ -18,12 +18,13 @@
 
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/std_cxx11/array.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/function.h>
 #include <deal.II/grid/tria.h>
+
+#include <array>
 #include <map>
 
 DEAL_II_NAMESPACE_OPEN
@@ -409,7 +410,7 @@ namespace GridGenerator
   void
   subdivided_parallelepiped (Triangulation<dim, spacedim>  &tria,
                              const Point<spacedim> &origin,
-                             const std_cxx11::array<Tensor<1,spacedim>,dim> &edges,
+                             const std::array<Tensor<1,spacedim>,dim> &edges,
                              const std::vector<unsigned int> &subdivisions = std::vector<unsigned int>(),
                              const bool colorize = false);
 

@@ -161,7 +161,7 @@ void test()
   Point<dim> direction;
   direction[dim-1] = 1.;
 
-  std_cxx11::shared_ptr<Manifold<dim> > cylinder_manifold
+  std::shared_ptr<Manifold<dim> > cylinder_manifold
   (dim == 2 ? static_cast<Manifold<dim>*>(new SphericalManifold<dim>(center)) :
    static_cast<Manifold<dim>*>(new CylindricalManifold<dim>(direction, center)));
   Triangulation<dim> tria;

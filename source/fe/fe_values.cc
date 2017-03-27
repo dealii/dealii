@@ -17,7 +17,6 @@
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/signaling_nan.h>
-#include <deal.II/base/std_cxx11/unique_ptr.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/la_vector.h>
@@ -36,6 +35,7 @@
 #include <deal.II/fe/fe.h>
 
 #include <iomanip>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -3484,12 +3484,12 @@ maybe_invalidate_previous_present_cell (const typename Triangulation<dim,spacedi
           invalidate_present_cell();
           tria_listener_refinement =
             cell->get_triangulation().signals.any_change.connect
-            (std_cxx11::bind (&FEValuesBase<dim,spacedim>::invalidate_present_cell,
-                              std_cxx11::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));
+            (std::bind (&FEValuesBase<dim,spacedim>::invalidate_present_cell,
+                        std::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));
           tria_listener_mesh_transform =
             cell->get_triangulation().signals.mesh_movement.connect
-            (std_cxx11::bind (&FEValuesBase<dim,spacedim>::invalidate_present_cell,
-                              std_cxx11::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));
+            (std::bind (&FEValuesBase<dim,spacedim>::invalidate_present_cell,
+                        std::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));
         }
     }
   else
@@ -3499,12 +3499,12 @@ maybe_invalidate_previous_present_cell (const typename Triangulation<dim,spacedi
       // changes
       tria_listener_refinement =
         cell->get_triangulation().signals.post_refinement.connect
-        (std_cxx11::bind (&FEValuesBase<dim,spacedim>::invalidate_present_cell,
-                          std_cxx11::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));
+        (std::bind (&FEValuesBase<dim,spacedim>::invalidate_present_cell,
+                    std::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));
       tria_listener_mesh_transform =
         cell->get_triangulation().signals.mesh_movement.connect
-        (std_cxx11::bind (&FEValuesBase<dim,spacedim>::invalidate_present_cell,
-                          std_cxx11::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));
+        (std::bind (&FEValuesBase<dim,spacedim>::invalidate_present_cell,
+                    std::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));
     }
 }
 
@@ -3678,7 +3678,7 @@ namespace
   template <typename Type, typename Pointer, typename Iterator>
   void
   reset_pointer_in_place_if_possible
-  (std_cxx11::unique_ptr<Pointer> &present_cell,
+  (std::unique_ptr<Pointer> &present_cell,
    const Iterator         &new_cell)
   {
     // see if the existing pointer is non-null and if the type of

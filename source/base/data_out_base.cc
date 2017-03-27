@@ -36,7 +36,6 @@
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/memory_consumption.h>
-#include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <deal.II/base/mpi.h>
 
 #include <cstring>
@@ -47,6 +46,7 @@
 #include <set>
 #include <sstream>
 #include <fstream>
+#include <memory>
 
 // we use uint32_t and uint8_t below, which are declared here:
 #include <stdint.h>
@@ -2555,7 +2555,7 @@ namespace DataOutBase
   template <int dim, int spacedim>
   void write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
                   const std::vector<std::string>          &data_names,
-                  const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &,
+                  const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
                   const UcdFlags                          &flags,
                   std::ostream                            &out)
   {
@@ -2646,7 +2646,7 @@ namespace DataOutBase
   template <int dim, int spacedim>
   void write_dx (const std::vector<Patch<dim,spacedim> > &patches,
                  const std::vector<std::string>          &data_names,
-                 const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &,
+                 const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
                  const DXFlags                           &flags,
                  std::ostream                            &out)
   {
@@ -2937,7 +2937,7 @@ namespace DataOutBase
   template <int dim, int spacedim>
   void write_gnuplot (const std::vector<Patch<dim,spacedim> > &patches,
                       const std::vector<std::string>          &data_names,
-                      const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &,
+                      const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
                       const GnuplotFlags                      &flags,
                       std::ostream                            &out)
   {
@@ -3151,7 +3151,7 @@ namespace DataOutBase
   template <int dim, int spacedim>
   void write_povray (const std::vector<Patch<dim,spacedim> > &patches,
                      const std::vector<std::string>          &data_names,
-                     const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &,
+                     const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
                      const PovrayFlags                       &flags,
                      std::ostream                            &out)
   {
@@ -3508,7 +3508,7 @@ namespace DataOutBase
   template <int dim, int spacedim>
   void write_eps (const std::vector<Patch<dim,spacedim> > &/*patches*/,
                   const std::vector<std::string>          &/*data_names*/,
-                  const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &,
+                  const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
                   const EpsFlags                          &/*flags*/,
                   std::ostream                            &/*out*/)
   {
@@ -3520,7 +3520,7 @@ namespace DataOutBase
   template <int spacedim>
   void write_eps (const std::vector<Patch<2,spacedim> > &patches,
                   const std::vector<std::string>          &/*data_names*/,
-                  const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &,
+                  const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
                   const EpsFlags                          &flags,
                   std::ostream                            &out)
   {
@@ -3889,7 +3889,7 @@ namespace DataOutBase
   template <int dim, int spacedim>
   void write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
                   const std::vector<std::string>          &data_names,
-                  const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &,
+                  const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
                   const GmvFlags                          &flags,
                   std::ostream                            &out)
   {
@@ -4044,7 +4044,7 @@ namespace DataOutBase
   template <int dim, int spacedim>
   void write_tecplot (const std::vector<Patch<dim,spacedim> > &patches,
                       const std::vector<std::string>          &data_names,
-                      const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &,
+                      const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
                       const TecplotFlags                      &flags,
                       std::ostream                            &out)
   {
@@ -4287,7 +4287,7 @@ namespace DataOutBase
   template <int dim, int spacedim>
   void write_tecplot_binary (const std::vector<Patch<dim,spacedim> > &patches,
                              const std::vector<std::string>          &data_names,
-                             const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                             const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                              const TecplotFlags                      &flags,
                              std::ostream                            &out)
   {
@@ -4633,7 +4633,7 @@ namespace DataOutBase
   void
   write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
              const std::vector<std::string>          &data_names,
-             const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+             const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
              const VtkFlags                          &flags,
              std::ostream                            &out)
   {
@@ -4798,21 +4798,21 @@ namespace DataOutBase
     std::vector<bool> data_set_written (n_data_sets, false);
     for (unsigned int n_th_vector=0; n_th_vector<vector_data_ranges.size(); ++n_th_vector)
       {
-        AssertThrow (std_cxx11::get<1>(vector_data_ranges[n_th_vector]) >=
-                     std_cxx11::get<0>(vector_data_ranges[n_th_vector]),
-                     ExcLowerRange (std_cxx11::get<1>(vector_data_ranges[n_th_vector]),
-                                    std_cxx11::get<0>(vector_data_ranges[n_th_vector])));
-        AssertThrow (std_cxx11::get<1>(vector_data_ranges[n_th_vector]) < n_data_sets,
-                     ExcIndexRange (std_cxx11::get<1>(vector_data_ranges[n_th_vector]),
+        AssertThrow (std::get<1>(vector_data_ranges[n_th_vector]) >=
+                     std::get<0>(vector_data_ranges[n_th_vector]),
+                     ExcLowerRange (std::get<1>(vector_data_ranges[n_th_vector]),
+                                    std::get<0>(vector_data_ranges[n_th_vector])));
+        AssertThrow (std::get<1>(vector_data_ranges[n_th_vector]) < n_data_sets,
+                     ExcIndexRange (std::get<1>(vector_data_ranges[n_th_vector]),
                                     0, n_data_sets));
-        AssertThrow (std_cxx11::get<1>(vector_data_ranges[n_th_vector]) + 1
-                     - std_cxx11::get<0>(vector_data_ranges[n_th_vector]) <= 3,
+        AssertThrow (std::get<1>(vector_data_ranges[n_th_vector]) + 1
+                     - std::get<0>(vector_data_ranges[n_th_vector]) <= 3,
                      ExcMessage ("Can't declare a vector with more than 3 components "
                                  "in VTK"));
 
         // mark these components as already written:
-        for (unsigned int i=std_cxx11::get<0>(vector_data_ranges[n_th_vector]);
-             i<=std_cxx11::get<1>(vector_data_ranges[n_th_vector]);
+        for (unsigned int i=std::get<0>(vector_data_ranges[n_th_vector]);
+             i<=std::get<1>(vector_data_ranges[n_th_vector]);
              ++i)
           data_set_written[i] = true;
 
@@ -4823,15 +4823,15 @@ namespace DataOutBase
         // name has been specified
         out << "VECTORS ";
 
-        if (std_cxx11::get<2>(vector_data_ranges[n_th_vector]) != "")
-          out << std_cxx11::get<2>(vector_data_ranges[n_th_vector]);
+        if (std::get<2>(vector_data_ranges[n_th_vector]) != "")
+          out << std::get<2>(vector_data_ranges[n_th_vector]);
         else
           {
-            for (unsigned int i=std_cxx11::get<0>(vector_data_ranges[n_th_vector]);
-                 i<std_cxx11::get<1>(vector_data_ranges[n_th_vector]);
+            for (unsigned int i=std::get<0>(vector_data_ranges[n_th_vector]);
+                 i<std::get<1>(vector_data_ranges[n_th_vector]);
                  ++i)
               out << data_names[i] << "__";
-            out << data_names[std_cxx11::get<1>(vector_data_ranges[n_th_vector])];
+            out << data_names[std::get<1>(vector_data_ranges[n_th_vector])];
           }
 
         out << " double"
@@ -4842,20 +4842,20 @@ namespace DataOutBase
         // components
         for (unsigned int n=0; n<n_nodes; ++n)
           {
-            switch (std_cxx11::get<1>(vector_data_ranges[n_th_vector]) -
-                    std_cxx11::get<0>(vector_data_ranges[n_th_vector]))
+            switch (std::get<1>(vector_data_ranges[n_th_vector]) -
+                    std::get<0>(vector_data_ranges[n_th_vector]))
               {
               case 0:
-                out << data_vectors(std_cxx11::get<0>(vector_data_ranges[n_th_vector]), n) << " 0 0"
+                out << data_vectors(std::get<0>(vector_data_ranges[n_th_vector]), n) << " 0 0"
                     << '\n';
                 break;
 
               case 1:
-                out << data_vectors(std_cxx11::get<0>(vector_data_ranges[n_th_vector]),   n) << ' '<< data_vectors(std_cxx11::get<0>(vector_data_ranges[n_th_vector])+1, n) << " 0"
+                out << data_vectors(std::get<0>(vector_data_ranges[n_th_vector]),   n) << ' '<< data_vectors(std::get<0>(vector_data_ranges[n_th_vector])+1, n) << " 0"
                     << '\n';
                 break;
               case 2:
-                out << data_vectors(std_cxx11::get<0>(vector_data_ranges[n_th_vector]),   n) << ' '<< data_vectors(std_cxx11::get<0>(vector_data_ranges[n_th_vector])+1, n) << ' '<< data_vectors(std_cxx11::get<0>(vector_data_ranges[n_th_vector])+2, n)
+                out << data_vectors(std::get<0>(vector_data_ranges[n_th_vector]),   n) << ' '<< data_vectors(std::get<0>(vector_data_ranges[n_th_vector])+1, n) << ' '<< data_vectors(std::get<0>(vector_data_ranges[n_th_vector])+2, n)
                     << '\n';
                 break;
 
@@ -4943,7 +4943,7 @@ namespace DataOutBase
   void
   write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
              const std::vector<std::string>          &data_names,
-             const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+             const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
              const VtkFlags                          &flags,
              std::ostream                            &out)
   {
@@ -4958,7 +4958,7 @@ namespace DataOutBase
   template <int dim, int spacedim>
   void write_vtu_main (const std::vector<Patch<dim,spacedim> > &patches,
                        const std::vector<std::string>          &data_names,
-                       const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                       const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                        const VtkFlags                          &flags,
                        std::ostream                            &out)
   {
@@ -4995,8 +4995,8 @@ namespace DataOutBase
           {
             // mark these components as already
             // written:
-            for (unsigned int i=std_cxx11::get<0>(vector_data_ranges[n_th_vector]);
-                 i<=std_cxx11::get<1>(vector_data_ranges[n_th_vector]);
+            for (unsigned int i=std::get<0>(vector_data_ranges[n_th_vector]);
+                 i<=std::get<1>(vector_data_ranges[n_th_vector]);
                  ++i)
               data_set_written[i] = true;
 
@@ -5007,15 +5007,15 @@ namespace DataOutBase
             // name has been specified
             out << "    <DataArray type=\"Float64\" Name=\"";
 
-            if (std_cxx11::get<2>(vector_data_ranges[n_th_vector]) != "")
-              out << std_cxx11::get<2>(vector_data_ranges[n_th_vector]);
+            if (std::get<2>(vector_data_ranges[n_th_vector]) != "")
+              out << std::get<2>(vector_data_ranges[n_th_vector]);
             else
               {
-                for (unsigned int i=std_cxx11::get<0>(vector_data_ranges[n_th_vector]);
-                     i<std_cxx11::get<1>(vector_data_ranges[n_th_vector]);
+                for (unsigned int i=std::get<0>(vector_data_ranges[n_th_vector]);
+                     i<std::get<1>(vector_data_ranges[n_th_vector]);
                      ++i)
                   out << data_names[i] << "__";
-                out << data_names[std_cxx11::get<1>(vector_data_ranges[n_th_vector])];
+                out << data_names[std::get<1>(vector_data_ranges[n_th_vector])];
               }
 
             out << "\" NumberOfComponents=\"3\"></DataArray>\n";
@@ -5212,22 +5212,22 @@ namespace DataOutBase
     std::vector<bool> data_set_written (n_data_sets, false);
     for (unsigned int n_th_vector=0; n_th_vector<vector_data_ranges.size(); ++n_th_vector)
       {
-        AssertThrow (std_cxx11::get<1>(vector_data_ranges[n_th_vector]) >=
-                     std_cxx11::get<0>(vector_data_ranges[n_th_vector]),
-                     ExcLowerRange (std_cxx11::get<1>(vector_data_ranges[n_th_vector]),
-                                    std_cxx11::get<0>(vector_data_ranges[n_th_vector])));
-        AssertThrow (std_cxx11::get<1>(vector_data_ranges[n_th_vector]) < n_data_sets,
-                     ExcIndexRange (std_cxx11::get<1>(vector_data_ranges[n_th_vector]),
+        AssertThrow (std::get<1>(vector_data_ranges[n_th_vector]) >=
+                     std::get<0>(vector_data_ranges[n_th_vector]),
+                     ExcLowerRange (std::get<1>(vector_data_ranges[n_th_vector]),
+                                    std::get<0>(vector_data_ranges[n_th_vector])));
+        AssertThrow (std::get<1>(vector_data_ranges[n_th_vector]) < n_data_sets,
+                     ExcIndexRange (std::get<1>(vector_data_ranges[n_th_vector]),
                                     0, n_data_sets));
-        AssertThrow (std_cxx11::get<1>(vector_data_ranges[n_th_vector]) + 1
-                     - std_cxx11::get<0>(vector_data_ranges[n_th_vector]) <= 3,
+        AssertThrow (std::get<1>(vector_data_ranges[n_th_vector]) + 1
+                     - std::get<0>(vector_data_ranges[n_th_vector]) <= 3,
                      ExcMessage ("Can't declare a vector with more than 3 components "
                                  "in VTK"));
 
         // mark these components as already
         // written:
-        for (unsigned int i=std_cxx11::get<0>(vector_data_ranges[n_th_vector]);
-             i<=std_cxx11::get<1>(vector_data_ranges[n_th_vector]);
+        for (unsigned int i=std::get<0>(vector_data_ranges[n_th_vector]);
+             i<=std::get<1>(vector_data_ranges[n_th_vector]);
              ++i)
           data_set_written[i] = true;
 
@@ -5238,15 +5238,15 @@ namespace DataOutBase
         // name has been specified
         out << "    <DataArray type=\"Float64\" Name=\"";
 
-        if (std_cxx11::get<2>(vector_data_ranges[n_th_vector]) != "")
-          out << std_cxx11::get<2>(vector_data_ranges[n_th_vector]);
+        if (std::get<2>(vector_data_ranges[n_th_vector]) != "")
+          out << std::get<2>(vector_data_ranges[n_th_vector]);
         else
           {
-            for (unsigned int i=std_cxx11::get<0>(vector_data_ranges[n_th_vector]);
-                 i<std_cxx11::get<1>(vector_data_ranges[n_th_vector]);
+            for (unsigned int i=std::get<0>(vector_data_ranges[n_th_vector]);
+                 i<std::get<1>(vector_data_ranges[n_th_vector]);
                  ++i)
               out << data_names[i] << "__";
-            out << data_names[std_cxx11::get<1>(vector_data_ranges[n_th_vector])];
+            out << data_names[std::get<1>(vector_data_ranges[n_th_vector])];
           }
 
         out << "\" NumberOfComponents=\"3\" format=\""
@@ -5260,24 +5260,24 @@ namespace DataOutBase
 
         for (unsigned int n=0; n<n_nodes; ++n)
           {
-            switch (std_cxx11::get<1>(vector_data_ranges[n_th_vector]) -
-                    std_cxx11::get<0>(vector_data_ranges[n_th_vector]))
+            switch (std::get<1>(vector_data_ranges[n_th_vector]) -
+                    std::get<0>(vector_data_ranges[n_th_vector]))
               {
               case 0:
-                data.push_back (data_vectors(std_cxx11::get<0>(vector_data_ranges[n_th_vector]), n));
+                data.push_back (data_vectors(std::get<0>(vector_data_ranges[n_th_vector]), n));
                 data.push_back (0);
                 data.push_back (0);
                 break;
 
               case 1:
-                data.push_back (data_vectors(std_cxx11::get<0>(vector_data_ranges[n_th_vector]),   n));
-                data.push_back (data_vectors(std_cxx11::get<0>(vector_data_ranges[n_th_vector])+1, n));
+                data.push_back (data_vectors(std::get<0>(vector_data_ranges[n_th_vector]),   n));
+                data.push_back (data_vectors(std::get<0>(vector_data_ranges[n_th_vector])+1, n));
                 data.push_back (0);
                 break;
               case 2:
-                data.push_back (data_vectors(std_cxx11::get<0>(vector_data_ranges[n_th_vector]),   n));
-                data.push_back (data_vectors(std_cxx11::get<0>(vector_data_ranges[n_th_vector])+1, n));
-                data.push_back (data_vectors(std_cxx11::get<0>(vector_data_ranges[n_th_vector])+2, n));
+                data.push_back (data_vectors(std::get<0>(vector_data_ranges[n_th_vector]),   n));
+                data.push_back (data_vectors(std::get<0>(vector_data_ranges[n_th_vector])+1, n));
+                data.push_back (data_vectors(std::get<0>(vector_data_ranges[n_th_vector])+2, n));
                 break;
 
               default:
@@ -5328,7 +5328,7 @@ namespace DataOutBase
   write_pvtu_record (std::ostream                                                                  &out,
                      const std::vector<std::string>                                                &piece_names,
                      const std::vector<std::string>                                                &data_names,
-                     const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges)
+                     const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges)
   {
     AssertThrow (out, ExcIO());
 
@@ -5351,22 +5351,22 @@ namespace DataOutBase
     std::vector<bool> data_set_written (n_data_sets, false);
     for (unsigned int n_th_vector=0; n_th_vector<vector_data_ranges.size(); ++n_th_vector)
       {
-        AssertThrow (std_cxx11::get<1>(vector_data_ranges[n_th_vector]) >=
-                     std_cxx11::get<0>(vector_data_ranges[n_th_vector]),
-                     ExcLowerRange (std_cxx11::get<1>(vector_data_ranges[n_th_vector]),
-                                    std_cxx11::get<0>(vector_data_ranges[n_th_vector])));
-        AssertThrow (std_cxx11::get<1>(vector_data_ranges[n_th_vector]) < n_data_sets,
-                     ExcIndexRange (std_cxx11::get<1>(vector_data_ranges[n_th_vector]),
+        AssertThrow (std::get<1>(vector_data_ranges[n_th_vector]) >=
+                     std::get<0>(vector_data_ranges[n_th_vector]),
+                     ExcLowerRange (std::get<1>(vector_data_ranges[n_th_vector]),
+                                    std::get<0>(vector_data_ranges[n_th_vector])));
+        AssertThrow (std::get<1>(vector_data_ranges[n_th_vector]) < n_data_sets,
+                     ExcIndexRange (std::get<1>(vector_data_ranges[n_th_vector]),
                                     0, n_data_sets));
-        AssertThrow (std_cxx11::get<1>(vector_data_ranges[n_th_vector]) + 1
-                     - std_cxx11::get<0>(vector_data_ranges[n_th_vector]) <= 3,
+        AssertThrow (std::get<1>(vector_data_ranges[n_th_vector]) + 1
+                     - std::get<0>(vector_data_ranges[n_th_vector]) <= 3,
                      ExcMessage ("Can't declare a vector with more than 3 components "
                                  "in VTK"));
 
         // mark these components as already
         // written:
-        for (unsigned int i=std_cxx11::get<0>(vector_data_ranges[n_th_vector]);
-             i<=std_cxx11::get<1>(vector_data_ranges[n_th_vector]);
+        for (unsigned int i=std::get<0>(vector_data_ranges[n_th_vector]);
+             i<=std::get<1>(vector_data_ranges[n_th_vector]);
              ++i)
           data_set_written[i] = true;
 
@@ -5377,15 +5377,15 @@ namespace DataOutBase
         // name has been specified
         out << "    <PDataArray type=\"Float64\" Name=\"";
 
-        if (std_cxx11::get<2>(vector_data_ranges[n_th_vector]) != "")
-          out << std_cxx11::get<2>(vector_data_ranges[n_th_vector]);
+        if (std::get<2>(vector_data_ranges[n_th_vector]) != "")
+          out << std::get<2>(vector_data_ranges[n_th_vector]);
         else
           {
-            for (unsigned int i=std_cxx11::get<0>(vector_data_ranges[n_th_vector]);
-                 i<std_cxx11::get<1>(vector_data_ranges[n_th_vector]);
+            for (unsigned int i=std::get<0>(vector_data_ranges[n_th_vector]);
+                 i<std::get<1>(vector_data_ranges[n_th_vector]);
                  ++i)
               out << data_names[i] << "__";
-            out << data_names[std_cxx11::get<1>(vector_data_ranges[n_th_vector])];
+            out << data_names[std::get<1>(vector_data_ranges[n_th_vector])];
           }
 
         out << "\" NumberOfComponents=\"3\" format=\"ascii\"/>\n";
@@ -5526,7 +5526,7 @@ namespace DataOutBase
   template <int dim, int spacedim>
   void write_svg (const std::vector<Patch<dim,spacedim> > &,
                   const std::vector<std::string> &,
-                  const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &,
+                  const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
                   const SvgFlags &,
                   std::ostream &)
   {
@@ -5536,7 +5536,7 @@ namespace DataOutBase
   template <int spacedim>
   void write_svg (const std::vector<Patch<2,spacedim> > &patches,
                   const std::vector<std::string> &/*data_names*/,
-                  const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &/*vector_data_ranges*/,
+                  const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &/*vector_data_ranges*/,
                   const SvgFlags &flags,
                   std::ostream &out)
   {
@@ -6175,7 +6175,7 @@ namespace DataOutBase
   void
   write_deal_II_intermediate (const std::vector<Patch<dim,spacedim> > &patches,
                               const std::vector<std::string>          &data_names,
-                              const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                              const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                               const Deal_II_IntermediateFlags         &/*flags*/,
                               std::ostream                            &out)
   {
@@ -6203,9 +6203,9 @@ namespace DataOutBase
 
     out << vector_data_ranges.size() << '\n';
     for (unsigned int i=0; i<vector_data_ranges.size(); ++i)
-      out << std_cxx11::get<0>(vector_data_ranges[i]) << ' '
-          << std_cxx11::get<1>(vector_data_ranges[i]) << '\n'
-          << std_cxx11::get<2>(vector_data_ranges[i]) << '\n';
+      out << std::get<0>(vector_data_ranges[i]) << ' '
+          << std::get<1>(vector_data_ranges[i]) << '\n'
+          << std::get<2>(vector_data_ranges[i]) << '\n';
 
     out << '\n';
     // make sure everything now gets to
@@ -6667,7 +6667,7 @@ write_filtered_data (DataOutBase::DataOutFilter &filtered_data) const
 template <int dim, int spacedim>
 void DataOutBase::write_filtered_data (const std::vector<Patch<dim,spacedim> > &patches,
                                        const std::vector<std::string>          &data_names,
-                                       const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                                       const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                                        DataOutBase::DataOutFilter &filtered_data)
 {
   const unsigned int n_data_sets = data_names.size();
@@ -6714,35 +6714,35 @@ void DataOutBase::write_filtered_data (const std::vector<Patch<dim,spacedim> > &
   for (n_th_vector=0,data_set=0; data_set<n_data_sets;)
     {
       // Advance n_th_vector to at least the current data set we are on
-      while (n_th_vector < vector_data_ranges.size() && std_cxx11::get<0>(vector_data_ranges[n_th_vector]) < data_set) n_th_vector++;
+      while (n_th_vector < vector_data_ranges.size() && std::get<0>(vector_data_ranges[n_th_vector]) < data_set) n_th_vector++;
 
       // Determine the dimension of this data
-      if (n_th_vector < vector_data_ranges.size() && std_cxx11::get<0>(vector_data_ranges[n_th_vector]) == data_set)
+      if (n_th_vector < vector_data_ranges.size() && std::get<0>(vector_data_ranges[n_th_vector]) == data_set)
         {
           // Multiple dimensions
-          pt_data_vector_dim = std_cxx11::get<1>(vector_data_ranges[n_th_vector]) - std_cxx11::get<0>(vector_data_ranges[n_th_vector])+1;
+          pt_data_vector_dim = std::get<1>(vector_data_ranges[n_th_vector]) - std::get<0>(vector_data_ranges[n_th_vector])+1;
 
           // Ensure the dimensionality of the data is correct
-          AssertThrow (std_cxx11::get<1>(vector_data_ranges[n_th_vector]) >= std_cxx11::get<0>(vector_data_ranges[n_th_vector]),
-                       ExcLowerRange (std_cxx11::get<1>(vector_data_ranges[n_th_vector]), std_cxx11::get<0>(vector_data_ranges[n_th_vector])));
-          AssertThrow (std_cxx11::get<1>(vector_data_ranges[n_th_vector]) < n_data_sets,
-                       ExcIndexRange (std_cxx11::get<1>(vector_data_ranges[n_th_vector]), 0, n_data_sets));
+          AssertThrow (std::get<1>(vector_data_ranges[n_th_vector]) >= std::get<0>(vector_data_ranges[n_th_vector]),
+                       ExcLowerRange (std::get<1>(vector_data_ranges[n_th_vector]), std::get<0>(vector_data_ranges[n_th_vector])));
+          AssertThrow (std::get<1>(vector_data_ranges[n_th_vector]) < n_data_sets,
+                       ExcIndexRange (std::get<1>(vector_data_ranges[n_th_vector]), 0, n_data_sets));
 
           // Determine the vector name
           // Concatenate all the
           // component names with double
           // underscores unless a vector
           // name has been specified
-          if (std_cxx11::get<2>(vector_data_ranges[n_th_vector]) != "")
+          if (std::get<2>(vector_data_ranges[n_th_vector]) != "")
             {
-              vector_name = std_cxx11::get<2>(vector_data_ranges[n_th_vector]);
+              vector_name = std::get<2>(vector_data_ranges[n_th_vector]);
             }
           else
             {
               vector_name = "";
-              for (i=std_cxx11::get<0>(vector_data_ranges[n_th_vector]); i<std_cxx11::get<1>(vector_data_ranges[n_th_vector]); ++i)
+              for (i=std::get<0>(vector_data_ranges[n_th_vector]); i<std::get<1>(vector_data_ranges[n_th_vector]); ++i)
                 vector_name += data_names[i] + "__";
-              vector_name += data_names[std_cxx11::get<1>(vector_data_ranges[n_th_vector])];
+              vector_name += data_names[std::get<1>(vector_data_ranges[n_th_vector])];
             }
         }
       else
@@ -7314,10 +7314,10 @@ DataOutInterface<dim,spacedim>::memory_consumption () const
 
 
 template <int dim, int spacedim>
-std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >
+std::vector<std::tuple<unsigned int, unsigned int, std::string> >
 DataOutInterface<dim,spacedim>::get_vector_data_ranges () const
 {
-  return std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >();
+  return std::vector<std::tuple<unsigned int, unsigned int, std::string> >();
 }
 
 
@@ -7332,7 +7332,7 @@ validate_dataset_names () const
     // complicated, because vector ranges might have a name or not.
     std::set<std::string> all_names;
 
-    const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string> >
     ranges = this->get_vector_data_ranges();
     const std::vector<std::string> data_names = this->get_dataset_names();
     const unsigned int n_data_sets = data_names.size();
@@ -7340,15 +7340,15 @@ validate_dataset_names () const
 
     for (unsigned int n_th_vector=0; n_th_vector<ranges.size(); ++n_th_vector)
       {
-        const std::string &name = std_cxx11::get<2>(ranges[n_th_vector]);
+        const std::string &name = std::get<2>(ranges[n_th_vector]);
         if (name != "")
           {
             Assert(all_names.find(name) == all_names.end(),
             ExcMessage("Error: names of fields in DataOut need to be unique, "
             "but '" + name +  "' is used more than once."));
             all_names.insert(name);
-            for (unsigned int i=std_cxx11::get<0>(ranges[n_th_vector]);
-            i<=std_cxx11::get<1>(ranges[n_th_vector]);
+            for (unsigned int i=std::get<0>(ranges[n_th_vector]);
+            i<=std::get<1>(ranges[n_th_vector]);
             ++i)
               data_set_written[i] = true;
           }
@@ -7388,7 +7388,7 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
     tmp.swap (dataset_names);
   }
   {
-    std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > tmp;
+    std::vector<std::tuple<unsigned int, unsigned int, std::string> > tmp;
     tmp.swap (vector_data_ranges);
   }
 
@@ -7463,8 +7463,8 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
   vector_data_ranges.resize (n_vector_data_ranges);
   for (unsigned int i=0; i<n_vector_data_ranges; ++i)
     {
-      in >> std_cxx11::get<0>(vector_data_ranges[i])
-         >> std_cxx11::get<1>(vector_data_ranges[i]);
+      in >> std::get<0>(vector_data_ranges[i])
+         >> std::get<1>(vector_data_ranges[i]);
 
       // read in the name of that vector
       // range. because it is on a separate
@@ -7477,7 +7477,7 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
       std::string name;
       getline(in, name);
       getline(in, name);
-      std_cxx11::get<2>(vector_data_ranges[i]) = name;
+      std::get<2>(vector_data_ranges[i]) = name;
     }
 
   AssertThrow (in, ExcIO());
@@ -7509,16 +7509,16 @@ merge (const DataOutReader<dim,spacedim> &source)
                       "as vectors."));
   for (unsigned int i=0; i<get_vector_data_ranges().size(); ++i)
     {
-      Assert (std_cxx11::get<0>(get_vector_data_ranges()[i]) ==
-              std_cxx11::get<0>(source.get_vector_data_ranges()[i]),
+      Assert (std::get<0>(get_vector_data_ranges()[i]) ==
+              std::get<0>(source.get_vector_data_ranges()[i]),
               ExcMessage ("Both sources need to declare the same components "
                           "as vectors."));
-      Assert (std_cxx11::get<1>(get_vector_data_ranges()[i]) ==
-              std_cxx11::get<1>(source.get_vector_data_ranges()[i]),
+      Assert (std::get<1>(get_vector_data_ranges()[i]) ==
+              std::get<1>(source.get_vector_data_ranges()[i]),
               ExcMessage ("Both sources need to declare the same components "
                           "as vectors."));
-      Assert (std_cxx11::get<2>(get_vector_data_ranges()[i]) ==
-              std_cxx11::get<2>(source.get_vector_data_ranges()[i]),
+      Assert (std::get<2>(get_vector_data_ranges()[i]) ==
+              std::get<2>(source.get_vector_data_ranges()[i]),
               ExcMessage ("Both sources need to declare the same components "
                           "as vectors."));
     }
@@ -7572,7 +7572,7 @@ DataOutReader<dim,spacedim>::get_dataset_names () const
 
 
 template <int dim, int spacedim>
-std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >
+std::vector<std::tuple<unsigned int, unsigned int, std::string> >
 DataOutReader<dim,spacedim>::get_vector_data_ranges () const
 {
   return vector_data_ranges;

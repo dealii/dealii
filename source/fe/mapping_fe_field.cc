@@ -20,7 +20,6 @@
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/tensor_product_polynomials.h>
-#include <deal.II/base/std_cxx11/unique_ptr.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
@@ -48,6 +47,7 @@
 
 #include <numeric>
 #include <fstream>
+#include <memory>
 
 
 
@@ -1769,8 +1769,8 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
 //  the right size and transformation shape values already computed at point
 //  p.
   const Quadrature<dim> point_quadrature(p);
-  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_quadrature_points | update_jacobians,
-                                                      point_quadrature));
+  std::unique_ptr<InternalData> mdata (get_data(update_quadrature_points | update_jacobians,
+                                                point_quadrature));
 
   update_internal_dofs(cell, *mdata);
 
@@ -1830,7 +1830,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
   UpdateFlags update_flags = update_quadrature_points | update_jacobians;
   if (spacedim>dim)
     update_flags |= update_jacobian_grads;
-  std_cxx11::unique_ptr<InternalData>
+  std::unique_ptr<InternalData>
   mdata (get_data(update_flags,point_quadrature));
 
   update_internal_dofs(cell, *mdata);

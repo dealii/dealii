@@ -22,7 +22,7 @@
 // now interpolate the function x*y*z onto points. note that this function is
 // (bi/tri)linear and so we can later know what the correct value is that the
 // function should provide
-Table<1,double> fill (const std_cxx11::array<std::vector<double>,1> &coordinates)
+Table<1,double> fill (const std::array<std::vector<double>,1> &coordinates)
 {
   Table<1,double> data(coordinates[0].size());
   for (unsigned int i=0; i<coordinates[0].size(); ++i)
@@ -30,7 +30,7 @@ Table<1,double> fill (const std_cxx11::array<std::vector<double>,1> &coordinates
   return data;
 }
 
-Table<2,double> fill (const std_cxx11::array<std::vector<double>,2> &coordinates)
+Table<2,double> fill (const std::array<std::vector<double>,2> &coordinates)
 {
   Table<2,double> data(coordinates[0].size(),
                        coordinates[1].size());
@@ -40,7 +40,7 @@ Table<2,double> fill (const std_cxx11::array<std::vector<double>,2> &coordinates
   return data;
 }
 
-Table<3,double> fill (const std_cxx11::array<std::vector<double>,3> &coordinates)
+Table<3,double> fill (const std::array<std::vector<double>,3> &coordinates)
 {
   Table<3,double> data(coordinates[0].size(),
                        coordinates[1].size(),
@@ -60,15 +60,15 @@ void check ()
 {
   // have coordinate arrays that span an interval starting at d+1
   // d+5 nonuniform intervals
-  std_cxx11::array<std::pair<double,double>,dim> intervals;
-  std_cxx11::array<unsigned int,dim> n_subintervals;
+  std::array<std::pair<double,double>,dim> intervals;
+  std::array<unsigned int,dim> n_subintervals;
   for (unsigned int d=0; d<dim; ++d)
     {
       intervals[d] = std::make_pair(d+2., 2*d+5.);
       n_subintervals[d] = d+1 + d*d;
     }
 
-  std_cxx11::array<std::vector<double>,dim> coordinates;
+  std::array<std::vector<double>,dim> coordinates;
   for (unsigned int d=0; d<dim; ++d)
     {
       const double x = intervals[d].first;

@@ -996,7 +996,7 @@ public:
     /**
      * Stores the preconditioner object that the Chebyshev is wrapped around.
      */
-    std_cxx11::shared_ptr<PreconditionerType> preconditioner;
+    std::shared_ptr<PreconditionerType> preconditioner;
   };
 
   DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
@@ -1897,7 +1897,7 @@ namespace internal
     inline
     void
     initialize_preconditioner(const MatrixType                          &matrix,
-                              std_cxx11::shared_ptr<PreconditionerType> &preconditioner,
+                              std::shared_ptr<PreconditionerType> &preconditioner,
                               VectorType &)
     {
       (void)matrix;
@@ -1909,7 +1909,7 @@ namespace internal
     inline
     void
     initialize_preconditioner(const MatrixType                                   &matrix,
-                              std_cxx11::shared_ptr<DiagonalMatrix<VectorType> > &preconditioner,
+                              std::shared_ptr<DiagonalMatrix<VectorType> > &preconditioner,
                               VectorType                                         &diagonal_inverse)
     {
       if (preconditioner.get() == NULL ||
@@ -2094,9 +2094,9 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::estimate_eigenv
 
       internal::PreconditionChebyshev::EigenvalueTracker eigenvalue_tracker;
       SolverCG<VectorType> solver (control);
-      solver.connect_eigenvalues_slot(std_cxx11::bind(&internal::PreconditionChebyshev::EigenvalueTracker::slot,
-                                                      &eigenvalue_tracker,
-                                                      std_cxx11::_1));
+      solver.connect_eigenvalues_slot(std::bind(&internal::PreconditionChebyshev::EigenvalueTracker::slot,
+                                                &eigenvalue_tracker,
+                                                std::placeholders::_1));
 
       // set an initial guess which is close to the constant vector but where
       // one entry is different to trigger high frequencies

@@ -874,7 +874,7 @@ protected:
    * Geometry data that can be generated FEValues on the fly with the
    * respective constructor.
    */
-  std_cxx1x::shared_ptr<internal::MatrixFreeFunctions::MappingDataOnTheFly<dim,Number> > mapped_geometry;
+  std::shared_ptr<internal::MatrixFreeFunctions::MappingDataOnTheFly<dim,Number> > mapped_geometry;
 
   /**
    * For use with on-the-fly evaluation, provide a data structure to store the

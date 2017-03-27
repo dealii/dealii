@@ -34,7 +34,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/base/std_cxx11/bind.h>
+#include <functional>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -88,12 +88,12 @@ namespace parallel
 
       offset
         = tria->register_data_attach(size,
-                                     std_cxx11::bind(&SolutionTransfer<dim, VectorType,
-                                                     DoFHandlerType>::pack_callback,
-                                                     this,
-                                                     std_cxx11::_1,
-                                                     std_cxx11::_2,
-                                                     std_cxx11::_3));
+                                     std::bind(&SolutionTransfer<dim, VectorType,
+                                               DoFHandlerType>::pack_callback,
+                                               this,
+                                               std::placeholders::_1,
+                                               std::placeholders::_2,
+                                               std::placeholders::_3));
 
     }
 
@@ -168,13 +168,13 @@ namespace parallel
       Assert (tria != 0, ExcInternalError());
 
       tria->notify_ready_to_unpack(offset,
-                                   std_cxx11::bind(&SolutionTransfer<dim, VectorType,
-                                                   DoFHandlerType>::unpack_callback,
-                                                   this,
-                                                   std_cxx11::_1,
-                                                   std_cxx11::_2,
-                                                   std_cxx11::_3,
-                                                   std_cxx11::ref(all_out)));
+                                   std::bind(&SolutionTransfer<dim, VectorType,
+                                             DoFHandlerType>::unpack_callback,
+                                             this,
+                                             std::placeholders::_1,
+                                             std::placeholders::_2,
+                                             std::placeholders::_3,
+                                             std::ref(all_out)));
 
 
       for (typename std::vector<VectorType *>::iterator it=all_out.begin();

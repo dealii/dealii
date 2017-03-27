@@ -49,7 +49,7 @@ check_this (const FiniteElement<dim> &fe1,
   GridGenerator::hyper_cube(tria, 0., 1.);
   tria.refine_global (2);
 
-  std_cxx11::unique_ptr<DoFHandler<dim> > dof1(make_dof_handler (tria, fe1));
+  std::unique_ptr<DoFHandler<dim> > dof1(make_dof_handler (tria, fe1));
 
   Vector<double> in (dof1->n_dofs());
   for (unsigned int i=0; i<in.size(); ++i)

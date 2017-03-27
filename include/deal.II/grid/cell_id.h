@@ -18,8 +18,8 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/std_cxx11/array.h>
 
+#include <array>
 #include <vector>
 #include <iostream>
 
@@ -63,7 +63,7 @@ public:
    * (using 2 times 32 bit for storage), a limitation that is identical to
    * the one used by p4est.
    */
-  typedef std_cxx11::array<unsigned int, 4> binary_type;
+  typedef std::array<unsigned int, 4> binary_type;
 
   /**
    * Construct a CellId object with a given @p coarse_cell_id and vector of
@@ -160,9 +160,9 @@ private:
    * the array can be extended.
    */
 #ifdef DEAL_II_WITH_P4EST
-  std_cxx11::array<char,internal::p4est::functions<2>::max_level> child_indices;
+  std::array<char,internal::p4est::functions<2>::max_level> child_indices;
 #else
-  std_cxx11::array<char,30> child_indices;
+  std::array<char,30> child_indices;
 #endif
 
   friend std::istream &operator>> (std::istream &is, CellId &cid);

@@ -18,7 +18,6 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/smartpointer.h>
-#include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mg_level_object.h>
 #include <deal.II/lac/block_indices.h>
@@ -26,6 +25,8 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/algorithms/any_data.h>
+
+#include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -344,7 +345,7 @@ public:
    * The pointer type used for storing the objects. We use a shard pointer,
    * such that they get deleted automatically when not used anymore.
    */
-  typedef std_cxx11::shared_ptr<value_type> ptr_type;
+  typedef std::shared_ptr<value_type> ptr_type;
 
   /**
    * Add a new matrix block at the position <tt>(row,column)</tt> in the block

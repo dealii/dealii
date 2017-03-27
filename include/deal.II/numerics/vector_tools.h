@@ -21,7 +21,6 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/std_cxx11/function.h>
 #include <deal.II/dofs/function_map.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/hp/dof_handler.h>
@@ -30,6 +29,7 @@
 #include <map>
 #include <vector>
 #include <set>
+#include <functional>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -894,7 +894,7 @@ namespace VectorTools
                 const DoFHandler<dim,spacedim> &dof,
                 const ConstraintMatrix         &constraints,
                 const Quadrature<dim>          &quadrature,
-                const std_cxx11::function< typename VectorType::value_type (const typename DoFHandler<dim, spacedim>::active_cell_iterator &, const unsigned int)> func,
+                const std::function< typename VectorType::value_type (const typename DoFHandler<dim, spacedim>::active_cell_iterator &, const unsigned int)> func,
                 VectorType                     &vec_result);
 
   /**
@@ -918,19 +918,19 @@ namespace VectorTools
    * which stores quadrature point data.
    */
   template <int dim, typename VectorType>
-  void project (std_cxx11::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > data,
+  void project (std::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > data,
                 const ConstraintMatrix &constraints,
                 const unsigned int n_q_points_1d,
-                const std_cxx11::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
+                const std::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
                 VectorType &vec_result);
 
   /**
    * Same as above but for <code>n_q_points_1d = matrix_free.get_dof_handler().get_fe().degree+1</code>.
    */
   template <int dim, typename VectorType>
-  void project (std_cxx11::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > data,
+  void project (std::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > data,
                 const ConstraintMatrix &constraints,
-                const std_cxx11::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
+                const std::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
                 VectorType &vec_result);
 
   /**

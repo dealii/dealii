@@ -28,10 +28,10 @@
 #  include <deal.II/lac/vector.h>
 
 #  include <petscmat.h>
-#  include <deal.II/base/std_cxx11/shared_ptr.h>
 
 #  include <vector>
 #  include <cmath>
+#  include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -144,12 +144,12 @@ namespace PETScWrappers
          * performance, we keep a shared pointer to these entries so that more
          * than one accessor can access this data if necessary.
          */
-        std_cxx11::shared_ptr<const std::vector<size_type> > colnum_cache;
+        std::shared_ptr<const std::vector<size_type> > colnum_cache;
 
         /**
          * Similar cache for the values of this row.
          */
-        std_cxx11::shared_ptr<const std::vector<PetscScalar> > value_cache;
+        std::shared_ptr<const std::vector<PetscScalar> > value_cache;
 
         /**
          * Discard the old row caches (they may still be used by other

@@ -270,8 +270,8 @@ namespace LinearAlgebra
      */
     void import(const distributed::Vector<Number> &vec,
                 VectorOperation::values operation,
-                std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern =
-                  std_cxx11::shared_ptr<const CommunicationPatternBase> ());
+                std::shared_ptr<const CommunicationPatternBase> communication_pattern =
+                  std::shared_ptr<const CommunicationPatternBase> ());
 
 #ifdef DEAL_II_WITH_PETSC
     /**
@@ -284,8 +284,8 @@ namespace LinearAlgebra
      */
     void import(const PETScWrappers::MPI::Vector &petsc_vec,
                 VectorOperation::values operation,
-                std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern =
-                  std_cxx11::shared_ptr<const CommunicationPatternBase> ());
+                std::shared_ptr<const CommunicationPatternBase> communication_pattern =
+                  std::shared_ptr<const CommunicationPatternBase> ());
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -299,8 +299,8 @@ namespace LinearAlgebra
      */
     void import(const TrilinosWrappers::MPI::Vector &trilinos_vec,
                 VectorOperation::values operation,
-                std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern =
-                  std_cxx11::shared_ptr<const CommunicationPatternBase> ());
+                std::shared_ptr<const CommunicationPatternBase> communication_pattern =
+                  std::shared_ptr<const CommunicationPatternBase> ());
 
     /**
      * Imports all the elements present in the vector's IndexSet from the input
@@ -312,8 +312,8 @@ namespace LinearAlgebra
      */
     void import(const EpetraWrappers::Vector &epetra_vec,
                 VectorOperation::values operation,
-                std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern =
-                  std_cxx11::shared_ptr<const CommunicationPatternBase> ());
+                std::shared_ptr<const CommunicationPatternBase> communication_pattern =
+                  std::shared_ptr<const CommunicationPatternBase> ());
 #endif
 
 #ifdef DEAL_II_WITH_CUDA
@@ -325,8 +325,8 @@ namespace LinearAlgebra
      */
     void import(const CUDAWrappers::Vector<Number> &cuda_vec,
                 VectorOperation::values operation,
-                std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern =
-                  std_cxx11::shared_ptr<const CommunicationPatternBase> ());
+                std::shared_ptr<const CommunicationPatternBase> communication_pattern =
+                  std::shared_ptr<const CommunicationPatternBase> ());
 #endif
 
     /**
@@ -515,7 +515,7 @@ namespace LinearAlgebra
                 const IndexSet                                 &locally_owned_elements,
                 VectorOperation::values                         operation,
                 const MPI_Comm                                 &mpi_comm,
-                std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern);
+                std::shared_ptr<const CommunicationPatternBase> communication_pattern);
 #endif
 
     /**
@@ -558,7 +558,7 @@ namespace LinearAlgebra
      * CommunicationPattern for the communication between the
      * source_stored_elements IndexSet and the current vector.
      */
-    std_cxx11::shared_ptr<CommunicationPatternBase> comm_pattern;
+    std::shared_ptr<CommunicationPatternBase> comm_pattern;
 
     /**
      * Pointer to the array of local elements of this vector.
@@ -569,7 +569,7 @@ namespace LinearAlgebra
      * For parallel loops with TBB, this member variable stores the affinity
      * information of loops.
      */
-    mutable std_cxx11::shared_ptr< ::dealii::parallel::internal::TBBPartitioner> thread_loop_partitioner;
+    mutable std::shared_ptr< ::dealii::parallel::internal::TBBPartitioner> thread_loop_partitioner;
 
     /**
      * Make all other ReadWriteVector types friends.

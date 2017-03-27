@@ -17,7 +17,8 @@
 #include <deal.II/base/polynomials_piecewise.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/table.h>
-#include <deal.II/base/std_cxx11/array.h>
+
+#include <array>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -334,9 +335,9 @@ compute (const Point<dim>            &p,
   // derivatives, up to the 4th derivative, for up to 20 polynomials).
   // If someone uses a larger number of
   // polynomials, we need to allocate more memory on the heap.
-  std_cxx11::array<std_cxx11::array<double,5>, dim> *v;
-  std_cxx11::array<std_cxx11::array<std_cxx11::array<double,5>, dim>, 20> small_array;
-  std::vector<std_cxx11::array<std_cxx11::array<double,5>, dim> > large_array;
+  std::array<std::array<double,5>, dim> *v;
+  std::array<std::array<std::array<double,5>, dim>, 20> small_array;
+  std::vector<std::array<std::array<double,5>, dim> > large_array;
 
   const unsigned int n_polynomials = polynomials.size();
   if (n_polynomials > 20)

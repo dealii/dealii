@@ -43,12 +43,12 @@ print_dofs (const DoFHandler<dim> &dof)
 {
   const FiniteElement<dim> &fe = dof.get_fe();
   std::vector<types::global_dof_index> v (fe.dofs_per_cell);
-  std_cxx11::shared_ptr<FEValues<dim> > fevalues;
+  std::shared_ptr<FEValues<dim> > fevalues;
 
   if (fe.has_support_points())
     {
       Quadrature<dim> quad(fe.get_unit_support_points());
-      fevalues = std_cxx11::shared_ptr<FEValues<dim> >(new FEValues<dim>(fe, quad, update_quadrature_points));
+      fevalues = std::shared_ptr<FEValues<dim> >(new FEValues<dim>(fe, quad, update_quadrature_points));
     }
 
   for (typename DoFHandler<dim>::active_cell_iterator cell=dof.begin_active();
@@ -76,12 +76,12 @@ print_dofs (const DoFHandler<dim> &dof, unsigned int level)
 {
   const FiniteElement<dim> &fe = dof.get_fe();
   std::vector<types::global_dof_index> v (fe.dofs_per_cell);
-  std_cxx11::shared_ptr<FEValues<dim> > fevalues;
+  std::shared_ptr<FEValues<dim> > fevalues;
 
   if (fe.has_support_points())
     {
       Quadrature<dim> quad(fe.get_unit_support_points());
-      fevalues = std_cxx11::shared_ptr<FEValues<dim> >(new FEValues<dim>(fe, quad, update_quadrature_points));
+      fevalues = std::shared_ptr<FEValues<dim> >(new FEValues<dim>(fe, quad, update_quadrature_points));
     }
 
   for (typename DoFHandler<dim>::cell_iterator cell=dof.begin(level);

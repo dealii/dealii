@@ -43,7 +43,7 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
     template
     std::vector<dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type>
     compute_active_cell_halo_layer (const X &,
-                                    const std_cxx11::function<bool (const dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type&)> &);
+                                    const std::function<bool (const dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type&)> &);
 
     template
     std::vector<dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type>

@@ -512,7 +512,7 @@ private:
   /**
    * Pointer to the sparsity pattern used for this matrix.
    */
-  std_cxx11::shared_ptr<PointerMatrixBase<VectorType> > matrix;
+  std::shared_ptr<PointerMatrixBase<VectorType> > matrix;
 
   /**
    * Sorted list of pairs denoting the index of the variable and the value to

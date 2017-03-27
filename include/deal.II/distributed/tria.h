@@ -23,9 +23,6 @@
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/base/std_cxx11/function.h>
-#include <deal.II/base/std_cxx11/tuple.h>
-
 #include <deal.II/distributed/tria_base.h>
 #include <deal.II/distributed/p4est_wrappers.h>
 
@@ -33,6 +30,8 @@
 #include <vector>
 #include <list>
 #include <utility>
+#include <functional>
+#include <tuple>
 
 #ifdef DEAL_II_WITH_MPI
 #  include <mpi.h>
@@ -157,7 +156,7 @@ namespace parallel
      * information into the function. C++ provides a nice mechanism for this
      * that is best explained using an example:
      * @code
-     *     #include <deal.II/base/std_cxx11/bind.h>
+     *     #include <functional>
      *
      *     template <int dim>
      *     void set_boundary_ids (parallel::distributed::Triangulation<dim> &triangulation)
@@ -173,13 +172,13 @@ namespace parallel
      *       ... create the coarse mesh ...
      *
      *       coarse_grid.signals.post_refinement.connect
-     *         (std_cxx11::bind (&set_boundary_ids<dim>,
-     *                           std_cxx11::ref(coarse_grid)));
+     *         (std::bind (&set_boundary_ids<dim>,
+     *                     std::ref(coarse_grid)));
      *
      *     }
      * @endcode
      *
-     * What the call to <code>std_cxx11::bind</code> does is to produce an
+     * What the call to <code>std::bind</code> does is to produce an
      * object that can be called like a function with no arguments. It does so
      * by taking the address of a function that does, in fact, take an
      * argument but permanently fix this one argument to a reference to the
@@ -197,7 +196,7 @@ namespace parallel
      * static, but possibly private) member function of the
      * <code>MyClass</code> class, then the following will work:
      * @code
-     *     #include <deal.II/base/std_cxx11/bind.h>
+     *     #include <functional>
      *
      *     template <int dim>
      *     void
@@ -215,9 +214,9 @@ namespace parallel
      *       ... create the coarse mesh ...
      *
      *       coarse_grid.signals.post_refinement.connect
-     *         (std_cxx11::bind (&MyGeometry<dim>::set_boundary_ids,
-     *                           std_cxx11::cref(*this),
-     *                           std_cxx11::ref(coarse_grid)));
+     *         (std::bind (&MyGeometry<dim>::set_boundary_ids,
+     *                     std::cref(*this),
+     *                     std::ref(coarse_grid)));
      *     }
      * @endcode
      * Here, like any other member function, <code>set_boundary_ids</code>
@@ -644,9 +643,9 @@ namespace parallel
        */
       unsigned int
       register_data_attach (const std::size_t size,
-                            const std_cxx11::function<void (const cell_iterator &,
-                                                            const CellStatus,
-                                                            void *)> &pack_callback);
+                            const std::function<void (const cell_iterator &,
+                                                      const CellStatus,
+                                                      void *)> &pack_callback);
 
       /**
        * The supplied callback function is called for each newly locally owned
@@ -664,9 +663,9 @@ namespace parallel
        */
       void
       notify_ready_to_unpack (const unsigned int offset,
-                              const std_cxx11::function<void (const cell_iterator &,
-                                                              const CellStatus,
-                                                              const void *)> &unpack_callback);
+                              const std::function<void (const cell_iterator &,
+                                                        const CellStatus,
+                                                        const void *)> &unpack_callback);
 
       /**
        * Return a permutation vector for the order the coarse cells are handed
@@ -776,7 +775,7 @@ namespace parallel
        */
       unsigned int n_attached_deserialize;
 
-      typedef  std_cxx11::function<
+      typedef  std::function<
       void(typename Triangulation<dim,spacedim>::cell_iterator, CellStatus, void *)
       > pack_callback_t;
 

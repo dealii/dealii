@@ -31,7 +31,7 @@
 #include <deal.II/numerics/data_postprocessor.h>
 #include <deal.II/numerics/data_component_interpretation.h>
 
-#include <deal.II/base/std_cxx11/shared_ptr.h>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -326,14 +326,14 @@ namespace internal
                         const unsigned int n_subdivisions,
                         const std::vector<unsigned int> &n_postprocessor_outputs,
                         const Mapping<dim,spacedim> &mapping,
-                        const std::vector<std_cxx11::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
+                        const std::vector<std::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
                         const UpdateFlags update_flags,
                         const bool        use_face_values);
 
       ParallelDataBase (const ParallelDataBase &data);
 
       template <typename DoFHandlerType>
-      void reinit_all_fe_values(std::vector<std_cxx11::shared_ptr<DataEntryBase<DoFHandlerType> > > &dof_data,
+      void reinit_all_fe_values(std::vector<std::shared_ptr<DataEntryBase<DoFHandlerType> > > &dof_data,
                                 const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
                                 const unsigned int face = numbers::invalid_unsigned_int);
 
@@ -350,11 +350,11 @@ namespace internal
       std::vector<std::vector<dealii::Vector<double> > > postprocessed_values;
 
       const dealii::hp::MappingCollection<dim,spacedim> mapping_collection;
-      const std::vector<std_cxx11::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > finite_elements;
+      const std::vector<std::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > finite_elements;
       const UpdateFlags update_flags;
 
-      std::vector<std_cxx11::shared_ptr<dealii::hp::FEValues<dim,spacedim> > > x_fe_values;
-      std::vector<std_cxx11::shared_ptr<dealii::hp::FEFaceValues<dim,spacedim> > > x_fe_face_values;
+      std::vector<std::shared_ptr<dealii::hp::FEValues<dim,spacedim> > > x_fe_values;
+      std::vector<std::shared_ptr<dealii::hp::FEFaceValues<dim,spacedim> > > x_fe_face_values;
     };
   }
 }
@@ -826,12 +826,12 @@ protected:
   /**
    * List of data elements with vectors of values for each degree of freedom.
    */
-  std::vector<std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> > >  dof_data;
+  std::vector<std::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> > >  dof_data;
 
   /**
    * List of data elements with vectors of values for each cell.
    */
-  std::vector<std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> > >  cell_data;
+  std::vector<std::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> > >  cell_data;
 
   /**
    * This is a list of patches that is created each time build_patches() is
@@ -858,7 +858,7 @@ protected:
    * Extracts the finite elements stored in the dof_data object, including a
    * dummy object of FE_DGQ<dim>(0) in case only the triangulation is used.
    */
-  std::vector<std_cxx11::shared_ptr<dealii::hp::FECollection<DoFHandlerType::dimension,DoFHandlerType::space_dimension> > >
+  std::vector<std::shared_ptr<dealii::hp::FECollection<DoFHandlerType::dimension,DoFHandlerType::space_dimension> > >
   get_finite_elements() const;
 
   /**
@@ -866,7 +866,7 @@ protected:
    * function. See there for a more extensive documentation.
    */
   virtual
-  std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >
+  std::vector<std::tuple<unsigned int, unsigned int, std::string> >
   get_vector_data_ranges () const;
 
   /**
@@ -921,16 +921,16 @@ merge_patches (const DataOut_DoFData<DoFHandlerType2,patch_dim,patch_space_dim> 
                       "as vectors."));
   for (unsigned int i=0; i<get_vector_data_ranges().size(); ++i)
     {
-      Assert (std_cxx11::get<0>(get_vector_data_ranges()[i]) ==
-              std_cxx11::get<0>(source.get_vector_data_ranges()[i]),
+      Assert (std::get<0>(get_vector_data_ranges()[i]) ==
+              std::get<0>(source.get_vector_data_ranges()[i]),
               ExcMessage ("Both sources need to declare the same components "
                           "as vectors."));
-      Assert (std_cxx11::get<1>(get_vector_data_ranges()[i]) ==
-              std_cxx11::get<1>(source.get_vector_data_ranges()[i]),
+      Assert (std::get<1>(get_vector_data_ranges()[i]) ==
+              std::get<1>(source.get_vector_data_ranges()[i]),
               ExcMessage ("Both sources need to declare the same components "
                           "as vectors."));
-      Assert (std_cxx11::get<2>(get_vector_data_ranges()[i]) ==
-              std_cxx11::get<2>(source.get_vector_data_ranges()[i]),
+      Assert (std::get<2>(get_vector_data_ranges()[i]) ==
+              std::get<2>(source.get_vector_data_ranges()[i]),
               ExcMessage ("Both sources need to declare the same components "
                           "as vectors."));
     }

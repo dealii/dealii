@@ -93,8 +93,8 @@ namespace LinearAlgebra
        */
       virtual void import(const ReadWriteVector<Number> &V,
                           VectorOperation::values operation,
-                          std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern =
-                            std_cxx11::shared_ptr<const CommunicationPatternBase> ()) override;
+                          std::shared_ptr<const CommunicationPatternBase> communication_pattern =
+                            std::shared_ptr<const CommunicationPatternBase> ()) override;
 
       /**
        * Multiply the entive vector by a fixed factor.

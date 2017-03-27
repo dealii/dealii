@@ -19,11 +19,11 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/derivative_form.h>
-#include <deal.II/base/std_cxx11/array.h>
 #include <deal.II/base/array_view.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/fe/fe_update_flags.h>
 
+#include <array>
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
@@ -320,7 +320,7 @@ public:
    * <code>cell-@>vertex(v)</code>.
    */
   virtual
-  std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+  std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
   get_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
   /**

@@ -27,7 +27,7 @@
 #include <deal.II/base/table.h>
 #include <deal.II/base/thread_management.h>
 
-#include <deal.II/base/std_cxx11/shared_ptr.h>
+#include <memory>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

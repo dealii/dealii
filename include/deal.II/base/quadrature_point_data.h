@@ -763,11 +763,11 @@ namespace parallel
       data_size_in_bytes = sizeof(double) * dofs_per_cell * number_of_values;
 
       offset = triangulation->register_data_attach(data_size_in_bytes,
-                                                   std_cxx11::bind(&ContinuousQuadratureDataTransfer<dim,DataType>::pack_function,
-                                                       this,
-                                                       std_cxx11::_1,
-                                                       std_cxx11::_2,
-                                                       std_cxx11::_3));
+                                                   std::bind(&ContinuousQuadratureDataTransfer<dim,DataType>::pack_function,
+                                                             this,
+                                                             std::placeholders::_1,
+                                                             std::placeholders::_2,
+                                                             std::placeholders::_3));
     }
 
 
@@ -776,11 +776,11 @@ namespace parallel
     void ContinuousQuadratureDataTransfer<dim,DataType>::interpolate ()
     {
       triangulation->notify_ready_to_unpack(offset,
-                                            std_cxx11::bind(&ContinuousQuadratureDataTransfer<dim,DataType>::unpack_function,
-                                                            this,
-                                                            std_cxx11::_1,
-                                                            std_cxx11::_2,
-                                                            std_cxx11::_3));
+                                            std::bind(&ContinuousQuadratureDataTransfer<dim,DataType>::unpack_function,
+                                                      this,
+                                                      std::placeholders::_1,
+                                                      std::placeholders::_2,
+                                                      std::placeholders::_3));
 
       // invalidate the pointers
       data_storage = nullptr;

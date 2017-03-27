@@ -490,11 +490,11 @@ public:
    * to the function object.
    */
   template <typename OutVector, typename InVector>
-  void cell_loop (const std_cxx11::function<void (const MatrixFree<dim,Number> &,
-                                                  OutVector &,
-                                                  const InVector &,
-                                                  const std::pair<unsigned int,
-                                                  unsigned int> &)> &cell_operation,
+  void cell_loop (const std::function<void (const MatrixFree<dim,Number> &,
+                                            OutVector &,
+                                            const InVector &,
+                                            const std::pair<unsigned int,
+                                            unsigned int> &)> &cell_operation,
                   OutVector      &dst,
                   const InVector &src) const;
 
@@ -503,7 +503,7 @@ public:
    * a function pointer to a member function of class @p CLASS with the
    * signature <code>cell_operation (const MatrixFree<dim,Number> &, OutVector
    * &, InVector &, std::pair<unsigned int,unsigned int>&)const</code>. This
-   * method obviates the need to call std_cxx11::bind to bind the class into
+   * method obviates the need to call std::bind to bind the class into
    * the given function in case the local function needs to access data in the
    * class (i.e., it is a non-static member function).
    */
@@ -617,7 +617,7 @@ public:
    * usually prefer this data structure as the data exchange information can
    * be reused from one vector to another.
    */
-  const std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> &
+  const std::shared_ptr<const Utilities::MPI::Partitioner> &
   get_vector_partitioner (const unsigned int vector_component=0) const;
 
   /**
@@ -1097,7 +1097,7 @@ MatrixFree<dim,Number>::initialize_dof_vector(LinearAlgebra::distributed::Vector
 
 template <int dim, typename Number>
 inline
-const std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> &
+const std::shared_ptr<const Utilities::MPI::Partitioner> &
 MatrixFree<dim,Number>::get_vector_partitioner (const unsigned int comp) const
 {
   AssertIndexRange (comp, n_components());
@@ -2386,11 +2386,11 @@ template <typename OutVector, typename InVector>
 inline
 void
 MatrixFree<dim, Number>::cell_loop
-(const std_cxx11::function<void (const MatrixFree<dim,Number> &,
-                                 OutVector &,
-                                 const InVector &,
-                                 const std::pair<unsigned int,
-                                 unsigned int> &)> &cell_operation,
+(const std::function<void (const MatrixFree<dim,Number> &,
+                           OutVector &,
+                           const InVector &,
+                           const std::pair<unsigned int,
+                           unsigned int> &)> &cell_operation,
  OutVector       &dst,
  const InVector  &src) const
 {
@@ -2406,14 +2406,14 @@ MatrixFree<dim, Number>::cell_loop
       // to simplify the function calls, bind away all arguments except the
       // cell range
       typedef
-      std_cxx11::function<void (const std::pair<unsigned int,unsigned int> &range)>
+      std::function<void (const std::pair<unsigned int,unsigned int> &range)>
       Worker;
 
-      const Worker func = std_cxx11::bind (std_cxx11::ref(cell_operation),
-                                           std_cxx11::cref(*this),
-                                           std_cxx11::ref(dst),
-                                           std_cxx11::cref(src),
-                                           std_cxx11::_1);
+      const Worker func = std::bind (std::ref(cell_operation),
+                                     std::cref(*this),
+                                     std::ref(dst),
+                                     std::cref(src),
+                                     std::placeholders::_1);
 
       if (task_info.use_partition_partition == true)
         {
@@ -2681,19 +2681,19 @@ MatrixFree<dim,Number>::cell_loop
  OutVector      &dst,
  const InVector &src) const
 {
-  // here, use std_cxx11::bind to hand a function handler with the appropriate
+  // here, use std::bind to hand a function handler with the appropriate
   // argument to the other loop function
-  std_cxx11::function<void (const MatrixFree<dim,Number> &,
-                            OutVector &,
-                            const InVector &,
-                            const std::pair<unsigned int,
-                            unsigned int> &)>
-  function = std_cxx11::bind<void>(function_pointer,
-                                   owning_class,
-                                   std_cxx11::_1,
-                                   std_cxx11::_2,
-                                   std_cxx11::_3,
-                                   std_cxx11::_4);
+  std::function<void (const MatrixFree<dim,Number> &,
+                      OutVector &,
+                      const InVector &,
+                      const std::pair<unsigned int,
+                      unsigned int> &)>
+  function = std::bind<void>(function_pointer,
+                             owning_class,
+                             std::placeholders::_1,
+                             std::placeholders::_2,
+                             std::placeholders::_3,
+                             std::placeholders::_4);
   cell_loop (function, dst, src);
 }
 
@@ -2713,19 +2713,19 @@ MatrixFree<dim,Number>::cell_loop
  OutVector      &dst,
  const InVector &src) const
 {
-  // here, use std_cxx11::bind to hand a function handler with the appropriate
+  // here, use std::bind to hand a function handler with the appropriate
   // argument to the other loop function
-  std_cxx11::function<void (const MatrixFree<dim,Number> &,
-                            OutVector &,
-                            const InVector &,
-                            const std::pair<unsigned int,
-                            unsigned int> &)>
-  function = std_cxx11::bind<void>(function_pointer,
-                                   owning_class,
-                                   std_cxx11::_1,
-                                   std_cxx11::_2,
-                                   std_cxx11::_3,
-                                   std_cxx11::_4);
+  std::function<void (const MatrixFree<dim,Number> &,
+                      OutVector &,
+                      const InVector &,
+                      const std::pair<unsigned int,
+                      unsigned int> &)>
+  function = std::bind<void>(function_pointer,
+                             owning_class,
+                             std::placeholders::_1,
+                             std::placeholders::_2,
+                             std::placeholders::_3,
+                             std::placeholders::_4);
   cell_loop (function, dst, src);
 }
 

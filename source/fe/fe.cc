@@ -88,9 +88,9 @@ FiniteElement (const FiniteElementData<dim> &fe_data,
   n_nonzero_components_table (compute_n_nonzero_components(nonzero_components)),
   cached_primitivity (std::find_if (n_nonzero_components_table.begin(),
                                     n_nonzero_components_table.end(),
-                                    std_cxx11::bind (std::not_equal_to<unsigned int>(),
-                                                     std_cxx11::_1,
-                                                     1U))
+                                    std::bind (std::not_equal_to<unsigned int>(),
+                                               std::placeholders::_1,
+                                               1U))
                       == n_nonzero_components_table.end())
 {
   Assert (restriction_is_additive_flags.size() == this->dofs_per_cell,

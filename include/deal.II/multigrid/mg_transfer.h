@@ -33,7 +33,7 @@
 
 #include <deal.II/dofs/dof_handler.h>
 
-#include <deal.II/base/std_cxx11/shared_ptr.h>
+#include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -559,14 +559,14 @@ private:
   /**
    * Sparsity patterns for transfer matrices.
    */
-  std::vector<std_cxx11::shared_ptr<typename internal::MatrixSelector<VectorType>::Sparsity> > prolongation_sparsities;
+  std::vector<std::shared_ptr<typename internal::MatrixSelector<VectorType>::Sparsity> > prolongation_sparsities;
 
   /**
    * The actual prolongation matrix.  column indices belong to the dof indices
    * of the mother cell, i.e. the coarse level.  while row indices belong to
    * the child cell, i.e. the fine level.
    */
-  std::vector<std_cxx11::shared_ptr<typename internal::MatrixSelector<VectorType>::Matrix> > prolongation_matrices;
+  std::vector<std::shared_ptr<typename internal::MatrixSelector<VectorType>::Matrix> > prolongation_matrices;
 
   /**
    * Degrees of freedom on the refinement edge excluding those on the

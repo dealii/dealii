@@ -16,7 +16,6 @@
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
-#include <deal.II/base/std_cxx11/unique_ptr.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
@@ -34,7 +33,7 @@
 
 #include <fstream>
 #include <iomanip>
-#include <iomanip>
+#include <memory>
 #include <string>
 
 //#define DEBUG_OUTPUT_VTK
@@ -140,10 +139,10 @@ check_this (const FiniteElement<dim> &fe1,
   if (!fe2.isotropic_restriction_is_implemented())
     return;
 
-  std_cxx11::unique_ptr<parallel::distributed::Triangulation<dim> > tria(make_tria<dim>());
+  std::unique_ptr<parallel::distributed::Triangulation<dim> > tria(make_tria<dim>());
 
-  std_cxx11::unique_ptr<DoFHandler<dim> >    dof1(make_dof_handler (*tria, fe1));
-  std_cxx11::unique_ptr<DoFHandler<dim> >    dof2(make_dof_handler (*tria, fe2));
+  std::unique_ptr<DoFHandler<dim> >    dof1(make_dof_handler (*tria, fe1));
+  std::unique_ptr<DoFHandler<dim> >    dof2(make_dof_handler (*tria, fe2));
   ConstraintMatrix cm1;
   DoFTools::make_hanging_node_constraints (*dof1, cm1);
   cm1.close ();
@@ -264,10 +263,10 @@ check_this_dealii (const FiniteElement<dim> &fe1,
   if (!fe2.isotropic_restriction_is_implemented())
     return;
 
-  std_cxx11::unique_ptr<parallel::distributed::Triangulation<dim> > tria(make_tria<dim>());
+  std::unique_ptr<parallel::distributed::Triangulation<dim> > tria(make_tria<dim>());
 
-  std_cxx11::unique_ptr<DoFHandler<dim> >    dof1(make_dof_handler (*tria, fe1));
-  std_cxx11::unique_ptr<DoFHandler<dim> >    dof2(make_dof_handler (*tria, fe2));
+  std::unique_ptr<DoFHandler<dim> >    dof1(make_dof_handler (*tria, fe1));
+  std::unique_ptr<DoFHandler<dim> >    dof2(make_dof_handler (*tria, fe2));
   ConstraintMatrix cm1;
   DoFTools::make_hanging_node_constraints (*dof1, cm1);
   cm1.close ();

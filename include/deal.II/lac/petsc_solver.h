@@ -23,9 +23,10 @@
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/solver_control.h>
-#  include <deal.II/base/std_cxx11/shared_ptr.h>
 
 #  include <petscksp.h>
+
+#  include <memory>
 
 #ifdef DEAL_II_WITH_SLEPC
 #include <deal.II/lac/slepc_spectral_transformation.h>
@@ -250,7 +251,7 @@ namespace PETScWrappers
      * Pointer to an object that stores the solver context. This is recreated
      * in the main solver routine if necessary.
      */
-    std_cxx11::shared_ptr<SolverData> solver_data;
+    std::shared_ptr<SolverData> solver_data;
 
 #ifdef DEAL_II_WITH_SLEPC
     /**
@@ -994,7 +995,7 @@ namespace PETScWrappers
       PC  pc;
     };
 
-    std_cxx11::shared_ptr<SolverDataMUMPS> solver_data;
+    std::shared_ptr<SolverDataMUMPS> solver_data;
 
     /**
      * Flag specifies whether matrix being factorized is symmetric or not. It

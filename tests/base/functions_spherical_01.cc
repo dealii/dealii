@@ -86,26 +86,26 @@ public:
   {}
 
 private:
-  virtual double svalue(const std_cxx11::array<double, dim> &sp,
+  virtual double svalue(const std::array<double, dim> &sp,
                         const unsigned int) const
   {
     return std::exp(-Z*sp[0]);
   }
 
-  virtual std_cxx11::array<double, dim> sgradient(const std_cxx11::array<double, dim> &sp,
-                                                  const unsigned int) const
+  virtual std::array<double, dim> sgradient(const std::array<double, dim> &sp,
+                                            const unsigned int) const
   {
-    std_cxx11::array<double, dim> res;
+    std::array<double, dim> res;
     res[0] = -Z*std::exp(-Z*sp[0]);
     for (unsigned int i=1; i < dim; i++)
       res[i] = 0.;
     return res;
   }
 
-  virtual std_cxx11::array<double, 6> shessian (const std_cxx11::array<double, dim> &sp,
-                                                const unsigned int) const
+  virtual std::array<double, 6> shessian (const std::array<double, dim> &sp,
+                                          const unsigned int) const
   {
-    std_cxx11::array<double, 6> res;
+    std::array<double, 6> res;
     res[0] = Z*Z*std::exp(-Z*sp[0]);
     for (unsigned int i=1; i < 6; i++)
       res[i] = 0.;
@@ -131,7 +131,7 @@ void check()
     for (double theta = 0; theta < 2*numbers::PI; theta+= numbers::PI/3.)
       for (double phi = 0.01; phi <= numbers::PI; phi+= numbers::PI/4.)
         {
-          std_cxx11::array<double, dim> sp;
+          std::array<double, dim> sp;
           sp[0] = r;
           sp[1] = theta;
           sp[2] = phi;

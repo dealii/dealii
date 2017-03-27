@@ -18,8 +18,6 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_CXX11
-
 #  include <iterator>
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx11
@@ -28,17 +26,5 @@ namespace std_cxx11
   using std::end;
 }
 DEAL_II_NAMESPACE_CLOSE
-
-#else
-
-#include <boost/range.hpp>
-DEAL_II_NAMESPACE_OPEN
-namespace std_cxx11
-{
-  using boost::begin;
-  using boost::end;
-}
-DEAL_II_NAMESPACE_CLOSE
-#endif
 
 #endif

@@ -44,12 +44,12 @@
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/distributed/tria.h>
 
-#include <deal.II/base/std_cxx11/bind.h>
 
 #include <numeric>
 #include <algorithm>
 #include <cmath>
 #include <vector>
+#include <functional>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1162,10 +1162,10 @@ estimate (const Mapping<dim, spacedim>               &mapping,
   // now let's work on all those cells:
   WorkStream::run (dof_handler.begin_active(),
                    static_cast<typename DoFHandlerType::active_cell_iterator>(dof_handler.end()),
-                   std_cxx11::bind (&internal::estimate_one_cell<InputVector,DoFHandlerType>,
-                                    std_cxx11::_1, std_cxx11::_2, std_cxx11::_3, std_cxx11::ref(solutions),strategy),
-                   std_cxx11::bind (&internal::copy_local_to_global<DoFHandlerType>,
-                                    std_cxx11::_1, std_cxx11::ref(face_integrals)),
+                   std::bind (&internal::estimate_one_cell<InputVector,DoFHandlerType>,
+                              std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::ref(solutions),strategy),
+                   std::bind (&internal::copy_local_to_global<DoFHandlerType>,
+                              std::placeholders::_1, std::ref(face_integrals)),
                    parallel_data,
                    sample_local_face_integrals);
 

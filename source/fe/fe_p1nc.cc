@@ -87,7 +87,7 @@ FE_P1NC::get_dpo_vector ()
 
 
 
-std_cxx11::array<std_cxx11::array<double,3>,4>
+std::array<std::array<double,3>,4>
 FE_P1NC::get_linear_shape_coefficients (const Triangulation<2,2>::cell_iterator &cell)
 {
   // edge midpoints
@@ -105,7 +105,7 @@ FE_P1NC::get_linear_shape_coefficients (const Triangulation<2,2>::cell_iterator 
 
   const double det = (mpt[0](0)-mpt[1](0))*(mpt[2](1)-mpt[3](1)) - (mpt[2](0)-mpt[3](0))*(mpt[0](1)-mpt[1](1));
 
-  std_cxx11::array<std_cxx11::array<double,3>,4> coeffs;
+  std::array<std::array<double,3>,4> coeffs;
   coeffs[0][0] = ((mpt[2](1)-mpt[3](1))*(0.5) -(mpt[0](1)-mpt[1](1))*(0.5))/det;
   coeffs[1][0] = ((mpt[2](1)-mpt[3](1))*(-0.5) -(mpt[0](1)-mpt[1](1))*(0.5))/det;
   coeffs[2][0] = ((mpt[2](1)-mpt[3](1))*(0.5) -(mpt[0](1)-mpt[1](1))*(-0.5))/det;
@@ -207,7 +207,7 @@ FE_P1NC::fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell
   const unsigned int n_q_points = mapping_data.quadrature_points.size();
 
   // linear shape functions
-  std_cxx11::array<std_cxx11::array<double,3>,4> coeffs = get_linear_shape_coefficients (cell);
+  std::array<std::array<double,3>,4> coeffs = get_linear_shape_coefficients (cell);
 
   // compute on the cell
   if (flags & update_values)
@@ -239,7 +239,7 @@ FE_P1NC::fill_fe_face_values (const Triangulation<2,2>::cell_iterator           
   const UpdateFlags flags(fe_internal.update_each);
 
   // linear shape functions
-  const std_cxx11::array<std_cxx11::array<double,3>,4> coeffs
+  const std::array<std::array<double,3>,4> coeffs
     = get_linear_shape_coefficients (cell);
 
   // compute on the face
@@ -280,7 +280,7 @@ FE_P1NC::fill_fe_subface_values (const Triangulation<2,2>::cell_iterator        
   const UpdateFlags flags(fe_internal.update_each);
 
   // linear shape functions
-  const std_cxx11::array<std_cxx11::array<double,3>,4> coeffs
+  const std::array<std::array<double,3>,4> coeffs
     = get_linear_shape_coefficients (cell);
 
   // compute on the subface

@@ -440,7 +440,7 @@ namespace internal
  * @author Uwe Koecher, 2017
  */
 template <>
-struct is_serial_vector< PETScWrappers::Vector > : std_cxx11::true_type
+struct is_serial_vector< PETScWrappers::Vector > : std::true_type
 {
 };
 

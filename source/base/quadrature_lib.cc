@@ -16,11 +16,10 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/geometry_info.h>
 
-#include <deal.II/base/std_cxx11/bind.h>
-
 #include <cmath>
 #include <limits>
 #include <algorithm>
+#include <functional>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -935,10 +934,10 @@ QSorted<dim>::QSorted(const Quadrature<dim> &quad) :
 
   std::sort(permutation.begin(),
             permutation.end(),
-            std_cxx11::bind(&QSorted<dim>::compare_weights,
-                            std_cxx11::ref(*this),
-                            std_cxx11::_1,
-                            std_cxx11::_2));
+            std::bind(&QSorted<dim>::compare_weights,
+                      std::ref(*this),
+                      std::placeholders::_1,
+                      std::placeholders::_2));
 
   for (unsigned int i=0; i<quad.size(); ++i)
     {

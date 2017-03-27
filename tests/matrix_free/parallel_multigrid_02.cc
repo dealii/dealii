@@ -114,7 +114,7 @@ void do_test (const DoFHandler<dim>  &dof)
   MappingQ<dim> mapping(fe_degree+1);
 
   LaplaceOperator<dim,fe_degree,n_q_points_1d,1,LinearAlgebra::distributed::Vector<number> > fine_matrix;
-  std_cxx11::shared_ptr<MatrixFree<dim,number> > fine_level_data(new MatrixFree<dim,number> ());
+  std::shared_ptr<MatrixFree<dim,number> > fine_level_data(new MatrixFree<dim,number> ());
 
   typename MatrixFree<dim,number>::AdditionalData fine_level_additional_data;
   fine_level_additional_data.tasks_parallel_scheme = MatrixFree<dim,number>::AdditionalData::none;
@@ -155,7 +155,7 @@ void do_test (const DoFHandler<dim>  &dof)
 
       mg_level_data[level].reinit (mapping, dof, level_constraints, QGauss<1>(n_q_points_1d),
                                    mg_additional_data);
-      mg_matrices[level].initialize(std_cxx11::make_shared<MatrixFree<dim,number> >(
+      mg_matrices[level].initialize(std::make_shared<MatrixFree<dim,number> >(
                                       mg_level_data[level]),
                                     mg_constrained_dofs,
                                     level);

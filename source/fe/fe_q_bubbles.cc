@@ -17,7 +17,6 @@
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/template_constraints.h>
-#include <deal.II/base/std_cxx11/unique_ptr.h>
 #include <deal.II/fe/fe_q_bubbles.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_tools.h>
@@ -33,6 +32,7 @@
 
 #include <vector>
 #include <sstream>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -52,7 +52,7 @@ namespace FE_Q_Bubbles_Helper
       const unsigned int degree = fe.degree;
 
       // Initialize quadrature formula on fine cells
-      std_cxx11::unique_ptr<Quadrature<dim> > q_fine;
+      std::unique_ptr<Quadrature<dim> > q_fine;
       Quadrature<1> q_dummy(std::vector<Point<1> >(1), std::vector<double> (1,1.));
       switch (dim)
         {

@@ -1481,7 +1481,7 @@ void FESystem<dim,spacedim>::initialize (const std::vector<const FiniteElement<d
       if (multiplicities[i]>0)
         {
           base_elements[ind] =
-            std::make_pair (std_cxx11::shared_ptr<const FiniteElement<dim,spacedim> >
+            std::make_pair (std::shared_ptr<const FiniteElement<dim,spacedim> >
                             (clone_base_elements[ind].return_value()),
                             multiplicities[i]);
           ++ind;

@@ -376,9 +376,9 @@ void MGTransferComponentBase::build_matrices (
   for (unsigned int i=0; i<n_levels-1; ++i)
     {
       prolongation_sparsities
-      .push_back (std_cxx11::shared_ptr<BlockSparsityPattern> (new BlockSparsityPattern));
+      .push_back (std::shared_ptr<BlockSparsityPattern> (new BlockSparsityPattern));
       prolongation_matrices
-      .push_back (std_cxx11::shared_ptr<BlockSparseMatrix<double> > (new BlockSparseMatrix<double>));
+      .push_back (std::shared_ptr<BlockSparseMatrix<double> > (new BlockSparseMatrix<double>));
     }
 
   // two fields which will store the
@@ -659,9 +659,9 @@ void MGTransferSelect<number>::build_matrices (
       // global to level dofs
       const types::global_dof_index n_active_dofs =
         std::count_if (temp_copy_indices.begin(), temp_copy_indices.end(),
-                       std_cxx11::bind (std::not_equal_to<types::global_dof_index>(),
-                                        std_cxx11::_1,
-                                        numbers::invalid_dof_index));
+                       std::bind (std::not_equal_to<types::global_dof_index>(),
+                                  std::placeholders::_1,
+                                  numbers::invalid_dof_index));
       copy_to_and_from_indices[level].resize (n_active_dofs);
       types::global_dof_index counter = 0;
       for (types::global_dof_index i=0; i<temp_copy_indices.size(); ++i)

@@ -287,7 +287,7 @@ namespace Step34
     Functions::ParsedFunction<dim> exact_solution;
 
     unsigned int singular_quadrature_order;
-    std_cxx11::shared_ptr<Quadrature<dim-1> > quadrature;
+    std::shared_ptr<Quadrature<dim-1> > quadrature;
 
     SolverControl solver_control;
 
@@ -431,7 +431,7 @@ namespace Step34
     prm.enter_subsection("Quadrature rules");
     {
       quadrature =
-        std_cxx11::shared_ptr<Quadrature<dim-1> >
+        std::shared_ptr<Quadrature<dim-1> >
         (new QuadratureSelector<dim-1> (prm.get("Quadrature type"),
                                         prm.get_integer("Quadrature order")));
       singular_quadrature_order = prm.get_integer("Singular quadrature order");

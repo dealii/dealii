@@ -19,7 +19,6 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/tensor_product_polynomials.h>
-#include <deal.II/base/std_cxx11/unique_ptr.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_accessor.h>
@@ -28,6 +27,7 @@
 #include <deal.II/fe/fe_values.h>
 
 #include <numeric>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -76,7 +76,7 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int degree,
   // created via the shared_ptr objects
   qp_mapping (this->polynomial_degree>1
               ?
-              std_cxx11::shared_ptr<const MappingQGeneric<dim,spacedim> >(new MappingQGeneric<dim,spacedim>(degree))
+              std::shared_ptr<const MappingQGeneric<dim,spacedim> >(new MappingQGeneric<dim,spacedim>(degree))
               :
               q1_mapping)
 {}
@@ -95,7 +95,7 @@ MappingQ<dim,spacedim>::MappingQ (const MappingQ<dim,spacedim> &mapping)
   // created via the shared_ptr objects
   qp_mapping (this->polynomial_degree>1
               ?
-              std_cxx11::shared_ptr<const MappingQGeneric<dim,spacedim> >(dynamic_cast<MappingQGeneric<dim,spacedim>*>(mapping.qp_mapping->clone()))
+              std::shared_ptr<const MappingQGeneric<dim,spacedim> >(dynamic_cast<MappingQGeneric<dim,spacedim>*>(mapping.qp_mapping->clone()))
               :
               q1_mapping)
 {}

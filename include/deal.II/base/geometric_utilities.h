@@ -18,7 +18,9 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/std_cxx11/array.h>
+
+
+#include <array>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -54,7 +56,7 @@ namespace GeometricUtilities
      * @f}
      */
     template <int dim>
-    std_cxx11::array<double,dim>
+    std::array<double,dim>
     to_spherical(const Point<dim> &point);
 
     /**
@@ -72,7 +74,7 @@ namespace GeometricUtilities
      */
     template <std::size_t dim>
     Point<dim>
-    from_spherical(const std_cxx11::array<double,dim> &scoord);
+    from_spherical(const std::array<double,dim> &scoord);
 
   }
 }

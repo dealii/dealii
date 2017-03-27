@@ -85,7 +85,7 @@ namespace Step27
     hp::QCollection<dim-1>   face_quadrature_collection;
 
     hp::QCollection<dim> fourier_q_collection;
-    std_cxx11::shared_ptr<FESeries::Fourier<dim> > fourier;
+    std::shared_ptr<FESeries::Fourier<dim> > fourier;
     std::vector<double> ln_k;
     Table<dim,std::complex<double> > fourier_coefficients;
 
@@ -152,9 +152,9 @@ namespace Step27
     for (unsigned int i = 0; i < fe_collection.size(); i++)
       fourier_q_collection.push_back(quadrature);
 
-    fourier = std_cxx11::make_shared<FESeries::Fourier<dim> >(N,
-                                                              fe_collection,
-                                                              fourier_q_collection);
+    fourier = std::make_shared<FESeries::Fourier<dim> >(N,
+                                                        fe_collection,
+                                                        fourier_q_collection);
     resize(fourier_coefficients,N);
   }
 

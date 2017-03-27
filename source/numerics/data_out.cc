@@ -41,7 +41,7 @@ namespace internal
                   const unsigned int n_subdivisions,
                   const std::vector<unsigned int> &n_postprocessor_outputs,
                   const Mapping<dim,spacedim> &mapping,
-                  const std::vector<std_cxx11::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
+                  const std::vector<std::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
                   const UpdateFlags update_flags,
                   const std::vector<std::vector<unsigned int> > &cell_to_patch_index_map)
       :
@@ -453,17 +453,17 @@ void DataOut<dim,DoFHandlerType>::build_patches
   if (all_cells.size() > 0)
     WorkStream::run (&all_cells[0],
                      &all_cells[0]+all_cells.size(),
-                     std_cxx11::bind(&DataOut<dim,DoFHandlerType>::build_one_patch,
-                                     this,
-                                     std_cxx11::_1,
-                                     std_cxx11::_2,
-                                     /* no std_cxx11::_3, since this function doesn't actually need a
-                                        copy data object -- it just writes everything right into the
-                                        output array */
-                                     n_subdivisions,
-                                     curved_cell_region),
+                     std::bind(&DataOut<dim,DoFHandlerType>::build_one_patch,
+                               this,
+                               std::placeholders::_1,
+                               std::placeholders::_2,
+                               /* no std::placeholders::_3, since this function doesn't actually need a
+                                  copy data object -- it just writes everything right into the
+                                  output array */
+                               n_subdivisions,
+                               curved_cell_region),
                      // no copy-local-to-global function needed here
-                     std_cxx11::function<void (const int &)>(),
+                     std::function<void (const int &)>(),
                      thread_data,
                      /* dummy CopyData object = */ 0,
                      // experimenting shows that we can make things run a bit

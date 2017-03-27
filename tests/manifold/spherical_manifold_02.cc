@@ -18,7 +18,6 @@
 #include "../tests.h"
 
 #include <deal.II/base/utilities.h>
-#include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <deal.II/grid/manifold_lib.h>
 
 #include <deal.II/base/quadrature_lib.h>
@@ -44,6 +43,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <memory>
 
 #include <deal.II/grid/manifold.h>
 
@@ -109,7 +109,7 @@ void test (MappingEnum::type mapping_name, unsigned int refinements=1)
   //           << " degrees of freedom."
   //           << std::endl;
 
-  std_cxx11::shared_ptr<Mapping<2,3> > mapping;
+  std::shared_ptr<Mapping<2,3> > mapping;
   switch (mapping_name)
     {
     case MappingEnum::MappingManifold:

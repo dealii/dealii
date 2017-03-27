@@ -23,9 +23,9 @@
 
 #ifdef DEAL_II_WITH_MPI
 
-#include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <deal.II/lac/communication_pattern_base.h>
 #include "Epetra_Import.h"
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -71,12 +71,12 @@ namespace LinearAlgebra
       /**
        * Shared pointer to the MPI communicator used.
        */
-      std_cxx11::shared_ptr<const MPI_Comm> comm;
+      std::shared_ptr<const MPI_Comm> comm;
 
       /**
        * Shared pointer to the Epetra_Import object used.
        */
-      std_cxx11::shared_ptr<Epetra_Import> import;
+      std::shared_ptr<Epetra_Import> import;
     };
   } // end of namespace EpetraWrappers
 } // end of namespace LinearAlgebra

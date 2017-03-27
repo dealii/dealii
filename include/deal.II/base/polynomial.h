@@ -22,8 +22,8 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/std_cxx11/shared_ptr.h>
 
+#include <memory>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -534,7 +534,7 @@ namespace Polynomials
      * shared_ptr in order to correctly free the memory of the vectors when
      * the global destructor is called.
      */
-    static std::vector<std_cxx11::shared_ptr<const std::vector<double> > > recursive_coefficients;
+    static std::vector<std::shared_ptr<const std::vector<double> > > recursive_coefficients;
   };
 
 

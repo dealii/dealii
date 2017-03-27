@@ -463,10 +463,10 @@ namespace TrilinosWrappers
                    const Epetra_Map                          &input_col_map,
                    const SparsityPatternType                 &sparsity_pattern,
                    const bool                                 exchange_data,
-                   std_cxx11::shared_ptr<Epetra_Map>         &column_space_map,
-                   std_cxx11::shared_ptr<Epetra_FECrsMatrix> &matrix,
-                   std_cxx11::shared_ptr<Epetra_CrsMatrix>   &nonlocal_matrix,
-                   std_cxx11::shared_ptr<Epetra_Export>      &nonlocal_matrix_exporter)
+                   std::shared_ptr<Epetra_Map>         &column_space_map,
+                   std::shared_ptr<Epetra_FECrsMatrix> &matrix,
+                   std::shared_ptr<Epetra_CrsMatrix>   &nonlocal_matrix,
+                   std::shared_ptr<Epetra_Export>      &nonlocal_matrix_exporter)
     {
       // release memory before reallocation
       matrix.reset();
@@ -519,7 +519,7 @@ namespace TrilinosWrappers
       // col_map that tells how the domain dofs of the matrix will be
       // distributed). for only one processor, we can directly assign the
       // columns as well. Compare this with bug # 4123 in the Sandia Bugzilla.
-      std_cxx11::shared_ptr<Epetra_CrsGraph> graph;
+      std::shared_ptr<Epetra_CrsGraph> graph;
       if (input_row_map.Comm().NumProc() > 1)
         graph.reset (new Epetra_CrsGraph (Copy, input_row_map,
                                           &n_entries_per_row[0], true));
@@ -599,10 +599,10 @@ namespace TrilinosWrappers
                    const Epetra_Map                          &input_col_map,
                    const DynamicSparsityPattern              &sparsity_pattern,
                    const bool                                 exchange_data,
-                   std_cxx11::shared_ptr<Epetra_Map>         &column_space_map,
-                   std_cxx11::shared_ptr<Epetra_FECrsMatrix> &matrix,
-                   std_cxx11::shared_ptr<Epetra_CrsMatrix>   &nonlocal_matrix,
-                   std_cxx11::shared_ptr<Epetra_Export>      &nonlocal_matrix_exporter)
+                   std::shared_ptr<Epetra_Map>         &column_space_map,
+                   std::shared_ptr<Epetra_FECrsMatrix> &matrix,
+                   std::shared_ptr<Epetra_CrsMatrix>   &nonlocal_matrix,
+                   std::shared_ptr<Epetra_Export>      &nonlocal_matrix_exporter)
     {
       matrix.reset();
       nonlocal_matrix.reset();
@@ -666,8 +666,8 @@ namespace TrilinosWrappers
                                    (ghost_rows.size()>0)?(&ghost_rows[0]):NULL,
                                    0, input_row_map.Comm());
 
-      std_cxx11::shared_ptr<Epetra_CrsGraph> graph;
-      std_cxx11::shared_ptr<Epetra_CrsGraphMod> nonlocal_graph;
+      std::shared_ptr<Epetra_CrsGraph> graph;
+      std::shared_ptr<Epetra_CrsGraphMod> nonlocal_graph;
       if (input_row_map.Comm().NumProc() > 1)
         {
           graph.reset (new Epetra_CrsGraph (Copy, input_row_map,

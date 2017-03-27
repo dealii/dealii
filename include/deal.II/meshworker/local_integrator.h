@@ -19,8 +19,8 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/subscriptor.h>
-#include <deal.II/base/std_cxx11/function.h>
 
+#include <functional>
 #include <vector>
 #include <string>
 

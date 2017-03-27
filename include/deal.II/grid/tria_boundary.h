@@ -210,7 +210,7 @@ private:
   /**
    * Point generator for the intermediate points on a boundary.
    */
-  mutable std::vector<std_cxx11::shared_ptr<QGaussLobatto<1> > > points;
+  mutable std::vector<std::shared_ptr<QGaussLobatto<1> > > points;
 
   /**
    * Mutex for protecting the points array.

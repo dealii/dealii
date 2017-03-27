@@ -22,12 +22,13 @@
 
 #ifdef DEAL_II_WITH_SLEPC
 
-#  include <deal.II/base/std_cxx11/shared_ptr.h>
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/petsc_solver.h>
 
 #  include <petscksp.h>
 #  include <slepceps.h>
+
+#  include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

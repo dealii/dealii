@@ -20,7 +20,6 @@
 #include <deal.II/meshworker/assembler.h>
 #include <deal.II/meshworker/loop.h>
 
-#include <deal.II/base/std_cxx11/function.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -33,6 +32,7 @@
 #include <deal.II/numerics/data_out.h>
 
 #include <fstream>
+#include <functional>
 #include <iomanip>
 
 using namespace dealii;
@@ -255,12 +255,12 @@ namespace Advection
     MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >
     (dof_handler.begin_active(), dof_handler.end(),
      dof_info, info_box,
-     std_cxx11::bind(&AdvectionProblem<dim>::integrate_cell_term,
-                     this, std_cxx11::_1, std_cxx11::_2),
-     std_cxx11::bind(&AdvectionProblem<dim>::integrate_boundary_term,
-                     this, std_cxx11::_1, std_cxx11::_2),
-     std_cxx11::bind(&AdvectionProblem<dim>::integrate_face_term,
-                     this, std_cxx11::_1, std_cxx11::_2, std_cxx11::_3, std_cxx11::_4),
+     std::bind(&AdvectionProblem<dim>::integrate_cell_term,
+               this, std::placeholders::_1, std::placeholders::_2),
+     std::bind(&AdvectionProblem<dim>::integrate_boundary_term,
+               this, std::placeholders::_1, std::placeholders::_2),
+     std::bind(&AdvectionProblem<dim>::integrate_face_term,
+               this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4),
      assembler, lctrl);
 
   }//assemble_system

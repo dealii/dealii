@@ -17,10 +17,11 @@
 #define dealii__fe_collection_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_values_extractors.h>
 #include <deal.II/fe/component_mask.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -458,7 +459,7 @@ namespace hp
     /**
      * Array of pointers to the finite elements stored by this collection.
      */
-    std::vector<std_cxx11::shared_ptr<const FiniteElement<dim,spacedim> > > finite_elements;
+    std::vector<std::shared_ptr<const FiniteElement<dim,spacedim> > > finite_elements;
   };
 
 

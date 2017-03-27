@@ -291,7 +291,7 @@ public:
      *
      * Filled once.
      */
-    std_cxx11::array<std::vector<Tensor<1,dim> >, GeometryInfo<dim>::faces_per_cell *(dim-1)> unit_tangentials;
+    std::array<std::vector<Tensor<1,dim> >, GeometryInfo<dim>::faces_per_cell *(dim-1)> unit_tangentials;
 
     /**
      * Tensors of covariant transformation at each of the quadrature points.

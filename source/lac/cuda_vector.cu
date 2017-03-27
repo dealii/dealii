@@ -567,7 +567,7 @@ namespace LinearAlgebra
     template <typename Number>
     void Vector<Number>::import(const ReadWriteVector<Number> &V,
                                 VectorOperation::values operation,
-                                std_cxx11::shared_ptr<const CommunicationPatternBase> )
+                                std::shared_ptr<const CommunicationPatternBase> )
     {
       if (operation == VectorOperation::insert)
         {

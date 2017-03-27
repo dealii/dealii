@@ -128,16 +128,16 @@ public:
   {}
 
 private:
-  virtual double svalue(const std_cxx11::array<double, dim> &sp,
+  virtual double svalue(const std::array<double, dim> &sp,
                         const unsigned int) const
   {
     return sp[0]*sp[0]*std::cos(sp[1])*std::sin(sp[2]);
   }
 
-  virtual std_cxx11::array<double, dim> sgradient(const std_cxx11::array<double, dim> &sp,
-                                                  const unsigned int) const
+  virtual std::array<double, dim> sgradient(const std::array<double, dim> &sp,
+                                            const unsigned int) const
   {
-    std_cxx11::array<double, dim> res;
+    std::array<double, dim> res;
     const double r     = sp[0];
     const double theta = sp[1];
     const double phi   = sp[2];
@@ -147,10 +147,10 @@ private:
     return res;
   }
 
-  virtual std_cxx11::array<double, 6> shessian (const std_cxx11::array<double, dim> &sp,
-                                                const unsigned int) const
+  virtual std::array<double, 6> shessian (const std::array<double, dim> &sp,
+                                          const unsigned int) const
   {
-    std_cxx11::array<double, 6> res;
+    std::array<double, 6> res;
     const double r = sp[0];
     const double theta = sp[1];
     const double phi = sp[2];
@@ -180,7 +180,7 @@ void check()
     for (double theta = 0; theta < 2*numbers::PI; theta+= numbers::PI/3.)
       for (double phi = 0.01; phi <= numbers::PI; phi+= numbers::PI/4.)
         {
-          std_cxx11::array<double, dim> sp;
+          std::array<double, dim> sp;
           sp[0] = r;
           sp[1] = theta;
           sp[2] = phi;

@@ -22,7 +22,7 @@
 #include <deal.II/fe/fe.h>
 
 #include <vector>
-#include <deal.II/base/std_cxx11/shared_ptr.h>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -113,7 +113,7 @@ namespace hp
      * The real container, which stores pointers to the different Mapping
      * objects.
      */
-    std::vector<std_cxx11::shared_ptr<const Mapping<dim,spacedim> > > mappings;
+    std::vector<std::shared_ptr<const Mapping<dim,spacedim> > > mappings;
   };
 
 

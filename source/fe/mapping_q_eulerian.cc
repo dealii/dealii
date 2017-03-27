@@ -143,7 +143,7 @@ SupportQuadrature (const unsigned int map_degree)
 // .... COMPUTE MAPPING SUPPORT POINTS
 
 template <int dim, class VectorType, int spacedim>
-std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
 MappingQEulerian<dim, VectorType, spacedim>::
 get_vertices
 (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
@@ -152,7 +152,7 @@ get_vertices
   const std::vector<Point<spacedim> > a
     = dynamic_cast<const MappingQEulerianGeneric &>(*this->qp_mapping).compute_mapping_support_points(cell);
 
-  std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertex_locations;
+  std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertex_locations;
   std::copy (a.begin(),
              a.begin()+GeometryInfo<dim>::vertices_per_cell,
              vertex_locations.begin());
@@ -163,7 +163,7 @@ get_vertices
 
 
 template <int dim, class VectorType, int spacedim>
-std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
 MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
 get_vertices
 (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const

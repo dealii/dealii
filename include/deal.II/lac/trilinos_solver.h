@@ -21,11 +21,12 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-#  include <deal.II/base/std_cxx11/shared_ptr.h>
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/solver_control.h>
 #  include <deal.II/lac/vector.h>
 #  include <deal.II/lac/la_parallel_vector.h>
+
+#  include <memory>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_LinearProblem.h>
@@ -321,13 +322,13 @@ namespace TrilinosWrappers
      * side vector and the solution vector, which is passed down to the
      * Trilinos solver.
      */
-    std_cxx11::shared_ptr<Epetra_LinearProblem> linear_problem;
+    std::shared_ptr<Epetra_LinearProblem> linear_problem;
 
     /**
      * A structure that contains a Trilinos object that can query the linear
      * solver and determine whether the convergence criterion have been met.
      */
-    std_cxx11::shared_ptr<AztecOO_StatusTest> status_test;
+    std::shared_ptr<AztecOO_StatusTest> status_test;
 
     /**
      * A structure that contains the Trilinos solver and preconditioner
@@ -745,13 +746,13 @@ namespace TrilinosWrappers
      * side vector and the solution vector, which is passed down to the
      * Trilinos solver.
      */
-    std_cxx11::shared_ptr<Epetra_LinearProblem> linear_problem;
+    std::shared_ptr<Epetra_LinearProblem> linear_problem;
 
     /**
      * A structure that contains the Trilinos solver and preconditioner
      * objects.
      */
-    std_cxx11::shared_ptr<Amesos_BaseSolver> solver;
+    std::shared_ptr<Amesos_BaseSolver> solver;
 
     /**
      * Store a copy of the flags for this particular solver.

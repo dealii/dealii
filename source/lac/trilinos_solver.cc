@@ -371,10 +371,10 @@ namespace TrilinosWrappers
       private:
         double initial_residual;
         double current_residual;
-        std_cxx11::shared_ptr<AztecOO_StatusTestCombo>    status_test_collection;
-        std_cxx11::shared_ptr<AztecOO_StatusTestMaxIters> status_test_max_steps;
-        std_cxx11::shared_ptr<AztecOO_StatusTestResNorm>  status_test_abs_tol;
-        std_cxx11::shared_ptr<AztecOO_StatusTestResNorm>  status_test_rel_tol;
+        std::shared_ptr<AztecOO_StatusTestCombo>    status_test_collection;
+        std::shared_ptr<AztecOO_StatusTestMaxIters> status_test_max_steps;
+        std::shared_ptr<AztecOO_StatusTestResNorm>  status_test_abs_tol;
+        std::shared_ptr<AztecOO_StatusTestResNorm>  status_test_rel_tol;
       };
 
 

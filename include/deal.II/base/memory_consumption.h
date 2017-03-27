@@ -18,16 +18,15 @@
 
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/std_cxx11/shared_ptr.h>
-#include <deal.II/base/std_cxx11/type_traits.h>
-#include <deal.II/base/std_cxx11/unique_ptr.h>
-#include <deal.II/base/std_cxx11/array.h>
 
 #include <string>
 #include <complex>
 #include <vector>
 #include <cstddef>
 #include <cstring>
+#include <memory>
+#include <array>
+#include <type_traits>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -98,7 +97,7 @@ namespace MemoryConsumption
    */
   template <typename T>
   inline
-  typename std_cxx11::enable_if<std_cxx11::is_fundamental<T>::value, std::size_t>::type
+  typename std::enable_if<std::is_fundamental<T>::value, std::size_t>::type
   memory_consumption (const T &t);
 
   /**
@@ -109,7 +108,7 @@ namespace MemoryConsumption
    */
   template <typename T>
   inline
-  typename std_cxx11::enable_if<!(std_cxx11::is_fundamental<T>::value || std_cxx11::is_pointer<T>::value), std::size_t>::type
+  typename std::enable_if<!(std::is_fundamental<T>::value || std::is_pointer<T>::value), std::size_t>::type
   memory_consumption (const T &t);
 
   /**
@@ -177,7 +176,7 @@ namespace MemoryConsumption
 
   /**
    * Determine the amount of memory in bytes consumed by a
-   * <tt>std_cxx11::array</tt> of <tt>N</tt> elements of type <tt>T</tt> by
+   * <tt>std::array</tt> of <tt>N</tt> elements of type <tt>T</tt> by
    * calling memory_consumption() for each entry.
    *
    * This function loops over all entries of the array and determines their
@@ -197,7 +196,7 @@ namespace MemoryConsumption
    */
   template <typename T, std::size_t N>
   inline
-  std::size_t memory_consumption (const std_cxx11::array<T,N> &v);
+  std::size_t memory_consumption (const std::array<T,N> &v);
 
   /**
    * Estimate the amount of memory (in bytes) occupied by a C-style array.
@@ -250,16 +249,16 @@ namespace MemoryConsumption
    */
   template <typename T>
   inline
-  std::size_t memory_consumption (const std_cxx11::shared_ptr<T> &);
+  std::size_t memory_consumption (const std::shared_ptr<T> &);
 
   /**
-   * Return the amount of memory used by a std_cxx11::unique_ptr object.
+   * Return the amount of memory used by a std::unique_ptr object.
    *
    * @note This returns the size of the pointer, not of the object pointed to.
    */
   template <typename T>
   inline
-  std::size_t memory_consumption (const std_cxx11::unique_ptr<T> &);
+  std::size_t memory_consumption (const std::unique_ptr<T> &);
 }
 
 
@@ -270,7 +269,7 @@ namespace MemoryConsumption
 {
   template <typename T>
   inline
-  typename std_cxx11::enable_if<std_cxx11::is_fundamental<T>::value, std::size_t>::type
+  typename std::enable_if<std::is_fundamental<T>::value, std::size_t>::type
   memory_consumption(const T &)
   {
     return sizeof(T);
@@ -323,7 +322,7 @@ namespace MemoryConsumption
   std::size_t memory_consumption (const std::vector<T> &v)
   {
     // shortcut for types that do not allocate memory themselves
-    if (std_cxx11::is_fundamental<T>::value || std_cxx11::is_pointer<T>::value)
+    if (std::is_fundamental<T>::value || std::is_pointer<T>::value)
       {
         return v.capacity()*sizeof(T) + sizeof(v);
       }
@@ -342,10 +341,10 @@ namespace MemoryConsumption
 
 
   template <typename T, std::size_t N>
-  std::size_t memory_consumption (const std_cxx11::array<T,N> &v)
+  std::size_t memory_consumption (const std::array<T,N> &v)
   {
     // shortcut for types that do not allocate memory themselves
-    if (std_cxx11::is_fundamental<T>::value || std_cxx11::is_pointer<T>::value)
+    if (std::is_fundamental<T>::value || std::is_pointer<T>::value)
       {
         return sizeof(v);
       }
@@ -402,9 +401,9 @@ namespace MemoryConsumption
   template <typename T>
   inline
   std::size_t
-  memory_consumption (const std_cxx11::shared_ptr<T> &)
+  memory_consumption (const std::shared_ptr<T> &)
   {
-    return sizeof(std_cxx11::shared_ptr<T>);
+    return sizeof(std::shared_ptr<T>);
   }
 
 
@@ -412,16 +411,16 @@ namespace MemoryConsumption
   template <typename T>
   inline
   std::size_t
-  memory_consumption (const std_cxx11::unique_ptr<T> &)
+  memory_consumption (const std::unique_ptr<T> &)
   {
-    return sizeof(std_cxx11::unique_ptr<T>);
+    return sizeof(std::unique_ptr<T>);
   }
 
 
 
   template <typename T>
   inline
-  typename std_cxx11::enable_if<!(std_cxx11::is_fundamental<T>::value || std_cxx11::is_pointer<T>::value), std::size_t>::type
+  typename std::enable_if<!(std::is_fundamental<T>::value || std::is_pointer<T>::value), std::size_t>::type
   memory_consumption (const T &t)
   {
     return t.memory_consumption();

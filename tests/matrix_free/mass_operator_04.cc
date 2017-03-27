@@ -58,9 +58,9 @@ void test ()
   constraints_0.close();
   constraints_1.close();
 
-  std_cxx11::shared_ptr<MatrixFree<dim,number> > mf_data_0(new MatrixFree<dim,number> ());
-  std_cxx11::shared_ptr<MatrixFree<dim,number> > mf_data_1(new MatrixFree<dim,number> ());
-  std_cxx11::shared_ptr<MatrixFree<dim,number> > mf_data_combined(new MatrixFree<dim,number> ());
+  std::shared_ptr<MatrixFree<dim,number> > mf_data_0(new MatrixFree<dim,number> ());
+  std::shared_ptr<MatrixFree<dim,number> > mf_data_1(new MatrixFree<dim,number> ());
+  std::shared_ptr<MatrixFree<dim,number> > mf_data_combined(new MatrixFree<dim,number> ());
   const QGauss<1> quad (2);
   typename MatrixFree<dim,number>::AdditionalData data;
   data.tasks_parallel_scheme =

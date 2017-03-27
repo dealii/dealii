@@ -16,7 +16,7 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/std_cxx11/unique_ptr.h>
+#include <memory>
 #include <fstream>
 #include <iomanip>
 
@@ -64,7 +64,7 @@ int main ()
   {
     AssertThrow (counter == 0, ExcInternalError());
     {
-      std_cxx11::unique_ptr<X> p (new X);
+      std::unique_ptr<X> p (new X);
       AssertThrow (counter == 1, ExcInternalError());
     }
     AssertThrow (counter == 0, ExcInternalError());
@@ -76,10 +76,10 @@ int main ()
   {
     AssertThrow (counter == 0, ExcInternalError());
     {
-      std_cxx11::unique_ptr<X> p (new X);
+      std::unique_ptr<X> p (new X);
       AssertThrow (counter == 1, ExcInternalError());
 
-      std_cxx11::unique_ptr<X> q = std::move(p);
+      std::unique_ptr<X> q = std::move(p);
       AssertThrow (counter == 1, ExcInternalError());
     }
     AssertThrow (counter == 0, ExcInternalError());

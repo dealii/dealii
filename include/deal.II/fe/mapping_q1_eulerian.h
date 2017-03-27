@@ -17,10 +17,12 @@
 #define dealii__mapping_q1_eulerian_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/std_cxx11/array.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/dofs/dof_handler.h>
+
+
+#include <array>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -120,7 +122,7 @@ public:
    * addition to the geometry of the cell.
    */
   virtual
-  std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+  std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
   get_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
   /**

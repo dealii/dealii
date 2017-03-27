@@ -114,7 +114,7 @@ void test ()
   }
 
   // Compute a halo layer around active fe index 2 and set it to active fe index 3
-  std_cxx11::function<bool (const cell_iterator &)> predicate
+  std::function<bool (const cell_iterator &)> predicate
     = IteratorFilters::ActiveFEIndexEqualTo(2, true);
   std::vector<cell_iterator> active_halo_layer
     = GridTools::compute_active_cell_halo_layer(dof_handler, predicate);

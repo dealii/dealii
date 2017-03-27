@@ -515,7 +515,7 @@ namespace Step9
 
     template <int dim>
     static
-    void estimate_cell (const SynchronousIterators<std_cxx11::tuple<typename DoFHandler<dim>::active_cell_iterator,
+    void estimate_cell (const SynchronousIterators<std::tuple<typename DoFHandler<dim>::active_cell_iterator,
                         Vector<float>::iterator> >     &cell,
                         EstimateScratchData<dim>       &scratch_data,
                         const EstimateCopyData         &copy_data);
@@ -1024,7 +1024,7 @@ namespace Step9
             ExcInvalidVectorLength (error_per_cell.size(),
                                     dof_handler.get_triangulation().n_active_cells()));
 
-    typedef std_cxx11::tuple<typename DoFHandler<dim>::active_cell_iterator,Vector<float>::iterator>
+    typedef std::tuple<typename DoFHandler<dim>::active_cell_iterator,Vector<float>::iterator>
     IteratorTuple;
 
     SynchronousIterators<IteratorTuple>
@@ -1036,7 +1036,7 @@ namespace Step9
     WorkStream::run (begin_sync_it,
                      end_sync_it,
                      &GradientEstimation::template estimate_cell<dim>,
-                     std_cxx11::function<void (const EstimateCopyData &)> (),
+                     std::function<void (const EstimateCopyData &)> (),
                      EstimateScratchData<dim> (dof_handler.get_fe(),
                                                solution),
                      EstimateCopyData ());
@@ -1075,12 +1075,12 @@ namespace Step9
   // passing the following as the third argument when calling WorkStream::run
   // above:
   // @code
-  //    std_cxx11::function<void (const SynchronousIterators<IteratorTuple> &,
-  //                              EstimateScratchData<dim>                  &,
-  //                              EstimateCopyData                          &)>
-  //      (std_cxx11::bind (&GradientEstimation::template estimate_cell<dim>,
-  //                        std_cxx11::_1,
-  //                        std_cxx11::_2))
+  //    std::function<void (const SynchronousIterators<IteratorTuple> &,
+  //                        EstimateScratchData<dim>                  &,
+  //                        EstimateCopyData                          &)>
+  //      (std::bind (&GradientEstimation::template estimate_cell<dim>,
+  //                  std::placeholders::_1,
+  //                  std::placeholders::_2))
   // @endcode
   // This creates a function object taking three arguments, but when it calls
   // the underlying function object, it simply only uses the first and second
@@ -1091,7 +1091,7 @@ namespace Step9
   // Now for the details:
   template <int dim>
   void
-  GradientEstimation::estimate_cell (const SynchronousIterators<std_cxx11::tuple<typename DoFHandler<dim>::active_cell_iterator,
+  GradientEstimation::estimate_cell (const SynchronousIterators<std::tuple<typename DoFHandler<dim>::active_cell_iterator,
                                      Vector<float>::iterator> > &cell,
                                      EstimateScratchData<dim>                                               &scratch_data,
                                      const EstimateCopyData &)
@@ -1109,7 +1109,7 @@ namespace Step9
     active_neighbors.reserve (GeometryInfo<dim>::faces_per_cell *
                               GeometryInfo<dim>::max_children_per_face);
 
-    typename DoFHandler<dim>::active_cell_iterator cell_it(std_cxx11::get<0>(*cell));
+    typename DoFHandler<dim>::active_cell_iterator cell_it(std::get<0>(*cell));
 
     // First initialize the <code>FEValues</code> object, as well as the
     // <code>Y</code> tensor:
@@ -1144,14 +1144,14 @@ namespace Step9
     // neighbors, of course.
     active_neighbors.clear ();
     for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
-      if (! std_cxx11::get<0>(*cell)->at_boundary(face_no))
+      if (! std::get<0>(*cell)->at_boundary(face_no))
         {
           // First define an abbreviation for the iterator to the face and
           // the neighbor
           const typename DoFHandler<dim>::face_iterator
-          face = std_cxx11::get<0>(*cell)->face(face_no);
+          face = std::get<0>(*cell)->face(face_no);
           const typename DoFHandler<dim>::cell_iterator
-          neighbor = std_cxx11::get<0>(*cell)->neighbor(face_no);
+          neighbor = std::get<0>(*cell)->neighbor(face_no);
 
           // Then check whether the neighbor is active. If it is, then it
           // is on the same level or one level coarser (if we are not in
@@ -1194,7 +1194,7 @@ namespace Step9
                   // as an internal error. We therefore use a predefined
                   // exception class to throw here.
                   Assert (neighbor_child->neighbor(face_no==0 ? 1 : 0)
-                          ==std_cxx11::get<0>(*cell),ExcInternalError());
+                          ==std::get<0>(*cell),ExcInternalError());
 
                   // If the check succeeded, we push the active neighbor
                   // we just found to the stack we keep:
@@ -1205,7 +1205,7 @@ namespace Step9
                 // `behind' the subfaces of the current face
                 for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
                   active_neighbors.push_back (
-                    std_cxx11::get<0>(*cell)->neighbor_child_on_subface(face_no,subface_no));
+                    std::get<0>(*cell)->neighbor_child_on_subface(face_no,subface_no));
             }
         }
 
@@ -1307,9 +1307,9 @@ namespace Step9
     // at the second element of the pair of iterators, which requires
     // slightly awkward syntax but is not otherwise particularly
     // difficult:
-    *(std_cxx11::get<1>(*cell)) = (std::pow(std_cxx11::get<0>(*cell)->diameter(),
-                                            1+1.0*dim/2) *
-                                   std::sqrt(gradient.norm_square()));
+    *(std::get<1>(*cell)) = (std::pow(std::get<0>(*cell)->diameter(),
+                                      1+1.0*dim/2) *
+                             std::sqrt(gradient.norm_square()));
 
   }
 }

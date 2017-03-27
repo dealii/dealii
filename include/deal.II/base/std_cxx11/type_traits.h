@@ -19,8 +19,6 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_CXX11
-
 #  include <type_traits>
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx11
@@ -37,55 +35,6 @@ namespace std_cxx11
   using std::false_type;
 }
 DEAL_II_NAMESPACE_CLOSE
-
-#else
-
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#include <boost/type_traits.hpp>
-#include <boost/version.hpp>
-#if BOOST_VERSION<105600
-#include <boost/utility/enable_if.hpp>
-#else
-#include <boost/core/enable_if.hpp>
-#endif
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
-
-DEAL_II_NAMESPACE_OPEN
-namespace std_cxx11
-{
-  using boost::is_fundamental;
-  using boost::is_pod;
-  using boost::is_pointer;
-
-  // boost::enable_if_c, *not* boost::enable_if, is equivalent to std::enable_if.
-  template <bool B, class T = void>
-  struct enable_if : public boost::enable_if_c<B, T>
-  {};
-
-  // boost does not have is_standard_layout and
-  // is_trivial, but those are both a subset of
-  // is_pod
-  template <typename T>
-  struct is_standard_layout
-  {
-    static const bool value = boost::is_pod<T>::value;
-  };
-
-  template <typename T>
-  struct is_trivial
-  {
-    static const bool value = boost::has_trivial_copy<T>::value &&
-                              boost::has_trivial_assign<T>::value &&
-                              boost::has_trivial_constructor<T>::value &&
-                              boost::has_trivial_destructor<T>::value;
-  };
-
-  using boost::true_type;
-  using boost::false_type;
-}
-DEAL_II_NAMESPACE_CLOSE
-
-#endif
 
 
 // then allow using the old namespace name instead of the new one

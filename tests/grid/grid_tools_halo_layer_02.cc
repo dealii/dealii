@@ -83,7 +83,7 @@ void test ()
   }
 
   // Compute a halo layer around material id 2 and set it to material id 3
-  std_cxx11::function<bool (const cell_iterator &)> predicate
+  std::function<bool (const cell_iterator &)> predicate
     = IteratorFilters::MaterialIdEqualTo(2, true);
   const std::vector<cell_iterator> active_halo_layer
     = GridTools::compute_active_cell_halo_layer(tria, predicate);

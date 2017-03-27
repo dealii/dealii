@@ -23,12 +23,10 @@
 #include <deal.II/base/synchronous_iterator.h>
 #include <deal.II/base/thread_management.h>
 
-#include <deal.II/base/std_cxx11/tuple.h>
-#include <deal.II/base/std_cxx11/bind.h>
-#include <deal.II/base/std_cxx11/function.h>
-#include <deal.II/base/std_cxx11/shared_ptr.h>
-
 #include <cstddef>
+#include <tuple>
+#include <memory>
+#include <functional>
 
 #ifdef DEAL_II_WITH_THREADS
 #  include <tbb/parallel_for.h>
@@ -107,9 +105,9 @@ namespace parallel
       static
       void
       apply (const F &f,
-             const std_cxx11::tuple<I1,I2> &p)
+             const std::tuple<I1,I2> &p)
       {
-        *std_cxx11::get<1>(p) = f (*std_cxx11::get<0>(p));
+        *std::get<1>(p) = f (*std::get<0>(p));
       }
 
       /**
@@ -119,10 +117,10 @@ namespace parallel
       static
       void
       apply (const F &f,
-             const std_cxx11::tuple<I1,I2,I3> &p)
+             const std::tuple<I1,I2,I3> &p)
       {
-        *std_cxx11::get<2>(p) = f (*std_cxx11::get<0>(p),
-                                   *std_cxx11::get<1>(p));
+        *std::get<2>(p) = f (*std::get<0>(p),
+                             *std::get<1>(p));
       }
 
       /**
@@ -133,11 +131,11 @@ namespace parallel
       static
       void
       apply (const F &f,
-             const std_cxx11::tuple<I1,I2,I3,I4> &p)
+             const std::tuple<I1,I2,I3,I4> &p)
       {
-        *std_cxx11::get<3>(p) = f (*std_cxx11::get<0>(p),
-                                   *std_cxx11::get<1>(p),
-                                   *std_cxx11::get<2>(p));
+        *std::get<3>(p) = f (*std::get<0>(p),
+                             *std::get<1>(p),
+                             *std::get<2>(p));
       }
     };
 
@@ -195,7 +193,7 @@ namespace parallel
     for (OutputIterator in = begin_in; in != end_in;)
       *out++ = predicate (*in++);
 #else
-    typedef std_cxx11::tuple<InputIterator,OutputIterator> Iterators;
+    typedef std::tuple<InputIterator,OutputIterator> Iterators;
     typedef SynchronousIterators<Iterators> SyncIterators;
     Iterators x_begin (begin_in, out);
     Iterators x_end (end_in, OutputIterator());
@@ -252,7 +250,7 @@ namespace parallel
       *out++ = predicate (*in1++, *in2++);
 #else
     typedef
-    std_cxx11::tuple<InputIterator1,InputIterator2,OutputIterator>
+    std::tuple<InputIterator1,InputIterator2,OutputIterator>
     Iterators;
     typedef SynchronousIterators<Iterators> SyncIterators;
     Iterators x_begin (begin_in1, in2, out);
@@ -312,7 +310,7 @@ namespace parallel
       *out++ = predicate (*in1++, *in2++, *in3++);
 #else
     typedef
-    std_cxx11::tuple<InputIterator1,InputIterator2,InputIterator3,OutputIterator>
+    std::tuple<InputIterator1,InputIterator2,InputIterator3,OutputIterator>
     Iterators;
     typedef SynchronousIterators<Iterators> SyncIterators;
     Iterators x_begin (begin_in1, in2, in3, out);
@@ -371,11 +369,11 @@ namespace parallel
    *   {
    *     parallel::apply_to_subranges
    *        (0, A.n_rows(),
-   *         std_cxx11::bind (&mat_vec_on_subranges,
-   *                          std_cxx11::_1, std_cxx11::_2,
-   *                          std_cxx11::cref(A),
-   *                          std_cxx11::cref(x),
-   *                          std_cxx11::ref(y)),
+   *         std::bind (&mat_vec_on_subranges,
+   *                    std::placeholders::_1, std::placeholders::_2,
+   *                    std::cref(A),
+   *                    std::cref(x),
+   *                    std::ref(y)),
    *         50);
    *   }
    *
@@ -391,10 +389,10 @@ namespace parallel
    *   }
    * @endcode
    *
-   * Note how we use the <code>std_cxx11::bind</code> function to convert
+   * Note how we use the <code>std::bind</code> function to convert
    * <code>mat_vec_on_subranges</code> from a function that takes 5 arguments
    * to one taking 2 by binding the remaining arguments (the modifiers
-   * <code>std_cxx11::ref</code> and <code>std_cxx11::cref</code> make sure
+   * <code>std::ref</code> and <code>std::cref</code> make sure
    * that the enclosed variables are actually passed by reference and constant
    * reference, rather than by value). The resulting function object requires
    * only two arguments, begin_row and end_row, with all other arguments
@@ -437,9 +435,9 @@ namespace parallel
 #else
     tbb::parallel_for (tbb::blocked_range<RangeType>
                        (begin, end, grainsize),
-                       std_cxx11::bind (&internal::apply_to_subranges<RangeType,Function>,
-                                        std_cxx11::_1,
-                                        std_cxx11::cref(f)),
+                       std::bind (&internal::apply_to_subranges<RangeType,Function>,
+                                  std::placeholders::_1,
+                                  std::cref(f)),
                        tbb::auto_partitioner());
 #endif
   }
@@ -591,7 +589,7 @@ namespace parallel
        * The function object to be used to reduce the result of two calls into
        * one number.
        */
-      const std_cxx11::function<ResultType (ResultType, ResultType)> reductor;
+      const std::function<ResultType (ResultType, ResultType)> reductor;
     };
 #endif
   }
@@ -614,10 +612,10 @@ namespace parallel
    *      std::sqrt
    *       (parallel::accumulate_from_subranges<double>
    *        (0, A.n_rows(),
-   *         std_cxx11::bind (&mat_norm_sqr_on_subranges,
-   *                          std_cxx11::_1, std_cxx11::_2,
-   *                          std_cxx11::cref(A),
-   *                          std_cxx11::cref(x)),
+   *         std::bind (&mat_norm_sqr_on_subranges,
+   *                     std::placeholders::_1, std::placeholders::_2,
+   *                     std::cref(A),
+   *                     std::cref(x)),
    *         50);
    *   }
    *
@@ -731,12 +729,12 @@ namespace parallel
        * released it yet, a new object is created. To free the partitioner
        * again, return it by the release_one_partitioner() call.
        */
-      std_cxx11::shared_ptr<tbb::affinity_partitioner>
+      std::shared_ptr<tbb::affinity_partitioner>
       acquire_one_partitioner()
       {
         dealii::Threads::Mutex::ScopedLock lock(mutex);
         if (in_use)
-          return std_cxx11::shared_ptr<tbb::affinity_partitioner>(new tbb::affinity_partitioner());
+          return std::shared_ptr<tbb::affinity_partitioner>(new tbb::affinity_partitioner());
 
         in_use = true;
         return my_partitioner;
@@ -747,7 +745,7 @@ namespace parallel
        * acquire_one_partitioner(), this call makes the partitioner available
        * again.
        */
-      void release_one_partitioner(std_cxx11::shared_ptr<tbb::affinity_partitioner> &p)
+      void release_one_partitioner(std::shared_ptr<tbb::affinity_partitioner> &p)
       {
         if (p.get() == my_partitioner.get())
           {
@@ -761,7 +759,7 @@ namespace parallel
        * The stored partitioner that can accumulate knowledge over several
        * runs of tbb::parallel_for
        */
-      std_cxx11::shared_ptr<tbb::affinity_partitioner> my_partitioner;
+      std::shared_ptr<tbb::affinity_partitioner> my_partitioner;
 
       /**
        * A flag to indicate whether the partitioner has been acquired but not

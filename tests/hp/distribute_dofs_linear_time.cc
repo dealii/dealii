@@ -40,8 +40,8 @@
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/householder.h>
 
-#include <deal.II/base/std_cxx11/array.h>
-#include <deal.II/base/std_cxx11/shared_ptr.h>
+#include <array>
+#include <memory>
 
 #include <iostream>
 
@@ -57,18 +57,18 @@ static const types::manifold_id straight_manifold_id = 3;
  * grid: see step-6.
  */
 template <int dim>
-std_cxx11::shared_ptr<dealii::Manifold<dim> >
+std::shared_ptr<dealii::Manifold<dim> >
 ladutenko_circle(dealii::Triangulation<dim> &triangulation,
                  const dealii::Point<dim>    center = dealii::Point<dim>(),
                  const double                radius = 1.0);
 
 template <int dim>
-std_cxx11::shared_ptr<Manifold<dim > >
+std::shared_ptr<Manifold<dim > >
 ladutenko_circle(Triangulation<dim> &triangulation,
                  const Point<dim>    center,
                  const double        radius)
 {
-  std_cxx11::shared_ptr<Manifold<dim> > boundary(new SphericalManifold<dim>(center));
+  std::shared_ptr<Manifold<dim> > boundary(new SphericalManifold<dim>(center));
   GridGenerator::hyper_ball (triangulation, center, radius);
   triangulation.set_all_manifold_ids(circular_manifold_id);
   triangulation.set_manifold (circular_manifold_id, *boundary);
@@ -136,7 +136,7 @@ public:
 
   const unsigned int n_global_refines;
 
-  std_cxx11::shared_ptr<Manifold<dim> > boundary_manifold;
+  std::shared_ptr<Manifold<dim> > boundary_manifold;
   Triangulation<dim> triangulation;
   hp::FECollection<dim> finite_elements;
   hp::DoFHandler<dim> dof_handler;

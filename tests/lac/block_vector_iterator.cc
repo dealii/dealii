@@ -17,7 +17,6 @@
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
-#include <deal.II/base/std_cxx11/bind.h>
 #include <deal.II/lac/block_vector.h>
 #include <fstream>
 #include <iomanip>
@@ -26,6 +25,7 @@
 #include <numeric>
 #include <utility>
 #include <cmath>
+#include <functional>
 
 template <typename number>
 bool operator == (const BlockVector<number> &v1,
@@ -177,9 +177,9 @@ void test ()
 
       // check std::transform
       std::transform (v1.begin(), v1.end(), v2.begin(),
-                      std_cxx11::bind (std::multiplies<double>(),
-                                       std_cxx11::_1,
-                                       2.0));
+                      std::bind (std::multiplies<double>(),
+                                 std::placeholders::_1,
+                                 2.0));
       v2 *= 1./2;
       deallog << "Check 7: " << (v1 == v2 ? "true" : "false") << std::endl;
 

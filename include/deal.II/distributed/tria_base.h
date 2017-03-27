@@ -24,9 +24,8 @@
 #include <deal.II/base/mpi.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/base/std_cxx1x/function.h>
-#include <deal.II/base/std_cxx1x/tuple.h>
-
+#include <functional>
+#include <tuple>
 #include <set>
 #include <vector>
 #include <list>

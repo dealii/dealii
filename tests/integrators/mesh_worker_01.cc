@@ -21,7 +21,6 @@
 #include <deal.II/meshworker/assembler.h>
 #include <deal.II/meshworker/loop.h>
 
-#include <deal.II/base/std_cxx11/function.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -32,6 +31,7 @@
 #include <deal.II/fe/fe_dgp.h>
 
 #include <fstream>
+#include <functional>
 #include <iomanip>
 
 using namespace dealii;
@@ -151,9 +151,9 @@ test_simple(DoFHandler<dim> &mgdofs)
   MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >
   (dofs.begin_active(), dofs.end(),
    dof_info, info_box,
-   std_cxx11::bind (&Local<dim>::cell, local, std_cxx11::_1, std_cxx11::_2),
-   std_cxx11::bind (&Local<dim>::bdry, local, std_cxx11::_1, std_cxx11::_2),
-   std_cxx11::bind (&Local<dim>::face, local, std_cxx11::_1, std_cxx11::_2, std_cxx11::_3, std_cxx11::_4),
+   std::bind (&Local<dim>::cell, local, std::placeholders::_1, std::placeholders::_2),
+   std::bind (&Local<dim>::bdry, local, std::placeholders::_1, std::placeholders::_2),
+   std::bind (&Local<dim>::face, local, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4),
    assembler, lctrl);
 
   for (unsigned int i=0; i<v.size(); ++i)
@@ -205,9 +205,9 @@ int main ()
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
 
-  std::vector<std_cxx11::shared_ptr<FiniteElement<2> > > fe2;
-  fe2.push_back(std_cxx11::shared_ptr<FiniteElement<2> >(new  FE_DGP<2>(1)));
-  fe2.push_back(std_cxx11::shared_ptr<FiniteElement<2> >(new  FE_Q<2>(1)));
+  std::vector<std::shared_ptr<FiniteElement<2> > > fe2;
+  fe2.push_back(std::shared_ptr<FiniteElement<2> >(new  FE_DGP<2>(1)));
+  fe2.push_back(std::shared_ptr<FiniteElement<2> >(new  FE_Q<2>(1)));
 
   for (unsigned int i=0; i<fe2.size(); ++i)
     test(*fe2[i]);

@@ -59,8 +59,8 @@
 #include <deal.II/multigrid/mg_matrix.h>
 
 #include <fstream>
+#include <functional>
 #include <sstream>
-#include <deal.II/base/std_cxx11/bind.h>
 
 using namespace dealii;
 
@@ -313,7 +313,7 @@ LaplaceProblem<dim>::output_gpl(const DoFHandler<dim> &dof,
       MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> > (
         dof.begin_mg(l), dof.end_mg(l),
         dof_info, info_box,
-        std_cxx11::bind(&OutputCreator<dim>::cell, &matrix_integrator, std_cxx11::_1, std_cxx11::_2),
+        std::bind(&OutputCreator<dim>::cell, &matrix_integrator, std::placeholders::_1, std::placeholders::_2),
         0,
         0,
         assembler);
