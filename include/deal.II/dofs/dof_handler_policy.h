@@ -180,13 +180,63 @@ namespace internal
 
       };
 
+      /**
+       * Base policy for parallel policies
+       */
+      template <int dim, int spacedim>
+      class ParallelBase : public PolicyBase<dim,spacedim>
+      {
+      public:
+        virtual
+        void
+        distribute_dofs (dealii::DoFHandler<dim,spacedim> &dof_handler,
+                         NumberCache &number_cache) const;
+
+        virtual
+        void
+        verify_dof_distribution(const dealii::DoFHandler<dim,spacedim> &dof_handler) const;
+      };
 
       /**
        * This class implements the policy for operations when we use a
        * parallel::distributed::Triangulation object.
        */
       template <int dim, int spacedim>
-      class ParallelDistributed : public PolicyBase<dim,spacedim>
+      class ParallelDistributed : public ParallelBase<dim,spacedim>
+      {
+      public:
+        /**
+         * Distribute degrees of freedom on the object given as last argument.
+         */
+        virtual
+        void
+        distribute_dofs (dealii::DoFHandler<dim,spacedim> &dof_handler,
+                         NumberCache &number_cache) const;
+
+        /**
+         * Distribute multigrid DoFs.
+         */
+        virtual
+        void
+        distribute_mg_dofs (dealii::DoFHandler<dim,spacedim> &dof_handler,
+                            std::vector<NumberCache> &number_caches) const;
+
+        /**
+         * Renumber degrees of freedom as specified by the first argument.
+         */
+        virtual
+        void
+        renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers,
+                       dealii::DoFHandler<dim,spacedim> &dof_handler,
+                       NumberCache &number_cache) const;
+      };
+
+      /**
+       * This class implements the policy for operations when we use a
+       * parallel::distributed::Triangulation object.
+       */
+      template <int dim, int spacedim>
+      class ParallelSplit : public ParallelBase<dim,spacedim>
       {
       public:
         /**

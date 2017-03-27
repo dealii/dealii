@@ -246,6 +246,25 @@ namespace parallel
     return number_cache.level_ghost_owners;
   }
 
+  template <int dim, int spacedim>
+  void
+  Triangulation<dim,spacedim>::
+  fill_vertices_with_ghost_neighbors
+  (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+   &vertices_with_ghost_neighbors)
+  {
+    // TODO: periodicity?!
+    for (typename Triangulation<dim,spacedim>::active_cell_iterator
+         cell = this->begin_active();
+         cell != this->end(); ++cell)
+      if (cell->is_ghost())
+        {
+          for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+            vertices_with_ghost_neighbors[cell->vertex_index(v)].insert(cell->subdomain_id());
+        }
+
+  }
+
 } // end namespace parallel
 
 

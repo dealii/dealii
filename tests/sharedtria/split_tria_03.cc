@@ -95,6 +95,10 @@ void test()
       << " n_global_coarse_cells: " << tr.n_global_coarse_cells()
       << std::endl;
 
+  deallog << "available_coarse_cells: ";
+  tr.available_coarse_cells().print(deallog);
+
+
 
   /*deallog << "n_locally_owned_active_cells_per_processor: ";
   std::vector<unsigned int> v = tr.n_locally_owned_active_cells_per_processor();
@@ -108,7 +112,8 @@ void test()
       for (unsigned int index=0; it!=tr.end(); ++it,++index)
         {
           deallog << "cell at " << it->center()
-                  << " has id "
+                  << " has owner " << (int)(it->active() ? it->subdomain_id() : -1)
+                  << " id "
                   << it->id() << std::endl;
 
           // check that we get the same cell back:

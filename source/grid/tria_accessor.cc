@@ -1668,7 +1668,8 @@ CellAccessor<dim,spacedim>::id() const
     }
 
   Assert(ptr.level()==0, ExcInternalError());
-  const unsigned int coarse_index = ptr.index();
+  // TODO: coarse_index can be more than 32bits?
+  const unsigned int coarse_index = this->tria->coarse_cell_index_to_global_index(ptr.index());
 
   return CellId(coarse_index, n_child_indices, &(id[0]));
 }

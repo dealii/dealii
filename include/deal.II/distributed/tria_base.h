@@ -152,6 +152,16 @@ namespace parallel
     const std::set<types::subdomain_id> &
     level_ghost_owners () const;
 
+    /**
+     * Fills a map that, for each vertex, lists all the processors whose
+     * subdomains are adjacent to that vertex.
+     */
+    virtual
+    void
+    fill_vertices_with_ghost_neighbors
+    (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+     &vertices_with_ghost_neighbors);
+
   protected:
     /**
      * MPI communicator to be used for the triangulation. We create a unique

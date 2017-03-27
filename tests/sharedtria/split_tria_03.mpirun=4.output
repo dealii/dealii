@@ -7,69 +7,70 @@ DEAL:0:2d:: locally_owned_subdomain(): 0
  n_global_active_cells: 48
  n_coarse_cells: 3
  n_global_coarse_cells: 3
-DEAL:0:2d::cell at -0.500000 -0.500000 has id 0_0:
-DEAL:0:2d::cell at 0.500000 -0.500000 has id 1_0:
-DEAL:0:2d::cell at -0.500000 0.500000 has id 2_0:
-DEAL:0:2d::cell at -0.750000 -0.750000 has id 0_1:0
-DEAL:0:2d::cell at -0.250000 -0.750000 has id 0_1:1
-DEAL:0:2d::cell at -0.750000 -0.250000 has id 0_1:2
-DEAL:0:2d::cell at -0.250000 -0.250000 has id 0_1:3
-DEAL:0:2d::cell at 0.250000 -0.750000 has id 1_1:0
-DEAL:0:2d::cell at 0.750000 -0.750000 has id 1_1:1
-DEAL:0:2d::cell at 0.250000 -0.250000 has id 1_1:2
-DEAL:0:2d::cell at 0.750000 -0.250000 has id 1_1:3
-DEAL:0:2d::cell at -0.750000 0.250000 has id 2_1:0
-DEAL:0:2d::cell at -0.250000 0.250000 has id 2_1:1
-DEAL:0:2d::cell at -0.750000 0.750000 has id 2_1:2
-DEAL:0:2d::cell at -0.250000 0.750000 has id 2_1:3
-DEAL:0:2d::cell at -0.875000 -0.875000 has id 0_2:00
-DEAL:0:2d::cell at -0.625000 -0.875000 has id 0_2:01
-DEAL:0:2d::cell at -0.875000 -0.625000 has id 0_2:02
-DEAL:0:2d::cell at -0.625000 -0.625000 has id 0_2:03
-DEAL:0:2d::cell at -0.375000 -0.875000 has id 0_2:10
-DEAL:0:2d::cell at -0.125000 -0.875000 has id 0_2:11
-DEAL:0:2d::cell at -0.375000 -0.625000 has id 0_2:12
-DEAL:0:2d::cell at -0.125000 -0.625000 has id 0_2:13
-DEAL:0:2d::cell at -0.875000 -0.375000 has id 0_2:20
-DEAL:0:2d::cell at -0.625000 -0.375000 has id 0_2:21
-DEAL:0:2d::cell at -0.875000 -0.125000 has id 0_2:22
-DEAL:0:2d::cell at -0.625000 -0.125000 has id 0_2:23
-DEAL:0:2d::cell at -0.375000 -0.375000 has id 0_2:30
-DEAL:0:2d::cell at -0.125000 -0.375000 has id 0_2:31
-DEAL:0:2d::cell at -0.375000 -0.125000 has id 0_2:32
-DEAL:0:2d::cell at -0.125000 -0.125000 has id 0_2:33
-DEAL:0:2d::cell at 0.125000 -0.875000 has id 1_2:00
-DEAL:0:2d::cell at 0.375000 -0.875000 has id 1_2:01
-DEAL:0:2d::cell at 0.125000 -0.625000 has id 1_2:02
-DEAL:0:2d::cell at 0.375000 -0.625000 has id 1_2:03
-DEAL:0:2d::cell at 0.625000 -0.875000 has id 1_2:10
-DEAL:0:2d::cell at 0.875000 -0.875000 has id 1_2:11
-DEAL:0:2d::cell at 0.625000 -0.625000 has id 1_2:12
-DEAL:0:2d::cell at 0.875000 -0.625000 has id 1_2:13
-DEAL:0:2d::cell at 0.125000 -0.375000 has id 1_2:20
-DEAL:0:2d::cell at 0.375000 -0.375000 has id 1_2:21
-DEAL:0:2d::cell at 0.125000 -0.125000 has id 1_2:22
-DEAL:0:2d::cell at 0.375000 -0.125000 has id 1_2:23
-DEAL:0:2d::cell at 0.625000 -0.375000 has id 1_2:30
-DEAL:0:2d::cell at 0.875000 -0.375000 has id 1_2:31
-DEAL:0:2d::cell at 0.625000 -0.125000 has id 1_2:32
-DEAL:0:2d::cell at 0.875000 -0.125000 has id 1_2:33
-DEAL:0:2d::cell at -0.875000 0.125000 has id 2_2:00
-DEAL:0:2d::cell at -0.625000 0.125000 has id 2_2:01
-DEAL:0:2d::cell at -0.875000 0.375000 has id 2_2:02
-DEAL:0:2d::cell at -0.625000 0.375000 has id 2_2:03
-DEAL:0:2d::cell at -0.375000 0.125000 has id 2_2:10
-DEAL:0:2d::cell at -0.125000 0.125000 has id 2_2:11
-DEAL:0:2d::cell at -0.375000 0.375000 has id 2_2:12
-DEAL:0:2d::cell at -0.125000 0.375000 has id 2_2:13
-DEAL:0:2d::cell at -0.875000 0.625000 has id 2_2:20
-DEAL:0:2d::cell at -0.625000 0.625000 has id 2_2:21
-DEAL:0:2d::cell at -0.875000 0.875000 has id 2_2:22
-DEAL:0:2d::cell at -0.625000 0.875000 has id 2_2:23
-DEAL:0:2d::cell at -0.375000 0.625000 has id 2_2:30
-DEAL:0:2d::cell at -0.125000 0.625000 has id 2_2:31
-DEAL:0:2d::cell at -0.375000 0.875000 has id 2_2:32
-DEAL:0:2d::cell at -0.125000 0.875000 has id 2_2:33
+DEAL:0:2d::available_coarse_cells: {[0,2]}
+DEAL:0:2d::cell at -0.500000 -0.500000 has owner -1 id 0_0:
+DEAL:0:2d::cell at 0.500000 -0.500000 has owner -1 id 1_0:
+DEAL:0:2d::cell at -0.500000 0.500000 has owner -1 id 2_0:
+DEAL:0:2d::cell at -0.750000 -0.750000 has owner -1 id 0_1:0
+DEAL:0:2d::cell at -0.250000 -0.750000 has owner -1 id 0_1:1
+DEAL:0:2d::cell at -0.750000 -0.250000 has owner -1 id 0_1:2
+DEAL:0:2d::cell at -0.250000 -0.250000 has owner -1 id 0_1:3
+DEAL:0:2d::cell at 0.250000 -0.750000 has owner -1 id 1_1:0
+DEAL:0:2d::cell at 0.750000 -0.750000 has owner -1 id 1_1:1
+DEAL:0:2d::cell at 0.250000 -0.250000 has owner -1 id 1_1:2
+DEAL:0:2d::cell at 0.750000 -0.250000 has owner -1 id 1_1:3
+DEAL:0:2d::cell at -0.750000 0.250000 has owner -1 id 2_1:0
+DEAL:0:2d::cell at -0.250000 0.250000 has owner -1 id 2_1:1
+DEAL:0:2d::cell at -0.750000 0.750000 has owner -1 id 2_1:2
+DEAL:0:2d::cell at -0.250000 0.750000 has owner -1 id 2_1:3
+DEAL:0:2d::cell at -0.875000 -0.875000 has owner -2 id 0_2:00
+DEAL:0:2d::cell at -0.625000 -0.875000 has owner -2 id 0_2:01
+DEAL:0:2d::cell at -0.875000 -0.625000 has owner 1 id 0_2:02
+DEAL:0:2d::cell at -0.625000 -0.625000 has owner 1 id 0_2:03
+DEAL:0:2d::cell at -0.375000 -0.875000 has owner -2 id 0_2:10
+DEAL:0:2d::cell at -0.125000 -0.875000 has owner 2 id 0_2:11
+DEAL:0:2d::cell at -0.375000 -0.625000 has owner 2 id 0_2:12
+DEAL:0:2d::cell at -0.125000 -0.625000 has owner 2 id 0_2:13
+DEAL:0:2d::cell at -0.875000 -0.375000 has owner 0 id 0_2:20
+DEAL:0:2d::cell at -0.625000 -0.375000 has owner 0 id 0_2:21
+DEAL:0:2d::cell at -0.875000 -0.125000 has owner 0 id 0_2:22
+DEAL:0:2d::cell at -0.625000 -0.125000 has owner 0 id 0_2:23
+DEAL:0:2d::cell at -0.375000 -0.375000 has owner 0 id 0_2:30
+DEAL:0:2d::cell at -0.125000 -0.375000 has owner 0 id 0_2:31
+DEAL:0:2d::cell at -0.375000 -0.125000 has owner 0 id 0_2:32
+DEAL:0:2d::cell at -0.125000 -0.125000 has owner 0 id 0_2:33
+DEAL:0:2d::cell at 0.125000 -0.875000 has owner 0 id 1_2:00
+DEAL:0:2d::cell at 0.375000 -0.875000 has owner 0 id 1_2:01
+DEAL:0:2d::cell at 0.125000 -0.625000 has owner 0 id 1_2:02
+DEAL:0:2d::cell at 0.375000 -0.625000 has owner 0 id 1_2:03
+DEAL:0:2d::cell at 0.625000 -0.875000 has owner 0 id 1_2:10
+DEAL:0:2d::cell at 0.875000 -0.875000 has owner 0 id 1_2:11
+DEAL:0:2d::cell at 0.625000 -0.625000 has owner 0 id 1_2:12
+DEAL:0:2d::cell at 0.875000 -0.625000 has owner 0 id 1_2:13
+DEAL:0:2d::cell at 0.125000 -0.375000 has owner 0 id 1_2:20
+DEAL:0:2d::cell at 0.375000 -0.375000 has owner 0 id 1_2:21
+DEAL:0:2d::cell at 0.125000 -0.125000 has owner 0 id 1_2:22
+DEAL:0:2d::cell at 0.375000 -0.125000 has owner 0 id 1_2:23
+DEAL:0:2d::cell at 0.625000 -0.375000 has owner 0 id 1_2:30
+DEAL:0:2d::cell at 0.875000 -0.375000 has owner 0 id 1_2:31
+DEAL:0:2d::cell at 0.625000 -0.125000 has owner 0 id 1_2:32
+DEAL:0:2d::cell at 0.875000 -0.125000 has owner 0 id 1_2:33
+DEAL:0:2d::cell at -0.875000 0.125000 has owner 0 id 2_2:00
+DEAL:0:2d::cell at -0.625000 0.125000 has owner 0 id 2_2:01
+DEAL:0:2d::cell at -0.875000 0.375000 has owner 0 id 2_2:02
+DEAL:0:2d::cell at -0.625000 0.375000 has owner 0 id 2_2:03
+DEAL:0:2d::cell at -0.375000 0.125000 has owner 0 id 2_2:10
+DEAL:0:2d::cell at -0.125000 0.125000 has owner 0 id 2_2:11
+DEAL:0:2d::cell at -0.375000 0.375000 has owner 0 id 2_2:12
+DEAL:0:2d::cell at -0.125000 0.375000 has owner 0 id 2_2:13
+DEAL:0:2d::cell at -0.875000 0.625000 has owner 0 id 2_2:20
+DEAL:0:2d::cell at -0.625000 0.625000 has owner 0 id 2_2:21
+DEAL:0:2d::cell at -0.875000 0.875000 has owner 0 id 2_2:22
+DEAL:0:2d::cell at -0.625000 0.875000 has owner 0 id 2_2:23
+DEAL:0:2d::cell at -0.375000 0.625000 has owner 0 id 2_2:30
+DEAL:0:2d::cell at -0.125000 0.625000 has owner 0 id 2_2:31
+DEAL:0:2d::cell at -0.375000 0.875000 has owner 0 id 2_2:32
+DEAL:0:2d::cell at -0.125000 0.875000 has owner 0 id 2_2:33
 
 DEAL:1:2d:: locally_owned_subdomain(): 1
  n_active_cells: 16
@@ -79,27 +80,28 @@ DEAL:1:2d:: locally_owned_subdomain(): 1
  n_global_active_cells: 48
  n_coarse_cells: 1
  n_global_coarse_cells: 3
-DEAL:1:2d::cell at -0.500000 -0.500000 has id 0_0:
-DEAL:1:2d::cell at -0.750000 -0.750000 has id 0_1:0
-DEAL:1:2d::cell at -0.250000 -0.750000 has id 0_1:1
-DEAL:1:2d::cell at -0.750000 -0.250000 has id 0_1:2
-DEAL:1:2d::cell at -0.250000 -0.250000 has id 0_1:3
-DEAL:1:2d::cell at -0.875000 -0.875000 has id 0_2:00
-DEAL:1:2d::cell at -0.625000 -0.875000 has id 0_2:01
-DEAL:1:2d::cell at -0.875000 -0.625000 has id 0_2:02
-DEAL:1:2d::cell at -0.625000 -0.625000 has id 0_2:03
-DEAL:1:2d::cell at -0.375000 -0.875000 has id 0_2:10
-DEAL:1:2d::cell at -0.125000 -0.875000 has id 0_2:11
-DEAL:1:2d::cell at -0.375000 -0.625000 has id 0_2:12
-DEAL:1:2d::cell at -0.125000 -0.625000 has id 0_2:13
-DEAL:1:2d::cell at -0.875000 -0.375000 has id 0_2:20
-DEAL:1:2d::cell at -0.625000 -0.375000 has id 0_2:21
-DEAL:1:2d::cell at -0.875000 -0.125000 has id 0_2:22
-DEAL:1:2d::cell at -0.625000 -0.125000 has id 0_2:23
-DEAL:1:2d::cell at -0.375000 -0.375000 has id 0_2:30
-DEAL:1:2d::cell at -0.125000 -0.375000 has id 0_2:31
-DEAL:1:2d::cell at -0.375000 -0.125000 has id 0_2:32
-DEAL:1:2d::cell at -0.125000 -0.125000 has id 0_2:33
+DEAL:1:2d::available_coarse_cells: {0}
+DEAL:1:2d::cell at -0.500000 -0.500000 has owner -1 id 0_0:
+DEAL:1:2d::cell at -0.750000 -0.750000 has owner -1 id 0_1:0
+DEAL:1:2d::cell at -0.250000 -0.750000 has owner -1 id 0_1:1
+DEAL:1:2d::cell at -0.750000 -0.250000 has owner -1 id 0_1:2
+DEAL:1:2d::cell at -0.250000 -0.250000 has owner -1 id 0_1:3
+DEAL:1:2d::cell at -0.875000 -0.875000 has owner 1 id 0_2:00
+DEAL:1:2d::cell at -0.625000 -0.875000 has owner 1 id 0_2:01
+DEAL:1:2d::cell at -0.875000 -0.625000 has owner 1 id 0_2:02
+DEAL:1:2d::cell at -0.625000 -0.625000 has owner 1 id 0_2:03
+DEAL:1:2d::cell at -0.375000 -0.875000 has owner 2 id 0_2:10
+DEAL:1:2d::cell at -0.125000 -0.875000 has owner -2 id 0_2:11
+DEAL:1:2d::cell at -0.375000 -0.625000 has owner 2 id 0_2:12
+DEAL:1:2d::cell at -0.125000 -0.625000 has owner -2 id 0_2:13
+DEAL:1:2d::cell at -0.875000 -0.375000 has owner 0 id 0_2:20
+DEAL:1:2d::cell at -0.625000 -0.375000 has owner 0 id 0_2:21
+DEAL:1:2d::cell at -0.875000 -0.125000 has owner -2 id 0_2:22
+DEAL:1:2d::cell at -0.625000 -0.125000 has owner -2 id 0_2:23
+DEAL:1:2d::cell at -0.375000 -0.375000 has owner 0 id 0_2:30
+DEAL:1:2d::cell at -0.125000 -0.375000 has owner -2 id 0_2:31
+DEAL:1:2d::cell at -0.375000 -0.125000 has owner -2 id 0_2:32
+DEAL:1:2d::cell at -0.125000 -0.125000 has owner -2 id 0_2:33
 
 
 DEAL:2:2d:: locally_owned_subdomain(): 2
@@ -110,40 +112,41 @@ DEAL:2:2d:: locally_owned_subdomain(): 2
  n_global_active_cells: 48
  n_coarse_cells: 2
  n_global_coarse_cells: 3
-DEAL:2:2d::cell at -0.500000 -0.500000 has id 0_0:
-DEAL:2:2d::cell at 0.500000 -0.500000 has id 1_0:
-DEAL:2:2d::cell at -0.750000 -0.750000 has id 0_1:0
-DEAL:2:2d::cell at -0.250000 -0.750000 has id 0_1:1
-DEAL:2:2d::cell at -0.750000 -0.250000 has id 0_1:2
-DEAL:2:2d::cell at -0.250000 -0.250000 has id 0_1:3
-DEAL:2:2d::cell at 0.250000 -0.750000 has id 1_1:0
-DEAL:2:2d::cell at 0.750000 -0.750000 has id 1_1:1
-DEAL:2:2d::cell at 0.250000 -0.250000 has id 1_1:2
-DEAL:2:2d::cell at 0.750000 -0.250000 has id 1_1:3
-DEAL:2:2d::cell at -0.875000 -0.875000 has id 0_2:00
-DEAL:2:2d::cell at -0.625000 -0.875000 has id 0_2:01
-DEAL:2:2d::cell at -0.875000 -0.625000 has id 0_2:02
-DEAL:2:2d::cell at -0.625000 -0.625000 has id 0_2:03
-DEAL:2:2d::cell at -0.375000 -0.875000 has id 0_2:10
-DEAL:2:2d::cell at -0.125000 -0.875000 has id 0_2:11
-DEAL:2:2d::cell at -0.375000 -0.625000 has id 0_2:12
-DEAL:2:2d::cell at -0.125000 -0.625000 has id 0_2:13
-DEAL:2:2d::cell at -0.875000 -0.375000 has id 0_2:20
-DEAL:2:2d::cell at -0.625000 -0.375000 has id 0_2:21
-DEAL:2:2d::cell at -0.875000 -0.125000 has id 0_2:22
-DEAL:2:2d::cell at -0.625000 -0.125000 has id 0_2:23
-DEAL:2:2d::cell at -0.375000 -0.375000 has id 0_2:30
-DEAL:2:2d::cell at -0.125000 -0.375000 has id 0_2:31
-DEAL:2:2d::cell at -0.375000 -0.125000 has id 0_2:32
-DEAL:2:2d::cell at -0.125000 -0.125000 has id 0_2:33
-DEAL:2:2d::cell at 0.125000 -0.875000 has id 1_2:00
-DEAL:2:2d::cell at 0.375000 -0.875000 has id 1_2:01
-DEAL:2:2d::cell at 0.125000 -0.625000 has id 1_2:02
-DEAL:2:2d::cell at 0.375000 -0.625000 has id 1_2:03
-DEAL:2:2d::cell at 0.125000 -0.375000 has id 1_2:20
-DEAL:2:2d::cell at 0.375000 -0.375000 has id 1_2:21
-DEAL:2:2d::cell at 0.125000 -0.125000 has id 1_2:22
-DEAL:2:2d::cell at 0.375000 -0.125000 has id 1_2:23
+DEAL:2:2d::available_coarse_cells: {[0,1]}
+DEAL:2:2d::cell at -0.500000 -0.500000 has owner -1 id 0_0:
+DEAL:2:2d::cell at 0.500000 -0.500000 has owner -1 id 1_0:
+DEAL:2:2d::cell at -0.750000 -0.750000 has owner -1 id 0_1:0
+DEAL:2:2d::cell at -0.250000 -0.750000 has owner -1 id 0_1:1
+DEAL:2:2d::cell at -0.750000 -0.250000 has owner -1 id 0_1:2
+DEAL:2:2d::cell at -0.250000 -0.250000 has owner -1 id 0_1:3
+DEAL:2:2d::cell at 0.250000 -0.750000 has owner -1 id 1_1:0
+DEAL:2:2d::cell at 0.750000 -0.750000 has owner -2 id 1_1:1
+DEAL:2:2d::cell at 0.250000 -0.250000 has owner -1 id 1_1:2
+DEAL:2:2d::cell at 0.750000 -0.250000 has owner -2 id 1_1:3
+DEAL:2:2d::cell at -0.875000 -0.875000 has owner -2 id 0_2:00
+DEAL:2:2d::cell at -0.625000 -0.875000 has owner 1 id 0_2:01
+DEAL:2:2d::cell at -0.875000 -0.625000 has owner -2 id 0_2:02
+DEAL:2:2d::cell at -0.625000 -0.625000 has owner 1 id 0_2:03
+DEAL:2:2d::cell at -0.375000 -0.875000 has owner 2 id 0_2:10
+DEAL:2:2d::cell at -0.125000 -0.875000 has owner 2 id 0_2:11
+DEAL:2:2d::cell at -0.375000 -0.625000 has owner 2 id 0_2:12
+DEAL:2:2d::cell at -0.125000 -0.625000 has owner 2 id 0_2:13
+DEAL:2:2d::cell at -0.875000 -0.375000 has owner -2 id 0_2:20
+DEAL:2:2d::cell at -0.625000 -0.375000 has owner 0 id 0_2:21
+DEAL:2:2d::cell at -0.875000 -0.125000 has owner -2 id 0_2:22
+DEAL:2:2d::cell at -0.625000 -0.125000 has owner -2 id 0_2:23
+DEAL:2:2d::cell at -0.375000 -0.375000 has owner 0 id 0_2:30
+DEAL:2:2d::cell at -0.125000 -0.375000 has owner 0 id 0_2:31
+DEAL:2:2d::cell at -0.375000 -0.125000 has owner -2 id 0_2:32
+DEAL:2:2d::cell at -0.125000 -0.125000 has owner -2 id 0_2:33
+DEAL:2:2d::cell at 0.125000 -0.875000 has owner 0 id 1_2:00
+DEAL:2:2d::cell at 0.375000 -0.875000 has owner -2 id 1_2:01
+DEAL:2:2d::cell at 0.125000 -0.625000 has owner 0 id 1_2:02
+DEAL:2:2d::cell at 0.375000 -0.625000 has owner -2 id 1_2:03
+DEAL:2:2d::cell at 0.125000 -0.375000 has owner 0 id 1_2:20
+DEAL:2:2d::cell at 0.375000 -0.375000 has owner -2 id 1_2:21
+DEAL:2:2d::cell at 0.125000 -0.125000 has owner -2 id 1_2:22
+DEAL:2:2d::cell at 0.375000 -0.125000 has owner -2 id 1_2:23
 
 
 DEAL:3:2d:: locally_owned_subdomain(): 3
@@ -154,4 +157,5 @@ DEAL:3:2d:: locally_owned_subdomain(): 3
  n_global_active_cells: 48
  n_coarse_cells: 0
  n_global_coarse_cells: 3
+DEAL:3:2d::available_coarse_cells: {}
 

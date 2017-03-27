@@ -863,6 +863,7 @@ namespace parallel
        * subdomains are adjacent to that vertex. Used by
        * DoFHandler::Policy::ParallelDistributed.
        */
+      virtual
       void
       fill_vertices_with_ghost_neighbors
       (std::map<unsigned int, std::set<dealii::types::subdomain_id> >

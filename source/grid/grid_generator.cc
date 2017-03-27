@@ -4006,7 +4006,7 @@ namespace GridGenerator
                 data.vertices[vidx] = new_idx;
               }
             cells.push_back(data);
-            coarse_cell_indices.add_index(map_new_to_old_coarse_cell.size());
+            coarse_cell_indices.add_index(it->index());
             map_new_to_old_coarse_cell.push_back(it->index());
           }
 

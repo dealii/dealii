@@ -144,6 +144,10 @@ namespace parallel
         */
       virtual types::global_dof_index n_global_coarse_cells () const;
 
+      /**
+        */
+      virtual const IndexSet &available_coarse_cells () const;
+
     private:
       /**
        * This function calls GridTools::partition_triangulation () and if
@@ -152,16 +156,10 @@ namespace parallel
       void partition();
 
       /**
-       * map local cell->index() on level 0 to globally consistent cell
-       * index
-       */
-      std::vector<types::global_dof_index> local_to_global_coarse_cell_index;
-
-      /**
         * This IndexSet has the size n_global_coarse_cells() and contains
-        * all cell indices that are available locally;
+        * all cell indices that are available locally
         */
-      IndexSet available_coarse_cells;
+      IndexSet available_coarse_cell_set;
     };
 
     template <int dim, int spacedim>

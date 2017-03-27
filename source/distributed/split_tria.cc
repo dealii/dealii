@@ -206,7 +206,7 @@ namespace parallel
            it = active_halo_layer_vector.begin(); it != active_halo_layer_vector.end(); ++it)
         (*it)->set_user_flag();
 
-      GridGenerator::create_mesh_from_marked_cells(*this, other_not_const, available_coarse_cells);
+      GridGenerator::create_mesh_from_marked_cells(*this, other_not_const, available_coarse_cell_set);
 
       other_not_const.load_user_flags(user_flags);
 
@@ -221,11 +221,14 @@ namespace parallel
     Triangulation<dim,spacedim>::
     coarse_cell_index_to_global_index (const int index) const
     {
-      Assert(index>=0 && index<this->n_cells(0),
-             dealii::ExcIndexRange(index,0,this->n_cells(0)));
-      Assert(index < local_to_global_coarse_cell_index.size(), ExcInternalError());
+      Assert(index>=0 && static_cast<unsigned int>(index)<this->n_cells(0),
+             dealii::ExcIndexRange(index,0,static_cast<int>(this->n_cells(0))));
+      Assert(static_cast<unsigned int>(index) < available_coarse_cell_set.n_elements(),
+             ExcMessage("The coarse cell with the given index "
+                        + Utilities::int_to_string(index) +
+                        " is not available on this processor."));
 
-      return local_to_global_coarse_cell_index[index];
+      return available_coarse_cell_set.nth_index_in_set(index);
     }
 
 
@@ -236,9 +239,9 @@ namespace parallel
     {
       Assert(index>=0 && index<n_global_coarse_cells(),
              dealii::ExcIndexRange(index,0,n_global_coarse_cells()));
-      Assert(available_coarse_cells.is_element(index),
+      Assert(available_coarse_cell_set.is_element(index),
              ExcMessage("Error: the coarse cell with the given index is not available here."));
-      return available_coarse_cells.index_within_set(index);
+      return available_coarse_cell_set.index_within_set(index);
     }
 
 
@@ -248,51 +251,25 @@ namespace parallel
     n_global_coarse_cells () const
     {
       // TODO: can not check n_cells() if mesh is empty
-//      Assert(available_coarse_cells.size()>=this->n_cells(0),
+//      Assert(available_coarse_cell_set.size()>=this->n_cells(0),
 //             ExcInternalError());
-      return available_coarse_cells.size();
+      return available_coarse_cell_set.size();
     }
 
+
+
+    template <int dim, int spacedim>
+    const IndexSet &
+    Triangulation<dim,spacedim>::
+    available_coarse_cells () const
+    {
+      return available_coarse_cell_set;
+    }
   }
 }
 
 #else
-
-namespace parallel
-{
-  namespace shared
-  {
-    template <int dim, int spacedim>
-    Triangulation<dim,spacedim>::Triangulation ()
-      :
-      dealii::parallel::Triangulation<dim,spacedim>(MPI_COMM_SELF)
-    {
-      Assert (false, ExcNotImplemented());
-    }
-
-
-
-    template <int dim, int spacedim>
-    bool
-    Triangulation<dim,spacedim>::with_artificial_cells() const
-    {
-      Assert (false, ExcNotImplemented());
-      return true;
-    }
-
-
-
-    template <int dim, int spacedim>
-    const std::vector<unsigned int> &
-    Triangulation<dim,spacedim>::get_true_subdomain_ids_of_cells() const
-    {
-      Assert (false, ExcNotImplemented());
-      return true_subdomain_ids_of_cells;
-    }
-
-  }
-}
-
+todo
 
 #endif
 

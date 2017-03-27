@@ -26,6 +26,7 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/distributed/shared_tria.h>
+#include <deal.II/distributed/split_tria.h>
 #include <deal.II/distributed/tria.h>
 
 #include <set>
@@ -78,6 +79,8 @@ namespace internal
       policy_name = "Policy::ParallelShared<";
     else
       AssertThrow(false, ExcNotImplemented());
+
+
     policy_name += Utilities::int_to_string(dim)+
                    ","+Utilities::int_to_string(spacedim)+">";
     return policy_name;
@@ -667,10 +670,14 @@ DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
     policy.reset (new internal::DoFHandler::Policy::ParallelShared<dim,spacedim>());
   else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
            (&tria)
-           == 0)
-    policy.reset (new internal::DoFHandler::Policy::Sequential<dim,spacedim>());
-  else
+           != 0)
     policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>());
+  else if (dynamic_cast<const parallel::split::Triangulation< dim, spacedim >*>
+           (&tria)
+           != 0)
+    policy.reset (new internal::DoFHandler::Policy::ParallelSplit<dim,spacedim>());
+  else
+    policy.reset (new internal::DoFHandler::Policy::Sequential<dim,spacedim>());
 }
 
 
