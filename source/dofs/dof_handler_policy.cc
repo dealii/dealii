@@ -3008,17 +3008,6 @@ namespace internal
                           {
                             const dealii::types::subdomain_id subdomain = *it;
 
-                            std::cout << "sending cell " << cell->id()
-                                      << " from " << (int)tr->locally_owned_subdomain()
-                                      << " to " << (int)subdomain
-                                      << " with ";
-                            for (auto i: local_dof_indices)
-                              std::cout << i << " ";
-
-                            std::cout << std::endl;
-
-
-
                             // get an iterator
                             // to what needs to
                             // be sent to that
@@ -3058,11 +3047,6 @@ namespace internal
                    ++it, ++idx)
                 {
                   celldofinfo<dim> &cdi = destination_to_dof_info[*it];
-
-                  std::cout << " SEND " << cdi.cell_ids.size()
-                            << " cells from " << tr->locally_owned_subdomain()
-                            << " to " << *it
-                            << std::endl;
 
                   // pack all the data into
                   // the buffer for this
@@ -3105,8 +3089,6 @@ namespace internal
                   dealii::types::global_dof_index *dofs = cellinfo.dofs.data();
                   for (unsigned int c=0; c<cellinfo.cell_ids.size(); ++c, dofs+=1+dofs[0])
                     {
-                      std::cout << "unpacking cell id " << cellinfo.cell_ids[c]
-                                << std::endl;
                       typename parallel::split::Triangulation<dim,spacedim>::cell_iterator
                       tria_cell = cellinfo.cell_ids[c].to_cell(*tr);
                       typename DoFHandler<dim,spacedim>::active_cell_iterator
@@ -3121,11 +3103,6 @@ namespace internal
                       cell->update_cell_dof_indices_cache();
                       cell->get_dof_indices(dof_indices);
 
-                      std::cout << "setting " << cell->id() << " from ";
-                      for (auto i: dof_indices)
-                        std::cout << i << " ";
-                      std::cout << " to ";
-
                       Assert(cell->get_fe().dofs_per_cell == *dofs,
                              ExcInternalError());
                       const dealii::types::global_dof_index *new_dofs = dofs+1;
@@ -3134,24 +3111,15 @@ namespace internal
                       for (unsigned int i=0; i<dof_indices.size(); ++i)
                         if (new_dofs[i] != DoFHandler<dim,spacedim>::invalid_dof_index)
                           {
-                            if ((dof_indices[i] !=
-                                 (DoFHandler<dim,spacedim>::invalid_dof_index))
-                                &&
-                                (dof_indices[i]!=new_dofs[i]))
-                              std::cout << "oh no! " << dof_indices[i] << " " << new_dofs[i] << std::endl;
-//                            Assert((dof_indices[i] ==
-//                                    (DoFHandler<dim,spacedim>::invalid_dof_index))
-//                                   ||
-//                                   (dof_indices[i]==dofs[i]),
-//                                   ExcInternalError());
+                            Assert((dof_indices[i] ==
+                                    (DoFHandler<dim,spacedim>::invalid_dof_index))
+                                   ||
+                                   (dof_indices[i]==new_dofs[i]),
+                                   ExcInternalError());
                             dof_indices[i]=new_dofs[i];
                           }
                         else if (dof_indices[i] == DoFHandler<dim,spacedim>::invalid_dof_index)
                           complete=false;
-
-                      for (auto i: dof_indices)
-                        std::cout << i << " ";
-                      std::cout << std::endl;
 
                       if (complete)
                         cell->clear_user_flag();
