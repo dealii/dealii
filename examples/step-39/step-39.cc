@@ -718,7 +718,7 @@ namespace Step39
 
     // Now, we are ready to set up the V-cycle operator and the multilevel
     // preconditioner.
-    Multigrid<Vector<double> > mg(dof_handler, mgmatrix,
+    Multigrid<Vector<double> > mg(mgmatrix,
                                   mg_coarse, mg_transfer,
                                   mg_smoother, mg_smoother);
     // Let us not forget the edge matrices needed because of the adaptive
