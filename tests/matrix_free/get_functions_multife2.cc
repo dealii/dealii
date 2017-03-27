@@ -314,8 +314,7 @@ void test ()
     quad.push_back (QGauss<1>(fe_degree+1));
     mf_data.reinit (dof, constraints, quad,
                     typename MatrixFree<dim,number>::AdditionalData
-                    (MPI_COMM_SELF,
-                     MatrixFree<dim,number>::AdditionalData::none));
+                    (MatrixFree<dim,number>::AdditionalData::none));
   }
 
   MatrixFreeTest<dim,fe_degree,fe_degree+1,number> mf (mf_data);
@@ -347,4 +346,3 @@ int main ()
     deallog.pop();
   }
 }
-

@@ -166,9 +166,6 @@ public:
       color
     };
 
-    // avoid warning about use of deprecated variables
-    DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-
     /**
      * Constructor for AdditionalData.
      */
@@ -180,7 +177,6 @@ public:
                     const bool                initialize_indices = true,
                     const bool                initialize_mapping = true)
       :
-      mpi_communicator      (MPI_COMM_SELF),
       tasks_parallel_scheme (tasks_parallel_scheme),
       tasks_block_size      (tasks_block_size),
       mapping_update_flags  (mapping_update_flags),
@@ -190,41 +186,6 @@ public:
       initialize_mapping    (initialize_mapping)
     {};
 
-    /**
-     * Constructor for AdditionalData.
-     *
-     * @deprecated @p mpi_communicator should not be specified here
-     * since it is not used in the MatrixFree class.
-     */
-    AdditionalData (const MPI_Comm            mpi_communicator,
-                    const TasksParallelScheme tasks_parallel_scheme = partition_partition,
-                    const unsigned int        tasks_block_size   = 0,
-                    const UpdateFlags         mapping_update_flags  = update_gradients | update_JxW_values,
-                    const unsigned int level_mg_handler = numbers::invalid_unsigned_int,
-                    const bool                store_plain_indices = true,
-                    const bool                initialize_indices = true,
-                    const bool                initialize_mapping = true)
-      :
-      mpi_communicator      (mpi_communicator),
-      tasks_parallel_scheme (tasks_parallel_scheme),
-      tasks_block_size      (tasks_block_size),
-      mapping_update_flags  (mapping_update_flags),
-      level_mg_handler      (level_mg_handler),
-      store_plain_indices   (store_plain_indices),
-      initialize_indices    (initialize_indices),
-      initialize_mapping    (initialize_mapping)
-    {} DEAL_II_DEPRECATED
-
-    /**
-     * Set the MPI communicator that the parallel layout of the operator
-     * should be based upon. Defaults to MPI_COMM_SELF, but should be set to a
-     * communicator similar to the one used for a distributed triangulation in
-     * order to inform this class over all cells that are present.
-     *
-     * @deprecated This variable is not used anymore. The @p mpi_communicator
-     * is automatically set to the one used by the triangulation.
-     */
-    MPI_Comm            mpi_communicator DEAL_II_DEPRECATED;
 
     /**
      * Set the scheme for task parallelism. There are four options available.
@@ -316,8 +277,6 @@ public:
      */
     bool                initialize_mapping;
   };
-
-  DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
   /**
    * @name 1: Construction and initialization

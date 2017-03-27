@@ -255,8 +255,7 @@ void test ()
     QGauss<1> quad(fe_degree+1);
     mf_data.reinit (dof_handler_sca, constraints, quad,
                     typename MatrixFree<dim>::AdditionalData
-                    (MPI_COMM_WORLD,
-                     MatrixFree<dim>::AdditionalData::none));
+                    (MatrixFree<dim>::AdditionalData::none));
   }
 
   system_matrix.vmult (solution, system_rhs);
