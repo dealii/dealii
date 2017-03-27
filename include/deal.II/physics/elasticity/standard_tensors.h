@@ -132,12 +132,12 @@ namespace Physics
        *  \mathcal{P} : \{ \bullet \}
        *  := \{ \bullet \} - \frac{1}{\textrm{dim}} \left[ \{ \bullet \} : \mathbf{I} \right]\mathbf{I}
        *   = \mathcal{P}^{T} : \{ \bullet \}
-       *   = \texttt{dev_P} \left( \{ \bullet \} \right)
+       *   = \texttt{dev\_P} \left( \{ \bullet \} \right)
        * @f]
        * and, therefore,
        * @f[
-       * \texttt{dev_P} \left( \{ \bullet \} \right) : \mathbf{I}
-       *   = \textrm{trace}(\texttt{dev_P} \left( \{ \bullet \} \right)) = 0 \, .
+       * \texttt{dev\_P} \left( \{ \bullet \} \right) : \mathbf{I}
+       *   = \textrm{trace}(\texttt{dev\_P} \left( \{ \bullet \} \right)) = 0 \, .
        * @f]
        *
        * This definition aligns with the fourth-order symmetric tensor that
@@ -173,11 +173,11 @@ namespace Physics
        * @f[
        *  \{ \bullet \} : \hat{\mathcal{P}}
        *    := J^{-2/\textrm{dim}} \left[ \{ \bullet \} - \frac{1}{\textrm{dim}}\left[\mathbf{C} : \{ \bullet \}\right] \mathbf{C}^{-1} \right]
-       *    = \texttt{Dev_P} \left( \{ \bullet \} \right) \, .
+       *    = \texttt{Dev\_P} \left( \{ \bullet \} \right) \, .
        * @f]
        * It can therefore be readily shown that
        * @f[
-       *  \texttt{Dev_P} \left( \{ \bullet \} \right) : \mathbf{C} = 0 \, .
+       *  \texttt{Dev\_P} \left( \{ \bullet \} \right) : \mathbf{C} = 0 \, .
        * @f]
        *
        * @note It may be observed that we have defined the tensor as the
@@ -214,7 +214,7 @@ namespace Physics
        * @f[
        *  \hat{\mathcal{P}}^{T} : \{ \bullet \}
        *    = J^{-2/\textrm{dim}} \left[ \{ \bullet \} - \frac{1}{\textrm{dim}} \left[\mathbf{C}^{-1} : \{ \bullet \}\right] \mathbf{C} \right]
-       *    = \texttt{Dev_P_T} \{ \bullet \}
+       *    = \texttt{Dev\_P\_T} \{ \bullet \}
        * @f]
        */
       template <typename Number>

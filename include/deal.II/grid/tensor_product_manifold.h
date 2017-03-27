@@ -30,7 +30,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * This manifold will combine the ChartManifolds @p A and @p B given in the
  * constructor to form a new ChartManifold by building the tensor product
- * $A\cross B$. The first @p spacedim_A dimensions in the real space and the
+ * $A\otimes B$. The first @p spacedim_A dimensions in the real space and the
  * first @p chartdim_A dimensions of the chart will be given by manifold @p A,
  * while the remaining coordinates are given by @p B. The manifold is to be
  * used by a <tt>Triangulation@<dim, space_dim_A+space_dim_B@></tt>.

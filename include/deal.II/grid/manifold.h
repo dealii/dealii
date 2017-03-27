@@ -409,7 +409,7 @@ public:
    * @p weights.
    *
    * In its default implementation, this function simply calls get_new_point()
-   * on each row of @weights and appends those points to the output vector
+   * on each row of @p weights and appends those points to the output vector
    * @p new_points. However, this function is more efficient if multiple new
    * points need to be generated like in MappingQGeneric and the manifold does
    * expensive transformations between a chart space and the physical space,
