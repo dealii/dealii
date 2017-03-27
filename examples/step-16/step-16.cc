@@ -532,8 +532,7 @@ namespace Step16
 
     // Now, we are ready to set up the V-cycle operator and the multilevel
     // preconditioner.
-    Multigrid<Vector<double> > mg(dof_handler,
-                                  mg_matrix,
+    Multigrid<Vector<double> > mg(mg_matrix,
                                   coarse_grid_solver,
                                   mg_transfer,
                                   mg_smoother,
