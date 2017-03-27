@@ -439,7 +439,10 @@ namespace Step41
     TrilinosWrappers::MPI::Vector lambda (complete_index_set(dof_handler.n_dofs()));
     complete_system_matrix.residual (lambda,
                                      solution, complete_system_rhs);
-    contact_force.ratio (lambda, diagonal_of_mass_matrix);
+
+    // compute contact_force[i] = - lambda[i] * diagonal_of_mass_matrix[i]
+    contact_force = lambda;
+    contact_force.scale (diagonal_of_mass_matrix);
     contact_force *= -1;
 
     // The next step is to reset the active set and constraints objects and to

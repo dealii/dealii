@@ -904,8 +904,7 @@ namespace Step56
         mg::Matrix<Vector<double> > mg_interface_down(mg_interface_matrices);
 
         // Now, we are ready to set up the V-cycle operator and the multilevel preconditioner.
-        Multigrid<Vector<double> > mg(velocity_dof_handler,
-                                      mg_matrix,
+        Multigrid<Vector<double> > mg(mg_matrix,
                                       coarse_grid_solver,
                                       mg_transfer,
                                       mg_smoother,
