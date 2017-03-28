@@ -157,14 +157,14 @@ namespace internal
         temp2 = temp1 + std::max(Utilities::fixed_power<dim>(shape_info.fe_degree+1),
                                  Utilities::fixed_power<dim>(shape_info.n_q_points_1d));
       }
-    else if (temp_size > 100)
+    else if (temp_size < 100)
       {
-        temp1 = scratch_data;
+        temp1 = &temp_data[0];
         temp2 = temp1 + temp_size;
       }
     else
       {
-        temp1 = &temp_data[0];
+        temp1 = scratch_data;
         temp2 = temp1 + temp_size;
       }
 
@@ -376,14 +376,14 @@ namespace internal
         temp2 = temp1 + std::max(Utilities::fixed_power<dim>(shape_info.fe_degree+1),
                                  Utilities::fixed_power<dim>(shape_info.n_q_points_1d));
       }
-    else if (temp_size > 100)
+    else if (temp_size < 100)
       {
-        temp1 = scratch_data;
+        temp1 = &temp_data[0];
         temp2 = temp1 + temp_size;
       }
     else
       {
-        temp1 = &temp_data[0];
+        temp1 = scratch_data;
         temp2 = temp1 + temp_size;
       }
 
