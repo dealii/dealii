@@ -17,9 +17,15 @@
 // Test GSL by running CSpline. Copy-paste of /base/functions_cspline
 // take example from https://www.gnu.org/software/gsl/manual/html_node/Interpolation-Example-programs.html
 
-#include "../tests.h"
-#include <cmath>
 #include <deal.II/base/function_cspline.h>
+#include <deal.II/base/logstream.h>
+
+#include <cmath>
+#include <string>
+#include <fstream>
+#include <vector>
+
+using namespace dealii;
 
 template <int dim>
 void check()
@@ -52,4 +58,3 @@ int main()
 
   check<1>();
 }
-
