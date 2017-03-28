@@ -209,23 +209,47 @@ namespace internal
           this->face_gradient[1][i] = fe->shape_grad(my_i,q_point)[0];
         }
 
-      // get spectral evaluation points
-      if (fe_degree+1 == n_q_points_1d)
-        {
-          FE_DGQArbitraryNodes<1> fe(quad.get_points());
-          shape_grad_spectral.resize(n_dofs_1d*n_dofs_1d);
-          for (unsigned int i=0; i<n_dofs_1d; ++i)
-            for (unsigned int q=0; q<n_dofs_1d; ++q)
-              shape_grad_spectral[i*n_q_points_1d+q] = fe.shape_grad(i, quad.get_points()[q])[0];
-        }
-
       if (element_type == tensor_general &&
           check_1d_shapes_symmetric(n_q_points_1d))
         {
           if (check_1d_shapes_gausslobatto())
             element_type = tensor_gausslobatto;
           else
-            element_type = tensor_symmetric;
+            {
+              element_type = tensor_symmetric;
+              // get spectral evaluation points
+              if (fe_degree+1 == n_q_points_1d)
+                {
+                  const unsigned int stride = fe_degree/2+1;
+                  shape_grad_spectral_eo.resize((fe_degree+1)*stride);
+                  shape_hessian_spectral_eo.resize((fe_degree+1)*stride);
+                  FE_DGQArbitraryNodes<1> fe(quad.get_points());
+                  for (unsigned int i=0; i<(fe_degree+1)/2; ++i)
+                    for (unsigned int q=0; q<stride; ++q)
+                      {
+                        shape_grad_spectral_eo[i*stride+q] =
+                          0.5* (fe.shape_grad(i, quad.get_points()[q])[0] +
+                                fe.shape_grad(i, quad.get_points()[n_q_points_1d-1-q])[0]);
+                        shape_grad_spectral_eo[(fe_degree-i)*stride+q] =
+                          0.5* (fe.shape_grad(i, quad.get_points()[q])[0] -
+                                fe.shape_grad(i, quad.get_points()[n_q_points_1d-1-q])[0]);
+                        shape_hessian_spectral_eo[i*stride+q] =
+                          0.5* (fe.shape_grad_grad(i, quad.get_points()[q])[0][0] +
+                                fe.shape_grad_grad(i, quad.get_points()[n_q_points_1d-1-q])[0][0]);
+                        shape_hessian_spectral_eo[(fe_degree-i)*stride+q] =
+                          0.5* (fe.shape_grad_grad(i, quad.get_points()[q])[0][0] -
+                                fe.shape_grad_grad(i, quad.get_points()[n_q_points_1d-1-q])[0][0]);
+                      }
+                  if (fe_degree % 2 == 0)
+                    for (unsigned int q=0; q<stride; ++q)
+                      {
+                        shape_grad_spectral_eo[fe_degree/2*stride+q] =
+                          fe.shape_grad(fe_degree/2, quad.get_points()[q])[0];
+                        shape_hessian_spectral_eo[fe_degree/2*stride+q] =
+                          fe.shape_grad_grad(fe_degree/2, quad.get_points()[q])[0][0];
+                      }
+                }
+            }
         }
       else if (element_type == tensor_symmetric_plus_dg0)
         check_1d_shapes_symmetric(n_q_points_1d);
@@ -331,7 +355,6 @@ namespace internal
       shape_val_evenodd.resize((fe_degree+1)*stride);
       shape_gra_evenodd.resize((fe_degree+1)*stride);
       shape_hes_evenodd.resize((fe_degree+1)*stride);
-      shape_grad_spectral_eo.resize((fe_degree+1)*stride);
       for (unsigned int i=0; i<(fe_degree+1)/2; ++i)
         for (unsigned int q=0; q<stride; ++q)
           {
@@ -355,16 +378,6 @@ namespace internal
             shape_hes_evenodd[(fe_degree-i)*stride+q] =
               Number(0.5) * (shape_hessians[i*n_q_points_1d+q] -
                              shape_hessians[i*n_q_points_1d+n_q_points_1d-1-q]);
-
-            if (fe_degree+1 == n_q_points_1d)
-              {
-                shape_grad_spectral_eo[i*stride+q] =
-                  Number(0.5) * (shape_grad_spectral[i*n_q_points_1d+q] +
-                                 shape_grad_spectral[i*n_q_points_1d+n_q_points_1d-1-q]);
-                shape_grad_spectral_eo[(fe_degree-i)*stride+q] =
-                  Number(0.5) * (shape_grad_spectral[i*n_q_points_1d+q] -
-                                 shape_grad_spectral[i*n_q_points_1d+n_q_points_1d-1-q]);
-              }
           }
       if (fe_degree % 2 == 0)
         for (unsigned int q=0; q<stride; ++q)
@@ -375,9 +388,6 @@ namespace internal
               shape_gradients[(fe_degree/2)*n_q_points_1d+q];
             shape_hes_evenodd[fe_degree/2*stride+q] =
               shape_hessians[(fe_degree/2)*n_q_points_1d+q];
-            if (fe_degree+1 == n_q_points_1d)
-              shape_grad_spectral_eo[fe_degree/2*stride+q] =
-                shape_grad_spectral[(fe_degree/2)*n_q_points_1d+q];
           }
 
       return true;
@@ -434,8 +444,8 @@ namespace internal
       memory += MemoryConsumption::memory_consumption(shape_val_evenodd);
       memory += MemoryConsumption::memory_consumption(shape_gra_evenodd);
       memory += MemoryConsumption::memory_consumption(shape_hes_evenodd);
-      memory += MemoryConsumption::memory_consumption(shape_grad_spectral);
       memory += MemoryConsumption::memory_consumption(shape_grad_spectral_eo);
+      memory += MemoryConsumption::memory_consumption(shape_hessian_spectral_eo);
       memory += face_indices.memory_consumption();
       for (unsigned int i=0; i<2; ++i)
         {
