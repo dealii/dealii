@@ -406,6 +406,13 @@ IF (DEAL_II_WITH_CXX14)
 ELSEIF(DEAL_II_WITH_CXX11)
   ADD_FLAGS(DEAL_II_CXX_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
   MESSAGE(STATUS "DEAL_II_WITH_CXX11 successfully set up")
+  #
+  # If the user specified a flag that does not imply C++11 or C++14 (e.g.,
+  # -std=c++03) then add it
+  #
+ELSEIF(_user_provided_cxx_version_flag)
+  MESSAGE(STATUS "Using C++ version flag \"${DEAL_II_CXX_VERSION_FLAG}\"")
+  ADD_FLAGS(DEAL_II_CXX_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
 ELSE()
   MESSAGE(STATUS "DEAL_II_WITH_CXX14 and DEAL_II_WITH_CXX11 are both disabled")
 ENDIF()
