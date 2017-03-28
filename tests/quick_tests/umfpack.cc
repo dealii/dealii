@@ -18,13 +18,13 @@
 // test the umfpack sparse direct solver on a mass matrix.
 // test of the transpose as well
 
-#include "../tests.h"
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
 
-#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
@@ -42,6 +42,7 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
 
+using namespace dealii;
 
 template <int dim>
 void test (bool transpose = false)
