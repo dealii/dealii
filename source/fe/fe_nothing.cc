@@ -239,6 +239,27 @@ hp_constraints_are_implemented () const
 }
 
 
+
+template <int dim, int spacedim>
+void
+FE_Nothing<dim,spacedim>::
+get_interpolation_matrix (const FiniteElement<dim,spacedim> &/*source_fe*/,
+                          FullMatrix<double>       &interpolation_matrix) const
+{
+  // Since this element has no dofs,
+  // the interpolation matrix is necessarily empty.
+  (void)interpolation_matrix;
+
+  Assert (interpolation_matrix.m() == 0,
+          ExcDimensionMismatch (interpolation_matrix.m(),
+                                0));
+  Assert (interpolation_matrix.n() == 0,
+          ExcDimensionMismatch (interpolation_matrix.n(),
+                                0));
+}
+
+
+
 template <int dim, int spacedim>
 void
 FE_Nothing<dim,spacedim>::

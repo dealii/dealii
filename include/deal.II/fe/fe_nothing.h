@@ -216,6 +216,16 @@ public:
   hp_constraints_are_implemented () const;
 
   /**
+   * Return the matrix interpolating from the given finite element to the
+   * present one. Since the current finite element has no degrees of freedom, the
+   * interpolation matrix is necessarily empty.
+   */
+  virtual
+  void
+  get_interpolation_matrix (const FiniteElement<dim,spacedim> &source_fe,
+                            FullMatrix<double>       &interpolation_matrix) const;
+
+  /**
    * Return the matrix interpolating from a face of of one element to the face
    * of the neighboring element. The size of the matrix is then
    * <tt>source.#dofs_per_face</tt> times <tt>this->#dofs_per_face</tt>.
