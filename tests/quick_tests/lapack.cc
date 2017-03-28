@@ -17,7 +17,6 @@
 // Tests vector multiplication and eigenvalues of LAPACKFullMatrix
 // copy-paste of lapack/full_matrix_01
 
-#include "../tests.h"
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/full_matrix.h>
@@ -48,6 +47,7 @@ const double rect[] =
   11., 13., -4., -5
 };
 
+using namespace dealii;
 
 void test_rect(unsigned int m, unsigned int n, const double *values)
 {
