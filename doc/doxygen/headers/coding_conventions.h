@@ -36,14 +36,14 @@ code is written, without having to look up the exact definition of something.
 style file is provided at
 <code>
 <pre>
-  ./contrib/utilities/astyle.rc
+  ./contrib/styles/astyle.rc
 </pre>
 </code>
 
 <p>Before a commit, you should run
 <code>
 <pre>
-  astyle --options=&lt;SOURCE DIRECTORY&gt;/contrib/utilities/astyle.rc &lt;file&gt;
+  astyle --options=&lt;SOURCE DIRECTORY&gt;/contrib/styles/astyle.rc &lt;file&gt;
 </pre>
 </code>
 on each of your files. This will make sure indentation is conforming to the
