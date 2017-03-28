@@ -16,13 +16,9 @@
 
 // test Arpack by calculating eigenvalues of Laplace matrix.
 
-#include "../tests.h"
-#include <iostream>
-#include <fstream>
-#include <cstdlib>
-
-#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
@@ -43,7 +39,12 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
 
+#include <complex>
+#include <fstream>
+#include <iostream>
+#include <vector>
 
+using namespace dealii;
 
 template <int dim>
 void test ()
