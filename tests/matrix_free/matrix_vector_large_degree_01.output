@@ -1,11 +1,16 @@
 
 DEAL:2d::Testing FE_Q<2>(5)
 DEAL:2d::Result norm: 1.14444
+DEAL:2d::Result norm: 1.14444
 DEAL:2d::Testing FE_Q<2>(15)
+DEAL:2d::Result norm: 0.399128
 DEAL:2d::Result norm: 0.399128
 DEAL:2d::Testing FE_Q<2>(35)
 DEAL:2d::Result norm: 0.173861
+DEAL:2d::Result norm: 0.173861
 DEAL:3d::Testing FE_Q<3>(10)
 DEAL:3d::Result norm: 0.143708
+DEAL:3d::Result norm: 0.143708
 DEAL:3d::Testing FE_Q<3>(20)
+DEAL:3d::Result norm: 0.0523289
 DEAL:3d::Result norm: 0.0523289
