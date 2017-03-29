@@ -1482,12 +1482,6 @@ public:
   void scatter (const unsigned int *offsets,
                 double             *base_ptr) const
   {
-    for (unsigned int i=0; i<4; ++i)
-      for (unsigned int j=i+1; j<4; ++j)
-        Assert(offsets[i] != offsets[j],
-               ExcMessage("Result of scatter undefined if two offset elements"
-                          " point to the same position"));
-
     // no scatter operation in AVX/AVX2
     for (unsigned int i=0; i<4; ++i)
       base_ptr[offsets[i]] = *(reinterpret_cast<const double *>(&data)+i);
@@ -1853,12 +1847,6 @@ public:
   void scatter (const unsigned int *offsets,
                 float              *base_ptr) const
   {
-    for (unsigned int i=0; i<8; ++i)
-      for (unsigned int j=i+1; j<8; ++j)
-        Assert(offsets[i] != offsets[j],
-               ExcMessage("Result of scatter undefined if two offset elements"
-                          " point to the same position"));
-
     // no scatter operation in AVX/AVX2
     for (unsigned int i=0; i<8; ++i)
       base_ptr[offsets[i]] = *(reinterpret_cast<const float *>(&data)+i);
@@ -2243,10 +2231,6 @@ public:
   void scatter (const unsigned int *offsets,
                 double             *base_ptr) const
   {
-    Assert(offsets[0] != offsets[1],
-           ExcMessage("Result of scatter undefined if two offset elements"
-                      " point to the same position"));
-
     for (unsigned int i=0; i<2; ++i)
       base_ptr[offsets[i]] = *(reinterpret_cast<const double *>(&data)+i);
   }
@@ -2567,12 +2551,6 @@ public:
   void scatter (const unsigned int *offsets,
                 float              *base_ptr) const
   {
-    for (unsigned int i=0; i<4; ++i)
-      for (unsigned int j=i+1; j<4; ++j)
-        Assert(offsets[i] != offsets[j],
-               ExcMessage("Result of scatter undefined if two offset elements"
-                          " point to the same position"));
-
     for (unsigned int i=0; i<4; ++i)
       base_ptr[offsets[i]] = *(reinterpret_cast<const float *>(&data)+i);
   }
