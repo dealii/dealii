@@ -150,10 +150,10 @@ void test ()
   dealii::IndexSet locally_owned_dofs;
   dealii::IndexSet locally_relevant_dofs;
 
-  std::vector<dealii::PETScWrappers::MPI::Vector> eigenfunctions;
+  std::vector<dealii::PETScWrappers::MPI::Vector>  eigenfunctions;
   std::vector<dealii::PETScWrappers::MPI::Vector>  arpack_vectors;
-  std::vector<std::complex<PetscScalar>>          eigenvalues;
-  dealii::PETScWrappers::MPI::SparseMatrix        stiffness_matrix, mass_matrix;
+  std::vector<std::complex<PetscScalar> >          eigenvalues;
+  dealii::PETScWrappers::MPI::SparseMatrix         stiffness_matrix, mass_matrix;
 
   dealii::GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (global_mesh_refinement_steps);
