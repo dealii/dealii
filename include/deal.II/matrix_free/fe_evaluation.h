@@ -2813,11 +2813,14 @@ namespace internal
                              VectorizedArray<Number> &res,
                              internal::bool2type<true>) const
     {
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL < 3
+      // TODO: enable scatter path when indices are fixed
+
+      //#if DEAL_II_COMPILER_VECTORIZATION_LEVEL < 3
+#if 1
       for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
         vector_access(vec, indices[v]) += res[v];
 #else
-      // only use gather in case there is also scatter
+      // only use gather in case there is also scatter.
       VectorizedArray<Number> tmp;
       tmp.gather(vec.begin(), indices);
       tmp += res;
