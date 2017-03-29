@@ -2741,6 +2741,8 @@ namespace internal
       res = vector_access (const_cast<const VectorType &>(vec), index);
     }
 
+    // variant where VectorType::value_type is the same as Number -> can call
+    // gather
     template <typename VectorType>
     void process_dof_gather (const unsigned int      *indices,
                              VectorType              &vec,
@@ -2750,6 +2752,8 @@ namespace internal
       res.gather(vec.begin(), indices);
     }
 
+    // variant where VectorType::value_type is not the same as Number -> must
+    // manually load the data
     template <typename VectorType>
     void process_dof_gather (const unsigned int      *indices,
                              VectorType              &vec,
@@ -2807,6 +2811,8 @@ namespace internal
       vector_access (vec, index) += res;
     }
 
+    // variant where VectorType::value_type is the same as Number -> can call
+    // scatter
     template <typename VectorType>
     void process_dof_gather (const unsigned int      *indices,
                              VectorType              &vec,
@@ -2814,7 +2820,6 @@ namespace internal
                              internal::bool2type<true>) const
     {
       // TODO: enable scatter path when indices are fixed
-
       //#if DEAL_II_COMPILER_VECTORIZATION_LEVEL < 3
 #if 1
       for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
@@ -2828,6 +2833,8 @@ namespace internal
 #endif
     }
 
+    // variant where VectorType::value_type is not the same as Number -> must
+    // manually append all data
     template <typename VectorType>
     void process_dof_gather (const unsigned int      *indices,
                              VectorType              &vec,
@@ -5408,9 +5415,9 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   else
     {
       if (fe_degree+1 == n_q_points_1d &&
-          this->data->element_type == internal::MatrixFreeFunctions::tensor_gausslobatto)
+          this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric_collocation)
         {
-          internal::FEEvaluationImplSpectral<dim, fe_degree_templ, n_components_, Number>
+          internal::FEEvaluationImplCollocation<dim, fe_degree_templ, n_components_, Number>
           ::evaluate(*this->data, &this->values_dofs[0], this->values_quad,
                      this->gradients_quad, this->hessians_quad, this->scratch_data,
                      evaluate_val, evaluate_grad, evaluate_lapl);
@@ -5418,7 +5425,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
       else if (fe_degree+1 == n_q_points_1d &&
                this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric)
         {
-          internal::FEEvaluationImplTransformSpectral<dim, fe_degree_templ, n_components_, Number>
+          internal::FEEvaluationImplTransformToCollocation<dim, fe_degree_templ, n_components_, Number>
           ::evaluate(*this->data, &this->values_dofs[0], this->values_quad,
                      this->gradients_quad, this->hessians_quad, this->scratch_data,
                      evaluate_val, evaluate_grad, evaluate_lapl);
@@ -5520,9 +5527,9 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   else
     {
       if (fe_degree+1 == n_q_points_1d &&
-          this->data->element_type == internal::MatrixFreeFunctions::tensor_gausslobatto)
+          this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric_collocation)
         {
-          internal::FEEvaluationImplSpectral<dim, fe_degree_templ, n_components_, Number>
+          internal::FEEvaluationImplCollocation<dim, fe_degree_templ, n_components_, Number>
           ::integrate(*this->data, &this->values_dofs[0], this->values_quad,
                       this->gradients_quad, this->scratch_data,
                       integrate_val, integrate_grad);
@@ -5530,7 +5537,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
       else if (fe_degree+1 == n_q_points_1d &&
                this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric)
         {
-          internal::FEEvaluationImplTransformSpectral<dim, fe_degree_templ, n_components_, Number>
+          internal::FEEvaluationImplTransformToCollocation<dim, fe_degree_templ, n_components_, Number>
           ::integrate(*this->data, &this->values_dofs[0], this->values_quad,
                       this->gradients_quad, this->scratch_data,
                       integrate_val, integrate_grad);

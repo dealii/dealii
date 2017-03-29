@@ -40,11 +40,42 @@ namespace internal
      */
     enum ElementType
     {
-      tensor_general,
-      tensor_symmetric,
-      truncated_tensor,
-      tensor_symmetric_plus_dg0,
-      tensor_gausslobatto
+      /**
+       * Tensor product shape function where the shape value evaluation in the
+       * quadrature point corresponds to the identity operation and no
+       * interpolation needs to be performed (collocation approach, also
+       * called spectral evaluation). This is for example the case for an
+       * element with nodes in the Gauss-Lobatto support points and
+       * integration in the Gauss-Lobatto quadrature points of the same order.
+       */
+      tensor_symmetric_collocation = 0,
+      /**
+       * Symmetric tensor product shape functions fulfilling a Hermite
+       * identity with values and first derivatives zero at the element end
+       * points in 1D.
+       */
+      tensor_symmetric_hermite = 1,
+      /**
+       * Usual tensor product shape functions whose shape values and
+       * quadrature points are symmetric about the midpoint of the unit
+       * interval 0.5
+       */
+      tensor_symmetric = 2,
+      /**
+       * Tensor product shape functions without further particular properties
+       */
+      tensor_general = 3,
+      /**
+       * Polynomials of complete degree rather than tensor degree which can be
+       * described by a truncated tensor product
+       */
+      truncated_tensor = 4,
+      /**
+       * Tensor product shape functions that are symmetric about the midpoint
+       * of the unit interval 0.5 that additionally add a constant shape
+       * function according to FE_Q_DG0.
+       */
+      tensor_symmetric_plus_dg0 = 5
     };
 
     /**
@@ -128,33 +159,35 @@ namespace internal
        * even-odd scheme where the symmetries in shape_values are used for
        * faster evaluation.
        */
-      AlignedVector<VectorizedArray<Number> > shape_val_evenodd;
+      AlignedVector<VectorizedArray<Number> > shape_values_eo;
 
       /**
        * Stores the shape gradients in a different format, namely the so-
        * called even-odd scheme where the symmetries in shape_gradients are
        * used for faster evaluation.
        */
-      AlignedVector<VectorizedArray<Number> > shape_gra_evenodd;
+      AlignedVector<VectorizedArray<Number> > shape_gradients_eo;
 
       /**
        * Stores the shape second derivatives in a different format, namely the
        * so-called even-odd scheme where the symmetries in shape_hessians are
        * used for faster evaluation.
        */
-      AlignedVector<VectorizedArray<Number> > shape_hes_evenodd;
+      AlignedVector<VectorizedArray<Number> > shape_hessians_eo;
 
       /**
-       * Stores the shape gradients of the spectral element space
-       * FE_DGQ<1>(Quadrature<1>) for faster evaluation in even-odd format.
+       * Stores the shape gradients of the shape function space associated to
+       * the quadrature (collocation), given by FE_DGQ<1>(Quadrature<1>). For
+       * faster evaluation only the even-odd format is necessary.
        */
-      AlignedVector<VectorizedArray<Number> > shape_grad_spectral_eo;
+      AlignedVector<VectorizedArray<Number> > shape_gradients_collocation_eo;
 
       /**
-       * Stores the shape hessians of the spectral element space
-       * FE_DGQ<1>(Quadrature<1>) for faster evaluation in even-odd format.
+       * Stores the shape hessians of the shape function space associated to
+       * the quadrature (collocation), given by FE_DGQ<1>(Quadrature<1>). For
+       * faster evaluation only the even-odd format is necessary.
        */
-      AlignedVector<VectorizedArray<Number> > shape_hessian_spectral_eo;
+      AlignedVector<VectorizedArray<Number> > shape_hessians_collocation_eo;
 
       /**
        * Stores the indices from cell DoFs to face DoFs. The rows go through
@@ -234,16 +267,17 @@ namespace internal
 
       /**
        * Check whether we have symmetries in the shape values. In that case,
-       * also fill the shape_???_evenodd fields.
+       * also fill the shape_???_eo fields.
        */
       bool check_1d_shapes_symmetric(const unsigned int n_q_points_1d);
 
       /**
        * Check whether symmetric 1D basis functions are such that the shape
-       * values form a diagonal matrix, which allows to use specialized
-       * algorithms that save some operations.
+       * values form a diagonal matrix, i.e., the nodal points are collocated
+       * with the quadrature points. This allows for specialized algorithms
+       * that save some operations in the evaluation.
        */
-      bool check_1d_shapes_gausslobatto();
+      bool check_1d_shapes_collocation();
     };
 
 
@@ -257,6 +291,7 @@ namespace internal
                                   const FiniteElement<dim> &fe_in,
                                   const unsigned int base_element_number)
       :
+      element_type(tensor_general),
       fe_degree (0),
       n_q_points_1d (0),
       n_q_points (0),
@@ -267,9 +302,8 @@ namespace internal
       reinit (quad, fe_in, base_element_number);
     }
 
-
-
   } // end of namespace MatrixFreeFunctions
+
 } // end of namespace internal
 
 DEAL_II_NAMESPACE_CLOSE
