@@ -21,6 +21,7 @@
 
 #include "../tests.h"
 #include <deal.II/fe/fe_abf.h>
+#include <deal.II/lac/vector.h>
 
 
 
