@@ -72,6 +72,67 @@ namespace parallel
       typedef typename dealii::Triangulation<dim,spacedim>::cell_iterator        cell_iterator;
 
       /**
+       * Configuration flags for distributed Triangulations to be set in the
+       * constructor. Settings can be combined using bitwise OR.
+       *
+       * The constructor requires that exactly one of <code>partition_metis</code>,
+       * <code>partition_zorder</code>, and <code>partition_custom_signal</code> be set.
+       * If no setting is given to the constructor, it will set <code>partition_metis</code>
+       * by default.
+       */
+      enum Settings
+      {
+        /**
+         * Use METIS partitioner to partition active cells. This is the
+         * default partioning method.
+         */
+        partition_metis = 0x1,
+
+        /**
+         * Partition active cells with the same scheme used in the
+         * p4est library.
+         */
+        partition_zorder = 0x2,
+
+        /**
+         * Partition cells using a custom, user defined function. This is
+         * accomplished by connecting the post_refinement signal to the
+         * triangulation whenever it is first created and passing the user
+         * defined function through the signal using <code>std_cxx11::bind</code>.
+         * Here is an example:
+         *
+         *  @code
+         *     template <int dim>
+         *     void mypartition(parallel::shared::Triangulation<dim> &tria)
+         *     {
+         *       // user defined partitioning scheme
+         *     }
+         *
+         *     int main ()
+         *     {
+         *       parallel::shared::Triangulation<dim> tria(...,
+         *                                                 parallel::shared::Triangulation<dim>::Settings::partition_custom_signal);
+         *       tria.signals.post_refinement.connect (std::bind(&mypartition<dim>, std::ref(shared_tria)));
+         *     }
+         *  @endcode
+         *
+         * Note: If you plan to use a custom partition with geometric multigrid,
+         * you must manualy partition the level cells in addition to the active cells.
+         */
+        partition_custom_signal = 0x4,
+
+        /**
+         * This flag needs to be set to use the geometric multigrid
+         * functionality. This option requires additional computation and communication.
+         *
+         * Note: This flag should always be set alongside a flag for an
+         * active cell partitioning method.
+         */
+        construct_multigrid_hierarchy = 0x8,
+      };
+
+
+      /**
        * Constructor.
        *
        * If @p allow_aritifical_cells is true, this class will behave similar
@@ -83,7 +144,8 @@ namespace parallel
       Triangulation (MPI_Comm mpi_communicator,
                      const typename dealii::Triangulation<dim,spacedim>::MeshSmoothing =
                        (dealii::Triangulation<dim,spacedim>::none),
-                     const bool allow_artificial_cells = false);
+                     const bool allow_artificial_cells = false,
+                     const Settings settings = partition_metis);
 
       /**
        * Destructor.
@@ -150,6 +212,12 @@ namespace parallel
       bool with_artificial_cells() const;
 
     private:
+
+      /**
+       * Settings
+       */
+      const Settings settings;
+
       /**
        * A flag to decide whether or not artificial cells are allowed.
        */

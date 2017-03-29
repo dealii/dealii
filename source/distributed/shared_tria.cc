@@ -36,17 +36,48 @@ namespace parallel
     template <int dim, int spacedim>
     Triangulation<dim,spacedim>::Triangulation (MPI_Comm mpi_communicator,
                                                 const typename dealii::Triangulation<dim,spacedim>::MeshSmoothing smooth_grid,
-                                                const bool allow_artificial_cells):
+                                                const bool allow_artificial_cells,
+                                                const Settings settings):
       dealii::parallel::Triangulation<dim,spacedim>(mpi_communicator,smooth_grid,false),
+      settings (settings),
       allow_artificial_cells(allow_artificial_cells)
-    {}
+    {
+      Assert((settings & (partition_metis | partition_zorder | partition_custom_signal)) == partition_metis ||
+             (settings & (partition_metis | partition_zorder | partition_custom_signal)) == partition_zorder ||
+             (settings & (partition_metis | partition_zorder | partition_custom_signal)) == partition_custom_signal,
+             ExcMessage ("Settings must contain exactly one type of active cell partitioning scheme."))
+
+      if (settings & construct_multigrid_hierarchy)
+        Assert(allow_artificial_cells,
+               ExcMessage ("construct_multigrid_hierarchy requires allow_artificial_cells to be set to true."))
+      }
 
 
 
     template <int dim, int spacedim>
     void Triangulation<dim,spacedim>::partition()
     {
-      dealii::GridTools::partition_triangulation (this->n_subdomains, *this);
+      if (settings & partition_metis)
+        {
+          dealii::GridTools::partition_triangulation (this->n_subdomains, *this);
+        }
+      else if (settings & partition_zorder)
+        {
+          dealii::GridTools::partition_triangulation_zorder (this->n_subdomains, *this);
+        }
+      else if (settings & partition_custom_signal)
+        {
+          // User partitions mesh manually
+        }
+      else
+        {
+          AssertThrow(false, ExcInternalError())
+        }
+
+      // do not partition multigrid levels if user is
+      // defining a custom partition
+      if ((settings & construct_multigrid_hierarchy) && !(settings & partition_custom_signal))
+        dealii::GridTools::partition_multigrid_levels(*this);
 
       true_subdomain_ids_of_cells.resize(this->n_active_cells());
 
@@ -57,7 +88,7 @@ namespace parallel
 
       if (allow_artificial_cells)
         {
-          // get halo layer of (ghost) cells
+          // get active halo layer of (ghost) cells
           // parallel::shared::Triangulation<dim>::
           std_cxx11::function<bool (const typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator &)> predicate
             = IteratorFilters::SubdomainEqualTo(this->my_subdomain);
@@ -76,14 +107,85 @@ namespace parallel
                   active_halo_layer.find(cell) == active_halo_layer.end())
                 cell->set_subdomain_id(numbers::artificial_subdomain_id);
             }
+
+          // loop over all cells in multigrid hierarchy and mark artificial:
+          if (settings & construct_multigrid_hierarchy)
+            {
+              std_cxx11::function<bool (const typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator &)> predicate
+                = IteratorFilters::LocallyOwnedLevelCell();
+              for (unsigned int lvl=0; lvl<this->n_levels(); ++lvl)
+                {
+                  const std::vector<typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator>
+                  level_halo_layer_vector = GridTools::compute_cell_halo_layer_on_level (*this, predicate, lvl);
+                  std::set<typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator>
+                  level_halo_layer(level_halo_layer_vector.begin(), level_halo_layer_vector.end());
+
+                  typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator
+                  cell = this->begin(lvl),
+                  endc = this->end(lvl);
+                  for (; cell != endc; cell++)
+                    {
+                      // for active cells we must keep level subdomain id of all neighbors
+                      // to our subdomain, not just cells that share a vertex on the same level.
+                      // if the cells subdomain id was not set to artitficial above, we will
+                      // also keep its level subdomain id since it is either owned by this processor
+                      // or in the ghost layer of the active mesh.
+                      if (!cell->has_children() && cell->subdomain_id() != numbers::artificial_subdomain_id)
+                        continue;
+                      if (!cell->is_locally_owned_on_level() &&
+                          level_halo_layer.find(cell) == level_halo_layer.end())
+                        cell->set_level_subdomain_id(numbers::artificial_subdomain_id);
+                    }
+                }
+            }
         }
       else
         {
           // just store true subdomain ids
           for (unsigned int index=0; cell != endc; cell++, index++)
             true_subdomain_ids_of_cells[index] = cell->subdomain_id();
-
         }
+
+#ifdef DEBUG
+      {
+        // Assert that each cell is owned by a processor
+        unsigned int n_my_cells = 0;
+        typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator
+        cell = this->begin_active(),
+        endc = this->end();
+        for (; cell!=endc; ++cell)
+          if (cell->is_locally_owned())
+            n_my_cells += 1;
+
+        unsigned int total_cells;
+        int ierr = MPI_Allreduce (&n_my_cells, &total_cells, 1,
+                                  MPI_UNSIGNED, MPI_SUM, this->get_communicator());
+        AssertThrowMPI(ierr);
+
+        Assert(total_cells == this->n_active_cells(),
+               ExcMessage("Not all cells are assigned to a processor."))
+      }
+
+      // If running with multigrid, assert that each level
+      // cell is owned by a processor
+      if (settings & construct_multigrid_hierarchy)
+        {
+          unsigned int n_my_cells = 0;
+          typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator
+          cell = this->begin(),
+          endc = this->end();
+          for (; cell!=endc; ++cell)
+            if (cell->is_locally_owned_on_level())
+              n_my_cells += 1;
+
+          unsigned int total_cells;
+          int ierr = MPI_Allreduce (&n_my_cells, &total_cells, 1, MPI_UNSIGNED, MPI_SUM, this->get_communicator());
+          AssertThrowMPI(ierr);
+
+          Assert(total_cells == this->n_cells(),
+                 ExcMessage("Not all cells are assigned to a processor."))
+        }
+#endif
     }
 
 
