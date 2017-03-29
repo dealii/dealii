@@ -74,6 +74,11 @@ namespace parallel
       /**
        * Configuration flags for distributed Triangulations to be set in the
        * constructor. Settings can be combined using bitwise OR.
+       *
+       * The constructor requires that exactly one of <code>partition_metis</code>,
+       * <code>partition_zorder</code>, and <code>partition_custom_signal</code> be set.
+       * If no setting is given to the constructor, it will set <code>partition_metis</code>
+       * by default.
        */
       enum Settings
       {

@@ -928,9 +928,9 @@ namespace GridTools
                                   Triangulation<dim,spacedim> &triangulation);
 
   /**
-   * Partitions the cells of a multigrid heirarchy by assigning level subdomain ids
-   * using the "youngest child" rule, that is, each cell in the heirarchy is owned by
-   * the processor who owns its left most child in the forrest, and active cells
+   * Partitions the cells of a multigrid hierarchy by assigning level subdomain ids
+   * using the "youngest child" rule, that is, each cell in the hierarchy is owned by
+   * the processor who owns its left most child in the forest, and active cells
    * have the same subdomain id and level subdomain id. You can access the level subdomain
    * id of a cell by using <tt>cell-@>level_subdomain_id()</tt>.
    *
