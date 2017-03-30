@@ -66,7 +66,7 @@ MACRO(DEAL_II_SETUP_TARGET _target)
   ENDIF()
 
   # Necessary for setting INCLUDE_DIRECTORIES via SET_PROPERTY
-  CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
+  CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
 
   #
   # Set build type with the help of the specified keyword, or
