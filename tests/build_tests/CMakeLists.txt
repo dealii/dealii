@@ -13,7 +13,7 @@
 ##
 ## ---------------------------------------------------------------------
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
 INCLUDE(../setup_testsubproject.cmake)
 PROJECT(testsuite CXX)
 
