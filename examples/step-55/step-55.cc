@@ -440,14 +440,14 @@ namespace Step55
 
       DoFTools::make_sparsity_pattern (dof_handler, coupling, dsp,
                                        constraints, false);
-      preconditioner_matrix.reinit (owned_partitioning,
-                                    //      owned_partitioning,
-                                    dsp,
-                                    mpi_communicator);
       SparsityTools::distribute_sparsity_pattern (dsp,
                                                   dof_handler.locally_owned_dofs_per_processor(),
                                                   mpi_communicator,
                                                   locally_relevant_dofs);
+      preconditioner_matrix.reinit (owned_partitioning,
+                                    //      owned_partitioning,
+                                    dsp,
+                                    mpi_communicator);
     }
 
     // Finally, we construct the block vectors with the right sizes. The
