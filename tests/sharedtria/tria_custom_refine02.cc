@@ -16,7 +16,7 @@
 
 
 // create a shared tria mesh and distribute with a custom function
-// tests that the correct cells are set to artitficial in multigrid
+// tests that the correct cells are set to artificial in multigrid
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
