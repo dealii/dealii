@@ -2256,8 +2256,8 @@ next_cell:
 
     // Duplicate the coarse cell reordoring
     // as done in p4est
-    std::vector<unsigned int> coarse_cell_to_p4est_tree_permutation;
-    std::vector<unsigned int> p4est_tree_to_coarse_cell_permutation;
+    std::vector<types::global_dof_index> coarse_cell_to_p4est_tree_permutation;
+    std::vector<types::global_dof_index> p4est_tree_to_coarse_cell_permutation;
 
     DynamicSparsityPattern cell_connectivity;
     GridTools::get_vertex_connectivity_of_cells_on_level (triangulation, 0, cell_connectivity);
