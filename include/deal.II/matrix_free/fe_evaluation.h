@@ -415,6 +415,43 @@ public:
    */
   value_type get_laplacian (const unsigned int q_point) const;
 
+#ifdef DOXYGEN
+  // doxygen does not anyhow mention functions coming from partial template
+  // specialization of the base class, in this case FEEvaluationAccess<dim,dim>.
+  // For now, hack-in those functions manually only to fix documentation:
+
+  /** @copydoc FEEvaluationAccess<dim,dim,Number>::get_divergence()
+   * @note Only available for n_components_==dim.
+   */
+  VectorizedArray<Number> get_divergence (const unsigned int q_point) const;
+
+  /** @copydoc FEEvaluationAccess<dim,dim,Number>::get_symmetric_gradient()
+   * @note Only available for n_components_==dim.
+   */
+  SymmetricTensor<2, dim, VectorizedArray<Number> > get_symmetric_gradient (const unsigned int q_point) const;
+
+  /** @copydoc FEEvaluationAccess<dim,dim,Number>::get_curl()
+   * @note Only available for n_components_==dim.
+   */
+  Tensor<1,(dim==2?1:dim), VectorizedArray<Number> > get_curl (const unsigned int q_point) const;
+
+  /** @copydoc FEEvaluationAccess<dim,dim,Number>::submit_divergence()
+   * @note Only available for n_components_==dim.
+   */
+  void submit_divergence (const VectorizedArray<Number> div_in, const unsigned int q_point);
+
+  /** @copydoc FEEvaluationAccess<dim,dim,Number>::submit_symmetric_gradient()
+   * @note Only available for n_components_==dim.
+   */
+  void submit_symmetric_gradient (const SymmetricTensor<2, dim, VectorizedArray<Number> > grad_in, const unsigned int q_point);
+
+  /** @copydoc FEEvaluationAccess<dim,dim,Number>::submit_curl()
+   * @note Only available for n_components_==dim.
+   */
+  void submit_curl (const Tensor<1, dim==2?1:dim, VectorizedArray<Number> > curl_in, const unsigned int q_point);
+
+#endif
+
   /**
    * Takes values on quadrature points, multiplies by the Jacobian determinant
    * and quadrature weights (JxW) and sums the values for all quadrature
@@ -1153,7 +1190,7 @@ public:
   get_symmetric_gradient (const unsigned int q_point) const;
 
   /**
-   * Return the curl of the vector field, $nabla \times v$ after a call to @p
+   * Return the curl of the vector field, $\nabla \times v$ after a call to @p
    * evaluate(...,true,...).
    */
   Tensor<1,(dim==2?1:dim),VectorizedArray<Number> >
@@ -1710,10 +1747,11 @@ protected:
  * An overview of the performance of FEEvaluation is given in the following
  * figure. It considers the time spent per degree of freedom for evaluating
  * the Laplacian with continuous finite elements using a code similar to the
- * step-37 tutorial program. The time is based on an experiment on a single
- * core of an Intel Xeon E5-2687W v4, running at 3.4 GHz and measured at
- * problem sizes around 10 million. The plot lists the computational time
- * (around 0.1 seconds) divided by the number of degrees freedom.
+ * step-37 tutorial program for single-precision arithmetics. The time is
+ * based on an experiment on a single core of an Intel Xeon E5-2687W v4,
+ * running at 3.4 GHz and measured at problem sizes around 10 million. The
+ * plot lists the computational time (around 0.1 seconds) divided by the
+ * number of degrees freedom.
  *
  * @image html fe_evaluation_laplacian_time_per_dof.png
  *
@@ -2000,64 +2038,27 @@ public:
    */
   FEEvaluation &operator= (const FEEvaluation &other);
 
-#ifdef DOXYGEN
-  // doxygen does not anyhow mentions functions coming from partial template
-  // specialization of the base class, in this case FEEvaluationAccess<dim,dim>.
-  // For now, hack-in those functions manually only to fix documentation:
-
-  /** @copydoc FEEvaluationAccess<dim,dim,Number>::get_divergence()
-   * @note: only available for n_components_==dim.
-   */
-  VectorizedArray<Number> get_divergence (const unsigned int q_point) const;
-
-  /** @copydoc FEEvaluationAccess<dim,dim,Number>::get_symmetric_gradient()
-   * @note: only available for n_components_==dim.
-   */
-  SymmetricTensor<2, dim, VectorizedArray<Number> > get_symmetric_gradient (const unsigned int q_point) const;
-
-  /** @copydoc FEEvaluationAccess<dim,dim,Number>::get_curl()
-   * @note: only available for n_components_==dim.
-   */
-  Tensor<1,(dim==2?1:dim), VectorizedArray<Number> > get_curl (const unsigned int q_point) const;
-
-  /** @copydoc FEEvaluationAccess<dim,dim,Number>::submit_divergence()
-   * @note: only available for n_components_==dim.
-   */
-  void submit_divergence (const VectorizedArray<Number> div_in, const unsigned int q_point);
-
-  /** @copydoc FEEvaluationAccess<dim,dim,Number>::submit_symmetric_gradient()
-   * @note: only available for n_components_==dim.
-   */
-  void submit_symmetric_gradient (const SymmetricTensor<2, dim, VectorizedArray<Number> > grad_in, const unsigned int q_point);
-
-  /** @copydoc FEEvaluationAccess<dim,dim,Number>::submit_curl()
-   * @note: only available for n_components_==dim.
-   */
-  void submit_curl (const Tensor<1, dim==2?1:dim, VectorizedArray<Number> > curl_in, const unsigned int q_point);
-
-#endif
-
   /**
-   * Evaluates the function values, the gradients, and the Laplacians of the
+   * Evaluates the function values, the gradients, and the Hessians of the
    * FE function given at the DoF values in the input vector at the quadrature
    * points on the unit cell.  The function arguments specify which parts
    * shall actually be computed. Needs to be called before the functions @p
    * get_value(), @p get_gradient() or @p get_laplacian give useful
    * information (unless these values have been set manually).
    */
-  void evaluate (const bool evaluate_val,
-                 const bool evaluate_grad,
-                 const bool evaluate_hess = false);
+  void evaluate (const bool evaluate_values,
+                 const bool evaluate_gradients,
+                 const bool evaluate_hessians = false);
 
   /**
    * This function takes the values and/or gradients that are stored on
    * quadrature points, tests them by all the basis functions/gradients on the
-   * cell and performs the cell integration. The two function arguments @p
-   * integrate_val and @p integrate_grad are used to enable/disable some of
-   * values or gradients.
+   * cell and performs the cell integration. The two function arguments
+   * @p integrate_values and @p integrate_gradients define which of the values
+   * or gradients (or both) are summed together.
    */
-  void integrate (const bool integrate_val,
-                  const bool integrate_grad);
+  void integrate (const bool integrate_values,
+                  const bool integrate_gradients);
 
   /**
    * Return the q-th quadrature point stored in MappingInfo.
