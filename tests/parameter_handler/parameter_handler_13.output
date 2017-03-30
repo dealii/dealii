@@ -1,2 +1,5 @@
 
 DEAL::test_13=1 : b, 0: a, 1 : c
+DEAL:: found key = '1' value = 'b'
+DEAL:: found key = '0' value = 'a'
+DEAL:: found key = '1' value = 'c'

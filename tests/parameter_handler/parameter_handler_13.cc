@@ -34,6 +34,16 @@ void check (const char *p)
   prm.read_input (in);
 
   deallog << "test_13=" << prm.get ("test_13") << std::endl;
+
+  const std::vector<std::string> split_entries = Utilities::split_string_list (prm.get ("test_13"), ',');
+  for (const std::string &entry : split_entries)
+    {
+      const std::vector<std::string> parts = Utilities::split_string_list (entry, ':');
+      const std::string key = parts[0];
+      const std::string value = parts[1];
+      deallog << " found key = '" << key << "' value = '" << value << "'" << std::endl;
+    }
+
 }
 
 
