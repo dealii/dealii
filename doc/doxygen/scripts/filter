@@ -75,7 +75,29 @@ while (<>)
     # "file :", which doxygen doesn't recognize:
     s#file:[ \t]*$#file :#g;
 
-
+    # handle tutorial DOIs of the form @dealiiTutorialDOI{link,imglink}
+    # and @dealiiTutorialDOI{link}
+    if (m/(\@dealiiTutorialDOI\{([^\}]+)\})/)
+    {
+	@args = split(',', $2, 2);
+	$doi = @args[0];
+	$url = "https://doi.org/" . $doi;
+	$imgurl = @args[1] || '';
+	$text = "\@note If you use this program as a basis for your own work, please consider citing it in your list of references. The initial version of this work was contributed to the deal.II project by the authors listed in the following citation: ";
+	# Note: We need to wrap the html in @htmlonly @endhtmlonly because doxygen
+	# will remove the embedded img tag completely otherwise. Don't ask me why.
+	$text = $text . "\@htmlonly <a href=\"$url\">";
+	if (length($imgurl) > 0)
+	{
+	    $text = $text . "<img src=\"$imgurl\" alt=\"$doi\"/>";
+	}
+	else
+	{
+	    $text = $text . "$doi";
+	}
+	$text = $text . "</a> \@endhtmlonly";
+	s/(\@dealiiTutorialDOI\{([^\}]+)\})/$text/;
+    }
 
     # Handle commands such as @dealiiVideoLecture{20.5,33} by expanding it
     # into a note with some text
