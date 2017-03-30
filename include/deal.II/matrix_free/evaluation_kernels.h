@@ -807,7 +807,7 @@ namespace internal
           }
         if (evaluate_hessians == true)
           {
-            eval.template hessians<0,true,false> (values_quad[c], hessians_quad[c][0]);
+            eval.template hessians<0,true,false> (values_dofs[c], hessians_quad[c][0]);
             if (dim > 1)
               {
                 // re-use grad_x already in gradients
