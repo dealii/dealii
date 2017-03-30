@@ -53,7 +53,11 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
     FILE(GLOB _steps ${CMAKE_CURRENT_SOURCE_DIR}/step-*/*.cc)
     FOREACH(_step ${_steps})
       GET_FILENAME_COMPONENT(_name ${_step} NAME_WE)
-      GET_FILENAME_COMPONENT(_directory ${_step} DIRECTORY)
+      #
+      # to ensure compatibility with 2.8.8 - 2.8.11 we use "PATH" instead
+      # of "DIRECTORY"
+      #
+      GET_FILENAME_COMPONENT(_directory ${_step} PATH)
 
       #
       # Extract dependency information from CMakeLists.txt file.
