@@ -2086,30 +2086,6 @@ private:
    */
   void check_template_arguments(const unsigned int fe_no,
                                 const unsigned int first_selected_component);
-
-  /**
-   * Function pointer for the evaluate function
-   */
-  void (*evaluate_funct) (const internal::MatrixFreeFunctions::ShapeInfo<Number> &,
-                          VectorizedArray<Number> *values_dofs_actual[],
-                          VectorizedArray<Number> *values_quad[],
-                          VectorizedArray<Number> *gradients_quad[][dim],
-                          VectorizedArray<Number> *hessians_quad[][(dim*(dim+1))/2],
-                          VectorizedArray<Number> *scratch_data,
-                          const bool               evaluate_val,
-                          const bool               evaluate_grad,
-                          const bool               evaluate_lapl);
-
-  /**
-   * Function pointer for the integrate function
-   */
-  void (*integrate_funct)(const internal::MatrixFreeFunctions::ShapeInfo<Number> &,
-                          VectorizedArray<Number> *values_dofs_actual[],
-                          VectorizedArray<Number> *values_quad[],
-                          VectorizedArray<Number> *gradients_quad[][dim],
-                          VectorizedArray<Number> *scratch_data,
-                          const bool               evaluate_val,
-                          const bool               evaluate_grad);
 };
 
 
@@ -2765,6 +2741,29 @@ namespace internal
       res = vector_access (const_cast<const VectorType &>(vec), index);
     }
 
+    // variant where VectorType::value_type is the same as Number -> can call
+    // gather
+    template <typename VectorType>
+    void process_dof_gather (const unsigned int      *indices,
+                             VectorType              &vec,
+                             VectorizedArray<Number> &res,
+                             internal::bool2type<true>) const
+    {
+      res.gather(vec.begin(), indices);
+    }
+
+    // variant where VectorType::value_type is not the same as Number -> must
+    // manually load the data
+    template <typename VectorType>
+    void process_dof_gather (const unsigned int      *indices,
+                             VectorType              &vec,
+                             VectorizedArray<Number> &res,
+                             internal::bool2type<false>) const
+    {
+      for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+        res[v] = vector_access(const_cast<const VectorType &>(vec), indices[v]);
+    }
+
     template <typename VectorType>
     void process_dof_global (const types::global_dof_index index,
                              VectorType         &vec,
@@ -2812,6 +2811,40 @@ namespace internal
       vector_access (vec, index) += res;
     }
 
+    // variant where VectorType::value_type is the same as Number -> can call
+    // scatter
+    template <typename VectorType>
+    void process_dof_gather (const unsigned int      *indices,
+                             VectorType              &vec,
+                             VectorizedArray<Number> &res,
+                             internal::bool2type<true>) const
+    {
+      // TODO: enable scatter path when indices are fixed
+      //#if DEAL_II_COMPILER_VECTORIZATION_LEVEL < 3
+#if 1
+      for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+        vector_access(vec, indices[v]) += res[v];
+#else
+      // only use gather in case there is also scatter.
+      VectorizedArray<Number> tmp;
+      tmp.gather(vec.begin(), indices);
+      tmp += res;
+      tmp.scatter(indices, vec.begin());
+#endif
+    }
+
+    // variant where VectorType::value_type is not the same as Number -> must
+    // manually append all data
+    template <typename VectorType>
+    void process_dof_gather (const unsigned int      *indices,
+                             VectorType              &vec,
+                             VectorizedArray<Number> &res,
+                             internal::bool2type<false>) const
+    {
+      for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+        vector_access(vec, indices[v]) += res[v];
+    }
+
     template <typename VectorType>
     void process_dof_global (const types::global_dof_index index,
                              VectorType         &vec,
@@ -2856,6 +2889,25 @@ namespace internal
                       Number             &res) const
     {
       vector_access (vec, index) = res;
+    }
+
+    template <typename VectorType>
+    void process_dof_gather (const unsigned int      *indices,
+                             VectorType              &vec,
+                             VectorizedArray<Number> &res,
+                             internal::bool2type<true>) const
+    {
+      res.scatter(indices, vec.begin());
+    }
+
+    template <typename VectorType>
+    void process_dof_gather (const unsigned int      *indices,
+                             VectorType              &vec,
+                             VectorizedArray<Number> &res,
+                             internal::bool2type<false>) const
+    {
+      for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+        vector_access(vec, indices[v]) = res[v];
     }
 
     template <typename VectorType>
@@ -3071,11 +3123,11 @@ FEEvaluationBase<dim,n_components_,Number>
               // vectorization loop
               AssertDimension (dof_info->end_indices(cell)-dof_indices,
                                static_cast<int>(n_local_dofs));
-              for (unsigned int j=0; j<n_local_dofs; j+=VectorizedArray<Number>::n_array_elements)
-                for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
-                  for (unsigned int comp=0; comp<n_components; ++comp)
-                    operation.process_dof (dof_indices[j+v], *src[comp],
-                                           local_data[comp][j+v]);
+              for (unsigned int j=0, ind=0; j<dofs_per_cell; ++j, ind += VectorizedArray<Number>::n_array_elements)
+                for (unsigned int comp=0; comp<n_components; ++comp)
+                  operation.process_dof_gather(dof_indices+ind,
+                                               *src[comp], values_dofs[comp][j],
+                                               dealii::internal::bool2type<types_are_equal<typename VectorType::value_type,Number>::value>());
             }
         }
 
@@ -3214,10 +3266,11 @@ FEEvaluationBase<dim,n_components_,Number>
               // vectorization loop
               AssertDimension (dof_info->end_indices(cell)-dof_indices,
                                static_cast<int>(n_local_dofs));
-              for (unsigned int j=0; j<n_local_dofs; j+=VectorizedArray<Number>::n_array_elements)
-                for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
-                  operation.process_dof (dof_indices[j+v], *src[0],
-                                         local_data[j+v]);
+              for (unsigned int comp=0, ind=0; comp<n_components; ++comp)
+                for (unsigned int j=0; j<dofs_per_cell; ++j, ind += VectorizedArray<Number>::n_array_elements)
+                  operation.process_dof_gather(dof_indices+ind,
+                                               *src[0], values_dofs[comp][j],
+                                               dealii::internal::bool2type<types_are_equal<typename VectorType::value_type,Number>::value>());
             }
         }
 
@@ -5147,94 +5200,6 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::check_template_arguments(const unsigned int fe_no,
                            const unsigned int first_selected_component)
 {
-  const unsigned int fe_degree_templ = fe_degree != -1 ? fe_degree : 0;
-  const unsigned int n_q_points_1d_templ = n_q_points_1d > 0 ? n_q_points_1d : 1;
-  if (fe_degree == -1)
-    {
-      if (this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0)
-        {
-          evaluate_funct = internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0,
-          dim, -1, 0, n_components_, Number>::evaluate;
-          integrate_funct = internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0,
-          dim, -1, 0, n_components_, Number>::integrate;
-        }
-      else if (this->data->element_type == internal::MatrixFreeFunctions::truncated_tensor)
-        {
-          evaluate_funct = internal::FEEvaluationImpl<internal::MatrixFreeFunctions::truncated_tensor,
-          dim, -1, 0, n_components_, Number>::evaluate;
-          integrate_funct = internal::FEEvaluationImpl<internal::MatrixFreeFunctions::truncated_tensor,
-          dim, -1, 0, n_components_, Number>::integrate;
-        }
-      else
-        {
-          evaluate_funct = internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
-          dim, -1, 0, n_components_, Number>::evaluate;
-          integrate_funct = internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
-          dim, -1, 0, n_components_, Number>::integrate;
-        }
-    }
-  else
-    switch (this->data->element_type)
-      {
-      case internal::MatrixFreeFunctions::tensor_symmetric:
-        evaluate_funct =
-          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric,
-          dim, fe_degree_templ, n_q_points_1d_templ, n_components_,
-          Number>::evaluate;
-        integrate_funct =
-          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric,
-          dim, fe_degree_templ, n_q_points_1d_templ, n_components_,
-          Number>::integrate;
-        break;
-
-      case internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0:
-        evaluate_funct =
-          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0,
-          dim, fe_degree_templ, n_q_points_1d_templ, n_components_,
-          Number>::evaluate;
-        integrate_funct =
-          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0,
-          dim, fe_degree_templ, n_q_points_1d_templ, n_components_,
-          Number>::integrate;
-        break;
-
-      case internal::MatrixFreeFunctions::tensor_general:
-        evaluate_funct =
-          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
-          dim, fe_degree_templ, n_q_points_1d_templ, n_components_,
-          Number>::evaluate;
-        integrate_funct =
-          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
-          dim, fe_degree_templ, n_q_points_1d_templ, n_components_,
-          Number>::integrate;
-        break;
-
-      case internal::MatrixFreeFunctions::tensor_gausslobatto:
-        evaluate_funct =
-          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_gausslobatto,
-          dim, fe_degree_templ, n_q_points_1d_templ, n_components_,
-          Number>::evaluate;
-        integrate_funct =
-          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_gausslobatto,
-          dim, fe_degree_templ, n_q_points_1d_templ, n_components_,
-          Number>::integrate;
-        break;
-
-      case internal::MatrixFreeFunctions::truncated_tensor:
-        evaluate_funct =
-          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::truncated_tensor,
-          dim, fe_degree_templ, n_q_points_1d_templ, n_components_,
-          Number>::evaluate;
-        integrate_funct =
-          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::truncated_tensor,
-          dim, fe_degree_templ, n_q_points_1d_templ, n_components_,
-          Number>::integrate;
-        break;
-
-      default:
-        AssertThrow(false, ExcNotImplemented());
-      }
-
   (void)fe_no;
   (void)first_selected_component;
 
@@ -5417,11 +5382,89 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   Assert(this->matrix_info != 0 ||
          this->mapped_geometry->is_initialized(), ExcNotInitialized());
 
-  // Select algorithm matching the element type at run time (the function
-  // pointer is easy to predict, so negligible in cost)
-  evaluate_funct (*this->data, &this->values_dofs[0], this->values_quad,
-                  this->gradients_quad, this->hessians_quad, this->scratch_data,
-                  evaluate_val, evaluate_grad, evaluate_lapl);
+  // Select algorithm matching the element type at run time
+  const unsigned int fe_degree_templ = fe_degree != -1 ? fe_degree : 0;
+  const unsigned int n_q_points_1d_templ = n_q_points_1d > 0 ? n_q_points_1d : 1;
+  if (fe_degree == -1)
+    {
+      if (this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0)
+        {
+          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0,
+                   dim, -1, 0, n_components_, Number>
+                   ::evaluate(*this->data, &this->values_dofs[0], this->values_quad,
+                              this->gradients_quad, this->hessians_quad, this->scratch_data,
+                              evaluate_val, evaluate_grad, evaluate_lapl);
+        }
+      else if (this->data->element_type == internal::MatrixFreeFunctions::truncated_tensor)
+        {
+          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::truncated_tensor,
+                   dim, -1, 0, n_components_, Number>
+                   ::evaluate(*this->data, &this->values_dofs[0], this->values_quad,
+                              this->gradients_quad, this->hessians_quad, this->scratch_data,
+                              evaluate_val, evaluate_grad, evaluate_lapl);
+        }
+      else
+        {
+          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
+                   dim, -1, 0, n_components_, Number>
+                   ::evaluate(*this->data, &this->values_dofs[0], this->values_quad,
+                              this->gradients_quad, this->hessians_quad, this->scratch_data,
+                              evaluate_val, evaluate_grad, evaluate_lapl);
+        }
+    }
+  else
+    {
+      if (fe_degree+1 == n_q_points_1d &&
+          this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric_collocation)
+        {
+          internal::FEEvaluationImplCollocation<dim, fe_degree_templ, n_components_, Number>
+          ::evaluate(*this->data, &this->values_dofs[0], this->values_quad,
+                     this->gradients_quad, this->hessians_quad, this->scratch_data,
+                     evaluate_val, evaluate_grad, evaluate_lapl);
+        }
+      else if (fe_degree+1 == n_q_points_1d &&
+               this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric)
+        {
+          internal::FEEvaluationImplTransformToCollocation<dim, fe_degree_templ, n_components_, Number>
+          ::evaluate(*this->data, &this->values_dofs[0], this->values_quad,
+                     this->gradients_quad, this->hessians_quad, this->scratch_data,
+                     evaluate_val, evaluate_grad, evaluate_lapl);
+        }
+      else if (this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric)
+        {
+          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric,
+                   dim, fe_degree_templ, n_q_points_1d_templ, n_components_, Number>
+                   ::evaluate(*this->data, &this->values_dofs[0], this->values_quad,
+                              this->gradients_quad, this->hessians_quad, this->scratch_data,
+                              evaluate_val, evaluate_grad, evaluate_lapl);
+        }
+      else if (this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0)
+        {
+          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0,
+                   dim, fe_degree_templ, n_q_points_1d_templ, n_components_, Number>
+                   ::evaluate(*this->data, &this->values_dofs[0], this->values_quad,
+                              this->gradients_quad, this->hessians_quad, this->scratch_data,
+                              evaluate_val, evaluate_grad, evaluate_lapl);
+        }
+      else if (this->data->element_type == internal::MatrixFreeFunctions::tensor_general)
+        {
+          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
+                   dim, fe_degree_templ, n_q_points_1d_templ, n_components_, Number>
+                   ::evaluate(*this->data, &this->values_dofs[0], this->values_quad,
+                              this->gradients_quad, this->hessians_quad, this->scratch_data,
+                              evaluate_val, evaluate_grad, evaluate_lapl);
+        }
+      else if (this->data->element_type == internal::MatrixFreeFunctions::truncated_tensor)
+        {
+          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::truncated_tensor,
+                   dim, fe_degree_templ, n_q_points_1d_templ, n_components_, Number>
+                   ::evaluate(*this->data, &this->values_dofs[0], this->values_quad,
+                              this->gradients_quad, this->hessians_quad, this->scratch_data,
+                              evaluate_val, evaluate_grad, evaluate_lapl);
+        }
+      else
+        AssertThrow(false, ExcNotImplemented());
+    }
 
 #ifdef DEBUG
   if (evaluate_val == true)
@@ -5451,11 +5494,89 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   Assert(this->matrix_info != 0 ||
          this->mapped_geometry->is_initialized(), ExcNotInitialized());
 
-  // Select algorithm matching the element type at run time (the function
-  // pointer is easy to predict, so negligible in cost)
-  integrate_funct (*this->data, this->values_dofs, this->values_quad,
-                   this->gradients_quad, this->scratch_data,
-                   integrate_val, integrate_grad);
+  // Select algorithm matching the element type at run time
+  const unsigned int fe_degree_templ = fe_degree != -1 ? fe_degree : 0;
+  const unsigned int n_q_points_1d_templ = n_q_points_1d > 0 ? n_q_points_1d : 1;
+  if (fe_degree == -1)
+    {
+      if (this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0)
+        {
+          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0,
+                   dim, -1, 0, n_components_, Number>
+                   ::integrate(*this->data, &this->values_dofs[0], this->values_quad,
+                               this->gradients_quad, this->scratch_data,
+                               integrate_val, integrate_grad);
+        }
+      else if (this->data->element_type == internal::MatrixFreeFunctions::truncated_tensor)
+        {
+          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::truncated_tensor,
+                   dim, -1, 0, n_components_, Number>
+                   ::integrate(*this->data, &this->values_dofs[0], this->values_quad,
+                               this->gradients_quad, this->scratch_data,
+                               integrate_val, integrate_grad);
+        }
+      else
+        {
+          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
+                   dim, -1, 0, n_components_, Number>
+                   ::integrate(*this->data, &this->values_dofs[0], this->values_quad,
+                               this->gradients_quad, this->scratch_data,
+                               integrate_val, integrate_grad);
+        }
+    }
+  else
+    {
+      if (fe_degree+1 == n_q_points_1d &&
+          this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric_collocation)
+        {
+          internal::FEEvaluationImplCollocation<dim, fe_degree_templ, n_components_, Number>
+          ::integrate(*this->data, &this->values_dofs[0], this->values_quad,
+                      this->gradients_quad, this->scratch_data,
+                      integrate_val, integrate_grad);
+        }
+      else if (fe_degree+1 == n_q_points_1d &&
+               this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric)
+        {
+          internal::FEEvaluationImplTransformToCollocation<dim, fe_degree_templ, n_components_, Number>
+          ::integrate(*this->data, &this->values_dofs[0], this->values_quad,
+                      this->gradients_quad, this->scratch_data,
+                      integrate_val, integrate_grad);
+        }
+      else if (this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric)
+        {
+          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric,
+                   dim, fe_degree_templ, n_q_points_1d_templ, n_components_, Number>
+                   ::integrate(*this->data, &this->values_dofs[0], this->values_quad,
+                               this->gradients_quad, this->scratch_data,
+                               integrate_val, integrate_grad);
+        }
+      else if (this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0)
+        {
+          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0,
+                   dim, fe_degree_templ, n_q_points_1d_templ, n_components_, Number>
+                   ::integrate(*this->data, &this->values_dofs[0], this->values_quad,
+                               this->gradients_quad, this->scratch_data,
+                               integrate_val, integrate_grad);
+        }
+      else if (this->data->element_type == internal::MatrixFreeFunctions::tensor_general)
+        {
+          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
+                   dim, fe_degree_templ, n_q_points_1d_templ, n_components_, Number>
+                   ::integrate(*this->data, &this->values_dofs[0], this->values_quad,
+                               this->gradients_quad, this->scratch_data,
+                               integrate_val, integrate_grad);
+        }
+      else if (this->data->element_type == internal::MatrixFreeFunctions::truncated_tensor)
+        {
+          internal::FEEvaluationImpl<internal::MatrixFreeFunctions::truncated_tensor,
+                   dim, fe_degree_templ, n_q_points_1d_templ, n_components_, Number>
+                   ::integrate(*this->data, &this->values_dofs[0], this->values_quad,
+                               this->gradients_quad, this->scratch_data,
+                               integrate_val, integrate_grad);
+        }
+      else
+        AssertThrow(false, ExcNotImplemented());
+    }
 
 #ifdef DEBUG
   this->dof_values_initialized = true;

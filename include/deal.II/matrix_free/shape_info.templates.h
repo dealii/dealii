@@ -24,6 +24,7 @@
 #include <deal.II/base/polynomials_piecewise.h>
 #include <deal.II/fe/fe_poly.h>
 #include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q_dg0.h>
 
 #include <deal.II/matrix_free/shape_info.h>
@@ -211,10 +212,46 @@ namespace internal
       if (element_type == tensor_general &&
           check_1d_shapes_symmetric(n_q_points_1d))
         {
-          if (check_1d_shapes_gausslobatto())
-            element_type = tensor_gausslobatto;
+          if (check_1d_shapes_collocation())
+            element_type = tensor_symmetric_collocation;
           else
-            element_type = tensor_symmetric;
+            {
+              element_type = tensor_symmetric;
+              // get gradient and Hessian transformation matrix for the
+              // polynomial space associated with the quadrature rule
+              // (collocation space)
+              if (fe_degree+1 == n_q_points_1d)
+                {
+                  const unsigned int stride = fe_degree/2+1;
+                  shape_gradients_collocation_eo.resize((fe_degree+1)*stride);
+                  shape_hessians_collocation_eo.resize((fe_degree+1)*stride);
+                  FE_DGQArbitraryNodes<1> fe(quad.get_points());
+                  for (unsigned int i=0; i<(fe_degree+1)/2; ++i)
+                    for (unsigned int q=0; q<stride; ++q)
+                      {
+                        shape_gradients_collocation_eo[i*stride+q] =
+                          0.5* (fe.shape_grad(i, quad.get_points()[q])[0] +
+                                fe.shape_grad(i, quad.get_points()[n_q_points_1d-1-q])[0]);
+                        shape_gradients_collocation_eo[(fe_degree-i)*stride+q] =
+                          0.5* (fe.shape_grad(i, quad.get_points()[q])[0] -
+                                fe.shape_grad(i, quad.get_points()[n_q_points_1d-1-q])[0]);
+                        shape_hessians_collocation_eo[i*stride+q] =
+                          0.5* (fe.shape_grad_grad(i, quad.get_points()[q])[0][0] +
+                                fe.shape_grad_grad(i, quad.get_points()[n_q_points_1d-1-q])[0][0]);
+                        shape_hessians_collocation_eo[(fe_degree-i)*stride+q] =
+                          0.5* (fe.shape_grad_grad(i, quad.get_points()[q])[0][0] -
+                                fe.shape_grad_grad(i, quad.get_points()[n_q_points_1d-1-q])[0][0]);
+                      }
+                  if (fe_degree % 2 == 0)
+                    for (unsigned int q=0; q<stride; ++q)
+                      {
+                        shape_gradients_collocation_eo[fe_degree/2*stride+q] =
+                          fe.shape_grad(fe_degree/2, quad.get_points()[q])[0];
+                        shape_hessians_collocation_eo[fe_degree/2*stride+q] =
+                          fe.shape_grad_grad(fe_degree/2, quad.get_points()[q])[0][0];
+                      }
+                }
+            }
         }
       else if (element_type == tensor_symmetric_plus_dg0)
         check_1d_shapes_symmetric(n_q_points_1d);
@@ -317,41 +354,41 @@ namespace internal
             return false;
 
       const unsigned int stride = (n_q_points_1d+1)/2;
-      shape_val_evenodd.resize((fe_degree+1)*stride);
-      shape_gra_evenodd.resize((fe_degree+1)*stride);
-      shape_hes_evenodd.resize((fe_degree+1)*stride);
+      shape_values_eo.resize((fe_degree+1)*stride);
+      shape_gradients_eo.resize((fe_degree+1)*stride);
+      shape_hessians_eo.resize((fe_degree+1)*stride);
       for (unsigned int i=0; i<(fe_degree+1)/2; ++i)
         for (unsigned int q=0; q<stride; ++q)
           {
-            shape_val_evenodd[i*stride+q] =
+            shape_values_eo[i*stride+q] =
               Number(0.5) * (shape_values[i*n_q_points_1d+q] +
                              shape_values[i*n_q_points_1d+n_q_points_1d-1-q]);
-            shape_val_evenodd[(fe_degree-i)*stride+q] =
+            shape_values_eo[(fe_degree-i)*stride+q] =
               Number(0.5) * (shape_values[i*n_q_points_1d+q] -
                              shape_values[i*n_q_points_1d+n_q_points_1d-1-q]);
 
-            shape_gra_evenodd[i*stride+q] =
+            shape_gradients_eo[i*stride+q] =
               Number(0.5) * (shape_gradients[i*n_q_points_1d+q] +
                              shape_gradients[i*n_q_points_1d+n_q_points_1d-1-q]);
-            shape_gra_evenodd[(fe_degree-i)*stride+q] =
+            shape_gradients_eo[(fe_degree-i)*stride+q] =
               Number(0.5) * (shape_gradients[i*n_q_points_1d+q] -
                              shape_gradients[i*n_q_points_1d+n_q_points_1d-1-q]);
 
-            shape_hes_evenodd[i*stride+q] =
+            shape_hessians_eo[i*stride+q] =
               Number(0.5) * (shape_hessians[i*n_q_points_1d+q] +
                              shape_hessians[i*n_q_points_1d+n_q_points_1d-1-q]);
-            shape_hes_evenodd[(fe_degree-i)*stride+q] =
+            shape_hessians_eo[(fe_degree-i)*stride+q] =
               Number(0.5) * (shape_hessians[i*n_q_points_1d+q] -
                              shape_hessians[i*n_q_points_1d+n_q_points_1d-1-q]);
           }
       if (fe_degree % 2 == 0)
         for (unsigned int q=0; q<stride; ++q)
           {
-            shape_val_evenodd[fe_degree/2*stride+q] =
+            shape_values_eo[fe_degree/2*stride+q] =
               shape_values[(fe_degree/2)*n_q_points_1d+q];
-            shape_gra_evenodd[fe_degree/2*stride+q] =
+            shape_gradients_eo[fe_degree/2*stride+q] =
               shape_gradients[(fe_degree/2)*n_q_points_1d+q];
-            shape_hes_evenodd[fe_degree/2*stride+q] =
+            shape_hessians_eo[fe_degree/2*stride+q] =
               shape_hessians[(fe_degree/2)*n_q_points_1d+q];
           }
 
@@ -362,7 +399,7 @@ namespace internal
 
     template <typename Number>
     bool
-    ShapeInfo<Number>::check_1d_shapes_gausslobatto()
+    ShapeInfo<Number>::check_1d_shapes_collocation()
     {
       if (dofs_per_cell != n_q_points)
         return false;
@@ -406,9 +443,11 @@ namespace internal
       memory += MemoryConsumption::memory_consumption(shape_values);
       memory += MemoryConsumption::memory_consumption(shape_gradients);
       memory += MemoryConsumption::memory_consumption(shape_hessians);
-      memory += MemoryConsumption::memory_consumption(shape_val_evenodd);
-      memory += MemoryConsumption::memory_consumption(shape_gra_evenodd);
-      memory += MemoryConsumption::memory_consumption(shape_hes_evenodd);
+      memory += MemoryConsumption::memory_consumption(shape_values_eo);
+      memory += MemoryConsumption::memory_consumption(shape_gradients_eo);
+      memory += MemoryConsumption::memory_consumption(shape_hessians_eo);
+      memory += MemoryConsumption::memory_consumption(shape_gradients_collocation_eo);
+      memory += MemoryConsumption::memory_consumption(shape_hessians_collocation_eo);
       memory += face_indices.memory_consumption();
       for (unsigned int i=0; i<2; ++i)
         {
