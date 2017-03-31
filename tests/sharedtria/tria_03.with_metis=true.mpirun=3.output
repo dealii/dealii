@@ -1,10 +1,10 @@
 
-DEAL:0:0::28
-DEAL:0:0::19
+DEAL:0:0::n_active_cells=28
+DEAL:0:0::n_global_active_cells=19
 
-DEAL:1:1::16
-DEAL:1:1::19
+DEAL:1:1::n_active_cells=16
+DEAL:1:1::n_global_active_cells=19
 
 
-DEAL:2:2::16
-DEAL:2:2::19
+DEAL:2:2::n_active_cells=16
+DEAL:2:2::n_global_active_cells=19
