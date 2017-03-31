@@ -1,0 +1,4 @@
+The deprecated MPI communicator and the constructor which used it were
+removed from the MatrixFree::AdditionalData class.
+<br>
+(Denis Davydov, 2017/03/26)
