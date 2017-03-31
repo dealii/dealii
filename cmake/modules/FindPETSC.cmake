@@ -197,16 +197,29 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
   ENDFOREACH()
 ENDIF()
 
+IF(PETSC_WITH_MPIUNI)
+  #
+  # Workaround: Some distributions happen to not install petscvariables and
+  # we consequently might miss some essential include directories. Let's
+  # try at least to find the mpiuni include directory.
+  #
+  DEAL_II_FIND_PATH(PETSC_INCLUDE_DIR_MPIUNI mpiuni/mpi.h
+    HINTS ${PETSC_INCLUDE_DIR_COMMON} ${PETSC_INCLUDE_DIR_ARCH} ${_petsc_includes}
+    PATH_SUFFIXES petsc
+    )
+  SET(PETSC_INCLUDE_DIR_MPIUNI "${PETSC_INCLUDE_DIR_MPIUNI}/mpiuni")
+ENDIF()
+
 DEAL_II_PACKAGE_HANDLE(PETSC
   LIBRARIES
     REQUIRED PETSC_LIBRARY
     OPTIONAL _petsc_libraries
   INCLUDE_DIRS
     REQUIRED PETSC_INCLUDE_DIR_COMMON PETSC_INCLUDE_DIR_ARCH
-    OPTIONAL _petsc_includes
+    OPTIONAL PETSC_INCLUDE_DIR_MPIUNI _petsc_includes
   USER_INCLUDE_DIRS
     REQUIRED PETSC_INCLUDE_DIR_COMMON PETSC_INCLUDE_DIR_ARCH
-    OPTIONAL _petsc_includes
+    OPTIONAL PETSC_INCLUDE_DIR_MPIUNI _petsc_includes
   CLEAR
     PETSC_LIBRARY PETSC_INCLUDE_DIR_COMMON PETSC_INCLUDE_DIR_ARCH
     PETSC_PETSCVARIABLES ${_cleanup_variables}
