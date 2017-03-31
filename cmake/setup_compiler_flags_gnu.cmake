@@ -21,10 +21,10 @@
 #
 
 IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
-    CMAKE_CXX_COMPILER_VERSION VERSION_LESS "3.4" )
+    CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.8" )
   MESSAGE(WARNING "\n"
-    "You're using an old version of the GNU Compiler Collection (gcc/g++)!\n"
-    "It is strongly recommended to use at least version 3.4.\n"
+    "deal.II requires support for features of C++11 that are not present in\n"
+    "versions of GCC prior to 4.8."
     )
 ENDIF()
 
