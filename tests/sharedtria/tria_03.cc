@@ -75,7 +75,8 @@ void test (const unsigned int flag)
   triangulation.prepare_coarsening_and_refinement();
   triangulation.execute_coarsening_and_refinement ();
 
-  deallog << "n_active_cells="<<triangulation.n_active_cells() << std::endl
+  deallog << "n_cells=" << triangulation.n_cells() << std::endl
+          << "n_active_cells="<<triangulation.n_active_cells() << std::endl
           << "n_global_active_cells="<<triangulation.n_global_active_cells() << std::endl;
 
 }
