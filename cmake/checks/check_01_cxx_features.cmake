@@ -154,6 +154,11 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
 ENDIF()
 
 
+IF (NOT DEAL_II_HAVE_CXX14)
+  MESSAGE(FATAL_ERROR "Deal.II requires C++14.")
+ENDIF()
+
+
 #
 # Check for proper C++11 support and set up DEAL_II_HAVE_CXX11:
 #
