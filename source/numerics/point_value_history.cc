@@ -309,10 +309,7 @@ void PointValueHistory<dim>
       // entry
       const ComponentMask &current_mask = (component_mask.find (data_store_begin->first))->second;
       unsigned int n_stored = current_mask.n_selected_components();
-      for (unsigned int component = 0; component < n_stored; component++)
-        {
-          data_store_begin->second.push_back (std::vector<double> (0));
-        }
+      data_store_begin->second.resize(data_store_begin->second.size() + n_stored);
     }
 }
 
@@ -429,10 +426,7 @@ void PointValueHistory<dim>
           // entry
           const ComponentMask current_mask = (component_mask.find (data_store_begin->first))->second;
           unsigned int n_stored = current_mask.n_selected_components();
-          for (unsigned int component = 0; component < n_stored; component++)
-            {
-              data_store_begin->second.push_back (std::vector<double> (0));
-            }
+          data_store_begin->second.resize(data_store_begin->second.size() + n_stored);
         }
     }
 }
