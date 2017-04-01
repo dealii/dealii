@@ -388,8 +388,8 @@ namespace internal
  *   ...   // compute error_estimator, which contains one value per cell
  *
  *   std::vector<std::string> solution_names;
- *   solution_names.push_back ("x-displacement");
- *   solution_names.push_back ("y-displacement");
+ *   solution_names.emplace_back ("x-displacement");
+ *   solution_names.emplace_back ("y-displacement");
  *
  *   DataOut<dim> data_out;
  *   data_out.attach_dof_handler (dof_handler);

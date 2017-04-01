@@ -1613,7 +1613,7 @@ reinit(const DoFHandlerType                                  &dof_handler,
     (dof_handlers, additional_data.level_mg_handler);
 
   std::vector<hp::QCollection<1> > quad_hp;
-  quad_hp.push_back (hp::QCollection<1>(quad));
+  quad_hp.emplace_back (quad);
 
   internal_reinit(StaticMappingQ1<dim>::mapping, dof_handlers,constraints,
                   locally_owned_sets, quad_hp, additional_data);
@@ -1641,7 +1641,7 @@ reinit(const Mapping<dim>                                    &mapping,
     (dof_handlers, additional_data.level_mg_handler);
 
   std::vector<hp::QCollection<1> > quad_hp;
-  quad_hp.push_back (hp::QCollection<1>(quad));
+  quad_hp.emplace_back (quad);
 
   internal_reinit(mapping, dof_handlers,constraints,locally_owned_sets,
                   quad_hp,  additional_data);
@@ -1662,7 +1662,7 @@ reinit(const std::vector<const DoFHandlerType *>   &dof_handler,
     (dof_handler, additional_data.level_mg_handler);
   std::vector<hp::QCollection<1> > quad_hp;
   for (unsigned int q=0; q<quad.size(); ++q)
-    quad_hp.push_back (hp::QCollection<1>(quad[q]));
+    quad_hp.emplace_back (quad[q]);
   internal_reinit(StaticMappingQ1<dim>::mapping, dof_handler,constraint,
                   locally_owned_set, quad_hp, additional_data);
 }
@@ -1681,7 +1681,7 @@ reinit(const std::vector<const DoFHandlerType *>             &dof_handler,
     internal::MatrixFree::extract_locally_owned_index_sets
     (dof_handler, additional_data.level_mg_handler);
   std::vector<hp::QCollection<1> > quad_hp;
-  quad_hp.push_back (hp::QCollection<1>(quad));
+  quad_hp.emplace_back (quad);
   internal_reinit(StaticMappingQ1<dim>::mapping, dof_handler,constraint,
                   locally_owned_set, quad_hp, additional_data);
 }
@@ -1701,7 +1701,7 @@ reinit(const Mapping<dim>                                    &mapping,
     internal::MatrixFree::extract_locally_owned_index_sets
     (dof_handler, additional_data.level_mg_handler);
   std::vector<hp::QCollection<1> > quad_hp;
-  quad_hp.push_back (hp::QCollection<1>(quad));
+  quad_hp.emplace_back (quad);
   internal_reinit(mapping, dof_handler,constraint,
                   locally_owned_set, quad_hp, additional_data);
 }
@@ -1722,7 +1722,7 @@ reinit(const Mapping<dim>                                   &mapping,
     (dof_handler, additional_data.level_mg_handler);
   std::vector<hp::QCollection<1> > quad_hp;
   for (unsigned int q=0; q<quad.size(); ++q)
-    quad_hp.push_back (hp::QCollection<1>(quad[q]));
+    quad_hp.emplace_back (quad[q]);
   internal_reinit(mapping, dof_handler,constraint,locally_owned_set,
                   quad_hp, additional_data);
 }
@@ -1742,7 +1742,7 @@ reinit(const Mapping<dim>                                    &mapping,
   // find out whether we use a hp Quadrature or a standard quadrature
   std::vector<hp::QCollection<1> > quad_hp;
   for (unsigned int q=0; q<quad.size(); ++q)
-    quad_hp.push_back (hp::QCollection<1>(quad[q]));
+    quad_hp.emplace_back (quad[q]);
   internal_reinit (mapping,
                    dof_handler,
                    constraint, locally_owned_set, quad_hp, additional_data);

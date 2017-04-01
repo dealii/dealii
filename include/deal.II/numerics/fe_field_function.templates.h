@@ -498,8 +498,8 @@ namespace Functions
 
       // Put in the first point.
       cells.push_back(cell);
-      qpoints.push_back(std::vector<Point<dim> >(1, qp.get()));
-      maps.push_back(std::vector<unsigned int> (1, 0));
+      qpoints.emplace_back(1, qp.get());
+      maps.emplace_back(1, 0);
     }
 
 
@@ -556,8 +556,8 @@ namespace Functions
                          VectorTools::ExcPointNotAvailableHere());
 
             cells.push_back(my_pair.first);
-            qpoints.push_back(std::vector<Point<dim> >(1, my_pair.second));
-            maps.push_back(std::vector<unsigned int>(1, first_outside));
+            qpoints.emplace_back(1, my_pair.second);
+            maps.emplace_back(1, first_outside);
             c++;
             point_flags[first_outside] = true;
             // And check if we can exit the loop now

@@ -227,7 +227,7 @@ namespace Utilities
           // indices and then push back new values. When we are done, copy the
           // data to that field of the partitioner. This way, the variable
           // ghost_targets will have exactly the size we need, whereas the
-          // vector filled with push_back might actually be too long.
+          // vector filled with emplace_back might actually be too long.
           unsigned int current_proc = 0;
           ghost_indices_data.fill_index_vector (expanded_ghost_indices);
           types::global_dof_index current_index = expanded_ghost_indices[0];
@@ -247,8 +247,7 @@ namespace Utilities
                 {
                   ghost_targets_temp[n_ghost_targets-1].second =
                     iterator - ghost_targets_temp[n_ghost_targets-1].second;
-                  ghost_targets_temp.push_back(std::pair<unsigned int,
-                                               unsigned int>(current_proc,iterator));
+                  ghost_targets_temp.emplace_back (current_proc, iterator);
                   n_ghost_targets++;
                 }
             }
@@ -274,8 +273,7 @@ namespace Utilities
           if (receive_buffer[i] > 0)
             {
               n_import_indices_data += receive_buffer[i];
-              import_targets_temp.push_back(std::pair<unsigned int,
-                                            unsigned int> (i, receive_buffer[i]));
+              import_targets_temp.emplace_back(i, receive_buffer[i]);
             }
         // copy, don't move, to get deterministic memory usage.
         import_targets_data = import_targets_temp;
@@ -340,8 +338,7 @@ namespace Utilities
                 compressed_import_indices.back().second++;
               else
                 {
-                  compressed_import_indices.push_back
-                  (std::pair<unsigned int,unsigned int>(new_index,new_index+1));
+                  compressed_import_indices.emplace_back (new_index,new_index+1);
                 }
               last_index = new_index;
             }

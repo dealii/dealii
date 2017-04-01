@@ -491,8 +491,8 @@ void TimeStepBase_Tria<dim>::save_refine_flags ()
 {
   // for any of the non-initial grids
   // store the refinement flags
-  refine_flags.push_back (std::vector<bool>());
-  coarsen_flags.push_back (std::vector<bool>());
+  refine_flags.emplace_back ();
+  coarsen_flags.emplace_back ();
   tria->save_refine_flags (refine_flags.back());
   tria->save_coarsen_flags (coarsen_flags.back());
 }

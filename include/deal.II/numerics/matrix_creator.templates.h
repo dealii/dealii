@@ -938,7 +938,7 @@ namespace MatrixCreator
 
       std::vector<types::global_dof_index> dofs_on_face_vector (dofs_per_face);
 
-      // Because CopyData objects are reused and that push_back is
+      // Because CopyData objects are reused and emplace_back is
       // used, dof_is_on_face, cell_matrix, and cell_vector must be
       // cleared before they are reused
       copy_data.dof_is_on_face.clear();
@@ -951,9 +951,9 @@ namespace MatrixCreator
         if (boundary_functions.find(cell->face(face)->boundary_id()) !=
             boundary_functions.end())
           {
-            copy_data.cell_matrix.push_back(FullMatrix<number> (copy_data.dofs_per_cell,
-                                                                copy_data.dofs_per_cell));
-            copy_data.cell_vector.push_back(Vector<number> (copy_data.dofs_per_cell));
+            copy_data.cell_matrix.emplace_back(copy_data.dofs_per_cell,
+                                               copy_data.dofs_per_cell);
+            copy_data.cell_vector.emplace_back(copy_data.dofs_per_cell);
             fe_values.reinit (cell, face);
 
             if (fe_is_system)
@@ -1069,7 +1069,7 @@ namespace MatrixCreator
             cell->face(face)->get_dof_indices (dofs_on_face_vector);
             // for each dof on the cell, have a flag whether it is on
             // the face
-            copy_data.dof_is_on_face.push_back(std::vector<bool> (copy_data.dofs_per_cell));
+            copy_data.dof_is_on_face.emplace_back(copy_data.dofs_per_cell);
             // check for each of the dofs on this cell whether it is
             // on the face
             for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
@@ -1325,9 +1325,9 @@ namespace MatrixCreator
 
             const FEFaceValues<dim,spacedim> &fe_values = x_fe_values.get_present_fe_values ();
 
-            copy_data.cell_matrix.push_back(FullMatrix<number> (copy_data.dofs_per_cell,
-                                                                copy_data.dofs_per_cell));
-            copy_data.cell_vector.push_back(Vector<number> (copy_data.dofs_per_cell));
+            copy_data.cell_matrix.emplace_back(copy_data.dofs_per_cell,
+                                               copy_data.dofs_per_cell);
+            copy_data.cell_vector.emplace_back(copy_data.dofs_per_cell);
 
             if (fe_is_system)
               // FE has several components
@@ -1466,7 +1466,7 @@ namespace MatrixCreator
                                                cell->active_fe_index());
             // for each dof on the cell, have a
             // flag whether it is on the face
-            copy_data.dof_is_on_face.push_back(std::vector<bool> (copy_data.dofs_per_cell));
+            copy_data.dof_is_on_face.emplace_back(copy_data.dofs_per_cell);
             // check for each of the dofs on this cell
             // whether it is on the face
             for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)

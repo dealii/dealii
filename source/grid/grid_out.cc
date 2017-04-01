@@ -2537,10 +2537,10 @@ void GridOut::write_mesh_per_processor_as_vtu (const Triangulation<dim,spacedim>
   std::vector<DataOutBase::Patch<dim,spacedim> > patches;
   const unsigned int n_datasets=4;
   std::vector<std::string> data_names;
-  data_names.push_back("level");
-  data_names.push_back("subdomain");
-  data_names.push_back("level_subdomain");
-  data_names.push_back("proc_writing");
+  data_names.emplace_back("level");
+  data_names.emplace_back("subdomain");
+  data_names.emplace_back("level_subdomain");
+  data_names.emplace_back("proc_writing");
 
   const unsigned int n_q_points = GeometryInfo<dim>::vertices_per_cell;
 
@@ -3642,12 +3642,12 @@ namespace internal
                   // the compiler will
                   // optimize away this
                   // little kludge
-                  line_list.push_back (LineEntry(Point<2>(line->vertex(0)(0),
-                                                          line->vertex(0)(1)),
-                                                 Point<2>(line->vertex(1)(0),
-                                                          line->vertex(1)(1)),
-                                                 line->user_flag_set(),
-                                                 cell->level()));
+                  line_list.emplace_back(Point<2>(line->vertex(0)(0),
+                                                  line->vertex(0)(1)),
+                                         Point<2>(line->vertex(1)(0),
+                                                  line->vertex(1)(1)),
+                                         line->user_flag_set(),
+                                         cell->level());
               }
 
           // next if we are to treat
@@ -3700,18 +3700,20 @@ namespace internal
                                                      (cell, q_projector.point(offset+i)));
                             const Point<2>   p1     (p1_dim(0), p1_dim(1));
 
-                            line_list.push_back (LineEntry(p0, p1,
-                                                           face->user_flag_set(),
-                                                           cell->level() ));
+                            line_list.emplace_back (p0,
+                                                    p1,
+                                                    face->user_flag_set(),
+                                                    cell->level() );
                             p0=p1;
                           }
 
                         // generate last piece
                         const Point<dim> p1_dim (face->vertex(1));
                         const Point<2>   p1     (p1_dim(0), p1_dim(1));
-                        line_list.push_back (LineEntry(p0, p1,
-                                                       face->user_flag_set(),
-                                                       cell->level()));
+                        line_list.emplace_back (p0,
+                                                p1,
+                                                face->user_flag_set(),
+                                                cell->level());
                       }
                   }
             }
@@ -3778,12 +3780,12 @@ namespace internal
               {
                 typename dealii::Triangulation<dim, spacedim>::line_iterator
                 line=cell->line(line_no);
-                line_list.push_back (LineEntry(Point<2>(line->vertex(0) * unit_vector2,
-                                                        line->vertex(0) * unit_vector1),
-                                               Point<2>(line->vertex(1) * unit_vector2,
-                                                        line->vertex(1) * unit_vector1),
-                                               line->user_flag_set(),
-                                               cell->level()));
+                line_list.emplace_back (Point<2>(line->vertex(0) * unit_vector2,
+                                                 line->vertex(0) * unit_vector1),
+                                        Point<2>(line->vertex(1) * unit_vector2,
+                                                 line->vertex(1) * unit_vector1),
+                                        line->user_flag_set(),
+                                        cell->level());
               }
 
           break;

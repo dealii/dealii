@@ -146,7 +146,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
           Point<3> x;
           in >> x(0) >> x(1) >> x(2);
 
-          vertices.push_back(Point<spacedim>());
+          vertices.emplace_back();
           for (unsigned int d=0; d<spacedim; ++d)
             vertices.back()(d) = x(d);
         }
@@ -194,7 +194,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                                subcelldata.boundary_lines.size() == 0,
                                ExcNotImplemented());
 
-                  cells.push_back(CellData<dim>());
+                  cells.emplace_back();
 
                   for (unsigned int j = 0; j < type; j++) //loop to feed data
                     in >> cells.back().vertices[j];
@@ -204,7 +204,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
               else if ( type == 4)
                 {
-                  subcelldata.boundary_quads.push_back(CellData<2>());
+                  subcelldata.boundary_quads.emplace_back();
 
                   for (unsigned int j = 0; j < type; j++) //loop to feed the data to the boundary
                     in >> subcelldata.boundary_quads.back().vertices[j];
@@ -232,7 +232,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                   AssertThrow (subcelldata.boundary_lines.size() == 0,
                                ExcNotImplemented());
 
-                  cells.push_back(CellData<dim>());
+                  cells.emplace_back();
 
                   for (unsigned int j = 0; j < type; j++) //loop to feed data
                     in >> cells.back().vertices[j];
@@ -244,7 +244,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                 {
                   //If this is encountered, the pointer comes out of the loop
                   //and starts processing boundaries.
-                  subcelldata.boundary_lines.push_back(CellData<1>());
+                  subcelldata.boundary_lines.emplace_back();
 
                   for (unsigned int j = 0; j < type; j++) //loop to feed the data to the boundary
                     {
@@ -424,7 +424,7 @@ void GridIn<dim, spacedim>::read_unv(std::istream &in)
       AssertThrow(in, ExcIO());
       in >> x[0] >> x[1] >> x[2];
 
-      vertices.push_back(Point<spacedim>());
+      vertices.emplace_back();
 
       for (unsigned int d = 0; d < spacedim; d++)
         vertices.back()(d) = x[d];
@@ -473,7 +473,7 @@ void GridIn<dim, spacedim>::read_unv(std::istream &in)
 
       if ( (((type == 44)||(type == 94))&&(dim == 2)) || ((type == 115)&&(dim == 3)) ) // cell
         {
-          cells.push_back(CellData<dim>());
+          cells.emplace_back();
 
           AssertThrow(in, ExcIO());
           for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; v++)
@@ -493,7 +493,7 @@ void GridIn<dim, spacedim>::read_unv(std::istream &in)
           AssertThrow(in, ExcIO());
           in >> dummy >> dummy >> dummy;
 
-          subcelldata.boundary_lines.push_back(CellData<1>());
+          subcelldata.boundary_lines.emplace_back();
 
           AssertThrow(in, ExcIO());
           for (unsigned int v = 0; v < 2; v++)
@@ -510,7 +510,7 @@ void GridIn<dim, spacedim>::read_unv(std::istream &in)
         }
       else if ( ((type == 44)||(type == 94)) && (dim == 3) ) // boundary quad
         {
-          subcelldata.boundary_quads.push_back(CellData<2>());
+          subcelldata.boundary_quads.emplace_back();
 
           AssertThrow(in, ExcIO());
           for (unsigned int v = 0; v < 4; v++)
@@ -694,7 +694,7 @@ void GridIn<dim, spacedim>::read_ucd (std::istream                            &i
         // found a cell
         {
           // allocate and read indices
-          cells.push_back (CellData<dim>());
+          cells.emplace_back ();
           for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
             in >> cells.back().vertices[i];
 
@@ -725,7 +725,7 @@ void GridIn<dim, spacedim>::read_ucd (std::istream                            &i
       else if ((cell_type == "line") && ((dim == 2) || (dim == 3)))
         // boundary info
         {
-          subcelldata.boundary_lines.push_back (CellData<1>());
+          subcelldata.boundary_lines.emplace_back ();
           in >> subcelldata.boundary_lines.back().vertices[0]
              >> subcelldata.boundary_lines.back().vertices[1];
 
@@ -764,7 +764,7 @@ void GridIn<dim, spacedim>::read_ucd (std::istream                            &i
       else if ((cell_type == "quad") && (dim == 3))
         // boundary info
         {
-          subcelldata.boundary_quads.push_back (CellData<2>());
+          subcelldata.boundary_quads.emplace_back ();
           in >> subcelldata.boundary_quads.back().vertices[0]
              >> subcelldata.boundary_quads.back().vertices[1]
              >> subcelldata.boundary_quads.back().vertices[2]
@@ -1015,7 +1015,7 @@ void GridIn<dim, spacedim>::read_dbmesh (std::istream &in)
     {
       // read in vertex numbers. they
       // are 1-based, so subtract one
-      cells.push_back (CellData<dim>());
+      cells.emplace_back ();
       for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
         {
           in >> cells.back().vertices[i];
@@ -1420,7 +1420,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
                                    "number required for this object"));
 
           // allocate and read indices
-          cells.push_back (CellData<dim>());
+          cells.emplace_back ();
           for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
             in >> cells.back().vertices[i];
 
@@ -1449,7 +1449,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
       else if ((cell_type == 1) && ((dim == 2) || (dim == 3)))
         // boundary info
         {
-          subcelldata.boundary_lines.push_back (CellData<1>());
+          subcelldata.boundary_lines.emplace_back ();
           in >> subcelldata.boundary_lines.back().vertices[0]
              >> subcelldata.boundary_lines.back().vertices[1];
 
@@ -1484,7 +1484,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
       else if ((cell_type == 3) && (dim == 3))
         // boundary info
         {
-          subcelldata.boundary_quads.push_back (CellData<2>());
+          subcelldata.boundary_quads.emplace_back ();
           in >> subcelldata.boundary_quads.back().vertices[0]
              >> subcelldata.boundary_quads.back().vertices[1]
              >> subcelldata.boundary_quads.back().vertices[2]

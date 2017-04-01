@@ -419,7 +419,7 @@ IndexSet::add_indices(const IndexSet &other,
         }
       else if (r1 == ranges.end() || (r2->end+offset) < r1->begin)
         {
-          new_ranges.push_back(Range(r2->begin+offset,r2->end+offset));
+          new_ranges.emplace_back(r2->begin+offset, r2->end+offset);
           ++r2;
         }
       else

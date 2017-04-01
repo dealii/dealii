@@ -317,10 +317,9 @@ void ConstraintMatrix::close ()
                                       weight);
 
                     for (size_type i=1; i<constrained_line->entries.size(); ++i)
-                      line->entries
-                      .push_back (std::make_pair (constrained_line->entries[i].first,
-                                                  constrained_line->entries[i].second *
-                                                  weight));
+                      line->entries.emplace_back (constrained_line->entries[i].first,
+                                                  constrained_line->entries[i].second
+                                                  * weight);
 
 #ifdef DEBUG
                     // keep track of how many entries we replace in this
@@ -528,8 +527,7 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
 
               for (ConstraintLine::Entries::const_iterator j=other_line->begin();
                    j!=other_line->end(); ++j)
-                tmp.push_back (std::pair<size_type,double>(j->first,
-                                                           j->second*weight));
+                tmp.emplace_back(j->first, j->second*weight);
 
               line->inhomogeneity
               += other_constraints.get_inhomogeneity(line->entries[i].first) *

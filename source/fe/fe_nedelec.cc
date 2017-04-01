@@ -2382,7 +2382,7 @@ const
 
       for (unsigned int i = 0;
            i < std::min (fe_nedelec_other->degree, this->degree); ++i)
-        identities.push_back (std::make_pair (i, i));
+        identities.emplace_back (i, i);
 
       return identities;
     }
@@ -2427,10 +2427,8 @@ const
       for (unsigned int i = 0; i < p_min; ++i)
         for (unsigned int j = 0; j < p_min - 1; ++j)
           {
-            identities.push_back (std::make_pair (i * (q - 1) + j,
-                                                  i * (p - 1) + j));
-            identities.push_back (std::make_pair (i + (j + q - 1) * q,
-                                                  i + (j + p - 1) * p));
+            identities.emplace_back (i * (q - 1) + j, i * (p - 1) + j);
+            identities.emplace_back (i + (j + q - 1) * q, i + (j + p - 1) * p);
           }
 
       return identities;

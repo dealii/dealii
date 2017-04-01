@@ -33,7 +33,7 @@ void
 PathSearch::initialize_classes()
 {
   std::vector<std::string> v;
-  v.push_back(empty);
+  v.emplace_back();
   path_lists.insert(map_type(std::string("PARAMETER"), v));
 
   /*
@@ -42,8 +42,8 @@ PathSearch::initialize_classes()
   path_lists.insert(map_type(std::string("MESH"), v));
 
   v.clear();
-  v.push_back(empty);
-  v.push_back(std::string(".prm"));
+  v.emplace_back();
+  v.emplace_back(".prm");
   suffix_lists.insert(map_type(std::string("PARAMETER"), v));
 
   /*
@@ -55,14 +55,14 @@ PathSearch::initialize_classes()
   // would require linking with the
   // deal.II libraries.
   v.clear();
-  v.push_back(empty);
-  v.push_back(std::string(".inp"));
-  v.push_back(std::string(".xda"));
-  v.push_back(std::string(".dbmesh"));
-  v.push_back(std::string(".dat"));
-  v.push_back(std::string(".plt"));
-  v.push_back(std::string(".nc"));
-  v.push_back(std::string(".msh"));
+  v.emplace_back();
+  v.emplace_back(".inp");
+  v.emplace_back(".xda");
+  v.emplace_back(".dbmesh");
+  v.emplace_back(".dat");
+  v.emplace_back(".plt");
+  v.emplace_back(".nc");
+  v.emplace_back(".msh");
   suffix_lists.insert(map_type(std::string("MESH"), v));
 }
 
@@ -208,7 +208,7 @@ PathSearch::add_class (const std::string &cls)
   // Add empty path and empty suffix
   // for new class
   std::vector<std::string> v;
-  v.push_back(empty);
+  v.emplace_back();
   path_lists.insert(map_type(cls, v));
   suffix_lists.insert(map_type(cls, v));
 }

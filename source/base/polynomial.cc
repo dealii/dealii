@@ -832,7 +832,7 @@ namespace Polynomials
     p.reserve (points.size());
 
     for (unsigned int i=0; i<points.size(); ++i)
-      p.push_back (Polynomial<double> (points, i));
+      p.emplace_back (points, i);
     return p;
   }
 

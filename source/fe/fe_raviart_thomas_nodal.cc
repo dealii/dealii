@@ -402,10 +402,10 @@ hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
 
       if (p==q)
         for (unsigned int i=0; i<p+1; ++i)
-          identities.push_back (std::make_pair(i,i));
+          identities.emplace_back (i, i);
 
       else if (p%2==0 && q%2==0)
-        identities.push_back(std::make_pair(p/2,q/2));
+        identities.emplace_back(p/2, q/2);
 
       return identities;
     }
@@ -442,10 +442,10 @@ FE_RaviartThomasNodal<dim>::hp_quad_dof_identities (
 
       if (p==q)
         for (unsigned int i=0; i<p; ++i)
-          identities.push_back (std::make_pair(i,i));
+          identities.emplace_back (i, i);
 
       else if (p%2!=0 && q%2!=0)
-        identities.push_back(std::make_pair(p/2, q/2));
+        identities.emplace_back (p/2, q/2);
 
       return identities;
     }

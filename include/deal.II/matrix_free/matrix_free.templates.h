@@ -392,8 +392,7 @@ namespace internal
              || cell->subdomain_id() == subdomain_id)
       {
         Assert (cell->active(), ExcInternalError());
-        cell_its.push_back (std::pair<unsigned int,unsigned int>
-                            (cell->level(), cell->index()));
+        cell_its.emplace_back (cell->level(), cell->index());
       }
   }
 }
@@ -448,8 +447,7 @@ initialize_dof_handlers (const std::vector<const DoFHandler<dim>*> &dof_handler,
                                                      end_cell = tria.end(level);
           for ( ; cell != end_cell; ++cell)
             if (cell->level_subdomain_id() == my_pid)
-              cell_level_index.push_back (std::pair<unsigned int,unsigned int>
-                                          (cell->level(), cell->index()));
+              cell_level_index.emplace_back (cell->level(), cell->index());
         }
     }
 }

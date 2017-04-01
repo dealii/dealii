@@ -703,8 +703,7 @@ no_constraint:
                 else
                   {
                     const unsigned short constraint_loc = constr_ind[j]->second;
-                    new_constraint_indicator.push_back
-                    (std::pair<unsigned short,unsigned short> (m_index, constraint_loc));
+                    new_constraint_indicator.emplace_back (m_index, constraint_loc);
                     for (unsigned int k=constraint_pool_row_index[constraint_loc];
                          k<constraint_pool_row_index[constraint_loc+1];
                          ++k, ++glob_indices[j])

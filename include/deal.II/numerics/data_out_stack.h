@@ -78,8 +78,8 @@ template <int dim, int spacedim> class DoFHandler;
  *                                  // first declare the vectors
  *                                  // to be used later
  *   std::vector<std::string> solution_names;
- *   solution_names.push_back ("u");
- *   solution_names.push_back ("v");
+ *   solution_names.emplace_back ("u");
+ *   solution_names.emplace_back ("v");
  *   data_out_stack.declare_data_vector (solution_names,
  *                                       DataOutStack<dim>::dof_vector);
  *   data_out_stack.declare_data_vector ("error",
