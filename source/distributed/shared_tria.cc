@@ -125,16 +125,35 @@ namespace parallel
                   endc = this->end(lvl);
                   for (; cell != endc; cell++)
                     {
-                      // for active cells we must keep level subdomain id of all neighbors
-                      // to our subdomain, not just cells that share a vertex on the same level.
+                      // for active cells, we must have knowledge of level subdomain ids of
+                      // all neighbors to our subdomain, not just neighbors on the same level.
                       // if the cells subdomain id was not set to artitficial above, we will
                       // also keep its level subdomain id since it is either owned by this processor
                       // or in the ghost layer of the active mesh.
                       if (!cell->has_children() && cell->subdomain_id() != numbers::artificial_subdomain_id)
                         continue;
+
+                      // we must have knowledge of our parent in the hierarchy
+                      if (cell->has_children())
+                        {
+                          bool keep_cell = false;
+                          for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
+                            if (cell->child(c)->level_subdomain_id() == this->my_subdomain)
+                              {
+                                keep_cell = true;
+                                break;
+                              }
+                          if (keep_cell)
+                            continue;
+                        }
+
+                      // we must have knowledge of our neighbors on the same level
                       if (!cell->is_locally_owned_on_level() &&
-                          level_halo_layer.find(cell) == level_halo_layer.end())
-                        cell->set_level_subdomain_id(numbers::artificial_subdomain_id);
+                          level_halo_layer.find(cell) != level_halo_layer.end())
+                        continue;
+
+                      // mark all other cells to artificial
+                      cell->set_level_subdomain_id(numbers::artificial_subdomain_id);
                     }
                 }
             }

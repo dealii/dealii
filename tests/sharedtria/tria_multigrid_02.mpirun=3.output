@@ -3863,6 +3863,7 @@ DEAL:1::OK
 
 
 DEAL:2:1d::(CellId,level_subdomain_id) for each active cell:
+DEAL:2:1d::(1_0:,1)
 DEAL:2:1d::(1_1:0,1)
 DEAL:2:1d::(1_1:1,2)
 DEAL:2:1d::(1_2:00,1)
