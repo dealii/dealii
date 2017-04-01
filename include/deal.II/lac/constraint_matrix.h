@@ -1469,16 +1469,23 @@ ConstraintMatrix::add_entry (const size_type line,
   Assert (line != column,
           ExcMessage ("Can't constrain a degree of freedom to itself"));
 
+  // Ensure that the current line is present in the cache:
+  const size_type line_index = calculate_line_index(line);
+  Assert (line_index < lines_cache.size(),
+          ExcMessage("The current ConstraintMatrix does not contain the line "
+                     "for the current entry. Call ConstraintMatrix::add_line "
+                     "before calling this function."));
+
   // if in debug mode, check whether an entry for this column already exists
   // and if it's the same as the one entered at present
   //
   // in any case: exit the function if an entry for this column already
   // exists, since we don't want to enter it twice
-  Assert (lines_cache[calculate_line_index(line)] != numbers::invalid_size_type,
+  Assert (lines_cache[line_index] != numbers::invalid_size_type,
           ExcInternalError());
   Assert (!local_lines.size() || local_lines.is_element(column),
           ExcColumnNotStoredHere(line, column));
-  ConstraintLine *line_ptr = &lines[lines_cache[calculate_line_index(line)]];
+  ConstraintLine *line_ptr = &lines[lines_cache[line_index]];
   Assert (line_ptr->line == line, ExcInternalError());
   for (ConstraintLine::Entries::const_iterator
        p=line_ptr->entries.begin();
