@@ -76,6 +76,7 @@ namespace internal
       // vertex DoFs come first, which is incompatible with the lexicographic
       // ordering necessary to apply tensor products efficiently)
       std::vector<unsigned int> scalar_lexicographic;
+      Point<dim> unit_point;
       {
         // find numbering to lexicographic
         Assert(fe->n_components() == 1,
@@ -147,12 +148,14 @@ namespace internal
                 }
           }
 
-        // to evaluate 1D polynomials, evaluate along the line where y=z=0,
-        // assuming that shape_value(0,Point<dim>()) == 1. otherwise, need
-        // other entry point (e.g. generating a 1D element by reading the
-        // name, as done before r29356)
+        // to evaluate 1D polynomials, evaluate along the line with the first
+        // unit support point, assuming that fe.shape_value(0,unit_point) ==
+        // 1. otherwise, need other entry point (e.g. generating a 1D element
+        // by reading the name, as done before r29356)
+        if (fe->has_support_points())
+          unit_point = fe->get_unit_support_points()[scalar_lexicographic[0]];
         Assert(std::fabs(fe->shape_value(scalar_lexicographic[0],
-                                         Point<dim>())-1) < 1e-13,
+                                         unit_point)-1) < 1e-13,
                ExcInternalError());
       }
 
@@ -186,7 +189,7 @@ namespace internal
               // VectorizedArray<Number>::n_array_elements
               // copies for the shape information and
               // non-vectorized fields
-              Point<dim> q_point;
+              Point<dim> q_point = unit_point;
               q_point[0] = quad.get_points()[q][0];
               shape_values_number[i*n_q_points_1d+q]   = fe->shape_value(my_i,q_point);
               shape_gradient_number[i*n_q_points_1d+q] = fe->shape_grad (my_i,q_point)[0];
@@ -333,24 +336,28 @@ namespace internal
         }
 
       // skew-symmetry for gradient, zero of middle basis function in middle
-      // quadrature point
+      // quadrature point. Multiply tolerance by degree of the element to
+      // the power of 1.5 to get a suitable gradient scaling
+      const double zero_tol_gradient = zero_tol * std::sqrt(fe_degree+1.)*(fe_degree+1);
       for (unsigned int i=0; i<(n_dofs_1d+1)/2; ++i)
         for (unsigned int j=0; j<n_q_points_1d; ++j)
           if (std::fabs(shape_gradients[i*n_q_points_1d+j][0] +
                         shape_gradients[(n_dofs_1d-i)*n_q_points_1d-
-                                        j-1][0]) > zero_tol)
+                                        j-1][0]) > zero_tol_gradient)
             return false;
       if (n_dofs_1d%2 == 1 && n_q_points_1d%2 == 1)
         if (std::fabs(shape_gradients[(n_dofs_1d/2)*n_q_points_1d+
-                                      (n_q_points_1d/2)][0]) > zero_tol)
+                                      (n_q_points_1d/2)][0]) > zero_tol_gradient)
           return false;
 
-      // symmetry for Laplacian
+      // symmetry for Hessian. Multiply tolerance by degree^3 of the element
+      // to get a suitable Hessian scaling
+      const double zero_tol_hessian = zero_tol * (fe_degree+1)*(fe_degree+1)*(fe_degree+1);
       for (unsigned int i=0; i<(n_dofs_1d+1)/2; ++i)
         for (unsigned int j=0; j<n_q_points_1d; ++j)
           if (std::fabs(shape_hessians[i*n_q_points_1d+j][0] -
                         shape_hessians[(n_dofs_1d-i)*n_q_points_1d-
-                                       j-1][0]) > zero_tol)
+                                       j-1][0]) > zero_tol_hessian)
             return false;
 
       const unsigned int stride = (n_q_points_1d+1)/2;
@@ -423,13 +430,6 @@ namespace internal
                                          j][0]-1.)>zero_tol)
                 return false;
             }
-      for (unsigned int i=1; i<n_points_1d-1; ++i)
-        if (std::fabs(shape_gradients[i*n_points_1d+i][0])>zero_tol)
-          return false;
-      if (std::fabs(shape_gradients[n_points_1d-1][0]-
-                    (n_points_1d%2==0 ? -1. : 1.)) > zero_tol)
-        return false;
-
       return true;
     }
 
