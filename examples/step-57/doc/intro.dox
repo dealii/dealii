@@ -8,7 +8,9 @@ Geodynamics initiative (CIG), through the National Science Foundation under
 Award No. EAR-0949446 and The University of California-Davis.
 </i>
 
-<a name="Intro"></a> 
+@dealiiTutorialDOI{10.5281/zenodo.484156,https://zenodo.org/badge/DOI/10.5281/zenodo.484156.svg}
+
+<a name="Intro"></a>
 <h1>Introduction</h1>
 
 <h3> Navier Stokes Equations </h3>
