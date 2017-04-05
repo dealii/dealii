@@ -257,9 +257,11 @@ get_tangent_vector (const Point<spacedim> &p1,
   // Tangent vector to the unit sphere along the geodesic given by e1 and e2.
   Tensor<1,spacedim> tg = (e2-(e2*e1)*e1);
 
-  // There is a special case if e2*e1, in which case tg=0
+  // There is a special case if e2*e1==1.0, in which case tg==0
   const double tg_norm = tg.norm();
-  if (tg_norm > tolerance)
+  if (tg_norm < tolerance)
+    return p2-p1;
+  else
     tg /= tg_norm;
 
   const double gamma = std::acos(e1*e2);
