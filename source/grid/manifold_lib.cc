@@ -239,22 +239,28 @@ get_tangent_vector (const Point<spacedim> &p1,
   const double r1 = (p1 - center).norm();
   const double r2 = (p2 - center).norm();
 
-  Assert(r1 > 1e-10,
+  const double tolerance = 1e-10;
+
+  Assert(r1 > tolerance,
          ExcMessage("p1 cannot coincide with the center."));
 
-  Assert(r2 > 1e-10,
+  Assert(r2 > tolerance,
          ExcMessage("p2 cannot coincide with the center."));
 
   const Tensor<1,spacedim> e1 = (p1 - center)/r1;
   const Tensor<1,spacedim> e2 = (p2 - center)/r2;
 
-  Assert(e1*e2 + 1.0 > 1e-10,
+  Assert(e1*e2 + 1.0 > tolerance,
          ExcMessage("p1 and p2 cannot lie on the same diameter and be opposite "
                     "respect to the center."));
 
   // Tangent vector to the unit sphere along the geodesic given by e1 and e2.
   Tensor<1,spacedim> tg = (e2-(e2*e1)*e1);
-  tg = tg / tg.norm();
+
+  // There is a special case if e2*e1, in which case tg=0
+  const double tg_norm = tg.norm();
+  if (tg_norm > tolerance)
+    tg /= tg_norm;
 
   const double gamma = std::acos(e1*e2);
 
