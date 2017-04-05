@@ -1539,7 +1539,7 @@ public:
      * automatically generated destructor would have a different one due to
      * member objects.
      */
-    virtual ~DistortedCellList () DEAL_II_NOEXCEPT;
+    virtual ~DistortedCellList () noexcept;
 
     /**
      * A list of those cells among the coarse mesh cells that are deformed or

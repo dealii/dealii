@@ -62,17 +62,6 @@ ENDIF()
 
 
 #
-# Newer gcc versions generate a large number of warnings inside boost if we
-# are compiling without cxx11 but with -pedantic and there is no way to
-# silence them.
-#
-IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
-   NOT DEAL_II_WITH_CXX11)
-  STRIP_FLAG(DEAL_II_CXX_FLAGS "-pedantic")
-ENDIF()
-
-
-#
 # In some cases, we would like to name partial specializations
 # as friends. However, the standard forbids us to do so. But
 # then, we can declare the general template as a friend, and
@@ -306,57 +295,27 @@ ENDIF()
 #
 # - Wolfgang Bangerth, 2014
 #
-IF(DEAL_II_WITH_CXX11)
-  PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
-  CHECK_CXX_COMPILER_BUG(
-    "
-    #include <functional>
+PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_FLAGS}")
+CHECK_CXX_COMPILER_BUG(
+  "
+  #include <functional>
 
-    void f(int, int) {}
+  void f(int, int) {}
 
-    template <typename F>
-    void g(const F &func)
-    {
-      func(1);
-    }
+  template <typename F>
+  void g(const F &func)
+  {
+    func(1);
+  }
 
-    int main ()
-    {
-      g (std::bind(&f, std::placeholders::_1, 1));
-    }
-    "
-    DEAL_II_BIND_NO_CONST_OP_PARENTHESES
-    )
-  RESET_CMAKE_REQUIRED()
-ELSE()
-  CHECK_CXX_COMPILER_BUG(
-    "
-    #include <functional>
-    #include \"${BOOST_FOLDER}/include/boost/bind.hpp\"
-
-    void f(int, int) {}
-
-    template <typename F>
-    void g(const F &func)
-    {
-      func(1);
-    }
-
-    int main ()
-    {
-      using boost::bind;
-      using boost::reference_wrapper;
-  
-      // now also import the _1, _2 placeholders from the global namespace
-      // into the current one as suggested above
-      using ::_1;
-
-      g (boost::bind(&f, boost::_1, 1));
-    }
-    "
-    DEAL_II_BIND_NO_CONST_OP_PARENTHESES
-    )
-ENDIF()
+  int main ()
+  {
+    g (std::bind(&f, std::placeholders::_1, 1));
+  }
+  "
+  DEAL_II_BIND_NO_CONST_OP_PARENTHESES
+  )
+RESET_CMAKE_REQUIRED()
 
 
 #

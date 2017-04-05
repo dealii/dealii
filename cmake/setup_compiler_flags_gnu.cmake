@@ -21,10 +21,10 @@
 #
 
 IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
-    CMAKE_CXX_COMPILER_VERSION VERSION_LESS "3.4" )
+    CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.8" )
   MESSAGE(WARNING "\n"
-    "You're using an old version of the GNU Compiler Collection (gcc/g++)!\n"
-    "It is strongly recommended to use at least version 3.4.\n"
+    "deal.II requires support for features of C++11 that are not present in\n"
+    "versions of GCC prior to 4.8."
     )
 ENDIF()
 
@@ -38,10 +38,7 @@ ENDIF()
 #
 # Set -pedantic if the compiler supports it.
 #
-IF(NOT (CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
-        CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.4"))
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-pedantic")
-ENDIF()
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-pedantic")
 
 #
 # Set the pic flag.
@@ -65,12 +62,6 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wsynth")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wsign-compare")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wswitch")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Woverloaded-virtual")
-
-#
-# Disable Wlong-long that will trigger a lot of warnings when compiling
-# with disabled C++11 support:
-#
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-long-long")
 
 #
 # Disable Wplacement-new that will trigger a lot of warnings
@@ -104,11 +95,6 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-parameter")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-variable")
-
-  # without c++11 enabled, clang produces a ton of warnings in boost:
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-c99-extensions")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-variadic-macros")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-c++11-extensions")
 
   #
   # Disable a diagnostic that warns about potentially uninstantiated static

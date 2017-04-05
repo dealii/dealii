@@ -99,7 +99,7 @@ public:
       : last_step (last_step), last_residual(last_residual)
     {}
 
-    virtual ~NoConvergence () DEAL_II_NOEXCEPT {}
+    virtual ~NoConvergence () noexcept {}
 
     virtual void print_info (std::ostream &out) const
     {
