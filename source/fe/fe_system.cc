@@ -1538,7 +1538,7 @@ initialize_unit_support_points ()
       {
         this->unit_support_points.resize(0);
         return;
-      };
+      }
 
   // generate unit support points from unit support points of sub elements
   this->unit_support_points.resize(this->dofs_per_cell);
@@ -1552,7 +1552,7 @@ initialize_unit_support_points ()
       Assert (base_index<base_element(base).unit_support_points.size(),
               ExcInternalError());
       this->unit_support_points[i] = base_element(base).unit_support_points[base_index];
-    };
+    }
 }
 
 
@@ -2157,7 +2157,7 @@ FESystem<dim,spacedim>::get_constant_modes () const
   std::vector<unsigned int> components;
   for (unsigned int i=0; i<base_elements.size(); ++i)
     {
-      std::pair<Table<2,bool>, std::vector<unsigned int> >
+      const std::pair<Table<2,bool>, std::vector<unsigned int> >
       base_table = base_elements[i].first->get_constant_modes();
       AssertDimension(base_table.first.n_rows(), base_table.second.size());
       const unsigned int element_multiplicity = this->element_multiplicity(i);
