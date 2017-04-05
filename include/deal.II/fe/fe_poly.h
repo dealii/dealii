@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2016 by the deal.II authors
+// Copyright (C) 2004 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,11 +30,11 @@ DEAL_II_NAMESPACE_OPEN
  * FiniteElement classes based on polynomial spaces like the
  * TensorProductPolynomials or PolynomialSpace classes.
  *
- * Every class conforming to the following interface can be used as template
- * parameter PolynomialType.
+ * Every class that has the following public member variables and
+ * functions can be used as template parameter @p PolynomialType.
  *
  * @code
- * static const unsigned int dimension;
+ *  static const unsigned int dimension;
  *
  *  void compute (const Point<dim>            &unit_point,
  *                std::vector<double>         &values,
@@ -43,8 +43,8 @@ DEAL_II_NAMESPACE_OPEN
  *                std::vector<Tensor<3,dim> > &third_derivatives,
  *                std::vector<Tensor<4,dim> > &fourth_derivatives) const;
  *
- * double compute_value (const unsigned int i,
- *                       const Point<dim> &p) const;
+ *  double compute_value (const unsigned int i,
+ *                        const Point<dim> &p) const;
  *
  *  template <int order>
  *  Tensor<order,dim> compute_derivative (const unsigned int i,
