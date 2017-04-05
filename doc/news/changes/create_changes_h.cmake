@@ -42,24 +42,26 @@ ENDFUNCTION()
 # Generate 'changes.h'.
 
 # First, create a file 'changes.h.in' based on all changelog fragments.
-FILE(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/changes.h.in "")
-CAT    (${CMAKE_CURRENT_SOURCE_DIR}/header                   
-        ${CMAKE_CURRENT_SOURCE_DIR}/changes.h.in "FALSE")
-CAT    (${CMAKE_CURRENT_SOURCE_DIR}/header_incompatibilities 
-        ${CMAKE_CURRENT_SOURCE_DIR}/changes.h.in "FALSE")
-PROCESS(${CMAKE_CURRENT_SOURCE_DIR}/incompatibilities        
-        ${CMAKE_CURRENT_SOURCE_DIR}/changes.h.in)
-CAT    (${CMAKE_CURRENT_SOURCE_DIR}/header_major             
-        ${CMAKE_CURRENT_SOURCE_DIR}/changes.h.in "FALSE")
-PROCESS(${CMAKE_CURRENT_SOURCE_DIR}/major                    
-        ${CMAKE_CURRENT_SOURCE_DIR}/changes.h.in)
-CAT    (${CMAKE_CURRENT_SOURCE_DIR}/header_minor             
-        ${CMAKE_CURRENT_SOURCE_DIR}/changes.h.in "FALSE")
-PROCESS(${CMAKE_CURRENT_SOURCE_DIR}/minor                    
-        ${CMAKE_CURRENT_SOURCE_DIR}/changes.h.in)
-CAT    (${CMAKE_CURRENT_SOURCE_DIR}/footer                   
-        ${CMAKE_CURRENT_SOURCE_DIR}/changes.h.in "FALSE")
+SET(OUTPUT_FILE_TEMP "${OUTPUT_FILE}.in")
+FILE(WRITE ${OUTPUT_FILE_TEMP} "")
+CAT    (${CMAKE_CURRENT_SOURCE_DIR}/header
+        ${OUTPUT_FILE_TEMP} "FALSE")
+CAT    (${CMAKE_CURRENT_SOURCE_DIR}/header_incompatibilities
+        ${OUTPUT_FILE_TEMP} "FALSE")
+PROCESS(${CMAKE_CURRENT_SOURCE_DIR}/incompatibilities
+        ${OUTPUT_FILE_TEMP})
+CAT    (${CMAKE_CURRENT_SOURCE_DIR}/header_major
+        ${OUTPUT_FILE_TEMP} "FALSE")
+PROCESS(${CMAKE_CURRENT_SOURCE_DIR}/major
+        ${OUTPUT_FILE_TEMP})
+CAT    (${CMAKE_CURRENT_SOURCE_DIR}/header_minor
+        ${OUTPUT_FILE_TEMP} "FALSE")
+PROCESS(${CMAKE_CURRENT_SOURCE_DIR}/minor
+        ${OUTPUT_FILE_TEMP})
+CAT    (${CMAKE_CURRENT_SOURCE_DIR}/footer
+        ${OUTPUT_FILE_TEMP} "FALSE")
 
-# Copy it over to 'changes.h' but only touch the time stamp 
+# Copy it over to 'changes.h' but only touch the time stamp
 # if the file actually changed (this is what CONFIGURE_FILE does).
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/changes.h.in ${OUTPUT_FILE} COPYONLY)
+MESSAGE(STATUS "Generating changelog file: ${OUTPUT_FILE}")
+CONFIGURE_FILE(${OUTPUT_FILE_TEMP} ${OUTPUT_FILE} COPYONLY)
