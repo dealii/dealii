@@ -269,6 +269,7 @@ namespace Utilities
 
         // allocate memory for import data
         std::vector<std::pair<unsigned int,unsigned int> > import_targets_temp;
+        import_targets_temp.reserve(n_procs);
         n_import_indices_data = 0;
         for (unsigned int i=0; i<n_procs; i++)
           if (receive_buffer[i] > 0)
@@ -277,7 +278,8 @@ namespace Utilities
               import_targets_temp.push_back(std::pair<unsigned int,
                                             unsigned int> (i, receive_buffer[i]));
             }
-        import_targets_data = import_targets_temp;
+
+        import_targets_data = std::move(import_targets_temp);
       }
 
       // send and receive indices for import data. non-blocking receives and
