@@ -16,6 +16,7 @@
 
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/lac/vector.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_tools.h>
@@ -98,6 +99,29 @@ FE_DGQ<dim, spacedim>::get_name () const
           << Utilities::dim_string(dim,spacedim)
           << ">(" << this->degree << ")";
   return namebuf.str();
+}
+
+
+
+template <int dim, int spacedim>
+void
+FE_DGQ<dim,spacedim>::
+convert_generalized_support_point_values_to_nodal_values (const std::vector<Vector<double> > &support_point_values,
+                                                          std::vector<double>                &nodal_values) const
+{
+  AssertDimension (support_point_values.size(),
+                   this->get_unit_support_points().size());
+  AssertDimension (support_point_values.size(),
+                   nodal_values.size());
+  AssertDimension (this->dofs_per_cell,
+                   nodal_values.size());
+
+  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+    {
+      AssertDimension (support_point_values[i].size(), 1);
+
+      nodal_values[i] = support_point_values[i](0);
+    }
 }
 
 
@@ -756,6 +780,30 @@ FE_DGQArbitraryNodes<dim,spacedim>::get_name () const
   namebuf << "FE_DGQArbitraryNodes<" << Utilities::dim_string(dim,spacedim) << ">(QUnknownNodes(" << this->degree+1 << "))";
   return namebuf.str();
 }
+
+
+
+template <int dim, int spacedim>
+void
+FE_DGQArbitraryNodes<dim,spacedim>::
+convert_generalized_support_point_values_to_nodal_values (const std::vector<Vector<double> > &support_point_values,
+                                                          std::vector<double>                &nodal_values) const
+{
+  AssertDimension (support_point_values.size(),
+                   this->get_unit_support_points().size());
+  AssertDimension (support_point_values.size(),
+                   nodal_values.size());
+  AssertDimension (this->dofs_per_cell,
+                   nodal_values.size());
+
+  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+    {
+      AssertDimension (support_point_values[i].size(), 1);
+
+      nodal_values[i] = support_point_values[i](0);
+    }
+}
+
 
 
 
