@@ -1243,7 +1243,7 @@ namespace Functions
      */
     InterpolatedUniformGridData (const std::array<std::pair<double,double>,dim> &interval_endpoints,
                                  const std::array<unsigned int,dim>             &n_subintervals,
-                                 const Table<dim,double>                              &data_values);
+                                 const Table<dim,double>                        &data_values);
 
     /**
      * Compute the value of the function set by bilinear interpolation of the
