@@ -55,6 +55,21 @@ MACRO(FEATURE_P4EST_FIND_EXTERNAL var)
       SET(${var} FALSE)
     ENDIF()
 
+    #
+    # Check whether p4est is built against zlib:
+    #
+    IF(NOT P4EST_WITH_ZLIB)
+      MESSAGE(STATUS "Insufficient p4est installation found: "
+        "p4est has to be configured with enabled zlib support."
+        )
+      SET(P4EST_ADDITIONAL_ERROR_STRING
+        ${P4EST_ADDITIONAL_ERROR_STRING}
+        "Insufficient p4est installation found!\n"
+        "p4est has to be configured with enabled zlib support.\n"
+        )
+      SET(${var} FALSE)
+    ENDIF()
+
     CHECK_MPI_INTERFACE(P4EST ${var})
   ENDIF()
 ENDMACRO()
