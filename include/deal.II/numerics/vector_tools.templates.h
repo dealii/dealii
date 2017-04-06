@@ -6063,7 +6063,7 @@ namespace VectorTools
                     // if they should point in different directions. this is the
                     // case in tests/deal.II/no_flux_11.
                     Tensor<1,dim> normal_vector
-                      = (cell->face(face_no)->get_boundary().normal_vector
+                      = (cell->face(face_no)->get_manifold().normal_vector
                          (cell->face(face_no),
                           fe_values.quadrature_point(i)));
                     if (normal_vector * fe_values.normal_vector(i) < 0)
