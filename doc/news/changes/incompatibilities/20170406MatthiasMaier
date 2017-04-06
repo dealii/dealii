@@ -1,0 +1,6 @@
+Removed: A number of deprecated classes have been removed in favor of the
+new LinearOperator concept: TODO
+Use the LinearOperator class instead, see the module on @ref LAOperators "linear operators"
+for more details.
+<br>
+(Matthias Maier, 2017/04/06)
