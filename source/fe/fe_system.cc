@@ -2201,6 +2201,73 @@ FESystem<dim,spacedim>::get_constant_modes () const
 
 
 template <int dim, int spacedim>
+void
+FESystem<dim,spacedim>::
+convert_generalized_support_point_values_to_nodal_values (const std::vector<Vector<double> > &support_point_values,
+                                                          std::vector<double>                &nodal_values) const
+{
+  // we currently only support the case where each base element has exactly
+  // as many generalized support points as there are dofs in that element.
+  //
+  // in the more general case, if there are more generalized support
+  // points than dofs, we don't have the infrastructure at the time of
+  // writing this to tease apart which support point value
+  // belongs to which element
+  AssertDimension (support_point_values.size(), this->dofs_per_cell);
+  AssertDimension (nodal_values.size(), this->dofs_per_cell);
+
+  // loop over the bases and let them do the work on their
+  // share of the input argument
+  std::vector<Vector<double>> base_support_point_values;
+  std::vector<double>         base_nodal_values;
+  unsigned int                current_vector_component = 0;
+  for (unsigned int base=0; base<base_elements.size(); ++base)
+    {
+      const unsigned int element_multiplicity = this->element_multiplicity(base);
+      for (unsigned int m=0;
+           m<element_multiplicity;
+           ++m, current_vector_component += base_element(base).n_components())
+        {
+          // extract the support points of this base element.
+          // assume that support points are numbered in exactly
+          // the same way as dofs -- this is how the
+          // initialize_unit_support_points() function does it,
+          // at least
+          //
+          // to pick things apart, we could really use a base_to_system_index()
+          // function, but that doesn't exist -- just do it by using
+          // the reverse table -- the amount of work done here is not
+          // worth trying to optimizing this
+          base_support_point_values.resize  (base_element(base).dofs_per_cell);
+          for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+            if (this->system_to_base_index(i).first == std::make_pair(base,m))
+              {
+                const unsigned int base_n_components = base_element(base).n_components();
+                base_support_point_values[this->system_to_base_index(i).second]
+                .reinit (base_n_components, false);
+                for (unsigned int c=0; c<base_n_components; ++c)
+                  base_support_point_values[this->system_to_base_index(i).second][c]
+                    = support_point_values[i][current_vector_component+c];
+              }
+
+          // then call the base element to get its version of the
+          // nodal values
+          base_nodal_values.resize (base_element(base).dofs_per_cell);
+          base_element(base).convert_generalized_support_point_values_to_nodal_values
+          (base_support_point_values, base_nodal_values);
+
+          // finally put these nodal values back into global nodal
+          // values vector. use the same reverse loop as above
+          for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+            if (this->system_to_base_index(i).first == std::make_pair(base,m))
+              nodal_values[i] = base_nodal_values[this->system_to_base_index(i).second];
+        }
+    }
+}
+
+
+
+template <int dim, int spacedim>
 std::size_t
 FESystem<dim,spacedim>::memory_consumption () const
 {
