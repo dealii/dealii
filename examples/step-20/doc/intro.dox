@@ -661,9 +661,6 @@ chose to introduce this material here anyway to demonstrate how to work with
 block matrices and to develop solvers and preconditioners, rather than using
 black box components from the library.
 
-For those interested in looking up the corresponding library classes: the Schur
-complement class corresponds to the <code>SchurMatrix</code> class.
-
 
 <h3>Definition of the test case</h3>
 
