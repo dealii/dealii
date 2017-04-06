@@ -31,19 +31,11 @@ void check_q_bubbles(const Function<dim> &f,
 
   std::vector<double> dofs(fe.dofs_per_cell);
 
-  std::vector<std::vector<double> >
-  values(1, std::vector<double>(fe.get_unit_support_points().size()));
-  f.value_list(fe.get_unit_support_points(), values[0]);
-  fe.interpolate(dofs, values[0]);
-  deallog << " value " << difference(fe,dofs,f);
-  fe.interpolate(dofs, values);
-  deallog << " vector " << difference(fe,dofs,f);
-
-  std::vector<Vector<double> >
-  vectors(fe.get_unit_support_points().size(), Vector<double>(1));
-  f.vector_value_list(fe.get_unit_support_points(), vectors);
-  fe.interpolate(dofs, vectors, 0);
-  deallog << " Vector " << difference(fe,dofs,f) << std::endl;
+  std::vector<Vector<double> > values (fe.get_unit_support_points().size(),
+                                       Vector<double>(1));
+  f.vector_value_list(fe.get_unit_support_points(), values);
+  fe.convert_generalized_support_point_values_to_nodal_values(values, dofs);
+  deallog << " value " << difference(fe,dofs,f) << std::endl;
 }
 
 int main()

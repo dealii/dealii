@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 by the deal.II authors
+// Copyright (C) 2015, 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,14 +61,14 @@ void test_nodal_matrix()
   // simply assumes that there are dim components. Thus we do it ourselves.
   const unsigned int n_dofs = fe.dofs_per_cell;
   const std::vector<Point<2> > &points = fe.get_generalized_support_points();
-  std::vector<double> values(points.size());
+  std::vector<Vector<double> > values(points.size(), Vector<double>(1));
   std::vector<double> local_dofs(n_dofs);
 
   for (unsigned int i = 0; i < n_dofs; ++i)
     {
       for (unsigned int k = 0; k < values.size(); ++k)
-        values[k] = fe.shape_value(i, points[k]);
-      fe.interpolate(local_dofs, values);
+        values[k][0] = fe.shape_value(i, points[k]);
+      fe.convert_generalized_support_point_values_to_nodal_values(values, local_dofs);
 
       for (unsigned int j=0; j < n_dofs; ++j)
         N(j,i) = local_dofs[j];
@@ -121,11 +121,11 @@ void test_interpolation()
     {
       fev.reinit(cell);
 
-      std::vector<double> values(quadrature.size());
+      std::vector<Vector<double> > values(quadrature.size(), Vector<double>(1));
       fev.get_function_values(input_vector, values);
 
       std::vector<double> interpolated_local_dofs(n_dofs);
-      fe.interpolate(interpolated_local_dofs, values);
+      fe.convert_generalized_support_point_values_to_nodal_values(values, interpolated_local_dofs);
 
       Vector<double> local_dofs(n_dofs);
       cell->get_dof_values(input_vector, local_dofs);
