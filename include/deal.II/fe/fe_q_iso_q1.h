@@ -34,7 +34,8 @@ DEAL_II_NAMESPACE_OPEN
  * with the same number of degrees of freedom as the @p Qp elements but using
  * linear interpolation instead of higher order one. This type of element is
  * also called macro element in the literature as it really consists of
- * several smaller elements, namely <i>p</i><tt><sup>dim</sup></tt>.
+ * several smaller elements, namely <i>p</i><tt><sup>dim</sup></tt> such
+ * sub-cells.
  *
  * The numbering of degrees of freedom is done in exactly the same way as in
  * FE_Q of degree @p p. See there for a detailed description on how degrees of
@@ -52,24 +53,27 @@ DEAL_II_NAMESPACE_OPEN
  * whereas these elements reach only <i>(h/p)<sup>2</sup></i>. For these two
  * reasons, this element is usually not very useful as a standalone. In
  * addition, any evaluation of face terms on the boundaries within the
- * elements becomes impossible with this element.
+ * elements becomes impossible with this element because deal.II does not
+ * have the equivalent of FEFaceValues for lower-dimensional integrals
+ * in the interior of cells.
  *
  * Nonetheless, there are a few use cases where this element actually is
  * useful:
  * <ol>
  *
  * <li> Systems of PDEs where certain variables demand for higher resolutions
- * than the others and the additional degrees of freedom should be spend on
+ * than the others and the additional degrees of freedom should be spent on
  * increasing the resolution of linears instead of higher order polynomials,
  * and you do not want to use two different meshes for the different
  * components. This can be the case when irregularities (shocks) appear in the
  * solution and stabilization techniques are used that work for linears but
  * not higher order elements. </li>
  *
- * <li> Stokes/Navier Stokes systems as the one discussed in step-22 could be
+ * <li> Stokes/Navier Stokes systems such as the one discussed in step-22 could be
  * solved with Q2-iso-Q1 elements for velocities instead of Q2 elements.
  * Combined with Q1 pressures they give a stable mixed element pair. However,
- * they perform worse than the standard approach in most situations.  </li>
+ * they perform worse than the standard (Taylor-Hood $Q_2\times Q_1$)
+ * approach in most situations.  </li>
  *
  * <li> Preconditioning systems of FE_Q systems of higher order @p p with a
  * preconditioner based on @p Qp-iso-Q1 elements: Some preconditioners like
