@@ -1939,7 +1939,8 @@ public:
    * Given the values of a function $f(\mathbf x)$ at the (generalized) support
    * points, this function then computes what the nodal values of the element
    * are, i.e., $\Psi_i[f]$, where $\Psi_i$ are the node functionals of
-   * the element. The values $\Psi_i[f]$ are then the expansion coefficients
+   * the element (see also @ref GlossNodes "Node values or node functionals").
+   * The values $\Psi_i[f]$ are then the expansion coefficients
    * for the shape functions of the finite element function that
    * <i>interpolates</i> the given function $f(x)$, i.e.,
    * $ f_h(\mathbf x) = \sum_i \Psi_i[f] \varphi_i(\mathbf x)
