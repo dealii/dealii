@@ -174,7 +174,11 @@ struct PointerComparison
    * two pointers are equal.
    */
   template <typename T>
-  static bool equal (const T *p1, const T *p2);
+  static bool equal (const T *p1, const T *p2)
+  {
+    return (p1==p2);
+  }
+
 
   /**
    * Comparison function for pointers of different types. The C++ language
@@ -183,7 +187,11 @@ struct PointerComparison
    * can't be the same, so we always return @p false.
    */
   template <typename T, typename U>
-  static bool equal (const T *, const U *);
+  static bool equal (const T *, const U *)
+  {
+    return false;
+  }
+
 };
 
 
@@ -300,7 +308,6 @@ struct types_are_equal<T,T>
 };
 
 
-
 /**
  * A class with a local typedef that represents the type that results from the
  * product of two variables of type @p T and @p U. In other words, we would
@@ -352,116 +359,8 @@ struct types_are_equal<T,T>
 template <typename T, typename U>
 struct ProductType
 {
-#ifdef DEAL_II_WITH_CXX11
   typedef decltype(std::declval<T>() * std::declval<U>()) type;
-#endif
 };
-
-#ifndef DEAL_II_WITH_CXX11
-
-template <typename T>
-struct ProductType<T,T>
-{
-  typedef T type;
-};
-
-template <typename T>
-struct ProductType<T,bool>
-{
-  typedef T type;
-};
-
-template <typename T>
-struct ProductType<bool, T>
-{
-  typedef T type;
-};
-
-template <>
-struct ProductType<bool,double>
-{
-  typedef double type;
-};
-
-template <>
-struct ProductType<double,bool>
-{
-  typedef double type;
-};
-
-template <>
-struct ProductType<double,float>
-{
-  typedef double type;
-};
-
-template <>
-struct ProductType<float,double>
-{
-  typedef double type;
-};
-
-template <>
-struct ProductType<double,long double>
-{
-  typedef long double type;
-};
-
-template <>
-struct ProductType<long double,double>
-{
-  typedef long double type;
-};
-
-template <>
-struct ProductType<double,int>
-{
-  typedef double type;
-};
-
-template <>
-struct ProductType<int,double>
-{
-  typedef double type;
-};
-
-template <>
-struct ProductType<float,int>
-{
-  typedef float type;
-};
-
-template <>
-struct ProductType<int,float>
-{
-  typedef float type;
-};
-
-template <>
-struct ProductType<double, unsigned int>
-{
-  typedef double type;
-};
-
-template <>
-struct ProductType<unsigned int, double>
-{
-  typedef double type;
-};
-
-template <>
-struct ProductType<float,unsigned int>
-{
-  typedef float type;
-};
-
-template <>
-struct ProductType<unsigned int,float>
-{
-  typedef float type;
-};
-
-#endif
 
 // Annoyingly, there is no std::complex<T>::operator*(U) for scalars U
 // other than T (not even in C++11, or C++14). We provide our own overloads
@@ -491,7 +390,6 @@ struct ProductType<std::complex<T>,double>
 {
   typedef std::complex<typename ProductType<T,double>::type> type;
 };
-
 
 template <typename U>
 struct ProductType<float,std::complex<U> >
@@ -556,7 +454,7 @@ struct ProductType<std::complex<T>,float>
  * multiply for different types of arguments, without resulting in ambiguous
  * call errors by the compiler.
  *
- * @author Wolfgang Bangerth, 2015
+ * @author Wolfgang Bangerth, Matthias Maier, 2015 - 2017
  */
 template <typename T>
 struct EnableIfScalar;
@@ -567,58 +465,30 @@ template <> struct EnableIfScalar<double>
   typedef double type;
 };
 
-
 template <> struct EnableIfScalar<float>
 {
   typedef float type;
 };
-
 
 template <> struct EnableIfScalar<long double>
 {
   typedef long double type;
 };
 
-
 template <> struct EnableIfScalar<int>
 {
   typedef int type;
 };
-
 
 template <> struct EnableIfScalar<unsigned int>
 {
   typedef unsigned int type;
 };
 
-
-
 template <typename T> struct EnableIfScalar<std::complex<T> >
 {
   typedef std::complex<T> type;
 };
-
-
-// --------------- inline functions -----------------
-
-
-template <typename T, typename U>
-inline
-bool
-PointerComparison::equal (const T *, const U *)
-{
-  return false;
-}
-
-
-
-template <typename T>
-inline
-bool
-PointerComparison::equal (const T *p1, const T *p2)
-{
-  return (p1==p2);
-}
 
 
 DEAL_II_NAMESPACE_CLOSE
