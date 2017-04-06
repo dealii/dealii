@@ -1468,27 +1468,27 @@ void FESystem<dim,spacedim>::initialize (const std::vector<const FiniteElement<d
     if (multiplicities[i]>0)
       this->base_to_block_indices.push_back( multiplicities[i] );
 
-  std::vector<Threads::Task<FiniteElement<dim,spacedim>*> > clone_base_elements;
+  {
+    Threads::TaskGroup<> clone_base_elements;
 
-  for (unsigned int i=0; i<fes.size(); i++)
-    if (multiplicities[i]>0)
-      clone_base_elements.push_back (Threads::new_task (&FiniteElement<dim,spacedim>::clone,
-                                                        *fes[i]));
-
-  unsigned int ind=0;
-  for (unsigned int i=0; i<fes.size(); i++)
-    {
+    unsigned int ind=0;
+    for (unsigned int i=0; i<fes.size(); i++)
       if (multiplicities[i]>0)
         {
-          base_elements[ind] =
-            std::make_pair (std::shared_ptr<const FiniteElement<dim,spacedim> >
-                            (clone_base_elements[ind].return_value()),
-                            multiplicities[i]);
+          clone_base_elements += Threads::new_task ([ &,i,ind] ()
+          {
+            base_elements[ind]
+              = std::make_pair (std::shared_ptr<FiniteElement<dim,spacedim>>(fes[i]->clone()),
+                                multiplicities[i]);
+          });
           ++ind;
         }
-    }
+    Assert(ind>0, ExcInternalError());
 
-  Assert(ind>0, ExcInternalError());
+    // wait for all of these clone operations to finish
+    clone_base_elements.join_all();
+  }
+
 
   {
     // If the system is not primitive, these have not been initialized by
