@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2016 by the deal.II authors
+// Copyright (C) 2000 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -120,6 +120,18 @@ public:
    * equivalent_degree replaced by appropriate values.
    */
   virtual std::string get_name () const;
+
+  /**
+   * Implementation of the corresponding function in the FiniteElement
+   * class.  Since the current element is interpolatory, the nodal
+   * values are exactly the support point values. Furthermore, since
+   * the current element is scalar, the support point values need to
+   * be vectors of length 1.
+   */
+  virtual
+  void
+  convert_generalized_support_point_values_to_nodal_values (const std::vector<Vector<double> > &support_point_values,
+                                                            std::vector<double>                &nodal_values) const;
 
   /**
    * @name Functions to support hp
