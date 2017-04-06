@@ -50,7 +50,7 @@ check_this (const FiniteElement<dim> &fe1,
   tria.refine_global (2);
 
   hp::FECollection<dim> hp_fe1(fe1);
-  std_cxx11::unique_ptr<hp::DoFHandler<dim> > hp_dof1(make_hp_dof_handler (tria, hp_fe1));
+  std::unique_ptr<hp::DoFHandler<dim> > hp_dof1(make_hp_dof_handler (tria, hp_fe1));
 
   Vector<double> in (hp_dof1->n_dofs());
   for (unsigned int i=0; i<in.size(); ++i)

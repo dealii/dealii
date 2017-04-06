@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/std_cxx11/array.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/lac/vector.h>
@@ -49,6 +48,7 @@
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/mersenne_twister.hpp>
 
+#include <array>
 #include <cmath>
 #include <numeric>
 #include <list>
@@ -1581,7 +1581,7 @@ next_cell:
   std::vector<typename MeshType::active_cell_iterator>
   compute_active_cell_halo_layer
   (const MeshType                                                                    &mesh,
-   const std_cxx11::function<bool (const typename MeshType::active_cell_iterator &)> &predicate)
+   const std::function<bool (const typename MeshType::active_cell_iterator &)> &predicate)
   {
     std::vector<typename MeshType::active_cell_iterator> active_halo_layer;
     std::vector<bool> locally_active_vertices_on_subdomain (mesh.get_triangulation().n_vertices(),
@@ -1660,7 +1660,7 @@ next_cell:
   std::vector<typename MeshType::active_cell_iterator>
   compute_ghost_cell_halo_layer (const MeshType &mesh)
   {
-    std_cxx11::function<bool (const typename MeshType::active_cell_iterator &)> predicate
+    std::function<bool (const typename MeshType::active_cell_iterator &)> predicate
       = IteratorFilters::LocallyOwnedCell();
 
     const std::vector<typename MeshType::active_cell_iterator>
@@ -1750,7 +1750,7 @@ next_cell:
     unsigned int max_cellid_size = 0;
     std::set<std::pair<types::subdomain_id,types::global_vertex_index> > vertices_added;
     std::map<types::subdomain_id,std::set<unsigned int> > vertices_to_recv;
-    std::map<types::subdomain_id,std::vector<std_cxx11::tuple<types::global_vertex_index,
+    std::map<types::subdomain_id,std::vector<std::tuple<types::global_vertex_index,
         types::global_vertex_index,std::string> > > vertices_to_send;
     active_cell_iterator cell = triangulation.begin_active(),
                          endc = triangulation.end();
@@ -1791,7 +1791,7 @@ next_cell:
                               if (vertices_added.find(tmp)==vertices_added.end())
                                 {
                                   vertices_to_send[(*adjacent_cell)->subdomain_id()].push_back(
-                                    std_cxx11::tuple<types::global_vertex_index,types::global_vertex_index,
+                                    std::tuple<types::global_vertex_index,types::global_vertex_index,
                                     std::string> (i,cell->vertex_index(i),
                                                   cell->id().to_string()));
                                   if (cell->id().to_string().size() > max_cellid_size)
@@ -1867,7 +1867,7 @@ next_cell:
       vertices_to_send.size());
     std::vector<MPI_Request> first_requests(vertices_to_send.size());
     typename std::map<types::subdomain_id,
-             std::vector<std_cxx11::tuple<types::global_vertex_index,
+             std::vector<std::tuple<types::global_vertex_index,
              types::global_vertex_index,std::string> > >::iterator
              vert_to_send_it = vertices_to_send.begin(),
              vert_to_send_end = vertices_to_send.end();
@@ -1882,9 +1882,9 @@ next_cell:
         // fill the buffer
         for (unsigned int j=0; j<n_vertices; ++j)
           {
-            vertices_send_buffers[i][2*j] = std_cxx11::get<0>(vert_to_send_it->second[j]);
+            vertices_send_buffers[i][2*j] = std::get<0>(vert_to_send_it->second[j]);
             vertices_send_buffers[i][2*j+1] =
-              local_to_global_vertex_index[std_cxx11::get<1>(vert_to_send_it->second[j])];
+              local_to_global_vertex_index[std::get<1>(vert_to_send_it->second[j])];
           }
 
         // Send the message
@@ -1929,7 +1929,7 @@ next_cell:
         unsigned int pos = 0;
         for (unsigned int j=0; j<n_vertices; ++j)
           {
-            std::string cell_id = std_cxx11::get<2>(vert_to_send_it->second[j]);
+            std::string cell_id = std::get<2>(vert_to_send_it->second[j]);
             for (unsigned int k=0; k<max_cellid_size; ++k, ++pos)
               {
                 if (k<cell_id.size())
@@ -3728,7 +3728,7 @@ next_cell:
 
   template<> struct OrientationLookupTable<1>
   {
-    typedef std_cxx11::array<unsigned int, GeometryInfo<1>::vertices_per_face> MATCH_T;
+    typedef std::array<unsigned int, GeometryInfo<1>::vertices_per_face> MATCH_T;
     static inline std::bitset<3> lookup (const MATCH_T &)
     {
       // The 1D case is trivial
@@ -3738,7 +3738,7 @@ next_cell:
 
   template<> struct OrientationLookupTable<2>
   {
-    typedef std_cxx11::array<unsigned int, GeometryInfo<2>::vertices_per_face> MATCH_T;
+    typedef std::array<unsigned int, GeometryInfo<2>::vertices_per_face> MATCH_T;
     static inline std::bitset<3> lookup (const MATCH_T &matching)
     {
       // In 2D matching faces (=lines) results in two cases: Either
@@ -3759,7 +3759,7 @@ next_cell:
 
   template<> struct OrientationLookupTable<3>
   {
-    typedef std_cxx11::array<unsigned int, GeometryInfo<3>::vertices_per_face> MATCH_T;
+    typedef std::array<unsigned int, GeometryInfo<3>::vertices_per_face> MATCH_T;
     static inline std::bitset<3> lookup (const MATCH_T &matching)
     {
       // The full fledged 3D case. *Yay*
@@ -3808,7 +3808,7 @@ next_cell:
 
     // Do a full matching of the face vertices:
 
-    std_cxx11::
+    std::
     array<unsigned int, GeometryInfo<dim>::vertices_per_face> matching;
 
     std::set<unsigned int> face2_vertices;

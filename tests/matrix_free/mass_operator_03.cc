@@ -68,7 +68,7 @@ void test ()
   //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
   //std::cout << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
-  std_cxx11::shared_ptr<MatrixFree<dim,number> > mf_data(new MatrixFree<dim,number> ());
+  std::shared_ptr<MatrixFree<dim,number> > mf_data(new MatrixFree<dim,number> ());
   {
     const QGauss<1> quad (fe_degree+2);
     typename MatrixFree<dim,number>::AdditionalData data;

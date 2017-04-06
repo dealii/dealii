@@ -435,8 +435,8 @@ namespace LinearAlgebra
        */
       virtual void import(const LinearAlgebra::ReadWriteVector<Number> &V,
                           VectorOperation::values operation,
-                          std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern =
-                            std_cxx11::shared_ptr<const CommunicationPatternBase> ());
+                          std::shared_ptr<const CommunicationPatternBase> communication_pattern =
+                            std::shared_ptr<const CommunicationPatternBase> ());
 
       /**
        * Return the scalar product of two vectors.
@@ -605,7 +605,7 @@ void swap (LinearAlgebra::distributed::BlockVector<Number> &u,
  * @author Uwe Koecher, 2017
  */
 template <typename Number>
-struct is_serial_vector< LinearAlgebra::distributed::BlockVector< Number > > : std_cxx11::false_type
+struct is_serial_vector< LinearAlgebra::distributed::BlockVector< Number > > : std::false_type
 {
 };
 

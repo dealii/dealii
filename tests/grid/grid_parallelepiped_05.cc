@@ -54,7 +54,7 @@ void check (bool subdivide)
   for (unsigned int d=0; d<spacedim; ++d)
     origin[d] = 0.1+d*1.0;
 
-  std_cxx11::array<Tensor<1,spacedim>,dim> edges;
+  std::array<Tensor<1,spacedim>,dim> edges;
   switch (dim)
     {
     case 1:

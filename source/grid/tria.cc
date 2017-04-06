@@ -17,7 +17,6 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/geometry_info.h>
-#include <deal.II/base/std_cxx11/bind.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_levels.h>
@@ -38,8 +37,8 @@
 #include <list>
 #include <cmath>
 #include <functional>
+#include <array>
 
-#include <deal.II/base/std_cxx11/array.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -2332,7 +2331,7 @@ namespace internal
         // this file
         std::map<internal::Triangulation::TriaObject<2>,
             std::pair<typename Triangulation<dim,spacedim>::quad_iterator,
-            std_cxx11::array<bool,GeometryInfo<dim>::lines_per_face> >,
+            std::array<bool,GeometryInfo<dim>::lines_per_face> >,
             QuadComparator>
             needed_quads;
         for (unsigned int cell=0; cell<cells.size(); ++cell)
@@ -2363,7 +2362,7 @@ namespace internal
             std::pair<int,int> line_list[GeometryInfo<dim>::lines_per_cell],
                 inverse_line_list[GeometryInfo<dim>::lines_per_cell];
             unsigned int face_line_list[GeometryInfo<dim>::lines_per_face];
-            std_cxx11::array<bool,GeometryInfo<dim>::lines_per_face> orientation;
+            std::array<bool,GeometryInfo<dim>::lines_per_face> orientation;
 
             for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
               {
@@ -2484,7 +2483,7 @@ namespace internal
           quad = triangulation.begin_raw_quad();
           typename std::map<internal::Triangulation::TriaObject<2>,
                    std::pair<typename Triangulation<dim,spacedim>::quad_iterator,
-                   std_cxx11::array<bool,GeometryInfo<dim>::lines_per_face> >,
+                   std::array<bool,GeometryInfo<dim>::lines_per_face> >,
                    QuadComparator>
                    ::iterator q;
           for (q = needed_quads.begin(); quad!=triangulation.end_quad(); ++quad, ++q)
@@ -4371,7 +4370,7 @@ namespace internal
             const unsigned int used_cells
               =  std::count_if (triangulation.levels[level+1]->cells.used.begin(),
                                 triangulation.levels[level+1]->cells.used.end(),
-                                std_cxx11::bind (std::equal_to<bool>(), std_cxx11::_1, true));
+                                std::bind (std::equal_to<bool>(), std::placeholders::_1, true));
 
             // reserve space for the used_cells cells already existing
             // on the next higher level as well as for the
@@ -4396,9 +4395,9 @@ namespace internal
         // vertices are already in use
         needed_vertices += std::count_if (triangulation.vertices_used.begin(),
                                           triangulation.vertices_used.end(),
-                                          std_cxx11::bind (std::equal_to<bool>(),
-                                                           std_cxx11::_1,
-                                                           true));
+                                          std::bind (std::equal_to<bool>(),
+                                                     std::placeholders::_1,
+                                                     true));
         // if we need more vertices: create them, if not: leave the
         // array as is, since shrinking is not really possible because
         // some of the vertices at the end may be in use
@@ -4694,7 +4693,7 @@ namespace internal
             const unsigned int used_cells
               = std::count_if (triangulation.levels[level+1]->cells.used.begin(),
                                triangulation.levels[level+1]->cells.used.end(),
-                               std_cxx11::bind (std::equal_to<bool>(), std_cxx11::_1, true));
+                               std::bind (std::equal_to<bool>(), std::placeholders::_1, true));
 
 
             // reserve space for the used_cells cells already existing
@@ -4730,7 +4729,7 @@ namespace internal
 
         // add to needed vertices how many vertices are already in use
         needed_vertices += std::count_if (triangulation.vertices_used.begin(), triangulation.vertices_used.end(),
-                                          std_cxx11::bind (std::equal_to<bool>(), std_cxx11::_1, true));
+                                          std::bind (std::equal_to<bool>(), std::placeholders::_1, true));
         // if we need more vertices: create them, if not: leave the
         // array as is, since shrinking is not really possible because
         // some of the vertices at the end may be in use
@@ -5100,7 +5099,7 @@ namespace internal
             const unsigned int used_cells
               = std::count_if (triangulation.levels[level+1]->cells.used.begin(),
                                triangulation.levels[level+1]->cells.used.end(),
-                               std_cxx11::bind (std::equal_to<bool>(), std_cxx11::_1, true));
+                               std::bind (std::equal_to<bool>(), std::placeholders::_1, true));
 
 
             // reserve space for the used_cells cells already existing
@@ -5175,7 +5174,7 @@ namespace internal
 
         // add to needed vertices how many vertices are already in use
         needed_vertices += std::count_if (triangulation.vertices_used.begin(), triangulation.vertices_used.end(),
-                                          std_cxx11::bind (std::equal_to<bool>(), std_cxx11::_1, true));
+                                          std::bind (std::equal_to<bool>(), std::placeholders::_1, true));
         // if we need more vertices: create them, if not: leave the
         // array as is, since shrinking is not really possible because
         // some of the vertices at the end may be in use
@@ -11772,7 +11771,7 @@ unsigned int
 Triangulation<dim, spacedim>::n_used_vertices () const
 {
   return std::count_if (vertices_used.begin(), vertices_used.end(),
-                        std_cxx11::bind (std::equal_to<bool>(), std_cxx11::_1, true));
+                        std::bind (std::equal_to<bool>(), std::placeholders::_1, true));
 }
 
 

@@ -19,8 +19,6 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_CXX11
-
 #  include <mutex>
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx11
@@ -28,18 +26,6 @@ namespace std_cxx11
   using std::mutex;
 }
 DEAL_II_NAMESPACE_CLOSE
-
-#else
-
-#  include <boost/thread/mutex.hpp>
-DEAL_II_NAMESPACE_OPEN
-namespace std_cxx11
-{
-  using boost::mutex;
-}
-DEAL_II_NAMESPACE_CLOSE
-
-#endif
 
 // then allow using the old namespace name instead of the new one
 DEAL_II_NAMESPACE_OPEN

@@ -285,7 +285,7 @@ private:
    * Return the coefficients of 4 local linear shape functions $\phi_j(x,y) = a x + b y + c$ on given cell.
    * For each local shape function, the array consists of three coefficients is in order of a,b and c.
    */
-  static std_cxx11::array<std_cxx11::array<double,3>,4>
+  static std::array<std::array<double,3>,4>
   get_linear_shape_coefficients (const Triangulation<2,2>::cell_iterator &cell);
 
   /**

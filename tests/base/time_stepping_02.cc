@@ -36,8 +36,8 @@ double my(double const t)
 }
 
 void test(TimeStepping::EmbeddedExplicitRungeKutta<Vector<double> > &solver,
-          std_cxx11::function<Vector<double> (double const, Vector<double> const &)> f,
-          std_cxx11::function<double (double const)> my)
+          std::function<Vector<double> (double const, Vector<double> const &)> f,
+          std::function<double (double const)> my)
 {
   double initial_time = 0.0, final_time = 1.0;
   double time_step = 0.1;

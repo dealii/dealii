@@ -23,7 +23,6 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/thread_management.h>
-#include <deal.II/base/std_cxx11/unique_ptr.h>
 #include <deal.II/base/work_stream.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
@@ -55,6 +54,7 @@
 #include <algorithm>
 #include <numeric>
 #include <sstream>
+#include <memory>
 
 // The last step is as in all previous programs:
 namespace Step14
@@ -569,15 +569,15 @@ namespace Step14
 
       WorkStream::run(dof_handler.begin_active(),
                       dof_handler.end(),
-                      std_cxx11::bind(&Solver<dim>::local_assemble_matrix,
-                                      this,
-                                      std_cxx11::_1,
-                                      std_cxx11::_2,
-                                      std_cxx11::_3),
-                      std_cxx11::bind(&Solver<dim>::copy_local_to_global,
-                                      this,
-                                      std_cxx11::_1,
-                                      std_cxx11::ref(linear_system)),
+                      std::bind(&Solver<dim>::local_assemble_matrix,
+                                this,
+                                std::placeholders::_1,
+                                std::placeholders::_2,
+                                std::placeholders::_3),
+                      std::bind(&Solver<dim>::copy_local_to_global,
+                                this,
+                                std::placeholders::_1,
+                                std::ref(linear_system)),
                       AssemblyScratchData(*fe, *quadrature),
                       AssemblyCopyData());
       linear_system.hanging_node_constraints.condense (linear_system.matrix);
@@ -1958,7 +1958,7 @@ namespace Step14
       // in step-9:
       void estimate_error (Vector<float> &error_indicators) const;
 
-      void estimate_on_one_cell (const SynchronousIterators<std_cxx11::tuple<
+      void estimate_on_one_cell (const SynchronousIterators<std::tuple<
                                  active_cell_iterator,Vector<float>::iterator> > &cell_and_error,
                                  WeightedResidualScratchData                     &scratch_data,
                                  WeightedResidualCopyData                        &copy_data,
@@ -1969,7 +1969,7 @@ namespace Step14
       // interiors, on those faces that have no hanging nodes, and on those
       // faces with hanging nodes, respectively:
       void
-      integrate_over_cell (const SynchronousIterators<std_cxx11::tuple<
+      integrate_over_cell (const SynchronousIterators<std::tuple<
                            active_cell_iterator,Vector<float>::iterator> > &cell_and_error,
                            const Vector<double>                            &primal_solution,
                            const Vector<double>                            &dual_weights,
@@ -2369,7 +2369,7 @@ namespace Step14
                                .get_triangulation().n_active_cells());
 
       typedef
-      std_cxx11::tuple<active_cell_iterator,Vector<float>::iterator>
+      std::tuple<active_cell_iterator,Vector<float>::iterator>
       IteratorTuple;
 
       SynchronousIterators<IteratorTuple>
@@ -2381,13 +2381,13 @@ namespace Step14
 
       WorkStream::run(cell_and_error_begin,
                       cell_and_error_end,
-                      std_cxx11::bind(&WeightedResidual<dim>::estimate_on_one_cell,
-                                      this,
-                                      std_cxx11::_1,
-                                      std_cxx11::_2,
-                                      std_cxx11::_3,
-                                      std_cxx11::ref(face_integrals)),
-                      std_cxx11::function<void (const WeightedResidualCopyData &)>(),
+                      std::bind(&WeightedResidual<dim>::estimate_on_one_cell,
+                                this,
+                                std::placeholders::_1,
+                                std::placeholders::_2,
+                                std::placeholders::_3,
+                                std::ref(face_integrals)),
+                      std::function<void (const WeightedResidualCopyData &)>(),
                       WeightedResidualScratchData (*DualSolver<dim>::fe,
                                                    *DualSolver<dim>::quadrature,
                                                    *DualSolver<dim>::face_quadrature,
@@ -2430,7 +2430,7 @@ namespace Step14
     template <int dim>
     void
     WeightedResidual<dim>::
-    estimate_on_one_cell (const SynchronousIterators<std_cxx11::tuple<
+    estimate_on_one_cell (const SynchronousIterators<std::tuple<
                           active_cell_iterator,Vector<float>::iterator> > &cell_and_error,
                           WeightedResidualScratchData                       &scratch_data,
                           WeightedResidualCopyData                          &copy_data,
@@ -2444,7 +2444,7 @@ namespace Step14
       // First task on each cell is to compute the cell residual
       // contributions of this cell, and put them into the
       // <code>error_indicators</code> variable:
-      active_cell_iterator cell = std_cxx11::get<0>(*cell_and_error);
+      active_cell_iterator cell = std::get<0>(*cell_and_error);
 
       integrate_over_cell (cell_and_error,
                            scratch_data.primal_solution,
@@ -2523,7 +2523,7 @@ namespace Step14
     // the cell terms:
     template <int dim>
     void WeightedResidual<dim>::
-    integrate_over_cell (const SynchronousIterators<std_cxx11::tuple<
+    integrate_over_cell (const SynchronousIterators<std::tuple<
                          active_cell_iterator,Vector<float>::iterator> >   &cell_and_error,
                          const Vector<double>                              &primal_solution,
                          const Vector<double>                              &dual_weights,
@@ -2533,7 +2533,7 @@ namespace Step14
       // error estimation formula: first get the right hand side and Laplacian
       // of the numerical solution at the quadrature points for the cell
       // residual,
-      cell_data.fe_values.reinit (std_cxx11::get<0>(*cell_and_error));
+      cell_data.fe_values.reinit (std::get<0>(*cell_and_error));
       cell_data.right_hand_side
       ->value_list (cell_data.fe_values.get_quadrature_points(),
                     cell_data.rhs_values);
@@ -2551,7 +2551,7 @@ namespace Step14
         sum += ((cell_data.rhs_values[p]+cell_data.cell_laplacians[p]) *
                 cell_data.dual_weights[p] *
                 cell_data.fe_values.JxW (p));
-      *(std_cxx11::get<1>(*cell_and_error)) += sum;
+      *(std::get<1>(*cell_and_error)) += sum;
     }
 
 
@@ -2807,7 +2807,7 @@ namespace Step14
       // side, domain, boundary values, etc. The pointer needed here defaults
       // to the Null pointer, i.e. you will have to set it in actual instances
       // of this object to make it useful.
-      std_cxx11::unique_ptr<const Data::SetUpBase<dim> > data;
+      std::unique_ptr<const Data::SetUpBase<dim> > data;
 
       // Since we allow to use different refinement criteria (global
       // refinement, refinement by the Kelly error indicator, possibly with a
@@ -2827,7 +2827,7 @@ namespace Step14
       // Next, an object that describes the dual functional. It is only needed
       // if the dual weighted residual refinement is chosen, and also defaults
       // to a Null pointer.
-      std_cxx11::unique_ptr<const DualFunctional::DualFunctionalBase<dim> >
+      std::unique_ptr<const DualFunctional::DualFunctionalBase<dim> >
       dual_functional;
 
       // Then a list of evaluation objects. Its default value is empty,
@@ -2839,7 +2839,7 @@ namespace Step14
       // pointer is zero, but you have to set it to some other value if you
       // want to use the <code>weighted_kelly_indicator</code> refinement
       // criterion.
-      std_cxx11::unique_ptr<const Function<dim> > kelly_weight;
+      std::unique_ptr<const Function<dim> > kelly_weight;
 
       // Finally, we have a variable that denotes the maximum number of
       // degrees of freedom we allow for the (primal) discretization. If it is
@@ -2889,7 +2889,7 @@ namespace Step14
 
     // Next, select one of the classes implementing different refinement
     // criteria.
-    std_cxx11::unique_ptr<LaplaceSolver::Base<dim> > solver;
+    std::unique_ptr<LaplaceSolver::Base<dim> > solver;
     switch (descriptor.refinement_criterion)
       {
       case ProblemDescription::dual_weighted_error_estimator:

@@ -102,9 +102,9 @@ test_simple(DoFHandler<dim> &dofs, MeshWorker::LoopControl &lctrl)
 //                typename identity<ITERATOR>::type end,
 //                DOFINFO &dinfo,
 //                INFOBOX &info,
-//                const std_cxx11::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &cell_worker,
-//                const std_cxx11::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &boundary_worker,
-//                const std_cxx11::function<void (DOFINFO &, DOFINFO &,
+//                const std::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &cell_worker,
+//                const std::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &boundary_worker,
+//                const std::function<void (DOFINFO &, DOFINFO &,
 //                                                typename INFOBOX::CellInfo &,
 //                                                typename INFOBOX::CellInfo &)> &face_worker,
 //                ASSEMBLER &assembler,
@@ -122,9 +122,9 @@ test_simple(DoFHandler<dim> &dofs, MeshWorker::LoopControl &lctrl)
 //  MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >
 //    (dofs.begin_active(), dofs.end(),
 //   dof_info, info_box,
-//       std_cxx11::bind (&Integrator<dim>::cell, local, std_cxx11::_1, std_cxx11::_2),
-//   std_cxx11::bind (&Integrator<dim>::bdry, local, std_cxx11::_1, std_cxx11::_2),
-//   std_cxx11::bind (&Integrator<dim>::face, local, std_cxx11::_1, std_cxx11::_2, std_cxx11::_3, std_cxx11::_4),
+//       std::bind (&Integrator<dim>::cell, local, std::placeholders::_1, std::placeholders::_2),
+//   std::bind (&Integrator<dim>::bdry, local, std::placeholders::_1, std::placeholders::_2),
+//   std::bind (&Integrator<dim>::face, local, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4),
 //     local,
 //     lctrl);
 }

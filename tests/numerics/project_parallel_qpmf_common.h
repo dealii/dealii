@@ -119,7 +119,7 @@ void do_project (const parallel::distributed::Triangulation<dim> &triangulation,
   typename MatrixFree<dim,double>::AdditionalData additional_data;
   additional_data.tasks_parallel_scheme = MatrixFree<dim,double>::AdditionalData::partition_color;
   additional_data.mapping_update_flags = update_values | update_JxW_values | update_quadrature_points;
-  std_cxx11::shared_ptr<MatrixFree<dim,double> >  data(new MatrixFree<dim,double> ());
+  std::shared_ptr<MatrixFree<dim,double> >  data(new MatrixFree<dim,double> ());
   data->reinit (dof_handler, constraints, quadrature_formula_1d, additional_data);
 
   for (unsigned int q=0; q<=p; ++q)

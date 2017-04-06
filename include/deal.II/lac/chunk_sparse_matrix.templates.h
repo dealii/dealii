@@ -408,10 +408,10 @@ ChunkSparseMatrix<number>::operator = (const double d)
     (matrix_size+m()) / m();
   if (matrix_size>grain_size)
     parallel::apply_to_subranges (0U, matrix_size,
-                                  std_cxx11::bind(&internal::ChunkSparseMatrix::template
-                                                  zero_subrange<number>,
-                                                  std_cxx11::_1, std_cxx11::_2,
-                                                  val),
+                                  std::bind(&internal::ChunkSparseMatrix::template
+                                            zero_subrange<number>,
+                                            std::placeholders::_1, std::placeholders::_2,
+                                            val),
                                   grain_size);
   else if (matrix_size > 0)
     std::memset (&val[0], 0, matrix_size*sizeof(number));
@@ -523,7 +523,7 @@ ChunkSparseMatrix<number>::n_actually_nonzero_elements () const
   return std::count_if(&val[0],
                        &val[cols->sparsity_pattern.n_nonzero_elements () *
                             chunk_size * chunk_size],
-                       std_cxx11::bind(std::not_equal_to<double>(), std_cxx11::_1, 0));
+                       std::bind(std::not_equal_to<double>(), std::placeholders::_1, 0));
 }
 
 
@@ -717,15 +717,15 @@ ChunkSparseMatrix<number>::vmult_add (OutVector &dst,
 
   Assert (!PointerComparison::equal(&src, &dst), ExcSourceEqualsDestination());
   parallel::apply_to_subranges (0U, cols->sparsity_pattern.n_rows(),
-                                std_cxx11::bind (&internal::ChunkSparseMatrix::vmult_add_on_subrange
-                                                 <number,InVector,OutVector>,
-                                                 std_cxx11::cref(*cols),
-                                                 std_cxx11::_1, std_cxx11::_2,
-                                                 val,
-                                                 cols->sparsity_pattern.rowstart,
-                                                 cols->sparsity_pattern.colnums,
-                                                 std_cxx11::cref(src),
-                                                 std_cxx11::ref(dst)),
+                                std::bind (&internal::ChunkSparseMatrix::vmult_add_on_subrange
+                                           <number,InVector,OutVector>,
+                                           std::cref(*cols),
+                                           std::placeholders::_1, std::placeholders::_2,
+                                           val,
+                                           cols->sparsity_pattern.rowstart,
+                                           cols->sparsity_pattern.colnums,
+                                           std::cref(src),
+                                           std::ref(dst)),
                                 internal::SparseMatrix::minimum_parallel_grain_size/cols->chunk_size+1);
 
 }

@@ -32,7 +32,6 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/tensor_function.h>
-#include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <deal.II/base/index_set.h>
 
 #include <deal.II/lac/full_matrix.h>
@@ -69,6 +68,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <memory>
 
 
 // At the end of this top-matter, we open a namespace for the current project
@@ -591,8 +591,8 @@ namespace Step43
     const double                         porosity;
     const double                         AOS_threshold;
 
-    std_cxx11::shared_ptr<TrilinosWrappers::PreconditionIC> Amg_preconditioner;
-    std_cxx11::shared_ptr<TrilinosWrappers::PreconditionIC> Mp_preconditioner;
+    std::shared_ptr<TrilinosWrappers::PreconditionIC> Amg_preconditioner;
+    std::shared_ptr<TrilinosWrappers::PreconditionIC> Mp_preconditioner;
 
     bool                                rebuild_saturation_matrix;
 
@@ -981,11 +981,11 @@ namespace Step43
   {
     assemble_darcy_preconditioner ();
 
-    Amg_preconditioner = std_cxx11::shared_ptr<TrilinosWrappers::PreconditionIC>
+    Amg_preconditioner = std::shared_ptr<TrilinosWrappers::PreconditionIC>
                          (new TrilinosWrappers::PreconditionIC());
     Amg_preconditioner->initialize(darcy_preconditioner_matrix.block(0,0));
 
-    Mp_preconditioner = std_cxx11::shared_ptr<TrilinosWrappers::PreconditionIC>
+    Mp_preconditioner = std::shared_ptr<TrilinosWrappers::PreconditionIC>
                         (new TrilinosWrappers::PreconditionIC());
     Mp_preconditioner->initialize(darcy_preconditioner_matrix.block(1,1));
 

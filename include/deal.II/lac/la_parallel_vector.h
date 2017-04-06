@@ -20,12 +20,12 @@
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/partitioner.h>
-#include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/lac/vector_space_vector.h>
 #include <deal.II/lac/vector_type_traits.h>
 
 #include <iomanip>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -254,7 +254,7 @@ namespace LinearAlgebra
        * partitioner data only once and share it between several vectors with
        * the same layout.
        */
-      Vector (const std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
+      Vector (const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
 
       /**
        * Destructor.
@@ -314,7 +314,7 @@ namespace LinearAlgebra
        * the partitioner data only once and share it between several vectors
        * with the same layout.
        */
-      void reinit (const std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
+      void reinit (const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
 
       /**
        * Swap the contents of this vector and the other vector @p v. One could
@@ -564,8 +564,8 @@ namespace LinearAlgebra
        */
       virtual void import(const LinearAlgebra::ReadWriteVector<Number> &V,
                           VectorOperation::values operation,
-                          std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern =
-                            std_cxx11::shared_ptr<const CommunicationPatternBase> ());
+                          std::shared_ptr<const CommunicationPatternBase> communication_pattern =
+                            std::shared_ptr<const CommunicationPatternBase> ());
 
       /**
        * Return the scalar product of two vectors.
@@ -936,7 +936,7 @@ namespace LinearAlgebra
        * respective reinit() call, for additional queries regarding the
        * parallel communication, or the compatibility of partitioners.
        */
-      const std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> &
+      const std::shared_ptr<const Utilities::MPI::Partitioner> &
       get_partitioner () const;
 
       /**
@@ -1049,7 +1049,7 @@ namespace LinearAlgebra
        * information can be shared between several vectors that have the same
        * partitioning.
        */
-      std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> partitioner;
+      std::shared_ptr<const Utilities::MPI::Partitioner> partitioner;
 
       /**
        * The size that is currently allocated in the val array.
@@ -1065,7 +1065,7 @@ namespace LinearAlgebra
        * For parallel loops with TBB, this member variable stores the affinity
        * information of loops.
        */
-      mutable std_cxx11::shared_ptr< ::dealii::parallel::internal::TBBPartitioner> thread_loop_partitioner;
+      mutable std::shared_ptr< ::dealii::parallel::internal::TBBPartitioner> thread_loop_partitioner;
 
       /**
        * Temporary storage that holds the data that is sent to this processor
@@ -1441,7 +1441,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     inline
-    const std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> &
+    const std::shared_ptr<const Utilities::MPI::Partitioner> &
     Vector<Number>::get_partitioner () const
     {
       return partitioner;
@@ -1476,7 +1476,7 @@ void swap (LinearAlgebra::distributed::Vector<Number> &u,
  * @author Uwe Koecher, 2017
  */
 template <typename Number>
-struct is_serial_vector< LinearAlgebra::distributed::Vector< Number > > : std_cxx11::false_type
+struct is_serial_vector< LinearAlgebra::distributed::Vector< Number > > : std::false_type
 {
 };
 

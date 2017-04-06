@@ -242,7 +242,7 @@ namespace internal
           // hp::DoFHandler<dim>::active_cell_iterator, we need to manually
           // select the correct finite element, so just hold a vector of
           // FEValues
-          std::vector<std_cxx11::shared_ptr<dealii::FEValues<dim> > >
+          std::vector<std::shared_ptr<dealii::FEValues<dim> > >
           fe_values (current_data.quadrature.size());
           UpdateFlags update_flags_feval =
             ((update_flags & update_inverse_jacobians) ? update_jacobians : update_default) |

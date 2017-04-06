@@ -23,7 +23,7 @@
 #include <deal.II/fe/fe.h>
 
 #include <vector>
-#include <deal.II/base/std_cxx11/shared_ptr.h>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -129,7 +129,7 @@ namespace hp
      * The real container, which stores pointers to the different quadrature
      * objects.
      */
-    std::vector<std_cxx11::shared_ptr<const Quadrature<dim> > > quadratures;
+    std::vector<std::shared_ptr<const Quadrature<dim> > > quadratures;
   };
 
 
@@ -188,7 +188,7 @@ namespace hp
   QCollection<dim>::QCollection (const Quadrature<dim> &quadrature)
   {
     quadratures
-    .push_back (std_cxx11::shared_ptr<const Quadrature<dim> >(new Quadrature<dim>(quadrature)));
+    .push_back (std::shared_ptr<const Quadrature<dim> >(new Quadrature<dim>(quadrature)));
   }
 
 
@@ -231,7 +231,7 @@ namespace hp
   QCollection<dim>::push_back (const Quadrature<dim> &new_quadrature)
   {
     quadratures
-    .push_back (std_cxx11::shared_ptr<const Quadrature<dim> >(new Quadrature<dim>(new_quadrature)));
+    .push_back (std::shared_ptr<const Quadrature<dim> >(new Quadrature<dim>(new_quadrature)));
   }
 
 } // namespace hp

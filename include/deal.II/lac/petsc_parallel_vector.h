@@ -632,7 +632,7 @@ namespace internal
  * @author Uwe Koecher, 2017
  */
 template <>
-struct is_serial_vector< PETScWrappers::MPI::Vector > : std_cxx11::false_type
+struct is_serial_vector< PETScWrappers::MPI::Vector > : std::false_type
 {
 };
 

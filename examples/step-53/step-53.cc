@@ -87,8 +87,8 @@ namespace Step53
   private:
     const Functions::InterpolatedUniformGridData<2> topography_data;
 
-    static std_cxx11::array<std::pair<double,double>,2> get_endpoints ();
-    static std_cxx11::array<unsigned int,2>             n_intervals ();
+    static std::array<std::pair<double,double>,2> get_endpoints ();
+    static std::array<unsigned int,2>             n_intervals ();
     static std::vector<double>                           get_data ();
   };
 
@@ -128,20 +128,20 @@ namespace Step53
   }
 
 
-  std_cxx11::array<std::pair<double,double>,2>
+  std::array<std::pair<double,double>,2>
   AfricaTopography::get_endpoints ()
   {
-    std_cxx11::array<std::pair<double,double>,2> endpoints;
+    std::array<std::pair<double,double>,2> endpoints;
     endpoints[0] = std::make_pair (-6.983333, 11.966667);
     endpoints[1] = std::make_pair (25, 35.95);
     return endpoints;
   }
 
 
-  std_cxx11::array<unsigned int,2>
+  std::array<unsigned int,2>
   AfricaTopography::n_intervals ()
   {
-    std_cxx11::array<unsigned int,2> endpoints;
+    std::array<unsigned int,2> endpoints;
     endpoints[0] = 379;
     endpoints[1] = 219;
     return endpoints;
@@ -382,9 +382,9 @@ namespace Step53
                                                  corner_points[0], corner_points[1],
                                                  true);
 
-      GridTools::transform (std_cxx11::bind(&AfricaGeometry::push_forward,
-                                            std_cxx11::cref(geometry),
-                                            std_cxx11::_1),
+      GridTools::transform (std::bind(&AfricaGeometry::push_forward,
+                                      std::cref(geometry),
+                                      std::placeholders::_1),
                             triangulation);
     }
 

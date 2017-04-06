@@ -1270,7 +1270,7 @@ namespace DoFTools
          subdomain_id < n_subdomains; ++subdomain_id)
       {
         // Extract the layer of cells around this subdomain
-        std_cxx11::function<bool (const typename DoFHandlerType::active_cell_iterator &)> predicate
+        std::function<bool (const typename DoFHandlerType::active_cell_iterator &)> predicate
           = IteratorFilters::SubdomainEqualTo(subdomain_id);
         const std::vector<typename DoFHandlerType::active_cell_iterator>
         active_halo_layer = GridTools::compute_active_cell_halo_layer (dof_handler,

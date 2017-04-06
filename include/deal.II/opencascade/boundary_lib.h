@@ -374,7 +374,7 @@ namespace OpenCASCADE
      * Return a tuple representing the minimum and maximum values of u
      * and v.  Precisely, it returns (u_min, u_max, v_min, v_max)
      */
-    std_cxx11::tuple<double, double, double, double>
+    std::tuple<double, double, double, double>
     get_uv_bounds() const;
 
     /**

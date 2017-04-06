@@ -75,7 +75,7 @@ void test ()
     v.push_back (i);
 
   WorkStream::run (GraphColoring::make_graph_coloring (v.begin(), v.end(),
-                                                       std_cxx11::function<std::vector<types::global_dof_index>
+                                                       std::function<std::vector<types::global_dof_index>
                                                        (const std::vector<unsigned int>::iterator &)>
                                                        (&conflictor)),
                    &worker, &copier,

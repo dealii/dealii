@@ -525,7 +525,7 @@ namespace internal
  * @author Uwe Koecher, 2017
  */
 template <typename Number>
-struct is_serial_vector< BlockVector< Number > > : std_cxx11::true_type
+struct is_serial_vector< BlockVector< Number > > : std::true_type
 {
 };
 

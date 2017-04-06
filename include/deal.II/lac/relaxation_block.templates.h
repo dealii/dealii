@@ -102,8 +102,8 @@ RelaxationBlock<MatrixType, InverseNumberType, VectorType>::invert_diagblocks ()
     {
       // compute blocks in parallel
       parallel::apply_to_subranges(0, this->additional_data->block_list.n_rows(),
-                                   std_cxx11::bind(&RelaxationBlock<MatrixType, InverseNumberType, VectorType>::block_kernel, this,
-                                                   std_cxx11::_1, std_cxx11::_2),
+                                   std::bind(&RelaxationBlock<MatrixType, InverseNumberType, VectorType>::block_kernel, this,
+                                             std::placeholders::_1, std::placeholders::_2),
                                    16);
     }
   this->inverses_computed(true);

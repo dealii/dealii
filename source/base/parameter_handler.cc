@@ -713,7 +713,7 @@ namespace Patterns
         std::string str;
         std::getline(is, str, '>');
 
-        std_cxx11::shared_ptr<PatternBase> base_pattern (pattern_factory(str));
+        std::shared_ptr<PatternBase> base_pattern (pattern_factory(str));
 
         is.ignore(strlen(" of length "));
         if (!(is >> min_elements))
@@ -932,8 +932,8 @@ namespace Patterns
         std::string value = str;
         value.erase (0, value.find(":")+1);
 
-        std_cxx11::shared_ptr<PatternBase> key_pattern (pattern_factory(key));
-        std_cxx11::shared_ptr<PatternBase> value_pattern (pattern_factory(value));
+        std::shared_ptr<PatternBase> key_pattern (pattern_factory(key));
+        std::shared_ptr<PatternBase> value_pattern (pattern_factory(value));
 
         is.ignore(strlen(" of length "));
         if (!(is >> min_elements))
@@ -1832,7 +1832,7 @@ namespace
   read_xml_recursively (const boost::property_tree::ptree &source,
                         const std::string                 &current_path,
                         const char                         path_separator,
-                        const std::vector<std_cxx11::shared_ptr<const Patterns::PatternBase> > &
+                        const std::vector<std::shared_ptr<const Patterns::PatternBase> > &
                         patterns,
                         boost::property_tree::ptree       &destination)
   {
@@ -2000,7 +2000,7 @@ ParameterHandler::declare_entry (const std::string           &entry,
 
   // clone the pattern and store its
   // index in the node
-  patterns.push_back (std_cxx11::shared_ptr<const Patterns::PatternBase>
+  patterns.push_back (std::shared_ptr<const Patterns::PatternBase>
                       (pattern.clone()));
   entries->put (get_current_full_path(entry) + path_separator + "pattern",
                 static_cast<unsigned int>(patterns.size()-1));

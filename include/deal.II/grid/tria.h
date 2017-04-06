@@ -23,8 +23,6 @@
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/iterator_range.h>
-#include <deal.II/base/std_cxx11/function.h>
-#include <deal.II/base/std_cxx11/unique_ptr.h>
 #include <deal.II/grid/tria_iterator_selector.h>
 
 // Ignore deprecation warnings for auto_ptr.
@@ -45,6 +43,8 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #include <map>
 #include <numeric>
 #include <bitset>
+#include <functional>
+#include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -1067,8 +1067,8 @@ namespace internal
  *           // mesh refinement
  *           previous_cell = current_cell;
  *           previous_cell->get_triangulation().signals.post_refinement
- *             .connect (std_cxx11::bind (&FEValues<dim>::invalidate_previous_cell,
- *                                        std_cxx11::ref (*this)));
+ *             .connect (std::bind (&FEValues<dim>::invalidate_previous_cell,
+ *                                  std::ref (*this)));
  *         }
  *       else
  *         previous_cell = current_cell;
@@ -3438,7 +3438,7 @@ private:
    * in 2D it contains data concerning lines and in 3D quads and lines.  All
    * of these have no level and are therefore treated separately.
    */
-  std_cxx11::unique_ptr<dealii::internal::Triangulation::TriaFaces<dim> > faces;
+  std::unique_ptr<dealii::internal::Triangulation::TriaFaces<dim> > faces;
 
 
   /**
@@ -3495,7 +3495,7 @@ private:
    * this field (that can be modified by TriaAccessor::set_boundary_id) were
    * not a pointer.
    */
-  std_cxx11::unique_ptr<std::map<unsigned int, types::boundary_id> > vertex_to_boundary_id_map_1d;
+  std::unique_ptr<std::map<unsigned int, types::boundary_id> > vertex_to_boundary_id_map_1d;
 
 
   /**
@@ -3517,7 +3517,7 @@ private:
    * this field (that can be modified by TriaAccessor::set_boundary_id) were
    * not a pointer.
    */
-  std_cxx11::unique_ptr<std::map<unsigned int, types::manifold_id> > vertex_to_manifold_id_map_1d;
+  std::unique_ptr<std::map<unsigned int, types::manifold_id> > vertex_to_manifold_id_map_1d;
 
   // make a couple of classes friends
   template <int,int,int> friend class TriaAccessorBase;

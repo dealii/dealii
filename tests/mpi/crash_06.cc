@@ -75,14 +75,14 @@ void test(FiniteElement<dim> &fe)
 template <int dim>
 void testit()
 {
-  std::vector<std_cxx11::shared_ptr<FiniteElement<dim> > > fes;
-  fes.push_back(std_cxx11::shared_ptr<FiniteElement<dim> >(new FE_RaviartThomas<dim>(0)));
-  fes.push_back(std_cxx11::shared_ptr<FiniteElement<dim> >(new FE_RaviartThomas<dim>(1)));
-  fes.push_back(std_cxx11::shared_ptr<FiniteElement<dim> >(new FE_Nedelec<dim>(0)));
-  fes.push_back(std_cxx11::shared_ptr<FiniteElement<dim> >(new FE_Nedelec<dim>(1)));
-  fes.push_back(std_cxx11::shared_ptr<FiniteElement<dim> >(new FE_Q<dim>(3)));
-  fes.push_back(std_cxx11::shared_ptr<FiniteElement<dim> >(new FE_DGQ<dim>(2)));
-  fes.push_back(std_cxx11::shared_ptr<FiniteElement<dim> >(new FE_Q_DG0<dim>(2)));
+  std::vector<std::shared_ptr<FiniteElement<dim> > > fes;
+  fes.push_back(std::shared_ptr<FiniteElement<dim> >(new FE_RaviartThomas<dim>(0)));
+  fes.push_back(std::shared_ptr<FiniteElement<dim> >(new FE_RaviartThomas<dim>(1)));
+  fes.push_back(std::shared_ptr<FiniteElement<dim> >(new FE_Nedelec<dim>(0)));
+  fes.push_back(std::shared_ptr<FiniteElement<dim> >(new FE_Nedelec<dim>(1)));
+  fes.push_back(std::shared_ptr<FiniteElement<dim> >(new FE_Q<dim>(3)));
+  fes.push_back(std::shared_ptr<FiniteElement<dim> >(new FE_DGQ<dim>(2)));
+  fes.push_back(std::shared_ptr<FiniteElement<dim> >(new FE_Q_DG0<dim>(2)));
 
   for (unsigned int i=0; i<fes.size(); ++i)
     {

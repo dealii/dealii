@@ -34,7 +34,7 @@ void check ()
     {
       const unsigned int size = 17 + test*1101;
 
-      std_cxx11::shared_ptr< ::dealii::parallel::internal::TBBPartitioner> thread_loop_partitioner;
+      std::shared_ptr< ::dealii::parallel::internal::TBBPartitioner> thread_loop_partitioner;
       thread_loop_partitioner.reset(new ::dealii::parallel::internal::TBBPartitioner());
 
       Number *val;

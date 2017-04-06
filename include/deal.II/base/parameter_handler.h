@@ -20,8 +20,6 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
-#include <deal.II/base/std_cxx11/shared_ptr.h>
-#include <deal.II/base/std_cxx11/unique_ptr.h>
 
 #include <boost/property_tree/ptree_fwd.hpp>
 #include <boost/serialization/split_member.hpp>
@@ -29,6 +27,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -2158,13 +2157,13 @@ private:
    * than having to include all of the property_tree stuff from boost. This
    * works around a problem with gcc 4.5.
    */
-  std_cxx11::unique_ptr<boost::property_tree::ptree> entries;
+  std::unique_ptr<boost::property_tree::ptree> entries;
 
   /**
    * A list of patterns that are used to describe the parameters of this
    * object. The are indexed by nodes in the property tree.
    */
-  std::vector<std_cxx11::shared_ptr<const Patterns::PatternBase> > patterns;
+  std::vector<std::shared_ptr<const Patterns::PatternBase> > patterns;
 
   /**
    * Mangle a string so that it doesn't contain any special characters or
@@ -2282,7 +2281,7 @@ private:
  *
  *       static void declare_parameters (ParameterHandler &prm);
  *     private:
- *       std_cxx11::shared_ptr<Problem> p;
+ *       std::shared_ptr<Problem> p;
  *     };
  *
  *
@@ -2687,7 +2686,7 @@ ParameterHandler::load (Archive &ar, const unsigned int)
 
   patterns.clear ();
   for (unsigned int j=0; j<descriptions.size(); ++j)
-    patterns.push_back (std_cxx11::shared_ptr<const Patterns::PatternBase>(Patterns::pattern_factory(descriptions[j])));
+    patterns.push_back (std::shared_ptr<const Patterns::PatternBase>(Patterns::pattern_factory(descriptions[j])));
 }
 
 

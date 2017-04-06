@@ -19,7 +19,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_accessor.templates.h>
 #include <deal.II/grid/tria_iterator.templates.h>
-#include <deal.II/base/std_cxx11/array.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/grid/grid_tools.h>
@@ -27,6 +26,7 @@
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/fe_q.h>
 
+#include <array>
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
@@ -1640,7 +1640,7 @@ template <int dim, int spacedim>
 CellId
 CellAccessor<dim,spacedim>::id() const
 {
-  std_cxx11::array<unsigned char,30> id;
+  std::array<unsigned char,30> id;
 
   CellAccessor<dim,spacedim> ptr = *this;
   const unsigned int n_child_indices = ptr.level();

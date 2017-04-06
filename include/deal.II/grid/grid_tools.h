@@ -735,7 +735,7 @@ namespace GridTools
   std::vector<typename MeshType::active_cell_iterator>
   compute_active_cell_halo_layer
   (const MeshType                                                                    &mesh,
-   const std_cxx11::function<bool (const typename MeshType::active_cell_iterator &)> &predicate);
+   const std::function<bool (const typename MeshType::active_cell_iterator &)> &predicate);
 
 
   /**

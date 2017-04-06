@@ -201,11 +201,11 @@ namespace LinearAlgebra
   void
   ReadWriteVector<Number>::import(const distributed::Vector<Number> &vec,
                                   VectorOperation::values operation,
-                                  std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern)
+                                  std::shared_ptr<const CommunicationPatternBase> communication_pattern)
   {
     // If no communication pattern is given, create one. Otherwise, use the
     // given one.
-    std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> comm_pattern;
+    std::shared_ptr<const Utilities::MPI::Partitioner> comm_pattern;
     if (communication_pattern.get() == NULL)
       {
         comm_pattern.reset(new Utilities::MPI::Partitioner(vec.locally_owned_elements(),
@@ -215,7 +215,7 @@ namespace LinearAlgebra
     else
       {
         comm_pattern =
-          std_cxx11::dynamic_pointer_cast<const Utilities::MPI::Partitioner> (communication_pattern);
+          std::dynamic_pointer_cast<const Utilities::MPI::Partitioner> (communication_pattern);
         AssertThrow(comm_pattern != NULL,
                     ExcMessage("The communication pattern is not of type "
                                "Utilities::MPI::Partitioner."));
@@ -270,7 +270,7 @@ namespace LinearAlgebra
   void
   ReadWriteVector<Number>::import(const PETScWrappers::MPI::Vector &petsc_vec,
                                   VectorOperation::values /*operation*/,
-                                  std_cxx11::shared_ptr<const CommunicationPatternBase> /*communication_pattern*/)
+                                  std::shared_ptr<const CommunicationPatternBase> /*communication_pattern*/)
   {
     //TODO: this works only if no communication is needed.
     Assert(petsc_vec.locally_owned_elements() == stored_elements,
@@ -299,9 +299,9 @@ namespace LinearAlgebra
                                   const IndexSet                  &source_elements,
                                   VectorOperation::values          operation,
                                   const MPI_Comm                  &mpi_comm,
-                                  std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern)
+                                  std::shared_ptr<const CommunicationPatternBase> communication_pattern)
   {
-    std_cxx11::shared_ptr<const EpetraWrappers::CommunicationPattern> epetra_comm_pattern;
+    std::shared_ptr<const EpetraWrappers::CommunicationPattern> epetra_comm_pattern;
 
     // If no communication pattern is given, create one. Otherwise, use the one
     // given.
@@ -314,18 +314,18 @@ namespace LinearAlgebra
             (source_elements == source_stored_elements))
           {
             epetra_comm_pattern =
-              std_cxx11::dynamic_pointer_cast<const EpetraWrappers::CommunicationPattern> (comm_pattern);
+              std::dynamic_pointer_cast<const EpetraWrappers::CommunicationPattern> (comm_pattern);
             if (epetra_comm_pattern == NULL)
-              epetra_comm_pattern = std_cxx11::make_shared<const EpetraWrappers::CommunicationPattern>(
+              epetra_comm_pattern = std::make_shared<const EpetraWrappers::CommunicationPattern>(
                                       create_epetra_comm_pattern(source_elements, mpi_comm));
           }
         else
-          epetra_comm_pattern = std_cxx11::make_shared<const EpetraWrappers::CommunicationPattern>(
+          epetra_comm_pattern = std::make_shared<const EpetraWrappers::CommunicationPattern>(
                                   create_epetra_comm_pattern(source_elements, mpi_comm));
       }
     else
       {
-        epetra_comm_pattern = std_cxx11::dynamic_pointer_cast<const EpetraWrappers::CommunicationPattern> (
+        epetra_comm_pattern = std::dynamic_pointer_cast<const EpetraWrappers::CommunicationPattern> (
                                 communication_pattern);
         AssertThrow(epetra_comm_pattern != NULL,
                     ExcMessage(std::string("The communication pattern is not of type ") +
@@ -359,7 +359,7 @@ namespace LinearAlgebra
   void
   ReadWriteVector<Number>::import(const TrilinosWrappers::MPI::Vector            &trilinos_vec,
                                   VectorOperation::values                         operation,
-                                  std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern)
+                                  std::shared_ptr<const CommunicationPatternBase> communication_pattern)
   {
     import(trilinos_vec.trilinos_vector(), trilinos_vec.locally_owned_elements(),
            operation, trilinos_vec.get_mpi_communicator(), communication_pattern);
@@ -371,7 +371,7 @@ namespace LinearAlgebra
   void
   ReadWriteVector<Number>::import(const LinearAlgebra::EpetraWrappers::Vector    &trilinos_vec,
                                   VectorOperation::values                         operation,
-                                  std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern)
+                                  std::shared_ptr<const CommunicationPatternBase> communication_pattern)
   {
     import(trilinos_vec.trilinos_vector(), trilinos_vec.locally_owned_elements(),
            operation, trilinos_vec.get_mpi_communicator(), communication_pattern);
@@ -385,7 +385,7 @@ namespace LinearAlgebra
   void
   ReadWriteVector<Number>::import(const LinearAlgebra::CUDAWrappers::Vector<Number> &cuda_vec,
                                   VectorOperation::values                            operation,
-                                  std_cxx11::shared_ptr<const CommunicationPatternBase> )
+                                  std::shared_ptr<const CommunicationPatternBase> )
   {
     const unsigned int n_elements = stored_elements.n_elements();
     if (operation == VectorOperation::insert)

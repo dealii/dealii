@@ -122,7 +122,7 @@ public:
    * addition to the geometry of the cell.
    */
   virtual
-  std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+  std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
   get_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
   /**
@@ -196,7 +196,7 @@ private:
      * field in addition to the geometry of the cell.
      */
     virtual
-    std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+    std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
     get_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
     /**

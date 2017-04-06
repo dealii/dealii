@@ -167,9 +167,9 @@ template <int dim>
 void create_tria(Triangulation<dim> &triangulation, const Geometry<dim> &geometry)
 {
   GridGenerator::hyper_cube (triangulation, -1.0, 1.0);
-  GridTools::transform (std_cxx11::bind(&Geometry<dim>::push_forward,
-                                        std_cxx11::cref(geometry),
-                                        std_cxx11::_1),
+  GridTools::transform (std::bind(&Geometry<dim>::push_forward,
+                                  std::cref(geometry),
+                                  std::placeholders::_1),
                         triangulation);
 
   triangulation.set_manifold(0, geometry);

@@ -23,7 +23,6 @@
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/iterator_range.h>
-#include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <deal.II/dofs/block_info.h>
 #include <deal.II/dofs/dof_iterator_selector.h>
 #include <deal.II/dofs/number_cache.h>
@@ -36,6 +35,7 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -940,7 +940,7 @@ private:
    * An object that describes how degrees of freedom should be distributed and
    * renumbered.
    */
-  std_cxx11::shared_ptr<dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> > policy;
+  std::shared_ptr<dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> > policy;
 
   /**
    * A structure that contains all sorts of numbers that characterize the

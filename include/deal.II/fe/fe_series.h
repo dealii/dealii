@@ -18,7 +18,6 @@
 
 
 
-#include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <deal.II/base/config.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/exceptions.h>
@@ -33,6 +32,7 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -260,7 +260,7 @@ namespace FESeries
   template <int dim, typename T>
   std::pair<std::vector<unsigned int>,std::vector<double> >
   process_coefficients(const Table<dim,T> &coefficients,
-                       const std_cxx11::function<std::pair<bool,unsigned int>(const TableIndices<dim> &)> &predicate,
+                       const std::function<std::pair<bool,unsigned int>(const TableIndices<dim> &)> &predicate,
                        const VectorTools::NormType norm);
 
 
@@ -286,7 +286,7 @@ namespace
   template <int dim,typename T>
   void fill_map_index(const Table<dim,T> &coefficients,
                       const TableIndices<dim> &ind,
-                      const std_cxx11::function<std::pair<bool,unsigned int>(const TableIndices<dim> &)> &predicate,
+                      const std::function<std::pair<bool,unsigned int>(const TableIndices<dim> &)> &predicate,
                       std::map<unsigned int, std::vector<T> > &pred_to_values)
   {
     const std::pair<bool,unsigned int> pred_pair = predicate(ind);
@@ -303,7 +303,7 @@ namespace
 
   template <typename T>
   void fill_map(const Table<1,T> &coefficients,
-                const std_cxx11::function<std::pair<bool,unsigned int>(const TableIndices<1> &)> &predicate,
+                const std::function<std::pair<bool,unsigned int>(const TableIndices<1> &)> &predicate,
                 std::map<unsigned int, std::vector<T> > &pred_to_values)
   {
     for (unsigned int i = 0; i < coefficients.size(0); i++)
@@ -316,7 +316,7 @@ namespace
 
   template <typename T>
   void fill_map(const Table<2,T> &coefficients,
-                const std_cxx11::function<std::pair<bool,unsigned int>(const TableIndices<2> &)> &predicate,
+                const std::function<std::pair<bool,unsigned int>(const TableIndices<2> &)> &predicate,
                 std::map<unsigned int, std::vector<T> > &pred_to_values)
   {
     for (unsigned int i = 0; i < coefficients.size(0); i++)
@@ -330,7 +330,7 @@ namespace
 
   template <typename T>
   void fill_map(const Table<3,T> &coefficients,
-                const std_cxx11::function<std::pair<bool,unsigned int>(const TableIndices<3> &)> &predicate,
+                const std::function<std::pair<bool,unsigned int>(const TableIndices<3> &)> &predicate,
                 std::map<unsigned int, std::vector<T> > &pred_to_values)
   {
     for (unsigned int i = 0; i < coefficients.size(0); i++)
@@ -363,7 +363,7 @@ namespace
 template <int dim, typename T>
 std::pair<std::vector<unsigned int>,std::vector<double> >
 FESeries::process_coefficients(const Table<dim,T> &coefficients,
-                               const std_cxx11::function<std::pair<bool,unsigned int>(const TableIndices<dim> &)> &predicate,
+                               const std::function<std::pair<bool,unsigned int>(const TableIndices<dim> &)> &predicate,
                                const VectorTools::NormType norm)
 {
   std::vector<unsigned int> predicate_values;

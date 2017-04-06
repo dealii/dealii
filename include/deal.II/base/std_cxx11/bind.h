@@ -19,7 +19,6 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_CXX11
 
 #  include <functional>
 
@@ -43,46 +42,6 @@ namespace std_cxx11
 }
 DEAL_II_NAMESPACE_CLOSE
 
-#else
-
-#include <boost/bind.hpp>
-
-DEAL_II_NAMESPACE_OPEN
-namespace std_cxx11
-{
-  using boost::bind;
-  using boost::ref;
-  using boost::cref;
-  using boost::reference_wrapper;
-
-  // now also import the _1, _2 placeholders from the global namespace
-  // into the current one as suggested above
-  using ::_1;
-  using ::_2;
-  using ::_3;
-  using ::_4;
-  using ::_5;
-  using ::_6;
-  using ::_7;
-  using ::_8;
-  using ::_9;
-
-  namespace placeholders
-  {
-    using ::_1;
-    using ::_2;
-    using ::_3;
-    using ::_4;
-    using ::_5;
-    using ::_6;
-    using ::_7;
-    using ::_8;
-    using ::_9;
-  }
-}
-DEAL_II_NAMESPACE_CLOSE
-
-#endif
 
 // then allow using the old namespace name instead of the new one
 DEAL_II_NAMESPACE_OPEN

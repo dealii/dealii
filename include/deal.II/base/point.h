@@ -63,7 +63,7 @@ DEAL_II_NAMESPACE_OPEN
  * a tensor (because it lacks the transformation properties under rotation of
  * the coordinate system) and should consequently not be represented by either
  * of these classes. Use an array of size 3 in this case, or the
- * <code>std_cxx11::array</code> class. Alternatively, as in the case of
+ * <code>std::array</code> class. Alternatively, as in the case of
  * vector-valued functions, you can use objects of type Vector or
  * <code>std::vector</code>.
  *

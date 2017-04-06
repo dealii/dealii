@@ -3,7 +3,6 @@
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_tools.h>
@@ -33,6 +32,7 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -173,10 +173,10 @@ public:
 };
 
 template <int dim>
-std_cxx11::shared_ptr<Manifold<dim> >
+std::shared_ptr<Manifold<dim> >
 cubic_roof(Triangulation<dim> &triangulation)
 {
-  std_cxx11::shared_ptr<Manifold<dim> > boundary(new CubicRoofManifold<dim>());
+  std::shared_ptr<Manifold<dim> > boundary(new CubicRoofManifold<dim>());
   GridGenerator::hyper_cube(triangulation);
 
   triangulation.set_all_manifold_ids(cubic_manifold_id);
@@ -196,10 +196,10 @@ public:
   double run();
 
 protected:
-  std_cxx11::shared_ptr<Function<dim> > manufactured_solution;
-  std_cxx11::shared_ptr<Function<dim> > manufactured_forcing;
+  std::shared_ptr<Function<dim> > manufactured_solution;
+  std::shared_ptr<Function<dim> > manufactured_forcing;
 
-  std_cxx11::shared_ptr<Manifold<dim> > boundary_manifold;
+  std::shared_ptr<Manifold<dim> > boundary_manifold;
   Triangulation<dim> triangulation;
   FE_Q<dim> finite_element;
   DoFHandler<dim> dof_handler;

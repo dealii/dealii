@@ -722,7 +722,7 @@ namespace LinearAlgebra
     void
     BlockVector<Number>::import(const LinearAlgebra::ReadWriteVector<Number> &,
                                 VectorOperation::values,
-                                std_cxx11::shared_ptr<const CommunicationPatternBase>)
+                                std::shared_ptr<const CommunicationPatternBase>)
     {
       AssertThrow(false, ExcNotImplemented());
     }

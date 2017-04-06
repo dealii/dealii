@@ -102,7 +102,7 @@ namespace LinearAlgebra
 
     void Vector::import(const ReadWriteVector<double>                  &V,
                         VectorOperation::values                         operation,
-                        std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern)
+                        std::shared_ptr<const CommunicationPatternBase> communication_pattern)
     {
       // If no communication pattern is given, create one. Otherwsie, use the
       // one given.
@@ -122,7 +122,7 @@ namespace LinearAlgebra
       else
         {
           epetra_comm_pattern =
-            std_cxx11::dynamic_pointer_cast<const CommunicationPattern> (communication_pattern);
+            std::dynamic_pointer_cast<const CommunicationPattern> (communication_pattern);
           AssertThrow(epetra_comm_pattern != NULL,
                       ExcMessage(std::string("The communication pattern is not of type ") +
                                  "LinearAlgebra::EpetraWrappers::CommunicationPattern."));

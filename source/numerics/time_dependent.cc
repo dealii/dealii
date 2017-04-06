@@ -18,7 +18,6 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/parallel.h>
-#include <deal.II/base/std_cxx11/bind.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -160,8 +159,8 @@ void TimeDependent::delete_timestep (const unsigned int position)
 void
 TimeDependent::solve_primal_problem ()
 {
-  do_loop (std_cxx11::bind(&TimeStepBase::init_for_primal_problem, std_cxx11::_1),
-           std_cxx11::bind(&TimeStepBase::solve_primal_problem, std_cxx11::_1),
+  do_loop (std::bind(&TimeStepBase::init_for_primal_problem, std::placeholders::_1),
+           std::bind(&TimeStepBase::solve_primal_problem, std::placeholders::_1),
            timestepping_data_primal,
            forward);
 }
@@ -170,8 +169,8 @@ TimeDependent::solve_primal_problem ()
 void
 TimeDependent::solve_dual_problem ()
 {
-  do_loop (std_cxx11::bind(&TimeStepBase::init_for_dual_problem, std_cxx11::_1),
-           std_cxx11::bind(&TimeStepBase::solve_dual_problem, std_cxx11::_1),
+  do_loop (std::bind(&TimeStepBase::init_for_dual_problem, std::placeholders::_1),
+           std::bind(&TimeStepBase::solve_dual_problem, std::placeholders::_1),
            timestepping_data_dual,
            backward);
 }
@@ -180,8 +179,8 @@ TimeDependent::solve_dual_problem ()
 void
 TimeDependent::postprocess ()
 {
-  do_loop (std_cxx11::bind(&TimeStepBase::init_for_postprocessing, std_cxx11::_1),
-           std_cxx11::bind(&TimeStepBase::postprocess_timestep, std_cxx11::_1),
+  do_loop (std::bind(&TimeStepBase::init_for_postprocessing, std::placeholders::_1),
+           std::bind(&TimeStepBase::postprocess_timestep, std::placeholders::_1),
            timestepping_data_postprocess,
            forward);
 }
@@ -216,7 +215,7 @@ void TimeDependent::end_sweep ()
   void (TimeDependent::*p) (const unsigned int, const unsigned int)
     = &TimeDependent::end_sweep;
   parallel::apply_to_subranges (0U, timesteps.size(),
-                                std_cxx11::bind (p, this, std_cxx11::_1, std_cxx11::_2),
+                                std::bind (p, this, std::placeholders::_1, std::placeholders::_2),
                                 1);
 }
 

@@ -90,7 +90,7 @@ namespace parallel
         {
           // get active halo layer of (ghost) cells
           // parallel::shared::Triangulation<dim>::
-          std_cxx11::function<bool (const typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator &)> predicate
+          std::function<bool (const typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator &)> predicate
             = IteratorFilters::SubdomainEqualTo(this->my_subdomain);
 
           const std::vector<typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator>

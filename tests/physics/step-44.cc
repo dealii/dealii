@@ -547,7 +547,7 @@ namespace Step44
       return Jc;
     }
   private:
-    std_cxx11::shared_ptr< Material_Compressible_Neo_Hook_Three_Field<dim> > material;
+    std::shared_ptr< Material_Compressible_Neo_Hook_Three_Field<dim> > material;
     Tensor<2, dim> F_inv;
     SymmetricTensor<2, dim> tau;
     double                  d2Psi_vol_dJ2;
@@ -1356,14 +1356,14 @@ namespace Step44
     ScratchData_K scratch_data(fe, qf_cell, uf_cell);
     WorkStream::run(dof_handler_ref.begin_active(),
                     dof_handler_ref.end(),
-                    std_cxx11::bind(&Solid<dim>::assemble_system_tangent_one_cell,
-                                    this,
-                                    std_cxx11::_1,
-                                    std_cxx11::_2,
-                                    std_cxx11::_3),
-                    std_cxx11::bind(&Solid<dim>::copy_local_to_global_K,
-                                    this,
-                                    std_cxx11::_1),
+                    std::bind(&Solid<dim>::assemble_system_tangent_one_cell,
+                              this,
+                              std::placeholders::_1,
+                              std::placeholders::_2,
+                              std::placeholders::_3),
+                    std::bind(&Solid<dim>::copy_local_to_global_K,
+                              this,
+                              std::placeholders::_1),
                     scratch_data,
                     per_task_data);
     timer.leave_subsection();
@@ -1478,14 +1478,14 @@ namespace Step44
     ScratchData_RHS scratch_data(fe, qf_cell, uf_cell, qf_face, uf_face);
     WorkStream::run(dof_handler_ref.begin_active(),
                     dof_handler_ref.end(),
-                    std_cxx11::bind(&Solid<dim>::assemble_system_rhs_one_cell,
-                                    this,
-                                    std_cxx11::_1,
-                                    std_cxx11::_2,
-                                    std_cxx11::_3),
-                    std_cxx11::bind(&Solid<dim>::copy_local_to_global_rhs,
-                                    this,
-                                    std_cxx11::_1),
+                    std::bind(&Solid<dim>::assemble_system_rhs_one_cell,
+                              this,
+                              std::placeholders::_1,
+                              std::placeholders::_2,
+                              std::placeholders::_3),
+                    std::bind(&Solid<dim>::copy_local_to_global_rhs,
+                              this,
+                              std::placeholders::_1),
                     scratch_data,
                     per_task_data);
     timer.leave_subsection();

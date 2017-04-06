@@ -19,7 +19,6 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_CXX11
 
 #  include <memory>
 DEAL_II_NAMESPACE_OPEN
@@ -32,22 +31,6 @@ namespace std_cxx11
 }
 DEAL_II_NAMESPACE_CLOSE
 
-#else
-
-#include <boost/shared_ptr.hpp>
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/make_shared.hpp>
-DEAL_II_NAMESPACE_OPEN
-namespace std_cxx11
-{
-  using boost::shared_ptr;
-  using boost::enable_shared_from_this;
-  using boost::make_shared;
-  using boost::dynamic_pointer_cast;
-}
-DEAL_II_NAMESPACE_CLOSE
-
-#endif
 
 // then allow using the old namespace name instead of the new one
 DEAL_II_NAMESPACE_OPEN

@@ -332,9 +332,9 @@ namespace TrilinosWrappers
     reinit_sp (const Epetra_Map                         &row_map,
                const Epetra_Map                         &col_map,
                const size_type                           n_entries_per_row,
-               std_cxx11::shared_ptr<Epetra_Map>        &column_space_map,
-               std_cxx11::shared_ptr<Epetra_FECrsGraph> &graph,
-               std_cxx11::shared_ptr<Epetra_CrsGraph>   &nonlocal_graph)
+               std::shared_ptr<Epetra_Map>        &column_space_map,
+               std::shared_ptr<Epetra_FECrsGraph> &graph,
+               std::shared_ptr<Epetra_CrsGraph>   &nonlocal_graph)
     {
       Assert(row_map.IsOneToOne(),
              ExcMessage("Row map must be 1-to-1, i.e., no overlap between "
@@ -377,9 +377,9 @@ namespace TrilinosWrappers
     reinit_sp (const Epetra_Map                         &row_map,
                const Epetra_Map                         &col_map,
                const std::vector<size_type>             &n_entries_per_row,
-               std_cxx11::shared_ptr<Epetra_Map>        &column_space_map,
-               std_cxx11::shared_ptr<Epetra_FECrsGraph> &graph,
-               std_cxx11::shared_ptr<Epetra_CrsGraph>   &nonlocal_graph)
+               std::shared_ptr<Epetra_Map>        &column_space_map,
+               std::shared_ptr<Epetra_FECrsGraph> &graph,
+               std::shared_ptr<Epetra_CrsGraph>   &nonlocal_graph)
     {
       Assert(row_map.IsOneToOne(),
              ExcMessage("Row map must be 1-to-1, i.e., no overlap between "
@@ -426,9 +426,9 @@ namespace TrilinosWrappers
                const Epetra_Map                         &col_map,
                const SparsityPatternType                &sp,
                const bool                                exchange_data,
-               std_cxx11::shared_ptr<Epetra_Map>        &column_space_map,
-               std_cxx11::shared_ptr<Epetra_FECrsGraph> &graph,
-               std_cxx11::shared_ptr<Epetra_CrsGraph>   &nonlocal_graph)
+               std::shared_ptr<Epetra_Map>        &column_space_map,
+               std::shared_ptr<Epetra_FECrsGraph> &graph,
+               std::shared_ptr<Epetra_CrsGraph>   &nonlocal_graph)
     {
       nonlocal_graph.reset ();
       graph.reset ();

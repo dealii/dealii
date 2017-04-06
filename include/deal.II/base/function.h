@@ -24,8 +24,8 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/std_cxx11/function.h>
 
+#include <functional>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -638,9 +638,9 @@ protected:
  * or we could write it like so:
  * @code
  *    ScalarFunctionFromFunctionObject<dim, Number>
- *      my_distance_object (std_cxx11::bind (&Point<dim>::distance,
+ *      my_distance_object (std::bind (&Point<dim>::distance,
  *                                           q,
- *                                           std_cxx11::_1));
+ *                                           std::placeholders::_1));
  * @endcode
  * The savings in work to write this are apparent.
  *
@@ -655,7 +655,7 @@ public:
    * convert this into an object that matches the Function<dim, Number>
    * interface.
    */
-  ScalarFunctionFromFunctionObject (const std_cxx11::function<Number (const Point<dim> &)> &function_object);
+  ScalarFunctionFromFunctionObject (const std::function<Number (const Point<dim> &)> &function_object);
 
   /**
    * Return the value of the function at the given point. Returns the value
@@ -669,7 +669,7 @@ private:
    * The function object which we call when this class's value() or
    * value_list() functions are called.
    */
-  const std_cxx11::function<Number (const Point<dim> &)> function_object;
+  const std::function<Number (const Point<dim> &)> function_object;
 };
 
 
@@ -722,7 +722,7 @@ public:
    * @param selected_component The single component that should be filled by
    * the first argument.
    */
-  VectorFunctionFromScalarFunctionObject (const std_cxx11::function<Number (const Point<dim> &)> &function_object,
+  VectorFunctionFromScalarFunctionObject (const std::function<Number (const Point<dim> &)> &function_object,
                                           const unsigned int selected_component,
                                           const unsigned int n_components);
 
@@ -746,7 +746,7 @@ private:
    * The function object which we call when this class's value() or
    * value_list() functions are called.
    */
-  const std_cxx11::function<Number (const Point<dim> &)> function_object;
+  const std::function<Number (const Point<dim> &)> function_object;
 
   /**
    * The vector component whose value is to be filled by the given scalar

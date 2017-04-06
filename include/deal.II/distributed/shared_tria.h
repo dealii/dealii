@@ -26,9 +26,9 @@
 
 #include <deal.II/distributed/tria_base.h>
 
-#include <deal.II/base/std_cxx1x/function.h>
-#include <deal.II/base/std_cxx1x/tuple.h>
 
+#include <tuple>
+#include <functional>
 #include <set>
 #include <vector>
 #include <list>

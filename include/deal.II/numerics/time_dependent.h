@@ -251,8 +251,8 @@ template <int dim, int spacedim> class Triangulation;
  *   void
  *   TimeDependent::solve_primal_problem ()
  *   {
- *     do_loop (std_cxx11::bind(&TimeStepBase::init_for_primal_problem, std_cxx11::_1),
- *              std_cxx11::bind(&TimeStepBase::solve_primal_problem, std_cxx11::_1),
+ *     do_loop (std::bind(&TimeStepBase::init_for_primal_problem, std::placeholders::_1),
+ *              std::bind(&TimeStepBase::solve_primal_problem, std::placeholders::_1),
  *              timestepping_data_primal,
  *              forward);
  *   };
@@ -273,7 +273,7 @@ template <int dim, int spacedim> class Triangulation;
  * look-back and the last one denotes in which direction the loop is to be
  * run.
  *
- * Using function pointers through the @p std_cxx11::bind functions provided by the
+ * Using function pointers through the @p std::bind functions provided by the
  * <tt>C++</tt> standard library, it is possible to do neat tricks, like the
  * following, also taken from the wave program, in this case from the function
  * @p refine_grids:
@@ -282,11 +282,11 @@ template <int dim, int spacedim> class Triangulation;
  *   compute the thresholds for refinement
  *   ...
  *
- *   do_loop (std_cxx11::bind(&TimeStepBase_Tria<dim>::init_for_refinement, std_cxx11::_1),
- *            std_cxx11::bind(&TimeStepBase_Wave<dim>::refine_grid,
- *                            std_cxx11::_1,
- *                            TimeStepBase_Tria<dim>::RefinementData (top_threshold,
- *                                                                    bottom_threshold)),
+ *   do_loop (std::bind(&TimeStepBase_Tria<dim>::init_for_refinement, std::placeholders::_1),
+ *            std::bind(&TimeStepBase_Wave<dim>::refine_grid,
+ *                      std::placeholders::_1,
+ *                      TimeStepBase_Tria<dim>::RefinementData (top_threshold,
+ *                                                              bottom_threshold)),
  *            TimeDependent::TimeSteppingData (0,1),
  *            TimeDependent::forward);
  * @endcode
@@ -519,8 +519,8 @@ public:
    *
    * To see how this function work, note that the function @p
    * solve_primal_problem only consists of a call to <tt>do_loop
-   * (std_cxx11::bind(&TimeStepBase::init_for_primal_problem, std_cxx11::_1),
-   * std_cxx11::bind(&TimeStepBase::solve_primal_problem, std_cxx11::_1), timestepping_data_primal,
+   * (std::bind(&TimeStepBase::init_for_primal_problem, std::placeholders::_1),
+   * std::bind(&TimeStepBase::solve_primal_problem, std::placeholders::_1), timestepping_data_primal,
    * forward);</tt>.
    *
    * Note also, that the given class from which the two functions are taken
@@ -532,7 +532,7 @@ public:
    * the TimeStepBase class.
    *
    * Instead of using the above form, you can equally well use
-   * <tt>std_cxx11::bind(&X::unary_function, std_cxx11::_1, args...)</tt> which
+   * <tt>std::bind(&X::unary_function, std::placeholders::_1, args...)</tt> which
    * lets the @p do_loop function call the given function with the specified
    * parameters.
    */

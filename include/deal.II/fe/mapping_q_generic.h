@@ -25,8 +25,7 @@
 #include <deal.II/fe/mapping.h>
 #include <deal.II/fe/fe_q.h>
 
-#include <deal.II/base/std_cxx11/array.h>
-
+#include <array>
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
@@ -420,7 +419,7 @@ public:
      *
      * Filled once.
      */
-    std_cxx11::array<std::vector<Tensor<1,dim> >, GeometryInfo<dim>::faces_per_cell *(dim-1)> unit_tangentials;
+    std::array<std::vector<Tensor<1,dim> >, GeometryInfo<dim>::faces_per_cell *(dim-1)> unit_tangentials;
 
     /**
      * The polynomial degree of the mapping. Since the objects here are also
@@ -570,7 +569,7 @@ protected:
    * shape functions/DoFs on non-standard faces. This is used to reorder
    * support points in the same way.
    */
-  const std_cxx11::unique_ptr<FE_Q<dim> > fe_q;
+  const std::unique_ptr<FE_Q<dim> > fe_q;
 
   /**
    * A vector of tables of weights by which we multiply the locations of the

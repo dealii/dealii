@@ -40,10 +40,10 @@ namespace GeometricUtilities
 
 
     template <int dim>
-    std_cxx11::array<double,dim>
+    std::array<double,dim>
     to_spherical(const Point<dim> &position)
     {
-      std_cxx11::array<double,dim> scoord;
+      std::array<double,dim> scoord;
 
       // radius
       scoord[0] = position.norm();
@@ -67,7 +67,7 @@ namespace GeometricUtilities
 
     template <std::size_t dim>
     Point<dim>
-    from_spherical(const std_cxx11::array<double,dim> &scoord)
+    from_spherical(const std::array<double,dim> &scoord)
     {
       Point<dim> ccoord;
 
@@ -104,10 +104,10 @@ namespace GeometricUtilities
     }
 
 
-    template Point<2> from_spherical<2>(const std_cxx11::array<double,2> &);
-    template Point<3> from_spherical<3>(const std_cxx11::array<double,3> &);
-    template std_cxx11::array<double,2> to_spherical<2>(const Point<2> &);
-    template std_cxx11::array<double,3> to_spherical<3>(const Point<3> &);
+    template Point<2> from_spherical<2>(const std::array<double,2> &);
+    template Point<3> from_spherical<3>(const std::array<double,3> &);
+    template std::array<double,2> to_spherical<2>(const Point<2> &);
+    template std::array<double,3> to_spherical<3>(const Point<3> &);
 
   }
 }

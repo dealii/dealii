@@ -49,7 +49,7 @@ void test ()
 
   const Point<dim> origin;
 
-  std_cxx1x::array<double,dim> sorigin;
+  std::array<double,dim> sorigin;
   for (unsigned int d= 0; d < dim; d++)
     sorigin[d] = 0.;
 
@@ -57,7 +57,7 @@ void test ()
   for (unsigned int d=0; d< dim; d++)
     one[d] = 1.;
 
-  std_cxx1x::array<double,dim> sone;
+  std::array<double,dim> sone;
   sone[0] = std::sqrt(1.*dim);
   sone[1] = numbers::PI/4;
   if (dim==3)
@@ -76,15 +76,15 @@ void test3d()
   const dealii::Point<3> y(0,1,0);
   const dealii::Point<3> z(0,0,1);
 
-  std_cxx1x::array<double,3> sx;
+  std::array<double,3> sx;
   sx[0] = 1.;
   sx[1] = 0;
   sx[2] = numbers::PI/2;
-  std_cxx1x::array<double,3> sy;
+  std::array<double,3> sy;
   sy[0] = 1;
   sy[1] = numbers::PI/2;
   sy[2] = numbers::PI/2;
-  std_cxx1x::array<double,3> sz;
+  std::array<double,3> sz;
   sz[0] = 1.;
   sz[1] = 0.;
   sz[2] = 0.;
@@ -98,7 +98,7 @@ void test3d()
   print<3>(to_spherical(z),sz);
 
   const Point<3> dateline(0,-1,0);
-  std_cxx1x::array<double,3> sdateline;
+  std::array<double,3> sdateline;
   sdateline[0] = 1.;
   sdateline[1] = 3*numbers::PI/2;
   sdateline[2] = numbers::PI/2;

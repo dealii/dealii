@@ -171,7 +171,7 @@ namespace Functions
                          const unsigned int component) const
   {
     const Point<dim> p = p_ - coordinate_system_offset;
-    const std_cxx11::array<double, dim> sp = GeometricUtilities::Coordinates::to_spherical(p);
+    const std::array<double, dim> sp = GeometricUtilities::Coordinates::to_spherical(p);
     return svalue(sp, component);
   }
 
@@ -183,8 +183,8 @@ namespace Functions
                             const unsigned int component) const
   {
     const Point<dim> p = p_ - coordinate_system_offset;
-    const std_cxx11::array<double, dim> sp = GeometricUtilities::Coordinates::to_spherical(p);
-    const std_cxx11::array<double, dim> sg = sgradient(sp, component);
+    const std::array<double, dim> sp = GeometricUtilities::Coordinates::to_spherical(p);
+    const std::array<double, dim> sg = sgradient(sp, component);
 
     // somewhat backwards, but we need cos/sin's for unit vectors
     const double cos_theta = std::cos(sp[1]);
@@ -229,9 +229,9 @@ namespace Functions
                            const unsigned int component) const
   {
     const Point<dim> p = p_ - coordinate_system_offset;
-    const std_cxx11::array<double, dim> sp = GeometricUtilities::Coordinates::to_spherical(p);
-    const std_cxx11::array<double, dim> sg = sgradient(sp, component);
-    const std_cxx11::array<double, 6>   sh = shessian(sp, component);
+    const std::array<double, dim> sp = GeometricUtilities::Coordinates::to_spherical(p);
+    const std::array<double, dim> sg = sgradient(sp, component);
+    const std::array<double, 6>   sh = shessian(sp, component);
 
     // somewhat backwards, but we need cos/sin's for unit vectors
     const double cos_theta = std::cos(sp[1]);
@@ -310,7 +310,7 @@ namespace Functions
 
   template <int dim>
   double
-  Spherical<dim>::svalue(const std_cxx11::array<double, dim> & /* sp */,
+  Spherical<dim>::svalue(const std::array<double, dim> & /* sp */,
                          const unsigned int /*component*/) const
   {
     AssertThrow(false,
@@ -321,25 +321,25 @@ namespace Functions
 
 
   template <int dim>
-  std_cxx11::array<double, dim>
-  Spherical<dim>::sgradient(const std_cxx11::array<double, dim> & /* sp */,
+  std::array<double, dim>
+  Spherical<dim>::sgradient(const std::array<double, dim> & /* sp */,
                             const unsigned int /*component*/) const
   {
     AssertThrow(false,
                 ExcNotImplemented());
-    return std_cxx11::array<double,dim>();
+    return std::array<double,dim>();
   }
 
 
 
   template <int dim>
-  std_cxx11::array<double, 6>
-  Spherical<dim>::shessian (const std_cxx11::array<double, dim> & /* sp */,
+  std::array<double, 6>
+  Spherical<dim>::shessian (const std::array<double, dim> & /* sp */,
                             const unsigned int /*component*/) const
   {
     AssertThrow(false,
                 ExcNotImplemented());
-    return std_cxx11::array<double, 6>();
+    return std::array<double, 6>();
   }
 
 

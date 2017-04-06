@@ -18,7 +18,6 @@
 #define dealii__mesh_worker_loop_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/std_cxx11/function.h>
 #include <deal.II/base/work_stream.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/grid/tria.h>
@@ -27,6 +26,7 @@
 #include <deal.II/meshworker/dof_info.h>
 #include <deal.II/meshworker/integration_info.h>
 
+#include <functional>
 
 #define DEAL_II_MESHWORKER_PARALLEL 1
 
@@ -176,11 +176,11 @@ namespace MeshWorker
     ITERATOR cell,
     DoFInfoBox<dim, DOFINFO> &dof_info,
     INFOBOX &info,
-    const std_cxx11::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &cell_worker,
-    const std_cxx11::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &boundary_worker,
-    const std_cxx11::function<void (DOFINFO &, DOFINFO &,
-                                    typename INFOBOX::CellInfo &,
-                                    typename INFOBOX::CellInfo &)> &face_worker,
+    const std::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &cell_worker,
+    const std::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &boundary_worker,
+    const std::function<void (DOFINFO &, DOFINFO &,
+                              typename INFOBOX::CellInfo &,
+                              typename INFOBOX::CellInfo &)> &face_worker,
     const LoopControl &loop_control)
   {
     const bool ignore_subdomain = (cell->get_triangulation().locally_owned_subdomain()
@@ -384,11 +384,11 @@ namespace MeshWorker
             typename identity<ITERATOR>::type end,
             DOFINFO &dinfo,
             INFOBOX &info,
-            const std_cxx11::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &cell_worker,
-            const std_cxx11::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &boundary_worker,
-            const std_cxx11::function<void (DOFINFO &, DOFINFO &,
-                                            typename INFOBOX::CellInfo &,
-                                            typename INFOBOX::CellInfo &)> &face_worker,
+            const std::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &cell_worker,
+            const std::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &boundary_worker,
+            const std::function<void (DOFINFO &, DOFINFO &,
+                                      typename INFOBOX::CellInfo &,
+                                      typename INFOBOX::CellInfo &)> &face_worker,
             ASSEMBLER &assembler,
             const LoopControl &lctrl = LoopControl())
   {
@@ -404,10 +404,10 @@ namespace MeshWorker
     // Loop over all cells
 #ifdef DEAL_II_MESHWORKER_PARALLEL
     WorkStream::run(begin, end,
-                    std_cxx11::bind(&cell_action<INFOBOX, DOFINFO, dim, spacedim, ITERATOR>,
-                                    std_cxx11::_1, std_cxx11::_3, std_cxx11::_2,
-                                    cell_worker, boundary_worker, face_worker, lctrl),
-                    std_cxx11::bind(&internal::assemble<dim,DOFINFO,ASSEMBLER>, std_cxx11::_1, &assembler),
+                    std::bind(&cell_action<INFOBOX, DOFINFO, dim, spacedim, ITERATOR>,
+                              std::placeholders::_1, std::placeholders::_3, std::placeholders::_2,
+                              cell_worker, boundary_worker, face_worker, lctrl),
+                    std::bind(&internal::assemble<dim,DOFINFO,ASSEMBLER>, std::placeholders::_1, &assembler),
                     info, dof_info);
 #else
     for (ITERATOR cell = begin; cell != end; ++cell)
@@ -438,17 +438,17 @@ namespace MeshWorker
                         ASSEMBLER &assembler,
                         const LoopControl &lctrl = LoopControl())
   {
-    std_cxx11::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> cell_worker;
-    std_cxx11::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> boundary_worker;
-    std_cxx11::function<void (DoFInfo<dim> &, DoFInfo<dim> &,
-                              IntegrationInfo<dim, spacedim> &,
-                              IntegrationInfo<dim, spacedim> &)> face_worker;
+    std::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> cell_worker;
+    std::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> boundary_worker;
+    std::function<void (DoFInfo<dim> &, DoFInfo<dim> &,
+                        IntegrationInfo<dim, spacedim> &,
+                        IntegrationInfo<dim, spacedim> &)> face_worker;
     if (integrator.use_cell)
-      cell_worker = std_cxx11::bind(&LocalIntegrator<dim, spacedim>::cell, &integrator, std_cxx11::_1, std_cxx11::_2);
+      cell_worker = std::bind(&LocalIntegrator<dim, spacedim>::cell, &integrator, std::placeholders::_1, std::placeholders::_2);
     if (integrator.use_boundary)
-      boundary_worker = std_cxx11::bind(&LocalIntegrator<dim, spacedim>::boundary, &integrator, std_cxx11::_1, std_cxx11::_2);
+      boundary_worker = std::bind(&LocalIntegrator<dim, spacedim>::boundary, &integrator, std::placeholders::_1, std::placeholders::_2);
     if (integrator.use_face)
-      face_worker = std_cxx11::bind(&LocalIntegrator<dim, spacedim>::face, &integrator, std_cxx11::_1, std_cxx11::_2, std_cxx11::_3, std_cxx11::_4);
+      face_worker = std::bind(&LocalIntegrator<dim, spacedim>::face, &integrator, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
 
     loop<dim, spacedim>
     (begin, end,

@@ -24,7 +24,6 @@
 #ifdef DEAL_II_WITH_MPI
 
 #include <deal.II/base/index_set.h>
-#include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/vector_space_vector.h>
 #include <memory>
@@ -69,7 +68,7 @@ namespace LinearAlgebra
        * This constructor takes an IndexSet that defines how to distribute the
        * individual components among the MPI processors. Since it also
        * includes information about the size of the vector, this is all we
-       * need to genereate a %parallel vector.
+       * need to generate a %parallel vector.
        */
       explicit Vector(const IndexSet &parallel_partitioner,
                       const MPI_Comm &communicator);
@@ -101,8 +100,8 @@ namespace LinearAlgebra
        */
       virtual void import(const ReadWriteVector<double>  &V,
                           VectorOperation::values         operation,
-                          std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern =
-                            std_cxx11::shared_ptr<const CommunicationPatternBase> ());
+                          std::shared_ptr<const CommunicationPatternBase> communication_pattern =
+                            std::shared_ptr<const CommunicationPatternBase> ());
 
       /**
        * Multiply the entire vector by a fixed factor.
@@ -296,7 +295,7 @@ namespace LinearAlgebra
       /**
        * Pointer to the actual Epetra vector object.
        */
-      std_cxx11::shared_ptr<Epetra_FEVector> vector;
+      std::shared_ptr<Epetra_FEVector> vector;
 
       /**
        * IndexSet of the elements of the last imported vector.
@@ -307,7 +306,7 @@ namespace LinearAlgebra
        * CommunicationPattern for the communication between the
        * source_stored_elements IndexSet and the current vector.
        */
-      std_cxx11::shared_ptr<const CommunicationPattern> epetra_comm_pattern;
+      std::shared_ptr<const CommunicationPattern> epetra_comm_pattern;
     };
   }
 }

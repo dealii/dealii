@@ -26,7 +26,6 @@
 #include <deal.II/base/vector_slice.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/table.h>
-#include <deal.II/base/std_cxx11/unique_ptr.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -38,6 +37,7 @@
 #include <deal.II/fe/mapping.h>
 
 #include <algorithm>
+#include <memory>
 
 // dummy include in order to have the
 // definition of PetscScalar available
@@ -2624,7 +2624,7 @@ protected:
    * is necessary for the <tt>get_function_*</tt> functions as well as the
    * functions of same name in the extractor classes.
    */
-  std_cxx11::unique_ptr<const CellIteratorBase> present_cell;
+  std::unique_ptr<const CellIteratorBase> present_cell;
 
   /**
    * A signal connection we use to ensure we get informed whenever the
@@ -2673,7 +2673,7 @@ protected:
    * Mapping::get_data(), Mapping::get_face_data(), or
    * Mapping::get_subface_data().
    */
-  std_cxx11::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase> mapping_data;
+  std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase> mapping_data;
 
   /**
    * An object into which the Mapping::fill_fe_values() and similar functions
@@ -2693,7 +2693,7 @@ protected:
    * FiniteElement::get_data(), Mapping::get_face_data(), or
    * FiniteElement::get_subface_data().
    */
-  std_cxx11::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase> fe_data;
+  std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase> fe_data;
 
   /**
    * An object into which the FiniteElement::fill_fe_values() and similar

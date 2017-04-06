@@ -88,7 +88,7 @@ void test ()
     GridOut().write_vtk (tria, f);
   }
 
-  std_cxx11::function<bool (const cell_iterator &)> predicate = pred_mat_id<dim>;
+  std::function<bool (const cell_iterator &)> predicate = pred_mat_id<dim>;
 
   // Compute a halo layer around material id 2 and set it to material id 3
   const std::vector<cell_iterator> active_halo_layer

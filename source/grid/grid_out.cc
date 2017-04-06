@@ -2495,7 +2495,7 @@ void GridOut::write_vtk (const Triangulation<dim,spacedim> &tria,
   generate_triangulation_patches(patches, tria.begin_active(), tria.end());
   DataOutBase::write_vtk (patches,
                           triangulation_patch_data_names(),
-                          std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >(),
+                          std::vector<std::tuple<unsigned int, unsigned int, std::string> >(),
                           vtk_flags,
                           out);
 
@@ -2519,7 +2519,7 @@ void GridOut::write_vtu (const Triangulation<dim,spacedim> &tria,
   generate_triangulation_patches(patches, tria.begin_active(), tria.end());
   DataOutBase::write_vtu (patches,
                           triangulation_patch_data_names(),
-                          std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >(),
+                          std::vector<std::tuple<unsigned int, unsigned int, std::string> >(),
                           vtu_flags,
                           out);
 
@@ -2594,7 +2594,7 @@ void GridOut::write_mesh_per_processor_as_vtu (const Triangulation<dim,spacedim>
                                 Utilities::int_to_string (tria.locally_owned_subdomain(), 4) +
                                 ".vtu");
   std::ofstream out(new_file.c_str());
-  std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > vector_data_ranges;
+  std::vector<std::tuple<unsigned int, unsigned int, std::string> > vector_data_ranges;
   DataOutBase::VtkFlags flags;
   DataOutBase::write_vtu (patches,
                           data_names,

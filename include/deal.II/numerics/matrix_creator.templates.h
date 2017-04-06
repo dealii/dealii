@@ -699,9 +699,9 @@ namespace MatrixCreator
     WorkStream::run (dof.begin_active(),
                      static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::mass_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator,number>,
-                     std_cxx11::bind (&MatrixCreator::internal::
-                                      copy_local_to_global<number,SparseMatrix<number>, Vector<number> >,
-                                      std_cxx11::_1, &matrix, (Vector<number> *)0),
+                     std::bind (&MatrixCreator::internal::
+                                copy_local_to_global<number,SparseMatrix<number>, Vector<number> >,
+                                std::placeholders::_1, &matrix, (Vector<number> *)0),
                      assembler_data,
                      copy_data);
   }
@@ -755,9 +755,9 @@ namespace MatrixCreator
     WorkStream::run (dof.begin_active(),
                      static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::mass_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator,number>,
-                     std_cxx11::bind(&MatrixCreator::internal::
-                                     copy_local_to_global<number,SparseMatrix<number>, Vector<number> >,
-                                     std_cxx11::_1, &matrix, &rhs_vector),
+                     std::bind(&MatrixCreator::internal::
+                               copy_local_to_global<number,SparseMatrix<number>, Vector<number> >,
+                               std::placeholders::_1, &matrix, &rhs_vector),
                      assembler_data,
                      copy_data);
   }
@@ -809,9 +809,9 @@ namespace MatrixCreator
     WorkStream::run (dof.begin_active(),
                      static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::mass_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator,number>,
-                     std_cxx11::bind (&MatrixCreator::internal::
-                                      copy_local_to_global<number,SparseMatrix<number>, Vector<number> >,
-                                      std_cxx11::_1, &matrix, (Vector<number> *)0),
+                     std::bind (&MatrixCreator::internal::
+                                copy_local_to_global<number,SparseMatrix<number>, Vector<number> >,
+                                std::placeholders::_1, &matrix, (Vector<number> *)0),
                      assembler_data,
                      copy_data);
   }
@@ -862,9 +862,9 @@ namespace MatrixCreator
     WorkStream::run (dof.begin_active(),
                      static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::mass_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator,number>,
-                     std_cxx11::bind (&MatrixCreator::internal::
-                                      copy_local_to_global<number,SparseMatrix<number>, Vector<number> >,
-                                      std_cxx11::_1, &matrix, &rhs_vector),
+                     std::bind (&MatrixCreator::internal::
+                                copy_local_to_global<number,SparseMatrix<number>, Vector<number> >,
+                                std::placeholders::_1, &matrix, &rhs_vector),
                      assembler_data,
                      copy_data);
   }
@@ -1237,22 +1237,22 @@ namespace MatrixCreator
     MatrixCreator::internal::AssemblerBoundary::CopyData<DoFHandler<dim,spacedim>,number > copy_data;
 
     WorkStream::run(dof.begin_active(),dof.end(),
-                    static_cast<std_cxx11::function<void (typename DoFHandler<dim,spacedim>::active_cell_iterator
-                                                          const &,MatrixCreator::internal::AssemblerBoundary::Scratch const &,
-                                                          MatrixCreator::internal::AssemblerBoundary::CopyData<DoFHandler<dim,spacedim>,number > &)> >
-                    (std_cxx11::bind(&internal::create_boundary_mass_matrix_1<dim,spacedim,number>,std_cxx11::_1,std_cxx11::_2,
-                                     std_cxx11::_3,
-                                     std_cxx11::cref(mapping),std_cxx11::cref(fe),std_cxx11::cref(q),
-                                     std_cxx11::cref(boundary_functions),coefficient,
-                                     std_cxx11::cref(component_mapping))),
-                    static_cast<std_cxx11::function<void (MatrixCreator::internal::AssemblerBoundary
-                                                          ::CopyData<DoFHandler<dim,spacedim>,number> const &)> > (std_cxx11::bind(
-                                                                &internal::copy_boundary_mass_matrix_1<dim,spacedim,number>,
-                                                                std_cxx11::_1,
-                                                                std_cxx11::cref(boundary_functions),
-                                                                std_cxx11::cref(dof_to_boundary_mapping),
-                                                                std_cxx11::ref(matrix),
-                                                                std_cxx11::ref(rhs_vector))),
+                    static_cast<std::function<void (typename DoFHandler<dim,spacedim>::active_cell_iterator
+                                                    const &,MatrixCreator::internal::AssemblerBoundary::Scratch const &,
+                                                    MatrixCreator::internal::AssemblerBoundary::CopyData<DoFHandler<dim,spacedim>,number > &)> >
+                    (std::bind(&internal::create_boundary_mass_matrix_1<dim,spacedim,number>,std::placeholders::_1,std::placeholders::_2,
+                               std::placeholders::_3,
+                               std::cref(mapping),std::cref(fe),std::cref(q),
+                               std::cref(boundary_functions),coefficient,
+                               std::cref(component_mapping))),
+                    static_cast<std::function<void (MatrixCreator::internal::AssemblerBoundary
+                                                    ::CopyData<DoFHandler<dim,spacedim>,number> const &)> > (std::bind(
+                                                          &internal::copy_boundary_mass_matrix_1<dim,spacedim,number>,
+                                                          std::placeholders::_1,
+                                                          std::cref(boundary_functions),
+                                                          std::cref(dof_to_boundary_mapping),
+                                                          std::ref(matrix),
+                                                          std::ref(rhs_vector))),
                     scratch,
                     copy_data);
   }
@@ -1654,22 +1654,22 @@ namespace MatrixCreator
     MatrixCreator::internal::AssemblerBoundary::CopyData<hp::DoFHandler<dim,spacedim>,number > copy_data;
 
     WorkStream::run(dof.begin_active(),dof.end(),
-                    static_cast<std_cxx11::function<void (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
-                                                          const &,MatrixCreator::internal::AssemblerBoundary::Scratch const &,
-                                                          MatrixCreator::internal::AssemblerBoundary::CopyData<hp::DoFHandler<dim,spacedim>,number > &)> >
-                    (std_cxx11::bind( &create_hp_boundary_mass_matrix_1<dim,spacedim,number>,std_cxx11::_1,std_cxx11::_2,
-                                      std_cxx11::_3,
-                                      std_cxx11::cref(mapping),std_cxx11::cref(fe_collection),std_cxx11::cref(q),
-                                      std_cxx11::cref(boundary_functions),coefficient,
-                                      std_cxx11::cref(component_mapping))),
-                    static_cast<std_cxx11::function<void (MatrixCreator::internal::AssemblerBoundary
-                                                          ::CopyData<hp::DoFHandler<dim,spacedim>,number > const &)> > (
-                      std_cxx11::bind( &copy_hp_boundary_mass_matrix_1<dim,spacedim,number>,
-                                       std_cxx11::_1,
-                                       std_cxx11::cref(boundary_functions),
-                                       std_cxx11::cref(dof_to_boundary_mapping),
-                                       std_cxx11::ref(matrix),
-                                       std_cxx11::ref(rhs_vector))),
+                    static_cast<std::function<void (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
+                                                    const &,MatrixCreator::internal::AssemblerBoundary::Scratch const &,
+                                                    MatrixCreator::internal::AssemblerBoundary::CopyData<hp::DoFHandler<dim,spacedim>,number > &)> >
+                    (std::bind( &create_hp_boundary_mass_matrix_1<dim,spacedim,number>,std::placeholders::_1,std::placeholders::_2,
+                                std::placeholders::_3,
+                                std::cref(mapping),std::cref(fe_collection),std::cref(q),
+                                std::cref(boundary_functions),coefficient,
+                                std::cref(component_mapping))),
+                    static_cast<std::function<void (MatrixCreator::internal::AssemblerBoundary
+                                                    ::CopyData<hp::DoFHandler<dim,spacedim>,number > const &)> > (
+                      std::bind( &copy_hp_boundary_mass_matrix_1<dim,spacedim,number>,
+                                 std::placeholders::_1,
+                                 std::cref(boundary_functions),
+                                 std::cref(dof_to_boundary_mapping),
+                                 std::ref(matrix),
+                                 std::ref(rhs_vector))),
                     scratch,
                     copy_data);
   }
@@ -1725,11 +1725,11 @@ namespace MatrixCreator
     WorkStream::run (dof.begin_active(),
                      static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::laplace_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
-                     std_cxx11::bind (&MatrixCreator::internal::
-                                      copy_local_to_global<double,SparseMatrix<double>, Vector<double> >,
-                                      std_cxx11::_1,
-                                      &matrix,
-                                      (Vector<double> *)NULL),
+                     std::bind (&MatrixCreator::internal::
+                                copy_local_to_global<double,SparseMatrix<double>, Vector<double> >,
+                                std::placeholders::_1,
+                                &matrix,
+                                (Vector<double> *)NULL),
                      assembler_data,
                      copy_data);
   }
@@ -1783,11 +1783,11 @@ namespace MatrixCreator
     WorkStream::run (dof.begin_active(),
                      static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::laplace_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
-                     std_cxx11::bind (&MatrixCreator::internal::
-                                      copy_local_to_global<double,SparseMatrix<double>, Vector<double> >,
-                                      std_cxx11::_1,
-                                      &matrix,
-                                      &rhs_vector),
+                     std::bind (&MatrixCreator::internal::
+                                copy_local_to_global<double,SparseMatrix<double>, Vector<double> >,
+                                std::placeholders::_1,
+                                &matrix,
+                                &rhs_vector),
                      assembler_data,
                      copy_data);
   }
@@ -1838,11 +1838,11 @@ namespace MatrixCreator
     WorkStream::run (dof.begin_active(),
                      static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::laplace_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
-                     std_cxx11::bind (&MatrixCreator::internal::
-                                      copy_local_to_global<double,SparseMatrix<double>, Vector<double> >,
-                                      std_cxx11::_1,
-                                      &matrix,
-                                      (Vector<double> *)0),
+                     std::bind (&MatrixCreator::internal::
+                                copy_local_to_global<double,SparseMatrix<double>, Vector<double> >,
+                                std::placeholders::_1,
+                                &matrix,
+                                (Vector<double> *)0),
                      assembler_data,
                      copy_data);
   }
@@ -1893,11 +1893,11 @@ namespace MatrixCreator
     WorkStream::run (dof.begin_active(),
                      static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::laplace_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
-                     std_cxx11::bind (&MatrixCreator::internal::
-                                      copy_local_to_global<double,SparseMatrix<double>, Vector<double> >,
-                                      std_cxx11::_1,
-                                      &matrix,
-                                      &rhs_vector),
+                     std::bind (&MatrixCreator::internal::
+                                copy_local_to_global<double,SparseMatrix<double>, Vector<double> >,
+                                std::placeholders::_1,
+                                &matrix,
+                                &rhs_vector),
                      assembler_data,
                      copy_data);
   }

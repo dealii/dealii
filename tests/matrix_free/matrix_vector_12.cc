@@ -87,10 +87,10 @@ public:
   {
     for (unsigned int i=0; i<dst.size(); ++i)
       dst[i] = 0;
-    const std_cxx11::function<void(const MatrixFree<dim,Number> &,
-                                   std::vector<LinearAlgebra::distributed::Vector<Number> > &,
-                                   const std::vector<LinearAlgebra::distributed::Vector<Number> > &,
-                                   const std::pair<unsigned int,unsigned int> &)>
+    const std::function<void(const MatrixFree<dim,Number> &,
+                             std::vector<LinearAlgebra::distributed::Vector<Number> > &,
+                             const std::vector<LinearAlgebra::distributed::Vector<Number> > &,
+                             const std::pair<unsigned int,unsigned int> &)>
     wrap = helmholtz_operator<dim,fe_degree,Number>;
     data.cell_loop (wrap, dst, src);
   };

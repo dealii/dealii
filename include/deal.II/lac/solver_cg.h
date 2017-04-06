@@ -190,7 +190,7 @@ public:
    */
   boost::signals2::connection
   connect_coefficients_slot(
-    const std_cxx11::function<void (double,double)> &slot);
+    const std::function<void (double,double)> &slot);
 
   /**
    * Connect a slot to retrieve the estimated condition number. Called on each
@@ -199,7 +199,7 @@ public:
    * divergence has been detected).
    */
   boost::signals2::connection
-  connect_condition_number_slot(const std_cxx11::function<void (double)> &slot,
+  connect_condition_number_slot(const std::function<void (double)> &slot,
                                 const bool every_iteration=false);
 
   /**
@@ -210,7 +210,7 @@ public:
    */
   boost::signals2::connection
   connect_eigenvalues_slot(
-    const std_cxx11::function<void (const std::vector<double> &)> &slot,
+    const std::function<void (const std::vector<double> &)> &slot,
     const bool every_iteration=false);
 
 protected:
@@ -596,7 +596,7 @@ SolverCG<VectorType>::solve (const MatrixType         &A,
 template<typename VectorType>
 boost::signals2::connection
 SolverCG<VectorType>::connect_coefficients_slot
-(const std_cxx11::function<void(double,double)> &slot)
+(const std::function<void(double,double)> &slot)
 {
   return coefficients_signal.connect(slot);
 }
@@ -606,7 +606,7 @@ SolverCG<VectorType>::connect_coefficients_slot
 template<typename VectorType>
 boost::signals2::connection
 SolverCG<VectorType>::connect_condition_number_slot
-(const std_cxx11::function<void(double)> &slot,
+(const std::function<void(double)> &slot,
  const bool                              every_iteration)
 {
   if (every_iteration)
@@ -624,7 +624,7 @@ SolverCG<VectorType>::connect_condition_number_slot
 template<typename VectorType>
 boost::signals2::connection
 SolverCG<VectorType>::connect_eigenvalues_slot
-(const std_cxx11::function<void (const std::vector<double> &)> &slot,
+(const std::function<void (const std::vector<double> &)> &slot,
  const bool                                                    every_iteration)
 {
   if (every_iteration)

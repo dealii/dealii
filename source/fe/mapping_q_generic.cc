@@ -20,8 +20,6 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/memory_consumption.h>
-#include <deal.II/base/std_cxx11/array.h>
-#include <deal.II/base/std_cxx11/unique_ptr.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -36,6 +34,8 @@
 #include <cmath>
 #include <algorithm>
 #include <numeric>
+#include <array>
+#include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -69,7 +69,7 @@ namespace internal
       template<int spacedim>
       Point<1>
       transform_real_to_unit_cell
-      (const std_cxx11::array<Point<spacedim>, GeometryInfo<1>::vertices_per_cell> &vertices,
+      (const std::array<Point<spacedim>, GeometryInfo<1>::vertices_per_cell> &vertices,
        const Point<spacedim> &p)
       {
         Assert(spacedim == 1, ExcInternalError());
@@ -81,7 +81,7 @@ namespace internal
       template<int spacedim>
       Point<2>
       transform_real_to_unit_cell
-      (const std_cxx11::array<Point<spacedim>, GeometryInfo<2>::vertices_per_cell> &vertices,
+      (const std::array<Point<spacedim>, GeometryInfo<2>::vertices_per_cell> &vertices,
        const Point<spacedim> &p)
       {
         Assert(spacedim == 2, ExcInternalError());
@@ -180,7 +180,7 @@ namespace internal
       template<int spacedim>
       Point<3>
       transform_real_to_unit_cell
-      (const std_cxx11::array<Point<spacedim>, GeometryInfo<3>::vertices_per_cell> &/*vertices*/,
+      (const std::array<Point<spacedim>, GeometryInfo<3>::vertices_per_cell> &/*vertices*/,
        const Point<spacedim> &/*p*/)
       {
         // It should not be possible to get here
@@ -1691,8 +1691,8 @@ transform_real_to_unit_cell_internal
   UpdateFlags update_flags = update_quadrature_points | update_jacobians;
   if (spacedim>dim)
     update_flags |= update_jacobian_grads;
-  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
-                                                      point_quadrature));
+  std::unique_ptr<InternalData> mdata (get_data(update_flags,
+                                                point_quadrature));
 
   mdata->mapping_support_points = this->compute_mapping_support_points (cell);
 
@@ -1717,8 +1717,8 @@ transform_real_to_unit_cell_internal
   UpdateFlags update_flags = update_quadrature_points | update_jacobians;
   if (spacedim>dim)
     update_flags |= update_jacobian_grads;
-  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
-                                                      point_quadrature));
+  std::unique_ptr<InternalData> mdata (get_data(update_flags,
+                                                point_quadrature));
 
   mdata->mapping_support_points = this->compute_mapping_support_points (cell);
 
@@ -1743,8 +1743,8 @@ transform_real_to_unit_cell_internal
   UpdateFlags update_flags = update_quadrature_points | update_jacobians;
   if (spacedim>dim)
     update_flags |= update_jacobian_grads;
-  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
-                                                      point_quadrature));
+  std::unique_ptr<InternalData> mdata (get_data(update_flags,
+                                                point_quadrature));
 
   mdata->mapping_support_points = this->compute_mapping_support_points (cell);
 
@@ -1769,8 +1769,8 @@ transform_real_to_unit_cell_internal
   UpdateFlags update_flags = update_quadrature_points | update_jacobians;
   if (spacedim>dim)
     update_flags |= update_jacobian_grads;
-  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
-                                                      point_quadrature));
+  std::unique_ptr<InternalData> mdata (get_data(update_flags,
+                                                point_quadrature));
 
   mdata->mapping_support_points = this->compute_mapping_support_points (cell);
 
@@ -1795,8 +1795,8 @@ transform_real_to_unit_cell_internal
   UpdateFlags update_flags = update_quadrature_points | update_jacobians;
   if (spacedim>dim)
     update_flags |= update_jacobian_grads;
-  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
-                                                      point_quadrature));
+  std::unique_ptr<InternalData> mdata (get_data(update_flags,
+                                                point_quadrature));
 
   mdata->mapping_support_points = this->compute_mapping_support_points (cell);
 
@@ -1853,7 +1853,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
       //   cell and that value is returned.
       // * In 3D there is no (known to the authors) exact formula, so the Newton
       //   algorithm is used.
-      const std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+      const std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
       vertices = this->get_vertices(cell);
       try
         {

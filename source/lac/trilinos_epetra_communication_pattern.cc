@@ -20,8 +20,8 @@
 #ifdef DEAL_II_WITH_MPI
 
 #include <deal.II/base/index_set.h>
-#include <deal.II/base/std_cxx11/shared_ptr.h>
 #include "Epetra_Map.h"
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -42,7 +42,7 @@ namespace LinearAlgebra
                                       const IndexSet &read_write_vector_index_set,
                                       const MPI_Comm &communicator)
     {
-      comm = std_cxx11::make_shared<const MPI_Comm>(communicator);
+      comm = std::make_shared<const MPI_Comm>(communicator);
 
       Epetra_Map vector_space_vector_map = vector_space_vector_index_set.make_trilinos_map(*comm,
                                            false);

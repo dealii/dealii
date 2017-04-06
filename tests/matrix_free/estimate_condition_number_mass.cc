@@ -77,10 +77,10 @@ public:
               const Vector<Number> &src) const
   {
     dst = 0;
-    const std_cxx11::function<void(const MatrixFree<dim,Number> &,
-                                   Vector<Number> &,
-                                   const Vector<Number> &,
-                                   const std::pair<unsigned int,unsigned int> &)>
+    const std::function<void(const MatrixFree<dim,Number> &,
+                             Vector<Number> &,
+                             const Vector<Number> &,
+                             const std::pair<unsigned int,unsigned int> &)>
     wrap = mass_operator<dim,fe_degree,Number>;
     data.cell_loop (wrap, dst, src);
   };

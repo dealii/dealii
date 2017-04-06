@@ -300,7 +300,7 @@ namespace internal
         {
           // shift the local number of the copy indices according to the new
           // partitioner that we are going to use for the vector
-          const std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> part
+          const std::shared_ptr<const Utilities::MPI::Partitioner> part
             = ghosted_level_vector.get_partitioner();
           ghosted_dofs.add_indices(part->ghost_indices());
           for (unsigned int i=0; i<copy_indices_global_mine.size(); ++i)
@@ -479,7 +479,7 @@ namespace internal
                 ExcInternalError());
         fe_name[template_starts+1] = '1';
       }
-      std_cxx11::shared_ptr<FiniteElement<1> > fe_1d
+      std::shared_ptr<FiniteElement<1> > fe_1d
       (FETools::get_fe_by_name<1,1>(fe_name));
       const FiniteElement<1> &fe = *fe_1d;
 

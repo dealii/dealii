@@ -48,14 +48,14 @@ void test ()
   // first run with only a worker
   WorkStream::run (v.begin(), v.end(),
                    &foo,
-                   std_cxx11::function<void(const unsigned int &)>(),
+                   std::function<void(const unsigned int &)>(),
                    ScratchData(),
                    0U);
 
   // next run with only a copier
   WorkStream::run (v.begin(), v.end(),
-                   std_cxx11::function<void(const std::vector<unsigned int>::iterator,
-                                            ScratchData &,unsigned int &)>(),
+                   std::function<void(const std::vector<unsigned int>::iterator,
+                                      ScratchData &,unsigned int &)>(),
                    &bar,
                    ScratchData(),
                    0U);

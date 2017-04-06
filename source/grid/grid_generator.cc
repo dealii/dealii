@@ -802,7 +802,7 @@ namespace GridGenerator
                  const bool         colorize)
   {
     Point<2> origin;
-    std_cxx11::array<Tensor<1,2>,2> edges;
+    std::array<Tensor<1,2>,2> edges;
     edges[0] = corners[0];
     edges[1] = corners[1];
     std::vector<unsigned int> subdivisions;
@@ -859,7 +859,7 @@ namespace GridGenerator
   {
     Point<dim> origin;
     std::vector<unsigned int> subdivisions;
-    std_cxx11::array<Tensor<1,dim>,dim> edges;
+    std::array<Tensor<1,dim>,dim> edges;
     for (unsigned int i=0; i<dim; ++i)
       {
         subdivisions.push_back(n_subdivisions[i]);
@@ -881,7 +881,7 @@ namespace GridGenerator
   void
   subdivided_parallelepiped (Triangulation<dim, spacedim>  &tria,
                              const Point<spacedim> &origin,
-                             const std_cxx11::array<Tensor<1,spacedim>,dim> &edges,
+                             const std::array<Tensor<1,spacedim>,dim> &edges,
                              const std::vector<unsigned int> &subdivisions,
                              const bool colorize)
   {

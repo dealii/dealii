@@ -370,7 +370,7 @@ namespace Polynomials
     // need to transform p into standard form as
     // well if necessary. copy the polynomial to
     // do this
-    std_cxx11::shared_ptr<Polynomial<number> > q_data;
+    std::shared_ptr<Polynomial<number> > q_data;
     const Polynomial<number> *q = 0;
     if (p.in_lagrange_product_form == true)
       {
@@ -414,7 +414,7 @@ namespace Polynomials
     // need to transform p into standard form as
     // well if necessary. copy the polynomial to
     // do this
-    std_cxx11::shared_ptr<Polynomial<number> > q_data;
+    std::shared_ptr<Polynomial<number> > q_data;
     const Polynomial<number> *q = 0;
     if (p.in_lagrange_product_form == true)
       {
@@ -450,7 +450,7 @@ namespace Polynomials
     // need to transform p into standard form as
     // well if necessary. copy the polynomial to
     // do this
-    std_cxx11::shared_ptr<Polynomial<number> > q_data;
+    std::shared_ptr<Polynomial<number> > q_data;
     const Polynomial<number> *q = 0;
     if (p.in_lagrange_product_form == true)
       {
@@ -597,7 +597,7 @@ namespace Polynomials
     if (degree() == 0)
       return Monomial<number>(0, 0.);
 
-    std_cxx11::shared_ptr<Polynomial<number> > q_data;
+    std::shared_ptr<Polynomial<number> > q_data;
     const Polynomial<number> *q = 0;
     if (in_lagrange_product_form == true)
       {
@@ -623,7 +623,7 @@ namespace Polynomials
   {
     // no simple form possible for Lagrange
     // polynomial on product form
-    std_cxx11::shared_ptr<Polynomial<number> > q_data;
+    std::shared_ptr<Polynomial<number> > q_data;
     const Polynomial<number> *q = 0;
     if (in_lagrange_product_form == true)
       {
@@ -973,7 +973,7 @@ namespace Polynomials
 
 // Reserve space for polynomials up to degree 19. Should be sufficient
 // for the start.
-  std::vector<std_cxx11::shared_ptr<const std::vector<double> > >
+  std::vector<std::shared_ptr<const std::vector<double> > >
   Hierarchical::recursive_coefficients(20);
 
 
@@ -1050,9 +1050,9 @@ namespace Polynomials
             // now make these arrays
             // const
             recursive_coefficients[0] =
-              std_cxx11::shared_ptr<const std::vector<double> >(c0);
+              std::shared_ptr<const std::vector<double> >(c0);
             recursive_coefficients[1] =
-              std_cxx11::shared_ptr<const std::vector<double> >(c1);
+              std::shared_ptr<const std::vector<double> >(c1);
           }
         else if (k==2)
           {
@@ -1069,7 +1069,7 @@ namespace Polynomials
             (*c2)[2] =   4.*a;
 
             recursive_coefficients[2] =
-              std_cxx11::shared_ptr<const std::vector<double> >(c2);
+              std::shared_ptr<const std::vector<double> >(c2);
           }
         else
           {
@@ -1113,7 +1113,7 @@ namespace Polynomials
             // const pointer in the
             // coefficients array
             recursive_coefficients[k] =
-              std_cxx11::shared_ptr<const std::vector<double> >(ck);
+              std::shared_ptr<const std::vector<double> >(ck);
           };
       };
   }

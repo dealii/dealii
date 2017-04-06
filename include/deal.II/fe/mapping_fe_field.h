@@ -25,7 +25,7 @@
 #include <deal.II/fe/mapping.h>
 #include <deal.II/fe/fe.h>
 
-#include <deal.II/base/std_cxx11/array.h>
+#include <array>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -372,7 +372,7 @@ public:
      *
      * Filled once.
      */
-    std_cxx11::array<std::vector<Tensor<1,dim> >, GeometryInfo<dim>::faces_per_cell *(dim-1)> unit_tangentials;
+    std::array<std::vector<Tensor<1,dim> >, GeometryInfo<dim>::faces_per_cell *(dim-1)> unit_tangentials;
 
     /**
      * Number of shape functions. If this is a Q1 mapping, then it is simply

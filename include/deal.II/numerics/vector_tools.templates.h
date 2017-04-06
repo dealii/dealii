@@ -70,7 +70,7 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
 
-#include <deal.II/base/std_cxx11/array.h>
+#include <array>
 #include <numeric>
 #include <algorithm>
 #include <vector>
@@ -931,7 +931,7 @@ namespace VectorTools
       additional_data.tasks_parallel_scheme =
         MatrixFree<dim,Number>::AdditionalData::partition_color;
       additional_data.mapping_update_flags = (update_values | update_JxW_values);
-      std_cxx11::shared_ptr<MatrixFree<dim, Number> > matrix_free(
+      std::shared_ptr<MatrixFree<dim, Number> > matrix_free(
         new MatrixFree<dim, Number> ());
       matrix_free->reinit (mapping, dof, constraints,
                            QGauss<1>(dof.get_fe().degree+2), additional_data);
@@ -1146,7 +1146,7 @@ namespace VectorTools
                            const DoFHandler<dim,spacedim> &dof,
                            const ConstraintMatrix         &constraints,
                            const Quadrature<dim>          &quadrature,
-                           const std_cxx11::function< typename VectorType::value_type (const typename DoFHandler<dim, spacedim>::active_cell_iterator &, const unsigned int)> func,
+                           const std::function< typename VectorType::value_type (const typename DoFHandler<dim, spacedim>::active_cell_iterator &, const unsigned int)> func,
                            VectorType                     &vec_result)
     {
       typedef typename VectorType::value_type Number;
@@ -1164,7 +1164,7 @@ namespace VectorTools
       additional_data.tasks_parallel_scheme =
         MatrixFree<dim,Number>::AdditionalData::partition_color;
       additional_data.mapping_update_flags = (update_values | update_JxW_values);
-      std_cxx11::shared_ptr<MatrixFree<dim, Number> > matrix_free(
+      std::shared_ptr<MatrixFree<dim, Number> > matrix_free(
         new MatrixFree<dim, Number>());
       matrix_free->reinit (mapping, dof, constraints,
                            QGauss<1>(dof.get_fe().degree+2), additional_data);
@@ -1242,9 +1242,9 @@ namespace VectorTools
 
 
     template <int dim, typename VectorType, int spacedim, int fe_degree, int n_q_points_1d>
-    void project_parallel (std_cxx11::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > matrix_free,
+    void project_parallel (std::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > matrix_free,
                            const ConstraintMatrix &constraints,
-                           const std_cxx11::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
+                           const std::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
                            VectorType &vec_result)
     {
       const DoFHandler<dim,spacedim> &dof = matrix_free->get_dof_handler();
@@ -1322,7 +1322,7 @@ namespace VectorTools
                 const DoFHandler<dim,spacedim> &dof,
                 const ConstraintMatrix         &constraints,
                 const Quadrature<dim>          &quadrature,
-                const std_cxx11::function< typename VectorType::value_type (const typename DoFHandler<dim, spacedim>::active_cell_iterator &, const unsigned int)> func,
+                const std::function< typename VectorType::value_type (const typename DoFHandler<dim, spacedim>::active_cell_iterator &, const unsigned int)> func,
                 VectorType                     &vec_result)
   {
     switch (dof.get_fe().degree)
@@ -1344,10 +1344,10 @@ namespace VectorTools
 
 
   template <int dim, typename VectorType>
-  void project (std_cxx11::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > matrix_free,
+  void project (std::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > matrix_free,
                 const ConstraintMatrix &constraints,
                 const unsigned int n_q_points_1d,
-                const std_cxx11::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
+                const std::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
                 VectorType &vec_result)
   {
     (void) n_q_points_1d;
@@ -1375,9 +1375,9 @@ namespace VectorTools
 
 
   template <int dim, typename VectorType>
-  void project (std_cxx11::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > matrix_free,
+  void project (std::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > matrix_free,
                 const ConstraintMatrix &constraints,
-                const std_cxx11::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
+                const std::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
                 VectorType &vec_result)
   {
     project (matrix_free,
@@ -6447,8 +6447,8 @@ namespace VectorTools
     template <int dim>
     struct PointComparator
     {
-      bool operator ()(const std_cxx11::array<types::global_dof_index,dim> &p1,
-                       const std_cxx11::array<types::global_dof_index,dim> &p2)
+      bool operator ()(const std::array<types::global_dof_index,dim> &p1,
+                       const std::array<types::global_dof_index,dim> &p2)
       {
         for (unsigned int d=0; d<dim; ++d)
           if (p1[d] < p2[d])
@@ -6530,14 +6530,14 @@ namespace VectorTools
     // Extract a list that collects all vector components that belong to the
     // same node (scalar basis function). When creating that list, we use an
     // array of dim components that stores the global degree of freedom.
-    std::set<std_cxx11::array<types::global_dof_index,dim>, PointComparator<dim> > vector_dofs;
+    std::set<std::array<types::global_dof_index,dim>, PointComparator<dim> > vector_dofs;
     std::vector<types::global_dof_index> face_dofs;
 
-    std::map<std_cxx11::array<types::global_dof_index,dim>, Vector<double> >
+    std::map<std::array<types::global_dof_index,dim>, Vector<double> >
     dof_vector_to_b_values;
 
     std::set<types::boundary_id>::iterator b_id;
-    std::vector<std_cxx11::array<types::global_dof_index,dim> > cell_vector_dofs;
+    std::vector<std::array<types::global_dof_index,dim> > cell_vector_dofs;
     for (typename DoFHandlerType<dim,spacedim>::active_cell_iterator cell =
            dof_handler.begin_active(); cell != dof_handler.end(); ++cell)
       if (!cell->is_artificial())
@@ -6602,7 +6602,7 @@ namespace VectorTools
     // iterate over the list of all vector components we found and see if we
     // can find constrained ones
     unsigned int n_total_constraints_found = 0;
-    for (typename std::set<std_cxx11::array<types::global_dof_index,dim>,
+    for (typename std::set<std::array<types::global_dof_index,dim>,
          PointComparator<dim> >::const_iterator it=vector_dofs.begin();
          it!=vector_dofs.end(); ++it)
       {

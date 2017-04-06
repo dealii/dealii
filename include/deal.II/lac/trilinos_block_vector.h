@@ -502,7 +502,7 @@ namespace internal
  * @author Uwe Koecher, 2017
  */
 template <>
-struct is_serial_vector< TrilinosWrappers::BlockVector > : std_cxx11::true_type
+struct is_serial_vector< TrilinosWrappers::BlockVector > : std::true_type
 {
 };
 
@@ -513,7 +513,7 @@ struct is_serial_vector< TrilinosWrappers::BlockVector > : std_cxx11::true_type
  * @author Uwe Koecher, 2017
  */
 template <>
-struct is_serial_vector< TrilinosWrappers::MPI::BlockVector > : std_cxx11::false_type
+struct is_serial_vector< TrilinosWrappers::MPI::BlockVector > : std::false_type
 {
 };
 

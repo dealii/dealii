@@ -800,7 +800,7 @@ namespace Step44
     // materials are used in different regions of the domain, as well as the
     // inverse of the deformation gradient...
   private:
-    std_cxx11::shared_ptr< Material_Compressible_Neo_Hook_Three_Field<dim> > material;
+    std::shared_ptr< Material_Compressible_Neo_Hook_Three_Field<dim> > material;
 
     Tensor<2, dim> F_inv;
 
@@ -2111,14 +2111,14 @@ namespace Step44
     // non-constant.
     WorkStream::run(dof_handler_ref.begin_active(),
                     dof_handler_ref.end(),
-                    std_cxx11::bind(&Solid<dim>::assemble_system_tangent_one_cell,
-                                    this,
-                                    std_cxx11::_1,
-                                    std_cxx11::_2,
-                                    std_cxx11::_3),
-                    std_cxx11::bind(&Solid<dim>::copy_local_to_global_K,
-                                    this,
-                                    std_cxx11::_1),
+                    std::bind(&Solid<dim>::assemble_system_tangent_one_cell,
+                              this,
+                              std::placeholders::_1,
+                              std::placeholders::_2,
+                              std::placeholders::_3),
+                    std::bind(&Solid<dim>::copy_local_to_global_K,
+                              this,
+                              std::placeholders::_1),
                     scratch_data,
                     per_task_data);
 
@@ -2293,14 +2293,14 @@ namespace Step44
 
     WorkStream::run(dof_handler_ref.begin_active(),
                     dof_handler_ref.end(),
-                    std_cxx11::bind(&Solid<dim>::assemble_system_rhs_one_cell,
-                                    this,
-                                    std_cxx11::_1,
-                                    std_cxx11::_2,
-                                    std_cxx11::_3),
-                    std_cxx11::bind(&Solid<dim>::copy_local_to_global_rhs,
-                                    this,
-                                    std_cxx11::_1),
+                    std::bind(&Solid<dim>::assemble_system_rhs_one_cell,
+                              this,
+                              std::placeholders::_1,
+                              std::placeholders::_2,
+                              std::placeholders::_3),
+                    std::bind(&Solid<dim>::copy_local_to_global_rhs,
+                              this,
+                              std::placeholders::_1),
                     scratch_data,
                     per_task_data);
 

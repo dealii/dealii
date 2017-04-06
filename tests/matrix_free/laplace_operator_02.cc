@@ -141,7 +141,7 @@ void test ()
   //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
   //std::cout << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
-  std_cxx11::shared_ptr<MatrixFree<dim,number> > mf_data(new MatrixFree<dim,number> ());
+  std::shared_ptr<MatrixFree<dim,number> > mf_data(new MatrixFree<dim,number> ());
   {
     const QGauss<1> quad (fe_degree+1);
     typename MatrixFree<dim,number>::AdditionalData data;
@@ -152,8 +152,8 @@ void test ()
     mf_data->reinit (dof, constraints, quad, data);
   }
 
-  std_cxx11::shared_ptr<Table<2, VectorizedArray<number> > > coefficient;
-  coefficient = std_cxx11::make_shared<Table<2, VectorizedArray<number> > >();
+  std::shared_ptr<Table<2, VectorizedArray<number> > > coefficient;
+  coefficient = std::make_shared<Table<2, VectorizedArray<number> > >();
   {
     FEEvaluation<dim,fe_degree,fe_degree+1,1,number> fe_eval(*mf_data);
 

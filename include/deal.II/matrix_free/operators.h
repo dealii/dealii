@@ -41,7 +41,7 @@ namespace MatrixFreeOperators
     // workaroud for unifying non-block vector and block vector implementations
     // a non-block vector has one block and the only subblock is the vector itself
     template <typename VectorType>
-    typename std_cxx11::enable_if<IsBlockVector<VectorType>::value,
+    typename std::enable_if<IsBlockVector<VectorType>::value,
              unsigned int>::type
              n_blocks(const VectorType &vector)
     {
@@ -49,7 +49,7 @@ namespace MatrixFreeOperators
     }
 
     template <typename VectorType>
-    typename std_cxx11::enable_if<!IsBlockVector<VectorType>::value,
+    typename std::enable_if<!IsBlockVector<VectorType>::value,
              unsigned int>::type
              n_blocks(const VectorType &)
     {
@@ -57,7 +57,7 @@ namespace MatrixFreeOperators
     }
 
     template <typename VectorType>
-    typename std_cxx11::enable_if<IsBlockVector<VectorType>::value,
+    typename std::enable_if<IsBlockVector<VectorType>::value,
              typename VectorType::BlockType &>::type
              subblock(VectorType &vector, unsigned int block_no)
     {
@@ -65,7 +65,7 @@ namespace MatrixFreeOperators
     }
 
     template <typename VectorType>
-    typename std_cxx11::enable_if<IsBlockVector<VectorType>::value,
+    typename std::enable_if<IsBlockVector<VectorType>::value,
              const typename VectorType::BlockType &>::type
              subblock(const VectorType &vector, unsigned int block_no)
     {
@@ -74,7 +74,7 @@ namespace MatrixFreeOperators
     }
 
     template <typename VectorType>
-    typename std_cxx11::enable_if<!IsBlockVector<VectorType>::value,
+    typename std::enable_if<!IsBlockVector<VectorType>::value,
              VectorType &>::type
              subblock(VectorType &vector, unsigned int)
     {
@@ -82,7 +82,7 @@ namespace MatrixFreeOperators
     }
 
     template <typename VectorType>
-    typename std_cxx11::enable_if<!IsBlockVector<VectorType>::value,
+    typename std::enable_if<!IsBlockVector<VectorType>::value,
              const VectorType &>::type
              subblock(const VectorType &vector, unsigned int)
     {
@@ -90,7 +90,7 @@ namespace MatrixFreeOperators
     }
 
     template <typename VectorType>
-    typename std_cxx11::enable_if<IsBlockVector<VectorType>::value,
+    typename std::enable_if<IsBlockVector<VectorType>::value,
              void>::type
              collect_sizes(VectorType &vector)
     {
@@ -98,7 +98,7 @@ namespace MatrixFreeOperators
     }
 
     template <typename VectorType>
-    typename std_cxx11::enable_if<!IsBlockVector<VectorType>::value,
+    typename std::enable_if<!IsBlockVector<VectorType>::value,
              void>::type
              collect_sizes(const VectorType &)
     {}
@@ -206,7 +206,7 @@ namespace MatrixFreeOperators
      * column selection vector is empty, it is taken the same as the row
      * selection, defining a diagonal block.
      */
-    void initialize (std_cxx11::shared_ptr<const MatrixFree<dim,value_type> > data,
+    void initialize (std::shared_ptr<const MatrixFree<dim,value_type> > data,
                      const std::vector<unsigned int> &selected_row_blocks = std::vector<unsigned int>(),
                      const std::vector<unsigned int> &selected_column_blocks = std::vector<unsigned int>());
 
@@ -223,7 +223,7 @@ namespace MatrixFreeOperators
      * columns is used as opposed to the non-level initialization function. If
      * empty, all components are selected.
      */
-    void initialize (std_cxx11::shared_ptr<const MatrixFree<dim,value_type> > data,
+    void initialize (std::shared_ptr<const MatrixFree<dim,value_type> > data,
                      const MGConstrainedDoFs &mg_constrained_dofs,
                      const unsigned int level,
                      const std::vector<unsigned int> &selected_row_blocks = std::vector<unsigned int>());
@@ -243,7 +243,7 @@ namespace MatrixFreeOperators
      * empty, all components are selected.
      */
     void
-    initialize(std_cxx11::shared_ptr<const MatrixFree<dim, value_type> > data_,
+    initialize(std::shared_ptr<const MatrixFree<dim, value_type> > data_,
                const std::vector<MGConstrainedDoFs> &mg_constrained_dofs,
                const unsigned int level,
                const std::vector<unsigned int> &selected_row_blocks = std::vector<unsigned int>());
@@ -322,13 +322,13 @@ namespace MatrixFreeOperators
     /**
      * Get read access to the MatrixFree object stored with this operator.
      */
-    std_cxx11::shared_ptr<const MatrixFree<dim,value_type> >
+    std::shared_ptr<const MatrixFree<dim,value_type> >
     get_matrix_free () const;
 
     /**
      * Get read access to the inverse diagonal of this operator.
      */
-    const std_cxx11::shared_ptr<DiagonalMatrix<VectorType> > &
+    const std::shared_ptr<DiagonalMatrix<VectorType> > &
     get_matrix_diagonal_inverse() const;
 
     /**
@@ -365,13 +365,13 @@ namespace MatrixFreeOperators
     /**
      * MatrixFree object to be used with this operator.
      */
-    std_cxx11::shared_ptr<const MatrixFree<dim,value_type> > data;
+    std::shared_ptr<const MatrixFree<dim,value_type> > data;
 
     /**
      * A shared pointer to a diagonal matrix that stores the inverse of
      * diagonal elements as a vector.
      */
-    std_cxx11::shared_ptr<DiagonalMatrix<VectorType > > inverse_diagonal_entries;
+    std::shared_ptr<DiagonalMatrix<VectorType > > inverse_diagonal_entries;
 
     /**
      * A vector which defines the selection of sub-components of MatrixFree
@@ -675,8 +675,8 @@ namespace MatrixFreeOperators
      *
      * Such tables can be initialized by
      * @code
-     * std_cxx11::shared_ptr<Table<2, VectorizedArray<double> > > coefficient;
-     * coefficient = std_cxx11::make_shared<Table<2, VectorizedArray<double> > >();
+     * std::shared_ptr<Table<2, VectorizedArray<double> > > coefficient;
+     * coefficient = std::make_shared<Table<2, VectorizedArray<double> > >();
      * {
      *   FEEvaluation<dim,fe_degree,n_q_points_1d,1,double> fe_eval(mf_data);
      *   const unsigned int n_cells = mf_data.n_macro_cells();
@@ -705,7 +705,7 @@ namespace MatrixFreeOperators
      * of scope in user code and the clear() command or destructor of this class
      * will delete the table.
      */
-    void set_coefficient(const std_cxx11::shared_ptr<Table<2, VectorizedArray<value_type> > > &scalar_coefficient );
+    void set_coefficient(const std::shared_ptr<Table<2, VectorizedArray<value_type> > > &scalar_coefficient );
 
     virtual void clear();
 
@@ -715,7 +715,7 @@ namespace MatrixFreeOperators
      * The function will throw an error if coefficients are not previously set
      * by set_coefficient() function.
      */
-    std_cxx11::shared_ptr< Table<2, VectorizedArray<value_type> > > get_coefficient();
+    std::shared_ptr< Table<2, VectorizedArray<value_type> > > get_coefficient();
 
   private:
     /**
@@ -751,7 +751,7 @@ namespace MatrixFreeOperators
     /**
      * User-provided heterogeneity coefficient.
      */
-    std_cxx11::shared_ptr< Table<2, VectorizedArray<value_type> > > scalar_coefficient;
+    std::shared_ptr< Table<2, VectorizedArray<value_type> > > scalar_coefficient;
   };
 
 
@@ -967,7 +967,7 @@ namespace MatrixFreeOperators
   template <int dim, typename VectorType>
   void
   Base<dim,VectorType>::
-  initialize (std_cxx11::shared_ptr<const MatrixFree<dim,typename Base<dim,VectorType>::value_type> > data_,
+  initialize (std::shared_ptr<const MatrixFree<dim,typename Base<dim,VectorType>::value_type> > data_,
               const std::vector<unsigned int> &given_row_selection,
               const std::vector<unsigned int> &given_column_selection)
   {
@@ -1019,7 +1019,7 @@ namespace MatrixFreeOperators
   template <int dim, typename VectorType>
   void
   Base<dim,VectorType>::
-  initialize (std_cxx11::shared_ptr<const MatrixFree<dim,typename Base<dim,VectorType>::value_type> > data_,
+  initialize (std::shared_ptr<const MatrixFree<dim,typename Base<dim,VectorType>::value_type> > data_,
               const MGConstrainedDoFs         &mg_constrained_dofs,
               const unsigned int               level,
               const std::vector<unsigned int> &given_row_selection)
@@ -1033,7 +1033,7 @@ namespace MatrixFreeOperators
   template <int dim, typename VectorType>
   void
   Base<dim, VectorType>::
-  initialize (std_cxx11::shared_ptr<const MatrixFree<dim, value_type> > data_,
+  initialize (std::shared_ptr<const MatrixFree<dim, value_type> > data_,
               const std::vector<MGConstrainedDoFs> &mg_constrained_dofs,
               const unsigned int                    level,
               const std::vector<unsigned int>      &given_row_selection)
@@ -1354,7 +1354,7 @@ namespace MatrixFreeOperators
 
 
   template <int dim, typename VectorType>
-  std_cxx11::shared_ptr<const MatrixFree<dim,typename Base<dim,VectorType>::value_type> >
+  std::shared_ptr<const MatrixFree<dim,typename Base<dim,VectorType>::value_type> >
   Base<dim,VectorType>::get_matrix_free() const
   {
     return data;
@@ -1363,7 +1363,7 @@ namespace MatrixFreeOperators
 
 
   template <int dim, typename VectorType>
-  const std_cxx11::shared_ptr<DiagonalMatrix<VectorType> > &
+  const std::shared_ptr<DiagonalMatrix<VectorType> > &
   Base<dim,VectorType>::get_matrix_diagonal_inverse() const
   {
     Assert(inverse_diagonal_entries.get() != NULL &&
@@ -1572,7 +1572,7 @@ namespace MatrixFreeOperators
   template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename VectorType>
   void
   LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
-  set_coefficient(const std_cxx11::shared_ptr<Table<2, VectorizedArray<typename Base<dim,VectorType>::value_type> > > &scalar_coefficient_ )
+  set_coefficient(const std::shared_ptr<Table<2, VectorizedArray<typename Base<dim,VectorType>::value_type> > > &scalar_coefficient_ )
   {
     scalar_coefficient = scalar_coefficient_;
   }
@@ -1580,7 +1580,7 @@ namespace MatrixFreeOperators
 
 
   template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename VectorType>
-  std_cxx11::shared_ptr< Table<2, VectorizedArray< typename LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::value_type> > >
+  std::shared_ptr< Table<2, VectorizedArray< typename LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::value_type> > >
   LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
   get_coefficient()
   {

@@ -21,7 +21,6 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-#  include <deal.II/base/std_cxx11/shared_ptr.h>
 #  include <deal.II/base/subscriptor.h>
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/base/utilities.h>
@@ -34,6 +33,8 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include "Epetra_Map.h"
 #  include "Epetra_LocalMap.h"
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1094,7 +1095,7 @@ namespace internal
  * @author Uwe Koecher, 2017
  */
 template <>
-struct is_serial_vector< TrilinosWrappers::Vector > : std_cxx11::true_type
+struct is_serial_vector< TrilinosWrappers::Vector > : std::true_type
 {
 };
 
@@ -1105,7 +1106,7 @@ struct is_serial_vector< TrilinosWrappers::Vector > : std_cxx11::true_type
  * @author Uwe Koecher, 2017
  */
 template <>
-struct is_serial_vector< TrilinosWrappers::MPI::Vector > : std_cxx11::false_type
+struct is_serial_vector< TrilinosWrappers::MPI::Vector > : std::false_type
 {
 };
 

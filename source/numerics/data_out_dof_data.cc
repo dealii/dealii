@@ -53,7 +53,7 @@ namespace internal
                       const unsigned int n_subdivisions,
                       const std::vector<unsigned int> &n_postprocessor_outputs,
                       const Mapping<dim,spacedim> &mapping,
-                      const std::vector<std_cxx11::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
+                      const std::vector<std::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
                       const UpdateFlags update_flags,
                       const bool        use_face_values)
       :
@@ -206,7 +206,7 @@ namespace internal
     template <typename DoFHandlerType>
     void
     ParallelDataBase<dim,spacedim>::
-    reinit_all_fe_values(std::vector<std_cxx11::shared_ptr<DataEntryBase<DoFHandlerType> > > &dof_data,
+    reinit_all_fe_values(std::vector<std::shared_ptr<DataEntryBase<DoFHandlerType> > > &dof_data,
                          const typename dealii::Triangulation<dim,spacedim>::cell_iterator   &cell,
                          const unsigned int                                                   face)
     {
@@ -990,9 +990,9 @@ add_data_vector (const VectorType                         &vec,
     = new internal::DataOut::DataEntry<DoFHandlerType,VectorType>(dofs, &vec, names,
         data_component_interpretation);
   if (actual_type == type_dof_data)
-    dof_data.push_back (std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> >(new_entry));
+    dof_data.push_back (std::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> >(new_entry));
   else
-    cell_data.push_back (std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> >(new_entry));
+    cell_data.push_back (std::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> >(new_entry));
 }
 
 
@@ -1020,7 +1020,7 @@ add_data_vector (const VectorType                       &vec,
 
   internal::DataOut::DataEntryBase<DoFHandlerType> *new_entry
     = new internal::DataOut::DataEntry<DoFHandlerType,VectorType>(dofs, &vec, &data_postprocessor);
-  dof_data.push_back (std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> >(new_entry));
+  dof_data.push_back (std::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> >(new_entry));
 }
 
 
@@ -1043,7 +1043,7 @@ add_data_vector (const DoFHandlerType                   &dof_handler,
 
   internal::DataOut::DataEntryBase<DoFHandlerType> *new_entry
     = new internal::DataOut::DataEntry<DoFHandlerType,VectorType>(&dof_handler, &vec, &data_postprocessor);
-  dof_data.push_back (std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> >(new_entry));
+  dof_data.push_back (std::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> >(new_entry));
 }
 
 
@@ -1121,7 +1121,7 @@ add_data_vector
   internal::DataOut::DataEntryBase<DoFHandlerType> *new_entry
     = new internal::DataOut::DataEntry<DoFHandlerType,VectorType>(&dof_handler, &data, names,
         data_component_interpretation);
-  dof_data.push_back (std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> >(new_entry));
+  dof_data.push_back (std::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> >(new_entry));
 }
 
 
@@ -1186,7 +1186,7 @@ get_dataset_names () const
   // collect the names of dof
   // and cell data
   typedef
-  typename std::vector<std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> > >::const_iterator
+  typename std::vector<std::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> > >::const_iterator
   data_iterator;
 
   for (data_iterator  d=dof_data.begin();
@@ -1206,16 +1206,16 @@ get_dataset_names () const
 
 template <typename DoFHandlerType,
           int patch_dim, int patch_space_dim>
-std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >
+std::vector<std::tuple<unsigned int, unsigned int, std::string> >
 DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::get_vector_data_ranges () const
 {
-  std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >
+  std::vector<std::tuple<unsigned int, unsigned int, std::string> >
   ranges;
 
   // collect the ranges of dof
   // and cell data
   typedef
-  typename std::vector<std_cxx11::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> > >::const_iterator
+  typename std::vector<std::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> > >::const_iterator
   data_iterator;
 
   unsigned int output_component = 0;
@@ -1261,7 +1261,7 @@ DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::get_vector_data_range
 
           // finally add a corresponding
           // range
-          std_cxx11::tuple<unsigned int, unsigned int, std::string>
+          std::tuple<unsigned int, unsigned int, std::string>
           range (output_component,
                  output_component+patch_space_dim-1,
                  name);
@@ -1310,13 +1310,13 @@ DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::get_patches () const
 
 template <typename DoFHandlerType,
           int patch_dim, int patch_space_dim>
-std::vector<std_cxx11::shared_ptr<dealii::hp::FECollection<DoFHandlerType::dimension,
+std::vector<std::shared_ptr<dealii::hp::FECollection<DoFHandlerType::dimension,
     DoFHandlerType::space_dimension> > >
     DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::get_finite_elements() const
 {
   const unsigned int dhdim = DoFHandlerType::dimension;
   const unsigned int dhspacedim = DoFHandlerType::space_dimension;
-  std::vector<std_cxx11::shared_ptr<dealii::hp::FECollection<dhdim,dhspacedim> > >
+  std::vector<std::shared_ptr<dealii::hp::FECollection<dhdim,dhspacedim> > >
   finite_elements(this->dof_data.size());
   for (unsigned int i=0; i<this->dof_data.size(); ++i)
     {

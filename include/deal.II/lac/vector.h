@@ -1013,7 +1013,7 @@ protected:
    * For parallel loops with TBB, this member variable stores the affinity
    * information of loops.
    */
-  mutable std_cxx11::shared_ptr<parallel::internal::TBBPartitioner> thread_loop_partitioner;
+  mutable std::shared_ptr<parallel::internal::TBBPartitioner> thread_loop_partitioner;
 
   /**
    * Make all other vector types friends.
@@ -1440,7 +1440,7 @@ operator << (LogStream &os, const Vector<number> &v)
  * @author Uwe Koecher, 2017
  */
 template <typename Number>
-struct is_serial_vector< Vector<Number> > : std_cxx11::true_type
+struct is_serial_vector< Vector<Number> > : std::true_type
 {
 };
 

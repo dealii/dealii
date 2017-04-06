@@ -144,7 +144,7 @@ namespace OpenCASCADE
     tolerance(tolerance)
   {
     Assert(spacedim == 3, ExcNotImplemented());
-    Assert(std_cxx11::get<0>(count_elements(sh)) > 0,
+    Assert(std::get<0>(count_elements(sh)) > 0,
            ExcMessage("NormalToMeshProjectionBoundary needs a shape containing faces to operate."));
   }
 
@@ -172,12 +172,12 @@ namespace OpenCASCADE
       {
         for (unsigned int i=0; i<surrounding_points.size(); ++i)
           {
-            std_cxx11::tuple<Point<3>,  Tensor<1,3>, double, double>
+            std::tuple<Point<3>,  Tensor<1,3>, double, double>
             p_and_diff_forms =
               closest_point_and_differential_forms(sh,
                                                    surrounding_points[i],
                                                    tolerance);
-            average_normal += std_cxx11::get<1>(p_and_diff_forms);
+            average_normal += std::get<1>(p_and_diff_forms);
           }
 
         average_normal/=2.0;
@@ -333,13 +333,13 @@ namespace OpenCASCADE
   }
 
   template<>
-  std_cxx11::tuple<double, double, double, double>
+  std::tuple<double, double, double, double>
   NURBSPatchManifold<2, 3>::
   get_uv_bounds() const
   {
     Standard_Real umin, umax, vmin, vmax;
     BRepTools::UVBounds(face, umin, umax, vmin, vmax);
-    return std_cxx11::make_tuple(umin, umax, vmin, vmax);
+    return std::make_tuple(umin, umax, vmin, vmax);
   }
 
 // Explicit instantiations

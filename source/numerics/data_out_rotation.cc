@@ -54,7 +54,7 @@ namespace internal
                   const unsigned int n_patches_per_circle,
                   const std::vector<unsigned int> &n_postprocessor_outputs,
                   const Mapping<dim,spacedim> &mapping,
-                  const std::vector<std_cxx11::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
+                  const std::vector<std::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
                   const UpdateFlags update_flags)
       :
       internal::DataOut::
@@ -476,11 +476,11 @@ void DataOutRotation<dim,DoFHandlerType>::build_patches (const unsigned int n_pa
   // now build the patches in parallel
   WorkStream::run (&all_cells[0],
                    &all_cells[0]+all_cells.size(),
-                   std_cxx11::bind(&DataOutRotation<dim,DoFHandlerType>::build_one_patch,
-                                   this, std_cxx11::_1, std_cxx11::_2, std_cxx11::_3),
-                   std_cxx11::bind(&internal::DataOutRotation
-                                   ::append_patch_to_list<dim,space_dimension>,
-                                   std_cxx11::_1, std_cxx11::ref(this->patches)),
+                   std::bind(&DataOutRotation<dim,DoFHandlerType>::build_one_patch,
+                             this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3),
+                   std::bind(&internal::DataOutRotation
+                             ::append_patch_to_list<dim,space_dimension>,
+                             std::placeholders::_1, std::ref(this->patches)),
                    thread_data,
                    new_patches);
 }

@@ -257,13 +257,13 @@ protected:
      * A pointer to a structure to store the information for the pure $Q_1$
      * mapping that is, by default, used on all interior cells.
      */
-    std_cxx11::unique_ptr<typename MappingQGeneric<dim,spacedim>::InternalData> mapping_q1_data;
+    std::unique_ptr<typename MappingQGeneric<dim,spacedim>::InternalData> mapping_q1_data;
 
     /**
      * A pointer to a structure to store the information for the full $Q_p$
      * mapping that is, by default, used on all boundary cells.
      */
-    std_cxx11::unique_ptr<typename MappingQGeneric<dim,spacedim>::InternalData> mapping_qp_data;
+    std::unique_ptr<typename MappingQGeneric<dim,spacedim>::InternalData> mapping_qp_data;
   };
 
 protected:
@@ -352,7 +352,7 @@ protected:
    * the qp_mapping and q1_mapping variables point to the same underlying
    * object.
    */
-  std_cxx11::shared_ptr<const MappingQGeneric<dim,spacedim> > q1_mapping;
+  std::shared_ptr<const MappingQGeneric<dim,spacedim> > q1_mapping;
 
   /**
    * Pointer to a Q_p mapping. This mapping is used on boundary cells unless
@@ -368,7 +368,7 @@ protected:
    * the qp_mapping and q1_mapping variables point to the same underlying
    * object.
    */
-  std_cxx11::shared_ptr<const MappingQGeneric<dim,spacedim> > qp_mapping;
+  std::shared_ptr<const MappingQGeneric<dim,spacedim> > qp_mapping;
 };
 
 /*@}*/

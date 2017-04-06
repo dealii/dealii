@@ -15,7 +15,7 @@
 
 
 
-// test memory_consumption() on std_cxx11::array
+// test memory_consumption() on std::array
 
 #include "../tests.h"
 
@@ -29,7 +29,7 @@ int main()
   std::ofstream logfile("output");
   deallog.attach(logfile);
 
-  typedef std_cxx11::array<std_cxx11::array<int, 3>, 3> IntArray;
+  typedef std::array<std::array<int, 3>, 3> IntArray;
   deallog << dealii::MemoryConsumption::memory_consumption(IntArray()) << std::endl;
   deallog << sizeof(IntArray) << std::endl;
 }

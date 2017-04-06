@@ -159,7 +159,7 @@ namespace LinearAlgebra
                             const MPI_Comm  communicator)
     {
       // set up parallel partitioner with index sets and communicator
-      std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> new_partitioner
+      std::shared_ptr<const Utilities::MPI::Partitioner> new_partitioner
       (new Utilities::MPI::Partitioner (locally_owned_indices,
                                         ghost_indices, communicator));
       reinit (new_partitioner);
@@ -173,7 +173,7 @@ namespace LinearAlgebra
                             const MPI_Comm  communicator)
     {
       // set up parallel partitioner with index sets and communicator
-      std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> new_partitioner
+      std::shared_ptr<const Utilities::MPI::Partitioner> new_partitioner
       (new Utilities::MPI::Partitioner (locally_owned_indices,
                                         communicator));
       reinit (new_partitioner);
@@ -183,7 +183,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
-    Vector<Number>::reinit (const std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_in)
+    Vector<Number>::reinit (const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_in)
     {
       clear_mpi_requests();
       partitioner = partitioner_in;
@@ -290,7 +290,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     Vector<Number>::
-    Vector (const std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> &partitioner)
+    Vector (const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner)
       :
       allocated_size (0),
       val (0),
@@ -825,12 +825,12 @@ namespace LinearAlgebra
     void
     Vector<Number>::import(const ReadWriteVector<Number>                  &V,
                            VectorOperation::values                         operation,
-                           std_cxx11::shared_ptr<const CommunicationPatternBase> communication_pattern)
+                           std::shared_ptr<const CommunicationPatternBase> communication_pattern)
     {
       IndexSet locally_owned_elem = locally_owned_elements();
       // If no communication pattern is given, create one. Otherwise, use the
       // given one.
-      std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> comm_pattern;
+      std::shared_ptr<const Utilities::MPI::Partitioner> comm_pattern;
       if (communication_pattern.get() == NULL)
         {
           // Split the IndexSet of V in locally owned elements and ghost indices
@@ -846,7 +846,7 @@ namespace LinearAlgebra
       else
         {
           comm_pattern =
-            std_cxx11::dynamic_pointer_cast<const Utilities::MPI::Partitioner> (communication_pattern);
+            std::dynamic_pointer_cast<const Utilities::MPI::Partitioner> (communication_pattern);
           AssertThrow(comm_pattern != NULL,
                       ExcMessage("The communication pattern is not of type "
                                  "Utilities::MPI::Partitioner."));

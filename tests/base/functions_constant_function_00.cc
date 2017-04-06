@@ -19,7 +19,7 @@
 #include "../tests.h"
 #include <deal.II/base/function.h>
 #include <deal.II/lac/vector.h>
-#include <deal.II/base/std_cxx11/array.h>
+#include <array>
 #include <vector>
 
 #define MAX_DIM 3

@@ -161,7 +161,7 @@ namespace internal
     void parallel_for(Functor &functor,
                       size_type start,
                       size_type end,
-                      std_cxx11::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
+                      std::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
     {
 #ifdef DEAL_II_WITH_THREADS
       size_type vec_size = end-start;
@@ -173,7 +173,7 @@ namespace internal
           Assert(partitioner.get() != NULL,
                  ExcInternalError("Unexpected initialization of Vector that does "
                                   "not set the TBB partitioner to a usable state."));
-          std_cxx11::shared_ptr<tbb::affinity_partitioner> tbb_partitioner =
+          std::shared_ptr<tbb::affinity_partitioner> tbb_partitioner =
             partitioner->acquire_one_partitioner();
 
           TBBForFunctor<Functor> generic_functor(functor, start, end);
@@ -1255,7 +1255,7 @@ namespace internal
                           const size_type    start,
                           const size_type    end,
                           ResultType        &result,
-                          std_cxx11::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
+                          std::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
     {
 #ifdef DEAL_II_WITH_THREADS
       size_type vec_size = end-start;
@@ -1267,7 +1267,7 @@ namespace internal
           Assert(partitioner.get() != NULL,
                  ExcInternalError("Unexpected initialization of Vector that does "
                                   "not set the TBB partitioner to a usable state."));
-          std_cxx11::shared_ptr<tbb::affinity_partitioner> tbb_partitioner =
+          std::shared_ptr<tbb::affinity_partitioner> tbb_partitioner =
             partitioner->acquire_one_partitioner();
 
           TBBReduceFunctor<Operation,ResultType> generic_functor(op, start, end);

@@ -22,10 +22,11 @@
 #ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/base/subscriptor.h>
-#  include <deal.II/base/std_cxx11/shared_ptr.h>
 
 #  include <deal.II/lac/trilinos_vector_base.h>
 #  include <deal.II/lac/la_parallel_vector.h>
+
+#  include <memory>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  ifdef DEAL_II_WITH_MPI
@@ -224,7 +225,7 @@ namespace TrilinosWrappers
      * This is a pointer to the preconditioner object that is used when
      * applying the preconditioner.
      */
-    std_cxx11::shared_ptr<Epetra_Operator> preconditioner;
+    std::shared_ptr<Epetra_Operator> preconditioner;
 
     /**
      * Internal communication pattern in case the matrix needs to be copied
@@ -240,7 +241,7 @@ namespace TrilinosWrappers
      * Internal Trilinos map in case the matrix needs to be copied from
      * deal.II format.
      */
-    std_cxx11::shared_ptr<Epetra_Map>   vector_distributor;
+    std::shared_ptr<Epetra_Map>   vector_distributor;
   };
 
 
@@ -1604,7 +1605,7 @@ namespace TrilinosWrappers
     /**
      * A copy of the deal.II matrix into Trilinos format.
      */
-    std_cxx11::shared_ptr<SparseMatrix> trilinos_matrix;
+    std::shared_ptr<SparseMatrix> trilinos_matrix;
   };
 
 
@@ -1839,7 +1840,7 @@ namespace TrilinosWrappers
     /**
      * A copy of the deal.II matrix into Trilinos format.
      */
-    std_cxx11::shared_ptr<SparseMatrix> trilinos_matrix;
+    std::shared_ptr<SparseMatrix> trilinos_matrix;
   };
 #endif
 

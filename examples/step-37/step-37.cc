@@ -841,7 +841,7 @@ namespace Step37
         MatrixFree<dim,double>::AdditionalData::none;
       additional_data.mapping_update_flags = (update_gradients | update_JxW_values |
                                               update_quadrature_points);
-      std_cxx11::shared_ptr<MatrixFree<dim,double> >
+      std::shared_ptr<MatrixFree<dim,double> >
       system_mf_storage(new MatrixFree<dim,double>());
       system_mf_storage->reinit (dof_handler, constraints, QGauss<1>(fe.degree+1),
                                  additional_data);
@@ -891,7 +891,7 @@ namespace Step37
         additional_data.mapping_update_flags = (update_gradients | update_JxW_values |
                                                 update_quadrature_points);
         additional_data.level_mg_handler = level;
-        std_cxx11::shared_ptr<MatrixFree<dim,float> >
+        std::shared_ptr<MatrixFree<dim,float> >
         mg_mf_storage_level(new MatrixFree<dim,float>());
         mg_mf_storage_level->reinit(dof_handler, level_constraints,
                                     QGauss<1>(fe.degree+1), additional_data);

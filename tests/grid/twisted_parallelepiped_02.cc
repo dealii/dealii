@@ -21,9 +21,9 @@
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/std_cxx11/array.h>
 #include <deal.II/base/tensor.h>
 
+#include <array>
 #include <fstream>
 
 /*
@@ -36,7 +36,7 @@ void check_parallelepiped (std::ofstream &logfile)
 {
   // Data structure defining dim coordinates that make up a
   // parallelepiped.
-  std_cxx11::array<Tensor<1, dim>, dim> edges;
+  std::array<Tensor<1, dim>, dim> edges;
 
   switch (dim)
     {

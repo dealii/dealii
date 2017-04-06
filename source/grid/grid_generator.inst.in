@@ -47,7 +47,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     subdivided_parallelepiped<deal_II_dimension, deal_II_space_dimension>
     (Triangulation<deal_II_dimension, deal_II_space_dimension> &,
      const Point<deal_II_space_dimension> &,
-     const std_cxx11::array<Tensor<1,deal_II_space_dimension>,deal_II_dimension> &,
+     const std::array<Tensor<1,deal_II_space_dimension>,deal_II_dimension> &,
      const std::vector<unsigned int> &,
      const bool colorize);
 

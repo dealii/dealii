@@ -128,30 +128,30 @@ int main()
       //Attach all possible slots.
       solver_cg.connect_coefficients_slot(&output_coefficients);
       solver_cg.connect_condition_number_slot(
-        std_cxx11::bind(output_double_number,std_cxx11::_1,"Condition number: "),true);
+        std::bind(output_double_number,std::placeholders::_1,"Condition number: "),true);
       solver_cg.connect_condition_number_slot(
-        std_cxx11::bind(output_double_number,std_cxx11::_1,"Final condition number: "));
+        std::bind(output_double_number,std::placeholders::_1,"Final condition number: "));
       solver_cg.connect_eigenvalues_slot(
-        std_cxx11::bind(output_eigenvalues<double>,std_cxx11::_1,"Eigenvalues: "),true);
+        std::bind(output_eigenvalues<double>,std::placeholders::_1,"Eigenvalues: "),true);
       solver_cg.connect_eigenvalues_slot(
-        std_cxx11::bind(output_eigenvalues<double>,std_cxx11::_1,"Final Eigenvalues: "));
+        std::bind(output_eigenvalues<double>,std::placeholders::_1,"Final Eigenvalues: "));
       solver_cg.solve(A,u,f,PreconditionIdentity());
 
       u=0;
       SolverGMRES<> solver_gmres(solver_control);
       //Attach all possible slots.
       solver_gmres.connect_condition_number_slot(
-        std_cxx11::bind(output_double_number,std_cxx11::_1,"Condition number: "),true);
+        std::bind(output_double_number,std::placeholders::_1,"Condition number: "),true);
       solver_gmres.connect_condition_number_slot(
-        std_cxx11::bind(output_double_number,std_cxx11::_1,"Final condition number: "));
+        std::bind(output_double_number,std::placeholders::_1,"Final condition number: "));
       solver_gmres.connect_eigenvalues_slot(
-        std_cxx11::bind(output_eigenvalues<std::complex<double> >,std_cxx11::_1,"Eigenvalues: "),true);
+        std::bind(output_eigenvalues<std::complex<double> >,std::placeholders::_1,"Eigenvalues: "),true);
       solver_gmres.connect_eigenvalues_slot(
-        std_cxx11::bind(output_eigenvalues<std::complex<double> >,std_cxx11::_1,"Final Eigenvalues: "));
+        std::bind(output_eigenvalues<std::complex<double> >,std::placeholders::_1,"Final Eigenvalues: "));
       solver_gmres.connect_hessenberg_slot(
-        std_cxx11::bind(output_hessenberg_matrix<double>,std_cxx11::_1,"Hessenberg matrix: "),false);
+        std::bind(output_hessenberg_matrix<double>,std::placeholders::_1,"Hessenberg matrix: "),false);
       solver_gmres.connect_krylov_space_slot(
-        std_cxx11::bind(output_arnoldi_vectors_norms<double>,std_cxx11::_1,"Arnoldi vectors norms: "));
+        std::bind(output_arnoldi_vectors_norms<double>,std::placeholders::_1,"Arnoldi vectors norms: "));
       solver_gmres.solve(A,u,f,PreconditionIdentity());
     }
   catch (std::exception &e)

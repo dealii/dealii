@@ -29,7 +29,6 @@
 #  include <cmath>
 #  include <memory>
 
-#  include <deal.II/base/std_cxx11/shared_ptr.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_FECrsGraph.h>
@@ -146,7 +145,7 @@ namespace TrilinosWrappers
        * performance, we keep a shared pointer to these entries so that more
        * than one accessor can access this data if necessary.
        */
-      std_cxx11::shared_ptr<const std::vector<size_type> > colnum_cache;
+      std::shared_ptr<const std::vector<size_type> > colnum_cache;
 
       /**
        * Discard the old row caches (they may still be used by other
@@ -1143,14 +1142,14 @@ namespace TrilinosWrappers
      * Pointer to the user-supplied Epetra Trilinos mapping of the matrix
      * columns that assigns parts of the matrix to the individual processes.
      */
-    std_cxx11::shared_ptr<Epetra_Map> column_space_map;
+    std::shared_ptr<Epetra_Map> column_space_map;
 
     /**
      * A sparsity pattern object in Trilinos to be used for finite element
      * based problems which allows for adding non-local elements to the
      * pattern.
      */
-    std_cxx11::shared_ptr<Epetra_FECrsGraph> graph;
+    std::shared_ptr<Epetra_FECrsGraph> graph;
 
     /**
      * A sparsity pattern object for the non-local part of the sparsity
@@ -1158,7 +1157,7 @@ namespace TrilinosWrappers
      * when the particular constructor or reinit method with writable_rows
      * argument is set
      */
-    std_cxx11::shared_ptr<Epetra_CrsGraph> nonlocal_graph;
+    std::shared_ptr<Epetra_CrsGraph> nonlocal_graph;
 
     friend class TrilinosWrappers::SparseMatrix;
     friend class SparsityPatternIterators::Accessor;

@@ -111,7 +111,7 @@ namespace Step27
     hp::QCollection<dim-1>   face_quadrature_collection;
 
     hp::QCollection<dim> fourier_q_collection;
-    std_cxx11::shared_ptr<FESeries::Fourier<dim> > fourier;
+    std::shared_ptr<FESeries::Fourier<dim> > fourier;
     std::vector<double> ln_k;
     Table<dim,std::complex<double> > fourier_coefficients;
 
@@ -235,9 +235,9 @@ namespace Step27
       fourier_q_collection.push_back(quadrature);
 
     // Now we are ready to set-up the FESeries::Fourier object
-    fourier = std_cxx11::make_shared<FESeries::Fourier<dim> >(N,
-                                                              fe_collection,
-                                                              fourier_q_collection);
+    fourier = std::make_shared<FESeries::Fourier<dim> >(N,
+                                                        fe_collection,
+                                                        fourier_q_collection);
 
     // We need to resize the matrix of fourier coefficients according to the
     // number of modes N.
@@ -756,9 +756,9 @@ namespace Step27
         // k}|$ and thereby need to use VectorTools::Linfty_norm:
         std::pair<std::vector<unsigned int>, std::vector<double> > res =
           FESeries::process_coefficients<dim>(fourier_coefficients,
-                                              std_cxx11::bind(&LaplaceProblem<dim>::predicate,
-                                                              this,
-                                                              std_cxx11::_1),
+                                              std::bind(&LaplaceProblem<dim>::predicate,
+                                                        this,
+                                                        std::placeholders::_1),
                                               VectorTools::Linfty_norm);
 
         Assert (res.first.size() == res.second.size(),

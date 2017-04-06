@@ -19,8 +19,6 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_CXX11
-
 #  include <thread>
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx11
@@ -28,21 +26,6 @@ namespace std_cxx11
   using std::thread;
 }
 DEAL_II_NAMESPACE_CLOSE
-
-#else
-
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#  include <boost/thread.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
-
-DEAL_II_NAMESPACE_OPEN
-namespace std_cxx11
-{
-  using boost::thread;
-}
-DEAL_II_NAMESPACE_CLOSE
-
-#endif
 
 // then allow using the old namespace name instead of the new one
 DEAL_II_NAMESPACE_OPEN

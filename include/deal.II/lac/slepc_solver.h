@@ -21,8 +21,6 @@
 
 #ifdef DEAL_II_WITH_SLEPC
 
-#  include <deal.II/base/std_cxx11/shared_ptr.h>
-#  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/solver_control.h>
 #  include <deal.II/lac/petsc_matrix_base.h>
 #  include <deal.II/lac/slepc_spectral_transformation.h>
@@ -30,6 +28,8 @@
 #  include <petscconf.h>
 #  include <petscksp.h>
 #  include <slepceps.h>
+
+#  include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

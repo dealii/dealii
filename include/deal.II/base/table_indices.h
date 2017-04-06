@@ -19,10 +19,10 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/std_cxx11/iterator.h>
 
 #include <algorithm>
 #include <ostream>
+#include <iterator>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -238,7 +238,7 @@ inline
 void
 TableIndices<N>::sort ()
 {
-  std::sort(std_cxx11::begin(indices), std_cxx11::end(indices));
+  std::sort(std::begin(indices), std::end(indices));
 }
 
 

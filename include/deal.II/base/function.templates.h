@@ -639,7 +639,7 @@ ComponentSelectFunction<dim, Number>::memory_consumption () const
 
 template <int dim, typename Number>
 ScalarFunctionFromFunctionObject<dim, Number>::
-ScalarFunctionFromFunctionObject (const std_cxx11::function<Number (const Point<dim> &)> &function_object)
+ScalarFunctionFromFunctionObject (const std::function<Number (const Point<dim> &)> &function_object)
   :
   Function<dim, Number>(1),
   function_object (function_object)
@@ -663,7 +663,7 @@ ScalarFunctionFromFunctionObject<dim, Number>::value (const Point<dim> &p,
 template <int dim, typename Number>
 VectorFunctionFromScalarFunctionObject<dim, Number>::
 VectorFunctionFromScalarFunctionObject (
-  const std_cxx11::function<Number (const Point<dim> &)> &function_object,
+  const std::function<Number (const Point<dim> &)> &function_object,
   const unsigned int selected_component,
   const unsigned int n_components)
   :

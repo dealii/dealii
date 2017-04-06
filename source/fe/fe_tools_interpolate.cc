@@ -40,11 +40,11 @@
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/hp/dof_handler.h>
 
-#include <deal.II/base/std_cxx11/shared_ptr.h>
 
 #include <deal.II/base/index_set.h>
 
 #include <iostream>
+#include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -113,7 +113,7 @@ namespace FETools
     // that memory is released again
     std::map<const FiniteElement<dim,spacedim> *,
         std::map<const FiniteElement<dim,spacedim> *,
-        std_cxx11::shared_ptr<FullMatrix<double> > > >
+        std::shared_ptr<FullMatrix<double> > > >
         interpolation_matrices;
 
     typename DoFHandlerType1<dim,spacedim>::active_cell_iterator cell1 = dof1.begin_active(),
@@ -174,7 +174,7 @@ namespace FETools
           // there
           if (interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()].get() == 0)
             {
-              std_cxx11::shared_ptr<FullMatrix<double> >
+              std::shared_ptr<FullMatrix<double> >
               interpolation_matrix (new FullMatrix<double> (dofs_per_cell2,
                                                             dofs_per_cell1));
               interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()]
@@ -278,7 +278,7 @@ namespace FETools
     // dof1 to the back_interpolation
     // matrices
     std::map<const FiniteElement<dim> *,
-        std_cxx11::shared_ptr<FullMatrix<double> > > interpolation_matrices;
+        std::shared_ptr<FullMatrix<double> > > interpolation_matrices;
 
     for (; cell!=endc; ++cell)
       if ((cell->subdomain_id() == subdomain_id)
@@ -308,7 +308,7 @@ namespace FETools
           if (interpolation_matrices[&cell->get_fe()] == 0)
             {
               interpolation_matrices[&cell->get_fe()] =
-                std_cxx11::shared_ptr<FullMatrix<double> >
+                std::shared_ptr<FullMatrix<double> >
                 (new FullMatrix<double>(dofs_per_cell1, dofs_per_cell1));
               get_back_interpolation_matrix(cell->get_fe(), fe2,
                                             *interpolation_matrices[&cell->get_fe()]);

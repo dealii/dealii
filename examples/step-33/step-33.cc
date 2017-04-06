@@ -28,7 +28,6 @@
 #include <deal.II/base/function_parser.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/conditional_ostream.h>
-#include <deal.II/base/std_cxx11/array.h>
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
@@ -81,6 +80,7 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #include <fstream>
 #include <vector>
 #include <memory>
+#include <array>
 
 // To end this section, introduce everything in the dealii library into the
 // namespace into which the contents of this program will go:
@@ -220,7 +220,7 @@ namespace Step33
     template <typename InputVector>
     static
     void compute_flux_matrix (const InputVector &W,
-                              std_cxx11::array <std_cxx11::array
+                              std::array <std::array
                               <typename InputVector::value_type, dim>,
                               EulerEquations<dim>::n_components > &flux)
     {
@@ -264,12 +264,12 @@ namespace Step33
                                 const InputVector                  &Wplus,
                                 const InputVector                  &Wminus,
                                 const double                        alpha,
-                                std_cxx11::array
+                                std::array
                                 <typename InputVector::value_type, n_components>
                                 &normal_flux)
     {
-      std_cxx11::array
-      <std_cxx11::array <typename InputVector::value_type, dim>,
+      std::array
+      <std::array <typename InputVector::value_type, dim>,
       EulerEquations<dim>::n_components > iflux, oflux;
 
       compute_flux_matrix (Wplus, iflux);
@@ -298,7 +298,7 @@ namespace Step33
     template <typename InputVector>
     static
     void compute_forcing_vector (const InputVector &W,
-                                 std_cxx11::array
+                                 std::array
                                  <typename InputVector::value_type, n_components>
                                  &forcing)
     {
@@ -1763,16 +1763,16 @@ namespace Step33
     // later easily be computed from it:
 
     std::vector <
-    std_cxx11::array <std_cxx11::array <Sacado::Fad::DFad<double>, dim>, EulerEquations<dim>::n_components >
+    std::array <std::array <Sacado::Fad::DFad<double>, dim>, EulerEquations<dim>::n_components >
     > flux(n_q_points);
 
     std::vector <
-    std_cxx11::array <std_cxx11::array <double, dim>, EulerEquations<dim>::n_components >
+    std::array <std::array <double, dim>, EulerEquations<dim>::n_components >
     > flux_old(n_q_points);
 
-    std::vector < std_cxx11::array< Sacado::Fad::DFad<double>, EulerEquations<dim>::n_components> > forcing(n_q_points);
+    std::vector < std::array< Sacado::Fad::DFad<double>, EulerEquations<dim>::n_components> > forcing(n_q_points);
 
-    std::vector < std_cxx11::array< double, EulerEquations<dim>::n_components> > forcing_old(n_q_points);
+    std::vector < std::array< double, EulerEquations<dim>::n_components> > forcing_old(n_q_points);
 
     for (unsigned int q=0; q<n_q_points; ++q)
       {
@@ -2013,8 +2013,8 @@ namespace Step33
     // that does so, we also need to determine the Lax-Friedrich's stability
     // parameter:
 
-    std::vector< std_cxx11::array < Sacado::Fad::DFad<double>, EulerEquations<dim>::n_components> >  normal_fluxes(n_q_points);
-    std::vector< std_cxx11::array < double, EulerEquations<dim>::n_components> >  normal_fluxes_old(n_q_points);
+    std::vector< std::array < Sacado::Fad::DFad<double>, EulerEquations<dim>::n_components> >  normal_fluxes(n_q_points);
+    std::vector< std::array < double, EulerEquations<dim>::n_components> >  normal_fluxes_old(n_q_points);
 
     double alpha;
 

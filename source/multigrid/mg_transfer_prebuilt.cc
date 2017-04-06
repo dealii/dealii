@@ -153,9 +153,9 @@ void MGTransferPrebuilt<VectorType>::build_matrices
   for (unsigned int i=0; i<n_levels-1; ++i)
     {
       prolongation_sparsities.push_back
-      (std_cxx11::shared_ptr<typename internal::MatrixSelector<VectorType>::Sparsity> (new typename internal::MatrixSelector<VectorType>::Sparsity));
+      (std::shared_ptr<typename internal::MatrixSelector<VectorType>::Sparsity> (new typename internal::MatrixSelector<VectorType>::Sparsity));
       prolongation_matrices.push_back
-      (std_cxx11::shared_ptr<typename internal::MatrixSelector<VectorType>::Matrix> (new typename internal::MatrixSelector<VectorType>::Matrix));
+      (std::shared_ptr<typename internal::MatrixSelector<VectorType>::Matrix> (new typename internal::MatrixSelector<VectorType>::Matrix));
     }
 
   // two fields which will store the

@@ -281,7 +281,7 @@ public:
    * or because divergence has been detected).
    */
   boost::signals2::connection
-  connect_condition_number_slot(const std_cxx11::function<void (double)> &slot,
+  connect_condition_number_slot(const std::function<void (double)> &slot,
                                 const bool every_iteration=false);
 
   /**
@@ -292,7 +292,7 @@ public:
    */
   boost::signals2::connection
   connect_eigenvalues_slot(
-    const std_cxx11::function<void (const std::vector<std::complex<double> > &)> &slot,
+    const std::function<void (const std::vector<std::complex<double> > &)> &slot,
     const bool every_iteration=false);
 
   /**
@@ -304,7 +304,7 @@ public:
    */
   boost::signals2::connection
   connect_hessenberg_slot(
-    const std_cxx11::function<void (const FullMatrix<double> &)> &slot,
+    const std::function<void (const FullMatrix<double> &)> &slot,
     const bool every_iteration=true);
 
   /**
@@ -315,7 +315,7 @@ public:
    */
   boost::signals2::connection
   connect_krylov_space_slot(
-    const std_cxx11::function<void (const internal::SolverGMRES::TmpVectors<VectorType> &)> &slot);
+    const std::function<void (const internal::SolverGMRES::TmpVectors<VectorType> &)> &slot);
 
 
   DeclException1 (ExcTooFewTmpVectors,
@@ -1114,7 +1114,7 @@ SolverGMRES<VectorType>::solve (const MatrixType         &A,
 template<class VectorType>
 boost::signals2::connection
 SolverGMRES<VectorType>::connect_condition_number_slot
-(const std_cxx11::function<void(double)> &slot,
+(const std::function<void(double)> &slot,
  const bool every_iteration)
 {
   if (every_iteration)
@@ -1132,7 +1132,7 @@ SolverGMRES<VectorType>::connect_condition_number_slot
 template<class VectorType>
 boost::signals2::connection
 SolverGMRES<VectorType>::connect_eigenvalues_slot
-(const std_cxx11::function<void (const std::vector<std::complex<double> > &)> &slot,
+(const std::function<void (const std::vector<std::complex<double> > &)> &slot,
  const bool every_iteration)
 {
   if (every_iteration)
@@ -1150,7 +1150,7 @@ SolverGMRES<VectorType>::connect_eigenvalues_slot
 template<class VectorType>
 boost::signals2::connection
 SolverGMRES<VectorType>::connect_hessenberg_slot
-(const std_cxx11::function<void (const FullMatrix<double> &)> &slot,
+(const std::function<void (const FullMatrix<double> &)> &slot,
  const bool every_iteration)
 {
   if (every_iteration)
@@ -1168,7 +1168,7 @@ SolverGMRES<VectorType>::connect_hessenberg_slot
 template<class VectorType>
 boost::signals2::connection
 SolverGMRES<VectorType>::connect_krylov_space_slot
-(const std_cxx11::function<void (const internal::SolverGMRES::TmpVectors<VectorType> &)> &slot)
+(const std::function<void (const internal::SolverGMRES::TmpVectors<VectorType> &)> &slot)
 {
   return krylov_space_signal.connect(slot);
 }
