@@ -111,7 +111,7 @@ namespace parallel
           // loop over all cells in multigrid hierarchy and mark artificial:
           if (settings & construct_multigrid_hierarchy)
             {
-              std_cxx11::function<bool (const typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator &)> predicate
+              std::function<bool (const typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator &)> predicate
                 = IteratorFilters::LocallyOwnedLevelCell();
               for (unsigned int lvl=0; lvl<this->n_levels(); ++lvl)
                 {
