@@ -401,113 +401,6 @@ private:
 
 
 
-/**
- * Objects of this type represent the inverse of a matrix as computed
- * approximately by using the SolverRichardson iterative solver. In other
- * words, if you set up an object of the current type for a matrix $A$, then
- * calling the vmult() function with arguments $v,w$ amounts to setting
- * $w=A^{-1}v$ by solving the linear system $Aw=v$ using the Richardson solver
- * with a preconditioner that can be chosen. Similarly, this class allows to
- * also multiple with the transpose of the inverse (i.e., the inverse of the
- * transpose) using the function SolverRichardson::Tsolve().
- *
- * The functions vmult() and Tvmult() approximate the inverse iteratively
- * starting with the vector <tt>dst</tt>. Functions vmult_add() and
- * Tvmult_add() start the iteration with a zero vector. All of the matrix-
- * vector multiplication functions expect that the Richardson solver with the
- * given preconditioner actually converge. If the Richardson solver does not
- * converge within the specified number of iterations, the exception that will
- * result in the solver will simply be propagated to the caller of the member
- * function of the current class.
- *
- * @note A more powerful version of this class is provided by the
- * IterativeInverse class.
- *
- * @note Instantiations for this template are provided for <tt>@<float@> and
- * @<double@></tt>; others can be generated in application programs (see the
- * section on
- * @ref Instantiations
- * in the manual).
- *
- * @deprecated If deal.II was configured with C++11 support, use the
- * LinearOperator class instead, see the module on
- * @ref LAOperators "linear operators"
- * for further details.
- *
- * @author Guido Kanschat, 2005
- */
-template<typename VectorType>
-class InverseMatrixRichardson : public Subscriptor
-{
-public:
-  /**
-   * Constructor, initializing the solver with a control and memory object.
-   * The inverted matrix and the preconditioner are added in initialize().
-   */
-  InverseMatrixRichardson (SolverControl            &control,
-                           VectorMemory<VectorType> &mem);
-  /**
-   * Since we use two pointers, we must implement a destructor.
-   */
-  ~InverseMatrixRichardson();
-
-  /**
-   * Initialization function. Provide a solver object, a matrix, and another
-   * preconditioner for this.
-   */
-  template <typename MatrixType, typename PreconditionerType>
-  void initialize (const MatrixType &,
-                   const PreconditionerType &);
-
-  /**
-   * Access to the SolverControl object used by the solver.
-   */
-  SolverControl &control() const;
-  /**
-   * Execute solver.
-   */
-  void vmult (VectorType &, const VectorType &) const;
-
-  /**
-   * Execute solver.
-   */
-  void vmult_add (VectorType &, const VectorType &) const;
-
-  /**
-   * Execute transpose solver.
-   */
-  void Tvmult (VectorType &, const VectorType &) const;
-
-  /**
-   * Execute transpose solver.
-   */
-  void Tvmult_add (VectorType &, const VectorType &) const;
-
-private:
-  /**
-   * A reference to the provided VectorMemory object.
-   */
-  VectorMemory<VectorType> &mem;
-
-  /**
-   * The solver object.
-   */
-  mutable SolverRichardson<VectorType> solver;
-
-  /**
-   * The matrix in use.
-   */
-  PointerMatrixBase<VectorType> *matrix;
-
-  /**
-   * The preconditioner to use.
-   */
-  PointerMatrixBase<VectorType> *precondition;
-};
-
-
-
-
 /*@}*/
 //---------------------------------------------------------------------------
 
@@ -737,22 +630,6 @@ inline void
 MeanValueFilter::Tvmult_add(VectorType &, const VectorType &) const
 {
   Assert(false, ExcNotImplemented());
-}
-
-//-----------------------------------------------------------------------//
-
-template <typename VectorType>
-template <typename MatrixType, typename PreconditionerType>
-inline void
-InverseMatrixRichardson<VectorType>::initialize (const MatrixType &m,
-                                                 const PreconditionerType &p)
-{
-  if (matrix != 0)
-    delete matrix;
-  matrix = new PointerMatrix<MatrixType, VectorType>(&m);
-  if (precondition != 0)
-    delete precondition;
-  precondition = new PointerMatrix<PreconditionerType, VectorType>(&p);
 }
 
 
