@@ -129,11 +129,15 @@ SET(_doxygen_input
   ${CMAKE_CURRENT_SOURCE_DIR}/headers/
 )
 
+file(GLOB _changelog_files
+  ${CMAKE_SOURCE_DIR}/doc/news/*.h
+  )
+
 LIST(APPEND _doxygen_input
   ${CMAKE_SOURCE_DIR}/include/
   ${CMAKE_SOURCE_DIR}/source/
   ${CMAKE_BINARY_DIR}/include/
-  ${CMAKE_SOURCE_DIR}/doc/news/
+  ${_changelog_files}
   ${CMAKE_BINARY_DIR}/doc/news/
   ${CMAKE_CURRENT_BINARY_DIR}/tutorial/tutorial.h
   )
