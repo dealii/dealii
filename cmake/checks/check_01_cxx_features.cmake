@@ -325,9 +325,14 @@ RESET_CMAKE_REQUIRED()
 CHECK_CXX_SOURCE_COMPILES(
   "
   #include <memory>
-  int main()
+
+  #if __cplusplus < 201103L
+  #  error \"The compiler does not default to C++11 or newer.\"
+  #endif
+
+  auto main() -> int
   {
-    std::unique_ptr<int> p0;
+    auto p0 = std::unique_ptr<int>();
     auto p1 = std::move(p0);
   }
   "
