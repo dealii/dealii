@@ -123,39 +123,6 @@ FE_Q_Hierarchical<dim>::get_name () const
 }
 
 
-template <int dim>
-void
-FE_Q_Hierarchical<dim>::interpolate(
-  std::vector<double> &,
-  const std::vector<double> &) const
-{
-  // The default implementation assumes that the FE has a delta property,
-  // i.e., values at the support points equal the corresponding DoFs. This
-  // is obviously not the case here.
-  Assert (false, ExcNotImplemented());
-}
-
-
-template <int dim>
-void
-FE_Q_Hierarchical<dim>::interpolate(
-  std::vector<double> &,
-  const std::vector<Vector<double> > &,
-  unsigned int) const
-{
-  Assert (false, ExcNotImplemented());
-}
-
-
-template <int dim>
-void
-FE_Q_Hierarchical<dim>::interpolate(
-  std::vector<double> &,
-  const VectorSlice<const std::vector<std::vector<double> > > &) const
-{
-  Assert (false, ExcNotImplemented());
-}
-
 
 template <int dim>
 FiniteElement<dim> *
@@ -163,6 +130,8 @@ FE_Q_Hierarchical<dim>::clone() const
 {
   return new FE_Q_Hierarchical<dim>(*this);
 }
+
+
 
 template <int dim>
 void

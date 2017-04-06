@@ -1,0 +1,7 @@
+Removed: The FiniteElement::interpolate() function and all of its
+implementations in derived classes has been removed. It was
+previously already deprecated. Use
+FiniteElement::convert_generalized_support_point_values_to_nodal_values()
+instead.
+<br>
+(Wolfgang Bangerth, 2017/04/05)

@@ -105,34 +105,15 @@ template <int dim>
 void
 FE_RannacherTurek<dim>::
 convert_generalized_support_point_values_to_nodal_values(const std::vector<Vector<double> > &support_point_values,
-                                                         std::vector<double> &nodal_dofs) const
+                                                         std::vector<double> &nodal_values) const
 {
   AssertDimension(support_point_values.size(), this->generalized_support_points.size());
-  AssertDimension(nodal_dofs.size(), this->dofs_per_cell);
-
-  // extract component and call scalar version of this function
-  std::vector<double> scalar_values(support_point_values.size());
-  for (unsigned int q = 0; q < support_point_values.size(); ++q)
-    {
-      scalar_values[q] = support_point_values[q][0];
-    }
-  this->interpolate(nodal_dofs, scalar_values);
-}
-
-
-
-template <int dim>
-void FE_RannacherTurek<dim>::interpolate(
-  std::vector<double> &local_dofs,
-  const std::vector<double> &values) const
-{
-  AssertDimension(values.size(), this->generalized_support_points.size());
-  AssertDimension(local_dofs.size(), this->dofs_per_cell);
+  AssertDimension(nodal_values.size(), this->dofs_per_cell);
 
   const unsigned int q_points_per_face = this->weights.size();
-  std::fill(local_dofs.begin(), local_dofs.end(), 0.0);
+  std::fill(nodal_values.begin(), nodal_values.end(), 0.0);
 
-  std::vector<double>::const_iterator value = values.begin();
+  std::vector<Vector<double> >::const_iterator value = support_point_values.begin();
   for (unsigned int face = 0;
        face < dealii::GeometryInfo<dim>::faces_per_cell;
        ++face)
@@ -141,50 +122,10 @@ void FE_RannacherTurek<dim>::interpolate(
            q < q_points_per_face;
            ++q)
         {
-          local_dofs[face] += (*value) * this->weights[q];
+          nodal_values[face] += (*value)[0] * this->weights[q];
           ++value;
         }
     }
-}
-
-
-
-template <int dim>
-void FE_RannacherTurek<dim>::interpolate(
-  std::vector<double> &local_dofs,
-  const std::vector<Vector<double> > &values,
-  const unsigned int offset) const
-{
-  AssertDimension(values.size(), this->generalized_support_points.size());
-  AssertDimension(local_dofs.size(), this->dofs_per_cell);
-
-  // extract component at offset and call scalar version of this function
-  std::vector<double> scalar_values(values.size());
-  for (unsigned int q = 0; q < values.size(); ++q)
-    {
-      scalar_values[q] = values[q][offset];
-    }
-  this->interpolate(local_dofs, scalar_values);
-}
-
-
-
-template <int dim>
-void FE_RannacherTurek<dim>::interpolate(
-  std::vector<double> &local_dofs,
-  const VectorSlice<const std::vector<std::vector<double> > > &values) const
-{
-  AssertDimension(values.size(), 1);
-  AssertDimension(values[0].size(), this->generalized_support_points.size());
-  AssertDimension(local_dofs.size(), this->dofs_per_cell);
-
-  // convert data structure to use scalar version of this function
-  std::vector<double> scalar_values(values[0].size());
-  for (unsigned int q = 0; q < values[0].size(); ++q)
-    {
-      scalar_values[q] = values[0][q];
-    }
-  this->interpolate(local_dofs, scalar_values);
 }
 
 

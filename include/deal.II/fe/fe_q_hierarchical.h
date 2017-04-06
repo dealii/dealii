@@ -688,31 +688,6 @@ public:
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
   get_constant_modes () const;
 
-  /**
-   * This function is not implemented and throws an exception if called.
-   */
-  virtual
-  void interpolate(std::vector<double>       &local_dofs,
-                   const std::vector<double> &values) const DEAL_II_DEPRECATED;
-
-  /**
-   * This function is not implemented and throws an exception if called.
-   */
-  virtual
-  void
-  interpolate(std::vector<double>                &local_dofs,
-              const std::vector<Vector<double> > &values,
-              const unsigned int offset = 0) const DEAL_II_DEPRECATED;
-
-  /**
-   * This function is not implemented and throws an exception if called.
-   */
-  virtual
-  void
-  interpolate(std::vector<double> &local_dofs,
-              const VectorSlice<const std::vector<std::vector<double> > > &values) const DEAL_II_DEPRECATED;
-
-
 protected:
   /**
    * @p clone function instead of a copy constructor.

@@ -1601,6 +1601,7 @@ FE_Q_Base<PolynomialType,dim,spacedim>::get_constant_modes () const
 }
 
 
+
 // explicit instantiations
 #include "fe_q_base.inst"
 

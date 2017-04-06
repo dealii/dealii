@@ -78,16 +78,6 @@ public:
   convert_generalized_support_point_values_to_nodal_values (const std::vector<Vector<double> > &support_point_values,
                                                             std::vector<double>                &nodal_values) const;
 
-  virtual void interpolate(std::vector<double>                &local_dofs,
-                           const std::vector<double>          &values) const DEAL_II_DEPRECATED;
-
-  virtual void interpolate(std::vector<double>                &local_dofs,
-                           const std::vector<Vector<double> > &values,
-                           const unsigned int                  offset = 0) const DEAL_II_DEPRECATED;
-
-  virtual void interpolate(std::vector<double> &local_dofs,
-                           const VectorSlice<const std::vector<std::vector<double> > > &values) const DEAL_II_DEPRECATED;
-
 private:
   /**
    * Only for internal use. Its full name is @p get_dofs_per_object_vector

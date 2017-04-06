@@ -90,35 +90,6 @@ FE_DGVector<PolynomialType,dim,spacedim>::has_support_on_face
 }
 
 
-template <class PolynomialType, int dim, int spacedim>
-void
-FE_DGVector<PolynomialType,dim,spacedim>::interpolate
-(std::vector<double> &,
- const std::vector<double> &) const
-{
-  Assert(false, ExcNotImplemented());
-}
-
-
-template <class PolynomialType, int dim, int spacedim>
-void
-FE_DGVector<PolynomialType,dim,spacedim>::interpolate
-(std::vector<double> & /*local_dofs*/,
- const std::vector<Vector<double> > & /*values*/,
- const unsigned int /*offset*/) const
-{
-  Assert(false, ExcNotImplemented());
-}
-
-template <class PolynomialType, int dim, int spacedim>
-void
-FE_DGVector<PolynomialType,dim,spacedim>::interpolate
-(std::vector<double> & /*local_dofs*/,
- const VectorSlice<const std::vector<std::vector<double> > > & /*values*/) const
-{
-  Assert(false, ExcNotImplemented());
-}
-
 
 template <class PolynomialType, int dim, int spacedim>
 std::size_t
