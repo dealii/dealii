@@ -110,7 +110,7 @@ namespace PETScWrappers
         // convergence
         ierr = KSPSetConvergenceTest (solver_data->ksp, &convergence_test,
                                       reinterpret_cast<void *>(&solver_control),
-                                      PETSC_NULL);
+                                      nullptr);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
       }
 
@@ -228,7 +228,7 @@ namespace PETScWrappers
     // convergence
     ierr = KSPSetConvergenceTest (solver_data->ksp, &convergence_test,
                                   reinterpret_cast<void *>(&solver_control),
-                                  PETSC_NULL);
+                                  nullptr);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // set the command line options provided

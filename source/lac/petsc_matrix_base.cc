@@ -161,7 +161,7 @@ namespace PETScWrappers
     const PetscErrorCode ierr = MatZeroRowsIS(matrix, index_set, new_diag_value);
 #else
     const PetscErrorCode ierr = MatZeroRowsIS(matrix, index_set, new_diag_value,
-                                              PETSC_NULL, PETSC_NULL);
+                                              nullptr, nullptr);
 #endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 

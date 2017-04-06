@@ -1190,7 +1190,7 @@ namespace PETScWrappers
         PetscErrorCode ierr = VecGetOwnershipRange (vector, &begin, &end);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-        Vec locally_stored_elements = PETSC_NULL;
+        Vec locally_stored_elements = nullptr;
         ierr = VecGhostGetLocalForm(vector, &locally_stored_elements);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
