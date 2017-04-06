@@ -1619,9 +1619,9 @@ next_cell:
   template <class MeshType>
   std::vector<typename MeshType::cell_iterator>
   compute_cell_halo_layer_on_level
-  (const MeshType                                                             &mesh,
-   const std_cxx11::function<bool (const typename MeshType::cell_iterator &)> &predicate,
-   const unsigned int                                                         level)
+  (const MeshType                                                       &mesh,
+   const std::function<bool (const typename MeshType::cell_iterator &)> &predicate,
+   const unsigned int                                                    level)
   {
     std::vector<typename MeshType::cell_iterator> level_halo_layer;
     std::vector<bool> locally_active_vertices_on_level_subdomain (mesh.get_triangulation().n_vertices(),
