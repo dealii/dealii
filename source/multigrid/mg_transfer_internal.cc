@@ -114,7 +114,7 @@ namespace internal
               for (unsigned int i=0; i<dofs_per_cell; ++i)
                 {
                   // we need to ignore if the DoF is on a refinement edge (hanging node)
-                  if (mg_constrained_dofs != 0
+                  if (mg_constrained_dofs != nullptr
                       && mg_constrained_dofs->at_refinement_edge(level, level_dof_indices[i]))
                     continue;
                   types::global_dof_index global_idx = globally_relevant.index_within_set(global_dof_indices[i]);
@@ -151,7 +151,7 @@ namespace internal
       const dealii::parallel::distributed::Triangulation<dim,spacedim> *tria =
         (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
          (&mg_dof.get_triangulation()));
-      AssertThrow(send_data_temp.size()==0 || tria!=NULL, ExcMessage("parallel Multigrid only works with a distributed Triangulation!"));
+      AssertThrow(send_data_temp.size()==0 || tria!=nullptr, ExcMessage("parallel Multigrid only works with a distributed Triangulation!"));
 
 #ifdef DEAL_II_WITH_MPI
       if (tria)
@@ -201,7 +201,7 @@ namespace internal
                   }
                 else
                   {
-                    const int ierr = MPI_Isend(NULL, 0, MPI_BYTE, dest, 71,
+                    const int ierr = MPI_Isend(nullptr, 0, MPI_BYTE, dest, 71,
                                                tria->get_communicator(), &*requests.rbegin());
                     AssertThrowMPI(ierr);
                   }
@@ -223,7 +223,7 @@ namespace internal
 
                 if (len==0)
                   {
-                    ierr = MPI_Recv(NULL, 0, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
+                    ierr = MPI_Recv(nullptr, 0, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
                                     tria->get_communicator(), &status);
                     AssertThrowMPI(ierr);
                     continue;
@@ -596,7 +596,7 @@ namespace internal
 
                       // set Dirichlet boundary conditions (as a list of
                       // constrained DoFs) for the child
-                      if (mg_constrained_dofs != 0)
+                      if (mg_constrained_dofs != nullptr)
                         for (unsigned int i=0; i<mg_dof.get_fe().dofs_per_cell; ++i)
                           if (mg_constrained_dofs->is_boundary_index(level,
                                                                      local_dof_indices[elem_info.lexicographic_numbering[i]]))
@@ -632,7 +632,7 @@ namespace internal
                                          &global_level_dof_indices_l0[start_index]);
 
                   dirichlet_indices[0].push_back(std::vector<unsigned short>());
-                  if (mg_constrained_dofs != 0)
+                  if (mg_constrained_dofs != nullptr)
                     for (unsigned int i=0; i<mg_dof.get_fe().dofs_per_cell; ++i)
                       if (mg_constrained_dofs->is_boundary_index(0, local_dof_indices[elem_info.lexicographic_numbering[i]]))
                         dirichlet_indices[0].back().push_back(i);
@@ -665,7 +665,7 @@ namespace internal
           const parallel::Triangulation<dim,dim> *ptria =
             (dynamic_cast<const parallel::Triangulation<dim,dim>*> (&tria));
           const MPI_Comm communicator =
-            ptria != 0 ? ptria->get_communicator() : MPI_COMM_SELF;
+            ptria != nullptr ? ptria->get_communicator() : MPI_COMM_SELF;
 
           reinit_ghosted_vector (mg_dof.locally_owned_mg_dofs(level),
                                  ghosted_level_dofs, communicator,

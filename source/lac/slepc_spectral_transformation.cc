@@ -39,7 +39,7 @@ namespace SLEPcWrappers
 
   TransformationBase::~TransformationBase ()
   {
-    if (st!=NULL)
+    if (st!=nullptr)
       {
         const PetscErrorCode ierr = STDestroy(&st);
         AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));

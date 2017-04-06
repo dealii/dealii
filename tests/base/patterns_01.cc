@@ -37,7 +37,7 @@ int main()
   // started out with
   Patterns::Integer *pattern2 = Patterns::Integer::create (desc);
 
-  AssertThrow (pattern2 != 0, ExcInternalError());
+  AssertThrow (pattern2 != nullptr, ExcInternalError());
   AssertThrow (desc == pattern2->description(), ExcInternalError());
 
   deallog << desc << std::endl;

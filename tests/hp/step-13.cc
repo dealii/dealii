@@ -762,7 +762,7 @@ void solve_problem (const std::string &solver_name)
   const RightHandSide<dim> rhs_function;
   const Solution<dim>      boundary_values;
 
-  LaplaceSolver::Base<dim> *solver = 0;
+  LaplaceSolver::Base<dim> *solver = nullptr;
   if (solver_name == "global")
     solver = new LaplaceSolver::RefinementGlobal<dim> (triangulation, fe,
                                                        quadrature,

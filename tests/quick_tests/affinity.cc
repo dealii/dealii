@@ -60,7 +60,7 @@ bool getaffinity(unsigned int &bits_set,unsigned int &mask)
 int get_num_thread_env()
 {
   const char *penv = getenv ("DEAL_II_NUM_THREADS");
-  if (penv!=NULL)
+  if (penv!=nullptr)
     {
       int max_threads_env = -1;
       try

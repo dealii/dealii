@@ -55,8 +55,8 @@ SparseDirectUMFPACK::SparseDirectUMFPACK ()
   :
   _m (0),
   _n (0),
-  symbolic_decomposition (0),
-  numeric_decomposition (0),
+  symbolic_decomposition (nullptr),
+  numeric_decomposition (nullptr),
   control (UMFPACK_CONTROL)
 {
   umfpack_dl_defaults (&control[0]);
@@ -68,16 +68,16 @@ void
 SparseDirectUMFPACK::clear ()
 {
   // delete objects that haven't been deleted yet
-  if (symbolic_decomposition != 0)
+  if (symbolic_decomposition != nullptr)
     {
       umfpack_dl_free_symbolic (&symbolic_decomposition);
-      symbolic_decomposition = 0;
+      symbolic_decomposition = nullptr;
     }
 
-  if (numeric_decomposition != 0)
+  if (numeric_decomposition != nullptr)
     {
       umfpack_dl_free_numeric (&numeric_decomposition);
-      numeric_decomposition = 0;
+      numeric_decomposition = nullptr;
     }
 
   {
@@ -281,14 +281,14 @@ factorize (const Matrix &matrix)
   status = umfpack_dl_symbolic (N, N,
                                 &Ap[0], &Ai[0], &Ax[0],
                                 &symbolic_decomposition,
-                                &control[0], 0);
+                                &control[0], nullptr);
   AssertThrow (status == UMFPACK_OK,
                ExcUMFPACKError("umfpack_dl_symbolic", status));
 
   status = umfpack_dl_numeric (&Ap[0], &Ai[0], &Ax[0],
                                symbolic_decomposition,
                                &numeric_decomposition,
-                               &control[0], 0);
+                               &control[0], nullptr);
   AssertThrow (status == UMFPACK_OK,
                ExcUMFPACKError("umfpack_dl_numeric", status));
 
@@ -320,7 +320,7 @@ SparseDirectUMFPACK::solve (Vector<double> &rhs_and_solution,
                         &Ap[0], &Ai[0], &Ax[0],
                         rhs_and_solution.begin(), rhs.begin(),
                         numeric_decomposition,
-                        &control[0], 0);
+                        &control[0], nullptr);
   AssertThrow (status == UMFPACK_OK, ExcUMFPACKError("umfpack_dl_solve", status));
 }
 

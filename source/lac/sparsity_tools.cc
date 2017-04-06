@@ -120,15 +120,15 @@ namespace SparsityTools
     // Use recursive if the number of partitions is less than or equal to 8
     if (nparts <= 8)
       ierr = METIS_PartGraphRecursive(&n, &ncon, &int_rowstart[0], &int_colnums[0],
-                                      NULL, NULL, NULL,
-                                      &nparts,NULL,NULL,&options[0],
+                                      nullptr, nullptr, nullptr,
+                                      &nparts,nullptr,nullptr,&options[0],
                                       &dummy,&int_partition_indices[0]);
 
     // Otherwise use kway
     else
       ierr = METIS_PartGraphKway(&n, &ncon, &int_rowstart[0], &int_colnums[0],
-                                 NULL, NULL, NULL,
-                                 &nparts,NULL,NULL,&options[0],
+                                 nullptr, nullptr, nullptr,
+                                 &nparts,nullptr,nullptr,&options[0],
                                  &dummy,&int_partition_indices[0]);
 
     // If metis returns normally, an error code METIS_OK=1 is returned from

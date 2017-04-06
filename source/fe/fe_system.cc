@@ -62,7 +62,7 @@ FESystem<dim,spacedim>::InternalData::~InternalData()
     if (base_fe_datas[i])
       {
         delete base_fe_datas[i];
-        base_fe_datas[i] = 0;
+        base_fe_datas[i] = nullptr;
       }
 }
 
@@ -596,7 +596,7 @@ FESystem<dim,spacedim>::get_interpolation_matrix (
   typedef FiniteElement<dim,spacedim> FEL;
   AssertThrow ((x_source_fe.get_name().find ("FESystem<") == 0)
                ||
-               (dynamic_cast<const FESystem<dim,spacedim>*>(&x_source_fe) != 0),
+               (dynamic_cast<const FESystem<dim,spacedim>*>(&x_source_fe) != nullptr),
                typename FEL::
                ExcInterpolationNotImplemented());
 
@@ -1108,7 +1108,7 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<const InternalData *> (&fe_internal) != 0, ExcInternalError());
+  Assert (dynamic_cast<const InternalData *> (&fe_internal) != nullptr, ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
   // Either dim_1==dim
@@ -1141,8 +1141,8 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
 
         // fill_fe_face_values needs argument Quadrature<dim-1> for both cases
         // dim_1==dim-1 and dim_1=dim. Hence the following workaround
-        const Quadrature<dim>   *cell_quadrature = 0;
-        const Quadrature<dim-1> *face_quadrature = 0;
+        const Quadrature<dim>   *cell_quadrature = nullptr;
+        const Quadrature<dim-1> *face_quadrature = nullptr;
         const unsigned int n_q_points = quadrature.size();
 
         // static cast to the common base class of quadrature being either
@@ -1152,7 +1152,7 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
         if (face_no==invalid_face_number)
           {
             Assert(dim_1==dim, ExcDimensionMismatch(dim_1,dim));
-            Assert (dynamic_cast<const Quadrature<dim> *>(quadrature_base_pointer) != 0,
+            Assert (dynamic_cast<const Quadrature<dim> *>(quadrature_base_pointer) != nullptr,
                     ExcInternalError());
 
             cell_quadrature
@@ -1161,7 +1161,7 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
         else
           {
             Assert(dim_1==dim-1, ExcDimensionMismatch(dim_1,dim-1));
-            Assert (dynamic_cast<const Quadrature<dim-1> *>(quadrature_base_pointer) != 0,
+            Assert (dynamic_cast<const Quadrature<dim-1> *>(quadrature_base_pointer) != nullptr,
                     ExcInternalError());
 
             face_quadrature
@@ -1681,7 +1681,7 @@ get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
   typedef FiniteElement<dim,spacedim> FEL;
   AssertThrow ((x_source_fe.get_name().find ("FE_System<") == 0)
                ||
-               (dynamic_cast<const FESystem<dim,spacedim>*>(&x_source_fe) != 0),
+               (dynamic_cast<const FESystem<dim,spacedim>*>(&x_source_fe) != nullptr),
                typename FEL::
                ExcInterpolationNotImplemented());
 
@@ -1792,7 +1792,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
   typedef FiniteElement<dim,spacedim> FEL;
   AssertThrow ((x_source_fe.get_name().find ("FE_System<") == 0)
                ||
-               (dynamic_cast<const FESystem<dim,spacedim>*>(&x_source_fe) != 0),
+               (dynamic_cast<const FESystem<dim,spacedim>*>(&x_source_fe) != nullptr),
                typename FEL::
                ExcInterpolationNotImplemented());
 

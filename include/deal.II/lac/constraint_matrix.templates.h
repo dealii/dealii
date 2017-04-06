@@ -680,7 +680,7 @@ distribute_local_to_global (const Vector<LocalType>      &local_vector,
         // global dof index
         const size_type line_index = calculate_line_index (local_dof_indices_col[i]);
         const ConstraintLine *position =
-          lines_cache.size() <= line_index ? 0 : &lines[lines_cache[line_index]];
+          lines_cache.size() <= line_index ? nullptr : &lines[lines_cache[line_index]];
 
         // Gauss elimination of the matrix columns with the inhomogeneity.
         // Go through them one by one and again check whether they are
@@ -757,7 +757,7 @@ namespace internal
       const Epetra_MpiComm *mpi_comm
         = dynamic_cast<const Epetra_MpiComm *>(&vec.trilinos_vector().Comm());
 
-      Assert (mpi_comm != 0, ExcInternalError());
+      Assert (mpi_comm != nullptr, ExcInternalError());
       output.reinit (needed_elements, mpi_comm->GetMpiComm());
 #else
       output.reinit (needed_elements, MPI_COMM_WORLD);
@@ -2283,7 +2283,7 @@ ConstraintMatrix::distribute_local_to_global (
       vals.resize (n_actual_dofs);
     }
   else
-    Assert (sparse_matrix != 0, ExcInternalError());
+    Assert (sparse_matrix != nullptr, ExcInternalError());
 
   // now do the actual job. go through all the global rows that we will touch
   // and call resolve_matrix_row for each of those.
@@ -2512,7 +2512,7 @@ distribute_local_to_global (const FullMatrix<typename MatrixType::value_type>  &
                   SparseMatrix<number> *sparse_matrix
                     = dynamic_cast<SparseMatrix<number> *>(&global_matrix.block(block,
                                                            block_col));
-                  Assert (sparse_matrix != 0, ExcInternalError());
+                  Assert (sparse_matrix != nullptr, ExcInternalError());
                   internals::resolve_matrix_row (global_rows, i, start_block,
                                                  end_block, local_matrix, sparse_matrix);
                 }

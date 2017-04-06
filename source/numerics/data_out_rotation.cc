@@ -191,7 +191,7 @@ build_one_patch (const cell_iterator                                            
               const unsigned int n_components
                 = fe_patch_values.get_fe().n_components();
               const DataPostprocessor<dim> *postprocessor=this->dof_data[dataset]->postprocessor;
-              if (postprocessor != 0)
+              if (postprocessor != nullptr)
                 {
                   // we have to postprocess the
                   // data, so determine, which
@@ -407,7 +407,7 @@ void DataOutRotation<dim,DoFHandlerType>::build_patches (const unsigned int n_pa
   // Check consistency of redundant
   // template parameter
   Assert (dim==dimension, ExcDimensionMismatch(dim, dimension));
-  Assert (this->triangulation != 0,
+  Assert (this->triangulation != nullptr,
           Exceptions::DataOut::ExcNoTriangulationSelected());
 
   const unsigned int n_subdivisions = (nnnn_subdivisions != 0)

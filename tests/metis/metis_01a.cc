@@ -99,8 +99,8 @@ void partition (const SparsityPattern     &sparsity_pattern,
   // create
 
   ierr = METIS_PartGraphRecursive(&n, &ncon, &int_rowstart[0], &int_colnums[0],
-                                  NULL, NULL, NULL,
-                                  &nparts,NULL,NULL,&options[0],
+                                  nullptr, nullptr, nullptr,
+                                  &nparts,nullptr,nullptr,&options[0],
                                   &dummy,&int_partition_indices[0]);
 
   deallog << "METIS outputs:" << std::endl;

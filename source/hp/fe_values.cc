@@ -91,7 +91,7 @@ namespace internal
       // already have an object for
       // this particular combination
       // of indices
-      if (fe_values_table(present_fe_values_index).get() == 0)
+      if (fe_values_table(present_fe_values_index).get() == nullptr)
         fe_values_table(present_fe_values_index)
           =
             std::shared_ptr<FEValuesType>

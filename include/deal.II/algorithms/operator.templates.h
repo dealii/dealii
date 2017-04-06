@@ -32,7 +32,7 @@ namespace Algorithms
   OutputOperator<VectorType>::OutputOperator()
     :
     step (numbers::invalid_unsigned_int),
-    os(0)
+    os(nullptr)
   {}
 
   template <typename VectorType>
@@ -45,13 +45,13 @@ namespace Algorithms
   OutputOperator<VectorType> &
   OutputOperator<VectorType>::operator<< (const AnyData &vectors)
   {
-    if (os == 0)
+    if (os == nullptr)
       {
         deallog << "Step " << step << std::endl;
         for (unsigned int i=0; i<vectors.size(); ++i)
           {
             const VectorType *v = vectors.try_read_ptr<VectorType>(i);
-            if (v == 0) continue;
+            if (v == nullptr) continue;
             deallog << vectors.name(i);
             for (unsigned int j=0; j<v->size(); ++j)
               deallog << ' ' << (*v)(j);
@@ -65,7 +65,7 @@ namespace Algorithms
         for (unsigned int i=0; i<vectors.size(); ++i)
           {
             const VectorType *v = vectors.try_read_ptr<VectorType>(i);
-            if (v == 0) continue;
+            if (v == nullptr) continue;
             for (unsigned int j=0; j<v->size(); ++j)
               (*os) << ' ' << (*v)(j);
           }

@@ -44,7 +44,7 @@ check_this (const DoFHandler<dim> &dof_handler)
 
   // create sparsity pattern
   typename FunctionMap<dim>::type boundary_ids;
-  boundary_ids[0] = 0;
+  boundary_ids[0] = nullptr;
   SparsityPattern sp (dof_handler.n_boundary_dofs(boundary_ids),
                       dof_handler.max_couplings_between_dofs());
   DoFTools::make_boundary_sparsity_pattern (dof_handler, boundary_ids,

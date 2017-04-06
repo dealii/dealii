@@ -654,20 +654,20 @@ template<int dim, int spacedim>
 DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
   :
   tria(&tria, typeid(*this).name()),
-  selected_fe(0, typeid(*this).name()),
-  faces(NULL),
-  mg_faces (NULL)
+  selected_fe(nullptr, typeid(*this).name()),
+  faces(nullptr),
+  mg_faces (nullptr)
 {
   // decide whether we need a
   // sequential or a parallel
   // distributed policy
   if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*>
       (&tria)
-      != 0)
+      != nullptr)
     policy.reset (new internal::DoFHandler::Policy::ParallelShared<dim,spacedim>());
   else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
            (&tria)
-           == 0)
+           == nullptr)
     policy.reset (new internal::DoFHandler::Policy::Sequential<dim,spacedim>());
   else
     policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>());
@@ -677,10 +677,10 @@ DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
 template<int dim, int spacedim>
 DoFHandler<dim,spacedim>::DoFHandler ()
   :
-  tria(0, typeid(*this).name()),
-  selected_fe(0, typeid(*this).name()),
-  faces(NULL),
-  mg_faces (NULL)
+  tria(nullptr, typeid(*this).name()),
+  selected_fe(nullptr, typeid(*this).name()),
+  faces(nullptr),
+  mg_faces (nullptr)
 {}
 
 
@@ -699,7 +699,7 @@ DoFHandler<dim,spacedim>::initialize(
   const FiniteElement<dim,spacedim> &fe)
 {
   tria = &t;
-  faces = 0;
+  faces = nullptr;
   number_cache.n_global_dofs = 0;
 
   // decide whether we need a
@@ -707,11 +707,11 @@ DoFHandler<dim,spacedim>::initialize(
   // distributed policy
   if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*>
       (&t)
-      != 0)
+      != nullptr)
     policy.reset (new internal::DoFHandler::Policy::ParallelShared<dim,spacedim>());
   else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
            (&t)
-           == 0)
+           == nullptr)
     policy.reset (new internal::DoFHandler::Policy::Sequential<dim,spacedim>());
   else
     policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>());
@@ -1064,7 +1064,7 @@ DoFHandler<dim,spacedim>::memory_consumption () const
   for (unsigned int level = 0; level < mg_levels.size (); ++level)
     mem += mg_levels[level]->memory_consumption ();
 
-  if (mg_faces != 0)
+  if (mg_faces != nullptr)
     mem += MemoryConsumption::memory_consumption (*mg_faces);
 
   for (unsigned int i = 0; i < mg_vertex_dofs.size (); ++i)
@@ -1106,7 +1106,7 @@ void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim
   // only if this is a sequential
   // triangulation. it doesn't work
   // correctly yet if it is parallel
-  if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&*tria) == 0)
+  if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&*tria) == nullptr)
     block_info_object.initialize(*this, false, true);
 }
 
@@ -1140,7 +1140,7 @@ void DoFHandler<dim, spacedim>::distribute_mg_dofs (const FiniteElement<dim, spa
   // only if this is a sequential
   // triangulation. it doesn't work
   // correctly yet if it is parallel
-  if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&*tria) == 0)
+  if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&*tria) == nullptr)
     block_info_object.initialize (*this, true, false);
 }
 
@@ -1158,7 +1158,7 @@ void DoFHandler<dim, spacedim>::clear_mg_space ()
 
   mg_levels.clear ();
   delete mg_faces;
-  mg_faces = NULL;
+  mg_faces = nullptr;
 
   std::vector<MGVertexDoFs> tmp;
 
@@ -1180,7 +1180,7 @@ template<int dim, int spacedim>
 void DoFHandler<dim,spacedim>::clear ()
 {
   // release lock to old fe
-  selected_fe = 0;
+  selected_fe = nullptr;
 
   // release memory
   clear_space ();
@@ -1482,7 +1482,7 @@ void DoFHandler<dim,spacedim>::clear_space ()
   levels.resize (0);
 
   delete faces;
-  faces = 0;
+  faces = nullptr;
 
   std::vector<types::global_dof_index> tmp;
   std::swap (vertex_dofs, tmp);
@@ -1514,7 +1514,7 @@ void DoFHandler<dim, spacedim>::set_dof_index (const unsigned int obj_level, con
 
 
 template<int dim, int spacedim>
-DoFHandler<dim, spacedim>::MGVertexDoFs::MGVertexDoFs (): coarsest_level (numbers::invalid_unsigned_int), finest_level (0), indices (0), indices_offset (0)
+DoFHandler<dim, spacedim>::MGVertexDoFs::MGVertexDoFs (): coarsest_level (numbers::invalid_unsigned_int), finest_level (0), indices (nullptr), indices_offset (nullptr)
 {
 }
 
@@ -1529,16 +1529,16 @@ DoFHandler<dim, spacedim>::MGVertexDoFs::~MGVertexDoFs ()
 template<int dim, int spacedim>
 void DoFHandler<dim, spacedim>::MGVertexDoFs::init (const unsigned int cl, const unsigned int fl, const unsigned int dofs_per_vertex)
 {
-  if (indices != 0)
+  if (indices != nullptr)
     {
       delete[] indices;
-      indices = 0;
+      indices = nullptr;
     }
 
-  if (indices_offset != 0)
+  if (indices_offset != nullptr)
     {
       delete[] indices_offset;
-      indices_offset = 0;
+      indices_offset = nullptr;
     }
 
   coarsest_level = cl;
@@ -1551,13 +1551,13 @@ void DoFHandler<dim, spacedim>::MGVertexDoFs::init (const unsigned int cl, const
   const unsigned int n_indices = n_levels * dofs_per_vertex;
 
   indices = new types::global_dof_index[n_indices];
-  Assert (indices != 0, ExcNoMemory ());
+  Assert (indices != nullptr, ExcNoMemory ());
 
   for (unsigned int i = 0; i < n_indices; ++i)
     indices[i] = DoFHandler<dim, spacedim>::invalid_dof_index;
 
   indices_offset = new types::global_dof_index[n_levels];
-  Assert (indices != 0, ExcNoMemory ());
+  Assert (indices != nullptr, ExcNoMemory ());
 
   for (unsigned int i = 0; i < n_levels; ++i)
     indices_offset[i] = i * dofs_per_vertex;

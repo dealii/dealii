@@ -121,7 +121,7 @@ internal_reinit(const Mapping<dim>                          &mapping,
           const parallel::Triangulation<dim> *dist_tria =
             dynamic_cast<const parallel::Triangulation<dim>*>
             (&(dof_handler[0]->get_triangulation()));
-          size_info.communicator = dist_tria != 0 ?
+          size_info.communicator = dist_tria != nullptr ?
                                    dist_tria->get_communicator() :
                                    MPI_COMM_SELF;
           size_info.my_pid  =
@@ -255,7 +255,7 @@ internal_reinit(const Mapping<dim>                            &mapping,
           const parallel::Triangulation<dim> *dist_tria =
             dynamic_cast<const parallel::Triangulation<dim>*>
             (&(dof_handler[0]->get_triangulation()));
-          size_info.communicator = dist_tria != 0 ?
+          size_info.communicator = dist_tria != nullptr ?
                                    dist_tria->get_communicator() :
                                    MPI_COMM_SELF;
           size_info.my_pid  =
@@ -358,14 +358,14 @@ MatrixFree<dim, Number>::is_supported(const FiniteElement<dim, spacedim> &fe)
     return false;
 
   // then check of the base element is supported
-  if (dynamic_cast<const FE_Poly<TensorProductPolynomials<dim>,dim,spacedim>*>(fe_ptr)!=0)
+  if (dynamic_cast<const FE_Poly<TensorProductPolynomials<dim>,dim,spacedim>*>(fe_ptr)!=nullptr)
     return true;
   if (dynamic_cast<const FE_Poly<TensorProductPolynomials<dim,
-      Polynomials::PiecewisePolynomial<double> >,dim,spacedim>*>(fe_ptr)!=0)
+      Polynomials::PiecewisePolynomial<double> >,dim,spacedim>*>(fe_ptr)!=nullptr)
     return true;
-  if (dynamic_cast<const FE_DGP<dim, spacedim>*>(fe_ptr)!=0)
+  if (dynamic_cast<const FE_DGP<dim, spacedim>*>(fe_ptr)!=nullptr)
     return true;
-  if (dynamic_cast<const FE_Q_DG0<dim, spacedim>*>(fe_ptr)!=0)
+  if (dynamic_cast<const FE_Q_DG0<dim, spacedim>*>(fe_ptr)!=nullptr)
     return true;
 
   // if the base element is not in the above list it is not supported
@@ -430,7 +430,7 @@ initialize_dof_handlers (const std::vector<const DoFHandler<dim>*> &dof_handler,
       // For serial Triangulations always take all cells
       const unsigned int subdomain_id
         = (dynamic_cast<const parallel::Triangulation<dim> *>
-           (&dof_handler[0]->get_triangulation())!=0)
+           (&dof_handler[0]->get_triangulation())!=nullptr)
           ? my_pid : numbers::invalid_subdomain_id;
       for ( ; cell != end_cell; ++cell)
         internal::resolve_cell (cell, cell_level_index, subdomain_id);
@@ -488,7 +488,7 @@ initialize_dof_handlers (const std::vector<const hp::DoFHandler<dim>*> &dof_hand
   // For serial Triangulations always take all cells
   const unsigned int subdomain_id
     = (dynamic_cast<const parallel::Triangulation<dim> *>
-       (&dof_handler[0]->get_triangulation())!=0)
+       (&dof_handler[0]->get_triangulation())!=nullptr)
       ? my_pid : numbers::invalid_subdomain_id;
   for ( ; cell != end_cell; ++cell)
     internal::resolve_cell (cell, cell_level_index,
@@ -761,7 +761,7 @@ void MatrixFree<dim,Number>::initialize_indices
   constraint_pool_row_index.resize(1, 0);
   for (unsigned int i=0; i<constraints.size(); ++i)
     {
-      Assert(constraints[i] != 0, ExcInternalError());
+      Assert(constraints[i] != nullptr, ExcInternalError());
       constraint_pool_data.insert(constraint_pool_data.end(),
                                   constraints[i]->begin(),
                                   constraints[i]->end());

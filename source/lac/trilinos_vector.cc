@@ -240,7 +240,7 @@ namespace TrilinosWrappers
 #if defined(DEBUG) && defined(DEAL_II_WITH_MPI)
       const Epetra_MpiComm *comm_ptr
         = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()));
-      Assert (comm_ptr != 0, ExcInternalError());
+      Assert (comm_ptr != nullptr, ExcInternalError());
       const size_type n_elements_global
         = Utilities::MPI::sum (owned_elements.n_elements(), comm_ptr->Comm());
 
@@ -309,7 +309,7 @@ namespace TrilinosWrappers
 #ifdef DEAL_II_WITH_MPI
           const Epetra_MpiComm *my_comm = dynamic_cast<const Epetra_MpiComm *>(&vector->Comm());
           const Epetra_MpiComm *v_comm = dynamic_cast<const Epetra_MpiComm *>(&v.vector->Comm());
-          const bool same_communicators = my_comm != NULL && v_comm != NULL &&
+          const bool same_communicators = my_comm != nullptr && v_comm != nullptr &&
                                           my_comm->DataPtr() == v_comm->DataPtr();
 #else
           const bool same_communicators = true;
@@ -361,7 +361,7 @@ namespace TrilinosWrappers
 #if defined(DEBUG) && defined(DEAL_II_WITH_MPI)
       const Epetra_MpiComm *comm_ptr
         = dynamic_cast<const Epetra_MpiComm *>(&(v.vector->Comm()));
-      Assert (comm_ptr != 0, ExcInternalError());
+      Assert (comm_ptr != nullptr, ExcInternalError());
       const size_type n_elements_global
         = Utilities::MPI::sum (owned_elements.n_elements(), comm_ptr->Comm());
 
@@ -440,7 +440,7 @@ namespace TrilinosWrappers
 #if defined(DEBUG) && defined(DEAL_II_WITH_MPI)
       const Epetra_MpiComm *comm_ptr
         = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()));
-      Assert (comm_ptr != 0, ExcInternalError());
+      Assert (comm_ptr != nullptr, ExcInternalError());
       const size_type n_elements_global
         = Utilities::MPI::sum (owned_elements.n_elements(), comm_ptr->Comm());
 
@@ -503,7 +503,7 @@ namespace TrilinosWrappers
 #ifdef DEAL_II_WITH_MPI
       const Epetra_MpiComm *my_comm = dynamic_cast<const Epetra_MpiComm *>(&vector->Comm());
       const Epetra_MpiComm *v_comm = dynamic_cast<const Epetra_MpiComm *>(&v.vector->Comm());
-      const bool same_communicators = my_comm != NULL && v_comm != NULL &&
+      const bool same_communicators = my_comm != nullptr && v_comm != nullptr &&
                                       my_comm->DataPtr() == v_comm->DataPtr();
       // Need to ask MPI whether the communicators are the same. We would like
       // to use the following checks but currently we cannot make sure the
@@ -535,7 +535,7 @@ namespace TrilinosWrappers
       if (same_communicators && v.vector->Map().SameAs(vector->Map()))
         {
           *vector = *v.vector;
-          if (v.nonlocal_vector.get() != 0)
+          if (v.nonlocal_vector.get() != nullptr)
             nonlocal_vector.reset(new Epetra_MultiVector(v.nonlocal_vector->Map(), 1));
           last_action = Zero;
         }
@@ -558,7 +558,7 @@ namespace TrilinosWrappers
           owned_elements = v.owned_elements;
         }
 
-      if (v.nonlocal_vector.get() != 0)
+      if (v.nonlocal_vector.get() != nullptr)
         nonlocal_vector.reset(new Epetra_MultiVector(v.nonlocal_vector->Map(), 1));
 
       return *this;
@@ -744,7 +744,7 @@ namespace TrilinosWrappers
 #ifdef DEAL_II_WITH_MPI
         const Epetra_MpiComm *my_comm = dynamic_cast<const Epetra_MpiComm *>(&vector->Comm());
         const Epetra_MpiComm *v_comm = dynamic_cast<const Epetra_MpiComm *>(&v.vector->Comm());
-        const bool same_communicators = my_comm != NULL && v_comm != NULL &&
+        const bool same_communicators = my_comm != nullptr && v_comm != nullptr &&
                                         my_comm->DataPtr() == v_comm->DataPtr();
 #else
         const bool same_communicators = true;

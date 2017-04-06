@@ -150,7 +150,7 @@ void test ()
   };
 
   for (unsigned int i=0; i<sizeof(fe_list)/sizeof(fe_list[0]); ++i)
-    if (fe_list[i] != 0)
+    if (fe_list[i] != nullptr)
       {
         deallog << dim << "d, uniform grid, fe #" << i;
         check_element (tr, *fe_list[i]);

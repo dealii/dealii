@@ -114,7 +114,7 @@ namespace Algorithms
     src2.add<const double *>(&vtheta, "Theta");
     src2.merge(in);
 
-    if (output != 0)
+    if (output != nullptr)
       (*output) << 0U << out;
 
     for (unsigned int count = 1; d_explicit.time < control.final(); ++count)
@@ -138,7 +138,7 @@ namespace Algorithms
         (*op_explicit)(out1, src1);
         (*op_implicit)(out, src2);
 
-        if (output != 0 && control.print())
+        if (output != nullptr && control.print())
           (*output) << count << out;
 
         d_explicit.time = control.now();

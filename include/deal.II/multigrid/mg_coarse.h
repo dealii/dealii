@@ -245,7 +245,7 @@ public:
   /**
    * Constructor, taking the coarse grid matrix.
    */
-  MGCoarseGridHouseholder (const FullMatrix<number> *A = 0);
+  MGCoarseGridHouseholder (const FullMatrix<number> *A = nullptr);
 
   /**
    * Initialize for a new matrix.
@@ -308,13 +308,13 @@ private:
 /* ------------------ Functions for MGCoarseGridApplySmoother -----------*/
 template<class VectorType>
 MGCoarseGridApplySmoother<VectorType>::MGCoarseGridApplySmoother ()
-  : coarse_smooth(NULL)
+  : coarse_smooth((nullptr))
 {
 }
 
 template<class VectorType>
 MGCoarseGridApplySmoother<VectorType>::MGCoarseGridApplySmoother (const MGSmootherBase<VectorType> &coarse_smooth)
-  : coarse_smooth(NULL)
+  : coarse_smooth((nullptr))
 {
   initialize(coarse_smooth);
 }
@@ -397,13 +397,13 @@ void
 MGCoarseGridLACIteration<SolverType, VectorType>
 ::clear()
 {
-  solver = 0;
+  solver = nullptr;
   if (matrix)
     delete matrix;
-  matrix = 0;
+  matrix = nullptr;
   if (precondition)
     delete precondition;
-  precondition = 0;
+  precondition = nullptr;
 }
 
 
@@ -414,9 +414,9 @@ MGCoarseGridLACIteration<SolverType, VectorType>
               VectorType         &dst,
               const VectorType   &src) const
 {
-  Assert(solver!=0, ExcNotInitialized());
-  Assert(matrix!=0, ExcNotInitialized());
-  Assert(precondition!=0, ExcNotInitialized());
+  Assert(solver!=nullptr, ExcNotInitialized());
+  Assert(matrix!=nullptr, ExcNotInitialized());
+  Assert(precondition!=nullptr, ExcNotInitialized());
   solver->solve(*matrix, dst, src, *precondition);
 }
 
@@ -510,9 +510,9 @@ MGCoarseGridIterativeSolver<VectorType, SolverType, MatrixType, PreconditionerTy
               VectorType         &dst,
               const VectorType   &src) const
 {
-  Assert(solver!=0, ExcNotInitialized());
-  Assert(matrix!=0, ExcNotInitialized());
-  Assert(preconditioner!=0, ExcNotInitialized());
+  Assert(solver!=nullptr, ExcNotInitialized());
+  Assert(matrix!=nullptr, ExcNotInitialized());
+  Assert(preconditioner!=nullptr, ExcNotInitialized());
   solver->solve(*matrix, dst, src, *preconditioner);
 }
 
@@ -524,7 +524,7 @@ template<typename number, class VectorType>
 MGCoarseGridHouseholder<number, VectorType>::MGCoarseGridHouseholder
 (const FullMatrix<number> *A)
 {
-  if (A != 0) householder.initialize(*A);
+  if (A != nullptr) householder.initialize(*A);
 }
 
 

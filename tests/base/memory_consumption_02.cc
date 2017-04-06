@@ -32,6 +32,24 @@ struct EqualityWithSizeofTest
   }
 };
 
+
+template<typename T>
+struct EqualityWithSizeofTest<T *>
+{
+  EqualityWithSizeofTest()
+  {
+    T *t = nullptr;
+    deallog << (sizeof(t) == dealii::MemoryConsumption::memory_consumption(t))
+            << std::endl;
+
+    std::vector<T *> vector_test(42);
+    deallog << ((sizeof(std::vector<T *>) + vector_test.capacity()*sizeof(T *))
+                == dealii::MemoryConsumption::memory_consumption(vector_test))
+            << std::endl;
+  }
+};
+
+
 int main()
 {
   std::ofstream logfile("output");

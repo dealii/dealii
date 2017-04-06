@@ -235,7 +235,7 @@ namespace TrilinosWrappers
       {
         ML_Epetra::MultiLevelPreconditioner *multilevel_operator =
           dynamic_cast<ML_Epetra::MultiLevelPreconditioner *> (preconditioner.get());
-        Assert (multilevel_operator != 0,
+        Assert (multilevel_operator != nullptr,
                 ExcMessage ("Preconditioner setup failed."));
         multilevel_operator->PrintUnused(0);
       }
@@ -281,7 +281,7 @@ namespace TrilinosWrappers
     vector_distributor.reset (new Epetra_Map(static_cast<TrilinosWrappers::types::int_type>(n_rows),
                                              0, communicator));
 
-    if (trilinos_matrix.get() == 0)
+    if (trilinos_matrix.get() == nullptr)
       trilinos_matrix.reset (new SparseMatrix());
 
     trilinos_matrix->reinit (*vector_distributor, *vector_distributor,
@@ -317,7 +317,7 @@ namespace TrilinosWrappers
 
     // todo: find a way to read out ML's data
     // sizes
-    if (trilinos_matrix.get() != 0)
+    if (trilinos_matrix.get() != nullptr)
       memory += trilinos_matrix->memory_consumption();
     return memory;
   }

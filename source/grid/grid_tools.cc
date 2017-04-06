@@ -123,7 +123,7 @@ namespace GridTools
   {
     // get the degree of the mapping if possible. if not, just assume 1
     const unsigned int mapping_degree
-      = (dynamic_cast<const MappingQ<dim,spacedim>*>(&mapping) != 0 ?
+      = (dynamic_cast<const MappingQ<dim,spacedim>*>(&mapping) != nullptr ?
          dynamic_cast<const MappingQ<dim,spacedim>*>(&mapping)->get_degree() :
          1);
 
@@ -2124,7 +2124,7 @@ next_cell:
   {
     Assert ((dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
              (&triangulation)
-             == 0),
+             == nullptr),
             ExcMessage ("Objects of type parallel::distributed::Triangulation "
                         "are already partitioned implicitly and can not be "
                         "partitioned again explicitly."));
@@ -2164,7 +2164,7 @@ next_cell:
   {
     Assert ((dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
              (&triangulation)
-             == 0),
+             == nullptr),
             ExcMessage ("Objects of type parallel::distributed::Triangulation "
                         "are already partitioned implicitly and can not be "
                         "partitioned again explicitly."));
@@ -2238,7 +2238,7 @@ next_cell:
   {
     Assert ((dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
              (&triangulation)
-             == 0),
+             == nullptr),
             ExcMessage ("Objects of type parallel::distributed::Triangulation "
                         "are already partitioned implicitly and can not be "
                         "partitioned again explicitly."));
@@ -2810,7 +2810,7 @@ next_cell:
               Iterator::AccessorType::space_dimension>
               *manifold = (respect_manifold ?
                            &object->get_boundary() :
-                           0);
+                           nullptr);
 
         const unsigned int structdim = Iterator::AccessorType::structure_dimension;
         const unsigned int spacedim  = Iterator::AccessorType::space_dimension;

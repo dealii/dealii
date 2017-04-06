@@ -71,7 +71,7 @@ template<>
 Quadrature<0> &
 get_q_face <1>()
 {
-  Quadrature<0> *q = 0;
+  Quadrature<0> *q = nullptr;
   return *q;
 }
 
@@ -167,7 +167,7 @@ check ()
       Vector<float> this_error (tria.n_active_cells());
       KellyErrorEstimator<dim,spacedim>::estimate (mapping, dof, q_face, neumann_bc,
                                                    v, this_error,
-                                                   std::vector<bool>(), 0,
+                                                   std::vector<bool>(), nullptr,
                                                    MultithreadInfo::n_threads(),
                                                    subdomain);
       this_error *= scaling_factor;

@@ -104,7 +104,7 @@ namespace
   {
     // start from fe=1 as 0th is always non-enriched FE.
     for (unsigned int fe=1; fe < fes.size(); fe++)
-      if (dynamic_cast<const FE_Nothing<dim>*>(fes[fe]) == 0)
+      if (dynamic_cast<const FE_Nothing<dim>*>(fes[fe]) == nullptr)
         // this is not FE_Nothing => there will be enrichment
         return true;
 
@@ -118,7 +118,7 @@ FE_Enriched<dim,spacedim>::FE_Enriched (const FiniteElement<dim,spacedim> &fe_ba
   :
   FE_Enriched<dim,spacedim>(fe_base,
                             FE_Nothing<dim,spacedim>(fe_base.n_components(),true),
-                            NULL)
+                            nullptr)
 {
 }
 
@@ -285,7 +285,7 @@ FE_Enriched<dim,spacedim>::setup_data (std::unique_ptr<typename FiniteElement<di
                                        const UpdateFlags      flags,
                                        const Quadrature<dim_1> &quadrature) const
 {
-  Assert ((dynamic_cast<typename FESystem<dim,spacedim>::InternalData *> (fes_data.get()) != NULL),
+  Assert ((dynamic_cast<typename FESystem<dim,spacedim>::InternalData *> (fes_data.get()) != nullptr),
           ExcInternalError());
   typename FESystem<dim,spacedim>::InternalData *data_fesystem =
     static_cast<typename FESystem<dim,spacedim>::InternalData *> (fes_data.get());
@@ -461,7 +461,7 @@ FE_Enriched<dim,spacedim>::fill_fe_values (const typename Triangulation< dim, sp
                                            internal::FEValues::FiniteElementRelatedData< dim, spacedim > &output_data
                                           ) const
 {
-  Assert (dynamic_cast<const InternalData *> (&fe_internal) != NULL,
+  Assert (dynamic_cast<const InternalData *> (&fe_internal) != nullptr,
           ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
@@ -497,7 +497,7 @@ FE_Enriched<dim,spacedim>::fill_fe_face_values
  internal::FEValues::FiniteElementRelatedData< dim, spacedim > &output_data
 ) const
 {
-  Assert (dynamic_cast<const InternalData *> (&fe_internal) != NULL,
+  Assert (dynamic_cast<const InternalData *> (&fe_internal) != nullptr,
           ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
@@ -534,7 +534,7 @@ FE_Enriched<dim,spacedim>::fill_fe_subface_values
  internal::FEValues::FiniteElementRelatedData< dim, spacedim > &output_data
 ) const
 {
-  Assert (dynamic_cast<const InternalData *> (&fe_internal) != NULL,
+  Assert (dynamic_cast<const InternalData *> (&fe_internal) != nullptr,
           ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
@@ -656,7 +656,7 @@ FE_Enriched<dim,spacedim>::multiply_by_enrichment
                                    fe_data.enrichment[base_no].size()));
       for (unsigned int m=0; m < base_no_mult_local_enriched_dofs[base_no].size(); m++)
         {
-          Assert (enrichments[base_no-1][m](cell) !=NULL,
+          Assert (enrichments[base_no-1][m](cell) !=nullptr,
                   ExcMessage("The pointer to the enrichment function is NULL"));
 
           Assert (enrichments[base_no-1][m](cell)->n_components == 1,

@@ -167,7 +167,7 @@ namespace Threads
                                           const char *,
                                           void *)
   {
-    pthread_barrier_init (&barrier, 0, count);
+    pthread_barrier_init (&barrier, nullptr, count);
   }
 
 #else

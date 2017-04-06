@@ -86,7 +86,7 @@ namespace internal
       // see if we need to fill this
       // entry, or whether it already
       // exists
-      if (identities.get() == 0)
+      if (identities.get() == nullptr)
         {
           switch (structdim)
             {
@@ -543,7 +543,7 @@ namespace internal
 
           typedef DoFHandler<dim,spacedim> BaseClass;
 
-          Assert (dof_handler.finite_elements != 0,
+          Assert (dof_handler.finite_elements != nullptr,
                   typename BaseClass::ExcNoFESelected());
           Assert (dof_handler.finite_elements->size() > 0,
                   typename BaseClass::ExcNoFESelected());
@@ -672,7 +672,7 @@ namespace internal
 
           typedef DoFHandler<dim,spacedim> BaseClass;
 
-          Assert (dof_handler.finite_elements != 0,
+          Assert (dof_handler.finite_elements != nullptr,
                   typename BaseClass::ExcNoFESelected());
           Assert (dof_handler.finite_elements->size() > 0,
                   typename BaseClass::ExcNoFESelected());
@@ -1049,7 +1049,7 @@ namespace internal
 
           typedef DoFHandler<dim,spacedim> BaseClass;
 
-          Assert (dof_handler.finite_elements != 0,
+          Assert (dof_handler.finite_elements != nullptr,
                   typename BaseClass::ExcNoFESelected());
           Assert (dof_handler.finite_elements->size() > 0,
                   typename BaseClass::ExcNoFESelected());
@@ -1663,11 +1663,11 @@ namespace hp
   DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
     :
     tria(&tria, typeid(*this).name()),
-    faces (NULL)
+    faces (nullptr)
   {
     Assert ((dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
              (&tria)
-             == 0),
+             == nullptr),
             ExcMessage ("The given triangulation is parallel distributed but "
                         "this class does not currently support this."));
 
@@ -1812,7 +1812,7 @@ namespace hp
   template <>
   types::global_dof_index DoFHandler<1>::n_boundary_dofs () const
   {
-    Assert (finite_elements != 0, ExcNoFESelected());
+    Assert (finite_elements != nullptr, ExcNoFESelected());
 
     DoFHandler<1,1>::cell_iterator cell;
     types::global_dof_index n = 0;
@@ -1838,7 +1838,7 @@ namespace hp
   template <typename number>
   types::global_dof_index DoFHandler<1>::n_boundary_dofs (const std::map<types::boundary_id, const Function<1,number>*> &boundary_ids) const
   {
-    Assert (finite_elements != 0, ExcNoFESelected());
+    Assert (finite_elements != nullptr, ExcNoFESelected());
 
     // check that only boundary
     // indicators 0 and 1 are allowed
@@ -1877,7 +1877,7 @@ namespace hp
   template <>
   types::global_dof_index DoFHandler<1>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_ids) const
   {
-    Assert (finite_elements != 0, ExcNoFESelected());
+    Assert (finite_elements != nullptr, ExcNoFESelected());
 
     // check that only boundary
     // indicators 0 and 1 are allowed
@@ -1962,7 +1962,7 @@ namespace hp
   template<int dim, int spacedim>
   types::global_dof_index DoFHandler<dim,spacedim>::n_boundary_dofs () const
   {
-    Assert (finite_elements != 0, ExcNoFESelected());
+    Assert (finite_elements != nullptr, ExcNoFESelected());
 
     std::set<types::global_dof_index> boundary_dofs;
     std::vector<types::global_dof_index> dofs_on_face;
@@ -2001,7 +2001,7 @@ namespace hp
   types::global_dof_index
   DoFHandler<dim,spacedim>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_ids) const
   {
-    Assert (finite_elements != 0, ExcNoFESelected());
+    Assert (finite_elements != nullptr, ExcNoFESelected());
     Assert (boundary_ids.find (numbers::internal_face_boundary_id) == boundary_ids.end(),
             ExcInvalidBoundaryIndicator());
 
@@ -2687,7 +2687,7 @@ namespace hp
 
     if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim >*>
         (&this->get_triangulation())
-        == 0)
+        == nullptr)
       {
         number_cache.locally_owned_dofs
           = IndexSet (number_cache.n_global_dofs);
@@ -2735,7 +2735,7 @@ namespace hp
   void DoFHandler<dim,spacedim>::clear ()
   {
     // release lock to old fe
-    finite_elements = 0;
+    finite_elements = nullptr;
 
     // release memory
     clear_space ();
@@ -3097,7 +3097,7 @@ namespace hp
   unsigned int
   DoFHandler<dim, spacedim>::max_couplings_between_dofs () const
   {
-    Assert (finite_elements != 0, ExcNoFESelected());
+    Assert (finite_elements != nullptr, ExcNoFESelected());
     return dealii::internal::hp::DoFHandler::Implementation::max_couplings_between_dofs (*this);
   }
 
@@ -3107,7 +3107,7 @@ namespace hp
   unsigned int
   DoFHandler<dim,spacedim>::max_couplings_between_boundary_dofs () const
   {
-    Assert (finite_elements != 0, ExcNoFESelected());
+    Assert (finite_elements != nullptr, ExcNoFESelected());
 
     switch (dim)
       {
@@ -3267,7 +3267,7 @@ namespace hp
     // (besides, we would trip over
     // an assertion in
     // set_active_fe_index)
-    if (finite_elements != 0)
+    if (finite_elements != nullptr)
       {
         cell_iterator cell = begin(),
                       endc = end ();
@@ -3348,7 +3348,7 @@ namespace hp
       delete levels[i];
     levels.resize (0);
     delete faces;
-    faces = NULL;
+    faces = nullptr;
 
     {
       std::vector<types::global_dof_index> tmp;

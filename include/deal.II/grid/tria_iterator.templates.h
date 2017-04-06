@@ -37,7 +37,7 @@ template <typename Accessor>
 inline
 TriaRawIterator<Accessor>::TriaRawIterator ()
   :
-  accessor (0, -2, -2, 0)
+  accessor (nullptr, -2, -2, nullptr)
 {}
 
 
@@ -68,7 +68,7 @@ TriaRawIterator<Accessor>::TriaRawIterator (
   const TriaAccessorBase<Accessor::structure_dimension,Accessor::dimension,Accessor::space_dimension> &tria_accessor,
   const typename Accessor::AccessorData *local_data)
   :
-  accessor(0, -2, -2, local_data)
+  accessor(nullptr, -2, -2, local_data)
 {
   accessor.copy_from(tria_accessor);
 }

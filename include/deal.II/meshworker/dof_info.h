@@ -291,7 +291,7 @@ namespace MeshWorker
   DoFInfo<dim,spacedim,number>::get_indices(const DHCellIterator &c)
   {
     indices.resize(c->get_fe().dofs_per_cell);
-    if (block_info == 0 || block_info->local().size() == 0)
+    if (block_info == nullptr || block_info->local().size() == 0)
       c->get_active_or_mg_dof_indices(indices);
     else
       {

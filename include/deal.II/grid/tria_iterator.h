@@ -272,7 +272,7 @@ public:
   TriaRawIterator (const Triangulation<Accessor::dimension,Accessor::space_dimension> *parent,
                    const int level,
                    const int index,
-                   const typename AccessorType::AccessorData *local_data = 0);
+                   const typename AccessorType::AccessorData *local_data = nullptr);
 
   /**
    * This is a conversion operator (constructor) which takes another iterator
@@ -568,7 +568,7 @@ public:
   TriaIterator (const Triangulation<Accessor::dimension,Accessor::space_dimension> *parent,
                 const int                 level,
                 const int                 index,
-                const typename Accessor::AccessorData *local_data = 0);
+                const typename Accessor::AccessorData *local_data = nullptr);
 
   /**
    * Construct from an accessor of type OtherAccessor that is convertible to

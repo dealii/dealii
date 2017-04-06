@@ -868,7 +868,7 @@ template<typename MatrixType, typename inverse_type>
 inline bool
 PreconditionBlock<MatrixType, inverse_type>::empty () const
 {
-  if (A == 0)
+  if (A == nullptr)
     return true;
   return A->empty();
 }

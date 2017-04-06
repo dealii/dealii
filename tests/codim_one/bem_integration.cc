@@ -108,7 +108,7 @@ template <int dim>
 LaplaceKernelIntegration<dim>::~LaplaceKernelIntegration()
 {
   FEValues<dim,dim+1> *fp = fe_values;
-  fe_values = 0;
+  fe_values = nullptr;
   delete fp;
 }
 

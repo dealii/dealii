@@ -1032,7 +1032,7 @@ void
 PreconditionLU<number>::initialize(const LAPACKFullMatrix<number> &M)
 {
   matrix = &M;
-  mem = 0;
+  mem = nullptr;
 }
 
 
@@ -1071,7 +1071,7 @@ void
 PreconditionLU<number>::vmult(BlockVector<number> &dst,
                               const BlockVector<number> &src) const
 {
-  Assert(mem != 0, ExcNotInitialized());
+  Assert(mem != nullptr, ExcNotInitialized());
   Vector<number> *aux = mem->alloc();
   *aux = src;
   matrix->apply_lu_factorization(*aux, false);
@@ -1084,7 +1084,7 @@ void
 PreconditionLU<number>::Tvmult(BlockVector<number> &dst,
                                const BlockVector<number> &src) const
 {
-  Assert(mem != 0, ExcNotInitialized());
+  Assert(mem != nullptr, ExcNotInitialized());
   Vector<number> *aux = mem->alloc();
   *aux = src;
   matrix->apply_lu_factorization(*aux, true);

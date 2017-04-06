@@ -1305,7 +1305,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
-  Assert (dynamic_cast<const InternalData *> (&internal_data) != 0, ExcInternalError());
+  Assert (dynamic_cast<const InternalData *> (&internal_data) != nullptr, ExcInternalError());
   const InternalData &data = static_cast<const InternalData &> (internal_data);
 
   const unsigned int n_q_points=quadrature.size();
@@ -1485,7 +1485,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
-  Assert (dynamic_cast<const InternalData *> (&internal_data) != 0,
+  Assert (dynamic_cast<const InternalData *> (&internal_data) != nullptr,
           ExcInternalError());
   const InternalData &data = static_cast<const InternalData &> (internal_data);
 
@@ -1519,7 +1519,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
-  Assert (dynamic_cast<const InternalData *> (&internal_data) != 0,
+  Assert (dynamic_cast<const InternalData *> (&internal_data) != nullptr,
           ExcInternalError());
   const InternalData &data = static_cast<const InternalData &> (internal_data);
 
@@ -1552,7 +1552,7 @@ namespace
                    const ArrayView<Tensor<rank,spacedim> >                 &output)
   {
     AssertDimension (input.size(), output.size());
-    Assert ((dynamic_cast<const typename MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData *>(&mapping_data) != 0),
+    Assert ((dynamic_cast<const typename MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData *>(&mapping_data) != nullptr),
             ExcInternalError());
     const typename MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData
     &data = static_cast<const typename MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData &>(mapping_data);
@@ -1616,7 +1616,7 @@ namespace
   {
 
     AssertDimension (input.size(), output.size());
-    Assert ((dynamic_cast<const typename MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData *>(&mapping_data) != 0),
+    Assert ((dynamic_cast<const typename MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData *>(&mapping_data) != nullptr),
             ExcInternalError());
     const typename MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData
     &data = static_cast<const typename MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData &>(mapping_data);
@@ -1699,7 +1699,7 @@ transform (const ArrayView<const DerivativeForm<2, dim, spacedim> >  &input,
            const ArrayView<Tensor<3,spacedim> >                      &output) const
 {
   AssertDimension (input.size(), output.size());
-  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != nullptr,
           ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(mapping_data);
 
@@ -1978,7 +1978,7 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::update_internal_dofs
 (const typename Triangulation<dim,spacedim>::cell_iterator  &cell,
  const typename MappingFEField<dim, spacedim,VectorType,DoFHandlerType>::InternalData &data) const
 {
-  Assert(euler_dof_handler != 0, ExcMessage("euler_dof_handler is empty"));
+  Assert(euler_dof_handler != nullptr, ExcMessage("euler_dof_handler is empty"));
 
   typename DoFHandlerType::cell_iterator dof_cell(*cell, euler_dof_handler);
   Assert (dof_cell->active() == true, ExcInactiveCell());

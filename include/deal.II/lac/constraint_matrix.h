@@ -1567,7 +1567,7 @@ ConstraintMatrix::get_constraint_entries (const size_type line) const
   const size_type line_index = calculate_line_index(line);
   if (line_index >= lines_cache.size() ||
       lines_cache[line_index] == numbers::invalid_size_type)
-    return 0;
+    return nullptr;
   else
     return &lines[lines_cache[line_index]].entries;
 }
@@ -1785,7 +1785,7 @@ public:
    * derived from BlockMatrixBase<T>).
    */
   static const bool value = (sizeof(check_for_block_matrix
-                                    ((MatrixType *)0))
+                                    ((MatrixType *)nullptr))
                              ==
                              sizeof(yes_type));
 };

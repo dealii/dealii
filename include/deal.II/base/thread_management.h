@@ -192,8 +192,8 @@ namespace Threads
      * raises an exception if the <code>count</code> argument is one.
      */
     DummyBarrier (const unsigned int  count,
-                  const char         *name = 0,
-                  void               *arg  = 0);
+                  const char         *name = nullptr,
+                  void               *arg  = nullptr);
 
     /**
      * Wait for all threads to reach this point. Since there may only be one
@@ -416,8 +416,8 @@ namespace Threads
      * Constructor. Initialize the underlying POSIX barrier data structure.
      */
     PosixThreadBarrier (const unsigned int  count,
-                        const char         *name = 0,
-                        void               *arg  = 0);
+                        const char         *name = nullptr,
+                        void               *arg  = nullptr);
 
     /**
      * Destructor. Release all resources.
@@ -720,7 +720,7 @@ namespace Threads
     private:
       RT *value;
     public:
-      inline return_value () : value(0) {}
+      inline return_value () : value(nullptr) {}
 
       inline RT &get () const
       {
@@ -2782,7 +2782,7 @@ namespace Threads
           {
             internal::handle_unknown_exception ();
           }
-        return 0;
+        return nullptr;
       }
 
       /**
@@ -2900,7 +2900,7 @@ namespace Threads
     TaskDescriptor<RT>::TaskDescriptor (const std::function<RT ()> &function)
       :
       function (function),
-      task(NULL),
+      task((nullptr)),
       task_is_done (false)
     {}
 
@@ -2970,7 +2970,7 @@ namespace Threads
       // of the arena". rather, let's explicitly destroy the empty
       // task object. before that, make sure that the task has been
       // shut down, expressed by a zero reference count
-      AssertNothrow (task != 0, ExcInternalError());
+      AssertNothrow (task != nullptr, ExcInternalError());
       AssertNothrow (task->ref_count()==0, ExcInternalError());
       task->destroy (*task);
     }

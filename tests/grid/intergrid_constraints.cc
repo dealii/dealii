@@ -74,7 +74,7 @@ void check ()
                                         ?
                                         new FE_DGQ<dim>(2)
                                         :
-                                        0);
+                                        nullptr);
 
   // define composed finite
   // elements. to limit memory
@@ -231,7 +231,7 @@ void check ()
 
   delete fe_1;
   delete fe_2;
-  if (fe_dq_quadratic != 0)
+  if (fe_dq_quadratic != nullptr)
     delete fe_dq_quadratic;
 }
 

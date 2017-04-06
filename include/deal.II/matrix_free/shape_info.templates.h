@@ -95,18 +95,18 @@ namespace internal
         const FE_Q_DG0<dim> *fe_q_dg0 = dynamic_cast<const FE_Q_DG0<dim>*>(fe);
 
         element_type = tensor_general;
-        if (fe_poly != 0)
+        if (fe_poly != nullptr)
           scalar_lexicographic = fe_poly->get_poly_space_numbering_inverse();
-        else if (fe_poly_piece != 0)
+        else if (fe_poly_piece != nullptr)
           scalar_lexicographic = fe_poly_piece->get_poly_space_numbering_inverse();
-        else if (fe_dgp != 0)
+        else if (fe_dgp != nullptr)
           {
             scalar_lexicographic.resize(fe_dgp->dofs_per_cell);
             for (unsigned int i=0; i<fe_dgp->dofs_per_cell; ++i)
               scalar_lexicographic[i] = i;
             element_type = truncated_tensor;
           }
-        else if (fe_q_dg0 != 0)
+        else if (fe_q_dg0 != nullptr)
           {
             scalar_lexicographic = fe_q_dg0->get_poly_space_numbering_inverse();
             element_type = tensor_symmetric_plus_dg0;

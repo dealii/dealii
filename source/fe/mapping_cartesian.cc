@@ -344,7 +344,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 {
   // convert data object to internal data for this class. fails with
   // an exception if that is not possible
-  Assert (dynamic_cast<const InternalData *> (&internal_data) != 0, ExcInternalError());
+  Assert (dynamic_cast<const InternalData *> (&internal_data) != nullptr, ExcInternalError());
   const InternalData &data = static_cast<const InternalData &> (internal_data);
 
   std::vector<Tensor<1,dim> > dummy;
@@ -440,7 +440,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<const InternalData *> (&internal_data) != 0,
+  Assert (dynamic_cast<const InternalData *> (&internal_data) != nullptr,
           ExcInternalError());
   const InternalData &data = static_cast<const InternalData &> (internal_data);
 
@@ -528,7 +528,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 {
   // convert data object to internal data for this class. fails with
   // an exception if that is not possible
-  Assert (dynamic_cast<const InternalData *> (&internal_data) != 0, ExcInternalError());
+  Assert (dynamic_cast<const InternalData *> (&internal_data) != nullptr, ExcInternalError());
   const InternalData &data = static_cast<const InternalData &> (internal_data);
 
   compute_fill (cell, face_no, subface_no, CellSimilarity::none,
@@ -622,7 +622,7 @@ transform (const ArrayView<const Tensor<1,dim> >                  &input,
            const ArrayView<Tensor<1,spacedim> >                   &output) const
 {
   AssertDimension (input.size(), output.size());
-  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != nullptr,
           ExcInternalError());
   const InternalData &data = static_cast<const InternalData &> (mapping_data);
 
@@ -677,7 +677,7 @@ transform (const ArrayView<const DerivativeForm<1, dim,spacedim> > &input,
            const ArrayView<Tensor<2,spacedim> >                    &output) const
 {
   AssertDimension (input.size(), output.size());
-  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != nullptr,
           ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(mapping_data);
 
@@ -779,7 +779,7 @@ transform (const ArrayView<const Tensor<2, dim> >                 &input,
 {
 
   AssertDimension (input.size(), output.size());
-  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != nullptr,
           ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(mapping_data);
 
@@ -880,7 +880,7 @@ transform (const ArrayView<const  DerivativeForm<2, dim, spacedim> > &input,
 {
 
   AssertDimension (input.size(), output.size());
-  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != nullptr,
           ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(mapping_data);
 
@@ -918,7 +918,7 @@ transform (const ArrayView<const  Tensor<3,dim> >                 &input,
 {
 
   AssertDimension (input.size(), output.size());
-  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != nullptr,
           ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(mapping_data);
 

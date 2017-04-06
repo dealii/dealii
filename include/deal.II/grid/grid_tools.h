@@ -351,7 +351,7 @@ namespace GridTools
   template <int dim>
   void laplace_transform (const std::map<unsigned int,Point<dim> > &new_points,
                           Triangulation<dim> &tria,
-                          const Function<dim,double> *coefficient = 0,
+                          const Function<dim,double> *coefficient = nullptr,
                           const bool solve_for_absolute_positions = false);
 
   /**

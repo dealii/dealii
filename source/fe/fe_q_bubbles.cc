@@ -77,7 +77,7 @@ namespace FE_Q_Bubbles_Helper
           Assert(false, ExcInternalError());
         }
 
-      Assert(q_fine.get() != NULL, ExcInternalError());
+      Assert(q_fine.get() != nullptr, ExcInternalError());
       const unsigned int nq = q_fine->size();
 
       // loop over all possible refinement cases
@@ -370,7 +370,7 @@ get_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
 
   AssertThrow ((x_source_fe.get_name().find ("FE_Q_Bubbles<") == 0)
                ||
-               (dynamic_cast<const FEQBUBBLES *>(&x_source_fe) != 0)
+               (dynamic_cast<const FEQBUBBLES *>(&x_source_fe) != nullptr)
                ,
                typename FEL::
                ExcInterpolationNotImplemented());

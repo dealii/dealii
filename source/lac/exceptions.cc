@@ -41,8 +41,8 @@ namespace LACExceptions
     // statically allocated description of the current error message.
     const char *petsc_message;
     const PetscErrorCode ierr = PetscErrorMessage (error_code, &petsc_message,
-                                                   /*specific=*/NULL);
-    if (ierr == 0 && petsc_message != NULL)
+                                                   /*specific=*/nullptr);
+    if (ierr == 0 && petsc_message != nullptr)
       {
         out << "The description of the error provided by PETSc is \""
             << petsc_message

@@ -740,7 +740,7 @@ namespace DataPostprocessorInputs
            ExcMessage ("You are trying to access the cell associated with a "
                        "DataPostprocessorInputs::Scalar object for which no cell has "
                        "been set."));
-    Assert(boost::any_cast<typename DoFHandlerType::cell_iterator>(&cell) != 0,
+    Assert(boost::any_cast<typename DoFHandlerType::cell_iterator>(&cell) != nullptr,
            ExcMessage ("You are trying to access the cell associated with a "
                        "DataPostprocessorInputs::Scalar with a DoFHandler type that "
                        "is different from the type with which it has been set. For "

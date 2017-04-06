@@ -1466,7 +1466,7 @@ namespace Step13
 
     // Create a solver object of the kind indicated by the argument to this
     // function. If the name is not recognized, throw an exception!
-    LaplaceSolver::Base<dim> *solver = 0;
+    LaplaceSolver::Base<dim> *solver = nullptr;
     if (solver_name == "global")
       solver = new LaplaceSolver::RefinementGlobal<dim> (triangulation, fe,
                                                          quadrature,

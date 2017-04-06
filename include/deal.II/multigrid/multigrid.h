@@ -468,8 +468,8 @@ Multigrid<VectorType>::Multigrid (const DoFHandler<dim>              &mg_dof_han
   transfer(&transfer, typeid(*this).name()),
   pre_smooth(&pre_smooth, typeid(*this).name()),
   post_smooth(&post_smooth, typeid(*this).name()),
-  edge_down(0, typeid(*this).name()),
-  edge_up(0, typeid(*this).name()),
+  edge_down(nullptr, typeid(*this).name()),
+  edge_up(nullptr, typeid(*this).name()),
   debug(0)
 {
   const unsigned int dof_handler_max_level
@@ -500,10 +500,10 @@ Multigrid<VectorType>::Multigrid (const MGMatrixBase<VectorType>        &matrix,
   transfer(&transfer, typeid(*this).name()),
   pre_smooth(&pre_smooth, typeid(*this).name()),
   post_smooth(&post_smooth, typeid(*this).name()),
-  edge_out(0, typeid(*this).name()),
-  edge_in(0, typeid(*this).name()),
-  edge_down(0, typeid(*this).name()),
-  edge_up(0, typeid(*this).name()),
+  edge_out(nullptr, typeid(*this).name()),
+  edge_in(nullptr, typeid(*this).name()),
+  edge_down(nullptr, typeid(*this).name()),
+  edge_up(nullptr, typeid(*this).name()),
   debug(0)
 {
   if (max_level == numbers::invalid_unsigned_int)
@@ -597,7 +597,7 @@ PreconditionMG<dim, VectorType, TRANSFER>::get_mpi_communicator() const
   // so it should be a safe bet to use it to query MPI communicator:
   const Triangulation<dim> &tria = dof_handler->get_triangulation();
   const parallel::distributed::Triangulation<dim> *ptria = dynamic_cast<const parallel::distributed::Triangulation<dim> *>(&tria);
-  Assert (ptria != NULL, ExcInternalError());
+  Assert (ptria != nullptr, ExcInternalError());
   return ptria->get_communicator ();
 }
 

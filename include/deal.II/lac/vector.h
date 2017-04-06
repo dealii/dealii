@@ -864,7 +864,7 @@ public:
    *
    * This function is deprecated.
    */
-  void print (const char *format = 0) const DEAL_II_DEPRECATED;
+  void print (const char *format = nullptr) const DEAL_II_DEPRECATED;
 
   /**
    * Print to a stream. @p precision denotes the desired precision with which
@@ -1073,7 +1073,7 @@ Vector<Number>::Vector ()
   :
   vec_size(0),
   max_vec_size(0),
-  val(0)
+  val(nullptr)
 {
   reinit(0);
 }
@@ -1086,7 +1086,7 @@ Vector<Number>::Vector (const InputIterator first, const InputIterator last)
   :
   vec_size (0),
   max_vec_size (0),
-  val (0)
+  val (nullptr)
 {
   // allocate memory. do not initialize it, as we will copy over to it in a
   // second
@@ -1102,7 +1102,7 @@ Vector<Number>::Vector (const size_type n)
   :
   vec_size(0),
   max_vec_size(0),
-  val(0)
+  val(nullptr)
 {
   reinit (n, false);
 }
@@ -1116,7 +1116,7 @@ Vector<Number>::~Vector ()
   if (val)
     {
       deallocate();
-      val=0;
+      val=nullptr;
     }
 }
 

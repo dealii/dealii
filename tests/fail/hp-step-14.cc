@@ -2013,7 +2013,7 @@ void Framework<dim>::run (const ProblemDescription &descriptor)
   const hp::QCollection<dim>   quadrature(QGauss<dim>(descriptor.dual_fe_degree+1));
   const hp::QCollection<dim-1> face_quadrature(QGauss<dim-1>(descriptor.dual_fe_degree+1));
 
-  LaplaceSolver::Base<dim> *solver = 0;
+  LaplaceSolver::Base<dim> *solver = nullptr;
   switch (descriptor.refinement_criterion)
     {
     case ProblemDescription::dual_weighted_error_estimator:
@@ -2100,7 +2100,7 @@ void Framework<dim>::run (const ProblemDescription &descriptor)
 
   deallog << std::endl;
   delete solver;
-  solver = 0;
+  solver = nullptr;
 }
 
 

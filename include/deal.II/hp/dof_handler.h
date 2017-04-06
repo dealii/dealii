@@ -1042,7 +1042,7 @@ namespace hp
   const hp::FECollection<dim,spacedim> &
   DoFHandler<dim,spacedim>::get_fe () const
   {
-    Assert (finite_elements != 0,
+    Assert (finite_elements != nullptr,
             ExcMessage ("No finite element collection is associated with "
                         "this DoFHandler"));
     return *finite_elements;

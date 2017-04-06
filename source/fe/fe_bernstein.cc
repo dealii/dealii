@@ -181,7 +181,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
           Assert (std::fabs(sum-1) < eps, ExcInternalError());
         }
     }
-  else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe) != 0)
+  else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe) != nullptr)
     {
       // nothing to do here, the FE_Nothing has no degrees of freedom anyway
     }
@@ -208,13 +208,13 @@ FE_Bernstein<dim,spacedim>::hp_vertex_dof_identities (const FiniteElement<dim,sp
   // or if the other one is an FE_Nothing. in the first case, there should be
   // exactly one single DoF of each FE at a vertex, and they should have
   // identical value
-  if (dynamic_cast<const FE_Bernstein<dim,spacedim>*>(&fe_other) != 0)
+  if (dynamic_cast<const FE_Bernstein<dim,spacedim>*>(&fe_other) != nullptr)
     {
       return
         std::vector<std::pair<unsigned int, unsigned int> >
         (1, std::make_pair (0U, 0U));
     }
-  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != 0)
+  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != nullptr)
     {
       // the FE_Nothing has no degrees of freedom, so there are no
       // equivalencies to be recorded

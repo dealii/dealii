@@ -108,7 +108,7 @@ check ()
                       rhs_function, rhs_ref);
   constraints.condense(matrix_ref, rhs_ref);
 
-  const Function<dim> *const dummy = 0;
+  const Function<dim> *const dummy = nullptr;
   MatrixTools::create_mass_matrix (mapping, dof, quadrature, matrix,
                                    rhs_function, rhs, dummy, constraints);
 

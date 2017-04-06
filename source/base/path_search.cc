@@ -135,7 +135,7 @@ PathSearch::find (const std::string &filename,
           deallog << "PathSearch[" << cls << "] trying "
                   << real_name << std::endl;
         FILE *fp = fopen(real_name.c_str(), open_mode);
-        if (fp != 0)
+        if (fp != nullptr)
           {
             if (debug > 0)
               deallog << "PathSearch[" << cls << "] opened "
@@ -154,7 +154,7 @@ PathSearch::find (const std::string &filename,
             deallog << "PathSearch[" << cls << "] trying "
                     << real_name << std::endl;
           FILE *fp = fopen(real_name.c_str(), open_mode);
-          if (fp != 0)
+          if (fp != nullptr)
             {
               if (debug > 0)
                 deallog << "PathSearch[" << cls << "] opened "

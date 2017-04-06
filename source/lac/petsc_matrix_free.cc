@@ -182,8 +182,8 @@ namespace PETScWrappers
 // a given PETSc Vec* object without allocating new memory
 // and without taking ownership of the Vec*
 
-    VectorBase  *x = 0;
-    VectorBase  *y = 0;
+    VectorBase  *x = nullptr;
+    VectorBase  *y = nullptr;
     // because we do not know,
     // if dst and src are sequential
     // or distributed vectors,

@@ -82,7 +82,7 @@ namespace internal
                     x_fe_values[i] = x_fe_values[j];
                     break;
                   }
-              if (x_fe_values[i].get() == 0)
+              if (x_fe_values[i].get() == nullptr)
                 x_fe_values[i].reset(new dealii::hp::FEValues<dim,spacedim>
                                      (this->mapping_collection,
                                       *this->finite_elements[i],
@@ -107,7 +107,7 @@ namespace internal
                     x_fe_face_values[i] = x_fe_face_values[j];
                     break;
                   }
-              if (x_fe_face_values[i].get() == 0)
+              if (x_fe_face_values[i].get() == nullptr)
                 x_fe_face_values[i].reset(new dealii::hp::FEFaceValues<dim,spacedim>
                                           (this->mapping_collection,
                                            *this->finite_elements[i],
@@ -166,7 +166,7 @@ namespace internal
                     x_fe_values[i] = x_fe_values[j];
                     break;
                   }
-              if (x_fe_values[i].get() == 0)
+              if (x_fe_values[i].get() == nullptr)
                 x_fe_values[i].reset(new dealii::hp::FEValues<dim,spacedim>
                                      (this->mapping_collection,
                                       *this->finite_elements[i],
@@ -190,7 +190,7 @@ namespace internal
                     x_fe_face_values[i] = x_fe_face_values[j];
                     break;
                   }
-              if (x_fe_face_values[i].get() == 0)
+              if (x_fe_face_values[i].get() == nullptr)
                 x_fe_face_values[i].reset(new dealii::hp::FEFaceValues<dim,spacedim>
                                           (this->mapping_collection,
                                            *this->finite_elements[i],
@@ -312,7 +312,7 @@ namespace internal
       dof_handler (dofs, typeid(dealii::DataOut_DoFData<DoFHandlerType,DoFHandlerType::dimension,DoFHandlerType::space_dimension>).name()),
       names(names_in),
       data_component_interpretation (data_component_interpretation),
-      postprocessor(0, typeid(*this).name()),
+      postprocessor(nullptr, typeid(*this).name()),
       n_output_variables(names.size())
     {
       Assert (names.size() == data_component_interpretation.size(),
@@ -820,8 +820,8 @@ namespace internal
     void
     DataEntry<DoFHandlerType,VectorType>::clear ()
     {
-      vector = 0;
-      this->dof_handler = 0;
+      vector = nullptr;
+      this->dof_handler = nullptr;
     }
   }
 }
@@ -832,8 +832,8 @@ template <typename DoFHandlerType,
           int patch_dim, int patch_space_dim>
 DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::DataOut_DoFData ()
   :
-  triangulation(0,typeid(*this).name()),
-  dofs(0,typeid(*this).name())
+  triangulation(nullptr,typeid(*this).name()),
+  dofs(nullptr,typeid(*this).name())
 {}
 
 
@@ -892,10 +892,10 @@ add_data_vector (const VectorType                         &vec,
                  const DataVectorType                      type,
                  const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
 {
-  Assert (triangulation != 0,
+  Assert (triangulation != nullptr,
           Exceptions::DataOut::ExcNoTriangulationSelected ());
   const unsigned int n_components =
-    dofs != 0 ? dofs->get_fe().n_components () : 1;
+    dofs != nullptr ? dofs->get_fe().n_components () : 1;
 
   std::vector<std::string> names;
   // if only one component or vector is cell vector: we only need one name
@@ -931,7 +931,7 @@ add_data_vector (const VectorType                         &vec,
                  const DataVectorType                      type,
                  const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation_)
 {
-  Assert (triangulation != 0,
+  Assert (triangulation != nullptr,
           Exceptions::DataOut::ExcNoTriangulationSelected ());
 
   const std::vector<DataComponentInterpretation::DataComponentInterpretation> &
@@ -949,7 +949,7 @@ add_data_vector (const VectorType                         &vec,
   if (type == type_automatic)
     {
       // in the rare case that someone has a DGP(0) attached, we can not decide what she wants here:
-      Assert((dofs == 0) || (triangulation->n_active_cells() != dofs->n_dofs()),
+      Assert((dofs == nullptr) || (triangulation->n_active_cells() != dofs->n_dofs()),
              ExcMessage("Unable to determine the type of vector automatically because the number of DoFs "
                         "is equal to the number of cells. Please specify DataVectorType."));
 
@@ -970,7 +970,7 @@ add_data_vector (const VectorType                         &vec,
       break;
 
     case type_dof_data:
-      Assert (dofs != 0,
+      Assert (dofs != nullptr,
               Exceptions::DataOut::ExcNoDoFHandlerSelected ());
       Assert (vec.size() == dofs->n_dofs(),
               Exceptions::DataOut::ExcInvalidVectorSize (vec.size(),
@@ -1010,7 +1010,7 @@ add_data_vector (const VectorType                       &vec,
   // things a bit simpler, we also don't need to deal with some of the other
   // stuff and use a different constructor of DataEntry
 
-  Assert (dofs != 0,
+  Assert (dofs != nullptr,
           Exceptions::DataOut::ExcNoDoFHandlerSelected ());
 
   Assert (vec.size() == dofs->n_dofs(),
@@ -1096,7 +1096,7 @@ add_data_vector
   // this is an extended version of the other functions where we pass a vector
   // together with its DoFHandler. if we do, we know that we have
   // type_dof_data, which makes things a bit simpler
-  if (triangulation == 0)
+  if (triangulation == nullptr)
     triangulation = SmartPointer<const Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> >(&dof_handler.get_triangulation(), typeid(*this).name());
 
   Assert (&dof_handler.get_triangulation() == triangulation,
@@ -1152,8 +1152,8 @@ clear_input_data_references ()
   for (unsigned int i=0; i<cell_data.size(); ++i)
     cell_data[i]->clear ();
 
-  if (dofs != 0)
-    dofs = 0;
+  if (dofs != nullptr)
+    dofs = nullptr;
 }
 
 
@@ -1166,8 +1166,8 @@ DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::clear ()
   dof_data.erase (dof_data.begin(), dof_data.end());
   cell_data.erase (cell_data.begin(), cell_data.end());
 
-  if (dofs != 0)
-    dofs = 0;
+  if (dofs != nullptr)
+    dofs = nullptr;
 
   // delete patches
   std::vector<Patch> dummy;
@@ -1320,7 +1320,7 @@ std::vector<std::shared_ptr<dealii::hp::FECollection<DoFHandlerType::dimension,
   finite_elements(this->dof_data.size());
   for (unsigned int i=0; i<this->dof_data.size(); ++i)
     {
-      Assert (dof_data[i]->dof_handler != 0,
+      Assert (dof_data[i]->dof_handler != nullptr,
               Exceptions::DataOut::ExcNoDoFHandlerSelected ());
 
       // avoid creating too many finite elements and doing a lot of work on

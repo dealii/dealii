@@ -415,7 +415,7 @@ namespace TimeStepping
     refine_tol(refine_tol),
     coarsen_tol(coarsen_tol),
     last_same_as_first(false),
-    last_stage(NULL)
+    last_stage((nullptr))
   {
     initialize(method);
   }
@@ -665,10 +665,10 @@ namespace TimeStepping
   template <typename VectorType>
   void EmbeddedExplicitRungeKutta<VectorType>::free_memory()
   {
-    if (last_stage!=NULL)
+    if (last_stage!=(nullptr))
       delete last_stage;
 
-    last_stage = NULL;
+    last_stage = (nullptr);
   }
 
 
@@ -762,7 +762,7 @@ namespace TimeStepping
     // Save the last stage if necessary
     if (last_same_as_first==true)
       {
-        if (last_stage==NULL)
+        if (last_stage==(nullptr))
           last_stage = new VectorType(f_stages.back());
         else
           *last_stage = f_stages.back();
@@ -817,7 +817,7 @@ namespace TimeStepping
     // of the first stage.
     if (last_same_as_first==true)
       {
-        if (last_stage!=NULL)
+        if (last_stage!=(nullptr))
           {
             f_stages[0] = *last_stage;
             i = 1;

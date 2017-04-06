@@ -1368,7 +1368,7 @@ inline
 typename ChunkSparseMatrix<number>::size_type
 ChunkSparseMatrix<number>::m () const
 {
-  Assert (cols != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
   return cols->rows;
 }
 
@@ -1378,7 +1378,7 @@ inline
 typename ChunkSparseMatrix<number>::size_type
 ChunkSparseMatrix<number>::n () const
 {
-  Assert (cols != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
   return cols->cols;
 }
 
@@ -1389,7 +1389,7 @@ inline
 const ChunkSparsityPattern &
 ChunkSparseMatrix<number>::get_sparsity_pattern () const
 {
-  Assert (cols != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
   return *cols;
 }
 
@@ -1427,7 +1427,7 @@ void ChunkSparseMatrix<number>::set (const size_type i,
 
   AssertIsFinite(value);
 
-  Assert (cols != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
   // it is allowed to set elements of the matrix that are not part of the
   // sparsity pattern, if the value to which we set it is zero
   const size_type index = compute_location(i,j);
@@ -1450,7 +1450,7 @@ void ChunkSparseMatrix<number>::add (const size_type i,
 
   AssertIsFinite(value);
 
-  Assert (cols != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
 
   if (value != 0.)
     {
@@ -1486,8 +1486,8 @@ inline
 ChunkSparseMatrix<number> &
 ChunkSparseMatrix<number>::operator *= (const number factor)
 {
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
 
   const size_type chunk_size = cols->get_chunk_size();
 
@@ -1513,8 +1513,8 @@ inline
 ChunkSparseMatrix<number> &
 ChunkSparseMatrix<number>::operator /= (const number factor)
 {
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
   Assert (factor !=0, ExcDivideByZero());
 
   const number factor_inv = 1. / factor;
@@ -1544,7 +1544,7 @@ inline
 number ChunkSparseMatrix<number>::operator () (const size_type i,
                                                const size_type j) const
 {
-  Assert (cols != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
   AssertThrow (compute_location(i,j) != SparsityPattern::invalid_entry,
                ExcInvalidIndex(i,j));
   return val[compute_location(i,j)];
@@ -1557,7 +1557,7 @@ inline
 number ChunkSparseMatrix<number>::el (const size_type i,
                                       const size_type j) const
 {
-  Assert (cols != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
   const size_type index = compute_location(i,j);
 
   if (index != ChunkSparsityPattern::invalid_entry)
@@ -1572,7 +1572,7 @@ template <typename number>
 inline
 number ChunkSparseMatrix<number>::diag_element (const size_type i) const
 {
-  Assert (cols != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
   Assert (m() == n(),  ExcNotQuadratic());
   AssertIndexRange(i, m());
 

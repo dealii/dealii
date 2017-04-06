@@ -41,8 +41,8 @@ SparsityPattern::SparsityPattern ()
   :
   max_dim(0),
   max_vec_len(0),
-  rowstart(0),
-  colnums(0),
+  rowstart(nullptr),
+  colnums(nullptr),
   compressed(false),
   store_diagonal_first_in_row(false)
 {
@@ -56,8 +56,8 @@ SparsityPattern::SparsityPattern (const SparsityPattern &s)
   Subscriptor(),
   max_dim(0),
   max_vec_len(0),
-  rowstart(0),
-  colnums(0),
+  rowstart(nullptr),
+  colnums(nullptr),
   compressed(false),
   store_diagonal_first_in_row(false)
 {
@@ -78,8 +78,8 @@ SparsityPattern::SparsityPattern (const size_type m,
   :
   max_dim(0),
   max_vec_len(0),
-  rowstart(0),
-  colnums(0),
+  rowstart(nullptr),
+  colnums(nullptr),
   compressed(false),
   store_diagonal_first_in_row(m == n)
 {
@@ -94,8 +94,8 @@ SparsityPattern::SparsityPattern (const size_type m,
   :
   max_dim(0),
   max_vec_len(0),
-  rowstart(0),
-  colnums(0),
+  rowstart(nullptr),
+  colnums(nullptr),
   store_diagonal_first_in_row(m == n)
 {
   reinit (m, n, row_lengths);
@@ -108,8 +108,8 @@ SparsityPattern::SparsityPattern (const size_type m,
   :
   max_dim(0),
   max_vec_len(0),
-  rowstart(0),
-  colnums(0)
+  rowstart(nullptr),
+  colnums(nullptr)
 {
   reinit (m, m, max_per_row);
 }
@@ -121,8 +121,8 @@ SparsityPattern::SparsityPattern (const size_type               m,
   :
   max_dim(0),
   max_vec_len(0),
-  rowstart(0),
-  colnums(0)
+  rowstart(nullptr),
+  colnums(nullptr)
 {
   reinit (m, m, row_lengths);
 }
@@ -135,8 +135,8 @@ SparsityPattern::SparsityPattern (const SparsityPattern &original,
   :
   max_dim(0),
   max_vec_len(0),
-  rowstart(0),
-  colnums(0)
+  rowstart(nullptr),
+  colnums(nullptr)
 {
   Assert (original.rows==original.cols, ExcNotQuadratic());
   Assert (original.is_compressed(), ExcNotCompressed());
@@ -216,8 +216,8 @@ SparsityPattern::SparsityPattern (const SparsityPattern &original,
 
 SparsityPattern::~SparsityPattern ()
 {
-  if (rowstart != 0)  delete[] rowstart;
-  if (colnums != 0)   delete[] colnums;
+  if (rowstart != nullptr)  delete[] rowstart;
+  if (colnums != nullptr)   delete[] colnums;
 }
 
 
@@ -267,8 +267,8 @@ SparsityPattern::reinit (const size_type m,
     {
       if (rowstart)  delete[] rowstart;
       if (colnums)   delete[] colnums;
-      rowstart = 0;
-      colnums = 0;
+      rowstart = nullptr;
+      colnums = nullptr;
       max_vec_len = max_dim = rows = cols = 0;
       // if dimension is zero: ignore max_per_row
       max_row_length = 0;
@@ -304,7 +304,7 @@ SparsityPattern::reinit (const size_type m,
       if (colnums)
         {
           delete[] colnums;
-          colnums = 0;
+          colnums = nullptr;
         }
 
       max_vec_len = vec_len;
@@ -331,7 +331,7 @@ SparsityPattern::reinit (const size_type m,
       if (rowstart)
         {
           delete[] rowstart;
-          rowstart = 0;
+          rowstart = nullptr;
         }
 
       max_dim = rows;
@@ -344,7 +344,7 @@ SparsityPattern::reinit (const size_type m,
       if (colnums)
         {
           delete[] colnums;
-          colnums = 0;
+          colnums = nullptr;
         }
 
       max_vec_len = vec_len;
@@ -381,7 +381,7 @@ SparsityPattern::reinit (const size_type m,
 void
 SparsityPattern::compress ()
 {
-  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());
+  Assert ((rowstart!=nullptr) && (colnums!=nullptr), ExcEmptyObject());
 
   // do nothing if already compressed
   if (compressed)
@@ -616,12 +616,12 @@ SparsityPattern::empty () const
   // and freeing memory was not present in the original implementation and I
   // don't know at how many places I missed something in adding it, so I try
   // to be cautious. wb)
-  if ((rowstart==0) || (rows==0) || (cols==0))
+  if ((rowstart==nullptr) || (rows==0) || (cols==0))
     {
-      Assert (rowstart==0, ExcInternalError());
+      Assert (rowstart==nullptr, ExcInternalError());
       Assert (rows==0, ExcInternalError());
       Assert (cols==0, ExcInternalError());
-      Assert (colnums==0, ExcInternalError());
+      Assert (colnums==nullptr, ExcInternalError());
       Assert (max_vec_len==0, ExcInternalError());
 
       return true;
@@ -654,7 +654,7 @@ SparsityPattern::size_type
 SparsityPattern::operator () (const size_type i,
                               const size_type j) const
 {
-  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());
+  Assert ((rowstart!=nullptr) && (colnums!=nullptr), ExcEmptyObject());
   Assert (i<rows, ExcIndexRange(i,0,rows));
   Assert (j<cols, ExcIndexRange(j,0,cols));
   Assert (compressed, ExcNotCompressed());
@@ -693,7 +693,7 @@ void
 SparsityPattern::add (const size_type i,
                       const size_type j)
 {
-  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());
+  Assert ((rowstart!=nullptr) && (colnums!=nullptr), ExcEmptyObject());
   Assert (i<rows, ExcIndexRange(i,0,rows));
   Assert (j<cols, ExcIndexRange(j,0,cols));
   Assert (compressed==false, ExcMatrixIsCompressed());
@@ -768,7 +768,7 @@ SparsityPattern::add_entries (const size_type row,
 bool
 SparsityPattern::exists (const size_type i, const size_type j) const
 {
-  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());
+  Assert ((rowstart!=nullptr) && (colnums!=nullptr), ExcEmptyObject());
   Assert (i<rows, ExcIndexRange(i,0,rows));
   Assert (j<cols, ExcIndexRange(j,0,cols));
 
@@ -785,7 +785,7 @@ SparsityPattern::exists (const size_type i, const size_type j) const
 SparsityPattern::size_type
 SparsityPattern::row_position (const size_type i, const size_type j) const
 {
-  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());
+  Assert ((rowstart!=nullptr) && (colnums!=nullptr), ExcEmptyObject());
   Assert (i<rows, ExcIndexRange(i,0,rows));
   Assert (j<cols, ExcIndexRange(j,0,cols));
 
@@ -827,7 +827,7 @@ SparsityPattern::matrix_position (const std::size_t global_index) const
 void
 SparsityPattern::symmetrize ()
 {
-  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());
+  Assert ((rowstart!=nullptr) && (colnums!=nullptr), ExcEmptyObject());
   Assert (compressed==false, ExcMatrixIsCompressed());
   // Note that we only require a quadratic matrix here, no special treatment
   // of diagonals
@@ -861,7 +861,7 @@ SparsityPattern::symmetrize ()
 void
 SparsityPattern::print (std::ostream &out) const
 {
-  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());
+  Assert ((rowstart!=nullptr) && (colnums!=nullptr), ExcEmptyObject());
 
   AssertThrow (out, ExcIO());
 
@@ -882,7 +882,7 @@ SparsityPattern::print (std::ostream &out) const
 void
 SparsityPattern::print_gnuplot (std::ostream &out) const
 {
-  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());
+  Assert ((rowstart!=nullptr) && (colnums!=nullptr), ExcEmptyObject());
 
   AssertThrow (out, ExcIO());
 
@@ -934,7 +934,7 @@ SparsityPattern::print_svg (std::ostream &out) const
 SparsityPattern::size_type
 SparsityPattern::bandwidth () const
 {
-  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());
+  Assert ((rowstart!=nullptr) && (colnums!=nullptr), ExcEmptyObject());
   size_type b=0;
   for (size_type i=0; i<rows; ++i)
     for (size_type j=rowstart[i]; j<rowstart[i+1]; ++j)

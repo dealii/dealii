@@ -40,7 +40,7 @@ public:
     for (unsigned int i=0; i<vectors.size(); ++i)
       {
         const VectorType *p = vectors.try_read_ptr<VectorType>(i);
-        if (p!=0)
+        if (p!=nullptr)
           {
             // this should be equal to dof->n_dofs() otherwise
             // DoFOutputOperator will complain

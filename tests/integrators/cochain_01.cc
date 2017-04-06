@@ -166,7 +166,7 @@ test_cochain(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
   MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >(
     dof.begin_active(), dof.end(), dof_info, info_box,
-    cell_matrix<dim>, 0, 0, assembler);
+    cell_matrix<dim>, nullptr, nullptr, assembler);
 
   for (unsigned int b=0; b<matrices.size(); ++b)
     if (b%3 == 0)

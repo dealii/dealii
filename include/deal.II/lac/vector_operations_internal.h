@@ -54,7 +54,7 @@ namespace internal
     void print (const T    &t,
                 const char *format)
     {
-      if (format != 0)
+      if (format != nullptr)
         std::printf (format, t);
       else
         std::printf (" %5.2f", double(t));
@@ -66,7 +66,7 @@ namespace internal
     void print (const std::complex<T> &t,
                 const char            *format)
     {
-      if (format != 0)
+      if (format != nullptr)
         std::printf (format, t.real(), t.imag());
       else
         std::printf (" %5.2f+%5.2fi",
@@ -170,7 +170,7 @@ namespace internal
       if (vec_size >= 4*internal::Vector::minimum_parallel_grain_size &&
           MultithreadInfo::n_threads() > 1)
         {
-          Assert(partitioner.get() != NULL,
+          Assert(partitioner.get() != nullptr,
                  ExcInternalError("Unexpected initialization of Vector that does "
                                   "not set the TBB partitioner to a usable state."));
           std::shared_ptr<tbb::affinity_partitioner> tbb_partitioner =
@@ -1264,7 +1264,7 @@ namespace internal
       if (vec_size >= 4*internal::Vector::minimum_parallel_grain_size &&
           MultithreadInfo::n_threads() > 1)
         {
-          Assert(partitioner.get() != NULL,
+          Assert(partitioner.get() != nullptr,
                  ExcInternalError("Unexpected initialization of Vector that does "
                                   "not set the TBB partitioner to a usable state."));
           std::shared_ptr<tbb::affinity_partitioner> tbb_partitioner =

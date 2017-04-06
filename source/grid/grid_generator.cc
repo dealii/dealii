@@ -3934,9 +3934,9 @@ namespace GridGenerator
     Assert (GridTools::have_same_coarse_mesh (triangulation_1, triangulation_2),
             ExcMessage ("The two input triangulations are not derived from "
                         "the same coarse mesh as required."));
-    Assert ((dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&triangulation_1) == 0)
+    Assert ((dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&triangulation_1) == nullptr)
             &&
-            (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&triangulation_2) == 0),
+            (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&triangulation_2) == nullptr),
             ExcMessage ("The source triangulations for this function must both "
                         "be available entirely locally, and not be distributed "
                         "triangulations."));
@@ -4380,7 +4380,7 @@ namespace GridGenerator
       dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim1> *>(&in_tria);
 
     (void)pt;
-    Assert (pt == NULL,
+    Assert (pt == nullptr,
             ExcMessage("Cannot use this function on parallel::distributed::Triangulation."));
 
     std::vector<Point<spacedim2> > v;
@@ -4470,7 +4470,7 @@ namespace GridGenerator
   {
     Assert ((dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
              (&volume_mesh.get_triangulation())
-             == 0),
+             == nullptr),
             ExcNotImplemented());
 
 // This function works using the following assumption:

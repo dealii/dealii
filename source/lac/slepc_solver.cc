@@ -59,7 +59,7 @@ namespace SLEPcWrappers
 
   SolverBase::~SolverBase ()
   {
-    if (eps != NULL)
+    if (eps != nullptr)
       {
         // Destroy the solver object.
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)

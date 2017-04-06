@@ -657,7 +657,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
           Assert (std::fabs(sum-1) < eps, ExcInternalError());
         }
     }
-  else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe) != 0)
+  else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe) != nullptr)
     {
       // nothing to do here, the FE_Nothing has no degrees of freedom anyway
     }
@@ -687,13 +687,13 @@ hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
   // if the other one is an FE_Nothing. in the first case, there should be
   // exactly one single DoF of each FE at a vertex, and they should have
   // identical value
-  if (dynamic_cast<const FE_Q_Base<PolynomialType,dim,spacedim>*>(&fe_other) != 0)
+  if (dynamic_cast<const FE_Q_Base<PolynomialType,dim,spacedim>*>(&fe_other) != nullptr)
     {
       return
         std::vector<std::pair<unsigned int, unsigned int> >
         (1, std::make_pair (0U, 0U));
     }
-  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != 0)
+  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != nullptr)
     {
       // the FE_Nothing has no degrees of freedom, so there are no
       // equivalencies to be recorded
@@ -756,7 +756,7 @@ hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
 
       return identities;
     }
-  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != 0)
+  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != nullptr)
     {
       // the FE_Nothing has no degrees of freedom, so there are no
       // equivalencies to be recorded
@@ -823,7 +823,7 @@ hp_quad_dof_identities (const FiniteElement<dim,spacedim>        &fe_other) cons
 
       return identities;
     }
-  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != 0)
+  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != nullptr)
     {
       // the FE_Nothing has no degrees of freedom, so there are no
       // equivalencies to be recorded
@@ -878,9 +878,9 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
           return FiniteElementDomination::no_requirements;
         }
     }
-  else if ((dynamic_cast<const FE_DGQ<dim,spacedim>*>(&fe_other) != 0)
+  else if ((dynamic_cast<const FE_DGQ<dim,spacedim>*>(&fe_other) != nullptr)
            ||
-           (dynamic_cast<const FE_DGP<dim,spacedim>*>(&fe_other) != 0))
+           (dynamic_cast<const FE_DGP<dim,spacedim>*>(&fe_other) != nullptr))
     {
       // there are no requirements between continuous and
       // discontinuous elements

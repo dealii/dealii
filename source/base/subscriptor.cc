@@ -47,7 +47,7 @@ static const char *unknown_subscriber = "unknown subscriber";
 Subscriptor::Subscriptor ()
   :
   counter (0),
-  object_info (0)
+  object_info (nullptr)
 {
   // this has to go somewhere to avoid an extra warning.
   (void)unknown_subscriber;
@@ -58,7 +58,7 @@ Subscriptor::Subscriptor ()
 Subscriptor::Subscriptor (const Subscriptor &)
   :
   counter (0),
-  object_info (0)
+  object_info (nullptr)
 {}
 
 
@@ -165,7 +165,7 @@ void
 Subscriptor::subscribe(const char *id) const
 {
 #ifdef DEBUG
-  if (object_info == 0)
+  if (object_info == nullptr)
     object_info = &typeid(*this);
   Threads::Mutex::ScopedLock lock (subscription_lock);
   ++counter;
@@ -192,7 +192,7 @@ void
 Subscriptor::unsubscribe(const char *id) const
 {
 #ifdef DEBUG
-  const char *name = (id != 0) ? id : unknown_subscriber;
+  const char *name = (id != nullptr) ? id : unknown_subscriber;
   AssertNothrow (counter>0, ExcNoSubscriber(object_info->name(), name));
   // This is for the case that we do
   // not abort after the exception

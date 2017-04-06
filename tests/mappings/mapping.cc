@@ -537,11 +537,11 @@ void mapping_test()
   // delete all triangulations and
   // boundary objects
   for (unsigned int i=0; i<tria_ptr.size(); ++i)
-    if (tria_ptr[i]!=0)
+    if (tria_ptr[i]!=nullptr)
       delete tria_ptr[i];
 
   for (unsigned int i=0; i<boundary_ptr.size(); ++i)
-    if (boundary_ptr[i]!=0)
+    if (boundary_ptr[i]!=nullptr)
       delete boundary_ptr[i];
 }
 

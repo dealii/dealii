@@ -586,7 +586,7 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
                           ?
                           reinterpret_cast<TrilinosWrappers::types::int_type *>(&indices[0])
                           :
-                          0),
+                          nullptr),
                          0,
 #ifdef DEAL_II_WITH_MPI
                          Epetra_MpiComm(communicator)

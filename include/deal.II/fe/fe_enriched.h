@@ -136,7 +136,7 @@ DEAL_II_NAMESPACE_OPEN
  * @code
  *   FE_Enriched<dim> fe_non_enriched(FE_Q<dim>(1),
  *                                    FE_Nothing<dim>(1,true),
- *                                    NULL);
+ *                                    (nullptr));
  * @endcode
  * and will result in the correct constraints for enriched DoFs attributed to
  * support points on the interface between the two regions.

@@ -83,7 +83,7 @@ void test(VectorTools::NormType norm, double value, double exp = 2.0)
   Vector<double> cellwise_errors (tria.n_active_cells());
   QIterated<dim> quadrature (QTrapez<1>(), 5);
 
-  const dealii::Function<dim,double> *w = 0;
+  const dealii::Function<dim,double> *w = nullptr;
   VectorTools::integrate_difference (dofh,
                                      solution,
                                      ZeroFunction<dim>(dim),

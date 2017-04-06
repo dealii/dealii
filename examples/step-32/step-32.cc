@@ -3479,7 +3479,7 @@ namespace Step32
                                         temperature_solution,
                                         estimated_error_per_cell,
                                         ComponentMask(),
-                                        0,
+                                        nullptr,
                                         0,
                                         triangulation.locally_owned_subdomain());
 

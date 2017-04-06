@@ -53,7 +53,7 @@ get_interpolated_dof_values (const InputVector &values,
     {
       if ((dynamic_cast<DoFHandler<DoFHandlerType::dimension,DoFHandlerType::space_dimension>*>
            (this->dof_handler)
-           != 0)
+           != nullptr)
           ||
           // for hp-DoFHandlers, we need to require that on
           // active cells, you either don't specify an fe_index,
@@ -89,7 +89,7 @@ get_interpolated_dof_values (const InputVector &values,
       // fe_index is given
       Assert ((dynamic_cast<DoFHandler<DoFHandlerType::dimension,DoFHandlerType::space_dimension>*>
                (this->dof_handler)
-               != 0)
+               != nullptr)
               ||
               (fe_index != DoFHandlerType::default_fe_index),
               ExcMessage ("You cannot call this function on non-active cells "
@@ -102,7 +102,7 @@ get_interpolated_dof_values (const InputVector &values,
       const FiniteElement<dim,spacedim> &fe            = this->get_dof_handler().get_fe()[fe_index];
       const unsigned int                 dofs_per_cell = fe.dofs_per_cell;
 
-      Assert (this->dof_handler != 0,
+      Assert (this->dof_handler != nullptr,
               typename BaseClass::ExcInvalidObject());
       Assert (interpolated_values.size() == dofs_per_cell,
               typename BaseClass::ExcVectorDoesNotMatch());

@@ -994,13 +994,13 @@ namespace FETools
     FiniteElementData<dim>
     multiply_dof_numbers (const FiniteElement<dim,spacedim> *fe1,
                           const unsigned int            N1,
-                          const FiniteElement<dim,spacedim> *fe2=NULL,
+                          const FiniteElement<dim,spacedim> *fe2=nullptr,
                           const unsigned int            N2=0,
-                          const FiniteElement<dim,spacedim> *fe3=NULL,
+                          const FiniteElement<dim,spacedim> *fe3=nullptr,
                           const unsigned int            N3=0,
-                          const FiniteElement<dim,spacedim> *fe4=NULL,
+                          const FiniteElement<dim,spacedim> *fe4=nullptr,
                           const unsigned int            N4=0,
-                          const FiniteElement<dim,spacedim> *fe5=NULL,
+                          const FiniteElement<dim,spacedim> *fe5=nullptr,
                           const unsigned int            N5=0);
 
     /**
@@ -1038,13 +1038,13 @@ namespace FETools
     std::vector<bool>
     compute_restriction_is_additive_flags (const FiniteElement<dim,spacedim> *fe1,
                                            const unsigned int        N1,
-                                           const FiniteElement<dim,spacedim> *fe2=NULL,
+                                           const FiniteElement<dim,spacedim> *fe2=nullptr,
                                            const unsigned int        N2=0,
-                                           const FiniteElement<dim,spacedim> *fe3=NULL,
+                                           const FiniteElement<dim,spacedim> *fe3=nullptr,
                                            const unsigned int        N3=0,
-                                           const FiniteElement<dim,spacedim> *fe4=NULL,
+                                           const FiniteElement<dim,spacedim> *fe4=nullptr,
                                            const unsigned int        N4=0,
-                                           const FiniteElement<dim,spacedim> *fe5=NULL,
+                                           const FiniteElement<dim,spacedim> *fe5=nullptr,
                                            const unsigned int        N5=0);
 
     /**
@@ -1091,13 +1091,13 @@ namespace FETools
     std::vector<ComponentMask>
     compute_nonzero_components (const FiniteElement<dim,spacedim> *fe1,
                                 const unsigned int        N1,
-                                const FiniteElement<dim,spacedim> *fe2=NULL,
+                                const FiniteElement<dim,spacedim> *fe2=nullptr,
                                 const unsigned int        N2=0,
-                                const FiniteElement<dim,spacedim> *fe3=NULL,
+                                const FiniteElement<dim,spacedim> *fe3=nullptr,
                                 const unsigned int        N3=0,
-                                const FiniteElement<dim,spacedim> *fe4=NULL,
+                                const FiniteElement<dim,spacedim> *fe4=nullptr,
                                 const unsigned int        N4=0,
-                                const FiniteElement<dim,spacedim> *fe5=NULL,
+                                const FiniteElement<dim,spacedim> *fe5=nullptr,
                                 const unsigned int        N5=0,
                                 const bool do_tensor_product = true);
 

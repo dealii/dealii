@@ -83,7 +83,7 @@ int main ()
             }
 
   // then compute new point locations and output the result
-  GridTools::laplace_transform<dim>  (new_points,tria, NULL, true);
+  GridTools::laplace_transform<dim>  (new_points,tria, nullptr, true);
   std::ofstream out ("output");
   GridOut grid_out;
   grid_out.write_eps (tria, out);

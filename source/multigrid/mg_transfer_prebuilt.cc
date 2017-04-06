@@ -249,7 +249,7 @@ void MGTransferPrebuilt<VectorType>::build_matrices
                   = mg_dof.get_fe().get_prolongation_matrix (child,
                                                              cell->refinement_case());
 
-                if (this->mg_constrained_dofs != 0 &&
+                if (this->mg_constrained_dofs != nullptr &&
                     this->mg_constrained_dofs->have_boundary_indices())
                   for (unsigned int j=0; j<dofs_per_cell; ++j)
                     if (this->mg_constrained_dofs->is_boundary_index(level, dof_indices_parent[j]))

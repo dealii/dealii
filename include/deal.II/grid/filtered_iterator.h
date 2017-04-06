@@ -945,7 +945,7 @@ FilteredIterator<BaseIterator>::
 ~FilteredIterator ()
 {
   delete predicate;
-  predicate = 0;
+  predicate = nullptr;
 }
 
 

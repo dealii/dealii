@@ -42,7 +42,7 @@ check_this (const DoFHandler<dim> &dof_handler)
   DoFTools::map_dof_to_boundary_indices (dof_handler, set, map);
 
   typename FunctionMap<dim>::type boundary_ids;
-  boundary_ids[0] = 0;
+  boundary_ids[0] = nullptr;
   const unsigned int n_boundary_dofs = dof_handler.n_boundary_dofs(boundary_ids);
   const unsigned int n_blocks = std::min (dof_handler.get_fe().n_components(),
                                           n_boundary_dofs);

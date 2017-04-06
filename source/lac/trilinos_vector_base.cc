@@ -134,7 +134,7 @@ namespace TrilinosWrappers
   VectorBase &
   VectorBase::operator = (const VectorBase &v)
   {
-    Assert (vector.get() != 0,
+    Assert (vector.get() != nullptr,
             ExcMessage("Vector is not constructed properly."));
 
     if (local_range() != v.local_range())
@@ -214,7 +214,7 @@ namespace TrilinosWrappers
     double double_mode = mode;
     const Epetra_MpiComm *comm_ptr
       = dynamic_cast<const Epetra_MpiComm *>(&(vector_partitioner().Comm()));
-    Assert (comm_ptr != 0, ExcInternalError());
+    Assert (comm_ptr != nullptr, ExcInternalError());
     Utilities::MPI::MinMaxAvg result
       = Utilities::MPI::min_max_avg (double_mode, comm_ptr->GetMpiComm());
     Assert(result.max-result.min<1e-5,
@@ -227,7 +227,7 @@ namespace TrilinosWrappers
 
     // Now pass over the information about what we did last to the vector.
     int ierr = 0;
-    if (nonlocal_vector.get() == 0 || mode != Add)
+    if (nonlocal_vector.get() == nullptr || mode != Add)
       ierr = vector->GlobalAssemble(mode);
     else
       {
@@ -372,7 +372,7 @@ namespace TrilinosWrappers
     // is zero on _all_ processors.
     const Epetra_MpiComm *mpi_comm
       = dynamic_cast<const Epetra_MpiComm *>(&vector->Map().Comm());
-    Assert(mpi_comm != 0, ExcInternalError());
+    Assert(mpi_comm != nullptr, ExcInternalError());
     unsigned int num_nonzero = Utilities::MPI::sum(flag, mpi_comm->Comm());
     return num_nonzero == 0;
 #else
@@ -475,7 +475,7 @@ namespace TrilinosWrappers
       {
         double t = (*vector)[0][j];
 
-        if (format != 0)
+        if (format != nullptr)
           std::printf (format, t);
         else
           std::printf (" %5.2f", double(t));

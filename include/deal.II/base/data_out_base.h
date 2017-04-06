@@ -896,8 +896,8 @@ namespace DataOutBase
     /**
      * Constructor.
      */
-    TecplotFlags (const char *tecplot_binary_file_name = NULL,
-                  const char *zone_name = NULL,
+    TecplotFlags (const char *tecplot_binary_file_name = nullptr,
+                  const char *zone_name = nullptr,
                   const double solution_time = -1.0);
 
     /**

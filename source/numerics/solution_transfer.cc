@@ -46,7 +46,7 @@ SolutionTransfer(const DoFHandlerType &dof)
 {
   Assert ((dynamic_cast<const parallel::distributed::Triangulation<DoFHandlerType::dimension, DoFHandlerType::space_dimension>*>
            (&dof_handler->get_tria())
-           == 0),
+           == nullptr),
           ExcMessage ("You are calling the dealii::SolutionTransfer class "
                       "with a DoF handler that is built on a "
                       "parallel::distributed::Triangulation. This will not "
@@ -451,7 +451,7 @@ interpolate (const std::vector<VectorType> &all_in,
           // cell stayed as it was or was refined
           if (indexptr)
             {
-              Assert (valuesptr == 0,
+              Assert (valuesptr == nullptr,
                       ExcInternalError());
 
               const unsigned int old_fe_index =
@@ -478,7 +478,7 @@ interpolate (const std::vector<VectorType> &all_in,
             // deleted
             {
               Assert (!cell->has_children(), ExcInternalError());
-              Assert (indexptr == 0,
+              Assert (indexptr == nullptr,
                       ExcInternalError());
 
               const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
@@ -502,7 +502,7 @@ interpolate (const std::vector<VectorType> &all_in,
                   // test we would have to
                   // store the fe_index of all
                   // cells
-                  const Vector<typename VectorType::value_type> *data = 0;
+                  const Vector<typename VectorType::value_type> *data = nullptr;
                   const unsigned int active_fe_index = cell->active_fe_index();
                   if (active_fe_index != pointerstruct->second.active_fe_index)
                     {

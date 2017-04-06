@@ -1164,7 +1164,7 @@ const Number *
 MatrixFree<dim,Number>::constraint_pool_begin (const unsigned int row) const
 {
   AssertIndexRange (row, constraint_pool_row_index.size()-1);
-  return constraint_pool_data.empty() ? 0 :
+  return constraint_pool_data.empty() ? nullptr :
          &constraint_pool_data[0] + constraint_pool_row_index[row];
 }
 
@@ -1176,7 +1176,7 @@ const Number *
 MatrixFree<dim,Number>::constraint_pool_end (const unsigned int row) const
 {
   AssertIndexRange (row, constraint_pool_row_index.size()-1);
-  return constraint_pool_data.empty() ? 0 :
+  return constraint_pool_data.empty() ? nullptr :
          &constraint_pool_data[0] + constraint_pool_row_index[row+1];
 }
 
@@ -1303,7 +1303,7 @@ MatrixFree<dim,Number>::get_cell_iterator(const unsigned int macro_cell_number,
     AssertIndexRange (vector_number, irreg_filled);
 #endif
 
-  const DoFHandler<dim> *dofh = 0;
+  const DoFHandler<dim> *dofh = nullptr;
   if (dof_handlers.active_dof_handler == DoFHandlers::usual)
     {
       AssertDimension (dof_handlers.dof_handler.size(),
@@ -2100,7 +2100,7 @@ namespace internal
                 const internal::MatrixFreeFunctions::TaskInfo &task_info_in,
                 const bool is_blocked_in)
         :
-        dummy (NULL),
+        dummy ((nullptr)),
         worker (worker_in),
         partition (partition_in),
         task_info (task_info_in),
@@ -2114,7 +2114,7 @@ namespace internal
         worker(cell_range);
         if (is_blocked==true)
           dummy->spawn (*dummy);
-        return NULL;
+        return (nullptr);
       }
 
       tbb::empty_task *dummy;
@@ -2137,7 +2137,7 @@ namespace internal
                      const internal::MatrixFreeFunctions::TaskInfo &task_info_in,
                      const bool    is_blocked_in = false)
         :
-        dummy (NULL),
+        dummy ((nullptr)),
         function (function_in),
         partition (partition_in),
         task_info (task_info_in),
@@ -2201,7 +2201,7 @@ namespace internal
         root->destroy(*root);
         if (is_blocked==true)
           dummy->spawn (*dummy);
-        return NULL;
+        return (nullptr);
       }
 
       tbb::empty_task *dummy;
@@ -2265,7 +2265,7 @@ namespace internal
                      const internal::MatrixFreeFunctions::TaskInfo &task_info_in,
                      const bool    is_blocked_in)
         :
-        dummy (NULL),
+        dummy ((nullptr)),
         worker (worker_in),
         partition (partition_in),
         task_info (task_info_in),
@@ -2279,7 +2279,7 @@ namespace internal
                      CellWork<Worker> (worker,task_info));
         if (is_blocked==true)
           dummy->spawn (*dummy);
-        return NULL;
+        return (nullptr);
       }
 
       tbb::empty_task *dummy;
@@ -2306,7 +2306,7 @@ namespace internal
     tbb::task *execute ()
     {
       internal::update_ghost_values_finish(src);
-      return 0;
+      return nullptr;
     }
 
   private:
@@ -2327,7 +2327,7 @@ namespace internal
     tbb::task *execute ()
     {
       internal::compress_start(dst);
-      return 0;
+      return nullptr;
     }
 
   private:

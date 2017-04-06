@@ -724,7 +724,7 @@ namespace FETools
         = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
            (&dof2.get_tria()));
 
-      Assert (tr != 0, ExcInternalError());
+      Assert (tr != nullptr, ExcInternalError());
 
       typename DoFHandler<dim,spacedim>::cell_iterator
       cell=dof2.begin(0),
@@ -915,7 +915,7 @@ namespace FETools
         = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
            (&dof2.get_tria()));
 
-      Assert (tr != 0, ExcInternalError());
+      Assert (tr != nullptr, ExcInternalError());
 
       // collect in a set all trees this
       // process has to compute cells on
@@ -1292,7 +1292,7 @@ namespace FETools
         = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
            (&dof2.get_tria()));
 
-      Assert (tr != 0,
+      Assert (tr != nullptr,
               ExcMessage ("Extrapolate in parallel only works for parallel distributed triangulations!"));
 
       communicator = tr->get_communicator ();
@@ -1411,7 +1411,7 @@ namespace FETools
       {
         const parallel::distributed::Triangulation<dim,spacedim> *parallel_tria =
           dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_tria());
-        Assert (parallel_tria !=0, ExcNotImplemented());
+        Assert (parallel_tria !=nullptr, ExcNotImplemented());
 
         const IndexSet locally_owned_dofs = dh.locally_owned_dofs();
         vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
@@ -1425,7 +1425,7 @@ namespace FETools
       {
         const parallel::distributed::Triangulation<dim,spacedim> *parallel_tria =
           dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_tria());
-        Assert (parallel_tria !=0, ExcNotImplemented());
+        Assert (parallel_tria !=nullptr, ExcNotImplemented());
 
         const IndexSet locally_owned_dofs = dh.locally_owned_dofs();
         vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
@@ -1438,7 +1438,7 @@ namespace FETools
       {
         const parallel::distributed::Triangulation<dim,spacedim> *parallel_tria =
           dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_tria());
-        Assert (parallel_tria !=0, ExcNotImplemented());
+        Assert (parallel_tria !=nullptr, ExcNotImplemented());
 
         const IndexSet locally_owned_dofs = dh.locally_owned_dofs();
         vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
@@ -1460,7 +1460,7 @@ namespace FETools
       {
         const parallel::distributed::Triangulation<dim,spacedim> *parallel_tria =
           dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_tria());
-        Assert(parallel_tria !=0, ExcNotImplemented());
+        Assert(parallel_tria !=nullptr, ExcNotImplemented());
         const IndexSet  locally_owned_dofs = dh.locally_owned_dofs();
         IndexSet  locally_relevant_dofs;
         DoFTools::extract_locally_relevant_dofs (dh, locally_relevant_dofs);
@@ -1476,7 +1476,7 @@ namespace FETools
       {
         const parallel::distributed::Triangulation<dim,spacedim> *parallel_tria =
           dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_tria());
-        Assert (parallel_tria !=0, ExcNotImplemented());
+        Assert (parallel_tria !=nullptr, ExcNotImplemented());
         const IndexSet  locally_owned_dofs = dh.locally_owned_dofs();
         IndexSet  locally_relevant_dofs;
         DoFTools::extract_locally_relevant_dofs (dh, locally_relevant_dofs);
@@ -1491,7 +1491,7 @@ namespace FETools
       {
         const parallel::distributed::Triangulation<dim,spacedim> *parallel_tria =
           dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_tria());
-        Assert (parallel_tria !=0, ExcNotImplemented());
+        Assert (parallel_tria !=nullptr, ExcNotImplemented());
         const IndexSet  locally_owned_dofs = dh.locally_owned_dofs();
         IndexSet  locally_relevant_dofs;
         DoFTools::extract_locally_relevant_dofs (dh, locally_relevant_dofs);
@@ -1585,7 +1585,7 @@ namespace FETools
 
     OutVector u3;
     internal::reinit_distributed(dof2, u3);
-    if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dof2.get_tria()) != 0)
+    if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dof2.get_tria()) != nullptr)
       {
         interpolate(dof1, u1, dof2, constraints, u3);
 

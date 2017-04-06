@@ -87,7 +87,7 @@ reinit (const size_type n_block_rows,
     for (size_type j=0; j<columns; ++j)
       {
         SparsityPatternBase *sp = sub_objects[i][j];
-        sub_objects[i][j] = 0;
+        sub_objects[i][j] = nullptr;
         delete sp;
       };
   sub_objects.reinit (0,0);

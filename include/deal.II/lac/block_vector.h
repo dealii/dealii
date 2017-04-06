@@ -324,7 +324,7 @@ public:
    *
    * This function is deprecated.
    */
-  void print (const char *format = 0) const DEAL_II_DEPRECATED;
+  void print (const char *format = nullptr) const DEAL_II_DEPRECATED;
 
   /**
    * Print to a stream.

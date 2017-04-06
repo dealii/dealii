@@ -473,16 +473,16 @@ private:
    */
   struct Pointerstruct
   {
-    Pointerstruct() : indices_ptr(0), dof_values_ptr(0), active_fe_index(0) {};
+    Pointerstruct() : indices_ptr(nullptr), dof_values_ptr(nullptr), active_fe_index(0) {};
     Pointerstruct(std::vector<types::global_dof_index> *indices_ptr_in,
                   const unsigned int active_fe_index_in = 0)
       :
       indices_ptr(indices_ptr_in),
-      dof_values_ptr (0),
+      dof_values_ptr (nullptr),
       active_fe_index(active_fe_index_in) {};
     Pointerstruct(std::vector<Vector<typename VectorType::value_type> > *dof_values_ptr_in,
                   const unsigned int active_fe_index_in = 0) :
-      indices_ptr (0),
+      indices_ptr (nullptr),
       dof_values_ptr(dof_values_ptr_in),
       active_fe_index(active_fe_index_in) {};
     std::size_t memory_consumption () const;

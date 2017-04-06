@@ -692,7 +692,7 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::clear ()
   unsigned int i=matrices.min_level(),
                max_level=matrices.max_level();
   for (; i<=max_level; ++i)
-    matrices[i]=0;
+    matrices[i]=nullptr;
 }
 
 
@@ -859,7 +859,7 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::clear ()
   unsigned int i=matrices.min_level(),
                max_level=matrices.max_level();
   for (; i<=max_level; ++i)
-    matrices[i]=0;
+    matrices[i]=nullptr;
 }
 
 

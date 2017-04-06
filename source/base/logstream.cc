@@ -48,7 +48,7 @@ LogStream deallog;
 LogStream::LogStream()
   :
   std_out(&std::cerr),
-  file(0),
+  file(nullptr),
   std_depth(0),
   file_depth(10000),
   print_utime(false),
@@ -58,7 +58,7 @@ LogStream::LogStream()
   float_threshold(0.),
   offset(0),
   print_thread_id(false),
-  old_cerr(0),
+  old_cerr(nullptr),
   at_newline(true)
 {
   get_prefixes().push("DEAL:");
@@ -235,21 +235,21 @@ LogStream::attach(std::ostream &o,
 void LogStream::detach ()
 {
   Threads::Mutex::ScopedLock lock(log_lock);
-  file = 0;
+  file = nullptr;
 }
 
 
 void LogStream::log_cerr ()
 {
   Threads::Mutex::ScopedLock lock(log_lock);
-  if (old_cerr == 0)
+  if (old_cerr == nullptr)
     {
       old_cerr = std::cerr.rdbuf(file->rdbuf());
     }
   else
     {
       std::cerr.rdbuf(old_cerr);
-      old_cerr = 0;
+      old_cerr = nullptr;
     }
 }
 
@@ -274,7 +274,7 @@ LogStream::get_file_stream()
 bool
 LogStream::has_file() const
 {
-  return (file != 0);
+  return (file != nullptr);
 }
 
 

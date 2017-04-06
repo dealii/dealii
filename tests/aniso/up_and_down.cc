@@ -155,8 +155,8 @@ void test ()
     new FE_DGQ<dim>(0),
     new FE_DGQ<dim>(1),
     new FE_DGQ<dim>(2),
-    (dim<3 ? new FE_DGQ<dim>(3) : 0),
-    (dim<3 ? new FE_DGQ<dim>(4) : 0),
+    (dim<3 ? new FE_DGQ<dim>(3) : nullptr),
+    (dim<3 ? new FE_DGQ<dim>(4) : nullptr),
 
     // FE_DGP
     new FE_DGP<dim>(0),
@@ -225,7 +225,7 @@ void test ()
 
 
       for (unsigned int i=0; i<sizeof(fe_list)/sizeof(fe_list[0]); ++i)
-        if (fe_list[i] != 0)
+        if (fe_list[i] != nullptr)
           {
             deallog << dim << "d, uniform grid, fe #" << i
                     << ", " << ref_case_names[j];
@@ -235,7 +235,7 @@ void test ()
 
 
   for (unsigned int i=0; i<sizeof(fe_list)/sizeof(fe_list[0]); ++i)
-    if (fe_list[i] != 0)
+    if (fe_list[i] != nullptr)
       delete fe_list[i];
 }
 

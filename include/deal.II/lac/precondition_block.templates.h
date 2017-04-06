@@ -54,7 +54,7 @@ template <typename MatrixType, typename inverse_type>
 PreconditionBlock<MatrixType,inverse_type>::PreconditionBlock (bool store)
   : PreconditionBlockBase<inverse_type>(store),
     blocksize(0),
-    A(0, typeid(*this).name()),
+    A(nullptr, typeid(*this).name()),
     relaxation(1.0)
 {}
 
@@ -69,7 +69,7 @@ void PreconditionBlock<MatrixType,inverse_type>::clear ()
 {
   PreconditionBlockBase<inverse_type>::clear();
   blocksize     = 0;
-  A = 0;
+  A = nullptr;
 }
 
 
@@ -115,7 +115,7 @@ void PreconditionBlock<MatrixType,inverse_type>::initialize
 template <typename MatrixType, typename inverse_type>
 void PreconditionBlock<MatrixType,inverse_type>::invert_permuted_diagblocks()
 {
-  Assert (A!=0, ExcNotInitialized());
+  Assert (A!=nullptr, ExcNotInitialized());
   Assert (blocksize!=0, ExcNotInitialized());
 
   const MatrixType &M=*A;
@@ -226,7 +226,7 @@ void PreconditionBlock<MatrixType,inverse_type>::forward_step
  const Vector<number2> &src,
  const bool             transpose_diagonal) const
 {
-  Assert (this->A!=0, ExcNotInitialized());
+  Assert (this->A!=nullptr, ExcNotInitialized());
 
   const MatrixType &M=*this->A;
 
@@ -324,7 +324,7 @@ void PreconditionBlock<MatrixType,inverse_type>::backward_step
  const Vector<number2> &src,
  const bool             transpose_diagonal) const
 {
-  Assert (this->A!=0, ExcNotInitialized());
+  Assert (this->A!=nullptr, ExcNotInitialized());
 
   const MatrixType &M=*this->A;
 
@@ -425,7 +425,7 @@ PreconditionBlock<MatrixType,inverse_type>::block_size() const
 template <typename MatrixType, typename inverse_type>
 void PreconditionBlock<MatrixType,inverse_type>::invert_diagblocks()
 {
-  Assert (A!=0, ExcNotInitialized());
+  Assert (A!=nullptr, ExcNotInitialized());
   Assert (blocksize!=0, ExcNotInitialized());
 
   const MatrixType &M=*A;
@@ -553,7 +553,7 @@ void PreconditionBlockJacobi<MatrixType,inverse_type>
             const Vector<number2> &src,
             bool                   adding) const
 {
-  Assert(this->A!=0, ExcNotInitialized());
+  Assert(this->A!=nullptr, ExcNotInitialized());
 
   const MatrixType &M=*this->A;
 
@@ -716,7 +716,7 @@ void PreconditionBlockSOR<MatrixType,inverse_type>::forward
  const bool             transpose_diagonal,
  const bool) const
 {
-  Assert (this->A!=0, ExcNotInitialized());
+  Assert (this->A!=nullptr, ExcNotInitialized());
 
   const MatrixType &M=*this->A;
   const bool permuted = (this->permutation.size() != 0);
@@ -806,7 +806,7 @@ void PreconditionBlockSOR<MatrixType,inverse_type>::backward
  const bool              transpose_diagonal,
  const bool) const
 {
-  Assert (this->A!=0, ExcNotInitialized());
+  Assert (this->A!=nullptr, ExcNotInitialized());
 
   const MatrixType &M=*this->A;
   const bool permuted = (this->permutation.size() != 0);

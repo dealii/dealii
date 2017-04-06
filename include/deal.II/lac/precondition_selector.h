@@ -202,7 +202,7 @@ template <typename MatrixType, typename VectorType>
 PreconditionSelector<MatrixType,VectorType>::~PreconditionSelector()
 {
   // release the matrix A
-  A=0;
+  A=nullptr;
 }
 
 
@@ -217,7 +217,7 @@ template <typename MatrixType, typename VectorType>
 inline typename PreconditionSelector<MatrixType,VectorType>::size_type
 PreconditionSelector<MatrixType,VectorType>::m () const
 {
-  Assert(A!=0, ExcNoMatrixGivenToUse());
+  Assert(A!=nullptr, ExcNoMatrixGivenToUse());
   return A->m();
 }
 
@@ -226,7 +226,7 @@ template <typename MatrixType, typename VectorType>
 inline typename PreconditionSelector<MatrixType,VectorType>::size_type
 PreconditionSelector<MatrixType,VectorType>::n () const
 {
-  Assert(A!=0, ExcNoMatrixGivenToUse());
+  Assert(A!=nullptr, ExcNoMatrixGivenToUse());
   return A->n();
 }
 
@@ -242,7 +242,7 @@ void PreconditionSelector<MatrixType,VectorType>::vmult (VectorType &dst,
     }
   else
     {
-      Assert(A!=0, ExcNoMatrixGivenToUse());
+      Assert(A!=nullptr, ExcNoMatrixGivenToUse());
 
       if (preconditioning=="jacobi")
         {
@@ -272,7 +272,7 @@ void PreconditionSelector<MatrixType,VectorType>::Tvmult (VectorType &dst,
     }
   else
     {
-      Assert(A!=0, ExcNoMatrixGivenToUse());
+      Assert(A!=nullptr, ExcNoMatrixGivenToUse());
 
       if (preconditioning=="jacobi")
         {

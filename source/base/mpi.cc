@@ -351,8 +351,8 @@ namespace Utilities
 
 #ifdef DEAL_II_WITH_P4EST
       //Initialize p4est and libsc components
-      sc_init(MPI_COMM_WORLD, 0, 0, NULL, SC_LP_SILENT);
-      p4est_init (0, SC_LP_SILENT);
+      sc_init(MPI_COMM_WORLD, 0, 0, nullptr, SC_LP_SILENT);
+      p4est_init (nullptr, SC_LP_SILENT);
 #endif
 
       constructor_has_already_run = true;

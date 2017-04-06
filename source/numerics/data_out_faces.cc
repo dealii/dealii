@@ -143,7 +143,7 @@ build_one_patch (const FaceDescriptor *cell_and_face,
           const unsigned int n_components
             = this_fe_patch_values.get_fe().n_components();
           const DataPostprocessor<dim> *postprocessor=this->dof_data[dataset]->postprocessor;
-          if (postprocessor != 0)
+          if (postprocessor != nullptr)
             {
               // we have to postprocess the data, so determine, which fields
               // have to be updated
@@ -290,7 +290,7 @@ void DataOutFaces<dim,DoFHandlerType>::build_patches (const Mapping<dimension> &
   Assert (n_subdivisions >= 1,
           Exceptions::DataOut::ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
-  Assert (this->triangulation != 0,
+  Assert (this->triangulation != nullptr,
           Exceptions::DataOut::ExcNoTriangulationSelected());
 
   this->validate_dataset_names();

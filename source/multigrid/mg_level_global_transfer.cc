@@ -76,7 +76,7 @@ MGLevelGlobalTransfer<VectorType>::fill_and_communicate_copy_indices
   const parallel::Triangulation<dim, spacedim> *ptria =
     dynamic_cast<const parallel::Triangulation<dim, spacedim> *>
     (&mg_dof.get_tria());
-  const MPI_Comm mpi_communicator = ptria != 0 ? ptria->get_communicator() :
+  const MPI_Comm mpi_communicator = ptria != nullptr ? ptria->get_communicator() :
                                     MPI_COMM_SELF;
   perform_plain_copy =
     Utilities::MPI::min(static_cast<int>(perform_plain_copy),
@@ -95,7 +95,7 @@ MGLevelGlobalTransfer<VectorType>::clear()
   copy_indices_global_mine.clear();
   copy_indices_level_mine.clear();
   component_to_block_map.resize(0);
-  mg_constrained_dofs = 0;
+  mg_constrained_dofs = nullptr;
 }
 
 
@@ -173,7 +173,7 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::fill_and_com
   const parallel::Triangulation<dim, spacedim> *ptria =
     dynamic_cast<const parallel::Triangulation<dim, spacedim> *>
     (&mg_dof.get_tria());
-  const MPI_Comm mpi_communicator = ptria != 0 ? ptria->get_communicator() :
+  const MPI_Comm mpi_communicator = ptria != nullptr ? ptria->get_communicator() :
                                     MPI_COMM_SELF;
 
   IndexSet index_set(mg_dof.locally_owned_dofs().size());
@@ -286,7 +286,7 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::clear()
   copy_indices_global_mine.clear();
   copy_indices_level_mine.clear();
   component_to_block_map.resize(0);
-  mg_constrained_dofs = 0;
+  mg_constrained_dofs = nullptr;
   ghosted_global_vector.reinit(0);
   ghosted_level_vector.resize(0, 0);
 }

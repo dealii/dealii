@@ -280,7 +280,7 @@ namespace MemoryConsumption
   inline
   std::size_t memory_consumption (const char *string)
   {
-    if (string == NULL)
+    if (string == (nullptr))
       {
         return 0;
       }

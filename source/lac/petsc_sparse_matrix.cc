@@ -32,7 +32,7 @@ namespace PETScWrappers
   {
     const int m=0, n=0, n_nonzero_per_row=0;
     const PetscErrorCode ierr = MatCreateSeqAIJ(PETSC_COMM_SELF, m, n,
-                                                n_nonzero_per_row, 0, &matrix);
+                                                n_nonzero_per_row, nullptr, &matrix);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -147,7 +147,7 @@ namespace PETScWrappers
     // for all rows globally
     const PetscErrorCode ierr = MatCreateSeqAIJ(PETSC_COMM_SELF, m, n,
                                                 n_nonzero_per_row,
-                                                0, &matrix);
+                                                nullptr, &matrix);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // set symmetric flag, if so requested

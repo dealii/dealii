@@ -237,11 +237,11 @@ namespace MatrixCreator
       const FiniteElement<dim,spacedim> &fe  = fe_values.get_fe();
       const unsigned int n_components  = fe.n_components();
 
-      Assert(data.rhs_function == 0 ||
+      Assert(data.rhs_function == nullptr ||
              data.rhs_function->n_components==1 ||
              data.rhs_function->n_components==n_components,
              ::dealii::MatrixCreator::ExcComponentMismatch());
-      Assert(data.coefficient == 0 ||
+      Assert(data.coefficient == nullptr ||
              data.coefficient->n_components==1 ||
              data.coefficient->n_components==n_components,
              ::dealii::MatrixCreator::ExcComponentMismatch());
@@ -252,7 +252,7 @@ namespace MatrixCreator
       copy_data.dof_indices.resize (dofs_per_cell);
       cell->get_dof_indices (copy_data.dof_indices);
 
-      const bool use_rhs_function = data.rhs_function != 0;
+      const bool use_rhs_function = data.rhs_function != nullptr;
       if (use_rhs_function)
         {
           if (data.rhs_function->n_components==1)
@@ -270,7 +270,7 @@ namespace MatrixCreator
             }
         }
 
-      const bool use_coefficient = data.coefficient != 0;
+      const bool use_coefficient = data.coefficient != nullptr;
       if (use_coefficient)
         {
           if (data.coefficient->n_components==1)
@@ -420,11 +420,11 @@ namespace MatrixCreator
       const FiniteElement<dim,spacedim>    &fe  = fe_values.get_fe();
       const unsigned int n_components  = fe.n_components();
 
-      Assert(data.rhs_function == 0 ||
+      Assert(data.rhs_function == nullptr ||
              data.rhs_function->n_components==1 ||
              data.rhs_function->n_components==n_components,
              ::dealii::MatrixCreator::ExcComponentMismatch());
-      Assert(data.coefficient == 0 ||
+      Assert(data.coefficient == nullptr ||
              data.coefficient->n_components==1 ||
              data.coefficient->n_components==n_components,
              ::dealii::MatrixCreator::ExcComponentMismatch());
@@ -435,7 +435,7 @@ namespace MatrixCreator
       cell->get_dof_indices (copy_data.dof_indices);
 
 
-      const bool use_rhs_function = data.rhs_function != 0;
+      const bool use_rhs_function = data.rhs_function != nullptr;
       if (use_rhs_function)
         {
           if (data.rhs_function->n_components==1)
@@ -453,7 +453,7 @@ namespace MatrixCreator
             }
         }
 
-      const bool use_coefficient = data.coefficient != 0;
+      const bool use_coefficient = data.coefficient != nullptr;
       if (use_coefficient)
         {
           if (data.coefficient->n_components==1)
@@ -600,12 +600,12 @@ namespace MatrixCreator
               ExcInternalError());
       Assert (data.cell_matrix.n() == dofs_per_cell,
               ExcInternalError());
-      Assert ((right_hand_side == 0)
+      Assert ((right_hand_side == nullptr)
               ||
               (data.cell_rhs.size() == dofs_per_cell),
               ExcInternalError());
 
-      if (right_hand_side != 0)
+      if (right_hand_side != nullptr)
         data.constraints->distribute_local_to_global(data.cell_matrix,
                                                      data.cell_rhs,
                                                      data.dof_indices,
@@ -685,8 +685,8 @@ namespace MatrixCreator
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim,number>
     assembler_data (fe_collection,
                     update_values | update_JxW_values |
-                    (coefficient != 0 ? update_quadrature_points : UpdateFlags(0)),
-                    coefficient, /*rhs_function=*/0,
+                    (coefficient != nullptr ? update_quadrature_points : UpdateFlags(0)),
+                    coefficient, /*rhs_function=*/nullptr,
                     q_collection, mapping_collection);
 
     MatrixCreator::internal::AssemblerData::CopyData<number> copy_data;
@@ -701,7 +701,7 @@ namespace MatrixCreator
                      &MatrixCreator::internal::mass_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator,number>,
                      std::bind (&MatrixCreator::internal::
                                 copy_local_to_global<number,SparseMatrix<number>, Vector<number> >,
-                                std::placeholders::_1, &matrix, (Vector<number> *)0),
+                                std::placeholders::_1, &matrix, (Vector<number> *)nullptr),
                      assembler_data,
                      copy_data);
   }
@@ -796,8 +796,8 @@ namespace MatrixCreator
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim,number>
     assembler_data (dof.get_fe(),
                     update_values | update_JxW_values |
-                    (coefficient != 0 ? update_quadrature_points : UpdateFlags(0)),
-                    coefficient, /*rhs_function=*/0,
+                    (coefficient != nullptr ? update_quadrature_points : UpdateFlags(0)),
+                    coefficient, /*rhs_function=*/nullptr,
                     q, mapping);
     MatrixCreator::internal::AssemblerData::CopyData<number> copy_data;
     copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
@@ -811,7 +811,7 @@ namespace MatrixCreator
                      &MatrixCreator::internal::mass_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator,number>,
                      std::bind (&MatrixCreator::internal::
                                 copy_local_to_global<number,SparseMatrix<number>, Vector<number> >,
-                                std::placeholders::_1, &matrix, (Vector<number> *)0),
+                                std::placeholders::_1, &matrix, (Vector<number> *)nullptr),
                      assembler_data,
                      copy_data);
   }
@@ -926,7 +926,7 @@ namespace MatrixCreator
       std::vector<number>          coefficient_values (fe_values.n_quadrature_points, 1.);
       std::vector<Vector<number> > coefficient_vector_values (fe_values.n_quadrature_points,
                                                               Vector<number>(n_components));
-      const bool coefficient_is_vector = (coefficient != 0 && coefficient->n_components != 1)
+      const bool coefficient_is_vector = (coefficient != nullptr && coefficient->n_components != 1)
                                          ? true : false;
 
       std::vector<number>          rhs_values_scalar (fe_values.n_quadrature_points);
@@ -973,7 +973,7 @@ namespace MatrixCreator
                     // If a scalar function is given, update the
                     // values, if not, use the default one set in the
                     // constructor above
-                    if (coefficient != 0)
+                    if (coefficient != nullptr)
                       coefficient->value_list (fe_values.get_quadrature_points(),
                                                coefficient_values);
                     // Copy scalar values into vector
@@ -1046,7 +1046,7 @@ namespace MatrixCreator
                 boundary_functions.find(cell->face(face)->boundary_id())
                 ->second->value_list (fe_values.get_quadrature_points(), rhs_values_scalar);
 
-                if (coefficient != 0)
+                if (coefficient != nullptr)
                   coefficient->value_list (fe_values.get_quadrature_points(),
                                            coefficient_values);
                 for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -1220,7 +1220,7 @@ namespace MatrixCreator
     Assert (boundary_functions.size() != 0, ExcInternalError());
     Assert (dof_to_boundary_mapping.size() == dof.n_dofs(),
             ExcInternalError());
-    Assert (coefficient ==0 ||
+    Assert (coefficient ==nullptr ||
             coefficient->n_components==1 ||
             coefficient->n_components==n_components, ExcComponentMismatch());
 
@@ -1338,7 +1338,7 @@ namespace MatrixCreator
                 ->second->vector_value_list (fe_values.get_quadrature_points(),
                                              rhs_values_system);
 
-                if (coefficient != 0)
+                if (coefficient != nullptr)
                   {
                     if (coefficient->n_components==1)
                       {
@@ -1424,7 +1424,7 @@ namespace MatrixCreator
                 boundary_functions.find(cell->face(face)->boundary_id())
                 ->second->value_list (fe_values.get_quadrature_points(), rhs_values_scalar);
 
-                if (coefficient != 0)
+                if (coefficient != nullptr)
                   {
                     coefficient_values.resize (fe_values.n_quadrature_points);
                     coefficient->value_list (fe_values.get_quadrature_points(),
@@ -1637,7 +1637,7 @@ namespace MatrixCreator
     Assert (boundary_functions.size() != 0, ExcInternalError());
     Assert (dof_to_boundary_mapping.size() == dof.n_dofs(),
             ExcInternalError());
-    Assert (coefficient ==0 ||
+    Assert (coefficient ==nullptr ||
             coefficient->n_components==1 ||
             coefficient->n_components==n_components, ExcComponentMismatch());
 
@@ -1712,8 +1712,8 @@ namespace MatrixCreator
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim,double>
     assembler_data (fe_collection,
                     update_gradients  | update_JxW_values |
-                    (coefficient != 0 ? update_quadrature_points : UpdateFlags(0)),
-                    coefficient, /*rhs_function=*/0,
+                    (coefficient != nullptr ? update_quadrature_points : UpdateFlags(0)),
+                    coefficient, /*rhs_function=*/nullptr,
                     q_collection, mapping_collection);
     MatrixCreator::internal::AssemblerData::CopyData<double> copy_data;
     copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
@@ -1729,7 +1729,7 @@ namespace MatrixCreator
                                 copy_local_to_global<double,SparseMatrix<double>, Vector<double> >,
                                 std::placeholders::_1,
                                 &matrix,
-                                (Vector<double> *)NULL),
+                                (Vector<double> *)(nullptr)),
                      assembler_data,
                      copy_data);
   }
@@ -1825,8 +1825,8 @@ namespace MatrixCreator
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim,double>
     assembler_data (dof.get_fe(),
                     update_gradients  | update_JxW_values |
-                    (coefficient != 0 ? update_quadrature_points : UpdateFlags(0)),
-                    coefficient, /*rhs_function=*/0,
+                    (coefficient != nullptr ? update_quadrature_points : UpdateFlags(0)),
+                    coefficient, /*rhs_function=*/nullptr,
                     q, mapping);
     MatrixCreator::internal::AssemblerData::CopyData<double> copy_data;
     copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
@@ -1842,7 +1842,7 @@ namespace MatrixCreator
                                 copy_local_to_global<double,SparseMatrix<double>, Vector<double> >,
                                 std::placeholders::_1,
                                 &matrix,
-                                (Vector<double> *)0),
+                                (Vector<double> *)nullptr),
                      assembler_data,
                      copy_data);
   }

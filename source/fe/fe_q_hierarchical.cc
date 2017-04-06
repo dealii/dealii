@@ -217,13 +217,13 @@ hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const
   // single DoF of each FE at a
   // vertex, and they should have
   // identical value
-  if (dynamic_cast<const FE_Q_Hierarchical<dim>*>(&fe_other) != 0)
+  if (dynamic_cast<const FE_Q_Hierarchical<dim>*>(&fe_other) != nullptr)
     {
       return
         std::vector<std::pair<unsigned int, unsigned int> >
         (1, std::make_pair (0U, 0U));
     }
-  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != 0)
+  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != nullptr)
     {
       // the FE_Nothing has no
       // degrees of freedom, so there
@@ -247,7 +247,7 @@ hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
   // these identities if both FEs are
   // FE_Q_Hierarchicals or if the other
   // one is an FE_Nothing.
-  if (dynamic_cast<const FE_Q_Hierarchical<dim>*>(&fe_other) != 0)
+  if (dynamic_cast<const FE_Q_Hierarchical<dim>*>(&fe_other) != nullptr)
     {
       const unsigned int &this_dpl  = this->dofs_per_line;
       const unsigned int &other_dpl = fe_other.dofs_per_line;
@@ -262,7 +262,7 @@ hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
 
       return res;
     }
-  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != 0)
+  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != nullptr)
     {
       // the FE_Nothing has no
       // degrees of freedom, so there
@@ -286,7 +286,7 @@ hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const
   // these identities if both FEs are
   // FE_Q_Hierarchicals or if the other
   // one is an FE_Nothing.
-  if (dynamic_cast<const FE_Q_Hierarchical<dim>*>(&fe_other) != 0)
+  if (dynamic_cast<const FE_Q_Hierarchical<dim>*>(&fe_other) != nullptr)
     {
       const unsigned int &this_dpq  = this->dofs_per_quad;
       const unsigned int &other_dpq = fe_other.dofs_per_quad;
@@ -301,7 +301,7 @@ hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const
 
       return res;
     }
-  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != 0)
+  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != nullptr)
     {
       // the FE_Nothing has no
       // degrees of freedom, so there
@@ -824,7 +824,7 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
   typedef FiniteElement<dim> FEL;
   AssertThrow ((x_source_fe.get_name().find ("FE_Q_Hierarchical<") == 0)
                ||
-               (dynamic_cast<const FEQHierarchical *>(&x_source_fe) != 0),
+               (dynamic_cast<const FEQHierarchical *>(&x_source_fe) != nullptr),
                typename FEL::
                ExcInterpolationNotImplemented());
 
@@ -912,7 +912,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
   typedef FiniteElement<dim> FEL;
   AssertThrow ((x_source_fe.get_name().find ("FE_Q_Hierarchical<") == 0)
                ||
-               (dynamic_cast<const FEQHierarchical *>(&x_source_fe) != 0),
+               (dynamic_cast<const FEQHierarchical *>(&x_source_fe) != nullptr),
                typename FEL::
                ExcInterpolationNotImplemented());
 

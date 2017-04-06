@@ -832,7 +832,7 @@ namespace TrilinosWrappers
      *
      * This function is deprecated.
      */
-    void print (const char *format = 0) const DEAL_II_DEPRECATED;
+    void print (const char *format = nullptr) const DEAL_II_DEPRECATED;
 
     /**
      * Print to a stream. @p precision denotes the desired precision with
@@ -1203,14 +1203,14 @@ namespace TrilinosWrappers
   VectorBase::reinit (const VectorBase &v,
                       const bool        omit_zeroing_entries)
   {
-    Assert (vector.get() != 0,
+    Assert (vector.get() != nullptr,
             ExcMessage("Vector has not been constructed properly."));
 
     if (omit_zeroing_entries == false ||
         vector_partitioner().SameAs(v.vector_partitioner())==false)
       vector.reset (new Epetra_FEVector(*v.vector));
 
-    if (v.nonlocal_vector.get() != 0)
+    if (v.nonlocal_vector.get() != nullptr)
       nonlocal_vector.reset(new Epetra_MultiVector(v.nonlocal_vector->Map(), 1));
 
     owned_elements = v.owned_elements;
@@ -1227,7 +1227,7 @@ namespace TrilinosWrappers
     int ierr = vector->PutScalar(s);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-    if (nonlocal_vector.get() != 0)
+    if (nonlocal_vector.get() != nullptr)
       {
         ierr = nonlocal_vector->PutScalar(0.);
         AssertThrow (ierr == 0, ExcTrilinosError(ierr));
@@ -1373,7 +1373,7 @@ namespace TrilinosWrappers
         const TrilinosWrappers::types::int_type local_row = vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(row));
         if (local_row != -1)
           (*vector)[0][local_row] += values[i];
-        else if (nonlocal_vector.get() == 0)
+        else if (nonlocal_vector.get() == nullptr)
           {
             const int ierr = vector->SumIntoGlobalValues (1,
                                                           (const TrilinosWrappers::types::int_type *)(&row),

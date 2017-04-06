@@ -477,7 +477,7 @@ ChunkSparsityPattern::n_nonzero_elements () const
 void
 ChunkSparsityPattern::print (std::ostream &out) const
 {
-  Assert ((sparsity_pattern.rowstart!=0) && (sparsity_pattern.colnums!=0),
+  Assert ((sparsity_pattern.rowstart!=nullptr) && (sparsity_pattern.colnums!=nullptr),
           ExcEmptyObject());
 
   AssertThrow (out, ExcIO());
@@ -507,8 +507,8 @@ ChunkSparsityPattern::print (std::ostream &out) const
 void
 ChunkSparsityPattern::print_gnuplot (std::ostream &out) const
 {
-  Assert ((sparsity_pattern.rowstart!=0) &&
-          (sparsity_pattern.colnums!=0), ExcEmptyObject());
+  Assert ((sparsity_pattern.rowstart!=nullptr) &&
+          (sparsity_pattern.colnums!=nullptr), ExcEmptyObject());
 
   AssertThrow (out, ExcIO());
 

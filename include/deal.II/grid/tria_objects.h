@@ -371,7 +371,7 @@ namespace internal
          */
         UserData()
         {
-          p = 0;
+          p = nullptr;
         }
 
         /**
@@ -693,7 +693,7 @@ namespace internal
     {
       user_data_type = data_unknown;
       for (unsigned int i=0; i<user_data.size(); ++i)
-        user_data[i].p = 0;
+        user_data[i].p = nullptr;
     }
 
 

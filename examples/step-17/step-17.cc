@@ -782,7 +782,7 @@ namespace Step17
                                         localized_solution,
                                         local_error_per_cell,
                                         ComponentMask(),
-                                        0,
+                                        nullptr,
                                         MultithreadInfo::n_threads(),
                                         this_mpi_process);
 

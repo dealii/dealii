@@ -74,13 +74,13 @@ ExceptionBase::ExceptionBase ()
   function(""),
   cond(""),
   exc(""),
-  stacktrace (NULL),
+  stacktrace (nullptr),
   n_stacktrace_frames (0),
   what_str("")
 {
 #ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
   for (unsigned int i=0; i<sizeof(raw_stacktrace)/sizeof(raw_stacktrace[0]); ++i)
-    raw_stacktrace[i] = NULL;
+    raw_stacktrace[i] = nullptr;
 #endif
 }
 
@@ -93,13 +93,13 @@ ExceptionBase::ExceptionBase (const ExceptionBase &exc)
   function(exc.function),
   cond(exc.cond),
   exc(exc.exc),
-  stacktrace (NULL), // don't copy stacktrace to avoid double de-allocation problem
+  stacktrace (nullptr), // don't copy stacktrace to avoid double de-allocation problem
   n_stacktrace_frames (0),
   what_str("") // don't copy the error message, it gets generated dynamically by what()
 {
 #ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
   for (unsigned int i=0; i<sizeof(raw_stacktrace)/sizeof(raw_stacktrace[0]); ++i)
-    raw_stacktrace[i] = NULL;
+    raw_stacktrace[i] = nullptr;
 #endif
 }
 
@@ -108,7 +108,7 @@ ExceptionBase::ExceptionBase (const ExceptionBase &exc)
 ExceptionBase::~ExceptionBase () noexcept
 {
   free (stacktrace); // free(NULL) is allowed
-  stacktrace = NULL;
+  stacktrace = nullptr;
 }
 
 
@@ -186,7 +186,7 @@ void ExceptionBase::print_exc_data (std::ostream &out) const
   // between numerous "..."-enclosed strings that the preprocessor
   // collates into a single string, making it awkward to read. Consequently,
   // elide this text if the message was generated via an ExcMessage object
-  if (std::strstr(cond, "dealii::ExcMessage") != NULL)
+  if (std::strstr(cond, "dealii::ExcMessage") != nullptr)
     out << "The name and call sequence of the exception was:" << std::endl
         << "    " << exc  << std::endl;
 
@@ -250,7 +250,7 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
       // for unknown reasons :-) if we can, demangle the function name
 #ifdef DEAL_II_HAVE_LIBSTDCXX_DEMANGLER
       int         status;
-      char *p = abi::__cxa_demangle(functionname.c_str(), 0, 0, &status);
+      char *p = abi::__cxa_demangle(functionname.c_str(), nullptr, nullptr, &status);
 
       if ((status == 0) && (functionname != "main"))
         {

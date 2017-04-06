@@ -425,11 +425,11 @@ FunctionManifold<dim,spacedim,chartdim>::~FunctionManifold()
   if (owns_pointers == true)
     {
       const Function<chartdim> *pf = push_forward_function;
-      push_forward_function = 0;
+      push_forward_function = nullptr;
       delete pf;
 
       const Function<spacedim> *pb = pull_back_function;
-      pull_back_function = 0;
+      pull_back_function = nullptr;
       delete pb;
     }
 }

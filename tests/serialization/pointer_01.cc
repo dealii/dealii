@@ -71,7 +71,7 @@ void test ()
   // p2 should have been created, and should
   // have been different from the address of
   // p1
-  AssertThrow (p2 != 0, ExcInternalError());
+  AssertThrow (p2 != nullptr, ExcInternalError());
   AssertThrow (p1 != p2, ExcInternalError());
 
   delete p1;

@@ -200,9 +200,9 @@ namespace MeshWorker
     dof_info.cell.reinit(cell);
     dof_info.cell_valid = true;
 
-    const bool integrate_cell          = (cell_worker != 0);
-    const bool integrate_boundary      = (boundary_worker != 0);
-    const bool integrate_interior_face = (face_worker != 0);
+    const bool integrate_cell          = (cell_worker != nullptr);
+    const bool integrate_boundary      = (boundary_worker != nullptr);
+    const bool integrate_interior_face = (face_worker != nullptr);
 
     if (integrate_cell)
       info.cell.reinit(dof_info.cell);

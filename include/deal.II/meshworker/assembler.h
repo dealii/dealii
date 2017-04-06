@@ -623,7 +623,7 @@ namespace MeshWorker
      const std::vector<types::global_dof_index> &dof1,
      const std::vector<types::global_dof_index> &dof2)
     {
-      if (constraints == 0)
+      if (constraints == nullptr)
         {
           for (unsigned int j=0; j<local.n_rows(); ++j)
             for (unsigned int k=0; k<local.n_cols(); ++k)

@@ -371,7 +371,7 @@ namespace Polynomials
     // well if necessary. copy the polynomial to
     // do this
     std::shared_ptr<Polynomial<number> > q_data;
-    const Polynomial<number> *q = 0;
+    const Polynomial<number> *q = nullptr;
     if (p.in_lagrange_product_form == true)
       {
         q_data.reset (new Polynomial<number>(p));
@@ -415,7 +415,7 @@ namespace Polynomials
     // well if necessary. copy the polynomial to
     // do this
     std::shared_ptr<Polynomial<number> > q_data;
-    const Polynomial<number> *q = 0;
+    const Polynomial<number> *q = nullptr;
     if (p.in_lagrange_product_form == true)
       {
         q_data.reset (new Polynomial<number>(p));
@@ -451,7 +451,7 @@ namespace Polynomials
     // well if necessary. copy the polynomial to
     // do this
     std::shared_ptr<Polynomial<number> > q_data;
-    const Polynomial<number> *q = 0;
+    const Polynomial<number> *q = nullptr;
     if (p.in_lagrange_product_form == true)
       {
         q_data.reset (new Polynomial<number>(p));
@@ -598,7 +598,7 @@ namespace Polynomials
       return Monomial<number>(0, 0.);
 
     std::shared_ptr<Polynomial<number> > q_data;
-    const Polynomial<number> *q = 0;
+    const Polynomial<number> *q = nullptr;
     if (in_lagrange_product_form == true)
       {
         q_data.reset (new Polynomial<number>(*this));
@@ -624,7 +624,7 @@ namespace Polynomials
     // no simple form possible for Lagrange
     // polynomial on product form
     std::shared_ptr<Polynomial<number> > q_data;
-    const Polynomial<number> *q = 0;
+    const Polynomial<number> *q = nullptr;
     if (in_lagrange_product_form == true)
       {
         q_data.reset (new Polynomial<number>(*this));
@@ -753,7 +753,7 @@ namespace Polynomials
     unsigned int n_functions=n+1;
     Assert(support_point<n_functions,
            ExcIndexRange(support_point, 0, n_functions));
-    double const *x=0;
+    double const *x=nullptr;
 
     switch (n)
       {
@@ -794,7 +794,7 @@ namespace Polynomials
         Assert(false, ExcInternalError())
       }
 
-    Assert(x!=0, ExcInternalError());
+    Assert(x!=nullptr, ExcInternalError());
     for (unsigned int i=0; i<n_functions; ++i)
       a[i]=x[support_point*n_functions+i];
   }
@@ -1005,7 +1005,7 @@ namespace Polynomials
     // already exist?
     if (  (recursive_coefficients.size() < k+1) ||
           ((recursive_coefficients.size() >= k+1) &&
-           (recursive_coefficients[k].get() == 0)) )
+           (recursive_coefficients[k].get() == nullptr)) )
       // no, then generate the
       // respective coefficients
       {

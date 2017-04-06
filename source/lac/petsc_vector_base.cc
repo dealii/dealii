@@ -39,7 +39,7 @@ namespace PETScWrappers
       // if the vector is local, then
       // simply access the element we
       // are interested in
-      if (dynamic_cast<const PETScWrappers::Vector *>(&vector) != 0)
+      if (dynamic_cast<const PETScWrappers::Vector *>(&vector) != nullptr)
         {
           PetscInt idx = index;
           PetscScalar value;
@@ -49,7 +49,7 @@ namespace PETScWrappers
         }
       // else see if we are dealing
       // with a parallel vector
-      else if (dynamic_cast<const PETScWrappers::MPI::Vector *>(&vector) != 0)
+      else if (dynamic_cast<const PETScWrappers::MPI::Vector *>(&vector) != nullptr)
         {
           // there is the possibility
           // that the vector has
@@ -149,7 +149,7 @@ namespace PETScWrappers
 
   VectorBase::VectorBase ()
     :
-    vector (NULL),
+    vector (nullptr),
     ghosted(false),
     last_action (::dealii::VectorOperation::unknown),
     attained_ownership(true)
@@ -472,7 +472,7 @@ namespace PETScWrappers
   {
     // We can only use our more efficient
     // routine in the serial case.
-    if (dynamic_cast<const PETScWrappers::MPI::Vector *>(this) != 0)
+    if (dynamic_cast<const PETScWrappers::MPI::Vector *>(this) != nullptr)
       {
         PetscScalar sum;
         const PetscErrorCode ierr = VecSum(vector, &sum);

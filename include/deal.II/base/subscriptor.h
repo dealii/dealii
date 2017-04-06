@@ -101,7 +101,7 @@ public:
    * Subscribes a user of the object. The subscriber may be identified by text
    * supplied as <tt>identifier</tt>.
    */
-  void subscribe (const char *identifier = 0) const;
+  void subscribe (const char *identifier = nullptr) const;
 
   /**
    * Unsubscribes a user from the object.
@@ -109,7 +109,7 @@ public:
    * @note The <tt>identifier</tt> must be the <b>same pointer</b> as the one
    * supplied to subscribe(), not just the same text.
    */
-  void unsubscribe (const char *identifier = 0) const;
+  void unsubscribe (const char *identifier = nullptr) const;
 
   /**
    * Return the present number of subscriptions to this object. This allows to

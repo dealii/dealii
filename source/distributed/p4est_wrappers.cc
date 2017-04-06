@@ -442,7 +442,7 @@ namespace internal
                                void *user_data)
     {
       p4est_iterate (parallel_forest, parallel_ghost, user_data,
-                     NULL,
+                     nullptr,
                      find_ghosts_face<2,spacedim>,
                      find_ghosts_corner<2,spacedim>);
     }
@@ -644,7 +644,7 @@ namespace internal
                                void *user_data)
     {
       p8est_iterate (parallel_forest, parallel_ghost, user_data,
-                     NULL,
+                     nullptr,
                      find_ghosts_face<3,spacedim>,
                      find_ghosts_edge<3,spacedim>,
                      find_ghosts_corner<3,spacedim>);
