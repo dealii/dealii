@@ -1282,22 +1282,30 @@
  *
  * <dt class="glossary">@anchor GlossNodes <b>Node values or node functionals</b></dt>
  *
- * <dd>It is customary to define a FiniteElement as a pair consisting
- * of a local function space and a set of node values $N_i$ on the
- * mesh cells (usually defined on the @ref GlossReferenceCell
- * "reference cell"). Then, the basis of the local function space is
- * chosen such that $N_i(v_j) = \delta_{ij}$, the Kronecker delta.
+ * <dd>It is customary to define a finite element as a triple
+ * $(K,P,\Psi)$ where
+ * - $K$ is the cell, where in deal.II this is always a line segment,
+ *   quadrilateral, or hexahedron;
+ * - $P$ is a finite-dimensional space, e.g., a polynomial space mapped
+ *   from the @ref GlossReferenceCell "reference cell" to $K$;
+ * - $\Psi$ is a set of "node functionals", i.e., functionals
+ *   $\Psi_i : P \rightarrow {\mathbb R}$.
+ * The dimension of $P$ must be equal to the number of node functionals.
+ * With this definition, we can define a basis of the local function space,
+ * i.e., a set of "shape functions" $\varphi_j\in P$, by requiring that
+ * $\Psi_i(\varphi_j) = \delta_{ij}$, where $\delta$ is the Kronecker delta.
  *
- * This splitting has several advantages, concerning analysis as well
+ * This definition of what a finite element is has several advantages,
+ * concerning analysis as well
  * as implementation. For the analysis, it means that conformity with
  * certain spaces (FiniteElementData::Conformity), e.g. continuity, is
- * up to the node values. In deal.II, it helps simplifying the
+ * up to the node functionals. In deal.II, it helps simplifying the
  * implementation of more complex elements like FE_RaviartThomas
  * considerably.
  *
- * Examples for node functionals are values in @ref GlossSupport
- * "support points" and moments with respect to Legendre
- * polynomials. Let us give some examples:
+ * Examples for node functionals are values in
+ * @ref GlossSupport "support points" and moments with respect to Legendre
+ * polynomials. Examples:
  *
  * <table><tr>
  *   <th>Element</th>
@@ -1316,6 +1324,13 @@
  *     <td><i>Q<sub>k+1,k</sub> x Q<sub>k,k+1</sub></i></td>
  *     <td>Gauss points on edges(faces) and anisotropic Gauss points in the interior</td></tr>
  * </table>
+ *
+ * The construction of finite elements as outlined above allows writing
+ * code that describes a finite element simply by providing a polynomial
+ * space (without having to give it any particular basis -- whatever is convenient
+ * is entirely sufficient) and the nodal functionals. This is used, for example
+ * in the FiniteElement::convert_generalized_support_point_values_to_nodal_values()
+ * function.
  * </dd>
  *
  *
