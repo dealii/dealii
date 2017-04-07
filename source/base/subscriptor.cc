@@ -63,7 +63,6 @@ Subscriptor::Subscriptor (const Subscriptor &)
 
 
 
-#ifdef DEAL_II_WITH_CXX11
 Subscriptor::Subscriptor (Subscriptor &&subscriptor)
   :
   counter(0),
@@ -71,19 +70,13 @@ Subscriptor::Subscriptor (Subscriptor &&subscriptor)
 {
   subscriptor.check_no_subscribers();
 }
-#endif
 
 
 
 Subscriptor::~Subscriptor ()
 {
   check_no_subscribers();
-
-#ifdef DEAL_II_WITH_CXX11
   object_info = nullptr;
-#else
-  object_info = 0;
-#endif
 }
 
 
@@ -159,14 +152,13 @@ Subscriptor &Subscriptor::operator = (const Subscriptor &s)
 
 
 
-#ifdef DEAL_II_WITH_CXX11
 Subscriptor &Subscriptor::operator = (Subscriptor &&s)
 {
   s.check_no_subscribers();
   object_info = s.object_info;
   return *this;
 }
-#endif
+
 
 
 void

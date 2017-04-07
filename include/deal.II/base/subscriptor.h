@@ -69,7 +69,6 @@ public:
    */
   Subscriptor(const Subscriptor &);
 
-#ifdef DEAL_II_WITH_CXX11
   /**
    * Move constructor.
    *
@@ -77,7 +76,6 @@ public:
    * objects are subscribing to it.
    */
   Subscriptor(Subscriptor &&);
-#endif
 
   /**
    * Destructor, asserting that the counter is zero.
@@ -92,14 +90,12 @@ public:
    */
   Subscriptor &operator = (const Subscriptor &);
 
-#ifdef DEAL_II_WITH_CXX11
   /**
    * Move assignment operator.
    *
    * Asserts that the counter for the moved object is zero.
    */
   Subscriptor &operator = (Subscriptor &&);
-#endif
 
   /**
    * Subscribes a user of the object. The subscriber may be identified by text

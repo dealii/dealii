@@ -108,7 +108,6 @@ public:
    */
   explicit IndexSet (const size_type size);
 
-#ifdef DEAL_II_WITH_CXX11
   /**
    * Copy constructor.
    */
@@ -130,7 +129,6 @@ public:
    * the current one.
    */
   IndexSet &operator= (IndexSet &&is);
-#endif
 
 #ifdef DEAL_II_WITH_TRILINOS
   /**
@@ -1348,8 +1346,6 @@ IndexSet::IndexSet (const size_type size)
 
 
 
-#ifdef DEAL_II_WITH_CXX11
-
 inline
 IndexSet::IndexSet (IndexSet &&is)
   :
@@ -1365,6 +1361,7 @@ IndexSet::IndexSet (IndexSet &&is)
 
   compress ();
 }
+
 
 
 inline
@@ -1385,7 +1382,6 @@ IndexSet &IndexSet::operator= (IndexSet &&is)
   return *this;
 }
 
-#endif
 
 
 inline

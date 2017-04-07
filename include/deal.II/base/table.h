@@ -444,14 +444,10 @@ public:
   template <typename T2>
   TableBase (const TableBase<N,T2> &src);
 
-#ifdef DEAL_II_WITH_CXX11
   /**
    * Move constructor. Transfers the contents of another Table.
-   *
-   * @note This constructor is only available if deal.II is built with C++11.
    */
   TableBase (TableBase<N,T> &&src);
-#endif
 
   /**
    * Destructor. Free allocated memory.
@@ -478,15 +474,11 @@ public:
   template<typename T2>
   TableBase<N,T> &operator = (const TableBase<N,T2> &src);
 
-#ifdef DEAL_II_WITH_CXX11
   /**
    * Move assignment operator. Transfer all elements of <tt>src</tt> into the
    * table.
-   *
-   * @note This operator is only available if deal.II is built with C++11.
    */
   TableBase<N,T> &operator = (TableBase<N,T> &&src);
-#endif
 
   /**
    * Test for equality of two tables.
@@ -1668,8 +1660,6 @@ TableBase<N,T>::TableBase (const TableBase<N,T2> &src)
 
 
 
-#ifdef DEAL_II_WITH_CXX11
-
 template <int N, typename T>
 TableBase<N,T>::TableBase (TableBase<N,T> &&src)
   :
@@ -1679,8 +1669,6 @@ TableBase<N,T>::TableBase (TableBase<N,T> &&src)
 {
   src.table_size = TableIndices<N>();
 }
-
-#endif
 
 
 
@@ -1882,8 +1870,6 @@ TableBase<N,T>::operator = (const TableBase<N,T2> &m)
 
 
 
-#ifdef DEAL_II_WITH_CXX11
-
 template <int N, typename T>
 inline
 TableBase<N,T> &
@@ -1896,8 +1882,6 @@ TableBase<N,T>::operator = (TableBase<N,T> &&m)
 
   return *this;
 }
-
-#endif
 
 
 
