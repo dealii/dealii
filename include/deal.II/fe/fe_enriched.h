@@ -197,8 +197,6 @@ DEAL_II_NAMESPACE_OPEN
  * The ordering of the shape function, @p interface_constrains, the @p prolongation (embedding)
  * and the @p restriction matrices are taken from the FESystem class.
  *
- * @note This class is only available when deal.II is compiled with C++11.
- *
  * @ingroup fe
  *
  * @author Denis Davydov, 2016.

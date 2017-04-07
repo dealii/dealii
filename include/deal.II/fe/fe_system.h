@@ -271,8 +271,7 @@ public:
    *   {}
    * @endcode
    *
-   * If your compiler supports the C++11 language standard (or later) and
-   * deal.II has been configured to use it, then you could do something like
+   * Using the C++11 language standard (or later) you could do something like
    * this to create an element with four base elements and multiplicities 1,
    * 2, 3 and 4:
    * @code
@@ -291,7 +290,7 @@ public:
    *
    * This code has a problem: it creates four memory leaks because the first
    * vector above is created with pointers to elements that are allocated with
-   * <code>new</code> but never destroyed. Without C++11, you have another
+   * <code>new</code> but never destroyed. Without C++11, you would have another
    * problem: brace-initializer don't exist in earlier C++ standards.
    *
    * The solution to the second of these problems is to create two static

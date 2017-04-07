@@ -1184,11 +1184,7 @@ namespace FETools
    * function, use the add_fe_name() function.  This function does not work if
    * one wants to get a codimension 1 finite element.
    */
-  template <int dim, int spacedim
-#ifdef DEAL_II_WITH_CXX11
-            =dim
-#endif
-            >
+  template <int dim, int spacedim = dim>
   FiniteElement<dim, spacedim> *
   get_fe_by_name (const std::string &name);
 

@@ -30,11 +30,7 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/signals2.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/map.hpp>
-#ifdef DEAL_II_WITH_CXX11
-#  include <boost/serialization/unique_ptr.hpp>
-#else
-#  include <boost/serialization/scoped_ptr.hpp>
-#endif
+#include <boost/serialization/unique_ptr.hpp>
 #include <boost/serialization/split_member.hpp>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
@@ -1593,7 +1589,6 @@ public:
    */
   Triangulation (const Triangulation<dim, spacedim> &t);
 
-#ifdef DEAL_II_WITH_CXX11
   /**
    * Move constructor.
    *
@@ -1606,7 +1601,6 @@ public:
    * Move assignment operator.
    */
   Triangulation &operator = (Triangulation<dim, spacedim> &&tria);
-#endif
 
   /**
    * Delete the object and all levels of the hierarchy.
@@ -3537,12 +3531,10 @@ private:
 
   // explicitly check for sensible template arguments, but not on windows
   // because MSVC creates bogus warnings during normal compilation
-#ifdef DEAL_II_WITH_CXX11
 #ifndef DEAL_II_MSVC
   static_assert (dim<=spacedim,
                  "The dimension <dim> of a Triangulation must be less than or "
                  "equal to the space dimension <spacedim> in which it lives.");
-#endif
 #endif
 
 };

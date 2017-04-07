@@ -8986,8 +8986,6 @@ Triangulation (const Triangulation<dim, spacedim> &other)
 
 
 
-#ifdef DEAL_II_WITH_CXX11
-
 template <int dim, int spacedim>
 Triangulation<dim, spacedim>::
 Triangulation (Triangulation<dim, spacedim> &&tria)
@@ -9040,8 +9038,6 @@ Triangulation<dim, spacedim>::operator= (Triangulation<dim, spacedim> &&tria)
 
   return *this;
 }
-
-#endif
 
 
 
