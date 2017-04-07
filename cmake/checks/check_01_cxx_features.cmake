@@ -19,6 +19,7 @@
 # This file sets up
 #
 #   DEAL_II_WITH_CXX14
+#   DEAL_II_WITH_CXX17
 #
 #   DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
 #   DEAL_II_HAVE_ISNAN
@@ -26,6 +27,8 @@
 #   DEAL_II_HAVE_ISFINITE
 #   DEAL_II_HAVE_FP_EXCEPTIONS
 #   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
+#
+#   DEAL_II_FALLTHROUGH
 #
 
 
@@ -36,6 +39,18 @@
 ########################################################################
 
 #
+IF(DEAL_II_WITH_CXX17 AND DEFINED DEAL_II_WITH_CXX14 AND NOT DEAL_II_WITH_CXX14)
+  MESSAGE(FATAL_ERROR
+    "Compiling deal.II with C++17 support (i.e., DEAL_II_WITH_CXX17=ON) requires"
+    " that C++14 support not be explicitly disabled (i.e., DEAL_II_WITH_CXX14 may"
+    " not be set to a logically false value)."
+    )
+ENDIF()
+
+IF(DEFINED DEAL_II_WITH_CXX14 AND NOT DEAL_II_WITH_CXX14)
+  SET(DEAL_II_WITH_CXX17 OFF CACHE STRING "" FORCE)
+ENDIF()
+
 # Check the user supplied DEAL_II_CXX_VERSION_FLAG
 #
 
@@ -89,6 +104,61 @@ MACRO(_check_version _version _symbolic)
       )
   ENDIF()
 ENDMACRO()
+
+#
+# Check for proper C++17 support and set up DEAL_II_HAVE_CXX17:
+#
+IF(NOT DEFINED DEAL_II_WITH_CXX17 OR DEAL_II_WITH_CXX17)
+  _check_version("17" "1z")
+
+  IF(NOT "${DEAL_II_CXX_VERSION_FLAG}" STREQUAL "")
+    # Set CMAKE_REQUIRED_FLAGS for the unit tests
+    MESSAGE(STATUS "Using C++ version flag \"${DEAL_II_CXX_VERSION_FLAG}\"")
+    PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
+    PUSH_CMAKE_REQUIRED("-Werror")
+
+    #
+    # Test that the c++17 attributes are supported.
+    #
+    CHECK_CXX_SOURCE_COMPILES(
+      "
+      #include <iostream>
+
+      [[nodiscard]] int test_nodiscard()
+      {
+        return 1;
+      }
+
+      int main()
+      {
+        const unsigned int n=1;
+        switch (n)
+        {
+          case 1:
+            std::cout << n;
+            [[fallthrough]];
+          case 2:
+            std::cout << n;
+        }
+
+        [[maybe_unused]] int i = test_nodiscard();
+      }
+      "
+      DEAL_II_HAVE_CXX17_ATTRIBUTES)
+
+    RESET_CMAKE_REQUIRED()
+  ENDIF()
+
+  IF( DEAL_II_HAVE_CXX17_ATTRIBUTES )
+    SET(DEAL_II_HAVE_CXX17 TRUE)
+  ELSE()
+    IF(NOT _user_provided_cxx_version_flag)
+      SET(DEAL_II_CXX_VERSION_FLAG "")
+    ENDIF()
+  ENDIF()
+ENDIF()
+
+
 
 #
 # Check for proper C++14 support and set up DEAL_II_HAVE_CXX14:
@@ -284,8 +354,13 @@ ENDIF()
 
 
 #
-# Set up a configuration option for C++14 support:
+# Set up a configuration option for C++14 and C++17 support:
 #
+
+IF (DEAL_II_HAVE_CXX17 AND NOT DEAL_II_HAVE_CXX14)
+  MESSAGE(STATUS "Disabling CXX17 support because CXX14 detection failed.")
+  SET(DEAL_II_HAVE_CXX17 FALSE)
+ENDIF()
 
 OPTION(DEAL_II_WITH_CXX14
   "Compile deal.II using C++14 language standard."
@@ -293,6 +368,13 @@ OPTION(DEAL_II_WITH_CXX14
   )
 LIST(APPEND DEAL_II_FEATURES CXX14)
 SET(FEATURE_CXX14_PROCESSED TRUE)
+
+OPTION(DEAL_II_WITH_CXX17
+  "Compile deal.II using C++17 language standard."
+  ${DEAL_II_HAVE_CXX17}
+  )
+LIST(APPEND DEAL_II_FEATURES CXX17)
+SET(FEATURE_CXX17_PROCESSED TRUE)
 
 #
 # Bail out if user requested support for a certain C++ version (e.g.,
@@ -302,8 +384,8 @@ SET(FEATURE_CXX14_PROCESSED TRUE)
 MACRO(_bailout _version _symbolic)
   IF(DEAL_II_WITH_CXX${_version} AND NOT DEAL_II_HAVE_CXX${_version})
     MESSAGE(FATAL_ERROR "\n"
-      "C++${_version} support was requested (DEAL_II_WITH_CXX${_version}=${DEAL_II_WITH_CXX${_version}}) but is not "
-      "supported by the current compiler.\n"
+      "C++${_version} support was requested (DEAL_II_WITH_CXX${_version}=${DEAL_II_WITH_CXX${_version}}) "
+      "but it is not supported by the current compiler.\n"
       "Please disable C++${_version} support, i.e. configure with\n"
       "    -DDEAL_II_WITH_CXX${_version}=FALSE,\n"
       "or use a different compiler, instead. (If the compiler flag for C++${_version} "
@@ -315,6 +397,7 @@ MACRO(_bailout _version _symbolic)
 ENDMACRO()
 
 _bailout("14" "1y")
+_bailout("17" "1z")
 
 #
 # Some compilers (notably GCC6 and up) default to C++14 (more exactly, GNU++14,
@@ -343,6 +426,27 @@ IF(_user_provided_cxx_version_flag OR
     (DEAL_II_COMPILER_DEFAULTS_TO_CXX11_OR_NEWER AND NOT DEAL_II_WITH_CXX14))
   ADD_FLAGS(DEAL_II_CXX_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
   MESSAGE(STATUS "Using C++ version flag \"${DEAL_II_CXX_VERSION_FLAG}\"")
+ENDIF ()
+
+IF (DEAL_II_WITH_CXX17)
+  ADD_FLAGS(DEAL_II_CXX_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
+  MESSAGE(STATUS "DEAL_II_WITH_CXX14 successfully set up")
+  MESSAGE(STATUS "DEAL_II_WITH_CXX17 successfully set up")
+ELSEIF (DEAL_II_WITH_CXX14)
+  ADD_FLAGS(DEAL_II_CXX_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
+  MESSAGE(STATUS "DEAL_II_WITH_CXX14 successfully set up")
+ELSE()
+  MESSAGE(STATUS
+    "DEAL_II_WITH_CXX17 and DEAL_II_WITH_CXX14 are both disabled")
+ENDIF()
+
+#
+# Enable c++17's [[fallthrough]] attribute.
+#
+IF(DEAL_II_WITH_CXX17)
+  SET(DEAL_II_FALLTHROUGH "[[fallthrough]]")
+ELSE()
+  SET(DEAL_II_FALLTHROUGH " ")
 ENDIF()
 
 

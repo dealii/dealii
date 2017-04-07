@@ -2,7 +2,7 @@ This folder contains the deal.II CMake build system
 ===================================================
 
 Extensive documentation can be found at
-`/doc/development/cmake-internals.html`
+`/doc/developers/cmake-internals.html`
 
 It is structured as follows:
 
