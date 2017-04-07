@@ -385,9 +385,7 @@ EigenInverse<VectorType>::solve (double           &value,
       --i;
 
       // Compute unshifted eigenvalue
-      value = (entry * x (i) < 0.) ? -length : length;
-      value = 1./value;
-      value -= current_shift;
+      value = (entry * x(i) < 0. ? -1. : 1.) / length - current_shift;
 
       if (iter==goal)
         {
