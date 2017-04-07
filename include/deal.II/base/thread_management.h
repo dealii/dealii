@@ -2900,7 +2900,7 @@ namespace Threads
     TaskDescriptor<RT>::TaskDescriptor (const std::function<RT ()> &function)
       :
       function (function),
-      task((nullptr)),
+      task(nullptr),
       task_is_done (false)
     {}
 

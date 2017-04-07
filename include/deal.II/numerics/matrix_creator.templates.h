@@ -1220,7 +1220,7 @@ namespace MatrixCreator
     Assert (boundary_functions.size() != 0, ExcInternalError());
     Assert (dof_to_boundary_mapping.size() == dof.n_dofs(),
             ExcInternalError());
-    Assert (coefficient ==nullptr ||
+    Assert (coefficient == nullptr ||
             coefficient->n_components==1 ||
             coefficient->n_components==n_components, ExcComponentMismatch());
 
@@ -1637,7 +1637,7 @@ namespace MatrixCreator
     Assert (boundary_functions.size() != 0, ExcInternalError());
     Assert (dof_to_boundary_mapping.size() == dof.n_dofs(),
             ExcInternalError());
-    Assert (coefficient ==nullptr ||
+    Assert (coefficient == nullptr ||
             coefficient->n_components==1 ||
             coefficient->n_components==n_components, ExcComponentMismatch());
 

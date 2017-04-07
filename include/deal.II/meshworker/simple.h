@@ -524,7 +524,7 @@ namespace MeshWorker
                                                                  info.indices:
                                                                  info.indices_by_block[i];
 
-              if (constraints !=nullptr)
+              if (constraints != nullptr)
                 constraints->distribute_local_to_global(info.vector(k).block(i), ldi, *v);
               else
                 v->add(ldi, info.vector(k).block(i));

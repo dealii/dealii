@@ -930,7 +930,7 @@ namespace internal
  * classes. Again, see
  * @ref GlossUserData "the glossary for more information".
  *
- * The value of these user indices or pointers is @pnullptrby default. Note
+ * The value of these user indices or pointers is @p nullptr by default. Note
  * that the pointers are not inherited to children upon refinement. Still,
  * after a remeshing they are available on all cells, where they were set on
  * the previous mesh.

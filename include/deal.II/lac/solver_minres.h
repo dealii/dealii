@@ -169,13 +169,13 @@ SolverMinRes<VectorType>::SolverMinRes (SolverControl        &cn,
                                         const AdditionalData &)
   :
   Solver<VectorType>(cn),
-  Vu0((nullptr)),
-  Vu1((nullptr)),
-  Vu2((nullptr)),
-  Vm0((nullptr)),
-  Vm1((nullptr)),
-  Vm2((nullptr)),
-  Vv((nullptr)),
+  Vu0(nullptr),
+  Vu1(nullptr),
+  Vu2(nullptr),
+  Vm0(nullptr),
+  Vm1(nullptr),
+  Vm2(nullptr),
+  Vv(nullptr),
   res2(numbers::signaling_nan<double>())
 {}
 

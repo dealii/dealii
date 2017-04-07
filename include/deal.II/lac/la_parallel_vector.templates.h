@@ -831,7 +831,7 @@ namespace LinearAlgebra
       // If no communication pattern is given, create one. Otherwise, use the
       // given one.
       std::shared_ptr<const Utilities::MPI::Partitioner> comm_pattern;
-      if (communication_pattern.get() == (nullptr))
+      if (communication_pattern.get() == nullptr)
         {
           // Split the IndexSet of V in locally owned elements and ghost indices
           // then create the communication pattern
@@ -1552,7 +1552,7 @@ namespace LinearAlgebra
                            const bool         scientific,
                            const bool         across) const
     {
-      Assert (partitioner.get() !=nullptr, ExcInternalError());
+      Assert (partitioner.get() != nullptr, ExcInternalError());
       AssertThrow (out, ExcIO());
       std::ios::fmtflags old_flags = out.flags();
       unsigned int old_precision = out.precision (precision);

@@ -157,7 +157,7 @@ template <typename ElementType>
 inline
 ArrayView<ElementType>::ArrayView()
   :
-  starting_element ((nullptr)),
+  starting_element (nullptr),
   n_elements(0)
 {}
 

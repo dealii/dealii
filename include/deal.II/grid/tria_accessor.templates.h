@@ -2134,7 +2134,7 @@ inline
 TriaAccessor<0, dim, spacedim>::
 TriaAccessor (const TriaAccessor<structdim2,dim2,spacedim2> &)
   :
-  tria ((nullptr)),
+  tria (nullptr),
   global_vertex_index (numbers::invalid_unsigned_int)
 {
   Assert(false, ExcImpossibleInDim(0));
@@ -2148,7 +2148,7 @@ inline
 TriaAccessor<0, dim, spacedim>::
 TriaAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &)
   :
-  tria ((nullptr)),
+  tria (nullptr),
   global_vertex_index (numbers::invalid_unsigned_int)
 {
   Assert(false, ExcImpossibleInDim(0));

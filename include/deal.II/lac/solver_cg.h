@@ -327,9 +327,9 @@ SolverCG<VectorType>::SolverCG (SolverControl        &cn,
                                 const AdditionalData     &data)
   :
   Solver<VectorType>(cn,mem),
-  Vr((nullptr)),
-  Vp((nullptr)),
-  Vz((nullptr)),
+  Vr(nullptr),
+  Vp(nullptr),
+  Vz(nullptr),
   additional_data(data)
 {}
 
@@ -340,9 +340,9 @@ SolverCG<VectorType>::SolverCG (SolverControl        &cn,
                                 const AdditionalData &data)
   :
   Solver<VectorType>(cn),
-  Vr((nullptr)),
-  Vp((nullptr)),
-  Vz((nullptr)),
+  Vr(nullptr),
+  Vp(nullptr),
+  Vz(nullptr),
   additional_data(data)
 {}
 

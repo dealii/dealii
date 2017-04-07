@@ -83,19 +83,19 @@ namespace Patterns
       return p;
 
     p = Double::create(description);
-    if (p !=nullptr )
+    if (p != nullptr )
       return p;
 
     p = Selection::create(description);
-    if (p !=nullptr )
+    if (p != nullptr )
       return p;
 
     p = List::create(description);
-    if (p !=nullptr )
+    if (p != nullptr )
       return p;
 
     p = MultipleSelection::create(description);
-    if (p !=nullptr )
+    if (p != nullptr )
       return p;
 
     p = Bool::create(description);
@@ -103,11 +103,11 @@ namespace Patterns
       return p;
 
     p = Anything::create(description);
-    if (p !=nullptr )
+    if (p != nullptr )
       return p;
 
     p = FileName::create(description);
-    if (p !=nullptr )
+    if (p != nullptr )
       return p;
 
     p = DirectoryName::create(description);

@@ -931,7 +931,7 @@ namespace MatrixFreeOperators
   {
     (void) col;
     Assert (row == col, ExcNotImplemented());
-    Assert (inverse_diagonal_entries.get() !=nullptr&&
+    Assert (inverse_diagonal_entries.get() != nullptr &&
             inverse_diagonal_entries->m() > 0, ExcNotInitialized());
     return 1.0/(*inverse_diagonal_entries)(row,row);
   }
@@ -1344,7 +1344,8 @@ namespace MatrixFreeOperators
   std::size_t
   Base<dim,VectorType>::memory_consumption () const
   {
-    return inverse_diagonal_entries.get() !=nullptr? inverse_diagonal_entries->memory_consumption() : sizeof(*this);
+    return inverse_diagonal_entries.get() != nullptr ?
+           inverse_diagonal_entries->memory_consumption() : sizeof(*this);
   }
 
 
@@ -1362,7 +1363,7 @@ namespace MatrixFreeOperators
   const std::shared_ptr<DiagonalMatrix<VectorType> > &
   Base<dim,VectorType>::get_matrix_diagonal_inverse() const
   {
-    Assert(inverse_diagonal_entries.get() !=nullptr&&
+    Assert(inverse_diagonal_entries.get() != nullptr &&
            inverse_diagonal_entries->m() > 0, ExcNotInitialized());
     return inverse_diagonal_entries;
   }
@@ -1399,7 +1400,7 @@ namespace MatrixFreeOperators
   MGInterfaceOperator<OperatorType>::MGInterfaceOperator ()
     :
     Subscriptor(),
-    mf_base_operator((nullptr))
+    mf_base_operator(nullptr)
   {
   }
 
@@ -1409,7 +1410,7 @@ namespace MatrixFreeOperators
   void
   MGInterfaceOperator<OperatorType>::clear ()
   {
-    mf_base_operator = (nullptr);
+    mf_base_operator = nullptr;
   }
 
 

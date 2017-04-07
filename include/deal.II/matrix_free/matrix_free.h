@@ -2100,7 +2100,7 @@ namespace internal
                 const internal::MatrixFreeFunctions::TaskInfo &task_info_in,
                 const bool is_blocked_in)
         :
-        dummy ((nullptr)),
+        dummy (nullptr),
         worker (worker_in),
         partition (partition_in),
         task_info (task_info_in),
@@ -2137,7 +2137,7 @@ namespace internal
                      const internal::MatrixFreeFunctions::TaskInfo &task_info_in,
                      const bool    is_blocked_in = false)
         :
-        dummy ((nullptr)),
+        dummy (nullptr),
         function (function_in),
         partition (partition_in),
         task_info (task_info_in),
@@ -2265,7 +2265,7 @@ namespace internal
                      const internal::MatrixFreeFunctions::TaskInfo &task_info_in,
                      const bool    is_blocked_in)
         :
-        dummy ((nullptr)),
+        dummy (nullptr),
         worker (worker_in),
         partition (partition_in),
         task_info (task_info_in),

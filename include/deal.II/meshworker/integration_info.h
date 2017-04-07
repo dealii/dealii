@@ -633,7 +633,7 @@ namespace MeshWorker
   inline const FiniteElement<dim, spacedim> &
   IntegrationInfo<dim,spacedim>::finite_element() const
   {
-    Assert (fe_pointer !=nullptr, ExcNotInitialized());
+    Assert (fe_pointer != nullptr, ExcNotInitialized());
     return *fe_pointer;
   }
 

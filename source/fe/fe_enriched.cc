@@ -656,7 +656,7 @@ FE_Enriched<dim,spacedim>::multiply_by_enrichment
                                    fe_data.enrichment[base_no].size()));
       for (unsigned int m=0; m < base_no_mult_local_enriched_dofs[base_no].size(); m++)
         {
-          Assert (enrichments[base_no-1][m](cell) !=nullptr,
+          Assert (enrichments[base_no-1][m](cell) != nullptr,
                   ExcMessage("The pointer to the enrichment function is NULL"));
 
           Assert (enrichments[base_no-1][m](cell)->n_components == 1,

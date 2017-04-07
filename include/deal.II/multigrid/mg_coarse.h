@@ -308,13 +308,13 @@ private:
 /* ------------------ Functions for MGCoarseGridApplySmoother -----------*/
 template<class VectorType>
 MGCoarseGridApplySmoother<VectorType>::MGCoarseGridApplySmoother ()
-  : coarse_smooth((nullptr))
+  : coarse_smooth(nullptr)
 {
 }
 
 template<class VectorType>
 MGCoarseGridApplySmoother<VectorType>::MGCoarseGridApplySmoother (const MGSmootherBase<VectorType> &coarse_smooth)
-  : coarse_smooth((nullptr))
+  : coarse_smooth(nullptr)
 {
   initialize(coarse_smooth);
 }

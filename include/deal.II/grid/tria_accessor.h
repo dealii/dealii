@@ -1104,7 +1104,7 @@ public:
   void set_user_pointer (void *p) const;
 
   /**
-   * Reset the user pointer to a @pnullptrpointer. See
+   * Reset the user pointer to a @p nullptr pointer. See
    * @ref GlossUserData
    * for more information.
    */

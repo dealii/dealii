@@ -1912,10 +1912,10 @@ namespace internal
                               std::shared_ptr<DiagonalMatrix<VectorType> > &preconditioner,
                               VectorType                                         &diagonal_inverse)
     {
-      if (preconditioner.get() ==nullptr||
+      if (preconditioner.get() == nullptr ||
           preconditioner->m() != matrix.m())
         {
-          if (preconditioner.get() == (nullptr))
+          if (preconditioner.get() == nullptr)
             preconditioner.reset(new DiagonalMatrix<VectorType>());
 
           Assert(preconditioner->m() == 0,
