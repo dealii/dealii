@@ -45,9 +45,4 @@ template void MeanValueFilter::vmult_add(BlockVector<float> &,
 template void MeanValueFilter::vmult_add(BlockVector<double> &,
                                          const BlockVector<double> &) const;
 
-template class InverseMatrixRichardson<Vector<float> >;
-template class InverseMatrixRichardson<Vector<double> >;
-template class InverseMatrixRichardson<BlockVector<float> >;
-template class InverseMatrixRichardson<BlockVector<double> >;
-
 DEAL_II_NAMESPACE_CLOSE
