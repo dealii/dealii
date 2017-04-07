@@ -1636,7 +1636,7 @@ FESystem<dim,spacedim>::initialize_quad_dof_index_permutation ()
   Assert (index == this->dofs_per_quad,
           ExcInternalError());
 
-  // aditionally compose the permutation information for lines
+  // additionally compose the permutation information for lines
   Assert (this->adjust_line_dof_index_for_line_orientation_table.size()==
           this->dofs_per_line, ExcInternalError());
   index = 0;
