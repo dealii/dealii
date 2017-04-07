@@ -14,13 +14,12 @@
 // ---------------------------------------------------------------------
 
 
-// Test vmult and Tvmult of PointerMatrix and TransposeMatrix
+// Test vmult and Tvmult of PointerMatrix
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
-#include <deal.II/lac/pointer_matrix.h>
-#include <deal.II/lac/transpose_matrix.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/pointer_matrix.h>
 #include <deal.II/lac/vector.h>
 
 #include <fstream>
@@ -37,7 +36,6 @@ int main()
       A(i,j) = ++k;
 
   PointerMatrix<FullMatrix<double>, Vector<double> > P(&A, "P");
-  TransposeMatrix<FullMatrix<double>, Vector<double> > T(&A, "T");
 
   Vector<double> x(5);
   Vector<double> y(5);
@@ -53,21 +51,11 @@ int main()
       diff = y;
       diff.add(-1., y2);
       deallog << "P.vmult:  diff " << diff.l2_norm() << std::endl;
-      T.Tvmult(y2,x);
-      diff = y;
-      diff.add(-1., y2);
-      deallog << "T.Tvmult: diff " << diff.l2_norm() << std::endl;
 
       A.Tvmult(y,x);
       P.Tvmult(y2,x);
       diff = y;
       diff.add(-1., y2);
       deallog << "P.Tvmult: diff " << diff.l2_norm() << std::endl;
-      T.vmult(y2,x);
-      diff = y;
-      diff.add(-1., y2);
-      deallog << "T.vmult:  diff " << diff.l2_norm() << std::endl;
-
-
     }
 }
