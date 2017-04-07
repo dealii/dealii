@@ -1743,7 +1743,9 @@ FE_PolyTensor<PolynomialType,dim,spacedim>::requires_update_flags(const UpdateFl
         out |= update_hessians |  update_values | update_gradients |
                update_jacobian_pushed_forward_grads |
                update_jacobian_pushed_forward_2nd_derivatives;
+      break;
     }
+
     case mapping_raviart_thomas:
     case mapping_piola:
     {

@@ -1404,6 +1404,7 @@ isotropic_child_index (const unsigned int i) const
       else
         Assert(false,
                ExcMessage("This cell has no grandchildren equivalent to isotropic refinement"));
+      break;
     }
 
     case 3:
@@ -1510,6 +1511,7 @@ isotropic_child (const unsigned int i) const
       else
         Assert(false,
                ExcMessage("This cell has no grandchildren equivalent to isotropic refinement"));
+      break;
     }
 
     default:

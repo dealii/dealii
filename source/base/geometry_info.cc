@@ -1608,6 +1608,7 @@ d_linear_shape_function (const Point<dim> &xi,
         case 1:
           return x;
         }
+      break;
     }
 
     case 2:
@@ -1625,6 +1626,7 @@ d_linear_shape_function (const Point<dim> &xi,
         case 3:
           return x*y;
         }
+      break;
     }
 
     case 3:
@@ -1651,6 +1653,7 @@ d_linear_shape_function (const Point<dim> &xi,
         case 7:
           return x*y*z;
         }
+      break;
     }
 
     default:

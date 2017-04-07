@@ -659,26 +659,32 @@ namespace Utilities
                 if (!comp(*first, val))
                   return first;
                 ++first;
+                DEAL_II_FALLTHROUGH;
               case 6:
                 if (!comp(*first, val))
                   return first;
                 ++first;
+                DEAL_II_FALLTHROUGH;
               case 5:
                 if (!comp(*first, val))
                   return first;
                 ++first;
+                DEAL_II_FALLTHROUGH;
               case 4:
                 if (!comp(*first, val))
                   return first;
                 ++first;
+                DEAL_II_FALLTHROUGH;
               case 3:
                 if (!comp(*first, val))
                   return first;
                 ++first;
+                DEAL_II_FALLTHROUGH;
               case 2:
                 if (!comp(*first, val))
                   return first;
                 ++first;
+                DEAL_II_FALLTHROUGH;
               case 1:
                 if (!comp(*first, val))
                   return first;

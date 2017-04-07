@@ -2119,8 +2119,10 @@ void GridIn<dim, spacedim>::parse_tecplot_header(std::string &header,
     {
     case 3:
       IJK[2]=0;
+      DEAL_II_FALLTHROUGH;
     case 2:
       IJK[1]=0;
+      DEAL_II_FALLTHROUGH;
     case 1:
       IJK[0]=0;
     }

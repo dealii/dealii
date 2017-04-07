@@ -140,22 +140,30 @@ TableIndices<N>::TableIndices(const unsigned int index0,
 
   switch (N)
     {
-    case 1: // fallthrough
+    case 1:
       Assert (index1 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
-    case 2: // fallthrough
+      DEAL_II_FALLTHROUGH;
+    case 2:
       Assert (index2 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
-    case 3: // fallthrough
+      DEAL_II_FALLTHROUGH;
+    case 3:
       Assert (index3 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
-    case 4: // fallthrough
+      DEAL_II_FALLTHROUGH;
+    case 4:
       Assert (index4 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
-    case 5: // fallthrough
+      DEAL_II_FALLTHROUGH;
+    case 5:
       Assert (index5 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
-    case 6: // fallthrough
+      DEAL_II_FALLTHROUGH;
+    case 6:
       Assert (index6 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
-    case 7: // fallthrough
+      DEAL_II_FALLTHROUGH;
+    case 7:
       Assert (index7 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
-    case 8: // fallthrough
+      DEAL_II_FALLTHROUGH;
+    case 8:
       Assert (index8 == numbers::invalid_unsigned_int, ExcMessage("more than N index values provided"));
+      break;
     default:
       ;
     }
@@ -169,23 +177,32 @@ TableIndices<N>::TableIndices(const unsigned int index0,
       // remaining indices to numbers::invalid_unsigned_int:
       for (unsigned int i=0; i<N; ++i)
         indices[i] = numbers::invalid_unsigned_int;
-    case 9: // fallthrough
+      DEAL_II_FALLTHROUGH;
+    case 9:
       indices[8 % N] = index8;
-    case 8: // fallthrough
+      DEAL_II_FALLTHROUGH;
+    case 8:
       indices[7 % N] = index7;
-    case 7: // fallthrough
+      DEAL_II_FALLTHROUGH;
+    case 7:
       indices[6 % N] = index6;
-    case 6: // fallthrough
+      DEAL_II_FALLTHROUGH;
+    case 6:
       indices[5 % N] = index5;
-    case 5: // fallthrough
+      DEAL_II_FALLTHROUGH;
+    case 5:
       indices[4 % N] = index4;
-    case 4: // fallthrough
+      DEAL_II_FALLTHROUGH;
+    case 4:
       indices[3 % N] = index3;
-    case 3: // fallthrough
+      DEAL_II_FALLTHROUGH;
+    case 3:
       indices[2 % N] = index2;
-    case 2: // fallthrough
+      DEAL_II_FALLTHROUGH;
+    case 2:
       indices[1 % N] = index1;
-    case 1: // fallthrough
+      DEAL_II_FALLTHROUGH;
+    case 1:
       indices[0 % N] = index0;
     }
 
