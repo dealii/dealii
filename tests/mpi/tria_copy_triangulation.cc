@@ -59,10 +59,13 @@ void test()
 
   new_tr.copy_triangulation (tr);
 
+  Assert (tr.n_active_cells() == new_tr.n_active_cells(), ExcInternalError());
+  Assert (tr.n_levels() == new_tr.n_levels(), ExcInternalError());
+
   typename Triangulation<dim,dim>::active_cell_iterator cell1, cell2;
 
   for (cell1 = tr.begin_active(), cell2 = new_tr.begin_active();
-       cell1 != tr.end(), cell2 != new_tr.end();
+       cell1 != tr.end();
        ++cell1, ++cell2)
     {
       if (cell1->is_locally_owned ())
@@ -109,11 +112,6 @@ void test()
       else
         Assert (false, ExcInternalError());
     };
-
-//   assert_tria_equal("tria_copy_triangulation", tr, new_tr);
-
-  Assert (tr.n_active_cells() == new_tr.n_active_cells(), ExcInternalError());
-  Assert (tr.n_levels() == new_tr.n_levels(), ExcInternalError());
 }
 
 
