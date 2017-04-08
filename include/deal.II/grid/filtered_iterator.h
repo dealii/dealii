@@ -23,9 +23,7 @@
 #include <deal.II/grid/tria_iterator_base.h>
 
 #include <set>
-#ifdef DEAL_II_WITH_CXX11
 #include <tuple>
-#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -775,7 +773,6 @@ make_filtered_iterator (const BaseIterator &i,
 
 
 
-#ifdef DEAL_II_WITH_CXX11
 namespace internal
 {
   namespace FilteredIterator
@@ -894,7 +891,6 @@ filter_iterators (IteratorRange<BaseIterator> i,
   auto fi = filter_iterators(i,p);
   return filter_iterators(fi, args...);
 }
-#endif
 
 
 /* ------------------ Inline functions and templates ------------ */
