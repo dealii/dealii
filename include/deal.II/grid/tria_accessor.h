@@ -284,10 +284,10 @@ protected:
   /**
    * Constructor. Protected, thus only callable from friend classes.
    */
-  TriaAccessorBase (const Triangulation<dim,spacedim> *parent =  0,
+  TriaAccessorBase (const Triangulation<dim,spacedim> *parent =  nullptr,
                     const int                 level  = -1,
                     const int                 index  = -1,
-                    const AccessorData             * =  0);
+                    const AccessorData             * =  nullptr);
 
   /**
    * Copy constructor. Creates an object with exactly the same data.
@@ -592,10 +592,10 @@ public:
   /**
    * Constructor.
    */
-  TriaAccessor (const Triangulation<dim,spacedim> *parent     =  0,
+  TriaAccessor (const Triangulation<dim,spacedim> *parent     =  nullptr,
                 const int                 level      = -1,
                 const int                 index      = -1,
-                const AccessorData       *local_data =  0);
+                const AccessorData       *local_data =  nullptr);
 
   /**
    * Conversion constructor. This constructor exists to make certain
@@ -1104,7 +1104,7 @@ public:
   void set_user_pointer (void *p) const;
 
   /**
-   * Reset the user pointer to a @p NULL pointer. See
+   * Reset the user pointer to a @p nullptr pointer. See
    * @ref GlossUserData
    * for more information.
    */
@@ -1518,10 +1518,10 @@ public:
    * compatibility with the other accessor classes. @p index can be used to
    * set the global index of the vertex we point to.
    */
-  TriaAccessor (const Triangulation<dim,spacedim> *tria  = NULL,
+  TriaAccessor (const Triangulation<dim,spacedim> *tria  = nullptr,
                 const int                          level = 0,
                 const int                          index = 0,
-                const AccessorData                     * = 0);
+                const AccessorData                     * = nullptr);
 
   /**
    * Constructor. Should never be called and thus produces an error.
@@ -1894,10 +1894,10 @@ public:
    * compatibility with the other accessor classes. However, it doesn't do
    * anything useful here and so may not actually be called.
    */
-  TriaAccessor (const Triangulation<1,spacedim> *tria = 0,
+  TriaAccessor (const Triangulation<1,spacedim> *tria = nullptr,
                 const int = 0,
                 const int = 0,
-                const AccessorData * = 0);
+                const AccessorData * = nullptr);
 
   /**
    * Constructor. Should never be called and thus produces an error.
@@ -2302,10 +2302,10 @@ public:
   /**
    * Constructor.
    */
-  CellAccessor (const Triangulation<dim,spacedim> *parent     =  0,
+  CellAccessor (const Triangulation<dim,spacedim> *parent     =  nullptr,
                 const int                 level      = -1,
                 const int                 index      = -1,
-                const AccessorData       *local_data =  0);
+                const AccessorData       *local_data =  nullptr);
 
   /**
    * Copy constructor.

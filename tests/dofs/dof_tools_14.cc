@@ -34,7 +34,7 @@ check_this (const DoFHandler<dim> &dof_handler)
 
   // with FunctionMap
   typename FunctionMap<dim>::type fm;
-  fm[0] = 0;
+  fm[0] = nullptr;
   deallog << dof_handler.n_boundary_dofs(fm) << std::endl;
 
   // with std::set

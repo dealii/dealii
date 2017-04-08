@@ -882,11 +882,7 @@ namespace MatrixFreeOperators
     :
     Subscriptor(),
     have_interface_matrices(false)
-  {
-    // boost-1.62.0 doesn't allow initializing a shared_ptr
-    // with NULL. Make sure the default constructor does that.
-    Assert(data.get() == NULL, ExcInternalError());
-  }
+  {}
 
 
 
@@ -894,7 +890,7 @@ namespace MatrixFreeOperators
   typename Base<dim,VectorType>::size_type
   Base<dim,VectorType>::m () const
   {
-    Assert(data.get() != NULL,
+    Assert(data.get() != nullptr,
            ExcNotInitialized());
     typename Base<dim, VectorType>::size_type total_size = 0;
     for (unsigned int i=0; i<selected_rows.size(); ++i)
@@ -908,7 +904,7 @@ namespace MatrixFreeOperators
   typename Base<dim,VectorType>::size_type
   Base<dim,VectorType>::n () const
   {
-    Assert(data.get() != NULL,
+    Assert(data.get() != nullptr,
            ExcNotInitialized());
     typename Base<dim, VectorType>::size_type total_size = 0;
     for (unsigned int i=0; i<selected_columns.size(); ++i)
@@ -935,7 +931,7 @@ namespace MatrixFreeOperators
   {
     (void) col;
     Assert (row == col, ExcNotImplemented());
-    Assert (inverse_diagonal_entries.get() != NULL &&
+    Assert (inverse_diagonal_entries.get() != nullptr &&
             inverse_diagonal_entries->m() > 0, ExcNotInitialized());
     return 1.0/(*inverse_diagonal_entries)(row,row);
   }
@@ -946,7 +942,7 @@ namespace MatrixFreeOperators
   void
   Base<dim,VectorType>::initialize_dof_vector (VectorType &vec) const
   {
-    Assert(data.get() != NULL,
+    Assert(data.get() != nullptr,
            ExcNotInitialized());
     AssertDimension(n_blocks(vec), selected_rows.size());
     for (unsigned int i = 0; i < n_blocks(vec); ++i)
@@ -1348,7 +1344,8 @@ namespace MatrixFreeOperators
   std::size_t
   Base<dim,VectorType>::memory_consumption () const
   {
-    return inverse_diagonal_entries.get() != NULL ? inverse_diagonal_entries->memory_consumption() : sizeof(*this);
+    return inverse_diagonal_entries.get() != nullptr ?
+           inverse_diagonal_entries->memory_consumption() : sizeof(*this);
   }
 
 
@@ -1366,7 +1363,7 @@ namespace MatrixFreeOperators
   const std::shared_ptr<DiagonalMatrix<VectorType> > &
   Base<dim,VectorType>::get_matrix_diagonal_inverse() const
   {
-    Assert(inverse_diagonal_entries.get() != NULL &&
+    Assert(inverse_diagonal_entries.get() != nullptr &&
            inverse_diagonal_entries->m() > 0, ExcNotInitialized());
     return inverse_diagonal_entries;
   }
@@ -1403,7 +1400,7 @@ namespace MatrixFreeOperators
   MGInterfaceOperator<OperatorType>::MGInterfaceOperator ()
     :
     Subscriptor(),
-    mf_base_operator(NULL)
+    mf_base_operator(nullptr)
   {
   }
 
@@ -1413,7 +1410,7 @@ namespace MatrixFreeOperators
   void
   MGInterfaceOperator<OperatorType>::clear ()
   {
-    mf_base_operator = NULL;
+    mf_base_operator = nullptr;
   }
 
 
@@ -1439,7 +1436,7 @@ namespace MatrixFreeOperators
                    "operator");
 #endif
 
-    Assert(mf_base_operator != NULL,
+    Assert(mf_base_operator != nullptr,
            ExcNotInitialized());
 
     mf_base_operator->vmult_interface_down(dst, src);
@@ -1459,7 +1456,7 @@ namespace MatrixFreeOperators
                    "operator");
 #endif
 
-    Assert(mf_base_operator != NULL,
+    Assert(mf_base_operator != nullptr,
            ExcNotInitialized());
 
     mf_base_operator->vmult_interface_up(dst, src);
@@ -1484,7 +1481,7 @@ namespace MatrixFreeOperators
   compute_diagonal()
   {
     typedef typename Base<dim,VectorType>::value_type Number;
-    Assert((Base<dim, VectorType>::data.get() != NULL), ExcNotInitialized());
+    Assert((Base<dim, VectorType>::data.get() != nullptr), ExcNotInitialized());
 
     this->inverse_diagonal_entries.
     reset(new DiagonalMatrix<VectorType>());
@@ -1593,7 +1590,7 @@ namespace MatrixFreeOperators
   compute_diagonal()
   {
     typedef typename Base<dim,VectorType>::value_type Number;
-    Assert((Base<dim, VectorType>::data.get() != NULL), ExcNotInitialized());
+    Assert((Base<dim, VectorType>::data.get() != nullptr), ExcNotInitialized());
 
     unsigned int dummy = 0;
     this->inverse_diagonal_entries.

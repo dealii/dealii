@@ -1397,7 +1397,7 @@ inline
 std::size_t
 SparsityPattern::n_nonzero_elements () const
 {
-  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());
+  Assert ((rowstart!=nullptr) && (colnums!=nullptr), ExcEmptyObject());
   Assert (compressed, ExcNotCompressed());
   return rowstart[rows]-rowstart[0];
 }
@@ -1430,11 +1430,11 @@ SparsityPattern::load (Archive &ar, const unsigned int)
 
   ar &max_dim &rows &cols &max_vec_len &max_row_length &compressed &store_diagonal_first_in_row;
 
-  if (rowstart != 0)
+  if (rowstart != nullptr)
     delete[] rowstart;
   rowstart = new std::size_t[max_dim + 1];
 
-  if (colnums != 0)
+  if (colnums != nullptr)
     delete[] colnums;
   colnums = new size_type[max_vec_len];
 

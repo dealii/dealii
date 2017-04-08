@@ -684,7 +684,7 @@ namespace TrilinosWrappers
     void Vector::reinit (const Epetra_Map             &parallel_partitioner,
                          const dealii::Vector<number> &v)
     {
-      if (vector.get() == 0 || vector->Map().SameAs(parallel_partitioner) == false)
+      if (vector.get() == nullptr || vector->Map().SameAs(parallel_partitioner) == false)
         reinit(parallel_partitioner);
 
       const int size = parallel_partitioner.NumMyElements();

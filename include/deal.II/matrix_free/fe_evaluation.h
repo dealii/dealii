@@ -2151,14 +2151,14 @@ FEEvaluationBase<dim,n_components_,Number>
   data               (&data_in.get_shape_info
                       (fe_no_in, quad_no_in, active_fe_index,
                        active_quad_index)),
-  cartesian_data     (0),
-  jacobian           (0),
-  J_value            (0),
+  cartesian_data     (nullptr),
+  jacobian           (nullptr),
+  J_value            (nullptr),
   quadrature_weights (mapping_info->mapping_data_gen[quad_no].
                       quadrature_weights[active_quad_index].begin()),
-  quadrature_points  (0),
-  jacobian_grad      (0),
-  jacobian_grad_upper(0),
+  quadrature_points  (nullptr),
+  jacobian_grad      (nullptr),
+  jacobian_grad_upper(nullptr),
   cell               (numbers::invalid_unsigned_int),
   cell_type          (internal::MatrixFreeFunctions::undefined),
   cell_data_number   (numbers::invalid_unsigned_int),
@@ -2209,18 +2209,18 @@ FEEvaluationBase<dim,n_components_,Number>
   n_fe_components    (n_components_),
   active_fe_index    (numbers::invalid_unsigned_int),
   active_quad_index  (numbers::invalid_unsigned_int),
-  matrix_info        (0),
-  dof_info           (0),
-  mapping_info       (0),
+  matrix_info        (nullptr),
+  dof_info           (nullptr),
+  mapping_info       (nullptr),
   // select the correct base element from the given FE component
   data               (new internal::MatrixFreeFunctions::ShapeInfo<Number>(quadrature, fe, fe.component_to_base_index(first_selected_component).first)),
-  cartesian_data     (0),
-  jacobian           (0),
-  J_value            (0),
-  quadrature_weights (0),
-  quadrature_points  (0),
-  jacobian_grad      (0),
-  jacobian_grad_upper(0),
+  cartesian_data     (nullptr),
+  jacobian           (nullptr),
+  J_value            (nullptr),
+  quadrature_weights (nullptr),
+  quadrature_points  (nullptr),
+  jacobian_grad      (nullptr),
+  jacobian_grad_upper(nullptr),
   cell               (0),
   cell_type          (internal::MatrixFreeFunctions::general),
   cell_data_number   (numbers::invalid_unsigned_int),
@@ -2238,8 +2238,8 @@ FEEvaluationBase<dim,n_components_,Number>
     fe.component_to_base_index(first_selected_component).first;
   set_data_pointers();
 
-  Assert(other == 0 || other->mapped_geometry.get() != 0, ExcInternalError());
-  if (other != 0 &&
+  Assert(other == nullptr || other->mapped_geometry.get() != nullptr, ExcInternalError());
+  if (other != nullptr &&
       other->mapped_geometry->get_quadrature() == quadrature)
     mapped_geometry = other->mapped_geometry;
   else
@@ -2264,7 +2264,7 @@ inline
 FEEvaluationBase<dim,n_components_,Number>
 ::FEEvaluationBase (const FEEvaluationBase<dim,n_components_,Number> &other)
   :
-  scratch_data_array (other.matrix_info == 0 ?
+  scratch_data_array (other.matrix_info == nullptr ?
                       new AlignedVector<VectorizedArray<Number> >() :
                       other.matrix_info->acquire_scratch_data()),
   quad_no            (other.quad_no),
@@ -2274,20 +2274,20 @@ FEEvaluationBase<dim,n_components_,Number>
   matrix_info        (other.matrix_info),
   dof_info           (other.dof_info),
   mapping_info       (other.mapping_info),
-  data               (other.matrix_info == 0 ?
+  data               (other.matrix_info == nullptr ?
                       new internal::MatrixFreeFunctions::ShapeInfo<Number>(*other.data) :
                       other.data),
-  cartesian_data     (0),
-  jacobian           (0),
-  J_value            (0),
-  quadrature_weights (mapping_info != 0 ?
+  cartesian_data     (nullptr),
+  jacobian           (nullptr),
+  J_value            (nullptr),
+  quadrature_weights (mapping_info != nullptr ?
                       mapping_info->mapping_data_gen[quad_no].
                       quadrature_weights[active_quad_index].begin()
                       :
-                      0),
-  quadrature_points  (0),
-  jacobian_grad      (0),
-  jacobian_grad_upper(0),
+                      nullptr),
+  quadrature_points  (nullptr),
+  jacobian_grad      (nullptr),
+  jacobian_grad_upper(nullptr),
   cell               (numbers::invalid_unsigned_int),
   cell_type          (internal::MatrixFreeFunctions::general),
   cell_data_number   (numbers::invalid_unsigned_int),
@@ -2302,7 +2302,7 @@ FEEvaluationBase<dim,n_components_,Number>
   set_data_pointers();
 
   // Create deep copy of mapped geometry for use in parallel...
-  if (other.mapped_geometry.get() != 0)
+  if (other.mapped_geometry.get() != nullptr)
     {
       mapped_geometry.reset
       (new internal::MatrixFreeFunctions::
@@ -2331,7 +2331,7 @@ FEEvaluationBase<dim,n_components_,Number>
   AssertDimension(first_selected_component, other.first_selected_component);
 
   // release old memory
-  if (matrix_info == 0)
+  if (matrix_info == nullptr)
     {
       delete data;
       delete scratch_data_array;
@@ -2344,7 +2344,7 @@ FEEvaluationBase<dim,n_components_,Number>
   matrix_info = other.matrix_info;
   dof_info = other.dof_info;
   mapping_info = other.mapping_info;
-  if (other.matrix_info == 0)
+  if (other.matrix_info == nullptr)
     {
       data = new internal::MatrixFreeFunctions::ShapeInfo<Number>(*other.data);
       scratch_data_array = new AlignedVector<VectorizedArray<Number> >();
@@ -2356,23 +2356,23 @@ FEEvaluationBase<dim,n_components_,Number>
     }
   set_data_pointers();
 
-  cartesian_data = 0;
-  jacobian = 0;
-  J_value = 0;
-  quadrature_weights = mapping_info != 0 ?
+  cartesian_data = nullptr;
+  jacobian = nullptr;
+  J_value = nullptr;
+  quadrature_weights = mapping_info != nullptr ?
                        mapping_info->mapping_data_gen[quad_no].
                        quadrature_weights[active_quad_index].begin()
                        :
-                       0;
-  quadrature_points = 0;
-  jacobian_grad = 0;
-  jacobian_grad_upper = 0;
+                       nullptr;
+  quadrature_points = nullptr;
+  jacobian_grad = nullptr;
+  jacobian_grad_upper = nullptr;
   cell = numbers::invalid_unsigned_int;
   cell_type = internal::MatrixFreeFunctions::general;
   cell_data_number = numbers::invalid_unsigned_int;
 
   // Create deep copy of mapped geometry for use in parallel...
-  if (other.mapped_geometry.get() != 0)
+  if (other.mapped_geometry.get() != nullptr)
     {
       mapped_geometry.reset
       (new internal::MatrixFreeFunctions::
@@ -2394,7 +2394,7 @@ template <int dim, int n_components_, typename Number>
 inline
 FEEvaluationBase<dim,n_components_,Number>::~FEEvaluationBase ()
 {
-  if (matrix_info != 0)
+  if (matrix_info != nullptr)
     {
       try
         {
@@ -2418,7 +2418,7 @@ void
 FEEvaluationBase<dim,n_components_,Number>
 ::set_data_pointers()
 {
-  Assert(scratch_data_array != NULL, ExcInternalError());
+  Assert(scratch_data_array != nullptr, ExcInternalError());
 
   const unsigned int tensor_dofs_per_cell =
     Utilities::fixed_power<dim>(this->data->fe_degree+1);
@@ -2457,13 +2457,13 @@ inline
 void
 FEEvaluationBase<dim,n_components_,Number>::reinit (const unsigned int cell_in)
 {
-  Assert (mapped_geometry == 0,
+  Assert (mapped_geometry == nullptr,
           ExcMessage("FEEvaluation was initialized without a matrix-free object."
                      " Integer indexing is not possible"));
-  if (mapped_geometry != 0)
+  if (mapped_geometry != nullptr)
     return;
-  Assert (dof_info != 0, ExcNotInitialized());
-  Assert (mapping_info != 0, ExcNotInitialized());
+  Assert (dof_info != nullptr, ExcNotInitialized());
+  Assert (mapping_info != nullptr, ExcNotInitialized());
   AssertIndexRange (cell_in, dof_info->row_starts.size()-1);
   AssertDimension (((dof_info->cell_active_fe_index.size() > 0) ?
                     dof_info->cell_active_fe_index[cell_in] : 0),
@@ -2539,12 +2539,12 @@ void
 FEEvaluationBase<dim,n_components_,Number>
 ::reinit (const TriaIterator<DoFCellAccessor<DoFHandlerType,level_dof_access> > &cell)
 {
-  Assert(matrix_info == 0,
+  Assert(matrix_info == nullptr,
          ExcMessage("Cannot use initialization from cell iterator if "
                     "initialized from MatrixFree object. Use variant for "
                     "on the fly computation with arguments as for FEValues "
                     "instead"));
-  Assert(mapped_geometry.get() != 0, ExcNotInitialized());
+  Assert(mapped_geometry.get() != nullptr, ExcNotInitialized());
   mapped_geometry->reinit(static_cast<typename Triangulation<dim>::cell_iterator>(cell));
   local_dof_indices.resize(cell->get_fe().dofs_per_cell);
   if (level_dof_access)
@@ -2600,7 +2600,7 @@ inline
 const internal::MatrixFreeFunctions::ShapeInfo<Number> &
 FEEvaluationBase<dim,n_components_,Number>::get_shape_info() const
 {
-  Assert(data != 0, ExcInternalError());
+  Assert(data != nullptr, ExcInternalError());
   return *data;
 }
 
@@ -2613,11 +2613,11 @@ FEEvaluationBase<dim,n_components_,Number>
 ::fill_JxW_values(AlignedVector<VectorizedArray<Number> > &JxW_values) const
 {
   AssertDimension(JxW_values.size(), data->n_q_points);
-  Assert (this->J_value != 0, ExcNotInitialized());
+  Assert (this->J_value != nullptr, ExcNotInitialized());
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian ||
       this->cell_type == internal::MatrixFreeFunctions::affine)
     {
-      Assert (this->mapping_info != 0, ExcNotImplemented());
+      Assert (this->mapping_info != nullptr, ExcNotImplemented());
       VectorizedArray<Number> J = this->J_value[0];
       for (unsigned int q=0; q<this->data->n_q_points; ++q)
         JxW_values[q] = J * this->quadrature_weights[q];
@@ -2634,11 +2634,11 @@ inline
 VectorizedArray<Number>
 FEEvaluationBase<dim,n_components_,Number>::JxW(const unsigned int q_point) const
 {
-  Assert (this->J_value != 0, ExcNotInitialized());
+  Assert (this->J_value != nullptr, ExcNotInitialized());
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian ||
       this->cell_type == internal::MatrixFreeFunctions::affine)
     {
-      Assert (this->mapping_info != 0, ExcInternalError());
+      Assert (this->mapping_info != nullptr, ExcInternalError());
       return this->J_value[0] * this->quadrature_weights[q_point];
     }
   else
@@ -3019,7 +3019,7 @@ FEEvaluationBase<dim,n_components_,Number>
 
   // Case 1: No MatrixFree object given, simple case because we do not need to
   // process constraints and need not care about vectorization
-  if (matrix_info == 0)
+  if (matrix_info == nullptr)
     {
       Assert (!local_dof_indices.empty(), ExcNotInitialized());
 
@@ -3037,7 +3037,7 @@ FEEvaluationBase<dim,n_components_,Number>
       return;
     }
 
-  Assert (dof_info != 0, ExcNotInitialized());
+  Assert (dof_info != nullptr, ExcNotInitialized());
   Assert (matrix_info->indices_initialized() == true,
           ExcNotInitialized());
   Assert (cell != numbers::invalid_unsigned_int, ExcNotInitialized());
@@ -3448,7 +3448,7 @@ FEEvaluationBase<dim,n_components_,Number>
 ::read_dof_values_plain (const VectorType *src[])
 {
   // Case without MatrixFree initialization object
-  if (matrix_info == 0)
+  if (matrix_info == nullptr)
     {
       internal::VectorReader<Number> reader;
       read_write_operation (reader, src);
@@ -3457,7 +3457,7 @@ FEEvaluationBase<dim,n_components_,Number>
 
   // this is different from the other three operations because we do not use
   // constraints here, so this is a separate function.
-  Assert (dof_info != 0, ExcNotInitialized());
+  Assert (dof_info != nullptr, ExcNotInitialized());
   Assert (matrix_info->indices_initialized() == true,
           ExcNotInitialized());
   Assert (cell != numbers::invalid_unsigned_int, ExcNotInitialized());
@@ -5114,7 +5114,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   :
   BaseClass (mapping, fe, quadrature, update_flags,
              first_selected_component,
-             static_cast<FEEvaluationBase<dim,1,Number>*>(0)),
+             static_cast<FEEvaluationBase<dim,1,Number>*>(nullptr)),
   dofs_per_cell (this->data->dofs_per_cell),
   n_q_points (this->data->n_q_points)
 {
@@ -5134,7 +5134,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   :
   BaseClass (StaticMappingQ1<dim>::mapping, fe, quadrature, update_flags,
              first_selected_component,
-             static_cast<FEEvaluationBase<dim,1,Number>*>(0)),
+             static_cast<FEEvaluationBase<dim,1,Number>*>(nullptr)),
   dofs_per_cell (this->data->dofs_per_cell),
   n_q_points (this->data->n_q_points)
 {
@@ -5335,7 +5335,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 {
   Assert (this->mapping_info->quadrature_points_initialized == true,
           ExcNotInitialized());
-  Assert (this->quadrature_points != 0, ExcNotInitialized());
+  Assert (this->quadrature_points != nullptr, ExcNotInitialized());
   AssertIndexRange (q, n_q_points);
 
   // Cartesian mesh: not all quadrature points are stored, only the
@@ -5380,7 +5380,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 {
   Assert (this->dof_values_initialized == true,
           internal::ExcAccessToUninitializedField());
-  Assert(this->matrix_info != 0 ||
+  Assert(this->matrix_info != nullptr ||
          this->mapped_geometry->is_initialized(), ExcNotInitialized());
 
   // Run time selection of algorithm matching the element type. Since some
@@ -5470,7 +5470,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   if (integrate_gradients == true)
     Assert (this->gradients_quad_submitted == true,
             internal::ExcAccessToUninitializedField());
-  Assert(this->matrix_info != 0 ||
+  Assert(this->matrix_info != nullptr ||
          this->mapped_geometry->is_initialized(), ExcNotInitialized());
 
   // Run time selection of algorithm matching the element type. Since some

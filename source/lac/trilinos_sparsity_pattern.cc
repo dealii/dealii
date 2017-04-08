@@ -767,8 +767,8 @@ namespace TrilinosWrappers
   SparsityPattern::compress ()
   {
     int ierr;
-    Assert (column_space_map.get() != 0, ExcInternalError());
-    if (nonlocal_graph.get() != 0)
+    Assert (column_space_map.get() != nullptr, ExcInternalError());
+    if (nonlocal_graph.get() != nullptr)
       {
         if (nonlocal_graph->IndicesAreGlobal() == false &&
             nonlocal_graph->RowMap().NumMyElements() > 0)
@@ -1051,7 +1051,7 @@ namespace TrilinosWrappers
 
     const Epetra_MpiComm *mpi_comm
       = dynamic_cast<const Epetra_MpiComm *>(&graph->RangeMap().Comm());
-    Assert (mpi_comm != 0, ExcInternalError());
+    Assert (mpi_comm != nullptr, ExcInternalError());
     return mpi_comm->Comm();
 #else
 

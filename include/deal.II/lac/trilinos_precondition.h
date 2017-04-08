@@ -1574,7 +1574,7 @@ namespace TrilinosWrappers
     void initialize (const ::dealii::SparseMatrix<number> &deal_ii_sparse_matrix,
                      const AdditionalData                 &additional_data = AdditionalData(),
                      const double                          drop_tolerance = 1e-13,
-                     const ::dealii::SparsityPattern      *use_this_sparsity = 0);
+                     const ::dealii::SparsityPattern      *use_this_sparsity = nullptr);
 
     /**
      * This function can be used for a faster recalculation of the
@@ -1823,7 +1823,7 @@ namespace TrilinosWrappers
     void initialize (const ::dealii::SparseMatrix<number> &deal_ii_sparse_matrix,
                      const AdditionalData                 &additional_data = AdditionalData(),
                      const double                          drop_tolerance = 1e-13,
-                     const ::dealii::SparsityPattern      *use_this_sparsity = 0);
+                     const ::dealii::SparsityPattern      *use_this_sparsity = nullptr);
 
     /**
      * Destroys the preconditioner, leaving an object like just after having

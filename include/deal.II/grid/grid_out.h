@@ -919,7 +919,7 @@ public:
   template <int dim, int spacedim>
   void write_gnuplot (const Triangulation<dim,spacedim> &tria,
                       std::ostream           &out,
-                      const Mapping<dim,spacedim> *mapping=0) const;
+                      const Mapping<dim,spacedim> *mapping=nullptr) const;
 
   /**
    * Write the triangulation in the msh format.
@@ -998,7 +998,7 @@ public:
   template <int dim, int spacedim>
   void write_eps (const Triangulation<dim, spacedim> &tria,
                   std::ostream             &out,
-                  const Mapping<dim, spacedim>       *mapping=0) const;
+                  const Mapping<dim, spacedim>       *mapping=nullptr) const;
 
   /**
    * Write two-dimensional XFig-file.
@@ -1021,7 +1021,7 @@ public:
   template <int dim, int spacedim>
   void write_xfig (const Triangulation<dim, spacedim> &tria,
                    std::ostream              &out,
-                   const Mapping<dim, spacedim>        *mapping=0) const;
+                   const Mapping<dim, spacedim>        *mapping=nullptr) const;
 
   /**
    * Write the triangulation in the SVG format.
@@ -1128,7 +1128,7 @@ public:
   void write (const Triangulation<dim,spacedim> &tria,
               std::ostream                      &out,
               const OutputFormat                 output_format,
-              const Mapping<dim,spacedim>       *mapping=0) const;
+              const Mapping<dim,spacedim>       *mapping=nullptr) const;
 
   /**
    * Write mesh in default format set by ParameterHandler.
@@ -1136,7 +1136,7 @@ public:
   template <int dim, int spacedim>
   void write (const Triangulation<dim,spacedim> &tria,
               std::ostream                      &out,
-              const Mapping<dim,spacedim>       *mapping=0) const;
+              const Mapping<dim,spacedim>       *mapping=nullptr) const;
 
   /**
    * Set flags for DX output

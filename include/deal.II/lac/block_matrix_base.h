@@ -1553,7 +1553,7 @@ BlockMatrixBase<MatrixType>::clear ()
     for (unsigned int c=0; c<n_block_cols(); ++c)
       {
         MatrixType *p = this->sub_objects[r][c];
-        this->sub_objects[r][c] = 0;
+        this->sub_objects[r][c] = nullptr;
         delete p;
       }
   sub_objects.reinit (0,0);

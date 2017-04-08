@@ -65,34 +65,34 @@ TimeDependent::insert_timestep (const TimeStepBase *position,
                                 TimeStepBase       *new_timestep)
 {
   Assert ((std::find(timesteps.begin(), timesteps.end(), position) != timesteps.end()) ||
-          (position == 0),
+          (position == nullptr),
           ExcInvalidPosition());
   // first insert the new time step
   // into the doubly linked list
   // of timesteps
-  if (position == 0)
+  if (position == nullptr)
     {
       // at the end
-      new_timestep->set_next_timestep (0);
+      new_timestep->set_next_timestep (nullptr);
       if (timesteps.size() > 0)
         {
           timesteps.back()->set_next_timestep (new_timestep);
           new_timestep->set_previous_timestep (timesteps.back());
         }
       else
-        new_timestep->set_previous_timestep (0);
+        new_timestep->set_previous_timestep (nullptr);
     }
   else if (position == timesteps[0])
     {
       // at the beginning
-      new_timestep->set_previous_timestep (0);
+      new_timestep->set_previous_timestep (nullptr);
       if (timesteps.size() > 0)
         {
           timesteps[0]->set_previous_timestep (new_timestep);
           new_timestep->set_next_timestep (timesteps[0]);
         }
       else
-        new_timestep->set_next_timestep (0);
+        new_timestep->set_next_timestep (nullptr);
     }
   else
     {
@@ -108,7 +108,7 @@ TimeDependent::insert_timestep (const TimeStepBase *position,
 
   // finally enter it into the
   // array
-  timesteps.insert ((position == 0 ?
+  timesteps.insert ((position == nullptr ?
                      timesteps.end() :
                      std::find(timesteps.begin(), timesteps.end(), position)),
                     new_timestep);
@@ -118,7 +118,7 @@ TimeDependent::insert_timestep (const TimeStepBase *position,
 void
 TimeDependent::add_timestep (TimeStepBase *new_timestep)
 {
-  insert_timestep (0, new_timestep);
+  insert_timestep (nullptr, new_timestep);
 }
 
 
@@ -131,7 +131,7 @@ void TimeDependent::delete_timestep (const unsigned int position)
   // later deletion and unlock
   // SmartPointer
   TimeStepBase *t = timesteps[position];
-  timesteps[position] = 0;
+  timesteps[position] = nullptr;
   // Now delete unsubscribed object
   delete t;
 
@@ -250,8 +250,8 @@ TimeDependent::memory_consumption () const
 
 
 TimeStepBase::TimeStepBase (const double time) :
-  previous_timestep(0),
-  next_timestep (0),
+  previous_timestep(nullptr),
+  next_timestep (nullptr),
   sweep_no (numbers::invalid_unsigned_int),
   timestep_no (numbers::invalid_unsigned_int),
   time (time),
@@ -348,7 +348,7 @@ TimeStepBase::get_timestep_no () const
 double
 TimeStepBase::get_backward_timestep () const
 {
-  Assert (previous_timestep != 0,
+  Assert (previous_timestep != nullptr,
           ExcMessage("The backward time step cannot be computed because "
                      "there is no previous time step."));
   return time - previous_timestep->time;
@@ -359,7 +359,7 @@ TimeStepBase::get_backward_timestep () const
 double
 TimeStepBase::get_forward_timestep () const
 {
-  Assert (next_timestep != 0,
+  Assert (next_timestep != nullptr,
           ExcMessage("The forward time step cannot be computed because "
                      "there is no next time step."));
   return next_timestep->time - time;
@@ -411,8 +411,8 @@ TimeStepBase::memory_consumption () const
 template <int dim>
 TimeStepBase_Tria<dim>::TimeStepBase_Tria() :
   TimeStepBase (0),
-  tria (0, typeid(*this).name()),
-  coarse_grid (0, typeid(*this).name()),
+  tria (nullptr, typeid(*this).name()),
+  coarse_grid (nullptr, typeid(*this).name()),
   flags (),
   refinement_flags(0)
 {
@@ -427,7 +427,7 @@ TimeStepBase_Tria<dim>::TimeStepBase_Tria (const double              time,
                                            const Flags              &flags,
                                            const RefinementFlags    &refinement_flags) :
   TimeStepBase (time),
-  tria(0, typeid(*this).name()),
+  tria(nullptr, typeid(*this).name()),
   coarse_grid (&coarse_grid, typeid(*this).name()),
   flags (flags),
   refinement_flags (refinement_flags)
@@ -441,13 +441,13 @@ TimeStepBase_Tria<dim>::~TimeStepBase_Tria ()
   if (!flags.delete_and_rebuild_tria)
     {
       Triangulation<dim> *t = tria;
-      tria = 0;
+      tria = nullptr;
       delete t;
     }
   else
-    Assert (tria==0, ExcInternalError());
+    Assert (tria==nullptr, ExcInternalError());
 
-  coarse_grid = 0;
+  coarse_grid = nullptr;
 }
 
 
@@ -471,12 +471,12 @@ TimeStepBase_Tria<dim>::sleep (const unsigned int sleep_level)
 {
   if (sleep_level == flags.sleep_level_to_delete_grid)
     {
-      Assert (tria!=0, ExcInternalError());
+      Assert (tria!=nullptr, ExcInternalError());
 
       if (flags.delete_and_rebuild_tria)
         {
           Triangulation<dim> *t = tria;
-          tria = 0;
+          tria = nullptr;
           delete t;
         }
     }
@@ -502,7 +502,7 @@ void TimeStepBase_Tria<dim>::save_refine_flags ()
 template <int dim>
 void TimeStepBase_Tria<dim>::restore_grid ()
 {
-  Assert (tria == 0, ExcGridNotDeleted());
+  Assert (tria == nullptr, ExcGridNotDeleted());
   Assert (refine_flags.size() == coarsen_flags.size(),
           ExcInternalError());
 
@@ -741,8 +741,8 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
   // two pointers into this array denoting
   // the position where the two thresholds
   // are assumed
-  Vector<float>::const_iterator p_refinement_threshold=0,
-                                p_coarsening_threshold=0;
+  Vector<float>::const_iterator p_refinement_threshold=nullptr,
+                                p_coarsening_threshold=nullptr;
 
 
   // if we are to do some cell number

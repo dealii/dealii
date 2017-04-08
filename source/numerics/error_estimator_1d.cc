@@ -224,7 +224,7 @@ estimate (const Mapping<1,spacedim>                  &mapping,
 #ifdef DEAL_II_WITH_P4EST
   if (dynamic_cast<const parallel::distributed::Triangulation<1,spacedim>*>
       (&dof_handler.get_triangulation())
-      != 0)
+      != nullptr)
     Assert ((subdomain_id_ == numbers::invalid_subdomain_id)
             ||
             (subdomain_id_ ==
@@ -237,7 +237,7 @@ estimate (const Mapping<1,spacedim>                  &mapping,
   const types::subdomain_id subdomain_id
     = ((dynamic_cast<const parallel::distributed::Triangulation<1,spacedim>*>
         (&dof_handler.get_triangulation())
-        != 0)
+        != nullptr)
        ?
        dynamic_cast<const parallel::distributed::Triangulation<1,spacedim>&>
        (dof_handler.get_triangulation()).locally_owned_subdomain()
@@ -269,7 +269,7 @@ estimate (const Mapping<1,spacedim>                  &mapping,
   Assert (component_mask.n_selected_components(n_components) > 0,
           ExcInvalidComponentMask());
 
-  Assert ((coefficient == 0) ||
+  Assert ((coefficient == nullptr) ||
           (coefficient->n_components == n_components) ||
           (coefficient->n_components == 1),
           ExcInvalidCoefficient());
@@ -283,7 +283,7 @@ estimate (const Mapping<1,spacedim>                  &mapping,
             ExcDimensionMismatch(solutions[n]->size(),
                                  dof_handler.n_dofs()));
 
-  Assert ((coefficient == 0) ||
+  Assert ((coefficient == nullptr) ||
           (coefficient->n_components == n_components) ||
           (coefficient->n_components == 1),
           ExcInvalidCoefficient());
@@ -315,7 +315,7 @@ estimate (const Mapping<1,spacedim>                  &mapping,
   // coefficient, then we fill it by unity once and for all and don't set it
   // any more
   Vector<double> coefficient_values (n_components);
-  if (coefficient == 0)
+  if (coefficient == nullptr)
     for (unsigned int c=0; c<n_components; ++c)
       coefficient_values(c) = 1;
 
@@ -417,7 +417,7 @@ estimate (const Mapping<1,spacedim>                  &mapping,
 
             // if there is a coefficient, then evaluate it at the present
             // position. if there is none, reuse the preset values.
-            if (coefficient != 0)
+            if (coefficient != nullptr)
               {
                 if (coefficient->n_components == 1)
                   {

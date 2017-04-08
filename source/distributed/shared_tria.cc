@@ -272,7 +272,7 @@ namespace parallel
     Triangulation<dim, spacedim>::
     copy_triangulation (const dealii::Triangulation<dim, spacedim> &other_tria)
     {
-      Assert ((dynamic_cast<const dealii::parallel::distributed::Triangulation<dim,spacedim> *>(&other_tria) == NULL),
+      Assert ((dynamic_cast<const dealii::parallel::distributed::Triangulation<dim,spacedim> *>(&other_tria) == nullptr),
               ExcMessage("Cannot use this function on parallel::distributed::Triangulation."));
 
       dealii::parallel::Triangulation<dim,spacedim>::copy_triangulation (other_tria);

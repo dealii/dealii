@@ -172,7 +172,7 @@ namespace FETools
           // matrix for this particular
           // pair of elements is already
           // there
-          if (interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()].get() == 0)
+          if (interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()].get() == nullptr)
             {
               std::shared_ptr<FullMatrix<double> >
               interpolation_matrix (new FullMatrix<double> (dofs_per_cell2,
@@ -305,7 +305,7 @@ namespace FETools
 
           // make sure back_interpolation
           // matrix is available
-          if (interpolation_matrices[&cell->get_fe()] == 0)
+          if (interpolation_matrices[&cell->get_fe()] == nullptr)
             {
               interpolation_matrices[&cell->get_fe()] =
                 std::shared_ptr<FullMatrix<double> >

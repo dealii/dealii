@@ -659,7 +659,7 @@ namespace Utilities
 
     std::string get_time ()
     {
-      std::time_t  time1= std::time (0);
+      std::time_t  time1= std::time (nullptr);
       std::tm     *time = std::localtime(&time1);
 
       std::ostringstream o;
@@ -674,7 +674,7 @@ namespace Utilities
 
     std::string get_date ()
     {
-      std::time_t  time1= std::time (0);
+      std::time_t  time1= std::time (nullptr);
       std::tm     *time = std::localtime(&time1);
 
       std::ostringstream o;
@@ -693,7 +693,7 @@ namespace Utilities
       const int ierr = ::posix_memalign (memptr, alignment, size);
 
       AssertThrow (ierr == 0, ExcOutOfMemory());
-      AssertThrow (*memptr != 0, ExcOutOfMemory());
+      AssertThrow (*memptr != nullptr, ExcOutOfMemory());
 #else
       // Windows does not appear to have posix_memalign. just use the
       // regular malloc in that case
@@ -758,7 +758,7 @@ namespace Utilities
       // return a duplicate of it
       const Epetra_MpiComm
       *mpi_comm = dynamic_cast<const Epetra_MpiComm *>(&communicator);
-      if (mpi_comm != 0)
+      if (mpi_comm != nullptr)
         return new Epetra_MpiComm(Utilities::MPI::
                                   duplicate_communicator(mpi_comm->GetMpiComm()));
 #endif
@@ -768,7 +768,7 @@ namespace Utilities
       // not an MPI communicator, return a
       // copy of the same object again
       Assert (dynamic_cast<const Epetra_SerialComm *>(&communicator)
-              != 0,
+              != nullptr,
               ExcInternalError());
       return new Epetra_SerialComm(dynamic_cast<const Epetra_SerialComm &>(communicator));
     }
@@ -782,7 +782,7 @@ namespace Utilities
 #ifdef DEAL_II_WITH_MPI
       Epetra_MpiComm
       *mpi_comm = dynamic_cast<Epetra_MpiComm *>(&communicator);
-      if (mpi_comm != 0)
+      if (mpi_comm != nullptr)
         {
           MPI_Comm comm = mpi_comm->GetMpiComm();
           *mpi_comm = Epetra_MpiComm(MPI_COMM_SELF);

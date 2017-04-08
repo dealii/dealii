@@ -197,7 +197,7 @@ private:
 
 template <int dim>
 TestCases<dim>::TestCases () :
-  tria(0), dof(0) {}
+  tria(nullptr), dof(nullptr) {}
 
 
 
@@ -213,8 +213,8 @@ TestCases<dim>::~TestCases ()
 template <int dim>
 void TestCases<dim>::create_new ()
 {
-  if (dof  != 0) delete dof;
-  if (tria != 0) delete tria;
+  if (dof  != nullptr) delete dof;
+  if (tria != nullptr) delete tria;
 
   tria = new Triangulation<dim>();
   GridGenerator::hyper_cube(*tria);

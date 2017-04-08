@@ -640,7 +640,7 @@ namespace TrilinosWrappers
     void reinit (const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
                  const double                          drop_tolerance=1e-13,
                  const bool                            copy_values=true,
-                 const ::dealii::SparsityPattern      *use_this_sparsity=0);
+                 const ::dealii::SparsityPattern      *use_this_sparsity=nullptr);
 
     /**
      * This reinit function takes as input a Trilinos Epetra_CrsMatrix and
@@ -799,7 +799,7 @@ namespace TrilinosWrappers
                  const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
                  const double                          drop_tolerance=1e-13,
                  const bool                            copy_values=true,
-                 const ::dealii::SparsityPattern      *use_this_sparsity=0) DEAL_II_DEPRECATED;
+                 const ::dealii::SparsityPattern      *use_this_sparsity=nullptr) DEAL_II_DEPRECATED;
 
     /**
      * This function is similar to the other initialization function with
@@ -822,7 +822,7 @@ namespace TrilinosWrappers
                  const ::dealii::SparseMatrix<number>  &dealii_sparse_matrix,
                  const double                           drop_tolerance=1e-13,
                  const bool                             copy_values=true,
-                 const ::dealii::SparsityPattern      *use_this_sparsity=0) DEAL_II_DEPRECATED;
+                 const ::dealii::SparsityPattern      *use_this_sparsity=nullptr) DEAL_II_DEPRECATED;
 //@}
     /**
      * @name Constructors and initialization using an IndexSet description
@@ -960,7 +960,7 @@ namespace TrilinosWrappers
                  const MPI_Comm                       &communicator = MPI_COMM_WORLD,
                  const double                          drop_tolerance=1e-13,
                  const bool                            copy_values=true,
-                 const ::dealii::SparsityPattern      *use_this_sparsity=0);
+                 const ::dealii::SparsityPattern      *use_this_sparsity=nullptr);
 
     /**
      * This function is similar to the other initialization function with
@@ -982,7 +982,7 @@ namespace TrilinosWrappers
                  const MPI_Comm                        &communicator = MPI_COMM_WORLD,
                  const double                           drop_tolerance=1e-13,
                  const bool                             copy_values=true,
-                 const ::dealii::SparsityPattern      *use_this_sparsity=0);
+                 const ::dealii::SparsityPattern      *use_this_sparsity=nullptr);
 //@}
     /**
      * @name Information on the matrix
@@ -3040,7 +3040,7 @@ namespace TrilinosWrappers
     // If the matrix structure has not been fixed (i.e., we did not have a
     // sparsity pattern), it does not know about the number of columns so we
     // must always take this from the additional column space map
-    Assert(column_space_map.get() != 0, ExcInternalError());
+    Assert(column_space_map.get() != nullptr, ExcInternalError());
 #ifndef DEAL_II_WITH_64BIT_INDICES
     return column_space_map->NumGlobalElements();
 #else

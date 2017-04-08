@@ -145,7 +145,7 @@ build_one_patch
           const DataPostprocessor<DoFHandlerType::space_dimension> *postprocessor
             = this->dof_data[dataset]->postprocessor;
 
-          if (postprocessor != 0)
+          if (postprocessor != nullptr)
             {
               // we have to postprocess the data, so determine, which fields
               // have to be updated
@@ -331,7 +331,7 @@ void DataOut<dim,DoFHandlerType>::build_patches
   // Check consistency of redundant template parameter
   Assert (dim==DoFHandlerType::dimension, ExcDimensionMismatch(dim, DoFHandlerType::dimension));
 
-  Assert (this->triangulation != 0,
+  Assert (this->triangulation != nullptr,
           Exceptions::DataOut::ExcNoTriangulationSelected());
 
   const unsigned int n_subdivisions = (n_subdivisions_ != 0)

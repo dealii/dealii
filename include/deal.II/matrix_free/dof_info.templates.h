@@ -182,7 +182,7 @@ namespace internal
                                ConstraintValues<double> &constraint_values,
                                bool                            &cell_at_boundary)
     {
-      Assert (vector_partitioner.get() !=0, ExcInternalError());
+      Assert (vector_partitioner.get() != nullptr, ExcInternalError());
       const unsigned int n_mpi_procs = vector_partitioner->n_mpi_processes();
       const types::global_dof_index first_owned = vector_partitioner->local_range().first;
       const types::global_dof_index last_owned  = vector_partitioner->local_range().second;
@@ -203,7 +203,7 @@ namespace internal
             constraints.get_constraint_entries(current_dof);
 
           // dof is constrained
-          if (entries_ptr != 0)
+          if (entries_ptr != nullptr)
             {
               // in case we want to access plain indices, we need to know
               // about the location of constrained indices as well (all the

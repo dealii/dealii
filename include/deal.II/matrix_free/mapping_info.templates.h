@@ -290,7 +290,7 @@ namespace internal
               const unsigned int fe_index = active_fe_index.size() > 0 ?
                                             active_fe_index[cell] : 0;
               const unsigned int n_q_points = current_data.n_q_points[fe_index];
-              if (fe_values[fe_index].get() == 0)
+              if (fe_values[fe_index].get() == nullptr)
                 fe_values[fe_index].reset
                 (new dealii::FEValues<dim> (mapping, dummy_fe,
                                             current_data.quadrature[fe_index],

@@ -139,7 +139,7 @@ namespace MeshWorker
     inline void
     GnuplotPatch::write(const T &d) const
     {
-      if (os == 0)
+      if (os == nullptr)
         deallog << d;
       else
         (*os) << d;
@@ -149,7 +149,7 @@ namespace MeshWorker
     inline void
     GnuplotPatch::write_endl() const
     {
-      if (os == 0)
+      if (os == nullptr)
         deallog << std::endl;
       else
         (*os) << std::endl;
@@ -159,7 +159,7 @@ namespace MeshWorker
     inline
     GnuplotPatch::GnuplotPatch()
       :
-      os(0)
+      os(nullptr)
     {}
 
 

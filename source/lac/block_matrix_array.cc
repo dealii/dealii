@@ -36,7 +36,7 @@ BlockMatrixArray<number,BlockVectorType>::Entry::Entry (const Entry &e)
   matrix(e.matrix)
 {
   Entry &e2 = const_cast<Entry &>(e);
-  e2.matrix = 0;
+  e2.matrix = nullptr;
 }
 
 

@@ -917,7 +917,7 @@ IndexSet::size_type IndexSet::IntervalAccessor::n_elements() const
 inline
 bool IndexSet::IntervalAccessor::is_valid() const
 {
-  return index_set != NULL && range_idx < index_set->n_intervals();
+  return index_set != nullptr && range_idx < index_set->n_intervals();
 }
 
 inline
@@ -999,7 +999,7 @@ IndexSet::IntervalIterator::IntervalIterator(const IndexSet *idxset, const Index
 
 inline
 IndexSet::IntervalIterator::IntervalIterator()
-  : accessor(NULL)
+  : accessor(nullptr)
 {}
 
 inline

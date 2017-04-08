@@ -451,7 +451,7 @@ ConstantFunction (const Number *begin_ptr, const unsigned int n_components)
   ZeroFunction<dim, Number> (n_components),
   function_value_vector (n_components)
 {
-  Assert (begin_ptr != 0, ExcMessage ("Null pointer encountered!"));
+  Assert (begin_ptr != nullptr, ExcMessage ("Null pointer encountered!"));
   std::copy (begin_ptr, begin_ptr+n_components, function_value_vector.begin());
 }
 

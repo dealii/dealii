@@ -257,7 +257,7 @@ int main ()
   deallog.attach(logfile);
   deallog.threshold_double(1.e-10);
 
-  FiniteElement<3> *fe = 0;
+  FiniteElement<3> *fe = nullptr;
 
   for (unsigned int element=0; element<2; ++element)
     {

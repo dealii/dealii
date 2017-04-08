@@ -50,7 +50,7 @@ namespace parallel
       offset (numbers::invalid_unsigned_int)
     {
       Assert (dynamic_cast<const parallel::distributed::Triangulation<dim>*>
-              (&dof_handler->get_triangulation()) != 0,
+              (&dof_handler->get_triangulation()) != nullptr,
               ExcMessage("parallel::distributed::SolutionTransfer requires a parallel::distributed::Triangulation object."));
     }
 
@@ -84,7 +84,7 @@ namespace parallel
         = (dynamic_cast<parallel::distributed::Triangulation<dim,DoFHandlerType::space_dimension>*>
            (const_cast<dealii::Triangulation<dim,DoFHandlerType::space_dimension>*>
             (&dof_handler->get_triangulation())));
-      Assert (tria != 0, ExcInternalError());
+      Assert (tria != nullptr, ExcInternalError());
 
       offset
         = tria->register_data_attach(size,
@@ -165,7 +165,7 @@ namespace parallel
         = (dynamic_cast<parallel::distributed::Triangulation<dim,DoFHandlerType::space_dimension>*>
            (const_cast<dealii::Triangulation<dim,DoFHandlerType::space_dimension>*>
             (&dof_handler->get_triangulation())));
-      Assert (tria != 0, ExcInternalError());
+      Assert (tria != nullptr, ExcInternalError());
 
       tria->notify_ready_to_unpack(offset,
                                    std::bind(&SolutionTransfer<dim, VectorType,

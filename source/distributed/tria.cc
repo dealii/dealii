@@ -1292,14 +1292,14 @@ namespace parallel
        false),
       settings(settings_),
       triangulation_has_content (false),
-      connectivity (0),
-      parallel_forest (0),
+      connectivity (nullptr),
+      parallel_forest (nullptr),
       refinement_in_progress (false),
       attached_data_size(0),
       n_attached_datas(0),
       n_attached_deserialize(0)
     {
-      parallel_ghost = 0;
+      parallel_ghost = nullptr;
     }
 
 
@@ -1311,8 +1311,8 @@ namespace parallel
 
       Assert (triangulation_has_content == false,
               ExcInternalError());
-      Assert (connectivity == 0,    ExcInternalError());
-      Assert (parallel_forest == 0, ExcInternalError());
+      Assert (connectivity == nullptr,    ExcInternalError());
+      Assert (parallel_forest == nullptr, ExcInternalError());
       Assert (refinement_in_progress == false, ExcInternalError());
     }
 
@@ -1677,22 +1677,22 @@ namespace parallel
     {
       triangulation_has_content = false;
 
-      if (parallel_ghost != 0)
+      if (parallel_ghost != nullptr)
         {
           dealii::internal::p4est::functions<dim>::ghost_destroy (parallel_ghost);
-          parallel_ghost = 0;
+          parallel_ghost = nullptr;
         }
 
-      if (parallel_forest != 0)
+      if (parallel_forest != nullptr)
         {
           dealii::internal::p4est::functions<dim>::destroy (parallel_forest);
-          parallel_forest = 0;
+          parallel_forest = nullptr;
         }
 
-      if (connectivity != 0)
+      if (connectivity != nullptr)
         {
           dealii::internal::p4est::functions<dim>::connectivity_destroy (connectivity);
-          connectivity = 0;
+          connectivity = nullptr;
         }
 
       coarse_cell_to_p4est_tree_permutation.resize (0);
@@ -1753,10 +1753,10 @@ namespace parallel
     void
     Triangulation<dim,spacedim>::write_mesh_vtk (const char *file_basename) const
     {
-      Assert (parallel_forest != 0,
+      Assert (parallel_forest != nullptr,
               ExcMessage ("Can't produce output when no forest is created yet."));
       dealii::internal::p4est::functions<dim>::
-      vtk_write_file (parallel_forest, 0, file_basename);
+      vtk_write_file (parallel_forest, nullptr, file_basename);
     }
 
 
@@ -1803,7 +1803,7 @@ namespace parallel
 
       // and release the data
       void *userptr = parallel_forest->user_pointer;
-      dealii::internal::p4est::functions<dim>::reset_data (parallel_forest, 0, NULL, NULL);
+      dealii::internal::p4est::functions<dim>::reset_data (parallel_forest, 0, nullptr, nullptr);
       parallel_forest->user_pointer = userptr;
     }
 
@@ -1818,15 +1818,15 @@ namespace parallel
       Assert(this->n_levels()==1, ExcMessage("Triangulation may only contain coarse cells when calling load()."));
 
 
-      if (parallel_ghost != 0)
+      if (parallel_ghost != nullptr)
         {
           dealii::internal::p4est::functions<dim>::ghost_destroy (parallel_ghost);
-          parallel_ghost = 0;
+          parallel_ghost = nullptr;
         }
       dealii::internal::p4est::functions<dim>::destroy (parallel_forest);
-      parallel_forest = 0;
+      parallel_forest = nullptr;
       dealii::internal::p4est::functions<dim>::connectivity_destroy (connectivity);
-      connectivity = 0;
+      connectivity = nullptr;
 
       unsigned int version, numcpus, attached_size, attached_count, n_coarse_cells;
       {
@@ -1897,7 +1897,7 @@ namespace parallel
     unsigned int
     Triangulation<dim,spacedim>::get_checksum () const
     {
-      Assert (parallel_forest != 0,
+      Assert (parallel_forest != nullptr,
               ExcMessage ("Can't produce a check sum when no forest is created yet."));
       return dealii::internal::p4est::functions<dim>::checksum (parallel_forest);
     }
@@ -2059,7 +2059,7 @@ namespace parallel
                       /* minimum level of upfront refinement */ 0,
                       /* use uniform upfront refinement */ 1,
                       /* user_data_size = */ 0,
-                      /* user_data_constructor = */ NULL,
+                      /* user_data_constructor = */ nullptr,
                       /* user_pointer */ this);
     }
 
@@ -2130,7 +2130,7 @@ namespace parallel
                       /* minimum level of upfront refinement */ 0,
                       /* use uniform upfront refinement */ 1,
                       /* user_data_size = */ 0,
-                      /* user_data_constructor = */ NULL,
+                      /* user_data_constructor = */ nullptr,
                       /* user_pointer */ this);
     }
 
@@ -2282,7 +2282,7 @@ namespace parallel
                       /* minimum level of upfront refinement */ 0,
                       /* use uniform upfront refinement */ 1,
                       /* user_data_size = */ 0,
-                      /* user_data_constructor = */ NULL,
+                      /* user_data_constructor = */ nullptr,
                       /* user_pointer */ this);
     }
 
@@ -2576,10 +2576,10 @@ namespace parallel
 
 
       // query p4est for the ghost cells
-      if (parallel_ghost != 0)
+      if (parallel_ghost != nullptr)
         {
           dealii::internal::p4est::functions<dim>::ghost_destroy (parallel_ghost);
-          parallel_ghost = 0;
+          parallel_ghost = nullptr;
         }
       parallel_ghost = dealii::internal::p4est::functions<dim>::ghost_new (parallel_forest,
                        (dim == 2
@@ -2897,19 +2897,19 @@ namespace parallel
               ExcInternalError());
       parallel_forest->user_pointer = &refine_and_coarsen_list;
 
-      if (parallel_ghost != 0)
+      if (parallel_ghost != nullptr)
         {
           dealii::internal::p4est::functions<dim>::ghost_destroy (parallel_ghost);
-          parallel_ghost = 0;
+          parallel_ghost = nullptr;
         }
       dealii::internal::p4est::functions<dim>::
       refine (parallel_forest, /* refine_recursive */ false,
               &RefineAndCoarsenList<dim,spacedim>::refine_callback,
-              /*init_callback=*/NULL);
+              /*init_callback=*/nullptr);
       dealii::internal::p4est::functions<dim>::
       coarsen (parallel_forest, /* coarsen_recursive */ false,
                &RefineAndCoarsenList<dim,spacedim>::coarsen_callback,
-               /*init_callback=*/NULL);
+               /*init_callback=*/nullptr);
 
       // make sure all cells in the lists have been consumed
       Assert (refine_and_coarsen_list.pointers_are_at_end(),
@@ -2929,7 +2929,7 @@ namespace parallel
                 :
                 typename dealii::internal::p4est::types<dim>::
                 balance_type(P8EST_CONNECT_FULL)),
-               /*init_callback=*/NULL);
+               /*init_callback=*/nullptr);
 
       // before repartitioning the mesh let others attach mesh related info
       // (such as SolutionTransfer data) to the p4est
@@ -2943,7 +2943,7 @@ namespace parallel
             dealii::internal::p4est::functions<dim>::
             partition (parallel_forest,
                        /* prepare coarsening */ 1,
-                       /* weight_callback */ NULL);
+                       /* weight_callback */ nullptr);
           else
             {
               // get cell weights for a weighted repartitioning.
@@ -3070,7 +3070,7 @@ namespace parallel
           dealii::internal::p4est::functions<dim>::
           partition (parallel_forest,
                      /* prepare coarsening */ 1,
-                     /* weight_callback */ NULL);
+                     /* weight_callback */ nullptr);
         }
       else
         {
@@ -3357,7 +3357,7 @@ namespace parallel
 
           // and release the data
           void *userptr = parallel_forest->user_pointer;
-          dealii::internal::p4est::functions<dim>::reset_data (parallel_forest, 0, NULL, NULL);
+          dealii::internal::p4est::functions<dim>::reset_data (parallel_forest, 0, nullptr, nullptr);
           parallel_forest->user_pointer = userptr;
         }
     }
@@ -3645,7 +3645,7 @@ namespace parallel
                       /* minimum level of upfront refinement */ 0,
                       /* use uniform upfront refinement */ 1,
                       /* user_data_size = */ 0,
-                      /* user_data_constructor = */ NULL,
+                      /* user_data_constructor = */ nullptr,
                       /* user_pointer */ this);
 
 
@@ -3782,7 +3782,7 @@ namespace parallel
       void *userptr = parallel_forest->user_pointer;
       dealii::internal::p4est::functions<dim>::reset_data (parallel_forest,
                                                            attached_data_size+sizeof(CellStatus),
-                                                           NULL, NULL);
+                                                           nullptr, nullptr);
       parallel_forest->user_pointer = userptr;
 
 

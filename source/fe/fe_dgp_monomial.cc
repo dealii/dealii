@@ -260,7 +260,7 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
   (void)interpolation_matrix;
   AssertThrow ((x_source_fe.get_name().find ("FE_DGPMonomial<") == 0)
                ||
-               (dynamic_cast<const FE_DGPMonomial<dim>*>(&x_source_fe) != 0),
+               (dynamic_cast<const FE_DGPMonomial<dim>*>(&x_source_fe) != nullptr),
                typename FiniteElement<dim>::
                ExcInterpolationNotImplemented());
 
@@ -290,7 +290,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
   (void)interpolation_matrix;
   AssertThrow ((x_source_fe.get_name().find ("FE_DGPMonomial<") == 0)
                ||
-               (dynamic_cast<const FE_DGPMonomial<dim>*>(&x_source_fe) != 0),
+               (dynamic_cast<const FE_DGPMonomial<dim>*>(&x_source_fe) != nullptr),
                typename FiniteElement<dim>::
                ExcInterpolationNotImplemented());
 
@@ -320,7 +320,7 @@ hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const
 {
   // there are no such constraints for DGPMonomial
   // elements at all
-  if (dynamic_cast<const FE_DGPMonomial<dim>*>(&fe_other) != 0)
+  if (dynamic_cast<const FE_DGPMonomial<dim>*>(&fe_other) != nullptr)
     return
       std::vector<std::pair<unsigned int, unsigned int> > ();
   else
@@ -339,7 +339,7 @@ hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
 {
   // there are no such constraints for DGPMonomial
   // elements at all
-  if (dynamic_cast<const FE_DGPMonomial<dim>*>(&fe_other) != 0)
+  if (dynamic_cast<const FE_DGPMonomial<dim>*>(&fe_other) != nullptr)
     return
       std::vector<std::pair<unsigned int, unsigned int> > ();
   else
@@ -358,7 +358,7 @@ hp_quad_dof_identities (const FiniteElement<dim>        &fe_other) const
 {
   // there are no such constraints for DGPMonomial
   // elements at all
-  if (dynamic_cast<const FE_DGPMonomial<dim>*>(&fe_other) != 0)
+  if (dynamic_cast<const FE_DGPMonomial<dim>*>(&fe_other) != nullptr)
     return
       std::vector<std::pair<unsigned int, unsigned int> > ();
   else
@@ -379,7 +379,7 @@ compare_for_face_domination (const FiniteElement<dim> &fe_other) const
   // elements, see
   // the description of
   // FiniteElementDomination::Domination
-  if (dynamic_cast<const FE_DGPMonomial<dim>*>(&fe_other) != 0)
+  if (dynamic_cast<const FE_DGPMonomial<dim>*>(&fe_other) != nullptr)
     return FiniteElementDomination::no_requirements;
 
   Assert (false, ExcNotImplemented());

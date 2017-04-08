@@ -531,7 +531,7 @@ void PointValueHistory<dim>
 ::clear ()
 {
   cleared = true;
-  dof_handler = 0;
+  dof_handler = nullptr;
   have_dof_handler = false;
 }
 

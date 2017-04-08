@@ -200,7 +200,7 @@ template <typename T, typename P>
 inline
 SmartPointer<T,P>::SmartPointer ()
   :
-  t (0), id(typeid(P).name())
+  t (nullptr), id(typeid(P).name())
 {}
 
 
@@ -211,7 +211,7 @@ SmartPointer<T,P>::SmartPointer (T *t)
   :
   t (t), id(typeid(P).name())
 {
-  if (t != 0)
+  if (t != nullptr)
     t->subscribe(id);
 }
 
@@ -223,7 +223,7 @@ SmartPointer<T,P>::SmartPointer (T *t, const char *id)
   :
   t (t), id(id)
 {
-  if (t != 0)
+  if (t != nullptr)
     t->subscribe(id);
 }
 
@@ -248,7 +248,7 @@ SmartPointer<T,P>::SmartPointer (const SmartPointer<T,P> &tt)
   :
   t (tt.t), id(tt.id)
 {
-  if (t != 0)
+  if (t != nullptr)
     t->subscribe(id);
 }
 
@@ -258,7 +258,7 @@ template <typename T, typename P>
 inline
 SmartPointer<T,P>::~SmartPointer ()
 {
-  if (t != 0)
+  if (t != nullptr)
     t->unsubscribe(id);
 }
 
@@ -288,10 +288,10 @@ SmartPointer<T,P> &SmartPointer<T,P>::operator = (T *tt)
   if (t == tt)
     return *this;
 
-  if (t != 0)
+  if (t != nullptr)
     t->unsubscribe(id);
   t = tt;
-  if (tt != 0)
+  if (tt != nullptr)
     tt->subscribe(id);
   return *this;
 }
@@ -331,10 +331,10 @@ SmartPointer<T,P>::operator = (const SmartPointer<T,P> &tt)
   if (&tt == this)
     return *this;
 
-  if (t != 0)
+  if (t != nullptr)
     t->unsubscribe(id);
   t = static_cast<T *>(tt);
-  if (tt != 0)
+  if (tt != nullptr)
     tt->subscribe(id);
   return *this;
 }
@@ -354,7 +354,7 @@ template <typename T, typename P>
 inline
 T &SmartPointer<T,P>::operator * () const
 {
-  Assert(t != 0, ExcNotInitialized());
+  Assert(t != nullptr, ExcNotInitialized());
   return *t;
 }
 
@@ -364,7 +364,7 @@ template <typename T, typename P>
 inline
 T *SmartPointer<T,P>::operator -> () const
 {
-  Assert(t != 0, ExcNotInitialized());
+  Assert(t != nullptr, ExcNotInitialized());
   return t;
 }
 

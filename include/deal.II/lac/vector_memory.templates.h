@@ -32,7 +32,7 @@ template <typename VectorType>
 inline
 GrowingVectorMemory<VectorType>::Pool::Pool()
   :
-  data(0)
+  data(nullptr)
 {}
 
 
@@ -42,7 +42,7 @@ inline
 GrowingVectorMemory<VectorType>::Pool::~Pool()
 {
   // Nothing to do if memory was unused.
-  if (data == 0) return;
+  if (data == nullptr) return;
 
   // First, delete all remaining
   // vectors. Actually, there should
@@ -63,7 +63,7 @@ inline
 void
 GrowingVectorMemory<VectorType>::Pool::initialize(const size_type size)
 {
-  if (data == 0)
+  if (data == nullptr)
     {
       data = new std::vector<entry_type>(size);
 
@@ -170,7 +170,7 @@ GrowingVectorMemory<VectorType>::release_unused_memory ()
 
   std::vector<entry_type> new_data;
 
-  if (pool.data != 0)
+  if (pool.data != nullptr)
     {
       const typename std::vector<entry_type>::const_iterator
       end = pool.data->end();

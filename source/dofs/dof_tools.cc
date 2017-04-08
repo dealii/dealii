@@ -559,7 +559,7 @@ namespace DoFTools
   {
     Assert ((dynamic_cast<const parallel::distributed::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension>*>
              (&dof_handler.get_triangulation())
-             == 0),
+             == nullptr),
             ExcMessage ("This function can not be used with distributed triangulations."
                         "See the documentation for more information."));
 
@@ -1172,7 +1172,7 @@ namespace DoFTools
     // ask is for its locally owned subdomain
     Assert ((dynamic_cast<const parallel::distributed::
              Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *>
-             (&dof_handler.get_triangulation()) == 0),
+             (&dof_handler.get_triangulation()) == nullptr),
             ExcMessage ("For parallel::distributed::Triangulation objects and "
                         "associated DoF handler objects, asking for any information "
                         "related to a subdomain other than the locally owned one does "
@@ -1189,7 +1189,7 @@ namespace DoFTools
     // is non-empty (n_dofs()>0).
     const unsigned int n_subdomains
       = (dynamic_cast<const parallel::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *>
-         (&dof_handler.get_triangulation()) == 0
+         (&dof_handler.get_triangulation()) == nullptr
          ?
          (1+*std::max_element (subdomain_association.begin (),
                                subdomain_association.end ()))
@@ -1249,7 +1249,7 @@ namespace DoFTools
     // ask is for its locally owned subdomain
     Assert ((dynamic_cast<const parallel::distributed::
              Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *>
-             (&dof_handler.get_triangulation()) == 0),
+             (&dof_handler.get_triangulation()) == nullptr),
             ExcMessage ("For parallel::distributed::Triangulation objects and "
                         "associated DoF handler objects, asking for any information "
                         "related to a subdomain other than the locally owned one does "
@@ -1313,7 +1313,7 @@ namespace DoFTools
     // ask is for its locally owned subdomain
     Assert ((dynamic_cast<const parallel::distributed::
              Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *>
-             (&dof_handler.get_triangulation()) == 0),
+             (&dof_handler.get_triangulation()) == nullptr),
             ExcMessage ("For parallel::distributed::Triangulation objects and "
                         "associated DoF handler objects, asking for any subdomain other "
                         "than the locally owned one does not make sense."));
@@ -1965,7 +1965,7 @@ namespace DoFTools
     Assert ((dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
              (&dof_handler.get_triangulation())
              ==
-             0),
+             nullptr),
             ExcMessage ("This function can not be used with distributed triangulations."
                         "See the documentation for more information."));
 
@@ -1989,7 +1989,7 @@ namespace DoFTools
     Assert ((dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
              (&dof_handler.get_triangulation())
              ==
-             0),
+             nullptr),
             ExcMessage ("This function can not be used with distributed triangulations."
                         "See the documentation for more information."));
 

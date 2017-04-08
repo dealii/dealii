@@ -135,7 +135,7 @@ Multigrid<VectorType>::level_v_step (const unsigned int level)
   if (debug>1)
     deallog << "Residual on      level " << level << std::endl;
   matrix->vmult(level, t[level], solution[level]);
-  if (edge_out != 0)
+  if (edge_out != nullptr)
     {
       edge_out->vmult_add(level, t[level], solution[level]);
       if (debug>2)
@@ -149,7 +149,7 @@ Multigrid<VectorType>::level_v_step (const unsigned int level)
 
   // Get the defect on the next coarser level as part of the (DG) edge matrix
   // and then the main part by the restriction of the transfer
-  if (edge_down != 0)
+  if (edge_down != nullptr)
     {
       edge_down->vmult(level, t[level-1], solution[level]);
       defect[level-1] -= t[level-1];
@@ -166,12 +166,12 @@ Multigrid<VectorType>::level_v_step (const unsigned int level)
   solution[level] += t[level];
 
   // get in contribution from edge matrices to the defect
-  if (edge_in != 0)
+  if (edge_in != nullptr)
     {
       edge_in->Tvmult(level, t[level], solution[level]);
       defect[level] -= t[level];
     }
-  if (edge_up != 0)
+  if (edge_up != nullptr)
     {
       edge_up->Tvmult(level, t[level], solution[level-1]);
       defect[level] -= t[level];
@@ -251,7 +251,7 @@ Multigrid<VectorType>::level_step(const unsigned int level,
   if (debug>1)
     deallog << cychar << "-cycle residual level  " << level << std::endl;
   matrix->vmult(level, t[level], solution[level]);
-  if (edge_out != 0)
+  if (edge_out != nullptr)
     edge_out->vmult_add(level, t[level], solution[level]);
   t[level].sadd(-1.0, 1.0, defect2[level]);
 
@@ -261,7 +261,7 @@ Multigrid<VectorType>::level_step(const unsigned int level,
 
   // Get the defect on the next coarser level as part of the (DG) edge matrix
   // and then the main part by the restriction of the transfer
-  if (edge_down != 0)
+  if (edge_down != nullptr)
     edge_down->vmult(level, defect2[level-1], solution[level]);
   else
     defect2[level-1] = 0;
@@ -293,13 +293,13 @@ Multigrid<VectorType>::level_step(const unsigned int level,
   solution[level] += t[level];
 
   // get in contribution from edge matrices to the defect
-  if (edge_in != 0)
+  if (edge_in != nullptr)
     {
       edge_in->Tvmult(level, t[level], solution[level]);
       defect2[level] -= t[level];
     }
 
-  if (edge_up != 0)
+  if (edge_up != nullptr)
     {
       edge_up->Tvmult(level, t[level], solution[level-1]);
       defect2[level] -= t[level];

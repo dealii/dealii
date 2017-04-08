@@ -55,12 +55,12 @@ print_dofs (const DoFHandler<dim> &dof)
        cell != dof.end(); ++cell)
     {
       Point<dim> p = cell->center();
-      if (fevalues.get() != 0)
+      if (fevalues.get() != nullptr)
         fevalues->reinit(cell);
 
       cell->get_dof_indices (v);
       for (unsigned int i=0; i<v.size(); ++i)
-        if (fevalues.get() != 0)
+        if (fevalues.get() != nullptr)
           deallog << fevalues->quadrature_point(i) << '\t' << v[i] << std::endl;
         else
           deallog << p << '\t' << v[i] << std::endl;
@@ -88,12 +88,12 @@ print_dofs (const DoFHandler<dim> &dof, unsigned int level)
        cell != dof.end(level); ++cell)
     {
       Point<dim> p = cell->center();
-      if (fevalues.get() != 0)
+      if (fevalues.get() != nullptr)
         fevalues->reinit(cell);
 
       cell->get_mg_dof_indices (v);
       for (unsigned int i=0; i<v.size(); ++i)
-        if (fevalues.get() != 0)
+        if (fevalues.get() != nullptr)
           deallog << fevalues->quadrature_point(i) << '\t' << v[i] << std::endl;
         else
           deallog << p << '\t' << v[i] << std::endl;

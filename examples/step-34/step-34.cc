@@ -895,7 +895,7 @@ namespace Step34
     Assert(index < fe.dofs_per_cell,
            ExcIndexRange(0, fe.dofs_per_cell, index));
 
-    static Quadrature<1> *q_pointer = NULL;
+    static Quadrature<1> *q_pointer = nullptr;
     if (q_pointer) delete q_pointer;
 
     q_pointer = new QGaussLogR<1>(singular_quadrature_order,

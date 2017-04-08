@@ -213,7 +213,7 @@ namespace internal
     static Threads::Mutex rand_mutex;
     Threads::Mutex::ScopedLock lock(rand_mutex);
     static boost::random::uniform_real_distribution<> uniform_distribution(0,1);
-    static boost::random::mt19937 rng(static_cast<unsigned long>(std::time(0)));
+    static boost::random::mt19937 rng(static_cast<unsigned long>(std::time(nullptr)));
     return uniform_distribution(rng);
   }
 

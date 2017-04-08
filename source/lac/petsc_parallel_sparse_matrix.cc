@@ -39,7 +39,7 @@ namespace PETScWrappers
       const int m=0, n=0, n_nonzero_per_row=0;
       const PetscErrorCode ierr
         = MatCreateSeqAIJ(PETSC_COMM_SELF, m, n, n_nonzero_per_row,
-                          0, &matrix);
+                          nullptr, &matrix);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
     }
 
@@ -250,8 +250,8 @@ namespace PETScWrappers
                                   (communicator,
                                    local_rows, local_columns,
                                    m, n,
-                                   n_nonzero_per_row, 0,
-                                   n_offdiag_nonzero_per_row, 0,
+                                   n_nonzero_per_row, nullptr,
+                                   n_offdiag_nonzero_per_row, nullptr,
                                    &matrix);
       set_matrix_option (matrix, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
 #endif
@@ -319,7 +319,7 @@ namespace PETScWrappers
                                    m, n,
                                    0, &int_row_lengths[0],
                                    0,
-                                   offdiag_row_lengths.size() ? &int_offdiag_row_lengths[0] : 0,
+                                   offdiag_row_lengths.size() ? &int_offdiag_row_lengths[0] : nullptr,
                                    &matrix);
 
 //TODO: Sometimes the actual number of nonzero entries allocated is greater than the number of nonzero entries, which petsc will complain about unless explicitly disabled with MatSetOption. There is probably a way to prevent a different number nonzero elements being allocated in the first place. (See also previous TODO).
@@ -451,7 +451,7 @@ namespace PETScWrappers
           ierr = MatMPIAIJSetPreallocationCSR (matrix,
                                                &rowstart_in_window[0],
                                                &colnums_in_window[0],
-                                               0);
+                                               nullptr);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
         }
       else
@@ -460,7 +460,7 @@ namespace PETScWrappers
           ierr = MatMPIAIJSetPreallocationCSR (matrix,
                                                &i,
                                                &i,
-                                               0);
+                                               nullptr);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
         }
       compress (dealii::VectorOperation::insert);
@@ -628,7 +628,7 @@ namespace PETScWrappers
           ierr = MatMPIAIJSetPreallocationCSR (matrix,
                                                &rowstart_in_window[0],
                                                &colnums_in_window[0],
-                                               0);
+                                               nullptr);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
 
 #if DEAL_II_PETSC_VERSION_LT(2,3,3)

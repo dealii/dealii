@@ -168,7 +168,7 @@ template <typename number>
 void DataOutStack<dim,spacedim,DoFHandlerType>::add_data_vector (const Vector<number> &vec,
     const std::vector<std::string> &names)
 {
-  Assert (dof_handler != 0,
+  Assert (dof_handler != nullptr,
           Exceptions::DataOut::ExcNoDoFHandlerSelected ());
   // either cell data and one name,
   // or dof data and n_components names
@@ -243,7 +243,7 @@ void DataOutStack<dim,spacedim,DoFHandlerType>::build_patches (const unsigned in
 
   Assert (n_subdivisions >= 1,
           Exceptions::DataOut::ExcInvalidNumberOfSubdivisions(n_subdivisions));
-  Assert (dof_handler != 0,
+  Assert (dof_handler != nullptr,
           Exceptions::DataOut::ExcNoDoFHandlerSelected());
 
   this->validate_dataset_names();
@@ -421,7 +421,7 @@ template <int dim, int spacedim, typename DoFHandlerType>
 void DataOutStack<dim,spacedim,DoFHandlerType>::finish_parameter_value ()
 {
   // release lock on dof handler
-  dof_handler = 0;
+  dof_handler = nullptr;
   for (typename std::vector<DataVector>::iterator i=dof_data.begin();
        i!=dof_data.end(); ++i)
     i->data.reinit (0);

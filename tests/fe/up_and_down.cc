@@ -154,15 +154,15 @@ void test ()
     new FE_Q<dim>(1),
     new FE_Q<dim>(2),
     new FE_Q<dim>(3),
-    (dim<2 ? new FE_Q<dim>(4) : 0),
-    (dim<2 ? new FE_Q<dim>(5) : 0),
+    (dim<2 ? new FE_Q<dim>(4) : nullptr),
+    (dim<2 ? new FE_Q<dim>(5) : nullptr),
 
     // FE_DGQ
     new FE_DGQ<dim>(0),
     new FE_DGQ<dim>(1),
     new FE_DGQ<dim>(2),
-    (dim<3 ? new FE_DGQ<dim>(3) : 0),
-    (dim<3 ? new FE_DGQ<dim>(4) : 0),
+    (dim<3 ? new FE_DGQ<dim>(3) : nullptr),
+    (dim<3 ? new FE_DGQ<dim>(4) : nullptr),
 
     // FE_DGP does not
     // presently have the
@@ -176,8 +176,8 @@ void test ()
 //           new FE_DGP<dim>(3),
 
     // a non-primitive FE
-    (dim != 1 ? new FE_Nedelec<dim>(0) : 0),
-    (dim != 1 ? new FE_Nedelec<dim>(1) : 0),
+    (dim != 1 ? new FE_Nedelec<dim>(0) : nullptr),
+    (dim != 1 ? new FE_Nedelec<dim>(1) : nullptr),
 
     // some composed elements
     // of increasing
@@ -217,21 +217,21 @@ void test ()
     // really difficult
     (dim != 1 ?
     new FESystem<dim>(FE_Nedelec<dim>(0), 2)
-    : 0),
+    : nullptr),
     (dim != 1 ?
     new FESystem<dim>(FE_Nedelec<dim>(0), 2,
     FE_Q<dim> (2), 2)
-    : 0),
+    : nullptr),
     (dim != 1 ?
     new FESystem<dim>(FE_Nedelec<dim>(0), 2,
     FE_DGQ<dim> (2), 2,
     FESystem<dim>(FE_Nedelec<dim>(0), 2,
     FE_Q<dim> (2), 2), 2)
-    : 0),
+    : nullptr),
   };
 
   for (unsigned int i=0; i<sizeof(fe_list)/sizeof(fe_list[0]); ++i)
-    if (fe_list[i] != 0)
+    if (fe_list[i] != nullptr)
       {
         deallog << dim << "d, uniform grid, fe #" << i;
         check_element (tr, *fe_list[i]);
@@ -239,7 +239,7 @@ void test ()
 
 
   for (unsigned int i=0; i<sizeof(fe_list)/sizeof(fe_list[0]); ++i)
-    if (fe_list[i] != 0)
+    if (fe_list[i] != nullptr)
       delete fe_list[i];
 }
 

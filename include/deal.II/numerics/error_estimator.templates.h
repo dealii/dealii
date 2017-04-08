@@ -377,7 +377,7 @@ namespace internal
 
       // if a coefficient was given: use that to scale the jump in the
       // gradient
-      if (parallel_data.coefficients != 0)
+      if (parallel_data.coefficients != nullptr)
         {
           // scalar coefficient
           if (parallel_data.coefficients->n_components == 1)
@@ -1080,7 +1080,7 @@ estimate (const Mapping<dim, spacedim>               &mapping,
 #ifdef DEAL_II_WITH_P4EST
   if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
       (&dof_handler.get_triangulation())
-      != 0)
+      != nullptr)
     Assert ((subdomain_id_ == numbers::invalid_subdomain_id)
             ||
             (subdomain_id_ ==
@@ -1093,7 +1093,7 @@ estimate (const Mapping<dim, spacedim>               &mapping,
   const types::subdomain_id subdomain_id
     = ((dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
         (&dof_handler.get_triangulation())
-        != 0)
+        != nullptr)
        ?
        dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>&>
        (dof_handler.get_triangulation()).locally_owned_subdomain()
@@ -1125,7 +1125,7 @@ estimate (const Mapping<dim, spacedim>               &mapping,
   Assert (component_mask.n_selected_components(n_components) > 0,
           ExcInvalidComponentMask());
 
-  Assert ((coefficients == 0) ||
+  Assert ((coefficients == nullptr) ||
           (coefficients->n_components == n_components) ||
           (coefficients->n_components == 1),
           ExcInvalidCoefficient());
@@ -1150,7 +1150,7 @@ estimate (const Mapping<dim, spacedim>               &mapping,
   parallel_data (dof_handler.get_fe(),
                  face_quadratures,
                  mapping_collection,
-                 (!neumann_bc.empty() || (coefficients != 0)),
+                 (!neumann_bc.empty() || (coefficients != nullptr)),
                  solutions.size(),
                  subdomain_id,
                  material_id,

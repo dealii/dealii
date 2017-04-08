@@ -938,7 +938,7 @@ namespace FETools
   FEFactory<FE>::get (const Quadrature<1> &) const
   {
     Assert(false, ExcNotImplemented());
-    return 0;
+    return nullptr;
   }
 
   // Specializations for FE_Q.
@@ -2421,7 +2421,7 @@ namespace FETools
                 // everything went ok. so
                 // generate the composed
                 // element
-                FiniteElement<dim,spacedim> *system_element = 0;
+                FiniteElement<dim,spacedim> *system_element = nullptr;
 
                 // uses new FESystem constructor
                 // which is independent of
@@ -2560,7 +2560,7 @@ namespace FETools
         // make some compilers happy that
         // do not realize that we can't get
         // here after throwing
-        return 0;
+        return nullptr;
       }
 
 
@@ -2668,7 +2668,7 @@ namespace FETools
         AssertThrow(false, ExcInvalidFEName(parameter_name
                                             + std::string(" at ")
                                             + errline));
-        return 0;
+        return nullptr;
       }
   }
 

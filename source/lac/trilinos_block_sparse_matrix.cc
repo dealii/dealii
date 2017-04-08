@@ -76,7 +76,7 @@ namespace TrilinosWrappers
         {
           BlockType *p = new BlockType();
 
-          Assert (this->sub_objects[r][c] == 0,
+          Assert (this->sub_objects[r][c] == nullptr,
                   ExcInternalError());
           this->sub_objects[r][c] = p;
         }

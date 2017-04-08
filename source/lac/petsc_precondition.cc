@@ -32,7 +32,7 @@ namespace PETScWrappers
 {
   PreconditionerBase::PreconditionerBase ()
     :
-    pc(NULL), matrix(NULL)
+    pc(nullptr), matrix(nullptr)
   {}
 
   PreconditionerBase::~PreconditionerBase ()
@@ -48,16 +48,16 @@ namespace PETScWrappers
   void
   PreconditionerBase::clear ()
   {
-    matrix = NULL;
+    matrix = nullptr;
 
-    if (pc!=NULL)
+    if (pc!=nullptr)
       {
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
         PetscErrorCode ierr = PCDestroy(pc);
 #else
         PetscErrorCode ierr = PCDestroy(&pc);
 #endif
-        pc = NULL;
+        pc = nullptr;
         AssertThrow (ierr == 0, ExcPETScError(ierr));
       }
   }
@@ -67,7 +67,7 @@ namespace PETScWrappers
   PreconditionerBase::vmult (VectorBase       &dst,
                              const VectorBase &src) const
   {
-    AssertThrow (pc != NULL, StandardExceptions::ExcInvalidState ());
+    AssertThrow (pc != nullptr, StandardExceptions::ExcInvalidState ());
 
     const PetscErrorCode ierr = PCApply(pc, src, dst);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -79,7 +79,7 @@ namespace PETScWrappers
   {
     // only allow the creation of the
     // preconditioner once
-    AssertThrow (pc == NULL, StandardExceptions::ExcInvalidState ());
+    AssertThrow (pc == nullptr, StandardExceptions::ExcInvalidState ());
 
     MPI_Comm comm;
     // this ugly cast is necessary because the
@@ -140,7 +140,7 @@ namespace PETScWrappers
   void
   PreconditionJacobi::initialize()
   {
-    AssertThrow (pc != NULL, StandardExceptions::ExcInvalidState ());
+    AssertThrow (pc != nullptr, StandardExceptions::ExcInvalidState ());
 
     PetscErrorCode ierr = PCSetType (pc, const_cast<char *>(PCJACOBI));
     AssertThrow (ierr == 0, ExcPETScError(ierr));

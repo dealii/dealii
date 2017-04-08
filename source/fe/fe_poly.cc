@@ -44,7 +44,7 @@ fill_fe_values (const Triangulation<1,2>::cell_iterator &,
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<const InternalData *> (&fe_internal) != 0, ExcInternalError());
+  Assert (dynamic_cast<const InternalData *> (&fe_internal) != nullptr, ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
   // transform gradients and higher derivatives. there is nothing to do
@@ -103,7 +103,7 @@ fill_fe_values (const Triangulation<2,3>::cell_iterator &,
 
   // assert that the following dynamics
   // cast is really well-defined.
-  Assert (dynamic_cast<const InternalData *> (&fe_internal) != 0, ExcInternalError());
+  Assert (dynamic_cast<const InternalData *> (&fe_internal) != nullptr, ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
   // transform gradients and higher derivatives. there is nothing to do
@@ -163,7 +163,7 @@ fill_fe_values (const Triangulation<1,2>::cell_iterator &,
   // an exception if that is not
   // possible
 
-  Assert (dynamic_cast<const InternalData *> (&fe_internal) != 0, ExcInternalError());
+  Assert (dynamic_cast<const InternalData *> (&fe_internal) != nullptr, ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
   // transform gradients and higher derivatives. there is nothing to do
@@ -218,7 +218,7 @@ fill_fe_values (const Triangulation<2,3>::cell_iterator &,
                 const FiniteElement<2,3>::InternalDataBase                &fe_internal,
                 dealii::internal::FEValues::FiniteElementRelatedData<2,3> &output_data) const
 {
-  Assert (dynamic_cast<const InternalData *> (&fe_internal) != 0, ExcInternalError());
+  Assert (dynamic_cast<const InternalData *> (&fe_internal) != nullptr, ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
   // transform gradients and higher derivatives. there is nothing to do

@@ -285,8 +285,8 @@ namespace internal
 template <typename number>
 ChunkSparseMatrix<number>::ChunkSparseMatrix ()
   :
-  cols(0, "ChunkSparseMatrix"),
-  val(0),
+  cols(nullptr, "ChunkSparseMatrix"),
+  val(nullptr),
   max_len(0)
 {}
 
@@ -296,11 +296,11 @@ template <typename number>
 ChunkSparseMatrix<number>::ChunkSparseMatrix (const ChunkSparseMatrix &m)
   :
   Subscriptor (m),
-  cols(0, "ChunkSparseMatrix"),
-  val(0),
+  cols(nullptr, "ChunkSparseMatrix"),
+  val(nullptr),
   max_len(0)
 {
-  Assert (m.cols==0 && m.val==0 && m.max_len==0,
+  Assert (m.cols==nullptr && m.val==nullptr && m.max_len==0,
           ExcMessage("This constructor can only be called if the provided argument "
                      "is an empty matrix. This constructor can not be used to "
                      "copy-construct a non-empty matrix. Use the "
@@ -314,7 +314,7 @@ ChunkSparseMatrix<number> &
 ChunkSparseMatrix<number>::operator = (const ChunkSparseMatrix<number> &m)
 {
   (void)m;
-  Assert (m.cols==0 && m.val==0 && m.max_len==0,
+  Assert (m.cols==nullptr && m.val==nullptr && m.max_len==0,
           ExcMessage("This operator can only be called if the provided right "
                      "hand side is an empty matrix. This operator can not be "
                      "used to copy a non-empty matrix. Use the "
@@ -328,8 +328,8 @@ ChunkSparseMatrix<number>::operator = (const ChunkSparseMatrix<number> &m)
 template <typename number>
 ChunkSparseMatrix<number>::ChunkSparseMatrix (const ChunkSparsityPattern &c)
   :
-  cols(0, "ChunkSparseMatrix"),
-  val(0),
+  cols(nullptr, "ChunkSparseMatrix"),
+  val(nullptr),
   max_len(0)
 {
   reinit (c);
@@ -341,8 +341,8 @@ template <typename number>
 ChunkSparseMatrix<number>::ChunkSparseMatrix (const ChunkSparsityPattern &c,
                                               const IdentityMatrix  &id)
   :
-  cols(0, "ChunkSparseMatrix"),
-  val(0),
+  cols(nullptr, "ChunkSparseMatrix"),
+  val(nullptr),
   max_len(0)
 {
   (void)id;
@@ -359,9 +359,9 @@ ChunkSparseMatrix<number>::ChunkSparseMatrix (const ChunkSparsityPattern &c,
 template <typename number>
 ChunkSparseMatrix<number>::~ChunkSparseMatrix ()
 {
-  cols = 0;
+  cols = nullptr;
 
-  if (val != 0)
+  if (val != nullptr)
     delete[] val;
 }
 
@@ -390,7 +390,7 @@ ChunkSparseMatrix<number>::operator = (const double d)
   (void)d;
   Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
 
-  Assert (cols != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
   Assert (cols->sparsity_pattern.compressed || cols->empty(),
           ChunkSparsityPattern::ExcNotCompressed());
 
@@ -448,9 +448,9 @@ ChunkSparseMatrix<number>::reinit (const ChunkSparsityPattern &sparsity)
 
   if (cols->empty())
     {
-      if (val != 0)
+      if (val != nullptr)
         delete[] val;
-      val = 0;
+      val = nullptr;
       max_len = 0;
       return;
     }
@@ -462,7 +462,7 @@ ChunkSparseMatrix<number>::reinit (const ChunkSparsityPattern &sparsity)
                       chunk_size * chunk_size;
   if (N > max_len || max_len == 0)
     {
-      if (val != 0)
+      if (val != nullptr)
         delete[] val;
       val = new number[N];
       max_len = N;
@@ -480,9 +480,9 @@ template <typename number>
 void
 ChunkSparseMatrix<number>::clear ()
 {
-  cols = 0;
+  cols = nullptr;
   if (val) delete[] val;
-  val = 0;
+  val = nullptr;
   max_len = 0;
 }
 
@@ -492,7 +492,7 @@ template <typename number>
 bool
 ChunkSparseMatrix<number>::empty () const
 {
-  if (cols == 0)
+  if (cols == nullptr)
     return true;
   else
     return cols->empty();
@@ -504,7 +504,7 @@ template <typename number>
 typename ChunkSparseMatrix<number>::size_type
 ChunkSparseMatrix<number>::n_nonzero_elements () const
 {
-  Assert (cols != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
   return cols->n_nonzero_elements ();
 }
 
@@ -514,7 +514,7 @@ template <typename number>
 typename ChunkSparseMatrix<number>::size_type
 ChunkSparseMatrix<number>::n_actually_nonzero_elements () const
 {
-  Assert (cols != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
 
   // count those elements that are nonzero, even if they lie in the padding
   // around the matrix. since we have the invariant that padding elements are
@@ -532,7 +532,7 @@ template <typename number>
 void
 ChunkSparseMatrix<number>::symmetrize ()
 {
-  Assert (cols != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
   Assert (cols->rows == cols->cols, ExcNotQuadratic());
 
   Assert (false, ExcNotImplemented());
@@ -545,8 +545,8 @@ template <typename somenumber>
 ChunkSparseMatrix<number> &
 ChunkSparseMatrix<number>::copy_from (const ChunkSparseMatrix<somenumber> &matrix)
 {
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
   Assert (cols == matrix.cols, ExcDifferentChunkSparsityPatterns());
 
   // copy everything, including padding elements
@@ -584,8 +584,8 @@ void
 ChunkSparseMatrix<number>::add (const number factor,
                                 const ChunkSparseMatrix<somenumber> &matrix)
 {
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
   Assert (cols == matrix.cols, ExcDifferentChunkSparsityPatterns());
 
   // add everything, including padding elements
@@ -661,8 +661,8 @@ void
 ChunkSparseMatrix<number>::vmult (OutVector &dst,
                                   const InVector &src) const
 {
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
   Assert(m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
   Assert(n() == src.size(), ExcDimensionMismatch(n(),src.size()));
 
@@ -682,15 +682,15 @@ void
 ChunkSparseMatrix<number>::Tvmult (OutVector &dst,
                                    const InVector &src) const
 {
-  Assert (val != 0, ExcNotInitialized());
-  Assert (cols != 0, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
   Assert(n() == dst.size(), ExcDimensionMismatch(n(),dst.size()));
   Assert(m() == src.size(), ExcDimensionMismatch(m(),src.size()));
 
   Assert (!PointerComparison::equal(&src, &dst), ExcSourceEqualsDestination());
 
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
   Assert(m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
   Assert(n() == src.size(), ExcDimensionMismatch(n(),src.size()));
 
@@ -710,8 +710,8 @@ void
 ChunkSparseMatrix<number>::vmult_add (OutVector &dst,
                                       const InVector &src) const
 {
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
   Assert(m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
   Assert(n() == src.size(), ExcDimensionMismatch(n(),src.size()));
 
@@ -737,8 +737,8 @@ void
 ChunkSparseMatrix<number>::Tvmult_add (OutVector &dst,
                                        const InVector &src) const
 {
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
   Assert(m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
   Assert(n() == src.size(), ExcDimensionMismatch(n(),src.size()));
 
@@ -830,8 +830,8 @@ template <typename somenumber>
 somenumber
 ChunkSparseMatrix<number>::matrix_norm_square (const Vector<somenumber> &v) const
 {
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
   Assert(m() == v.size(), ExcDimensionMismatch(m(),v.size()));
   Assert(n() == v.size(), ExcDimensionMismatch(n(),v.size()));
 
@@ -940,8 +940,8 @@ somenumber
 ChunkSparseMatrix<number>::matrix_scalar_product (const Vector<somenumber> &u,
                                                   const Vector<somenumber> &v) const
 {
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
   Assert(m() == u.size(), ExcDimensionMismatch(m(),u.size()));
   Assert(n() == v.size(), ExcDimensionMismatch(n(),v.size()));
 
@@ -1046,8 +1046,8 @@ template <typename number>
 typename ChunkSparseMatrix<number>::real_type
 ChunkSparseMatrix<number>::l1_norm () const
 {
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
 
   const size_type n_chunk_rows = cols->sparsity_pattern.n_rows();
 
@@ -1078,8 +1078,8 @@ template <typename number>
 typename ChunkSparseMatrix<number>::real_type
 ChunkSparseMatrix<number>::linfty_norm () const
 {
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
 
   // this function works like l1_norm(). it can be made more efficient
   // (without allocating a temporary vector) as is done in the SparseMatrix
@@ -1133,8 +1133,8 @@ ChunkSparseMatrix<number>::residual (Vector<somenumber>       &dst,
                                      const Vector<somenumber> &u,
                                      const Vector<somenumber> &b) const
 {
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
   Assert(m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
   Assert(m() == b.size(), ExcDimensionMismatch(m(),b.size()));
   Assert(n() == u.size(), ExcDimensionMismatch(n(),u.size()));
@@ -1249,8 +1249,8 @@ ChunkSparseMatrix<number>::precondition_Jacobi (Vector<somenumber>       &dst,
 {
   (void)dst;
   (void)src;
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
   Assert (m() == n(), ExcMessage("This operation is only valid on square matrices."));
 
   Assert (dst.size() == n(), ExcDimensionMismatch (dst.size(), n()));
@@ -1272,8 +1272,8 @@ ChunkSparseMatrix<number>::precondition_SSOR (Vector<somenumber>       &dst,
   // CVS archives to see the original version which is much clearer...
   (void)dst;
   (void)src;
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
   Assert (m() == n(), ExcMessage("This operation is only valid on square matrices."));
 
   Assert (dst.size() == n(), ExcDimensionMismatch (dst.size(), n()));
@@ -1290,8 +1290,8 @@ ChunkSparseMatrix<number>::precondition_SOR (Vector<somenumber> &dst,
                                              const Vector<somenumber> &src,
                                              const number om) const
 {
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
   Assert (m() == n(), ExcMessage("This operation is only valid on square matrices."));
 
 
@@ -1307,8 +1307,8 @@ ChunkSparseMatrix<number>::precondition_TSOR (Vector<somenumber> &dst,
                                               const Vector<somenumber> &src,
                                               const number om) const
 {
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
   Assert (m() == n(), ExcMessage("This operation is only valid on square matrices."));
 
 
@@ -1324,8 +1324,8 @@ ChunkSparseMatrix<number>::SOR (Vector<somenumber> &dst,
                                 const number /*om*/) const
 {
   (void)dst;
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
   Assert (m() == n(), ExcMessage("This operation is only valid on square matrices."));
   Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
 
@@ -1340,8 +1340,8 @@ ChunkSparseMatrix<number>::TSOR (Vector<somenumber> &dst,
                                  const number /*om*/) const
 {
   (void)dst;
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
   Assert (m() == n(), ExcMessage("This operation is only valid on square matrices."));
   Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
 
@@ -1360,8 +1360,8 @@ ChunkSparseMatrix<number>::PSOR (Vector<somenumber> &dst,
   (void)dst;
   (void)permutation;
   (void)inverse_permutation;
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
   Assert (m() == n(), ExcMessage("This operation is only valid on square matrices."));
 
   Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
@@ -1385,8 +1385,8 @@ ChunkSparseMatrix<number>::TPSOR (Vector<somenumber> &dst,
   (void)dst;
   (void)permutation;
   (void)inverse_permutation;
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
   Assert (m() == n(), ExcMessage("This operation is only valid on square matrices."));
 
   Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
@@ -1409,8 +1409,8 @@ ChunkSparseMatrix<number>::SOR_step (Vector<somenumber> &v,
 {
   (void)v;
   (void)b;
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
   Assert (m() == n(), ExcMessage("This operation is only valid on square matrices."));
 
   Assert (m() == v.size(), ExcDimensionMismatch(m(),v.size()));
@@ -1430,8 +1430,8 @@ ChunkSparseMatrix<number>::TSOR_step (Vector<somenumber> &v,
 {
   (void)v;
   (void)b;
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
   Assert (m() == n(), ExcMessage("This operation is only valid on square matrices."));
 
   Assert (m() == v.size(), ExcDimensionMismatch(m(),v.size()));
@@ -1462,8 +1462,8 @@ ChunkSparseMatrix<number>::SSOR (Vector<somenumber> &dst,
                                  const number /*om*/) const
 {
   (void)dst;
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
   Assert (m() == n(), ExcMessage("This operation is only valid on square matrices."));
 
   Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
@@ -1478,8 +1478,8 @@ void ChunkSparseMatrix<number>::print (std::ostream &out) const
 {
   AssertThrow (out, ExcIO());
 
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
 
   Assert (false, ExcNotImplemented());
 
@@ -1497,8 +1497,8 @@ void ChunkSparseMatrix<number>::print_formatted (std::ostream &out,
 {
   AssertThrow (out, ExcIO());
 
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
 
   unsigned int width = width_;
 
@@ -1545,8 +1545,8 @@ void ChunkSparseMatrix<number>::print_pattern (std::ostream &out,
 {
   AssertThrow (out, ExcIO());
 
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (val != 0, ExcNotInitialized());
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (val != nullptr, ExcNotInitialized());
 
   const size_type chunk_size = cols->get_chunk_size();
 

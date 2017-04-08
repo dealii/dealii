@@ -2387,7 +2387,7 @@ const
       return identities;
     }
 
-  else if (dynamic_cast<const FE_Nothing<dim>*> (&fe_other) != 0)
+  else if (dynamic_cast<const FE_Nothing<dim>*> (&fe_other) != nullptr)
     {
       // the FE_Nothing has no
       // degrees of freedom, so there
@@ -2436,7 +2436,7 @@ const
       return identities;
     }
 
-  else if (dynamic_cast<const FE_Nothing<dim>*> (&fe_other) != 0)
+  else if (dynamic_cast<const FE_Nothing<dim>*> (&fe_other) != nullptr)
     {
       // the FE_Nothing has no
       // degrees of freedom, so there
@@ -2472,7 +2472,7 @@ const
   typedef FiniteElement<dim> FEL;
 
   AssertThrow ((source.get_name ().find ("FE_Nedelec<") == 0) ||
-               (dynamic_cast<const FEN *> (&source) != 0),
+               (dynamic_cast<const FEN *> (&source) != nullptr),
                typename FEL::ExcInterpolationNotImplemented());
   Assert (interpolation_matrix.m () == source.dofs_per_face,
           ExcDimensionMismatch (interpolation_matrix.m (),
@@ -2580,7 +2580,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
   typedef FiniteElement<dim> FEL;
 
   AssertThrow ((source.get_name ().find ("FE_Nedelec<") == 0) ||
-               (dynamic_cast<const FEN *> (&source) != 0),
+               (dynamic_cast<const FEN *> (&source) != nullptr),
                typename FEL::ExcInterpolationNotImplemented ());
   Assert (interpolation_matrix.m () == source.dofs_per_face,
           ExcDimensionMismatch (interpolation_matrix.m (),

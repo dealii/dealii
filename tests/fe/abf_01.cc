@@ -143,10 +143,10 @@ void create_mass_matrix (const Mapping<dim>       &mapping,
                          SparseMatrix<double>     &matrix,
                          const Function<dim>   &rhs_function,
                          Vector<double>        &rhs_vector,
-                         const Function<dim> *const coefficient = 0)
+                         const Function<dim> *const coefficient = nullptr)
 {
   UpdateFlags update_flags = UpdateFlags(update_values | update_JxW_values | update_quadrature_points);
-  if (coefficient != 0)
+  if (coefficient != nullptr)
     update_flags = UpdateFlags (update_flags | update_quadrature_points);
 
   FEValues<dim> fe_values (mapping, dof.get_fe(), q, update_flags);
@@ -156,7 +156,7 @@ void create_mass_matrix (const Mapping<dim>       &mapping,
   const FiniteElement<dim>    &fe  = fe_values.get_fe();
   const unsigned int n_components  = fe.n_components();
 
-  Assert(coefficient == 0 ||
+  Assert(coefficient == nullptr ||
          coefficient->n_components==1 ||
          coefficient->n_components==n_components, ExcInternalError());
 
@@ -183,7 +183,7 @@ void create_mass_matrix (const Mapping<dim>       &mapping,
       rhs_function.vector_value_list (fe_values.get_quadrature_points(), rhs_values);
       cell_vector = 0;
 
-      if (coefficient != 0)
+      if (coefficient != nullptr)
         {
           if (coefficient->n_components==1)
             {

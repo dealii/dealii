@@ -48,7 +48,7 @@ Vector<Number>::Vector (const Vector<Number> &v)
   Subscriptor(),
   vec_size(v.size()),
   max_vec_size(v.size()),
-  val(0)
+  val(nullptr)
 {
   if (vec_size != 0)
     {
@@ -85,7 +85,7 @@ Vector<Number>::Vector (const Vector<OtherNumber> &v)
   Subscriptor(),
   vec_size(v.size()),
   max_vec_size(v.size()),
-  val(0)
+  val(nullptr)
 {
   if (vec_size != 0)
     {
@@ -104,7 +104,7 @@ Vector<Number>::Vector (const PETScWrappers::Vector &v)
   Subscriptor(),
   vec_size(v.size()),
   max_vec_size(v.size()),
-  val(0)
+  val(nullptr)
 {
   if (vec_size != 0)
     {
@@ -133,7 +133,7 @@ Vector<Number>::Vector (const PETScWrappers::MPI::Vector &v)
   Subscriptor(),
   vec_size(0),
   max_vec_size(0),
-  val(0)
+  val(nullptr)
 {
   if (v.size() != 0)
     {
@@ -156,7 +156,7 @@ Vector<Number>::Vector (const TrilinosWrappers::MPI::Vector &v)
   Subscriptor(),
   vec_size(v.size()),
   max_vec_size(v.size()),
-  val(0)
+  val(nullptr)
 {
   if (vec_size != 0)
     {
@@ -189,7 +189,7 @@ Vector<Number>::Vector (const TrilinosWrappers::Vector &v)
   Subscriptor(),
   vec_size(v.size()),
   max_vec_size(v.size()),
-  val(0)
+  val(nullptr)
 {
   if (vec_size != 0)
     {
@@ -280,7 +280,7 @@ void Vector<Number>::reinit (const size_type n,
   if (n==0)
     {
       if (val) deallocate();
-      val = 0;
+      val = nullptr;
       max_vec_size = vec_size = 0;
       thread_loop_partitioner.reset(new parallel::internal::TBBPartitioner());
       return;
@@ -319,7 +319,7 @@ void Vector<Number>::reinit (const Vector<Number2> &v,
   if (v.vec_size==0)
     {
       if (val) deallocate();
-      val = 0;
+      val = nullptr;
       max_vec_size = vec_size = 0;
       return;
     };
@@ -1123,7 +1123,7 @@ void
 Vector<Number>::allocate()
 {
   // make sure that we don't create a memory leak
-  Assert (val == 0, ExcInternalError());
+  Assert (val == nullptr, ExcInternalError());
 
   // then allocate memory with the proper alignment requirements of 64 bytes
   Utilities::System::posix_memalign ((void **)&val, 64, sizeof(Number)*max_vec_size);
@@ -1136,7 +1136,7 @@ void
 Vector<Number>::deallocate()
 {
   free(val);
-  val = 0;
+  val = nullptr;
 }
 
 DEAL_II_NAMESPACE_CLOSE

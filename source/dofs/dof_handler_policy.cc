@@ -1050,7 +1050,7 @@ namespace internal
         // and then turn artificial cells on at the end of this function.
         const parallel::shared::Triangulation<dim, spacedim> *tr =
           (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&dof_handler.get_triangulation()));
-        Assert(tr != 0, ExcInternalError());
+        Assert(tr != nullptr, ExcInternalError());
         typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator
         cell = dof_handler.get_triangulation().begin_active(),
         endc = dof_handler.get_triangulation().end();
@@ -1116,7 +1116,7 @@ namespace internal
         // case artificial cells are present.
         const parallel::shared::Triangulation<dim, spacedim> *tr =
           (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&dof_handler.get_triangulation()));
-        Assert(tr != 0, ExcInternalError());
+        Assert(tr != nullptr, ExcInternalError());
         typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator
         cell = dof_handler.get_triangulation().begin_active(),
         endc = dof_handler.get_triangulation().end();
@@ -1872,7 +1872,7 @@ namespace internal
           const parallel::distributed::Triangulation< dim, spacedim > *tr
             = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
                (&dof_handler.get_triangulation()));
-          Assert (tr != 0, ExcInternalError());
+          Assert (tr != nullptr, ExcInternalError());
 
           // now collect cells and their
           // dof_indices for the
@@ -2096,7 +2096,7 @@ namespace internal
           = (dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
              (const_cast<dealii::Triangulation< dim, spacedim >*>
               (&dof_handler.get_triangulation())));
-        Assert (tr != 0, ExcInternalError());
+        Assert (tr != nullptr, ExcInternalError());
 
         const unsigned int
         n_cpus = Utilities::MPI::n_mpi_processes (tr->get_communicator());
@@ -2319,7 +2319,7 @@ namespace internal
           = (dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
              (const_cast<dealii::Triangulation< dim, spacedim >*>
               (&dof_handler.get_triangulation())));
-        Assert (tr != 0, ExcInternalError());
+        Assert (tr != nullptr, ExcInternalError());
 
         AssertThrow(
           (tr->settings &  parallel::distributed::Triangulation< dim, spacedim >::construct_multigrid_hierarchy),
@@ -2699,7 +2699,7 @@ namespace internal
             = (dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
                (const_cast<dealii::Triangulation< dim, spacedim >*>
                 (&dof_handler.get_triangulation())));
-          Assert (tr != 0, ExcInternalError());
+          Assert (tr != nullptr, ExcInternalError());
 
           std::vector<bool> user_flags;
           tr->save_user_flags(user_flags);

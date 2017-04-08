@@ -262,7 +262,7 @@ VectorView<Number>::~VectorView()
   // memory it doesn't own
   this->vec_size = 0;
   this->max_vec_size = 0;
-  this->val = 0;
+  this->val = nullptr;
 }
 
 

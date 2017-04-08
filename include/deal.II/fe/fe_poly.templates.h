@@ -231,7 +231,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<const InternalData *> (&fe_internal) != 0, ExcInternalError());
+  Assert (dynamic_cast<const InternalData *> (&fe_internal) != nullptr, ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
   const UpdateFlags flags(fe_data.update_each);
@@ -293,7 +293,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator  
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<const InternalData *> (&fe_internal) != 0, ExcInternalError());
+  Assert (dynamic_cast<const InternalData *> (&fe_internal) != nullptr, ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
   // offset determines which data set
@@ -372,7 +372,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<const InternalData *> (&fe_internal) != 0, ExcInternalError());
+  Assert (dynamic_cast<const InternalData *> (&fe_internal) != nullptr, ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
   // offset determines which data set

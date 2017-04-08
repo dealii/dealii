@@ -1040,7 +1040,7 @@ namespace DoFTools
       get_fe_collection (const dealii::DoFHandler<dim,spacedim> &)
       {
         Assert(false, ExcInternalError());
-        return NULL;
+        return nullptr;
       }
     }
 

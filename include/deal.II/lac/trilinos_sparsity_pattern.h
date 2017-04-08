@@ -1454,7 +1454,7 @@ namespace TrilinosWrappers
     int ierr;
     if ( graph->RowMap().LID(static_cast<TrilinosWrappers::types::int_type>(row)) != -1)
       ierr = graph->InsertGlobalIndices (row, n_cols, col_index_ptr);
-    else if (nonlocal_graph.get() != 0)
+    else if (nonlocal_graph.get() != nullptr)
       {
         // this is the case when we have explicitly set the off-processor rows
         // and want to create a separate matrix object for them (to retain

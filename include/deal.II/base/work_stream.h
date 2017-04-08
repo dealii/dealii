@@ -306,8 +306,8 @@ namespace WorkStream
           ItemType ()
             :
             n_items (0),
-            scratch_data (0),
-            sample_scratch_data (0),
+            scratch_data (nullptr),
+            sample_scratch_data (nullptr),
             currently_in_use (false)
           {}
         };
@@ -367,7 +367,7 @@ namespace WorkStream
           // another thread where we release items and set 'false'
           // flags to 'true', but that too does not produce any
           // problems)
-          ItemType *current_item = 0;
+          ItemType *current_item = nullptr;
           for (unsigned int i=0; i<item_buffer.size(); ++i)
             if (item_buffer[i].currently_in_use == false)
               {
@@ -375,7 +375,7 @@ namespace WorkStream
                 current_item = &item_buffer[i];
                 break;
               }
-          Assert (current_item != 0, ExcMessage ("This can't be. There must be a free item!"));
+          Assert (current_item != nullptr, ExcMessage ("This can't be. There must be a free item!"));
 
           // initialize the next item. it may
           // consist of at most chunk_size
@@ -396,7 +396,7 @@ namespace WorkStream
           if (current_item->n_items == 0)
             // there were no items
             // left. terminate the pipeline
-            return 0;
+            return nullptr;
           else
             return current_item;
         }
@@ -513,7 +513,7 @@ namespace WorkStream
           // we can't take an iterator into the list now and expect it to
           // still be valid after calling the worker, but we at least do
           // not have to lock the following section
-          ScratchData *scratch_data = 0;
+          ScratchData *scratch_data = nullptr;
           {
             typename ItemType::ScratchDataList &
             scratch_data_list = current_item->scratch_data->get();
@@ -531,7 +531,7 @@ namespace WorkStream
                 }
 
             // if no object was found, create one and mark it as used
-            if (scratch_data == 0)
+            if (scratch_data == nullptr)
               {
                 scratch_data = new ScratchData(*current_item->sample_scratch_data);
 
@@ -672,7 +672,7 @@ namespace WorkStream
 
           // return an invalid item since we are at the end of the
           // pipeline
-          return 0;
+          return nullptr;
         }
 
 
@@ -790,8 +790,8 @@ namespace WorkStream
           // This means that we can't take an iterator into the list
           // now and expect it to still be valid after calling the worker,
           // but we at least do not have to lock the following section.
-          ScratchData *scratch_data = 0;
-          CopyData    *copy_data    = 0;
+          ScratchData *scratch_data = nullptr;
+          CopyData    *copy_data    = nullptr;
           {
             ScratchAndCopyDataList &scratch_and_copy_data_list = data.get();
 
@@ -809,9 +809,9 @@ namespace WorkStream
                 }
 
             // if no element in the list was found, create one and mark it as used
-            if (scratch_data == 0)
+            if (scratch_data == nullptr)
               {
-                Assert (copy_data==0, ExcInternalError());
+                Assert (copy_data==nullptr, ExcInternalError());
                 scratch_data = new ScratchData(sample_scratch_data);
                 copy_data    = new CopyData(sample_copy_data);
 

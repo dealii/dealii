@@ -112,7 +112,7 @@ void MultithreadInfo::set_thread_limit(const unsigned int max_threads)
   // then also see if something was given in the environment
   {
     const char *penv = getenv ("DEAL_II_NUM_THREADS");
-    if (penv!=NULL)
+    if (penv!=nullptr)
       {
         unsigned int max_threads_env = numbers::invalid_unsigned_int;
         try

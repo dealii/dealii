@@ -541,7 +541,7 @@ namespace internal
                 VectorMemory<VectorType> &vmem)
       :
       mem(vmem),
-      data (max_size, 0),
+      data (max_size, nullptr),
       offset(0)
     {}
 
@@ -552,7 +552,7 @@ namespace internal
     {
       for (typename std::vector<VectorType *>::iterator v = data.begin();
            v != data.end(); ++v)
-        if (*v != 0)
+        if (*v != nullptr)
           mem.free(*v);
     }
 
@@ -564,7 +564,7 @@ namespace internal
       Assert (i+offset<data.size(),
               ExcIndexRange(i, -offset, data.size()-offset));
 
-      Assert (data[i-offset] != 0, ExcNotInitialized());
+      Assert (data[i-offset] != nullptr, ExcNotInitialized());
       return *data[i-offset];
     }
 
@@ -576,7 +576,7 @@ namespace internal
     {
       Assert (i+offset<data.size(),
               ExcIndexRange(i,-offset, data.size()-offset));
-      if (data[i-offset] == 0)
+      if (data[i-offset] == nullptr)
         {
           data[i-offset] = mem.alloc();
           data[i-offset]->reinit(temp);
@@ -877,9 +877,9 @@ SolverGMRES<VectorType>::solve (const MatrixType         &A,
   // Following vectors are needed
   // when not the default residuals
   // are used as stopping criterion
-  VectorType *r=0;
-  VectorType *x_=0;
-  dealii::Vector<double> *gamma_=0;
+  VectorType *r=nullptr;
+  VectorType *x_=nullptr;
+  dealii::Vector<double> *gamma_=nullptr;
   if (!use_default_residual)
     {
       r=this->memory.alloc();

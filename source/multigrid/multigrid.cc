@@ -61,14 +61,14 @@ MGTransferBlockBase::MGTransferBlockBase (const ConstraintMatrix &/*c*/,
 template <typename number>
 MGTransferBlock<number>::MGTransferBlock ()
   :
-  memory(0, typeid(*this).name())
+  memory(nullptr, typeid(*this).name())
 {}
 
 
 template <typename number>
 MGTransferBlock<number>::~MGTransferBlock ()
 {
-  if (memory != 0) memory = 0;
+  if (memory != nullptr) memory = nullptr;
 }
 
 
@@ -126,7 +126,7 @@ void MGTransferBlock<number>::restrict_and_add (
         {
           if (factors.size() != 0)
             {
-              Assert (memory != 0, ExcNotInitialized());
+              Assert (memory != nullptr, ExcNotInitialized());
               Vector<number> *aux = memory->alloc();
               aux->reinit(dst.block(this->mg_block[b]));
               prolongation_matrices[from_level-1]->block(b,b).Tvmult (

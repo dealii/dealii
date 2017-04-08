@@ -54,12 +54,12 @@ print_dofs (const DoFHandler<dim> &dof, stream &out)
        cell != dof.end(); ++cell)
     {
       Point<dim> p = cell->center();
-      if (fevalues.get() != 0)
+      if (fevalues.get() != nullptr)
         fevalues->reinit(cell);
 
       cell->get_dof_indices (v);
       for (unsigned int i=0; i<v.size(); ++i)
-        if (fevalues.get() != 0)
+        if (fevalues.get() != nullptr)
           out << fevalues->quadrature_point(i) << '\t' << v[i] << std::endl;
         else
           out << p << '\t' << v[i] << std::endl;

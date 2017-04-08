@@ -82,7 +82,7 @@ namespace
 
 template <int dim, int spacedim>
 GridIn<dim, spacedim>::GridIn () :
-  tria(0, typeid(*this).name()), default_format(ucd)
+  tria(nullptr, typeid(*this).name()), default_format(ucd)
 {}
 
 
@@ -384,7 +384,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 template<int dim, int spacedim>
 void GridIn<dim, spacedim>::read_unv(std::istream &in)
 {
-  Assert(tria != 0, ExcNoTriangulationSelected());
+  Assert(tria != nullptr, ExcNoTriangulationSelected());
   Assert((dim == 2)||(dim == 3), ExcNotImplemented());
 
   AssertThrow(in, ExcIO());
@@ -621,7 +621,7 @@ template <int dim, int spacedim>
 void GridIn<dim, spacedim>::read_ucd (std::istream                            &in,
                                       const bool apply_all_indicators_to_manifolds)
 {
-  Assert (tria != 0, ExcNoTriangulationSelected());
+  Assert (tria != nullptr, ExcNoTriangulationSelected());
   AssertThrow (in, ExcIO());
 
   // skip comments at start of file
@@ -855,7 +855,7 @@ template <int dim, int spacedim>
 void GridIn<dim, spacedim>::read_abaqus (std::istream                            &in,
                                          const bool apply_all_indicators_to_manifolds)
 {
-  Assert (tria != 0, ExcNoTriangulationSelected());
+  Assert (tria != nullptr, ExcNoTriangulationSelected());
   Assert (dim==2 || dim==3, ExcNotImplemented());
   AssertThrow (in, ExcIO());
 
@@ -899,7 +899,7 @@ void GridIn<dim, spacedim>::read_abaqus (std::istream                           
 template <int dim, int spacedim>
 void GridIn<dim, spacedim>::read_dbmesh (std::istream &in)
 {
-  Assert (tria != 0, ExcNoTriangulationSelected());
+  Assert (tria != nullptr, ExcNoTriangulationSelected());
   Assert (dim==2, ExcNotImplemented());
 
   AssertThrow (in, ExcIO());
@@ -1073,7 +1073,7 @@ void GridIn<dim, spacedim>::read_xda (std::istream &)
 template <>
 void GridIn<2>::read_xda (std::istream &in)
 {
-  Assert (tria != 0, ExcNoTriangulationSelected());
+  Assert (tria != nullptr, ExcNoTriangulationSelected());
   AssertThrow (in, ExcIO());
 
   std::string line;
@@ -1144,7 +1144,7 @@ void GridIn<2>::read_xda (std::istream &in)
 template <>
 void GridIn<3>::read_xda (std::istream &in)
 {
-  Assert (tria != 0, ExcNoTriangulationSelected());
+  Assert (tria != nullptr, ExcNoTriangulationSelected());
   AssertThrow (in, ExcIO());
 
   static const unsigned int xda_to_dealII_map[] = {0,1,5,4,3,2,6,7};
@@ -1223,7 +1223,7 @@ void GridIn<3>::read_xda (std::istream &in)
 template <int dim, int spacedim>
 void GridIn<dim, spacedim>::read_msh (std::istream &in)
 {
-  Assert (tria != 0, ExcNoTriangulationSelected());
+  Assert (tria != nullptr, ExcNoTriangulationSelected());
   AssertThrow (in, ExcIO());
 
   unsigned int n_vertices;
@@ -2304,7 +2304,7 @@ void GridIn<2>::read_tecplot (std::istream &in)
 {
   const unsigned int dim=2;
   const unsigned int spacedim=2;
-  Assert (tria != 0, ExcNoTriangulationSelected());
+  Assert (tria != nullptr, ExcNoTriangulationSelected());
   AssertThrow (in, ExcIO());
 
   // skip comments at start of file

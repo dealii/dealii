@@ -241,7 +241,7 @@ namespace MatrixCreator
                            const DoFHandler<dim,spacedim>    &dof,
                            const Quadrature<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<spacedim,number> *const a = 0,
+                           const Function<spacedim,number> *const a = nullptr,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -252,7 +252,7 @@ namespace MatrixCreator
   void create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
                            const Quadrature<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<spacedim,number> *const a = 0,
+                           const Function<spacedim,number> *const a = nullptr,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -278,7 +278,7 @@ namespace MatrixCreator
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim,number> &rhs,
                            Vector<number>           &rhs_vector,
-                           const Function<spacedim,number> *const a = 0,
+                           const Function<spacedim,number> *const a = nullptr,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -302,7 +302,7 @@ namespace MatrixCreator
                            const hp::DoFHandler<dim,spacedim>    &dof,
                            const hp::QCollection<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<spacedim,number> *const a = 0,
+                           const Function<spacedim,number> *const a = nullptr,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -325,7 +325,7 @@ namespace MatrixCreator
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim,number> &rhs,
                            Vector<number>           &rhs_vector,
-                           const Function<spacedim,number> *const a = 0,
+                           const Function<spacedim,number> *const a = nullptr,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -437,7 +437,7 @@ namespace MatrixCreator
                               const DoFHandler<dim,spacedim> &dof,
                               const Quadrature<dim>    &q,
                               SparseMatrix<double>     &matrix,
-                              const Function<spacedim> *const a = 0,
+                              const Function<spacedim> *const a = nullptr,
                               const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -448,7 +448,7 @@ namespace MatrixCreator
   void create_laplace_matrix (const DoFHandler<dim,spacedim> &dof,
                               const Quadrature<dim>    &q,
                               SparseMatrix<double>     &matrix,
-                              const Function<spacedim> *const a = 0,
+                              const Function<spacedim> *const a = nullptr,
                               const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -473,7 +473,7 @@ namespace MatrixCreator
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim> &rhs,
                               Vector<double>           &rhs_vector,
-                              const Function<spacedim> *const a = 0,
+                              const Function<spacedim> *const a = nullptr,
                               const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -486,7 +486,7 @@ namespace MatrixCreator
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim> &rhs,
                               Vector<double>           &rhs_vector,
-                              const Function<spacedim> *const a = 0,
+                              const Function<spacedim> *const a = nullptr,
                               const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -498,7 +498,7 @@ namespace MatrixCreator
                               const hp::DoFHandler<dim,spacedim> &dof,
                               const hp::QCollection<dim>    &q,
                               SparseMatrix<double>     &matrix,
-                              const Function<spacedim> *const a = 0,
+                              const Function<spacedim> *const a = nullptr,
                               const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -509,7 +509,7 @@ namespace MatrixCreator
   void create_laplace_matrix (const hp::DoFHandler<dim,spacedim> &dof,
                               const hp::QCollection<dim>    &q,
                               SparseMatrix<double>     &matrix,
-                              const Function<spacedim> *const a = 0,
+                              const Function<spacedim> *const a = nullptr,
                               const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -523,7 +523,7 @@ namespace MatrixCreator
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
-                              const Function<spacedim> *const a = 0,
+                              const Function<spacedim> *const a = nullptr,
                               const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -536,7 +536,7 @@ namespace MatrixCreator
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
-                              const Function<spacedim> *const a = 0,
+                              const Function<spacedim> *const a = nullptr,
                               const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**

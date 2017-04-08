@@ -75,7 +75,7 @@ namespace PETScWrappers
 
   MatrixBase::MatrixBase ()
     :
-    matrix (NULL),
+    matrix (nullptr),
     last_action (VectorOperation::unknown)
   {}
 
@@ -102,7 +102,7 @@ namespace PETScWrappers
     const int m=0, n=0, n_nonzero_per_row=0;
     const PetscErrorCode ierr = MatCreateSeqAIJ(PETSC_COMM_SELF, m, n,
                                                 n_nonzero_per_row,
-                                                0, &matrix);
+                                                nullptr, &matrix);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -161,7 +161,7 @@ namespace PETScWrappers
     const PetscErrorCode ierr = MatZeroRowsIS(matrix, index_set, new_diag_value);
 #else
     const PetscErrorCode ierr = MatZeroRowsIS(matrix, index_set, new_diag_value,
-                                              PETSC_NULL, PETSC_NULL);
+                                              nullptr, nullptr);
 #endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 

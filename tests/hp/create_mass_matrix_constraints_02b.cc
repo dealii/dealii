@@ -116,7 +116,7 @@ check ()
                       hp::QCollection<dim>(quadrature), matrix_ref);
   constraints.condense(matrix_ref);
 
-  const Function<dim> *const dummy = 0;
+  const Function<dim> *const dummy = nullptr;
   MatrixTools::create_mass_matrix (hp::MappingCollection<dim>(mapping), dof,
                                    hp::QCollection<dim>(quadrature), matrix,
                                    dummy, constraints);

@@ -79,44 +79,44 @@ namespace Patterns
     PatternBase *p;
 
     p = Integer::create(description);
-    if (p != 0)
+    if (p != nullptr)
       return p;
 
     p = Double::create(description);
-    if (p !=0 )
+    if (p != nullptr )
       return p;
 
     p = Selection::create(description);
-    if (p !=0 )
+    if (p != nullptr )
       return p;
 
     p = List::create(description);
-    if (p !=0 )
+    if (p != nullptr )
       return p;
 
     p = MultipleSelection::create(description);
-    if (p !=0 )
+    if (p != nullptr )
       return p;
 
     p = Bool::create(description);
-    if (p!=0 )
+    if (p!=nullptr )
       return p;
 
     p = Anything::create(description);
-    if (p !=0 )
+    if (p != nullptr )
       return p;
 
     p = FileName::create(description);
-    if (p !=0 )
+    if (p != nullptr )
       return p;
 
     p = DirectoryName::create(description);
-    if (p!=0 )
+    if (p!=nullptr )
       return p;
 
     Assert(false, ExcNotImplemented());
 
-    return 0;
+    return nullptr;
   }
 
 
@@ -128,13 +128,13 @@ namespace Patterns
   std::size_t
   PatternBase::memory_consumption () const
   {
-    if (dynamic_cast<const Integer *>(this) != 0)
+    if (dynamic_cast<const Integer *>(this) != nullptr)
       return sizeof(Integer);
-    else if (dynamic_cast<const Double *>(this) != 0)
+    else if (dynamic_cast<const Double *>(this) != nullptr)
       return sizeof(Double);
-    else if (dynamic_cast<const Bool *>(this) != 0)
+    else if (dynamic_cast<const Bool *>(this) != nullptr)
       return sizeof(Bool);
-    else if (dynamic_cast<const Anything *>(this) != 0)
+    else if (dynamic_cast<const Anything *>(this) != nullptr)
       return sizeof(Anything);
     else
       return sizeof(*this) + 32;
@@ -276,7 +276,7 @@ namespace Patterns
           return new Integer();
       }
     else
-      return 0;
+      return nullptr;
   }
 
 
@@ -416,9 +416,9 @@ namespace Patterns
   {
     const std::string description_init_str = description_init;
     if (description.compare(0, description_init_str.size(), description_init_str) != 0)
-      return NULL;
+      return nullptr;
     if (*description.rbegin() != ']')
-      return NULL;
+      return nullptr;
 
     std::string temp = description.substr(description_init_str.size());
     if (temp == "]")
@@ -437,7 +437,7 @@ namespace Patterns
       {
         // parse lower bound and give up if not a double
         if (!(is >> lower_bound))
-          return NULL;
+          return nullptr;
       }
 
     // ignore failure here and assume we got MAX_DOUBLE as upper bound:
@@ -558,7 +558,7 @@ namespace Patterns
         return new Selection(sequence);
       }
     else
-      return 0;
+      return nullptr;
   }
 
 
@@ -590,7 +590,7 @@ namespace Patterns
   List::~List ()
   {
     delete pattern;
-    pattern = 0;
+    pattern = nullptr;
   }
 
 
@@ -733,7 +733,7 @@ namespace Patterns
         return new List(*base_pattern, min_elements, max_elements, separator);
       }
     else
-      return 0;
+      return nullptr;
   }
 
 
@@ -770,10 +770,10 @@ namespace Patterns
   Map::~Map ()
   {
     delete key_pattern;
-    key_pattern = 0;
+    key_pattern = nullptr;
 
     delete value_pattern;
-    value_pattern = 0;
+    value_pattern = nullptr;
   }
 
 
@@ -955,7 +955,7 @@ namespace Patterns
                        separator);
       }
     else
-      return 0;
+      return nullptr;
   }
 
 
@@ -1103,7 +1103,7 @@ namespace Patterns
         return new MultipleSelection(sequence);
       }
     else
-      return 0;
+      return nullptr;
   }
 
 
@@ -1159,7 +1159,7 @@ namespace Patterns
     if (description.compare(0, std::strlen(description_init), description_init) == 0)
       return new Bool();
     else
-      return 0;
+      return nullptr;
   }
 
 
@@ -1220,7 +1220,7 @@ namespace Patterns
     if (description.compare(0, std::strlen(description_init), description_init) == 0)
       return new Anything();
     else
-      return 0;
+      return nullptr;
   }
 
 
@@ -1304,7 +1304,7 @@ namespace Patterns
         return new FileName(type);
       }
     else
-      return 0;
+      return nullptr;
   }
 
 
@@ -1364,7 +1364,7 @@ namespace Patterns
     if (description.compare(0, std::strlen(description_init), description_init) == 0)
       return new DirectoryName();
     else
-      return 0;
+      return nullptr;
   }
 
 }   // end namespace Patterns

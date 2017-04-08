@@ -46,12 +46,12 @@ void mpi_check(const std::set<types::subdomain_id> &s)
   unsigned int tag = 1234;
   for (std::set<types::subdomain_id>::iterator it = s.begin();
        it != s.end(); ++it)
-    MPI_Send(NULL, 0, MPI_INT, *it, tag, MPI_COMM_WORLD);
+    MPI_Send(nullptr, 0, MPI_INT, *it, tag, MPI_COMM_WORLD);
 
   for (unsigned int i=0; i<s.size(); ++i)
     {
       MPI_Status status;
-      MPI_Recv(NULL, 0, MPI_INT, MPI_ANY_SOURCE, tag, MPI_COMM_WORLD, &status);
+      MPI_Recv(nullptr, 0, MPI_INT, MPI_ANY_SOURCE, tag, MPI_COMM_WORLD, &status);
       if ((s.end() == s.find(status.MPI_SOURCE)))
         deallog << status.MPI_SOURCE <<  " NOTOKAY" << std::endl;
       Assert(s.end() != s.find(status.MPI_SOURCE), ExcInternalError());

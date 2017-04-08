@@ -59,7 +59,7 @@ namespace SLEPcWrappers
 
   SolverBase::~SolverBase ()
   {
-    if (eps != NULL)
+    if (eps != nullptr)
       {
         // Destroy the solver object.
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
@@ -75,7 +75,7 @@ namespace SLEPcWrappers
   SolverBase::set_matrices (const PETScWrappers::MatrixBase &A)
   {
     // standard eigenspectrum problem
-    const PetscErrorCode ierr = EPSSetOperators (eps, A, PETSC_NULL);
+    const PetscErrorCode ierr = EPSSetOperators (eps, A, nullptr);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 
@@ -231,8 +231,8 @@ namespace SLEPcWrappers
   {
     // get converged eigenpair
     const PetscErrorCode ierr = EPSGetEigenpair (eps, index,
-                                                 &eigenvalues, PETSC_NULL,
-                                                 eigenvectors, PETSC_NULL);
+                                                 &eigenvalues, nullptr,
+                                                 eigenvectors, nullptr);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 

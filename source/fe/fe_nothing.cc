@@ -179,7 +179,7 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &fe) const
       return FiniteElementDomination::no_requirements;
     }
   // if it does and the other is FE_Nothing, either can dominate
-  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe) != 0)
+  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe) != nullptr)
     {
       return FiniteElementDomination::either_element_can_dominate;
     }

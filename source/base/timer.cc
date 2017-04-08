@@ -141,7 +141,7 @@ void Timer::start ()
 //TODO: Break this out into a function like the functions in
 //namespace windows above
   struct timeval wall_timer;
-  gettimeofday(&wall_timer, NULL);
+  gettimeofday(&wall_timer, nullptr);
   start_wall_time = wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec;
 
   rusage usage;
@@ -184,7 +184,7 @@ double Timer::stop ()
       cumulative_time += dtime_children - start_time_children;
 
       struct timeval wall_timer;
-      gettimeofday(&wall_timer, NULL);
+      gettimeofday(&wall_timer, nullptr);
       last_lap_time = wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec
                       - start_wall_time;
 #elif defined(DEAL_II_MSVC)
@@ -263,7 +263,7 @@ double Timer::wall_time () const
     {
 #if defined(DEAL_II_HAVE_SYS_TIME_H) && defined(DEAL_II_HAVE_SYS_RESOURCE_H)
       struct timeval wall_timer;
-      gettimeofday(&wall_timer, NULL);
+      gettimeofday(&wall_timer, nullptr);
       return (wall_timer.tv_sec
               + 1.e-6 * wall_timer.tv_usec
               - start_wall_time

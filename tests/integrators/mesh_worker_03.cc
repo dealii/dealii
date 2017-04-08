@@ -169,7 +169,7 @@ assemble(const DoFHandler<dim> &dof_handler, SparseMatrix<double> &matrix)
    dof_info,
    info_box,
    &MatrixIntegrator<dim>::cell,
-   0,
+   nullptr,
    &MatrixIntegrator<dim>::face,
    assembler);
 }

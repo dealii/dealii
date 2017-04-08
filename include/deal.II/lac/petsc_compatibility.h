@@ -53,7 +53,7 @@ namespace PETScWrappers
 #if DEAL_II_PETSC_VERSION_LT(3, 7, 0)
     const PetscErrorCode ierr = PetscOptionsSetValue (name.c_str (), value.c_str ());
 #else
-    const PetscErrorCode ierr = PetscOptionsSetValue (NULL, name.c_str (), value.c_str ());
+    const PetscErrorCode ierr = PetscOptionsSetValue (nullptr, name.c_str (), value.c_str ());
 #endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
@@ -72,7 +72,7 @@ namespace PETScWrappers
    */
   inline PetscErrorCode destroy_matrix (Mat &matrix)
   {
-    // PETSc will check whether or not matrix is NULL.
+    // PETSc will check whether or not matrix is nullptr.
 #if DEAL_II_PETSC_VERSION_LT(3, 2, 0)
     return MatDestroy (matrix);
 #else
@@ -94,7 +94,7 @@ namespace PETScWrappers
    */
   inline PetscErrorCode destroy_krylov_solver (KSP &krylov_solver)
   {
-    // PETSc will check whether or not matrix is NULL.
+    // PETSc will check whether or not matrix is nullptr.
 #if DEAL_II_PETSC_VERSION_LT(3, 2, 0)
     return KSPDestroy (krylov_solver);
 #else

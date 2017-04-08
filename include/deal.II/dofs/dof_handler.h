@@ -1214,7 +1214,7 @@ inline
 const FiniteElement<dim,spacedim> &
 DoFHandler<dim,spacedim>::get_fe () const
 {
-  Assert(selected_fe!=0, ExcMessage("You are trying to access the DoFHandler's FiniteElement object before it has been initialized."));
+  Assert(selected_fe!=nullptr, ExcMessage("You are trying to access the DoFHandler's FiniteElement object before it has been initialized."));
   return *selected_fe;
 }
 
@@ -1225,7 +1225,7 @@ inline
 const Triangulation<dim,spacedim> &
 DoFHandler<dim,spacedim>::get_tria () const
 {
-  Assert(tria != 0, ExcNotInitialized());
+  Assert(tria != nullptr, ExcNotInitialized());
   return *tria;
 }
 
@@ -1236,7 +1236,7 @@ inline
 const Triangulation<dim,spacedim> &
 DoFHandler<dim,spacedim>::get_triangulation () const
 {
-  Assert(tria != 0, ExcNotInitialized());
+  Assert(tria != nullptr, ExcNotInitialized());
   return *tria;
 }
 
@@ -1322,7 +1322,7 @@ void DoFHandler<dim,spacedim>::load (Archive &ar,
     delete levels[i];
   levels.resize (0);
   delete faces;
-  faces = 0;
+  faces = nullptr;
 
   ar &levels;
   ar &faces;

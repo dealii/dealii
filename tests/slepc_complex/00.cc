@@ -39,7 +39,7 @@ int main (int argc, char **argv)
       logfile << "Initializing SLEPc (PETSc): "
               << std::flush;
 
-      SlepcInitialize (&argc, &argv, 0, 0);
+      SlepcInitialize (&argc, &argv, nullptr, nullptr);
       {
         logfile << "ok"
                 << std::endl;

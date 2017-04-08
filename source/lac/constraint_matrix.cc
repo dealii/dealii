@@ -521,7 +521,7 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
             {
               const ConstraintLine::Entries *other_line
                 = other_constraints.get_constraint_entries (line->entries[i].first);
-              Assert (other_line != 0,
+              Assert (other_line != nullptr,
                       ExcInternalError());
 
               const double weight = line->entries[i].second;
@@ -1234,7 +1234,7 @@ ConstraintMatrix::resolve_indices (std::vector<types::global_dof_index> &indices
       line_ptr = get_constraint_entries(indices[i]);
       // if the index is constraint, the constraints indices are added to the
       // indices vector
-      if (line_ptr!=NULL)
+      if (line_ptr!=nullptr)
         {
           const unsigned int line_size = line_ptr->size();
           for (unsigned int j=0; j<line_size; ++j)

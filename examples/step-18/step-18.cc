@@ -1510,7 +1510,7 @@ namespace Step18
                                         incremental_displacement,
                                         error_per_cell,
                                         ComponentMask(),
-                                        0,
+                                        nullptr,
                                         MultithreadInfo::n_threads(),
                                         this_mpi_process);
 

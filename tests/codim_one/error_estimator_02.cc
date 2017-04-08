@@ -101,7 +101,7 @@ template<>
 Quadrature<0> &
 get_q_face <1>()
 {
-  Quadrature<0> *q = 0;
+  Quadrature<0> *q = nullptr;
   return *q;
 }
 

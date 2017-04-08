@@ -102,7 +102,7 @@ namespace LinearAlgebra
   Vector<Number> &Vector<Number>::operator+= (const VectorSpaceVector<Number> &V)
   {
     // Check that casting will work.
-    Assert(dynamic_cast<const Vector<Number>*>(&V)!=NULL, ExcVectorTypeNotCompatible());
+    Assert(dynamic_cast<const Vector<Number>*>(&V)!=nullptr, ExcVectorTypeNotCompatible());
 
     // Downcast V. If fails, throws an exception.
     const Vector<Number> &down_V = dynamic_cast<const Vector<Number>&>(V);
@@ -121,7 +121,7 @@ namespace LinearAlgebra
   Vector<Number> &Vector<Number>::operator-= (const VectorSpaceVector<Number> &V)
   {
     // Check that casting will work.
-    Assert(dynamic_cast<const Vector<Number>*>(&V)!=NULL, ExcVectorTypeNotCompatible());
+    Assert(dynamic_cast<const Vector<Number>*>(&V)!=nullptr, ExcVectorTypeNotCompatible());
 
     // Downcast V. If fails, throws an exception.
     const Vector<Number> &down_V = dynamic_cast<const Vector<Number>&>(V);
@@ -139,7 +139,7 @@ namespace LinearAlgebra
   Number Vector<Number>::operator* (const VectorSpaceVector<Number> &V) const
   {
     // Check that casting will work.
-    Assert(dynamic_cast<const Vector<Number>*>(&V)!=NULL,
+    Assert(dynamic_cast<const Vector<Number>*>(&V)!=nullptr,
            ExcVectorTypeNotCompatible());
 
     // Downcast V. If fails, throws an exception.
@@ -182,7 +182,7 @@ namespace LinearAlgebra
   void Vector<Number>::add(const Number a, const VectorSpaceVector<Number> &V)
   {
     // Check that casting will work.
-    Assert(dynamic_cast<const Vector<Number>*>(&V)!=NULL,
+    Assert(dynamic_cast<const Vector<Number>*>(&V)!=nullptr,
            ExcVectorTypeNotCompatible());
 
     // Downcast V. If fails, throws an exception.
@@ -202,10 +202,10 @@ namespace LinearAlgebra
                            const Number b, const VectorSpaceVector<Number> &W)
   {
     // Check that casting will work.
-    Assert(dynamic_cast<const Vector<Number>*>(&V)!=NULL,
+    Assert(dynamic_cast<const Vector<Number>*>(&V)!=nullptr,
            ExcVectorTypeNotCompatible());
     // Check that casting will work.
-    Assert(dynamic_cast<const Vector<Number>*>(&W)!=NULL,
+    Assert(dynamic_cast<const Vector<Number>*>(&W)!=nullptr,
            ExcVectorTypeNotCompatible());
 
     // Downcast V. If fails, throws an exception.
@@ -234,7 +234,7 @@ namespace LinearAlgebra
     AssertIsFinite(a);
 
     // Check that casting will work.
-    Assert(dynamic_cast<const Vector<Number>*>(&V)!=NULL,
+    Assert(dynamic_cast<const Vector<Number>*>(&V)!=nullptr,
            ExcVectorTypeNotCompatible());
 
     // Downcast V. It fails, throws an exception.
@@ -250,7 +250,7 @@ namespace LinearAlgebra
   void Vector<Number>::scale(const VectorSpaceVector<Number> &scaling_factors)
   {
     // Check that casting will work.
-    Assert(dynamic_cast<const Vector<Number>*>(&scaling_factors)!=NULL,
+    Assert(dynamic_cast<const Vector<Number>*>(&scaling_factors)!=nullptr,
            ExcVectorTypeNotCompatible());
 
     // Downcast scaling_factors. If fails, throws an exception.
@@ -271,7 +271,7 @@ namespace LinearAlgebra
     AssertIsFinite(a);
 
     // Check that casting will work.
-    Assert(dynamic_cast<const Vector<Number>*>(&V)!=NULL,
+    Assert(dynamic_cast<const Vector<Number>*>(&V)!=nullptr,
            ExcVectorTypeNotCompatible());
 
     // Downcast V. If fails, throws an exception.
@@ -377,10 +377,10 @@ namespace LinearAlgebra
                                      const VectorSpaceVector<Number> &W)
   {
     // Check that casting will work.
-    Assert(dynamic_cast<const Vector<Number>*>(&V)!=NULL,
+    Assert(dynamic_cast<const Vector<Number>*>(&V)!=nullptr,
            ExcVectorTypeNotCompatible());
     // Check that casting will work.
-    Assert(dynamic_cast<const Vector<Number>*>(&W)!=NULL,
+    Assert(dynamic_cast<const Vector<Number>*>(&W)!=nullptr,
            ExcVectorTypeNotCompatible());
 
     // Downcast V. If fails, throws an exception.

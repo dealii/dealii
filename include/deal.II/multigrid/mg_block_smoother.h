@@ -174,8 +174,8 @@ MGSmootherBlock<MatrixType, RelaxationType, number>::clear ()
                max_level=matrices.max_level();
   for (; i<=max_level; ++i)
     {
-      smoothers[i] = 0;
-      matrices[i] = 0;
+      smoothers[i] = nullptr;
+      matrices[i] = nullptr;
     }
 }
 

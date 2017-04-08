@@ -1253,7 +1253,7 @@ MappingQGeneric<dim,spacedim>::MappingQGeneric (const unsigned int p)
   :
   polynomial_degree(p),
   line_support_points(this->polynomial_degree+1),
-  fe_q(dim == 3 ? new FE_Q<dim>(this->polynomial_degree) : 0),
+  fe_q(dim == 3 ? new FE_Q<dim>(this->polynomial_degree) : nullptr),
   support_point_weights_perimeter_to_interior (compute_support_point_weights_perimeter_to_interior(this->polynomial_degree, dim)),
   support_point_weights_cell (compute_support_point_weights_cell<dim>(this->polynomial_degree))
 {
@@ -1268,7 +1268,7 @@ MappingQGeneric<dim,spacedim>::MappingQGeneric (const MappingQGeneric<dim,spaced
   :
   polynomial_degree(mapping.polynomial_degree),
   line_support_points(mapping.line_support_points),
-  fe_q(dim == 3 ? new FE_Q<dim>(*mapping.fe_q) : 0),
+  fe_q(dim == 3 ? new FE_Q<dim>(*mapping.fe_q) : nullptr),
   support_point_weights_perimeter_to_interior (mapping.support_point_weights_perimeter_to_interior),
   support_point_weights_cell (mapping.support_point_weights_cell)
 {}
@@ -2618,7 +2618,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                 internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
 {
   // ensure that the following static_cast is really correct:
-  Assert (dynamic_cast<const InternalData *>(&internal_data) != 0,
+  Assert (dynamic_cast<const InternalData *>(&internal_data) != nullptr,
           ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(internal_data);
 
@@ -3026,7 +3026,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
                      internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
 {
   // ensure that the following cast is really correct:
-  Assert ((dynamic_cast<const InternalData *>(&internal_data) != 0),
+  Assert ((dynamic_cast<const InternalData *>(&internal_data) != nullptr),
           ExcInternalError());
   const InternalData &data
     = static_cast<const InternalData &>(internal_data);
@@ -3071,7 +3071,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
                         internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
 {
   // ensure that the following cast is really correct:
-  Assert ((dynamic_cast<const InternalData *>(&internal_data) != 0),
+  Assert ((dynamic_cast<const InternalData *>(&internal_data) != nullptr),
           ExcInternalError());
   const InternalData &data
     = static_cast<const InternalData &>(internal_data);
@@ -3116,7 +3116,7 @@ namespace
                    const ArrayView<Tensor<rank,spacedim> >                &output)
   {
     AssertDimension (input.size(), output.size());
-    Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *>(&mapping_data) != 0),
+    Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *>(&mapping_data) != nullptr),
             ExcInternalError());
     const typename MappingQGeneric<dim,spacedim>::InternalData
     &data = static_cast<const typename MappingQGeneric<dim,spacedim>::InternalData &>(mapping_data);
@@ -3179,7 +3179,7 @@ namespace
                       const ArrayView<Tensor<rank,spacedim> >                 &output)
   {
     AssertDimension (input.size(), output.size());
-    Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *>(&mapping_data) != 0),
+    Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *>(&mapping_data) != nullptr),
             ExcInternalError());
     const typename MappingQGeneric<dim,spacedim>::InternalData
     &data = static_cast<const typename MappingQGeneric<dim,spacedim>::InternalData &>(mapping_data);
@@ -3260,7 +3260,7 @@ namespace
                      const ArrayView<Tensor<3,spacedim> >                   &output)
   {
     AssertDimension (input.size(), output.size());
-    Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *>(&mapping_data) != 0),
+    Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *>(&mapping_data) != nullptr),
             ExcInternalError());
     const typename MappingQGeneric<dim,spacedim>::InternalData
     &data = static_cast<const typename MappingQGeneric<dim,spacedim>::InternalData &>(mapping_data);
@@ -3402,7 +3402,7 @@ namespace
                                const ArrayView<Tensor<rank+1, spacedim> >                   &output)
   {
     AssertDimension (input.size(), output.size());
-    Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *>(&mapping_data) != 0),
+    Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *>(&mapping_data) != nullptr),
             ExcInternalError());
     const typename MappingQGeneric<dim,spacedim>::InternalData
     &data = static_cast<const typename MappingQGeneric<dim,spacedim>::InternalData &>(mapping_data);
@@ -3489,7 +3489,7 @@ transform (const ArrayView<const  DerivativeForm<2, dim, spacedim> > &input,
 {
 
   AssertDimension (input.size(), output.size());
-  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != nullptr,
           ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(mapping_data);
 
@@ -3695,7 +3695,7 @@ add_quad_support_points(const Triangulation<3,3>::cell_iterator &cell,
       // the triangulation if no manifold is assigned).
       const Boundary<3,3> *boundary =
         dynamic_cast<const Boundary<3,3> *>(&face->get_manifold());
-      if (boundary != NULL &&
+      if (boundary != nullptr &&
           std::string(typeid(*boundary).name()).find("StraightBoundary") ==
           std::string::npos)
         {

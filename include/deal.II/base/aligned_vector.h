@@ -470,9 +470,9 @@ template < class T >
 inline
 AlignedVector<T>::AlignedVector ()
   :
-  _data (0),
-  _end_data (0),
-  _end_allocated (0)
+  _data (nullptr),
+  _end_data (nullptr),
+  _end_allocated (nullptr)
 {}
 
 
@@ -482,9 +482,9 @@ inline
 AlignedVector<T>::AlignedVector (const size_type size,
                                  const T &init)
   :
-  _data (0),
-  _end_data (0),
-  _end_allocated (0)
+  _data (nullptr),
+  _end_data (nullptr),
+  _end_allocated (nullptr)
 {
   if (size > 0)
     resize (size, init);
@@ -505,9 +505,9 @@ template < class T >
 inline
 AlignedVector<T>::AlignedVector (const AlignedVector<T> &vec)
   :
-  _data (0),
-  _end_data (0),
-  _end_allocated (0)
+  _data (nullptr),
+  _end_data (nullptr),
+  _end_allocated (nullptr)
 {
   // copy the data from vec
   reserve (vec._end_data - vec._data);
@@ -650,7 +650,7 @@ AlignedVector<T>::reserve (const size_type size_alloc)
           free(new_data);
         }
       else
-        Assert(new_data == 0, ExcInternalError());
+        Assert(new_data == nullptr, ExcInternalError());
     }
   else if (size_alloc == 0)
     clear();
@@ -663,7 +663,7 @@ inline
 void
 AlignedVector<T>::clear ()
 {
-  if (_data != 0)
+  if (_data != nullptr)
     {
       if (std::is_trivial<T>::value == false)
         while (_end_data != _data)
@@ -671,9 +671,9 @@ AlignedVector<T>::clear ()
 
       free(_data);
     }
-  _data = 0;
-  _end_data = 0;
-  _end_allocated = 0;
+  _data = nullptr;
+  _end_data = nullptr;
+  _end_allocated = nullptr;
 }
 
 

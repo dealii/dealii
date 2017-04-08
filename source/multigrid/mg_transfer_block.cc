@@ -398,7 +398,7 @@ void MGTransferBlockBase::build_matrices (
   // impose boundary conditions
   // but only in the column of
   // the prolongation matrix
-  if (mg_constrained_dofs != 0 && mg_constrained_dofs->have_boundary_indices())
+  if (mg_constrained_dofs != nullptr && mg_constrained_dofs->have_boundary_indices())
     {
       std::vector<types::global_dof_index> constrain_indices;
       std::vector<std::vector<bool> > constraints_per_block (n_blocks);
@@ -494,7 +494,7 @@ void MGTransferBlockSelect<number>::build_matrices (
               const unsigned int block = fe.system_to_block_index(i).first;
               if (selected[block])
                 {
-                  if (mg_constrained_dofs != 0)
+                  if (mg_constrained_dofs != nullptr)
                     {
                       if (!mg_constrained_dofs->at_refinement_edge(level,level_dof_indices[i]))
                         temp_copy_indices[level_dof_indices[i] - mg_block_start[level][block]]

@@ -62,9 +62,9 @@ namespace LinearAlgebra
     {
       if (new_alloc_size > allocated_size)
         {
-          Assert (((allocated_size > 0 && val != 0) ||
-                   val == 0), ExcInternalError());
-          if (val != 0)
+          Assert (((allocated_size > 0 && val != nullptr) ||
+                   val == nullptr), ExcInternalError());
+          if (val != nullptr)
             free(val);
 
           Utilities::System::posix_memalign ((void **)&val, 64, sizeof(Number)*new_alloc_size);
@@ -73,9 +73,9 @@ namespace LinearAlgebra
         }
       else if (new_alloc_size == 0)
         {
-          if (val != 0)
+          if (val != nullptr)
             free(val);
-          val = 0;
+          val = nullptr;
           allocated_size = 0;
         }
       thread_loop_partitioner.reset(new ::dealii::parallel::internal::TBBPartitioner());
@@ -94,9 +94,9 @@ namespace LinearAlgebra
       resize_val (size);
 
       // delete previous content in import data
-      if (import_data != 0)
+      if (import_data != nullptr)
         delete[] import_data;
-      import_data = 0;
+      import_data = nullptr;
 
       // set partitioner to serial version
       partitioner.reset (new Utilities::MPI::Partitioner (size));
@@ -117,7 +117,7 @@ namespace LinearAlgebra
                             const bool             omit_zeroing_entries)
     {
       clear_mpi_requests();
-      Assert (v.partitioner.get() != 0, ExcNotInitialized());
+      Assert (v.partitioner.get() != nullptr, ExcNotInitialized());
 
       // check whether the partitioners are
       // different (check only if the are allocated
@@ -134,7 +134,7 @@ namespace LinearAlgebra
       if (omit_zeroing_entries == false)
         this->operator= (Number());
 
-      if (import_data != 0)
+      if (import_data != nullptr)
         {
           delete [] import_data;
 
@@ -142,7 +142,7 @@ namespace LinearAlgebra
           // is only used as temporary storage for compress() and
           // update_ghost_values, and we might have vectors where we never
           // call these methods and hence do not need to have the storage.
-          import_data = 0;
+          import_data = nullptr;
         }
 
       vector_is_ghosted = false;
@@ -196,7 +196,7 @@ namespace LinearAlgebra
       // initialize to zero
       this->operator= (Number());
 
-      if (import_data != 0)
+      if (import_data != nullptr)
         {
           delete [] import_data;
 
@@ -204,7 +204,7 @@ namespace LinearAlgebra
           // is only used as temporary storage for compress() and
           // update_ghost_values, and we might have vectors where we never
           // call these methods and hence do not need to have the storage.
-          import_data = 0;
+          import_data = nullptr;
         }
 
       vector_is_ghosted = false;
@@ -217,8 +217,8 @@ namespace LinearAlgebra
       :
       partitioner (new Utilities::MPI::Partitioner()),
       allocated_size (0),
-      val (0),
-      import_data (0)
+      val (nullptr),
+      import_data (nullptr)
     {
       reinit(0);
     }
@@ -230,8 +230,8 @@ namespace LinearAlgebra
       :
       Subscriptor(),
       allocated_size (0),
-      val (0),
-      import_data (0),
+      val (nullptr),
+      import_data (nullptr),
       vector_is_ghosted (false)
     {
       reinit (v, true);
@@ -252,8 +252,8 @@ namespace LinearAlgebra
                             const MPI_Comm  communicator)
       :
       allocated_size (0),
-      val (0),
-      import_data (0),
+      val (nullptr),
+      import_data (nullptr),
       vector_is_ghosted (false)
     {
       reinit (local_range, ghost_indices, communicator);
@@ -266,8 +266,8 @@ namespace LinearAlgebra
                             const MPI_Comm  communicator)
       :
       allocated_size (0),
-      val (0),
-      import_data (0),
+      val (nullptr),
+      import_data (nullptr),
       vector_is_ghosted (false)
     {
       reinit (local_range, communicator);
@@ -279,8 +279,8 @@ namespace LinearAlgebra
     Vector<Number>::Vector (const size_type size)
       :
       allocated_size (0),
-      val (0),
-      import_data (0),
+      val (nullptr),
+      import_data (nullptr),
       vector_is_ghosted (false)
     {
       reinit (size, false);
@@ -293,8 +293,8 @@ namespace LinearAlgebra
     Vector (const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner)
       :
       allocated_size (0),
-      val (0),
-      import_data (0),
+      val (nullptr),
+      import_data (nullptr),
       vector_is_ghosted (false)
     {
       reinit (partitioner);
@@ -308,9 +308,9 @@ namespace LinearAlgebra
     {
       resize_val(0);
 
-      if (import_data != 0)
+      if (import_data != nullptr)
         delete[] import_data;
-      import_data = 0;
+      import_data = nullptr;
 
       clear_mpi_requests();
     }
@@ -337,7 +337,7 @@ namespace LinearAlgebra
     Vector<Number> &
     Vector<Number>::operator = (const Vector<Number2> &c)
     {
-      Assert (c.partitioner.get() != 0, ExcNotInitialized());
+      Assert (c.partitioner.get() != nullptr, ExcNotInitialized());
 
       // we update ghost values whenever one of the input or output vector
       // already held ghost values or when we import data from a vector with
@@ -352,7 +352,7 @@ namespace LinearAlgebra
       // c does not have any ghosts (constructed without ghost elements given)
       // but the current vector does: In that case, we need to exchange data
       // also when none of the two vector had updated its ghost values before.
-      if (partitioner.get() == 0)
+      if (partitioner.get() == nullptr)
         reinit (c, true);
       else if (partitioner.get() != c.partitioner.get())
         {
@@ -567,7 +567,7 @@ namespace LinearAlgebra
       compress_requests.resize (n_import_targets + n_ghost_targets);
 
       // allocate import_data in case it is not set up yet
-      if (import_data == 0)
+      if (import_data == nullptr)
         import_data = new Number[part.n_import_indices()];
 
       // initiate the receive operations
@@ -754,13 +754,13 @@ namespace LinearAlgebra
                        part.local_size()+part.n_ghost_indices());
 
       // allocate import_data in case it is not set up yet
-      if (import_data == 0 && part.n_import_indices() > 0)
+      if (import_data == nullptr && part.n_import_indices() > 0)
         import_data = new Number[part.n_import_indices()];
 
       // copy the data to be sent to the import_data field
       if (part.n_import_indices() > 0)
         {
-          Assert (import_data != 0, ExcInternalError());
+          Assert (import_data != nullptr, ExcInternalError());
           Number *write_position = import_data;
           std::vector<std::pair<unsigned int, unsigned int> >::const_iterator
           my_imports = part.import_indices().begin();
@@ -831,7 +831,7 @@ namespace LinearAlgebra
       // If no communication pattern is given, create one. Otherwise, use the
       // given one.
       std::shared_ptr<const Utilities::MPI::Partitioner> comm_pattern;
-      if (communication_pattern.get() == NULL)
+      if (communication_pattern.get() == nullptr)
         {
           // Split the IndexSet of V in locally owned elements and ghost indices
           // then create the communication pattern
@@ -847,7 +847,7 @@ namespace LinearAlgebra
         {
           comm_pattern =
             std::dynamic_pointer_cast<const Utilities::MPI::Partitioner> (communication_pattern);
-          AssertThrow(comm_pattern != NULL,
+          AssertThrow(comm_pattern != nullptr,
                       ExcMessage("The communication pattern is not of type "
                                  "Utilities::MPI::Partitioner."));
         }
@@ -946,7 +946,7 @@ namespace LinearAlgebra
     Vector<Number>::operator += (const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=NULL,
+      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=nullptr,
              ExcVectorTypeNotCompatible());
       const Vector<Number> &v = dynamic_cast<const Vector<Number> &>(vv);
 
@@ -969,7 +969,7 @@ namespace LinearAlgebra
     Vector<Number>::operator -= (const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=NULL,
+      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=nullptr,
              ExcVectorTypeNotCompatible());
       const Vector<Number> &v = dynamic_cast<const Vector<Number> &>(vv);
 
@@ -1009,7 +1009,7 @@ namespace LinearAlgebra
                          const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=NULL,
+      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=nullptr,
              ExcVectorTypeNotCompatible());
       const Vector<Number> &v = dynamic_cast<const Vector<Number> &>(vv);
 
@@ -1034,10 +1034,10 @@ namespace LinearAlgebra
                          const VectorSpaceVector<Number> &ww)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=NULL,
+      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=nullptr,
              ExcVectorTypeNotCompatible());
       const Vector<Number> &v = dynamic_cast<const Vector<Number> &>(vv);
-      Assert(dynamic_cast<const Vector<Number> *>(&ww)!=NULL,
+      Assert(dynamic_cast<const Vector<Number> *>(&ww)!=nullptr,
              ExcVectorTypeNotCompatible());
       const Vector<Number> &w = dynamic_cast<const Vector<Number> &>(ww);
 
@@ -1097,7 +1097,7 @@ namespace LinearAlgebra
                           const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=NULL,
+      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=nullptr,
              ExcVectorTypeNotCompatible());
       const Vector<Number> &v = dynamic_cast<const Vector<Number> &>(vv);
 
@@ -1175,7 +1175,7 @@ namespace LinearAlgebra
     Vector<Number>::scale (const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=NULL,
+      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=nullptr,
              ExcVectorTypeNotCompatible());
       const Vector<Number> &v = dynamic_cast<const Vector<Number> &>(vv);
 
@@ -1197,7 +1197,7 @@ namespace LinearAlgebra
                          const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=NULL,
+      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=nullptr,
              ExcVectorTypeNotCompatible());
       const Vector<Number> &v = dynamic_cast<const Vector<Number> &>(vv);
 
@@ -1296,7 +1296,7 @@ namespace LinearAlgebra
     Vector<Number>::operator * (const VectorSpaceVector<Number> &vv) const
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=NULL,
+      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=nullptr,
              ExcVectorTypeNotCompatible());
       const Vector<Number> &v = dynamic_cast<const Vector<Number> &>(vv);
 
@@ -1486,10 +1486,10 @@ namespace LinearAlgebra
                                  const VectorSpaceVector<Number> &ww)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=NULL,
+      Assert(dynamic_cast<const Vector<Number> *>(&vv)!=nullptr,
              ExcVectorTypeNotCompatible());
       const Vector<Number> &v = dynamic_cast<const Vector<Number> &>(vv);
-      Assert(dynamic_cast<const Vector<Number> *>(&ww)!=NULL,
+      Assert(dynamic_cast<const Vector<Number> *>(&ww)!=nullptr,
              ExcVectorTypeNotCompatible());
       const Vector<Number> &w = dynamic_cast<const Vector<Number> &>(ww);
 
@@ -1537,7 +1537,7 @@ namespace LinearAlgebra
       // for it.
       if (partitioner.use_count() > 0)
         memory += partitioner->memory_consumption()/partitioner.use_count()+1;
-      if (import_data != 0)
+      if (import_data != nullptr)
         memory += (static_cast<std::size_t>(partitioner->n_import_indices())*
                    sizeof(Number));
       return memory;
@@ -1552,7 +1552,7 @@ namespace LinearAlgebra
                            const bool         scientific,
                            const bool         across) const
     {
-      Assert (partitioner.get() !=0, ExcInternalError());
+      Assert (partitioner.get() != nullptr, ExcInternalError());
       AssertThrow (out, ExcIO());
       std::ios::fmtflags old_flags = out.flags();
       unsigned int old_precision = out.precision (precision);

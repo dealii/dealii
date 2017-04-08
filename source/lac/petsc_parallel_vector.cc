@@ -306,7 +306,7 @@ namespace PETScWrappers
            ?
            (const PetscInt *)(&(ghostindices[0]))
            :
-           0);
+           nullptr);
 
       PetscErrorCode ierr = VecCreateGhost(communicator,
                                            local_size,

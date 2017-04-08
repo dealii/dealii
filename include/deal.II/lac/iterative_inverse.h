@@ -149,8 +149,8 @@ template <typename VectorType>
 inline void
 IterativeInverse<VectorType>::vmult (VectorType &dst, const VectorType &src) const
 {
-  Assert(matrix.get() != 0, ExcNotInitialized());
-  Assert(preconditioner.get() != 0, ExcNotInitialized());
+  Assert(matrix.get() != nullptr, ExcNotInitialized());
+  Assert(preconditioner.get() != nullptr, ExcNotInitialized());
   dst = 0.;
   solver.solve(*matrix, dst, src, *preconditioner);
 }

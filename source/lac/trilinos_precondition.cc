@@ -129,8 +129,8 @@ namespace TrilinosWrappers
 
     Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
                                     (preconditioner.get());
-    Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
-                                     "preconditioner"));
+    Assert (ifpack != nullptr, ExcMessage ("Trilinos could not create this "
+                                           "preconditioner"));
 
     int ierr;
 
@@ -181,8 +181,8 @@ namespace TrilinosWrappers
 
     Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
                                     (preconditioner.get());
-    Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
-                                     "preconditioner"));
+    Assert (ifpack != nullptr, ExcMessage ("Trilinos could not create this "
+                                           "preconditioner"));
 
     int ierr;
 
@@ -234,8 +234,8 @@ namespace TrilinosWrappers
 
     Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
                                     (preconditioner.get());
-    Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
-                                     "preconditioner"));
+    Assert (ifpack != nullptr, ExcMessage ("Trilinos could not create this "
+                                           "preconditioner"));
 
     int ierr;
 
@@ -290,8 +290,8 @@ namespace TrilinosWrappers
 
     Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
                                     (preconditioner.get());
-    Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
-                                     "preconditioner"));
+    Assert (ifpack != nullptr, ExcMessage ("Trilinos could not create this "
+                                           "preconditioner"));
 
     int ierr;
 
@@ -350,8 +350,8 @@ namespace TrilinosWrappers
 
     Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
                                     (preconditioner.get());
-    Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
-                                     "preconditioner"));
+    Assert (ifpack != nullptr, ExcMessage ("Trilinos could not create this "
+                                           "preconditioner"));
 
     int ierr;
 
@@ -411,8 +411,8 @@ namespace TrilinosWrappers
 
     Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
                                     (preconditioner.get());
-    Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
-                                     "preconditioner"));
+    Assert (ifpack != nullptr, ExcMessage ("Trilinos could not create this "
+                                           "preconditioner"));
 
     int ierr;
 
@@ -468,8 +468,8 @@ namespace TrilinosWrappers
 
     Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
                                     (preconditioner.get());
-    Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
-                                     "preconditioner"));
+    Assert (ifpack != nullptr, ExcMessage ("Trilinos could not create this "
+                                           "preconditioner"));
 
     int ierr;
 
@@ -519,8 +519,8 @@ namespace TrilinosWrappers
 
     Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
                                     (preconditioner.get());
-    Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
-                                     "preconditioner"));
+    Assert (ifpack != nullptr, ExcMessage ("Trilinos could not create this "
+                                           "preconditioner"));
 
     int ierr;
 
@@ -572,8 +572,8 @@ namespace TrilinosWrappers
 
     Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
                                     (preconditioner.get());
-    Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
-                                     "preconditioner"));
+    Assert (ifpack != nullptr, ExcMessage ("Trilinos could not create this "
+                                           "preconditioner"));
 
     int ierr;
 
@@ -618,8 +618,8 @@ namespace TrilinosWrappers
 
     Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
                                     (preconditioner.get());
-    Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
-                                     "preconditioner"));
+    Assert (ifpack != nullptr, ExcMessage ("Trilinos could not create this "
+                                           "preconditioner"));
 
     int ierr;
 
@@ -667,8 +667,8 @@ namespace TrilinosWrappers
 
     Ifpack_Chebyshev *ifpack = static_cast<Ifpack_Chebyshev *>
                                (preconditioner.get());
-    Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
-                                     "preconditioner"));
+    Assert (ifpack != nullptr, ExcMessage ("Trilinos could not create this "
+                                           "preconditioner"));
 
     int ierr;
 
@@ -727,8 +727,8 @@ namespace TrilinosWrappers
 
     Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
                                     (preconditioner.get());
-    Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
-                                     "preconditioner"));
+    Assert (ifpack != nullptr, ExcMessage ("Trilinos could not create this "
+                                           "preconditioner"));
 
     int ierr;
 

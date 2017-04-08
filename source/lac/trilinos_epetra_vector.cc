@@ -106,7 +106,7 @@ namespace LinearAlgebra
     {
       // If no communication pattern is given, create one. Otherwsie, use the
       // one given.
-      if (communication_pattern == NULL)
+      if (communication_pattern == nullptr)
         {
           // The first time import is called, a communication pattern is created.
           // Check if the communication pattern already exists and if it can be
@@ -123,7 +123,7 @@ namespace LinearAlgebra
         {
           epetra_comm_pattern =
             std::dynamic_pointer_cast<const CommunicationPattern> (communication_pattern);
-          AssertThrow(epetra_comm_pattern != NULL,
+          AssertThrow(epetra_comm_pattern != nullptr,
                       ExcMessage(std::string("The communication pattern is not of type ") +
                                  "LinearAlgebra::EpetraWrappers::CommunicationPattern."));
         }
@@ -167,7 +167,7 @@ namespace LinearAlgebra
     Vector &Vector::operator+= (const VectorSpaceVector<double> &V)
     {
       // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&V)!=NULL, ExcVectorTypeNotCompatible());
+      Assert(dynamic_cast<const Vector *>(&V)!=nullptr, ExcVectorTypeNotCompatible());
 
       // Downcast V. If fails, throws an exception.
       const Vector &down_V = dynamic_cast<const Vector &>(V);
@@ -222,7 +222,7 @@ namespace LinearAlgebra
     double Vector::operator* (const VectorSpaceVector<double> &V) const
     {
       // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&V)!=NULL,
+      Assert(dynamic_cast<const Vector *>(&V)!=nullptr,
              ExcVectorTypeNotCompatible());
 
       // Downcast V. If fails, throws an exception.
@@ -255,7 +255,7 @@ namespace LinearAlgebra
     void Vector::add(const double a, const VectorSpaceVector<double> &V)
     {
       // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&V)!=NULL,
+      Assert(dynamic_cast<const Vector *>(&V)!=nullptr,
              ExcVectorTypeNotCompatible());
 
       // Downcast V. If fails, throws an exception.
@@ -275,10 +275,10 @@ namespace LinearAlgebra
                      const double b, const VectorSpaceVector<double> &W)
     {
       // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&V)!=NULL,
+      Assert(dynamic_cast<const Vector *>(&V)!=nullptr,
              ExcVectorTypeNotCompatible());
       // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&W)!=NULL,
+      Assert(dynamic_cast<const Vector *>(&W)!=nullptr,
              ExcVectorTypeNotCompatible());
 
       // Downcast V. If fails, throws an exception.
@@ -304,7 +304,7 @@ namespace LinearAlgebra
                       const VectorSpaceVector<double> &V)
     {
       // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&V)!=NULL,
+      Assert(dynamic_cast<const Vector *>(&V)!=nullptr,
              ExcVectorTypeNotCompatible());
 
       *this *= s;
@@ -320,7 +320,7 @@ namespace LinearAlgebra
     void Vector::scale(const VectorSpaceVector<double> &scaling_factors)
     {
       // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&scaling_factors)!=NULL,
+      Assert(dynamic_cast<const Vector *>(&scaling_factors)!=nullptr,
              ExcVectorTypeNotCompatible());
 
       // Downcast scaling_factors. If fails, throws an exception.
@@ -340,7 +340,7 @@ namespace LinearAlgebra
     void Vector::equ(const double a, const VectorSpaceVector<double> &V)
     {
       // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&V)!=NULL,
+      Assert(dynamic_cast<const Vector *>(&V)!=nullptr,
              ExcVectorTypeNotCompatible());
 
       // Downcast V. If fails, throws an exception.
@@ -434,7 +434,7 @@ namespace LinearAlgebra
     {
       const Epetra_MpiComm *epetra_comm
         = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()));
-      Assert (epetra_comm != 0, ExcInternalError());
+      Assert (epetra_comm != nullptr, ExcInternalError());
       return epetra_comm->GetMpiComm();
     }
 

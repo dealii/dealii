@@ -60,7 +60,7 @@ DoFAccessor (const Triangulation<DoFHandlerType::dimension,DoFHandlerType::space
                                                index),
   dof_handler(const_cast<DoFHandlerType *>(dof_handler))
 {
-  Assert (tria == NULL || &dof_handler->get_triangulation() == tria,
+  Assert (tria == nullptr || &dof_handler->get_triangulation() == tria,
           ExcMessage ("You can't create a DoF accessor in which the DoFHandler object "
                       "uses a different triangulation than the one you pass as argument."));
 }
@@ -83,7 +83,7 @@ inline
 DoFAccessor<structdim,DoFHandlerType,level_dof_access>::DoFAccessor
 (const DoFAccessor<dim2, DoFHandlerType2, level_dof_access2> &other)
   : BaseClass(other),
-    dof_handler(0)
+    dof_handler(nullptr)
 {
   Assert (false, ExcMessage("You are trying to assign iterators that are incompatible. "
                             "Reasons for incompatibility are that they point to different "
@@ -112,7 +112,7 @@ inline
 void
 DoFAccessor<structdim,DoFHandlerType,level_dof_access>::set_dof_handler (DoFHandlerType *dh)
 {
-  Assert (dh != 0, ExcInvalidObject());
+  Assert (dh != nullptr, ExcInvalidObject());
   this->dof_handler = dh;
 }
 
@@ -134,7 +134,7 @@ void
 DoFAccessor<structdim,DoFHandlerType,level_dof_access>::copy_from
 (const TriaAccessorBase<structdim, DoFHandlerType::dimension, DoFHandlerType::space_dimension> &da)
 {
-  Assert (this->dof_handler != 0, ExcInvalidObject());
+  Assert (this->dof_handler != nullptr, ExcInvalidObject());
   BaseClass::copy_from(da);
 }
 
@@ -1088,7 +1088,7 @@ namespace internal
         (void)fe_index;
         Assert ((fe_index == dealii::DoFHandler<dim,spacedim>::default_fe_index),
                 ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-        Assert (dof_handler.selected_fe != 0,
+        Assert (dof_handler.selected_fe != nullptr,
                 ExcMessage ("No finite element collection is associated with "
                             "this DoFHandler"));
         Assert (local_index < dof_handler.selected_fe->dofs_per_vertex,
@@ -1114,7 +1114,7 @@ namespace internal
         Assert ( (fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
                  ExcMessage ("You need to specify a FE index when working "
                              "with hp DoFHandlers"));
-        Assert (dof_handler.finite_elements != 0,
+        Assert (dof_handler.finite_elements != nullptr,
                 ExcMessage ("No finite element collection is associated with "
                             "this DoFHandler"));
         Assert (local_index < (*dof_handler.finite_elements)[fe_index].dofs_per_vertex,
@@ -1177,7 +1177,7 @@ namespace internal
         (void)fe_index;
         Assert ((fe_index == dealii::DoFHandler<dim,spacedim>::default_fe_index),
                 ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-        Assert (dof_handler.selected_fe != 0,
+        Assert (dof_handler.selected_fe != nullptr,
                 ExcMessage ("No finite element collection is associated with "
                             "this DoFHandler"));
         Assert (local_index < dof_handler.selected_fe->dofs_per_vertex,
@@ -1202,7 +1202,7 @@ namespace internal
         Assert ( (fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
                  ExcMessage ("You need to specify a FE index when working "
                              "with hp DoFHandlers"));
-        Assert (dof_handler.finite_elements != 0,
+        Assert (dof_handler.finite_elements != nullptr,
                 ExcMessage ("No finite element collection is associated with "
                             "this DoFHandler"));
         Assert (local_index < (*dof_handler.finite_elements)[fe_index].dofs_per_vertex,
@@ -1255,7 +1255,7 @@ namespace internal
       n_active_vertex_fe_indices (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
                                   const unsigned int vertex_index)
       {
-        Assert (dof_handler.finite_elements != 0,
+        Assert (dof_handler.finite_elements != nullptr,
                 ExcMessage ("No finite element collection is associated with "
                             "this DoFHandler"));
 
@@ -1303,7 +1303,7 @@ namespace internal
                                   const unsigned int vertex_index,
                                   const unsigned int n)
       {
-        Assert (dof_handler.finite_elements != 0,
+        Assert (dof_handler.finite_elements != nullptr,
                 ExcMessage ("No finite element collection is associated with "
                             "this DoFHandler"));
         Assert (n < n_active_vertex_fe_indices(dof_handler, vertex_index),
@@ -1606,7 +1606,7 @@ DoFAccessor<structdim, DoFHandlerType,level_dof_access>::mg_vertex_dof_index (co
     const unsigned int fe_index) const
 {
   (void)fe_index;
-  Assert (this->dof_handler != 0, ExcInvalidObject ());
+  Assert (this->dof_handler != nullptr, ExcInvalidObject ());
   Assert (vertex < GeometryInfo<structdim>::vertices_per_cell, ExcIndexRange (vertex, 0, GeometryInfo<structdim>::vertices_per_cell));
   Assert (i < this->dof_handler->get_fe ()[fe_index].dofs_per_vertex, ExcIndexRange (i, 0, this->dof_handler->get_fe ()[fe_index].dofs_per_vertex));
   return this->dof_handler->mg_vertex_dofs[this->vertex_index (vertex)].get_index (level, i);
@@ -1641,7 +1641,7 @@ DoFAccessor<structdim, DoFHandlerType,level_dof_access>::set_mg_vertex_dof_index
  const unsigned int            fe_index) const
 {
   (void)fe_index;
-  Assert (this->dof_handler != 0, ExcInvalidObject ());
+  Assert (this->dof_handler != nullptr, ExcInvalidObject ());
   Assert (vertex < GeometryInfo<structdim>::vertices_per_cell, ExcIndexRange (vertex, 0, GeometryInfo<structdim>::vertices_per_cell));
   Assert (i < this->dof_handler->get_fe ()[fe_index].dofs_per_vertex, ExcIndexRange (i, 0, this->dof_handler->get_fe ()[fe_index].dofs_per_vertex));
   this->dof_handler->mg_vertex_dofs[this->vertex_index (vertex)].set_index (level, i, index);
@@ -1920,7 +1920,7 @@ DoFAccessor<structdim,DoFHandlerType,level_dof_access>::get_dof_indices
 (std::vector<types::global_dof_index> &dof_indices,
  const unsigned int                    fe_index) const
 {
-  Assert (this->dof_handler != 0, ExcNotInitialized());
+  Assert (this->dof_handler != nullptr, ExcNotInitialized());
   Assert (static_cast<unsigned int>(this->level()) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
 
@@ -1983,7 +1983,7 @@ void DoFAccessor<structdim, DoFHandlerType,level_dof_access>::get_mg_dof_indices
  std::vector<types::global_dof_index> &dof_indices,
  const unsigned int                    fe_index) const
 {
-  Assert (this->dof_handler != 0, ExcInvalidObject ());
+  Assert (this->dof_handler != nullptr, ExcInvalidObject ());
 
   switch (structdim)
     {
@@ -2035,7 +2035,7 @@ void DoFAccessor<structdim, DoFHandlerType,level_dof_access>::set_mg_dof_indices
  const std::vector<types::global_dof_index> &dof_indices,
  const unsigned int                          fe_index)
 {
-  Assert (this->dof_handler != 0, ExcInvalidObject ());
+  Assert (this->dof_handler != nullptr, ExcInvalidObject ());
 
   switch (structdim)
     {
@@ -2245,7 +2245,7 @@ DoFAccessor (const Triangulation<1,spacedim> *,
              const int                 ,
              const DoFHandlerType<1,spacedim> *)
   :
-  dof_handler(0)
+  dof_handler(nullptr)
 {
   Assert (false,
           ExcMessage ("This constructor can not be called for face iterators in 1d."));
@@ -2279,7 +2279,7 @@ void
 DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::set_dof_handler
 (DoFHandlerType<1,spacedim> *dh)
 {
-  Assert (dh != 0, ExcInvalidObject());
+  Assert (dh != nullptr, ExcInvalidObject());
   this->dof_handler = dh;
 }
 
@@ -2350,7 +2350,7 @@ get_mg_dof_indices (const int,
 {
   (void) dof_indices;
   (void) fe_index;
-  Assert (this->dof_handler != 0, ExcInvalidObject ());
+  Assert (this->dof_handler != nullptr, ExcInvalidObject ());
   Assert (dof_indices.size () ==
           this->dof_handler->get_fe ()[fe_index].dofs_per_vertex,
           ExcVectorDoesNotMatch ());
@@ -2437,7 +2437,7 @@ const FiniteElement<DoFHandlerType<1,spacedim>::dimension,DoFHandlerType<1,space
 DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::
 get_fe (const unsigned int fe_index) const
 {
-  Assert (this->dof_handler != 0, ExcInvalidObject());
+  Assert (this->dof_handler != nullptr, ExcInvalidObject());
   return dof_handler->get_fe()[fe_index];
 }
 
@@ -2994,7 +2994,7 @@ namespace internal
                            const unsigned int                                      i)
       {
         typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access> BaseClass;
-        Assert (accessor.dof_handler != 0,
+        Assert (accessor.dof_handler != nullptr,
                 typename BaseClass::ExcInvalidObject());
         Assert (static_cast<unsigned int>(accessor.level()) <
                 accessor.dof_handler->levels.size(),
@@ -3015,7 +3015,7 @@ namespace internal
                                   OutputVector   &global_destination)
       {
         typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access> BaseClass;
-        Assert (accessor.dof_handler != 0,
+        Assert (accessor.dof_handler != nullptr,
                 typename BaseClass::ExcInvalidObject());
         Assert (static_cast<unsigned int>(local_source_end-local_source_begin)
                 ==
@@ -3140,7 +3140,7 @@ namespace internal
                                   OutputMatrix                     &global_destination)
       {
         typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access> BaseClass;
-        Assert (accessor.dof_handler != 0,
+        Assert (accessor.dof_handler != nullptr,
                 typename BaseClass::ExcInvalidObject());
         Assert (local_source.m() == accessor.get_fe().dofs_per_cell,
                 typename BaseClass::ExcMatrixDoesNotMatch());
@@ -3606,7 +3606,7 @@ const FiniteElement<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &
 DoFCellAccessor<DoFHandlerType,level_dof_access>::get_fe () const
 {
   Assert ((dynamic_cast<const dealii::DoFHandler<DoFHandlerType::dimension,DoFHandlerType::space_dimension>*>
-           (this->dof_handler) != 0)
+           (this->dof_handler) != nullptr)
           ||
           (this->has_children() == false),
           ExcMessage ("In hp::DoFHandler objects, finite elements are only associated "
@@ -3623,7 +3623,7 @@ unsigned int
 DoFCellAccessor<DoFHandlerType,level_dof_access>::active_fe_index () const
 {
   Assert ((dynamic_cast<const dealii::DoFHandler<DoFHandlerType::dimension,DoFHandlerType::space_dimension>*>
-           (this->dof_handler) != 0)
+           (this->dof_handler) != nullptr)
           ||
           (this->has_children() == false),
           ExcMessage ("You can not ask for the active_fe_index on a cell that has "
@@ -3641,7 +3641,7 @@ void
 DoFCellAccessor<DoFHandlerType,level_dof_access>::set_active_fe_index (const unsigned int i)
 {
   Assert ((dynamic_cast<const dealii::DoFHandler<DoFHandlerType::dimension,DoFHandlerType::space_dimension>*>
-           (this->dof_handler) != 0)
+           (this->dof_handler) != nullptr)
           ||
           (this->has_children() == false),
           ExcMessage ("You can not set the active_fe_index on a cell that has "

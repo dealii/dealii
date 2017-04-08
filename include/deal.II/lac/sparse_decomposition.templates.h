@@ -32,7 +32,7 @@ SparseLUDecomposition<number>::SparseLUDecomposition()
   :
   SparseMatrix<number>(),
   strengthen_diagonal (0),
-  own_sparsity(0)
+  own_sparsity(nullptr)
 {}
 
 
@@ -55,7 +55,7 @@ void SparseLUDecomposition<number>::clear()
   if (own_sparsity)
     {
       delete own_sparsity;
-      own_sparsity=0;
+      own_sparsity=nullptr;
     }
 }
 
@@ -69,7 +69,7 @@ void SparseLUDecomposition<number>::initialize (
 {
   const SparsityPattern &matrix_sparsity=matrix.get_sparsity_pattern();
 
-  const SparsityPattern *sparsity_pattern_to_use = 0;
+  const SparsityPattern *sparsity_pattern_to_use = nullptr;
 
   if (data.use_this_sparsity)
     sparsity_pattern_to_use = data.use_this_sparsity;

@@ -368,7 +368,7 @@ template <typename VectorType>
 inline
 VectorMemory<VectorType>::Pointer::Pointer(VectorMemory<VectorType> &mem)
   :
-  pool(&mem, typeid(*this).name()), v(0)
+  pool(&mem, typeid(*this).name()), v(nullptr)
 {
   v = pool->alloc();
 }

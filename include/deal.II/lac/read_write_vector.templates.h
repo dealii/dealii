@@ -52,14 +52,14 @@ namespace LinearAlgebra
   {
     if (new_alloc_size == 0)
       {
-        if (val != NULL)
+        if (val != nullptr)
           free(val);
-        val = NULL;
+        val = nullptr;
         thread_loop_partitioner.reset(new parallel::internal::TBBPartitioner());
       }
     else
       {
-        if (val != NULL)
+        if (val != nullptr)
           free(val);
 
         Utilities::System::posix_memalign ((void **)&val, 64, sizeof(Number)*new_alloc_size);
@@ -206,7 +206,7 @@ namespace LinearAlgebra
     // If no communication pattern is given, create one. Otherwise, use the
     // given one.
     std::shared_ptr<const Utilities::MPI::Partitioner> comm_pattern;
-    if (communication_pattern.get() == NULL)
+    if (communication_pattern.get() == nullptr)
       {
         comm_pattern.reset(new Utilities::MPI::Partitioner(vec.locally_owned_elements(),
                                                            get_stored_elements(),
@@ -216,7 +216,7 @@ namespace LinearAlgebra
       {
         comm_pattern =
           std::dynamic_pointer_cast<const Utilities::MPI::Partitioner> (communication_pattern);
-        AssertThrow(comm_pattern != NULL,
+        AssertThrow(comm_pattern != nullptr,
                     ExcMessage("The communication pattern is not of type "
                                "Utilities::MPI::Partitioner."));
       }
@@ -305,7 +305,7 @@ namespace LinearAlgebra
 
     // If no communication pattern is given, create one. Otherwise, use the one
     // given.
-    if (communication_pattern == NULL)
+    if (communication_pattern == nullptr)
       {
         // The first time import is called, we create a communication pattern.
         // Check if the communication pattern already exists and if it can be
@@ -315,7 +315,7 @@ namespace LinearAlgebra
           {
             epetra_comm_pattern =
               std::dynamic_pointer_cast<const EpetraWrappers::CommunicationPattern> (comm_pattern);
-            if (epetra_comm_pattern == NULL)
+            if (epetra_comm_pattern == nullptr)
               epetra_comm_pattern = std::make_shared<const EpetraWrappers::CommunicationPattern>(
                                       create_epetra_comm_pattern(source_elements, mpi_comm));
           }
@@ -327,7 +327,7 @@ namespace LinearAlgebra
       {
         epetra_comm_pattern = std::dynamic_pointer_cast<const EpetraWrappers::CommunicationPattern> (
                                 communication_pattern);
-        AssertThrow(epetra_comm_pattern != NULL,
+        AssertThrow(epetra_comm_pattern != nullptr,
                     ExcMessage(std::string("The communication pattern is not of type ") +
                                "LinearAlgebra::EpetraWrappers::CommunicationPattern."));
       }

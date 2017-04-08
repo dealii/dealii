@@ -74,7 +74,7 @@ MGTransferSelect<number>::copy_from_mg (
   dst = 0;
   do_copy_from_mg (mg_dof_handler,
                    dst.block(target_component[selected_component]), src);
-  if (constraints != 0)
+  if (constraints != nullptr)
     constraints->condense(dst);
 }
 
@@ -90,7 +90,7 @@ MGTransferSelect<number>::copy_from_mg (
 {
   dst = 0;
   do_copy_from_mg (mg_dof_handler, dst, src);
-  if (constraints != 0)
+  if (constraints != nullptr)
     {
       //If we were given constraints
       //apply them to the dst that goes

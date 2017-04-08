@@ -316,7 +316,7 @@ namespace LinearAlgebra
     BlockVector<Number>::scale (const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const BlockVector<Number> *>(&vv)!=NULL,
+      Assert(dynamic_cast<const BlockVector<Number> *>(&vv)!=nullptr,
              ExcVectorTypeNotCompatible());
       const BlockVector<Number> &v = dynamic_cast<const BlockVector<Number> &>(vv);
       AssertDimension(this->n_blocks(), v.n_blocks());
@@ -332,7 +332,7 @@ namespace LinearAlgebra
                               const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const BlockVector<Number> *>(&vv)!=NULL,
+      Assert(dynamic_cast<const BlockVector<Number> *>(&vv)!=nullptr,
              ExcVectorTypeNotCompatible());
       const BlockVector<Number> &v = dynamic_cast<const BlockVector<Number> &>(vv);
       AssertDimension(this->n_blocks(), v.n_blocks());
@@ -362,7 +362,7 @@ namespace LinearAlgebra
     BlockVector<Number>::operator += (const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const BlockVector<Number> *>(&vv)!=NULL,
+      Assert(dynamic_cast<const BlockVector<Number> *>(&vv)!=nullptr,
              ExcVectorTypeNotCompatible());
       const BlockVector<Number> &v = dynamic_cast<const BlockVector<Number> &>(vv);
       AssertDimension(this->n_blocks(), v.n_blocks());
@@ -379,7 +379,7 @@ namespace LinearAlgebra
     BlockVector<Number>::operator -= (const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const BlockVector<Number> *>(&vv)!=NULL,
+      Assert(dynamic_cast<const BlockVector<Number> *>(&vv)!=nullptr,
              ExcVectorTypeNotCompatible());
       const BlockVector<Number> &v = dynamic_cast<const BlockVector<Number> &>(vv);
       AssertDimension(this->n_blocks(), v.n_blocks());
@@ -407,7 +407,7 @@ namespace LinearAlgebra
                               const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const BlockVector<Number> *>(&vv)!=NULL,
+      Assert(dynamic_cast<const BlockVector<Number> *>(&vv)!=nullptr,
              ExcVectorTypeNotCompatible());
       const BlockVector<Number> &v = dynamic_cast<const BlockVector<Number> &>(vv);
       AssertDimension(this->n_blocks(), v.n_blocks());
@@ -425,11 +425,11 @@ namespace LinearAlgebra
                               const VectorSpaceVector<Number> &ww)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const BlockVector<Number> *>(&vv)!=NULL,
+      Assert(dynamic_cast<const BlockVector<Number> *>(&vv)!=nullptr,
              ExcVectorTypeNotCompatible());
       const BlockVector<Number> &v = dynamic_cast<const BlockVector<Number> &>(vv);
       AssertDimension(this->n_blocks(), v.n_blocks());
-      Assert(dynamic_cast<const BlockVector<Number> *>(&ww)!=NULL,
+      Assert(dynamic_cast<const BlockVector<Number> *>(&ww)!=nullptr,
              ExcVectorTypeNotCompatible());
       const BlockVector<Number> &w = dynamic_cast<const BlockVector<Number> &>(ww);
       AssertDimension(this->n_blocks(), v.n_blocks());
@@ -447,7 +447,7 @@ namespace LinearAlgebra
                                const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const BlockVector<Number> *>(&vv)!=NULL,
+      Assert(dynamic_cast<const BlockVector<Number> *>(&vv)!=nullptr,
              ExcVectorTypeNotCompatible());
       const BlockVector<Number> &v = dynamic_cast<const BlockVector<Number> &>(vv);
       AssertDimension(this->n_blocks(), v.n_blocks());
@@ -541,7 +541,7 @@ namespace LinearAlgebra
       Assert (this->n_blocks() > 0, ExcEmptyObject());
 
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const BlockVector<Number> *>(&vv)!=NULL,
+      Assert(dynamic_cast<const BlockVector<Number> *>(&vv)!=nullptr,
              ExcVectorTypeNotCompatible());
       const BlockVector<Number> &v = dynamic_cast<const BlockVector<Number> &>(vv);
       AssertDimension(this->n_blocks(), v.n_blocks());
@@ -669,13 +669,13 @@ namespace LinearAlgebra
                                       const VectorSpaceVector<Number> &ww)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const BlockVector<Number> *>(&vv)!=NULL,
+      Assert(dynamic_cast<const BlockVector<Number> *>(&vv)!=nullptr,
              ExcVectorTypeNotCompatible());
       const BlockVector<Number> &v = dynamic_cast<const BlockVector<Number> &>(vv);
       AssertDimension(this->n_blocks(), v.n_blocks());
 
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const BlockVector<Number> *>(&ww)!=NULL,
+      Assert(dynamic_cast<const BlockVector<Number> *>(&ww)!=nullptr,
              ExcVectorTypeNotCompatible());
       const BlockVector<Number> &w = dynamic_cast<const BlockVector<Number> &>(ww);
       AssertDimension(this->n_blocks(), w.n_blocks());

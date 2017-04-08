@@ -524,7 +524,7 @@ namespace MeshWorker
                                                                  info.indices:
                                                                  info.indices_by_block[i];
 
-              if (constraints !=0)
+              if (constraints != nullptr)
                 constraints->distribute_local_to_global(info.vector(k).block(i), ldi, *v);
               else
                 v->add(ldi, info.vector(k).block(i));
@@ -622,7 +622,7 @@ namespace MeshWorker
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
 
-      if (constraints == 0)
+      if (constraints == nullptr)
         {
           for (unsigned int j=0; j<i1.size(); ++j)
             for (unsigned int k=0; k<i2.size(); ++k)
@@ -805,7 +805,7 @@ namespace MeshWorker
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
 
-      if (mg_constrained_dofs == 0)
+      if (mg_constrained_dofs == nullptr)
         {
           for (unsigned int j=0; j<i1.size(); ++j)
             for (unsigned int k=0; k<i2.size(); ++k)
@@ -858,7 +858,7 @@ namespace MeshWorker
       AssertDimension(M.n(), i1.size());
       AssertDimension(M.m(), i2.size());
 
-      if (mg_constrained_dofs == 0)
+      if (mg_constrained_dofs == nullptr)
         {
           for (unsigned int j=0; j<i1.size(); ++j)
             for (unsigned int k=0; k<i2.size(); ++k)
@@ -887,7 +887,7 @@ namespace MeshWorker
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
 
-      if (mg_constrained_dofs == 0)
+      if (mg_constrained_dofs == nullptr)
         {
           for (unsigned int j=0; j<i1.size(); ++j)
             for (unsigned int k=0; k<i2.size(); ++k)
@@ -915,7 +915,7 @@ namespace MeshWorker
     {
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
-      Assert(mg_constrained_dofs != 0, ExcInternalError());
+      Assert(mg_constrained_dofs != nullptr, ExcInternalError());
 
       for (unsigned int j=0; j<i1.size(); ++j)
         for (unsigned int k=0; k<i2.size(); ++k)
@@ -956,7 +956,7 @@ namespace MeshWorker
     {
       AssertDimension(M.n(), i1.size());
       AssertDimension(M.m(), i2.size());
-      Assert(mg_constrained_dofs != 0, ExcInternalError());
+      Assert(mg_constrained_dofs != nullptr, ExcInternalError());
 
       for (unsigned int j=0; j<i1.size(); ++j)
         for (unsigned int k=0; k<i2.size(); ++k)
@@ -987,7 +987,7 @@ namespace MeshWorker
         {
           assemble((*matrix)[level], info.matrix(0,false).matrix,
                    info.indices, info.indices, level);
-          if (mg_constrained_dofs != 0)
+          if (mg_constrained_dofs != nullptr)
             {
               assemble_in((*interface_in)[level], info.matrix(0,false).matrix,
                           info.indices, info.indices, level);
@@ -1004,7 +1004,7 @@ namespace MeshWorker
             assemble((*matrix)[level], info.matrix(k,false).matrix,
                      info.indices_by_block[row], info.indices_by_block[column], level);
 
-            if (mg_constrained_dofs != 0)
+            if (mg_constrained_dofs != nullptr)
               {
                 assemble_in((*interface_in)[level], info.matrix(k,false).matrix,
                             info.indices_by_block[row], info.indices_by_block[column], level);
@@ -1130,7 +1130,7 @@ namespace MeshWorker
       AnyData residuals = ResidualSimple<VectorType>::residuals;
       VectorType *v = residuals.entry<VectorType *>(index);
 
-      if (ResidualSimple<VectorType>::constraints == 0)
+      if (ResidualSimple<VectorType>::constraints == nullptr)
         {
           for (unsigned int i=0; i<indices.size(); ++i)
             (*v)(indices[i]) += vector(i);
@@ -1160,7 +1160,7 @@ namespace MeshWorker
       AnyData residuals = ResidualSimple<VectorType>::residuals;
       VectorType *v = residuals.entry<VectorType *>(index);
 
-      if (ResidualSimple<VectorType>::constraints == 0)
+      if (ResidualSimple<VectorType>::constraints == nullptr)
         {
           for (unsigned int j=0; j<i1.size(); ++j)
             for (unsigned int k=0; k<i2.size(); ++k)

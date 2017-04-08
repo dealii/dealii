@@ -504,7 +504,7 @@ namespace
     // type is std::true_type if Matrix provides vmult_add and Tvmult_add,
     // otherwise it is std::false_type
 
-    typedef decltype(test<T>(0, 0, 0)) type;
+    typedef decltype(test<T>(nullptr, nullptr, nullptr)) type;
   };
 }
 

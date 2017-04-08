@@ -1100,9 +1100,9 @@ SparseMatrixEZ<number>::locate (const size_type row,
       if (entry->column == col)
         return entry;
       if (entry->column == Entry::invalid)
-        return 0;
+        return nullptr;
     }
-  return 0;
+  return nullptr;
 }
 
 
@@ -1231,7 +1231,7 @@ void SparseMatrixEZ<number>::set (const size_type i,
   if (elide_zero_values && value == 0.)
     {
       Entry *entry = locate(i,j);
-      if (entry != 0)
+      if (entry != nullptr)
         entry->value = 0.;
     }
   else

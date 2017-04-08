@@ -288,7 +288,7 @@ get_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
 
   AssertThrow ((x_source_fe.get_name().find ("FE_Q_DG0<") == 0)
                ||
-               (dynamic_cast<const FEQDG0 *>(&x_source_fe) != 0),
+               (dynamic_cast<const FEQDG0 *>(&x_source_fe) != nullptr),
                typename FEL::
                ExcInterpolationNotImplemented());
 

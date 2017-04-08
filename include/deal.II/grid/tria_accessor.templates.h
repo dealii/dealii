@@ -118,7 +118,7 @@ inline
 bool
 TriaAccessorBase<structdim,dim,spacedim>::operator == (const TriaAccessorBase<structdim,dim,spacedim> &a) const
 {
-  Assert (tria == a.tria || tria == 0 || a.tria == 0,
+  Assert (tria == a.tria || tria == nullptr || a.tria == nullptr,
           TriaAccessorExceptions::ExcCantCompareIterators());
   return ((present_level == a.present_level) &&
           (present_index == a.present_index));
@@ -131,7 +131,7 @@ inline
 bool
 TriaAccessorBase<structdim,dim,spacedim>::operator != (const TriaAccessorBase<structdim,dim,spacedim> &a) const
 {
-  Assert (tria == a.tria || tria == 0 || a.tria == 0,
+  Assert (tria == a.tria || tria == nullptr || a.tria == nullptr,
           TriaAccessorExceptions::ExcCantCompareIterators());
   return ((present_level != a.present_level) ||
           (present_index != a.present_index));
@@ -311,7 +311,7 @@ namespace internal
                  const dealii::internal::int2type<1>)
     {
       Assert (false, ExcInternalError());
-      return 0;
+      return nullptr;
     }
 
     inline
@@ -320,7 +320,7 @@ namespace internal
                  const dealii::internal::int2type<2>)
     {
       Assert (false, ExcInternalError());
-      return 0;
+      return nullptr;
     }
 
     inline
@@ -329,7 +329,7 @@ namespace internal
                  const dealii::internal::int2type<3>)
     {
       Assert (false, ExcInternalError());
-      return 0;
+      return nullptr;
     }
 
     /**
@@ -343,7 +343,7 @@ namespace internal
                  const dealii::internal::int2type<3>)
     {
       Assert (false, ExcInternalError());
-      return 0;
+      return nullptr;
     }
 
     /**
@@ -356,7 +356,7 @@ namespace internal
                  const dealii::internal::int2type<structdim>)
     {
       Assert (false, ExcInternalError());
-      return 0;
+      return nullptr;
     }
 
     template <int dim>
@@ -1705,7 +1705,7 @@ template <int structdim, int dim, int spacedim>
 void TriaAccessor<structdim,dim,spacedim>::clear_user_pointer () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  this->objects().user_pointer(this->present_index) = 0;
+  this->objects().user_pointer(this->present_index) = nullptr;
 }
 
 
@@ -2134,7 +2134,7 @@ inline
 TriaAccessor<0, dim, spacedim>::
 TriaAccessor (const TriaAccessor<structdim2,dim2,spacedim2> &)
   :
-  tria (NULL),
+  tria (nullptr),
   global_vertex_index (numbers::invalid_unsigned_int)
 {
   Assert(false, ExcImpossibleInDim(0));
@@ -2148,7 +2148,7 @@ inline
 TriaAccessor<0, dim, spacedim>::
 TriaAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &)
   :
-  tria (NULL),
+  tria (nullptr),
   global_vertex_index (numbers::invalid_unsigned_int)
 {
   Assert(false, ExcImpossibleInDim(0));
@@ -2530,7 +2530,7 @@ inline
 TriaAccessor<0, 1, spacedim>::
 TriaAccessor (const TriaAccessor<structdim2,dim2,spacedim2> &)
   :
-  tria (0),
+  tria (nullptr),
   vertex_kind (interior_vertex),
   global_vertex_index (numbers::invalid_unsigned_int)
 {
@@ -2545,7 +2545,7 @@ inline
 TriaAccessor<0, 1, spacedim>::
 TriaAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &)
   :
-  tria (0),
+  tria (nullptr),
   vertex_kind (interior_vertex),
   global_vertex_index (numbers::invalid_unsigned_int)
 {
@@ -3383,7 +3383,7 @@ CellAccessor<dim,spacedim>::is_locally_owned () const
   const parallel::Triangulation<dim,spacedim> *pt
     = dynamic_cast<const parallel::Triangulation<dim,spacedim> *>(this->tria);
 
-  if (pt == 0)
+  if (pt == nullptr)
     return true;
   else
     return (this->subdomain_id() == pt->locally_owned_subdomain());
@@ -3405,7 +3405,7 @@ CellAccessor<dim,spacedim>::is_locally_owned_on_level () const
   const parallel::Triangulation<dim,spacedim> *pt
     = dynamic_cast<const parallel::Triangulation<dim,spacedim> *>(this->tria);
 
-  if (pt == 0)
+  if (pt == nullptr)
     return true;
   else
     return (this->level_subdomain_id() == pt->locally_owned_subdomain());
@@ -3431,7 +3431,7 @@ CellAccessor<dim,spacedim>::is_ghost () const
   const parallel::Triangulation<dim,spacedim> *pt
     = dynamic_cast<const parallel::Triangulation<dim,spacedim> *>(this->tria);
 
-  if (pt == 0)
+  if (pt == nullptr)
     return false;
   else
     return (this->subdomain_id() != pt->locally_owned_subdomain());
@@ -3455,7 +3455,7 @@ CellAccessor<dim,spacedim>::is_artificial () const
   const parallel::Triangulation<dim,spacedim> *pt
     = dynamic_cast<const parallel::Triangulation<dim,spacedim> *>(this->tria);
 
-  if (pt == 0)
+  if (pt == nullptr)
     return false;
   else
     return this->subdomain_id() == numbers::artificial_subdomain_id;

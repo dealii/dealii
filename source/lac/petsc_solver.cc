@@ -69,7 +69,7 @@ namespace PETScWrappers
 
     // first create a solver object if this
     // is necessary
-    if (solver_data.get() == 0)
+    if (solver_data.get() == nullptr)
       {
         solver_data.reset (new SolverData());
 
@@ -87,7 +87,7 @@ namespace PETScWrappers
 
         // make sure the preconditioner has an associated matrix set
         const Mat B = preconditioner;
-        AssertThrow (B != NULL,
+        AssertThrow (B != nullptr,
                      ExcMessage("PETSc preconditioner should have an"
                                 "associated matrix set to be used in solver."));
 
@@ -110,7 +110,7 @@ namespace PETScWrappers
         // convergence
         ierr = KSPSetConvergenceTest (solver_data->ksp, &convergence_test,
                                       reinterpret_cast<void *>(&solver_control),
-                                      PETSC_NULL);
+                                      nullptr);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
       }
 
@@ -228,7 +228,7 @@ namespace PETScWrappers
     // convergence
     ierr = KSPSetConvergenceTest (solver_data->ksp, &convergence_test,
                                   reinterpret_cast<void *>(&solver_control),
-                                  PETSC_NULL);
+                                  nullptr);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // set the command line options provided
