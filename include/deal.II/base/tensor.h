@@ -1146,22 +1146,6 @@ std::ostream &operator << (std::ostream &out, const Tensor<0,dim,Number> &p)
 //@{
 
 
-#ifndef DEAL_II_WITH_CXX11
-template <typename T, typename U, int rank, int dim>
-struct ProductType<T,Tensor<rank,dim,U> >
-{
-  typedef Tensor<rank,dim,typename ProductType<T,U>::type> type;
-};
-
-template <typename T, typename U, int rank, int dim>
-struct ProductType<Tensor<rank,dim,T>,U>
-{
-  typedef Tensor<rank,dim,typename ProductType<T,U>::type> type;
-};
-#endif
-
-
-
 /**
  * Scalar multiplication of a tensor of rank 0 with an object from the left.
  *
@@ -1178,6 +1162,7 @@ operator * (const Other                 object,
 {
   return object * static_cast<const Number &>(t);
 }
+
 
 
 /**

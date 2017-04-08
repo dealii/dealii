@@ -25,7 +25,7 @@
 DEAL_II_NAMESPACE_OPEN
 // In boost, the placeholders _1, _2, ... are in the global namespace. In
 // C++11, they are in namespace std::placeholders, which makes them awkward to
-// use. Import them into the dealii::std_cxx11 namespace instead and do them
+// use. Import them into the dealii::std_cxx11 namespace instead and do the
 // same below if we use boost instead. Namespace 'placeholders' is also defined
 // in dealii::std_cxx11 namespace to make code C++ standard compatible.
 // That is to say, if std::something works with C++11 standard,

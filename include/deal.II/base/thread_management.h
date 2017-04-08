@@ -1746,7 +1746,6 @@ namespace Threads
   }
 
 
-#ifdef DEAL_II_WITH_CXX11
 
   /**
    * Overload of the new_thread() function for objects that can be called like a
@@ -1821,7 +1820,6 @@ namespace Threads
     return Thread<return_type>(std::function<return_type ()>(function_object));
   }
 
-#endif
 
 
   /**
@@ -3212,7 +3210,6 @@ namespace Threads
   }
 
 
-#ifdef DEAL_II_WITH_CXX11
 
   /**
    * Overload of the new_task function for objects that can be called like a
@@ -3287,7 +3284,7 @@ namespace Threads
     return Task<return_type>(std::function<return_type ()>(function_object));
   }
 
-#endif
+
 
   /**
    * Overload of the new_task function for non-member or static member

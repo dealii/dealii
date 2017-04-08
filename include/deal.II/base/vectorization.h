@@ -85,41 +85,6 @@ struct EnableIfScalar<VectorizedArray<Number> >
 
 
 
-#ifndef DEAL_II_WITH_CXX11
-// Specify the types for the implemented multiplications explicitly
-
-template <typename Number>
-struct ProductType<Number, VectorizedArray<Number> >
-{
-  typedef VectorizedArray<Number> type;
-};
-
-template <typename Number>
-struct ProductType<VectorizedArray<Number>, Number>
-{
-  typedef VectorizedArray<Number> type;
-};
-
-// In contrast to scalar types for which the product of a float and a double
-// variable would be a double variable, the implemented type here really is
-// VectorizedArray<float>. Since VectorizedArray<double> is only half as
-// wide as VectorizedArray<float>, we would have to throw away half of the
-// vector otherwise.
-template<>
-struct ProductType<double, VectorizedArray<float> >
-{
-  typedef VectorizedArray<float> type;
-};
-
-template<>
-struct ProductType<VectorizedArray<float>, double>
-{
-  typedef VectorizedArray<float> type;
-};
-#endif
-
-
-
 /**
  * This generic class defines a unified interface to a vectorized data type.
  * For general template arguments, this class simply corresponds to the

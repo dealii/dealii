@@ -16,10 +16,7 @@
 #ifndef dealii__quadrature_point_data_h
 #define dealii__quadrature_point_data_h
 
-// must include config before checking for DEAL_II_WITH_CXX11
 #include <deal.II/base/config.h>
-
-#ifdef DEAL_II_WITH_CXX11
 
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/subscriptor.h>
@@ -51,8 +48,6 @@ DEAL_II_NAMESPACE_OPEN
  * However, within the cell this class stores a vector of objects of a single data type.
  * For this reason, this class may not be sufficiently flexible when, for example,
  * adopting a level-set approach to describe material behavior.
- *
- * @note This class is only available if deal.II is configured with C++11 support.
  *
  * @author Denis Davydov, Jean-Paul Pelteret, 2016
  */
@@ -857,7 +852,5 @@ namespace parallel
 
 #endif // DOXYGEN
 DEAL_II_NAMESPACE_CLOSE
-
-#endif // CXX11
 
 #endif
