@@ -269,7 +269,6 @@ namespace Utilities
 
         // allocate memory for import data
         std::vector<std::pair<unsigned int,unsigned int> > import_targets_temp;
-        import_targets_temp.reserve(n_procs);
         n_import_indices_data = 0;
         for (unsigned int i=0; i<n_procs; i++)
           if (receive_buffer[i] > 0)
