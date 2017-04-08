@@ -16,6 +16,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/work_stream.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/la_vector.h>
@@ -986,13 +987,13 @@ add_data_vector (const VectorType                         &vec,
       Assert (false, ExcInternalError());
     }
 
-  internal::DataOut::DataEntryBase<DoFHandlerType> *new_entry
-    = new internal::DataOut::DataEntry<DoFHandlerType,VectorType>(dofs, &vec, names,
-        data_component_interpretation);
+  auto new_entry = std_cxx14::make_unique<internal::DataOut::DataEntry<DoFHandlerType,VectorType>>
+                   (dofs, &vec, names, data_component_interpretation);
+
   if (actual_type == type_dof_data)
-    dof_data.push_back (std::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> >(new_entry));
+    dof_data.emplace_back (std::move(new_entry));
   else
-    cell_data.push_back (std::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> >(new_entry));
+    cell_data.emplace_back (std::move(new_entry));
 }
 
 
@@ -1018,9 +1019,9 @@ add_data_vector (const VectorType                       &vec,
                                                      dofs->n_dofs(),
                                                      dofs->get_triangulation().n_active_cells()));
 
-  internal::DataOut::DataEntryBase<DoFHandlerType> *new_entry
-    = new internal::DataOut::DataEntry<DoFHandlerType,VectorType>(dofs, &vec, &data_postprocessor);
-  dof_data.push_back (std::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> >(new_entry));
+  auto new_entry = std_cxx14::make_unique<internal::DataOut::DataEntry<DoFHandlerType,VectorType>>
+                   (dofs, &vec, &data_postprocessor);
+  dof_data.emplace_back (std::move(new_entry));
 }
 
 
@@ -1041,9 +1042,9 @@ add_data_vector (const DoFHandlerType                   &dof_handler,
 
   AssertDimension (vec.size(), dof_handler.n_dofs());
 
-  internal::DataOut::DataEntryBase<DoFHandlerType> *new_entry
-    = new internal::DataOut::DataEntry<DoFHandlerType,VectorType>(&dof_handler, &vec, &data_postprocessor);
-  dof_data.push_back (std::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> >(new_entry));
+  auto new_entry = std_cxx14::make_unique<internal::DataOut::DataEntry<DoFHandlerType,VectorType>>
+                   (&dof_handler, &vec, &data_postprocessor);
+  dof_data.emplace_back (std::move(new_entry));
 }
 
 
@@ -1118,10 +1119,9 @@ add_data_vector
        std::vector<DataComponentInterpretation::DataComponentInterpretation>
        (names.size(), DataComponentInterpretation::component_is_scalar));
 
-  internal::DataOut::DataEntryBase<DoFHandlerType> *new_entry
-    = new internal::DataOut::DataEntry<DoFHandlerType,VectorType>(&dof_handler, &data, names,
-        data_component_interpretation);
-  dof_data.push_back (std::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> >(new_entry));
+  auto new_entry = std_cxx14::make_unique<internal::DataOut::DataEntry<DoFHandlerType,VectorType>>
+                   (&dof_handler, &data, names, data_component_interpretation);
+  dof_data.emplace_back (std::move(new_entry));
 }
 
 
