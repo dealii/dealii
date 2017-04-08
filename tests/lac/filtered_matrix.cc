@@ -19,6 +19,7 @@
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/filtered_matrix.h>
+#include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/matrix_lib.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/vector.h>
@@ -85,17 +86,15 @@ int main()
   deallog.attach(logfile);
 
   PreconditionIdentity identity;
-  ScaledMatrix<Vector<double> > s(identity, 3.);
-
   FilteredMatrix<Vector<double> > f;
-  f.initialize(s, false);
+  f.initialize(identity, false);
   test(f);
 
   for (unsigned int i=0; i<5; ++i)
     f.add_constraint(i*i,i/2.);
   test(f);
 
-  f.initialize(s, true);
+  f.initialize(identity, true);
   test(f);
 
 }
