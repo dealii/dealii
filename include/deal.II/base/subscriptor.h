@@ -20,9 +20,10 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 
-#include <typeinfo>
+#include <atomic>
 #include <map>
 #include <string>
+#include <typeinfo>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -191,12 +192,12 @@ private:
    * We use the <tt>mutable</tt> keyword in order to allow subscription to
    * constant objects also.
    *
-   * In multithreaded mode, this counter may be modified by different threads.
-   * We thus have to mark it <tt>volatile</tt>. However, this is counter-
-   * productive in non-MT mode since it may pessimize code. So use the macro
-   * defined in <tt>deal.II/base/config.h</tt> to selectively add volatility.
+   * This counter may be read from and written to concurrently in
+   * multithreaded code: hence we use the <code>std::atomic</code> class
+   * template.
+   *
    */
-  mutable DEAL_VOLATILE unsigned int counter;
+  mutable std::atomic<unsigned int> counter;
 
   /**
    * In this map, we count subscriptions for each different identification

@@ -24,23 +24,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-#ifdef DEBUG
-namespace
-{
-// create a lock that might be used to control subscription to and
-// unsubscription from objects, as that might happen in parallel.
-// since it should happen rather seldom that several threads try to
-// operate on different objects at the same time (the usual case is
-// that they subscribe to the same object right after thread
-// creation), a global lock should be sufficient, rather than one that
-// operates on a per-object base (in which case we would have to
-// include the huge <thread_management.h> file into the
-// <subscriptor.h> file).
-  Threads::Mutex subscription_lock;
-}
-#endif
-
-
 static const char *unknown_subscriber = "unknown subscriber";
 
 
@@ -167,7 +150,6 @@ Subscriptor::subscribe(const char *id) const
 #ifdef DEBUG
   if (object_info == nullptr)
     object_info = &typeid(*this);
-  Threads::Mutex::ScopedLock lock (subscription_lock);
   ++counter;
 
 #  ifndef DEAL_II_WITH_THREADS
@@ -199,7 +181,6 @@ Subscriptor::unsubscribe(const char *id) const
   if (counter == 0)
     return;
 
-  Threads::Mutex::ScopedLock lock (subscription_lock);
   --counter;
 
 #  ifndef DEAL_II_WITH_THREADS

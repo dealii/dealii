@@ -17,6 +17,7 @@
 // see if we can detach from threads
 
 #include "../tests.h"
+#include <atomic>
 #include <iomanip>
 #include <fstream>
 #include <unistd.h>
@@ -25,7 +26,7 @@
 
 
 Threads::Mutex mutex;
-volatile int spin_lock = 0;
+static std::atomic<int> spin_lock(0);
 
 
 void worker ()

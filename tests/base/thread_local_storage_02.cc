@@ -18,6 +18,7 @@
 // the initialization with an exemplar
 
 #include "../tests.h"
+#include <atomic>
 #include <iomanip>
 #include <fstream>
 
@@ -49,7 +50,7 @@ struct X
 
 Threads::ThreadLocalStorage<X> *tls_data;
 
-volatile int counter = 0;
+static std::atomic<int> counter(0);
 
 void execute (int i)
 {
