@@ -65,6 +65,18 @@
       the <code>-fPIC</code> flag from the scheme.
     </p>
 
+    <p>
+      Try to run one of the examples and compare the output.
+      How the output should look like is stated in the README
+      that can be found in the <code>EXAMPLES</code> directory.
+    </p>
+
+    <p>
+      If that output you produced looks like it should you can
+      proceed to compile <acronym>deal.II</acronym> with
+      <acronym>ARPACK</acronym>.
+    </p>
+
     <h3>How to compile and install <acronym>ARPACK-NG</acronym></h3>
 
     <p>
@@ -84,27 +96,22 @@
         ../
 
         make
-        make install
       </pre>
 
       You will need to adjust the path into which you want to install ARPACK-NG
-      in the CMAKE_INSTALL_PREFIX line. If you do not have MPI installed you
+      in the CMAKE_INSTALL_PREFIX line. If you do not have MPI installed, you
       should use <code>-DMPI=OFF</code> instead.
     </p>
 
-    <h3>Test the installation</h3>
-
     <p>
-      After installing <acronym>ARPACK</acronym> or <acronym>ARPACK-NG</acronym>
-      try to run one of the examples and compare the output.
-      How the output should look like is stated in the README
-      that can be found in the <code>EXAMPLES</code> directory.
-    </p>
-
-    <p>
-      If that output you produced looks like it should you can
-      proceed to compile <acronym>deal.II</acronym> with
-      <acronym>ARPACK</acronym>.
+      Afterwards run
+      <pre>
+        make check
+        make test
+        make install
+      </pre>
+      to test that the build of <acronym>ARPACK-NG</acronym> works correctly
+      and to install the library finally.
     </p>
 
     <h2>Interfacing <acronym>deal.II</acronym>
