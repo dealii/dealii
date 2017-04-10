@@ -1507,153 +1507,134 @@ void FESystem<dim,spacedim>::initialize (const std::vector<const FiniteElement<d
 
   }
 
-  // restriction and prolongation matrices are built on demand
+  // now initialize interface constraints, support points, and other tables.
+  // (restriction and prolongation matrices are only built on demand.) do
+  // this in parallel
 
-  // now set up the interface constraints.  this is kind'o hairy, so don't try
-  // to do it dimension independent
-  build_interface_constraints ();
+  Threads::TaskGroup<> init_tasks;
 
-  // finally fill in support points on cell and face
-  initialize_unit_support_points ();
-  initialize_unit_face_support_points ();
+  init_tasks += Threads::new_task ([&]()
+  {
+    this->build_interface_constraints ();
+  });
 
-  initialize_quad_dof_index_permutation ();
-}
-
-
-
-
-
-
-template <int dim, int spacedim>
-void
-FESystem<dim,spacedim>::
-initialize_unit_support_points ()
-{
-  // if one of the base elements has no support points, then it makes no sense
-  // to define support points for the composed element, so return an empty
-  // array to demonstrate that fact. Note that we ignore FE_Nothing in this logic.
-  for (unsigned int base_el=0; base_el<this->n_base_elements(); ++base_el)
-    if (!base_element(base_el).has_support_points() && base_element(base_el).dofs_per_cell!=0)
-      {
-        this->unit_support_points.resize(0);
-        return;
-      }
-
-  // generate unit support points from unit support points of sub elements
-  this->unit_support_points.resize(this->dofs_per_cell);
-
-  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-    {
-      const unsigned int
-      base       = this->system_to_base_table[i].first.first,
-      base_index = this->system_to_base_table[i].second;
-      Assert (base<this->n_base_elements(), ExcInternalError());
-      Assert (base_index<base_element(base).unit_support_points.size(),
-              ExcInternalError());
-      this->unit_support_points[i] = base_element(base).unit_support_points[base_index];
-    }
-}
-
-
-
-template <int dim, int spacedim>
-void
-FESystem<dim,spacedim>::
-initialize_unit_face_support_points ()
-{
-  // Nothing to do in 1D
-  if (dim == 1)
-    return;
-
-  // if one of the base elements has no support points, then it makes no sense
-  // to define support points for the composed element. In that case, return
-  // an empty array to demonstrate that fact (note that we ask whether the
-  // base element has no support points at all, not only none on the face!)
-  //
-  // on the other hand, if there is an element that simply has no degrees of
-  // freedom on the face at all, then we don't care whether it has support
-  // points or not. this is, for example, the case for the stable Stokes
-  // element Q(p)^dim \times DGP(p-1).
-  for (unsigned int base_el=0; base_el<this->n_base_elements(); ++base_el)
-    if (!base_element(base_el).has_support_points()
-        &&
-        (base_element(base_el).dofs_per_face > 0))
-      {
-        this->unit_face_support_points.resize(0);
-        return;
-      }
-
-
-  // generate unit face support points from unit support points of sub
-  // elements
-  this->unit_face_support_points.resize(this->dofs_per_face);
-
-  for (unsigned int i=0; i<this->dofs_per_face; ++i)
-    {
-      const unsigned int base_i = this->face_system_to_base_table[i].first.first;
-      const unsigned int index_in_base = this->face_system_to_base_table[i].second;
-
-      Assert (index_in_base < base_element(base_i).unit_face_support_points.size(),
-              ExcInternalError());
-
-      this->unit_face_support_points[i]
-        = base_element(base_i).unit_face_support_points[index_in_base];
-    }
-}
-
-
-
-template <int dim, int spacedim>
-void
-FESystem<dim,spacedim>::initialize_quad_dof_index_permutation ()
-{
-  // nothing to do in other dimensions than 3
-  if (dim < 3)
-    return;
-
-  // the array into which we want to write should have the correct size
-  // already.
-  Assert (this->adjust_quad_dof_index_for_face_orientation_table.n_elements()==
-          8*this->dofs_per_quad, ExcInternalError());
-
-  // to obtain the shifts for this composed element, copy the shift
-  // information of the base elements
-  unsigned int index = 0;
-  for (unsigned int b=0; b<this->n_base_elements(); ++b)
-    {
-      const Table<2,int> &temp
-        = this->base_element(b).adjust_quad_dof_index_for_face_orientation_table;
-      for (unsigned int c=0; c<this->element_multiplicity(b); ++c)
+  init_tasks += Threads::new_task ([&]()
+  {
+    // if one of the base elements has no support points, then it makes no sense
+    // to define support points for the composed element, so return an empty
+    // array to demonstrate that fact. Note that we ignore FE_Nothing in this logic.
+    for (unsigned int base_el=0; base_el<this->n_base_elements(); ++base_el)
+      if (!base_element(base_el).has_support_points() && base_element(base_el).dofs_per_cell!=0)
         {
-          for (unsigned int i=0; i<temp.size(0); ++i)
-            for (unsigned int j=0; j<8; ++j)
-              this->adjust_quad_dof_index_for_face_orientation_table(index+i,j)=
-                temp(i,j);
-          index += temp.size(0);
+          this->unit_support_points.resize(0);
+          return;
         }
-    }
-  Assert (index == this->dofs_per_quad,
-          ExcInternalError());
 
-  // additionally compose the permutation information for lines
-  Assert (this->adjust_line_dof_index_for_line_orientation_table.size()==
-          this->dofs_per_line, ExcInternalError());
-  index = 0;
-  for (unsigned int b=0; b<this->n_base_elements(); ++b)
+    // generate unit support points from unit support points of sub elements
+    this->unit_support_points.resize(this->dofs_per_cell);
+
+    for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+      {
+        const unsigned int
+        base       = this->system_to_base_table[i].first.first,
+        base_index = this->system_to_base_table[i].second;
+        Assert (base<this->n_base_elements(), ExcInternalError());
+        Assert (base_index<base_element(base).unit_support_points.size(),
+                ExcInternalError());
+        this->unit_support_points[i] = base_element(base).unit_support_points[base_index];
+      }
+  });
+
+  // initialize face support points (for dim==2,3). same procedure as above
+  if (dim > 1)
+    init_tasks += Threads::new_task ([&]()
     {
-      const std::vector<int> &temp2
-        = this->base_element(b).adjust_line_dof_index_for_line_orientation_table;
-      for (unsigned int c=0; c<this->element_multiplicity(b); ++c)
+      // if one of the base elements has no support points, then it makes no sense
+      // to define support points for the composed element. In that case, return
+      // an empty array to demonstrate that fact (note that we ask whether the
+      // base element has no support points at all, not only none on the face!)
+      //
+      // on the other hand, if there is an element that simply has no degrees of
+      // freedom on the face at all, then we don't care whether it has support
+      // points or not. this is, for example, the case for the stable Stokes
+      // element Q(p)^dim \times DGP(p-1).
+      for (unsigned int base_el=0; base_el<this->n_base_elements(); ++base_el)
+        if (!base_element(base_el).has_support_points()
+            &&
+            (base_element(base_el).dofs_per_face > 0))
+          {
+            this->unit_face_support_points.resize(0);
+            return;
+          }
+
+
+      // generate unit face support points from unit support points of sub
+      // elements
+      this->unit_face_support_points.resize(this->dofs_per_face);
+
+      for (unsigned int i=0; i<this->dofs_per_face; ++i)
         {
-          std::copy(temp2.begin(), temp2.end(),
-                    this->adjust_line_dof_index_for_line_orientation_table.begin()
-                    +index);
-          index += temp2.size();
+          const unsigned int base_i = this->face_system_to_base_table[i].first.first;
+          const unsigned int index_in_base = this->face_system_to_base_table[i].second;
+
+          Assert (index_in_base < base_element(base_i).unit_face_support_points.size(),
+                  ExcInternalError());
+
+          this->unit_face_support_points[i]
+            = base_element(base_i).unit_face_support_points[index_in_base];
         }
-    }
-  Assert (index == this->dofs_per_line,
-          ExcInternalError());
+    });
+
+  // initialize quad dof index permutation in 3d and higher
+  if (dim >= 3)
+    init_tasks += Threads::new_task ([&]()
+    {
+      // the array into which we want to write should have the correct size
+      // already.
+      Assert (this->adjust_quad_dof_index_for_face_orientation_table.n_elements()==
+              8*this->dofs_per_quad, ExcInternalError());
+
+      // to obtain the shifts for this composed element, copy the shift
+      // information of the base elements
+      unsigned int index = 0;
+      for (unsigned int b=0; b<this->n_base_elements(); ++b)
+        {
+          const Table<2,int> &temp
+            = this->base_element(b).adjust_quad_dof_index_for_face_orientation_table;
+          for (unsigned int c=0; c<this->element_multiplicity(b); ++c)
+            {
+              for (unsigned int i=0; i<temp.size(0); ++i)
+                for (unsigned int j=0; j<8; ++j)
+                  this->adjust_quad_dof_index_for_face_orientation_table(index+i,j)=
+                    temp(i,j);
+              index += temp.size(0);
+            }
+        }
+      Assert (index == this->dofs_per_quad,
+              ExcInternalError());
+
+      // additionally compose the permutation information for lines
+      Assert (this->adjust_line_dof_index_for_line_orientation_table.size()==
+              this->dofs_per_line, ExcInternalError());
+      index = 0;
+      for (unsigned int b=0; b<this->n_base_elements(); ++b)
+        {
+          const std::vector<int> &temp2
+            = this->base_element(b).adjust_line_dof_index_for_line_orientation_table;
+          for (unsigned int c=0; c<this->element_multiplicity(b); ++c)
+            {
+              std::copy(temp2.begin(), temp2.end(),
+                        this->adjust_line_dof_index_for_line_orientation_table.begin()
+                        +index);
+              index += temp2.size();
+            }
+        }
+      Assert (index == this->dofs_per_line,
+              ExcInternalError());
+    });
+
+  // wait for all of this to finish
+  init_tasks.join_all();
 }
 
 
