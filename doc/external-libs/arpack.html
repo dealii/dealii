@@ -23,10 +23,17 @@
     </p>
 
     <p>
+      Since <acronym>ARPACK</acronym> has not been maintained by Rice university for some years, Debian,
+      Octave and Scilab developers gathered their
+      <a href="https://github.com/opencollab/arpack-ng/blob/master/CHANGES">own modifications and bug fixes</a>
+      in the library <a href="https://github.com/opencollab/arpack-ng">ARPACK-NG</a>.
+      Furthermore, <acronym>ARPACK-NG</acronym> equips <acronym>ARPACK</acronym> with a CMake build system.
+    </p>
+
+    <p>
       Below is a short summary of instructions on how to compile and install
-      <acronym>ARPACK</acronym> by hand (for the case you wish to do so)
-      or using <a href="https://github.com/opencollab/arpack-ng">ARPACK-NG</a>
-      that equips <acronym>ARPACK</acronym> with a CMake build system.
+      <acronym>ARPACK</acronym> or <acronym>ARPACK-NG</acronym> by hand
+      (for the case you wish to do so).
     </p>
 
     <h3>How to compile and install <acronym>ARPACK</acronym> by hand</h3>
@@ -55,7 +62,7 @@
     </ul>
 
     <p>
-      Note: For compilation of <acronym>ARPACK</acronym> we emphasise
+      Note: For compilation of <acronym>ARPACK</acronym> we emphasize
       adding the compiler flag <code>-fPIC</code>. This is a definite
       requirement if we are compiling <acronym>deal.II</acronym> with
       shared libraries (which is the default). If we had preferred to be
