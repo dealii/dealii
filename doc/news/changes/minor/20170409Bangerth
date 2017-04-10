@@ -1,0 +1,6 @@
+New: There is now a function TableHandler::start_new_row() that fills
+all entries of the current row (if any) that hadn't been filled, and
+thus starts a new row of the table.
+interface.
+<br>
+(Wolfgang Bangerth, 2017/04/09)
