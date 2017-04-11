@@ -973,23 +973,6 @@ private:
       base_elements;
 
   /**
-   * Initialize the @p unit_support_points field of the FiniteElement class.
-   * Called from the constructor.
-   */
-  void initialize_unit_support_points ();
-
-  /**
-   * Initialize the @p unit_face_support_points field of the FiniteElement
-   * class. Called from the constructor.
-   */
-  void initialize_unit_face_support_points ();
-
-  /**
-   * Initialize the @p adjust_quad_dof_index_for_face_orientation_table field
-   * of the FiniteElement class. Called from the constructor.
-   */
-  void initialize_quad_dof_index_permutation ();
-  /**
    * This function is simply singled out of the constructors since there are
    * several of them. It sets up the index table for the system as well as @p
    * restriction and @p prolongation matrices.
