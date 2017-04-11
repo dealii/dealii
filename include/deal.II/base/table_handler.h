@@ -346,6 +346,30 @@ public:
    */
   TableHandler ();
 
+
+  /**
+   * Declare the existence of a column in the table by giving it a name.
+   * As discussed in the documentation of the class, this is not usually
+   * necessary -- just adding a value for a given column key via the
+   * add_value() function also declares the column. This function is
+   * therefore only necessary in cases where you want a column to
+   * also show up even if you never add an entry to any row in this column;
+   * or, more likely, if you want to prescribe the order in which columns
+   * are later printed by declaring columns in a particular order before
+   * entries are ever put into them.
+   *
+   * (The latter objective can also be achieved by adding entries to
+   * the table in whatever order they are produced by a program,
+   * and later calling set_column_order(). However, this approach
+   * requires knowing -- in one central place of your software --
+   * all of the columns keys that other parts of the software have
+   * written into, and how they should be sorted. This is easily
+   * possible for small programs, but may not be feasible for
+   * large code bases in which parts of the code base are only
+   * executed based on run-time parameters.)
+   */
+  void declare_column (const std::string &key);
+
   /**
    * Adds a column (if not yet existent) with the key <tt>key</tt> and adds
    * the value of type <tt>T</tt> to the column. Values of type <tt>T</tt>
@@ -841,11 +865,7 @@ void TableHandler::add_value (const std::string &key,
 {
   // see if the column already exists
   if (columns.find(key) == columns.end())
-    {
-      std::pair<std::string, Column> new_column(key, Column(key));
-      columns.insert(new_column);
-      column_order.push_back(key);
-    }
+    declare_column (key);
 
   if (auto_fill_mode == true)
     {

@@ -189,6 +189,19 @@ TableHandler::TableHandler()
 
 
 
+void TableHandler::declare_column (const std::string &key)
+{
+  // see if the column already exists; insert it if not
+  Assert (columns.find(key) == columns.end(),
+          ExcMessage ("You are trying to declare a column with key <" + key +
+                      "> but such a column already exists."));
+
+  columns.insert(std::make_pair(key, Column(key)));
+  column_order.push_back(key);
+}
+
+
+
 void TableHandler::start_new_row ()
 {
   // figure out the longest current column
