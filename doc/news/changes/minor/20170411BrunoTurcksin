@@ -1,0 +1,4 @@
+New: Augment python interface of Point: add operators to modify point, a
+function to compute the distance between points, and functions to compute norms.
+<br>
+(Bruno Turcksin, 2017/04/11)
