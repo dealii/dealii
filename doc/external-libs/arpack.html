@@ -23,8 +23,17 @@
     </p>
 
     <p>
+      Since <acronym>ARPACK</acronym> has not been maintained by Rice university for some years, Debian,
+      Octave and Scilab developers gathered their
+      <a href="https://github.com/opencollab/arpack-ng/blob/master/CHANGES">own modifications and bug fixes</a>
+      in the library <a href="https://github.com/opencollab/arpack-ng">ARPACK-NG</a>.
+      Furthermore, <acronym>ARPACK-NG</acronym> equips <acronym>ARPACK</acronym> with a CMake build system.
+    </p>
+
+    <p>
       Below is a short summary of instructions on how to compile and install
-      <acronym>ARPACK</acronym> by hand (for the case you wish to do so).
+      <acronym>ARPACK</acronym> or <acronym>ARPACK-NG</acronym> by hand
+      (for the case you wish to do so).
     </p>
 
     <h3>How to compile and install <acronym>ARPACK</acronym> by hand</h3>
@@ -36,8 +45,7 @@
       further instructions please read the README file or the
       <a href="http://www.caam.rice.edu/software/ARPACK/SRC/instruction.arpack">instructions</a>.
       We will explain here in a few steps what has to be done to be able
-      to compile
-      <acronym>ARPACK</acronym>.
+      to compile <acronym>ARPACK</acronym>.
     </p>
 
     <ul>
@@ -54,26 +62,63 @@
     </ul>
 
     <p>
-    Note: For compilation of <acronym>ARPACK</acronym> we emphasise
-    adding the compiler flag <code>-fPIC</code>. This is a definite
-    requirement if we are compiling <acronym>deal.II</acronym> with
-    shared libraries (which is the default). If we had preferred to be
-    compiling <acronym>deal.II</acronym> without shared libraries,
-    that's ok too; in that case we would do exactly the same thing
-    as described above, but this time omitting
-    the <code>-fPIC</code> flag from the scheme.
+      Note: For compilation of <acronym>ARPACK</acronym> we emphasize
+      adding the compiler flag <code>-fPIC</code>. This is a definite
+      requirement if we are compiling <acronym>deal.II</acronym> with
+      shared libraries (which is the default). If we had preferred to be
+      compiling <acronym>deal.II</acronym> without shared libraries,
+      that's ok too; in that case we would do exactly the same thing
+      as described above, but this time omitting
+      the <code>-fPIC</code> flag from the scheme.
     </p>
 
     <p>
-    Try to run one of the examples and compare the output.
-    How the output should look like is stated in the README
-    that can be found in the <code>EXAMPLES</code> directory.
+      Try to run one of the examples and compare the output.
+      How the output should look like is stated in the README
+      that can be found in the <code>EXAMPLES</code> directory.
     </p>
 
     <p>
-    If that output you produced looks like it should you can
-    proceed to compile <acronym>deal.II</acronym> with
-    <acronym>ARPACK</acronym>.
+      If that output you produced looks like it should you can
+      proceed to compile <acronym>deal.II</acronym> with
+      <acronym>ARPACK</acronym>.
+    </p>
+
+    <h3>How to compile and install <acronym>ARPACK-NG</acronym></h3>
+
+    <p>
+      First clone the <a href="https://github.com/opencollab/arpack-ng">ARPACK-NG</a>
+      repository. The following commands will set up an appropriate configuration:
+
+      <pre>
+        cd arpack-ng
+        mkdir build
+        cd build
+
+        cmake                                       \
+        -DEXAMPLES=ON                               \
+        -DMPI=ON                                    \
+        -DBUILD_SHARED_LIBS=ON                      \
+        -DCMAKE_INSTALL_PREFIX:PATH=$HOME/ARPACK-NG \
+        ../
+
+        make
+      </pre>
+
+      You will need to adjust the path into which you want to install ARPACK-NG
+      in the CMAKE_INSTALL_PREFIX line. If you do not have MPI installed, you
+      should use <code>-DMPI=OFF</code> instead.
+    </p>
+
+    <p>
+      Afterwards run
+      <pre>
+        make check
+        make test
+        make install
+      </pre>
+      to test that the build of <acronym>ARPACK-NG</acronym> works correctly
+      and to install the library finally.
     </p>
 
     <h2>Interfacing <acronym>deal.II</acronym>
