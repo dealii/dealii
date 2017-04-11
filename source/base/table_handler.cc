@@ -189,6 +189,29 @@ TableHandler::TableHandler()
 
 
 
+void TableHandler::start_new_row ()
+{
+  // figure out the longest current column
+  unsigned int max_col_length = 0;
+  for (std::map< std::string, Column >::iterator p = columns.begin(); p != columns.end(); ++p)
+    max_col_length = std::max(max_col_length,
+                              static_cast<unsigned int>(p->second.entries.size()));
+
+
+  // then pad all columns to that length with empty strings
+  for (std::map<std::string,Column>::iterator col=columns.begin(); col!=columns.end(); ++col)
+    while (col->second.entries.size() < max_col_length)
+      {
+        col->second.entries.push_back (internal::TableEntry(""));
+        internal::TableEntry &entry = col->second.entries.back();
+        entry.cache_string(col->second.scientific, col->second.precision);
+        col->second.max_length = std::max(col->second.max_length,
+                                          static_cast<unsigned int>(entry.get_cached_string().length()));
+      }
+}
+
+
+
 void
 TableHandler::set_auto_fill_mode (const bool state)
 {

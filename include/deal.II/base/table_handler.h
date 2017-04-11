@@ -357,6 +357,21 @@ public:
                   const T            value);
 
   /**
+   * If a row is only partially filled, then set all elements of that
+   * row for which no elements exist in a particular column to the
+   * empty string. This is akin to the 'auto_fill_mode' described in
+   * the introduction, but more general because it allows you to start
+   * writing into a column for a new row without having to know that
+   * that column had been written to in the previous row.
+   *
+   * If all columns have been written into in the current row, then
+   * this function doesn't do anything at all. In other words,
+   * conceptually the function "completes" the current row, though its
+   * use case is to "start" a new row.
+   */
+  void start_new_row ();
+
+  /**
    * Switch auto-fill mode on or off. See the general documentation of this
    * class for a description of what auto-fill mode does.
    */
@@ -818,6 +833,8 @@ namespace internal
   }
 }
 
+
+
 template <typename T>
 void TableHandler::add_value (const std::string &key,
                               const T            value)
@@ -834,11 +851,12 @@ void TableHandler::add_value (const std::string &key,
     {
       // follow the algorithm given in the introduction to this class
       // of padding columns as necessary
-      unsigned int n = 0;
+      unsigned int max_col_length = 0;
       for (std::map< std::string, Column >::iterator p = columns.begin(); p != columns.end(); ++p)
-        n = (n >= p->second.entries.size() ? n : p->second.entries.size());
+        max_col_length = std::max(max_col_length,
+                                  static_cast<unsigned int>(p->second.entries.size()));
 
-      while (columns[key].entries.size()+1 < n)
+      while (columns[key].entries.size()+1 < max_col_length)
         {
           columns[key].entries.push_back (internal::TableEntry(T()));
           internal::TableEntry &entry = columns[key].entries.back();
@@ -851,8 +869,10 @@ void TableHandler::add_value (const std::string &key,
   columns[key].entries.push_back (internal::TableEntry(value));
   internal::TableEntry &entry = columns[key].entries.back();
   entry.cache_string(columns[key].scientific, columns[key].precision);
-  columns[key].max_length = std::max(columns[key].max_length, static_cast<unsigned int>(entry.get_cached_string().length()));
+  columns[key].max_length = std::max(columns[key].max_length,
+                                     static_cast<unsigned int>(entry.get_cached_string().length()));
 }
+
 
 
 template <class Archive>
@@ -865,6 +885,8 @@ TableHandler::Column::save(Archive &ar, const unsigned int /*version*/) const
   & flag
   & max_length;
 }
+
+
 
 template<class Archive>
 void
