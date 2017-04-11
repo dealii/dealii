@@ -183,7 +183,7 @@ namespace internal
  *   {
  *     table.add_value("numbers", i);
  *     table.add_value("squares", i*i);
- *     table.add_value("square roots", sqrt(i));
+ *     table.add_value("square roots", std::sqrt(1.*i));
  *   }
  *                                  // merge the second and third column
  * table.add_column_to_supercolumn("squares", "squares and roots");
@@ -657,7 +657,7 @@ protected:
   /**
    * Stores the column and supercolumn keys in the order desired by the user.
    * By default this is the order of adding the columns. This order may be
-   * changed by <tt>set_column_order(...)</tt>.
+   * changed by set_column_order().
    */
   std::vector<std::string> column_order;
 
