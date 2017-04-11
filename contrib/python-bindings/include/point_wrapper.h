@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 by the deal.II authors
+// Copyright (C) 2016 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,8 @@
 #include <deal.II/base/config.h>
 
 #ifdef DEAL_II_WITH_CXX11
+
+#include <deal.II/base/point.h>
 
 #include <boost/python.hpp>
 
@@ -41,6 +43,12 @@ namespace python
     PointWrapper(boost::python::list list);
 
     /**
+     * Constructor. Intialize PointWrapper using a Point.
+     */
+    template <int dim>
+    PointWrapper(const Point<dim> &p);
+
+    /**
      * Copy constructor.
      */
     PointWrapper(const PointWrapper &other);
@@ -51,10 +59,87 @@ namespace python
     ~PointWrapper();
 
     /**
+     * Return the Euclidean distance of this point to the point p, i.e., the
+     * l2_norm of the difference between the vectors representing the two
+     * points.
+     */
+    double distance(const PointWrapper &p) const;
+
+    /**
+     * Return the l2_norm of the vector connecting the origin to the point.
+     */
+    double norm() const;
+
+    /**
+     * Return the sum of the absolute squares of all entries.
+     */
+    double norm_square() const;
+
+    /**
      * Assignment operator. The dimension of the point is changed if it is
      * different than the one of @p other.
      */
     PointWrapper &operator= (const PointWrapper &other);
+
+    /**
+     * Test for inequality of two points.
+     */
+    bool operator!= (const PointWrapper &p) const; 
+
+    /**
+     * Test for equality of two tensors.
+     */
+    bool operator== (const PointWrapper &p) const;
+
+    /**
+     * Return the scalar product of the vectors representing two points.
+     */
+    double operator* (const PointWrapper &p) const;
+
+    /**
+     * Add an offset to a point.
+     */
+    PointWrapper operator+(const PointWrapper &) const;
+
+    /**
+     * Subtract two points.
+     */
+    PointWrapper operator-(const PointWrapper &) const;
+
+    /**
+     * The opposite point.
+     */
+    PointWrapper operator-() const;
+
+    /**
+     * Divide the coordinates of the point by a factor.
+     */
+    PointWrapper operator/(const double factor) const;
+
+    /**
+     * Multiply the coordinates of the point by a factor.
+     */
+    PointWrapper operator* (const double factor) const;
+
+    /**
+     * Add another point.
+     */
+    PointWrapper& operator+= (const PointWrapper &p);
+
+    /**
+     * Subtract another point.
+     */
+    PointWrapper& operator-= (const PointWrapper &p);
+
+    /**
+     * Scale the coordinates of the point by factor.
+     */
+    PointWrapper& operator*= (const double factor);
+
+    /**
+     * Scale the coordinates of the point by 1/factor.
+     */
+    PointWrapper& operator/= (const double factor);
 
     /**
      * Return the first component of the Point.
@@ -96,6 +181,11 @@ namespace python
      */
     void *get_point();
 
+    /**
+     * Return a constant pointer that can be casted to the underlying Point.
+     */
+    const void *get_point() const;
+
   private:
     /**
      * Delete the underlying Point and free the memory.
@@ -134,6 +224,14 @@ namespace python
 
   inline
   void *PointWrapper::get_point()
+  {
+    return point;
+  }
+
+
+
+  inline
+  const void *PointWrapper::get_point() const
   {
     return point;
   }
