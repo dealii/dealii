@@ -1,0 +1,6 @@
+Fixed: When initializing a LinearAlgebra::distributed::Vector and omitting
+zeroing the entries, ghost entries were left undefined, leading to use of
+invalid memory when calling compress() without a previous zero_out_ghosts()
+also when the local range was completely valid. This is now fixed.
+<br>
+(Martin Kronbichler, 2017/04/12)
