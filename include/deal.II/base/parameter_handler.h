@@ -23,7 +23,7 @@
 
 #include <boost/property_tree/ptree_fwd.hpp>
 #include <boost/serialization/split_member.hpp>
-#include <boost/archive/basic_archive.hpp> 
+#include <boost/archive/basic_archive.hpp>
 #include <boost/property_tree/ptree_serialization.hpp>
 
 #include <map>
