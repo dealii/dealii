@@ -26,6 +26,7 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/vector.h>
+#include <deal.II/lac/block_vector_base.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_system.h>
@@ -117,6 +118,43 @@ output_vector (const VectorType &v, const std::string &output_name, const DoFHan
 
 
 
+template <typename VectorType>
+typename std::enable_if<!IsBlockVector<VectorType>::value, VectorType>::type
+build_ghosted (const IndexSet &owned_indices,
+               const IndexSet &ghosted_indices)
+{
+  return VectorType(owned_indices, ghosted_indices, MPI_COMM_WORLD);
+}
+
+template <typename VectorType>
+typename std::enable_if<IsBlockVector<VectorType>::value, VectorType>::type
+build_ghosted (const IndexSet &owned_indices,
+               const IndexSet &ghosted_indices)
+{
+  std::vector<IndexSet> owned_indices_vector(1, owned_indices);
+  std::vector<IndexSet> ghosted_indices_vector(1, ghosted_indices);
+  return VectorType(owned_indices_vector, ghosted_indices_vector, MPI_COMM_WORLD);
+}
+
+
+
+template <typename VectorType>
+typename std::enable_if<!IsBlockVector<VectorType>::value, VectorType>::type
+build_distributed (const IndexSet &owned_indices)
+{
+  return VectorType(owned_indices, MPI_COMM_WORLD);
+}
+
+template <typename VectorType>
+typename std::enable_if<IsBlockVector<VectorType>::value, VectorType>::type
+build_distributed (const IndexSet &owned_indices)
+{
+  std::vector<IndexSet> owned_indices_vector(1, owned_indices);
+  return VectorType(owned_indices_vector, MPI_COMM_WORLD);
+}
+
+
+
 template <int dim, typename VectorType>
 void
 check_this (const FiniteElement<dim> &fe1,
@@ -157,11 +195,11 @@ check_this (const FiniteElement<dim> &fe1,
   IndexSet locally_relevant_dofs2;
   DoFTools::extract_locally_relevant_dofs (*dof2, locally_relevant_dofs2);
 
-  VectorType in_ghosted (locally_owned_dofs1, locally_relevant_dofs1, MPI_COMM_WORLD);
-  VectorType in_distributed (locally_owned_dofs1, MPI_COMM_WORLD);
-  VectorType out_distributed (locally_owned_dofs2, MPI_COMM_WORLD);
-  VectorType out_ghosted (locally_owned_dofs2, locally_relevant_dofs2, MPI_COMM_WORLD);
-  VectorType out_reference (locally_owned_dofs2, MPI_COMM_WORLD);
+  VectorType in_ghosted = build_ghosted<VectorType> (locally_owned_dofs1, locally_relevant_dofs1);
+  VectorType in_distributed = build_distributed<VectorType> (locally_owned_dofs1);
+  VectorType out_distributed = build_distributed<VectorType> (locally_owned_dofs2);
+  VectorType out_ghosted = build_ghosted<VectorType> (locally_owned_dofs2, locally_relevant_dofs2);
+  VectorType out_reference = build_distributed<VectorType> (locally_owned_dofs2);
 
   // Choose some reference function of sufficiently high polynomial degree.
   TestFunction<dim> function (std::max(fe1.degree,fe2.degree));
@@ -281,9 +319,9 @@ check_this_dealii (const FiniteElement<dim> &fe1,
   IndexSet locally_relevant_dofs2;
   DoFTools::extract_locally_relevant_dofs (*dof2, locally_relevant_dofs2);
 
-  VectorType in_ghosted (locally_owned_dofs1, locally_relevant_dofs1, MPI_COMM_WORLD);
-  VectorType out_ghosted (locally_owned_dofs2, locally_relevant_dofs2, MPI_COMM_WORLD);
-  VectorType out_reference (locally_owned_dofs2, locally_relevant_dofs2, MPI_COMM_WORLD);
+  VectorType in_ghosted = build_ghosted<VectorType> (locally_owned_dofs1, locally_relevant_dofs1);
+  VectorType out_ghosted = build_ghosted<VectorType> (locally_owned_dofs2, locally_relevant_dofs2);
+  VectorType out_reference = build_ghosted<VectorType> (locally_owned_dofs2, locally_relevant_dofs2);
 
   // Choose some reference function of sufficiently high polynomial degree.
   TestFunction<dim> function (std::max(fe1.degree,fe2.degree));
