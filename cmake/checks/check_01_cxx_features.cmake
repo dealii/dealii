@@ -299,7 +299,7 @@ SET(FEATURE_CXX14_PROCESSED TRUE)
 # DEAL_II_WITH_CXX14) but support is not available due to above tests
 #
 
-MACRO(_bailout _version)
+MACRO(_bailout _version _symbolic)
   IF(DEAL_II_WITH_CXX${_version} AND NOT DEAL_II_HAVE_CXX${_version})
     MESSAGE(FATAL_ERROR "\n"
       "C++${_version} support was requested (DEAL_II_WITH_CXX${_version}=${DEAL_II_WITH_CXX${_version}}) but is not "
@@ -307,14 +307,14 @@ MACRO(_bailout _version)
       "Please disable C++${_version} support, i.e. configure with\n"
       "    -DDEAL_II_WITH_CXX${_version}=FALSE,\n"
       "or use a different compiler, instead. (If the compiler flag for C++${_version} "
-      "support differs from \"-std=c++0x\" or \"-std=c++${_version}\", a suitable "
-      "compiler flag has to be specified manually via\n"
+      "support differs from \"-std=c++${_symbolic}\" or \"-std=c++${_version}\", "
+      "a suitable compiler flag has to be specified manually via\n"
       "    -DDEAL_II_CXX_VERSION_FLAG=\"...\"\n\n"
       )
   ENDIF()
 ENDMACRO()
 
-_bailout("14")
+_bailout("14" "1y")
 
 #
 # Some compilers (notably GCC6 and up) default to C++14 (more exactly, GNU++14,
