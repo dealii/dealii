@@ -152,6 +152,8 @@ Subscriptor::subscribe(const char *id) const
     object_info = &typeid(*this);
   ++counter;
 
+  // This feature is disabled when we compile with threads: see the
+  // documentation of this class.
 #  ifndef DEAL_II_WITH_THREADS
   const char *const name = (id != 0) ? id : unknown_subscriber;
 
@@ -183,6 +185,8 @@ Subscriptor::unsubscribe(const char *id) const
 
   --counter;
 
+  // This feature is disabled when we compile with threads: see the
+  // documentation of this class.
 #  ifndef DEAL_II_WITH_THREADS
   map_iterator it = counter_map.find(name);
   AssertNothrow (it != counter_map.end(), ExcNoSubscriber(object_info->name(), name));
