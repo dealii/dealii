@@ -251,6 +251,11 @@ public:
   void enable_history_data();
 
   /**
+   * Provide read access to the collected residual data.
+   */
+  const std::vector<double> &get_history_data() const;
+
+  /**
    * Average error reduction over all steps.
    *
    * Requires enable_history_data()
