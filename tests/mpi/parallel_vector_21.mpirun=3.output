@@ -1,0 +1,35 @@
+
+Process #0
+Local range: [0, 2), global size: 6
+Vector data:
+4.000e+00 1.000e+00 
+Process #0
+Local range: [0, 2), global size: 6
+Vector data:
+4.000e+00 1.000e+00 
+Ghost entries (global index / value):
+(2/4.000e+00) 
+
+Process #1
+Local range: [2, 4), global size: 6
+Vector data:
+4.000e+00 1.000e+00 
+Process #1
+Local range: [2, 4), global size: 6
+Vector data:
+4.000e+00 1.000e+00 
+Ghost entries (global index / value):
+(0/4.000e+00) 
+
+
+Process #2
+Local range: [4, 6), global size: 6
+Vector data:
+1.000e+00 1.000e+00 
+Process #2
+Local range: [4, 6), global size: 6
+Vector data:
+1.000e+00 1.000e+00 
+Ghost entries (global index / value):
+(0/4.000e+00) (2/4.000e+00) 
+

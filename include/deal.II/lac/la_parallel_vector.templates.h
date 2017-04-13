@@ -104,8 +104,8 @@ namespace LinearAlgebra
       // set entries to zero if so requested
       if (omit_zeroing_entries == false)
         this->operator = (Number());
-
-      vector_is_ghosted = false;
+      else
+        zero_out_ghosts();
     }
 
 
@@ -133,6 +133,8 @@ namespace LinearAlgebra
 
       if (omit_zeroing_entries == false)
         this->operator= (Number());
+      else
+        zero_out_ghosts();
 
       if (import_data != nullptr)
         {
@@ -144,8 +146,6 @@ namespace LinearAlgebra
           // call these methods and hence do not need to have the storage.
           import_data = nullptr;
         }
-
-      vector_is_ghosted = false;
 
       thread_loop_partitioner = v.thread_loop_partitioner;
     }
@@ -240,8 +240,6 @@ namespace LinearAlgebra
       dealii::internal::VectorOperations::Vector_copy<Number,Number> copier(v.val, val);
       internal::VectorOperations::parallel_for(copier, 0, partitioner->local_size(),
                                                thread_loop_partitioner);
-
-      zero_out_ghosts();
     }
 
 
