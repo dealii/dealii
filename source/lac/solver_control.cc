@@ -63,8 +63,6 @@ SolverControl::check (const unsigned int step,
   if (step==0)
     {
       initial_val = check_value;
-      if (history_data_enabled)
-        history_data.resize(maxsteps);
     }
 
   if (m_log_history && ((step % m_log_frequency) == 0))
@@ -83,7 +81,7 @@ SolverControl::check (const unsigned int step,
     }
 
   if (history_data_enabled)
-    history_data[step] = check_value;
+    history_data.push_back(check_value);
 
   if (check_value <= tol)
     {
@@ -156,6 +154,20 @@ SolverControl::enable_history_data ()
 {
   history_data_enabled = true;
 }
+
+
+
+const std::vector<double> &SolverControl::get_history_data() const
+{
+  Assert (history_data_enabled, ExcHistoryDataRequired());
+  Assert (history_data.size() > 0,
+          ExcMessage("The SolverControl object was asked for the solver history "
+                     "data, but there is no data. Possibly you requested the data before the "
+                     "solver was run."));
+
+  return history_data;
+}
+
 
 
 double
