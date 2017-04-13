@@ -19,7 +19,6 @@
 
 #include "serialization.h"
 #include <deal.II/base/parameter_handler.h>
-#include <boost/property_tree/ptree_serialization.hpp>
 #include <boost/serialization/vector.hpp>
 
 
