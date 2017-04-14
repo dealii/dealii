@@ -7,6 +7,8 @@ that interface with the OpenCASCADE library (http://www.opencascade.org) that
 allow the specification of arbitrary IGES files to describe the boundaries for
 your geometries.
 
+@dealiiTutorialDOI{10.5281/zenodo.546220,https://zenodo.org/badge/DOI/10.5281/zenodo.546220.svg}
+
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
