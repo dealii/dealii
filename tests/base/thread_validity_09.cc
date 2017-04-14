@@ -20,6 +20,7 @@
 // and makes sure nobody writes into it at undue times
 
 #include "../tests.h"
+#include <atomic>
 #include <iomanip>
 #include <fstream>
 #include <unistd.h>
@@ -28,7 +29,7 @@
 
 
 Threads::Mutex mutex;
-volatile int spin_lock = 0;
+static std::atomic<int> spin_lock(0);
 
 
 int worker ()

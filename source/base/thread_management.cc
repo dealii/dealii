@@ -15,10 +15,9 @@
 
 #include <deal.II/base/thread_management.h>
 
-#include <cerrno>
+#include <atomic>
 #include <cstdlib>
 #include <iostream>
-#include <list>
 
 #ifdef DEAL_II_HAVE_UNISTD_H
 #  include <unistd.h>
@@ -32,15 +31,11 @@ namespace Threads
 {
   namespace internal
   {
-    // counter and access mutex for the
-    // number of threads
-    volatile unsigned int n_existing_threads_counter = 1;
-    Mutex  n_existing_threads_mutex;
+    static std::atomic<unsigned int> n_existing_threads_counter(1);
 
 
     void register_thread ()
     {
-      Mutex::ScopedLock lock (n_existing_threads_mutex);
       ++n_existing_threads_counter;
     }
 
@@ -48,7 +43,6 @@ namespace Threads
 
     void deregister_thread ()
     {
-      Mutex::ScopedLock lock (n_existing_threads_mutex);
       --n_existing_threads_counter;
       Assert (n_existing_threads_counter >= 1,
               ExcInternalError());
@@ -128,7 +122,6 @@ namespace Threads
 
   unsigned int n_existing_threads ()
   {
-    Mutex::ScopedLock lock (internal::n_existing_threads_mutex);
     return internal::n_existing_threads_counter;
   }
 

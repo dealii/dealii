@@ -20,9 +20,10 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 
-#include <typeinfo>
+#include <atomic>
 #include <map>
 #include <string>
+#include <typeinfo>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -41,14 +42,17 @@ DEAL_II_NAMESPACE_OPEN
  * The utility of this class is even enhanced by providing identifying strings
  * to the functions subscribe() and unsubscribe(). In case of a hanging
  * subscription during destruction, this string will be listed in the
- * exception's message. For reasons of efficiency, these strings are handled
- * as <tt>const char*</tt>. Therefore, the pointers provided to subscribe()
- * and to unsubscribe() must be the same. Strings with equal contents will not
- * be recognized to be the same. The handling in SmartPointer will take care
- * of this.
+ * exception's message. These strings are represented as <code>const char
+ * *</code> pointers since the underlying buffer comes from (and is managed
+ * by) the run-time type information system: more exactly, these pointers are
+ * the result the function call <code>typeid(x).name()<code> where
+ * <code>x</code> is some object. Therefore, the pointers provided to
+ * subscribe() and to unsubscribe() must be the same. Strings with equal
+ * contents will not be recognized to be the same. The handling in
+ * SmartPointer will take care of this.
  *
- * @note Due to a problem with <tt>volatile</tt> declarations, this additional
- * feature is switched off if multithreading is used.
+ * @note This feature is switched off if multithreading is used (i.e., if
+ * <code>DEAL_II_WITH_THREADS</code> is on).
  *
  * @ingroup memory
  * @author Guido Kanschat, 1998 - 2005
@@ -191,12 +195,12 @@ private:
    * We use the <tt>mutable</tt> keyword in order to allow subscription to
    * constant objects also.
    *
-   * In multithreaded mode, this counter may be modified by different threads.
-   * We thus have to mark it <tt>volatile</tt>. However, this is counter-
-   * productive in non-MT mode since it may pessimize code. So use the macro
-   * defined in <tt>deal.II/base/config.h</tt> to selectively add volatility.
+   * This counter may be read from and written to concurrently in
+   * multithreaded code: hence we use the <code>std::atomic</code> class
+   * template.
+   *
    */
-  mutable DEAL_VOLATILE unsigned int counter;
+  mutable std::atomic<unsigned int> counter;
 
   /**
    * In this map, we count subscriptions for each different identification
