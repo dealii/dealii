@@ -1171,21 +1171,6 @@ namespace StandardExceptions
                                              dealii::ExcIndexRange((index),0,(range)))
 
 /**
- * An assertion that tests that a given index is within the half-open
- * range <code>[0,range)</code>. It throws an exception object
- * <code>ExcIndexRange(index,0,range)</code> if the assertion
- * fails.
- *
- * This variation of the AssertIndexRange assertion is used for indices of type
- * types::global_dof_index for which we need to make special accommodations because
- * they may not fit into the regular 32-bit integer indices used in AssertIndexRange.
- *
- * @ingroup Exceptions
- */
-#define AssertGlobalIndexRange(index,range) Assert((index) < (range), \
-                                                   dealii::ExcIndexRange<types::global_dof_index>((index),0,(range)))
-
-/**
  * An assertion that checks whether a number is finite or not. We explicitly
  * cast the number to std::complex to match the signature of the exception
  * (see there for an explanation of why we use std::complex at all) and to

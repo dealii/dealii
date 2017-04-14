@@ -1,0 +1,3 @@
+Changed: The <code>AssertGlobalIndexRange</code> macro has been removed: the expansion of this macro involved an undeclared template and always generates compiler errors if used.
+<br>
+(David Wells, 2017/04/13)
