@@ -138,8 +138,8 @@ namespace Step54
   // this function we import the CAD shape upon which we want to
   // generate and refine our triangulation. We assume that the CAD
   // surface is contained in the @p cad_file_name file (we provide an
-  // example IGES file in this directory called
-  // "DTMB-5415_bulbous_bow.iges" that represents the bulbous bow of a
+  // example IGES file in the input directory called
+  // "input/DTMB-5415_bulbous_bow.iges" that represents the bulbous bow of a
   // ship). The presence of several convex and concave high curvature
   // regions makes the geometry we provided a particularly meaningful
   // example.
@@ -401,7 +401,7 @@ int main ()
       using namespace Step54;
 
       const std::string in_mesh_filename = "input/initial_mesh_3d.vtk";
-      const std::string cad_file_name = "DTMB-5415_bulbous_bow.iges";
+      const std::string cad_file_name = "input/DTMB-5415_bulbous_bow.iges";
 
       cout << "----------------------------------------------------------" << endl;
       cout << "Testing projection in direction normal to CAD surface" << endl;
