@@ -247,8 +247,9 @@ CHECK_CXX_SOURCE_COMPILES(
   thread_local std::array<int,3> p;
   std::condition_variable c;
 
-  // check the version language macro
-  #if !(__cplusplus >= 201103L)
+  // Check the version language macro, but skip MSVC because
+  // MSVC reports 199711 even in MSVC 2017.
+  #if __cplusplus < 201103L && !defined(_MSC_VER)
   #  error \"insufficient support for C++11\"
   #endif
 
