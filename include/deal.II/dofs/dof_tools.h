@@ -1437,18 +1437,18 @@ namespace DoFTools
                                          const std::set<types::boundary_id> &boundary_ids = std::set<types::boundary_id>());
 
   /**
-   * Extract all degrees of freedom (DoFs) that have support only within cells,
-   * for which @p predicate is <code>true</code>. The result is returned as
-   * an IndexSet.
+   * Extract all indices of shape functions such that their support is entirely
+   * contained within the cells for which the @p predicate is <code>true</code>.
+   * The result is returned as an IndexSet.
    *
    * Consider the following FE space where predicate returns <code>true</code>
-   * for all cells on the left side:
+   * for all cells on the left half of the domain:
    *
-   * @image html extract_dofs_with_support_on.png
+   * @image html extract_dofs_with_support_contained_within.png
    *
-   * This functions will return the union of all DoFs on those cells minus
+   * This functions will return the union of all DoF indices on those cells minus
    * DoF 11, 13, 2 and 0; the result will be <code>[9,10], 12, [14,38]</code>.
-   * On the image above the returned DoFs are separated from the rest by the
+   * In the image above the returned DoFs are separated from the rest by the
    * red line
    *
    * Essentially, the question this functions answers is the following:
@@ -1460,14 +1460,14 @@ namespace DoFTools
    *
    * In case of parallel::distributed::Triangulation @p predicate will be called
    * only for locally owned and ghost cells. The resulting index set may contain
-   * DoFs that are associated to the locally owned or ghost cells, but are not
+   * DoFs that are associated with the locally owned or ghost cells, but are not
    * owned by the current MPI core.
    */
   template <typename DoFHandlerType>
   IndexSet
-  extract_dofs_with_support_on(const DoFHandlerType &dof_handler,
-                               const std::function< bool(const typename DoFHandlerType::active_cell_iterator &)> &predicate,
-                               const ConstraintMatrix &cm = ConstraintMatrix());
+  extract_dofs_with_support_contained_within(const DoFHandlerType &dof_handler,
+                                             const std::function< bool(const typename DoFHandlerType::active_cell_iterator &)> &predicate,
+                                             const ConstraintMatrix &cm = ConstraintMatrix());
 
   /**
    * Extract a vector that represents the constant modes of the DoFHandler for

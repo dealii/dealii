@@ -14,7 +14,8 @@
 // ---------------------------------------------------------------------
 //
 
-// Test DoFTools::extract_dofs_with_support_on()
+// test DoFTools::extract_dofs_with_support_contained_within() but
+// for a slightly different configuration
 
 #include "../tests.h"
 #include <deal.II/fe/mapping_q1.h>
@@ -38,25 +39,33 @@
 
 template<int dim>
 bool
-pred_d(const typename Triangulation<dim>::active_cell_iterator &cell)
+pred_left(const typename Triangulation<dim>::active_cell_iterator &cell)
 {
-  return (cell->center()(0) < 0.49 &&
-          cell->center()(1) < 0.49);
+  return (cell->center()(0) < 0.49);
 }
+
+template<int dim>
+bool
+pred_right(const typename Triangulation<dim>::active_cell_iterator &cell)
+{
+  return (cell->center()(0) > 0.51);
+}
+
 
 template<int dim>
 bool
 pred_r(const typename Triangulation<dim>::active_cell_iterator &cell)
 {
   return (cell->center()(0) < 0.49 &&
-          cell->center()(0) > 0.25 &&
-          cell->center()(1) < 0.49);
+          cell->center()(1) < 0.49) ||
+         (cell->center()(0) > 0.49 &&
+          cell->center()(1) > 0.49);
 }
 
 
 
 template <int dim>
-void test (const unsigned int flag)
+void test (const bool left = true)
 {
 
   // Setup system
@@ -66,17 +75,13 @@ void test (const unsigned int flag)
                                   Point<dim>(0,0),
                                   Point<dim>(1,1));
 
-  if (flag == 0)
-    triangulation.refine_global(2);
-  else
-    triangulation.refine_global(1);
+  triangulation.refine_global(1);
 
   // Extra refinement to generate hanging nodes
   for (typename Triangulation<dim>::active_cell_iterator
        cell = triangulation.begin_active();
        cell != triangulation.end(); ++cell)
-    if ( (flag==1 && pred_d<dim>(cell)) ||
-         (flag==2 && !pred_d<dim>(cell))  )
+    if (pred_r<dim>(cell))
       cell->set_refine_flag ();
 
   triangulation.prepare_coarsening_and_refinement();
@@ -90,13 +95,15 @@ void test (const unsigned int flag)
   ConstraintMatrix cm;
   DoFTools::make_hanging_node_constraints(dh,cm);
 
-  IndexSet support = DoFTools::extract_dofs_with_support_on(dh, pred_d<dim>, cm);
+  IndexSet support = left ?
+                     DoFTools::extract_dofs_with_support_contained_within(dh, pred_left<dim>, cm) :
+                     DoFTools::extract_dofs_with_support_contained_within(dh, pred_right<dim>, cm);
   support.print(deallog);
 
   // print grid and DoFs for visual inspection
   if (false)
     {
-      std::cout << "-------------------- " << Utilities::int_to_string(dim) << Utilities::int_to_string(flag) << std::endl;
+      std::cout << "-------------------- " << Utilities::int_to_string(dim) << std::endl;
       cm.print(std::cout);
 
       std::map<types::global_dof_index, Point<dim> > support_points;
@@ -104,11 +111,11 @@ void test (const unsigned int flag)
       DoFTools::map_dofs_to_support_points(mapping, dh, support_points);
 
       const std::string filename =
-        "grid" + Utilities::int_to_string(dim) + Utilities::int_to_string(flag) + ".gp";
+        "grid" + Utilities::int_to_string(dim) + ".gp";
       std::ofstream f(filename.c_str());
 
       f << "set terminal png size 400,410 enhanced font \"Helvetica,8\"" << std::endl
-        << "set output \"grid" << Utilities::int_to_string(dim) << Utilities::int_to_string(flag) << ".png\"" << std::endl
+        << "set output \"grid" << Utilities::int_to_string(dim) << ".png\"" << std::endl
         << "set size square" << std::endl
         << "set view equal xy" << std::endl
         << "unset xtics" << std::endl
@@ -129,9 +136,8 @@ int main(int argc, char **argv)
 {
   initlog();
 
-  test<2>(0);
-  test<2>(1);
-  test<2>(2);
+  test<2>(true);
+  test<2>(false);
 
   return 0;
 }

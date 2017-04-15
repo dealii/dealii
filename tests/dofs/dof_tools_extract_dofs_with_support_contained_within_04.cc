@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 //
 
-// test DoFTools::extract_dofs_with_support_on() for calculation of the RHS
-// function in parallel
+// test DoFTools::extract_dofs_with_support_contained_within() for calculation
+// of the RHS function in parallel
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -111,7 +111,7 @@ void test ()
   std::vector<types::global_dof_index> local_dof_indices(fe.dofs_per_cell);
 
   // get support on the predicate
-  IndexSet support = DoFTools::extract_dofs_with_support_on(dh, pred_d<dim>, cm);
+  IndexSet support = DoFTools::extract_dofs_with_support_contained_within(dh, pred_d<dim>, cm);
   IndexSet local_support = support & locally_owned_set;
 
   // rhs vectors:

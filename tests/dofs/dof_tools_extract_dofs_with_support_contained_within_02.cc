@@ -14,9 +14,9 @@
 // ---------------------------------------------------------------------
 //
 
-// similar to dof_tools_23, but for the p::d::Tria. As an MPI test, make sure
-// that the total number of shape functions that are non-zero within the domain
-// is the same.
+// test DoFTools::extract_dofs_with_support_contained_within() for the p::d::Tria.
+// As an MPI test, make sure that the total number of shape functions that are
+// non-zero within the domain is the same.
 
 #include "../tests.h"
 #include <deal.II/distributed/tria.h>
@@ -102,7 +102,7 @@ void test (const unsigned int flag)
   DoFTools::make_hanging_node_constraints(dh,cm);
   cm.close ();
 
-  const IndexSet support = DoFTools::extract_dofs_with_support_on(dh, pred_d<dim>, cm);
+  const IndexSet support = DoFTools::extract_dofs_with_support_contained_within(dh, pred_d<dim>, cm);
   const IndexSet support_local = support & dh.locally_owned_dofs();
 
   deallog << support.n_elements() << std::endl;

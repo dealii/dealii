@@ -162,7 +162,7 @@ for (deal_II_dimension : DIMENSIONS)
 
     template
     IndexSet
-    DoFTools::extract_dofs_with_support_on<DoFHandler<deal_II_dimension> >
+    DoFTools::extract_dofs_with_support_contained_within<DoFHandler<deal_II_dimension> >
     (const DoFHandler<deal_II_dimension> &,
      const std::function< bool(const typename DoFHandler<deal_II_dimension>::active_cell_iterator &)> &,
      const ConstraintMatrix&);
