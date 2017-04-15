@@ -37,7 +37,8 @@ namespace SLEPcWrappers
                           const MPI_Comm &mpi_communicator)
     :
     solver_control (cn),
-    mpi_communicator (mpi_communicator)
+    mpi_communicator (mpi_communicator),
+    reason (EPS_CONVERGED_ITERATING)
   {
     // create eigensolver context
     PetscErrorCode ierr = EPSCreate (mpi_communicator, &eps);
@@ -67,7 +68,7 @@ namespace SLEPcWrappers
 #else
         const PetscErrorCode ierr = EPSDestroy (&eps);
 #endif
-        AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+        AssertNothrow (ierr == 0, ExcSLEPcError(ierr));
       }
   }
 
