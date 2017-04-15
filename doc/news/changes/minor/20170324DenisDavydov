@@ -1,0 +1,5 @@
+New: DoFTools::extract_dofs_with_support_contained_within() returns a set of 
+degrees of freedom whose support is entirely contained within the cells for 
+which the predicate returns true.
+<br>
+(Denis Davydov, 2017/03/24)

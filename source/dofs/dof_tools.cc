@@ -765,6 +765,106 @@ namespace DoFTools
 
 
 
+  template <typename DoFHandlerType>
+  IndexSet
+  extract_dofs_with_support_contained_within(const DoFHandlerType &dof_handler,
+                                             const std::function< bool(const typename DoFHandlerType::active_cell_iterator &)> &predicate,
+                                             const ConstraintMatrix &cm)
+  {
+    const std::function< bool(const typename DoFHandlerType::active_cell_iterator &)> predicate_local
+    = [=] (const typename DoFHandlerType::active_cell_iterator & cell) -> bool
+    {
+      return cell->is_locally_owned() && predicate(cell);
+    };
+
+    std::vector<types::global_dof_index> local_dof_indices;
+    local_dof_indices.reserve (max_dofs_per_cell(dof_handler));
+
+    // Get all the dofs that live on the subdomain:
+    std::set<types::global_dof_index> predicate_dofs;
+
+    typename DoFHandlerType::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+    for (; cell!=endc; ++cell)
+      if (!cell->is_artificial() && predicate(cell))
+        {
+          local_dof_indices.resize (cell->get_fe().dofs_per_cell);
+          cell->get_dof_indices (local_dof_indices);
+          predicate_dofs.insert(local_dof_indices.begin(),
+                                local_dof_indices.end());
+        }
+
+    // Get halo layer and accumulate its DoFs
+    std::set<types::global_dof_index> dofs_with_support_on_halo_cells;
+
+    const std::vector<typename DoFHandlerType::active_cell_iterator> halo_cells =
+      GridTools::compute_active_cell_halo_layer(dof_handler, predicate_local);
+    for (typename std::vector<typename DoFHandlerType::active_cell_iterator>::const_iterator it = halo_cells.begin();
+         it != halo_cells.end(); ++it)
+      {
+        // skip halo cells that satisfy the given predicate and thereby
+        // shall be a part of the index set on another MPI core.
+        // Those could only be ghost cells with p::d::Tria.
+        if (predicate(*it))
+          {
+            Assert ((*it)->is_ghost(),
+                    ExcInternalError());
+            continue;
+          }
+
+        const unsigned int dofs_per_cell = (*it)->get_fe().dofs_per_cell;
+        local_dof_indices.resize (dofs_per_cell);
+        (*it)->get_dof_indices (local_dof_indices);
+        dofs_with_support_on_halo_cells.insert(local_dof_indices.begin(),
+                                               local_dof_indices.end());
+      }
+
+    // A complication coming from the fact that DoFs living on locally
+    // owned cells which satisfy predicate may participate in constraints for
+    // DoFs outside of this region.
+    if (cm.n_constraints() > 0)
+      {
+        // Remove DoFs that are part of constraints for DoFs outside
+        // of predicate. Since we will subtract halo_dofs from predicate_dofs,
+        // achieve this by extending halo_dofs with DoFs to which
+        // halo_dofs are constrained.
+        std::set<types::global_dof_index> extra_halo;
+        for (std::set<types::global_dof_index>::iterator it = dofs_with_support_on_halo_cells.begin();
+             it != dofs_with_support_on_halo_cells.end(); ++it)
+          // if halo DoF is constrained, add all DoFs to which it's constrained
+          // because after resolving constraints, the support of the DoFs that
+          // constrain the current DoF will extend to the halo cells.
+          if (const std::vector<std::pair<types::global_dof_index,double> > *line_ptr = cm.get_constraint_entries(*it))
+            {
+              const unsigned int line_size = line_ptr->size();
+              for (unsigned int j=0; j<line_size; ++j)
+                extra_halo.insert((*line_ptr)[j].first);
+            }
+
+        dofs_with_support_on_halo_cells.insert(extra_halo.begin(),
+                                               extra_halo.end());
+      }
+
+    // Rework our std::set's into IndexSet and subtract halo DoFs from the
+    // predicate_dofs:
+    IndexSet support_set(dof_handler.n_dofs());
+    support_set.add_indices(predicate_dofs.begin(),
+                            predicate_dofs.end());
+    support_set.compress();
+
+    IndexSet halo_set(dof_handler.n_dofs());
+    halo_set.add_indices(dofs_with_support_on_halo_cells.begin(),
+                         dofs_with_support_on_halo_cells.end());
+    halo_set.compress();
+
+    support_set.subtract_set(halo_set);
+
+    // we intentionally do not want to limit the output to locally owned DoFs.
+    return support_set;
+  }
+
+
 
   namespace internal
   {

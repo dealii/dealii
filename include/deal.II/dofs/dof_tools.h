@@ -1437,6 +1437,39 @@ namespace DoFTools
                                          const std::set<types::boundary_id> &boundary_ids = std::set<types::boundary_id>());
 
   /**
+   * Extract all indices of shape functions such that their support is entirely
+   * contained within the cells for which the @p predicate is <code>true</code>.
+   * The result is returned as an IndexSet.
+   *
+   * Consider the following FE space where predicate returns <code>true</code>
+   * for all cells on the left half of the domain:
+   *
+   * @image html extract_dofs_with_support_contained_within.png
+   *
+   * This functions will return the union of all DoF indices on those cells minus
+   * DoF 11, 13, 2 and 0; the result will be <code>[9,10], 12, [14,38]</code>.
+   * In the image above the returned DoFs are separated from the rest by the
+   * red line
+   *
+   * Essentially, the question this functions answers is the following:
+   * Given a subdomain with associated DoFs, what is the largest subset of
+   * these DoFs that are allowed to be non-zero such that after calling
+   * ConstraintMatrix::distribute() the resulting solution vector will have
+   * support only within the given domain. Here @p cm is the ConstraintMatrix
+   * containing hanging nodes constraints.
+   *
+   * In case of parallel::distributed::Triangulation @p predicate will be called
+   * only for locally owned and ghost cells. The resulting index set may contain
+   * DoFs that are associated with the locally owned or ghost cells, but are not
+   * owned by the current MPI core.
+   */
+  template <typename DoFHandlerType>
+  IndexSet
+  extract_dofs_with_support_contained_within(const DoFHandlerType &dof_handler,
+                                             const std::function< bool(const typename DoFHandlerType::active_cell_iterator &)> &predicate,
+                                             const ConstraintMatrix &cm = ConstraintMatrix());
+
+  /**
    * Extract a vector that represents the constant modes of the DoFHandler for
    * the components chosen by <tt>component_mask</tt> (see
    * @ref GlossComponentMask).
