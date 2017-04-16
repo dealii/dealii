@@ -241,8 +241,8 @@ namespace MeshWorker
      */
     virtual void fill(
       std::vector<std::vector<std::vector<Number> > > &values,
-      std::vector<std::vector<std::vector<Tensor<1,dim,Number> > > > &gradients,
-      std::vector<std::vector<std::vector<Tensor<2,dim,Number> > > > &hessians,
+      std::vector<std::vector<std::vector<Tensor<1,spacedim,Number> > > > &gradients,
+      std::vector<std::vector<std::vector<Tensor<2,spacedim,Number> > > > &hessians,
       const FEValuesBase<dim,spacedim> &fe,
       const std::vector<types::global_dof_index> &index,
       const unsigned int component,
@@ -258,8 +258,8 @@ namespace MeshWorker
      */
     virtual void mg_fill(
       std::vector<std::vector<std::vector<Number> > > &values,
-      std::vector<std::vector<std::vector<Tensor<1,dim,Number> > > > &gradients,
-      std::vector<std::vector<std::vector<Tensor<2,dim,Number> > > > &hessians,
+      std::vector<std::vector<std::vector<Tensor<1,spacedim,Number> > > > &gradients,
+      std::vector<std::vector<std::vector<Tensor<2,spacedim,Number> > > > &hessians,
       const FEValuesBase<dim,spacedim> &fe,
       const unsigned int level,
       const std::vector<types::global_dof_index> &index,
@@ -315,8 +315,8 @@ namespace MeshWorker
 
     virtual void fill(
       std::vector<std::vector<std::vector<typename VectorType::value_type> > > &values,
-      std::vector<std::vector<std::vector<Tensor<1,dim,typename VectorType::value_type> > > > &gradients,
-      std::vector<std::vector<std::vector<Tensor<2,dim,typename VectorType::value_type> > > > &hessians,
+      std::vector<std::vector<std::vector<Tensor<1,spacedim,typename VectorType::value_type> > > > &gradients,
+      std::vector<std::vector<std::vector<Tensor<2,spacedim,typename VectorType::value_type> > > > &hessians,
       const FEValuesBase<dim,spacedim> &fe,
       const std::vector<types::global_dof_index> &index,
       const unsigned int component,
@@ -326,8 +326,8 @@ namespace MeshWorker
 
     virtual void mg_fill(
       std::vector<std::vector<std::vector<typename VectorType::value_type> > > &values,
-      std::vector<std::vector<std::vector<Tensor<1,dim,typename VectorType::value_type> > > > &gradients,
-      std::vector<std::vector<std::vector<Tensor<2,dim,typename VectorType::value_type> > > > &hessians,
+      std::vector<std::vector<std::vector<Tensor<1,spacedim,typename VectorType::value_type> > > > &gradients,
+      std::vector<std::vector<std::vector<Tensor<2,spacedim,typename VectorType::value_type> > > > &hessians,
       const FEValuesBase<dim,spacedim> &fe,
       const unsigned int level,
       const std::vector<types::global_dof_index> &index,

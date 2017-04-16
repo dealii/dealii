@@ -15,21 +15,25 @@
 
 
 
-for (deal_II_dimension : DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
 {
     namespace MeshWorker
     \{
-    template class VectorDataBase<deal_II_dimension>;
+#if deal_II_dimension <= deal_II_space_dimension
+    template class VectorDataBase<deal_II_dimension, deal_II_space_dimension>;
+#endif
     \}
 }
 
-for (VECTOR : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
+for (VECTOR : SERIAL_VECTORS; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
 {
     namespace MeshWorker
     \{
-    template class VectorData<VECTOR,deal_II_dimension>;
-    template class VectorData<const VECTOR,deal_II_dimension>;
-    template class MGVectorData<VECTOR,deal_II_dimension>;
-    template class MGVectorData<const VECTOR,deal_II_dimension>;
+#if deal_II_dimension <= deal_II_space_dimension
+    template class VectorData<VECTOR, deal_II_dimension, deal_II_space_dimension>;
+    template class VectorData<const VECTOR, deal_II_dimension, deal_II_space_dimension>;
+    template class MGVectorData<VECTOR, deal_II_dimension, deal_II_space_dimension>;
+    template class MGVectorData<const VECTOR, deal_II_dimension, deal_II_space_dimension>;
+#endif
     \}
 }

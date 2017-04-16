@@ -1,0 +1,3 @@
+Fixed: The MeshWorker framework can also be used in case dim != spacedim.
+<br>
+(Daniel Arndt, 2017/04/16)

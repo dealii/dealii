@@ -166,7 +166,7 @@ namespace MeshWorker
      * one vector for each component, containing vectors with values for each
      * quadrature point.
      */
-    std::vector<std::vector<std::vector<Tensor<1,dim> > > > gradients;
+    std::vector<std::vector<std::vector<Tensor<1,spacedim> > > > gradients;
 
     /**
      * The vector containing the second derivatives of finite element
@@ -176,7 +176,7 @@ namespace MeshWorker
      * one vector for each component, containing vectors with values for each
      * quadrature point.
      */
-    std::vector<std::vector<std::vector<Tensor<2,dim> > > > hessians;
+    std::vector<std::vector<std::vector<Tensor<2,spacedim> > > > hessians;
 
     /**
      * Reinitialize internal data structures for use on a cell.
@@ -666,13 +666,13 @@ namespace MeshWorker
         if (info.sub_number != numbers::invalid_unsigned_int)
           {
             // This is a subface
-            FESubfaceValues<dim> &fe = dynamic_cast<FESubfaceValues<dim>&> (febase);
+            FESubfaceValues<dim,spacedim> &fe = dynamic_cast<FESubfaceValues<dim,spacedim>&> (febase);
             fe.reinit(info.cell, info.face_number, info.sub_number);
           }
         else if (info.face_number != numbers::invalid_unsigned_int)
           {
             // This is a face
-            FEFaceValues<dim> &fe = dynamic_cast<FEFaceValues<dim>&> (febase);
+            FEFaceValues<dim,spacedim> &fe = dynamic_cast<FEFaceValues<dim,spacedim>&> (febase);
             fe.reinit(info.cell, info.face_number);
           }
         else

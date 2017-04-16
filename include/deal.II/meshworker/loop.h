@@ -438,9 +438,9 @@ namespace MeshWorker
                         ASSEMBLER &assembler,
                         const LoopControl &lctrl = LoopControl())
   {
-    std::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> cell_worker;
-    std::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> boundary_worker;
-    std::function<void (DoFInfo<dim> &, DoFInfo<dim> &,
+    std::function<void (DoFInfo<dim, spacedim>&, IntegrationInfo<dim, spacedim>&)> cell_worker;
+    std::function<void (DoFInfo<dim, spacedim>&, IntegrationInfo<dim, spacedim>&)> boundary_worker;
+    std::function<void (DoFInfo<dim, spacedim>&, DoFInfo<dim, spacedim> &,
                         IntegrationInfo<dim, spacedim> &,
                         IntegrationInfo<dim, spacedim> &)> face_worker;
     if (integrator.use_cell)
