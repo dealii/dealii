@@ -258,7 +258,7 @@ hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
       // dofs_per_line for each FE_Q_Hierarchical.
       std::vector<std::pair<unsigned int, unsigned int> > res;
       for (unsigned int i = 0; i < std::min(this_dpl,other_dpl); i++)
-        res.push_back(std::make_pair (i, i));
+        res.emplace_back(i, i);
 
       return res;
     }
@@ -297,7 +297,7 @@ hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const
       // dofs_per_line for each FE_Q_Hierarchical.
       std::vector<std::pair<unsigned int, unsigned int> > res;
       for (unsigned int i = 0; i < std::min(this_dpq,other_dpq); i++)
-        res.push_back(std::make_pair (i, i));
+        res.emplace_back(i, i);
 
       return res;
     }

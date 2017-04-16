@@ -142,13 +142,13 @@ compute (const Point<dim>            &p,
   if (do_values)
     values.push_back(1.);
   if (do_grads)
-    grads.push_back(Tensor<1,dim>());
+    grads.emplace_back();
   if (do_grad_grads)
-    grad_grads.push_back(Tensor<2,dim>());
+    grad_grads.emplace_back();
   if (do_3rd_derivatives)
-    third_derivatives.push_back(Tensor<3,dim>());
+    third_derivatives.emplace_back();
   if (do_4th_derivatives)
-    fourth_derivatives.push_back(Tensor<4,dim>());
+    fourth_derivatives.emplace_back();
 }
 
 

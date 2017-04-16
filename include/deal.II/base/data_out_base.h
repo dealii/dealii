@@ -1805,7 +1805,7 @@ namespace DataOutBase
    *    std::ofstream output (filename.c_str());
    *    data_out.write_vtu (output);
    *
-   *    times_and_names.push_back (std::pair<double,std::string> (time, filename));
+   *    times_and_names.emplace_back (time, filename);
    *    std::ofstream pvd_output ("solution.pvd");
    *    DataOutBase::write_pvd_record (pvd_output, times_and_names);
    *  }
@@ -1848,14 +1848,14 @@ namespace DataOutBase
    *  const unsigned int number_of_time_steps = 3;
    *  std::vector<std::vector<std::string > > piece_names(number_of_time_steps);
    *
-   *  piece_names[0].push_back("subdomain_01.time_step_0.vtk");
-   *  piece_names[0].push_back("subdomain_02.time_step_0.vtk");
+   *  piece_names[0].emplace_back("subdomain_01.time_step_0.vtk");
+   *  piece_names[0].emplace_back("subdomain_02.time_step_0.vtk");
    *
-   *  piece_names[1].push_back("subdomain_01.time_step_1.vtk");
-   *  piece_names[1].push_back("subdomain_02.time_step_1.vtk");
+   *  piece_names[1].emplace_back("subdomain_01.time_step_1.vtk");
+   *  piece_names[1].emplace_back("subdomain_02.time_step_1.vtk");
    *
-   *  piece_names[2].push_back("subdomain_01.time_step_2.vtk");
-   *  piece_names[2].push_back("subdomain_02.time_step_2.vtk");
+   *  piece_names[2].emplace_back("subdomain_01.time_step_2.vtk");
+   *  piece_names[2].emplace_back("subdomain_02.time_step_2.vtk");
    *
    *  std::ofstream visit_output ("master_file.visit");
    *
@@ -1880,16 +1880,16 @@ namespace DataOutBase
    *  std::vector<std::pair<double,std::vector<std::string > > > times_and_piece_names(number_of_time_steps);
    *
    *  times_and_piece_names[0].first = 0.0;
-   *  times_and_piece_names[0].second.push_back("subdomain_01.time_step_0.vtk");
-   *  times_and_piece_names[0].second.push_back("subdomain_02.time_step_0.vtk");
+   *  times_and_piece_names[0].second.emplace_back("subdomain_01.time_step_0.vtk");
+   *  times_and_piece_names[0].second.emplace_back("subdomain_02.time_step_0.vtk");
    *
    *  times_and_piece_names[1].first = 0.5;
-   *  times_and_piece_names[1].second.push_back("subdomain_01.time_step_1.vtk");
-   *  times_and_piece_names[1].second.push_back("subdomain_02.time_step_1.vtk");
+   *  times_and_piece_names[1].second.emplace_back("subdomain_01.time_step_1.vtk");
+   *  times_and_piece_names[1].second.emplace_back("subdomain_02.time_step_1.vtk");
    *
    *  times_and_piece_names[2].first = 1.0;
-   *  times_and_piece_names[2].second.push_back("subdomain_01.time_step_2.vtk");
-   *  times_and_piece_names[2].second.push_back("subdomain_02.time_step_2.vtk");
+   *  times_and_piece_names[2].second.emplace_back("subdomain_01.time_step_2.vtk");
+   *  times_and_piece_names[2].second.emplace_back("subdomain_02.time_step_2.vtk");
    *
    *  std::ofstream visit_output ("master_file.visit");
    *

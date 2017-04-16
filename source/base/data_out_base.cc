@@ -550,7 +550,7 @@ void DataOutBase::DataOutFilter::write_data_set(const std::string &name, const u
   // Record the data set name, dimension, and allocate space for it
   data_set_names.push_back(name);
   data_set_dims.push_back(new_dim);
-  data_sets.push_back(std::vector<double>(new_dim*num_verts));
+  data_sets.emplace_back(new_dim*num_verts);
 
   // TODO: averaging, min/max, etc for merged vertices
   for (i=0; i<filtered_points.size(); ++i)
@@ -1613,9 +1613,9 @@ namespace DataOutBase
 
   GnuplotFlags::GnuplotFlags ()
   {
-    space_dimension_labels.push_back("x");
-    space_dimension_labels.push_back("y");
-    space_dimension_labels.push_back("z");
+    space_dimension_labels.emplace_back("x");
+    space_dimension_labels.emplace_back("y");
+    space_dimension_labels.emplace_back("z");
   }
 
 

@@ -431,7 +431,7 @@ namespace SparsityTools
 
               // Add the pivot and all direct neighbors of the pivot node not
               // yet touched to the list of new entries.
-              groups.push_back(std::vector<types::global_dof_index>());
+              groups.emplace_back();
               std::vector<types::global_dof_index> &next_group = groups.back();
 
               next_group.push_back(min_neighbors.first);

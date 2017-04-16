@@ -406,7 +406,7 @@ void DataOut<dim,DoFHandlerType>::build_patches
                 ExcInternalError());
         cell_to_patch_index_map[cell->level()][cell->index()] = all_cells.size();
 
-        all_cells.push_back (std::make_pair(cell, active_index));
+        all_cells.emplace_back (cell, active_index);
       }
   }
 

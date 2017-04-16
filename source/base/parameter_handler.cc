@@ -1998,10 +1998,8 @@ ParameterHandler::declare_entry (const std::string           &entry,
   entries->put (get_current_full_path(entry) + path_separator + "documentation",
                 documentation);
 
-  // clone the pattern and store its
-  // index in the node
-  patterns.push_back (std::shared_ptr<const Patterns::PatternBase>
-                      (pattern.clone()));
+  patterns.reserve (patterns.size() + 1);
+  patterns.emplace_back (pattern.clone());
   entries->put (get_current_full_path(entry) + path_separator + "pattern",
                 static_cast<unsigned int>(patterns.size()-1));
   // also store the description of
@@ -3239,9 +3237,9 @@ void MultipleParameterLoop::init_branches_current_section ()
       {
         const std::string value = p->second.get<std::string>("value");
         if (value.find('{') != std::string::npos)
-          multiple_choices.push_back (Entry(subsection_path,
-                                            demangle(p->first),
-                                            value));
+          multiple_choices.emplace_back (subsection_path,
+                                         demangle(p->first),
+                                         value);
       }
 
   // then loop over all subsections

@@ -3142,8 +3142,7 @@ namespace DoFTools
               const std::map<types::global_dof_index,float>::const_iterator
               j = weights[row].find(col);
               if ((j != weights[row].end()) && (j->second != 0))
-                constraint_line.push_back (std::pair<types::global_dof_index,double>(representants[row],
-                                           j->second));
+                constraint_line.emplace_back (representants[row], j->second);
             };
 
           constraints.add_entries (global_dof, constraint_line);

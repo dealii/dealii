@@ -67,8 +67,8 @@ void
 PersistentTriangulation<dim,spacedim>::execute_coarsening_and_refinement ()
 {
   // first save flags
-  refine_flags.push_back (std::vector<bool>());
-  coarsen_flags.push_back (std::vector<bool>());
+  refine_flags.emplace_back ();
+  coarsen_flags.emplace_back ();
   this->save_refine_flags (refine_flags.back());
   this->save_coarsen_flags (coarsen_flags.back());
 
@@ -206,8 +206,8 @@ PersistentTriangulation<dim,spacedim>::read_flags(std::istream &in)
   in >> n_flag_levels;
   for (unsigned int i=0; i<n_flag_levels; ++i)
     {
-      refine_flags.push_back (std::vector<bool>());
-      coarsen_flags.push_back (std::vector<bool>());
+      refine_flags.emplace_back ();
+      coarsen_flags.emplace_back ();
       this->read_bool_vector (mn_tria_refine_flags_begin, refine_flags.back(),
                               mn_tria_refine_flags_end, in);
       this->read_bool_vector (mn_tria_coarsen_flags_begin, coarsen_flags.back(),
@@ -252,4 +252,3 @@ template class PersistentTriangulation<1,2>;
 template class PersistentTriangulation<2,3>;
 
 DEAL_II_NAMESPACE_CLOSE
-

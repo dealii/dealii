@@ -800,14 +800,14 @@ QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
   std::vector<Point<2> > origins;
   // Id of the corner with a
   // singularity
-  quads.push_back(QGaussOneOverR(n, 3, factor_out_singularity));
-  quads.push_back(QGaussOneOverR(n, 2, factor_out_singularity));
-  quads.push_back(QGaussOneOverR(n, 1, factor_out_singularity));
-  quads.push_back(QGaussOneOverR(n, 0, factor_out_singularity));
+  quads.emplace_back(n, 3, factor_out_singularity);
+  quads.emplace_back(n, 2, factor_out_singularity);
+  quads.emplace_back(n, 1, factor_out_singularity);
+  quads.emplace_back(n, 0, factor_out_singularity);
 
-  origins.push_back(Point<2>(0.,0.));
-  origins.push_back(Point<2>(singularity[0],0.));
-  origins.push_back(Point<2>(0.,singularity[1]));
+  origins.emplace_back(0., 0.);
+  origins.emplace_back(singularity[0], 0.);
+  origins.emplace_back(0., singularity[1]);
   origins.push_back(singularity);
 
   // Lexicographical ordering.

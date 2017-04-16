@@ -127,16 +127,18 @@ namespace internal
 
                   if (global_mine && level_mine)
                     {
-                      copy_indices[level].push_back(
-                        std::make_pair (global_dof_indices[i], level_dof_indices[i]));
+                      copy_indices[level].emplace_back(global_dof_indices[i],
+                                                       level_dof_indices[i]);
                     }
                   else if (global_mine)
                     {
-                      copy_indices_global_mine[level].push_back(
-                        std::make_pair (global_dof_indices[i], level_dof_indices[i]));
+                      copy_indices_global_mine[level].emplace_back(global_dof_indices[i],
+                                                                   level_dof_indices[i]);
 
                       //send this to the owner of the level_dof:
-                      send_data_temp.push_back(DoFPair(level, global_dof_indices[i], level_dof_indices[i]));
+                      send_data_temp.emplace_back(level,
+                                                  global_dof_indices[i],
+                                                  level_dof_indices[i]);
                     }
                   else
                     {
@@ -631,7 +633,7 @@ namespace internal
                                          local_dof_indices,
                                          &global_level_dof_indices_l0[start_index]);
 
-                  dirichlet_indices[0].push_back(std::vector<unsigned short>());
+                  dirichlet_indices[0].emplace_back();
                   if (mg_constrained_dofs != nullptr)
                     for (unsigned int i=0; i<mg_dof.get_fe().dofs_per_cell; ++i)
                       if (mg_constrained_dofs->is_boundary_index(0, local_dof_indices[elem_info.lexicographic_numbering[i]]))

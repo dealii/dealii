@@ -118,12 +118,12 @@ void DataOutStack<dim,spacedim,DoFHandlerType>::declare_data_vector (const std::
   switch (vector_type)
     {
     case dof_vector:
-      dof_data.push_back (DataVector());
+      dof_data.emplace_back ();
       dof_data.back().names = names;
       break;
 
     case cell_vector:
-      cell_data.push_back (DataVector());
+      cell_data.emplace_back ();
       cell_data.back().names = names;
       break;
     };

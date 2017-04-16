@@ -146,7 +146,7 @@ void Histogram::evaluate (const std::vector<Vector<number> > &values,
   // then produce all the other lists
   // for the other data vectors by
   // copying
-  intervals.push_back (std::vector<Interval>());
+  intervals.emplace_back ();
 
   switch (interval_spacing)
     {
@@ -155,8 +155,7 @@ void Histogram::evaluate (const std::vector<Vector<number> > &values,
       const float delta = (max_value-min_value)/n_intervals;
 
       for (unsigned int n=0; n<n_intervals; ++n)
-        intervals[0].push_back (Interval(min_value+n*delta,
-                                         min_value+(n+1)*delta));
+        intervals[0].emplace_back (min_value+n*delta, min_value+(n+1)*delta);
 
       break;
     };
@@ -166,8 +165,8 @@ void Histogram::evaluate (const std::vector<Vector<number> > &values,
       const float delta = (std::log(max_value)-std::log(min_value))/n_intervals;
 
       for (unsigned int n=0; n<n_intervals; ++n)
-        intervals[0].push_back (Interval(std::exp(std::log(min_value)+n*delta),
-                                         std::exp(std::log(min_value)+(n+1)*delta)));
+        intervals[0].emplace_back (std::exp(std::log(min_value)+n*delta),
+                                   std::exp(std::log(min_value)+(n+1)*delta));
 
       break;
     };

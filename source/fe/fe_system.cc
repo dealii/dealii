@@ -1937,9 +1937,8 @@ FESystem<dim,spacedim>::hp_object_dof_identities (const FiniteElement<dim,spaced
             }
 
           for (unsigned int i=0; i<base_identities.size(); ++i)
-            identities.push_back
-            (std::make_pair (base_identities[i].first + dof_offset,
-                             base_identities[i].second + dof_offset_other));
+            identities.emplace_back (base_identities[i].first + dof_offset,
+                                     base_identities[i].second + dof_offset_other);
 
           // record the dofs treated above as already taken care of
           dof_offset       += base.template n_dofs_per_object<structdim>();

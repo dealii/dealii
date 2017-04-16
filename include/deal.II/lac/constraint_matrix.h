@@ -1451,7 +1451,7 @@ ConstraintMatrix::add_line (const size_type line)
                         numbers::invalid_size_type);
 
   // push a new line to the end of the list
-  lines.push_back (ConstraintLine());
+  lines.emplace_back ();
   lines.back().line = line;
   lines.back().inhomogeneity = 0.;
   lines_cache[line_index] = lines.size()-1;
@@ -1497,7 +1497,7 @@ ConstraintMatrix::add_entry (const size_type line,
         return;
       }
 
-  line_ptr->entries.push_back (std::make_pair(column,value));
+  line_ptr->entries.emplace_back (column, value);
 }
 
 

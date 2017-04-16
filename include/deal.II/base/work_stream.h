@@ -815,9 +815,7 @@ namespace WorkStream
                 scratch_data = new ScratchData(sample_scratch_data);
                 copy_data    = new CopyData(sample_copy_data);
 
-                typename ScratchAndCopyDataList::value_type
-                new_scratch_object (scratch_data, copy_data, true);
-                scratch_and_copy_data_list.push_back (new_scratch_object);
+                scratch_and_copy_data_list.emplace_back (scratch_data, copy_data, true);
               }
           }
 

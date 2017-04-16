@@ -56,8 +56,7 @@ namespace
       for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
         {
           ++vertex_touch_count[cell->vertex_index(v)];
-          vertex_to_cell[cell->vertex_index(v)]
-          .push_back (std::make_pair (cell, v));
+          vertex_to_cell[cell->vertex_index(v)].emplace_back (cell, v);
         }
   }
 
@@ -82,8 +81,7 @@ namespace
       for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
         {
           ++edge_touch_count[cell->line(l)->index()];
-          edge_to_cell[cell->line(l)->index()]
-          .push_back (std::make_pair (cell, l));
+          edge_to_cell[cell->line(l)->index()].emplace_back (cell, l);
         }
   }
 
@@ -3286,9 +3284,7 @@ namespace parallel
       unsigned int offset = attached_data_size+sizeof(CellStatus);
       ++n_attached_datas;
       attached_data_size+=size;
-      attached_data_pack_callbacks.push_back(
-        std::pair<unsigned int, pack_callback_t> (offset, pack_callback)
-      );
+      attached_data_pack_callbacks.emplace_back(offset, pack_callback);
       return offset;
     }
 

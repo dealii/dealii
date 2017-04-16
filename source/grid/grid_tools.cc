@@ -1790,10 +1790,8 @@ next_cell:
                               tmp((*adjacent_cell)->subdomain_id(), cell->vertex_index(i));
                               if (vertices_added.find(tmp)==vertices_added.end())
                                 {
-                                  vertices_to_send[(*adjacent_cell)->subdomain_id()].push_back(
-                                    std::tuple<types::global_vertex_index,types::global_vertex_index,
-                                    std::string> (i,cell->vertex_index(i),
-                                                  cell->id().to_string()));
+                                  vertices_to_send[(*adjacent_cell)->subdomain_id()].emplace_back
+                                  (i, cell->vertex_index(i), cell->id().to_string());
                                   if (cell->id().to_string().size() > max_cellid_size)
                                     max_cellid_size = cell->id().to_string().size();
                                   vertices_added.insert(tmp);
@@ -2453,7 +2451,7 @@ next_cell:
     cell_1 = mesh_1.begin(0),
     cell_2 = mesh_2.begin(0);
     for (; cell_1 != mesh_1.end(0); ++cell_1, ++cell_2)
-      cell_list.push_back (std::make_pair (cell_1, cell_2));
+      cell_list.emplace_back (cell_1, cell_2);
 
     // then traverse list as described
     // above
@@ -2471,8 +2469,8 @@ next_cell:
             Assert(cell_pair->first->refinement_case()==
                    cell_pair->second->refinement_case(), ExcNotImplemented());
             for (unsigned int c=0; c<cell_pair->first->n_children(); ++c)
-              cell_list.push_back (std::make_pair (cell_pair->first->child(c),
-                                                   cell_pair->second->child(c)));
+              cell_list.emplace_back (cell_pair->first->child(c),
+                                      cell_pair->second->child(c));
 
             // erasing an iterator
             // keeps other iterators

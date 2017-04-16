@@ -1208,7 +1208,7 @@ namespace DoFTools
           for (unsigned int i=0; i<data.second.size(); ++i)
             if (component_mask[data.second[i]])
               constant_mode_to_component_translation[data.second[i]].
-              push_back(std::make_pair(n_constant_modes++,i));
+              emplace_back(n_constant_modes++, i);
         AssertDimension(element_constant_modes.back().n_rows(),
                         element_constant_modes[0].n_rows());
       }

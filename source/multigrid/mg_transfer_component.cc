@@ -372,13 +372,13 @@ void MGTransferComponentBase::build_matrices (
   // by itself
   prolongation_matrices.resize (0);
   prolongation_sparsities.resize (0);
+  prolongation_matrices.reserve (n_levels - 1);
+  prolongation_sparsities.reserve (n_levels - 1);
 
   for (unsigned int i=0; i<n_levels-1; ++i)
     {
-      prolongation_sparsities
-      .push_back (std::shared_ptr<BlockSparsityPattern> (new BlockSparsityPattern));
-      prolongation_matrices
-      .push_back (std::shared_ptr<BlockSparseMatrix<double> > (new BlockSparseMatrix<double>));
+      prolongation_sparsities.emplace_back (new BlockSparsityPattern);
+      prolongation_matrices.emplace_back (new BlockSparseMatrix<double>);
     }
 
   // two fields which will store the

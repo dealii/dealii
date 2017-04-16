@@ -752,7 +752,7 @@ hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
           if (std::fabs(this->unit_support_points[index_map_inverse[i+1]][0]-
                         fe_q_other->unit_support_points[index_map_inverse_other[j+1]][0])
               < 1e-14)
-            identities.push_back (std::make_pair(i,j));
+            identities.emplace_back (i, j);
 
       return identities;
     }
@@ -818,8 +818,7 @@ hp_quad_dof_identities (const FiniteElement<dim,spacedim>        &fe_other) cons
                   (std::fabs(this->unit_support_points[index_map_inverse[i2+1]][0]-
                              fe_q_other->unit_support_points[index_map_inverse_other[j2+1]][0])
                    < 1e-14))
-                identities.push_back (std::make_pair(i1*(p-1)+i2,
-                                                     j1*(q-1)+j2));
+                identities.emplace_back (i1*(p-1)+i2, j1*(q-1)+j2);
 
       return identities;
     }

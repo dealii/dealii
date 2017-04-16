@@ -549,7 +549,7 @@ namespace
     edge_list.reserve(cells.size()*GeometryInfo<dim>::lines_per_cell);
     for (unsigned int i=0; i<cells.size(); ++i)
       for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
-        edge_list.push_back (Edge<dim>(cells[i], l));
+        edge_list.emplace_back (cells[i], l);
 
     // next sort the edge list and then remove duplicates
     std::sort (edge_list.begin(), edge_list.end());
@@ -576,7 +576,7 @@ namespace
       {
         // create our own data structure for the cells and let it
         // connect to the edges array
-        cell_list.push_back (Cell<dim>(cells[i], edges));
+        cell_list.emplace_back (cells[i], edges);
 
         // then also inform the edges that they are adjacent
         // to the current cell, and where within this cell
@@ -1269,4 +1269,3 @@ template class GridReordering<2,3>;
 template class GridReordering<3,3>;
 
 DEAL_II_NAMESPACE_CLOSE
-
