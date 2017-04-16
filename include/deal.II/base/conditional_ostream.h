@@ -109,6 +109,11 @@ public:
   std::ostream &get_stream () const;
 
   /**
+   * Close the actived output stream.
+   */
+  void close();
+
+  /**
    * Output a constant something through this stream. This function must be @p
    * const so that member objects of this type can also be used from @p const
    * member functions of the surrounding class.
@@ -129,12 +134,12 @@ public:
   const ConditionalOStream &
   operator<< (std::ostream& (*p) (std::ostream &)) const;
 
-private:
   /**
-   * Reference to the stream we want to write to.
+   * The stream we want to write to.
    */
-  std::ostream  &output_stream;
+  std::ostream  output_stream;
 
+private:
   /**
    * Stores the actual condition the object is in.
    */
@@ -172,6 +177,14 @@ std::ostream &
 ConditionalOStream::get_stream () const
 {
   return output_stream;
+}
+
+
+inline
+void ConditionalOStream::close ()
+{
+  if (active_flag == true)
+    output_stream.close();
 }
 
 
