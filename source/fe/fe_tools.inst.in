@@ -147,11 +147,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     compute_node_matrix(const FiniteElement<deal_II_dimension> &);
 
     template
-    void
-    compute_node_matrix(FullMatrix<double> &,
-                        const FiniteElement<deal_II_dimension> &);
-
-    template
     void compute_component_wise(
         const FiniteElement<deal_II_dimension> & ,
         std::vector<unsigned int> &, std::vector<std::vector<unsigned int> > &);
