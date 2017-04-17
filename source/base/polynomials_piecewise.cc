@@ -131,14 +131,14 @@ namespace Polynomials
     std::vector<PiecewisePolynomial<double> > p;
     p.reserve (n_subdivisions * base_degree + 1);
 
-    p.push_back (PiecewisePolynomial<double> (p_base[0], n_subdivisions, 0,
-                                              false));
+    p.emplace_back(p_base[0], n_subdivisions, 0,
+                   false);
     for (unsigned int s=0; s<n_subdivisions; ++s)
       for (unsigned int i=0; i<base_degree; ++i)
-        p.push_back (PiecewisePolynomial<double> (p_base[i+1], n_subdivisions,
-                                                  s,
-                                                  i==(base_degree-1) &&
-                                                  s<n_subdivisions-1));
+        p.emplace_back(p_base[i+1], n_subdivisions,
+                       s,
+                       i==(base_degree-1) &&
+                       s<n_subdivisions-1);
     return p;
   }
 

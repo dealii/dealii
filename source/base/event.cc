@@ -28,7 +28,7 @@ namespace Algorithms
   Event::assign(const char *name)
   {
     unsigned int index = names.size();
-    names.push_back(name);
+    names.emplace_back(name);
 
     Event result;
     // The constructor generated an
