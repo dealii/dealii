@@ -81,7 +81,7 @@ template<typename number> class FullMatrix;
  * default_increment.
  *
  * Letting @p default_increment zero causes an exception whenever a row
- * overflows.
+ * overflows, in and only in DEBUG mode.
  *
  * If the rows are expected to be filled more or less from first to last,
  * using a @p default_row_length of zero may not be such a bad idea.
@@ -431,7 +431,8 @@ public:
   /**
    * Set the element <tt>(i,j)</tt> to @p value.
    *
-   * If <tt>value</tt> is not a finite number an exception is thrown.
+   * If <tt>value</tt> is not a finite number an exception is thrown in and only
+   * in DEBUG mode.
    *
    * The optional parameter <tt>elide_zero_values</tt> can be used to specify
    * whether zero values should be added anyway or these should be filtered
@@ -450,7 +451,7 @@ public:
   /**
    * Add @p value to the element <tt>(i,j)</tt>. Allocates the entry if it
    * does not exist. Filters out zeroes automatically. If <tt>value</tt> is
-   * not a finite number an exception is thrown.
+   * not a finite number an exception is thrown in and only in DEBUG mode.
    */
   void add (const size_type i,
             const size_type j,
@@ -559,17 +560,6 @@ public:
    * @name Entry Access
    */
 //@{
-  /**
-   * Return the value of the entry (i,j).  This may be an expensive operation
-   * and you should always take care where to call this function.  In order to
-   * avoid abuse, this function throws an exception if the required element
-   * does not exist in the matrix.
-   *
-   * In case you want a function that returns zero instead (for entries that
-   * are not in the sparsity pattern of the matrix), use the @p el function.
-   */
-  number operator () (const size_type i,
-                      const size_type j) const;
 
   /**
    * Return the value of the entry (i,j). Returns zero for all non-existing
@@ -577,6 +567,14 @@ public:
    */
   number el (const size_type i,
              const size_type j) const;
+
+  /**
+   * Do the same thing as function @p el() does, but throws an exception if the
+   * required element does not exist in the matrix in and only in DEBUG mode.
+   */
+  number operator () (const size_type i,
+                      const size_type j) const;
+
 //@}
   /**
    * @name Multiplications
@@ -698,6 +696,14 @@ public:
    * the result is <tt>end(r)</tt>, which does NOT point into row @p r.
    */
   const_iterator begin (const size_type r) const;
+
+  /**
+   * Iterator on diagonal entry of row @p r. This function throws an exception
+   * if the row @p r has no diagonal element in and only in DEBUG mode.
+   * In RELEASE mode, this function will return an iterator points to an
+   * unpredictable position silently when the row @p r has no diagonal element.
+   */
+  const_iterator diagonal (const size_type r) const;
 
   /**
    * Final iterator of row @p r. The result may be different from
@@ -1379,6 +1385,19 @@ SparseMatrixEZ<number>::begin (const size_type r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
   const_iterator result (this, r, 0);
+  return result;
+}
+
+template <typename number>
+inline
+typename SparseMatrixEZ<number>::const_iterator
+SparseMatrixEZ<number>::diagonal (const size_type r) const
+{
+  Assert (r<m(), ExcIndexRange(r,0,m()));
+  Assert (row_info[r].diagonal != RowInfo::invalid_diagonal,
+          ExcInvalidEntry(r,r));
+
+  const_iterator result (this, r, row_info[r].diagonal);
   return result;
 }
 
