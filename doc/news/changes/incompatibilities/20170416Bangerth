@@ -1,0 +1,5 @@
+Removed: The FETools::compute_node_matrix() variant that takes two
+arguments has been removed. It was previously already deprecated. Use
+the variant with just one argument instead.
+<br>
+(Wolfgang Bangerth, 2017/04/16)
