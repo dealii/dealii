@@ -275,9 +275,9 @@ void TestPointValueHistory<dim>::run()
   {
     node_monitor.add_field_name("Solution");
     std::vector <std::string> solution_names;
-    solution_names.push_back("X velocity");
-    solution_names.push_back("Y velocity");
-    solution_names.push_back("Z velocity");
+    solution_names.emplace_back("X velocity");
+    solution_names.emplace_back("Y velocity");
+    solution_names.emplace_back("Z velocity");
     node_monitor.add_component_names ("Solution", solution_names);
     node_monitor.add_field_name("Post Processed Vector"); // not sensitive to spaces
     std::vector <bool> component_mask (3, false);
@@ -294,7 +294,7 @@ void TestPointValueHistory<dim>::run()
     node_monitor.add_field_name("Scalar_out", component_mask);
 
     std::vector <std::string> indep_names;
-    indep_names.push_back ("Input");
+    indep_names.emplace_back("Input");
     node_monitor.add_independent_names(indep_names);
 
     // two alternatives here, adding a point at a time or a vector of points
@@ -342,8 +342,8 @@ void TestPointValueHistory<dim>::run()
       Postprocess<dim> postprocessor;
       QGauss<dim> postprocess_quadrature (2);
       std::vector<std::string> names;
-      names.push_back ("Vector_out");
-      names.push_back ("Scalar_out");
+      names.emplace_back("Vector_out");
+      names.emplace_back("Scalar_out");
       node_monitor.evaluate_field(names, solution, postprocessor, postprocess_quadrature);
 //         output_results (step, solution);
       step++;
@@ -401,7 +401,7 @@ template <int dim>
 void TestPointValueHistory<dim>::output_results (unsigned int step, Vector <double> solution)  const
 {
   std::vector<std::string> solution_names (dim, "velocity");
-  solution_names.push_back ("pressure");
+  solution_names.emplace_back("pressure");
 
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
   data_component_interpretation

@@ -215,7 +215,7 @@ void TableHandler::start_new_row ()
   for (std::map<std::string,Column>::iterator col=columns.begin(); col!=columns.end(); ++col)
     while (col->second.entries.size() < max_col_length)
       {
-        col->second.entries.push_back (internal::TableEntry(""));
+        col->second.entries.emplace_back("");
         internal::TableEntry &entry = col->second.entries.back();
         entry.cache_string(col->second.scientific, col->second.precision);
         col->second.max_length = std::max(col->second.max_length,

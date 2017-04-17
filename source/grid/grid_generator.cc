@@ -1524,7 +1524,7 @@ namespace GridGenerator
     double ax = p[0];
     for (unsigned int x=0; x<=n_cells; ++x)
       {
-        points.push_back (Point<1> (ax));
+        points.emplace_back(ax);
         if (x<n_cells)
           ax += spacing[0][x];
       }
@@ -1591,7 +1591,7 @@ namespace GridGenerator
         double ax = p[0];
         for (unsigned int x=0; x<=repetitions[0]; ++x)
           {
-            points.push_back (Point<2> (ax,ay));
+            points.emplace_back(ax,ay);
             if (x<repetitions[0])
               ax += spacing[0][x];
           }
@@ -1693,7 +1693,7 @@ namespace GridGenerator
             double ax = p[0];
             for (unsigned int x=0; x<=repetitions[0]; ++x)
               {
-                points.push_back (Point<dim> (ax,ay,az));
+                points.emplace_back(ax,ay,az);
                 if (x<repetitions[0])
                   ax += spacing[0][x];
               }

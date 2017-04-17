@@ -177,7 +177,7 @@ struct FE_Q_Base<PolynomialType,xdim,xspacedim>::Implementation
     // 0 and on subface 1
     std::vector<Point<dim-1> > constraint_points;
     // Add midpoint
-    constraint_points.push_back (Point<dim-1> (0.5));
+    constraint_points.emplace_back(0.5);
 
     if (q_deg>1)
       {
@@ -256,13 +256,13 @@ struct FE_Q_Base<PolynomialType,xdim,xspacedim>::Implementation
     std::vector<Point<dim-1> > constraint_points;
 
     // Add midpoint
-    constraint_points.push_back (Point<dim-1> (0.5, 0.5));
+    constraint_points.emplace_back(0.5, 0.5);
 
     // Add midpoints of lines of "mother-face"
-    constraint_points.push_back (Point<dim-1> (0, 0.5));
-    constraint_points.push_back (Point<dim-1> (1, 0.5));
-    constraint_points.push_back (Point<dim-1> (0.5, 0));
-    constraint_points.push_back (Point<dim-1> (0.5, 1));
+    constraint_points.emplace_back(0, 0.5);
+    constraint_points.emplace_back(1, 0.5);
+    constraint_points.emplace_back(0.5, 0);
+    constraint_points.emplace_back(0.5, 1);
 
     if (q_deg>1)
       {
