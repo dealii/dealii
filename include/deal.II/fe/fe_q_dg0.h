@@ -264,16 +264,6 @@ public:
   convert_generalized_support_point_values_to_nodal_values (const std::vector<Vector<double> > &support_point_values,
                                                             std::vector<double>                &nodal_values) const;
 
-  virtual void interpolate(std::vector<double>       &local_dofs,
-                           const std::vector<double> &values) const DEAL_II_DEPRECATED;
-
-  virtual void interpolate(std::vector<double>                &local_dofs,
-                           const std::vector<Vector<double> > &values,
-                           const unsigned int                  offset = 0) const DEAL_II_DEPRECATED;
-
-  virtual void interpolate(std::vector<double>          &local_dofs,
-                           const VectorSlice<const std::vector<std::vector<double> > > &values) const DEAL_II_DEPRECATED;
-
   /**
    * Return the matrix interpolating from the given finite element to the
    * present one.  The size of the matrix is then @p dofs_per_cell times
