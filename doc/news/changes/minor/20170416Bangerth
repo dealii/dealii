@@ -1,0 +1,9 @@
+Changed: The PointValueHistory class still used the old, deprecated
+interface for DataPostprocessor objects in that variant of the
+PointValueHistory::evaluate_field() function that takes such an
+object. This is now fixed: it uses
+DataPostprocessor::evaluate_scalar_field() and
+DataPostprocessor::evaluate_vector_field(), like all other
+users of the DataPostprocessor class.
+<br>
+(Wolfgang Bangerth, 2017/04/16)
