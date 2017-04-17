@@ -1,0 +1,8 @@
+New: The new function ParameterHandler::add_action() allows to
+register actions that should be performed when a parameter
+is read from somewhere. This allows, in particular, initializing
+member variables that store parameter values without having to
+explicitly call ParameterHandler::get(),
+ParameterHandler::get_integer(), or similar functions.
+<br>
+(Wolfgang Bangerth, 2017/04/16)
