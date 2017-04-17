@@ -303,17 +303,6 @@ namespace FETools
   compute_node_matrix(const FiniteElement<dim,spacedim> &fe);
 
   /**
-   * Same as the function above, but return the matrix by reference through
-   * the first argument, rather than as the function's return value.
-   *
-   * @deprecated
-   */
-  template <int dim, int spacedim>
-  void
-  compute_node_matrix(FullMatrix<double> &M,
-                      const FiniteElement<dim,spacedim> &fe) DEAL_II_DEPRECATED;
-
-  /**
    * For all possible (isotropic and anisotropic) refinement cases compute the
    * embedding matrices from a coarse cell to the child cells. Each column of
    * the resulting matrices contains the representation of a coarse grid basis
