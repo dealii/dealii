@@ -58,23 +58,12 @@ template <int dim>
 class Postprocess : public DataPostprocessor<dim>
 {
 public:
-
-  void compute_derived_quantities_scalar (
-    const std::vector< double > &,
-    const std::vector< Tensor< 1, dim > > &,
-    const std::vector< Tensor< 2, dim > > &,
-    const std::vector< Point< dim > > &,
-    const std::vector< Point< dim > > &,
-    std::vector< Vector< double > > &
-  ) const;
+  void evaluate_scalar_field (const DataPostprocessorInputs::Scalar<dim> &inputs,
+                              std::vector<Vector<double> >               &computed_quantities) const;
 
   std::vector<std::string> get_names () const;
   UpdateFlags              get_needed_update_flags () const;
   unsigned int             n_output_variables () const;
-  // The following function is not required
-  // by the point_value_history class.
-  //std::vector<DataComponentInterpretation::DataComponentInterpretation>
-  //                  get_data_component_interpretation () const;
 };
 
 template <int dim>
@@ -104,25 +93,19 @@ Postprocess<dim>::n_output_variables () const
 
 template <int dim>
 void
-Postprocess<dim>::compute_derived_quantities_scalar (
-  const std::vector< double >                  &solution_values,
-  const std::vector< Tensor< 1, dim > >   &solution_gradients,
-  const std::vector< Tensor< 2, dim > >   &solution_hessians,
-  const std::vector< Point< dim > >                     & /* normals */,
-  const std::vector< Point< dim > >                     & /* locations */,
-  std::vector< Vector< double > >                        &computed_quantities
-) const
+Postprocess<dim>::evaluate_scalar_field (const DataPostprocessorInputs::Scalar<dim> &inputs,
+                                         std::vector<Vector<double> >               &computed_quantities) const
 {
-  Assert(computed_quantities.size() == solution_values.size(),
-         ExcDimensionMismatch (computed_quantities.size(), solution_values.size()));
+  Assert(computed_quantities.size() == inputs.solution_values.size(),
+         ExcDimensionMismatch (computed_quantities.size(), inputs.solution_values.size()));
 
   for (unsigned int i=0; i<computed_quantities.size(); i++)
     {
       Assert(computed_quantities[i].size() == 2,
              ExcDimensionMismatch (computed_quantities[i].size(), 2));
 
-      computed_quantities[i](0) = solution_gradients[i][0]; // norm of x gradient
-      computed_quantities[i](1) = solution_hessians[i][0].norm(); // norm of x hessian
+      computed_quantities[i](0) = inputs.solution_gradients[i][0]; // norm of x gradient
+      computed_quantities[i](1) = inputs.solution_hessians[i][0].norm(); // norm of x hessian
     }
 }
 
