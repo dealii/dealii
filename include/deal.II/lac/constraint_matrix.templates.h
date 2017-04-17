@@ -531,7 +531,7 @@ namespace internal
               continue;
             size_type idx = *it - shift;
             if (idx<vec.size() && locally_owned.is_element(idx))
-              vec(idx) = 0.;
+              internal::ElementAccess<VEC>::set(0., idx, vec);
           }
       }
 
@@ -895,10 +895,11 @@ ConstraintMatrix::distribute (VectorType &vec) const
             new_value = it->inhomogeneity;
             for (unsigned int i=0; i<it->entries.size(); ++i)
               new_value += (static_cast<typename VectorType::value_type>
-                            (ghosted_vector(it->entries[i].first)) *
+                            (internal::ElementAccess<VectorType>::get(
+                               ghosted_vector, it->entries[i].first)) *
                             it->entries[i].second);
             AssertIsFinite(new_value);
-            vec(it->line) = new_value;
+            internal::ElementAccess<VectorType>::set(new_value, it->line, vec);
           }
 
       // now compress to communicate the entries that we added to
@@ -923,10 +924,12 @@ ConstraintMatrix::distribute (VectorType &vec) const
           new_value = next_constraint->inhomogeneity;
           for (unsigned int i=0; i<next_constraint->entries.size(); ++i)
             new_value += (static_cast<typename VectorType::value_type>
-                          (vec(next_constraint->entries[i].first)) *
+                          (internal::ElementAccess<VectorType>::get(
+                             vec, next_constraint->entries[i].first))*
                           next_constraint->entries[i].second);
           AssertIsFinite(new_value);
-          vec(next_constraint->line) = new_value;
+          internal::ElementAccess<VectorType>::set(new_value, next_constraint->line,
+                                                   vec);
         }
     }
 }

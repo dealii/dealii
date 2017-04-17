@@ -23,6 +23,7 @@
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/trilinos_epetra_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_block_vector.h>
 #include <deal.II/grid/tria.h>

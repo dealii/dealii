@@ -24,7 +24,8 @@
 #ifdef DEAL_II_WITH_MPI
 
 #include <deal.II/base/index_set.h>
-#include <deal.II/lac/read_write_vector.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/lac/trilinos_epetra_communication_pattern.h>
 #include <deal.II/lac/vector_space_vector.h>
 #include <memory>
 #include "mpi.h"
@@ -50,7 +51,7 @@ namespace LinearAlgebra
      * @ingroup Vectors
      * @author Bruno Turcksin, 2015
      */
-    class Vector : public VectorSpaceVector<double>
+    class Vector : public VectorSpaceVector<double>, public Subscriptor
     {
     public:
       /**
@@ -84,11 +85,24 @@ namespace LinearAlgebra
                    const bool      omit_zeroing_entries = false);
 
       /**
+       * Change the dimension to that of the vector V. The elements of V are not
+       * copied.
+       */
+      virtual void reinit(const VectorSpaceVector<double> &V,
+                          const bool omit_zeroing_entries = false);
+
+      /**
        * Copy function. This function takes a Vector and copies all the
        * elements. The Vector will have the same parallel distribution as @p
        * V.
        */
       Vector &operator= (const Vector &V);
+
+      /**
+       * Sets all elements of the vector to the scalar @p s. This operation is
+       * only allowed if @p s is equal to zero.
+       */
+      Vector &operator= (const double s);
 
       /**
        * Imports all the elements present in the vector's IndexSet from the input
@@ -211,6 +225,11 @@ namespace LinearAlgebra
       virtual double add_and_dot(const double a,
                                  const VectorSpaceVector<double> &V,
                                  const VectorSpaceVector<double> &W);
+      /**
+       * This function always returns false and is present only for backward
+       * compatibility.
+       */
+      bool has_ghost_elements() const;
 
       /**
        * Return the global size of the vector, equal to the sum of the number of
@@ -308,8 +327,24 @@ namespace LinearAlgebra
        */
       std::shared_ptr<const CommunicationPattern> epetra_comm_pattern;
     };
+
+
+    inline
+    bool Vector::has_ghost_elements() const
+    {
+      return false;
+    }
   }
 }
+
+
+/**
+ * Declare dealii::LinearAlgebra::EpetraWrappers::Vector as distributed vector.
+ */
+template <>
+struct is_serial_vector<LinearAlgebra::EpetraWrappers::Vector> : std::false_type
+{
+};
 
 DEAL_II_NAMESPACE_CLOSE
 

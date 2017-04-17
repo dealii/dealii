@@ -940,6 +940,20 @@ namespace LinearAlgebra
 
 
     template <typename Number>
+    void Vector<Number>::reinit(const VectorSpaceVector<Number> &V,
+                                const bool omit_zeroing_entries)
+    {
+      // Downcast. Throws an exception if invalid.
+      Assert(dynamic_cast<const Vector<Number> *>(&V)!=NULL,
+             ExcVectorTypeNotCompatible());
+      const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
+
+      reinit(down_V, omit_zeroing_entries);
+    }
+
+
+
+    template <typename Number>
     Vector<Number> &
     Vector<Number>::operator += (const VectorSpaceVector<Number> &vv)
     {

@@ -201,8 +201,10 @@ namespace FETools
               const types::global_dof_index gdi = dofs[i];
               if (u2_elements.is_element(gdi))
                 {
-                  u2(dofs[i])+=u2_local(i);
-                  touch_count(dofs[i]) += 1;
+                  ::dealii::internal::ElementAccess<OutVector>::add(u2_local(i),
+                                                                    dofs[i], u2);
+                  ::dealii::internal::ElementAccess<OutVector>::add(1,
+                                                                    dofs[i], touch_count);
                 }
             }
         }
@@ -227,9 +229,16 @@ namespace FETools
     for (types::global_dof_index i=0; i<dof2.n_dofs(); ++i)
       if (locally_owned_dofs.is_element(i))
         {
-          Assert(static_cast<typename OutVector::value_type>(touch_count(i)) != typename OutVector::value_type(0),
+          Assert(static_cast<typename OutVector::value_type>(
+                   ::dealii::internal::ElementAccess<OutVector>::get(
+                     touch_count, i)) != typename OutVector::value_type(0),
                  ExcInternalError());
-          u2(i) /= touch_count(i);
+
+
+          const double val = ::dealii::internal::ElementAccess<OutVector>::get(
+                               u2, i);
+          ::dealii::internal::ElementAccess<OutVector>::set(
+            val/::dealii::internal::ElementAccess<OutVector>::get(touch_count,i), i, u2);
         }
 
     // finish the work on parallel vectors
@@ -639,7 +648,8 @@ namespace FETools
         cell2->get_dof_indices(dofs);
         for (unsigned int i=0; i<n2; ++i)
           {
-            u2(dofs[i])+=u2_local(i);
+            ::dealii::internal::ElementAccess<OutVector>::add(u2_local(i),
+                                                              dofs[i], u2);
           }
 
         ++cell1;

@@ -113,6 +113,57 @@ namespace TrilinosWrappers
 #endif
   }
 
+  namespace internal
+  {
+    template <typename VectorType>
+    double *begin(VectorType &V)
+    {
+      return V.begin();
+    }
+
+    template <>
+    double *begin(LinearAlgebra::EpetraWrappers::Vector &V)
+    {
+      return V.trilinos_vector()[0];
+    }
+
+    template <typename VectorType>
+    const double *begin(const VectorType &V)
+    {
+      return V.begin();
+    }
+
+    template <>
+    const double *begin(const LinearAlgebra::EpetraWrappers::Vector &V)
+    {
+      return V.trilinos_vector()[0];
+    }
+
+    template <typename VectorType>
+    double *end(VectorType &V)
+    {
+      return V.end();
+    }
+
+    template <>
+    double *end(LinearAlgebra::EpetraWrappers::Vector &V)
+    {
+      return V.trilinos_vector()[0]+V.trilinos_vector().MyLength();
+    }
+
+    template <typename VectorType>
+    const double *end(const VectorType &V)
+    {
+      return V.end();
+    }
+
+    template <>
+    const double *end(const LinearAlgebra::EpetraWrappers::Vector &V)
+    {
+      return V.trilinos_vector()[0]+V.trilinos_vector().MyLength();
+    }
+  }
+
 
   namespace SparseMatrixIterators
   {
@@ -1958,15 +2009,15 @@ namespace TrilinosWrappers
     (void)dst;
 
     internal::SparseMatrix::check_vector_map_equality(*matrix, src, dst);
-    const size_type dst_local_size = dst.end() - dst.begin();
+    const size_type dst_local_size = internal::end(dst) - internal::begin(dst);
     AssertDimension (dst_local_size, static_cast<size_type>(matrix->RangeMap().NumMyPoints()));
-    const size_type src_local_size = src.end() - src.begin();
+    const size_type src_local_size = internal::end(src) - internal::begin(src);
     AssertDimension (src_local_size, static_cast<size_type>(matrix->DomainMap().NumMyPoints()));
 
-    Epetra_MultiVector tril_dst (View, matrix->RangeMap(), dst.begin(),
+    Epetra_MultiVector tril_dst (View, matrix->RangeMap(), internal::begin(dst),
                                  dst_local_size, 1);
     Epetra_MultiVector tril_src (View, matrix->DomainMap(),
-                                 const_cast<TrilinosScalar *>(src.begin()),
+                                 const_cast<TrilinosScalar *>(internal::begin(src)),
                                  src_local_size, 1);
 
     const int ierr = matrix->Multiply (false, tril_src, tril_dst);
@@ -1985,15 +2036,15 @@ namespace TrilinosWrappers
     Assert (matrix->Filled(), ExcMatrixNotCompressed());
 
     internal::SparseMatrix::check_vector_map_equality(*matrix, dst, src);
-    const size_type dst_local_size = dst.end() - dst.begin();
+    const size_type dst_local_size = internal::end(dst) - internal::begin(dst);
     AssertDimension (dst_local_size, static_cast<size_type>(matrix->DomainMap().NumMyPoints()));
-    const size_type src_local_size = src.end() - src.begin();
+    const size_type src_local_size = internal::end(src) - internal::begin(src);
     AssertDimension (src_local_size, static_cast<size_type>(matrix->RangeMap().NumMyPoints()));
 
-    Epetra_MultiVector tril_dst (View, matrix->DomainMap(), dst.begin(),
+    Epetra_MultiVector tril_dst (View, matrix->DomainMap(), internal::begin(dst),
                                  dst_local_size, 1);
     Epetra_MultiVector tril_src (View, matrix->RangeMap(),
-                                 const_cast<double *>(src.begin()),
+                                 const_cast<double *>(internal::begin(src)),
                                  src_local_size, 1);
 
     const int ierr = matrix->Multiply (true, tril_src, tril_dst);
@@ -2016,9 +2067,11 @@ namespace TrilinosWrappers
     // deal.II local vector that has this fast setting. It will be accepted in
     // vmult because it only checks the local size.
     dealii::Vector<TrilinosScalar> temp_vector;
-    temp_vector.reinit(dst.end()-dst.begin(), true);
-    dealii::VectorView<TrilinosScalar> src_view(src.end()-src.begin(), src.begin());
-    dealii::VectorView<TrilinosScalar> dst_view(dst.end()-dst.begin(), dst.begin());
+    temp_vector.reinit(internal::end(dst)-internal::begin(dst), true);
+    dealii::VectorView<TrilinosScalar> src_view(internal::end(src)-internal::begin(src),
+                                                internal::begin(src));
+    dealii::VectorView<TrilinosScalar> dst_view(internal::end(dst)-internal::begin(dst),
+                                                internal::begin(dst));
     vmult (temp_vector, static_cast<const dealii::Vector<TrilinosScalar>&>(src_view));
     if (dst_view.size() > 0)
       dst_view += temp_vector;
@@ -2039,9 +2092,11 @@ namespace TrilinosWrappers
     // deal.II local vector that has this fast setting. It will be accepted in
     // vmult because it only checks the local size.
     dealii::Vector<TrilinosScalar> temp_vector;
-    temp_vector.reinit(dst.end()-dst.begin(), true);
-    dealii::VectorView<TrilinosScalar> src_view(src.end()-src.begin(), src.begin());
-    dealii::VectorView<TrilinosScalar> dst_view(dst.end()-dst.begin(), dst.begin());
+    temp_vector.reinit(internal::end(dst)-internal::begin(dst), true);
+    dealii::VectorView<TrilinosScalar> src_view(internal::end(src)-internal::begin(src),
+                                                internal::begin(src));
+    dealii::VectorView<TrilinosScalar> dst_view(internal::end(dst)-internal::begin(dst),
+                                                internal::begin(dst));
     Tvmult (temp_vector, static_cast<const dealii::Vector<TrilinosScalar>&>(src_view));
     if (dst_view.size() > 0)
       dst_view += temp_vector;
@@ -3406,6 +3461,9 @@ namespace TrilinosWrappers
   SparseMatrix::vmult (dealii::LinearAlgebra::distributed::Vector<double> &,
                        const dealii::LinearAlgebra::distributed::Vector<double> &) const;
   template void
+  SparseMatrix::vmult (dealii::LinearAlgebra::EpetraWrappers::Vector &,
+                       const dealii::LinearAlgebra::EpetraWrappers::Vector &) const;
+  template void
   SparseMatrix::Tvmult (VectorBase &,
                         const VectorBase &) const;
   template void
@@ -3420,6 +3478,9 @@ namespace TrilinosWrappers
   template void
   SparseMatrix::Tvmult (dealii::LinearAlgebra::distributed::Vector<double> &,
                         const dealii::LinearAlgebra::distributed::Vector<double> &) const;
+  template void
+  SparseMatrix::Tvmult (dealii::LinearAlgebra::EpetraWrappers::Vector &,
+                        const dealii::LinearAlgebra::EpetraWrappers::Vector &) const;
   template void
   SparseMatrix::vmult_add (VectorBase &,
                            const VectorBase &) const;
@@ -3436,6 +3497,9 @@ namespace TrilinosWrappers
   SparseMatrix::vmult_add (dealii::LinearAlgebra::distributed::Vector<double> &,
                            const dealii::LinearAlgebra::distributed::Vector<double> &) const;
   template void
+  SparseMatrix::vmult_add (dealii::LinearAlgebra::EpetraWrappers::Vector &,
+                           const dealii::LinearAlgebra::EpetraWrappers::Vector &) const;
+  template void
   SparseMatrix::Tvmult_add (VectorBase &,
                             const VectorBase &) const;
   template void
@@ -3450,6 +3514,9 @@ namespace TrilinosWrappers
   template void
   SparseMatrix::Tvmult_add (dealii::LinearAlgebra::distributed::Vector<double> &,
                             const dealii::LinearAlgebra::distributed::Vector<double> &) const;
+  template void
+  SparseMatrix::Tvmult_add (dealii::LinearAlgebra::EpetraWrappers::Vector &,
+                            const dealii::LinearAlgebra::EpetraWrappers::Vector &) const;
 
 }
 

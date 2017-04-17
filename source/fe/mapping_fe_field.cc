@@ -1986,7 +1986,8 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::update_internal_dofs
   dof_cell->get_dof_indices(data.local_dof_indices);
 
   for (unsigned int i=0; i<data.local_dof_values.size(); ++i)
-    data.local_dof_values[i] = (*euler_vector)(data.local_dof_indices[i]);
+    data.local_dof_values[i] = internal::ElementAccess<VectorType>::get(
+                                 *euler_vector, data.local_dof_indices[i]);
 }
 
 // explicit instantiations

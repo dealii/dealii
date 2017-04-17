@@ -535,6 +535,13 @@ namespace LinearAlgebra
       //@{
 
       /**
+       * Change the dimension to that of the vector V. The elements of V are not
+       * copied.
+       */
+      virtual void reinit(const VectorSpaceVector<Number> &V,
+                          const bool omit_zeroing_entries = false);
+
+      /**
        * Multiply the entire vector by a fixed factor.
        */
       virtual Vector<Number> &operator*= (const Number factor);

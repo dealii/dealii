@@ -46,6 +46,7 @@ SERIAL_VECTORS := { Vector<double>;
 
                     @DEAL_II_EXPAND_TRILINOS_VECTOR@;
                     @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
+                    @DEAL_II_EXPAND_EPETRA_VECTOR@;
                     @DEAL_II_EXPAND_PETSC_VECTOR@;
                     @DEAL_II_EXPAND_PETSC_MPI_VECTOR@;
 
@@ -73,6 +74,7 @@ REAL_SERIAL_VECTORS := { Vector<double>;
 
                     @DEAL_II_EXPAND_TRILINOS_VECTOR@;
                     @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
+                    @DEAL_II_EXPAND_EPETRA_VECTOR@;
                     @DEAL_II_EXPAND_PETSC_VECTOR_REAL@;
                     @DEAL_II_EXPAND_PETSC_MPI_VECTOR_REAL@;
 
@@ -94,6 +96,7 @@ REAL_NONBLOCK_VECTORS := { Vector<double>;
 
                     @DEAL_II_EXPAND_TRILINOS_VECTOR@;
                     @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
+                    @DEAL_II_EXPAND_EPETRA_VECTOR@;
                     @DEAL_II_EXPAND_PETSC_VECTOR_REAL@;
                     @DEAL_II_EXPAND_PETSC_MPI_VECTOR_REAL@;
                   }
@@ -108,6 +111,7 @@ EXTERNAL_SEQUENTIAL_VECTORS := { @DEAL_II_EXPAND_TRILINOS_VECTOR@;
 // wrappers for MPI vectors (PETSc/Trilinos) 
 EXTERNAL_PARALLEL_VECTORS := { @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
                                @DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR@;
+                               @DEAL_II_EXPAND_EPETRA_VECTOR@;
                                @DEAL_II_EXPAND_PETSC_MPI_VECTOR@;
                                @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR@
                              }
@@ -126,6 +130,7 @@ VECTORS_WITH_MATRIX := { Vector<double>;
 
                     @DEAL_II_EXPAND_TRILINOS_VECTOR@;
                     @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
+                    @DEAL_II_EXPAND_EPETRA_VECTOR@;
                   }
 
 // DoFHandler and hp::DoFHandler templates

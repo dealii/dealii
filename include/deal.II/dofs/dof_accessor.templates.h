@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/types.h>
 #include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/read_write_vector.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_levels.h>
 #include <deal.II/dofs/dof_faces.h>
@@ -1479,6 +1480,66 @@ namespace internal
         Assert (next == dof_indices.end (), ExcInternalError ());
       }
 
+
+
+      template <typename InputVector, typename ForwardIterator>
+      static
+      void extract_subvector_to(const InputVector &values,
+                                const types::global_dof_index *cache,
+                                const types::global_dof_index *cache_end,
+                                ForwardIterator local_values_begin)
+      {
+        values.extract_subvector_to (cache, cache_end, local_values_begin);
+      }
+
+
+
+#ifdef DEAL_II_WITH_TRILINOS
+      static
+      std::vector<unsigned int> sort_indices(const types::global_dof_index *v_begin,
+                                             const types::global_dof_index *v_end)
+      {
+        // initialize original index locations
+        std::vector<unsigned int> idx(v_end-v_begin);
+        std::iota(idx.begin(), idx.end(), 0);
+
+        // sort indices based on comparing values in v
+        std::sort(idx.begin(), idx.end(),
+                  [&v_begin](unsigned int i1, unsigned int i2)
+        {
+          return *(v_begin+i1) < *(v_begin+i2);
+        });
+
+        return idx;
+      }
+
+
+
+      template <typename ForwardIterator>
+      static
+      void extract_subvector_to(const LinearAlgebra::EpetraWrappers::Vector &values,
+                                const types::global_dof_index *cache_begin,
+                                const types::global_dof_index *cache_end,
+                                ForwardIterator local_values_begin)
+      {
+        std::vector<unsigned int> sorted_indices_pos = sort_indices(cache_begin,
+                                                                    cache_end);
+        const unsigned int cache_size = cache_end-cache_begin;
+        std::vector<types::global_dof_index> cache_indices(cache_size);
+        for (unsigned int i=0; i < cache_size; ++i)
+          cache_indices[i] = *(cache_begin+sorted_indices_pos[i]);
+
+        IndexSet index_set(cache_indices.back() + 1);
+        index_set.add_indices(cache_indices.begin(), cache_indices.end());
+        index_set.compress();
+        LinearAlgebra::ReadWriteVector<double> read_write_vector(index_set);
+        read_write_vector.import(values, VectorOperation::insert);
+
+        // Copy the elements from read_write_vector and reorder them.
+        for (unsigned int i=0; i<cache_size; ++i, ++local_values_begin)
+          *local_values_begin = read_write_vector[sorted_indices_pos[i]];
+      }
+#endif
     };
   }
 }
@@ -3530,10 +3591,8 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::get_dof_values
   const types::global_dof_index *cache
     = this->dof_handler->levels[this->present_level]
       ->get_cell_cache_start (this->present_index, this->get_fe().dofs_per_cell);
-
-  values.extract_subvector_to (cache,
-                               cache + this->get_fe().dofs_per_cell,
-                               local_values_begin);
+  dealii::internal::DoFAccessor::Implementation::extract_subvector_to(
+    values, cache, cache + this->get_fe().dofs_per_cell, local_values_begin);
 }
 
 
@@ -3595,7 +3654,8 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::set_dof_values
       ->get_cell_cache_start (this->present_index, this->get_fe().dofs_per_cell);
 
   for (unsigned int i=0; i<this->get_fe().dofs_per_cell; ++i, ++cache)
-    values(*cache) = local_values(i);
+    internal::ElementAccess<OutputVector>::set(local_values(i),
+                                               *cache, values);
 }
 
 

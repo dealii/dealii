@@ -51,7 +51,6 @@ namespace Algorithms
     notifications.clear();
   }
 
-
 #include "operator.inst"
 }
 

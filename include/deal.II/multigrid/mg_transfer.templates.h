@@ -18,6 +18,7 @@
 #define dealii__mg_transfer_templates_h
 
 #include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_epetra_vector.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector_view.h>
 #include <deal.II/grid/tria_iterator.h>
