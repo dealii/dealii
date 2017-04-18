@@ -16,8 +16,6 @@
 
 #include <deal.II/fe/fe_enriched.h>
 
-#ifdef DEAL_II_WITH_CXX14
-
 #include <deal.II/fe/fe_tools.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -942,5 +940,3 @@ InternalData::get_fe_output_object (const unsigned int base_no) const
 #include "fe_enriched.inst"
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif // CXX14
