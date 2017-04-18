@@ -1478,7 +1478,7 @@ void FESystem<dim,spacedim>::initialize (const std::vector<const FiniteElement<d
           clone_base_elements += Threads::new_task ([ &,i,ind] ()
           {
             base_elements[ind]
-              = std::make_pair (std::shared_ptr<FiniteElement<dim,spacedim>>(fes[i]->clone()),
+              = std::make_pair (std::unique_ptr<FiniteElement<dim,spacedim>>(fes[i]->clone()),
                                 multiplicities[i]);
           });
           ++ind;

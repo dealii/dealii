@@ -24,7 +24,9 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/fe/fe.h>
 #include <vector>
+#include <memory>
 #include <utility>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -968,7 +970,7 @@ private:
    * pointers to the underlying base finite elements. The last one of these
    * copies around will then delete the pointer to the base elements.
    */
-  std::vector<std::pair<std::shared_ptr<const FiniteElement<dim,spacedim> >,
+  std::vector<std::pair<std::unique_ptr<const FiniteElement<dim,spacedim> >,
       unsigned int> >
       base_elements;
 
