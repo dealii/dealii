@@ -235,8 +235,9 @@ namespace FETools
                  ExcInternalError());
 
 
-          const double val = ::dealii::internal::ElementAccess<OutVector>::get(
-                               u2, i);
+          const typename OutVector::value_type val
+            = ::dealii::internal::ElementAccess<OutVector>::get(
+                u2, i);
           ::dealii::internal::ElementAccess<OutVector>::set(
             val/::dealii::internal::ElementAccess<OutVector>::get(touch_count,i), i, u2);
         }

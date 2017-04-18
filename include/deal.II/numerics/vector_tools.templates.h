@@ -358,12 +358,12 @@ namespace VectorTools
       {
         Assert (touch_count[i] != 0,
                 ExcInternalError());
-
-        const double val = ::dealii::internal::ElementAccess<OutVector>::get(
-                             data_2, i);
+        typedef typename OutVector::value_type value_type;
+        const value_type val
+          = ::dealii::internal::ElementAccess<OutVector>::get(data_2, i);
 
         ::dealii::internal::ElementAccess<OutVector>::set(
-          val/touch_count[i], i, data_2);
+          val/static_cast<value_type>(touch_count[i]), i, data_2);
       }
   }
 
