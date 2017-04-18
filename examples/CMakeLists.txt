@@ -93,6 +93,9 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
             )
           ADD_DEPENDENCIES(examples ${_name}.${_build_lowercase})
+          INSTALL(TARGETS ${_name}.${_build_lowercase}
+            DESTINATION ${DEAL_II_EXAMPLES_RELDIR}/${_name}
+            )
         ENDFOREACH()
 
       ELSE()
