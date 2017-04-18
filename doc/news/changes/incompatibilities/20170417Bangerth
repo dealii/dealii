@@ -1,0 +1,6 @@
+Changed: It was previously allowed to copy one FESystem object to
+another via the copy constructor. There are probably few reasons to do
+so, but they complicated the design of data structures. Consequently,
+it is now no longer allowed to copy such objects.
+<br>
+(Wolfgang Bangerth, 2017/04/17)
