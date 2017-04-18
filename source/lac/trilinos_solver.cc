@@ -508,15 +508,19 @@ namespace TrilinosWrappers
       case -1:
         AssertThrow (false, ExcMessage("AztecOO::Iterate error code -1: "
                                        "option not implemented"));
+        break;
       case -2:
         AssertThrow (false, ExcMessage("AztecOO::Iterate error code -2: "
                                        "numerical breakdown"));
+        break;
       case -3:
         AssertThrow (false, ExcMessage("AztecOO::Iterate error code -3: "
                                        "loss of precision"));
+        break;
       case -4:
         AssertThrow (false, ExcMessage("AztecOO::Iterate error code -4: "
                                        "GMRES Hessenberg ill-conditioned"));
+        break;
       default:
         AssertThrow (ierr >= 0, ExcTrilinosError(ierr));
       }

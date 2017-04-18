@@ -1060,11 +1060,12 @@ face_to_cell_index (const unsigned int face_index,
 
       // we now also need to adjust the line index for the case of
       // face orientation, face flips, etc
-      unsigned int adjusted_dof_index_on_line;
+      unsigned int adjusted_dof_index_on_line = 0;
       switch (dim)
         {
         case 1:
           Assert (false, ExcInternalError());
+          break;
 
         case 2:
           // in 2d, only face_flip has a meaning. if it is set, consider
@@ -1090,6 +1091,9 @@ face_to_cell_index (const unsigned int face_index,
                   ExcNotImplemented());
           adjusted_dof_index_on_line = dof_index_on_line;
           break;
+
+        default:
+          Assert (false, ExcInternalError());
         }
 
       return (this->first_line_index

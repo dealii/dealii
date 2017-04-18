@@ -4211,6 +4211,7 @@ namespace GridGenerator
                           break;
                         case 7:
                           cell->face(f)->vertex(v) = center+Point<dim>(outer_radius,-outer_radius);
+                          break;
                         default:
                           break;
                         }

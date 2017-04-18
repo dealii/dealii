@@ -128,6 +128,7 @@ namespace
         {
           while (1)
             {
+              DEAL_II_FALLTHROUGH;
             case step_A:
             {
               if (plainchar == plaintextend)
@@ -140,6 +141,7 @@ namespace
               result = (fragment & 0x0fc) >> 2;
               *codechar++ = base64_encode_value(result);
               result = (fragment & 0x003) << 4;
+              DEAL_II_FALLTHROUGH;
             }
             case step_B:
             {
@@ -153,6 +155,7 @@ namespace
               result |= (fragment & 0x0f0) >> 4;
               *codechar++ = base64_encode_value(result);
               result = (fragment & 0x00f) << 2;
+              DEAL_II_FALLTHROUGH;
             }
             case step_C:
             {
@@ -626,15 +629,16 @@ namespace
     if (patch->points_are_available)
       {
         unsigned int point_no=0;
-        // note: switch without break !
         switch (dim)
           {
           case 3:
             Assert (zstep<n_subdivisions+1, ExcIndexRange(zstep,0,n_subdivisions+1));
             point_no+=(n_subdivisions+1)*(n_subdivisions+1)*zstep;
+            DEAL_II_FALLTHROUGH;
           case 2:
             Assert (ystep<n_subdivisions+1, ExcIndexRange(ystep,0,n_subdivisions+1));
             point_no+=(n_subdivisions+1)*ystep;
+            DEAL_II_FALLTHROUGH;
           case 1:
             Assert (xstep<n_subdivisions+1, ExcIndexRange(xstep,0,n_subdivisions+1));
             point_no+=xstep;
@@ -1887,6 +1891,7 @@ namespace DataOutBase
             rgb_values.red   = 1;
             rgb_values.green = (4*x-xmin-3*xmax)*rezdif;
             rgb_values.blue  = (4.*x-sum13)*rezdif;
+            break;
           default:
             break;
           }

@@ -965,18 +965,18 @@ namespace internal
                   r2 = op(index++);
                   for (size_type j=1; j<8; ++j)
                     r2 += op(index++);
-                // no break
+                  DEAL_II_FALLTHROUGH;
                 case 2:
                   r1 = op(index++);
                   for (size_type j=1; j<8; ++j)
                     r1 += op(index++);
                   r1 += r2;
-                // no break
+                  DEAL_II_FALLTHROUGH;
                 case 1:
                   r2 = op(index++);
                   for (size_type j=1; j<8; ++j)
                     r2 += op(index++);
-                // no break
+                  DEAL_II_FALLTHROUGH;
                 default:
                   for (size_type j=0; j<remainder_inner; ++j)
                     r0 += op(index++);

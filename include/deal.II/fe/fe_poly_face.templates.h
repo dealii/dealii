@@ -124,9 +124,8 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
                 for (unsigned int k=0; k<this->dofs_per_quad; ++k)
                   output_data.shape_values(foffset+k,i) = fe_data.shape_values[k+this->first_face_quad_index][i];
               }
-
-            // fall through...
           }
+          DEAL_II_FALLTHROUGH;
 
           case 2:
           {
@@ -141,9 +140,8 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
                         = fe_data.shape_values[k+(line*this->dofs_per_line)+this->first_face_line_index][i];
                   }
               }
-
-            // fall through...
           }
+          DEAL_II_FALLTHROUGH;
 
           case 1:
           {

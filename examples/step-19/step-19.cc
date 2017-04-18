@@ -456,6 +456,7 @@ namespace Step19
             return;
           }
         AssertThrow (false, ExcNotImplemented());
+        break;
 
       case 2:
         switch (dimensions.second)
@@ -469,6 +470,7 @@ namespace Step19
             return;
           }
         AssertThrow (false, ExcNotImplemented());
+        break;
 
       case 3:
         switch (dimensions.second)

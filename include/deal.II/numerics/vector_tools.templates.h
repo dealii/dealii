@@ -7125,7 +7125,7 @@ namespace VectorTools
           update_flags |= UpdateFlags (update_gradients);
           if (spacedim == dim+1)
             update_flags |= UpdateFlags (update_normal_vectors);
-        // no break!
+          DEAL_II_FALLTHROUGH;
 
         default:
           update_flags |= UpdateFlags (update_values);
