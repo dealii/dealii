@@ -2022,6 +2022,43 @@ ParameterHandler::declare_entry (const std::string           &entry,
 
 
 
+
+void ParameterHandler::add_action(const std::string &entry,
+                                  const std::function<void (const std::string &)> &action)
+{
+  actions.push_back (action);
+
+  // get the current list of actions, if any
+  boost::optional<std::string>
+  current_actions
+    =
+      entries->get_optional<std::string> (get_current_full_path(entry) + path_separator + "actions");
+
+  // if there were actions already associated with this parameter, add
+  // the current one to it; otherwise, create a one-item list and use
+  // that
+  if (current_actions)
+    {
+      const std::string all_actions = current_actions.get() +
+                                      "," +
+                                      Utilities::int_to_string (actions.size()-1);
+      entries->put (get_current_full_path(entry) + path_separator + "actions",
+                    all_actions);
+    }
+  else
+    entries->put (get_current_full_path(entry) + path_separator + "actions",
+                  Utilities::int_to_string(actions.size()-1));
+
+
+  // as documented, run the action on the default value at the very end
+  const std::string default_value = entries->get<std::string>(get_current_full_path(entry) +
+                                                              path_separator +
+                                                              "default_value");
+  action (default_value);
+}
+
+
+
 void
 ParameterHandler::declare_alias(const std::string &existing_entry_name,
                                 const std::string &alias_name,
@@ -2191,9 +2228,12 @@ ParameterHandler::set (const std::string &entry_string,
   if (entries->get_optional<std::string>(path + path_separator + "alias"))
     path = get_current_full_path(entries->get<std::string>(path + path_separator + "alias"));
 
-  // assert that the entry is indeed declared
+  // get the node for the entry. if it doesn't exist, then we end up
+  // in the else-branch below, which asserts that the entry is indeed
+  // declared
   if (entries->get_optional<std::string>(path + path_separator + "value"))
     {
+      // verify that the new value satisfies the provided pattern
       const unsigned int pattern_index
         = entries->get<unsigned int> (path + path_separator + "pattern");
       AssertThrow (patterns[pattern_index]->match(new_value),
@@ -2203,6 +2243,20 @@ ParameterHandler::set (const std::string &entry_string,
                                                  path_separator +
                                                  "pattern_description")));
 
+      // then also execute the actions associated with this
+      // parameter (if any have been provided)
+      const boost::optional<std::string> action_indices_as_string
+        = entries->get_optional<std::string> (path + path_separator + "actions");
+      if (action_indices_as_string)
+        {
+          std::vector<int> action_indices
+            = Utilities::string_to_int (Utilities::split_string_list (action_indices_as_string.get()));
+          for (unsigned int index : action_indices)
+            if (actions.size() >= index+1)
+              actions[index](new_value);
+        }
+
+      // finally write the new value into the database
       entries->put (path + path_separator + "value",
                     new_value);
     }
@@ -2996,7 +3050,9 @@ ParameterHandler::scan_line (std::string         line,
           path = get_current_full_path(entries->get<std::string>(path + path_separator + "alias"));
         }
 
-      // assert that the entry is indeed declared
+      // get the node for the entry. if it doesn't exist, then we end up
+      // in the else-branch below, which asserts that the entry is indeed
+      // declared
       if (entries->get_optional<std::string> (path + path_separator + "value"))
         {
           // if entry was declared:
@@ -3007,6 +3063,7 @@ ParameterHandler::scan_line (std::string         line,
           // entry, then ignore content
           if (entry_value.find ('{') == std::string::npos)
             {
+              // verify that the new value satisfies the provided pattern
               const unsigned int pattern_index
                 = entries->get<unsigned int> (path + path_separator + "pattern");
               AssertThrow (patterns[pattern_index]->match (entry_value),
@@ -3015,8 +3072,22 @@ ParameterHandler::scan_line (std::string         line,
                                                       entry_value,
                                                       entry_name,
                                                       patterns[pattern_index]->description()));
+
+              // then also execute the actions associated with this
+              // parameter (if any have been provided)
+              const boost::optional<std::string> action_indices_as_string
+                = entries->get_optional<std::string> (path + path_separator + "actions");
+              if (action_indices_as_string)
+                {
+                  std::vector<int> action_indices
+                    = Utilities::string_to_int (Utilities::split_string_list (action_indices_as_string.get()));
+                  for (unsigned int index : action_indices)
+                    if (actions.size() >= index+1)
+                      actions[index](entry_value);
+                }
             }
 
+          // finally write the new value into the database
           entries->put (path + path_separator + "value",
                         entry_value);
         }

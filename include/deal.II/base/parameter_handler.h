@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2016 by the deal.II authors
+// Copyright (C) 1998 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1158,6 +1158,110 @@ namespace Patterns
  * know the values of parameters not specified in the input file.
  *
  *
+ *
+ * <h3>Adding Actions to Parameters</h3>
+ *
+ * It is often convenient to have something happen as soon as a parameter
+ * value is read. This could be a check that it is valid -- say, that a
+ * file that is listed in the parameter file exists -- or to initiate
+ * something else in response, such as setting a variable outside the
+ * ParameterHandler (as in the example shown below). In almost all cases,
+ * this "action" could also be initiated once all parameters are read
+ * via parse_input(), but it is sometimes <i>convenient</i> to do it
+ * right away.
+ *
+ * This is facilitated by the add_action() function that can be called
+ * after declaring a parameter via declare_entry(). "Actions" are in essence
+ * pointers to functions that will be called for parameters that have
+ * associated actions. These functions take the value of a parameter as
+ * argument, and can then do whatever they want with it -- e.g., save it
+ * somewhere outside the ParameterHandler object. (Exactly when the
+ * action is called is described in the documentation of the
+ * add_action() function.) Of course, in C++ one doesn't usually pass
+ * around the address of a function, but an action can be a function-like
+ * object (taking a string as argument) that results from calling
+ * @p std::bind, or more conveniently, it can be a
+ * <a href="http://en.cppreference.com/w/cpp/language/lambda">lambda
+ * function</a> that has the form
+ * @code
+ *   [] (const std::string &value) { ... do something with the value ... }
+ * @endcode
+ * and that is attached to a specific parameter.
+ *
+ * A typical example of such an action would be as follows: let's assume
+ * that you have a program that declares a parameter for the number
+ * of iterations it is going to run, say
+ * @code
+ *   class MyAlgorithm
+ *   {
+ *      public:
+ *        void run ();
+ *      private:
+ *        unsigned int n_iterations;
+ *   };
+ * @endcode
+ * then one could obtain this parameter from a parameter file using a
+ * code snippet in @p run() as follows:
+ * @code
+ *   void MyAlgorithm::run ()
+ *   {
+ *     ParameterHandler prm;
+ *     prm.declare_entry ("Number of iterations",  // name of parameter
+ *                        "10",                    // default value
+ *                        Patterns::Integer(1,100),// allowed values: 1...100
+ *                        "The number of ...");    // some documentation, to be completed
+ *
+ *     // next read the parameter from an input file...
+ *     prm.parse_input ("my_algorithm.prm");
+ *
+ *     // ...and finally get the value for use in the program:
+ *     n_iterations = prm.get_integer ("Number of iterations");
+ *
+ *     ... actual code doing something useful follows here...
+ * @endcode
+ *
+ * This two-step process -- first declaring the parameter, and later reading
+ * it -- is a bit cumbersome because one has to first declare <i>all</i>
+ * parameters and at a later time retrieve them from the ParameterHandler
+ * object. In large programs, these two things also often happen in
+ * different functions.
+ *
+ * To avoid this, it would be nice if we could put both the declaration
+ * and the retrieval into the same place. This can be done via actions,
+ * and the function would then look like this:
+ * @code
+ *   void MyAlgorithm::run ()
+ *   {
+ *     ParameterHandler prm;
+ *     prm.declare_entry ("Number of iterations",  // name of parameter
+ *                        "10",                    // default value
+ *                        Patterns::Integer(1,100),// allowed values: 1...100
+ *                        "The number of ...");    // some documentation, to be completed
+ *     prm.add_action ("Number of iterations",
+ *                     [&](const std::string &value) {
+ *                       this->n_iterations = Utilities::string_to_int(value);
+ *                     });
+ *
+ *     // next read the parameter from an input file...
+ *     prm.parse_input ("my_algorithm.prm");
+ *
+ *     ... actual code doing something useful follows here...
+ * @endcode
+ * Here, the action consists of a lambda function that takes the value
+ * for this parameter as a string, and then converts it to an integer
+ * to store in the variable where it belongs. This action is
+ * executed inside the call to <code>prm.parse_input()</code>, and so
+ * there is now no longer a need to extract the parameter's value
+ * at a later time. Furthermore, the code that sets the member variable
+ * is located right next to the place where the parameter is actually
+ * declared, so we no longer need to have two separate parts of the code
+ * base that deal with input parameters.
+ *
+ * Of course, it is possible to execute far more involved actions than
+ * just setting a member variable as shown above, even though that is
+ * a typical case.
+ *
+ *
  * <h3>Style guide for data retrieval</h3>
  *
  * We propose that every class which gets data out of a ParameterHandler
@@ -1472,7 +1576,8 @@ namespace Patterns
  * We can think of the parameters so arranged as a file system in which every
  * parameter is a directory. The name of this directory is the name of the
  * parameter, and in this directory lie files that describe the parameter.
- * These files are:
+ * These files are at the time of writing this documentation (other fields,
+ * such as those indicating "actions" may also exist in each directory):
  *
  * - <code>value</code>: The content of this file is the current value of this
  * parameter; initially, the content of the file equals the default value of
@@ -1553,7 +1658,7 @@ namespace Patterns
  *
  *
  * @ingroup input
- * @author Wolfgang Bangerth, October 1997, revised February 1998, 2010, 2011
+ * @author Wolfgang Bangerth, October 1997, revised February 1998, 2010, 2011, 2017
  * @author Alberto Sartori, 2015
  * @author David Wells, 2016
  */
@@ -1776,6 +1881,43 @@ public:
                       const std::string           &default_value,
                       const Patterns::PatternBase &pattern = Patterns::Anything(),
                       const std::string           &documentation = std::string());
+
+  /**
+   * Attach an action to the parameter with name @p entry in the current
+   * section. The action needs to be a function-like object that takes the
+   * value of the parameter as a (string) argument. See the general documentation
+   * of this class for a longer description of actions, as well as examples.
+   *
+   * The action is executed in three different circumstances:
+   * - With the default value of the parameter with name @p name, at
+   *   the end of the current function. This is useful because it allows
+   *   for the action to execute whatever it needs to do at least once
+   *   for each parameter, even those that are not actually specified in
+   *   the input file (and thus remain at their default values).
+   * - Within the ParameterHandler::set() functions that explicitly
+   *   set a value for a parameter.
+   * - Within the parse_input() function and similar functions such
+   *   as parse_input_from_string(). Here, the action is executed
+   *   whenever the parameter with which it is associated is read
+   *   from the input, after it has been established that the value
+   *   so read matches the pattern that corresponds to this parameter,
+   *   and before the value is actually saved.
+   *
+   * It is valid to add multiple actions to the same parameter. They will
+   * in that case be executed in the same order in which they were added.
+   *
+   * @note Actions may modify all sorts of variables in their scope. The
+   *  only thing an action should not modify is the ParameterHandler object
+   *  it is attached to. In other words, it is not allowed to enter or
+   *  leave sections of the current ParameterHandler object. It is, in
+   *  principle, acceptable to call ParameterHandler::get() and related
+   *  functions on other parameters in the current section, but since
+   *  there is no guarantee about the order in which they will be read
+   *  from an input file, you will not want to rely on the values these
+   *  functions would return.
+   */
+  void add_action (const std::string &entry,
+                   const std::function<void (const std::string &value)> &action);
 
   /**
    * Create an alias for an existing entry. This provides a way to refer to a
@@ -2163,9 +2305,18 @@ private:
 
   /**
    * A list of patterns that are used to describe the parameters of this
-   * object. The are indexed by nodes in the property tree.
+   * object. Every nodes in the property tree corresponding to a parameter
+   * stores an index into this array.
    */
   std::vector<std::shared_ptr<const Patterns::PatternBase> > patterns;
+
+  /**
+   * A list of actions that are associated with parameters. These
+   * are added by the add_action() function. Nodes in the property
+   * tree corresponding to individual parameters
+   * store indices into this array in order to reference specific actions.
+   */
+  std::vector<std::function<void (const std::string &)> > actions;
 
   /**
    * Mangle a string so that it doesn't contain any special characters or
