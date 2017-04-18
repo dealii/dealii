@@ -58,23 +58,12 @@ template <int dim>
 class Postprocess : public DataPostprocessor<dim>
 {
 public:
-
-  void compute_derived_quantities_vector (
-    const std::vector< Vector< double > > &,
-    const std::vector< std::vector< Tensor< 1, dim > > > &,
-    const std::vector< std::vector< Tensor< 2, dim > > > &,
-    const std::vector< Point< dim > > &,
-    const std::vector< Point< dim > > &,
-    std::vector< Vector< double > > &
-  ) const;
+  void evaluate_vector_field (const DataPostprocessorInputs::Vector<dim> &inputs,
+                              std::vector<Vector<double> >               &computed_quantities) const;
 
   std::vector<std::string> get_names () const;
   UpdateFlags              get_needed_update_flags () const;
   unsigned int             n_output_variables () const;
-  // The following function is not required
-  // by the point_value_history class.
-  //std::vector<DataComponentInterpretation::DataComponentInterpretation>
-  //                  get_data_component_interpretation () const;
 };
 
 template <int dim>
@@ -106,28 +95,23 @@ Postprocess<dim>::n_output_variables () const
 
 template <int dim>
 void
-Postprocess<dim>::compute_derived_quantities_vector (
-  const std::vector< Vector< double > >                  &solution_values,
-  const std::vector< std::vector< Tensor< 1, dim > > >   &solution_gradients,
-  const std::vector< std::vector< Tensor< 2, dim > > >   &solution_hessians,
-  const std::vector< Point< dim > >                     & /* normals */,
-  const std::vector< Point< dim > >                     & /* locations */,
-  std::vector< Vector< double > >                        &computed_quantities
-) const
+Postprocess<dim>::evaluate_vector_field (const DataPostprocessorInputs::Vector<dim> &inputs,
+                                         std::vector<Vector<double> >               &computed_quantities) const
 {
-  Assert(computed_quantities.size() == solution_values.size(),
-         ExcDimensionMismatch (computed_quantities.size(), solution_values.size()));
+  Assert(computed_quantities.size() == inputs.solution_values.size(),
+         ExcDimensionMismatch (computed_quantities.size(), inputs.solution_values.size()));
 
   for (unsigned int i=0; i<computed_quantities.size(); i++)
     {
       Assert(computed_quantities[i].size() == 4,
              ExcDimensionMismatch (computed_quantities[i].size(), 3));
-      Assert(solution_values[i].size() == dim + 1, ExcDimensionMismatch (solution_values[i].size(), dim + 1));
+      Assert(inputs.solution_values[i].size() == dim + 1,
+             ExcDimensionMismatch (inputs.solution_values[i].size(), dim + 1));
 
-      computed_quantities[i](0) = solution_gradients[i][0].norm(); // norm of x gradient
-      computed_quantities[i](1) = solution_hessians[i][1].norm(); // norm of y hessian
-      computed_quantities[i](2) = solution_gradients[i][0].norm() + solution_hessians[i][1].norm(); // norm of y hessian
-      computed_quantities[i](3) = solution_values[i].l2_norm();
+      computed_quantities[i](0) = inputs.solution_gradients[i][0].norm(); // norm of x gradient
+      computed_quantities[i](1) = inputs.solution_hessians[i][1].norm(); // norm of y hessian
+      computed_quantities[i](2) = inputs.solution_gradients[i][0].norm() + inputs.solution_hessians[i][1].norm(); // norm of y hessian
+      computed_quantities[i](3) = inputs.solution_values[i].l2_norm();
     }
 }
 
