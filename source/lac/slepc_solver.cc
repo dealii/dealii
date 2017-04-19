@@ -68,6 +68,7 @@ namespace SLEPcWrappers
 #else
         const PetscErrorCode ierr = EPSDestroy (&eps);
 #endif
+        (void)ierr;
         AssertNothrow (ierr == 0, ExcSLEPcError(ierr));
       }
   }
