@@ -301,6 +301,47 @@ namespace Patterns
   }
 
 
+  void Integer::string_to_any(const std::string &s, boost::any &v) const
+  {
+    AssertThrow(match(s),
+                ParameterHandler::ExcValueDoesNotMatchPattern(s,description()));
+    if (v.type() == typeid(int *))
+      *(boost::any_cast<int *>(v)) = Utilities::string_to_int(s);
+    else if (v.type() == typeid(unsigned int *))
+      {
+        AssertThrow(lower_bound >= 0, ExcMessage("Cannot convert to unsigned int "
+                                                 "a possibly negative number"));
+        *(boost::any_cast<unsigned int *>)(v) = Utilities::string_to_int(s);
+      }
+    else
+      {
+        AssertThrow(false, ExcIncompatibleType(v, *this));
+      }
+  }
+
+
+
+  std::string
+  Integer::any_to_string(const boost::any &v) const
+  {
+    std::string s;
+    if (v.type() == typeid(const int *))
+      s = Utilities::int_to_string(*(boost::any_cast<const int *>(v)));
+    else if (v.type() == typeid(const unsigned int *))
+      {
+        s = Utilities::int_to_string(*(boost::any_cast<const unsigned int *>(v)));
+      }
+    else
+      {
+        AssertThrow(false, ExcIncompatibleType(v, *this));
+      }
+    AssertThrow(match(s),
+                ParameterHandler::ExcValueDoesNotMatchPattern(s,description()));
+    return s;
+  }
+
+
+
 
   const double Double::min_double_value = -std::numeric_limits<double>::max();
   const double Double::max_double_value = std::numeric_limits<double>::max();

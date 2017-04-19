@@ -286,6 +286,21 @@ namespace Patterns
      */
     static std::unique_ptr<Integer> create (const std::string &description);
 
+  protected:
+    /**
+     * Convert, if possible, the content of the pointer contained in the
+     * boost::any object to a string matching this pattern.
+     * See documentation of the base class for further details.
+     */
+    virtual std::string any_to_string(const boost::any &v) const;
+
+    /**
+     * Convert, if possible, the content of the string to a value stored in
+     * the pointer contained in the boost::any object. See documentation of
+     * the base class for further details.
+     */
+    virtual void string_to_any(const std::string &s, boost::any &v) const;
+
   private:
     /**
      * Value of the lower bound. A number that satisfies the
@@ -2900,6 +2915,11 @@ namespace Patterns
   template<class T>
   void PatternBase::to_value(const std::string &s, T &t) const
   {
+    AssertThrow(std::is_const<T>::value == false,
+                ExcMessage("You tried to convert from a string to "
+                           "a type that is actually a const type. "
+                           "Make sure you pass a type which is not"
+                           " const."));
     boost::any b(&t);
     return string_to_any(s, b);
   }
