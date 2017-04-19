@@ -142,6 +142,22 @@ namespace Patterns
 
 
 
+  void PatternBase::to_value(const std::string &s, boost::any &v) const
+  {
+    AssertThrow(false, ExcPureFunctionCalled());
+  }
+
+
+
+  std::string
+  PatternBase::to_string(const boost::any &v) const
+  {
+    AssertThrow(false, ExcPureFunctionCalled());
+    return std::string();
+  }
+
+
+
   const int Integer::min_int_value = std::numeric_limits<int>::min();
   const int Integer::max_int_value = std::numeric_limits<int>::max();
 
