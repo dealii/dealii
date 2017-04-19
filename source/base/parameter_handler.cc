@@ -326,11 +326,9 @@ namespace Patterns
   {
     std::string s;
     if (v.type() == typeid(const int *))
-      s = Utilities::int_to_string(*(boost::any_cast<const int *>(v)));
+      s = std::to_string(*(boost::any_cast<const int *>(v)));
     else if (v.type() == typeid(const unsigned int *))
-      {
-        s = Utilities::int_to_string(*(boost::any_cast<const unsigned int *>(v)));
-      }
+      s = std::to_string(*(boost::any_cast<const unsigned int *>(v)));
     else
       {
         AssertThrow(false, ExcIncompatibleType(v, *this));
