@@ -1336,6 +1336,27 @@ namespace Patterns
   }
 
 
+  void Anything::string_to_any(const std::string &s, boost::any &v) const
+  {
+    if (v.type() == typeid(std::string *))
+      *boost::any_cast<std::string *>(v) = s;
+    else
+      Assert(false, ExcIncompatibleType(v, *this));
+  }
+
+
+
+  std::string
+  Anything::any_to_string(const boost::any &v) const
+  {
+    if (v.type() == typeid(const std::string *))
+      return *boost::any_cast<const std::string *>(v);
+    else
+      Assert(false, ExcIncompatibleType(v, *this));
+    return std::string();
+  }
+
+
 
   const char *FileName::description_init = "[FileName";
 
