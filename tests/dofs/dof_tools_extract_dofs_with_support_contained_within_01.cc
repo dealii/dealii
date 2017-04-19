@@ -38,22 +38,11 @@
 
 template<int dim>
 bool
-pred_d(const typename Triangulation<dim>::active_cell_iterator &cell)
+pred_d(const typename DoFHandler<dim>::active_cell_iterator &cell)
 {
   return (cell->center()(0) < 0.49 &&
           cell->center()(1) < 0.49);
 }
-
-template<int dim>
-bool
-pred_r(const typename Triangulation<dim>::active_cell_iterator &cell)
-{
-  return (cell->center()(0) < 0.49 &&
-          cell->center()(0) > 0.25 &&
-          cell->center()(1) < 0.49);
-}
-
-
 
 template <int dim>
 void test (const unsigned int flag)
@@ -71,18 +60,18 @@ void test (const unsigned int flag)
   else
     triangulation.refine_global(1);
 
+  DoFHandler<dim> dh (triangulation);
+
   // Extra refinement to generate hanging nodes
-  for (typename Triangulation<dim>::active_cell_iterator
-       cell = triangulation.begin_active();
-       cell != triangulation.end(); ++cell)
+  for (typename DoFHandler<dim>::active_cell_iterator
+       cell = dh.begin_active();
+       cell != dh.end(); ++cell)
     if ( (flag==1 && pred_d<dim>(cell)) ||
          (flag==2 && !pred_d<dim>(cell))  )
       cell->set_refine_flag ();
 
   triangulation.prepare_coarsening_and_refinement();
   triangulation.execute_coarsening_and_refinement ();
-
-  DoFHandler<dim> dh (triangulation);
 
   FE_Q<dim> fe(2);
   dh.distribute_dofs (fe);

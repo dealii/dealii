@@ -43,7 +43,7 @@
 
 template<int dim>
 bool
-pred_d(const typename parallel::distributed::Triangulation<dim>::active_cell_iterator &cell)
+pred_d(const typename DoFHandler<dim>::active_cell_iterator &cell)
 {
   return (cell->center()(0) < 0.5 &&
           cell->center()(1) < 0.5);
@@ -73,10 +73,12 @@ void test (const unsigned int flag)
   else
     triangulation.refine_global(1);
 
+  DoFHandler<dim> dh (triangulation);
+
   // Extra refinement to generate hanging nodes
-  for (typename parallel::distributed::Triangulation<dim>::active_cell_iterator
-       cell = triangulation.begin_active();
-       cell != triangulation.end(); ++cell)
+  for (typename DoFHandler<dim>::active_cell_iterator
+       cell = dh.begin_active();
+       cell != dh.end(); ++cell)
     if (cell->is_locally_owned() &&
         ((flag==1 &&  pred_d<dim>(cell)) ||
          (flag==2 && !pred_d<dim>(cell)))   )
@@ -87,8 +89,6 @@ void test (const unsigned int flag)
 
   if (flag > 0)
     triangulation.refine_global(1);
-
-  DoFHandler<dim> dh (triangulation);
 
   FE_Q<dim> fe(2);
   dh.distribute_dofs (fe);
