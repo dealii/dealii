@@ -125,6 +125,61 @@ namespace Patterns
      * assumption significantly, you can still overload this function.
      */
     virtual std::size_t memory_consumption () const;
+
+
+    /**
+     * Convert a string to a value, and store its content in the type
+     * pointed to by a boost::any object.
+     *
+     * Derived patterns can use this function to convert a matching string
+     * to a compatible type, stored as boost::any object.
+     *
+     * This class expects the boost::any object to store a pointer to a
+     * value type that is compatible with this pattern. If this is not the case,
+     * an exception ExcIncompatibleType is thrown. An example usage
+     * is here:
+     *
+     * @code
+     * int a;
+     * Patterns::Integer p;
+     *
+     * p.to_value("5", boost::any(&a));
+     * @endcode
+     */
+    virtual void to_value(const std::string &s, boost::any &v) const;
+
+    /**
+     * Convert a compatible value type to a string. The value type should
+     * be store as a pointer in the boost::any object.
+     *
+     * Derived patterns can use this function to convert a compatible type
+     * to a string matching this pattern.
+     *
+     * This class expects the boost::any object to store a pointer to a
+     * value type that is compatible with this pattern.  If this is not the
+     * case, an exception ExcIncompatibleType is thrown. An example usage
+     * is here:
+     *
+     * @code
+     * int a = 5;
+     * Patterns::Integer p;
+     *
+     * std::string s = p.to_string(boost::any(&a)); // s = "5"
+     * @endcode
+     */
+    virtual std::string to_string(const boost::any &v) const;
+
+    /**
+     * An incompatible type was encountered when trying to access
+     * a pointer contained in a boost::any object
+     *
+     * @ingroup Exceptions
+     */
+    DeclException2 (ExcIncompatibleType,
+                    boost::any &, PatternBase &,
+                    << "The object contained in " << arg1.type().name()
+                    << " is not compatible with the pattern "
+                    << arg2.description(Text));
   };
 
   /**
