@@ -148,7 +148,7 @@ namespace Patterns
 
 
 
-  void PatternBase::to_value(const std::string &s, boost::any &v) const
+  void PatternBase::string_to_any(const std::string &s, boost::any &v) const
   {
     AssertThrow(false, ExcPureFunctionCalled());
   }
@@ -156,7 +156,7 @@ namespace Patterns
 
 
   std::string
-  PatternBase::to_string(const boost::any &v) const
+  PatternBase::any_to_string(const boost::any &v) const
   {
     AssertThrow(false, ExcPureFunctionCalled());
     return std::string();
