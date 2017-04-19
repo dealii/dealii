@@ -1290,7 +1290,21 @@ public:
                           const bool use_laplace_transformation=false) const;
 
   /**
-   * Barycenter of the object.
+   * Return the barycenter (also called centroid)
+   * of the object. The barycenter for an object $K$
+   * of dimension $d$ in $D$ space dimensions is given by the $D$-dimensional
+   * vector $\mathbf x_K$ defined by
+   * @f{
+   *   \mathbf x_K = \frac{1}{|K|} \int_K \mathbf x \; \textrm{d}x
+   * @f}
+   * where the measure of the object is given by
+   * @f{
+   *   |K| = \int_K \mathbf 1 \; \textrm{d}x.
+   * @f}
+   * This function assumes that $K$ is mapped by a $d$-linear function from
+   * the reference $d$-dimensional cell. Then the integrals above can be
+   * pulled back to the reference cell and evaluated exactly (if through
+   * lengthy and, compared to the center() function, expensive computations).
    */
   Point<spacedim> barycenter () const;
 

@@ -141,7 +141,7 @@ namespace
     /*
       Get the computation of the barycenter by this little Maple script. We
       use the bilinear mapping of the unit quad to the real quad. However,
-      every transformation mapping the unit faces to strait lines should
+      every transformation mapping the unit faces to straight lines should
       do.
 
       Remember that the area of the quad is given by
