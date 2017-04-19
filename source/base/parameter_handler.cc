@@ -650,6 +650,35 @@ namespace Patterns
   }
 
 
+  void Selection::string_to_any(const std::string &s, boost::any &v) const
+  {
+    AssertThrow(match(s),
+                ParameterHandler::ExcValueDoesNotMatchPattern(s,description()));
+    if (v.type() == typeid(std::string *))
+      *(boost::any_cast<std::string *>(v)) = s;
+    else
+      {
+        AssertThrow(false, ExcIncompatibleType(v, *this));
+      }
+  }
+
+
+  std::string
+  Selection::any_to_string(const boost::any &v) const
+  {
+    std::string s;
+    if (v.type() == typeid(const std::string *))
+      s = *(boost::any_cast<const std::string *>(v));
+    else
+      {
+        AssertThrow(false, ExcIncompatibleType(v, *this));
+      }
+    AssertThrow(match(s),
+                ParameterHandler::ExcValueDoesNotMatchPattern(s,description()));
+    return s;
+  }
+
+
 
   const unsigned int List::max_int_value
     = std::numeric_limits<unsigned int>::max();
