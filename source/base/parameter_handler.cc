@@ -506,6 +506,34 @@ namespace Patterns
   }
 
 
+  void Double::string_to_any(const std::string &s, boost::any &v) const
+  {
+    AssertThrow(match(s),
+                ParameterHandler::ExcValueDoesNotMatchPattern(s,description()));
+    if (v.type() == typeid(double *))
+      *(boost::any_cast<double *>(v)) = std::stod(s);
+    else
+      {
+        AssertThrow(false, ExcIncompatibleType(v, *this));
+      }
+  }
+
+
+  std::string
+  Double::any_to_string(const boost::any &v) const
+  {
+    std::string s;
+    if (v.type() == typeid(const double *))
+      s = std::to_string(*(boost::any_cast<const double *>(v)));
+    else
+      {
+        AssertThrow(false, ExcIncompatibleType(v, *this));
+      }
+    AssertThrow(match(s),
+                ParameterHandler::ExcValueDoesNotMatchPattern(s,description()));
+    return s;
+  }
+
 
   const char *Selection::description_init = "[Selection";
 

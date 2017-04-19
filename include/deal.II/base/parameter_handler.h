@@ -395,6 +395,22 @@ namespace Patterns
      */
     static Double *create (const std::string &description);
 
+  protected:
+    /**
+     * Convert, if possible, the content of the pointer contained in the
+     * boost::any object to a string matching this pattern.
+     * See documentation of the base class for further details.
+     */
+    virtual std::string any_to_string(const boost::any &v) const;
+
+    /**
+     * Convert, if possible, the content of the string to a value stored in
+     * the pointer contained in the boost::any object. See documentation of
+     * the base class for further details.
+     */
+    virtual void string_to_any(const std::string &s, boost::any &v) const;
+
+
   private:
     /**
      * Value of the lower bound. A number that satisfies the
