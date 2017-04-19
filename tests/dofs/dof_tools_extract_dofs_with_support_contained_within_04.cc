@@ -53,7 +53,7 @@ std::string output_name(const unsigned int subdomain)
 
 template<int dim>
 bool
-pred_d(const typename Triangulation<dim>::active_cell_iterator &cell)
+pred_d(const typename DoFHandler<dim>::active_cell_iterator &cell)
 {
   return (cell->center()(0) < 0.49);
 }
