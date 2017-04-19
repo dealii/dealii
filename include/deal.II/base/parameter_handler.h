@@ -134,6 +134,15 @@ namespace Patterns
      * Internally, this function wraps the value in a boost::any object
      * and calls the virtual function any_to_string(). Derived patterns
      * should implement any_to_string for this function to work properly.
+     *
+     * An example usage is here:
+     *
+     * @code
+     * int a = 5;
+     * Patterns::Integer p;
+     *
+     * std::string s = p.to_string(a); // s = "5"
+     * @endcode
      */
     template<class T>
     std::string to_string(const T &value) const;
@@ -148,6 +157,15 @@ namespace Patterns
      * Internally, this function wraps a pointer to @p value in a
      * boost::any object and calls the virtual function string_to_any(). Derived
      * patterns should implement string_to_any for this function to work properly.
+     *
+     * An example usage is here:
+     *
+     * @code
+     * int a;
+     * Patterns::Integer p;
+     *
+     * p.to_value("5", a);
+     * @endcode
      */
     template<class T>
     void to_value(const std::string &s, T &value) const;
@@ -171,19 +189,11 @@ namespace Patterns
      * pointed to by a boost::any object.
      *
      * Derived patterns can use this function to convert a matching string
-     * to a compatible type, stored as boost::any object.
+     * to a compatible type, stored as a boost::any object.
      *
      * This class expects the boost::any object to store a pointer to a
      * value type that is compatible with this pattern. If this is not the case,
-     * an exception ExcIncompatibleType is thrown. An example usage
-     * is here:
-     *
-     * @code
-     * int a;
-     * Patterns::Integer p;
-     *
-     * p.to_value("5", boost::any(&a));
-     * @endcode
+     * an exception ExcIncompatibleType is thrown.
      */
     virtual void string_to_any(const std::string &s, boost::any &v) const;
 
@@ -196,15 +206,7 @@ namespace Patterns
      *
      * This class expects the boost::any object to store a pointer to a
      * value type that is compatible with this pattern.  If this is not the
-     * case, an exception ExcIncompatibleType is thrown. An example usage
-     * is here:
-     *
-     * @code
-     * int a = 5;
-     * Patterns::Integer p;
-     *
-     * std::string s = p.to_string(boost::any(&a)); // s = "5"
-     * @endcode
+     * case, an exception ExcIncompatibleType is thrown.
      */
     virtual std::string any_to_string(const boost::any &v) const;
   };
