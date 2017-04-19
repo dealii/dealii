@@ -704,13 +704,13 @@ namespace GridTools
    * @endcode
    *
    * Predicates that are frequently useful can be found in namespace
-   * IteratorFilters. For example, it is possible to extracting a layer based
-   * on material id
+   * IteratorFilters. For example, it is possible to extract a layer
+   * of cells around all of those cells with a given material id,
    * @code
    * GridTools::compute_active_cell_halo_layer(tria,
    *                                           IteratorFilters::MaterialIdEqualTo(1, true));
    * @endcode
-   * or based on a set of active FE indices for an hp::DoFHandler
+   * or around all cells with one of a set of active FE indices for an hp::DoFHandler
    * @code
    * GridTools::compute_active_cell_halo_layer(hp_dof_handler,
    *                                           IteratorFilters::ActiveFEIndexEqualTo({1,2}, true));
