@@ -593,6 +593,22 @@ namespace Patterns
                     << "The values " << arg1 << " and " << arg2
                     << " do not form a valid range.");
     //@}
+
+  protected:
+    /**
+     * Convert, if possible, the content of the pointer contained in the
+     * boost::any object to a string matching this pattern.
+     * See documentation of the base class for further details.
+     */
+    virtual std::string any_to_string(const boost::any &v) const;
+
+    /**
+     * Convert, if possible, the content of the string to a value stored in
+     * the pointer contained in the boost::any object. See documentation of
+     * the base class for further details.
+     */
+    virtual void string_to_any(const std::string &s, boost::any &v) const;
+
   private:
     /**
      * Copy of the pattern that each element of the list has to satisfy.

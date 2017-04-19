@@ -848,6 +848,102 @@ namespace Patterns
       return nullptr;
   }
 
+// I don't know how to do this more efficiently...
+  namespace
+  {
+
+    template<class T>
+    bool check_and_convert_to_any(const std::vector<std::string> &sv,
+                                  const PatternBase &t_pattern,
+                                  boost::any &v)
+    {
+      if (v.type() == typeid(std::vector<T> *))
+        {
+          std::vector<T> &vector = *boost::any_cast<std::vector<T> *>(v);
+          vector.resize(sv.size());
+          auto it = sv.begin();
+          for (auto &value : vector)
+            {
+              t_pattern.to_value(*(it++), value);
+            }
+          return true;
+        }
+      else
+        return false;
+    }
+
+
+    template<class T>
+    bool check_and_convert_to_string(const boost::any &v,
+                                     const PatternBase &t_pattern,
+                                     std::vector<std::string> &sv)
+    {
+      if (v.type() == typeid(const std::vector<T> *))
+        {
+          const std::vector<T> &vector = *boost::any_cast<const std::vector<T> *>(v);
+          sv.resize(vector.size());
+          auto it = sv.begin();
+          for (auto &value : vector)
+            {
+              *(it++) = t_pattern.to_string(value);
+            }
+          return true;
+        }
+      else
+        return false;
+    }
+
+  }
+
+
+  void List::string_to_any(const std::string &s, boost::any &v) const
+  {
+    AssertThrow(match(s),
+                ParameterHandler::ExcValueDoesNotMatchPattern(s,description()));
+    auto string_list = Utilities::split_string_list(s, this->separator[0]);
+    if      (check_and_convert_to_any<int                       >(string_list,*pattern,v)) {}
+    else if (check_and_convert_to_any<unsigned int              >(string_list,*pattern,v)) {}
+    else if (check_and_convert_to_any<double                    >(string_list,*pattern,v)) {}
+    else if (check_and_convert_to_any<std::string               >(string_list,*pattern,v)) {}
+    else if (check_and_convert_to_any<std::vector<int         > >(string_list,*pattern,v)) {}
+    else if (check_and_convert_to_any<std::vector<unsigned int> >(string_list,*pattern,v)) {}
+    else if (check_and_convert_to_any<std::vector<double      > >(string_list,*pattern,v)) {}
+    else if (check_and_convert_to_any<std::vector<std::string > >(string_list,*pattern,v)) {}
+    else
+      {
+        AssertThrow(false, ExcNotImplemented());
+      }
+  }
+
+
+  std::string
+  List::any_to_string(const boost::any &v) const
+  {
+    std::vector<std::string> string_list;
+    if      (check_and_convert_to_string<int                       >(v, *pattern, string_list)) {}
+    else if (check_and_convert_to_string<unsigned int              >(v, *pattern, string_list)) {}
+    else if (check_and_convert_to_string<double                    >(v, *pattern, string_list)) {}
+    else if (check_and_convert_to_string<std::string               >(v, *pattern, string_list)) {}
+    else if (check_and_convert_to_string<std::vector<int         > >(v, *pattern, string_list)) {}
+    else if (check_and_convert_to_string<std::vector<unsigned int> >(v, *pattern, string_list)) {}
+    else if (check_and_convert_to_string<std::vector<double      > >(v, *pattern, string_list)) {}
+    else if (check_and_convert_to_string<std::vector<std::string > >(v, *pattern, string_list)) {}
+    else
+      {
+        AssertThrow(false, ExcNotImplemented());
+      }
+
+    std::string s;
+    if (string_list.size()>0)
+      s=string_list[0];
+    for (unsigned int i=1; i<string_list.size(); ++i)
+      s += separator + string_list[i];
+
+    AssertThrow(match(s),
+                ParameterHandler::ExcValueDoesNotMatchPattern(s,description()));
+    return s;
+  }
+
 
 
   const unsigned int Map::max_int_value
