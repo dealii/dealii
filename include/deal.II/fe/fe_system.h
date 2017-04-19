@@ -24,7 +24,9 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/fe/fe.h>
 #include <vector>
+#include <memory>
 #include <utility>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -967,7 +969,7 @@ private:
    * discretization and its multiplicity. It is created by the constructor and
    * constant afterwards.
    */
-  std::vector<std::pair<std::shared_ptr<const FiniteElement<dim,spacedim> >,
+  std::vector<std::pair<std::unique_ptr<const FiniteElement<dim,spacedim> >,
       unsigned int> >
       base_elements;
 
