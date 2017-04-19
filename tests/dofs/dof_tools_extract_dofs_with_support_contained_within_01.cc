@@ -79,7 +79,9 @@ void test (const unsigned int flag)
   ConstraintMatrix cm;
   DoFTools::make_hanging_node_constraints(dh,cm);
 
-  IndexSet support = DoFTools::extract_dofs_with_support_contained_within(dh, pred_d<dim>, cm);
+  IndexSet support = DoFTools::extract_dofs_with_support_contained_within(dh,
+                     std::function<bool (const typename DoFHandler<dim>::active_cell_iterator &)>(&pred_d<dim>),
+                     cm);
   support.print(deallog);
 
   // print grid and DoFs for visual inspection

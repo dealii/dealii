@@ -111,7 +111,9 @@ void test ()
   std::vector<types::global_dof_index> local_dof_indices(fe.dofs_per_cell);
 
   // get support on the predicate
-  IndexSet support = DoFTools::extract_dofs_with_support_contained_within(dh, pred_d<dim>, cm);
+  IndexSet support = DoFTools::extract_dofs_with_support_contained_within(dh,
+                     std::function<bool (const typename DoFHandler<dim>::active_cell_iterator &)>(&pred_d<dim>),
+                     cm);
   IndexSet local_support = support & locally_owned_set;
 
   // rhs vectors:
