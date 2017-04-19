@@ -128,6 +128,45 @@ namespace Patterns
 
 
     /**
+     * Convert a compatible value type to a string. If the type is not
+     * compatible, an excepion ExcIncompatibleType is thrown.
+     *
+     * Internally, this function wraps the value in a boost::any object
+     * and calls the virtual function any_to_string(). Derived patterns
+     * should implement any_to_string for this function to work properly.
+     */
+    template<class T>
+    std::string to_string(const T &value) const;
+
+
+    /**
+     * Translate the content of the string matching this pattern, into a
+     * value and store it in @p value.  If the type T is not
+     * compatible with the pattern, an excepion ExcIncompatibleType is
+     * thrown.
+     *
+     * Internally, this function wraps a pointer to @p value in a
+     * boost::any object and calls the virtual function string_to_any(). Derived
+     * patterns should implement string_to_any for this function to work properly.
+     */
+    template<class T>
+    void to_value(const std::string &s, T &value) const;
+
+
+    /**
+     * An incompatible type was encountered when trying to access
+     * a pointer contained in a boost::any object
+     *
+     * @ingroup Exceptions
+     */
+    DeclException2 (ExcIncompatibleType,
+                    boost::any &, PatternBase &,
+                    << "The type " << arg1.type().name()
+                    << " is not compatible with the pattern "
+                    << arg2.description(Text));
+
+  protected:
+    /**
      * Convert a string to a value, and store its content in the type
      * pointed to by a boost::any object.
      *
@@ -146,7 +185,7 @@ namespace Patterns
      * p.to_value("5", boost::any(&a));
      * @endcode
      */
-    virtual void to_value(const std::string &s, boost::any &v) const;
+    virtual void string_to_any(const std::string &s, boost::any &v) const;
 
     /**
      * Convert a compatible value type to a string. The value type should
@@ -167,19 +206,7 @@ namespace Patterns
      * std::string s = p.to_string(boost::any(&a)); // s = "5"
      * @endcode
      */
-    virtual std::string to_string(const boost::any &v) const;
-
-    /**
-     * An incompatible type was encountered when trying to access
-     * a pointer contained in a boost::any object
-     *
-     * @ingroup Exceptions
-     */
-    DeclException2 (ExcIncompatibleType,
-                    boost::any &, PatternBase &,
-                    << "The object contained in " << arg1.type().name()
-                    << " is not compatible with the pattern "
-                    << arg2.description(Text));
+    virtual std::string any_to_string(const boost::any &v) const;
   };
 
   /**
@@ -2897,6 +2924,27 @@ ParameterHandler::load (Archive &ar, const unsigned int)
     patterns.push_back (std::shared_ptr<const Patterns::PatternBase>(Patterns::pattern_factory(descriptions[j])));
 }
 
+// ---------------------- inline and template functions --------------------
+
+namespace Patterns
+{
+
+  template<class T>
+  std::string PatternBase::to_string(const T &t) const
+  {
+    boost::any b(&t);
+    return any_to_string(b);
+  }
+
+
+
+  template<class T>
+  void PatternBase::to_value(const std::string &s, T &t) const
+  {
+    boost::any b(&t);
+    return string_to_any(s, b);
+  }
+}
 
 DEAL_II_NAMESPACE_CLOSE
 
