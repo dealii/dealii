@@ -25,6 +25,7 @@
 #  include <sys/sysctl.h>
 #endif
 
+#include <algorithm>
 
 #ifdef DEAL_II_WITH_THREADS
 #  include <deal.II/base/thread_management.h>

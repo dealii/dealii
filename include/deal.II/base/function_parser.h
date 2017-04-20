@@ -26,10 +26,11 @@
 #include <vector>
 #include <map>
 
-namespace mu
-{
-  class Parser;
-}
+#ifdef DEAL_II_WITH_MUPARSER
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#include <muParser.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -13,6 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
+
+// It's necessary to include winsock2.h before thread_local_storage.h,
+// because Intel implementation of TBB includes winsock.h,
+// and we'll get a conflict between winsock.h and winsock2.h otherwise.
+#ifdef DEAL_II_MSVC
+#  include <winsock2.h>
+#endif
 
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/mpi.h>
@@ -40,10 +48,6 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #ifndef DEAL_II_MSVC
 #  include <stdlib.h>
-#endif
-
-#ifdef DEAL_II_MSVC
-#  include <winsock2.h>
 #endif
 
 
