@@ -45,11 +45,7 @@ DEAL_II_NAMESPACE_OPEN
 #ifdef DEAL_II_WITH_PETSC
 namespace PETScWrappers
 {
-  class Vector;
-  namespace MPI
-  {
-    class Vector;
-  }
+  class VectorBase;
 }
 #endif
 
@@ -208,23 +204,17 @@ public:
 
 #ifdef DEAL_II_WITH_PETSC
   /**
-   * Another copy constructor: copy the values from a sequential PETSc wrapper
-   * vector class. This copy constructor is only available if PETSc was
-   * detected during configuration time.
-   */
-  explicit Vector (const PETScWrappers::Vector &v);
-
-  /**
-   * Another copy constructor: copy the values from a parallel PETSc wrapper
-   * vector class. This copy constructor is only available if PETSc was
-   * detected during configuration time.
+   * Another copy constructor: copy the values from a PETSc vector class. This
+   * copy constructor is only available if PETSc was detected during
+   * configuration time.
    *
    * Note that due to the communication model used in MPI, this operation can
-   * only succeed if all processes do it at the same time. I.e., it is not
-   * possible for only one process to obtain a copy of a parallel vector while
-   * the other jobs do something else.
+   * only succeed if all processes do it at the same time when <code>v</code>
+   * is a distributed vector: It is not possible for only one process to
+   * obtain a copy of a parallel vector while the other jobs do something
+   * else.
    */
-  explicit Vector (const PETScWrappers::MPI::Vector &v);
+  explicit Vector (const PETScWrappers::VectorBase &v);
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -382,25 +372,18 @@ public:
 
 #ifdef DEAL_II_WITH_PETSC
   /**
-   * Another copy operator: copy the values from a sequential PETSc wrapper
-   * vector class. This operator is only available if PETSc was detected
-   * during configuration time.
-   */
-  Vector<Number> &
-  operator= (const PETScWrappers::Vector &v);
-
-  /**
-   * Another copy operator: copy the values from a parallel PETSc wrapper
-   * vector class. This operator is only available if PETSc was detected
-   * during configuration time.
+   * Another copy operator: copy the values from a PETSc wrapper vector
+   * class. This operator is only available if PETSc was detected during
+   * configuration time.
    *
    * Note that due to the communication model used in MPI, this operation can
-   * only succeed if all processes do it at the same time. I.e., it is not
-   * possible for only one process to obtain a copy of a parallel vector while
-   * the other jobs do something else.
+   * only succeed if all processes do it at the same time when <code>v</code>
+   * is a distributed vector: It is not possible for only one process to
+   * obtain a copy of a parallel vector while the other jobs do something
+   * else.
    */
   Vector<Number> &
-  operator= (const PETScWrappers::MPI::Vector &v);
+  operator= (const PETScWrappers::VectorBase &v);
 #endif
 
 

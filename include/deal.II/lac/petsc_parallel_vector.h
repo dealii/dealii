@@ -36,6 +36,9 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace PETScWrappers
 {
+  // forward declaration for copy constructor from sequential vector
+  class Vector;
+
   /**
    * Namespace for PETSc classes that work in parallel over MPI, such as
    * distributed vectors and matrices.

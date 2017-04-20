@@ -25,8 +25,7 @@
 #include <deal.II/lac/vector_operations_internal.h>
 
 #ifdef DEAL_II_WITH_PETSC
-#  include <deal.II/lac/petsc_vector.h>
-#  include <deal.II/lac/petsc_parallel_vector.h>
+#  include <deal.II/lac/petsc_vector_base.h>
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -34,11 +33,12 @@
 #endif
 
 
+#include <algorithm>
 #include <cmath>
 #include <cstring>
-#include <algorithm>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -95,38 +95,56 @@ Vector<Number>::Vector (const Vector<OtherNumber> &v)
 
 
 #ifdef DEAL_II_WITH_PETSC
-
-template <typename Number>
-Vector<Number>::Vector (const PETScWrappers::Vector &v)
-  :
-  Subscriptor(),
-  vec_size(v.size()),
-  max_vec_size(v.size()),
-  val(nullptr)
+namespace internal
 {
-  if (vec_size != 0)
+  template <typename Number>
+  void
+  copy_petsc_vector(const PETScWrappers::VectorBase &v,
+                    ::dealii::Vector<Number> &out)
+  {
+    // Create a sequential PETSc vector and then copy over the entries into
+    // the deal.II vector.
+    //
+    // Wrap the sequential vector with a custom deleter.
+    std::unique_ptr<Vec, std::function<void(Vec *)>> sequential_vector
+                                                  (new Vec(), [](Vec *ptr)
     {
-      allocate();
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
+      const PetscErrorCode ierr = VecDestroy (*ptr);
+#else
+      const PetscErrorCode ierr = VecDestroy (ptr);
+#endif
+      (void)ierr;
+      AssertNothrow (ierr == 0, ExcPETScError(ierr));
+    });
 
-      // get a representation of the vector
-      // and copy it
-      PetscScalar *start_ptr;
-      PetscErrorCode ierr = VecGetArray (static_cast<const Vec &>(v), &start_ptr);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
+    PetscErrorCode ierr = VecCreateSeq (v.get_mpi_communicator(),
+                                        v.size(),
+                                        sequential_vector.get());
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    ierr = VecCopy (v, *sequential_vector);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      internal::VectorOperations::copy (start_ptr, start_ptr+vec_size, begin());
+    PetscScalar *start_ptr;
+    ierr = VecGetArray(*sequential_vector, &start_ptr);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      // restore the representation of the
-      // vector
-      ierr = VecRestoreArray (static_cast<const Vec &>(v), &start_ptr);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
-    }
+    const auto v_size = v.size();
+    if (out.size() != v_size)
+      out.reinit (v_size, true);
+
+    internal::VectorOperations::copy (start_ptr,
+                                      start_ptr + out.size(),
+                                      out.begin());
+    ierr = VecRestoreArray (*sequential_vector, &start_ptr);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+  }
 }
 
 
 
 template <typename Number>
-Vector<Number>::Vector (const PETScWrappers::MPI::Vector &v)
+Vector<Number>::Vector (const PETScWrappers::VectorBase &v)
   :
   Subscriptor(),
   vec_size(0),
@@ -135,14 +153,9 @@ Vector<Number>::Vector (const PETScWrappers::MPI::Vector &v)
 {
   if (v.size() != 0)
     {
-      // do this in a two-stage process:
-      // first convert to a sequential petsc
-      // vector, then copy that
-      PETScWrappers::Vector seq (v);
-      *this = seq;
+      internal::copy_petsc_vector(v, *this);
     }
 }
-
 #endif
 
 
@@ -862,47 +875,13 @@ Vector<Number>::operator= (const BlockVector<Number> &v)
 
 
 #ifdef DEAL_II_WITH_PETSC
-
 template <typename Number>
 Vector<Number> &
-Vector<Number>::operator= (const PETScWrappers::Vector &v)
+Vector<Number>::operator= (const PETScWrappers::VectorBase &v)
 {
-  if (v.size() != vec_size)
-    reinit (v.size(), true);
-  if (vec_size != 0)
-    {
-      // get a representation of the vector
-      // and copy it
-      PetscScalar *start_ptr;
-      PetscErrorCode ierr = VecGetArray (static_cast<const Vec &>(v), &start_ptr);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-      internal::VectorOperations::copy (start_ptr, start_ptr+vec_size, begin());
-
-      // restore the representation of the
-      // vector
-      ierr = VecRestoreArray (static_cast<const Vec &>(v), &start_ptr);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
-    }
-
+  internal::copy_petsc_vector(v, *this);
   return *this;
 }
-
-
-
-template <typename Number>
-Vector<Number> &
-Vector<Number>::operator= (const PETScWrappers::MPI::Vector &v)
-{
-  // do this in a two-stage process:
-  // first convert to a sequential petsc
-  // vector, then copy that
-  PETScWrappers::Vector seq (v);
-  *this = seq;
-
-  return *this;
-}
-
 #endif
 
 
