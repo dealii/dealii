@@ -882,6 +882,20 @@ public:
                               const std::vector<size_type> &local_dof_indices,
                               MatrixType                   &global_matrix) const;
 
+
+  /**
+   * Same as above but distributes only diagonal elements of the assembled matrix.
+   *
+   * This function is useful in matrix-free methods to obtain a vector of
+   * diagonal elements fully consistent with the sparse matrix.
+   */
+  template <typename VectorType>
+  void
+  distribute_local_to_global (VectorType                   &global_diagonal_vector,
+                              const FullMatrix<typename VectorType::value_type> &local_matrix,
+                              const std::vector<size_type> &local_dof_indices) const;
+
+
   /**
    * Does almost the same as the function above but can treat general
    * rectangular matrices.  The main difference to achieve this is that the
