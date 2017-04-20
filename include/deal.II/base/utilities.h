@@ -270,6 +270,26 @@ namespace Utilities
   fixed_power (const T t);
 
   /**
+   * Calculate a fixed power (second, third, and forth order)  of a number.
+   *
+   * This functions have less code compared to
+   * <code>fixed_power@<dim@> (n)</code> and should be a bit faster to
+   * compile (less optimizations needed) and faster to run (in debug
+   * mode).
+   */
+  template <typename T>
+  T
+  pow2 (const T t);
+
+  template <typename T>
+  T
+  pow3 (const T t);
+
+  template <typename T>
+  T
+  pow2 (const T t);
+
+  /**
    * Calculate a fixed power of an integer number by a template expression
    * where both the number <code>a</code> and the power <code>N</code> are
    * compile-time constants. This computes the result of the power operation
@@ -608,6 +628,33 @@ namespace Utilities
           result *= n;
         return result;
       }
+  }
+
+
+
+  template <typename T>
+  inline
+  T pow2 (const T n)
+  {
+    return n*n;
+  }
+
+
+
+  template <typename T>
+  inline
+  T pow3 (const T n)
+  {
+    return n*n*n;
+  }
+
+
+
+  template <typename T>
+  inline
+  T pow4 (const T n)
+  {
+    return n*n*n*n;
   }
 
 
