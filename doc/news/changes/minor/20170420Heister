@@ -1,0 +1,5 @@
+Changed: We no longer support Visual Studio 2013 because it
+lacks important c++11 features like constexpr. It is now possible
+to use MSVC 2017 in addition to MSVC 2015.
+<br>
+(Timo Heister, 2017/04/20)
