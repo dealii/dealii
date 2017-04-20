@@ -265,14 +265,14 @@ public:
   virtual ~Vector ();
 
   /**
-   * This function does nothing but is there for compatibility with the @p
-   * PETScWrappers::Vector class.
+   * This function does nothing but exists for compatibility with the parallel
+   * vector classes.
    *
-   * For the PETSc vector wrapper class, this function compresses the
-   * underlying representation of the PETSc object, i.e. flushes the buffers
-   * of the vector object if it has any. This function is necessary after
-   * writing into a vector element-by-element and before anything else can be
-   * done on it.
+   * For the parallel vector wrapper class, this function compresses the
+   * underlying representation of the vector, i.e. flushes the buffers of the
+   * vector object if it has any. This function is necessary after writing
+   * into a vector element-by-element and before anything else can be done on
+   * it.
    *
    * However, for the implementation of this class, it is immaterial and thus
    * an empty function.
