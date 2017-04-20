@@ -102,7 +102,9 @@ void test (const unsigned int flag)
   DoFTools::make_hanging_node_constraints(dh,cm);
   cm.close ();
 
-  const IndexSet support = DoFTools::extract_dofs_with_support_contained_within(dh, pred_d<dim>, cm);
+  const IndexSet support = DoFTools::extract_dofs_with_support_contained_within(dh,
+                           std::function<bool (const typename DoFHandler<dim>::active_cell_iterator &)>(&pred_d<dim>),
+                           cm);
   const IndexSet support_local = support & dh.locally_owned_dofs();
 
   deallog << support.n_elements() << std::endl;

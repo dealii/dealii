@@ -96,8 +96,12 @@ void test (const bool left = true)
   DoFTools::make_hanging_node_constraints(dh,cm);
 
   IndexSet support = left ?
-                     DoFTools::extract_dofs_with_support_contained_within(dh, pred_left<dim>, cm) :
-                     DoFTools::extract_dofs_with_support_contained_within(dh, pred_right<dim>, cm);
+                     DoFTools::extract_dofs_with_support_contained_within(dh,
+                         std::function<bool (const typename DoFHandler<dim>::active_cell_iterator &)>(&pred_left<dim>),
+                         cm) :
+                     DoFTools::extract_dofs_with_support_contained_within(dh,
+                         std::function<bool (const typename DoFHandler<dim>::active_cell_iterator &)>(&pred_right<dim>),
+                         cm);
   support.print(deallog);
 
   // print grid and DoFs for visual inspection
