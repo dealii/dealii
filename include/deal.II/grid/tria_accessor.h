@@ -1270,19 +1270,25 @@ public:
 
   /**
    * Center of the object. The center of an object is defined to be the
-   * average of the locations of the vertices. If required, the user may ask
-   * this function to return the average of the point according to the
-   * underlying Manifold object, by setting to true the optional parameter @p
-   * respect_manifold.
+   * average of the locations of the vertices, which is also where a $Q_1$
+   * mapping would map the center of the reference cell. However, you can also
+   * ask this function to instead return the average of the vertices as
+   * computed by the underlying Manifold object associated with the current
+   * object, by setting to true the optional parameter @p respect_manifold.
+   * Manifolds would then typically pull back the coordinates of the vertices
+   * to a reference domain (not necessarily the reference cell), compute the
+   * average there, and then push forward the coordinates of the averaged
+   * point to the physical space again; the resulting point is guaranteed to
+   * lie within the manifold, even if the manifold is curved.
    *
    * When the geometry of a TriaAccessor is not flat, or when part of the
    * bounding objects of this TriaAccessor are not flat, the result given by
    * the TriaAccessor::center() function may not be accurate enough, even when
    * parameter @p respect_manifold is set to true. If you find this to be
    * case, than you can further refine the computation of the center by
-   * setting to true the second additional parameter @p
-   * use_laplace_transformation, which will force this function to compute the
-   * location of the center by solving a linear elasticity problem with
+   * setting to true the second additional parameter
+   * @p use_laplace_transformation, which will force this function to compute
+   * the location of the center by solving a linear elasticity problem with
    * Dirichlet boundary conditions set to the location of the bounding
    * vertices and the centers of the bounding lines and quads.
    */
