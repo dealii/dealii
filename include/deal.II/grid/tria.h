@@ -3425,7 +3425,7 @@ private:
    * Array of pointers pointing to the objects storing the cell data on the
    * different levels.
    */
-  std::vector<dealii::internal::Triangulation::TriaLevel<dim>*> levels;
+  std::vector<std::unique_ptr<dealii::internal::Triangulation::TriaLevel<dim> > > levels;
 
   /**
    * Pointer to the faces of the triangulation. In 1d this contains nothing,
