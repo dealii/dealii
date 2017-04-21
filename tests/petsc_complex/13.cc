@@ -15,16 +15,16 @@
 
 
 
-// check PETScWrappers::Vector::operator() in add-mode
+// check PETScWrappers::MPI::Vector::operator() in add-mode
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
 
-void test (PETScWrappers::Vector &v)
+void test (PETScWrappers::MPI::Vector &v)
 {
   // set only certain elements of the vector. have a bit pattern of
   // where we actually wrote elements to
@@ -60,7 +60,7 @@ int main (int argc,char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        PETScWrappers::Vector v (100);
+        PETScWrappers::MPI::Vector v (MPI_COMM_WORLD, 100, 100);
         test (v);
       }
 

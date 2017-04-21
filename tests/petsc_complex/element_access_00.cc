@@ -16,7 +16,7 @@
 
 // deal.II includes
 #include "../tests.h"
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 
 #include <fstream>
 #include <iostream>
@@ -29,7 +29,7 @@
 // on vector
 
 // vector elements
-void test_vector (PETScWrappers::Vector &v)
+void test_vector (PETScWrappers::MPI::Vector &v)
 {
   deallog << "Check vector access" << std::endl;
 
@@ -67,7 +67,7 @@ int main (int argc, char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        PETScWrappers::Vector v (5);
+        PETScWrappers::MPI::Vector v (MPI_COMM_WORLD, 5, 5);
         test_vector (v);
 
         deallog << "vector:" << std::endl;
@@ -105,5 +105,3 @@ int main (int argc, char **argv)
 
   return 0;
 }
-
-

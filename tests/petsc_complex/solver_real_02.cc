@@ -24,7 +24,7 @@
 #include <deal.II/lac/petsc_precondition.h>
 #include <deal.II/lac/petsc_solver.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 
 int main(int argc, char **argv)
 {
@@ -42,8 +42,8 @@ int main(int argc, char **argv)
     PETScWrappers::SparseMatrix  A(dim, dim, 5);
     testproblem.five_point(A);
 
-    PETScWrappers::Vector  f(dim);
-    PETScWrappers::Vector  u(dim);
+    PETScWrappers::MPI::Vector  f(MPI_COMM_WORLD, dim, dim);
+    PETScWrappers::MPI::Vector  u(MPI_COMM_WORLD, dim, dim);
 
     f = 1.;
     u = 0.;

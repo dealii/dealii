@@ -63,7 +63,6 @@
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/petsc_precondition.h>
 #include <deal.II/lac/petsc_solver.h>
-#include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/sparsity_tools.h>

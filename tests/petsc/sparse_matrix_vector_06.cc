@@ -18,14 +18,14 @@
 // check SparseMatrix::matrix_norm_square
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
 
-void test (PETScWrappers::Vector &v)
+void test (PETScWrappers::MPI::Vector &v)
 {
   PETScWrappers::SparseMatrix m(v.size(),v.size(),v.size());
   for (unsigned int i=0; i<m.m(); ++i)
@@ -67,7 +67,9 @@ int main (int argc, char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       {
-        PETScWrappers::Vector v (30);
+        IndexSet indices(30);
+        indices.add_range(0, 30);
+        PETScWrappers::MPI::Vector v (indices, MPI_COMM_WORLD);
         test (v);
       }
 

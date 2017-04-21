@@ -15,16 +15,16 @@
 
 
 
-// check PETScWrappers::Vector::is_non_zero
+// check PETScWrappers::MPI::Vector::is_non_zero
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
 
-void test (PETScWrappers::Vector &v)
+void test (PETScWrappers::MPI::Vector &v)
 {
   // set only certain elements of the
   // vector. they are all positive
@@ -61,8 +61,10 @@ int main (int argc,char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       {
-        PETScWrappers::Vector v (100);
-        test (v);
+        IndexSet indices(100);
+        indices.add_range(0, 100);
+        PETScWrappers::MPI::Vector v(indices, MPI_COMM_WORLD);
+        test(v);
       }
 
     }

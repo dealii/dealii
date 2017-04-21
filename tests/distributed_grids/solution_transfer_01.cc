@@ -31,7 +31,6 @@
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/intergrid_map.h>
 
-#include <deal.II/lac/petsc_vector.h>
 #include <deal.II/fe/fe_q.h>
 
 #include <fstream>

@@ -15,7 +15,7 @@
 
 
 
-// when calling PETScWrappers::Vector::operator() (), the return type is a
+// when calling PETScWrappers::MPI::Vector::operator() (), the return type is a
 // reference object, not a reference to the actual element. this leads to the
 // funny situation that an assignment like v2(i)=v1(i) isn't really what it
 // looks like: it tries to copy the reference objects, not the values they
@@ -24,14 +24,14 @@
 // this was fixed 2004-04-05, and this test checks that it works
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
 
-void test (PETScWrappers::Vector &v,
-           PETScWrappers::Vector &w)
+void test (PETScWrappers::MPI::Vector &v,
+           PETScWrappers::MPI::Vector &w)
 {
   // set the first vector
   for (unsigned int i=0; i<v.size(); ++i)
@@ -59,8 +59,10 @@ int main (int argc, char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       {
-        PETScWrappers::Vector v (100);
-        PETScWrappers::Vector w (100);
+        IndexSet indices(100);
+        indices.add_range(0, 100);
+        PETScWrappers::MPI::Vector v (indices, MPI_COMM_WORLD);
+        PETScWrappers::MPI::Vector w (indices, MPI_COMM_WORLD);
         test (v,w);
       }
 

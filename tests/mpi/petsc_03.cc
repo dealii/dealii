@@ -22,7 +22,6 @@
 
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_parallel_block_vector.h>
-#include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/vector_memory.h>
 #include <deal.II/base/logstream.h>
@@ -50,8 +49,6 @@ void test()
 
   testit<PETScWrappers::MPI::Vector>();
   testit<PETScWrappers::MPI::BlockVector>();
-  testit<PETScWrappers::Vector>();
-  testit<PETScWrappers::BlockVector>();
 
   if (myid==0)
     deallog << "done" << std::endl;

@@ -15,16 +15,16 @@
 
 
 
-// check PETScWrappers::Vector::reinit(!fast)
+// check PETScWrappers::MPI::Vector::reinit(!fast)
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
 
-void test (PETScWrappers::Vector &v)
+void test (PETScWrappers::MPI::Vector &v)
 {
   // set some entries of the vector
   for (unsigned int i=0; i<v.size(); ++i)
@@ -33,7 +33,7 @@ void test (PETScWrappers::Vector &v)
   v.compress (VectorOperation::insert);
 
   // then resize with setting to zero
-  v.reinit (13, false);
+  v.reinit (MPI_COMM_WORLD, 13, 13, false);
 
   AssertThrow (v.size() == 13, ExcInternalError());
   AssertThrow (v.l2_norm() == 0, ExcInternalError());
@@ -53,8 +53,10 @@ int main (int argc,char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       {
-        PETScWrappers::Vector v (100);
-        test (v);
+        IndexSet indices(100);
+        indices.add_range(0, 100);
+        PETScWrappers::MPI::Vector v(indices, MPI_COMM_WORLD);
+        test(v);
       }
 
     }

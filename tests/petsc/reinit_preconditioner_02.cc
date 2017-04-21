@@ -20,7 +20,7 @@
 #include "../tests.h"
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_precondition.h>
 #include <deal.II/base/index_set.h>
 #include <fstream>
@@ -50,9 +50,11 @@ void test ()
   mat.compress(VectorOperation::insert);
 
   {
-    PETScWrappers::Vector src, dst;
-    src.reinit(5);
-    dst.reinit(5);
+    IndexSet indices(5);
+    indices.add_range(0, 5);
+    PETScWrappers::MPI::Vector src, dst;
+    src.reinit(indices, MPI_COMM_WORLD);
+    dst.reinit(indices, MPI_COMM_WORLD);
     src(0) = 1.0;
     src(1) = 2.0;
     src.compress(VectorOperation::insert);

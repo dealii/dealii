@@ -19,7 +19,7 @@
 // restores the previous value of the stream precision
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -35,7 +35,9 @@ int main (int argc, char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       {
-        PETScWrappers::Vector v (5);
+        IndexSet indices(5);
+        indices.add_range(0, 5);
+        PETScWrappers::MPI::Vector v (indices, MPI_COMM_WORLD);
         for (unsigned int i=0; i<v.size(); ++i)
           v(i) = i*1.2345678901234567;
 

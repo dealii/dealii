@@ -18,14 +18,14 @@
 // See comments in tests/petsc/vector_wrap_01.cc
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
 
-void test (PETScWrappers::Vector &v,
-           PETScWrappers::Vector &w)
+void test (PETScWrappers::MPI::Vector &v,
+           PETScWrappers::MPI::Vector &w)
 {
   // set the first vector
   for (unsigned int k=0; k<v.size(); ++k)
@@ -61,8 +61,8 @@ int main (int argc, char **argv)
       int ierr = VecCreateSeq (PETSC_COMM_SELF, 100, &vpetsc);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
       {
-        PETScWrappers::Vector v (vpetsc);
-        PETScWrappers::Vector w (100);
+        PETScWrappers::MPI::Vector v (vpetsc);
+        PETScWrappers::MPI::Vector w (PETSC_COMM_SELF, 100, 100);
         test (v,w);
       }
 

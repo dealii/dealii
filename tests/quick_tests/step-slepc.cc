@@ -33,7 +33,7 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/slepc_solver.h>
 
 #include <fstream>
@@ -58,10 +58,10 @@ private:
   FE_Q<2>          fe;
   DoFHandler<2>    dof_handler;
 
-  PETScWrappers::SparseMatrix        A, B;
-  std::vector<PETScWrappers::Vector> x;
-  std::vector<double>                lambda;
-  ConstraintMatrix                   constraints;
+  PETScWrappers::SparseMatrix             A, B;
+  std::vector<PETScWrappers::MPI::Vector> x;
+  std::vector<double>                     lambda;
+  ConstraintMatrix                        constraints;
 
   TableHandler output_table;
 };
@@ -86,7 +86,7 @@ void LaplaceEigenspectrumProblem::setup_system ()
             dof_handler.max_couplings_between_dofs());
 
   x.resize (1);
-  x[0].reinit (dof_handler.n_dofs ());
+  x[0].reinit (MPI_COMM_WORLD, dof_handler.n_dofs(), dof_handler.n_dofs());
   lambda.resize (1);
   lambda[0] = 0.;
 
@@ -161,7 +161,7 @@ void LaplaceEigenspectrumProblem::solve ()
 
   {
     const double precision = 1e-7;
-    PETScWrappers::Vector Ax(x[0]), Bx(x[0]);
+    PETScWrappers::MPI::Vector Ax(x[0]), Bx(x[0]);
     for (unsigned int i=0; i < x.size(); ++i)
       {
         B.vmult(Bx,x[i]);

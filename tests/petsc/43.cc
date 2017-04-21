@@ -15,18 +15,18 @@
 
 
 
-// check PETScWrappers::Vector::sadd(s,s,V,s,V)
+// check PETScWrappers::MPI::Vector::sadd(s,s,V,s,V)
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
 
-void test (PETScWrappers::Vector &v,
-           PETScWrappers::Vector &w,
-           PETScWrappers::Vector &x)
+void test (PETScWrappers::MPI::Vector &v,
+           PETScWrappers::MPI::Vector &w,
+           PETScWrappers::MPI::Vector &x)
 {
   for (unsigned int i=0; i<v.size(); ++i)
     {
@@ -64,10 +64,12 @@ int main (int argc,char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       {
-        PETScWrappers::Vector v (100);
-        PETScWrappers::Vector w (100);
-        PETScWrappers::Vector x (100);
-        test (v,w,x);
+        IndexSet indices(100);
+        indices.add_range(0, 100);
+        PETScWrappers::MPI::Vector v(indices, MPI_COMM_WORLD);
+        PETScWrappers::MPI::Vector w(indices, MPI_COMM_WORLD);
+        PETScWrappers::MPI::Vector x(indices, MPI_COMM_WORLD);
+        test(v, w, x);
       }
 
     }

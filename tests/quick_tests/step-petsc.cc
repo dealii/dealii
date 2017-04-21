@@ -33,7 +33,7 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_solver.h>
 #include <deal.II/lac/petsc_precondition.h>
 
@@ -60,7 +60,7 @@ private:
   DoFHandler<2>    dof_handler;
 
   PETScWrappers::SparseMatrix A;
-  PETScWrappers::Vector       b, x;
+  PETScWrappers::MPI::Vector  b, x;
   ConstraintMatrix            constraints;
 
   TableHandler output_table;
@@ -82,8 +82,8 @@ void LaplaceProblem::setup_system ()
 
   A.reinit (dof_handler.n_dofs(), dof_handler.n_dofs(),
             dof_handler.max_couplings_between_dofs());
-  b.reinit (dof_handler.n_dofs());
-  x.reinit (dof_handler.n_dofs());
+  b.reinit (MPI_COMM_WORLD, dof_handler.n_dofs(), dof_handler.n_dofs());
+  x.reinit (MPI_COMM_WORLD, dof_handler.n_dofs(), dof_handler.n_dofs());
 
   // some output
   output_table.add_value ("cells", triangulation.n_active_cells());
@@ -155,7 +155,7 @@ void LaplaceProblem::solve ()
   PETScWrappers::PreconditionBlockJacobi preconditioner (A);
   cg_solver.solve (A, x, b, preconditioner);
 
-  PETScWrappers::Vector res(x);
+  PETScWrappers::MPI::Vector res(x);
   A.residual(res,x,b);
   AssertThrow(res.l2_norm()<1e-3,
               ExcInternalError());
