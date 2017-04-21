@@ -93,7 +93,7 @@ namespace Utilities
                        const std::size_t  size)
       {
 #ifdef DEAL_II_WITH_MPI
-        if (job_supports_mpi())
+        if (job_supports_mpi() && n_mpi_processes(mpi_communicator) > 1)
           {
             const int ierr = MPI_Allreduce
                              (values != output
@@ -131,7 +131,7 @@ namespace Utilities
                        const std::size_t               size)
       {
 #ifdef DEAL_II_WITH_MPI
-        if (job_supports_mpi())
+        if (job_supports_mpi() && n_mpi_processes(mpi_communicator) > 1)
           {
             T dummy_selector;
             const int ierr = MPI_Allreduce
