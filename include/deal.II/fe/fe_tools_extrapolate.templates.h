@@ -1454,6 +1454,7 @@ namespace FETools
 
 
 
+#ifdef DEAL_II_WITH_MPI
       template <int dim, int spacedim>
       void reinit_distributed(const DoFHandler<dim, spacedim> &dh,
                               LinearAlgebra::EpetraWrappers::Vector &vector)
@@ -1465,6 +1466,7 @@ namespace FETools
         const IndexSet locally_owned_dofs = dh.locally_owned_dofs();
         vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
       }
+#endif
 #endif //DEAL_II_WITH_TRILINOS
 
       template <int dim, int spacedim, typename Number>

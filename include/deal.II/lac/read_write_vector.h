@@ -295,6 +295,7 @@ namespace LinearAlgebra
                 std::shared_ptr<const CommunicationPatternBase> communication_pattern =
                   std::shared_ptr<const CommunicationPatternBase> ());
 
+#ifdef DEAL_II_WITH_MPI
     /**
      * Imports all the elements present in the vector's IndexSet from the input
      * vector @p epetra_vec. VectorOperation::values @p operation is used to
@@ -307,6 +308,7 @@ namespace LinearAlgebra
                 VectorOperation::values operation,
                 std::shared_ptr<const CommunicationPatternBase> communication_pattern =
                   std::shared_ptr<const CommunicationPatternBase> ());
+#endif
 #endif
 
 #ifdef DEAL_II_WITH_CUDA

@@ -19,9 +19,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_TRILINOS
-
-#ifdef DEAL_II_WITH_MPI
+#if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
 
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/subscriptor.h>
@@ -347,8 +345,6 @@ struct is_serial_vector<LinearAlgebra::EpetraWrappers::Vector> : std::false_type
 };
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif
 
 #endif
 

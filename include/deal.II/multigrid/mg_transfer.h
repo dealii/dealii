@@ -89,6 +89,7 @@ namespace internal
 
   };
 
+#ifdef DEAL_II_WITH_MPI
   template <>
   struct MatrixSelector<dealii::LinearAlgebra::EpetraWrappers::Vector>
   {
@@ -102,8 +103,8 @@ namespace internal
                     dh.locally_owned_mg_dofs(level),
                     sp, MPI_COMM_WORLD, true);
     }
-
   };
+#endif
 
   template <>
   struct MatrixSelector<dealii::TrilinosWrappers::Vector>

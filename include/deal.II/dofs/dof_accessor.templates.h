@@ -1494,7 +1494,7 @@ namespace internal
 
 
 
-#ifdef DEAL_II_WITH_TRILINOS
+#if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
       static
       std::vector<unsigned int> sort_indices(const types::global_dof_index *v_begin,
                                              const types::global_dof_index *v_end)
