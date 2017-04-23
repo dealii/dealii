@@ -849,10 +849,13 @@ namespace Patterns
       return nullptr;
   }
 
-// I don't know how to do this more efficiently...
   namespace
   {
+    // Helper functions for the List pattern.
 
+
+    // See if v contains an std::vector<T> type, and convert a
+    // vector of strings to it if true.
     template<class T>
     bool vector_to_any(const std::vector<std::string> &sv,
                        const PatternBase &t_pattern,
@@ -873,7 +876,8 @@ namespace Patterns
         return false;
     }
 
-
+    // See if v contains an std::vector<T> type, and convert it
+    // to a vector of strings if true.
     template<class T>
     bool vector_to_string(const boost::any &v,
                           const PatternBase &t_pattern,
@@ -894,6 +898,8 @@ namespace Patterns
         return false;
     }
 
+    // See if v contains a Point, and convert a vector of strings
+    // to it if true.
     template <int dim>
     bool point_to_any(const std::vector<std::string> &sv,
                       const PatternBase &t_pattern,
@@ -913,7 +919,8 @@ namespace Patterns
         return false;
     }
 
-
+    // See if v contains a Point, and convert it to a vector
+    // of strings if true.
     template <int dim>
     bool point_to_string(const boost::any &v,
                          const PatternBase &t_pattern,
@@ -933,6 +940,39 @@ namespace Patterns
         return false;
     }
 
+    // See if v contains a complex, and convert the sv to it
+    bool complex_to_any(const std::vector<std::string> &sv,
+                        const PatternBase &t_pattern,
+                        boost::any &v)
+    {
+      if (v.type() == typeid(std::complex<double> *))
+        {
+          std::complex<double> &c = *boost::any_cast<std::complex<double> *>(v);
+          AssertDimension(sv.size(), 2);
+          c = {std::stod(sv[0]),std::stod(sv[1])};
+          return true;
+        }
+      else
+        return false;
+
+    }
+
+    // See if v contains a complex, and convert it to sv
+    bool complex_to_string(const boost::any &v,
+                           const PatternBase &t_pattern,
+                           std::vector<std::string> &sv)
+    {
+      if (v.type() == typeid(const std::complex<double> *))
+        {
+          const std::complex<double> &c = *boost::any_cast<const std::complex<double> *>(v);
+          sv.resize(2);
+          sv[0] = std::to_string(c.real());
+          sv[1] = std::to_string(c.imag());
+          return true;
+        }
+      else
+        return false;
+    }
   }
 
 
@@ -948,9 +988,11 @@ namespace Patterns
     else if (point_to_any<1>                          (string_list,*pattern,v)) {}
     else if (point_to_any<2>                          (string_list,*pattern,v)) {}
     else if (point_to_any<3>                          (string_list,*pattern,v)) {}
+    else if (complex_to_any                           (string_list,*pattern,v)) {}
     else if (vector_to_any<Point<1>                  >(string_list,*pattern,v)) {}
     else if (vector_to_any<Point<2>                  >(string_list,*pattern,v)) {}
     else if (vector_to_any<Point<3>                  >(string_list,*pattern,v)) {}
+    else if (vector_to_any<std::complex<double>      >(string_list,*pattern,v)) {}
     else if (vector_to_any<std::vector<int         > >(string_list,*pattern,v)) {}
     else if (vector_to_any<std::vector<unsigned int> >(string_list,*pattern,v)) {}
     else if (vector_to_any<std::vector<double      > >(string_list,*pattern,v)) {}
@@ -973,9 +1015,11 @@ namespace Patterns
     else if (point_to_string<1>                          (v, *pattern, string_list)) {}
     else if (point_to_string<2>                          (v, *pattern, string_list)) {}
     else if (point_to_string<3>                          (v, *pattern, string_list)) {}
+    else if (complex_to_string                           (v, *pattern, string_list)) {}
     else if (vector_to_string<Point<1>                  >(v, *pattern, string_list)) {}
     else if (vector_to_string<Point<2>                  >(v, *pattern, string_list)) {}
     else if (vector_to_string<Point<3>                  >(v, *pattern, string_list)) {}
+    else if (vector_to_string<std::complex<double>      >(v, *pattern, string_list)) {}
     else if (vector_to_string<std::vector<int         > >(v, *pattern, string_list)) {}
     else if (vector_to_string<std::vector<unsigned int> >(v, *pattern, string_list)) {}
     else if (vector_to_string<std::vector<double      > >(v, *pattern, string_list)) {}
