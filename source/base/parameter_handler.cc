@@ -19,6 +19,7 @@
 #include <deal.II/base/path_search.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/utilities.h>
+#include <deal.II/base/point.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/property_tree/ptree.hpp>
@@ -853,9 +854,9 @@ namespace Patterns
   {
 
     template<class T>
-    bool check_and_convert_to_any(const std::vector<std::string> &sv,
-                                  const PatternBase &t_pattern,
-                                  boost::any &v)
+    bool vector_to_any(const std::vector<std::string> &sv,
+                       const PatternBase &t_pattern,
+                       boost::any &v)
     {
       if (v.type() == typeid(std::vector<T> *))
         {
@@ -874,9 +875,9 @@ namespace Patterns
 
 
     template<class T>
-    bool check_and_convert_to_string(const boost::any &v,
-                                     const PatternBase &t_pattern,
-                                     std::vector<std::string> &sv)
+    bool vector_to_string(const boost::any &v,
+                          const PatternBase &t_pattern,
+                          std::vector<std::string> &sv)
     {
       if (v.type() == typeid(const std::vector<T> *))
         {
@@ -893,6 +894,45 @@ namespace Patterns
         return false;
     }
 
+    template <int dim>
+    bool point_to_any(const std::vector<std::string> &sv,
+                      const PatternBase &t_pattern,
+                      boost::any &v)
+    {
+      if (v.type() == typeid(Point<dim> *))
+        {
+          Point<dim> &p = *boost::any_cast<Point<dim> *>(v);
+          AssertDimension(sv.size(), dim);
+          for (unsigned int d=0; d<dim; ++d)
+            {
+              p[d] = std::stod(sv[d]);
+            }
+          return true;
+        }
+      else
+        return false;
+    }
+
+
+    template <int dim>
+    bool point_to_string(const boost::any &v,
+                         const PatternBase &t_pattern,
+                         std::vector<std::string> &sv)
+    {
+      if (v.type() == typeid(const Point<dim> *))
+        {
+          const Point<dim> &p = *boost::any_cast<const Point<dim> *>(v);
+          sv.resize(dim);
+          for (unsigned int d=0; d<dim; ++d)
+            {
+              sv[d] = std::to_string(p[d]);
+            }
+          return true;
+        }
+      else
+        return false;
+    }
+
   }
 
 
@@ -901,14 +941,20 @@ namespace Patterns
     AssertThrow(match(s),
                 ParameterHandler::ExcValueDoesNotMatchPattern(s,description()));
     auto string_list = Utilities::split_string_list(s, this->separator[0]);
-    if      (check_and_convert_to_any<int                       >(string_list,*pattern,v)) {}
-    else if (check_and_convert_to_any<unsigned int              >(string_list,*pattern,v)) {}
-    else if (check_and_convert_to_any<double                    >(string_list,*pattern,v)) {}
-    else if (check_and_convert_to_any<std::string               >(string_list,*pattern,v)) {}
-    else if (check_and_convert_to_any<std::vector<int         > >(string_list,*pattern,v)) {}
-    else if (check_and_convert_to_any<std::vector<unsigned int> >(string_list,*pattern,v)) {}
-    else if (check_and_convert_to_any<std::vector<double      > >(string_list,*pattern,v)) {}
-    else if (check_and_convert_to_any<std::vector<std::string > >(string_list,*pattern,v)) {}
+    if      (vector_to_any<int                       >(string_list,*pattern,v)) {}
+    else if (vector_to_any<unsigned int              >(string_list,*pattern,v)) {}
+    else if (vector_to_any<double                    >(string_list,*pattern,v)) {}
+    else if (vector_to_any<std::string               >(string_list,*pattern,v)) {}
+    else if (point_to_any<1>                          (string_list,*pattern,v)) {}
+    else if (point_to_any<2>                          (string_list,*pattern,v)) {}
+    else if (point_to_any<3>                          (string_list,*pattern,v)) {}
+    else if (vector_to_any<Point<1>                  >(string_list,*pattern,v)) {}
+    else if (vector_to_any<Point<2>                  >(string_list,*pattern,v)) {}
+    else if (vector_to_any<Point<3>                  >(string_list,*pattern,v)) {}
+    else if (vector_to_any<std::vector<int         > >(string_list,*pattern,v)) {}
+    else if (vector_to_any<std::vector<unsigned int> >(string_list,*pattern,v)) {}
+    else if (vector_to_any<std::vector<double      > >(string_list,*pattern,v)) {}
+    else if (vector_to_any<std::vector<std::string > >(string_list,*pattern,v)) {}
     else
       {
         AssertThrow(false, ExcNotImplemented());
@@ -920,14 +966,20 @@ namespace Patterns
   List::any_to_string(const boost::any &v) const
   {
     std::vector<std::string> string_list;
-    if      (check_and_convert_to_string<int                       >(v, *pattern, string_list)) {}
-    else if (check_and_convert_to_string<unsigned int              >(v, *pattern, string_list)) {}
-    else if (check_and_convert_to_string<double                    >(v, *pattern, string_list)) {}
-    else if (check_and_convert_to_string<std::string               >(v, *pattern, string_list)) {}
-    else if (check_and_convert_to_string<std::vector<int         > >(v, *pattern, string_list)) {}
-    else if (check_and_convert_to_string<std::vector<unsigned int> >(v, *pattern, string_list)) {}
-    else if (check_and_convert_to_string<std::vector<double      > >(v, *pattern, string_list)) {}
-    else if (check_and_convert_to_string<std::vector<std::string > >(v, *pattern, string_list)) {}
+    if      (vector_to_string<int                       >(v, *pattern, string_list)) {}
+    else if (vector_to_string<unsigned int              >(v, *pattern, string_list)) {}
+    else if (vector_to_string<double                    >(v, *pattern, string_list)) {}
+    else if (vector_to_string<std::string               >(v, *pattern, string_list)) {}
+    else if (point_to_string<1>                          (v, *pattern, string_list)) {}
+    else if (point_to_string<2>                          (v, *pattern, string_list)) {}
+    else if (point_to_string<3>                          (v, *pattern, string_list)) {}
+    else if (vector_to_string<Point<1>                  >(v, *pattern, string_list)) {}
+    else if (vector_to_string<Point<2>                  >(v, *pattern, string_list)) {}
+    else if (vector_to_string<Point<3>                  >(v, *pattern, string_list)) {}
+    else if (vector_to_string<std::vector<int         > >(v, *pattern, string_list)) {}
+    else if (vector_to_string<std::vector<unsigned int> >(v, *pattern, string_list)) {}
+    else if (vector_to_string<std::vector<double      > >(v, *pattern, string_list)) {}
+    else if (vector_to_string<std::vector<std::string > >(v, *pattern, string_list)) {}
     else
       {
         AssertThrow(false, ExcNotImplemented());
