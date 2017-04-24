@@ -20,11 +20,20 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
-#include <boost/serialization/array.hpp>
+
+// boost::serialization::make_array used to be in array.hpp, but was
+// moved to a different file in BOOST 1.64
+#include <boost/version.hpp>
+#if BOOST_VERSION >= 106400
+#  include <boost/serialization/array_wrapper.hpp>
+#else
+#  include <boost/serialization/array.hpp>
+#endif
 #include <boost/serialization/split_member.hpp>
 
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 DEAL_II_NAMESPACE_OPEN
 
