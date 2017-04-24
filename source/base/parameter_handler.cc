@@ -1613,31 +1613,6 @@ ParameterHandler::get_current_full_path (const std::string &name) const
 
 
 
-bool ParameterHandler::read_input (std::istream &input,
-                                   const std::string &filename,
-                                   const std::string &last_line)
-{
-  try
-    {
-      parse_input(input, filename, last_line);
-      return true;
-    }
-  catch (const ExcIO &)
-    {
-      throw;
-    }
-  // This catch block more or less duplicates the old behavior of this function,
-  // which was to print something to stderr for every parsing error (which are
-  // now exceptions) and then return false.
-  catch (const ExceptionBase &exc)
-    {
-      std::cerr << exc.what() << std::endl;
-    }
-  return false;
-}
-
-
-
 void ParameterHandler::parse_input (std::istream &input,
                                     const std::string &filename,
                                     const std::string &last_line)
@@ -1741,39 +1716,6 @@ void ParameterHandler::parse_input (std::istream &input,
 
 
 
-bool ParameterHandler::read_input (const std::string &filename,
-                                   const bool optional,
-                                   const bool write_compact,
-                                   const std::string &last_line)
-{
-  PathSearch search("PARAMETERS");
-
-  try
-    {
-      std::string openname = search.find(filename);
-      std::ifstream file_stream (openname.c_str());
-      AssertThrow(file_stream, ExcIO());
-
-      return read_input (file_stream, filename, last_line);
-    }
-  catch (const PathSearch::ExcFileNotFound &)
-    {
-      std::cerr << "ParameterHandler::read_input: could not open file <"
-                << filename << "> for reading." << std::endl;
-      if (!optional)
-        {
-          std::cerr << "Trying to make file <"
-                    << filename << "> with default values for you." << std::endl;
-          std::ofstream output (filename.c_str());
-          if (output)
-            print_parameters (output, (write_compact ? ShortText : Text));
-        }
-    }
-  return false;
-}
-
-
-
 void ParameterHandler::parse_input (const std::string &filename,
                                     const std::string &last_line)
 {
@@ -1782,31 +1724,6 @@ void ParameterHandler::parse_input (const std::string &filename,
   std::string openname = search.find(filename);
   std::ifstream file_stream (openname.c_str());
   parse_input (file_stream, filename, last_line);
-}
-
-
-
-bool
-ParameterHandler::read_input_from_string (const char *s,
-                                          const std::string &last_line)
-{
-  try
-    {
-      parse_input_from_string (s, last_line);
-      return true;
-    }
-  catch (const ExcIO &)
-    {
-      throw;
-    }
-  // This catch block more or less duplicates the old behavior of this function,
-  // which was to print something to stderr for every parsing error (which are
-  // now exceptions) and then return false.
-  catch (const ExceptionBase &exc)
-    {
-      std::cerr << exc.what() << std::endl;
-    }
-  return false;
 }
 
 
@@ -1901,26 +1818,6 @@ namespace
           }
       }
   }
-}
-
-
-
-bool ParameterHandler::read_input_from_xml(std::istream &in)
-{
-  try
-    {
-      parse_input_from_xml (in);
-      return true;
-    }
-  catch (const ExcIO &)
-    {
-      throw;
-    }
-  catch (const ExceptionBase &exc)
-    {
-      std::cerr << exc.what() << std::endl;
-    }
-  return false;
 }
 
 
@@ -3190,33 +3087,6 @@ MultipleParameterLoop::MultipleParameterLoop()
 
 MultipleParameterLoop::~MultipleParameterLoop ()
 {}
-
-
-
-bool
-MultipleParameterLoop::read_input (std::istream &input,
-                                   const std::string &filename,
-                                   const std::string &last_line)
-{
-
-  try
-    {
-      MultipleParameterLoop::parse_input(input, filename, last_line);
-      return true;
-    }
-  catch (const ExcIO &)
-    {
-      throw;
-    }
-  // This catch block more or less duplicates the old behavior of this function,
-  // which was to print something to stderr for every parsing error (which are
-  // now exceptions) and then return false.
-  catch (const ExceptionBase &exc)
-    {
-      std::cerr << exc.what() << std::endl;
-    }
-  return false;
-}
 
 
 

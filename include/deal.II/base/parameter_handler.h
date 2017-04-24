@@ -1735,24 +1735,6 @@ public:
   virtual ~ParameterHandler ();
 
   /**
-   * Read input from a stream until the stream returns the <tt>eof</tt>
-   * condition or error. The second argument can be used to denote the name of
-   * the file (if that's what the input stream represents) we are reading
-   * from; this is only used when creating output for error messages.
-   *
-   * If non-empty @p last_line is provided, the ParameterHandler object
-   * will stop parsing lines after encountering @p last_line .
-   * This is handy when adding extra data that shall be parsed manually.
-   *
-   * @deprecated This function has been deprecated in favor of the replacement
-   * ParameterHandler::parse_input, which raises exceptions to indicate errors
-   * instead of returning an error code.
-   */
-  virtual bool read_input (std::istream &input,
-                           const std::string &filename = "input file",
-                           const std::string &last_line = "") DEAL_II_DEPRECATED;
-
-  /**
    * Parse each line from a stream until the stream returns the <tt>eof</tt>
    * condition or error to provide values for known parameter fields. The second
    * argument can be used to denote the name of the file (if that's what the
@@ -1768,32 +1750,6 @@ public:
                             const std::string &last_line = "");
 
   /**
-   * Read input from a file the name of which is given. The PathSearch class
-   * "PARAMETERS" is used to find the file.
-   *
-   * Unless <tt>optional</tt> is <tt>true</tt>, this function will
-   * automatically generate the requested file with default values if the file
-   * did not exist. This file will not contain additional comments if
-   * <tt>write_stripped_file</tt> is <tt>true</tt>.
-   *
-   * If non-empty @p last_line is provided, the ParameterHandler object
-   * will stop parsing lines after encountering @p last_line .
-   * This is handy when adding extra data that shall be parsed manually.
-   *
-   * @deprecated This function has been deprecated in favor of the replacement
-   * ParameterHandler::parse_input, which raises exceptions to indicate errors
-   * instead of returning an error code. ParameterHandler::parse_input does
-   * not have the capability to write default values to a file on failure: if
-   * you wish to duplicate that old behavior then you should catch the
-   * PathSearch::ExcFileNotFound exception and then call
-   * ParameterHandler::print_parameters.
-   */
-  virtual bool read_input (const std::string &filename,
-                           const bool optional = false,
-                           const bool write_stripped_file = false,
-                           const std::string &last_line = "") DEAL_II_DEPRECATED;
-
-  /**
    * Parse the given file to provide values for known parameter fields. The
    * PathSearch class "PARAMETERS" is used to find the file.
    *
@@ -1805,21 +1761,6 @@ public:
                             const std::string &last_line = "");
 
   /**
-   * Read input from a string in memory. The lines in memory have to be
-   * separated by <tt>@\n</tt> characters.
-   *
-   * If non-empty @p last_line is provided, the ParameterHandler object
-   * will stop parsing lines after encountering @p last_line .
-   * This is handy when adding extra data that shall be parsed manually.
-   *
-   * @deprecated This function has been deprecated in favor of the replacement
-   * ParameterHandler::parse_input_from_string, which raises exceptions to
-   * indicate errors instead of returning an error code.
-   */
-  virtual bool read_input_from_string (const char *s,
-                                       const std::string &last_line = "");
-
-  /**
    * Parse input from a string to populate known parameter fields. The lines
    * in the string must be separated by <tt>@\n</tt> characters.
    *
@@ -1829,19 +1770,6 @@ public:
    */
   virtual void parse_input_from_string (const char *s,
                                         const std::string &last_line = "");
-
-  /**
-   * Read a parameter file in XML format. This could be from a file originally
-   * written by the print_parameters() function using the XML output style and
-   * then modified by hand as necessary; or from a file written using this
-   * method and then modified by the graphical parameter GUI (see the general
-   * documentation of this class).
-   *
-   * @deprecated This function has been deprecated in favor of the replacement
-   * ParameterHandler::parse_input_from_xml, which raises exceptions to indicate
-   * errors instead of returning an error code.
-   */
-  virtual bool read_input_from_xml (std::istream &input) DEAL_II_DEPRECATED;
 
   /**
    * Parse input from an XML stream to populate known parameter fields. This
@@ -2629,33 +2557,6 @@ public:
    * the file (if that's what the input stream represents) we are reading
    * from; this is only used when creating output for error messages.
    *
-   * Return whether the read was successful.
-   *
-   * If non-empty @p last_line is provided, the ParameterHandler object
-   * will stop parsing lines after encountering @p last_line .
-   * This is handy when adding extra data that shall be parsed manually.
-   *
-   * @note Of the three <tt>read_input</tt> functions implemented by
-   * ParameterHandler, this method and its replacement
-   * (MultipleParameterLoop::parse_input) are the only ones overridden with
-   * new behavior by this class. This is because the other two
-   * <tt>read_input</tt> functions just reformat their inputs and then call
-   * this version.
-   *
-   * @deprecated This function has been deprecated in favor of the replacement
-   * MultipleParameterLoop::parse_input, which raises exceptions to indicate
-   * errors instead of returning an error code.
-   */
-  virtual bool read_input (std::istream &input,
-                           const std::string &filename = "input file",
-                           const std::string &last_line = "") DEAL_II_DEPRECATED;
-
-  /**
-   * Read input from a stream until the stream returns the <tt>eof</tt>
-   * condition or error. The second argument can be used to denote the name of
-   * the file (if that's what the input stream represents) we are reading
-   * from; this is only used when creating output for error messages.
-   *
    * If non-empty @p last_line is provided, the ParameterHandler object
    * will stop parsing lines after encountering @p last_line .
    * This is handy when adding extra data that shall be parsed manually.
@@ -2678,11 +2579,6 @@ public:
    * ParameterHandler::parse_input and then overriding the one we care about.
    */
   using ParameterHandler::parse_input;
-
-  /**
-   * For backwards compatibility also include the deprecated read functions.
-   */
-  using ParameterHandler::read_input;
 
   /**
    * run the central loop.
