@@ -1,0 +1,7 @@
+New: Added a new function ParameterHandler::add_parameter() that 
+takes as arguments an entry and a reference to a templated type 
+parameter, and create an entry for the given type, and adds an 
+action that would update the given type when the ParameterHandler
+is updated.
+<br>
+(Luca Heltai, 2017/04/24)

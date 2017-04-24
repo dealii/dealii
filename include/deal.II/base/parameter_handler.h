@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/point.h>
 
 #include <boost/property_tree/ptree_fwd.hpp>
 #include <boost/serialization/split_member.hpp>
@@ -1062,6 +1063,14 @@ namespace Patterns
      */
     static const char *description_init;
   };
+
+
+  /**
+   * Return a std::unique_ptr to a Pattern that can be used to interpret a
+   * string as the type of the template argument, and the other way around.
+   */
+  template<class T>
+  std::unique_ptr<Patterns::PatternBase> default_pattern();
 }
 
 
@@ -2042,6 +2051,26 @@ public:
                       const std::string           &default_value,
                       const Patterns::PatternBase &pattern = Patterns::Anything(),
                       const std::string           &documentation = std::string());
+
+
+
+  /**
+   * Declare a new entry with name @p entry, set its default value
+   * to the content of the variable @p parameter, and create an action
+   * that will fill @p parameter with updated values when a file is parsed,
+   * or the entry is set to a new value.
+   *
+   * By default, the pattern to use is obtained by calling the function
+   * Patterns::default_pattern<ParameterType>(), but a custom one can be used.
+   *
+   * An exception is thrown if ParameterType is a const type.
+   */
+  template<class ParameterType>
+  void add_parameter (const std::string           &entry,
+                      ParameterType               &parameter,
+                      const std::string           &documentation = std::string(),
+                      const Patterns::PatternBase &pattern = *Patterns::default_pattern<ParameterType>());
+
 
   /**
    * Attach an action to the parameter with name @p entry in the current
@@ -3028,7 +3057,90 @@ namespace Patterns
     boost::any b(&t);
     return string_to_any(s, b);
   }
+
+  // A list of default patterns.
+  template<class T>
+  std::unique_ptr<Patterns::PatternBase> default_pattern()
+  {
+    AssertThrow(false, ExcNotImplemented(std::string("We don't know how to construct"
+                                                     " a Pattern for the type ") + typeid(T).name()));
+  }
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<int>();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<unsigned int>();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<double>();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::complex<double> >();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::string>();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<Point<1,double> >();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<Point<2,double> >();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<Point<3,double> >();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<int> >();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<unsigned int> >();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<double> >();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<std::string> >();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<std::complex<double> > >();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<Point<1> > >();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<Point<2> > >();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<Point<3> > >();
 }
+
+
+template<class ParameterType>
+void ParameterHandler::add_parameter(const std::string           &entry,
+                                     ParameterType               &parameter,
+                                     const std::string           &documentation,
+                                     const Patterns::PatternBase &pattern)
+{
+
+  AssertThrow(std::is_const<ParameterType>::value == false,
+              ExcMessage("You tried to add a parameter using a type "
+                         "that is const. Use a non-const type."));
+
+  declare_entry(entry, pattern.to_string(parameter), pattern, documentation);
+
+  std::string path = get_current_full_path(entry);
+  const unsigned int pattern_index
+    = entries->get<unsigned int> (path + path_separator + "pattern");
+  const Patterns::PatternBase &newpattern = *patterns[pattern_index];
+  auto action = [&] (const std::string &val)
+  {
+    newpattern.to_value(val,parameter);
+  };
+  add_action(entry, action);
+}
+
+
 
 DEAL_II_NAMESPACE_CLOSE
 
