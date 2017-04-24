@@ -120,7 +120,10 @@ namespace LinearAlgebra
     Vector &Vector::operator= (const double s)
     {
       Assert(s==0., ExcMessage("Only 0 can be assigned to a vector."));
-      vector->PutScalar(s);
+
+      const int ierr = vector->PutScalar(s);
+      Assert(ierr == 0, ExcTrilinosError(ierr));
+      (void) ierr;
 
       return *this;
     }
