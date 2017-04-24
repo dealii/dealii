@@ -1,0 +1,4 @@
+Removed: The ParameterHandler::read_input() function and friends have
+been removed. They were already deprecated in the previous release.
+<br>
+(Wolfgang Bangerth, 2017/04/21)

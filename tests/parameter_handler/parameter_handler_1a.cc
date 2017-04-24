@@ -30,7 +30,7 @@ void check (const char *p)
                      Patterns::List(Patterns::Integer(-1,1),2,3,"xyz"));
 
   std::ifstream in(p);
-  prm.read_input (in);
+  prm.parse_input (in);
 
   deallog << "test_1=" << prm.get ("test_1") << std::endl;
 }

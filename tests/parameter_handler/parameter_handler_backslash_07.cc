@@ -45,16 +45,16 @@ int main ()
       prm.declare_entry ("value", "value", Patterns::Anything());
       prm.leave_subsection ();
 
-      // test both relevant read_input functions
+      // test both relevant parse_input functions
       if (i == 0)
         {
-          prm.read_input(SOURCE_DIR "/prm/parameter_handler_backslash_07.prm");
+          prm.parse_input(SOURCE_DIR "/prm/parameter_handler_backslash_07.prm");
         }
       else
         {
           std::ifstream input_stream
           (SOURCE_DIR "/prm/parameter_handler_backslash_07.prm");
-          prm.read_input(input_stream);
+          prm.parse_input(input_stream);
         }
 
       std::string list;

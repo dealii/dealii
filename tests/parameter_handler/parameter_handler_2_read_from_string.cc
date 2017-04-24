@@ -15,7 +15,7 @@
 
 
 
-// like _02, but use the read_input_from_string function
+// like _02, but use the parse_input_from_string function
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -45,7 +45,7 @@ int main ()
       input += s;
       input += '\n';
     }
-  prm.read_input_from_string(input.c_str());
+  prm.parse_input_from_string(input.c_str());
 
   std::string list;
   prm.enter_subsection ("Testing");

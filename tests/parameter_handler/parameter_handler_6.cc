@@ -48,7 +48,7 @@ int main ()
                          "docs 3");
       prm.leave_subsection ();
 
-      prm.read_input(SOURCE_DIR "/prm/parameter_handler_3.prm");
+      prm.parse_input(SOURCE_DIR "/prm/parameter_handler_3.prm");
 
       // now set some of the entries to
       // different values

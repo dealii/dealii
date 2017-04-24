@@ -34,7 +34,7 @@ void check (const char *content, double &v1, double &v2)
 
   std::stringstream ss(content);
 
-  foo.read_input(ss);
+  foo.parse_input(ss);
 
 
 

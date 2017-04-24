@@ -52,7 +52,7 @@ int main ()
       prm.leave_subsection ();
 
       // read and then write parameters
-      prm.read_input(SOURCE_DIR "/prm/parameter_handler_3_with_space.prm");
+      prm.parse_input(SOURCE_DIR "/prm/parameter_handler_3_with_space.prm");
       prm.print_parameters (logfile, ParameterHandler::Text);
     }
   catch (std::exception &exc)

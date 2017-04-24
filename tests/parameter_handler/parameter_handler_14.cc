@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2016 by the deal.II authors
+// Copyright (C) 2002 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,6 +26,10 @@
 
 void check ()
 {
+  std::string input = "subsection bar\n"
+                      "  set value = 1.0\n"
+                      "end\n";
+
   ParameterHandler foo;
   foo.enter_subsection("bar");
   foo.declare_entry("value", "1.0", dealii::Patterns::Double(), "");
@@ -33,7 +37,7 @@ void check ()
 
   try
     {
-      foo.read_input("tmp.prm");
+      foo.parse_input_from_string(input.c_str());
     }
   catch (...)
     {
@@ -44,9 +48,6 @@ void check ()
   foo.enter_subsection("bar");
   deallog << foo.get ("value") << std::endl;
   foo.leave_subsection();
-
-  // delete tmp file again
-  std::remove("tmp.prm");
 }
 
 

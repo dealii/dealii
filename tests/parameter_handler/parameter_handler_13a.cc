@@ -31,7 +31,7 @@ void check (const char *p)
                                    2,3, "xyz"));
 
   std::ifstream in(p);
-  prm.read_input (in);
+  prm.parse_input (in);
 
   deallog << "test_13=" << prm.get ("test_13") << std::endl;
 }
