@@ -23,7 +23,15 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/parallel.h>
-#include <boost/serialization/array.hpp>
+
+// boost::serialization::make_array used to be in array.hpp, but was
+// moved to a different file in BOOST 1.64
+#include <boost/version.hpp>
+#if BOOST_VERSION >= 106400
+#  include <boost/serialization/array_wrapper.hpp>
+#else
+#  include <boost/serialization/array.hpp>
+#endif
 #include <boost/serialization/split_member.hpp>
 
 #include <cstring>
