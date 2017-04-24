@@ -18,7 +18,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#ifdef DEAL_II_WITH_TRILINOS
+#if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
 namespace VectorTools
 {
   template <>

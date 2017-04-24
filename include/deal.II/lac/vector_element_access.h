@@ -69,7 +69,7 @@ namespace internal
 
 
 
-#ifdef DEAL_II_WITH_TRILINOS
+#if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
   template <>
   inline
   void ElementAccess<LinearAlgebra::EpetraWrappers::Vector>::
