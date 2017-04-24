@@ -1638,8 +1638,139 @@ namespace Patterns
       return std::unique_ptr<DirectoryName>();
   }
 
-}   // end namespace Patterns
 
+
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<int>()
+  {
+    return std::unique_ptr<Patterns::PatternBase>(Integer().clone());
+  }
+
+
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<unsigned int>()
+  {
+    return std::unique_ptr<Patterns::PatternBase>(Integer(0).clone());
+  }
+
+
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<double>()
+  {
+    return std::unique_ptr<Patterns::PatternBase>(Double().clone());
+  }
+
+
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::complex<double> >()
+  {
+    return std::unique_ptr<Patterns::PatternBase>(List(Double(),2,2).clone());
+  }
+
+
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::string>()
+  {
+    return std::unique_ptr<Patterns::PatternBase>(Anything().clone());
+  }
+
+
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<Point<1,double> >()
+  {
+    return std::unique_ptr<Patterns::PatternBase>(List(Double(),1,1).clone());
+  }
+
+
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<Point<2,double> >()
+  {
+    return std::unique_ptr<Patterns::PatternBase>(List(Double(),2,2).clone());
+  }
+
+
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<Point<3,double> >()
+  {
+    return std::unique_ptr<Patterns::PatternBase>(List(Double(),3,3).clone());
+  }
+
+
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<int> >()
+  {
+    return std::unique_ptr<Patterns::PatternBase>(List(Integer()).clone());
+  }
+
+
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<unsigned int> >()
+  {
+    return std::unique_ptr<Patterns::PatternBase>(List(Integer(0)).clone());
+  }
+
+
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<double> >()
+  {
+    return std::unique_ptr<Patterns::PatternBase>(List(Double()).clone());
+  }
+
+
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<std::string> >()
+  {
+    return std::unique_ptr<Patterns::PatternBase>(List(Anything()).clone());
+  }
+
+
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<std::complex<double> > >()
+  {
+    return std::unique_ptr<Patterns::PatternBase>(List(List(Double(),2,2)
+                                                       ,0,std::numeric_limits<int>::max(),";").clone());
+  }
+
+
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<Point<1> > >()
+  {
+    return std::unique_ptr<Patterns::PatternBase>(List(List(Double(),1,1)
+                                                       ,0,std::numeric_limits<int>::max(),";").clone());
+  }
+
+
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<Point<2> > >()
+  {
+    return std::unique_ptr<Patterns::PatternBase>(List(List(Double(),2,2)
+                                                       ,0,std::numeric_limits<int>::max(),";").clone());
+  }
+
+
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<Point<3> > >()
+  {
+    return std::unique_ptr<Patterns::PatternBase>(List(List(Double(),3,3)
+                                                       ,0,std::numeric_limits<int>::max(),";").clone());
+  }
+}   // end namespace Patterns
 
 
 ParameterHandler::ParameterHandler ()
@@ -2232,7 +2363,6 @@ ParameterHandler::declare_entry (const std::string           &entry,
   AssertThrow (pattern.match (default_value),
                ExcValueDoesNotMatchPattern (default_value, pattern.description()));
 }
-
 
 
 
