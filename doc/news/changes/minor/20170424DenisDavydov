@@ -1,0 +1,4 @@
+New: add Point<dim,Number>::squared_distance() which calculates the squared
+Euclidean distance.
+<br>
+(Denis Davydov, 2017/04/24)

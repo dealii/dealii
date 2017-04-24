@@ -228,6 +228,12 @@ public:
   typename numbers::NumberTraits<Number>::real_type distance (const Point<dim,Number> &p) const;
 
   /**
+   * Return the squared Euclidean distance of <tt>this</tt> point to the point
+   * <tt>p</tt>.
+   */
+  typename numbers::NumberTraits<Number>::real_type squared_distance (const Point<dim,Number> &p) const;
+
+  /**
    * @}
    */
 
@@ -476,6 +482,16 @@ inline
 typename numbers::NumberTraits<Number>::real_type
 Point<dim,Number>::distance (const Point<dim,Number> &p) const
 {
+  return std::sqrt(squared_distance(p));
+}
+
+
+
+template <int dim, typename Number>
+inline
+typename numbers::NumberTraits<Number>::real_type
+Point<dim,Number>::squared_distance (const Point<dim,Number> &p) const
+{
   Number sum = Number();
   for (unsigned int i=0; i<dim; ++i)
     {
@@ -483,7 +499,7 @@ Point<dim,Number>::distance (const Point<dim,Number> &p) const
       sum += numbers::NumberTraits<Number>::abs_square (diff);
     }
 
-  return std::sqrt(sum);
+  return sum;
 }
 
 
