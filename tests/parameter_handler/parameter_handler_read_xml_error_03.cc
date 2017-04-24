@@ -15,7 +15,7 @@
 
 
 
-// check ParameterHandler::read_input_from_xml. try to read a file that is not
+// check ParameterHandler::parse_input_from_xml. try to read a file that is not
 // valid XML (there is more than one top-level element)
 
 #include "../tests.h"

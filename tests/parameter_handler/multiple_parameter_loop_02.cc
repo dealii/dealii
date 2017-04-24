@@ -73,7 +73,7 @@ void check (const char *p)
   HelperClass h;
 
   h.declare_parameters (prm);
-  prm.read_input (p);
+  prm.parse_input (p);
   prm.loop (h);
 }
 

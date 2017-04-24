@@ -43,7 +43,7 @@ void check (const char *p)
   std::ifstream in(p);
 
   deallog << "Reading parameters" << std::endl;
-  prm.read_input (in);
+  prm.parse_input (in);
 
   deallog << "test_1=" << prm.get ("test_1") << std::endl;
   deallog << "Saved parameter: " << parameter_set_by_action << std::endl;

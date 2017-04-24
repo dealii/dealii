@@ -33,7 +33,7 @@ void check ()
 
   try
     {
-      foo.read_input("tmp.prm");
+      foo.parse_input("tmp.prm");
     }
   catch (...)
     {

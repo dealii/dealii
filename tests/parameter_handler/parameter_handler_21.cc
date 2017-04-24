@@ -29,7 +29,7 @@ void check (const char *defaults, const char *defined, const char *input)
   prm.declare_entry ("v", defaults, Patterns::MultipleSelection(defined), "");
 
   std::stringstream in(input);
-  prm.read_input (in);
+  prm.parse_input (in);
 
   deallog << "defaults='" << defaults
           << "' defined='" << defined
