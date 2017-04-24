@@ -1,0 +1,5 @@
+Removed: DataPostprocessor had member functions
+<code>compute_derived_quantities_*()</code> that had previously
+already been deprecated. These have now been removed.
+<br>
+(Wolfgang Bangerth, 2017/04/24)
