@@ -6447,46 +6447,6 @@ DataOutInterface<dim,spacedim>::write_pvtu_record (std::ostream &out,
 
 
 template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::
-write_pvd_record (std::ostream &out,
-                  const std::vector<std::pair<double,std::string> >  &times_and_names)
-{
-  DataOutBase::write_pvd_record(out, times_and_names);
-}
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::write_visit_record (std::ostream &out,
-                                                    const std::vector<std::string> &piece_names)
-{
-  DataOutBase::write_visit_record (out, piece_names);
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::write_visit_record (std::ostream &out,
-                                                    const std::vector<std::vector<std::string> > &piece_names)
-{
-  DataOutBase::write_visit_record (out, piece_names);
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::write_visit_record (std::ostream &out,
-                                                    const std::vector<std::pair<double,std::vector<std::string> > > &times_and_piece_names)
-{
-  DataOutBase::write_visit_record (out, times_and_piece_names);
-}
-
-
-
-template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::
 write_deal_II_intermediate (std::ostream &out) const
 {
