@@ -415,6 +415,11 @@ namespace Patterns
           const std::string  &separator = ",");
 
     /**
+     * Copy constructor.
+     */
+    List (const List &other);
+
+    /**
      * Destructor.
      */
     virtual ~List ();
@@ -528,6 +533,11 @@ namespace Patterns
          const unsigned int  min_elements = 0,
          const unsigned int  max_elements = max_int_value,
          const std::string  &separator = ",");
+
+    /**
+     * Copy constructor.
+     */
+    Map (const Map &other);
 
     /**
      * Destructor.

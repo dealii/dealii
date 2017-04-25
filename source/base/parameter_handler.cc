@@ -587,6 +587,16 @@ namespace Patterns
 
 
 
+  List::List (const List &other)
+    :
+    pattern (other.pattern->clone()),
+    min_elements (other.min_elements),
+    max_elements (other.max_elements),
+    separator (other.separator)
+  {}
+
+
+
   List::~List ()
   {
     delete pattern;
@@ -764,6 +774,17 @@ namespace Patterns
             ExcMessage ("The separator can not be a colon ':' since that "
                         "is the separator between the two elements of <key:value> pairs"));
   }
+
+
+
+  Map::Map (const Map &other)
+    :
+    key_pattern (other.key_pattern->clone()),
+    value_pattern (other.value_pattern->clone()),
+    min_elements (other.min_elements),
+    max_elements (other.max_elements),
+    separator (other.separator)
+  {}
 
 
 
