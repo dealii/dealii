@@ -1,0 +1,7 @@
+New: The ParameterHandler::parse_input() function and friends now make
+a guarantee that if a parameter value does not match its pattern, or
+an associated action throws an exception, that the enclosing
+ParameterHandler object will be reset to the same subsection level
+it was in before ParameterHandler::parse_input() was called.
+<br>
+(Wolfgang Bangerth, 2017/04/21)

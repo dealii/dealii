@@ -1744,6 +1744,23 @@ public:
    * If non-empty @p last_line is provided, the ParameterHandler object
    * will stop parsing lines after encountering @p last_line .
    * This is handy when adding extra data that shall be parsed manually.
+   *
+   * The function sets the value of all parameters it encounters in the
+   * input file to the provided value. Parameters not explicitly listed
+   * in the input file are left at the value they previously held, which
+   * will be the default value provided to declare_entry() unless one
+   * has previously read a different input file.
+   *
+   * Each parameter value is matched against the pattern for this
+   * parameter that was provided to declare_entry(), and for each parameter
+   * all associated actions that may previously have been set by
+   * add_action() are executed. If a parameter does not satisfy its
+   * pattern, or if an associated action throws an exception, then the
+   * value provided for the parameter is not set and the current
+   * object reverts to the subsection it was in before the current
+   * function was called. No further processing of the input stream
+   * occurs, that is everything that comes after the parameter whose
+   * value does not satisfy its pattern is ignored.
    */
   virtual void parse_input (std::istream &input,
                             const std::string &filename = "input file",
@@ -1753,9 +1770,9 @@ public:
    * Parse the given file to provide values for known parameter fields. The
    * PathSearch class "PARAMETERS" is used to find the file.
    *
-   * If non-empty @p last_line is provided, the ParameterHandler object
-   * will stop parsing lines after encountering @p last_line .
-   * This is handy when adding extra data that shall be parsed manually.
+   * The function in essence reads the entire file into a stream and
+   * then calls the other parse_input() function with that stream. See
+   * there for more information.
    */
   virtual void parse_input (const std::string &filename,
                             const std::string &last_line = "");
@@ -1764,9 +1781,9 @@ public:
    * Parse input from a string to populate known parameter fields. The lines
    * in the string must be separated by <tt>@\n</tt> characters.
    *
-   * If non-empty @p last_line is provided, the ParameterHandler object
-   * will stop parsing lines after encountering @p last_line .
-   * This is handy when adding extra data that shall be parsed manually.
+   * The function in essence reads the entire file into a stream and
+   * then calls the other parse_input() function with that stream. See
+   * there for more information.
    */
   virtual void parse_input_from_string (const char *s,
                                         const std::string &last_line = "");
@@ -1843,6 +1860,14 @@ public:
    *  there is no guarantee about the order in which they will be read
    *  from an input file, you will not want to rely on the values these
    *  functions would return.
+   *
+   * @note Throwing an exception in an action is generally not a good
+   *  idea, but yields fundamentally the same result as if one tries to
+   *  read a parameter from a file for which the value does not satisfy
+   *  the pattern associated with the parameter. In other words, the
+   *  value just read is discarded, and ParameterHandler::parse_input()
+   *  stops to read any further content from the file. See
+   *  ParameterHandler::parse_input() for more information.
    */
   void add_action (const std::string &entry,
                    const std::function<void (const std::string &value)> &action);

@@ -1620,7 +1620,7 @@ void ParameterHandler::parse_input (std::istream &input,
   AssertThrow (input, ExcIO());
 
   // store subsections we are currently in
-  std::vector<std::string> saved_path = subsection_path;
+  const std::vector<std::string> saved_path = subsection_path;
 
   std::string input_line;
   std::string fully_concatenated_line;
@@ -1630,6 +1630,39 @@ void ParameterHandler::parse_input (std::istream &input,
   // current line continuation started.
   unsigned int current_line_n = 0;
   unsigned int current_logical_line_n = 0;
+
+  // define an action that tries to scan a line.
+  //
+  // if that fails, i.e., if scan_line throws
+  // an exception either because a parameter doesn't match its
+  // pattern or because an associated action throws an exception,
+  // then try to rewind the set of subsections to the same
+  // point where we were when the current function was called.
+  // this at least allows to read parameters from a predictable
+  // state, rather than leave the subsection stack in some
+  // unknown state.
+  //
+  // after unwinding the subsection stack, just re-throw the exception
+  auto scan_line_or_cleanup =
+    [this, &saved_path](const std::string &line,
+                        const std::string &filename,
+                        const unsigned int line_number)
+  {
+    try
+      {
+        scan_line (line, filename, line_number);
+      }
+    catch (...)
+      {
+        while ((saved_path != subsection_path)
+               &&
+               (subsection_path.size() > 0))
+          leave_subsection ();
+
+        throw;
+      }
+  };
+
 
   while (std::getline (input, input_line))
     {
@@ -1672,17 +1705,21 @@ void ParameterHandler::parse_input (std::istream &input,
 
       if (!is_concatenated)
         {
-          scan_line (fully_concatenated_line, filename, current_logical_line_n);
+          scan_line_or_cleanup (fully_concatenated_line,
+                                filename,
+                                current_logical_line_n);
+
           fully_concatenated_line.clear();
         }
     }
 
   // While it does not make much sense for anyone to actually do this, allow
-  // the last line to end in a backslash.
+  // the last line to end in a backslash. to do do, we need to parse
+  // whatever was left in the stash of concatenated lines
   if (is_concatenated)
-    {
-      scan_line (fully_concatenated_line, filename, current_line_n);
-    }
+    scan_line_or_cleanup (fully_concatenated_line,
+                          filename,
+                          current_line_n);
 
   if (saved_path != subsection_path)
     {
