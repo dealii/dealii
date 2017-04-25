@@ -1,0 +1,5 @@
+
+DEAL::default=13
+DEAL::new value=42
+DEAL::default=1, 2, 3
+DEAL::new value=4,5,6
