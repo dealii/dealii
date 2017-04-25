@@ -1,0 +1,5 @@
+Changed: The deprecated functions DataOutInterface::write_pvd_record()
+and DataOutBase::write_visit_record() have been removed. Use the
+corresponding functions in namespace DataOutBase.
+<br>
+(Wolfgang Bangerth, 2017/04/25)
