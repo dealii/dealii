@@ -597,14 +597,6 @@ namespace Patterns
 
 
 
-  List::~List ()
-  {
-    delete pattern;
-    pattern = nullptr;
-  }
-
-
-
   bool List::match (const std::string &test_string_list) const
   {
     std::string tmp = test_string_list;
@@ -785,17 +777,6 @@ namespace Patterns
     max_elements (other.max_elements),
     separator (other.separator)
   {}
-
-
-
-  Map::~Map ()
-  {
-    delete key_pattern;
-    key_pattern = nullptr;
-
-    delete value_pattern;
-    value_pattern = nullptr;
-  }
 
 
 
