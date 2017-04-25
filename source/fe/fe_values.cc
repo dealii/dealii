@@ -3375,24 +3375,19 @@ FEValuesBase<dim,spacedim>::get_all_normal_vectors () const
 {
   Assert (this->update_flags & update_normal_vectors,
           (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_normal_vectors")));
-  return this->mapping_output.normal_vectors;
+  return get_normal_vectors();
 }
 
 
 
 template <int dim, int spacedim>
-std::vector<Point<spacedim> >
+const std::vector<Tensor<1,spacedim> > &
 FEValuesBase<dim,spacedim>::get_normal_vectors () const
 {
   Assert (this->update_flags & update_normal_vectors,
           (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_normal_vectors")));
 
-  // copy things into a vector of Points, then return that
-  std::vector<Point<spacedim> > tmp (this->mapping_output.normal_vectors.size());
-  for (unsigned int q=0; q<this->mapping_output.normal_vectors.size(); ++q)
-    tmp[q] = Point<spacedim>(this->mapping_output.normal_vectors[q]);
-
-  return tmp;
+  return this->mapping_output.normal_vectors;
 }
 
 
