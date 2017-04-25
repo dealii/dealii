@@ -728,7 +728,7 @@ namespace FETools
     {
       const parallel::distributed::Triangulation< dim, spacedim > *tr
         = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
-           (&dof2.get_tria()));
+           (&dof2.get_triangulation()));
 
       Assert (tr != nullptr, ExcInternalError());
 
@@ -919,7 +919,7 @@ namespace FETools
     {
       const parallel::distributed::Triangulation< dim, spacedim > *tr
         = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
-           (&dof2.get_tria()));
+           (&dof2.get_triangulation()));
 
       Assert (tr != nullptr, ExcInternalError());
 
@@ -1296,7 +1296,7 @@ namespace FETools
     {
       const parallel::distributed::Triangulation< dim, spacedim > *tr
         = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
-           (&dof2.get_tria()));
+           (&dof2.get_triangulation()));
 
       Assert (tr != nullptr,
               ExcMessage ("Extrapolate in parallel only works for parallel distributed triangulations!"));
@@ -1431,7 +1431,7 @@ namespace FETools
                               PETScWrappers::MPI::Vector &vector)
       {
         const parallel::distributed::Triangulation<dim,spacedim> *parallel_tria =
-          dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_tria());
+          dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_triangulation());
         Assert (parallel_tria != nullptr, ExcNotImplemented());
 
         const IndexSet locally_owned_dofs = dh.locally_owned_dofs();
@@ -1445,7 +1445,7 @@ namespace FETools
                               TrilinosWrappers::MPI::Vector &vector)
       {
         const parallel::distributed::Triangulation<dim,spacedim> *parallel_tria =
-          dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_tria());
+          dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_triangulation());
         Assert (parallel_tria != nullptr, ExcNotImplemented());
 
         const IndexSet locally_owned_dofs = dh.locally_owned_dofs();
@@ -1460,7 +1460,7 @@ namespace FETools
                               LinearAlgebra::EpetraWrappers::Vector &vector)
       {
         const parallel::distributed::Triangulation<dim,spacedim> *parallel_tria =
-          dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_tria());
+          dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_triangulation());
         Assert (parallel_tria !=0, ExcNotImplemented());
 
         const IndexSet locally_owned_dofs = dh.locally_owned_dofs();
@@ -1474,7 +1474,7 @@ namespace FETools
                               LinearAlgebra::distributed::Vector<Number> &vector)
       {
         const parallel::distributed::Triangulation<dim,spacedim> *parallel_tria =
-          dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_tria());
+          dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_triangulation());
         Assert (parallel_tria != nullptr, ExcNotImplemented());
 
         const IndexSet locally_owned_dofs = dh.locally_owned_dofs();
@@ -1496,7 +1496,7 @@ namespace FETools
                           PETScWrappers::MPI::Vector &vector)
       {
         const parallel::distributed::Triangulation<dim,spacedim> *parallel_tria =
-          dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_tria());
+          dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_triangulation());
         Assert(parallel_tria != nullptr, ExcNotImplemented());
         const IndexSet  locally_owned_dofs = dh.locally_owned_dofs();
         IndexSet  locally_relevant_dofs;
@@ -1512,7 +1512,7 @@ namespace FETools
                           TrilinosWrappers::MPI::Vector &vector)
       {
         const parallel::distributed::Triangulation<dim,spacedim> *parallel_tria =
-          dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_tria());
+          dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_triangulation());
         Assert (parallel_tria != nullptr, ExcNotImplemented());
         const IndexSet  locally_owned_dofs = dh.locally_owned_dofs();
         IndexSet  locally_relevant_dofs;
@@ -1527,7 +1527,7 @@ namespace FETools
                           LinearAlgebra::distributed::Vector<Number> &vector)
       {
         const parallel::distributed::Triangulation<dim,spacedim> *parallel_tria =
-          dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_tria());
+          dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dh.get_triangulation());
         Assert (parallel_tria != nullptr, ExcNotImplemented());
         const IndexSet  locally_owned_dofs = dh.locally_owned_dofs();
         IndexSet  locally_relevant_dofs;
@@ -1622,7 +1622,7 @@ namespace FETools
 
     internal::BlockType<OutVector> u3;
     internal::reinit_distributed(dof2, u3);
-    if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dof2.get_tria()) != nullptr)
+    if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dof2.get_triangulation()) != nullptr)
       {
         interpolate(dof1, u1, dof2, constraints, u3);
 

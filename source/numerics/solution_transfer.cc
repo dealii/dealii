@@ -44,7 +44,7 @@ SolutionTransfer(const DoFHandlerType &dof)
   prepared_for(none)
 {
   Assert ((dynamic_cast<const parallel::distributed::Triangulation<DoFHandlerType::dimension, DoFHandlerType::space_dimension>*>
-           (&dof_handler->get_tria())
+           (&dof_handler->get_triangulation())
            == nullptr),
           ExcMessage ("You are calling the dealii::SolutionTransfer class "
                       "with a DoF handler that is built on a "

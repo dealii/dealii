@@ -606,14 +606,6 @@ namespace hp
     /**
      * Return a constant reference to the triangulation underlying this
      * object.
-     *
-     * @deprecated Use get_triangulation() instead.
-     */
-    const Triangulation<dim,spacedim> &get_tria () const DEAL_II_DEPRECATED;
-
-    /**
-     * Return a constant reference to the triangulation underlying this
-     * object.
      */
     const Triangulation<dim,spacedim> &get_triangulation () const;
 
@@ -1046,16 +1038,6 @@ namespace hp
             ExcMessage ("No finite element collection is associated with "
                         "this DoFHandler"));
     return *finite_elements;
-  }
-
-
-
-  template<int dim, int spacedim>
-  inline
-  const Triangulation<dim,spacedim> &
-  DoFHandler<dim,spacedim>::get_tria () const
-  {
-    return *tria;
   }
 
 

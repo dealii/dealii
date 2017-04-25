@@ -812,13 +812,6 @@ public:
 
   /**
    * Return a constant reference to the triangulation underlying this object.
-   *
-   * @deprecated Use get_triangulation() instead.
-   */
-  const Triangulation<dim,spacedim> &get_tria () const DEAL_II_DEPRECATED;
-
-  /**
-   * Return a constant reference to the triangulation underlying this object.
    */
   const Triangulation<dim,spacedim> &get_triangulation () const;
 
@@ -1216,17 +1209,6 @@ DoFHandler<dim,spacedim>::get_fe () const
 {
   Assert(selected_fe!=nullptr, ExcMessage("You are trying to access the DoFHandler's FiniteElement object before it has been initialized."));
   return *selected_fe;
-}
-
-
-
-template <int dim, int spacedim>
-inline
-const Triangulation<dim,spacedim> &
-DoFHandler<dim,spacedim>::get_tria () const
-{
-  Assert(tria != nullptr, ExcNotInitialized());
-  return *tria;
 }
 
 

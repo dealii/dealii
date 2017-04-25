@@ -76,7 +76,7 @@ MGLevelGlobalTransfer<VectorType>::fill_and_communicate_copy_indices
     }
   const parallel::Triangulation<dim, spacedim> *ptria =
     dynamic_cast<const parallel::Triangulation<dim, spacedim> *>
-    (&mg_dof.get_tria());
+    (&mg_dof.get_triangulation());
   const MPI_Comm mpi_communicator = ptria != nullptr ? ptria->get_communicator() :
                                     MPI_COMM_SELF;
   perform_plain_copy =
@@ -173,7 +173,7 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::fill_and_com
   // precisely the indices that we need)
   const parallel::Triangulation<dim, spacedim> *ptria =
     dynamic_cast<const parallel::Triangulation<dim, spacedim> *>
-    (&mg_dof.get_tria());
+    (&mg_dof.get_triangulation());
   const MPI_Comm mpi_communicator = ptria != nullptr ? ptria->get_communicator() :
                                     MPI_COMM_SELF;
 
