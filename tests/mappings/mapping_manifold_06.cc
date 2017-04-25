@@ -71,7 +71,7 @@ void test()
           {
             fe_v.reinit(cell, f);
             const std::vector<Point<spacedim> > &qps = fe_v.get_quadrature_points();
-            const std::vector<Point<spacedim> > &nps = fe_v.get_normal_vectors();
+            const std::vector<Tensor<1,spacedim> > &nps = fe_v.get_normal_vectors();
             for (unsigned int i=0; i<qps.size(); ++i)
               {
                 out << qps[i] << std::endl;
@@ -100,7 +100,7 @@ void test()
           {
             fe_v.reinit(cell, f);
             const std::vector<Point<spacedim> > &qps = fe_v.get_quadrature_points();
-            const std::vector<Point<spacedim> > &nps = fe_v.get_normal_vectors();
+            const std::vector<Tensor<1,spacedim> > &nps = fe_v.get_normal_vectors();
             for (unsigned int i=0; i<qps.size(); ++i)
               {
                 out << qps[i] << " " << nps[i] << std::endl;
