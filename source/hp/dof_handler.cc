@@ -2106,7 +2106,7 @@ namespace hp
     // loop over all vertices and
     // see which one we need to
     // work on
-    for (unsigned int vertex_index=0; vertex_index<get_tria().n_vertices();
+    for (unsigned int vertex_index=0; vertex_index<get_triangulation().n_vertices();
          ++vertex_index)
       {
         const unsigned int n_active_fe_indices
@@ -2533,8 +2533,8 @@ namespace hp
   template <int dim, int spacedim>
   void DoFHandler<dim,spacedim>::set_active_fe_indices (const std::vector<unsigned int> &active_fe_indices)
   {
-    Assert(active_fe_indices.size()==get_tria().n_active_cells(),
-           ExcDimensionMismatch(active_fe_indices.size(), get_tria().n_active_cells()));
+    Assert(active_fe_indices.size()==get_triangulation().n_active_cells(),
+           ExcDimensionMismatch(active_fe_indices.size(), get_triangulation().n_active_cells()));
 
     create_active_fe_table ();
     // we could set the values directly, since
@@ -2555,7 +2555,7 @@ namespace hp
   template <int dim, int spacedim>
   void DoFHandler<dim,spacedim>::get_active_fe_indices (std::vector<unsigned int> &active_fe_indices) const
   {
-    active_fe_indices.resize(get_tria().n_active_cells());
+    active_fe_indices.resize(get_triangulation().n_active_cells());
 
     // we could try to extract the values directly, since
     // they are stored as protected data of
@@ -2800,7 +2800,7 @@ namespace hp
   {
     Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
 
-    for (unsigned int vertex_index=0; vertex_index<get_tria().n_vertices();
+    for (unsigned int vertex_index=0; vertex_index<get_triangulation().n_vertices();
          ++vertex_index)
       {
         const unsigned int n_active_fe_indices

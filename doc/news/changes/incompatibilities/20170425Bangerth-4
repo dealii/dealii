@@ -1,0 +1,6 @@
+Changed: The deprecated functions DoFHandler::get_tria() and
+hp::DoFHandler::get_tria() have been removed. Use
+DoFHandler::get_triangulation() and
+hp::DoFHandler::get_triangulation() instead.
+<br>
+(Wolfgang Bangerth, 2017/04/25)
