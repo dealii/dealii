@@ -147,10 +147,7 @@ namespace Step36
 
     std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
-    FunctionParser<dim> potential;
-    potential.initialize (FunctionParser<dim>::default_variable_names (),
-                          "0",
-                          typename FunctionParser<dim>::ConstMap());
+    ZeroFunction<dim> potential;
 
     std::vector<double> potential_values (n_q_points);
 
