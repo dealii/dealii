@@ -420,11 +420,6 @@ namespace Patterns
     List (const List &other);
 
     /**
-     * Destructor.
-     */
-    virtual ~List ();
-
-    /**
      * Return <tt>true</tt> if the string is a comma-separated list of strings
      * each of which match the pattern given to the constructor.
      */
@@ -473,7 +468,7 @@ namespace Patterns
     /**
      * Copy of the pattern that each element of the list has to satisfy.
      */
-    PatternBase *pattern;
+    std::unique_ptr<PatternBase> pattern;
 
     /**
      * Minimum number of elements the list must have.
@@ -540,11 +535,6 @@ namespace Patterns
     Map (const Map &other);
 
     /**
-     * Destructor.
-     */
-    virtual ~Map ();
-
-    /**
      * Return <tt>true</tt> if the string is a comma-separated list of strings
      * each of which match the pattern given to the constructor.
      */
@@ -594,8 +584,8 @@ namespace Patterns
      * Copy of the patterns that each key and each value of the map has to
      * satisfy.
      */
-    PatternBase *key_pattern;
-    PatternBase *value_pattern;
+    std::unique_ptr<PatternBase> key_pattern;
+    std::unique_ptr<PatternBase> value_pattern;
 
     /**
      * Minimum number of elements the list must have.
