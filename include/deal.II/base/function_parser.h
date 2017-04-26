@@ -25,12 +25,12 @@
 #include <deal.II/base/thread_local_storage.h>
 #include <vector>
 #include <map>
+#include <memory>
 
-#ifdef DEAL_II_WITH_MUPARSER
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#include <muParser.h>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
-#endif
+namespace mu
+{
+  class Parser;
+}
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -313,9 +313,11 @@ private:
   mutable Threads::ThreadLocalStorage<std::vector<double> > vars;
 
   /**
-   * The muParser objects for each thread (and one for each component)
+   * The muParser objects for each thread (and one for each component). We are
+   * storing unique_ptr so that we don't need to include the definition of
+   * mu::Parser in this header.
    */
-  mutable Threads::ThreadLocalStorage<std::vector<mu::Parser> > fp;
+  mutable Threads::ThreadLocalStorage<std::vector<std::unique_ptr<mu::Parser> > > fp;
 
   /**
    * An array to keep track of all the constants, required to initialize fp in
