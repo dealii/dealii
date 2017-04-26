@@ -1238,6 +1238,34 @@ public:
   double diameter () const;
 
   /**
+   * Return a pair of Point and double corresponding to the center and
+   * the radius of a reasonably small enclosing ball of the object.
+   *
+   * The function implements Ritter's O(n) algorithm to get a reasonably
+   * small enclosing ball around the vertices of the object.
+   * The initial guess for the enclosing ball is taken to be the ball
+   * which contains the largest diagonal of the object as its diameter.
+   * Starting from such an initial guess, the algorithm tests whether all
+   * the vertices of the object (except the vertices of the largest diagonal)
+   * are geometrically within the ball.
+   * If any vertex (v) is found to be geometrically outside the ball,
+   * a new iterate of the ball is constructed by shifting its center and
+   * increasing the radius so as to geometrically enclose both the previous
+   * ball and the vertex (v). The algorithm terminates when all the vertices
+   * are geometrically inside the ball.
+   *
+   * If a vertex (v) is geometrically inside a particular iterate of the ball,
+   * then it will continue to be so in the subsequent iterates of
+   * the ball (this is true \a by \a construction).
+   *
+   * @note This function assumes d-linear mapping from the reference cell.
+   *
+   * <a href="http://geomalgorithms.com/a08-_containers.html">see this</a> and
+   * [Ritter 1990]
+   */
+  std::pair<Point<spacedim>,double> enclosing_ball () const;
+
+  /**
    * Length of an object in the direction of the given axis, specified in the
    * local coordinate system. See the documentation of GeometryInfo for the
    * meaning and enumeration of the local axes.

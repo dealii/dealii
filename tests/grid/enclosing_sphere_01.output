@@ -1,0 +1,11 @@
+
+DEAL::dim2:case0:diameter=1.4142:center=2.0000 2.0000
+DEAL::dim2:case1:diameter=1.8028:center=1.5000 2.0000
+DEAL::dim2:case2:diameter=2.2361:center=2.0000 2.0000
+DEAL::dim2:case3:diameter=1.4504:center=2.0268 2.0243
+DEAL::PASSED!
+DEAL::dim3:case0:diameter=1.7321:center=2.0000 2.0000 2.0000
+DEAL::dim3:case1:diameter=2.0616:center=1.5000 2.0000 2.0000
+DEAL::dim3:case2:diameter=2.0616:center=1.5000 2.0000 2.0000
+DEAL::dim3:case3:diameter=1.9053:center=1.9000 2.1000 2.1000
+DEAL::PASSED!
