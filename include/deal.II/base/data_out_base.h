@@ -2359,36 +2359,6 @@ public:
                           const std::vector<std::string> &piece_names) const;
 
   /**
-   * @deprecated Use DataOutBase::write_pvd_record() instead
-   */
-  static void write_pvd_record (std::ostream &out,
-                                const std::vector<std::pair<double,std::string> >  &times_and_names) DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated Use DataOutBase::write_visit_record() instead
-   */
-  static
-  void
-  write_visit_record (std::ostream &out,
-                      const std::vector<std::string> &piece_names) DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated Use DataOutBase::write_visit_record() instead
-   */
-  static
-  void
-  write_visit_record (std::ostream &out,
-                      const std::vector<std::vector<std::string> > &piece_names) DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated Use DataOutBase::write_visit_record() instead
-   */
-  static
-  void
-  write_visit_record (std::ostream &out,
-                      const std::vector<std::pair<double,std::vector<std::string> > > &times_and_piece_names) DEAL_II_DEPRECATED;
-
-  /**
    * Obtain data through get_patches() and write it to <tt>out</tt> in SVG
    * format. See DataOutBase::write_svg.
    */
