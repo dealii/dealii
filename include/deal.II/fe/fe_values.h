@@ -2406,27 +2406,19 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_normal_vectors}
    *
-   * @note This function should really be named get_normal_vectors(), but this
-   * function already exists with a different return type that returns a
-   * vector of Point objects, rather than a vector of Tensor objects. This is
-   * a historical accident, but can not be fixed in a backward compatible
-   * style. That said, the get_normal_vectors() function is now deprecated,
-   * will be removed in the next version, and the current function will then
-   * be renamed.
+   * @deprecated Use get_normal_vectors() instead, which returns the exact
+   * same thing.
    */
-  const std::vector<Tensor<1,spacedim> > &get_all_normal_vectors () const;
+  const std::vector<Tensor<1,spacedim> > &get_all_normal_vectors () const DEAL_II_DEPRECATED;
 
   /**
-   * Return the normal vectors at the quadrature points as a vector of Point
-   * objects. This function is deprecated because normal vectors are correctly
-   * represented by rank-1 Tensor objects, not Point objects. Use
-   * get_all_normal_vectors() instead.
+   * Return the normal vectors at the quadrature points. For a face, these are
+   * the outward normal vectors to the cell. For a cell of codimension one,
+   * the orientation is given by the numbering of vertices.
    *
    * @dealiiRequiresUpdateFlags{update_normal_vectors}
-   *
-   * @deprecated
    */
-  std::vector<Point<spacedim> > get_normal_vectors () const DEAL_II_DEPRECATED;
+  const std::vector<Tensor<1,spacedim> > &get_normal_vectors () const;
 
   /**
    * Transform a set of vectors, one for each quadrature point. The

@@ -1,0 +1,9 @@
+Changed: The deprecated function FEValuesBase::get_normal_vectors()
+that returned a vector of Point objects has been removed. Its
+replacement, FEValuesBase::get_all_normal_vectors() has now itself
+been deprecated, and we have created a new function 
+FEValuesBase::get_normal_vectors() that returns a vector of
+Tensor<1,dim> objects. The net effect is that the function with the
+old name has simply gotten a new return type.
+<br>
+(Wolfgang Bangerth, 2017/04/25)
