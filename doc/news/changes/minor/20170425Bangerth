@@ -1,0 +1,4 @@
+Fixed: Copying Patterns::List or Patterns::Map objects previously led
+to memory corruption. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2017/04/25)
