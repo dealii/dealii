@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/point.h>
 
 #include <boost/property_tree/ptree_fwd.hpp>
 #include <boost/serialization/split_member.hpp>
@@ -125,6 +126,90 @@ namespace Patterns
      * assumption significantly, you can still overload this function.
      */
     virtual std::size_t memory_consumption () const;
+
+
+    /**
+     * Convert a compatible value type to a string. If the type is not
+     * compatible, an excepion ExcIncompatibleType is thrown.
+     *
+     * Internally, this function wraps the value in a boost::any object
+     * and calls the virtual function any_to_string(). Derived patterns
+     * should implement any_to_string for this function to work properly.
+     *
+     * An example usage is here:
+     *
+     * @code
+     * int a = 5;
+     * Patterns::Integer p;
+     *
+     * std::string s = p.to_string(a); // s = "5"
+     * @endcode
+     */
+    template<class T>
+    std::string to_string(const T &value) const;
+
+
+    /**
+     * Translate the content of the string matching this pattern, into a
+     * value and store it in @p value.  If the type T is not
+     * compatible with the pattern, an excepion ExcIncompatibleType is
+     * thrown.
+     *
+     * Internally, this function wraps a pointer to @p value in a
+     * boost::any object and calls the virtual function string_to_any(). Derived
+     * patterns should implement string_to_any for this function to work properly.
+     *
+     * An example usage is here:
+     *
+     * @code
+     * int a;
+     * Patterns::Integer p;
+     *
+     * p.to_value("5", a);
+     * @endcode
+     */
+    template<class T>
+    void to_value(const std::string &s, T &value) const;
+
+
+    /**
+     * An incompatible type was encountered when trying to access
+     * a pointer contained in a boost::any object
+     *
+     * @ingroup Exceptions
+     */
+    DeclException2 (ExcIncompatibleType,
+                    boost::any &, PatternBase &,
+                    << "The type " << arg1.type().name()
+                    << " is not compatible with the pattern "
+                    << arg2.description(Text));
+
+  protected:
+    /**
+     * Convert a string to a value, and store its content in the type
+     * pointed to by a boost::any object.
+     *
+     * Derived patterns can use this function to convert a matching string
+     * to a compatible type, stored as a boost::any object.
+     *
+     * This class expects the boost::any object to store a pointer to a
+     * value type that is compatible with this pattern. If this is not the case,
+     * an exception ExcIncompatibleType is thrown.
+     */
+    virtual void string_to_any(const std::string &s, boost::any &v) const;
+
+    /**
+     * Convert a compatible value type to a string. The value type should
+     * be store as a pointer in the boost::any object.
+     *
+     * Derived patterns can use this function to convert a compatible type
+     * to a string matching this pattern.
+     *
+     * This class expects the boost::any object to store a pointer to a
+     * value type that is compatible with this pattern.  If this is not the
+     * case, an exception ExcIncompatibleType is thrown.
+     */
+    virtual std::string any_to_string(const boost::any &v) const;
   };
 
   /**
@@ -201,6 +286,21 @@ namespace Patterns
      * caller of this function.
      */
     static Integer *create (const std::string &description);
+
+  protected:
+    /**
+     * Convert, if possible, the content of the pointer contained in the
+     * boost::any object to a string matching this pattern.
+     * See documentation of the base class for further details.
+     */
+    virtual std::string any_to_string(const boost::any &v) const;
+
+    /**
+     * Convert, if possible, the content of the string to a value stored in
+     * the pointer contained in the boost::any object. See documentation of
+     * the base class for further details.
+     */
+    virtual void string_to_any(const std::string &s, boost::any &v) const;
 
   private:
     /**
@@ -296,6 +396,21 @@ namespace Patterns
      */
     static Double *create (const std::string &description);
 
+  protected:
+    /**
+     * Convert, if possible, the content of the pointer contained in the
+     * boost::any object to a string matching this pattern.
+     * See documentation of the base class for further details.
+     */
+    virtual std::string any_to_string(const boost::any &v) const;
+
+    /**
+     * Convert, if possible, the content of the string to a value stored in
+     * the pointer contained in the boost::any object. See documentation of
+     * the base class for further details.
+     */
+    virtual void string_to_any(const std::string &s, boost::any &v) const;
+
   private:
     /**
      * Value of the lower bound. A number that satisfies the
@@ -369,6 +484,21 @@ namespace Patterns
      * caller of this function.
      */
     static Selection *create (const std::string &description);
+
+  protected:
+    /**
+     * Convert, if possible, the content of the pointer contained in the
+     * boost::any object to a string matching this pattern.
+     * See documentation of the base class for further details.
+     */
+    virtual std::string any_to_string(const boost::any &v) const;
+
+    /**
+     * Convert, if possible, the content of the string to a value stored in
+     * the pointer contained in the boost::any object. See documentation of
+     * the base class for further details.
+     */
+    virtual void string_to_any(const std::string &s, boost::any &v) const;
 
   private:
     /**
@@ -464,6 +594,22 @@ namespace Patterns
                     << "The values " << arg1 << " and " << arg2
                     << " do not form a valid range.");
     //@}
+
+  protected:
+    /**
+     * Convert, if possible, the content of the pointer contained in the
+     * boost::any object to a string matching this pattern.
+     * See documentation of the base class for further details.
+     */
+    virtual std::string any_to_string(const boost::any &v) const;
+
+    /**
+     * Convert, if possible, the content of the string to a value stored in
+     * the pointer contained in the boost::any object. See documentation of
+     * the base class for further details.
+     */
+    virtual void string_to_any(const std::string &s, boost::any &v) const;
+
   private:
     /**
      * Copy of the pattern that each element of the list has to satisfy.
@@ -763,6 +909,22 @@ namespace Patterns
      */
     static Anything *create (const std::string &description);
 
+
+  protected:
+    /**
+     * Convert, if possible, the content of the pointer contained in the
+     * boost::any object to a string matching this pattern.
+     * See documentation of the base class for further details.
+     */
+    virtual std::string any_to_string(const boost::any &v) const;
+
+    /**
+     * Convert, if possible, the content of the string to a value stored in
+     * the pointer contained in the boost::any object. See documentation of
+     * the base class for further details.
+     */
+    virtual void string_to_any(const std::string &s, boost::any &v) const;
+
   private:
     /**
      * Initial part of description
@@ -901,6 +1063,14 @@ namespace Patterns
      */
     static const char *description_init;
   };
+
+
+  /**
+   * Return a std::unique_ptr to a Pattern that can be used to interpret a
+   * string as the type of the template argument, and the other way around.
+   */
+  template<class T>
+  std::unique_ptr<Patterns::PatternBase> default_pattern();
 }
 
 
@@ -1826,6 +1996,26 @@ public:
                       const std::string           &default_value,
                       const Patterns::PatternBase &pattern = Patterns::Anything(),
                       const std::string           &documentation = std::string());
+
+
+
+  /**
+   * Declare a new entry with name @p entry, set its default value
+   * to the content of the variable @p parameter, and create an action
+   * that will fill @p parameter with updated values when a file is parsed,
+   * or the entry is set to a new value.
+   *
+   * By default, the pattern to use is obtained by calling the function
+   * Patterns::default_pattern<ParameterType>(), but a custom one can be used.
+   *
+   * An exception is thrown if ParameterType is a const type.
+   */
+  template<class ParameterType>
+  void add_parameter (const std::string           &entry,
+                      ParameterType               &parameter,
+                      const std::string           &documentation = std::string(),
+                      const Patterns::PatternBase &pattern = *Patterns::default_pattern<ParameterType>());
+
 
   /**
    * Attach an action to the parameter with name @p entry in the current
@@ -2762,6 +2952,115 @@ ParameterHandler::load (Archive &ar, const unsigned int)
   for (unsigned int j=0; j<descriptions.size(); ++j)
     patterns.push_back (std::shared_ptr<const Patterns::PatternBase>(Patterns::pattern_factory(descriptions[j])));
 }
+
+// ---------------------- inline and template functions --------------------
+
+namespace Patterns
+{
+
+  template<class T>
+  std::string PatternBase::to_string(const T &t) const
+  {
+    boost::any b(&t);
+    return any_to_string(b);
+  }
+
+
+
+  template<class T>
+  void PatternBase::to_value(const std::string &s, T &t) const
+  {
+    AssertThrow(std::is_const<T>::value == false,
+                ExcMessage("You tried to convert from a string to "
+                           "a type that is actually a const type. "
+                           "Make sure you pass a type which is not"
+                           " const."));
+    boost::any b(&t);
+    return string_to_any(s, b);
+  }
+
+  // A list of default patterns.
+  template<class T>
+  std::unique_ptr<Patterns::PatternBase> default_pattern()
+  {
+    AssertThrow(false, ExcNotImplemented(std::string("We don't know how to construct"
+                                                     " a Pattern for the type ") + typeid(T).name()));
+  }
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<int>();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<unsigned int>();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<double>();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::complex<double> >();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::string>();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<Point<1,double> >();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<Point<2,double> >();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<Point<3,double> >();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<int> >();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<unsigned int> >();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<double> >();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<std::string> >();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<std::complex<double> > >();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<Point<1> > >();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<Point<2> > >();
+
+  template<>
+  std::unique_ptr<Patterns::PatternBase> default_pattern<std::vector<Point<3> > >();
+}
+
+
+template<class ParameterType>
+void ParameterHandler::add_parameter(const std::string           &entry,
+                                     ParameterType               &parameter,
+                                     const std::string           &documentation,
+                                     const Patterns::PatternBase &pattern)
+{
+
+  AssertThrow(std::is_const<ParameterType>::value == false,
+              ExcMessage("You tried to add a parameter using a type "
+                         "that is const. Use a non-const type."));
+
+  declare_entry(entry, pattern.to_string(parameter), pattern, documentation);
+
+  std::string path = get_current_full_path(entry);
+  const unsigned int pattern_index
+    = entries->get<unsigned int> (path + path_separator + "pattern");
+  const Patterns::PatternBase &newpattern = *patterns[pattern_index];
+  auto action = [&] (const std::string &val)
+  {
+    newpattern.to_value(val,parameter);
+  };
+  add_action(entry, action);
+}
+
 
 
 DEAL_II_NAMESPACE_CLOSE
