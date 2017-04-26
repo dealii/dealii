@@ -1,0 +1,4 @@
+Extend: The two overloaded functions GridTools::find_active_cell_around_point() now take an optional custom mask for vertices
+to narrow down the search for surrounding cells.
+<br>
+(Vishal Boddu, 2017/03/22)
