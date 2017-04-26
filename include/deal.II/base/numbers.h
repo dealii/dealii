@@ -42,6 +42,18 @@ namespace std
   max(const ::dealii::VectorizedArray<Number> &, const ::dealii::VectorizedArray<Number> &);
   template <typename Number> DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number>
   min (const ::dealii::VectorizedArray<Number> &, const ::dealii::VectorizedArray<Number> &);
+  template <typename Number> ::dealii::VectorizedArray<Number>
+  pow(const ::dealii::VectorizedArray<Number> &, const Number p);
+  template <typename Number> ::dealii::VectorizedArray<Number>
+  sin(const ::dealii::VectorizedArray<Number> &);
+  template <typename Number> ::dealii::VectorizedArray<Number>
+  cos(const ::dealii::VectorizedArray<Number> &);
+  template <typename Number> ::dealii::VectorizedArray<Number>
+  tan(const ::dealii::VectorizedArray<Number> &);
+  template <typename Number> ::dealii::VectorizedArray<Number>
+  exp(const ::dealii::VectorizedArray<Number> &);
+  template <typename Number> ::dealii::VectorizedArray<Number>
+  log(const ::dealii::VectorizedArray<Number> &);
 }
 
 DEAL_II_NAMESPACE_OPEN
