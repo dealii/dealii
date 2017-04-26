@@ -24,7 +24,8 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
     template
     unsigned int
     find_closest_vertex (const X &,
-                         const Point<deal_II_space_dimension> &);
+                         const Point<deal_II_space_dimension> &,
+                         const std::vector<bool> &);
 
     template
     std::vector<dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type>
@@ -32,13 +33,14 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
 
     template
     dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type
-    find_active_cell_around_point (const X &, const Point<deal_II_space_dimension> &p);
+    find_active_cell_around_point (const X &, const Point<deal_II_space_dimension> &, const std::vector<bool> &);
 
     template
     std::pair<dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type, Point<deal_II_dimension> >
     find_active_cell_around_point (const Mapping<deal_II_dimension, deal_II_space_dimension> &,
                                    const X &,
-                                   const Point<deal_II_space_dimension> &);
+                                   const Point<deal_II_space_dimension> &,
+                                   const std::vector<bool> &);
 
     template
     std::vector<dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type>

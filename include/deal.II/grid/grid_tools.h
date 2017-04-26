@@ -468,20 +468,30 @@ namespace GridTools
   /*@{*/
 
   /**
-   * Find and return the number of the used vertex in a given mesh that is
-   * located closest to a given point.
+   * Find and return the number of the used vertex (or marked vertex) in a
+   * given mesh that is located closest to a given point.
    *
    * @param mesh A variable of a type that satisfies the requirements of the
    * @ref ConceptMeshType "MeshType concept".
    * @param p The point for which we want to find the closest vertex.
+   * @param marked_vertices An array of bools indicating which
+   * vertices of @p mesh will be considered within the search
+   * as the potentially closest vertex. On receiving a non-empty
+   * @p marked_vertices, the function will
+   * only search among @p marked_vertices for the closest vertex.
+   * The size of this array should be equal to the value returned by
+   * Triangulation::n_vertices() for the triangulation underlying the given mesh
+   * (as opposed to the value returned by Triangulation::n_used_vertices()).
    * @return The index of the closest vertex found.
+   *
    *
    * @author Ralf B. Schulz, 2006
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
   unsigned int
   find_closest_vertex (const MeshType<dim, spacedim> &mesh,
-                       const Point<spacedim>         &p);
+                       const Point<spacedim>         &p,
+                       const std::vector<bool>       &marked_vertices = std::vector<bool>());
 
   /**
    * Find and return a vector of iterators to active cells that surround a
@@ -532,6 +542,14 @@ namespace GridTools
    * @param mesh A variable of a type that satisfies the requirements of the
    * @ref ConceptMeshType "MeshType concept".
    * @param p The point for which we want to find the surrounding cell.
+   * @param marked_vertices An array of bools indicating whether an
+   * entry in the vertex array should be considered
+   * (and the others must be ignored) as the potentially
+   * closest vertex to the specified point. On specifying a non-default
+   * @p marked_vertices, find_closest_vertex() would
+   * only search among @p marked_vertices for the closest vertex.
+   * The size of this array should be equal to n_vertices() of the
+   * triangulation (as opposed to n_used_vertices() ).
    * @return An iterator into the mesh that points to the surrounding cell.
    *
    * @note If the point requested does not lie in any of the cells of the mesh
@@ -556,7 +574,8 @@ namespace GridTools
   typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type
 #endif
   find_active_cell_around_point (const MeshType<dim,spacedim> &mesh,
-                                 const Point<spacedim>        &p);
+                                 const Point<spacedim>        &p,
+                                 const std::vector<bool>      &marked_vertices = std::vector<bool>());
 
   /**
    * Find and return an iterator to the active cell that surrounds a given
@@ -580,6 +599,14 @@ namespace GridTools
    * @param mesh A variable of a type that satisfies the requirements of the
    * @ref ConceptMeshType "MeshType concept".
    * @param p The point for which we want to find the surrounding cell.
+   * @param marked_vertices An array of bools indicating whether an
+   * entry in the vertex array should be considered
+   * (and the others must be ignored) as the potentially
+   * closest vertex to the specified point. On specifying a non-default
+   * @p marked_vertices, find_closest_vertex() would
+   * only search among @p marked_vertices for the closest vertex.
+   * The size of this array should be equal to n_vertices() of the
+   * triangulation (as opposed to n_used_vertices() ).
    * @return An pair of an iterators into the mesh that points to the
    * surrounding cell, and of the coordinates of that point inside the cell in
    * the reference coordinates of that cell. This local position might be
@@ -587,6 +614,19 @@ namespace GridTools
    * Therefore, the point returned by this function should be projected onto
    * the unit cell, using GeometryInfo::project_to_unit_cell().  This is not
    * automatically performed by the algorithm.
+   *
+   * @note When @p marked_vertices is specified the function should always be
+   * called inside a try block to catch the exception that the function might
+   * throw in the case it couldn't find an active cell surrounding the point.
+   * The motivation of using @p marked_vertices is to cut down the search space
+   * of vertices if one has a priori knowledge of a collection of vertices that
+   * the point of interest may be close to. For instance, in the case when a
+   * parallel::shared::Triangulation is employed and we are looking for a point
+   * that we know is inside the locally owned part of the mesh, then it would
+   * make sense to pass an array for @p marked_vertices that flags only the
+   * vertices of all locally owned active cells. If, however, the function
+   * throws an exception, then that would imply that the point lies outside
+   * locally owned active cells.
    *
    * @note If the point requested does not lie in any of the cells of the mesh
    * given, then this function throws an exception of type
@@ -611,7 +651,8 @@ namespace GridTools
 #endif
   find_active_cell_around_point (const Mapping<dim,spacedim>  &mapping,
                                  const MeshType<dim,spacedim> &mesh,
-                                 const Point<spacedim>        &p);
+                                 const Point<spacedim>        &p,
+                                 const std::vector<bool>      &marked_vertices = std::vector<bool>());
 
   /**
    * A version of the previous function where we use that mapping on a given

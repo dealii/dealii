@@ -1047,11 +1047,11 @@ namespace GridTools
   }
 
 
-
   template <int dim, template <int, int> class MeshType, int spacedim>
   unsigned int
   find_closest_vertex (const MeshType<dim,spacedim> &mesh,
-                       const Point<spacedim>        &p)
+                       const Point<spacedim>        &p,
+                       const std::vector<bool>      &marked_vertices)
   {
     // first get the underlying
     // triangulation from the
@@ -1060,7 +1060,37 @@ namespace GridTools
     const Triangulation<dim, spacedim> &tria = mesh.get_triangulation();
 
     const std::vector< Point<spacedim> > &vertices = tria.get_vertices();
-    const std::vector< bool       > &used     = tria.get_used_vertices();
+
+    Assert ( tria.get_vertices().size() == marked_vertices.size() || marked_vertices.size() ==0,
+             ExcDimensionMismatch(tria.get_vertices().size(), marked_vertices.size()));
+
+    // If p is an element of marked_vertices,
+    // and q is that of used_Vertices,
+    // the vector marked_vertices does NOT
+    // contain unused vertices if p implies q.
+    // I.e., if p is true q must be true
+    // (if p is false, q could be false or true).
+    // p implies q logic is encapsulated in ~p|q.
+    Assert( marked_vertices.size()==0
+            ||
+            std::equal( marked_vertices.begin(),
+                        marked_vertices.end(),
+                        tria.get_used_vertices().begin(),
+                        [](bool p, bool q)
+    {
+      return !p || q;
+    }),
+    ExcMessage("marked_vertices should be a subset of used vertices in the triangulation "
+               "but marked_vertices contains one or more vertices that are not used vertices!") );
+
+    // In addition, if a vector bools
+    // is specified (marked_vertices)
+    // marking all the vertices which
+    // could be the potentially closest
+    // vertex to the point, use it instead
+    // of used vertices
+    const std::vector<bool> &used     =
+      (marked_vertices.size()==0) ? tria.get_used_vertices() : marked_vertices;
 
     // At the beginning, the first
     // used vertex is the closest one
@@ -1296,12 +1326,13 @@ next_cell:
   typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type
 #endif
   find_active_cell_around_point (const MeshType<dim,spacedim> &mesh,
-                                 const Point<spacedim>        &p)
+                                 const Point<spacedim>        &p,
+                                 const std::vector<bool>      &marked_vertices)
   {
     return
       find_active_cell_around_point<dim,MeshType,spacedim>
       (StaticMappingQ1<dim,spacedim>::mapping,
-       mesh, p).first;
+       mesh, p, marked_vertices).first;
   }
 
 
@@ -1313,7 +1344,8 @@ next_cell:
 #endif
   find_active_cell_around_point (const Mapping<dim,spacedim>  &mapping,
                                  const MeshType<dim,spacedim> &mesh,
-                                 const Point<spacedim>        &p)
+                                 const Point<spacedim>        &p,
+                                 const std::vector<bool>      &marked_vertices)
   {
     typedef typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type active_cell_iterator;
 
@@ -1329,7 +1361,7 @@ next_cell:
     // all adjacent cells
     std::vector<active_cell_iterator> adjacent_cells_tmp
       = find_cells_adjacent_to_vertex(mesh,
-                                      find_closest_vertex(mesh, p));
+                                      find_closest_vertex(mesh, p, marked_vertices));
 
     // Make sure that we have found
     // at least one cell adjacent to vertex.
@@ -1398,6 +1430,12 @@ next_cell:
 
         // update the number of cells searched
         cells_searched += adjacent_cells.size();
+
+        // if the user provided a custom mask for vertices,
+        // terminate the search without trying to expand the search
+        // to all cells of the triangulation, as done below.
+        if (marked_vertices.size() > 0)
+          cells_searched = n_active_cells;
 
         // if we have not found the cell in
         // question and have not yet searched every
