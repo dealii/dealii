@@ -1,0 +1,7 @@
+
+DEAL::1.00000 1.00000 is the closest vertex
+DEAL::The first call to the function find_closest_vertex() has thrown an exception. It is supposed to throw.
+DEAL::Test passed!
+DEAL::0.707107 0.707107 is the closest vertex
+DEAL::The first call to the function find_closest_vertex() has thrown an exception. It is supposed to throw.
+DEAL::Test passed!
