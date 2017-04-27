@@ -447,35 +447,6 @@ public:
                          std::vector<Vector<double> >               &computed_quantities) const;
 
   /**
-   * @deprecated This function is deprecated. It has been superseded by
-   * the evaluate_scalar_field() function that receives a superset of the
-   * information provided to the current function through the members
-   * of the structure it receives as the first argument.
-   *
-   * If a user class derived from the current class (or from
-   * DataPostprocessorScalar) does not overload the function above,
-   * but instead overloads the current (legacy) form of the function,
-   * then the default implementation of the function above will simply
-   * call the current function. However, not all elements of the
-   * DataPostprocessorInputs::Scalar argument the function above
-   * receives have corresponding function arguments in the current
-   * function, and consequently not all information that function has
-   * available is passed on to the current one. In other words, there
-   * are pieces of information you may need in an implementation of a
-   * postprocess that are available if you overload the new form of this
-   * function above, but that are not available if you overload the old
-   * form of the function here.
-   */
-  virtual
-  void
-  compute_derived_quantities_scalar (const std::vector<double>         &solution_values,
-                                     const std::vector<Tensor<1,dim> > &solution_gradients,
-                                     const std::vector<Tensor<2,dim> > &solution_hessians,
-                                     const std::vector<Point<dim> >    &normals,
-                                     const std::vector<Point<dim> >    &evaluation_points,
-                                     std::vector<Vector<double> >      &computed_quantities) const DEAL_II_DEPRECATED;
-
-  /**
    * Same as the evaluate_scalar_field() function, but this
    * function is called when the original data vector represents vector data,
    * i.e. the finite element in use has multiple vector components.
@@ -484,35 +455,6 @@ public:
   void
   evaluate_vector_field (const DataPostprocessorInputs::Vector<dim> &input_data,
                          std::vector<Vector<double> >               &computed_quantities) const;
-
-  /**
-   * @deprecated This function is deprecated. It has been superseded by
-   * the evaluate_vector_field() function that receives a superset of the
-   * information provided to the current function through the members
-   * of the structure it receives as the first argument.
-   *
-   * If a user class derived from the current class (or from
-   * DataPostprocessorVector) does not overload the function above,
-   * but instead overloads the current (legacy) form of the function,
-   * then the default implementation of the function above will simply
-   * call the current function. However, not all elements of the
-   * DataPostprocessorInputs::Vector argument the function above
-   * receives have corresponding function arguments in the current
-   * function, and consequently not all information that function has
-   * available is passed on to the current one. In other words, there
-   * are pieces of information you may need in an implementation of a
-   * postprocess that are available if you overload the new form of this
-   * function above, but that are not available if you overload the old
-   * form of the function here.
-   */
-  virtual
-  void
-  compute_derived_quantities_vector (const std::vector<Vector<double> >              &solution_values,
-                                     const std::vector<std::vector<Tensor<1,dim> > > &solution_gradients,
-                                     const std::vector<std::vector<Tensor<2,dim> > > &solution_hessians,
-                                     const std::vector<Point<dim> >                  &normals,
-                                     const std::vector<Point<dim> >                  &evaluation_points,
-                                     std::vector<Vector<double> >                    &computed_quantities) const DEAL_II_DEPRECATED;
 
   /**
    * Return the vector of strings describing the names of the computed
