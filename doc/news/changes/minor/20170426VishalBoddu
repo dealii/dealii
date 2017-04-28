@@ -1,0 +1,5 @@
+New: TriaAccessor::enclosing_ball() computes and return a pair of Point 
+and double corresponding to the center and the radius of a reasonably small 
+enclosing ball of the TriaAccessor object.
+<br>
+(Vishal Boddu, Denis Davydov 2017/04/26)

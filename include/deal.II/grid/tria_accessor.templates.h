@@ -2043,6 +2043,140 @@ TriaAccessor<structdim, dim, spacedim>::diameter () const
 
 
 template <int structdim, int dim, int spacedim>
+std::pair<Point<spacedim>,double>
+TriaAccessor<structdim, dim, spacedim>::enclosing_ball () const
+{
+  // If the object is one dimensional,
+  // the enclosing ball is the initial iterate
+  // i.e., the ball's center and diameter are
+  // the center and the diameter of the object.
+  if (structdim==1)
+    return std::make_pair( (this->vertex(1)+this->vertex(0))*0.5,
+                           (this->vertex(1)-this->vertex(0)).norm()*0.5);
+
+  // The list is_initial_guess_vertex contains bool values and has
+  // the same size as the number of vertices per object.
+  // The entries of is_initial_guess_vertex are set true only for those
+  // two vertices corresponding to the largest diagonal which is being used
+  // to construct the initial ball.
+  // We employ this mask to skip these two vertices while enlarging the ball.
+  std::array<bool, GeometryInfo<structdim>::vertices_per_cell> is_initial_guess_vertex;
+
+  //First let all the vertices be outside
+  std::fill(is_initial_guess_vertex.begin(),
+            is_initial_guess_vertex.end(),
+            false);
+
+  // Get an initial guess by looking at the largest diagonal
+  Point<spacedim> center;
+  double radius = 0;
+
+  switch (structdim)
+    {
+    case 2:
+    {
+      const Point<spacedim> p30( this->vertex(3)-this->vertex(0));
+      const Point<spacedim> p21( this->vertex(2)-this->vertex(1));
+      if (p30.norm() > p21.norm())
+        {
+          center = this->vertex(0) + 0.5* p30;
+          radius = p30.norm()/2.;
+          is_initial_guess_vertex[3] = true;
+          is_initial_guess_vertex[0] = true;
+        }
+      else
+        {
+          center = this->vertex(1) + 0.5* p21;
+          radius = p21.norm()/2.;
+          is_initial_guess_vertex[2] = true;
+          is_initial_guess_vertex[1] = true;
+        }
+      break;
+    }
+    case 3:
+    {
+      const Point<spacedim> p70( this->vertex(7)-this->vertex(0));
+      const Point<spacedim> p61( this->vertex(6)-this->vertex(1));
+      const Point<spacedim> p25( this->vertex(2)-this->vertex(5));
+      const Point<spacedim> p34( this->vertex(3)-this->vertex(4));
+      const std::vector<double> diagonals= { p70.norm(),
+                                             p61.norm(),
+                                             p25.norm(),
+                                             p34.norm()
+                                           };
+      const std::vector<double>::const_iterator
+      it = std::max_element( diagonals.begin(), diagonals.end());
+      if (it == diagonals.begin())
+        {
+          center = this->vertex(0) + 0.5* p70;
+          is_initial_guess_vertex[7] = true;
+          is_initial_guess_vertex[0] = true;
+        }
+      else if (it == diagonals.begin()+1)
+        {
+          center = this->vertex(1) + 0.5* p61;
+          is_initial_guess_vertex[6] = true;
+          is_initial_guess_vertex[1] = true;
+        }
+      else if (it == diagonals.begin()+2)
+        {
+          center = this->vertex(5) + 0.5* p25;
+          is_initial_guess_vertex[2] = true;
+          is_initial_guess_vertex[5] = true;
+        }
+      else
+        {
+          center = this->vertex(4) + 0.5* p34;
+          is_initial_guess_vertex[3] = true;
+          is_initial_guess_vertex[4] = true;
+        }
+      radius = *it * 0.5;
+      break;
+    }
+    default:
+      Assert (false, ExcNotImplemented());
+      return std::pair<Point<spacedim>,double>();
+    }
+
+  // For each vertex that is found to be geometrically outside the ball
+  // enlarge the ball  so that the new ball contains both the previous ball
+  // and the given vertex.
+  for (unsigned int v = 0; v < GeometryInfo<structdim>::vertices_per_cell; ++v)
+    if (!is_initial_guess_vertex[v])
+      {
+        const double distance = center.distance(this->vertex(v));
+        if (distance > radius)
+          {
+            // we found a vertex which is outside of the ball
+            // extend it (move center and change radius)
+            const Point<spacedim> pCV (center - this->vertex(v));
+            radius = (distance + radius) * 0.5;
+            center = this->vertex(v) + pCV * (radius / distance);
+
+            // Now the new ball constructed in this block
+            // encloses the vertex (v) that was found to be geometrically
+            // outside the old ball.
+          }
+      }
+#ifdef DEBUG
+  bool all_vertices_within_ball = true;
+
+  // Set all_vertices_within_ball false if any of the vertices of the object
+  // are geometrically outside the ball
+  for (unsigned int v = 0; v < GeometryInfo<structdim>::vertices_per_cell; ++v)
+    if (center.distance(this->vertex(v)) > radius + 100. *std::numeric_limits<double>::epsilon())
+      {
+        all_vertices_within_ball = false;
+        break;
+      }
+  // If all the vertices are not within the ball throw error
+  Assert (all_vertices_within_ball, ExcInternalError());
+#endif
+  return std::make_pair(center, radius);
+}
+
+
+template <int structdim, int dim, int spacedim>
 double
 TriaAccessor<structdim, dim, spacedim>::minimum_vertex_distance () const
 {
