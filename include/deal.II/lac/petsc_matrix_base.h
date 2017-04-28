@@ -1219,17 +1219,7 @@ namespace PETScWrappers
     // If we don't elide zeros, the pointers are already available...
     if (elide_zero_values == false)
       {
-#ifndef PETSC_USE_64BIT_INDICES
         col_index_ptr = reinterpret_cast<const PetscInt *>(col_indices);
-#else
-        if (column_indices.size() < n_cols)
-          column_indices.resize(n_cols);
-
-        for (size_type j=0; j<n_cols; ++j)
-          column_indices[j] = col_indices[j];
-
-        col_index_ptr = &column_indices[0];
-#endif
         col_value_ptr = values;
         n_columns = n_cols;
       }
@@ -1369,17 +1359,7 @@ namespace PETScWrappers
     // If we don't elide zeros, the pointers are already available...
     if (elide_zero_values == false)
       {
-#ifndef PETSC_USE_64BIT_INDICES
         col_index_ptr = reinterpret_cast<const PetscInt *>(col_indices);
-#else
-        if (column_indices.size() < n_cols)
-          column_indices.resize(n_cols);
-
-        for (size_type j=0; j<n_cols; ++j)
-          column_indices[j] = col_indices[j];
-
-        col_index_ptr = &column_indices[0];
-#endif
         col_value_ptr = values;
         n_columns = n_cols;
       }
