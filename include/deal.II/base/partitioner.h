@@ -43,9 +43,9 @@ namespace Utilities
      * allows the inclusion of ghost indices (i.e. indices that a current
      * processor needs to have access to, but are owned by another process)
      * through an IndexSet. In addition, it also stores the other processors'
-     * ghost indices belonging to the current processor, which are the indices
-     * where other processors might require information from. In a sense,
-     * these import indices form the dual of the ghost indices. This
+     * ghost indices belonging to the current processor (see import_targets()),
+     * which are the indices where other processors might require information from.
+     * In a sense, these import indices form the dual of the ghost indices. This
      * information is gathered once when constructing the partitioner, which
      * obviates subsequent global communication steps when exchanging data.
      *
@@ -190,18 +190,21 @@ namespace Utilities
       unsigned int n_ghost_indices() const;
 
       /**
-       * Return a list of processors (first entry) and the number of degrees
-       * of freedom for the individual processor on the ghost elements present
-       * (second entry).
+       * Return a list of processors (first entry) and the number of ghost degrees
+       * of freedom owned by that processor (second entry). The sum of the
+       * latter over all processors equals n_ghost_indices().
        */
       const std::vector<std::pair<unsigned int, unsigned int> > &
       ghost_targets() const;
 
       /**
-       * The set of (local) indices that we are importing during compress(),
-       * i.e., others' ghosts that belong to the local range. Similar
+       * Return a vector of ranges of local indices that we are importing during
+       * compress(), i.e., others' ghosts that belong to the local range. Similar
        * structure as in an IndexSet, but tailored to be iterated over, and
-       * some indices may be duplicates.
+       * some indices may be duplicated.
+       * The returned pairs consists of the index of
+       * the first element and the index of the element one past the last
+       * one in a range.
        */
       const std::vector<std::pair<unsigned int, unsigned int> > &
       import_indices() const;
@@ -214,9 +217,12 @@ namespace Utilities
 
       /**
        * Return a list of processors (first entry) and the number of degrees
-       * of freedom for all the processors that data is obtained from (second
-       * entry), i.e., locally owned indices that are ghosts on other
-       * processors.
+       * of freedom imported from it during compress() operation (second entry)
+       * for all the processors that data is obtained from, i.e., locally owned
+       * indices that are ghosts on other processors.
+       *
+       * @note the returned vector only contains those processor id's for which
+       * the second entry is non-zero.
        */
       const std::vector<std::pair<unsigned int, unsigned int> > &
       import_targets() const;
