@@ -22,7 +22,7 @@
 #  include <deal.II/lac/petsc_full_matrix.h>
 #  include <deal.II/lac/petsc_sparse_matrix.h>
 #  include <deal.II/lac/petsc_parallel_sparse_matrix.h>
-#  include <deal.II/lac/petsc_vector.h>
+#  include <deal.II/lac/petsc_vector_base.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -384,8 +384,8 @@ namespace PETScWrappers
   PetscScalar
   MatrixBase::matrix_norm_square (const VectorBase &v) const
   {
-    Vector tmp(v.size());
-    vmult (tmp, v);
+    VectorBase tmp(v);
+    vmult(tmp, v);
     return tmp*v;
   }
 
@@ -394,8 +394,8 @@ namespace PETScWrappers
   MatrixBase::matrix_scalar_product (const VectorBase &u,
                                      const VectorBase &v) const
   {
-    Vector tmp(v.size());
-    vmult (tmp, v);
+    VectorBase tmp(u);
+    vmult(tmp, v);
     return u*tmp;
   }
 
