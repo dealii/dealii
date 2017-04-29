@@ -1171,14 +1171,7 @@ namespace PETScWrappers
     // (unlike the above calls)
     if (n_elements != 0)
       {
-#ifdef PETSC_USE_64BIT_INDICES
-        std::vector<PetscInt> petsc_ind (n_elements);
-        for (size_type i=0; i<n_elements; ++i)
-          petsc_ind[i] = indices[i];
-        const PetscInt *petsc_indices = &petsc_ind[0];
-#else
-        const int *petsc_indices = (const int *)indices;
-#endif
+        const PetscInt *petsc_indices = reinterpret_cast<const PetscInt *>(indices);
 
         const InsertMode mode = (add_values ? ADD_VALUES : INSERT_VALUES);
         const PetscErrorCode ierr = VecSetValues (vector, n_elements, petsc_indices,
