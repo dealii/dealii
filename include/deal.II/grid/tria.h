@@ -3651,21 +3651,26 @@ Triangulation<dim,spacedim>::save (Archive &ar,
 {
   // as discussed in the documentation, do not store the signals as
   // well as boundary and manifold description but everything else
-  ar &smooth_grid;
-  ar &levels;
-  ar &faces;
-  ar &vertices;
-  ar &vertices_used;
+  ar & smooth_grid;
 
-  ar &anisotropic_refinement;
-  ar &number_cache;
+  unsigned int size = levels.size();
+  ar & size;
+  for (unsigned int i = 0; i < levels.size(); ++i)
+    ar & levels[i];
 
-  ar &check_for_distorted_cells;
+  ar & faces;
+  ar & vertices;
+  ar & vertices_used;
+
+  ar & anisotropic_refinement;
+  ar & number_cache;
+
+  ar & check_for_distorted_cells;
 
   if (dim == 1)
     {
-      ar &vertex_to_boundary_id_map_1d;
-      ar &vertex_to_manifold_id_map_1d;
+      ar & vertex_to_boundary_id_map_1d;
+      ar & vertex_to_manifold_id_map_1d;
     }
 }
 
@@ -3682,14 +3687,24 @@ Triangulation<dim,spacedim>::load (Archive &ar,
 
   // as discussed in the documentation, do not store the signals as
   // well as boundary and manifold description but everything else
-  ar &smooth_grid;
-  ar &levels;
-  ar &faces;
-  ar &vertices;
-  ar &vertices_used;
+  ar & smooth_grid;
 
-  ar &anisotropic_refinement;
-  ar &number_cache;
+  unsigned int size;
+  ar & size;
+  levels.resize(size);
+  for (unsigned int i = 0; i < levels.size(); ++i)
+    {
+      std::unique_ptr<internal::Triangulation::TriaLevel<dim>> level;
+      ar & level;
+      levels[i] = std::move(level);
+    }
+
+  ar & faces;
+  ar & vertices;
+  ar & vertices_used;
+
+  ar & anisotropic_refinement;
+  ar & number_cache;
 
   // the levels do not serialize the active_cell_indices because
   // they are easy enough to rebuild upon re-loading data. do
@@ -3702,7 +3717,7 @@ Triangulation<dim,spacedim>::load (Archive &ar,
 
 
   bool my_check_for_distorted_cells;
-  ar &my_check_for_distorted_cells;
+  ar & my_check_for_distorted_cells;
 
   Assert (my_check_for_distorted_cells == check_for_distorted_cells,
           ExcMessage ("The triangulation loaded into here must have the "
@@ -3711,8 +3726,8 @@ Triangulation<dim,spacedim>::load (Archive &ar,
 
   if (dim == 1)
     {
-      ar &vertex_to_boundary_id_map_1d;
-      ar &vertex_to_manifold_id_map_1d;
+      ar & vertex_to_boundary_id_map_1d;
+      ar & vertex_to_manifold_id_map_1d;
     }
 
   // trigger the create signal to indicate
