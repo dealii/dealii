@@ -808,15 +808,8 @@ public:
               const Vector<Number> &b) DEAL_II_DEPRECATED;
 
   /**
-   * This function does nothing but is there for compatibility with the @p
-   * PETScWrappers::Vector class.
-   *
-   * For the PETSc vector wrapper class, this function updates the ghost
-   * values of the PETSc vector. This is necessary after any modification
-   * before reading ghost values.
-   *
-   * However, for the implementation of this class, it is immaterial and thus
-   * an empty function.
+   * This function does nothing but exists for compatibility with the @p
+   * parallel vector classes (e.g., LinearAlgebra::distributed::Vector class).
    */
   void update_ghost_values () const;
   //@}

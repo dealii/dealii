@@ -1700,12 +1700,12 @@ public:
    * described by fe_function at the $q$th quadrature point.
    *
    * @note The actual data type of the input vector may be either a
-   * Vector&lt;T&gt;, BlockVector&lt;T&gt;, or one of the sequential PETSc or
-   * Trilinos vector wrapper classes. It represents a global vector of DoF
-   * values associated with the DofHandler object with which this FEValues
-   * object was last initialized. Alternatively, if the vector argument is of
-   * type IndexSet, then the function is represented as one that is either
-   * zero or one, depending on whether a DoF index is in the set or not.
+   * Vector&lt;T&gt;, BlockVector&lt;T&gt;, or one of the PETSc or Trilinos
+   * vector wrapper classes. It represents a global vector of DoF values
+   * associated with the DoFHandler object with which this FEValues object was
+   * last initialized. Alternatively, if the vector argument is of type
+   * IndexSet, then the function is represented as one that is either zero or
+   * one, depending on whether a DoF index is in the set or not.
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
@@ -1849,12 +1849,12 @@ public:
    * direction $d$ at quadrature point $q$.
    *
    * @note The actual data type of the input vector may be either a
-   * Vector&lt;T&gt;, BlockVector&lt;T&gt;, or one of the sequential PETSc or
-   * Trilinos vector wrapper classes. It represents a global vector of DoF
-   * values associated with the DoFHandler object with which this FEValues
-   * object was last initialized. Alternatively, if the vector argument is of
-   * type IndexSet, then the function is represented as one that is either
-   * zero or one, depending on whether a DoF index is in the set or not.
+   * Vector&lt;T&gt;, BlockVector&lt;T&gt;, or one of the PETSc or Trilinos
+   * vector wrapper classes. It represents a global vector of DoF values
+   * associated with the DoFHandler object with which this FEValues object was
+   * last initialized. Alternatively, if the vector argument is of type
+   * IndexSet, then the function is represented as one that is either zero or
+   * one, depending on whether a DoF index is in the set or not.
    *
    * @dealiiRequiresUpdateFlags{update_gradients}
    */
@@ -1939,12 +1939,12 @@ public:
    * matrix of second derivatives at quadrature point $q$.
    *
    * @note The actual data type of the input vector may be either a
-   * Vector&lt;T&gt;, BlockVector&lt;T&gt;, or one of the sequential PETSc or
-   * Trilinos vector wrapper classes. It represents a global vector of DoF
-   * values associated with the DofHandler object with which this FEValues
-   * object was last initialized. Alternatively, if the vector argument is of
-   * type IndexSet, then the function is represented as one that is either
-   * zero or one, depending on whether a DoF index is in the set or not.
+   * Vector&lt;T&gt;, BlockVector&lt;T&gt;, or one of the PETSc or Trilinos
+   * vector wrapper classes. It represents a global vector of DoF values
+   * associated with the DoFHandler object with which this FEValues object was
+   * last initialized. Alternatively, if the vector argument is of type
+   * IndexSet, then the function is represented as one that is either zero or
+   * one, depending on whether a DoF index is in the set or not.
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
@@ -2032,12 +2032,12 @@ public:
    * would be the output of the get_function_hessians() function.
    *
    * @note The actual data type of the input vector may be either a
-   * Vector&lt;T&gt;, BlockVector&lt;T&gt;, or one of the sequential PETSc or
-   * Trilinos vector wrapper classes. It represents a global vector of DoF
-   * values associated with the DofHandler object with which this FEValues
-   * object was last initialized. Alternatively, if the vector argument is of
-   * type IndexSet, then the function is represented as one that is either
-   * zero or one, depending on whether a DoF index is in the set or not.
+   * Vector&lt;T&gt;, BlockVector&lt;T&gt;, or one of the PETSc or Trilinos
+   * vector wrapper classes. It represents a global vector of DoF values
+   * associated with the DoFHandler object with which this FEValues object was
+   * last initialized. Alternatively, if the vector argument is of type
+   * IndexSet, then the function is represented as one that is either zero or
+   * one, depending on whether a DoF index is in the set or not.
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
@@ -2142,12 +2142,12 @@ public:
    * quadrature point $q$.
    *
    * @note The actual data type of the input vector may be either a
-   * Vector&lt;T&gt;, BlockVector&lt;T&gt;, or one of the sequential PETSc or
-   * Trilinos vector wrapper classes. It represents a global vector of DoF
-   * values associated with the DofHandler object with which this FEValues
-   * object was last initialized. Alternatively, if the vector argument is of
-   * type IndexSet, then the function is represented as one that is either
-   * zero or one, depending on whether a DoF index is in the set or not.
+   * Vector&lt;T&gt;, BlockVector&lt;T&gt;, or one of the PETSc or Trilinos
+   * vector wrapper classes. It represents a global vector of DoF values
+   * associated with the DoFHandler object with which this FEValues object was
+   * last initialized. Alternatively, if the vector argument is of type
+   * IndexSet, then the function is represented as one that is either zero or
+   * one, depending on whether a DoF index is in the set or not.
    *
    * @dealiiRequiresUpdateFlags{update_3rd_derivatives}
    */

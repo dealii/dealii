@@ -474,9 +474,9 @@ namespace internal
 /**
  * A vector composed of several blocks each representing a vector of its own.
  *
- * The BlockVector is a collection of Vectors (e.g. of either deal.II Vector
- * objects or PETScWrappers::Vector object). Each of the vectors inside can
- * have a different size.
+ * The BlockVector is a collection of vectors of a given type (e.g., deal.II
+ * Vector objects, PETScWrappers::MPI::Vector objects, etc.). Each of the
+ * vectors inside can have a different size.
  *
  * The functionality of BlockVector includes everything a Vector can do, plus
  * the access to a single Vector inside the BlockVector by <tt>block(i)</tt>.
@@ -931,15 +931,8 @@ public:
             const value_type b, const BlockVectorBase &W);
 
   /**
-   * This function does nothing but is there for compatibility with the @p
-   * PETScWrappers::Vector class.
-   *
-   * For the PETSc vector wrapper class, this function updates the ghost
-   * values of the PETSc vector. This is necessary after any modification
-   * before reading ghost values.
-   *
-   * However, for the implementation of this class, it is immaterial and thus
-   * an empty function.
+   * Update the ghost values by calling <code>update_ghost_values</code> for
+   * each block.
    */
   void update_ghost_values () const;
 

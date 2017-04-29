@@ -43,11 +43,11 @@ namespace PETScWrappers
      */
 
     /**
-     * Blocked sparse matrix based on the PETScWrappers::SparseMatrix class.
-     * This class implements the functions that are specific to the PETSc
-     * SparseMatrix base objects for a blocked sparse matrix, and leaves the
-     * actual work relaying most of the calls to the individual blocks to the
-     * functions implemented in the base class. See there also for a
+     * Blocked sparse matrix based on the PETScWrappers::MPI::SparseMatrix
+     * class. This class implements the functions that are specific to the
+     * PETSc SparseMatrix base objects for a blocked sparse matrix, and leaves
+     * the actual work relaying most of the calls to the individual blocks to
+     * the functions implemented in the base class. See there also for a
      * description of when this class is useful.
      *
      * In contrast to the deal.II-type SparseMatrix class, the PETSc matrices
