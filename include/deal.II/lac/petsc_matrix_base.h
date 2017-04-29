@@ -1208,26 +1208,22 @@ namespace PETScWrappers
                    const PetscScalar  *values,
                    const bool         elide_zero_values)
   {
-    (void)elide_zero_values;
-
     prepare_action(VectorOperation::insert);
 
     const PetscInt petsc_i = row;
-    PetscInt *col_index_ptr;
+    PetscInt const *col_index_ptr;
 
     PetscScalar const *col_value_ptr;
     int n_columns;
 
     // If we don't elide zeros, the pointers are already available...
-#ifndef PETSC_USE_64BIT_INDICES
     if (elide_zero_values == false)
       {
-        col_index_ptr = (int *)col_indices;
+        col_index_ptr = reinterpret_cast<const PetscInt *>(col_indices);
         col_value_ptr = values;
         n_columns = n_cols;
       }
     else
-#endif
       {
         // Otherwise, extract nonzero values in each row and get the
         // respective index.
@@ -1355,21 +1351,19 @@ namespace PETScWrappers
     prepare_action(VectorOperation::add);
 
     const PetscInt petsc_i = row;
-    PetscInt *col_index_ptr;
+    PetscInt const *col_index_ptr;
 
     PetscScalar const *col_value_ptr;
     int n_columns;
 
     // If we don't elide zeros, the pointers are already available...
-#ifndef PETSC_USE_64BIT_INDICES
     if (elide_zero_values == false)
       {
-        col_index_ptr = (int *)col_indices;
+        col_index_ptr = reinterpret_cast<const PetscInt *>(col_indices);
         col_value_ptr = values;
         n_columns = n_cols;
       }
     else
-#endif
       {
         // Otherwise, extract nonzero values in each row and get the
         // respective index.
