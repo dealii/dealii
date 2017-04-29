@@ -483,30 +483,6 @@ namespace PETScWrappers
              internal::VectorReference::ExcWrongMode (VectorOperation::unknown,
                                                       last_action));
 
-
-      if (v.size()==0)
-        {
-          // this happens if v has not been initialized to something useful:
-          //   Vector x,v;
-          //   x=v;
-          // we skip the code below and create a simple serial vector of
-          // length 0
-
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-          PetscErrorCode ierr = VecDestroy (vector);
-#else
-          PetscErrorCode ierr = VecDestroy (&vector);
-#endif
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-          const int n = 0;
-          ierr = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
-          ghosted = false;
-          ghost_indices.clear();
-          return *this;
-        }
-
       // if the vectors have different sizes,
       // then first resize the present one
       if (size() != v.size())

@@ -32,12 +32,7 @@ namespace PETScWrappers
     Vector::Vector ()
       : communicator (MPI_COMM_SELF)
     {
-      // this is an invalid empty vector, so we can just as well create a
-      // sequential one to avoid all the overhead incurred by parallelism
-      const int n = 0;
-      const PetscErrorCode ierr = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
-      ghosted = false;
+      create_vector(0, 0);
     }
 
 
@@ -104,15 +99,10 @@ namespace PETScWrappers
     void
     Vector::clear ()
     {
-      // destroy the PETSc Vec and create an invalid empty vector,
-      // so we can just as well create a sequential one to avoid
-      // all the overhead incurred by parallelism
       attained_ownership = true;
       VectorBase::clear ();
 
-      const int n = 0;
-      const PetscErrorCode ierr = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
+      create_vector(0, 0);
     }
 
 
