@@ -3652,7 +3652,12 @@ Triangulation<dim,spacedim>::save (Archive &ar,
   // as discussed in the documentation, do not store the signals as
   // well as boundary and manifold description but everything else
   ar &smooth_grid;
-  ar &levels;
+
+  unsigned int n_levels = levels.size();
+  ar &n_levels;
+  for (unsigned int i = 0; i < levels.size(); ++i)
+    ar &levels[i];
+
   ar &faces;
   ar &vertices;
   ar &vertices_used;
@@ -3683,7 +3688,17 @@ Triangulation<dim,spacedim>::load (Archive &ar,
   // as discussed in the documentation, do not store the signals as
   // well as boundary and manifold description but everything else
   ar &smooth_grid;
-  ar &levels;
+
+  unsigned int size;
+  ar &size;
+  levels.resize(size);
+  for (unsigned int i = 0; i < levels.size(); ++i)
+    {
+      std::unique_ptr<internal::Triangulation::TriaLevel<dim>> level;
+      ar &level;
+      levels[i] = std::move(level);
+    }
+
   ar &faces;
   ar &vertices;
   ar &vertices_used;
