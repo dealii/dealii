@@ -582,7 +582,7 @@ namespace PETScWrappers
     {
       /**
        * Constructor. (Default values taken from function PCCreate_LU of the
-       * PetSC lib.)
+       * PETSc lib.)
        */
       AdditionalData (const double pivoting = 1.e-6,
                       const double zero_pivot = 1.e-12,
@@ -590,13 +590,13 @@ namespace PETScWrappers
 
       /**
        * Determines, when Pivoting is done during LU decomposition. 0.0
-       * indicates no pivoting, and 1.0 complete pivoting. Confer PetSC manual
+       * indicates no pivoting, and 1.0 complete pivoting. Confer PETSc manual
        * for more details.
        */
       double pivoting;
 
       /**
-       * Size at which smaller pivots are declared to be zero. Confer PetSC
+       * Size at which smaller pivots are declared to be zero. Confer PETSc
        * manual for more details.
        */
       double zero_pivot;

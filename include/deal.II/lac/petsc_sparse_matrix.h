@@ -34,7 +34,7 @@ template <typename MatrixType> class BlockMatrixBase;
 namespace PETScWrappers
 {
   /**
-   * Implementation of a sequential sparse matrix class based on PETSC. All
+   * Implementation of a sequential sparse matrix class based on PETSc. All
    * the functionality is actually in the base class, except for the calls to
    * generate a sequential sparse matrix. This is possible since PETSc only
    * works on an abstract matrix type and internally distributes to functions

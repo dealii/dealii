@@ -40,7 +40,7 @@ namespace PETScWrappers
 
 
     /**
-     * Implementation of a parallel sparse matrix class based on PETSC, with
+     * Implementation of a parallel sparse matrix class based on PETSc, with
      * rows of the matrix distributed across an MPI network. All the
      * functionality is actually in the base class, except for the calls to
      * generate a parallel sparse matrix. This is possible since PETSc only
