@@ -32,12 +32,7 @@ namespace PETScWrappers
     Vector::Vector ()
       : communicator (MPI_COMM_SELF)
     {
-      // this is an invalid empty vector, so we can just as well create a
-      // sequential one to avoid all the overhead incurred by parallelism
-      const int n = 0;
-      const PetscErrorCode ierr = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
-      ghosted = false;
+      create_vector(0, 0);
     }
 
 
@@ -101,18 +96,49 @@ namespace PETScWrappers
 
 
 
+    Vector &
+    Vector::operator= (const Vector &v)
+    {
+      // make sure left- and right-hand side of the assignment are compress()'ed:
+      Assert(v.last_action == VectorOperation::unknown,
+             internal::VectorReference::ExcWrongMode (VectorOperation::unknown,
+                                                      v.last_action));
+      Assert(last_action == VectorOperation::unknown,
+             internal::VectorReference::ExcWrongMode (VectorOperation::unknown,
+                                                      last_action));
+
+      // if the vectors have different sizes,
+      // then first resize the present one
+      if (size() != v.size())
+        {
+          if (v.has_ghost_elements())
+            reinit( v.locally_owned_elements(), v.ghost_indices, v.communicator);
+          else
+            reinit (v.communicator, v.size(), v.local_size(), true);
+        }
+
+      PetscErrorCode ierr = VecCopy (v.vector, vector);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      if (has_ghost_elements())
+        {
+          ierr = VecGhostUpdateBegin(vector, INSERT_VALUES, SCATTER_FORWARD);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
+          ierr = VecGhostUpdateEnd(vector, INSERT_VALUES, SCATTER_FORWARD);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
+        }
+      return *this;
+    }
+
+
+
     void
     Vector::clear ()
     {
-      // destroy the PETSc Vec and create an invalid empty vector,
-      // so we can just as well create a sequential one to avoid
-      // all the overhead incurred by parallelism
       attained_ownership = true;
       VectorBase::clear ();
 
-      const int n = 0;
-      const PetscErrorCode ierr = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
+      create_vector(0, 0);
     }
 
 

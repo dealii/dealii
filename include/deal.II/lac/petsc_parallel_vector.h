@@ -471,67 +471,6 @@ namespace PETScWrappers
 
 
 
-    inline
-    Vector &
-    Vector::operator= (const Vector &v)
-    {
-      // make sure left- and right-hand side of the assignment are compress()'ed:
-      Assert(v.last_action == VectorOperation::unknown,
-             internal::VectorReference::ExcWrongMode (VectorOperation::unknown,
-                                                      v.last_action));
-      Assert(last_action == VectorOperation::unknown,
-             internal::VectorReference::ExcWrongMode (VectorOperation::unknown,
-                                                      last_action));
-
-
-      if (v.size()==0)
-        {
-          // this happens if v has not been initialized to something useful:
-          //   Vector x,v;
-          //   x=v;
-          // we skip the code below and create a simple serial vector of
-          // length 0
-
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-          PetscErrorCode ierr = VecDestroy (vector);
-#else
-          PetscErrorCode ierr = VecDestroy (&vector);
-#endif
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-          const int n = 0;
-          ierr = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
-          ghosted = false;
-          ghost_indices.clear();
-          return *this;
-        }
-
-      // if the vectors have different sizes,
-      // then first resize the present one
-      if (size() != v.size())
-        {
-          if (v.has_ghost_elements())
-            reinit( v.locally_owned_elements(), v.ghost_indices, v.communicator);
-          else
-            reinit (v.communicator, v.size(), v.local_size(), true);
-        }
-
-      PetscErrorCode ierr = VecCopy (v.vector, vector);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-      if (has_ghost_elements())
-        {
-          ierr = VecGhostUpdateBegin(vector, INSERT_VALUES, SCATTER_FORWARD);
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
-          ierr = VecGhostUpdateEnd(vector, INSERT_VALUES, SCATTER_FORWARD);
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
-        }
-      return *this;
-    }
-
-
-
     template <typename number>
     inline
     Vector &
