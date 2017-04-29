@@ -1716,6 +1716,208 @@ next_cell:
 
 
 
+  template <class MeshType>
+  std::vector<typename MeshType::active_cell_iterator>
+  compute_active_cell_layer_within_distance
+  (const MeshType                                                                    &mesh,
+   const std::function<bool (const typename MeshType::active_cell_iterator &)> &predicate,
+   const double                                                                       layer_thickness)
+  {
+    std::vector<typename MeshType::active_cell_iterator> subdomain_boundary_cells, active_cell_layer_within_distance;
+    std::vector<bool> vertices_outside_subdomain ( mesh.get_triangulation().n_vertices(),
+                                                   false);
+
+    const unsigned int spacedim = MeshType::space_dimension;
+
+    unsigned int n_non_predicate_cells = 0; // Number of non predicate cells
+
+    // Find the layer of cells for which predicate is true and that
+    // are on the boundary with other cells. These are
+    // subdomain boundary cells.
+
+    // Find the cells for which the predicate is false
+    // These are the cells which are around the predicate subdomain
+    for ( typename MeshType::active_cell_iterator
+          cell = mesh.begin_active();
+          cell != mesh.end(); ++cell)
+      if ( !predicate(cell)) // Negation of predicate --> Not Part of subdomain
+        {
+          for (unsigned int v=0; v<GeometryInfo<MeshType::dimension>::vertices_per_cell; ++v)
+            vertices_outside_subdomain[cell->vertex_index(v)] = true;
+          n_non_predicate_cells++;
+        }
+
+    // If all the active cells conform to the predicate
+    // or if none of the active cells conform to the predicate
+    // there is no active cell layer around the predicate
+    // subdomain (within any distance)
+    if ( n_non_predicate_cells == 0  || n_non_predicate_cells == mesh.get_triangulation().n_active_cells() )
+      return std::vector<typename MeshType::active_cell_iterator>();
+
+    // Find the cells that conform to the predicate
+    // but share a vertex with the cell not in the predicate subdomain
+    for ( typename MeshType::active_cell_iterator
+          cell = mesh.begin_active();
+          cell != mesh.end(); ++cell)
+      if ( predicate(cell)) // True predicate --> Potential boundary cell of the subdomain
+        for (unsigned int v=0; v<GeometryInfo<MeshType::dimension>::vertices_per_cell; ++v)
+          if (vertices_outside_subdomain[cell->vertex_index(v)] == true)
+            {
+              subdomain_boundary_cells.push_back(cell);
+              break; // No need to go through remaining vertices
+            }
+
+    // To cheaply filter out some cells located far away from the predicate subdomain,
+    // get the bounding box of the predicate subdomain.
+    std::pair< Point<spacedim>, Point<spacedim> > bounding_box = compute_bounding_box( mesh,
+        predicate );
+
+    // DOUBLE_EPSILON to compare really close double values
+    const double &DOUBLE_EPSILON = 100.*std::numeric_limits<double>::epsilon();
+
+    // Add layer_thickness to the bounding box
+    for ( unsigned int d=0; d<spacedim; ++d)
+      {
+        bounding_box.first[d]  -= (layer_thickness+DOUBLE_EPSILON); // minp
+        bounding_box.second[d] += (layer_thickness+DOUBLE_EPSILON); // maxp
+      }
+
+    std::vector<Point<spacedim> > subdomain_boundary_cells_centers; // cache all the subdomain boundary cells centers here
+    std::vector<double> subdomain_boundary_cells_radii; // cache all the subdomain boundary cells radii
+    subdomain_boundary_cells_centers.reserve (subdomain_boundary_cells.size());
+    subdomain_boundary_cells_radii.reserve (subdomain_boundary_cells.size());
+    // compute cell radius for each boundary cell of the predicate subdomain
+    for ( typename std::vector<typename MeshType::active_cell_iterator>::const_iterator
+          subdomain_boundary_cell_iterator  = subdomain_boundary_cells.begin();
+          subdomain_boundary_cell_iterator != subdomain_boundary_cells.end(); ++subdomain_boundary_cell_iterator )
+      {
+        const std::pair<Point<spacedim>, double> &
+        subdomain_boundary_cell_enclosing_ball = (*subdomain_boundary_cell_iterator)->enclosing_ball();
+
+        subdomain_boundary_cells_centers.push_back( subdomain_boundary_cell_enclosing_ball.first);
+        subdomain_boundary_cells_radii.push_back( subdomain_boundary_cell_enclosing_ball.second);
+      }
+    AssertThrow( subdomain_boundary_cells_radii.size() == subdomain_boundary_cells_centers.size(),
+                 ExcInternalError());
+
+    // Find the cells that are within layer_thickness of predicate subdomain boundary
+    // distance but are inside the extended bounding box.
+    // Most cells might be outside the extended bounding box, so we could skip them.
+    // Those cells that are inside the extended bounding box but are not part of the
+    // predicate subdomain are possible candidates to be within the distance to the
+    // boundary cells of the predicate subdomain.
+    for ( typename MeshType::active_cell_iterator
+          cell = mesh.begin_active();
+          cell != mesh.end(); ++cell)
+      {
+        // Ignore all the cells that are in the predicate subdomain
+        if ( predicate(cell))
+          continue;
+
+        const std::pair<Point<spacedim>, double> &cell_enclosing_ball
+          = cell->enclosing_ball();
+
+        const Point<spacedim> &cell_enclosing_ball_center = cell_enclosing_ball.first;
+        const double &cell_enclosing_ball_radius = cell_enclosing_ball.second;
+
+        bool cell_inside = true; // reset for each cell
+
+        for (unsigned int d = 0; d < spacedim; ++d)
+          cell_inside &= (cell_enclosing_ball_center[d] + cell_enclosing_ball_radius > bounding_box.first[d])
+                         && (cell_enclosing_ball_center[d] - cell_enclosing_ball_radius < bounding_box.second[d]);
+        // cell_inside is true if its enclosing ball intersects the extended bounding box
+
+        // Ignore all the cells that are outside the extended bounding box
+        if (cell_inside)
+          for (unsigned int i =0; i< subdomain_boundary_cells_radii.size(); ++i)
+            if ( cell_enclosing_ball_center.distance_square(subdomain_boundary_cells_centers[i])
+                 <  Utilities::fixed_power<2>( cell_enclosing_ball_radius +
+                                               subdomain_boundary_cells_radii[i] +
+                                               layer_thickness + DOUBLE_EPSILON ))
+              {
+                active_cell_layer_within_distance.push_back(cell);
+                break; // Exit the loop checking all the remaining subdomain boundary cells
+              }
+
+      }
+    return active_cell_layer_within_distance;
+  }
+
+
+
+  template <class MeshType>
+  std::vector<typename MeshType::active_cell_iterator>
+  compute_ghost_cell_layer_within_distance ( const MeshType &mesh, const double layer_thickness)
+  {
+    IteratorFilters::LocallyOwnedCell locally_owned_cell_predicate;
+    std::function<bool (const typename MeshType::active_cell_iterator &)> predicate (locally_owned_cell_predicate);
+
+    const std::vector<typename MeshType::active_cell_iterator>
+    ghost_cell_layer_within_distance = compute_active_cell_layer_within_distance (mesh, predicate, layer_thickness);
+
+    // Check that we never return locally owned or artificial cells
+    // What is left should only be the ghost cells
+    Assert(contains_locally_owned_cells<MeshType>(ghost_cell_layer_within_distance) == false,
+           ExcMessage("Ghost cells within layer_thickness contains locally owned cells."));
+    Assert(contains_artificial_cells<MeshType>(ghost_cell_layer_within_distance) == false,
+           ExcMessage("Ghost cells within layer_thickness contains artificial cells."
+                      "The function compute_ghost_cell_layer_within_distance "
+                      "is probably called while using parallel::distributed::Triangulation. "
+                      "In such case please refer to the description of this function."));
+
+    return ghost_cell_layer_within_distance;
+  }
+
+
+
+  template< class MeshType>
+  std::pair< Point<MeshType::space_dimension>, Point<MeshType::space_dimension> >
+  compute_bounding_box
+  ( const MeshType                                                                    &mesh,
+    const std::function<bool (const typename MeshType::active_cell_iterator &)> &predicate )
+  {
+    std::vector<bool> locally_active_vertices_on_subdomain (mesh.get_triangulation().n_vertices(),
+                                                            false);
+
+    const unsigned int spacedim = MeshType::space_dimension;
+
+    // Two extreme points can define the bounding box
+    // around the active cells that conform to the given predicate.
+    Point<MeshType::space_dimension> maxp, minp;
+
+    // initialize minp and maxp with the first predicate cell center
+    for ( typename MeshType::active_cell_iterator
+          cell = mesh.begin_active();
+          cell != mesh.end(); ++cell)
+      if ( predicate(cell))
+        {
+          minp = cell->center();
+          maxp = cell->center();
+          break;
+        }
+
+    // Run through all the cells to check if it belongs to predicate domain,
+    // if it belongs to the predicate domain, extend the bounding box.
+    for ( typename MeshType::active_cell_iterator
+          cell = mesh.begin_active();
+          cell != mesh.end(); ++cell)
+      if (predicate(cell)) // True predicate --> Part of subdomain
+        for (unsigned int v=0; v<GeometryInfo<MeshType::dimension>::vertices_per_cell; ++v)
+          if (locally_active_vertices_on_subdomain[cell->vertex_index(v)] == false)
+            {
+              locally_active_vertices_on_subdomain[cell->vertex_index(v)] = true;
+              for ( unsigned int d=0; d<spacedim; ++d)
+                {
+                  minp[d] = std::min( minp[d], cell->vertex(v)[d]);
+                  maxp[d] = std::max( maxp[d], cell->vertex(v)[d]);
+                }
+            }
+
+    return std::make_pair( minp, maxp );
+  }
+
+
+
   template <int dim, int spacedim>
   std::vector<std::set<typename Triangulation<dim,spacedim>::active_cell_iterator> >
   vertex_to_cell_map(const Triangulation<dim,spacedim> &triangulation)

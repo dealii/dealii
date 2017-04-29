@@ -1,0 +1,10 @@
+New: GridTools::compute_bounding_box() computes a bounding box of a subdomain
+whose active cells conform to a given predicate. 
+GridTools::compute_active_cell_layer_within_distance() computes a collection
+of active cells that are within a given distance from  
+predicate subdomain.
+GridTools::compute_ghost_cell_layer_within_distance() computes a collection
+of active cells that are within a given distance from 
+locally owned active cells.
+<br>
+(Vishal Boddu, Denis Davydov 2017/03/23)
