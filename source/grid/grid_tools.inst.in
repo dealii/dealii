@@ -57,6 +57,24 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
     std::vector<dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type>
     compute_ghost_cell_halo_layer (const X &);
 
+
+    template
+    std::vector<dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type>
+    compute_active_cell_layer_within_distance (const X &,
+            const std::function<bool (const dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type&)> &,
+            const double);
+
+
+    template
+    std::vector<dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type>
+    compute_ghost_cell_layer_within_distance (const X &, const double);
+
+
+    template
+    std::pair< Point<X::space_dimension>, Point<X::space_dimension> >
+    compute_bounding_box (const X &,
+                          const std::function<bool (const dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type&)> &);
+
     template
     std::list<std::pair<X::cell_iterator, X::cell_iterator> >
     get_finest_common_cells (const X &mesh_1,
