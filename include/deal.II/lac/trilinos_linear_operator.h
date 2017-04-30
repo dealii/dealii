@@ -18,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-#if defined(DEAL_II_WITH_CXX11) && defined(DEAL_II_WITH_TRILINOS)
+#if defined(DEAL_II_WITH_TRILINOS)
 
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/block_linear_operator.h>
@@ -222,5 +222,5 @@ namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_WITH_CXX11 && DEAL_II_WITH_TRILINOS
+#endif // DEAL_II_WITH_TRILINOS
 #endif

@@ -267,11 +267,8 @@ namespace internal
        * Copy constructor from an iterator of different constness.
        *
        * @note Constructing a non-const iterator from a const iterator does
-       * not make sense. If deal.II was configured with C++11 support, then
-       * attempting this will result in a compile-time error (via
-       * <code>static_assert</code>). If deal.II was not configured with C++11
-       * support, then attempting this will result in a thrown exception in
-       * debug mode.
+       * not make sense. Attempting this will result in a compile-time error
+       * (via <code>static_assert</code>).
        */
       Iterator (const Iterator<BlockVectorType,!Constness> &c);
 
@@ -423,16 +420,6 @@ namespace internal
                         "different block vectors. There is no reasonable way "
                         "to do this.");
 
-      /**
-       * Exception thrown when one attempts to copy construct a non-const
-       * iterator from a const iterator.
-       *
-       * @note when deal.II is compiled with C++11 support this check is
-       * instead performed at compile time via <code>static_assert</code>.
-       */
-      DeclExceptionMsg (ExcCastingAwayConstness,
-                        "Constructing a non-const iterator from a const "
-                        "iterator does not make sense.");
       //@}
     private:
       /**
@@ -580,7 +567,6 @@ public:
    */
   BlockVectorBase ();
 
-#ifdef DEAL_II_WITH_CXX11
   /**
    * Copy constructor.
    */
@@ -590,12 +576,8 @@ public:
    * Move constructor. Each block of the argument vector is moved into the current
    * object if the underlying <code>VectorType</code> is move-constructible,
    * otherwise they are copied.
-   *
-   * @note This constructor is only available if deal.II is configured with
-   * C++11 support.
    */
   BlockVectorBase (BlockVectorBase &&/*V*/) = default;
-#endif
 
   /**
    * Update internal structures after resizing vectors. Whenever you reinited
@@ -743,14 +725,12 @@ public:
   BlockVectorBase &
   operator= (const BlockVectorBase &V);
 
-#ifdef DEAL_II_WITH_CXX11
   /**
    * Move assignment operator. Move each block of the given argument
    * vector into the current object if `VectorType` is
    * move-constructible, otherwise copy them.
    */
   BlockVectorBase &operator= (BlockVectorBase &&/*V*/) = default;
-#endif
 
   /**
    * Copy operator for template arguments of different types.
@@ -1046,13 +1026,9 @@ namespace internal
       // iterators, and not vice versa (i.e., Constness must always be
       // true). As mentioned above, try to check this at compile time if C++11
       // support is available.
-#ifdef DEAL_II_WITH_CXX11
       static_assert(Constness == true,
                     "Constructing a non-const iterator from a const iterator "
                     "does not make sense.");
-#else
-      Assert(Constness == true, ExcCastingAwayConstness());
-#endif
     }
 
 

@@ -59,7 +59,6 @@ Vector<Number>::Vector (const Vector<Number> &v)
 
 
 
-#ifdef DEAL_II_WITH_CXX11
 template <typename Number>
 Vector<Number>::Vector (Vector<Number> &&v)
   :
@@ -73,7 +72,6 @@ Vector<Number>::Vector (Vector<Number> &&v)
   v.max_vec_size = 0;
   v.val = nullptr;
 }
-#endif
 
 
 

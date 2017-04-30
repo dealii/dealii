@@ -20,8 +20,6 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/lac/vector_memory.h>
 
-#ifdef DEAL_II_WITH_CXX11
-
 #include <array>
 #include <functional>
 #include <type_traits>
@@ -143,10 +141,6 @@ null_operator(const LinearOperator<Range, Domain, Payload> &);
  * @note To ensure that the correct payload is provided, wrapper functions
  * for linear operators have been provided within the respective
  * TrilinosWrappers (and, in the future, PetscWrappers) namespaces.
- *
- * @note This class is only available if deal.II was configured with C++11
- * support, i.e., if <code>DEAL_II_WITH_CXX11</code> is enabled during cmake
- * configure.
  *
  * @author Luca Heltai, Matthias Maier, 2015; Jean-Paul Pelteret, 2016
  *
@@ -1302,5 +1296,4 @@ linear_operator(const OperatorExemplar &operator_exemplar, const Matrix &matrix)
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_WITH_CXX11
 #endif

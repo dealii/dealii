@@ -24,10 +24,7 @@
 #  include <deal.II/lac/dynamic_sparsity_pattern.h>
 #  include <deal.II/lac/sparsity_tools.h>
 #  include <deal.II/lac/la_parallel_vector.h>
-
-#ifdef DEAL_II_WITH_CXX11
 #  include <deal.II/lac/trilinos_precondition.h>
-#endif
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Export.h>
@@ -2501,7 +2498,6 @@ namespace TrilinosWrappers
   }
 }
 
-#ifdef DEAL_II_WITH_CXX11
 
 namespace TrilinosWrappers
 {
@@ -3400,7 +3396,6 @@ namespace TrilinosWrappers
   } /* namespace internal */
 } /* namespace TrilinosWrappers */
 
-#endif // DEAL_II_WITH_CXX11
 
 
 // explicit instantiations

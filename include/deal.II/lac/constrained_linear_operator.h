@@ -20,7 +20,6 @@
 #include <deal.II/lac/packaged_operation.h>
 #include <deal.II/lac/constraint_matrix.h>
 
-#ifdef DEAL_II_WITH_CXX11
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -317,5 +316,4 @@ constrained_right_hand_side(const ConstraintMatrix &constraint_matrix,
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_WITH_CXX11
 #endif

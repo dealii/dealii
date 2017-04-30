@@ -105,16 +105,11 @@ public:
   BlockVector (const BlockVector<Number> &V);
 
 
-#ifdef DEAL_II_WITH_CXX11
   /**
    * Move constructor. Creates a new vector by stealing the internal data of
    * the given argument vector.
-   *
-   * @note This constructor is only available if deal.II is configured with
-   * C++11 support.
    */
   BlockVector (BlockVector<Number> &&/*v*/) = default;
-#endif
 
 
 #ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
@@ -201,16 +196,11 @@ public:
   BlockVector<Number> &
   operator= (const BlockVector<Number> &v);
 
-#ifdef DEAL_II_WITH_CXX11
   /**
    * Move the given vector. This operator replaces the present vector with
    * the contents of the given argument vector.
-   *
-   * @note This operator is only available if deal.II is configured with C++11
-   * support.
    */
   BlockVector<Number> &operator= (BlockVector<Number> &&/*v*/) = default;
-#endif
 
   /**
    * Copy operator for template arguments of different types. Resize the

@@ -66,10 +66,8 @@ DEAL_II_NAMESPACE_OPEN
  * from machine accuracy, even if the errors of the outer loop are in the
  * range of machine accuracy.
  *
- * @deprecated If deal.II was configured with C++11 support, use the
- * LinearOperator class instead, see the module on
- * @ref LAOperators "linear operators"
- * for further details.
+ * @deprecated Use the LinearOperator class instead. See the module on
+ * @ref LAOperators "linear operators" for further details.
  *
  * @ingroup Matrix2
  * @author Guido Kanschat

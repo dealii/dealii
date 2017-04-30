@@ -28,12 +28,9 @@
 #  include <deal.II/lac/trilinos_vector.h>
 #  include <deal.II/lac/trilinos_epetra_vector.h>
 #  include <deal.II/lac/vector_view.h>
+#  include <deal.II/lac/vector_memory.h>
 
-#ifdef DEAL_II_WITH_CXX11
-#include <deal.II/lac/vector_memory.h>
-#include <type_traits>
-#endif // DEAL_II_WITH_CXX11
-
+#  include <type_traits>
 #  include <vector>
 #  include <cmath>
 #  include <memory>
@@ -2047,7 +2044,6 @@ namespace TrilinosWrappers
   };
 
 
-#ifdef DEAL_II_WITH_CXX11
 
   // forwards declarations
   class SolverBase;
@@ -2523,7 +2519,6 @@ namespace TrilinosWrappers
     } /* namespace LinearOperator */
   } /* namespace internal */
 
-#endif // DEAL_II_WITH_CXX11
 
 
 // -------------------------- inline and template functions ----------------------
@@ -3173,7 +3168,6 @@ namespace TrilinosWrappers
   }
 
 
-#ifdef DEAL_II_WITH_CXX11
   namespace internal
   {
     namespace LinearOperator
@@ -3262,7 +3256,6 @@ namespace TrilinosWrappers
       }
     } // namespace LinearOperator
   } // namespace internal
-#endif // DEAL_II_WITH_CXX11
 
 #endif // DOXYGEN
 

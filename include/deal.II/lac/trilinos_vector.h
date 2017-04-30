@@ -291,16 +291,11 @@ namespace TrilinosWrappers
        */
       Vector (const Vector &v);
 
-#ifdef DEAL_II_WITH_CXX11
       /**
        * Move constructor. Creates a new vector by stealing the internal data
        * of the vector @p v.
-       *
-       * @note This constructor is only available if deal.II is configured
-       * with C++11 support.
        */
       Vector (Vector &&v);
-#endif
 
       /**
        * Destructor.
@@ -355,16 +350,11 @@ namespace TrilinosWrappers
        */
       Vector &operator= (const Vector &v);
 
-#ifdef DEAL_II_WITH_CXX11
       /**
        * Move the given vector. This operator replaces the present vector with
        * @p v by efficiently swapping the internal data structures.
-       *
-       * @note This operator is only available if deal.II is configured with
-       * C++11 support.
        */
       Vector &operator= (Vector &&v);
-#endif
 
       /**
        * Copy operator from a given localized vector (present on all
