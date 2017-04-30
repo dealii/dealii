@@ -182,17 +182,11 @@ public:
    */
   Vector (const Vector<Number> &v);
 
-#ifdef DEAL_II_WITH_CXX11
   /**
    * Move constructor. Creates a new vector by stealing the internal data of
    * the vector @p v.
-   *
-   * @note This constructor is only available if deal.II is configured with
-   * C++11 support.
    */
   Vector (Vector<Number> &&v);
-#endif
-
 
 #ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
   /**
@@ -369,9 +363,6 @@ public:
    * Move the given vector. This operator replaces the present vector with
    * the internal data of the vector @p v and resets @p v to the state it would
    * have after being newly default-constructed.
-   *
-   * @note This operator is only available if deal.II is configured with C++11
-   * support.
    */
   Vector<Number> &operator= (Vector<Number> &&v);
 #endif

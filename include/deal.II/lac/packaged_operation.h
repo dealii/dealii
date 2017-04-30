@@ -20,8 +20,6 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/lac/vector_memory.h>
 
-#ifdef DEAL_II_WITH_CXX11
-
 #include <functional>
 
 DEAL_II_NAMESPACE_OPEN
@@ -831,5 +829,4 @@ operator*(const PackagedOperation<Range> &comp,
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_WITH_CXX11
 #endif

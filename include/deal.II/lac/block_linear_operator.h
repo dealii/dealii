@@ -21,7 +21,6 @@
 
 #include <deal.II/lac/linear_operator.h>
 
-#ifdef DEAL_II_WITH_CXX11
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -133,10 +132,6 @@ block_back_substitution(const BlockLinearOperator<Range, Domain, BlockPayload> &
  * this object to encapsulate object with medium to large individual block
  * sizes, and small block structure (as a rule of thumb, matrix blocks greater
  * than $1000\times1000$).
- *
- * @note This class is only available if deal.II was configured with C++11
- * support, i.e., if <code>DEAL_II_WITH_CXX11</code> is enabled during cmake
- * configure.
  *
  * @author Matthias Maier, 2015
  *
@@ -901,5 +896,4 @@ block_back_substitution(const BlockLinearOperator<Range, Domain, BlockPayload> &
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_WITH_CXX11
 #endif

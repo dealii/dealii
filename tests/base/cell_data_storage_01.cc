@@ -20,8 +20,6 @@
 
 #include "../tests.h"
 
-#ifdef DEAL_II_WITH_CXX11
-
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>
@@ -160,12 +158,3 @@ int main(int argc, char *argv[])
 
   test<2>();
 }
-
-#else
-int main(int argc, char *argv[])
-{
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  initlog();
-  deallog << "Ok" << std::endl;
-}
-#endif

@@ -18,9 +18,7 @@
 #include <deal.II/base/tensor_accessors.h>
 #include <deal.II/base/table_indices.h>
 
-#ifdef DEAL_II_WITH_CXX11
 #include <array>
-#endif
 
 int main()
 {
@@ -77,12 +75,8 @@ int main()
     // via std::array
 
     // via std::array:
-#ifdef DEAL_II_WITH_CXX11
     std::array<unsigned int, 5> temp {{2, 1, 0, 2, 1}};
     deallog << TensorAccessors::extract<5>(foo, temp) << std::endl;
-#else
-    deallog << 42. << std::endl;
-#endif
   }
 
 }

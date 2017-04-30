@@ -537,19 +537,14 @@ public:
    */
   SparseMatrix (const SparseMatrix &);
 
-#ifdef DEAL_II_WITH_CXX11
   /**
    * Move constructor. Construct a new sparse matrix by transferring the
    * internal data of the matrix @p m into a new object.
    *
    * Move construction allows an object to be returned from a function or
    * packed into a tuple even when the class cannot be copy-constructed.
-   *
-   * @note this constructor is only available if deal.II is configured with
-   * C++11 support.
    */
   SparseMatrix (SparseMatrix<number> &&m);
-#endif
 
   /**
    * Constructor. Takes the given matrix sparsity structure to represent the
@@ -596,9 +591,6 @@ public:
   /**
    * Move assignment operator. This operator replaces the present matrix with
    * @p m by transferring the internal data of @p m.
-   *
-   * @note This operator is only available if deal.II is configured with C++11
-   * support.
    */
   SparseMatrix<number> &operator = (SparseMatrix<number> &&m);
 #endif

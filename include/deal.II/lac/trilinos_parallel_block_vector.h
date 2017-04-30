@@ -132,16 +132,11 @@ namespace TrilinosWrappers
        */
       BlockVector (const BlockVector  &v);
 
-#ifdef DEAL_II_WITH_CXX11
       /**
        * Move constructor. Creates a new vector by stealing the internal data
        * of the vector @p v.
-       *
-       * @note This constructor is only available if deal.II is configured
-       * with C++11 support.
        */
       BlockVector (BlockVector &&v);
-#endif
 
       /**
        * Creates a block vector consisting of <tt>num_blocks</tt> components,
@@ -166,16 +161,11 @@ namespace TrilinosWrappers
        */
       BlockVector &operator= (const BlockVector &v);
 
-#ifdef DEAL_II_WITH_CXX11
       /**
        * Move the given vector. This operator replaces the present vector with
        * @p v by efficiently swapping the internal data structures.
-       *
-       * @note This operator is only available if deal.II is configured with
-       * C++11 support.
        */
       BlockVector &operator= (BlockVector &&v);
-#endif
 
       /**
        * Copy operator for arguments of the localized Trilinos vector type.
@@ -400,7 +390,6 @@ namespace TrilinosWrappers
 
 
 
-#ifdef DEAL_II_WITH_CXX11
     inline
     BlockVector::BlockVector (BlockVector &&v)
     {
@@ -408,7 +397,6 @@ namespace TrilinosWrappers
       reinit (0);
       swap(v);
     }
-#endif
 
 
 

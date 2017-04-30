@@ -202,7 +202,6 @@ namespace LinearAlgebra
     virtual void reinit (const IndexSet &locally_stored_indices,
                          const bool      omit_zeroing_entries = false);
 
-#ifdef DEAL_II_WITH_CXX11
     /**
      * Apply the functor @p func to each element of the vector. The functor
      * should look like
@@ -218,7 +217,6 @@ namespace LinearAlgebra
      */
     template <typename Functor>
     void apply(const Functor &func);
-#endif
 
     /**
      * Swap the contents of this vector and the other vector @p v. One could
@@ -571,7 +569,6 @@ namespace LinearAlgebra
      */
     template <typename Number2> friend class ReadWriteVector;
 
-#ifdef DEAL_II_WITH_CXX11
   private:
     /**
      * This class provides a wrapper around a Functor which acts on
@@ -605,7 +602,6 @@ namespace LinearAlgebra
        */
       const Functor &functor;
     };
-#endif
   };
 
   /*@}*/
@@ -881,7 +877,6 @@ namespace LinearAlgebra
 
 
 
-#ifdef DEAL_II_WITH_CXX11
   template <typename Number>
   template <typename Functor>
   inline
@@ -904,7 +899,6 @@ namespace LinearAlgebra
     for (size_type i=begin; i<end; ++i)
       functor(parent.val[i]);
   }
-#endif
 
 #endif  // ifndef DOXYGEN
 

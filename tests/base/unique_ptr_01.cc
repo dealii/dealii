@@ -72,7 +72,6 @@ int main ()
 
   // test with plain unique_ptr, but also copy stuff. this only works
   // with move constructors, so test only in C++11 mode
-#ifdef DEAL_II_WITH_CXX11
   {
     AssertThrow (counter == 0, ExcInternalError());
     {
@@ -84,7 +83,6 @@ int main ()
     }
     AssertThrow (counter == 0, ExcInternalError());
   }
-#endif
 
   deallog << "OK" << std::endl;
 }

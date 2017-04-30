@@ -133,7 +133,6 @@ namespace LinearAlgebra
 
 
 
-#ifdef DEAL_II_WITH_CXX11
   template <typename Number>
   template <typename Functor>
   void
@@ -142,7 +141,6 @@ namespace LinearAlgebra
     FunctorTemplate<Functor> functor(*this, func);
     internal::VectorOperations::parallel_for(functor, 0, n_elements(), thread_loop_partitioner);
   }
-#endif
 
 
 

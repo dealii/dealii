@@ -22,7 +22,6 @@
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/packaged_operation.h>
 
-#ifdef DEAL_II_WITH_CXX11
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -330,5 +329,4 @@ postprocess_schur_solution (const LinearOperator<Range_1, Domain_1, Payload> &A_
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_WITH_CXX11
 #endif

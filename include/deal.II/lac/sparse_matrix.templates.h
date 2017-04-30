@@ -71,7 +71,6 @@ SparseMatrix<number>::SparseMatrix (const SparseMatrix &m)
 
 
 
-#ifdef DEAL_II_WITH_CXX11
 template <typename number>
 SparseMatrix<number>::SparseMatrix (SparseMatrix<number> &&m)
   :
@@ -84,7 +83,6 @@ SparseMatrix<number>::SparseMatrix (SparseMatrix<number> &&m)
   m.val = nullptr;
   m.max_len = 0;
 }
-#endif
 
 
 
@@ -104,7 +102,6 @@ SparseMatrix<number>::operator = (const SparseMatrix<number> &m)
 
 
 
-#ifdef DEAL_II_WITH_CXX11
 template <typename number>
 SparseMatrix<number> &
 SparseMatrix<number>::operator = (SparseMatrix<number> &&m)
@@ -119,7 +116,6 @@ SparseMatrix<number>::operator = (SparseMatrix<number> &&m)
 
   return *this;
 }
-#endif
 
 
 

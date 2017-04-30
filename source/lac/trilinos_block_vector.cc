@@ -76,14 +76,12 @@ namespace TrilinosWrappers
 
 
 
-#ifdef DEAL_II_WITH_CXX11
     BlockVector &
     BlockVector::operator= (BlockVector &&v)
     {
       swap(v);
       return *this;
     }
-#endif
 
 
 

@@ -564,8 +564,6 @@ namespace TrilinosWrappers
   }
 
 
-#ifdef DEAL_II_WITH_CXX11
-
 
   namespace internal
   {
@@ -616,7 +614,6 @@ namespace TrilinosWrappers
     } /*namespace BlockLinearOperator*/
   } /* namespace internal */
 
-#endif // DEAL_II_WITH_CXX11
 
 }/* namespace TrilinosWrappers */
 
