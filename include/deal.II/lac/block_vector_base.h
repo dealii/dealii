@@ -562,20 +562,6 @@ public:
   typedef typename BlockType::real_type real_type;
 
   /**
-   * A variable that indicates whether this vector supports distributed data
-   * storage. If true, then this vector also needs an appropriate compress()
-   * function that allows communicating recent set or add operations to
-   * individual elements to be communicated to other processors.
-   *
-   * For the current class, the variable equals the value declared for the
-   * type of the individual blocks.
-   *
-   * @deprecated instead of using this variable, please use the type trait value
-   * <code>is_serial_vector< VectorType >::value</code>
-   */
-  static const bool supports_distributed_data DEAL_II_DEPRECATED = !is_serial_vector<BlockType>::value;
-
-  /**
    * Default constructor.
    */
   BlockVectorBase ();

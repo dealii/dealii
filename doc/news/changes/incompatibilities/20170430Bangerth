@@ -1,0 +1,5 @@
+Changed: The deprecated member variables @p supports_distributed_data
+that was present in all vector classes has been removed. If you needed
+this functionality, use the type trait is_serial_vector instead.
+<br>
+(Wolfgang Bangerth, 2017/04/30)
