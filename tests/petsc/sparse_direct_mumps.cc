@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 //    solver.set_symmetric_mode(true);
     solver.solve(A,u,f);
 
-    PETScWrappers::MPI::Vector  tmp(dim);
+    PETScWrappers::MPI::Vector  tmp(indices, MPI_COMM_WORLD);
     deallog << "residual = " << A.residual (tmp, u, f)
             << std::endl;
   }
