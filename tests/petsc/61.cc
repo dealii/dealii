@@ -15,10 +15,10 @@
 
 
 
-// check PETScWrappers::Vector::operator = (const ::Vector &)
+// check PETScWrappers::MPI::Vector::operator = (const ::Vector &)
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/vector.h>
 
 #include <fstream>
@@ -26,7 +26,7 @@
 #include <vector>
 
 
-void test (PETScWrappers::Vector &v)
+void test (PETScWrappers::MPI::Vector &v)
 {
   // set only certain elements of the
   // vector.
@@ -44,9 +44,9 @@ void test (PETScWrappers::Vector &v)
   Vector<float>  x;
   x=v;
 
-  PETScWrappers::Vector w1;
+  PETScWrappers::MPI::Vector w1(MPI_COMM_WORLD, v.size(), v.size());
   w1=w;
-  PETScWrappers::Vector x1;
+  PETScWrappers::MPI::Vector x1(MPI_COMM_WORLD, v.size(), v.size());
   x1=x;
 
   for (unsigned int i=0; i<v.size(); ++i)
@@ -70,8 +70,10 @@ int main (int argc,char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       {
-        PETScWrappers::Vector v (100);
-        test (v);
+        IndexSet indices(100);
+        indices.add_range(0, 100);
+        PETScWrappers::MPI::Vector v(indices, MPI_COMM_WORLD);
+        test(v);
       }
 
     }

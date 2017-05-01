@@ -23,16 +23,12 @@
 #include <deal.II/lac/linear_operator.h>
 
 // Vectors:
-#include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
 
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 
 // Block Matrix and Vectors:
-#include <deal.II/lac/petsc_block_vector.h>
-#include <deal.II/lac/petsc_block_sparse_matrix.h>
-
 #include <deal.II/lac/petsc_parallel_block_vector.h>
 #include <deal.II/lac/petsc_parallel_block_sparse_matrix.h>
 
@@ -47,22 +43,6 @@ int main(int argc, char *argv[])
 
   initlog();
   deallog << std::setprecision(10);
-
-  {
-    PETScWrappers::SparseMatrix a(2,2,2);
-    for (unsigned int i = 0; i<2; ++i)
-      for (unsigned int j = 0; j<2; ++j)
-        a.add (i,j, 2);
-    a.compress (VectorOperation::add);
-
-    PETScWrappers::Vector v(2);
-    for (unsigned int i = 0; i<2; ++i)
-      v[i] = 1;
-    PETScWrappers::Vector u(v);
-    auto op_a  = linear_operator<PETScWrappers::Vector>(a);
-    op_a.vmult(u,v);
-    deallog << "SparseMatrix -> OK" << std::endl;
-  }
 
   {
     unsigned int np = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
@@ -87,12 +67,6 @@ int main(int argc, char *argv[])
   }
 
   {
-    PETScWrappers::BlockSparseMatrix a;
-    auto op_a  = linear_operator<PETScWrappers::BlockVector>(a);
-    deallog << "BlockSparseMatrix -> OK" << std::endl;
-  }
-
-  {
     PETScWrappers::MPI::BlockSparseMatrix a;
     auto op_a  = linear_operator<PETScWrappers::MPI::BlockVector>(a);
     deallog << "BlockSparseMatrix MPI -> OK" << std::endl;
@@ -102,5 +76,3 @@ int main(int argc, char *argv[])
 
   return 0;
 }
-
-

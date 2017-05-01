@@ -15,18 +15,18 @@
 
 
 
-// this test used to check for PETScWrappers::Vector::clear(). However, this
-// function has since been removed, so we test for v=0 instead, although that
-// may be covered by one of the other tests
+// this test used to check for PETScWrappers::MPI::Vector::clear(). However,
+// this function has since been removed, so we test for v=0 instead, although
+// that may be covered by one of the other tests
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
 
-void test (PETScWrappers::Vector &v)
+void test (PETScWrappers::MPI::Vector &v)
 {
   // set some entries of the vector
   for (unsigned int i=0; i<v.size(); ++i)
@@ -56,8 +56,10 @@ int main (int argc,char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       {
-        PETScWrappers::Vector v (100);
-        test (v);
+        IndexSet indices(100);
+        indices.add_range(0, 100);
+        PETScWrappers::MPI::Vector v(indices, MPI_COMM_WORLD);
+        test(v);
       }
 
     }

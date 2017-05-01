@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include "fe_tools_extrapolate_common.h"
 
 // check FETools::extrapolate on distributed triangulations
@@ -64,4 +64,3 @@ int main (int argc, char **argv)
   CHECK_ALL(DGQ,1,DGQ,0);
   CHECK_ALL(DGQ,1,DGQ,1);
 }
-

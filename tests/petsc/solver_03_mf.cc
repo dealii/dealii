@@ -25,7 +25,7 @@
 #include <iomanip>
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_solver.h>
 #include <deal.II/lac/petsc_precondition.h>
 #include <deal.II/lac/vector_memory.h>
@@ -78,8 +78,10 @@ int main(int argc, char **argv)
 
     PetscFDMatrix  A(size, dim);
 
-    PETScWrappers::Vector  f(dim);
-    PETScWrappers::Vector  u(dim);
+    IndexSet indices(dim);
+    indices.add_range(0, dim);
+    PETScWrappers::MPI::Vector  f(indices, MPI_COMM_WORLD);
+    PETScWrappers::MPI::Vector  u(indices, MPI_COMM_WORLD);
     f = 1.;
     A.compress (VectorOperation::insert);
 

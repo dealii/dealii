@@ -1,6 +1,4 @@
 
-DEAL::SparseMatrix -> OK
 DEAL::SparseMatrix MPI -> OK
-DEAL::BlockSparseMatrix -> OK
 DEAL::BlockSparseMatrix MPI -> OK
 DEAL::OK

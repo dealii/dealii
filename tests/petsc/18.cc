@@ -15,16 +15,16 @@
 
 
 
-// check PETScWrappers::Vector::l2_norm()
+// check PETScWrappers::MPI::Vector::l2_norm()
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
 
-void test (PETScWrappers::Vector &v)
+void test (PETScWrappers::MPI::Vector &v)
 {
   // set some elements of the vector
   PetscScalar norm = 0;
@@ -54,7 +54,9 @@ int main (int argc,char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       {
-        PETScWrappers::Vector v (100);
+        IndexSet indices(100);
+        indices.add_range(0, 100);
+        PETScWrappers::MPI::Vector v (indices, MPI_COMM_WORLD);
         test (v);
       }
 

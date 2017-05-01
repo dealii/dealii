@@ -15,17 +15,17 @@
 
 
 
-// check PETScWrappers::Vector::equ (s,V)
+// check PETScWrappers::MPI::Vector::equ (s,V)
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
 
-void test (PETScWrappers::Vector &v,
-           PETScWrappers::Vector &w)
+void test (PETScWrappers::MPI::Vector &v,
+           PETScWrappers::MPI::Vector &w)
 {
   for (unsigned int i=0; i<v.size(); ++i)
     {
@@ -60,9 +60,11 @@ int main (int argc,char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       {
-        PETScWrappers::Vector v (100);
-        PETScWrappers::Vector w (100);
-        test (v,w);
+        IndexSet indices(100);
+        indices.add_range(0, 100);
+        PETScWrappers::MPI::Vector v(indices, MPI_COMM_WORLD);
+        PETScWrappers::MPI::Vector w(indices, MPI_COMM_WORLD);
+        test(v, w);
       }
 
     }

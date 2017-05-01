@@ -15,18 +15,18 @@
 
 
 
-// Test the constructor PETScWrappers::Vector(const Vec &) that takes an
+// Test the constructor PETScWrappers::MPI::Vector(const Vec &) that takes an
 // existing PETSc vector.
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
 
-void test (PETScWrappers::Vector &v,
-           PETScWrappers::Vector &w)
+void test (PETScWrappers::MPI::Vector &v,
+           PETScWrappers::MPI::Vector &w)
 {
   // set the first vector
   for (unsigned int i=0; i<v.size(); ++i)
@@ -39,6 +39,8 @@ void test (PETScWrappers::Vector &v,
   // check that they're equal
   Assert (v==w, ExcInternalError());
 
+  v.compress(VectorOperation::insert);
+  w.compress(VectorOperation::insert);
   v=w;
 
   deallog << "OK" << std::endl;
@@ -59,8 +61,10 @@ int main (int argc, char **argv)
       int ierr = VecCreateSeq (PETSC_COMM_SELF, 100, &vpetsc);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
       {
-        PETScWrappers::Vector v (vpetsc);
-        PETScWrappers::Vector w (100);
+        IndexSet indices(100);
+        indices.add_range(0, 100);
+        PETScWrappers::MPI::Vector v (indices, MPI_COMM_WORLD);
+        PETScWrappers::MPI::Vector w (indices, MPI_COMM_WORLD);
         test (v,w);
       }
 

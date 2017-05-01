@@ -15,7 +15,7 @@
 
 
 
-// this is equivalent to the petsc_vector_assign_01 test, except that we use
+// this is equivalent to the petsc vector_assign_01 test, except that we use
 // operator+= instead of operator=. Now, this does not present a problem,
 // since the compiler does not automatically generate a version of this
 // operator, but simply performs the conversion to PetscScalar, i.e. the
@@ -23,14 +23,14 @@
 // wrote the test to make sure it works this way, let's keep it then...
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
 
-void test (PETScWrappers::Vector &v,
-           PETScWrappers::Vector &w)
+void test (PETScWrappers::MPI::Vector &v,
+           PETScWrappers::MPI::Vector &w)
 {
   // set the first vector
   for (unsigned int i=0; i<v.size(); ++i)
@@ -58,8 +58,10 @@ int main (int argc, char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       {
-        PETScWrappers::Vector v (100);
-        PETScWrappers::Vector w (100);
+        IndexSet indices(100);
+        indices.add_range(0, 100);
+        PETScWrappers::MPI::Vector v (indices, MPI_COMM_WORLD);
+        PETScWrappers::MPI::Vector w (indices, MPI_COMM_WORLD);
         test (v,w);
       }
 

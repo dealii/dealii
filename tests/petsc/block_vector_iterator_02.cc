@@ -18,21 +18,21 @@
 // like _01, except that we use operator[] instead of operator*
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/petsc_parallel_block_vector.h>
 #include <fstream>
 #include <iostream>
 
 
 void test ()
 {
-  PETScWrappers::BlockVector v(2,1);
+  PETScWrappers::MPI::BlockVector v(2, MPI_COMM_WORLD, 1, 1);
   v(0) = 1;
   v(1) = 2;
 
   // first check reading through a const
   // iterator
   {
-    PETScWrappers::BlockVector::const_iterator i=v.begin();
+    PETScWrappers::MPI::BlockVector::const_iterator i=v.begin();
     AssertThrow (i[0] == 1, ExcInternalError());
     AssertThrow (i[1] == 2, ExcInternalError());
   }
@@ -40,29 +40,29 @@ void test ()
   // same, but create iterator in a different
   // way
   {
-    PETScWrappers::BlockVector::const_iterator
-    i=const_cast<const PETScWrappers::BlockVector &>(v).begin();
+    PETScWrappers::MPI::BlockVector::const_iterator
+    i=const_cast<const PETScWrappers::MPI::BlockVector &>(v).begin();
     AssertThrow (i[0] == 1, ExcInternalError());
     AssertThrow (i[1] == 2, ExcInternalError());
   }
 
   // read through a read-write iterator
   {
-    PETScWrappers::BlockVector::iterator i = v.begin();
+    PETScWrappers::MPI::BlockVector::iterator i = v.begin();
     AssertThrow (i[0] == 1, ExcInternalError());
     AssertThrow (i[1] == 2, ExcInternalError());
   }
 
   // write through a read-write iterator
   {
-    PETScWrappers::BlockVector::iterator i = v.begin();
+    PETScWrappers::MPI::BlockVector::iterator i = v.begin();
     i[0] = 2;
     i[1] = 3;
   }
 
   // and read again
   {
-    PETScWrappers::BlockVector::iterator i = v.begin();
+    PETScWrappers::MPI::BlockVector::iterator i = v.begin();
     AssertThrow (i[0] == 2, ExcInternalError());
     AssertThrow (i[1] == 3, ExcInternalError());
   }

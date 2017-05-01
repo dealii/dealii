@@ -18,8 +18,6 @@
 // check is_serial_vector type trait
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_vector.h>
-#include <deal.II/lac/petsc_block_vector.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_parallel_block_vector.h>
 #include <fstream>
@@ -27,22 +25,6 @@
 
 void test ()
 {
-  // make sure that is_serial_vector< dealii::PETScWrappers::Vector > is working
-  Assert (is_serial_vector< dealii::PETScWrappers::Vector >::value == true,
-          ExcInternalError());
-
-  deallog << is_serial_vector< dealii::PETScWrappers::Vector >::value << std::endl;
-
-  deallog << "OK" << std::endl << std::endl;
-
-  // make sure that is_serial_vector< dealii::PETScWrappers::BlockVector > is working
-  Assert (is_serial_vector< dealii::PETScWrappers::BlockVector >::value == true,
-          ExcInternalError());
-
-  deallog << is_serial_vector< dealii::PETScWrappers::BlockVector >::value << std::endl;
-
-  deallog << "OK" << std::endl << std::endl;
-
   // make sure that is_serial_vector< dealii::PETScWrappers::MPI::Vector > is working
   Assert (is_serial_vector< dealii::PETScWrappers::MPI::Vector >::value == false,
           ExcInternalError());

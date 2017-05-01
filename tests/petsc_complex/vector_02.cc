@@ -18,7 +18,7 @@
 // check assignment of elements in Vector
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/vector.h>
 #include <fstream>
 #include <iostream>
@@ -28,13 +28,13 @@
 void test ()
 {
   const unsigned int s = 10;
-  PETScWrappers::Vector v(s);
+  PETScWrappers::MPI::Vector  v(MPI_COMM_WORLD, s, s);
   for (unsigned int k=0; k<v.size(); ++k)
     v(k) = k;
 
   v.compress (VectorOperation::insert);
 
-  PETScWrappers::Vector v2(s);
+  PETScWrappers::MPI::Vector v2(MPI_COMM_WORLD, s, s);
   for (int k=0; k<v2.size(); ++k)
     v2(k) = PetscScalar (k,-k);
 

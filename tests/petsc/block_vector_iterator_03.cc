@@ -19,7 +19,7 @@
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
-#include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/petsc_parallel_block_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -29,8 +29,8 @@
 #include <cmath>
 
 template <typename number>
-bool operator == (const PETScWrappers::BlockVector &v1,
-                  const PETScWrappers::BlockVector &v2)
+bool operator == (const PETScWrappers::MPI::BlockVector &v1,
+                  const PETScWrappers::MPI::BlockVector &v2)
 {
   if (v1.size() != v2.size())
     return false;
@@ -53,8 +53,8 @@ void test ()
   // iterators
   if (true)
     {
-      PETScWrappers::BlockVector v1(ivector);
-      PETScWrappers::BlockVector v2(ivector);
+      PETScWrappers::MPI::BlockVector v1(ivector, MPI_COMM_WORLD, ivector);
+      PETScWrappers::MPI::BlockVector v2(ivector, MPI_COMM_WORLD, ivector);
 
       // initialize first vector with
       // simple loop
@@ -62,7 +62,7 @@ void test ()
         v1(i) = i;
       // initialize other vector
       // through iterators
-      PETScWrappers::BlockVector::iterator p2 = v2.begin();
+      PETScWrappers::MPI::BlockVector::iterator p2 = v2.begin();
       for (unsigned int i=0; i<v1.size(); ++i, ++p2)
         *p2 = i;
       Assert (p2==v2.end(), ExcInternalError());
@@ -71,36 +71,18 @@ void test ()
       deallog << "Check 1: " << (v1==v2 ? "true" : "false") << std::endl;
     };
 
-  // Check 1: initialization via
-  // iterators
-  if (true)
-    {
-      PETScWrappers::BlockVector v1(ivector);
-
-      // initialize first vector with
-      // simple loop
-      for (unsigned int i=0; i<v1.size(); ++i)
-        v1(i) = i;
-      // initialize other vector
-      // through iterators into first
-      // vector
-      PETScWrappers::BlockVector v2(ivector, v1.begin(), v1.end());
-      // check that the two vectors are equal
-      deallog << "Check 2: " << (v1==v2 ? "true" : "false") << std::endl;
-    };
-
-  // Check 3: loop forward and back
+  // Check 2: loop forward and back
   // and check that things are the
   // same
   if (true)
     {
-      PETScWrappers::BlockVector v1(ivector);
+      PETScWrappers::MPI::BlockVector v1(ivector, MPI_COMM_WORLD, ivector);
       // initialize first vector with
       // simple loop
       for (unsigned int i=0; i<v1.size(); ++i)
         v1(i) = i;
 
-      PETScWrappers::BlockVector::iterator p1 = v1.begin();
+      PETScWrappers::MPI::BlockVector::iterator p1 = v1.begin();
       for (unsigned int i=0; i<v1.size(); ++i, ++p1)
         AssertThrow (*p1 == i, ExcInternalError());
 
@@ -116,21 +98,21 @@ void test ()
 
       // if we came thus far,
       // everything is alright
-      deallog << "Check 3: true" << std::endl;
+      deallog << "Check 2: true" << std::endl;
     };
 
 
-  // Check 4: same, but this time
+  // Check 3: same, but this time
   // with const iterators
   if (true)
     {
-      PETScWrappers::BlockVector v1(ivector);
+      PETScWrappers::MPI::BlockVector v1(ivector, MPI_COMM_WORLD, ivector);
       // initialize first vector with
       // simple loop
       for (unsigned int i=0; i<v1.size(); ++i)
         v1(i) = i;
 
-      PETScWrappers::BlockVector::const_iterator p1 = v1.begin();
+      PETScWrappers::MPI::BlockVector::const_iterator p1 = v1.begin();
       for (unsigned int i=0; i<v1.size(); ++i, ++p1)
         AssertThrow (*p1 == i, ExcInternalError());
 
@@ -150,14 +132,14 @@ void test ()
 
       // if we came thus far,
       // everything is alright
-      deallog << "Check 4: true" << std::endl;
+      deallog << "Check 3: true" << std::endl;
     };
 
-  // Checks 5-14: use some standard
+  // Checks 4-13: use some standard
   // algorithms
   if (true)
     {
-      PETScWrappers::BlockVector v1(ivector);
+      PETScWrappers::MPI::BlockVector v1(ivector, MPI_COMM_WORLD, ivector);
       // initialize first vector with
       // simple loop
       for (unsigned int i=0; i<v1.size(); ++i)
@@ -165,156 +147,76 @@ void test ()
 
       // check std::distance
       // algorithm
-      deallog << "Check 5: "
+      deallog << "Check 4: "
               << (std::distance (v1.begin(), v1.end()) ==
                   static_cast<signed int>(v1.size()) ?
                   "true" : "false")
               << std::endl;
 
       // check std::copy
-      PETScWrappers::BlockVector v2(ivector);
+      PETScWrappers::MPI::BlockVector v2(ivector, MPI_COMM_WORLD, ivector);
       std::copy (v1.begin(), v1.end(), v2.begin());
-      deallog << "Check 6: " << (v1 == v2 ? "true" : "false") << std::endl;
+      deallog << "Check 5: " << (v1 == v2 ? "true" : "false") << std::endl;
 
       // check std::transform
       std::transform (v1.begin(), v1.end(), v2.begin(),
                       std::bind (std::multiplies<double>(),
                                  std::placeholders::_1,
                                  2.0));
+      v2.compress(VectorOperation::insert);
       v2 *= 1./2.;
-      deallog << "Check 7: " << (v1 == v2 ? "true" : "false") << std::endl;
+      deallog << "Check 6: " << (v1 == v2 ? "true" : "false") << std::endl;
 
 
       // check operators +/-, +=/-=
-      deallog << "Check 8: "
+      deallog << "Check 7: "
               << (std::distance(v1.begin(), v1.begin()+3) == 3 ?
                   "true" : "false")
               << std::endl;
-      deallog << "Check 9: "
+      deallog << "Check 8: "
               << (std::distance(v1.end()-6, v1.end()) == 6 ?
                   "true" : "false")
               << std::endl;
-      deallog << "Check 10: "
+      deallog << "Check 9: "
               << (std::distance(v1.begin(), v1.end()) == (signed)v1.size() ?
                   "true" : "false")
               << std::endl;
-      deallog << "Check 11: "
+      deallog << "Check 10: "
               << (std::distance(v1.begin(), (v1.begin()+=7)) == 7 ?
                   "true" : "false")
               << std::endl;
-      deallog << "Check 12: "
+      deallog << "Check 11: "
               << (std::distance((v1.end()-=4), v1.end()) == 4 ?
                   "true" : "false")
               << std::endl;
 
       // check advance
-      PETScWrappers::BlockVector::iterator p2 = v1.begin();
+      PETScWrappers::MPI::BlockVector::iterator p2 = v1.begin();
       std::advance (p2, v1.size());
-      deallog << "Check 13: " << (p2 == v1.end() ? "true" : "false") << std::endl;
+      deallog << "Check 12: " << (p2 == v1.end() ? "true" : "false") << std::endl;
 
-      PETScWrappers::BlockVector::const_iterator p3 = v1.begin();
+      PETScWrappers::MPI::BlockVector::const_iterator p3 = v1.begin();
       std::advance (p3, v1.size());
-      deallog << "Check 14: " << (p3 == v1.end() ? "true" : "false") << std::endl;
+      deallog << "Check 13: " << (p3 == v1.end() ? "true" : "false") << std::endl;
     };
 
-  // Check 15: initialization through
-  // iterators
+  // Check 14: operator[]
   if (true)
     {
-      PETScWrappers::BlockVector v1(ivector);
-      // initialize first vector with
-      // simple loop
-      for (unsigned int i=0; i<v1.size(); ++i)
-        v1(i) = i;
-
-      // initialize a normal vector
-      // from it
-      Vector<double> v2(v1.begin(), v1.end());
-
-      // and reverse way
-      PETScWrappers::BlockVector v3(ivector, v2.begin(), v2.end());
-      deallog << "Check 15: " << (v1==v3 ? "true" : "false") << std::endl;
-    };
-
-  // Check 16: initialization through
-  // iterators. variant with one
-  // constant object
-  if (true)
-    {
-      PETScWrappers::BlockVector v1(ivector);
-      // initialize first vector with
-      // simple loop
-      for (unsigned int i=0; i<v1.size(); ++i)
-        v1(i) = i;
-
-      // initialize a normal vector
-      // from it
-      const Vector<double> v2(v1.begin(), v1.end());
-
-      // and reverse way
-      PETScWrappers::BlockVector v3(ivector, v2.begin(), v2.end());
-      deallog << "Check 16: " << (v1==v3 ? "true" : "false") << std::endl;
-    };
-
-  // Check 17: initialization through
-  // iterators. variant with two
-  // constant object
-  if (true)
-    {
-      PETScWrappers::BlockVector v1(ivector);
-      // initialize first vector with
-      // simple loop
-      for (unsigned int i=0; i<v1.size(); ++i)
-        v1(i) = i;
-
-      // initialize a normal vector
-      // from it
-      const Vector<double> v2(v1.begin(), v1.end());
-
-      // and reverse way
-      const PETScWrappers::BlockVector v3(ivector, v2.begin(), v2.end());
-      deallog << "Check 17: " << (v1==v3 ? "true" : "false") << std::endl;
-    };
-
-  // Check 18: initialization through
-  // iterators. variant with three
-  // constant object
-  if (true)
-    {
-      PETScWrappers::BlockVector v0(ivector);
-      // initialize first vector with
-      // simple loop
-      for (unsigned int i=0; i<v0.size(); ++i)
-        v0(i) = i;
-
-      const PETScWrappers::BlockVector v1 = v0;
-
-      // initialize a normal vector
-      // from it
-      const Vector<double> v2(v1.begin(), v1.end());
-
-      // and reverse way
-      const PETScWrappers::BlockVector v3(ivector, v2.begin(), v2.end());
-      deallog << "Check 18: " << (v1==v3 ? "true" : "false") << std::endl;
-    };
-
-  // Check 19: operator[]
-  if (true)
-    {
-      PETScWrappers::BlockVector v1(ivector);
+      PETScWrappers::MPI::BlockVector v1(ivector, MPI_COMM_WORLD, ivector);
       for (unsigned int i=0; i<v1.size(); ++i)
         v1(i) = i;
 
       for (unsigned int i=0; i<v1.size(); ++i)
         {
-          const PETScWrappers::BlockVector::iterator p = (v1.begin()+i);
+          const PETScWrappers::MPI::BlockVector::iterator p = (v1.begin()+i);
           for (unsigned int j=0; j<v1.size(); ++j)
             AssertThrow (p[(signed)j-(signed)i] == j, ExcInternalError());
         };
 
       // if we came thus far,
       // everything is alright
-      deallog << "Check 19: true" << std::endl;
+      deallog << "Check 14: true" << std::endl;
     };
 }
 
@@ -366,4 +268,3 @@ int main (int argc,char **argv)
 
   return 0;
 }
-
