@@ -896,7 +896,7 @@ namespace GridTools
    *
    * @author Vishal Boddu, Denis Davydov, 2017
    */
-  template <int spacedim, class MeshType>
+  template <class MeshType>
   std::vector<typename MeshType::active_cell_iterator>
   compute_ghost_cell_layer_within_distance ( const MeshType &mesh,
                                              const double layer_thickness);
