@@ -120,7 +120,7 @@ double coefficient (const Point<dim> &p)
 // on every mesh. (Though that polynomial approximation of course
 // tends to a discontinuous function under mesh refinement.) Refer to
 // CellAccessor::set_material_id to set a discontinuous coefficient
-// between cells.
+// between cells and step-28 as an advanced usage example.
 
 // @sect3{The <code>Step5</code> class implementation}
 
