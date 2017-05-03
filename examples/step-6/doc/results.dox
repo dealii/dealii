@@ -484,6 +484,16 @@ step-49, step-53, and step-54, among other tutorial programs that cover
 the issue. Information on curved domains can also be found in the
 documentation module on @ref manifold "Manifold descriptions".
 
+The reason to track the geometry was given in the note on working with
+nonconstant coefficients in step-5: it looks like we use a
+discontinuous coefficient, however, the finite element method using
+quadrature really sees only a polynomial approximation (defined by a
+<code>quadrature_formula</code>) of that discontinuous coefficient on
+every mesh. (Though that polynomial approximation of course tends to a
+discontinuous function under mesh refinement.) With a cell boundary
+exactly aligned to the location of the coefficient drop we can use
+CellAccessor::set_material_id to set a discontinuous coefficient
+between cells.
 
 
 <h4>Playing with the regularity of the solution</h4>
