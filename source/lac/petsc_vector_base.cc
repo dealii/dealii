@@ -49,7 +49,7 @@ namespace PETScWrappers
         }
       // else see if we are dealing
       // with a parallel vector
-      else if (dynamic_cast<const PETScWrappers::MPI::Vector *>(&vector) != nullptr)
+      else if (dynamic_cast<const PETScWrappers::VectorBase *>(&vector) != nullptr)
         {
           // there is the possibility
           // that the vector has

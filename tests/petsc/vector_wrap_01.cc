@@ -15,7 +15,7 @@
 
 
 
-// Test the constructor PETScWrappers::MPI::Vector(const Vec &) that takes an
+// Test the constructor PETScWrappers::VectorBase(const Vec &) that takes an
 // existing PETSc vector.
 
 #include "../tests.h"
@@ -25,7 +25,7 @@
 #include <vector>
 
 
-void test (PETScWrappers::MPI::Vector &v,
+void test (PETScWrappers::VectorBase &v,
            PETScWrappers::MPI::Vector &w)
 {
   // set the first vector
@@ -39,20 +39,13 @@ void test (PETScWrappers::MPI::Vector &v,
   // check that they're equal
   Assert (v==w, ExcInternalError());
 
-  v.compress(VectorOperation::insert);
-  w.compress(VectorOperation::insert);
-  v=w;
-
   deallog << "OK" << std::endl;
 }
 
 
-
 int main (int argc, char **argv)
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
+  initlog();
 
   try
     {
@@ -61,10 +54,8 @@ int main (int argc, char **argv)
       int ierr = VecCreateSeq (PETSC_COMM_SELF, 100, &vpetsc);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
       {
-        IndexSet indices(100);
-        indices.add_range(0, 100);
-        PETScWrappers::MPI::Vector v (indices, MPI_COMM_WORLD);
-        PETScWrappers::MPI::Vector w (indices, MPI_COMM_WORLD);
+        PETScWrappers::VectorBase v (vpetsc);
+        PETScWrappers::MPI::Vector w (PETSC_COMM_SELF, 100, 100);
         test (v,w);
       }
 
@@ -75,8 +66,6 @@ int main (int argc, char **argv)
 #endif
 
       AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-
     }
   catch (std::exception &exc)
     {
