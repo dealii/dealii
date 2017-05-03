@@ -35,6 +35,8 @@ void test (PETScWrappers::MPI::Vector &v,
       if (k%3 == 0)
         w(k) = std::complex<double> (k+1.,k+1);
     }
+  v.compress(VectorOperation::insert);
+  w.compress(VectorOperation::insert);
 
   // then copy elements and make sure the vectors are actually equal
   v = w;

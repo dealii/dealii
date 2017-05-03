@@ -15,7 +15,8 @@
 
 
 
-// See comments in tests/petsc/vector_wrap_01.cc
+// Test the constructor PETScWrappers::VectorBase(const Vec &) that takes an
+// existing PETSc vector for complex values.
 
 #include "../tests.h"
 #include <deal.II/lac/petsc_parallel_vector.h>
@@ -24,7 +25,7 @@
 #include <vector>
 
 
-void test (PETScWrappers::MPI::Vector &v,
+void test (PETScWrappers::VectorBase &v,
            PETScWrappers::MPI::Vector &w)
 {
   // set the first vector
@@ -38,21 +39,13 @@ void test (PETScWrappers::MPI::Vector &v,
   // check that they're equal
   AssertThrow (v==w, ExcInternalError());
 
-  v=w;
-
-  // check that they're still equal
-  AssertThrow (v==w, ExcInternalError());
-
   deallog << "OK" << std::endl;
 }
 
 
 int main (int argc, char **argv)
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
-  deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);
+  initlog();
 
   try
     {
@@ -61,7 +54,7 @@ int main (int argc, char **argv)
       int ierr = VecCreateSeq (PETSC_COMM_SELF, 100, &vpetsc);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
       {
-        PETScWrappers::MPI::Vector v (vpetsc);
+        PETScWrappers::VectorBase v (vpetsc);
         PETScWrappers::MPI::Vector w (PETSC_COMM_SELF, 100, 100);
         test (v,w);
       }
