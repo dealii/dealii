@@ -84,7 +84,6 @@ SET(_inst
 IF(DEAL_II_WITH_PETSC)
   SET(_src
     ${_src}
-    petsc_block_sparse_matrix.cc
     petsc_full_matrix.cc
     petsc_matrix_base.cc
     petsc_matrix_free.cc
@@ -96,7 +95,6 @@ IF(DEAL_II_WITH_PETSC)
     petsc_solver.cc
     petsc_sparse_matrix.cc
     petsc_vector_base.cc
-    petsc_vector.cc
   )
 ENDIF()
 

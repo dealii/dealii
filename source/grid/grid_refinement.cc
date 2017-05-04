@@ -18,8 +18,6 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector_base.h>
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/petsc_vector.h>
-#include <deal.II/lac/petsc_block_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_block_vector.h>
 
@@ -61,46 +59,6 @@ namespace
     // Silence a (bogus) warning in clang-3.6 about the following four
     // functions being unused:
     DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-
-#ifdef DEAL_II_WITH_PETSC
-    inline
-    PetscScalar
-    max_element (const PETScWrappers::Vector &criteria)
-    {
-      // this is horribly slow (since we have
-      // to get the array of values from PETSc
-      // in every iteration), but works
-      PetscScalar m = 0;
-#ifndef PETSC_USE_COMPLEX
-      for (unsigned int i=0; i<criteria.size(); ++i)
-        m = std::max (m, criteria(i));
-#else
-      Assert(false, ExcMessage("The GridRefinement functions should only get real-valued vectors of refinement indicators."
-                               " Using these functions with complex-valued PETSc vectors does not make sense."))
-#endif
-      return m;
-    }
-
-
-    inline
-    PetscScalar
-    min_element (const PETScWrappers::Vector &criteria)
-    {
-      // this is horribly slow (since we have
-      // to get the array of values from PETSc
-      // in every iteration), but works
-      PetscScalar m = criteria(0);
-#ifndef PETSC_USE_COMPLEX
-      for (unsigned int i=1; i<criteria.size(); ++i)
-        m = std::min (m, criteria(i));
-#else
-      Assert(false, ExcMessage("The GridRefinement functions should only get real-valued vectors of refinement indicators."
-                               " Using these functions with complex-valued PETSc vectors does not make sense."))
-#endif
-      return m;
-    }
-#endif
-
 
 #ifdef DEAL_II_WITH_TRILINOS
     inline

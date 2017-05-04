@@ -35,11 +35,9 @@
 #endif
 
 #ifdef DEAL_II_WITH_PETSC
-#    include <petscsys.h>
-#    include <deal.II/lac/petsc_block_vector.h>
-#    include <deal.II/lac/petsc_parallel_block_vector.h>
-#    include <deal.II/lac/petsc_vector.h>
-#    include <deal.II/lac/petsc_parallel_vector.h>
+#  include <petscsys.h>
+#  include <deal.II/lac/petsc_parallel_block_vector.h>
+#  include <deal.II/lac/petsc_parallel_vector.h>
 #endif
 
 #ifdef DEAL_II_WITH_SLEPC
@@ -469,10 +467,6 @@ namespace Utilities
           GrowingVectorMemory<PETScWrappers::MPI::Vector>
           ::release_unused_memory ();
           GrowingVectorMemory<PETScWrappers::MPI::BlockVector>
-          ::release_unused_memory ();
-          GrowingVectorMemory<PETScWrappers::Vector>
-          ::release_unused_memory ();
-          GrowingVectorMemory<PETScWrappers::BlockVector>
           ::release_unused_memory ();
 
 #  ifdef DEAL_II_WITH_SLEPC

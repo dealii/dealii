@@ -23,6 +23,7 @@
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/petsc_matrix_base.h>
+#  include <deal.II/lac/petsc_vector_base.h>
 #  include <vector>
 
 DEAL_II_NAMESPACE_OPEN

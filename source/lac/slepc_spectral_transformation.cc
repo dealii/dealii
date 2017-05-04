@@ -19,8 +19,6 @@
 
 #  include <deal.II/lac/slepc_solver.h>
 #  include <deal.II/lac/petsc_matrix_base.h>
-#  include <deal.II/lac/petsc_vector_base.h>
-#  include <deal.II/lac/petsc_vector.h>
 
 #  include <cmath>
 #  include <vector>

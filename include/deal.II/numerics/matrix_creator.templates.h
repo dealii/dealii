@@ -41,7 +41,7 @@
 #  include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 #  include <deal.II/lac/petsc_sparse_matrix.h>
 #  include <deal.II/lac/petsc_parallel_vector.h>
-#  include <deal.II/lac/petsc_vector.h>
+#  include <deal.II/lac/petsc_parallel_vector.h>
 #  include <deal.II/lac/petsc_parallel_block_sparse_matrix.h>
 #endif
 

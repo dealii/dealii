@@ -18,7 +18,6 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
-#  include <deal.II/lac/petsc_vector.h>
 #  include <cmath>
 #  include <algorithm>
 
@@ -247,52 +246,6 @@ namespace PETScWrappers
       Assert(local.is_ascending_and_one_to_one(comm), ExcNotImplemented());
       Assert(local.size()>0, ExcMessage("can not create vector of size 0."));
       create_vector(local.size(), local.n_elements());
-    }
-
-
-    Vector &
-    Vector::operator = (const PETScWrappers::Vector &v)
-    {
-      Assert(last_action==VectorOperation::unknown,
-             ExcMessage("Call to compress() required before calling operator=."));
-      //TODO [TH]: can not access v.last_action here. Implement is_compressed()?
-      //Assert(v.last_action==VectorOperation::unknown,
-      //    ExcMessage("Call to compress() required before calling operator=."));
-
-      // get a pointer to the local memory of
-      // this vector
-      PetscScalar *dest_array;
-      PetscErrorCode ierr = VecGetArray (vector, &dest_array);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-      // then also a pointer to the source
-      // vector
-      PetscScalar *src_array;
-      ierr = VecGetArray (static_cast<const Vec &>(v), &src_array);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-      // then copy:
-      const std::pair<size_type, size_type>
-      local_elements = local_range ();
-      std::copy (src_array + local_elements.first,
-                 src_array + local_elements.second,
-                 dest_array);
-
-      // finally restore the arrays
-      ierr = VecRestoreArray (vector, &dest_array);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-      ierr = VecRestoreArray (static_cast<const Vec &>(v), &src_array);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-      if (has_ghost_elements())
-        {
-          ierr = VecGhostUpdateBegin(vector, INSERT_VALUES, SCATTER_FORWARD);
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
-          ierr = VecGhostUpdateEnd(vector, INSERT_VALUES, SCATTER_FORWARD);
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
-        }
-      return *this;
     }
 
 
