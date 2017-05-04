@@ -209,8 +209,10 @@ namespace PETScWrappers
    * parallel ones) are built by filling the contents of an abstract object
    * that is only referenced through a pointer of a type that is independent
    * of the actual vector type, we can implement almost all functionality of
-   * vectors in this base class. Derived classes will then only have to
-   * provide the functionality to create one or the other kind of vector.
+   * vectors in this base class. As such, this class can also be used as a
+   * deal.II-compatible wrapper for a PETSc <code>Vec</code> object of any
+   * type. Derived classes will then only have to provide the functionality to
+   * create one or the other kind of vector.
    *
    * The interface of this class is modeled after the existing Vector class in
    * deal.II. It has almost the same member functions, and is often

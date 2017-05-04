@@ -17,8 +17,6 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
-#  include <deal.II/lac/petsc_block_vector.h>
-
 DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers
@@ -26,21 +24,6 @@ namespace PETScWrappers
   namespace MPI
   {
     typedef types::global_dof_index size_type;
-
-    BlockVector &
-    BlockVector::operator = (const PETScWrappers::BlockVector &v)
-    {
-      this->block_indices = v.get_block_indices();
-
-      if (this->components.size() != this->n_blocks())
-        this->components.resize(this->n_blocks());
-
-      for (unsigned int i=0; i<this->n_blocks(); ++i)
-        this->block(i) = v.block(i);
-
-      return *this;
-    }
-
 
     void
     BlockVector::reinit (const unsigned int num_blocks)

@@ -151,25 +151,6 @@ namespace PETScWrappers
       operator= (const BlockVector &V);
 
       /**
-       * Copy the given sequential (non-distributed) block vector into the
-       * present parallel block vector. It is assumed that they have the same
-       * size, and this operation does not change the partitioning of the
-       * parallel vectors by which its elements are distributed across several
-       * MPI processes. What this operation therefore does is to copy that
-       * chunk of the given vector @p v that corresponds to elements of the
-       * target vector that are stored locally, and copies them, for each of
-       * the individual blocks of this object. Elements that are not stored
-       * locally are not touched.
-       *
-       * This being a parallel vector, you must make sure that @em all
-       * processes call this function at the same time. It is not possible to
-       * change the local part of a parallel vector on only one process,
-       * independent of what other processes do, with this function.
-       */
-      BlockVector &
-      operator= (const PETScWrappers::BlockVector &v);
-
-      /**
        * Reinitialize the BlockVector to contain @p n_blocks of size @p
        * block_size, each of which stores @p local_size elements locally. The
        * @p communicator argument denotes which MPI channel each of these

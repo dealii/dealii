@@ -31,10 +31,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 
 
 #ifdef DEAL_II_WITH_PETSC
-    template class SolutionTransfer<deal_II_dimension, PETScWrappers::Vector, DoFHandler<deal_II_dimension,deal_II_space_dimension> >;
-
-    template class SolutionTransfer<deal_II_dimension, PETScWrappers::BlockVector, DoFHandler<deal_II_dimension,deal_II_space_dimension> >;
-
     template class SolutionTransfer<deal_II_dimension, PETScWrappers::MPI::Vector, DoFHandler<deal_II_dimension,deal_II_space_dimension> >;
 
     template class SolutionTransfer<deal_II_dimension, PETScWrappers::MPI::BlockVector, DoFHandler<deal_II_dimension,deal_II_space_dimension> >;

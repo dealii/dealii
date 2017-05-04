@@ -35,7 +35,7 @@ namespace PETScWrappers
    */
 
   /**
-   * Implementation of a sequential dense matrix class based on PETSC. All the
+   * Implementation of a sequential dense matrix class based on PETSc. All the
    * functionality is actually in the base class, except for the calls to
    * generate a sequential dense matrix. This is possible since PETSc only
    * works on an abstract matrix type and internally distributes to functions

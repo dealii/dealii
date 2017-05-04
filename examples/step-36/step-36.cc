@@ -44,7 +44,7 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/lac/full_matrix.h>
 
-// IndexSet is used to set the size of PETScWrappers::Vector:
+// IndexSet is used to set the size of each PETScWrappers::MPI::Vector:
 #include <deal.II/base/index_set.h>
 
 // PETSc appears here because SLEPc depends on this library:

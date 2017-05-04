@@ -45,11 +45,7 @@ DEAL_II_NAMESPACE_OPEN
 #ifdef DEAL_II_WITH_PETSC
 namespace PETScWrappers
 {
-  class Vector;
-  namespace MPI
-  {
-    class Vector;
-  }
+  class VectorBase;
 }
 #endif
 
@@ -208,23 +204,17 @@ public:
 
 #ifdef DEAL_II_WITH_PETSC
   /**
-   * Another copy constructor: copy the values from a sequential PETSc wrapper
-   * vector class. This copy constructor is only available if PETSc was
-   * detected during configuration time.
-   */
-  explicit Vector (const PETScWrappers::Vector &v);
-
-  /**
-   * Another copy constructor: copy the values from a parallel PETSc wrapper
-   * vector class. This copy constructor is only available if PETSc was
-   * detected during configuration time.
+   * Another copy constructor: copy the values from a PETSc vector class. This
+   * copy constructor is only available if PETSc was detected during
+   * configuration time.
    *
    * Note that due to the communication model used in MPI, this operation can
-   * only succeed if all processes do it at the same time. I.e., it is not
-   * possible for only one process to obtain a copy of a parallel vector while
-   * the other jobs do something else.
+   * only succeed if all processes do it at the same time when <code>v</code>
+   * is a distributed vector: It is not possible for only one process to
+   * obtain a copy of a parallel vector while the other jobs do something
+   * else.
    */
-  explicit Vector (const PETScWrappers::MPI::Vector &v);
+  explicit Vector (const PETScWrappers::VectorBase &v);
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -275,14 +265,14 @@ public:
   virtual ~Vector ();
 
   /**
-   * This function does nothing but is there for compatibility with the @p
-   * PETScWrappers::Vector class.
+   * This function does nothing but exists for compatibility with the parallel
+   * vector classes.
    *
-   * For the PETSc vector wrapper class, this function compresses the
-   * underlying representation of the PETSc object, i.e. flushes the buffers
-   * of the vector object if it has any. This function is necessary after
-   * writing into a vector element-by-element and before anything else can be
-   * done on it.
+   * For the parallel vector wrapper class, this function compresses the
+   * underlying representation of the vector, i.e. flushes the buffers of the
+   * vector object if it has any. This function is necessary after writing
+   * into a vector element-by-element and before anything else can be done on
+   * it.
    *
    * However, for the implementation of this class, it is immaterial and thus
    * an empty function.
@@ -382,25 +372,18 @@ public:
 
 #ifdef DEAL_II_WITH_PETSC
   /**
-   * Another copy operator: copy the values from a sequential PETSc wrapper
-   * vector class. This operator is only available if PETSc was detected
-   * during configuration time.
-   */
-  Vector<Number> &
-  operator= (const PETScWrappers::Vector &v);
-
-  /**
-   * Another copy operator: copy the values from a parallel PETSc wrapper
-   * vector class. This operator is only available if PETSc was detected
-   * during configuration time.
+   * Another copy operator: copy the values from a PETSc wrapper vector
+   * class. This operator is only available if PETSc was detected during
+   * configuration time.
    *
    * Note that due to the communication model used in MPI, this operation can
-   * only succeed if all processes do it at the same time. I.e., it is not
-   * possible for only one process to obtain a copy of a parallel vector while
-   * the other jobs do something else.
+   * only succeed if all processes do it at the same time when <code>v</code>
+   * is a distributed vector: It is not possible for only one process to
+   * obtain a copy of a parallel vector while the other jobs do something
+   * else.
    */
   Vector<Number> &
-  operator= (const PETScWrappers::MPI::Vector &v);
+  operator= (const PETScWrappers::VectorBase &v);
 #endif
 
 
@@ -825,15 +808,8 @@ public:
               const Vector<Number> &b) DEAL_II_DEPRECATED;
 
   /**
-   * This function does nothing but is there for compatibility with the @p
-   * PETScWrappers::Vector class.
-   *
-   * For the PETSc vector wrapper class, this function updates the ghost
-   * values of the PETSc vector. This is necessary after any modification
-   * before reading ghost values.
-   *
-   * However, for the implementation of this class, it is immaterial and thus
-   * an empty function.
+   * This function does nothing but exists for compatibility with the @p
+   * parallel vector classes (e.g., LinearAlgebra::distributed::Vector class).
    */
   void update_ghost_values () const;
   //@}

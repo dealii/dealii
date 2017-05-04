@@ -19,7 +19,7 @@
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/petsc_compatibility.h>
-#  include <deal.II/lac/petsc_vector.h>
+#  include <deal.II/lac/petsc_vector_base.h>
 #  include <deal.II/lac/sparsity_pattern.h>
 #  include <deal.II/lac/dynamic_sparsity_pattern.h>
 
@@ -284,23 +284,6 @@ namespace PETScWrappers
   template void
   SparseMatrix::do_reinit (const DynamicSparsityPattern &,
                            const bool);
-
-  PetscScalar
-  SparseMatrix::matrix_norm_square (const VectorBase &v) const
-  {
-    Vector tmp (v.size());
-    vmult (tmp, v);
-    return tmp*v;
-  }
-
-  PetscScalar
-  SparseMatrix::matrix_scalar_product (const VectorBase &u,
-                                       const VectorBase &v) const
-  {
-    Vector tmp (v.size());
-    vmult (tmp, v);
-    return u*tmp;
-  }
 }
 
 

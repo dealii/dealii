@@ -58,13 +58,11 @@ namespace hp
 #ifdef DEAL_II_WITH_PETSC
 namespace PETScWrappers
 {
-  class SparseMatrix;
-  class Vector;
+  class MatrixBase;
+  class VectorBase;
   namespace MPI
   {
-    class SparseMatrix;
     class BlockSparseMatrix;
-    class Vector;
     class BlockVector;
   }
 }
@@ -799,16 +797,6 @@ namespace MatrixTools
    * this namespace.)
    *
    * This function is used in step-17 and step-18.
-   */
-  void
-  apply_boundary_values (const std::map<types::global_dof_index,PetscScalar> &boundary_values,
-                         PETScWrappers::SparseMatrix  &matrix,
-                         PETScWrappers::Vector  &solution,
-                         PETScWrappers::Vector  &right_hand_side,
-                         const bool             eliminate_columns = true);
-
-  /**
-   * Same function as above, but for parallel PETSc matrices.
    *
    * @note If the matrix is stored in parallel across multiple processors
    * using MPI, this function only touches rows that are locally stored and
@@ -827,14 +815,15 @@ namespace MatrixTools
    * rows.
    */
   void
-  apply_boundary_values (const std::map<types::global_dof_index,PetscScalar> &boundary_values,
-                         PETScWrappers::MPI::SparseMatrix  &matrix,
-                         PETScWrappers::MPI::Vector  &solution,
-                         PETScWrappers::MPI::Vector  &right_hand_side,
-                         const bool             eliminate_columns = true);
+  apply_boundary_values
+  (const std::map<types::global_dof_index,PetscScalar> &boundary_values,
+   PETScWrappers::MatrixBase                           &matrix,
+   PETScWrappers::VectorBase                           &solution,
+   PETScWrappers::VectorBase                           &right_hand_side,
+   const bool                                           eliminate_columns = true);
 
   /**
-   * Same as above but for BlockSparseMatrix.
+   * Same as above but for the parallel BlockSparseMatrix.
    */
   void
   apply_boundary_values (const std::map<types::global_dof_index,PetscScalar>  &boundary_values,

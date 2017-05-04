@@ -20,11 +20,9 @@
 #include <deal.II/base/config.h>
 
 #ifdef DEAL_II_WITH_PETSC
-
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/petsc_matrix_base.h>
-#  include <deal.II/lac/petsc_vector.h>
-
+#  include <deal.II/lac/petsc_parallel_vector.h>
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -48,14 +46,12 @@ namespace PETScWrappers
    * multiplication <tt>vmult(VectorBase &dst, const VectorBase &src)</tt>
    * which is pure virtual and must be reimplemented in derived classes.
    * Besides the usual interface, this class has a matrix-vector
-   * multiplication <tt>vmult(Vec  &dst, const Vec  &src)</tt> taking PETSc
-   * Vec objects, which will be called by <tt>matrix_free_mult(Mat A, Vec src,
-   * Vec dst)</tt> registered as matrix-vector multiplication of this PETSc
-   * matrix object. The default implementation of the vmult function in the
-   * base class translates the given PETSc <tt>Vec*</tt> vectors into a
-   * deal.II vector, calls the usual vmult function with the usual interface
-   * and converts the result back to PETSc <tt>Vec*</tt>. This could be made
-   * much more efficient in derived classes without allocating new memory.
+   * multiplication <tt>vmult(Vec &dst, const Vec &src)</tt> taking PETSc Vec
+   * objects, which will be called by <tt>matrix_free_mult(Mat A, Vec src, Vec
+   * dst)</tt> registered as matrix-vector multiplication of this PETSc matrix
+   * object. The default implementation of the vmult function in the base
+   * class wraps the given PETSc vectors with the PETScWrappers::VectorBase
+   * class and then calls the usual vmult function with the usual interface.
    *
    * @ingroup PETScWrappers
    * @ingroup Matrix1

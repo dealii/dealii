@@ -23,6 +23,7 @@
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/petsc_matrix_base.h>
+#  include <deal.II/lac/petsc_vector_base.h>
 #  include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -33,7 +34,7 @@ template <typename MatrixType> class BlockMatrixBase;
 namespace PETScWrappers
 {
   /**
-   * Implementation of a sequential sparse matrix class based on PETSC. All
+   * Implementation of a sequential sparse matrix class based on PETSc. All
    * the functionality is actually in the base class, except for the calls to
    * generate a sequential sparse matrix. This is possible since PETSc only
    * works on an abstract matrix type and internally distributes to functions
@@ -197,33 +198,6 @@ namespace PETScWrappers
      * communicator.
      */
     virtual const MPI_Comm &get_mpi_communicator () const;
-
-    /**
-     * Return the square of the norm of the vector $v$ with respect to the
-     * norm induced by this matrix, i.e. $\left(v,Mv\right)$. This is useful,
-     * e.g. in the finite element context, where the $L_2$ norm of a function
-     * equals the matrix norm with respect to the mass matrix of the vector
-     * representing the nodal values of the finite element function.
-     *
-     * Obviously, the matrix needs to be quadratic for this operation.
-     *
-     * The implementation of this function is not as efficient as the one in
-     * the @p MatrixBase class used in deal.II (i.e. the original one, not the
-     * PETSc wrapper class) since PETSc doesn't support this operation and
-     * needs a temporary vector.
-     */
-    PetscScalar matrix_norm_square (const VectorBase &v) const;
-
-    /**
-     * Compute the matrix scalar product $\left(u,Mv\right)$.
-     *
-     * The implementation of this function is not as efficient as the one in
-     * the @p MatrixBase class used in deal.II (i.e. the original one, not the
-     * PETSc wrapper class) since PETSc doesn't support this operation and
-     * needs a temporary vector.
-     */
-    PetscScalar matrix_scalar_product (const VectorBase &u,
-                                       const VectorBase &v) const;
 
     /**
      * Return the number of rows of this matrix.

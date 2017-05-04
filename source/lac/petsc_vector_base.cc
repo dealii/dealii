@@ -20,7 +20,6 @@
 #  include <deal.II/base/memory_consumption.h>
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/petsc_compatibility.h>
-#  include <deal.II/lac/petsc_vector.h>
 #  include <deal.II/lac/petsc_parallel_vector.h>
 #  include <cmath>
 #  include <deal.II/base/multithread_info.h>
@@ -36,114 +35,77 @@ namespace PETScWrappers
       Assert (index < vector.size(),
               ExcIndexRange (index, 0, vector.size()));
 
-      // if the vector is local, then
-      // simply access the element we
-      // are interested in
-      if (dynamic_cast<const PETScWrappers::Vector *>(&vector) != nullptr)
+      // The vector may have ghost entries. In that case, we first need to
+      // figure out which elements we own locally, then get a pointer to the
+      // elements that are stored here (both the ones we own as well as the
+      // ghost elements). In this array, the locally owned elements come first
+      // followed by the ghost elements whose position we can get from an
+      // index set.
+      if (vector.ghosted)
         {
-          PetscInt idx = index;
-          PetscScalar value;
-          PetscErrorCode ierr = VecGetValues(vector.vector, 1, &idx, &value);
+          PetscInt begin, end;
+          PetscErrorCode ierr = VecGetOwnershipRange (vector.vector, &begin,
+                                                      &end);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
-          return value;
-        }
-      // else see if we are dealing
-      // with a parallel vector
-      else if (dynamic_cast<const PETScWrappers::VectorBase *>(&vector) != nullptr)
-        {
-          // there is the possibility
-          // that the vector has
-          // ghost elements. in that
-          // case, we first need to
-          // figure out which
-          // elements we own locally,
-          // then get a pointer to
-          // the elements that are
-          // stored here (both the
-          // ones we own as well as
-          // the ghost elements). in
-          // this array, the locally
-          // owned elements come
-          // first followed by the
-          // ghost elements whose
-          // position we can get from
-          // an index set
-          if (vector.ghosted)
+
+          Vec locally_stored_elements = PETSC_NULL;
+          ierr = VecGhostGetLocalForm(vector.vector, &locally_stored_elements);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+          PetscInt lsize;
+          ierr = VecGetSize(locally_stored_elements, &lsize);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+          PetscScalar *ptr;
+          ierr = VecGetArray(locally_stored_elements, &ptr);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+          PetscScalar value;
+
+          if ( index>=static_cast<size_type>(begin)
+               && index<static_cast<size_type>(end) )
             {
-              PetscInt begin, end;
-              PetscErrorCode ierr = VecGetOwnershipRange (vector.vector, &begin,
-                                                          &end);
-              AssertThrow (ierr == 0, ExcPETScError(ierr));
+              //local entry
+              value = *(ptr+index-begin);
+            }
+          else
+            {
+              //ghost entry
+              const size_type ghostidx
+                = vector.ghost_indices.index_within_set(index);
 
-              Vec locally_stored_elements = PETSC_NULL;
-              ierr = VecGhostGetLocalForm(vector.vector, &locally_stored_elements);
-              AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-              PetscInt lsize;
-              ierr = VecGetSize(locally_stored_elements, &lsize);
-              AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-              PetscScalar *ptr;
-              ierr = VecGetArray(locally_stored_elements, &ptr);
-              AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-              PetscScalar value;
-
-              if ( index>=static_cast<size_type>(begin)
-                   && index<static_cast<size_type>(end) )
-                {
-                  //local entry
-                  value = *(ptr+index-begin);
-                }
-              else
-                {
-                  //ghost entry
-                  const size_type ghostidx
-                    = vector.ghost_indices.index_within_set(index);
-
-                  Assert(ghostidx+end-begin<(size_type)lsize, ExcInternalError());
-                  value = *(ptr+ghostidx+end-begin);
-                }
-
-              ierr = VecRestoreArray(locally_stored_elements, &ptr);
-              AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-              ierr = VecGhostRestoreLocalForm(vector.vector, &locally_stored_elements);
-              AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-              return value;
+              Assert(ghostidx+end-begin<(size_type)lsize, ExcInternalError());
+              value = *(ptr+ghostidx+end-begin);
             }
 
-
-          // first verify that the requested
-          // element is actually locally
-          // available
-          PetscInt begin, end;
-
-          PetscErrorCode ierr = VecGetOwnershipRange (vector.vector, &begin, &end);
+          ierr = VecRestoreArray(locally_stored_elements, &ptr);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-
-
-          AssertThrow ((index >= static_cast<size_type>(begin)) &&
-                       (index < static_cast<size_type>(end)),
-                       ExcAccessToNonlocalElement (index, begin, end-1));
-
-          // old version which only work with
-          // VecGetArray()...
-          PetscInt idx = index;
-          PetscScalar value;
-          ierr = VecGetValues(vector.vector, 1, &idx, &value);
+          ierr = VecGhostRestoreLocalForm(vector.vector, &locally_stored_elements);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
 
           return value;
         }
-      else
-        // what? what other kind of vector
-        // exists there?
-        Assert (false, ExcInternalError());
 
-      return -1e20;
+
+      // first verify that the requested
+      // element is actually locally
+      // available
+      PetscInt begin, end;
+
+      PetscErrorCode ierr = VecGetOwnershipRange (vector.vector, &begin, &end);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      AssertThrow ((index >= static_cast<size_type>(begin)) &&
+                   (index < static_cast<size_type>(end)),
+                   ExcAccessToNonlocalElement (index, begin, end-1));
+
+      PetscInt idx = index;
+      PetscScalar value;
+      ierr = VecGetValues(vector.vector, 1, &idx, &value);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      return value;
     }
   }
 
