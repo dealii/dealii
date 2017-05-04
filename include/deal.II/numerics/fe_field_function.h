@@ -414,11 +414,6 @@ namespace Functions
      std::vector<std::vector<Point<dim> > >                      &qpoints,
      std::vector<std::vector<unsigned int> >                     &maps) const;
 
-    /**
-     * @deprecated Use VectorTools::ExcPointNotAvailableHere instead.
-     */
-    typedef VectorTools::ExcPointNotAvailableHere ExcPointNotAvailableHere DEAL_II_DEPRECATED;
-
   private:
     /**
      * Typedef holding the local cell_hint.
