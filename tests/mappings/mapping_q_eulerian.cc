@@ -123,7 +123,7 @@ double MappingTest<dim>::compute_area ()
 {
   QGauss<dim>  quadrature_formula(degree+1);
 
-  MappingQEulerian<dim> mapping(degree,displacements,dof_handler);
+  MappingQEulerian<dim> mapping(degree, dof_handler, displacements);
 
   FEValues<dim> fe_values (mapping, fe, quadrature_formula,
                            update_JxW_values);
