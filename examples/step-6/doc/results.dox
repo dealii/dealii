@@ -488,7 +488,7 @@ The reason to track the geometry is due to the fact, that the finite
 element method uses quadrature integration over the cell.  This way,
 during the assembly of a local matrix all functions for the coefficient
 with same values at quadrature points will contribute to the integral
-exactly as a polynomial (defined by a <code>quadrature_formula</code>)
+exactly as a defined by a <code>quadrature_formula</code> polynomial
 fitted to these points. The mesh used here and in the step-5 is not
 aligned to the internal boundary, so it is possible to have both
 coefficient values of 1 or 20 at quadrature points inside of a single
