@@ -1,0 +1,5 @@
+Changed: The deprecated variant of
+GridTools::get_face_connectivity_of_cells() has been removed. Use the
+other variant instead.
+<br>
+(Wolfgang Bangerth, 2017/05/04)
