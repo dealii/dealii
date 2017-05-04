@@ -2365,60 +2365,6 @@ ConstraintMatrix::distribute_local_to_global (
 
 
 
-template <typename MatrixType>
-void
-ConstraintMatrix::distribute_local_to_global (
-  const FullMatrix<typename MatrixType::value_type>  &local_matrix,
-  const std::vector<size_type> &row_indices,
-  const std::vector<size_type> &col_indices,
-  MatrixType                   &global_matrix) const
-{
-  typedef typename MatrixType::value_type number;
-
-  AssertDimension (local_matrix.m(), row_indices.size());
-  AssertDimension (local_matrix.n(), col_indices.size());
-  //Assert (sorted == true, ExcMatrixNotClosed());
-
-  const size_type n_local_row_dofs = row_indices.size();
-  const size_type n_local_col_dofs = col_indices.size();
-
-  typename internals::ConstraintMatrixData<number>::ScratchDataAccessor
-  scratch_data;
-  internals::GlobalRowsFromLocal &global_rows = scratch_data->global_rows;
-  global_rows.reinit(n_local_row_dofs);
-  internals::GlobalRowsFromLocal &global_cols = scratch_data->global_columns;
-  global_cols.reinit(n_local_col_dofs);
-  make_sorted_row_list (row_indices, global_rows);
-  make_sorted_row_list (col_indices, global_cols);
-
-  const size_type n_actual_row_dofs = global_rows.size();
-  const size_type n_actual_col_dofs = global_cols.size();
-
-  // create arrays for the column data (indices and values) that will then be
-  // written into the matrix. Shortcut for deal.II sparse matrix
-  std::vector<size_type> &cols = scratch_data->columns;
-  std::vector<number>     &vals = scratch_data->values;
-  cols.resize(n_actual_col_dofs);
-  vals.resize(n_actual_col_dofs);
-
-  // now do the actual job.
-  for (size_type i=0; i<n_actual_row_dofs; ++i)
-    {
-      const size_type row = global_rows.global_row(i);
-
-      // calculate all the data that will be written into the matrix row.
-      size_type *col_ptr = &cols[0];
-      number    *val_ptr = &vals[0];
-      internals::resolve_matrix_row (global_rows, global_cols, i, 0,
-                                     n_actual_col_dofs,
-                                     local_matrix, col_ptr, val_ptr);
-      const size_type n_values = col_ptr - &cols[0];
-      if (n_values > 0)
-        global_matrix.add(row, n_values, &cols[0], &vals[0], false, true);
-    }
-}
-
-
 // similar function as above, but now specialized for block matrices. See the
 // other function for additional comments.
 template <typename MatrixType, typename VectorType>
@@ -2537,6 +2483,75 @@ distribute_local_to_global (const FullMatrix<typename MatrixType::value_type>  &
   internals::set_matrix_diagonals (global_rows, local_dof_indices,
                                    local_matrix, *this,
                                    global_matrix, global_vector, use_inhomogeneities_for_rhs);
+}
+
+
+
+template <typename MatrixType>
+void
+ConstraintMatrix::distribute_local_to_global (
+  const FullMatrix<typename MatrixType::value_type>  &local_matrix,
+  const std::vector<size_type> &row_indices,
+  const std::vector<size_type> &col_indices,
+  MatrixType                   &global_matrix) const
+{
+  distribute_local_to_global(local_matrix, row_indices, *this,
+                             col_indices, global_matrix);
+}
+
+
+
+template <typename MatrixType>
+void
+ConstraintMatrix::distribute_local_to_global (
+  const FullMatrix<typename MatrixType::value_type>  &local_matrix,
+  const std::vector<size_type> &row_indices,
+  const ConstraintMatrix       &col_constraint_matrix,
+  const std::vector<size_type> &col_indices,
+  MatrixType                   &global_matrix) const
+{
+  typedef typename MatrixType::value_type number;
+
+  AssertDimension (local_matrix.m(), row_indices.size());
+  AssertDimension (local_matrix.n(), col_indices.size());
+
+  const size_type n_local_row_dofs = row_indices.size();
+  const size_type n_local_col_dofs = col_indices.size();
+
+  typename internals::ConstraintMatrixData<number>::ScratchDataAccessor
+  scratch_data;
+  internals::GlobalRowsFromLocal &global_rows = scratch_data->global_rows;
+  global_rows.reinit(n_local_row_dofs);
+  internals::GlobalRowsFromLocal &global_cols = scratch_data->global_columns;
+  global_cols.reinit(n_local_col_dofs);
+  make_sorted_row_list (row_indices, global_rows);
+  col_constraint_matrix.make_sorted_row_list (col_indices, global_cols);
+
+  const size_type n_actual_row_dofs = global_rows.size();
+  const size_type n_actual_col_dofs = global_cols.size();
+
+  // create arrays for the column data (indices and values) that will then be
+  // written into the matrix. Shortcut for deal.II sparse matrix
+  std::vector<size_type> &cols = scratch_data->columns;
+  std::vector<number>    &vals = scratch_data->values;
+  cols.resize(n_actual_col_dofs);
+  vals.resize(n_actual_col_dofs);
+
+  // now do the actual job.
+  for (size_type i=0; i<n_actual_row_dofs; ++i)
+    {
+      const size_type row = global_rows.global_row(i);
+
+      // calculate all the data that will be written into the matrix row.
+      size_type *col_ptr = &cols[0];
+      number    *val_ptr = &vals[0];
+      internals::resolve_matrix_row (global_rows, global_cols, i, 0,
+                                     n_actual_col_dofs,
+                                     local_matrix, col_ptr, val_ptr);
+      const size_type n_values = col_ptr - &cols[0];
+      if (n_values > 0)
+        global_matrix.add(row, n_values, &cols[0], &vals[0], false, true);
+    }
 }
 
 

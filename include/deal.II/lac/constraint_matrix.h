@@ -917,6 +917,30 @@ public:
                               MatrixType                   &global_matrix) const;
 
   /**
+   * Does almost the same as the function above for general rectangular
+   * matrices but uses different ConstraintMatrix objects on the row and
+   * column indices. The convention is that row indices are constrained
+   * according to the calling ConstraintMatrix <code>*this</code>, whereas
+   * column indices are constrained according to the given ConstraintMatrix
+   * <code>column_constraint_matrix</code>. This function allows to handle the
+   * case where rows and columns of a matrix are represented by different
+   * function spaces with their own enumeration of indices, as e.g. in mixed
+   * finite element problems with separate DoFHandler objects or for flux
+   * matrices between different levels in multigrid methods.
+   *
+   * Like the other method with separate slots for row and column indices,
+   * this method does not add diagonal entries to eliminated degrees of
+   * freedom. See there for a more elaborate description.
+   */
+  template <typename MatrixType>
+  void
+  distribute_local_to_global (const FullMatrix<typename MatrixType::value_type> &local_matrix,
+                              const std::vector<size_type> &row_indices,
+                              const ConstraintMatrix       &column_constraint_matrix,
+                              const std::vector<size_type> &column_indices,
+                              MatrixType                   &global_matrix) const;
+
+  /**
    * This function simultaneously writes elements into matrix and vector,
    * according to the constraints specified by the calling ConstraintMatrix.
    * This function can correctly handle inhomogeneous constraints as well. For
