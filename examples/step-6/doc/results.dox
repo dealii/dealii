@@ -486,18 +486,18 @@ documentation module on @ref manifold "Manifold descriptions".
 
 The reason to track the geometry is due to the fact, that the finite
 element method uses quadrature integration over the cell.  This way,
-during the assembly of a local matrix all functions for the coefficent
+during the assembly of a local matrix all functions for the coefficient
 with same values at quadrature points will contribute to the integral
 exactly as a polynomial (defined by a <code>quadrature_formula</code>)
 fitted to these points. The mesh used here and in the step-5 is not
 aligned to the internal boundary, so it is possible to have both
-coefficent values of 1 or 20 at quadrature points inside of a single
-cell. This means that the abrupt change of the coefficent will be
-effectively replaced with a smooth polinomial. Moreover, as soon as
+coefficient values of 1 or 20 at quadrature points inside of a single
+cell. This means that the abrupt change of the coefficient will be
+effectively replaced with a smooth polynomial. Moreover, as soon as
 the quadrature rule used in both steps does not have points on cell`s
 edges\faces this will most likely lead to the discontinuity of the
-polinomial representation (as it is used in the integration) of the
-coefficent on the boundary of such a cell. An important point here is
+polynomial representation (as it is used in the integration) of the
+coefficient on the boundary of such a cell. An important point here is
 that the discontinuity due to quadrature integration does not lead to
 the discontinuity of the solution (which is for sure is continuous due
 to the fact that it is what we obtain during the solution of the
@@ -508,11 +508,11 @@ and the interface between them is exactly on the boundary between
 cells. Refer to CellAccessor::set_material_id and step-28 as an
 advanced usage example.
 
-Finally, let us consider the case of a coefficent with non-uniform
-distribution in space. We can repeat once again all the disscusion on
+Finally, let us consider the case of a coefficient with non-uniform
+distribution in space. We can repeat once again all the discussion on
 the representation of such a function with quadratures. So, to
 simulate it correctly you have basically two options: you can reduce
-the cell size and/or increase the order of the polinomial used in the
+the cell size and/or increase the order of the polynomial used in the
 quadrature formula.
 
 
