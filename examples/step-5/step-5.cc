@@ -113,14 +113,8 @@ double coefficient (const Point<dim> &p)
   else
     return 1;
 }
-// @note It looks like we use a discontinuous coefficient, however,
-// the finite element method using quadrature really sees only a
-// polynomial approximation (defined by a
-// <code>quadrature_formula</code>) of that discontinuous coefficient
-// on every mesh. (Though that polynomial approximation of course
-// tends to a discontinuous function under mesh refinement.) Refer to
-// CellAccessor::set_material_id to set a discontinuous coefficient
-// between cells and step-28 as an advanced usage example.
+// @note Mapping of this representation of the coefficient to the mesh cell
+// is non-trivial, see Results section of step-6 for more discussion.
 
 // @sect3{The <code>Step5</code> class implementation}
 
