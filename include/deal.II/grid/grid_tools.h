@@ -983,16 +983,6 @@ namespace GridTools
                                   DynamicSparsityPattern             &connectivity);
 
   /**
-   * As above, but filling a SparsityPattern object instead.
-   *
-   * @deprecated
-   */
-  template <int dim, int spacedim>
-  void
-  get_face_connectivity_of_cells (const Triangulation<dim, spacedim> &triangulation,
-                                  SparsityPattern                    &connectivity) DEAL_II_DEPRECATED;
-
-  /**
    * Produce a sparsity pattern in which nonzero entries indicate that two
    * cells are connected via a common vertex. The diagonal entries of the
    * sparsity pattern are also set.

@@ -2293,18 +2293,6 @@ next_cell:
 
   template <int dim, int spacedim>
   void
-  get_face_connectivity_of_cells (const Triangulation<dim,spacedim> &triangulation,
-                                  SparsityPattern                   &cell_connectivity)
-  {
-    DynamicSparsityPattern dsp;
-    get_face_connectivity_of_cells(triangulation, dsp);
-    cell_connectivity.copy_from(dsp);
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
   get_vertex_connectivity_of_cells (const Triangulation<dim,spacedim> &triangulation,
                                     DynamicSparsityPattern            &cell_connectivity)
   {
@@ -2384,11 +2372,13 @@ next_cell:
     // passing this graph off to METIS.
     // finally defer to the other function for
     // partitioning and assigning subdomain ids
-    SparsityPattern cell_connectivity;
+    DynamicSparsityPattern cell_connectivity;
     get_face_connectivity_of_cells (triangulation, cell_connectivity);
 
+    SparsityPattern sp_cell_connectivity;
+    sp_cell_connectivity.copy_from(cell_connectivity);
     partition_triangulation (n_partitions,
-                             cell_connectivity,
+                             sp_cell_connectivity,
                              triangulation);
   }
 
