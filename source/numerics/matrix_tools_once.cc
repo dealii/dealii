@@ -35,11 +35,10 @@
 #include <deal.II/lac/block_sparse_matrix.h>
 
 #ifdef DEAL_II_WITH_PETSC
-#  include <deal.II/lac/petsc_parallel_sparse_matrix.h>
-#  include <deal.II/lac/petsc_sparse_matrix.h>
-#  include <deal.II/lac/petsc_parallel_vector.h>
-#  include <deal.II/lac/petsc_vector.h>
+#  include <deal.II/lac/petsc_matrix_base.h>
+#  include <deal.II/lac/petsc_parallel_block_vector.h>
 #  include <deal.II/lac/petsc_parallel_block_sparse_matrix.h>
+#  include <deal.II/lac/petsc_vector_base.h>
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -50,7 +49,6 @@
 #endif
 
 #include <algorithm>
-#include <set>
 #include <cmath>
 
 
@@ -60,139 +58,102 @@ namespace MatrixTools
 {
 
 #ifdef DEAL_II_WITH_PETSC
-
-  namespace internal
+  void
+  apply_boundary_values
+  (const std::map<types::global_dof_index,PetscScalar> &boundary_values,
+   PETScWrappers::MatrixBase                           &matrix,
+   PETScWrappers::VectorBase                           &solution,
+   PETScWrappers::VectorBase                           &right_hand_side,
+   const bool                                           eliminate_columns)
   {
-    namespace PETScWrappers
-    {
-      template <typename PETScMatrix, typename PETScVector>
-      void
-      apply_boundary_values (const std::map<types::global_dof_index,PetscScalar> &boundary_values,
-                             PETScMatrix      &matrix,
-                             PETScVector      &solution,
-                             PETScVector      &right_hand_side,
-                             const bool        eliminate_columns)
+    (void)eliminate_columns;
+    Assert (eliminate_columns == false, ExcNotImplemented());
+
+    Assert (matrix.n() == right_hand_side.size(),
+            ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
+    Assert (matrix.n() == solution.size(),
+            ExcDimensionMismatch(matrix.n(), solution.size()));
+
+    // if no boundary values are to be applied, then
+    // jump straight to the compress() calls that we still have
+    // to perform because they are collective operations
+    if (boundary_values.size() > 0)
       {
-        (void)eliminate_columns;
-        Assert (eliminate_columns == false, ExcNotImplemented());
+        const std::pair<types::global_dof_index, types::global_dof_index> local_range
+          = matrix.local_range();
+        Assert (local_range == right_hand_side.local_range(),
+                ExcInternalError());
+        Assert (local_range == solution.local_range(),
+                ExcInternalError());
 
-        Assert (matrix.n() == right_hand_side.size(),
-                ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
-        Assert (matrix.n() == solution.size(),
-                ExcDimensionMismatch(matrix.n(), solution.size()));
+        // determine the first nonzero diagonal
+        // entry from within the part of the
+        // matrix that we can see. if we can't
+        // find such an entry, take one
+        PetscScalar average_nonzero_diagonal_entry = 1;
+        for (types::global_dof_index i=local_range.first; i<local_range.second; ++i)
+          if (matrix.diag_element(i) != PetscScalar ())
+            {
+              average_nonzero_diagonal_entry = std::abs(matrix.diag_element(i));
+              break;
+            }
 
-        // if no boundary values are to be applied, then
-        // jump straight to the compress() calls that we still have
-        // to perform because they are collective operations
-        if (boundary_values.size() > 0)
-          {
-            const std::pair<types::global_dof_index, types::global_dof_index> local_range
-              = matrix.local_range();
-            Assert (local_range == right_hand_side.local_range(),
-                    ExcInternalError());
-            Assert (local_range == solution.local_range(),
-                    ExcInternalError());
+        // figure out which rows of the matrix we
+        // have to eliminate on this processor
+        std::vector<types::global_dof_index> constrained_rows;
+        for (std::map<types::global_dof_index,PetscScalar>::const_iterator
+             dof  = boundary_values.begin();
+             dof != boundary_values.end();
+             ++dof)
+          if ((dof->first >= local_range.first) &&
+              (dof->first < local_range.second))
+            constrained_rows.push_back (dof->first);
 
-            // determine the first nonzero diagonal
-            // entry from within the part of the
-            // matrix that we can see. if we can't
-            // find such an entry, take one
-            PetscScalar average_nonzero_diagonal_entry = 1;
-            for (types::global_dof_index i=local_range.first; i<local_range.second; ++i)
-              if (matrix.diag_element(i) != PetscScalar ())
-                {
-                  average_nonzero_diagonal_entry = std::abs(matrix.diag_element(i));
-                  break;
-                }
+        // then eliminate these rows and set
+        // their diagonal entry to what we have
+        // determined above. note that for petsc
+        // matrices interleaving read with write
+        // operations is very expensive. thus, we
+        // here always replace the diagonal
+        // element, rather than first checking
+        // whether it is nonzero and in that case
+        // preserving it. this is different from
+        // the case of deal.II sparse matrices
+        // treated in the other functions.
+        matrix.clear_rows (constrained_rows, average_nonzero_diagonal_entry);
 
-            // figure out which rows of the matrix we
-            // have to eliminate on this processor
-            std::vector<types::global_dof_index> constrained_rows;
-            for (std::map<types::global_dof_index,PetscScalar>::const_iterator
-                 dof  = boundary_values.begin();
-                 dof != boundary_values.end();
-                 ++dof)
-              if ((dof->first >= local_range.first) &&
-                  (dof->first < local_range.second))
-                constrained_rows.push_back (dof->first);
+        std::vector<types::global_dof_index> indices;
+        std::vector<PetscScalar>  solution_values;
+        for (std::map<types::global_dof_index,PetscScalar>::const_iterator
+             dof  = boundary_values.begin();
+             dof != boundary_values.end();
+             ++dof)
+          if ((dof->first >= local_range.first) &&
+              (dof->first < local_range.second))
+            {
+              indices.push_back (dof->first);
+              solution_values.push_back (dof->second);
+            }
+        solution.set (indices, solution_values);
 
-            // then eliminate these rows and set
-            // their diagonal entry to what we have
-            // determined above. note that for petsc
-            // matrices interleaving read with write
-            // operations is very expensive. thus, we
-            // here always replace the diagonal
-            // element, rather than first checking
-            // whether it is nonzero and in that case
-            // preserving it. this is different from
-            // the case of deal.II sparse matrices
-            // treated in the other functions.
-            matrix.clear_rows (constrained_rows, average_nonzero_diagonal_entry);
+        // now also set appropriate values for
+        // the rhs
+        for (unsigned int i=0; i<solution_values.size(); ++i)
+          solution_values[i] *= average_nonzero_diagonal_entry;
 
-            std::vector<types::global_dof_index> indices;
-            std::vector<PetscScalar>  solution_values;
-            for (std::map<types::global_dof_index,PetscScalar>::const_iterator
-                 dof  = boundary_values.begin();
-                 dof != boundary_values.end();
-                 ++dof)
-              if ((dof->first >= local_range.first) &&
-                  (dof->first < local_range.second))
-                {
-                  indices.push_back (dof->first);
-                  solution_values.push_back (dof->second);
-                }
-            solution.set (indices, solution_values);
-
-            // now also set appropriate values for
-            // the rhs
-            for (unsigned int i=0; i<solution_values.size(); ++i)
-              solution_values[i] *= average_nonzero_diagonal_entry;
-
-            right_hand_side.set (indices, solution_values);
-          }
-        else
-          {
-            // clear_rows() is a collective operation so we still have to call
-            // it:
-            std::vector<types::global_dof_index> constrained_rows;
-            matrix.clear_rows (constrained_rows, 1.);
-          }
-
-        // clean up
-        solution.compress (VectorOperation::insert);
-        right_hand_side.compress (VectorOperation::insert);
+        right_hand_side.set (indices, solution_values);
       }
-    }
-  }
+    else
+      {
+        // clear_rows() is a collective operation so we still have to call
+        // it:
+        std::vector<types::global_dof_index> constrained_rows;
+        matrix.clear_rows (constrained_rows, 1.);
+      }
 
-
-
-  void
-  apply_boundary_values (const std::map<types::global_dof_index,PetscScalar> &boundary_values,
-                         PETScWrappers::SparseMatrix   &matrix,
-                         PETScWrappers::Vector   &solution,
-                         PETScWrappers::Vector   &right_hand_side,
-                         const bool        eliminate_columns)
-  {
-    // simply redirect to the generic function
-    // used for both petsc matrix types
-    internal::PETScWrappers::apply_boundary_values (boundary_values, matrix, solution,
-                                                    right_hand_side, eliminate_columns);
-  }
-
-
-
-  void
-  apply_boundary_values (const std::map<types::global_dof_index,PetscScalar> &boundary_values,
-                         PETScWrappers::MPI::SparseMatrix   &matrix,
-                         PETScWrappers::MPI::Vector   &solution,
-                         PETScWrappers::MPI::Vector   &right_hand_side,
-                         const bool        eliminate_columns)
-  {
-    // simply redirect to the generic function
-    // used for both petsc matrix types
-    internal::PETScWrappers::apply_boundary_values (boundary_values, matrix, solution,
-                                                    right_hand_side, eliminate_columns);
+    // clean up
+    solution.compress (VectorOperation::insert);
+    right_hand_side.compress (VectorOperation::insert);
   }
 
 
@@ -239,11 +200,11 @@ namespace MatrixTools
     // the diagonal subblocks and the
     // solution/rhs.
     for (unsigned int block=0; block<n_blocks; ++block)
-      internal::PETScWrappers::apply_boundary_values(block_boundary_values[block],
-                                                     matrix.block(block,block),
-                                                     solution.block(block),
-                                                     right_hand_side.block(block),
-                                                     eliminate_columns);
+      apply_boundary_values(block_boundary_values[block],
+                            matrix.block(block,block),
+                            solution.block(block),
+                            right_hand_side.block(block),
+                            eliminate_columns);
 
     // Finally, we need to do something
     // about the off-diagonal matrices. This
