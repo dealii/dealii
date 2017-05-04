@@ -171,6 +171,9 @@ namespace PETScWrappers
        * documentation states that one cannot form an ILU decomposition of a
        * matrix for which this flag has been set to @p true, only an ICC. The
        * default value of this flag is @p false.
+       *
+       * @deprecated This constructor is deprecated: please use the
+       * constructor with a sparsity pattern argument instead.
        */
       SparseMatrix (const MPI_Comm  &communicator,
                     const size_type  m,
@@ -179,7 +182,7 @@ namespace PETScWrappers
                     const size_type  local_columns,
                     const size_type  n_nonzero_per_row,
                     const bool       is_symmetric = false,
-                    const size_type  n_offdiag_nonzero_per_row = 0);
+                    const size_type  n_offdiag_nonzero_per_row = 0) DEAL_II_DEPRECATED;
 
       /**
        * Initialize a rectangular matrix with @p m rows and @p n columns. The
@@ -200,6 +203,9 @@ namespace PETScWrappers
        * documentation states that one cannot form an ILU decomposition of a
        * matrix for which this flag has been set to @p true, only an ICC. The
        * default value of this flag is @p false.
+       *
+       * @deprecated This constructor is deprecated: please use the
+       * constructor with a sparsity pattern argument instead.
        */
       SparseMatrix (const MPI_Comm               &communicator,
                     const size_type               m,
@@ -208,7 +214,7 @@ namespace PETScWrappers
                     const size_type               local_columns,
                     const std::vector<size_type> &row_lengths,
                     const bool                    is_symmetric = false,
-                    const std::vector<size_type> &offdiag_row_lengths = std::vector<size_type>());
+                    const std::vector<size_type> &offdiag_row_lengths = std::vector<size_type>()) DEAL_II_DEPRECATED;
 
       /**
        * Initialize using the given sparsity pattern with communication
@@ -262,6 +268,9 @@ namespace PETScWrappers
        * Throw away the present matrix and generate one that has the same
        * properties as if it were created by the constructor of this class
        * with the same argument list as the present function.
+       *
+       * @deprecated This overload of <code>reinit</code> is deprecated:
+       * please use the overload with a sparsity pattern argument instead.
        */
       void reinit (const MPI_Comm     &communicator,
                    const size_type m,
@@ -270,12 +279,15 @@ namespace PETScWrappers
                    const size_type local_columns,
                    const size_type n_nonzero_per_row,
                    const bool      is_symmetric = false,
-                   const size_type n_offdiag_nonzero_per_row = 0);
+                   const size_type n_offdiag_nonzero_per_row = 0) DEAL_II_DEPRECATED;
 
       /**
        * Throw away the present matrix and generate one that has the same
        * properties as if it were created by the constructor of this class
        * with the same argument list as the present function.
+       *
+       * @deprecated This overload of <code>reinit</code> is deprecated:
+       * please use the overload with a sparsity pattern argument instead.
        */
       void reinit (const MPI_Comm               &communicator,
                    const size_type               m,
@@ -284,7 +296,7 @@ namespace PETScWrappers
                    const size_type               local_columns,
                    const std::vector<size_type> &row_lengths,
                    const bool                    is_symmetric = false,
-                   const std::vector<size_type> &offdiag_row_lengths = std::vector<size_type>());
+                   const std::vector<size_type> &offdiag_row_lengths = std::vector<size_type>()) DEAL_II_DEPRECATED;
 
       /**
        * Initialize using the given sparsity pattern with communication
@@ -403,6 +415,9 @@ namespace PETScWrappers
        * Do the actual work for the respective reinit() function and the
        * matching constructor, i.e. create a matrix. Getting rid of the
        * previous matrix is left to the caller.
+       *
+       * @deprecated This overload of <code>do_reinit</code> is deprecated:
+       * please use the overload with a sparsity pattern argument instead.
        */
       void do_reinit (const size_type m,
                       const size_type n,
@@ -410,10 +425,13 @@ namespace PETScWrappers
                       const size_type local_columns,
                       const size_type n_nonzero_per_row,
                       const bool      is_symmetric = false,
-                      const size_type n_offdiag_nonzero_per_row = 0);
+                      const size_type n_offdiag_nonzero_per_row = 0) DEAL_II_DEPRECATED;
 
       /**
        * Same as previous function.
+       *
+       * @deprecated This overload of <code>do_reinit</code> is deprecated:
+       * please use the overload with a sparsity pattern argument instead.
        */
       void do_reinit (const size_type               m,
                       const size_type               n,
@@ -421,7 +439,7 @@ namespace PETScWrappers
                       const size_type               local_columns,
                       const std::vector<size_type> &row_lengths,
                       const bool                    is_symmetric = false,
-                      const std::vector<size_type> &offdiag_row_lengths = std::vector<size_type>());
+                      const std::vector<size_type> &offdiag_row_lengths = std::vector<size_type>()) DEAL_II_DEPRECATED;
 
       /**
        * Same as previous functions.
