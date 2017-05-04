@@ -100,13 +100,6 @@ namespace TrilinosWrappers
 
 
 
-    Vector::Vector (const Epetra_Map &parallel_partitioning)
-    {
-      reinit (parallel_partitioning);
-    }
-
-
-
     Vector::Vector (const IndexSet &parallel_partitioning,
                     const MPI_Comm &communicator)
     {
@@ -135,28 +128,6 @@ namespace TrilinosWrappers
       owned_elements.clear();
 
       swap(v);
-    }
-
-
-
-    Vector::Vector (const Epetra_Map &input_map,
-                    const VectorBase &v)
-      :
-      VectorBase()
-    {
-      AssertThrow (n_global_elements(input_map) == n_global_elements(v.vector->Map()),
-                   ExcDimensionMismatch (n_global_elements(input_map),
-                                         n_global_elements(v.vector->Map())));
-
-      last_action = Zero;
-
-      if (input_map.SameAs(v.vector->Map()) == true)
-        vector.reset (new Epetra_FEVector(*v.vector));
-      else
-        {
-          vector.reset (new Epetra_FEVector(input_map));
-          reinit (v, false, true);
-        }
     }
 
 
@@ -191,62 +162,7 @@ namespace TrilinosWrappers
 
 
 
-    Vector::~Vector ()
-    {}
-
-
-
-    void
-    Vector::reinit (const Epetra_Map &input_map,
-                    const bool      /*omit_zeroing_entries*/)
-    {
-      nonlocal_vector.reset();
-
-      vector.reset (new Epetra_FEVector(input_map));
-
-      has_ghosts = vector->Map().UniqueGIDs()==false;
-
-      // If the IndexSets are overlapping, we don't really know
-      // which process owns what. So we decide that no process
-      // owns anything in that case. In particular asking for
-      // the locally owned elements is not allowed.
-      owned_elements.clear();
-      if (has_ghosts)
-        owned_elements.set_size(0);
-      else
-        {
-          owned_elements.set_size(size());
-
-          // easy case: local range is contiguous
-          if (vector->Map().LinearMap())
-            {
-              const std::pair<size_type, size_type> x = local_range();
-              owned_elements.add_range (x.first, x.second);
-            }
-          else if (vector->Map().NumMyElements() > 0)
-            {
-              const size_type n_indices = vector->Map().NumMyElements();
-#ifndef DEAL_II_WITH_64BIT_INDICES
-              unsigned int *vector_indices = (unsigned int *)vector->Map().MyGlobalElements();
-#else
-              size_type *vector_indices = (size_type *)vector->Map().MyGlobalElements64();
-#endif
-              owned_elements.add_indices(vector_indices, vector_indices+n_indices);
-              owned_elements.compress();
-            }
-        }
-#if defined(DEBUG) && defined(DEAL_II_WITH_MPI)
-      const Epetra_MpiComm *comm_ptr
-        = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()));
-      Assert (comm_ptr != nullptr, ExcInternalError());
-      const size_type n_elements_global
-        = Utilities::MPI::sum (owned_elements.n_elements(), comm_ptr->Comm());
-
-      Assert (has_ghosts || n_elements_global == size(), ExcInternalError());
-#endif
-
-      last_action = Zero;
-    }
+    Vector::~Vector () = default;
 
 
 
@@ -362,89 +278,10 @@ namespace TrilinosWrappers
       Assert (comm_ptr != nullptr, ExcInternalError());
       const size_type n_elements_global
         = Utilities::MPI::sum (owned_elements.n_elements(), comm_ptr->Comm());
-
       Assert (has_ghosts || n_elements_global == size(), ExcInternalError());
 #endif
     }
 
-
-
-    void
-    Vector::reinit (const BlockVector &v,
-                    const bool         import_data)
-    {
-      nonlocal_vector.reset();
-      owned_elements.clear();
-      owned_elements.set_size(v.size());
-
-      // In case we do not allow to have different maps, this call means that
-      // we have to reset the vector. So clear the vector, initialize our map
-      // with the map in v, and generate the vector.
-      if (v.n_blocks() == 0)
-        return;
-
-      // create a vector that holds all the elements contained in the block
-      // vector. need to manually create an Epetra_Map.
-      size_type n_elements = 0, added_elements = 0, block_offset = 0;
-      for (size_type block=0; block<v.n_blocks(); ++block)
-        n_elements += v.block(block).local_size();
-      std::vector<TrilinosWrappers::types::int_type> global_ids (n_elements, -1);
-      for (size_type block=0; block<v.n_blocks(); ++block)
-        {
-          TrilinosWrappers::types::int_type *glob_elements =
-            my_global_elements(v.block(block).vector_partitioner());
-          for (size_type i=0; i<v.block(block).local_size(); ++i)
-            global_ids[added_elements++] = glob_elements[i] + block_offset;
-          owned_elements.add_indices(v.block(block).owned_elements,
-                                     block_offset);
-          block_offset += v.block(block).size();
-        }
-
-      Assert (n_elements == added_elements, ExcInternalError());
-      Epetra_Map new_map (v.size(), n_elements, &global_ids[0], 0,
-                          v.block(0).vector_partitioner().Comm());
-
-      std::shared_ptr<Epetra_FEVector> actual_vec;
-      if ( import_data == true )
-        actual_vec.reset (new Epetra_FEVector (new_map));
-      else
-        {
-          vector.reset (new Epetra_FEVector (new_map));
-          actual_vec = vector;
-        }
-
-      TrilinosScalar *entries = (*actual_vec)[0];
-      block_offset = 0;
-      for (size_type block=0; block<v.n_blocks(); ++block)
-        {
-          v.block(block).trilinos_vector().ExtractCopy (entries, 0);
-          entries += v.block(block).local_size();
-        }
-
-      if (import_data == true)
-        {
-          AssertThrow (static_cast<size_type>(global_length(*actual_vec))
-                       == v.size(),
-                       ExcDimensionMismatch (global_length(*actual_vec),
-                                             v.size()));
-
-          Epetra_Import data_exchange (vector->Map(), actual_vec->Map());
-
-          const int ierr = vector->Import(*actual_vec, data_exchange, Insert);
-          AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-          last_action = Insert;
-        }
-#if defined(DEBUG) && defined(DEAL_II_WITH_MPI)
-      const Epetra_MpiComm *comm_ptr
-        = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()));
-      Assert (comm_ptr != nullptr, ExcInternalError());
-      const size_type n_elements_global
-        = Utilities::MPI::sum (owned_elements.n_elements(), comm_ptr->Comm());
-
-      Assert (has_ghosts || n_elements_global == size(), ExcInternalError());
-#endif
-    }
 
 
     void Vector::reinit(const IndexSet &locally_owned_entries,
@@ -461,9 +298,6 @@ namespace TrilinosWrappers
           Epetra_Map map = parallel_partitioner.make_trilinos_map (communicator,
                                                                    true);
           vector.reset (new Epetra_FEVector(map));
-          has_ghosts = vector->Map().UniqueGIDs()==false;
-
-          last_action = Zero;
         }
       else
         {
@@ -472,7 +306,15 @@ namespace TrilinosWrappers
           Assert (map.IsOneToOne(),
                   ExcMessage("A writable vector must not have ghost entries in "
                              "its parallel partitioning"));
-          reinit (map);
+
+          if (vector->Map().SameAs(map)==false)
+            vector.reset (new Epetra_FEVector(map));
+          else
+            {
+              const int ierr = vector->PutScalar(0.);
+              (void)ierr;
+              Assert (ierr == 0, ExcTrilinosError(ierr));
+            }
 
           IndexSet nonlocal_entries(ghost_entries);
           nonlocal_entries.subtract_set(locally_owned_entries);
@@ -483,6 +325,11 @@ namespace TrilinosWrappers
               nonlocal_vector.reset(new Epetra_MultiVector(nonlocal_map, 1));
             }
         }
+
+      has_ghosts = vector->Map().UniqueGIDs()==false;
+
+      last_action = Zero;
+
 #ifdef DEBUG
       const size_type n_elements_global
         = Utilities::MPI::sum (owned_elements.n_elements(), communicator);
@@ -618,57 +465,6 @@ namespace TrilinosWrappers
     }
 
   } /* end of namespace MPI */
-
-
-
-
-  Vector::Vector ()
-  {
-    last_action = Zero;
-    Epetra_LocalMap map (0, 0, Utilities::Trilinos::comm_self());
-    vector.reset (new Epetra_FEVector(map));
-  }
-
-
-
-  Vector::Vector (const size_type n)
-  {
-    reinit(n);
-  }
-
-
-
-  Vector::Vector (const Epetra_Map &input_map)
-  {
-    reinit(input_map);
-  }
-
-
-
-  Vector::Vector (const IndexSet &partitioning,
-                  const MPI_Comm &communicator)
-  {
-    reinit (partitioning, communicator);
-  }
-
-
-
-  Vector::Vector (const VectorBase &v)
-  {
-    last_action = Zero;
-    Epetra_LocalMap map (n_global_elements(v.vector->Map()),
-                         v.vector->Map().IndexBase(),
-                         v.vector->Map().Comm());
-    vector.reset (new Epetra_FEVector(map));
-
-    if (vector->Map().SameAs(v.vector->Map()) == true)
-      {
-        const int ierr = vector->Update(1.0, *v.vector, 0.0);
-        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-      }
-    else
-      reinit (v, false, true);
-  }
 
 
 

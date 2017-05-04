@@ -290,14 +290,6 @@ namespace TrilinosWrappers
     void compress (::dealii::VectorOperation::values operation);
 
     /**
-     * Return the state of the vector, i.e., whether compress() has already
-     * been called after an operation requiring data exchange.
-     *
-     * This function is deprecated.
-     */
-    bool is_compressed () const DEAL_II_DEPRECATED;
-
-    /**
      * Set all components of the vector to the given number @p s. Simply pass
      * this down to the Trilinos Epetra object, but we still need to declare
      * this function to make the example given in the discussion about making
@@ -438,13 +430,6 @@ namespace TrilinosWrappers
 
     /**
      * Compute the minimal value of the elements of this vector.
-     *
-     * This function is deprecated use min() instead.
-     */
-    TrilinosScalar minimal_value () const DEAL_II_DEPRECATED;
-
-    /**
-     * Compute the minimal value of the elements of this vector.
      */
     TrilinosScalar min () const;
 
@@ -572,18 +557,6 @@ namespace TrilinosWrappers
     void extract_subvector_to (ForwardIterator          indices_begin,
                                const ForwardIterator    indices_end,
                                OutputIterator           values_begin) const;
-
-    /**
-     * Return the value of the vector entry <i>i</i>. Note that this function
-     * does only work properly when we request a data stored on the local
-     * processor. In case the elements sits on another process, this function
-     * returns 0 which might or might not be appropriate in a given situation.
-     * If you rely on consistent results, use the access functions () or []
-     * that throw an assertion in case a non-local element is used.
-     *
-     * This function is deprecated.
-     */
-    TrilinosScalar el (const size_type index) const DEAL_II_DEPRECATED;
 
     /**
      * Make the Vector class a bit like the <tt>vector<></tt> class of the C++
@@ -741,31 +714,6 @@ namespace TrilinosWrappers
                const VectorBase     &V);
 
     /**
-     * Scaling and multiple addition.
-     *
-     * This function is deprecated.
-     */
-    void sadd (const TrilinosScalar  s,
-               const TrilinosScalar  a,
-               const VectorBase     &V,
-               const TrilinosScalar  b,
-               const VectorBase     &W) DEAL_II_DEPRECATED;
-
-    /**
-     * Scaling and multiple addition.  <tt>*this = s*(*this) + a*V + b*W +
-     * c*X</tt>.
-     *
-     * This function is deprecated.
-     */
-    void sadd (const TrilinosScalar  s,
-               const TrilinosScalar  a,
-               const VectorBase     &V,
-               const TrilinosScalar  b,
-               const VectorBase     &W,
-               const TrilinosScalar  c,
-               const VectorBase     &X) DEAL_II_DEPRECATED;
-
-    /**
      * Scale each element of this vector by the corresponding element in the
      * argument. This function is mostly meant to simulate multiplication (and
      * immediate re-assignment) by a diagonal scaling matrix.
@@ -777,29 +725,6 @@ namespace TrilinosWrappers
      */
     void equ (const TrilinosScalar  a,
               const VectorBase     &V);
-
-    /**
-     * Assignment <tt>*this = a*V + b*W</tt>.
-     *
-     * This function is deprecated.
-     */
-    void equ (const TrilinosScalar  a,
-              const VectorBase     &V,
-              const TrilinosScalar  b,
-              const VectorBase     &W) DEAL_II_DEPRECATED;
-
-    /**
-     * Compute the elementwise ratio of the two given vectors, that is let
-     * <tt>this[i] = a[i]/b[i]</tt>. This is useful for example if you want to
-     * compute the cellwise ratio of true to estimated error.
-     *
-     * This vector is appropriately scaled to hold the result.
-     *
-     * If any of the <tt>b[i]</tt> is zero, the result is undefined. No
-     * attempt is made to catch such situations.
-     */
-    void ratio (const VectorBase &a,
-                const VectorBase &b) DEAL_II_DEPRECATED;
     //@}
 
 
@@ -825,14 +750,6 @@ namespace TrilinosWrappers
      * sets the parallel partitioning of the vector.
      */
     const Epetra_Map &vector_partitioner () const;
-
-    /**
-     * Output of vector in user-defined format in analogy to the
-     * dealii::Vector class.
-     *
-     * This function is deprecated.
-     */
-    void print (const char *format = nullptr) const DEAL_II_DEPRECATED;
 
     /**
      * Print to a stream. @p precision denotes the desired precision with
@@ -1064,15 +981,6 @@ namespace TrilinosWrappers
       vector.set (1, &index, &new_value);
       return *this;
     }
-  }
-
-
-
-  inline
-  bool
-  VectorBase::is_compressed () const
-  {
-    return compressed;
   }
 
 
@@ -1487,15 +1395,6 @@ namespace TrilinosWrappers
 
   inline
   TrilinosScalar
-  VectorBase::minimal_value () const
-  {
-    return min();
-  }
-
-
-
-  inline
-  TrilinosScalar
   VectorBase::min () const
   {
     TrilinosScalar min_value;
@@ -1800,103 +1699,6 @@ namespace TrilinosWrappers
 
   inline
   void
-  VectorBase::sadd (const TrilinosScalar  s,
-                    const TrilinosScalar  a,
-                    const VectorBase     &v,
-                    const TrilinosScalar  b,
-                    const VectorBase     &w)
-  {
-    // if we have ghost values, do not allow
-    // writing to this vector at all.
-    Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (size() == v.size(),
-            ExcDimensionMismatch (size(), v.size()));
-    Assert (size() == w.size(),
-            ExcDimensionMismatch (size(), w.size()));
-    AssertIsFinite(s);
-    AssertIsFinite(a);
-    AssertIsFinite(b);
-
-    // We assume that the vectors have the same Map
-    // if the local size is the same and if the vectors are not ghosted
-    if (local_size() == v.local_size() && !v.has_ghost_elements() &&
-        local_size() == w.local_size() && !w.has_ghost_elements())
-      {
-        Assert (this->vector->Map().SameAs(v.vector->Map())==true,
-                ExcDifferentParallelPartitioning());
-        Assert (this->vector->Map().SameAs(w.vector->Map())==true,
-                ExcDifferentParallelPartitioning());
-        const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
-        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-      }
-    else
-      {
-        this->sadd( s, a, v);
-        this->sadd(1., b, w);
-      }
-  }
-
-
-
-  inline
-  void
-  VectorBase::sadd (const TrilinosScalar  s,
-                    const TrilinosScalar  a,
-                    const VectorBase     &v,
-                    const TrilinosScalar  b,
-                    const VectorBase     &w,
-                    const TrilinosScalar  c,
-                    const VectorBase     &x)
-  {
-    // if we have ghost values, do not allow
-    // writing to this vector at all.
-    Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (size() == v.size(),
-            ExcDimensionMismatch (size(), v.size()));
-    Assert (size() == w.size(),
-            ExcDimensionMismatch (size(), w.size()));
-    Assert (size() == x.size(),
-            ExcDimensionMismatch (size(), x.size()));
-    AssertIsFinite(s);
-    AssertIsFinite(a);
-    AssertIsFinite(b);
-    AssertIsFinite(c);
-
-    // We assume that the vectors have the same Map
-    // if the local size is the same and if the vectors are not ghosted
-    if (local_size() == v.local_size() && !v.has_ghost_elements() &&
-        local_size() == w.local_size() && !w.has_ghost_elements() &&
-        local_size() == x.local_size() && !x.has_ghost_elements())
-      {
-        Assert (this->vector->Map().SameAs(v.vector->Map())==true,
-                ExcDifferentParallelPartitioning());
-        Assert (this->vector->Map().SameAs(w.vector->Map())==true,
-                ExcDifferentParallelPartitioning());
-        Assert (this->vector->Map().SameAs(x.vector->Map())==true,
-                ExcDifferentParallelPartitioning());
-
-        // Update member can only
-        // input two other vectors so
-        // do it in two steps
-        const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
-        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-        const int jerr = vector->Update(c, *(x.vector), 1.);
-        Assert (jerr == 0, ExcTrilinosError(jerr));
-        (void)jerr; // removes -Wunused-parameter warning in optimized mode
-      }
-    else
-      {
-        this->sadd( s, a, v);
-        this->sadd(1., b, w);
-        this->sadd(1., c, x);
-      }
-  }
-
-
-
-  inline
-  void
   VectorBase::scale (const VectorBase &factors)
   {
     // if we have ghost values, do not allow
@@ -1935,24 +1737,6 @@ namespace TrilinosWrappers
         last_action = Zero;
       }
 
-  }
-
-
-
-  inline
-  void
-  VectorBase::ratio (const VectorBase &v,
-                     const VectorBase &w)
-  {
-    Assert (v.local_size() == w.local_size(),
-            ExcDimensionMismatch (v.local_size(), w.local_size()));
-    Assert (local_size() == w.local_size(),
-            ExcDimensionMismatch (local_size(), w.local_size()));
-
-    const int ierr = vector->ReciprocalMultiply(1.0, *(w.vector),
-                                                *(v.vector), 0.0);
-
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
   }
 
 

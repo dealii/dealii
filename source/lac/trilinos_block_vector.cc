@@ -105,30 +105,6 @@ namespace TrilinosWrappers
 
 
     void
-    BlockVector::reinit (const std::vector<Epetra_Map> &input_maps,
-                         const bool                     omit_zeroing_entries)
-    {
-      const size_type no_blocks = input_maps.size();
-      std::vector<size_type> block_sizes (no_blocks);
-
-      for (size_type i=0; i<no_blocks; ++i)
-        {
-          block_sizes[i] = n_global_elements(input_maps[i]);
-        }
-
-      this->block_indices.reinit (block_sizes);
-      if (components.size() != n_blocks())
-        components.resize(n_blocks());
-
-      for (size_type i=0; i<n_blocks(); ++i)
-        components[i].reinit(input_maps[i], omit_zeroing_entries);
-
-      collect_sizes();
-    }
-
-
-
-    void
     BlockVector::reinit (const std::vector<IndexSet> &parallel_partitioning,
                          const MPI_Comm              &communicator,
                          const bool                   omit_zeroing_entries)

@@ -179,7 +179,8 @@ Vector<Number>::Vector (const TrilinosWrappers::MPI::Vector &v)
       // be a better solution than
       // this, but it has not yet been
       // found.
-      TrilinosWrappers::Vector localized_vector (v);
+      TrilinosWrappers::Vector localized_vector;
+      localized_vector.reinit (v, false, true);
 
       // get a representation of the vector
       // and copy it
@@ -895,7 +896,8 @@ Vector<Number>::operator= (const TrilinosWrappers::MPI::Vector &v)
   // of the Trilinos vectors and
   // then call the other =
   // operator.
-  TrilinosWrappers::Vector localized_vector (v);
+  TrilinosWrappers::Vector localized_vector;
+  localized_vector.reinit(v, false, true);
   *this = localized_vector;
   return *this;
 }

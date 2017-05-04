@@ -98,61 +98,6 @@ namespace TrilinosWrappers
     BlockVector ();
 
     /**
-     * Constructor. Generate a block vector with as many blocks as there are
-     * entries in Input_Maps.  For this non-distributed vector, the %parallel
-     * partitioning is not used, just the global size of the partitioner.
-     */
-    explicit BlockVector (const std::vector<Epetra_Map> &partitioner) DEAL_II_DEPRECATED;
-
-    /**
-     * Constructor. Generate a block vector with as many blocks as there are
-     * entries in Input_Maps.  For this non-distributed vector, the %parallel
-     * partitioning is not used, just the global size of the partitioner.
-     */
-    explicit BlockVector (const std::vector<IndexSet> &partitioner,
-                          const MPI_Comm              &communicator = MPI_COMM_WORLD) DEAL_II_DEPRECATED;
-
-    /**
-     * Copy-Constructor. Set all the properties of the non-%parallel vector to
-     * those of the given %parallel vector and import the elements.
-     */
-    BlockVector (const MPI::BlockVector &V) DEAL_II_DEPRECATED;
-
-    /**
-     * Copy-Constructor. Set all the properties of the vector to those of the
-     * given input vector and copy the elements.
-     */
-    BlockVector (const BlockVector  &V) DEAL_II_DEPRECATED;
-
-    /**
-     * Creates a block vector consisting of <tt>num_blocks</tt> components,
-     * but there is no content in the individual components and the user has
-     * to fill appropriate data using a reinit of the blocks.
-     */
-    explicit BlockVector (const size_type num_blocks) DEAL_II_DEPRECATED;
-
-    /**
-     * Constructor. Set the number of blocks to <tt>n.size()</tt> and
-     * initialize each block with <tt>n[i]</tt> zero elements.
-     *
-     * References BlockVector.reinit().
-     */
-    explicit BlockVector (const std::vector<size_type> &N) DEAL_II_DEPRECATED;
-
-    /**
-     * Constructor. Set the number of blocks to <tt>n.size()</tt>. Initialize
-     * the vector with the elements pointed to by the range of iterators given
-     * as second and third argument. Apart from the first argument, this
-     * constructor is in complete analogy to the respective constructor of the
-     * <tt>std::vector</tt> class, but the first argument is needed in order
-     * to know how to subdivide the block vector into different blocks.
-     */
-    template <typename InputIterator>
-    BlockVector (const std::vector<size_type> &n,
-                 const InputIterator           first,
-                 const InputIterator           end) DEAL_II_DEPRECATED;
-
-    /**
      * Destructor. Clears memory
      */
     ~BlockVector ();
@@ -317,93 +262,13 @@ namespace TrilinosWrappers
 
 
   inline
-  BlockVector::BlockVector ()
-  {}
+  BlockVector::BlockVector () = default;
 
 
 
   inline
-  BlockVector::BlockVector (const std::vector<Epetra_Map> &partitioning)
-  {
-    reinit (partitioning);
-  }
+  BlockVector::~BlockVector() = default;
 
-
-
-  inline
-  BlockVector::BlockVector (const std::vector<IndexSet> &partitioning,
-                            const MPI_Comm              &communicator)
-  {
-    reinit (partitioning, communicator);
-  }
-
-
-
-  inline
-  BlockVector::BlockVector (const std::vector<size_type> &N)
-  {
-    reinit (N);
-  }
-
-
-
-  template <typename InputIterator>
-  BlockVector::BlockVector (const std::vector<size_type> &n,
-                            const InputIterator           first,
-                            const InputIterator           end)
-  {
-    // first set sizes of blocks, but
-    // don't initialize them as we will
-    // copy elements soon
-    (void)end;
-    reinit (n, true);
-    InputIterator start = first;
-    for (size_type b=0; b<n.size(); ++b)
-      {
-        InputIterator end = start;
-        std::advance (end, static_cast<size_type>(n[b]));
-
-        for (size_type i=0; i<n[b]; ++i, ++start)
-          this->block(b)(i) = *start;
-      }
-    Assert (start == end, ExcIteratorRangeDoesNotMatchVectorSize());
-  }
-
-
-
-  inline
-  BlockVector::BlockVector (const size_type num_blocks)
-  {
-    reinit (num_blocks);
-  }
-
-
-
-  inline
-  BlockVector::~BlockVector()
-  {}
-
-
-
-  inline
-  BlockVector::BlockVector (const MPI::BlockVector &v)
-  {
-    reinit (v);
-  }
-
-
-
-  inline
-  BlockVector::BlockVector (const BlockVector &v)
-    :
-    BlockVectorBase<Vector > ()
-  {
-    this->components.resize (v.n_blocks());
-    this->block_indices = v.block_indices;
-
-    for (size_type i=0; i<this->n_blocks(); ++i)
-      this->components[i] = v.components[i];
-  }
 
 
   inline
