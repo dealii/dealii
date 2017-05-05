@@ -513,15 +513,15 @@ between cells (as it is shown on figures above).  Refer to
 CellAccessor::set_material_id and step-28 as an advanced usage
 example.
 
-Finally, let us consider the case of a coefficient with non-uniform
-distribution in space. We can repeat once again all the discussion on
-the representation of such a function with quadratures. So, to
-simulate it correctly you have basically few options: you can reduce
-the cell size and/or increase the order of the polynomial used in the
-quadrature formula and/or change the quadrature formula. The key is to
-provide the best fit of the coefficient dependance with the quadrature
-polinomial, this will provide an accurate mapping of your model to FEM
-description.
+Finally, let us consider the case of a coefficient with smooth and
+non-uniform distribution in space. We can repeat once again all the
+discussion on the representation of such a function with
+quadratures. So, to simulate it correctly you have basically few
+options: you can reduce the cell size and/or increase the order of the
+polynomial used in the quadrature formula and/or change the quadrature
+formula. The key is to provide the best fit of the coefficient
+dependance with the quadrature polinomial, this will provide an
+accurate mapping of your model to FEM description.
 
 
 <h4>Playing with the regularity of the solution</h4>
