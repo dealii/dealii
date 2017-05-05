@@ -16,8 +16,8 @@
 
 
 // this is part of a whole suite of tests that checks the relative speed of
-// using PETSc for sparse matrices as compared to the speed of our own
-// library. the tests therefore may not all actually use PETSc, but they are
+// using Trilinos for sparse matrices as compared to the speed of our own
+// library. the tests therefore may not all actually use Trilinos, but they are
 // meant to compare it
 //
 // the tests build the 5-point stencil matrix for a uniform grid of size N*N
@@ -64,9 +64,8 @@ void test ()
   }
 
   // build the sparse matrix
-  Epetra_Map map (TrilinosWrappers::types::int_type(N*N), 0,
-                  Utilities::Trilinos::comm_world());
-  TrilinosWrappers::SparseMatrix matrix (map, 5);
+  IndexSet indices = complete_index_set(N*N);
+  TrilinosWrappers::SparseMatrix matrix (indices, MPI_COMM_WORLD, 5);
   for (unsigned int i_=0; i_<N; i_++)
     for (unsigned int j_=0; j_<N; j_++)
       {
@@ -101,8 +100,8 @@ void test ()
   // then do a single matrix-vector
   // multiplication with subsequent formation
   // of the matrix norm
-  TrilinosWrappers::MPI::Vector v1(map);
-  TrilinosWrappers::MPI::Vector v2(map);
+  TrilinosWrappers::MPI::Vector v1(indices, MPI_COMM_WORLD);
+  TrilinosWrappers::MPI::Vector v2(indices, MPI_COMM_WORLD);
   for (unsigned int i=0; i<N*N; ++i)
     v1(i) = i;
   matrix.vmult (v2, v1);

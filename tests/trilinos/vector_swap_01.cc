@@ -36,10 +36,12 @@ void print(TrilinosWrappers::Vector &v)
 
 void test ()
 {
-  TrilinosWrappers::Vector v(5);
+  TrilinosWrappers::Vector v;
+  v.reinit(5);
   for (unsigned int i=0; i<v.size(); ++i)
     v(i) = 1;
-  TrilinosWrappers::Vector w(9);
+  TrilinosWrappers::Vector w;
+  w.reinit(9);
   for (unsigned int i=0; i<w.size(); ++i)
     w(i) = 2;
 

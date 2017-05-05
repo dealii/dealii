@@ -188,19 +188,6 @@ namespace TrilinosWrappers
 
       /**
        * Reinitialize the BlockVector to contain as many blocks as there are
-       * Epetra_Maps given in the input argument, according to the parallel
-       * distribution of the individual components described in the maps.
-       *
-       * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with
-       * zeros.
-       *
-       * This function is deprecated.
-       */
-      void reinit (const std::vector<Epetra_Map> &parallel_partitioning,
-                   const bool                     omit_zeroing_entries = false) DEAL_II_DEPRECATED;
-
-      /**
-       * Reinitialize the BlockVector to contain as many blocks as there are
        * index sets given in the input argument, according to the parallel
        * distribution of the individual components described in the maps.
        *

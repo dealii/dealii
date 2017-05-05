@@ -16,8 +16,8 @@
 
 
 // this is part of a whole suite of tests that checks the relative speed of
-// using PETSc for sparse matrices as compared to the speed of our own
-// library. the tests therefore may not all actually use PETSc, but they are
+// using Trilinos for sparse matrices as compared to the speed of our own
+// library. the tests therefore may not all actually use Trilinos, but they are
 // meant to compare it
 //
 // the tests build the 5-point stencil matrix for a uniform grid of size N*N
@@ -69,7 +69,10 @@ void test ()
   // then do a single matrix-vector
   // multiplication with subsequent formation
   // of the matrix norm
-  TrilinosWrappers::Vector v1(N*N), v2(N*N);
+  TrilinosWrappers::Vector v1;
+  v1.reinit(N*N);
+  TrilinosWrappers::Vector v2;
+  v2.reinit(N*N);
   for (unsigned int i=0; i<N*N; ++i)
     v1(i) = i;
   matrix.vmult (v2, v1);

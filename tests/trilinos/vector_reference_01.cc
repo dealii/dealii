@@ -29,7 +29,8 @@
 
 void test ()
 {
-  TrilinosWrappers::Vector v(3);
+  TrilinosWrappers::Vector v;
+  v.reinit(3);
   v(0) = 0;
   v(1) = 1;
   v(2) = 2;
