@@ -485,7 +485,7 @@ int main ()
   hn_constraints_def.close ();
 
   {
-    MappingQ1Eulerian<2> mapping_euler (deformation, *dof_handler_def);
+    MappingQ1Eulerian<2> mapping_euler (*dof_handler_def, deformation);
 
     // Try rotating the elements
     for (double rotat = 0; rotat < 2 * numbers::PI; rotat += 0.25 * numbers::PI)

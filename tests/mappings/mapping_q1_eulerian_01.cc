@@ -101,7 +101,7 @@ void test ()
                             Displacement<dim>(),
                             displacements);
 
-  MappingQ1Eulerian<dim> euler(displacements, dof_handler);
+  MappingQ1Eulerian<dim> euler(dof_handler, displacements);
   // now the actual test
   DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
