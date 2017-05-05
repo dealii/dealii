@@ -1,0 +1,5 @@
+Changed: The deprecated typedef
+FEFieldFunction::ExcPointNotAvailableHere has been removed. Use
+VectorTools::ExcPointNotAvailableHere instead.
+<br>
+(Wolfgang Bangerth, 2017/05/04)
