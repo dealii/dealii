@@ -484,36 +484,44 @@ step-49, step-53, and step-54, among other tutorial programs that cover
 the issue. Information on curved domains can also be found in the
 documentation module on @ref manifold "Manifold descriptions".
 
-The reason to track the geometry is due to the fact, that the finite
-element method uses quadrature integration over the cell.  This way,
-during the assembly of a local matrix all functions for the coefficient
-with same values at quadrature points will contribute to the integral
-exactly as a defined by a <code>quadrature_formula</code> polynomial
-fitted to these points. The mesh used here and in the step-5 is not
-aligned to the internal boundary, so it is possible to have both
-coefficient values of 1 or 20 at quadrature points inside of a single
-cell. This means that the abrupt change of the coefficient will be
-effectively replaced with a smooth polynomial. Moreover, as soon as
-the quadrature rule used in both steps does not have points on cell`s
-edges\faces this will most likely lead to the discontinuity of the
-polynomial representation (as it is used in the integration) of the
-coefficient on the boundary of such a cell. An important point here is
-that the discontinuity due to quadrature integration does not lead to
-the discontinuity of the solution (which is for sure is continuous due
-to the fact that it is what we obtain during the solution of the
-global system matrix using continuous finite elements).
+The reason to track the geometry here (and in similar setups) is due
+to the fact, that the finite element method uses quadrature
+integration over the cell.  This way, during the assembly of a local
+matrix all/any functions for the coefficient with same values at
+quadrature points will contribute to the integral exactly as a defined
+by a <code>quadrature_formula</code> polynomial fitted to these
+points. The mesh used here and in the step-5 is not aligned to the
+internal boundary (where the coefficient changes from 1 to 20) , so it
+is possible to have both coefficient values of 1 or 20 at quadrature
+points inside of a single cell. This means that this abrupt change of
+the coefficient will be effectively replaced with a smooth
+polynomial inside of that cell. Moreover, as soon as the quadrature rule used in both
+steps does not have points on cell`s edges\faces this will most likely
+lead to the discontinuity of the polynomial representation (as it is
+used in the integration) of the coefficient on the boundary of such a
+cell. An important point here is that the discontinuity due to
+quadrature integration does not lead to the discontinuity of the
+solution (which is for sure is continuous due to the fact that it is
+what we obtain during the solution of the global system matrix using
+continuous finite elements). See more on the relation of the
+coefficient discontinuity and the solution behavior in the next
+section.
 
-All this details are not important if we have a fixed set of materials
-and the interface between them is exactly on the boundary between
-cells. Refer to CellAccessor::set_material_id and step-28 as an
-advanced usage example.
+All this details are not that important if we have a fixed set of
+materials and the interface between them is exactly on the boundary
+between cells (as it is shown on figures above).  Refer to
+CellAccessor::set_material_id and step-28 as an advanced usage
+example.
 
 Finally, let us consider the case of a coefficient with non-uniform
 distribution in space. We can repeat once again all the discussion on
 the representation of such a function with quadratures. So, to
-simulate it correctly you have basically two options: you can reduce
+simulate it correctly you have basically few options: you can reduce
 the cell size and/or increase the order of the polynomial used in the
-quadrature formula.
+quadrature formula and/or change the quadrature formula. The key is to
+provide the best fit of the coefficient dependance with the quadrature
+polinomial, this will provide an accurate mapping of your model to FEM
+description.
 
 
 <h4>Playing with the regularity of the solution</h4>
