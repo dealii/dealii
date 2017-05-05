@@ -221,7 +221,7 @@ void curved_grid (std::ofstream &out)
       combined_cell->set_dof_values (dxy, displacements);
     }
   // and create the MappingQEulerian
-  MappingQEulerian<2> euler(2, displacements, cdh);
+  MappingQEulerian<2> euler(2, cdh, displacements);
   // now the actual test
   DataOut<2> data_out;
   data_out.attach_dof_handler(cdh);

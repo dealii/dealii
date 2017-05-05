@@ -76,7 +76,7 @@ void test ()
           shift(0) = 0.121;
           shift(1) = -0.005;
         }
-      MappingQEulerian<dim> mapping(2,shift,dofh_eulerian);
+      MappingQEulerian<dim> mapping(2, dofh_eulerian, shift);
 
       {
         const QGauss<1> quad (fe_degree+1);

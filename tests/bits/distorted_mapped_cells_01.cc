@@ -63,7 +63,7 @@ void test()
 
   // this gives a Cartesian cell but in non-standard orientation (x-coordinate
   // is gone through backwards)
-  MappingQEulerian<dim> mapping(1,displacements, dof_h);
+  MappingQEulerian<dim> mapping(1, dof_h, displacements);
   QGauss<dim> quad(1);
   FEValues<dim> fe_val (mapping, fe, quad, update_JxW_values);
   double integral = 0.;

@@ -186,7 +186,7 @@ void test()
           else
             break;
         }
-      catch (const typename Functions::FEFieldFunction<dim,DoFHandler<dim>,TrilinosWrappers::MPI::Vector>::ExcPointNotAvailableHere &)
+      catch (const VectorTools::ExcPointNotAvailableHere &)
         {
           deallog << "  ExcPointNotAvailableHere" << std::endl;
         }

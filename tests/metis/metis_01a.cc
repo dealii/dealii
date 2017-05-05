@@ -118,10 +118,12 @@ void test ()
   GridGenerator::hyper_cube (triangulation);
   triangulation.refine_global (2);
 
-  SparsityPattern cell_connectivity;
+  DynamicSparsityPattern cell_connectivity;
   GridTools::get_face_connectivity_of_cells (triangulation, cell_connectivity);
 
-  partition (cell_connectivity, 5);
+  SparsityPattern sp_cell_connectivity;
+  sp_cell_connectivity.copy_from (cell_connectivity);
+  partition (sp_cell_connectivity, 5);
 }
 
 
