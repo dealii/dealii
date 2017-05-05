@@ -496,16 +496,16 @@ is possible to have both coefficient values of 1 or 20 at quadrature
 points inside of a single cell. This means that this abrupt change of
 the coefficient will be effectively replaced with a smooth polynomial
 inside of that cell. Moreover, as soon as the quadrature rule used in
-both steps does not have points on cell`s edges\faces this will most
-likely lead to the discontinuity of the polynomial representation (as
-it is used in the integration) of the coefficient on the boundary of
-such a cell. An important point here is that the discontinuity due to
-quadrature integration does not lead to the discontinuity of the
-solution (which is for sure is continuous due to the fact that it is
-what we obtain during the solution of the global system matrix using
-continuous finite elements). See more on the relation of the
-coefficient discontinuity and the solution behavior in the next
-section.
+both tutorial steps does not have points on cell`s edges\faces this
+will most likely lead to the discontinuity of the polynomial
+representation (as it is used in the integration) of the coefficient
+on the boundary of such a cell. An important point here is that the
+discontinuity due to quadrature integration does not lead to the
+discontinuity of the solution (which is for sure is continuous due to
+the fact that it is what we obtain during the solution of the global
+system matrix using continuous finite elements). See more on the
+relation of the coefficient discontinuity and the solution behavior in
+the next section.
 
 All this details are not that important if we have a fixed set of
 materials and the interface between them is exactly on the boundary
