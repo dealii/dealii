@@ -269,13 +269,7 @@ get_tangent_vector (const Point<spacedim> &p1,
   return (r1-r2)*e1 + r1*gamma*tg;
 }
 
-template <int dim, int spacedim>
-Point<spacedim>
-SphericalManifold<dim, spacedim>::
-get_new_point (const Quadrature<spacedim> &quad) const
-{
-  return get_new_point(quad.get_points(),quad.get_weights());
-}
+
 
 template <int dim, int spacedim>
 Point<spacedim>
@@ -332,16 +326,6 @@ CylindricalManifold<dim,spacedim>::CylindricalManifold(const Point<spacedim> &di
 template <int dim, int spacedim>
 Point<spacedim>
 CylindricalManifold<dim,spacedim>::
-get_new_point (const Quadrature<spacedim> &quad) const
-{
-  return get_new_point(quad.get_points(),quad.get_weights());
-}
-
-
-
-template <int dim, int spacedim>
-Point<spacedim>
-CylindricalManifold<dim,spacedim>::
 get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
                const std::vector<double>           &weights) const
 {
@@ -378,7 +362,7 @@ get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
 
 
 // ============================================================
-// FunctionChartManifold
+// FunctionManifold
 // ============================================================
 template <int dim, int spacedim, int chartdim>
 FunctionManifold<dim,spacedim,chartdim>::FunctionManifold
@@ -395,6 +379,8 @@ FunctionManifold<dim,spacedim,chartdim>::FunctionManifold
   AssertDimension(push_forward_function.n_components, spacedim);
   AssertDimension(pull_back_function.n_components, chartdim);
 }
+
+
 
 template <int dim, int spacedim, int chartdim>
 FunctionManifold<dim,spacedim,chartdim>::FunctionManifold
@@ -419,6 +405,8 @@ FunctionManifold<dim,spacedim,chartdim>::FunctionManifold
   pull_back_function = pb;
 }
 
+
+
 template <int dim, int spacedim, int chartdim>
 FunctionManifold<dim,spacedim,chartdim>::~FunctionManifold()
 {
@@ -433,6 +421,8 @@ FunctionManifold<dim,spacedim,chartdim>::~FunctionManifold()
       delete pb;
     }
 }
+
+
 
 template <int dim, int spacedim, int chartdim>
 Point<spacedim>
@@ -458,6 +448,7 @@ FunctionManifold<dim,spacedim,chartdim>::push_forward(const Point<chartdim> &cha
 }
 
 
+
 template <int dim, int spacedim, int chartdim>
 DerivativeForm<1,chartdim, spacedim>
 FunctionManifold<dim,spacedim,chartdim>::push_forward_gradient(const Point<chartdim> &chart_point) const
@@ -470,6 +461,7 @@ FunctionManifold<dim,spacedim,chartdim>::push_forward_gradient(const Point<chart
       DF[i][j] = gradients[i][j];
   return DF;
 }
+
 
 
 template <int dim, int spacedim, int chartdim>
@@ -499,6 +491,8 @@ TorusManifold<dim>::pull_back(const Point<3> &p) const
   return Point<3>(phi, theta, w);
 }
 
+
+
 template <int dim>
 Point<3>
 TorusManifold<dim>::push_forward(const Point<3> &chart_point) const
@@ -514,6 +508,7 @@ TorusManifold<dim>::push_forward(const Point<3> &chart_point) const
 }
 
 
+
 template <int dim>
 TorusManifold<dim>::TorusManifold (const double R, const double r)
   : ChartManifold<dim,3,3> (Point<3>(2*numbers::PI, 2*numbers::PI, 0.0)),
@@ -524,6 +519,8 @@ TorusManifold<dim>::TorusManifold (const double R, const double r)
                           "radius r."));
   Assert (r>0.0, ExcMessage("inner radius must be positive."));
 }
+
+
 
 template <int dim>
 DerivativeForm<1,3,3>

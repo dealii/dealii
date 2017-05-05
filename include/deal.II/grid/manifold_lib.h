@@ -230,16 +230,6 @@ public:
   /**
    * Return a point on the spherical manifold which is intermediate
    * with respect to the surrounding points.
-   *
-   * @deprecated Use the other function that takes points and weights separately instead.
-   */
-  virtual
-  Point<spacedim>
-  get_new_point(const dealii::Quadrature<spacedim> &quadrature) const DEAL_II_DEPRECATED;
-
-  /**
-   * Return a point on the spherical manifold which is intermediate
-   * with respect to the surrounding points.
    */
   virtual
   Point<spacedim>
@@ -291,13 +281,6 @@ public:
   CylindricalManifold (const Point<spacedim> &direction,
                        const Point<spacedim> &point_on_axis,
                        const double tolerance = 1e-10);
-
-  /**
-   * Compute new points on the CylindricalManifold. See the documentation of
-   * the base class for a detailed description of what this function does.
-   */
-  virtual Point<spacedim>
-  get_new_point(const Quadrature<spacedim> &quad) const DEAL_II_DEPRECATED;
 
   /**
    * Compute new points on the CylindricalManifold. See the documentation of

@@ -83,16 +83,6 @@ get_intermediate_point (const Point<spacedim> &p1,
 template <int dim, int spacedim>
 Point<spacedim>
 Manifold<dim, spacedim>::
-get_new_point (const Quadrature<spacedim> &quad) const
-{
-  return get_new_point(quad.get_points(),quad.get_weights());
-}
-
-
-
-template <int dim, int spacedim>
-Point<spacedim>
-Manifold<dim, spacedim>::
 get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
                const std::vector<double>           &weights) const
 {
@@ -554,16 +544,6 @@ FlatManifold<dim,spacedim>::FlatManifold (const Tensor<1,spacedim> &periodicity,
 template <int dim, int spacedim>
 Point<spacedim>
 FlatManifold<dim, spacedim>::
-get_new_point (const Quadrature<spacedim> &quad) const
-{
-  return get_new_point(quad.get_points(),quad.get_weights());
-}
-
-
-
-template <int dim, int spacedim>
-Point<spacedim>
-FlatManifold<dim, spacedim>::
 get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
                const std::vector<double>           &weights) const
 {
@@ -742,16 +722,6 @@ ChartManifold<dim,spacedim,chartdim>::ChartManifold (const Tensor<1,chartdim> &p
   :
   sub_manifold(periodicity)
 {}
-
-
-
-template <int dim, int spacedim, int chartdim>
-Point<spacedim>
-ChartManifold<dim,spacedim,chartdim>::
-get_new_point (const Quadrature<spacedim> &quad) const
-{
-  return get_new_point(quad.get_points(),quad.get_weights());
-}
 
 
 
