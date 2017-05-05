@@ -49,7 +49,7 @@ namespace GridGenerator
   ///@{
 
   /**
-   * Initialize the given triangulation with a hypercube (line in 1D, square
+   * Return a triangulation that corresponds to a hypercube (line in 1D, square
    * in 2D, etc) consisting of exactly one cell. The hypercube volume is the
    * tensor product interval $[left,right]^{\text{dim}}$ in the present number
    * of dimensions, where the limits are given as arguments. They default to
@@ -70,17 +70,27 @@ namespace GridGenerator
    * See also subdivided_hyper_cube() for a coarse mesh consisting of several
    * cells. See hyper_rectangle(), if different lengths in different ordinate
    * directions are required.
-   *
-   * @note The triangulation needs to be void upon calling this function.
+   */
+  template <int dim, int spacedim=dim>
+  Triangulation<dim,spacedim>
+  hyper_cube (const double                  left = 0.,
+              const double                  right= 1.,
+              const bool                    colorize = false);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim, int spacedim>
   void hyper_cube (Triangulation<dim,spacedim>  &tria,
                    const double                  left = 0.,
                    const double                  right= 1.,
-                   const bool                    colorize= false);
+                   const bool                    colorize = false);
 
   /**
-   * \brief %Triangulation of a d-simplex with (d+1) vertices and mesh cells.
+   * Return a %Triangulation that corresponds to a d-simplex
+   * with (d+1) vertices and mesh cells.
    *
    * The @p vertices argument contains a vector with all d+1 vertices of the
    * simplex. They must be given in an order such that the vectors from the
@@ -92,16 +102,19 @@ namespace GridGenerator
    * @image html simplex_2d.png
    * @image html simplex_3d.png
    *
-   * @param tria The Triangulation to create. It needs to be empty upon
-   * calling this function.
-   *
    * @param vertices The dim+1 corners of the simplex.
-   *
-   * @note Implemented for <tt>Triangulation@<2,2@></tt>,
-   * <tt>Triangulation@<3,3@></tt>.
    *
    * @author Guido Kanschat
    * @date 2015
+   */
+  template <int dim>
+  Triangulation<dim>
+  simplex(const std::vector<Point<dim> > &vertices);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim>
   void simplex(Triangulation<dim, dim> &tria,
@@ -117,8 +130,17 @@ namespace GridGenerator
    * the first @p dim coordinate directions embedded into the @p spacedim
    * dimensional space with the remaining entries set to zero. For example, a
    * <tt>Triangulation@<2,3@></tt> will be a square in the xy plane with z=0.
-   *
-   * @note The triangulation needs to be void upon calling this function.
+   */
+  template <int dim, int spacedim>
+  Triangulation<dim,spacedim>
+  subdivided_hyper_cube (const unsigned int   repetitions,
+                         const double         left = 0.,
+                         const double         right= 1.);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim, int spacedim>
   void subdivided_hyper_cube (Triangulation<dim,spacedim>  &tria,
@@ -127,8 +149,8 @@ namespace GridGenerator
                               const double         right= 1.);
 
   /**
-   * Create a coordinate-parallel brick from the two diagonally opposite
-   * corner points @p p1 and @p p2.
+   * Return a triangulation that corresponds to a coordinate-parallel brick
+   * created from the two diagonally opposite corner points @p p1 and @p p2.
    *
    * If the @p colorize flag is @p true, the @p boundary_ids of the boundary
    * faces are assigned, such that the lower one in @p x-direction is 0, the
@@ -156,15 +178,23 @@ namespace GridGenerator
    * dimensional space with the remaining entries set to zero. For example, a
    * <tt>Triangulation@<2,3@></tt> will be a rectangle in the xy plane with
    * z=0, defined by the two opposing corners @p p1 and @p p2.
-   *
-   * @note The triangulation needs to be void upon calling this function.
+   */
+  template <int dim, int spacedim=dim>
+  Triangulation<dim,spacedim>
+  hyper_rectangle (const Point<dim>            &p1,
+                   const Point<dim>            &p2,
+                   const bool                  colorize = false);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim, int spacedim>
   void hyper_rectangle (Triangulation<dim,spacedim> &tria,
                         const Point<dim>            &p1,
                         const Point<dim>            &p2,
                         const bool                  colorize = false);
-
   /**
    * Create a coordinate-parallel brick from the two diagonally opposite
    * corner points @p p1 and @p p2. The number of cells in coordinate
@@ -199,9 +229,6 @@ namespace GridGenerator
    * @note For an example of the use of this function see the step-28 tutorial
    * program.
    *
-   * @param tria The Triangulation to create. It needs to be empty upon
-   * calling this function.
-   *
    * @param repetitions A vector of @p dim positive values denoting the number
    * of cells to generate in that direction.
    *
@@ -214,6 +241,18 @@ namespace GridGenerator
    *
    */
   template <int dim, int spacedim>
+  Triangulation<dim,spacedim>
+  subdivided_hyper_rectangle (const std::vector<unsigned int> &repetitions,
+                              const Point<dim>                &p1,
+                              const Point<dim>                &p2,
+                              const bool                      colorize=false);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
+   */
+  template <int dim, int spacedim>
   void
   subdivided_hyper_rectangle (Triangulation<dim,spacedim>     &tria,
                               const std::vector<unsigned int> &repetitions,
@@ -222,7 +261,7 @@ namespace GridGenerator
                               const bool                      colorize=false);
 
   /**
-   * Like the previous function. However, here the second argument does not
+   * Like the previous function. However, here the first argument does not
    * denote the number of subdivisions in each coordinate direction, but a
    * sequence of step sizes for each coordinate direction. The domain will
    * therefore be subdivided into <code>step_sizes[i].size()</code> cells in
@@ -235,6 +274,18 @@ namespace GridGenerator
    *
    * The step sizes have to add up to the dimensions of the hyper rectangle
    * specified by the points @p p1 and @p p2.
+   */
+  template <int dim>
+  Triangulation<dim>
+  subdivided_hyper_rectangle (const std::vector<std::vector<double> > &step_sizes,
+                              const Point<dim>                        &p_1,
+                              const Point<dim>                        &p_2,
+                              const bool                              colorize=false);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim>
   void
@@ -255,6 +306,18 @@ namespace GridGenerator
    * @note If you need a lot of holes, you may consider cheese().
    */
   template <int dim>
+  Triangulation<dim>
+  subdivided_hyper_rectangle (const std::vector< std::vector<double> > &spacing,
+                              const Point<dim>                         &p,
+                              const Table<dim,types::material_id>      &material_id,
+                              const bool                                colorize=false);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
+   */
+  template <int dim>
   void
   subdivided_hyper_rectangle (Triangulation<dim>                       &tria,
                               const std::vector< std::vector<double> > &spacing,
@@ -263,7 +326,8 @@ namespace GridGenerator
                               const bool                                colorize=false);
 
   /**
-   * \brief Rectangular domain with rectangular pattern of holes
+   * Return a triangulation that corresponds to a rectangular domain with
+   * a rectangular pattern of holes.
    *
    * The domain itself is rectangular, very much as if it had been generated
    * by subdivided_hyper_rectangle(). The argument <code>holes</code>
@@ -281,12 +345,19 @@ namespace GridGenerator
    * the first @p dim coordinate directions embedded into the @p spacedim
    * dimensional space with the remaining entries set to zero.
    *
-   * @param tria The Triangulation to create. It needs to be empty upon
-   * calling this function.
-   *
    * @param holes Positive number of holes in each of the dim directions.
+   *
    * @author Guido Kanschat
    * @date 2015
+   */
+  template <int dim, int spacedim>
+  Triangulation<dim,spacedim>
+  cheese (const std::vector<unsigned int> &holes);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim, int spacedim>
   void
@@ -294,7 +365,8 @@ namespace GridGenerator
           const std::vector<unsigned int> &holes);
 
   /**
-   * A general quadrilateral in 2d or a general hexahedron in 3d. It is the
+   * Return a triangulation that corresponds to a
+   * general quadrilateral in 2d or a general hexahedron in 3d. It is the
    * responsibility of the user to provide the vertices in the right order (see
    * the documentation of the GeometryInfo class) because the vertices are stored
    * in the same order as they are given. It is also important to make sure that
@@ -308,20 +380,39 @@ namespace GridGenerator
    * @author Bruno Turcksin
    */
   template <int dim>
+  Triangulation<dim>
+  general_cell(const std::vector<Point<dim> > &vertices,
+               const bool colorize = false);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
+   */
+  template <int dim>
   void
   general_cell(Triangulation<dim> &tria,
                const std::vector<Point<dim> > &vertices,
                const bool colorize = false);
 
   /**
-   * A parallelogram. The first corner point is the origin. The @p dim
-   * adjacent points are the ones given in the second argument and the fourth
-   * point will be the sum of these two vectors.  Colorizing is done in the
-   * same way as in hyper_rectangle().
+   * Return a triangulation that corresponds to a parallelogram. The
+   * first corner point is the origin. The @p dim
+   * adjacent points are the ones given in @p corners and the remaining
+   * corners will be sums of vectors given in @p corners.
+   * Colorizing is done in the same way as in hyper_rectangle().
    *
    * @note This function is implemented in 2d only.
-   *
-   * @note The triangulation needs to be void upon calling this function.
+   */
+  template <int dim>
+  Triangulation<dim>
+  parallelogram (const Point<dim>  (&corners)[dim],
+                 const bool          colorize=false);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim>
   void
@@ -330,7 +421,8 @@ namespace GridGenerator
                  const bool          colorize=false);
 
   /**
-   * A parallelepiped. The first corner point is the origin. The @p dim
+   * Return a triangulation that corresponds to A parallelepiped.
+   * The first corner point is the origin. The @p dim
    * adjacent points are vectors describing the edges of the parallelepiped
    * with respect to the origin. Additional points are sums of these dim
    * vectors. Colorizing is done according to hyper_rectangle().
@@ -340,8 +432,16 @@ namespace GridGenerator
    * In other words, if reordering of the vertices does occur, the ordering of
    * vertices in the array of <code>corners</code> will no longer refer to the
    * same triangulation.
-   *
-   * @note The triangulation needs to be void upon calling this function.
+   */
+  template <int dim>
+  Triangulation<dim>
+  parallelepiped (const Point<dim>  (&corners) [dim],
+                  const bool          colorize = false);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim>
   void
@@ -350,14 +450,24 @@ namespace GridGenerator
                   const bool          colorize = false);
 
   /**
-   * A subdivided parallelepiped. The first corner point is the origin. The @p
+   * Return a triangulation that corresponds to a subdivided parallelepiped.
+   * The first corner point is the origin. The @p
    * dim adjacent points are vectors describing the edges of the
    * parallelepiped with respect to the origin. Additional points are sums of
    * these dim vectors. The variable @p n_subdivisions designates the number
    * of subdivisions in each of the @p dim directions. Colorizing is done
    * according to hyper_rectangle().
-   *
-   * @note The triangulation needs to be void upon calling this function.
+   */
+  template <int dim>
+  Triangulation<dim>
+  subdivided_parallelepiped (const unsigned int   n_subdivisions,
+                             const Point<dim>   (&corners) [dim],
+                             const bool           colorize = false);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim>
   void
@@ -367,11 +477,26 @@ namespace GridGenerator
                              const bool           colorize = false);
 
   /**
-   * A subdivided parallelepiped, i.e., the same as above, but where the
+   * Return a triangulation that corresponds to a subdivided parallelepiped,
+   * i.e., the same as above, but where the
    * number of subdivisions in each of the @p dim directions may vary.
    * Colorizing is done according to hyper_rectangle().
-   *
-   * @note The triangulation needs to be void upon calling this function.
+   */
+  template <int dim>
+  Triangulation<dim>
+  subdivided_parallelepiped (
+#ifndef _MSC_VER
+    const unsigned int(&n_subdivisions)[dim],
+#else
+    const unsigned int *n_subdivisions,
+#endif
+    const Point<dim>   (&corners) [dim],
+    const bool           colorize = false);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim>
   void
@@ -385,10 +510,7 @@ namespace GridGenerator
                              const bool           colorize = false);
 
   /**
-   * A subdivided parallelepiped.
-   *
-   * @param tria The Triangulation to create. It needs to be empty upon
-   * calling this function.
+   * Return a triangulation that corresponds to a subdivided parallelepiped.
    *
    * @param origin First corner of the parallelepiped.
    *
@@ -402,9 +524,18 @@ namespace GridGenerator
    * @param colorize Assign different boundary ids if set to true.
    *
    * @note Implemented for all combinations of @p dim and @p spacedim.
-   *
-   * @note You likely need to help the compiler by explicitly specifying the
-   * two template parameters when calling this function.
+   */
+  template <int dim, int spacedim>
+  Triangulation<dim,spacedim>
+  subdivided_parallelepiped (const Point<spacedim> &origin,
+                             const std::array<Tensor<1,spacedim>,dim> &edges,
+                             const std::vector<unsigned int> &subdivisions = std::vector<unsigned int>(),
+                             const bool colorize = false);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim, int spacedim>
   void
@@ -415,7 +546,8 @@ namespace GridGenerator
                              const bool colorize = false);
 
   /**
-   * Hypercube with a layer of hypercubes around it. The first two parameters
+   * Return a triangulation that corresponds to a hypercube with
+   * a layer of hypercubes around it. The first two parameters
    * give the lower and upper bound of the inner hypercube in all coordinate
    * directions.  @p thickness marks the size of the layer cells.
    *
@@ -425,8 +557,18 @@ namespace GridGenerator
    * corners and edges (3d) get these values bitwise or'd.
    *
    * Presently only available in 2d and 3d.
-   *
-   * @note The triangulation needs to be void upon calling this function.
+   */
+  template <int dim>
+  Triangulation<dim>
+  enclosed_hyper_cube (const double        left = 0.,
+                       const double        right= 1.,
+                       const double        thickness = 1.,
+                       const bool          colorize = false);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim>
   void enclosed_hyper_cube (Triangulation<dim> &tria,
@@ -436,7 +578,7 @@ namespace GridGenerator
                             const bool          colorize = false);
 
   /**
-   * Initialize the given triangulation with a hyperball, i.e. a circle or a
+   * Return a triangulation that corresponds to a hyperball, i.e. a circle or a
    * ball around @p center with given @p radius.
    *
    * In order to avoid degenerate cells at the boundaries, the circle is
@@ -450,8 +592,16 @@ namespace GridGenerator
    * You should attach a SphericalManifold to the cells and faces for correct
    * placement of vertices upon refinement and to be able to use higher order
    * mappings.
-   *
-   * @note The triangulation needs to be void upon calling this function.
+   */
+  template <int dim>
+  Triangulation<dim>
+  hyper_ball (const Point<dim>   &center = Point<dim>(),
+              const double        radius = 1.);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim>
   void hyper_ball (Triangulation<dim> &tria,
@@ -459,7 +609,8 @@ namespace GridGenerator
                    const double        radius = 1.);
 
   /**
-   * Creates a hyper sphere, i.e., a surface of a ball in @p spacedim
+   * Return a triangulation that corresponds to a hyper sphere, i.e.,
+   * a surface of a ball in @p spacedim
    * dimensions. This function only exists for dim+1=spacedim in 2 and 3 space
    * dimensions.
    *
@@ -486,25 +637,42 @@ namespace GridGenerator
    *
    * @image html sphere.png
    * @image html sphere_section.png
-   *
-   * @note The triangulation needs to be void upon calling this function.
    */
 
+  template <int dim, int spacedim>
+  Triangulation<dim,spacedim>
+  hyper_sphere (const Point<spacedim>   &center = Point<spacedim>(),
+                const double        radius = 1.);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
+   */
   template <int dim, int spacedim>
   void hyper_sphere (Triangulation<dim,spacedim> &tria,
                      const Point<spacedim>   &center = Point<spacedim>(),
                      const double        radius = 1.);
 
   /**
-   * This class produces a hyper-ball intersected with the positive orthant
+   * Return a triangulation that corresponds to a
+   * hyper-ball intersected with the positive orthant
    * relative to @p center, which contains three elements in 2d and four in 3d.
    *
    * The boundary indicators for the final triangulation are 0 for the curved
    * boundary and 1 for the cut plane.
    *
    * The appropriate boundary class is HyperBallBoundary.
-   *
-   * @note The triangulation needs to be void upon calling this function.
+   */
+  template <int dim>
+  Triangulation<dim>
+  quarter_hyper_ball (const Point<dim>   &center = Point<dim>(),
+                      const double        radius = 1.);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim>
   void quarter_hyper_ball (Triangulation<dim> &tria,
@@ -512,7 +680,8 @@ namespace GridGenerator
                            const double        radius = 1.);
 
   /**
-   * This class produces a half hyper-ball around @p center, which contains
+   * Return a triangulation that corresponds to a half hyper-ball
+   * around @p center, containing
    * four elements in 2d and 6 in 3d. The cut plane is perpendicular to the
    * <i>x</i>-axis.
    *
@@ -521,8 +690,16 @@ namespace GridGenerator
    *
    * The appropriate boundary class is HalfHyperBallBoundary, or
    * HyperBallBoundary.
-   *
-   * @note The triangulation needs to be void upon calling this function.
+   */
+  template <int dim>
+  Triangulation<dim>
+  half_hyper_ball (const Point<dim>   &center = Point<dim>(),
+                   const double        radius = 1.);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim>
   void half_hyper_ball (Triangulation<dim> &tria,
@@ -530,7 +707,8 @@ namespace GridGenerator
                         const double        radius = 1.);
 
   /**
-   * Create a cylinder around the $x$-axis.  The cylinder extends from
+   * Return a triangulation that corresponds to a cylinder around the
+   * $x$-axis.  The cylinder extends from
    * <tt>x=-half_length</tt> to <tt>x=+half_length</tt> and its projection
    * into the @p yz-plane is a circle of radius @p radius.
    *
@@ -546,8 +724,16 @@ namespace GridGenerator
    * $x$-axis, then simply rotate the mesh generated by this function using
    * the GridTools::transform() function using a rotation operator as
    * argument.
-   *
-   * @note The triangulation needs to be void upon calling this function.
+   */
+  template <int dim>
+  Triangulation<dim>
+  cylinder (const double        radius = 1.,
+            const double        half_length = 1.);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim>
   void cylinder (Triangulation<dim> &tria,
@@ -555,7 +741,8 @@ namespace GridGenerator
                  const double        half_length = 1.);
 
   /**
-   * Create a cut cone around the x-axis.  The cone extends from
+   * Return a triangulation that corresponds to a cut cone around the $x$-axis.
+   * The cone extends from
    * <tt>x=-half_length</tt> to <tt>x=half_length</tt> and its projection into
    * the @p yz-plane is a circle of radius @p radius_0 at
    * <tt>x=-half_length</tt> and a circle of radius @p radius_1 at
@@ -574,9 +761,18 @@ namespace GridGenerator
    * class, with which you probably want to associate boundary indicator 0
    * (the hull of the cone).
    *
-   * @note The triangulation needs to be void upon calling this function.
-   *
    * @author Markus B&uuml;rg, 2009
+   */
+  template <int dim>
+  Triangulation<dim>
+  truncated_cone (const double        radius_0 = 1.0,
+                  const double        radius_1 = 0.5,
+                  const double        half_length = 1.0);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim>
   void
@@ -586,12 +782,11 @@ namespace GridGenerator
                   const double        half_length = 1.0);
 
   /**
-   * \brief A center cell with stacks of cell protruding from each surface.
+   * Return a triangulation that corresponds to a center cell with stacks
+   * of cell protruding from each surface.
    *
    * Each of the square mesh cells is Cartesian and has size one in each
    * coordinate direction. The center of cell number zero is the origin.
-   *
-   * @param tria A Triangulation object which has to be empty.
    *
    * @param sizes A vector of integers of dimension
    * GeometryInfo<dim>::faces_per_cell with the following meaning: the legs of
@@ -614,12 +809,22 @@ namespace GridGenerator
    * @date 2015
    */
   template <int dim, int spacedim>
+  Triangulation<dim,spacedim>
+  hyper_cross(const std::vector<unsigned int> &sizes,
+              const bool colorize_cells = false);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
+   */
+  template <int dim, int spacedim>
   void hyper_cross(Triangulation<dim, spacedim> &tria,
                    const std::vector<unsigned int> &sizes,
                    const bool colorize_cells = false);
 
   /**
-   * Initialize the given triangulation with a hyper-L (in 2d or 3d)
+   * Return a triangulation that corresponds to a hyper-L (in 2d or 3d)
    * consisting of exactly <tt>2^dim-1</tt> cells. It produces the
    * hypercube with the interval [<i>left,right</i>] without the
    * hypercube made out of the interval [<i>(left+right)/2,right</i>]
@@ -647,8 +852,17 @@ namespace GridGenerator
    *
    * This function exists for triangulations of all space
    * dimensions, but throws an error if called in 1d.
-   *
-   * @note The triangulation needs to be void upon calling this function.
+   */
+  template <int dim>
+  Triangulation<dim>
+  hyper_L (const double        left = -1.,
+           const double        right= 1.,
+           const bool          colorize = false);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim>
   void hyper_L (Triangulation<dim> &tria,
@@ -657,7 +871,7 @@ namespace GridGenerator
                 const bool          colorize = false);
 
   /**
-   * Initialize the given Triangulation with a hypercube with a slit. In each
+   * Return a triangulation that corresponds to a hypercube with a slit. In each
    * coordinate direction, the hypercube extends from @p left to @p right.
    *
    * In 2d, the split goes in vertical direction from <tt>x=(left+right)/2,
@@ -670,8 +884,17 @@ namespace GridGenerator
    *
    * If @p colorize is set to @p true, the faces forming the slit are marked
    * with boundary id 1 and 2, respectively.
-   *
-   * @note The triangulation needs to be void upon calling this function.
+   */
+  template <int dim>
+  Triangulation<dim>
+  hyper_cube_slit (const double        left = 0.,
+                   const double        right = 1.,
+                   const bool          colorize = false);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim>
   void hyper_cube_slit (Triangulation<dim> &tria,
@@ -680,8 +903,8 @@ namespace GridGenerator
                         const bool          colorize = false);
 
   /**
-   * Produce a hyper-shell, the region between two spheres around
-   * <tt>center</tt>, with given <tt>inner_radius</tt> and
+   * Return a triangulation that corresponds to a hyper-shell, i.e. the region
+   * between two spheres around <tt>center</tt> with given <tt>inner_radius</tt> and
    * <tt>outer_radius</tt>. The number <tt>n_cells</tt> indicates the number
    * of cells of the resulting triangulation, i.e., how many cells form the
    * ring (in 2d) or the shell (in 3d).
@@ -740,8 +963,19 @@ namespace GridGenerator
    *
    * @note This function is declared to exist for triangulations of all space
    * dimensions, but throws an error if called in 1d.
-   *
-   * @note The triangulation needs to be void upon calling this function.
+   */
+  template <int dim>
+  Triangulation<dim>
+  hyper_shell (const Point<dim>   &center,
+               const double        inner_radius,
+               const double        outer_radius,
+               const unsigned int  n_cells = 0,
+               bool                colorize = false);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim>
   void hyper_shell (Triangulation<dim> &tria,
@@ -752,7 +986,8 @@ namespace GridGenerator
                     bool                colorize = false);
 
   /**
-   * Produce a half hyper-shell, i.e. the space between two circles in two
+   * Return a triangulation that corresponds to a half hyper-shell,
+   * i.e. the space between two circles in two
    * space dimensions and the region between two spheres in 3d, with given
    * inner and outer radius and a given number of elements for this initial
    * triangulation.  However, opposed to the previous function, it does not
@@ -769,8 +1004,19 @@ namespace GridGenerator
    * If colorize is set to true, the inner, outer, and the part of the
    * boundary where $x=0$, get indicator 0, 1, and 2, respectively. Otherwise
    * all indicators are set to 0.
-   *
-   * @note The triangulation needs to be void upon calling this function.
+   */
+  template <int dim>
+  Triangulation<dim>
+  half_hyper_shell (const Point<dim>   &center,
+                    const double        inner_radius,
+                    const double        outer_radius,
+                    const unsigned int  n_cells = 0,
+                    const bool          colorize = false);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim>
   void half_hyper_shell (Triangulation<dim> &tria,
@@ -780,9 +1026,8 @@ namespace GridGenerator
                          const unsigned int  n_cells = 0,
                          const bool          colorize = false);
 
-
   /**
-   * Produce a domain that is the intersection between a hyper-shell with
+   * Return a triangulation that corresponds to the intersection between a hyper-shell with
    * given inner and outer radius, i.e. the space between two circles in two
    * space dimensions and the region between two spheres in 3d, and the
    * positive quadrant (in 2d) or octant (in 3d). In 2d, this is indeed a
@@ -798,8 +1043,19 @@ namespace GridGenerator
    * get indicator 0, 1, 2, and 3 in 2d, respectively. Otherwise all
    * indicators are set to 0. In 3d indicator 2 is at the face x=0, 3 at y=0,
    * 4 at z=0.
-   *
-   * @note The triangulation needs to be void upon calling this function.
+   */
+  template <int dim>
+  Triangulation<dim>
+  quarter_hyper_shell (const Point<dim>   &center,
+                       const double        inner_radius,
+                       const double        outer_radius,
+                       const unsigned int  n_cells = 0,
+                       const bool          colorize = false);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim>
   void quarter_hyper_shell (Triangulation<dim> &tria,
@@ -810,7 +1066,7 @@ namespace GridGenerator
                             const bool          colorize = false);
 
   /**
-   * Produce a domain that is the space between two cylinders in 3d, with
+   * Return a triangulation that corresponds to the space between two cylinders in 3d, with
    * given length, inner and outer radius and a given number of elements. The
    * cylinder shell is built around the $z$-axis with the two faces located
    * at $z = 0$ and $z = $ @p length.
@@ -822,8 +1078,19 @@ namespace GridGenerator
    * @note Although this function is declared as a template, it does not make
    * sense in 1D and 2D. Also keep in mind that this object is rotated
    * and positioned differently than the one created by cylinder().
-   *
-   * @note The triangulation needs to be void upon calling this function.
+   */
+  template <int dim>
+  Triangulation<dim>
+  cylinder_shell (const double        length,
+                  const double        inner_radius,
+                  const double        outer_radius,
+                  const unsigned int  n_radial_cells = 0,
+                  const unsigned int  n_axial_cells = 0);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim>
   void cylinder_shell (Triangulation<dim> &tria,
@@ -834,9 +1101,9 @@ namespace GridGenerator
                        const unsigned int  n_axial_cells = 0);
 
 
-
   /**
-   * Produce the volume or surface mesh of a torus. The axis of the torus is
+   * Return a triangulation that corresponds to the volume or surface
+   * mesh of a torus. The axis of the torus is
    * the $y$-axis while the plane of the torus is the $x$-$z$ plane.
    *
    * If @p dim is 3, the mesh will be the volume of the torus. By default,
@@ -848,14 +1115,22 @@ namespace GridGenerator
    * cells and faces will have manifold id 0 and you should attach a
    * TorusManifold to it.
    *
-   * @param tria The triangulation to be filled.
-   *
    * @param R The radius of the circle, which forms the middle line of the
    * torus containing the loop of cells. Must be greater than @p r.
    *
    * @param r The inner radius of the torus.
    *
    * @note Implemented for Triangulation<2,3> and Triangulation<3,3>.
+   */
+  template <int dim, int spacedim>
+  Triangulation<dim,spacedim>
+  torus (const double R,
+         const double r);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
    */
   template <int dim, int spacedim>
   void torus (Triangulation<dim,spacedim> &tria,
@@ -865,7 +1140,8 @@ namespace GridGenerator
 
 
   /**
-   * This class produces a square in the <i>xy</i>-plane with a circular hole
+   * Return a triangulation that corresponds to a square in
+   * the <i>xy</i>-plane with a circular hole
    * in the middle. Square and circle are centered at the origin. In 3d, this
    * geometry is extruded in $z$ direction to the interval $[0,L]$.
    *
@@ -873,7 +1149,6 @@ namespace GridGenerator
    *
    * It is implemented in 2d and 3d, and takes the following arguments:
    *
-   * @param triangulation The triangulation to be filled.
    * @param inner_radius  Radius of the internal hole.
    * @param outer_radius Half of the edge length of the square.
    * @param L  Extension in @p z-direction (only used in 3d).
@@ -884,20 +1159,33 @@ namespace GridGenerator
    * and 6 in 3d). If @p colorize is set to false, then flat faces get the
    * number 0 and the hole gets number 1.
    */
-  template<int dim>
-  void hyper_cube_with_cylindrical_hole (
-    Triangulation<dim> &triangulation,
-    const double        inner_radius = .25,
-    const double        outer_radius = .5,
-    const double        L = .5,
-    const unsigned int  repetitions = 1,
-    const bool          colorize = false);
+  template <int dim>
+  Triangulation<dim>
+  hyper_cube_with_cylindrical_hole (const double        inner_radius = .25,
+                                    const double        outer_radius = .5,
+                                    const double        L = .5,
+                                    const unsigned int  repetitions = 1,
+                                    const bool          colorize = false);
 
   /**
-   * Produce a ring of cells in 3d that is cut open, twisted and glued
-   * together again. This results in a kind of moebius-loop.
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
+   */
+  template <int dim>
+  void hyper_cube_with_cylindrical_hole (Triangulation<dim> &triangulation,
+                                         const double        inner_radius = .25,
+                                         const double        outer_radius = .5,
+                                         const double        L = .5,
+                                         const unsigned int  repetitions = 1,
+                                         const bool          colorize = false);
+
+  /**
+   * Return a triangulation that corresponds to a ring of cells in 3d
+   * that is cut open, twisted and glued together again. This results
+   * in a kind of Moebius-loop, but because it is a volume mesh in 3d, it
+   * remains an orientable domain (i.e., it is not the Moebius strip).
    *
-   * @param tria        The triangulation to be worked on.
    * @param n_cells     The number of cells in the loop. Must be greater than
    * 4.
    * @param n_rotations The number of rotations (Pi/2 each) to be performed
@@ -906,12 +1194,22 @@ namespace GridGenerator
    * of the torus containing the loop of cells. Must be greater than @p r.
    * @param r           The radius of the cylinder bent together as a loop.
    */
+  Triangulation<3,3>
+  moebius (const unsigned int  n_cells,
+           const unsigned int  n_rotations,
+           const double        R,
+           const double        r);
+
+  /**
+   * Same as the previous function, but return the new triangulation through
+   * the first argument. The triangulation given as argument needs to be
+   * empty when this function is called.
+   */
   void moebius (Triangulation<3,3> &tria,
                 const unsigned int  n_cells,
                 const unsigned int  n_rotations,
                 const double        R,
                 const double        r);
-
   ///@}
 
   /**

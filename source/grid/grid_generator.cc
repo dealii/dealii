@@ -336,10 +336,10 @@ namespace GridGenerator
   }
 
 
+
   template <int dim, int spacedim>
-  void
-  hyper_rectangle (Triangulation<dim,spacedim> &tria,
-                   const Point<dim>   &p_1,
+  Triangulation<dim,spacedim>
+  hyper_rectangle (const Point<dim>   &p_1,
                    const Point<dim>   &p_2,
                    const bool          colorize)
   {
@@ -392,17 +392,34 @@ namespace GridGenerator
       cells[0].vertices[i] = i;
     cells[0].material_id = 0;
 
+    Triangulation<dim,spacedim> tria;
     tria.create_triangulation (vertices, cells, SubCellData());
 
     // Assign boundary indicators
     if (colorize)
       colorize_hyper_rectangle (tria);
+
+    return tria;
   }
 
 
+
   template <int dim, int spacedim>
-  void hyper_cube (Triangulation<dim,spacedim> &tria,
-                   const double                 left,
+  void
+  hyper_rectangle (Triangulation<dim,spacedim> &tria,
+                   const Point<dim>   &p_1,
+                   const Point<dim>   &p_2,
+                   const bool          colorize)
+  {
+    // simply forward to the other function
+    tria = hyper_rectangle<dim,spacedim> (p_1, p_2, colorize);
+  }
+
+
+
+  template <int dim, int spacedim>
+  Triangulation<dim,spacedim>
+  hyper_cube (const double                 left,
                    const double                 right,
                    const bool                   colorize)
   {
@@ -415,8 +432,23 @@ namespace GridGenerator
         p1(i) = left;
         p2(i) = right;
       }
-    hyper_rectangle (tria, p1, p2, colorize);
+
+    return hyper_rectangle<dim,spacedim> (p1, p2, colorize);
   }
+
+
+
+  template <int dim, int spacedim>
+  void hyper_cube (Triangulation<dim,spacedim> &tria,
+                   const double                 left,
+                   const double                 right,
+                   const bool                   colorize)
+  {
+    // simply forward to the other function
+    tria = hyper_cube<dim,spacedim> (left, right, colorize);
+  }
+
+
 
   template <int dim>
   void
