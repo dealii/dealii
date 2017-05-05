@@ -52,26 +52,6 @@ MappingQEulerianGeneric (const unsigned int                                 degr
             update_values | update_quadrature_points)
 {}
 
-template <int dim, class VectorType, int spacedim>
-MappingQEulerian<dim, VectorType, spacedim>::
-MappingQEulerian (const unsigned int              degree,
-                  const VectorType               &euler_vector,
-                  const DoFHandler<dim,spacedim> &euler_dof_handler)
-  :
-  MappingQ<dim,spacedim>(degree, true),
-  euler_vector(&euler_vector),
-  euler_dof_handler(&euler_dof_handler)
-{
-  // reset the q1 mapping we use for interior cells (and previously
-  // set by the MappingQ constructor) to a MappingQ1Eulerian with the
-  // current vector
-  this->q1_mapping.reset (new MappingQ1Eulerian<dim,VectorType,spacedim>(euler_vector,
-                          euler_dof_handler));
-
-  // also reset the qp mapping pointer with our own class
-  this->qp_mapping.reset (new MappingQEulerianGeneric(degree,*this));
-}
-
 
 
 template <int dim, class VectorType, int spacedim>
@@ -101,8 +81,8 @@ Mapping<dim,spacedim> *
 MappingQEulerian<dim, VectorType, spacedim>::clone () const
 {
   return new MappingQEulerian<dim,VectorType,spacedim>(this->get_degree(),
-                                                       *euler_vector,
-                                                       *euler_dof_handler);
+                                                       *euler_dof_handler,
+                                                       *euler_vector);
 }
 
 

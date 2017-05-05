@@ -1,0 +1,4 @@
+Changed: The deprecated constructor of MappingQEulerian
+has been removed. Use the other constructor instead.
+<br>
+(Wolfgang Bangerth, 2017/05/04)
