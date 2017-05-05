@@ -1,0 +1,6 @@
+Changed: The deprecated function FEValuesBase::transform()
+has been removed. It only forwarded the call to the Mapping object
+used by the FEValuesBase object. Use the corresponding function of the
+mapping instead.
+<br>
+(Wolfgang Bangerth, 2017/05/04)

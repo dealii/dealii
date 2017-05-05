@@ -3393,20 +3393,6 @@ FEValuesBase<dim,spacedim>::get_normal_vectors () const
 
 
 template <int dim, int spacedim>
-void
-FEValuesBase<dim,spacedim>::
-transform (std::vector<Tensor<1,spacedim> > &transformed,
-           const std::vector<Tensor<1,dim> > &original,
-           MappingType type) const
-{
-  mapping->transform(make_array_view(original),
-                     type,
-                     *mapping_data,
-                     make_array_view(transformed));
-}
-
-
-template <int dim, int spacedim>
 std::size_t
 FEValuesBase<dim,spacedim>::memory_consumption () const
 {
