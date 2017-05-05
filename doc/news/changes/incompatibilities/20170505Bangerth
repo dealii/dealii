@@ -1,0 +1,6 @@
+Changed: The deprecated version of Manifold::get_new_point() that took
+an argument of type Quadrature has been removed. Use the other variant
+of that function instead. The same has been done to all
+implementations of that interface in derived classes.
+<br>
+(Wolfgang Bangerth, 2017/05/05)
