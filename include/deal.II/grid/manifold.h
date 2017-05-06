@@ -357,27 +357,6 @@ public:
 
   /**
    * Return the point which shall become the new vertex surrounded by the
-   * given points which make up the quadrature. We use a quadrature object,
-   * which should be filled with the surrounding points together with
-   * appropriate weights.
-   *
-   * In its default implementation it uses a pair-wise reduction of
-   * the points in the quadrature formula by calling the function
-   * get_intermediate_point() on the first two points, then on the
-   * resulting point and the next, until all points in the quadrature
-   * have been taken into account. User classes can get away by simply
-   * implementing the get_intermediate_point() function. Notice that
-   * by default the get_intermediate_point() function calls the
-   * project_to_manifold() function with the convex combination of its
-   * arguments. For simple situations you may get away by implementing
-   * only the project_to_manifold() function.
-   */
-  virtual
-  Point<spacedim>
-  get_new_point (const Quadrature<spacedim> &quad) const DEAL_II_DEPRECATED;
-
-  /**
-   * Return the point which shall become the new vertex surrounded by the
    * given points @p surrounding_points. @p weights contains appropriate
    * weights for the surrounding points according to which the manifold
    * determines the new point's position.
@@ -725,31 +704,6 @@ public:
    */
   virtual
   Point<spacedim>
-  get_new_point(const Quadrature<spacedim> &quad) const DEAL_II_DEPRECATED;
-
-  /**
-   * Let the new point be the average sum of surrounding vertices.
-   *
-   * This particular implementation constructs the weighted average of the
-   * surrounding points, and then calls internally the function
-   * project_to_manifold(). The reason why we do it this way, is to allow lazy
-   * programmers to implement only the project_to_manifold() function for their
-   * own Manifold classes which are small (or trivial) perturbations of a flat
-   * manifold. This is the case whenever the coarse mesh is a decent
-   * approximation of the manifold geometry. In this case, the middle point of
-   * a cell is close to true middle point of the manifold, and a projection
-   * may suffice.
-   *
-   * For most simple geometries, it is possible to get reasonable results by
-   * deriving your own Manifold class from FlatManifold, and write a new
-   * interface only for the project_to_manifold function. You will have good
-   * approximations also with large deformations, as long as in the coarsest
-   * mesh size you are trying to refine, the middle point is not too far from
-   * the manifold mid point, i.e., as long as the coarse mesh size is small
-   * enough.
-   */
-  virtual
-  Point<spacedim>
   get_new_point(const std::vector<Point<spacedim> > &surrounding_points,
                 const std::vector<double>           &weights) const;
 
@@ -961,15 +915,6 @@ public:
    * virtual.
    */
   virtual ~ChartManifold ();
-
-
-  /**
-   * Refer to the general documentation of this class and the documentation of
-   * the base class for more information.
-   */
-  virtual
-  Point<spacedim>
-  get_new_point(const Quadrature<spacedim> &quad) const DEAL_II_DEPRECATED;
 
   /**
    * Refer to the general documentation of this class and the documentation of
