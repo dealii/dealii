@@ -104,40 +104,44 @@ namespace internal
   {
     // Create a sequential PETSc vector and then copy over the entries into
     // the deal.II vector.
-    //
-    // Wrap the sequential vector with a custom deleter.
-    std::unique_ptr<Vec, std::function<void(Vec *)>> sequential_vector
-                                                  (new Vec(), [](Vec *ptr)
-    {
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-      const PetscErrorCode ierr = VecDestroy (*ptr);
-#else
-      const PetscErrorCode ierr = VecDestroy (ptr);
-#endif
-      (void)ierr;
-      AssertNothrow (ierr == 0, ExcPETScError(ierr));
-    });
+    Vec sequential_vector;
+    VecScatter scatter_context;
 
-    PetscErrorCode ierr = VecCreateSeq (v.get_mpi_communicator(),
-                                        v.size(),
-                                        sequential_vector.get());
+    PetscErrorCode ierr = VecScatterCreateToAll(v, &scatter_context, &sequential_vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-    ierr = VecCopy (v, *sequential_vector);
+
+    ierr = VecScatterBegin(scatter_context, v, sequential_vector, INSERT_VALUES,
+                           SCATTER_FORWARD);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    ierr = VecScatterEnd(scatter_context, v, sequential_vector, INSERT_VALUES,
+                         SCATTER_FORWARD);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     PetscScalar *start_ptr;
-    ierr = VecGetArray(*sequential_vector, &start_ptr);
+    ierr = VecGetArray(sequential_vector, &start_ptr);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-    const auto v_size = v.size();
+    const PETScWrappers::VectorBase::size_type v_size = v.size();
     if (out.size() != v_size)
       out.reinit (v_size, true);
 
     internal::VectorOperations::copy (start_ptr,
                                       start_ptr + out.size(),
                                       out.begin());
-    ierr = VecRestoreArray (*sequential_vector, &start_ptr);
+    ierr = VecRestoreArray (sequential_vector, &start_ptr);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
+    ierr = VecScatterDestroy(scatter_context);
+    AssertNothrow (ierr == 0, ExcPETScError(ierr));
+    ierr = VecDestroy (sequential_vector);
+    AssertNothrow (ierr == 0, ExcPETScError(ierr));
+#else
+    ierr = VecScatterDestroy(&scatter_context);
+    AssertNothrow (ierr == 0, ExcPETScError(ierr));
+    ierr = VecDestroy (&sequential_vector);
+    AssertNothrow (ierr == 0, ExcPETScError(ierr));
+#endif
   }
 }
 
