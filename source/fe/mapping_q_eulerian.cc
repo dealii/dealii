@@ -67,8 +67,8 @@ MappingQEulerian (const unsigned int              degree,
   // reset the q1 mapping we use for interior cells (and previously
   // set by the MappingQ constructor) to a MappingQ1Eulerian with the
   // current vector
-  this->q1_mapping.reset (new MappingQ1Eulerian<dim,VectorType,spacedim>(euler_vector,
-                          euler_dof_handler));
+  this->q1_mapping.reset (new MappingQ1Eulerian<dim,VectorType,spacedim>(euler_dof_handler,
+                          euler_vector));
 
   // also reset the qp mapping pointer with our own class
   this->qp_mapping.reset (new MappingQEulerianGeneric(degree,*this));

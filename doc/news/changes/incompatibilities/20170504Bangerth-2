@@ -1,4 +1,5 @@
-Changed: The deprecated constructor of MappingQEulerian
-has been removed. Use the other constructor instead.
+Changed: The deprecated constructors of MappingQEulerian
+and MappingQ1Eulerian have been removed. Use the other constructor
+of each class instead.
 <br>
 (Wolfgang Bangerth, 2017/05/04)

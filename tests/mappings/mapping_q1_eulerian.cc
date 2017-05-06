@@ -56,7 +56,7 @@ show_values(FiniteElement<dim> &fe,
   DoFHandler<dim> flowfield_dof_handler(tr);
   flowfield_dof_handler.distribute_dofs(mapping_fe);
   Vector<double> map_points(flowfield_dof_handler.n_dofs());
-  MappingQ1Eulerian<dim> mapping(map_points, flowfield_dof_handler);
+  MappingQ1Eulerian<dim> mapping(flowfield_dof_handler, map_points);
 
 
   QGauss<dim> quadrature_formula(2);

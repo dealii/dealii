@@ -109,13 +109,6 @@ public:
                      const VectorType               &euler_vector);
 
   /**
-   * @deprecated Use the constructor with the reverse order of first and
-   * second argument.
-   */
-  MappingQ1Eulerian (const VectorType               &euler_vector,
-                     const DoFHandler<dim,spacedim> &euler_dof_handler) DEAL_II_DEPRECATED;
-
-  /**
    * Return the mapped vertices of the cell. For the current class, this
    * function does not use the support points from the geometry of the current
    * cell but instead evaluates an externally given displacement field in

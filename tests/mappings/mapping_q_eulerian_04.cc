@@ -61,7 +61,7 @@ void test()
   grid_out.write_ucd (tria, logfile);
 
   QTrapez<dim> quad;
-  MappingQ1Eulerian<dim,Vector<double>,spacedim> mapping(shift, shift_dh);
+  MappingQ1Eulerian<dim,Vector<double>,spacedim> mapping(shift_dh, shift);
 
   typename Triangulation<dim,spacedim>::active_cell_iterator cell=tria.begin_active(),
                                                              endc=tria.end() ;
