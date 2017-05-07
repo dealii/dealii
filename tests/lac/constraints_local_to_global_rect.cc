@@ -48,7 +48,7 @@ void test ()
   cm2.add_entry(4, 5, 0.7);
   cm2.close();
 
-  std::vector<unsigned int> indices1(2), indices2(2);
+  std::vector<types::global_dof_index> indices1(2), indices2(2);
   indices1[0] = 1;
   indices1[1] = 2;
   indices2[0] = 4;
