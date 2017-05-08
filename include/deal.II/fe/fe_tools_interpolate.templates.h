@@ -238,7 +238,8 @@ namespace FETools
             = ::dealii::internal::ElementAccess<OutVector>::get(
                 u2, i);
           ::dealii::internal::ElementAccess<OutVector>::set(
-            val/::dealii::internal::ElementAccess<OutVector>::get(touch_count,i), i, u2);
+            val /
+            ::dealii::internal::ElementAccess<OutVector>::get(touch_count,i), i, u2);
         }
 
     // finish the work on parallel vectors

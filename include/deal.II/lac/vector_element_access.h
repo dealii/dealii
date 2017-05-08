@@ -27,22 +27,25 @@ namespace internal
   struct ElementAccess
   {
   public:
-    static void add(typename VectorType::value_type value,
-                    types::global_dof_index i, VectorType &V);
+    static void add(const typename VectorType::value_type value,
+                    const types::global_dof_index         i,
+                    VectorType                           &V);
 
     static void set(typename VectorType::value_type value,
-                    types::global_dof_index i, VectorType &V);
+                    const types::global_dof_index   i,
+                    VectorType                     &V);
 
-    static typename VectorType::value_type get(const VectorType &V,
-                                               types::global_dof_index i);
+    static typename VectorType::value_type get(const VectorType             &V,
+                                               const types::global_dof_index i);
   };
 
 
 
   template <typename VectorType>
   inline
-  void ElementAccess<VectorType>::add(typename VectorType::value_type value,
-                                      types::global_dof_index i, VectorType &V)
+  void ElementAccess<VectorType>::add(const typename VectorType::value_type value,
+                                      const types::global_dof_index         i,
+                                      VectorType                           &V)
   {
     V(i) += value;
   }
@@ -51,8 +54,9 @@ namespace internal
 
   template <typename VectorType>
   inline
-  void ElementAccess<VectorType>::set(typename VectorType::value_type value,
-                                      types::global_dof_index i, VectorType &V)
+  void ElementAccess<VectorType>::set(const typename VectorType::value_type value,
+                                      const types::global_dof_index         i,
+                                      VectorType                           &V)
   {
     V(i) = value;
   }
@@ -62,7 +66,8 @@ namespace internal
   template <typename VectorType>
   inline
   typename VectorType::value_type
-  ElementAccess<VectorType>::get(const VectorType &V, types::global_dof_index i)
+  ElementAccess<VectorType>::get(const VectorType             &V,
+                                 const types::global_dof_index i)
   {
     return V(i);
   }
@@ -73,7 +78,9 @@ namespace internal
   template <>
   inline
   void ElementAccess<LinearAlgebra::EpetraWrappers::Vector>::
-  add(double value, types::global_dof_index i, LinearAlgebra::EpetraWrappers::Vector &V)
+  add(const double                           value,
+      const types::global_dof_index          i,
+      LinearAlgebra::EpetraWrappers::Vector &V)
   {
     // Extract local indices in the vector.
     Epetra_FEVector vector = V.trilinos_vector();
@@ -88,7 +95,9 @@ namespace internal
   template <>
   inline
   void ElementAccess<LinearAlgebra::EpetraWrappers::Vector>::
-  set(double value, types::global_dof_index i, LinearAlgebra::EpetraWrappers::Vector &V)
+  set(const double                           value,
+      const types::global_dof_index          i,
+      LinearAlgebra::EpetraWrappers::Vector &V)
   {
     // Extract local indices in the vector.
     Epetra_FEVector vector = V.trilinos_vector();
@@ -103,7 +112,8 @@ namespace internal
   inline
   double
   ElementAccess<LinearAlgebra::EpetraWrappers::Vector>::
-  get(const LinearAlgebra::EpetraWrappers::Vector &V, types::global_dof_index i)
+  get(const LinearAlgebra::EpetraWrappers::Vector &V,
+      const types::global_dof_index                i)
   {
     // Extract local indices in the vector.
     Epetra_FEVector vector = V.trilinos_vector();
