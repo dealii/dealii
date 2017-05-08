@@ -44,15 +44,8 @@ namespace TrilinosWrappers
     {
       return map.NumGlobalElements();
     }
-    // define a helper function that queries the pointer to internal array
-    // containing list of global IDs assigned to the calling processor
-    // by calling either the 32- or 64-bit function necessary, and returns the
-    // result in the correct data type so that we can use it in calling other
-    // Epetra member functions that are overloaded by index type
-    int *my_global_elements(const Epetra_BlockMap &map)
-    {
-      return map.MyGlobalElements();
-    }
+
+
     // define a helper function that queries the global vector length of an
     // Epetra_FEVector object  by calling either the 32- or 64-bit
     // function necessary.
@@ -69,15 +62,8 @@ namespace TrilinosWrappers
     {
       return map.NumGlobalElements64();
     }
-    // define a helper function that queries the pointer to internal array
-    // containing list of global IDs assigned to the calling processor
-    // by calling either the 32- or 64-bit function necessary, and returns the
-    // result in the correct data type so that we can use it in calling other
-    // Epetra member functions that are overloaded by index type
-    long long int *my_global_elements(const Epetra_BlockMap &map)
-    {
-      return map.MyGlobalElements64();
-    }
+
+
     // define a helper function that queries the global vector length of an
     // Epetra_FEVector object  by calling either the 32- or 64-bit
     // function necessary.
