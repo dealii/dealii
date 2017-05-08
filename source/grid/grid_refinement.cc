@@ -19,7 +19,7 @@
 #include <deal.II/lac/block_vector_base.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
 
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -63,7 +63,7 @@ namespace
 #ifdef DEAL_II_WITH_TRILINOS
     inline
     TrilinosScalar
-    max_element (const TrilinosWrappers::Vector &criteria)
+    max_element (const TrilinosWrappers::VectorBase &criteria)
     {
       TrilinosScalar m = 0;
       criteria.trilinos_vector().MaxValue(&m);
@@ -73,7 +73,7 @@ namespace
 
     inline
     TrilinosScalar
-    min_element (const TrilinosWrappers::Vector &criteria)
+    min_element (const TrilinosWrappers::VectorBase &criteria)
     {
       TrilinosScalar m = 0;
       criteria.trilinos_vector().MinValue(&m);

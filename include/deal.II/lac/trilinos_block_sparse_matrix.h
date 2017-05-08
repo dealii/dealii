@@ -25,7 +25,7 @@
 #  include <deal.II/base/template_constraints.h>
 #  include <deal.II/lac/block_matrix_base.h>
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
-#  include <deal.II/lac/trilinos_block_vector.h>
+#  include <deal.II/lac/trilinos_parallel_block_vector.h>
 #  include <deal.II/lac/full_matrix.h>
 #  include <deal.II/lac/exceptions.h>
 
@@ -292,9 +292,9 @@ namespace TrilinosWrappers
      * Source <i>x</i> and destination <i>dst</i> must not be the same vector.
      *
      * Note that both vectors have to be distributed vectors generated using
-     * the same Map as was used for the matrix in case you work on a
-     * distributed memory architecture, using the interface in the
-     * TrilinosWrappers::MPI::BlockVector class.
+     * the same Map as was used for the matrix.
+     *
+     * This function only applicable if the matrix only has one block row.
      */
     TrilinosScalar residual (MPI::BlockVector       &dst,
                              const MPI::BlockVector &x,
@@ -305,25 +305,7 @@ namespace TrilinosWrappers
      * defined to be <i>r=b-Mx</i>. Write the residual into @p dst. The
      * <i>l<sub>2</sub></i> norm of the residual vector is returned.
      *
-     * Source <i>x</i> and destination <i>dst</i> must not be the same vector.
-     *
-     * Note that both vectors have to be distributed vectors generated using
-     * the same Map as was used for the matrix in case you work on a
-     * distributed memory architecture, using the interface in the
-     * TrilinosWrappers::BlockVector class. Since the block matrix is in
-     * general distributed among processes, this function only works when
-     * running the program on one processor.
-     */
-    TrilinosScalar residual (BlockVector       &dst,
-                             const BlockVector &x,
-                             const BlockVector &b) const;
-
-    /**
-     * Compute the residual of an equation <i>Mx=b</i>, where the residual is
-     * defined to be <i>r=b-Mx</i>. Write the residual into @p dst. The
-     * <i>l<sub>2</sub></i> norm of the residual vector is returned. Just like
-     * the previous function, but only applicable if the matrix only has one
-     * block row.
+     * This function is only applicable if the matrix only has one block row.
      */
     TrilinosScalar residual (MPI::BlockVector       &dst,
                              const MPI::Vector      &x,
@@ -332,20 +314,9 @@ namespace TrilinosWrappers
     /**
      * Compute the residual of an equation <i>Mx=b</i>, where the residual is
      * defined to be <i>r=b-Mx</i>. Write the residual into @p dst. The
-     * <i>l<sub>2</sub></i> norm of the residual vector is returned. Just like
-     * the previous function, but only applicable if the matrix only has one
-     * block row.
-     */
-    TrilinosScalar residual (BlockVector       &dst,
-                             const Vector      &x,
-                             const BlockVector &b) const;
-
-    /**
-     * Compute the residual of an equation <i>Mx=b</i>, where the residual is
-     * defined to be <i>r=b-Mx</i>. Write the residual into @p dst. The
-     * <i>l<sub>2</sub></i> norm of the residual vector is returned. Just like
-     * the previous function, but only applicable if the matrix only has one
-     * block column.
+     * <i>l<sub>2</sub></i> norm of the residual vector is returned.
+     *
+     * This function is only applicable if the matrix only has one block column.
      */
     TrilinosScalar residual (MPI::Vector            &dst,
                              const MPI::BlockVector &x,
@@ -354,20 +325,9 @@ namespace TrilinosWrappers
     /**
      * Compute the residual of an equation <i>Mx=b</i>, where the residual is
      * defined to be <i>r=b-Mx</i>. Write the residual into @p dst. The
-     * <i>l<sub>2</sub></i> norm of the residual vector is returned. Just like
-     * the previous function, but only applicable if the matrix only has one
-     * block column.
-     */
-    TrilinosScalar residual (Vector            &dst,
-                             const BlockVector &x,
-                             const Vector      &b) const;
-
-    /**
-     * Compute the residual of an equation <i>Mx=b</i>, where the residual is
-     * defined to be <i>r=b-Mx</i>. Write the residual into @p dst. The
-     * <i>l<sub>2</sub></i> norm of the residual vector is returned. Just like
-     * the previous function, but only applicable if the matrix only has one
-     * block.
+     * <i>l<sub>2</sub></i> norm of the residual vector is returned.
+     *
+     * This function is only applicable if the matrix only has one block.
      */
     TrilinosScalar residual (VectorBase       &dst,
                              const VectorBase &x,

@@ -107,7 +107,7 @@ namespace internal
 #endif
 
   template <>
-  struct MatrixSelector<dealii::TrilinosWrappers::Vector>
+  struct MatrixSelector<dealii::TrilinosWrappers::VectorBase>
   {
     typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;

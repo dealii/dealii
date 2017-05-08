@@ -25,7 +25,7 @@
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/vector_element_access.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/data_out_dof_data.h>

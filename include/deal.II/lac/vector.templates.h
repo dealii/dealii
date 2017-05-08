@@ -183,7 +183,8 @@ Vector<Number>::Vector (const TrilinosWrappers::MPI::Vector &v)
       // be a better solution than
       // this, but it has not yet been
       // found.
-      TrilinosWrappers::Vector localized_vector;
+      TrilinosWrappers::MPI::Vector localized_vector;
+      localized_vector.reinit(complete_index_set(vec_size));
       localized_vector.reinit (v, false, true);
 
       // get a representation of the vector
@@ -200,7 +201,7 @@ Vector<Number>::Vector (const TrilinosWrappers::MPI::Vector &v)
 
 
 template <typename Number>
-Vector<Number>::Vector (const TrilinosWrappers::Vector &v)
+Vector<Number>::Vector (const TrilinosWrappers::VectorBase &v)
   :
   Subscriptor(),
   vec_size(v.size()),
@@ -900,9 +901,10 @@ Vector<Number>::operator= (const TrilinosWrappers::MPI::Vector &v)
   // of the Trilinos vectors and
   // then call the other =
   // operator.
-  TrilinosWrappers::Vector localized_vector;
+  TrilinosWrappers::MPI::Vector localized_vector;
+  localized_vector.reinit(complete_index_set(v.size()));
   localized_vector.reinit(v, false, true);
-  *this = localized_vector;
+  *this = static_cast<TrilinosWrappers::VectorBase>(localized_vector);
   return *this;
 }
 
@@ -910,7 +912,7 @@ Vector<Number>::operator= (const TrilinosWrappers::MPI::Vector &v)
 
 template <typename Number>
 Vector<Number> &
-Vector<Number>::operator= (const TrilinosWrappers::Vector &v)
+Vector<Number>::operator= (const TrilinosWrappers::VectorBase &v)
 {
   if (v.size() != vec_size)
     reinit (v.size(), true);

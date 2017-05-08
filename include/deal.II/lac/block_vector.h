@@ -32,7 +32,10 @@ DEAL_II_NAMESPACE_OPEN
 #ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
-  class BlockVector;
+  namespace MPI
+  {
+    class BlockVector;
+  }
 }
 #endif
 
@@ -136,7 +139,7 @@ public:
    * A copy constructor taking a (parallel) Trilinos block vector and copying
    * it into the deal.II own format.
    */
-  BlockVector (const TrilinosWrappers::BlockVector &v);
+  BlockVector (const TrilinosWrappers::MPI::BlockVector &v);
 
 #endif
   /**
@@ -222,7 +225,7 @@ public:
    * vector.
    */
   BlockVector<Number> &
-  operator= (const TrilinosWrappers::BlockVector &V);
+  operator= (const TrilinosWrappers::MPI::BlockVector &V);
 #endif
 
   /**

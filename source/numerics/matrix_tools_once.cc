@@ -45,7 +45,7 @@
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
 #  include <deal.II/lac/trilinos_vector.h>
 #  include <deal.II/lac/trilinos_block_sparse_matrix.h>
-#  include <deal.II/lac/trilinos_block_vector.h>
+#  include <deal.II/lac/trilinos_parallel_block_vector.h>
 #endif
 
 #include <algorithm>
@@ -422,8 +422,8 @@ namespace MatrixTools
   void
   apply_boundary_values (const std::map<types::global_dof_index,TrilinosScalar> &boundary_values,
                          TrilinosWrappers::SparseMatrix   &matrix,
-                         TrilinosWrappers::Vector         &solution,
-                         TrilinosWrappers::Vector         &right_hand_side,
+                         TrilinosWrappers::VectorBase         &solution,
+                         TrilinosWrappers::VectorBase         &right_hand_side,
                          const bool        eliminate_columns)
   {
     // simply redirect to the generic function
@@ -445,20 +445,6 @@ namespace MatrixTools
     // used for both trilinos matrix types
     internal::TrilinosWrappers::apply_boundary_values (boundary_values, matrix, solution,
                                                        right_hand_side, eliminate_columns);
-  }
-
-
-
-  void
-  apply_boundary_values (const std::map<types::global_dof_index,TrilinosScalar>  &boundary_values,
-                         TrilinosWrappers::BlockSparseMatrix &matrix,
-                         TrilinosWrappers::BlockVector        &solution,
-                         TrilinosWrappers::BlockVector        &right_hand_side,
-                         const bool                            eliminate_columns)
-  {
-    internal::TrilinosWrappers::apply_block_boundary_values (boundary_values, matrix,
-                                                             solution, right_hand_side,
-                                                             eliminate_columns);
   }
 
 

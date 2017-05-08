@@ -32,7 +32,7 @@
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/precondition.h>

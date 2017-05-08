@@ -19,7 +19,7 @@
 #ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/base/mpi.h>
-#  include <deal.II/lac/trilinos_block_vector.h>
+#  include <deal.II/lac/trilinos_parallel_block_vector.h>
 #  include <deal.II/lac/trilinos_index_access.h>
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
 
@@ -230,7 +230,7 @@ namespace TrilinosWrappers
 
 
     void
-    Vector::reinit (const BlockVector &v,
+    Vector::reinit (const MPI::BlockVector &v,
                     const bool         import_data)
     {
       nonlocal_vector.reset();
@@ -444,7 +444,7 @@ namespace TrilinosWrappers
 
 
     Vector &
-    Vector::operator = (const TrilinosWrappers::Vector &v)
+    Vector::operator = (const TrilinosWrappers::VectorBase &v)
     {
       nonlocal_vector.reset();
 
@@ -489,173 +489,7 @@ namespace TrilinosWrappers
     }
 
   } /* end of namespace MPI */
-
-
-
-  void
-  Vector::reinit (const size_type n,
-                  const bool    /*omit_zeroing_entries*/)
-  {
-    owned_elements = complete_index_set(n);
-    Epetra_LocalMap map ((TrilinosWrappers::types::int_type)n, 0,
-                         Utilities::Trilinos::comm_self());
-    vector.reset (new Epetra_FEVector (map));
-
-    last_action = Zero;
-  }
-
-
-
-  void
-  Vector::reinit (const Epetra_Map &input_map,
-                  const bool     /*omit_zeroing_entries*/)
-  {
-    Epetra_LocalMap map (TrilinosWrappers::n_global_elements(input_map),
-                         input_map.IndexBase(),
-                         input_map.Comm());
-    vector.reset (new Epetra_FEVector(map));
-    owned_elements = complete_index_set(TrilinosWrappers::n_global_elements(input_map));
-
-    last_action = Zero;
-  }
-
-
-
-  void
-  Vector::reinit (const IndexSet &partitioning,
-                  const MPI_Comm &communicator,
-                  const bool    /*omit_zeroing_entries*/)
-  {
-    Epetra_LocalMap map (static_cast<TrilinosWrappers::types::int_type>(partitioning.size()),
-                         0,
-#ifdef DEAL_II_WITH_MPI
-                         Epetra_MpiComm(communicator));
-#else
-                         Epetra_SerialComm());
-    (void)communicator;
-#endif
-    vector.reset (new Epetra_FEVector(map));
-
-    last_action = Zero;
-    owned_elements = partitioning;
-  }
-
-
-
-  void
-  Vector::reinit (const VectorBase &v,
-                  const bool        omit_zeroing_entries,
-                  const bool        allow_different_maps)
-  {
-    // In case we do not allow to
-    // have different maps, this
-    // call means that we have to
-    // reset the vector. So clear
-    // the vector, initialize our
-    // map with the map in v, and
-    // generate the vector.
-    if (allow_different_maps == false)
-      {
-        // check equality for MPI communicators
-#ifdef DEAL_II_WITH_MPI
-        const Epetra_MpiComm *my_comm = dynamic_cast<const Epetra_MpiComm *>(&vector->Comm());
-        const Epetra_MpiComm *v_comm = dynamic_cast<const Epetra_MpiComm *>(&v.vector->Comm());
-        const bool same_communicators = my_comm != nullptr && v_comm != nullptr &&
-                                        my_comm->DataPtr() == v_comm->DataPtr();
-#else
-        const bool same_communicators = true;
-#endif
-        if (!same_communicators || local_range() != v.local_range())
-          {
-            Epetra_LocalMap map (TrilinosWrappers::global_length(*(v.vector)),
-                                 v.vector->Map().IndexBase(),
-                                 v.vector->Comm());
-            vector.reset (new Epetra_FEVector(map));
-            owned_elements = v.owned_elements;
-          }
-        else if (omit_zeroing_entries)
-          {
-            int ierr;
-            Assert (vector->Map().SameAs(v.vector->Map()) == true,
-                    ExcMessage ("The Epetra maps in the assignment operator ="
-                                " do not match, even though the local_range "
-                                " seems to be the same. Check vector setup!"));
-
-            ierr = vector->GlobalAssemble(last_action);
-            (void)ierr;
-            Assert (ierr == 0, ExcTrilinosError(ierr));
-
-            ierr = vector->PutScalar(0.0);
-            Assert (ierr == 0, ExcTrilinosError(ierr));
-          }
-        last_action = Zero;
-      }
-
-    // Otherwise, we have to check
-    // that the two vectors are
-    // already of the same size,
-    // create an object for the data
-    // exchange and then insert all
-    // the data.
-    else
-      {
-        Assert (omit_zeroing_entries == false,
-                ExcMessage ("It is not possible to exchange data with the "
-                            "option 'omit_zeroing_entries' set, which would not write "
-                            "elements."));
-
-        AssertThrow (size() == v.size(),
-                     ExcDimensionMismatch (size(), v.size()));
-
-        Epetra_Import data_exchange (vector->Map(), v.vector->Map());
-
-        const int ierr = vector->Import(*v.vector, data_exchange, Insert);
-        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-        last_action = Insert;
-      }
-
-  }
-
-
-
-  Vector &
-  Vector::operator = (const MPI::Vector &v)
-  {
-    if (size() != v.size())
-      {
-        Epetra_LocalMap map (TrilinosWrappers::n_global_elements(v.vector->Map()),
-                             v.vector->Map().IndexBase(),
-                             v.vector->Comm());
-        vector.reset (new Epetra_FEVector(map));
-      }
-
-    reinit (v, false, true);
-    return *this;
-  }
-
-
-
-  Vector &
-  Vector::operator = (const Vector &v)
-  {
-    if (size() != v.size())
-      {
-        Epetra_LocalMap map (TrilinosWrappers::n_global_elements(v.vector->Map()),
-                             v.vector->Map().IndexBase(),
-                             v.vector->Comm());
-        vector.reset (new Epetra_FEVector(map));
-        owned_elements = v.owned_elements;
-      }
-
-    const int ierr = vector->Update(1.0, *v.vector, 0.0);
-    Assert (ierr == 0, ExcTrilinosError(ierr));
-    (void)ierr;
-
-    return *this;
-  }
-
-}
+} /* end of namespace TrilinosWrappers */
 
 DEAL_II_NAMESPACE_CLOSE
 

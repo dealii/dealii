@@ -32,7 +32,7 @@
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 #include <deal.II/lac/petsc_parallel_block_sparse_matrix.h>
 #include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_block_sparse_matrix.h>
 #include <deal.II/lac/matrix_block.h>
@@ -1366,8 +1366,7 @@ BLOCK_MATRIX_VECTOR_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix ,PETScWrappe
 #ifdef DEAL_II_WITH_TRILINOS
 MATRIX_FUNCTIONS(TrilinosWrappers::SparseMatrix);
 BLOCK_MATRIX_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix);
-MATRIX_VECTOR_FUNCTIONS(TrilinosWrappers::SparseMatrix, TrilinosWrappers::Vector);
-BLOCK_MATRIX_VECTOR_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix, TrilinosWrappers::BlockVector);
+MATRIX_VECTOR_FUNCTIONS(TrilinosWrappers::SparseMatrix, TrilinosWrappers::VectorBase);
 MATRIX_VECTOR_FUNCTIONS(TrilinosWrappers::SparseMatrix, TrilinosWrappers::MPI::Vector);
 BLOCK_MATRIX_VECTOR_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix, TrilinosWrappers::MPI::BlockVector);
 #endif

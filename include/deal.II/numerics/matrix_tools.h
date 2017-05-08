@@ -72,9 +72,8 @@ namespace PETScWrappers
 namespace TrilinosWrappers
 {
   class SparseMatrix;
-  class Vector;
   class BlockSparseMatrix;
-  class BlockVector;
+  class VectorBase;
   namespace MPI
   {
     class Vector;
@@ -855,20 +854,9 @@ namespace MatrixTools
   void
   apply_boundary_values (const std::map<types::global_dof_index,TrilinosScalar> &boundary_values,
                          TrilinosWrappers::SparseMatrix  &matrix,
-                         TrilinosWrappers::Vector        &solution,
-                         TrilinosWrappers::Vector        &right_hand_side,
+                         TrilinosWrappers::VectorBase        &solution,
+                         TrilinosWrappers::VectorBase        &right_hand_side,
                          const bool             eliminate_columns = true);
-
-  /**
-   * This function does the same as the one above, except now working on block
-   * structures.
-   */
-  void
-  apply_boundary_values (const std::map<types::global_dof_index,TrilinosScalar> &boundary_values,
-                         TrilinosWrappers::BlockSparseMatrix  &matrix,
-                         TrilinosWrappers::BlockVector        &solution,
-                         TrilinosWrappers::BlockVector        &right_hand_side,
-                         const bool                eliminate_columns = true);
 
   /**
    * Same as above, but for parallel matrices and vectors.

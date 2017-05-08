@@ -30,7 +30,7 @@
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
-#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/numerics/solution_transfer.h>
 
 DEAL_II_NAMESPACE_OPEN

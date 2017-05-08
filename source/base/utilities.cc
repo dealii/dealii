@@ -61,7 +61,7 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #    include <Epetra_MpiComm.h>
 #    include <deal.II/lac/vector_memory.h>
 #    include <deal.II/lac/trilinos_vector.h>
-#    include <deal.II/lac/trilinos_block_vector.h>
+#    include <deal.II/lac/trilinos_parallel_block_vector.h>
 #  endif
 #  include "Teuchos_RCP.hpp"
 #  include "Epetra_SerialComm.h"

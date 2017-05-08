@@ -1475,7 +1475,7 @@ namespace TrilinosWrappers
      * Source and destination must not be the same vector.
      *
      * This function can be called with several different vector objects,
-     * namely TrilinosWrappers::Vector, TrilinosWrappers::MPI::Vector as well
+     * namely TrilinosWrappers::VectorBase, TrilinosWrappers::MPI::Vector as well
      * as deal.II's own vector classes Vector<double> and
      * LinearAlgebra::distributed::Vector<double>.
      *
@@ -1501,7 +1501,7 @@ namespace TrilinosWrappers
      * Source and destination must not be the same vector.
      *
      * This function can be called with several different vector objects,
-     * namely TrilinosWrappers::Vector, TrilinosWrappers::MPI::Vector as well
+     * namely TrilinosWrappers::VectorBase, TrilinosWrappers::MPI::Vector as well
      * as deal.II's own vector classes Vector<double> and
      * LinearAlgebra::distributed::Vector<double>.
      *
@@ -1526,7 +1526,7 @@ namespace TrilinosWrappers
      * Source and destination must not be the same vector.
      *
      * This function can be called with several different vector objects,
-     * namely TrilinosWrappers::Vector, TrilinosWrappers::MPI::Vector as well
+     * namely TrilinosWrappers::VectorBase, TrilinosWrappers::MPI::Vector as well
      * as deal.II's own vector classes Vector<double> and
      * LinearAlgebra::distributed::Vector<double>.
      *
@@ -1536,7 +1536,7 @@ namespace TrilinosWrappers
      * memory architecture, using the interface in the
      * TrilinosWrappers::VectorBase class.
      *
-     * In case of a localized Vector (i.e., TrilinosWrappers::Vector or
+     * In case of a localized Vector (i.e., TrilinosWrappers::VectorBase or
      * Vector<double>), this function will only work when running on one
      * processor, since the matrix object is inherently distributed.
      * Otherwise, and exception will be thrown.
@@ -1554,7 +1554,7 @@ namespace TrilinosWrappers
      * Source and destination must not be the same vector.
      *
      * This function can be called with several different vector objects,
-     * namely TrilinosWrappers::Vector, TrilinosWrappers::MPI::Vector as well
+     * namely TrilinosWrappers::VectorBase, TrilinosWrappers::MPI::Vector as well
      * as deal.II's own vector classes Vector<double> and
      * LinearAlgebra::distributed::Vector<double>.
      *
@@ -1564,7 +1564,7 @@ namespace TrilinosWrappers
      * memory architecture, using the interface in the
      * TrilinosWrappers::VectorBase class.
      *
-     * In case of a localized Vector (i.e., TrilinosWrappers::Vector or
+     * In case of a localized Vector (i.e., TrilinosWrappers::VectorBase or
      * Vector<double>), this function will only work when running on one
      * processor, since the matrix object is inherently distributed.
      * Otherwise, and exception will be thrown.
@@ -2989,7 +2989,7 @@ namespace TrilinosWrappers
       {
         // we have to check after Insert/Add in any case to be consistent
         // with the MPI communication model (see the comments in the
-        // documentation of TrilinosWrappers::Vector), but we can save some
+        // documentation of TrilinosWrappers::VectorBase), but we can save some
         // work if the addend is zero. However, these actions are done in case
         // we pass on to the other function.
 

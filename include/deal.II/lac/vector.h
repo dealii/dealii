@@ -56,7 +56,7 @@ namespace TrilinosWrappers
   {
     class Vector;
   }
-  class Vector;
+  class VectorBase;
 }
 #endif
 
@@ -236,7 +236,7 @@ public:
    * wrapper vector. This copy constructor is only available if Trilinos was
    * detected during configuration time.
    */
-  explicit Vector (const TrilinosWrappers::Vector &v);
+  explicit Vector (const TrilinosWrappers::VectorBase &v);
 #endif
 
   /**
@@ -408,7 +408,7 @@ public:
    * during configuration time.
    */
   Vector<Number> &
-  operator= (const TrilinosWrappers::Vector &v);
+  operator= (const TrilinosWrappers::VectorBase &v);
 #endif
 
   /**

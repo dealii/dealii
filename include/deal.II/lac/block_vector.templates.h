@@ -19,7 +19,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <cmath>
 #include <algorithm>
 
@@ -77,7 +77,7 @@ BlockVector<Number>::BlockVector (const BlockVector<OtherNumber> &v)
 #ifdef DEAL_II_WITH_TRILINOS
 
 template <typename Number>
-BlockVector<Number>::BlockVector (const TrilinosWrappers::BlockVector &v)
+BlockVector<Number>::BlockVector (const TrilinosWrappers::MPI::BlockVector &v)
 {
   this->block_indices = v.get_block_indices();
   this->components.resize(this->n_blocks());
@@ -151,7 +151,7 @@ BlockVector<Number>::~BlockVector ()
 template <typename Number>
 inline
 BlockVector<Number> &
-BlockVector<Number>::operator= (const TrilinosWrappers::BlockVector &v)
+BlockVector<Number>::operator= (const TrilinosWrappers::MPI::BlockVector &v)
 {
   BaseClass::operator= (v);
   return *this;
