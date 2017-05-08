@@ -100,15 +100,6 @@ namespace TrilinosWrappers
 
       /**
        * Constructor. Generate a block vector with as many blocks as there are
-       * entries in @p partitioning. Each Epetra_Map contains the layout of
-       * the distribution of data among the MPI processes.
-       *
-       * This function is deprecated.
-       */
-      explicit BlockVector (const std::vector<Epetra_Map> &parallel_partitioning) DEAL_II_DEPRECATED;
-
-      /**
-       * Constructor. Generate a block vector with as many blocks as there are
        * entries in @p partitioning.  Each IndexSet together with the MPI
        * communicator contains the layout of the distribution of data among
        * the MPI processes.
@@ -185,19 +176,6 @@ namespace TrilinosWrappers
        */
       template <typename Number>
       BlockVector &operator= (const ::dealii::BlockVector<Number> &v);
-
-      /**
-       * Reinitialize the BlockVector to contain as many blocks as there are
-       * Epetra_Maps given in the input argument, according to the parallel
-       * distribution of the individual components described in the maps.
-       *
-       * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with
-       * zeros.
-       *
-       * This function is deprecated.
-       */
-      void reinit (const std::vector<Epetra_Map> &parallel_partitioning,
-                   const bool                     omit_zeroing_entries = false) DEAL_II_DEPRECATED;
 
       /**
        * Reinitialize the BlockVector to contain as many blocks as there are
@@ -278,17 +256,6 @@ namespace TrilinosWrappers
        */
       void import_nonlocal_data_for_fe (const TrilinosWrappers::BlockSparseMatrix &m,
                                         const BlockVector                         &v);
-
-      /**
-       * Return the state of the vector, i.e., whether compress() needs to be
-       * called after an operation requiring data exchange. Does only return
-       * non-true values when used in <tt>debug</tt> mode, since it is quite
-       * expensive to keep track of all operations that lead to the need for
-       * compress().
-       *
-       * This function is deprecated.
-       */
-      bool is_compressed () const DEAL_II_DEPRECATED;
 
       /**
        * Return if this Vector contains ghost elements.

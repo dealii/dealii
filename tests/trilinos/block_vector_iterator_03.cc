@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// this test is an adaptation of lac/block_vector_iterator for PETSc block
+// this test is an adaptation of lac/block_vector_iterator for Trilinos block
 // vectors
 
 #include "../tests.h"
@@ -54,8 +54,10 @@ void test ()
   // iterators
   if (true)
     {
-      TrilinosWrappers::BlockVector v1(ivector);
-      TrilinosWrappers::BlockVector v2(ivector);
+      TrilinosWrappers::BlockVector v1;
+      v1.reinit(ivector);
+      TrilinosWrappers::BlockVector v2;
+      v2.reinit(ivector);
 
       // initialize first vector with
       // simple loop
@@ -72,30 +74,13 @@ void test ()
       deallog << "Check 1: " << (v1==v2 ? "true" : "false") << std::endl;
     };
 
-  // Check 1: initialization via
-  // iterators
-  if (true)
-    {
-      TrilinosWrappers::BlockVector v1(ivector);
-
-      // initialize first vector with
-      // simple loop
-      for (unsigned int i=0; i<v1.size(); ++i)
-        v1(i) = i;
-      // initialize other vector
-      // through iterators into first
-      // vector
-      TrilinosWrappers::BlockVector v2(ivector, v1.begin(), v1.end());
-      // check that the two vectors are equal
-      deallog << "Check 2: " << (v1==v2 ? "true" : "false") << std::endl;
-    };
-
-  // Check 3: loop forward and back
+  // Check 2: loop forward and back
   // and check that things are the
   // same
   if (true)
     {
-      TrilinosWrappers::BlockVector v1(ivector);
+      TrilinosWrappers::BlockVector v1;
+      v1.reinit(ivector);
       // initialize first vector with
       // simple loop
       for (unsigned int i=0; i<v1.size(); ++i)
@@ -121,11 +106,12 @@ void test ()
     };
 
 
-  // Check 4: same, but this time
+  // Check 3: same, but this time
   // with const iterators
   if (true)
     {
-      TrilinosWrappers::BlockVector v1(ivector);
+      TrilinosWrappers::BlockVector v1;
+      v1.reinit(ivector);
       // initialize first vector with
       // simple loop
       for (unsigned int i=0; i<v1.size(); ++i)
@@ -154,11 +140,12 @@ void test ()
       deallog << "Check 4: true" << std::endl;
     };
 
-  // Checks 5-14: use some standard
+  // Checks 4-13: use some standard
   // algorithms
   if (true)
     {
-      TrilinosWrappers::BlockVector v1(ivector);
+      TrilinosWrappers::BlockVector v1;
+      v1.reinit(ivector);
       // initialize first vector with
       // simple loop
       for (unsigned int i=0; i<v1.size(); ++i)
@@ -173,7 +160,8 @@ void test ()
               << std::endl;
 
       // check std::copy
-      TrilinosWrappers::BlockVector v2(ivector);
+      TrilinosWrappers::BlockVector v2;
+      v2.reinit(ivector);
       std::copy (v1.begin(), v1.end(), v2.begin());
       deallog << "Check 6: " << (v1 == v2 ? "true" : "false") << std::endl;
 
@@ -218,91 +206,11 @@ void test ()
       deallog << "Check 14: " << (p3 == v1.end() ? "true" : "false") << std::endl;
     };
 
-  // Check 15: initialization through
-  // iterators
+  // Check 15: operator[]
   if (true)
     {
-      TrilinosWrappers::BlockVector v1(ivector);
-      // initialize first vector with
-      // simple loop
-      for (unsigned int i=0; i<v1.size(); ++i)
-        v1(i) = i;
-
-      // initialize a normal vector
-      // from it
-      Vector<double> v2(v1.begin(), v1.end());
-
-      // and reverse way
-      TrilinosWrappers::BlockVector v3(ivector, v2.begin(), v2.end());
-      deallog << "Check 15: " << (v1==v3 ? "true" : "false") << std::endl;
-    };
-
-  // Check 16: initialization through
-  // iterators. variant with one
-  // constant object
-  if (true)
-    {
-      TrilinosWrappers::BlockVector v1(ivector);
-      // initialize first vector with
-      // simple loop
-      for (unsigned int i=0; i<v1.size(); ++i)
-        v1(i) = i;
-
-      // initialize a normal vector
-      // from it
-      const Vector<double> v2(v1.begin(), v1.end());
-
-      // and reverse way
-      TrilinosWrappers::BlockVector v3(ivector, v2.begin(), v2.end());
-      deallog << "Check 16: " << (v1==v3 ? "true" : "false") << std::endl;
-    };
-
-  // Check 17: initialization through
-  // iterators. variant with two
-  // constant object
-  if (true)
-    {
-      TrilinosWrappers::BlockVector v1(ivector);
-      // initialize first vector with
-      // simple loop
-      for (unsigned int i=0; i<v1.size(); ++i)
-        v1(i) = i;
-
-      // initialize a normal vector
-      // from it
-      const Vector<double> v2(v1.begin(), v1.end());
-
-      // and reverse way
-      const TrilinosWrappers::BlockVector v3(ivector, v2.begin(), v2.end());
-      deallog << "Check 17: " << (v1==v3 ? "true" : "false") << std::endl;
-    };
-
-  // Check 18: initialization through
-  // iterators. variant with three
-  // constant object
-  if (true)
-    {
-      TrilinosWrappers::BlockVector v0(ivector);
-      // initialize first vector with
-      // simple loop
-      for (unsigned int i=0; i<v0.size(); ++i)
-        v0(i) = i;
-
-      const TrilinosWrappers::BlockVector v1 = v0;
-
-      // initialize a normal vector
-      // from it
-      const Vector<double> v2(v1.begin(), v1.end());
-
-      // and reverse way
-      const TrilinosWrappers::BlockVector v3(ivector, v2.begin(), v2.end());
-      deallog << "Check 18: " << (v1==v3 ? "true" : "false") << std::endl;
-    };
-
-  // Check 19: operator[]
-  if (true)
-    {
-      TrilinosWrappers::BlockVector v1(ivector);
+      TrilinosWrappers::BlockVector v1;
+      v1.reinit(ivector);
       for (unsigned int i=0; i<v1.size(); ++i)
         v1(i) = i;
 
@@ -315,7 +223,7 @@ void test ()
 
       // if we came thus far,
       // everything is alright
-      deallog << "Check 19: true" << std::endl;
+      deallog << "Check 15: true" << std::endl;
     };
 }
 

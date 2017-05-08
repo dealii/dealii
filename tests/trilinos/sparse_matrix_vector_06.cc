@@ -70,7 +70,8 @@ int main (int argc, char **argv)
   try
     {
       {
-        TrilinosWrappers::Vector v (30);
+        TrilinosWrappers::Vector v;
+        v.reinit(30);
         test (v);
       }
     }

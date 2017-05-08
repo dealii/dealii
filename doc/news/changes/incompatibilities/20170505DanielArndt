@@ -1,0 +1,6 @@
+Changed: The deprecated member functions in the classes
+TrilinosWrappers::BlockVector, TrilinosWrappers::MPI::BlockVector,
+TrilinosWrappers::Vector and TrilinosWrappers::MPI::Vector
+have been removed.
+<br>
+(Daniel Arndt, 2017/05/05)

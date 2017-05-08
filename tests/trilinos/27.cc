@@ -34,7 +34,8 @@ void test (TrilinosWrappers::Vector &v)
   v.compress (VectorOperation::insert);
 
   // then copy it
-  TrilinosWrappers::Vector w (v.size());
+  TrilinosWrappers::Vector w;
+  w.reinit(v.size());
   w = v;
 
   // make sure they're equal
@@ -61,7 +62,8 @@ int main (int argc,char **argv)
   try
     {
       {
-        TrilinosWrappers::Vector v (100);
+        TrilinosWrappers::Vector v;
+        v.reinit(100);
         test (v);
       }
     }

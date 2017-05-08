@@ -245,23 +245,6 @@ namespace TrilinosWrappers
 
 
   TrilinosScalar
-  VectorBase::el (const size_type index) const
-  {
-    // Extract local indices in the vector.
-    TrilinosWrappers::types::int_type trilinos_i =
-      vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(index));
-
-    // If the element is not present on the current processor, we can't
-    // continue. Just print out 0 as opposed to the () method below.
-    if (trilinos_i == -1)
-      return 0.;
-    else
-      return (*vector)[0][trilinos_i];
-  }
-
-
-
-  TrilinosScalar
   VectorBase::operator () (const size_type index) const
   {
     // Extract local indices in the vector.
@@ -419,68 +402,6 @@ namespace TrilinosWrappers
       }
 
     return flag;
-  }
-
-
-
-  void
-  VectorBase::equ (const TrilinosScalar  a,
-                   const VectorBase     &v,
-                   const TrilinosScalar  b,
-                   const VectorBase     &w)
-  {
-    // if we have ghost values, do not allow
-    // writing to this vector at all.
-    Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (v.local_size() == w.local_size(),
-            ExcDimensionMismatch (v.local_size(), w.local_size()));
-
-    AssertIsFinite(a);
-    AssertIsFinite(b);
-
-    // If we don't have the same map, copy.
-    if (vector->Map().SameAs(v.vector->Map())==false)
-      {
-        sadd(0., a, v, b, w);
-      }
-    else
-      {
-        // Otherwise, just update. verify
-        // that *this does not only have
-        // the same map as v (the
-        // if-condition above) but also as
-        // w
-        Assert (vector->Map().SameAs(w.vector->Map()),
-                ExcDifferentParallelPartitioning());
-        int ierr = vector->Update(a, *v.vector, b, *w.vector, 0.0);
-        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-        last_action = Zero;
-      }
-  }
-
-
-
-  // TODO: up to now only local
-  // data printed out! Find a
-  // way to neatly output
-  // distributed data...
-  void
-  VectorBase::print (const char *format) const
-  {
-    Assert (global_length(*vector)!=0, ExcEmptyObject());
-    (void)global_length;
-
-    for (size_type j=0; j<size(); ++j)
-      {
-        double t = (*vector)[0][j];
-
-        if (format != nullptr)
-          std::printf (format, t);
-        else
-          std::printf (" %5.2f", double(t));
-      }
-    std::printf ("\n");
   }
 
 

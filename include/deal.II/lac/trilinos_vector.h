@@ -383,100 +383,6 @@ namespace TrilinosWrappers
        const Vector                                 &vector);
 //@}
       /**
-       * @name Initialization with an Epetra_Map
-       */
-//@{
-      /**
-       * This constructor takes an Epetra_Map that already knows how to
-       * distribute the individual components among the MPI processors. Since
-       * it also includes information about the size of the vector, this is
-       * all we need to generate a parallel vector.
-       *
-       * Depending on whether the @p parallel_partitioning argument uniquely
-       * subdivides elements among processors or not, the resulting vector may
-       * or may not have ghost elements. See the general documentation of this
-       * class for more information.
-       *
-       * This function is deprecated.
-       *
-       * @see
-       * @ref GlossGhostedVector "vectors with ghost elements"
-       */
-      explicit Vector (const Epetra_Map &parallel_partitioning)  DEAL_II_DEPRECATED;
-
-      /**
-       * Copy constructor from the TrilinosWrappers vector class. Since a
-       * vector of this class does not necessarily need to be distributed
-       * among processes, the user needs to supply us with an Epetra_Map that
-       * sets the partitioning details.
-       *
-       * Depending on whether the @p parallel_partitioning argument uniquely
-       * subdivides elements among processors or not, the resulting vector may
-       * or may not have ghost elements. See the general documentation of this
-       * class for more information.
-       *
-       * This function is deprecated.
-       *
-       * @see
-       * @ref GlossGhostedVector "vectors with ghost elements"
-       */
-      Vector (const Epetra_Map &parallel_partitioning,
-              const VectorBase &v) DEAL_II_DEPRECATED;
-
-      /**
-       * Reinitialize from a deal.II vector. The Epetra_Map specifies the
-       * %parallel partitioning.
-       *
-       * Depending on whether the @p parallel_partitioning argument uniquely
-       * subdivides elements among processors or not, the resulting vector may
-       * or may not have ghost elements. See the general documentation of this
-       * class for more information.
-       *
-       * This function is deprecated.
-       *
-       * @see
-       * @ref GlossGhostedVector "vectors with ghost elements"
-       */
-      template <typename number>
-      void reinit (const Epetra_Map             &parallel_partitioner,
-                   const dealii::Vector<number> &v) DEAL_II_DEPRECATED;
-
-      /**
-       * Reinit functionality. This function destroys the old vector content
-       * and generates a new one based on the input map.
-       *
-       * Depending on whether the @p parallel_partitioning argument uniquely
-       * subdivides elements among processors or not, the resulting vector may
-       * or may not have ghost elements. See the general documentation of this
-       * class for more information.
-       *
-       * This function is deprecated.
-       *
-       * @see
-       * @ref GlossGhostedVector "vectors with ghost elements"
-       */
-      void reinit (const Epetra_Map &parallel_partitioning,
-                   const bool        omit_zeroing_entries = false) DEAL_II_DEPRECATED;
-
-      /**
-       * Copy-constructor from deal.II vectors. Sets the dimension to that of
-       * the given vector, and copies all elements.
-       *
-       * Depending on whether the @p parallel_partitioning argument uniquely
-       * subdivides elements among processors or not, the resulting vector may
-       * or may not have ghost elements. See the general documentation of this
-       * class for more information.
-       *
-       * This function is deprecated.
-       *
-       * @see
-       * @ref GlossGhostedVector "vectors with ghost elements"
-       */
-      template <typename Number>
-      Vector (const Epetra_Map             &parallel_partitioning,
-              const dealii::Vector<Number> &v) DEAL_II_DEPRECATED;
-//@}
-      /**
        * @name Initialization with an IndexSet
        */
 //@{
@@ -634,15 +540,6 @@ namespace TrilinosWrappers
 #ifndef DOXYGEN
 
     template <typename number>
-    Vector::Vector (const Epetra_Map             &input_map,
-                    const dealii::Vector<number> &v)
-    {
-      reinit (input_map, v);
-    }
-
-
-
-    template <typename number>
     Vector::Vector (const IndexSet               &parallel_partitioner,
                     const dealii::Vector<number> &v,
                     const MPI_Comm               &communicator)
@@ -652,24 +549,6 @@ namespace TrilinosWrappers
       owned_elements = parallel_partitioner;
     }
 
-
-
-
-    template <typename number>
-    void Vector::reinit (const Epetra_Map             &parallel_partitioner,
-                         const dealii::Vector<number> &v)
-    {
-      if (vector.get() == nullptr || vector->Map().SameAs(parallel_partitioner) == false)
-        reinit(parallel_partitioner);
-
-      const int size = parallel_partitioner.NumMyElements();
-
-      // Need to copy out values, since the deal.II might not use doubles, so
-      // that a direct access is not possible.
-      for (int i=0; i<size; ++i)
-        (*vector)[0][i] = v(gid(parallel_partitioner,i));
-
-    }
 
 
     inline
@@ -736,54 +615,6 @@ namespace TrilinosWrappers
      * Declare type for container size.
      */
     typedef dealii::types::global_dof_index size_type;
-
-    /**
-     * Default constructor that generates an empty (zero size) vector. The
-     * function <tt>reinit()</tt> will have to give the vector the correct
-     * size.
-     */
-    Vector () DEAL_II_DEPRECATED;
-
-    /**
-     * This constructor takes as input the number of elements in the vector.
-     */
-    explicit Vector (const size_type n) DEAL_II_DEPRECATED;
-
-    /**
-     * This constructor takes as input the number of elements in the vector.
-     * If the map is not localized, i.e., if there are some elements that are
-     * not present on all processes, only the global size of the map will be
-     * taken and a localized map will be generated internally. In other words,
-     * which element of the @p partitioning argument are set is in fact
-     * ignored, the only thing that matters is the size of the index space
-     * described by this argument.
-     */
-    explicit Vector (const Epetra_Map &partitioning) DEAL_II_DEPRECATED;
-
-    /**
-     * This constructor takes as input the number of elements in the vector.
-     * If the index set is not localized, i.e., if there are some elements
-     * that are not present on all processes, only the global size of the
-     * index set will be taken and a localized version will be generated
-     * internally. In other words, which element of the @p partitioning
-     * argument are set is in fact ignored, the only thing that matters is the
-     * size of the index space described by this argument.
-     */
-    explicit Vector (const IndexSet &partitioning,
-                     const MPI_Comm &communicator = MPI_COMM_WORLD) DEAL_II_DEPRECATED;
-
-    /**
-     * This constructor takes a (possibly parallel) Trilinos Vector and
-     * generates a localized version of the whole content on each processor.
-     */
-    explicit Vector (const VectorBase &V) DEAL_II_DEPRECATED;
-
-    /**
-     * Copy-constructor from deal.II vectors. Sets the dimension to that of
-     * the given vector, and copies all elements.
-     */
-    template <typename Number>
-    explicit Vector (const dealii::Vector<Number> &v) DEAL_II_DEPRECATED;
 
     /**
      * Reinit function that resizes the vector to the size specified by
@@ -915,16 +746,6 @@ namespace TrilinosWrappers
 
 
 #ifndef DOXYGEN
-
-  template <typename number>
-  Vector::Vector (const dealii::Vector<number> &v)
-  {
-    Epetra_LocalMap map ((TrilinosWrappers::types::int_type)v.size(), 0, Utilities::Trilinos::comm_self());
-    vector.reset (new Epetra_FEVector(map));
-    *this = v;
-  }
-
-
 
   inline
   Vector &

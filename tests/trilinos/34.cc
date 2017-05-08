@@ -59,7 +59,8 @@ int main (int argc,char **argv)
   try
     {
       {
-        TrilinosWrappers::Vector v (100);
+        TrilinosWrappers::Vector v;
+        v.reinit(100);
         test (v);
       }
     }

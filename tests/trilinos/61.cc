@@ -45,9 +45,11 @@ void test (TrilinosWrappers::Vector &v)
   Vector<float>  x(v.size());
   x=v;
 
-  TrilinosWrappers::Vector w1(v.size());
+  TrilinosWrappers::Vector w1;
+  w1.reinit(v.size());
   w1=w;
-  TrilinosWrappers::Vector x1(v.size());
+  TrilinosWrappers::Vector x1;
+  x1.reinit(v.size());
   x1=x;
 
   for (unsigned int i=0; i<v.size(); ++i)
@@ -73,7 +75,8 @@ int main (int argc,char **argv)
   try
     {
       {
-        TrilinosWrappers::Vector v (100);
+        TrilinosWrappers::Vector v;
+        v.reinit(100);
         test (v);
       }
     }

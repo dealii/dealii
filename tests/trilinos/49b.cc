@@ -49,7 +49,9 @@ void test (TrilinosWrappers::MPI::BlockVector &v)
 
   // now also check the reverse assignment
   w = 0;
-  w = v;
+  TrilinosWrappers::BlockVector v_serial;
+  v_serial.reinit(v);
+  w = v_serial;
   for (unsigned int i=0; i<v.size(); ++i)
     {
       AssertThrow (w(i) == i, ExcInternalError());
@@ -74,15 +76,10 @@ int main (int argc,char **argv)
   try
     {
       {
-        std::vector<Epetra_Map> sizes;
-        Epetra_Map map(TrilinosWrappers::types::int_type(3),
-                       TrilinosWrappers::types::int_type(3),
-                       0,
-                       Utilities::Trilinos::comm_world());
-        sizes.push_back (map);
-        sizes.push_back (map);
+        std::vector<IndexSet> sizes(2, complete_index_set(3));
 
-        TrilinosWrappers::MPI::BlockVector v (sizes);
+        TrilinosWrappers::MPI::BlockVector v;
+        v.reinit(sizes, MPI_COMM_WORLD);
         test (v);
       }
     }
