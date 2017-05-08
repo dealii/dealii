@@ -39,7 +39,7 @@
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/lac/trilinos_block_sparse_matrix.h>
-#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_precondition.h>
 #include <deal.II/lac/trilinos_solver.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
@@ -50,14 +50,14 @@ using namespace dealii;
 
 template<int dim>
 void build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
-                         TrilinosWrappers::BlockVector       &vector,
+                         TrilinosWrappers::MPI::BlockVector       &vector,
                          const FE_Q<dim>                     &fe_test,
                          const FE_Q<dim>                     &fe_trial)
 {
   deallog.push("build_matrix_vector");
 
   // Configure block system
-  std::vector<types::global_dof_index> dofs_per_block(2);
+  std::vector<types::global_dof_index> dofs_per_block (2);
   std::vector<unsigned int> block_component (2);
   block_component[0] = 0;
   block_component[1] = 1;
@@ -80,16 +80,19 @@ void build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
   DoFRenumbering::component_wise(dof_handler, block_component);
   DoFTools::count_dofs_per_block(dof_handler, dofs_per_block,
                                  block_component);
+  std::vector<IndexSet> partitioning(2);
+  partitioning[0] = complete_index_set(dofs_per_block[0]);
+  partitioning[1] = complete_index_set(dofs_per_block[1]);
 
   constraints.clear();
   constraints.close();
-  BlockDynamicSparsityPattern dsp (dofs_per_block,dofs_per_block);
+  BlockDynamicSparsityPattern dsp (partitioning);
   DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints, false);
 
   matrix.clear();
   // vector.clear();
   matrix.reinit (dsp);
-  vector.reinit (dofs_per_block);
+  vector.reinit (partitioning);
 
   // Assemble system: Mass matrix and constrant RHS vector
   FEValues<dim> fe_values (fe, quadrature_formula,
@@ -136,11 +139,11 @@ void build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
 }
 
 void evaluate_ops (const TrilinosWrappers::BlockSparseMatrix &matrix,
-                   const TrilinosWrappers::BlockVector       &vector)
+                   const TrilinosWrappers::MPI::BlockVector       &vector)
 {
   const double tol = 1e-12;
   typedef dealii::TrilinosWrappers::SparseMatrix MatrixType;
-  typedef dealii::TrilinosWrappers::Vector       VectorType;
+  typedef dealii::TrilinosWrappers::MPI::Vector       VectorType;
   typedef dealii::TrilinosWrappers::internal::LinearOperator::TrilinosPayload PayloadType;
   typedef typename PayloadType::VectorType       PayloadVectorType;
   typedef dealii::types::global_dof_index        size_type;
@@ -440,7 +443,7 @@ int main(int argc, char *argv[])
   FE_Q<dim>            fe_trial  (1);
 
   TrilinosWrappers::BlockSparseMatrix A;
-  TrilinosWrappers::BlockVector       b;
+  TrilinosWrappers::MPI::BlockVector       b;
 
   deallog.push("Square");
   build_matrix_vector<dim>(A,b,fe_test_1,fe_trial);

@@ -28,7 +28,7 @@
 #include <deal.II/lac/solver_richardson.h>
 
 #include <deal.II/lac/trilinos_block_sparse_matrix.h>
-#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_precondition.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
@@ -230,8 +230,8 @@ int main(int argc, char *argv[])
     sparsity_pattern.compress();
 
     TrilinosWrappers::SparseMatrix A (sparsity_pattern);
-    TrilinosWrappers::Vector b;
-    b.reinit(A.domain_partitioner());
+    TrilinosWrappers::MPI::Vector b;
+    b.reinit(A.locally_owned_domain_indices());
     TrilinosWrappers::MPI::Vector c;
     c.reinit(A.locally_owned_domain_indices());
     for (unsigned int i=0; i < rc; ++i)
@@ -333,49 +333,49 @@ int main(int argc, char *argv[])
 
     {
       deallog.push("SolverBicgstab");
-      typedef SolverBicgstab<TrilinosWrappers::Vector> SLVR;
+      typedef SolverBicgstab<TrilinosWrappers::MPI::Vector> SLVR;
       test_solver<SLVR> (A, b);
       deallog.pop();
     }
 
     {
       deallog.push("SolverCG");
-      typedef SolverCG<TrilinosWrappers::Vector> SLVR;
+      typedef SolverCG<TrilinosWrappers::MPI::Vector> SLVR;
       test_solver<SLVR> (A, b);
       deallog.pop();
     }
 
     {
       deallog.push("SolverGMRES");
-      typedef SolverGMRES<TrilinosWrappers::Vector> SLVR;
+      typedef SolverGMRES<TrilinosWrappers::MPI::Vector> SLVR;
       test_solver<SLVR> (A, b);
       deallog.pop();
     }
 
     {
       deallog.push("SolverFGMRES");
-      typedef SolverFGMRES<TrilinosWrappers::Vector> SLVR;
+      typedef SolverFGMRES<TrilinosWrappers::MPI::Vector> SLVR;
       test_solver<SLVR> (A, b);
       deallog.pop();
     }
 
     {
       deallog.push("SolverMinRes");
-      typedef SolverMinRes<TrilinosWrappers::Vector> SLVR;
+      typedef SolverMinRes<TrilinosWrappers::MPI::Vector> SLVR;
       test_solver<SLVR> (A, b);
       deallog.pop();
     }
 
     {
       deallog.push("SolverQMRS");
-      typedef SolverQMRS<TrilinosWrappers::Vector> SLVR;
+      typedef SolverQMRS<TrilinosWrappers::MPI::Vector> SLVR;
       test_solver<SLVR> (A, b);
       deallog.pop();
     }
 
     {
       deallog.push("SolverRichardson");
-      typedef SolverRichardson<TrilinosWrappers::Vector> SLVR;
+      typedef SolverRichardson<TrilinosWrappers::MPI::Vector> SLVR;
       test_solver<SLVR> (A, b);
       deallog.pop();
     }

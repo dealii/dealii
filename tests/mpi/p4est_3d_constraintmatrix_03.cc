@@ -38,7 +38,7 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/numerics/data_out.h>
-#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>

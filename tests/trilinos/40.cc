@@ -25,9 +25,9 @@
 #include <vector>
 
 
-void test (TrilinosWrappers::Vector &v,
-           TrilinosWrappers::Vector &w,
-           TrilinosWrappers::Vector &x)
+void test (TrilinosWrappers::MPI::Vector &v,
+           TrilinosWrappers::MPI::Vector &w,
+           TrilinosWrappers::MPI::Vector &x)
 {
   for (unsigned int i=0; i<v.size(); ++i)
     {
@@ -67,12 +67,12 @@ int main (int argc,char **argv)
   try
     {
       {
-        TrilinosWrappers::Vector v;
-        v.reinit(100);
-        TrilinosWrappers::Vector w;
-        w.reinit(100);
-        TrilinosWrappers::Vector x;
-        x.reinit(100);
+        TrilinosWrappers::MPI::Vector v;
+        v.reinit(complete_index_set(100), MPI_COMM_WORLD);
+        TrilinosWrappers::MPI::Vector w;
+        w.reinit(complete_index_set(100), MPI_COMM_WORLD);
+        TrilinosWrappers::MPI::Vector x;
+        x.reinit(complete_index_set(100), MPI_COMM_WORLD);
         test (v,w,x);
       }
     }

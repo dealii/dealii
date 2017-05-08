@@ -29,8 +29,8 @@
 
 void test ()
 {
-  TrilinosWrappers::Vector v;
-  v.reinit(3);
+  TrilinosWrappers::MPI::Vector v;
+  v.reinit(complete_index_set(3), MPI_COMM_WORLD);
   v(0) = 0;
   v(1) = 1;
   v(2) = 2;

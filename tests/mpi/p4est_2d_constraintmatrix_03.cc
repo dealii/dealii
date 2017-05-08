@@ -198,9 +198,9 @@ void test()
   std::ofstream output (filename.c_str());
   data_out.write_deal_II_intermediate (output);
 
-  TrilinosWrappers::Vector x_dub;
-  x_dub.reinit(dof_set.size());
-  x_dub = x_rel;
+  TrilinosWrappers::MPI::Vector x_dub;
+  x_dub.reinit(complete_index_set(dof_set.size()));
+  x_dub.reinit(x_rel, false, true);
 
   if (myid==0)
     {

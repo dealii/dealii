@@ -103,6 +103,6 @@ int main (int argc, char **argv)
 
   initlog();
 
-  do_test<TrilinosWrappers::Vector>();
+  do_test<TrilinosWrappers::MPI::Vector>();
   do_test<TrilinosWrappers::MPI::Vector>();
 }

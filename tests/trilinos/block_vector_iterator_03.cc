@@ -20,7 +20,7 @@
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/logstream.h>
-#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -30,8 +30,8 @@
 #include <cmath>
 
 template <typename number>
-bool operator == (const TrilinosWrappers::BlockVector &v1,
-                  const TrilinosWrappers::BlockVector &v2)
+bool operator == (const TrilinosWrappers::MPI::BlockVector &v1,
+                  const TrilinosWrappers::MPI::BlockVector &v2)
 {
   if (v1.size() != v2.size())
     return false;
@@ -44,19 +44,19 @@ bool operator == (const TrilinosWrappers::BlockVector &v1,
 
 void test ()
 {
-  std::vector<types::global_dof_index> ivector(4);
-  ivector[0] = 2;
-  ivector[1] = 4;
-  ivector[2] = 3;
-  ivector[3] = 5;
+  std::vector<IndexSet> ivector(4);
+  ivector[0] = complete_index_set(2);
+  ivector[1] = complete_index_set(4);
+  ivector[2] = complete_index_set(3);
+  ivector[3] = complete_index_set(5);
 
   // Check 1: initialization via
   // iterators
   if (true)
     {
-      TrilinosWrappers::BlockVector v1;
+      TrilinosWrappers::MPI::BlockVector v1;
       v1.reinit(ivector);
-      TrilinosWrappers::BlockVector v2;
+      TrilinosWrappers::MPI::BlockVector v2;
       v2.reinit(ivector);
 
       // initialize first vector with
@@ -65,7 +65,7 @@ void test ()
         v1(i) = i;
       // initialize other vector
       // through iterators
-      TrilinosWrappers::BlockVector::iterator p2 = v2.begin();
+      TrilinosWrappers::MPI::BlockVector::iterator p2 = v2.begin();
       for (unsigned int i=0; i<v1.size(); ++i, ++p2)
         *p2 = i;
       AssertThrow (p2==v2.end(), ExcInternalError());
@@ -79,14 +79,14 @@ void test ()
   // same
   if (true)
     {
-      TrilinosWrappers::BlockVector v1;
+      TrilinosWrappers::MPI::BlockVector v1;
       v1.reinit(ivector);
       // initialize first vector with
       // simple loop
       for (unsigned int i=0; i<v1.size(); ++i)
         v1(i) = i;
 
-      TrilinosWrappers::BlockVector::iterator p1 = v1.begin();
+      TrilinosWrappers::MPI::BlockVector::iterator p1 = v1.begin();
       for (unsigned int i=0; i<v1.size(); ++i, ++p1)
         AssertThrow (*p1 == i, ExcInternalError());
 
@@ -110,14 +110,14 @@ void test ()
   // with const iterators
   if (true)
     {
-      TrilinosWrappers::BlockVector v1;
+      TrilinosWrappers::MPI::BlockVector v1;
       v1.reinit(ivector);
       // initialize first vector with
       // simple loop
       for (unsigned int i=0; i<v1.size(); ++i)
         v1(i) = i;
 
-      TrilinosWrappers::BlockVector::const_iterator p1 = v1.begin();
+      TrilinosWrappers::MPI::BlockVector::const_iterator p1 = v1.begin();
       for (unsigned int i=0; i<v1.size(); ++i, ++p1)
         AssertThrow (*p1 == i, ExcInternalError());
 
@@ -144,7 +144,7 @@ void test ()
   // algorithms
   if (true)
     {
-      TrilinosWrappers::BlockVector v1;
+      TrilinosWrappers::MPI::BlockVector v1;
       v1.reinit(ivector);
       // initialize first vector with
       // simple loop
@@ -160,7 +160,7 @@ void test ()
               << std::endl;
 
       // check std::copy
-      TrilinosWrappers::BlockVector v2;
+      TrilinosWrappers::MPI::BlockVector v2;
       v2.reinit(ivector);
       std::copy (v1.begin(), v1.end(), v2.begin());
       deallog << "Check 6: " << (v1 == v2 ? "true" : "false") << std::endl;
@@ -197,11 +197,11 @@ void test ()
               << std::endl;
 
       // check advance
-      TrilinosWrappers::BlockVector::iterator p2 = v1.begin();
+      TrilinosWrappers::MPI::BlockVector::iterator p2 = v1.begin();
       std::advance (p2, v1.size());
       deallog << "Check 13: " << (p2 == v1.end() ? "true" : "false") << std::endl;
 
-      TrilinosWrappers::BlockVector::const_iterator p3 = v1.begin();
+      TrilinosWrappers::MPI::BlockVector::const_iterator p3 = v1.begin();
       std::advance (p3, v1.size());
       deallog << "Check 14: " << (p3 == v1.end() ? "true" : "false") << std::endl;
     };
@@ -209,14 +209,14 @@ void test ()
   // Check 15: operator[]
   if (true)
     {
-      TrilinosWrappers::BlockVector v1;
+      TrilinosWrappers::MPI::BlockVector v1;
       v1.reinit(ivector);
       for (unsigned int i=0; i<v1.size(); ++i)
         v1(i) = i;
 
       for (unsigned int i=0; i<v1.size(); ++i)
         {
-          const TrilinosWrappers::BlockVector::iterator p = (v1.begin()+i);
+          const TrilinosWrappers::MPI::BlockVector::iterator p = (v1.begin()+i);
           for (unsigned int j=0; j<v1.size(); ++j)
             AssertThrow (p[(signed)j-(signed)i] == j, ExcInternalError());
         };

@@ -69,16 +69,16 @@ int main (int argc, char *argv[])
     A.reinit(csp);
     testproblem.five_point(A);
 
-    TrilinosWrappers::Vector  f;
-    f.reinit(dim);
-    TrilinosWrappers::Vector  u;
-    u.reinit(dim);
+    TrilinosWrappers::MPI::Vector f;
+    f.reinit(complete_index_set(dim));
+    TrilinosWrappers::MPI::Vector u;
+    u.reinit(complete_index_set(dim));
 
     A.compress (VectorOperation::insert);
     f.compress (VectorOperation::insert);
     u.compress (VectorOperation::insert);
 
-    const auto lo_A = linear_operator<TrilinosWrappers::Vector>(A);
+    const auto lo_A = linear_operator<TrilinosWrappers::MPI::Vector>(A);
     const auto lo_null = null_operator(lo_A);
     const auto lo_A_plus_null = lo_A + lo_null;
 

@@ -57,12 +57,12 @@ int main(int argc, char **argv)
     A.reinit(csp);
     testproblem.five_point(A);
 
-    TrilinosWrappers::Vector f;
-    f.reinit(dim);
-    TrilinosWrappers::Vector u1;
-    u1.reinit(dim);
-    TrilinosWrappers::Vector u2;
-    u2.reinit(dim);
+    TrilinosWrappers::MPI::Vector f;
+    f.reinit(complete_index_set(dim),MPI_COMM_WORLD);
+    TrilinosWrappers::MPI::Vector u1;
+    u1.reinit(complete_index_set(dim),MPI_COMM_WORLD);
+    TrilinosWrappers::MPI::Vector u2;
+    u2.reinit(complete_index_set(dim),MPI_COMM_WORLD);
     f = 1.;
     A.compress (VectorOperation::insert);
     f.compress (VectorOperation::insert);
@@ -75,7 +75,7 @@ int main(int argc, char **argv)
     SolverControl solver_control(2000, 1.e-3);
     TrilinosWrappers::SolverCG solver(solver_control);
 
-    const auto lo_A = linear_operator<TrilinosWrappers::Vector>(A);
+    const auto lo_A = linear_operator<TrilinosWrappers::MPI::Vector>(A);
     const auto lo_A_inv = inverse_operator(lo_A,
                                            solver,
                                            preconditioner);

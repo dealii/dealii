@@ -62,8 +62,8 @@ private:
   ConstraintMatrix     constraints;
 
   TrilinosWrappers::SparseMatrix system_matrix;
-  TrilinosWrappers::Vector       solution;
-  TrilinosWrappers::Vector       system_rhs;
+  TrilinosWrappers::MPI::Vector       solution;
+  TrilinosWrappers::MPI::Vector       system_rhs;
 };
 
 
@@ -148,8 +148,8 @@ void Step4<dim>::setup_system ()
   DoFTools::make_sparsity_pattern (dof_handler, c_sparsity, constraints, false);
   system_matrix.reinit (c_sparsity);
 
-  solution.reinit (dof_handler.n_dofs());
-  system_rhs.reinit (dof_handler.n_dofs());
+  solution.reinit (complete_index_set(dof_handler.n_dofs()));
+  system_rhs.reinit (complete_index_set(dof_handler.n_dofs()));
 }
 
 
@@ -220,7 +220,7 @@ void Step4<dim>::solve ()
     deallog.pop();
   }
 
-  typedef TrilinosWrappers::Vector VectorType;
+  typedef TrilinosWrappers::MPI::Vector VectorType;
   VectorType output(solution);
   {
     deallog.push("Trilinos_CG_SSOR");

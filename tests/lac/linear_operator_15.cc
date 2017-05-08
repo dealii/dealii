@@ -69,18 +69,18 @@ int main (int argc, char *argv[])
     A.reinit(csp);
     testproblem.five_point(A);
 
-    TrilinosWrappers::Vector  f;
-    f.reinit(dim);
-    TrilinosWrappers::Vector  u;
-    u.reinit(dim);
+    TrilinosWrappers::MPI::Vector f;
+    f.reinit(complete_index_set(dim));
+    TrilinosWrappers::MPI::Vector u;
+    u.reinit(complete_index_set(dim));
 
     A.compress (VectorOperation::insert);
     f.compress (VectorOperation::insert);
     u.compress (VectorOperation::insert);
 
-    const auto lo_A = linear_operator<TrilinosWrappers::Vector>(A);
-    const auto lo_id_1 = identity_operator<TrilinosWrappers::Vector>(lo_A.reinit_range_vector);
-    const auto lo_id_2 = identity_operator<TrilinosWrappers::Vector>(lo_A);
+    const auto lo_A = linear_operator<TrilinosWrappers::MPI::Vector>(A);
+    const auto lo_id_1 = identity_operator<TrilinosWrappers::MPI::Vector>(lo_A.reinit_range_vector);
+    const auto lo_id_2 = identity_operator<TrilinosWrappers::MPI::Vector>(lo_A);
     const auto lo_A_plus_id_1 = lo_A + lo_id_1; // Not a good idea. See below.
     const auto lo_A_plus_id_2 = lo_A + lo_id_2;
 

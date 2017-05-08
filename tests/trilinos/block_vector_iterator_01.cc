@@ -19,17 +19,17 @@
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
-#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <fstream>
 #include <iostream>
 
 
 void test ()
 {
-  TrilinosWrappers::BlockVector v;
+  TrilinosWrappers::MPI::BlockVector v;
   v.reinit(2);
   for (unsigned int i=0; i<v.n_blocks(); ++i)
-    v.block(i).reinit(1);
+    v.block(i).reinit(complete_index_set(1),MPI_COMM_WORLD);
   v.collect_sizes();
 
   v(0) = 1;
@@ -38,7 +38,7 @@ void test ()
   // first check reading through a const
   // iterator
   {
-    TrilinosWrappers::BlockVector::const_iterator i=v.begin();
+    TrilinosWrappers::MPI::BlockVector::const_iterator i=v.begin();
     AssertThrow (*i == 1, ExcInternalError());
     ++i;
     AssertThrow (*i == 2, ExcInternalError());
@@ -47,8 +47,8 @@ void test ()
   // same, but create iterator in a different
   // way
   {
-    TrilinosWrappers::BlockVector::const_iterator
-    i=const_cast<const TrilinosWrappers::BlockVector &>(v).begin();
+    TrilinosWrappers::MPI::BlockVector::const_iterator
+    i=const_cast<const TrilinosWrappers::MPI::BlockVector &>(v).begin();
     AssertThrow (*i == 1, ExcInternalError());
     ++i;
     AssertThrow (*i == 2, ExcInternalError());
@@ -56,7 +56,7 @@ void test ()
 
   // read through a read-write iterator
   {
-    TrilinosWrappers::BlockVector::iterator i = v.begin();
+    TrilinosWrappers::MPI::BlockVector::iterator i = v.begin();
     AssertThrow (*i == 1, ExcInternalError());
     ++i;
     AssertThrow (*i == 2, ExcInternalError());
@@ -64,7 +64,7 @@ void test ()
 
   // write through a read-write iterator
   {
-    TrilinosWrappers::BlockVector::iterator i = v.begin();
+    TrilinosWrappers::MPI::BlockVector::iterator i = v.begin();
 
     *i = 2;
     ++i;
@@ -73,7 +73,7 @@ void test ()
 
   // and read again
   {
-    TrilinosWrappers::BlockVector::iterator i = v.begin();
+    TrilinosWrappers::MPI::BlockVector::iterator i = v.begin();
     AssertThrow (*i == 2, ExcInternalError());
     ++i;
     AssertThrow (*i == 3, ExcInternalError());

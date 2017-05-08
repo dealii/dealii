@@ -91,14 +91,9 @@ void test()
   cm.distribute(x);
   x_rel = x;
 
-  //x.print(std::cout);
-
-//  x_rel.print(std::cout);
-
-  TrilinosWrappers::Vector x_dub;
-  x_dub.reinit(dof_set.size());
-
-  x_dub = x_rel;
+  TrilinosWrappers::MPI::Vector x_dub;
+  x_dub.reinit(complete_index_set(dof_set.size()));
+  x_dub.reinit(x_rel, false, true);
 
   {
     std::stringstream out;

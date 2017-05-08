@@ -26,7 +26,7 @@
 #include <vector>
 
 
-void test (TrilinosWrappers::Vector &v)
+void test (TrilinosWrappers::MPI::Vector &v)
 {
   Vector<double> w (v.size());
   Vector<float>  x (v.size());
@@ -76,8 +76,8 @@ int main (int argc,char **argv)
   try
     {
       {
-        TrilinosWrappers::Vector v;
-        v.reinit(100);
+        TrilinosWrappers::MPI::Vector v;
+        v.reinit(complete_index_set(100), MPI_COMM_WORLD);
         test (v);
       }
     }

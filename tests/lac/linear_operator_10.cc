@@ -21,7 +21,7 @@
 #include <deal.II/lac/packaged_operation.h>
 
 #include <deal.II/lac/trilinos_block_sparse_matrix.h>
-#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_precondition.h>
 #include <deal.II/lac/trilinos_solver.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
@@ -224,7 +224,7 @@ int main(int argc, char *argv[])
     sparsity_pattern.compress();
 
     TrilinosWrappers::SparseMatrix A (sparsity_pattern);
-    TrilinosWrappers::Vector b;
+    TrilinosWrappers::MPI::Vector b;
     b.reinit(A.locally_owned_domain_indices());
     TrilinosWrappers::MPI::Vector c;
     c.reinit(A.locally_owned_domain_indices());
@@ -365,7 +365,7 @@ int main(int argc, char *argv[])
     //   typedef TrilinosWrappers::SolverDirect SLVR;
     //   // test_solver<SLVR> (A, b);
     //
-    //   typedef dealii::TrilinosWrappers::Vector VectorType;
+    //   typedef dealii::TrilinosWrappers::MPI::Vector VectorType;
     //   typedef dealii::TrilinosWrappers::internal::LinearOperator::TrilinosPayload PayloadType;
     //   // TODO: Full template expansion required for composite operator. Can one prevent this?
     //   //       i.e. is 'const auto lo_A = linear_operator<VectorType>(A);' possible?
@@ -382,7 +382,7 @@ int main(int argc, char *argv[])
     //   // Singular operation
     //   {
     //     deallog.push("S_Op");
-    //     const TrilinosWrappers::Vector x_approx = lo_A_inv*b;
+    //     const TrilinosWrappers::MPI::Vector x_approx = lo_A_inv*b;
     //     print(x_approx);
     //     deallog.pop();
     //   }
@@ -390,7 +390,7 @@ int main(int argc, char *argv[])
     //   // Composite operation
     //   {
     //     deallog.push("C_Op");
-    //     const TrilinosWrappers::Vector x_approx = (lo_A_inv*lo_A*lo_A_inv)*b;
+    //     const TrilinosWrappers::MPI::Vector x_approx = (lo_A_inv*lo_A*lo_A_inv)*b;
     //     print(x_approx);
     //     deallog.pop();
     //   }
