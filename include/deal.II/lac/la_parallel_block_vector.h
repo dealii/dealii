@@ -367,7 +367,7 @@ namespace LinearAlgebra
        * This function is mainly for internal consistency checks and should
        * seldom be used when not in debug mode since it uses quite some time.
        */
-      bool all_zero () const;
+      virtual bool all_zero () const override;
 
       /**
        * Compute the mean value of all the entries in the vector.

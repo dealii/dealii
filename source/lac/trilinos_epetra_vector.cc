@@ -389,6 +389,35 @@ namespace LinearAlgebra
 
 
 
+    bool Vector::all_zero() const
+    {
+      // get a representation of the vector and
+      // loop over all the elements
+      double *start_ptr = (*vector)[0];
+      const double *ptr  = start_ptr,
+                    *eptr = start_ptr + vector->MyLength();
+      unsigned int flag = 0;
+      while (ptr != eptr)
+        {
+          if (*ptr != 0)
+            {
+              flag = 1;
+              break;
+            }
+          ++ptr;
+        }
+
+      // Check that the vector is zero on _all_ processors.
+      const Epetra_MpiComm *mpi_comm
+        = dynamic_cast<const Epetra_MpiComm *>(&vector->Map().Comm());
+      Assert(mpi_comm != nullptr, ExcInternalError());
+      unsigned int num_nonzero = Utilities::MPI::sum(flag, mpi_comm->Comm());
+
+      return num_nonzero == 0;
+    }
+
+
+
     double Vector::mean_value() const
     {
       double mean_value(0.);

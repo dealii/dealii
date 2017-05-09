@@ -226,6 +226,11 @@ namespace LinearAlgebra
     virtual void equ(const Number a, const VectorSpaceVector<Number> &V);
 
     /**
+     * Return wether the vector contains only elements with value zero.
+     */
+    virtual bool all_zero() const override;
+
+    /**
      * Return the mean value of all the entries of this vector.
      */
     virtual value_type mean_value() const;

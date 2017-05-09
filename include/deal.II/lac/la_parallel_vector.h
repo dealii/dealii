@@ -897,7 +897,7 @@ namespace LinearAlgebra
        * This is a collective operation. This function is expensive, because
        * potentially all elements have to be checked.
        */
-      bool all_zero () const;
+      virtual bool all_zero () const override;
 
       /**
        * Compute the mean value of all the entries in the vector.

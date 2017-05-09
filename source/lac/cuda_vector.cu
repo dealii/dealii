@@ -916,6 +916,14 @@ namespace LinearAlgebra
 
 
     template <typename Number>
+    bool Vector<Number>::all_zero() const
+    {
+      return (linfty_norm() == 0) ? true : false;
+    }
+
+
+
+    template <typename Number>
     typename Vector<Number>::value_type Vector<Number>::mean_value() const
     {
       Number *result_device;

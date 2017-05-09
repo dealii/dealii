@@ -328,6 +328,21 @@ namespace LinearAlgebra
 
 
   template <typename Number>
+  bool Vector<Number>::all_zero() const
+  {
+    Assert(this->size(), ExcEmptyObject());
+
+    const size_type size = this->size();
+    for (size_type i=0; i<size; ++i)
+      if (this->val[i] != Number())
+        return false;
+
+    return true;
+  }
+
+
+
+  template <typename Number>
   typename Vector<Number>::value_type Vector<Number>::mean_value() const
   {
     Assert (this->size(), ExcEmptyObject());
