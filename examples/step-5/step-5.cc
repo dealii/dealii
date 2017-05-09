@@ -113,8 +113,6 @@ double coefficient (const Point<dim> &p)
   else
     return 1;
 }
-// @note Mapping of this representation of the coefficient to the mesh cell
-// is non-trivial, see Results section of step-6 for more discussion.
 
 // @sect3{The <code>Step5</code> class implementation}
 
