@@ -102,8 +102,10 @@ int main(int argc,char **argv)
       TrilinosWrappers::SparseMatrix C (rc,rc,rc);
       TrilinosWrappers::SparseMatrix D (rc,rc,rc);
 
-      VectorType y (rc);
-      VectorType g (rc);
+      VectorType y;
+      y.reinit(rc);
+      VectorType g;
+      g.reinit(rc);
       for (unsigned int i=0; i < rc; ++i)
         {
           A.set(i,i, 1.0*(i+1));

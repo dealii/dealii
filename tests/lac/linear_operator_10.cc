@@ -224,8 +224,10 @@ int main(int argc, char *argv[])
     sparsity_pattern.compress();
 
     TrilinosWrappers::SparseMatrix A (sparsity_pattern);
-    TrilinosWrappers::Vector b (A.domain_partitioner());
-    TrilinosWrappers::MPI::Vector c (A.domain_partitioner());
+    TrilinosWrappers::Vector b;
+    b.reinit(A.locally_owned_domain_indices());
+    TrilinosWrappers::MPI::Vector c;
+    c.reinit(A.locally_owned_domain_indices());
     for (unsigned int i=0; i < rc; ++i)
       {
         A.set(i,i,2.0);

@@ -69,8 +69,10 @@ int main (int argc, char *argv[])
     A.reinit(csp);
     testproblem.five_point(A);
 
-    TrilinosWrappers::Vector  f(dim);
-    TrilinosWrappers::Vector  u(dim);
+    TrilinosWrappers::Vector  f;
+    f.reinit(dim);
+    TrilinosWrappers::Vector  u;
+    u.reinit(dim);
 
     A.compress (VectorOperation::insert);
     f.compress (VectorOperation::insert);
