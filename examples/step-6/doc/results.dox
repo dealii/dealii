@@ -501,25 +501,26 @@ is usually rather inaccurate if the integrand is discontinuous on a
 cell.
 
 Consequently, it is worthwhile to align cells in such a way that the
-interfaces where the coefficient is discontinuous are aligned with
-cell interfaces. This way, the coefficient is constant on each cell,
-the integrand is smooth on each cell, its polynomial approximation is
-accurate, and the quadrature approximation of the integral is accurate
-as well. Note, that such an alignment is rather common in many
-practical cases, so deal.ii provides a number of functions
-(e.g. CellAccessor::material_id() and so on) to manage such a case.
-Refer to  step-28 as an advanced usage example.
+interfaces across which the coefficient is discontinuous are aligned
+with cell interfaces.  This way, the coefficient is constant on each
+cell, following which the integrand will be smooth, and its polynomial
+approximation and the quadrature approximation of the integral will
+both be accurate.  Note that such an alignment is common in many
+practical cases, so deal.II provides a number of functions (such as
+@ref GlossMaterialId "material_id") to help manage such a scenario.
+Refer to step-28 and step-46 for examples of how material id's can be
+applied.
 
-Finally, let us consider the case of a coefficient with smooth and
-non-uniform distribution in space. We can repeat once again all the
-discussion on the representation of such a function with the
-quadrature. So, to simulate it accurately you have basically few
-options: you can reduce the cell size and/or increase the order of the
-polynomial used in the quadrature formula and/or select a more
-appropriate quadrature formula. The key is to provide the best fit of
-the coefficient dependence with the quadrature polynomial interpolant,
-this will provide an accurate mapping of your model to the FEM
-description.
+Finally, let us consider the case of a coefficient that has a smooth
+and non-uniform distribution in space. We can repeat once again all of
+the above discussion on the representation of such a function with the
+quadrature. So, to simulate it accurately there are a few readily
+available options: you could reduce the cell size, increase the order
+of the polynomial used in the quadrature formula, select a more
+appropriate quadrature formula, or perform a combination of these
+steps. The key is to provide the best fit of the coefficient space
+dependence with the quadrature polynomial interpolant, this will
+provide an accurate mapping of your model to the FEM description.
 
 
 <h4>Playing with the regularity of the solution</h4>
