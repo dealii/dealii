@@ -31,7 +31,7 @@ Cycle 7:
 
 
 
-As intended, the number of cells roughly doubles in each cycle.  The
+As intended, the number of cells roughly doubles in each cycle. The
 number of degrees is slightly more than four times the number of
 cells; one would expect a factor of exactly four in two spatial
 dimensions on an infinite grid (since the spacing between the degrees
@@ -488,7 +488,7 @@ Why does it make sense to choose a mesh that tracks the internal
 interface? There are a number of reasons, but the most essential one
 comes down to what we actually integrate in our bilinear
 form. Conceptually, we want to integrate the term $A_{ij}^K=\int_K
-a(\mathbf x) \varphi_i(\mathbf x) \varphi_j(\mathbf x) ; dx$ as the
+a(\mathbf x) \nabla \varphi_i(\mathbf x) \nabla \varphi_j(\mathbf x) ; dx$ as the
 contribution of cell $K$ to the matrix entry $A_{ij}$. We can not
 compute it exactly and have to resort to quadrature. We know that
 quadrature is accurate if the integrand is smooth. That is because
@@ -502,10 +502,10 @@ cell.
 
 Consequently, it is worthwhile to align cells in such a way that the
 interfaces across which the coefficient is discontinuous are aligned
-with cell interfaces.  This way, the coefficient is constant on each
+with cell interfaces. This way, the coefficient is constant on each
 cell, following which the integrand will be smooth, and its polynomial
 approximation and the quadrature approximation of the integral will
-both be accurate.  Note that such an alignment is common in many
+both be accurate. Note that such an alignment is common in many
 practical cases, so deal.II provides a number of functions (such as
 @ref GlossMaterialId "material_id") to help manage such a scenario.
 Refer to step-28 and step-46 for examples of how material id's can be
@@ -518,9 +518,9 @@ quadrature. So, to simulate it accurately there are a few readily
 available options: you could reduce the cell size, increase the order
 of the polynomial used in the quadrature formula, select a more
 appropriate quadrature formula, or perform a combination of these
-steps. The key is to provide the best fit of the coefficient`s spatial
-dependence with the quadrature polynomial interpolant, this will
-provide an accurate mapping of your model to the FEM description.
+steps. The key is that providing the best fit of the coefficient's
+spatial dependence with the quadrature polynomial will lead to a more
+accurate finite element solution of the PDE.
 
 <h4>Playing with the regularity of the solution</h4>
 
