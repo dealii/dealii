@@ -450,6 +450,26 @@ public:
   };
 
   /**
+   * An enumeration data type that describes the type of data to return
+   * when fetching the data from the timer.
+   */
+  enum OutputData
+  {
+    /**
+     * Output CPU times.
+     */
+    total_cpu_time,
+    /**
+     * Output wall clock times.
+     */
+    total_wall_time,
+    /**
+     * Output number of calls.
+     */
+    n_calls
+  };
+
+  /**
    * An enumeration data type that describes whether to show CPU times, wall
    * times, or both CPU and wall times whenever we generate output.
    */
@@ -588,6 +608,11 @@ public:
    * Same as @p leave_subsection.
    */
   void exit_section (const std::string &section_name = std::string());
+
+  /**
+   * Get a map with the collected data of the specified type for each subsection
+   */
+  std::map<std::string, double> get_summary_data (const OutputData kind) const;
 
   /**
    * Print a formatted table that summarizes the time consumed in the various

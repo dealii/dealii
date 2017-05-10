@@ -474,6 +474,32 @@ TimerOutput::leave_subsection (const std::string &section_name)
 
 
 
+std::map<std::string, double>
+TimerOutput::get_summary_data (const OutputData kind) const
+{
+  std::map<std::string, double> output;
+  for (const auto &section : sections)
+    {
+      switch (kind)
+        {
+        case TimerOutput::OutputData::total_cpu_time:
+          output[section.first] = section.second.total_cpu_time;
+          break;
+        case TimerOutput::OutputData::total_wall_time:
+          output[section.first] = section.second.total_wall_time;
+          break;
+        case TimerOutput::OutputData::n_calls:
+          output[section.first] = section.second.n_calls;
+          break;
+        default:
+          Assert(false, ExcNotImplemented());
+        }
+    }
+  return output;
+}
+
+
+
 void
 TimerOutput::print_summary () const
 {
