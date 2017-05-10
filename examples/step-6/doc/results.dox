@@ -518,10 +518,9 @@ quadrature. So, to simulate it accurately there are a few readily
 available options: you could reduce the cell size, increase the order
 of the polynomial used in the quadrature formula, select a more
 appropriate quadrature formula, or perform a combination of these
-steps. The key is to provide the best fit of the coefficient space
+steps. The key is to provide the best fit of the coefficient`s spatial
 dependence with the quadrature polynomial interpolant, this will
 provide an accurate mapping of your model to the FEM description.
-
 
 <h4>Playing with the regularity of the solution</h4>
 
