@@ -132,55 +132,6 @@ namespace
 }
 
 
-namespace
-{
-  /**
-   * Sorts the vector @p ind as an index vector of @p a in increasing order.
-   * This implementation of quicksort seems to be faster than the standard
-   * library version and is needed in @p refine_and_coarsen_optimize.
-   */
-
-  template <class VectorType>
-  void qsort_index (const VectorType          &a,
-                    std::vector<unsigned int> &ind,
-                    int                        l,
-                    int                        r)
-  {
-    int i,j;
-    typename VectorType::value_type v;
-
-    if (r<=l)
-      return;
-
-    v = a(ind[r]);
-    i = l-1;
-    j = r;
-    do
-      {
-        do
-          {
-            ++i;
-          }
-        while ((a(ind[i])>v) && (i<r));
-        do
-          {
-            --j;
-          }
-        while ((a(ind[j])<v) && (j>0));
-
-        if (i<j)
-          std::swap (ind[i], ind[j]);
-        else
-          std::swap (ind[i], ind[r]);
-      }
-    while (i<j);
-    qsort_index(a,ind,l,i-1);
-    qsort_index(a,ind,i+1,r);
-  }
-}
-
-
-
 
 template <int dim, class VectorType, int spacedim>
 void GridRefinement::refine (Triangulation<dim,spacedim> &tria,
@@ -515,26 +466,29 @@ GridRefinement::refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
           ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
   Assert (criteria.is_non_negative (), ExcNegativeCriteria());
 
-  // get an increasing order on
-  // the error indicator
-  std::vector<unsigned int> tmp(criteria.size());
-  for (unsigned int i=0; i<criteria.size(); ++i)
-    tmp[i] = i;
+  // get a decreasing order on the error indicator
+  std::vector<unsigned int> cell_indices(criteria.size());
+  std::iota(cell_indices.begin(), cell_indices.end(), 0);
 
-  qsort_index (criteria, tmp, 0, criteria.size()-1);
+  std::sort(cell_indices.begin(), cell_indices.end(),
+            [&criteria](const unsigned int left,
+                        const unsigned int right)
+  {
+    return criteria[left] > criteria[right];
+  });
 
   double expected_error_reduction = 0;
   const double original_error     = criteria.l1_norm();
 
-  const unsigned int N = criteria.size();
+  const std::size_t N = criteria.size();
 
   // minimize the cost functional discussed in the documentation
   double min_cost = std::numeric_limits<double>::max();
-  unsigned int min_arg = 0;
+  std::size_t min_arg = 0;
 
-  for (unsigned int M = 0; M<criteria.size(); ++M)
+  for (std::size_t M = 0; M<criteria.size(); ++M)
     {
-      expected_error_reduction += (1-std::pow(2.,-1.*order)) * criteria(tmp[M]);
+      expected_error_reduction += (1-std::pow(2.,-1.*order)) * criteria(cell_indices[M]);
 
       const double cost = std::pow(((std::pow(2.,dim)-1)*(1+M)+N),
                                    (double)order/dim) *
@@ -546,7 +500,7 @@ GridRefinement::refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
         }
     }
 
-  refine (tria, criteria, criteria(tmp[min_arg]));
+  refine (tria, criteria, criteria(cell_indices[min_arg]));
 }
 
 
