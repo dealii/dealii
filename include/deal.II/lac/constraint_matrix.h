@@ -193,6 +193,16 @@ public:
   explicit ConstraintMatrix (const ConstraintMatrix &constraint_matrix);
 
   /**
+   * Move constructor
+   */
+  ConstraintMatrix (ConstraintMatrix &&constraint_matrix) = default;
+
+  /**
+   * Move assignment operator
+   */
+  ConstraintMatrix &operator= (ConstraintMatrix &&constraint_matrix) = default;
+
+  /**
    * clear() the ConstraintMatrix object and supply an IndexSet with lines
    * that may be constrained. This function is only relevant in the
    * distributed case to supply a different IndexSet. Otherwise this routine
