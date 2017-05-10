@@ -1,0 +1,3 @@
+New: The vertex (and face) iterator for dimension 1 triangulations now implements
+the get_manifold method.
+<br> (David Wells, 2017/05/10)
