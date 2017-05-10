@@ -416,7 +416,13 @@ namespace TrilinosWrappers
 
 
 
-
+  MPI_Comm
+  BlockSparseMatrix::get_mpi_communicator () const
+  {
+    Assert (this->n_block_cols() != 0, ExcNotInitialized());
+    Assert (this->n_block_rows() != 0, ExcNotInitialized());
+    return this->sub_objects[0][0]->get_mpi_communicator();
+  }
 
 
 

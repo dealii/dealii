@@ -1,0 +1,7 @@
+New: TrilinosWrappers::MPI::BlockMatrix can now return its MPI_Comm via
+get_mpi_communicator() and its range and domain indices via
+locally_owned_range_indices() and locally_owned_domain_indices()
+relying on the information of the TrilinosWrappers::MPI::Matrix
+object it is based on.
+<br>
+(Daniel Arndt, 2017/05/09)

@@ -456,7 +456,8 @@ namespace internal
                                 TrilinosWrappers::MPI::BlockVector &v,
                                 bool omit_zeroing_entries)
       {
-        v.reinit(matrix.range_partitioner(), omit_zeroing_entries);
+        v.reinit(matrix.locally_owned_range_indices(),
+                 matrix.get_mpi_communicator(), omit_zeroing_entries);
       }
 
       template <typename Matrix>
@@ -465,7 +466,8 @@ namespace internal
                                 TrilinosWrappers::MPI::BlockVector &v,
                                 bool omit_zeroing_entries)
       {
-        v.reinit(matrix.domain_partitioner(), omit_zeroing_entries);
+        v.reinit(matrix.locally_owned_domain_indices(),
+                 matrix.get_mpi_communicator(), omit_zeroing_entries);
       }
     };
 

@@ -225,6 +225,11 @@ namespace TrilinosWrappers
     size_type n_nonzero_elements () const;
 
     /**
+     * Return the MPI communicator object in use with this matrix.
+     */
+    MPI_Comm get_mpi_communicator () const;
+
+    /**
      * Return a vector of the underlying Trilinos Epetra_Map that sets the
      * partitioning of the domain space of this block matrix, i.e., the
      * partitioning of the individual block vectors this matrix has to be
@@ -246,6 +251,19 @@ namespace TrilinosWrappers
      */
     std::vector<Epetra_Map> range_partitioner () const DEAL_II_DEPRECATED;
 
+    /**
+     * Return the partitioning of the domain space for the individual blocks of
+     * this matrix, i.e., the partitioning of the block vectors this matrix has
+     * to be multiplied with.
+     */
+    std::vector<IndexSet> locally_owned_domain_indices() const;
+
+    /**
+     * Return the partitioning of the range space for the individual blocks of
+     * this matrix, i.e., the partitioning of the block vectors that result
+     * from matrix-vector products.
+     */
+    std::vector<IndexSet> locally_owned_range_indices() const;
 
     /**
      * Matrix-vector multiplication: let $dst = M*src$ with $M$ being this
@@ -561,6 +579,38 @@ namespace TrilinosWrappers
       BaseClass::Tvmult_nonblock_nonblock (dst, src);
     else
       BaseClass::vmult_nonblock_nonblock (dst, src);
+  }
+
+
+
+  inline
+  std::vector<IndexSet>
+  BlockSparseMatrix::locally_owned_domain_indices () const
+  {
+    Assert (this->n_block_cols() != 0, ExcNotInitialized());
+    Assert (this->n_block_rows() != 0, ExcNotInitialized());
+
+    std::vector<IndexSet> domain_indices;
+    for (size_type c = 0; c < this->n_block_cols(); ++c)
+      domain_indices.push_back(this->sub_objects[0][c]->locally_owned_domain_indices());
+
+    return domain_indices;
+  }
+
+
+
+  inline
+  std::vector<IndexSet>
+  BlockSparseMatrix::locally_owned_range_indices () const
+  {
+    Assert (this->n_block_cols() != 0, ExcNotInitialized());
+    Assert (this->n_block_rows() != 0, ExcNotInitialized());
+
+    std::vector<IndexSet> range_indices;
+    for (size_type r = 0; r < this->n_block_rows(); ++r)
+      range_indices.push_back(this->sub_objects[r][0]->locally_owned_range_indices());
+
+    return range_indices;
   }
 
 
