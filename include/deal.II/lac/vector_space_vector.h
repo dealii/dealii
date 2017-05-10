@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2016 by the deal.II authors
+// Copyright (C) 2015 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -140,6 +140,11 @@ namespace LinearAlgebra
      * Assignment <tt>*this = a*V</tt>.
      */
     virtual void equ(const Number a, const VectorSpaceVector<Number> &V) = 0;
+
+    /**
+     * Return whether the vector contains only elements with value zero.
+     */
+    virtual bool all_zero() const = 0;
 
     /**
      * Return the mean value of all the entries of this vector.
