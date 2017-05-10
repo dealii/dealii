@@ -59,6 +59,7 @@ recent version or use a different MPI library like MPICH.\n"
     ENDIF()
 
   ENDFOREACH()
+  MESSAGE(FATAL_ERROR "quick tests failed")
 
   # The CMake command MESSAGE(SEND_ERROR ...) is, to the best of the authors'
   # knowledge, the only way to set the exit status of CMake to a nonzero value.
