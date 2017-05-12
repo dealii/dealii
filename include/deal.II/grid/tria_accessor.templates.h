@@ -2887,6 +2887,16 @@ TriaAccessor<0, 1, spacedim>::boundary_id () const
 
 template <int spacedim>
 inline
+const Manifold<1, spacedim> &
+TriaAccessor<0, 1, spacedim>::get_manifold () const
+{
+  return this->tria->get_manifold(this->manifold_id());
+}
+
+
+
+template <int spacedim>
+inline
 types::manifold_id
 TriaAccessor<0, 1, spacedim>::manifold_id () const
 {

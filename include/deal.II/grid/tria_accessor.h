@@ -2110,6 +2110,11 @@ public:
   types::boundary_id boundary_id () const;
 
   /**
+   * Return a constant reference to the manifold object used for this object.
+   */
+  const Manifold<1,spacedim> &get_manifold () const;
+
+  /**
    * Return the manifold indicator of this object.
    *
    * @see
