@@ -576,7 +576,8 @@ void test ()
 
 int main (int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv,
+                                            testing_max_num_threads());
 
   mpi_initlog();
   deallog.threshold_double(1e-9);
