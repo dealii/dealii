@@ -14,10 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// same test as parallel_multigrid_adaptive_01 but using
-// MGTransferMatrixFree rather the MGTransferPrebuilt (and manually
-// implementing the full LaplaceOperator class rather than using the
-// operator as in _02)
+// same test as parallel_multigrid_adaptive_03 but using partition_color
 
 #include "../tests.h"
 
@@ -65,7 +62,7 @@ public:
     const QGauss<1> quad (n_q_points_1d);
     typename MatrixFree<dim,number>::AdditionalData addit_data;
     if (threaded)
-      addit_data.tasks_parallel_scheme = MatrixFree<dim,number>::AdditionalData::partition_partition;
+      addit_data.tasks_parallel_scheme = MatrixFree<dim,number>::AdditionalData::partition_color;
     else
       addit_data.tasks_parallel_scheme = MatrixFree<dim,number>::AdditionalData::none;
     addit_data.tasks_block_size = 3;
@@ -563,9 +560,6 @@ void test ()
       dof.distribute_dofs(fe);
       dof.distribute_mg_dofs(fe);
 
-      deallog.push("nothread");
-      do_test<dim, fe_degree, fe_degree+1, Number> (dof, false);
-      deallog.pop();
       deallog.push("threaded");
       do_test<dim, fe_degree, fe_degree+1, Number> (dof, true);
       deallog.pop();
@@ -576,14 +570,12 @@ void test ()
 
 int main (int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv,
-                                            testing_max_num_threads());
+  // The original issue with partition_color
+  // is hit with 2 threads and 4 cores.
+  Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 2);
 
   mpi_initlog();
   deallog.threshold_double(1e-9);
 
   test<2,1,double>();
-  test<2,3,float>();
-  test<3,1,double>();
-  test<3,2,float>();
 }
