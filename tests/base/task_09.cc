@@ -61,8 +61,7 @@ void outer ()
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.e-10);
 
   for (unsigned int i=0; i<MultithreadInfo::n_cores()*2; ++i)

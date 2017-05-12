@@ -107,8 +107,7 @@ namespace Step38
 
 int main ()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   {
     using namespace dealii;

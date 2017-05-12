@@ -318,8 +318,7 @@ int main (int argc, char **argv)
     {
       using namespace dealii;
 
-      std::ofstream logfile("output");
-      deallog.attach(logfile);
+      initlog();
       deallog.threshold_double(1.e-10);
 
 

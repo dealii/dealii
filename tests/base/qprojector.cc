@@ -176,8 +176,7 @@ void check(Quadrature<1> &q)
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog << std::setprecision(2);
 
   deallog.threshold_double(1.e-10);

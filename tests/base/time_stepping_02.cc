@@ -63,8 +63,7 @@ void test(TimeStepping::EmbeddedExplicitRungeKutta<Vector<double> > &solver,
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.e-10);
 
   TimeStepping::EmbeddedExplicitRungeKutta<Vector<double> > he(TimeStepping::HEUN_EULER);

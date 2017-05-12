@@ -1,5 +1,6 @@
 // Test the sizes of fundamental types, their pointers, and vectors comprised
 // of either.
+#include "../tests.h"
 #include <deal.II/base/config.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/memory_consumption.h>
@@ -52,8 +53,7 @@ struct EqualityWithSizeofTest<T *>
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   // do not test value type (just pointers) with void
   EqualityWithSizeofTest<void *> a;

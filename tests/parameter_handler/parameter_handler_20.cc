@@ -52,8 +52,7 @@ void check (const char *content)
 
 int main ()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.e-10);
 
   check ("subsection bar\nend  #comment is okay");

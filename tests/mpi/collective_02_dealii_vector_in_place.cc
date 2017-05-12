@@ -72,8 +72,7 @@ int main(int argc, char *argv[])
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
-      std::ofstream logfile("output");
-      deallog.attach(logfile);
+      initlog();
       deallog.threshold_double(1.e-10);
 
       deallog.push("mpi");

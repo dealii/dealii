@@ -82,8 +82,7 @@ void test (const FilteredMatrix<VectorType> &M)
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   PreconditionIdentity identity;
   FilteredMatrix<Vector<double> > f;

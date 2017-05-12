@@ -191,8 +191,7 @@ int main ()
 {
   const int dim = 1;
 
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1e-8);
 
   test_legendre_orthonormal(3);

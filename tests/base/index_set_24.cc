@@ -23,8 +23,7 @@
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   IndexSet is1(100);
   is1.add_range(0, 10);

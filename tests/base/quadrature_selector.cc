@@ -43,8 +43,7 @@ void check (const std::string     &name,
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.e-10);
 
   check ("gauss", 2, QGauss<1>(2));

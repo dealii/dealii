@@ -36,6 +36,7 @@
 //
 // The domain is a distorted cube which will contain non-rectangular faces.
 
+#include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
@@ -458,8 +459,7 @@ int main ()
 {
   using namespace Maxwell;
 
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   for (unsigned int p=0; p<3; ++p)
     {

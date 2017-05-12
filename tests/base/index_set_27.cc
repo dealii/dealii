@@ -23,8 +23,7 @@
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   const unsigned int size = 100;
 

@@ -46,8 +46,7 @@ void test (MatrixType &m)
 
 int main (int argc,char **argv)
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.e-10);
 
   try

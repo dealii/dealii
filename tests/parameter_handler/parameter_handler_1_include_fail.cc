@@ -48,8 +48,7 @@ void check (const char *p)
 
 int main ()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.e-10);
 
   // go into the source dir to read files there. this

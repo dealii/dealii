@@ -94,8 +94,7 @@ int main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   AnyData data;
   fill(data);

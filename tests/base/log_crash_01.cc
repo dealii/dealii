@@ -31,8 +31,7 @@ int main()
 
   try
     {
-      std::ofstream logfile("output");
-      deallog.attach(logfile);
+      initlog();
       deallog << "OK" << std::endl;
       deallog << "no newline here!";
     }

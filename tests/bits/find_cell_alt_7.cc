@@ -64,8 +64,7 @@ void check (Triangulation<2> &tria)
 
 int main ()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog << std::scientific;
   deallog.precision(8);
 

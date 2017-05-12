@@ -106,8 +106,7 @@ void test()
 
 int main ()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   test();
 }

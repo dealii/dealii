@@ -135,8 +135,7 @@ void test(unsigned int ref=1)
 
 int main ()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.e-8);
 
   test<1,1>();

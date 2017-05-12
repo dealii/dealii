@@ -22,8 +22,7 @@
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.0e-10);
 
   const unsigned int entries[] = {1, 2, 3, 4, 5, 6};

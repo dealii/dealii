@@ -41,8 +41,7 @@
 
 int main ()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.e-10);
 
   const CylindricalManifold<3> boundary_description;

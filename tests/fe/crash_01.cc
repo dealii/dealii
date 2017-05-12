@@ -78,8 +78,7 @@ void test(FiniteElement<dim> &fe)
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog << std::setprecision(7);
   deallog.threshold_double(1.e-10);
 

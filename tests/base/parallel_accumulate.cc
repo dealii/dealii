@@ -35,8 +35,7 @@ int sum (const int begin,
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.e-10);
 
   const int N = 10000;

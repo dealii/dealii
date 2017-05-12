@@ -121,8 +121,7 @@ void test()
 
 int main ()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1e-14);
 
   deallog.push("values");

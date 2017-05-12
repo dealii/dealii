@@ -60,8 +60,7 @@ void test()
 
 int main ()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.depth_console(0);
 
   test();

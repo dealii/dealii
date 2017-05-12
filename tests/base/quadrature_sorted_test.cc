@@ -204,8 +204,7 @@ check_quadratures (const std::vector<Quadrature<dim>*> &quadratures)
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.e-10);
 
   std::vector<Quadrature<1> *> q1;

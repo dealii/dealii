@@ -26,8 +26,7 @@
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   typedef std::array<std::array<int, 3>, 3> IntArray;
   deallog << dealii::MemoryConsumption::memory_consumption(IntArray()) << std::endl;

@@ -401,8 +401,7 @@ void MaxwellProblem<dim>::run ()
 
 int main ()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   MaxwellProblem<2> maxwell(4);
   maxwell.run ();

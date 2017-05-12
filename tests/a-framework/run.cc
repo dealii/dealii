@@ -26,8 +26,7 @@
 
 int main ()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   std::abort ();
 

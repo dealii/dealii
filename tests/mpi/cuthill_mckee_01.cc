@@ -50,8 +50,7 @@ int main(int argc, char *argv[])
   deallog.push(Utilities::int_to_string(myid));
   if (myid == 0)
     {
-      std::ofstream logfile("output");
-      deallog.attach(logfile);
+      initlog();
       deallog.threshold_double(1.e-10);
 
       deallog.push("2d");
