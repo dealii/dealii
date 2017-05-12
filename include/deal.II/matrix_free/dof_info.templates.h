@@ -839,13 +839,11 @@ no_constraint:
             std::min(((size_info.boundary_cells_end+task_info.block_size-1)/
                       task_info.block_size)*task_info.block_size,
                      size_info.n_macro_cells);
-          start_up = start_nonboundary;
           size_info.boundary_cells_end = start_nonboundary;
         }
       else
         {
           start_nonboundary = size_info.n_macro_cells;
-          start_up = size_info.n_macro_cells;
           size_info.boundary_cells_start = 0;
           size_info.boundary_cells_end = size_info.n_macro_cells;
         }
@@ -948,10 +946,11 @@ no_constraint:
         {
           // put all cells up to begin_inner_cells into first partition. if
           // the numbers do not add up exactly, assign an additional block
-          if (start_nonboundary>0 && start_up == start_nonboundary)
+          if (start_nonboundary>0)
             {
               unsigned int n_blocks = ((start_nonboundary+task_info.block_size-1)
                                        /task_info.block_size);
+              start_nonboundary = 0;
               for (unsigned int cell=0; cell<n_blocks; ++cell)
                 {
                   cell_partition[cell] = partition;
