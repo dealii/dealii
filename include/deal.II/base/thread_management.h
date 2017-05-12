@@ -291,8 +291,7 @@ namespace Threads
     /**
      * Default constructor.
      */
-    Mutex ()
-    {}
+    Mutex () = default;
 
     /**
      * Copy constructor. As discussed in this class's documentation, no state
@@ -1223,7 +1222,7 @@ namespace Threads
      * this way, except for assigning it a thread object that holds data
      * created by the new_thread() functions.
      */
-    Thread () {}
+    Thread () = default;
 
     /**
      * Copy constructor.
@@ -3103,7 +3102,7 @@ namespace Threads
      * @post Using this constructor leaves the object in an unjoinable state,
      * i.e., joinable() will return false.
      */
-    Task () {}
+    Task () = default;
 
     /**
      * Join the task represented by this object, i.e. wait for it to finish.

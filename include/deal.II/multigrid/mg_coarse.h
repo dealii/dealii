@@ -278,7 +278,7 @@ public:
   /**
    * Constructor leaving an uninitialized object.
    */
-  MGCoarseGridSVD ();
+  MGCoarseGridSVD () = default;
 
   /**
    * Initialize for a new matrix. This resets the dimensions to the
@@ -548,11 +548,6 @@ MGCoarseGridHouseholder<number, VectorType>::operator() (const unsigned int /*le
 }
 
 //---------------------------------------------------------------------------
-
-template<typename number, class VectorType>
-inline
-MGCoarseGridSVD<number, VectorType>::MGCoarseGridSVD()
-{}
 
 
 

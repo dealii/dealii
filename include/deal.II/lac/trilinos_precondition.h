@@ -1863,12 +1863,7 @@ namespace TrilinosWrappers
      * preconditioner to be handed to a smoother.  This does nothing.
      */
     struct AdditionalData
-    {
-      /**
-       * Constructor.
-       */
-      AdditionalData () {}
-    };
+    {};
 
     /**
      * The matrix argument is ignored and here just for compatibility with more

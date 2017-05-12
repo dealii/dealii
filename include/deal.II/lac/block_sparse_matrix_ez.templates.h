@@ -23,13 +23,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
-template <typename number>
-BlockSparseMatrixEZ<number>::BlockSparseMatrixEZ ()
-{}
-
-
-
 template <typename number>
 BlockSparseMatrixEZ<number>::
 BlockSparseMatrixEZ (const unsigned int rows,

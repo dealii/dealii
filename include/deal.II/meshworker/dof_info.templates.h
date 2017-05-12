@@ -39,10 +39,6 @@ namespace MeshWorker
   }
 
 
-  template <int dim, int spacedim, typename number>
-  DoFInfo<dim,spacedim,number>::DoFInfo()
-  {}
-
 
   template <int dim, int spacedim, typename number>
   void

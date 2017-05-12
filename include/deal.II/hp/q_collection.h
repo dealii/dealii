@@ -50,7 +50,7 @@ namespace hp
      * Default constructor. Leads to an empty collection that can later be
      * filled using push_back().
      */
-    QCollection ();
+    QCollection () = default;
 
     /**
      * Conversion constructor. This constructor creates a QCollection from a
@@ -173,13 +173,6 @@ namespace hp
             ExcIndexRange (index, 0, quadratures.size ()));
     return *quadratures[index];
   }
-
-
-
-  template <int dim>
-  inline
-  QCollection<dim>::QCollection ()
-  {}
 
 
 

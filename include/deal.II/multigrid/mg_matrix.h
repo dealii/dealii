@@ -47,7 +47,7 @@ namespace mg
     /**
      * Default constructor for an empty object.
      */
-    Matrix();
+    Matrix() = default;
 
     /**
      * Constructor setting up pointers to the matrices in <tt>M</tt> by
@@ -192,13 +192,6 @@ namespace mg
   {
     initialize(p);
   }
-
-
-
-  template <typename VectorType>
-  inline
-  Matrix<VectorType>::Matrix ()
-  {}
 
 
 

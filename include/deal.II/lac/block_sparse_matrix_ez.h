@@ -60,7 +60,7 @@ public:
   /**
    * Default constructor. The result is an empty object with zero dimensions.
    */
-  BlockSparseMatrixEZ ();
+  BlockSparseMatrixEZ () = default;
 
   /**
    * Constructor setting up an object with given number of block rows and

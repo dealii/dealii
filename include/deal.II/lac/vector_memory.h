@@ -176,7 +176,7 @@ public:
   /**
    * Constructor.
    */
-  PrimitiveVectorMemory () {}
+  PrimitiveVectorMemory () = default;
 
   /**
    * Return a pointer to a new vector. The number of elements or their

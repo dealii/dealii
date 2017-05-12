@@ -171,7 +171,7 @@ namespace MeshWorker
      * constructor is not recommended, but it is needed for the arrays in
      * DoFInfoBox.
      */
-    DoFInfo ();
+    DoFInfo () = default;
 
     /// Set up local block indices
     void set_block_indices ();

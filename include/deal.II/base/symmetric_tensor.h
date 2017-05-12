@@ -529,7 +529,7 @@ public:
   /**
    * Default constructor. Creates a tensor with all entries equal to zero.
    */
-  SymmetricTensor ();
+  SymmetricTensor () = default;
 
   /**
    * Constructor. Generate a symmetric tensor from a general one. Assumes that
@@ -919,13 +919,6 @@ namespace internal
     }
   }
 }
-
-
-
-template <int rank, int dim, typename Number>
-inline
-SymmetricTensor<rank,dim,Number>::SymmetricTensor ()
-{}
 
 
 

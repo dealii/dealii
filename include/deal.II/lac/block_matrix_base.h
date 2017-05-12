@@ -369,7 +369,7 @@ public:
   /**
    * Default constructor.
    */
-  BlockMatrixBase ();
+  BlockMatrixBase () = default;
 
   /**
    * Destructor.
@@ -1484,12 +1484,6 @@ namespace BlockMatrixIterators
 
 
 //---------------------------------------------------------------------------
-
-
-template <typename MatrixType>
-inline
-BlockMatrixBase<MatrixType>::BlockMatrixBase ()
-{}
 
 template <typename MatrixType>
 inline
