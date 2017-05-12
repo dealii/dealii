@@ -293,7 +293,8 @@ namespace MeshWorker
     /**
      * Constructor.
      */
-    VectorData();
+    VectorData() = default;
+
     /**
      * Constructor using a prefilled VectorSelector
      */
@@ -359,7 +360,7 @@ namespace MeshWorker
     /**
      * Constructor.
      */
-    MGVectorData();
+    MGVectorData() = default;
 
     /**
      * Constructor using a prefilled VectorSelector

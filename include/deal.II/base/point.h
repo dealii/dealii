@@ -93,7 +93,7 @@ public:
    * Standard constructor. Creates an object that corresponds to the origin,
    * i.e., all coordinates are set to zero.
    */
-  Point ();
+  Point () = default;
 
   /**
    * Convert a tensor to a point.
@@ -248,13 +248,6 @@ public:
 /*------------------------------- Inline functions: Point ---------------------------*/
 
 #ifndef DOXYGEN
-
-template <int dim, typename Number>
-inline
-Point<dim,Number>::Point ()
-{}
-
-
 
 template <int dim, typename Number>
 inline

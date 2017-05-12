@@ -23,13 +23,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
-template <typename number>
-BlockSparseMatrix<number>::BlockSparseMatrix ()
-{}
-
-
-
 template <typename number>
 BlockSparseMatrix<number>::
 BlockSparseMatrix (const BlockSparsityPattern &sparsity)

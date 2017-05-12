@@ -87,7 +87,7 @@ public:
    * reinit(BlockSparsityPattern). The number of blocks per row and column are
    * then determined by that function.
    */
-  BlockSparseMatrix ();
+  BlockSparseMatrix () = default;
 
   /**
    * Constructor. Takes the given matrix sparsity structure to represent the

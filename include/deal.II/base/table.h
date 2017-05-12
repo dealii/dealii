@@ -414,7 +414,7 @@ public:
   /**
    * Default constructor. Set all dimensions to zero.
    */
-  TableBase ();
+  TableBase () = default;
 
   /**
    * Constructor. Initialize the array with the given dimensions in each index
@@ -700,7 +700,7 @@ public:
   /**
    * Default constructor. Set all dimensions to zero.
    */
-  Table ();
+  Table () = default;
 
   /**
    * Constructor. Pass down the given dimension to the base class.
@@ -819,7 +819,7 @@ public:
   /**
    * Default constructor. Set all dimensions to zero.
    */
-  Table ();
+  Table () = default;
 
   /**
    * Constructor. Pass down the given dimensions to the base class.
@@ -1004,7 +1004,7 @@ public:
   /**
    * Default constructor. Set all dimensions to zero.
    */
-  Table ();
+  Table () = default;
 
   /**
    * Constructor. Pass down the given dimensions to the base class.
@@ -1138,7 +1138,7 @@ public:
   /**
    * Default constructor. Set all dimensions to zero.
    */
-  Table ();
+  Table () = default;
 
   /**
    * Constructor. Pass down the given dimensions to the base class.
@@ -1231,7 +1231,7 @@ public:
   /**
    * Default constructor. Set all dimensions to zero.
    */
-  Table ();
+  Table () = default;
 
   /**
    * Constructor. Pass down the given dimensions to the base class.
@@ -1325,7 +1325,7 @@ public:
   /**
    * Default constructor. Set all dimensions to zero.
    */
-  Table ();
+  Table () = default;
 
   /**
    * Constructor. Pass down the given dimensions to the base class.
@@ -1421,7 +1421,7 @@ public:
   /**
    * Default constructor. Set all dimensions to zero.
    */
-  Table ();
+  Table () = default;
 
   /**
    * Constructor. Pass down the given dimensions to the base class.
@@ -1524,7 +1524,7 @@ public:
   /**
    * Default constructor. Set all dimensions to zero.
    */
-  TransposeTable ();
+  TransposeTable () = default;
 
   /**
    * Constructor. Pass down the given dimensions to the base class.
@@ -1609,12 +1609,6 @@ protected:
 /* --------------------- Template and inline functions ---------------- */
 
 #ifndef DOXYGEN
-
-template <int N, typename T>
-TableBase<N,T>::TableBase ()
-{}
-
-
 
 template <int N, typename T>
 TableBase<N,T>::TableBase (const TableIndices<N> &sizes)
@@ -2174,13 +2168,6 @@ TableBase<N,T>::el (const TableIndices<N> &indices)
 
 template <typename T>
 inline
-Table<1,T>::Table ()
-{}
-
-
-
-template <typename T>
-inline
 Table<1,T>::Table (const unsigned int size)
   :
   TableBase<1,T> (TableIndices<1> (size))
@@ -2270,11 +2257,6 @@ Table<1,T>::operator () (const TableIndices<1> &indices)
 
 
 //---------------------------------------------------------------------------
-
-template <typename T>
-inline
-Table<2,T>::Table ()
-{}
 
 
 
@@ -2434,14 +2416,6 @@ Table<2,T>::n_cols () const
 
 
 //---------------------------------------------------------------------------
-
-template <typename T>
-inline
-TransposeTable<T>::TransposeTable ()
-{}
-
-
-
 template <typename T>
 inline
 TransposeTable<T>::TransposeTable (const unsigned int size1,
@@ -2537,12 +2511,6 @@ TransposeTable<T>::n_cols () const
 
 
 //---------------------------------------------------------------------------
-
-
-template <typename T>
-inline
-Table<3,T>::Table ()
-{}
 
 
 
@@ -2665,13 +2633,6 @@ Table<3,T>::operator () (const TableIndices<3> &indices)
 
 template <typename T>
 inline
-Table<4,T>::Table ()
-{}
-
-
-
-template <typename T>
-inline
 Table<4,T>::Table (const unsigned int size1,
                    const unsigned int size2,
                    const unsigned int size3,
@@ -2779,13 +2740,6 @@ Table<4,T>::operator () (const TableIndices<4> &indices)
 {
   return TableBase<4,T>::operator () (indices);
 }
-
-
-
-template <typename T>
-inline
-Table<5,T>::Table ()
-{}
 
 
 
@@ -2909,13 +2863,6 @@ Table<5,T>::operator () (const TableIndices<5> &indices)
 {
   return TableBase<5,T>::operator () (indices);
 }
-
-
-
-template <typename T>
-inline
-Table<6,T>::Table ()
-{}
 
 
 
@@ -3050,13 +2997,6 @@ Table<6,T>::operator () (const TableIndices<6> &indices)
 {
   return TableBase<6,T>::operator () (indices);
 }
-
-
-
-template <typename T>
-inline
-Table<7,T>::Table ()
-{}
 
 
 

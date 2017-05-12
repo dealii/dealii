@@ -64,8 +64,7 @@ namespace internal
         /**
          * Default constructor.
          */
-        type ()
-        {}
+        type () = default;
 
         /**
          * Dummy constructor. Only level zero is allowed.

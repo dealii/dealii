@@ -87,7 +87,7 @@ namespace PETScWrappers
       /**
        * Default constructor. Generate an empty vector without any blocks.
        */
-      BlockVector ();
+      BlockVector () = default;
 
       /**
        * Constructor. Generate a block vector with @p n_blocks blocks, each of
@@ -280,13 +280,6 @@ namespace PETScWrappers
     /*@}*/
 
     /*----------------------- Inline functions ----------------------------------*/
-
-
-    inline
-    BlockVector::BlockVector ()
-    {}
-
-
 
     inline
     BlockVector::BlockVector (const unsigned int  n_blocks,

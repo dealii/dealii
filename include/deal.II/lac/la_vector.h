@@ -68,7 +68,7 @@ namespace LinearAlgebra
     /**
      * Constructor. Create a vector of dimension zero.
      */
-    Vector();
+    Vector() = default;
 
     /**
      * Copy constructor. Sets the dimension to that of the given vector and
@@ -343,12 +343,6 @@ namespace LinearAlgebra
 
   /*@}*/
   /*----------------------- Inline functions ----------------------------------*/
-
-  template <typename Number>
-  inline
-  Vector<Number>::Vector() {}
-
-
 
   template <typename Number>
   inline

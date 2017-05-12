@@ -106,7 +106,7 @@ public:
   /**
    * Constructor, filling in default values
    */
-  SolverSelector ();
+  SolverSelector () = default;
 
   /**
    * Destructor
@@ -240,11 +240,6 @@ private:
 
 /*@}*/
 /* --------------------- Inline and template functions ------------------- */
-
-
-template <typename VectorType>
-SolverSelector<VectorType>::SolverSelector()
-{}
 
 
 template <typename VectorType>

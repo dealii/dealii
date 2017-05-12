@@ -73,7 +73,7 @@ public:
    * calling this constructor results in a component mask that always returns
    * <code>true</code> whenever asked whether a component is selected.
    */
-  ComponentMask ();
+  ComponentMask () = default;
 
   /**
    * Initialize an object of this type with a set of selected components
@@ -237,11 +237,6 @@ std::ostream &operator << (std::ostream &out,
 
 
 // -------------------- inline functions ---------------------
-
-inline
-ComponentMask::ComponentMask()
-{}
-
 
 inline
 ComponentMask::ComponentMask(const std::vector<bool> &component_mask)

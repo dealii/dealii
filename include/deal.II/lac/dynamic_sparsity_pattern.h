@@ -599,11 +599,6 @@ private:
     std::vector<size_type> entries;
 
     /**
-     * Constructor.
-     */
-    Line ();
-
-    /**
      * Add the given column number to this line.
      */
     void add (const size_type col_num);
@@ -983,12 +978,6 @@ DynamicSparsityPattern::add_entries (const size_type row,
     rowset.size()==0 ? row : rowset.index_within_set(row);
   lines[rowindex].add_entries (begin, end, indices_are_sorted);
 }
-
-
-
-inline
-DynamicSparsityPattern::Line::Line ()
-{}
 
 
 

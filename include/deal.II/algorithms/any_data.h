@@ -37,7 +37,7 @@ class AnyData :
 {
 public:
   /// Default constructor for empty object
-  AnyData();
+  AnyData() = default;
 
   /// Number of stored data objects.
   unsigned int size() const;
@@ -192,11 +192,6 @@ private:
   /// The names of the stored data
   std::vector<std::string> names;
 };
-
-
-inline
-AnyData::AnyData()
-{}
 
 
 unsigned int
@@ -470,13 +465,3 @@ void AnyData::list(StreamType &os) const
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-
-
-
-
-
-
-
-
-
-

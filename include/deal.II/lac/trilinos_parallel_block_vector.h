@@ -96,7 +96,7 @@ namespace TrilinosWrappers
       /**
        * Default constructor. Generate an empty vector without any blocks.
        */
-      BlockVector ();
+      BlockVector () = default;
 
       /**
        * Constructor. Generate a block vector with as many blocks as there are
@@ -306,14 +306,6 @@ namespace TrilinosWrappers
 
 
     /*----------------------- Inline functions ----------------------------------*/
-
-
-    inline
-    BlockVector::BlockVector ()
-    {}
-
-
-
     inline
     BlockVector::BlockVector (const std::vector<IndexSet> &parallel_partitioning,
                               const MPI_Comm              &communicator)

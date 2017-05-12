@@ -77,7 +77,7 @@ public:
    * constructor results in a block mask that always returns <code>true</code>
    * whenever asked whether a block is selected.
    */
-  BlockMask ();
+  BlockMask () = default;
 
   /**
    * Initialize an object of this type with a set of selected blocks specified
@@ -229,11 +229,6 @@ std::ostream &operator << (std::ostream &out,
 
 
 // -------------------- inline functions ---------------------
-
-inline
-BlockMask::BlockMask()
-{}
-
 
 inline
 BlockMask::BlockMask(const std::vector<bool> &block_mask)

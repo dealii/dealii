@@ -52,7 +52,7 @@ public:
   /**
    * Constructor.
    */
-  DiagonalMatrix();
+  DiagonalMatrix() = default;
 
   /**
    * Initialize with a given vector by copying the content of the vector
@@ -193,14 +193,6 @@ private:
 /* ---------------------------------- Inline functions ------------------- */
 
 #ifndef DOXYGEN
-
-template <typename VectorType>
-DiagonalMatrix<VectorType>::DiagonalMatrix()
-  :
-  Subscriptor()
-{}
-
-
 
 template <typename VectorType>
 void

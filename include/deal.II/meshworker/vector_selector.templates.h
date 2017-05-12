@@ -89,11 +89,6 @@ namespace MeshWorker
 //----------------------------------------------------------------------//
 
   template <typename VectorType, int dim, int spacedim>
-  VectorData<VectorType, dim, spacedim>::VectorData()
-  {}
-
-
-  template <typename VectorType, int dim, int spacedim>
   VectorData<VectorType, dim, spacedim>::VectorData(const VectorSelector &s)
     :
     VectorDataBase<dim, spacedim, typename VectorType::value_type>(s)
@@ -170,11 +165,6 @@ namespace MeshWorker
   }
 
 //----------------------------------------------------------------------//
-
-  template <typename VectorType, int dim, int spacedim>
-  MGVectorData<VectorType, dim, spacedim>::MGVectorData()
-  {}
-
 
   template <typename VectorType, int dim, int spacedim>
   MGVectorData<VectorType, dim, spacedim>::MGVectorData(const VectorSelector &s)

@@ -551,7 +551,7 @@ public:
   /**
    * Default constructor.
    */
-  BlockVectorBase ();
+  BlockVectorBase () = default;
 
   /**
    * Copy constructor.
@@ -1450,13 +1450,6 @@ namespace internal
   } // namespace BlockVectorIterators
 
 } //namespace internal
-
-
-
-template <class VectorType>
-inline
-BlockVectorBase<VectorType>::BlockVectorBase ()
-{}
 
 
 
