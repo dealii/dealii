@@ -1830,8 +1830,7 @@ namespace parallel
       {
         std::string fname=std::string(filename)+".info";
         std::ifstream f(fname.c_str());
-        Assert (f, ExcMessage("Could not open the file <" +
-                              fname + ">."));
+        AssertThrow (f, ExcIO());
         std::string firstline;
         getline(f, firstline); //skip first line
         f >> version >> numcpus >> attached_size >> attached_count >> n_coarse_cells;
