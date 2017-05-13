@@ -883,152 +883,7 @@ attach_triangulation (const Triangulation<DoFHandlerType::dimension,DoFHandlerTy
 
 
 
-
-template <typename DoFHandlerType,
-          int patch_dim, int patch_space_dim>
-template <typename VectorType>
-void
-DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
-add_data_vector (const VectorType                         &vec,
-                 const std::string                        &name,
-                 const DataVectorType                      type,
-                 const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
-{
-  Assert (triangulation != nullptr,
-          Exceptions::DataOut::ExcNoTriangulationSelected ());
-  const unsigned int n_components =
-    dofs != nullptr ? dofs->get_fe().n_components () : 1;
-
-  std::vector<std::string> names;
-  // if only one component or vector is cell vector: we only need one name
-  if ((n_components == 1) ||
-      (vec.size() == triangulation->n_active_cells()))
-    {
-      names.resize (1, name);
-    }
-  else
-    // otherwise append _i to the given name
-    {
-      names.resize (n_components);
-      for (unsigned int i=0; i<n_components; ++i)
-        {
-          std::ostringstream namebuf;
-          namebuf << '_' << i;
-          names[i] = name + namebuf.str();
-        }
-    }
-
-  add_data_vector (vec, names, type, data_component_interpretation);
-}
-
-
-
-template <typename DoFHandlerType,
-          int patch_dim, int patch_space_dim>
-template <typename VectorType>
-void
-DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
-add_data_vector (const VectorType                         &vec,
-                 const std::vector<std::string>           &names,
-                 const DataVectorType                      type,
-                 const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation_)
-{
-  Assert (triangulation != nullptr,
-          Exceptions::DataOut::ExcNoTriangulationSelected ());
-
-  const std::vector<DataComponentInterpretation::DataComponentInterpretation> &
-  data_component_interpretation
-    = (data_component_interpretation_.size() != 0
-       ?
-       data_component_interpretation_
-       :
-       std::vector<DataComponentInterpretation::DataComponentInterpretation>
-       (names.size(), DataComponentInterpretation::component_is_scalar));
-
-  // either cell data and one name,
-  // or dof data and n_components names
-  DataVectorType actual_type = type;
-  if (type == type_automatic)
-    {
-      // in the rare case that someone has a DGP(0) attached, we can not decide what she wants here:
-      Assert((dofs == nullptr) || (triangulation->n_active_cells() != dofs->n_dofs()),
-             ExcMessage("Unable to determine the type of vector automatically because the number of DoFs "
-                        "is equal to the number of cells. Please specify DataVectorType."));
-
-      if (vec.size() == triangulation->n_active_cells())
-        actual_type = type_cell_data;
-      else
-        actual_type = type_dof_data;
-    }
-
-  switch (actual_type)
-    {
-    case type_cell_data:
-      Assert (vec.size() == triangulation->n_active_cells(),
-              ExcDimensionMismatch (vec.size(),
-                                    triangulation->n_active_cells()));
-      Assert (names.size() == 1,
-              Exceptions::DataOut::ExcInvalidNumberOfNames (names.size(), 1));
-      break;
-
-    case type_dof_data:
-      Assert (dofs != nullptr,
-              Exceptions::DataOut::ExcNoDoFHandlerSelected ());
-      Assert (vec.size() == dofs->n_dofs(),
-              Exceptions::DataOut::ExcInvalidVectorSize (vec.size(),
-                                                         dofs->n_dofs(),
-                                                         triangulation->n_active_cells()));
-      Assert (names.size() == dofs->get_fe().n_components(),
-              Exceptions::DataOut::ExcInvalidNumberOfNames (names.size(),
-                                                            dofs->get_fe().n_components()));
-      break;
-
-    case type_automatic:
-      // this case should have been handled above...
-      Assert (false, ExcInternalError());
-    }
-
-  auto new_entry = std_cxx14::make_unique<internal::DataOut::DataEntry<DoFHandlerType,VectorType>>
-                   (dofs, &vec, names, data_component_interpretation);
-
-  if (actual_type == type_dof_data)
-    dof_data.emplace_back (std::move(new_entry));
-  else
-    cell_data.emplace_back (std::move(new_entry));
-}
-
-
-
-template <typename DoFHandlerType,
-          int patch_dim, int patch_space_dim>
-template <typename VectorType>
-void
-DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
-add_data_vector (const VectorType                       &vec,
-                 const DataPostprocessor<DoFHandlerType::space_dimension> &data_postprocessor)
-{
-  // this is a specialized version of the other function where we have a
-  // postprocessor. if we do, we know that we have type_dof_data, which makes
-  // things a bit simpler, we also don't need to deal with some of the other
-  // stuff and use a different constructor of DataEntry
-
-  Assert (dofs != nullptr,
-          Exceptions::DataOut::ExcNoDoFHandlerSelected ());
-
-  Assert (vec.size() == dofs->n_dofs(),
-          Exceptions::DataOut::ExcInvalidVectorSize (vec.size(),
-                                                     dofs->n_dofs(),
-                                                     dofs->get_triangulation().n_active_cells()));
-
-  auto new_entry = std_cxx14::make_unique<internal::DataOut::DataEntry<DoFHandlerType,VectorType>>
-                   (dofs, &vec, &data_postprocessor);
-  dof_data.emplace_back (std::move(new_entry));
-}
-
-
-
-template <typename DoFHandlerType,
-          int patch_dim, int patch_space_dim>
+template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
 template <typename VectorType>
 void
 DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
@@ -1040,8 +895,23 @@ add_data_vector (const DoFHandlerType                   &dof_handler,
   // postprocessor. if we do, we know that we have type_dof_data, which makes
   // things a bit simpler, we also don't need to deal with some of the other
   // stuff and use a different constructor of DataEntry
+  if (triangulation != nullptr)
+    {
+      Assert (&dof_handler.get_triangulation() == triangulation,
+              ExcMessage("The triangulation attached to the DoFHandler does not "
+                         "match with the one set previously"));
+    }
+  else
+    {
+      triangulation = SmartPointer<const Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension>>
+        (&dof_handler.get_triangulation(), typeid(*this).name());
+    }
 
-  AssertDimension (vec.size(), dof_handler.n_dofs());
+  Assert (vec.size() == dof_handler.n_dofs(),
+          Exceptions::DataOut::ExcInvalidVectorSize (vec.size(),
+                                                     dof_handler.n_dofs(),
+                                                     dof_handler.get_triangulation().n_active_cells()));
+
 
   auto new_entry = std_cxx14::make_unique<internal::DataOut::DataEntry<DoFHandlerType,VectorType>>
                    (&dof_handler, &vec, &data_postprocessor);
@@ -1050,79 +920,120 @@ add_data_vector (const DoFHandlerType                   &dof_handler,
 
 
 
-template <typename DoFHandlerType,
-          int patch_dim, int patch_space_dim>
+template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
 template <typename VectorType>
 void
 DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
-add_data_vector
-(const DoFHandlerType           &dof_handler,
- const VectorType               &data,
- const std::string              &name,
- const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
+add_data_vector_internal
+(const DoFHandlerType           *dof_handler,
+ const VectorType               &data_vector,
+ const std::vector<std::string> &names,
+ const DataVectorType            type,
+ const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation_,
+ const bool                      deduce_output_names)
 {
-  const unsigned int n_components = dof_handler.get_fe().n_components ();
-
-  std::vector<std::string> names;
-  // if only one component: we only need one name
-  if (n_components == 1)
-    names.resize (1, name);
-  else
-    // otherwise append _i to the given name
+  // Check available mesh information:
+  if (triangulation == nullptr)
     {
-      names.resize (n_components);
-      for (unsigned int i=0; i<n_components; ++i)
-        {
-          std::ostringstream namebuf;
-          namebuf << '_' << i;
-          names[i] = name + namebuf.str();
-        }
+      Assert(dof_handler != nullptr, ExcInternalError());
+      triangulation = SmartPointer<const Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension>>
+                      (&dof_handler->get_triangulation(), typeid(*this).name());
     }
 
-  add_data_vector (dof_handler, data, names, data_component_interpretation);
-}
+  if (dof_handler != nullptr)
+    {
+      Assert (&dof_handler->get_triangulation() == triangulation,
+              ExcMessage("The triangulation attached to the DoFHandler does not "
+                         "match with the one set previously"));
+    }
 
+  // Figure out the data type:
+  DataVectorType actual_type = type;
+  if (type == type_automatic)
+    {
+      Assert((dof_handler == nullptr) || (triangulation->n_active_cells() != dof_handler->n_dofs()),
+             ExcMessage("Unable to determine the type of vector automatically because the number of DoFs "
+                        "is equal to the number of cells. Please specify DataVectorType."));
 
+      if (data_vector.size() == triangulation->n_active_cells())
+        actual_type = type_cell_data;
+      else
+        actual_type = type_dof_data;
+    }
+  Assert(actual_type == type_cell_data || actual_type == type_dof_data,
+         ExcInternalError());
 
-template <typename DoFHandlerType,
-          int patch_dim, int patch_space_dim>
-template <typename VectorType>
-void
-DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
-add_data_vector
-(const DoFHandlerType           &dof_handler,
- const VectorType               &data,
- const std::vector<std::string> &names,
- const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation_)
-{
-  // this is an extended version of the other functions where we pass a vector
-  // together with its DoFHandler. if we do, we know that we have
-  // type_dof_data, which makes things a bit simpler
-  if (triangulation == nullptr)
-    triangulation = SmartPointer<const Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> >(&dof_handler.get_triangulation(), typeid(*this).name());
+  // If necessary, append '_1', '_2', etc. to component names:
+  std::vector<std::string> deduced_names;
+  if (deduce_output_names && actual_type == type_dof_data)
+    {
+      Assert(names.size() == 1, ExcInternalError());
+      Assert(dof_handler != nullptr, ExcInternalError());
+      Assert(dof_handler->n_dofs() > 0,
+             ExcMessage("The DoF handler attached to the current output vector "
+                        "does not have any degrees of freedom, so it is not "
+                        "possible to output DoF data in this context."));
+      const std::string name = names[0];
+      const unsigned int n_components = dof_handler->get_fe().n_components();
+      deduced_names.resize (n_components);
+      if (n_components > 1)
+        {
+          for (unsigned int i=0; i<n_components; ++i)
+            {
+              deduced_names[i] = name + '_' + Utilities::to_string(i);
+            }
+        }
+      else
+        {
+          deduced_names[0] = name;
+        }
+    }
+  else
+    {
+      deduced_names = names;
+    }
 
-  Assert (&dof_handler.get_triangulation() == triangulation,
-          ExcMessage("The triangulation attached to the DoFHandler does not "
-                     "match with the one set previously"));
+  // Check that things have the right sizes for the data type:
+  switch (actual_type)
+    {
+    case type_cell_data:
+      Assert (data_vector.size() == triangulation->n_active_cells(),
+              ExcDimensionMismatch (data_vector.size(),
+                                    triangulation->n_active_cells()));
+      Assert (deduced_names.size() == 1,
+              Exceptions::DataOut::ExcInvalidNumberOfNames (deduced_names.size(), 1));
+      break;
+    case type_dof_data:
+      Assert (dof_handler != nullptr,
+              Exceptions::DataOut::ExcNoDoFHandlerSelected ());
+      Assert (data_vector.size() == dof_handler->n_dofs(),
+              Exceptions::DataOut::ExcInvalidVectorSize (data_vector.size(),
+                                                         dof_handler->n_dofs(),
+                                                         triangulation->n_active_cells()));
+      Assert (deduced_names.size() == dof_handler->get_fe().n_components(),
+              Exceptions::DataOut::ExcInvalidNumberOfNames (deduced_names.size(),
+                                                            dof_handler->get_fe().n_components()));
+      break;
+    default:
+      Assert (false, ExcInternalError());
+    }
 
-  Assert (data.size() == dof_handler.n_dofs(),
-          ExcDimensionMismatch (data.size(), dof_handler.n_dofs()));
-  Assert (names.size() == dof_handler.get_fe().n_components(),
-          Exceptions::DataOut::ExcInvalidNumberOfNames (names.size(),
-                                                        dof_handler.get_fe().n_components()));
-
-  const std::vector<DataComponentInterpretation::DataComponentInterpretation> &
-  data_component_interpretation
+  const auto &data_component_interpretation
     = (data_component_interpretation_.size() != 0
        ?
        data_component_interpretation_
        :
        std::vector<DataComponentInterpretation::DataComponentInterpretation>
-       (names.size(), DataComponentInterpretation::component_is_scalar));
+       (deduced_names.size(), DataComponentInterpretation::component_is_scalar));
 
+  // finally, add the data vector:
   auto new_entry = std_cxx14::make_unique<internal::DataOut::DataEntry<DoFHandlerType,VectorType>>
-                   (&dof_handler, &data, names, data_component_interpretation);
-  dof_data.emplace_back (std::move(new_entry));
+                   (dof_handler, &data_vector, deduced_names, data_component_interpretation);
+
+  if (actual_type == type_dof_data)
+    dof_data.emplace_back (std::move(new_entry));
+  else
+    cell_data.emplace_back (std::move(new_entry));
 }
 
 
@@ -1361,7 +1272,6 @@ DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::memory_consumption ()
           MemoryConsumption::memory_consumption (dofs) +
           MemoryConsumption::memory_consumption (patches));
 }
-
 
 
 // explicit instantiations
