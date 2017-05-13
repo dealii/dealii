@@ -17,6 +17,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#include "data_out_dof_data.inst"
+#include "data_out_dof_data_codim.inst"
 
 DEAL_II_NAMESPACE_CLOSE
