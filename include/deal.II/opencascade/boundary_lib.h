@@ -164,7 +164,7 @@ namespace OpenCASCADE
     /**
      * Direction used to project new points on the shape.
      */
-    const Point<3> direction;
+    const Tensor<1, spacedim> direction;
 
     /**
      * Relative tolerance used by this class to compute distances.
