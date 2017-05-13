@@ -40,7 +40,7 @@ ChunkSparsityPattern::ChunkSparsityPattern (const ChunkSparsityPattern &s)
                      "is the sparsity pattern for an empty matrix. This constructor can "
                      "not be used to copy-construct a non-empty sparsity pattern."));
 
-  reinit (0,0,0,0);
+  reinit (0,0,0,chunk_size);
 }
 
 
