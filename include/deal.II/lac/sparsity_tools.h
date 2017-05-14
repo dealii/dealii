@@ -136,16 +136,6 @@ namespace SparsityTools
                          const std::vector<DynamicSparsityPattern::size_type> &starting_indices = std::vector<DynamicSparsityPattern::size_type>());
 
   /**
-   * As above, but taking a SparsityPattern object instead.
-   *
-   * @deprecated
-   */
-  void
-  reorder_Cuthill_McKee (const SparsityPattern &sparsity,
-                         std::vector<SparsityPattern::size_type> &new_indices,
-                         const std::vector<SparsityPattern::size_type> &starting_indices = std::vector<SparsityPattern::size_type>()) DEAL_II_DEPRECATED;
-
-  /**
    * For a given sparsity pattern, compute a re-enumeration of row/column
    * indices in a hierarchical way, similar to what
    * DoFRenumbering::hierarchical does for degrees of freedom on

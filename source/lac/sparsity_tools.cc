@@ -328,23 +328,6 @@ namespace SparsityTools
 
 
 
-  void
-  reorder_Cuthill_McKee (const SparsityPattern                   &sparsity,
-                         std::vector<SparsityPattern::size_type> &new_indices,
-                         const std::vector<SparsityPattern::size_type> &starting_indices)
-  {
-    DynamicSparsityPattern dsp(sparsity.n_rows(), sparsity.n_cols());
-    for (unsigned int row=0; row<sparsity.n_rows(); ++row)
-      {
-        for (SparsityPattern::iterator it=sparsity.begin(row); it!=sparsity.end(row)
-             && it->is_valid_entry() ; ++it)
-          dsp.add(row, it->column());
-      }
-    reorder_Cuthill_McKee(dsp, new_indices, starting_indices);
-  }
-
-
-
   namespace internal
   {
     void
