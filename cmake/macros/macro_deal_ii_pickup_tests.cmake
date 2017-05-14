@@ -81,6 +81,9 @@ MACRO(DEAL_II_PICKUP_TESTS)
   # Necessary external interpreters and programs:
   #
 
+  FIND_PACKAGE(CUDA)
+  SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -std=c++11 -arch=sm_35)
+
   FIND_PACKAGE(Perl REQUIRED)
 
   FIND_PROGRAM(DIFF_EXECUTABLE
