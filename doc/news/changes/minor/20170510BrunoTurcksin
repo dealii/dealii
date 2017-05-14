@@ -1,0 +1,5 @@
+New: Add support for matrix-free operator application on GPU using CUDA.
+Constraints (Dirichlet boundary conditions, hanging nodes, etc.) cannot be
+applied.
+<br>
+(Bruno Turcksin and Karl Ljungkvist, 2017/05/10)
