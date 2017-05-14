@@ -81,11 +81,12 @@ class DeprecatedDeclaration(object):
         self.output_time = datetime.datetime.utcfromtimestamp(self.epoch_time)
 
         git_tag_output = subprocess.check_output(["git", "tag", "--contains",
-                                                  self.commit_hash])
+                                                  self.commit_hash,
+                                                  "-l", "v[0-9].[0-9].[0-9]"])
         git_tag_output = decode_and_split(git_tag_output)
-        relevant_tags = [tag for tag in git_tag_output if "rc" not in tag]
-        if relevant_tags:
-            self.release = relevant_tags[0][1:] # skip the prepended 'v'
+        if git_tag_output:
+            # matched tags must start with 'v[0-9]': skip the v
+            self.release = git_tag_output[0][1:]
         else:
             self.release = ""
 
