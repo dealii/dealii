@@ -23,7 +23,7 @@ int main ()
 {
   initlog();
 
-  ChunkSparsityPattern chunk1 ();
+  ChunkSparsityPattern chunk1;
   ChunkSparsityPattern chunk2 = chunk1;
 
   deallog << "OK" << std::endl;
