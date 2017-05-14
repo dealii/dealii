@@ -152,24 +152,6 @@ public:
   /**
    * Return number of rows of this matrix, which equals the dimension of the
    * codomain (or range) space. It is the sum of the number of rows over the
-   * sub-matrix blocks of this matrix.
-   *
-   * @deprecated Use m() instead.
-   */
-  size_type n_rows () const DEAL_II_DEPRECATED;
-
-  /**
-   * Return number of columns of this matrix, which equals the dimension of
-   * the domain space. It is the sum of the number of columns over the sub-
-   * matrix blocks of this matrix.
-   *
-   * @deprecated Use n() instead.
-   */
-  size_type n_cols () const DEAL_II_DEPRECATED;
-
-  /**
-   * Return number of rows of this matrix, which equals the dimension of the
-   * codomain (or range) space. It is the sum of the number of rows over the
    * sub-matrix blocks of this matrix. Recall that the matrix is of size m()
    * times n().
    */
@@ -279,30 +261,10 @@ BlockSparseMatrixEZ<Number>::n_block_rows () const
 
 template <typename Number>
 inline
-typename BlockSparseMatrixEZ<Number>::size_type
-BlockSparseMatrixEZ<Number>::n_rows () const
-{
-  return row_indices.total_size();
-}
-
-
-
-template <typename Number>
-inline
 unsigned int
 BlockSparseMatrixEZ<Number>::n_block_cols () const
 {
   return column_indices.size();
-}
-
-
-
-template <typename Number>
-inline
-typename BlockSparseMatrixEZ<Number>::size_type
-BlockSparseMatrixEZ<Number>::n_cols () const
-{
-  return column_indices.total_size();
 }
 
 

@@ -1,0 +1,5 @@
+Changed: The deprecated functions BlockSparseMatrixEZ::n_rows()
+and BlockSparseMatrixEZ::n_cols() have been removed.
+Use BlockSparseMatrixEZ::m() and BlockSparseMatrixEZ::n() instead.
+<br>
+(Daniel Arndt, 2017/05/14)
