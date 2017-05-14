@@ -27,6 +27,7 @@
 #include <ostream>
 #include <vector>
 
+
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations:
@@ -129,8 +130,10 @@ public:
 
   /**
    * Constructor. Set to zero.
+   *
+   * @ingroup CUDAWrappers
    */
-  Tensor ();
+  DEAL_II_CUDA_HOST_DEV Tensor ();
 
   /**
    * Constructor from tensors with different underlying scalar type. This
@@ -152,16 +155,20 @@ public:
    *
    * This is the non-const conversion operator that returns a writable
    * reference.
+   *
+   * @ingroup CUDAWrappers
    */
-  operator Number &();
+  DEAL_II_CUDA_HOST_DEV operator Number &();
 
   /**
    * Return a reference to the encapsulated Number object. Since rank-0
    * tensors are scalars, this is a natural operation.
    *
    * This is the const conversion operator that returns a read-only reference.
+   *
+   * @ingroup CUDAWrappers
    */
-  operator const Number &() const;
+  DEAL_II_CUDA_HOST_DEV operator const Number &() const;
 
   /**
    * Assignment from tensors with different underlying scalar type. This
@@ -197,9 +204,11 @@ public:
 
   /**
    * Multiply the scalar with a <tt>factor</tt>.
+   *
+   * @ingroup CUDAWrappers
    */
   template<typename OtherNumber>
-  Tensor<0,dim,Number> &operator *= (const OtherNumber factor);
+  DEAL_II_CUDA_HOST_DEV Tensor<0,dim,Number> &operator *= (const OtherNumber factor);
 
   /**
    * Divide the scalar by <tt>factor</tt>.
@@ -236,8 +245,10 @@ public:
   /**
    * Return the square of the Frobenius-norm of a tensor, i.e. the sum of the
    * absolute squares of all entries.
+   *
+   * @ingroup CUDAWrappers
    */
-  real_type norm_square () const;
+  DEAL_II_CUDA_HOST_DEV real_type norm_square () const;
 
   /**
    * Read or write the data of this object to or from a stream for the purpose
@@ -358,8 +369,10 @@ public:
 
   /**
    * Constructor. Initialize all entries to zero.
+   *
+   * @ingroup CUDAWrappers
    */
-  Tensor ();
+  DEAL_II_CUDA_HOST_DEV Tensor ();
 
   /**
    * Constructor, where the data is copied from a C-style array.
@@ -388,13 +401,17 @@ public:
 
   /**
    * Read-Write access operator.
+   *
+   * @ingroup CUDAWrappers
    */
-  value_type &operator [] (const unsigned int i);
+  DEAL_II_CUDA_HOST_DEV value_type &operator [] (const unsigned int i);
 
   /**
    * Read-only access operator.
+   *
+   * @ingroup CUDAWrappers
    */
-  const value_type &operator[](const unsigned int i) const;
+  DEAL_II_CUDA_HOST_DEV const value_type &operator[](const unsigned int i) const;
 
   /**
    * Read access using TableIndices <tt>indices</tt>
@@ -449,9 +466,11 @@ public:
   /**
    * Scale the tensor by <tt>factor</tt>, i.e. multiply all components by
    * <tt>factor</tt>.
+   *
+   * @ingroup CUDAWrappers
    */
   template <typename OtherNumber>
-  Tensor<rank_,dim,Number> &operator *= (const OtherNumber factor);
+  DEAL_II_CUDA_HOST_DEV Tensor<rank_,dim,Number> &operator *= (const OtherNumber factor);
 
   /**
    * Scale the vector by <tt>1/factor</tt>.
@@ -489,8 +508,10 @@ public:
   /**
    * Return the square of the Frobenius-norm of a tensor, i.e. the sum of the
    * absolute squares of all entries.
+   *
+   * @ingroup CUDAWrappers
    */
-  typename numbers::NumberTraits<Number>::real_type norm_square() const;
+  DEAL_II_CUDA_HOST_DEV typename numbers::NumberTraits<Number>::real_type norm_square() const;
 
   /**
    * Fill a vector with all tensor elements.
@@ -569,7 +590,7 @@ private:
 
 template <int dim,typename Number>
 inline
-Tensor<0,dim,Number>::Tensor ()
+DEAL_II_CUDA_HOST_DEV Tensor<0,dim,Number>::Tensor ()
   : value()
 {
 }
@@ -595,7 +616,7 @@ Tensor<0,dim,Number>::Tensor (const Tensor<0,dim,OtherNumber> &p)
 
 template <int dim, typename Number>
 inline
-Tensor<0,dim,Number>::operator Number &()
+DEAL_II_CUDA_HOST_DEV Tensor<0,dim,Number>::operator Number &()
 {
   Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
   return value;
@@ -604,7 +625,7 @@ Tensor<0,dim,Number>::operator Number &()
 
 template <int dim, typename Number>
 inline
-Tensor<0,dim,Number>::operator const Number &() const
+DEAL_II_CUDA_HOST_DEV Tensor<0,dim,Number>::operator const Number &() const
 {
   Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
   return value;
@@ -662,7 +683,7 @@ Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator -= (const Tensor<0,dim,Othe
 template <int dim, typename Number>
 template <typename OtherNumber>
 inline
-Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator *= (const OtherNumber s)
+DEAL_II_CUDA_HOST_DEV Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator *= (const OtherNumber s)
 {
   value *= s;
   return *this;
@@ -700,7 +721,7 @@ Tensor<0,dim,Number>::norm () const
 template <int dim, typename Number>
 inline
 typename Tensor<0,dim,Number>::real_type
-Tensor<0,dim,Number>::norm_square () const
+DEAL_II_CUDA_HOST_DEV Tensor<0,dim,Number>::norm_square () const
 {
   Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
   return numbers::NumberTraits<Number>::abs_square (value);
@@ -742,7 +763,7 @@ void Tensor<0,dim,Number>::serialize(Archive &ar, const unsigned int)
 
 template <int rank_, int dim, typename Number>
 inline
-Tensor<rank_,dim,Number>::Tensor ()
+DEAL_II_CUDA_HOST_DEV Tensor<rank_,dim,Number>::Tensor ()
 {
   // All members of the c-style array values are already default initialized
   // and thus all values are already set to zero recursively.
@@ -796,6 +817,7 @@ namespace internal
   {
     template <typename ArrayElementType, int dim>
     inline DEAL_II_ALWAYS_INLINE
+    DEAL_II_CUDA_HOST_DEV
     ArrayElementType &
     subscript (ArrayElementType *values,
                const unsigned int i,
@@ -807,6 +829,7 @@ namespace internal
 
 
     template <typename ArrayElementType>
+    DEAL_II_CUDA_HOST_DEV
     ArrayElementType &
     subscript (ArrayElementType *,
                const unsigned int,
@@ -822,6 +845,7 @@ namespace internal
 
 template <int rank_, int dim, typename Number>
 inline DEAL_II_ALWAYS_INLINE
+DEAL_II_CUDA_HOST_DEV
 typename Tensor<rank_,dim,Number>::value_type &
 Tensor<rank_,dim,Number>::operator[] (const unsigned int i)
 {
@@ -831,6 +855,7 @@ Tensor<rank_,dim,Number>::operator[] (const unsigned int i)
 
 template <int rank_, int dim, typename Number>
 inline DEAL_II_ALWAYS_INLINE
+DEAL_II_CUDA_HOST_DEV
 const typename Tensor<rank_,dim,Number>::value_type &
 Tensor<rank_,dim,Number>::operator[] (const unsigned int i) const
 {
@@ -950,6 +975,7 @@ Tensor<rank_,dim,Number>::operator -= (const Tensor<rank_,dim,OtherNumber> &p)
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
 inline
+DEAL_II_CUDA_HOST_DEV
 Tensor<rank_,dim,Number> &
 Tensor<rank_,dim,Number>::operator *= (const OtherNumber s)
 {
@@ -996,6 +1022,7 @@ Tensor<rank_,dim,Number>::norm () const
 
 template <int rank_, int dim, typename Number>
 inline
+DEAL_II_CUDA_HOST_DEV
 typename numbers::NumberTraits<Number>::real_type
 Tensor<rank_,dim,Number>::norm_square () const
 {
