@@ -556,7 +556,7 @@ public:
   /**
    * Copy constructor.
    */
-  BlockVectorBase (const BlockVectorBase &V) = default;
+  BlockVectorBase (const BlockVectorBase &/*V*/) = default;
 
   /**
    * Move constructor. Each block of the argument vector is moved into the current
