@@ -450,11 +450,6 @@ namespace Utilities
      * leaving this task to the calling site.
      */
     void posix_memalign (void **memptr, size_t alignment, size_t size);
-
-    /**
-     * @deprecated Use Utilities::MPI::job_supports_mpi() instead.
-     */
-    bool job_supports_mpi () DEAL_II_DEPRECATED;
   }
 
 

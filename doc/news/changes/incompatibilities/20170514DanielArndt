@@ -1,0 +1,4 @@
+Changed: The deprecated function Utilities::System::job_supports_mpi()
+has been removed. Use Utilities::MPI::job_supports_mpi() instead. 
+<br>
+(Daniel Arndt, 2017/05/14)

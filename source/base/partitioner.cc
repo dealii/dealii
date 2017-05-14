@@ -105,7 +105,7 @@ namespace Utilities
     void
     Partitioner::set_owned_indices (const IndexSet &locally_owned_indices)
     {
-      if (Utilities::System::job_supports_mpi() == true)
+      if (Utilities::MPI::job_supports_mpi() == true)
         {
           my_pid = Utilities::MPI::this_mpi_process(communicator);
           n_procs = Utilities::MPI::n_mpi_processes(communicator);
