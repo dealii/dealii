@@ -34,27 +34,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
-  namespace
-  {
-#ifndef DEAL_II_WITH_64BIT_INDICES
-    // define a helper function that queries the global vector length of an
-    // Epetra_FEVector object  by calling either the 32- or 64-bit
-    // function necessary.
-    int global_length(const Epetra_FEVector &vector)
-    {
-      return vector.GlobalLength();
-    }
-#else
-    // define a helper function that queries the global vector length of an
-    // Epetra_FEVector object  by calling either the 32- or 64-bit
-    // function necessary.
-    long long int global_length(const Epetra_FEVector &vector)
-    {
-      return vector.GlobalLength64();
-    }
-#endif
-  }
-
   namespace internal
   {
     VectorReference::operator TrilinosScalar () const
