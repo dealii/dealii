@@ -1015,7 +1015,7 @@ namespace internal
     dealii::Tensor<2,dim,Number>
     convert_to_tensor (const dealii::SymmetricTensor<2,dim,Number> &s)
     {
-      Number t[dim][dim];
+      dealii::Tensor<2,dim,Number> t;
 
       // diagonal entries are stored first
       for (unsigned int d=0; d<dim; ++d)
@@ -1028,7 +1028,7 @@ namespace internal
             t[d][e] = s.access_raw_entry(dim+c);
             t[e][d] = s.access_raw_entry(dim+c);
           }
-      return dealii::Tensor<2,dim,Number>(t);
+      return t;
     }
 
 

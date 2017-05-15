@@ -46,6 +46,10 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #include <limits>
 #include <sstream>
 
+#if defined(DEAL_II_HAVE_UNISTD_H) && defined(DEAL_II_HAVE_GETHOSTNAME)
+#  include <unistd.h>
+#endif
+
 #ifndef DEAL_II_MSVC
 #  include <stdlib.h>
 #endif
