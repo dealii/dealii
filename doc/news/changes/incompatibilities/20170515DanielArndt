@@ -1,0 +1,5 @@
+Changed: The deprecated function SparsityTools::reorder_Cuthill_McKee() 
+acting on a SparsityPattern object has been removed.
+Use the one acting on a DynamicSparsityPattern instead.
+<br>
+(Daniel Arndt, 2017/05/15)
