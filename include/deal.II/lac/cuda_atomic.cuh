@@ -27,6 +27,8 @@ namespace LinearAlgebra
   {
     /**
      * Provide atomicAdd for floats.
+     *
+     * @ingroup CUDAWrappers
      */
     inline __device__  float atomicAdd_wrapper(float *address, float val)
     {
@@ -37,6 +39,8 @@ namespace LinearAlgebra
 
     /**
      * Provide atomicAdd for doubles.
+     *
+     * @ingroup CUDAWrappers
      */
     inline __device__ double atomicAdd_wrapper(double *address, double val)
     {
@@ -64,6 +68,8 @@ namespace LinearAlgebra
 
     /**
      * Provide atomicMax for floats.
+     *
+     * @ingroup CUDAWrappers
      */
     inline __device__  float atomicMax_wrapper(float *address, float val)
     {
@@ -84,6 +90,8 @@ namespace LinearAlgebra
 
     /**
      * Provide atomicMax for doubles.
+     *
+     * @ingroup CUDAWrappers
      */
     inline __device__  double atomicMax_wrapper(double *address, double val)
     {

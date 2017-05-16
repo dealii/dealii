@@ -24,6 +24,13 @@
 #include <cstdlib>
 #include <complex>
 
+#ifdef DEAL_II_WITH_CUDA
+#  include <cuda_runtime_api.h>
+#  define DEAL_II_CUDA_HOST_DEV __host__ __device__
+#else
+#  define DEAL_II_CUDA_HOST_DEV
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations to support abs or sqrt operations on VectorizedArray
@@ -210,8 +217,11 @@ namespace numbers
      * Return the square of the absolute value of the given number. Since the
      * general template is chosen for types not equal to std::complex, this
      * function simply returns the square of the given number.
+     *
+     * @ingroup CUDAWrappers
      */
     static
+    DEAL_II_CUDA_HOST_DEV
     real_type abs_square (const number &x);
 
     /**
@@ -341,6 +351,7 @@ namespace numbers
 
 
   template <typename number>
+  DEAL_II_CUDA_HOST_DEV
   typename NumberTraits<number>::real_type
   NumberTraits<number>::abs_square (const number &x)
   {

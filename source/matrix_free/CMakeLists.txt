@@ -27,5 +27,20 @@ FILE(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/matrix_free/*.h
   )
 
+IF(DEAL_II_WITH_CUDA)
+  SET(_src
+    cuda_matrix_free.cu
+    ${_src}
+    )
+  SET(_inst
+    cuda_matrix_free.inst.in
+    ${_inst}
+    )
+  FILE(GLOB _header
+    ${CMAKE_SOURCE_DIR}/include/deal.II/matrix_free/*.cuh
+    ${_header}
+    )
+ENDIF()
+
 DEAL_II_ADD_LIBRARY(obj_matrix_free OBJECT ${_src} ${_header} ${_inst})
 EXPAND_INSTANTIATIONS(obj_matrix_free "${_inst}")
