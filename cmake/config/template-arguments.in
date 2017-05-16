@@ -54,7 +54,7 @@ SERIAL_VECTORS := { Vector<double>;
                     @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR@;
                   }
 
-// TODO: why is this the same as SERIAL_VECTORS?
+// same as SERIAL_VECTORS but only with real-valued PETSc vectors
 REAL_SERIAL_VECTORS := { Vector<double>;
                     Vector<float> ;
 
@@ -96,12 +96,12 @@ REAL_NONBLOCK_VECTORS := { Vector<double>;
                     @DEAL_II_EXPAND_PETSC_MPI_VECTOR_REAL@;
                   }
 
-// wrappers for non-MPI vectors (PETSc/Trilinos) 
+// wrappers for non-MPI vectors (PETSc/Trilinos)
 EXTERNAL_SEQUENTIAL_VECTORS := { @DEAL_II_EXPAND_TRILINOS_VECTOR@;
                                  @DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR@;
                                }
 
-// wrappers for MPI vectors (PETSc/Trilinos) 
+// wrappers for MPI vectors (PETSc/Trilinos)
 EXTERNAL_PARALLEL_VECTORS := { @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
                                @DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR@;
                                @DEAL_II_EXPAND_EPETRA_VECTOR@;
