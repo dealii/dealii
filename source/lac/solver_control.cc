@@ -349,4 +349,77 @@ IterationNumberControl::check (const unsigned int step,
     return SolverControl::check(step, check_value);
 }
 
+/*------------------------ ConsecutiveControl -------------------------------*/
+
+
+ConsecutiveControl::ConsecutiveControl(const unsigned int n,
+                                       const double       tolerance,
+                                       const unsigned int n_consecutive_iterations,
+                                       const bool m_log_history,
+                                       const bool m_log_result)
+  :
+  SolverControl (n, tolerance, m_log_history, m_log_result),
+  n_consecutive_iterations(n_consecutive_iterations),
+  n_converged_iterations(0)
+{
+  AssertThrow(n_consecutive_iterations>0,
+              ExcMessage("n_consecutive_iterations should be positive"));
+}
+
+
+
+ConsecutiveControl::ConsecutiveControl (const SolverControl &c)
+  :
+  SolverControl(c),
+  n_consecutive_iterations(1),
+  n_converged_iterations(0)
+{}
+
+
+
+ConsecutiveControl &
+ConsecutiveControl::operator= (const SolverControl &c)
+{
+  SolverControl::operator=(c);
+  n_consecutive_iterations = 1;
+  n_converged_iterations = 0;
+  return *this;
+}
+
+
+
+ConsecutiveControl::~ConsecutiveControl()
+{}
+
+
+SolverControl::State
+ConsecutiveControl::check (const unsigned int step,
+                           const double check_value)
+{
+  // reset the counter if ConsecutiveControl is being reused
+  if (step==0)
+    n_converged_iterations = 0;
+
+  SolverControl::State state = SolverControl::check(step, check_value);
+  // check if we need to override the success:
+  if (state == success)
+    {
+      n_converged_iterations++;
+      if (n_converged_iterations == n_consecutive_iterations)
+        {
+          return success;
+        }
+      else
+        {
+          lcheck = iterate;
+          return iterate;
+        }
+    }
+  else
+    {
+      n_converged_iterations = 0;
+      return state;
+    }
+}
+
 DEAL_II_NAMESPACE_CLOSE
