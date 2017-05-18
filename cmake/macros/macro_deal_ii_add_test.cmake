@@ -250,9 +250,11 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/${_target}/interrupt_guard.cc
           )
         
-        FIND_PACKAGE(CUDA)
-        CUDA_INCLUDE_DIRECTORIES("${DEAL_II_INCLUDE_DIRS}")
-        CUDA_WRAP_SRCS( ${_target} OBJ _generated_files ${_source_file} )
+        IF(DEAL_II_WITH_CUDA)
+          FIND_PACKAGE(CUDA)
+          CUDA_INCLUDE_DIRECTORIES("${DEAL_II_INCLUDE_DIRS}")
+          CUDA_WRAP_SRCS( ${_target} OBJ _generated_files ${_source_file} )
+        ENDIF()
 
         ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL
           ${_generated_files}
