@@ -411,6 +411,9 @@ for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS
     template void copy_material_to_manifold_id<deal_II_dimension, deal_II_space_dimension>
     (Triangulation<deal_II_dimension, deal_II_space_dimension> &, const bool);
 
+    template
+    void regularize_corner_cells
+    (Triangulation<deal_II_dimension,deal_II_space_dimension> &, double);
     \}
 #endif
 }

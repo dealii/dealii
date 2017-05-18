@@ -1,0 +1,5 @@
+New: Added a GridTools::regularize_corner_cells function that 
+detects if the boundary cells of a mesh at corner positions 
+(with dim adjacent faces on the boundary) need to be split into 
+cells with smaller angles.
+<br> (Luca Heltai, Martin Kronbichler, 2017/05/18)
