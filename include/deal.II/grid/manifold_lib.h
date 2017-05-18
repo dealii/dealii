@@ -503,6 +503,282 @@ private:
   double r, R;
 };
 
+
+
+/**
+ * A mapping class that extends curved boundary descriptions into the interior
+ * of the computational domain. The outer curved boundary description is
+ * assumed to be given by another manifold (e.g. a polar manifold on a circle).
+ * The mechanism to extend the boundary information is a so-called transfinite
+ * interpolation.
+ *
+ * The formula for extending such a description in 2D is inspired by
+ * <a href="https://en.wikipedia.org/wiki/Transfinite_interpolation">
+ * Wikipedia</a>
+ * Given a point $(u,v)$ on the chart, the image of this point in real space
+ * is given by
+ * @f{align*}{
+ * \bf S(u,v) &= (1-v)\bf c_0(u)+v \bf c_1(u) + (1-u)\bf c_2(v) + u \bf c_3(v) \\
+ * &\quad - \begin[(1-u)(1-v) \bf x_0 + u(1-v) \bf x_1 + (1-u)v \bf x_2 + uv \bf x_3 \right]
+ * @f}
+ * where $\bf x_0, \bf x_1, \bf x_2, \bf x_3$ denote the four bounding vertices
+ * bounding the image space and $\bf c_0, \bf c_1, \bf c_2, \bf c_3$ are the
+ * four curves describing the lines of the cell. If a curved manifold is
+ * attached to any of these lines, the evaluation is done according to
+ * Manifold::get_new_point() with the two end points of the line and
+ * appropriate weight. In 3D, the generalization of this formula is
+ * implemented, creating a weighted sum of the vertices (positive
+ * contribution), the lines (negative), and the faces (positive contribution).
+ *
+ * This manifold is usually attached to a coarse mesh and then places new
+ * points as a combination of the descriptions on the boundaries, weighted
+ * appropriately according to the position of the point on the original chart
+ * point $(u,v). Whenever possible, this manifold should be preferred over
+ * setting only a curved manifold on the boundary of a mesh, since the latter
+ * will need to switch from a curved description to a straight description in a
+ * single layer of elements, which causes an error order on cells close to the
+ * boundary that does not exceed 3 no matter how high the degree of the
+ * polynomial mapping and the finite element space. Using this class instead,
+ * the curved nature of the manifold that is originally contained in one
+ * <i>coarse</i> mesh layer will be applied to more than one <i>fine</i> mesh
+ * layer once the mesh gets refined, restoring the optimal convergence rates of
+ * the underlying finite element and mapping as appropriate.
+ *
+ * If no curved boundaries surround a coarse cell, this class reduces to a flat
+ * manifold description.
+ *
+ * To give an example of using this class, the following code attaches a
+ * transfinite manifold to a circle:
+ *
+ * @code
+ * PolarManifold<dim> polar_manifold;
+ * TransfiniteInterpolationManifold<dim> inner_manifold;
+ *
+ * Triangulation<dim> triangulation;
+ * GridGenerator::hyper_ball (triangulation);
+ *
+ * triangulation.set_all_manifold_ids(1);
+ * triangulation.set_all_manifold_ids_on_boundary(0);
+ * triangulation.set_manifold (0, polar_manifold);
+ * inner_manifold.initialize(triangulation);
+ * triangulation.set_manifold (1, inner_manifold);
+ * triangulation.refine_global(4);
+ * @endcode
+ *
+ * In this code, we first set all manifold ids to the id of the transfinite
+ * interpolation, and then re-set the manifold ids on the boundary to identify
+ * the curved boundary described by the polar manifold. With this code, one
+ * gets a really nice mesh:
+ *
+ * <p ALIGN="center">
+ * @image html circular_mesh_transfinite_interpolation.png
+ * </p>
+ *
+ * which is obviously much nicer than the polar manifold applied to just the
+ * boundary:
+ *
+ * <p ALIGN="center">
+ * @image html circular_mesh_only_boundary_manifold.png
+ * </p>
+ *
+ * @note In the implementation of this class, the manifolds surrounding a
+ * coarse cell are queried repeatedly to compute points on their interior. For
+ * optimal mesh quality, those manifolds should be compatible with a chart
+ * notion. For example, computing a point that is 0.25 along the line between
+ * two vertices using the weights 0.25 and 0.75 for the two vertices should
+ * give the same result as first computing the mid point at 0.5 and then again
+ * compute the midpoint between the first vertex and coarse mid point. This is
+ * the case for PolarManifold but not for Spherical manifold, so be careful
+ * when using the latter. In case the quality of the manifold is not good
+ * enough, upon mesh refinement it may happen that the transformation to a
+ * chart inside the get_new_point() or add_new_point() methods produces points
+ * that are outside the unit cells, then this class throws an exception of type
+ * Manifold@<dim,spacedim@>::ExcTransformationFailed. If that happens, the mesh
+ * should be refined before applying this class, as done in the following
+ * example:
+ * @code
+ * SphericalManifold<dim> spherical_manifold;
+ * TransfiniteInterpolationManifold<dim> inner_manifold;
+ * Triangulation<dim> triangulation;
+ * GridGenerator::hyper_ball (triangulation);
+ * triangulation.set_all_manifold_ids(1);
+ * triangulation.set_all_manifold_ids_on_boundary(0);
+ * triangulation.set_manifold (0, polar_manifold);
+ * inner_manifold.initialize(triangulation);
+ * triangulation.set_manifold (1, inner_manifold);
+ * triangulation.refine_global(1);
+ * // initialize the transfinite manifold again
+ * inner_manifold.initialize(triangulation);
+ * triangulation.refine_global(4);
+ * @endcode
+ *
+ * @note For performance and accuracy reasons, it is recommended to apply the
+ * transfinite manifold to as coarse a mesh as possible. Regarding accuracy,
+ * the curved description can only be applied to new points created from a
+ * given neighborhood, and the grid quality is typically higher when extending
+ * the curved description over as large a domain as possible. Regarding
+ * performance, the identification of the correct coarse cell in the
+ * get_new_point() method needs to pass all coarse cells, so expect a quadratic
+ * complexity in the number of coarse cells. Thus, the current implementation
+ * is only really economical when there are not more than a few hundred coarse
+ * cells. To make performance better for larger numbers of cells, one could
+ * extend the current implementation by a pre-identification of relevant cells
+ * with axis-aligned bounding boxes.
+ *
+ * @author Martin Kronbichler, Luca Heltai, 2017
+ */
+template <int dim, int spacedim=dim>
+class TransfiniteInterpolationManifold : public Manifold<dim,spacedim>
+{
+public:
+  /**
+   * Constructor.
+   */
+  TransfiniteInterpolationManifold();
+
+  /**
+   * Initializes the manifold with a coarse mesh. The prerequisite for using
+   * this class is that the input triangulation is uniformly refined and the
+   * manifold is later attached to the same triangulation.
+   *
+   * @note The triangulation used to construct the manifold must not be
+   * destroyed during the usage of this object.
+   */
+  void initialize (const Triangulation<dim,spacedim> &triangulation);
+
+  /**
+   * Return the point which shall become the new vertex surrounded by the
+   * given points @p surrounding_points. @p weights contains appropriate
+   * weights for the surrounding points according to which the manifold
+   * determines the new point's position.
+   *
+   * The implementation in this class overrides the method in the base class
+   * and computes the new point by a transfinite interpolation. The first step
+   * in the implementation is to identify the coarse cell on which the
+   * surrounding points are located. Then, the coordinates are transformed to
+   * the unit coordinates on the coarse cell by a Newton iteration, where the
+   * new point is then computed according to the weights. Finally, it is
+   * pushed forward to the real space according to the transfinite
+   * interpolation.
+   */
+  virtual
+  Point<spacedim>
+  get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
+                 const std::vector<double>           &weights) const;
+
+  /**
+   * Compute a new set of points that interpolate between the given points
+   * @p surrounding_points. @p weights is a table with as many columns as
+   * @p surrounding_points.size(). The number of rows in @p weights determines
+   * how many new points will be computed and appended to the last input
+   * argument @p new_points. After exit of this function, the size of
+   * @p new_points equals the size at entry plus the number of rows in
+   * @p weights.
+   *
+   * The implementation in this class overrides the method in the base class
+   * and computes the new point by a transfinite interpolation. The first step
+   * in the implementation is to identify the coarse cell on which the
+   * surrounding points are located. Then, the coordinates are transformed to
+   * the unit coordinates on the coarse cell by a Newton iteration, where the
+   * new points are then computed according to the weights. Finally, the is
+   * pushed forward to the real space according to the transfinite
+   * interpolation.
+   *
+   * The implementation does not allow for @p surrounding_points and
+   * @p new_points to point to the same vector, so make sure to pass different
+   * objects into the function.
+   */
+  virtual
+  void
+  add_new_points (const std::vector<Point<spacedim> > &surrounding_points,
+                  const Table<2,double>               &weights,
+                  std::vector<Point<spacedim> >       &new_points) const;
+
+private:
+  /**
+   * Internal function to identify the most suitable cells (=charts) where the
+   * given surrounding points are located. We use a cheap algorithm to identify
+   * the cells and rank the cells by probability before we actually do the
+   * search inside the relevant cells. The cells are sorted by the distance of
+   * a Q1 approximation of the inverse mapping to the unit cell of the
+   * surrounding points. We expect at most 10 cells (it should be less than 8
+   * candidates even in 3D, typically only two or three), so get an array with
+   * 10 entries of a the indices <tt>cell->index()</tt>.
+   */
+  std::array<unsigned int, 10>
+  get_possible_cells_around_points(const std::vector<Point<spacedim> > &surrounding_points) const;
+
+  /**
+   * Finalizes the identification of the correct chart and returns the location
+   * of the surrounding points on the chart. This method internally calls
+   * @p get_possible_cells_around_points().
+   */
+  std::pair<typename Triangulation<dim,spacedim>::cell_iterator,
+      std::vector<Point<dim> > >
+      compute_chart_points(const std::vector<Point<spacedim> > &surrounding_points) const;
+
+  /**
+   * Pull back operation into the unit coordinates on the given coarse cell.
+   *
+   * @note This internal function is currently not compatible with the
+   * ChartManifold::pull_back() function because the given class represents an
+   * atlas of charts, not a single chart. Thus, the pull_back() operation is
+   * only valid with the additional information of the chart, given by a cell
+   * on the coarse grid. An alternative implementation could shift the index
+   * depending on the coarse cell for a 1-to-1 relation between the chart space
+   * and the image space.
+   */
+  Point<dim>
+  pull_back(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+            const Point<spacedim> &p) const;
+
+  /**
+   * Push forward operation.
+   *
+   * @note This internal function is currently not compatible with the
+   * ChartManifold::pull_back() function because the given class represents an
+   * atlas of charts, not a single chart. Thus, the pull_back() operation is
+   * only valid with the additional information of the chart, given by a cell
+   * on the coarse grid. An alternative implementation could shift the index
+   * depending on the coarse cell for a 1-to-1 relation between the chart space
+   * and the image space.
+   */
+  Point<spacedim>
+  push_forward(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+               const Point<dim> &chart_point) const;
+
+  /**
+   * Gradient of the push_forward method.
+   */
+  DerivativeForm<1,dim,spacedim>
+  push_forward_gradient(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                        const Point<dim> &chart_point) const;
+
+  /**
+   * The underlying triangulation.
+   */
+  const Triangulation<dim,spacedim> *triangulation;
+
+  /**
+   * The level of the mesh cells where the transfinite approximation is
+   * applied, usually level 0.
+   */
+  int level_coarse;
+
+  /**
+   * In case there all surrounding manifolds are the transfinite manifold or
+   * have default (invalid) manifold id, the manifold degenerates to a flat
+   * manifold and we can choose cheaper algorithms for the push_forward method.
+   */
+  std::vector<bool> coarse_cell_is_flat;
+
+  /**
+   * A flat manifold used to compute new points in the chart space where it we
+   * use a FlatManifold description.
+   */
+  FlatManifold<dim> chart_manifold;
+};
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

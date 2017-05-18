@@ -24,6 +24,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_boundary.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe.h>
@@ -1461,6 +1462,8 @@ namespace
           }
 
         // Solve  [f'(x)]d=f(x)
+        AssertThrow(determinant(df) > 0,
+                    (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
         Tensor<2,spacedim> df_inverse = invert(df);
         const Tensor<1,spacedim> delta = df_inverse * static_cast<const Tensor<1,spacedim>&>(f);
 
@@ -3792,21 +3795,23 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
   if (this->polynomial_degree > 1)
     {
       // check if all entities have the same manifold id which is when we can
-      // simply ask the manifold for all points
+      // simply ask the manifold for all points. the transfinite manifold can
+      // do the interpolation better than this class, so if we detect that we
+      // do not have to change anything here
       Assert(dim<=3, ExcImpossibleInDim(dim));
       bool all_manifold_ids_are_equal = (dim == spacedim);
-      if (dim > 1)
-        for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
-          if (&cell->line(l)->get_manifold() != &cell->get_manifold())
-            all_manifold_ids_are_equal = false;
-      if (dim == 3)
-        if (check_identical_manifolds_of_quads(cell) == false)
-          all_manifold_ids_are_equal = false;
-      if (all_manifold_ids_are_equal)
+      if (all_manifold_ids_are_equal &&
+          dynamic_cast<const TransfiniteInterpolationManifold<dim,spacedim>*>(&cell->get_manifold()) == nullptr)
         {
-          std::vector<Point<spacedim> > vertices(a);
-          cell->get_manifold().add_new_points(vertices, support_point_weights_cell, a);
+          if (dim > 1)
+            for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+              if (&cell->line(l)->get_manifold() != &cell->get_manifold())
+                all_manifold_ids_are_equal = false;
+          if (dim == 3)
+            if (check_identical_manifolds_of_quads(cell) == false)
+              all_manifold_ids_are_equal = false;
         }
+
       else
         switch (dim)
           {
