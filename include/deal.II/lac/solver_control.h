@@ -528,6 +528,74 @@ public:
                        const double   check_value);
 };
 
+
+/**
+ * Specialization of @p SolverControl which returns SolverControl::State::success if
+ * and only if a certain positive number of consecutive iterations satisfy the
+ * specified tolerance. This is useful in cases when solving nonlinear problems
+ * using inexact Hessian.
+ *
+ * For example: The requested number of consecutively converged iterations is 2,
+ * the tolerance is 0.2. The ConsecutiveControl will return SolverControl::State::success
+ * only at the last step in the sequence 0.5, 0.0005, 1.0, 0.05, 0.01.
+ *
+ * @author Denis Davydov, 2017
+ */
+class ConsecutiveControl : public SolverControl
+{
+public:
+  /**
+   * Constructor. @p n_consecutive_iterations is the number of
+   * consecutive iterations which should satisfy the prescribed tolerance for
+   * convergence. Other arguments have the same meaning as those of the
+   * constructor of the SolverControl.
+   */
+  ConsecutiveControl (const unsigned int maxiter = 100,
+                      const double   tolerance   = 1.e-10,
+                      const unsigned int n_consecutive_iterations = 2,
+                      const bool     log_history = false,
+                      const bool     log_result  = false);
+
+  /**
+   * Initialize with a SolverControl object. The result will emulate
+   * SolverControl by setting @p n_consecutive_iterations to one.
+   */
+  ConsecutiveControl (const SolverControl &c);
+
+  /**
+   * Assign a SolverControl object to ConsecutiveControl. The result of the
+   * assignment will emulate SolverControl by setting @p n_consecutive_iterations
+   * to one.
+   */
+  ConsecutiveControl &operator= (const SolverControl &c);
+
+  /**
+   * Virtual destructor is needed as there are virtual functions in this
+   * class.
+   */
+  virtual ~ConsecutiveControl();
+
+  /**
+   * Decide about success or failure of an iteration, see the class description
+   * above.
+   */
+  virtual State check (const unsigned int step,
+                       const double   check_value);
+
+protected:
+  /**
+   * The number of consecutive iterations which should satisfy the prescribed
+   * tolerance for convergence.
+   */
+  unsigned int n_consecutive_iterations;
+
+  /**
+   * Counter for the number of consecutively converged iterations.
+   */
+  unsigned int n_converged_iterations;
+
+};
+
 /*@}*/
 //---------------------------------------------------------------------------
 

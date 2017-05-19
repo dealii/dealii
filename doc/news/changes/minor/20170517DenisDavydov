@@ -1,0 +1,5 @@
+New: add a new class ConsecutiveControl which returns SolverControl::State::success
+if and only if a certain positive number of consecutive iterations satisfy the
+specified tolerance.
+<br>
+(Denis Davydov, 2017/05/17)
