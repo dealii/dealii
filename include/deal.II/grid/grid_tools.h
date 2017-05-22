@@ -461,6 +461,99 @@ namespace GridTools
                       const double max_ratio = 1.6180339887,
                       const unsigned int max_iterations = 5);
 
+  /**
+   * Analyze the boundary cells of a mesh, and if one cell is found at
+   * a corner position (with dim adjacent faces on the boundary), and its
+   * dim-dimensional angle fraction exceeds @p limit_angle_fraction,
+   * refine globally once, and replace the children of such cell
+   * with children where the corner is no longer offending the given angle
+   * fraction.
+   *
+   * If no boundary cells exist with two adjacent faces on the boundary, then
+   * the triangulation is left untouched. If instead we do have cells with dim
+   * adjacent faces on the boundary, then the fraction between the dim-dimensional
+   * solid angle and dim*pi/2 is checked against the parameter @p limit_angle_fraction.
+   * If it is higher, the grid is refined once, and the children of the
+   * offending cell are replaced with some cells that instead respect the limit. After
+   * this process the triangulation is flattened, and all Manifold objects are restored
+   * as they were in the original triangulation.
+   *
+   * An example is given by the following mesh, obtained by attaching a SphericalManifold
+   * to a mesh generated using GridGenerator::hyper_cube:
+   *
+   * @code
+   * const SphericalManifold<dim> m0;
+   * Triangulation<dim> tria;
+   * GridGenerator::hyper_cube(tria,-1,1);
+   * tria.set_all_manifold_ids_on_boundary(0);
+   * tria.set_manifold(0, m0);
+   * tria.refine_global(4);
+   * @endcode
+   *
+   * <p ALIGN="center">
+   * @image html regularize_mesh_01.png
+   * </p>
+   *
+   * The four cells that were originally the corners of a square will give you some troubles
+   * during computations, as the jacobian of the transformation from the reference cell to
+   * those cells will go to zero, affecting the error constants of the finite element estimates.
+   *
+   * Those cells have a corner with an angle that is very close to 180 degrees, i.e., an angle
+   * fraction very close to one.
+   *
+   * The same code, adding a call to regularize_corner_cells:
+   * @code
+   * const SphericalManifold<dim> m0;
+   * Triangulation<dim> tria;
+   * GridGenerator::hyper_cube(tria,-1,1);
+   * tria.set_all_manifold_ids_on_boundary(0);
+   * tria.set_manifold(0, m0);
+   * GridTools::regularize_corner_cells(tria);
+   * tria.refine_global(2);
+   * @endcode
+   * generates a mesh that has a much better behaviour w.r.t. the jacobian of the Mapping:
+   *
+   * <p ALIGN="center">
+   * @image html regularize_mesh_02.png
+   * </p>
+   *
+   * This mesh is very similar to the one obtained by GridGenerator::hyper_ball. However, using
+   * GridTools::regularize_corner_cells one has the freedom to choose when to apply the
+   * regularization, i.e., one could in principle first refine a few times, and then call the
+   * regularize_corner_cells function:
+   *
+   * @code
+   * const SphericalManifold<dim> m0;
+   * Triangulation<dim> tria;
+   * GridGenerator::hyper_cube(tria,-1,1);
+   * tria.set_all_manifold_ids_on_boundary(0);
+   * tria.set_manifold(0, m0);
+   * tria.refine_global(2);
+   * GridTools::regularize_corner_cells(tria);
+   * tria.refine_global(1);
+   * @endcode
+   *
+   * This generates the following mesh:
+   *
+   * <p ALIGN="center">
+   * @image html regularize_mesh_03.png
+   * </p>
+   *
+   * The function is currently implemented only for dim = 2 and
+   * will throw an exception if called with dim = 3.
+   *
+   * @param[in,out] tria Triangulation to regularize.
+   *
+   * @param[in] limit_angle_fraction Maximum ratio of angle or solid
+   * angle that is allowed for a corner element in the mesh.
+   *
+   * @author Luca Heltai, Martin Kronbichler, 2017
+   */
+  template <int dim, int spacedim>
+  void
+  regularize_corner_cells(Triangulation<dim,spacedim> &tria,
+                          const double limit_angle_fraction=.75);
+
   /*@}*/
   /**
    * @name Finding cells and vertices of a triangulation

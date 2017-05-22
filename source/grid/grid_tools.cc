@@ -35,6 +35,7 @@
 #include <deal.II/grid/tria_boundary.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_reordering.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -4450,6 +4451,312 @@ next_cell:
         tria.execute_coarsening_and_refinement ();
       }
   }
+
+
+  template<int dim, int spacedim>
+  void regularize_corner_cells (Triangulation<dim,spacedim> &tria,
+                                const double limit_angle_fraction)
+  {
+    if (dim == 1)
+      return; // Nothing to do
+
+    // Check that we don't have hanging nodes
+    AssertThrow(!tria.has_hanging_nodes(), ExcMessage("The input Triangulation cannot "
+                                                      "have hanging nodes."));
+
+
+    bool has_cells_with_more_than_dim_faces_on_boundary = true;
+    bool has_cells_with_dim_faces_on_boundary = false;
+
+    unsigned int refinement_cycles = 0;
+
+    while (has_cells_with_more_than_dim_faces_on_boundary)
+      {
+        has_cells_with_more_than_dim_faces_on_boundary = false;
+
+        for (auto cell: tria.active_cell_iterators())
+          {
+            unsigned int boundary_face_counter = 0;
+            for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+              if (cell->face(f)->at_boundary())
+                boundary_face_counter++;
+            if (boundary_face_counter > dim)
+              {
+                has_cells_with_more_than_dim_faces_on_boundary = true;
+                break;
+              }
+            else if (boundary_face_counter == dim)
+              has_cells_with_dim_faces_on_boundary = true;
+          }
+        if (has_cells_with_more_than_dim_faces_on_boundary)
+          {
+            tria.refine_global(1);
+            refinement_cycles++;
+          }
+      }
+
+    if (has_cells_with_dim_faces_on_boundary)
+      {
+        tria.refine_global(1);
+        refinement_cycles++;
+      }
+    else
+      {
+        while (refinement_cycles>0)
+          {
+            for (auto cell: tria.active_cell_iterators())
+              cell->set_coarsen_flag();
+            tria.execute_coarsening_and_refinement();
+            refinement_cycles--;
+          }
+        return;
+      }
+
+    std::vector<bool> cells_to_remove(tria.n_active_cells(), false);
+    std::vector<Point<spacedim> > vertices = tria.get_vertices();
+
+    std::vector<bool> faces_to_remove(tria.n_raw_faces(),false);
+
+    std::vector<CellData<dim> > cells_to_add;
+    SubCellData                 subcelldata_to_add;
+
+    // Trick compiler for dimension independent things
+    const unsigned int
+    v0 = 0, v1 = 1,
+    v2 = (dim > 1 ? 2:0), v3 = (dim > 1 ? 3:0),
+    v4 = (dim > 2 ? 4:0), v5 = (dim > 2 ? 5:0),
+    v6 = (dim > 2 ? 6:0), v7 = (dim > 2 ? 7:0);
+
+    for (auto cell : tria.active_cell_iterators())
+      {
+        double angle_fraction = 0;
+        unsigned int vertex_at_corner = numbers::invalid_unsigned_int;
+
+        if (dim == 2)
+          {
+            Tensor<1,spacedim> p0;
+            p0[spacedim > 1 ? 1 : 0] = 1;
+            Tensor<1,spacedim> p1;
+            p1[0] = 1;
+
+            if (cell->face(v0)->at_boundary() && cell->face(v3)->at_boundary())
+              {
+                p0 = cell->vertex(v0) -  cell->vertex(v2);
+                p1 = cell->vertex(v3) -  cell->vertex(v2);
+                vertex_at_corner = v2;
+              }
+            else  if (cell->face(v3)->at_boundary() && cell->face(v1)->at_boundary())
+              {
+                p0 = cell->vertex(v2) -  cell->vertex(v3);
+                p1 = cell->vertex(v1) -  cell->vertex(v3);
+                vertex_at_corner = v3;
+              }
+            else  if (cell->face(1)->at_boundary() && cell->face(2)->at_boundary())
+              {
+                p0 = cell->vertex(v0) -  cell->vertex(v1);
+                p1 = cell->vertex(v3) -  cell->vertex(v1);
+                vertex_at_corner = v1;
+              }
+            else  if (cell->face(2)->at_boundary() && cell->face(0)->at_boundary())
+              {
+                p0 = cell->vertex(v2) -  cell->vertex(v0);
+                p1 = cell->vertex(v1) -  cell->vertex(v0);
+                vertex_at_corner = v0;
+              }
+            p0 /= p0.norm();
+            p1 /= p1.norm();
+            angle_fraction = std::acos(p0*p1)/numbers::PI;
+
+          }
+        else
+          {
+            Assert(false, ExcNotImplemented());
+          }
+
+        if (angle_fraction > limit_angle_fraction)
+          {
+
+            auto flags_removal = [&](unsigned int f1, unsigned int f2,
+                                     unsigned int n1, unsigned int n2) -> void
+            {
+              cells_to_remove[cell->active_cell_index()] = true;
+              cells_to_remove[cell->neighbor(n1)->active_cell_index()] = true;
+              cells_to_remove[cell->neighbor(n2)->active_cell_index()] = true;
+
+              faces_to_remove[cell->face(f1)->index()] = true;
+              faces_to_remove[cell->face(f2)->index()] = true;
+
+              faces_to_remove[cell->neighbor(n1)->face(f1)->index()] = true;
+              faces_to_remove[cell->neighbor(n2)->face(f2)->index()] = true;
+            };
+
+            auto cell_creation = [&](
+                                   const unsigned int vv0,
+                                   const unsigned int vv1,
+                                   const unsigned int f0,
+                                   const unsigned int f1,
+
+                                   const unsigned int n0,
+                                   const unsigned int v0n0,
+                                   const unsigned int v1n0,
+
+                                   const unsigned int n1,
+                                   const unsigned int v0n1,
+                                   const unsigned int v1n1)
+            {
+              CellData<dim> c1, c2;
+              CellData<1> l1, l2;
+
+              c1.vertices[v0] = cell->vertex_index(vv0);
+              c1.vertices[v1] = cell->vertex_index(vv1);
+              c1.vertices[v2] = cell->neighbor(n0)->vertex_index(v0n0);
+              c1.vertices[v3] = cell->neighbor(n0)->vertex_index(v1n0);
+
+              c1.manifold_id = cell->manifold_id();
+              c1.material_id = cell->material_id();
+
+              c2.vertices[v0] = cell->vertex_index(vv0);
+              c2.vertices[v1] = cell->neighbor(n1)->vertex_index(v0n1);
+              c2.vertices[v2] = cell->vertex_index(vv1);
+              c2.vertices[v3] = cell->neighbor(n1)->vertex_index(v1n1);
+
+              c2.manifold_id = cell->manifold_id();
+              c2.material_id = cell->material_id();
+
+              l1.vertices[0] = cell->vertex_index(vv0);
+              l1.vertices[1] = cell->neighbor(n0)->vertex_index(v0n0);
+
+              l1.boundary_id = cell->line(f0)->boundary_id();
+              l1.manifold_id = cell->line(f0)->manifold_id();
+              subcelldata_to_add.boundary_lines.push_back(l1);
+
+              l2.vertices[0] = cell->vertex_index(vv0);
+              l2.vertices[1] = cell->neighbor(n1)->vertex_index(v0n1);
+
+              l2.boundary_id = cell->line(f1)->boundary_id();
+              l2.manifold_id = cell->line(f1)->manifold_id();
+              subcelldata_to_add.boundary_lines.push_back(l2);
+
+              cells_to_add.push_back(c1);
+              cells_to_add.push_back(c2);
+            };
+
+            if (dim == 2)
+              {
+                switch (vertex_at_corner)
+                  {
+                  case 0:
+                    flags_removal(0,2,3,1);
+                    cell_creation(0,3, 0,2, 3,2,3,  1,1,3);
+                    break;
+                  case 1:
+                    flags_removal(1,2,3,0);
+                    cell_creation(1,2, 2,1, 0,0,2, 3,3,2);
+                    break;
+                  case 2:
+                    flags_removal(3,0,1,2);
+                    cell_creation(2,1, 3,0, 1,3,1, 2,0,1);
+                    break;
+                  case 3:
+                    flags_removal(3,1,0,2);
+                    cell_creation(3,0, 1,3, 2,1,0, 0,2,0);
+                    break;
+                  }
+              }
+            else
+              {
+                Assert(false, ExcNotImplemented());
+              }
+          }
+      }
+
+    // if no cells need to be added, then no regularization is necessary. Restore things
+    // as they were before this function was called.
+    if (cells_to_add.size() == 0)
+      {
+        while (refinement_cycles>0)
+          {
+            for (auto cell: tria.active_cell_iterators())
+              cell->set_coarsen_flag();
+            tria.execute_coarsening_and_refinement();
+            refinement_cycles--;
+          }
+        return;
+      }
+
+    // add the cells that were not marked as skipped
+    for (auto cell : tria.active_cell_iterators())
+      {
+        if (cells_to_remove[cell->active_cell_index()] == false)
+          {
+            CellData<dim> c;
+            for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+              c.vertices[v] = cell->vertex_index(v);
+            c.manifold_id = cell->manifold_id();
+            c.material_id = cell->material_id();
+            cells_to_add.push_back(c);
+          }
+      }
+
+    // Face counter for both dim == 2 and dim == 3
+    typename Triangulation<dim,spacedim>::active_face_iterator
+    face = tria.begin_active_face(),
+    endf = tria.end_face();
+    for (; face != endf; ++face)
+      if ( (face->at_boundary() || face->manifold_id() != numbers::invalid_manifold_id)
+           && faces_to_remove[face->index()] == false)
+        {
+          for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_face; ++l)
+            {
+              CellData<1> line;
+              if (dim == 2)
+                {
+                  for (unsigned int v=0; v<GeometryInfo<1>::vertices_per_cell; ++v)
+                    line.vertices[v] = face->vertex_index(v);
+                  line.boundary_id = face->boundary_id();
+                  line.manifold_id = face->manifold_id();
+                }
+              else
+                {
+                  for (unsigned int v=0; v<GeometryInfo<1>::vertices_per_cell; ++v)
+                    line.vertices[v] = face->line(l)->vertex_index(v);
+                  line.boundary_id = face->line(l)->boundary_id();
+                  line.manifold_id = face->line(l)->manifold_id();
+                }
+              subcelldata_to_add.boundary_lines.push_back(line);
+            }
+          if (dim == 3)
+            {
+              CellData<2> quad;
+              for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
+                quad.vertices[v] = face->vertex_index(v);
+              quad.boundary_id = face->boundary_id();
+              quad.manifold_id = face->manifold_id();
+              subcelldata_to_add.boundary_quads.push_back(quad);
+            }
+        }
+    GridTools::delete_unused_vertices(vertices, cells_to_add, subcelldata_to_add);
+    GridReordering<dim,spacedim>::reorder_cells(cells_to_add, true);
+
+    // Save manifolds
+    auto manifold_ids = tria.get_manifold_ids();
+    std::map<types::manifold_id, const Manifold<dim,spacedim>*> manifolds;
+    // Set manifolds in new Triangulation
+    for (auto manifold_id: manifold_ids)
+      if (manifold_id != numbers::invalid_manifold_id)
+        manifolds[manifold_id] = &tria.get_manifold(manifold_id);
+
+    tria.clear();
+
+    tria.create_triangulation(vertices, cells_to_add, subcelldata_to_add);
+
+    // Restore manifolds
+    for (auto manifold_id: manifold_ids)
+      if (manifold_id != numbers::invalid_manifold_id)
+        tria.set_manifold(manifold_id, *manifolds[manifold_id]);
+  }
+
+
 
 } /* namespace GridTools */
 
