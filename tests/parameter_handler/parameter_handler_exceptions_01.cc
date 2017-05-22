@@ -54,7 +54,7 @@ void check (const char *p)
 
 
   // make sure the prm object was reset to a state where we are in the
-  // subsection we were in before attempting the `read_input` call
+  // subsection we were in before attempting the `parse_input` call
   // (namely, in the top-level section of the prm tree)
   deallog << "test_1="
           << prm.get ("test_1")  // should =1, because we read that value
