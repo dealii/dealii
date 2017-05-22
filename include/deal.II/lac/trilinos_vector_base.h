@@ -413,6 +413,14 @@ namespace TrilinosWrappers
     bool has_ghost_elements() const;
 
     /**
+     * This function only exists for compatibility with the @p
+     * LinearAlgebra::distributed::Vector class and does nothing: this class
+     * implements ghost value updates in a different way that is a better fit
+     * with the underlying Trilinos vector object.
+     */
+    void update_ghost_values () const;
+
+    /**
      * Return the scalar (inner) product of two vectors. The vectors must have
      * the same size.
      */
@@ -1015,6 +1023,13 @@ namespace TrilinosWrappers
   {
     return has_ghosts;
   }
+
+
+
+  inline
+  void
+  VectorBase::update_ghost_values () const
+  {}
 
 
 
