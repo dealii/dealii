@@ -27,6 +27,7 @@
 #       GIT_BRANCH
 #       GIT_REVISION
 #       GIT_SHORTREV
+#       GIT_TAG
 #
 # If this macro is called within the deal.II build system the variables are
 # prefixed with DEAL_II_:
@@ -34,6 +35,7 @@
 #       DEAL_II_GIT_BRANCH
 #       DEAL_II_GIT_REVISION
 #       DEAL_II_GIT_SHORTREV
+#       DEAL_II_GIT_TAG
 #
 
 MACRO(DEAL_II_QUERY_GIT_INFORMATION)
@@ -108,6 +110,30 @@ MACRO(DEAL_II_QUERY_GIT_INFORMATION)
     IF(${_result} EQUAL 0)
       STRING(REGEX REPLACE "refs/heads/" "" ${_prefix}GIT_BRANCH "${_branch}")
     ENDIF()
+
+    #
+    # Query for tag:
+    #
+
+    EXECUTE_PROCESS(
+       COMMAND ${GIT_EXECUTABLE} rev-list --tags --max-count=1
+       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+       OUTPUT_VARIABLE _tag
+       RESULT_VARIABLE _result
+       OUTPUT_STRIP_TRAILING_WHITESPACE
+       )
+
+    EXECUTE_PROCESS(
+       COMMAND ${GIT_EXECUTABLE} describe --tags ${_tag}
+       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+       OUTPUT_VARIABLE _tag
+       RESULT_VARIABLE _result
+       OUTPUT_STRIP_TRAILING_WHITESPACE
+       )
+    IF(${_result} EQUAL 0)
+      SET(${_prefix}GIT_TAG ${_tag})
+    ENDIF()
+
   ENDIF()
 
 ENDMACRO()
