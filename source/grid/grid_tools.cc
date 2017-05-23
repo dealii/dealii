@@ -4523,9 +4523,7 @@ next_cell:
     // Trick compiler for dimension independent things
     const unsigned int
     v0 = 0, v1 = 1,
-    v2 = (dim > 1 ? 2:0), v3 = (dim > 1 ? 3:0),
-    v4 = (dim > 2 ? 4:0), v5 = (dim > 2 ? 5:0),
-    v6 = (dim > 2 ? 6:0), v7 = (dim > 2 ? 7:0);
+    v2 = (dim > 1 ? 2:0), v3 = (dim > 1 ? 3:0);
 
     for (auto cell : tria.active_cell_iterators())
       {
