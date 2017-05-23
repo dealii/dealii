@@ -410,9 +410,28 @@ namespace deal_II_exceptions
     {
       if (dealii::deal_II_exceptions::abort_on_exception)
         {
-          // Print the error message and bail out:
+          // first print the error
           std::cerr << exc.what() << std::endl;
+
+          // then bail out. if in MPI mode, bring down the entire
+          // house by asking the MPI system to do a best-effort
+          // operation at also terminating all of the other MPI
+          // processes. this is useful because if only one process
+          // runs into an assertion, then that may lead to deadlocks
+          // if the others don't recognize this, or at the very least
+          // delay their termination until they realize that their
+          // communication with the job that died times out.
+#ifdef DEAL_II_WITH_MPI
+          int is_initialized;
+          MPI_Initialized(&is_initialized);
+          if (is_initialized)
+            MPI_Abort (MPI_COMM_WORLD,
+                       /* return code = */ 255);
+          else
+            std::abort ();
+#else
           std::abort();
+#endif
         }
       else if (nothrow)
         {
