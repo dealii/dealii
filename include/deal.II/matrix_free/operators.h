@@ -343,6 +343,18 @@ namespace MatrixFreeOperators
   protected:
 
     /**
+     * Perform necessary operations related to constraints before calling
+     * apply_add() or Tapply_add() inside mult_add().
+     */
+    void preprocess_constraints(VectorType &dst, const VectorType &src) const;
+
+    /**
+     * Perform necessary operations related to constraints after calling
+     * apply_add() or Tapply_add() inside mult_add().
+     */
+    void postprocess_constraints(VectorType &dst, const VectorType &src) const;
+
+    /**
      * Set constrained entries (both from hanging nodes and edge constraints)
      * of @p dst to one.
      */
@@ -1180,13 +1192,9 @@ namespace MatrixFreeOperators
 
   template <int dim, typename VectorType>
   void
-  Base<dim,VectorType>::mult_add (VectorType &dst,
-                                  const VectorType &src,
-                                  const bool transpose) const
+  Base<dim,VectorType>::preprocess_constraints (VectorType &dst,
+                                                const VectorType &src) const
   {
-    AssertDimension(dst.size(), src.size());
-    AssertDimension(n_blocks(dst), n_blocks(src));
-    AssertDimension(n_blocks(dst), selected_rows.size());
     typedef typename Base<dim,VectorType>::value_type Number;
     adjust_ghost_range_if_necessary(src, false);
     adjust_ghost_range_if_necessary(dst, true);
@@ -1204,12 +1212,34 @@ namespace MatrixFreeOperators
             subblock(const_cast<VectorType &>(src),j).local_element(edge_constrained_indices[j][i]) = 0.;
           }
       }
+  }
 
+
+
+  template <int dim, typename VectorType>
+  void
+  Base<dim,VectorType>::mult_add (VectorType &dst,
+                                  const VectorType &src,
+                                  const bool transpose) const
+  {
+    AssertDimension(dst.size(), src.size());
+    AssertDimension(n_blocks(dst), n_blocks(src));
+    AssertDimension(n_blocks(dst), selected_rows.size());
+    preprocess_constraints (dst,src);
     if (transpose)
       Tapply_add(dst,src);
     else
       apply_add(dst,src);
+    postprocess_constraints(dst,src);
+  }
 
+
+
+  template <int dim, typename VectorType>
+  void
+  Base<dim,VectorType>::postprocess_constraints (VectorType &dst,
+                                                 const VectorType &src) const
+  {
     for (unsigned int j=0; j<n_blocks(dst); ++j)
       {
         const std::vector<unsigned int> &
