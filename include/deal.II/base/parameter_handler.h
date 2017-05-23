@@ -2586,15 +2586,14 @@ public:
    * will stop parsing lines after encountering @p last_line .
    * This is handy when adding extra data that shall be parsed manually.
    *
-   * @note Of the three <tt>parse_input</tt> functions implemented by
-   * ParameterHandler, this method and the deprecated method
-   * MultipleParameterLoop::read_input are the only ones overridden with new
-   * behavior by this class. This is because the other two <tt>parse_input</tt>
-   * functions just reformat their inputs and then call this version.
+   * @note This is the only overload of the three <tt>parse_input</tt>
+   * functions implemented by ParameterHandler overridden with new behavior by
+   * this class. This is because the other two <tt>parse_input</tt> functions
+   * just reformat their inputs and then call this version.
    */
   virtual void parse_input (std::istream &input,
                             const std::string &filename = "input file",
-                            const std::string &last_line = "");
+                            const std::string &last_line = "") override;
 
   /**
    * Overriding virtual functions which are overloaded (like
