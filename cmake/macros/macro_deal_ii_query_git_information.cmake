@@ -109,24 +109,25 @@ MACRO(DEAL_II_QUERY_GIT_INFORMATION)
     #
     # Query for tag:
     #
-
-    EXECUTE_PROCESS(
-       COMMAND ${GIT_EXECUTABLE} rev-list --tags --max-count=1
-       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-       OUTPUT_VARIABLE _tag
-       RESULT_VARIABLE _result
-       OUTPUT_STRIP_TRAILING_WHITESPACE
-       )
-
-    EXECUTE_PROCESS(
-       COMMAND ${GIT_EXECUTABLE} describe --tags ${_tag}
-       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-       OUTPUT_VARIABLE _tag
-       RESULT_VARIABLE _result
-       OUTPUT_STRIP_TRAILING_WHITESPACE
-       )
-    IF(${_result} EQUAL 0)
-      SET(${_prefix}GIT_TAG ${_tag})
+    SET(_script "")
+    IF(EXISTS     ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/scripts/get_latest_tag.sh)
+      SET(_script ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/scripts/get_latest_tag.sh)
+    ELSEIF(EXISTS ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/get_latest_tag.sh)
+      SET(_script ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/get_latest_tag.sh)
+    ENDIF()
+    IF(NOT "${_script}" STREQUAL "")
+       EXECUTE_PROCESS(
+          COMMAND ${_script}
+          WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+          OUTPUT_VARIABLE _tag
+          RESULT_VARIABLE _result
+          OUTPUT_STRIP_TRAILING_WHITESPACE
+          )
+       IF(${_result} EQUAL 0)
+         SET(${_prefix}GIT_TAG ${_tag})
+       ENDIF()
+    ELSE()
+       MESSAGE(STATUS "Could not locate get_latest_tag.sh. " ${_prefix}GIT_TAG " will not be set.")
     ENDIF()
 
   ENDIF()
