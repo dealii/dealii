@@ -54,8 +54,8 @@ MACRO(CHECK_MPI_INTERFACE _feature _var)
         "deal.II picked up."
         )
       TO_STRING(_str ${MPI_LIBRARIES})
-      SET(PETSC_ADDITIONAL_ERROR_STRING
-        ${PETSC_ADDITIONAL_ERROR_STRING}
+      SET(${_feature}_ADDITIONAL_ERROR_STRING
+        ${${_feature}_ADDITIONAL_ERROR_STRING}
         "Could not find a sufficient ${_feature} installation:\n"
         "${_feature} has to be compiled against the same MPI library as deal.II "
         "but the link line of ${_feature} contains:\n"
