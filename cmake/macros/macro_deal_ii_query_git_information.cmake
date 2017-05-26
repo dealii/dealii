@@ -19,6 +19,7 @@
 #
 # Usage:
 #       DEAL_II_QUERY_GIT_INFORMATION()
+#       DEAL_II_QUERY_GIT_INFORMATION("CUSTOM_PREFIX")
 #
 # This will try to gather information about current branch, as well as
 # short and long revision. If ${CMAKE_SOURCE_DIR} is the root of a git
@@ -27,29 +28,25 @@
 #       GIT_BRANCH
 #       GIT_REVISION
 #       GIT_SHORTREV
+#       GIT_TAG
 #
-# If this macro is called within the deal.II build system the variables are
-# prefixed with DEAL_II_:
+# The macro can be called with an optional PREFIX argument to prefix the
+# variables:
 #
-#       DEAL_II_GIT_BRANCH
-#       DEAL_II_GIT_REVISION
-#       DEAL_II_GIT_SHORTREV
+#       PREFIX_GIT_BRANCH
+#       PREFIX_GIT_REVISION
+#       PREFIX_GIT_SHORTREV
+#       PREFIX_GIT_TAG
 #
 
 MACRO(DEAL_II_QUERY_GIT_INFORMATION)
 
   MESSAGE(STATUS "Query git repository information.")
 
-  #
-  # If DEAL_II_BASE_NAME is defined and DEAL_II_PROJECT_CONFIG_INCLUDED was
-  # not set, we assume that we are called from within the deal.II build
-  # system. In this case we prepend all variables by "DEAL_II_"
-  #
-  IF( DEFINED DEAL_II_BASE_NAME AND
-      NOT DEFINED DEAL_II_PROJECT_CONFIG_INCLUDED )
-    SET(_prefix "DEAL_II_")
-  ELSE()
-    SET(_prefix "")
+  # Set prefix.
+  SET(_prefix "")
+  IF(NOT "${ARGN}" STREQUAL "")
+    SET(_prefix "${ARGN}_")
   ENDIF()
 
   FIND_PACKAGE(Git)
@@ -108,6 +105,31 @@ MACRO(DEAL_II_QUERY_GIT_INFORMATION)
     IF(${_result} EQUAL 0)
       STRING(REGEX REPLACE "refs/heads/" "" ${_prefix}GIT_BRANCH "${_branch}")
     ENDIF()
+
+    #
+    # Query for tag:
+    #
+    SET(_script "")
+    IF(EXISTS     ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/scripts/get_latest_tag.sh)
+      SET(_script ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/scripts/get_latest_tag.sh)
+    ELSEIF(EXISTS ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/get_latest_tag.sh)
+      SET(_script ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/get_latest_tag.sh)
+    ENDIF()
+    IF(NOT "${_script}" STREQUAL "")
+       EXECUTE_PROCESS(
+          COMMAND ${_script}
+          WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+          OUTPUT_VARIABLE _tag
+          RESULT_VARIABLE _result
+          OUTPUT_STRIP_TRAILING_WHITESPACE
+          )
+       IF(${_result} EQUAL 0)
+         SET(${_prefix}GIT_TAG ${_tag})
+       ENDIF()
+    ELSE()
+       MESSAGE(STATUS "Could not locate get_latest_tag.sh. " ${_prefix}GIT_TAG " will not be set.")
+    ENDIF()
+
   ENDIF()
 
 ENDMACRO()

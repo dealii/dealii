@@ -49,6 +49,8 @@ SET(_scripts
   ${CMAKE_CURRENT_SOURCE_DIR}/normalize.pl
   ${CMAKE_CURRENT_SOURCE_DIR}/run_test.cmake
   ${CMAKE_CURRENT_SOURCE_DIR}/run_test.sh
+  ${CMAKE_CURRENT_SOURCE_DIR}/get_closest_tag.sh
+  ${CMAKE_CURRENT_SOURCE_DIR}/get_latest_tag.sh
   )
 FILE(COPY ${_scripts}
   DESTINATION ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/scripts

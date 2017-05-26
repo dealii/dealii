@@ -20,7 +20,7 @@
 #                                                                      #
 ########################################################################
 
-DEAL_II_QUERY_GIT_INFORMATION()
+DEAL_II_QUERY_GIT_INFORMATION("DEAL_II")
 
 FILE(WRITE ${CMAKE_BINARY_DIR}/revision.log
 "###
