@@ -459,14 +459,18 @@ IndexSet::write(std::ostream &out) const
 void
 IndexSet::read(std::istream &in)
 {
-  size_type s;
-  unsigned int numranges;
+  AssertThrow (in, ExcIO());
 
-  in >> s >> numranges;
+  size_type s;
+  unsigned int n_ranges;
+
+  in >> s >> n_ranges;
   ranges.clear();
   set_size(s);
-  for (unsigned int i=0; i<numranges; ++i)
+  for (unsigned int i=0; i<n_ranges; ++i)
     {
+      AssertThrow (in, ExcIO());
+
       size_type b, e;
       in >> b >> e;
       add_range(b,e);
