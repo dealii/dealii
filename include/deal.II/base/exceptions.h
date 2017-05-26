@@ -265,16 +265,22 @@ namespace deal_II_exceptions
      * This routine does the main work for the exception generation mechanism
      * used in the <tt>Assert</tt> macro.
      *
+     * The actual exception object (the last argument) is typically an unnamed
+     * object created in place; because we modify it, we can't take it by
+     * const reference, and temporaries don't bind to non-const references.
+     * So take it by value (=copy it) -- the performance implications are
+     * pretty minimal anyway.
+     *
      * @ref ExceptionBase
      */
-    template <class exc>
-    void issue_error (ExceptionHandling handling,
-                      const char *file,
-                      int         line,
-                      const char *function,
-                      const char *cond,
-                      const char *exc_name,
-                      exc         e)
+    template <class ExceptionType>
+    void issue_error (ExceptionHandling  handling,
+                      const char       *file,
+                      int               line,
+                      const char       *function,
+                      const char       *cond,
+                      const char       *exc_name,
+                      ExceptionType     e)
     {
       // Fill the fields of the exception object
       e.set_fields (file, line, function, cond, exc_name);
