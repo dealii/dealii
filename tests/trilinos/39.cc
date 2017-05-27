@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::add(scalar, Vector)
+// check TrilinosWrappers::MPI::Vector::add(scalar, Vector)
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>

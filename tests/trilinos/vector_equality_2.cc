@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::operator==(TrilinosWrappers::Vector) for vectors that are
+// check TrilinosWrappers::MPI::Vector::operator==(TrilinosWrappers::Vector) for vectors that are
 // equal
 
 #include "../tests.h"

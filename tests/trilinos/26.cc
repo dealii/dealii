@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::operator = (TrilinosScalar) with setting to a
+// check TrilinosWrappers::MPI::Vector::operator = (TrilinosScalar) with setting to a
 // nonzero value
 
 #include "../tests.h"

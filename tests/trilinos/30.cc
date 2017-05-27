@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::reinit(!fast)
+// check TrilinosWrappers::MPI::Vector::reinit(!fast)
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>

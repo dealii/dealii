@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::operator() in set-mode
+// check TrilinosWrappers::MPI::Vector::operator() in set-mode
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>

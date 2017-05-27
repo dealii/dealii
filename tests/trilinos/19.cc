@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::linfty_norm()
+// check TrilinosWrappers::MPI::Vector::linfty_norm()
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>

@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::all_zero
+// check TrilinosWrappers::MPI::Vector::all_zero
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>

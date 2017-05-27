@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::l1_norm()
+// check TrilinosWrappers::MPI::Vector::l1_norm()
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>

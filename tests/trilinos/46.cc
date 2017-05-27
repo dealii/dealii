@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::equ (s,V)
+// check TrilinosWrappers::MPI::Vector::equ (s,V)
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>

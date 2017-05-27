@@ -15,7 +15,7 @@
 
 
 
-// this test used to check for TrilinosWrappers::Vector::clear(). However, this
+// this test used to check for TrilinosWrappers::MPI::Vector::clear(). However, this
 // function has since been removed, so we test for v=0 instead, although that
 // may be covered by one of the other tests
 

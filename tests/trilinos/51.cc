@@ -15,7 +15,7 @@
 
 
 
-// check copy constructor TrilinosWrappers::Vector::Vector(Vector)
+// check copy constructor TrilinosWrappers::MPI::Vector::Vector(Vector)
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>

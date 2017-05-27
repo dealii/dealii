@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::operator() in set/add-mode
+// check TrilinosWrappers::MPI::Vector::operator() in set/add-mode
 // alternatingly. this test doesn't really make sense any more -- at
 // least one a single processor. on multiple processors, one has to
 // call compress() and it used to be that we had code that called

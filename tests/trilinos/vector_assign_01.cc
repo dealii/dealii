@@ -15,7 +15,7 @@
 
 
 
-// when calling TrilinosWrappers::Vector::operator() (), the return type is a
+// when calling TrilinosWrappers::MPI::Vector::operator() (), the return type is a
 // reference object, not a reference to the actual element. this leads to the
 // funny situation that an assignment like v2(i)=v1(i) isn't really what it
 // looks like: it tries to copy the reference objects, not the values they

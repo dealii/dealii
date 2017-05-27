@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::operator*(Vector) on two vectors that are
+// check TrilinosWrappers::MPI::Vector::operator*(Vector) on two vectors that are
 // not orthogonal
 
 #include "../tests.h"

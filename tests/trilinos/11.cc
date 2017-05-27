@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::size()
+// check TrilinosWrappers::MPI::Vector::size()
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>

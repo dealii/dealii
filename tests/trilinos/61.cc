@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::operator = (const ::Vector &)
+// check TrilinosWrappers::MPI::Vector::operator = (const ::Vector &)
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>

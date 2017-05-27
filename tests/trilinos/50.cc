@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::operator = (Vector<T>) with T!=TrilinosScalar
+// check TrilinosWrappers::MPI::Vector::operator = (Vector<T>) with T!=TrilinosScalar
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>

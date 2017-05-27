@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::sadd(scalar, scalar, Vector)
+// check TrilinosWrappers::MPI::Vector::sadd(scalar, scalar, Vector)
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>

@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::add(s,V,s,V)
+// check TrilinosWrappers::MPI::Vector::add(s,V,s,V)
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>

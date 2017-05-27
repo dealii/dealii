@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::operator *=
+// check TrilinosWrappers::MPI::Vector::operator *=
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>

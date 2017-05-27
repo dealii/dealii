@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::mean_value()
+// check TrilinosWrappers::MPI::Vector::mean_value()
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>

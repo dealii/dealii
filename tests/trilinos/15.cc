@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::operator() in set/add-mode alternatingly, but
+// check TrilinosWrappers::MPI::Vector::operator() in set/add-mode alternatingly, but
 // writing to the same elements
 //
 // this test doesn't really make sense any more -- at least one a

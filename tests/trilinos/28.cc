@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::operator = (Vector), except that we don't
+// check TrilinosWrappers::MPI::Vector::operator = (Vector), except that we don't
 // resize the vector to be copied to beforehand
 
 #include "../tests.h"

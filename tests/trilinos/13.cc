@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::operator() in add-mode
+// check TrilinosWrappers::MPI::Vector::operator() in add-mode
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
