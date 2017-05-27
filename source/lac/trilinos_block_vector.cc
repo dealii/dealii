@@ -17,33 +17,15 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-#  include <deal.II/lac/trilinos_block_sparse_matrix.h>
+#include <deal.II/lac/trilinos_index_access.h>
+
+#include <deal.II/lac/trilinos_block_sparse_matrix.h>
 
 
 DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
-  namespace
-  {
-    // define a helper function that queries the size of an Epetra_Map object
-    // by calling either the 32- or 64-bit function necessary, and returns the
-    // result in the correct data type so that we can use it in calling other
-    // Epetra member functions that are overloaded by index type
-#ifndef DEAL_II_WITH_64BIT_INDICES
-    int n_global_elements (const Epetra_BlockMap &map)
-    {
-      return map.NumGlobalElements();
-    }
-#else
-    long long int n_global_elements (const Epetra_BlockMap &map)
-    {
-      return map.NumGlobalElements64();
-    }
-#endif
-  }
-
-
   namespace MPI
   {
     BlockVector &
@@ -248,7 +230,7 @@ namespace TrilinosWrappers
     std::vector<size_type> block_sizes (no_blocks);
 
     for (size_type i=0; i<no_blocks; ++i)
-      block_sizes[i] = n_global_elements(input_maps[i]);
+      block_sizes[i] = TrilinosWrappers::n_global_elements(input_maps[i]);
 
 
     this->block_indices.reinit (block_sizes);

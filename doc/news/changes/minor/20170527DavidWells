@@ -1,0 +1,4 @@
+New: There is a new header, <tt>lac/trilinos_index_access.h</tt>, that provides
+index and size functions for some common Trilinos objects that work correctly for
+both 32 and 64 bit code.
+<br> (David Wells, 2017/05/10)

@@ -13,6 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/lac/trilinos_index_access.h>
 #include <deal.II/lac/trilinos_precondition.h>
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -20,6 +21,7 @@
 
 #  include <deal.II/lac/vector.h>
 #  include <deal.II/lac/sparse_matrix.h>
+#  include <deal.II/lac/trilinos_index_access.h>
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
@@ -38,43 +40,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
-  namespace
-  {
-#ifndef DEAL_II_WITH_64BIT_INDICES
-    int n_global_rows (const Epetra_RowMatrix &matrix)
-    {
-      return matrix.NumGlobalRows();
-    }
-
-    int global_length (const Epetra_MultiVector &vector)
-    {
-      return vector.GlobalLength();
-    }
-
-    int gid(const Epetra_Map &map, unsigned int i)
-    {
-      return map.GID(i);
-    }
-#else
-    long long int n_global_rows (const Epetra_RowMatrix &matrix)
-    {
-      return matrix.NumGlobalRows64();
-    }
-
-    long long int global_length (const Epetra_MultiVector &vector)
-    {
-      return vector.GlobalLength64();
-    }
-
-    long long int gid(const Epetra_Map &map, dealii::types::global_dof_index i)
-    {
-      return map.GID64(i);
-    }
-#endif
-  }
-
-
-
   PreconditionAMGMueLu::AdditionalData::
   AdditionalData (const bool                             elliptic,
                   const unsigned int                     n_cycles,
@@ -181,7 +146,7 @@ namespace TrilinosWrappers
 
     if (constant_modes_dimension > 0)
       {
-        const size_type n_rows = n_global_rows(matrix);
+        const size_type n_rows = TrilinosWrappers::n_global_rows(matrix);
         const bool constant_modes_are_global =
           additional_data.constant_modes[0].size() == n_rows;
         const size_type n_relevant_rows =
@@ -191,9 +156,9 @@ namespace TrilinosWrappers
           Assert (n_relevant_rows == my_size,
                   ExcDimensionMismatch(n_relevant_rows, my_size));
         Assert (n_rows ==
-                static_cast<size_type>(global_length(distributed_constant_modes)),
+                static_cast<size_type>(TrilinosWrappers::global_length(distributed_constant_modes)),
                 ExcDimensionMismatch(n_rows,
-                                     global_length(distributed_constant_modes)));
+                                     TrilinosWrappers::global_length(distributed_constant_modes)));
 
         (void)n_relevant_rows;
         (void)global_length;
@@ -204,7 +169,7 @@ namespace TrilinosWrappers
           for (size_type row=0; row<my_size; ++row)
             {
               TrilinosWrappers::types::int_type global_row_id =
-                constant_modes_are_global ? gid(domain_map,row) : row;
+                constant_modes_are_global ? TrilinosWrappers::global_index(domain_map,row) : row;
               distributed_constant_modes[d][row] =
                 additional_data.constant_modes[d][global_row_id];
             }

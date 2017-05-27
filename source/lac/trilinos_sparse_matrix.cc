@@ -13,6 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/lac/trilinos_index_access.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -24,6 +25,7 @@
 #  include <deal.II/lac/dynamic_sparsity_pattern.h>
 #  include <deal.II/lac/sparsity_tools.h>
 #  include <deal.II/lac/la_parallel_vector.h>
+#  include <deal.II/lac/trilinos_index_access.h>
 #  include <deal.II/lac/trilinos_precondition.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
@@ -37,79 +39,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
-  namespace
-  {
-#ifndef DEAL_II_WITH_64BIT_INDICES
-    // define a helper function that queries the size of an Epetra_Map object
-    // by calling either the 32- or 64-bit function necessary, and returns the
-    // result in the correct data type so that we can use it in calling other
-    // Epetra member functions that are overloaded by index type
-    int n_global_elements (const Epetra_BlockMap &map)
-    {
-      return map.NumGlobalElements();
-    }
-
-    int min_my_gid(const Epetra_BlockMap &map)
-    {
-      return map.MinMyGID();
-    }
-
-    int max_my_gid(const Epetra_BlockMap &map)
-    {
-      return map.MaxMyGID();
-    }
-
-    int n_global_cols(const Epetra_CrsGraph &graph)
-    {
-      return graph.NumGlobalCols();
-    }
-
-    int global_column_index(const Epetra_CrsMatrix &matrix, int i)
-    {
-      return matrix.GCID(i);
-    }
-
-    int global_row_index(const Epetra_CrsMatrix &matrix, int i)
-    {
-      return matrix.GRID(i);
-    }
-#else
-    // define a helper function that queries the size of an Epetra_Map object
-    // by calling either the 32- or 64-bit function necessary, and returns the
-    // result in the correct data type so that we can use it in calling other
-    // Epetra member functions that are overloaded by index type
-    long long int n_global_elements (const Epetra_BlockMap &map)
-    {
-      return map.NumGlobalElements64();
-    }
-
-    long long int min_my_gid(const Epetra_BlockMap &map)
-    {
-      return map.MinMyGID64();
-    }
-
-    long long int max_my_gid(const Epetra_BlockMap &map)
-    {
-      return map.MaxMyGID64();
-    }
-
-    long long int n_global_cols(const Epetra_CrsGraph &graph)
-    {
-      return graph.NumGlobalCols64();
-    }
-
-    long long int global_column_index(const Epetra_CrsMatrix &matrix, int i)
-    {
-      return matrix.GCID64(i);
-    }
-
-    long long int global_row_index(const Epetra_CrsMatrix &matrix, int i)
-    {
-      return matrix.GRID64(i);
-    }
-#endif
-  }
-
   namespace internal
   {
     template <typename VectorType>
@@ -526,9 +455,9 @@ namespace TrilinosWrappers
       if (input_row_map.Comm().MyPID() == 0)
         {
           AssertDimension (sparsity_pattern.n_rows(),
-                           static_cast<size_type>(n_global_elements(input_row_map)));
+                           static_cast<size_type>(TrilinosWrappers::n_global_elements(input_row_map)));
           AssertDimension (sparsity_pattern.n_cols(),
-                           static_cast<size_type>(n_global_elements(input_col_map)));
+                           static_cast<size_type>(TrilinosWrappers::n_global_elements(input_col_map)));
         }
 
       column_space_map.reset (new Epetra_Map (input_col_map));
@@ -548,8 +477,8 @@ namespace TrilinosWrappers
           return;
         }
 
-      const size_type first_row = min_my_gid(input_row_map),
-                      last_row = max_my_gid(input_row_map)+1;
+      const size_type first_row = TrilinosWrappers::min_my_gid(input_row_map),
+                      last_row = TrilinosWrappers::max_my_gid(input_row_map)+1;
       std::vector<int> n_entries_per_row(last_row-first_row);
 
       for (size_type row=first_row; row<last_row; ++row)
@@ -609,7 +538,7 @@ namespace TrilinosWrappers
 
       // check whether we got the number of columns right.
       AssertDimension (sparsity_pattern.n_cols(),
-                       static_cast<size_type>(n_global_cols(*graph)));
+                       static_cast<size_type>(TrilinosWrappers::n_global_cols(*graph)));
       (void)n_global_cols;
 
       // And now finally generate the matrix.
@@ -659,9 +588,9 @@ namespace TrilinosWrappers
       nonlocal_matrix_exporter.reset();
 
       AssertDimension (sparsity_pattern.n_rows(),
-                       static_cast<size_type>(n_global_elements(input_row_map)));
+                       static_cast<size_type>(TrilinosWrappers::n_global_elements(input_row_map)));
       AssertDimension (sparsity_pattern.n_cols(),
-                       static_cast<size_type>(n_global_elements(input_col_map)));
+                       static_cast<size_type>(TrilinosWrappers::n_global_elements(input_col_map)));
 
       column_space_map.reset (new Epetra_Map (input_col_map));
 
@@ -669,8 +598,8 @@ namespace TrilinosWrappers
       // serial case
       if (relevant_rows.size() == 0)
         {
-          relevant_rows.set_size(n_global_elements(input_row_map));
-          relevant_rows.add_range(0, n_global_elements(input_row_map));
+          relevant_rows.set_size(TrilinosWrappers::n_global_elements(input_row_map));
+          relevant_rows.add_range(0, TrilinosWrappers::n_global_elements(input_row_map));
         }
       relevant_rows.compress();
       Assert(relevant_rows.n_elements() >= static_cast<unsigned int>(input_row_map.NumMyElements()),
@@ -786,7 +715,7 @@ namespace TrilinosWrappers
       graph->OptimizeStorage();
 
       AssertDimension (sparsity_pattern.n_cols(),static_cast<size_type>(
-                         n_global_cols(*graph)));
+                         TrilinosWrappers::n_global_cols(*graph)));
 
       matrix.reset (new Epetra_FECrsMatrix(Copy, *graph, false));
     }
@@ -2244,45 +2173,38 @@ namespace TrilinosWrappers
                                                inputleft.range_partitioner());
           Assert (inputleft.domain_partitioner().LinearMap() == true,
                   ExcMessage("Matrix must be partitioned contiguously between procs."));
-          for (unsigned int i=0; i<inputleft.local_size(); ++i)
+          for (dealii::types::global_dof_index i=0; i<inputleft.local_size(); ++i)
             {
               int num_entries, * indices;
               inputleft.trilinos_sparsity_pattern().ExtractMyRowView(i, num_entries,
                                                                      indices);
               Assert (num_entries >= 0, ExcInternalError());
-#ifndef DEAL_II_WITH_64BIT_INDICES
-              const size_type GID = inputleft.trilinos_matrix().RowMap().GID(i);
+
+              const auto &trilinos_matrix = inputleft.trilinos_matrix();
+              const size_type GID = TrilinosWrappers::global_index(trilinos_matrix.RowMap(), i);
               for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)
-                sparsity_transposed.add (inputleft.trilinos_matrix().ColMap().GID(indices[j]),
-                                         GID);
-#else
-              const size_type GID = inputleft.trilinos_matrix().RowMap().GID64(i);
-              for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)
-                sparsity_transposed.add (inputleft.trilinos_matrix().ColMap().GID64(indices[j]),
-                                         GID);
-#endif
+                sparsity_transposed.add
+                (TrilinosWrappers::global_index(trilinos_matrix.ColMap(),
+                                                indices[j]),
+                 GID);
             }
 
           sparsity_transposed.compress();
           transposed_mat.reinit (sparsity_transposed);
-          for (unsigned int i=0; i<inputleft.local_size(); ++i)
+          for (dealii::types::global_dof_index i=0; i<inputleft.local_size(); ++i)
             {
               int num_entries, * indices;
               double *values;
               inputleft.trilinos_matrix().ExtractMyRowView(i, num_entries,
                                                            values, indices);
               Assert (num_entries >= 0, ExcInternalError());
-#ifndef DEAL_II_WITH_64BIT_INDICES
-              const size_type GID = inputleft.trilinos_matrix().RowMap().GID(i);
+
+              const auto &trilinos_matrix = inputleft.trilinos_matrix();
+              const size_type GID = TrilinosWrappers::global_index(trilinos_matrix.RowMap(), i);
               for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)
-                transposed_mat.set (inputleft.trilinos_matrix().ColMap().GID(indices[j]),
+                transposed_mat.set (TrilinosWrappers::global_index(trilinos_matrix.ColMap(),
+                                                                   indices[j]),
                                     GID, values[j]);
-#else
-              const size_type GID = inputleft.trilinos_matrix().RowMap().GID64(i);
-              for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)
-                transposed_mat.set (inputleft.trilinos_matrix().ColMap().GID64(indices[j]),
-                                    GID, values[j]);
-#endif
             }
           transposed_mat.compress(VectorOperation::insert);
           ML_Operator_WrapEpetraCrsMatrix
@@ -2426,8 +2348,8 @@ namespace TrilinosWrappers
           {
             matrix->ExtractMyRowView (i, num_entries, values, indices);
             for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)
-              out << "(" << global_row_index(*matrix,i) << ","
-                  << global_column_index(*matrix,indices[j]) << ") "
+              out << "(" << TrilinosWrappers::global_row_index(*matrix,i) << ","
+                  << TrilinosWrappers::global_column_index(*matrix,indices[j]) << ") "
                   << values[j] << std::endl;
           }
       }
