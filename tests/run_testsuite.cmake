@@ -261,7 +261,7 @@ IF(NOT "${CONFIG_FILE}" STREQUAL "")
 ENDIF()
 
 IF("${TRACK}" STREQUAL "Build Tests")
-  SET(TEST_PICKUP_REGEX "^build_tests")
+  SET(TEST_PICKUP_REGEX "^do_not_run_any_tests")
 ENDIF()
 
 # Pass all relevant variables down to configure:
