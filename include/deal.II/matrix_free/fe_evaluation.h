@@ -1401,7 +1401,15 @@ public:
    * points on the cell. The result is a scalar, representing the integral
    * over the function over the cell. If a vector-element is used, the
    * resulting components are still separated. Moreover, if vectorization is
-   * enabled, the integral values of several cells are represented together.
+   * enabled, the integral values of several cells are contained in the slots
+   * of the returned VectorizedArray field.
+   *
+   * @note In case the FEEvaluation object is initialized with a batch of
+   * cells where not all lanes in the SIMD vector VectorizedArray are
+   * representing actual data, this method performs computations on dummy data
+   * (that is copied from the last valid lane) that will not make sense. Thus,
+   * the user needs to make sure that it is not used in any computation
+   * explicitly, like when summing the results of several cells.
    */
   value_type integrate_value () const;
 
@@ -1681,6 +1689,51 @@ protected:
  * OpenMP. This is because deal.II needs to know the notation of thread local
  * storage. The FEEvaluation kernels have been verified to work within OpenMP
  * loops.
+ *
+ * <h4>Vectorization scheme through VectorizedArray</h4>
+ *
+ * This class is designed to perform all arithmetics on single-instruction
+ * multiple-data (SIMD) instructions present on modern CPUs by explicit
+ * vectorization, which are made available in deal.II through the class
+ * VectorizedArray, using the widest vector width available at
+ * configure/compile time. In order to keep programs flexible, FEEvaluation
+ * always applies vectorization over several elements. This is often the best
+ * compromise because computations on different elements are usually
+ * independent in the finite element method (except of course the process of
+ * adding an integral contribution to a global residual vector), also in more
+ * complicated scenarios: Stabilization parameter can e.g. be defined as the
+ * maximum of some quantities on all quadrature points of a cell divided by
+ * the cell's volume, but without locally mixing the results with
+ * neighbors. Using the terminology from computer architecture, the design of
+ * FEEvaluation relies on not doing any cross-lane data exchange when
+ * operating on the cell in typical integration scenarios.
+ *
+ * When the number of cells in the problem is not a multiple of the number of
+ * array elements in the SIMD vector, the implementation of FEEvaluation fills
+ * in some dummy entries in the unused SIMD lanes and carries them around
+ * nonetheless, a choice made necessary since the length of VectorizedArray is
+ * fixed at compile time. Yet, this approach most often results in superior
+ * code as compared to an auto-vectorization setup where an alternative
+ * unvectorized code path would be necessary next to the vectorized version to
+ * be used on fully populated lanes, together with a dispatch mechanism. In
+ * @p read_dof_values, the empty lanes resulting from a reinit() call to an
+ * incomplete batch of cells are set to zero, whereas
+ * @p distribute_local_to_global or @p set_dof_values simply ignores the
+ * content in the empty lanes. The number of actually filled SIMD lanes can by
+ * queried by MatrixFree::n_components_filled().
+ *
+ * Obviously, the computations performed on the artificial lanes (without real
+ * data) should never be mixed with valid results. The contract in using this
+ * class is that the user makes sure that lanes are not crossed in user code,
+ * in particular since it is not clear a priori which cells are going to be
+ * put together in vectorization. For example, results on an element should
+ * not be added to results on other elements except through the global vector
+ * access methods or by access that is masked by
+ * MatrixFree::n_components_filled(). No guarantee can be made that results on
+ * artificial lanes will always be zero that can safely be added to other
+ * results: The data on JxW or Jacobians is copied from the last valid lane in
+ * order to avoid division by zero that could trigger floating point
+ * exceptions or trouble in other situations.
  *
  * <h3>Description of evaluation routines</h3>
  *
