@@ -392,7 +392,7 @@ void do_test (const DoFHandler<dim>  &dof)
 template <int dim, int fe_degree, typename number>
 void test ()
 {
-  for (unsigned int i=5; i<8; ++i)
+  for (unsigned int i=5; i<7; ++i)
     {
       parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD,
                                                      Triangulation<dim>::limit_level_difference_at_vertices,

@@ -583,7 +583,7 @@ int main (int argc, char **argv)
   deallog.threshold_double(1e-9);
 
   test<2,1,double>();
-  test<2,3,float>();
+  test<2,2,float>();
   test<3,1,double>();
-  test<3,2,float>();
+  test<3,1,float>();
 }

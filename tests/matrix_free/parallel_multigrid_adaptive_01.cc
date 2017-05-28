@@ -590,11 +590,9 @@ int main (int argc, char **argv)
     deallog.threshold_double(1.e-10);
     deallog.push("2d");
     test<2,1>();
-    test<2,3>();
     deallog.pop();
     deallog.push("3d");
     test<3,1>();
-    test<3,2>();
     deallog.pop();
   }
 }
