@@ -279,7 +279,7 @@ void test ()
                                                  Triangulation<dim>::limit_level_difference_at_vertices,
                                                  parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
   GridGenerator::hyper_cube (tria);
-  tria.refine_global(6-dim);
+  tria.refine_global(8-2*dim);
   const unsigned int n_runs = fe_degree == 1 ? 6-dim : 5-dim;
   for (unsigned int i=0; i<n_runs; ++i)
     {
@@ -317,11 +317,9 @@ int main (int argc, char **argv)
     deallog.threshold_double(1.e-10);
     deallog.push("2d");
     test<2,1>();
-    test<2,3>();
     deallog.pop();
     deallog.push("3d");
     test<3,1>();
-    test<3,2>();
     deallog.pop();
   }
 }
