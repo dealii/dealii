@@ -4,6 +4,11 @@
 # current HEAD
 #
 
+if ! git --version | grep -q "git version 2"; then
+  # This script requires version 2 or newer
+  exit 1
+fi
+
 head="$(git rev-parse HEAD)"
 
 tags="$(git tag --sort=-creatordate)"
