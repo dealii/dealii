@@ -1,0 +1,5 @@
+Removed: The build_tests category of tests has been removed. Build tests
+now compile all configurable example steps as part of the regular build
+stage.
+<br>
+(Matthias Maier, 2017/04/06)
