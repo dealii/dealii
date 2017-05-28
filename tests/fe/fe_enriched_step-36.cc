@@ -600,7 +600,7 @@ namespace Step36
   void
   EigenvalueProblem<dim>::run()
   {
-    for (unsigned int cycle = 0; cycle < 5; cycle++)
+    for (unsigned int cycle = 0; cycle < 4; cycle++)
       {
         pcout << "Cycle "<<cycle <<std::endl;
         const std::pair<unsigned int, unsigned int> n_cells = setup_system ();
