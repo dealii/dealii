@@ -65,8 +65,17 @@ int main()
   deallog.attach(logfile);
   deallog.threshold_double(1.e-10);
 
-  for (unsigned int i=0; i<MultithreadInfo::n_cores()*2; ++i)
-    Threads::new_task (outer);
+  const std::size_t n_tasks = MultithreadInfo::n_cores()*2;
+  // Since this test relies on providing more tasks than there are cores,
+  // reset the concurrency limit that exists in tests.h:
+  MultithreadInfo::set_thread_limit(n_tasks);
+  std::vector<Threads::Task<void>> tasks(n_tasks);
+  for (std::size_t task_n=0; task_n<n_tasks; ++task_n)
+    {
+      // We must save each task, otherwise it will join before the next loop
+      // iteration
+      tasks.emplace_back(Threads::new_task(outer));
+    }
 
   deallog << "OK" << std::endl;
 }
