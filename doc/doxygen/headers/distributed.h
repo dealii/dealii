@@ -274,7 +274,7 @@
  * ghosted vectors) and vectors without ghost elements.  (Both
  * kinds can typically be represented by the same data type, but there
  * are of course different vector types that can each represent both flavors:
- * for example TrilinosWrappers::MPI::Vector, PETScWrappers::Vector, and
+ * for example TrilinosWrappers::MPI::Vector, PETScWrappers::MPI::Vector, and
  * BlockVector objects built on these).
  * You can find a discussion of what distinguishes these kinds of vectors
  * in the @ref GlossGhostedVector "glossary entry on ghosted vectors".
