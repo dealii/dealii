@@ -779,9 +779,9 @@ TRACK
     "Experimental"     - all tests that are not specifically "build" or
                          "regression" tests should go into this track
 
-    "Build Tests"      - Build tests that configure and build in a
-                         clean directory and run the build tests
-                         "build_tests/*"
+    "Build Tests"      - Build tests that configure and build in a clean
+                         directory (without actually running the
+                         testsuite)
 
     "Nightly"          - Reserved for nightly regression tests for
                          build bots on various architectures
@@ -836,9 +836,9 @@ ctest -j4 -S ../tests/run_buildtest.cmake
 
     <p>
       What this does is to compile and build deal.II in the directory
-      <code>build</code>, try to configure, build (and run a subset) of all
-      tutorial programs supported by the current configuration and send the
-      results to the CDash instance.
+      <code>build</code> (which includes building all configurable tutorial
+      programs as well) but does not run the full testsuite. The results
+      are sent to the CDash instance.
     </p>
 
     <p>

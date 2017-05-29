@@ -59,8 +59,8 @@
 #                            "regression" tests should go into this track
 #
 #       "Build Tests"      - Build tests that configure and build in a clean
-#                            directory and run exactly all build tests matching
-#                            "build_tests/.*"
+#                            directory (without actually running the
+#                            testsuite)
 #
 #       "Regression Tests" - Reserved for the "official" regression tester
 #
@@ -261,7 +261,7 @@ IF(NOT "${CONFIG_FILE}" STREQUAL "")
 ENDIF()
 
 IF("${TRACK}" STREQUAL "Build Tests")
-  SET(TEST_PICKUP_REGEX "^build_tests")
+  SET(TEST_PICKUP_REGEX "^do_not_run_any_tests")
 ENDIF()
 
 # Pass all relevant variables down to configure:
