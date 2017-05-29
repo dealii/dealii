@@ -458,7 +458,15 @@ public:
    * points on the cell. The result is a scalar, representing the integral
    * over the function over the cell. If a vector-element is used, the
    * resulting components are still separated. Moreover, if vectorization is
-   * enabled, the integral values of several cells are represented together.
+   * enabled, the integral values of several cells are contained in the slots
+   * of the returned VectorizedArray field.
+   *
+   * @note In case the FEEvaluation object is initialized with a batch of
+   * cells where not all lanes in the SIMD vector VectorizedArray are
+   * representing actual data, this method performs computations on dummy data
+   * (that is copied from the last valid lane) that will not make sense. Thus,
+   * the user needs to make sure that it is not used in any computation
+   * explicitly, like when summing the results of several cells.
    */
   value_type integrate_value () const;
 
@@ -1023,89 +1031,47 @@ public:
   static const unsigned int dimension          = dim;
   typedef FEEvaluationBase<dim,1,Number>         BaseClass;
 
-  /**
-   * Return the value stored for the local degree of freedom with index @p
-   * dof. If the object is vector-valued, a vector-valued return argument is
-   * given. Note that when vectorization is enabled, values from several cells
-   * are grouped together. If @p set_dof_values was called last, the value
-   * corresponds to the one set there. If @p integrate was called last, it
-   * instead corresponds to the value of the integrated function with the test
-   * function of the given index.
+  /** @copydoc FEEvaluationBase<dim,1,Number>::get_dof_value()
    */
   value_type get_dof_value (const unsigned int dof) const;
 
-  /**
-   * Write a value to the field containing the degrees of freedom with
-   * component @p dof. Access to the same field as through @p get_dof_value.
+  /** @copydoc FEEvaluationBase<dim,1,Number>::submit_dof_value()
    */
   void submit_dof_value (const value_type   val_in,
                          const unsigned int dof);
 
-  /**
-   * Return the value of a finite element function at quadrature point number
-   * @p q_point after a call to @p evaluate(true,...), or the value that has
-   * been stored there with a call to @p submit_value. If the object is
-   * vector-valued, a vector-valued return argument is given. Note that when
-   * vectorization is enabled, values from several cells are grouped together.
+  /** @copydoc FEEvaluationBase<dim,1,Number>::get_value()
    */
   value_type get_value (const unsigned int q_point) const;
 
-  /**
-   * Write a value to the field containing the values on quadrature points
-   * with component @p q_point. Access to the same field as through @p
-   * get_value. If applied before the function @p integrate(true,...) is
-   * called, this specifies the value which is tested by all basis function on
-   * the current cell and integrated over.
+  /** @copydoc FEEvaluationBase<dim,1,Number>::submit_value()
    */
   void submit_value (const value_type   val_in,
                      const unsigned int q_point);
 
-  /**
-   * Return the gradient of a finite element function at quadrature point
-   * number @p q_point after a call to @p evaluate(...,true,...), or the value
-   * that has been stored there with a call to @p submit_gradient.
+  /** @copydoc FEEvaluationBase<dim,1,Number>::get_gradient()
    */
   gradient_type get_gradient (const unsigned int q_point) const;
 
-  /**
-   * Write a contribution that is tested by the gradient to the field
-   * containing the values on quadrature points with component @p q_point.
-   * Access to the same field as through @p get_gradient. If applied before
-   * the function @p integrate(...,true) is called, this specifies what is
-   * tested by all basis function gradients on the current cell and integrated
-   * over.
+  /** @copydoc FEEvaluationBase<dim,1,Number>::submit_gradient()
    */
   void submit_gradient(const gradient_type grad_in,
                        const unsigned int  q_point);
 
-  /**
-   * Return the Hessian of a finite element function at quadrature point
-   * number @p q_point after a call to @p evaluate(...,true). If only the
-   * diagonal part of the Hessian or its trace, the Laplacian, are needed, use
-   * the respective functions below.
+  /** @copydoc FEEvaluationBase<dim,1,Number>::get_hessian()
    */
   Tensor<2,dim,VectorizedArray<Number> >
   get_hessian (unsigned int q_point) const;
 
-  /**
-   * Return the diagonal of the Hessian of a finite element function at
-   * quadrature point number @p q_point after a call to @p evaluate(...,true).
+  /** @copydoc FEEvaluationBase<dim,1,Number>::get_hessian_diagonal()
    */
   gradient_type get_hessian_diagonal (const unsigned int q_point) const;
 
-  /**
-   * Return the Laplacian of a finite element function at quadrature point
-   * number @p q_point after a call to @p evaluate(...,true).
+  /** @copydoc FEEvaluationBase<dim,1,Number>::get_laplacian()
    */
   value_type get_laplacian (const unsigned int q_point) const;
 
-  /**
-   * Takes values on quadrature points, multiplies by the Jacobian determinant
-   * and quadrature weights (JxW) and sums the values for all quadrature
-   * points on the cell. The result is a scalar, representing the integral
-   * over the function over the cell. If a vector-element is used, the
-   * resulting components are still separated. Moreover, if vectorization is
-   * enabled, the integral values of several cells are represented together.
+  /** @copydoc FEEvaluationBase<dim,1,Number>::integrate_value()
    */
   value_type integrate_value () const;
 
@@ -1168,9 +1134,7 @@ public:
   static const unsigned int n_components  = dim;
   typedef FEEvaluationBase<dim,dim,Number> BaseClass;
 
-  /**
-   * Return the gradient of a finite element function at quadrature point
-   * number @p q_point after a call to @p evaluate(...,true,...).
+  /** @copydoc FEEvaluationBase<dim,dim,Number>::get_gradient()
    */
   gradient_type get_gradient (const unsigned int q_point) const;
 
@@ -1196,28 +1160,16 @@ public:
   Tensor<1,(dim==2?1:dim),VectorizedArray<Number> >
   get_curl (const unsigned int q_point) const;
 
-  /**
-   * Return the Hessian of a finite element function at quadrature point
-   * number @p q_point after a call to @p evaluate(...,true). If only the
-   * diagonal of the Hessian or its trace, the Laplacian, is needed, use the
-   * respective functions.
+  /** @copydoc FEEvaluationBase<dim,dim,Number>::get_hessian()
    */
   Tensor<3,dim,VectorizedArray<Number> >
   get_hessian (const unsigned int q_point) const;
 
-  /**
-   * Return the diagonal of the Hessian of a finite element function at
-   * quadrature point number @p q_point after a call to @p evaluate(...,true).
+  /** @copydoc FEEvaluationBase<dim,dim,Number>::get_hessian_diagonal()
    */
   gradient_type get_hessian_diagonal (const unsigned int q_point) const;
 
-  /**
-   * Write a contribution that is tested by the gradient to the field
-   * containing the values on quadrature points with component @p q_point.
-   * Access to the same field as through @p get_gradient. If applied before
-   * the function @p integrate(...,true) is called, this specifies what is
-   * tested by all basis function gradients on the current cell and integrated
-   * over.
+  /** @copydoc FEEvaluationBase<dim,dim,Number>::submit_gradient()
    */
   void submit_gradient(const gradient_type grad_in,
                        const unsigned int  q_point);
@@ -1319,97 +1271,47 @@ public:
   static const unsigned int dimension          = 1;
   typedef FEEvaluationBase<1,1,Number>           BaseClass;
 
-  /**
-   * Return the value stored for the local degree of freedom with index @p
-   * dof. If the object is vector-valued, a vector-valued return argument is
-   * given. Note that when vectorization is enabled, values from several cells
-   * are grouped together. If @p set_dof_values was called last, the value
-   * corresponds to the one set there. If @p integrate was called last, it
-   * instead corresponds to the value of the integrated function with the test
-   * function of the given index.
+  /** @copydoc FEEvaluationBase<1,1,Number>::get_dof_value()
    */
   value_type get_dof_value (const unsigned int dof) const;
 
-  /**
-   * Write a value to the field containing the degrees of freedom with
-   * component @p dof. Access to the same field as through @p get_dof_value.
+  /** @copydoc FEEvaluationBase<1,1,Number>::submit_dof_value()
    */
   void submit_dof_value (const value_type   val_in,
                          const unsigned int dof);
 
-  /**
-   * Return the value of a finite element function at quadrature point number
-   * @p q_point after a call to @p evaluate(true,...), or the value that has
-   * been stored there with a call to @p submit_value. If the object is
-   * vector-valued, a vector-valued return argument is given. Note that when
-   * vectorization is enabled, values from several cells are grouped together.
+  /** @copydoc FEEvaluationBase<1,1,Number>::get_value()
    */
   value_type get_value (const unsigned int q_point) const;
 
-  /**
-   * Write a value to the field containing the values on quadrature points
-   * with component @p q_point. Access to the same field as through @p
-   * get_value. If applied before the function @p integrate(true,...) is
-   * called, this specifies the value which is tested by all basis function on
-   * the current cell and integrated over.
+  /** @copydoc FEEvaluationBase<1,1,Number>::submit_value()
    */
   void submit_value (const value_type   val_in,
                      const unsigned int q_point);
 
-  /**
-   * Return the gradient of a finite element function at quadrature point
-   * number @p q_point after a call to @p evaluate(...,true,...), or the value
-   * that has been stored there with a call to @p submit_gradient.
+  /** @copydoc FEEvaluationBase<1,1,Number>::get_gradient()
    */
   gradient_type get_gradient (const unsigned int q_point) const;
 
-  /**
-   * Write a contribution that is tested by the gradient to the field
-   * containing the values on quadrature points with component @p q_point.
-   * Access to the same field as through @p get_gradient. If applied before
-   * the function @p integrate(...,true) is called, this specifies what is
-   * tested by all basis function gradients on the current cell and integrated
-   * over.
+  /** @copydoc FEEvaluationBase<1,1,Number>::submit_gradient()
    */
   void submit_gradient(const gradient_type grad_in,
                        const unsigned int  q_point);
 
-  /**
-   * Return the Hessian of a finite element function at quadrature point
-   * number @p q_point after a call to @p evaluate(...,true). If only the
-   * diagonal part of the Hessian or its trace, the Laplacian, are needed, use
-   * the respective functions below.
+  /** @copydoc FEEvaluationBase<1,1,Number>::get_hessian()
    */
   Tensor<2,1,VectorizedArray<Number> >
   get_hessian (unsigned int q_point) const;
 
-  /**
-   * Return the diagonal of the Hessian of a finite element function at
-   * quadrature point number @p q_point after a call to @p evaluate(...,true).
+  /** @copydoc FEEvaluationBase<1,1,Number>::get_hessian_diagonal()
    */
   gradient_type get_hessian_diagonal (const unsigned int q_point) const;
 
-  /**
-   * Return the Laplacian of a finite element function at quadrature point
-   * number @p q_point after a call to @p evaluate(...,true).
+  /** @copydoc FEEvaluationBase<1,1,Number>::get_laplacian()
    */
   value_type get_laplacian (const unsigned int q_point) const;
 
-  /**
-   * Takes values on quadrature points, multiplies by the Jacobian determinant
-   * and quadrature weights (JxW) and sums the values for all quadrature
-   * points on the cell. The result is a scalar, representing the integral
-   * over the function over the cell. If a vector-element is used, the
-   * resulting components are still separated. Moreover, if vectorization is
-   * enabled, the integral values of several cells are contained in the slots
-   * of the returned VectorizedArray field.
-   *
-   * @note In case the FEEvaluation object is initialized with a batch of
-   * cells where not all lanes in the SIMD vector VectorizedArray are
-   * representing actual data, this method performs computations on dummy data
-   * (that is copied from the last valid lane) that will not make sense. Thus,
-   * the user needs to make sure that it is not used in any computation
-   * explicitly, like when summing the results of several cells.
+  /** @copydoc FEEvaluationBase<1,1,Number>::integrate_value()
    */
   value_type integrate_value () const;
 
