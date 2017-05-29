@@ -1,10 +1,5 @@
 
-DEAL::Timestep 2: 0.00982 -1.35e-06 -0.100
-DEAL::Timestep 3: 0.0201 -3.32e-06 -0.200
-DEAL::Timestep 4: 0.0308 -5.19e-06 -0.300
-DEAL::Timestep 5: 0.0424 -5.68e-06 -0.400
-DEAL::Timestep 6: 0.0554 7.87e-07 -0.500
-DEAL::Timestep 7: 0.0720 3.84e-05 -0.600
-DEAL::Timestep 8: 0.0979 0.000188 -0.700
-DEAL::Timestep 9: 0.139 0.000618 -0.800
-DEAL::Timestep 10: 0.178 0.00126 -0.900
+DEAL::Timestep 2: 0.00982 -7.31e-08 -0.100
+DEAL::Timestep 3: 0.0201 6.50e-08 -0.200
+DEAL::Timestep 4: 0.0308 2.51e-07 -0.300
+DEAL::Timestep 5: 0.0424 9.18e-07 -0.400

@@ -331,7 +331,7 @@ namespace Step18
   {
     present_time = 0;
     present_timestep = 1;
-    end_time = 10;
+    end_time = 5;
     timestep_no = 0;
     do_initial_timestep ();
     while (present_time < end_time)
@@ -608,7 +608,7 @@ namespace Step18
     ++timestep_no;
     pcout << "Timestep " << timestep_no << " at time " << present_time
           << std::endl;
-    for (unsigned int cycle=0; cycle<2; ++cycle)
+    for (unsigned int cycle=0; cycle<1; ++cycle)
       {
         pcout << "  Cycle " << cycle << ':' << std::endl;
         if (cycle == 0)
