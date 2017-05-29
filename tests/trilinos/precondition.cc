@@ -124,7 +124,7 @@ template <int dim>
 void Step4<dim>::make_grid ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
-  triangulation.refine_global (6);
+  triangulation.refine_global (5);
 }
 
 
@@ -248,7 +248,7 @@ void Step4<dim>::solve ()
     deallog.push("BlockJacobi");
     TrilinosWrappers::PreconditionBlockJacobi preconditioner;
     TrilinosWrappers::PreconditionBlockJacobi::AdditionalData data;
-    data.block_size = 4;
+    data.block_size = 16;
     solution = 0;
     SolverControl           solver_control (1000, 1e-10);
     SolverCG<>              solver (solver_control);
@@ -262,7 +262,7 @@ void Step4<dim>::solve ()
     deallog.push("BlockSSOR");
     TrilinosWrappers::PreconditionBlockSSOR preconditioner;
     TrilinosWrappers::PreconditionBlockSSOR::AdditionalData data;
-    data.block_size = 4;
+    data.block_size = 16;
     data.omega = 1.2;
     solution = 0;
     SolverControl           solver_control (1000, 1e-10);
@@ -277,7 +277,7 @@ void Step4<dim>::solve ()
     deallog.push("BlockSOR");
     TrilinosWrappers::PreconditionBlockSOR preconditioner;
     TrilinosWrappers::PreconditionBlockSOR::AdditionalData data;
-    data.block_size = 4;
+    data.block_size = 16;
     data.omega = 0.8;
     solution = 0;
     SolverControl           solver_control (1000, 1e-5);
