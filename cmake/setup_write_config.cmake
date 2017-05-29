@@ -49,14 +49,17 @@ MACRO(_both)
   FILE(APPEND ${_log_detailed} "${ARGN}")
   FILE(APPEND ${_log_summary} "${ARGN}")
 ENDMACRO()
+
 MACRO(_detailed)
   # Only write to detailed.log:
   FILE(APPEND ${_log_detailed} "${ARGN}")
 ENDMACRO()
+
 MACRO(_summary)
   # Only write to summary.log:
   FILE(APPEND ${_log_summary} "${ARGN}")
 ENDMACRO()
+
 MACRO(_featurelog)
   # Only write to deal.IIFeatureConfig.cmake:
   FILE(APPEND ${_log_feature} "${ARGN}")
