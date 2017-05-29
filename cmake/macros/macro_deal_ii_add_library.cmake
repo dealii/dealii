@@ -37,6 +37,9 @@ MACRO(DEAL_II_ADD_LIBRARY _library)
       ${ARGN}
       )
 
+    IF(DEAL_II_USE_COTIRE)
+      cotire(${_library}_${_build_lowercase})
+    ENDIF()
 
     #
     # Work around a problem in CUDA_WARP_SRCS that doesn't take empty list

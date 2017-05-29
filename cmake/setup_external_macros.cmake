@@ -25,3 +25,10 @@ INCLUDE(CheckIncludeFileCXX)
 
 INCLUDE(CheckCSourceCompiles)
 INCLUDE(CheckFunctionExists)
+
+IF(EXISTS ${CMAKE_SOURCE_DIR}/cotire/CMake/cotire.cmake)
+  INCLUDE(${CMAKE_SOURCE_DIR}/cotire/CMake/cotire.cmake)
+  IF("${DEAL_II_USE_COTIRE}" STREQUAL "")
+    SET(DEAL_II_USE_COTIRE TRUE)
+  ENDIF()
+ENDIF()
