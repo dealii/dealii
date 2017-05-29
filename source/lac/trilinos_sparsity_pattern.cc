@@ -13,14 +13,17 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/lac/trilinos_index_access.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 
 #ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/base/utilities.h>
 #  include <deal.II/base/mpi.h>
-#  include <deal.II/lac/sparsity_pattern.h>
+
 #  include <deal.II/lac/dynamic_sparsity_pattern.h>
+#  include <deal.II/lac/sparsity_pattern.h>
+#  include <deal.II/lac/trilinos_index_access.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Export.h>
@@ -30,85 +33,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
-  namespace
-  {
-    // define a helper function that queries the size of an Epetra_Map object
-    // by calling either the 32- or 64-bit function necessary, and returns the
-    // result in the correct data type so that we can use it in calling other
-    // Epetra member functions that are overloaded by index type
-#ifndef DEAL_II_WITH_64BIT_INDICES
-    int n_global_elements (const Epetra_BlockMap &map)
-    {
-      return map.NumGlobalElements();
-    }
-
-    int min_my_gid(const Epetra_BlockMap &map)
-    {
-      return map.MinMyGID();
-    }
-
-    int max_my_gid(const Epetra_BlockMap &map)
-    {
-      return map.MaxMyGID();
-    }
-
-    int n_global_rows(const Epetra_CrsGraph &graph)
-    {
-      return graph.NumGlobalRows();
-    }
-
-    int n_global_cols(const Epetra_CrsGraph &graph)
-    {
-      return graph.NumGlobalCols();
-    }
-
-    int n_global_entries(const Epetra_CrsGraph &graph)
-    {
-      return graph.NumGlobalEntries();
-    }
-
-    int local_to_global_index(const Epetra_BlockMap &map, int i)
-    {
-      return map.GID(i);
-    }
-#else
-    long long int n_global_elements (const Epetra_BlockMap &map)
-    {
-      return map.NumGlobalElements64();
-    }
-
-    long long int min_my_gid(const Epetra_BlockMap &map)
-    {
-      return map.MinMyGID64();
-    }
-
-    long long int max_my_gid(const Epetra_BlockMap &map)
-    {
-      return map.MaxMyGID64();
-    }
-
-    long long int n_global_rows(const Epetra_CrsGraph &graph)
-    {
-      return graph.NumGlobalRows64();
-    }
-
-    long long int n_global_cols(const Epetra_CrsGraph &graph)
-    {
-      return graph.NumGlobalCols64();
-    }
-
-    long long int n_global_entries(const Epetra_CrsGraph &graph)
-    {
-      return graph.NumGlobalEntries64();
-    }
-
-    long long int local_to_global_index(const Epetra_BlockMap &map, int i)
-    {
-      return map.GID64(i);
-    }
-#endif
-  }
-
   namespace SparsityPatternIterators
   {
     void
@@ -392,13 +316,13 @@ namespace TrilinosWrappers
       nonlocal_graph.reset();
       graph.reset ();
       AssertDimension (n_entries_per_row.size(),
-                       static_cast<size_type>(n_global_elements(row_map)));
+                       static_cast<size_type>(TrilinosWrappers::n_global_elements(row_map)));
 
       column_space_map.reset (new Epetra_Map (col_map));
-      std::vector<int> local_entries_per_row(max_my_gid(row_map)-
-                                             min_my_gid(row_map));
+      std::vector<int> local_entries_per_row(TrilinosWrappers::max_my_gid(row_map)-
+                                             TrilinosWrappers::min_my_gid(row_map));
       for (unsigned int i=0; i<local_entries_per_row.size(); ++i)
-        local_entries_per_row[i] = n_entries_per_row[min_my_gid(row_map)+i];
+        local_entries_per_row[i] = n_entries_per_row[TrilinosWrappers::min_my_gid(row_map)+i];
 
       if (row_map.Comm().NumProc() > 1)
         graph.reset(new Epetra_FECrsGraph(Copy, row_map,
@@ -434,17 +358,17 @@ namespace TrilinosWrappers
       graph.reset ();
 
       AssertDimension (sp.n_rows(),
-                       static_cast<size_type>(n_global_elements(row_map)));
+                       static_cast<size_type>(TrilinosWrappers::n_global_elements(row_map)));
       AssertDimension (sp.n_cols(),
-                       static_cast<size_type>(n_global_elements(col_map)));
+                       static_cast<size_type>(TrilinosWrappers::n_global_elements(col_map)));
 
       column_space_map.reset (new Epetra_Map (col_map));
 
       Assert (row_map.LinearMap() == true,
               ExcMessage ("This function only works if the row map is contiguous."));
 
-      const size_type first_row = min_my_gid(row_map),
-                      last_row = max_my_gid(row_map)+1;
+      const size_type first_row = TrilinosWrappers::min_my_gid(row_map),
+                      last_row = TrilinosWrappers::max_my_gid(row_map)+1;
       std::vector<int> n_entries_per_row(last_row - first_row);
 
       // Trilinos wants the row length as an int this is hopefully never going
@@ -932,7 +856,7 @@ namespace TrilinosWrappers
     if (graph->Filled() == true)
       n_cols = n_global_cols(*graph);
     else
-      n_cols = n_global_elements(*column_space_map);
+      n_cols = TrilinosWrappers::n_global_elements(*column_space_map);
 
     return n_cols;
   }
@@ -953,8 +877,8 @@ namespace TrilinosWrappers
   SparsityPattern::local_range () const
   {
     size_type begin, end;
-    begin =  min_my_gid(graph->RowMap());
-    end = max_my_gid(graph->RowMap())+1;
+    begin =  TrilinosWrappers::min_my_gid(graph->RowMap());
+    end = TrilinosWrappers::max_my_gid(graph->RowMap())+1;
 
     return std::make_pair (begin, end);
   }
@@ -1089,8 +1013,8 @@ namespace TrilinosWrappers
           {
             graph->ExtractMyRowView (i, num_entries, indices);
             for (int j=0; j<num_entries; ++j)
-              out << "(" << local_to_global_index(graph->RowMap(), i)
-                  << "," << local_to_global_index(graph->ColMap(), indices[j]) << ") "
+              out << "(" << TrilinosWrappers::global_index(graph->RowMap(), i)
+                  << "," << TrilinosWrappers::global_index(graph->ColMap(), indices[j]) << ") "
                   << std::endl;
           }
       }
@@ -1104,20 +1028,23 @@ namespace TrilinosWrappers
   SparsityPattern::print_gnuplot (std::ostream &out) const
   {
     Assert (graph->Filled() == true, ExcInternalError());
-    for (unsigned int row=0; row<local_size(); ++row)
+    for (dealii::types::global_dof_index row=0; row<local_size(); ++row)
       {
         int *indices;
         int num_entries;
         graph->ExtractMyRowView (row, num_entries, indices);
 
-        for (int j=0; j<num_entries; ++j)
+        Assert(num_entries >= 0, ExcInternalError());
+        // avoid sign comparison warning
+        const dealii::types::global_dof_index num_entries_ = num_entries;
+        for (dealii::types::global_dof_index j=0; j<num_entries_; ++j)
           // while matrix entries are usually
           // written (i,j), with i vertical and
           // j horizontal, gnuplot output is
           // x-y, that is we have to exchange
           // the order of output
-          out << static_cast<int>(local_to_global_index(graph->ColMap(), indices[j]))
-              << " " << -static_cast<int>(local_to_global_index(graph->RowMap(), row)) << std::endl;
+          out << static_cast<int>(TrilinosWrappers::global_index(graph->ColMap(), indices[j]))
+              << " " << -static_cast<int>(TrilinosWrappers::global_index(graph->RowMap(), row)) << std::endl;
       }
 
     AssertThrow (out, ExcIO());

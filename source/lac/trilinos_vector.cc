@@ -13,13 +13,15 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/lac/trilinos_index_access.h>
 #include <deal.II/lac/trilinos_vector.h>
 
 #ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/base/mpi.h>
-#  include <deal.II/lac/trilinos_sparse_matrix.h>
 #  include <deal.II/lac/trilinos_block_vector.h>
+#  include <deal.II/lac/trilinos_index_access.h>
+#  include <deal.II/lac/trilinos_sparse_matrix.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Import.h>
@@ -33,65 +35,8 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
-  namespace
-  {
-#ifndef DEAL_II_WITH_64BIT_INDICES
-    // define a helper function that queries the size of an Epetra_BlockMap object
-    // by calling either the 32- or 64-bit function necessary, and returns the
-    // result in the correct data type so that we can use it in calling other
-    // Epetra member functions that are overloaded by index type
-    int n_global_elements (const Epetra_BlockMap &map)
-    {
-      return map.NumGlobalElements();
-    }
-    // define a helper function that queries the pointer to internal array
-    // containing list of global IDs assigned to the calling processor
-    // by calling either the 32- or 64-bit function necessary, and returns the
-    // result in the correct data type so that we can use it in calling other
-    // Epetra member functions that are overloaded by index type
-    int *my_global_elements(const Epetra_BlockMap &map)
-    {
-      return map.MyGlobalElements();
-    }
-    // define a helper function that queries the global vector length of an
-    // Epetra_FEVector object  by calling either the 32- or 64-bit
-    // function necessary.
-    int global_length(const Epetra_FEVector &vector)
-    {
-      return vector.GlobalLength();
-    }
-#else
-    // define a helper function that queries the size of an Epetra_BlockMap object
-    // by calling either the 32- or 64-bit function necessary, and returns the
-    // result in the correct data type so that we can use it in calling other
-    // Epetra member functions that are overloaded by index type
-    long long int n_global_elements (const Epetra_BlockMap &map)
-    {
-      return map.NumGlobalElements64();
-    }
-    // define a helper function that queries the pointer to internal array
-    // containing list of global IDs assigned to the calling processor
-    // by calling either the 32- or 64-bit function necessary, and returns the
-    // result in the correct data type so that we can use it in calling other
-    // Epetra member functions that are overloaded by index type
-    long long int *my_global_elements(const Epetra_BlockMap &map)
-    {
-      return map.MyGlobalElements64();
-    }
-    // define a helper function that queries the global vector length of an
-    // Epetra_FEVector object  by calling either the 32- or 64-bit
-    // function necessary.
-    long long int global_length(const Epetra_FEVector &vector)
-    {
-      return vector.GlobalLength64();
-    }
-#endif
-  }
-
   namespace MPI
   {
-
-
     Vector::Vector ()
     {
       last_action = Zero;
@@ -139,9 +84,9 @@ namespace TrilinosWrappers
       VectorBase()
     {
       AssertThrow (parallel_partitioner.size() ==
-                   static_cast<size_type>(n_global_elements(v.vector->Map())),
+                   static_cast<size_type>(TrilinosWrappers::n_global_elements(v.vector->Map())),
                    ExcDimensionMismatch (parallel_partitioner.size(),
-                                         n_global_elements(v.vector->Map())));
+                                         TrilinosWrappers::n_global_elements(v.vector->Map())));
 
       last_action = Zero;
 
@@ -307,7 +252,7 @@ namespace TrilinosWrappers
       for (size_type block=0; block<v.n_blocks(); ++block)
         {
           TrilinosWrappers::types::int_type *glob_elements =
-            my_global_elements(v.block(block).vector_partitioner());
+            TrilinosWrappers::my_global_elements(v.block(block).vector_partitioner());
           for (size_type i=0; i<v.block(block).local_size(); ++i)
             global_ids[added_elements++] = glob_elements[i] + block_offset;
           owned_elements.add_indices(v.block(block).owned_elements,
@@ -338,9 +283,9 @@ namespace TrilinosWrappers
 
       if (import_data == true)
         {
-          AssertThrow (static_cast<size_type>(global_length(*actual_vec))
+          AssertThrow (static_cast<size_type>(TrilinosWrappers::global_length(*actual_vec))
                        == v.size(),
-                       ExcDimensionMismatch (global_length(*actual_vec),
+                       ExcDimensionMismatch (TrilinosWrappers::global_length(*actual_vec),
                                              v.size()));
 
           Epetra_Import data_exchange (vector->Map(), actual_vec->Map());
@@ -565,11 +510,11 @@ namespace TrilinosWrappers
   Vector::reinit (const Epetra_Map &input_map,
                   const bool     /*omit_zeroing_entries*/)
   {
-    Epetra_LocalMap map (n_global_elements(input_map),
+    Epetra_LocalMap map (TrilinosWrappers::n_global_elements(input_map),
                          input_map.IndexBase(),
                          input_map.Comm());
     vector.reset (new Epetra_FEVector(map));
-    owned_elements = complete_index_set(n_global_elements(input_map));
+    owned_elements = complete_index_set(TrilinosWrappers::n_global_elements(input_map));
 
     last_action = Zero;
   }
@@ -622,7 +567,7 @@ namespace TrilinosWrappers
 #endif
         if (!same_communicators || local_range() != v.local_range())
           {
-            Epetra_LocalMap map (global_length(*(v.vector)),
+            Epetra_LocalMap map (TrilinosWrappers::global_length(*(v.vector)),
                                  v.vector->Map().IndexBase(),
                                  v.vector->Comm());
             vector.reset (new Epetra_FEVector(map));
@@ -679,7 +624,7 @@ namespace TrilinosWrappers
   {
     if (size() != v.size())
       {
-        Epetra_LocalMap map (n_global_elements(v.vector->Map()),
+        Epetra_LocalMap map (TrilinosWrappers::n_global_elements(v.vector->Map()),
                              v.vector->Map().IndexBase(),
                              v.vector->Comm());
         vector.reset (new Epetra_FEVector(map));
@@ -696,7 +641,7 @@ namespace TrilinosWrappers
   {
     if (size() != v.size())
       {
-        Epetra_LocalMap map (n_global_elements(v.vector->Map()),
+        Epetra_LocalMap map (TrilinosWrappers::n_global_elements(v.vector->Map()),
                              v.vector->Map().IndexBase(),
                              v.vector->Comm());
         vector.reset (new Epetra_FEVector(map));
