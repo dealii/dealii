@@ -489,6 +489,7 @@ normal_vector (const typename Triangulation<dim>::face_iterator &,
   for (unsigned int d=0; d<dim; ++d)
     if (d != dim-1)  // don't test the last component of the vector
       Assert (this->x_1[d] == 0., ExcNotImplemented());
+  Assert (this->x_1[dim-1] > 0, ExcNotImplemented());
 
   const double c_squared = (this->radius_1 / this->x_1[dim-1])*(this->radius_1 / this->x_1[dim-1]);
   Tensor<1,dim> normal = p;
