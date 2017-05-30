@@ -7141,6 +7141,8 @@ DataOutInterface<dim, spacedim>::set_flags (const FlagType &flags)
     vtk_flags = *reinterpret_cast<const DataOutBase::VtkFlags *>(&flags);
   else if (typeid(flags) == typeid(svg_flags))
     svg_flags = *reinterpret_cast<const DataOutBase::SvgFlags *>(&flags);
+  else if (typeid(flags) == typeid(gnuplot_flags))
+    gnuplot_flags = *reinterpret_cast<const DataOutBase::GnuplotFlags *>(&flags);
   else if (typeid(flags) == typeid(deal_II_intermediate_flags))
     deal_II_intermediate_flags = *reinterpret_cast<const DataOutBase::Deal_II_IntermediateFlags *>(&flags);
   else
