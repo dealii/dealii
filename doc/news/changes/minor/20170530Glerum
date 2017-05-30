@@ -1,0 +1,2 @@
+New: The ConeBoundary class now has a member function ConeBoundary::normal_vector().
+<br> (Anne Glerum, 2017/05/30)
