@@ -57,5 +57,6 @@ FILE(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/grid/*.h
   )
 
+SET(_disable_unity_build_obj_grid TRUE)
 DEAL_II_ADD_LIBRARY(obj_grid OBJECT ${_src} ${_header} ${_inst})
 EXPAND_INSTANTIATIONS(obj_grid "${_inst}")
