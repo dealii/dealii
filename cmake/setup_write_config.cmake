@@ -41,7 +41,7 @@ FILE(WRITE ${CMAKE_BINARY_DIR}/revision.log
 
 SET(_log_detailed "${CMAKE_BINARY_DIR}/detailed.log")
 SET(_log_summary  "${CMAKE_BINARY_DIR}/summary.log")
-SET(_log_feature "${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}FeatureConfig.cmake")
+SET(_log_feature "${CMAKE_BINARY_DIR}/cmake/config/${DEAL_II_PROJECT_CONFIG_NAME}FeatureConfig.cmake")
 FILE(REMOVE ${_log_detailed} ${_log_summary} ${_log_feature})
 
 MACRO(_both)
