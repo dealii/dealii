@@ -48,6 +48,11 @@ public:
   MGCoarseGridApplySmoother (const MGSmootherBase<VectorType> &coarse_smooth);
 
   /**
+   * Clear the pointer.
+   */
+  void clear ();
+
+  /**
    * Initialize new data.
    */
   void initialize (const MGSmootherBase<VectorType> &coarse_smooth);
@@ -328,6 +333,15 @@ MGCoarseGridApplySmoother<VectorType>::initialize (const MGSmootherBase<VectorTy
     SmartPointer<const MGSmootherBase<VectorType>, MGCoarseGridApplySmoother<VectorType> >
     (&coarse_smooth_,typeid(*this).name());
 }
+
+
+template<class VectorType>
+void
+MGCoarseGridApplySmoother<VectorType>::clear()
+{
+  coarse_smooth = nullptr;
+}
+
 
 template<class VectorType>
 void
