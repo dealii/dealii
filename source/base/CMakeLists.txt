@@ -51,6 +51,7 @@ SET(_src
   polynomials_bernstein.cc
   polynomials_bdm.cc
   polynomials_nedelec.cc
+  polynomials_integrated_legendre_sz.cc
   polynomial_space.cc
   polynomials_p.cc
   polynomials_piecewise.cc
