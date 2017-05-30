@@ -331,9 +331,9 @@ namespace TrilinosWrappers
 
 
   TrilinosScalar
-  BlockSparseMatrix::residual (VectorBase       &dst,
-                               const VectorBase &x,
-                               const VectorBase &b) const
+  BlockSparseMatrix::residual (MPI::Vector       &dst,
+                               const MPI::Vector &x,
+                               const MPI::Vector &b) const
   {
     vmult (dst, x);
     dst -= b;

@@ -42,7 +42,6 @@ namespace TrilinosWrappers
 {
   // forward declarations
   class SparseMatrix;
-  class VectorBase;
   class PreconditionBase;
 
 
@@ -154,8 +153,8 @@ namespace TrilinosWrappers
      */
     void
     solve (const SparseMatrix     &A,
-           VectorBase             &x,
-           const VectorBase       &b,
+           MPI::Vector            &x,
+           const MPI::Vector      &b,
            const PreconditionBase &preconditioner);
 
     /**
@@ -167,8 +166,8 @@ namespace TrilinosWrappers
      */
     void
     solve (const Epetra_Operator  &A,
-           VectorBase             &x,
-           const VectorBase       &b,
+           MPI::Vector            &x,
+           const MPI::Vector      &b,
            const PreconditionBase &preconditioner);
 
     /**
@@ -182,8 +181,8 @@ namespace TrilinosWrappers
      */
     void
     solve (const Epetra_Operator  &A,
-           VectorBase             &x,
-           const VectorBase       &b,
+           MPI::Vector            &x,
+           const MPI::Vector      &b,
            const Epetra_Operator  &preconditioner);
 
     /**
@@ -677,7 +676,7 @@ namespace TrilinosWrappers
      * package set in intialize(). Note the matrix is not refactorized during
      * this call.
      */
-    void solve (VectorBase &x, const VectorBase &b);
+    void solve (MPI::Vector &x, const MPI::Vector &b);
 
     /**
      * Solve the linear system <tt>Ax=b</tt>. Creates a factorization of the
@@ -687,8 +686,8 @@ namespace TrilinosWrappers
      */
     void
     solve (const SparseMatrix     &A,
-           VectorBase             &x,
-           const VectorBase       &b);
+           MPI::Vector            &x,
+           const MPI::Vector      &b);
 
     /**
      * Solve the linear system <tt>Ax=b</tt>. This class works with Trilinos

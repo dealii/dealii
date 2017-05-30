@@ -15,8 +15,8 @@
 
 
 
-// check TrilinosWrappers::MPI::Vector::operator!=(TrilinosWrappers::Vector) for vectors that are not
-// equal
+// check TrilinosWrappers::MPI::Vector::operator!=(TrilinosWrappers::MPI::Vector)
+// for vectors that are not equal
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>

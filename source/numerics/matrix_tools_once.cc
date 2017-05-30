@@ -418,22 +418,6 @@ namespace MatrixTools
 
 
 
-
-  void
-  apply_boundary_values (const std::map<types::global_dof_index,TrilinosScalar> &boundary_values,
-                         TrilinosWrappers::SparseMatrix   &matrix,
-                         TrilinosWrappers::VectorBase         &solution,
-                         TrilinosWrappers::VectorBase         &right_hand_side,
-                         const bool        eliminate_columns)
-  {
-    // simply redirect to the generic function
-    // used for both trilinos matrix types
-    internal::TrilinosWrappers::apply_boundary_values (boundary_values, matrix, solution,
-                                                       right_hand_side, eliminate_columns);
-  }
-
-
-
   void
   apply_boundary_values (const std::map<types::global_dof_index,TrilinosScalar> &boundary_values,
                          TrilinosWrappers::SparseMatrix   &matrix,

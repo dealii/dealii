@@ -63,7 +63,7 @@ namespace
 #ifdef DEAL_II_WITH_TRILINOS
     inline
     TrilinosScalar
-    max_element (const TrilinosWrappers::VectorBase &criteria)
+    max_element (const TrilinosWrappers::MPI::Vector &criteria)
     {
       TrilinosScalar m = 0;
       criteria.trilinos_vector().MaxValue(&m);
@@ -73,7 +73,7 @@ namespace
 
     inline
     TrilinosScalar
-    min_element (const TrilinosWrappers::VectorBase &criteria)
+    min_element (const TrilinosWrappers::MPI::Vector &criteria)
     {
       TrilinosScalar m = 0;
       criteria.trilinos_vector().MinValue(&m);

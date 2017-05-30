@@ -106,17 +106,6 @@ namespace internal
   };
 #endif
 
-  template <>
-  struct MatrixSelector<dealii::TrilinosWrappers::VectorBase>
-  {
-    typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
-    typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
-
-    template <typename SparsityPatternType, typename DoFHandlerType>
-    static void reinit(Matrix &, Sparsity &, int /*level*/, const SparsityPatternType &, DoFHandlerType &)
-    {
-    }
-  };
 #else
   // ! DEAL_II_WITH_TRILINOS
   template <typename Number>

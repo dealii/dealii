@@ -329,9 +329,9 @@ namespace TrilinosWrappers
      *
      * This function is only applicable if the matrix only has one block.
      */
-    TrilinosScalar residual (VectorBase       &dst,
-                             const VectorBase &x,
-                             const VectorBase &b) const;
+    TrilinosScalar residual (MPI::Vector       &dst,
+                             const MPI::Vector &x,
+                             const MPI::Vector &b) const;
 
     /**
      * Make the clear() function in the base class visible, though it is

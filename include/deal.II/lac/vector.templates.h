@@ -198,31 +198,6 @@ Vector<Number>::Vector (const TrilinosWrappers::MPI::Vector &v)
     }
 }
 
-
-
-template <typename Number>
-Vector<Number>::Vector (const TrilinosWrappers::VectorBase &v)
-  :
-  Subscriptor(),
-  vec_size(v.size()),
-  max_vec_size(v.size()),
-  val(nullptr)
-{
-  if (vec_size != 0)
-    {
-      allocate();
-
-      // get a representation of the vector
-      // and copy it
-      TrilinosScalar **start_ptr;
-
-      int ierr = v.trilinos_vector().ExtractView (&start_ptr);
-      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-      std::copy (start_ptr[0], start_ptr[0]+vec_size, begin());
-    }
-}
-
 #endif
 
 
@@ -904,16 +879,7 @@ Vector<Number>::operator= (const TrilinosWrappers::MPI::Vector &v)
   TrilinosWrappers::MPI::Vector localized_vector;
   localized_vector.reinit(complete_index_set(v.size()));
   localized_vector.reinit(v, false, true);
-  *this = static_cast<TrilinosWrappers::VectorBase>(localized_vector);
-  return *this;
-}
 
-
-
-template <typename Number>
-Vector<Number> &
-Vector<Number>::operator= (const TrilinosWrappers::VectorBase &v)
-{
   if (v.size() != vec_size)
     reinit (v.size(), true);
   if (vec_size != 0)

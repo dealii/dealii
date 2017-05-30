@@ -1271,8 +1271,7 @@ namespace PETScWrappers
     if (value == PetscScalar())
       {
         // we have to check after using Insert/Add in any case to be
-        // consistent with the MPI communication model (see the comments in
-        // the documentation of TrilinosWrappers::VectorBase), but we can save
+        // consistent with the MPI communication model, but we can save
         // some work if the addend is zero. However, these actions are done
         // in case we pass on to the other function.
         prepare_action(VectorOperation::add);

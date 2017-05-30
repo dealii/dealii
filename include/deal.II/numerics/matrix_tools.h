@@ -73,7 +73,6 @@ namespace TrilinosWrappers
 {
   class SparseMatrix;
   class BlockSparseMatrix;
-  class VectorBase;
   namespace MPI
   {
     class Vector;
@@ -850,16 +849,6 @@ namespace MatrixTools
    * argument is actually not implemented; that argument has <code>true</code>
    * as its default value to stay consistent with the other functions of same
    * name in this namespace.)
-   */
-  void
-  apply_boundary_values (const std::map<types::global_dof_index,TrilinosScalar> &boundary_values,
-                         TrilinosWrappers::SparseMatrix  &matrix,
-                         TrilinosWrappers::VectorBase        &solution,
-                         TrilinosWrappers::VectorBase        &right_hand_side,
-                         const bool             eliminate_columns = true);
-
-  /**
-   * Same as above, but for parallel matrices and vectors.
    *
    * @note If the matrix is stored in parallel across multiple processors
    * using MPI, this function only touches rows that are locally stored and

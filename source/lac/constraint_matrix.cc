@@ -1366,7 +1366,6 @@ BLOCK_MATRIX_VECTOR_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix ,PETScWrappe
 #ifdef DEAL_II_WITH_TRILINOS
 MATRIX_FUNCTIONS(TrilinosWrappers::SparseMatrix);
 BLOCK_MATRIX_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix);
-MATRIX_VECTOR_FUNCTIONS(TrilinosWrappers::SparseMatrix, TrilinosWrappers::VectorBase);
 MATRIX_VECTOR_FUNCTIONS(TrilinosWrappers::SparseMatrix, TrilinosWrappers::MPI::Vector);
 BLOCK_MATRIX_VECTOR_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix, TrilinosWrappers::MPI::BlockVector);
 #endif
