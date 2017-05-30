@@ -65,6 +65,11 @@ namespace mg
     initialize(const MGLevelObject<MatrixType> &M);
 
     /**
+     * Reset the object.
+     */
+    void reset();
+
+    /**
      * Access matrix on a level.
      */
     const PointerMatrixBase<VectorType> &operator[] (unsigned int level) const;
@@ -181,6 +186,16 @@ namespace mg
     for (unsigned int level=p.min_level(); level <= p.max_level(); ++level)
       matrices[level] = std::shared_ptr<PointerMatrixBase<VectorType> >
                         (new_pointer_matrix_base(p[level], VectorType()));
+  }
+
+
+
+  template <typename VectorType>
+  inline
+  void
+  Matrix<VectorType>::reset ()
+  {
+    matrices.resize(0,0);
   }
 
 
