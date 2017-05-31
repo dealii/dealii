@@ -375,7 +375,7 @@ restriction. Implicit schemes do not have this restriction for stability, but
 they become inaccurate if the time step is too large.
 
 This condition was first recognized by Courant, Friedrichs, and Lewy &mdash;
-in 1928, long before computers become available for numerical
+in 1928, long before computers became available for numerical
 computations! (This result appeared in the German language article
 R. Courant, K. Friedrichs and H. Lewy: <i>&Uuml;ber die partiellen
 Differenzengleichungen der mathematischen Physik</i>, Mathematische
