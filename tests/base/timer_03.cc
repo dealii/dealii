@@ -90,11 +90,11 @@ int main ()
   tO.exit_section("Section1");
 
   std::map<std::string, double> cpu_times =
-      tO.get_summary_data(TimerOutput::OutputData::total_cpu_time);
+    tO.get_summary_data(TimerOutput::OutputData::total_cpu_time);
   std::map<std::string, double> wall_times =
-      tO.get_summary_data(TimerOutput::OutputData::total_wall_time);
+    tO.get_summary_data(TimerOutput::OutputData::total_wall_time);
   std::map<std::string, double> calls =
-      tO.get_summary_data(TimerOutput::OutputData::n_calls);
+    tO.get_summary_data(TimerOutput::OutputData::n_calls);
 
   match(calls["Section1"], 1.0);
   match(calls["Section2"], 2.0);
