@@ -103,6 +103,14 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-undefined-var-template")
 
   #
+  # Disable warnings about template instantiations for template arguments
+  # for which there is already a specialization. Our setup with the
+  # *.inst.in files makes it hard to selectively exclude these. There
+  # is no harm in still using the instantiation, it just has no effect.
+  #
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-instantiation-after-specialization")
+
+  #
   # Clang versions prior to 3.6 emit a lot of false positives wrt
   # "-Wunused-function". Also suppress warnings for Xcode older than 6.3
   # (which is equivalent to clang < 3.6).
