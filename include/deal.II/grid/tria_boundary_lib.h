@@ -262,6 +262,18 @@ public:
   get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
                            typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const;
 
+  /**
+   * Implementation of the function declared in the base class.
+   *
+   * Refer to the general documentation of this class and the documentation of
+   * the base class.
+   */
+  virtual
+  Tensor<1,dim>
+  normal_vector (const typename Triangulation<dim>::face_iterator &face,
+                 const Point<dim> &p) const;
+
+
 protected:
   /**
    * First radius of the (truncated) cone.

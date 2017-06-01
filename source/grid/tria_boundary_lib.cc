@@ -475,6 +475,33 @@ get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
 }
 
 
+template <int dim>
+inline
+Tensor<1,dim>
+ConeBoundary<dim>::
+normal_vector (const typename Triangulation<dim>::face_iterator &,
+               const Point<dim> &p) const
+{
+// TODO only for cone opening along z-axis
+  Assert (dim == 3, ExcNotImplemented());
+  Assert (this->radius_0 == 0., ExcNotImplemented());
+  Assert (this->x_0 == Point<dim>(), ExcNotImplemented());
+  for (unsigned int d=0; d<dim; ++d)
+    if (d != dim-1)  // don't test the last component of the vector
+      Assert (this->x_1[d] == 0., ExcNotImplemented());
+  Assert (this->x_1[dim-1] > 0, ExcNotImplemented());
+
+  const double c_squared = (this->radius_1 / this->x_1[dim-1])*(this->radius_1 / this->x_1[dim-1]);
+  Tensor<1,dim> normal = p;
+  normal[0] *= -2.0/c_squared;
+  normal[1] *= -2.0/c_squared;
+  normal[dim-1] *= 2.0;
+
+  return normal/normal.norm();
+}
+
+
+
 //======================================================================//
 
 template <int dim, int spacedim>
