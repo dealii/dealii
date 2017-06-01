@@ -1476,17 +1476,17 @@ namespace TrilinosWrappers
      *
      * This function can be called with several different vector objects,
      * namely TrilinosWrappers::MPI::Vector as well as deal.II's own vector
-     * classes Vector<double> and LinearAlgebra::distributed::Vector<double>.
+     * classes, e.g., Vector<double> and LinearAlgebra::distributed::Vector<double>.
      *
-     * When using a vector of type TrilinosWrappers::MPI::Vector, both vectors
-     * have to be distributed vectors generated using the same Map as was used
-     * for the matrix rows and columns in case you work on a distributed
-     * memory architecture, using the interface in the
-     * TrilinosWrappers::MPI::Vector class.
+     * When using vectors of type TrilinosWrappers::MPI::Vector, the vector
+     * @p dst has to be initialized with the same IndexSet that was used for
+     * the row indices of the matrix and the vector @p src has to be
+     * initialized with the same IndexSet that was used for the column indices
+     * of the matrix.
      *
      * In case of a localized Vector, this function will only work when
      * running on one processor, since the matrix object is inherently
-     * distributed. Otherwise, and exception will be thrown.
+     * distributed. Otherwise, an exception will be thrown.
      */
     template<typename VectorType>
     void vmult (VectorType       &dst,
@@ -1501,17 +1501,17 @@ namespace TrilinosWrappers
      *
      * This function can be called with several different vector objects,
      * namely TrilinosWrappers::MPI::Vector as well as deal.II's own vector
-     * classes Vector<double> and LinearAlgebra::distributed::Vector<double>.
+     * classes, e.g., Vector<double> and LinearAlgebra::distributed::Vector<double>.
      *
-     * When using a vector of type TrilinosWrappers::MPI::Vector, both vectors
-     * have to be distributed vectors generated using the same Map as was used
-     * for the matrix rows and columns in case you work on a distributed
-     * memory architecture, using the interface in the
-     * TrilinosWrappers::MPI::Vector class.
+     * When using vectors of type TrilinosWrappers::MPI::Vector, the vector
+     * @p src has to be initialized with the same IndexSet that was used for
+     * the row indices of the matrix and the vector @p dst has to be
+     * initialized with the same IndexSet that was used for the column indices
+     * of the matrix.
      *
      * In case of a localized Vector, this function will only work when
      * running on one processor, since the matrix object is inherently
-     * distributed. Otherwise, and exception will be thrown.
+     * distributed. Otherwise, an exception will be thrown.
      */
     template <typename VectorType>
     void Tvmult (VectorType       &dst,
@@ -1525,17 +1525,17 @@ namespace TrilinosWrappers
      *
      * This function can be called with several different vector objects,
      * namely TrilinosWrappers::MPI::Vector as well as deal.II's own vector
-     * classes Vector<double> and LinearAlgebra::distributed::Vector<double>.
+     * classes, e.g., Vector<double> and LinearAlgebra::distributed::Vector<double>.
      *
-     * When using a vector of type TrilinosWrappers::MPI::Vector, both vectors
-     * have to be distributed vectors generated using the same Map as was used
-     * for the matrix rows and columns in case you work on a distributed
-     * memory architecture, using the interface in the
-     * TrilinosWrappers::MPI::Vector class.
+     * When using vectors of type TrilinosWrappers::MPI::Vector, the vector
+     * @p dst has to be initialized with the same IndexSet that was used for
+     * the row indices of the matrix and the vector @p src has to be
+     * initialized with the same IndexSet that was used for the column indices
+     * of the matrix.
      *
      * In case of a localized Vector, this function will only work when
      * running on one processor, since the matrix object is inherently
-     * distributed. Otherwise, and exception will be thrown.
+     * distributed. Otherwise, an exception will be thrown.
      *
      */
     template<typename VectorType>
@@ -1551,17 +1551,17 @@ namespace TrilinosWrappers
      *
      * This function can be called with several different vector objects,
      * namely TrilinosWrappers::MPI::Vector as well as deal.II's own vector
-     * classes Vector<double> and LinearAlgebra::distributed::Vector<double>.
+     * classes, e.g., Vector<double> and LinearAlgebra::distributed::Vector<double>.
      *
-     * When using a vector of type TrilinosWrappers::MPI::Vector, both vectors
-     * have to be distributed vectors generated using the same Map as was used
-     * for the matrix rows and columns in case you work on a distributed
-     * memory architecture, using the interface in the
-     * TrilinosWrappers::MPI::Vector class.
+     * When using vectors of type TrilinosWrappers::MPI::Vector, the vector
+     * @p src has to be initialized with the same IndexSet that was used for
+     * the row indices of the matrix and the vector @p dst has to be
+     * initialized with the same IndexSet that was used for the column indices
+     * of the matrix.
      *
      * In case of a localized Vector, this function will only work when
      * running on one processor, since the matrix object is inherently
-     * distributed. Otherwise, and exception will be thrown.
+     * distributed. Otherwise, an exception will be thrown.
      */
     template <typename VectorType>
     void Tvmult_add (VectorType       &dst,
@@ -1581,15 +1581,12 @@ namespace TrilinosWrappers
      * the Trilinos wrapper class) since Trilinos doesn't support this
      * operation and needs a temporary vector.
      *
-     * When using a vector of type TrilinosWrappers::MPI::Vector, both vectors
-     * have to be distributed vectors generated using the same Map as was used
-     * for the matrix rows and columns in case you work on a distributed
-     * memory architecture, using the interface in the
-     * TrilinosWrappers::MPI::Vector class.
+     * The vector has to be initialized with the same IndexSet the matrix
+     * was initialized with.
      *
      * In case of a localized Vector, this function will only work when
      * running on one processor, since the matrix object is inherently
-     * distributed. Otherwise, and exception will be thrown.
+     * distributed. Otherwise, an exception will be thrown.
      */
     TrilinosScalar matrix_norm_square (const MPI::Vector &v) const;
 
@@ -1601,15 +1598,16 @@ namespace TrilinosWrappers
      * the Trilinos wrapper class) since Trilinos doesn't support this
      * operation and needs a temporary vector.
      *
-     * When using a vector of type TrilinosWrappers::MPI::Vector, both vectors
-     * have to be distributed vectors generated using the same Map as was used
-     * for the matrix rows and columns in case you work on a distributed
-     * memory architecture, using the interface in the
-     * TrilinosWrappers::MPI::Vector class.
+     * The vector @p u has to be initialized with the same IndexSet that
+     * was used for the row indices of the matrix and the vector @p v has
+     * to be initialized with the same IndexSet that was used for the
+     * column indices of the matrix.
      *
      * In case of a localized Vector, this function will only work when
      * running on one processor, since the matrix object is inherently
-     * distributed. Otherwise, and exception will be thrown.
+     * distributed. Otherwise, an exception will be thrown.
+     *
+     * This function is only implemented for square matrices.
      */
     TrilinosScalar matrix_scalar_product (const MPI::Vector &u,
                                           const MPI::Vector &v) const;
@@ -1621,15 +1619,14 @@ namespace TrilinosWrappers
      *
      * Source <i>x</i> and destination <i>dst</i> must not be the same vector.
      *
-     * When using a vector of type TrilinosWrappers::MPI::Vector, both vectors
-     * have to be distributed vectors generated using the same Map as was used
-     * for the matrix rows and columns in case you work on a distributed
-     * memory architecture, using the interface in the
-     * TrilinosWrappers::MPI::Vector class.
+     * The vectors @p dst and @p b have to be initialized with the same
+     * IndexSet that was used for the row indices of the matrix and the vector
+     * @p x has to be initialized with the same IndexSet that was used for the
+     * column indices of the matrix.
      *
      * In case of a localized Vector, this function will only work when
      * running on one processor, since the matrix object is inherently
-     * distributed. Otherwise, and exception will be thrown.
+     * distributed. Otherwise, an exception will be thrown.
      */
     TrilinosScalar residual (MPI::Vector       &dst,
                              const MPI::Vector &x,
