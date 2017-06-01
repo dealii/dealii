@@ -9039,6 +9039,9 @@ Triangulation<dim, spacedim>::operator= (Triangulation<dim, spacedim> &&tria)
 template <int dim, int spacedim>
 Triangulation<dim, spacedim>::~Triangulation ()
 {
+  // notify listeners that the triangulation is going down...
+  signals.clear();
+
   levels.clear ();
 
   // the vertex_to_boundary_id_map_1d field should be unused except in

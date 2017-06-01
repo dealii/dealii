@@ -2120,9 +2120,10 @@ public:
 
     /**
      * This signal is triggered whenever the Triangulation::clear() function
-     * is called. This signal is also triggered when loading a triangulation
-     * from an archive via Triangulation::load() as the previous content of
-     * the triangulation is first destroyed.
+     * is called and in the destructor of the triangulation. This signal is
+     * also triggered when loading a triangulation from an archive via
+     * Triangulation::load() as the previous content of the triangulation is
+     * first destroyed.
      *
      * The signal is triggered before the data structures of the
      * triangulation are destroyed. In other words, the functions
