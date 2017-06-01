@@ -18,19 +18,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
-namespace VectorTools
-{
-  template <>
-  void
-  subtract_mean_value(LinearAlgebra::EpetraWrappers::Vector &,
-                      const std::vector<bool> &)
-  {
-    Assert(false,ExcNotImplemented());
-  }
-}
-#endif
-
 // ---------------------------- explicit instantiations --------------------
 #include "vector_tools_mean_value.inst"
 
