@@ -1103,7 +1103,7 @@ private:
    * Stores whether the preconditioner has been set up and eigenvalues have
    * been computed.
    */
-  bool is_initialized;
+  bool eigenvalues_are_initialized;
 
   /**
    * A mutex to avoid that multiple vmult() invocations by different threads
@@ -1920,6 +1920,9 @@ namespace internal
       // a period of 11
       for (unsigned int i=0; i<vector.size(); ++i)
         vector(i) = i%11;
+
+      const Number mean_value = vector.mean_value();
+      vector.add(-mean_value);
     }
 
     template <typename Number>
@@ -1931,6 +1934,9 @@ namespace internal
       // a period of 11
       for (unsigned int i=0; i<vector.local_size(); ++i)
         vector.local_element(i) = i%11;
+
+      const Number mean_value = vector.mean_value();
+      vector.add(-mean_value);
     }
 
     struct EigenvalueTracker
@@ -1976,9 +1982,9 @@ template <typename MatrixType, typename VectorType, typename PreconditionerType>
 inline
 PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::PreconditionChebyshev ()
   :
-  theta          (1.),
-  delta          (1.),
-  is_initialized (false)
+  theta                       (1.),
+  delta                       (1.),
+  eigenvalues_are_initialized (false)
 {
   static_assert(
     std::is_same<size_type, typename VectorType::size_type>::value,
@@ -2001,7 +2007,7 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::initialize
   internal::PreconditionChebyshev::initialize_preconditioner(matrix,
                                                              data.preconditioner,
                                                              data.matrix_diagonal_inverse);
-  is_initialized = false;
+  eigenvalues_are_initialized = false;
 }
 
 
@@ -2011,7 +2017,7 @@ inline
 void
 PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::clear ()
 {
-  is_initialized = false;
+  eigenvalues_are_initialized = false;
   theta = delta = 1.0;
   matrix_ptr = nullptr;
   {
@@ -2034,7 +2040,7 @@ void
 PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::estimate_eigenvalues
 (const VectorType &src) const
 {
-  Assert(is_initialized == false, ExcInternalError());
+  Assert(eigenvalues_are_initialized == false, ExcInternalError());
   Assert(data.preconditioner.get() != nullptr, ExcNotInitialized());
 
   update1.reinit(src);
@@ -2120,7 +2126,7 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::estimate_eigenv
       ))
     update3.reinit (src, true);
 
-  const_cast<PreconditionChebyshev<MatrixType,VectorType,PreconditionerType> *>(this)->is_initialized = true;
+  const_cast<PreconditionChebyshev<MatrixType,VectorType,PreconditionerType> *>(this)->eigenvalues_are_initialized = true;
 }
 
 
@@ -2180,7 +2186,7 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>
          const VectorType &src) const
 {
   Threads::Mutex::ScopedLock lock(mutex);
-  if (is_initialized == false)
+  if (eigenvalues_are_initialized == false)
     estimate_eigenvalues(src);
 
   internal::PreconditionChebyshev::vector_updates
@@ -2199,7 +2205,7 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>
           const VectorType &src) const
 {
   Threads::Mutex::ScopedLock lock(mutex);
-  if (is_initialized == false)
+  if (eigenvalues_are_initialized == false)
     estimate_eigenvalues(src);
 
   internal::PreconditionChebyshev::vector_updates
@@ -2218,7 +2224,7 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>
         const VectorType &src) const
 {
   Threads::Mutex::ScopedLock lock(mutex);
-  if (is_initialized == false)
+  if (eigenvalues_are_initialized == false)
     estimate_eigenvalues(src);
 
   if (!dst.all_zero())
@@ -2244,7 +2250,7 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>
          const VectorType &src) const
 {
   Threads::Mutex::ScopedLock lock(mutex);
-  if (is_initialized == false)
+  if (eigenvalues_are_initialized == false)
     estimate_eigenvalues(src);
 
   if (!dst.all_zero())
