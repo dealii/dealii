@@ -21,6 +21,7 @@
 
 #include <vector>
 #include <sstream>
+#include <deal.II/base/std_cxx14/memory.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -92,10 +93,10 @@ convert_generalized_support_point_values_to_nodal_values (const std::vector<Vect
 
 
 template <int dim, int spacedim>
-FiniteElement<dim,spacedim> *
+std::unique_ptr<FiniteElement<dim,spacedim> >
 FE_Q_iso_Q1<dim,spacedim>::clone() const
 {
-  return new FE_Q_iso_Q1<dim,spacedim>(*this);
+  return std_cxx14::make_unique<FE_Q_iso_Q1<dim,spacedim>>(*this);
 }
 
 

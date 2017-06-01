@@ -15,6 +15,7 @@
 
 
 #include <deal.II/fe/fe_nothing.h>
+#include <deal.II/base/std_cxx14/memory.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -48,10 +49,10 @@ FE_Nothing<dim,spacedim>::FE_Nothing (const unsigned int n_components,
 
 
 template <int dim, int spacedim>
-FiniteElement<dim,spacedim> *
+std::unique_ptr<FiniteElement<dim,spacedim> >
 FE_Nothing<dim,spacedim>::clone() const
 {
-  return new FE_Nothing<dim,spacedim>(*this);
+  return std_cxx14::make_unique<FE_Nothing<dim,spacedim>>(*this);
 }
 
 

@@ -125,6 +125,10 @@ public:
    */
   virtual std::string get_name () const;
 
+  virtual
+  std::unique_ptr<FiniteElement<dim,spacedim> >
+  clone() const;
+
   /**
    * Implementation of the corresponding function in the FiniteElement
    * class.  Since the current element is interpolatory, the nodal
@@ -155,15 +159,6 @@ public:
   FiniteElementDomination::Domination
   compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
   //@}
-
-protected:
-
-  /**
-   * @p clone function instead of a copy constructor.
-   *
-   * This function is needed by the constructors of @p FESystem.
-   */
-  virtual FiniteElement<dim,spacedim> *clone() const;
 };
 
 

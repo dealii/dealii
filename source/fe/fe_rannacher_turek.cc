@@ -20,6 +20,7 @@
 #include <algorithm>
 
 #include <sstream>
+#include <deal.II/base/std_cxx14/memory.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -70,9 +71,10 @@ std::string FE_RannacherTurek<dim>::get_name() const
 
 
 template <int dim>
-FiniteElement<dim> *FE_RannacherTurek<dim>::clone() const
+std::unique_ptr<FiniteElement<dim,dim> >
+FE_RannacherTurek<dim>::clone() const
 {
-  return new FE_RannacherTurek<dim>(this->order, this->n_face_support_points);
+  return std_cxx14::make_unique<FE_RannacherTurek<dim>>(this->order, this->n_face_support_points);
 }
 
 

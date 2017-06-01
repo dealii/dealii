@@ -25,6 +25,7 @@
 #include <deal.II/fe/fe_tools.h>
 
 #include <sstream>
+#include <deal.II/base/std_cxx14/memory.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -319,7 +320,7 @@ FESystem<dim,spacedim>::get_name () const
 
 
 template <int dim, int spacedim>
-FiniteElement<dim,spacedim> *
+std::unique_ptr<FiniteElement<dim,spacedim> >
 FESystem<dim,spacedim>::clone() const
 {
   std::vector< const FiniteElement<dim,spacedim>* >  fes;
@@ -330,7 +331,7 @@ FESystem<dim,spacedim>::clone() const
       fes.push_back( & base_element(i) );
       multiplicities.push_back(this->element_multiplicity(i) );
     }
-  return new FESystem<dim,spacedim>(fes, multiplicities);
+  return std_cxx14::make_unique<FESystem<dim,spacedim>>(fes, multiplicities);
 }
 
 
@@ -1477,9 +1478,7 @@ void FESystem<dim,spacedim>::initialize (const std::vector<const FiniteElement<d
         {
           clone_base_elements += Threads::new_task ([ &,i,ind] ()
           {
-            base_elements[ind]
-              = std::make_pair (std::unique_ptr<FiniteElement<dim,spacedim>>(fes[i]->clone()),
-                                multiplicities[i]);
+            base_elements[ind] = { fes[i]->clone(), multiplicities[i] };
           });
           ++ind;
         }

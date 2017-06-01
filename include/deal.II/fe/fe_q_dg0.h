@@ -294,13 +294,9 @@ public:
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
   get_constant_modes () const;
 
-protected:
-  /**
-   * @p clone function instead of a copy constructor.
-   *
-   * This function is needed by the constructors of @p FESystem.
-   */
-  virtual FiniteElement<dim,spacedim> *clone() const;
+  virtual
+  std::unique_ptr<FiniteElement<dim,spacedim> >
+  clone() const;
 
 private:
 

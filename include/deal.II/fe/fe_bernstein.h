@@ -192,14 +192,11 @@ public:
    */
   virtual std::string get_name () const;
 
-protected:
+  virtual
+  std::unique_ptr<FiniteElement<dim,spacedim> >
+  clone() const;
 
-  /**
-   * @p clone function instead of a copy constructor.
-   *
-   * This function is needed by the constructors of @p FESystem.
-   */
-  virtual FiniteElement<dim,spacedim> *clone() const;
+protected:
 
   /**
    * Only for internal use. Its full name is @p get_dofs_per_object_vector

@@ -95,14 +95,8 @@ public:
   FE_Nothing (const unsigned int n_components = 1,
               const bool dominate = false);
 
-  /**
-   * A sort of virtual copy constructor. Some places in the library, for
-   * example the constructors of FESystem as well as the hp::FECollection
-   * class, need to make copied of finite elements without knowing their exact
-   * type. They do so through this function.
-   */
   virtual
-  FiniteElement<dim,spacedim> *
+  std::unique_ptr<FiniteElement<dim,spacedim> >
   clone() const;
 
   /**

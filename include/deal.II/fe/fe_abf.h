@@ -130,7 +130,10 @@ public:
                                                             std::vector<double>                &nodal_values) const;
 
   virtual std::size_t memory_consumption () const;
-  virtual FiniteElement<dim> *clone() const;
+
+  virtual
+  std::unique_ptr<FiniteElement<dim,dim> >
+  clone() const;
 
 private:
   /**

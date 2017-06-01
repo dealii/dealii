@@ -268,7 +268,10 @@ public:
   get_constant_modes () const;
 
   virtual std::size_t memory_consumption () const;
-  virtual FiniteElement<dim> *clone() const;
+
+  virtual
+  std::unique_ptr<FiniteElement<dim,dim> >
+  clone() const;
 
 private:
   /**

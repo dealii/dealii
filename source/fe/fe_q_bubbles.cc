@@ -33,6 +33,7 @@
 #include <vector>
 #include <sstream>
 #include <memory>
+#include <deal.II/base/std_cxx14/memory.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -320,10 +321,10 @@ FE_Q_Bubbles<dim,spacedim>::get_name () const
 
 
 template <int dim, int spacedim>
-FiniteElement<dim,spacedim> *
+std::unique_ptr<FiniteElement<dim,spacedim> >
 FE_Q_Bubbles<dim,spacedim>::clone() const
 {
-  return new FE_Q_Bubbles<dim,spacedim>(*this);
+  return std_cxx14::make_unique<FE_Q_Bubbles<dim,spacedim>>(*this);
 }
 
 

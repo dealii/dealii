@@ -142,13 +142,9 @@ public:
   virtual bool has_support_on_face (const unsigned int shape_index,
                                     const unsigned int face_index) const;
 
-protected:
-  /**
-   * @p clone function instead of a copy constructor.
-   *
-   * This function is needed by the constructors of @p FESystem.
-   */
-  virtual FiniteElement<dim,spacedim> *clone() const;
+  virtual
+  std::unique_ptr<FiniteElement<dim,spacedim> >
+  clone() const;
 
 private:
 

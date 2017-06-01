@@ -18,6 +18,8 @@
 #include <deal.II/fe/fe_tools.h>
 
 #include <sstream>
+#include <deal.II/base/std_cxx14/memory.h>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -156,10 +158,10 @@ FE_DGPMonomial<dim>::get_name () const
 
 
 template <int dim>
-FiniteElement<dim> *
+std::unique_ptr<FiniteElement<dim,dim> >
 FE_DGPMonomial<dim>::clone() const
 {
-  return new FE_DGPMonomial<dim>(*this);
+  return std_cxx14::make_unique<FE_DGPMonomial<dim>>(*this);
 }
 
 

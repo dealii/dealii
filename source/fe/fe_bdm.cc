@@ -29,6 +29,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <deal.II/base/std_cxx14/memory.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -114,10 +115,10 @@ FE_BDM<dim>::get_name () const
 
 
 template <int dim>
-FiniteElement<dim> *
+std::unique_ptr<FiniteElement<dim,dim> >
 FE_BDM<dim>::clone() const
 {
-  return new FE_BDM<dim>(*this);
+  return std_cxx14::make_unique<FE_BDM<dim>>(*this);
 }
 
 

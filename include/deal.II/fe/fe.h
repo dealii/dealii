@@ -24,6 +24,9 @@
 #include <deal.II/fe/block_mask.h>
 #include <deal.II/fe/mapping.h>
 
+#include <memory>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim> class FEValuesBase;
@@ -697,12 +700,19 @@ public:
   virtual ~FiniteElement ();
 
   /**
-   * A sort of virtual copy constructor. Some places in the library, for
+   * A sort of virtual copy constructor, this function returns a copy of
+   * the finite element object. Derived classes need to override the function
+   * here in this base class and return an object of the same type as the
+   * derived class.
+   *
+   * Some places in the library, for
    * example the constructors of FESystem as well as the hp::FECollection
    * class, need to make copies of finite elements without knowing their exact
    * type. They do so through this function.
    */
-  virtual FiniteElement<dim,spacedim> *clone() const = 0;
+  virtual
+  std::unique_ptr<FiniteElement<dim,spacedim>>
+                                            clone() const = 0;
 
   /**
    * Return a string that uniquely identifies a finite element. The general

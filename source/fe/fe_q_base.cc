@@ -30,6 +30,7 @@
 
 #include <vector>
 #include <sstream>
+#include <deal.II/base/std_cxx14/memory.h>
 
 DEAL_II_NAMESPACE_OPEN
 

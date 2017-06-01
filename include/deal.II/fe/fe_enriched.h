@@ -273,12 +273,9 @@ private:
                const std::vector<std::vector<std::function<const Function<spacedim> *(const typename Triangulation<dim, spacedim>::cell_iterator &) > > > &functions);
 public:
 
-  /**
-   * @p clone function instead of a copy constructor.
-   *
-   * This function is needed by the constructors of @p FESystem.
-   */
-  virtual FiniteElement<dim,spacedim> *clone() const;
+  virtual
+  std::unique_ptr<FiniteElement<dim,spacedim> >
+  clone() const;
 
   virtual
   UpdateFlags
