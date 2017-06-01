@@ -1,0 +1,7 @@
+New: A new manifold class TransfiniteInterpolationManifold implementing an
+interpolation from a curved boundary description to the interior has been
+added. This class enables high-order convergence rates of more than three in
+the power of the mesh size for situations where a curved manifold can only be
+prescribed to the boundary but not in a whole volume.
+<br>
+(Martin Kronbichler, Luca Heltai, 2017/06/01)

@@ -2,4 +2,4 @@ New: ConstraintMatrix::distribute_local_to_global can now also assemble to
 rectangular matrices where rows and columns are described by different
 ConstraintMatrix objects.
 <br>
-(Martin Kronbichler, 2017/04/12)
+(Martin Kronbichler, 2017/05/04)
