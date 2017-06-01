@@ -79,30 +79,36 @@ int main ()
   TimerOutput tO(std::cout,
                  TimerOutput::summary,
                  TimerOutput::cpu_times);
+
   tO.enter_section("Section1");
-  tO.enter_section("Section3");
-  tO.enter_section("Section4");
-  burn (50);
-  tO.exit_section("Section1");
-  tO.exit_section("Section4");
   tO.enter_section("Section2");
   burn (50);
   tO.exit_section("Section2");
-  tO.exit_section("Section3");
-  tO.enter_section("Section4");
+  tO.enter_section("Section2");
   burn (50);
-  tO.exit_section("Section4");
+  tO.exit_section("Section2");
+  tO.exit_section("Section1");
 
-  std::map<std::string, double> cpu_times = tO.get_summary_data(TimerOutput::OutputData::total_cpu_time);
-  std::map<std::string, double> calls = tO.get_summary_data(TimerOutput::OutputData::n_calls);
+  std::map<std::string, double> cpu_times =
+    tO.get_summary_data(TimerOutput::OutputData::total_cpu_time);
+  std::map<std::string, double> wall_times =
+    tO.get_summary_data(TimerOutput::OutputData::total_wall_time);
+  std::map<std::string, double> calls =
+    tO.get_summary_data(TimerOutput::OutputData::n_calls);
 
   match(calls["Section1"], 1.0);
-  match(calls["Section2"], 1.0);
-  match(calls["Section3"], 1.0);
-  match(calls["Section4"], 2.0);
+  match(calls["Section2"], 2.0);
+
+  if (cpu_times["Section1"] * cpu_times["Section2"] > 0.)
+    deallog << "OK" << std::endl;
+  else
+    deallog << "ERROR - total cpu time 0" << std::endl;
+
+  if (wall_times["Section1"] * wall_times["Section2"] > 0.)
+    deallog << "OK" << std::endl;
+  else
+    deallog << "ERROR - total wall time 0" << std::endl;
 
   compare (cpu_times["Section1"],cpu_times["Section2"],1.);
-  compare (cpu_times["Section1"],cpu_times["Section3"],2.);
-  compare (cpu_times["Section3"],cpu_times["Section4"],1.);
+  compare (wall_times["Section1"],wall_times["Section2"],1.);
 }
-
