@@ -3809,6 +3809,11 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
               all_manifold_ids_are_equal = false;
         }
 
+      if (all_manifold_ids_are_equal)
+        {
+          std::vector<Point<spacedim> > vertices(a);
+          cell->get_manifold().add_new_points(vertices, support_point_weights_cell, a);
+        }
       else
         switch (dim)
           {
