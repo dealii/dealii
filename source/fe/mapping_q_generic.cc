@@ -107,11 +107,8 @@ namespace internal
         const double discriminant = b*b - 4*a*c;
         // exit if the point is not in the cell (this is the only case where the
         // discriminant is negative)
-        if (discriminant < 0.0)
-          {
-            AssertThrow (false,
-                         (typename Mapping<spacedim,spacedim>::ExcTransformationFailed()));
-          }
+        AssertThrow (discriminant > 0.0,
+                     (typename Mapping<spacedim,spacedim>::ExcTransformationFailed()));
 
         double eta1;
         double eta2;
