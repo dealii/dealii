@@ -68,7 +68,7 @@ int main ()
   if (s3 == s2)
     deallog << "OK" << std::endl;
   else
-    deallog << "ERROR - s3 should be euqal to s2" << std::endl;
+    deallog << "ERROR - s3 should be equal to s2" << std::endl;
 
   t.start();
   burn(50);
