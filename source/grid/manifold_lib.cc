@@ -13,12 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/table.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/manifold_lib.h>
-#include <deal.II/base/tensor.h>
 #include <deal.II/lac/vector.h>
+#include <deal.II/fe/mapping_q1.h>
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
@@ -545,6 +547,543 @@ TorusManifold<dim>::push_forward_gradient(const Point<3> &chart_point) const
   DX[2][2] = r*cos(theta)*sin(phi);
 
   return DX;
+}
+
+
+
+template <int dim, int spacedim>
+TransfiniteInterpolationManifold<dim,spacedim>::TransfiniteInterpolationManifold()
+  :
+  triangulation(nullptr),
+  level_coarse (-1)
+{}
+
+
+
+template <int dim, int spacedim>
+void
+TransfiniteInterpolationManifold<dim,spacedim>
+::initialize(const Triangulation<dim,spacedim> &triangulation)
+{
+  this->triangulation = &triangulation;
+  // in case the triangulatoin is cleared, remove the pointers by a signal
+  triangulation.signals.clear.connect
+  ([&]() -> void {this->triangulation = nullptr; this->level_coarse = -1;});
+  level_coarse = triangulation.last()->level();
+  coarse_cell_is_flat.resize(triangulation.n_cells(level_coarse), false);
+  typename Triangulation<dim,spacedim>::active_cell_iterator
+  cell = triangulation.begin(level_coarse),
+  endc = triangulation.end(level_coarse);
+  for ( ; cell != endc; ++cell)
+    {
+      bool cell_is_flat = true;
+      for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+        if (cell->line(l)->manifold_id() != cell->manifold_id() &&
+            cell->line(l)->manifold_id() != numbers::invalid_manifold_id)
+          cell_is_flat = false;
+      if (dim > 2)
+        for (unsigned int q=0; q<GeometryInfo<dim>::quads_per_cell; ++q)
+          if (cell->quad(q)->manifold_id() != cell->manifold_id() &&
+              cell->quad(q)->manifold_id() != numbers::invalid_manifold_id)
+            cell_is_flat = false;
+      AssertIndexRange(static_cast<unsigned int>(cell->index()),
+                       coarse_cell_is_flat.size());
+      coarse_cell_is_flat[cell->index()] = cell_is_flat;
+    }
+}
+
+
+
+namespace
+{
+  // version for 1D
+  template <typename AccessorType>
+  Point<AccessorType::space_dimension>
+  compute_transfinite_interpolation(const AccessorType &cell,
+                                    const Point<1> &chart_point,
+                                    const bool      cell_is_flat)
+  {
+    return cell.vertex(0) * (1.-chart_point[0]) + cell.vertex(1) * chart_point[0];
+  }
+
+  // version for 2D
+  template <typename AccessorType>
+  Point<AccessorType::space_dimension>
+  compute_transfinite_interpolation(const AccessorType &cell,
+                                    const Point<2>     &chart_point,
+                                    const bool          cell_is_flat)
+  {
+    const unsigned int spacedim = AccessorType::space_dimension;
+    const types::manifold_id my_manifold_id = cell.manifold_id();
+
+    // formula see wikipedia
+    // https://en.wikipedia.org/wiki/Transfinite_interpolation
+    // S(u,v) = (1-v)c_1(u)+v c_3(u) + (1-u)c_2(v) + u c_4(v) -
+    //   [(1-u)(1-v)P_0 + u(1-v) P_1 + (1-u)v P_2 + uv P_3]
+
+    Point<spacedim> new_point;
+    if (cell_is_flat)
+      for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
+        new_point += GeometryInfo<2>::d_linear_shape_function(chart_point, v) *
+                     cell.vertex(v);
+    else
+      {
+        // We subtract the contribution of the vertices (second line in formula).
+        // If a line applies the same manifold as the cell, we also subtract a
+        // weighted part of the vertex, so accumulate the final weight of the
+        // the vertices while going through the faces (this is a bit artificial
+        // in 2D but it becomes clear in 3D where we avoid looking at the faces'
+        // orientation and other complications).
+        double weights_vertices[GeometryInfo<2>::vertices_per_cell];
+        for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
+          weights_vertices[v] = -GeometryInfo<2>::d_linear_shape_function(chart_point, v);
+
+        // add the contribution from the lines around the cell (first line in
+        // formula)
+        std::vector<double> weights(GeometryInfo<2>::vertices_per_face);
+        std::vector<Point<spacedim> > points(GeometryInfo<2>::vertices_per_face);
+        for (unsigned int line=0; line<GeometryInfo<2>::lines_per_cell; ++line)
+          {
+            const double my_weight = line%2 ? chart_point[line/2] : 1-chart_point[line/2];
+            const double line_point = chart_point[1-line/2];
+
+            // Same manifold or invalid id which will go back to the same class ->
+            // adds to the vertices
+            if (cell.line(line)->manifold_id() == my_manifold_id ||
+                cell.line(line)->manifold_id() == numbers::invalid_manifold_id)
+              {
+                weights_vertices[GeometryInfo<2>::line_to_cell_vertices(line,0)]
+                += my_weight * (1.-line_point);
+                weights_vertices[GeometryInfo<2>::line_to_cell_vertices(line,1)]
+                += my_weight * line_point;
+              }
+            else
+              {
+                points[0] = cell.vertex(GeometryInfo<2>::line_to_cell_vertices(line,0));
+                points[1] = cell.vertex(GeometryInfo<2>::line_to_cell_vertices(line,1));
+                weights[0] = 1. - line_point;
+                weights[1] = line_point;
+                new_point += my_weight *
+                             cell.line(line)->get_manifold().get_new_point(points, weights);
+              }
+          }
+
+        // subtract contribution from the vertices (second line in formula)
+        for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
+          new_point += weights_vertices[v] * cell.vertex(v);
+      }
+
+    return new_point;
+  }
+
+  // version for 3D
+  template <typename AccessorType>
+  Point<AccessorType::space_dimension>
+  compute_transfinite_interpolation(const AccessorType &cell,
+                                    const Point<3> &chart_point,
+                                    const bool      cell_is_flat)
+  {
+    const unsigned int dim = AccessorType::dimension;
+    const unsigned int spacedim = AccessorType::space_dimension;
+    const types::manifold_id my_manifold_id = cell.manifold_id();
+
+    // Same approach as in 2D, but adding the faces, subtracting the edges, and
+    // adding the vertices
+    Point<spacedim> new_point;
+
+    if (cell_is_flat)
+      for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_cell; ++v)
+        new_point += GeometryInfo<3>::d_linear_shape_function(chart_point, v) *
+                     cell.vertex(v);
+    else
+      {
+        // identify the weights for the vertices and lines to be accumulated
+        double weights_vertices[GeometryInfo<3>::vertices_per_cell];
+        for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_cell; ++v)
+          weights_vertices[v] = GeometryInfo<3>::d_linear_shape_function(chart_point, v);
+        double weights_lines[GeometryInfo<3>::lines_per_cell];
+        for (unsigned int line=0; line<GeometryInfo<3>::lines_per_cell; ++line)
+          weights_lines[line] = 0;
+
+        // start with the contributions of the faces
+        std::vector<double> weights;
+        std::vector<Point<spacedim> > points;
+        for (unsigned int face=0; face<GeometryInfo<3>::faces_per_cell; ++face)
+          {
+            Point<2> quad_point(chart_point[(face/2+1)%3], chart_point[(face/2+2)%3]);
+            const double my_weight = face%2 ? chart_point[face/2] : 1-chart_point[face/2];
+
+            if (std::abs(my_weight) < 1e-13)
+              continue;
+
+            // same manifold or invalid id which will go back to the same class
+            // -> face will interpolate from the surrounding lines and vertices
+            if (cell.face(face)->manifold_id() == my_manifold_id ||
+                cell.face(face)->manifold_id() == numbers::invalid_manifold_id)
+              {
+                for (unsigned int line=0; line<GeometryInfo<2>::lines_per_cell; ++line)
+                  {
+                    const double line_weight = line%2 ? quad_point[line/2] : 1-quad_point[line/2];
+                    weights_lines[GeometryInfo<3>::face_to_cell_lines(face, line)] +=
+                      my_weight * line_weight;
+                  }
+                for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
+                  weights_vertices[GeometryInfo<3>::face_to_cell_vertices(face, v)]
+                  -= GeometryInfo<2>::d_linear_shape_function(quad_point, v) * my_weight;
+              }
+            else
+              {
+                points.resize(GeometryInfo<2>::vertices_per_cell);
+                weights.resize(GeometryInfo<2>::vertices_per_cell);
+                for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
+                  {
+                    points[v] = cell.vertex(GeometryInfo<3>::face_to_cell_vertices(face,v));
+                    weights[v] = GeometryInfo<2>::d_linear_shape_function(quad_point, v);
+                  }
+                new_point += my_weight *
+                             cell.face(face)->get_manifold().get_new_point(points, weights);
+              }
+          }
+
+        // next subtract the contributions of the lines
+        for (unsigned int line=0; line<GeometryInfo<3>::lines_per_cell; ++line)
+          {
+            const double line_point = (line < 8 ? chart_point[1-(line%4)/2] : chart_point[2]);
+            double my_weight = 0.;
+            if (line < 8)
+              {
+                const unsigned int subline = line%4;
+                my_weight = subline % 2 ? chart_point[subline/2] : 1-chart_point[subline/2];
+                my_weight *= line/4 ? chart_point[2] : (1-chart_point[2]);
+              }
+            else
+              {
+                Point<2> xy(chart_point[0], chart_point[1]);
+                my_weight = GeometryInfo<2>::d_linear_shape_function(xy, line-8);
+              }
+            my_weight -= weights_lines[line];
+
+            if (std::abs(my_weight) < 1e-13)
+              continue;
+
+            if (cell.line(line)->manifold_id() == my_manifold_id ||
+                cell.line(line)->manifold_id() == numbers::invalid_manifold_id)
+              {
+                weights_vertices[GeometryInfo<3>::line_to_cell_vertices(line,0)]
+                -= my_weight * (1.-line_point);
+                weights_vertices[GeometryInfo<3>::line_to_cell_vertices(line,1)]
+                -= my_weight * (line_point);
+              }
+            else
+              {
+                points.resize(2);
+                weights.resize(2);
+                points[0] = cell.vertex(GeometryInfo<3>::line_to_cell_vertices(line,0));
+                points[1] = cell.vertex(GeometryInfo<3>::line_to_cell_vertices(line,1));
+                weights[0] = 1. - line_point;
+                weights[1] = line_point;
+                new_point -= my_weight *
+                             cell.line(line)->get_manifold().get_new_point(points, weights);
+              }
+          }
+
+        // finally add the contribution of the
+        for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+          new_point += weights_vertices[v] * cell.vertex(v);
+      }
+    return new_point;
+  }
+}
+
+
+
+template <int dim, int spacedim>
+Point<spacedim>
+TransfiniteInterpolationManifold<dim,spacedim>
+::push_forward(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+               const Point<dim> &chart_point) const
+{
+  AssertDimension(cell->level(), level_coarse);
+
+  // check that the point is in the unit cell which is the current chart
+  // Tolerance 1e-6 chosen that the method also works with
+  // SphericalManifold
+  Assert(GeometryInfo<dim>::is_inside_unit_cell(chart_point, 1e-6),
+         ExcMessage("chart_point is not in unit interval"));
+
+  return compute_transfinite_interpolation(*cell, chart_point,
+                                           coarse_cell_is_flat[cell->index()]);
+}
+
+
+
+template <int dim, int spacedim>
+DerivativeForm<1,dim,spacedim>
+TransfiniteInterpolationManifold<dim,spacedim>
+::push_forward_gradient(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                        const Point<dim> &chart_point) const
+{
+  // compute the derivative with the help of finite differences
+  Point<spacedim> point = compute_transfinite_interpolation(*cell, chart_point,
+                                                            coarse_cell_is_flat[cell->index()]);
+  DerivativeForm<1,dim,spacedim> grad;
+  for (unsigned int d=0; d<dim; ++d)
+    {
+      Point<dim> modified = chart_point;
+      const double step = chart_point[d] > 0.5 ? -1e-8 : 1e-8;
+
+      // avoid checking outside of the unit interval
+      modified[d] += step;
+      Tensor<1,spacedim> difference =
+        compute_transfinite_interpolation(*cell, modified,
+                                          coarse_cell_is_flat[cell->index()]) - point;
+      for (unsigned int e=0; e<spacedim; ++e)
+        grad[e][d] = difference[e] / step;
+    }
+  return grad;
+}
+
+
+
+template <int dim, int spacedim>
+Point<dim>
+TransfiniteInterpolationManifold<dim,spacedim>
+::pull_back(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+            const Point<spacedim> &point) const
+{
+  Point<dim> outside;
+  for (unsigned int d=0; d<dim; ++d)
+    outside[d] = 20;
+
+  // initial guess: MappingQ1
+  Point<dim> chart_point;
+  try
+    {
+      chart_point = GeometryInfo<dim>::project_to_unit_cell(StaticMappingQ1<dim,spacedim>::mapping.transform_real_to_unit_cell(cell, point));
+    }
+  catch (typename Mapping<dim,spacedim>::ExcTransformationFailed)
+    {
+      for (unsigned int d=0; d<dim; ++d)
+        chart_point[d] = 0.5;
+    }
+
+  // run Newton iteration. As opposed to the various mapping implementations,
+  // this class does not throw exception upon failure as those are relatively
+  // expensive and failure occurs quite regularly in the implementation of the
+  // compute_chart_points method.
+  Tensor<1,spacedim> residual = point - compute_transfinite_interpolation(*cell, chart_point,
+                                coarse_cell_is_flat[cell->index()]);
+  const double tolerance = 1e-21 * cell->diameter() * cell->diameter();
+  double residual_norm_square = residual.norm_square();
+  for (unsigned int i=0; i<100; ++i)
+    {
+      if (residual_norm_square < tolerance)
+        return chart_point;
+
+      // if the determinant is zero, the mapping is not invertible and we are
+      // outside the valid chart region
+      DerivativeForm<1,dim,spacedim> grad = push_forward_gradient(cell, chart_point);
+      if (grad.determinant() <= 0.0)
+        return outside;
+      DerivativeForm<1,dim,spacedim> inv_grad = grad.covariant_form();
+      Tensor<1,dim> update;
+      for (unsigned int d=0; d<spacedim; ++d)
+        for (unsigned int e=0; e<dim; ++e)
+          update[e] += inv_grad[d][e] * residual[d];
+
+      // Line search, accept step if the residual has decreased
+      double alpha = 1.;
+      while (alpha > 1e-7)
+        {
+          Point<dim> guess = chart_point + alpha*update;
+          residual = point - compute_transfinite_interpolation(*cell, guess,
+                                                               coarse_cell_is_flat[cell->index()]);
+          const double residual_norm_new = residual.norm_square();
+          if (residual_norm_new < residual_norm_square)
+            {
+              residual_norm_square = residual_norm_new;
+              chart_point += alpha*update;
+              break;
+            }
+          else
+            alpha *= 0.5;
+        }
+      if (alpha < 1e-7)
+        return outside;
+    }
+  return outside;
+}
+
+
+
+template <int dim, int spacedim>
+std::array<unsigned int, 10>
+TransfiniteInterpolationManifold<dim,spacedim>
+::get_possible_cells_around_points(const std::vector<Point<spacedim> > &points) const
+{
+  // The methods to identify cells around points in GridTools are all written
+  // for the active cells, but we are here looking at some cells at the coarse
+  // level.
+  Assert(triangulation != nullptr, ExcNotInitialized());
+  Assert(triangulation->begin_active()->level() >= level_coarse,
+         ExcMessage("The manifold was initialized with level " +
+                    Utilities::to_string(level_coarse) + " but there are now" +
+                    "active cells on a lower level. Coarsening the mesh is " +
+                    "currently not supported"));
+
+  // This computes the distance of the surrouding points transformed to the unit
+  // cell from the unit cell.
+  typename Triangulation<dim,spacedim>::cell_iterator
+  cell = triangulation->begin(level_coarse),
+  endc = triangulation->end(level_coarse),
+  best_fit = cell;
+  const double circle_gap = 1.3;
+  std::vector<std::pair<double, unsigned int> > distances_and_cells;
+  for ( ; cell != endc; ++cell)
+    {
+      // only consider cells where the current manifold is attached
+      if (&cell->get_manifold() != this)
+        continue;
+
+      // cheap check: if any of the points is not inside a circle around the
+      // center of the loop, we can skip the expensive part below (this assumes
+      // that the manifold does not deform the grid too much)
+      Point<spacedim> center;
+      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+        center += cell->vertex(v);
+      center *= 1./GeometryInfo<dim>::vertices_per_cell;
+      double radius_square = 0.;
+      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+        radius_square = std::max(radius_square, (center-cell->vertex(v)).norm_square());
+      bool inside_circle = true;
+      for (unsigned int i=0; i<points.size(); ++i)
+        if ((center-points[i]).norm_square() > radius_square*circle_gap)
+          {
+            inside_circle = false;
+            break;
+          }
+      if (inside_circle == false)
+        continue;
+
+      // expensive search
+      try
+        {
+          double current_distance = 0;
+          for (unsigned int i=0; i<points.size(); ++i)
+            {
+              Point<dim> point = StaticMappingQ1<dim,spacedim>::mapping.transform_real_to_unit_cell(cell, points[i]);
+              current_distance += GeometryInfo<dim>::distance_to_unit_cell(point);
+            }
+          distances_and_cells.emplace_back(current_distance, cell->index());
+        }
+      catch (typename Mapping<dim,spacedim>::ExcTransformationFailed &)
+        {
+          // in case the transformation by the mapping fails, use the radius
+          distances_and_cells.emplace_back(std::sqrt(radius_square), cell->index());
+        }
+    }
+  // no coarse cell could be found -> transformation failed
+  AssertThrow(distances_and_cells.size() > 0,
+              (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
+  std::sort(distances_and_cells.begin(), distances_and_cells.end());
+  std::array<unsigned int,10> cells;
+  cells.fill(numbers::invalid_unsigned_int);
+  for (unsigned int i=0; i<distances_and_cells.size() && i<10; ++i)
+    cells[i] = distances_and_cells[i].second;
+
+  return cells;
+}
+
+
+
+template <int dim, int spacedim>
+std::pair<typename Triangulation<dim,spacedim>::cell_iterator,
+    std::vector<Point<dim> > >
+    TransfiniteInterpolationManifold<dim, spacedim>
+    ::compute_chart_points (const std::vector<Point<spacedim> > &surrounding_points) const
+{
+  std::pair<typename Triangulation<dim,spacedim>::cell_iterator,
+      std::vector<Point<dim> > > chart_points;
+  chart_points.second.resize(surrounding_points.size());
+
+  std::array<unsigned int,10> nearby_cells =
+    get_possible_cells_around_points(surrounding_points);
+
+  // check whether all points are inside the unit cell of the current chart
+  for (unsigned int c=0; c<nearby_cells.size(); ++c)
+    {
+      AssertThrow(nearby_cells[c] != numbers::invalid_unsigned_int,
+                  (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
+      typename Triangulation<dim,spacedim>::cell_iterator cell(triangulation,
+                                                               level_coarse,
+                                                               nearby_cells[c]);
+      bool inside_unit_cell = true;
+      for (unsigned int i=0; i<surrounding_points.size(); ++i)
+        {
+          chart_points.second[i] = pull_back(cell, surrounding_points[i]);
+
+          // Tolerance 1e-6 chosen that the method also works with
+          // SphericalManifold
+          if (GeometryInfo<dim>::is_inside_unit_cell(chart_points.second[i],
+                                                     1e-6) == false)
+            {
+              inside_unit_cell = false;
+              break;
+            }
+        }
+      if (inside_unit_cell == true)
+        {
+          chart_points.first = cell;
+          return chart_points;
+        }
+    }
+
+  // a valid inversion should have returned a point above.
+  AssertThrow(false,
+              (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
+  chart_points.second.clear();
+  return chart_points;
+}
+
+
+
+template <int dim, int spacedim>
+Point<spacedim>
+TransfiniteInterpolationManifold<dim, spacedim>
+::get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
+                 const std::vector<double>           &weights) const
+{
+  const std::pair<typename Triangulation<dim,spacedim>::cell_iterator,
+        std::vector<Point<dim> > > chart_points =
+          compute_chart_points(surrounding_points);
+
+  const Point<dim> p_chart = chart_manifold.get_new_point(chart_points.second,weights);
+
+  return push_forward(chart_points.first, p_chart);
+}
+
+
+
+template <int dim, int spacedim>
+void
+TransfiniteInterpolationManifold<dim,spacedim>::
+add_new_points (const std::vector<Point<spacedim> > &surrounding_points,
+                const Table<2,double>               &weights,
+                std::vector<Point<spacedim> >       &new_points) const
+{
+  Assert(weights.size(0) > 0, ExcEmptyObject());
+  AssertDimension(surrounding_points.size(), weights.size(1));
+
+  const std::pair<typename Triangulation<dim,spacedim>::cell_iterator,
+        std::vector<Point<dim> > > chart_points =
+          compute_chart_points(surrounding_points);
+
+  std::vector<Point<dim> > new_points_on_chart;
+  new_points_on_chart.reserve(weights.size(0));
+  chart_manifold.add_new_points(chart_points.second, weights, new_points_on_chart);
+
+  for (unsigned int row=0; row<weights.size(0); ++row)
+    new_points.push_back(push_forward(chart_points.first, new_points_on_chart[row]));
 }
 
 
