@@ -22,25 +22,6 @@
 #include <cmath>
 #include <iomanip>
 
-// compute the ratio of two measurements and compare to
-// the expected value.
-
-void compare (double t1, double t2, double ratio)
-{
-  double r = t2/t1;
-  double d = std::fabs(r-ratio) / ratio;
-
-  // relative error < 25%?
-  if (d <= .25)
-    {
-      deallog << "OK" << std::endl;
-    }
-  else
-    {
-      deallog << "Ratio " << r << " should be " << ratio << std::endl;
-    }
-}
-
 // burn computer time
 
 double s = 0.;
@@ -62,24 +43,62 @@ int main ()
   deallog.attach(logfile);
   deallog.threshold_double(1.e-10);
 
-  Timer t1,t2;
-  burn (50);
-  double s01 = t1.stop();
-  double s02 = t2();
-  burn (50);
-  double s11 = t1.stop();
-  double s12 = t2();
-  t1.start();
-  burn (50);
-  double s21 = t1();
-  double s22 = t2();
-  burn (50);
-  double s31 = t1();
-  double s32 = t2();
+  Timer t;
+  burn(50);
 
-  compare (s01,s02,1.);
-  compare (s11,s12,2.);
-  compare (s21,s22,3./2.);
-  compare (s31,s32,4./3.);
+  double s1 = t();
+
+  if (s1 > 0.)
+    deallog << "OK" << std::endl;
+  else
+    deallog << "ERROR - s1 should be nonzero" << std::endl;
+
+  burn(50);
+  t.stop();
+  double s2 = t();
+
+  if (s2 > s1)
+    deallog << "OK" << std::endl;
+  else
+    deallog << "ERROR - s2 should be greater than s1" << std::endl;
+
+  burn(50);
+  double s3 = t();
+
+  if (s3 == s2)
+    deallog << "OK" << std::endl;
+  else
+    deallog << "ERROR - s3 should be equal to s2" << std::endl;
+
+  t.start();
+  burn(50);
+  double s4 = t();
+
+  if (s4 > s3)
+    deallog << "OK" << std::endl;
+  else
+    deallog << "ERROR - s4 should be greater than s3" << std::endl;
+
+  t.stop();
+  t.reset();
+  burn(50);
+  double s5 = t();
+
+  if (s5 == 0.)
+    deallog << "OK" << std::endl;
+  else
+    deallog << "ERROR - s5 should be zero" << std::endl;
+
+  t.start();
+  burn(50);
+  t.reset();
+  burn(50);
+  double s6 = t();
+
+  if (s6 == 0.)
+    deallog << "OK" << std::endl;
+  else
+    deallog << "ERROR - s6 should be zero" << std::endl;
+
 }
 
