@@ -293,17 +293,40 @@ namespace Utilities
 
 
     /**
-     * Data structure to store the result of min_max_avg().
+     * A data structure to store the result of the min_max_avg() function.
+     * The structure stores the minimum, maximum, and average of one
+     * value contributed by each processor that participates in an
+     * @ref GlossMPICommunicator "MPI communicator". The structure also stores
+     * the indices (or, more precisely, the @ref GlossMPIRank "MPI rank")
+     * of the processors that hold the minimum and maximum values,
+     * as well as the sum over all values.
+     *
+     * @note This structure has no constructors because MPI requires it
+     *   to be a POD type.
      */
     struct MinMaxAvg
     {
-      // Note: We assume a POD property of this struct in the MPI calls in
-      // min_max_avg
+      /**
+       * The sum over all values contributed by the processors that
+       * participate in the call to min_max_avg(), as well as the
+       * minimum and maximum value.
+       */
       double sum;
       double min;
       double max;
+
+      /**
+       * The indices (i.e., @ref GlossMPIRank "MPI rank" within an
+       * @ref GlossMPICommunicator "MPI communicator") of the
+       * processors that hold the minimal and maximal values.
+       */
       unsigned int min_index;
       unsigned int max_index;
+
+      /**
+       * The average of the values contributed by the processors that
+       * participate in the call to min_max_avg().
+       */
       double avg;
     };
 
