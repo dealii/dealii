@@ -512,14 +512,14 @@ private:
  * The mechanism to extend the boundary information is a so-called transfinite
  * interpolation.
  *
- * The formula for extending such a description in 2D is inspired by
+ * The formula for extending such a description in 2D is, for example,
+ * described on
  * <a href="https://en.wikipedia.org/wiki/Transfinite_interpolation">
- * Wikipedia</a>
- * Given a point $(u,v)$ on the chart, the image of this point in real space
- * is given by
+ * Wikipedia</a>.  Given a point $(u,v)$ on the chart, the image of this point
+ * in real space is given by
  * @f{align*}{
- * \bf S(u,v) &= (1-v)\bf c_0(u)+v \bf c_1(u) + (1-u)\bf c_2(v) + u \bf c_3(v) \\
- * &\quad - \begin[(1-u)(1-v) \bf x_0 + u(1-v) \bf x_1 + (1-u)v \bf x_2 + uv \bf x_3 \right]
+ * \mathbf S(u,v) &= (1-v)\mathbf c_0(u)+v \mathbf c_1(u) + (1-u)\mathbf c_2(v) + u \mathbf c_3(v) \\
+ * &\quad - \left[(1-u)(1-v) \mathbf x_0 + u(1-v) \mathbf x_1 + (1-u)v \mathbf x_2 + uv \mathbf x_3 \right]
  * @f}
  * where $\bf x_0, \bf x_1, \bf x_2, \bf x_3$ denote the four bounding vertices
  * bounding the image space and $\bf c_0, \bf c_1, \bf c_2, \bf c_3$ are the
@@ -532,8 +532,8 @@ private:
  *
  * This manifold is usually attached to a coarse mesh and then places new
  * points as a combination of the descriptions on the boundaries, weighted
- * appropriately according to the position of the point on the original chart
- * point $(u,v). Whenever possible, this manifold should be preferred over
+ * appropriately according to the position of the point in the original chart
+ * coordinates $(u,v)$. Whenever possible, this manifold should be preferred over
  * setting only a curved manifold on the boundary of a mesh, since the latter
  * will need to switch from a curved description to a straight description in a
  * single layer of elements, which causes an error order on cells close to the
@@ -581,8 +581,10 @@ private:
  * @image html circular_mesh_only_boundary_manifold.png
  * </p>
  *
- * @note In the implementation of this class, the manifolds surrounding a
- * coarse cell are queried repeatedly to compute points on their interior. For
+ * <h3>Implementation details</h3>
+ *
+ * In the implementation of this class, the manifolds surrounding a coarse
+ * cell are queried repeatedly to compute points on their interior. For
  * optimal mesh quality, those manifolds should be compatible with a chart
  * notion. For example, computing a point that is 0.25 along the line between
  * two vertices using the weights 0.25 and 0.75 for the two vertices should
@@ -591,22 +593,25 @@ private:
  * the case for PolarManifold but not for Spherical manifold, so be careful
  * when using the latter. In case the quality of the manifold is not good
  * enough, upon mesh refinement it may happen that the transformation to a
- * chart inside the get_new_point() or add_new_point() methods produces points
- * that are outside the unit cells, then this class throws an exception of type
- * Manifold@<dim,spacedim@>::ExcTransformationFailed. If that happens, the mesh
- * should be refined before applying this class, as done in the following
- * example:
+ * chart inside the get_new_point() or add_new_points() methods produces points
+ * that are outside the unit cell. Then this class throws an exception of
+ * type Manifold@<dim,spacedim@>::ExcTransformationFailed. In that case,
+ * the mesh should be refined before attaching this class, as done in the
+ * following example:
+ *
  * @code
  * SphericalManifold<dim> spherical_manifold;
  * TransfiniteInterpolationManifold<dim> inner_manifold;
  * Triangulation<dim> triangulation;
  * GridGenerator::hyper_ball (triangulation);
+ *
  * triangulation.set_all_manifold_ids(1);
  * triangulation.set_all_manifold_ids_on_boundary(0);
  * triangulation.set_manifold (0, polar_manifold);
  * inner_manifold.initialize(triangulation);
  * triangulation.set_manifold (1, inner_manifold);
  * triangulation.refine_global(1);
+ *
  * // initialize the transfinite manifold again
  * inner_manifold.initialize(triangulation);
  * triangulation.refine_global(4);
@@ -618,12 +623,16 @@ private:
  * given neighborhood, and the grid quality is typically higher when extending
  * the curved description over as large a domain as possible. Regarding
  * performance, the identification of the correct coarse cell in the
- * get_new_point() method needs to pass all coarse cells, so expect a quadratic
- * complexity in the number of coarse cells. Thus, the current implementation
- * is only really economical when there are not more than a few hundred coarse
- * cells. To make performance better for larger numbers of cells, one could
- * extend the current implementation by a pre-identification of relevant cells
- * with axis-aligned bounding boxes.
+ * get_new_point() method needs to pass all coarse cells, so expect a linear
+ * complexity in the number of coarse cells for each single mapping operation,
+ * i.e., at least quadratic in the number of coarse mesh cells for any global
+ * operation on the whole mesh. Thus, the current implementation is only
+ * economical when there are not more than a few hundreds of coarse cells. To
+ * make performance better for larger numbers of cells, one could extend the
+ * current implementation by a pre-identification of relevant cells with
+ * axis-aligned bounding boxes.
+ *
+ * @ingroup manifold
  *
  * @author Martin Kronbichler, Luca Heltai, 2017
  */
