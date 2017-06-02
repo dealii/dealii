@@ -1,0 +1,6 @@
+Changed: The FiniteElement::clone() function and all of its
+implementations in derived classes now return a std::unique_ptr rather
+than a plain pointer to a finite element object. User-implemented
+finite element classes need to be adjusted accordingly.
+<br>
+(Wolfgang Bangerth, 2017/06/01)
