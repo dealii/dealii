@@ -2359,31 +2359,19 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
     {
       if (include_top_level_elements)
         {
-          // call the writer
-          // function and exit as
-          // there is nothing
-          // further to do down in
-          // this function
+          // call the writer function and exit as there is nothing
+          // further to do down in this function
           //
-          // XML has a requirement that
-          // there can only be one
-          // single top-level entry,
-          // but a section has multiple
-          // entries and sections. we
-          // work around this by
-          // creating a tree just for
-          // this purpose with the
-          // single top-level node
-          // "ParameterHandler" and
-          // assign the full path of
-          // down to the current section
-          // under it
+          // XML has a requirement that there can only be one single
+          // top-level entry, but a section has multiple entries and
+          // sections. we work around this by creating a tree just for
+          // this purpose with the single top-level node
+          // "ParameterHandler" and assign the full path of down to
+          // the current section under it
           boost::property_tree::ptree single_node_tree;
 
-          // if there is no subsection selected,
-          // add the whole tree of entries,
-          // otherwise add a root element
-          // and the selected subsection under it
+          // if there is no subsection selected, add the whole tree of entries,
+          // otherwise add a root element and the selected subsection under it
           if (subsection_path.size() == 0)
             {
               single_node_tree.add_child("ParameterHandler",
@@ -2398,7 +2386,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
 
               path += path_separator + get_current_path ();
               single_node_tree.add_child (path, current_section);
-            };
+            }
 
           write_xml (out, single_node_tree);
         }
@@ -2417,18 +2405,12 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
             out << std::setw(overall_indent_level*2) << ""
                 << "subsection " << demangle (subsection_path[i]) << std::endl;
             overall_indent_level += 1;
-          };
+          }
 
-      // first find out the longest
-      // entry name to be able to
-      // align the equal signs
-      //
-      // to do this loop over all
-      // nodes of the current tree,
-      // select the parameter nodes
-      // (and discard sub-tree
-      // nodes) and take the
-      // maximum of their lengths
+      // first find out the longest entry name to be able to align the
+      // equal signs to do this loop over all nodes of the current
+      // tree, select the parameter nodes (and discard sub-tree nodes)
+      // and take the maximum of their lengths
       std::size_t longest_name = 0;
       for (boost::property_tree::ptree::const_iterator
            p = current_section.begin();
@@ -2437,11 +2419,8 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
           longest_name = std::max (longest_name,
                                    demangle(p->first).length());
 
-      // likewise find the longest
-      // actual value string to
-      // make sure we can align the
-      // default and documentation
-      // strings
+      // likewise find the longest actual value string to make sure we
+      // can align the default and documentation strings
       std::size_t longest_value = 0;
       for (boost::property_tree::ptree::const_iterator
            p = current_section.begin();
@@ -2451,10 +2430,8 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                                     p->second.get<std::string>("value").length());
 
 
-      // print entries one by
-      // one. make sure they are
-      // sorted by using the
-      // appropriate iterators
+      // print entries one by one. make sure they are sorted by using
+      // the appropriate iterators
       bool first_entry = true;
       for (boost::property_tree::ptree::const_assoc_iterator
            p = current_section.ordered_begin();
@@ -2463,16 +2440,11 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
           {
             const std::string value = p->second.get<std::string>("value");
 
-            // if there is documentation,
-            // then add an empty line (unless
-            // this is the first entry in a
-            // subsection), print the
-            // documentation, and then the
-            // actual entry; break the
-            // documentation into readable
-            // chunks such that the whole
-            // thing is at most 78 characters
-            // wide
+            // if there is documentation, then add an empty line
+            // (unless this is the first entry in a subsection), print
+            // the documentation, and then the actual entry; break the
+            // documentation into readable chunks such that the whole
+            // thing is at most 78 characters wide
             if ((!(style & 128)) &&
                 !p->second.get<std::string>("documentation").empty())
               {
@@ -2495,17 +2467,14 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
 
 
 
-            // print name and value
-            // of this entry
+            // print name and value of this entry
             out << std::setw(overall_indent_level*2) << ""
                 << "set "
                 << demangle(p->first)
                 << std::setw(longest_name-demangle(p->first).length()+1) << " "
                 << "= " << value;
 
-            // finally print the
-            // default value, but
-            // only if it differs
+            // finally print the default value, but only if it differs
             // from the actual value
             if ((!(style & 64)) && value != p->second.get<std::string>("default_value"))
               {
@@ -2522,9 +2491,8 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
 
     case LaTeX:
     {
-      // if there are any parameters in
-      // this section then print them as an
-      // itemized list
+      // if there are any parameters in this section then print them
+      // as an itemized list
       bool parameters_exist_here = false;
       for (boost::property_tree::ptree::const_assoc_iterator
            p = current_section.ordered_begin();
@@ -2542,10 +2510,8 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
           out << "\\begin{itemize}"
               << std::endl;
 
-          // print entries one by
-          // one. make sure they are
-          // sorted by using the
-          // appropriate iterators
+          // print entries one by one. make sure they are sorted by
+          // using the appropriate iterators
           for (boost::property_tree::ptree::const_assoc_iterator
                p = current_section.ordered_begin();
                p != current_section.not_found(); ++p)
@@ -2578,9 +2544,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                     << p->second.get<std::string>("default_value") << "\n\n"
                     << std::endl;
 
-                // if there is a
-                // documenting string,
-                // print it as well
+                // if there is a documenting string, print it as well
                 if (!p->second.get<std::string>("documentation").empty())
                   out << "{\\it Description:} "
                       << p->second.get<std::string>("documentation") << "\n\n"
@@ -2643,9 +2607,8 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
             overall_indent_level += 1;
           };
 
-      // first find out the longest
-      // entry name to be able to
-      // align the equal signs
+      // first find out the longest entry name to be able to align the
+      // equal signs
       std::size_t longest_name = 0;
       for (boost::property_tree::ptree::const_iterator
            p = current_section.begin();
@@ -2654,10 +2617,8 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
           longest_name = std::max (longest_name,
                                    demangle(p->first).length());
 
-      // print entries one by
-      // one. make sure they are
-      // sorted by using the
-      // appropriate iterators
+      // print entries one by one. make sure they are sorted by using
+      // the appropriate iterators
       for (boost::property_tree::ptree::const_assoc_iterator
            p = current_section.ordered_begin();
            p != current_section.not_found(); ++p)
@@ -2688,9 +2649,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
             else
               out << std::endl;
 
-            // if there is a
-            // documenting string,
-            // print it as well
+            // if there is a documenting string, print it as well
             if (p->second.get<std::string>("documentation").length() != 0)
               out << std::setw(overall_indent_level*2 + longest_name + 10) << ""
                   << "(" << p->second.get<std::string>("documentation") << ")" << std::endl;
@@ -2704,10 +2663,8 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
     }
 
 
-  // if there was text before and there are
-  // sections to come, put two newlines
-  // between the last entry and the first
-  // subsection
+  // if there was text before and there are sections to come, put two
+  // newlines between the last entry and the first subsection
   if (style != XML)
     {
       unsigned int n_parameters = 0;
@@ -2729,8 +2686,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
           (n_sections != 0))
         out << std::endl << std::endl;
 
-      // now traverse subsections tree,
-      // in alphabetical order
+      // now traverse subsections tree, in alphabetical order
       for (boost::property_tree::ptree::const_assoc_iterator
            p = current_section.ordered_begin();
            p != current_section.not_found(); ++p)
@@ -2752,10 +2708,8 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                 out << std::endl
                     << "\\subsection{Parameters in section \\tt ";
 
-                // find the path to the
-                // current section so that we
-                // can print it in the
-                // \subsection{...} heading
+                // find the path to the current section so that we can
+                // print it in the \subsection{...} heading
                 for (unsigned int i=0; i<subsection_path.size(); ++i)
                   out << subsection_path[i] << "/";
                 out << demangle(p->first);
@@ -2775,24 +2729,20 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                 Assert (false, ExcNotImplemented());
               };
 
-            // then the contents of the
-            // subsection
+            // then the contents of the subsection
             enter_subsection (demangle(p->first));
             print_parameters_section (out, style, overall_indent_level+1);
             leave_subsection ();
             switch (style)
               {
               case Text:
-                // write end of
-                // subsection. one
-                // blank line after
-                // each subsection
+                // write end of subsection. one blank line after each
+                // subsection
                 out << std::setw(overall_indent_level*2) << ""
                     << "end" << std::endl
                     << std::endl;
 
-                // if this is a toplevel
-                // subsection, then have two
+                // if this is a toplevel subsection, then have two
                 // newlines
                 if (overall_indent_level == 0)
                   out << std::endl;
@@ -2801,8 +2751,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
               case Description:
                 break;
               case ShortText:
-                // write end of
-                // subsection.
+                // write end of subsection.
                 out << std::setw(overall_indent_level*2) << ""
                     << "end" << std::endl;
                 break;
@@ -2847,8 +2796,7 @@ void
 ParameterHandler::log_parameters (LogStream &out)
 {
   out.push("parameters");
-  // dive recursively into the
-  // subsections
+  // dive recursively into the subsections
   log_parameters_section (out);
 
   out.pop();
