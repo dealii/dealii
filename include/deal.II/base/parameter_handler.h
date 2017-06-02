@@ -1677,11 +1677,7 @@ private:
 
 public:
   /**
-   * List of possible output formats.
-   *
-   * The formats down the list with prefix <em>Short</em> and bit 6 and 7 set
-   * reproduce the old behavior of not writing comments or original values to
-   * the files.
+   * List of possible output formats used for ParameterHandler::print_parameters().
    */
   enum OutputStyle
   {
@@ -1690,6 +1686,7 @@ public:
      * again.
      */
     Text = 1,
+
     /**
      * Write parameters as a LaTeX table.
      */
