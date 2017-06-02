@@ -2022,8 +2022,7 @@ public:
 
 
   /**
-   * Print all parameters with the given style to <tt>out</tt>. Presently only
-   * <tt>Text</tt>, <tt>LaTeX</tt> and <tt>XML</tt> are implemented.
+   * Print all parameters with the given style to <tt>out</tt>.
    *
    * In <tt>Text</tt> format, the output is formatted in such a way that it is
    * possible to use it for later input again. This is most useful to record
