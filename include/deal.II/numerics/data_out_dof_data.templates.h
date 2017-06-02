@@ -17,33 +17,36 @@
 #define dealii__data_out_dof_data_templates_h
 
 
-#include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/work_stream.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/utilities.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/la_vector.h>
-#include <deal.II/lac/la_parallel_vector.h>
-#include <deal.II/lac/la_parallel_block_vector.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
-#include <deal.II/lac/petsc_parallel_block_vector.h>
-#include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/lac/trilinos_parallel_block_vector.h>
-#include <deal.II/lac/vector_element_access.h>
-#include <deal.II/numerics/data_out.h>
-#include <deal.II/numerics/data_out_dof_data.h>
-#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/base/work_stream.h>
+
 #include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/fe/fe.h>
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping.h>
+
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+
 #include <deal.II/hp/dof_handler.h>
+#include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
-#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/hp/q_collection.h>
+
+#include <deal.II/lac/vector.h>
+
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/data_out_dof_data.h>
+
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
