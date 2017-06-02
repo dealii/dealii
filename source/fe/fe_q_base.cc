@@ -440,7 +440,7 @@ FE_Q_Base<PolynomialType,dim,spacedim>::initialize (const std::vector<Point<1> >
   const unsigned int q_dofs_per_cell = Utilities::fixed_power<dim>(q_degree+1);
   Assert(q_dofs_per_cell == this->dofs_per_cell ||
          q_dofs_per_cell+1 == this->dofs_per_cell ||
-         q_dofs_per_cell+dim == this->dofs_per_cell , ExcInternalError());
+         q_dofs_per_cell+dim == this->dofs_per_cell, ExcInternalError());
 
   {
     std::vector<unsigned int> renumber(q_dofs_per_cell);

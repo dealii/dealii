@@ -64,7 +64,7 @@ FiniteElement (const FiniteElementData<dim> &fe_data,
   :
   FiniteElementData<dim> (fe_data),
   adjust_quad_dof_index_for_face_orientation_table (dim == 3 ?
-                                                    this->dofs_per_quad : 0 ,
+                                                    this->dofs_per_quad : 0,
                                                     dim==3 ? 8 : 0),
   adjust_line_dof_index_for_line_orientation_table (dim == 3 ?
                                                     this->dofs_per_line : 0),

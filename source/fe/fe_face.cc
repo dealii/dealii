@@ -460,7 +460,7 @@ template <int spacedim>
 void
 FE_FaceQ<1,spacedim>::
 fill_fe_values(const typename Triangulation<1,spacedim>::cell_iterator &,
-               const CellSimilarity::Similarity                                   ,
+               const CellSimilarity::Similarity,
                const Quadrature<1> &,
                const Mapping<1,spacedim> &,
                const typename Mapping<1,spacedim>::InternalDataBase &,
@@ -499,8 +499,8 @@ template <int spacedim>
 void
 FE_FaceQ<1,spacedim>::
 fill_fe_subface_values (const typename Triangulation<1,spacedim>::cell_iterator &,
-                        const unsigned int                                                 ,
-                        const unsigned int                                                 ,
+                        const unsigned int,
+                        const unsigned int,
                         const Quadrature<0> &,
                         const Mapping<1,spacedim> &,
                         const typename Mapping<1,spacedim>::InternalDataBase &,
@@ -687,7 +687,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
                                                             subface);
 
           for (unsigned int j = 0; j < source_fe->dofs_per_face; ++j)
-            mass (k , j) = source_fe->poly_space.compute_value(j, p);
+            mass (k, j) = source_fe->poly_space.compute_value(j, p);
         }
 
       Householder<double> H(mass);

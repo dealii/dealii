@@ -152,7 +152,7 @@ void make_tria (Triangulation<3> &tria, int step)
                                       Point<3>(1,1,2),
                                       Point<3>(0,1,2)
                                     };
-      const int cell_vertices[2][8] = { { 0,1,2,3,4,5,6,7 }, { 3, 2, 8, 9 , 7, 6, 10, 11} };
+      const int cell_vertices[2][8] = { { 0,1,2,3,4,5,6,7 }, { 3, 2, 8, 9, 7, 6, 10, 11} };
       std::vector<CellData<3> > cells (2, CellData<3>());
       for (unsigned int cell=0; cell<2; ++cell)
         for (unsigned int j=0; j<8; ++j)

@@ -2145,7 +2145,7 @@ namespace internal
       {};
       tbb::task *execute ()
       {
-        tbb::empty_task *root = new( tbb::task::allocate_root() )
+        tbb::empty_task *root = new ( tbb::task::allocate_root() )
         tbb::empty_task;
         unsigned int evens = task_info.partition_evens[partition];
         unsigned int odds  = task_info.partition_odds[partition];
@@ -2158,14 +2158,14 @@ namespace internal
         root->set_ref_count(evens+1);
         for (unsigned int j=0; j<evens; j++)
           {
-            worker[j] = new(root->allocate_child())
+            worker[j] = new (root->allocate_child())
             CellWork<Worker>(function, task_info.
                              partition_color_blocks_row_index[partition]+2*j,
                              task_info, false);
             if (j>0)
               {
                 worker[j]->set_ref_count(2);
-                blocked_worker[j-1]->dummy = new(worker[j]->allocate_child())
+                blocked_worker[j-1]->dummy = new (worker[j]->allocate_child())
                 tbb::empty_task;
                 worker[j-1]->spawn(*blocked_worker[j-1]);
               }
@@ -2173,7 +2173,7 @@ namespace internal
               worker[j]->set_ref_count(1);
             if (j<evens-1)
               {
-                blocked_worker[j] = new(worker[j]->allocate_child())
+                blocked_worker[j] = new (worker[j]->allocate_child())
                 CellWork<Worker>(function, task_info.
                                  partition_color_blocks_row_index
                                  [partition] + 2*j+1, task_info, true);
@@ -2182,7 +2182,7 @@ namespace internal
               {
                 if (odds==evens)
                   {
-                    worker[evens] = new(worker[j]->allocate_child())
+                    worker[evens] = new (worker[j]->allocate_child())
                     CellWork<Worker>(function, task_info.
                                      partition_color_blocks_row_index[partition]+2*j+1,
                                      task_info, false);
@@ -2190,7 +2190,7 @@ namespace internal
                   }
                 else
                   {
-                    tbb::empty_task *child = new(worker[j]->allocate_child())
+                    tbb::empty_task *child = new (worker[j]->allocate_child())
                     tbb::empty_task();
                     worker[j]->spawn(*child);
                   }
@@ -2376,7 +2376,7 @@ MatrixFree<dim, Number>::cell_loop
 
       if (task_info.use_partition_partition == true)
         {
-          tbb::empty_task *root = new( tbb::task::allocate_root() )
+          tbb::empty_task *root = new ( tbb::task::allocate_root() )
           tbb::empty_task;
           unsigned int evens = task_info.evens;
           unsigned int odds  = task_info.odds;
@@ -2388,18 +2388,18 @@ MatrixFree<dim, Number>::cell_loop
           std::vector<internal::partition::PartitionWork<Worker>*>
           blocked_worker(n_blocked_workers);
           internal::MPIComCompress<OutVector> *worker_compr =
-            new(root->allocate_child())
+            new (root->allocate_child())
           internal::MPIComCompress<OutVector>(dst);
           worker_compr->set_ref_count(1);
           for (unsigned int j=0; j<evens; j++)
             {
               if (j>0)
                 {
-                  worker[j] = new(root->allocate_child())
+                  worker[j] = new (root->allocate_child())
                   internal::partition::PartitionWork<Worker>
                   (func,2*j,task_info,false);
                   worker[j]->set_ref_count(2);
-                  blocked_worker[j-1]->dummy = new(worker[j]->allocate_child())
+                  blocked_worker[j-1]->dummy = new (worker[j]->allocate_child())
                   tbb::empty_task;
                   if (j>1)
                     worker[j-1]->spawn(*blocked_worker[j-1]);
@@ -2408,7 +2408,7 @@ MatrixFree<dim, Number>::cell_loop
                 }
               else
                 {
-                  worker[j] = new(worker_compr->allocate_child())
+                  worker[j] = new (worker_compr->allocate_child())
                   internal::partition::PartitionWork<Worker>
                   (func,2*j,task_info,false);
                   worker[j]->set_ref_count(2);
@@ -2419,7 +2419,7 @@ MatrixFree<dim, Number>::cell_loop
                 }
               if (j<evens-1)
                 {
-                  blocked_worker[j] = new(worker[j]->allocate_child())
+                  blocked_worker[j] = new (worker[j]->allocate_child())
                   internal::partition::PartitionWork<Worker>
                   (func,2*j+1,task_info,true);
                 }
@@ -2427,14 +2427,14 @@ MatrixFree<dim, Number>::cell_loop
                 {
                   if (odds==evens)
                     {
-                      worker[evens] = new(worker[j]->allocate_child())
+                      worker[evens] = new (worker[j]->allocate_child())
                       internal::partition::PartitionWork<Worker>
                       (func,2*j+1,task_info,false);
                       worker[j]->spawn(*worker[evens]);
                     }
                   else
                     {
-                      tbb::empty_task *child = new(worker[j]->allocate_child())
+                      tbb::empty_task *child = new (worker[j]->allocate_child())
                       tbb::empty_task();
                       worker[j]->spawn(*child);
                     }
@@ -2453,7 +2453,7 @@ MatrixFree<dim, Number>::cell_loop
           // tree of partitions
           if (odds > 0)
             {
-              tbb::empty_task *root = new( tbb::task::allocate_root() ) tbb::empty_task;
+              tbb::empty_task *root = new ( tbb::task::allocate_root() ) tbb::empty_task;
               root->set_ref_count(evens+1);
               unsigned int n_blocked_workers = odds-(odds+evens+1)%2;
               unsigned int n_workers = task_info.partition_color_blocks_data.size()-1-
@@ -2463,7 +2463,7 @@ MatrixFree<dim, Number>::cell_loop
               unsigned int worker_index = 0, slice_index = 0;
               unsigned int spawn_index =  0;
               int spawn_index_child = -2;
-              internal::MPIComCompress<OutVector> *worker_compr = new(root->allocate_child())
+              internal::MPIComCompress<OutVector> *worker_compr = new (root->allocate_child())
               internal::MPIComCompress<OutVector>(dst);
               worker_compr->set_ref_count(1);
               for (unsigned int part=0;
@@ -2471,10 +2471,10 @@ MatrixFree<dim, Number>::cell_loop
                 {
                   const unsigned int spawn_index_new = worker_index;
                   if (part == 0)
-                    worker[worker_index] = new(worker_compr->allocate_child())
+                    worker[worker_index] = new (worker_compr->allocate_child())
                     internal::color::PartitionWork<Worker>(func,slice_index,task_info,false);
                   else
-                    worker[worker_index] = new(root->allocate_child())
+                    worker[worker_index] = new (root->allocate_child())
                     internal::color::PartitionWork<Worker>(func,slice_index,task_info,false);
                   slice_index++;
                   for (; slice_index<task_info.partition_color_blocks_row_index[part+1];
@@ -2513,14 +2513,14 @@ MatrixFree<dim, Number>::cell_loop
                     {
                       if (part<task_info.partition_color_blocks_row_index.size()-2)
                         {
-                          blocked_worker[part/2] = new(worker[worker_index-1]->allocate_child())
+                          blocked_worker[part/2] = new (worker[worker_index-1]->allocate_child())
                           internal::color::PartitionWork<Worker>(func,slice_index,task_info,true);
                           slice_index++;
                           if (slice_index<
                               task_info.partition_color_blocks_row_index[part+1])
                             {
                               blocked_worker[part/2]->set_ref_count(1);
-                              worker[worker_index] = new(blocked_worker[part/2]->allocate_child())
+                              worker[worker_index] = new (blocked_worker[part/2]->allocate_child())
                               internal::color::PartitionWork<Worker>(func,slice_index,task_info,false);
                               slice_index++;
                             }

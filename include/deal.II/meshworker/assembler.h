@@ -601,7 +601,7 @@ namespace MeshWorker
 
 
 
-    template <typename MatrixType ,typename number>
+    template <typename MatrixType,typename number>
     template <class DOFINFO>
     inline void
     MatrixLocalBlocksToGlobalBlocks<MatrixType, number>::initialize_info
@@ -730,7 +730,7 @@ namespace MeshWorker
     }
 
 
-    template <typename MatrixType ,typename number>
+    template <typename MatrixType,typename number>
     template <class DOFINFO>
     inline void
     MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::initialize_info

@@ -43,7 +43,7 @@ int main()
     t[1][1] = 3.35792;
     AssertThrow (7*t == 7.0 * t, ExcInternalError());
     AssertThrow (t*7 == t * 7.0, ExcInternalError());
-    AssertThrow (t*7 == 7*t    , ExcInternalError());
+    AssertThrow (t*7 == 7*t, ExcInternalError());
     AssertThrow ((t*7 - (t+t+t+t+t+t+t)).norm() < 1e-12, ExcInternalError());
   }
 

@@ -2018,7 +2018,7 @@ namespace GridGenerator
                     const Point<1> &,
                     const double,
                     const double,
-                    const unsigned int ,
+                    const unsigned int,
                     const bool)
   {
     Assert (false, ExcNotImplemented());
@@ -2030,7 +2030,7 @@ namespace GridGenerator
                        const double,
                        const double,
                        const double,
-                       const unsigned int ,
+                       const unsigned int,
                        const unsigned int )
   {
     Assert (false, ExcNotImplemented());
@@ -2063,7 +2063,7 @@ namespace GridGenerator
                     const Point<1> &,
                     const double,
                     const double,
-                    const unsigned int ,
+                    const unsigned int,
                     const bool)
   {
     Assert (false, ExcNotImplemented());
@@ -2074,7 +2074,7 @@ namespace GridGenerator
                             const Point<1> &,
                             const double,
                             const double,
-                            const unsigned int ,
+                            const unsigned int,
                             const bool)
   {
     Assert (false, ExcNotImplemented());
@@ -2728,26 +2728,26 @@ namespace GridGenerator
 
     const Point<3> vertices[20] =
     {
-      Point<3>(left, left , -len/2.),
-      Point<3>(rl2,  left , -len/2.),
-      Point<3>(rl2,  rl2  , -len/2.),
-      Point<3>(left, rl2  , -len/2.),
-      Point<3>(right,left , -len/2.),
-      Point<3>(right,rl2  , -len/2.),
+      Point<3>(left, left, -len/2.),
+      Point<3>(rl2,  left, -len/2.),
+      Point<3>(rl2,  rl2, -len/2.),
+      Point<3>(left, rl2, -len/2.),
+      Point<3>(right,left, -len/2.),
+      Point<3>(right,rl2, -len/2.),
       Point<3>(rl2,  right, -len/2.),
       Point<3>(left, right, -len/2.),
       Point<3>(right,right, -len/2.),
-      Point<3>(rl2,  left , -len/2.),
-      Point<3>(left, left , len/2.),
-      Point<3>(rl2,  left , len/2.),
-      Point<3>(rl2,  rl2  , len/2.),
-      Point<3>(left, rl2  , len/2.),
-      Point<3>(right,left , len/2.),
-      Point<3>(right,rl2  , len/2.),
+      Point<3>(rl2,  left, -len/2.),
+      Point<3>(left, left, len/2.),
+      Point<3>(rl2,  left, len/2.),
+      Point<3>(rl2,  rl2, len/2.),
+      Point<3>(left, rl2, len/2.),
+      Point<3>(right,left, len/2.),
+      Point<3>(right,rl2, len/2.),
       Point<3>(rl2,  right, len/2.),
       Point<3>(left, right, len/2.),
       Point<3>(right,right, len/2.),
-      Point<3>(rl2,  left , len/2.)
+      Point<3>(rl2,  left, len/2.)
     };
     const int cell_vertices[4][8] = { { 0,1,3,2, 10, 11, 13, 12 },
       { 9,4,2,5, 19,14, 12, 15 },
@@ -2806,9 +2806,9 @@ namespace GridGenerator
       21,20,22,
       17,16,18,
       25,24,26,
-      5 , 4, 6,
-      1 , 0, 2,
-      9 , 8,10,
+      5, 4, 6,
+      1, 0, 2,
+      9, 8,10,
       37,36,38,
       33,32,34,
       41,40,42
@@ -3746,16 +3746,16 @@ namespace GridGenerator
         vertices.push_back (center+Point<3>( a,  a, 0));                  //1
         vertices.push_back (center+Point<3>( b,  b, 0));                  //2
         vertices.push_back (center+Point<3>( 0, outer_radius, 0));        //3
-        vertices.push_back (center+Point<3>( 0, a , a));                  //4
-        vertices.push_back (center+Point<3>( c, c , h));                  //5
-        vertices.push_back (center+Point<3>( d, d , e));                  //6
-        vertices.push_back (center+Point<3>( 0, b , b));                  //7
-        vertices.push_back (center+Point<3>( inner_radius, 0 , 0));       //8
-        vertices.push_back (center+Point<3>( outer_radius, 0 , 0));       //9
-        vertices.push_back (center+Point<3>( a, 0 , a));  //10
-        vertices.push_back (center+Point<3>( b, 0 , b));  //11
-        vertices.push_back (center+Point<3>( 0, 0 , inner_radius));       //12
-        vertices.push_back (center+Point<3>( 0, 0 , outer_radius));       //13
+        vertices.push_back (center+Point<3>( 0, a, a));                   //4
+        vertices.push_back (center+Point<3>( c, c, h));                   //5
+        vertices.push_back (center+Point<3>( d, d, e));                   //6
+        vertices.push_back (center+Point<3>( 0, b, b));                   //7
+        vertices.push_back (center+Point<3>( inner_radius, 0, 0));        //8
+        vertices.push_back (center+Point<3>( outer_radius, 0, 0));        //9
+        vertices.push_back (center+Point<3>( a, 0, a));   //10
+        vertices.push_back (center+Point<3>( b, 0, b));   //11
+        vertices.push_back (center+Point<3>( 0, 0, inner_radius));        //12
+        vertices.push_back (center+Point<3>( 0, 0, outer_radius));        //13
 
         const int cell_vertices[3][8] =
         {
@@ -4649,13 +4649,13 @@ namespace GridGenerator
 {
 
   template void
-  hyper_sphere< 1 ,  2 > (Triangulation< 1 ,   2> &,
-                          const Point<2>   &center,
-                          const double        radius);
+  hyper_sphere< 1,  2 > (Triangulation< 1,   2> &,
+                         const Point<2>   &center,
+                         const double        radius);
   template void
-  hyper_sphere< 2 ,  3 > (Triangulation< 2 ,   3> &,
-                          const Point<3>   &center,
-                          const double        radius);
+  hyper_sphere< 2,  3 > (Triangulation< 2,   3> &,
+                         const Point<3>   &center,
+                         const double        radius);
 }
 #include "grid_generator.inst"
 

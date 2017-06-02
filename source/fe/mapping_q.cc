@@ -373,7 +373,7 @@ transform (const ArrayView<const Tensor<1,dim> >                  &input,
 template<int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::
-transform (const ArrayView<const DerivativeForm<1, dim ,spacedim> >  &input,
+transform (const ArrayView<const DerivativeForm<1, dim, spacedim> >  &input,
            const MappingType                                          mapping_type,
            const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_data,
            const ArrayView<Tensor<2,spacedim> >                      &output) const
@@ -421,7 +421,7 @@ transform (const ArrayView<const Tensor<2, dim> >                 &input,
 template<int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::
-transform (const ArrayView<const DerivativeForm<2, dim ,spacedim> >  &input,
+transform (const ArrayView<const DerivativeForm<2, dim,spacedim> >  &input,
            const MappingType                                          mapping_type,
            const typename Mapping<dim,spacedim>::InternalDataBase    &mapping_data,
            const ArrayView<Tensor<3,spacedim> >                      &output) const

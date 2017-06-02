@@ -203,7 +203,7 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
                                FETools::Compositing::compute_nonzero_components(&fe1, n1,
                                    &fe2, n2,
                                    &fe3, n3,
-                                   &fe4 ,n4)),
+                                   &fe4, n4)),
   base_elements((n1>0)+(n2>0)+(n3>0)+(n4>0))
 {
   std::vector<const FiniteElement<dim,spacedim>*> fes;
@@ -245,7 +245,7 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
                                FETools::Compositing::compute_nonzero_components(&fe1, n1,
                                    &fe2, n2,
                                    &fe3, n3,
-                                   &fe4 ,n4,
+                                   &fe4, n4,
                                    &fe5, n5)),
   base_elements((n1>0)+(n2>0)+(n3>0)+(n4>0)+(n5>0))
 {

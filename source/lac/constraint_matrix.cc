@@ -1360,7 +1360,7 @@ MATRIX_FUNCTIONS(PETScWrappers::SparseMatrix);
 MATRIX_FUNCTIONS(PETScWrappers::MPI::SparseMatrix);
 BLOCK_MATRIX_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix);
 MATRIX_VECTOR_FUNCTIONS(PETScWrappers::MPI::SparseMatrix, PETScWrappers::MPI::Vector);
-BLOCK_MATRIX_VECTOR_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix ,PETScWrappers::MPI::BlockVector);
+BLOCK_MATRIX_VECTOR_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix,PETScWrappers::MPI::BlockVector);
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS

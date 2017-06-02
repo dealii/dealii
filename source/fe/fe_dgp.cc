@@ -125,7 +125,7 @@ template <int dim, int spacedim>
 void
 FE_DGP<dim,spacedim>::
 get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
-                                  const unsigned int ,
+                                  const unsigned int,
                                   FullMatrix<double>           &interpolation_matrix) const
 {
   // this is only implemented, if the source FE is also a DGP element. in that

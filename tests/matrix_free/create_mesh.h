@@ -27,8 +27,8 @@ void create_mesh (Triangulation<2> &tria,
   // 1. cube cell
   points[0] = Point<dim> (0, 0);
   points[1] = Point<dim> (0, 1);
-  points[2] = Point<dim> (1 ,0);
-  points[3] = Point<dim> (1 ,1);
+  points[2] = Point<dim> (1,0);
+  points[3] = Point<dim> (1,1);
 
   // 2. rectangular cell
   points[4] = Point<dim> (3., 0);

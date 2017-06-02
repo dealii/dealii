@@ -203,7 +203,7 @@ namespace LinearAlgebra
 
   template <typename Number>
   void Vector<Number>::import(const ReadWriteVector<Number> &,
-                              VectorOperation::values        ,
+                              VectorOperation::values,
                               std::shared_ptr<const CommunicationPatternBase>)
   {
     AssertThrow(false, ExcMessage("This function is not implemented."));

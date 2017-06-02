@@ -278,7 +278,7 @@ template <int dim>
 void
 FE_DGPMonomial<dim>::
 get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
-                                  const unsigned int ,
+                                  const unsigned int,
                                   FullMatrix<double>           &interpolation_matrix) const
 {
   // this is only implemented, if the source

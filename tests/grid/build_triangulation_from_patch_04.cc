@@ -63,7 +63,7 @@ void test()
         = GridTools::get_patch_around_cell<Triangulation<dim> > (cell);
 
       Triangulation<dim> local_triangulation(Triangulation<dim>::limit_level_difference_at_vertices);
-      std::map<typename Triangulation<dim>::active_cell_iterator , typename Triangulation<dim>::active_cell_iterator>  patch_to_global_tria_map;
+      std::map<typename Triangulation<dim>::active_cell_iterator, typename Triangulation<dim>::active_cell_iterator>  patch_to_global_tria_map;
 
       GridTools::build_triangulation_from_patch <Triangulation<dim> >
       (patch_cells,local_triangulation,patch_to_global_tria_map);

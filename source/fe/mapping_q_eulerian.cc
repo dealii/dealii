@@ -222,7 +222,7 @@ template<int dim, class VectorType, int spacedim>
 CellSimilarity::Similarity
 MappingQEulerian<dim,VectorType,spacedim>::
 fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                const CellSimilarity::Similarity                           ,
+                const CellSimilarity::Similarity,
                 const Quadrature<dim>                                     &quadrature,
                 const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
                 internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const

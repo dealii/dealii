@@ -71,7 +71,7 @@ public:
   {
     typedef VectorizedArray<Number> vector_t;
     FEEvaluation<dim,degree_p+1,degree_p+2,dim,Number> velocity (data, 0);
-    FEEvaluation<dim,degree_p  ,degree_p+2,1,  Number> pressure (data, 1);
+    FEEvaluation<dim,degree_p,degree_p+2,1,  Number> pressure (data, 1);
 
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {

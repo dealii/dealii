@@ -135,7 +135,7 @@ void check_consistency(const Point<dim>    &p,
   // product rule:
   const double                 v_s = v_s0 + v_s1 * v_f;
   const Tensor<1,dim>          g_s = g_s0 + g_s1 * v_f + v_s1 * g_f;
-  Tensor<2,dim>                 op = outer_product(g_s1 , g_f );
+  Tensor<2,dim>                 op = outer_product(g_s1, g_f );
 
   const SymmetricTensor<2,dim> sp = symmetrize (op) * 2.0; // symmetrize does [s+s^T]/2
   // Hessians should be symmetric, but due to round off errors and the fact

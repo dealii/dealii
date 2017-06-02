@@ -729,13 +729,13 @@ namespace PETScWrappers
     SparseMatrix::do_reinit (const SparsityPattern &,
                              const std::vector<size_type> &,
                              const std::vector<size_type> &,
-                             const unsigned int ,
+                             const unsigned int,
                              const bool);
     template void
     SparseMatrix::do_reinit (const DynamicSparsityPattern &,
                              const std::vector<size_type> &,
                              const std::vector<size_type> &,
-                             const unsigned int ,
+                             const unsigned int,
                              const bool);
 
     template void

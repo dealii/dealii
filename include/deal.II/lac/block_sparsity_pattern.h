@@ -840,7 +840,7 @@ BlockSparsityPatternBase<SparsityPatternType>::add_entries (const size_type row,
     {
       const size_type col = *it;
 
-      const std::pair<size_type , size_type>
+      const std::pair<size_type, size_type>
       col_index = this->column_indices.global_to_local(col);
 
       const size_type local_index = counter_within_block[col_index.first]++;
@@ -862,7 +862,7 @@ BlockSparsityPatternBase<SparsityPatternType>::add_entries (const size_type row,
   // where we should start reading out
   // data. Now let's write the data into
   // the individual blocks!
-  const std::pair<size_type , size_type>
+  const std::pair<size_type, size_type>
   row_index = this->row_indices.global_to_local (row);
   for (size_type block_col=0; block_col<n_block_cols(); ++block_col)
     {
@@ -887,7 +887,7 @@ BlockSparsityPatternBase<SparsityPatternType>::exists (const size_type i,
   // if you get an error here, are
   // you sure you called
   // <tt>collect_sizes()</tt> before?
-  const std::pair<size_type , size_type>
+  const std::pair<size_type, size_type>
   row_index = row_indices.global_to_local (i),
   col_index = column_indices.global_to_local (j);
   return sub_objects[row_index.first][col_index.first]->exists (row_index.second,
@@ -902,7 +902,7 @@ unsigned int
 BlockSparsityPatternBase<SparsityPatternType>::
 row_length (const size_type row) const
 {
-  const std::pair<size_type , size_type>
+  const std::pair<size_type, size_type>
   row_index = row_indices.global_to_local (row);
 
   unsigned int c = 0;
@@ -940,7 +940,7 @@ BlockDynamicSparsityPattern::column_number (const size_type row,
                                             const unsigned int index) const
 {
   // .first= ith block, .second = jth row in that block
-  const std::pair<size_type ,size_type >
+  const std::pair<size_type,size_type >
   row_index = row_indices.global_to_local (row);
 
   Assert(index<row_length(row), ExcIndexRange(index, 0, row_length(row)));

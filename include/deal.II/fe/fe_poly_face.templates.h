@@ -75,7 +75,7 @@ template <class PolynomialType, int dim, int spacedim>
 void
 FE_PolyFace<PolynomialType,dim,spacedim>::
 fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
-                const CellSimilarity::Similarity                                     ,
+                const CellSimilarity::Similarity,
                 const Quadrature<dim> &,
                 const Mapping<dim,spacedim> &,
                 const typename Mapping<dim,spacedim>::InternalDataBase &,

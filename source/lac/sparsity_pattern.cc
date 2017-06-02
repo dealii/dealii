@@ -1042,7 +1042,7 @@ template void SparsityPattern::copy_from<SparsityPattern> (const SparsityPattern
 template void SparsityPattern::copy_from<float> (const FullMatrix<float> &);
 template void SparsityPattern::copy_from<double> (const FullMatrix<double> &);
 
-template void SparsityPattern::add_entries<const SparsityPattern::size_type *> (const size_type ,
+template void SparsityPattern::add_entries<const SparsityPattern::size_type *> (const size_type,
     const size_type *,
     const size_type *,
     const bool);

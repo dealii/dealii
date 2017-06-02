@@ -62,7 +62,7 @@ void test()
       std::sort(coarse_cells.begin(), coarse_cells.end());
 
       for (unsigned int i=0; i<patch_cells.size(); ++i)
-        Assert (patch_cells[i]==coarse_cells[i] ,ExcInternalError());
+        Assert (patch_cells[i]==coarse_cells[i],ExcInternalError());
 
       deallog << "coarse_ cells " << cell << ": ";
       for (unsigned int i=0; i<coarse_cells.size(); ++i)

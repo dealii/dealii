@@ -81,7 +81,7 @@ void test ()
     {
       FE_Q<dim> fe1(p);
       FE_Q<dim> fe2(p+1);
-      FESystem<dim> fe(fe1, 2, fe2 , 1);
+      FESystem<dim> fe(fe1, 2, fe2, 1);
       DoFHandler<dim> dof_handler(triangulation);
       dof_handler.distribute_dofs (fe);
 

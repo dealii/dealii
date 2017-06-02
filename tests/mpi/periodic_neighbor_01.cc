@@ -292,7 +292,7 @@ int main(int argc, char *argv[])
 {
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv ,1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv,1);
       MPILogInitAll log;
 
       periodicity_tests<2> test_2D;

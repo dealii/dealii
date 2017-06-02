@@ -56,7 +56,7 @@ TensorProductPolynomialsBubbles<dim>::compute_value (const unsigned int i,
 
 template <>
 double
-TensorProductPolynomialsBubbles<0>::compute_value (const unsigned int ,
+TensorProductPolynomialsBubbles<0>::compute_value (const unsigned int,
                                                    const Point<0> &) const
 {
   Assert (false, ExcNotImplemented());

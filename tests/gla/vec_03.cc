@@ -75,7 +75,7 @@ void test ()
 
   ConstraintMatrix cm;
   cm.add_line(1);
-  cm.add_entry(1 ,2, 3.0);
+  cm.add_entry(1,2, 3.0);
   cm.close();
 
   if (myid==0)

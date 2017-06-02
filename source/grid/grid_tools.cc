@@ -3975,9 +3975,9 @@ next_cell:
       // property somewhat sloppy as "face_flip"
       // (always: face_orientation = true, face_rotation = false)
 
-      static const MATCH_T m_tff = {{ 0 , 1 }};
+      static const MATCH_T m_tff = {{ 0, 1 }};
       if (matching == m_tff) return 1;           // [true ,false,false]
-      static const MATCH_T m_ttf = {{ 1 , 0 }};
+      static const MATCH_T m_ttf = {{ 1, 0 }};
       if (matching == m_ttf) return 3;           // [true ,true ,false]
       Assert(false, ExcInternalError());
       // what follows is dead code, but it avoids warnings about the lack
@@ -3996,21 +3996,21 @@ next_cell:
       // as well as the actual implementation in source/grid/tria.cc
       // for more details...
 
-      static const MATCH_T m_tff = {{ 0 , 1 , 2 , 3 }};
+      static const MATCH_T m_tff = {{ 0, 1, 2, 3 }};
       if (matching == m_tff) return 1;                   // [true ,false,false]
-      static const MATCH_T m_tft = {{ 1 , 3 , 0 , 2 }};
+      static const MATCH_T m_tft = {{ 1, 3, 0, 2 }};
       if (matching == m_tft) return 5;                   // [true ,false,true ]
-      static const MATCH_T m_ttf = {{ 3 , 2 , 1 , 0 }};
+      static const MATCH_T m_ttf = {{ 3, 2, 1, 0 }};
       if (matching == m_ttf) return 3;                   // [true ,true ,false]
-      static const MATCH_T m_ttt = {{ 2 , 0 , 3 , 1 }};
+      static const MATCH_T m_ttt = {{ 2, 0, 3, 1 }};
       if (matching == m_ttt) return 7;                   // [true ,true ,true ]
-      static const MATCH_T m_fff = {{ 0 , 2 , 1 , 3 }};
+      static const MATCH_T m_fff = {{ 0, 2, 1, 3 }};
       if (matching == m_fff) return 0;                   // [false,false,false]
-      static const MATCH_T m_fft = {{ 2 , 3 , 0 , 1 }};
+      static const MATCH_T m_fft = {{ 2, 3, 0, 1 }};
       if (matching == m_fft) return 4;                   // [false,false,true ]
-      static const MATCH_T m_ftf = {{ 3 , 1 , 2 , 0 }};
+      static const MATCH_T m_ftf = {{ 3, 1, 2, 0 }};
       if (matching == m_ftf) return 2;                   // [false,true ,false]
-      static const MATCH_T m_ftt = {{ 1 , 0 , 3 , 2 }};
+      static const MATCH_T m_ftt = {{ 1, 0, 3, 2 }};
       if (matching == m_ftt) return 6;                   // [false,true ,true ]
       Assert(false, ExcInternalError());
       // what follows is dead code, but it avoids warnings about the lack
