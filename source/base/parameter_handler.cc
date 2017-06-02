@@ -2257,28 +2257,20 @@ ParameterHandler::print_parameters (std::ostream     &out,
 {
   AssertThrow (out, ExcIO());
 
-  switch (style)
+  // we treat XML and JSON is one step via BOOST, whereas all of the others are
+  // done recursively in our own code. take care of the two special formats
+  // first
+  if (style == XML)
     {
-    case XML:
-    {
-      // call the writer
-      // function and exit as
-      // there is nothing
-      // further to do down in
-      // this function
+      // call the writer function and exit as there is nothing
+      // further to do down in this function
       //
-      // XML has a requirement that
-      // there can only be one
-      // single top-level entry,
-      // but we may have multiple
-      // entries and sections.  we
-      // work around this by
-      // creating a tree just for
-      // this purpose with the
-      // single top-level node
-      // "ParameterHandler" and
-      // assign the existing tree
-      // under it
+      // XML has a requirement that there can only be one
+      // single top-level entry, but we may have multiple
+      // entries and sections.  we work around this by
+      // creating a tree just for this purpose with the
+      // single top-level node "ParameterHandler" and
+      // assign the existing tree under it
       boost::property_tree::ptree single_node_tree;
       single_node_tree.add_child("ParameterHandler",
                                  *entries);
@@ -2287,48 +2279,39 @@ ParameterHandler::print_parameters (std::ostream     &out,
       return out;
     }
 
-
-    case JSON:
-      // call the writer
-      // function and exit as
-      // there is nothing
-      // further to do down in
-      // this function
+  if (style == JSON)
+    {
       write_json (out, *entries);
       return out;
+    }
 
+  // for all of the other formats, print a preamble:
+  switch (style)
+    {
     case Text:
       out << "# Listing of Parameters" << std::endl
           << "# ---------------------" << std::endl;
       break;
+
     case LaTeX:
       out << "\\subsection{Global parameters}" << std::endl;
       out << "\\label{parameters:global}" << std::endl;
       out << std::endl << std::endl;
       break;
+
     case Description:
       out << "Listing of Parameters:" << std::endl << std::endl;
       break;
+
     case ShortText:
       break;
+
     default:
       Assert (false, ExcNotImplemented());
-    };
+    }
 
   // dive recursively into the subsections
   print_parameters_section (out, style, 0);
-
-  switch (style)
-    {
-    case Text:
-    case Description:
-    case ShortText:
-      break;
-    case LaTeX:
-      break;
-    default:
-      Assert (false, ExcNotImplemented());
-    };
 
   return out;
 }
