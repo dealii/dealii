@@ -161,8 +161,10 @@ void test ()
   connections_1[4].disconnect ();
   tria_1.refine_global (1);
 
-  // avoid compiler warning
+  // avoid compiler warning.
   (void)connections_2;
+
+  // any_change on tria_2 will signal at destruction
 }
 
 
