@@ -7753,6 +7753,59 @@ namespace VectorTools
     return gradient[0];
   }
 
+  namespace
+  {
+    template <typename VectorType>
+    typename std::enable_if<dealii::is_serial_vector< VectorType >::value == true>::type
+    internal_subtract_mean_value(VectorType              &v,
+                                 const std::vector<bool> &p_select)
+    {
+      if (p_select.size() == 0)
+        {
+          // In case of an empty boolean mask operate on the whole vector:
+          v.add( - v.mean_value() );
+        }
+      else
+        {
+          const unsigned int n = v.size();
+
+          Assert(p_select.size() == n,
+                 ExcDimensionMismatch(p_select.size(), n));
+
+          typename VectorType::value_type s = 0.;
+          unsigned int counter = 0;
+          for (unsigned int i=0; i<n; ++i)
+            if (p_select[i])
+              {
+                typename VectorType::value_type vi = v(i);
+                s += vi;
+                ++counter;
+              }
+          // Error out if we have not constrained anything. Note that in this
+          // case the vector v is always nonempty.
+          Assert (n == 0 || counter > 0, ComponentMask::ExcNoComponentSelected());
+
+          s /= counter;
+
+          for (unsigned int i=0; i<n; ++i)
+            if (p_select[i])
+              v(i) -= s;
+        }
+    }
+
+
+
+    template <typename VectorType>
+    typename std::enable_if<dealii::is_serial_vector< VectorType >::value == false>::type
+    internal_subtract_mean_value(VectorType              &v,
+                                 const std::vector<bool> &p_select)
+    {
+      (void) p_select;
+      Assert(p_select.size() == 0, ExcNotImplemented());
+      // In case of an empty boolean mask operate on the whole vector:
+      v.add( - v.mean_value() );
+    }
+  }
 
 
   template <typename VectorType>
@@ -7760,41 +7813,7 @@ namespace VectorTools
   subtract_mean_value(VectorType              &v,
                       const std::vector<bool> &p_select)
   {
-    if (p_select.size() == 0)
-      {
-        // In case of an empty boolean mask operate on the whole vector:
-        v.add( - v.mean_value() );
-      }
-    else
-      {
-        // This function is not implemented for distributed vectors.
-        Assert((dealii::is_serial_vector< VectorType >::value == true),
-               ExcNotImplemented());
-
-        const unsigned int n = v.size();
-
-        Assert(p_select.size() == n,
-               ExcDimensionMismatch(p_select.size(), n));
-
-        typename VectorType::value_type s = 0.;
-        unsigned int counter = 0;
-        for (unsigned int i=0; i<n; ++i)
-          if (p_select[i])
-            {
-              typename VectorType::value_type vi = v(i);
-              s += vi;
-              ++counter;
-            }
-        // Error out if we have not constrained anything. Note that in this
-        // case the vector v is always nonempty.
-        Assert (n == 0 || counter > 0, ComponentMask::ExcNoComponentSelected());
-
-        s /= counter;
-
-        for (unsigned int i=0; i<n; ++i)
-          if (p_select[i])
-            v(i) -= s;
-      }
+    internal_subtract_mean_value(v,p_select);
   }
 
   namespace
