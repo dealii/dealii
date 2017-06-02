@@ -56,7 +56,6 @@ namespace TrilinosWrappers
   {
     class Vector;
   }
-  class Vector;
 }
 #endif
 
@@ -230,13 +229,6 @@ public:
    * result in a copy of the vector on all processors.
    */
   explicit Vector (const TrilinosWrappers::MPI::Vector &v);
-
-  /**
-   * Another copy constructor: copy the values from a localized Trilinos
-   * wrapper vector. This copy constructor is only available if Trilinos was
-   * detected during configuration time.
-   */
-  explicit Vector (const TrilinosWrappers::Vector &v);
 #endif
 
   /**
@@ -401,14 +393,6 @@ public:
    */
   Vector<Number> &
   operator= (const TrilinosWrappers::MPI::Vector &v);
-
-  /**
-   * Another copy operator: copy the values from a sequential Trilinos wrapper
-   * vector class. This operator is only available if Trilinos was detected
-   * during configuration time.
-   */
-  Vector<Number> &
-  operator= (const TrilinosWrappers::Vector &v);
 #endif
 
   /**

@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::operator = (Vector), except that we don't
+// check TrilinosWrappers::MPI::Vector::operator = (Vector), except that we don't
 // resize the vector to be copied to beforehand
 
 #include "../tests.h"
@@ -26,7 +26,7 @@
 #include <vector>
 
 
-void test (TrilinosWrappers::Vector &v)
+void test (TrilinosWrappers::MPI::Vector &v)
 {
   // set some entries of the vector
   for (unsigned int i=0; i<v.size(); ++i)
@@ -36,8 +36,8 @@ void test (TrilinosWrappers::Vector &v)
 
   // then copy it to a vector of different
   // size
-  TrilinosWrappers::Vector w;
-  w.reinit(1);
+  TrilinosWrappers::MPI::Vector w;
+  w.reinit(complete_index_set(1), MPI_COMM_WORLD);
   w = v;
 
   // make sure they're equal
@@ -64,8 +64,8 @@ int main (int argc,char **argv)
   try
     {
       {
-        TrilinosWrappers::Vector v;
-        v.reinit(100);
+        TrilinosWrappers::MPI::Vector v;
+        v.reinit(complete_index_set(100), MPI_COMM_WORLD);
         test (v);
       }
     }

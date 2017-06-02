@@ -79,8 +79,8 @@ namespace TrilinosWrappers
 
   void
   SolverBase::solve (const SparseMatrix     &A,
-                     VectorBase             &x,
-                     const VectorBase       &b,
+                     MPI::Vector            &x,
+                     const MPI::Vector      &b,
                      const PreconditionBase &preconditioner)
   {
     linear_problem.reset();
@@ -101,8 +101,8 @@ namespace TrilinosWrappers
   //       can be used by the inverse_operator of LinearOperator
   void
   SolverBase::solve (const Epetra_Operator  &A,
-                     VectorBase             &x,
-                     const VectorBase       &b,
+                     MPI::Vector            &x,
+                     const MPI::Vector      &b,
                      const PreconditionBase &preconditioner)
   {
     linear_problem.reset();
@@ -123,8 +123,8 @@ namespace TrilinosWrappers
   //       can be used by the inverse_operator of LinearOperator
   void
   SolverBase::solve (const Epetra_Operator  &A,
-                     VectorBase             &x,
-                     const VectorBase       &b,
+                     MPI::Vector            &x,
+                     const MPI::Vector      &b,
                      const Epetra_Operator  &preconditioner)
   {
     linear_problem.reset();
@@ -780,7 +780,7 @@ namespace TrilinosWrappers
   }
 
 
-  void SolverDirect::solve (VectorBase &x, const VectorBase &b)
+  void SolverDirect::solve (MPI::Vector &x, const MPI::Vector &b)
   {
     // Assign the empty LHS vector to the Epetra_LinearProblem object
     linear_problem->SetLHS(&x.trilinos_vector());
@@ -862,8 +862,8 @@ namespace TrilinosWrappers
 
   void
   SolverDirect::solve (const SparseMatrix     &A,
-                       VectorBase             &x,
-                       const VectorBase       &b)
+                       MPI::Vector            &x,
+                       const MPI::Vector      &b)
   {
     // We need an Epetra_LinearProblem object to let the Amesos solver know
     // about the matrix and vectors.

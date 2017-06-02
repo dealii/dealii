@@ -30,14 +30,6 @@ for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
     template class EmbeddedExplicitRungeKutta<LinearAlgebra::distributed::V<S> >;
 }
 
-for (V : EXTERNAL_SEQUENTIAL_VECTORS)
-{
-    template class RungeKutta<V>;
-    template class ExplicitRungeKutta<V>;
-    template class ImplicitRungeKutta<V>;
-    template class EmbeddedExplicitRungeKutta<V>;
-}
-
 for (V : EXTERNAL_PARALLEL_VECTORS)
 {
     template class RungeKutta<V>;

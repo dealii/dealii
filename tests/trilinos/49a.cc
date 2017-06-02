@@ -16,20 +16,20 @@
 
 
 // like 49, but do the test for
-//  TrilinosWrappers::BlockVector
+//  TrilinosWrappers::MPI::BlockVector
 //         ::operator = (dealii::BlockVector<TrilinosScalar>)
 // with block vectors instead of plain vectors
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
-#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/block_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
 
-void test (TrilinosWrappers::BlockVector &v)
+void test (TrilinosWrappers::MPI::BlockVector &v)
 {
   std::vector<types::global_dof_index> sizes (2, 3);
   dealii::BlockVector<TrilinosScalar> w;
@@ -75,8 +75,8 @@ int main (int argc,char **argv)
   try
     {
       {
-        std::vector<types::global_dof_index> sizes (2, 3);
-        TrilinosWrappers::BlockVector v;
+        std::vector<IndexSet> sizes (2, complete_index_set(3));
+        TrilinosWrappers::MPI::BlockVector v;
         v.reinit(sizes);
         test (v);
       }

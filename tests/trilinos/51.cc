@@ -15,7 +15,7 @@
 
 
 
-// check copy constructor TrilinosWrappers::Vector::Vector(Vector)
+// check copy constructor TrilinosWrappers::MPI::Vector::Vector(Vector)
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
@@ -25,7 +25,7 @@
 #include <vector>
 
 
-void test (TrilinosWrappers::Vector &v)
+void test (TrilinosWrappers::MPI::Vector &v)
 {
   // set some entries of the vector
   for (unsigned int i=0; i<v.size(); ++i)
@@ -34,7 +34,7 @@ void test (TrilinosWrappers::Vector &v)
   v.compress (VectorOperation::insert);
 
   // then copy it
-  TrilinosWrappers::Vector w (v);
+  TrilinosWrappers::MPI::Vector w (v);
   w.compress (VectorOperation::insert);
 
   // make sure they're equal
@@ -61,8 +61,8 @@ int main (int argc,char **argv)
   try
     {
       {
-        TrilinosWrappers::Vector v;
-        v.reinit(100);
+        TrilinosWrappers::MPI::Vector v;
+        v.reinit(complete_index_set(100), MPI_COMM_WORLD);
         test (v);
       }
     }

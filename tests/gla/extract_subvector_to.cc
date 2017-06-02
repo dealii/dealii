@@ -85,8 +85,8 @@ int main (int argc, char **argv)
 
     {
       deallog.push("Trilinos");
-      TrilinosWrappers::Vector v;
-      v.reinit(17);
+      TrilinosWrappers::MPI::Vector v;
+      v.reinit(complete_index_set(17), MPI_COMM_WORLD);
       test (v);
       deallog.pop();
     }
@@ -116,11 +116,10 @@ int main (int argc, char **argv)
 
     {
       deallog.push("Trilinos");
-      TrilinosWrappers::BlockVector v;
-      v.reinit(3);
-      v.block(0).reinit(7);
-      v.block(1).reinit(5);
-      v.block(2).reinit(3);
+      TrilinosWrappers::MPI::BlockVector v(3);
+      v.block(0).reinit(complete_index_set(7));
+      v.block(1).reinit(complete_index_set(5));
+      v.block(2).reinit(complete_index_set(3));
       v.collect_sizes();
       test (v);
       deallog.pop();

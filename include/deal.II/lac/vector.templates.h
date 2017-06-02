@@ -183,7 +183,8 @@ Vector<Number>::Vector (const TrilinosWrappers::MPI::Vector &v)
       // be a better solution than
       // this, but it has not yet been
       // found.
-      TrilinosWrappers::Vector localized_vector;
+      TrilinosWrappers::MPI::Vector localized_vector;
+      localized_vector.reinit(complete_index_set(vec_size));
       localized_vector.reinit (v, false, true);
 
       // get a representation of the vector
@@ -191,31 +192,6 @@ Vector<Number>::Vector (const TrilinosWrappers::MPI::Vector &v)
       TrilinosScalar **start_ptr;
 
       int ierr = localized_vector.trilinos_vector().ExtractView (&start_ptr);
-      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-      std::copy (start_ptr[0], start_ptr[0]+vec_size, begin());
-    }
-}
-
-
-
-template <typename Number>
-Vector<Number>::Vector (const TrilinosWrappers::Vector &v)
-  :
-  Subscriptor(),
-  vec_size(v.size()),
-  max_vec_size(v.size()),
-  val(nullptr)
-{
-  if (vec_size != 0)
-    {
-      allocate();
-
-      // get a representation of the vector
-      // and copy it
-      TrilinosScalar **start_ptr;
-
-      int ierr = v.trilinos_vector().ExtractView (&start_ptr);
       AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
       std::copy (start_ptr[0], start_ptr[0]+vec_size, begin());
@@ -900,18 +876,10 @@ Vector<Number>::operator= (const TrilinosWrappers::MPI::Vector &v)
   // of the Trilinos vectors and
   // then call the other =
   // operator.
-  TrilinosWrappers::Vector localized_vector;
+  TrilinosWrappers::MPI::Vector localized_vector;
+  localized_vector.reinit(complete_index_set(v.size()));
   localized_vector.reinit(v, false, true);
-  *this = localized_vector;
-  return *this;
-}
 
-
-
-template <typename Number>
-Vector<Number> &
-Vector<Number>::operator= (const TrilinosWrappers::Vector &v)
-{
   if (v.size() != vec_size)
     reinit (v.size(), true);
   if (vec_size != 0)

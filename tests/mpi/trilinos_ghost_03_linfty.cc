@@ -61,7 +61,7 @@ void test ()
     {
       norm = v_tmp.linfty_norm();
     }
-  catch (TrilinosWrappers::VectorBase::ExcTrilinosError e)
+  catch (TrilinosWrappers::MPI::Vector::ExcTrilinosError e)
     {
       deallog << e.get_exc_name() << std::endl;
       exc = true;

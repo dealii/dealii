@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::operator*(Vector) on two vectors that are
+// check TrilinosWrappers::MPI::Vector::operator*(Vector) on two vectors that are
 // orthogonal
 
 #include "../tests.h"
@@ -26,8 +26,8 @@
 #include <vector>
 
 
-void test (TrilinosWrappers::Vector &v,
-           TrilinosWrappers::Vector &w)
+void test (TrilinosWrappers::MPI::Vector &v,
+           TrilinosWrappers::MPI::Vector &w)
 {
   // set only certain elements of each
   // vector, but disjoint sets of elements
@@ -59,10 +59,10 @@ int main (int argc,char **argv)
   try
     {
       {
-        TrilinosWrappers::Vector v;
-        v.reinit(100);
-        TrilinosWrappers::Vector w;
-        w.reinit(100);
+        TrilinosWrappers::MPI::Vector v;
+        v.reinit(complete_index_set(100), MPI_COMM_WORLD);
+        TrilinosWrappers::MPI::Vector w;
+        w.reinit(complete_index_set(100), MPI_COMM_WORLD);
         test (v,w);
       }
     }

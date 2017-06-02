@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::operator = (const ::Vector &)
+// check TrilinosWrappers::MPI::Vector::operator = (const ::Vector &)
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
@@ -27,7 +27,7 @@
 #include <vector>
 
 
-void test (TrilinosWrappers::Vector &v)
+void test (TrilinosWrappers::MPI::Vector &v)
 {
   // set only certain elements of the
   // vector.
@@ -45,11 +45,11 @@ void test (TrilinosWrappers::Vector &v)
   Vector<float>  x(v.size());
   x=v;
 
-  TrilinosWrappers::Vector w1;
-  w1.reinit(v.size());
+  TrilinosWrappers::MPI::Vector w1;
+  w1.reinit(complete_index_set(v.size()), MPI_COMM_WORLD);
   w1=w;
-  TrilinosWrappers::Vector x1;
-  x1.reinit(v.size());
+  TrilinosWrappers::MPI::Vector x1;
+  x1.reinit(complete_index_set(v.size()), MPI_COMM_WORLD);
   x1=x;
 
   for (unsigned int i=0; i<v.size(); ++i)
@@ -75,8 +75,8 @@ int main (int argc,char **argv)
   try
     {
       {
-        TrilinosWrappers::Vector v;
-        v.reinit(100);
+        TrilinosWrappers::MPI::Vector v;
+        v.reinit(complete_index_set(100), MPI_COMM_WORLD);
         test (v);
       }
     }

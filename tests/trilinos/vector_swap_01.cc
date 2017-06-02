@@ -26,7 +26,7 @@
 #include <iostream>
 #include <vector>
 
-void print(TrilinosWrappers::Vector &v)
+void print(TrilinosWrappers::MPI::Vector &v)
 {
   deallog << "size= " << v.size()
           << " el(0)= " << v(0)
@@ -36,12 +36,12 @@ void print(TrilinosWrappers::Vector &v)
 
 void test ()
 {
-  TrilinosWrappers::Vector v;
-  v.reinit(5);
+  TrilinosWrappers::MPI::Vector v;
+  v.reinit(complete_index_set(5), MPI_COMM_WORLD);
   for (unsigned int i=0; i<v.size(); ++i)
     v(i) = 1;
-  TrilinosWrappers::Vector w;
-  w.reinit(9);
+  TrilinosWrappers::MPI::Vector w;
+  w.reinit(complete_index_set(9), MPI_COMM_WORLD);
   for (unsigned int i=0; i<w.size(); ++i)
     w(i) = 2;
 

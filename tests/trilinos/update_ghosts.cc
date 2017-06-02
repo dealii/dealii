@@ -17,9 +17,8 @@
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 
 
-// Check that the base class vector and also the block vector class support
-// update_ghost_values. This method doesn't do anything but is needed for
-// genericity.
+// Check that the block vector class support update_ghost_values. This method
+// doesn't do anything but is needed for genericity.
 
 int main(int argc, char **argv)
 {
@@ -27,8 +26,6 @@ int main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 
   initlog();
-  TrilinosWrappers::VectorBase v;
-  v.update_ghost_values();
   TrilinosWrappers::MPI::BlockVector bv;
   bv.update_ghost_values();
   deallog << "OK" << std::endl;

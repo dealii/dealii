@@ -23,7 +23,7 @@
 #include <deal.II/lac/trilinos_block_sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
 
 using namespace dealii;
 
@@ -37,18 +37,14 @@ int main(int argc, char *argv[])
   TrilinosWrappers::SparseMatrix a;
 
   auto op_a  = linear_operator<TrilinosWrappers::MPI::Vector>(a);
-  auto op_a2  = linear_operator<TrilinosWrappers::Vector>(a);
 
   TrilinosWrappers::BlockSparseMatrix b;
 
   auto op_b = linear_operator<TrilinosWrappers::MPI::BlockVector>(b);
-  auto op_b3 = linear_operator<TrilinosWrappers::BlockVector>(b);
 
   typedef LinearOperator<TrilinosWrappers::MPI::Vector,TrilinosWrappers::MPI::Vector> Op_MPI;
-  typedef LinearOperator<TrilinosWrappers::Vector,TrilinosWrappers::Vector> Op;
 
   auto op_c = block_diagonal_operator<2, TrilinosWrappers::MPI::BlockVector >(std::array<Op_MPI,2> ({{ op_a, op_a}}));
-  auto op_c2 = block_diagonal_operator<2, TrilinosWrappers::BlockVector >(std::array<Op,2> ({{ op_a2, op_a2}}));
 
   deallog << "OK" << std::endl;
 

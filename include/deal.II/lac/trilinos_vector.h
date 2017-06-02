@@ -159,7 +159,7 @@ namespace TrilinosWrappers
      * code that may for example look like this:
      *
      * @code
-     * TrilinosWrappers::Vector vector;
+     * TrilinosWrappers::VectorBase vector;
      * // do some write operations on the vector
      * for (size_type i=0; i<vector->size(); ++i)
      *   vector(i) = i;
@@ -304,7 +304,7 @@ namespace TrilinosWrappers
        * (but being distributed differently among the processors). A trivial
        * application of this function is to generate a replication of a whole
        * vector on each machine, when the calling vector is built according to
-       * the localized vector class TrilinosWrappers::Vector, and <tt>v</tt>
+       * the localized vector class TrilinosWrappers::VectorBase, and <tt>v</tt>
        * is a distributed vector. In this case, the variable
        * <tt>omit_zeroing_entries</tt> needs to be set to <tt>false</tt>,
        * since it does not make sense to exchange data between differently
@@ -348,7 +348,7 @@ namespace TrilinosWrappers
        * object) already is of the same size as the right hand side vector.
        * Otherwise, an exception will be thrown.
        */
-      Vector &operator= (const ::dealii::TrilinosWrappers::Vector &v);
+      Vector &operator= (const ::dealii::TrilinosWrappers::VectorBase &v);
 
       /**
        * Another copy function. This one takes a deal.II vector and copies it
@@ -592,212 +592,7 @@ namespace TrilinosWrappers
 #endif /* DOXYGEN */
 
   } /* end of namespace MPI */
-
-
-
-  /**
-   * This class is a specialization of a Trilinos vector to a localized
-   * version. The purpose of this class is to provide a copy interface from
-   * the possibly parallel Vector class to a local vector on each processor,
-   * in order to be able to access all elements in the vector or to apply
-   * certain deal.II functions.
-   *
-   * This class is deprecated, use TrilinosWrappers::MPI::Vector instead.
-   *
-   * @ingroup TrilinosWrappers
-   * @ingroup Vectors
-   * @author Martin Kronbichler, 2008
-   */
-  class Vector : public VectorBase
-  {
-  public:
-    /**
-     * Declare type for container size.
-     */
-    typedef dealii::types::global_dof_index size_type;
-
-    /**
-     * Reinit function that resizes the vector to the size specified by
-     * <tt>n</tt>. The flag <tt>omit_zeroing_entries</tt> specifies whether
-     * the vector entries should be initialized to zero (false). If it is set
-     * to <tt>true</tt>, the vector entries are in an unspecified state and
-     * the user has to set all elements. In the current implementation, this
-     * method still sets the entries to zero, but this might change between
-     * releases without notification.
-     */
-    void reinit (const size_type n,
-                 const bool      omit_zeroing_entries = false);
-
-    /**
-     * Initialization with an Epetra_Map. Similar to the call in the other
-     * class MPI::Vector, with the difference that now a copy on all processes
-     * is generated. This initialization function is appropriate when the data
-     * in the localized vector should be imported from a distributed vector
-     * that has been initialized with the same communicator. The variable
-     * <tt>omit_zeroing_entries</tt> determines whether the vector should be
-     * filled with zero (false). If it is set to <tt>true</tt>, the vector
-     * entries are in an unspecified state and the user has to set all
-     * elements. In the current implementation, this method still sets the
-     * entries to zero, but this might change between releases without
-     * notification.
-     *
-     * Which element of the @p input_map argument are set is in fact ignored,
-     * the only thing that matters is the size of the index space described by
-     * this argument.
-     */
-    void reinit (const Epetra_Map &input_map,
-                 const bool        omit_zeroing_entries = false);
-
-    /**
-     * Initialization with an IndexSet. Similar to the call in the other class
-     * MPI::Vector, with the difference that now a copy on all processes is
-     * generated. This initialization function is appropriate in case the data
-     * in the localized vector should be imported from a distributed vector
-     * that has been initialized with the same communicator. The variable
-     * <tt>omit_zeroing_entries</tt> determines whether the vector should be
-     * filled with zero (false). If it is set to <tt>true</tt>, the vector
-     * entries are in an unspecified state and the user has to set all
-     * elements. In the current implementation, this method still sets the
-     * entries to zero, but this might change between releases without
-     * notification.
-     *
-     * Which element of the @p input_map argument are set is in fact ignored,
-     * the only thing that matters is the size of the index space described by
-     * this argument.
-     */
-    void reinit (const IndexSet   &input_map,
-                 const MPI_Comm   &communicator = MPI_COMM_WORLD,
-                 const bool        omit_zeroing_entries = false);
-
-    /**
-     * Reinit function. Takes the information of a Vector and copies
-     * everything to the calling vector, now also allowing different maps.
-     *
-     * If the optional flag <tt>omit_zeroing_entries</tt> is not
-     * <tt>true</tt>, the elements in the vector are initialized with zero. If
-     * it is set to <tt>true</tt>, the vector entries are in an unspecified
-     * state and the user has to set all elements. In the current
-     * implementation, this method does not touch the vector entries in case
-     * the vector layout is unchanged from before, otherwise entries are set
-     * to zero.  Note that this behavior might change between releases without
-     * notification.
-     */
-    void reinit (const VectorBase &V,
-                 const bool        omit_zeroing_entries = false,
-                 const bool        allow_different_maps = false);
-
-    /**
-     * Set all components of the vector to the given number @p s. Simply pass
-     * this down to the base class, but we still need to declare this function
-     * to make the example given in the discussion about making the
-     * constructor explicit work.
-     */
-    Vector &operator= (const TrilinosScalar s);
-
-    /**
-     * Set the left hand argument to the (parallel) Trilinos Vector.
-     * Equivalent to the @p reinit function.
-     */
-    Vector &operator= (const MPI::Vector &v);
-
-    /**
-     * Set the left hand argument to the deal.II vector.
-     */
-    template <typename Number>
-    Vector &operator= (const ::dealii::Vector<Number> &v);
-
-    /**
-     * Copy operator. Copies both the dimension and the content in the right
-     * hand argument.
-     */
-    Vector &operator= (const Vector &v);
-
-    /**
-     * This function does nothing but is there for compatibility with the @p
-     * PETScWrappers::Vector class.
-     *
-     * For the PETSc vector wrapper class, this function updates the ghost
-     * values of the PETSc vector. This is necessary after any modification
-     * before reading ghost values.
-     *
-     * However, for the implementation of this class, it is immaterial and
-     * thus an empty function.
-     */
-    void update_ghost_values () const;
-  };
-
-
-// ------------------- inline and template functions --------------
-
-
-  /**
-   * Global function @p swap which overloads the default implementation of the
-   * C++ standard library which uses a temporary object. The function simply
-   * exchanges the data of the two vectors.
-   *
-   * @relates TrilinosWrappers::Vector
-   * @author Martin Kronbichler, Wolfgang Bangerth, 2008
-   */
-  inline
-  void swap (Vector &u, Vector &v)
-  {
-    u.swap (v);
-  }
-
-
-#ifndef DOXYGEN
-
-  inline
-  Vector &
-  Vector::operator= (const TrilinosScalar s)
-  {
-    VectorBase::operator= (s);
-
-    return *this;
-  }
-
-
-
-  template <typename Number>
-  Vector &
-  Vector::operator= (const ::dealii::Vector<Number> &v)
-  {
-    if (size() != v.size())
-      {
-        vector.reset();
-
-        Epetra_LocalMap map ((TrilinosWrappers::types::int_type)v.size(), 0,
-                             Utilities::Trilinos::comm_self());
-        vector.reset (new Epetra_FEVector(map));
-        owned_elements = v.locally_owned_elements();
-      }
-
-    const Epetra_Map &map = vector_partitioner();
-    const TrilinosWrappers::types::int_type size = map.NumMyElements();
-
-    Assert (map.MaxLID() == size-1,
-            ExcDimensionMismatch(map.MaxLID(), size-1));
-
-    // Need to copy out values, since the
-    // deal.II might not use doubles, so
-    // that a direct access is not possible.
-    for (TrilinosWrappers::types::int_type i=0; i<size; ++i)
-      (*vector)[0][i] = v(i);
-
-    return *this;
-  }
-
-
-
-  inline
-  void
-  Vector::update_ghost_values () const
-  {}
-
-
-#endif
-
-} /* namespace TrilinosWrappers */
+} /* end of namespace TrilinosWrappers */
 
 /*@}*/
 
@@ -837,16 +632,16 @@ namespace internal
 
     /**
      * A helper class used internally in linear_operator.h. Specialization for
-     * TrilinosWrappers::Vector.
+     * TrilinosWrappers::VectorBase.
      */
     template<>
-    class ReinitHelper<TrilinosWrappers::Vector>
+    class ReinitHelper<TrilinosWrappers::VectorBase>
     {
     public:
       template <typename Matrix>
       static
       void reinit_range_vector (const Matrix &matrix,
-                                TrilinosWrappers::Vector &v,
+                                TrilinosWrappers::VectorBase &v,
                                 bool omit_zeroing_entries)
       {
         v.reinit(matrix.locally_owned_range_indices(),
@@ -857,7 +652,7 @@ namespace internal
       template <typename Matrix>
       static
       void reinit_domain_vector(const Matrix &matrix,
-                                TrilinosWrappers::Vector &v,
+                                TrilinosWrappers::VectorBase &v,
                                 bool omit_zeroing_entries)
       {
         v.reinit(matrix.locally_owned_domain_indices(),
@@ -871,12 +666,12 @@ namespace internal
 
 
 /**
- * Declare dealii::TrilinosWrappers::Vector as serial vector.
+ * Declare dealii::TrilinosWrappers::VectorBase as serial vector.
  *
  * @author Uwe Koecher, 2017
  */
 template <>
-struct is_serial_vector< TrilinosWrappers::Vector > : std::true_type
+struct is_serial_vector< TrilinosWrappers::VectorBase > : std::true_type
 {
 };
 

@@ -88,10 +88,10 @@ int main(int argc, char **argv)
     A.reinit(csp);
     testproblem.five_point(A);
 
-    TrilinosWrappers::Vector f;
-    f.reinit(dim);
-    TrilinosWrappers::Vector u;
-    u.reinit(dim);
+    TrilinosWrappers::MPI::Vector f;
+    f.reinit(complete_index_set(dim),MPI_COMM_WORLD);
+    TrilinosWrappers::MPI::Vector u;
+    u.reinit(complete_index_set(dim),MPI_COMM_WORLD);
     f = 1.;
     A.compress (VectorOperation::insert);
     f.compress (VectorOperation::insert);

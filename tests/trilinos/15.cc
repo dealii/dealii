@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::operator() in set/add-mode alternatingly, but
+// check TrilinosWrappers::MPI::Vector::operator() in set/add-mode alternatingly, but
 // writing to the same elements
 //
 // this test doesn't really make sense any more -- at least one a
@@ -42,7 +42,7 @@
 #include <vector>
 
 
-void test (TrilinosWrappers::Vector &v)
+void test (TrilinosWrappers::MPI::Vector &v)
 {
   // set only certain elements of the
   // vector. have a bit pattern of where we
@@ -82,8 +82,8 @@ int main (int argc,char **argv)
   try
     {
       {
-        TrilinosWrappers::Vector v;
-        v.reinit(100);
+        TrilinosWrappers::MPI::Vector v;
+        v.reinit(complete_index_set(100), MPI_COMM_WORLD);
         test (v);
       }
     }

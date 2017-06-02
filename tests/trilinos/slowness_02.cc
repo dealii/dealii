@@ -69,10 +69,10 @@ void test ()
   // then do a single matrix-vector
   // multiplication with subsequent formation
   // of the matrix norm
-  TrilinosWrappers::Vector v1;
-  v1.reinit(N*N);
-  TrilinosWrappers::Vector v2;
-  v2.reinit(N*N);
+  TrilinosWrappers::MPI::Vector v1;
+  v1.reinit(complete_index_set(N*N), MPI_COMM_WORLD);
+  TrilinosWrappers::MPI::Vector v2;
+  v2.reinit(complete_index_set(N*N), MPI_COMM_WORLD);
   for (unsigned int i=0; i<N*N; ++i)
     v1(i) = i;
   matrix.vmult (v2, v1);

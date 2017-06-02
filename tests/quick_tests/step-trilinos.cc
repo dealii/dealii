@@ -61,7 +61,7 @@ private:
   DoFHandler<2>    dof_handler;
 
   TrilinosWrappers::SparseMatrix A;
-  TrilinosWrappers::Vector       b, x;
+  TrilinosWrappers::MPI::Vector  b, x;
   ConstraintMatrix            constraints;
 
   TableHandler output_table;
@@ -159,7 +159,7 @@ void LaplaceProblem::solve ()
   preconditioner.initialize (A);
   cg_solver.solve (A, x, b, preconditioner);
 
-  TrilinosWrappers::Vector res(x);
+  TrilinosWrappers::MPI::Vector res(x);
   A.residual(res,x,b);
   AssertThrow(res.l2_norm()<1e-3,
               ExcInternalError());

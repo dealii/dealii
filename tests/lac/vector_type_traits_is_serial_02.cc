@@ -19,34 +19,24 @@
 
 #include "../tests.h"
 #include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <fstream>
 #include <iomanip>
 
 void test ()
 {
-  // make sure that is_serial_vector< dealii::TrilinosWrappers::Vector > is working
-  Assert (is_serial_vector< dealii::TrilinosWrappers::Vector >::value == true,
-          ExcInternalError());
-
+  // make sure that is_serial_vector< dealii::TrilinosWrappers::MPI::Vector > is working
   Assert (is_serial_vector< dealii::TrilinosWrappers::MPI::Vector >::value == false,
           ExcInternalError());
-
-  deallog << is_serial_vector< dealii::TrilinosWrappers::Vector >::value << std::endl;
 
   deallog << is_serial_vector< dealii::TrilinosWrappers::MPI::Vector >::value << std::endl;
 
   deallog << "OK" << std::endl << std::endl;
 
 
-  // make sure that dealii::TrilinosWrappers::BlockVector > is working
-  Assert (is_serial_vector< dealii::TrilinosWrappers::BlockVector >::value == true,
-          ExcInternalError());
-
+  // make sure that dealii::TrilinosWrappers::MPI::BlockVector > is working
   Assert (is_serial_vector< dealii::TrilinosWrappers::MPI::BlockVector >::value == false,
           ExcInternalError());
-
-  deallog << is_serial_vector< dealii::TrilinosWrappers::BlockVector >::value << std::endl;
 
   deallog << is_serial_vector< dealii::TrilinosWrappers::MPI::BlockVector >::value << std::endl;
 

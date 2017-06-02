@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::operator = (TrilinosScalar) with setting to a
+// check TrilinosWrappers::MPI::Vector::operator = (TrilinosScalar) with setting to a
 // nonzero value
 
 #include "../tests.h"
@@ -26,7 +26,7 @@
 #include <vector>
 
 
-void test (TrilinosWrappers::Vector &v)
+void test (TrilinosWrappers::MPI::Vector &v)
 {
   // set some entries of the vector
   for (unsigned int i=0; i<v.size(); ++i)
@@ -56,8 +56,8 @@ int main (int argc,char **argv)
   try
     {
       {
-        TrilinosWrappers::Vector v;
-        v.reinit(100);
+        TrilinosWrappers::MPI::Vector v;
+        v.reinit(complete_index_set(100), MPI_COMM_WORLD);
         test (v);
       }
     }

@@ -62,6 +62,10 @@ namespace TrilinosWrappers
 {
   // forward declaration
   class VectorBase;
+  namespace MPI
+  {
+    class Vector;
+  }
 
   /**
    * @cond internal
@@ -189,15 +193,14 @@ namespace TrilinosWrappers
 
 
   /**
-   * Base class for the two types of Trilinos vectors, the distributed memory
-   * vector MPI::Vector and a localized vector Vector. The latter is designed
-   * for use in either serial implementations or as a localized copy on each
-   * processor.  The implementation of this class is based on the Trilinos
-   * vector class Epetra_FEVector, the (parallel) partitioning of which is
-   * governed by an Epetra_Map. This means that the vector type is generic and
-   * can be done in this base class, while the definition of the partition map
-   * (and hence, the constructor and reinit function) will have to be done in
-   * the derived classes. The Epetra_FEVector is precisely the kind of vector
+   * Base class for the the distributed memory vector MPI::Vector that is
+   * designed for use in either serial implementations or as a localized copy
+   * on each processor.  The implementation of this class is based on the
+   * Trilinos vector class Epetra_FEVector, the (parallel) partitioning of which
+   * is governed by an Epetra_Map. This means that the vector type is generic
+   * and can be done in this base class, while the definition of the partition
+   * map (and hence, the constructor and reinit function) will have to be done
+   * in the derived classes. The Epetra_FEVector is precisely the kind of vector
    * we deal with all the time - we probably get it from some assembly
    * process, where also entries not locally owned might need to written and
    * hence need to be forwarded to the owner. The only requirement for this

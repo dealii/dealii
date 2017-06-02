@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::operator() in set/add-mode
+// check TrilinosWrappers::MPI::Vector::operator() in set/add-mode
 // alternatingly. this test doesn't really make sense any more -- at
 // least one a single processor. on multiple processors, one has to
 // call compress() and it used to be that we had code that called
@@ -40,7 +40,7 @@
 #include <vector>
 
 
-void test (TrilinosWrappers::Vector &v)
+void test (TrilinosWrappers::MPI::Vector &v)
 {
   // set only certain elements of the
   // vector. have a bit pattern of where we
@@ -83,8 +83,8 @@ int main (int argc,char **argv)
   try
     {
       {
-        TrilinosWrappers::Vector v;
-        v.reinit(100);
+        TrilinosWrappers::MPI::Vector v;
+        v.reinit(complete_index_set(100), MPI_COMM_WORLD);
         test (v);
       }
     }

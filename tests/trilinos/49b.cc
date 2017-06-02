@@ -22,7 +22,7 @@
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
-#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/block_vector.h>
 #include <fstream>
 #include <iostream>
@@ -48,10 +48,7 @@ void test (TrilinosWrappers::MPI::BlockVector &v)
     }
 
   // now also check the reverse assignment
-  w = 0;
-  TrilinosWrappers::BlockVector v_serial;
-  v_serial.reinit(v);
-  w = v_serial;
+  w = v;
   for (unsigned int i=0; i<v.size(); ++i)
     {
       AssertThrow (w(i) == i, ExcInternalError());

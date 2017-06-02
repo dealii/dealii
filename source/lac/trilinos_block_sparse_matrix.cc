@@ -300,40 +300,12 @@ namespace TrilinosWrappers
 
   // TODO: In the following we
   // use the same code as just
-  // above six more times. Use
+  // above three more times. Use
   // templates.
-  TrilinosScalar
-  BlockSparseMatrix::residual (BlockVector       &dst,
-                               const BlockVector &x,
-                               const BlockVector &b) const
-  {
-    vmult (dst, x);
-    dst -= b;
-    dst *= -1.;
-
-    return dst.l2_norm();
-  }
-
-
-
   TrilinosScalar
   BlockSparseMatrix::residual (MPI::BlockVector       &dst,
                                const MPI::Vector      &x,
                                const MPI::BlockVector &b) const
-  {
-    vmult (dst, x);
-    dst -= b;
-    dst *= -1.;
-
-    return dst.l2_norm();
-  }
-
-
-
-  TrilinosScalar
-  BlockSparseMatrix::residual (BlockVector       &dst,
-                               const Vector      &x,
-                               const BlockVector &b) const
   {
     vmult (dst, x);
     dst -= b;
@@ -359,23 +331,9 @@ namespace TrilinosWrappers
 
 
   TrilinosScalar
-  BlockSparseMatrix::residual (Vector            &dst,
-                               const BlockVector &x,
-                               const Vector      &b) const
-  {
-    vmult (dst, x);
-    dst -= b;
-    dst *= -1.;
-
-    return dst.l2_norm();
-  }
-
-
-
-  TrilinosScalar
-  BlockSparseMatrix::residual (VectorBase       &dst,
-                               const VectorBase &x,
-                               const VectorBase &b) const
+  BlockSparseMatrix::residual (MPI::Vector       &dst,
+                               const MPI::Vector &x,
+                               const MPI::Vector &b) const
   {
     vmult (dst, x);
     dst -= b;

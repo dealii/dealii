@@ -20,7 +20,7 @@
 
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 #include <deal.II/lac/trilinos_block_sparse_matrix.h>
-#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_precondition.h>
@@ -95,7 +95,7 @@ int main(int argc,char **argv)
        */
 
       const unsigned int rc=1;
-      typedef TrilinosWrappers::Vector VectorType;
+      typedef TrilinosWrappers::MPI::Vector VectorType;
 
       TrilinosWrappers::SparseMatrix A (rc,rc,rc);
       TrilinosWrappers::SparseMatrix B (rc,rc,rc);
@@ -103,9 +103,9 @@ int main(int argc,char **argv)
       TrilinosWrappers::SparseMatrix D (rc,rc,rc);
 
       VectorType y;
-      y.reinit(rc);
+      y.reinit(complete_index_set(rc));
       VectorType g;
-      g.reinit(rc);
+      g.reinit(complete_index_set(rc));
       for (unsigned int i=0; i < rc; ++i)
         {
           A.set(i,i, 1.0*(i+1));

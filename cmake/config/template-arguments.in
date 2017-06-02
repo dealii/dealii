@@ -44,12 +44,10 @@ SERIAL_VECTORS := { Vector<double>;
                     LinearAlgebra::distributed::BlockVector<double>;
                     LinearAlgebra::distributed::BlockVector<float> ;
 
-                    @DEAL_II_EXPAND_TRILINOS_VECTOR@;
                     @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
                     @DEAL_II_EXPAND_EPETRA_VECTOR@;
                     @DEAL_II_EXPAND_PETSC_MPI_VECTOR@;
 
-                    @DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR@;
                     @DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR@;
                     @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR@;
                   }
@@ -70,12 +68,10 @@ REAL_SERIAL_VECTORS := { Vector<double>;
                          LinearAlgebra::distributed::BlockVector<double>;
                          LinearAlgebra::distributed::BlockVector<float> ;
 
-                         @DEAL_II_EXPAND_TRILINOS_VECTOR@;
                          @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
                          @DEAL_II_EXPAND_EPETRA_VECTOR@;
                          @DEAL_II_EXPAND_PETSC_MPI_VECTOR_REAL@;
 
-                         @DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR@;
                          @DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR@;
                          @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR_REAL@;
                        }
@@ -90,16 +86,10 @@ REAL_NONBLOCK_VECTORS := { Vector<double>;
                            LinearAlgebra::distributed::Vector<double>;
                            LinearAlgebra::distributed::Vector<float> ;
 
-                           @DEAL_II_EXPAND_TRILINOS_VECTOR@;
                            @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
                            @DEAL_II_EXPAND_EPETRA_VECTOR@;
                            @DEAL_II_EXPAND_PETSC_MPI_VECTOR_REAL@;
                          }
-
-// wrappers for non-MPI vectors (PETSc/Trilinos)
-EXTERNAL_SEQUENTIAL_VECTORS := { @DEAL_II_EXPAND_TRILINOS_VECTOR@;
-                                 @DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR@;
-                               }
 
 // wrappers for MPI vectors (PETSc/Trilinos)
 EXTERNAL_PARALLEL_VECTORS := { @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
@@ -121,7 +111,6 @@ VECTORS_WITH_MATRIX := { Vector<double>;
 
                          LinearAlgebra::distributed::Vector<double>;
 
-                         @DEAL_II_EXPAND_TRILINOS_VECTOR@;
                          @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
                          @DEAL_II_EXPAND_EPETRA_VECTOR@;
                        }

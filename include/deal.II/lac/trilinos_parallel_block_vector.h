@@ -31,7 +31,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declaration
-template <typename Number> class BlockVector;
+template <typename Number> class BlockVectorBase;
 
 /*! @addtogroup TrilinosWrappers
  *@{
@@ -44,7 +44,6 @@ namespace TrilinosWrappers
   {
     class BlockVector;
   }
-  class BlockVector;
   class BlockSparseMatrix;
 
 
@@ -68,13 +67,13 @@ namespace TrilinosWrappers
      * @ref GlossBlockLA "Block (linear algebra)"
      * @author Martin Kronbichler, Wolfgang Bangerth, 2008, 2009
      */
-    class BlockVector : public BlockVectorBase<Vector>
+    class BlockVector : public dealii::BlockVectorBase<MPI::Vector>
     {
     public:
       /**
        * Typedef the base class for simpler access to its own typedefs.
        */
-      typedef BlockVectorBase<Vector> BaseClass;
+      typedef dealii::BlockVectorBase<MPI::Vector> BaseClass;
 
       /**
        * Typedef the type of the underlying vector.
@@ -157,12 +156,6 @@ namespace TrilinosWrappers
        * @p v by efficiently swapping the internal data structures.
        */
       BlockVector &operator= (BlockVector &&v);
-
-      /**
-       * Copy operator for arguments of the localized Trilinos vector type.
-       */
-      BlockVector &
-      operator= (const ::dealii::TrilinosWrappers::BlockVector &v);
 
       /**
        * Another copy function. This one takes a deal.II block vector and
@@ -338,7 +331,7 @@ namespace TrilinosWrappers
     inline
     BlockVector::BlockVector (const BlockVector &v)
       :
-      BlockVectorBase<Vector > ()
+      dealii::BlockVectorBase<MPI::Vector> ()
     {
       this->components.resize (v.n_blocks());
       this->block_indices = v.block_indices;
@@ -466,6 +459,16 @@ namespace internal
   } /* namespace LinearOperator */
 } /* namespace internal */
 
+
+/**
+ * Declare dealii::TrilinosWrappers::MPI::BlockVector as distributed vector.
+ *
+ * @author Uwe Koecher, 2017
+ */
+template <>
+struct is_serial_vector< TrilinosWrappers::MPI::BlockVector > : std::false_type
+{
+};
 
 DEAL_II_NAMESPACE_CLOSE
 

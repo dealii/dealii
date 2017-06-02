@@ -15,7 +15,7 @@
 
 
 
-// check TrilinosWrappers::Vector::all_zero
+// check TrilinosWrappers::MPI::Vector::all_zero
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
@@ -25,7 +25,7 @@
 #include <vector>
 
 
-void test (TrilinosWrappers::Vector &v)
+void test (TrilinosWrappers::MPI::Vector &v)
 {
   // set some elements of the vector
   double sum = 0;
@@ -59,8 +59,8 @@ int main (int argc,char **argv)
   try
     {
       {
-        TrilinosWrappers::Vector v;
-        v.reinit(100);
+        TrilinosWrappers::MPI::Vector v;
+        v.reinit(complete_index_set(100), MPI_COMM_WORLD);
         test (v);
       }
     }
