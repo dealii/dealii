@@ -36,7 +36,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
             Vector<float>           &,
             const ComponentMask &,
             const Function<deal_II_space_dimension>     *,
-            const unsigned int       ,
+            const unsigned int,
             const types::subdomain_id,
             const types::material_id,
             const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);
@@ -52,7 +52,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
         Vector<float>           &,
         const ComponentMask &,
         const Function<deal_II_space_dimension>     *,
-        const unsigned int       ,
+        const unsigned int,
         const types::subdomain_id,
         const types::material_id,
         const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);
@@ -68,7 +68,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
             std::vector<Vector<float> *>         &,
             const ComponentMask &,
             const Function<deal_II_space_dimension>     *,
-            const unsigned int       ,
+            const unsigned int,
             const types::subdomain_id,
             const types::material_id,
             const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);
@@ -84,7 +84,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
         std::vector<Vector<float> *>         &,
         const ComponentMask &,
         const Function<deal_II_space_dimension>     *,
-        const unsigned int       ,
+        const unsigned int,
         const types::subdomain_id,
         const types::material_id,
         const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);
@@ -100,7 +100,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
             Vector<float>           &,
             const ComponentMask &,
             const Function<deal_II_space_dimension>     *,
-            const unsigned int       ,
+            const unsigned int,
             const types::subdomain_id,
             const types::material_id,
             const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);
@@ -116,7 +116,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
         Vector<float>           &,
         const ComponentMask &,
         const Function<deal_II_space_dimension>     *,
-        const unsigned int       ,
+        const unsigned int,
         const types::subdomain_id,
         const types::material_id,
         const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);
@@ -132,7 +132,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
             std::vector<Vector<float> *>         &,
             const ComponentMask &,
             const Function<deal_II_space_dimension>     *,
-            const unsigned int       ,
+            const unsigned int,
             const types::subdomain_id,
             const types::material_id,
             const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);
@@ -148,7 +148,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
         std::vector<Vector<float> *>         &,
         const ComponentMask &,
         const Function<deal_II_space_dimension>     *,
-        const unsigned int       ,
+        const unsigned int,
         const types::subdomain_id,
         const types::material_id,
         const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);

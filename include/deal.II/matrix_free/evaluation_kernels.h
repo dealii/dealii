@@ -584,7 +584,7 @@ namespace internal
               VectorizedArray<Number> *gradients_quad[][dim],
               VectorizedArray<Number> *hessians_quad[][(dim*(dim+1))/2],
               VectorizedArray<Number> *,
-              const bool               ,
+              const bool,
               const bool               evaluate_gradients,
               const bool               evaluate_hessians)
   {

@@ -3450,7 +3450,7 @@ private:
    * Collection of manifold objects. We store only objects, which are not of
    * type FlatManifold.
    */
-  std::map<types::manifold_id, SmartPointer<const Manifold<dim,spacedim> , Triangulation<dim, spacedim> > >  manifold;
+  std::map<types::manifold_id, SmartPointer<const Manifold<dim,spacedim>, Triangulation<dim, spacedim> > >  manifold;
 
 
   /**

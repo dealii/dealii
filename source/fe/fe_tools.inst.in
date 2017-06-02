@@ -97,7 +97,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 
     template
     void compute_block_renumbering (
-        const FiniteElement<deal_II_dimension,deal_II_space_dimension> & ,
+        const FiniteElement<deal_II_dimension,deal_II_space_dimension> &,
         std::vector<types::global_dof_index> &, std::vector<types::global_dof_index> &, bool);
 
     template
@@ -148,7 +148,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 
     template
     void compute_component_wise(
-        const FiniteElement<deal_II_dimension> & ,
+        const FiniteElement<deal_II_dimension> &,
         std::vector<unsigned int> &, std::vector<std::vector<unsigned int> > &);
 
     template
@@ -222,7 +222,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     compute_projection_from_face_quadrature_points_matrix (const FiniteElement<deal_II_dimension> &,
             const Quadrature<deal_II_dimension-1>    &,
             const Quadrature<deal_II_dimension-1>    &,
-            const DoFHandler<deal_II_dimension>::active_cell_iterator & ,
+            const DoFHandler<deal_II_dimension>::active_cell_iterator &,
             unsigned int,
             FullMatrix<double> &);
 #endif

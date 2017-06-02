@@ -208,7 +208,7 @@ namespace Step22
     triangulation (mpi_communicator/*,
                    Triangulation<dim>::maximum_smoothing*/),
     fe (FE_Q<dim>(degree+1), dim,
-        FE_Q<dim>(degree)  , 1),
+        FE_Q<dim>(degree), 1),
     dof_handler (triangulation),
     pcout (Utilities::MPI::this_mpi_process(mpi_communicator)
            == 0

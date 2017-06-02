@@ -86,7 +86,7 @@ namespace Step47
     bool interface_intersects_cell (const typename Triangulation<dim>::cell_iterator &cell) const;
     std::pair<unsigned int, Quadrature<dim> > compute_quadrature(const Quadrature<dim> &plain_quadrature, const typename hp::DoFHandler<dim>::active_cell_iterator &cell, const std::vector<double> &level_set_values);
     void append_quadrature(const Quadrature<dim> &plain_quadrature,
-                           const std::vector<Point<dim> > &v      ,
+                           const std::vector<Point<dim> > &v,
                            std::vector<Point<dim> > &xfem_points,
                            std::vector<double>      &xfem_weights);
 

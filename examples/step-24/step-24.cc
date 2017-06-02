@@ -518,7 +518,7 @@ namespace Step24
         G2.add (wave_speed, tmp);
 
         system_rhs_p = G1;
-        system_rhs_p.add(time_step * theta , G2);
+        system_rhs_p.add(time_step * theta, G2);
 
         solve_p ();
 

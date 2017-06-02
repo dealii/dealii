@@ -1660,7 +1660,7 @@ transform (const ArrayView<const Tensor<1,dim> >                  &input,
 template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
-transform (const ArrayView<const DerivativeForm<1, dim ,spacedim> > &input,
+transform (const ArrayView<const DerivativeForm<1, dim, spacedim> > &input,
            const MappingType                                         mapping_type,
            const typename Mapping<dim,spacedim>::InternalDataBase   &mapping_data,
            const ArrayView<Tensor<2,spacedim> >                     &output) const
@@ -1676,7 +1676,7 @@ template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 transform (const ArrayView<const Tensor<2, dim> >                 &input,
-           const MappingType                                       ,
+           const MappingType,
            const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
            const ArrayView<Tensor<2,spacedim> >                   &output) const
 {

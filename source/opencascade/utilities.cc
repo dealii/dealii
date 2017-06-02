@@ -337,7 +337,7 @@ namespace OpenCASCADE
     gp_Pnt PIn(0.0,0.0,0.0);
     gp_Pnt PFin(0.0,0.0,0.0);
     gp_Pnt PMid(0.0,0.0,0.0);
-    TopExp_Explorer edgeExplorer(edges , TopAbs_EDGE);
+    TopExp_Explorer edgeExplorer(edges, TopAbs_EDGE);
     TopoDS_Edge edge;
     while (edgeExplorer.More())
       {

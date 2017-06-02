@@ -194,7 +194,7 @@ FE_P1NC::get_subface_data (const UpdateFlags update_flags,
 
 void
 FE_P1NC::fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell,
-                         const CellSimilarity::Similarity                   ,
+                         const CellSimilarity::Similarity,
                          const Quadrature<2> &,
                          const Mapping<2,2> &,
                          const Mapping<2,2>::InternalDataBase &,

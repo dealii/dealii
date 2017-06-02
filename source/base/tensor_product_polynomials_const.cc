@@ -45,7 +45,7 @@ TensorProductPolynomialsConst<dim>::compute_value (const unsigned int i,
 
 template <>
 double
-TensorProductPolynomialsConst<0>::compute_value (const unsigned int ,
+TensorProductPolynomialsConst<0>::compute_value (const unsigned int,
                                                  const Point<0> &) const
 {
   Assert (false, ExcNotImplemented());

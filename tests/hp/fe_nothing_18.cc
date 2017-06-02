@@ -329,8 +329,8 @@ void ElasticProblem<dim>::setup_system ()
   BlockDynamicSparsityPattern dynamic_sparsity_pattern(n_blocks,
                                                        n_blocks);
 
-  dynamic_sparsity_pattern.block(u_block     ,u_block     ).reinit(dofs_per_block[u_block]     ,dofs_per_block[u_block]);
-  dynamic_sparsity_pattern.block(u_block     ,lambda_block).reinit(dofs_per_block[u_block]     ,dofs_per_block[lambda_block]);
+  dynamic_sparsity_pattern.block(u_block,u_block     ).reinit(dofs_per_block[u_block],dofs_per_block[u_block]);
+  dynamic_sparsity_pattern.block(u_block,lambda_block).reinit(dofs_per_block[u_block],dofs_per_block[lambda_block]);
   dynamic_sparsity_pattern.block(lambda_block,u_block     ).reinit(dofs_per_block[lambda_block],dofs_per_block[u_block]);
   dynamic_sparsity_pattern.block(lambda_block,lambda_block).reinit(dofs_per_block[lambda_block],dofs_per_block[lambda_block]);
 

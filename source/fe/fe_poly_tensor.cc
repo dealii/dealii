@@ -41,7 +41,7 @@ namespace
    */
   void
   get_face_sign_change_rt (const Triangulation<1>::cell_iterator &,
-                           const unsigned int                     ,
+                           const unsigned int,
                            std::vector<double>                   &face_sign)
   {
     // nothing to do in 1d

@@ -867,7 +867,7 @@ namespace internal
       static
       unsigned int
       n_active_fe_indices (const dealii::hp::DoFHandler<2,spacedim> &dof_handler,
-                           const unsigned int ,
+                           const unsigned int,
                            const unsigned int obj_index,
                            const dealii::internal::int2type<1> &)
       {
@@ -1017,7 +1017,7 @@ namespace internal
       static
       unsigned int
       n_active_fe_indices (const dealii::hp::DoFHandler<3,spacedim> &dof_handler,
-                           const unsigned int ,
+                           const unsigned int,
                            const unsigned int obj_index,
                            const dealii::internal::int2type<2> &)
       {
@@ -2302,8 +2302,8 @@ template <template <int, int> class DoFHandlerType, int spacedim, bool level_dof
 inline
 DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::
 DoFAccessor (const Triangulation<1,spacedim> *,
-             const int                 ,
-             const int                 ,
+             const int,
+             const int,
              const DoFHandlerType<1,spacedim> *)
   :
   dof_handler(nullptr)

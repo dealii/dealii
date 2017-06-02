@@ -2732,8 +2732,8 @@ namespace VectorTools
     bool real_part_bigger_than(const std::complex<number1> a,
                                const std::complex<number2> &b)
     {
-      Assert(std::abs(a.imag()) <= 1e-15*std::abs(a) , ExcInternalError());
-      Assert(std::abs(b.imag()) <= 1e-15*std::abs(b) , ExcInternalError());
+      Assert(std::abs(a.imag()) <= 1e-15*std::abs(a), ExcInternalError());
+      Assert(std::abs(b.imag()) <= 1e-15*std::abs(b), ExcInternalError());
       return a.real() > b.real();
     }
 
@@ -5717,7 +5717,7 @@ namespace VectorTools
                   fe_values.reinit (cell, face + cell->active_fe_index ()
                                     * GeometryInfo<dim>::faces_per_cell);
 
-                  const std::vector<DerivativeForm<1,dim ,spacedim> > &
+                  const std::vector<DerivativeForm<1,dim,spacedim> > &
                   jacobians = fe_values.get_present_fe_values ().get_jacobians ();
 
                   fe_face_values.reinit (cell, face);

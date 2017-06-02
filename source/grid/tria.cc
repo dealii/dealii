@@ -9325,7 +9325,7 @@ copy_triangulation (const Triangulation<dim, spacedim> &other_tria)
     faces.reset (new internal::Triangulation::TriaFaces<dim>(*other_tria.faces));
 
   typename std::map<types::manifold_id,
-           SmartPointer<const Manifold<dim,spacedim> , Triangulation<dim, spacedim> > >::const_iterator
+           SmartPointer<const Manifold<dim,spacedim>, Triangulation<dim, spacedim> > >::const_iterator
            bdry_iterator = other_tria.manifold.begin();
   for (; bdry_iterator != other_tria.manifold.end() ; ++bdry_iterator)
     manifold[bdry_iterator->first] = bdry_iterator->second;
@@ -9474,10 +9474,10 @@ create_triangulation (const std::vector<Point<spacedim> >    &v,
         }
         case 2:
         {
-          bool values [][4]= {{false,true ,true , false},
-            {true ,false,false, true },
-            {true ,false,false, true },
-            {false,true ,true , false}
+          bool values [][4]= {{false,true,true, false},
+            {true,false,false, true },
+            {true,false,false, true },
+            {false,true,true, false}
           };
           for (unsigned int i=0; i< GeometryInfo< dim >::faces_per_cell; ++i)
             for (unsigned int j=0; j< GeometryInfo< dim >::faces_per_cell; ++j)

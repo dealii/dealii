@@ -85,7 +85,7 @@ void test_boundary(const FEValuesBase<dim> &fev)
   const unsigned int n = fev.dofs_per_cell;
   unsigned int d=fev.get_fe().n_components();
   FullMatrix<double> M(n,n);
-  std::vector<std::vector<double> > vel(dim ,std::vector<double>(1));
+  std::vector<std::vector<double> > vel(dim,std::vector<double>(1));
   vel[0][0]=1.;
   vel[1][0]=1.;
   if (dim > 2)
@@ -143,7 +143,7 @@ void test_face(const FEValuesBase<dim> &fev1,
   FullMatrix<double> M12(n1,n2);
   FullMatrix<double> M21(n2,n1);
   FullMatrix<double> M22(n2,n2);
-  std::vector<std::vector<double> > vel(dim ,std::vector<double>(1));
+  std::vector<std::vector<double> > vel(dim,std::vector<double>(1));
   vel[0][0]=1.;
   vel[1][0]=1.;
   if (dim > 2)

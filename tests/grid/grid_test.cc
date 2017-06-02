@@ -171,7 +171,7 @@ template <int dim>
 void test (const int test_case)
 {
   char testname[100];
-  sprintf(testname, "Test%d.dim%d", test_case , dim);
+  sprintf(testname, "Test%d.dim%d", test_case, dim);
 
   deallog.push(testname);
   deallog << "Start" << std::endl;

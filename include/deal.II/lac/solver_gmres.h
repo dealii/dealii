@@ -412,7 +412,7 @@ protected:
    */
   static void
   compute_eigs_and_cond(
-    const FullMatrix<double> &H_orig ,
+    const FullMatrix<double> &H_orig,
     const unsigned int dim,
     const boost::signals2::signal<void (const std::vector<std::complex<double> > &)> &eigenvalues_signal,
     const boost::signals2::signal<void (const FullMatrix<double> &)> &hessenberg_signal,

@@ -43,8 +43,8 @@ namespace internal
 
     inline
     void compute_tensor_index(const unsigned int n,
-                              const unsigned int ,
-                              const unsigned int ,
+                              const unsigned int,
+                              const unsigned int,
                               unsigned int       (&indices)[1])
     {
       indices[0] = n;
@@ -53,7 +53,7 @@ namespace internal
     inline
     void compute_tensor_index(const unsigned int n,
                               const unsigned int n_pols_0,
-                              const unsigned int ,
+                              const unsigned int,
                               unsigned int       (&indices)[2])
     {
       indices[0] = n % n_pols_0;

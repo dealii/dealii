@@ -2224,7 +2224,7 @@ namespace TrilinosWrappers
       else Btmp = B_;
 
       // perform matrix-matrix product
-      ML_matmat_mult(A_, Btmp , &Ctmp);
+      ML_matmat_mult(A_, Btmp, &Ctmp);
 
       // release temporary structures we needed
       // for multiplication

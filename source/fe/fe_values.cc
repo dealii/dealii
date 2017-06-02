@@ -3674,7 +3674,7 @@ namespace
         static_cast<const Type *>(present_cell.get())->~Type();
 
         // then construct a new object in-place
-        new(const_cast<void *>(static_cast<const void *>(present_cell.get()))) Type(new_cell);
+        new (const_cast<void *>(static_cast<const void *>(present_cell.get()))) Type(new_cell);
       }
     else
       // if the types don't match, there is nothing we can do here

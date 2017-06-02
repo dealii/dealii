@@ -297,7 +297,7 @@ DiagonalMatrix<VectorType>::add (const size_type  row,
                                  const size_type  n_cols,
                                  const size_type *col_indices,
                                  const number2   *values,
-                                 const bool       ,
+                                 const bool,
                                  const bool       )
 {
   for (size_type i=0; i<n_cols; ++i)

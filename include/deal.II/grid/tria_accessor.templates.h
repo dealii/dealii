@@ -395,8 +395,8 @@ TriaAccessorBase<structdim,dim,spacedim>::objects() const
 template <int structdim, int dim, int spacedim>
 InvalidAccessor<structdim, dim, spacedim>::
 InvalidAccessor (const Triangulation<dim,spacedim> *,
-                 const int                 ,
-                 const int                 ,
+                 const int,
+                 const int,
                  const AccessorData *)
 {
   Assert (false,

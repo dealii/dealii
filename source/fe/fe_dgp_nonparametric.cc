@@ -281,7 +281,7 @@ template <int dim, int spacedim>
 void
 FE_DGPNonparametric<dim,spacedim>::
 fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
-                const CellSimilarity::Similarity                                     ,
+                const CellSimilarity::Similarity,
                 const Quadrature<dim> &,
                 const Mapping<dim,spacedim> &,
                 const typename Mapping<dim,spacedim>::InternalDataBase &,
@@ -327,7 +327,7 @@ template <int dim, int spacedim>
 void
 FE_DGPNonparametric<dim,spacedim>::
 fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
-                     const unsigned int                                                   ,
+                     const unsigned int,
                      const Quadrature<dim-1>                                             &,
                      const Mapping<dim,spacedim> &,
                      const typename Mapping<dim,spacedim>::InternalDataBase &,
@@ -373,8 +373,8 @@ template <int dim, int spacedim>
 void
 FE_DGPNonparametric<dim,spacedim>::
 fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
-                        const unsigned int                                                   ,
-                        const unsigned int                                                   ,
+                        const unsigned int,
+                        const unsigned int,
                         const Quadrature<dim-1>                                             &,
                         const Mapping<dim,spacedim> &,
                         const typename Mapping<dim,spacedim>::InternalDataBase &,
@@ -450,7 +450,7 @@ template <int dim, int spacedim>
 void
 FE_DGPNonparametric<dim,spacedim>::
 get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
-                                  const unsigned int ,
+                                  const unsigned int,
                                   FullMatrix<double>           &interpolation_matrix) const
 {
   // this is only implemented, if the source
