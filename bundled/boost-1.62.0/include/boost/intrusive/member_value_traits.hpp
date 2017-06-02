@@ -18,6 +18,7 @@
 
 #include <boost/intrusive/link_mode.hpp>
 #include <boost/intrusive/detail/parent_from_member.hpp>
+#include <boost/intrusive/detail/to_raw_pointer.hpp>
 #include <boost/intrusive/pointer_traits.hpp>
 
 #if defined(BOOST_HAS_PRAGMA_ONCE)

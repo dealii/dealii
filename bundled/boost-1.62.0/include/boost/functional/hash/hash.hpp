@@ -171,7 +171,7 @@ namespace boost
              const int size_t_bits = std::numeric_limits<std::size_t>::digits;
              // ceiling(std::numeric_limits<T>::digits / size_t_bits) - 1
              const int length = (std::numeric_limits<T>::digits - 1)
-                 / size_t_bits;
+                 / static_cast<int>(size_t_bits);
 
              std::size_t seed = 0;
              T positive = val < 0 ? -1 - val : val;
@@ -192,7 +192,7 @@ namespace boost
              const int size_t_bits = std::numeric_limits<std::size_t>::digits;
              // ceiling(std::numeric_limits<T>::digits / size_t_bits) - 1
              const int length = (std::numeric_limits<T>::digits - 1)
-                 / size_t_bits;
+                 / static_cast<int>(size_t_bits);
 
              std::size_t seed = 0;
 
@@ -236,7 +236,7 @@ namespace boost
         inline void hash_combine_impl(boost::uint64_t& h,
                 boost::uint64_t k)
         {
-            const uint64_t m = UINT64_C(0xc6a4a7935bd1e995);
+            const boost::uint64_t m = UINT64_C(0xc6a4a7935bd1e995);
             const int r = 47;
 
             k *= m;
@@ -456,7 +456,7 @@ namespace boost
     BOOST_HASH_SPECIALIZE(long double)
 
     BOOST_HASH_SPECIALIZE_REF(std::string)
-#if !defined(BOOST_NO_STD_WSTRING)
+#if !defined(BOOST_NO_STD_WSTRING) && !defined(BOOST_NO_INTRINSIC_WCHAR_T)
     BOOST_HASH_SPECIALIZE_REF(std::wstring)
 #endif
 

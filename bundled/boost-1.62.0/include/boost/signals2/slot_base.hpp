@@ -67,7 +67,7 @@ namespace boost
       typedef std::vector<detail::void_shared_ptr_variant> locked_container_type;
 
       const tracked_container_type& tracked_objects() const {return _tracked_objects;}
-    #if(!BOOST_NO_EXCEPTIONS)
+    #ifndef BOOST_NO_EXCEPTIONS
       locked_container_type lock() const
       {
         locked_container_type locked_objects;

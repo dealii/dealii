@@ -971,7 +971,7 @@ namespace detail
 
         pointer uninitialized_grow( size_type n ) // strong
         {
-            if( size_ + n <= members_.capacity_ )
+            if( size_ + n > members_.capacity_ )
                 reserve( size_ + n );
 
             pointer res = end();
@@ -1116,7 +1116,7 @@ namespace detail
     inline bool operator<=( const auto_buffer<T,SBP,GP,A>& l,
                             const auto_buffer<T,SBP,GP,A>& r )
     {
-        return !(r > l);
+        return !(r < l);
     }
 
     template< class T, class SBP, class GP, class A >
