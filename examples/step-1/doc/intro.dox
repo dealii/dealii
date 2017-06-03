@@ -86,8 +86,8 @@ tutorial is that you're interested in) and type
 The first command sets up the files that describe which include files this
 tutorial program depends on, how to compile it and how to run it. This command
 should find the installed deal.II libraries as well that were generated when
-you compiled and installed everything as described in the <a
-href="http://www.dealii.org/readme.html">deal.II ReadMe file</a>.
+you compiled and installed everything as described in the
+<a href="../../readme.html" target="body">README</a> file.
 If this command should fail to find the deal.II library, then you need to
 provide the path to the installation using the command
 @code

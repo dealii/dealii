@@ -170,12 +170,12 @@ procedure. A sketch of how this can be done can be found in @ref
 step_17 "step-17".
 
 <li> Finally, there are alternatives to using the SLEPc eigenvalue
-solvers. deal.II has interfaces to one of them, ARPACK (see
-http://www.dealii.org/developer/external-libs/arpack.html), implemented in the
-ArpackSolver class. Here is a short and quick overview of what one would need
-to change to use it, provided you have a working installation of ARPACK and
-deal.II has been configured properly for it (see the deal.II ReadMe file
-at http://www.dealii.org/readme.html):
+solvers. deal.II has interfaces to one of them, ARPACK (see <a
+href="../../external-libs/arpack.html">the ARPACK configuration page</a> for
+setup instructions), implemented in the ArpackSolver class. Here is a short and
+quick overview of what one would need to change to use it, provided you have a
+working installation of ARPACK and deal.II has been configured properly for it
+(see the deal.II <a href="../../readme.html" target="body">README</a> file):
 
 First, in order to use the ARPACK interfaces, we can go back to using standard
 deal.II matrices and vectors, so we start by replacing the PETSc and SLEPc
