@@ -19,7 +19,7 @@ you want to run in %parallel on a cluster, you also need <a
 href="http://www-users.cs.umn.edu/~karypis/metis/index.html"
 target="_top">METIS</a> to partition meshes. The installation of deal.II
 together with these two additional libraries is described in the <a
-href="https://www.dealii.org/developer/readme.html" target="body">README</a> file.
+href="../../readme.html" target="body">README</a> file.
 
 Now, for the details: as mentioned, the program does not compute anything new,
 so the use of finite element classes, etc., is exactly the same as before. The
