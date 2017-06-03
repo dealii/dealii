@@ -28,8 +28,10 @@
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>
+
 #include <sstream>
 #include <iostream>
+#include <deal.II/base/std_cxx14/memory.h>
 
 //TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
 //adjust_line_dof_index_for_line_orientation_table fields, and write tests
@@ -207,10 +209,10 @@ FE_Nedelec<dim>::get_name () const
 
 
 template <int dim>
-FiniteElement<dim>
-*FE_Nedelec<dim>::clone () const
+std::unique_ptr<FiniteElement<dim,dim> >
+FE_Nedelec<dim>::clone () const
 {
-  return new FE_Nedelec<dim> (*this);
+  return std_cxx14::make_unique<FE_Nedelec<dim> >(*this);
 }
 
 //---------------------------------------------------------------------------

@@ -19,6 +19,7 @@
 
 #include <cmath>
 #include <sstream>
+#include <deal.II/base/std_cxx14/memory.h>
 
 //TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
 //adjust_line_dof_index_for_line_orientation_table fields, and write tests
@@ -125,10 +126,10 @@ FE_Q_Hierarchical<dim>::get_name () const
 
 
 template <int dim>
-FiniteElement<dim> *
+std::unique_ptr<FiniteElement<dim,dim> >
 FE_Q_Hierarchical<dim>::clone() const
 {
-  return new FE_Q_Hierarchical<dim>(*this);
+  return std_cxx14::make_unique<FE_Q_Hierarchical<dim>>(*this);
 }
 
 

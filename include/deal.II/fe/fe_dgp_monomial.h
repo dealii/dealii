@@ -433,14 +433,9 @@ public:
    */
   virtual std::size_t memory_consumption () const;
 
-protected:
-
-  /**
-   * @p clone function instead of a copy constructor.
-   *
-   * This function is needed by the constructors of @p FESystem.
-   */
-  virtual FiniteElement<dim> *clone() const;
+  virtual
+  std::unique_ptr<FiniteElement<dim,dim> >
+  clone() const;
 
 private:
 

@@ -65,7 +65,10 @@ public:
                     const unsigned int n_face_support_points = 2);
 
   virtual std::string get_name() const;
-  virtual FiniteElement<dim> *clone() const;
+
+  virtual
+  std::unique_ptr<FiniteElement<dim,dim> >
+  clone() const;
 
   // documentation inherited from the base class
   virtual

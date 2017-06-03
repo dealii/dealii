@@ -281,6 +281,10 @@ public:
    */
   virtual std::string get_name () const;
 
+  virtual
+  std::unique_ptr<FiniteElement<dim,spacedim> >
+  clone() const;
+
   // for documentation, see the FiniteElement base class
   virtual
   UpdateFlags
@@ -532,13 +536,6 @@ private:
   };
 
 protected:
-
-  /**
-   * @p clone function instead of a copy constructor.
-   *
-   * This function is needed by the constructors of @p FESystem.
-   */
-  virtual FiniteElement<dim,spacedim> *clone() const;
 
   /**
    * Prepare internal data structures and fill in values independent of the

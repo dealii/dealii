@@ -553,6 +553,10 @@ public:
    */
   virtual std::string get_name () const;
 
+  virtual
+  std::unique_ptr<FiniteElement<dim,dim> >
+  clone() const;
+
   /**
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
@@ -687,14 +691,6 @@ public:
    */
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
   get_constant_modes () const;
-
-protected:
-  /**
-   * @p clone function instead of a copy constructor.
-   *
-   * This function is needed by the constructors of @p FESystem.
-   */
-  virtual FiniteElement<dim> *clone() const;
 
 private:
 

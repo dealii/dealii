@@ -444,6 +444,10 @@ public:
 
   // for documentation, see the FiniteElement base class
   virtual
+  std::unique_ptr<FiniteElement<dim,spacedim> >
+  clone() const;
+
+  virtual
   UpdateFlags
   requires_update_flags (const UpdateFlags update_flags) const;
 
@@ -870,14 +874,6 @@ public:
   virtual std::size_t memory_consumption () const;
 
 protected:
-
-  /**
-   * @p clone function instead of a copy constructor.
-   *
-   * This function is needed by the constructors of @p FESystem.
-   */
-  virtual FiniteElement<dim,spacedim> *clone() const;
-
 
   virtual typename FiniteElement<dim,spacedim>::InternalDataBase *
   get_data (const UpdateFlags                                                    update_flags,

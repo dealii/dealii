@@ -265,7 +265,9 @@ public:
 
   virtual UpdateFlags requires_update_flags (const UpdateFlags flags) const;
 
-  virtual FiniteElement<2,2> *clone () const;
+  virtual
+  std::unique_ptr<FiniteElement<2,2>>
+                                   clone() const;
 
   /**
    * Destructor.

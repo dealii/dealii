@@ -30,6 +30,7 @@
 
 #include <sstream>
 #include <iostream>
+#include <deal.II/base/std_cxx14/memory.h>
 
 //TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
 //adjust_line_dof_index_for_line_orientation_table fields, and write tests
@@ -122,10 +123,10 @@ FE_RaviartThomas<dim>::get_name () const
 
 
 template <int dim>
-FiniteElement<dim> *
+std::unique_ptr<FiniteElement<dim,dim> >
 FE_RaviartThomas<dim>::clone() const
 {
-  return new FE_RaviartThomas<dim>(*this);
+  return std_cxx14::make_unique<FE_RaviartThomas<dim>>(*this);
 }
 
 

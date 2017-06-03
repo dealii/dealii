@@ -117,6 +117,10 @@ public:
    */
   virtual std::string get_name () const;
 
+  // documentation inherited from the base class
+  virtual
+  std::unique_ptr<FiniteElement<dim,dim> >
+  clone() const;
 
   /**
    * This function returns @p true, if the shape function @p shape_index has
@@ -142,7 +146,6 @@ public:
   get_constant_modes () const;
 
   virtual std::size_t memory_consumption () const;
-  virtual FiniteElement<dim> *clone() const;
 
 private:
   /**
@@ -254,9 +257,11 @@ public:
    */
   virtual std::string get_name () const;
 
-  virtual FiniteElement<dim> *clone () const;
-
   // documentation inherited from the base class
+  virtual
+  std::unique_ptr<FiniteElement<dim,dim> >
+  clone() const;
+
   virtual
   void
   convert_generalized_support_point_values_to_nodal_values (const std::vector<Vector<double> > &support_point_values,

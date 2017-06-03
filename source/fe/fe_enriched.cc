@@ -15,8 +15,10 @@
 
 
 #include <deal.II/fe/fe_enriched.h>
-
 #include <deal.II/fe/fe_tools.h>
+
+#include <deal.II/base/std_cxx14/memory.h>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -236,7 +238,7 @@ FE_Enriched<dim,spacedim>::shape_value(const unsigned int   i,
 
 
 template <int dim, int spacedim>
-FiniteElement<dim,spacedim> *
+std::unique_ptr<FiniteElement<dim,spacedim> >
 FE_Enriched<dim,spacedim>::clone() const
 {
   std::vector< const FiniteElement< dim, spacedim > * > fes;
@@ -248,7 +250,9 @@ FE_Enriched<dim,spacedim>::clone() const
       multiplicities.push_back(this->element_multiplicity(i) );
     }
 
-  return new FE_Enriched<dim,spacedim>(fes, multiplicities, get_enrichments());
+  return std::unique_ptr<FE_Enriched<dim,spacedim>>(new FE_Enriched<dim,spacedim>(fes,
+                                                    multiplicities,
+                                                    get_enrichments()));
 }
 
 

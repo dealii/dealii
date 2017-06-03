@@ -24,6 +24,8 @@
 
 #include <iostream>
 #include <sstream>
+#include <deal.II/base/std_cxx14/memory.h>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -127,10 +129,10 @@ convert_generalized_support_point_values_to_nodal_values (const std::vector<Vect
 
 
 template <int dim, int spacedim>
-FiniteElement<dim,spacedim> *
+std::unique_ptr<FiniteElement<dim,spacedim> >
 FE_DGQ<dim, spacedim>::clone() const
 {
-  return new FE_DGQ<dim, spacedim>(*this);
+  return std_cxx14::make_unique<FE_DGQ<dim, spacedim>>(*this);
 }
 
 
@@ -808,7 +810,7 @@ convert_generalized_support_point_values_to_nodal_values (const std::vector<Vect
 
 
 template <int dim, int spacedim>
-FiniteElement<dim,spacedim> *
+std::unique_ptr<FiniteElement<dim,spacedim> >
 FE_DGQArbitraryNodes<dim,spacedim>::clone() const
 {
   // Construct a dummy quadrature formula containing the FE's nodes:
@@ -818,7 +820,7 @@ FE_DGQArbitraryNodes<dim,spacedim>::clone() const
     qpoints[i] = Point<1>(this->unit_support_points[lexicographic[i]][0]);
   Quadrature<1> pquadrature(qpoints);
 
-  return new FE_DGQArbitraryNodes<dim,spacedim>(pquadrature);
+  return std_cxx14::make_unique<FE_DGQArbitraryNodes<dim,spacedim>>(pquadrature);
 }
 
 
@@ -857,10 +859,10 @@ FE_DGQLegendre<dim,spacedim>::get_name () const
 
 
 template <int dim, int spacedim>
-FiniteElement<dim,spacedim> *
+std::unique_ptr<FiniteElement<dim,spacedim> >
 FE_DGQLegendre<dim,spacedim>::clone() const
 {
-  return new FE_DGQLegendre<dim,spacedim>(this->degree);
+  return std_cxx14::make_unique<FE_DGQLegendre<dim,spacedim>>(this->degree);
 }
 
 
@@ -912,10 +914,10 @@ FE_DGQHermite<dim,spacedim>::get_name () const
 
 
 template <int dim, int spacedim>
-FiniteElement<dim,spacedim> *
+std::unique_ptr<FiniteElement<dim,spacedim> >
 FE_DGQHermite<dim,spacedim>::clone() const
 {
-  return new FE_DGQHermite<dim,spacedim>(this->degree);
+  return std_cxx14::make_unique<FE_DGQHermite<dim,spacedim>>(this->degree);
 }
 
 

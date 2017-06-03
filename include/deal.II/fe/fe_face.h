@@ -59,7 +59,9 @@ public:
    */
   FE_FaceQ (const unsigned int p);
 
-  virtual FiniteElement<dim,spacedim> *clone() const;
+  virtual
+  std::unique_ptr<FiniteElement<dim,spacedim> >
+  clone() const;
 
   /**
    * Return a string that uniquely identifies a finite element. This class
@@ -156,10 +158,9 @@ public:
    */
   FE_FaceQ (const unsigned int p);
 
-  /**
-   * Clone method.
-   */
-  virtual FiniteElement<1,spacedim> *clone() const;
+  virtual
+  std::unique_ptr<FiniteElement<1,spacedim>>
+                                          clone() const;
 
   /**
    * Return a string that uniquely identifies a finite element. This class
@@ -358,10 +359,9 @@ public:
    */
   FE_FaceP(unsigned int p);
 
-  /**
-   * Clone method.
-   */
-  virtual FiniteElement<dim,spacedim> *clone() const;
+  virtual
+  std::unique_ptr<FiniteElement<dim,spacedim> >
+  clone() const;
 
   /**
    * Return a string that uniquely identifies a finite element. This class

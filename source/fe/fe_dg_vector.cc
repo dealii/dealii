@@ -20,6 +20,9 @@
 #include <deal.II/base/polynomials_nedelec.h>
 #include <deal.II/base/polynomials_raviart_thomas.h>
 
+#include <deal.II/base/std_cxx14/memory.h>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>

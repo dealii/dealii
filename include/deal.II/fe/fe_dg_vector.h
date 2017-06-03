@@ -59,9 +59,6 @@ public:
    * Constructor for the vector element of degree @p p.
    */
   FE_DGVector (const unsigned int p, MappingType m);
-public:
-
-  FiniteElement<dim, spacedim> *clone() const;
 
   /**
    * Return a string that uniquely identifies a finite element. This class
@@ -70,6 +67,9 @@ public:
    */
   virtual std::string get_name () const;
 
+  virtual
+  std::unique_ptr<FiniteElement<dim,spacedim> >
+  clone() const;
 
   /**
    * This function returns @p true, if the shape function @p shape_index has

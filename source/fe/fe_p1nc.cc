@@ -15,6 +15,7 @@
 
 
 #include <deal.II/fe/fe_p1nc.h>
+#include <deal.II/base/std_cxx14/memory.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -64,9 +65,10 @@ UpdateFlags FE_P1NC::requires_update_flags (const UpdateFlags flags) const
 
 
 
-FiniteElement<2,2> *FE_P1NC::clone () const
+std::unique_ptr<FiniteElement<2,2>>
+                                 FE_P1NC::clone () const
 {
-  return new FE_P1NC(*this);
+  return std_cxx14::make_unique<FE_P1NC>(*this);
 }
 
 

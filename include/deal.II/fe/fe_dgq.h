@@ -322,6 +322,9 @@ public:
    */
   virtual std::size_t memory_consumption () const;
 
+  virtual
+  std::unique_ptr<FiniteElement<dim,spacedim> >
+  clone() const;
 
 protected:
   /**
@@ -333,13 +336,6 @@ protected:
    * The degree of these polynomials is <tt>polynomials.size()-1</tt>.
    */
   FE_DGQ (const std::vector<Polynomials::Polynomial<double> > &polynomials);
-
-  /**
-   * @p clone function instead of a copy constructor.
-   *
-   * This function is needed by the constructors of @p FESystem.
-   */
-  virtual FiniteElement<dim, spacedim> *clone() const;
 
 private:
   /**
@@ -432,14 +428,9 @@ public:
   void
   convert_generalized_support_point_values_to_nodal_values (const std::vector<Vector<double> > &support_point_values,
                                                             std::vector<double>                &nodal_values) const;
-
-protected:
-  /**
-   * @p clone function instead of a copy constructor.
-   *
-   * This function is needed by the constructors of @p FESystem.
-   */
-  virtual FiniteElement<dim,spacedim> *clone() const;
+  virtual
+  std::unique_ptr<FiniteElement<dim,spacedim> >
+  clone() const;
 };
 
 
@@ -480,13 +471,9 @@ public:
    */
   virtual std::string get_name () const;
 
-protected:
-  /**
-   * @p clone function instead of a copy constructor.
-   *
-   * This function is needed by the constructors of @p FESystem.
-   */
-  virtual FiniteElement<dim,spacedim> *clone() const;
+  virtual
+  std::unique_ptr<FiniteElement<dim,spacedim> >
+  clone() const;
 };
 
 
@@ -531,13 +518,9 @@ public:
    */
   virtual std::string get_name () const;
 
-protected:
-  /**
-   * @p clone function instead of a copy constructor.
-   *
-   * This function is needed by the constructors of @p FESystem.
-   */
-  virtual FiniteElement<dim,spacedim> *clone() const;
+  virtual
+  std::unique_ptr<FiniteElement<dim,spacedim> >
+  clone() const;
 };
 
 

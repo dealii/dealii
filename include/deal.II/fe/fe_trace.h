@@ -52,18 +52,15 @@ public:
   FE_TraceQ(unsigned int p);
 
   /**
-   * @p clone function instead of a copy constructor.
-   *
-   * This function is needed by the constructors of @p FESystem.
-   */
-  virtual FiniteElement<dim,spacedim> *clone() const;
-
-  /**
    * Return a string that uniquely identifies a finite element. This class
    * returns <tt>FE_DGQ<dim>(degree)</tt>, with <tt>dim</tt> and
    * <tt>degree</tt> replaced by appropriate values.
    */
   virtual std::string get_name () const;
+
+  virtual
+  std::unique_ptr<FiniteElement<dim,spacedim> >
+  clone() const;
 
   /**
    * This function returns @p true, if the shape function @p shape_index has
