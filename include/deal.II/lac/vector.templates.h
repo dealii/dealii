@@ -131,17 +131,10 @@ namespace internal
     ierr = VecRestoreArray (sequential_vector, &start_ptr);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    ierr = VecScatterDestroy(scatter_context);
-    AssertNothrow (ierr == 0, ExcPETScError(ierr));
-    ierr = VecDestroy (sequential_vector);
-    AssertNothrow (ierr == 0, ExcPETScError(ierr));
-#else
     ierr = VecScatterDestroy(&scatter_context);
     AssertNothrow (ierr == 0, ExcPETScError(ierr));
     ierr = VecDestroy (&sequential_vector);
     AssertNothrow (ierr == 0, ExcPETScError(ierr));
-#endif
   }
 }
 

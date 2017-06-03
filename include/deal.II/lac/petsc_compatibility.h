@@ -36,11 +36,14 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers
 {
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-  typedef PetscTruth PetscBooleanType;
-#else
-  typedef PetscBool PetscBooleanType;
-#endif
+  /**
+   * a compatibility typedef for older versions of PETSc.
+   *
+   * @deprecated The name of this type changed in PETSc 3.2: deal.II does not
+   * support versions of PETSc older than this so this typedef will be removed
+   * in a future release.
+   */
+  typedef PetscBool PetscBooleanType DEAL_II_DEPRECATED;
 
   /**
    * Set an option in the global PETSc database. This function just wraps
@@ -73,11 +76,7 @@ namespace PETScWrappers
   inline PetscErrorCode destroy_matrix (Mat &matrix)
   {
     // PETSc will check whether or not matrix is nullptr.
-#if DEAL_II_PETSC_VERSION_LT(3, 2, 0)
-    return MatDestroy (matrix);
-#else
     return MatDestroy (&matrix);
-#endif
   }
 
 
@@ -95,11 +94,7 @@ namespace PETScWrappers
   inline PetscErrorCode destroy_krylov_solver (KSP &krylov_solver)
   {
     // PETSc will check whether or not matrix is nullptr.
-#if DEAL_II_PETSC_VERSION_LT(3, 2, 0)
-    return KSPDestroy (krylov_solver);
-#else
     return KSPDestroy (&krylov_solver);
-#endif
   }
 
 
@@ -113,14 +108,9 @@ namespace PETScWrappers
    */
   inline void set_matrix_option (Mat &matrix,
                                  const MatOption option_name,
-                                 const PetscBooleanType option_value = PETSC_FALSE)
+                                 const PetscBool option_value = PETSC_FALSE)
   {
-#if DEAL_II_PETSC_VERSION_LT(3,0,0)
-    const PetscErrorCode ierr = MatSetOption (matrix, option_name);
-#else
     const PetscErrorCode ierr = MatSetOption (matrix, option_name, option_value);
-#endif
-
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -132,19 +122,11 @@ namespace PETScWrappers
    */
   inline void close_matrix (Mat &matrix)
   {
-#if DEAL_II_PETSC_VERSION_LT(3, 0, 0)
-#  ifdef DEBUG
-    set_matrix_option (matrix, MAT_NEW_NONZERO_LOCATION_ERR);
-#  else
-    set_matrix_option (matrix, MAT_NO_NEW_NONZERO_LOCATIONS);
-#  endif
-#else
 #  ifdef DEBUG
     set_matrix_option (matrix, MAT_NEW_NONZERO_LOCATION_ERR, PETSC_TRUE);
 #  else
     set_matrix_option (matrix, MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
 #  endif
-#endif
   }
 
 
@@ -156,11 +138,7 @@ namespace PETScWrappers
    */
   inline void set_keep_zero_rows (Mat &matrix)
   {
-#if DEAL_II_PETSC_VERSION_LT(3, 1, 0)
-    set_matrix_option (matrix, MAT_KEEP_ZEROED_ROWS, PETSC_TRUE);
-#else
     set_matrix_option (matrix, MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
-#endif
   }
 }
 

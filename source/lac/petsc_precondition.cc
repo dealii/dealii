@@ -52,11 +52,7 @@ namespace PETScWrappers
 
     if (pc!=nullptr)
       {
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-        PetscErrorCode ierr = PCDestroy(pc);
-#else
         PetscErrorCode ierr = PCDestroy(&pc);
-#endif
         pc = nullptr;
         AssertThrow (ierr == 0, ExcPETScError(ierr));
       }
@@ -758,21 +754,13 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // set flags as given
-#if DEAL_II_PETSC_VERSION_LT(3,0,1)
-    ierr = PCFactorSetPivoting (pc, additional_data.pivoting);
-#else
     ierr = PCFactorSetColumnPivot (pc, additional_data.pivoting);
-#endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     ierr = PCFactorSetZeroPivot (pc, additional_data.zero_pivot);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-#if DEAL_II_PETSC_VERSION_LT(3,0,1)
-    ierr = PCFactorSetShiftNonzero (pc, additional_data.damping);
-#else
     ierr = PCFactorSetShiftAmount (pc, additional_data.damping);
-#endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     ierr = PCSetFromOptions (pc);

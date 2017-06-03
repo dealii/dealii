@@ -62,11 +62,8 @@ namespace SLEPcWrappers
     if (eps != nullptr)
       {
         // Destroy the solver object.
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-        const PetscErrorCode ierr = EPSDestroy (eps);
-#else
         const PetscErrorCode ierr = EPSDestroy (&eps);
-#endif
+
         (void)ierr;
         AssertNothrow (ierr == 0, ExcSLEPcError(ierr));
       }
@@ -105,11 +102,8 @@ namespace SLEPcWrappers
            ExcMessage("Initial vector should be nonzero."));
 
     Vec vec = this_initial_vector;
-#if DEAL_II_PETSC_VERSION_LT(3,1,0)
-    const PetscErrorCode ierr = EPSSetInitialVector (eps, &vec);
-#else
     const PetscErrorCode ierr = EPSSetInitialSpace (eps, 1, &vec);
-#endif
+
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 
@@ -400,7 +394,6 @@ namespace SLEPcWrappers
     SolverBase (cn, mpi_communicator),
     additional_data (data)
   {
-#if DEAL_II_PETSC_VERSION_GTE(3,1,0)
     PetscErrorCode ierr = EPSSetType (eps, const_cast<char *>(EPSGD));
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
@@ -409,12 +402,6 @@ namespace SLEPcWrappers
         ierr = EPSGDSetDoubleExpansion (eps, PETSC_TRUE);
         AssertThrow (ierr == 0, ExcSLEPcError(ierr));
       }
-#else
-    // PETSc/SLEPc version must be > 3.1.0.
-    Assert ((false),
-            ExcMessage ("Your SLEPc installation does not include a copy of the "
-                        "Generalized Davidson solver. A SLEPc version > 3.1.0 is required."));
-#endif
   }
 
   /* ------------------ Jacobi Davidson -------------------- */
@@ -425,15 +412,8 @@ namespace SLEPcWrappers
     SolverBase (cn, mpi_communicator),
     additional_data (data)
   {
-#if DEAL_II_PETSC_VERSION_GTE(3,1,0)
     const PetscErrorCode ierr = EPSSetType (eps, const_cast<char *>(EPSJD));
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
-#else
-    // PETSc/SLEPc version must be > 3.1.0.
-    Assert ((false),
-            ExcMessage ("Your SLEPc installation does not include a copy of the "
-                        "Jacobi-Davidson solver. A SLEPc version > 3.1.0 is required."));
-#endif
   }
 
   /* ---------------------- LAPACK ------------------------- */
@@ -460,4 +440,3 @@ namespace SLEPcWrappers
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_SLEPC
-
