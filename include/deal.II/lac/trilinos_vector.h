@@ -82,9 +82,9 @@ namespace TrilinosWrappers
     /**
      * This class implements a wrapper for accessing the Trilinos vector in
      * the same way as we access deal.II objects: it is initialized with a
-     * vector and an element within it, and has a conversion operatorto
+     * vector and an element within it, and has a conversion operator to
      * extract the scalar value of this element. It also has a variety of
-     * assignment operatorfor writing to this one element.
+     * assignment operator for writing to this one element.
      *
      * @ingroup TrilinosWrappers
      */
@@ -107,9 +107,9 @@ namespace TrilinosWrappers
        * @p v and @p w, and assign elements like in <tt>v(i)=w(i)</tt>. Here,
        * both left and right hand side of the assignment have data type
        * VectorReference, but what we really mean is to assign the vector
-       * elements represented by the two references. This operatorimplements
+       * elements represented by the two references. This operator implements
        * this operation. Note also that this allows us to make the assignment
-       * operatorconst.
+       * operator const.
        */
       const VectorReference &
       operator= (const VectorReference &r) const;
@@ -632,7 +632,7 @@ namespace TrilinosWrappers
        * the constructor explicit work.
        *
        * Since the semantics of assigning a scalar to a vector are not
-       * immediately clear, this operatorcan only be used if you want
+       * immediately clear, this operator can only be used if you want
        * to set the entire vector to zero. This allows the intuitive notation
        * <tt>v=0</tt>.
        */
@@ -646,7 +646,7 @@ namespace TrilinosWrappers
       Vector &operator= (const Vector &v);
 
       /**
-       * Move the given vector. This operatorreplaces the present vector with
+       * Move the given vector. This operator replaces the present vector with
        * @p v by efficiently swapping the internal data structures.
        */
       Vector &operator= (Vector &&v);
