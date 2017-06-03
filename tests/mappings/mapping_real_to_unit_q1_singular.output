@@ -1,0 +1,4 @@
+
+DEAL::dim=2
+DEAL::Transformation for point 0.00000 -0.292893 on cell with center -0.500000 -1.38778e-17 is not invertible
+DEAL::OK
