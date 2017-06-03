@@ -1677,11 +1677,7 @@ private:
 
 public:
   /**
-   * List of possible output formats.
-   *
-   * The formats down the list with prefix <em>Short</em> and bit 6 and 7 set
-   * reproduce the old behavior of not writing comments or original values to
-   * the files.
+   * List of possible output formats used for ParameterHandler::print_parameters().
    */
   enum OutputStyle
   {
@@ -1690,6 +1686,7 @@ public:
      * again.
      */
     Text = 1,
+
     /**
      * Write parameters as a LaTeX table.
      */
@@ -2022,8 +2019,7 @@ public:
 
 
   /**
-   * Print all parameters with the given style to <tt>out</tt>. Presently only
-   * <tt>Text</tt>, <tt>LaTeX</tt> and <tt>XML</tt> are implemented.
+   * Print all parameters with the given style to <tt>out</tt>.
    *
    * In <tt>Text</tt> format, the output is formatted in such a way that it is
    * possible to use it for later input again. This is most useful to record
