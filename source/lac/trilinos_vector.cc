@@ -64,22 +64,18 @@ namespace TrilinosWrappers
   {
     Vector::Vector ()
       :
+      Subscriptor(),
       last_action (Zero),
       compressed  (true),
       has_ghosts  (false),
-#ifdef DEAL_II_WITH_MPI
-      vector(new Epetra_FEVector(
-               Epetra_Map(0,0,Epetra_MpiComm(MPI_COMM_SELF))))
-#else
-      vector(new Epetra_FEVector(
-               Epetra_Map(0,0,Epetra_SerialComm())))
-#endif
+      vector(new Epetra_FEVector(Epetra_Map(0,0,0,Utilities::Trilinos::comm_self())))
     {}
 
 
 
     Vector::Vector (const IndexSet &parallel_partitioning,
                     const MPI_Comm &communicator)
+      : Vector()
     {
       reinit (parallel_partitioning, communicator);
     }
@@ -88,23 +84,19 @@ namespace TrilinosWrappers
 
     Vector::Vector (const Vector &v)
       :
-      Subscriptor(),
-      last_action (Zero),
-      compressed (true),
-      has_ghosts  (v.has_ghosts),
-      vector(new Epetra_FEVector(*v.vector)),
-      owned_elements(v.owned_elements)
-    {}
+      Vector()
+    {
+      has_ghosts = v.has_ghosts;
+      vector.reset(new Epetra_FEVector(*v.vector));
+      owned_elements = v.owned_elements;
+    }
 
 
 
     Vector::Vector (Vector &&v)
+      : Vector()
     {
       // initialize a minimal, valid object and swap
-      last_action = Zero;
-      vector.reset(new Epetra_FEVector(Epetra_Map(0,0,0,Utilities::Trilinos::comm_self())));
-      owned_elements.clear();
-
       swap(v);
     }
 
@@ -113,10 +105,7 @@ namespace TrilinosWrappers
     Vector::Vector (const IndexSet   &parallel_partitioner,
                     const Vector     &v,
                     const MPI_Comm   &communicator)
-      :
-      last_action (Zero),
-      compressed  (true),
-      has_ghosts  (false)
+      : Vector()
     {
       AssertThrow (parallel_partitioner.size() ==
                    static_cast<size_type>(TrilinosWrappers::n_global_elements(v.vector->Map())),
@@ -134,9 +123,7 @@ namespace TrilinosWrappers
     Vector::Vector (const IndexSet &local,
                     const IndexSet &ghost,
                     const MPI_Comm &communicator)
-      :
-      last_action (Zero),
-      compressed  (true)
+      : Vector()
     {
       reinit(local, ghost, communicator, false);
     }
@@ -812,6 +799,7 @@ namespace TrilinosWrappers
       std::swap(last_action, v.last_action);
       std::swap(compressed, v.compressed);
       std::swap(vector, v.vector);
+      std::swap(has_ghosts, v.has_ghosts);
     }
 
 
