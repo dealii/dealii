@@ -1296,6 +1296,31 @@ public:
   Point<spacedim> intermediate_point(const Point<structdim> &coordinates) const;
 
   /**
+   * This function computes a fast approximate transformation from the real to
+   * the unit cell by inversion of an affine approximation of the $d$-linear
+   * function from the reference $d$-dimensional cell.
+   *
+   * The affine approximation of the unit to real cell mapping is found by a
+   * least squares fit of an affine function to the $2^d$ vertices of the
+   * present object. For any valid mesh cell whose geometry is not degenerate,
+   * this operation results in a unique affine mapping. Thus, this function
+   * will return a finite result for all given input points, even in cases
+   * where the actual transformation by an actual bi-/trilinear or higher
+   * order mapping might be singular. Besides only approximating the mapping
+   * from the vertex points, this function also ignores the attached manifold
+   * descriptions. The result is only exact in case the transformation from
+   * the unit to the real cell is indeed affine, such as in one dimension or
+   * for Cartesian and affine (parallelogram) meshes in 2D/3D.
+   *
+   * For exact transformations to the unit cell, use
+   * Mapping::transform_real_to_unit_cell().
+   *
+   * @note If dim<spacedim we first project p onto the plane.
+   */
+  Point<structdim>
+  real_to_unit_cell_affine_approximation (const Point<spacedim> &point) const;
+
+  /**
    * Center of the object. The center of an object is defined to be the
    * average of the locations of the vertices, which is also where a $Q_1$
    * mapping would map the center of the reference cell. However, you can also
