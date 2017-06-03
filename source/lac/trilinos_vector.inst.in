@@ -18,6 +18,6 @@
 for (SCALAR : REAL_SCALARS)
 {
     template
-    VectorBase &
-    VectorBase::operator = (const ::dealii::Vector<SCALAR> &v);
+    Vector &
+    Vector::operator = (const ::dealii::Vector<SCALAR> &v);
 }

@@ -23,7 +23,7 @@
 
 #  include <deal.II/base/subscriptor.h>
 
-#  include <deal.II/lac/trilinos_vector_base.h>
+#  include <deal.II/lac/trilinos_vector.h>
 #  include <deal.II/lac/la_parallel_vector.h>
 
 #  include <memory>
@@ -133,14 +133,14 @@ namespace TrilinosWrappers
     /**
      * Apply the preconditioner.
      */
-    virtual void vmult (VectorBase       &dst,
-                        const VectorBase &src) const;
+    virtual void vmult (MPI::Vector       &dst,
+                        const MPI::Vector &src) const;
 
     /**
      * Apply the transpose preconditioner.
      */
-    virtual void Tvmult (VectorBase       &dst,
-                         const VectorBase &src) const;
+    virtual void Tvmult (MPI::Vector       &dst,
+                         const MPI::Vector &src) const;
 
     /**
      * Apply the preconditioner on deal.II data structures instead of the ones
@@ -1877,14 +1877,14 @@ namespace TrilinosWrappers
     /**
      * Apply the preconditioner, i.e., dst = src.
      */
-    void vmult (VectorBase       &dst,
-                const VectorBase &src) const;
+    void vmult (MPI::Vector       &dst,
+                const MPI::Vector &src) const;
 
     /**
      * Apply the transport conditioner, i.e., dst = src.
      */
-    void Tvmult (VectorBase       &dst,
-                 const VectorBase &src) const;
+    void Tvmult (MPI::Vector       &dst,
+                 const MPI::Vector &src) const;
 
     /**
      * Apply the preconditioner on deal.II data structures instead of the ones
@@ -1950,8 +1950,8 @@ namespace TrilinosWrappers
 
   inline
   void
-  PreconditionBase::vmult (VectorBase       &dst,
-                           const VectorBase &src) const
+  PreconditionBase::vmult (MPI::Vector       &dst,
+                           const MPI::Vector &src) const
   {
     Assert (dst.vector_partitioner().SameAs(preconditioner->OperatorRangeMap()),
             ExcNonMatchingMaps("dst"));
@@ -1965,8 +1965,8 @@ namespace TrilinosWrappers
 
   inline
   void
-  PreconditionBase::Tvmult (VectorBase       &dst,
-                            const VectorBase &src) const
+  PreconditionBase::Tvmult (MPI::Vector       &dst,
+                            const MPI::Vector &src) const
   {
     Assert (dst.vector_partitioner().SameAs(preconditioner->OperatorRangeMap()),
             ExcNonMatchingMaps("dst"));

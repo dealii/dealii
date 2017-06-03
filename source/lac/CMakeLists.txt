@@ -121,13 +121,12 @@ IF(DEAL_II_WITH_TRILINOS)
     trilinos_solver.cc
     trilinos_sparse_matrix.cc
     trilinos_sparsity_pattern.cc
-    trilinos_vector_base.cc
     trilinos_vector.cc
   )
   SET(_inst
     ${_inst}
     trilinos_sparse_matrix.inst.in
-    trilinos_vector_base.inst.in
+    trilinos_vector.inst.in
   )
 ENDIF()
 

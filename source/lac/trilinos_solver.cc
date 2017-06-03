@@ -19,7 +19,7 @@
 
 #  include <deal.II/base/conditional_ostream.h>
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
-#  include <deal.II/lac/trilinos_vector_base.h>
+#  include <deal.II/lac/trilinos_vector.h>
 #  include <deal.II/lac/trilinos_precondition.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
