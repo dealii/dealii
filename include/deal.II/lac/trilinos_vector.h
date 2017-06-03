@@ -226,9 +226,7 @@ namespace TrilinosWrappers
      * The Epetra_FEVector is precisely the kind of vector
      * we deal with all the time - we probably get it from some assembly
      * process, where also entries not locally owned might need to written and
-     * hence need to be forwarded to the owner. The only requirement for this
-     * class to work is that Trilinos is installed with the same compiler as is
-     * used for compilation of deal.II.
+     * hence need to be forwarded to the owner.
      *
      * The interface of this class is modeled after the existing Vector class in
      * deal.II. It has almost the same member functions, and is often
@@ -1232,8 +1230,6 @@ namespace TrilinosWrappers
        * Make the reference class a friend.
        */
       friend class internal::VectorReference;
-      friend class Vector;
-      friend class MPI::Vector;
     };
 
 

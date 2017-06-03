@@ -16,6 +16,9 @@
 #ifndef dealii__trilinos_vector_base_h
 #define dealii__trilinos_vector_base_h
 
+#warning This file is deprecated. Use <deal.II/lac/trilinos_vector.h> instead.
+
+#include <deal.II/base/config.h>
 #include <deal.II/lac/trilinos_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -27,7 +30,7 @@ namespace TrilinosWrappers
   // MPI::Vector as this ended up to be the only derived class.
   // Hence, using the class VectorBase is deprecated and we only provide
   // an alias for backward compatibility.
-  using VectorBase = MPI::Vector;
+  typedef MPI::Vector VectorBase DEAL_II_DEPRECATED;
 }
 #endif
 

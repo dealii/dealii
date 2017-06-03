@@ -749,15 +749,15 @@ namespace TrilinosWrappers
   }
 
   void
-  PreconditionIdentity::vmult(VectorBase       &dst,
-                              const VectorBase &src) const
+  PreconditionIdentity::vmult(MPI::Vector       &dst,
+                              const MPI::Vector &src) const
   {
     dst = src;
   }
 
   void
-  PreconditionIdentity::Tvmult(VectorBase       &dst,
-                               const VectorBase &src) const
+  PreconditionIdentity::Tvmult(MPI::Vector       &dst,
+                               const MPI::Vector &src) const
   {
     dst = src;
   }
