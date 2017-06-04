@@ -834,7 +834,7 @@ namespace PETScWrappers
      * Test whether a matrix is symmetric.  Default tolerance is
      * $1000\times32$-bit machine precision.
      */
-    PetscBooleanType
+    PetscBool
     is_symmetric (const double tolerance = 1.e-12);
 
     /**
@@ -842,7 +842,7 @@ namespace PETScWrappers
      * its transpose. Default tolerance is $1000\times32$-bit machine
      * precision.
      */
-    PetscBooleanType
+    PetscBool
     is_hermitian (const double tolerance = 1.e-12);
 
     /**

@@ -222,7 +222,7 @@ namespace PETScWrappers
     Assert (size() == v.size(),
             ExcDimensionMismatch(size(), v.size()));
 
-    PetscBooleanType flag;
+    PetscBool flag;
     const PetscErrorCode ierr = VecEqual (vector, v.vector, &flag);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -237,7 +237,7 @@ namespace PETScWrappers
     Assert (size() == v.size(),
             ExcDimensionMismatch(size(), v.size()));
 
-    PetscBooleanType flag;
+    PetscBool flag;
     const PetscErrorCode ierr = VecEqual (vector, v.vector, &flag);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
