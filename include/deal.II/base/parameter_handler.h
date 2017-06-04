@@ -2076,11 +2076,14 @@ public:
    *
    * In most cases, you will not want to use this function directly, but have
    * it called recursively by the previous function.
+   *
+   * @deprecated This function is deprecated because, even though it only
+   *   outputs information, it is not a <code>const</code> function.
    */
   void print_parameters_section (std::ostream       &out,
                                  const OutputStyle   style,
                                  const unsigned int  indent_level,
-                                 const bool          include_top_level_elements = false);
+                                 const bool          include_top_level_elements = false) DEAL_II_DEPRECATED;
 
   /**
    * Print parameters to a logstream. This function allows to print all
