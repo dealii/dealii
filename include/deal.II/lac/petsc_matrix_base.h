@@ -678,14 +678,11 @@ namespace PETScWrappers
     PetscScalar matrix_scalar_product (const VectorBase &u,
                                        const VectorBase &v) const;
 
-
-#if DEAL_II_PETSC_VERSION_GTE(3,1,0)
     /**
      * Return the trace of the matrix, i.e. the sum of all diagonal entries in
      * the matrix.
      */
     PetscScalar trace () const;
-#endif
 
     /**
      * Multiply the entire matrix by a fixed factor.

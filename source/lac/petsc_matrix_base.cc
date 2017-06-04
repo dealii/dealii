@@ -149,27 +149,13 @@ namespace PETScWrappers
     // since this is a collective operation
     IS index_set;
 
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    ISCreateGeneral (get_mpi_communicator(), rows.size(),
-                     &petsc_rows[0], &index_set);
-#else
     ISCreateGeneral (get_mpi_communicator(), rows.size(),
                      &petsc_rows[0], PETSC_COPY_VALUES, &index_set);
-#endif
 
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    const PetscErrorCode ierr = MatZeroRowsIS(matrix, index_set, new_diag_value);
-#else
     const PetscErrorCode ierr = MatZeroRowsIS(matrix, index_set, new_diag_value,
                                               nullptr, nullptr);
-#endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-    ISDestroy (index_set);
-#else
     ISDestroy (&index_set);
-#endif
   }
 
 
@@ -400,7 +386,6 @@ namespace PETScWrappers
   }
 
 
-#if DEAL_II_PETSC_VERSION_GTE(3,1,0)
   PetscScalar
   MatrixBase::trace () const
   {
@@ -411,7 +396,6 @@ namespace PETScWrappers
 
     return result;
   }
-#endif
 
 
 

@@ -163,11 +163,7 @@ namespace PETScWrappers
   {
     if (attained_ownership)
       {
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-        const PetscErrorCode ierr = VecDestroy (vector);
-#else
         const PetscErrorCode ierr = VecDestroy (&vector);
-#endif
         AssertNothrow (ierr == 0, ExcPETScError(ierr));
         (void) ierr;
       }
@@ -180,11 +176,7 @@ namespace PETScWrappers
   {
     if (attained_ownership)
       {
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-        const PetscErrorCode ierr = VecDestroy (vector);
-#else
         const PetscErrorCode ierr = VecDestroy (&vector);
-#endif
         AssertThrow (ierr == 0, ExcPETScError(ierr));
       }
 

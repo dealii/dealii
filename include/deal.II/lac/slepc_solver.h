@@ -803,11 +803,7 @@ namespace SLEPcWrappers
     // One could still build a vector that is rich in the directions of all guesses,
     // by taking a linear combination of them. (TODO: make function virtual?)
 
-#if DEAL_II_PETSC_VERSION_LT(3,1,0)
-    const PetscErrorCode ierr = EPSSetInitialVector (eps, &vecs[0]);
-#else
     const PetscErrorCode ierr = EPSSetInitialSpace (eps, vecs.size(), &vecs[0]);
-#endif
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 

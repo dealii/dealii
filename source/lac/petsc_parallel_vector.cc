@@ -171,11 +171,7 @@ namespace PETScWrappers
 
           // so let's go the slow way:
 
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-          const PetscErrorCode ierr = VecDestroy (vector);
-#else
           const PetscErrorCode ierr = VecDestroy (&vector);
-#endif
           AssertThrow (ierr == 0, ExcPETScError(ierr));
 
           create_vector (n, local_sz);
@@ -213,11 +209,7 @@ namespace PETScWrappers
                     const IndexSet &ghost,
                     const MPI_Comm     &comm)
     {
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-      const PetscErrorCode ierr = VecDestroy (vector);
-#else
       const PetscErrorCode ierr = VecDestroy (&vector);
-#endif
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       communicator = comm;
@@ -234,11 +226,7 @@ namespace PETScWrappers
     Vector::reinit (const IndexSet &local,
                     const MPI_Comm &comm)
     {
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-      const PetscErrorCode ierr = VecDestroy (vector);
-#else
       const PetscErrorCode ierr = VecDestroy (&vector);
-#endif
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       communicator = comm;

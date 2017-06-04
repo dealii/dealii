@@ -92,11 +92,7 @@ namespace SLEPcWrappers
     TransformationBase(mpi_communicator),
     additional_data (data)
   {
-#if DEAL_II_PETSC_VERSION_LT(3,1,0)
-    PetscErrorCode ierr = STSetType (st, const_cast<char *>(STSINV));
-#else
     PetscErrorCode ierr = STSetType (st, const_cast<char *>(STSINVERT));
-#endif
     AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
 
     ierr = STSetShift (st, additional_data.shift_parameter);

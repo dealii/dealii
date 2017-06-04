@@ -307,15 +307,7 @@ namespace PETScWrappers
   void
   SolverChebychev::set_solver_type (KSP &ksp) const
   {
-    // set the type of solver. note the
-    // completely pointless change in
-    // spelling Chebyshev between PETSc 3.2
-    // and 3.3...
-#if DEAL_II_PETSC_VERSION_LT(3,3,0)
-    PetscErrorCode ierr = KSPSetType (ksp, KSPCHEBYCHEV);
-#else
     PetscErrorCode ierr = KSPSetType (ksp, KSPCHEBYSHEV);
-#endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
@@ -436,12 +428,7 @@ namespace PETScWrappers
     // right
     if (additional_data.right_preconditioning)
       {
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-        ierr = KSPSetPreconditionerSide(ksp, PC_RIGHT);
-#else
         ierr = KSPSetPCSide(ksp, PC_RIGHT);
-#endif
-
         AssertThrow (ierr == 0, ExcPETScError(ierr));
       }
 
@@ -770,11 +757,7 @@ namespace PETScWrappers
          * factorization here we start to see differences with the base
          * class solve function
          */
-#if DEAL_II_PETSC_VERSION_GTE(3,2,0)
         ierr = PCFactorSetMatSolverPackage (solver_data->pc, MATSOLVERMUMPS);
-#else
-        ierr = PCFactorSetMatSolverPackage (solver_data->pc, MAT_SOLVER_MUMPS);
-#endif
         AssertThrow (ierr == 0, ExcPETScError (ierr));
 
         /**
