@@ -1,0 +1,4 @@
+Improved: CylindricalManifold is now really using cylindrical coordinates
+instead of taking an average in space coordinates.
+<br>
+(Daniel Arndt, 2017/06/05)

@@ -19,7 +19,7 @@ DEAL::56   cells, degree=4: 4.18868242879
 DEAL::
 DEAL::Testing with CylindricalManifold in 3d
 DEAL::80   cells, degree=1: 5.65685424949 
-DEAL::80   cells, degree=2: 6.25775643968 
-DEAL::80   cells, degree=3: 6.28283082764 
-DEAL::80   cells, degree=4: 6.28312774156 
+DEAL::80   cells, degree=2: 6.27829514062 
+DEAL::80   cells, degree=3: 6.28316607872 
+DEAL::80   cells, degree=4: 6.28318526295 
 DEAL::
