@@ -34,11 +34,11 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
     #
     IF(PETSC_VERSION_MAJOR LESS 3 OR
         ((PETSC_VERSION_MAJOR EQUAL 3) AND (PETSC_VERSION_MINOR LESS 3)))
-      MESSAGE(STATUS "Could not find a sufficient modern PETSc installation: "
+      MESSAGE(STATUS "Could not find a sufficiently modern PETSc installation: "
         "Version >=3.3.0 required!"
         )
       SET(PETSC_ADDITIONAL_ERROR_STRING
-        "Could not find a sufficient modern PETSc installation: "
+        "Could not find a sufficiently modern PETSc installation: "
         "Version >=3.3.0 required!\n"
         )
       SET(${var} FALSE)

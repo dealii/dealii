@@ -30,7 +30,7 @@ MACRO(FEATURE_METIS_FIND_EXTERNAL var)
         "Version 5.x required!"
         )
       SET(METIS_ADDITIONAL_ERROR_STRING
-        "Could not find a sufficient modern metis installation: "
+        "Could not find a sufficiently modern metis installation: "
         "Version 5.x required!\n"
         )
       SET(${var} FALSE)
