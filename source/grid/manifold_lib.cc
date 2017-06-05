@@ -20,7 +20,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/lac/vector.h>
-#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping.h>
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
@@ -855,17 +855,9 @@ TransfiniteInterpolationManifold<dim,spacedim>
   for (unsigned int d=0; d<dim; ++d)
     outside[d] = 20;
 
-  // initial guess: MappingQ1
-  Point<dim> chart_point;
-  try
-    {
-      chart_point = GeometryInfo<dim>::project_to_unit_cell(StaticMappingQ1<dim,spacedim>::mapping.transform_real_to_unit_cell(cell, point));
-    }
-  catch (typename Mapping<dim,spacedim>::ExcTransformationFailed)
-    {
-      for (unsigned int d=0; d<dim; ++d)
-        chart_point[d] = 0.5;
-    }
+  // initial guess from affine approximation and projection to unit cell
+  Point<dim> chart_point =
+    GeometryInfo<dim>::project_to_unit_cell(cell->real_to_unit_cell_affine_approximation(point));
 
   // run Newton iteration. As opposed to the various mapping implementations,
   // this class does not throw exception upon failure as those are relatively
@@ -935,9 +927,7 @@ TransfiniteInterpolationManifold<dim,spacedim>
   // cell from the unit cell.
   typename Triangulation<dim,spacedim>::cell_iterator
   cell = triangulation->begin(level_coarse),
-  endc = triangulation->end(level_coarse),
-  best_fit = cell;
-  const double circle_gap = 1.3;
+  endc = triangulation->end(level_coarse);
   std::vector<std::pair<double, unsigned int> > distances_and_cells;
   for ( ; cell != endc; ++cell)
     {
@@ -957,7 +947,7 @@ TransfiniteInterpolationManifold<dim,spacedim>
         radius_square = std::max(radius_square, (center-cell->vertex(v)).norm_square());
       bool inside_circle = true;
       for (unsigned int i=0; i<points.size(); ++i)
-        if ((center-points[i]).norm_square() > radius_square*circle_gap)
+        if ((center-points[i]).norm_square() > radius_square * 1.5)
           {
             inside_circle = false;
             break;
@@ -965,22 +955,14 @@ TransfiniteInterpolationManifold<dim,spacedim>
       if (inside_circle == false)
         continue;
 
-      // expensive search
-      try
+      // slightly more expensive search
+      double current_distance = 0;
+      for (unsigned int i=0; i<points.size(); ++i)
         {
-          double current_distance = 0;
-          for (unsigned int i=0; i<points.size(); ++i)
-            {
-              Point<dim> point = StaticMappingQ1<dim,spacedim>::mapping.transform_real_to_unit_cell(cell, points[i]);
-              current_distance += GeometryInfo<dim>::distance_to_unit_cell(point);
-            }
-          distances_and_cells.emplace_back(current_distance, cell->index());
+          Point<dim> point = cell->real_to_unit_cell_affine_approximation(points[i]);
+          current_distance += GeometryInfo<dim>::distance_to_unit_cell(point);
         }
-      catch (typename Mapping<dim,spacedim>::ExcTransformationFailed &)
-        {
-          // in case the transformation by the mapping fails, use the radius
-          distances_and_cells.emplace_back(std::sqrt(radius_square), cell->index());
-        }
+      distances_and_cells.emplace_back(current_distance, cell->index());
     }
   // no coarse cell could be found -> transformation failed
   AssertThrow(distances_and_cells.size() > 0,

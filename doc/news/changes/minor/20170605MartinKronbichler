@@ -1,0 +1,4 @@
+New: A function TriaAccessor::real_to_unit_cell_affine_approximation that
+computes an approximation to a point in unit coordinates has been added.
+<br>
+(Martin Kronbichler, 2017/06/05)

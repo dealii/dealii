@@ -188,160 +188,6 @@ namespace internal
 
 
 
-      /**
-       * Compute an initial guess to pass to the Newton method in
-       * transform_real_to_unit_cell.  For the initial guess we proceed in the
-       * following way:
-       * <ul>
-       * <li> find the least square dim-dimensional plane approximating the cell
-       * vertices, i.e. we find an affine map A x_hat + b from the reference cell
-       * to the real space.
-       * <li> Solve the equation A x_hat + b = p for x_hat
-       * <li> This x_hat is the initial solution used for the Newton Method.
-       * </ul>
-       *
-       * @note if dim<spacedim we first project p onto the plane.
-       *
-       * @note if dim==1 (for any spacedim) the initial guess is the exact
-       * solution and no Newton iteration is needed.
-       *
-       * Some details about how we compute the least square plane. We look
-       * for a spacedim x (dim + 1) matrix X such that X * M = Y where M is
-       * a (dim+1) x n_vertices matrix and Y a spacedim x n_vertices.  And:
-       * The i-th column of M is unit_vertex[i] and the last row all
-       * 1's. The i-th column of Y is real_vertex[i].  If we split X=[A|b],
-       * the least square approx is A x_hat+b Classically X = Y * (M^t (M
-       * M^t)^{-1}) Let K = M^t * (M M^t)^{-1} = [KA Kb] this can be
-       * precomputed, and that is exactly what we do.  Finally A = Y*KA and
-       * b = Y*Kb.
-       */
-      template <int dim>
-      struct TransformR2UInitialGuess
-      {
-        static const double KA[GeometryInfo<dim>::vertices_per_cell][dim];
-        static const double Kb[GeometryInfo<dim>::vertices_per_cell];
-      };
-
-
-      /*
-        Octave code:
-        M=[0 1; 1 1];
-        K1 = transpose(M) * inverse (M*transpose(M));
-        printf ("{%f, %f},\n", K1' );
-      */
-      template <>
-      const double
-      TransformR2UInitialGuess<1>::
-      KA[GeometryInfo<1>::vertices_per_cell][1] =
-      {
-        {-1.000000},
-        {1.000000}
-      };
-
-      template <>
-      const double
-      TransformR2UInitialGuess<1>::
-      Kb[GeometryInfo<1>::vertices_per_cell] = {1.000000, 0.000000};
-
-
-      /*
-        Octave code:
-        M=[0 1 0 1;0 0 1 1;1 1 1 1];
-        K2 = transpose(M) * inverse (M*transpose(M));
-        printf ("{%f, %f, %f},\n", K2' );
-      */
-      template <>
-      const double
-      TransformR2UInitialGuess<2>::
-      KA[GeometryInfo<2>::vertices_per_cell][2] =
-      {
-        {-0.500000, -0.500000},
-        { 0.500000, -0.500000},
-        {-0.500000,  0.500000},
-        { 0.500000,  0.500000}
-      };
-
-      /*
-        Octave code:
-        M=[0 1 0 1 0 1 0 1;0 0 1 1 0 0 1 1; 0 0 0 0 1 1 1 1; 1 1 1 1 1 1 1 1];
-        K3 = transpose(M) * inverse (M*transpose(M))
-        printf ("{%f, %f, %f, %f},\n", K3' );
-      */
-      template <>
-      const double
-      TransformR2UInitialGuess<2>::
-      Kb[GeometryInfo<2>::vertices_per_cell] =
-      {0.750000,0.250000,0.250000,-0.250000 };
-
-
-      template <>
-      const double
-      TransformR2UInitialGuess<3>::
-      KA[GeometryInfo<3>::vertices_per_cell][3] =
-      {
-        {-0.250000, -0.250000, -0.250000},
-        { 0.250000, -0.250000, -0.250000},
-        {-0.250000,  0.250000, -0.250000},
-        { 0.250000,  0.250000, -0.250000},
-        {-0.250000, -0.250000,  0.250000},
-        { 0.250000, -0.250000,  0.250000},
-        {-0.250000,  0.250000,  0.250000},
-        { 0.250000,  0.250000,  0.250000}
-
-      };
-
-
-      template <>
-      const double
-      TransformR2UInitialGuess<3>::
-      Kb[GeometryInfo<3>::vertices_per_cell] =
-      {0.500000,0.250000,0.250000,0.000000,0.250000,0.000000,0.000000,-0.250000};
-
-      template<int dim, int spacedim>
-      Point<dim>
-      transform_real_to_unit_cell_initial_guess (const std::vector<Point<spacedim> > &vertex,
-                                                 const Point<spacedim>               &p)
-      {
-        Point<dim> p_unit;
-
-        dealii::FullMatrix<double>  KA(GeometryInfo<dim>::vertices_per_cell, dim);
-        dealii::Vector <double>  Kb(GeometryInfo<dim>::vertices_per_cell);
-
-        KA.fill( (double *)(TransformR2UInitialGuess<dim>::KA) );
-        for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-          Kb(i) = TransformR2UInitialGuess<dim>::Kb[i];
-
-        FullMatrix<double> Y(spacedim, GeometryInfo<dim>::vertices_per_cell);
-        for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; v++)
-          for (unsigned int i=0; i<spacedim; ++i)
-            Y(i,v) = vertex[v][i];
-
-        FullMatrix<double> A(spacedim,dim);
-        Y.mmult(A,KA); // A = Y*KA
-        dealii::Vector<double> b(spacedim);
-        Y.vmult(b,Kb); // b = Y*Kb
-
-        for (unsigned int i=0; i<spacedim; ++i)
-          b(i) -= p[i];
-        b*=-1;
-
-        dealii::Vector<double> dest(dim);
-
-        FullMatrix<double> A_1(dim,spacedim);
-        if (dim<spacedim)
-          A_1.left_invert(A);
-        else
-          A_1.invert(A);
-
-        A_1.vmult(dest,b); //A^{-1}*b
-
-        for (unsigned int i=0; i<dim; ++i)
-          p_unit[i]=dest(i);
-
-        return p_unit;
-      }
-
-
       template <int dim, int spacedim>
       void compute_shape_function_values_general (const unsigned int            n_shape_functions,
                                                   const std::vector<Point<dim> > &unit_points,
@@ -1865,11 +1711,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
               if (spacedim == 1)
                 return internal::MappingQ1::transform_real_to_unit_cell(vertices, p);
               else
-                {
-                  const std::vector<Point<spacedim> > a (vertices.begin(),
-                                                         vertices.end());
-                  return internal::MappingQ1::transform_real_to_unit_cell_initial_guess<dim,spacedim>(a,p);
-                }
+                break;
             }
 
             case 2:
@@ -1908,54 +1750,49 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
     }
 
 
+  // Find the initial value for the Newton iteration by a normal
+  // projection to the least square plane determined by the vertices
+  // of the cell
   Point<dim> initial_p_unit;
-  if (polynomial_degree == 1)
+  if (this->preserves_vertex_locations())
+    initial_p_unit = cell->real_to_unit_cell_affine_approximation(p);
+  else
     {
-      // Find the initial value for the Newton iteration by a normal
-      // projection to the least square plane determined by the vertices
-      // of the cell
-      const std::vector<Point<spacedim> > a
+      // for the MappingQEulerian type classes, we want to still call the cell
+      // iterator's affine approximation. do so by creating a dummy
+      // triangulation with just the first vertices.
+      //
+      // we do this by first getting all support points, then
+      // throwing away all but the vertices, and finally calling
+      // the same function as above
+      std::vector<Point<spacedim> > a
         = this->compute_mapping_support_points (cell);
-      Assert(a.size() == GeometryInfo<dim>::vertices_per_cell,
-             ExcInternalError());
-      initial_p_unit = internal::MappingQ1::transform_real_to_unit_cell_initial_guess<dim,spacedim>(a,p);
+      a.resize(GeometryInfo<dim>::vertices_per_cell);
+      std::vector<CellData<dim> > cells(1);
+      for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+        cells[0].vertices[i] = i;
+      Triangulation<dim,spacedim> tria;
+      tria.create_triangulation(a, cells, SubCellData());
+      initial_p_unit = tria.begin_active()->real_to_unit_cell_affine_approximation(p);
+    }
+  // in 1d with spacedim > 1 the affine approximation is exact
+  if (dim == 1 && polynomial_degree == 1)
+    {
+      return initial_p_unit;
     }
   else
     {
-      try
-        {
-          // Find the initial value for the Newton iteration by a normal
-          // projection to the least square plane determined by the vertices
-          // of the cell
-          //
-          // we do this by first getting all support points, then
-          // throwing away all but the vertices, and finally calling
-          // the same function as above
-          std::vector<Point<spacedim> > a
-            = this->compute_mapping_support_points (cell);
-          a.resize(GeometryInfo<dim>::vertices_per_cell);
-          initial_p_unit = internal::MappingQ1::transform_real_to_unit_cell_initial_guess<dim,spacedim>(a,p);
-        }
-      catch (const typename Mapping<dim,spacedim>::ExcTransformationFailed &)
-        {
-          for (unsigned int d=0; d<dim; ++d)
-            initial_p_unit[d] = 0.5;
-        }
-
-      // in case the function above should have given us something
-      // back that lies outside the unit cell (that might happen
-      // because we may have given a point 'p' that lies inside the
-      // cell with the higher order mapping, but outside the Q1-mapped
-      // reference cell), then project it back into the reference cell
-      // in hopes that this gives a better starting point to the
+      // in case the function above should have given us something back that
+      // lies outside the unit cell, then project it back into the reference
+      // cell in hopes that this gives a better starting point to the
       // following iteration
       initial_p_unit = GeometryInfo<dim>::project_to_unit_cell(initial_p_unit);
-    }
 
-  // perform the Newton iteration and return the result. note that
-  // this statement may throw an exception, which we simply pass up to
-  // the caller
-  return this->transform_real_to_unit_cell_internal(cell, p, initial_p_unit);
+      // perform the Newton iteration and return the result. note that this
+      // statement may throw an exception, which we simply pass up to the
+      // caller
+      return this->transform_real_to_unit_cell_internal(cell, p, initial_p_unit);
+    }
 }
 
 

@@ -129,6 +129,7 @@ public:
    * preserve vertex locations (unless the translation vector happens to
    * provide for zero displacements at vertex locations).
    */
+  virtual
   bool preserves_vertex_locations () const;
 
   /**
@@ -199,6 +200,14 @@ private:
     virtual
     std::vector<Point<spacedim> >
     compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
+
+    /**
+     * Always returns @p false because MappingQ1Eulerian does not in general
+     * preserve vertex locations (unless the translation vector happens to
+     * provide for zero displacements at vertex locations).
+     */
+    virtual
+    bool preserves_vertex_locations () const;
 
   private:
     /**

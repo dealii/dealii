@@ -153,6 +153,15 @@ get_vertices
 
 
 
+template <int dim, class VectorType, int spacedim>
+bool
+MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
+preserves_vertex_locations () const
+{
+  return false;
+}
+
+
 
 template <int dim, class VectorType, int spacedim>
 std::vector<Point<spacedim> >
