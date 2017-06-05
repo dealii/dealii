@@ -518,20 +518,20 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
-  PetscBooleanType
+  PetscBool
   MatrixBase::is_symmetric (const double tolerance)
   {
-    PetscBooleanType truth;
+    PetscBool truth;
     assert_is_compressed ();
     const PetscErrorCode ierr = MatIsSymmetric (matrix, tolerance, &truth);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
     return truth;
   }
 
-  PetscBooleanType
+  PetscBool
   MatrixBase::is_hermitian (const double tolerance)
   {
-    PetscBooleanType truth;
+    PetscBool truth;
 
     assert_is_compressed ();
     const PetscErrorCode ierr = MatIsHermitian (matrix, tolerance, &truth);
