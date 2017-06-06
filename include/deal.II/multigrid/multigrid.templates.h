@@ -125,7 +125,7 @@ Multigrid<VectorType>::level_v_step (const unsigned int level)
   // smoothing of the residual
   if (debug>1)
     deallog << "Smoothing on     level " << level << std::endl;
-  pre_smooth->smooth(level, solution[level], defect[level]);
+  pre_smooth->apply(level, solution[level], defect[level]);
 
   if (debug>2)
     deallog << "Solution norm          " << solution[level].l2_norm()
@@ -241,7 +241,7 @@ Multigrid<VectorType>::level_step(const unsigned int level,
   // smoothing of the residual
   if (debug>1)
     deallog << cychar << "-cycle smoothing level " << level << std::endl;
-  pre_smooth->smooth(level, solution[level], defect2[level]);
+  pre_smooth->apply(level, solution[level], defect2[level]);
 
   if (debug>2)
     deallog << cychar << "-cycle solution norm   "
@@ -268,11 +268,7 @@ Multigrid<VectorType>::level_step(const unsigned int level,
 
   transfer->restrict_and_add (level, defect2[level-1], t[level]);
 
-  // Every cycle starts with a recursion of its type. As opposed to the
-  // V-cycle above where we do not need to set the solution vector to zero (as
-  // that has been done in the init functions), we need to zero out the values
-  // from previous cycles.
-  solution[level-1] = 0;
+  // Every cycle starts with a recursion of its type.
   level_step(level-1, cycle);
 
   // For W and F-cycle, repeat the process on the next coarser level except
@@ -337,8 +333,10 @@ Multigrid<VectorType>::cycle()
 
   for (unsigned int level=minlevel; level<=maxlevel; ++level)
     {
-      solution[level].reinit(defect[level]);
-      t[level].reinit(defect[level]);
+      // the vectors for level>minlevel will be overwritten by the apply()
+      // method of the smoother -> do not force them to be zeroed out here
+      solution[level].reinit(defect[level], level>minlevel);
+      t[level].reinit(defect[level], level>minlevel);
       if (cycle_type != v_cycle)
         defect2[level].reinit(defect[level]);
     }
@@ -362,8 +360,8 @@ Multigrid<VectorType>::vcycle()
 
   for (unsigned int level=minlevel; level<=maxlevel; ++level)
     {
-      solution[level].reinit(defect[level]);
-      t[level].reinit(defect[level]);
+      solution[level].reinit(defect[level], level>minlevel);
+      t[level].reinit(defect[level], level>minlevel);
     }
   level_v_step (maxlevel);
 }

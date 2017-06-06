@@ -223,6 +223,7 @@ public:
    * Virtual destructor.
    */
   virtual ~MGSmootherBase();
+
   /**
    * Release matrices.
    */
@@ -234,6 +235,20 @@ public:
   virtual void smooth (const unsigned int level,
                        VectorType         &u,
                        const VectorType   &rhs) const = 0;
+
+  /**
+   * As opposed to the smoothing function, this function applies the action of
+   * the smoothing, overwriting the previous content in the vector u. This
+   * function must be equivalent to the following code
+   * @code
+   * u = 0;
+   * smooth(level, u, rhs);
+   * @endcode
+   * but can usually be implemented more efficiently than the former.
+   */
+  virtual void apply (const unsigned int level,
+                      VectorType         &u,
+                      const VectorType   &rhs) const;
 };
 
 /*@}*/
