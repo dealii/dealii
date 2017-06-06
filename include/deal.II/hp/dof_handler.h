@@ -767,7 +767,7 @@ namespace hp
      * Functions that will be triggered through signals whenever the
      * triangulation is modified.
      *
-     * Here they are used to administrate the the active_fe_fields during the
+     * Here they are used to administrate the active_fe_fields during the
      * spatial refinement.
      */
     void pre_refinement_action ();

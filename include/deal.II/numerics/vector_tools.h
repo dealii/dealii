@@ -389,7 +389,7 @@ namespace VectorTools
     L1_norm,
 
     /**
-     * The square of the function is integrated and the the square root of the
+     * The square of the function is integrated and the square root of the
      * result is computed on each cell:
      * @f[
      *   E_K = \sqrt{ \int_K \sum_c e_c^2 \, w_c }

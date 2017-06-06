@@ -1019,7 +1019,7 @@ namespace Threads
        * the thread.
        *
        * The return value is stored in a shared_ptr because we might abandon
-       * the the ThreadDescriptor.  This makes sure the object stays alive
+       * the ThreadDescriptor.  This makes sure the object stays alive
        * until the thread exits.
        */
       std::shared_ptr<return_value<RT> > ret_val;

@@ -734,7 +734,7 @@ namespace PETScWrappers
      * only swaps the pointers to the data of the two vectors and therefore
      * does not need to allocate temporary storage and move data around.
      *
-     * This function is analogous to the the @p swap function of all C++
+     * This function is analogous to the @p swap function of all C++
      * standard containers. Also, there is a global function
      * <tt>swap(u,v)</tt> that simply calls <tt>u.swap(v)</tt>, again in
      * analogy to standard functions.

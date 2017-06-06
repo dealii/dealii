@@ -2831,7 +2831,7 @@ private:
  * files, the rest of the nodes will have valid set to false. The XDMF file in
  * turn points to heavy data files (such as HDF5) where the actual simulation
  * data is stored. This allows flexibility in arranging the data, and also
- * allows the mesh to be separated from the the point data.
+ * allows the mesh to be separated from the point data.
  */
 class XDMFEntry
 {

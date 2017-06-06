@@ -107,7 +107,7 @@ namespace hp
  * to describe the manifold this object belongs to.
  *
  * This structure is also used to represent data for faces and edges when used
- * as a member of the the SubCellData class. In this case, the template argument
+ * as a member of the SubCellData class. In this case, the template argument
  * @p structdim of an object will be less than the dimension @p dim of the
  * triangulation. If this is so, then #vertices array represents the indices of
  * the vertices of one face or edge of one of the cells passed to
@@ -1682,7 +1682,7 @@ public:
   void set_boundary (const types::manifold_id number);
 
   /**
-   * Assign a manifold object to a certain part of the the triangulation. If
+   * Assign a manifold object to a certain part of the triangulation. If
    * an object with manifold number @p number is refined, this object is used
    * to find the location of new vertices (see the results section of step-49
    * for a more in-depth discussion of this, with examples).  It is also used

@@ -480,7 +480,7 @@ public:
   bool has_inhomogeneities () const;
 
   /**
-   * Return a pointer to the the vector of entries if a line is constrained,
+   * Return a pointer to the vector of entries if a line is constrained,
    * and a zero pointer in case the dof is not constrained.
    */
   const std::vector<std::pair<size_type,double> > *

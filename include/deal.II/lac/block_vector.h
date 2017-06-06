@@ -306,7 +306,7 @@ public:
    * only swaps the pointers to the data of the two vectors and therefore does
    * not need to allocate temporary storage and move data around.
    *
-   * This function is analogous to the the swap() function of all C++ standard
+   * This function is analogous to the swap() function of all C++ standard
    * containers. Also, there is a global function swap(u,v) that simply calls
    * <tt>u.swap(v)</tt>, again in analogy to standard functions.
    */

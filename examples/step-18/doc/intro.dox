@@ -300,7 +300,7 @@ simply translated along. The dilational or compressional change produces a
 corresponding stress update. However, the rotational component does not
 necessarily induce a nonzero stress update (think, in 2d, for example of the
 situation where $\Delta\mathbf{u}=(y, -x)^T$, with which $\varepsilon(\Delta
-\mathbf{u})=0$). Nevertheless, if the the material was prestressed in a certain
+\mathbf{u})=0$). Nevertheless, if the material was prestressed in a certain
 direction, then this direction will be rotated along with the material.  To
 this end, we have to define a rotation matrix $R(\Delta \mathbf{u}^n)$ that
 describes, in each point the rotation due to the displacement increments. It

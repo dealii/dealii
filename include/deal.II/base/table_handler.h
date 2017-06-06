@@ -468,7 +468,7 @@ public:
   void set_tex_table_label (const std::string &table_label);
 
   /**
-   * Set the caption the the supercolumn <tt>superkey</tt> for tex output.
+   * Set the caption the supercolumn <tt>superkey</tt> for tex output.
    * You may want to chose this different from <tt>superkey</tt>, if it
    * contains formulas or similar constructs.
    */
@@ -695,7 +695,7 @@ protected:
   mutable std::map<std::string,Column> columns;
 
   /**
-   * Maps each supercolumn key to the the keys of its subcolumns in the right
+   * Maps each supercolumn key to the keys of its subcolumns in the right
    * order.  It is allowed that a supercolumn has got the same key as a
    * column.
    *

@@ -73,7 +73,7 @@ namespace PETScWrappers
      * For the meaning of the @p local_rows and @p local_columns parameters,
      * see the PETScWrappers::MPI::SparseMatrix class documentation.
      *
-     * As other PETSc matrices, also the the matrix-free object needs to have
+     * As other PETSc matrices, also the matrix-free object needs to have
      * a size and to perform matrix vector multiplications efficiently in
      * parallel also @p local_rows and @p local_columns. But in contrast to
      * PETSc::SparseMatrix classes a PETSc matrix-free object does not need
@@ -90,7 +90,7 @@ namespace PETScWrappers
      * Create a matrix object of dimensions @p m times @p n with communication
      * happening over the provided @p communicator.
      *
-     * As other PETSc matrices, also the the matrix-free object needs to have
+     * As other PETSc matrices, also the matrix-free object needs to have
      * a size and to perform matrix vector multiplications efficiently in
      * parallel also @p local_rows and @p local_columns. But in contrast to
      * PETSc::SparseMatrix classes a PETSc matrix-free object does not need
