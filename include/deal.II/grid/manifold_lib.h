@@ -283,17 +283,17 @@ public:
                        const double tolerance = 1e-10);
 
   /**
-   * Compute the cartesian coordinates for a point given in cylindrical
+   * Compute the Cartesian coordinates for a point given in cylindrical
    * coordinates.
    */
   virtual Point<3>
   pull_back(const Point<spacedim> &space_point) const override;
 
   /**
-   * Compute the cylindrical coordinates \f$(r, \phi, \lambda)\f$ for the given
-   * point where \f$r\f$ denotes the distance from the axis,
-   * \f$\phi\f$ the angle between the given point and the computed normal
-   * direction and \f$\lambda\f$ the axial position.
+   * Compute the cylindrical coordinates $(r, \phi, \lambda)$ for the given
+   * point where $r$ denotes the distance from the axis,
+   * $\phi$ the angle between the given point and the computed normal
+   * direction and $\lambda$ the axial position.
    */
   virtual Point<spacedim>
   push_forward(const Point<3> &chart_point) const override;
@@ -306,13 +306,7 @@ public:
   get_new_point(const std::vector<Point<spacedim> > &surrounding_points,
                 const std::vector<double>           &weights) const override;
 
-private:
-  /**
-   * Compute a vector that is orthogonal to the given one.
-   * Used for initializing the member variable normal_direction.
-   */
-  Point<spacedim> compute_normal(const Tensor<1,spacedim> &vector) const;
-
+protected:
   /**
    * A vector orthogonal to direcetion.
    */
@@ -328,10 +322,19 @@ private:
    */
   const Point<spacedim> point_on_axis;
 
+private:
   /**
    * Relative tolerance to measure zero distances.
    */
   double tolerance;
+
+  // explicitly check for sensible template arguments, but not on windows
+  // because MSVC creates bogus warnings during normal compilation
+#ifndef DEAL_II_MSVC
+  static_assert (spacedim==3,
+                 "CylindricalManifold can only be used for spacedim==3!");
+#endif
+
 };
 
 

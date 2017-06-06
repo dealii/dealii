@@ -300,18 +300,49 @@ get_new_point (const std::vector<Point<spacedim> > &vertices,
 // CylindricalManifold
 // ============================================================
 
+namespace
+{
+  // helper function to compute a vector orthogonal to a given one.
+  template <int spacedim>
+  Point<spacedim>
+  compute_normal(const Tensor<1,spacedim> &vector)
+  {
+    AssertThrow(vector.norm() != 0.,
+                ExcMessage("The direction parameter must not be zero!"));
+    Point<3> normal;
+    if (std::abs(vector[0]) >= std::abs(vector[1])
+        && std::abs(vector[0]) >= std::abs(vector[2]))
+      {
+        normal[1]=-1.;
+        normal[2]=-1.;
+        normal[0]=(vector[1]+vector[2])/vector[0];
+      }
+    else if (std::abs(vector[1]) >= std::abs(vector[0])
+             && std::abs(vector[1]) >= std::abs(vector[2]))
+      {
+        normal[0]=-1.;
+        normal[2]=-1.;
+        normal[1]=(vector[0]+vector[2])/vector[1];
+      }
+    else
+      {
+        normal[0]=-1.;
+        normal[1]=-1.;
+        normal[2]=(vector[0]+vector[1])/vector[2];
+      }
+    return normal;
+  }
+}
+
+
+
 template <int dim, int spacedim>
 CylindricalManifold<dim, spacedim>::CylindricalManifold(const unsigned int axis,
                                                         const double tolerance) :
-  ChartManifold<dim,spacedim,3>(Tensor<1,3>({0,2.*numbers::PI,0})),
-              normal_direction(compute_normal(Point<3>::unit_vector(axis))),
-              direction (Point<3>::unit_vector(axis)),
-              point_on_axis (Point<3>()),
-              tolerance(tolerance)
-{
-  static_assert(spacedim==3,
-                "CylindricalManifold can only be used for spacedim==3!");
-}
+  CylindricalManifold<dim, spacedim>(Point<3>::unit_vector(axis),
+                                     Point<3>(),
+                                     tolerance)
+{}
 
 
 
@@ -324,42 +355,7 @@ CylindricalManifold<dim, spacedim>::CylindricalManifold(const Point<spacedim> &d
               direction (direction_/direction_.norm()),
               point_on_axis (point_on_axis_),
               tolerance(tolerance)
-{
-  static_assert(spacedim==3,
-                "CylindricalManifold can only be used for spacedim==3!");
-}
-
-
-
-template <int dim, int spacedim>
-Point<spacedim>
-CylindricalManifold<dim, spacedim>::compute_normal(const Tensor<1,spacedim> &vector) const
-{
-  AssertThrow(vector.norm() != 0.,
-              ExcMessage("The direction parameter must not be zero!"));
-  Point<3> normal;
-  if (std::abs(vector[0]) >= std::abs(vector[1])
-      && std::abs(vector[0]) >= std::abs(vector[2]))
-    {
-      normal[1]=-1.;
-      normal[2]=-1.;
-      normal[0]=(vector[1]+vector[2])/vector[0];
-    }
-  else if (std::abs(vector[1]) >= std::abs(vector[0])
-           && std::abs(vector[1]) >= std::abs(vector[2]))
-    {
-      normal[0]=-1.;
-      normal[2]=-1.;
-      normal[1]=(vector[0]+vector[2])/vector[1];
-    }
-  else
-    {
-      normal[0]=-1.;
-      normal[1]=-1.;
-      normal[2]=(vector[0]+vector[1])/vector[2];
-    }
-  return normal;
-}
+{}
 
 
 
@@ -369,7 +365,7 @@ CylindricalManifold<dim,spacedim>::
 get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
                const std::vector<double>           &weights) const
 {
-  // First check if the the average in space lies on the axis.
+  // First check if the average in space lies on the axis.
   Point<spacedim> middle;
   double average_length = 0.;
   for (unsigned int i=0; i<surrounding_points.size(); ++i)
