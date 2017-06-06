@@ -1168,8 +1168,24 @@
  * "material id". It is commonly used in problems with heterogeneous
  * coefficients to identify which part of the domain a cell is in and,
  * consequently, which value the coefficient should have on this particular
- * cell. The material id is inherited from mother to child cell upon mesh
- * refinement.
+ * cell. In practice, the material id of a cell
+ * is typically used to identify which cells belong to a particular part of
+ * the domain, e.g., when you have different materials (steel, concrete, wood)
+ * that are all part of the same domain. One would then usually query the
+ * material id associated with a cell during assembly of the bilinear form,
+ * and use it to determine (e.g., by table lookup, or a sequence of if-else
+ * statements) what the correct material coefficients would be for that cell.
+ *
+ * This material_id may be set upon construction of a triangulation (through
+ * the CellData data structure), or later through use of cell iterators. For a
+ * typical use of this functionality, see the step-28 tutorial program. The
+ * functions of the GridGenerator namespace typically set the material ID of
+ * all cells to zero. When reading a triangulation through the GridIn class,
+ * different input file formats have different conventions, but typically
+ * either explicitly specify the material id, or if they don't, then GridIn
+ * simply sets them to zero. Because the material of a cell is intended
+ * to pertain to a particular region of the domain, material ids are inherited
+ * by child cells from their parent upon mesh refinement.
  *
  * The material id is set and queried using the CellAccessor::material_id,
  * CellAccessor::set_material_id and CellAccessor::recursively_set_material_id
