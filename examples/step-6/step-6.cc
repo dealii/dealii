@@ -579,9 +579,10 @@ void Step6<dim>::refine_grid ()
 // hack with an explicit assertion at the beginning of the function. If this
 // assertion is triggered, i.e. when <code>cycle</code> is larger than or
 // equal to 10, an exception of type <code>ExcNotImplemented</code> is raised,
-// indicating that some functionality is not implemented for this case (the
+// indicating that some functionality is not implemented for this case -- the
 // functionality that is missing, of course, is the generation of file names
-// for that case):
+// for that case. (A longer discussion of what exactly the @p Assert macro
+// does can be found in the @ref Exceptions "exception documentation module".)
 template <int dim>
 void Step6<dim>::output_results (const unsigned int cycle) const
 {

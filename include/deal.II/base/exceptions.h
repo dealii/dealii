@@ -185,6 +185,8 @@ namespace deal_II_exceptions
    *
    * Previously set additional output is replaced by the argument given to
    * this function.
+   *
+   * @see Exceptions
    */
   void set_additional_assert_output (const char *const p);
 
@@ -195,6 +197,8 @@ namespace deal_II_exceptions
    * to compare the output of a program across different machines and systems,
    * since the stacktrace shows memory addresses and library names/paths that
    * depend on the exact setup of a machine.
+   *
+   * @see Exceptions
    */
   void suppress_stacktrace_in_exceptions ();
 
@@ -208,6 +212,8 @@ namespace deal_II_exceptions
    * for example in regression tests. Please note that some fatal errors will
    * still call abort(), e.g. when an exception is caught during exception
    * handling.
+   *
+   * @see Exceptions
    */
   void disable_abort_on_exception ();
 
@@ -305,11 +311,13 @@ namespace deal_II_exceptions
 
 
 /**
- * This is the main routine in the exception mechanism for debug mode error
- * checking. It asserts that a certain condition is fulfilled, otherwise
+ * A macro that serves as the main routine in the exception mechanism for debug mode
+ * error checking. It asserts that a certain condition is fulfilled, otherwise
  * issues an error and aborts the program.
  *
- * See the <tt>ExceptionBase</tt> class for more information.
+ * A more detailed description can be found in the @ref Exceptions documentation
+ * module. It is first used in step-5 and step-6.
+ * See also the <tt>ExceptionBase</tt> class for more information.
  *
  * @note Active in DEBUG mode only
  * @ingroup Exceptions
@@ -332,13 +340,14 @@ namespace deal_II_exceptions
 
 /**
  * A variant of the <tt>Assert</tt> macro above that exhibits the same runtime
- * behaviour as long as disable_abort_on_exception was not called.
+ * behavior as long as disable_abort_on_exception was not called.
  *
  * However, if disable_abort_on_exception was called, this macro merely prints
  * the exception that would be thrown to deallog and continues normally
  * without throwing an exception.
  *
- * See the <tt>ExceptionBase</tt> class for more information.
+ * A more detailed description can be found in the @ref Exceptions documentation
+ * module, in the discussion about the corner case at the bottom of the page.
  *
  * @note Active in DEBUG mode only
  * @ingroup Exceptions
@@ -361,11 +370,15 @@ namespace deal_II_exceptions
 
 
 /**
- * This is the main routine in the exception mechanism for run-time mode error
- * checking. It assert that a certain condition is fulfilled, otherwise issues
- * an error and aborts the program.
+ * A macro that serves as the main routine in the exception mechanism for dynamic
+ * error checking. It asserts that a certain condition is fulfilled, otherwise
+ * throws an exception via the C++ @p throw mechanism. This exception can
+ * be caught via a @p catch clause, as is shown in step-6 and all following
+ * tutorial programs.
  *
- * See the <tt>ExceptionBase</tt> class for more information.
+ * A more detailed description can be found in the @ref Exceptions documentation
+ * module. It is first used in step-9 and step-13.
+ * See also the <tt>ExceptionBase</tt> class for more information.
  *
  * @note Active in both DEBUG and RELEASE modes
  * @ingroup Exceptions

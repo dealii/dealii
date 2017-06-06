@@ -416,11 +416,13 @@ void Step5<dim>::run ()
   // the condition which is given as first argument is valid, and if not
   // throws an exception (its second argument) which will usually terminate
   // the program giving information where the error occurred and what the
-  // reason was. This generally reduces the time to find programming errors
+  // reason was. (A longer discussion of what exactly the @p Assert macro
+  // does can be found in the @ref Exceptions "exception documentation module".)
+  // This generally reduces the time to find programming errors
   // dramatically and we have found assertions an invaluable means to program
   // fast.
   //
-  // On the other hand, all these checks (there are over 9000 of them in the
+  // On the other hand, all these checks (there are over 10,000 of them in the
   // library at present) should not slow down the program too much if you want
   // to do large computations. To this end, the <code>Assert</code> macro is
   // only used in debug mode and expands to nothing if in optimized
