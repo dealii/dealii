@@ -8982,7 +8982,8 @@ Triangulation (const Triangulation<dim, spacedim> &other)
 {
   Assert (false, ExcMessage ("You are not allowed to call this constructor "
                              "because copying Triangulation objects is not "
-                             "allowed. Use Triangulation::copy_from() instead."));
+                             "allowed. Use Triangulation::copy_triangulation() "
+                             "instead."));
 }
 
 
