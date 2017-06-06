@@ -291,7 +291,7 @@ void DataOutStack<dim,spacedim,DoFHandlerType>::build_patches (const unsigned in
 
   // add the required number of
   // patches. first initialize a template
-  // patch with n_q_points (in the the plane
+  // patch with n_q_points (in the plane
   // of the cells) times n_subdivisions+1 (in
   // the time direction) points
   dealii::DataOutBase::Patch<dim+1,dim+1>  default_patch;
@@ -366,7 +366,7 @@ void DataOutStack<dim,spacedim,DoFHandlerType>::build_patches (const unsigned in
         };
 
 
-      // now fill in the the data values.
+      // now fill in the data values.
       // note that the required order is
       // with highest coordinate running
       // fastest, we need to enter each

@@ -355,7 +355,7 @@ namespace TrilinosWrappers
      * a ghosted vector may not even store all of the elements a non- ghosted
      * vector would store on the current processor.  Consequently, for
      * Trilinos vectors, there is no notion of an 'owner' of vector elements
-     * in the way we have it in the the non-ghost case view.
+     * in the way we have it in the non-ghost case view.
      *
      * This explains why we do not allow writing into ghosted vectors on the
      * Trilinos side: Who would be responsible for taking care of the
@@ -1134,7 +1134,7 @@ namespace TrilinosWrappers
        * does not need to allocate temporary storage and move data around. Note
        * that the vectors need to be of the same size and base on the same map.
        *
-       * This function is analogous to the the @p swap function of all C++
+       * This function is analogous to the @p swap function of all C++
        * standard containers. Also, there is a global function
        * <tt>swap(u,v)</tt> that simply calls <tt>u.swap(v)</tt>, again in
        * analogy to standard functions.

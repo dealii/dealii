@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// same as the the test with number _01, but check for block vectors
+// same as the test with number _01, but check for block vectors
 
 
 #include "../tests.h"

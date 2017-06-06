@@ -633,7 +633,7 @@ namespace DoFRenumbering
   /**
    * Sort the degrees of freedom by component. It does the same thing as the
    * above function, only that it does this for one single level of a
-   * multilevel discretization. The non-multigrid part of the the DoFHandler
+   * multilevel discretization. The non-multigrid part of the DoFHandler
    * is not touched.
    */
   template <typename DoFHandlerType>
@@ -679,7 +679,7 @@ namespace DoFRenumbering
   /**
    * Sort the degrees of freedom by vector block. It does the same thing as
    * the above function, only that it does this for one single level of a
-   * multilevel discretization. The non-multigrid part of the the DoFHandler
+   * multilevel discretization. The non-multigrid part of the DoFHandler
    * is not touched.
    */
   template <int dim, int spacedim>

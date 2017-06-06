@@ -238,7 +238,7 @@ private:
     const SupportQuadrature support_quadrature;
 
     /**
-     * FEValues object used to query the the given finite element field at the
+     * FEValues object used to query the given finite element field at the
      * support points in the reference configuration.
      *
      * The variable is marked as mutable since we have to call

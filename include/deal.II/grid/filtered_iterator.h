@@ -528,7 +528,7 @@ public:
    * iterator with the given value.
    *
    * If the initial value @p bi does not satisfy the predicate @p p then it is
-   * advanced until we either hit the the past-the-end iterator, or the
+   * advanced until we either hit the past-the-end iterator, or the
    * predicate is satisfied. This allows, for example, to write code like
    * @code
    *   FilteredIterator<typename Triangulation<dim>::active_cell_iterator>

@@ -158,7 +158,7 @@ private:
   std::vector<number> diag;
 
   /**
-   * Inverses of the the diagonal: precomputed for faster vmult.
+   * Inverses of the diagonal: precomputed for faster vmult.
    */
   std::vector<number> inv_diag;
 

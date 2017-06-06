@@ -136,7 +136,7 @@ public:
   /**
    * Implementation of the interface for @p Multigrid. This function does
    * nothing, which by comparison with the definition of this function means
-   * that the the smoothing operator equals the null operator.
+   * that the smoothing operator equals the null operator.
    */
   virtual void smooth (const unsigned int level,
                        VectorType         &u,

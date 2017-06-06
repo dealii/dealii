@@ -380,7 +380,7 @@ namespace internal
   /**
    * Class that issues the set commands for AlignedVector.
    *
-   * @tparam initialize_memory Sets whether the the set command should
+   * @tparam initialize_memory Sets whether the set command should
    * initialize memory (with a call to the copy constructor) or rather use the
    * copy assignment operator. A template is necessary to select the
    * appropriate operation since some classes might define only one of those

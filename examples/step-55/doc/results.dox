@@ -230,7 +230,7 @@ Trilinos AMG to achieve an optimal preconditioner.
 This change requires changing the outer solver to GMRES or BiCGStab, because
 the system is no longer symmetric.
 
-You can prescribe the the exact flow solution as $b$ in the convective term $b
+You can prescribe the exact flow solution as $b$ in the convective term $b
 \cdot \nabla u$. This should give the same solution as the original problem,
 if you set the right hand side to zero.
 

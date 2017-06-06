@@ -45,7 +45,7 @@ template <typename> class Vector;
  * vector that defines the mapping from the reference configuration to the
  * current configuration and a reference to the DoFHandler. The vector should
  * then represent a (flattened out version of a) vector valued field defined
- * at nodes defined by the the DoFHandler, where the number of components of
+ * at nodes defined by the DoFHandler, where the number of components of
  * the vector field equals the number of space dimensions. Thus, the
  * DoFHandler shall operate on a finite element that has as many components as
  * space dimensions. As an additional requirement, we impose that it have as

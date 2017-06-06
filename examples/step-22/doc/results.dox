@@ -793,7 +793,7 @@ $[-2,2]\times[-2,2]\times[-1,0]$
                                                bottom_left,
                                                top_right);
 @endcode
-then we get images where the the fault line is curved:
+then we get images where the fault line is curved:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">

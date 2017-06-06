@@ -596,7 +596,7 @@ namespace Step8
   // will be only four quadrature points in each direction on the
   // domain. However, the right hand side function was chosen to be rather
   // localized and in that case, by pure chance, it happens that all quadrature
-  // points lie at points where the the right hand side function is zero (in
+  // points lie at points where the right hand side function is zero (in
   // mathematical terms, the quadrature points happen to be at points outside
   // the <i>support</i> of the right hand side function). The right hand side
   // vector computed with quadrature will then contain only zeroes (even though
