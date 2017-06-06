@@ -47,6 +47,20 @@ template <typename> class Vector;
  * used in the step-33 and step-36 tutorial programs (the latter being much
  * simpler to understand).
  *
+ * In addition to the built-in functions of muparser, namely
+ * @code
+ * sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh,
+ * atan2, log2, log10, log, ln, exp, sqrt, sign, rint, abs, min, max, sum, avg
+ * @endcode
+ * this class also supports:
+ * - <tt>if(condition, then-value, else-value)</tt>
+ * - <tt>|</tt> and <tt>&</tt> (logic or and and)
+ * - <tt>int(x)</tt>, <tt>ceil(x)</tt>, <tt>floor(x)</tt> (rounding)
+ * - <tt>cot(x)</tt>, <tt>csc(x)</tt>, <tt>sec(x)</tt>
+ * - <tt>pow(x,n)</tt>, <tt>log(x)</tt>
+ * - <tt>erfc(x)</tt>
+ * - <tt>rand()</tt>, <tt>rand_seed(seed)</tt>
+ *
  * The following examples shows how to use this class:
  * @code
  * // set up problem:
