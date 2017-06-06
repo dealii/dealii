@@ -798,8 +798,10 @@ namespace TrilinosWrappers
     {
       std::swap(last_action, v.last_action);
       std::swap(compressed, v.compressed);
-      std::swap(vector, v.vector);
       std::swap(has_ghosts, v.has_ghosts);
+      std::swap(vector, v.vector);
+      std::swap(nonlocal_vector, v.nonlocal_vector);
+      std::swap(owned_elements, v.owned_elements);
     }
 
 
