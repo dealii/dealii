@@ -48,13 +48,30 @@ void check_at_one (const std::vector<Polynomial<double> > &p)
 
 
 
+void check_at_half (const std::vector<Polynomial<double> > &p)
+{
+  // Ignore first two polynomials as the integrated Legendre polynomials are only defined
+  // for degree > 1, it is only added to maintain the recursive relation.
+
+  deallog << "Function value of polynomial at -0.5 | 0.5:" << std::endl;
+  for (unsigned int i=2; i<p.size(); ++i)
+    {
+      const double y = p[i].value(0.5);
+      const double z = p[i].value(-0.5);
+      deallog << y << " | " << z << std::endl;
+    }
+  deallog << std::endl;
+}
+
+
+
 void
 check_poly (const unsigned int n)
 {
   deallog << "Degree: " << n+1 << std::endl;
   std::vector<Polynomial<double> > p = IntegratedLegendreSZ::generate_complete_basis(n);
   check_at_one (p);
-  deallog << std::endl;
+  check_at_half (p);
 }
 
 
