@@ -1,0 +1,4 @@
+Deprecated: The ParameterHandler::print_parameters_section() function
+has been deprecated.
+<br>
+(Wolfgang Bangerth, 2017/06/07)
