@@ -1,0 +1,6 @@
+Initialization of Chebyshev smoother: project vector onto space of vectors 
+with zero mean which is necessary in some cases where the matrix is singular.
+Rename variable is_initialized -> eigenvalues_are_initialized 
+in order to improve code readability.
+<br>
+(Niklas Fehn, 2017/06/07)
