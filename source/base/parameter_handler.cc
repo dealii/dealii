@@ -1582,8 +1582,9 @@ namespace
 }
 
 
+
 std::string
-ParameterHandler::get_current_path () const
+ParameterHandler::collate_path_string (const std::vector<std::string> &subsection_path)
 {
   if (subsection_path.size() > 0)
     {
@@ -1597,6 +1598,13 @@ ParameterHandler::get_current_path () const
     }
   else
     return "";
+}
+
+
+std::string
+ParameterHandler::get_current_path () const
+{
+  return collate_path_string (subsection_path);
 }
 
 
@@ -2253,7 +2261,7 @@ ParameterHandler::set (const std::string &entry_string,
 
 std::ostream &
 ParameterHandler::print_parameters (std::ostream     &out,
-                                    const OutputStyle style)
+                                    const OutputStyle style) const
 {
   AssertThrow (out, ExcIO());
 
@@ -2311,9 +2319,393 @@ ParameterHandler::print_parameters (std::ostream     &out,
     }
 
   // dive recursively into the subsections
-  print_parameters_section (out, style, 0);
+  recursively_print_parameters (std::vector<std::string>(), // start at the top level
+                                style,
+                                0,
+                                out);
 
   return out;
+}
+
+
+
+void
+ParameterHandler::recursively_print_parameters (const std::vector<std::string> &target_subsection_path,
+                                                const OutputStyle               style,
+                                                const unsigned int              indent_level,
+                                                std::ostream                   &out) const
+{
+  AssertThrow (out, ExcIO());
+
+  // this function should not be necessary for XML or JSON output...
+  Assert ((style != XML) && (style != JSON),
+          ExcInternalError());
+
+  const boost::property_tree::ptree &current_section
+    = entries->get_child (collate_path_string(target_subsection_path));
+
+  unsigned int overall_indent_level = indent_level;
+
+  switch (style)
+    {
+    case Text:
+    case ShortText:
+    {
+      // first find out the longest entry name to be able to align the
+      // equal signs to do this loop over all nodes of the current
+      // tree, select the parameter nodes (and discard sub-tree nodes)
+      // and take the maximum of their lengths
+      //
+      // likewise find the longest actual value string to make sure we
+      // can align the default and documentation strings
+      std::size_t longest_name  = 0;
+      std::size_t longest_value = 0;
+      for (boost::property_tree::ptree::const_iterator
+           p = current_section.begin();
+           p != current_section.end(); ++p)
+        if (is_parameter_node (p->second) == true)
+          {
+            longest_name = std::max (longest_name,
+                                     demangle(p->first).length());
+            longest_value = std::max (longest_value,
+                                      p->second.get<std::string>("value").length());
+          }
+
+      // print entries one by one. make sure they are sorted by using
+      // the appropriate iterators
+      bool first_entry = true;
+      for (boost::property_tree::ptree::const_assoc_iterator
+           p = current_section.ordered_begin();
+           p != current_section.not_found(); ++p)
+        if (is_parameter_node (p->second) == true)
+          {
+            const std::string value = p->second.get<std::string>("value");
+
+            // if there is documentation, then add an empty line
+            // (unless this is the first entry in a subsection), print
+            // the documentation, and then the actual entry; break the
+            // documentation into readable chunks such that the whole
+            // thing is at most 78 characters wide
+            if ((!(style & 128)) &&
+                !p->second.get<std::string>("documentation").empty())
+              {
+                if (first_entry == false)
+                  out << '\n';
+                else
+                  first_entry = false;
+
+                const std::vector<std::string> doc_lines
+                  = Utilities::
+                    break_text_into_lines (p->second.get<std::string>("documentation"),
+                                           78 - overall_indent_level*2 - 2);
+
+                for (unsigned int i=0; i<doc_lines.size(); ++i)
+                  out << std::setw(overall_indent_level*2) << ""
+                      << "# "
+                      << doc_lines[i]
+                      << '\n';
+              }
+
+
+
+            // print name and value of this entry
+            out << std::setw(overall_indent_level*2) << ""
+                << "set "
+                << demangle(p->first)
+                << std::setw(longest_name-demangle(p->first).length()+1) << " "
+                << "= " << value;
+
+            // finally print the default value, but only if it differs
+            // from the actual value
+            if ((!(style & 64)) && value != p->second.get<std::string>("default_value"))
+              {
+                out << std::setw(longest_value-value.length()+1) << ' '
+                    << "# ";
+                out << "default: " << p->second.get<std::string>("default_value");
+              }
+
+            out << '\n';
+          }
+
+      break;
+    }
+
+    case LaTeX:
+    {
+      // if there are any parameters in this section then print them
+      // as an itemized list
+      bool parameters_exist_here = false;
+      for (boost::property_tree::ptree::const_assoc_iterator
+           p = current_section.ordered_begin();
+           p != current_section.not_found(); ++p)
+        if ((is_parameter_node (p->second) == true)
+            ||
+            (is_alias_node (p->second) == true))
+          {
+            parameters_exist_here = true;
+            break;
+          }
+
+      if (parameters_exist_here)
+        {
+          out << "\\begin{itemize}"
+              << '\n';
+
+          // print entries one by one. make sure they are sorted by
+          // using the appropriate iterators
+          for (boost::property_tree::ptree::const_assoc_iterator
+               p = current_section.ordered_begin();
+               p != current_section.not_found(); ++p)
+            if (is_parameter_node (p->second) == true)
+              {
+                const std::string value = p->second.get<std::string>("value");
+
+                // print name
+                out << "\\item {\\it Parameter name:} {\\tt " << demangle(p->first) << "}\n"
+                    << "\\phantomsection\\label{parameters:";
+                for (unsigned int i=0; i<target_subsection_path.size(); ++i)
+                  out << target_subsection_path[i] << "/";
+                out << demangle(p->first);
+                out << "}\n\n"
+                    << '\n';
+
+                out << "\\index[prmindex]{"
+                    << demangle(p->first)
+                    << "}\n";
+                out << "\\index[prmindexfull]{";
+                for (unsigned int i=0; i<target_subsection_path.size(); ++i)
+                  out << target_subsection_path[i] << "!";
+                out << demangle(p->first)
+                    << "}\n";
+
+                // finally print value and default
+                out << "{\\it Value:} " << value << "\n\n"
+                    << '\n'
+                    << "{\\it Default:} "
+                    << p->second.get<std::string>("default_value") << "\n\n"
+                    << '\n';
+
+                // if there is a documenting string, print it as well
+                if (!p->second.get<std::string>("documentation").empty())
+                  out << "{\\it Description:} "
+                      << p->second.get<std::string>("documentation") << "\n\n"
+                      << '\n';
+
+                // also output possible values
+                const unsigned int pattern_index = p->second.get<unsigned int> ("pattern");
+                const std::string desc_str = patterns[pattern_index]->description (Patterns::PatternBase::LaTeX);
+                out << "{\\it Possible values:} "
+                    << desc_str
+                    << '\n';
+              }
+            else if (is_alias_node (p->second) == true)
+              {
+                const std::string alias = p->second.get<std::string>("alias");
+
+                // print name
+                out << "\\item {\\it Parameter name:} {\\tt " << demangle(p->first) << "}\n"
+                    << "\\phantomsection\\label{parameters:";
+                for (unsigned int i=0; i<target_subsection_path.size(); ++i)
+                  out << target_subsection_path[i] << "/";
+                out << demangle(p->first);
+                out << "}\n\n"
+                    << '\n';
+
+                out << "\\index[prmindex]{"
+                    << demangle(p->first)
+                    << "}\n";
+                out << "\\index[prmindexfull]{";
+                for (unsigned int i=0; i<target_subsection_path.size(); ++i)
+                  out << target_subsection_path[i] << "!";
+                out << demangle(p->first)
+                    << "}\n";
+
+                // finally print alias and indicate if it is deprecated
+                out << "This parameter is an alias for the parameter ``\\texttt{"
+                    << alias << "}''."
+                    << (p->second.get<std::string>("deprecation_status") == "true"
+                        ?
+                        " Its use is deprecated."
+                        :
+                        "")
+                    << "\n\n"
+                    << '\n';
+              }
+          out << "\\end{itemize}"
+              << '\n';
+        }
+
+      break;
+    }
+
+    case Description:
+    {
+      // first find out the longest entry name to be able to align the
+      // equal signs
+      std::size_t longest_name = 0;
+      for (boost::property_tree::ptree::const_iterator
+           p = current_section.begin();
+           p != current_section.end(); ++p)
+        if (is_parameter_node (p->second) == true)
+          longest_name = std::max (longest_name,
+                                   demangle(p->first).length());
+
+      // print entries one by one. make sure they are sorted by using
+      // the appropriate iterators
+      for (boost::property_tree::ptree::const_assoc_iterator
+           p = current_section.ordered_begin();
+           p != current_section.not_found(); ++p)
+        if (is_parameter_node (p->second) == true)
+          {
+            // print name and value
+            out << std::setw(overall_indent_level*2) << ""
+                << "set "
+                << demangle(p->first)
+                << std::setw(longest_name-demangle(p->first).length()+1) << " "
+                << " = ";
+
+            // print possible values:
+            const unsigned int pattern_index = p->second.get<unsigned int> ("pattern");
+            const std::string full_desc_str = patterns[pattern_index]->description (Patterns::PatternBase::Text);
+            const std::vector<std::string> description_str
+              = Utilities::break_text_into_lines (full_desc_str,
+                                                  78 - overall_indent_level*2 - 2, '|');
+            if (description_str.size() > 1)
+              {
+                out << '\n';
+                for (unsigned int i=0; i<description_str.size(); ++i)
+                  out << std::setw(overall_indent_level*2+6) << ""
+                      << description_str[i] << '\n';
+              }
+            else if (description_str.empty() == false)
+              out << "  " << description_str[0] << '\n';
+            else
+              out << '\n';
+
+            // if there is a documenting string, print it as well
+            if (p->second.get<std::string>("documentation").length() != 0)
+              out << std::setw(overall_indent_level*2 + longest_name + 10) << ""
+                  << "(" << p->second.get<std::string>("documentation") << ")"
+                  << '\n';
+          }
+
+      break;
+    }
+
+    default:
+      Assert (false, ExcNotImplemented());
+    }
+
+
+  // if there was text before and there are sections to come, put two
+  // newlines between the last entry and the first subsection
+  {
+    unsigned int n_parameters = 0;
+    unsigned int n_sections   = 0;
+    for (boost::property_tree::ptree::const_iterator
+         p = current_section.begin();
+         p != current_section.end(); ++p)
+      if (is_parameter_node (p->second) == true)
+        ++n_parameters;
+      else if (is_alias_node (p->second) == false)
+        ++n_sections;
+
+    if ((style != Description)
+        &&
+        (!(style & 128))
+        &&
+        (n_parameters != 0)
+        &&
+        (n_sections != 0))
+      out << "\n\n";
+  }
+
+  // now traverse subsections tree, in alphabetical order
+  for (boost::property_tree::ptree::const_assoc_iterator
+       p = current_section.ordered_begin();
+       p != current_section.not_found(); ++p)
+    if ((is_parameter_node (p->second) == false)
+        &&
+        (is_alias_node (p->second) == false))
+      {
+        // first print the subsection header
+        switch (style)
+          {
+          case Text:
+          case Description:
+          case ShortText:
+            out << std::setw(overall_indent_level*2) << ""
+                << "subsection " << demangle(p->first)
+                << '\n';
+            break;
+
+          case LaTeX:
+          {
+            out << '\n'
+                << "\\subsection{Parameters in section \\tt ";
+
+            // find the path to the current section so that we can
+            // print it in the \subsection{...} heading
+            for (unsigned int i=0; i<target_subsection_path.size(); ++i)
+              out << target_subsection_path[i] << "/";
+            out << demangle(p->first);
+
+            out << "}" << '\n';
+            out << "\\label{parameters:";
+            for (unsigned int i=0; i<target_subsection_path.size(); ++i)
+              out << mangle(target_subsection_path[i]) << "/";
+            out << p->first << "}";
+            out << '\n';
+
+            out << '\n';
+            break;
+          }
+
+          default:
+            Assert (false, ExcNotImplemented());
+          }
+
+        // then the contents of the subsection
+        const std::string subsection = demangle(p->first);
+        std::vector<std::string> directory_path = target_subsection_path;
+        directory_path.emplace_back (subsection);
+
+        recursively_print_parameters (directory_path, style,
+                                      overall_indent_level+1,
+                                      out);
+
+        switch (style)
+          {
+          case Text:
+            // write end of subsection. one blank line after each
+            // subsection
+            out << std::setw(overall_indent_level*2) << ""
+                << "end" << '\n'
+                << '\n';
+
+            // if this is a toplevel subsection, then have two
+            // newlines
+            if (overall_indent_level == 0)
+              out << '\n';
+
+            break;
+
+          case Description:
+            break;
+
+          case ShortText:
+            // write end of subsection.
+            out << std::setw(overall_indent_level*2) << ""
+                << "end" << '\n';
+            break;
+
+          case LaTeX:
+            break;
+
+          default:
+            Assert (false, ExcNotImplemented());
+          }
+      }
 }
 
 
