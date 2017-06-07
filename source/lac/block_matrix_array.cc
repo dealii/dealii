@@ -374,7 +374,7 @@ BlockTrianglePrecondition<number,BlockVectorType>::vmult_add
   BlockVectorType aux;
   aux.reinit(dst);
   vmult(aux, src);
-  dst.add(aux);
+  dst += aux;
 }
 
 

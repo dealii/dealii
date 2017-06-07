@@ -391,7 +391,7 @@ SolverQMRS<VectorType>::iterate(const MatrixType         &A,
       tau *= theta*psi;
 
       d.sadd(psi*theta_old, psi*alpha, p);
-      x.add(d);
+      x += d;
 
       print_vectors(step,x,v,d);
       // Step 5

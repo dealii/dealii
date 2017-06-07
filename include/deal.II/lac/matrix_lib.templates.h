@@ -115,7 +115,7 @@ MeanValueFilter::vmult_add(BlockVector<number> &dst,
     if (i == component)
       vmult_add(dst.block(i), src.block(i));
     else
-      dst.block(i).add(src.block(i));
+      dst.block(i)+=src.block(i);
 }
 
 

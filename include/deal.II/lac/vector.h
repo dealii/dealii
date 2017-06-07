@@ -641,16 +641,6 @@ public:
   void add (const Number s);
 
   /**
-   * Simple vector addition, equal to the <tt>operator +=</tt>.
-   *
-   * @deprecated Use the <tt>operator +=</tt> instead.
-   *
-   * @dealiiOperationIsMultithreaded
-   */
-  void add (const Vector<Number> &V) DEAL_II_DEPRECATED;
-
-
-  /**
    * Multiple addition of scaled vectors, i.e. <tt>*this += a*V+b*W</tt>.
    *
    * @dealiiOperationIsMultithreaded

@@ -612,8 +612,10 @@ template <typename Number>
 Vector<Number> &Vector<Number>::operator += (const Vector<Number> &v)
 {
   Assert (vec_size!=0, ExcEmptyObject());
+  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
-  add (v);
+  internal::VectorOperations::Vectorization_add_v<Number> vector_add(val, v.val);
+  internal::VectorOperations::parallel_for(vector_add,0,vec_size,thread_loop_partitioner);
   return *this;
 }
 
@@ -639,18 +641,6 @@ void Vector<Number>::add (const Number v)
   Assert (vec_size!=0, ExcEmptyObject());
 
   internal::VectorOperations::Vectorization_add_factor<Number> vector_add(val, v);
-  internal::VectorOperations::parallel_for(vector_add,0,vec_size,thread_loop_partitioner);
-}
-
-
-
-template <typename Number>
-void Vector<Number>::add (const Vector<Number> &v)
-{
-  Assert (vec_size!=0, ExcEmptyObject());
-  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
-
-  internal::VectorOperations::Vectorization_add_v<Number> vector_add(val, v.val);
   internal::VectorOperations::parallel_for(vector_add,0,vec_size,thread_loop_partitioner);
 }
 

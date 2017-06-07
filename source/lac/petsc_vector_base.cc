@@ -561,18 +561,6 @@ namespace PETScWrappers
 
 
   VectorBase::real_type
-  VectorBase::normalize () const
-  {
-    real_type d;
-    Assert (!has_ghost_elements(), ExcGhostsPresent());
-    const PetscErrorCode ierr = VecNormalize (vector, &d);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    return d;
-  }
-
-
-  VectorBase::real_type
   VectorBase::min ()  const
   {
     PetscInt  p;
@@ -598,65 +586,6 @@ namespace PETScWrappers
   }
 
 
-  VectorBase &
-  VectorBase::abs ()
-  {
-    Assert (!has_ghost_elements(), ExcGhostsPresent());
-
-    const PetscErrorCode ierr = VecAbs (vector);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    return *this;
-  }
-
-
-
-  VectorBase &
-  VectorBase::conjugate ()
-  {
-    Assert (!has_ghost_elements(), ExcGhostsPresent());
-
-    const PetscErrorCode ierr = VecConjugate (vector);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    return *this;
-  }
-
-
-
-  VectorBase &
-  VectorBase::mult ()
-  {
-    Assert (!has_ghost_elements(), ExcGhostsPresent());
-
-    const PetscErrorCode ierr = VecPointwiseMult (vector,vector,vector);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    return *this;
-  }
-
-
-  VectorBase &
-  VectorBase::mult (const VectorBase &v)
-  {
-    Assert (!has_ghost_elements(), ExcGhostsPresent());
-    const PetscErrorCode ierr = VecPointwiseMult (vector,vector,v);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    return *this;
-  }
-
-
-  VectorBase &
-  VectorBase::mult (const VectorBase &u,
-                    const VectorBase &v)
-  {
-    Assert (!has_ghost_elements(), ExcGhostsPresent());
-    const PetscErrorCode ierr = VecPointwiseMult (vector,u,v);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    return *this;
-  }
 
   bool
   VectorBase::all_zero () const
@@ -806,14 +735,6 @@ namespace PETScWrappers
 
     const PetscErrorCode ierr = VecShift (vector, s);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-  }
-
-
-
-  void
-  VectorBase::add (const VectorBase &v)
-  {
-    *this += v;
   }
 
 
