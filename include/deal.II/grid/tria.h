@@ -817,19 +817,25 @@ namespace internal
  * <h3>Material and boundary information</h3>
  *
  * Each cell, face or edge stores information denoting the material or the
- * part of the boundary that an object belongs to. The material of a cell may
- * be used during matrix generation in order to implement different
- * coefficients in different parts of the domain. It is not used by functions
- * of the grid and dof handling libraries.
+ * part of the boundary that an object belongs to. The material id of a cell
+ * is typically used to identify which cells belong to a particular part of
+ * the domain, e.g., when you have different materials (steel, concrete, wood)
+ * that are all part of the same domain. One would then usually query the
+ * material id associated with a cell during assembly of the bilinear form,
+ * and use it to determine (e.g., by table lookup, or a sequence of if-else
+ * statements) what the correct material coefficients would be for that cell.
+ * See also @ref GlossMaterialId "this glossary entry".
  *
  * This material_id may be set upon construction of a triangulation (through
  * the CellData data structure), or later through use of cell iterators. For a
  * typical use of this functionality, see the step-28 tutorial program. The
  * functions of the GridGenerator namespace typically set the material ID of
- * all cells to zero. When reading a triangulation, the material id must be
- * specified in the input file (UCD format) or is otherwise set to zero.
- * Material IDs are inherited by child cells from their parent upon mesh
- * refinement.
+ * all cells to zero. When reading a triangulation through the GridIn class,
+ * different input file formats have different conventions, but typically
+ * either explicitly specify the material id, or if they don't, then GridIn
+ * simply sets them to zero. Because the material of a cell is intended
+ * to pertain to a particular region of the domain, material ids are inherited
+ * by child cells from their parent upon mesh refinement.
  *
  * Boundary indicators on lower dimensional objects (these have no material
  * id) indicate the number of a boundary component. These are used for two
