@@ -300,28 +300,62 @@ get_new_point (const std::vector<Point<spacedim> > &vertices,
 // CylindricalManifold
 // ============================================================
 
-template <int dim, int spacedim>
-CylindricalManifold<dim,spacedim>::CylindricalManifold(const unsigned int axis,
-                                                       const double tolerance) :
-  direction (Point<spacedim>::unit_vector(axis)),
-  point_on_axis (Point<spacedim>()),
-  tolerance(tolerance)
+namespace
 {
-  Assert(spacedim > 1, ExcImpossibleInDim(1));
+  // helper function to compute a vector orthogonal to a given one.
+  template <int spacedim>
+  Point<spacedim>
+  compute_normal(const Tensor<1,spacedim> &vector)
+  {
+    AssertThrow(vector.norm() != 0.,
+                ExcMessage("The direction parameter must not be zero!"));
+    Point<3> normal;
+    if (std::abs(vector[0]) >= std::abs(vector[1])
+        && std::abs(vector[0]) >= std::abs(vector[2]))
+      {
+        normal[1]=-1.;
+        normal[2]=-1.;
+        normal[0]=(vector[1]+vector[2])/vector[0];
+      }
+    else if (std::abs(vector[1]) >= std::abs(vector[0])
+             && std::abs(vector[1]) >= std::abs(vector[2]))
+      {
+        normal[0]=-1.;
+        normal[2]=-1.;
+        normal[1]=(vector[0]+vector[2])/vector[1];
+      }
+    else
+      {
+        normal[0]=-1.;
+        normal[1]=-1.;
+        normal[2]=(vector[0]+vector[1])/vector[2];
+      }
+    return normal;
+  }
 }
 
 
-template <int dim, int spacedim>
-CylindricalManifold<dim,spacedim>::CylindricalManifold(const Point<spacedim> &direction,
-                                                       const Point<spacedim> &point_on_axis,
-                                                       const double tolerance) :
-  direction (direction),
-  point_on_axis (point_on_axis),
-  tolerance(tolerance)
-{
-  Assert(spacedim > 2, ExcImpossibleInDim(spacedim));
-}
 
+template <int dim, int spacedim>
+CylindricalManifold<dim, spacedim>::CylindricalManifold(const unsigned int axis,
+                                                        const double tolerance) :
+  CylindricalManifold<dim, spacedim>(Point<3>::unit_vector(axis),
+                                     Point<3>(),
+                                     tolerance)
+{}
+
+
+
+template <int dim, int spacedim>
+CylindricalManifold<dim, spacedim>::CylindricalManifold(const Point<spacedim> &direction_,
+                                                        const Point<spacedim> &point_on_axis_,
+                                                        const double tolerance) :
+  ChartManifold<dim,3,3>(Tensor<1,3>({0,2.*numbers::PI,0})),
+              normal_direction(compute_normal(direction_)),
+              direction (direction_/direction_.norm()),
+              point_on_axis (point_on_axis_),
+              tolerance(tolerance)
+{}
 
 
 
@@ -331,36 +365,76 @@ CylindricalManifold<dim,spacedim>::
 get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
                const std::vector<double>           &weights) const
 {
-  // compute a proposed new point
-  const Point<spacedim> middle = flat_manifold.get_new_point(surrounding_points,
-                                                             weights);
-
-  double radius = 0;
-  Tensor<1,spacedim> on_plane;
-
+  // First check if the average in space lies on the axis.
+  Point<spacedim> middle;
+  double average_length = 0.;
   for (unsigned int i=0; i<surrounding_points.size(); ++i)
     {
-      on_plane = surrounding_points[i]-point_on_axis;
-      on_plane = on_plane - (on_plane*direction) * direction;
-      radius += weights[i]*on_plane.norm();
+      middle += surrounding_points[i]*weights[i];
+      average_length += surrounding_points[i].square()*weights[i];
     }
+  middle -= point_on_axis;
+  const double lambda = middle*direction;
 
-  // we then have to project this point out to the given radius from
-  // the axis. to this end, we have to take into account the offset
-  // point_on_axis and the direction of the axis
-  const Tensor<1,spacedim> vector_from_axis = (middle-point_on_axis) -
-                                              ((middle-point_on_axis) * direction) * direction;
-
-  // scale it to the desired length and put everything back together,
-  // unless we have a point on the axis
-  if (vector_from_axis.norm() <= tolerance * middle.norm())
-    return middle;
-
-  else
-    return Point<spacedim>((vector_from_axis / vector_from_axis.norm() * radius +
-                            ((middle-point_on_axis) * direction) * direction +
-                            point_on_axis));
+  if ((middle-direction*lambda).square() < tolerance*average_length)
+    return Point<spacedim>()+direction*lambda;
+  else // If not, using the ChartManifold should yield valid results.
+    return ChartManifold<dim, spacedim, 3>::get_new_point(surrounding_points,
+                                                          weights);
 }
+
+
+
+template <int dim, int spacedim>
+Point<3>
+CylindricalManifold<dim, spacedim>::pull_back(const Point<spacedim> &space_point) const
+{
+  // First find the projection of the given point to the axis.
+  const Tensor<1,3> normalized_point = space_point-point_on_axis;
+  const double lambda = normalized_point*direction;
+  const Point<3> projection = point_on_axis + direction*lambda;
+  const Tensor<1,3> p_diff = space_point - projection;
+
+  // Then compute the angle between the projection direction and
+  // another vector orthogonal to the direction vector.
+  const double dot = normal_direction*p_diff;
+  const double det = direction*cross_product_3d(normal_direction, p_diff);
+  const double phi = std::atan2(det, dot);
+
+  // Return distance from the axis, angle and signed distance on the axis.
+  return Point<3> (p_diff.norm(), phi, lambda);
+}
+
+
+
+template <int dim, int spacedim>
+Point<spacedim>
+CylindricalManifold<dim, spacedim>::push_forward(const Point<3> &chart_point) const
+{
+  // Rotate the orthogonal direction by the given angle.
+  // Formula from Section 5.2 in
+  // http://inside.mines.edu/fs_home/gmurray/ArbitraryAxisRotation/
+  // simplified assuming normal_direction and direction are orthogonal.
+  const double sine = std::sin(chart_point(1));
+  const double cosine = std::cos(chart_point(1));
+  const double x = normal_direction[0]*cosine
+                   -sine*(direction[2]*normal_direction[1]
+                          -direction[1]*normal_direction[2]);
+  const double y = normal_direction[1]*cosine
+                   -sine*(direction[0]*normal_direction[2]
+                          -direction[2]*normal_direction[0]);
+  const double z = normal_direction[2]*cosine
+                   -sine*(direction[1]*normal_direction[0]
+                          -direction[0]*normal_direction[1]);
+
+  // Rescale according to the given distance from the axis.
+  Point<3> intermediate (x,y,z);
+  intermediate *= chart_point(0)/std::sqrt(intermediate.square());
+
+  // Finally, put everything together.
+  return intermediate+point_on_axis+direction*chart_point(2);
+}
+
 
 
 // ============================================================

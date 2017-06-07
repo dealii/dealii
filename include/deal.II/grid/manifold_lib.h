@@ -251,15 +251,15 @@ public:
  * its axis and a point located on the axis.
  *
  * This class was developed to be used in conjunction with the @p cylinder or
- * @p cylinder_shell functions of GridGenerator. This function will throw an
- * exception whenever spacedim is not equal to three.
+ * @p cylinder_shell functions of GridGenerator. This function will throw a
+ * compile time exception whenever spacedim is not equal to three.
  *
  * @ingroup manifold
  *
- * @author Luca Heltai, 2014
+ * @author Luca Heltai, Daniel Arndt, 2014, 2017
  */
 template <int dim, int spacedim = dim>
-class CylindricalManifold : public Manifold<dim,spacedim>
+class CylindricalManifold : public ChartManifold<dim,spacedim,3>
 {
 public:
   /**
@@ -283,18 +283,39 @@ public:
                        const double tolerance = 1e-10);
 
   /**
+   * Compute the Cartesian coordinates for a point given in cylindrical
+   * coordinates.
+   */
+  virtual Point<3>
+  pull_back(const Point<spacedim> &space_point) const override;
+
+  /**
+   * Compute the cylindrical coordinates $(r, \phi, \lambda)$ for the given
+   * point where $r$ denotes the distance from the axis,
+   * $\phi$ the angle between the given point and the computed normal
+   * direction and $\lambda$ the axial position.
+   */
+  virtual Point<spacedim>
+  push_forward(const Point<3> &chart_point) const override;
+
+  /**
    * Compute new points on the CylindricalManifold. See the documentation of
    * the base class for a detailed description of what this function does.
    */
   virtual Point<spacedim>
   get_new_point(const std::vector<Point<spacedim> > &surrounding_points,
-                const std::vector<double>           &weights) const;
+                const std::vector<double>           &weights) const override;
 
 protected:
   /**
+   * A vector orthogonal to direcetion.
+   */
+  const Tensor<1,spacedim> normal_direction;
+
+  /**
    * The direction vector of the axis.
    */
-  const Point<spacedim> direction;
+  const Tensor<1,spacedim> direction;
 
   /**
    * An arbitrary point on the axis.
@@ -303,14 +324,17 @@ protected:
 
 private:
   /**
-   * Helper FlatManifold to compute tentative midpoints.
-   */
-  FlatManifold<dim,spacedim> flat_manifold;
-
-  /**
    * Relative tolerance to measure zero distances.
    */
   double tolerance;
+
+  // explicitly check for sensible template arguments, but not on windows
+  // because MSVC creates bogus warnings during normal compilation
+#ifndef DEAL_II_MSVC
+  static_assert (spacedim==3,
+                 "CylindricalManifold can only be used for spacedim==3!");
+#endif
+
 };
 
 

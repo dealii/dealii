@@ -150,7 +150,28 @@ void create_triangulation(Triangulation<3> &tria)
     }
 }
 
+template <int dim>
+struct ManifoldWrapper
+{
+  Manifold<dim> *operator()(const Point<dim> &direction,
+                            const Point<dim> &center ) const;
+};
 
+template <>
+Manifold<2> *
+ManifoldWrapper<2>::operator()(const Point<2> &/*direction*/,
+                               const Point<2> &center ) const
+{
+  return new SphericalManifold<2>(center);
+}
+
+template <>
+Manifold<3> *
+ManifoldWrapper<3>::operator()(const Point<3> &direction,
+                               const Point<3> &center ) const
+{
+  return new CylindricalManifold<3>(direction, center);
+}
 
 template <int dim>
 void test()
@@ -162,8 +183,7 @@ void test()
   direction[dim-1] = 1.;
 
   std::shared_ptr<Manifold<dim> > cylinder_manifold
-  (dim == 2 ? static_cast<Manifold<dim>*>(new SphericalManifold<dim>(center)) :
-   static_cast<Manifold<dim>*>(new CylindricalManifold<dim>(direction, center)));
+  (ManifoldWrapper<dim>()(direction, center));
   Triangulation<dim> tria;
   create_triangulation(tria);
   tria.set_manifold(MANIFOLD_ID, *cylinder_manifold);
