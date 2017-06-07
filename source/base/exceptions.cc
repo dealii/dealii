@@ -421,14 +421,30 @@ namespace deal_II_exceptions
           // if the others don't recognize this, or at the very least
           // delay their termination until they realize that their
           // communication with the job that died times out.
+          //
+          // Unlike std::abort(), MPI_Abort() unfortunately doesn't break when
+          // running inside a debugger like GDB, so only use this strategy if
+          // absolutely necessary and inform the user how to use a debugger.
 #ifdef DEAL_II_WITH_MPI
           int is_initialized;
           MPI_Initialized(&is_initialized);
           if (is_initialized)
-            MPI_Abort (MPI_COMM_WORLD,
-                       /* return code = */ 255);
-          else
-            std::abort ();
+            {
+              const unsigned int n_proc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+              if (n_proc>1)
+                {
+                  std::cerr << "Calling MPI_Abort now.\n"
+                            << "To break execution in a GDB session, execute 'break MPI_Abort' before "
+                            << "running. You can also put the following into your ~/.gdbinit:\n"
+                            << "  set breakpoint pending on\n"
+                            << "  break MPI_Abort\n"
+                            << "  set breakpoint pending auto" << std::endl;
+
+                  MPI_Abort (MPI_COMM_WORLD,
+                             /* return code = */ 255);
+                }
+            }
+          std::abort ();
 #else
           std::abort();
 #endif
