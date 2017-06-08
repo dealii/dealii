@@ -114,8 +114,7 @@ void dim3_parallelepiped_grid ()
 int main ()
 {
 
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.precision(3);
 
   dim2_grid ();

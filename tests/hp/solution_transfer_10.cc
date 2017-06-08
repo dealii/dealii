@@ -16,6 +16,7 @@
 // A test by Krzysztof Bzowski that verifies something in SolutionTransfer
 // that didn't work for a few days
 
+#include "../tests.h"
 #include <deal.II/base/logstream.h>
 
 #include <deal.II/grid/tria.h>
@@ -40,8 +41,7 @@ using namespace dealii;
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.e-10);
 
   Triangulation<2> triangulation(Triangulation<2>::none);

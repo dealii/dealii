@@ -26,8 +26,7 @@
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   FullMatrix<double> A(5,5);
   unsigned int k=0;

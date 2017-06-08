@@ -54,8 +54,7 @@ void print_dofs (const hp::DoFHandler<2>::active_cell_iterator &cell)
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.e-10);
 
   Triangulation<dim>   triangulation;

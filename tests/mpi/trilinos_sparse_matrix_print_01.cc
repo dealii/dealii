@@ -93,8 +93,7 @@ int main (int argc, char **argv)
   // in parallel
   if ((n_procs == 1) || (myid == 1))
     {
-      std::ofstream logfile("output");
-      deallog.attach(logfile);
+      initlog();
       deallog << std::setprecision(4);
       deallog.threshold_double(1.e-10);
 

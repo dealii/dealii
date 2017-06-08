@@ -36,8 +36,7 @@ using namespace OpenCASCADE;
 
 int main ()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   // A unit circle
   gp_Dir z_axis(0.,0.,1.);

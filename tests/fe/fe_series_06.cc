@@ -70,8 +70,7 @@ void test_2d ()
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.e-10);
 
   test_2d();

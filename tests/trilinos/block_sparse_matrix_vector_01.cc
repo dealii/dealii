@@ -90,8 +90,7 @@ void test (const unsigned int size_1, const unsigned int size_2)
 
 int main (int argc, char **argv)
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.e-10);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());

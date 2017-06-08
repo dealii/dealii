@@ -17,6 +17,7 @@
 // test Utilities::trim. Note that deallog does not like being given '\n's in
 // the middle of strings, so the output file is almost empty.
 
+#include "../tests.h"
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 
@@ -49,8 +50,7 @@ void test ()
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.e-10);
 
   test ();

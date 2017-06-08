@@ -241,8 +241,7 @@ void test(const FiniteElement<dim> &fe)
 
 int main ()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog << std::setprecision (5);
   deallog.depth_console (0);
 

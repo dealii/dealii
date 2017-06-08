@@ -278,8 +278,7 @@ void test_fe_datas()
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.e-10);
 //  deallog.log_execution_time(true);
 //  deallog.log_time_differences(true);

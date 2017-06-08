@@ -22,8 +22,7 @@
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.0e-10);
 
   size_t m = 2, n = 3;

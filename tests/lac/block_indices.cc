@@ -55,8 +55,7 @@ void test (const BlockIndices &idx)
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   BlockIndices bi0;
   deallog << "empty: " << bi0 << std::endl;

@@ -16,6 +16,7 @@
 
 // ParameterHandler could not handle files with DOS line endings.
 
+#include "../tests.h"
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/parameter_handler.h>
 #include <fstream>
@@ -54,8 +55,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 

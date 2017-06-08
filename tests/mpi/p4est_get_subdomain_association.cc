@@ -85,8 +85,7 @@ int main(int argc, char *argv[])
 
   if (myid == 1)
     {
-      std::ofstream logfile("output");
-      deallog.attach(logfile);
+      initlog();
       deallog.threshold_double(1.e-10);
 
       deallog.push("2d");

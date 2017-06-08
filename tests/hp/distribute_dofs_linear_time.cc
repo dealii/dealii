@@ -201,8 +201,7 @@ void QuadraticTimeCircle<dim>::run()
 
 int main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   static const int dim = 2;
   static const unsigned int n_cycles = 6;

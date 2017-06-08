@@ -88,8 +88,7 @@ void check (const unsigned int testcase)
 
 int main ()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.e-10);
 
   for (unsigned int testcase=1; testcase<=2; ++testcase)

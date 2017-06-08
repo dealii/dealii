@@ -25,8 +25,7 @@
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   Vector<double> u(5);
   Vector<double> v(5);

@@ -33,8 +33,7 @@ void check_all_zero()
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   check_all_zero<float>();
   check_all_zero<double>();

@@ -53,8 +53,7 @@ void save_mesh(const Triangulation<dim,spacedim> &tria)
 
 int main ()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   Triangulation<2,3> triangulation;
 

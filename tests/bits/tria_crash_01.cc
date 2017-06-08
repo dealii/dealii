@@ -39,8 +39,7 @@ bool predicate (const Point<3> &p,
 
 int main ()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   const unsigned int dim=3;
   Triangulation<dim> tria;

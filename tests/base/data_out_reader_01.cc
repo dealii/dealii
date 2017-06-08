@@ -74,8 +74,7 @@ void check()
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   check<1,1>();
   check<1,2>();

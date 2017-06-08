@@ -16,6 +16,7 @@
 
 // test Arpack by calculating eigenvalues of Laplace matrix.
 
+#include "../tests.h"
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -123,8 +124,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.e-9);
 
   test<2> ();

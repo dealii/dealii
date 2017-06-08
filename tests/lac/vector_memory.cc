@@ -71,8 +71,7 @@ test_stat()
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.e-10);
   deal_II_exceptions::disable_abort_on_exception();
 

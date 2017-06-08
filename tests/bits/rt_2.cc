@@ -134,8 +134,7 @@ void evaluate_normal (DoFHandler<2>  &dof_handler,
 
 int main ()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.e-10);
 
   Triangulation<2> tria_test;

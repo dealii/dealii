@@ -54,8 +54,7 @@ void test (const FiniteElement<dim> &fe)
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.e-10);
 
   test(FE_Q<1>(2));

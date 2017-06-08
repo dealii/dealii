@@ -75,8 +75,7 @@ int main()
   exact_monomials[31] = 0.3170611116013786;
 
 
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.e-10);
   deallog << std::setprecision(8);
 

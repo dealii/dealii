@@ -17,6 +17,7 @@
 // check VectorTools::project_parallel() for matrix-free quadrature data for
 // FE_Q on a mesh with hanging nodes.
 
+#include "../tests.h"
 #include "project_parallel_qpmf_common.h"
 
 template <int dim>
@@ -32,8 +33,7 @@ int main(int argc, char *argv[])
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv,
                                                        numbers::invalid_unsigned_int);
 
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
   deallog.threshold_double(1.e-10);
 
   test<2>();

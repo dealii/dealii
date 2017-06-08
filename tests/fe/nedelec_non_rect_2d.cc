@@ -33,6 +33,7 @@
 // The domain is a distorted quad after 1 refinement. The distortion is
 // performed by GridTools::distort_random.
 
+#include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 
@@ -307,8 +308,7 @@ int main ()
 {
   const unsigned int dim(2);
 
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   for (unsigned int p=0; p<3; ++p)
     {
