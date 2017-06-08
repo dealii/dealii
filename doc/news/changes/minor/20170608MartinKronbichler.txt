@@ -1,0 +1,4 @@
+Fixed: FullMatrix::print_formatted() and LAPACKFullMatrix::print_formatted
+would previously print NaN values as zero. This is now fixed.
+<br>
+(Simon Sticko, Martin Kronbichler, 2017/06/08)
