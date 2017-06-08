@@ -1,0 +1,7 @@
+
+DEAL::Using print
+nan  inf  
+0.0  -inf 
+DEAL::Using print_formatted
+nan        inf        
+0          -inf       

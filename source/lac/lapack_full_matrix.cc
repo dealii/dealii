@@ -1010,7 +1010,11 @@ LAPACKFullMatrix<number>::print_formatted (
   for (size_type i=0; i<this->n_rows(); ++i)
     {
       for (size_type j=0; j<this->n_cols(); ++j)
-        if (std::fabs(this->el(i,j)) > threshold)
+        // we might have complex numbers, so use abs also to check for nan
+        // since there is no isnan on complex numbers
+        if (std::isnan(std::abs((*this)(i,j))))
+          out << std::setw(width) << (*this)(i,j) << ' ';
+        else if (std::fabs(this->el(i,j)) > threshold)
           out << std::setw(width)
               << this->el(i,j) * denominator << ' ';
         else
