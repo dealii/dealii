@@ -1,0 +1,4 @@
+Changed: The ParameterHandler::print_parameters() function is now 
+@p const, as one would expect it to be.
+<br>
+(Wolfgang Bangerth, 2017/06/07)

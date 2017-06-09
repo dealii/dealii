@@ -2060,8 +2060,9 @@ public:
    * \printindex[prmindexfull]
    * @endcode
    */
-  std::ostream &print_parameters (std::ostream      &out,
-                                  const OutputStyle  style);
+  std::ostream &
+  print_parameters (std::ostream      &out,
+                    const OutputStyle  style) const;
 
   /**
    * Print out the parameters of the present subsection as given by the
@@ -2246,6 +2247,11 @@ private:
   static const char path_separator = '.';
 
   /**
+   * Path of presently selected subsections; empty list means top level
+   */
+  std::vector<std::string> subsection_path;
+
+  /**
    * The complete tree of sections and entries. See the general documentation
    * of this class for a description how data is stored in this variable.
    *
@@ -2282,14 +2288,22 @@ private:
   static std::string demangle (const std::string &s);
 
   /**
-   * Path of presently selected subsections; empty list means top level
+   * Given a list of directories and subdirectories that identify
+   * a particular place in the tree, return the string that identifies
+   * this place in the way the BOOST property tree libraries likes
+   * to identify things.
    */
-  std::vector<std::string> subsection_path;
+  static
+  std::string
+  collate_path_string (const std::vector<std::string> &subsection_path);
 
   /**
    * Return the string that identifies the current path into the property
    * tree. This is only a path, i.e. it is not terminated by the
    * path_separator character.
+   *
+   * This function simply calls collate_path_string() with
+   * @p subsection_path as argument
    */
   std::string get_current_path () const;
 
@@ -2314,6 +2328,22 @@ private:
   void scan_line (std::string         line,
                   const std::string  &input_filename,
                   const unsigned int  current_line_n);
+
+  /**
+   * Print out the parameters of the subsection given by the
+   * @p target_subsection_path argument, as well as all subsections
+   * within it recursively. This function is called from the
+   * print_parameters() function, and is implemented for all @p style
+   * arguments other than XML and JSON (where we can output the
+   * entire set of parameters via BOOST functions). The @p indent_level
+   * argument indicates how many spaces the output should be indented,
+   * so that subsections properly nest inside the output of higher
+   * sections.
+   */
+  void recursively_print_parameters (const std::vector<std::string> &target_subsection_path,
+                                     const OutputStyle               style,
+                                     const unsigned int              indent_level,
+                                     std::ostream                   &out) const;
 
   friend class MultipleParameterLoop;
 };
