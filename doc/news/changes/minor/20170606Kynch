@@ -1,0 +1,5 @@
+New: Added a new polynomial class IntegratedLegendreSZ. This implements
+the integrated Legendre polynomials described in the 2006 PhD thesis
+of Sabine Zaglmayr.
+<br>
+(Ross Kynch, 2017/06/06)
