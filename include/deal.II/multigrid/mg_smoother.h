@@ -227,7 +227,18 @@ namespace mg
 
     /**
      * The apply variant of smoothing, setting the vector u to zero before
-     * calling the smooth function.
+     * calling the smooth function. This function is equivalent to the
+     * following code
+     * @code
+     * u = 0;
+     * smooth(level, u, rhs);
+     * @endcode
+     *
+     * In the multigrid preconditioner interfaces, the apply() method is used for
+     * the pre-smoothing operation because the previous content in the solution
+     * vector needs to be overwritten for a new incoming residual. On the other
+     * hand, all subsequent operations need to smooth the content already present
+     * in the vector @p u given the right hand side, which is done by smooth().
      */
     virtual void apply (const unsigned int level,
                         VectorType         &u,
@@ -352,7 +363,18 @@ public:
 
   /**
    * The apply variant of smoothing, setting the vector u to zero before
-   * calling the smooth function.
+   * calling the smooth function. This function is equivalent to the
+   * following code
+   * @code
+   * u = 0;
+   * smooth(level, u, rhs);
+   * @endcode
+   *
+   * In the multigrid preconditioner interfaces, the apply() method is used for
+   * the pre-smoothing operation because the previous content in the solution
+   * vector needs to be overwritten for a new incoming residual. On the other
+   * hand, all subsequent operations need to smooth the content already present
+   * in the vector @p u given the right hand side, which is done by smooth().
    */
   virtual void apply (const unsigned int level,
                       VectorType         &u,
@@ -493,7 +515,18 @@ public:
 
   /**
    * The apply variant of smoothing, setting the vector u to zero before
-   * calling the smooth function.
+   * calling the smooth function. This function is equivalent to the
+   * following code
+   * @code
+   * u = 0;
+   * smooth(level, u, rhs);
+   * @endcode
+   *
+   * In the multigrid preconditioner interfaces, the apply() method is used for
+   * the pre-smoothing operation because the previous content in the solution
+   * vector needs to be overwritten for a new incoming residual. On the other
+   * hand, all subsequent operations need to smooth the content already present
+   * in the vector @p u given the right hand side, which is done by smooth().
    */
   virtual void apply (const unsigned int level,
                       VectorType         &u,
