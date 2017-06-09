@@ -35,9 +35,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int, int> class FEValuesBase;
-
-
 namespace Exceptions
 {
   /**
@@ -875,11 +872,99 @@ protected:
    */
   template <class, int, int>
   friend class DataOut_DoFData;
+private:
+  /**
+   * Common function called by the four public add_data_vector methods.
+   */
+  template <class VectorType>
+  void
+  add_data_vector_internal
+  (const DoFHandlerType           *dof_handler,
+   const VectorType               &data,
+   const std::vector<std::string> &names,
+   const DataVectorType            type,
+   const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation,
+   const bool                      deduce_output_names);
 };
 
 
 
 // -------------------- template and inline functions ------------------------
+template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <typename VectorType>
+void
+DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
+add_data_vector
+(const VectorType                         &vec,
+ const std::string                        &name,
+ const DataVectorType                      type,
+ const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
+{
+  Assert (triangulation != nullptr, Exceptions::DataOut::ExcNoTriangulationSelected ());
+  std::vector<std::string> names(1, name);
+  add_data_vector_internal (dofs, vec, names, type, data_component_interpretation, true);
+}
+
+
+
+template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <typename VectorType>
+void
+DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
+add_data_vector
+(const VectorType                         &vec,
+ const std::vector<std::string>           &names,
+ const DataVectorType                      type,
+ const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
+{
+  Assert (triangulation != nullptr, Exceptions::DataOut::ExcNoTriangulationSelected ());
+  add_data_vector_internal(dofs, vec, names, type, data_component_interpretation, false);
+}
+
+
+
+template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <typename VectorType>
+void
+DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
+add_data_vector
+(const DoFHandlerType           &dof_handler,
+ const VectorType               &data,
+ const std::string              &name,
+ const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
+{
+  std::vector<std::string> names(1, name);
+  add_data_vector_internal (&dof_handler, data, names, type_dof_data, data_component_interpretation, true);
+}
+
+
+
+template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <typename VectorType>
+void
+DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
+add_data_vector
+(const DoFHandlerType           &dof_handler,
+ const VectorType               &data,
+ const std::vector<std::string> &names,
+ const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
+{
+  add_data_vector_internal(&dof_handler, data, names, type_dof_data, data_component_interpretation, false);
+}
+
+
+
+template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <typename VectorType>
+void
+DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
+add_data_vector (const VectorType                       &vec,
+                 const DataPostprocessor<DoFHandlerType::space_dimension> &data_postprocessor)
+{
+  Assert (dofs != nullptr, Exceptions::DataOut::ExcNoDoFHandlerSelected ());
+  add_data_vector(*dofs, vec, data_postprocessor);
+}
+
 
 
 template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
