@@ -32,7 +32,10 @@ DEAL_II_NAMESPACE_OPEN
 template <int, int> class Triangulation;
 
 /**
- * A class to represent a unique ID for a cell in a Triangulation.  This class
+ * A class to represent a unique ID for a cell in a Triangulation. It is
+ * returned by <tt>cell->id()</tt> if <tt>cell</tt> is a cell iterator.
+ *
+ * This class
  * stores the index of the coarse cell from which a cell is descendant,
  * together with information on how to reach the cell from that coarse cell
  * (i.e., which child index to take on each level when moving from one cell to
