@@ -32,6 +32,8 @@ shift 2
 
 # Ensure uniform sorting for pathname expansion
 export LC_ALL=C
+# Prevent OpenMP from creating additional threads
+export OMP_NUM_THREADS=2
 
 case $STAGE in
   run)
