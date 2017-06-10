@@ -1,0 +1,21 @@
+
+42xxxxxxxxxxxxx
+Listing of Parameters:
+
+set int1  =   An integer n such that -2147483648 <= n <= 2147483647
+              (doc 1)
+set int2  =   An integer n such that -2147483648 <= n <= 2147483647
+              (doc 2)
+subsection Testing%testing
+  set double+double  =   A floating point number v such that -MAX_DOUBLE <= v <= MAX_DOUBLE
+                         (docs 3)
+  set int*int        =   An integer n such that -2147483648 <= n <= 2147483647
+  set string&list    =   Any string
+                         (docs 1)
+subsection ss1
+  set double 1  =   A floating point number v such that -MAX_DOUBLE <= v <= MAX_DOUBLE
+                    (doc 3)
+  subsection ss2
+    set double 2  =   A floating point number v such that -MAX_DOUBLE <= v <= MAX_DOUBLE
+                      (doc 4)
+42xxxxxxxxxxxxx
